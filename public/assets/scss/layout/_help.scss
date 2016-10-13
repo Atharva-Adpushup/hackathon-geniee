@@ -1,0 +1,36 @@
+.helpInsert 
+{
+	.row 
+	{
+		border-bottom: 1px solid $borderColor;
+  	padding: $HEMPadTB 0;
+  	margin: 0 -5px 10px;
+  	h5.helpHead
+  	{
+  		font-weight: bold;
+  		font-size: 15px;
+  		color: #555555;
+  		margin-bottom: 8px;
+  	}
+  	p 
+  	{
+  		font-size: 11px;
+  		line-height: 17px;
+  	}
+  	i 
+  	{
+  		background: #d3d2d2;
+  		height: 43px;
+  		width: 43px;
+  		border-radius:50%;
+  		text-align: center;
+  		color: #fff;
+  		font-size: 17px;
+  		padding-top: 14px;
+  	}
+    &:last-child 
+    {
+      border-bottom: 0;
+    }
+	}
+}

@@ -1,0 +1,233 @@
+
+._ap_modal 
+{
+	.modal-dialog 
+	{
+		@include box-shadow1(0, 2px, 26px, 0, rgba(0, 0, 0, .3), 0, 0, 0, 1px, rgba(0, 0, 0, .1), false);	
+		@include border-radius($MBorderRadius);	
+		.modal-content 
+		{
+			@include border-radius($MBorderRadius);
+			box-shadow: none;
+			border:none;
+			.modal-header
+			{
+				@extend modalHeader;
+				padding: 12px 15px;
+				h4 
+				{
+					font-size: 18px;
+					font-weight: 500;
+				}
+				.close 
+				{
+					@extend closeMDDg;
+					&:hover, &:focus 
+					{
+						@extend closeMDDghover;
+					}
+				}
+			}
+			.modal-body
+			{	
+				padding: 10px $MLogoBodyPadding $MLogoBodyPadding;
+				font-size: 14px;
+				h6 
+				{
+					font-size: $MLogotxtSize;
+					margin-bottom: 30px;
+					text-align: center;
+				}
+			}
+			.modal-footer 
+			{
+				background: #f6f7f8;
+				border:0;
+				margin: 0;
+				padding: 15px 20px;
+				@include border-radius-separate(0, 0, $MBorderRadius, $MBorderRadius);
+				&.modalfooter-btn
+				{
+					padding: 0;
+					.btn-red {
+						@include border-radius(0);
+						padding: 10px;
+						margin: 0;
+					}
+				}	
+				&.codeEditorFooter 
+				{
+					border-top: 1px solid $borderColor;
+					padding: 10px 0;
+					text-align: center;
+				}		
+			}
+			.cm-s-solarized
+			{
+				.CodeMirror-gutters
+				{
+					border: none;
+					.CodeMirror-linenumbers 
+					{
+						@include box-shadow(0, 0, 6px, 0, rgba(0,0,0,0.2), $inset: false);
+						border-right:1px solid $borderColor;
+					}
+				}
+				&.CodeMirror
+				{
+					@include box-shadow(0, 0, 6px, 0, rgba(0,0,0,0.2), $inset: true);
+				}
+			}
+		}
+	}
+}
+	
+
+._ap_modal_logo 
+{
+	.modal-dialog 
+	{
+		@include box-shadow1(0, 2px, 26px, 0, rgba(0, 0, 0, .3), 0, 0, 0, 1px, rgba(0, 0, 0, .1), false);	
+		@include border-radius($MBorderRadius);	
+		.modal-content 
+		{
+			@include border-radius($MBorderRadius);
+			box-shadow: none;
+			background: url("../images/adpushupbg.png") no-repeat -33px -24px $whiteColor;
+			min-height: $MLogoMinHeight;
+			overflow: hidden;
+			.modal-title 
+			{
+				display: none;
+			}
+			.modal-body 
+			{
+				padding: 0 $MLogoBodyPadding $MLogoBodyPadding $MLogoPaddingL;
+				h4 
+				{
+					font-size: $MLogoHeadSize;
+					margin-bottom: $MH4FontSize;
+					&.nextsmall
+					{
+						margin-bottom: 15px;
+					}
+				}
+				h4+small 
+				{
+					font-size: 12px;
+				}
+				small+.platformrow {
+					margin-top: 20px;
+				}
+				p 
+				{
+					font-size: $MPFontSize;
+				}
+				.btnrow 
+				{
+					margin: 10px 0;
+					padding: $MButtonRowPadding;
+				}
+				.platformrow 
+				{
+					text-align: center;
+					cursor: pointer;
+					margin: 0;
+					padding: 10px 0 0 0;
+					i 
+					{
+						font-size: $MIFontSize;
+					}
+					h6 
+					{
+						font-size: $MH6FontSize;
+					}
+					p {
+						margin: $MPMarginTB 0;
+						font-size: $MPFontSize;
+					}
+					.btn-box {
+						font-size: 22px;
+						padding: 15px;
+						i {
+							margin-right: 10px;
+						}
+					}
+					.btn-fontLarge {
+						font-size: 22px;
+					}
+					.btn-lightBg {
+						a {
+							color: $primaryColor;
+						}
+					}
+				}
+			}
+			.modalfooter-btn
+			{
+				.btn-red {
+					@include border-radius(0);
+					padding: 10px;
+				}
+			}
+			.spin {
+				-webkit-animation:spinnerM 2.2s linear infinite;
+				-moz-animation:spinnerM 2.2s linear infinite;
+				-ms-animation:spinnerM 2.2s linear infinite;
+				-o-animation:spinnerM 2.2s linear infinite;
+				animation:spinnerM 2.2s linear infinite;
+				height: 213px;
+			  width: 214px;
+			  position: absolute;
+			  top: -34px;
+			  left: -43px;
+			  float: left;
+				&:after
+				{
+					content: '';
+				  position: absolute;
+				  top: 0px;
+				  left: 0px;
+				  display: block;
+				  width: 213px;
+				  height: 214px;
+				  @include border-radius(50%);
+				  border: 3.125px solid transparent;
+				  border-right-color: $primaryColor;
+				}
+			}	
+		}
+	}
+	&._ap_modal_smily 
+	{
+		.modal-dialog 
+		{
+			.modal-content 
+			{
+				background: url("../images/smily.png") no-repeat -33px -24px $whiteColor;
+			}
+		}
+	}
+	&._ap_modal_sad 
+	{
+		.modal-dialog 
+		{
+			.modal-content 
+			{
+				background: url("../images/sadFace.png") no-repeat -33px -24px $whiteColor;
+			}
+		}
+	}
+}
+		
+@include keyframes(spinnerM) 
+{
+ 	0%   
+	{ 
+ 		@include transform(rotate(0deg));
+	}
+ 	100% 
+	{ 
+		@include transform(rotate(360deg));
+	}		
+}

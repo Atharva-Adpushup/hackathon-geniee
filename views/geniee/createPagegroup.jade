@@ -1,0 +1,160 @@
+doctype html
+html
+	head
+		title PAGEGROUP APIs
+		style.
+			html, body {
+				font-family: sans-serif;
+			}
+			h1, h2 {
+				font-weight: 400;
+				margin: 0 0 20px;
+			}
+			section {
+				padding: 30px 0;
+				border-bottom: 1px solid #ddd;
+			}
+	body
+		h1 Geniee-AP REST APIs
+
+		section
+			h2 API to create new pagegroup 
+			pre 
+				strong POST 
+				| /geniee/pagegroup/create
+			form#createPagegroup
+				input(type="text" placeholder="Enter site id" name="siteId")
+				br
+				input(type="text" placeholder="Enter pagegroup name" name="pageGroupName")
+				br
+				input(type="text" placeholder="Enter sample url" name="sampleUrl")
+				br
+				select(name="device")
+					option(value="") Select device
+					option(value="desktop") Desktop
+					option(value="tablet") Tablet
+					option(value="mobile") Mobile
+				br
+				button Create
+		section
+			h2 API to get existing pagegroup 
+			pre 
+				strong GET 
+				| /geniee/pagegroup/view
+			form#getPagegroup
+				input(type="text" placeholder="Enter pagegroup id" name="pageGroupId")
+				br
+				button Get
+		section
+			h2 API to update existing pagegroup 
+			pre 
+				strong POST 
+				| /geniee/pagegroup/edit
+			form#updatePagegroup
+				input(type="text" placeholder="Enter pagegroup id" name="pageGroupId")
+				br
+				input(type="text" placeholder="Enter sample url" name="sampleUrl")
+				br
+				button Update
+		section
+			h2 API to delete pagegroup 
+			pre 
+				strong POST 
+				| /geniee/pagegroup/delete
+			form#deletePagegroup
+				input(type="text" placeholder="Enter pagegroup id" name="pageGroupId")
+				br
+				button Delete
+		script(src="http://code.jquery.com/jquery.js")
+		script.
+			function convertToJson(array) {
+				var json = {};
+				$.each(array, function(i, data) {	
+					json[data.name] = data.value;
+				});
+				return json;
+			}
+
+			$('#createPagegroup').on('submit', function(e) {
+				e.preventDefault();
+				var data = $(this).serializeArray(),
+					json = convertToJson(data);
+
+				$.ajax({
+					type: "POST",
+					url: "/geniee/pagegroup/create",
+					data: {
+						siteId: json.siteId,
+						pageGroupName: json.pageGroupName,
+						sampleUrl: json.sampleUrl,
+						device: json.device
+					},
+					success: function (data) {
+						console.log(data);
+					},
+					error: function (err) {
+						console.log(err);
+					}
+				});
+			});
+
+			$('#getPagegroup').on('submit', function(e) {
+				e.preventDefault();
+				var data = $(this).serializeArray(),
+					json = convertToJson(data);
+
+				$.ajax({
+					type: "GET",
+					url: "/geniee/pagegroup/view",
+					data: {
+						pageGroupId: json.pageGroupId
+					},
+					success: function (data) {
+						console.log(data);
+					},
+					error: function (err) {
+						console.log(err);
+					}
+				});
+			});
+
+			$('#updatePagegroup').on('submit', function(e) {
+				e.preventDefault();
+				var data = $(this).serializeArray(),
+					json = convertToJson(data);
+
+				$.ajax({
+					type: "POST",
+					url: "/geniee/pagegroup/edit",
+					data: {
+						pageGroupId: json.pageGroupId,
+						sampleUrl: json.sampleUrl
+					},
+					success: function (data) {
+						console.log(data);
+					},
+					error: function (err) {
+						console.log(err);
+					}
+				});
+			});
+
+			$('#deletePagegroup').on('submit', function(e) {
+				e.preventDefault();
+				var data = $(this).serializeArray(),
+					json = convertToJson(data);
+
+				$.ajax({
+					type: "POST",
+					url: "/geniee/pagegroup/delete",
+					data: {
+						pageGroupId: json.pageGroupId
+					},
+					success: function (data) {
+						console.log(data);
+					},
+					error: function (err) {
+						console.log(err);
+					}
+				});
+			});

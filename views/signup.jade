@@ -1,0 +1,116 @@
+extends layout/base
+
+block getTitle
+	- var titleVar = "Sign Up"
+
+block append headScripts
+	- var validateBaseStr = "/assets/js/libs/third-party/";
+	- var jqueryValidateStr = (environment == "production") ? (validateBaseStr + 'jquery.validate.min.js') : (validateBaseStr + 'jquery.validate.js');
+	+loadAsset("js", [jqueryValidateStr])
+
+	if environment == "production"
+		script(type="text/javascript").
+			(function(b,o,u,n,c,e){ 
+			b.__ba = (b.__ba || {}); 
+			b.__ba.pixelName = "Signed Up"; 
+			b.__ba.siteId = 34; 
+			b.__ba.pageLoadStart = Date.now(); 
+			c=o.createElement(u); 
+			e=o.getElementsByTagName(u)[0]; 
+			c.async=1;c.src=n + b.__ba.siteId + "/ba.js?t="+Math.floor(Date.now() / (3600 * 1000));e.parentNode.insertBefore(c,e);})(window,document,"script","//static.blipmetrics.com/"); 
+
+block bodyContent
+	- formData = formData || {}
+	main(class="aligner aligner--vCenter aligner--hCenter wrapper wrapper--page")
+		div(class="LoginWrap form-container js-form-container", data-ui-component="user-signup", id="signup-container")
+			// Header Starts Here
+			div(class="LoginHead")
+				div(class="LoginHead-logo")
+				h3(class="form-container-heading", id="signup-heading") Create Account
+			// Header Ends Here
+
+			// Form Starts Here
+			form(id="signup-form", class="form-horizontal js-signup-form", action="signup", method="post")
+				div(class="LoginForm")
+					div(class="form-group")
+						div(class="col-md-12 pd-0")
+							div(class="col-md-6 u-padding-r15px")
+								div(class="input-group")
+									span(class="input-group-addon")
+										i(class="fa fa-user")
+									input(type="text", id="signup-name", value=formData.name, name="name", class="form-control input-lg", placeholder="Full Name", required=true)
+								- var nameError = (errors && errors.name) ? errors.name[0] : null;
+								div(class="error-message js-error-message js-name-error") #{nameError}
+							div(class="col-md-6 pd-0")
+								div(class="input-group")
+									span(class="input-group-addon")
+										i(class="fa fa-link")
+									input(type="url", id="signup-website", value=formData.site, name="site", class="form-control input-lg", placeholder="Website", required)
+								- var siteError = (errors && errors.site) ? errors.site[0]: null;
+								div(class="error-message js-error-message js-site-error") #{siteError}
+
+					div(class="form-group")
+						div(class="col-md-12 pd-0")
+							div(class="col-md-6 u-padding-r15px")
+								div(class="input-group")
+									span(class="input-group-addon")
+										i(class="fa fa-envelope")
+									input(type="email", id="signup-email", value=formData.email, name="email", class="form-control input-lg", placeholder="Email", required=true)
+								- var emailError = (errors && errors.email) ? errors.email[0] : null;
+								div(class="error-message js-error-message js-email-error") #{emailError}
+							div(class="col-md-6 pd-0")
+								div(class="input-group")
+									span(class="input-group-addon")
+										i(class="fa fa-key")
+									input(type="password", id="signup-password", value=formData.password, name="password", class="form-control input-lg", placeholder="Password", required, autofocus=pass_autof ? true : false)
+								- var passwordError = (errors && errors.password) ? errors.password[0] : null;
+								div(class="error-message js-error-message js-password-error") #{passwordError}
+
+					div(class="form-group")
+						div(class="col-md-12 pd-0")
+							div(class="col-md-6 u-padding-r15px")
+								select(class="form-control input-lg" id="signup-pageviewRange" name="pageviewRange" required)
+									option(value="") Site Page Views Daily
+									option(value="<1000") &lt; 1000
+									option(value="1000-5000") 1000-5000
+									option(value="5000-15000") 5000-15000
+									option(value="15000-50000") 15000-50000
+									option(value="50000-200,000") 50000-200,000
+									option(value="200,000+") 200,000+
+								- var pageviewRangeError = (errors && errors.pageviewRange) ? errors.pageviewRange[0]: null;
+								div(class="error-message js-error-message js-pageviewRange-error") #{pageviewRangeError}									
+							div(class="col-md-6 pd-0")
+								select(class="form-control" id="signup-adNetworks" name="adNetworks" multiple="multiple" required)
+									option(value="Adsense") Adsense
+									option(value="Media.net") Media.net
+									option(value="Direct Ads") Direct Ads
+									option(value="Other") Other
+								- var adNetworksError = (errors && errors.adNetworks) ? errors.adNetworks[0]: null;
+								div(class="error-message js-error-message js-adNetworks-error") #{adNetworksError}
+
+					div(class="form-group")
+						div(class="col-md-12 pd-0")
+							div(class="col-md-6 u-padding-r15px")
+								div(class="input-group input-group--minimal")
+									span(class="input-group-addon")
+										input(type="checkbox", id="signup-termsPolicy", name="termsPolicy", required)
+									div(class="input-group-text") I agree to 
+										a(target="_blank", href="http://www.adpushup.com/tos.php") Terms of Service 
+										| &amp; 
+										a(target="_blank", href="http://www.adpushup.com/privacy.php") Privacy Policy
+								div(class="error-message js-error-message js-termsPolicy-error")
+							div(class="col-md-6 pd-0")
+								button(type="submit", id="signup-submit", class="u-margin-0px btn btn-lightBg btn-red pull-right") Create an account
+						
+				input(type="hidden", id="signup-analyticsId", name="anonId", value="")
+
+				// Footer Section Starts Here
+				div(class="LoginFooter row text-center")
+					div Already have an account?
+						a(href="/user/login", id="signup-login-redirect-btn", class="btn btn-lightBg") Login!
+					span(class="u-padding-0px label label--text-faded") Have any questions? Please email our Sales Team - 
+						a(href="mailto:sales@adpushup.com", class="u-padding-0px u-margin-0px link link--primary") sales@adpushup.com
+
+	- signupJsBaseStr = "/assets/js/";
+	- signupJsStr = (environment == "production") ? (signupJsBaseStr + "build/signup-build.min.js") : (signupJsBaseStr + "signup.js");
+	+loadAsset("js", [signupJsStr])

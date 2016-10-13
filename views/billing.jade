@@ -1,0 +1,29 @@
+extends layout/base
+
+block getTitle
+    - var titleVar = "Billing - AdPushup"
+
+block append analyticsIdentify
+    if (environment == "production")
+        script(type="text/javascript").
+            analytics.track('APP_Billing', {
+                IS_ADMIN: #{isSuperUser}
+            }, intercomObj);
+
+block bodyContent
+    include layout/sideBar
+
+    .pageContainer
+        include layout/header
+        // Page Content Starts Here
+        .pageContentWrapper
+            .pageContentInner
+                // Control v/s Adpushup Starts here
+                .controlAdpushupWrap.col-sm-12.mb-30.pd-20
+                    h3 We'll be coming out with paid plans soon.
+                    br
+                    h4
+                        | Don't worry, we'll give a heads-up in time.
+                        br
+                        br
+                        | AdPushup is on the house till then! :)

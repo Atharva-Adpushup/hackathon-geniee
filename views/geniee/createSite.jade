@@ -1,0 +1,151 @@
+doctype html
+html
+	head
+		title SITE APIs
+		style.
+			html, body {
+				font-family: sans-serif;
+			}
+			h1, h2 {
+				font-weight: 400;
+				margin: 0 0 20px;
+			}
+			section {
+				padding: 30px 0;
+				border-bottom: 1px solid #ddd;
+			}
+	body
+		h1 Geniee-AP REST APIs
+
+		section
+			h2 API to create new media 
+			pre 
+				strong POST 
+				| /geniee/site/create
+			form#createMedia
+				input(type="text" placeholder="Enter site name" name="siteName")
+				br
+				input(type="text" placeholder="Enter site url" name="siteDomain")
+				br
+				button Create
+		section
+			h2 API to get existing media 
+			pre 
+				strong GET 
+				| /geniee/site/view
+			form#getMedia
+				input(type="text" placeholder="Enter site id" name="siteId")
+				br
+				button Get
+		section
+			h2 API to update existing media 
+			pre 
+				strong POST 
+				| /geniee/site/edit
+			form#updateMedia
+				input(type="text" placeholder="Enter site id" name="siteId")
+				br
+				input(type="text" placeholder="Enter site name" name="siteName")
+				br
+				button Update
+		section
+			h2 API to delete media 
+			pre 
+				strong POST 
+				| /geniee/site/delete
+			form#deleteMedia
+				input(type="text" placeholder="Enter site id" name="siteId")
+				br
+				button Delete
+		script(src="http://code.jquery.com/jquery.js")
+		script.
+			function convertToJson(array) {
+				var json = {};
+				$.each(array, function(i, data) {	
+					json[data.name] = data.value;
+				});
+				return json;
+			}
+
+			$('#createMedia').on('submit', function(e) {
+				e.preventDefault();
+				var data = $(this).serializeArray(),
+					json = convertToJson(data);
+
+				$.ajax({
+					type: "POST",
+					url: "/geniee/site/create",
+					data: {
+						siteDomain: json.siteDomain,
+						siteName: json.siteName
+					},
+					success: function (data) {
+						console.log(data);
+					},
+					error: function (err) {
+						console.log(err);
+					}
+				});
+			});
+
+			$('#getMedia').on('submit', function(e) {
+				e.preventDefault();
+				var data = $(this).serializeArray(),
+					json = convertToJson(data);
+
+				$.ajax({
+					type: "GET",
+					url: "/geniee/site/view",
+					data: {
+						siteId: json.siteId
+					},
+					success: function (data) {
+						console.log(data);
+					},
+					error: function (err) {
+						console.log(err);
+					}
+				});
+			});
+
+			$('#updateMedia').on('submit', function(e) {
+				e.preventDefault();
+				var data = $(this).serializeArray(),
+					json = convertToJson(data);
+
+				$.ajax({
+					type: "POST",
+					url: "/geniee/site/edit",
+					data: {
+						siteId: json.siteId,
+						siteName: json.siteName,
+						siteDomain: json.siteDomain
+					},
+					success: function (data) {
+						console.log(data);
+					},
+					error: function (err) {
+						console.log(err);
+					}
+				});
+			});
+
+			$('#deleteMedia').on('submit', function(e) {
+				e.preventDefault();
+				var data = $(this).serializeArray(),
+					json = convertToJson(data);
+
+				$.ajax({
+					type: "POST",
+					url: "/geniee/site/delete",
+					data: {
+						siteId: json.siteId
+					},
+					success: function (data) {
+						console.log(data);
+					},
+					error: function (err) {
+						console.log(err);
+					}
+				});
+			});

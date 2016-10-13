@@ -1,0 +1,96 @@
+.ap-append:before
+{
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    content: "";
+ 	 background: url("../images/icons/append.png") no-repeat center center;
+  	background-size: 75% 83%;
+}
+.ap-prepend:before
+{
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    content: "";
+ 	 background: url("../images/icons/prepend.png") no-repeat center center;
+  	background-size: 75% 83%;
+}
+.ap-insertafter:before
+{
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    content: "";
+ 	 background: url("../images/icons/insertafter.png") no-repeat center center;
+  	background-size: 75% 83%;
+}
+.ap-insertbefore:before
+{
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    content: "";
+ 	 background: url("../images/icons/insertbefore.png") no-repeat center center;
+  	background-size: 75% 83%;
+}
+
+
+.MenuBarComponentWrap
+{
+ .MenuBarContainerWrapper
+  {
+    h5.head 
+    {
+      i
+      {
+        &.btn-edit-css
+        {
+          padding-top: 3px;
+          &::before 
+          {
+            line-height: 9px;
+            font-size: 12px;
+          }
+        }
+        &.ap-prepend
+        {
+          padding-top: 1px;
+          &::before 
+          {
+            background: url("../images/icons/prepend-dark.png") no-repeat center center;
+            background-size: 55% 63%;
+          }
+        }
+        &.ap-append
+        {
+          padding-top: 1px;
+          &::before 
+          {
+            background: url("../images/icons/append-dark.png") no-repeat center center;
+            background-size: 55% 63%;
+          }
+        }
+        &.ap-insertafter
+        {
+          padding-top: 1px;
+          &::before 
+          {
+            background: url("../images/icons/insertafter-dark.png") no-repeat center center;
+            background-size: 55% 63%;
+          }
+        }
+        &.ap-insertbefore
+        {
+          padding-top: 1px;
+          &::before 
+          {
+            background: url("../images/icons/insertbefore-dark.png") no-repeat center center;
+            background-size: 55% 63%;
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,245 @@
+#SideBarWrapper
+{
+	.SideBarIcon 
+	{
+		z-index: 2147483000;
+		position: fixed;
+		bottom: 20px;
+		right: 20px;
+		width: 48px;
+		height: 48px;
+		visibility: hidden;
+		-webkit-transform: translateZ(0);
+		&.SideBarIcon-enable
+		{
+			visibility: visible;
+		}
+		&.SideBarIcon-inactive
+		{
+			visibility: hidden;
+		}
+		.SideBarIcon-button
+		{
+			background: url(../images/adpushuplogo.png) no-repeat;
+		  -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+		  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+		  border-radius: 50%;
+		  border-style: solid;
+		  border-width: 1px;
+		  position: absolute;
+		  bottom: 0;
+		  right: 0;
+		  width: 48px;
+		  height: 48px;
+		  cursor: pointer;
+		  border:0;
+		}
+	}
+	#SideBar-messenger
+	{
+		.SideBar-messenger-inner
+		{
+		  z-index: 2147483000;
+		  visibility: hidden;
+		  position: fixed;
+		  height: 100%;
+		  width: 370px;
+		  bottom: 0;
+		  right: 0;
+		  -webkit-transform: scale(1);
+		  -moz-transform: scale(1);
+		  -ms-transform: scale(1);
+		  -o-transform: scale(1);
+		  transform: scale(1);
+		  -moz-transform-origin: bottom right;
+		  -o-transform-origin: bottom right;
+		  -ms-transform-origin: bottom right;
+		  -webkit-transform-origin: bottom right;
+		  transform-origin: bottom right;
+		  transition: transform 250ms ease-in-out, opacity 100ms linear 150ms;
+		  -o-transition: -o-transform 250ms ease-in-out, opacity 100ms linear 150ms;
+		  -moz-transition: -moz-transform 250ms ease-in-out, opacity 100ms linear 150ms;
+		  -webkit-transition: -webkit-transform 250ms ease-in-out, opacity 100ms linear 150ms;
+			.SideBar-messenger-header 
+			{
+			  z-index: 2147483002;
+			  -webkit-box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.08);
+			  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.08);
+			  background: white;
+			  position: absolute;
+			  top: 0;
+			  right: 0;
+			  width: 100%;
+			  height: 54px;
+				.SideBar-messenger-header-title-container 
+				{
+				  z-index: 2147483000;
+				  position: absolute;
+				  left: 0;
+				  top: 0;
+				  width: 100%;
+				  height: 100%;
+				  text-align: center;
+				  pointer-events: none;
+				  .SideBar-messenger-header-title
+				  {
+					  font-size: 17px;
+					  line-height: 54px;
+					  font-weight: 500;
+					  color: #465C66;
+					  letter-spacing: 0.2px;
+					  display: inline-block;
+					  max-width: 200px;
+					  white-space: nowrap;
+					  overflow: hidden;
+					  text-overflow: ellipsis;
+				  }
+				}
+				.SideBar-header-button
+				{
+					z-index: 2147483001;
+				  position: relative;
+				  margin: 0 20px;
+				  height: 54px;
+				  line-height: 54px;
+				  color: #555;
+				  font-size: 17px;
+				  &.SideBar-header-conversations-button
+				  {
+				  	float: left;
+				  	background:url("https://js.intercomcdn.com/images/icon-conversations.png") no-repeat 0 center;
+				  	width: 18px;
+				  }
+				  &.SideBar-header-close
+				  {
+				    float: right;
+  					margin-left: 15px;
+  					width: 16px;
+  					background:url("https://js.intercomcdn.com/images/icon-close.png") no-repeat 0 center;
+				  }
+				  &.SideBar-header-minimize {
+					  float: right;
+					  margin-right: 0;
+					  width: 16px;
+					  background:url("https://js.intercomcdn.com/images/icon-minimize.png")0 center no-repeat;
+					}
+				}
+			}
+			.SideBar-messenger-body
+			{
+				z-index: 2147483000;
+			  background: #fafafb;
+			  background: rgba(250, 250, 251, 0.98);
+			  border-left: 1px solid #dadee2;
+			  position: absolute;
+			  top: 0;
+			  right: 0;
+			  bottom: 0;
+			  width: 100%;
+			}
+			.SideBar-messenger-content
+			{
+			  z-index: 2147483001;
+			  position: absolute;
+			  top: 54px;
+			  right: 0;
+			  bottom:57px;
+			  width: 100%;
+			  -webkit-transform: translateZ(0);
+			  overflow-y:scroll;
+			  .SideBar-messenger-content-container
+			  {
+			  	-webkit-box-sizing: border-box;
+				  -moz-box-sizing: border-box;
+				  box-sizing: border-box;
+				  position: relative;
+				  min-height: 100%;
+				  max-width: 620px;
+				  margin: 0 auto;
+				  padding: 15px;
+			  }
+			}
+			.SideBar-messenger-footer
+			{
+				.SideBar-messenger-footer-inner
+				{
+					z-index: 2147483001;
+				  -webkit-box-shadow: 0 -1px 2px 0 rgba(0, 0, 0, 0.04);
+				  box-shadow: 0 -1px 2px 0 rgba(0, 0, 0, 0.04);
+				  position: absolute;
+				  bottom: 0;
+				  left: 0;
+				  right: 0;
+				  max-width: 620px;
+				  margin: 0 auto;
+				  border-top: 1px solid #dadee2;
+				  background-color: #fff;
+				  padding: 10px;
+				  form
+				  {
+				  	.SideBar-messenger-footer-textarea-wrap
+				  	{
+				  	  position: relative;
+						  overflow: hidden;
+						  min-height: 36px;
+						  border-radius: 4px;
+						  border: 1px solid #e4e4e4;
+						  .SideBar-messenger-emoji
+						  {
+						  	 z-index: 2147483001;
+							  -webkit-opacity: 0.6;
+							  -moz-opacity: 0.6;
+							  opacity: 0.6;
+							  background-image: url(https://js.intercomcdn.com/images/icon-emoji.png);
+							  background-size: 15px 15px;
+							  background-repeat: no-repeat;
+							  display: inline;
+							  height: 30px;
+							  width: 30px;
+							  position: absolute;
+							  top: 2px;
+							  right: 2px;
+							  padding: 5px;
+							  background-position: center;
+							  cursor: pointer;
+						  }
+						  textarea
+						  {
+						  	-webkit-transition: background-color 0.2s linear;
+							  -moz-transition: background-color 0.2s linear;
+							  -o-transition: background-color 0.2s linear;
+							  transition: background-color 0.2s linear;
+							  background: rgba(250, 250, 251, 0.8);
+							  position: absolute;
+							  top: 0;
+							  left: 0;
+							  font-weight: 400;
+							  color: #60686e;
+							  resize: none;
+							  border: none;
+							  white-space: pre-wrap;
+ 								word-wrap: break-word;
+ 								font-size: 15px;
+							  line-height: 22px;
+							  min-height: 32px;
+							  max-height: 200px;
+							  width: 100%;
+							  height: 100%;
+							  padding: 5px 50px 5px 10px;
+							  border-radius: 4px;
+						  }
+				  	}
+				  }
+				}
+			}
+		}
+		&.SideBar-messenger-active 
+		{
+			.SideBar-messenger-inner
+			{
+				visibility: visible;
+			}
+		}
+	}
+}
+  

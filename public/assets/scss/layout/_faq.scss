@@ -1,0 +1,59 @@
+.faq 
+{
+	margin: 0 10px;
+	.row 
+	{
+		[class*="col-"]
+		{
+			border:1px solid $borderColor;
+			border-top:0;
+			border-left: 0;
+			background: $FAQBgColor;
+			padding: $FAQBoxPad;
+			text-align: center;
+			color: $FAQColor;
+			height: $FAQBoxHeight;
+			&:first-child
+			{
+				border-left:1px solid $borderColor;
+			}
+			a 
+			{
+				cursor: pointer;
+				@include transition(all, 0.3s, ease-out);
+				i 
+				{
+					font-size: $FAQIFont;
+					color: $FAQIColor;
+				}
+				h5 
+				{
+					text-transform: uppercase;
+				  margin: $FAQHeadMarginT 0 $FAQHeadMarginB 0;
+				  font-weight: bold;
+				  font-size: $FAQHeadFont;
+				  color: $FAQColor;
+				}
+				p 
+				{
+					line-height: $FAQTxtLineHeight;
+	  			font-size: $FAQTxtFont
+				}
+				&:hover 
+				{
+					color: $primaryColor;
+					h5 {
+						color: $primaryColor;
+					}
+				}
+			}
+		}
+		&:first-child 
+		{
+			[class*="col-"]
+			{
+				border-top: 1px solid $borderColor;
+			}
+		}
+	}
+}

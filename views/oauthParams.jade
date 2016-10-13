@@ -1,0 +1,14 @@
+//
+   Created by Dhiraj on 3/8/2016.
+html
+    body
+        script(type="text/javascript").
+            window.opener.postMessage(JSON.stringify({
+                cmd:"SAVE_ADSENSE_INFO",
+                data: {
+                    adsenseEmail: "#{adsenseEmail}",
+                    pubId: "#{pubId}"
+                }
+            }), "#{consts.BASE_URL}");
+            window.close();
+

@@ -1,0 +1,22 @@
+::-webkit-scrollbar{
+    width: $SBWidthHeight; 
+    transition: all .1s ease-in-out; 
+    background:$mainBgColor;
+    height: $SBWidthHeight;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    @include box-shadow(0,0, 6px, 0px, rgba(0,0,0,.3),true);
+}
+::-webkit-scrollbar-thumb {
+	-webkit-background-clip:content-box;
+	background-color:rgba(0, 0, 0, .6);
+	border:1px solid rgba(85, 85, 85, .6);
+	@include border-radius($SBBorderRadius);
+	width:5px
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color:rgba(0, 0, 0, .5);
+}
+

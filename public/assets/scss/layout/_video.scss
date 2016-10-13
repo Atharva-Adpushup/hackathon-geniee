@@ -1,0 +1,45 @@
+.wizard_modal 
+{
+	.modal-content
+	{
+		width: 700px;
+		.ap_video
+		{
+			.video-js
+			{
+				margin: 0 auto;
+				.vjs-big-play-button
+				{
+					top: 50%;
+					left: 50%;
+					margin-left: -45px;
+					margin-top: -45px;
+					background: url("../images/replay.png") no-repeat center center $primaryColor;
+					width: 84px;
+					height: 84px;
+					border:6px solid #fff;
+					box-shadow: none;
+					border-radius: 50%;
+					box-shadow: 0 3px 5px rgba(0, 0, 0, 0.23), 0 0px 12px rgba(0, 0, 0, 0.19);
+					&:before 
+					{
+						display: none;
+					}
+					&:hover 
+					{
+						box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19);
+						border:6px solid $primaryColor;
+					}
+				}
+			}
+		}
+		ul
+		{
+			padding: 0 0 0 40px;
+			li 
+			{
+				list-style-type:disc;
+			}
+		}
+	}	
+}

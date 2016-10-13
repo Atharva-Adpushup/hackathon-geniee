@@ -1,0 +1,90 @@
+.errorMain {
+	background: $primaryColor;
+	padding: $EPPadTB 0;
+	color: $whiteColor;
+	ul 
+	{
+		height: $EPUlHeightLineHeight;
+		overflow: hidden;
+		line-height: $EPUlHeightLineHeight;
+		li 
+		{
+			font-size: $EPUlFont;
+			line-height: $EPUlHeightLineHeight;
+		}
+	}
+	.thanku 
+	{
+		font-size: $TYPFont;
+	}
+	.txt 
+	{
+		margin-top: $EPTxtMarginT;
+		padding: 20px 0 0px;
+		border-top:1px dotted rgba(255, 255, 255, 0.5);
+		a 
+		{
+			color: $whiteColor;
+			font-weight: bold;
+		}
+	}
+	form 
+	{
+		margin-top: $EPFormMarginT;
+		.input-group 
+		{
+			.form-control 
+			{
+				border-radius:0;
+				border:2px solid $borderColor;
+				height: $EPFormHeight;
+				&:focus 
+				{
+					border-color:$lightGrey;
+					outline: none;
+					box-shadow: none;
+				}
+			}
+		}
+		.btn 
+		{
+			height: $EPFormHeight;
+			width: 100%;
+			border-color: $whiteColor !important;
+			background: $primaryColor;
+			color: $whiteColor;
+			&:hover 
+			{
+				border-color: $whiteColor !important;
+				background: $primaryColor;
+				color: $whiteColor;
+			}
+		}
+	}	
+	&.thankyouMain
+	{
+		padding: $TYPPadTB 0;
+		position: relative;
+		.txt 
+		{
+			margin:$TYPTxtMarginT 0 10px ;
+		}
+		p
+		{
+			font-size: $TYPSmallTxt;
+		}
+		.greeting-logout-btn
+		{
+			position: absolute;
+			right: $FMLayoutDimension*2;
+			top: $FMLayoutDimension;
+		}
+	}
+}
+.clickhere
+{
+	position: fixed;
+	right: 70px;
+	bottom: 40px;
+	font-size: $TYPClickHereFont;
+}

@@ -1,0 +1,337 @@
+/*Reports Table Starts Here*/
+
+.ReportsWrapper 
+{
+	width: 100%;
+	height: 100%;
+	.ReportsToggleBtnWrap 
+	{
+		text-align: center;
+		border-bottom: 5px solid $primaryColor;
+		margin: 0 1px;
+		.ReportsToggleBtn 
+		{
+			width: $RTButtonWidth;
+			height: $RTButtonHeight;
+			background: $primaryColor;
+			border:0;
+			bottom: -1px;
+			@include border-radius-separate(2px, 2px, 0, 0);
+			position: relative;
+			&:after 
+			{
+				content:"\f0de";
+				color: $whiteColor;
+			  position: absolute;
+			  top: 12px;
+			  left: 50%;
+			  font:normal normal normal 14px/0 FontAwesome;
+			  margin-left: -4px;
+			}
+			&.collapsed:after 
+			{	
+				content:"\f0dd";
+				top:6px;
+			}
+		}
+	}
+	.well 
+	{
+		@include border-radius(0);
+		background: $whiteColor;
+		border-top: 0 !important;
+		border:1px solid $borderColor;
+		.panel 
+		{
+			border:0;
+			@include border-radius(0);
+			box-shadow: none;
+			margin-bottom: 0;
+			background: $primaryColor; /* Old browsers */
+			background: -moz-linear-gradient(top,  $primaryColor 85%, #f5f5f5 15%); /* FF3.6+ */
+			background: -webkit-gradient(linear, left top, left bottom, color-stop(85%,$primaryColor), color-stop(15%,#f5f5f5)); /* Chrome,Safari4+ */
+			background: -webkit-linear-gradient(top,  $primaryColor 85%,#f5f5f5 15%); /* Chrome10+,Safari5.1+ */
+			background: -o-linear-gradient(top,  $primaryColor 85%,#f5f5f5 15%); /* Opera 11.10+ */
+			background: -ms-linear-gradient(top,  $primaryColor 85%,#f5f5f5 15%); /* IE10+ */
+			background: linear-gradient(to bottom,  $primaryColor 85%,#f5f5f5 15%); /* W3C */
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$primaryColor', endColorstr='#f5f5f5',GradientType=0 ); /* IE6-9 */
+			padding: 9px 0 0 0;
+			.dataTables_length 
+			{
+				margin: 0 0 10px 18px;
+				label 
+				{
+					font-weight: normal;
+					color: $whiteColor;
+					position: relative;
+					font-size: $RTLabelFontSize;
+					select 
+					{
+					  font-size: $RTSelectFont;
+					  height: $RTInputHeight;
+					  @extend ReportsInputPadding;
+					  @include border-radius(3px);
+					  display: inline;
+					  border: 1px solid $borderColor;
+					  color: $fontColor;
+					  margin:0 5px;
+					}
+				}
+			}					
+			.dataTables_filter 
+			{
+				margin: 0 18px 10px 0;
+				label 
+				{
+					font-weight: normal;
+					color: $whiteColor;
+					position: relative;
+					font-size: $RTLabelFontSize;
+					input
+					{
+						width: auto;
+						display: inline;
+						@extend ReportsInputPadding;
+						height: $RTInputHeight;
+						margin: 0 0 0 5px;
+						border: 1px solid $borderColor;
+						@include border-radius(3px);
+					}	
+					i 
+					{
+						position: absolute;
+						right: 7px;
+						top:5px;
+						color: $fontColor;
+						cursor: pointer;
+					}
+				}					
+			}
+			._ap_table 
+			{
+				padding: $RTPadding;
+				font-size: $RTFontSize;
+				background: $whiteColor;
+				thead {
+					th,td 
+					{
+						text-transform: uppercase;
+						font-size: $RTTHFontSize;
+						border-bottom: 2px solid #ddd;
+					}
+				}
+				tbody
+				{
+					tr
+					{
+						td 
+						{
+							padding: 12px 8px;
+						}
+						&.odd 
+						{
+							background: transparent;
+							.sorting_1 
+							{
+								background: transparent;
+							}
+							&:hover 
+							{
+								background: rgba(85, 85, 85, 0.03);
+							}
+						}
+						&.even 
+						{
+							.sorting_1 
+							{
+								background: transparent;
+							}
+							&:hover 
+							{
+								background: rgba(85, 85, 85, 0.03);
+							}
+						}
+						&.selected
+						{
+							background: #f9f9f9;
+							box-shadow: 0 0 10px #ccc inset;
+
+							> td,
+							> td:hover
+							{
+								background: transparent !important;
+							}
+
+							> td:nth-child(6)
+							{
+								font-size: 1.3em;
+								letter-spacing: 1px;
+								position: relative;
+
+								> .fa
+								{
+									margin-left: 5px;
+								}
+							}
+						}
+					}
+				}	
+				tfoot {
+					th,td 
+					{
+						text-transform: uppercase;
+						font-size: $RTTHFontSize;
+						border-top: 2px solid #ddd;
+					}
+				}
+
+				.btn
+				{
+					height: 34px;
+					padding: 0;
+					width: 40px;
+
+					&:active,
+					&:hover,
+					&:focus
+					{
+						background: $whiteColor;
+					}
+
+					&:active,
+					&:focus,
+					&.selected
+					{
+						box-shadow: 0 0 3px #888 inset;
+					}
+
+					> .fa
+					{
+						font-size: 1.5em;
+					}
+
+					&.btn-success
+					{
+						background: $GreenColor;
+						border-color: $GreenColor;
+						box-shadow: 0 0 3px $GreenColor inset;
+					}
+
+					&.btn-error
+					{
+						background: $primaryColorDark;
+						border-color: $primaryColorDark;
+						box-shadow: 0 0 3px $primaryColorDark inset;
+					}
+				}
+
+				/********Reports input group********/
+				.input-group
+				{
+					max-width: 100px;
+					min-width: 80px;
+
+					> .form-control
+					{
+						height: 34px;
+					}
+
+					.btn
+					{
+						height: 34px;
+						padding: 5px 10px;
+						transition: all .3s ease;
+
+						> .fa
+						{
+							font-size: 1.3em;
+						}
+					}
+				}
+
+				.perf
+				{
+					position: relative;
+
+					> .fa.icon-caret
+					{
+						font-size: 2em;
+						left: 45px;
+						position: absolute;
+						top: 27%;
+					}
+
+					&.perf--high
+					{
+						> .fa.icon-caret
+						{
+							color: $GreenColor;
+						}
+					}
+
+					&.perf--low
+					{
+						> .fa.icon-caret
+						{
+							color: $warningColor;
+						}
+					}
+
+					&.perf--lowest
+					{
+						> .fa.icon-caret
+						{
+							color: $primaryColorDark;
+						}
+					}
+				}
+			}
+			.dataTables_info
+			{
+				padding: 12px 18px;
+				line-height: 40px;
+				font-size: $RTLabelFontSize;
+			}
+			.dataTables_paginate 
+			{
+				margin:  12px 18px;
+				background: $whiteColor;
+				@include border-radius($BorderRadius);
+				border:1px solid $borderColor;
+				padding: 0;
+				font-size:$RTLabelFontSize;
+				a 
+				{
+					border:0;
+					padding: 6px 12px;
+					&:hover
+					{
+						border:0;
+					}
+				}
+				span 
+				{
+					a 
+					{
+						margin: 0;
+						background: $whiteColor;
+						border:1px solid $borderColor;
+						border-top:0;
+						border-bottom:0;
+						&:hover 
+						{
+							background: rgba(85, 85, 85, 0.03);
+							border:1px solid $borderColor;
+							border-top:0;
+							border-bottom:0;
+						}
+						&.current {
+							background:$primaryColor;
+							color: $whiteColor !important; 
+						}
+					}
+				}
+			}
+		}
+	}
+}

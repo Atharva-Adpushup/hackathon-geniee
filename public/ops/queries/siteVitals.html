@@ -1,0 +1,70 @@
+<html>
+
+<head>
+	<script src='/assets/js/libs/third-party/jquery.js'></script>
+	<script src='/ops/assets/someHelperFunctions.js'></script>
+
+	<title>Site Vitals</title>
+	<script type="text/javascript">
+		var siteId = getQueryVariable('siteId'),
+		noOfDays = 7,src;
+		
+				
+		$(document).ready(function(){
+			var $siteIdEl = $("#siteId"),
+				$noOfDaysEl = $("#noOfDays"),
+				$kibanaEl = $("#frame"),
+				$submitEl = $("#submit");
+		
+			$siteIdEl.val(siteId);
+			$noOfDaysEl.val(noOfDays);
+			doit();
+			
+			$submitEl.on('click',doit);
+			
+			function doit(){
+				siteId = $siteIdEl.val();
+				noOfDays = $noOfDaysEl.val();
+				if(!siteId || !noOfDays){
+					alert("Siteid or No of days missing");
+					return;
+				}
+				
+				src = "https://apkibana:kibanaisthebest1@ops-kibana.adpushup.com:5050/app/kibana#/dashboard/SiteVitals?embed=true&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-"+noOfDays+"d,mode:quick,to:now))&_a=(filters:!(),options:(darkTheme:!t),panels:!((col:1,id:vitalsMode,panelIndex:1,row:1,size_x:3,size_y:3,type:visualization),(col:7,id:vitalsPlatform,panelIndex:2,row:5,size_x:2,size_y:2,type:visualization),(col:9,id:vitalsPlatformBrowsers,panelIndex:3,row:5,size_x:3,size_y:4,type:visualization),(col:4,id:vitalsPlatformMode,panelIndex:4,row:1,size_x:4,size_y:4,type:visualization),(col:1,id:vitalsTopCountries,panelIndex:5,row:4,size_x:3,size_y:5,type:visualization),(col:7,id:vitalsTopURLs,panelIndex:6,row:7,size_x:2,size_y:2,type:visualization),(col:8,id:vitalsTrafficMode,panelIndex:7,row:1,size_x:5,size_y:4,type:visualization),(col:4,id:vitalsE3DelayPercentile,panelIndex:8,row:5,size_x:3,size_y:4,type:visualization),(col:1,id:vitalsPageGroupPlatformFinalMode,panelIndex:9,row:9,size_x:8,size_y:8,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:'siteId:"+siteId+"')),title:SiteVitals,uiState:(P-1:(vis:(legendOpen:!f)),P-2:(vis:(legendOpen:!f)),P-3:(vis:(legendOpen:!f)),P-4:(vis:(legendOpen:!f)),P-5:(vis:(legendOpen:!f)),P-6:(vis:(legendOpen:!f)),P-7:(vis:(legendOpen:!f)),P-8:(vis:(legendOpen:!f)),P-9:(vis:(legendOpen:!f))))";		
+				$kibanaEl.html('<iframe id="kibana" src="'+src+'" height="100%" width="100%"></iframe>');
+			}
+				
+		})
+	</script>
+</head>
+
+<body>
+	<div id='inputDiv'>
+		<table style='font-size:10px'>
+			<tr>
+				<td>
+					<h3>Site Vitals</h3>
+				</td>
+				<td>
+					<label for="siteId">siteId</label>
+					<input type='number' name="siteId" id='siteId' placeholder="siteId" />
+				</td>
+				<td>
+					<label for="noOfDays">No of Days</label>
+					<input type='number' name="noOfDays" id='noOfDays' value="7" />
+				</td>
+				<td>
+					<input type="button" id="submit" value="Submit" />
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div id="frame">
+		<iframe id="kibana" src="" height="100%" width="100%"></iframe>
+	</div>
+
+
+
+</body>
+
+</html>

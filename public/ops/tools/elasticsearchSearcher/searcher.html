@@ -1,0 +1,72 @@
+<!doctype html >
+<html>
+
+<head>
+<title>Es Searcher </title>
+
+<link rel='stylesheet' href='searcher.css'/>
+<link rel='stylesheet' href='/ops/assets/jsonEditor/jsoneditor.min.css'/>
+
+<script src='/ops/assets/jsonEditor/jsoneditor.js'></script>
+<script src='/ops/assets/someHelperFunctions.js'></script>
+<script src='bundle.js'></script>
+
+</head>
+
+<body>
+
+<div style='text-align: center'>
+	<h2> Elasticsearch Searcher </h2>
+
+	<div id='feed'>
+		<input type='text' placeholder='index name' id='indexName'></input>
+		<input type='text' placeholder='doc type' id='docType'></input>
+		<button type='button' id='buttonSearch'>search</button>
+	</div>
+</div>
+
+
+
+<br>
+<div class='blob' id='searchUI'>
+
+</div>
+
+<br>
+<button type='button' id='switchToSourceButton'>switch to source mode (irreversible) </button>
+
+<div id='searchSourceContainer'>
+	<p>Search Query : </p>
+	<div id='searchSource' style='width:90%; height:500px'>
+
+	</div>
+</div>
+
+<br><br><br>
+<div id='searchResultsContainer'>
+	<p>Search Results : </p>
+	<div id='searchResults' style='width:90%; height:1200px'>
+
+	</div>
+</div>
+
+
+
+<!-- all the dialogs -->
+
+<div id='dialogContainer'>
+
+	<div id='dialogTest' style='background-color:#5f7'>
+		<p> a para aaaaaaa</p>
+		<input type='button' id="button_tag" value='a button' />
+	</div>
+
+	<div id='dialogTwo' style='background-color:#33f'>
+		<p> a para aaaaaaa</p>
+		<input type='button' id="button_tag" value='a button' />
+	</div>
+
+</div>
+
+</body>
+</html>

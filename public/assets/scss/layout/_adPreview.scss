@@ -1,0 +1,28 @@
+.adsWrapper
+{
+	background-color:$whiteColor;
+  font-family: arial,sans-serif;
+  margin: $APMarginT 0 0;
+  padding: $APPad;
+  h5 {
+  	padding:0 0 $APHeadPadB 0;
+  	a 
+  	{
+  		color: $APColor;
+  		&:hover 
+  		{
+  			text-decoration: underline;
+  		}	
+  	}
+  }
+  p.txt 
+  {
+  	font-size: $APTxtFont;
+  	margin-bottom: $APTxtMarginB;
+  	color: $APColor; 
+  }
+  .urlimg {
+    float: left;
+    margin-right: $APUrlImgMarginR;
+  }
+}

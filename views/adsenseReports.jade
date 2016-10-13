@@ -1,0 +1,111 @@
+extends layout/base
+block getTitle
+    - var titleVar = "Adsense Reports"
+
+block append headCss
+    +loadAsset("css", [
+        '/assets/css/c3.css',
+        '/assets/css/dataTables.css',
+        '/assets/css/datepicker.css'
+    ])
+
+block append headScripts
+    +loadAsset("js", [
+        '/assets/js/libs/third-party/d3.js',
+        '/assets/js/libs/third-party/c3.js',
+        '/assets/js/libs/third-party/nprogress.js',
+        '/assets/js/libs/third-party/datepicker.js',
+        '/assets/js/libs/third-party/dataTables.js',
+        '/assets/js/libs/third-party/dataTablesColReorder.js',
+        '/assets/js/reports/dataVisualization.js',
+        '/assets/js/reports/reports.js',
+        '/assets/js/reports/reporting.js'
+    ])
+
+block append analyticsIdentify
+    if environment == "production"
+        script(type="text/javascript").
+            analytics.track('APP_AdsenseReports', {
+                siteId: #{siteId ? siteId : 'null'},
+                IS_ADMIN: #{isSuperUser}
+            }, intercomObj);
+
+block bodyContent
+    include layout/sideBar
+    .pageContainer
+        include layout/header
+        // Page Content Starts Here
+        .pageContentWrapper
+            .pageContentInner
+                #loader
+                #reportsArea
+                    if sites
+                        // Report Control Starts
+                        #reports_control
+                            nav.navbar.navbar-default
+                                .container-fluid
+                                    .navbar-header
+                                        button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1')
+                                            span.sr-only Toggle navigation
+                                            span.icon-bar
+                                            span.icon-bar
+                                            span.icon-bar
+                                    #bs-example-navbar-collapse-1.collapse.navbar-collapse
+                                        ul.nav.navbar-nav.navbar-right
+                                            input#report_type(type='hidden', data-value='AdSense')
+                                            input#report_pubId(type='hidden', value='#{ pubId }')
+                                            li.adsenseDomain
+                                                .styleSelect
+                                                    select#report_adsenseDomain.report_control(data-param='adsenseDomain')
+                                                        each site,idx in JSON.parse(sites)
+                                                            - isQueryDomainMatched = (domainInfo && (idx === domainInfo[0])) ? true : false;
+                                                                option(value="#{site[0]}", selected=(isQueryDomainMatched ? true : false)) #{utils.domanize(site[0])}
+
+                                            li.adsenseMetric
+                                                .styleSelect
+                                                    select#report_adsenseMetric.report_control(data-param='adsenseMetric')
+                                                        option(data-value='PAGE VIEWS') PAGE VIEWS
+                                                        option(data-value='AD IMPRESSIONS') AD IMPRESSIONS
+                                                        option(data-value='AD REQUESTS') AD REQUESTS
+                                            li
+                                                .styleSelect
+                                                    select#report_platform.report_control(data-param='platform')
+                                                        option All Devices
+                                                        option(data-value='DESKTOP') DESKTOP
+                                                        option(data-value='MOBILE') MOBILE
+                                                        option(data-value='TABLET') TABLET
+                                            li.datefields
+                                                .input-group.input-group-sm
+                                                    span.input-group-btn
+                                                        button.btn.btn-inverse(type='button', disabled='') From:
+                                                    input#report_startDate.form-control.date_control(type='text', data-param='startDate', value='#{startDate}')
+                                            li.datefields
+                                                .input-group.input-group-sm
+                                                    span.input-group-btn
+                                                        button.btn.btn-inverse(type='button', disabled='') To:
+                                                    input#report_endDate.form-control.date_control(type='text', data-param='endDate', value='#{endDate}')
+                                            li
+                                                button#load_report.btn.btn-default.btn-lightBg.btn-red.mR-5(type='button') Load Reports
+                                                //button#take_to_editor.btn.btn-default.btn-lightBg.btn-red(type='button') Take to Editor
+                        // Report Control Ends
+                        // Report Chart Begins
+                        .controlAdpushupWrap.mb-30
+                            h3.title.m-All-0 Google AdSense
+                            .btn-group.ap-buttongroup(role='group', aria-label='...')
+                                button.step_control.btn.btn-default.active(type='button', data-param='step', data-value='1d') Daily
+                                button.step_control.btn.btn-default(type='button', data-param='step', data-value='7d') Weekly
+                                button.step_control.btn.btn-default(type='button', data-param='step', data-value='1M') Monthly
+                            .graph
+                                #reports_chart
+                        // Report Chart Ends
+                        // Report Table Begins
+                        .ReportsWrapper
+                            .ReportsToggleBtnWrap
+                                a.btn.ReportsToggleBtn.p-All-0(data-toggle='collapse', href='#collapseExample', data-placement='top', aria-expanded='true', aria-controls='collapseExample')
+                            #collapseExample.collapse.in(aria-expanded='true', style='')
+                                .well.pd-0
+                                    #reports_table.panel.panel-default
+                        // Report Table Ends
+                    else
+                        script(type='text/javascript').
+                            adpushup.alert("<span style='cursor:pointer;'><h2>No site present in Adsense</h2></span>", "#reportsArea", 2);

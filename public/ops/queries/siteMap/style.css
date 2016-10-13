@@ -1,0 +1,13 @@
+.monospaced {
+	font-family : "Lucida Console", Monaco, monospace;
+	font-size: 12px;
+}
+
+.stylishTable tr:nth-child(odd){
+	background: #fee;
+}
+
+
+.stylishTable tr:nth-child(even){
+	background: #efe;
+}

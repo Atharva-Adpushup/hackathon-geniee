@@ -1,0 +1,35 @@
+.CreateTemplate 
+{
+	.colorTempUl 
+	{
+		height: $CTHeight;
+		width: 100%;
+		margin-bottom: $CTMarginB;
+		li 
+		{
+			float: left;
+			cursor: pointer;
+			width: $CTLiWidth;
+			margin-right: $CTLiMarginR;
+			height: $CTBoxHeight;
+			text-align: center;
+			position: relative;
+			@include box-shadow(0, 0, 0, 0, rgba(0,0,0,0.1), $inset: true);
+			.colorBg 
+			{
+				border:1px dashed $lightGrey;
+				padding: $CTBoxPad;
+				height: $CTBoxHeight;
+				div 
+				{
+					width: 100%;
+					height: $CTInnerBoxHeight;	
+				}
+			}
+			span 
+			{
+				font-size: $CTTxtFont;
+			}
+		}
+	}
+}

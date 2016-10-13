@@ -1,0 +1,45 @@
+.desktopEditor {
+	@extend maxHeightWidth;
+	.desktopViePort 
+	{
+		@extend maxHeightWidth;
+	}
+}
+.iphone6sPortrait {
+	width: 472px;
+	height: 999px;
+    margin: 15px auto 15px;
+    padding: 117px 27px 117px 29px;
+    background: url('../images/iPhone6s-white-portrait.png') no-repeat;
+    .iphone6sViePort 
+    {
+		@extend maxHeightWidth;
+	}
+}
+.ipadAirPortrait {
+	width:873px;
+	height:1244px;
+    margin:15px auto 15px;
+    padding:109px 53px 111px 52px;
+    background: url('../images/ipad-air-portrait.png') no-repeat;
+    .ipadAirViePort 
+    {
+		@extend maxHeightWidth;
+	}
+}
+
+.platform
+{
+	&.desktopEditor.desktopEditor--adrecover {
+		/*****TODO: Replace below absolute position hack with flexbox
+		vertical alignment technique*********/
+		bottom: 0;
+		height: 768px !important;
+		left: 0;
+		margin: auto;
+		position: absolute !important;
+		right: 0;
+		top: 0;
+		width: 1366px !important;
+	}
+}

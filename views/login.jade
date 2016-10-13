@@ -1,0 +1,45 @@
+extends layout/base
+
+block getTitle
+	- var titleVar = "Login"
+
+block bodyContent
+	main(class="aligner aligner--vCenter aligner--hCenter wrapper wrapper--page")
+		div(class="LoginWrap form-container js-form-container", data-ui-component="user-login", id="login")
+			// Header Starts Here
+			div(class="LoginHead")
+				div(class="LoginHead-logo")
+				h3(class="form-container-heading", id="login-heading") Sign in
+			// Header Ends Here
+
+			// Form Starts Here
+			form(class="form-horizontal ", action="/login", method="post")
+				div(class="LoginForm")
+					- var errorMessage = error ? error : null;
+					div(class="error-message top") #{errorMessage}
+
+					div(class="form-group")
+						div(class="input-group")
+							span(class="input-group-addon")
+								i(class="fa fa-envelope")
+							input(type="email", id="login-email", required, name="email", class="form-control input-lg", placeholder="xyz@adpushup.com")
+
+
+					div(class="form-group")
+						div(class="input-group")
+							span(class="input-group-addon")
+								i(class="fa fa-key")
+							input(type="password", id="login-password", name="password", class="form-control input-lg", placeholder="Password", required)
+
+
+					div(class="form-group")
+						button(type="submit", id="login-submit", class="btn btn-lightBg btn-red pull-right") Login
+						a(href="/forgotPassword", id="login-forgotPassword-redirect-link", class="forgetPassword") Forgot Password?
+
+				// Footer Section Starts Here
+				div(class="LoginFooter row")
+					div(class="pull-right") Don't have an account?
+						a(href="/signup", id="login-signup-redirect-link", class="btn btn-lightBg") Sign up
+
+	script(type="text/javascript").
+		analytics.page('App-login');

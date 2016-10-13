@@ -1,0 +1,39 @@
+.pagination {
+	@include border-radius(3px);
+	li 
+	{
+		>a, >span 
+		{
+			border: 1px solid $borderColor;
+			color: $fontColor;
+			&:hover 
+			{
+				background: rgba(85, 85, 85, 0.03);
+				color: $fontColor;
+			}
+		}
+		&:first-child
+		{
+			a, span 
+			{
+				@include border-radius-separate(3px, 0, 3px, 0);
+			}
+		}
+		&:last-child 
+		{
+			a, span 
+			{
+				@include border-radius-separate(0, 3px, 0, 3px);
+			}
+		}
+		&.active
+		{
+			a, a:focus, a:hover,
+			span, span:focus, span:hover
+			{
+				background: $primaryColor;
+				border: 1px solid $primaryColorDark;
+			}
+		}
+	}
+}

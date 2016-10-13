@@ -1,0 +1,26 @@
+node_modules/
+.idea/
+public/assets/js/build
+public/assets/js/editor/build/
+public/assets/scss/.sass-cache/
+npm-debug.log
+/configs/config.js
+public/assets/css/website.style.css.map
+public/assets/js/mcmConnect/.DS_Store
+public/assets/js/mcmConnect/mcmConnect.min.js
+.vscode/
+jsconfig.json
+test.js
+logs/
+*.log
+composer.phar
+composer.lock
+config.urls.php
+application/
+vendor/
+services/apexService/ap/build/
+services/apexService/ap/dist/
+log/access-Invalid date.log
+services/apexService/dist/
+public/apex.js
+public/assets/js/gieneeApEditor/

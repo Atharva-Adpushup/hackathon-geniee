@@ -1,0 +1,70 @@
+input[type="radio"], .maincheckbox[type="checkbox"]
+{
+  @include opacity(0);
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  &::hover
+  {
+  	outline:none;
+  }
+}
+input[type="radio"]+label,
+.maincheckbox[type="checkbox"]+label
+{
+	position: relative;
+	display: inline-block;
+	margin: 0;
+	line-height: 20px;
+	min-height: 14px;
+	min-width: 14px;
+	font-weight: normal;
+	&::before 
+	{		
+		font-family: Arial,Helvetica,sans-serif;
+		font-weight: normal;
+		font-size: 27px;
+		color: $primaryColor;
+		content: "\a0";
+		background-color: $IMRadioBg;
+		border: 1px solid $IMRadioBorder;
+		@include box-shadow(0, 1px, 2px, rgba(0,0,0,0.05), false);
+		display: inline-block;
+		text-align: center;
+		vertical-align: middle;
+		height: 13px;
+		line-height: 13px;
+		min-width: 13px;
+		margin-right: 5px;
+		margin-top: -4px;
+		@include border-radius(50%);
+	}
+}
+.maincheckbox[type="checkbox"]+label 
+{
+	&:before 
+	{
+		@include border-radius(0); 	
+		font-size: 11px;
+		font-family:fontAwesome;
+	}
+}
+input[type=radio]:checked+label::before,
+.maincheckbox[type=checkbox]:checked+label::before
+{
+	display:inline-block;
+	content:'\2022';
+	border-color:$primaryColor;
+}
+.maincheckbox[type=checkbox]:checked+label::before
+{
+	content:'\f00c';
+}
+input[type=radio]:hover+.label::before,
+input[type=radio]+label:hover::before,
+.maincheckbox[type=checkbox]:hover+.label::before,
+.maincheckbox[type=checkbox]+label:hover::before
+{
+	border-color:$primaryColor;
+}

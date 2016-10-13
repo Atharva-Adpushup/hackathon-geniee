@@ -1,0 +1,287 @@
+/**************Overwrite generic bootstrap and custom components style**************************/
+/******Generic site rules*******/
+.wrapper
+{
+    &.wrapper--page
+    {
+        background: url(../images/banner-bg.jpg) top left/cover;
+        height: 100%;
+        width: 100%;
+    }
+}
+
+.dropdown-menu
+{
+    &> .active
+    {
+        &> a,
+        &> a:hover,
+        &> a:focus,
+        &:active
+        {
+            background: $LPFormColor;
+            color: $whiteColor;
+        }
+    }
+}
+.modal-dialog {
+	margin:60px auto;
+}
+.form-control {
+	border-radius:0;
+	padding: $FMPaddingTB $FMPaddingLR;
+	border:1px solid $FMInputBorderCol;
+	font-size:$fontSize;
+	height: $FMInputHeight;
+}
+.form-control:focus 
+{
+  outline: 0;
+  border:1px solid $SBBorderColorActive;
+}
+.form-group {
+	margin-bottom: 10px;
+}
+
+.list-group {
+	margin-bottom:10px;
+}
+.margin-left {
+	margin-left: 5px;
+}
+._ap_btn_group {
+	margin:0;
+	text-align:right;
+}
+
+.styleSelect select 
+{
+  background: transparent;
+  width: 128px;
+  padding:0 5px;
+  font-size: 13px;
+  border: 0;
+  border-radius: 0;
+  height: 30px;
+  -webkit-appearance: none;
+  outline: none;
+ }
+.styleSelect 
+{
+  width: 123px;
+  height: 30px;
+  @include border-radius(3px);
+  overflow: hidden;
+  background: url(../images/select-arrow.png) no-repeat 103px #fff;
+  border: 1px solid #e6e6e6;
+}
+.styleSelect:focus {
+	border:1px solid #cccccc;
+	outline: none;
+}
+
+#intercom-container .intercom-launcher-button
+{
+	background-image: url("../images/icon-launcher.png") !important;
+}
+
+/***********Utility rules***********/
+.u-error
+{
+    box-shadow: 0 0 2px 2px $primaryColor !important;
+}
+.form-group-feedback {
+    color: $primaryColorDark !important;
+    display: inline-block;
+    margin-top: $FMLayoutDimension/2;
+    text-align: $POSLeft;
+}
+
+
+/*********Generic form rules****************/
+.form.form--custom
+{
+    padding-right: $FMLayoutDimension+$FMLayoutDimension/2 !important;
+    padding-left: 2px !important;
+
+    .form-group {
+        margin: 0;
+        padding: $FMLayoutDimension/2 0;
+    }
+}
+.form-group.form-group--horizontal
+{
+    .form-control
+    {
+        width: $FMLayoutDimension * 6;
+    }
+
+    .btn.btn-lightBg {
+        font-size: $FMLayoutDimension;
+        padding: $FMLayoutDimension/2;
+        width: $FMLayoutDimension * 6;
+    }
+    &.form-group--range
+    {
+        .form-control
+        {
+            display: inline-block;
+        }
+        &.form-group--range-text
+        {
+            .form-control
+            {
+                width: 47%;
+            }
+        }
+    }
+    &.form-group--inputBtn
+    {
+        .form-control
+        {
+            border-right: 0 !important;
+            width: 100% !important;
+        }
+        .btn
+        {
+            border-bottom-left-radius: 0 !important;
+            border-top-left-radius: 0 !important;
+            width: 100% !important;
+        }
+    }
+}
+.form-group.form-group--vertical
+{
+    .form-control
+    {
+        width: 100% !important;
+    }
+    .toggle label
+    {
+        align-items: flex-start;
+        display: flex;
+        justify-content: flex-start;
+    }
+}
+
+
+/*****Generic form padding units for input-group-addon******/
+/***Generic minimal input groups (checkbox/radio-with-label)****/
+.form-group
+{
+  .input-group
+  {
+    &.input-group--minimal
+    {
+      .input-group-addon
+      {
+        background: transparent;
+        height: $FMLayoutDimension*2;
+        padding: $FMLayoutDimension/5 3px $FMLayoutDimension/5 0;
+      }
+    }
+    .input-group-addon
+    {
+      padding: $FMPaddingTB $FMPaddingLR;
+    }
+    .input-group-text
+    {
+      color: $LPFormColor;
+      padding: $FMPaddingTB 3px;
+      font-size: 1em;
+    }
+  }
+}
+
+
+/**************Bootstrap Multiselect rules****************/
+.hide-native-select
+{
+    .btn-group
+    {
+        height: auto;
+        width: 100% !important;
+        
+        .btn.dropdown-toggle {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+}
+
+/***********Popover rules************/
+.popover
+{
+    display: block;
+
+    > .popover-title
+    {
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    > .popover-content
+    {
+        padding: $FMLayoutDimension / 2;
+    }
+
+    .list-group
+    {
+        > .list-group-item
+        {
+            border: 1px solid #e6e9ed;
+            padding: $FMLayoutDimension;
+
+            > .list-group-item-content
+            {
+                font-size: 1.1em;
+                text-transform: uppercase;
+            }
+        }
+    }
+}
+
+
+// TODO: Remove below vendor specific rules and 
+// put them in separate vendor/component specific CSS file
+/*************Custom Popover rules*************/
+.popover
+{
+    &.popover--custom-adrecover
+    {
+        cursor: move;
+        left: 83%;
+        top: 13%;
+        width: $FMLayoutDimension * 18;
+
+        .list-group
+        {
+            > .list-group-item
+            {
+                > .list-group-item-content
+                {
+                    color: $ADREPrimaryBorder;
+                }
+            }
+        }
+
+        /*******Draggabilly rules*********/
+        /****Webkit specific*****/
+        &.is-pointer-down
+        {
+            cursor: -webkit-grab;
+        }
+        &.is-dragging
+        {
+            cursor: -webkit-grabbing;
+        }
+    }
+}
+
+/*******Custom label rules***********/
+.label.label--text-faded {
+    color: $LPFormColor;
+    font-weight: normal !important;
+    display: inline-block;
+}

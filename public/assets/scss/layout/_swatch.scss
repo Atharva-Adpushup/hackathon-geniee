@@ -1,0 +1,83 @@
+.swatch
+{
+	float: left;
+	-webkit-transition: all .25s linear;
+	-webkit-transition-delay: 0s;
+	-moz-transition: all .25s linear 0s;
+	-o-transition: all .25s linear 0s;
+	transition: all .25s linear 0s;
+	position: relative;
+		.colorOuter
+		{
+			width: 60px;
+			height: 20px;
+			padding: 2px;
+			border:1px dashed #ccc;
+			.color
+			{
+				height: 100%;
+				width: 20%;
+	 			float: left;
+			}
+		}
+	.info 
+	{
+ 		font-size: 12px;
+ 		text-align: center;
+ 		color: $fontColor;
+	}
+}
+
+.swatchDesc {
+	position: absolute;
+	top: 0;
+	width: 120px;
+	height: 120px;
+	background-color: #939a9f;
+	z-index: 4;
+	display: none;
+	opacity: 0;
+	@include border-radius($BorderRadius);
+}
+
+
+.swatch.swatch-open + .swatchDesc,
+.swatch.swatch-close + .swatchDesc {
+	-webkit-animation-duration: 0.4s;
+	animation-duration: 0.4s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+}
+
+.swatch.swatch-open + .swatchDesc {
+	display: block;
+	-webkit-animation-name: anim-open;
+	animation-name: anim-open;
+	-webkit-animation-timing-function: cubic-bezier(0.6,0,0.4,1);
+	animation-timing-function: cubic-bezier(0.6,0,0.4,1);
+}
+
+.swatch.swatch-close + .swatchDesc {
+	-webkit-animation-name: anim-close;
+	animation-name: anim-close;
+}
+
+@-webkit-keyframes anim-open {
+	0% { opacity: 0; -webkit-transform: scale3d(0, 0, 1); }
+	100% { opacity: 1; -webkit-transform: scale3d(1, 1, 1); }
+}
+
+@keyframes anim-open {
+	0% { opacity: 0; -webkit-transform: scale3d(0, 0, 1); transform: scale3d(0, 0, 1); }
+	100% { opacity: 1; -webkit-transform: scale3d(1, 1, 1); transform: scale3d(1, 1, 1); }
+}
+
+@-webkit-keyframes anim-close {
+	0% { opacity: 1; }
+	100% { opacity: 0; -webkit-transform: scale3d(0.5, 0.5, 1); transform: scale3d(0.5, 0.5, 1); }
+}
+
+@keyframes anim-close {
+	0% { opacity: 1; }
+	100% { opacity: 0; -webkit-transform: scale3d(0.5, 0.5, 1); transform: scale3d(0.5, 0.5, 1); }
+}

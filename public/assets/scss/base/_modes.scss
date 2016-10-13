@@ -1,0 +1,137 @@
+.modes 
+{
+  margin: 7px 5px 5px 5px;
+  float: left;
+  background: $MTModesBg;
+  position: relative;
+  height: 27px;
+  border:1px solid $MTModesBorderCol;
+  width: 82px;
+  @include border-radius($MTModesBorderRadius);
+  .modes-input
+  {
+  	display: none;
+  }
+  .modes-label
+  {
+  	position: relative;
+	  z-index: 2;
+	  font-weight: normal;
+	  float: left;
+	  width: 40px;
+	  line-height: 25px;
+	  font-size: $MTModesFontSize;
+	  color: $whiteColor;
+	  text-align: center;
+	  cursor: pointer;
+	  @include text-shadow(0, 1px, 1px, rgba(0, 0, 0, 0.2));
+	  &:before 
+	  {
+	  	display: none;
+	  }
+  }
+  .modes-input:checked + .modes-label 
+  {
+	  color: $whiteColor;
+	  @include transition(all, 0.15s, ease-out);
+	  @include text-shadow(0, 1px, 1px, rgba(0, 0, 0, 0.1));
+	  &:before 
+	  {
+	  	display: none;
+	  }
+	}
+	.modes-selection 
+	{
+	  display: block;
+	  position: absolute;
+	  z-index: 1;
+	  top: 1px;
+	  left: 1px;
+	  width: 39px;
+	  height: 23px;
+	  background: $GreenColor;
+	  @include border-radius($MTModesSelectedBorderRadius);
+	  @include transition(left, 0.15s, ease-out);
+	}
+	.modes-input:checked + .modes-label-on ~ .modes-selection 
+	{
+	  left: 40px;
+	}
+
+	/****AdRecover Specific******/
+	&.modes--adrecover
+	{
+		background: $ADREPrimaryBgColor;
+		border: 1px solid $ADREPrimaryBorder;
+		width: 162px !important;
+
+		> .modes-label
+		{
+			width: 80px !important;
+		}
+
+		> #adRecoverPauseMode:checked ~ .modes-selection
+		{
+			background: $primaryColor;
+		}
+
+		> .modes-selection
+		{
+			background: $ADREPrimaryFontColor;
+			width: 79px !important;
+		}
+
+		.modes-input:checked + .modes-label-on ~ .modes-selection
+		{
+			left: 80px !important;
+		}
+	}
+
+	// Modes UI state change rules
+	// Add 'modes--stateChange' className if a toggle switch look & feel
+	// is needed
+	&.modes--stateChange
+	{
+		.modes-input
+		{
+			&.modes-input-off
+			{
+				&:checked
+				{
+					~ .modes-selection
+					{
+						background: $primaryColor;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+.modeslarg {
+	width: 122px;
+
+	.modes-label
+  {
+  	width: 60px;
+  	font-size: 12px;
+  	text-shadow:0 1px 1px rgba(0, 0, 0, 0.3);
+  }
+  .modes-selection 
+  {
+  	width: 59px;
+  }
+  .modes-input:checked + .modes-label-on ~ .modes-selection 
+  {
+  	left: 60px;
+  }
+}
+
+.greenBtn 
+{
+	.modes-selection
+	{
+		background: $GreenColor;
+	}
+}

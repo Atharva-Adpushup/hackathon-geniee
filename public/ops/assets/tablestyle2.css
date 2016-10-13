@@ -1,0 +1,8 @@
+.collapsedTable {
+    border-collapse: collapse;
+}
+
+table.borderedTable td, table.borderedTable th, table.borderedTable > tr{
+    border: 1px solid grey;   
+    padding : 10px;
+}

@@ -1,0 +1,93 @@
+/*Main Page CSS Starts Here*/
+.pageLeftSidebar~.pageContainer {
+	padding-left: 65px;
+}
+.pageContainer 
+{
+	background: $dashboardBgColor;
+	width: 100%;
+	height: 100%;
+	.pageContentWrapper 
+	{
+		position: relative;
+		min-height: 100%;
+		.pageContentInner 
+		{
+  		z-index: 10;
+	  	padding: 90px 25px 25px;
+  		min-height: 100%;
+  		@include transition(all, 0.3s, ease);	
+      .notification-wrapper {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        z-index: 5;
+        .alert {
+          margin-bottom: 0;
+          @include border-radius(0);
+          transition:all 0.2s linear 0s;
+          -webkit-transition:all 0.2s linear 0s;
+          font-size: 14px;
+          padding: 12px 15px;
+          i {
+            margin-right: 10px;
+            font-size: 17px;
+          }
+        }
+      }
+  		.row 
+  		{
+				h3 
+				{
+          font-size: inherit;
+					>a {
+						color: $primaryColor;
+            font-size: $CVATitleSize;
+					}
+				}
+  		}	
+		}
+	}
+}
+
+.table-wrapper-paddded {
+  padding: 20px;
+
+  table {
+    margin-bottom: 0;
+    font-size: 1.2em;
+
+    thead {
+      background-color: lighten($mainBgColor, 1.5%);
+      color: $ADREPrimaryBorder;
+
+      th {
+        padding: 15px;
+      }
+    }
+
+    tbody {
+      td {
+        padding: 15px;
+      }
+
+      a {
+        color: $ADREPrimaryBorder;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.table-actions {
+  a {
+    font-size: 1.2em;
+    vertical-align: middle;
+    color: $ADREPrimaryBorder;
+
+    &:not(:last-child) {
+      margin-right: 10px;
+    }
+  }
+}

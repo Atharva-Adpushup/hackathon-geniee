@@ -1,0 +1,46 @@
+.MenuBarContainer 
+{
+  overflow: hidden;
+
+  .MenuBarInner
+  {
+    max-height: 500px;
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    .SelectParent
+    {
+      padding: 0 5px;
+
+      .row
+      {
+        border-bottom: 1px solid $IMBorderColor;
+        padding: 4px 0;
+        line-height: 20px;
+
+        &:last-child 
+        {
+          border-bottom:0;
+        }
+
+        &:hover
+        {
+          background: $RowHoverBg;
+        }
+      }
+
+      &.channelLst
+      {
+
+        .mobile, .tablet 
+        {
+
+          i 
+          {
+            font-size: 16px;
+          }
+        }
+      }
+    }
+  }
+}

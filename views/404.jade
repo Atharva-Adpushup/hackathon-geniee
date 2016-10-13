@@ -1,0 +1,24 @@
+extends layout/base
+
+block getTitle
+    - var titleVar = "404 Page Not Found"
+
+block append analyticsIdentify
+    if (environment == "production")
+        script(type="text/javascript").
+            analytics.track('APP_404', {
+                IS_ADMIN: #{isSuperUser}
+            });
+
+block bodyContent
+    .errorMain
+        .container
+            .row
+                .col-sm-12
+                    ul
+                        li OOPS!
+                        li 404
+                    section.txt.animated.In.fadeInDown
+                        h4
+                            | It looks like nothing was found at #{url}. Maybe try to&nbsp;
+                            a(href='/') SignUp.

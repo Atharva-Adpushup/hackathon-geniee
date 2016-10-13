@@ -1,0 +1,93 @@
+.containerButtonBar
+{
+	padding-bottom:70px;
+  	input[type="number"]{
+	  width: 60px;
+	}
+	.adsDescriptor
+	{
+		.row
+		{
+			margin: 0;
+			padding: 7px 0;
+			font-size: 12px;
+			&:hover
+			{
+				background:$RowHoverBg;
+			}
+		}
+	}
+  	.butttonsRow
+	{
+		padding: $ESPadding 0 !important;
+		margin: 0 0 0 -11px !important;
+		background: $ESBg;
+		position: absolute;
+		bottom: 0;
+		z-index: 6;
+		width: 100%;
+		border-top: 1px solid $MBButtonRowBorder;
+		border-radius: 0 0 3px 3px;
+	}
+	&.contextEditMenu 
+	{
+		.row
+		{
+			margin: 0;
+    	padding: 7px 0;
+    	font-size: 12px;
+    	i
+    	{
+    		color: $primaryColor;
+    		cursor: pointer;
+    	}
+		}
+	}
+}
+
+.sm-pad
+{
+  .row
+  {
+	margin: 0;
+	padding: 5px 0;
+  }
+}
+
+.MenuBarComponentWrap.TopRight 
+{
+	.MenuBarContainerWrapper 
+	{
+		float: right;
+		.MenuBarContainer
+		{
+			padding: 10px 5px 10px 10px;
+			.containerButtonBar 
+			{
+				.butttonsRow 
+				{
+					margin: 0 0 0 -10px;
+				}
+			}
+		}
+	}
+	.ContentExtWrap {
+		float: right;
+	}
+}
+
+.panelBySizeContainer
+{
+	.panel-group
+	{
+		overflow: hidden;
+		.panelBySize
+		{
+			max-height: 195px;
+			overflow-y:auto;
+			overflow-x:hidden;
+		}
+	}
+}
+
+

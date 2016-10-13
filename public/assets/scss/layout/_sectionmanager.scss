@@ -1,0 +1,264 @@
+
+.switcher-hidden 
+{
+  .sectionManager  
+  {
+    width: 50px;
+    overflow: hidden;
+    @include border-radius-separate(0, 4px, 0, 0);
+    &.statsmode 
+    {
+      width: 50px;
+    }
+  }
+}
+  .sectionManager 
+  {
+    height: 50px;
+    background-color: $primaryColor;
+    @include box-sizing(border-box);
+    width: 251px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    @include transition(width, 0.3s, ease);
+    @include opacity(0.98);
+    .switcher-toggle 
+    {
+      display: block;
+      text-indent: -9999px;
+      height: 50px;
+      width: 50px;
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 99;
+      background:$fontColor;
+      cursor: pointer;
+      &:hover 
+      {
+        background: $iconColor;
+        &:before 
+        {
+          color: $whiteColor;
+        }
+      }
+      &:before 
+      {
+        font-family: 'FontAwesome';
+        speak: none;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 50px;
+        -webkit-font-smoothing: antialiased;
+        margin: 0;
+        text-indent: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        color: $borderColor;
+        content: "\f07e";
+      }
+    }
+    .wrapper 
+    {
+      height: 50px;
+      position: relative;     
+        
+      .heading
+        {
+          *zoom: 1;
+          @include transition(all, 0.3s, ease);
+          @include box-sizing(border-box);
+          position: relative;
+          border-right: 1px solid $primaryColorLight;
+          height: 50px;
+          line-height: 50px;
+          border-width: 0 1px;
+          display: inline-block;
+          padding: 0 10px;
+          width: calc(100% - 50px); 
+          font-weight: 700;
+          a 
+          {
+            color: #fff;
+            float: left;
+          }
+          .toggle.toggleSizeSmall
+          {
+            float: left;
+            margin: 16px 0 0 15px;
+          }
+          &:hover 
+          {
+            background: rgba(255, 255, 255, 0.1);
+          }
+        }
+      .content
+      {
+        position: absolute;
+        bottom: 100%;
+        opacity: 1;
+        overflow: hidden;
+        visibility: visible;
+        margin: 0;
+        padding: 0;
+        z-index: 9999;
+        width: 100%;
+        background:rgba(121, 121, 121, 0.86);
+        list-style: none;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+        @include box-sizing(border-box);
+        @include transition(all, 0.3s, ease);
+        max-height: 100%;
+        min-height: 295px;
+        overflow-x: hidden !important;
+        ul.list 
+        {
+          li 
+          {
+            position: relative;
+            @include perspective(700);
+            @include box-sizing(border-box);
+            line-height: 25px;
+            font-weight: 700;
+            margin: 4px 4px 0 4px;
+            font-size: 14.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            .row 
+            {
+              margin: 0;
+              [class*="col-"]
+              {
+                text-align: center;
+                &:first-child
+                {
+                  padding-left: 5px;
+                  text-align: left;
+                }
+              }
+            }
+            &.statshead
+            {
+              border-top-left-radius: 3px;
+              border-top-right-radius: 3px;
+              height: 30px;
+              line-height: 30px;
+              font-size: 13px;
+              color: #fff;
+              margin: 0;
+              background-color: $primaryColor;
+              text-transform: uppercase;
+            }
+            .statsWrapper
+            {
+              position: absolute;
+              min-height: 265px;
+              max-height: 100%;
+              overflow:hidden;
+              overflow-y:auto; 
+              ul
+              {
+                margin-right: 8px;
+                .level-og
+                {
+                  @include transition(all, 350ms, ease);
+                  height: auto;
+                  background:$SMlevelFrstBG;
+                  width: 100%;
+                  float: left;
+                  margin: 0 4px 4px 4px;
+                  .level-og 
+                  {    
+                    background: $SMlevelScndBG;
+                    margin: 0;
+                    font-size: 14px;
+                    .row
+                      {
+                        border-bottom: 1px solid $SMlevelScndBorder;
+                        [class*="col-"]:first-child
+                        {
+                          padding-left: $SMlevelScndColPad;
+                        }
+                      }
+                    .level-og
+                    {    
+                      background: $SMlevelThrdBG;
+                      font-size: 12.5px;
+                      text-transform: capitalize;
+                      .row
+                      {
+                        border-bottom: 1px solid $SMlevelThrdBorder;
+                        [class*="col-"]:first-child
+                        {
+                          padding-left: $SMlevelThrdColPad;
+                        }
+                      }
+                      .level-og
+                      {    
+                        background: $SMlevelFrthBG;
+                        font-weight: lighter;
+                        .row
+                        {
+                          border-bottom: 1px solid $SMlevelFrthBorder;
+                          [class*="col-"]:first-child
+                          {
+                            padding-left: $SMlevelFrthColPad;
+                            &:before 
+                            {
+                              display: none;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                  .collapsed
+                  {
+                    [class*="col-"]:first-child
+                    {
+                      &:before 
+                      {
+                        @extend collapsedextended;
+                        content: "\f0da" !important;
+                      }
+                    } 
+                  }
+                  .expanded
+                  {
+                   [class*="col-"]:first-child
+                    {
+                      &:before 
+                      {
+                        @extend collapsedextended;
+                        content: "\f0d7";
+                      }
+                    } 
+                  }
+                }
+              } 
+            }         
+          }
+        }
+        .message
+        {
+          color: $SMMessageColor;
+          font-size: $SMMessageFontSize;
+          padding: 20px;
+          text-align: center;
+        }
+      }  
+    }
+    &.statsmode
+    {
+      width: 700px;
+    }
+  }

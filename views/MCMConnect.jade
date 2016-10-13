@@ -1,0 +1,74 @@
+extends layout/base
+
+block getTitle
+    - var titleVar = "MCM Connect"
+    
+block append headCss
+    style(type="text/css").
+        html, body {
+            height: 100%;
+            min-height: 100%;
+            width: 100%
+        }
+        .heading {
+            font-size: 1em;
+            line-height: 1em;
+            margin: 0 0 20px;
+        }
+        .alert {
+            background: transparent;
+            font-size: 0.8em;
+            margin: 10px 0;
+            padding: 5px 10px;
+        }
+        .alert strong {
+            margin: 0 5px 0 0;
+        }
+        .page-content {
+            align-items: center;
+            display: flex;
+            justify-content: center;
+        }
+        .page-content .jumbotron {
+            background: #fff;
+            border: 1px solid #e6e6e6;
+            min-height: 200px;
+            padding: 20px 0;
+            width: 60%;
+        }
+        .page-content .jumbotron h1 {
+            font-size: 1.6em;
+            margin: 0 0 1.6em;
+        }
+
+block append headScripts
+    script(type='text/javascript', src='/assets/js/libs/third-party/socket.io.js')
+
+block bodyContent
+    input(type="hidden", id="input-hidden--params", data-baseUrl=baseUrl, data-userEmail=userEmail, data-pubId=pubId, data-adsenseEmail=adsenseEmail)
+    .pageContainer.page-container
+        include layout/header
+        .pageContentWrapper.page-content.clearfix
+            .jumbotron.text-center(id="jumbotron-mcmConnect")
+                .container
+                    h1(class="heading heading--h1") Adsense MCM Invitation
+                    btn(id="btn-getMcmLink", class="btn btn-lightBg", data-loading-text="Fetching invite link...") Connect to MCM
+                    btn(id="btn-mcmInviteDone", class="btn btn-lightBg hide", data-loading-text="Verifying...") I have completed MCM invitation. Verify now!
+
+                    .alert.alert-success.hide(id="link-mcmInvite-success", role="alert")
+                        strong Got invite link!
+                        a(href="https://www.google.co.in") MCM Invite
+                        
+                    .alert.alert-success.hide(id="mcmInvite-success", role="alert")
+                        strong That's it!
+                        | Thank you for the cooperation.
+                        
+                    .alert.alert-danger.hide(id="link-mcmInvite-error", role="alert")
+                        strong Unable to get invite link.
+                        btn(id="btn-retryMcmLink", class="btn btn-lightBg", data-loading-text="Retrying...") Retry
+
+                    .alert.alert-danger.hide(id="mcmInvite-error", role="alert")
+                        strong Some error occurred!
+                        btn(id="btn-retryMcmInvite", class="btn btn-lightBg", data-loading-text="Retrying...") Retry
+
+    script(src="/assets/js/mcmConnect/mcmConnect.js")

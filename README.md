@@ -1,2 +1,2 @@
-# GenieeAdPushup
-GenieeAdPushup integration app, with A/B testing support editor.
+# AdPushup App
+Node repo for AdPushup App

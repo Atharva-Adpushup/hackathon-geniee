@@ -1,0 +1,323 @@
+$primaryColor:#eb575c;										//Main Adpushup Red Color
+$primaryColorDark:#cf474b;									//Red Dark Color
+$primaryColorLight:#FB9FA2;
+$mainBgColor:#f6f7f8;
+$whiteColor:#fff;
+$warningColor:#f0ad4e;
+$fontFamily:'Karla', sans-serif;
+$fontColor:#555555;
+$borderColor:#e6e6e6;
+$iconColor:#787878;
+$arrowDownIconSize:12px;
+$BorderRadius:3px;
+$dashboardBgColor: #ebf1f2;
+$lightGrey:#ccc;
+$fontSize:12px;
+$GreenColor:#14A314;
+
+// AdRecover branding
+$ADREPrimaryBgColor: #292929;
+$ADREPrimaryBorder: #444;
+$ADREPrimaryFontColor: #0fbe7c;
+
+//ScrollBar ($SB)
+$SBWidthHeight:7px;
+$SBBorderRadius:7px;
+
+//Loader ($LO)
+$LOSpinBeforeHeiWidth:100px;
+$LOSpinBeforeBorderWid:5px;
+
+//LoaderBar ($LB)
+$LBHeight:3px;
+$LBBgColor:#f9f9f9;
+$LBSpinnerPosition:15px;
+$LBSpinnerHeightWidth:20px;
+
+// Modal ($M)
+$MFontSize:16px;
+$MHeadPadTB:10px;
+$MHeadPadLR:15px;
+$MBodyPaddingTB:16px;
+$MBodyPaddingLR:12px;
+$MLogoMinHeight:200px;
+$MLogoBodyPadding:15px;
+$MLogoPaddingL:195px;
+$MLogoHeadSize:20px;
+$MLogotxtSize:16px;
+$MPFontSize:15px;
+$MH4FontSize:24px;
+$MH6FontSize:16px;
+$MButtonRowPadding:15px;
+$MIFontSize:25px;
+$MPMarginTB:5px;
+$MBorderRadius:3px;
+
+//Close 
+$closeColor:#ccc;
+$closeHoverColor:#f6f7f8;
+$closeHoverBGColor:#ccc;
+
+//Main Tabs ($MT)
+$MTBgColorli:#ccc;
+$MTBgColorliHover:#BEBEBE;
+$MTAddNewFontSize:16px;
+$MTIconHeight:11px;
+$MTIconWidth:12px;
+$MTIconFontSize:11px;
+$MTModesFontSize:16px;
+$MTModesSelectedColor:#eb575c;
+$MTModesBorderRadius:3px;
+$MTModesSelectedBorderRadius:2px;
+$MTRightSaveMarginT:7px;
+$MTRightSavePadTB:3px;
+$MTModesBg:#ccc;
+$MTModesBorderCol:#B3B3B3;
+
+/*ToolBar (MB) ToolBar Container ($MBC)*/
+$MBBorderRadius:3px;
+$MBBorderTopColor:#e6e7e8;
+$MBItemHeight:35px;
+$MBItemWidth:40px;
+$MBItemBg:#ccc;
+$MBCWrapBg:#fff;
+$MBCWrapWidth:255px;
+$MBCWrapborderColor:#DFDFE0;
+$MBCWrapMarginLeft:33px;
+$MBArrowSize:7px;
+$MBCHeadSize:15px;
+$MBCHeadBg:#f2f3f4;
+$MBCHeadHeight:34px;
+$MBCHeadIconBg:#fff;
+$MBCHeadIconSize:12px;
+$MBCHeadIconHeightWidth:24px;
+$MBButtonRowBorder:#DFDFE0;
+
+/*Insert Menu ($IM)*/
+$IMBorderColor:#e6e6e6;
+$IMPanelBodyPaddding:10px;
+$IMPanelBodyFontSize:11px;
+$IMRadioBg:#FAFAFA;
+$IMRadioBorder:#ccc;
+
+/*Row */
+$RowHoverBg:rgba(85, 85, 85, 0.05);
+
+/*Login Page ($LP)*/
+$LPBg:#fff;
+$LPBorderRadius: 5px;
+$LPHeadPadding: 20px 25px;
+$LPFormColor:#89949B;
+$LPFormInputHeight:50px;
+$LPFormIconSize:18px;
+$LPFormInputSize:16px;
+$LPFormBorderColor:#ddd;
+$LPFormBorderFocusColor:#ccc;
+$LPFormButtonSize:12px;
+$LPFormButtonPaddingTB:7px;
+$LPFormButtonPaddingLR:20px;
+$LPFormButtonMarginTop:10px;
+$LPFooterPadding:20px;
+$LPFooterTextMarginL:15px;
+$LPFooterTextPadTB:5px;
+$LPFooterTextPadLR:15px;
+$LPErrorMessageColor:#E34849;
+$LPSuccessMessageColor:#04A506;
+$LPErrorMessageMargin:5px;
+$LPErrorMessageFontSize:12px;
+$LPErrorMessagePadLeft:45px;
+$LPErrorMessageTopPadLeft:30px;
+$LPForgetPassFontSize:14px;
+$LPForgetPassPadTop:15px;
+
+/*Extra Space ($ES)*/
+$ESBg:#f6f7f8;
+$ESPadding:20px;
+
+/*SelectBox ($SB)*/
+$SBContainerWidth:100%;
+$SBContainerBorderRadius:3px;
+$SBBorderColor:#e6e6e6;
+$SBBorderColorActive:#ccc;
+$SBPaddingTB:5px;
+$SBPaddingLR:8px;
+$SBArrowRight:10px;
+$SBArrowBorder:5px;
+$SBArrowColor:#555555;
+$SBFontSmall:11px;
+
+/*Form ($FM) */
+$FMInputBorderCol:#e6e6e6;
+$FMInputBorderColorActive:#ccc;
+$FMPaddingTB:5px;
+$FMPaddingLR:8px;
+$FMInputHeight:26px;
+$FMLayoutDimension:10px;
+
+/*Position ($POS)*/
+$POSLeft:left;
+$POSRight:right;
+$POSTop:top;
+$POSBottom:bottom;
+
+/*Toggle Switch*/
+$TSHeight:24px;
+$TSLineHeight:24px;
+$TSWidth:50px;
+$TSBg:#919191;
+$TSBorderRadius:2px;
+$TSFontSize:11px;
+$TSAfterColor:#777;
+$TSAfterWidth:49px;
+$TSAfterLineHeight:22px;
+$TSSmallHeight:20px;
+$TSSmallWidthBefore:30px;
+$TSSmallFontSize:10px;
+$TSSmallAfterLineHeight:18px;
+$TSFocusBgColor:#777;
+$TSFocusAfterColor: #5e5e5e;
+$TSCheckedAfterColor:#e84046;
+
+/* Left Sidebar Navigation (LSN) */
+$LSNWidth:220px;
+$LSNHeadHeight:60px;
+$LSNiconHeight:40px;
+$LSNFontsize:15px;
+$LSNiconFontSize:20px;
+$LSNMarginBot:10px;
+$LSNTextPadLeft:15px;
+$LSNiconMarginRight:8px;
+$LSNLeftPosition:-155px;
+$LSNBorderRight:8px;
+
+/*Top Fixed Bar(TFB) Height*/
+$TFBHeight:60px;
+$TFBpaddingRight:20px;  
+$TFBthumbWrap:32px;
+$TFBthumbWrapBorderColor:#ffcdcf;
+$TFBthumbWrapPadding:2px;
+$TFBthumbFontSize:15px;
+
+/*Control V/S Adpushup  (CVA)*/
+$CVABgColor:#fff;
+$CVATitleSize:25px;
+$CVAGraphBgColor:#f9f9f9;
+$CVAColContHead:50px;
+
+/*Drop Down Icon (DDI)*/
+$DDIaBorderRadius:17px;
+$DDIBtnBorderRadius:3px;
+$DDIMenuMinWidth:180px; 
+$DDIMenuFont:13px;
+$DDIMarginTop:7px;
+
+/*Reports Table (RT) */
+$RTButtonWidth:66px;
+$RTButtonHeight:15px;
+$RTSelectFont:12px;
+$RTInputHeight:28px;
+$RTTHFontSize:13px;
+$RTLabelFontSize:15px;
+$RTPadding:25px;
+$RTFontSize:14px;
+
+/*New Channel */
+$fontSizeIconModalSm:13px;
+$fontSizeIconModal:16px;
+$defaultBgcolor:#e6e6e6;			
+
+/*PublishHelp (PH)*/
+$PHCompletedColor:#14A314;
+$PHHeadingFont:14px;
+$PHHeadingPadTB:8px;
+$PHHeadingPadLR:12px;
+$PHInnerPad:10px;
+$PHPanelBodyPad:10px;
+$PHPanelBodyFont:12px;
+$PHIconFont:14px;
+$PHStatusIconPadL:15px;
+$PHStatusIconMarginR:5px;
+$PHIconPositionT:11px;
+$PHIconPositionLR:7px;
+
+/*AdPreview (AP)*/
+$APMarginT:20px;
+$APPad:5px;
+$APHeadPadB:4px;
+$APTxtFont:12px;
+$APTxtMarginB:2px;
+$APColor:#818181;
+$APUrlImgMarginR:2px;
+
+/*ColorPicker/ CreateTemplate (CT)*/
+$CTHeight:40px;
+$CTMarginB:12px;
+$CTLiWidth:18%;
+$CTLiMarginR:2%;
+$CTBoxHeight:22px;
+$CTBoxPad:2px;
+$CTInnerBoxHeight:16px;
+$CTTxtFont:11px;
+
+/*CSSEditor (CE)*/
+$CEPad:7px;
+$CEMarginTB:10px;
+$CEAlignMarginB:10px;
+$CEAlignFont:12px;
+$CEAlignPadTB:4px;
+
+/*ErrorPage (EP)*/
+$EPPadTB:100px;
+$EPUlFont:8em;
+$EPUlHeightLineHeight:90px;
+$EPTxtMarginT:100px;
+$EPFormMarginT:40px;
+$EPFormHeight:50px;
+
+
+/* ThankYou Page (TYP)*/
+$TYPFont:3em;
+$TYPPadTB:60px;
+$TYPTxtMarginT:60px;
+$TYPSmallTxt:14px;
+$TYPClickHereFont:14px;
+
+
+/*FAQ Page (FAQ)*/
+$FAQBgColor:#fffdfd;
+$FAQBoxPad:20px;
+$FAQColor:#939393;
+$FAQBoxHeight:155px;
+$FAQIFont:30px;
+$FAQIColor:#bcbcbc;
+$FAQHeadMarginT:20px;
+$FAQHeadMarginB:10px;
+$FAQHeadFont:14px;
+$FAQTxtFont:11px;
+$FAQTxtLineHeight:18px;
+
+/*Help of Each Menu (HEM)*/
+$HEMPadTB:4px;
+
+/*Network Manager (NM)*/
+$NPHeadMarginT:10px;
+$NPHeadMarginB:20px;
+$NPHeadFont:14px;
+$NPHeadColor:#939393;
+$NPLabelfontSize:13px;
+$NPRowPad:7px;
+$NSButtonPadding:10px;
+
+/*Section Manager ($SM)*/
+$SMlevelFrstBG:#D1D6DB;
+$SMlevelScndBG:#DDE0E4;
+$SMlevelScndBorder:#CBCED0;
+$SMlevelScndColPad:12px;
+$SMlevelThrdBG:#E8EBED;
+$SMlevelThrdBorder:#DEDFE3;
+$SMlevelThrdColPad:20px;
+$SMlevelFrthBG:#f6f7f8;
+$SMlevelFrthBorder:#e6e6e6;
+$SMlevelFrthColPad:30px;
+$SMMessageFontSize:20px;
+$SMMessageColor:#fff;

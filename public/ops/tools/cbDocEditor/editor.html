@@ -1,0 +1,44 @@
+<html>
+
+<head>
+
+<title>Couchbase Doc Editor</title>
+
+<link rel="stylesheet" href="style.css"/></link>
+<link rel="stylesheet" href="/ops/assets/jsonEditor/jsoneditor.min.css"/></link>
+
+<script src='/assets/js/libs/third-party/jquery.js'></script>
+<script src='/ops/assets/jsonEditor/jsoneditor.js'></script>
+<script src='/ops/assets/someHelperFunctions.js'></script>
+<script src='script.js'></script>
+
+</head>
+
+<body>
+
+
+<div id='divv'>	
+	<h3>Couchbase Doc Editor </h3>
+
+	<select id="id_bucketName">
+	<option value="apAppBucket" selected>apAppBucket</option>
+	<option value="apStatsBucket">apStatsBucket</option>
+	<option value="apRawLogBucket">apRawLogBucket</option>
+	<option value="apLocalBucket">apLocalBucket</option>
+	</select>
+	<br><br>
+
+	<form onsubmit='pullDoc()'>
+		<input type="text" placeholder='Enter Doc Id to Load' id='id_docId' autofocus />
+	</form>
+	<br><br>
+	<input type = 'button' class='pullButton' value='pull doc' onclick='pullDoc(this)' id='id_pullDoc'></input>
+	<input type = 'button' class='pushButton' value='push doc' onClick='pushDoc(this)' id='id_pushDoc'></input><br>
+
+	<p id='msg' class='green'>Greetings User</p>
+</div>
+
+<div id='id_json'  style="width: 1000px; height: 800px;margin: auto;"></div><br>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+.panel-group
+	{
+		.panel
+		{
+			border:1px solid $IMBorderColor;
+			margin-bottom: 4px;
+			.panel-heading 
+			{
+				border-radius: 0;
+				background: #fff;
+				padding: 0 10px;
+				border-bottom: 2px solid $IMBorderColor;
+				.panel-title
+				{
+					font-size: 13px;
+					font-weight: bold;
+					color: $fontColor;
+					a 
+					{
+						padding: 7px 0;
+						color: $fontColor;
+					}
+				}
+			}
+			.panel-collapse 
+			{
+				.panel-body
+				{
+					padding:0 $IMPanelBodyPaddding;
+					font-size:$IMPanelBodyFontSize;
+					.Col 
+					{
+						margin: 5px 0;
+					}
+				}
+			}
+		}		
+	}

@@ -1,0 +1,39 @@
+.addSite
+{
+	padding: 25px 35px;
+	.form-group 
+	{
+		.input-group-addon, .form-control 
+		{
+			@include border-radius(0);
+			color: #89949b;
+			height: 50px;
+		}
+		.form-control 
+		{
+			border: 2px solid #ddd;
+			font-size: 16px;
+			&:focus 
+			{
+				border-color: #ccc;
+			}
+		}
+		.error-message 
+		{
+		  display: block;
+			margin-top: 5px;
+			text-align: left;
+			font-size: 12px;
+			line-height: 14px;
+			padding:0 0 0 45px;
+			color: #E34849;
+		}
+	}
+}
+.modal-footer 
+{
+	.btn-lightBg 
+	{
+		padding: 10px 15px;
+	}
+}

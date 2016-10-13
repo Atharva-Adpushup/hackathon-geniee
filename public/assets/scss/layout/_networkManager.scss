@@ -1,0 +1,76 @@
+.networkmanager
+{
+	h5 
+	{
+		text-transform: uppercase;
+	  margin: $NPHeadMarginT 0 $NPHeadMarginB 0;
+	  font-weight: bold;
+	  font-size: $NPHeadFont;
+	  color: $NPHeadColor;
+	}
+	a 
+	{
+		@include transition(all, 0.3s, ease-out);
+		&:hover
+		{
+			color: $primaryColor;
+		}
+	}
+	.panel 
+	{
+		box-shadow: none;
+		border:1px solid $borderColor;
+		@include border-radius($BorderRadius);
+		margin-bottom: 0;
+		.panel-heading
+		{
+			background: $mainBgColor;
+			font-weight: bold;
+	  	font-size: $NPHeadFont;
+	  	color: $fontColor;
+	  	@include border-radius-separate($BorderRadius, $BorderRadius, 0, 0);
+	  	border-color:$borderColor;
+		}
+		.panel-body
+		{
+			
+			.row
+			{
+				padding: $NPRowPad 0;
+				label 
+				{
+					font-size: $NPLabelfontSize;
+				}
+				&:first-child 
+				{
+					padding-top: 0;
+				}
+				&:last-child 
+				{
+					padding-bottom: 0;
+				}
+				.maxad 
+				{
+					padding: 0 0 0 $FMPaddingLR;
+				}
+				.maincheckbox[type="checkbox"]
+				{
+					z-index: 1;
+				}
+				&.butttonsRow
+				{
+					padding: $NSButtonPadding 0;
+					background: $ESBg;
+					position: relative;
+					bottom: -15px;
+					border-top: 1px solid $MBButtonRowBorder;
+					border-radius: 0 0 3px 3px;
+				}
+				&.err 
+				{
+					color: $primaryColor;
+				}
+			}	
+		}
+	}
+}

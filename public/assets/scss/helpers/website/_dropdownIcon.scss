@@ -1,0 +1,69 @@
+/*DropDown Option CSS Starts Here*/
+
+.btn-group-option 
+{
+  .btn-option 
+  {
+    @include border-radius($DDIBtnBorderRadius);
+    border-color: $borderColor;
+    &:first-child:not(:last-child):not(.dropdown-toggle)
+    {
+      @include border-radius($DDIaBorderRadius);
+    } 
+    .btn-txt {
+      font-size: 12px;
+      margin-right: 5px;
+    }
+  }
+  .dropdown-menu 
+  {
+    min-width: $DDIMenuMinWidth;
+    font-size: $DDIMenuFont;
+    border-color: $borderColor;
+    @include box-shadow(0, 2px, 5px, 0, rgba(0,0,0,.05), false);
+    display: block;
+    visibility: hidden;
+    @include opacity(0);
+    transition: visibility 0s, opacity 0s;
+    @include border-radius(0);
+    margin-top:$DDIMarginTop;
+    &.open
+    {
+      @extend dropdownMenuOpen ;
+    }
+    li 
+    {
+      a 
+      {
+        padding: 8px 10px;
+        i 
+        {
+          @include opacity(.2);
+          line-height: 17px;
+        }
+        &:hover
+        {
+          i 
+          {
+            @include opacity(.5);
+          }
+        }
+      }
+      &.divider 
+      {
+        margin: 3px 0;
+        background: $borderColor;
+      }
+    }
+  }
+  &.open 
+  {
+    .dropdown-menu
+    {
+      @extend dropdownMenuOpen ;     
+    }
+    .dropdown-toggle {
+      border-color: $borderColor;
+    }
+  }
+}

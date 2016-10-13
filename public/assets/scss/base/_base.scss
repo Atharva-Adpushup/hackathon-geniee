@@ -1,0 +1,78 @@
+.tooltip {
+    z-index: 20000;
+}
+
+.listView
+{
+    background:$primaryColor;
+    @include border-radius($BorderRadius);
+    .title
+    {
+        h1
+        {
+            font-size: 11px;
+            padding: 10px 12px;
+            text-transform: uppercase;
+        }
+    }
+    ul
+    {
+        margin: 0;
+        li
+        {
+            background:$lightGrey;
+            border-top-color:$borderColor;
+            padding:0 0 0 12px;
+            min-height:32px;
+            line-height:32px;
+            border-top: 1px solid #e2e2e2;
+            &:hover, &:focus
+            {
+                background:$RowHoverBg;
+                a
+                {
+                    width: 35px;
+                    opacity: 1;
+                }
+            }
+            &+.done
+            {
+                text-decoration: line-through;
+                color: #ccc;
+            }
+            a
+            {
+                float: right;
+                text-align: center;
+                width: 0;
+                background: #2ecc71;
+                color: #FFF;
+                opacity: 0;
+                font-size: 14px;
+                text-decoration: none;
+                -webkit-transition: all 0.2s ease;
+                transition: all 0.2s ease;
+            }
+            &.completed:hover
+            {
+                background: #52DB8C;
+            }
+            &.remove
+            {
+                background: #f58b24;
+                &:hover
+                {
+                    background: #ffa933;
+                }
+            }
+            &.disable
+            {
+                background: #454545;
+                &:hover
+                {
+                    background: #525252;
+                }
+            }
+        }
+    }
+}

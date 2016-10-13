@@ -1,0 +1,10 @@
+/***************Custom label rules***************/
+.label
+{
+	&.label--custom
+	{
+		background: $primaryColor;
+		display: inline-block;
+		padding: $FMLayoutDimension/2;
+	}
+}

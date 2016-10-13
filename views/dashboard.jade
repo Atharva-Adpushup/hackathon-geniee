@@ -1,0 +1,49 @@
+extends  layout/base
+
+block getTitle
+    - var titleVar = "DashBoard"
+
+block bodyContent
+    include layout/sideBar
+    .pageContainer.page-container
+        include layout/header
+        // Page Content Starts Here
+        .pageContentWrapper.page-content
+            .pageContentInner.page-content--inner
+                .notification-wrapper
+                #widgetsArea.row
+                    .mb-30
+                        .controlAdpushupWrap
+                            h3.title.m-All-0.clearfix 
+                                a Page Groups
+
+                            //- Pagegroups table
+                            .table-wrapper-paddded
+                                table.table.table-bordered.table-hover
+                                    thead
+                                        tr
+                                            th Name
+                                            th Platform
+                                            th Category
+                                            th Sub Category
+                                            th Page Views
+                                            th Variations
+                                            th Actions
+                                    tbody
+                                        for pagegroup in pageGroups
+                                            tr
+                                                td!= utils.convertPagegroupLink(pagegroup.pageGroupId, pagegroup.pageGroupName)
+                                                td!= pagegroup.platform
+                                                td!= pagegroup.category
+                                                td!= pagegroup.subCategory
+                                                td!= pagegroup.pageviews
+                                                td!= pagegroup.variations
+                                                td.table-actions
+                                                    a(href="/" title="Edit")
+                                                        i.fa.fa-edit
+                                                    a(href="/" title="Go to Editor")
+                                                        i.fa.fa-code
+                                                    a(href="/" title="Delete")
+                                                        i.fa.fa-trash
+                                        
+            

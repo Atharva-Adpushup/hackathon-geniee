@@ -1,0 +1,56 @@
+.headerTopBar 
+{
+  height: $TFBHeight;
+	z-index:1039;
+  padding: 0 $TFBpaddingRight 0 0;
+  background-color: $primaryColor;
+	@include box-shadow(0px, 1px, 3px, 0px, rgba(0,0,0,0.45), false);
+	.thumbWrapper 
+	{
+		height: $TFBthumbWrap;
+		width: $TFBthumbWrap;
+		@include border-radius(50%);
+		background: $TFBthumbWrapBorderColor;
+		display: block;
+		padding: $TFBthumbWrapPadding;
+		margin-top: 4px;
+	}
+	.thumbName 
+	{
+		padding: 8px 12px 0 10px;
+		color: $whiteColor;
+		font-size: $TFBthumbFontSize;
+		cursor:pointer;
+		position: relative;
+		i.arrowicon 
+		{
+			font-size: $arrowDownIconSize;
+			position: absolute;
+			top:12px;
+			right: 0;
+		}
+	}
+	.navbar-right {
+		margin-top: 5px;
+		li {
+			font-size: 1.25em;
+
+			a {
+				color: $whiteColor;
+
+				i {
+					margin-right: 5px;
+				}
+
+				&:focus,
+				&:active {
+					background: none;
+				}
+
+				&:hover {
+					background-color: $primaryColorDark;
+				}
+			}
+		}
+	}
+}

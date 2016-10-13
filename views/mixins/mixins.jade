@@ -1,0 +1,6 @@
+mixin loadAsset(type, assets)
+    each val in assets
+        if type === "js"
+            script(type="text/javascript", src=val)
+        else if type === "css"
+            link(href=val, rel="stylesheet", type="text/css")

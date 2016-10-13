@@ -1,0 +1,122 @@
+.pageLeftSidebar 
+{
+	width:$LSNWidth;
+	background-color:$whiteColor;
+	z-index:1040;
+	left:$LSNLeftPosition;
+	position:fixed;
+	bottom:0;
+	top:0;
+	right:auto;
+	overflow:hidden;
+	-webkit-transition:-webkit-transform 400ms cubic-bezier(0.05,0.74,0.27,0.99);
+	-moz-transition:-moz-transform 400ms cubic-bezier(0.05,0.74,0.27,0.99);
+	-o-transition:-o-transform 400ms cubic-bezier(0.05,0.74,0.27,0.99);
+	transition:transform 400ms cubic-bezier(0.05,0.74,0.27,0.99);
+	-webkit-backface-visibility:hidden;
+	@include perspective(1000);
+  @include translate3d(0,0px,0px);
+  &:hover
+  {
+  	@include translate3d(155px,0,0);
+  	background:white(0.7);
+  	.sidebarHeader
+  	{
+  		.logoS 
+  		{
+				display: none;
+			}
+			.logoL
+  		{
+				display: block;
+			}
+  	}
+  }
+  .sidebarHeader 
+  {
+		display:block;
+		height:$LSNHeadHeight;
+		text-align: center;
+		background:$primaryColorDark;
+		color:$whiteColor;
+		width:100%;
+		padding:14px 16px 0;
+		z-index:10;
+		position:relative;
+		@include box-shadow(0px, 1px, 3px, 0px, rgba(0,0,0,0.45), false);
+		.logoS 
+		{
+			display: block;
+			float:right;
+		}
+		.logoL 
+		{
+			display: none;
+		}
+	}
+	.sidebarMenu 
+	{
+  	height: calc(100% - 60px);
+  	position: relative;
+  	width: 100%;
+  	border-right: 1px solid $borderColor;
+  	.menuItems 
+  	{
+			position:relative;
+			overflow:hidden;
+			height:calc(100% - 5px);
+			width:100%;
+			li 
+			{
+			  display: block;
+			  border-right:$LSNBorderRight solid transparent;
+			  margin-bottom: $LSNMarginBot; 
+			  cursor: pointer;
+			  font-size: $LSNFontsize;
+			  a 
+			  {
+				  display: inline-block;
+				  padding-left: $LSNTextPadLeft;
+				  min-height: $LSNiconHeight;
+				  line-height: $LSNiconHeight;
+				  text-transform: uppercase;
+				  color: $fontColor;
+				  width: 100%;
+				  -webkit-backface-visibility:hidden;
+				}
+				.icon-thumbnail 
+				{
+					height:$LSNiconHeight;
+					width:$LSNiconHeight;
+					line-height:$LSNiconHeight;
+					text-align:center;
+					vertical-align:middle;
+					position:relative;
+					float:right;
+					margin-right:$LSNiconMarginRight;
+					color:$iconColor;
+					font-size:16px;
+					-webkit-transition:-webkit-transform 0.4s cubic-bezier(0.05,0.74,0.27,0.99);
+					transition:transform 0.4s cubic-bezier(0.05,0.74,0.27,0.99);
+					-webkit-font-smoothing:antialiased;
+					-webkit-backface-visibility:hidden;
+					@include perspective(1000);
+					i 
+					{
+						font-size: $LSNiconFontSize;
+						line-height:$LSNiconHeight;
+					}
+				}
+				&:hover, &.active
+				{
+					border-right:$LSNBorderRight solid $primaryColor;
+					background: $mainBgColor;
+					a, .icon-thumbnail 
+					{
+						color: $primaryColor;
+					}
+				}
+			}
+		}
+	}
+}

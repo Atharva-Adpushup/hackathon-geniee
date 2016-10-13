@@ -1,0 +1,75 @@
+/*-------New Channel CSS Starts Here------- */
+
+.platformRow
+{
+	margin:15px 0;
+	>div 
+	{
+		&:nth-child(1)
+		{
+			margin: 0 -15px;
+		}
+	}
+	.col-xs-4 
+	{
+		padding:0;
+		input[type="radio"]
+		{
+			display:none;
+		}
+		input[type="radio"]:disabled + label
+		{
+			cursor: not-allowed;
+			i 
+			{
+				color: rgba(85, 85, 85, 0.6);
+			}
+			span 
+			{
+					color: rgba(85, 85, 85, 0.6);
+			}
+		}
+		input[type="radio"]+label {
+			display: inline-block;
+			padding: 4px 0;
+			line-height: 20px;
+			width:100%;
+			text-align: center;
+			cursor: pointer;
+			font-weight: bold;
+			text-transform: capitalize;
+			background-color: $defaultBgcolor;
+			border: 1px solid $lightGrey;
+			border-left:0;
+			margin-bottom:0;
+			color: #555;
+		}
+		input[type="radio"] + label[for="desktop"] 
+		{
+			border-left: 1px solid $lightGrey;
+		}
+		input[type="radio"]:checked+label {
+			box-shadow:inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+			background:$primaryColorDark;
+			color:$whiteColor;
+			&:before {
+			display: none;
+		}
+		}
+		label 
+		{
+		.fa 
+			{
+				padding-right:5px;
+				font-size:$fontSizeIconModal;
+			}
+			.fa-desktop 
+			{
+				font-size:$fontSizeIconModalSm;
+			}
+		&:before {
+			display: none;
+		}
+		}
+	}
+}

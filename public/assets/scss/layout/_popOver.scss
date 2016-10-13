@@ -1,0 +1,42 @@
+.popover
+{
+	z-index: 10010;
+	background-color:$whiteColor;
+	border: 0;
+	@include box-shadow(0, 1px, 10px, 0, rgba(0,0,0,0.3), $inset: false);
+	@include border-radius(3px);
+	padding: 0;
+	width: 210px;
+	&.bottom 
+	{
+		.arrow
+		{
+			border-width:7px;
+			border-bottom-color:$primaryColor !important;
+			top:-14px;
+			margin-left: -7px;
+			&:after 
+			{
+				border-bottom-color:$primaryColor !important;
+				border-width: 0;
+			}
+		}
+	}
+	
+	.popover-title
+	{
+		background: $primaryColor;
+		padding: $PHHeadingPadTB $PHHeadingPadLR;
+		font-size: $PHHeadingFont;
+		color: $whiteColor;
+		@include border-radius-separate(3px, 3px, 0, 0);
+		font-weight: normal;
+	}
+	.popover-content
+	{
+		.adsWrapper 
+		{
+			margin-top: 0;
+		}
+	}
+}

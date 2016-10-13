@@ -1,0 +1,46 @@
+<html>
+<head>
+
+<script src='/assets/js/libs/third-party/jquery.js'></script>
+<script src='siteMap.js'></script>
+<script src='/ops/assets/someHelperFunctions.js'></script>
+
+<link rel='stylesheet' href='/ops/assets/monospace.css'></link>
+<link rel='stylesheet' href='/ops/assets/tablestyle1.css'></link>
+<link rel='stylesheet' href='style.css'></link>
+
+<title>siteId : site </title>
+</head>
+
+<body class='monospaced'>
+
+<h2>siteId to site</h2>
+<div>
+	<table class='paddedTable'>
+		<tr>
+		<td>
+			<p class='centered'>Enter Site Id : </p>
+			<input class='monospaced' type='number' id='siteIdInput'/><br><br>
+			<input class='monospaced' type='button' value='get' onclick='getSiteMapping(this);'/>
+		</td>
+		<td>or</td>
+		<td><input type='button' value='get full mapping' onclick='getFullSiteMapping(this);' /></td>
+		</tr>
+	</table>
+</div>
+
+
+<div>
+<p>Results : </p>
+
+<table class='borderedTable collapsedTable paddedTable monospaced stylishTable' id='resultTable'>
+
+
+</table>
+
+</div>
+
+
+</body>
+
+</html>

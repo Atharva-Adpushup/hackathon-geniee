@@ -1,0 +1,236 @@
+.MenuBarComponentWrap 
+{
+	position: relative;
+	&.TopLeft 
+	{
+		.MenuBarWrapper 
+		{
+			left:0;
+			top:0;
+		}
+	}
+	&.TopRight 
+	{
+		.MenuBarWrapper 
+		{
+			right:2px;
+			top:0;
+		}
+		.MenuBarContainerWrapper 
+		{
+			margin-right: $MBCWrapMarginLeft;
+			margin-left: 0;
+			padding-left: 0;
+			padding-right: 6px;
+		}
+	}
+	&.BottomLeft
+	{
+		.MenuBarWrapper 
+		{
+			left:0;
+			bottom:0;
+		}
+	}
+	&.BottomRight
+	{
+		.MenuBarWrapper 
+		{
+			right:0;
+			bottom:0;
+		}
+		.MenuBarContainerWrapper 
+		{
+			margin-right: $MBCWrapMarginLeft;
+			margin-left: 0;
+		}
+	}
+	.MenuBarWrapper 
+	{
+		width: $MBItemWidth;
+		position: absolute;
+		@include border-radius($MBBorderRadius);
+		z-index: 3;
+		li 
+		{
+			position: relative;
+			.MenuBarItem
+			{
+				text-align: center;
+				display: block;
+				background: $MBItemBg;
+			  height: $MBItemHeight;
+			  width: $MBItemWidth;
+				border-top: 1px solid $MBBorderTopColor;
+				border-bottom: 1px solid  #b3b3b3;
+				position: relative;
+				i 
+				{
+					color: $whiteColor;
+					font-size: 16px;
+					margin-top: 9px;
+					&.apSize 
+					{
+						font-size: 11px;
+						font-family: $fontFamily;		
+						color: $whiteColor;
+						margin: 0;
+						height: 32px;
+						line-height: 17px;			
+					}
+				}
+				.apcross {
+						height: 32px;
+						width: 40px;
+						top:0;
+						position: absolute;
+						background: url("../images/icons/cross.png") no-repeat center center;	
+						background-size: 7px 7px;
+					}
+				&.active
+				{
+					background:$primaryColor;
+				}				
+			}
+			&:first-child
+			{
+				.MenuBarItem
+				{
+					border-top: 1px solid transparent;
+					@include border-radius-separate(3px, 3px, 0, 0);
+				}
+			}
+			&:last-child
+			{
+				.MenuBarItem
+				{
+					border-bottom: 1px solid transparent;
+					@include border-radius-separate(0, 0, 3px, 3px);
+				}
+			}
+			.MenuBarItemRibbon
+			{
+				display: none;
+				@extend menubar;
+				position: absolute;
+				top:0;
+				left: $MBItemWidth;
+				min-height: $MBItemHeight;
+				padding: 5px 5px 5px 5px;
+				@include border-radius-separate(0, 3px, 0, 3px);
+			}
+			&:hover
+			{
+				.MenuBarItemRibbon
+				{
+					display: none;
+				}
+			}
+		}	
+		&.arrowLeft:after 
+		{
+			right: 100%;
+			top:10px;
+			content: " ";
+			height: 0;
+			width: 0;
+			position: absolute;
+			pointer-events: none;
+			border-top: $MBArrowSize solid transparent;
+			border-bottom: $MBArrowSize solid transparent; 	
+			border-right:$MBArrowSize solid $primaryColor;
+		}
+		&.arrowRight:after 
+		{
+			left: 100%;
+			top: 10px;
+			content: " ";
+			height: 0;
+			width: 0;
+			position: absolute;
+			pointer-events: none;
+			border-top: $MBArrowSize solid transparent;
+			border-bottom: $MBArrowSize solid transparent; 	
+			border-left:$MBArrowSize solid $primaryColor;
+		}
+		&.arrowTop:after 
+		{
+			bottom: 100%;
+			left:50%;
+			content: " ";
+			height: 0;
+			width: 0;
+			position: absolute;
+			pointer-events: none;
+			border-left: $MBArrowSize solid transparent;
+			border-right: $MBArrowSize solid transparent; 	
+			border-bottom:$MBArrowSize solid $primaryColor;
+			margin-left: -$MBArrowSize;
+		}
+		&.arrowBottom:after 
+		{
+			top: 100%;
+			left: 50%;
+			content: " ";
+			height: 0;
+			width: 0;
+			position: absolute;
+			pointer-events: none;
+			border-left: $MBArrowSize solid transparent;
+			border-right: $MBArrowSize solid transparent; 	
+			border-top:$MBArrowSize solid $primaryColor;
+			margin-left: -$MBArrowSize;
+		}
+	}
+	.MenuBarContainerWrapper 
+	{
+		@extend menubar;
+		height: 300px;
+		margin-left: $MBCWrapMarginLeft;
+		padding-left:6px;
+		width: $MBCWrapWidth;
+		float: left;
+		position: relative;
+		@include border-radius($MBBorderRadius);
+		border:1px solid $MBCWrapborderColor;
+		h5.head 
+		{
+			font-size: $MBCHeadSize;
+			font-weight: bold;
+			@include border-radius-separate(0, $MBBorderRadius, 0, 0);
+			padding: 0 10px;
+			line-height: $MBCHeadHeight;
+			background: $MBCHeadBg;
+			border-bottom: 1px solid $MBCWrapborderColor;
+			a 
+			{
+				color: $fontColor;
+			}
+			i {
+				height: $MBCHeadIconHeightWidth;
+				width: $MBCHeadIconHeightWidth;
+				background: $MBCHeadIconBg;
+				border:1px solid $MBCWrapborderColor;
+				@include border-radius(50%); 
+				margin-top: 6px;
+				font-size: $MBCHeadIconSize;
+				text-align: center;
+				padding-top: 5px;
+			}
+		}
+		.MenuBarContainer
+		{
+			padding: 10px 10px 10px 5px;
+			font-size: 13px;
+		}
+	}
+	.ContentExtWrap
+	{
+		@extend menubar;
+		@include border-radius($MBBorderRadius);
+		border:1px solid $MBCWrapborderColor;
+		float: left;
+		margin-left: -10px;
+		padding: 10px 10px 10px 20px;
+	}
+}

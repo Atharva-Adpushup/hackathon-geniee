@@ -1,0 +1,129 @@
+.publishHelperWrap
+{
+	&:after 
+	{
+		bottom: 100%;
+	  right: 0;
+	  content: " ";
+	  height: 0;
+	  width: 0;
+	  position: absolute;
+	  pointer-events: none;
+	  border-left: 7px solid transparent;
+	  border-right: 7px solid transparent;
+	  border-bottom: 7px solid $primaryColor;
+	  margin-right: 7px;
+	}
+	.publishHelperHeading
+	{
+		background: $primaryColor;
+		color: $whiteColor;
+		padding: $PHHeadingPadTB $PHHeadingPadLR;
+		font-size: $PHHeadingFont;
+	}
+	.publishHelperWrapInner 
+	{
+		position: relative;
+		padding: $PHInnerPad;
+		.panel-group
+		{
+			.panel
+			{
+				.panel-heading
+				{
+					position: relative;
+					&:after 
+					{
+						content:"\f0d7";
+						font-family: 'FontAwesome';
+					  font-size: $PHIconFont;
+					  right: $PHIconPositionLR;
+					  top: $PHIconPositionT;
+					  line-height: 6px;
+					  position: absolute;
+					  cursor: pointer;
+					}
+					a 
+					{
+						&:before 
+						{
+							font-family: 'FontAwesome';
+						  font-size: $PHIconFont;
+						  left: $PHIconPositionLR;
+						  margin-right: $PHStatusIconMarginR;
+						  top: 5px;
+						  line-height: 18px;
+						  position: absolute;
+						}
+					}
+				}
+				.panel-body 
+				{
+					position: relative;
+					padding:$PHPanelBodyPad;
+					font-size: $PHPanelBodyFont;
+					word-break:break-word;
+					span 
+					{
+						margin-right: 8px;
+					}
+					.publishHelperhelp
+					{
+						cursor: pointer;
+						padding: 0 5px;
+						text-transform: capitalize;
+					}
+				}
+				&.completed
+				{
+					.panel-heading
+					{
+						a 
+						{
+							color: $PHCompletedColor;
+							padding-left: $PHStatusIconPadL;
+							&:before 
+							{
+								content: "\f00c";
+							}
+						}
+					}
+				}
+				&.notcompleted
+				{
+					.panel-heading
+					{
+						a 
+						{	
+							padding-left: $PHStatusIconPadL;
+							color: $primaryColor;
+							&:before 
+							{
+								content: "\f00d";
+							}
+						}
+					}
+				}
+				&.pending
+				{
+					.panel-heading
+					{
+						a 
+						{	
+							padding-left: $PHStatusIconPadL;
+							&:before 
+							{
+								content: "\f110";
+							  @include animation(spinnerpending .7s linear infinite);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+@include keyframes(spinnerpending) {
+  to {@include transform(rotate(360deg))}
+}
