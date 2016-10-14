@@ -9,9 +9,16 @@ var express = require('express'),
 
 router
 	.get('/:pageGroupId', function(req, res) {
-		console.log(req.params.pageGroupId);
+		var data = {
+			pageGroupName: 'Post Page - Desktop',
+			sampleUrl: 'http://mysite.com/post',
+			platform: 'DESKTOP',
+			inventoryType: 'Standard Banner Ads'
+		};
 
-		res.render('pageGroup');
+		res.render('pageGroup', {
+			pageGroupName: data.pageGroupName
+		});
 	});
 
 module.exports = router;

@@ -32,7 +32,7 @@ module.exports = function(app) {
 		next();
 	}, genieeApiController);
 
-	app.use('/pagegroup/', function(req, res, next) {
+	app.use('/user/pagegroup/', function(req, res, next) {
 		// if (!req.session || !req.session.user) {
 		// 	return res.redirect('/login');
 		// }

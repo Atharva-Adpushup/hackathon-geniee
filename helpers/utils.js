@@ -6,7 +6,7 @@ var url = require('url'),
 	CryptoJS = require('crypto-js'),
 	API = {
 		convertPagegroupLink: function(pageGroupId, pageGroupName) {
-			return '<a href="/pagegroup/'+pageGroupId+'">'+pageGroupName+'</a>';
+			return '<a href="/user/pagegroup/'+pageGroupId+'">'+pageGroupName+'</a>';
 		},
 		random: function(low, high) {
 			return Math.floor(Math.random() * (high - low) + low);
