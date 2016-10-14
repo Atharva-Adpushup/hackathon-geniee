@@ -57,6 +57,7 @@
   table {
     margin-bottom: 0;
     font-size: 1.2em;
+    border-top: 2px solid $primaryColor;
 
     thead {
       background-color: lighten($mainBgColor, 1.5%);

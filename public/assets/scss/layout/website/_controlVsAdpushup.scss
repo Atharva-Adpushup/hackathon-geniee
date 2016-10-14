@@ -67,6 +67,7 @@
 	border:1px solid $borderColor;
 	position: relative;
 	min-height: 200px;
+	@include shadow;
 	.title 
 	{
 		color: $primaryColor;
