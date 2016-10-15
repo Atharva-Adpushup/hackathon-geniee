@@ -1,4 +1,5 @@
 module.exports = function (grunt) {
+	const buildPath = '../public/assets/js/builds/';
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		watch: {
@@ -21,8 +22,8 @@ module.exports = function (grunt) {
 		},
 		uglify: {
 			oBuild: {
-				src: './build/outer.js',
-				dest: './build/outer-min.js'
+				src: `${buildPath}/outer.js`,
+				dest: `${buildPath}outer-min.js`
 			}/* ,
 			iBuild: {
 				src: 'public/assets/js/editor/build/inner-build.js',
@@ -44,11 +45,11 @@ module.exports = function (grunt) {
 			},
 			Outer: {
 				src: ['./app/outer.js'],
-				dest: './build/outer.js'
+				dest: `${buildPath}outer.js`
 			},
 			Inner: {
 				src: ['./app/inner.js'],
-				dest: './build/inner.js'
+				dest: `${buildPath}inner.js`
 			}
 		},
 		sass: {

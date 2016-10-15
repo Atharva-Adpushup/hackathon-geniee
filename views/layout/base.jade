@@ -21,12 +21,12 @@ html(lang="en")
                     if environment == "production"
                         script(type='text/javascript', src='//code.jquery.com/jquery-1.11.2.min.js')
                     else
-                        script(type='text/javascript', src='/assets/js/libs/third-party/jquery.js')
+                        script(type='text/javascript', src='/assets/js/jquery-3.1.0.min.js')
 
                     script(type='text/javascript').
                         window.apjQuery = window.jQuery;
 
-                    - var baseLibsStr = "/assets/js/build/";
+                    - var baseLibsStr = "/assets/js/builds/";
                     - var baseLibsFinalStr = (environment == "production") ? (baseLibsStr + "base-libs-build.min.js") : (baseLibsStr + "base-libs-build.js");
                     +loadAsset("js", [baseLibsFinalStr])
                     
