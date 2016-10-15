@@ -1,0 +1,46 @@
+{
+  "name": "AdPushupGeniee",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "eslint": "eslint ."
+  },
+  "dependencies": {
+    "babel-plugin-transform-object-rest-spread": "^6.16.0",
+    "crypto-js": "^3.1.6",
+    "jquery": "^3.1.0",
+    "lodash": "^4.6.1",
+    "node-uuid": "^1.4.7",
+    "react": "^15.3.1",
+    "react-bootstrap": "^0.30.3",
+    "react-dom": "^15.3.1",
+    "react-hot-loader": "^3.0.0-beta.2",
+    "react-redux": "^4.4.5",
+    "react-router": "^2.4.0",
+    "redux": "^3.5.2",
+    "redux-thunk": "^2.1.0",
+    "redux-ui": "0.0.15",
+    "reselect": "^2.5.4",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "babel-eslint": "^6.0.4",
+    "babel-plugin-transform-react-jsx": "^6.8.0",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-react": "^6.11.1",
+    "babelify": "^7.3.0",
+    "eslint": "^3.7.1",
+    "eslint-config-airbnb": "^10.0.0",
+    "eslint-plugin-import": "^1.16.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.4.1",
+    "grunt": "~0.4.5",
+    "grunt-babel": "^6.0.0",
+    "grunt-browserify": "~3.8.0",
+    "grunt-contrib-cssmin": "~0.12.3",
+    "grunt-contrib-uglify": "~0.9.1",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-sass": "^1.1.0",
+    "grunt-string-replace": "*"
+  }
+}
