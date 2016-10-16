@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { reducer as formReducer } from 'redux-form';
 import channelData from './channelReducer';
 import variationByIds from './variationReducer';
 import adByIds from './adReducer';
@@ -13,4 +14,5 @@ export default combineReducers({
 	channelData,
 	insertMenu,
 	editMenu,
+	form: formReducer // key Name should be form only
 });

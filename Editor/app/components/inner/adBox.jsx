@@ -1,4 +1,6 @@
 import React, { PropTypes } from 'react';
+import $ from 'jquery';
+import Utils from 'libs/utils';
 import _ from 'lodash';
 
 const highLighterClass = '_APD_highlighter',
@@ -14,11 +16,6 @@ const highLighterClass = '_APD_highlighter',
 		position: 'absolute !important',
 		top: '5px !important',
 	},
-	camelCase = (input) => {
-		return input.toLowerCase().replace(/-(.)/g, (match, group1) => {
-			return group1.toUpperCase();
-		});
-	},
 	listStyle = {
 		position: 'absolute',
 		width: '100%',
@@ -26,12 +23,19 @@ const highLighterClass = '_APD_highlighter',
 	},
 	AdBox = (props) => {
 		const { id, width, height, css } = props.ad,
-			adBoxSizeContent = (`${width} X ${height}`);
+			adBoxSizeContent = (`${width} X ${height}`),
+			clickHandler = (ev) => {
+				const position = Utils.dom.getElementBounds($(ev.target));
+				props.clickHandler(id, position);
+			};
+
 
 		_(css).each((value, key) => {
 			delete css[key];
-			css[camelCase(key)] = value;
+			css[_.camelCase(key)] = value;
 		});
+
+
 		const adBoxStyles = Object.assign({
 			boxShadow: '#000 0px 0px 0px 2px inset',
 			backgroundColor: 'rgba(255, 255, 0, .25)',
@@ -40,9 +44,10 @@ const highLighterClass = '_APD_highlighter',
 			pointerEvents: 'auto',
 			position: 'relative'
 		}, css);
+
 		return (
 			<div style={listStyle}>
-				<div id={id} className={highLighterClass} onClick={props.clickHandler.bind(null, id)} style={adBoxStyles}>
+				<div id={`ad-${id}`} className={highLighterClass} onClick={clickHandler} style={adBoxStyles}>
 					<div className="_AP_adSize" style={adBoxSizeStyles}>
 						{adBoxSizeContent}
 					</div>
@@ -52,7 +57,8 @@ const highLighterClass = '_APD_highlighter',
 	};
 
 AdBox.propTypes = {
-	ad: PropTypes.object.isRequired
+	ad: PropTypes.object.isRequired,
+	clickHandler: PropTypes.func.isRequired
 };
 
 export default AdBox;
