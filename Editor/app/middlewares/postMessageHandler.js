@@ -16,7 +16,7 @@ const postMessageHanlder = store => next => (action) => {
 
 	if (prevSections !== nextSections) {
 		sendMessage(getActiveChannelId(state), messengerCommands.UPDATE_LAYOUT, nextSections);
-		console.log(nextSections);
+		// console.log(nextSections);
 	}
 
 	return state;

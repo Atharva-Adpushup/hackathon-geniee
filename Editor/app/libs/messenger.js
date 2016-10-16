@@ -1,6 +1,6 @@
+import $ from 'jquery';
 import Utils from './utils';
 import Event from './event';
-import $ from 'jquery';
 
 module.exports = (function ($, Utils, Event) {
 	const Messenger = function (target, origin) {
@@ -33,7 +33,7 @@ module.exports = (function ($, Utils, Event) {
 	};
 	Messenger.prototype.isOriginValid = function (e) {
 		return ((/.adpushup.com/gi).test(e.origin) ||
-		(this.alternateOrigin && Utils.urlInfo(e.origin).domain.indexOf(this.alternateOrigin) !== -1));
+			(this.alternateOrigin && Utils.urlInfo(e.origin).domain.indexOf(this.alternateOrigin) !== -1));
 	};
 
 	Messenger.prototype.handleMessage = function (e, s) {
@@ -42,14 +42,12 @@ module.exports = (function ($, Utils, Event) {
 			let req = null;
 			try {
 				req = JSON.parse(e.data);
-			} catch (d) {
+			} catch (d) { }
+			if (!req || !req.cmd) {  // some issue with google.com that's why introduces this check
+				return false;
 			}
 			console.log(req);
-			if (!req || !req.cmd) // some issue with google.com that's why introduces this check
-				return false;
-			//this.responseQueue.push(req);
-			let cmd = req.cmd, data = req.data;
-			this.onMessage.fire(cmd, data);
+			this.onMessage.fire(req.cmd, req.data);
 		}
 	};
 
