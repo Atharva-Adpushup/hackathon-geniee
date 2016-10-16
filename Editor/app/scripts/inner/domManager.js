@@ -72,9 +72,9 @@ const selectorator = new Selectorator(),
 						const vitals = getAdpVitals($target);
 						if (vitals) {
 							dispatch(setAdpElement(vitals));
-						} else {
+						}/* else {
 							dispatch(hideHighlighter());
-						}
+						}*/
 						break;
 					default:
 						return;

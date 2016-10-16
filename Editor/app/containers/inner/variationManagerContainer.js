@@ -10,6 +10,6 @@ export default connect(
 	}),
 	() => ({
 		onXpathMiss: (id) => { sendMessage(messengerCommands.SECTION_XPATH_MISSING, { sectionId: id }); },
-		onAdClick: (sectionId, id) => { sendMessage(messengerCommands.REMOVE_AD, { adId: id, sectionId }); }
+		onAdClick: (sectionId, adId, position) => { sendMessage(messengerCommands.SHOW_EDIT_CONTEXTMENU, { adId, position, sectionId }); }
 	})
 )(VariationManger);

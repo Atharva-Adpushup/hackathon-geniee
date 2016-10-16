@@ -4,6 +4,7 @@ import Messenger from 'libs/messenger';
 import * as channelActions from 'actions/channelActions';
 import { deleteAd } from 'actions/adActions';
 import { deleteSection } from 'actions/sectionActions';
+import { showMenu as showEditMenu } from '../actions/editMenuActions';
 
 
 const messenger = new Messenger(),
@@ -23,7 +24,7 @@ const messenger = new Messenger(),
 					break;
 
 				case messengerCommands.SHOW_EDIT_CONTEXTMENU:
-					// uiActions.showContextMenu(components.EDIT_CONTEXTMENU, { menu: components.EDIT_CONTEXTMENU, x: platformPos.left + data.clientX, y: platformPos.top + data.clientY, sectionId: data.sectionId, audienceId: data.audienceId, adSize: data.adSize });
+					dispatch(showEditMenu(data.sectionId, data.adId, data.position));
 					break;
 
 				case messengerCommands.CM_FRAMELOAD_SUCCESS:

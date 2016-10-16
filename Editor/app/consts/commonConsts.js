@@ -120,6 +120,10 @@ const status = {
 		HIDE_MENU: 'HIDE_MENU',
 		SHOW_MENU: 'SHOW_MENU'
 	},
+	editMenuActions = {
+		HIDE_EDIT_MENU: 'HIDE_EDIT_MENU',
+		SHOW_EDIT_MENU: 'SHOW_EDIT_MENU'
+	},
 	variationActions = {
 		ADD_VARIATION: 'ADD_VARIATION',
 		COPY_VARIATION: 'COPY_VARIATION',
@@ -180,8 +184,8 @@ const status = {
 
 export {
 	status, proxy, stores, adTypes, messengerCommands, siteModes,
-	siteActions, channelActions, sectionActions,
-	insertMenuActions, adActions,
+	siteActions, channelActions, sectionActions, adActions,
+	insertMenuActions, editMenuActions,
 	adBoxSizeStyles, commonSupportedSizes, variationActions,
 	hbBoxActions, innerVariationActions, innerActions,
 	defaultSectionCss
