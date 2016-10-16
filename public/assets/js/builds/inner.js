@@ -127,6 +127,14 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _utils = require('libs/utils');
+
+var _utils2 = _interopRequireDefault(_utils);
+
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -146,11 +154,6 @@ var highLighterClass = '_APD_highlighter',
 	position: 'absolute !important',
 	top: '5px !important'
 },
-    camelCase = function camelCase(input) {
-	return input.toLowerCase().replace(/-(.)/g, function (match, group1) {
-		return group1.toUpperCase();
-	});
-},
     listStyle = {
 	position: 'absolute',
 	width: '100%',
@@ -163,11 +166,16 @@ var highLighterClass = '_APD_highlighter',
 	var height = _props$ad.height;
 	var css = _props$ad.css;
 	var adBoxSizeContent = width + ' X ' + height;
+	var clickHandler = function clickHandler(ev) {
+		var position = _utils2.default.dom.getElementBounds((0, _jquery2.default)(ev.target));
+		props.clickHandler(id, position);
+	};
 
 	(0, _lodash2.default)(css).each(function (value, key) {
 		delete css[key];
-		css[camelCase(key)] = value;
+		css[_lodash2.default.camelCase(key)] = value;
 	});
+
 	var adBoxStyles = Object.assign({
 		boxShadow: '#000 0px 0px 0px 2px inset',
 		backgroundColor: 'rgba(255, 255, 0, .25)',
@@ -176,12 +184,13 @@ var highLighterClass = '_APD_highlighter',
 		pointerEvents: 'auto',
 		position: 'relative'
 	}, css);
+
 	return _react2.default.createElement(
 		'div',
 		{ style: listStyle },
 		_react2.default.createElement(
 			'div',
-			{ id: id, className: highLighterClass, onClick: props.clickHandler.bind(null, id), style: adBoxStyles },
+			{ id: 'ad-' + id, className: highLighterClass, onClick: clickHandler, style: adBoxStyles },
 			_react2.default.createElement(
 				'div',
 				{ className: '_AP_adSize', style: adBoxSizeStyles },
@@ -192,12 +201,13 @@ var highLighterClass = '_APD_highlighter',
 };
 
 AdBox.propTypes = {
-	ad: _react.PropTypes.object.isRequired
+	ad: _react.PropTypes.object.isRequired,
+	clickHandler: _react.PropTypes.func.isRequired
 };
 
 exports.default = AdBox;
 
-},{"lodash":242,"react":"react"}],4:[function(require,module,exports){
+},{"jquery":"jquery","libs/utils":14,"lodash":242,"react":"react"}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -615,6 +625,10 @@ var status = {
 	HIDE_MENU: 'HIDE_MENU',
 	SHOW_MENU: 'SHOW_MENU'
 },
+    editMenuActions = {
+	HIDE_EDIT_MENU: 'HIDE_EDIT_MENU',
+	SHOW_EDIT_MENU: 'SHOW_EDIT_MENU'
+},
     variationActions = {
 	ADD_VARIATION: 'ADD_VARIATION',
 	COPY_VARIATION: 'COPY_VARIATION',
@@ -676,8 +690,9 @@ exports.siteModes = siteModes;
 exports.siteActions = siteActions;
 exports.channelActions = channelActions;
 exports.sectionActions = sectionActions;
-exports.insertMenuActions = insertMenuActions;
 exports.adActions = adActions;
+exports.insertMenuActions = insertMenuActions;
+exports.editMenuActions = editMenuActions;
 exports.adBoxSizeStyles = adBoxSizeStyles;
 exports.commonSupportedSizes = commonSupportedSizes;
 exports.variationActions = variationActions;
@@ -736,8 +751,8 @@ exports.default = (0, _reactRedux.connect)(function (_ref) {
 		onXpathMiss: function onXpathMiss(id) {
 			(0, _messengerHelper.sendMessage)(_commonConsts.messengerCommands.SECTION_XPATH_MISSING, { sectionId: id });
 		},
-		onAdClick: function onAdClick(sectionId, id) {
-			(0, _messengerHelper.sendMessage)(_commonConsts.messengerCommands.REMOVE_AD, { adId: id, sectionId: sectionId });
+		onAdClick: function onAdClick(sectionId, adId, position) {
+			(0, _messengerHelper.sendMessage)(_commonConsts.messengerCommands.SHOW_EDIT_CONTEXTMENU, { adId: adId, position: position, sectionId: sectionId });
 		}
 	};
 })(_variationManger2.default);
@@ -966,6 +981,10 @@ exports.default = Event;
 },{"./utils":14,"jquery":"jquery"}],13:[function(require,module,exports){
 'use strict';
 
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
 var _utils = require('./utils');
 
 var _utils2 = _interopRequireDefault(_utils);
@@ -973,10 +992,6 @@ var _utils2 = _interopRequireDefault(_utils);
 var _event = require('./event');
 
 var _event2 = _interopRequireDefault(_event);
-
-var _jquery = require('jquery');
-
-var _jquery2 = _interopRequireDefault(_jquery);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1021,13 +1036,12 @@ module.exports = function ($, Utils, Event) {
 			try {
 				req = JSON.parse(e.data);
 			} catch (d) {}
-			console.log(req);
-			if (!req || !req.cmd) // some issue with google.com that's why introduces this check
+			if (!req || !req.cmd) {
+				// some issue with google.com that's why introduces this check
 				return false;
-			//this.responseQueue.push(req);
-			var cmd = req.cmd,
-			    data = req.data;
-			this.onMessage.fire(cmd, data);
+			}
+			console.log(req);
+			this.onMessage.fire(req.cmd, req.data);
 		}
 	};
 
@@ -1569,9 +1583,9 @@ var selectorator = new _cssSelectorator2.default(),
 					var vitals = getAdpVitals($target);
 					if (vitals) {
 						dispatch((0, _actions.setAdpElement)(vitals));
-					} else {
-						dispatch((0, _actions.hideHighlighter)());
-					}
+					} /* else {
+       dispatch(hideHighlighter());
+       }*/
 					break;
 				default:
 					return;
