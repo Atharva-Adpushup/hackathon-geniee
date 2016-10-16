@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import $ from 'jquery';
-import configureStore from 'store/innerStore.js';
-import InnerEditor from 'EditorComponents/innerEditor.jsx';
+import configureStore from 'store/inner/configureStore.js';
+import InnerEditor from 'components/innerEditor.jsx';
 import { initDomEvents } from './domManager';
 import { initMessageHandler } from './messengerHelper';
 

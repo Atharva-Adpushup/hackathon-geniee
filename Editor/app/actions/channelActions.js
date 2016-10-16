@@ -1,6 +1,6 @@
 import {channelActions} from 'consts/commonConsts';
 import {addVariation} from 'actions/variationActions';
-import Utils from 'libs/custom/utils';
+import Utils from 'libs/utils';
 
 const openChannel = (channelId) => {
 		return {

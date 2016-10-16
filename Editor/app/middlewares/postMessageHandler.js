@@ -1,7 +1,7 @@
 import { getActiveChannelActiveVariationId, getVariationSectionsWithAds } from '../selectors/variationSelectors';
 import { getActiveChannelId } from '../selectors/channelSelectors';
 import { messengerCommands } from '../consts/commonConsts';
-import { sendMessage } from '../scripts/outer/messengerHelper';
+import { sendMessage } from '../scripts/messengerHelper';
 
 const postMessageHanlder = store => next => (action) => {
 	let state = store.getState();

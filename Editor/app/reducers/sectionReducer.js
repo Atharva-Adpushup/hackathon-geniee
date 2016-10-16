@@ -1,5 +1,5 @@
 import { sectionActions, adActions } from 'consts/commonConsts';
-import { immutableObjectDelete, immutableArrayDelete, immutablePush } from 'libs/custom/immutableHelpers';
+import { immutableObjectDelete, immutableArrayDelete, immutablePush } from 'libs/immutableHelpers';
 
 const sectionByIds = (state = {}, action) => {
 	switch (action.type) {

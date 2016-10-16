@@ -1,5 +1,5 @@
 import { sectionActions, adActions } from 'consts/commonConsts';
-import { immutableObjectDelete } from 'libs/custom/immutableHelpers';
+import { immutableObjectDelete } from 'libs/immutableHelpers';
 
 const adsByIds = (state = {}, action) => {
 	switch (action.type) {

@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import * as channelActions from 'actions/channelActions';
-import ChannelManager from 'ChannelManager/channelManager.jsx';
-import { getAllChannels, getOpenChannels, getActiveChannelId } from 'selectors/channelSelectors';
+import ChannelManager from 'channelManager/channelManager.jsx';
+import { getAllChannels, getOpenChannels, getActiveChannelId } from '../selectors/channelSelectors';
 
 const noop = () => ({ type: 'Test' }),
 	mapStateToProps = (state) => ({

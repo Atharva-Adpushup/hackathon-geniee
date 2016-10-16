@@ -1,5 +1,5 @@
 import { adActions, defaultSectionCss } from 'consts/commonConsts';
-import Utils from 'libs/custom/utils';
+import Utils from 'libs/utils';
 
 const createAd = (payload) => {
 		return {

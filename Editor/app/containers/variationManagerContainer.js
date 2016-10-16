@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import VariationManager from 'VariationManager/variationManager.jsx';
+import VariationManager from 'variationManager/variationManager.jsx';
 import { addVariation, copyVariation, deleteVariation, setActiveVariation } from 'actions/variationActions';
 import { getActiveChannelId } from 'selectors/channelSelectors';
 import { getActiveChannelVariations, getActiveChannelActiveVariation } from 'selectors/variationSelectors';

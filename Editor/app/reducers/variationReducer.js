@@ -1,5 +1,5 @@
 import {variationActions, sectionActions} from 'consts/commonConsts';
-import { immutablePush } from 'libs/custom/immutableHelpers';
+import { immutablePush } from 'libs/immutableHelpers';
 import _ from 'lodash';
 
 const variation = (state = {}, action) => {

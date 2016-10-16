@@ -1,7 +1,7 @@
 import $ from 'jquery';
-import Selectorator from 'libs/custom/cssSelectorator';
-import Utils from 'libs/custom/utils';
-import { highlightElement, setAdpElement, hideHighlighter } from '../../actions/innerActions';
+import Selectorator from 'libs/cssSelectorator';
+import Utils from 'libs/utils';
+import { highlightElement, setAdpElement, hideHighlighter } from '../../actions/inner/actions';
 import { sendMessage } from './messengerHelper';
 import { messengerCommands } from '../../consts/commonConsts';
 

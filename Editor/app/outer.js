@@ -1,3 +1,3 @@
-import initEditor from './scripts/outer/editor';
+import initEditor from './scripts/editor';
 
 initEditor();

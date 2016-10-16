@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
-import InsertMenu from 'ContextMenu/insertMenu.jsx';
+import InsertMenu from 'contextMenu/insertMenu.jsx';
 import { hideMenu } from 'actions/insertMenuActions';
 import { createSection } from 'actions/sectionActions';
 import { getActiveChannelId } from 'selectors/channelSelectors';
 import { getActiveChannelActiveVariationId } from 'selectors/variationSelectors';
 import { getInsertMenuState } from 'selectors/insertMenuSelectors';
-import { sendMessage } from '../scripts/outer/messengerHelper';
+import { sendMessage } from '../scripts/messengerHelper';
 import { messengerCommands } from '../consts/commonConsts';
 
 const mapStateToProps = (state) => {

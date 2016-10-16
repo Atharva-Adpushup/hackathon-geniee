@@ -34,7 +34,7 @@ module.exports = function (grunt) {
 			options: {
 				browserifyOptions: {
 					basedir: './app',
-					paths: ['./', './components/', './components/EditorComponents/OuterComponents']
+					paths: ['./', './components/', './components/outer', './components/shared']
 				},
 				transform: [['babelify', {
 					sourceMapsAbsolute: true,

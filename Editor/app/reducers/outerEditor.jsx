@@ -5,8 +5,8 @@ import InsertMenu from 'containers/insertMenuContainer.js';
 
 const OuterEditor = () => (
 	<div>
-		<ChannelManager/>
-		<VariationManager/>
+		<channelManager>
+		<variationManager/>
 		<InsertMenu/>
 	</div>
 );

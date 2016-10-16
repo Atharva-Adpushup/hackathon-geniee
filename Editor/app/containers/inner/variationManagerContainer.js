@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import VariationManger from '../../components/EditorComponents/InnerComponents/variationManger.jsx';
+import VariationManger from '../../components/inner/variationManger.jsx';
 import { sendMessage } from '../../scripts/inner/messengerHelper.js';
 import { messengerCommands } from '../../consts/commonConsts.js';
 

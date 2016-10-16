@@ -1,32 +1,20 @@
 import { channelActions, variationActions } from 'consts/commonConsts';
-import { immutableArrayDelete } from 'libs/custom/immutableHelpers';
+import { immutableArrayDelete } from 'libs/immutableHelpers';
 
-let chnl = {
-		id: 'test1',
-		channelName: 'TEST',
-		siteDomain: window.ADP_SITE_DOMAIN,
-		platform: 'DESKTOP',
-		pageGroup: 'POST',
-		sampleUrl: 'http://app.adpushup.com/user/profile',
-		variations: [],
-		activeVariation: null,
-		isOpen: true,
-		isLoading: true
-	},
-	chnl2 = {
-		id: 'test2',
-		channelName: 'TEST2',
-		siteDomain: window.ADP_SITE_DOMAIN,
-		platform: 'DESKTOP',
-		pageGroup: 'POST',
-		sampleUrl: 'http://app.adpushup.com/user/profile',
-		variations: [],
-		isOpen: true,
-		isLoading: false,
-		activeVariation: null
-	};
+const chnl2 = {
+	id: 'test2',
+	channelName: 'TEST2',
+	siteDomain: window.ADP_SITE_DOMAIN,
+	platform: 'DESKTOP',
+	pageGroup: 'POST',
+	sampleUrl: 'http://www.articlemyriad.com/character-divine-influence-iliad-aeneid-role-gods-fate/',
+	variations: [],
+	isOpen: true,
+	isLoading: true,
+	activeVariation: null
+};
 
-const initialState = { activeChannel: 'test1', byIds: { test1: chnl, test2: chnl2 } },
+const initialState = { activeChannel: 'test2', byIds: { test2: chnl2 } },
 	channel = (state = {}, action) => {
 		let index;
 		switch (action.type) {
@@ -94,19 +82,19 @@ const initialState = { activeChannel: 'test1', byIds: { test1: chnl, test2: chnl
 			case channelActions.OPEN_CHANNEL_SUCCESS:
 			case variationActions.ADD_VARIATION:
 				return { ...state,
-					byIds: {
-						...state.byIds,
-						[action.channelId]: channel(state.byIds[action.channelId], action)
-					}
+	byIds: {
+		...state.byIds,
+		[action.channelId]: channel(state.byIds[action.channelId], action)
+	}
 };
 
 			case variationActions.DELETE_VARIATION:
 			case variationActions.SET_ACTIVE_VARIATION:
 				return { ...state,
-					byIds: {
-						...state.byIds,
-						[state.activeChannel]: channel(state.byIds[state.activeChannel], action)
-					}
+	byIds: {
+		...state.byIds,
+		[state.activeChannel]: channel(state.byIds[state.activeChannel], action)
+	}
 };
 
 			default:

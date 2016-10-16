@@ -6,13 +6,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.hideHighlighter = exports.updateLayout = exports.setAdpElement = exports.highlightElement = undefined;
 
-var _utils = require('libs/custom/utils');
+var _utils = require('libs/utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
-var _commonConsts = require('../consts/commonConsts');
+var _commonConsts = require('consts/commonConsts');
 
-var _messengerHelper = require('../scripts/inner/messengerHelper');
+var _messengerHelper = require('scripts/inner/messengerHelper');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -83,7 +83,40 @@ exports.setAdpElement = setAdpElement;
 exports.updateLayout = updateLayout;
 exports.hideHighlighter = hideHighlighter;
 
-},{"../consts/commonConsts":7,"../scripts/inner/messengerHelper":18,"libs/custom/utils":14}],2:[function(require,module,exports){
+},{"consts/commonConsts":7,"libs/utils":14,"scripts/inner/messengerHelper":18}],2:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _variationManagerContainer = require('../containers/inner/variationManagerContainer.js');
+
+var _variationManagerContainer2 = _interopRequireDefault(_variationManagerContainer);
+
+var _elementHighLighterContainer = require('../containers/inner/elementHighLighterContainer.js');
+
+var _elementHighLighterContainer2 = _interopRequireDefault(_elementHighLighterContainer);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//import HighlighterBox from '../../containers/inner/hbBoxContainer.js';
+var OuterEditor = function OuterEditor() {
+	return _react2.default.createElement(
+		'div',
+		null,
+		_react2.default.createElement(_variationManagerContainer2.default, null),
+		_react2.default.createElement(_elementHighLighterContainer2.default, null)
+	);
+};
+
+exports.default = OuterEditor;
+
+},{"../containers/inner/elementHighLighterContainer.js":8,"../containers/inner/variationManagerContainer.js":9,"react":"react"}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -164,7 +197,7 @@ AdBox.propTypes = {
 
 exports.default = AdBox;
 
-},{"lodash":242,"react":"react"}],3:[function(require,module,exports){
+},{"lodash":242,"react":"react"}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -215,7 +248,7 @@ ElementSelector.propTypes = {
 
 exports.default = ElementSelector;
 
-},{"react":"react"}],4:[function(require,module,exports){
+},{"react":"react"}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -371,7 +404,7 @@ Section.propTypes = {
 
 exports.default = Section;
 
-},{"./adBox.jsx":2,"jquery":"jquery","lodash":242,"react":"react","react-dom":"react-dom"}],5:[function(require,module,exports){
+},{"./adBox.jsx":3,"jquery":"jquery","lodash":242,"react":"react","react-dom":"react-dom"}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -454,40 +487,7 @@ variationManager.propTypes = {
 
 exports.default = variationManager;
 
-},{"./section.jsx":4,"lodash":242,"react":"react"}],6:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _variationManagerContainer = require('../../containers/inner/variationManagerContainer.js');
-
-var _variationManagerContainer2 = _interopRequireDefault(_variationManagerContainer);
-
-var _elementHighLighterContainer = require('../../containers/inner/elementHighLighterContainer.js');
-
-var _elementHighLighterContainer2 = _interopRequireDefault(_elementHighLighterContainer);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-//import HighlighterBox from '../../containers/inner/hbBoxContainer.js';
-var OuterEditor = function OuterEditor() {
-	return _react2.default.createElement(
-		'div',
-		null,
-		_react2.default.createElement(_variationManagerContainer2.default, null),
-		_react2.default.createElement(_elementHighLighterContainer2.default, null)
-	);
-};
-
-exports.default = OuterEditor;
-
-},{"../../containers/inner/elementHighLighterContainer.js":8,"../../containers/inner/variationManagerContainer.js":9,"react":"react"}],7:[function(require,module,exports){
+},{"./section.jsx":5,"lodash":242,"react":"react"}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -695,7 +695,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _reactRedux = require('react-redux');
 
-var _elementHighLighter = require('../../components/EditorComponents/InnerComponents/elementHighLighter.jsx');
+var _elementHighLighter = require('../../components/inner/elementHighLighter.jsx');
 
 var _elementHighLighter2 = _interopRequireDefault(_elementHighLighter);
 
@@ -706,7 +706,7 @@ exports.default = (0, _reactRedux.connect)(function (_ref) {
 	return { cords: hbBox };
 })(_elementHighLighter2.default);
 
-},{"../../components/EditorComponents/InnerComponents/elementHighLighter.jsx":3,"react-redux":246}],9:[function(require,module,exports){
+},{"../../components/inner/elementHighLighter.jsx":4,"react-redux":246}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -715,7 +715,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _reactRedux = require('react-redux');
 
-var _variationManger = require('../../components/EditorComponents/InnerComponents/variationManger.jsx');
+var _variationManger = require('../../components/inner/variationManger.jsx');
 
 var _variationManger2 = _interopRequireDefault(_variationManger);
 
@@ -742,7 +742,7 @@ exports.default = (0, _reactRedux.connect)(function (_ref) {
 	};
 })(_variationManger2.default);
 
-},{"../../components/EditorComponents/InnerComponents/variationManger.jsx":5,"../../consts/commonConsts.js":7,"../../scripts/inner/messengerHelper.js":18,"react-redux":246}],10:[function(require,module,exports){
+},{"../../components/inner/variationManger.jsx":6,"../../consts/commonConsts.js":7,"../../scripts/inner/messengerHelper.js":18,"react-redux":246}],10:[function(require,module,exports){
 'use strict';
 
 var _innerController = require('./scripts/inner/innerController');
@@ -1426,7 +1426,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _redux = require('redux');
 
-var _commonConsts = require('../consts/commonConsts');
+var _commonConsts = require('../../consts/commonConsts');
 
 var hbBoxInitState = { BOTTOM: 0, TOP: 0, LEFT: 0, RIGHT: 0 },
     hbBox = function hbBox() {
@@ -1476,7 +1476,7 @@ var hbBoxInitState = { BOTTOM: 0, TOP: 0, LEFT: 0, RIGHT: 0 },
 
 exports.default = (0, _redux.combineReducers)({ hbBox: hbBox, variation: variation, adpElement: adpElement });
 
-},{"../consts/commonConsts":7,"redux":259}],16:[function(require,module,exports){
+},{"../../consts/commonConsts":7,"redux":259}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1488,15 +1488,15 @@ var _jquery = require('jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _cssSelectorator = require('libs/custom/cssSelectorator');
+var _cssSelectorator = require('libs/cssSelectorator');
 
 var _cssSelectorator2 = _interopRequireDefault(_cssSelectorator);
 
-var _utils = require('libs/custom/utils');
+var _utils = require('libs/utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
-var _innerActions = require('../../actions/innerActions');
+var _actions = require('../../actions/inner/actions');
 
 var _messengerHelper = require('./messengerHelper');
 
@@ -1562,15 +1562,15 @@ var selectorator = new _cssSelectorator2.default(),
 
 			switch (e.type) {
 				case 'mouseover':
-					dispatch((0, _innerActions.highlightElement)($target));
+					dispatch((0, _actions.highlightElement)($target));
 					break;
 
 				case 'click':
 					var vitals = getAdpVitals($target);
 					if (vitals) {
-						dispatch((0, _innerActions.setAdpElement)(vitals));
+						dispatch((0, _actions.setAdpElement)(vitals));
 					} else {
-						dispatch((0, _innerActions.hideHighlighter)());
+						dispatch((0, _actions.hideHighlighter)());
 					}
 					break;
 				default:
@@ -1583,7 +1583,7 @@ var selectorator = new _cssSelectorator2.default(),
 exports.initDomEvents = initDomEvents;
 exports.getAdpVitals = getAdpVitals;
 
-},{"../../actions/innerActions":1,"../../consts/commonConsts":7,"./messengerHelper":18,"jquery":"jquery","libs/custom/cssSelectorator":11,"libs/custom/utils":14}],17:[function(require,module,exports){
+},{"../../actions/inner/actions":1,"../../consts/commonConsts":7,"./messengerHelper":18,"jquery":"jquery","libs/cssSelectorator":11,"libs/utils":14}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1604,11 +1604,11 @@ var _jquery = require('jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _innerStore = require('store/innerStore.js');
+var _configureStore = require('store/inner/configureStore.js');
 
-var _innerStore2 = _interopRequireDefault(_innerStore);
+var _configureStore2 = _interopRequireDefault(_configureStore);
 
-var _innerEditor = require('EditorComponents/innerEditor.jsx');
+var _innerEditor = require('components/innerEditor.jsx');
 
 var _innerEditor2 = _interopRequireDefault(_innerEditor);
 
@@ -1620,7 +1620,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var initEditor = function initEditor() {
 	(0, _jquery2.default)(document).ready(function () {
-		var store = (0, _innerStore2.default)(),
+		var store = (0, _configureStore2.default)(),
 		    rootElm = (0, _jquery2.default)('<div class="_ap_reject" id="adPushupEditor" />').insertAfter('body').get(0);
 		_reactDom2.default.render(_react2.default.createElement(_reactRedux.Provider, { store: store }, _react2.default.createElement(_innerEditor2.default, null)), rootElm);
 		(0, _domManager.initDomEvents)(store);
@@ -1630,7 +1630,7 @@ var initEditor = function initEditor() {
 
 exports.default = initEditor;
 
-},{"./domManager":16,"./messengerHelper":18,"EditorComponents/innerEditor.jsx":6,"jquery":"jquery","react":"react","react-dom":"react-dom","react-redux":246,"store/innerStore.js":19}],18:[function(require,module,exports){
+},{"./domManager":16,"./messengerHelper":18,"components/innerEditor.jsx":2,"jquery":"jquery","react":"react","react-dom":"react-dom","react-redux":246,"store/inner/configureStore.js":19}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1638,7 +1638,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.sendMessage = exports.initMessageHandler = undefined;
 
-var _messenger = require('libs/custom/messenger');
+var _messenger = require('libs/messenger');
 
 var _messenger2 = _interopRequireDefault(_messenger);
 
@@ -1646,7 +1646,7 @@ var _jquery = require('jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _innerActions = require('../../actions/innerActions');
+var _actions = require('../../actions/inner/actions');
 
 var _domManager = require('../../scripts/inner/domManager');
 
@@ -1662,15 +1662,15 @@ var messenger = new _messenger2.default(),
 	messenger.onMessage.add(function (cmd, data) {
 		switch (cmd) {
 			case _commonConsts.messengerCommands.UPDATE_LAYOUT:
-				dispatch((0, _innerActions.updateLayout)(data));
+				dispatch((0, _actions.updateLayout)(data));
 				break;
 
 			case _commonConsts.messengerCommands.HIGHLIGHT_ELEMENT:
-				dispatch((0, _innerActions.highlightElement)((0, _jquery2.default)(data.xpath)));
+				dispatch((0, _actions.highlightElement)((0, _jquery2.default)(data.xpath)));
 				break;
 
 			case _commonConsts.messengerCommands.SELECT_ELEMENT:
-				dispatch((0, _innerActions.setAdpElement)((0, _domManager.getAdpVitals)((0, _jquery2.default)(data.xpath))));
+				dispatch((0, _actions.setAdpElement)((0, _domManager.getAdpVitals)((0, _jquery2.default)(data.xpath))));
 				break;
 
 			default:
@@ -1693,7 +1693,7 @@ var messenger = new _messenger2.default(),
 exports.initMessageHandler = initMessageHandler;
 exports.sendMessage = sendMessage;
 
-},{"../../actions/innerActions":1,"../../consts/commonConsts":7,"../../scripts/inner/domManager":16,"jquery":"jquery","libs/custom/messenger":13}],19:[function(require,module,exports){
+},{"../../actions/inner/actions":1,"../../consts/commonConsts":7,"../../scripts/inner/domManager":16,"jquery":"jquery","libs/messenger":13}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1701,7 +1701,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports.default = function () {
-	var store = (0, _redux.createStore)(_innerReducer2.default, {}, (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default)));
+	var store = (0, _redux.createStore)(_index2.default, {}, (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default)));
 
 	return store;
 };
@@ -1712,13 +1712,13 @@ var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
 var _redux = require('redux');
 
-var _innerReducer = require('reducers/innerReducer');
+var _index = require('reducers/inner/index.js');
 
-var _innerReducer2 = _interopRequireDefault(_innerReducer);
+var _index2 = _interopRequireDefault(_index);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-},{"reducers/innerReducer":15,"redux":259,"redux-thunk":253}],20:[function(require,module,exports){
+},{"reducers/inner/index.js":15,"redux":259,"redux-thunk":253}],20:[function(require,module,exports){
 
 },{}],21:[function(require,module,exports){
 (function (global){

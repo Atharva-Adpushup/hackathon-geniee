@@ -8,7 +8,7 @@ exports.updateAdCode = exports.updateCss = exports.deleteAd = exports.createAd =
 
 var _commonConsts = require('consts/commonConsts');
 
-var _utils = require('libs/custom/utils');
+var _utils = require('libs/utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
@@ -43,7 +43,7 @@ exports.deleteAd = deleteAd;
 exports.updateCss = updateCss;
 exports.updateAdCode = updateAdCode;
 
-},{"consts/commonConsts":25,"libs/custom/utils":32}],2:[function(require,module,exports){
+},{"consts/commonConsts":25,"libs/utils":32}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -55,7 +55,7 @@ var _commonConsts = require('consts/commonConsts');
 
 var _variationActions = require('actions/variationActions');
 
-var _utils = require('libs/custom/utils');
+var _utils = require('libs/utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
@@ -133,7 +133,7 @@ exports.changeContentSelector = changeContentSelector;
 exports.loadCmsInfo = loadCmsInfo;
 exports.saveChannelBeforeAfterJs = saveChannelBeforeAfterJs;
 
-},{"actions/variationActions":5,"consts/commonConsts":25,"libs/custom/utils":32}],3:[function(require,module,exports){
+},{"actions/variationActions":5,"consts/commonConsts":25,"libs/utils":32}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -163,7 +163,7 @@ exports.renameSection = exports.deleteSection = exports.createSection = undefine
 
 var _commonConsts = require('consts/commonConsts');
 
-var _utils = require('libs/custom/utils');
+var _utils = require('libs/utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
@@ -201,7 +201,7 @@ exports.createSection = createSection;
 exports.deleteSection = deleteSection;
 exports.renameSection = renameSection;
 
-},{"consts/commonConsts":25,"libs/custom/utils":32}],5:[function(require,module,exports){
+},{"consts/commonConsts":25,"libs/utils":32}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -211,7 +211,7 @@ exports.setActiveVariation = exports.updateVariation = exports.deleteVariation =
 
 var _commonConsts = require('consts/commonConsts');
 
-var _utils = require('libs/custom/utils');
+var _utils = require('libs/utils');
 
 var _utils2 = _interopRequireDefault(_utils);
 
@@ -266,7 +266,1257 @@ exports.deleteVariation = deleteVariation;
 exports.updateVariation = updateVariation;
 exports.setActiveVariation = setActiveVariation;
 
-},{"consts/commonConsts":25,"libs/custom/utils":32}],6:[function(require,module,exports){
+},{"consts/commonConsts":25,"libs/utils":32}],6:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _channelManagerContainer = require('../containers/channelManagerContainer.js');
+
+var _channelManagerContainer2 = _interopRequireDefault(_channelManagerContainer);
+
+var _variationManagerContainer = require('../containers/variationManagerContainer.js');
+
+var _variationManagerContainer2 = _interopRequireDefault(_variationManagerContainer);
+
+var _insertMenuContainer = require('../containers/insertMenuContainer.js');
+
+var _insertMenuContainer2 = _interopRequireDefault(_insertMenuContainer);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var OuterEditor = function OuterEditor() {
+	return _react2.default.createElement(
+		'div',
+		null,
+		_react2.default.createElement(_channelManagerContainer2.default, null),
+		_react2.default.createElement(_variationManagerContainer2.default, null),
+		_react2.default.createElement(_insertMenuContainer2.default, null)
+	);
+};
+
+exports.default = OuterEditor;
+
+},{"../containers/channelManagerContainer.js":26,"../containers/insertMenuContainer.js":27,"../containers/variationManagerContainer.js":28,"react":"react"}],7:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _commonConsts = require('consts/commonConsts.js');
+
+var _loader = require('shared/loader.jsx');
+
+var _loader2 = _interopRequireDefault(_loader);
+
+var _platform = require('./platform.jsx');
+
+var _platform2 = _interopRequireDefault(_platform);
+
+var _tab = require('./tabs/tab.jsx');
+
+var _tab2 = _interopRequireDefault(_tab);
+
+var _tabPane = require('./tabs/tabPane.jsx');
+
+var _tabPane2 = _interopRequireDefault(_tabPane);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var getIframeUrl = function getIframeUrl(channel) {
+	var urlParts = channel.sampleUrl.split('#'),
+	    hashPart = void 0,
+	    iframeUrl = void 0;
+
+	var actualUrl = urlParts[0];
+
+	if (urlParts.length > 1) {
+		urlParts = urlParts.splice(1);
+		hashPart = urlParts.join('#');
+	}
+	iframeUrl = _commonConsts.proxy.HTTP_PROXY_URL + '?channelId=' + channel.id + '&url=' + btoa(actualUrl) + '\n\t\t\t\t&siteDomain=' + window.ADP_SITE_DOMAIN + '&platform=' + channel.platform + '&adpOrigin=' + window.ADP_ORIGIN + '&baseUrl=' + window.ADP_BASEURL + '&useAlternateProxy=' + channel.useAlternateProxy;
+	iframeUrl = iframeUrl + (hashPart ? '#' + hashPart : '');
+	return iframeUrl;
+};
+
+var channelManager = function (_React$Component) {
+	_inherits(channelManager, _React$Component);
+
+	function channelManager(props) {
+		_classCallCheck(this, channelManager);
+
+		var _this = _possibleConstructorReturn(this, (channelManager.__proto__ || Object.getPrototypeOf(channelManager)).call(this, props));
+
+		_this.state = {};
+		return _this;
+	}
+
+	_createClass(channelManager, [{
+		key: 'render',
+		value: function render() {
+			var props = this.props;
+
+			return _react2.default.createElement(
+				_tab2.default,
+				{ toggleEditorMode: props.toggleEditorMode, showPublisherHelper: props.showPublisherHelper,
+					masterSave: props.masterSave, handleNewChannelMenu: props.showNewChannelMenu,
+					showOptionsMenu: props.showOptionsMenu,
+					siteMode: props.siteMode, channels: props.channels, activeKey: props.activeChannelId
+				},
+				props.openChannels.map(function (channel) {
+					return _react2.default.createElement(
+						_tabPane2.default,
+						{ handleClick: props.setActiveChannel.bind(null, channel.id), key: channel.id, title: channel.channelName },
+						_react2.default.createElement(
+							_platform2.default,
+							{ type: channel.platform },
+							_react2.default.createElement(_loader2.default, { loading: channel.isLoading }),
+							_react2.default.createElement('iframe', { 'data-adpid': 'iframe' + channel.id,
+								src: getIframeUrl(channel),
+								style: {
+									width: '100%',
+									height: '100%'
+								}
+							})
+						)
+					);
+				})
+			);
+		}
+	}]);
+
+	return channelManager;
+}(_react2.default.Component);
+
+channelManager.propTypes = {
+	toggleEditorMode: _react.PropTypes.func.isRequired,
+	showPublisherHelper: _react.PropTypes.func.isRequired,
+	showNewChannelMenu: _react.PropTypes.func.isRequired,
+	masterSave: _react.PropTypes.func.isRequired,
+	showOptionsMenu: _react.PropTypes.func.isRequired,
+	setActiveChannel: _react.PropTypes.func.isRequired,
+	siteMode: _react.PropTypes.number.isRequired,
+	activeChannel: _react.PropTypes.string,
+	channels: _react.PropTypes.object.isRequired,
+	openChannels: _react2.default.PropTypes.array.isRequired
+};
+
+exports.default = channelManager;
+
+},{"./platform.jsx":8,"./tabs/tab.jsx":9,"./tabs/tabPane.jsx":10,"consts/commonConsts.js":25,"react":"react","shared/loader.jsx":20}],8:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Platform = function Platform(props) {
+	var platform = props.type;
+	var platformClass = 'defaultPlatform',
+	    viewPortClass = 'defaultViewPort';
+
+	switch (platform.toLowerCase()) {
+		case 'desktop':
+			platformClass = 'desktopEditor';
+			viewPortClass = 'desktopViePort';
+			break;
+
+		case 'mobile':
+			platformClass = 'iphone6sPortrait';
+			viewPortClass = 'iphone6sViePort';
+			break;
+
+		case 'tablet':
+			platformClass = 'ipadAirPortrait';
+			viewPortClass = 'ipadAirViePort';
+			break;
+		default:
+			break;
+	}
+
+	return _react2.default.createElement(
+		'div',
+		{ id: 'editorPlatform', className: 'platform ' + platformClass },
+		_react2.default.createElement(
+			'div',
+			{ id: 'editorViewPort', className: viewPortClass },
+			props.children
+		)
+	);
+};
+
+Platform.propTypes = {
+	type: _react.PropTypes.string.isRequired,
+	children: _react2.default.PropTypes.arrayOf(_react2.default.PropTypes.element).isRequired
+};
+
+Platform.defaultProps = {
+	type: 'desktop'
+};
+
+exports.default = Platform;
+
+},{"react":"react"}],9:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _reactBootstrap = require('react-bootstrap');
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _tabSiteOptions = require('./tabSiteOptions.jsx');
+
+var _tabSiteOptions2 = _interopRequireDefault(_tabSiteOptions);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var empyScreen = function empyScreen() {
+	return _react2.default.createElement('div', { className: 'tabContentbg' });
+},
+
+// eslint-disable-next-line react/no-multi-comp
+Tab = function Tab(props) {
+	return _react2.default.createElement(
+		'div',
+		{ className: 'tabAreaWrap' },
+		_react2.default.createElement(
+			'div',
+			{ className: 'tabArea' },
+			_react2.default.createElement('div', { className: 'borderBot' }),
+			_react2.default.createElement(
+				'div',
+				{ className: 'tabBar' },
+				_react2.default.createElement(
+					_reactBootstrap.OverlayTrigger,
+					{ placement: 'right', overlay: _react2.default.createElement(
+							_reactBootstrap.Tooltip,
+							{ id: 'goToDashboard' },
+							'Goto Dashboard'
+						) },
+					_react2.default.createElement(
+						_reactBootstrap.Button,
+						{ className: 'btn btn-sm btn-flat', href: '/user/dashboard' },
+						_react2.default.createElement('i', { className: 'fa fa-arrow-left' })
+					)
+				),
+				_react2.default.createElement(
+					'ul',
+					null,
+					_react2.default.createElement(
+						_reactBootstrap.OverlayTrigger,
+						{ placement: 'right', overlay: _react2.default.createElement(
+								_reactBootstrap.Tooltip,
+								{ id: 'createLoadPageGroup' },
+								'Create/Load PageGroup'
+							) },
+						_react2.default.createElement(
+							'li',
+							{ className: props.children.length === 0 ? 'pulseAnimate' : null },
+							_react2.default.createElement(
+								'a',
+								{ id: 'adNewChannel', href: '#', onClick: props.handleNewChannelMenu, className: 'addnew' },
+								'+'
+							)
+						)
+					),
+					props.children.map(function (tabPane) {
+						return _react2.default.createElement(
+							_reactBootstrap.OverlayTrigger,
+							{ key: 'trig_' + tabPane.key, placement: 'bottom', overlay: _react2.default.createElement(
+									_reactBootstrap.Tooltip,
+									{ id: 'pageGroupOptionsTooltip' },
+									'Click for Page Group options'
+								) },
+							_react2.default.createElement(
+								'li',
+								{ key: 'tab_' + tabPane.key, onClick: tabPane.props.handleClick.bind(null, tabPane), id: 'tab_' + tabPane.key },
+								_react2.default.createElement(
+									'a',
+									{ className: props.activeKey === tabPane.key ? 'active' : 'null', href: '#' },
+									tabPane.props.title,
+									_react2.default.createElement('i', { className: 'fa fa-angle-down' })
+								)
+							)
+						);
+					})
+				),
+				_react2.default.createElement(_tabSiteOptions2.default, props)
+			)
+		),
+		_react2.default.createElement(
+			'div',
+			{ className: 'tabContent' },
+			props.children.length.length === 0 ? empyScreen() : props.children.map(function (tabPane) {
+				return _react2.default.cloneElement(tabPane, {
+					key: 'tab_content_' + tabPane.key,
+					id: 'tab_content_' + tabPane.key,
+					selected: props.activeKey === tabPane.key
+				});
+			})
+		)
+	);
+};
+
+Tab.propTypes = {
+	handleNewChannelMenu: _react.PropTypes.func.isRequired,
+	activeKey: _react.PropTypes.string,
+	children: _react2.default.PropTypes.arrayOf(_react2.default.PropTypes.element)
+};
+
+exports.default = Tab;
+
+},{"./tabSiteOptions.jsx":11,"react":"react","react-bootstrap":362}],10:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var TabPane = function TabPane(props) {
+	return _react2.default.createElement(
+		'div',
+		{ className: 'tabContentArea', style: { display: props.selected ? 'block' : 'none' } },
+		props.children
+	);
+};
+
+TabPane.propTypes = {
+	selected: _react.PropTypes.bool,
+	children: _react2.default.PropTypes.element.isRequired,
+	title: _react2.default.PropTypes.string.isRequired,
+	handleClick: _react2.default.PropTypes.func.isRequired
+};
+
+exports.default = TabPane;
+
+},{"react":"react"}],11:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _commonConsts = require('consts/commonConsts.js');
+
+var _reactBootstrap = require('react-bootstrap');
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var SiteModes = function SiteModes(props) {
+	return _react2.default.createElement(
+		'div',
+		{ className: 'modes modes--stateChange' },
+		_react2.default.createElement('input', { type: 'radio', className: 'modes-input modes-input-off', name: 'view', value: 'editor', id: 'draftmode', checked: props.siteMode === _commonConsts.siteModes.DRAFT }),
+		_react2.default.createElement(
+			_reactBootstrap.OverlayTrigger,
+			{ placement: 'bottom', overlay: _react2.default.createElement(
+					_reactBootstrap.Tooltip,
+					{ id: 'siteModesPause' },
+					props.siteMode === _commonConsts.siteModes.DRAFT ? 'AdPushup is currently paused' : 'Pause AdPushup'
+				) },
+			_react2.default.createElement(
+				'label',
+				{ onClick: props.showPublisherHelper, htmlFor: 'draftmode', className: 'modes-label modes-label-off' },
+				_react2.default.createElement('i', { className: 'fa fa-pause' })
+			)
+		),
+		_react2.default.createElement('input', { type: 'radio', className: 'modes-input modes-input-on', name: 'view', value: 'browse', id: 'publishmode', checked: props.siteMode === _commonConsts.siteModes.PUBLISH }),
+		_react2.default.createElement(
+			_reactBootstrap.OverlayTrigger,
+			{ placement: 'bottom', overlay: _react2.default.createElement(
+					_reactBootstrap.Tooltip,
+					{ id: 'siteModesLive' },
+					props.siteMode === _commonConsts.siteModes.PUBLISH ? 'AdPushup is currently optimizing your website' : 'Start Optimization'
+				) },
+			_react2.default.createElement(
+				'label',
+				{ onClick: props.showPublisherHelper, htmlFor: 'publishmode', className: 'modes-label modes-label-on' },
+				_react2.default.createElement('i', { className: 'fa fa-play' })
+			)
+		),
+		_react2.default.createElement('span', { className: 'modes-selection' })
+	);
+},
+
+// eslint-disable-next-line react/no-multi-comp
+EditorModes = function EditorModes(props) {
+	return _react2.default.createElement(
+		'div',
+		{ className: 'modes' },
+		_react2.default.createElement('input', { onChange: props.toggleEditorMode, type: 'radio', className: 'modes-input', name: 'editorMode', value: 'editor', id: 'editormode', defaultChecked: true }),
+		_react2.default.createElement(
+			_reactBootstrap.OverlayTrigger,
+			{ placement: 'bottom', overlay: _react2.default.createElement(
+					_reactBootstrap.Tooltip,
+					{ id: 'editorModeTooltip' },
+					'Editor Mode'
+				) },
+			_react2.default.createElement(
+				'label',
+				{ htmlFor: 'editormode', className: 'modes-label modes-label-off' },
+				_react2.default.createElement('i', { className: 'fa fa-code' })
+			)
+		),
+		_react2.default.createElement('input', { onChange: props.toggleEditorMode, type: 'radio', className: 'modes-input', name: 'editorMode', value: 'browse', id: 'browsemode' }),
+		_react2.default.createElement(
+			_reactBootstrap.OverlayTrigger,
+			{ placement: 'bottom', overlay: _react2.default.createElement(
+					_reactBootstrap.Tooltip,
+					{ id: 'browseModeTooltip' },
+					'Browse Mode'
+				) },
+			_react2.default.createElement(
+				'label',
+				{ htmlFor: 'browsemode', className: 'modes-label modes-label-on' },
+				_react2.default.createElement('i', { className: 'fa fa-globe' })
+			)
+		),
+		_react2.default.createElement('span', { className: 'modes-selection' })
+	);
+},
+
+// eslint-disable-next-line react/no-multi-comp
+TabSiteOptions = function TabSiteOptions(props) {
+	return _react2.default.createElement(
+		'div',
+		{ className: 'option-right' },
+		_react2.default.createElement(EditorModes, { toggleEditorMode: props.toggleEditorMode }),
+		_react2.default.createElement(
+			_reactBootstrap.OverlayTrigger,
+			{ placement: 'bottom', overlay: _react2.default.createElement(
+					_reactBootstrap.Tooltip,
+					{ id: 'adpushupOptionsTooltip' },
+					'AdPushup Options'
+				) },
+			_react2.default.createElement(_reactBootstrap.Button, { id: 'miscOptions', className: 'btn-sm btn-lightBg btn-option btn--icon', onClick: props.showOptionsMenu })
+		),
+		_react2.default.createElement(
+			_reactBootstrap.OverlayTrigger,
+			{ placement: 'bottom', overlay: _react2.default.createElement(
+					_reactBootstrap.Tooltip,
+					{ id: 'masterSaveTooltip' },
+					'Save changes'
+				) },
+			_react2.default.createElement(_reactBootstrap.Button, { onClick: props.masterSave, className: 'btn-sm btn-save btn-lightBg btn--success btn--icon pull-left' })
+		),
+		_react2.default.createElement(SiteModes, { showPublisherHelper: props.showPublisherHelper, siteMode: props.siteMode })
+	);
+};
+
+TabSiteOptions.propTypes = {
+	showPublisherHelper: _react.PropTypes.func.isRequired,
+	toggleEditorMode: _react.PropTypes.func.isRequired,
+	masterSave: _react.PropTypes.func.isRequired,
+	showOptionsMenu: _react.PropTypes.func.isRequired,
+	siteMode: _react.PropTypes.number.isRequired
+};
+
+SiteModes.propTypes = {
+	showPublisherHelper: _react.PropTypes.func.isRequired,
+	siteMode: _react.PropTypes.number.isRequired
+};
+
+EditorModes.propTypes = {
+	toggleEditorMode: _react.PropTypes.func
+};
+
+exports.default = TabSiteOptions;
+
+},{"consts/commonConsts.js":25,"react":"react","react-bootstrap":362}],12:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _underscore = require('underscore');
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _reactBootstrap = require('react-bootstrap');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+// import CustomSizeForm from './customSizeForm.jsx';
+
+
+var AdSizeSelector = function (_React$Component) {
+	_inherits(AdSizeSelector, _React$Component);
+
+	function AdSizeSelector(props) {
+		_classCallCheck(this, AdSizeSelector);
+
+		var _this = _possibleConstructorReturn(this, (AdSizeSelector.__proto__ || Object.getPrototypeOf(AdSizeSelector)).call(this, props));
+
+		_this.state = {
+			activeTab: props.activeTab || 0
+		};
+		_this.onChecked = _this.onChecked.bind(_this);
+		_this.handleTabClick = _this.handleTabClick.bind(_this);
+		return _this;
+	}
+
+	_createClass(AdSizeSelector, [{
+		key: 'componentWillReceiveProps',
+		value: function componentWillReceiveProps(nextProps) {
+			if (nextProps.activeTab) {
+				this.setState({ activeTab: nextProps.activeTab });
+			}
+		}
+	}, {
+		key: 'onChecked',
+		value: function onChecked(adProps) {
+			this.props.onCheckedItem(adProps);
+		}
+	}, {
+		key: 'handleTabClick',
+		value: function handleTabClick(key) {
+			this.setState({ activeTab: key });
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this2 = this;
+
+			return _react2.default.createElement(
+				_reactBootstrap.Accordion,
+				{ activeKey: this.state.activeTab, onSelect: this.handleTabClick },
+				(0, _underscore2.default)(this.props.adSizes).map(function (rec, index) {
+					return _react2.default.createElement(
+						_reactBootstrap.Panel,
+						{ key: 'panel-' + index, header: rec.layoutType + ' Ads', eventKey: index },
+						_react2.default.createElement(
+							_reactBootstrap.Row,
+							null,
+							(0, _underscore2.default)(rec.sizes).map(function (adProps, innerIndex) {
+								return _react2.default.createElement(
+									_reactBootstrap.Col,
+									{ key: 'col-' + _this2.props.insertOption + '-' + innerIndex, xs: 6, className: 'Col' },
+									_react2.default.createElement('input', { id: _this2.props.insertOption + rec.layoutType + innerIndex,
+										type: 'radio',
+										checked: _this2.props.checked === adProps ? 'checked' : null,
+										onClick: _this2.props.onCheckedItem.bind(null, adProps)
+									}),
+									_react2.default.createElement(
+										'label',
+										{ htmlFor: _this2.props.insertOption + rec.layoutType + innerIndex },
+										adProps.width + ' X ' + adProps.height
+									)
+								);
+							})
+						),
+						rec.layoutType === 'CUSTOM' ? null /* (<CustomSizeForm updateMenu={self.props.onUpdate} flux={self.props.flux}/>)*/ : null
+					);
+				})
+			);
+		}
+	}]);
+
+	return AdSizeSelector;
+}(_react2.default.Component);
+
+AdSizeSelector.propTypes = {
+	activeTab: _react.PropTypes.number,
+	checked: _react.PropTypes.object,
+	onCheckedItem: _react.PropTypes.func,
+	adSizes: _react2.default.PropTypes.arrayOf(_react2.default.PropTypes.object).isRequired
+};
+
+AdSizeSelector.defaultProps = {
+	activeTab: 0
+};
+
+exports.default = AdSizeSelector;
+
+},{"react":"react","react-bootstrap":362,"underscore":549}],13:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _menu = require('shared/menu/menu.jsx');
+
+var _menu2 = _interopRequireDefault(_menu);
+
+var _menuItem = require('shared/menu/menuItem.jsx');
+
+var _menuItem2 = _interopRequireDefault(_menuItem);
+
+var _commonConsts = require('consts/commonConsts.js');
+
+var _adSizeSelector = require('./adSizeSelector.jsx');
+
+var _adSizeSelector2 = _interopRequireDefault(_adSizeSelector);
+
+var _parentSelector = require('./parentSelector.jsx');
+
+var _parentSelector2 = _interopRequireDefault(_parentSelector);
+
+var _sectionOptions = require('./sectionOptions.jsx');
+
+var _sectionOptions2 = _interopRequireDefault(_sectionOptions);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var initialState = {
+	adSize: null,
+	operation: null,
+	activeItem: 0,
+	prevActiveItem: 0,
+	showExtraOptions: false
+},
+    getInsertOptionClass = function getInsertOptionClass(option) {
+	switch (option) {
+		case 'Prepend':
+			return 'ap-prepend';
+		case 'Insert After':
+			return 'ap-insertafter';
+		case 'Insert Before':
+			return 'ap-insertbefore';
+		default:
+			return 'ap-append';
+	}
+};
+
+var insertMenu = function (_React$Component) {
+	_inherits(insertMenu, _React$Component);
+
+	function insertMenu(props) {
+		_classCallCheck(this, insertMenu);
+
+		var _this = _possibleConstructorReturn(this, (insertMenu.__proto__ || Object.getPrototypeOf(insertMenu)).call(this, props));
+
+		_this.state = initialState;
+		return _this;
+	}
+
+	_createClass(insertMenu, [{
+		key: 'componentWillReceiveProps',
+		value: function componentWillReceiveProps() {
+			this.setState(initialState);
+		}
+	}, {
+		key: 'setActiveItem',
+		value: function setActiveItem(item) {
+			this.setState({ activeItem: item, prevActiveItem: this.state.activeItem });
+		}
+	}, {
+		key: 'toggleExtraOptions',
+		value: function toggleExtraOptions() {
+			this.setState({ showExtraOptions: !this.state.showExtraOptions, activeItem: this.state.prevActiveItem, prevActiveItem: this.state.activeItem });
+		}
+	}, {
+		key: 'selectSize',
+		value: function selectSize(operation, adSize) {
+			this.setState({ adSize: adSize, operation: operation, showExtraOptions: true, activeItem: 0, prevActiveItem: this.state.activeItem });
+		}
+	}, {
+		key: 'createSectionAndAd',
+		value: function createSectionAndAd(position) {
+			var sectionPayload = {
+				position: position,
+				name: 'Section 1',
+				xpath: this.props.parents[0].xpath,
+				operation: this.state.operation
+			},
+			    adPayload = {
+				height: this.state.adSize.height,
+				width: this.state.adSize.width
+			};
+			this.props.createSectionAndAd(sectionPayload, adPayload, this.props.variationId);
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this2 = this;
+
+			var props = this.props;
+			var items = [];
+			if (!props.isVisible) {
+				return null;
+			}
+
+			if (!this.state.showExtraOptions) {
+				items = props.insertOptions.map(function (option, index) {
+					return _react2.default.createElement(
+						_menuItem2.default,
+						{ key: index, icon: getInsertOptionClass(option), contentHeading: option },
+						_react2.default.createElement(_adSizeSelector2.default, {
+							checked: option === _this2.state.operation ? _this2.state.adSize : null,
+							adSizes: _commonConsts.commonSupportedSizes,
+							insertOption: option,
+							onCheckedItem: _this2.selectSize.bind(_this2, option)
+						})
+					);
+				});
+			} else {
+				items.push(_react2.default.createElement(
+					_menuItem2.default,
+					{ key: 1, icon: 'fa-sitemap', contentHeading: 'Section Options' },
+					_react2.default.createElement(_sectionOptions2.default, { onCreateAd: this.createSectionAndAd.bind(this), onCancel: this.toggleExtraOptions.bind(this) })
+				));
+			}
+
+			items.push(_react2.default.createElement(
+				_menuItem2.default,
+				{ key: 5, icon: 'fa-sitemap', contentHeading: 'Select Parent' },
+				_react2.default.createElement(_parentSelector2.default, {
+					selectors: props.parents,
+					channelId: this.props.channelId,
+					onHighlightElement: props.highlightInnerElement,
+					onSelectElement: props.selectInnerElement
+				})
+			));
+
+			return _react2.default.createElement(
+				_menu2.default,
+				{ id: 'insertMenu',
+					position: Object.assign({}, this.props.position, { top: this.props.position.top + 40 }),
+					arrow: 'none',
+					activeItem: this.state.activeItem,
+					onMenuItemClick: this.setActiveItem.bind(this),
+					onGlassClick: props.hideMenu
+				},
+				items
+			);
+		}
+	}]);
+
+	return insertMenu;
+}(_react2.default.Component);
+
+insertMenu.propTypes = {
+	position: _react.PropTypes.object,
+	parents: _react.PropTypes.array,
+	variationId: _react.PropTypes.string,
+	channelId: _react.PropTypes.string,
+	insertOptions: _react.PropTypes.array,
+	isVisible: _react.PropTypes.bool.isRequired,
+	createSectionAndAd: _react.PropTypes.func,
+	hideMenu: _react.PropTypes.func,
+	selectInnerElement: _react.PropTypes.func,
+	highlightInnerElement: _react.PropTypes.func
+};
+
+exports.default = insertMenu;
+
+},{"./adSizeSelector.jsx":12,"./parentSelector.jsx":14,"./sectionOptions.jsx":15,"consts/commonConsts.js":25,"react":"react","shared/menu/menu.jsx":22,"shared/menu/menuItem.jsx":23}],14:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactBootstrap = require('react-bootstrap');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var platformSelector = function platformSelector(_ref) {
+	var selectors = _ref.selectors;
+	var onHighlightElement = _ref.onHighlightElement;
+	var onSelectElement = _ref.onSelectElement;
+	var channelId = _ref.channelId;
+
+	return _react2.default.createElement(
+		'div',
+		{ className: 'SelectParent' },
+		selectors.map(function (selector, index) {
+			return _react2.default.createElement(
+				_reactBootstrap.Row,
+				{ key: index, onMouseOut: onHighlightElement.bind(null, selectors[0].xpath, channelId),
+					onMouseOver: onHighlightElement.bind(null, selector.xpath, channelId), onClick: onSelectElement.bind(null, selector.xpath, channelId)
+				},
+				_react2.default.createElement(
+					_reactBootstrap.Col,
+					{ md: 3 },
+					_react2.default.createElement(
+						'b',
+						null,
+						selector.tagName
+					)
+				),
+				index === 0 ? _react2.default.createElement(
+					_reactBootstrap.Col,
+					{ md: 9 },
+					_react2.default.createElement(
+						'b',
+						null,
+						selector.xpath
+					)
+				) : _react2.default.createElement(
+					_reactBootstrap.Col,
+					{ md: 9 },
+					selector.xpath
+				)
+			);
+		})
+	);
+};
+
+platformSelector.propTypes = {
+	selectors: _react.PropTypes.array.isRequired,
+	channelId: _react.PropTypes.string.isRequired,
+	onHighlightElement: _react2.default.PropTypes.func.isRequired,
+	onSelectElement: _react2.default.PropTypes.func.isRequired
+};
+
+exports.default = platformSelector;
+
+},{"react":"react","react-bootstrap":362}],15:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactBootstrap = require('react-bootstrap');
+
+var _select = require('shared/select/select.js');
+
+var _select2 = _interopRequireDefault(_select);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var positions = ['Unknown', 'Header', 'Under the article/column', 'Sidebar', 'Footer'];
+
+var sectionOptions = function (_React$Component) {
+	_inherits(sectionOptions, _React$Component);
+
+	function sectionOptions(props) {
+		_classCallCheck(this, sectionOptions);
+
+		var _this = _possibleConstructorReturn(this, (sectionOptions.__proto__ || Object.getPrototypeOf(sectionOptions)).call(this, props));
+
+		_this.onSave = _this.onSave.bind(_this);
+		_this.onChange = _this.onChange.bind(_this);
+		_this.state = {
+			position: null
+		};
+		return _this;
+	}
+
+	_createClass(sectionOptions, [{
+		key: 'onSave',
+		value: function onSave() {
+			this.props.onCreateAd(this.state.position);
+		}
+	}, {
+		key: 'onChange',
+		value: function onChange(position) {
+			this.setState({ position: position });
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			return _react2.default.createElement(
+				'div',
+				{ className: 'containerButtonBar sectionOptions' },
+				_react2.default.createElement(
+					_reactBootstrap.Row,
+					null,
+					_react2.default.createElement(
+						_reactBootstrap.Col,
+						{ md: 3 },
+						_react2.default.createElement(
+							'b',
+							null,
+							'Position'
+						)
+					),
+					_react2.default.createElement(
+						_reactBootstrap.Col,
+						{ md: 9 },
+						_react2.default.createElement(
+							_select2.default,
+							{ value: this.state.position, label: 'Select Position', onChange: this.onChange },
+							positions.map(function (position, index) {
+								return _react2.default.createElement(
+									'option',
+									{ key: index, value: index },
+									position
+								);
+							})
+						)
+					)
+				),
+				_react2.default.createElement(
+					_reactBootstrap.Row,
+					{ className: 'butttonsRow' },
+					_react2.default.createElement(
+						_reactBootstrap.Col,
+						{ xs: 6 },
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ className: 'btn-lightBg btn-cancel btn-block', onClick: this.props.onCancel },
+							'Back'
+						)
+					),
+					_react2.default.createElement(
+						_reactBootstrap.Col,
+						{ xs: 6 },
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ disabled: !!!this.state.position, className: 'btn-lightBg btn-save btn-block', onClick: this.onSave },
+							'Create Ad'
+						)
+					)
+				)
+			);
+		}
+	}]);
+
+	return sectionOptions;
+}(_react2.default.Component);
+
+sectionOptions.propTypes = {
+	onCreateAd: _react.PropTypes.func.isRequired,
+	onCancel: _react.PropTypes.func.isRequired
+};
+
+exports.default = sectionOptions;
+
+},{"react":"react","react-bootstrap":362,"shared/select/select.js":24}],16:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var style = {
+	float: 'left',
+	margin: '5px',
+	border: '1px black solid'
+};
+
+var Variation = function (_React$Component) {
+	_inherits(Variation, _React$Component);
+
+	function Variation() {
+		_classCallCheck(this, Variation);
+
+		return _possibleConstructorReturn(this, (Variation.__proto__ || Object.getPrototypeOf(Variation)).call(this));
+	}
+
+	_createClass(Variation, [{
+		key: 'render',
+		value: function render() {
+			var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props;
+
+			var variation = _ref.variation;
+			var onClick = _ref.onClick;
+			var onDoubleClick = _ref.onDoubleClick;
+			var active = _ref.active;
+
+			return _react2.default.createElement(
+				'div',
+				{ onDoubleClick: onDoubleClick, onClick: onClick, className: 'variationBlock', style: _extends({}, style, { color: active ? 'red' : 'white' }) },
+				variation.name
+			);
+		}
+	}]);
+
+	return Variation;
+}(_react2.default.Component);
+
+Variation.propTypes = {
+	variation: _react.PropTypes.object.isRequired,
+	onClick: _react.PropTypes.func.isRequired,
+	onDoubleClick: _react.PropTypes.func.isRequired
+};
+
+exports.default = Variation;
+
+},{"react":"react"}],17:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var VariationAdder = function VariationAdder(props) {
+	var style = { height: '100%', width: '30px', backgroundColor: 'red', float: 'left' };
+	return _react2.default.createElement(
+		'div',
+		{ style: style, id: 'variationAdder', onClick: props.onNewVariation },
+		'+'
+	);
+};
+
+VariationAdder.propTypes = {
+	onNewVariation: _react.PropTypes.func.isRequired
+};
+
+exports.default = VariationAdder;
+
+},{"react":"react"}],18:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _utils = require('libs/utils.js');
+
+var _utils2 = _interopRequireDefault(_utils);
+
+var _variation = require('./variation.jsx');
+
+var _variation2 = _interopRequireDefault(_variation);
+
+var _variationAdder = require('./variationAdder.jsx');
+
+var _variationAdder2 = _interopRequireDefault(_variationAdder);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var getLastVariationNumber = function getLastVariationNumber(variations) {
+	var names = variations.map(function (_ref) {
+		var name = _ref.name;
+
+		return name.indexOf('Variation') === -1 ? 0 : parseInt(_utils2.default.stringReverse(name), 10);
+	});
+	return names.length ? names.sort().reverse()[0] : 0;
+};
+
+var variationManager = function (_React$Component) {
+	_inherits(variationManager, _React$Component);
+
+	function variationManager(props) {
+		_classCallCheck(this, variationManager);
+
+		var _this = _possibleConstructorReturn(this, (variationManager.__proto__ || Object.getPrototypeOf(variationManager)).call(this, props));
+
+		_this.createVariation = _this.createVariation.bind(_this);
+		return _this;
+	}
+
+	_createClass(variationManager, [{
+		key: 'createVariation',
+		value: function createVariation() {
+			this.props.createVariation({
+				name: 'Variation ' + (getLastVariationNumber(this.props.variations) + 1)
+			}, this.props.activeChannelId);
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var props = this.props,
+			    style = { position: 'absolute', bottom: '0px', height: '30px', width: '100%', backgroundColor: 'grey' };
+			if (!props.activeChannelId) {
+				return null;
+			}
+			return _react2.default.createElement(
+				'div',
+				{ id: 'variationManager', style: style },
+				props.variations.map(function (variation) {
+					return _react2.default.createElement(_variation2.default, { key: variation.id,
+						variation: variation,
+						active: variation.id === props.activeVariation.id,
+						onClick: props.setActiveVariation.bind(null, variation.id),
+						onDoubleClick: props.deleteVariation.bind(null, variation.id),
+						onCopy: props.copyVariation.bind(null, variation.id),
+						onRename: props.renameVariation.bind(null, variation.id)
+					});
+				}),
+				_react2.default.createElement(_variationAdder2.default, { onNewVariation: this.createVariation })
+			);
+		}
+	}]);
+
+	return variationManager;
+}(_react2.default.Component);
+
+variationManager.propTypes = {
+	variations: _react.PropTypes.array,
+	activeVariation: _react.PropTypes.object,
+	activeChannelId: _react.PropTypes.string,
+	createVariation: _react.PropTypes.func,
+	deleteVariation: _react.PropTypes.func,
+	copyVariation: _react.PropTypes.func,
+	renameVariation: _react.PropTypes.func,
+	setActiveVariation: _react.PropTypes.func
+};
+
+exports.default = variationManager;
+
+},{"./variation.jsx":16,"./variationAdder.jsx":17,"libs/utils.js":32,"react":"react"}],19:[function(require,module,exports){
+'use strict';
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var $ = require('jquery');
+
+module.exports = _react2.default.createClass({
+	displayName: 'exports',
+
+	getDefaultProps: function getDefaultProps() {
+		return {
+			clickHandler: function noop() {}
+		};
+	},
+	render: function render() {
+		var g_style = {
+			position: 'fixed',
+			top: 0,
+			left: 0,
+			width: '100%',
+			height: $(window).height(),
+			zIndex: 9999
+		};
+		return _react2.default.createElement('div', { style: g_style, onClick: this.props.clickHandler });
+	}
+});
+
+},{"jquery":"jquery","react":"react"}],20:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Loader = function Loader(props) {
+	return _react2.default.createElement(
+		'div',
+		{ 'data-id': 'loader', style: { display: props.loading ? 'block' : 'none' }, className: 'loaderwrapper spinner' },
+		_react2.default.createElement('img', { alt: 'loader', src: '/assets/images/loaderLogo.png' })
+	);
+};
+
+Loader.propTypes = {
+	loading: _react.PropTypes.bool.isRequired
+};
+
+Loader.defaultProps = {
+	loading: false
+};
+
+exports.default = Loader;
+
+},{"react":"react"}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -313,7 +1563,7 @@ MenuContent.propTypes = {
 
 exports.default = MenuContent;
 
-},{"react":"react"}],7:[function(require,module,exports){
+},{"react":"react"}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -330,11 +1580,11 @@ var _jquery = require('jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _glass = require('CustomComponents/glass.jsx');
+var _glass = require('shared/glass.jsx');
 
 var _glass2 = _interopRequireDefault(_glass);
 
-var _utils = require('libs/custom/utils.js');
+var _utils = require('libs/utils.js');
 
 var _utils2 = _interopRequireDefault(_utils);
 
@@ -476,7 +1726,7 @@ Menu.defaultProps = {
 
 exports.default = Menu;
 
-},{"CustomComponents/glass.jsx":10,"jquery":"jquery","libs/custom/utils.js":32,"react":"react"}],8:[function(require,module,exports){
+},{"jquery":"jquery","libs/utils.js":32,"react":"react","shared/glass.jsx":19}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -542,7 +1792,7 @@ MenuItem.defaultProps = {
 
 exports.default = MenuItem;
 
-},{"./content.jsx":6,"react":"react"}],9:[function(require,module,exports){
+},{"./content.jsx":21,"react":"react"}],24:[function(require,module,exports){
 "use strict";
 
 var React = window.React;
@@ -901,1256 +2151,7 @@ module.exports = React.createClass({ displayName: 'exports',
 	}
 });
 
-},{}],10:[function(require,module,exports){
-'use strict';
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var $ = require('jquery');
-
-module.exports = _react2.default.createClass({
-	displayName: 'exports',
-
-	getDefaultProps: function getDefaultProps() {
-		return {
-			clickHandler: function noop() {}
-		};
-	},
-	render: function render() {
-		var g_style = {
-			position: 'fixed',
-			top: 0,
-			left: 0,
-			width: '100%',
-			height: $(window).height(),
-			zIndex: 9999
-		};
-		return _react2.default.createElement('div', { style: g_style, onClick: this.props.clickHandler });
-	}
-});
-
-},{"jquery":"jquery","react":"react"}],11:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _commonConsts = require('../../../../consts/commonConsts.js');
-
-var _platform = require('./platform.jsx');
-
-var _platform2 = _interopRequireDefault(_platform);
-
-var _loader = require('../loader.jsx');
-
-var _loader2 = _interopRequireDefault(_loader);
-
-var _tab = require('./tabs/tab.jsx');
-
-var _tab2 = _interopRequireDefault(_tab);
-
-var _tabPane = require('./tabs/tabPane.jsx');
-
-var _tabPane2 = _interopRequireDefault(_tabPane);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var getIframeUrl = function getIframeUrl(channel) {
-	var urlParts = channel.sampleUrl.split('#'),
-	    hashPart = void 0,
-	    iframeUrl = void 0;
-
-	var actualUrl = urlParts[0];
-
-	if (urlParts.length > 1) {
-		urlParts = urlParts.splice(1);
-		hashPart = urlParts.join('#');
-	}
-	iframeUrl = _commonConsts.proxy.HTTP_PROXY_URL + '?channelId=' + channel.id + '&url=' + btoa(actualUrl) + '\n\t\t\t\t&siteDomain=' + window.ADP_SITE_DOMAIN + '&platform=' + channel.platform + '&adpOrigin=' + window.ADP_ORIGIN + '&baseUrl=' + window.ADP_BASEURL + '&useAlternateProxy=' + channel.useAlternateProxy;
-	iframeUrl = iframeUrl + (hashPart ? '#' + hashPart : '');
-	return iframeUrl;
-};
-
-var channelManager = function (_React$Component) {
-	_inherits(channelManager, _React$Component);
-
-	function channelManager(props) {
-		_classCallCheck(this, channelManager);
-
-		var _this = _possibleConstructorReturn(this, (channelManager.__proto__ || Object.getPrototypeOf(channelManager)).call(this, props));
-
-		_this.state = {};
-		return _this;
-	}
-
-	_createClass(channelManager, [{
-		key: 'render',
-		value: function render() {
-			var props = this.props;
-
-			return _react2.default.createElement(
-				_tab2.default,
-				{ toggleEditorMode: props.toggleEditorMode, showPublisherHelper: props.showPublisherHelper,
-					masterSave: props.masterSave, handleNewChannelMenu: props.showNewChannelMenu,
-					showOptionsMenu: props.showOptionsMenu,
-					siteMode: props.siteMode, channels: props.channels, activeKey: props.activeChannelId
-				},
-				props.openChannels.map(function (channel) {
-					return _react2.default.createElement(
-						_tabPane2.default,
-						{ handleClick: props.setActiveChannel.bind(null, channel.id), key: channel.id, title: channel.channelName },
-						_react2.default.createElement(
-							_platform2.default,
-							{ type: channel.platform },
-							_react2.default.createElement(_loader2.default, { loading: channel.isLoading }),
-							_react2.default.createElement('iframe', { 'data-adpid': 'iframe' + channel.id,
-								src: getIframeUrl(channel),
-								style: {
-									width: '100%',
-									height: '100%'
-								}
-							})
-						)
-					);
-				})
-			);
-		}
-	}]);
-
-	return channelManager;
-}(_react2.default.Component);
-
-channelManager.propTypes = {
-	toggleEditorMode: _react.PropTypes.func.isRequired,
-	showPublisherHelper: _react.PropTypes.func.isRequired,
-	showNewChannelMenu: _react.PropTypes.func.isRequired,
-	masterSave: _react.PropTypes.func.isRequired,
-	showOptionsMenu: _react.PropTypes.func.isRequired,
-	setActiveChannel: _react.PropTypes.func.isRequired,
-	siteMode: _react.PropTypes.number.isRequired,
-	activeChannel: _react.PropTypes.string,
-	channels: _react.PropTypes.object.isRequired,
-	openChannels: _react2.default.PropTypes.array.isRequired
-};
-
-exports.default = channelManager;
-
-},{"../../../../consts/commonConsts.js":25,"../loader.jsx":23,"./platform.jsx":12,"./tabs/tab.jsx":13,"./tabs/tabPane.jsx":14,"react":"react"}],12:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var Platform = function Platform(props) {
-	var platform = props.type,
-	    platformClass = 'defaultPlatform',
-	    viewPortClass = 'defaultViewPort';
-
-	switch (platform.toLowerCase()) {
-		case 'desktop':
-			platformClass = 'desktopEditor';
-			viewPortClass = 'desktopViePort';
-			break;
-
-		case 'mobile':
-			platformClass = 'iphone6sPortrait';
-			viewPortClass = 'iphone6sViePort';
-			break;
-
-		case 'tablet':
-			platformClass = 'ipadAirPortrait';
-			viewPortClass = 'ipadAirViePort';
-			break;
-		default:
-			break;
-	}
-
-	return _react2.default.createElement(
-		'div',
-		{ id: 'editorPlatform', className: 'platform ' + platformClass },
-		_react2.default.createElement(
-			'div',
-			{ id: 'editorViewPort', className: viewPortClass },
-			props.children
-		)
-	);
-};
-
-Platform.propTypes = {
-	type: _react.PropTypes.string.isRequired,
-	children: _react2.default.PropTypes.arrayOf(_react2.default.PropTypes.element).isRequired
-};
-
-Platform.defaultProps = {
-	type: 'desktop'
-};
-
-exports.default = Platform;
-
-},{"react":"react"}],13:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _reactBootstrap = require('react-bootstrap');
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _tabSiteOptions = require('./tabSiteOptions.jsx');
-
-var _tabSiteOptions2 = _interopRequireDefault(_tabSiteOptions);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var empyScreen = function empyScreen() {
-	return _react2.default.createElement('div', { className: 'tabContentbg' });
-},
-
-// eslint-disable-next-line react/no-multi-comp
-Tab = function Tab(props) {
-	return _react2.default.createElement(
-		'div',
-		{ className: 'tabAreaWrap' },
-		_react2.default.createElement(
-			'div',
-			{ className: 'tabArea' },
-			_react2.default.createElement('div', { className: 'borderBot' }),
-			_react2.default.createElement(
-				'div',
-				{ className: 'tabBar' },
-				_react2.default.createElement(
-					_reactBootstrap.OverlayTrigger,
-					{ placement: 'right', overlay: _react2.default.createElement(
-							_reactBootstrap.Tooltip,
-							{ id: 'goToDashboard' },
-							'Goto Dashboard'
-						) },
-					_react2.default.createElement(
-						_reactBootstrap.Button,
-						{ className: 'btn btn-sm btn-flat', href: '/user/dashboard' },
-						_react2.default.createElement('i', { className: 'fa fa-arrow-left' })
-					)
-				),
-				_react2.default.createElement(
-					'ul',
-					null,
-					_react2.default.createElement(
-						_reactBootstrap.OverlayTrigger,
-						{ placement: 'right', overlay: _react2.default.createElement(
-								_reactBootstrap.Tooltip,
-								{ id: 'createLoadPageGroup' },
-								'Create/Load PageGroup'
-							) },
-						_react2.default.createElement(
-							'li',
-							{ className: props.children.length === 0 ? 'pulseAnimate' : null },
-							_react2.default.createElement(
-								'a',
-								{ id: 'adNewChannel', href: '#', onClick: props.handleNewChannelMenu, className: 'addnew' },
-								'+'
-							)
-						)
-					),
-					props.children.map(function (tabPane) {
-						return _react2.default.createElement(
-							_reactBootstrap.OverlayTrigger,
-							{ key: 'trig_' + tabPane.key, placement: 'bottom', overlay: _react2.default.createElement(
-									_reactBootstrap.Tooltip,
-									{ id: 'pageGroupOptionsTooltip' },
-									'Click for Page Group options'
-								) },
-							_react2.default.createElement(
-								'li',
-								{ key: 'tab_' + tabPane.key, onClick: tabPane.props.handleClick.bind(null, tabPane), id: 'tab_' + tabPane.key },
-								_react2.default.createElement(
-									'a',
-									{ className: props.activeKey === tabPane.key ? 'active' : 'null', href: '#' },
-									tabPane.props.title,
-									_react2.default.createElement('i', { className: 'fa fa-angle-down' })
-								)
-							)
-						);
-					})
-				),
-				_react2.default.createElement(_tabSiteOptions2.default, props)
-			)
-		),
-		_react2.default.createElement(
-			'div',
-			{ className: 'tabContent' },
-			props.children.length.length === 0 ? empyScreen() : props.children.map(function (tabPane) {
-				return _react2.default.cloneElement(tabPane, {
-					key: 'tab_content_' + tabPane.key,
-					id: 'tab_content_' + tabPane.key,
-					selected: props.activeKey === tabPane.key
-				});
-			})
-		)
-	);
-};
-
-Tab.propTypes = {
-	handleNewChannelMenu: _react.PropTypes.func.isRequired,
-	activeKey: _react.PropTypes.string,
-	children: _react2.default.PropTypes.arrayOf(_react2.default.PropTypes.element)
-};
-
-exports.default = Tab;
-
-},{"./tabSiteOptions.jsx":15,"react":"react","react-bootstrap":362}],14:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var TabPane = function TabPane(props) {
-	return _react2.default.createElement(
-		'div',
-		{ className: 'tabContentArea', style: { display: props.selected ? 'block' : 'none' } },
-		props.children
-	);
-};
-
-TabPane.propTypes = {
-	selected: _react.PropTypes.bool,
-	children: _react2.default.PropTypes.element.isRequired,
-	title: _react2.default.PropTypes.string.isRequired,
-	handleClick: _react2.default.PropTypes.func.isRequired
-};
-
-exports.default = TabPane;
-
-},{"react":"react"}],15:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _commonConsts = require('consts/commonConsts.js');
-
-var _reactBootstrap = require('react-bootstrap');
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var SiteModes = function SiteModes(props) {
-	return _react2.default.createElement(
-		'div',
-		{ className: 'modes modes--stateChange' },
-		_react2.default.createElement('input', { type: 'radio', className: 'modes-input modes-input-off', name: 'view', value: 'editor', id: 'draftmode', checked: props.siteMode === _commonConsts.siteModes.DRAFT }),
-		_react2.default.createElement(
-			_reactBootstrap.OverlayTrigger,
-			{ placement: 'bottom', overlay: _react2.default.createElement(
-					_reactBootstrap.Tooltip,
-					{ id: 'siteModesPause' },
-					props.siteMode === _commonConsts.siteModes.DRAFT ? 'AdPushup is currently paused' : 'Pause AdPushup'
-				) },
-			_react2.default.createElement(
-				'label',
-				{ onClick: props.showPublisherHelper, htmlFor: 'draftmode', className: 'modes-label modes-label-off' },
-				_react2.default.createElement('i', { className: 'fa fa-pause' })
-			)
-		),
-		_react2.default.createElement('input', { type: 'radio', className: 'modes-input modes-input-on', name: 'view', value: 'browse', id: 'publishmode', checked: props.siteMode === _commonConsts.siteModes.PUBLISH }),
-		_react2.default.createElement(
-			_reactBootstrap.OverlayTrigger,
-			{ placement: 'bottom', overlay: _react2.default.createElement(
-					_reactBootstrap.Tooltip,
-					{ id: 'siteModesLive' },
-					props.siteMode === _commonConsts.siteModes.PUBLISH ? 'AdPushup is currently optimizing your website' : 'Start Optimization'
-				) },
-			_react2.default.createElement(
-				'label',
-				{ onClick: props.showPublisherHelper, htmlFor: 'publishmode', className: 'modes-label modes-label-on' },
-				_react2.default.createElement('i', { className: 'fa fa-play' })
-			)
-		),
-		_react2.default.createElement('span', { className: 'modes-selection' })
-	);
-},
-
-// eslint-disable-next-line react/no-multi-comp
-EditorModes = function EditorModes(props) {
-	return _react2.default.createElement(
-		'div',
-		{ className: 'modes' },
-		_react2.default.createElement('input', { onChange: props.toggleEditorMode, type: 'radio', className: 'modes-input', name: 'editorMode', value: 'editor', id: 'editormode', defaultChecked: true }),
-		_react2.default.createElement(
-			_reactBootstrap.OverlayTrigger,
-			{ placement: 'bottom', overlay: _react2.default.createElement(
-					_reactBootstrap.Tooltip,
-					{ id: 'editorModeTooltip' },
-					'Editor Mode'
-				) },
-			_react2.default.createElement(
-				'label',
-				{ htmlFor: 'editormode', className: 'modes-label modes-label-off' },
-				_react2.default.createElement('i', { className: 'fa fa-code' })
-			)
-		),
-		_react2.default.createElement('input', { onChange: props.toggleEditorMode, type: 'radio', className: 'modes-input', name: 'editorMode', value: 'browse', id: 'browsemode' }),
-		_react2.default.createElement(
-			_reactBootstrap.OverlayTrigger,
-			{ placement: 'bottom', overlay: _react2.default.createElement(
-					_reactBootstrap.Tooltip,
-					{ id: 'browseModeTooltip' },
-					'Browse Mode'
-				) },
-			_react2.default.createElement(
-				'label',
-				{ htmlFor: 'browsemode', className: 'modes-label modes-label-on' },
-				_react2.default.createElement('i', { className: 'fa fa-globe' })
-			)
-		),
-		_react2.default.createElement('span', { className: 'modes-selection' })
-	);
-},
-
-// eslint-disable-next-line react/no-multi-comp
-TabSiteOptions = function TabSiteOptions(props) {
-	return _react2.default.createElement(
-		'div',
-		{ className: 'option-right' },
-		_react2.default.createElement(EditorModes, { toggleEditorMode: props.toggleEditorMode }),
-		_react2.default.createElement(
-			_reactBootstrap.OverlayTrigger,
-			{ placement: 'bottom', overlay: _react2.default.createElement(
-					_reactBootstrap.Tooltip,
-					{ id: 'adpushupOptionsTooltip' },
-					'AdPushup Options'
-				) },
-			_react2.default.createElement(_reactBootstrap.Button, { id: 'miscOptions', className: 'btn-sm btn-lightBg btn-option btn--icon', onClick: props.showOptionsMenu })
-		),
-		_react2.default.createElement(
-			_reactBootstrap.OverlayTrigger,
-			{ placement: 'bottom', overlay: _react2.default.createElement(
-					_reactBootstrap.Tooltip,
-					{ id: 'masterSaveTooltip' },
-					'Save changes'
-				) },
-			_react2.default.createElement(_reactBootstrap.Button, { onClick: props.masterSave, className: 'btn-sm btn-save btn-lightBg btn--success btn--icon pull-left' })
-		),
-		_react2.default.createElement(SiteModes, { showPublisherHelper: props.showPublisherHelper, siteMode: props.siteMode })
-	);
-};
-
-TabSiteOptions.propTypes = {
-	showPublisherHelper: _react.PropTypes.func.isRequired,
-	toggleEditorMode: _react.PropTypes.func.isRequired,
-	masterSave: _react.PropTypes.func.isRequired,
-	showOptionsMenu: _react.PropTypes.func.isRequired,
-	siteMode: _react.PropTypes.number.isRequired
-};
-
-SiteModes.propTypes = {
-	showPublisherHelper: _react.PropTypes.func.isRequired,
-	siteMode: _react.PropTypes.number.isRequired
-};
-
-EditorModes.propTypes = {
-	toggleEditorMode: _react.PropTypes.func
-};
-
-exports.default = TabSiteOptions;
-
-},{"consts/commonConsts.js":25,"react":"react","react-bootstrap":362}],16:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _underscore = require('underscore');
-
-var _underscore2 = _interopRequireDefault(_underscore);
-
-var _reactBootstrap = require('react-bootstrap');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-// import CustomSizeForm from './customSizeForm.jsx';
-
-
-var AdSizeSelector = function (_React$Component) {
-	_inherits(AdSizeSelector, _React$Component);
-
-	function AdSizeSelector(props) {
-		_classCallCheck(this, AdSizeSelector);
-
-		var _this = _possibleConstructorReturn(this, (AdSizeSelector.__proto__ || Object.getPrototypeOf(AdSizeSelector)).call(this, props));
-
-		_this.state = {
-			activeTab: props.activeTab || 0
-		};
-		_this.onChecked = _this.onChecked.bind(_this);
-		_this.handleTabClick = _this.handleTabClick.bind(_this);
-		return _this;
-	}
-
-	_createClass(AdSizeSelector, [{
-		key: 'componentWillReceiveProps',
-		value: function componentWillReceiveProps(nextProps) {
-			if (nextProps.activeTab) {
-				this.setState({ activeTab: nextProps.activeTab });
-			}
-		}
-	}, {
-		key: 'onChecked',
-		value: function onChecked(adProps) {
-			this.props.onCheckedItem(adProps);
-		}
-	}, {
-		key: 'handleTabClick',
-		value: function handleTabClick(key) {
-			this.setState({ activeTab: key });
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var _this2 = this;
-
-			return _react2.default.createElement(
-				_reactBootstrap.Accordion,
-				{ activeKey: this.state.activeTab, onSelect: this.handleTabClick },
-				(0, _underscore2.default)(this.props.adSizes).map(function (rec, index) {
-					return _react2.default.createElement(
-						_reactBootstrap.Panel,
-						{ key: 'panel-' + index, header: rec.layoutType + ' Ads', eventKey: index },
-						_react2.default.createElement(
-							_reactBootstrap.Row,
-							null,
-							(0, _underscore2.default)(rec.sizes).map(function (adProps, innerIndex) {
-								return _react2.default.createElement(
-									_reactBootstrap.Col,
-									{ key: 'col-' + _this2.props.insertOption + '-' + innerIndex, xs: 6, className: 'Col' },
-									_react2.default.createElement('input', { id: _this2.props.insertOption + rec.layoutType + innerIndex,
-										type: 'radio',
-										checked: _this2.props.checked === adProps ? 'checked' : null,
-										onClick: _this2.props.onCheckedItem.bind(null, adProps)
-									}),
-									_react2.default.createElement(
-										'label',
-										{ htmlFor: _this2.props.insertOption + rec.layoutType + innerIndex },
-										adProps.width + ' X ' + adProps.height
-									)
-								);
-							})
-						),
-						rec.layoutType === 'CUSTOM' ? null /* (<CustomSizeForm updateMenu={self.props.onUpdate} flux={self.props.flux}/>)*/ : null
-					);
-				})
-			);
-		}
-	}]);
-
-	return AdSizeSelector;
-}(_react2.default.Component);
-
-AdSizeSelector.propTypes = {
-	activeTab: _react.PropTypes.number,
-	checked: _react.PropTypes.object,
-	onCheckedItem: _react.PropTypes.func,
-	adSizes: _react2.default.PropTypes.arrayOf(_react2.default.PropTypes.object).isRequired
-};
-
-AdSizeSelector.defaultProps = {
-	activeTab: 0
-};
-
-exports.default = AdSizeSelector;
-
-},{"react":"react","react-bootstrap":362,"underscore":549}],17:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _menu = require('CustomComponents/Menu/menu.jsx');
-
-var _menu2 = _interopRequireDefault(_menu);
-
-var _menuItem = require('CustomComponents/Menu/menuItem.jsx');
-
-var _menuItem2 = _interopRequireDefault(_menuItem);
-
-var _commonConsts = require('consts/commonConsts.js');
-
-var _adSizeSelector = require('./adSizeSelector.jsx');
-
-var _adSizeSelector2 = _interopRequireDefault(_adSizeSelector);
-
-var _parentSelector = require('./parentSelector.jsx');
-
-var _parentSelector2 = _interopRequireDefault(_parentSelector);
-
-var _sectionOptions = require('./sectionOptions.jsx');
-
-var _sectionOptions2 = _interopRequireDefault(_sectionOptions);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var initialState = {
-	adSize: null,
-	operation: null,
-	activeItem: 0,
-	prevActiveItem: 0,
-	showExtraOptions: false
-},
-    getInsertOptionClass = function getInsertOptionClass(option) {
-	switch (option) {
-		case 'Prepend':
-			return 'ap-prepend';
-		case 'Insert After':
-			return 'ap-insertafter';
-		case 'Insert Before':
-			return 'ap-insertbefore';
-		default:
-			return 'ap-append';
-	}
-};
-
-var insertMenu = function (_React$Component) {
-	_inherits(insertMenu, _React$Component);
-
-	function insertMenu(props) {
-		_classCallCheck(this, insertMenu);
-
-		var _this = _possibleConstructorReturn(this, (insertMenu.__proto__ || Object.getPrototypeOf(insertMenu)).call(this, props));
-
-		_this.state = initialState;
-		return _this;
-	}
-
-	_createClass(insertMenu, [{
-		key: 'componentWillReceiveProps',
-		value: function componentWillReceiveProps() {
-			this.setState(initialState);
-		}
-	}, {
-		key: 'setActiveItem',
-		value: function setActiveItem(item) {
-			this.setState({ activeItem: item, prevActiveItem: this.state.activeItem });
-		}
-	}, {
-		key: 'toggleExtraOptions',
-		value: function toggleExtraOptions() {
-			this.setState({ showExtraOptions: !this.state.showExtraOptions, activeItem: this.state.prevActiveItem, prevActiveItem: this.state.activeItem });
-		}
-	}, {
-		key: 'selectSize',
-		value: function selectSize(operation, adSize) {
-			this.setState({ adSize: adSize, operation: operation, showExtraOptions: true, activeItem: 0, prevActiveItem: this.state.activeItem });
-		}
-	}, {
-		key: 'createSectionAndAd',
-		value: function createSectionAndAd(position) {
-			var sectionPayload = {
-				position: position,
-				name: 'Section 1',
-				xpath: this.props.parents[0].xpath,
-				operation: this.state.operation
-			},
-			    adPayload = {
-				height: this.state.adSize.height,
-				width: this.state.adSize.width
-			};
-			this.props.createSectionAndAd(sectionPayload, adPayload, this.props.variationId);
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var _this2 = this;
-
-			var props = this.props;
-			var items = [];
-			if (!props.isVisible) {
-				return null;
-			}
-
-			if (!this.state.showExtraOptions) {
-				items = props.insertOptions.map(function (option, index) {
-					return _react2.default.createElement(
-						_menuItem2.default,
-						{ key: index, icon: getInsertOptionClass(option), contentHeading: option },
-						_react2.default.createElement(_adSizeSelector2.default, {
-							checked: option === _this2.state.operation ? _this2.state.adSize : null,
-							adSizes: _commonConsts.commonSupportedSizes,
-							insertOption: option,
-							onCheckedItem: _this2.selectSize.bind(_this2, option)
-						})
-					);
-				});
-			} else {
-				items.push(_react2.default.createElement(
-					_menuItem2.default,
-					{ key: 1, icon: 'fa-sitemap', contentHeading: 'Section Options' },
-					_react2.default.createElement(_sectionOptions2.default, { onCreateAd: this.createSectionAndAd.bind(this), onCancel: this.toggleExtraOptions.bind(this) })
-				));
-			}
-
-			items.push(_react2.default.createElement(
-				_menuItem2.default,
-				{ key: 5, icon: 'fa-sitemap', contentHeading: 'Select Parent' },
-				_react2.default.createElement(_parentSelector2.default, {
-					selectors: props.parents,
-					channelId: this.props.channelId,
-					onHighlightElement: props.highlightInnerElement,
-					onSelectElement: props.selectInnerElement
-				})
-			));
-
-			return _react2.default.createElement(
-				_menu2.default,
-				{ id: 'insertMenu',
-					position: Object.assign({}, this.props.position, { top: this.props.position.top + 40 }),
-					arrow: 'none',
-					activeItem: this.state.activeItem,
-					onMenuItemClick: this.setActiveItem.bind(this),
-					onGlassClick: props.hideMenu
-				},
-				items
-			);
-		}
-	}]);
-
-	return insertMenu;
-}(_react2.default.Component);
-
-insertMenu.propTypes = {
-	position: _react.PropTypes.object,
-	parents: _react.PropTypes.array,
-	variationId: _react.PropTypes.string,
-	channelId: _react.PropTypes.string,
-	insertOptions: _react.PropTypes.array,
-	isVisible: _react.PropTypes.bool.isRequired,
-	createSectionAndAd: _react.PropTypes.func,
-	hideMenu: _react.PropTypes.func,
-	selectInnerElement: _react.PropTypes.func,
-	highlightInnerElement: _react.PropTypes.func
-};
-
-exports.default = insertMenu;
-
-},{"./adSizeSelector.jsx":16,"./parentSelector.jsx":18,"./sectionOptions.jsx":19,"CustomComponents/Menu/menu.jsx":7,"CustomComponents/Menu/menuItem.jsx":8,"consts/commonConsts.js":25,"react":"react"}],18:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactBootstrap = require('react-bootstrap');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var platformSelector = function platformSelector(_ref) {
-	var selectors = _ref.selectors;
-	var onHighlightElement = _ref.onHighlightElement;
-	var onSelectElement = _ref.onSelectElement;
-	var channelId = _ref.channelId;
-
-	return _react2.default.createElement(
-		'div',
-		{ className: 'SelectParent' },
-		selectors.map(function (selector, index) {
-			return _react2.default.createElement(
-				_reactBootstrap.Row,
-				{ key: index, onMouseOut: onHighlightElement.bind(null, selectors[0].xpath, channelId),
-					onMouseOver: onHighlightElement.bind(null, selector.xpath, channelId), onClick: onSelectElement.bind(null, selector.xpath, channelId)
-				},
-				_react2.default.createElement(
-					_reactBootstrap.Col,
-					{ md: 3 },
-					_react2.default.createElement(
-						'b',
-						null,
-						selector.tagName
-					)
-				),
-				index === 0 ? _react2.default.createElement(
-					_reactBootstrap.Col,
-					{ md: 9 },
-					_react2.default.createElement(
-						'b',
-						null,
-						selector.xpath
-					)
-				) : _react2.default.createElement(
-					_reactBootstrap.Col,
-					{ md: 9 },
-					selector.xpath
-				)
-			);
-		})
-	);
-};
-
-platformSelector.propTypes = {
-	selectors: _react.PropTypes.array.isRequired,
-	channelId: _react.PropTypes.string.isRequired,
-	onHighlightElement: _react2.default.PropTypes.func.isRequired,
-	onSelectElement: _react2.default.PropTypes.func.isRequired
-};
-
-exports.default = platformSelector;
-
-},{"react":"react","react-bootstrap":362}],19:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactBootstrap = require('react-bootstrap');
-
-var _select = require('CustomComponents/Select/select.js');
-
-var _select2 = _interopRequireDefault(_select);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var positions = ['Unknown', 'Header', 'Under the article/column', 'Sidebar', 'Footer'];
-
-var sectionOptions = function (_React$Component) {
-	_inherits(sectionOptions, _React$Component);
-
-	function sectionOptions(props) {
-		_classCallCheck(this, sectionOptions);
-
-		var _this = _possibleConstructorReturn(this, (sectionOptions.__proto__ || Object.getPrototypeOf(sectionOptions)).call(this, props));
-
-		_this.onSave = _this.onSave.bind(_this);
-		_this.onChange = _this.onChange.bind(_this);
-		_this.state = {
-			position: null
-		};
-		return _this;
-	}
-
-	_createClass(sectionOptions, [{
-		key: 'onSave',
-		value: function onSave() {
-			this.props.onCreateAd(this.state.position);
-		}
-	}, {
-		key: 'onChange',
-		value: function onChange(position) {
-			this.setState({ position: position });
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			return _react2.default.createElement(
-				'div',
-				{ className: 'containerButtonBar sectionOptions' },
-				_react2.default.createElement(
-					_reactBootstrap.Row,
-					null,
-					_react2.default.createElement(
-						_reactBootstrap.Col,
-						{ md: 3 },
-						_react2.default.createElement(
-							'b',
-							null,
-							'Position'
-						)
-					),
-					_react2.default.createElement(
-						_reactBootstrap.Col,
-						{ md: 9 },
-						_react2.default.createElement(
-							_select2.default,
-							{ value: this.state.position, label: 'Select Position', onChange: this.onChange },
-							positions.map(function (position, index) {
-								return _react2.default.createElement(
-									'option',
-									{ key: index, value: index },
-									position
-								);
-							})
-						)
-					)
-				),
-				_react2.default.createElement(
-					_reactBootstrap.Row,
-					{ className: 'butttonsRow' },
-					_react2.default.createElement(
-						_reactBootstrap.Col,
-						{ xs: 6 },
-						_react2.default.createElement(
-							_reactBootstrap.Button,
-							{ className: 'btn-lightBg btn-cancel btn-block', onClick: this.props.onCancel },
-							'Back'
-						)
-					),
-					_react2.default.createElement(
-						_reactBootstrap.Col,
-						{ xs: 6 },
-						_react2.default.createElement(
-							_reactBootstrap.Button,
-							{ disabled: !!!this.state.position, className: 'btn-lightBg btn-save btn-block', onClick: this.onSave },
-							'Create Ad'
-						)
-					)
-				)
-			);
-		}
-	}]);
-
-	return sectionOptions;
-}(_react2.default.Component);
-
-sectionOptions.propTypes = {
-	onCreateAd: _react.PropTypes.func.isRequired,
-	onCancel: _react.PropTypes.func.isRequired
-};
-
-exports.default = sectionOptions;
-
-},{"CustomComponents/Select/select.js":9,"react":"react","react-bootstrap":362}],20:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var style = {
-	float: 'left',
-	margin: '5px',
-	border: '1px black solid'
-};
-
-var Variation = function (_React$Component) {
-	_inherits(Variation, _React$Component);
-
-	function Variation() {
-		_classCallCheck(this, Variation);
-
-		return _possibleConstructorReturn(this, (Variation.__proto__ || Object.getPrototypeOf(Variation)).call(this));
-	}
-
-	_createClass(Variation, [{
-		key: 'render',
-		value: function render() {
-			var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props;
-
-			var variation = _ref.variation;
-			var onClick = _ref.onClick;
-			var onDoubleClick = _ref.onDoubleClick;
-			var active = _ref.active;
-
-			return _react2.default.createElement(
-				'div',
-				{ onDoubleClick: onDoubleClick, onClick: onClick, className: 'variationBlock', style: _extends({}, style, { color: active ? 'red' : 'white' }) },
-				variation.name
-			);
-		}
-	}]);
-
-	return Variation;
-}(_react2.default.Component);
-
-Variation.propTypes = {
-	variation: _react.PropTypes.object.isRequired,
-	onClick: _react.PropTypes.func.isRequired,
-	onDoubleClick: _react.PropTypes.func.isRequired
-};
-
-exports.default = Variation;
-
-},{"react":"react"}],21:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var VariationAdder = function VariationAdder(props) {
-	var style = { height: '100%', width: '30px', 'backgroundColor': 'red', 'float': 'left' };
-	return _react2.default.createElement(
-		'div',
-		{ style: style, id: 'variationAdder', onClick: props.onNewVariation },
-		'+'
-	);
-};
-
-VariationAdder.propTypes = {
-	onNewVariation: _react.PropTypes.func.isRequired
-};
-
-exports.default = VariationAdder;
-
-},{"react":"react"}],22:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _utils = require('libs/custom/utils.js');
-
-var _utils2 = _interopRequireDefault(_utils);
-
-var _variation = require('./variation.jsx');
-
-var _variation2 = _interopRequireDefault(_variation);
-
-var _variationAdder = require('./variationAdder.jsx');
-
-var _variationAdder2 = _interopRequireDefault(_variationAdder);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var getLastVariationNumber = function getLastVariationNumber(variations) {
-	var names = variations.map(function (_ref) {
-		var name = _ref.name;
-
-		return name.indexOf('Variation') === -1 ? 0 : parseInt(_utils2.default.stringReverse(name), 10);
-	});
-	return names.length ? names.sort().reverse()[0] : 0;
-};
-
-var variationManager = function (_React$Component) {
-	_inherits(variationManager, _React$Component);
-
-	function variationManager(props) {
-		_classCallCheck(this, variationManager);
-
-		var _this = _possibleConstructorReturn(this, (variationManager.__proto__ || Object.getPrototypeOf(variationManager)).call(this, props));
-
-		_this.createVariation = _this.createVariation.bind(_this);
-		return _this;
-	}
-
-	_createClass(variationManager, [{
-		key: 'createVariation',
-		value: function createVariation() {
-			this.props.createVariation({
-				name: 'Variation ' + (getLastVariationNumber(this.props.variations) + 1)
-			}, this.props.activeChannelId);
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var props = this.props,
-			    style = { position: 'absolute', bottom: '0px', height: '30px', width: '100%', 'backgroundColor': 'grey' };
-			if (!props.activeChannelId) {
-				return null;
-			}
-			return _react2.default.createElement(
-				'div',
-				{ id: 'variationManager', style: style },
-				props.variations.map(function (variation) {
-					return _react2.default.createElement(_variation2.default, { key: variation.id,
-						variation: variation,
-						active: variation.id === props.activeVariation.id,
-						onClick: props.setActiveVariation.bind(null, variation.id),
-						onDoubleClick: props.deleteVariation.bind(null, variation.id),
-						onCopy: props.copyVariation.bind(null, variation.id),
-						onRename: props.renameVariation.bind(null, variation.id) });
-				}),
-				_react2.default.createElement(_variationAdder2.default, { onNewVariation: this.createVariation })
-			);
-		}
-	}]);
-
-	return variationManager;
-}(_react2.default.Component);
-
-variationManager.propTypes = {
-	variations: _react.PropTypes.array,
-	activeVariation: _react.PropTypes.object,
-	activeChannelId: _react.PropTypes.string,
-	createVariation: _react.PropTypes.func,
-	deleteVariation: _react.PropTypes.func,
-	copyVariation: _react.PropTypes.func,
-	renameVariation: _react.PropTypes.func,
-	setActiveVariation: _react.PropTypes.func
-};
-
-exports.default = variationManager;
-
-},{"./variation.jsx":20,"./variationAdder.jsx":21,"libs/custom/utils.js":32,"react":"react"}],23:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var Loader = function Loader(props) {
-	return _react2.default.createElement(
-		'div',
-		{ 'data-id': 'loader', style: { display: props.loading ? 'block' : 'none' }, className: 'loaderwrapper spinner' },
-		_react2.default.createElement('img', { src: '/assets/images/loaderLogo.png' })
-	);
-};
-
-Loader.propTypes = {
-	loading: _react.PropTypes.bool.isRequired
-};
-
-Loader.defaultProps = {
-	loading: false
-};
-
-exports.default = Loader;
-
-},{"react":"react"}],24:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _channelManagerContainer = require('containers/channelManagerContainer.js');
-
-var _channelManagerContainer2 = _interopRequireDefault(_channelManagerContainer);
-
-var _variationManagerContainer = require('containers/variationManagerContainer.js');
-
-var _variationManagerContainer2 = _interopRequireDefault(_variationManagerContainer);
-
-var _insertMenuContainer = require('containers/insertMenuContainer.js');
-
-var _insertMenuContainer2 = _interopRequireDefault(_insertMenuContainer);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var OuterEditor = function OuterEditor() {
-	return _react2.default.createElement(
-		'div',
-		null,
-		_react2.default.createElement(_channelManagerContainer2.default, null),
-		_react2.default.createElement(_variationManagerContainer2.default, null),
-		_react2.default.createElement(_insertMenuContainer2.default, null)
-	);
-};
-
-exports.default = OuterEditor;
-
-},{"containers/channelManagerContainer.js":26,"containers/insertMenuContainer.js":27,"containers/variationManagerContainer.js":28,"react":"react"}],25:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2363,11 +2364,11 @@ var _channelActions = require('actions/channelActions');
 
 var channelActions = _interopRequireWildcard(_channelActions);
 
-var _channelManager = require('ChannelManager/channelManager.jsx');
+var _channelManager = require('channelManager/channelManager.jsx');
 
 var _channelManager2 = _interopRequireDefault(_channelManager);
 
-var _channelSelectors = require('selectors/channelSelectors');
+var _channelSelectors = require('../selectors/channelSelectors');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2410,7 +2411,7 @@ var noop = function noop() {
 
 exports.default = ChannelManagerContainer;
 
-},{"ChannelManager/channelManager.jsx":11,"actions/channelActions":2,"react-redux":530,"selectors/channelSelectors":45}],27:[function(require,module,exports){
+},{"../selectors/channelSelectors":45,"actions/channelActions":2,"channelManager/channelManager.jsx":7,"react-redux":530}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2421,7 +2422,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _reactRedux = require('react-redux');
 
-var _insertMenu = require('ContextMenu/insertMenu.jsx');
+var _insertMenu = require('contextMenu/insertMenu.jsx');
 
 var _insertMenu2 = _interopRequireDefault(_insertMenu);
 
@@ -2435,7 +2436,7 @@ var _variationSelectors = require('selectors/variationSelectors');
 
 var _insertMenuSelectors = require('selectors/insertMenuSelectors');
 
-var _messengerHelper = require('../scripts/outer/messengerHelper');
+var _messengerHelper = require('../scripts/messengerHelper');
 
 var _commonConsts = require('../consts/commonConsts');
 
@@ -2465,7 +2466,7 @@ var mapStateToProps = function mapStateToProps(state) {
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_insertMenu2.default);
 
-},{"../consts/commonConsts":25,"../scripts/outer/messengerHelper":42,"ContextMenu/insertMenu.jsx":17,"actions/insertMenuActions":3,"actions/sectionActions":4,"react-redux":530,"selectors/channelSelectors":45,"selectors/insertMenuSelectors":46,"selectors/variationSelectors":48}],28:[function(require,module,exports){
+},{"../consts/commonConsts":25,"../scripts/messengerHelper":42,"actions/insertMenuActions":3,"actions/sectionActions":4,"contextMenu/insertMenu.jsx":13,"react-redux":530,"selectors/channelSelectors":45,"selectors/insertMenuSelectors":46,"selectors/variationSelectors":48}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2474,7 +2475,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _reactRedux = require('react-redux');
 
-var _variationManager = require('VariationManager/variationManager.jsx');
+var _variationManager = require('variationManager/variationManager.jsx');
 
 var _variationManager2 = _interopRequireDefault(_variationManager);
 
@@ -2518,7 +2519,7 @@ var mapStateToProps = function mapStateToProps(state) {
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_variationManager2.default);
 
-},{"VariationManager/variationManager.jsx":22,"actions/variationActions":5,"react-redux":530,"selectors/channelSelectors":45,"selectors/variationSelectors":48}],29:[function(require,module,exports){
+},{"actions/variationActions":5,"react-redux":530,"selectors/channelSelectors":45,"selectors/variationSelectors":48,"variationManager/variationManager.jsx":18}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3067,7 +3068,7 @@ var _channelSelectors = require('../selectors/channelSelectors');
 
 var _commonConsts = require('../consts/commonConsts');
 
-var _messengerHelper = require('../scripts/outer/messengerHelper');
+var _messengerHelper = require('../scripts/messengerHelper');
 
 var postMessageHanlder = function postMessageHanlder(store) {
 	return function (next) {
@@ -3094,10 +3095,10 @@ var postMessageHanlder = function postMessageHanlder(store) {
 
 exports.default = postMessageHanlder;
 
-},{"../consts/commonConsts":25,"../scripts/outer/messengerHelper":42,"../selectors/channelSelectors":45,"../selectors/variationSelectors":48}],34:[function(require,module,exports){
+},{"../consts/commonConsts":25,"../scripts/messengerHelper":42,"../selectors/channelSelectors":45,"../selectors/variationSelectors":48}],34:[function(require,module,exports){
 'use strict';
 
-var _editor = require('./scripts/outer/editor');
+var _editor = require('./scripts/editor');
 
 var _editor2 = _interopRequireDefault(_editor);
 
@@ -3105,7 +3106,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 (0, _editor2.default)();
 
-},{"./scripts/outer/editor":41}],35:[function(require,module,exports){
+},{"./scripts/editor":41}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3116,7 +3117,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _commonConsts = require('consts/commonConsts');
 
-var _immutableHelpers = require('libs/custom/immutableHelpers');
+var _immutableHelpers = require('libs/immutableHelpers');
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -3152,7 +3153,7 @@ var adsByIds = function adsByIds() {
 
 exports.default = adsByIds;
 
-},{"consts/commonConsts":25,"libs/custom/immutableHelpers":30}],36:[function(require,module,exports){
+},{"consts/commonConsts":25,"libs/immutableHelpers":30}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3163,7 +3164,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _commonConsts = require('consts/commonConsts');
 
-var _immutableHelpers = require('libs/custom/immutableHelpers');
+var _immutableHelpers = require('libs/immutableHelpers');
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -3269,7 +3270,7 @@ var initialState = { activeChannel: 'test2', byIds: { test2: chnl2 } },
 
 exports.default = channelData;
 
-},{"consts/commonConsts":25,"libs/custom/immutableHelpers":30}],37:[function(require,module,exports){
+},{"consts/commonConsts":25,"libs/immutableHelpers":30}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3354,7 +3355,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _commonConsts = require('consts/commonConsts');
 
-var _immutableHelpers = require('libs/custom/immutableHelpers');
+var _immutableHelpers = require('libs/immutableHelpers');
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -3399,7 +3400,7 @@ var sectionByIds = function sectionByIds() {
 
 exports.default = sectionByIds;
 
-},{"consts/commonConsts":25,"libs/custom/immutableHelpers":30}],40:[function(require,module,exports){
+},{"consts/commonConsts":25,"libs/immutableHelpers":30}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3410,7 +3411,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _commonConsts = require('consts/commonConsts');
 
-var _immutableHelpers = require('libs/custom/immutableHelpers');
+var _immutableHelpers = require('libs/immutableHelpers');
 
 var _lodash = require('lodash');
 
@@ -3463,7 +3464,7 @@ var variation = function variation() {
 
 exports.default = variationByIds;
 
-},{"consts/commonConsts":25,"libs/custom/immutableHelpers":30,"lodash":274}],41:[function(require,module,exports){
+},{"consts/commonConsts":25,"libs/immutableHelpers":30,"lodash":274}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3482,7 +3483,7 @@ var _jquery = require('jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _outerEditor = require('EditorComponents/outerEditor.jsx');
+var _outerEditor = require('components/outerEditor.jsx');
 
 var _outerEditor2 = _interopRequireDefault(_outerEditor);
 
@@ -3519,7 +3520,7 @@ var store = (0, _configureStore2.default)(),
 
 exports.default = initEditor;
 
-},{"./messengerHelper":42,"./unloadHandler":43,"EditorComponents/outerEditor.jsx":24,"jquery":"jquery","react":"react","react-dom":"react-dom","react-redux":530,"store/configureStore.js":50}],42:[function(require,module,exports){
+},{"./messengerHelper":42,"./unloadHandler":43,"components/outerEditor.jsx":6,"jquery":"jquery","react":"react","react-dom":"react-dom","react-redux":530,"store/configureStore.js":50}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3531,17 +3532,17 @@ var _commonConsts = require('consts/commonConsts');
 
 var _insertMenuActions = require('actions/insertMenuActions');
 
-var _messenger = require('libs/custom/messenger');
+var _messenger = require('libs/messenger');
 
 var _messenger2 = _interopRequireDefault(_messenger);
 
-var _channelActions = require('../../actions/channelActions');
+var _channelActions = require('actions/channelActions');
 
 var channelActions = _interopRequireWildcard(_channelActions);
 
-var _adActions = require('../../actions/adActions');
+var _adActions = require('actions/adActions');
 
-var _sectionActions = require('../../actions/sectionActions');
+var _sectionActions = require('actions/sectionActions');
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -3617,7 +3618,7 @@ var messenger = new _messenger2.default(),
 exports.initMessageHandler = initMessageHandler;
 exports.sendMessage = sendMessage;
 
-},{"../../actions/adActions":1,"../../actions/channelActions":2,"../../actions/sectionActions":4,"actions/insertMenuActions":3,"consts/commonConsts":25,"libs/custom/messenger":31}],43:[function(require,module,exports){
+},{"actions/adActions":1,"actions/channelActions":2,"actions/insertMenuActions":3,"actions/sectionActions":4,"consts/commonConsts":25,"libs/messenger":31}],43:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

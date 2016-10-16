@@ -1,6 +1,6 @@
-import Messenger from 'libs/custom/messenger';
+import Messenger from 'libs/messenger';
 import $ from 'jquery';
-import { updateLayout, highlightElement, setAdpElement } from '../../actions/innerActions';
+import { updateLayout, highlightElement, setAdpElement } from '../../actions/inner/actions';
 import { getAdpVitals } from '../../scripts/inner/domManager';
 import { messengerCommands } from '../../consts/commonConsts';
 

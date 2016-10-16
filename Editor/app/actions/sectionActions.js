@@ -1,5 +1,5 @@
 import { sectionActions, defaultSectionCss } from 'consts/commonConsts';
-import Utils from 'libs/custom/utils';
+import Utils from 'libs/utils';
 
 const createSection = (sectionPayload, adPayload, variationId) => {
 		const adId = Utils.getRandomNumber(),
