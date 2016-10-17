@@ -18,7 +18,7 @@ module.exports = function(app) {
 		next();
 	});
 
-	app.use('/user/reports/', function(req, res, next) {
+	app.use('/site/:siteId/reports/', function(req, res, next) {
 		if (!req.session || !req.session.user) {
 			return res.redirect('/login');
 		}
@@ -32,14 +32,14 @@ module.exports = function(app) {
 		next();
 	}, genieeApiController);
 
-	app.use('/user/pagegroup/', function(req, res, next) {
+	app.use('/site/:siteId/pagegroup/', function(req, res, next) {
 		// if (!req.session || !req.session.user) {
 		// 	return res.redirect('/login');
 		// }
 		next();
 	}, pageGroupController);
 
-	app.use('/user/', function(req, res, next) {
+	app.use('/site/:siteId', function(req, res, next) {
 		if (!req.session || !req.session.user) {
 			return res.redirect('/login');
 		}

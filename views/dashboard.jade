@@ -32,7 +32,7 @@ block bodyContent
                                     tbody
                                         for pagegroup in pageGroups
                                             tr
-                                                td!= utils.convertPagegroupLink(pagegroup.pageGroupId, pagegroup.pageGroupName)
+                                                td!= utils.convertPagegroupLink(pagegroup.pageGroupId, pagegroup.pageGroupName, siteId)
                                                 td!= pagegroup.platform
                                                 td!= pagegroup.category
                                                 td!= pagegroup.subCategory
