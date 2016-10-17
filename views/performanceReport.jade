@@ -1,0 +1,19 @@
+extends  layout/base
+
+block getTitle
+    - var titleVar = "PageGroup"
+
+block bodyContent
+    include layout/sideBar
+    .pageContainer.page-container
+        include layout/header
+        // Page Content Starts Here
+        .pageContentWrapper.page-content
+            .pageContentInner.page-content--inner
+                .notification-wrapper
+                #widgetsArea.row
+                   
+                    .mb-30
+                        .controlAdpushupWrap
+                            h3.title.m-All-0.clearfix 
+                                a Reporting and Analytics

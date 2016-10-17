@@ -13,6 +13,9 @@ var express = require('express'),
 	reports = require('../models/reportsModel');
 
 router
+	.get('/performance', function(req, res) {
+		res.render('performanceReport', data);
+	})
 	.get('/adsense', function(req, res) {
 		var getUser = userModel.getUserByEmail(req.session.user.email),
 			getNetworkData = getUser.then(function(user) {
