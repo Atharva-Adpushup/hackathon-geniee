@@ -3,8 +3,8 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         watch: {
             options: {spawn: false},
-            files: ['public/assets/js/**/*.js', 'public/assets/js/mcmConnect/**/*.js', 'public/assets/js/editor/**/*.js', 'public/assets/js/libs/**/*.js', 'public/assets/js/react_components/**/*.jsx', 'public/assets/scss/**/*.scss'],
-            tasks: ['browserify'/*, 'uglify'*/, 'sass']
+            files: ['public/assets/scss/**/*.scss'],
+            tasks: ['sass']
         },
         cssmin: {
             target: {
@@ -15,22 +15,6 @@ module.exports = function (grunt) {
             }
         },
         uglify: {
-            oBuild: {
-                src: 'public/assets/js/editor/build/outer-build.js',
-                dest: 'public/assets/js/editor/build/outer-build.min.js'
-            },
-            iBuild: {
-                src: 'public/assets/js/editor/build/inner-build.js',
-                dest: 'public/assets/js/editor/build/inner-build.min.js'
-            },
-            mcmConnectBuild: {
-                src: ['public/assets/js/mcmConnect/mcmConnect.js'],
-                dest: 'public/assets/js/mcmConnect/mcmConnect.min.js'
-            },
-            signupBuild: {
-                src: ['public/assets/js/build/signup-build.js'],
-                dest: 'public/assets/js/build/signup-build.min.js'
-            },
             baseLibsBuild: {
                 src: ['public/assets/js/build/base-libs-build.js'],
                 dest: 'public/assets/js/build/base-libs-build.min.js'
@@ -39,30 +23,14 @@ module.exports = function (grunt) {
         browserify: {
             options: {
                 browserifyOptions: {
-                    basedir: ".",
-                    paths:['./public/assets/js/', './public/assets/js/react_components/','./public/assets/js/react_components/EditorComponents/OuterComponents']
+                    basedir: "."  
                 },
-                transform: [[require('grunt-react').browserify, {harmony: true}]]
-            },
-            Outer: {
-                src: ['public/assets/js/editor/outer.js'],
-                dest: 'public/assets/js/editor/build/outer-build.js'
-            },
-            Inner: {
-                src: ['public/assets/js/editor/inject.js'],
-                dest: 'public/assets/js/editor/build/inner-build.js'
-            },
-            Signup: {
-                src: ['public/assets/js/signup.js'],
-                dest: 'public/assets/js/build/signup-build.js'
             },
             BaseLibs: {
                 src: [
                     'public/assets/js/libs/third-party/bootstrap.js',
                     'public/assets/js/libs/third-party/bootstrap-multiselect.js',
-                    'public/assets/js/libs/third-party/notifications.js',
-                    'public/assets/js/libs/custom/adpushup.js',
-                    'public/assets/js/appEvent.js'
+                    'public/assets/js/libs/custom/adpushup.js'
                 ],
                 dest: 'public/assets/js/build/base-libs-build.js'
             }
@@ -85,6 +53,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-sass');
+    
+    grunt.registerTask('sasswatch', ['watch', 'cssmin']);
 
     grunt.registerTask('default', [
         'browserify', 'sass', 'uglify', 'cssmin'

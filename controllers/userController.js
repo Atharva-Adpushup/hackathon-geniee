@@ -11,7 +11,8 @@ var express = require('express'),
 	oauthHelper = require('../helpers/googleOauth'),
 	// eslint-disable-next-line new-cap
 	router = express.Router(),
-	CC = require('../configs/commonConsts');
+	CC = require('../configs/commonConsts'),
+	config = require('../configs/config');
 
 router
 	.get('/dashboard', function(req, res) {
@@ -69,31 +70,37 @@ router
 		return res.redirect('/');
 	})
 	.get('/editor', function(req, res) {
-		userModel.verifySiteOwner(req.session.user.email, parseInt(req.query.siteId, 10))
-			.then(function(json) {
-				if (!json) {
-					throw new Error('User for site is not verified');
-				} else {
-					return { user: json.user.data, siteId: req.query.siteId, domain: json.site.domain };
-				}
-			}).then(function(json) {
-				return siteModel.getSiteById(json.siteId).then(function() {
-					json.hasSiteObject = true;
-					return json;
-				}, function() {
-					json.hasSiteObject = false;
-					return json;
-				});
-			}).then(function(json) {
-				json.isSuperUser = req.session.isSuperUser ? true : false;
-				json.isChrome = _.matches(req.headers['user-agent'], 'Chrome');
-				return json;
-			}).then(function(json) {
-				return res.render('editor', json);
-			})
-			.catch(function(err) {
-				res.send('err: ' + err.toString());
-			});
+		// userModel.verifySiteOwner(req.session.user.email, parseInt(req.query.siteId, 10))
+		// 	.then(function(json) {
+		// 		if (!json) {
+		// 			throw new Error('User for site is not verified');
+		// 		} else {
+		// 			return { user: json.user.data, siteId: req.query.siteId, domain: json.site.domain };
+		// 		}
+		// 	}).then(function(json) {
+		// 		return siteModel.getSiteById(json.siteId).then(function() {
+		// 			json.hasSiteObject = true;
+		// 			return json;
+		// 		}, function() {
+		// 			json.hasSiteObject = false;
+		// 			return json;
+		// 		});
+		// 	}).then(function(json) {
+		// 		json.isSuperUser = req.session.isSuperUser ? true : false;
+		// 		json.isChrome = _.matches(req.headers['user-agent'], 'Chrome');
+		// 		return json;
+		// 	}).then(function(json) {
+		// 		return res.render('editor', json);
+		// 	})
+		// 	.catch(function(err) {
+		// 		res.send('err: ' + err.toString());
+		// 	});
+		return res.render('editor', {
+			isChrome: true,
+			domain: 'http://mysite.com',
+			siteId: 1234,
+			environment: config.development.HOST_ENV
+		});
 	})
 	.post('/deleteSite', function(req, res) {
 		userModel.verifySiteOwner(req.session.user.email, req.body.siteId)
