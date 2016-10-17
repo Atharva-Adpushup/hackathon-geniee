@@ -16,4 +16,14 @@ block bodyContent
                         .controlAdpushupWrap
                             h3.title.m-All-0.clearfix
                                 a!= pageGroupName
-                    
+                            div
+                                ul.nav.nav-tabs(role='tablist')
+                                    li.active(role='presentation')
+                                        a(href='#summary', aria-controls='home', role='tab', data-toggle='tab') Summary  
+                                    li(role='presentation')
+                                        a(href='#variations', aria-controls='profile', role='tab', data-toggle='tab') Variations
+                                .tab-content
+                                    #summary.tab-pane.fade.in.active(role='tabpanel')  
+                                        |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda hic ea laborum explicabo necessitatibus similique fugiat excepturi, dolorum inventore voluptates, provident aspernatur delectus a nobis autem voluptas libero reprehenderit veniam!
+                                    #variations.tab-pane.fade(role='tabpanel')
+                                        |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda hic ea laborum explicabo necessitatibus similique fugiat excepturi, dolorum inventore voluptates, provident aspernatur delectus a nobis autem voluptas libero reprehenderit veniam!
