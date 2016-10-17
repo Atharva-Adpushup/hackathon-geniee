@@ -24,6 +24,32 @@ block bodyContent
                                         a(href='#variations', aria-controls='profile', role='tab', data-toggle='tab') Variations
                                 .tab-content
                                     #summary.tab-pane.fade.in.active(role='tabpanel')  
-                                        |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda hic ea laborum explicabo necessitatibus similique fugiat excepturi, dolorum inventore voluptates, provident aspernatur delectus a nobis autem voluptas libero reprehenderit veniam!
+                                        .data-row
+                                            h5.data-font-m.text-dark Basic Information
+                                            .row
+                                                .col-sm-3
+                                                    label.data-font-m Page Group URL
+                                                .col-sm-9
+                                                    a(href="#{sampleUrl}", target="_blank", class="data-font-m sampleUrl")!= sampleUrl
+                                            .row
+                                                .col-sm-3
+                                                    label.data-font-m Platform
+                                                .col-sm-9
+                                                    .platform.data-font-m.text-dark
+                                                        if platform === 'DESKTOP' 
+                                                            i.fa.fa-desktop 
+                                                            span!= platform
+                                                        if platform === 'TABLET' 
+                                                            i.fa.fa-tablet 
+                                                            span!= platform
+                                                        if platform === 'MOBILE' 
+                                                            i.fa.fa-mobile 
+                                                            span!= platform
+                                            .row
+                                                .col-sm-3
+                                                    label.data-font-m Inventory Type
+                                                .col-sm-9
+                                                    .data-font-m.text-dark Standard Banner Ads
+                                                    
                                     #variations.tab-pane.fade(role='tabpanel')
-                                        |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda hic ea laborum explicabo necessitatibus similique fugiat excepturi, dolorum inventore voluptates, provident aspernatur delectus a nobis autem voluptas libero reprehenderit veniam!
+                                        

@@ -31,10 +31,6 @@ module.exports = function (grunt) {
                 src: ['public/assets/js/build/signup-build.js'],
                 dest: 'public/assets/js/build/signup-build.min.js'
             },
-            adRecoverBuild: {
-                src: ['public/assets/js/build/adRecoverEditor-build.js'],
-                dest: 'public/assets/js/build/adRecoverEditor-build.min.js'
-            },
             baseLibsBuild: {
                 src: ['public/assets/js/build/base-libs-build.js'],
                 dest: 'public/assets/js/build/base-libs-build.min.js'
@@ -59,10 +55,6 @@ module.exports = function (grunt) {
             Signup: {
                 src: ['public/assets/js/signup.js'],
                 dest: 'public/assets/js/build/signup-build.js'
-            },
-            AdRecover: {
-                src: ['public/assets/js/vendor/adrecover/editor.js'],
-                dest: 'public/assets/js/build/adRecoverEditor-build.js'
             },
             BaseLibs: {
                 src: [

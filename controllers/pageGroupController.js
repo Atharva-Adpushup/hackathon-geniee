@@ -9,15 +9,11 @@ var express = require('express'),
 
 router
 	.get('/:pageGroupId', function(req, res) {
-		var data = {
-			pageGroupName: 'Post Page - Desktop',
-			sampleUrl: 'http://mysite.com/post',
-			platform: 'DESKTOP',
-			inventoryType: 'Standard Banner Ads'
-		};
 
 		res.render('pageGroup', {
-			pageGroupName: data.pageGroupName
+			pageGroupName: 'Post Page - Desktop',
+			sampleUrl: 'http://mysite.com/post',
+			platform: 'DESKTOP'
 		});
 	});
 

@@ -871,6 +871,28 @@ maxHeightWidth {
   .table-actions a:not(:last-child) {
     margin-right: 10px; }
 
+.data-font-m {
+  font-size: 1.2em; }
+
+.text-dark {
+  color: #292929; }
+
+.data-row {
+  margin-top: 20px; }
+  .data-row .row {
+    margin: 15px -15px; }
+  .data-row label {
+    color: #787878; }
+  .data-row h5 {
+    font-weight: 700;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e6e6e6; }
+  .data-row .sampleUrl {
+    color: #00a0e3;
+    text-decoration: underline; }
+  .data-row .platform i {
+    margin-right: 10px; }
+
 .headerTopBar {
   height: 60px;
   z-index: 1039;
@@ -2104,6 +2126,7 @@ maxHeightWidth {
   padding: 0 10px;
   font-size: 1.2em; }
   .nav-tabs li a {
+    font-size: 1.15em;
     padding: 10px;
     display: inline-block;
     margin-right: 30px;

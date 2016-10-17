@@ -92,3 +92,40 @@
     }
   }
 }
+
+.data-font-m {
+  font-size: 1.2em;
+}
+
+.text-dark {
+  color: $ADREPrimaryBgColor;
+}
+
+.data-row {
+  margin-top: 20px;
+
+  .row {
+    margin: 15px -15px;
+  }
+
+  label {
+    color: $iconColor;
+  }
+
+  h5 {
+    font-weight: 700;
+    padding-bottom: 10px;
+    border-bottom: 1px solid $borderColor;
+  }
+
+  .sampleUrl {
+    color: $linkBlue;
+    text-decoration: underline;    
+  }
+
+  .platform {
+    i {
+      margin-right: 10px;
+    }
+  }
+}
