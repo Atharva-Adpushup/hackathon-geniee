@@ -97,7 +97,7 @@ router
 		// 	});
 		return res.render('editor', {
 			isChrome: true,
-			domain: 'http://mysite.com',
+			domain: 'http://www.articlemyriad.com',
 			siteId: 1234,
 			environment: config.development.HOST_ENV
 		});
