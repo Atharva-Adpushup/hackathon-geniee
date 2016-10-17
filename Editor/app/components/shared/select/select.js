@@ -1,17 +1,17 @@
-"use strict"
+'use strict';
 
-var React = window.React;
+let React = require('react');
 
-var div = React.createElement.bind(null,'div')
-var button = React.createElement.bind(null,'button')
-var a = React.createElement.bind(null,'a')
-var select = React.createElement.bind(null,'select')
-var option = React.createElement.bind(null,'option')
-var label = React.createElement.bind(null,'label')
+let div = React.createElement.bind(null, 'div');
+let button = React.createElement.bind(null, 'button');
+let a = React.createElement.bind(null, 'a');
+let select = React.createElement.bind(null, 'select');
+let option = React.createElement.bind(null, 'option');
+let label = React.createElement.bind(null, 'label');
 
-var idInc = 0
+let idInc = 0;
 
-var keyHandlers = {
+let keyHandlers = {
 	38: 'handleUpKey',
 	40: 'handleDownKey',
 	32: 'handleSpaceKey',
@@ -19,258 +19,259 @@ var keyHandlers = {
 	27: 'handleEscKey',
 	74: 'handleDownKey',
 	75: 'handleUpKey'
-}
+};
 
 function interceptEvent(event) {
 	if (event) {
-		event.preventDefault()
-		event.stopPropagation()
+		event.preventDefault();
+		event.stopPropagation();
 	}
 }
 
-module.exports = React.createClass({displayName: 'exports',
-	getInitialState: function () {
+module.exports = React.createClass({
+	displayName: 'exports',
+	getInitialState () {
 		return {
-			id: 'react-select-box-' + (++idInc),
+			id: `react-select-box-${  ++idInc}`,
 			open: false,
 			focusedIndex: -1,
 			pedningValue: []
-		}
+		};
 	},
 
-	getDefaultProps: function () {
+	getDefaultProps () {
 		return {
 			closeText: 'Close'
-		}
+		};
 	},
 
-	changeOnClose: function () {
-		return this.isMultiple() && String(this.props.changeOnClose) === 'true'
+	changeOnClose () {
+		return this.isMultiple() && String(this.props.changeOnClose) === 'true';
 	},
 
-	updatePendingValue: function (value, cb) {
+	updatePendingValue (value, cb) {
 		if (this.changeOnClose()) {
-			this.setState({pendingValue: value}, cb)
-			return true
+			this.setState({ pendingValue: value }, cb);
+			return true;
 		}
-		return false
+		return false;
 	},
 
-	componentWillMount: function () {
-		this.updatePendingValue(this.props.value)
+	componentWillMount () {
+		this.updatePendingValue(this.props.value);
 	},
 
-	componentWillReceiveProps: function (next) {
-		this.updatePendingValue(next.value)
+	componentWillReceiveProps (next) {
+		this.updatePendingValue(next.value);
 	},
 
 	clickingOption: false,
 
 	blurTimeout: null,
 
-	handleFocus: function () {
-		clearTimeout(this.blurTimeout)
+	handleFocus () {
+		clearTimeout(this.blurTimeout);
 	},
 
-	handleBlur: function () {
-		clearTimeout(this.blurTimeout)
-		this.blurTimeout = setTimeout(this.handleClose, 0)
+	handleBlur () {
+		clearTimeout(this.blurTimeout);
+		this.blurTimeout = setTimeout(this.handleClose, 0);
 	},
 
-	handleMouseDown: function() {
-		this.clickingOption = true
+	handleMouseDown () {
+		this.clickingOption = true;
 	},
 
-	handleChange: function (val, cb) {
+	handleChange (val, cb) {
 		return function (event) {
-			this.clickingOption = false
-			interceptEvent(event)
+			this.clickingOption = false;
+			interceptEvent(event);
 			if (this.isMultiple()) {
-				var selected = []
+				let selected = [];
 				if (val != null) {
-					selected = this.value().slice(0)
-					var index = selected.indexOf(val)
+					selected = this.value().slice(0);
+					let index = selected.indexOf(val);
 					if (index !== -1) {
-						selected.splice(index, 1)
+						selected.splice(index, 1);
 					} else {
-						selected.push(val)
+						selected.push(val);
 					}
 				}
-				this.updatePendingValue(selected, cb) || this.props.onChange(selected)
+				this.updatePendingValue(selected, cb) || this.props.onChange(selected);
 			} else {
-				this.updatePendingValue(val, cb) || this.props.onChange(val)
-				this.handleClose()
-				this.refs.button.focus()
+				this.updatePendingValue(val, cb) || this.props.onChange(val);
+				this.handleClose();
+				this.refs.button.focus();
 			}
-		}.bind(this)
+		}.bind(this);
 	},
 
-	handleNativeChange: function (event) {
-		var val = event.target.value
+	handleNativeChange (event) {
+		let val = event.target.value;
 		if (this.isMultiple()) {
-			var children = [].slice.call(event.target.childNodes, 0)
-			val = children.reduce(function (memo, child) {
+			let children = [].slice.call(event.target.childNodes, 0);
+			val = children.reduce((memo, child) => {
 				if (child.selected) {
-					memo.push(child.value)
+					memo.push(child.value);
 				}
-				return memo
-			}, [])
+				return memo;
+			}, []);
 		}
-		this.props.onChange(val)
+		this.props.onChange(val);
 	},
 
-	handleClear: function (event) {
-		interceptEvent(event)
+	handleClear (event) {
+		interceptEvent(event);
 		this.handleChange(null, function () {
 			// only called when change="true"
-			this.props.onChange(this.state.pendingValue)
-		})(event)
+			this.props.onChange(this.state.pendingValue);
+		})(event);
 	},
 
-	toggleOpenClose: function (event) {
-		interceptEvent(event)
-		this.setState({open: !this.state.open});
+	toggleOpenClose (event) {
+		interceptEvent(event);
+		this.setState({ open: !this.state.open });
 	},
 
-	handleOpen: function (event) {
-		interceptEvent(event)
-		this.setState({open: true}, function () {
-			this.refs.menu.focus()
-		})
+	handleOpen (event) {
+		interceptEvent(event);
+		this.setState({ open: true }, function () {
+			this.refs.menu.focus();
+		});
 	},
 
-	handleClose: function (event) {
-		interceptEvent(event)
-		if(!this.clickingOption) {
-			this.setState({open: false, focusedIndex: -1})
+	handleClose (event) {
+		interceptEvent(event);
+		if (!this.clickingOption) {
+			this.setState({ open: false, focusedIndex: -1 });
 		}
 		if (this.changeOnClose()) {
-			this.props.onChange(this.state.pendingValue)
+			this.props.onChange(this.state.pendingValue);
 		}
 	},
 
 
-	moveFocus: function (move) {
-		var len = React.Children.count(this.props.children)
-		var idx = (this.state.focusedIndex + move + len) % len
-		this.setState({focusedIndex: idx})
+	moveFocus (move) {
+		let len = React.Children.count(this.props.children);
+		let idx = (this.state.focusedIndex + move + len) % len;
+		this.setState({ focusedIndex: idx });
 	},
 
-	handleKeyDown: function (event) {
+	handleKeyDown (event) {
 		if (keyHandlers[event.which]) {
-			this[keyHandlers[event.which]](event)
+			this[keyHandlers[event.which]](event);
 		}
 	},
 
-	handleUpKey: function (event) {
-		interceptEvent(event)
-		this.moveFocus(-1)
+	handleUpKey (event) {
+		interceptEvent(event);
+		this.moveFocus(-1);
 	},
 
-	handleDownKey: function (event) {
-		interceptEvent(event)
+	handleDownKey (event) {
+		interceptEvent(event);
 		if (!this.state.open) {
-			this.handleOpen(event)
+			this.handleOpen(event);
 		}
-		this.moveFocus(1)
+		this.moveFocus(1);
 	},
 
-	handleSpaceKey: function (event) {
-		interceptEvent(event)
+	handleSpaceKey (event) {
+		interceptEvent(event);
 		if (!this.state.open) {
-			this.handleOpen(event)
+			this.handleOpen(event);
 		} else if (this.state.focusedIndex !== -1) {
-			this.handleEnterKey()
+			this.handleEnterKey();
 		}
 	},
 
-	handleEnterKey: function (event) {
+	handleEnterKey (event) {
 		if (this.state.focusedIndex !== -1) {
-			this.handleChange(this.options()[this.state.focusedIndex].value)(event)
+			this.handleChange(this.options()[this.state.focusedIndex].value)(event);
 		}
 	},
 
-	handleEscKey: function (event) {
+	handleEscKey (event) {
 		if (this.state.open) {
-			this.handleClose(event)
+			this.handleClose(event);
 		} else {
-			this.handleClear(event)
+			this.handleClear(event);
 		}
 	},
 
-	label: function () {
-		var selected = this.options()
-			.filter(function (option) {
+	label () {
+		let selected = this.options()
+			.filter((option) => {
 				return this.isSelected(option.value)
-			}.bind(this))
-			.map(function (option) {
-				return option.label
 			})
-		return selected.length > 0 ? selected.join(', ') : this.props.label
+			.map((option) => {
+				return option.label;
+			});
+		return selected.length > 0 ? selected.join(', ') : this.props.label;
 	},
 
-	isMultiple: function () {
-		return String(this.props.multiple) === 'true'
+	isMultiple () {
+		return String(this.props.multiple) === 'true';
 	},
 
-	options: function () {
-		var options = []
-		React.Children.forEach(this.props.children, function (option) {
+	options () {
+		let options = [];
+		React.Children.forEach(this.props.children, (option) => {
 			options.push({
 				value: option.props.value,
 				label: option.props.children
-			})
-		})
-		return options
+			});
+		});
+		return options;
 	},
 
-	value: function () {
-		var value = this.changeOnClose() ?
+	value () {
+		let value = this.changeOnClose() ?
 			this.state.pendingValue :
-			this.props.value
+			this.props.value;
 
 		if (!this.isMultiple() || Array.isArray(value)) {
-			return value
+			return value;
 		} if (value != null) {
-			return [value]
+			return [value];
 		}
-		return []
+		return [];
 	},
 
-	hasValue: function () {
+	hasValue () {
 		if (this.isMultiple()) {
-			return this.value().length > 0
+			return this.value().length > 0;
 		}
-		return this.value() != null
+		return this.value() != null;
 	},
 
-	isSelected: function (value) {
+	isSelected (value) {
 		if (this.isMultiple()) {
-			return this.value().indexOf(value) !== -1
+			return this.value().indexOf(value) !== -1;
 		}
-		return this.value() === value
+		return this.value() === value;
 	},
-	onFocus: function () {
-		if(this.props.onFocus)
-			this.props.onFocus();
+	onFocus () {
+		if (this.props.onFocus)
+			{this.props.onFocus();}
 	},
-	render: function () {
-		var className = 'react-select-box-container'
+	render () {
+		let className = 'react-select-box-container';
 		if (this.props.className) {
-			className += ' ' + this.props.className
+			className += ` ${  this.props.className}`;
 		}
 		if (this.isMultiple()) {
-			className += ' react-select-box-multi'
+			className += ' react-select-box-multi';
 		}
 		if (!this.hasValue()) {
-			className += ' react-select-box-empty'
+			className += ' react-select-box-empty';
 		}
 		return (
 			div(
 				{
 					onKeyDown: this.handleKeyDown,
-					className: className,
-					onFocus:this.onFocus
+					className,
+					onFocus: this.onFocus
 				},
 				button(
 					{
@@ -282,38 +283,37 @@ module.exports = React.createClass({displayName: 'exports',
 						tabIndex: '0',
 						'aria-hidden': true
 					},
-					div({className: 'react-select-box-label'}, this.label())
+					div({ className: 'react-select-box-label' }, this.label())
 				),
 				this.renderOptionMenu(),
 				this.renderClearButton(),
 				this.renderNativeSelect()
 			)
-		)
+		);
 	},
 
-	renderNativeSelect: function () {
-		var id = this.state.id + '-native-select'
-		var multiple = this.isMultiple()
-		var empty = multiple ? null : option({key: '', value: ''}, 'No Selection')
-		var options = [empty].concat(this.props.children)
+	renderNativeSelect () {
+		let id = `${this.state.id  }-native-select`;
+		let multiple = this.isMultiple();
+		let empty = multiple ? null : option({ key: '', value: '' }, 'No Selection');
+		let options = [empty].concat(this.props.children);
 		return div(
-			{className: 'react-select-box-native'},
-			label({htmlFor: id}, this.props.label),
+			{ className: 'react-select-box-native' },
+			label({ htmlFor: id }, this.props.label),
 			select({
-				id: id,
-				multiple: multiple,
-				onKeyDown: function (e) { e.stopPropagation() },
+				id,
+				multiple,
+				onKeyDown (e) { e.stopPropagation(); },
 				value: this.props.value || (multiple ? [] : ''),
 				onChange: this.handleNativeChange
 			}, options)
-		)
-
+		);
 	},
 
-	renderOptionMenu: function () {
-		var className = 'react-select-box-options'
+	renderOptionMenu () {
+		let className = 'react-select-box-options';
 		if (!this.state.open) {
-			className += ' react-select-box-hidden'
+			className += ' react-select-box-hidden';
 		}
 		/*
 		 var active = null
@@ -323,7 +323,7 @@ module.exports = React.createClass({displayName: 'exports',
 		 */
 		return div(
 			{
-				className: className,
+				className,
 				onBlur: this.handleBlur,
 				onFocus: this.handleFocus,
 				'aria-hidden': true,
@@ -337,44 +337,44 @@ module.exports = React.createClass({displayName: 'exports',
 				this.options().map(this.renderOption)
 			),
 			this.renderCloseButton()
-		)
+		);
 	},
 
-	renderOption: function (option, i) {
-		var className = 'react-select-box-option'
+	renderOption (option, i) {
+		let className = 'react-select-box-option';
 		if (i === this.state.focusedIndex) {
-			className += ' react-select-box-option-focused'
+			className += ' react-select-box-option-focused';
 		}
 		if (this.isSelected(option.value)) {
-			className += ' react-select-box-option-selected'
+			className += ' react-select-box-option-selected';
 		}
 		return a(
 			{
-				id: this.state.id + '-' + i,
+				id: `${this.state.id  }-${  i}`,
 				href: '#',
 				onClick: this.handleChange(option.value),
 				onMouseDown: this.handleMouseDown,
-				className: className,
+				className,
 				tabIndex: -1,
 				key: option.value,
 				onBlur: this.handleBlur,
 				onFocus: this.handleFocus
 			},
 			option.label
-		)
+		);
 	},
 
-	renderClearButton: function () {
+	renderClearButton () {
 		if (this.hasValue()) {
 			return button({
 				className: 'react-select-box-clear',
 				'aria-hidden': true,
 				onClick: this.handleClear
-			})
+			});
 		}
 	},
 
-	renderCloseButton: function () {
+	renderCloseButton () {
 		if (this.isMultiple() && this.props.closeText) {
 			return button(
 				{
@@ -384,7 +384,7 @@ module.exports = React.createClass({displayName: 'exports',
 					onFocus: this.handleFocus
 				},
 				this.props.closeText
-			)
+			);
 		}
 	}
-})
+});
