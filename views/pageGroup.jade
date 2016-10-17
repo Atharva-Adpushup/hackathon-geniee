@@ -35,7 +35,7 @@ block bodyContent
                                             i.fa.fa-file-code-o
                                             | Ad Editor
                                 .tab-content
-                                    #summary.tab-pane.fade.in.active(role='tabpanel')  
+                                    #summary.tab-pane.fade.in.active(role='tabpanel', style="padding: 20px;") 
                                         .data-row
                                             h5.data-font-m.text-dark Basic Information
                                             .row
@@ -90,4 +90,31 @@ block bodyContent
                                                     input(type="checkbox", disabled, checked=(adultContent == true ? true : undefined))
                                                     
                                     #variations.tab-pane.fade(role='tabpanel')
-                                        
+                                        //- Variations table
+                                        .table-wrapper-paddded
+                                            table.table.table-bordered.table-hover
+                                                thead
+                                                    tr
+                                                        th Name
+                                                        th Zones
+                                                        th Impressions
+                                                        th CTR
+                                                        th RPM
+                                                        th Actions
+                                                tbody
+                                                    for variation in variations
+                                                        tr
+                                                            td!= variation.variationName
+                                                            td!= variation.zones
+                                                            td!= variation.impressions
+                                                                if variation.topPerforming
+                                                                    span.top-variation Top Performing
+                                                            td!= variation.ctr
+                                                            td!= variation.rpm
+                                                            td.table-actions
+                                                                a(href="/" title="Edit")
+                                                                    i.fa.fa-edit
+                                                                a(href="/" title="Pause Variation")
+                                                                    i.fa.fa-pause-circle-o
+                                                                a(href="/" title="Delete")
+                                                                    i.fa.fa-trash

@@ -84,7 +84,6 @@
 .table-actions {
   a {
     font-size: 1.2em;
-    vertical-align: middle;
     color: $ADREPrimaryBorder;
 
     &:not(:last-child) {
@@ -144,4 +143,13 @@
   i {
     margin-right: 5px;
   }
+}
+
+.top-variation {
+    background: $GreenColor;
+    color: $whiteColor;
+    font-size: .92em;
+    padding: 4px 8px;
+    border-radius: 20px;
+    margin-left: 12px;
 }

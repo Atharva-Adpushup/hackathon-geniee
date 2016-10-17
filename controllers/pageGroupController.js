@@ -19,7 +19,29 @@ router
 			subCategory: 'Preventive Health',
 			majorAudience: 'United States',
 			useSSL: true,
-			adultContent: true
+			adultContent: true,
+			variations: [{
+				variationName: 'Variation 1',
+				zones: 4,
+				impressions: 12342,
+				ctr: 1.61,
+				rpm: 2.54,
+				topPerforming: false
+			}, {
+				variationName: 'Variation 2',
+				zones: 3,
+				impressions: 10142,
+				ctr: 1.21,
+				rpm: 1.54,
+				topPerforming: false
+			}, {
+				variationName: 'Variation 3',
+				zones: 4,
+				impressions: 18342,
+				ctr: 2.61,
+				rpm: 3.54,
+				topPerforming: true
+			}]
 		});
 	});
 
