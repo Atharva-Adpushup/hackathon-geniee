@@ -14,7 +14,50 @@ var express = require('express'),
 
 router
 	.get('/performance', function(req, res) {
-		res.render('performanceReport', data);
+		var data = [{
+			variationName: 'Variation 1',
+			pageGroupName: 'Post page',
+			platform: 'DESKTOP',
+			impressions: 12345,
+			rpm: 1.45,
+			pageviews: 2345,
+			revenue: 12.54
+		}, {
+			variationName: 'Variation 2',
+			pageGroupName: 'About page',
+			platform: 'DESKTOP',
+			impressions: 22345,
+			rpm: 1.45,
+			pageviews: 2345,
+			revenue: 18.54
+		}, {
+			variationName: 'Variation 3',
+			pageGroupName: 'Home page',
+			platform: 'MOBILE',
+			impressions: 12345,
+			rpm: 1.45,
+			pageviews: 2345,
+			revenue: 12.54
+		}, {
+			variationName: 'Variation 4',
+			pageGroupName: 'Product page',
+			platform: 'TABLET',
+			impressions: 52431,
+			rpm: 1.45,
+			pageviews: 2345,
+			revenue: 42.54
+		}, {
+			variationName: 'Variation 5',
+			pageGroupName: 'Post page',
+			platform: 'DESKTOP',
+			impressions: 12345,
+			rpm: 1.45,
+			pageviews: 2345,
+			revenue: 12.54
+		}];
+		res.render('performanceReport', {
+			reportingData: data
+		});
 	})
 	.get('/adsense', function(req, res) {
 		var getUser = userModel.getUserByEmail(req.session.user.email),

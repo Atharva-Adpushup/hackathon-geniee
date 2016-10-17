@@ -17,3 +17,31 @@ block bodyContent
                         .controlAdpushupWrap
                             h3.title.m-All-0.clearfix 
                                 a Reporting and Analytics
+
+                            //- Chart wrapper
+                            div(style="margin: 20px; background-color: #eee; text-align: center; font-size: 1.5em; padding-top: 170px; height: 340px; border: 1px solid #ddd;")
+                                | Reporting chart will come here
+
+                            //- Reporting table
+                            .table-wrapper-paddded
+                                table.table.table-bordered.table-hover
+                                    thead
+                                        tr
+                                            th Variation
+                                            th Page Group
+                                            th Platform
+                                            th Impressions
+                                            th Page RPM
+                                            th Page Views
+                                            th Revenue
+                                    tbody
+                                        for data in reportingData
+                                            tr
+                                                td!= data.variationName
+                                                td!= data.pageGroupName
+                                                td!= data.platform
+                                                td!= data.impressions
+                                                td!= data.rpm
+                                                td!= data.pageviews
+                                                td!= data.revenue
+                                                
