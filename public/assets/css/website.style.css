@@ -898,6 +898,15 @@ maxHeightWidth {
 .data-row .platform i {
   margin-right: 10px; }
 
+.nav-tabs > li.data-row-action {
+  font-size: .85em;
+  position: relative;
+  top: 2px; }
+  .nav-tabs > li.data-row-action a {
+    margin-right: 10px; }
+  .nav-tabs > li.data-row-action i {
+    margin-right: 5px; }
+
 .headerTopBar {
   height: 60px;
   z-index: 1039;

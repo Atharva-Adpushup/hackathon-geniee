@@ -131,3 +131,17 @@
     }
   }
 }
+
+.nav-tabs > li.data-row-action {
+  font-size: .85em;
+  position: relative;
+  top: 2px;
+
+  a {
+    margin-right: 10px;
+  }
+
+  i {
+    margin-right: 5px;
+  }
+}
