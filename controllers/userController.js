@@ -45,6 +45,9 @@ router
 			pageGroups: pageGroups
 		});
 	})
+	.get('/settings', function(req, res) {
+		res.render('settings');
+	})
 	.get('/billing', function(req, res) {
 		res.render('billing', {
 			user: req.session.user,
