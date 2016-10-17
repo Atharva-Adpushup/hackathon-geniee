@@ -13,7 +13,13 @@ router
 		res.render('pageGroup', {
 			pageGroupName: 'Post Page - Desktop',
 			sampleUrl: 'http://mysite.com/post',
-			platform: 'DESKTOP'
+			platform: 'DESKTOP',
+			inventoryType: 'Standard Banner Ads',
+			category: 'Health and Wellness',
+			subCategory: 'Preventive Health',
+			majorAudience: 'United States',
+			useSSL: true,
+			adultContent: true
 		});
 	});
 

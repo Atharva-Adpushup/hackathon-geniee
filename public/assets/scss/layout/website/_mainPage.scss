@@ -102,7 +102,9 @@
 }
 
 .data-row {
-  margin-top: 20px;
+  &:not(:last-child) {
+    margin: 20px 0 50px;
+  }
 
   .row {
     margin: 15px -15px;
