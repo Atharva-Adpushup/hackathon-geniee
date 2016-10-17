@@ -19,10 +19,10 @@ const adsByIds = (state = {}, action) => {
 		case adActions.DELETE_AD:
 			return immutableObjectDelete(state, 'id', action.adId);
 
-		case sectionActions.UPDATE_ADCODE:
+		case adActions.UPDATE_ADCODE:
 			return { ...state, [action.adId]: { ...state[action.adId], adCode: action.adCode } };
 
-		case sectionActions.UPDATE_CSS:
+		case adActions.UPDATE_CSS:
 			return { ...state, [action.adId]: { ...state[action.adId], css: action.css } };
 
 

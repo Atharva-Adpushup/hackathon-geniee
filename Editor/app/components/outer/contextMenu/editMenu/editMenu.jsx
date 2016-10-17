@@ -2,8 +2,7 @@ import React, { PropTypes } from 'react';
 import _ from 'lodash';
 import Menu from 'shared/menu/menu.jsx';
 import MenuItem from 'shared/menu/menuItem.jsx';
-import { commonSupportedSizes } from 'consts/commonConsts.js';
-import CssEditor from 'shared/cssEditor/cssEditor.jsx';
+import AdDescriptor from 'containers/adDescripterContainer.js';
 
 const initialState = {
 	adSize: null,
@@ -23,18 +22,6 @@ class editMenu extends React.Component {
 		this.setState(initialState);
 	}
 
-	setActiveItem(item) {
-		this.setState({ activeItem: item, prevActiveItem: this.state.activeItem });
-	}
-
-	onCssEdit() {
-		console.log(arguments);
-	}
-
-	handleSubmit(newCss) {
-		console.log(newCss);
-	}
-
 	render() {
 		const props = this.props;
 		if (!props.isVisible) {
@@ -44,13 +31,11 @@ class editMenu extends React.Component {
 		return (
 			<Menu id="editMenu" arrow="none" onGlassClick={props.hideMenu} position={props.position}>
 				{
-					_.map(props.section.ads, (ad, index) => {
-						return (
-							<MenuItem key={index} icon={'apSize'} text={`${ad.width} ${ad.height}`} contentHeading={`${ad.width} x ${ad.height}`}>
-								<div> <CssEditor css={ad.css} onSave={this.handleSubmit} onCancel={this.onCssEdit.bind(this)} /> </div>
-							</MenuItem>
-						);
-					})
+					_.map(props.section.ads, (ad, index) => (
+						<MenuItem key={index} icon={'apSize'} text={`${ad.width} ${ad.height}`} contentHeading={`${ad.width} x ${ad.height}`}>
+							<AdDescriptor ad={ad} sectionId={props.section.id} />
+						</MenuItem>
+					))
 				}
 
 			</Menu>

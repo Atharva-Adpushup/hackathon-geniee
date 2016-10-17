@@ -1,8 +1,10 @@
 import React, { PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
+import Codemirror from 'react-codemirror';
 
-const Codemirror = require('react-codemirror');
-require('codemirror/mode/javascript/javascript');
+//require('libs/codemirror/codemirror.min');
+//require('libs/codemirror/codemirror.javascript.min');
+//	CodeMirrorEditor = require('shared/codeMirrorEditor');
 
 class customCssEditor extends React.Component {
 	constructor(props) {
