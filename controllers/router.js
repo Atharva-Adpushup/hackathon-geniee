@@ -19,9 +19,9 @@ module.exports = function(app) {
 	});
 
 	app.use('/site/:siteId/reports/', function(req, res, next) {
-		if (!req.session || !req.session.user) {
-			return res.redirect('/login');
-		}
+		// if (!req.session || !req.session.user) {
+		// 	return res.redirect('/login');
+		// }
 		next();
 	}, reportsController);
 
@@ -40,9 +40,9 @@ module.exports = function(app) {
 	}, pageGroupController);
 
 	app.use('/site/:siteId', function(req, res, next) {
-		if (!req.session || !req.session.user) {
-			return res.redirect('/login');
-		}
+		// if (!req.session || !req.session.user) {
+		// 	return res.redirect('/login');
+		// }
 		next();
 	}, userController);
 
@@ -61,10 +61,8 @@ module.exports = function(app) {
 	}, dataController);
 
 	app.use('/', function(req, res, next) {
-		if ((req.path.indexOf('/signup') !== -1 || req.path.indexOf('/forgotPassword') !== -1 || req.path.indexOf('/login') !== -1) && req.session && req.session.user) {
-			return res.redirect('/user/dashboard');
-		}
-		next();
+		return res.redirect('/site/'+app.locals.siteId+'/dashboard');
+		
 	}, indexController);
 
 

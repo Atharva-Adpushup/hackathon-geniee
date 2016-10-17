@@ -189,7 +189,7 @@ router
 	})
 
 	.get('/', function(req, res) {
-		return res.redirect('/login');
+		return res.redirect('/site:siteId/dashboard');
 	});
 
 module.exports = router;
