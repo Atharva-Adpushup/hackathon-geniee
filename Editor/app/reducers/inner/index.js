@@ -1,15 +1,15 @@
 import { combineReducers } from 'redux';
 import { hbBoxActions, innerVariationActions, innerActions } from '../../consts/commonConsts';
 
-const hbBoxInitState = { BOTTOM: 0, TOP: 0, LEFT: 0, RIGHT: 0 },
+const hbBoxInitState = { top: 0, left: 0, width: 0, height: 0 },
 	hbBox = (state = hbBoxInitState, action) => {
 		switch (action.type) {
 			case hbBoxActions.SHOW_HB_BOX:
 				return {
-					BOTTOM: action.payload.BOTTOM,
-					TOP: action.payload.TOP,
-					LEFT: action.payload.LEFT,
-					RIGHT: action.payload.RIGHT,
+					top: action.payload.top,
+					left: action.payload.left,
+					width: action.payload.width,
+					height: action.payload.height,
 				};
 
 			case hbBoxActions.HIDE_HB_BOX:
@@ -28,15 +28,20 @@ const hbBoxInitState = { BOTTOM: 0, TOP: 0, LEFT: 0, RIGHT: 0 },
 				return state;
 		}
 	},
-	adpElement = (state = { xpath: null, parents: [], insertOptions: [], position: {} }, action) => {
+	adpElmInitState = { BOTTOM: 0, TOP: 0, LEFT: 0, RIGHT: 0 },
+	elmSelector = (state = adpElmInitState, action) => {
 		switch (action.type) {
-			case innerActions.SET_ADP_ELEMENT:
+			case innerActions.SET_ELEMENT_SELECTOR_CORDS:
 				return action.payload;
+
+			case innerActions.HIDE_ELEMENT_SELECTOR:
+			case innerVariationActions.UPDATE_VARIATION:
+				return adpElmInitState;
 
 			default:
 				return state;
 		}
 	};
 
-export default combineReducers({ hbBox, variation, adpElement });
+export default combineReducers({ hbBox, variation, elmSelector });
 

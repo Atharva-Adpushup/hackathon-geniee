@@ -4,22 +4,25 @@ import { messengerCommands } from '../consts/commonConsts';
 import { sendMessage } from '../scripts/messengerHelper';
 
 const postMessageHanlder = store => next => (action) => {
-	let state = store.getState();
-	const prevActiveVariation = getActiveChannelActiveVariationId(state),
-		prevSections = prevActiveVariation ? getVariationSectionsWithAds(state, { variationId: prevActiveVariation }) : null;
+	const prevState = store.getState(),
+		prevActiveVariation = getActiveChannelActiveVariationId(prevState),
+		prevSections = prevActiveVariation ? getVariationSectionsWithAds(prevState, { variationId: prevActiveVariation }) : null;
 
 	next(action);
 
-	state = store.getState();
-	const nextActiveVariation = getActiveChannelActiveVariationId(state),
-		nextSections = nextActiveVariation ? getVariationSectionsWithAds(state, { variationId: nextActiveVariation }) : null;
+
+	const nextState = store.getState(),
+		nextActiveVariation = getActiveChannelActiveVariationId(nextState),
+		nextSections = nextActiveVariation ? getVariationSectionsWithAds(nextState, { variationId: nextActiveVariation }) : null;
 
 	if (prevSections !== nextSections) {
-		sendMessage(getActiveChannelId(state), messengerCommands.UPDATE_LAYOUT, nextSections);
+		sendMessage(getActiveChannelId(nextState), messengerCommands.UPDATE_LAYOUT, nextSections);
 		// console.log(nextSections);
+	} else if ((prevState.insertMenu.isVisible && !nextState.insertMenu.isVisible) || (prevState.editMenu.isVisible && !nextState.editMenu.isVisible)) {
+		sendMessage(getActiveChannelId(nextState), messengerCommands.HIDE_ELEMENT_SELECTOR, {});
 	}
 
-	return state;
+	return nextState;
 };
 
 export default postMessageHanlder;

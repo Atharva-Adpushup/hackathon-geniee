@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import Selectorator from 'libs/cssSelectorator';
 import Utils from 'libs/utils';
-import { highlightElement, setAdpElement, hideHighlighter } from '../../actions/inner/actions';
+import { highlightElement, setElementSelectorCords, hideHighlighter } from '../../actions/inner/actions';
 import { sendMessage } from './messengerHelper';
 import { messengerCommands } from '../../consts/commonConsts';
 
@@ -26,8 +26,8 @@ const selectorator = new Selectorator(),
 				return ['Append', 'Prepend', 'Insert After', 'Insert Before'];
 		}
 	},
-	getAdpVitals = ($el) => {
-		if ($el.get(0).tagName === 'HTML' || $el.get(0).tagName === 'BODY' || $el.hasClass('_ap_reject') || $el.parents().hasClass('_ap_reject')) {
+	getAdpVitals = ($el, force = false) => {
+		if (!force && ($el.get(0).tagName === 'HTML' || $el.get(0).tagName === 'BODY' || $el.hasClass('_ap_reject') || $el.parents().hasClass('_ap_reject'))) {
 			return false;
 		}
 		const xpath = selectorator.generate($el)[0],
@@ -71,10 +71,13 @@ const selectorator = new Selectorator(),
 					case 'click':
 						const vitals = getAdpVitals($target);
 						if (vitals) {
-							dispatch(setAdpElement(vitals));
-						}/* else {
-							dispatch(hideHighlighter());
-						}*/
+							sendMessage(messengerCommands.SHOW_INSERT_CONTEXTMENU, {
+								position: vitals.position,
+								parents: vitals.parents,
+								insertOptions: vitals.insertOptions
+							});
+							dispatch(setElementSelectorCords(Utils.ui.getElementSelectorCords($target)));
+						}
 						break;
 					default:
 						return;

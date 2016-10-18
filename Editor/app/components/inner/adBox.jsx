@@ -25,8 +25,9 @@ const highLighterClass = '_APD_highlighter',
 		const { id, width, height, css } = props.ad,
 			adBoxSizeContent = (`${width} X ${height}`),
 			clickHandler = (ev) => {
-				const position = Utils.dom.getElementBounds($(ev.target));
-				props.clickHandler(id, position);
+				const $el = $(ev.target),
+					position = Utils.dom.getElementBounds($(ev.target));
+				props.clickHandler(id, position, Utils.ui.getElementSelectorCords($el));
 			};
 
 

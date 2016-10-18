@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import HB from '../../components/EditorComponents/inner/highlighterBox.jsx';
+import HB from 'inner/highlighterBox.jsx';
 
 export default connect(
 	state => ({

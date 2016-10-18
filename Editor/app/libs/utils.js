@@ -169,7 +169,7 @@ const randomStore = [],
 					let value2;
 
 					if (Utils.isDef(obj2[key]))
-						value2 = obj2[key];
+					{ value2 = obj2[key]; }
 
 					diff[key] = this.map(obj1[key], value2, key);
 				}
@@ -274,7 +274,9 @@ const randomStore = [],
 				params: (function () {
 					let ret = {},
 						seg = a.search.replace(/^\?/, '').split('&'),
-						len = seg.length, i = 0, s;
+						len = seg.length,
+						i = 0,
+						s;
 					for (; i < len; i++) {
 						if (!seg[i]) { continue; }
 						s = seg[i].split('=');
@@ -303,7 +305,7 @@ const randomStore = [],
 		},
 		dom: {
 			getElementBounds(w) {
-				var rect = w.get(0).getBoundingClientRect();
+				const rect = w.get(0).getBoundingClientRect();
 				return {
 					bottom: rect.bottom,
 					left: rect.left,
@@ -312,20 +314,22 @@ const randomStore = [],
 					width: rect.width,
 					height: rect.width
 				};
-				// const q = w.offset(),
-				// 	p = q.left,
-				// 	y = q.top,
-				// 	x = w.outerWidth(!1),
-				// 	v = w.outerHeight(!1),
-				// 	u = {
-				// 		bottom: y + v,
-				// 		left: p,
-				// 		right: p + x,
-				// 		top: y,
-				// 		width: x,
-				// 		height: v
-				// 	};
-				// return u;
+			},
+			getElementRelativeBounds(w) {
+				const q = w.offset(),
+					p = q.left,
+					y = q.top,
+					x = w.outerWidth(!1),
+					v = w.outerHeight(!1),
+					u = {
+						bottom: y + v,
+						left: p,
+						right: p + x,
+						top: y,
+						width: x,
+						height: v
+					};
+				return u;
 			},
 			getViewPort() {
 				const o = Math.max($(window).height(), $(document).height()),
@@ -337,6 +341,40 @@ const randomStore = [],
 			}
 		},
 		ui: {
+			getElementSelectorCords($el) {
+				const w = $el.offset().top,
+					p = $el.offset().left,
+					y = $el.outerHeight(),
+					o = $el.outerWidth(),
+					v = Utils.dom.getViewPort(),
+					x = p + o;
+				return {
+					BOTTOM: {
+						top: w + y,
+						left: 0,
+						height: v.height - (y + w),
+						width: '100%'
+					},
+					TOP: {
+						top: 0,
+						left: 0,
+						height: w,
+						width: '100%'
+					},
+					LEFT: {
+						top: w,
+						left: 0,
+						width: p,
+						height: y
+					},
+					RIGHT: {
+						top: w,
+						left: x,
+						width: v.width - x,
+						height: y
+					}
+				};
+			},
 			menuRenderPosition($target, context) {
 				const contextTop = context.top,
 					contextLeft = context.left,

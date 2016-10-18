@@ -6,7 +6,7 @@ const style = {
 		top: 0,
 		left: 0,
 		boxShadow: 'rgb(255, 27, 27) 0px 0px 0px 2px inset',
-		backgroundColor: 'rgba(255, 27, 27, 0.247059)',
+		//backgroundColor: 'rgba(255, 27, 27, 0.247059)',
 		zIndex: 9999,
 		pointerEvents: 'none',
 		position: 'absolute'
