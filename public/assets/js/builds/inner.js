@@ -7488,20 +7488,29 @@
 
 		dom: {
 			getElementBounds: function getElementBounds(w) {
-				var q = w.offset(),
-				    p = q.left,
-				    y = q.top,
-				    x = w.outerWidth(!1),
-				    v = w.outerHeight(!1),
-				    u = {
-					bottom: y + v,
-					left: p,
-					right: p + x,
-					top: y,
-					width: x,
-					height: v
+				var rect = w.get(0).getBoundingClientRect();
+				return {
+					bottom: rect.bottom,
+					left: rect.left,
+					right: rect.right,
+					top: rect.top < 0 ? 0 : rect.top,
+					width: rect.width,
+					height: rect.width
 				};
-				return u;
+				// const q = w.offset(),
+				// 	p = q.left,
+				// 	y = q.top,
+				// 	x = w.outerWidth(!1),
+				// 	v = w.outerHeight(!1),
+				// 	u = {
+				// 		bottom: y + v,
+				// 		left: p,
+				// 		right: p + x,
+				// 		top: y,
+				// 		width: x,
+				// 		height: v
+				// 	};
+				// return u;
 			},
 			getViewPort: function getViewPort() {
 				var o = Math.max((0, _jquery2.default)(window).height(), (0, _jquery2.default)(document).height()),

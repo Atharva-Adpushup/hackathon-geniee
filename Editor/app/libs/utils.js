@@ -303,20 +303,29 @@ const randomStore = [],
 		},
 		dom: {
 			getElementBounds(w) {
-				const q = w.offset(),
-					p = q.left,
-					y = q.top,
-					x = w.outerWidth(!1),
-					v = w.outerHeight(!1),
-					u = {
-						bottom: y + v,
-						left: p,
-						right: p + x,
-						top: y,
-						width: x,
-						height: v
-					};
-				return u;
+				var rect = w.get(0).getBoundingClientRect();
+				return {
+					bottom: rect.bottom,
+					left: rect.left,
+					right: rect.right,
+					top: rect.top < 0 ? 0 : rect.top,
+					width: rect.width,
+					height: rect.width
+				};
+				// const q = w.offset(),
+				// 	p = q.left,
+				// 	y = q.top,
+				// 	x = w.outerWidth(!1),
+				// 	v = w.outerHeight(!1),
+				// 	u = {
+				// 		bottom: y + v,
+				// 		left: p,
+				// 		right: p + x,
+				// 		top: y,
+				// 		width: x,
+				// 		height: v
+				// 	};
+				// return u;
 			},
 			getViewPort() {
 				const o = Math.max($(window).height(), $(document).height()),

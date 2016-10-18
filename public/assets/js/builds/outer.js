@@ -6120,20 +6120,29 @@
 
 		dom: {
 			getElementBounds: function getElementBounds(w) {
-				var q = w.offset(),
-				    p = q.left,
-				    y = q.top,
-				    x = w.outerWidth(!1),
-				    v = w.outerHeight(!1),
-				    u = {
-					bottom: y + v,
-					left: p,
-					right: p + x,
-					top: y,
-					width: x,
-					height: v
+				var rect = w.get(0).getBoundingClientRect();
+				return {
+					bottom: rect.bottom,
+					left: rect.left,
+					right: rect.right,
+					top: rect.top < 0 ? 0 : rect.top,
+					width: rect.width,
+					height: rect.width
 				};
-				return u;
+				// const q = w.offset(),
+				// 	p = q.left,
+				// 	y = q.top,
+				// 	x = w.outerWidth(!1),
+				// 	v = w.outerHeight(!1),
+				// 	u = {
+				// 		bottom: y + v,
+				// 		left: p,
+				// 		right: p + x,
+				// 		top: y,
+				// 		width: x,
+				// 		height: v
+				// 	};
+				// return u;
 			},
 			getViewPort: function getViewPort() {
 				var o = Math.max((0, _jquery2.default)(window).height(), (0, _jquery2.default)(document).height()),
@@ -12243,8 +12252,8 @@
 			'div',
 			null,
 			_react2.default.createElement(_channelManagerContainer2.default, null),
-			_react2.default.createElement(_variationManagerContainer2.default, null),
 			_react2.default.createElement(_insertMenuContainer2.default, null),
+			_react2.default.createElement(_variationManagerContainer2.default, null),
 			_react2.default.createElement(_editMenuContainer2.default, null)
 		);
 	};
@@ -31982,7 +31991,7 @@
 			key: 'render',
 			value: function render() {
 				var props = this.props,
-				    style = { position: 'absolute', bottom: '0px', height: '30px', width: '100%', backgroundColor: 'grey' };
+				    style = { position: 'fixed', bottom: '0px', height: '30px', width: '100%', backgroundColor: 'grey' };
 				if (!props.activeChannelId) {
 					return null;
 				}
@@ -32976,11 +32985,11 @@
 		opacity: 1,
 		width: 300,
 		display: 'flex',
-		backgroundColor: 'red',
 		top: 0,
 		left: 0,
 		zIndex: 10000,
-		flex: 1
+		flex: 1,
+		minHeight: 300
 	};
 
 	var Menu = function (_React$Component) {

@@ -9,11 +9,11 @@ const style = {
 	opacity: 1,
 	width: 300,
 	display: 'flex',
-	backgroundColor: 'red',
 	top: 0,
 	left: 0,
 	zIndex: 10000,
-	flex: 1
+	flex: 1,
+	minHeight: 300
 };
 
 class Menu extends React.Component {

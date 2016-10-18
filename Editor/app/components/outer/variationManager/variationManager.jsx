@@ -24,7 +24,7 @@ class variationManager extends React.Component {
 
 	render() {
 		const props = this.props,
-			style = { position: 'absolute', bottom: '0px', height: '30px', width: '100%', backgroundColor: 'grey' };
+			style = { position: 'fixed', bottom: '0px', height: '30px', width: '100%', backgroundColor: 'grey' };
 		if (!props.activeChannelId) {
 			return null;
 		}

@@ -7,8 +7,8 @@ import EditMenu from 'containers/editMenuContainer.js';
 const OuterEditor = () => (
 	<div>
 		<ChannelManager />
-		<VariationManager />
 		<InsertMenu />
+		<VariationManager />
 		<EditMenu />
 	</div>
 );
