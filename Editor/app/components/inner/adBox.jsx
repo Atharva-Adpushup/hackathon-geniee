@@ -30,7 +30,7 @@ const highLighterClass = '_APD_highlighter',
 			};
 
 
-		_(css).each((value, key) => {
+		_.each(css, (value, key) => {
 			delete css[key];
 			css[_.camelCase(key)] = value;
 		});

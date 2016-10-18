@@ -14,13 +14,11 @@ class cssEditor extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
-
 	handleSubmit(css) {
 		this.props.onSave(css);
 	}
 
 	renderCustomEditor() {
-		console.log('called');
 		this.setState({ isCustomEditor: true });
 	}
 
