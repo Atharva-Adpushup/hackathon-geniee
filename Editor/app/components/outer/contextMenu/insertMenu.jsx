@@ -98,7 +98,7 @@ class insertMenu extends React.Component {
 
 		return (
 			<Menu id="insertMenu"
-				position={Object.assign({}, this.props.position, { top: this.props.position.top + 40 })}
+				position={Object.assign({}, this.props.position, { top: this.props.position.top + 43 })}
 				arrow="none"
 				activeItem={this.state.activeItem}
 				onMenuItemClick={this.setActiveItem.bind(this)}
