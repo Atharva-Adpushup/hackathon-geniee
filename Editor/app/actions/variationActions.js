@@ -1,4 +1,5 @@
-import {variationActions} from 'consts/commonConsts';
+import { variationActions } from 'consts/commonConsts';
+import _ from 'lodash';
 import Utils from 'libs/utils';
 
 const addVariation = (payload, channelId) => {
@@ -18,10 +19,36 @@ const addVariation = (payload, channelId) => {
 			})
 		};
 	},
-	copyVariation = (copyFrom) => {
+	copyVariation = (copyFromVariation, newName, channelId) => {
+		const newVariationId = Utils.getRandomNumber(),
+			ads = [],
+			sectionIds = [];
 		return {
 			type: variationActions.COPY_VARIATION,
-			copyFrom
+			variationId: newVariationId,
+			channelId,
+			sections: _.map(copyFromVariation.sections, (section) => {
+				const sectionId = Utils.getRandomNumber();
+				sectionIds.push(sectionId);
+				return {
+					...section,
+					id: sectionId,
+					name: `Section-${sectionId}`,
+					ads: _.map(section.ads, (ad) => {
+						const adId = Utils.getRandomNumber();
+						ads.push({ ...ad, id: adId });
+						return adId;
+					})
+				};
+			}),
+			ads,
+			variation: {
+				...copyFromVariation,
+				id: newVariationId,
+				name: newName,
+				createTs: Math.floor(Date.now() / 1000),
+				sections: sectionIds
+			}
 		};
 	},
 	deleteVariation = (variationId) => {
@@ -44,4 +71,4 @@ const addVariation = (payload, channelId) => {
 		};
 	};
 
-export {addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation};
+export { addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation };

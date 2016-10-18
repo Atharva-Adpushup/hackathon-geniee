@@ -1,5 +1,6 @@
-import { sectionActions, adActions } from 'consts/commonConsts';
+import { sectionActions, adActions, variationActions } from 'consts/commonConsts';
 import { immutableObjectDelete } from 'libs/immutableHelpers';
+import _ from 'lodash';
 
 const adsByIds = (state = {}, action) => {
 	switch (action.type) {
@@ -25,6 +26,10 @@ const adsByIds = (state = {}, action) => {
 		case adActions.UPDATE_CSS:
 			return { ...state, [action.adId]: { ...state[action.adId], css: action.css } };
 
+		case variationActions.COPY_VARIATION:
+			const ads = {};
+			_.each(action.ads, (section) => (ads[section.id] = section));
+			return { ...state, ...ads };
 
 		default:
 			return state;

@@ -11,8 +11,8 @@ class Variation extends React.Component {
 		super();
 	}
 
-	render({ variation, onClick, onDoubleClick, active } = this.props) {
-		return (<div onDoubleClick={onDoubleClick} onClick={onClick} className="variationBlock" style={{ ...style, color: active ? 'red' : 'white' }}>{variation.name}</div>);
+	render({ variation, onClick, onCopy, active } = this.props) {
+		return (<div onDoubleClick={onCopy.bind(null, variation)} onClick={onClick} className="variationBlock" style={{ ...style, color: active ? 'red' : 'white' }}>{variation.name}</div>);
 	}
 }
 

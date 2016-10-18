@@ -2,10 +2,10 @@ import { connect } from 'react-redux';
 import VariationManager from 'variationManager/variationManager.jsx';
 import { addVariation, copyVariation, deleteVariation, setActiveVariation } from 'actions/variationActions';
 import { getActiveChannelId } from 'selectors/channelSelectors';
-import { getActiveChannelVariations, getActiveChannelActiveVariation } from 'selectors/variationSelectors';
+import { getActiveChannelVariationsWithAds, getActiveChannelActiveVariation } from 'selectors/variationSelectors';
 
 const mapStateToProps = (state) => ({
-		variations: getActiveChannelVariations(state),
+		variations: getActiveChannelVariationsWithAds(state),
 		activeVariation: getActiveChannelActiveVariation(state),
 		activeChannelId: getActiveChannelId(state)
 	}),
@@ -14,8 +14,8 @@ const mapStateToProps = (state) => ({
 		deleteVariation: (variationId) => {
 			dispatch(deleteVariation(variationId));
 		},
-		copyVariation: (variationId) => {
-			dispatch(copyVariation(variationId));
+		copyVariation: (variationId, newName, channelId) => {
+			dispatch(copyVariation(variationId, newName, channelId));
 		},
 		setActiveVariation: (variationId, channelId) => {
 			dispatch(setActiveVariation(variationId, channelId));

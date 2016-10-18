@@ -42,6 +42,7 @@ const initialState = { activeChannel: 'test2', byIds: { test2: chnl2 } },
 				return { ...state, contentSelector: action.selector };
 
 			case variationActions.ADD_VARIATION:
+			case variationActions.COPY_VARIATION:
 				return { ...state, activeVariation: action.variationId, variations: [...state.variations, action.variationId] };
 
 			case variationActions.DELETE_VARIATION:
@@ -81,21 +82,22 @@ const initialState = { activeChannel: 'test2', byIds: { test2: chnl2 } },
 			case channelActions.CHANGE_CONTENT_SELECTOR:
 			case channelActions.OPEN_CHANNEL_SUCCESS:
 			case variationActions.ADD_VARIATION:
+			case variationActions.COPY_VARIATION:
 				return { ...state,
-	byIds: {
-		...state.byIds,
-		[action.channelId]: channel(state.byIds[action.channelId], action)
-	}
-};
+					byIds: {
+						...state.byIds,
+						[action.channelId]: channel(state.byIds[action.channelId], action)
+					}
+				};
 
 			case variationActions.DELETE_VARIATION:
 			case variationActions.SET_ACTIVE_VARIATION:
 				return { ...state,
-	byIds: {
-		...state.byIds,
-		[state.activeChannel]: channel(state.byIds[state.activeChannel], action)
-	}
-};
+					byIds: {
+						...state.byIds,
+						[state.activeChannel]: channel(state.byIds[state.activeChannel], action)
+					}
+				};
 
 			default:
 				return state;

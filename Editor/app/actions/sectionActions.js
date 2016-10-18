@@ -6,13 +6,13 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			sectionId = Utils.getRandomNumber();
 		return (dispatch) => {
 			dispatch({
-				type: sectionActions.CREATE_SECTION,
-				adPayload: Object.assign(adPayload, { id: adId, css: adPayload.css ? adPayload.css : defaultSectionCss, createTs: Math.floor(Date.now() / 1000) }),
-				sectionPayload: Object.assign(sectionPayload, { id: sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
-				sectionId,
-				adId,
-				variationId
-			});
+			type: sectionActions.CREATE_SECTION,
+			adPayload: Object.assign(adPayload, { id: adId, name: `Section-${sectionId}`, css: adPayload.css ? adPayload.css : defaultSectionCss, createTs: Math.floor(Date.now() / 1000) }),
+			sectionPayload: Object.assign(sectionPayload, { id: sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
+			sectionId,
+			adId,
+			variationId
+		});
 		};
 	},
 	deleteSection = (sectionId) => {

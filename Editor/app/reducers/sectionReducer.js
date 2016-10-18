@@ -1,5 +1,6 @@
-import { sectionActions, adActions } from 'consts/commonConsts';
+import { sectionActions, adActions, variationActions } from 'consts/commonConsts';
 import { immutableObjectDelete, immutableArrayDelete, immutablePush } from 'libs/immutableHelpers';
+import _ from 'lodash';
 
 const sectionByIds = (state = {}, action) => {
 	switch (action.type) {
@@ -31,12 +32,18 @@ const sectionByIds = (state = {}, action) => {
 		case sectionActions.RENAME_SECTION:
 			return { ...state, [action.sectionId]: { ...state[action.sectionId], name: action.name } };
 
+
 		case adActions.DELETE_AD:
 			const index = state[action.sectionId].ads.indexOf(action.adId);
 			if (index !== -1) {
 				return { ...state, [action.sectionId]: { ...state[action.sectionId], ads: immutableArrayDelete(state[action.sectionId].ads, index) } };
 			}
 			return state;
+
+		case variationActions.COPY_VARIATION:
+			const sections = {};
+			_.each(action.sections, (section) => (sections[section.id] = section));
+			return { ...state, ...sections };
 
 		default:
 			return state;

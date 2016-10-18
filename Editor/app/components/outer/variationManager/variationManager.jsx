@@ -14,6 +14,8 @@ class variationManager extends React.Component {
 	constructor(props) {
 		super(props);
 		this.createVariation = this.createVariation.bind(this);
+		this.deleteVariation = this.deleteVariation.bind(this);
+		this.copyVariation = this.copyVariation.bind(this);
 	}
 
 	createVariation() {
@@ -22,9 +24,21 @@ class variationManager extends React.Component {
 		}, this.props.activeChannelId);
 	}
 
+	deleteVariation(varaitionId) {
+		if (this.props.variations.length > 1) {
+			this.props.deleteVariation(varaitionId);
+			return;
+		}
+		alert('Can\'t delete varaiation.');
+	}
+
+	copyVariation(variation) {
+		this.props.copyVariation(variation, `Variation ${getLastVariationNumber(this.props.variations) + 1}`, this.props.activeChannelId);
+	}
+
 	render() {
 		const props = this.props,
-			style = { position: 'fixed', bottom: '0px', height: '30px', width: '100%', backgroundColor: 'grey' };
+			style = { position: 'absolute', bottom: '0px', height: '30px', width: '100%', backgroundColor: 'grey' };
 		if (!props.activeChannelId) {
 			return null;
 		}
@@ -36,8 +50,8 @@ class variationManager extends React.Component {
 							variation={variation}
 							active={variation.id === props.activeVariation.id}
 							onClick={props.setActiveVariation.bind(null, variation.id)}
-							onDoubleClick={props.deleteVariation.bind(null, variation.id)}
-							onCopy={props.copyVariation.bind(null, variation.id)}
+							onDoubleClick={this.deleteVariation}
+							onCopy={this.copyVariation}
 							onRename={props.renameVariation.bind(null, variation.id)}
       />
 					))
@@ -61,3 +75,4 @@ variationManager.propTypes = {
 };
 
 export default variationManager;
+

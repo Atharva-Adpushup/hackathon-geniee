@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
-import VariationManger from '../../components/inner/variationManger.jsx';
-import { sendMessage } from '../../scripts/inner/messengerHelper.js';
-import { messengerCommands } from '../../consts/commonConsts.js';
+import VariationManger from 'inner/variationManger.jsx';
+import { sendMessage } from 'scripts/inner/messengerHelper.js';
+import { messengerCommands } from 'consts/commonConsts.js';
 
 export default connect(
 	({ variation }) => ({

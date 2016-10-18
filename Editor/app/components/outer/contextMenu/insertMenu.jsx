@@ -51,7 +51,6 @@ class insertMenu extends React.Component {
 	createSectionAndAd(position) {
 		const sectionPayload = {
 				position,
-				name: 'Section 1',
 				xpath: this.props.parents[0].xpath,
 				operation: this.state.operation
 			},
@@ -124,3 +123,4 @@ insertMenu.propTypes = {
 };
 
 export default insertMenu;
+
