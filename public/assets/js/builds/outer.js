@@ -2332,7 +2332,7 @@ var MenuItem = function MenuItem(props) {
 		),
 		_react2.default.createElement(
 			'div',
-			{ style: props.isActive ? { display: 'block' } : { display: 'none' } },
+			{ style: props.isActive ? { display: 'block', position: 'absolute', top: 0, zIndex: -1 } : { display: 'none' } },
 			_react2.default.createElement(
 				_content2.default,
 				{ contentHeading: props.contentHeading },

@@ -2518,7 +2518,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
       border-top: 7px solid #eb575c;
       margin-left: -7px; }
   .MenuBarComponentWrap .MenuBarContainerWrapper {
-    height: 300px;
+    min-height: 300px;
     margin-left: 33px;
     padding-left: 6px;
     width: 255px;

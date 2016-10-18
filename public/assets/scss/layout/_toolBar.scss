@@ -185,7 +185,7 @@
 	.MenuBarContainerWrapper 
 	{
 		@extend menubar;
-		height: 300px;
+		min-height: 300px;
 		margin-left: $MBCWrapMarginLeft;
 		padding-left:6px;
 		width: $MBCWrapWidth;
