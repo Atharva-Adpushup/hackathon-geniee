@@ -2397,7 +2397,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
         text-align: center;
         display: block;
         background: #ccc;
-        height: 35px;
+        height: 36px;
         width: 40px;
         border-top: 1px solid #e6e7e8;
         border-bottom: 1px solid  #b3b3b3;
@@ -2425,37 +2425,51 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
       .MenuBarComponentWrap .MenuBarWrapper li:first-child .MenuBarItem {
         border-top: 1px solid transparent;
         -webkit-border-top-left-radius: 3px;
-        -webkit-border-top-right-radius: 3px;
+        -webkit-border-top-right-radius: 0;
         -webkit-border-bottom-right-radius: 0;
         -webkit-border-bottom-left-radius: 0;
         -moz-border-radius-topleft: 3px;
-        -moz-border-radius-topright: 3px;
+        -moz-border-radius-topright: 0;
         -moz-border-radius-bottomright: 0;
         -moz-border-radius-bottomleft: 0;
         border-top-left-radius: 3px;
-        border-top-right-radius: 3px;
+        border-top-right-radius: 0;
         border-bottom-right-radius: 0;
         border-bottom-left-radius: 0; }
       .MenuBarComponentWrap .MenuBarWrapper li:last-child .MenuBarItem {
         border-bottom: 1px solid transparent;
         -webkit-border-top-left-radius: 0;
         -webkit-border-top-right-radius: 0;
-        -webkit-border-bottom-right-radius: 3px;
+        -webkit-border-bottom-right-radius: 0;
         -webkit-border-bottom-left-radius: 3px;
         -moz-border-radius-topleft: 0;
         -moz-border-radius-topright: 0;
-        -moz-border-radius-bottomright: 3px;
+        -moz-border-radius-bottomright: 0;
         -moz-border-radius-bottomleft: 3px;
         border-top-left-radius: 0;
         border-top-right-radius: 0;
-        border-bottom-right-radius: 3px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 3px; }
+      .MenuBarComponentWrap .MenuBarWrapper li:only-child .MenuBarItem {
+        border-bottom: 1px solid transparent;
+        -webkit-border-top-left-radius: 3px;
+        -webkit-border-top-right-radius: 0;
+        -webkit-border-bottom-right-radius: 0;
+        -webkit-border-bottom-left-radius: 3px;
+        -moz-border-radius-topleft: 3px;
+        -moz-border-radius-topright: 0;
+        -moz-border-radius-bottomright: 0;
+        -moz-border-radius-bottomleft: 3px;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
         border-bottom-left-radius: 3px; }
       .MenuBarComponentWrap .MenuBarWrapper li .MenuBarItemRibbon {
         display: none;
         position: absolute;
         top: 0;
         left: 40px;
-        min-height: 35px;
+        min-height: 36px;
         padding: 5px 5px 5px 5px;
         -webkit-border-top-left-radius: 0;
         -webkit-border-top-right-radius: 3px;
