@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import Content from './content.jsx';
 
 const MenuItem = (props) => {
 	const content = [];
@@ -20,9 +19,6 @@ const MenuItem = (props) => {
 			<a href="#" onClick={props.onClick} className={props.isActive === true ? 'MenuBarItem active ' : 'MenuBarItem'}>
 				{content}
 			</a>
-			<div style={props.isActive ? { display: 'block', position: 'absolute', top: 0, zIndex: -1 } : { display: 'none' }} >
-				<Content contentHeading={props.contentHeading}>{React.cloneElement(props.children, { onUpdate: props.onUpdate })}</Content>
-			</div>
 		</li>
 	);
 };

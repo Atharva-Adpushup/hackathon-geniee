@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import $ from 'jquery';
 import Glass from 'shared/glass.jsx';
 import Utils from 'libs/utils.js';
+import Content from './content.jsx';
 
 const style = {
 	position: 'absolute',
@@ -71,6 +72,7 @@ class Menu extends React.Component {
 
 
 	render() {
+		const contentElms = [];
 		return (
 			<div >
 				<Glass clickHandler={this.props.onGlassClick} />
@@ -78,16 +80,26 @@ class Menu extends React.Component {
 					<div className={`MenuBarComponentWrap ${this.getMenuOrientationClass()}`}>
 						<ul ref="toolBar" className={`MenuBarWrapper  + ${this.getArrowClass()}`}>
 							{
-								this.props.children.map((el, index) => (
-									React.cloneElement(el, {
+								this.props.children.map((el, index) => {
+									const elm = React.cloneElement(el, {
 										key: index,
 										onClick: this.onMenuItemClick.bind(this, index),
 										isActive: (this.state.activeItem === index),
 										onUpdate: this.fixCss
-									})
-								))
+									});
+									contentElms.push(elm);
+									return elm;
+								})
 							}
 						</ul>
+						{
+							contentElms.map((el, index) => {
+								const props = el.props;
+								return (<div key={`menuContent-${index}`} style={this.state.activeItem === index ? { display: 'block', position: 'absolute', top: 0, zIndex: -1 } : { display: 'none' }} >
+									<Content contentHeading={props.contentHeading}>{React.cloneElement(props.children, { onUpdate: props.onUpdate })}</Content>
+								</div>);
+							})
+						}
 					</div>
 				</div>
 			</div>
