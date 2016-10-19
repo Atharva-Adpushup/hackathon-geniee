@@ -1,12 +1,18 @@
 import React, { PropTypes } from 'react';
+import ReactDOM from 'react-dom';
+import $ from 'jquery';
 
 class Variation extends React.Component {
 	constructor() {
 		super();
 	}
 
+	showVariationSettings() {
+		$('.variation-settings').toggleClass('variation-settings-active');
+	}
+
 	render({ variation, onClick, onCopy, active } = this.props) {
-		return (<div onDoubleClick={onCopy.bind(null, variation)} onClick={onClick} className={active ? 'variation-block active-variation' : 'variation-block'}>{variation.name} {active ? <span className="variation-settings-icon"><i className="fa fa-caret-up"></i></span> : ''}</div>);
+		return (<div onDoubleClick={onCopy.bind(null, variation)} onClick={active ? this.showVariationSettings : onClick} className={active ? 'variation-block active-variation' : 'variation-block'}>{variation.name} {active ? <span className="variation-settings-icon"><i className="fa fa-caret-up"></i></span> : ''}</div>);
 	}
 }
 

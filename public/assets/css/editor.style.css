@@ -3557,4 +3557,32 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   height: 60%;
   border-radius: 3px; }
 
+.variation-settings {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  height: 300px;
+  background: #fff;
+  box-shadow: 0px -3px 7px rgba(0, 0, 0, 0.14);
+  -webkit-transition: all 0.2s ease-in-out;
+  -khtml-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+  -webkit-transform: translate3d(0, 100%, 0);
+  -khtml-transform: translate3d(0, 100%, 0);
+  -moz-transform: translate3d(0, 100%, 0);
+  -ms-transform: translate3d(0, 100%, 0);
+  -o-transform: translate3d(0, 100%, 0);
+  transform: translate3d(0, 100%, 0); }
+
+.variation-settings-active {
+  -webkit-transform: translate3d(0, 0, 0);
+  -khtml-transform: translate3d(0, 0, 0);
+  -moz-transform: translate3d(0, 0, 0);
+  -ms-transform: translate3d(0, 0, 0);
+  -o-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0); }
+
 /*# sourceMappingURL=editor.style.css.map */

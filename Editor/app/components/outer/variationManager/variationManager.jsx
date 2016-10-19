@@ -37,25 +37,31 @@ class variationManager extends React.Component {
 	}
 
 	render() {
-		const props = this.props;	
+		const props = this.props,
+			  style = { color: '#555', fontSize: '1.2em', width: '50%', margin: '40px auto', textAlign: 'center' };
 		if (!props.activeChannelId) {
 			return null;
 		}
 		return (
-			<div id="variationManager" className="variation-bar">
-				{
-					props.variations.map((variation) => (
-						<Variation key={variation.id}
-							variation={variation}
-							active={variation.id === props.activeVariation.id}
-							onClick={props.setActiveVariation.bind(null, variation.id)}
-							onDoubleClick={this.deleteVariation}
-							onCopy={this.copyVariation}
-							onRename={props.renameVariation.bind(null, variation.id)}
-      />
-					))
-				}
-				<VariationAdder onNewVariation={this.createVariation} />
+			<div>
+				<div className="variation-settings">
+					<div style={style}>Variation settings will come here</div>
+				</div>
+				<div id="variationManager" className="variation-bar">
+					{
+						props.variations.map((variation) => (
+							<Variation key={variation.id}
+								variation={variation}
+								active={variation.id === props.activeVariation.id}
+								onClick={props.setActiveVariation.bind(null, variation.id)}
+								onDoubleClick={this.deleteVariation}
+								onCopy={this.copyVariation}
+								onRename={props.renameVariation.bind(null, variation.id)}
+		/>
+						))
+					}
+					<VariationAdder onNewVariation={this.createVariation} />
+				</div>
 			</div>
 		);
 	}
