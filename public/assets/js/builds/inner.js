@@ -1998,12 +1998,24 @@
 		}
 	},
 	    variation = function variation() {
-		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { id: null, sections: [] };
+		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { id: null, channelId: null, sections: [] };
 		var action = arguments[1];
 
 		switch (action.type) {
 			case _commonConsts.innerVariationActions.UPDATE_VARIATION:
 				return action.variation;
+
+			default:
+				return state;
+		}
+	},
+	    contentSelector = function contentSelector() {
+		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { position: hbBoxInitState, selector: null };
+		var action = arguments[1];
+
+		switch (action.type) {
+			case _commonConsts.innerActions.UPDATE_CONTENT_OVERLAY:
+				return action.payload;
 
 			default:
 				return state;
@@ -2027,7 +2039,7 @@
 		}
 	};
 
-	exports.default = (0, _redux.combineReducers)({ hbBox: hbBox, variation: variation, elmSelector: elmSelector });
+	exports.default = (0, _redux.combineReducers)({ hbBox: hbBox, variation: variation, elmSelector: elmSelector, contentSelector: contentSelector });
 
 /***/ },
 /* 33 */
@@ -2097,12 +2109,13 @@
 		CHANGE_EDITOR_MODE: 'CHANGE_EDITOR_MODE',
 		APPLY_CSS: 'APPLY_CSS',
 		HIGHLIGHT_ADBOX: 'HIGHLIGHT_ADBOX',
-		PREPARE_IN_CONTENT_AREA: 'PREPARE_IN_CONTENT_AREA',
 		SCROLL_SECTION_TO_SCREEN: 'SCROLL_SECTION_TO_SCREEN',
 		TRY_EDITING_XPATH: 'TRY_EDITING_XPATH',
 		SECTION_XPATH_MISSING: 'SECTION_XPATH_MISSING',
 		UPDATE_LAYOUT: 'UPDATE_LAYOUT',
-		HIDE_ELEMENT_SELECTOR: 'HIDE_ELEMENT_SELECTOR'
+		HIDE_ELEMENT_SELECTOR: 'HIDE_ELEMENT_SELECTOR',
+		CONTENT_SELECTOR_MISSING: 'CONTENT_SELECTOR_MISSING',
+		CONTENT_SELECTOR_WORKED: 'CONTENT_SELECTOR_WORKED'
 	},
 	    siteModes = {
 		DRAFT: 2,
@@ -2154,7 +2167,9 @@
 		EDIT_SAMPLE_URL: 'EDIT_SAMPLE_URL',
 		CHANGE_CONTENT_SELECTOR: 'CHANGE_CONTENT_SELECTOR',
 		EDIT_CONTENT_SELECTOR: 'EDIT_CONTENT_SELECTOR',
-		SAVE_BEFORE_AFTER_JS: 'SAVE_BEFORE_AFTER_JS'
+		SAVE_BEFORE_AFTER_JS: 'SAVE_BEFORE_AFTER_JS',
+		CONTENT_SELECTOR_MISSING: 'CONTENT_SELECTOR_MISSING',
+		CONTENT_SELECTOR_WORKED: 'CONTENT_SELECTOR_WORKED'
 
 	},
 	    insertMenuActions = {
@@ -2198,7 +2213,8 @@
 	},
 	    innerActions = {
 		HIDE_ELEMENT_SELECTOR: 'HIDE_ELEMENT_SELECTOR',
-		SET_ELEMENT_SELECTOR_CORDS: 'SET_ELEMENT_SELECTOR_CORDS'
+		SET_ELEMENT_SELECTOR_CORDS: 'SET_ELEMENT_SELECTOR_CORDS',
+		UPDATE_CONTENT_OVERLAY: 'UPDATE_CONTENT_OVERLAY'
 	},
 	    commonSupportedSizes = [{
 		layoutType: 'SQUARE',
@@ -2264,6 +2280,10 @@
 
 	var _elementHighLighterContainer2 = _interopRequireDefault(_elementHighLighterContainer);
 
+	var _contentOverylayContainer = __webpack_require__(608);
+
+	var _contentOverylayContainer2 = _interopRequireDefault(_contentOverylayContainer);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var OuterEditor = function OuterEditor() {
@@ -2272,7 +2292,8 @@
 			null,
 			_react2.default.createElement(_hbBoxContainer2.default, null),
 			_react2.default.createElement(_variationManagerContainer2.default, null),
-			_react2.default.createElement(_elementHighLighterContainer2.default, null)
+			_react2.default.createElement(_elementHighLighterContainer2.default, null),
+			_react2.default.createElement(_contentOverylayContainer2.default, null)
 		);
 	};
 
@@ -13528,6 +13549,8 @@
 	});
 	exports.sendMessage = exports.initMessageHandler = undefined;
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	var _messenger = __webpack_require__(204);
 
 	var _messenger2 = _interopRequireDefault(_messenger);
@@ -13556,7 +13579,7 @@
 				break;
 
 			default:
-				messenger.sendMessage(cmd, data);
+				messenger.sendMessage(cmd, _extends({}, data, { channelId: window.ADP_CHANNEL_ID }));
 				break;
 		}
 	},
@@ -13738,13 +13761,13 @@
 
 	var _utils2 = _interopRequireDefault(_utils);
 
-	var _commonConsts = __webpack_require__(33);
-
-	var _messengerHelper = __webpack_require__(203);
-
 	var _jquery = __webpack_require__(29);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _commonConsts = __webpack_require__(33);
+
+	var _messengerHelper = __webpack_require__(203);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -13762,7 +13785,29 @@
 		return { type: _commonConsts.hbBoxActions.HIDE_HB_BOX };
 	},
 	    updateLayout = function updateLayout(variation) {
-		return { type: _commonConsts.innerVariationActions.UPDATE_VARIATION, variation: variation };
+		return function (dispatch) {
+			dispatch({
+				type: _commonConsts.innerVariationActions.UPDATE_VARIATION,
+				variation: variation
+			});
+			var $el = variation.contentSelector ? (0, _jquery2.default)(variation.contentSelector) : null;
+
+			if (!$el || !$el.length) {
+				dispatch({
+					type: _commonConsts.innerActions.UPDATE_CONTENT_OVERLAY,
+					payload: { selector: null, position: { top: 0, left: 0, width: 0, height: 0 } }
+				});
+				if (variation.contentSelector) {
+					(0, _messengerHelper.sendMessage)(_commonConsts.messengerCommands.CONTENT_SELECTOR_MISSING, { selector: variation.contentSelector });
+				}
+			} else {
+				(0, _messengerHelper.sendMessage)(_commonConsts.messengerCommands.CONTENT_SELECTOR_WORKED, { selector: variation.contentSelector });
+				dispatch({
+					type: _commonConsts.innerActions.UPDATE_CONTENT_OVERLAY,
+					payload: { selector: variation.contentSelector, position: _utils2.default.dom.getElementRelativeBounds($el) }
+				});
+			}
+		};
 	},
 	    hideElementSelector = function hideElementSelector() {
 		return { type: _commonConsts.innerActions.HIDE_ELEMENT_SELECTOR };
@@ -14111,7 +14156,7 @@
 		minHeight: '0',
 		minWidth: '0',
 		padding: '0',
-		opacity: '.5',
+		opacity: '.8',
 		overflow: 'hidden'
 	},
 	    ElementSelector = function ElementSelector(props) {
@@ -14135,6 +14180,463 @@
 	};
 
 	exports.default = ElementSelector;
+
+/***/ },
+/* 211 */,
+/* 212 */,
+/* 213 */,
+/* 214 */,
+/* 215 */,
+/* 216 */,
+/* 217 */,
+/* 218 */,
+/* 219 */,
+/* 220 */,
+/* 221 */,
+/* 222 */,
+/* 223 */,
+/* 224 */,
+/* 225 */,
+/* 226 */,
+/* 227 */,
+/* 228 */,
+/* 229 */,
+/* 230 */,
+/* 231 */,
+/* 232 */,
+/* 233 */,
+/* 234 */,
+/* 235 */,
+/* 236 */,
+/* 237 */,
+/* 238 */,
+/* 239 */,
+/* 240 */,
+/* 241 */,
+/* 242 */,
+/* 243 */,
+/* 244 */,
+/* 245 */,
+/* 246 */,
+/* 247 */,
+/* 248 */,
+/* 249 */,
+/* 250 */,
+/* 251 */,
+/* 252 */,
+/* 253 */,
+/* 254 */,
+/* 255 */,
+/* 256 */,
+/* 257 */,
+/* 258 */,
+/* 259 */,
+/* 260 */,
+/* 261 */,
+/* 262 */,
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */,
+/* 267 */,
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */,
+/* 297 */,
+/* 298 */,
+/* 299 */,
+/* 300 */,
+/* 301 */,
+/* 302 */,
+/* 303 */,
+/* 304 */,
+/* 305 */,
+/* 306 */,
+/* 307 */,
+/* 308 */,
+/* 309 */,
+/* 310 */,
+/* 311 */,
+/* 312 */,
+/* 313 */,
+/* 314 */,
+/* 315 */,
+/* 316 */,
+/* 317 */,
+/* 318 */,
+/* 319 */,
+/* 320 */,
+/* 321 */,
+/* 322 */,
+/* 323 */,
+/* 324 */,
+/* 325 */,
+/* 326 */,
+/* 327 */,
+/* 328 */,
+/* 329 */,
+/* 330 */,
+/* 331 */,
+/* 332 */,
+/* 333 */,
+/* 334 */,
+/* 335 */,
+/* 336 */,
+/* 337 */,
+/* 338 */,
+/* 339 */,
+/* 340 */,
+/* 341 */,
+/* 342 */,
+/* 343 */,
+/* 344 */,
+/* 345 */,
+/* 346 */,
+/* 347 */,
+/* 348 */,
+/* 349 */,
+/* 350 */,
+/* 351 */,
+/* 352 */,
+/* 353 */,
+/* 354 */,
+/* 355 */,
+/* 356 */,
+/* 357 */,
+/* 358 */,
+/* 359 */,
+/* 360 */,
+/* 361 */,
+/* 362 */,
+/* 363 */,
+/* 364 */,
+/* 365 */,
+/* 366 */,
+/* 367 */,
+/* 368 */,
+/* 369 */,
+/* 370 */,
+/* 371 */,
+/* 372 */,
+/* 373 */,
+/* 374 */,
+/* 375 */,
+/* 376 */,
+/* 377 */,
+/* 378 */,
+/* 379 */,
+/* 380 */,
+/* 381 */,
+/* 382 */,
+/* 383 */,
+/* 384 */,
+/* 385 */,
+/* 386 */,
+/* 387 */,
+/* 388 */,
+/* 389 */,
+/* 390 */,
+/* 391 */,
+/* 392 */,
+/* 393 */,
+/* 394 */,
+/* 395 */,
+/* 396 */,
+/* 397 */,
+/* 398 */,
+/* 399 */,
+/* 400 */,
+/* 401 */,
+/* 402 */,
+/* 403 */,
+/* 404 */,
+/* 405 */,
+/* 406 */,
+/* 407 */,
+/* 408 */,
+/* 409 */,
+/* 410 */,
+/* 411 */,
+/* 412 */,
+/* 413 */,
+/* 414 */,
+/* 415 */,
+/* 416 */,
+/* 417 */,
+/* 418 */,
+/* 419 */,
+/* 420 */,
+/* 421 */,
+/* 422 */,
+/* 423 */,
+/* 424 */,
+/* 425 */,
+/* 426 */,
+/* 427 */,
+/* 428 */,
+/* 429 */,
+/* 430 */,
+/* 431 */,
+/* 432 */,
+/* 433 */,
+/* 434 */,
+/* 435 */,
+/* 436 */,
+/* 437 */,
+/* 438 */,
+/* 439 */,
+/* 440 */,
+/* 441 */,
+/* 442 */,
+/* 443 */,
+/* 444 */,
+/* 445 */,
+/* 446 */,
+/* 447 */,
+/* 448 */,
+/* 449 */,
+/* 450 */,
+/* 451 */,
+/* 452 */,
+/* 453 */,
+/* 454 */,
+/* 455 */,
+/* 456 */,
+/* 457 */,
+/* 458 */,
+/* 459 */,
+/* 460 */,
+/* 461 */,
+/* 462 */,
+/* 463 */,
+/* 464 */,
+/* 465 */,
+/* 466 */,
+/* 467 */,
+/* 468 */,
+/* 469 */,
+/* 470 */,
+/* 471 */,
+/* 472 */,
+/* 473 */,
+/* 474 */,
+/* 475 */,
+/* 476 */,
+/* 477 */,
+/* 478 */,
+/* 479 */,
+/* 480 */,
+/* 481 */,
+/* 482 */,
+/* 483 */,
+/* 484 */,
+/* 485 */,
+/* 486 */,
+/* 487 */,
+/* 488 */,
+/* 489 */,
+/* 490 */,
+/* 491 */,
+/* 492 */,
+/* 493 */,
+/* 494 */,
+/* 495 */,
+/* 496 */,
+/* 497 */,
+/* 498 */,
+/* 499 */,
+/* 500 */,
+/* 501 */,
+/* 502 */,
+/* 503 */,
+/* 504 */,
+/* 505 */,
+/* 506 */,
+/* 507 */,
+/* 508 */,
+/* 509 */,
+/* 510 */,
+/* 511 */,
+/* 512 */,
+/* 513 */,
+/* 514 */,
+/* 515 */,
+/* 516 */,
+/* 517 */,
+/* 518 */,
+/* 519 */,
+/* 520 */,
+/* 521 */,
+/* 522 */,
+/* 523 */,
+/* 524 */,
+/* 525 */,
+/* 526 */,
+/* 527 */,
+/* 528 */,
+/* 529 */,
+/* 530 */,
+/* 531 */,
+/* 532 */,
+/* 533 */,
+/* 534 */,
+/* 535 */,
+/* 536 */,
+/* 537 */,
+/* 538 */,
+/* 539 */,
+/* 540 */,
+/* 541 */,
+/* 542 */,
+/* 543 */,
+/* 544 */,
+/* 545 */,
+/* 546 */,
+/* 547 */,
+/* 548 */,
+/* 549 */,
+/* 550 */,
+/* 551 */,
+/* 552 */,
+/* 553 */,
+/* 554 */,
+/* 555 */,
+/* 556 */,
+/* 557 */,
+/* 558 */,
+/* 559 */,
+/* 560 */,
+/* 561 */,
+/* 562 */,
+/* 563 */,
+/* 564 */,
+/* 565 */,
+/* 566 */,
+/* 567 */,
+/* 568 */,
+/* 569 */,
+/* 570 */,
+/* 571 */,
+/* 572 */,
+/* 573 */,
+/* 574 */,
+/* 575 */,
+/* 576 */,
+/* 577 */,
+/* 578 */,
+/* 579 */,
+/* 580 */,
+/* 581 */,
+/* 582 */,
+/* 583 */,
+/* 584 */,
+/* 585 */,
+/* 586 */,
+/* 587 */,
+/* 588 */,
+/* 589 */,
+/* 590 */,
+/* 591 */,
+/* 592 */,
+/* 593 */,
+/* 594 */,
+/* 595 */,
+/* 596 */,
+/* 597 */,
+/* 598 */,
+/* 599 */,
+/* 600 */,
+/* 601 */,
+/* 602 */,
+/* 603 */,
+/* 604 */,
+/* 605 */,
+/* 606 */,
+/* 607 */,
+/* 608 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _reactRedux = __webpack_require__(4);
+
+	var _contentOverlay = __webpack_require__(609);
+
+	var _contentOverlay2 = _interopRequireDefault(_contentOverlay);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = (0, _reactRedux.connect)(function (_ref) {
+		var contentSelector = _ref.contentSelector;
+		return { position: contentSelector.position };
+	})(_contentOverlay2.default);
+
+/***/ },
+/* 609 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var contentOverlay = function contentOverlay(props) {
+		var style = Object.assign({}, {
+			top: 0,
+			left: 0,
+			height: 0,
+			width: 0,
+			display: 'block',
+			zIndex: 100,
+			background: '#3d464e',
+			position: 'absolute',
+			opacity: '.5'
+		}, props.position);
+		return _react2.default.createElement('div', { style: style, className: '_ap_contentOverlay _ap_reject' });
+	};
+
+	contentOverlay.propTypes = {
+		position: _react.PropTypes.object
+	};
+
+	exports.default = contentOverlay;
 
 /***/ }
 /******/ ]);

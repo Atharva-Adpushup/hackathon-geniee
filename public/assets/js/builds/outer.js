@@ -1955,12 +1955,13 @@
 		CHANGE_EDITOR_MODE: 'CHANGE_EDITOR_MODE',
 		APPLY_CSS: 'APPLY_CSS',
 		HIGHLIGHT_ADBOX: 'HIGHLIGHT_ADBOX',
-		PREPARE_IN_CONTENT_AREA: 'PREPARE_IN_CONTENT_AREA',
 		SCROLL_SECTION_TO_SCREEN: 'SCROLL_SECTION_TO_SCREEN',
 		TRY_EDITING_XPATH: 'TRY_EDITING_XPATH',
 		SECTION_XPATH_MISSING: 'SECTION_XPATH_MISSING',
 		UPDATE_LAYOUT: 'UPDATE_LAYOUT',
-		HIDE_ELEMENT_SELECTOR: 'HIDE_ELEMENT_SELECTOR'
+		HIDE_ELEMENT_SELECTOR: 'HIDE_ELEMENT_SELECTOR',
+		CONTENT_SELECTOR_MISSING: 'CONTENT_SELECTOR_MISSING',
+		CONTENT_SELECTOR_WORKED: 'CONTENT_SELECTOR_WORKED'
 	},
 	    siteModes = {
 		DRAFT: 2,
@@ -2012,7 +2013,9 @@
 		EDIT_SAMPLE_URL: 'EDIT_SAMPLE_URL',
 		CHANGE_CONTENT_SELECTOR: 'CHANGE_CONTENT_SELECTOR',
 		EDIT_CONTENT_SELECTOR: 'EDIT_CONTENT_SELECTOR',
-		SAVE_BEFORE_AFTER_JS: 'SAVE_BEFORE_AFTER_JS'
+		SAVE_BEFORE_AFTER_JS: 'SAVE_BEFORE_AFTER_JS',
+		CONTENT_SELECTOR_MISSING: 'CONTENT_SELECTOR_MISSING',
+		CONTENT_SELECTOR_WORKED: 'CONTENT_SELECTOR_WORKED'
 
 	},
 	    insertMenuActions = {
@@ -2056,7 +2059,8 @@
 	},
 	    innerActions = {
 		HIDE_ELEMENT_SELECTOR: 'HIDE_ELEMENT_SELECTOR',
-		SET_ELEMENT_SELECTOR_CORDS: 'SET_ELEMENT_SELECTOR_CORDS'
+		SET_ELEMENT_SELECTOR_CORDS: 'SET_ELEMENT_SELECTOR_CORDS',
+		UPDATE_CONTENT_OVERLAY: 'UPDATE_CONTENT_OVERLAY'
 	},
 	    commonSupportedSizes = [{
 		layoutType: 'SQUARE',
@@ -12455,7 +12459,7 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.saveChannelBeforeAfterJs = exports.loadCmsInfo = exports.changeContentSelector = exports.editSampleUrl = exports.createChannel = exports.setActiveChannel = exports.openChannelSuccess = exports.openChannel = undefined;
+	exports.contentSelectorMissing = exports.contentSelectorWorked = exports.saveChannelBeforeAfterJs = exports.loadCmsInfo = exports.changeContentSelector = exports.editSampleUrl = exports.createChannel = exports.setActiveChannel = exports.openChannelSuccess = exports.openChannel = undefined;
 
 	var _commonConsts = __webpack_require__(33);
 
@@ -12521,6 +12525,12 @@
 			cmsInfo: cmsInfo
 		};
 	},
+	    contentSelectorMissing = function contentSelectorMissing(channelId) {
+		return { type: _commonConsts.channelActions.CONTENT_SELECTOR_MISSING, channelId: channelId };
+	},
+	    contentSelectorWorked = function contentSelectorWorked(channelId) {
+		return { type: _commonConsts.channelActions.CONTENT_SELECTOR_WORKED, channelId: channelId };
+	},
 	    saveChannelBeforeAfterJs = function saveChannelBeforeAfterJs(channelId, jsType, code) {
 		return {
 			type: _commonConsts.channelActions.SAVE_BEFORE_AFTER_JS,
@@ -12538,6 +12548,8 @@
 	exports.changeContentSelector = changeContentSelector;
 	exports.loadCmsInfo = loadCmsInfo;
 	exports.saveChannelBeforeAfterJs = saveChannelBeforeAfterJs;
+	exports.contentSelectorWorked = contentSelectorWorked;
+	exports.contentSelectorMissing = contentSelectorMissing;
 
 /***/ },
 /* 215 */
@@ -32331,7 +32343,13 @@
 				return _react2.default.createElement(
 					'div',
 					{ onDoubleClick: onCopy.bind(null, variation), onClick: onClick, className: active ? 'variation-block active-variation' : 'variation-block' },
-					variation.name
+					variation.name,
+					' ',
+					active ? _react2.default.createElement(
+						'span',
+						{ className: 'variation-settings-icon' },
+						_react2.default.createElement('i', { className: 'fa fa-caret-up' })
+					) : ''
 				);
 			}
 		}]);
@@ -34217,15 +34235,11 @@
 
 	var _channelActions = __webpack_require__(214);
 
-	var channelActions = _interopRequireWildcard(_channelActions);
-
 	var _adActions = __webpack_require__(505);
 
 	var _sectionActions = __webpack_require__(502);
 
 	var _editMenuActions = __webpack_require__(506);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34253,7 +34267,7 @@
 					break;
 
 				case _commonConsts.messengerCommands.CM_FRAMELOAD_SUCCESS:
-					dispatch(channelActions.openChannelSuccess(data.channelId));
+					dispatch((0, _channelActions.openChannelSuccess)(data.channelId));
 					break;
 
 				case _commonConsts.messengerCommands.REMOVE_AD:
@@ -34262,6 +34276,14 @@
 
 				case _commonConsts.messengerCommands.REMOVE_SECTION:
 					dispatch((0, _sectionActions.deleteSection)(data.sectionId));
+					break;
+
+				case _commonConsts.messengerCommands.CONTENT_SELECTOR_MISSING:
+					dispatch((0, _channelActions.contentSelectorMissing)(data.channelId));
+					break;
+
+				case _commonConsts.messengerCommands.CONTENT_SELECTOR_WORKED:
+					dispatch((0, _channelActions.contentSelectorWorked)(data.channelId));
 					break;
 
 				case _commonConsts.messengerCommands.SECTION_ALL_XPATHS:
@@ -50176,6 +50198,8 @@
 		variations: [],
 		isOpen: true,
 		isLoading: true,
+		contentSelector: '.post-content',
+		contentSelectorMissing: false,
 		activeVariation: null
 	};
 
@@ -50199,6 +50223,7 @@
 					contentSelector: config.contentSelector,
 					variations: config.variations,
 					activeVariation: null,
+					contentSelectorMissing: false,
 					isLoading: false,
 					isOpen: false
 				};
@@ -50230,6 +50255,12 @@
 			case _commonConsts.channelActions.OPEN_CHANNEL_SUCCESS:
 				return _extends({}, state, { isLoading: false });
 
+			case _commonConsts.channelActions.CONTENT_SELECTOR_MISSING:
+				return _extends({}, state, { contentSelectorMissing: true });
+
+			case _commonConsts.channelActions.CONTENT_SELECTOR_WORKED:
+				return _extends({}, state, { contentSelectorMissing: false });
+
 			default:
 				return state;
 		}
@@ -50251,6 +50282,8 @@
 			case _commonConsts.channelActions.OPEN_CHANNEL_SUCCESS:
 			case _commonConsts.variationActions.ADD_VARIATION:
 			case _commonConsts.variationActions.COPY_VARIATION:
+			case _commonConsts.channelActions.CONTENT_SELECTOR_MISSING:
+			case _commonConsts.channelActions.CONTENT_SELECTOR_WORKED:
 				return _extends({}, state, {
 					byIds: _extends({}, state.byIds, _defineProperty({}, action.channelId, channel(state.byIds[action.channelId], action)))
 				});
@@ -51087,6 +51120,12 @@
 		value: true
 	});
 
+	var _isEqual2 = __webpack_require__(610);
+
+	var _isEqual3 = _interopRequireDefault(_isEqual2);
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	var _variationSelectors = __webpack_require__(481);
 
 	var _channelSelectors = __webpack_require__(475);
@@ -51095,27 +51134,37 @@
 
 	var _messengerHelper = __webpack_require__(504);
 
-	var postMessageHanlder = function postMessageHanlder(store) {
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var getData = function getData(state) {
+		var activeVariation = (0, _variationSelectors.getActiveChannelActiveVariationId)(state),
+		    sections = activeVariation ? (0, _variationSelectors.getVariationSectionsWithAds)(state, { variationId: activeVariation }) : null;
+		return {
+			insertMenuVisible: state.insertMenu.isVisible,
+			editMenuVisible: state.editMenu.isVisible,
+			layout: _extends({}, sections, {
+				contentSelector: (0, _channelSelectors.getActiveChannel)(state).contentSelector,
+				channelId: (0, _channelSelectors.getActiveChannelId)(state)
+			}),
+			activeChannelId: (0, _channelSelectors.getActiveChannelId)(state)
+		};
+	},
+	    postMessageHanlder = function postMessageHanlder(store) {
 		return function (next) {
 			return function (action) {
-				var prevState = store.getState(),
-				    prevActiveVariation = (0, _variationSelectors.getActiveChannelActiveVariationId)(prevState),
-				    prevSections = prevActiveVariation ? (0, _variationSelectors.getVariationSectionsWithAds)(prevState, { variationId: prevActiveVariation }) : null;
+				var prevState = getData(store.getState());
 
 				next(action);
 
-				var nextState = store.getState(),
-				    nextActiveVariation = (0, _variationSelectors.getActiveChannelActiveVariationId)(nextState),
-				    nextSections = nextActiveVariation ? (0, _variationSelectors.getVariationSectionsWithAds)(nextState, { variationId: nextActiveVariation }) : null;
+				var nextState = getData(store.getState());
 
-				if (prevSections !== nextSections) {
-					(0, _messengerHelper.sendMessage)((0, _channelSelectors.getActiveChannelId)(nextState), _commonConsts.messengerCommands.UPDATE_LAYOUT, nextSections);
-					// console.log(nextSections);
-				} else if (prevState.insertMenu.isVisible && !nextState.insertMenu.isVisible || prevState.editMenu.isVisible && !nextState.editMenu.isVisible) {
-					(0, _messengerHelper.sendMessage)((0, _channelSelectors.getActiveChannelId)(nextState), _commonConsts.messengerCommands.HIDE_ELEMENT_SELECTOR, {});
+				if (!(0, _isEqual3.default)(prevState.layout, nextState.layout)) {
+					(0, _messengerHelper.sendMessage)(nextState.activeChannelId, _commonConsts.messengerCommands.UPDATE_LAYOUT, nextState.layout);
+				} else if (prevState.insertMenuVisible && !nextState.insertMenuVisible || prevState.editMenuVisible && !nextState.editMenuVisible) {
+					(0, _messengerHelper.sendMessage)(nextState.activeChannelId, _commonConsts.messengerCommands.HIDE_ELEMENT_SELECTOR, {});
 				}
 
-				return nextState;
+				return store.getState();
 			};
 		};
 	};
@@ -51136,6 +51185,49 @@
 	};
 
 	exports.default = unloadHandler;
+
+/***/ },
+/* 608 */,
+/* 609 */,
+/* 610 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var baseIsEqual = __webpack_require__(108);
+
+	/**
+	 * Performs a deep comparison between two values to determine if they are
+	 * equivalent.
+	 *
+	 * **Note:** This method supports comparing arrays, array buffers, booleans,
+	 * date objects, error objects, maps, numbers, `Object` objects, regexes,
+	 * sets, strings, symbols, and typed arrays. `Object` objects are compared
+	 * by their own, not inherited, enumerable properties. Functions and DOM
+	 * nodes are **not** supported.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Lang
+	 * @param {*} value The value to compare.
+	 * @param {*} other The other value to compare.
+	 * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+	 * @example
+	 *
+	 * var object = { 'a': 1 };
+	 * var other = { 'a': 1 };
+	 *
+	 * _.isEqual(object, other);
+	 * // => true
+	 *
+	 * object === other;
+	 * // => false
+	 */
+	function isEqual(value, other) {
+	  return baseIsEqual(value, other);
+	}
+
+	module.exports = isEqual;
+
 
 /***/ }
 /******/ ]);
