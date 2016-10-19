@@ -1,28 +1,38 @@
+import _ from 'lodash';
 import { getActiveChannelActiveVariationId, getVariationSectionsWithAds } from '../selectors/variationSelectors';
-import { getActiveChannelId } from '../selectors/channelSelectors';
+import { getActiveChannelId, getActiveChannel } from '../selectors/channelSelectors';
 import { messengerCommands } from '../consts/commonConsts';
 import { sendMessage } from '../scripts/messengerHelper';
 
-const postMessageHanlder = store => next => (action) => {
-	const prevState = store.getState(),
-		prevActiveVariation = getActiveChannelActiveVariationId(prevState),
-		prevSections = prevActiveVariation ? getVariationSectionsWithAds(prevState, { variationId: prevActiveVariation }) : null;
 
-	next(action);
+const getData = (state) => {
+		const activeVariation = getActiveChannelActiveVariationId(state),
+			sections = activeVariation ? getVariationSectionsWithAds(state, { variationId: activeVariation }) : null;
+		return {
+			insertMenuVisible: state.insertMenu.isVisible,
+			editMenuVisible: state.editMenu.isVisible,
+			layout: {
+				...sections,
+				contentSelector: getActiveChannel(state).contentSelector,
+				channelId: getActiveChannelId(state)
+			},
+			activeChannelId: getActiveChannelId(state)
+		};
+	},
+	postMessageHanlder = store => next => (action) => {
+		const prevState = getData(store.getState());
 
+		next(action);
 
-	const nextState = store.getState(),
-		nextActiveVariation = getActiveChannelActiveVariationId(nextState),
-		nextSections = nextActiveVariation ? getVariationSectionsWithAds(nextState, { variationId: nextActiveVariation }) : null;
+		const nextState = getData(store.getState());
 
-	if (prevSections !== nextSections) {
-		sendMessage(getActiveChannelId(nextState), messengerCommands.UPDATE_LAYOUT, nextSections);
-		// console.log(nextSections);
-	} else if ((prevState.insertMenu.isVisible && !nextState.insertMenu.isVisible) || (prevState.editMenu.isVisible && !nextState.editMenu.isVisible)) {
-		sendMessage(getActiveChannelId(nextState), messengerCommands.HIDE_ELEMENT_SELECTOR, {});
-	}
+		if (!_.isEqual(prevState.layout, nextState.layout)) {
+			sendMessage(nextState.activeChannelId, messengerCommands.UPDATE_LAYOUT, nextState.layout);
+		} else if ((prevState.insertMenuVisible && !nextState.insertMenuVisible) || (prevState.editMenuVisible && !nextState.editMenuVisible)) {
+			sendMessage(nextState.activeChannelId, messengerCommands.HIDE_ELEMENT_SELECTOR, {});
+		}
 
-	return nextState;
-};
+		return store.getState();
+	};
 
 export default postMessageHanlder;
