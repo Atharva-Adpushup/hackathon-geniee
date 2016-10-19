@@ -13,7 +13,7 @@ const style = {
 		minHeight: '0',
 		minWidth: '0',
 		padding: '0',
-		opacity: '.5',
+		opacity: '.8',
 		overflow: 'hidden',
 	},
 	ElementSelector = (props) => {
