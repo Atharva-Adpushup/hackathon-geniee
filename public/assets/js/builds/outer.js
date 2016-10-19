@@ -32361,14 +32361,23 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactBootstrap = __webpack_require__(222);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var VariationAdder = function VariationAdder(props) {
-		var style = { height: '100%', width: '30px', backgroundColor: 'red', float: 'left' };
 		return _react2.default.createElement(
 			'div',
-			{ style: style, id: 'variationAdder', onClick: props.onNewVariation },
-			'+'
+			{ className: 'variation-adder', id: 'variationAdder', onClick: props.onNewVariation },
+			_react2.default.createElement(
+				_reactBootstrap.OverlayTrigger,
+				{ placement: 'top', overlay: _react2.default.createElement(
+						_reactBootstrap.Tooltip,
+						{ id: 'add-variation-tooltip' },
+						'Add New Variation'
+					) },
+				_react2.default.createElement('i', { className: 'fa fa-plus' })
+			)
 		);
 	};
 

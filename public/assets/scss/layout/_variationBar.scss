@@ -2,27 +2,42 @@
     position: fixed;
     bottom: 0;
     width: 100%;
-    padding: 4px;
     background-color: $whiteColor;
     border-top: 3px solid $primaryColorDark;
+    box-shadow: 0 -3px 5px rgba(0,0,0,.16);
 }
 
 .variation-block {
-    color: $fontColor;
-    float: left;
-	margin: 7px;
-    background-color: $whiteColor;
-	border-radius: 3px;
-    border: 2px solid $primaryColorDark;
-    padding: 5px;
     font-size: 1.2em;
+    color: lighten($fontColor, 4%);
+    float: left;
+    background-color: $whiteColor;
+    padding: 7px 20px;
+    box-shadow: -6px 2px 2px -6px rgba(0,0,0,.25);
     font-family: $fontFamily;
     cursor: pointer;
     @include css3-prefix(transition, all .12s ease-in-out);
 }
 
 .active-variation {
-    box-shadow: 0px 4px 8px rgba(0,0,0,.42);
-    background-color: $primaryColor;
+    box-shadow: inset 0px 0px 8px rgba(0,0,0,.35);
+    background-color: lighten($mainBgColor, 2%);
+}
+
+.variation-adder {
+    font-size: 1.4em;
+    padding: 9.5px 15px;
+    border-radius: 50%;
+    background: $primaryColor;
     color: $whiteColor;
+    position: absolute;
+    right: 25px;
+    top: -22px;
+    box-shadow: 2px 3px 5px rgba(0,0,0,.42);
+    @include css3-prefix(transition, all .12s ease-in-out);
+
+    &:hover {
+        background-color: $primaryColorDark;
+        cursor: pointer;
+    }
 }
