@@ -37,13 +37,12 @@ class variationManager extends React.Component {
 	}
 
 	render() {
-		const props = this.props,
-			style = { position: 'absolute', bottom: '0px', height: '30px', width: '100%', backgroundColor: 'grey' };
+		const props = this.props;	
 		if (!props.activeChannelId) {
 			return null;
 		}
 		return (
-			<div id="variationManager" style={style}>
+			<div id="variationManager" className="variation-bar">
 				{
 					props.variations.map((variation) => (
 						<Variation key={variation.id}

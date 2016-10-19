@@ -1,0 +1,28 @@
+.variation-bar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 4px;
+    background-color: $whiteColor;
+    border-top: 3px solid $primaryColorDark;
+}
+
+.variation-block {
+    color: $fontColor;
+    float: left;
+	margin: 7px;
+    background-color: $whiteColor;
+	border-radius: 3px;
+    border: 2px solid $primaryColorDark;
+    padding: 5px;
+    font-size: 1.2em;
+    font-family: $fontFamily;
+    cursor: pointer;
+    @include css3-prefix(transition, all .12s ease-in-out);
+}
+
+.active-variation {
+    box-shadow: 0px 4px 8px rgba(0,0,0,.42);
+    background-color: $primaryColor;
+    color: $whiteColor;
+}

@@ -3497,4 +3497,35 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
     .networkmanager .panel .panel-body .row.err {
       color: #eb575c; }
 
+.variation-bar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: 4px;
+  background-color: #fff;
+  border-top: 3px solid #cf474b; }
+
+.variation-block {
+  color: #555555;
+  float: left;
+  margin: 7px;
+  background-color: #fff;
+  border-radius: 3px;
+  border: 2px solid #cf474b;
+  padding: 5px;
+  font-size: 1.2em;
+  font-family: "Karla", sans-serif;
+  cursor: pointer;
+  -webkit-transition: all 0.12s ease-in-out;
+  -khtml-transition: all 0.12s ease-in-out;
+  -moz-transition: all 0.12s ease-in-out;
+  -ms-transition: all 0.12s ease-in-out;
+  -o-transition: all 0.12s ease-in-out;
+  transition: all 0.12s ease-in-out; }
+
+.active-variation {
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.42);
+  background-color: #eb575c;
+  color: #fff; }
+
 /*# sourceMappingURL=editor.style.css.map */

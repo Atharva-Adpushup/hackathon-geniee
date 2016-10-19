@@ -32247,14 +32247,13 @@
 			value: function render() {
 				var _this2 = this;
 
-				var props = this.props,
-				    style = { position: 'absolute', bottom: '0px', height: '30px', width: '100%', backgroundColor: 'grey' };
+				var props = this.props;
 				if (!props.activeChannelId) {
 					return null;
 				}
 				return _react2.default.createElement(
 					'div',
-					{ id: 'variationManager', style: style },
+					{ id: 'variationManager', className: 'variation-bar' },
 					props.variations.map(function (variation) {
 						return _react2.default.createElement(_variation2.default, { key: variation.id,
 							variation: variation,
@@ -32296,8 +32295,6 @@
 		value: true
 	});
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _react = __webpack_require__(2);
@@ -32311,12 +32308,6 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var style = {
-		float: 'left',
-		margin: '5px',
-		border: '1px black solid'
-	};
 
 	var Variation = function (_React$Component) {
 		_inherits(Variation, _React$Component);
@@ -32339,7 +32330,7 @@
 
 				return _react2.default.createElement(
 					'div',
-					{ onDoubleClick: onCopy.bind(null, variation), onClick: onClick, className: 'variationBlock', style: _extends({}, style, { color: active ? 'red' : 'white' }) },
+					{ onDoubleClick: onCopy.bind(null, variation), onClick: onClick, className: active ? 'variation-block active-variation' : 'variation-block' },
 					variation.name
 				);
 			}
