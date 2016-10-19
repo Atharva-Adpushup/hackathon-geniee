@@ -3,11 +3,11 @@ import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 
 const VariationAdder = (props) => {
 	return (
-		<div className="variation-adder" id="variationAdder" onClick={props.onNewVariation}>
-			<OverlayTrigger placement="top" overlay={<Tooltip id="add-variation-tooltip">Add New Variation</Tooltip>}>
+		<OverlayTrigger placement="top" overlay={<Tooltip id="add-variation-tooltip">Add New Variation</Tooltip>}>
+			<div className="variation-adder" id="variationAdder" onClick={props.onNewVariation}>
 				<i className="fa fa-plus"></i>
-			</OverlayTrigger>
-		</div>
+			</div>
+		</OverlayTrigger>
 	);
 };
 

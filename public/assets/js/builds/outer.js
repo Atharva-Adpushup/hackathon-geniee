@@ -32367,15 +32367,15 @@
 
 	var VariationAdder = function VariationAdder(props) {
 		return _react2.default.createElement(
-			'div',
-			{ className: 'variation-adder', id: 'variationAdder', onClick: props.onNewVariation },
+			_reactBootstrap.OverlayTrigger,
+			{ placement: 'top', overlay: _react2.default.createElement(
+					_reactBootstrap.Tooltip,
+					{ id: 'add-variation-tooltip' },
+					'Add New Variation'
+				) },
 			_react2.default.createElement(
-				_reactBootstrap.OverlayTrigger,
-				{ placement: 'top', overlay: _react2.default.createElement(
-						_reactBootstrap.Tooltip,
-						{ id: 'add-variation-tooltip' },
-						'Add New Variation'
-					) },
+				'div',
+				{ className: 'variation-adder', id: 'variationAdder', onClick: props.onNewVariation },
 				_react2.default.createElement('i', { className: 'fa fa-plus' })
 			)
 		);
