@@ -383,7 +383,8 @@ const randomStore = [],
 					targetWidth = $target.width(),
 					targetHeight = $target.height(),
 					windowHeight = $(window).height(),
-					rightSpace = vP.width - contextRight;
+					rightSpace = vP.width - contextRight,
+					variationBarHeight = $('#variationManager').height();
 
 				let top,
 					left;
@@ -399,7 +400,7 @@ const randomStore = [],
 				if ((windowHeight - contextTop) >= targetHeight) {
 					top = contextTop;
 				} else {
-					top = windowHeight - targetHeight;
+					top = (windowHeight - targetHeight) - variationBarHeight;
 				}
 
 				return { top, left };
