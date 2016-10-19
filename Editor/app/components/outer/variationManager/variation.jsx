@@ -12,7 +12,7 @@ class Variation extends React.Component {
 	}
 
 	render({ variation, onClick, onCopy, active } = this.props) {
-		return (<div onDoubleClick={onCopy.bind(null, variation)} onClick={active ? this.showVariationSettings : onClick} className={active ? 'variation-block active-variation' : 'variation-block'}>{variation.name} {active ? <span className="variation-settings-icon"><i className="fa fa-caret-up"></i></span> : ''}</div>);
+		return (<div onClick={active ? this.showVariationSettings : onClick} className={active ? 'variation-block active-variation' : 'variation-block'}>{variation.name} {active ? <span className="variation-settings-icon"><i className="fa fa-caret-up"></i></span> : ''}</div>);
 	}
 }
 
