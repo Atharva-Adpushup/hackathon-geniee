@@ -1,7 +1,7 @@
 import { messengerCommands } from 'consts/commonConsts';
 import { showMenu } from 'actions/insertMenuActions';
 import Messenger from 'libs/messenger';
-import * as channelActions from 'actions/channelActions';
+import { openChannelSuccess, contentSelectorMissing, contentSelectorWorked } from 'actions/channelActions';
 import { deleteAd } from 'actions/adActions';
 import { deleteSection } from 'actions/sectionActions';
 import { showMenu as showEditMenu } from '../actions/editMenuActions';
@@ -28,7 +28,7 @@ const messenger = new Messenger(),
 					break;
 
 				case messengerCommands.CM_FRAMELOAD_SUCCESS:
-					dispatch(channelActions.openChannelSuccess(data.channelId));
+					dispatch(openChannelSuccess(data.channelId));
 					break;
 
 				case messengerCommands.REMOVE_AD:
@@ -37,6 +37,14 @@ const messenger = new Messenger(),
 
 				case messengerCommands.REMOVE_SECTION:
 					dispatch(deleteSection(data.sectionId));
+					break;
+
+				case messengerCommands.CONTENT_SELECTOR_MISSING:
+					dispatch(contentSelectorMissing(data.channelId));
+					break;
+
+				case messengerCommands.CONTENT_SELECTOR_WORKED:
+					dispatch(contentSelectorWorked(data.channelId));
 					break;
 
 				case messengerCommands.SECTION_ALL_XPATHS:

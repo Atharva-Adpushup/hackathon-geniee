@@ -1,7 +1,7 @@
 import Utils from 'libs/utils';
+import $ from 'jquery';
 import { hbBoxActions, innerVariationActions, innerActions, messengerCommands } from 'consts/commonConsts';
 import { sendMessage } from 'scripts/inner/messengerHelper';
-import $ from 'jquery';
 
 const highlightElement = ($el) => {
 		const el = $el.get(0);
@@ -16,7 +16,31 @@ const highlightElement = ($el) => {
 
 	hideHighlighter = () => ({ type: hbBoxActions.HIDE_HB_BOX }),
 
-	updateLayout = (variation) => ({ type: innerVariationActions.UPDATE_VARIATION, variation }),
+	updateLayout = (variation) => (
+		(dispatch) => {
+			dispatch({
+				type: innerVariationActions.UPDATE_VARIATION,
+				variation
+			});
+			const $el = variation.contentSelector ? $(variation.contentSelector) : null;
+
+			if (!$el || !$el.length) {
+				dispatch({
+					type: innerActions.UPDATE_CONTENT_OVERLAY,
+					payload: { selector: null, position: { top: 0, left: 0, width: 0, height: 0 } }
+				});
+				if (variation.contentSelector) {
+					sendMessage(messengerCommands.CONTENT_SELECTOR_MISSING, { selector: variation.contentSelector });
+				}
+			} else {
+				sendMessage(messengerCommands.CONTENT_SELECTOR_WORKED, { selector: variation.contentSelector });
+				dispatch({
+					type: innerActions.UPDATE_CONTENT_OVERLAY,
+					payload: { selector: variation.contentSelector, position: Utils.dom.getElementRelativeBounds($el) }
+				});
+			}
+		}
+	),
 
 	hideElementSelector = () => ({ type: innerActions.HIDE_ELEMENT_SELECTOR }),
 

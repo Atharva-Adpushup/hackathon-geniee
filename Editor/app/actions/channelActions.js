@@ -1,5 +1,5 @@
-import {channelActions} from 'consts/commonConsts';
-import {addVariation} from 'actions/variationActions';
+import { channelActions } from 'consts/commonConsts';
+import { addVariation } from 'actions/variationActions';
 import Utils from 'libs/utils';
 
 const openChannel = (channelId) => {
@@ -14,13 +14,13 @@ const openChannel = (channelId) => {
 				type: channelActions.OPEN_CHANNEL_SUCCESS,
 				channelId
 			});
-			const {channelData} = getState();
+			const { channelData } = getState();
 			if (!channelData.byIds[channelId].variations.length) {
-				dispatch(addVariation({name: 'Variation 1'}, channelId));
+				dispatch(addVariation({ name: 'Variation 1' }, channelId));
 			}
 		};
 	},
-	setActiveChannel =  (channelId) => {
+	setActiveChannel = (channelId) => {
 		return {
 			type: channelActions.SET_ACTIVE_CHANNEL,
 			channelId
@@ -29,7 +29,7 @@ const openChannel = (channelId) => {
 	createChannel = (payload) => {
 		return {
 			type: channelActions.CREATE_CHANNEL,
-			payload: Object.assign(payload, {id: Utils.getRandomNumber(), createTs: Math.floor(Date.now() / 1000), variations: []})
+			payload: Object.assign(payload, { id: Utils.getRandomNumber(), createTs: Math.floor(Date.now() / 1000), variations: [] })
 		};
 	},
 	editSampleUrl = (channelId, sampleUrl) => {
@@ -52,6 +52,8 @@ const openChannel = (channelId) => {
 			cmsInfo
 		};
 	},
+	contentSelectorMissing = (channelId) => ({ type: channelActions.CONTENT_SELECTOR_MISSING, channelId }),
+	contentSelectorWorked = (channelId) => ({ type: channelActions.CONTENT_SELECTOR_WORKED, channelId }),
 	saveChannelBeforeAfterJs = (channelId, jsType, code) => {
 		return {
 			type: channelActions.SAVE_BEFORE_AFTER_JS,
@@ -61,5 +63,6 @@ const openChannel = (channelId) => {
 		};
 	};
 
-export {openChannel, openChannelSuccess, setActiveChannel, createChannel,
-	editSampleUrl, changeContentSelector, loadCmsInfo, saveChannelBeforeAfterJs};
+export { openChannel, openChannelSuccess, setActiveChannel, createChannel,
+	editSampleUrl, changeContentSelector, loadCmsInfo, saveChannelBeforeAfterJs,
+	contentSelectorWorked, contentSelectorMissing };

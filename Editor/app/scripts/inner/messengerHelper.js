@@ -13,7 +13,7 @@ const messenger = new Messenger(),
 				break;
 
 			default:
-				messenger.sendMessage(cmd, data);
+				messenger.sendMessage(cmd, { ...data, channelId: window.ADP_CHANNEL_ID });
 				break;
 		}
 	},

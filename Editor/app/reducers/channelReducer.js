@@ -11,6 +11,8 @@ const chnl2 = {
 	variations: [],
 	isOpen: true,
 	isLoading: true,
+	contentSelector: '.post-content',
+	contentSelectorMissing: false,
 	activeVariation: null
 };
 
@@ -31,6 +33,7 @@ const initialState = { activeChannel: 'test2', byIds: { test2: chnl2 } },
 					contentSelector: config.contentSelector,
 					variations: config.variations,
 					activeVariation: null,
+					contentSelectorMissing: false,
 					isLoading: false,
 					isOpen: false
 				};
@@ -62,6 +65,12 @@ const initialState = { activeChannel: 'test2', byIds: { test2: chnl2 } },
 			case channelActions.OPEN_CHANNEL_SUCCESS:
 				return { ...state, isLoading: false };
 
+			case channelActions.CONTENT_SELECTOR_MISSING:
+				return { ...state, contentSelectorMissing: true };
+
+			case channelActions.CONTENT_SELECTOR_WORKED:
+				return { ...state, contentSelectorMissing: false };
+
 			default:
 				return state;
 		}
@@ -83,6 +92,8 @@ const initialState = { activeChannel: 'test2', byIds: { test2: chnl2 } },
 			case channelActions.OPEN_CHANNEL_SUCCESS:
 			case variationActions.ADD_VARIATION:
 			case variationActions.COPY_VARIATION:
+			case channelActions.CONTENT_SELECTOR_MISSING:
+			case channelActions.CONTENT_SELECTOR_WORKED:
 				return { ...state,
 					byIds: {
 						...state.byIds,
