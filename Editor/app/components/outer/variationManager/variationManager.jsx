@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import Utils from 'libs/utils.js';
 import Variation from './variation.jsx';
+import VariationPanel from './variationPanel';
 import VariationAdder from './variationAdder.jsx';
 
 const getLastVariationNumber = function (variations) {
@@ -13,9 +14,20 @@ const getLastVariationNumber = function (variations) {
 class variationManager extends React.Component {
 	constructor(props) {
 		super(props);
+		this.state = {
+			panelVariation: null
+		};
 		this.createVariation = this.createVariation.bind(this);
-		this.deleteVariation = this.deleteVariation.bind(this);
-		this.copyVariation = this.copyVariation.bind(this);
+		this.setPanelVariation = this.setPanelVariation.bind(this);
+	}
+
+
+	setPanelVariation(variation) {
+		if (variation !== this.state.panelVariation) {
+			this.setState({ panelVariation: variation });
+		} else {
+			this.setState({ panelVariation: null });
+		}
 	}
 
 	createVariation() {
@@ -44,9 +56,9 @@ class variationManager extends React.Component {
 		}
 		return (
 			<div>
-				<div className="variation-settings">
-					<div style={style}>Variation settings will come here</div>
-				</div>
+				{this.state.panelVariation &&
+					(<div className="variation-settings" > <VariationPanel variation={this.state.panelVariation} /> </div>)
+				}
 				<div id="variationManager" className="variation-bar">
 					{
 						props.variations.map((variation) => (
@@ -54,10 +66,8 @@ class variationManager extends React.Component {
 								variation={variation}
 								active={variation.id === props.activeVariation.id}
 								onClick={props.setActiveVariation.bind(null, variation.id)}
-								onDoubleClick={this.deleteVariation}
-								onCopy={this.copyVariation}
-								onRename={props.renameVariation.bind(null, variation.id)}
-		/>
+								onSetPanelVariation={this.setPanelVariation}
+       />
 						))
 					}
 					<VariationAdder onNewVariation={this.createVariation} />

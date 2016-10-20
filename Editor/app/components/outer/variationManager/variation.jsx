@@ -1,25 +1,15 @@
 import React, { PropTypes } from 'react';
-import ReactDOM from 'react-dom';
-import $ from 'jquery';
 
-class Variation extends React.Component {
-	constructor() {
-		super();
-	}
-
-	showVariationSettings() {
-		$('.variation-settings').toggleClass('variation-settings-active');
-	}
-
-	render({ variation, onClick, onCopy, active } = this.props) {
-		return (<div onClick={active ? this.showVariationSettings : onClick} className={active ? 'variation-block active-variation' : 'variation-block'}>{variation.name} {active ? <span className="variation-settings-icon"><i className="fa fa-caret-up"></i></span> : ''}</div>);
-	}
-}
+const Variation = ({ variation, onSetPanelVariation, onClick, active }) => (
+	<div onClick={active ? onSetPanelVariation.bind(null, variation) : onClick} className={active ? 'variation-block active-variation' : 'variation-block'}>
+		{variation.name} {active ? <span className="variation-settings-icon"><i className="fa fa-caret-up" /></span> : ''}
+	</div>);
 
 Variation.propTypes = {
 	variation: PropTypes.object.isRequired,
+	active: PropTypes.bool.isRequired,
 	onClick: PropTypes.func.isRequired,
-	onDoubleClick: PropTypes.func.isRequired
+	onSetPanelVariation: PropTypes.func.isRequired
 };
 
 export default Variation;
