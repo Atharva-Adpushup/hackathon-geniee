@@ -94,6 +94,7 @@ const initialState = { activeChannel: 'test2', byIds: { test2: chnl2 } },
 			case variationActions.COPY_VARIATION:
 			case channelActions.CONTENT_SELECTOR_MISSING:
 			case channelActions.CONTENT_SELECTOR_WORKED:
+			case variationActions.DELETE_VARIATION:
 				return { ...state,
 					byIds: {
 						...state.byIds,
@@ -101,7 +102,6 @@ const initialState = { activeChannel: 'test2', byIds: { test2: chnl2 } },
 					}
 				};
 
-			case variationActions.DELETE_VARIATION:
 			case variationActions.SET_ACTIVE_VARIATION:
 				return { ...state,
 					byIds: {

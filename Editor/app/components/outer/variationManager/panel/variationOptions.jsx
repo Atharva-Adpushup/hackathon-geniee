@@ -13,7 +13,7 @@ const variationOtions = (props) => {
 			Delete Variation
 				</Col>
 				<Col className="u-padding-l10px" xs={4}>
-					<Button className="btn-lightBg btn-save btn-block" onClick={onDeleteVariation.bind(null, variation.id)} type="submit">Save</Button>
+					<Button className="btn-lightBg btn-save btn-block" onClick={onDeleteVariation.bind(null, variation.id, channelId)} type="submit">Save</Button>
 				</Col>
 			</Row>
 			<Row>

@@ -46,4 +46,4 @@ const getAllVariations = (state) => state.variationByIds,
 
 export { getAllVariations, getVariationSectionsWithAds, getActiveChannelActiveVariation,
 	getActiveChannelVariations, getActiveChannelActiveVariationId, getActiveChannelVariationsWithAds,
-	getChannelVariationsWithAds };
+	getChannelVariationsWithAds, getChannelVariations };

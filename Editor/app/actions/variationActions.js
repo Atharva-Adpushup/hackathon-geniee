@@ -1,7 +1,7 @@
 import { variationActions } from 'consts/commonConsts';
 import _ from 'lodash';
 import Utils from 'libs/utils';
-import { getChannelVariationsWithAds, getVariationSectionsWithAds } from 'selectors/variationSelectors';
+import { getChannelVariations, getChannelVariationsWithAds, getVariationSectionsWithAds } from 'selectors/variationSelectors';
 
 const getLastVariationNumber = function (variations) {
 		const names = variations.map(({ name }) => {
@@ -64,23 +64,16 @@ const getLastVariationNumber = function (variations) {
 			}
 		});
 	},
-	deleteVariation = (variationId) => ({
-		type: variationActions.DELETE_VARIATION,
-		variationId
-	}),
-	setActiveVariation = (variationId) => {
-		return {
-			type: variationActions.SET_ACTIVE_VARIATION,
-			variationId
-		};
+	deleteVariation = (variationId, channelId) => (dispatch, getState) => {
+		const variations = getChannelVariations(getState(), { channelId });
+		if (variations.length > 1) {
+			dispatch({ type: variationActions.DELETE_VARIATION, variationId, channelId });
+		} else {
+			alert('can\'t delete varaiation');
+		}
 	},
-	updateVariation = (variationId, payload) => {
-		return {
-			type: variationActions.UPDATE_VARIATION,
-			variationId,
-			payload
-		};
-	};
+	setActiveVariation = (variationId) => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
+	updateVariation = (variationId, payload) => ({ type: variationActions.UPDATE_VARIATION, variationId, payload });
 
 
 export { addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation };
