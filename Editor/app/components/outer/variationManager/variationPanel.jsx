@@ -12,7 +12,7 @@ class VariationPanel extends React.Component {
 
 	render() {
 		const { variation } = this.props;
-		return (<TabPanel tabPosition="left" onActivate={(index) => console.log(`Tab ${index} was activated!`)}>
+		return (<div className="variation-settings"><TabPanel tabPosition="left" onActivate={(index) => console.log(`Tab ${index} was activated!`)}>
 			<div tabTitle="First tab">
 				{variation.name}
 			</div>
@@ -20,7 +20,7 @@ class VariationPanel extends React.Component {
 			<div tabTitle="Second tab">
 				Lorem ipsum Sunt nisi sint.
 			</div>
-		</TabPanel>);
+		</TabPanel></div>);
 	}
 }
 

@@ -19,6 +19,7 @@ class variationManager extends React.Component {
 		};
 		this.createVariation = this.createVariation.bind(this);
 		this.setPanelVariation = this.setPanelVariation.bind(this);
+		this.setActiveVariation = this.setActiveVariation.bind(this);
 	}
 
 
@@ -30,7 +31,13 @@ class variationManager extends React.Component {
 		}
 	}
 
+	setActiveVariation(variationId) {
+		this.setState({ panelVariation: null });
+		this.props.setActiveVariation(variationId);
+	}
+
 	createVariation() {
+		this.setState({ panelVariation: null });
 		this.props.createVariation({
 			name: `Variation ${getLastVariationNumber(this.props.variations) + 1}`
 		}, this.props.activeChannelId);
@@ -57,7 +64,7 @@ class variationManager extends React.Component {
 		return (
 			<div>
 				{this.state.panelVariation &&
-					(<div className="variation-settings" > <VariationPanel variation={this.state.panelVariation} /> </div>)
+					(<VariationPanel variation={this.state.panelVariation} />)
 				}
 				<div id="variationManager" className="variation-bar">
 					{
@@ -65,7 +72,7 @@ class variationManager extends React.Component {
 							<Variation key={variation.id}
 								variation={variation}
 								active={variation.id === props.activeVariation.id}
-								onClick={props.setActiveVariation.bind(null, variation.id)}
+								onClick={this.setActiveVariation}
 								onSetPanelVariation={this.setPanelVariation}
        />
 						))

@@ -12312,13 +12312,13 @@
 
 	var _reactRedux = __webpack_require__(4);
 
-	var _configureStore = __webpack_require__(584);
+	var _configureStore = __webpack_require__(638);
 
 	var _configureStore2 = _interopRequireDefault(_configureStore);
 
-	var _messengerHelper = __webpack_require__(506);
+	var _messengerHelper = __webpack_require__(561);
 
-	var _unloadHandler = __webpack_require__(610);
+	var _unloadHandler = __webpack_require__(664);
 
 	var _unloadHandler2 = _interopRequireDefault(_unloadHandler);
 
@@ -12365,11 +12365,11 @@
 
 	var _variationManagerContainer2 = _interopRequireDefault(_variationManagerContainer);
 
-	var _insertMenuContainer = __webpack_require__(493);
+	var _insertMenuContainer = __webpack_require__(548);
 
 	var _insertMenuContainer2 = _interopRequireDefault(_insertMenuContainer);
 
-	var _editMenuContainer = __webpack_require__(509);
+	var _editMenuContainer = __webpack_require__(564);
 
 	var _editMenuContainer2 = _interopRequireDefault(_editMenuContainer);
 
@@ -32140,7 +32140,7 @@
 
 	var _channelSelectors = __webpack_require__(477);
 
-	var _variationSelectors = __webpack_require__(483);
+	var _variationSelectors = __webpack_require__(538);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -32200,7 +32200,11 @@
 
 	var _variation2 = _interopRequireDefault(_variation);
 
-	var _variationAdder = __webpack_require__(482);
+	var _variationPanel = __webpack_require__(482);
+
+	var _variationPanel2 = _interopRequireDefault(_variationPanel);
+
+	var _variationAdder = __webpack_require__(537);
 
 	var _variationAdder2 = _interopRequireDefault(_variationAdder);
 
@@ -32229,15 +32233,34 @@
 
 			var _this = _possibleConstructorReturn(this, (variationManager.__proto__ || Object.getPrototypeOf(variationManager)).call(this, props));
 
+			_this.state = {
+				panelVariation: null
+			};
 			_this.createVariation = _this.createVariation.bind(_this);
-			_this.deleteVariation = _this.deleteVariation.bind(_this);
-			_this.copyVariation = _this.copyVariation.bind(_this);
+			_this.setPanelVariation = _this.setPanelVariation.bind(_this);
+			_this.setActiveVariation = _this.setActiveVariation.bind(_this);
 			return _this;
 		}
 
 		_createClass(variationManager, [{
+			key: 'setPanelVariation',
+			value: function setPanelVariation(variation) {
+				if (variation !== this.state.panelVariation) {
+					this.setState({ panelVariation: variation });
+				} else {
+					this.setState({ panelVariation: null });
+				}
+			}
+		}, {
+			key: 'setActiveVariation',
+			value: function setActiveVariation(variationId) {
+				this.setState({ panelVariation: null });
+				this.props.setActiveVariation(variationId);
+			}
+		}, {
 			key: 'createVariation',
 			value: function createVariation() {
+				this.setState({ panelVariation: null });
 				this.props.createVariation({
 					name: 'Variation ' + (getLastVariationNumber(this.props.variations) + 1)
 				}, this.props.activeChannelId);
@@ -32269,15 +32292,7 @@
 				return _react2.default.createElement(
 					'div',
 					null,
-					_react2.default.createElement(
-						'div',
-						{ className: 'variation-settings' },
-						_react2.default.createElement(
-							'div',
-							{ style: style },
-							'Variation settings will come here'
-						)
-					),
+					this.state.panelVariation && _react2.default.createElement(_variationPanel2.default, { variation: this.state.panelVariation }),
 					_react2.default.createElement(
 						'div',
 						{ id: 'variationManager', className: 'variation-bar' },
@@ -32285,10 +32300,8 @@
 							return _react2.default.createElement(_variation2.default, { key: variation.id,
 								variation: variation,
 								active: variation.id === props.activeVariation.id,
-								onClick: props.setActiveVariation.bind(null, variation.id),
-								onDoubleClick: _this2.deleteVariation,
-								onCopy: _this2.copyVariation,
-								onRename: props.renameVariation.bind(null, variation.id)
+								onClick: _this2.setActiveVariation,
+								onSetPanelVariation: _this2.setPanelVariation
 							});
 						}),
 						_react2.default.createElement(_variationAdder2.default, { onNewVariation: this.createVariation })
@@ -32323,19 +32336,60 @@
 		value: true
 	});
 
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Variation = function Variation(_ref) {
+		var variation = _ref.variation;
+		var onSetPanelVariation = _ref.onSetPanelVariation;
+		var onClick = _ref.onClick;
+		var active = _ref.active;
+		return _react2.default.createElement(
+			'div',
+			{ onClick: active ? onSetPanelVariation.bind(null, variation) : onClick.bind(null, variation.id), className: active ? 'variation-block active-variation' : 'variation-block' },
+			variation.name,
+			' ',
+			active ? _react2.default.createElement(
+				'span',
+				{ className: 'variation-settings-icon' },
+				_react2.default.createElement('i', { className: 'fa fa-caret-up' })
+			) : ''
+		);
+	};
+
+	Variation.propTypes = {
+		variation: _react.PropTypes.object.isRequired,
+		active: _react.PropTypes.bool.isRequired,
+		onClick: _react.PropTypes.func.isRequired,
+		onSetPanelVariation: _react.PropTypes.func.isRequired
+	};
+
+	exports.default = Variation;
+
+/***/ },
+/* 482 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _react = __webpack_require__(2);
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactDom = __webpack_require__(3);
+	var _reactTabPanel = __webpack_require__(483);
 
-	var _reactDom2 = _interopRequireDefault(_reactDom);
+	var _reactTabPanel2 = _interopRequireDefault(_reactTabPanel);
 
-	var _jquery = __webpack_require__(29);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
+	__webpack_require__(533);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -32345,57 +32399,5908 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Variation = function (_React$Component) {
-		_inherits(Variation, _React$Component);
+	var VariationPanel = function (_React$Component) {
+		_inherits(VariationPanel, _React$Component);
 
-		function Variation() {
-			_classCallCheck(this, Variation);
+		function VariationPanel(props) {
+			_classCallCheck(this, VariationPanel);
 
-			return _possibleConstructorReturn(this, (Variation.__proto__ || Object.getPrototypeOf(Variation)).call(this));
+			var _this = _possibleConstructorReturn(this, (VariationPanel.__proto__ || Object.getPrototypeOf(VariationPanel)).call(this, props));
+
+			_this.state = {
+				activeTav: 0
+			};
+			return _this;
 		}
 
-		_createClass(Variation, [{
-			key: 'showVariationSettings',
-			value: function showVariationSettings() {
-				(0, _jquery2.default)('.variation-settings').toggleClass('variation-settings-active');
-			}
-		}, {
+		_createClass(VariationPanel, [{
 			key: 'render',
 			value: function render() {
-				var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.props;
-
-				var variation = _ref.variation;
-				var onClick = _ref.onClick;
-				var onCopy = _ref.onCopy;
-				var active = _ref.active;
+				var variation = this.props.variation;
 
 				return _react2.default.createElement(
 					'div',
-					{ onClick: active ? this.showVariationSettings : onClick, className: active ? 'variation-block active-variation' : 'variation-block' },
-					variation.name,
-					' ',
-					active ? _react2.default.createElement(
-						'span',
-						{ className: 'variation-settings-icon' },
-						_react2.default.createElement('i', { className: 'fa fa-caret-up' })
-					) : ''
+					{ className: 'variation-settings' },
+					_react2.default.createElement(
+						_reactTabPanel2.default,
+						{ tabPosition: 'left', onActivate: function onActivate(index) {
+								return console.log('Tab ' + index + ' was activated!');
+							} },
+						_react2.default.createElement(
+							'div',
+							{ tabTitle: 'First tab' },
+							variation.name
+						),
+						_react2.default.createElement(
+							'div',
+							{ tabTitle: 'Second tab' },
+							'Lorem ipsum Sunt nisi sint.'
+						)
+					)
 				);
 			}
 		}]);
 
-		return Variation;
+		return VariationPanel;
 	}(_react2.default.Component);
 
-	Variation.propTypes = {
-		variation: _react.PropTypes.object.isRequired,
-		onClick: _react.PropTypes.func.isRequired,
-		onDoubleClick: _react.PropTypes.func.isRequired
-	};
-
-	exports.default = Variation;
+	exports.default = VariationPanel;
 
 /***/ },
-/* 482 */
+/* 483 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.TabBody = exports.TabStrip = exports.Tab = undefined;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(3);
+
+	var _reactClass = __webpack_require__(484);
+
+	var _reactClass2 = _interopRequireDefault(_reactClass);
+
+	var _objectAssign = __webpack_require__(485);
+
+	var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+	var _reactFlex = __webpack_require__(486);
+
+	var _join = __webpack_require__(494);
+
+	var _join2 = _interopRequireDefault(_join);
+
+	var _getTransitionEnd = __webpack_require__(495);
+
+	var _getTransitionEnd2 = _interopRequireDefault(_getTransitionEnd);
+
+	var _TabStrip = __webpack_require__(496);
+
+	var _TabStrip2 = _interopRequireDefault(_TabStrip);
+
+	var _Body = __webpack_require__(520);
+
+	var _Body2 = _interopRequireDefault(_Body);
+
+	var _assignDefined = __webpack_require__(500);
+
+	var _assignDefined2 = _interopRequireDefault(_assignDefined);
+
+	var _tabPositions = __webpack_require__(497);
+
+	var _tabPositions2 = _interopRequireDefault(_tabPositions);
+
+	var _bemFactory = __webpack_require__(501);
+
+	var _bemFactory2 = _interopRequireDefault(_bemFactory);
+
+	var _reactStyleNormalizer = __webpack_require__(521);
+
+	var _reactStyleNormalizer2 = _interopRequireDefault(_reactStyleNormalizer);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var CLASS_NAME = 'react-tab-panel';
+	var bem = (0, _bemFactory2.default)(CLASS_NAME);
+	var m = function m(name) {
+	  return bem(null, name);
+	};
+
+	var transitionWrapperClassName = CLASS_NAME + '__transition-wrapper';
+
+	var clone = function clone(child, fn) {
+	  var childProps = child.props;
+
+	  child = (0, _react.cloneElement)(child, (0, _objectAssign2.default)({}, childProps, fn(childProps, child)));
+
+	  return child;
+	};
+
+	var cloneDisplayNone = function cloneDisplayNone(child) {
+	  return clone(child, function (childProps) {
+	    var childStyle = childProps ? childProps.style : null;
+
+	    return {
+	      style: (0, _objectAssign2.default)({}, childStyle, { display: 'none' })
+	    };
+	  });
+	};
+
+	var cloneWithClassName = function cloneWithClassName(className, child) {
+	  return clone(child, function (childProps) {
+	    return {
+	      className: (0, _join2.default)(childProps && childProps.className, className)
+	    };
+	  });
+	};
+
+	var STRATEGIES = {
+
+	  one: function one(children, activeIndex) {
+	    return children[activeIndex];
+	  },
+
+	  all: function all(children, activeIndex) {
+	    return children.map(function (child, index) {
+	      if (index !== activeIndex) {
+	        child = cloneDisplayNone(child);
+	      }
+
+	      return child;
+	    });
+	  }
+	};
+
+	var IN_CLASS_NAME = 'react-tab-panel__content--in';
+	var OUT_CLASS_NAME = 'react-tab-panel__content--out';
+
+	var Tab = function (_Component) {
+	  _inherits(Tab, _Component);
+
+	  function Tab() {
+	    _classCallCheck(this, Tab);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Tab).apply(this, arguments));
+	  }
+
+	  _createClass(Tab, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement('div', this.props);
+	    }
+	  }]);
+
+	  return Tab;
+	}(_reactClass2.default);
+
+	Tab.defaultProps = {
+	  isTabPanelTab: true
+	};
+
+	var TabPanel = function (_Component2) {
+	  _inherits(TabPanel, _Component2);
+
+	  function TabPanel(props) {
+	    _classCallCheck(this, TabPanel);
+
+	    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(TabPanel).call(this, props));
+
+	    _this2.state = {
+	      oldActiveIndex: null,
+	      activeIndex: props.defaultActiveIndex || 0
+	    };
+	    return _this2;
+	  }
+
+	  _createClass(TabPanel, [{
+	    key: 'prepareClassName',
+	    value: function prepareClassName(props) {
+	      return (0, _join2.default)(props.className, CLASS_NAME, m('orientation-' + (props.vertical ? 'vertical' : 'horizontal')), m('theme-' + props.theme), m('tab-align-' + props.tabAlign), m('tab-position-' + props.tabPosition));
+	    }
+	  }, {
+	    key: 'prepareProps',
+	    value: function prepareProps(thisProps) {
+	      var props = (0, _objectAssign2.default)({}, thisProps);
+
+	      var tabStrip = {};
+	      var tabBody = void 0;
+
+	      var tabStripIndex = void 0;
+	      var tabBodyIndex = void 0;
+
+	      var children = [];
+
+	      var tabs = [];
+
+	      _react2.default.Children.toArray(props.children).forEach(function (child, index) {
+
+	        if (!child) {
+	          return;
+	        }
+
+	        var childProps = child.props;
+
+	        if (childProps) {
+	          if (childProps.isTabStrip) {
+	            tabStrip = childProps;
+	            tabStripIndex = index;
+	            return;
+	          }
+
+	          if (childProps.isTabBody) {
+	            tabBody = childProps;
+	            tabBodyIndex = index;
+	            return;
+	          }
+	        }
+	      });
+
+	      var addTab = function addTab(child) {
+	        if (!child) {
+	          return null;
+	        }
+
+	        var childProps = child.props || {};
+
+	        if (childProps.isTabPanelTab) {
+	          children.push(childProps.children);
+
+	          if (props.transition && child.props.children) {
+	            console.warn('You must only have one child in a Tab component when `transition` is true.');
+	          }
+	        } else {
+	          children.push(child);
+	        }
+
+	        var tab = void 0;
+	        if (childProps.isTabPanelTab) {
+	          tab = (0, _objectAssign2.default)({}, childProps, {
+	            children: null
+	          });
+	        } else {
+	          tab = (0, _objectAssign2.default)({
+	            title: childProps.tabTitle || '',
+	            disabled: childProps.disabled
+	          }, childProps.tabProps);
+	        }
+
+	        tabs.push(tab);
+	      };
+
+	      _react2.default.Children.toArray(tabBody ? tabBody.children : props.children).forEach(addTab);
+
+	      props.tabs = tabs;
+
+	      props.activeIndex = this.prepareActiveIndex(props);
+	      props.tabPosition = this.prepareTabPosition(props, { tabStripIndex: tabStripIndex, tabBodyIndex: tabBodyIndex });
+
+	      props.vertical = props.vertical && (props.tabPosition == 'left' || props.tabPosition == 'right');
+	      props.tabStrip = tabStrip;
+	      props.tabBody = tabBody;
+	      props.children = children;
+
+	      if (props.transition) {
+	        props.initialStrategy = props.strategy;
+	        props.strategy = this.transitionStrategy;
+	      }
+
+	      return props;
+	    }
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this.body.addEventListener((0, _getTransitionEnd2.default)(), this.onBodyTransitionEnd);
+	    }
+	  }, {
+	    key: 'componentWillUnmount',
+	    value: function componentWillUnmount() {
+	      this.body && this.body.removeEventListener((0, _getTransitionEnd2.default)(), this.onBodyTransitionEnd);
+	    }
+	  }, {
+	    key: 'onBodyTransitionEnd',
+	    value: function onBodyTransitionEnd() {
+	      if (!this.state.transitioning) {
+	        return;
+	      }
+
+	      this.setState({
+	        transitioning: null,
+	        transitionInProgress: false,
+	        wrapperStyle: null,
+	        oldActiveIndex: null
+	      });
+	    }
+	  }, {
+	    key: 'componentWillUpdate',
+	    value: function componentWillUpdate(nextProps, nextState) {
+	      var _this3 = this;
+
+	      var activeIndex = this.p.activeIndex;
+	      var newActiveIndex = this.prepareActiveIndex(nextProps, nextState);
+
+	      if (newActiveIndex != activeIndex && nextProps.transition) {
+	        var _ret = function () {
+
+	          if (!_this3.wrapper) {
+	            return {
+	              v: void 0
+	            };
+	          }
+
+	          var dir = newActiveIndex > activeIndex ? 1 : -1;
+
+	          var getActiveChild = function getActiveChild() {
+	            return _this3.p.initialStrategy == 'one' ? _this3.wrapper.firstChild : _this3.wrapper.children[activeIndex];
+	          };
+	          var getOtherChild = function getOtherChild() {
+	            return _this3.p.initialStrategy == 'one' ? dir == 1 ? _this3.wrapper.lastChild : _this3.wrapper.firstChild : _this3.wrapper.children[newActiveIndex];
+	          };
+
+	          var childHeight = function childHeight() {
+	            var child = getActiveChild();
+	            return child && child.offsetHeight;
+	          };
+
+	          var activeChild = getActiveChild();
+
+	          //at this point only 1 child should be rendered
+	          var currentChildHeight = activeChild && activeChild.offsetHeight || 0;
+
+	          var wrapperStyle = {
+	            height: _this3.wrapper.offsetHeight
+	          };
+
+	          if (_this3.state.transitioning) {
+	            _this3.onBodyTransitionEnd();
+	          }
+
+	          _this3.setState({
+	            transitioning: dir,
+	            wrapperStyle: {
+	              height: wrapperStyle.height
+	            },
+	            oldActiveIndex: activeIndex
+	          }, function () {
+	            if (!_this3.wrapper) {
+	              _this3.onBodyTransitionEnd();
+	            }
+	            // debugger
+	            var otherChild = getOtherChild();
+
+	            var wrapperHeight = wrapperStyle.height - currentChildHeight + (otherChild && otherChild.offsetHeight || 0);
+
+	            _this3.setState({
+	              transitioning: dir,
+	              transitionInProgress: true,
+	              wrapperStyle: { height: wrapperHeight }
+	            });
+	          });
+	        }();
+
+	        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	      }
+	    }
+	  }, {
+	    key: 'transitionStrategy',
+	    value: function transitionStrategy(children, activeIndex) {
+	      var _this4 = this;
+
+	      var strategy = this.p.initialStrategy;
+	      var strategyFn = STRATEGIES[strategy];
+
+	      if (!strategyFn) {
+	        console.warn('Strategy not supported for transition');
+	      }
+
+	      if (this.state.oldActiveIndex != null) {
+
+	        if (strategy == 'one') {
+	          (function () {
+	            var indexes = [_this4.state.oldActiveIndex, activeIndex];
+
+	            //render them in the correct order
+	            indexes.sort();
+
+	            var firstIndex = indexes[0];
+	            var firstIn = firstIndex == activeIndex;
+
+	            var secondIndex = indexes[1];
+
+	            var firstClassName = firstIn ? IN_CLASS_NAME : OUT_CLASS_NAME;
+	            var secondClassName = firstIn ? OUT_CLASS_NAME : IN_CLASS_NAME;
+
+	            children = [clone(children[firstIndex], function (childProps) {
+	              return {
+	                style: _this4.addTransitionDuration(childProps && childProps.style),
+	                className: (0, _join2.default)(childProps && childProps.className, firstClassName)
+	              };
+	            }), clone(children[secondIndex], function (childProps) {
+	              return {
+	                style: _this4.addTransitionDuration(childProps && childProps.style),
+	                className: (0, _join2.default)(childProps && childProps.className, secondClassName)
+	              };
+	            })];
+	          })();
+	        } else {
+
+	          //strategy == 'all'
+	          children = children.map(function (child, index) {
+	            if (index != activeIndex && index != _this4.state.oldActiveIndex) {
+	              child = cloneDisplayNone(child);
+	            } else {
+	              (function () {
+	                var className = index == activeIndex ? IN_CLASS_NAME : OUT_CLASS_NAME;
+
+	                child = clone(child, function (childProps) {
+	                  return {
+	                    className: (0, _join2.default)(childProps && childProps.className, className),
+	                    style: _this4.addTransitionDuration(childProps.style)
+	                  };
+	                });
+	              })();
+	            }
+
+	            return child;
+	          });
+	        }
+	      } else {
+	        children = strategyFn(children, activeIndex);
+	      }
+
+	      var wrapperStyle = this.addTransitionDuration(this.state.wrapperStyle);
+
+	      return _react2.default.createElement('div', {
+	        ref: function ref(c) {
+	          return _this4.wrapper = c;
+	        },
+	        style: wrapperStyle,
+	        className: (0, _join2.default)(transitionWrapperClassName, this.props.vertical ? transitionWrapperClassName + '--vertical' : ''),
+	        children: children
+	      });
+	    }
+	  }, {
+	    key: 'addTransitionDuration',
+	    value: function addTransitionDuration(style) {
+	      if (this.props.transitionDuration) {
+	        style = (0, _objectAssign2.default)({}, style, (0, _reactStyleNormalizer2.default)({
+	          transitionDuration: this.props.transitionDuration
+	        }));
+	      }
+
+	      return style;
+	    }
+	  }, {
+	    key: 'prepareTabPosition',
+	    value: function prepareTabPosition(props, _ref) {
+	      var tabStripIndex = _ref.tabStripIndex;
+	      var tabBodyIndex = _ref.tabBodyIndex;
+
+	      var tabPosition = props.tabPosition in _tabPositions2.default ? props.tabPosition : 'top';
+
+	      if (!props.tabPosition && tabStripIndex !== undefined && tabBodyIndex !== undefined && tabStripIndex > tabBodyIndex) {
+	        tabPosition = 'bottom';
+	      }
+
+	      return tabPosition;
+	    }
+	  }, {
+	    key: 'prepareActiveIndex',
+	    value: function prepareActiveIndex(props, state) {
+	      return props.activeIndex == null ? (state || this.state).activeIndex : props.activeIndex;
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+
+	      var props = this.p = this.prepareProps(this.props);
+
+	      var className = this.prepareClassName(props);
+
+	      var tabStripFirst = props.tabPosition == 'top' || props.tabPosition == 'left';
+	      var row = props.tabPosition == 'left' || props.tabPosition == 'right';
+
+	      var rowColConfig = _defineProperty({}, row ? 'row' : 'column', true);
+
+	      return _react2.default.createElement(
+	        _reactFlex.Flex,
+	        _extends({ wrap: false, alignItems: 'stretch' }, rowColConfig, { inline: true }, props, { tabIndex: null, className: className }),
+	        tabStripFirst && this.renderTabStrip(),
+	        this.renderBody(),
+	        !tabStripFirst && this.renderTabStrip()
+	      );
+	    }
+	  }, {
+	    key: 'onActivate',
+	    value: function onActivate(activeIndex) {
+
+	      if (this.props.activeIndex == null) {
+	        this.setState({
+	          activeIndex: activeIndex
+	        });
+	      }
+
+	      this.props.onActivate(activeIndex);
+	    }
+	  }, {
+	    key: 'renderTabStrip',
+	    value: function renderTabStrip() {
+
+	      var tabs = this.p.tabs;
+
+	      var _p = this.p;
+	      var activeIndex = _p.activeIndex;
+	      var activateEvent = _p.activateEvent;
+	      var onAddNew = _p.onAddNew;
+	      var onCloseTab = _p.onCloseTab;
+	      var closeable = _p.closeable;
+	      var scroller = _p.scroller;
+	      var scrollSpringConfig = _p.scrollSpringConfig;
+	      var scrollOnClick = _p.scrollOnClick;
+	      var tabFactory = _p.tabFactory;
+	      var tabStripFactory = _p.tabStripFactory;
+	      var theme = _p.theme;
+	      var tabAlign = _p.tabAlign;
+	      var tabStyle = _p.tabStyle;
+	      var tabPosition = _p.tabPosition;
+	      var tabEllipsis = _p.tabEllipsis;
+	      var tabIndex = _p.tabIndex;
+	      var vertical = _p.vertical;
+
+
+	      var newTabStripProps = {
+	        activateEvent: activateEvent,
+	        onActivate: this.onActivate,
+	        activeIndex: activeIndex,
+	        tabFactory: tabFactory,
+	        tabAlign: tabAlign,
+	        theme: theme,
+	        defaultTabs: tabs,
+	        tabPosition: tabPosition,
+	        inTabPanel: true
+	      };
+
+	      (0, _assignDefined2.default)(newTabStripProps, {
+	        onAddNew: onAddNew,
+	        onCloseTab: onCloseTab,
+	        closeable: closeable,
+	        scroller: scroller,
+	        scrollSpringConfig: scrollSpringConfig,
+	        scrollOnClick: scrollOnClick,
+	        vertical: vertical,
+	        tabStyle: tabStyle,
+	        tabEllipsis: tabEllipsis,
+	        tabIndex: tabIndex
+	      });
+
+	      var tabStripProps = (0, _objectAssign2.default)({ tabFactory: tabFactory }, this.p.tabStrip, newTabStripProps);
+
+	      var tabStrip = void 0;
+
+	      if (tabStripFactory) {
+	        tabStrip = tabStripFactory(tabStripProps);
+	      }
+
+	      if (tabStrip === undefined) {
+	        tabStrip = _react2.default.createElement(_TabStrip2.default, tabStripProps);
+	      }
+
+	      return tabStrip;
+	    }
+	  }, {
+	    key: 'applyRenderStrategy',
+	    value: function applyRenderStrategy(_ref2) {
+	      var activeIndex = _ref2.activeIndex;
+	      var children = _ref2.children;
+	      var strategy = _ref2.strategy;
+
+
+	      var fn = STRATEGIES[strategy];
+
+	      if (typeof fn != 'function') {
+	        fn = typeof strategy == 'function' ? strategy : STRATEGIES.all;
+	      }
+
+	      return fn(children, activeIndex);
+	    }
+	  }, {
+	    key: 'renderBody',
+	    value: function renderBody() {
+	      var _this5 = this;
+
+	      var _p2 = this.p;
+	      var activeIndex = _p2.activeIndex;
+	      var transition = _p2.transition;
+	      var vertical = _p2.vertical;
+
+
+	      var bodyChildren = this.applyRenderStrategy(this.p);
+
+	      var tabBody = this.p.tabBody || {};
+
+	      var bodyProps = (0, _objectAssign2.default)({}, this.p.tabBody, {
+	        vertical: vertical,
+	        transition: transition,
+	        transitionInProgress: this.state.transitionInProgress,
+	        activeIndex: activeIndex,
+	        tabPosition: this.p.tabPosition,
+	        children: bodyChildren
+	      });
+
+	      return _react2.default.createElement(_Body2.default, _extends({
+	        ref: function ref(b) {
+	          return _this5.body = (0, _reactDom.findDOMNode)(b);
+	        },
+	        transitioning: this.state.transitioning
+	      }, bodyProps, this.state.bodyProps));
+	    }
+	  }]);
+
+	  return TabPanel;
+	}(_reactClass2.default);
+
+	exports.default = TabPanel;
+
+
+	TabPanel.propTypes = {
+	  tabStripFactory: _react.PropTypes.func,
+	  tabFactory: _react.PropTypes.func,
+	  strategy: _react.PropTypes.oneOfType([_react.PropTypes.oneOf(['one', 'all']), _react.PropTypes.func])
+	};
+
+	TabPanel.defaultProps = {
+	  theme: 'default',
+	  tabAlign: 'start',
+	  onActivate: function onActivate() {},
+	  strategy: 'one'
+	};
+
+	exports.Tab = Tab;
+	exports.TabStrip = _TabStrip2.default;
+	exports.TabBody = _Body2.default;
+
+/***/ },
+/* 484 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var React = __webpack_require__(2);
+	var assign = __webpack_require__(485);
+
+	function autoBind(object) {
+	  var proto = object.constructor.prototype;
+
+	  var names = Object.getOwnPropertyNames(proto).filter(function (key) {
+	    return key != 'constructor' && key != 'render' && typeof proto[key] == 'function';
+	  });
+
+	  names.push('setState');
+	  names.forEach(function (key) {
+	    object[key] = object[key].bind(object);
+	  });
+
+	  return object;
+	}
+
+	var ReactClass = (function (_React$Component) {
+	  _inherits(ReactClass, _React$Component);
+
+	  function ReactClass(props) {
+	    _classCallCheck(this, ReactClass);
+
+	    _get(Object.getPrototypeOf(ReactClass.prototype), 'constructor', this).call(this, props);
+	    autoBind(this);
+	  }
+
+	  _createClass(ReactClass, [{
+	    key: 'prepareProps',
+	    value: function prepareProps(thisProps) {
+
+	      var props = assign({}, thisProps);
+
+	      props.style = this.prepareStyle(props);
+	      props.className = this.prepareClassName(props);
+
+	      return props;
+	    }
+	  }, {
+	    key: 'prepareClassName',
+	    value: function prepareClassName(props) {
+	      var className = props.className || '';
+
+	      var defaultProps = this.constructor.defaultProps;
+
+	      if (defaultProps && defaultProps.defaultClassName != null) {
+	        className += ' ' + defaultProps.defaultClassName;
+	      }
+
+	      return className;
+	    }
+	  }, {
+	    key: 'prepareStyle',
+	    value: function prepareStyle(props) {
+	      var defaultStyle;
+
+	      if (this.constructor.defaultProps) {
+	        defaultStyle = this.constructor.defaultProps.defaultStyle;
+	      }
+
+	      return assign({}, defaultStyle, props.style);
+	    }
+	  }]);
+
+	  return ReactClass;
+	})(React.Component);
+
+	module.exports = ReactClass;
+
+/***/ },
+/* 485 */
+/***/ function(module, exports) {
+
+	'use strict';
+	/* eslint-disable no-unused-vars */
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
+	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+	function toObject(val) {
+		if (val === null || val === undefined) {
+			throw new TypeError('Object.assign cannot be called with null or undefined');
+		}
+
+		return Object(val);
+	}
+
+	function shouldUseNative() {
+		try {
+			if (!Object.assign) {
+				return false;
+			}
+
+			// Detect buggy property enumeration order in older V8 versions.
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+			var test1 = new String('abc');  // eslint-disable-line
+			test1[5] = 'de';
+			if (Object.getOwnPropertyNames(test1)[0] === '5') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test2 = {};
+			for (var i = 0; i < 10; i++) {
+				test2['_' + String.fromCharCode(i)] = i;
+			}
+			var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+				return test2[n];
+			});
+			if (order2.join('') !== '0123456789') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test3 = {};
+			'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+				test3[letter] = letter;
+			});
+			if (Object.keys(Object.assign({}, test3)).join('') !==
+					'abcdefghijklmnopqrst') {
+				return false;
+			}
+
+			return true;
+		} catch (e) {
+			// We don't expect any of the above to throw, but better to be safe.
+			return false;
+		}
+	}
+
+	module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+		var from;
+		var to = toObject(target);
+		var symbols;
+
+		for (var s = 1; s < arguments.length; s++) {
+			from = Object(arguments[s]);
+
+			for (var key in from) {
+				if (hasOwnProperty.call(from, key)) {
+					to[key] = from[key];
+				}
+			}
+
+			if (Object.getOwnPropertySymbols) {
+				symbols = Object.getOwnPropertySymbols(from);
+				for (var i = 0; i < symbols.length; i++) {
+					if (propIsEnumerable.call(from, symbols[i])) {
+						to[symbols[i]] = from[symbols[i]];
+					}
+				}
+			}
+		}
+
+		return to;
+	};
+
+
+/***/ },
+/* 486 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.Item = exports.Flex = undefined;
+
+	var _Flex = __webpack_require__(487);
+
+	Object.defineProperty(exports, 'Flex', {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_Flex).default;
+	  }
+	});
+
+	var _Item = __webpack_require__(493);
+
+	Object.defineProperty(exports, 'Item', {
+	  enumerable: true,
+	  get: function get() {
+	    return _interopRequireDefault(_Item).default;
+	  }
+	});
+
+	var _Flex2 = _interopRequireDefault(_Flex);
+
+	var _Item2 = _interopRequireDefault(_Item);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = {
+	  Flex: _Flex2.default,
+	  Item: _Item2.default
+	};
+
+/***/ },
+/* 487 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _objectAssign = __webpack_require__(485);
+
+	var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+	var _reactClass = __webpack_require__(484);
+
+	var _reactClass2 = _interopRequireDefault(_reactClass);
+
+	var _join = __webpack_require__(488);
+
+	var _join2 = _interopRequireDefault(_join);
+
+	var _props2className = __webpack_require__(489);
+
+	var _props2className2 = _interopRequireDefault(_props2className);
+
+	var _cleanup = __webpack_require__(492);
+
+	var _cleanup2 = _interopRequireDefault(_cleanup);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Flex = function (_Component) {
+	  _inherits(Flex, _Component);
+
+	  function Flex() {
+	    _classCallCheck(this, Flex);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Flex).apply(this, arguments));
+	  }
+
+	  _createClass(Flex, [{
+	    key: 'render',
+	    value: function render() {
+	      var props = this.props;
+	      var className = (0, _join2.default)('react-flex', (0, _props2className2.default)(props));
+
+	      var allProps = (0, _objectAssign2.default)({}, props);
+
+	      (0, _cleanup2.default)(allProps);
+
+	      allProps.className = className;
+
+	      if (props.factory) {
+	        return props.factory(allProps);
+	      }
+
+	      return _react2.default.createElement('div', allProps);
+	    }
+	  }]);
+
+	  return Flex;
+	}(_reactClass2.default);
+
+	Flex.defaultProps = {
+	  row: true,
+	  wrap: true,
+	  alignItems: 'center',
+	  display: 'flex'
+	};
+
+	Flex.propTypes = {
+
+	  flex: _react.PropTypes.oneOfType([_react.PropTypes.string, _react.PropTypes.number, _react.PropTypes.bool]),
+
+	  display: _react.PropTypes.oneOf(['flex', 'inline-flex']),
+
+	  inline: _react.PropTypes.bool,
+
+	  reverse: _react.PropTypes.bool,
+
+	  row: _react.PropTypes.bool,
+	  column: _react.PropTypes.bool,
+	  wrap: _react.PropTypes.bool,
+
+	  alignItems: _react.PropTypes.string,
+	  alignContent: _react.PropTypes.string,
+	  justifyContent: _react.PropTypes.string
+	};
+
+	exports.default = Flex;
+
+/***/ },
+/* 488 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var notEmpty = function notEmpty(v) {
+	  return !!v;
+	};
+
+	exports.default = function () {
+	  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	    args[_key] = arguments[_key];
+	  }
+
+	  return args.filter(notEmpty).join(' ');
+	};
+
+/***/ },
+/* 489 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _join = __webpack_require__(488);
+
+	var _join2 = _interopRequireDefault(_join);
+
+	var _props2flex = __webpack_require__(490);
+
+	var _props2flex2 = _interopRequireDefault(_props2flex);
+
+	var _prefix = __webpack_require__(491);
+
+	var _prefix2 = _interopRequireDefault(_prefix);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var PREFIX = _prefix2.default;
+
+	exports.default = function (props) {
+
+	  var column = !!props.column;
+	  var row = !column && !!props.row;
+	  var reverse = props.reverse ? '-reverse' : '';
+
+	  var flex = (0, _props2flex2.default)(props);
+
+	  var flexGrow = props.flexGrow;
+	  var flexShrink = props.flexShrink;
+	  var flexBasis = props.flexBasis;
+	  var display = props.inline ? 'inline-flex' : props.display;
+
+	  var className = (0, _join2.default)(props.className, props.alignItems ? PREFIX + '--align-items-' + props.alignItems : null, props.alignContent ? PREFIX + '--align-content-' + props.alignContent : null, props.justifyContent ? PREFIX + '--justify-content-' + props.justifyContent : null, props.wrap ? PREFIX + '--wrap' : null, props.alignSelf ? PREFIX + '--align-self-' + props.alignSelf : null, row ? PREFIX + '--row' + reverse : null, column ? PREFIX + '--column' + reverse : null,
+
+	  // more like flex item related
+	  flex != null ? PREFIX + '--flex-' + flex : null, flexGrow != null ? PREFIX + '--flex-grow-' + flexGrow : null, flexShrink != null ? PREFIX + '--flex-shrink-' + flexShrink : null, flexBasis != null ? PREFIX + '--flex-basis-' + flexBasis : null, display != null ? PREFIX + '--display-' + display : null);
+
+	  return className;
+	};
+
+/***/ },
+/* 490 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	exports.default = function (props) {
+	  return props.flex === false ? 0 : props.flex === true ? 1 : props.flex;
+	};
+
+/***/ },
+/* 491 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = 'react-flex-v2';
+
+/***/ },
+/* 492 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	exports.default = function (props) {
+	  delete props.display;
+	  delete props.wrap;
+	  delete props.row;
+	  delete props.column;
+	  delete props.alignItems;
+	  delete props.alignSelf;
+	  delete props.alignContent;
+	  delete props.justifyContent;
+	  delete props.flex;
+	  delete props.flexGrow;
+	  delete props.flexShrink;
+	  delete props.flexBasis;
+	  delete props.inline;
+	  delete props.wrap;
+	};
+
+/***/ },
+/* 493 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _objectAssign = __webpack_require__(485);
+
+	var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+	var _reactClass = __webpack_require__(484);
+
+	var _reactClass2 = _interopRequireDefault(_reactClass);
+
+	var _join = __webpack_require__(488);
+
+	var _join2 = _interopRequireDefault(_join);
+
+	var _props2className = __webpack_require__(489);
+
+	var _props2className2 = _interopRequireDefault(_props2className);
+
+	var _cleanup = __webpack_require__(492);
+
+	var _cleanup2 = _interopRequireDefault(_cleanup);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var FlexItem = function (_Component) {
+	  _inherits(FlexItem, _Component);
+
+	  function FlexItem() {
+	    _classCallCheck(this, FlexItem);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(FlexItem).apply(this, arguments));
+	  }
+
+	  _createClass(FlexItem, [{
+	    key: 'render',
+	    value: function render() {
+
+	      var props = this.props;
+	      var className = (0, _join2.default)('react-flex-item', (0, _props2className2.default)(props));
+
+	      var allProps = (0, _objectAssign2.default)({}, props);
+
+	      (0, _cleanup2.default)(allProps);
+
+	      allProps.className = className;
+
+	      if (props.factory) {
+	        return props.factory(allProps);
+	      }
+
+	      return _react2.default.createElement('div', allProps);
+	    }
+	  }]);
+
+	  return FlexItem;
+	}(_reactClass2.default);
+
+	FlexItem.defaultProps = {
+	  flex: 1
+	};
+
+	FlexItem.propTypes = {
+	  display: _react.PropTypes.oneOf(['flex', 'inline-flex']),
+	  inline: function inline(props, propName) {
+	    if (props[propName] !== undefined) {
+	      return new Error('"inline" prop should not be used on "Item". Use "display=\'inline-flex\'" instead');
+	    }
+	  },
+
+	  flex: _react.PropTypes.any,
+	  flexGrow: _react.PropTypes.any,
+	  flexShrink: _react.PropTypes.any,
+	  flexBasis: _react.PropTypes.any
+	};
+
+	exports.default = FlexItem;
+
+/***/ },
+/* 494 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	exports.default = function () {
+	  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	    args[_key] = arguments[_key];
+	  }
+
+	  return args.filter(function (x) {
+	    return !!x;
+	  }).join(' ');
+	};
+
+/***/ },
+/* 495 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/**
+	 * Transition-end mapping
+	 */
+
+	var map = {
+	  'WebkitTransition': 'webkitTransitionEnd',
+	  'MozTransition': 'transitionend',
+	  'OTransition': 'oTransitionEnd',
+	  'msTransition': 'MSTransitionEnd',
+	  'transition': 'transitionend'
+	};
+
+	var EL;
+	var RESULT;
+
+	exports.default = function () {
+	  if (!EL) {
+	    EL = document.createElement('p');
+	  }
+
+	  if (RESULT) {
+	    return RESULT;
+	  }
+
+	  for (var transition in map) {
+	    if (null != EL.style[transition]) {
+	      RESULT = map[transition];
+	      break;
+	    }
+	  }
+
+	  return RESULT;
+	};
+
+/***/ },
+/* 496 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(3);
+
+	var _reactClass = __webpack_require__(484);
+
+	var _reactClass2 = _interopRequireDefault(_reactClass);
+
+	var _objectAssign = __webpack_require__(485);
+
+	var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+	var _reactFlex = __webpack_require__(486);
+
+	var _tabPositions = __webpack_require__(497);
+
+	var _tabPositions2 = _interopRequireDefault(_tabPositions);
+
+	var _join = __webpack_require__(494);
+
+	var _join2 = _interopRequireDefault(_join);
+
+	var _TabTitle = __webpack_require__(498);
+
+	var _TabTitle2 = _interopRequireDefault(_TabTitle);
+
+	var _bemFactory = __webpack_require__(501);
+
+	var _bemFactory2 = _interopRequireDefault(_bemFactory);
+
+	var _Scroller = __webpack_require__(503);
+
+	var _Scroller2 = _interopRequireDefault(_Scroller);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var CLASS_NAME = 'react-tab-panel__tab-strip';
+
+	var NEW_TAB = _react2.default.createElement(
+	  'svg',
+	  { height: '20', viewBox: '0 0 24 24', width: '20', xmlns: 'http://www.w3.org/2000/svg' },
+	  _react2.default.createElement('path', { d: 'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z' }),
+	  _react2.default.createElement('path', { d: 'M0 0h24v24H0z', fill: 'none' })
+	);
+
+	var bem = (0, _bemFactory2.default)(CLASS_NAME);
+	var m = function m(name) {
+	  return bem(null, name);
+	};
+
+	var TabStrip = function (_Component) {
+	  _inherits(TabStrip, _Component);
+
+	  function TabStrip(props) {
+	    _classCallCheck(this, TabStrip);
+
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TabStrip).call(this, props));
+
+	    _this.tabNodes = [];
+	    _this.state = {
+	      focused: false,
+	      activeIndex: props.defaultActiveIndex || 0
+	    };
+	    return _this;
+	  }
+
+	  _createClass(TabStrip, [{
+	    key: 'componentDidUpdate',
+	    value: function componentDidUpdate(prevProps, prevState) {
+	      var _this2 = this;
+
+	      var oldIndex = this.prepareActiveIndex(prevProps, prevState);
+
+	      if (oldIndex != this.p.activeIndex) {
+	        (function () {
+	          var index = _this2.p.activeIndex;
+
+	          _this2.scrollToTab(index);
+
+	          setTimeout(function () {
+	            if (index === _this2.p.activeIndex) {
+	              _this2.scrollToTab(index);
+	            }
+	          }, 100);
+	        })();
+	      }
+	    }
+	  }, {
+	    key: 'scrollToTab',
+	    value: function scrollToTab(index) {
+	      var domNode = this.tabNodes[index];
+
+	      domNode && this.scroller && this.scroller.scrollIntoView(domNode);
+	    }
+	  }, {
+	    key: 'prepareClassName',
+	    value: function prepareClassName(props) {
+	      return (0, _join2.default)(props.className, CLASS_NAME, m('theme-' + props.theme), m('tab-align-' + props.tabAlign), m('tab-position-' + props.tabPosition), m('orientation-' + (props.vertical ? 'vertical' : 'horizontal')), props.focused && m('focused'), props.vertical && m('vertical'), props.firstActive && m('first-active'), props.lastActive && m('last-active'));
+	    }
+	  }, {
+	    key: 'prepareActiveIndex',
+	    value: function prepareActiveIndex(props, state) {
+	      return props.activeIndex == null ? (state || this.state).activeIndex : props.activeIndex;
+	    }
+	  }, {
+	    key: 'prepareProps',
+	    value: function prepareProps(thisProps) {
+	      var props = (0, _objectAssign2.default)({}, thisProps);
+
+	      var activeIndex = this.prepareActiveIndex(props);
+
+	      props.activeIndex = activeIndex;
+	      props.tabs = props.defaultTabs || props.tabs;
+
+	      if (props.onAddNew) {
+	        props.tabs = [].concat(_toConsumableArray(props.tabs), [{
+	          title: NEW_TAB,
+	          selectable: false,
+	          closeable: false,
+	          onMouseDown: function onMouseDown() {
+	            props.onAddNew();
+	          }
+	        }]);
+	      }
+	      props.tabIndex = typeof props.tabIndex === 'boolean' ? props.tabIndex ? 0 : -1 : props.tabIndex;
+
+	      this.tabNodes.length = props.tabs.length;
+
+	      props.firstActive = activeIndex === 0;
+	      props.lastActive = activeIndex === props.tabs.length - 1;
+	      props.allTabsProps = [];
+
+	      props.onFocus = this.onFocus;
+	      props.onBlur = this.onBlur;
+	      props.onKeyDown = this.onKeyDown;
+	      props.focused = this.state.focused;
+
+	      return props;
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this3 = this;
+
+	      var props = this.p = this.prepareProps(this.props);
+
+	      var className = this.prepareClassName(props);
+
+	      var beforeClassName = (0, _join2.default)(bem('before'), props.firstActive && bem('before', 'before-active'));
+
+	      var afterClassName = (0, _join2.default)(bem('after'), props.lastActive && bem('after', 'after-active'));
+
+	      var tabPosition = props.tabPosition;
+
+
+	      var row = tabPosition == 'top' || tabPosition == 'bottom';
+
+	      var renderProps = (0, _objectAssign2.default)({}, props, {
+	        alignItems: 'stretch',
+	        row: row,
+	        column: !row,
+	        wrap: false,
+	        className: className
+	      });
+
+	      var childProps = {
+	        className: bem('inner'),
+	        alignItems: "stretch",
+	        row: row,
+	        column: !row,
+	        wrap: false,
+	        children: [_react2.default.createElement(_reactFlex.Item, { className: beforeClassName }), props.tabs.map(this.renderTab), _react2.default.createElement(_reactFlex.Item, { className: afterClassName })]
+	      };
+
+	      var renderChildren = [];
+
+	      if (props.scroller === false) {
+	        return _react2.default.createElement(
+	          _reactFlex.Flex,
+	          renderProps,
+	          _react2.default.createElement(_reactFlex.Flex, childProps)
+	        );
+	      }
+
+	      return _react2.default.createElement(_Scroller2.default, _extends({
+	        ref: function ref(c) {
+	          return _this3.scroller = _this3.scroller || c;
+	        }
+	      }, renderProps, {
+	        childProps: childProps
+	      }));
+	    }
+	  }, {
+	    key: 'onResize',
+	    value: function onResize() {}
+	  }, {
+	    key: 'onFocus',
+	    value: function onFocus(event) {
+	      this.setState({
+	        focused: true
+	      });
+
+	      this.props.onFocus(event, (0, _reactDom.findDOMNode)(this));
+	    }
+	  }, {
+	    key: 'onBlur',
+	    value: function onBlur(event) {
+	      this.setState({
+	        focused: false
+	      });
+
+	      this.props.onBlur(event);
+	    }
+	  }, {
+	    key: 'onKeyDown',
+	    value: function onKeyDown(event) {
+
+	      var key = event.key;
+
+	      if (typeof this.props.onKeyDown == 'function') {
+	        this.props.onKeyDown(event);
+	      }
+
+	      var dir = 0;
+
+	      if (key == 'ArrowLeft' || key == 'ArrowUp') {
+	        dir = -1;
+	      } else if (key == 'ArrowRight' || key == 'ArrowDown') {
+	        dir = 1;
+	      }
+
+	      if (dir) {
+	        return this.onNavigate(dir);
+	      }
+
+	      if (key === 'Home') {
+	        return this.onNavigateFirst();
+	      }
+
+	      if (key == 'End') {
+	        return this.onNavigateLast();
+	      }
+	    }
+	  }, {
+	    key: 'renderTab',
+	    value: function renderTab(tab, index, array) {
+	      var _this4 = this;
+
+	      var props = this.p;
+	      var activeIndex = props.activeIndex;
+	      var activateEvent = props.activateEvent;
+	      var inTabPanel = props.inTabPanel;
+	      var tabStyle = props.tabStyle;
+	      var tabEllipsis = props.tabEllipsis;
+	      var vertical = props.vertical;
+	      var tabAlign = props.tabAlign;
+	      var closeable = props.closeable;
+
+
+	      if (typeof tab == 'string') {
+	        tab = {
+	          title: tab
+	        };
+	      }
+
+	      var first = index === 0;
+	      var last = props.tabs.length - 1 === index;
+
+	      var beforeActive = activeIndex - 1 === index;
+	      var afterActive = activeIndex + 1 === index;
+	      var active = index === activeIndex;
+
+	      var tabProps = (0, _objectAssign2.default)({ closeable: closeable }, tab, {
+	        ref: function ref(b) {
+	          return _this4.tabNodes[index] = (0, _reactDom.findDOMNode)(b);
+	        },
+	        index: index,
+	        activateEvent: activateEvent,
+	        activeIndex: activeIndex,
+	        active: active,
+	        first: first,
+	        last: last,
+	        beforeActive: beforeActive,
+	        afterActive: afterActive,
+	        tabAlign: tabAlign,
+
+	        tabTitle: tab.title,
+	        children: tab.title,
+
+	        vertical: vertical,
+	        tabStyle: tabStyle,
+	        tabEllipsis: tabEllipsis,
+
+	        key: index
+	      });
+
+	      tabProps.onActivate = this.onActivate.bind(this, index);
+	      tabProps.onClose = this.onClose.bind(this, index, tab);
+
+	      delete tabProps.title;
+
+	      props.allTabsProps.push(tabProps);
+
+	      var tabTitle = void 0;
+
+	      if (props.tabFactory) {
+	        tabTitle = props.tabFactory(tabProps);
+	      }
+
+	      if (tabTitle === undefined) {
+	        tabTitle = _react2.default.createElement(_TabTitle2.default, tabProps);
+	      }
+
+	      var betweenClassName = (0, _join2.default)(bem('between'), beforeActive && bem('between', 'before-active'), active && bem('between', 'after-active'));
+
+	      return [tabTitle, !last && _react2.default.createElement(_reactFlex.Item, { className: betweenClassName })];
+	    }
+	  }, {
+	    key: 'onNavigate',
+	    value: function onNavigate(dir) {
+	      var index = this.p.activeIndex;
+	      this.onActivate(this.getAvailableIndexFrom(index, dir, this.props.rotateNavigation));
+	    }
+	  }, {
+	    key: 'onNavigateFirst',
+	    value: function onNavigateFirst() {
+	      this.onActivate(this.getFirstAvailableIndex());
+	    }
+	  }, {
+	    key: 'onNavigateLast',
+	    value: function onNavigateLast() {
+	      this.onActivate(this.getLastAvailableIndex());
+	    }
+	  }, {
+	    key: 'onClose',
+	    value: function onClose(index, tabProps) {
+	      this.props.onCloseTab(index);
+
+	      if (tabProps.onClose) {
+	        tabProps.onClose();
+	      }
+	    }
+	  }, {
+	    key: 'onActivate',
+	    value: function onActivate(activeIndex) {
+	      if (!this.p.allTabsProps[activeIndex]) {
+	        return;
+	      }
+
+	      var tabProps = this.p.tabs[activeIndex];
+
+	      if (!this.isSelectableTab(tabProps)) {
+	        return;
+	      }
+
+	      if (tabProps && tabProps.onActivate) {
+	        if (tabProps.onActivate() === false) {
+	          return;
+	        }
+	      }
+
+	      if (this.props.activeIndex == null) {
+	        this.setState({
+	          activeIndex: activeIndex
+	        });
+	      }
+
+	      if (activeIndex != this.p.activeIndex) {
+	        this.props.onActivate(activeIndex);
+	      }
+	    }
+	  }, {
+	    key: 'getAvailableIndexFrom',
+	    value: function getAvailableIndexFrom(index, dir, rotate) {
+	      var tabs = this.p.allTabsProps || [];
+	      var len = tabs.length;
+
+	      var firstIndex = void 0;
+	      var lastIndex = void 0;
+
+	      if (rotate) {
+	        firstIndex = this.getFirstAvailableIndex();
+	        lastIndex = this.getLastAvailableIndex();
+	      }
+
+	      var currentTab = void 0;
+
+	      var adjustIndex = function adjustIndex(index) {
+	        if (rotate) {
+	          if (index < firstIndex) {
+	            index = lastIndex;
+	          } else if (index > lastIndex) {
+	            index = firstIndex;
+	          }
+	        }
+
+	        return index;
+	      };
+
+	      var currentIndex = adjustIndex(index + dir);
+
+	      while (currentTab = tabs[currentIndex]) {
+	        if (this.isSelectableTab(currentTab)) {
+	          return currentIndex;
+	        }
+
+	        currentIndex = adjustIndex(currentIndex + dir);
+	      }
+
+	      return -1;
+	    }
+	  }, {
+	    key: 'isSelectableTab',
+	    value: function isSelectableTab(tabOrIndex) {
+	      var tab = tabOrIndex;
+	      if (typeof tabOrIndex == 'number') {
+	        tab = this.p.allTabsProps[tabOrIndex];
+	      }
+	      return !tab.disabled && tab.selectable !== false;
+	    }
+	  }, {
+	    key: 'getFirstAvailableIndex',
+	    value: function getFirstAvailableIndex() {
+	      return this.getAvailableIndexFrom(-1, 1);
+	    }
+	  }, {
+	    key: 'getLastAvailableIndex',
+	    value: function getLastAvailableIndex() {
+	      var tabs = this.p.allTabsProps || [];
+
+	      return this.getAvailableIndexFrom(tabs.length, -1);
+	    }
+	  }]);
+
+	  return TabStrip;
+	}(_reactClass2.default);
+
+	exports.default = TabStrip;
+
+
+	TabStrip.propTypes = _defineProperty({
+	  tabStyle: _react.PropTypes.oneOfType([_react.PropTypes.func, _react.PropTypes.object]),
+
+	  rotateNavigation: _react.PropTypes.bool,
+
+	  scroller: _react.PropTypes.oneOf([true, false, 'auto']),
+
+	  tabIndex: _react.PropTypes.oneOfType([_react.PropTypes.bool, _react.PropTypes.number]),
+	  tabEllipsis: _react.PropTypes.bool,
+	  tabPosition: _react.PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
+
+	  vertical: function vertical(props, propName) {
+	    var value = props[propName];
+
+	    if (value && props.tabPosition != 'left' && props.tabPosition != 'right') {
+	      return new Error('You can only have "vertical" tabs if "tabPosition" is one of "left", "right".');
+	    }
+	  },
+
+	  tabAlign: _react.PropTypes.oneOf(['start', 'center', 'end', 'space-around', 'space-between', 'stretch'])
+
+	}, 'tabPosition', _react.PropTypes.oneOf(Object.keys(_tabPositions2.default)));
+
+	TabStrip.defaultProps = {
+	  scroller: 'auto',
+	  scrollOnClick: false,
+	  rotateNavigation: true,
+	  tabIndex: true,
+	  tabAlign: 'start',
+	  tabPosition: 'top',
+	  theme: 'default',
+	  onActivate: function onActivate() {},
+	  onCloseTab: function onCloseTab() {},
+	  onBlur: function onBlur() {},
+	  onFocus: function onFocus() {},
+	  isTabStrip: true
+	};
+
+/***/ },
+/* 497 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  top: 1,
+	  bottom: 1,
+	  left: 1,
+	  right: 1
+	};
+
+/***/ },
+/* 498 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(3);
+
+	var _reactClass = __webpack_require__(484);
+
+	var _reactClass2 = _interopRequireDefault(_reactClass);
+
+	var _objectAssign = __webpack_require__(485);
+
+	var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+	var _reactNotifyResize = __webpack_require__(499);
+
+	var _join = __webpack_require__(494);
+
+	var _join2 = _interopRequireDefault(_join);
+
+	var _assignDefined = __webpack_require__(500);
+
+	var _assignDefined2 = _interopRequireDefault(_assignDefined);
+
+	var _bemFactory = __webpack_require__(501);
+
+	var _bemFactory2 = _interopRequireDefault(_bemFactory);
+
+	var _FlexiBox = __webpack_require__(502);
+
+	var _FlexiBox2 = _interopRequireDefault(_FlexiBox);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var toNumber = function toNumber(n) {
+	  return parseInt(n, 10);
+	};
+
+	var stopPropagation = function stopPropagation(e) {
+	  return e.stopPropagation();
+	};
+
+	var getBorderPaddingSize = function getBorderPaddingSize(node) {
+	  var computedStyle = global.getComputedStyle(node);
+
+	  return {
+	    left: toNumber(computedStyle.borderLeftWidth) + toNumber(computedStyle.paddingLeft),
+	    right: toNumber(computedStyle.borderRightWidth) + toNumber(computedStyle.paddingRight),
+	    top: toNumber(computedStyle.borderTopWidth) + toNumber(computedStyle.paddingTop),
+	    bottom: toNumber(computedStyle.borderBottomWidth) + toNumber(computedStyle.paddingBottom)
+	  };
+	};
+
+	var CLASS_NAME = 'react-tab-panel__tab-title';
+	var bem = (0, _bemFactory2.default)(CLASS_NAME);
+	var m = function m(name) {
+	  return bem(null, name);
+	};
+
+	var invert = function invert(_ref) {
+	  var width = _ref.width;
+	  var height = _ref.height;
+
+	  return {
+	    height: width,
+	    width: height
+	  };
+	};
+
+	var HIDDEN_STYLE = {
+	  position: 'absolute',
+	  visibility: 'hidden',
+	  width: 'auto',
+	  minWidth: 'auto',
+	  maxWidth: 'auto',
+	  height: 'auto',
+	  minHeight: 'auto',
+	  maxHeight: 'auto'
+	};
+
+	var TabTitle = function (_Component) {
+	  _inherits(TabTitle, _Component);
+
+	  function TabTitle(props) {
+	    _classCallCheck(this, TabTitle);
+
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TabTitle).call(this, props));
+
+	    _this.state = {
+	      style: {},
+	      size: {},
+	      hiddenSize: {},
+	      innerSize: {}
+	    };
+	    return _this;
+	  }
+
+	  _createClass(TabTitle, [{
+	    key: 'prepareClassName',
+	    value: function prepareClassName(props) {
+
+	      return (0, _join2.default)(props.className, CLASS_NAME, props.first && m('first'), props.last && m('last'), props.vertical && m('vertical'), props.active && m('active'), props.beforeActive && m('before-active'), props.afterActive && m('after-active'), props.disabled && m('disabled'), props.closeable && m('closeable'), props.tabEllipsis && m('ellipsis'));
+	    }
+	  }, {
+	    key: 'prepareInnerClassName',
+	    value: function prepareInnerClassName(props) {
+	      return (0, _join2.default)(bem('inner'), props.active && bem('inner', 'active'), props.tabEllipsis && bem('inner', 'ellipsis'));
+	    }
+	  }, {
+	    key: 'prepareChildren',
+	    value: function prepareChildren(props) {
+	      var title = (props.tabTitle !== undefined ? props.tabTitle : props.children) || ' ';
+
+	      if (props.closeable) {
+	        return [title, this.renderCloseIcon()];
+	      }
+
+	      return title;
+	    }
+	  }, {
+	    key: 'renderCloseIcon',
+	    value: function renderCloseIcon() {
+	      var eventConfig = _defineProperty({}, this.p.activateEvent, stopPropagation);
+
+	      return _react2.default.createElement(
+	        'div',
+	        _extends({}, eventConfig, { onClick: this.onClose, title: 'Close tab', className: bem('close-icon') }),
+	        _react2.default.createElement(
+	          'svg',
+	          { className: bem('close-icon-svg'), height: '14', width: '14', viewBox: '0 0 24 24', xmlns: 'http://www.w3.org/2000/svg' },
+	          _react2.default.createElement('path', { d: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z' }),
+	          _react2.default.createElement('path', { d: 'M0 0h24v24H0z', fill: 'none' })
+	        )
+	      );
+	    }
+	  }, {
+	    key: 'onClose',
+	    value: function onClose(event) {
+	      if (this.p.activateEvent == 'onClick') {
+	        event.stopPropagation();
+	      }
+
+	      this.props.onClose(event);
+	    }
+	  }, {
+	    key: 'prepareInnerStyle',
+	    value: function prepareInnerStyle(props) {
+	      var tabStyle = props.tabStyle;
+
+	      var innerStyle = (typeof tabStyle == 'function' ? tabStyle(props) : tabStyle) || {};
+
+	      return (0, _objectAssign2.default)({}, innerStyle);
+	    }
+	  }, {
+	    key: 'prepareStyle',
+	    value: function prepareStyle(props, innerStyle) {
+
+	      var style = (0, _objectAssign2.default)({}, props.style);
+
+	      if (props.vertical) {
+	        (function () {
+	          //on vertical tabs - the name of the dimensions are inversed
+	          var dimensionStyles = {
+	            height: 'width',
+	            minHeight: 'minWidth',
+	            maxHeight: 'maxWidth'
+	          };
+
+	          Object.keys(dimensionStyles).forEach(function (name) {
+	            //NOTE: inner is rotated!
+	            var value = innerStyle[name];
+
+	            if (value !== undefined) {
+	              style[name] = value;
+	              delete innerStyle[name];
+	              innerStyle[dimensionStyles[name]] = value;
+	            }
+	          });
+	        })();
+	      }
+
+	      if (props.tabAlign === 'stretch') {
+
+	        //if we are in stretch mode, the size
+	        //dimensions should be set on the style object (if they are specified)
+	        //not on the innerStyle, since the main div will now give the dimension
+
+	        var dimensions = props.vertical ? ['height', 'minHeight', 'maxHeight'] : ['width', 'minWidth', 'maxWidth'];
+
+	        dimensions.forEach(function (name) {
+	          var value = innerStyle[name];
+
+	          if (value !== undefined) {
+	            style[name] = value;
+	            delete innerStyle[name];
+	          }
+	        });
+	      }
+
+	      return style;
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this2 = this;
+
+	      var props = this.p = (0, _objectAssign2.default)({}, this.props);
+
+	      props.activateEvent = props.activateEvent || 'onClick';
+
+	      var index = props.index;
+
+
+	      var className = this.prepareClassName(props);
+	      var innerClassName = this.prepareInnerClassName(props);
+	      var children = this.prepareChildren(props);
+
+	      var _state = this.state;
+	      var innerSize = _state.innerSize;
+	      var hiddenSize = _state.hiddenSize;
+
+
+	      var innerStyle = this.prepareInnerStyle(props);
+	      var style = this.prepareStyle(props, innerStyle);
+
+	      //HAIRY LOGIC - all needed for vertical tabs!
+	      if (props.vertical) {
+	        if (props.tabAlign != 'stretch') {
+	          style.minWidth = innerSize.height;
+	          style.height = innerSize.width;
+	        } else {
+	          style.minWidth = innerSize.height;
+	          style.height = hiddenSize.width;
+	        }
+	      }
+
+	      var renderProps = (0, _objectAssign2.default)({}, props, _defineProperty({
+	        style: style,
+	        disabled: null,
+	        className: className
+	      }, props.activateEvent, this.onActivate));
+
+	      var innerProps = {
+	        key: 'inner',
+	        style: innerStyle,
+	        className: innerClassName,
+	        children: [children, props.vertical && _react2.default.createElement(_reactNotifyResize.NotifyResize, { measureSize: this.measureInnerSize, onResize: this.onInnerResize, notifyOnMount: true })]
+	      };
+
+	      if (props.vertical && props.tabAlign === 'stretch') {
+	        var _ret2 = function () {
+	          var verticalFix = _react2.default.createElement(
+	            'div',
+	            {
+	              key: 'innerHidden',
+	              className: (0, _join2.default)(innerClassName, bem('inner', 'hidden')),
+	              style: (0, _objectAssign2.default)({}, innerStyle, HIDDEN_STYLE)
+	            },
+	            children,
+	            _react2.default.createElement(_reactNotifyResize.NotifyResize, { onResize: _this2.onHiddenResize, notifyOnMount: true })
+	          );
+
+	          return {
+	            v: _react2.default.createElement(
+	              _FlexiBox2.default,
+	              renderProps,
+	              function (_ref2) {
+	                var width = _ref2.width;
+	                var height = _ref2.height;
+
+
+	                height = Math.max(height || 0, hiddenSize.width || 0);
+
+	                return [_react2.default.createElement('div', _extends({}, innerProps, {
+	                  style: (0, _objectAssign2.default)({}, innerStyle, { width: height })
+	                })), verticalFix];
+	              }
+	            )
+	          };
+	        }();
+
+	        if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+	      }
+
+	      return _react2.default.createElement(
+	        'div',
+	        renderProps,
+	        _react2.default.createElement('div', innerProps)
+	      );
+	    }
+	  }, {
+	    key: 'measureInnerSize',
+	    value: function measureInnerSize(node) {
+
+	      var height = node.offsetHeight;
+	      var width = node.offsetWidth;
+
+	      if (this.props.vertical) {
+	        var borderPaddingSize = getBorderPaddingSize(node.parentNode);
+	        height += borderPaddingSize.left + borderPaddingSize.right;
+	      }
+
+	      return {
+	        width: width,
+	        height: height
+	      };
+	    }
+	  }, {
+	    key: 'onInnerResize',
+	    value: function onInnerResize(_ref3) {
+	      var width = _ref3.width;
+	      var height = _ref3.height;
+
+	      this.setState({
+	        innerSize: { width: width, height: height }
+	      });
+	    }
+	  }, {
+	    key: 'onHiddenResize',
+	    value: function onHiddenResize(_ref4) {
+	      var width = _ref4.width;
+	      var height = _ref4.height;
+
+	      this.setState({
+	        hiddenSize: { width: width, height: height }
+	      });
+	    }
+	  }, {
+	    key: 'onActivate',
+	    value: function onActivate(event) {
+	      var eventName = this.props.activateEvent || 'onClick';
+	      var domNode = (0, _reactDom.findDOMNode)(this);
+
+	      if (typeof this.props[eventName] === 'function') {
+	        this.props[eventName](event);
+	      }
+
+	      !this.props.disabled && this.props.onActivate(domNode);
+	    }
+	  }]);
+
+	  return TabTitle;
+	}(_reactClass2.default);
+
+	exports.default = TabTitle;
+
+
+	TabTitle.propTypes = {
+	  disabled: _react.PropTypes.bool,
+	  tabEllipsis: _react.PropTypes.bool,
+	  activateEvent: _react.PropTypes.oneOf(['onClick', 'onMouseEnter', 'onMouseDown']),
+	  onActivate: _react.PropTypes.func
+	};
+
+	TabTitle.defaultProps = {
+	  onActivate: function onActivate() {}
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 499 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.NotifyResize = undefined;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactClass = __webpack_require__(484);
+
+	var _reactClass2 = _interopRequireDefault(_reactClass);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var notifyResizeStyle = {
+	  position: 'absolute',
+	  top: 0,
+	  left: 0,
+	  width: '100%',
+	  height: '100%',
+	  zIndex: -1,
+	  overflow: 'hidden',
+	  display: 'block',
+	  pointerEvents: 'none',
+	  opacity: 0
+	};
+
+	var expandToolStyle = {
+	  position: 'absolute',
+	  top: 0,
+	  left: 0,
+	  width: '100%',
+	  height: '100%',
+	  overflow: 'auto'
+	};
+
+	var contractToolStyle = {
+	  position: 'absolute',
+	  top: 0,
+	  left: 0,
+	  width: '100%',
+	  height: '100%',
+	  overflow: 'auto'
+	};
+
+	var contractToolInnerStyle = {
+	  position: 'absolute',
+	  top: 0,
+	  left: 0,
+	  width: '200%',
+	  height: '200%'
+	};
+
+	var NotifyResize = function (_Component) {
+	  _inherits(NotifyResize, _Component);
+
+	  function NotifyResize(props) {
+	    _classCallCheck(this, NotifyResize);
+
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(NotifyResize).call(this, props));
+
+	    _this.state = {
+	      notifyResizeWidth: 0,
+	      notifyResizeHeight: 0,
+
+	      expandToolWidth: 0,
+	      expandToolHeight: 0,
+
+	      contractToolWidth: 0,
+	      contractToolHeight: 0
+	    };
+
+	    return _this;
+	  }
+
+	  _createClass(NotifyResize, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      if (typeof this.props.onMount === 'function') {
+	        this.props.onMount(this);
+	      }
+
+	      this.resetResizeTool();
+
+	      if (this.props.notifyOnMount) {
+	        var _notifyResizeSize = this.notifyResizeSize;
+	        var width = _notifyResizeSize.notifyResizeWidth;
+	        var height = _notifyResizeSize.notifyResizeHeight;
+
+	        this.onResize({ width: width, height: height });
+	      }
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        {
+	          ref: 'notifyResize',
+	          style: notifyResizeStyle,
+	          onScroll: this.checkResize
+	        },
+	        this.renderExpandTool(),
+	        this.renderContractTool()
+	      );
+	    }
+	  }, {
+	    key: 'renderExpandTool',
+	    value: function renderExpandTool() {
+	      return _react2.default.createElement(
+	        'div',
+	        {
+	          ref: 'expandTool',
+	          className: 'expandTool',
+	          style: expandToolStyle
+	        },
+	        _react2.default.createElement('div', {
+	          ref: 'expandToolInner',
+	          className: 'expandToolInner',
+	          style: {
+	            position: 'absolute',
+	            top: 0,
+	            left: 0,
+	            width: this.state.expandToolWidth,
+	            height: this.state.expandToolHeight
+	          }
+	        })
+	      );
+	    }
+	  }, {
+	    key: 'renderContractTool',
+	    value: function renderContractTool() {
+	      return _react2.default.createElement(
+	        'div',
+	        {
+	          ref: 'contractTool',
+	          className: 'contractTool',
+	          style: contractToolStyle,
+	          onScroll: this.checkResize
+	        },
+	        _react2.default.createElement('div', { ref: 'contractInner', style: contractToolInnerStyle })
+	      );
+	    }
+	  }, {
+	    key: 'resetResizeTool',
+	    value: function resetResizeTool() {
+	      this.setDimensions();
+	      this.scrollToBottomExpandTool();
+	    }
+	  }, {
+	    key: 'setDimensions',
+	    value: function setDimensions() {
+	      var _notifyResizeSize2 = this.notifyResizeSize = this.getDimensions();
+
+	      var notifyResizeWidth = _notifyResizeSize2.notifyResizeWidth;
+	      var notifyResizeHeight = _notifyResizeSize2.notifyResizeHeight;
+
+	      // Resize tool will be bigger than it's parent by 1 pixel in each direction
+
+	      this.setState({
+	        notifyResizeWidth: notifyResizeWidth,
+	        notifyResizeHeight: notifyResizeHeight,
+	        expandToolWidth: notifyResizeWidth + 1,
+	        expandToolHeight: notifyResizeHeight + 1
+	      });
+	    }
+	  }, {
+	    key: 'getDimensions',
+	    value: function getDimensions() {
+	      var notifyResize = this.refs.notifyResize;
+	      var node = notifyResize.parentElement || notifyResize;
+
+	      var size = void 0;
+
+	      if (typeof this.props.measureSize == 'function') {
+	        size = this.props.measureSize(node, notifyResize);
+	      } else {
+	        size = {
+	          width: node.offsetWidth,
+	          height: node.offsetHeight
+	        };
+	      }
+
+	      return {
+	        notifyResizeWidth: size.width,
+	        notifyResizeHeight: size.height
+	      };
+	    }
+	  }, {
+	    key: 'scrollToBottomExpandTool',
+	    value: function scrollToBottomExpandTool() {
+	      var _this2 = this;
+
+	      // so the scroll moves when element resizes
+
+	      if (this.refs.notifyResize) {
+	        setTimeout(function () {
+	          // scroll to bottom
+	          var expandTool = _this2.refs.expandTool;
+
+	          if (expandTool) {
+	            expandTool.scrollTop = expandTool.scrollHeight;
+	            expandTool.scrollLeft = expandTool.scrollWidth;
+	          }
+
+	          var contractTool = _this2.refs.contractTool;
+	          if (contractTool) {
+	            contractTool.scrollTop = contractTool.scrollHeight;
+	            contractTool.scrollLeft = contractTool.scrollWidth;
+	          }
+	        }, 0);
+	      }
+	    }
+	  }, {
+	    key: 'checkResize',
+	    value: function checkResize() {
+	      var _getDimensions = this.getDimensions();
+
+	      var notifyResizeWidth = _getDimensions.notifyResizeWidth;
+	      var notifyResizeHeight = _getDimensions.notifyResizeHeight;
+
+
+	      if (notifyResizeWidth !== this.state.notifyResizeWidth || notifyResizeHeight !== this.state.notifyResizeHeight) {
+	        // reset resizeToolDimensions
+	        this.onResize({
+	          width: notifyResizeWidth,
+	          height: notifyResizeHeight
+	        });
+	        this.resetResizeTool();
+	      }
+	    }
+	  }, {
+	    key: 'onResize',
+	    value: function onResize(_ref) {
+	      var width = _ref.width;
+	      var height = _ref.height;
+
+	      if (typeof this.props.onResize === 'function') {
+	        this.props.onResize({ width: width, height: height });
+	      }
+	    }
+	  }]);
+
+	  return NotifyResize;
+	}(_reactClass2.default);
+
+	NotifyResize.propTypes = {
+	  onResize: _react.PropTypes.func,
+	  onMount: _react.PropTypes.func,
+	  notifyOnMount: _react.PropTypes.bool
+	};
+
+	var notifyResize = function notifyResize(Component) {
+	  return function (_Component2) {
+	    _inherits(NotifyResizeWrapper, _Component2);
+
+	    function NotifyResizeWrapper() {
+	      _classCallCheck(this, NotifyResizeWrapper);
+
+	      return _possibleConstructorReturn(this, Object.getPrototypeOf(NotifyResizeWrapper).apply(this, arguments));
+	    }
+
+	    _createClass(NotifyResizeWrapper, [{
+	      key: 'componentDidMount',
+	      value: function componentDidMount() {
+	        var component = this.component = this.refs.component;
+
+	        // check if they are mounted
+	        if (!this.notifyResize) {
+	          console.warn('For notifyResize to work you must render resizeTool from {props.resizeTool}');
+	        }
+	      }
+	    }, {
+	      key: 'onNotifyResizeMount',
+	      value: function onNotifyResizeMount(notifier) {
+	        this.notifyResize = notifier;
+	      }
+	    }, {
+	      key: 'render',
+	      value: function render() {
+
+	        var resizeTool = _react2.default.createElement(NotifyResize, {
+	          onResize: this.onResize,
+	          onMount: this.onNotifyResizeMount,
+
+	          notifyOnMount: this.props.notifyOnMount
+	        });
+
+	        return _react2.default.createElement(Component, _extends({ ref: 'component' }, this.props, { resizeTool: resizeTool }));
+	      }
+	    }, {
+	      key: 'onResize',
+	      value: function onResize() {
+	        if (typeof this.props.onResize === 'function') {
+	          var _props;
+
+	          (_props = this.props).onResize.apply(_props, arguments);
+	        }
+
+	        if (typeof this.refs.component.onResize === 'function') {
+	          var _refs$component;
+
+	          (_refs$component = this.refs.component).onResize.apply(_refs$component, arguments);
+	        }
+	      }
+	    }]);
+
+	    return NotifyResizeWrapper;
+	  }(Component);
+	};
+
+	exports.default = notifyResize;
+	exports.NotifyResize = NotifyResize;
+
+/***/ },
+/* 500 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _objectAssign = __webpack_require__(485);
+
+	var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	var filter = function filter(object) {
+	  return Object.keys(object).reduce(function (acc, prop) {
+	    var value = object[prop];
+
+	    if (value !== undefined) {
+	      acc[prop] = value;
+	    }
+
+	    return acc;
+	  }, {});
+	};
+
+	exports.default = function (target) {
+	  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	    args[_key - 1] = arguments[_key];
+	  }
+
+	  return _objectAssign2.default.apply(undefined, [target].concat(_toConsumableArray(args.map(filter))));
+	};
+
+/***/ },
+/* 501 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	exports.default = function (className) {
+
+	  return function (element, modifier) {
+	    var el = element ? '-' + element : '';
+	    var mod = modifier ? '--' + modifier : '';
+
+	    return '' + className + el + mod;
+	  };
+	};
+
+/***/ },
+/* 502 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(3);
+
+	var _reactClass = __webpack_require__(484);
+
+	var _reactClass2 = _interopRequireDefault(_reactClass);
+
+	var _objectAssign = __webpack_require__(485);
+
+	var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+	var _reactNotifyResize = __webpack_require__(499);
+
+	var _join = __webpack_require__(494);
+
+	var _join2 = _interopRequireDefault(_join);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var emptyFn = function emptyFn() {
+	  return null;
+	};
+
+	var DivFactory = function DivFactory(props) {
+	  return _react2.default.createElement('div', props);
+	};
+
+	var FlexiBox = function (_Component) {
+	  _inherits(FlexiBox, _Component);
+
+	  function FlexiBox(props) {
+	    _classCallCheck(this, FlexiBox);
+
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(FlexiBox).call(this, props));
+
+	    _this.state = {
+	      width: null,
+	      height: null
+	    };
+
+	    _this.mounted = false;
+	    return _this;
+	  }
+
+	  _createClass(FlexiBox, [{
+	    key: 'render',
+	    value: function render() {
+	      var props = this.props;
+
+	      var style = (0, _objectAssign2.default)({}, props.style);
+
+	      if (!style.position || style.position === 'static') {
+	        style.position = 'relative';
+	      }
+
+	      var Factory = props.factory || DivFactory;
+	      var render = props.children;
+
+	      return _react2.default.createElement(
+	        Factory,
+	        _extends({}, props, { factory: null, children: null }),
+	        render(this.state),
+	        _react2.default.createElement(_reactNotifyResize.NotifyResize, { onResize: this.onResize, notifyOnMount: true })
+	      );
+	    }
+	  }, {
+	    key: 'onResize',
+	    value: function onResize(_ref) {
+	      var width = _ref.width;
+	      var height = _ref.height;
+
+	      if (!this.mounted) {
+	        this.mounted = true;
+	      }
+
+	      this.setState({
+	        width: width, height: height
+	      });
+	    }
+	  }]);
+
+	  return FlexiBox;
+	}(_reactClass2.default);
+
+	exports.default = FlexiBox;
+
+
+	FlexiBox.propTypes = {
+	  factory: _react.PropTypes.func,
+	  children: _react.PropTypes.func
+	};
+
+/***/ },
+/* 503 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(3);
+
+	var _reactClass = __webpack_require__(484);
+
+	var _reactClass2 = _interopRequireDefault(_reactClass);
+
+	var _objectAssign = __webpack_require__(485);
+
+	var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+	var _hasTouch = __webpack_require__(504);
+
+	var _hasTouch2 = _interopRequireDefault(_hasTouch);
+
+	var _reactNotifyResize = __webpack_require__(499);
+
+	var _lodash = __webpack_require__(505);
+
+	var _lodash2 = _interopRequireDefault(_lodash);
+
+	var _reactFlex = __webpack_require__(486);
+
+	var _reactMotion = __webpack_require__(506);
+
+	var _join = __webpack_require__(494);
+
+	var _join2 = _interopRequireDefault(_join);
+
+	var _bemFactory = __webpack_require__(501);
+
+	var _bemFactory2 = _interopRequireDefault(_bemFactory);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var CLASS_NAME = 'react-tab-panel__tab-strip-scroll-tool';
+
+	var bem = (0, _bemFactory2.default)(CLASS_NAME);
+	var m = function m(name) {
+	  return bem(null, name);
+	};
+
+	var styles = {};
+
+	var ARROWS = {
+	  right: _react2.default.createElement(
+	    'svg',
+	    { className: (0, _join2.default)(bem('arrow'), bem('arrow', 'right')), height: '18', viewBox: '0 0 24 24', width: '18', xmlns: 'http://www.w3.org/2000/svg' },
+	    _react2.default.createElement('path', { d: 'M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z' }),
+	    _react2.default.createElement('path', { d: 'M0-.25h24v24H0z', fill: 'none' })
+	  ),
+
+	  left: _react2.default.createElement(
+	    'svg',
+	    { className: (0, _join2.default)(bem('arrow'), bem('arrow', 'left')), height: '18', viewBox: '0 0 24 24', width: '18', xmlns: 'http://www.w3.org/2000/svg' },
+	    _react2.default.createElement('path', { d: 'M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z' }),
+	    _react2.default.createElement('path', { d: 'M0-.5h24v24H0z', fill: 'none' })
+	  ),
+
+	  down: _react2.default.createElement(
+	    'svg',
+	    { className: (0, _join2.default)(bem('arrow'), bem('arrow', 'down')), height: '18', viewBox: '0 0 24 24', width: '18', xmlns: 'http://www.w3.org/2000/svg' },
+	    _react2.default.createElement('path', { d: 'M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z' }),
+	    _react2.default.createElement('path', { d: 'M0-.75h24v24H0z', fill: 'none' })
+	  ),
+
+	  up: _react2.default.createElement(
+	    'svg',
+	    { className: (0, _join2.default)(bem('arrow'), bem('arrow', 'up')), height: '18', viewBox: '0 0 24 24', width: '18', xmlns: 'http://www.w3.org/2000/svg' },
+	    _react2.default.createElement('path', { d: 'M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z' }),
+	    _react2.default.createElement('path', { d: 'M0 0h24v24H0z', fill: 'none' })
+	  )
+	};
+
+	var emptyFn = function emptyFn() {};
+	var stop = function stop(e) {
+	  e.preventDefault();
+	  e.stopPropagation();
+	};
+
+	var Scroller = function (_Component) {
+	  _inherits(Scroller, _Component);
+
+	  function Scroller(props) {
+	    _classCallCheck(this, Scroller);
+
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Scroller).call(this, props));
+
+	    _this.scrollInfo = {
+	      scrollPos: 0,
+	      adjustScroll: true,
+
+	      hasStartScroll: false,
+	      hasEndScroll: false,
+
+	      scrollerSize: {
+	        start: 0,
+	        end: 0
+	      }
+	    };
+
+	    _this.state = {
+	      scrolling: false,
+	      activeScroll: 0
+	    };
+
+	    _this.onResize = (0, _lodash2.default)(_this.onResize, 50, { leading: false, trailing: true });
+	    return _this;
+	  }
+
+	  _createClass(Scroller, [{
+	    key: 'getOffsetSizeName',
+	    value: function getOffsetSizeName() {
+	      var tabPosition = this.props.tabPosition;
+
+	      return tabPosition == 'top' || tabPosition == 'bottom' ? 'offsetWidth' : 'offsetHeight';
+	    }
+	  }, {
+	    key: 'getSizeName',
+	    value: function getSizeName() {
+	      var tabPosition = this.props.tabPosition;
+
+	      return tabPosition == 'top' || tabPosition == 'bottom' ? 'width' : 'height';
+	    }
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      var name = this.getOffsetSizeName();
+
+	      this.scrollInfo.scrollerSize = {
+	        start: (0, _reactDom.findDOMNode)(this.refs.start)[name],
+	        end: (0, _reactDom.findDOMNode)(this.refs.end)[name]
+	      };
+
+	      this.syncScroll({ force: true });
+	    }
+	  }, {
+	    key: 'onResize',
+	    value: function onResize() {
+	      delete this.currentListSize;
+	      delete this.availableSize;
+
+	      this.syncScroll({ force: true });
+	    }
+	  }, {
+	    key: 'syncScroll',
+	    value: function syncScroll() {
+	      var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	      var force = _ref.force;
+
+	      this.updateScrollInfo();
+	      this.doScroll(0, null, { force: force });
+	    }
+	  }, {
+	    key: 'scrollIntoView',
+	    value: function scrollIntoView(domNode) {
+	      if (domNode) {
+	        var rect = domNode.getBoundingClientRect();
+	        var mainRect = (0, _reactDom.findDOMNode)(this.wrapper || this).getBoundingClientRect();
+
+	        var tabPosition = this.props.tabPosition;
+
+	        var startSideName = tabPosition == 'top' || tabPosition == 'bottom' ? 'left' : 'top';
+	        var endSideName = tabPosition == 'top' || tabPosition == 'bottom' ? 'right' : 'bottom';
+
+	        var startDiff = rect[startSideName] - mainRect[startSideName];
+	        var endDiff = rect[endSideName] - mainRect[endSideName];
+
+	        var scrollIntoViewOffset = this.props.scrollIntoViewOffset;
+
+	        if (startDiff < 0) {
+	          this.doScroll(-startDiff + scrollIntoViewOffset, -1);
+	        } else if (endDiff > 0) {
+	          this.doScroll(endDiff + scrollIntoViewOffset, 1);
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'doScroll',
+	    value: function doScroll(direction, step) {
+	      var _ref2 = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+	      var force = _ref2.force;
+
+	      var scrollInfo = this.scrollInfo;
+
+	      var newScrollPos = scrollInfo.scrollPos + direction * (step || this.props.scrollStep);
+
+	      this.setScrollPosition(newScrollPos, { force: force });
+	    }
+	  }, {
+	    key: 'scrollBy',
+	    value: function scrollBy(offset, direction) {
+	      var _ref3 = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+	      var force = _ref3.force;
+
+	      var scrollInfo = this.scrollInfo;
+
+	      var newScrollPos = scrollInfo.scrollPos + direction * offset;
+
+	      this.setScrollPosition(newScrollPos, { force: force });
+	    }
+	  }, {
+	    key: 'onClick',
+	    value: function onClick(direction) {
+	      var offset = this.getAvailableSize();
+
+	      this.scrollBy(offset, direction);
+	    }
+	  }, {
+	    key: 'setScrollPosition',
+	    value: function setScrollPosition(scrollPos) {
+	      var _ref4 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+	      var force = _ref4.force;
+
+	      var scrollInfo = this.scrollInfo;
+
+	      if (scrollPos > scrollInfo.maxScrollPos) {
+	        scrollPos = scrollInfo.maxScrollPos;
+	      }
+
+	      if (scrollPos < 0) {
+	        scrollPos = 0;
+	      }
+
+	      if (scrollPos === scrollInfo.scrollPos && force !== true) {
+	        return;
+	      }
+
+	      (0, _objectAssign2.default)(scrollInfo, {
+
+	        hasStartScroll: scrollPos !== 0,
+	        hasEndScroll: scrollPos < scrollInfo.maxScrollPos,
+
+	        scrollPos: scrollPos
+	      });
+
+	      this.setState({});
+	    }
+	  }, {
+	    key: 'updateScrollInfo',
+	    value: function updateScrollInfo() {
+
+	      var availableSize = this.getAvailableSize();
+	      var listSize = this.getCurrentListSize();
+
+	      var scrollInfo = (0, _objectAssign2.default)(this.scrollInfo, {
+	        availableSize: availableSize,
+	        listSize: listSize
+	      });
+
+	      if (listSize > availableSize) {
+	        scrollInfo.maxScrollPos = listSize - availableSize;
+	      } else {
+	        scrollInfo.maxScrollPos = 0;
+	      }
+
+	      scrollInfo.hasStartScroll = scrollInfo.scrollPos != 0;
+	      scrollInfo.hasEndScroll = scrollInfo.scrollPos < scrollInfo.maxScrollPos;
+	    }
+	  }, {
+	    key: 'handleScrollMax',
+	    value: function handleScrollMax(direction, event) {
+	      stop(event);
+
+	      var maxPos = direction == -1 ? 0 : this.scrollInfo.maxScrollPos;
+
+	      this.setScrollPosition(maxPos);
+	    }
+	  }, {
+	    key: 'startScroll',
+	    value: function startScroll(direction, event) {
+	      var _this2 = this;
+
+	      var eventName = _hasTouch2.default ? 'touchend' : 'mouseup';
+
+	      var mouseUpListener = function mouseUpListener() {
+	        _this2.stopScroll();
+	        global.removeEventListener(eventName, mouseUpListener);
+	      };
+
+	      global.addEventListener(eventName, mouseUpListener);
+
+	      this.scrollInterval = global.setInterval(this.doScroll.bind(this, direction), this.props.scrollSpeed);
+
+	      this.setState({
+	        scrolling: true,
+	        activeScroll: direction
+	      });
+	    }
+	  }, {
+	    key: 'stopScroll',
+	    value: function stopScroll() {
+
+	      global.clearInterval(this.scrollInterval);
+
+	      this.setState({
+	        scrolling: false,
+	        activeScroll: 0
+	      });
+	    }
+	  }, {
+	    key: 'renderScroller',
+	    value: function renderScroller(direction) {
+	      var _props = this.props;
+	      var scroller = _props.scroller;
+	      var vertical = _props.vertical;
+	      var tabPosition = _props.tabPosition;
+
+
+	      if (!scroller) {
+	        return null;
+	      }
+
+	      var directionName = vertical ? direction == -1 ? 'up' : 'down' : direction == -1 ? 'left' : 'right';
+
+	      var arrowName = tabPosition == 'top' || tabPosition == 'bottom' ? direction == -1 ? 'left' : 'right' : direction == -1 ? 'up' : 'down';
+
+	      var behavior = typeof scroller === 'boolean' ? scroller ? 'on' : 'off' : 'auto';
+
+	      var scrollInfo = this.scrollInfo;
+	      var disabled = direction == -1 ? !scrollInfo.hasStartScroll : !scrollInfo.hasEndScroll;
+
+	      var className = (0, _join2.default)(CLASS_NAME, m(behavior), m('direction-' + arrowName), m('tab-position-' + tabPosition), this.state.activeScroll == direction ? m('active') : '', scroller === 'auto' && disabled && m('hidden'), scroller === true && disabled && m('disabled'));
+
+	      var onClick = !disabled && this.props.scrollOnClick ? this.onClick.bind(this, direction) : emptyFn;
+
+	      var onMouseDown = !disabled && !this.props.scrollOnClick ? this.startScroll.bind(this, direction) : emptyFn;
+
+	      var onDoubleClick = !disabled ? this.handleScrollMax.bind(this, direction) : emptyFn;
+
+	      var scrollerProps = {
+	        ref: direction == -1 ? 'start' : 'end',
+	        disabled: disabled,
+	        className: className,
+	        onClick: onClick,
+	        onMouseDown: !_hasTouch2.default && onMouseDown,
+	        onTouchStart: _hasTouch2.default && onMouseDown,
+	        onDoubleClick: onDoubleClick,
+	        children: ARROWS[arrowName]
+	      };
+
+	      var result = void 0;
+
+	      if (this.props.renderScroller) {
+	        result = this.props.renderScroller(scrollerProps);
+	      }
+
+	      if (result === undefined) {
+	        result = _react2.default.createElement('div', scrollerProps);
+	      }
+
+	      return result;
+	    }
+
+	    /**
+	     * Cache the current list width on this instance.
+	     *
+	     * It will be invalidated by onResize
+	     *
+	     * @return {Number}
+	     */
+
+	  }, {
+	    key: 'getCurrentListSize',
+	    value: function getCurrentListSize() {
+	      return this.currentListSize = this.currentListSize || (0, _reactDom.findDOMNode)(this.strip)[this.getOffsetSizeName()];
+	    }
+
+	    /**
+	     * Cache the available width on this instance.
+	     *
+	     * It will be invalidated by onResize
+	     *
+	     * @return {Number}
+	     */
+
+	  }, {
+	    key: 'getAvailableSize',
+	    value: function getAvailableSize() {
+	      return this.availableSize = this.availableSize || (0, _reactDom.findDOMNode)(this.wrapper || this)[this.getOffsetSizeName()];
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this3 = this;
+
+	      var props = this.props;
+	      var scroller = props.scroller;
+	      var tabPosition = props.tabPosition;
+
+	      var scrollInfo = this.scrollInfo;
+
+	      var scrollStyleName = tabPosition == 'top' || tabPosition == 'bottom' ? 'left' : 'top';
+
+	      var style = _defineProperty({}, scrollStyleName, (0, _reactMotion.spring)(-scrollInfo.scrollPos, props.scrollSpringConfig));
+
+	      var resizer = _react2.default.createElement(_reactNotifyResize.NotifyResize, { key: 'resizer', onResize: this.onResize });
+	      var children = [props.childProps.children, resizer];
+
+	      return _react2.default.createElement(
+	        _reactFlex.Flex,
+	        _extends({ ref: null }, props),
+	        resizer,
+	        this.renderScroller(-1),
+	        _react2.default.createElement(
+	          _reactMotion.Motion,
+	          { style: style },
+	          function (_ref5) {
+	            var scrollValue = _ref5[scrollStyleName];
+
+	            var contents = _react2.default.createElement(_reactFlex.Flex, _extends({}, props.childProps, { ref: function ref(c) {
+	                return _this3.strip = c;
+	              }, children: children, style: _defineProperty({}, scrollStyleName, scrollValue) }));
+
+	            if (scroller === true) {
+	              //always show
+	              return _react2.default.createElement(
+	                _reactFlex.Flex,
+	                { ref: function ref(c) {
+	                    return _this3.wrapper = c;
+	                  }, className: 'react-tab-panel__tab-strip-scroll-wrap', row: true, flexGrow: 1, flexShrink: 1, wrap: false, alignItems: 'stretch' },
+	                contents
+	              );
+	            }
+	            return contents;
+	          }
+	        ),
+	        this.renderScroller(1)
+	      );
+	    }
+	  }]);
+
+	  return Scroller;
+	}(_reactClass2.default);
+
+	exports.default = Scroller;
+
+
+	Scroller.propTypes = {
+	  /**
+	   * When true, scrolling will only happen on click
+	   * and will scroll all visible tabs to a given direction
+	   *
+	   * When false, scrolling will happen on mouseDown
+	   *
+	   * @type {Boolean}
+	   */
+	  scrollOnClick: _react.PropTypes.bool,
+
+	  scroller: _react.PropTypes.oneOf(['auto', false, true])
+	};
+
+	Scroller.defaultProps = _defineProperty({
+	  onScrollEnd: function onScrollEnd() {},
+	  scrollStep: 15,
+	  scrollSpeed: 10,
+	  scrollSpringConfig: {
+	    stiffness: 370,
+	    damping: 60
+	  },
+	  scrollIntoViewOffset: 50,
+	  onScrollerClick: function onScrollerClick() {}
+	}, 'onScrollEnd', function onScrollEnd() {});
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 504 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {module.exports = 'ontouchstart' in global || (global.DocumentTouch && document instanceof DocumentTouch)
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 505 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/**
+	 * lodash (Custom Build) <https://lodash.com/>
+	 * Build: `lodash modularize exports="npm" -o ./`
+	 * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+	 * Released under MIT license <https://lodash.com/license>
+	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+	 * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	 */
+
+	/** Used as the `TypeError` message for "Functions" methods. */
+	var FUNC_ERROR_TEXT = 'Expected a function';
+
+	/** Used as references for various `Number` constants. */
+	var NAN = 0 / 0;
+
+	/** `Object#toString` result references. */
+	var symbolTag = '[object Symbol]';
+
+	/** Used to match leading and trailing whitespace. */
+	var reTrim = /^\s+|\s+$/g;
+
+	/** Used to detect bad signed hexadecimal string values. */
+	var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+
+	/** Used to detect binary string values. */
+	var reIsBinary = /^0b[01]+$/i;
+
+	/** Used to detect octal string values. */
+	var reIsOctal = /^0o[0-7]+$/i;
+
+	/** Built-in method references without a dependency on `root`. */
+	var freeParseInt = parseInt;
+
+	/** Detect free variable `global` from Node.js. */
+	var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+	/** Detect free variable `self`. */
+	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+	/** Used as a reference to the global object. */
+	var root = freeGlobal || freeSelf || Function('return this')();
+
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/**
+	 * Used to resolve the
+	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+	 * of values.
+	 */
+	var objectToString = objectProto.toString;
+
+	/* Built-in method references for those with the same name as other `lodash` methods. */
+	var nativeMax = Math.max,
+	    nativeMin = Math.min;
+
+	/**
+	 * Gets the timestamp of the number of milliseconds that have elapsed since
+	 * the Unix epoch (1 January 1970 00:00:00 UTC).
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 2.4.0
+	 * @category Date
+	 * @returns {number} Returns the timestamp.
+	 * @example
+	 *
+	 * _.defer(function(stamp) {
+	 *   console.log(_.now() - stamp);
+	 * }, _.now());
+	 * // => Logs the number of milliseconds it took for the deferred invocation.
+	 */
+	var now = function() {
+	  return root.Date.now();
+	};
+
+	/**
+	 * Creates a debounced function that delays invoking `func` until after `wait`
+	 * milliseconds have elapsed since the last time the debounced function was
+	 * invoked. The debounced function comes with a `cancel` method to cancel
+	 * delayed `func` invocations and a `flush` method to immediately invoke them.
+	 * Provide `options` to indicate whether `func` should be invoked on the
+	 * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+	 * with the last arguments provided to the debounced function. Subsequent
+	 * calls to the debounced function return the result of the last `func`
+	 * invocation.
+	 *
+	 * **Note:** If `leading` and `trailing` options are `true`, `func` is
+	 * invoked on the trailing edge of the timeout only if the debounced function
+	 * is invoked more than once during the `wait` timeout.
+	 *
+	 * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+	 * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+	 *
+	 * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+	 * for details over the differences between `_.debounce` and `_.throttle`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Function
+	 * @param {Function} func The function to debounce.
+	 * @param {number} [wait=0] The number of milliseconds to delay.
+	 * @param {Object} [options={}] The options object.
+	 * @param {boolean} [options.leading=false]
+	 *  Specify invoking on the leading edge of the timeout.
+	 * @param {number} [options.maxWait]
+	 *  The maximum time `func` is allowed to be delayed before it's invoked.
+	 * @param {boolean} [options.trailing=true]
+	 *  Specify invoking on the trailing edge of the timeout.
+	 * @returns {Function} Returns the new debounced function.
+	 * @example
+	 *
+	 * // Avoid costly calculations while the window size is in flux.
+	 * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
+	 *
+	 * // Invoke `sendMail` when clicked, debouncing subsequent calls.
+	 * jQuery(element).on('click', _.debounce(sendMail, 300, {
+	 *   'leading': true,
+	 *   'trailing': false
+	 * }));
+	 *
+	 * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
+	 * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
+	 * var source = new EventSource('/stream');
+	 * jQuery(source).on('message', debounced);
+	 *
+	 * // Cancel the trailing debounced invocation.
+	 * jQuery(window).on('popstate', debounced.cancel);
+	 */
+	function debounce(func, wait, options) {
+	  var lastArgs,
+	      lastThis,
+	      maxWait,
+	      result,
+	      timerId,
+	      lastCallTime,
+	      lastInvokeTime = 0,
+	      leading = false,
+	      maxing = false,
+	      trailing = true;
+
+	  if (typeof func != 'function') {
+	    throw new TypeError(FUNC_ERROR_TEXT);
+	  }
+	  wait = toNumber(wait) || 0;
+	  if (isObject(options)) {
+	    leading = !!options.leading;
+	    maxing = 'maxWait' in options;
+	    maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
+	    trailing = 'trailing' in options ? !!options.trailing : trailing;
+	  }
+
+	  function invokeFunc(time) {
+	    var args = lastArgs,
+	        thisArg = lastThis;
+
+	    lastArgs = lastThis = undefined;
+	    lastInvokeTime = time;
+	    result = func.apply(thisArg, args);
+	    return result;
+	  }
+
+	  function leadingEdge(time) {
+	    // Reset any `maxWait` timer.
+	    lastInvokeTime = time;
+	    // Start the timer for the trailing edge.
+	    timerId = setTimeout(timerExpired, wait);
+	    // Invoke the leading edge.
+	    return leading ? invokeFunc(time) : result;
+	  }
+
+	  function remainingWait(time) {
+	    var timeSinceLastCall = time - lastCallTime,
+	        timeSinceLastInvoke = time - lastInvokeTime,
+	        result = wait - timeSinceLastCall;
+
+	    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
+	  }
+
+	  function shouldInvoke(time) {
+	    var timeSinceLastCall = time - lastCallTime,
+	        timeSinceLastInvoke = time - lastInvokeTime;
+
+	    // Either this is the first call, activity has stopped and we're at the
+	    // trailing edge, the system time has gone backwards and we're treating
+	    // it as the trailing edge, or we've hit the `maxWait` limit.
+	    return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
+	      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
+	  }
+
+	  function timerExpired() {
+	    var time = now();
+	    if (shouldInvoke(time)) {
+	      return trailingEdge(time);
+	    }
+	    // Restart the timer.
+	    timerId = setTimeout(timerExpired, remainingWait(time));
+	  }
+
+	  function trailingEdge(time) {
+	    timerId = undefined;
+
+	    // Only invoke if we have `lastArgs` which means `func` has been
+	    // debounced at least once.
+	    if (trailing && lastArgs) {
+	      return invokeFunc(time);
+	    }
+	    lastArgs = lastThis = undefined;
+	    return result;
+	  }
+
+	  function cancel() {
+	    if (timerId !== undefined) {
+	      clearTimeout(timerId);
+	    }
+	    lastInvokeTime = 0;
+	    lastArgs = lastCallTime = lastThis = timerId = undefined;
+	  }
+
+	  function flush() {
+	    return timerId === undefined ? result : trailingEdge(now());
+	  }
+
+	  function debounced() {
+	    var time = now(),
+	        isInvoking = shouldInvoke(time);
+
+	    lastArgs = arguments;
+	    lastThis = this;
+	    lastCallTime = time;
+
+	    if (isInvoking) {
+	      if (timerId === undefined) {
+	        return leadingEdge(lastCallTime);
+	      }
+	      if (maxing) {
+	        // Handle invocations in a tight loop.
+	        timerId = setTimeout(timerExpired, wait);
+	        return invokeFunc(lastCallTime);
+	      }
+	    }
+	    if (timerId === undefined) {
+	      timerId = setTimeout(timerExpired, wait);
+	    }
+	    return result;
+	  }
+	  debounced.cancel = cancel;
+	  debounced.flush = flush;
+	  return debounced;
+	}
+
+	/**
+	 * Checks if `value` is the
+	 * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+	 * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.1.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+	 * @example
+	 *
+	 * _.isObject({});
+	 * // => true
+	 *
+	 * _.isObject([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObject(_.noop);
+	 * // => true
+	 *
+	 * _.isObject(null);
+	 * // => false
+	 */
+	function isObject(value) {
+	  var type = typeof value;
+	  return !!value && (type == 'object' || type == 'function');
+	}
+
+	/**
+	 * Checks if `value` is object-like. A value is object-like if it's not `null`
+	 * and has a `typeof` result of "object".
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+	 * @example
+	 *
+	 * _.isObjectLike({});
+	 * // => true
+	 *
+	 * _.isObjectLike([1, 2, 3]);
+	 * // => true
+	 *
+	 * _.isObjectLike(_.noop);
+	 * // => false
+	 *
+	 * _.isObjectLike(null);
+	 * // => false
+	 */
+	function isObjectLike(value) {
+	  return !!value && typeof value == 'object';
+	}
+
+	/**
+	 * Checks if `value` is classified as a `Symbol` primitive or object.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to check.
+	 * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+	 * @example
+	 *
+	 * _.isSymbol(Symbol.iterator);
+	 * // => true
+	 *
+	 * _.isSymbol('abc');
+	 * // => false
+	 */
+	function isSymbol(value) {
+	  return typeof value == 'symbol' ||
+	    (isObjectLike(value) && objectToString.call(value) == symbolTag);
+	}
+
+	/**
+	 * Converts `value` to a number.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 4.0.0
+	 * @category Lang
+	 * @param {*} value The value to process.
+	 * @returns {number} Returns the number.
+	 * @example
+	 *
+	 * _.toNumber(3.2);
+	 * // => 3.2
+	 *
+	 * _.toNumber(Number.MIN_VALUE);
+	 * // => 5e-324
+	 *
+	 * _.toNumber(Infinity);
+	 * // => Infinity
+	 *
+	 * _.toNumber('3.2');
+	 * // => 3.2
+	 */
+	function toNumber(value) {
+	  if (typeof value == 'number') {
+	    return value;
+	  }
+	  if (isSymbol(value)) {
+	    return NAN;
+	  }
+	  if (isObject(value)) {
+	    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
+	    value = isObject(other) ? (other + '') : other;
+	  }
+	  if (typeof value != 'string') {
+	    return value === 0 ? value : +value;
+	  }
+	  value = value.replace(reTrim, '');
+	  var isBinary = reIsBinary.test(value);
+	  return (isBinary || reIsOctal.test(value))
+	    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+	    : (reIsBadHex.test(value) ? NAN : +value);
+	}
+
+	module.exports = debounce;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 506 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	function _interopRequire(obj) { return obj && obj.__esModule ? obj['default'] : obj; }
+
+	var _Motion = __webpack_require__(507);
+
+	exports.Motion = _interopRequire(_Motion);
+
+	var _StaggeredMotion = __webpack_require__(514);
+
+	exports.StaggeredMotion = _interopRequire(_StaggeredMotion);
+
+	var _TransitionMotion = __webpack_require__(515);
+
+	exports.TransitionMotion = _interopRequire(_TransitionMotion);
+
+	var _spring = __webpack_require__(517);
+
+	exports.spring = _interopRequire(_spring);
+
+	var _presets = __webpack_require__(518);
+
+	exports.presets = _interopRequire(_presets);
+
+	// deprecated, dummy warning function
+
+	var _reorderKeys = __webpack_require__(519);
+
+	exports.reorderKeys = _interopRequire(_reorderKeys);
+
+/***/ },
+/* 507 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _mapToZero = __webpack_require__(508);
+
+	var _mapToZero2 = _interopRequireDefault(_mapToZero);
+
+	var _stripStyle = __webpack_require__(509);
+
+	var _stripStyle2 = _interopRequireDefault(_stripStyle);
+
+	var _stepper3 = __webpack_require__(510);
+
+	var _stepper4 = _interopRequireDefault(_stepper3);
+
+	var _performanceNow = __webpack_require__(511);
+
+	var _performanceNow2 = _interopRequireDefault(_performanceNow);
+
+	var _raf = __webpack_require__(512);
+
+	var _raf2 = _interopRequireDefault(_raf);
+
+	var _shouldStopAnimation = __webpack_require__(513);
+
+	var _shouldStopAnimation2 = _interopRequireDefault(_shouldStopAnimation);
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var msPerFrame = 1000 / 60;
+
+	var Motion = _react2['default'].createClass({
+	  displayName: 'Motion',
+
+	  propTypes: {
+	    // TOOD: warn against putting a config in here
+	    defaultStyle: _react.PropTypes.objectOf(_react.PropTypes.number),
+	    style: _react.PropTypes.objectOf(_react.PropTypes.oneOfType([_react.PropTypes.number, _react.PropTypes.object])).isRequired,
+	    children: _react.PropTypes.func.isRequired,
+	    onRest: _react.PropTypes.func
+	  },
+
+	  getInitialState: function getInitialState() {
+	    var _props = this.props;
+	    var defaultStyle = _props.defaultStyle;
+	    var style = _props.style;
+
+	    var currentStyle = defaultStyle || _stripStyle2['default'](style);
+	    var currentVelocity = _mapToZero2['default'](currentStyle);
+	    return {
+	      currentStyle: currentStyle,
+	      currentVelocity: currentVelocity,
+	      lastIdealStyle: currentStyle,
+	      lastIdealVelocity: currentVelocity
+	    };
+	  },
+
+	  wasAnimating: false,
+	  animationID: null,
+	  prevTime: 0,
+	  accumulatedTime: 0,
+	  // it's possible that currentStyle's value is stale: if props is immediately
+	  // changed from 0 to 400 to spring(0) again, the async currentStyle is still
+	  // at 0 (didn't have time to tick and interpolate even once). If we naively
+	  // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
+	  // In reality currentStyle should be 400
+	  unreadPropStyle: null,
+	  // after checking for unreadPropStyle != null, we manually go set the
+	  // non-interpolating values (those that are a number, without a spring
+	  // config)
+	  clearUnreadPropStyle: function clearUnreadPropStyle(destStyle) {
+	    var dirty = false;
+	    var _state = this.state;
+	    var currentStyle = _state.currentStyle;
+	    var currentVelocity = _state.currentVelocity;
+	    var lastIdealStyle = _state.lastIdealStyle;
+	    var lastIdealVelocity = _state.lastIdealVelocity;
+
+	    for (var key in destStyle) {
+	      if (!Object.prototype.hasOwnProperty.call(destStyle, key)) {
+	        continue;
+	      }
+
+	      var styleValue = destStyle[key];
+	      if (typeof styleValue === 'number') {
+	        if (!dirty) {
+	          dirty = true;
+	          currentStyle = _extends({}, currentStyle);
+	          currentVelocity = _extends({}, currentVelocity);
+	          lastIdealStyle = _extends({}, lastIdealStyle);
+	          lastIdealVelocity = _extends({}, lastIdealVelocity);
+	        }
+
+	        currentStyle[key] = styleValue;
+	        currentVelocity[key] = 0;
+	        lastIdealStyle[key] = styleValue;
+	        lastIdealVelocity[key] = 0;
+	      }
+	    }
+
+	    if (dirty) {
+	      this.setState({ currentStyle: currentStyle, currentVelocity: currentVelocity, lastIdealStyle: lastIdealStyle, lastIdealVelocity: lastIdealVelocity });
+	    }
+	  },
+
+	  startAnimationIfNecessary: function startAnimationIfNecessary() {
+	    var _this = this;
+
+	    // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
+	    // call cb? No, otherwise accidental parent rerender causes cb trigger
+	    this.animationID = _raf2['default'](function (timestamp) {
+	      // check if we need to animate in the first place
+	      var propsStyle = _this.props.style;
+	      if (_shouldStopAnimation2['default'](_this.state.currentStyle, propsStyle, _this.state.currentVelocity)) {
+	        if (_this.wasAnimating && _this.props.onRest) {
+	          _this.props.onRest();
+	        }
+
+	        // no need to cancel animationID here; shouldn't have any in flight
+	        _this.animationID = null;
+	        _this.wasAnimating = false;
+	        _this.accumulatedTime = 0;
+	        return;
+	      }
+
+	      _this.wasAnimating = true;
+
+	      var currentTime = timestamp || _performanceNow2['default']();
+	      var timeDelta = currentTime - _this.prevTime;
+	      _this.prevTime = currentTime;
+	      _this.accumulatedTime = _this.accumulatedTime + timeDelta;
+	      // more than 10 frames? prolly switched browser tab. Restart
+	      if (_this.accumulatedTime > msPerFrame * 10) {
+	        _this.accumulatedTime = 0;
+	      }
+
+	      if (_this.accumulatedTime === 0) {
+	        // no need to cancel animationID here; shouldn't have any in flight
+	        _this.animationID = null;
+	        _this.startAnimationIfNecessary();
+	        return;
+	      }
+
+	      var currentFrameCompletion = (_this.accumulatedTime - Math.floor(_this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
+	      var framesToCatchUp = Math.floor(_this.accumulatedTime / msPerFrame);
+
+	      var newLastIdealStyle = {};
+	      var newLastIdealVelocity = {};
+	      var newCurrentStyle = {};
+	      var newCurrentVelocity = {};
+
+	      for (var key in propsStyle) {
+	        if (!Object.prototype.hasOwnProperty.call(propsStyle, key)) {
+	          continue;
+	        }
+
+	        var styleValue = propsStyle[key];
+	        if (typeof styleValue === 'number') {
+	          newCurrentStyle[key] = styleValue;
+	          newCurrentVelocity[key] = 0;
+	          newLastIdealStyle[key] = styleValue;
+	          newLastIdealVelocity[key] = 0;
+	        } else {
+	          var newLastIdealStyleValue = _this.state.lastIdealStyle[key];
+	          var newLastIdealVelocityValue = _this.state.lastIdealVelocity[key];
+	          for (var i = 0; i < framesToCatchUp; i++) {
+	            var _stepper = _stepper4['default'](msPerFrame / 1000, newLastIdealStyleValue, newLastIdealVelocityValue, styleValue.val, styleValue.stiffness, styleValue.damping, styleValue.precision);
+
+	            newLastIdealStyleValue = _stepper[0];
+	            newLastIdealVelocityValue = _stepper[1];
+	          }
+
+	          var _stepper2 = _stepper4['default'](msPerFrame / 1000, newLastIdealStyleValue, newLastIdealVelocityValue, styleValue.val, styleValue.stiffness, styleValue.damping, styleValue.precision);
+
+	          var nextIdealX = _stepper2[0];
+	          var nextIdealV = _stepper2[1];
+
+	          newCurrentStyle[key] = newLastIdealStyleValue + (nextIdealX - newLastIdealStyleValue) * currentFrameCompletion;
+	          newCurrentVelocity[key] = newLastIdealVelocityValue + (nextIdealV - newLastIdealVelocityValue) * currentFrameCompletion;
+	          newLastIdealStyle[key] = newLastIdealStyleValue;
+	          newLastIdealVelocity[key] = newLastIdealVelocityValue;
+	        }
+	      }
+
+	      _this.animationID = null;
+	      // the amount we're looped over above
+	      _this.accumulatedTime -= framesToCatchUp * msPerFrame;
+
+	      _this.setState({
+	        currentStyle: newCurrentStyle,
+	        currentVelocity: newCurrentVelocity,
+	        lastIdealStyle: newLastIdealStyle,
+	        lastIdealVelocity: newLastIdealVelocity
+	      });
+
+	      _this.unreadPropStyle = null;
+
+	      _this.startAnimationIfNecessary();
+	    });
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    this.prevTime = _performanceNow2['default']();
+	    this.startAnimationIfNecessary();
+	  },
+
+	  componentWillReceiveProps: function componentWillReceiveProps(props) {
+	    if (this.unreadPropStyle != null) {
+	      // previous props haven't had the chance to be set yet; set them here
+	      this.clearUnreadPropStyle(this.unreadPropStyle);
+	    }
+
+	    this.unreadPropStyle = props.style;
+	    if (this.animationID == null) {
+	      this.prevTime = _performanceNow2['default']();
+	      this.startAnimationIfNecessary();
+	    }
+	  },
+
+	  componentWillUnmount: function componentWillUnmount() {
+	    if (this.animationID != null) {
+	      _raf2['default'].cancel(this.animationID);
+	      this.animationID = null;
+	    }
+	  },
+
+	  render: function render() {
+	    var renderedChildren = this.props.children(this.state.currentStyle);
+	    return renderedChildren && _react2['default'].Children.only(renderedChildren);
+	  }
+	});
+
+	exports['default'] = Motion;
+	module.exports = exports['default'];
+
+/***/ },
+/* 508 */
+/***/ function(module, exports) {
+
+	
+
+	// currently used to initiate the velocity style object to 0
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = mapToZero;
+
+	function mapToZero(obj) {
+	  var ret = {};
+	  for (var key in obj) {
+	    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+	      ret[key] = 0;
+	    }
+	  }
+	  return ret;
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 509 */
+/***/ function(module, exports) {
+
+	
+	// turn {x: {val: 1, stiffness: 1, damping: 2}, y: 2} generated by
+	// `{x: spring(1, {stiffness: 1, damping: 2}), y: 2}` into {x: 1, y: 2}
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = stripStyle;
+
+	function stripStyle(style) {
+	  var ret = {};
+	  for (var key in style) {
+	    if (!Object.prototype.hasOwnProperty.call(style, key)) {
+	      continue;
+	    }
+	    ret[key] = typeof style[key] === 'number' ? style[key] : style[key].val;
+	  }
+	  return ret;
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 510 */
+/***/ function(module, exports) {
+
+	
+
+	// stepper is used a lot. Saves allocation to return the same array wrapper.
+	// This is fine and danger-free against mutations because the callsite
+	// immediately destructures it and gets the numbers inside without passing the
+	"use strict";
+
+	exports.__esModule = true;
+	exports["default"] = stepper;
+
+	var reusedTuple = [0, 0];
+
+	function stepper(secondPerFrame, x, v, destX, k, b, precision) {
+	  // Spring stiffness, in kg / s^2
+
+	  // for animations, destX is really spring length (spring at rest). initial
+	  // position is considered as the stretched/compressed position of a spring
+	  var Fspring = -k * (x - destX);
+
+	  // Damping, in kg / s
+	  var Fdamper = -b * v;
+
+	  // usually we put mass here, but for animation purposes, specifying mass is a
+	  // bit redundant. you could simply adjust k and b accordingly
+	  // let a = (Fspring + Fdamper) / mass;
+	  var a = Fspring + Fdamper;
+
+	  var newV = v + a * secondPerFrame;
+	  var newX = x + newV * secondPerFrame;
+
+	  if (Math.abs(newV) < precision && Math.abs(newX - destX) < precision) {
+	    reusedTuple[0] = destX;
+	    reusedTuple[1] = 0;
+	    return reusedTuple;
+	  }
+
+	  reusedTuple[0] = newX;
+	  reusedTuple[1] = newV;
+	  return reusedTuple;
+	}
+
+	module.exports = exports["default"];
+	// array reference around.
+
+/***/ },
+/* 511 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {// Generated by CoffeeScript 1.7.1
+	(function() {
+	  var getNanoSeconds, hrtime, loadTime;
+
+	  if ((typeof performance !== "undefined" && performance !== null) && performance.now) {
+	    module.exports = function() {
+	      return performance.now();
+	    };
+	  } else if ((typeof process !== "undefined" && process !== null) && process.hrtime) {
+	    module.exports = function() {
+	      return (getNanoSeconds() - loadTime) / 1e6;
+	    };
+	    hrtime = process.hrtime;
+	    getNanoSeconds = function() {
+	      var hr;
+	      hr = hrtime();
+	      return hr[0] * 1e9 + hr[1];
+	    };
+	    loadTime = getNanoSeconds();
+	  } else if (Date.now) {
+	    module.exports = function() {
+	      return Date.now() - loadTime;
+	    };
+	    loadTime = Date.now();
+	  } else {
+	    module.exports = function() {
+	      return new Date().getTime() - loadTime;
+	    };
+	    loadTime = new Date().getTime();
+	  }
+
+	}).call(this);
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+
+/***/ },
+/* 512 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {var now = __webpack_require__(511)
+	  , root = typeof window === 'undefined' ? global : window
+	  , vendors = ['moz', 'webkit']
+	  , suffix = 'AnimationFrame'
+	  , raf = root['request' + suffix]
+	  , caf = root['cancel' + suffix] || root['cancelRequest' + suffix]
+
+	for(var i = 0; !raf && i < vendors.length; i++) {
+	  raf = root[vendors[i] + 'Request' + suffix]
+	  caf = root[vendors[i] + 'Cancel' + suffix]
+	      || root[vendors[i] + 'CancelRequest' + suffix]
+	}
+
+	// Some versions of FF have rAF but not cAF
+	if(!raf || !caf) {
+	  var last = 0
+	    , id = 0
+	    , queue = []
+	    , frameDuration = 1000 / 60
+
+	  raf = function(callback) {
+	    if(queue.length === 0) {
+	      var _now = now()
+	        , next = Math.max(0, frameDuration - (_now - last))
+	      last = next + _now
+	      setTimeout(function() {
+	        var cp = queue.slice(0)
+	        // Clear queue here to prevent
+	        // callbacks from appending listeners
+	        // to the current frame's queue
+	        queue.length = 0
+	        for(var i = 0; i < cp.length; i++) {
+	          if(!cp[i].cancelled) {
+	            try{
+	              cp[i].callback(last)
+	            } catch(e) {
+	              setTimeout(function() { throw e }, 0)
+	            }
+	          }
+	        }
+	      }, Math.round(next))
+	    }
+	    queue.push({
+	      handle: ++id,
+	      callback: callback,
+	      cancelled: false
+	    })
+	    return id
+	  }
+
+	  caf = function(handle) {
+	    for(var i = 0; i < queue.length; i++) {
+	      if(queue[i].handle === handle) {
+	        queue[i].cancelled = true
+	      }
+	    }
+	  }
+	}
+
+	module.exports = function(fn) {
+	  // Wrap in a new function to prevent
+	  // `cancel` potentially being assigned
+	  // to the native rAF function
+	  return raf.call(root, fn)
+	}
+	module.exports.cancel = function() {
+	  caf.apply(root, arguments)
+	}
+	module.exports.polyfill = function() {
+	  root.requestAnimationFrame = raf
+	  root.cancelAnimationFrame = caf
+	}
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 513 */
+/***/ function(module, exports) {
+
+	
+
+	// usage assumption: currentStyle values have already been rendered but it says
+	// nothing of whether currentStyle is stale (see unreadPropStyle)
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = shouldStopAnimation;
+
+	function shouldStopAnimation(currentStyle, style, currentVelocity) {
+	  for (var key in style) {
+	    if (!Object.prototype.hasOwnProperty.call(style, key)) {
+	      continue;
+	    }
+
+	    if (currentVelocity[key] !== 0) {
+	      return false;
+	    }
+
+	    var styleValue = typeof style[key] === 'number' ? style[key] : style[key].val;
+	    // stepper will have already taken care of rounding precision errors, so
+	    // won't have such thing as 0.9999 !=== 1
+	    if (currentStyle[key] !== styleValue) {
+	      return false;
+	    }
+	  }
+
+	  return true;
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 514 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _mapToZero = __webpack_require__(508);
+
+	var _mapToZero2 = _interopRequireDefault(_mapToZero);
+
+	var _stripStyle = __webpack_require__(509);
+
+	var _stripStyle2 = _interopRequireDefault(_stripStyle);
+
+	var _stepper3 = __webpack_require__(510);
+
+	var _stepper4 = _interopRequireDefault(_stepper3);
+
+	var _performanceNow = __webpack_require__(511);
+
+	var _performanceNow2 = _interopRequireDefault(_performanceNow);
+
+	var _raf = __webpack_require__(512);
+
+	var _raf2 = _interopRequireDefault(_raf);
+
+	var _shouldStopAnimation = __webpack_require__(513);
+
+	var _shouldStopAnimation2 = _interopRequireDefault(_shouldStopAnimation);
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var msPerFrame = 1000 / 60;
+
+	function shouldStopAnimationAll(currentStyles, styles, currentVelocities) {
+	  for (var i = 0; i < currentStyles.length; i++) {
+	    if (!_shouldStopAnimation2['default'](currentStyles[i], styles[i], currentVelocities[i])) {
+	      return false;
+	    }
+	  }
+	  return true;
+	}
+
+	var StaggeredMotion = _react2['default'].createClass({
+	  displayName: 'StaggeredMotion',
+
+	  propTypes: {
+	    // TOOD: warn against putting a config in here
+	    defaultStyles: _react.PropTypes.arrayOf(_react.PropTypes.objectOf(_react.PropTypes.number)),
+	    styles: _react.PropTypes.func.isRequired,
+	    children: _react.PropTypes.func.isRequired
+	  },
+
+	  getInitialState: function getInitialState() {
+	    var _props = this.props;
+	    var defaultStyles = _props.defaultStyles;
+	    var styles = _props.styles;
+
+	    var currentStyles = defaultStyles || styles().map(_stripStyle2['default']);
+	    var currentVelocities = currentStyles.map(function (currentStyle) {
+	      return _mapToZero2['default'](currentStyle);
+	    });
+	    return {
+	      currentStyles: currentStyles,
+	      currentVelocities: currentVelocities,
+	      lastIdealStyles: currentStyles,
+	      lastIdealVelocities: currentVelocities
+	    };
+	  },
+
+	  animationID: null,
+	  prevTime: 0,
+	  accumulatedTime: 0,
+	  // it's possible that currentStyle's value is stale: if props is immediately
+	  // changed from 0 to 400 to spring(0) again, the async currentStyle is still
+	  // at 0 (didn't have time to tick and interpolate even once). If we naively
+	  // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
+	  // In reality currentStyle should be 400
+	  unreadPropStyles: null,
+	  // after checking for unreadPropStyles != null, we manually go set the
+	  // non-interpolating values (those that are a number, without a spring
+	  // config)
+	  clearUnreadPropStyle: function clearUnreadPropStyle(unreadPropStyles) {
+	    var _state = this.state;
+	    var currentStyles = _state.currentStyles;
+	    var currentVelocities = _state.currentVelocities;
+	    var lastIdealStyles = _state.lastIdealStyles;
+	    var lastIdealVelocities = _state.lastIdealVelocities;
+
+	    var someDirty = false;
+	    for (var i = 0; i < unreadPropStyles.length; i++) {
+	      var unreadPropStyle = unreadPropStyles[i];
+	      var dirty = false;
+
+	      for (var key in unreadPropStyle) {
+	        if (!Object.prototype.hasOwnProperty.call(unreadPropStyle, key)) {
+	          continue;
+	        }
+
+	        var styleValue = unreadPropStyle[key];
+	        if (typeof styleValue === 'number') {
+	          if (!dirty) {
+	            dirty = true;
+	            someDirty = true;
+	            currentStyles[i] = _extends({}, currentStyles[i]);
+	            currentVelocities[i] = _extends({}, currentVelocities[i]);
+	            lastIdealStyles[i] = _extends({}, lastIdealStyles[i]);
+	            lastIdealVelocities[i] = _extends({}, lastIdealVelocities[i]);
+	          }
+	          currentStyles[i][key] = styleValue;
+	          currentVelocities[i][key] = 0;
+	          lastIdealStyles[i][key] = styleValue;
+	          lastIdealVelocities[i][key] = 0;
+	        }
+	      }
+	    }
+
+	    if (someDirty) {
+	      this.setState({ currentStyles: currentStyles, currentVelocities: currentVelocities, lastIdealStyles: lastIdealStyles, lastIdealVelocities: lastIdealVelocities });
+	    }
+	  },
+
+	  startAnimationIfNecessary: function startAnimationIfNecessary() {
+	    var _this = this;
+
+	    // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
+	    // call cb? No, otherwise accidental parent rerender causes cb trigger
+	    this.animationID = _raf2['default'](function (timestamp) {
+	      var destStyles = _this.props.styles(_this.state.lastIdealStyles);
+
+	      // check if we need to animate in the first place
+	      if (shouldStopAnimationAll(_this.state.currentStyles, destStyles, _this.state.currentVelocities)) {
+	        // no need to cancel animationID here; shouldn't have any in flight
+	        _this.animationID = null;
+	        _this.accumulatedTime = 0;
+	        return;
+	      }
+
+	      var currentTime = timestamp || _performanceNow2['default']();
+	      var timeDelta = currentTime - _this.prevTime;
+	      _this.prevTime = currentTime;
+	      _this.accumulatedTime = _this.accumulatedTime + timeDelta;
+	      // more than 10 frames? prolly switched browser tab. Restart
+	      if (_this.accumulatedTime > msPerFrame * 10) {
+	        _this.accumulatedTime = 0;
+	      }
+
+	      if (_this.accumulatedTime === 0) {
+	        // no need to cancel animationID here; shouldn't have any in flight
+	        _this.animationID = null;
+	        _this.startAnimationIfNecessary();
+	        return;
+	      }
+
+	      var currentFrameCompletion = (_this.accumulatedTime - Math.floor(_this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
+	      var framesToCatchUp = Math.floor(_this.accumulatedTime / msPerFrame);
+
+	      var newLastIdealStyles = [];
+	      var newLastIdealVelocities = [];
+	      var newCurrentStyles = [];
+	      var newCurrentVelocities = [];
+
+	      for (var i = 0; i < destStyles.length; i++) {
+	        var destStyle = destStyles[i];
+	        var newCurrentStyle = {};
+	        var newCurrentVelocity = {};
+	        var newLastIdealStyle = {};
+	        var newLastIdealVelocity = {};
+
+	        for (var key in destStyle) {
+	          if (!Object.prototype.hasOwnProperty.call(destStyle, key)) {
+	            continue;
+	          }
+
+	          var styleValue = destStyle[key];
+	          if (typeof styleValue === 'number') {
+	            newCurrentStyle[key] = styleValue;
+	            newCurrentVelocity[key] = 0;
+	            newLastIdealStyle[key] = styleValue;
+	            newLastIdealVelocity[key] = 0;
+	          } else {
+	            var newLastIdealStyleValue = _this.state.lastIdealStyles[i][key];
+	            var newLastIdealVelocityValue = _this.state.lastIdealVelocities[i][key];
+	            for (var j = 0; j < framesToCatchUp; j++) {
+	              var _stepper = _stepper4['default'](msPerFrame / 1000, newLastIdealStyleValue, newLastIdealVelocityValue, styleValue.val, styleValue.stiffness, styleValue.damping, styleValue.precision);
+
+	              newLastIdealStyleValue = _stepper[0];
+	              newLastIdealVelocityValue = _stepper[1];
+	            }
+
+	            var _stepper2 = _stepper4['default'](msPerFrame / 1000, newLastIdealStyleValue, newLastIdealVelocityValue, styleValue.val, styleValue.stiffness, styleValue.damping, styleValue.precision);
+
+	            var nextIdealX = _stepper2[0];
+	            var nextIdealV = _stepper2[1];
+
+	            newCurrentStyle[key] = newLastIdealStyleValue + (nextIdealX - newLastIdealStyleValue) * currentFrameCompletion;
+	            newCurrentVelocity[key] = newLastIdealVelocityValue + (nextIdealV - newLastIdealVelocityValue) * currentFrameCompletion;
+	            newLastIdealStyle[key] = newLastIdealStyleValue;
+	            newLastIdealVelocity[key] = newLastIdealVelocityValue;
+	          }
+	        }
+
+	        newCurrentStyles[i] = newCurrentStyle;
+	        newCurrentVelocities[i] = newCurrentVelocity;
+	        newLastIdealStyles[i] = newLastIdealStyle;
+	        newLastIdealVelocities[i] = newLastIdealVelocity;
+	      }
+
+	      _this.animationID = null;
+	      // the amount we're looped over above
+	      _this.accumulatedTime -= framesToCatchUp * msPerFrame;
+
+	      _this.setState({
+	        currentStyles: newCurrentStyles,
+	        currentVelocities: newCurrentVelocities,
+	        lastIdealStyles: newLastIdealStyles,
+	        lastIdealVelocities: newLastIdealVelocities
+	      });
+
+	      _this.unreadPropStyles = null;
+
+	      _this.startAnimationIfNecessary();
+	    });
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    this.prevTime = _performanceNow2['default']();
+	    this.startAnimationIfNecessary();
+	  },
+
+	  componentWillReceiveProps: function componentWillReceiveProps(props) {
+	    if (this.unreadPropStyles != null) {
+	      // previous props haven't had the chance to be set yet; set them here
+	      this.clearUnreadPropStyle(this.unreadPropStyles);
+	    }
+
+	    this.unreadPropStyles = props.styles(this.state.lastIdealStyles);
+	    if (this.animationID == null) {
+	      this.prevTime = _performanceNow2['default']();
+	      this.startAnimationIfNecessary();
+	    }
+	  },
+
+	  componentWillUnmount: function componentWillUnmount() {
+	    if (this.animationID != null) {
+	      _raf2['default'].cancel(this.animationID);
+	      this.animationID = null;
+	    }
+	  },
+
+	  render: function render() {
+	    var renderedChildren = this.props.children(this.state.currentStyles);
+	    return renderedChildren && _react2['default'].Children.only(renderedChildren);
+	  }
+	});
+
+	exports['default'] = StaggeredMotion;
+	module.exports = exports['default'];
+
+/***/ },
+/* 515 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _mapToZero = __webpack_require__(508);
+
+	var _mapToZero2 = _interopRequireDefault(_mapToZero);
+
+	var _stripStyle = __webpack_require__(509);
+
+	var _stripStyle2 = _interopRequireDefault(_stripStyle);
+
+	var _stepper3 = __webpack_require__(510);
+
+	var _stepper4 = _interopRequireDefault(_stepper3);
+
+	var _mergeDiff = __webpack_require__(516);
+
+	var _mergeDiff2 = _interopRequireDefault(_mergeDiff);
+
+	var _performanceNow = __webpack_require__(511);
+
+	var _performanceNow2 = _interopRequireDefault(_performanceNow);
+
+	var _raf = __webpack_require__(512);
+
+	var _raf2 = _interopRequireDefault(_raf);
+
+	var _shouldStopAnimation = __webpack_require__(513);
+
+	var _shouldStopAnimation2 = _interopRequireDefault(_shouldStopAnimation);
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var msPerFrame = 1000 / 60;
+
+	// the children function & (potential) styles function asks as param an
+	// Array<TransitionPlainStyle>, where each TransitionPlainStyle is of the format
+	// {key: string, data?: any, style: PlainStyle}. However, the way we keep
+	// internal states doesn't contain such a data structure (check the state and
+	// TransitionMotionState). So when children function and others ask for such
+	// data we need to generate them on the fly by combining mergedPropsStyles and
+	// currentStyles/lastIdealStyles
+	function rehydrateStyles(mergedPropsStyles, unreadPropStyles, plainStyles) {
+	  // Copy the value to a `const` so that Flow understands that the const won't
+	  // change and will be non-nullable in the callback below.
+	  var cUnreadPropStyles = unreadPropStyles;
+	  if (cUnreadPropStyles == null) {
+	    return mergedPropsStyles.map(function (mergedPropsStyle, i) {
+	      return {
+	        key: mergedPropsStyle.key,
+	        data: mergedPropsStyle.data,
+	        style: plainStyles[i]
+	      };
+	    });
+	  }
+	  return mergedPropsStyles.map(function (mergedPropsStyle, i) {
+	    for (var j = 0; j < cUnreadPropStyles.length; j++) {
+	      if (cUnreadPropStyles[j].key === mergedPropsStyle.key) {
+	        return {
+	          key: cUnreadPropStyles[j].key,
+	          data: cUnreadPropStyles[j].data,
+	          style: plainStyles[i]
+	        };
+	      }
+	    }
+	    return { key: mergedPropsStyle.key, data: mergedPropsStyle.data, style: plainStyles[i] };
+	  });
+	}
+
+	function shouldStopAnimationAll(currentStyles, destStyles, currentVelocities, mergedPropsStyles) {
+	  if (mergedPropsStyles.length !== destStyles.length) {
+	    return false;
+	  }
+
+	  for (var i = 0; i < mergedPropsStyles.length; i++) {
+	    if (mergedPropsStyles[i].key !== destStyles[i].key) {
+	      return false;
+	    }
+	  }
+
+	  // we have the invariant that mergedPropsStyles and
+	  // currentStyles/currentVelocities/last* are synced in terms of cells, see
+	  // mergeAndSync comment for more info
+	  for (var i = 0; i < mergedPropsStyles.length; i++) {
+	    if (!_shouldStopAnimation2['default'](currentStyles[i], destStyles[i].style, currentVelocities[i])) {
+	      return false;
+	    }
+	  }
+
+	  return true;
+	}
+
+	// core key merging logic
+
+	// things to do: say previously merged style is {a, b}, dest style (prop) is {b,
+	// c}, previous current (interpolating) style is {a, b}
+	// **invariant**: current[i] corresponds to merged[i] in terms of key
+
+	// steps:
+	// turn merged style into {a?, b, c}
+	//    add c, value of c is destStyles.c
+	//    maybe remove a, aka call willLeave(a), then merged is either {b, c} or {a, b, c}
+	// turn current (interpolating) style from {a, b} into {a?, b, c}
+	//    maybe remove a
+	//    certainly add c, value of c is willEnter(c)
+	// loop over merged and construct new current
+	// dest doesn't change, that's owner's
+	function mergeAndSync(willEnter, willLeave, oldMergedPropsStyles, destStyles, oldCurrentStyles, oldCurrentVelocities, oldLastIdealStyles, oldLastIdealVelocities) {
+	  var newMergedPropsStyles = _mergeDiff2['default'](oldMergedPropsStyles, destStyles, function (oldIndex, oldMergedPropsStyle) {
+	    var leavingStyle = willLeave(oldMergedPropsStyle);
+	    if (leavingStyle == null) {
+	      return null;
+	    }
+	    if (_shouldStopAnimation2['default'](oldCurrentStyles[oldIndex], leavingStyle, oldCurrentVelocities[oldIndex])) {
+	      return null;
+	    }
+	    return { key: oldMergedPropsStyle.key, data: oldMergedPropsStyle.data, style: leavingStyle };
+	  });
+
+	  var newCurrentStyles = [];
+	  var newCurrentVelocities = [];
+	  var newLastIdealStyles = [];
+	  var newLastIdealVelocities = [];
+	  for (var i = 0; i < newMergedPropsStyles.length; i++) {
+	    var newMergedPropsStyleCell = newMergedPropsStyles[i];
+	    var foundOldIndex = null;
+	    for (var j = 0; j < oldMergedPropsStyles.length; j++) {
+	      if (oldMergedPropsStyles[j].key === newMergedPropsStyleCell.key) {
+	        foundOldIndex = j;
+	        break;
+	      }
+	    }
+	    // TODO: key search code
+	    if (foundOldIndex == null) {
+	      var plainStyle = willEnter(newMergedPropsStyleCell);
+	      newCurrentStyles[i] = plainStyle;
+	      newLastIdealStyles[i] = plainStyle;
+
+	      var velocity = _mapToZero2['default'](newMergedPropsStyleCell.style);
+	      newCurrentVelocities[i] = velocity;
+	      newLastIdealVelocities[i] = velocity;
+	    } else {
+	      newCurrentStyles[i] = oldCurrentStyles[foundOldIndex];
+	      newLastIdealStyles[i] = oldLastIdealStyles[foundOldIndex];
+	      newCurrentVelocities[i] = oldCurrentVelocities[foundOldIndex];
+	      newLastIdealVelocities[i] = oldLastIdealVelocities[foundOldIndex];
+	    }
+	  }
+
+	  return [newMergedPropsStyles, newCurrentStyles, newCurrentVelocities, newLastIdealStyles, newLastIdealVelocities];
+	}
+
+	var TransitionMotion = _react2['default'].createClass({
+	  displayName: 'TransitionMotion',
+
+	  propTypes: {
+	    defaultStyles: _react.PropTypes.arrayOf(_react.PropTypes.shape({
+	      key: _react.PropTypes.string.isRequired,
+	      data: _react.PropTypes.any,
+	      style: _react.PropTypes.objectOf(_react.PropTypes.number).isRequired
+	    })),
+	    styles: _react.PropTypes.oneOfType([_react.PropTypes.func, _react.PropTypes.arrayOf(_react.PropTypes.shape({
+	      key: _react.PropTypes.string.isRequired,
+	      data: _react.PropTypes.any,
+	      style: _react.PropTypes.objectOf(_react.PropTypes.oneOfType([_react.PropTypes.number, _react.PropTypes.object])).isRequired
+	    }))]).isRequired,
+	    children: _react.PropTypes.func.isRequired,
+	    willLeave: _react.PropTypes.func,
+	    willEnter: _react.PropTypes.func
+	  },
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      willEnter: function willEnter(styleThatEntered) {
+	        return _stripStyle2['default'](styleThatEntered.style);
+	      },
+	      // recall: returning null makes the current unmounting TransitionStyle
+	      // disappear immediately
+	      willLeave: function willLeave() {
+	        return null;
+	      }
+	    };
+	  },
+
+	  getInitialState: function getInitialState() {
+	    var _props = this.props;
+	    var defaultStyles = _props.defaultStyles;
+	    var styles = _props.styles;
+	    var willEnter = _props.willEnter;
+	    var willLeave = _props.willLeave;
+
+	    var destStyles = typeof styles === 'function' ? styles(defaultStyles) : styles;
+
+	    // this is special. for the first time around, we don't have a comparison
+	    // between last (no last) and current merged props. we'll compute last so:
+	    // say default is {a, b} and styles (dest style) is {b, c}, we'll
+	    // fabricate last as {a, b}
+	    var oldMergedPropsStyles = undefined;
+	    if (defaultStyles == null) {
+	      oldMergedPropsStyles = destStyles;
+	    } else {
+	      oldMergedPropsStyles = defaultStyles.map(function (defaultStyleCell) {
+	        // TODO: key search code
+	        for (var i = 0; i < destStyles.length; i++) {
+	          if (destStyles[i].key === defaultStyleCell.key) {
+	            return destStyles[i];
+	          }
+	        }
+	        return defaultStyleCell;
+	      });
+	    }
+	    var oldCurrentStyles = defaultStyles == null ? destStyles.map(function (s) {
+	      return _stripStyle2['default'](s.style);
+	    }) : defaultStyles.map(function (s) {
+	      return _stripStyle2['default'](s.style);
+	    });
+	    var oldCurrentVelocities = defaultStyles == null ? destStyles.map(function (s) {
+	      return _mapToZero2['default'](s.style);
+	    }) : defaultStyles.map(function (s) {
+	      return _mapToZero2['default'](s.style);
+	    });
+
+	    var _mergeAndSync = mergeAndSync(
+	    // Because this is an old-style React.createClass component, Flow doesn't
+	    // understand that the willEnter and willLeave props have default values
+	    // and will always be present.
+	    willEnter, willLeave, oldMergedPropsStyles, destStyles, oldCurrentStyles, oldCurrentVelocities, oldCurrentStyles, // oldLastIdealStyles really
+	    oldCurrentVelocities);
+
+	    var mergedPropsStyles = _mergeAndSync[0];
+	    var currentStyles = _mergeAndSync[1];
+	    var currentVelocities = _mergeAndSync[2];
+	    var lastIdealStyles = _mergeAndSync[3];
+	    var lastIdealVelocities = _mergeAndSync[4];
+	    // oldLastIdealVelocities really
+
+	    return {
+	      currentStyles: currentStyles,
+	      currentVelocities: currentVelocities,
+	      lastIdealStyles: lastIdealStyles,
+	      lastIdealVelocities: lastIdealVelocities,
+	      mergedPropsStyles: mergedPropsStyles
+	    };
+	  },
+
+	  unmounting: false,
+	  animationID: null,
+	  prevTime: 0,
+	  accumulatedTime: 0,
+	  // it's possible that currentStyle's value is stale: if props is immediately
+	  // changed from 0 to 400 to spring(0) again, the async currentStyle is still
+	  // at 0 (didn't have time to tick and interpolate even once). If we naively
+	  // compare currentStyle with destVal it'll be 0 === 0 (no animation, stop).
+	  // In reality currentStyle should be 400
+	  unreadPropStyles: null,
+	  // after checking for unreadPropStyles != null, we manually go set the
+	  // non-interpolating values (those that are a number, without a spring
+	  // config)
+	  clearUnreadPropStyle: function clearUnreadPropStyle(unreadPropStyles) {
+	    var _mergeAndSync2 = mergeAndSync(this.props.willEnter, this.props.willLeave, this.state.mergedPropsStyles, unreadPropStyles, this.state.currentStyles, this.state.currentVelocities, this.state.lastIdealStyles, this.state.lastIdealVelocities);
+
+	    var mergedPropsStyles = _mergeAndSync2[0];
+	    var currentStyles = _mergeAndSync2[1];
+	    var currentVelocities = _mergeAndSync2[2];
+	    var lastIdealStyles = _mergeAndSync2[3];
+	    var lastIdealVelocities = _mergeAndSync2[4];
+
+	    for (var i = 0; i < unreadPropStyles.length; i++) {
+	      var unreadPropStyle = unreadPropStyles[i].style;
+	      var dirty = false;
+
+	      for (var key in unreadPropStyle) {
+	        if (!Object.prototype.hasOwnProperty.call(unreadPropStyle, key)) {
+	          continue;
+	        }
+
+	        var styleValue = unreadPropStyle[key];
+	        if (typeof styleValue === 'number') {
+	          if (!dirty) {
+	            dirty = true;
+	            currentStyles[i] = _extends({}, currentStyles[i]);
+	            currentVelocities[i] = _extends({}, currentVelocities[i]);
+	            lastIdealStyles[i] = _extends({}, lastIdealStyles[i]);
+	            lastIdealVelocities[i] = _extends({}, lastIdealVelocities[i]);
+	            mergedPropsStyles[i] = {
+	              key: mergedPropsStyles[i].key,
+	              data: mergedPropsStyles[i].data,
+	              style: _extends({}, mergedPropsStyles[i].style)
+	            };
+	          }
+	          currentStyles[i][key] = styleValue;
+	          currentVelocities[i][key] = 0;
+	          lastIdealStyles[i][key] = styleValue;
+	          lastIdealVelocities[i][key] = 0;
+	          mergedPropsStyles[i].style[key] = styleValue;
+	        }
+	      }
+	    }
+
+	    // unlike the other 2 components, we can't detect staleness and optionally
+	    // opt out of setState here. each style object's data might contain new
+	    // stuff we're not/cannot compare
+	    this.setState({
+	      currentStyles: currentStyles,
+	      currentVelocities: currentVelocities,
+	      mergedPropsStyles: mergedPropsStyles,
+	      lastIdealStyles: lastIdealStyles,
+	      lastIdealVelocities: lastIdealVelocities
+	    });
+	  },
+
+	  startAnimationIfNecessary: function startAnimationIfNecessary() {
+	    var _this = this;
+
+	    if (this.unmounting) {
+	      return;
+	    }
+	    // TODO: when config is {a: 10} and dest is {a: 10} do we raf once and
+	    // call cb? No, otherwise accidental parent rerender causes cb trigger
+	    this.animationID = _raf2['default'](function (timestamp) {
+	      var propStyles = _this.props.styles;
+	      var destStyles = typeof propStyles === 'function' ? propStyles(rehydrateStyles(_this.state.mergedPropsStyles, _this.unreadPropStyles, _this.state.lastIdealStyles)) : propStyles;
+
+	      // check if we need to animate in the first place
+	      if (shouldStopAnimationAll(_this.state.currentStyles, destStyles, _this.state.currentVelocities, _this.state.mergedPropsStyles)) {
+	        // no need to cancel animationID here; shouldn't have any in flight
+	        _this.animationID = null;
+	        _this.accumulatedTime = 0;
+	        return;
+	      }
+
+	      var currentTime = timestamp || _performanceNow2['default']();
+	      var timeDelta = currentTime - _this.prevTime;
+	      _this.prevTime = currentTime;
+	      _this.accumulatedTime = _this.accumulatedTime + timeDelta;
+	      // more than 10 frames? prolly switched browser tab. Restart
+	      if (_this.accumulatedTime > msPerFrame * 10) {
+	        _this.accumulatedTime = 0;
+	      }
+
+	      if (_this.accumulatedTime === 0) {
+	        // no need to cancel animationID here; shouldn't have any in flight
+	        _this.animationID = null;
+	        _this.startAnimationIfNecessary();
+	        return;
+	      }
+
+	      var currentFrameCompletion = (_this.accumulatedTime - Math.floor(_this.accumulatedTime / msPerFrame) * msPerFrame) / msPerFrame;
+	      var framesToCatchUp = Math.floor(_this.accumulatedTime / msPerFrame);
+
+	      var _mergeAndSync3 = mergeAndSync(_this.props.willEnter, _this.props.willLeave, _this.state.mergedPropsStyles, destStyles, _this.state.currentStyles, _this.state.currentVelocities, _this.state.lastIdealStyles, _this.state.lastIdealVelocities);
+
+	      var newMergedPropsStyles = _mergeAndSync3[0];
+	      var newCurrentStyles = _mergeAndSync3[1];
+	      var newCurrentVelocities = _mergeAndSync3[2];
+	      var newLastIdealStyles = _mergeAndSync3[3];
+	      var newLastIdealVelocities = _mergeAndSync3[4];
+
+	      for (var i = 0; i < newMergedPropsStyles.length; i++) {
+	        var newMergedPropsStyle = newMergedPropsStyles[i].style;
+	        var newCurrentStyle = {};
+	        var newCurrentVelocity = {};
+	        var newLastIdealStyle = {};
+	        var newLastIdealVelocity = {};
+
+	        for (var key in newMergedPropsStyle) {
+	          if (!Object.prototype.hasOwnProperty.call(newMergedPropsStyle, key)) {
+	            continue;
+	          }
+
+	          var styleValue = newMergedPropsStyle[key];
+	          if (typeof styleValue === 'number') {
+	            newCurrentStyle[key] = styleValue;
+	            newCurrentVelocity[key] = 0;
+	            newLastIdealStyle[key] = styleValue;
+	            newLastIdealVelocity[key] = 0;
+	          } else {
+	            var newLastIdealStyleValue = newLastIdealStyles[i][key];
+	            var newLastIdealVelocityValue = newLastIdealVelocities[i][key];
+	            for (var j = 0; j < framesToCatchUp; j++) {
+	              var _stepper = _stepper4['default'](msPerFrame / 1000, newLastIdealStyleValue, newLastIdealVelocityValue, styleValue.val, styleValue.stiffness, styleValue.damping, styleValue.precision);
+
+	              newLastIdealStyleValue = _stepper[0];
+	              newLastIdealVelocityValue = _stepper[1];
+	            }
+
+	            var _stepper2 = _stepper4['default'](msPerFrame / 1000, newLastIdealStyleValue, newLastIdealVelocityValue, styleValue.val, styleValue.stiffness, styleValue.damping, styleValue.precision);
+
+	            var nextIdealX = _stepper2[0];
+	            var nextIdealV = _stepper2[1];
+
+	            newCurrentStyle[key] = newLastIdealStyleValue + (nextIdealX - newLastIdealStyleValue) * currentFrameCompletion;
+	            newCurrentVelocity[key] = newLastIdealVelocityValue + (nextIdealV - newLastIdealVelocityValue) * currentFrameCompletion;
+	            newLastIdealStyle[key] = newLastIdealStyleValue;
+	            newLastIdealVelocity[key] = newLastIdealVelocityValue;
+	          }
+	        }
+
+	        newLastIdealStyles[i] = newLastIdealStyle;
+	        newLastIdealVelocities[i] = newLastIdealVelocity;
+	        newCurrentStyles[i] = newCurrentStyle;
+	        newCurrentVelocities[i] = newCurrentVelocity;
+	      }
+
+	      _this.animationID = null;
+	      // the amount we're looped over above
+	      _this.accumulatedTime -= framesToCatchUp * msPerFrame;
+
+	      _this.setState({
+	        currentStyles: newCurrentStyles,
+	        currentVelocities: newCurrentVelocities,
+	        lastIdealStyles: newLastIdealStyles,
+	        lastIdealVelocities: newLastIdealVelocities,
+	        mergedPropsStyles: newMergedPropsStyles
+	      });
+
+	      _this.unreadPropStyles = null;
+
+	      _this.startAnimationIfNecessary();
+	    });
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    this.prevTime = _performanceNow2['default']();
+	    this.startAnimationIfNecessary();
+	  },
+
+	  componentWillReceiveProps: function componentWillReceiveProps(props) {
+	    if (this.unreadPropStyles) {
+	      // previous props haven't had the chance to be set yet; set them here
+	      this.clearUnreadPropStyle(this.unreadPropStyles);
+	    }
+
+	    var styles = props.styles;
+	    if (typeof styles === 'function') {
+	      this.unreadPropStyles = styles(rehydrateStyles(this.state.mergedPropsStyles, this.unreadPropStyles, this.state.lastIdealStyles));
+	    } else {
+	      this.unreadPropStyles = styles;
+	    }
+
+	    if (this.animationID == null) {
+	      this.prevTime = _performanceNow2['default']();
+	      this.startAnimationIfNecessary();
+	    }
+	  },
+
+	  componentWillUnmount: function componentWillUnmount() {
+	    this.unmounting = true;
+	    if (this.animationID != null) {
+	      _raf2['default'].cancel(this.animationID);
+	      this.animationID = null;
+	    }
+	  },
+
+	  render: function render() {
+	    var hydratedStyles = rehydrateStyles(this.state.mergedPropsStyles, this.unreadPropStyles, this.state.currentStyles);
+	    var renderedChildren = this.props.children(hydratedStyles);
+	    return renderedChildren && _react2['default'].Children.only(renderedChildren);
+	  }
+	});
+
+	exports['default'] = TransitionMotion;
+	module.exports = exports['default'];
+
+	// list of styles, each containing interpolating values. Part of what's passed
+	// to children function. Notice that this is
+	// Array<ActualInterpolatingStyleObject>, without the wrapper that is {key: ...,
+	// data: ... style: ActualInterpolatingStyleObject}. Only mergedPropsStyles
+	// contains the key & data info (so that we only have a single source of truth
+	// for these, and to save space). Check the comment for `rehydrateStyles` to
+	// see how we regenerate the entirety of what's passed to children function
+
+	// the array that keeps track of currently rendered stuff! Including stuff
+	// that you've unmounted but that's still animating. This is where it lives
+
+/***/ },
+/* 516 */
+/***/ function(module, exports) {
+
+	
+
+	// core keys merging algorithm. If previous render's keys are [a, b], and the
+	// next render's [c, b, d], what's the final merged keys and ordering?
+
+	// - c and a must both be before b
+	// - b before d
+	// - ordering between a and c ambiguous
+
+	// this reduces to merging two partially ordered lists (e.g. lists where not
+	// every item has a definite ordering, like comparing a and c above). For the
+	// ambiguous ordering we deterministically choose to place the next render's
+	// item after the previous'; so c after a
+
+	// this is called a topological sorting. Except the existing algorithms don't
+	// work well with js bc of the amount of allocation, and isn't optimized for our
+	// current use-case bc the runtime is linear in terms of edges (see wiki for
+	// meaning), which is huge when two lists have many common elements
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = mergeDiff;
+
+	function mergeDiff(prev, next, onRemove) {
+	  // bookkeeping for easier access of a key's index below. This is 2 allocations +
+	  // potentially triggering chrome hash map mode for objs (so it might be faster
+
+	  var prevKeyIndex = {};
+	  for (var i = 0; i < prev.length; i++) {
+	    prevKeyIndex[prev[i].key] = i;
+	  }
+	  var nextKeyIndex = {};
+	  for (var i = 0; i < next.length; i++) {
+	    nextKeyIndex[next[i].key] = i;
+	  }
+
+	  // first, an overly elaborate way of merging prev and next, eliminating
+	  // duplicates (in terms of keys). If there's dupe, keep the item in next).
+	  // This way of writing it saves allocations
+	  var ret = [];
+	  for (var i = 0; i < next.length; i++) {
+	    ret[i] = next[i];
+	  }
+	  for (var i = 0; i < prev.length; i++) {
+	    if (!Object.prototype.hasOwnProperty.call(nextKeyIndex, prev[i].key)) {
+	      // this is called my TM's `mergeAndSync`, which calls willLeave. We don't
+	      // merge in keys that the user desires to kill
+	      var fill = onRemove(i, prev[i]);
+	      if (fill != null) {
+	        ret.push(fill);
+	      }
+	    }
+	  }
+
+	  // now all the items all present. Core sorting logic to have the right order
+	  return ret.sort(function (a, b) {
+	    var nextOrderA = nextKeyIndex[a.key];
+	    var nextOrderB = nextKeyIndex[b.key];
+	    var prevOrderA = prevKeyIndex[a.key];
+	    var prevOrderB = prevKeyIndex[b.key];
+
+	    if (nextOrderA != null && nextOrderB != null) {
+	      // both keys in next
+	      return nextKeyIndex[a.key] - nextKeyIndex[b.key];
+	    } else if (prevOrderA != null && prevOrderB != null) {
+	      // both keys in prev
+	      return prevKeyIndex[a.key] - prevKeyIndex[b.key];
+	    } else if (nextOrderA != null) {
+	      // key a in next, key b in prev
+
+	      // how to determine the order between a and b? We find a "pivot" (term
+	      // abuse), a key present in both prev and next, that is sandwiched between
+	      // a and b. In the context of our above example, if we're comparing a and
+	      // d, b's (the only) pivot
+	      for (var i = 0; i < next.length; i++) {
+	        var pivot = next[i].key;
+	        if (!Object.prototype.hasOwnProperty.call(prevKeyIndex, pivot)) {
+	          continue;
+	        }
+
+	        if (nextOrderA < nextKeyIndex[pivot] && prevOrderB > prevKeyIndex[pivot]) {
+	          return -1;
+	        } else if (nextOrderA > nextKeyIndex[pivot] && prevOrderB < prevKeyIndex[pivot]) {
+	          return 1;
+	        }
+	      }
+	      // pluggable. default to: next bigger than prev
+	      return 1;
+	    }
+	    // prevOrderA, nextOrderB
+	    for (var i = 0; i < next.length; i++) {
+	      var pivot = next[i].key;
+	      if (!Object.prototype.hasOwnProperty.call(prevKeyIndex, pivot)) {
+	        continue;
+	      }
+	      if (nextOrderB < nextKeyIndex[pivot] && prevOrderA > prevKeyIndex[pivot]) {
+	        return 1;
+	      } else if (nextOrderB > nextKeyIndex[pivot] && prevOrderA < prevKeyIndex[pivot]) {
+	        return -1;
+	      }
+	    }
+	    // pluggable. default to: next bigger than prev
+	    return -1;
+	  });
+	}
+
+	module.exports = exports['default'];
+	// to loop through and find a key's index each time), but I no longer care
+
+/***/ },
+/* 517 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	exports['default'] = spring;
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _presets = __webpack_require__(518);
+
+	var _presets2 = _interopRequireDefault(_presets);
+
+	var defaultConfig = _extends({}, _presets2['default'].noWobble, {
+	  precision: 0.01
+	});
+
+	function spring(val, config) {
+	  return _extends({}, defaultConfig, config, { val: val });
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 518 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	exports.__esModule = true;
+	exports["default"] = {
+	  noWobble: { stiffness: 170, damping: 26 }, // the default, if nothing provided
+	  gentle: { stiffness: 120, damping: 14 },
+	  wobbly: { stiffness: 180, damping: 12 },
+	  stiff: { stiffness: 210, damping: 20 }
+	};
+	module.exports = exports["default"];
+
+/***/ },
+/* 519 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = reorderKeys;
+
+	var hasWarned = false;
+
+	function reorderKeys() {
+	  if (process.env.NODE_ENV === 'development') {
+	    if (!hasWarned) {
+	      hasWarned = true;
+	      console.error('`reorderKeys` has been removed, since it is no longer needed for TransitionMotion\'s new styles array API.');
+	    }
+	  }
+	}
+
+	module.exports = exports['default'];
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+
+/***/ },
+/* 520 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactClass = __webpack_require__(484);
+
+	var _reactClass2 = _interopRequireDefault(_reactClass);
+
+	var _objectAssign = __webpack_require__(485);
+
+	var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+	var _reactFlex = __webpack_require__(486);
+
+	var _join = __webpack_require__(494);
+
+	var _join2 = _interopRequireDefault(_join);
+
+	var _bemFactory = __webpack_require__(501);
+
+	var _bemFactory2 = _interopRequireDefault(_bemFactory);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var CLASS_NAME = 'react-tab-panel__body';
+
+	var bem = (0, _bemFactory2.default)(CLASS_NAME);
+	var m = function m(name) {
+	  return bem(null, name);
+	};
+
+	var Body = function (_Component) {
+	  _inherits(Body, _Component);
+
+	  function Body() {
+	    _classCallCheck(this, Body);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Body).apply(this, arguments));
+	  }
+
+	  _createClass(Body, [{
+	    key: 'render',
+	    value: function render() {
+	      var props = this.props;
+
+
+	      var className = (0, _join2.default)(props.className, CLASS_NAME, m('tab-position-' + props.tabPosition), m('orientation-' + (props.vertical ? 'vertical' : 'horizontal')), props.transition && m('transition'), props.transitioning && props.transitioning !== true && m('transition-' + (props.transitioning == -1 ? 'prev' : 'next')), props.transitionInProgress && m('transitioning'));
+
+	      var content = props.renderContent(props.children);
+
+	      return _react2.default.createElement(_reactFlex.Flex, _extends({
+	        row: true,
+	        wrap: false,
+	        alignItems: 'start',
+	        flexGrow: 1,
+	        flexShrink: 1,
+	        flexBasis: 'auto'
+	      }, props, {
+	        className: className,
+	        children: content
+	      }));
+	    }
+	  }]);
+
+	  return Body;
+	}(_reactClass2.default);
+
+	exports.default = Body;
+
+
+	Body.propTypes = {
+	  renderContent: _react.PropTypes.func
+	};
+
+	Body.defaultProps = {
+	  renderContent: function renderContent(children) {
+	    return children;
+	  },
+	  isTabBody: true
+	};
+
+/***/ },
+/* 521 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var hasOwn      = __webpack_require__(522)
+	var getPrefixed = __webpack_require__(523)
+
+	var map      = __webpack_require__(529)
+	var plugable = __webpack_require__(530)
+
+	function plugins(key, value){
+
+		var result = {
+			key  : key,
+			value: value
+		}
+
+		;(RESULT.plugins || []).forEach(function(fn){
+
+			var tmp = map(function(res){
+				return fn(key, value, res)
+			}, result)
+
+			if (tmp){
+				result = tmp
+			}
+		})
+
+		return result
+	}
+
+	function normalize(key, value){
+
+		var result = plugins(key, value)
+
+		return map(function(result){
+			return {
+				key  : getPrefixed(result.key, result.value),
+				value: result.value
+			}
+		}, result)
+
+		return result
+	}
+
+	var RESULT = function(style){
+
+		var k
+		var item
+		var result = {}
+
+		for (k in style) if (hasOwn(style, k)){
+			item = normalize(k, style[k])
+
+			if (!item){
+				continue
+			}
+
+			map(function(item){
+				result[item.key] = item.value
+			}, item)
+		}
+
+		return result
+	}
+
+	module.exports = plugable(RESULT)
+
+/***/ },
+/* 522 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = function(obj, prop){
+		return Object.prototype.hasOwnProperty.call(obj, prop)
+	}
+
+
+/***/ },
+/* 523 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var getStylePrefixed = __webpack_require__(524)
+	var properties       = __webpack_require__(528)
+
+	module.exports = function(key, value){
+
+		if (!properties[key]){
+			return key
+		}
+
+		return getStylePrefixed(key, value)
+	}
+
+/***/ },
+/* 524 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var toUpperFirst = __webpack_require__(525)
+	var getPrefix    = __webpack_require__(526)
+	var el           = __webpack_require__(527)
+
+	var MEMORY = {}
+	var STYLE
+	var ELEMENT
+
+	var PREFIX
+
+	module.exports = function(key, value){
+
+	    ELEMENT = ELEMENT || el()
+	    STYLE   = STYLE   || ELEMENT.style
+
+	    var k = key// + ': ' + value
+
+	    if (MEMORY[k]){
+	        return MEMORY[k]
+	    }
+
+	    var prefix
+	    var prefixed
+
+	    if (!(key in STYLE)){//we have to prefix
+
+	        // if (PREFIX){
+	        //     prefix = PREFIX
+	        // } else {
+	            prefix = getPrefix('appearance')
+
+	        //     if (prefix){
+	        //         prefix = PREFIX = prefix.toLowerCase()
+	        //     }
+	        // }
+
+	        if (prefix){
+	            prefixed = prefix + toUpperFirst(key)
+
+	            if (prefixed in STYLE){
+	                key = prefixed
+	            }
+	        }
+	    }
+
+	    MEMORY[k] = key
+
+	    return key
+	}
+
+/***/ },
+/* 525 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = function(str){
+		return str?
+				str.charAt(0).toUpperCase() + str.slice(1):
+				''
+	}
+
+/***/ },
+/* 526 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var toUpperFirst = __webpack_require__(525)
+	var prefixes     = ["ms", "Moz", "Webkit", "O"]
+
+	var el = __webpack_require__(527)
+
+	var ELEMENT
+	var PREFIX
+
+	module.exports = function(key){
+
+		if (PREFIX !== undefined){
+			return PREFIX
+		}
+
+		ELEMENT = ELEMENT || el()
+
+		var i = 0
+		var len = prefixes.length
+		var tmp
+		var prefix
+
+		for (; i < len; i++){
+			prefix = prefixes[i]
+			tmp = prefix + toUpperFirst(key)
+
+			if (typeof ELEMENT.style[tmp] != 'undefined'){
+				return PREFIX = prefix
+			}
+		}
+
+		return PREFIX
+	}
+
+/***/ },
+/* 527 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	var el
+
+	module.exports = function(){
+
+		if(!el && !!global.document){
+		  	el = global.document.createElement('div')
+		}
+
+		if (!el){
+			el = {style: {}}
+		}
+
+		return el
+	}
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 528 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = {
+	  'alignItems': 1,
+	  'justifyContent': 1,
+	  'flex': 1,
+	  'flexFlow': 1,
+	  'flexGrow': 1,
+	  'flexShrink': 1,
+	  'flexBasis': 1,
+	  'flexDirection': 1,
+	  'flexWrap': 1,
+	  'alignContent': 1,
+	  'alignSelf': 1,
+
+	  'userSelect': 1,
+	  'transform': 1,
+	  'transition': 1,
+	  'transformOrigin': 1,
+	  'transformStyle': 1,
+	  'transitionProperty': 1,
+	  'transitionDuration': 1,
+	  'transitionTimingFunction': 1,
+	  'transitionDelay': 1,
+	  'borderImage': 1,
+	  'borderImageSlice': 1,
+	  'boxShadow': 1,
+	  'backgroundClip': 1,
+	  'backfaceVisibility': 1,
+	  'perspective': 1,
+	  'perspectiveOrigin': 1,
+	  'animation': 1,
+	  'animationDuration': 1,
+	  'animationName': 1,
+	  'animationDelay': 1,
+	  'animationDirection': 1,
+	  'animationIterationCount': 1,
+	  'animationTimingFunction': 1,
+	  'animationPlayState': 1,
+	  'animationFillMode': 1,
+	  'appearance': 1
+	}
+
+
+/***/ },
+/* 529 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = function(fn, item){
+
+		if (!item){
+			return
+		}
+
+		if (Array.isArray(item)){
+			return item.map(fn).filter(function(x){
+				return !!x
+			})
+		} else {
+			return fn(item)
+		}
+	}
+
+/***/ },
+/* 530 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var getCssPrefixedValue = __webpack_require__(531)
+
+	module.exports = function(target){
+		target.plugins = target.plugins || [
+			(function(){
+				var values = {
+					'flex':1,
+					'inline-flex':1
+				}
+
+				return function(key, value){
+					if (key === 'display' && value in values){
+						return {
+							key  : key,
+							value: getCssPrefixedValue(key, value, true)
+						}
+					}
+				}
+			})()
+		]
+
+		target.plugin = function(fn){
+			target.plugins = target.plugins || []
+
+			target.plugins.push(fn)
+		}
+
+		return target
+	}
+
+/***/ },
+/* 531 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var getPrefix     = __webpack_require__(526)
+	var forcePrefixed = __webpack_require__(532)
+	var el            = __webpack_require__(527)
+
+	var MEMORY = {}
+	var STYLE
+	var ELEMENT
+
+	module.exports = function(key, value, force){
+
+	    ELEMENT = ELEMENT || el()
+	    STYLE   = STYLE   ||  ELEMENT.style
+
+	    var k = key + ': ' + value
+
+	    if (MEMORY[k]){
+	        return MEMORY[k]
+	    }
+
+	    var prefix
+	    var prefixed
+	    var prefixedValue
+
+	    if (force || !(key in STYLE)){
+
+	        prefix = getPrefix('appearance')
+
+	        if (prefix){
+	            prefixed = forcePrefixed(key, value)
+
+	            prefixedValue = '-' + prefix.toLowerCase() + '-' + value
+
+	            if (prefixed in STYLE){
+	                ELEMENT.style[prefixed] = ''
+	                ELEMENT.style[prefixed] = prefixedValue
+
+	                if (ELEMENT.style[prefixed] !== ''){
+	                    value = prefixedValue
+	                }
+	            }
+	        }
+	    }
+
+	    MEMORY[k] = value
+
+	    return value
+	}
+
+/***/ },
+/* 532 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var toUpperFirst = __webpack_require__(525)
+	var getPrefix    = __webpack_require__(526)
+	var properties   = __webpack_require__(528)
+
+	/**
+	 * Returns the given key prefixed, if the property is found in the prefixProps map.
+	 *
+	 * Does not test if the property supports the given value unprefixed.
+	 * If you need this, use './getPrefixed' instead
+	 */
+	module.exports = function(key, value){
+
+		if (!properties[key]){
+			return key
+		}
+
+		var prefix = getPrefix(key)
+
+		return prefix?
+					prefix + toUpperFirst(key):
+					key
+	}
+
+/***/ },
+/* 533 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(534);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(536)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../css-loader/index.js!./index.css", function() {
+				var newContent = require("!!./../css-loader/index.js!./index.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 534 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(535)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".react-flex-v2 {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex; }\n\n.react-flex-v2--inline {\n  display: -webkit-inline-box;\n  display: -webkit-inline-flex;\n  display: -ms-inline-flexbox;\n  display: inline-flex; }\n\n.react-flex-v2--display-flex {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex; }\n\n.react-flex-v2--display-inline-flex {\n  display: -webkit-inline-box;\n  display: -webkit-inline-flex;\n  display: -ms-inline-flexbox;\n  display: inline-flex; }\n\n/* ALIGN-ITEMS */\n.react-flex-v2--align-items-center {\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n              -ms-grid-row-align: center;\n          align-items: center; }\n\n.react-flex-v2--align-items-stretch {\n  -webkit-box-align: stretch;\n  -webkit-align-items: stretch;\n      -ms-flex-align: stretch;\n              -ms-grid-row-align: stretch;\n          align-items: stretch; }\n\n.react-flex-v2--align-items-baseline {\n  -webkit-box-align: baseline;\n  -webkit-align-items: baseline;\n      -ms-flex-align: baseline;\n              -ms-grid-row-align: baseline;\n          align-items: baseline; }\n\n.react-flex-v2--align-items-end,\n.react-flex-v2--align-items-flex-end {\n  -webkit-box-align: end;\n  -webkit-align-items: flex-end;\n      -ms-flex-align: end;\n              -ms-grid-row-align: flex-end;\n          align-items: flex-end; }\n\n.react-flex-v2--align-items-start,\n.react-flex-v2--align-items-flex-start {\n  -webkit-box-align: start;\n  -webkit-align-items: flex-start;\n      -ms-flex-align: start;\n              -ms-grid-row-align: flex-start;\n          align-items: flex-start; }\n\n/* ALIGN-SELF */\n.react-flex-v2--align-self-center {\n  -webkit-align-self: center;\n      -ms-flex-item-align: center;\n          align-self: center; }\n\n.react-flex-v2--align-self-stretch {\n  -webkit-align-self: stretch;\n      -ms-flex-item-align: stretch;\n          align-self: stretch; }\n\n.react-flex-v2--align-self-baseline {\n  -webkit-align-self: baseline;\n      -ms-flex-item-align: baseline;\n          align-self: baseline; }\n\n.react-flex-v2--align-self-auto {\n  -webkit-align-self: auto;\n      -ms-flex-item-align: auto;\n          align-self: auto; }\n\n.react-flex-v2--align-self-end,\n.react-flex-v2--align-self-flex-end {\n  -webkit-align-self: flex-end;\n      -ms-flex-item-align: end;\n          align-self: flex-end; }\n\n.react-flex-v2--align-self-start,\n.react-flex-v2--align-self-flex-start {\n  -webkit-align-self: flex-start;\n      -ms-flex-item-align: start;\n          align-self: flex-start; }\n\n/* ALIGN-CONTENT */\n.react-flex-v2--align-content-center {\n  -webkit-align-content: center;\n      -ms-flex-line-pack: center;\n          align-content: center; }\n\n.react-flex-v2--align-content-stretch {\n  -webkit-align-content: stretch;\n      -ms-flex-line-pack: stretch;\n          align-content: stretch; }\n\n.react-flex-v2--align-content-around,\n.react-flex-v2--align-content-space-around {\n  -webkit-align-content: space-around;\n      -ms-flex-line-pack: distribute;\n          align-content: space-around; }\n\n.react-flex-v2--align-content-between,\n.react-flex-v2--align-content-space-between {\n  -webkit-align-content: space-between;\n      -ms-flex-line-pack: justify;\n          align-content: space-between; }\n\n.react-flex-v2--align-content-end,\n.react-flex-v2--align-content-flex-end {\n  -webkit-align-content: flex-end;\n      -ms-flex-line-pack: end;\n          align-content: flex-end; }\n\n.react-flex-v2--align-content-start,\n.react-flex-v2--align-content-flex-start {\n  -webkit-align-content: flex-start;\n      -ms-flex-line-pack: start;\n          align-content: flex-start; }\n\n/* JUSTIFY-CONTENT */\n.react-flex-v2--justify-content-start,\n.react-flex-v2--justify-content-flex-start {\n  -webkit-box-pack: start;\n  -webkit-justify-content: flex-start;\n      -ms-flex-pack: start;\n          justify-content: flex-start; }\n\n.react-flex-v2--justify-content-end,\n.react-flex-v2--justify-content-flex-end {\n  -webkit-box-pack: end;\n  -webkit-justify-content: flex-end;\n      -ms-flex-pack: end;\n          justify-content: flex-end; }\n\n.react-flex-v2--justify-content-center {\n  -webkit-box-pack: center;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center; }\n\n.react-flex-v2--justify-content-space-around {\n  -webkit-justify-content: space-around;\n      -ms-flex-pack: distribute;\n          justify-content: space-around; }\n\n.react-flex-v2--justify-content-space-between {\n  -webkit-box-pack: justify;\n  -webkit-justify-content: space-between;\n      -ms-flex-pack: justify;\n          justify-content: space-between; }\n\n/* WRAP */\n.react-flex-v2--wrap {\n  -webkit-flex-wrap: wrap;\n      -ms-flex-wrap: wrap;\n          flex-wrap: wrap; }\n\n/* COLUMN */\n.react-flex-v2--column {\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column; }\n\n.react-flex-v2--column-reverse {\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: reverse;\n  -webkit-flex-direction: column-reverse;\n      -ms-flex-direction: column-reverse;\n          flex-direction: column-reverse; }\n\n/* ROW */\n.react-flex-v2--row {\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: row;\n      -ms-flex-direction: row;\n          flex-direction: row; }\n\n.react-flex-v2--row-reverse {\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: reverse;\n  -webkit-flex-direction: row-reverse;\n      -ms-flex-direction: row-reverse;\n          flex-direction: row-reverse; }\n\n/* FLEX-BASIS */\n.react-flex-v2--flex-basis-auto {\n  -webkit-flex-basis: auto;\n      -ms-flex-preferred-size: auto;\n          flex-basis: auto; }\n\n.react-flex-v2--flex-basis-none,\n.react-flex-v2--flex-basis-0 {\n  -webkit-flex-basis: 0px;\n      -ms-flex-preferred-size: 0px;\n          flex-basis: 0px; }\n\n.react-flex-v2--flex-basis-fill {\n  -webkit-flex-basis: fill;\n      -ms-flex-preferred-size: fill;\n          flex-basis: fill; }\n\n.react-flex-v2--flex-basis-content {\n  -webkit-flex-basis: content;\n      -ms-flex-preferred-size: content;\n          flex-basis: content; }\n\n.react-flex-v2--flex-basis-fit-content {\n  -webkit-flex-basis: fit-content;\n      -ms-flex-preferred-size: fit-content;\n          flex-basis: fit-content; }\n\n.react-flex-v2--flex-basis-min-content {\n  -webkit-flex-basis: min-content;\n      -ms-flex-preferred-size: min-content;\n          flex-basis: min-content; }\n\n.react-flex-v2--flex-basis-max-content {\n  -webkit-flex-basis: max-content;\n      -ms-flex-preferred-size: max-content;\n          flex-basis: max-content; }\n\n/* FLEX */\n.react-flex-v2--flex-none,\n.react-flex-v2--flex-0 {\n  -webkit-box-flex: 0;\n  -webkit-flex: none;\n      -ms-flex: none;\n          flex: none; }\n\n.react-flex-v2--flex-1 {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.react-flex-v2--flex-2 {\n  -webkit-box-flex: 2;\n  -webkit-flex: 2;\n      -ms-flex: 2;\n          flex: 2; }\n\n.react-flex-v2--flex-3 {\n  -webkit-box-flex: 3;\n  -webkit-flex: 3;\n      -ms-flex: 3;\n          flex: 3; }\n\n.react-flex-v2--flex-4 {\n  -webkit-box-flex: 4;\n  -webkit-flex: 4;\n      -ms-flex: 4;\n          flex: 4; }\n\n.react-flex-v2--flex-5 {\n  -webkit-box-flex: 5;\n  -webkit-flex: 5;\n      -ms-flex: 5;\n          flex: 5; }\n\n.react-flex-v2--flex-6 {\n  -webkit-box-flex: 6;\n  -webkit-flex: 6;\n      -ms-flex: 6;\n          flex: 6; }\n\n.react-flex-v2--flex-7 {\n  -webkit-box-flex: 7;\n  -webkit-flex: 7;\n      -ms-flex: 7;\n          flex: 7; }\n\n.react-flex-v2--flex-8 {\n  -webkit-box-flex: 8;\n  -webkit-flex: 8;\n      -ms-flex: 8;\n          flex: 8; }\n\n.react-flex-v2--flex-9 {\n  -webkit-box-flex: 9;\n  -webkit-flex: 9;\n      -ms-flex: 9;\n          flex: 9; }\n\n.react-flex-v2--flex-10 {\n  -webkit-box-flex: 10;\n  -webkit-flex: 10;\n      -ms-flex: 10;\n          flex: 10; }\n\n.react-flex-v2--flex-11 {\n  -webkit-box-flex: 11;\n  -webkit-flex: 11;\n      -ms-flex: 11;\n          flex: 11; }\n\n.react-flex-v2--flex-12 {\n  -webkit-box-flex: 12;\n  -webkit-flex: 12;\n      -ms-flex: 12;\n          flex: 12; }\n\n.react-flex-v2--flex-13 {\n  -webkit-box-flex: 13;\n  -webkit-flex: 13;\n      -ms-flex: 13;\n          flex: 13; }\n\n.react-flex-v2--flex-14 {\n  -webkit-box-flex: 14;\n  -webkit-flex: 14;\n      -ms-flex: 14;\n          flex: 14; }\n\n.react-flex-v2--flex-15 {\n  -webkit-box-flex: 15;\n  -webkit-flex: 15;\n      -ms-flex: 15;\n          flex: 15; }\n\n.react-flex-v2--flex-16 {\n  -webkit-box-flex: 16;\n  -webkit-flex: 16;\n      -ms-flex: 16;\n          flex: 16; }\n\n.react-flex-v2--flex-17 {\n  -webkit-box-flex: 17;\n  -webkit-flex: 17;\n      -ms-flex: 17;\n          flex: 17; }\n\n.react-flex-v2--flex-18 {\n  -webkit-box-flex: 18;\n  -webkit-flex: 18;\n      -ms-flex: 18;\n          flex: 18; }\n\n.react-flex-v2--flex-19 {\n  -webkit-box-flex: 19;\n  -webkit-flex: 19;\n      -ms-flex: 19;\n          flex: 19; }\n\n.react-flex-v2--flex-20 {\n  -webkit-box-flex: 20;\n  -webkit-flex: 20;\n      -ms-flex: 20;\n          flex: 20; }\n\n.react-flex-v2--flex-21 {\n  -webkit-box-flex: 21;\n  -webkit-flex: 21;\n      -ms-flex: 21;\n          flex: 21; }\n\n.react-flex-v2--flex-22 {\n  -webkit-box-flex: 22;\n  -webkit-flex: 22;\n      -ms-flex: 22;\n          flex: 22; }\n\n.react-flex-v2--flex-23 {\n  -webkit-box-flex: 23;\n  -webkit-flex: 23;\n      -ms-flex: 23;\n          flex: 23; }\n\n.react-flex-v2--flex-24 {\n  -webkit-box-flex: 24;\n  -webkit-flex: 24;\n      -ms-flex: 24;\n          flex: 24; }\n\n.react-flex-v2--flex-25 {\n  -webkit-box-flex: 25;\n  -webkit-flex: 25;\n      -ms-flex: 25;\n          flex: 25; }\n\n.react-flex-v2--flex-26 {\n  -webkit-box-flex: 26;\n  -webkit-flex: 26;\n      -ms-flex: 26;\n          flex: 26; }\n\n.react-flex-v2--flex-27 {\n  -webkit-box-flex: 27;\n  -webkit-flex: 27;\n      -ms-flex: 27;\n          flex: 27; }\n\n.react-flex-v2--flex-28 {\n  -webkit-box-flex: 28;\n  -webkit-flex: 28;\n      -ms-flex: 28;\n          flex: 28; }\n\n.react-flex-v2--flex-29 {\n  -webkit-box-flex: 29;\n  -webkit-flex: 29;\n      -ms-flex: 29;\n          flex: 29; }\n\n.react-flex-v2--flex-30 {\n  -webkit-box-flex: 30;\n  -webkit-flex: 30;\n      -ms-flex: 30;\n          flex: 30; }\n\n.react-flex-v2--flex-31 {\n  -webkit-box-flex: 31;\n  -webkit-flex: 31;\n      -ms-flex: 31;\n          flex: 31; }\n\n.react-flex-v2--flex-32 {\n  -webkit-box-flex: 32;\n  -webkit-flex: 32;\n      -ms-flex: 32;\n          flex: 32; }\n\n.react-flex-v2--flex-33 {\n  -webkit-box-flex: 33;\n  -webkit-flex: 33;\n      -ms-flex: 33;\n          flex: 33; }\n\n.react-flex-v2--flex-34 {\n  -webkit-box-flex: 34;\n  -webkit-flex: 34;\n      -ms-flex: 34;\n          flex: 34; }\n\n.react-flex-v2--flex-35 {\n  -webkit-box-flex: 35;\n  -webkit-flex: 35;\n      -ms-flex: 35;\n          flex: 35; }\n\n.react-flex-v2--flex-36 {\n  -webkit-box-flex: 36;\n  -webkit-flex: 36;\n      -ms-flex: 36;\n          flex: 36; }\n\n.react-flex-v2--flex-37 {\n  -webkit-box-flex: 37;\n  -webkit-flex: 37;\n      -ms-flex: 37;\n          flex: 37; }\n\n.react-flex-v2--flex-38 {\n  -webkit-box-flex: 38;\n  -webkit-flex: 38;\n      -ms-flex: 38;\n          flex: 38; }\n\n.react-flex-v2--flex-39 {\n  -webkit-box-flex: 39;\n  -webkit-flex: 39;\n      -ms-flex: 39;\n          flex: 39; }\n\n.react-flex-v2--flex-40 {\n  -webkit-box-flex: 40;\n  -webkit-flex: 40;\n      -ms-flex: 40;\n          flex: 40; }\n\n.react-flex-v2--flex-41 {\n  -webkit-box-flex: 41;\n  -webkit-flex: 41;\n      -ms-flex: 41;\n          flex: 41; }\n\n.react-flex-v2--flex-42 {\n  -webkit-box-flex: 42;\n  -webkit-flex: 42;\n      -ms-flex: 42;\n          flex: 42; }\n\n.react-flex-v2--flex-43 {\n  -webkit-box-flex: 43;\n  -webkit-flex: 43;\n      -ms-flex: 43;\n          flex: 43; }\n\n.react-flex-v2--flex-44 {\n  -webkit-box-flex: 44;\n  -webkit-flex: 44;\n      -ms-flex: 44;\n          flex: 44; }\n\n.react-flex-v2--flex-45 {\n  -webkit-box-flex: 45;\n  -webkit-flex: 45;\n      -ms-flex: 45;\n          flex: 45; }\n\n.react-flex-v2--flex-46 {\n  -webkit-box-flex: 46;\n  -webkit-flex: 46;\n      -ms-flex: 46;\n          flex: 46; }\n\n.react-flex-v2--flex-47 {\n  -webkit-box-flex: 47;\n  -webkit-flex: 47;\n      -ms-flex: 47;\n          flex: 47; }\n\n.react-flex-v2--flex-48 {\n  -webkit-box-flex: 48;\n  -webkit-flex: 48;\n      -ms-flex: 48;\n          flex: 48; }\n\n.react-flex-v2--flex-49 {\n  -webkit-box-flex: 49;\n  -webkit-flex: 49;\n      -ms-flex: 49;\n          flex: 49; }\n\n.react-flex-v2--flex-50 {\n  -webkit-box-flex: 50;\n  -webkit-flex: 50;\n      -ms-flex: 50;\n          flex: 50; }\n\n.react-flex-v2--flex-51 {\n  -webkit-box-flex: 51;\n  -webkit-flex: 51;\n      -ms-flex: 51;\n          flex: 51; }\n\n.react-flex-v2--flex-52 {\n  -webkit-box-flex: 52;\n  -webkit-flex: 52;\n      -ms-flex: 52;\n          flex: 52; }\n\n.react-flex-v2--flex-53 {\n  -webkit-box-flex: 53;\n  -webkit-flex: 53;\n      -ms-flex: 53;\n          flex: 53; }\n\n.react-flex-v2--flex-54 {\n  -webkit-box-flex: 54;\n  -webkit-flex: 54;\n      -ms-flex: 54;\n          flex: 54; }\n\n.react-flex-v2--flex-55 {\n  -webkit-box-flex: 55;\n  -webkit-flex: 55;\n      -ms-flex: 55;\n          flex: 55; }\n\n.react-flex-v2--flex-56 {\n  -webkit-box-flex: 56;\n  -webkit-flex: 56;\n      -ms-flex: 56;\n          flex: 56; }\n\n.react-flex-v2--flex-57 {\n  -webkit-box-flex: 57;\n  -webkit-flex: 57;\n      -ms-flex: 57;\n          flex: 57; }\n\n.react-flex-v2--flex-58 {\n  -webkit-box-flex: 58;\n  -webkit-flex: 58;\n      -ms-flex: 58;\n          flex: 58; }\n\n.react-flex-v2--flex-59 {\n  -webkit-box-flex: 59;\n  -webkit-flex: 59;\n      -ms-flex: 59;\n          flex: 59; }\n\n.react-flex-v2--flex-60 {\n  -webkit-box-flex: 60;\n  -webkit-flex: 60;\n      -ms-flex: 60;\n          flex: 60; }\n\n.react-flex-v2--flex-61 {\n  -webkit-box-flex: 61;\n  -webkit-flex: 61;\n      -ms-flex: 61;\n          flex: 61; }\n\n.react-flex-v2--flex-62 {\n  -webkit-box-flex: 62;\n  -webkit-flex: 62;\n      -ms-flex: 62;\n          flex: 62; }\n\n.react-flex-v2--flex-63 {\n  -webkit-box-flex: 63;\n  -webkit-flex: 63;\n      -ms-flex: 63;\n          flex: 63; }\n\n.react-flex-v2--flex-64 {\n  -webkit-box-flex: 64;\n  -webkit-flex: 64;\n      -ms-flex: 64;\n          flex: 64; }\n\n.react-flex-v2--flex-65 {\n  -webkit-box-flex: 65;\n  -webkit-flex: 65;\n      -ms-flex: 65;\n          flex: 65; }\n\n.react-flex-v2--flex-66 {\n  -webkit-box-flex: 66;\n  -webkit-flex: 66;\n      -ms-flex: 66;\n          flex: 66; }\n\n.react-flex-v2--flex-67 {\n  -webkit-box-flex: 67;\n  -webkit-flex: 67;\n      -ms-flex: 67;\n          flex: 67; }\n\n.react-flex-v2--flex-68 {\n  -webkit-box-flex: 68;\n  -webkit-flex: 68;\n      -ms-flex: 68;\n          flex: 68; }\n\n.react-flex-v2--flex-69 {\n  -webkit-box-flex: 69;\n  -webkit-flex: 69;\n      -ms-flex: 69;\n          flex: 69; }\n\n.react-flex-v2--flex-70 {\n  -webkit-box-flex: 70;\n  -webkit-flex: 70;\n      -ms-flex: 70;\n          flex: 70; }\n\n.react-flex-v2--flex-71 {\n  -webkit-box-flex: 71;\n  -webkit-flex: 71;\n      -ms-flex: 71;\n          flex: 71; }\n\n.react-flex-v2--flex-72 {\n  -webkit-box-flex: 72;\n  -webkit-flex: 72;\n      -ms-flex: 72;\n          flex: 72; }\n\n.react-flex-v2--flex-73 {\n  -webkit-box-flex: 73;\n  -webkit-flex: 73;\n      -ms-flex: 73;\n          flex: 73; }\n\n.react-flex-v2--flex-74 {\n  -webkit-box-flex: 74;\n  -webkit-flex: 74;\n      -ms-flex: 74;\n          flex: 74; }\n\n.react-flex-v2--flex-75 {\n  -webkit-box-flex: 75;\n  -webkit-flex: 75;\n      -ms-flex: 75;\n          flex: 75; }\n\n.react-flex-v2--flex-76 {\n  -webkit-box-flex: 76;\n  -webkit-flex: 76;\n      -ms-flex: 76;\n          flex: 76; }\n\n.react-flex-v2--flex-77 {\n  -webkit-box-flex: 77;\n  -webkit-flex: 77;\n      -ms-flex: 77;\n          flex: 77; }\n\n.react-flex-v2--flex-78 {\n  -webkit-box-flex: 78;\n  -webkit-flex: 78;\n      -ms-flex: 78;\n          flex: 78; }\n\n.react-flex-v2--flex-79 {\n  -webkit-box-flex: 79;\n  -webkit-flex: 79;\n      -ms-flex: 79;\n          flex: 79; }\n\n.react-flex-v2--flex-80 {\n  -webkit-box-flex: 80;\n  -webkit-flex: 80;\n      -ms-flex: 80;\n          flex: 80; }\n\n.react-flex-v2--flex-81 {\n  -webkit-box-flex: 81;\n  -webkit-flex: 81;\n      -ms-flex: 81;\n          flex: 81; }\n\n.react-flex-v2--flex-82 {\n  -webkit-box-flex: 82;\n  -webkit-flex: 82;\n      -ms-flex: 82;\n          flex: 82; }\n\n.react-flex-v2--flex-83 {\n  -webkit-box-flex: 83;\n  -webkit-flex: 83;\n      -ms-flex: 83;\n          flex: 83; }\n\n.react-flex-v2--flex-84 {\n  -webkit-box-flex: 84;\n  -webkit-flex: 84;\n      -ms-flex: 84;\n          flex: 84; }\n\n.react-flex-v2--flex-85 {\n  -webkit-box-flex: 85;\n  -webkit-flex: 85;\n      -ms-flex: 85;\n          flex: 85; }\n\n.react-flex-v2--flex-86 {\n  -webkit-box-flex: 86;\n  -webkit-flex: 86;\n      -ms-flex: 86;\n          flex: 86; }\n\n.react-flex-v2--flex-87 {\n  -webkit-box-flex: 87;\n  -webkit-flex: 87;\n      -ms-flex: 87;\n          flex: 87; }\n\n.react-flex-v2--flex-88 {\n  -webkit-box-flex: 88;\n  -webkit-flex: 88;\n      -ms-flex: 88;\n          flex: 88; }\n\n.react-flex-v2--flex-89 {\n  -webkit-box-flex: 89;\n  -webkit-flex: 89;\n      -ms-flex: 89;\n          flex: 89; }\n\n.react-flex-v2--flex-90 {\n  -webkit-box-flex: 90;\n  -webkit-flex: 90;\n      -ms-flex: 90;\n          flex: 90; }\n\n.react-flex-v2--flex-91 {\n  -webkit-box-flex: 91;\n  -webkit-flex: 91;\n      -ms-flex: 91;\n          flex: 91; }\n\n.react-flex-v2--flex-92 {\n  -webkit-box-flex: 92;\n  -webkit-flex: 92;\n      -ms-flex: 92;\n          flex: 92; }\n\n.react-flex-v2--flex-93 {\n  -webkit-box-flex: 93;\n  -webkit-flex: 93;\n      -ms-flex: 93;\n          flex: 93; }\n\n.react-flex-v2--flex-94 {\n  -webkit-box-flex: 94;\n  -webkit-flex: 94;\n      -ms-flex: 94;\n          flex: 94; }\n\n.react-flex-v2--flex-95 {\n  -webkit-box-flex: 95;\n  -webkit-flex: 95;\n      -ms-flex: 95;\n          flex: 95; }\n\n.react-flex-v2--flex-96 {\n  -webkit-box-flex: 96;\n  -webkit-flex: 96;\n      -ms-flex: 96;\n          flex: 96; }\n\n.react-flex-v2--flex-97 {\n  -webkit-box-flex: 97;\n  -webkit-flex: 97;\n      -ms-flex: 97;\n          flex: 97; }\n\n.react-flex-v2--flex-98 {\n  -webkit-box-flex: 98;\n  -webkit-flex: 98;\n      -ms-flex: 98;\n          flex: 98; }\n\n.react-flex-v2--flex-99 {\n  -webkit-box-flex: 99;\n  -webkit-flex: 99;\n      -ms-flex: 99;\n          flex: 99; }\n\n.react-flex-v2--flex-100 {\n  -webkit-box-flex: 100;\n  -webkit-flex: 100;\n      -ms-flex: 100;\n          flex: 100; }\n\n/* FLEX-GROW */\n.react-flex-v2--flex-grow-0 {\n  -webkit-box-flex: 0;\n  -webkit-flex-grow: 0;\n      -ms-flex-positive: 0;\n          flex-grow: 0; }\n\n.react-flex-v2--flex-grow-1 {\n  -webkit-box-flex: 1;\n  -webkit-flex-grow: 1;\n      -ms-flex-positive: 1;\n          flex-grow: 1; }\n\n.react-flex-v2--flex-grow-2 {\n  -webkit-box-flex: 2;\n  -webkit-flex-grow: 2;\n      -ms-flex-positive: 2;\n          flex-grow: 2; }\n\n.react-flex-v2--flex-grow-3 {\n  -webkit-box-flex: 3;\n  -webkit-flex-grow: 3;\n      -ms-flex-positive: 3;\n          flex-grow: 3; }\n\n.react-flex-v2--flex-grow-4 {\n  -webkit-box-flex: 4;\n  -webkit-flex-grow: 4;\n      -ms-flex-positive: 4;\n          flex-grow: 4; }\n\n.react-flex-v2--flex-grow-5 {\n  -webkit-box-flex: 5;\n  -webkit-flex-grow: 5;\n      -ms-flex-positive: 5;\n          flex-grow: 5; }\n\n.react-flex-v2--flex-grow-6 {\n  -webkit-box-flex: 6;\n  -webkit-flex-grow: 6;\n      -ms-flex-positive: 6;\n          flex-grow: 6; }\n\n.react-flex-v2--flex-grow-7 {\n  -webkit-box-flex: 7;\n  -webkit-flex-grow: 7;\n      -ms-flex-positive: 7;\n          flex-grow: 7; }\n\n.react-flex-v2--flex-grow-8 {\n  -webkit-box-flex: 8;\n  -webkit-flex-grow: 8;\n      -ms-flex-positive: 8;\n          flex-grow: 8; }\n\n.react-flex-v2--flex-grow-9 {\n  -webkit-box-flex: 9;\n  -webkit-flex-grow: 9;\n      -ms-flex-positive: 9;\n          flex-grow: 9; }\n\n.react-flex-v2--flex-grow-10 {\n  -webkit-box-flex: 10;\n  -webkit-flex-grow: 10;\n      -ms-flex-positive: 10;\n          flex-grow: 10; }\n\n.react-flex-v2--flex-grow-11 {\n  -webkit-box-flex: 11;\n  -webkit-flex-grow: 11;\n      -ms-flex-positive: 11;\n          flex-grow: 11; }\n\n.react-flex-v2--flex-grow-12 {\n  -webkit-box-flex: 12;\n  -webkit-flex-grow: 12;\n      -ms-flex-positive: 12;\n          flex-grow: 12; }\n\n.react-flex-v2--flex-grow-13 {\n  -webkit-box-flex: 13;\n  -webkit-flex-grow: 13;\n      -ms-flex-positive: 13;\n          flex-grow: 13; }\n\n.react-flex-v2--flex-grow-14 {\n  -webkit-box-flex: 14;\n  -webkit-flex-grow: 14;\n      -ms-flex-positive: 14;\n          flex-grow: 14; }\n\n.react-flex-v2--flex-grow-15 {\n  -webkit-box-flex: 15;\n  -webkit-flex-grow: 15;\n      -ms-flex-positive: 15;\n          flex-grow: 15; }\n\n.react-flex-v2--flex-grow-16 {\n  -webkit-box-flex: 16;\n  -webkit-flex-grow: 16;\n      -ms-flex-positive: 16;\n          flex-grow: 16; }\n\n.react-flex-v2--flex-grow-17 {\n  -webkit-box-flex: 17;\n  -webkit-flex-grow: 17;\n      -ms-flex-positive: 17;\n          flex-grow: 17; }\n\n.react-flex-v2--flex-grow-18 {\n  -webkit-box-flex: 18;\n  -webkit-flex-grow: 18;\n      -ms-flex-positive: 18;\n          flex-grow: 18; }\n\n.react-flex-v2--flex-grow-19 {\n  -webkit-box-flex: 19;\n  -webkit-flex-grow: 19;\n      -ms-flex-positive: 19;\n          flex-grow: 19; }\n\n.react-flex-v2--flex-grow-20 {\n  -webkit-box-flex: 20;\n  -webkit-flex-grow: 20;\n      -ms-flex-positive: 20;\n          flex-grow: 20; }\n\n.react-flex-v2--flex-grow-21 {\n  -webkit-box-flex: 21;\n  -webkit-flex-grow: 21;\n      -ms-flex-positive: 21;\n          flex-grow: 21; }\n\n.react-flex-v2--flex-grow-22 {\n  -webkit-box-flex: 22;\n  -webkit-flex-grow: 22;\n      -ms-flex-positive: 22;\n          flex-grow: 22; }\n\n.react-flex-v2--flex-grow-23 {\n  -webkit-box-flex: 23;\n  -webkit-flex-grow: 23;\n      -ms-flex-positive: 23;\n          flex-grow: 23; }\n\n.react-flex-v2--flex-grow-24 {\n  -webkit-box-flex: 24;\n  -webkit-flex-grow: 24;\n      -ms-flex-positive: 24;\n          flex-grow: 24; }\n\n.react-flex-v2--flex-grow-25 {\n  -webkit-box-flex: 25;\n  -webkit-flex-grow: 25;\n      -ms-flex-positive: 25;\n          flex-grow: 25; }\n\n.react-flex-v2--flex-grow-26 {\n  -webkit-box-flex: 26;\n  -webkit-flex-grow: 26;\n      -ms-flex-positive: 26;\n          flex-grow: 26; }\n\n.react-flex-v2--flex-grow-27 {\n  -webkit-box-flex: 27;\n  -webkit-flex-grow: 27;\n      -ms-flex-positive: 27;\n          flex-grow: 27; }\n\n.react-flex-v2--flex-grow-28 {\n  -webkit-box-flex: 28;\n  -webkit-flex-grow: 28;\n      -ms-flex-positive: 28;\n          flex-grow: 28; }\n\n.react-flex-v2--flex-grow-29 {\n  -webkit-box-flex: 29;\n  -webkit-flex-grow: 29;\n      -ms-flex-positive: 29;\n          flex-grow: 29; }\n\n.react-flex-v2--flex-grow-30 {\n  -webkit-box-flex: 30;\n  -webkit-flex-grow: 30;\n      -ms-flex-positive: 30;\n          flex-grow: 30; }\n\n.react-flex-v2--flex-grow-31 {\n  -webkit-box-flex: 31;\n  -webkit-flex-grow: 31;\n      -ms-flex-positive: 31;\n          flex-grow: 31; }\n\n.react-flex-v2--flex-grow-32 {\n  -webkit-box-flex: 32;\n  -webkit-flex-grow: 32;\n      -ms-flex-positive: 32;\n          flex-grow: 32; }\n\n.react-flex-v2--flex-grow-33 {\n  -webkit-box-flex: 33;\n  -webkit-flex-grow: 33;\n      -ms-flex-positive: 33;\n          flex-grow: 33; }\n\n.react-flex-v2--flex-grow-34 {\n  -webkit-box-flex: 34;\n  -webkit-flex-grow: 34;\n      -ms-flex-positive: 34;\n          flex-grow: 34; }\n\n.react-flex-v2--flex-grow-35 {\n  -webkit-box-flex: 35;\n  -webkit-flex-grow: 35;\n      -ms-flex-positive: 35;\n          flex-grow: 35; }\n\n.react-flex-v2--flex-grow-36 {\n  -webkit-box-flex: 36;\n  -webkit-flex-grow: 36;\n      -ms-flex-positive: 36;\n          flex-grow: 36; }\n\n.react-flex-v2--flex-grow-37 {\n  -webkit-box-flex: 37;\n  -webkit-flex-grow: 37;\n      -ms-flex-positive: 37;\n          flex-grow: 37; }\n\n.react-flex-v2--flex-grow-38 {\n  -webkit-box-flex: 38;\n  -webkit-flex-grow: 38;\n      -ms-flex-positive: 38;\n          flex-grow: 38; }\n\n.react-flex-v2--flex-grow-39 {\n  -webkit-box-flex: 39;\n  -webkit-flex-grow: 39;\n      -ms-flex-positive: 39;\n          flex-grow: 39; }\n\n.react-flex-v2--flex-grow-40 {\n  -webkit-box-flex: 40;\n  -webkit-flex-grow: 40;\n      -ms-flex-positive: 40;\n          flex-grow: 40; }\n\n.react-flex-v2--flex-grow-41 {\n  -webkit-box-flex: 41;\n  -webkit-flex-grow: 41;\n      -ms-flex-positive: 41;\n          flex-grow: 41; }\n\n.react-flex-v2--flex-grow-42 {\n  -webkit-box-flex: 42;\n  -webkit-flex-grow: 42;\n      -ms-flex-positive: 42;\n          flex-grow: 42; }\n\n.react-flex-v2--flex-grow-43 {\n  -webkit-box-flex: 43;\n  -webkit-flex-grow: 43;\n      -ms-flex-positive: 43;\n          flex-grow: 43; }\n\n.react-flex-v2--flex-grow-44 {\n  -webkit-box-flex: 44;\n  -webkit-flex-grow: 44;\n      -ms-flex-positive: 44;\n          flex-grow: 44; }\n\n.react-flex-v2--flex-grow-45 {\n  -webkit-box-flex: 45;\n  -webkit-flex-grow: 45;\n      -ms-flex-positive: 45;\n          flex-grow: 45; }\n\n.react-flex-v2--flex-grow-46 {\n  -webkit-box-flex: 46;\n  -webkit-flex-grow: 46;\n      -ms-flex-positive: 46;\n          flex-grow: 46; }\n\n.react-flex-v2--flex-grow-47 {\n  -webkit-box-flex: 47;\n  -webkit-flex-grow: 47;\n      -ms-flex-positive: 47;\n          flex-grow: 47; }\n\n.react-flex-v2--flex-grow-48 {\n  -webkit-box-flex: 48;\n  -webkit-flex-grow: 48;\n      -ms-flex-positive: 48;\n          flex-grow: 48; }\n\n.react-flex-v2--flex-grow-49 {\n  -webkit-box-flex: 49;\n  -webkit-flex-grow: 49;\n      -ms-flex-positive: 49;\n          flex-grow: 49; }\n\n.react-flex-v2--flex-grow-50 {\n  -webkit-box-flex: 50;\n  -webkit-flex-grow: 50;\n      -ms-flex-positive: 50;\n          flex-grow: 50; }\n\n.react-flex-v2--flex-grow-51 {\n  -webkit-box-flex: 51;\n  -webkit-flex-grow: 51;\n      -ms-flex-positive: 51;\n          flex-grow: 51; }\n\n.react-flex-v2--flex-grow-52 {\n  -webkit-box-flex: 52;\n  -webkit-flex-grow: 52;\n      -ms-flex-positive: 52;\n          flex-grow: 52; }\n\n.react-flex-v2--flex-grow-53 {\n  -webkit-box-flex: 53;\n  -webkit-flex-grow: 53;\n      -ms-flex-positive: 53;\n          flex-grow: 53; }\n\n.react-flex-v2--flex-grow-54 {\n  -webkit-box-flex: 54;\n  -webkit-flex-grow: 54;\n      -ms-flex-positive: 54;\n          flex-grow: 54; }\n\n.react-flex-v2--flex-grow-55 {\n  -webkit-box-flex: 55;\n  -webkit-flex-grow: 55;\n      -ms-flex-positive: 55;\n          flex-grow: 55; }\n\n.react-flex-v2--flex-grow-56 {\n  -webkit-box-flex: 56;\n  -webkit-flex-grow: 56;\n      -ms-flex-positive: 56;\n          flex-grow: 56; }\n\n.react-flex-v2--flex-grow-57 {\n  -webkit-box-flex: 57;\n  -webkit-flex-grow: 57;\n      -ms-flex-positive: 57;\n          flex-grow: 57; }\n\n.react-flex-v2--flex-grow-58 {\n  -webkit-box-flex: 58;\n  -webkit-flex-grow: 58;\n      -ms-flex-positive: 58;\n          flex-grow: 58; }\n\n.react-flex-v2--flex-grow-59 {\n  -webkit-box-flex: 59;\n  -webkit-flex-grow: 59;\n      -ms-flex-positive: 59;\n          flex-grow: 59; }\n\n.react-flex-v2--flex-grow-60 {\n  -webkit-box-flex: 60;\n  -webkit-flex-grow: 60;\n      -ms-flex-positive: 60;\n          flex-grow: 60; }\n\n.react-flex-v2--flex-grow-61 {\n  -webkit-box-flex: 61;\n  -webkit-flex-grow: 61;\n      -ms-flex-positive: 61;\n          flex-grow: 61; }\n\n.react-flex-v2--flex-grow-62 {\n  -webkit-box-flex: 62;\n  -webkit-flex-grow: 62;\n      -ms-flex-positive: 62;\n          flex-grow: 62; }\n\n.react-flex-v2--flex-grow-63 {\n  -webkit-box-flex: 63;\n  -webkit-flex-grow: 63;\n      -ms-flex-positive: 63;\n          flex-grow: 63; }\n\n.react-flex-v2--flex-grow-64 {\n  -webkit-box-flex: 64;\n  -webkit-flex-grow: 64;\n      -ms-flex-positive: 64;\n          flex-grow: 64; }\n\n.react-flex-v2--flex-grow-65 {\n  -webkit-box-flex: 65;\n  -webkit-flex-grow: 65;\n      -ms-flex-positive: 65;\n          flex-grow: 65; }\n\n.react-flex-v2--flex-grow-66 {\n  -webkit-box-flex: 66;\n  -webkit-flex-grow: 66;\n      -ms-flex-positive: 66;\n          flex-grow: 66; }\n\n.react-flex-v2--flex-grow-67 {\n  -webkit-box-flex: 67;\n  -webkit-flex-grow: 67;\n      -ms-flex-positive: 67;\n          flex-grow: 67; }\n\n.react-flex-v2--flex-grow-68 {\n  -webkit-box-flex: 68;\n  -webkit-flex-grow: 68;\n      -ms-flex-positive: 68;\n          flex-grow: 68; }\n\n.react-flex-v2--flex-grow-69 {\n  -webkit-box-flex: 69;\n  -webkit-flex-grow: 69;\n      -ms-flex-positive: 69;\n          flex-grow: 69; }\n\n.react-flex-v2--flex-grow-70 {\n  -webkit-box-flex: 70;\n  -webkit-flex-grow: 70;\n      -ms-flex-positive: 70;\n          flex-grow: 70; }\n\n.react-flex-v2--flex-grow-71 {\n  -webkit-box-flex: 71;\n  -webkit-flex-grow: 71;\n      -ms-flex-positive: 71;\n          flex-grow: 71; }\n\n.react-flex-v2--flex-grow-72 {\n  -webkit-box-flex: 72;\n  -webkit-flex-grow: 72;\n      -ms-flex-positive: 72;\n          flex-grow: 72; }\n\n.react-flex-v2--flex-grow-73 {\n  -webkit-box-flex: 73;\n  -webkit-flex-grow: 73;\n      -ms-flex-positive: 73;\n          flex-grow: 73; }\n\n.react-flex-v2--flex-grow-74 {\n  -webkit-box-flex: 74;\n  -webkit-flex-grow: 74;\n      -ms-flex-positive: 74;\n          flex-grow: 74; }\n\n.react-flex-v2--flex-grow-75 {\n  -webkit-box-flex: 75;\n  -webkit-flex-grow: 75;\n      -ms-flex-positive: 75;\n          flex-grow: 75; }\n\n.react-flex-v2--flex-grow-76 {\n  -webkit-box-flex: 76;\n  -webkit-flex-grow: 76;\n      -ms-flex-positive: 76;\n          flex-grow: 76; }\n\n.react-flex-v2--flex-grow-77 {\n  -webkit-box-flex: 77;\n  -webkit-flex-grow: 77;\n      -ms-flex-positive: 77;\n          flex-grow: 77; }\n\n.react-flex-v2--flex-grow-78 {\n  -webkit-box-flex: 78;\n  -webkit-flex-grow: 78;\n      -ms-flex-positive: 78;\n          flex-grow: 78; }\n\n.react-flex-v2--flex-grow-79 {\n  -webkit-box-flex: 79;\n  -webkit-flex-grow: 79;\n      -ms-flex-positive: 79;\n          flex-grow: 79; }\n\n.react-flex-v2--flex-grow-80 {\n  -webkit-box-flex: 80;\n  -webkit-flex-grow: 80;\n      -ms-flex-positive: 80;\n          flex-grow: 80; }\n\n.react-flex-v2--flex-grow-81 {\n  -webkit-box-flex: 81;\n  -webkit-flex-grow: 81;\n      -ms-flex-positive: 81;\n          flex-grow: 81; }\n\n.react-flex-v2--flex-grow-82 {\n  -webkit-box-flex: 82;\n  -webkit-flex-grow: 82;\n      -ms-flex-positive: 82;\n          flex-grow: 82; }\n\n.react-flex-v2--flex-grow-83 {\n  -webkit-box-flex: 83;\n  -webkit-flex-grow: 83;\n      -ms-flex-positive: 83;\n          flex-grow: 83; }\n\n.react-flex-v2--flex-grow-84 {\n  -webkit-box-flex: 84;\n  -webkit-flex-grow: 84;\n      -ms-flex-positive: 84;\n          flex-grow: 84; }\n\n.react-flex-v2--flex-grow-85 {\n  -webkit-box-flex: 85;\n  -webkit-flex-grow: 85;\n      -ms-flex-positive: 85;\n          flex-grow: 85; }\n\n.react-flex-v2--flex-grow-86 {\n  -webkit-box-flex: 86;\n  -webkit-flex-grow: 86;\n      -ms-flex-positive: 86;\n          flex-grow: 86; }\n\n.react-flex-v2--flex-grow-87 {\n  -webkit-box-flex: 87;\n  -webkit-flex-grow: 87;\n      -ms-flex-positive: 87;\n          flex-grow: 87; }\n\n.react-flex-v2--flex-grow-88 {\n  -webkit-box-flex: 88;\n  -webkit-flex-grow: 88;\n      -ms-flex-positive: 88;\n          flex-grow: 88; }\n\n.react-flex-v2--flex-grow-89 {\n  -webkit-box-flex: 89;\n  -webkit-flex-grow: 89;\n      -ms-flex-positive: 89;\n          flex-grow: 89; }\n\n.react-flex-v2--flex-grow-90 {\n  -webkit-box-flex: 90;\n  -webkit-flex-grow: 90;\n      -ms-flex-positive: 90;\n          flex-grow: 90; }\n\n.react-flex-v2--flex-grow-91 {\n  -webkit-box-flex: 91;\n  -webkit-flex-grow: 91;\n      -ms-flex-positive: 91;\n          flex-grow: 91; }\n\n.react-flex-v2--flex-grow-92 {\n  -webkit-box-flex: 92;\n  -webkit-flex-grow: 92;\n      -ms-flex-positive: 92;\n          flex-grow: 92; }\n\n.react-flex-v2--flex-grow-93 {\n  -webkit-box-flex: 93;\n  -webkit-flex-grow: 93;\n      -ms-flex-positive: 93;\n          flex-grow: 93; }\n\n.react-flex-v2--flex-grow-94 {\n  -webkit-box-flex: 94;\n  -webkit-flex-grow: 94;\n      -ms-flex-positive: 94;\n          flex-grow: 94; }\n\n.react-flex-v2--flex-grow-95 {\n  -webkit-box-flex: 95;\n  -webkit-flex-grow: 95;\n      -ms-flex-positive: 95;\n          flex-grow: 95; }\n\n.react-flex-v2--flex-grow-96 {\n  -webkit-box-flex: 96;\n  -webkit-flex-grow: 96;\n      -ms-flex-positive: 96;\n          flex-grow: 96; }\n\n.react-flex-v2--flex-grow-97 {\n  -webkit-box-flex: 97;\n  -webkit-flex-grow: 97;\n      -ms-flex-positive: 97;\n          flex-grow: 97; }\n\n.react-flex-v2--flex-grow-98 {\n  -webkit-box-flex: 98;\n  -webkit-flex-grow: 98;\n      -ms-flex-positive: 98;\n          flex-grow: 98; }\n\n.react-flex-v2--flex-grow-99 {\n  -webkit-box-flex: 99;\n  -webkit-flex-grow: 99;\n      -ms-flex-positive: 99;\n          flex-grow: 99; }\n\n.react-flex-v2--flex-grow-100 {\n  -webkit-box-flex: 100;\n  -webkit-flex-grow: 100;\n      -ms-flex-positive: 100;\n          flex-grow: 100; }\n\n/* FLEX-SHRINK */\n.react-flex-v2--flex-shrink-0 {\n  -webkit-flex-shrink: 0;\n      -ms-flex-negative: 0;\n          flex-shrink: 0; }\n\n.react-flex-v2--flex-shrink-1 {\n  -webkit-flex-shrink: 1;\n      -ms-flex-negative: 1;\n          flex-shrink: 1; }\n\n.react-flex-v2--flex-shrink-2 {\n  -webkit-flex-shrink: 2;\n      -ms-flex-negative: 2;\n          flex-shrink: 2; }\n\n.react-flex-v2--flex-shrink-3 {\n  -webkit-flex-shrink: 3;\n      -ms-flex-negative: 3;\n          flex-shrink: 3; }\n\n.react-flex-v2--flex-shrink-4 {\n  -webkit-flex-shrink: 4;\n      -ms-flex-negative: 4;\n          flex-shrink: 4; }\n\n.react-flex-v2--flex-shrink-5 {\n  -webkit-flex-shrink: 5;\n      -ms-flex-negative: 5;\n          flex-shrink: 5; }\n\n.react-flex-v2--flex-shrink-6 {\n  -webkit-flex-shrink: 6;\n      -ms-flex-negative: 6;\n          flex-shrink: 6; }\n\n.react-flex-v2--flex-shrink-7 {\n  -webkit-flex-shrink: 7;\n      -ms-flex-negative: 7;\n          flex-shrink: 7; }\n\n.react-flex-v2--flex-shrink-8 {\n  -webkit-flex-shrink: 8;\n      -ms-flex-negative: 8;\n          flex-shrink: 8; }\n\n.react-flex-v2--flex-shrink-9 {\n  -webkit-flex-shrink: 9;\n      -ms-flex-negative: 9;\n          flex-shrink: 9; }\n\n.react-flex-v2--flex-shrink-10 {\n  -webkit-flex-shrink: 10;\n      -ms-flex-negative: 10;\n          flex-shrink: 10; }\n\n.react-flex-v2--flex-shrink-11 {\n  -webkit-flex-shrink: 11;\n      -ms-flex-negative: 11;\n          flex-shrink: 11; }\n\n.react-flex-v2--flex-shrink-12 {\n  -webkit-flex-shrink: 12;\n      -ms-flex-negative: 12;\n          flex-shrink: 12; }\n\n.react-flex-v2--flex-shrink-13 {\n  -webkit-flex-shrink: 13;\n      -ms-flex-negative: 13;\n          flex-shrink: 13; }\n\n.react-flex-v2--flex-shrink-14 {\n  -webkit-flex-shrink: 14;\n      -ms-flex-negative: 14;\n          flex-shrink: 14; }\n\n.react-flex-v2--flex-shrink-15 {\n  -webkit-flex-shrink: 15;\n      -ms-flex-negative: 15;\n          flex-shrink: 15; }\n\n.react-flex-v2--flex-shrink-16 {\n  -webkit-flex-shrink: 16;\n      -ms-flex-negative: 16;\n          flex-shrink: 16; }\n\n.react-flex-v2--flex-shrink-17 {\n  -webkit-flex-shrink: 17;\n      -ms-flex-negative: 17;\n          flex-shrink: 17; }\n\n.react-flex-v2--flex-shrink-18 {\n  -webkit-flex-shrink: 18;\n      -ms-flex-negative: 18;\n          flex-shrink: 18; }\n\n.react-flex-v2--flex-shrink-19 {\n  -webkit-flex-shrink: 19;\n      -ms-flex-negative: 19;\n          flex-shrink: 19; }\n\n.react-flex-v2--flex-shrink-20 {\n  -webkit-flex-shrink: 20;\n      -ms-flex-negative: 20;\n          flex-shrink: 20; }\n\n.react-flex-v2--flex-shrink-21 {\n  -webkit-flex-shrink: 21;\n      -ms-flex-negative: 21;\n          flex-shrink: 21; }\n\n.react-flex-v2--flex-shrink-22 {\n  -webkit-flex-shrink: 22;\n      -ms-flex-negative: 22;\n          flex-shrink: 22; }\n\n.react-flex-v2--flex-shrink-23 {\n  -webkit-flex-shrink: 23;\n      -ms-flex-negative: 23;\n          flex-shrink: 23; }\n\n.react-flex-v2--flex-shrink-24 {\n  -webkit-flex-shrink: 24;\n      -ms-flex-negative: 24;\n          flex-shrink: 24; }\n\n.react-flex-v2--flex-shrink-25 {\n  -webkit-flex-shrink: 25;\n      -ms-flex-negative: 25;\n          flex-shrink: 25; }\n\n.react-flex-v2--flex-shrink-26 {\n  -webkit-flex-shrink: 26;\n      -ms-flex-negative: 26;\n          flex-shrink: 26; }\n\n.react-flex-v2--flex-shrink-27 {\n  -webkit-flex-shrink: 27;\n      -ms-flex-negative: 27;\n          flex-shrink: 27; }\n\n.react-flex-v2--flex-shrink-28 {\n  -webkit-flex-shrink: 28;\n      -ms-flex-negative: 28;\n          flex-shrink: 28; }\n\n.react-flex-v2--flex-shrink-29 {\n  -webkit-flex-shrink: 29;\n      -ms-flex-negative: 29;\n          flex-shrink: 29; }\n\n.react-flex-v2--flex-shrink-30 {\n  -webkit-flex-shrink: 30;\n      -ms-flex-negative: 30;\n          flex-shrink: 30; }\n\n.react-flex-v2--flex-shrink-31 {\n  -webkit-flex-shrink: 31;\n      -ms-flex-negative: 31;\n          flex-shrink: 31; }\n\n.react-flex-v2--flex-shrink-32 {\n  -webkit-flex-shrink: 32;\n      -ms-flex-negative: 32;\n          flex-shrink: 32; }\n\n.react-flex-v2--flex-shrink-33 {\n  -webkit-flex-shrink: 33;\n      -ms-flex-negative: 33;\n          flex-shrink: 33; }\n\n.react-flex-v2--flex-shrink-34 {\n  -webkit-flex-shrink: 34;\n      -ms-flex-negative: 34;\n          flex-shrink: 34; }\n\n.react-flex-v2--flex-shrink-35 {\n  -webkit-flex-shrink: 35;\n      -ms-flex-negative: 35;\n          flex-shrink: 35; }\n\n.react-flex-v2--flex-shrink-36 {\n  -webkit-flex-shrink: 36;\n      -ms-flex-negative: 36;\n          flex-shrink: 36; }\n\n.react-flex-v2--flex-shrink-37 {\n  -webkit-flex-shrink: 37;\n      -ms-flex-negative: 37;\n          flex-shrink: 37; }\n\n.react-flex-v2--flex-shrink-38 {\n  -webkit-flex-shrink: 38;\n      -ms-flex-negative: 38;\n          flex-shrink: 38; }\n\n.react-flex-v2--flex-shrink-39 {\n  -webkit-flex-shrink: 39;\n      -ms-flex-negative: 39;\n          flex-shrink: 39; }\n\n.react-flex-v2--flex-shrink-40 {\n  -webkit-flex-shrink: 40;\n      -ms-flex-negative: 40;\n          flex-shrink: 40; }\n\n.react-flex-v2--flex-shrink-41 {\n  -webkit-flex-shrink: 41;\n      -ms-flex-negative: 41;\n          flex-shrink: 41; }\n\n.react-flex-v2--flex-shrink-42 {\n  -webkit-flex-shrink: 42;\n      -ms-flex-negative: 42;\n          flex-shrink: 42; }\n\n.react-flex-v2--flex-shrink-43 {\n  -webkit-flex-shrink: 43;\n      -ms-flex-negative: 43;\n          flex-shrink: 43; }\n\n.react-flex-v2--flex-shrink-44 {\n  -webkit-flex-shrink: 44;\n      -ms-flex-negative: 44;\n          flex-shrink: 44; }\n\n.react-flex-v2--flex-shrink-45 {\n  -webkit-flex-shrink: 45;\n      -ms-flex-negative: 45;\n          flex-shrink: 45; }\n\n.react-flex-v2--flex-shrink-46 {\n  -webkit-flex-shrink: 46;\n      -ms-flex-negative: 46;\n          flex-shrink: 46; }\n\n.react-flex-v2--flex-shrink-47 {\n  -webkit-flex-shrink: 47;\n      -ms-flex-negative: 47;\n          flex-shrink: 47; }\n\n.react-flex-v2--flex-shrink-48 {\n  -webkit-flex-shrink: 48;\n      -ms-flex-negative: 48;\n          flex-shrink: 48; }\n\n.react-flex-v2--flex-shrink-49 {\n  -webkit-flex-shrink: 49;\n      -ms-flex-negative: 49;\n          flex-shrink: 49; }\n\n.react-flex-v2--flex-shrink-50 {\n  -webkit-flex-shrink: 50;\n      -ms-flex-negative: 50;\n          flex-shrink: 50; }\n\n.react-flex-v2--flex-shrink-51 {\n  -webkit-flex-shrink: 51;\n      -ms-flex-negative: 51;\n          flex-shrink: 51; }\n\n.react-flex-v2--flex-shrink-52 {\n  -webkit-flex-shrink: 52;\n      -ms-flex-negative: 52;\n          flex-shrink: 52; }\n\n.react-flex-v2--flex-shrink-53 {\n  -webkit-flex-shrink: 53;\n      -ms-flex-negative: 53;\n          flex-shrink: 53; }\n\n.react-flex-v2--flex-shrink-54 {\n  -webkit-flex-shrink: 54;\n      -ms-flex-negative: 54;\n          flex-shrink: 54; }\n\n.react-flex-v2--flex-shrink-55 {\n  -webkit-flex-shrink: 55;\n      -ms-flex-negative: 55;\n          flex-shrink: 55; }\n\n.react-flex-v2--flex-shrink-56 {\n  -webkit-flex-shrink: 56;\n      -ms-flex-negative: 56;\n          flex-shrink: 56; }\n\n.react-flex-v2--flex-shrink-57 {\n  -webkit-flex-shrink: 57;\n      -ms-flex-negative: 57;\n          flex-shrink: 57; }\n\n.react-flex-v2--flex-shrink-58 {\n  -webkit-flex-shrink: 58;\n      -ms-flex-negative: 58;\n          flex-shrink: 58; }\n\n.react-flex-v2--flex-shrink-59 {\n  -webkit-flex-shrink: 59;\n      -ms-flex-negative: 59;\n          flex-shrink: 59; }\n\n.react-flex-v2--flex-shrink-60 {\n  -webkit-flex-shrink: 60;\n      -ms-flex-negative: 60;\n          flex-shrink: 60; }\n\n.react-flex-v2--flex-shrink-61 {\n  -webkit-flex-shrink: 61;\n      -ms-flex-negative: 61;\n          flex-shrink: 61; }\n\n.react-flex-v2--flex-shrink-62 {\n  -webkit-flex-shrink: 62;\n      -ms-flex-negative: 62;\n          flex-shrink: 62; }\n\n.react-flex-v2--flex-shrink-63 {\n  -webkit-flex-shrink: 63;\n      -ms-flex-negative: 63;\n          flex-shrink: 63; }\n\n.react-flex-v2--flex-shrink-64 {\n  -webkit-flex-shrink: 64;\n      -ms-flex-negative: 64;\n          flex-shrink: 64; }\n\n.react-flex-v2--flex-shrink-65 {\n  -webkit-flex-shrink: 65;\n      -ms-flex-negative: 65;\n          flex-shrink: 65; }\n\n.react-flex-v2--flex-shrink-66 {\n  -webkit-flex-shrink: 66;\n      -ms-flex-negative: 66;\n          flex-shrink: 66; }\n\n.react-flex-v2--flex-shrink-67 {\n  -webkit-flex-shrink: 67;\n      -ms-flex-negative: 67;\n          flex-shrink: 67; }\n\n.react-flex-v2--flex-shrink-68 {\n  -webkit-flex-shrink: 68;\n      -ms-flex-negative: 68;\n          flex-shrink: 68; }\n\n.react-flex-v2--flex-shrink-69 {\n  -webkit-flex-shrink: 69;\n      -ms-flex-negative: 69;\n          flex-shrink: 69; }\n\n.react-flex-v2--flex-shrink-70 {\n  -webkit-flex-shrink: 70;\n      -ms-flex-negative: 70;\n          flex-shrink: 70; }\n\n.react-flex-v2--flex-shrink-71 {\n  -webkit-flex-shrink: 71;\n      -ms-flex-negative: 71;\n          flex-shrink: 71; }\n\n.react-flex-v2--flex-shrink-72 {\n  -webkit-flex-shrink: 72;\n      -ms-flex-negative: 72;\n          flex-shrink: 72; }\n\n.react-flex-v2--flex-shrink-73 {\n  -webkit-flex-shrink: 73;\n      -ms-flex-negative: 73;\n          flex-shrink: 73; }\n\n.react-flex-v2--flex-shrink-74 {\n  -webkit-flex-shrink: 74;\n      -ms-flex-negative: 74;\n          flex-shrink: 74; }\n\n.react-flex-v2--flex-shrink-75 {\n  -webkit-flex-shrink: 75;\n      -ms-flex-negative: 75;\n          flex-shrink: 75; }\n\n.react-flex-v2--flex-shrink-76 {\n  -webkit-flex-shrink: 76;\n      -ms-flex-negative: 76;\n          flex-shrink: 76; }\n\n.react-flex-v2--flex-shrink-77 {\n  -webkit-flex-shrink: 77;\n      -ms-flex-negative: 77;\n          flex-shrink: 77; }\n\n.react-flex-v2--flex-shrink-78 {\n  -webkit-flex-shrink: 78;\n      -ms-flex-negative: 78;\n          flex-shrink: 78; }\n\n.react-flex-v2--flex-shrink-79 {\n  -webkit-flex-shrink: 79;\n      -ms-flex-negative: 79;\n          flex-shrink: 79; }\n\n.react-flex-v2--flex-shrink-80 {\n  -webkit-flex-shrink: 80;\n      -ms-flex-negative: 80;\n          flex-shrink: 80; }\n\n.react-flex-v2--flex-shrink-81 {\n  -webkit-flex-shrink: 81;\n      -ms-flex-negative: 81;\n          flex-shrink: 81; }\n\n.react-flex-v2--flex-shrink-82 {\n  -webkit-flex-shrink: 82;\n      -ms-flex-negative: 82;\n          flex-shrink: 82; }\n\n.react-flex-v2--flex-shrink-83 {\n  -webkit-flex-shrink: 83;\n      -ms-flex-negative: 83;\n          flex-shrink: 83; }\n\n.react-flex-v2--flex-shrink-84 {\n  -webkit-flex-shrink: 84;\n      -ms-flex-negative: 84;\n          flex-shrink: 84; }\n\n.react-flex-v2--flex-shrink-85 {\n  -webkit-flex-shrink: 85;\n      -ms-flex-negative: 85;\n          flex-shrink: 85; }\n\n.react-flex-v2--flex-shrink-86 {\n  -webkit-flex-shrink: 86;\n      -ms-flex-negative: 86;\n          flex-shrink: 86; }\n\n.react-flex-v2--flex-shrink-87 {\n  -webkit-flex-shrink: 87;\n      -ms-flex-negative: 87;\n          flex-shrink: 87; }\n\n.react-flex-v2--flex-shrink-88 {\n  -webkit-flex-shrink: 88;\n      -ms-flex-negative: 88;\n          flex-shrink: 88; }\n\n.react-flex-v2--flex-shrink-89 {\n  -webkit-flex-shrink: 89;\n      -ms-flex-negative: 89;\n          flex-shrink: 89; }\n\n.react-flex-v2--flex-shrink-90 {\n  -webkit-flex-shrink: 90;\n      -ms-flex-negative: 90;\n          flex-shrink: 90; }\n\n.react-flex-v2--flex-shrink-91 {\n  -webkit-flex-shrink: 91;\n      -ms-flex-negative: 91;\n          flex-shrink: 91; }\n\n.react-flex-v2--flex-shrink-92 {\n  -webkit-flex-shrink: 92;\n      -ms-flex-negative: 92;\n          flex-shrink: 92; }\n\n.react-flex-v2--flex-shrink-93 {\n  -webkit-flex-shrink: 93;\n      -ms-flex-negative: 93;\n          flex-shrink: 93; }\n\n.react-flex-v2--flex-shrink-94 {\n  -webkit-flex-shrink: 94;\n      -ms-flex-negative: 94;\n          flex-shrink: 94; }\n\n.react-flex-v2--flex-shrink-95 {\n  -webkit-flex-shrink: 95;\n      -ms-flex-negative: 95;\n          flex-shrink: 95; }\n\n.react-flex-v2--flex-shrink-96 {\n  -webkit-flex-shrink: 96;\n      -ms-flex-negative: 96;\n          flex-shrink: 96; }\n\n.react-flex-v2--flex-shrink-97 {\n  -webkit-flex-shrink: 97;\n      -ms-flex-negative: 97;\n          flex-shrink: 97; }\n\n.react-flex-v2--flex-shrink-98 {\n  -webkit-flex-shrink: 98;\n      -ms-flex-negative: 98;\n          flex-shrink: 98; }\n\n.react-flex-v2--flex-shrink-99 {\n  -webkit-flex-shrink: 99;\n      -ms-flex-negative: 99;\n          flex-shrink: 99; }\n\n.react-flex-v2--flex-shrink-100 {\n  -webkit-flex-shrink: 100;\n      -ms-flex-negative: 100;\n          flex-shrink: 100; }\n.react-tab-panel,\n.react-tab-panel__tab-strip {\n  box-sizing: border-box; }\n  .react-tab-panel *,\n  .react-tab-panel *:before,\n  .react-tab-panel *:after,\n  .react-tab-panel__tab-strip *,\n  .react-tab-panel__tab-strip *:before,\n  .react-tab-panel__tab-strip *:after {\n    box-sizing: border-box; }\n\n.react-tab-panel {\n  display: -webkit-inline-box;\n  display: -ms-inline-flexbox;\n  display: inline-flex;\n  width: 100%; }\n\n.react-tab-panel__body {\n  overflow: auto;\n  position: relative; }\n  .react-tab-panel__body .react-tab-panel__transition-wrapper {\n    position: relative;\n    -webkit-transition-property: height;\n    transition-property: height;\n    -webkit-transition-duration: 0.3s;\n            transition-duration: 0.3s; }\n  .react-tab-panel__body--transitioning,\n  .react-tab-panel__body--transitioning .react-tab-panel__transition-wrapper {\n    overflow: hidden; }\n  .react-tab-panel__body--transition .react-tab-panel__content--out {\n    -webkit-transform: translate3d(0px, 0px, 0px);\n            transform: translate3d(0px, 0px, 0px);\n    -webkit-transition-property: -webkit-transform;\n    transition-property: -webkit-transform;\n    transition-property: transform;\n    transition-property: transform, -webkit-transform;\n    -webkit-transition-duration: 0.3s;\n            transition-duration: 0.3s; }\n  .react-tab-panel__body--transition .react-tab-panel__content--in {\n    -webkit-transition-duration: 0.3s;\n            transition-duration: 0.3s;\n    position: absolute;\n    width: 100%;\n    z-index: 100; }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-horizontal .react-tab-panel__content--in {\n    top: 0px; }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-horizontal.react-tab-panel__body--transition-next .react-tab-panel__content--in {\n    -webkit-transition-property: left;\n    transition-property: left;\n    left: 100%; }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-horizontal.react-tab-panel__body--transition-next.react-tab-panel__body--transitioning .react-tab-panel__content--out {\n    -webkit-transform: translate3d(-100%, 0px, 0px);\n            transform: translate3d(-100%, 0px, 0px); }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-horizontal.react-tab-panel__body--transition-next.react-tab-panel__body--transitioning .react-tab-panel__content--in {\n    left: 0px; }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-horizontal.react-tab-panel__body--transition-prev .react-tab-panel__content--in {\n    -webkit-transition-property: right;\n    transition-property: right;\n    right: 100%; }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-horizontal.react-tab-panel__body--transition-prev.react-tab-panel__body--transitioning .react-tab-panel__content--out {\n    -webkit-transform: translate3d(100%, 0px, 0px);\n            transform: translate3d(100%, 0px, 0px); }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-horizontal.react-tab-panel__body--transition-prev.react-tab-panel__body--transitioning .react-tab-panel__content--in {\n    right: 0px; }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-vertical .react-tab-panel__content--in {\n    left: 0px; }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-vertical.react-tab-panel__body--transition-next .react-tab-panel__content--in {\n    -webkit-transition-property: top;\n    transition-property: top;\n    top: 100%; }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-vertical.react-tab-panel__body--transition-next.react-tab-panel__body--transitioning .react-tab-panel__content--out {\n    -webkit-transform: translate3d(0px, -100%, 0px);\n            transform: translate3d(0px, -100%, 0px); }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-vertical.react-tab-panel__body--transition-next.react-tab-panel__body--transitioning .react-tab-panel__content--in {\n    top: 0px; }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-vertical.react-tab-panel__body--transition-prev .react-tab-panel__content--in {\n    -webkit-transition-property: bottom;\n    transition-property: bottom;\n    bottom: 100%; }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-vertical.react-tab-panel__body--transition-prev.react-tab-panel__body--transitioning .react-tab-panel__content--out {\n    -webkit-transform: translate3d(0px, 100%, 0px);\n            transform: translate3d(0px, 100%, 0px); }\n  .react-tab-panel__body--transition.react-tab-panel__body--orientation-vertical.react-tab-panel__body--transition-prev.react-tab-panel__body--transitioning .react-tab-panel__content--in {\n    bottom: 0px; }\n\n.react-tab-panel__tab-strip {\n  position: relative;\n  -webkit-box-flex: 0;\n      -ms-flex: none;\n          flex: none;\n  overflow: hidden; }\n  .react-tab-panel__tab-strip:focus {\n    outline: none; }\n\n.react-tab-panel__tab-strip-scroll-wrap {\n  overflow: hidden;\n  position: relative; }\n\n.react-tab-panel__tab-strip-scroll-tool {\n  padding: 0px 6px; }\n  .react-tab-panel__tab-strip-scroll-tool--auto {\n    position: absolute;\n    z-index: 100; }\n  .react-tab-panel__tab-strip-scroll-tool.react-tab-panel__tab-strip-scroll-tool--direction-left, .react-tab-panel__tab-strip-scroll-tool.react-tab-panel__tab-strip-scroll-tool--direction-right {\n    top: 0px;\n    bottom: 0px; }\n  .react-tab-panel__tab-strip-scroll-tool.react-tab-panel__tab-strip-scroll-tool--direction-up, .react-tab-panel__tab-strip-scroll-tool.react-tab-panel__tab-strip-scroll-tool--direction-down {\n    left: 0px;\n    right: 0px; }\n  .react-tab-panel__tab-strip-scroll-tool--direction-left {\n    left: 0px;\n    z-index: 200; }\n  .react-tab-panel__tab-strip-scroll-tool--direction-right {\n    right: 0px; }\n  .react-tab-panel__tab-strip-scroll-tool--direction-up {\n    top: 0px;\n    z-index: 200; }\n  .react-tab-panel__tab-strip-scroll-tool--direction-down {\n    bottom: 0px; }\n  .react-tab-panel__tab-strip-scroll-tool--disabled {\n    opacity: 0.5; }\n  .react-tab-panel__tab-strip-scroll-tool--hidden {\n    display: none; }\n\n.react-tab-panel__tab-strip-inner {\n  -webkit-box-flex: 1;\n      -ms-flex: 1 0 auto;\n          flex: 1 0 auto;\n  position: relative; }\n\n.react-tab-panel__tab-strip--tab-align-start .react-tab-panel__tab-strip-between,\n.react-tab-panel__tab-strip--tab-align-start .react-tab-panel__tab-strip-before {\n  -webkit-box-flex: 0;\n      -ms-flex: none;\n          flex: none; }\n\n.react-tab-panel__tab-strip--tab-align-center .react-tab-panel__tab-strip-between {\n  -webkit-box-flex: 0;\n      -ms-flex: none;\n          flex: none; }\n\n.react-tab-panel__tab-strip--tab-align-end .react-tab-panel__tab-strip-between,\n.react-tab-panel__tab-strip--tab-align-end .react-tab-panel__tab-strip-after {\n  -webkit-box-flex: 0;\n      -ms-flex: none;\n          flex: none; }\n\n.react-tab-panel__tab-strip--tab-align-space-between .react-tab-panel__tab-strip-before,\n.react-tab-panel__tab-strip--tab-align-space-between .react-tab-panel__tab-strip-after {\n  -webkit-box-flex: 0;\n      -ms-flex: none;\n          flex: none; }\n\n.react-tab-panel__tab-strip--tab-align-stretch .react-tab-panel__tab-strip-before,\n.react-tab-panel__tab-strip--tab-align-stretch .react-tab-panel__tab-strip-after {\n  -webkit-box-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.react-tab-panel__tab-strip--tab-align-stretch .react-tab-panel__tab-strip-between {\n  -webkit-box-flex: 0;\n      -ms-flex: none;\n          flex: none; }\n\n.react-tab-panel__tab-strip--tab-align-stretch .react-tab-panel__tab-title,\n.react-tab-panel__tab-strip--tab-align-stretch .react-tab-panel__tab-title-inner {\n  -webkit-box-flex: 1000;\n      -ms-flex: 1000 0 auto;\n          flex: 1000 0 auto;\n  display: -webkit-inline-box;\n  display: -ms-inline-flexbox;\n  display: inline-flex;\n  -ms-flex-flow: column;\n      flex-flow: column;\n  -webkit-box-align: stretch;\n      -ms-flex-align: stretch;\n          align-items: stretch;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center; }\n\n.react-tab-panel__tab-strip--tab-align-stretch .react-tab-panel__tab-title--active {\n  -webkit-box-flex: 1001;\n      -ms-flex: 1001 0 auto;\n          flex: 1001 0 auto; }\n\n.react-tab-panel__tab-title {\n  cursor: pointer;\n  display: inline-block;\n  position: relative;\n  white-space: nowrap; }\n  .react-tab-panel__tab-title-inner--ellipsis, .react-tab-panel__tab-title--ellipsis {\n    overflow: hidden;\n    text-overflow: ellipsis; }\n  .react-tab-panel__tab-title--disabled {\n    cursor: default;\n    -webkit-user-select: none;\n       -moz-user-select: none;\n        -ms-user-select: none;\n            user-select: none; }\n\n.react-tab-panel__tab-strip--vertical .react-tab-panel__tab-title-inner {\n  display: inline-block;\n  position: absolute;\n  z-index: 1;\n  top: 100%;\n  left: 0px; }\n\n.react-tab-panel__tab-strip--vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner {\n  top: 100%;\n  left: 0px;\n  -webkit-transform-origin: 0 0;\n          transform-origin: 0 0;\n  -webkit-transform: translate(0%, 0%) rotate(-90deg);\n          transform: translate(0%, 0%) rotate(-90deg); }\n\n.react-tab-panel__tab-strip--vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner {\n  left: 100%;\n  top: 0px;\n  -webkit-transform-origin: 0 0;\n          transform-origin: 0 0;\n  -webkit-transform: translate(0%, 0%) rotate(90deg);\n          transform: translate(0%, 0%) rotate(90deg); }\n\n.react-tab-panel__tab-strip--vertical .react-tab-panel__tab-title-inner--hidden {\n  -webkit-transform: none !important;\n          transform: none !important;\n  position: absolute !important;\n  top: auto !important;\n  left: auto !important; }\n\n.react-tab-panel__tab-title-close-icon {\n  display: inline-block; }\n  .react-tab-panel__tab-title-close-icon-svg {\n    vertical-align: middle; }\n\n.react-tab-panel--theme-default .react-tab-panel__body {\n  padding: 5px 10px; }\n\n.react-tab-panel--theme-default .react-tab-panel__tab-title-close-icon {\n  position: relative; }\n  .react-tab-panel--theme-default .react-tab-panel__tab-title-close-icon:hover {\n    opacity: 0.7; }\n\n.react-tab-panel--theme-default .react-tab-panel__tab-title-close-icon-svg {\n  vertical-align: middle; }\n\n.react-tab-panel--theme-default .react-tab-panel__body--tab-position-top {\n  border-right: 1px solid #ddd;\n  border-left: 1px solid #ddd;\n  border-bottom: 1px solid #ddd; }\n\n.react-tab-panel--theme-default .react-tab-panel__body--tab-position-bottom {\n  border-right: 1px solid #ddd;\n  border-left: 1px solid #ddd;\n  border-top: 1px solid #ddd; }\n\n.react-tab-panel--theme-default .react-tab-panel__body--tab-position-left {\n  border-top: 1px solid #ddd;\n  border-bottom: 1px solid #ddd;\n  border-right: 1px solid #ddd; }\n\n.react-tab-panel--theme-default .react-tab-panel__body--tab-position-right {\n  border-top: 1px solid #ddd;\n  border-bottom: 1px solid #ddd;\n  border-left: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-align-stretch .react-tab-panel__tab-strip-before,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-align-stretch .react-tab-panel__tab-strip-after {\n  -webkit-box-flex: 0;\n      -ms-flex: none;\n          flex: none; }\n\n.react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-strip-scroll-tool {\n  background: white;\n  fill: #ddd;\n  padding: 0px;\n  cursor: pointer; }\n  .react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-strip-scroll-tool--auto.react-tab-panel__tab-strip-scroll-tool--tab-position-top {\n    bottom: 1px; }\n  .react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-strip-scroll-tool--auto.react-tab-panel__tab-strip-scroll-tool--tab-position-bottom {\n    top: 1px; }\n  .react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-strip-scroll-tool--auto.react-tab-panel__tab-strip-scroll-tool--tab-position-left {\n    right: 1px; }\n  .react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-strip-scroll-tool--auto.react-tab-panel__tab-strip-scroll-tool--tab-position-right {\n    left: 1px; }\n  .react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-strip-scroll-tool--on.react-tab-panel__tab-strip-scroll-tool--tab-position-top {\n    border-bottom: 1px solid #ddd; }\n  .react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-strip-scroll-tool--on.react-tab-panel__tab-strip-scroll-tool--tab-position-bottom {\n    border-top: 1px solid #ddd; }\n  .react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-strip-scroll-tool--on.react-tab-panel__tab-strip-scroll-tool--tab-position-left {\n    border-right: 1px solid #ddd; }\n  .react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-strip-scroll-tool--on.react-tab-panel__tab-strip-scroll-tool--tab-position-right {\n    border-left: 1px solid #ddd; }\n  .react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-strip-scroll-tool--disabled {\n    cursor: inherit;\n    opacity: inherit; }\n  .react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-strip-scroll-tool:not(.react-tab-panel__tab-strip-scroll-tool--hidden) {\n    display: -webkit-inline-box;\n    display: -ms-inline-flexbox;\n    display: inline-flex;\n    -ms-flex-flow: row;\n        flex-flow: row;\n    -webkit-box-align: center;\n        -ms-flex-align: center;\n            align-items: center;\n    -webkit-box-pack: center;\n        -ms-flex-pack: center;\n            justify-content: center; }\n  .react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-strip-scroll-tool:hover:not(.react-tab-panel__tab-strip-scroll-tool--disabled) {\n    fill: #4d7496;\n    background: #eee; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-strip-scroll-tool--disabled svg {\n  opacity: 0.5; }\n\n.react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-title-inner {\n  padding: 5px 10px;\n  text-align: center; }\n\n.react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-title:not(.react-tab-panel__tab-title--active) {\n  color: #4d7496;\n  fill: #4d7496; }\n\n.react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active) {\n  background: #f9f9f9; }\n\n.react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-title--focused {\n  outline: none; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top.react-tab-panel__tab-strip--orientation-horizontal .react-tab-panel__tab-title-close-icon, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom.react-tab-panel__tab-strip--orientation-horizontal .react-tab-panel__tab-title-close-icon {\n  margin-left: 10px;\n  float: right; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top.react-tab-panel__tab-strip--orientation-horizontal .react-tab-panel__tab-title-close-icon-svg, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom.react-tab-panel__tab-strip--orientation-horizontal .react-tab-panel__tab-title-close-icon-svg {\n  vertical-align: middle; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top.react-tab-panel__tab-strip--orientation-horizontal .react-tab-panel__tab-strip-between, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom.react-tab-panel__tab-strip--orientation-horizontal .react-tab-panel__tab-strip-between {\n  width: 2px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-title-inner:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-title-inner:after, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-title-inner:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-title-inner:after {\n  content: '';\n  position: absolute;\n  top: 0px;\n  bottom: 0px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-title-inner:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-title-inner:before {\n  left: 0px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-title-inner:after, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-title-inner:after {\n  right: 0px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-title-inner--active:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-title-inner--active:before {\n  border-left: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-title-inner--active:after, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-title-inner--active:after {\n  border-right: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active) .react-tab-panel__tab-title-inner:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active) .react-tab-panel__tab-title-inner:before {\n  border-left: 1px solid #eee; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active) .react-tab-panel__tab-title-inner:after, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active) .react-tab-panel__tab-title-inner:after {\n  border-right: 1px solid #eee; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-close-icon {\n  margin-right: 10px;\n  float: left; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-close-icon {\n  margin-left: 10px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-close-icon {\n  margin-left: 10px;\n  float: right; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-close-icon {\n  margin-left: 10px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-between, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-strip-between {\n  height: 2px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner:after, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner:after {\n  content: '';\n  position: absolute;\n  left: 0px;\n  right: 0px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner:before {\n  top: 0px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner:after, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner:after {\n  bottom: 0px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner--active:before {\n  border-top: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active:after, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner--active:after {\n  border-bottom: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) .react-tab-panel__tab-title-inner:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) .react-tab-panel__tab-title-inner:before {\n  border-top: 1px solid #eee; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) .react-tab-panel__tab-title-inner:after, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) .react-tab-panel__tab-title-inner:after {\n  border-bottom: 1px solid #eee; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-between, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-strip-between {\n  height: 2px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) .react-tab-panel__tab-title-inner:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) .react-tab-panel__tab-title-inner:before {\n  border-left: 1px solid #eee; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) .react-tab-panel__tab-title-inner:after, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) .react-tab-panel__tab-title-inner:after {\n  border-right: 1px solid #eee; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__body {\n  border-top: 1px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-strip-before,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-strip-after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-strip-between,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-title:not(.react-tab-panel__tab-title--active) {\n  border-bottom: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) {\n  margin-top: 2px;\n  border-top: 1px solid #eee; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-title-inner--active {\n  border-bottom: 1px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-title {\n  border-top: 3px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-top .react-tab-panel__tab-title--active {\n  border-top: 3px solid #4d7496; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__body {\n  border-bottom: 1px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-strip-before,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-strip-after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-strip-between,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-title:not(.react-tab-panel__tab-title--active) {\n  border-top: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) {\n  margin-bottom: 2px;\n  border-bottom: 1px solid #eee; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-title-inner--active {\n  border-top: 1px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-title {\n  border-bottom: 3px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--tab-position-bottom .react-tab-panel__tab-title--active {\n  border-bottom: 3px solid #4d7496; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner {\n  padding: 8px 10px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__body {\n  border-left: 1px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-before,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-between,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner {\n  border-right: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) {\n  margin-left: 2px;\n  border-left: 1px solid #eee; }\n  .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) .react-tab-panel__tab-title-inner:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) .react-tab-panel__tab-title-inner:after {\n    right: 1px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active {\n  border-right: 1px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title {\n  border-left: 3px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title--active {\n  border-left: 3px solid #4d7496; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__body {\n  border-right: 1px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-strip-before,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-strip-after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-strip-between,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner {\n  border-left: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) {\n  margin-right: 2px;\n  border-right: 1px solid #eee; }\n  .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) .react-tab-panel__tab-title-inner:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) .react-tab-panel__tab-title-inner:after {\n    left: 1px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner--active {\n  border-left: 1px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title {\n  border-right: 3px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title--active {\n  border-right: 3px solid #4d7496; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner {\n  padding: 8px 10px; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical .react-tab-panel__tab-title-inner:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical .react-tab-panel__tab-title-inner:after {\n  display: none; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical .react-tab-panel__tab-title:before {\n  content: '';\n  top: 0px;\n  left: 0px;\n  right: 0px;\n  z-index: 100;\n  position: absolute; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical .react-tab-panel__tab-title:after {\n  content: '';\n  bottom: 0px;\n  left: 0px;\n  right: 0px;\n  z-index: 100;\n  position: absolute; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-before,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-between {\n  border-right: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title {\n  border-left: 3px solid transparent;\n  border-right: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner {\n  border-top: 1px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active) {\n  background: #f9f9f9 padding-box; }\n  .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):before {\n    border-top: 1px solid #eee; }\n  .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):after {\n    border-bottom: 1px solid #eee; }\n  .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active) .react-tab-panel__tab-title-inner {\n    border-top: 1px solid #eee; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active {\n  border-bottom: 1px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title--active {\n  border-left: 3px solid #4d7496;\n  border-right: none; }\n  .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title--active:before {\n    border-top: 1px solid #ddd; }\n  .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title--active:after {\n    border-bottom: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-strip-before,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-strip-after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-strip-between {\n  border-left: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title {\n  border-right: 3px solid transparent;\n  border-left: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner {\n  border-top: 1px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) {\n  background: #f9f9f9 padding-box; }\n  .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled):before {\n    border-top: 1px solid #eee; }\n  .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled):after {\n    border-bottom: 1px solid #eee; }\n  .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title:hover:not(.react-tab-panel__tab-title--active):not(.react-tab-panel__tab-title--disabled) .react-tab-panel__tab-title-inner {\n    border-top: 1px solid #eee; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner--active {\n  border-bottom: 1px solid transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title--active {\n  border-right: 3px solid #4d7496;\n  border-left: none; }\n  .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title--active:before {\n    border-top: 1px solid #ddd; }\n  .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-vertical.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title--active:after {\n    border-bottom: 1px solid #ddd; }\n\n.react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-title--disabled.react-tab-panel__tab-title--disabled, .react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-title--disabled.react-tab-panel__tab-title--disabled:hover {\n  background: #eaeaea content-box;\n  color: grey; }\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 535 */
+/***/ function(module, exports) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function() {
+		var list = [];
+
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for(var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if(item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+
+		// import a list of modules into the list
+		list.i = function(modules, mediaQuery) {
+			if(typeof modules === "string")
+				modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for(var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if(typeof id === "number")
+					alreadyImportedModules[id] = true;
+			}
+			for(i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if(mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if(mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
+
+/***/ },
+/* 536 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	var stylesInDom = {},
+		memoize = function(fn) {
+			var memo;
+			return function () {
+				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+				return memo;
+			};
+		},
+		isOldIE = memoize(function() {
+			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+		}),
+		getHeadElement = memoize(function () {
+			return document.head || document.getElementsByTagName("head")[0];
+		}),
+		singletonElement = null,
+		singletonCounter = 0,
+		styleElementsInsertedAtTop = [];
+
+	module.exports = function(list, options) {
+		if(false) {
+			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+		}
+
+		options = options || {};
+		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+		// tags it will allow on a page
+		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
+
+		// By default, add <style> tags to the bottom of <head>.
+		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
+
+		var styles = listToStyles(list);
+		addStylesToDom(styles, options);
+
+		return function update(newList) {
+			var mayRemove = [];
+			for(var i = 0; i < styles.length; i++) {
+				var item = styles[i];
+				var domStyle = stylesInDom[item.id];
+				domStyle.refs--;
+				mayRemove.push(domStyle);
+			}
+			if(newList) {
+				var newStyles = listToStyles(newList);
+				addStylesToDom(newStyles, options);
+			}
+			for(var i = 0; i < mayRemove.length; i++) {
+				var domStyle = mayRemove[i];
+				if(domStyle.refs === 0) {
+					for(var j = 0; j < domStyle.parts.length; j++)
+						domStyle.parts[j]();
+					delete stylesInDom[domStyle.id];
+				}
+			}
+		};
+	}
+
+	function addStylesToDom(styles, options) {
+		for(var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+			if(domStyle) {
+				domStyle.refs++;
+				for(var j = 0; j < domStyle.parts.length; j++) {
+					domStyle.parts[j](item.parts[j]);
+				}
+				for(; j < item.parts.length; j++) {
+					domStyle.parts.push(addStyle(item.parts[j], options));
+				}
+			} else {
+				var parts = [];
+				for(var j = 0; j < item.parts.length; j++) {
+					parts.push(addStyle(item.parts[j], options));
+				}
+				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+			}
+		}
+	}
+
+	function listToStyles(list) {
+		var styles = [];
+		var newStyles = {};
+		for(var i = 0; i < list.length; i++) {
+			var item = list[i];
+			var id = item[0];
+			var css = item[1];
+			var media = item[2];
+			var sourceMap = item[3];
+			var part = {css: css, media: media, sourceMap: sourceMap};
+			if(!newStyles[id])
+				styles.push(newStyles[id] = {id: id, parts: [part]});
+			else
+				newStyles[id].parts.push(part);
+		}
+		return styles;
+	}
+
+	function insertStyleElement(options, styleElement) {
+		var head = getHeadElement();
+		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
+		if (options.insertAt === "top") {
+			if(!lastStyleElementInsertedAtTop) {
+				head.insertBefore(styleElement, head.firstChild);
+			} else if(lastStyleElementInsertedAtTop.nextSibling) {
+				head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
+			} else {
+				head.appendChild(styleElement);
+			}
+			styleElementsInsertedAtTop.push(styleElement);
+		} else if (options.insertAt === "bottom") {
+			head.appendChild(styleElement);
+		} else {
+			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
+		}
+	}
+
+	function removeStyleElement(styleElement) {
+		styleElement.parentNode.removeChild(styleElement);
+		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
+		if(idx >= 0) {
+			styleElementsInsertedAtTop.splice(idx, 1);
+		}
+	}
+
+	function createStyleElement(options) {
+		var styleElement = document.createElement("style");
+		styleElement.type = "text/css";
+		insertStyleElement(options, styleElement);
+		return styleElement;
+	}
+
+	function createLinkElement(options) {
+		var linkElement = document.createElement("link");
+		linkElement.rel = "stylesheet";
+		insertStyleElement(options, linkElement);
+		return linkElement;
+	}
+
+	function addStyle(obj, options) {
+		var styleElement, update, remove;
+
+		if (options.singleton) {
+			var styleIndex = singletonCounter++;
+			styleElement = singletonElement || (singletonElement = createStyleElement(options));
+			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
+			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
+		} else if(obj.sourceMap &&
+			typeof URL === "function" &&
+			typeof URL.createObjectURL === "function" &&
+			typeof URL.revokeObjectURL === "function" &&
+			typeof Blob === "function" &&
+			typeof btoa === "function") {
+			styleElement = createLinkElement(options);
+			update = updateLink.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+				if(styleElement.href)
+					URL.revokeObjectURL(styleElement.href);
+			};
+		} else {
+			styleElement = createStyleElement(options);
+			update = applyToTag.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+			};
+		}
+
+		update(obj);
+
+		return function updateStyle(newObj) {
+			if(newObj) {
+				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
+					return;
+				update(obj = newObj);
+			} else {
+				remove();
+			}
+		};
+	}
+
+	var replaceText = (function () {
+		var textStore = [];
+
+		return function (index, replacement) {
+			textStore[index] = replacement;
+			return textStore.filter(Boolean).join('\n');
+		};
+	})();
+
+	function applyToSingletonTag(styleElement, index, remove, obj) {
+		var css = remove ? "" : obj.css;
+
+		if (styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = replaceText(index, css);
+		} else {
+			var cssNode = document.createTextNode(css);
+			var childNodes = styleElement.childNodes;
+			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
+			if (childNodes.length) {
+				styleElement.insertBefore(cssNode, childNodes[index]);
+			} else {
+				styleElement.appendChild(cssNode);
+			}
+		}
+	}
+
+	function applyToTag(styleElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+
+		if(media) {
+			styleElement.setAttribute("media", media)
+		}
+
+		if(styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = css;
+		} else {
+			while(styleElement.firstChild) {
+				styleElement.removeChild(styleElement.firstChild);
+			}
+			styleElement.appendChild(document.createTextNode(css));
+		}
+	}
+
+	function updateLink(linkElement, obj) {
+		var css = obj.css;
+		var sourceMap = obj.sourceMap;
+
+		if(sourceMap) {
+			// http://stackoverflow.com/a/26603875
+			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+		}
+
+		var blob = new Blob([css], { type: "text/css" });
+
+		var oldSrc = linkElement.href;
+
+		linkElement.href = URL.createObjectURL(blob);
+
+		if(oldSrc)
+			URL.revokeObjectURL(oldSrc);
+	}
+
+
+/***/ },
+/* 537 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32435,7 +38340,7 @@
 	exports.default = VariationAdder;
 
 /***/ },
-/* 483 */
+/* 538 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32453,7 +38358,7 @@
 
 	var _filter3 = _interopRequireDefault(_filter2);
 
-	var _find2 = __webpack_require__(484);
+	var _find2 = __webpack_require__(539);
 
 	var _find3 = _interopRequireDefault(_find2);
 
@@ -32461,11 +38366,11 @@
 
 	var _reselect = __webpack_require__(478);
 
-	var _sectionSelectors = __webpack_require__(491);
+	var _sectionSelectors = __webpack_require__(546);
 
 	var _channelSelectors = __webpack_require__(477);
 
-	var _adsSelectors = __webpack_require__(492);
+	var _adsSelectors = __webpack_require__(547);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -32528,11 +38433,11 @@
 	exports.getActiveChannelVariationsWithAds = getActiveChannelVariationsWithAds;
 
 /***/ },
-/* 484 */
+/* 539 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var createFind = __webpack_require__(485),
-	    findIndex = __webpack_require__(486);
+	var createFind = __webpack_require__(540),
+	    findIndex = __webpack_require__(541);
 
 	/**
 	 * Iterates over elements of `collection`, returning the first element
@@ -32577,7 +38482,7 @@
 
 
 /***/ },
-/* 485 */
+/* 540 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseIteratee = __webpack_require__(69),
@@ -32608,12 +38513,12 @@
 
 
 /***/ },
-/* 486 */
+/* 541 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseFindIndex = __webpack_require__(487),
+	var baseFindIndex = __webpack_require__(542),
 	    baseIteratee = __webpack_require__(69),
-	    toInteger = __webpack_require__(488);
+	    toInteger = __webpack_require__(543);
 
 	/* Built-in method references for those with the same name as other `lodash` methods. */
 	var nativeMax = Math.max;
@@ -32670,7 +38575,7 @@
 
 
 /***/ },
-/* 487 */
+/* 542 */
 /***/ function(module, exports) {
 
 	/**
@@ -32700,10 +38605,10 @@
 
 
 /***/ },
-/* 488 */
+/* 543 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var toFinite = __webpack_require__(489);
+	var toFinite = __webpack_require__(544);
 
 	/**
 	 * Converts `value` to an integer.
@@ -32742,10 +38647,10 @@
 
 
 /***/ },
-/* 489 */
+/* 544 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var toNumber = __webpack_require__(490);
+	var toNumber = __webpack_require__(545);
 
 	/** Used as references for various `Number` constants. */
 	var INFINITY = 1 / 0,
@@ -32790,7 +38695,7 @@
 
 
 /***/ },
-/* 490 */
+/* 545 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var isObject = __webpack_require__(67),
@@ -32862,7 +38767,7 @@
 
 
 /***/ },
-/* 491 */
+/* 546 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32880,7 +38785,7 @@
 
 	var _reselect = __webpack_require__(478);
 
-	var _adsSelectors = __webpack_require__(492);
+	var _adsSelectors = __webpack_require__(547);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -32907,7 +38812,7 @@
 	exports.getSectionWithAds = getSectionWithAds;
 
 /***/ },
-/* 492 */
+/* 547 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32928,7 +38833,7 @@
 	exports.getAllAds = getAllAds;
 
 /***/ },
-/* 493 */
+/* 548 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32941,21 +38846,21 @@
 
 	var _reactRedux = __webpack_require__(4);
 
-	var _insertMenu = __webpack_require__(494);
+	var _insertMenu = __webpack_require__(549);
 
 	var _insertMenu2 = _interopRequireDefault(_insertMenu);
 
-	var _insertMenuActions = __webpack_require__(503);
+	var _insertMenuActions = __webpack_require__(558);
 
-	var _sectionActions = __webpack_require__(504);
+	var _sectionActions = __webpack_require__(559);
 
 	var _channelSelectors = __webpack_require__(477);
 
-	var _variationSelectors = __webpack_require__(483);
+	var _variationSelectors = __webpack_require__(538);
 
-	var _insertMenuSelectors = __webpack_require__(505);
+	var _insertMenuSelectors = __webpack_require__(560);
 
-	var _messengerHelper = __webpack_require__(506);
+	var _messengerHelper = __webpack_require__(561);
 
 	var _commonConsts = __webpack_require__(33);
 
@@ -32986,7 +38891,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_insertMenu2.default);
 
 /***/ },
-/* 494 */
+/* 549 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33001,25 +38906,25 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _menu = __webpack_require__(495);
+	var _menu = __webpack_require__(550);
 
 	var _menu2 = _interopRequireDefault(_menu);
 
-	var _menuItem = __webpack_require__(498);
+	var _menuItem = __webpack_require__(553);
 
 	var _menuItem2 = _interopRequireDefault(_menuItem);
 
 	var _commonConsts = __webpack_require__(33);
 
-	var _adSizeSelector = __webpack_require__(499);
+	var _adSizeSelector = __webpack_require__(554);
 
 	var _adSizeSelector2 = _interopRequireDefault(_adSizeSelector);
 
-	var _parentSelector = __webpack_require__(500);
+	var _parentSelector = __webpack_require__(555);
 
 	var _parentSelector2 = _interopRequireDefault(_parentSelector);
 
-	var _sectionOptions = __webpack_require__(501);
+	var _sectionOptions = __webpack_require__(556);
 
 	var _sectionOptions2 = _interopRequireDefault(_sectionOptions);
 
@@ -33173,7 +39078,7 @@
 	exports.default = insertMenu;
 
 /***/ },
-/* 495 */
+/* 550 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33192,7 +39097,7 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _glass = __webpack_require__(496);
+	var _glass = __webpack_require__(551);
 
 	var _glass2 = _interopRequireDefault(_glass);
 
@@ -33200,7 +39105,7 @@
 
 	var _utils2 = _interopRequireDefault(_utils);
 
-	var _content = __webpack_require__(497);
+	var _content = __webpack_require__(552);
 
 	var _content2 = _interopRequireDefault(_content);
 
@@ -33358,7 +39263,7 @@
 	exports.default = Menu;
 
 /***/ },
-/* 496 */
+/* 551 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33393,7 +39298,7 @@
 	});
 
 /***/ },
-/* 497 */
+/* 552 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -33443,7 +39348,7 @@
 	exports.default = MenuContent;
 
 /***/ },
-/* 498 */
+/* 553 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33499,7 +39404,7 @@
 	exports.default = MenuItem;
 
 /***/ },
-/* 499 */
+/* 554 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33619,7 +39524,7 @@
 	exports.default = AdSizeSelector;
 
 /***/ },
-/* 500 */
+/* 555 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33688,7 +39593,7 @@
 	exports.default = platformSelector;
 
 /***/ },
-/* 501 */
+/* 556 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33705,7 +39610,7 @@
 
 	var _reactBootstrap = __webpack_require__(224);
 
-	var _select = __webpack_require__(502);
+	var _select = __webpack_require__(557);
 
 	var _select2 = _interopRequireDefault(_select);
 
@@ -33816,7 +39721,7 @@
 	exports.default = sectionOptions;
 
 /***/ },
-/* 502 */
+/* 557 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34154,7 +40059,7 @@
 	});
 
 /***/ },
-/* 503 */
+/* 558 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34177,7 +40082,7 @@
 	exports.hideMenu = hideMenu;
 
 /***/ },
-/* 504 */
+/* 559 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34228,7 +40133,7 @@
 	exports.renameSection = renameSection;
 
 /***/ },
-/* 505 */
+/* 560 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -34244,7 +40149,7 @@
 	exports.getInsertMenuState = getInsertMenuState;
 
 /***/ },
-/* 506 */
+/* 561 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34256,7 +40161,7 @@
 
 	var _commonConsts = __webpack_require__(33);
 
-	var _insertMenuActions = __webpack_require__(503);
+	var _insertMenuActions = __webpack_require__(558);
 
 	var _messenger = __webpack_require__(204);
 
@@ -34264,11 +40169,11 @@
 
 	var _channelActions = __webpack_require__(216);
 
-	var _adActions = __webpack_require__(507);
+	var _adActions = __webpack_require__(562);
 
-	var _sectionActions = __webpack_require__(504);
+	var _sectionActions = __webpack_require__(559);
 
-	var _editMenuActions = __webpack_require__(508);
+	var _editMenuActions = __webpack_require__(563);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34351,7 +40256,7 @@
 	exports.sendMessage = sendMessage;
 
 /***/ },
-/* 507 */
+/* 562 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34391,7 +40296,7 @@
 	exports.updateAdCode = updateAdCode;
 
 /***/ },
-/* 508 */
+/* 563 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34414,7 +40319,7 @@
 	exports.hideMenu = hideMenu;
 
 /***/ },
-/* 509 */
+/* 564 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34427,15 +40332,15 @@
 
 	var _reactRedux = __webpack_require__(4);
 
-	var _editMenu = __webpack_require__(510);
+	var _editMenu = __webpack_require__(565);
 
 	var _editMenu2 = _interopRequireDefault(_editMenu);
 
-	var _editMenuActions = __webpack_require__(508);
+	var _editMenuActions = __webpack_require__(563);
 
-	var _editMenuSelectors = __webpack_require__(583);
+	var _editMenuSelectors = __webpack_require__(637);
 
-	var _sectionSelectors = __webpack_require__(491);
+	var _sectionSelectors = __webpack_require__(546);
 
 	var _commonConsts = __webpack_require__(33);
 
@@ -34456,7 +40361,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_editMenu2.default);
 
 /***/ },
-/* 510 */
+/* 565 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34475,15 +40380,15 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _menu = __webpack_require__(495);
+	var _menu = __webpack_require__(550);
 
 	var _menu2 = _interopRequireDefault(_menu);
 
-	var _menuItem = __webpack_require__(498);
+	var _menuItem = __webpack_require__(553);
 
 	var _menuItem2 = _interopRequireDefault(_menuItem);
 
-	var _adDescripterContainer = __webpack_require__(511);
+	var _adDescripterContainer = __webpack_require__(566);
 
 	var _adDescripterContainer2 = _interopRequireDefault(_adDescripterContainer);
 
@@ -34555,7 +40460,7 @@
 	exports.default = editMenu;
 
 /***/ },
-/* 511 */
+/* 566 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34570,11 +40475,11 @@
 
 	var _reactRedux = __webpack_require__(4);
 
-	var _adDescriptor = __webpack_require__(512);
+	var _adDescriptor = __webpack_require__(567);
 
 	var _adDescriptor2 = _interopRequireDefault(_adDescriptor);
 
-	var _adActions = __webpack_require__(507);
+	var _adActions = __webpack_require__(562);
 
 	var adActions = _interopRequireWildcard(_adActions);
 
@@ -34592,7 +40497,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_adDescriptor2.default);
 
 /***/ },
-/* 512 */
+/* 567 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34609,7 +40514,7 @@
 
 	var _reactBootstrap = __webpack_require__(224);
 
-	var _cssEditor = __webpack_require__(513);
+	var _cssEditor = __webpack_require__(568);
 
 	var _cssEditor2 = _interopRequireDefault(_cssEditor);
 
@@ -34705,7 +40610,7 @@
 	exports.default = adDescriptor;
 
 /***/ },
-/* 513 */
+/* 568 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34720,11 +40625,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _marginEditor = __webpack_require__(514);
+	var _marginEditor = __webpack_require__(569);
 
 	var _marginEditor2 = _interopRequireDefault(_marginEditor);
 
-	var _customCssEditor = __webpack_require__(579);
+	var _customCssEditor = __webpack_require__(634);
 
 	var _customCssEditor2 = _interopRequireDefault(_customCssEditor);
 
@@ -34786,7 +40691,7 @@
 	exports.default = cssEditor;
 
 /***/ },
-/* 514 */
+/* 569 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -34801,7 +40706,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reduxForm = __webpack_require__(515);
+	var _reduxForm = __webpack_require__(570);
 
 	var _reactBootstrap = __webpack_require__(224);
 
@@ -35001,7 +40906,7 @@
 	})(cssMarginEditor);
 
 /***/ },
-/* 515 */
+/* 570 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35011,11 +40916,11 @@
 	});
 	exports.values = exports.untouch = exports.touch = exports.SubmissionError = exports.stopSubmit = exports.stopAsyncValidation = exports.startSubmit = exports.startAsyncValidation = exports.setSubmitSucceeded = exports.setSubmitFailed = exports.reset = exports.reduxForm = exports.reducer = exports.propTypes = exports.isValid = exports.isPristine = exports.isInvalid = exports.isDirty = exports.initialize = exports.getFormValues = exports.formValueSelector = exports.focus = exports.FieldArray = exports.Fields = exports.Field = exports.destroy = exports.change = exports.autofill = exports.blur = exports.arrayUnshift = exports.arraySwap = exports.arraySplice = exports.arrayShift = exports.arrayRemoveAll = exports.arrayRemove = exports.arrayPush = exports.arrayPop = exports.arrayMove = exports.arrayInsert = exports.actionTypes = undefined;
 
-	var _createAll2 = __webpack_require__(516);
+	var _createAll2 = __webpack_require__(571);
 
 	var _createAll3 = _interopRequireDefault(_createAll2);
 
-	var _plain = __webpack_require__(538);
+	var _plain = __webpack_require__(593);
 
 	var _plain2 = _interopRequireDefault(_plain);
 
@@ -35105,7 +41010,7 @@
 	exports.values = values;
 
 /***/ },
-/* 516 */
+/* 571 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35116,67 +41021,67 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var _reducer = __webpack_require__(517);
+	var _reducer = __webpack_require__(572);
 
 	var _reducer2 = _interopRequireDefault(_reducer);
 
-	var _reduxForm = __webpack_require__(523);
+	var _reduxForm = __webpack_require__(578);
 
 	var _reduxForm2 = _interopRequireDefault(_reduxForm);
 
-	var _Field = __webpack_require__(550);
+	var _Field = __webpack_require__(605);
 
 	var _Field2 = _interopRequireDefault(_Field);
 
-	var _Fields = __webpack_require__(567);
+	var _Fields = __webpack_require__(622);
 
 	var _Fields2 = _interopRequireDefault(_Fields);
 
-	var _FieldArray = __webpack_require__(569);
+	var _FieldArray = __webpack_require__(624);
 
 	var _FieldArray2 = _interopRequireDefault(_FieldArray);
 
-	var _formValueSelector = __webpack_require__(572);
+	var _formValueSelector = __webpack_require__(627);
 
 	var _formValueSelector2 = _interopRequireDefault(_formValueSelector);
 
-	var _values = __webpack_require__(573);
+	var _values = __webpack_require__(628);
 
 	var _values2 = _interopRequireDefault(_values);
 
-	var _getFormValues = __webpack_require__(574);
+	var _getFormValues = __webpack_require__(629);
 
 	var _getFormValues2 = _interopRequireDefault(_getFormValues);
 
-	var _isDirty = __webpack_require__(575);
+	var _isDirty = __webpack_require__(630);
 
 	var _isDirty2 = _interopRequireDefault(_isDirty);
 
-	var _isInvalid = __webpack_require__(577);
+	var _isInvalid = __webpack_require__(632);
 
 	var _isInvalid2 = _interopRequireDefault(_isInvalid);
 
-	var _isPristine = __webpack_require__(576);
+	var _isPristine = __webpack_require__(631);
 
 	var _isPristine2 = _interopRequireDefault(_isPristine);
 
-	var _isValid = __webpack_require__(548);
+	var _isValid = __webpack_require__(603);
 
 	var _isValid2 = _interopRequireDefault(_isValid);
 
-	var _SubmissionError = __webpack_require__(531);
+	var _SubmissionError = __webpack_require__(586);
 
 	var _SubmissionError2 = _interopRequireDefault(_SubmissionError);
 
-	var _propTypes = __webpack_require__(578);
+	var _propTypes = __webpack_require__(633);
 
 	var _propTypes2 = _interopRequireDefault(_propTypes);
 
-	var _actions = __webpack_require__(529);
+	var _actions = __webpack_require__(584);
 
 	var actions = _interopRequireWildcard(_actions);
 
-	var _actionTypes = __webpack_require__(518);
+	var _actionTypes = __webpack_require__(573);
 
 	var actionTypes = _interopRequireWildcard(_actionTypes);
 
@@ -35209,7 +41114,7 @@
 	exports.default = createAll;
 
 /***/ },
-/* 517 */
+/* 572 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35218,11 +41123,11 @@
 	  value: true
 	});
 
-	var _actionTypes = __webpack_require__(518);
+	var _actionTypes = __webpack_require__(573);
 
-	__webpack_require__(519);
+	__webpack_require__(574);
 
-	var _deleteInWithCleanUp = __webpack_require__(520);
+	var _deleteInWithCleanUp = __webpack_require__(575);
 
 	var _deleteInWithCleanUp2 = _interopRequireDefault(_deleteInWithCleanUp);
 
@@ -35692,7 +41597,7 @@
 	exports.default = createReducer;
 
 /***/ },
-/* 518 */
+/* 573 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -35731,7 +41636,7 @@
 	var UPDATE_SYNC_WARNINGS = exports.UPDATE_SYNC_WARNINGS = 'redux-form/UPDATE_SYNC_WARNINGS';
 
 /***/ },
-/* 519 */
+/* 574 */
 /***/ function(module, exports) {
 
 	/**
@@ -35770,7 +41675,7 @@
 
 
 /***/ },
-/* 520 */
+/* 575 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35779,7 +41684,7 @@
 	  value: true
 	});
 
-	var _toPath2 = __webpack_require__(521);
+	var _toPath2 = __webpack_require__(576);
 
 	var _toPath3 = _interopRequireDefault(_toPath2);
 
@@ -35821,11 +41726,11 @@
 	exports.default = createDeleteInWithCleanUp;
 
 /***/ },
-/* 521 */
+/* 576 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var arrayMap = __webpack_require__(140),
-	    copyArray = __webpack_require__(522),
+	    copyArray = __webpack_require__(577),
 	    isArray = __webpack_require__(51),
 	    isSymbol = __webpack_require__(141),
 	    stringToPath = __webpack_require__(135),
@@ -35859,7 +41764,7 @@
 
 
 /***/ },
-/* 522 */
+/* 577 */
 /***/ function(module, exports) {
 
 	/**
@@ -35885,7 +41790,7 @@
 
 
 /***/ },
-/* 523 */
+/* 578 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -35894,7 +41799,7 @@
 	  value: true
 	});
 
-	var _mapValues2 = __webpack_require__(524);
+	var _mapValues2 = __webpack_require__(579);
 
 	var _mapValues3 = _interopRequireDefault(_mapValues2);
 
@@ -35914,43 +41819,43 @@
 
 	var _redux = __webpack_require__(12);
 
-	var _isPromise = __webpack_require__(527);
+	var _isPromise = __webpack_require__(582);
 
 	var _isPromise2 = _interopRequireDefault(_isPromise);
 
-	var _getDisplayName = __webpack_require__(528);
+	var _getDisplayName = __webpack_require__(583);
 
 	var _getDisplayName2 = _interopRequireDefault(_getDisplayName);
 
-	var _actions = __webpack_require__(529);
+	var _actions = __webpack_require__(584);
 
 	var importedActions = _interopRequireWildcard(_actions);
 
-	var _handleSubmit = __webpack_require__(530);
+	var _handleSubmit = __webpack_require__(585);
 
 	var _handleSubmit2 = _interopRequireDefault(_handleSubmit);
 
-	var _silenceEvent = __webpack_require__(533);
+	var _silenceEvent = __webpack_require__(588);
 
 	var _silenceEvent2 = _interopRequireDefault(_silenceEvent);
 
-	var _silenceEvents = __webpack_require__(535);
+	var _silenceEvents = __webpack_require__(590);
 
 	var _silenceEvents2 = _interopRequireDefault(_silenceEvents);
 
-	var _asyncValidation = __webpack_require__(536);
+	var _asyncValidation = __webpack_require__(591);
 
 	var _asyncValidation2 = _interopRequireDefault(_asyncValidation);
 
-	var _defaultShouldAsyncValidate = __webpack_require__(537);
+	var _defaultShouldAsyncValidate = __webpack_require__(592);
 
 	var _defaultShouldAsyncValidate2 = _interopRequireDefault(_defaultShouldAsyncValidate);
 
-	var _plain = __webpack_require__(538);
+	var _plain = __webpack_require__(593);
 
 	var _plain2 = _interopRequireDefault(_plain);
 
-	var _isValid = __webpack_require__(548);
+	var _isValid = __webpack_require__(603);
 
 	var _isValid2 = _interopRequireDefault(_isValid);
 
@@ -36629,10 +42534,10 @@
 	exports.default = createReduxForm;
 
 /***/ },
-/* 524 */
+/* 579 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseAssignValue = __webpack_require__(525),
+	var baseAssignValue = __webpack_require__(580),
 	    baseForOwn = __webpack_require__(43),
 	    baseIteratee = __webpack_require__(69);
 
@@ -36678,10 +42583,10 @@
 
 
 /***/ },
-/* 525 */
+/* 580 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var defineProperty = __webpack_require__(526);
+	var defineProperty = __webpack_require__(581);
 
 	/**
 	 * The base implementation of `assignValue` and `assignMergeValue` without
@@ -36709,7 +42614,7 @@
 
 
 /***/ },
-/* 526 */
+/* 581 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var getNative = __webpack_require__(87);
@@ -36726,7 +42631,7 @@
 
 
 /***/ },
-/* 527 */
+/* 582 */
 /***/ function(module, exports) {
 
 	module.exports = isPromise;
@@ -36737,7 +42642,7 @@
 
 
 /***/ },
-/* 528 */
+/* 583 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -36752,7 +42657,7 @@
 	exports.default = getDisplayName;
 
 /***/ },
-/* 529 */
+/* 584 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -36762,7 +42667,7 @@
 	});
 	exports.updateSyncWarnings = exports.updateSyncErrors = exports.untouch = exports.unregisterField = exports.touch = exports.setSubmitSucceeded = exports.setSubmitFailed = exports.stopSubmit = exports.stopAsyncValidation = exports.startSubmit = exports.startAsyncValidation = exports.reset = exports.registerField = exports.initialize = exports.focus = exports.destroy = exports.change = exports.blur = exports.autofill = exports.arrayUnshift = exports.arraySwap = exports.arraySplice = exports.arrayShift = exports.arrayRemoveAll = exports.arrayRemove = exports.arrayPush = exports.arrayPop = exports.arrayMove = exports.arrayInsert = undefined;
 
-	var _actionTypes = __webpack_require__(518);
+	var _actionTypes = __webpack_require__(573);
 
 	var arrayInsert = exports.arrayInsert = function arrayInsert(form, field, index, value) {
 	  return { type: _actionTypes.ARRAY_INSERT, meta: { form: form, field: field, index: index }, payload: value };
@@ -36930,7 +42835,7 @@
 	};
 
 /***/ },
-/* 530 */
+/* 585 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -36939,11 +42844,11 @@
 	  value: true
 	});
 
-	var _isPromise = __webpack_require__(527);
+	var _isPromise = __webpack_require__(582);
 
 	var _isPromise2 = _interopRequireDefault(_isPromise);
 
-	var _SubmissionError = __webpack_require__(531);
+	var _SubmissionError = __webpack_require__(586);
 
 	var _SubmissionError2 = _interopRequireDefault(_SubmissionError);
 
@@ -37036,7 +42941,7 @@
 	exports.default = handleSubmit;
 
 /***/ },
-/* 531 */
+/* 586 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37045,7 +42950,7 @@
 	  value: true
 	});
 
-	var _es6Error = __webpack_require__(532);
+	var _es6Error = __webpack_require__(587);
 
 	var _es6Error2 = _interopRequireDefault(_es6Error);
 
@@ -37075,7 +42980,7 @@
 	exports.default = SubmissionError;
 
 /***/ },
-/* 532 */
+/* 587 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -37160,7 +43065,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 533 */
+/* 588 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37169,7 +43074,7 @@
 	  value: true
 	});
 
-	var _isEvent = __webpack_require__(534);
+	var _isEvent = __webpack_require__(589);
 
 	var _isEvent2 = _interopRequireDefault(_isEvent);
 
@@ -37186,7 +43091,7 @@
 	exports.default = silenceEvent;
 
 /***/ },
-/* 534 */
+/* 589 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -37201,7 +43106,7 @@
 	exports.default = isEvent;
 
 /***/ },
-/* 535 */
+/* 590 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37210,7 +43115,7 @@
 	  value: true
 	});
 
-	var _silenceEvent = __webpack_require__(533);
+	var _silenceEvent = __webpack_require__(588);
 
 	var _silenceEvent2 = _interopRequireDefault(_silenceEvent);
 
@@ -37229,7 +43134,7 @@
 	exports.default = silenceEvents;
 
 /***/ },
-/* 536 */
+/* 591 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37238,7 +43143,7 @@
 	  value: true
 	});
 
-	var _isPromise = __webpack_require__(527);
+	var _isPromise = __webpack_require__(582);
 
 	var _isPromise2 = _interopRequireDefault(_isPromise);
 
@@ -37269,7 +43174,7 @@
 	exports.default = asyncValidation;
 
 /***/ },
-/* 537 */
+/* 592 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -37302,7 +43207,7 @@
 	exports.default = defaultShouldAsyncValidate;
 
 /***/ },
-/* 538 */
+/* 593 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37311,27 +43216,27 @@
 	  value: true
 	});
 
-	var _some2 = __webpack_require__(539);
+	var _some2 = __webpack_require__(594);
 
 	var _some3 = _interopRequireDefault(_some2);
 
-	var _splice = __webpack_require__(542);
+	var _splice = __webpack_require__(597);
 
 	var _splice2 = _interopRequireDefault(_splice);
 
-	var _getIn = __webpack_require__(543);
+	var _getIn = __webpack_require__(598);
 
 	var _getIn2 = _interopRequireDefault(_getIn);
 
-	var _setIn = __webpack_require__(544);
+	var _setIn = __webpack_require__(599);
 
 	var _setIn2 = _interopRequireDefault(_setIn);
 
-	var _deepEqual = __webpack_require__(545);
+	var _deepEqual = __webpack_require__(600);
 
 	var _deepEqual2 = _interopRequireDefault(_deepEqual);
 
-	var _deleteIn = __webpack_require__(547);
+	var _deleteIn = __webpack_require__(602);
 
 	var _deleteIn2 = _interopRequireDefault(_deleteIn);
 
@@ -37357,14 +43262,14 @@
 	exports.default = structure;
 
 /***/ },
-/* 539 */
+/* 594 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var arraySome = __webpack_require__(114),
 	    baseIteratee = __webpack_require__(69),
-	    baseSome = __webpack_require__(540),
+	    baseSome = __webpack_require__(595),
 	    isArray = __webpack_require__(51),
-	    isIterateeCall = __webpack_require__(541);
+	    isIterateeCall = __webpack_require__(596);
 
 	/**
 	 * Checks if `predicate` returns truthy for **any** element of `collection`.
@@ -37414,7 +43319,7 @@
 
 
 /***/ },
-/* 540 */
+/* 595 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseEach = __webpack_require__(42);
@@ -37442,7 +43347,7 @@
 
 
 /***/ },
-/* 541 */
+/* 596 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var eq = __webpack_require__(77),
@@ -37478,7 +43383,7 @@
 
 
 /***/ },
-/* 542 */
+/* 597 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -37522,7 +43427,7 @@
 	exports.default = splice;
 
 /***/ },
-/* 543 */
+/* 598 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37531,7 +43436,7 @@
 	  value: true
 	});
 
-	var _toPath2 = __webpack_require__(521);
+	var _toPath2 = __webpack_require__(576);
 
 	var _toPath3 = _interopRequireDefault(_toPath2);
 
@@ -37559,7 +43464,7 @@
 	exports.default = getIn;
 
 /***/ },
-/* 544 */
+/* 599 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37568,7 +43473,7 @@
 	  value: true
 	});
 
-	var _toPath2 = __webpack_require__(521);
+	var _toPath2 = __webpack_require__(576);
 
 	var _toPath3 = _interopRequireDefault(_toPath2);
 
@@ -37609,7 +43514,7 @@
 	exports.default = setIn;
 
 /***/ },
-/* 545 */
+/* 600 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37618,7 +43523,7 @@
 	  value: true
 	});
 
-	var _isEqualWith2 = __webpack_require__(546);
+	var _isEqualWith2 = __webpack_require__(601);
 
 	var _isEqualWith3 = _interopRequireDefault(_isEqualWith2);
 
@@ -37639,7 +43544,7 @@
 	exports.default = deepEqual;
 
 /***/ },
-/* 546 */
+/* 601 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseIsEqual = __webpack_require__(108);
@@ -37686,7 +43591,7 @@
 
 
 /***/ },
-/* 547 */
+/* 602 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37695,7 +43600,7 @@
 	  value: true
 	});
 
-	var _toPath2 = __webpack_require__(521);
+	var _toPath2 = __webpack_require__(576);
 
 	var _toPath3 = _interopRequireDefault(_toPath2);
 
@@ -37759,7 +43664,7 @@
 	exports.default = deleteIn;
 
 /***/ },
-/* 548 */
+/* 603 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37768,7 +43673,7 @@
 	  value: true
 	});
 
-	var _hasError = __webpack_require__(549);
+	var _hasError = __webpack_require__(604);
 
 	var _hasError2 = _interopRequireDefault(_hasError);
 
@@ -37806,7 +43711,7 @@
 	exports.default = createIsValid;
 
 /***/ },
-/* 549 */
+/* 604 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37815,7 +43720,7 @@
 	  value: true
 	});
 
-	var _getIn = __webpack_require__(543);
+	var _getIn = __webpack_require__(598);
 
 	var _getIn2 = _interopRequireDefault(_getIn);
 
@@ -37850,7 +43755,7 @@
 	exports.default = createHasError;
 
 /***/ },
-/* 550 */
+/* 605 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37869,11 +43774,11 @@
 
 	var _invariant2 = _interopRequireDefault(_invariant);
 
-	var _ConnectedField = __webpack_require__(551);
+	var _ConnectedField = __webpack_require__(606);
 
 	var _ConnectedField2 = _interopRequireDefault(_ConnectedField);
 
-	var _shallowCompare = __webpack_require__(561);
+	var _shallowCompare = __webpack_require__(616);
 
 	var _shallowCompare2 = _interopRequireDefault(_shallowCompare);
 
@@ -38008,7 +43913,7 @@
 	exports.default = createField;
 
 /***/ },
-/* 551 */
+/* 606 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38025,11 +43930,11 @@
 
 	var _reactRedux = __webpack_require__(4);
 
-	var _createFieldProps2 = __webpack_require__(552);
+	var _createFieldProps2 = __webpack_require__(607);
 
 	var _createFieldProps3 = _interopRequireDefault(_createFieldProps2);
 
-	var _plain = __webpack_require__(538);
+	var _plain = __webpack_require__(593);
 
 	var _plain2 = _interopRequireDefault(_plain);
 
@@ -38183,7 +44088,7 @@
 	exports.default = createConnectedField;
 
 /***/ },
-/* 552 */
+/* 607 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38192,29 +44097,29 @@
 	  value: true
 	});
 
-	var _noop2 = __webpack_require__(553);
+	var _noop2 = __webpack_require__(608);
 
 	var _noop3 = _interopRequireDefault(_noop2);
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var _createOnBlur = __webpack_require__(554);
+	var _createOnBlur = __webpack_require__(609);
 
 	var _createOnBlur2 = _interopRequireDefault(_createOnBlur);
 
-	var _createOnChange = __webpack_require__(557);
+	var _createOnChange = __webpack_require__(612);
 
 	var _createOnChange2 = _interopRequireDefault(_createOnChange);
 
-	var _createOnDragStart = __webpack_require__(558);
+	var _createOnDragStart = __webpack_require__(613);
 
 	var _createOnDragStart2 = _interopRequireDefault(_createOnDragStart);
 
-	var _createOnDrop = __webpack_require__(559);
+	var _createOnDrop = __webpack_require__(614);
 
 	var _createOnDrop2 = _interopRequireDefault(_createOnDrop);
 
-	var _createOnFocus = __webpack_require__(560);
+	var _createOnFocus = __webpack_require__(615);
 
 	var _createOnFocus2 = _interopRequireDefault(_createOnFocus);
 
@@ -38331,7 +44236,7 @@
 	exports.default = createFieldProps;
 
 /***/ },
-/* 553 */
+/* 608 */
 /***/ function(module, exports) {
 
 	/**
@@ -38354,7 +44259,7 @@
 
 
 /***/ },
-/* 554 */
+/* 609 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38363,11 +44268,11 @@
 	  value: true
 	});
 
-	var _getValue = __webpack_require__(555);
+	var _getValue = __webpack_require__(610);
 
 	var _getValue2 = _interopRequireDefault(_getValue);
 
-	var _isReactNative = __webpack_require__(556);
+	var _isReactNative = __webpack_require__(611);
 
 	var _isReactNative2 = _interopRequireDefault(_isReactNative);
 
@@ -38406,7 +44311,7 @@
 	exports.default = createOnBlur;
 
 /***/ },
-/* 555 */
+/* 610 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38415,7 +44320,7 @@
 	  value: true
 	});
 
-	var _isEvent = __webpack_require__(534);
+	var _isEvent = __webpack_require__(589);
 
 	var _isEvent2 = _interopRequireDefault(_isEvent);
 
@@ -38469,7 +44374,7 @@
 	exports.default = getValue;
 
 /***/ },
-/* 556 */
+/* 611 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -38482,7 +44387,7 @@
 	exports.default = isReactNative;
 
 /***/ },
-/* 557 */
+/* 612 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38491,11 +44396,11 @@
 	  value: true
 	});
 
-	var _getValue = __webpack_require__(555);
+	var _getValue = __webpack_require__(610);
 
 	var _getValue2 = _interopRequireDefault(_getValue);
 
-	var _isReactNative = __webpack_require__(556);
+	var _isReactNative = __webpack_require__(611);
 
 	var _isReactNative2 = _interopRequireDefault(_isReactNative);
 
@@ -38528,7 +44433,7 @@
 	exports.default = createOnChange;
 
 /***/ },
-/* 558 */
+/* 613 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -38546,7 +44451,7 @@
 	exports.default = createOnDragStart;
 
 /***/ },
-/* 559 */
+/* 614 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38555,7 +44460,7 @@
 	  value: true
 	});
 
-	var _createOnDragStart = __webpack_require__(558);
+	var _createOnDragStart = __webpack_require__(613);
 
 	var createOnDrop = function createOnDrop(name, change) {
 	  return function (event) {
@@ -38566,7 +44471,7 @@
 	exports.default = createOnDrop;
 
 /***/ },
-/* 560 */
+/* 615 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -38582,7 +44487,7 @@
 	exports.default = createOnFocus;
 
 /***/ },
-/* 561 */
+/* 616 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38591,7 +44496,7 @@
 	  value: true
 	});
 
-	var _shallowequal = __webpack_require__(562);
+	var _shallowequal = __webpack_require__(617);
 
 	var _shallowequal2 = _interopRequireDefault(_shallowequal);
 
@@ -38604,12 +44509,12 @@
 	exports.default = shallowCompare;
 
 /***/ },
-/* 562 */
+/* 617 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var fetchKeys = __webpack_require__(563);
+	var fetchKeys = __webpack_require__(618);
 
 	module.exports = function shallowEqual(objA, objB, compare, compareContext) {
 
@@ -38657,7 +44562,7 @@
 	};
 
 /***/ },
-/* 563 */
+/* 618 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -38668,9 +44573,9 @@
 	 * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <https://lodash.com/license>
 	 */
-	var getNative = __webpack_require__(564),
-	    isArguments = __webpack_require__(565),
-	    isArray = __webpack_require__(566);
+	var getNative = __webpack_require__(619),
+	    isArguments = __webpack_require__(620),
+	    isArray = __webpack_require__(621);
 
 	/** Used to detect unsigned integer values. */
 	var reIsUint = /^\d+$/;
@@ -38899,7 +44804,7 @@
 
 
 /***/ },
-/* 564 */
+/* 619 */
 /***/ function(module, exports) {
 
 	/**
@@ -39042,7 +44947,7 @@
 
 
 /***/ },
-/* 565 */
+/* 620 */
 /***/ function(module, exports) {
 
 	/**
@@ -39277,7 +45182,7 @@
 
 
 /***/ },
-/* 566 */
+/* 621 */
 /***/ function(module, exports) {
 
 	/**
@@ -39463,7 +45368,7 @@
 
 
 /***/ },
-/* 567 */
+/* 622 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39482,15 +45387,15 @@
 
 	var _invariant2 = _interopRequireDefault(_invariant);
 
-	var _ConnectedFields = __webpack_require__(568);
+	var _ConnectedFields = __webpack_require__(623);
 
 	var _ConnectedFields2 = _interopRequireDefault(_ConnectedFields);
 
-	var _shallowCompare = __webpack_require__(561);
+	var _shallowCompare = __webpack_require__(616);
 
 	var _shallowCompare2 = _interopRequireDefault(_shallowCompare);
 
-	var _plain = __webpack_require__(538);
+	var _plain = __webpack_require__(593);
 
 	var _plain2 = _interopRequireDefault(_plain);
 
@@ -39636,7 +45541,7 @@
 	exports.default = createFields;
 
 /***/ },
-/* 568 */
+/* 623 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39653,11 +45558,11 @@
 
 	var _reactRedux = __webpack_require__(4);
 
-	var _createFieldProps2 = __webpack_require__(552);
+	var _createFieldProps2 = __webpack_require__(607);
 
 	var _createFieldProps3 = _interopRequireDefault(_createFieldProps2);
 
-	var _plain = __webpack_require__(538);
+	var _plain = __webpack_require__(593);
 
 	var _plain2 = _interopRequireDefault(_plain);
 
@@ -39828,7 +45733,7 @@
 	exports.default = createConnectedFields;
 
 /***/ },
-/* 569 */
+/* 624 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39847,11 +45752,11 @@
 
 	var _invariant2 = _interopRequireDefault(_invariant);
 
-	var _ConnectedFieldArray = __webpack_require__(570);
+	var _ConnectedFieldArray = __webpack_require__(625);
 
 	var _ConnectedFieldArray2 = _interopRequireDefault(_ConnectedFieldArray);
 
-	var _shallowCompare = __webpack_require__(561);
+	var _shallowCompare = __webpack_require__(616);
 
 	var _shallowCompare2 = _interopRequireDefault(_shallowCompare);
 
@@ -39966,7 +45871,7 @@
 	exports.default = createFieldArray;
 
 /***/ },
-/* 570 */
+/* 625 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39975,7 +45880,7 @@
 	  value: true
 	});
 
-	var _mapValues2 = __webpack_require__(524);
+	var _mapValues2 = __webpack_require__(579);
 
 	var _mapValues3 = _interopRequireDefault(_mapValues2);
 
@@ -39989,11 +45894,11 @@
 
 	var _redux = __webpack_require__(12);
 
-	var _createFieldArrayProps = __webpack_require__(571);
+	var _createFieldArrayProps = __webpack_require__(626);
 
 	var _createFieldArrayProps2 = _interopRequireDefault(_createFieldArrayProps);
 
-	var _plain = __webpack_require__(538);
+	var _plain = __webpack_require__(593);
 
 	var _plain2 = _interopRequireDefault(_plain);
 
@@ -40167,7 +46072,7 @@
 	exports.default = createConnectedFieldArray;
 
 /***/ },
-/* 571 */
+/* 626 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -40260,7 +46165,7 @@
 	exports.default = createFieldArrayProps;
 
 /***/ },
-/* 572 */
+/* 627 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40273,7 +46178,7 @@
 
 	var _invariant2 = _interopRequireDefault(_invariant);
 
-	var _plain = __webpack_require__(538);
+	var _plain = __webpack_require__(593);
 
 	var _plain2 = _interopRequireDefault(_plain);
 
@@ -40308,7 +46213,7 @@
 	exports.default = createFormValueSelector;
 
 /***/ },
-/* 573 */
+/* 628 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40349,7 +46254,7 @@
 	exports.default = createValues;
 
 /***/ },
-/* 574 */
+/* 629 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -40372,7 +46277,7 @@
 	exports.default = createGetFormValues;
 
 /***/ },
-/* 575 */
+/* 630 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40381,7 +46286,7 @@
 	  value: true
 	});
 
-	var _isPristine = __webpack_require__(576);
+	var _isPristine = __webpack_require__(631);
 
 	var _isPristine2 = _interopRequireDefault(_isPristine);
 
@@ -40399,7 +46304,7 @@
 	exports.default = createIsDirty;
 
 /***/ },
-/* 576 */
+/* 631 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -40427,7 +46332,7 @@
 	exports.default = createIsPristine;
 
 /***/ },
-/* 577 */
+/* 632 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40436,7 +46341,7 @@
 	  value: true
 	});
 
-	var _isValid = __webpack_require__(548);
+	var _isValid = __webpack_require__(603);
 
 	var _isValid2 = _interopRequireDefault(_isValid);
 
@@ -40454,7 +46359,7 @@
 	exports.default = createIsInvalid;
 
 /***/ },
-/* 578 */
+/* 633 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40512,7 +46417,7 @@
 	exports.default = propTypes;
 
 /***/ },
-/* 579 */
+/* 634 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40529,7 +46434,7 @@
 
 	var _reactBootstrap = __webpack_require__(224);
 
-	var _reactCodemirror = __webpack_require__(580);
+	var _reactCodemirror = __webpack_require__(635);
 
 	var _reactCodemirror2 = _interopRequireDefault(_reactCodemirror);
 
@@ -40648,14 +46553,14 @@
 	exports.default = customCssEditor;
 
 /***/ },
-/* 580 */
+/* 635 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(2);
 	var className = __webpack_require__(311);
-	var debounce = __webpack_require__(581);
+	var debounce = __webpack_require__(505);
 
 	var CodeMirror = React.createClass({
 		displayName: 'CodeMirror',
@@ -40670,7 +46575,7 @@
 			codeMirrorInstance: React.PropTypes.object
 		},
 		getCodeMirrorInstance: function getCodeMirrorInstance() {
-			return this.props.codeMirrorInstance || __webpack_require__(582);
+			return this.props.codeMirrorInstance || __webpack_require__(636);
 		},
 		getInitialState: function getInitialState() {
 			return {
@@ -40736,391 +46641,7 @@
 	module.exports = CodeMirror;
 
 /***/ },
-/* 581 */
-/***/ function(module, exports) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {/**
-	 * lodash (Custom Build) <https://lodash.com/>
-	 * Build: `lodash modularize exports="npm" -o ./`
-	 * Copyright jQuery Foundation and other contributors <https://jquery.org/>
-	 * Released under MIT license <https://lodash.com/license>
-	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
-	 * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-	 */
-
-	/** Used as the `TypeError` message for "Functions" methods. */
-	var FUNC_ERROR_TEXT = 'Expected a function';
-
-	/** Used as references for various `Number` constants. */
-	var NAN = 0 / 0;
-
-	/** `Object#toString` result references. */
-	var symbolTag = '[object Symbol]';
-
-	/** Used to match leading and trailing whitespace. */
-	var reTrim = /^\s+|\s+$/g;
-
-	/** Used to detect bad signed hexadecimal string values. */
-	var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-
-	/** Used to detect binary string values. */
-	var reIsBinary = /^0b[01]+$/i;
-
-	/** Used to detect octal string values. */
-	var reIsOctal = /^0o[0-7]+$/i;
-
-	/** Built-in method references without a dependency on `root`. */
-	var freeParseInt = parseInt;
-
-	/** Detect free variable `global` from Node.js. */
-	var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
-
-	/** Detect free variable `self`. */
-	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
-
-	/** Used as a reference to the global object. */
-	var root = freeGlobal || freeSelf || Function('return this')();
-
-	/** Used for built-in method references. */
-	var objectProto = Object.prototype;
-
-	/**
-	 * Used to resolve the
-	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var objectToString = objectProto.toString;
-
-	/* Built-in method references for those with the same name as other `lodash` methods. */
-	var nativeMax = Math.max,
-	    nativeMin = Math.min;
-
-	/**
-	 * Gets the timestamp of the number of milliseconds that have elapsed since
-	 * the Unix epoch (1 January 1970 00:00:00 UTC).
-	 *
-	 * @static
-	 * @memberOf _
-	 * @since 2.4.0
-	 * @category Date
-	 * @returns {number} Returns the timestamp.
-	 * @example
-	 *
-	 * _.defer(function(stamp) {
-	 *   console.log(_.now() - stamp);
-	 * }, _.now());
-	 * // => Logs the number of milliseconds it took for the deferred invocation.
-	 */
-	var now = function() {
-	  return root.Date.now();
-	};
-
-	/**
-	 * Creates a debounced function that delays invoking `func` until after `wait`
-	 * milliseconds have elapsed since the last time the debounced function was
-	 * invoked. The debounced function comes with a `cancel` method to cancel
-	 * delayed `func` invocations and a `flush` method to immediately invoke them.
-	 * Provide `options` to indicate whether `func` should be invoked on the
-	 * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
-	 * with the last arguments provided to the debounced function. Subsequent
-	 * calls to the debounced function return the result of the last `func`
-	 * invocation.
-	 *
-	 * **Note:** If `leading` and `trailing` options are `true`, `func` is
-	 * invoked on the trailing edge of the timeout only if the debounced function
-	 * is invoked more than once during the `wait` timeout.
-	 *
-	 * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
-	 * until to the next tick, similar to `setTimeout` with a timeout of `0`.
-	 *
-	 * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
-	 * for details over the differences between `_.debounce` and `_.throttle`.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @since 0.1.0
-	 * @category Function
-	 * @param {Function} func The function to debounce.
-	 * @param {number} [wait=0] The number of milliseconds to delay.
-	 * @param {Object} [options={}] The options object.
-	 * @param {boolean} [options.leading=false]
-	 *  Specify invoking on the leading edge of the timeout.
-	 * @param {number} [options.maxWait]
-	 *  The maximum time `func` is allowed to be delayed before it's invoked.
-	 * @param {boolean} [options.trailing=true]
-	 *  Specify invoking on the trailing edge of the timeout.
-	 * @returns {Function} Returns the new debounced function.
-	 * @example
-	 *
-	 * // Avoid costly calculations while the window size is in flux.
-	 * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
-	 *
-	 * // Invoke `sendMail` when clicked, debouncing subsequent calls.
-	 * jQuery(element).on('click', _.debounce(sendMail, 300, {
-	 *   'leading': true,
-	 *   'trailing': false
-	 * }));
-	 *
-	 * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
-	 * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
-	 * var source = new EventSource('/stream');
-	 * jQuery(source).on('message', debounced);
-	 *
-	 * // Cancel the trailing debounced invocation.
-	 * jQuery(window).on('popstate', debounced.cancel);
-	 */
-	function debounce(func, wait, options) {
-	  var lastArgs,
-	      lastThis,
-	      maxWait,
-	      result,
-	      timerId,
-	      lastCallTime,
-	      lastInvokeTime = 0,
-	      leading = false,
-	      maxing = false,
-	      trailing = true;
-
-	  if (typeof func != 'function') {
-	    throw new TypeError(FUNC_ERROR_TEXT);
-	  }
-	  wait = toNumber(wait) || 0;
-	  if (isObject(options)) {
-	    leading = !!options.leading;
-	    maxing = 'maxWait' in options;
-	    maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
-	    trailing = 'trailing' in options ? !!options.trailing : trailing;
-	  }
-
-	  function invokeFunc(time) {
-	    var args = lastArgs,
-	        thisArg = lastThis;
-
-	    lastArgs = lastThis = undefined;
-	    lastInvokeTime = time;
-	    result = func.apply(thisArg, args);
-	    return result;
-	  }
-
-	  function leadingEdge(time) {
-	    // Reset any `maxWait` timer.
-	    lastInvokeTime = time;
-	    // Start the timer for the trailing edge.
-	    timerId = setTimeout(timerExpired, wait);
-	    // Invoke the leading edge.
-	    return leading ? invokeFunc(time) : result;
-	  }
-
-	  function remainingWait(time) {
-	    var timeSinceLastCall = time - lastCallTime,
-	        timeSinceLastInvoke = time - lastInvokeTime,
-	        result = wait - timeSinceLastCall;
-
-	    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
-	  }
-
-	  function shouldInvoke(time) {
-	    var timeSinceLastCall = time - lastCallTime,
-	        timeSinceLastInvoke = time - lastInvokeTime;
-
-	    // Either this is the first call, activity has stopped and we're at the
-	    // trailing edge, the system time has gone backwards and we're treating
-	    // it as the trailing edge, or we've hit the `maxWait` limit.
-	    return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
-	      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
-	  }
-
-	  function timerExpired() {
-	    var time = now();
-	    if (shouldInvoke(time)) {
-	      return trailingEdge(time);
-	    }
-	    // Restart the timer.
-	    timerId = setTimeout(timerExpired, remainingWait(time));
-	  }
-
-	  function trailingEdge(time) {
-	    timerId = undefined;
-
-	    // Only invoke if we have `lastArgs` which means `func` has been
-	    // debounced at least once.
-	    if (trailing && lastArgs) {
-	      return invokeFunc(time);
-	    }
-	    lastArgs = lastThis = undefined;
-	    return result;
-	  }
-
-	  function cancel() {
-	    if (timerId !== undefined) {
-	      clearTimeout(timerId);
-	    }
-	    lastInvokeTime = 0;
-	    lastArgs = lastCallTime = lastThis = timerId = undefined;
-	  }
-
-	  function flush() {
-	    return timerId === undefined ? result : trailingEdge(now());
-	  }
-
-	  function debounced() {
-	    var time = now(),
-	        isInvoking = shouldInvoke(time);
-
-	    lastArgs = arguments;
-	    lastThis = this;
-	    lastCallTime = time;
-
-	    if (isInvoking) {
-	      if (timerId === undefined) {
-	        return leadingEdge(lastCallTime);
-	      }
-	      if (maxing) {
-	        // Handle invocations in a tight loop.
-	        timerId = setTimeout(timerExpired, wait);
-	        return invokeFunc(lastCallTime);
-	      }
-	    }
-	    if (timerId === undefined) {
-	      timerId = setTimeout(timerExpired, wait);
-	    }
-	    return result;
-	  }
-	  debounced.cancel = cancel;
-	  debounced.flush = flush;
-	  return debounced;
-	}
-
-	/**
-	 * Checks if `value` is the
-	 * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
-	 * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-	 *
-	 * @static
-	 * @memberOf _
-	 * @since 0.1.0
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is an object, else `false`.
-	 * @example
-	 *
-	 * _.isObject({});
-	 * // => true
-	 *
-	 * _.isObject([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObject(_.noop);
-	 * // => true
-	 *
-	 * _.isObject(null);
-	 * // => false
-	 */
-	function isObject(value) {
-	  var type = typeof value;
-	  return !!value && (type == 'object' || type == 'function');
-	}
-
-	/**
-	 * Checks if `value` is object-like. A value is object-like if it's not `null`
-	 * and has a `typeof` result of "object".
-	 *
-	 * @static
-	 * @memberOf _
-	 * @since 4.0.0
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
-	 * @example
-	 *
-	 * _.isObjectLike({});
-	 * // => true
-	 *
-	 * _.isObjectLike([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObjectLike(_.noop);
-	 * // => false
-	 *
-	 * _.isObjectLike(null);
-	 * // => false
-	 */
-	function isObjectLike(value) {
-	  return !!value && typeof value == 'object';
-	}
-
-	/**
-	 * Checks if `value` is classified as a `Symbol` primitive or object.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @since 4.0.0
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
-	 * @example
-	 *
-	 * _.isSymbol(Symbol.iterator);
-	 * // => true
-	 *
-	 * _.isSymbol('abc');
-	 * // => false
-	 */
-	function isSymbol(value) {
-	  return typeof value == 'symbol' ||
-	    (isObjectLike(value) && objectToString.call(value) == symbolTag);
-	}
-
-	/**
-	 * Converts `value` to a number.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @since 4.0.0
-	 * @category Lang
-	 * @param {*} value The value to process.
-	 * @returns {number} Returns the number.
-	 * @example
-	 *
-	 * _.toNumber(3.2);
-	 * // => 3.2
-	 *
-	 * _.toNumber(Number.MIN_VALUE);
-	 * // => 5e-324
-	 *
-	 * _.toNumber(Infinity);
-	 * // => Infinity
-	 *
-	 * _.toNumber('3.2');
-	 * // => 3.2
-	 */
-	function toNumber(value) {
-	  if (typeof value == 'number') {
-	    return value;
-	  }
-	  if (isSymbol(value)) {
-	    return NAN;
-	  }
-	  if (isObject(value)) {
-	    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
-	    value = isObject(other) ? (other + '') : other;
-	  }
-	  if (typeof value != 'string') {
-	    return value === 0 ? value : +value;
-	  }
-	  value = value.replace(reTrim, '');
-	  var isBinary = reIsBinary.test(value);
-	  return (isBinary || reIsOctal.test(value))
-	    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
-	    : (reIsBadHex.test(value) ? NAN : +value);
-	}
-
-	module.exports = debounce;
-
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 582 */
+/* 636 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// CodeMirror, copyright (c) by Marijn Haverbeke and others
@@ -50090,7 +55611,7 @@
 
 
 /***/ },
-/* 583 */
+/* 637 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -50106,20 +55627,20 @@
 	exports.getEditMenuState = getEditMenuState;
 
 /***/ },
-/* 584 */
+/* 638 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
 	if (process.env.NODE_ENV === 'production') {
-	  module.exports = __webpack_require__(585);
+	  module.exports = __webpack_require__(639);
 	} else {
-	  module.exports = __webpack_require__(607);
+	  module.exports = __webpack_require__(661);
 	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ },
-/* 585 */
+/* 639 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -50134,7 +55655,7 @@
 
 	var _redux = __webpack_require__(12);
 
-	var _reducers = __webpack_require__(586);
+	var _reducers = __webpack_require__(640);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -50148,7 +55669,7 @@
 	var enhancer = (0, _redux.compose)(middlewares);
 
 /***/ },
-/* 586 */
+/* 640 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -50159,29 +55680,29 @@
 
 	var _redux = __webpack_require__(12);
 
-	var _reduxForm = __webpack_require__(515);
+	var _reduxForm = __webpack_require__(570);
 
-	var _channelReducer = __webpack_require__(587);
+	var _channelReducer = __webpack_require__(641);
 
 	var _channelReducer2 = _interopRequireDefault(_channelReducer);
 
-	var _variationReducer = __webpack_require__(602);
+	var _variationReducer = __webpack_require__(656);
 
 	var _variationReducer2 = _interopRequireDefault(_variationReducer);
 
-	var _adReducer = __webpack_require__(603);
+	var _adReducer = __webpack_require__(657);
 
 	var _adReducer2 = _interopRequireDefault(_adReducer);
 
-	var _sectionReducer = __webpack_require__(604);
+	var _sectionReducer = __webpack_require__(658);
 
 	var _sectionReducer2 = _interopRequireDefault(_sectionReducer);
 
-	var _insertMenuReducer = __webpack_require__(605);
+	var _insertMenuReducer = __webpack_require__(659);
 
 	var _insertMenuReducer2 = _interopRequireDefault(_insertMenuReducer);
 
-	var _editMenuReducer = __webpack_require__(606);
+	var _editMenuReducer = __webpack_require__(660);
 
 	var _editMenuReducer2 = _interopRequireDefault(_editMenuReducer);
 
@@ -50198,7 +55719,7 @@
 	});
 
 /***/ },
-/* 587 */
+/* 641 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -50211,7 +55732,7 @@
 
 	var _commonConsts = __webpack_require__(33);
 
-	var _immutableHelpers = __webpack_require__(588);
+	var _immutableHelpers = __webpack_require__(642);
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -50331,7 +55852,7 @@
 	exports.default = channelData;
 
 /***/ },
-/* 588 */
+/* 642 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -50341,7 +55862,7 @@
 	});
 	exports.immutableObjectDelete = exports.immutablePush = exports.immutablePop = exports.immutableArrayDelete = undefined;
 
-	var _omitBy3 = __webpack_require__(589);
+	var _omitBy3 = __webpack_require__(643);
 
 	var _omitBy4 = _interopRequireDefault(_omitBy3);
 
@@ -50370,12 +55891,12 @@
 	exports.immutableObjectDelete = immutableObjectDelete;
 
 /***/ },
-/* 589 */
+/* 643 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseIteratee = __webpack_require__(69),
-	    negate = __webpack_require__(590),
-	    pickBy = __webpack_require__(591);
+	    negate = __webpack_require__(644),
+	    pickBy = __webpack_require__(645);
 
 	/**
 	 * The opposite of `_.pickBy`; this method creates an object composed of
@@ -50405,7 +55926,7 @@
 
 
 /***/ },
-/* 590 */
+/* 644 */
 /***/ function(module, exports) {
 
 	/** Error message constants. */
@@ -50451,12 +55972,12 @@
 
 
 /***/ },
-/* 591 */
+/* 645 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseIteratee = __webpack_require__(69),
-	    basePickBy = __webpack_require__(592),
-	    getAllKeysIn = __webpack_require__(593);
+	    basePickBy = __webpack_require__(646),
+	    getAllKeysIn = __webpack_require__(647);
 
 	/**
 	 * Creates an object composed of the `object` properties `predicate` returns
@@ -50484,10 +56005,10 @@
 
 
 /***/ },
-/* 592 */
+/* 646 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseAssignValue = __webpack_require__(525);
+	var baseAssignValue = __webpack_require__(580);
 
 	/**
 	 * The base implementation of  `_.pickBy` without support for iteratee shorthands.
@@ -50518,12 +56039,12 @@
 
 
 /***/ },
-/* 593 */
+/* 647 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseGetAllKeys = __webpack_require__(594),
-	    getSymbolsIn = __webpack_require__(596),
-	    keysIn = __webpack_require__(599);
+	var baseGetAllKeys = __webpack_require__(648),
+	    getSymbolsIn = __webpack_require__(650),
+	    keysIn = __webpack_require__(653);
 
 	/**
 	 * Creates an array of own and inherited enumerable property names and
@@ -50541,10 +56062,10 @@
 
 
 /***/ },
-/* 594 */
+/* 648 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrayPush = __webpack_require__(595),
+	var arrayPush = __webpack_require__(649),
 	    isArray = __webpack_require__(51);
 
 	/**
@@ -50567,7 +56088,7 @@
 
 
 /***/ },
-/* 595 */
+/* 649 */
 /***/ function(module, exports) {
 
 	/**
@@ -50593,13 +56114,13 @@
 
 
 /***/ },
-/* 596 */
+/* 650 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var arrayPush = __webpack_require__(595),
+	var arrayPush = __webpack_require__(649),
 	    getPrototype = __webpack_require__(15),
-	    getSymbols = __webpack_require__(597),
-	    stubArray = __webpack_require__(598);
+	    getSymbols = __webpack_require__(651),
+	    stubArray = __webpack_require__(652);
 
 	/* Built-in method references for those with the same name as other `lodash` methods. */
 	var nativeGetSymbols = Object.getOwnPropertySymbols;
@@ -50625,11 +56146,11 @@
 
 
 /***/ },
-/* 597 */
+/* 651 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var overArg = __webpack_require__(16),
-	    stubArray = __webpack_require__(598);
+	    stubArray = __webpack_require__(652);
 
 	/* Built-in method references for those with the same name as other `lodash` methods. */
 	var nativeGetSymbols = Object.getOwnPropertySymbols;
@@ -50647,7 +56168,7 @@
 
 
 /***/ },
-/* 598 */
+/* 652 */
 /***/ function(module, exports) {
 
 	/**
@@ -50676,11 +56197,11 @@
 
 
 /***/ },
-/* 599 */
+/* 653 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var arrayLikeKeys = __webpack_require__(47),
-	    baseKeysIn = __webpack_require__(600),
+	    baseKeysIn = __webpack_require__(654),
 	    isArrayLike = __webpack_require__(65);
 
 	/**
@@ -50714,12 +56235,12 @@
 
 
 /***/ },
-/* 600 */
+/* 654 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var isObject = __webpack_require__(67),
 	    isPrototype = __webpack_require__(63),
-	    nativeKeysIn = __webpack_require__(601);
+	    nativeKeysIn = __webpack_require__(655);
 
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
@@ -50753,7 +56274,7 @@
 
 
 /***/ },
-/* 601 */
+/* 655 */
 /***/ function(module, exports) {
 
 	/**
@@ -50779,7 +56300,7 @@
 
 
 /***/ },
-/* 602 */
+/* 656 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -50788,7 +56309,7 @@
 		value: true
 	});
 
-	var _omitBy2 = __webpack_require__(589);
+	var _omitBy2 = __webpack_require__(643);
 
 	var _omitBy3 = _interopRequireDefault(_omitBy2);
 
@@ -50796,7 +56317,7 @@
 
 	var _commonConsts = __webpack_require__(33);
 
-	var _immutableHelpers = __webpack_require__(588);
+	var _immutableHelpers = __webpack_require__(642);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -50849,7 +56370,7 @@
 	exports.default = variationByIds;
 
 /***/ },
-/* 603 */
+/* 657 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -50868,7 +56389,7 @@
 
 	var _commonConsts = __webpack_require__(33);
 
-	var _immutableHelpers = __webpack_require__(588);
+	var _immutableHelpers = __webpack_require__(642);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -50930,7 +56451,7 @@
 	exports.default = adsByIds;
 
 /***/ },
-/* 604 */
+/* 658 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -50949,7 +56470,7 @@
 
 	var _commonConsts = __webpack_require__(33);
 
-	var _immutableHelpers = __webpack_require__(588);
+	var _immutableHelpers = __webpack_require__(642);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -51024,7 +56545,7 @@
 	exports.default = sectionByIds;
 
 /***/ },
-/* 605 */
+/* 659 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51062,7 +56583,7 @@
 	exports.default = insertMenu;
 
 /***/ },
-/* 606 */
+/* 660 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51096,7 +56617,7 @@
 	exports.default = editMenu;
 
 /***/ },
-/* 607 */
+/* 661 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51127,11 +56648,11 @@
 
 	var _redux = __webpack_require__(12);
 
-	var _reducers = __webpack_require__(586);
+	var _reducers = __webpack_require__(640);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
-	var _postMessageHandler = __webpack_require__(608);
+	var _postMessageHandler = __webpack_require__(662);
 
 	var _postMessageHandler2 = _interopRequireDefault(_postMessageHandler);
 
@@ -51140,7 +56661,7 @@
 	var composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || _redux.compose;
 
 /***/ },
-/* 608 */
+/* 662 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -51149,19 +56670,19 @@
 		value: true
 	});
 
-	var _isEqual2 = __webpack_require__(609);
+	var _isEqual2 = __webpack_require__(663);
 
 	var _isEqual3 = _interopRequireDefault(_isEqual2);
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var _variationSelectors = __webpack_require__(483);
+	var _variationSelectors = __webpack_require__(538);
 
 	var _channelSelectors = __webpack_require__(477);
 
 	var _commonConsts = __webpack_require__(33);
 
-	var _messengerHelper = __webpack_require__(506);
+	var _messengerHelper = __webpack_require__(561);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -51201,7 +56722,7 @@
 	exports.default = postMessageHanlder;
 
 /***/ },
-/* 609 */
+/* 663 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var baseIsEqual = __webpack_require__(108);
@@ -51242,7 +56763,7 @@
 
 
 /***/ },
-/* 610 */
+/* 664 */
 /***/ function(module, exports) {
 
 	"use strict";
