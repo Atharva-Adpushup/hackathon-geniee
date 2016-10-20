@@ -4,20 +4,12 @@ import Variation from './variation.jsx';
 import VariationPanel from './panel/variationPanel';
 import VariationAdder from './variationAdder.jsx';
 
-const getLastVariationNumber = function (variations) {
-	const names = variations.map(({ name }) => {
-		return name.indexOf('Variation') === -1 ? 0 : parseInt(Utils.stringReverse(name), 10);
-	});
-	return names.length ? names.sort().reverse()[0] : 0;
-};
-
 class variationManager extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			isPanelActive: false
 		};
-		this.createVariation = this.createVariation.bind(this);
 		this.toggleVariationPanel = this.toggleVariationPanel.bind(this);
 	}
 
@@ -32,24 +24,6 @@ class variationManager extends React.Component {
 		this.setState({ isPanelActive: !this.state.isPanelActive });
 	}
 
-	createVariation() {
-		this.props.createVariation({
-			name: `Variation ${getLastVariationNumber(this.props.variations) + 1}`
-		}, this.props.activeChannelId);
-	}
-
-	deleteVariation(varaitionId) {
-		if (this.props.variations.length > 1) {
-			this.props.deleteVariation(varaitionId);
-			return;
-		}
-		alert('Can\'t delete varaiation.');
-	}
-
-	copyVariation(variation) {
-		this.props.copyVariation(variation, `Variation ${getLastVariationNumber(this.props.variations) + 1}`, this.props.activeChannelId);
-	}
-
 	render() {
 		const props = this.props;
 		if (!props.activeChannelId) {
@@ -58,7 +32,7 @@ class variationManager extends React.Component {
 		return (
 			<div>
 				{this.state.isPanelActive &&
-					(<VariationPanel variation={this.props.activeVariation} />)
+					(<VariationPanel channelId={this.props.activeChannelId} variation={this.props.activeVariation} />)
 				}
 				<div id="variationManager" className="variation-bar">
 					{
@@ -71,7 +45,7 @@ class variationManager extends React.Component {
        />
 						))
 					}
-					<VariationAdder onNewVariation={this.createVariation} />
+					<VariationAdder onNewVariation={props.createVariation.bind(null, props.activeChannelId)} />
 				</div>
 			</div>
 		);

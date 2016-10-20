@@ -16,7 +16,7 @@ const openChannel = (channelId) => {
 			});
 			const { channelData } = getState();
 			if (!channelData.byIds[channelId].variations.length) {
-				dispatch(addVariation({ name: 'Variation 1' }, channelId));
+				dispatch(addVariation(channelId));
 			}
 		};
 	},

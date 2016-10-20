@@ -1,14 +1,23 @@
 import { variationActions } from 'consts/commonConsts';
 import _ from 'lodash';
 import Utils from 'libs/utils';
+import { getChannelVariationsWithAds, getVariationSectionsWithAds } from 'selectors/variationSelectors';
 
-const addVariation = (payload, channelId) => {
-		const variationId = Utils.getRandomNumber();
-		return {
+const getLastVariationNumber = function (variations) {
+		const names = variations.map(({ name }) => {
+			return name.indexOf('Variation') === -1 ? 0 : parseInt(Utils.stringReverse(name), 10);
+		});
+		return names.length ? names.sort().reverse()[0] : 0;
+	},
+	addVariation = (channelId) => (dispatch, getState) => {
+		const variationId = Utils.getRandomNumber(),
+			state = getState();
+		dispatch({
 			type: variationActions.ADD_VARIATION,
 			channelId,
 			variationId,
-			payload: Object.assign(payload, {
+			payload: {
+				name: `Variation ${getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1}`,
 				id: variationId,
 				createTs: Math.floor(Date.now() / 1000),
 				sections: [],
@@ -16,14 +25,18 @@ const addVariation = (payload, channelId) => {
 					beforeAp: null,
 					afterAp: null
 				}
-			})
-		};
+			}
+		});
 	},
-	copyVariation = (copyFromVariation, newName, channelId) => {
+	copyVariation = (variationId, channelId) => (dispatch, getState) => {
 		const newVariationId = Utils.getRandomNumber(),
 			ads = [],
-			sectionIds = [];
-		return {
+			state = getState(),
+			copyFromVariation = getVariationSectionsWithAds(state, { variationId }),
+			sectionIds = [],
+			newName = `Variation ${getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1}`;
+
+		dispatch({
 			type: variationActions.COPY_VARIATION,
 			variationId: newVariationId,
 			channelId,
@@ -49,14 +62,12 @@ const addVariation = (payload, channelId) => {
 				createTs: Math.floor(Date.now() / 1000),
 				sections: sectionIds
 			}
-		};
+		});
 	},
-	deleteVariation = (variationId) => {
-		return {
-			type: variationActions.DELETE_VARIATION,
-			variationId
-		};
-	},
+	deleteVariation = (variationId) => ({
+		type: variationActions.DELETE_VARIATION,
+		variationId
+	}),
 	setActiveVariation = (variationId) => {
 		return {
 			type: variationActions.SET_ACTIVE_VARIATION,
@@ -70,5 +81,6 @@ const addVariation = (payload, channelId) => {
 			payload
 		};
 	};
+
 
 export { addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation };

@@ -4,29 +4,35 @@ import Utils from 'libs/utils';
 const createSection = (sectionPayload, adPayload, variationId) => {
 		const adId = Utils.getRandomNumber(),
 			sectionId = Utils.getRandomNumber();
-		return (dispatch) => {
-			dispatch({
+		return {
 			type: sectionActions.CREATE_SECTION,
 			adPayload: Object.assign(adPayload, { id: adId, name: `Section-${sectionId}`, css: adPayload.css ? adPayload.css : defaultSectionCss, createTs: Math.floor(Date.now() / 1000) }),
 			sectionPayload: Object.assign(sectionPayload, { id: sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
 			sectionId,
 			adId,
 			variationId
-		});
 		};
 	},
-	deleteSection = (sectionId) => {
+	createIcontentSection = (sectionPayload, adPayload, variationId) => {
+		const adId = Utils.getRandomNumber(),
+			sectionId = Utils.getRandomNumber();
 		return {
-			type: sectionActions.DELETE_SECTION,
-			sectionId
-		};
-	},
-	renameSection = (sectionId, name) => {
-		return {
-			type: sectionActions.DELETE_SECTION,
+			type: sectionActions.CREATE_INCONTENT_SECTION,
+			adPayload: Object.assign(adPayload, { id: adId, name: `Section-${sectionId}`, css: adPayload.css ? adPayload.css : defaultSectionCss, createTs: Math.floor(Date.now() / 1000) }),
+			sectionPayload: Object.assign(sectionPayload, { id: sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
 			sectionId,
-			name
+			adId,
+			variationId
 		};
-	};
+	},
+	deleteSection = (sectionId) => ({
+		type: sectionActions.DELETE_SECTION,
+		sectionId
+	}),
+	renameSection = (sectionId, name) => ({
+		type: sectionActions.DELETE_SECTION,
+		sectionId,
+		name
+	});
 
-export { createSection, deleteSection, renameSection };
+export { createSection, deleteSection, renameSection, createIcontentSection };

@@ -8,7 +8,9 @@ const getAllChannels = (state) => state.channelData.byIds,
 
 	getActiveChannelId = (state) => getActiveChannel(state).id,
 
+	getChannel = (state, props) => getAllChannels(state)[props.channelId],
+
 	getOpenChannels = createSelector([getAllChannels], (channelByIds) => _.filter(channelByIds, { isOpen: true }));
 
 
-export { getOpenChannels, getAllChannels, getActiveChannel, getActiveChannelId };
+export { getOpenChannels, getAllChannels, getActiveChannel, getActiveChannelId, getChannel };
