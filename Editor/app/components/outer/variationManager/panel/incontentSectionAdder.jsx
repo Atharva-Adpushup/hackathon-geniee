@@ -56,7 +56,7 @@ class inContentAdder extends React.Component {
 					</Col>
 				</Row>
 				<Row>
-					<Col className="u-padding-r10px" xs={12}>
+					<Col style={{ paddingRight: 0 }} xs={12}>
 						<Button className="btn-lightBg btn-save btn-block" type="submit">Save</Button>
 					</Col>
 				</Row>
