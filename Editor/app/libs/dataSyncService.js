@@ -1,110 +1,63 @@
-// To pull async data about channels as soon as the application loads.
-// Because the data is asynchronous, it the communication will done via callbacks
-// in fetching the data.
-
 import $ from 'jquery';
 
-module.exports = (function ($) {
-    var DataSyncService = {
-        flux: null,
+const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' })),
 
-        initFlux: function (flux) {
-            this.flux = flux;
-        },
+	isApInstalled = (url, siteId) => $.getJSON(`/proxy/detectAp?url=${encodeURI(url)}&site=${siteId}`),
 
+	changeSiteMode = (siteId, mode) => (
+		save('/data/changeMode', { siteId, mode })
+			.then((response) => (!!response.success))
+	),
 
-        request: function (jqAjaxObjs, successCallback, failureCallback) {
-            $.when.apply(this, jqAjaxObjs).done(successCallback).fail(failureCallback);
-        },
+	loadInitialData = (siteId) => {
+		const deferred = $.Deferred(),
+			json = {
+				siteId,
+				channelData: {
+					activeChannel: 'test',
+					byIds: {
+						test2: {
+							id: 'test2',
+							channelName: 'TEST2',
+							siteDomain: window.ADP_SITE_DOMAIN,
+							platform: 'DESKTOP',
+							pageGroup: 'POST',
+							sampleUrl: 'http://www.articlemyriad.com/character-divine-influence-iliad-aeneid-role-gods-fate/',
+							variations: [],
+							isOpen: false,
+							isLoading: true,
+							contentSelector: '.post-content',
+							contentSelectorMissing: false,
+							activeVariation: null
+						},
+						test: {
+							id: 'test',
+							channelName: 'TEST',
+							siteDomain: window.ADP_SITE_DOMAIN,
+							platform: 'DESKTOP',
+							pageGroup: 'POST',
+							sampleUrl: 'http://www.articlemyriad.com/character-divine-influence-iliad-aeneid-role-gods-fate/',
+							variations: [],
+							isOpen: true,
+							isLoading: true,
+							contentSelector: '.post-content',
+							contentSelectorMissing: false,
+							activeVariation: null
+						} }
+				}
+			};
+		setTimeout(() => {
+			deferred.resolve(json);
+		}, 1000);
 
-        save: function (url, data, successCallback, failureCallback) {
-            var request = $.ajax({
-                type: "POST",
-                url: url,
-                data: data,
-                dataType: "json"
-            });
+		return deferred.promise();
+	},
 
-            request.done(successCallback).fail(failureCallback);
+	masterSave = (data) => {
+		console.log('Got masterSaved data: ', data);
+		return save('/data/saveData', {
+			data: JSON.stringify(data)
+		});
+	};
 
-            return request;
-        },
-
-        isApInstalled: function (url, siteId) {
-            return $.getJSON('/proxy/detectAp?url=' + encodeURI(url) + '&site=' + siteId);
-        },
-
-        detectAdsenseAds: function (url) {
-            var dfd = $.Deferred();
-            $.getJSON('/proxy/detect_adsense_ads?url=' + encodeURI(url)).done(function (response) {
-                response['has_ads'] ? dfd.resolve(true) : dfd.resolve(false);
-            }.bind(this));
-
-            return dfd.promise();
-        },
-        loadStats: function (siteId) {
-            var dfd = $.Deferred();
-            /*setTimeout(function(){
-             var json = JSON.parse(localStorage.getItem("ADP_STATS"));
-             json ? dfd.resolve(json.data) : dfd.reject();
-             },0)*/
-            $.getJSON('/user/reports/editorStatsData?siteId=' + siteId).done(function (response) {
-                response['has_ads'] ? dfd.resolve(true) : dfd.resolve(false);
-            }.bind(this));
-
-            return dfd.promise();
-        },
-        loadChannelStats: function (pageGroup, platform, startDate, endDate) {
-            var dfd = $.Deferred(),
-                endDate = endDate ? endDate : +new Date(),
-                startDate = startDate ? startDate : +new Date().setDate(new Date().getDate() - 30),
-                config = {
-                    siteId: window.ADP_SITE_ID,
-                    platform: platform,
-                    pageGroup: pageGroup,
-                    startDate: startDate,
-                    endDate: endDate
-                };
-            /* setTimeout(function(){
-             var json = JSON.parse(localStorage.getItem("ADP_STATS"));
-             json && json.success ? dfd.resolve(json.data) : dfd.reject();
-             },1000)*/
-            $.getJSON('/user/reports/editorStatsData?' + $.param(config)).done(function(response) {
-                (response.success && response.data && Object.keys(response.data).length > 0) ? dfd.resolve(response.data) : dfd.reject(response.data);
-            }).fail(function(response) {
-                dfd.reject(response);
-            });
-
-            return dfd.promise();
-        },
-        changeSiteMode: function (siteId, mode) {
-            var dfd = $.Deferred();
-            this.save("/data/changeMode", {siteId: siteId, mode: mode}).then(function (response) {
-                response['success'] ? dfd.resolve(true) : dfd.resolve(false);
-            }.bind(this))
-            return dfd.promise();
-        },
-        deleteChannel: function (platform, pageGroup) {
-            var dfd = $.Deferred();
-            this.save("/data/deleteChannel?siteId=" + window.ADP_SITE_ID, {
-                platform: platform,
-                pageGroup: pageGroup
-            }).then(function (response) {
-                response['success'] ? dfd.resolve(response) : dfd.reject(response);
-            }.bind(this), function (response) {
-                dfd.reject(response)
-            })
-            return dfd.promise();
-        },
-
-        // saveChannel: function(channel, sucesscallback, failureCallback){
-        //     this.save('/data/saveChannelData', channel.toJSON(this.flux) );
-        // },
-
-        masterSave: function (data) {
-            console.log("Got masterSaved data: ", data);
-            return this.save('/data/saveData', {data: JSON.stringify(data)});
-        }
-    };
-    return DataSyncService;
-})($);
+export { masterSave, changeSiteMode, isApInstalled, loadInitialData };

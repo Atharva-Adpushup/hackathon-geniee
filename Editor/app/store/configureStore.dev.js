@@ -5,8 +5,8 @@ import postMessageHanler from '../middlewares/postMessageHandler';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-export default function () {
-	const store = createStore(rootReducer, {}, composeEnhancers(
+export default function (initialState = {}) {
+	const store = createStore(rootReducer, initialState, composeEnhancers(
 		applyMiddleware(thunk, postMessageHanler)
 		/* storage(),*/
 		// window.devToolsExtension ? window.devToolsExtension() : nope => nope

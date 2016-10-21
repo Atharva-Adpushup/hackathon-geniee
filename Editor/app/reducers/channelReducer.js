@@ -1,22 +1,7 @@
 import { channelActions, variationActions } from 'consts/commonConsts';
 import { immutableArrayDelete } from 'libs/immutableHelpers';
 
-const chnl2 = {
-	id: 'test2',
-	channelName: 'TEST2',
-	siteDomain: window.ADP_SITE_DOMAIN,
-	platform: 'DESKTOP',
-	pageGroup: 'POST',
-	sampleUrl: 'http://www.articlemyriad.com/character-divine-influence-iliad-aeneid-role-gods-fate/',
-	variations: [],
-	isOpen: true,
-	isLoading: true,
-	contentSelector: '.post-content',
-	contentSelectorMissing: false,
-	activeVariation: null
-};
-
-const initialState = { activeChannel: 'test2', byIds: { test2: chnl2 } },
+const initialState = { activeChannel: null, byIds: {} },
 	channel = (state = {}, action) => {
 		let index;
 		switch (action.type) {
