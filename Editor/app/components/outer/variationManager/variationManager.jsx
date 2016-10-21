@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import Utils from 'libs/utils.js';
+import Glass from 'shared/glass';
 import Variation from './variation.jsx';
 import VariationPanel from './panel/variationPanel';
 import VariationAdder from './variationAdder.jsx';
@@ -32,7 +32,7 @@ class variationManager extends React.Component {
 		return (
 			<div>
 				{this.state.isPanelActive &&
-					(<VariationPanel channelId={this.props.activeChannelId} variation={this.props.activeVariation} />)
+					(<div><Glass clickHandler={this.toggleVariationPanel} /> <VariationPanel channelId={this.props.activeChannelId} variation={this.props.activeVariation} /></div>)
 				}
 				<div id="variationManager" className="variation-bar">
 					{
