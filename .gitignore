@@ -25,3 +25,4 @@ services/apexService/dist/
 public/apex.js
 public/assets/js/gieneeApEditor/
 Editor/build/
+*.map
