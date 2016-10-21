@@ -39,8 +39,17 @@ $lightGrey:#ccc;
     border-color: transparent;
 }
 
+.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner {
+    padding: 12px;
+}
+
 .react-tab-panel--theme-default .react-tab-panel__body {
-    padding: 10px;
+    padding: 12px 12px 12px 20px;
+
+    & > div {
+        display: block;
+        width: 100%;
+    }
 
     .row {
         margin: 0 0 12px;

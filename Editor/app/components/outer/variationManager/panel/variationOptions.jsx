@@ -8,20 +8,31 @@ const variationOtions = (props) => {
 	const { onDeleteVariation, onCopyVariation, variation, channelId } = props;
 	return (
 		<div>
+			<h1 className="variation-section-heading">Variataion Info</h1>
 			<Row>
-				<Col className="u-padding-r10px" xs={7}>
-			Delete Variation
+				<Col className="u-padding-r10px" xs={2}>
+					Variation Name
 				</Col>
-				<Col className="u-padding-l10px" xs={5}>
-					<Button className="btn-lightBg btn-save btn-block" onClick={onDeleteVariation.bind(null, variation.id, channelId)} type="submit">Save</Button>
+				<Col className="u-padding-l10px" xs={8}>
+					<strong>{props.variation.name}</strong>
+					<button className="btn-icn-edit"></button>
 				</Col>
 			</Row>
 			<Row>
-				<Col className="u-padding-r10px" xs={7}>
-			Copy Variation
+				<Col className="u-padding-r10px" xs={2}>
+					Sections
 				</Col>
-				<Col className="u-padding-l10px" xs={5}>
-					<Button className="btn-lightBg btn-save btn-block" onClick={onCopyVariation.bind(null, variation.id, channelId)} type="submit">Save</Button>
+				<Col className="u-padding-l10px" xs={8}>
+					<strong>{props.variation.sections.length}</strong>
+				</Col>
+			</Row>
+			<br /><br /><br /><br />
+			<Row>
+				<Col className="u-padding-r10px" xs={2}>
+					<Button className="btn-lightBg btn-copy btn-block" onClick={onCopyVariation.bind(null, variation.id, channelId)} type="submit">Copy Variation</Button>
+				</Col>
+				<Col className="u-padding-l10px" xs={2}>
+					<Button className="btn-lightBg btn-del-line btn-block" onClick={onDeleteVariation.bind(null, variation.id, channelId)} type="submit">Delete Variation</Button>
 				</Col>
 			</Row>
 		</div>

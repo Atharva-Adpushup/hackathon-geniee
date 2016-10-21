@@ -36,6 +36,18 @@
             @extend iconStyle;
         }
     }
+    &.btn-del-line {
+        &:before {
+            content: '\f014';
+            @extend iconStyle;
+        }
+    }
+    &.btn-copy {
+        &:before {
+            content: '\f24d';
+            @extend iconStyle;
+        }
+    }
     &.btn-edit {
         &:before {
             content: '\f121';

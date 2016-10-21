@@ -171,6 +171,10 @@ li, ul {
     border-color: #14A314 !important; }
   .btn.btn-lightBg.btn-del:before {
     content: '\f1f8'; }
+  .btn.btn-lightBg.btn-del-line:before {
+    content: '\f014'; }
+  .btn.btn-lightBg.btn-copy:before {
+    content: '\f24d'; }
   .btn.btn-lightBg.btn-edit:before {
     content: '\f121'; }
   .btn.btn-lightBg.btn-save:before {
@@ -1135,7 +1139,7 @@ collapsedextended, .sectionManager .wrapper .content ul.list li .statsWrapper ul
   word-wrap: break-word; }
 
 /*****Generic extendable classes*****/
-iconStyle, .btn.btn-lightBg.btn-del:before, .btn.btn-lightBg.btn-edit:before, .btn.btn-lightBg.btn-save:before, .btn.btn-lightBg.btn-cancel:before, .btn.btn-lightBg.btn-add:before, .btn.btn-lightBg.btn-download:before, .btn.btn-lightBg.btn-before:before, .btn.btn-lightBg.btn-after:before, .btn.btn-lightBg.btn-transform:before, .btn.btn-lightBg.btn-option:before, .btn.btn-lightBg.btn-back:before, .btn.btn-lightBg.btn-chevron-down:before, .btn.btn-lightBg.btn-chevron-up:before {
+iconStyle, .btn.btn-lightBg.btn-del:before, .btn.btn-lightBg.btn-del-line:before, .btn.btn-lightBg.btn-copy:before, .btn.btn-lightBg.btn-edit:before, .btn.btn-lightBg.btn-save:before, .btn.btn-lightBg.btn-cancel:before, .btn.btn-lightBg.btn-add:before, .btn.btn-lightBg.btn-download:before, .btn.btn-lightBg.btn-before:before, .btn.btn-lightBg.btn-after:before, .btn.btn-lightBg.btn-transform:before, .btn.btn-lightBg.btn-option:before, .btn.btn-lightBg.btn-back:before, .btn.btn-lightBg.btn-chevron-down:before, .btn.btn-lightBg.btn-chevron-up:before {
   font: normal normal normal 14px/1 FontAwesome;
   transform: translate(0, 0);
   -webkit-font-smoothing: antialiased;
@@ -3572,5 +3576,13 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   -ms-transition: all 0.2s ease-in-out;
   -o-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out; }
+
+.variation-section-heading {
+  font-weight: 700;
+  color: #555555;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  font-size: 1.05em;
+  border-bottom: 1px solid #ccc; }
 
 /*# sourceMappingURL=editor.style.css.map */

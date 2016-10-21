@@ -33619,7 +33619,7 @@
 
 
 	// module
-	exports.push([module.id, ".react-tab-panel {\n  font-size: 1.2em;\n  position: relative;\n  top: -12px;\n  font-family: \"Karla\", sans-serif;\n  height: 90%; }\n\n.react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-title:not(.react-tab-panel__tab-title--active) {\n  color: #555555; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-between {\n  display: none; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title--active {\n  border-left: 3px solid #cf474b; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner--active:before,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active:after, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner--active:after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner {\n  border-color: #e6e6e6; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active {\n  border-color: transparent; }\n\n.react-tab-panel--theme-default .react-tab-panel__body {\n  padding: 10px; }\n  .react-tab-panel--theme-default .react-tab-panel__body .row {\n    margin: 0 0 12px; }\n    .react-tab-panel--theme-default .react-tab-panel__body .row .bnt-block {\n      width: auto; }\n  .react-tab-panel--theme-default .react-tab-panel__body input {\n    width: 100%;\n    padding: 2px 10px;\n    border-radius: 3px;\n    border: 1px solid #ccc; }\n", ""]);
+	exports.push([module.id, ".react-tab-panel {\n  font-size: 1.2em;\n  position: relative;\n  top: -12px;\n  font-family: \"Karla\", sans-serif;\n  height: 90%; }\n\n.react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-title:not(.react-tab-panel__tab-title--active) {\n  color: #555555; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-between {\n  display: none; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title--active {\n  border-left: 3px solid #cf474b; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner--active:before,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active:after, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner--active:after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner {\n  border-color: #e6e6e6; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active {\n  border-color: transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner {\n  padding: 12px; }\n\n.react-tab-panel--theme-default .react-tab-panel__body {\n  padding: 12px 12px 12px 20px; }\n  .react-tab-panel--theme-default .react-tab-panel__body > div {\n    display: block;\n    width: 100%; }\n  .react-tab-panel--theme-default .react-tab-panel__body .row {\n    margin: 0 0 12px; }\n    .react-tab-panel--theme-default .react-tab-panel__body .row .bnt-block {\n      width: auto; }\n  .react-tab-panel--theme-default .react-tab-panel__body input {\n    width: 100%;\n    padding: 2px 10px;\n    border-radius: 3px;\n    border: 1px solid #ccc; }\n", ""]);
 
 	// exports
 
@@ -39350,21 +39350,27 @@
 			'div',
 			null,
 			_react2.default.createElement(
+				'h1',
+				{ className: 'variation-section-heading' },
+				'Variataion Info'
+			),
+			_react2.default.createElement(
 				_reactBootstrap.Row,
 				null,
 				_react2.default.createElement(
 					_reactBootstrap.Col,
-					{ className: 'u-padding-r10px', xs: 7 },
-					'Delete Variation'
+					{ className: 'u-padding-r10px', xs: 2 },
+					'Variation Name'
 				),
 				_react2.default.createElement(
 					_reactBootstrap.Col,
-					{ className: 'u-padding-l10px', xs: 5 },
+					{ className: 'u-padding-l10px', xs: 8 },
 					_react2.default.createElement(
-						_reactBootstrap.Button,
-						{ className: 'btn-lightBg btn-save btn-block', onClick: onDeleteVariation.bind(null, variation.id, channelId), type: 'submit' },
-						'Save'
-					)
+						'strong',
+						null,
+						props.variation.name
+					),
+					_react2.default.createElement('button', { className: 'btn-icn-edit' })
 				)
 			),
 			_react2.default.createElement(
@@ -39372,16 +39378,42 @@
 				null,
 				_react2.default.createElement(
 					_reactBootstrap.Col,
-					{ className: 'u-padding-r10px', xs: 7 },
-					'Copy Variation'
+					{ className: 'u-padding-r10px', xs: 2 },
+					'Sections'
 				),
 				_react2.default.createElement(
 					_reactBootstrap.Col,
-					{ className: 'u-padding-l10px', xs: 5 },
+					{ className: 'u-padding-l10px', xs: 8 },
+					_react2.default.createElement(
+						'strong',
+						null,
+						props.variation.sections.length
+					)
+				)
+			),
+			_react2.default.createElement('br', null),
+			_react2.default.createElement('br', null),
+			_react2.default.createElement('br', null),
+			_react2.default.createElement('br', null),
+			_react2.default.createElement(
+				_reactBootstrap.Row,
+				null,
+				_react2.default.createElement(
+					_reactBootstrap.Col,
+					{ className: 'u-padding-r10px', xs: 2 },
 					_react2.default.createElement(
 						_reactBootstrap.Button,
-						{ className: 'btn-lightBg btn-save btn-block', onClick: onCopyVariation.bind(null, variation.id, channelId), type: 'submit' },
-						'Save'
+						{ className: 'btn-lightBg btn-copy btn-block', onClick: onCopyVariation.bind(null, variation.id, channelId), type: 'submit' },
+						'Copy Variation'
+					)
+				),
+				_react2.default.createElement(
+					_reactBootstrap.Col,
+					{ className: 'u-padding-l10px', xs: 2 },
+					_react2.default.createElement(
+						_reactBootstrap.Button,
+						{ className: 'btn-lightBg btn-del-line btn-block', onClick: onDeleteVariation.bind(null, variation.id, channelId), type: 'submit' },
+						'Delete Variation'
 					)
 				)
 			)
