@@ -3502,6 +3502,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   bottom: 0;
   width: 100%;
   background-color: #fff;
+  z-index: 2000;
   border-top: 3px solid #cf474b;
   box-shadow: 0 -3px 5px rgba(0, 0, 0, 0.16); }
 
@@ -3561,6 +3562,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   position: absolute;
   width: 100%;
   bottom: 0;
+  z-index: 2000;
   height: 300px;
   background: #fff;
   box-shadow: 0px -3px 7px rgba(0, 0, 0, 0.14);
