@@ -6,6 +6,7 @@ const path = require('path'),
 //const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+	//devtool: 'cheap-module-source-map',
 	entry: {
 		outer: path.join(__dirname, 'app/outer.js'),
 		inner: path.join(__dirname, 'app/inner.js'),
@@ -21,6 +22,10 @@ module.exports = {
 		failOnError: false
 	},
 	resolve: {
+		alias: {
+			react: path.resolve('./node_modules/react'),
+			React: path.resolve('./node_modules/react'),
+		},
 		root: path.resolve('./app/'),
 		modulesDirectories: ['./components/', './components/outer', './components/shared', 'node_modules'],
 		extensions: ['', '.js', '.jsx', '.css']
@@ -47,6 +52,13 @@ module.exports = {
 				loaders: ['style', 'css', 'sass']
 			}
 		]
-	}
+	},
+	plugins: [
+		/*new webpack.DefinePlugin({
+			'process.env': {
+				NODE_ENV: JSON.stringify('production')
+			}
+		})*/
+	]
 
 };

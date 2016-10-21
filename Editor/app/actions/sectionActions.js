@@ -6,8 +6,8 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			sectionId = Utils.getRandomNumber();
 		return {
 			type: sectionActions.CREATE_SECTION,
-			adPayload: Object.assign(adPayload, { id: adId, name: `Section-${sectionId}`, css: adPayload.css ? adPayload.css : defaultSectionCss, createTs: Math.floor(Date.now() / 1000) }),
-			sectionPayload: Object.assign(sectionPayload, { id: sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
+			adPayload: Object.assign(adPayload, { id: adId, css: adPayload.css ? adPayload.css : defaultSectionCss, createTs: Math.floor(Date.now() / 1000) }),
+			sectionPayload: Object.assign(sectionPayload, { name: `Section-${sectionId}`, id: sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
 			sectionId,
 			adId,
 			variationId
@@ -18,8 +18,8 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			sectionId = Utils.getRandomNumber();
 		return {
 			type: sectionActions.CREATE_INCONTENT_SECTION,
-			adPayload: Object.assign(adPayload, { id: adId, name: `Section-${sectionId}`, css: adPayload.css ? adPayload.css : defaultSectionCss, createTs: Math.floor(Date.now() / 1000) }),
-			sectionPayload: Object.assign(sectionPayload, { id: sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
+			adPayload: Object.assign(adPayload, { id: adId, css: adPayload.css ? adPayload.css : defaultSectionCss, createTs: Math.floor(Date.now() / 1000) }),
+			sectionPayload: Object.assign(sectionPayload, { id: sectionId, name: `Section-${sectionId}`, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
 			sectionId,
 			adId,
 			variationId

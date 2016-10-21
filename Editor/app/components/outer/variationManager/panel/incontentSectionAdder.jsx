@@ -74,11 +74,22 @@ const inContentAdderForm = reduxForm({
 		form: 'cssMarginEditor' // a unique name for this form
 	})(inContentAdder),
 
-	mapStateToProps = (state, ownProps) => ({ ...ownProps }),
+	mapStateToProps = (state, ownProps) => ({
+		...ownProps,
+		initialValues: {
+			section: 0,
+			float: 'left',
+			minDistanceFromPrevAd: 200,
+			height: 0,
+			width: 0
+		}
+	}),
 
-	mapDispatchToProps = (dispatch, ownProps) => bindActionCreators({
-		dispatch
-	}, dispatch);
+	mapDispatchToProps = (dispatch) => ({
+		onSubmit: (values) => {
+			console.log(values);
+		}
+	});
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(inContentAdderForm);

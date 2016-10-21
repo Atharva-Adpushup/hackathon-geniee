@@ -14,10 +14,10 @@ class VariationPanel extends React.Component {
 					<VariationOptions channelId={channelId} variation={variation} />
 				</div>
 				<div tabTitle="Sections">
-					<IncontentAdder variation={variation} />
+					<div>Helllo </div>
 				</div>
 				<div tabTitle="Add Incontent Variation">
-					<IncontentAdder variation={variation} />
+					<IncontentAdder channelId={channelId} variation={variation} />
 				</div>
 			</TabPanel>
 		</div>);
