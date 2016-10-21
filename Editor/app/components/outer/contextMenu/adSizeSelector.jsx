@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import _ from 'underscore';
+import _ from 'lodash';
 // import CustomSizeForm from './customSizeForm.jsx';
 import { Accordion, Row, Col, Panel } from 'react-bootstrap';
 
@@ -32,10 +32,10 @@ class AdSizeSelector extends React.Component {
 	render() {
 		return (
 			<Accordion activeKey={this.state.activeTab} onSelect={this.handleTabClick}>
-				{_(this.props.adSizes).map((rec, index) => (
+				{_.map(this.props.adSizes, (rec, index) => (
 					<Panel key={`panel-${index}`} header={`${rec.layoutType} Ads`} eventKey={index}>
 						<Row>
-							{_(rec.sizes).map((adProps, innerIndex) => (
+							{_.map(rec.sizes, (adProps, innerIndex) => (
 								<Col key={`col-${this.props.insertOption}-${innerIndex}`} xs={6} className="Col">
 									<input id={this.props.insertOption + rec.layoutType + innerIndex}
 										type="radio"

@@ -1,21 +1,20 @@
-var React = window.React;
-var _ = require("../../libs/third-party/underscore");
+let React = window.React;
 
-var Fluxxor = require("../../libs/third-party/fluxxor"),
-    FluxMixin = Fluxxor.FluxMixin(React);
+let Fluxxor = require('../../libs/third-party/fluxxor'),
+	FluxMixin = Fluxxor.FluxMixin(React);
 
 module.exports = React.createClass({
-    mixins: [FluxMixin],
+	mixins: [FluxMixin],
 
-    getDefaultProps: function () {
-        return {
-            clickHandler: function () {
-                return;
-            }
-        }
-    },
+	getDefaultProps () {
+	return {
+	clickHandler () {
+	return;
+}
+};
+},
 
-    render: function () {
-        return (<i {...this.props} onClick={this.props.clickHandler} className="fa fa-times"></i>);
-    }
+	render () {
+	return (<i {...this.props} onClick={this.props.clickHandler} className="fa fa-times" />);
+}
 });

@@ -1,6 +1,6 @@
-import _ from 'underscore';
+import _ from 'lodash';
 import $ from 'jquery';
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 
 $.ajaxSetup({ cache: false });
 const randomStore = [],

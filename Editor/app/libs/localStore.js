@@ -1,40 +1,40 @@
 import $ from 'jquery';
-import _ from 'underscore';
+import _ from 'lodash';
 
 const Utils = require('./utils');
 
-var enums = {
+let enums = {
 	ADP_SERVER_JSON: 'ADP_SERVER_JSON',
 	ADP_LOADED_JSON: 'ADP_LOADED_JSON'
 };
 
-var getJsonFromKey = function (key) {
+let getJsonFromKey = function (key) {
 	return JSON.parse(localStorage.getItem(key));
 };
 
-var cleanJson = function (json) {
+let cleanJson = function (json) {
 	return json = JSON.parse(JSON.stringify(json)); // To make sure that every toJSON method is called on json object this will ensure that we have json of every thing
 };
 
-var save = function (key, json) {
-	var dfd = $.Deferred();
-	setTimeout(function () {
+let save = function (key, json) {
+	let dfd = $.Deferred();
+	setTimeout(() => {
 		localStorage.setItem(key, JSON.stringify(json));
 		!areObjectsChanged(json, getJsonFromKey(key)) ? dfd.resolve() : dfd.reject();
 	}, 0);
 	return dfd.promise();
 };
 
-var saveServerData = function (json) {
+let saveServerData = function (json) {
 	return save(enums.ADP_SERVER_JSON, json);
 };
 
-var saveLoadedData = function (json) {
+let saveLoadedData = function (json) {
 	return save(enums.ADP_LOADED_JSON, json);
 };
 
-var saveLoadedChannel = function (channelJSON) {
-	var json = getJsonFromKey(enums.ADP_LOADED_JSON),
+let saveLoadedChannel = function (channelJSON) {
+	let json = getJsonFromKey(enums.ADP_LOADED_JSON),
 		channelIndex = _.indexOf(_.pluck(json ? json.channels : [], 'id'), channelJSON.id);
 	if (channelIndex == -1) {
 		json.channels.push(channelJSON);
@@ -45,51 +45,51 @@ var saveLoadedChannel = function (channelJSON) {
 	return save(enums.ADP_LOADED_JSON, json);
 };
 
-var loadServerChannel = function (id) {
-	var json = getJsonFromKey(enums.ADP_SERVER_JSON);
+let loadServerChannel = function (id) {
+	let json = getJsonFromKey(enums.ADP_SERVER_JSON);
 	if (!json || !json.channels)
-		return false;
+		{return false;}
 
-	var channel = _(json.channels).findWhere({ id: id }) || false;
+	let channel = _(json.channels).findWhere({ id }) || false;
 	return channel;
 };
 
-var loadChannel = function (id) {
-	var json = getJsonFromKey(enums.ADP_LOADED_JSON);
+let loadChannel = function (id) {
+	let json = getJsonFromKey(enums.ADP_LOADED_JSON);
 	if (!json.channels)
-		return false;
+		{return false;}
 
-	return _(json.channels).findWhere({ id: id }) || false;
+	return _(json.channels).findWhere({ id }) || false;
 };
 
-var areObjectsChanged = function (obj1, obj2) {
+let areObjectsChanged = function (obj1, obj2) {
 	obj1 = cleanJson(obj1);
 	obj2 = cleanJson(obj2);
 	return Utils.deepDiffMapper.test(obj1, obj2).isChanged;
 };
 
-var isChannelChanged = function (channelJson) {
-	var localChannel = loadChannel(channelJson.id);
+let isChannelChanged = function (channelJson) {
+	let localChannel = loadChannel(channelJson.id);
 	if (!localChannel)
-		return true;
+		{return true;}
 	return areObjectsChanged(channelJson, localChannel);
 };
 
-var loadSiteData = function () {
+let loadSiteData = function () {
 	return getJsonFromKey(enums.ADP_LOADED_JSON);
 };
 
-var isSiteChanged = function (siteJson) {
-	var localJson = loadSiteData();
+let isSiteChanged = function (siteJson) {
+	let localJson = loadSiteData();
 	if (!localJson)
-		return true;
+		{return true;}
 	return areObjectsChanged(siteJson, localJson);
 };
 
-var deleteChannel = function (channelId) {
-	var json = getJsonFromKey(enums.ADP_LOADED_JSON);
+let deleteChannel = function (channelId) {
+	let json = getJsonFromKey(enums.ADP_LOADED_JSON);
 	if (!json.channels)
-		return true;
+		{return true;}
 
 	json.channels = _(json.channels).reject({ id: channelId });
 	save(enums.ADP_LOADED_JSON, json);
@@ -97,5 +97,4 @@ var deleteChannel = function (channelId) {
 };
 
 
-
-export default { saveServerData, saveLoadedData, saveLoadedChannel, loadChannel, loadServerChannel, loadSiteData, isSiteChanged, isChannelChanged, deleteChannel };;
+export default { saveServerData, saveLoadedData, saveLoadedChannel, loadChannel, loadServerChannel, loadSiteData, isSiteChanged, isChannelChanged, deleteChannel };
