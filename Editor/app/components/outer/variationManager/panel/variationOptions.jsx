@@ -9,18 +9,18 @@ const variationOtions = (props) => {
 	return (
 		<div>
 			<Row>
-				<Col className="u-padding-r10px" xs={8}>
+				<Col className="u-padding-r10px" xs={7}>
 			Delete Variation
 				</Col>
-				<Col className="u-padding-l10px" xs={4}>
+				<Col className="u-padding-l10px" xs={5}>
 					<Button className="btn-lightBg btn-save btn-block" onClick={onDeleteVariation.bind(null, variation.id, channelId)} type="submit">Save</Button>
 				</Col>
 			</Row>
 			<Row>
-				<Col className="u-padding-r10px" xs={8}>
+				<Col className="u-padding-r10px" xs={7}>
 			Copy Variation
 				</Col>
-				<Col className="u-padding-l10px" xs={4}>
+				<Col className="u-padding-l10px" xs={5}>
 					<Button className="btn-lightBg btn-save btn-block" onClick={onCopyVariation.bind(null, variation.id, channelId)} type="submit">Save</Button>
 				</Col>
 			</Row>
