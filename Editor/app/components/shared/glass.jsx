@@ -1,22 +1,27 @@
-import React from  'react';
-var $ = require('jquery');
+import React, { PropTypes } from 'react';
+import $ from 'jquery';
 
-module.exports = React.createClass({
-	getDefaultProps: function() {
-		return {
-			clickHandler: function noop() {
-			}
-		};
+const gStyle = {
+		position: 'fixed',
+		top: 0,
+		left: 0,
+		width: '100%',
+		height: $(window).height(),
+		zIndex: 9999
 	},
-	render: function() {
-		var g_style = {
-			position: 'fixed',
-			top: 0,
-			left: 0,
-			width: '100%',
-			height: $(window).height(),
-			zIndex: 9999
-		};
-		return (<div style={g_style} onClick={this.props.clickHandler}></div>);
-	}
-});
+	Glass = (props) => (
+		<div style={!props.shim ? gStyle : { ...gStyle }} onClick={props.clickHandler} />
+	);
+
+Glass.propTypes = {
+	clickHandler: PropTypes.func.isRequired,
+	shim: PropTypes.bool.isRequired
+};
+
+Glass.defaultProps = {
+	clickHandler: () => {},
+	shim: false
+};
+
+
+export default Glass;
