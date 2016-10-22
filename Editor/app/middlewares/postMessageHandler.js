@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { getActiveChannelActiveVariationId, getVariationSectionsWithAds } from '../selectors/variationSelectors';
-import { getActiveChannelId, getActiveChannel } from '../selectors/channelSelectors';
+import { getActiveChannel } from '../selectors/channelSelectors';
 import { messengerCommands } from '../consts/commonConsts';
 import { sendMessage } from '../scripts/messengerHelper';
 
@@ -11,7 +11,7 @@ const getData = (state) => {
 			return false;
 		}
 		const activeVariation = getActiveChannelActiveVariationId(state),
-			sections = activeVariation ? getVariationSectionsWithAds(state, { variationId: activeVariation }) : null;
+			sections = activeVariation ? getVariationSectionsWithAds(state, { variationId: activeVariation }) : [];
 
 		return {
 			insertMenuVisible: state.ui.insertMenu.isVisible,

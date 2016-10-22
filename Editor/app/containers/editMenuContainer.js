@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import EditMenu from 'contextMenu/editMenu/editMenu.jsx';
+import EditMenu from 'editMenu/index';
 import { hideMenu } from 'actions/editMenuActions';
 import { getEditMenuState } from 'selectors/uiSelectors';
 import { getSectionWithAds } from 'selectors/sectionSelectors';

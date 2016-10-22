@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import InsertMenu from 'contextMenu/insertMenu.jsx';
+import InsertMenu from 'insertMenu/index';
 import { hideMenu } from 'actions/insertMenuActions';
 import { createSection } from 'actions/sectionActions';
 import { getActiveChannelId } from 'selectors/channelSelectors';
