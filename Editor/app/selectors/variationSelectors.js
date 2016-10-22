@@ -10,18 +10,19 @@ const getAllVariations = (state) => state.variationByIds,
 
 	getVariationSections = (state, props) => state.variationByIds[props.variationId].sections,
 
-	getActiveChannelActiveVariation = createSelector([getActiveChannel, getAllVariations], (activeChanel, allVariations) => _.find(allVariations, { id: activeChanel.activeVariation })),
+	getActiveChannelActiveVariation = createSelector([getActiveChannel, getAllVariations], (activeChanel, allVariations) =>
+		activeChanel ? _.find(allVariations, { id: activeChanel.activeVariation }) : null),
 
-	getActiveChannelActiveVariationId = createSelector([getActiveChannel], (activeChanel) => activeChanel.activeVariation),
+	getActiveChannelActiveVariationId = createSelector([getActiveChannel], (activeChanel) => activeChanel ? activeChanel.activeVariation : null),
 
-	getActiveChannelVariations = createSelector([getActiveChannel, getAllVariations], (activeChanel, allVariations) => {
-		const variations = activeChanel.variations;
-		return _.filter(allVariations, (vraiation, variationId) => variations.indexOf(variationId) !== -1);
+	getActiveChannelVariations = createSelector([getActiveChannel, getAllVariations], (activeChanel = {}, allVariations) => {
+		const variations = activeChanel.variations || [];
+		return _.filter(allVariations, (variation, variationId) => variations.indexOf(variationId) !== -1);
 	}),
 
-	getChannelVariations = createSelector([getChannel, getAllVariations], (channel, allVariations) => {
-		const variations = channel.variations;
-		return _.filter(allVariations, (vraiation, variationId) => variations.indexOf(variationId) !== -1);
+	getChannelVariations = createSelector([getChannel, getAllVariations], (channel = {}, allVariations) => {
+		const variations = channel.variations || [];
+		return _.filter(allVariations, (variation, variationId) => variations.indexOf(variationId) !== -1);
 	}),
 
 

@@ -6,7 +6,7 @@ const getAllChannels = (state) => state.channelData.byIds,
 
 	getActiveChannel = (state) => getAllChannels(state)[state.channelData.activeChannel],
 
-	getActiveChannelId = (state) => getActiveChannel(state).id,
+	getActiveChannelId = (state) => { const activeChannel = getActiveChannel(state); return activeChannel ? activeChannel.id : null; },
 
 	getChannel = (state, props) => getAllChannels(state)[props.channelId],
 

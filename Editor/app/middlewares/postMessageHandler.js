@@ -6,17 +6,22 @@ import { sendMessage } from '../scripts/messengerHelper';
 
 
 const getData = (state) => {
+		const activeChannel = getActiveChannel(state);
+		if (!activeChannel) {
+			return false;
+		}
 		const activeVariation = getActiveChannelActiveVariationId(state),
 			sections = activeVariation ? getVariationSectionsWithAds(state, { variationId: activeVariation }) : null;
+
 		return {
 			insertMenuVisible: state.ui.insertMenu.isVisible,
 			editMenuVisible: state.ui.editMenu.isVisible,
 			layout: {
 				...sections,
-				contentSelector: getActiveChannel(state).contentSelector,
-				channelId: getActiveChannelId(state)
+				contentSelector: activeChannel.contentSelector,
+				channelId: activeChannel.id
 			},
-			activeChannelId: getActiveChannelId(state)
+			activeChannelId: activeChannel.id
 		};
 	},
 	postMessageHanlder = store => next => (action) => {
@@ -26,10 +31,12 @@ const getData = (state) => {
 
 		const nextState = getData(store.getState());
 
-		if (!_.isEqual(prevState.layout, nextState.layout)) {
-			sendMessage(nextState.activeChannelId, messengerCommands.UPDATE_LAYOUT, nextState.layout);
-		} else if ((prevState.insertMenuVisible && !nextState.insertMenuVisible) || (prevState.editMenuVisible && !nextState.editMenuVisible)) {
-			sendMessage(nextState.activeChannelId, messengerCommands.HIDE_ELEMENT_SELECTOR, {});
+		if (nextState) {
+			if (!_.isEqual(prevState.layout, nextState.layout)) {
+				sendMessage(nextState.activeChannelId, messengerCommands.UPDATE_LAYOUT, nextState.layout);
+			} else if ((prevState.insertMenuVisible && !nextState.insertMenuVisible) || (prevState.editMenuVisible && !nextState.editMenuVisible)) {
+				sendMessage(nextState.activeChannelId, messengerCommands.HIDE_ELEMENT_SELECTOR, {});
+			}
 		}
 
 		return store.getState();
