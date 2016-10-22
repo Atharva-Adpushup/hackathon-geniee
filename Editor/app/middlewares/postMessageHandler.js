@@ -9,8 +9,8 @@ const getData = (state) => {
 		const activeVariation = getActiveChannelActiveVariationId(state),
 			sections = activeVariation ? getVariationSectionsWithAds(state, { variationId: activeVariation }) : null;
 		return {
-			insertMenuVisible: state.insertMenu.isVisible,
-			editMenuVisible: state.editMenu.isVisible,
+			insertMenuVisible: state.ui.insertMenu.isVisible,
+			editMenuVisible: state.ui.editMenu.isVisible,
 			layout: {
 				...sections,
 				contentSelector: getActiveChannel(state).contentSelector,

@@ -1,9 +1,9 @@
 import { connect } from 'react-redux';
 import EditMenu from 'contextMenu/editMenu/editMenu.jsx';
-import { hideMenu } from '../actions/editMenuActions';
-import { getEditMenuState } from '../selectors/editMenuSelectors';
-import { getSectionWithAds } from '../selectors/sectionSelectors';
-import { messengerCommands } from '../consts/commonConsts';
+import { hideMenu } from 'actions/editMenuActions';
+import { getEditMenuState } from 'selectors/uiSelectors';
+import { getSectionWithAds } from 'selectors/sectionSelectors';
+import { messengerCommands } from 'consts/commonConsts';
 
 const mapStateToProps = (state) => {
 		const json = getEditMenuState(state);

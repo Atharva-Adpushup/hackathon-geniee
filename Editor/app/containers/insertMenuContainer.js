@@ -4,7 +4,7 @@ import { hideMenu } from 'actions/insertMenuActions';
 import { createSection } from 'actions/sectionActions';
 import { getActiveChannelId } from 'selectors/channelSelectors';
 import { getActiveChannelActiveVariationId } from 'selectors/variationSelectors';
-import { getInsertMenuState } from 'selectors/insertMenuSelectors';
+import { getInsertMenuState } from 'selectors/uiSelectors';
 import { sendMessage } from '../scripts/messengerHelper';
 import { messengerCommands } from '../consts/commonConsts';
 
