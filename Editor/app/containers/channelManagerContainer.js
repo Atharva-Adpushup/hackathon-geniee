@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import * as channelActions from 'actions/channelActions';
+import { showNewChannelMenu } from '../actions/uiActions';
 import ChannelManager from 'channelManager/channelManager.jsx';
 import { getAllChannels, getOpenChannels, getActiveChannelId } from '../selectors/channelSelectors';
 
@@ -17,8 +18,8 @@ const noop = () => ({ type: 'Test' }),
 		showPublisherHelper: () => {
 			dispatch(noop(arguments));
 		},
-		showNewChannelMenu: () => {
-			dispatch(noop(arguments));
+		showNewChannelMenu: (position) => {
+			dispatch(showNewChannelMenu(position));
 		},
 		masterSave: () => {
 			dispatch(noop(arguments));

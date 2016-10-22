@@ -1,4 +1,6 @@
 import React, { PropTypes } from 'react';
+import $ from 'jquery';
+import Utils from 'libs/utils';
 import { proxy } from 'consts/commonConsts.js';
 import Loader from 'shared/loader.jsx';
 import Platform from './platform.jsx';
@@ -26,6 +28,11 @@ class channelManager extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {};
+		this.handleMenuClick = this.handleMenuClick.bind(this);
+	}
+
+	handleMenuClick() {
+		this.props.showNewChannelMenu(Utils.ui.outerMenuRenderPosition($('#adNewChannel')));
 	}
 
 	render() {
@@ -33,7 +40,7 @@ class channelManager extends React.Component {
 
 		return (
 			<Tabs toggleEditorMode={props.toggleEditorMode} showPublisherHelper={props.showPublisherHelper}
-				masterSave={props.masterSave} handleNewChannelMenu={props.showNewChannelMenu}
+				masterSave={props.masterSave} handleNewChannelMenu={this.handleMenuClick}
 				showOptionsMenu={props.showOptionsMenu}
 				siteMode={props.siteMode} channels={props.channels} activeKey={props.activeChannelId}
 			>

@@ -375,6 +375,9 @@ const randomStore = [],
 					}
 				};
 			},
+			outerMenuRenderPosition($el) {
+				return Utils.dom.getElementRelativeBounds($el);
+			},
 			menuRenderPosition($target, context) {
 				const contextTop = context.top,
 					contextLeft = context.left,

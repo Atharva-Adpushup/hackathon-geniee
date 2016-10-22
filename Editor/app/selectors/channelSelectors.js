@@ -10,7 +10,9 @@ const getAllChannels = (state) => state.channelData.byIds,
 
 	getChannel = (state, props) => getAllChannels(state)[props.channelId],
 
-	getOpenChannels = createSelector([getAllChannels], (channelByIds) => _.filter(channelByIds, { isOpen: true }));
+	getOpenChannels = createSelector([getAllChannels], (channelByIds) => _.filter(channelByIds, { isOpen: true })),
+
+	getClosedChannels = createSelector([getAllChannels], (channelByIds) => _.filter(channelByIds, { isOpen: false }));
 
 
-export { getOpenChannels, getAllChannels, getActiveChannel, getActiveChannelId, getChannel };
+export { getOpenChannels, getAllChannels, getActiveChannel, getActiveChannelId, getChannel, getClosedChannels };

@@ -128,6 +128,10 @@ const status = {
 		HIDE_EDIT_MENU: 'HIDE_EDIT_MENU',
 		SHOW_EDIT_MENU: 'SHOW_EDIT_MENU'
 	},
+	newChannelMenuActions = {
+		HIDE_NEW_CHANNEL_MENU: 'HIDE_NEW_CHANNEL_MENU',
+		SHOW_NEW_CHANNEL_MENU: 'SHOW_NEW_CHANNEL_MENU'
+	},
 	variationActions = {
 		ADD_VARIATION: 'ADD_VARIATION',
 		COPY_VARIATION: 'COPY_VARIATION',
@@ -192,7 +196,7 @@ const status = {
 export {
 	status, proxy, stores, adTypes, messengerCommands, siteModes,
 	siteActions, channelActions, sectionActions, adActions,
-	insertMenuActions, editMenuActions,
+	insertMenuActions, editMenuActions, newChannelMenuActions,
 	adBoxSizeStyles, commonSupportedSizes, variationActions,
 	hbBoxActions, innerVariationActions, innerActions,
 	defaultSectionCss

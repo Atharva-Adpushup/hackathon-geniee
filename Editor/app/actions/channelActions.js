@@ -2,12 +2,8 @@ import { channelActions } from 'consts/commonConsts';
 import { addVariation } from 'actions/variationActions';
 import Utils from 'libs/utils';
 
-const openChannel = (channelId) => {
-		return {
-			type: channelActions.OPEN_CHANNEL,
-			channelId
-		};
-	},
+const openChannel = (channelId) => ({ type: channelActions.OPEN_CHANNEL, channelId }),
+
 	openChannelSuccess = (channelId) => {
 		return (dispatch, getState) => {
 			dispatch({

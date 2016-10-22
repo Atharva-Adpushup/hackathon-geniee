@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { editMenuActions, insertMenuActions, sectionActions, adActions } from '../consts/commonConsts';
+import { editMenuActions, insertMenuActions, sectionActions, adActions, newChannelMenuActions, channelActions } from '../consts/commonConsts';
 
 const insertMenu = (state = { isVisible: false }, action) => {
 		switch (action.type) {
@@ -36,10 +36,24 @@ const insertMenu = (state = { isVisible: false }, action) => {
 			default:
 				return state;
 		}
+	},
+	newChannelMenu = (state = { isVisible: false }, action) => {
+		switch (action.type) {
+			case newChannelMenuActions.SHOW_NEW_CHANNEL_MENU:
+				return { isVisible: true, position: action.position };
+
+			case newChannelMenuActions.HIDE_NEW_CHANNEL_MENU:
+			case channelActions.OPEN_CHANNEL:
+				return { isVisible: false };
+
+			default:
+				return state;
+		}
 	};
 
 export default combineReducers({
 	insertMenu,
-	editMenu
+	editMenu,
+	newChannelMenu
 });
 

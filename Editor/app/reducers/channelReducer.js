@@ -50,6 +50,9 @@ const initialState = { activeChannel: null, byIds: {} },
 			case channelActions.OPEN_CHANNEL_SUCCESS:
 				return { ...state, isLoading: false };
 
+			case channelActions.OPEN_CHANNEL:
+				return { ...state, isLoading: true, isOpen: true };
+
 			case channelActions.CONTENT_SELECTOR_MISSING:
 				return { ...state, contentSelectorMissing: true };
 
@@ -81,6 +84,15 @@ const initialState = { activeChannel: null, byIds: {} },
 			case channelActions.CONTENT_SELECTOR_WORKED:
 			case variationActions.DELETE_VARIATION:
 				return { ...state,
+					byIds: {
+						...state.byIds,
+						[action.channelId]: channel(state.byIds[action.channelId], action)
+					}
+				};
+
+			case channelActions.OPEN_CHANNEL:
+				return { ...state,
+					activeChannel: action.channelId,
 					byIds: {
 						...state.byIds,
 						[action.channelId]: channel(state.byIds[action.channelId], action)

@@ -1,10 +1,9 @@
 import { messengerCommands } from 'consts/commonConsts';
-import { showMenu } from 'actions/insertMenuActions';
 import Messenger from 'libs/messenger';
 import { openChannelSuccess, contentSelectorMissing, contentSelectorWorked } from 'actions/channelActions';
 import { deleteAd } from 'actions/adActions';
 import { deleteSection } from 'actions/sectionActions';
-import { showMenu as showEditMenu } from '../actions/editMenuActions';
+import { showEditMenu, showInsertMenu } from '../actions/uiActions';
 
 
 const messenger = new Messenger(),
@@ -20,7 +19,7 @@ const messenger = new Messenger(),
 		messenger.onMessage.add((cmd, data) => {
 			switch (cmd) {
 				case messengerCommands.SHOW_INSERT_CONTEXTMENU:
-					dispatch(showMenu(data));
+					dispatch(showInsertMenu(data));
 					break;
 
 				case messengerCommands.SHOW_EDIT_CONTEXTMENU:
@@ -64,7 +63,7 @@ const messenger = new Messenger(),
 	sendMessage = (channelId, cmd, data) => {
 		const target = getTarget(channelId);
 		if (!target) {
-			alert('Post message target not found');
+			console.log('Post message target not found');
 			return false;
 		}
 		messenger.setTarget(target);
