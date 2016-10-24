@@ -1,4 +1,10 @@
 const status = {
+		text: {
+			'SUCCESS': 'SUCCESS',
+			'PENDING': 'PENDING',
+			'FAILED': 'FAILED',
+			'LOADING': 'LOADING'
+		},
 		PENDING: 1,
 		SUCCESS: 2,
 		FAILED: 3,

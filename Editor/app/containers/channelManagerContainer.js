@@ -1,6 +1,8 @@
 import { connect } from 'react-redux';
 import * as channelActions from 'actions/channelActions';
 import { showNewChannelMenu } from '../actions/uiActions';
+import { afterSaveLoaderStatusPending } from 'actions/siteActions';
+import { status } from 'consts/commonConsts';
 import ChannelManager from 'channelManager/channelManager.jsx';
 import { getAllChannels, getOpenChannels, getActiveChannelId } from '../selectors/channelSelectors';
 
@@ -22,7 +24,7 @@ const noop = () => ({ type: 'Test' }),
 			dispatch(showNewChannelMenu(position));
 		},
 		masterSave: () => {
-			dispatch(noop(arguments));
+			dispatch(afterSaveLoaderStatusPending(status.PENDING));
 		},
 		showOptionsMenu: () => {
 			dispatch(noop(arguments));
