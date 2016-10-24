@@ -5,6 +5,7 @@ import variationByIds from './variationReducer';
 import adByIds from './adReducer';
 import sectionByIds from './sectionReducer';
 import ui from './uiReducer';
+import site from './siteReducer';
 
 
 export default combineReducers({
@@ -13,5 +14,6 @@ export default combineReducers({
 	variationByIds,
 	channelData,
 	ui,
+	site,
 	form: formReducer // key Name should be form only
 });

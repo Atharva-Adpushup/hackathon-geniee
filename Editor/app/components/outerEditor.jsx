@@ -4,6 +4,7 @@ import VariationManager from 'containers/variationManagerContainer.js';
 import InsertMenu from 'containers/insertMenuContainer.js';
 import EditMenu from 'containers/editMenuContainer.js';
 import NewChannelMenu from '../containers/newChannelMenuContainer.js';
+import AfterSaveLoaderContainer from '../containers/AfterSaveLoaderContainer';
 
 const OuterEditor = () => (
 	<div>
@@ -12,6 +13,7 @@ const OuterEditor = () => (
 		<VariationManager />
 		<EditMenu />
 		<NewChannelMenu />
+		<AfterSaveLoaderContainer />
 	</div>
 );
 
