@@ -1,6 +1,8 @@
 import { status } from 'consts/commonConsts';
 import { masterSave } from 'libs/dataSyncService';
+import { getFinalJson } from 'selectors/siteSelectors';
 import _ from 'lodash';
+import $ from 'jquery';
 
 const afterSaveLoaderStatusPending = (loaderStatus) => {
 		return {
@@ -13,23 +15,31 @@ const afterSaveLoaderStatusPending = (loaderStatus) => {
 			type: status.text.PENDING
 		});
 
-		let originalState = getState(),
-			paramData = {};
+		const paramData = getFinalJson(getState()),
+			doAsyncSave = () => {
+				const dfd = $.Deferred();
 
-		return new Promise((resolve, reject) => {
-			return masterSave(paramData)
-			.done((data) => {
-				dispatch({
-					type: status.text.SUCCESS
-				});
-				return resolve(data);
-			})
-			.fail((jqXHR, textStatus) => {
-				dispatch({
-					type: status.text.FAILED
-				});
-				// return reject(textStatus);
-			});
+				return masterSave(paramData)
+					.done((data) => {
+						dispatch({
+							type: status.text.SUCCESS
+						});
+						return dfd.resolve(data);
+					})
+					.fail((jqXHR, textStatus) => {
+						dispatch({
+							type: status.text.FAILED
+						});
+						return dfd.reject(textStatus);
+					});
+			};
+
+		$.when(doAsyncSave()).then((data) => {
+			// console.log('Data Saved successfully...');
+		}, (jqXHR) => {
+			// console.log('Error while saving data...');
+		}, (status) => {
+			// console.log('In Progress state...');
 		});
 	},
 	afterSaveLoaderStatusSuccess = (loaderStatus) => {
