@@ -1897,6 +1897,14 @@
 		value: true
 	});
 	var status = {
+		text: {
+			'SUCCESS': 'SUCCESS',
+			'PENDING': 'PENDING',
+			'FAILED': 'FAILED',
+			'LOADING': 'LOADING',
+			'RESET': 'RESET'
+		},
+		RESET: 0,
 		PENDING: 1,
 		SUCCESS: 2,
 		FAILED: 3,
@@ -7371,6 +7379,10 @@
 
 	var _newChannelMenuContainer2 = _interopRequireDefault(_newChannelMenuContainer);
 
+	var _AfterSaveLoaderContainer = __webpack_require__(667);
+
+	var _AfterSaveLoaderContainer2 = _interopRequireDefault(_AfterSaveLoaderContainer);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var OuterEditor = function OuterEditor() {
@@ -7381,7 +7393,8 @@
 			_react2.default.createElement(_insertMenuContainer2.default, null),
 			_react2.default.createElement(_variationManagerContainer2.default, null),
 			_react2.default.createElement(_editMenuContainer2.default, null),
-			_react2.default.createElement(_newChannelMenuContainer2.default, null)
+			_react2.default.createElement(_newChannelMenuContainer2.default, null),
+			_react2.default.createElement(_AfterSaveLoaderContainer2.default, null)
 		);
 	};
 
@@ -7405,6 +7418,8 @@
 	var channelActions = _interopRequireWildcard(_channelActions);
 
 	var _uiActions = __webpack_require__(220);
+
+	var _siteActions = __webpack_require__(665);
 
 	var _channelManager = __webpack_require__(221);
 
@@ -7439,7 +7454,7 @@
 				dispatch((0, _uiActions.showNewChannelMenu)(position));
 			},
 			masterSave: function masterSave() {
-				dispatch(noop(_arguments));
+				dispatch((0, _siteActions.masterSaveData)());
 			},
 			showOptionsMenu: function showOptionsMenu() {
 				dispatch(noop(_arguments));
@@ -33731,9 +33746,9 @@
 		value: true
 	});
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	var _react = __webpack_require__(2);
 
@@ -33755,16 +33770,77 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var inContentAdder = function (_React$Component) {
-		_inherits(inContentAdder, _React$Component);
+	var form = (0, _reduxForm.reduxForm)({
+		form: 'inContentForm',
+		validate: validate
+	});
 
-		function inContentAdder() {
-			_classCallCheck(this, inContentAdder);
+	var renderField = function renderField(field) {
+		return _react2.default.createElement(
+			'div',
+			null,
+			_react2.default.createElement(
+				_reactBootstrap.Col,
+				{ xs: 6, className: 'u-padding-r10px' },
+				_react2.default.createElement(
+					_reactBootstrap.Row,
+					null,
+					_react2.default.createElement(
+						_reactBootstrap.Col,
+						{ xs: 6, className: 'u-padding-r10px' },
+						_react2.default.createElement(
+							'strong',
+							null,
+							field.label
+						)
+					),
+					_react2.default.createElement(
+						_reactBootstrap.Col,
+						{ xs: 6, className: 'u-padding-r10px' },
+						_react2.default.createElement('input', _extends({ placeholder: field.placeholder }, field.input)),
+						field.meta.touched && field.meta.error && _react2.default.createElement(
+							'div',
+							{ className: 'error-message' },
+							field.meta.error
+						)
+					)
+				)
+			)
+		);
+	};
 
-			return _possibleConstructorReturn(this, (inContentAdder.__proto__ || Object.getPrototypeOf(inContentAdder)).apply(this, arguments));
+	function validate(formProps) {
+		var errors = {};
+
+		if (!formProps.section) {
+			errors.section = 'Please enter section';
 		}
 
-		_createClass(inContentAdder, [{
+		if (!formProps.minDistanceFromPrevAd) {
+			errors.minDistanceFromPrevAd = 'Please enter minDistanceFromPrevAd';
+		}
+
+		if (!formProps.height) {
+			errors.height = 'Please enter height';
+		}
+
+		if (!formProps.width) {
+			errors.width = 'Please enter width';
+		}
+
+		return errors;
+	}
+
+	var inContentForm = function (_React$Component) {
+		_inherits(inContentForm, _React$Component);
+
+		function inContentForm() {
+			_classCallCheck(this, inContentForm);
+
+			return _possibleConstructorReturn(this, (inContentForm.__proto__ || Object.getPrototypeOf(inContentForm)).apply(this, arguments));
+		}
+
+		_createClass(inContentForm, [{
 			key: 'render',
 			value: function render() {
 				var props = this.props;
@@ -33772,55 +33848,50 @@
 					'form',
 					{ onSubmit: props.handleSubmit },
 					_react2.default.createElement(
-						_reactBootstrap.Row,
-						null,
-						_react2.default.createElement(
-							_reactBootstrap.Col,
-							{ className: 'u-padding-r10px', xs: 8 },
-							_react2.default.createElement(
-								'b',
-								null,
-								'Section'
-							)
-						),
-						_react2.default.createElement(
-							_reactBootstrap.Col,
-							{ className: 'u-padding-l10px', xs: 4 },
-							_react2.default.createElement(_reduxForm.Field, { name: 'section', component: 'input', type: 'number' })
-						)
+						'h1',
+						{ className: 'variation-section-heading' },
+						'Variation In-content Settings'
 					),
+					_react2.default.createElement(_reduxForm.Field, { placeholder: 'Please enter section', name: 'section', component: renderField, type: 'number', label: 'Section' }),
+					_react2.default.createElement(_reduxForm.Field, { placeholder: 'Please enter minDistanceFromPrevAd', name: 'minDistanceFromPrevAd', component: renderField, type: 'number', label: 'minDistanceFromPrevAd' }),
+					_react2.default.createElement(_reduxForm.Field, { placeholder: 'Please enter height', name: 'height', component: renderField, type: 'number', label: 'Height' }),
+					_react2.default.createElement(_reduxForm.Field, { placeholder: 'Please enter width', name: 'width', component: renderField, type: 'number', label: 'Width' }),
 					_react2.default.createElement(
-						_reactBootstrap.Row,
-						null,
+						_reactBootstrap.Col,
+						{ xs: 6, className: 'u-padding-r10px' },
 						_react2.default.createElement(
-							_reactBootstrap.Col,
-							{ className: 'u-padding-r10px', xs: 8 },
+							_reactBootstrap.Row,
+							null,
 							_react2.default.createElement(
-								'b',
-								null,
-								'Float'
-							)
-						),
-						_react2.default.createElement(
-							_reactBootstrap.Col,
-							{ className: 'u-padding-l10px', xs: 4 },
+								_reactBootstrap.Col,
+								{ xs: 6, className: 'u-padding-r10px' },
+								_react2.default.createElement(
+									'strong',
+									null,
+									'Float'
+								)
+							),
 							_react2.default.createElement(
-								_reduxForm.Field,
-								{ name: 'float', component: 'select' },
+								_reactBootstrap.Col,
+								{ xs: 6, className: 'u-padding-r10px' },
 								_react2.default.createElement(
-									'option',
-									{ value: 'none' },
-									'None'
-								),
-								_react2.default.createElement(
-									'option',
-									{ value: 'left' },
-									'Left'
-								),
-								_react2.default.createElement(
-									'option',
-									{ value: 'right' },
-									'Right'
+									_reduxForm.Field,
+									{ name: 'float', component: 'select' },
+									_react2.default.createElement(
+										'option',
+										{ name: 'none' },
+										'None'
+									),
+									_react2.default.createElement(
+										'option',
+										{ name: 'left' },
+										'Left'
+									),
+									_react2.default.createElement(
+										'option',
+										{ name: 'right' },
+										'Right'
+									)
 								)
 							)
 						)
@@ -33830,61 +33901,7 @@
 						null,
 						_react2.default.createElement(
 							_reactBootstrap.Col,
-							{ className: 'u-padding-r10px', xs: 8 },
-							_react2.default.createElement(
-								'b',
-								null,
-								'Height'
-							)
-						),
-						_react2.default.createElement(
-							_reactBootstrap.Col,
-							{ className: 'u-padding-l10px', xs: 4 },
-							_react2.default.createElement(_reduxForm.Field, { name: 'height', component: 'input', type: 'number' })
-						)
-					),
-					_react2.default.createElement(
-						_reactBootstrap.Row,
-						null,
-						_react2.default.createElement(
-							_reactBootstrap.Col,
-							{ className: 'u-padding-r10px', xs: 8 },
-							_react2.default.createElement(
-								'b',
-								null,
-								'Width'
-							)
-						),
-						_react2.default.createElement(
-							_reactBootstrap.Col,
-							{ className: 'u-padding-l10px', xs: 4 },
-							_react2.default.createElement(_reduxForm.Field, { name: 'width', component: 'input', type: 'number' })
-						)
-					),
-					_react2.default.createElement(
-						_reactBootstrap.Row,
-						null,
-						_react2.default.createElement(
-							_reactBootstrap.Col,
-							{ className: 'u-padding-r10px', xs: 8 },
-							_react2.default.createElement(
-								'b',
-								null,
-								'minDistanceFromPrevAd'
-							)
-						),
-						_react2.default.createElement(
-							_reactBootstrap.Col,
-							{ className: 'u-padding-l10px', xs: 4 },
-							_react2.default.createElement(_reduxForm.Field, { name: 'minDistanceFromPrevAd', component: 'input', type: 'number' })
-						)
-					),
-					_react2.default.createElement(
-						_reactBootstrap.Row,
-						null,
-						_react2.default.createElement(
-							_reactBootstrap.Col,
-							{ style: { paddingRight: 0 }, xs: 12 },
+							{ className: 'u-padding-r10px', style: { marginTop: '30px', clear: 'both' }, xs: 2 },
 							_react2.default.createElement(
 								_reactBootstrap.Button,
 								{ className: 'btn-lightBg btn-save btn-block', type: 'submit' },
@@ -33896,24 +33913,21 @@
 			}
 		}]);
 
-		return inContentAdder;
+		return inContentForm;
 	}(_react2.default.Component);
 
-	inContentAdder.propTypes = {
+	inContentForm.propTypes = {
 		handleSubmit: _react.PropTypes.func.isRequired
 	};
 
-	var inContentAdderForm = (0, _reduxForm.reduxForm)({
-		form: 'incontentAdder' // a unique name for this form
-	})(inContentAdder),
-	    mapStateToProps = function mapStateToProps(state, ownProps) {
+	var mapStateToProps = function mapStateToProps(state, ownProps) {
 		return _extends({}, ownProps, {
 			initialValues: {
-				section: 0,
+				section: 2,
 				float: 'left',
 				minDistanceFromPrevAd: 200,
-				height: 0,
-				width: 0
+				height: 320,
+				width: 180
 			}
 		});
 	},
@@ -33925,7 +33939,7 @@
 		};
 	};
 
-	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(inContentAdderForm);
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(form(inContentForm));
 
 /***/ },
 /* 540 */
@@ -51514,6 +51528,10 @@
 
 	var _uiReducer2 = _interopRequireDefault(_uiReducer);
 
+	var _siteReducer = __webpack_require__(669);
+
+	var _siteReducer2 = _interopRequireDefault(_siteReducer);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = (0, _redux.combineReducers)({
@@ -51522,6 +51540,7 @@
 		variationByIds: _variationReducer2.default,
 		channelData: _channelReducer2.default,
 		ui: _uiReducer2.default,
+		site: _siteReducer2.default,
 		form: _reduxForm.reducer // key Name should be form only
 	});
 
@@ -52614,6 +52633,371 @@
 	};
 
 	exports.default = unloadHandler;
+
+/***/ },
+/* 665 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.afterSaveLoaderStatusFailed = exports.afterSaveLoaderStatusSuccess = exports.masterSaveData = exports.afterSaveLoaderStatusPending = exports.afterSaveLoaderStatusReset = undefined;
+
+	var _commonConsts = __webpack_require__(33);
+
+	var _dataSyncService = __webpack_require__(663);
+
+	var _siteSelectors = __webpack_require__(666);
+
+	var _jquery = __webpack_require__(29);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var afterSaveLoaderStatusPending = function afterSaveLoaderStatusPending(loaderStatus) {
+		return {
+			type: _commonConsts.status.text.PENDING,
+			loaderStatus: loaderStatus
+		};
+	},
+	    masterSaveData = function masterSaveData() {
+		return function (dispatch, getState) {
+			dispatch({
+				type: _commonConsts.status.text.PENDING
+			});
+
+			var paramData = (0, _siteSelectors.getFinalJson)(getState()),
+			    doAsyncSave = function doAsyncSave() {
+				var dfd = _jquery2.default.Deferred();
+
+				return (0, _dataSyncService.masterSave)(paramData).done(function (data) {
+					dispatch({
+						type: _commonConsts.status.text.SUCCESS
+					});
+					return dfd.resolve(data);
+				}).fail(function (jqXHR, textStatus) {
+					dispatch({
+						type: _commonConsts.status.text.FAILED
+					});
+					return dfd.reject(textStatus);
+				});
+			};
+
+			_jquery2.default.when(doAsyncSave()).then(function (data) {
+				// console.log('Data Saved successfully...');
+			}, function (jqXHR) {
+				// console.log('Error while saving data...');
+			}, function (status) {
+				// console.log('In Progress state...');
+			});
+		};
+	},
+	    afterSaveLoaderStatusSuccess = function afterSaveLoaderStatusSuccess(loaderStatus) {
+		return {
+			type: _commonConsts.status.text.SUCCESS,
+			loaderStatus: loaderStatus
+		};
+	},
+	    afterSaveLoaderStatusFailed = function afterSaveLoaderStatusFailed(loaderStatus) {
+		return {
+			type: _commonConsts.status.text.FAILED,
+			loaderStatus: loaderStatus
+		};
+	},
+	    afterSaveLoaderStatusReset = function afterSaveLoaderStatusReset() {
+		return {
+			type: _commonConsts.status.text.RESET
+		};
+	};
+
+	exports.afterSaveLoaderStatusReset = afterSaveLoaderStatusReset;
+	exports.afterSaveLoaderStatusPending = afterSaveLoaderStatusPending;
+	exports.masterSaveData = masterSaveData;
+	exports.afterSaveLoaderStatusSuccess = afterSaveLoaderStatusSuccess;
+	exports.afterSaveLoaderStatusFailed = afterSaveLoaderStatusFailed;
+
+/***/ },
+/* 666 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.getFinalJson = exports.getAfterSaveLoaderState = undefined;
+
+	var _map2 = __webpack_require__(180);
+
+	var _map3 = _interopRequireDefault(_map2);
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _reselect = __webpack_require__(216);
+
+	var _channelSelectors = __webpack_require__(219);
+
+	var _variationSelectors = __webpack_require__(211);
+
+	var _sectionSelectors = __webpack_require__(217);
+
+	var _adsSelectors = __webpack_require__(218);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var getAfterSaveLoaderState = function getAfterSaveLoaderState(state) {
+		return state.site.afterSaveLoader.status;
+	},
+	    getFinalJson = (0, _reselect.createSelector)([_channelSelectors.getAllChannels, _variationSelectors.getAllVariations, _sectionSelectors.getAllSections, _adsSelectors.getAllAds], function () {
+		var allChannels = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+		var allVariations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+		var allSections = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+		var allAds = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+		return (0, _map3.default)(allChannels, function (channel) {
+			var channelVariations = (0, _map3.default)(channel.variations, function (variationId) {
+				return allVariations[variationId];
+			});
+			return _extends({}, channel, {
+				variations: (0, _map3.default)(channelVariations, function (variation) {
+					var sections = (0, _map3.default)(variation.sections, function (sectionId) {
+						return allSections[sectionId];
+					});
+					return _extends({}, variation, { sections: (0, _map3.default)(sections, function (section) {
+							return _extends({}, section, { ads: (0, _map3.default)(section.ads, function (sectionAdId) {
+									return allAds[sectionAdId];
+								}) });
+						}) });
+				}) });
+		});
+	});
+
+	exports.getAfterSaveLoaderState = getAfterSaveLoaderState;
+	exports.getFinalJson = getFinalJson;
+
+/***/ },
+/* 667 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _reactRedux = __webpack_require__(4);
+
+	var _afterSaveModal = __webpack_require__(668);
+
+	var _afterSaveModal2 = _interopRequireDefault(_afterSaveModal);
+
+	var _siteSelectors = __webpack_require__(666);
+
+	var _siteActions = __webpack_require__(665);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var mapStateToProps = function mapStateToProps(state) {
+		return {
+			status: (0, _siteSelectors.getAfterSaveLoaderState)(state)
+		};
+	},
+	    mapDispatchToProps = function mapDispatchToProps(dispatch) {
+		return {
+			closeModal: function closeModal() {
+				dispatch((0, _siteActions.afterSaveLoaderStatusReset)());
+			}
+		};
+	},
+	    AfterSaveLoaderContainer = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_afterSaveModal2.default);
+
+	exports.default = AfterSaveLoaderContainer;
+
+/***/ },
+/* 668 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _commonConsts = __webpack_require__(33);
+
+	var _reactBootstrap = __webpack_require__(225);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var afterSaveModal = function (_React$Component) {
+		_inherits(afterSaveModal, _React$Component);
+
+		function afterSaveModal(props) {
+			_classCallCheck(this, afterSaveModal);
+
+			var _this = _possibleConstructorReturn(this, (afterSaveModal.__proto__ || Object.getPrototypeOf(afterSaveModal)).call(this, props));
+
+			_this.state = {};
+			return _this;
+		}
+
+		_createClass(afterSaveModal, [{
+			key: 'isModalShown',
+			value: function isModalShown() {
+				var props = this.props;
+
+				return !!parseInt(props.status, 10);
+			}
+		}, {
+			key: 'renderWaitMessage',
+			value: function renderWaitMessage() {
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement(
+							'h4',
+							null,
+							'Saving Please Wait'
+						),
+						_react2.default.createElement(
+							'p',
+							null,
+							'Optimization is few seconds away.'
+						)
+					),
+					_react2.default.createElement('div', { className: 'spin' })
+				);
+			}
+		}, {
+			key: 'renderSuccessMessage',
+			value: function renderSuccessMessage() {
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(
+						'h4',
+						null,
+						'Saved'
+					),
+					_react2.default.createElement(
+						'p',
+						null,
+						'Happy Optimization.'
+					)
+				);
+			}
+		}, {
+			key: 'renderErrorMessage',
+			value: function renderErrorMessage() {
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(
+						'h4',
+						null,
+						'Save Error'
+					),
+					_react2.default.createElement(
+						'p',
+						null,
+						'There was some error while saving your changes, please try again by clicking save button again. If problem persists, please contact support by using chat widget on bottom right of your screen.'
+					)
+				);
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var props = this.props;
+
+				return _react2.default.createElement(
+					_reactBootstrap.Modal,
+					{ show: this.isModalShown(), onHide: props.closeModal, className: '_ap_modal_logo  _ap_modal_smily', keyboard: false, title: 'Saved', animation: true },
+					_react2.default.createElement(_reactBootstrap.Modal.Header, { closeButton: props.status !== _commonConsts.status.PENDING }),
+					_react2.default.createElement(
+						_reactBootstrap.Modal.Body,
+						null,
+						props.status == _commonConsts.status.PENDING ? this.renderWaitMessage() : props.status == _commonConsts.status.SUCCESS ? this.renderSuccessMessage() : this.renderErrorMessage()
+					)
+				);
+			}
+		}]);
+
+		return afterSaveModal;
+	}(_react2.default.Component);
+
+	afterSaveModal.propTypes = {
+		status: _react.PropTypes.number.isRequired,
+		closeModal: _react.PropTypes.func.isRequired
+	};
+
+	exports.default = afterSaveModal;
+
+/***/ },
+/* 669 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _redux = __webpack_require__(12);
+
+	var _commonConsts = __webpack_require__(33);
+
+	var initialState = {
+		status: 0
+	},
+	    afterSaveLoader = function afterSaveLoader() {
+		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+		var action = arguments[1];
+
+		switch (action.type) {
+			case _commonConsts.status.text.RESET:
+				return {
+					status: _commonConsts.status.RESET
+				};
+			case _commonConsts.status.text.PENDING:
+				return {
+					status: _commonConsts.status.PENDING
+				};
+
+			case _commonConsts.status.text.SUCCESS:
+				return {
+					status: _commonConsts.status.SUCCESS
+				};
+
+			case _commonConsts.status.text.FAILED:
+				return {
+					status: _commonConsts.status.FAILED
+				};
+
+			default:
+				return state;
+		}
+	};
+
+	exports.default = (0, _redux.combineReducers)({
+		afterSaveLoader: afterSaveLoader
+	});
 
 /***/ }
 /******/ ]);

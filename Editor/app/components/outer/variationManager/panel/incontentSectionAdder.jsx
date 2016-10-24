@@ -4,59 +4,79 @@ import { Row, Col, Button } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
+const form = reduxForm({
+	form: 'inContentForm',
+	validate
+});
 
-class inContentAdder extends React.Component {
+const renderField = field => {
+	return (
+		<div>
+			<Col xs={6} className="u-padding-r10px">
+				<Row>
+					<Col xs={6} className="u-padding-r10px">
+						<strong>{field.label}</strong>
+					</Col>
+					<Col xs={6} className="u-padding-r10px">
+						<input placeholder={field.placeholder} {...field.input} />
+						{field.meta.touched && field.meta.error && <div className="error-message">{field.meta.error}</div>}
+					</Col>
+				</Row>
+			</Col>
+		</div>
+	);
+};
+
+function validate(formProps) {
+	const errors = {};
+
+	if (!formProps.section) {
+		errors.section = 'Please enter section';
+	}
+
+	if (!formProps.minDistanceFromPrevAd) {
+		errors.minDistanceFromPrevAd = 'Please enter minDistanceFromPrevAd';
+	}
+
+	if (!formProps.height) {
+		errors.height = 'Please enter height';
+	}
+
+	if (!formProps.width) {
+		errors.width = 'Please enter width';
+	}
+
+	return errors;
+}
+
+
+class inContentForm extends React.Component {
 
 	render() {
 		const props = this.props;
 		return (
 			<form onSubmit={props.handleSubmit}>
+				<h1 className="variation-section-heading">Variation In-content Settings</h1>
+				<Field placeholder="Please enter section" name="section" component={renderField} type="number" label="Section" />
+				<Field placeholder="Please enter minDistanceFromPrevAd" name="minDistanceFromPrevAd" component={renderField} type="number" label="minDistanceFromPrevAd" />
+				<Field placeholder="Please enter height" name="height" component={renderField} type="number" label="Height" />
+				<Field placeholder="Please enter width" name="width" component={renderField} type="number" label="Width" />
+				<Col xs={6} className="u-padding-r10px">
+					<Row>
+						<Col xs={6} className="u-padding-r10px">
+							<strong>Float</strong>
+						</Col>
+						<Col xs={6} className="u-padding-r10px">
+							<Field name="float" component="select">
+								<option name="none">None</option>
+								<option name="left">Left</option>
+								<option name="right">Right</option>
+							</Field>
+						</Col>
+					</Row>
+				</Col>
 				<Row>
-					<Col className="u-padding-r10px" xs={8}>
-						<b>Section</b>
-					</Col>
-					<Col className="u-padding-l10px" xs={4}>
-						<Field name="section" component="input" type="number" />
-					</Col>
-				</Row>
-				<Row>
-					<Col className="u-padding-r10px" xs={8}>
-						<b>Float</b>
-					</Col>
-					<Col className="u-padding-l10px" xs={4}>
-						<Field name="float" component="select">
-							<option value="none">None</option>
-							<option value="left">Left</option>
-							<option value="right">Right</option>
-						</Field>
-					</Col>
-				</Row>
-				<Row>
-					<Col className="u-padding-r10px" xs={8}>
-						<b>Height</b>
-					</Col>
-					<Col className="u-padding-l10px" xs={4}>
-						<Field name="height" component="input" type="number" />
-					</Col>
-				</Row>
-				<Row>
-					<Col className="u-padding-r10px" xs={8}>
-						<b>Width</b>
-					</Col>
-					<Col className="u-padding-l10px" xs={4}>
-						<Field name="width" component="input" type="number" />
-					</Col>
-				</Row>
-				<Row>
-					<Col className="u-padding-r10px" xs={8}>
-						<b>minDistanceFromPrevAd</b>
-					</Col>
-					<Col className="u-padding-l10px" xs={4}>
-						<Field name="minDistanceFromPrevAd" component="input" type="number" />
-					</Col>
-				</Row>
-				<Row>
-					<Col style={{ paddingRight: 0 }} xs={12}>
+					<Col className="u-padding-r10px" style={{ marginTop: '30px', clear: 'both' }} xs={2}>
 						<Button className="btn-lightBg btn-save btn-block" type="submit">Save</Button>
 					</Col>
 				</Row>
@@ -66,22 +86,18 @@ class inContentAdder extends React.Component {
 }
 
 
-inContentAdder.propTypes = {
+inContentForm.propTypes = {
 	handleSubmit: PropTypes.func.isRequired
 };
 
-const inContentAdderForm = reduxForm({
-		form: 'incontentAdder' // a unique name for this form
-	})(inContentAdder),
-
-	mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = (state, ownProps) => ({
 		...ownProps,
 		initialValues: {
-			section: 0,
+			section: 2,
 			float: 'left',
 			minDistanceFromPrevAd: 200,
-			height: 0,
-			width: 0
+			height: 320,
+			width: 180
 		}
 	}),
 
@@ -92,5 +108,5 @@ const inContentAdderForm = reduxForm({
 	});
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(inContentAdderForm);
+export default connect(mapStateToProps, mapDispatchToProps)(form(inContentForm));
 
