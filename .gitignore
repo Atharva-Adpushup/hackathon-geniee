@@ -13,6 +13,7 @@ jsconfig.json
 test.js
 logs/
 *.log
+*.map
 composer.phar
 composer.lock
 config.urls.php

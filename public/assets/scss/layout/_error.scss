@@ -88,3 +88,37 @@
 	bottom: 40px;
 	font-size: $TYPClickHereFont;
 }
+
+.error-message 
+{
+	  display: block;
+		margin-top: $FMLayoutDimension;
+		text-align: left;
+		font-size: $LPErrorMessageFontSize;
+		line-height: 14px;
+		color: $LPErrorMessageColor;
+		&.top 
+		{
+			padding-left: $LPErrorMessageTopPadLeft;
+			margin: 0 0 $LPErrorMessageMargin 0;
+		}
+}
+.success-message 
+{
+	  display: block;
+		margin-top: $LPErrorMessageMargin;
+		text-align: left;
+		font-size: $LPErrorMessageFontSize;
+		line-height: 14px;
+		padding:0 0 0 $LPErrorMessagePadLeft;
+		color: $LPSuccessMessageColor;
+		&.top 
+		{
+			padding-left: $LPErrorMessageTopPadLeft;
+			margin: 0 0 $LPErrorMessageMargin 0;
+		}
+		a {
+			color: $LPSuccessMessageColor;
+			text-decoration: underline;
+		}
+}

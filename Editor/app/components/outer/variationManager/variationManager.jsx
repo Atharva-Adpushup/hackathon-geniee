@@ -15,7 +15,7 @@ class variationManager extends React.Component {
 
 
 	componentWillReceiveProps(nextProps) {
-		if ((this.props.variations.length !== nextProps.variations.length) || (this.props.activeVariation !== nextProps.activeVariation)) {
+		if ((this.props.variations.length !== nextProps.variations.length) || (!this.props.activeVariation || !nextProps.activeVariation || (this.props.activeVariation.id !== nextProps.activeVariation.id))) {
 			this.setState({ isPanelActive: false });
 		}
 	}
