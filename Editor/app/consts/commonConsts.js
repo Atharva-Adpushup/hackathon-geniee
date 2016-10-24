@@ -3,8 +3,10 @@ const status = {
 			'SUCCESS': 'SUCCESS',
 			'PENDING': 'PENDING',
 			'FAILED': 'FAILED',
-			'LOADING': 'LOADING'
+			'LOADING': 'LOADING',
+			'RESET': 'RESET'
 		},
+		RESET: 0,
 		PENDING: 1,
 		SUCCESS: 2,
 		FAILED: 3,

@@ -6,6 +6,10 @@ const initialState = {
 },
 afterSaveLoader = (state = initialState, action) => {
 	switch (action.type) {
+		case status.text.RESET:
+			return {
+				status: status.RESET
+			};
 		case status.text.PENDING:
 			return {
 				status: status.PENDING

@@ -8,10 +8,10 @@ class afterSaveModal extends React.Component {
 		this.state = {};
 	}
 
-	resetSaveStatus() {
+	isModalShown() {
 		const props = this.props;
 
-		props.flux.actions.resetSaveStatus();
+		return !!(parseInt(props.status, 10));
 	}
 
 	renderWaitMessage() {
@@ -43,16 +43,10 @@ class afterSaveModal extends React.Component {
 		)
 	}
 
-	isModalShown() {
-		const props = this.props;
-
-		return !!(parseInt(props.status, 10));
-	}
-
 	render() {
 		const props = this.props;
 
-		return (<Modal show={this.isModalShown()} onHide={this.resetSaveStatus} className="_ap_modal_logo  _ap_modal_smily" keyboard={false} title='Saved' animation={true}>
+		return (<Modal show={this.isModalShown()} onHide={props.closeModal} className="_ap_modal_logo  _ap_modal_smily" keyboard={false} title='Saved' animation={true}>
 				<Modal.Header closeButton={props.status !== status.PENDING}></Modal.Header>
 				<Modal.Body>
 					{props.status == status.PENDING ? this.renderWaitMessage() : (props.status == status.SUCCESS) ? this.renderSuccessMessage() : this.renderErrorMessage()}
@@ -62,7 +56,8 @@ class afterSaveModal extends React.Component {
 }
 
 afterSaveModal.propTypes = {
-	status: PropTypes.number.isRequired
+	status: PropTypes.number.isRequired,
+	closeModal: PropTypes.func.isRequired
 };
 
 export default afterSaveModal;
