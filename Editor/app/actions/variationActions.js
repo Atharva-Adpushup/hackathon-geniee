@@ -73,7 +73,7 @@ const getLastVariationNumber = function (variations) {
 		}
 	},
 	setActiveVariation = (variationId) => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
-	updateVariation = (variationId, payload) => ({ type: variationActions.UPDATE_VARIATION, variationId, payload });
+	updateVariation = (variationId, payload) => ({ type: variationActions.UPDATE_VARIATION, variationId, payload }),
+	editVariationName = (variationId, name) => ({ type: variationActions.EDIT_VARIATION_NAME, variationId, name });
 
-
-export { addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation };
+export { addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation, editVariationName };

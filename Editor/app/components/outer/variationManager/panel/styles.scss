@@ -54,6 +54,10 @@ $lightGrey:#ccc;
     .row {
         margin: 0 0 12px;
 
+        .row {
+            margin-bottom: 0;
+        }
+
         .bnt-block {
             width: auto;
         }
@@ -61,7 +65,7 @@ $lightGrey:#ccc;
 
     input {
         width: 100%;
-        padding: 2px 10px;
+        padding: 3.5px 10px;
         border-radius: 3px;
         border: 1px solid $lightGrey;
     }

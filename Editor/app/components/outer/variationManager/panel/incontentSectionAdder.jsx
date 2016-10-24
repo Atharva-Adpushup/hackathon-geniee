@@ -71,7 +71,7 @@ inContentAdder.propTypes = {
 };
 
 const inContentAdderForm = reduxForm({
-		form: 'cssMarginEditor' // a unique name for this form
+		form: 'incontentAdder' // a unique name for this form
 	})(inContentAdder),
 
 	mapStateToProps = (state, ownProps) => ({

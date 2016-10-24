@@ -187,3 +187,19 @@
 	text-transform:capitalize;
 	width: 100%;
 }
+
+%btn-icn {
+    font:normal normal normal 14px/1 FontAwesome;
+    color: $primaryColor;
+    background: none;
+    border: none;
+    margin: 0 10px;
+}
+
+.btn-icn-edit {
+    @extend %btn-icn;
+
+    &:before {
+        content: '\f040';
+    }
+}

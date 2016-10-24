@@ -2180,6 +2180,10 @@
 		HIDE_EDIT_MENU: 'HIDE_EDIT_MENU',
 		SHOW_EDIT_MENU: 'SHOW_EDIT_MENU'
 	},
+	    newChannelMenuActions = {
+		HIDE_NEW_CHANNEL_MENU: 'HIDE_NEW_CHANNEL_MENU',
+		SHOW_NEW_CHANNEL_MENU: 'SHOW_NEW_CHANNEL_MENU'
+	},
 	    variationActions = {
 		ADD_VARIATION: 'ADD_VARIATION',
 		COPY_VARIATION: 'COPY_VARIATION',
@@ -2187,10 +2191,12 @@
 		PAUSE_VARIATION: 'PAUSE_VARIATION',
 		RESUME_VARIATION: 'RESUME_VARIATION',
 		UPDATE_VARIATION: 'UPDATE_VARIATION',
-		SET_ACTIVE_VARIATION: 'SET_ACTIVE_VARIATION'
+		SET_ACTIVE_VARIATION: 'SET_ACTIVE_VARIATION',
+		EDIT_VARIATION_NAME: 'EDIT_VARIATION_NAME'
 	},
 	    sectionActions = {
 		CREATE_SECTION: 'CREATE_SECTION',
+		CREATE_INCONTENT_SECTION: 'CREATE_INCONTENT_SECTION',
 		DELETE_SECTION: 'DELETE_SECTION',
 		SCROLL_SECTION_TO_SCREEN: 'SCROLL_SECTION_TO_SCREEN',
 		HANDLE_ALL_XPATHS: 'HANDLE_ALL_XPATHS',
@@ -2246,6 +2252,7 @@
 	exports.adActions = adActions;
 	exports.insertMenuActions = insertMenuActions;
 	exports.editMenuActions = editMenuActions;
+	exports.newChannelMenuActions = newChannelMenuActions;
 	exports.adBoxSizeStyles = adBoxSizeStyles;
 	exports.commonSupportedSizes = commonSupportedSizes;
 	exports.variationActions = variationActions;
@@ -7678,6 +7685,9 @@
 						height: y
 					}
 				};
+			},
+			outerMenuRenderPosition: function outerMenuRenderPosition($el) {
+				return Utils.dom.getElementRelativeBounds($el);
 			},
 			menuRenderPosition: function menuRenderPosition($target, context) {
 				var contextTop = context.top,

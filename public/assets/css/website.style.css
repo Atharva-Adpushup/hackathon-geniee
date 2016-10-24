@@ -520,6 +520,16 @@ maxHeightWidth {
   text-transform: capitalize;
   width: 100%; }
 
+.btn-icn-edit {
+  font: normal normal normal 14px/1 FontAwesome;
+  color: #eb575c;
+  background: none;
+  border: none;
+  margin: 0 10px; }
+
+.btn-icn-edit:before {
+  content: '\f040'; }
+
 @-webkit-keyframes spinner {
   to {
     -webkit-transform: rotate(360deg);
@@ -2140,6 +2150,32 @@ maxHeightWidth {
   right: 70px;
   bottom: 40px;
   font-size: 14px; }
+
+.error-message {
+  display: block;
+  margin-top: 10px;
+  text-align: left;
+  font-size: 12px;
+  line-height: 14px;
+  color: #E34849; }
+  .error-message.top {
+    padding-left: 30px;
+    margin: 0 0 5px 0; }
+
+.success-message {
+  display: block;
+  margin-top: 5px;
+  text-align: left;
+  font-size: 12px;
+  line-height: 14px;
+  padding: 0 0 0 45px;
+  color: #04A506; }
+  .success-message.top {
+    padding-left: 30px;
+    margin: 0 0 5px 0; }
+  .success-message a {
+    color: #04A506;
+    text-decoration: underline; }
 
 /***************Custom label rules***************/
 .label.label--custom {

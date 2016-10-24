@@ -30,6 +30,12 @@ const variation = (state = {}, action) => {
 					sections: immutablePush(state[action.variationId].sections, action.sectionId)
 				} };
 
+			case variationActions.EDIT_VARIATION_NAME:
+				return { ...state, [action.variationId]: {
+					...state[action.variationId],
+					name: action.name
+				} };
+
 			case variationActions.DELETE_VARIATION:
 				return _.omitBy(state, { id: action.variationId });
 
