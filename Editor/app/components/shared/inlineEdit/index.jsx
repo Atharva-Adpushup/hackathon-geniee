@@ -34,8 +34,8 @@ class InlineEdit extends React.Component {
 								<input type="text" ref="editedText" placeholder="Enter Variation Name" defaultValue={this.props.text} />
 								<span className="error-message">{this.state.inputError ? this.props.errorMessage : ''}</span>
 							</Col>
-							<Col className="u-padding-r10px" xs={1}>
-								<Button onClick={this.submitValue.bind(this)} className="btn-lightBg btn-save btn-block btn btn-default"></Button>
+							<Col className="u-padding-r10px" xs={2}>
+								<Button onClick={this.submitValue.bind(this)} className="btn-lightBg btn-save btn-block btn btn-default">Save</Button>
 							</Col>
 						</Row>
 					) : (
@@ -55,7 +55,7 @@ class InlineEdit extends React.Component {
 InlineEdit.propTypes = {
 	text: PropTypes.string.isRequired,
 	submitHandler: PropTypes.func.isRequired,
-	errorMessage: PropTypes.func.isRequired
+	errorMessage: PropTypes.string.isRequired
 };
 
 InlineEdit.defaultProps = {
