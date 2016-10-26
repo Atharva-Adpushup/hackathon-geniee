@@ -3,6 +3,7 @@ import { Field, reduxForm } from 'redux-form';
 import { Row, Col, Button } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { createIcontentSection } from 'actions/sectionActions';
 
 const form = reduxForm({
 	form: 'inContentForm',
@@ -51,7 +52,6 @@ function validate(formProps) {
 
 
 class inContentForm extends React.Component {
-
 	render() {
 		const props = this.props;
 		return (
@@ -59,8 +59,8 @@ class inContentForm extends React.Component {
 				<h1 className="variation-section-heading">Variation In-content Settings</h1>
 				<Field placeholder="Please enter section" name="section" component={renderField} type="number" label="Section" />
 				<Field placeholder="Please enter minDistanceFromPrevAd" name="minDistanceFromPrevAd" component={renderField} type="number" label="minDistanceFromPrevAd" />
-				<Field placeholder="Please enter height" name="height" component={renderField} type="number" label="Height" />
 				<Field placeholder="Please enter width" name="width" component={renderField} type="number" label="Width" />
+				<Field placeholder="Please enter height" name="height" component={renderField} type="number" label="Height" />
 				<Col xs={6} className="u-padding-r10px">
 					<Row>
 						<Col xs={6} className="u-padding-r10px">
@@ -94,16 +94,24 @@ const mapStateToProps = (state, ownProps) => ({
 		...ownProps,
 		initialValues: {
 			section: 2,
-			float: 'left',
+			float: 'none',
 			minDistanceFromPrevAd: 200,
-			height: 320,
-			width: 180
+			width: 320,
+			height: 180
 		}
 	}),
 
-	mapDispatchToProps = (dispatch) => ({
+	mapDispatchToProps = (dispatch, ownProps) => ({
 		onSubmit: (values) => {
-			console.log(values);
+			dispatch(createIcontentSection({
+				sectionNo: values.section,
+				minDistanceFromPrevAd: values.minDistanceFromPrevAd,
+				float: values.float
+			}, {
+				width: values.width,
+				height: values.height,
+				css: values.css ? values.css : undefined
+			}, ownProps.variation.id));
 		}
 	});
 

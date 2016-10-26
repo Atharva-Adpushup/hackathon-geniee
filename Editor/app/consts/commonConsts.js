@@ -200,7 +200,9 @@ const status = {
 			sizes: []
 		}
 	],
-	defaultSectionCss = { 'margin-left': 'auto', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px', clear: 'both' };
+	defaultSectionCss = { 'margin-left': 'auto', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px', clear: 'both' },
+	leftSectionCss = { 'margin-left': '0px', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px', clear: 'both' },
+	rightSectionCss = { 'margin-left': 'auto', 'margin-right': '0px', 'margin-top': '0px', 'margin-bottom': '0px', clear: 'both' };
 
 export {
 	status, proxy, stores, adTypes, messengerCommands, siteModes,
@@ -208,6 +210,6 @@ export {
 	insertMenuActions, editMenuActions, newChannelMenuActions,
 	adBoxSizeStyles, commonSupportedSizes, variationActions,
 	hbBoxActions, innerVariationActions, innerActions,
-	defaultSectionCss
+	defaultSectionCss, leftSectionCss, rightSectionCss
 };
 
