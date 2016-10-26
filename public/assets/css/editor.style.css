@@ -3569,21 +3569,19 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   padding-right: 50px; }
 
 .variation-adder {
-  font-size: 1.4em;
-  padding: 9.5px 15px;
-  border-radius: 50%;
+  display: inline-block;
+  padding: 8.5px 25px;
   background: #eb575c;
   color: #fff;
-  position: absolute;
-  right: 25px;
-  top: -22px;
-  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.42);
+  text-transform: uppercase;
   -webkit-transition: all 0.12s ease-in-out;
   -khtml-transition: all 0.12s ease-in-out;
   -moz-transition: all 0.12s ease-in-out;
   -ms-transition: all 0.12s ease-in-out;
   -o-transition: all 0.12s ease-in-out;
   transition: all 0.12s ease-in-out; }
+  .variation-adder i {
+    margin-left: 4px; }
   .variation-adder:hover {
     background-color: #cf474b;
     cursor: pointer; }

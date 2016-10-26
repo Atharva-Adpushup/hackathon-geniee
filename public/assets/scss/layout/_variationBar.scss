@@ -28,16 +28,16 @@
 }
 
 .variation-adder {
-    font-size: 1.4em;
-    padding: 9.5px 15px;
-    border-radius: 50%;
+    display: inline-block;
+    padding: 8.5px 25px;
     background: $primaryColor;
     color: $whiteColor;
-    position: absolute;
-    right: 25px;
-    top: -22px;
-    box-shadow: 2px 3px 5px rgba(0,0,0,.42);
+    text-transform: uppercase;
     @include css3-prefix(transition, all .12s ease-in-out);
+
+    i {
+         margin-left: 4px;
+    }
 
     &:hover {
         background-color: $primaryColorDark;

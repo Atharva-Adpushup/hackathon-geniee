@@ -26,7 +26,8 @@ const sectionByIds = (state = {}, action) => {
 					name: payload.name,
 					ads: payload.ads,
 					isIncontent: true,
-					adPayload: action.adPayload
+					adPayload: action.adPayload,
+					float: payload.float
 				}
 			};
 

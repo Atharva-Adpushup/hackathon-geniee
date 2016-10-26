@@ -109,8 +109,7 @@ const mapStateToProps = (state, ownProps) => ({
 				float: values.float
 			}, {
 				width: values.width,
-				height: values.height,
-				css: values.css ? values.css : undefined
+				height: values.height
 			}, ownProps.variation.id));
 		}
 	});
