@@ -1,0 +1,17 @@
+{
+  "name": "adpushupGeniee",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "mobile-detect": "^1.3.3",
+    "jquery": "1.11.2"
+  },
+  "scripts": {
+    "eslint": "eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^3.7.1",
+    "eslint-config-airbnb-es5": "^1.0.9",
+    "webpack": "^1.13.2"
+  }
+}
