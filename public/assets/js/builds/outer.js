@@ -5810,7 +5810,38 @@
 /* 164 */,
 /* 165 */,
 /* 166 */,
-/* 167 */,
+/* 167 */
+/***/ function(module, exports) {
+
+	/**
+	 * A specialized version of `_.reduce` for arrays without support for
+	 * iteratee shorthands.
+	 *
+	 * @private
+	 * @param {Array} [array] The array to iterate over.
+	 * @param {Function} iteratee The function invoked per iteration.
+	 * @param {*} [accumulator] The initial value.
+	 * @param {boolean} [initAccum] Specify using the first element of `array` as
+	 *  the initial value.
+	 * @returns {*} Returns the accumulated value.
+	 */
+	function arrayReduce(array, iteratee, accumulator, initAccum) {
+	  var index = -1,
+	      length = array ? array.length : 0;
+
+	  if (initAccum && length) {
+	    accumulator = array[++index];
+	  }
+	  while (++index < length) {
+	    accumulator = iteratee(accumulator, array[index], index, array);
+	  }
+	  return accumulator;
+	}
+
+	module.exports = arrayReduce;
+
+
+/***/ },
 /* 168 */,
 /* 169 */,
 /* 170 */,
@@ -8260,6 +8291,10 @@
 	});
 	exports.afterSaveLoaderStatusFailed = exports.afterSaveLoaderStatusSuccess = exports.masterSaveData = exports.afterSaveLoaderStatusPending = exports.afterSaveLoaderStatusReset = undefined;
 
+	var _cloneDeep2 = __webpack_require__(676);
+
+	var _cloneDeep3 = _interopRequireDefault(_cloneDeep2);
+
 	var _commonConsts = __webpack_require__(33);
 
 	var _dataSyncService = __webpack_require__(222);
@@ -8312,7 +8347,7 @@
 			// 	// console.log('In Progress state...');
 			// });
 
-			var paramData = (0, _siteSelectors.getFinalJson)(getState());
+			var paramData = (0, _siteSelectors.getFinalJson)((0, _cloneDeep3.default)(getState()));
 			return (0, _dataSyncService.masterSave)(paramData).then(function () {
 				dispatch({
 					type: _commonConsts.status.text.SUCCESS
@@ -8359,6 +8394,14 @@
 	});
 	exports.loadInitialData = exports.isApInstalled = exports.changeSiteMode = exports.masterSave = undefined;
 
+	var _keys2 = __webpack_require__(46);
+
+	var _keys3 = _interopRequireDefault(_keys2);
+
+	var _forOwn2 = __webpack_require__(697);
+
+	var _forOwn3 = _interopRequireDefault(_forOwn2);
+
 	var _jquery = __webpack_require__(29);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
@@ -8380,10 +8423,13 @@
 			return !!response.success;
 		});
 	},
-	    loadInitialData = function loadInitialData(siteId) {
+
+
+	/***TODO: Optimise and reduce below function***/
+	loadInitialData = function loadInitialData(siteId) {
 		var deferred = _jquery2.default.Deferred(),
 		    testNormalizr = function testNormalizr() {
-			var dummyData = [{ "id": "test2", "channelName": "TEST2", "siteDomain": "http://www.articlemyriad.com", "platform": "DESKTOP", "pageGroup": "POST", "sampleUrl": "http://www.articlemyriad.com/character-divine-influence-iliad-aeneid-role-gods-fate/", "variations": [], "isOpen": false, "isLoading": true, "contentSelector": ".post-content", "contentSelectorMissing": false, "activeVariation": null }, { "id": "test", "channelName": "TEST", "siteDomain": "http://www.articlemyriad.com", "platform": "DESKTOP", "pageGroup": "POST", "sampleUrl": "http://www.articlemyriad.com/character-divine-influence-iliad-aeneid-role-gods-fate/", "variations": [{ "id": "c6b9150f-5d91-4093-ac85-a219394a8a1d", "name": "Var-1", "createTs": 1477321144, "customJs": { "beforeAp": null, "afterAp": null }, "sections": [{ "id": "521bd708-2e09-44fe-9978-cdd0de9bba56", "xpath": ".breadcrumb", "operation": "Append", "name": "Section-521bd708-2e09-44fe-9978-cdd0de9bba56", "allXpaths": [], "ads": [{ "id": "8b8f283f-fa60-4888-afb4-0e538d209622", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 280, "width": 336 }] }, { "id": "07c51fad-50bb-4dd0-a24d-2eee61e24c15", "xpath": "#searchform > div:eq(0)", "operation": "Append", "name": "Section-07c51fad-50bb-4dd0-a24d-2eee61e24c15", "allXpaths": [], "ads": [] }, { "id": "793810f6-3a6c-4dbf-aa5d-1aff6211990f", "xpath": ".search_section_bottom", "operation": "Insert After", "name": "Section-793810f6-3a6c-4dbf-aa5d-1aff6211990f", "allXpaths": [], "ads": [{ "id": "05030f67-401c-4b60-90c7-182a9652d1e8", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 250, "width": 250 }] }, { "id": "82416f37-6fc3-4f1b-89ea-d3b8eb3c5344", "xpath": ".header", "operation": "Insert After", "name": "Section-82416f37-6fc3-4f1b-89ea-d3b8eb3c5344", "allXpaths": [], "ads": [{ "id": "c4af875a-ff48-459e-a4d0-9c5fcbedb18f", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 250, "width": 300 }] }] }, { "id": "7c5829c8-f20a-4251-b97c-cf8db174a50f", "name": "Var-2", "createTs": 1477321233, "customJs": { "beforeAp": null, "afterAp": null }, "sections": [{ "id": "d352212d-9c50-42c6-9c73-15cf74a42beb", "xpath": "[id^=post_]:eq(0)", "operation": "Insert Before", "name": "Section-d352212d-9c50-42c6-9c73-15cf74a42beb", "allXpaths": [], "ads": [{ "id": "d731bb67-e15a-4cbf-83da-d9debf213cbf", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 200, "width": 200 }] }] }, { "id": "92d8e601-4310-4fbc-b184-602dc0160ff8", "name": "Variation 1", "createTs": 1477321279, "customJs": { "beforeAp": null, "afterAp": null }, "sections": [] }, { "id": "232cdf0a-4c32-475e-b763-f6de8af1940c", "name": "Var-3", "createTs": 1477321323, "customJs": { "beforeAp": null, "afterAp": null }, "sections": [] }], "isOpen": true, "isLoading": false, "contentSelector": ".post-content", "contentSelectorMissing": false, "activeVariation": "232cdf0a-4c32-475e-b763-f6de8af1940c" }],
+			var dummyData = [{ "id": "test2", "channelName": "TEST2", "siteDomain": "http://www.articlemyriad.com", "platform": "DESKTOP", "pageGroup": "POST", "sampleUrl": "http://www.articlemyriad.com/character-divine-influence-iliad-aeneid-role-gods-fate/", "variations": {}, "isOpen": false, "isLoading": true, "contentSelector": ".post-content", "contentSelectorMissing": false, "activeVariation": null }, { "id": "test", "channelName": "TEST", "siteDomain": "http://www.articlemyriad.com", "platform": "DESKTOP", "pageGroup": "POST", "sampleUrl": "http://www.articlemyriad.com/character-divine-influence-iliad-aeneid-role-gods-fate/", "variations": { "c6b9150f-5d91-4093-ac85-a219394a8a1d": { "id": "c6b9150f-5d91-4093-ac85-a219394a8a1d", "name": "Var-1", "createTs": 1477321144, "customJs": { "beforeAp": null, "afterAp": null }, "sections": { "521bd708-2e09-44fe-9978-cdd0de9bba56": { "id": "521bd708-2e09-44fe-9978-cdd0de9bba56", "xpath": ".breadcrumb", "operation": "Append", "name": "Section-521bd708-2e09-44fe-9978-cdd0de9bba56", "allXpaths": [], "ads": { "8b8f283f-fa60-4888-afb4-0e538d209622": { "id": "8b8f283f-fa60-4888-afb4-0e538d209622", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 280, "width": 336 }, "05030f67-401c-4b60-90c7-182a9652d1e8": { "id": "05030f67-401c-4b60-90c7-182a9652d1e8", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 250, "width": 250 }, "c4af875a-ff48-459e-a4d0-9c5fcbedb18f": { "id": "c4af875a-ff48-459e-a4d0-9c5fcbedb18f", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 250, "width": 300 } } }, "07c51fad-50bb-4dd0-a24d-2eee61e24c15": { "id": "07c51fad-50bb-4dd0-a24d-2eee61e24c15", "xpath": "#searchform > div:eq(0)", "operation": "Append", "name": "Section-07c51fad-50bb-4dd0-a24d-2eee61e24c15", "allXpaths": [], "ads": { "8b8f283f-fa60-4888-afb4-0e538d209622": { "id": "8b8f283f-fa60-4888-afb4-0e538d209622", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 280, "width": 336 }, "05030f67-401c-4b60-90c7-182a9652d1e8": { "id": "05030f67-401c-4b60-90c7-182a9652d1e8", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 250, "width": 250 }, "c4af875a-ff48-459e-a4d0-9c5fcbedb18f": { "id": "c4af875a-ff48-459e-a4d0-9c5fcbedb18f", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 250, "width": 300 } } }, "793810f6-3a6c-4dbf-aa5d-1aff6211990f": { "id": "793810f6-3a6c-4dbf-aa5d-1aff6211990f", "xpath": ".search_section_bottom", "operation": "Insert After", "name": "Section-793810f6-3a6c-4dbf-aa5d-1aff6211990f", "allXpaths": [], "ads": { "8b8f283f-fa60-4888-afb4-0e538d209622": { "id": "8b8f283f-fa60-4888-afb4-0e538d209622", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 280, "width": 336 }, "05030f67-401c-4b60-90c7-182a9652d1e8": { "id": "05030f67-401c-4b60-90c7-182a9652d1e8", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 250, "width": 250 }, "c4af875a-ff48-459e-a4d0-9c5fcbedb18f": { "id": "c4af875a-ff48-459e-a4d0-9c5fcbedb18f", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 250, "width": 300 } } }, "82416f37-6fc3-4f1b-89ea-d3b8eb3c5344": { "id": "82416f37-6fc3-4f1b-89ea-d3b8eb3c5344", "xpath": ".header", "operation": "Insert After", "name": "Section-82416f37-6fc3-4f1b-89ea-d3b8eb3c5344", "allXpaths": [], "ads": { "8b8f283f-fa60-4888-afb4-0e538d209622": { "id": "8b8f283f-fa60-4888-afb4-0e538d209622", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 280, "width": 336 }, "05030f67-401c-4b60-90c7-182a9652d1e8": { "id": "05030f67-401c-4b60-90c7-182a9652d1e8", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 250, "width": 250 }, "c4af875a-ff48-459e-a4d0-9c5fcbedb18f": { "id": "c4af875a-ff48-459e-a4d0-9c5fcbedb18f", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 250, "width": 300 } } } } }, "7c5829c8-f20a-4251-b97c-cf8db174a50f": { "id": "7c5829c8-f20a-4251-b97c-cf8db174a50f", "name": "Var-2", "createTs": 1477321233, "customJs": { "beforeAp": null, "afterAp": null }, "sections": { "d352212d-9c50-42c6-9c73-15cf74a42beb": { "id": "d352212d-9c50-42c6-9c73-15cf74a42beb", "xpath": "[id^=post_]:eq(0)", "operation": "Insert Before", "name": "Section-d352212d-9c50-42c6-9c73-15cf74a42beb", "allXpaths": [], "ads": { "d731bb67-e15a-4cbf-83da-d9debf213cbf": { "id": "d731bb67-e15a-4cbf-83da-d9debf213cbf", "css": { "margin-left": "auto", "margin-right": "auto", "margin-top": "0px", "margin-bottom": "0px", "clear": "both" }, "height": 200, "width": 200 } } } } }, "92d8e601-4310-4fbc-b184-602dc0160ff8": { "id": "92d8e601-4310-4fbc-b184-602dc0160ff8", "name": "Variation 1", "createTs": 1477321279, "customJs": { "beforeAp": null, "afterAp": null }, "sections": {} }, "232cdf0a-4c32-475e-b763-f6de8af1940c": { "id": "232cdf0a-4c32-475e-b763-f6de8af1940c", "name": "Var-3", "createTs": 1477321323, "customJs": { "beforeAp": null, "afterAp": null }, "sections": {} } }, "isOpen": true, "isLoading": false, "contentSelector": ".post-content", "contentSelectorMissing": false, "activeVariation": "232cdf0a-4c32-475e-b763-f6de8af1940c" }],
 			    testData = localStorage.getItem('siteData') ? JSON.parse(localStorage.getItem('siteData')) : dummyData,
 			    result = (0, _normalizr.normalize)(testData, (0, _normalizr.arrayOf)(_site.channelSchema)),
 			    computedResult = _jquery2.default.extend(true, {}, result.entities);
@@ -8394,11 +8440,28 @@
 				byIds: _jquery2.default.extend(true, {}, result.entities.channelData)
 			};
 
+			// Compute active channel
 			Object.keys(computedResult.channelData.byIds).forEach(function (channelKey) {
 				activeChannel = computedResult.channelData.byIds[channelKey].activeVariation ? channelKey : null;
 			});
-
+			// Set active channel
 			computedResult.channelData.activeChannel = activeChannel;
+
+			// Change 'variations' keys object to keys array
+			(0, _forOwn3.default)(computedResult.channelData.byIds, function (chnlData, channelName) {
+				computedResult.channelData.byIds[channelName].variations = (0, _keys3.default)(computedResult.channelData.byIds[channelName].variations);
+			});
+
+			// Change 'sections' keys object to keys array
+			(0, _forOwn3.default)(computedResult.variationByIds, function (variationData, variationName) {
+				computedResult.variationByIds[variationName].sections = (0, _keys3.default)(computedResult.variationByIds[variationName].sections);
+			});
+
+			// Change 'ads' keys object to keys array
+			(0, _forOwn3.default)(computedResult.sectionByIds, function (sectionData, sectionName) {
+				computedResult.sectionByIds[sectionName].ads = (0, _keys3.default)(computedResult.sectionByIds[sectionName].ads);
+			});
+
 			return computedResult;
 		},
 		    json = testNormalizr();
@@ -8820,20 +8883,26 @@
 	var _normalizr = __webpack_require__(223);
 
 	var channelSchema = new _normalizr.Schema('channelData', { idAttribute: 'id' }),
-	    variationSchema = new _normalizr.Schema('variationByIds', { idAttribute: 'id' }),
-	    sectionSchema = new _normalizr.Schema('sectionByIds', { idAttribute: 'id' }),
-	    adSchema = new _normalizr.Schema('adByIds', { idAttribute: 'id' });
+	    variationSchema = new _normalizr.Schema('variationByIds'),
+	    sectionSchema = new _normalizr.Schema('sectionByIds'),
+	    adSchema = new _normalizr.Schema('adByIds');
 
+	//TODO: Find a way to change 'variations' type from {} to []
+	// after normalization
 	channelSchema.define({
-		variations: (0, _normalizr.arrayOf)(variationSchema)
+		variations: (0, _normalizr.valuesOf)(variationSchema)
 	});
 
+	//TODO: Find a way to change 'sections' type from {} to []
+	// after normalization
 	variationSchema.define({
-		sections: (0, _normalizr.arrayOf)(sectionSchema)
+		sections: (0, _normalizr.valuesOf)(sectionSchema)
 	});
 
+	//TODO: Find a way to change 'ads' type from {} to []
+	// after normalization
 	sectionSchema.define({
-		ads: (0, _normalizr.arrayOf)(adSchema)
+		ads: (0, _normalizr.valuesOf)(adSchema)
 	});
 
 	exports.channelSchema = channelSchema;
@@ -8849,11 +8918,13 @@
 	});
 	exports.getFinalJson = exports.getAfterSaveLoaderState = undefined;
 
+	var _forEach2 = __webpack_require__(176);
+
+	var _forEach3 = _interopRequireDefault(_forEach2);
+
 	var _map2 = __webpack_require__(180);
 
 	var _map3 = _interopRequireDefault(_map2);
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	var _reselect = __webpack_require__(216);
 
@@ -8876,20 +8947,28 @@
 		var allSections = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 		var allAds = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 		return (0, _map3.default)(allChannels, function (channel) {
-			var channelVariations = (0, _map3.default)(channel.variations, function (variationId) {
-				return allVariations[variationId];
-			});
-			return _extends({}, channel, {
-				variations: (0, _map3.default)(channelVariations, function (variation) {
-					var sections = (0, _map3.default)(variation.sections, function (sectionId) {
-						return allSections[sectionId];
+			var channelVariations = {};
+
+			(0, _forEach3.default)(channel.variations, function (variationId) {
+				var sections = {},
+				    ads = {};
+
+				channelVariations[variationId] = allVariations[variationId];
+
+				(0, _forEach3.default)(channelVariations[variationId].sections, function (sectionId) {
+					sections[sectionId] = allSections[sectionId];
+
+					(0, _forEach3.default)(sections[sectionId].ads, function (sectionAdId) {
+						ads[sectionAdId] = allAds[sectionAdId];
 					});
-					return _extends({}, variation, { sections: (0, _map3.default)(sections, function (section) {
-							return _extends({}, section, { ads: (0, _map3.default)(section.ads, function (sectionAdId) {
-									return allAds[sectionAdId];
-								}) });
-						}) });
-				}) });
+
+					sections[sectionId].ads = ads;
+				});
+				channelVariations[variationId].sections = sections;
+			});
+
+			channel.variations = channelVariations;
+			return channel;
 		});
 	});
 
@@ -34503,9 +34582,9 @@
 					_react2.default.createElement(
 						'h1',
 						{ className: 'variation-section-heading' },
-						'Variation In-content Settings'
+						'Add Incontent Variation'
 					),
-					_react2.default.createElement(_reduxForm.Field, { placeholder: 'Please enter section', name: 'section', component: renderField, type: 'number', label: 'Section' }),
+					_react2.default.createElement(_reduxForm.Field, { placeholder: 'Please enter section', name: 'section', component: renderField, type: 'number', label: 'Section No' }),
 					_react2.default.createElement(_reduxForm.Field, { placeholder: 'Please enter minDistanceFromPrevAd', name: 'minDistanceFromPrevAd', component: renderField, type: 'number', label: 'minDistanceFromPrevAd' }),
 					_react2.default.createElement(_reduxForm.Field, { placeholder: 'Please enter width', name: 'width', component: renderField, type: 'number', label: 'Width' }),
 					_react2.default.createElement(_reduxForm.Field, { placeholder: 'Please enter height', name: 'height', component: renderField, type: 'number', label: 'Height' }),
@@ -34587,7 +34666,7 @@
 	    mapDispatchToProps = function mapDispatchToProps(dispatch, ownProps) {
 		return {
 			onSubmit: function onSubmit(values) {
-				dispatch((0, _sectionActions.createIcontentSection)({
+				dispatch((0, _sectionActions.createIncontentSection)({
 					sectionNo: values.section,
 					minDistanceFromPrevAd: values.minDistanceFromPrevAd,
 					float: values.float
@@ -40104,7 +40183,15 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.createIcontentSection = exports.renameSection = exports.deleteSection = exports.createSection = undefined;
+	exports.createIncontentSection = exports.renameSection = exports.deleteSection = exports.createSection = undefined;
+
+	var _find2 = __webpack_require__(212);
+
+	var _find3 = _interopRequireDefault(_find2);
+
+	var _map2 = __webpack_require__(180);
+
+	var _map3 = _interopRequireDefault(_map2);
 
 	var _commonConsts = __webpack_require__(33);
 
@@ -40126,18 +40213,29 @@
 			variationId: variationId
 		};
 	},
-	    createIcontentSection = function createIcontentSection(sectionPayload, adPayload, variationId) {
-		var adId = _utils2.default.getRandomNumber(),
-		    sectionId = _utils2.default.getRandomNumber(),
-		    float = sectionPayload.float,
-		    css = float !== 'none' ? float === 'left' ? _commonConsts.leftSectionCss : _commonConsts.rightSectionCss : _commonConsts.defaultSectionCss;
-		return {
-			type: _commonConsts.sectionActions.CREATE_INCONTENT_SECTION,
-			adPayload: Object.assign(adPayload, { id: adId, css: css, createTs: Math.floor(Date.now() / 1000), defaultCss: float !== 'none' ? _commonConsts.defaultSectionCss : undefined }),
-			sectionPayload: Object.assign(sectionPayload, { id: sectionId, name: 'Section-' + sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
-			sectionId: sectionId,
-			adId: adId,
-			variationId: variationId
+	    createIncontentSection = function createIncontentSection(sectionPayload, adPayload, variationId) {
+		return function (dispatch, getState) {
+			var state = getState(),
+			    arr = (0, _map3.default)(state.sectionByIds, function (data) {
+				return data;
+			});
+			if ((0, _find3.default)(arr, { sectionNo: sectionPayload.sectionNo })) {
+				alert('Cannot create in content section with same section no.');
+				return;
+			}
+
+			var adId = _utils2.default.getRandomNumber(),
+			    sectionId = _utils2.default.getRandomNumber(),
+			    float = sectionPayload.float,
+			    css = float !== 'none' ? float === 'left' ? _commonConsts.leftSectionCss : _commonConsts.rightSectionCss : _commonConsts.defaultSectionCss;
+			dispatch({
+				type: _commonConsts.sectionActions.CREATE_INCONTENT_SECTION,
+				adPayload: Object.assign(adPayload, { id: adId, css: css, createTs: Math.floor(Date.now() / 1000), secondaryCss: float !== 'none' ? _commonConsts.defaultSectionCss : undefined }),
+				sectionPayload: Object.assign(sectionPayload, { id: sectionId, name: 'Section-' + sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
+				sectionId: sectionId,
+				adId: adId,
+				variationId: variationId
+			});
 		};
 	},
 	    deleteSection = function deleteSection(sectionId) {
@@ -40157,7 +40255,7 @@
 	exports.createSection = createSection;
 	exports.deleteSection = deleteSection;
 	exports.renameSection = renameSection;
-	exports.createIcontentSection = createIcontentSection;
+	exports.createIncontentSection = createIncontentSection;
 
 /***/ },
 /* 612 */
@@ -53033,11 +53131,13 @@
 		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 		var action = arguments[1];
 
+		var payload = void 0;
+
 		var _ret = function () {
 			switch (action.type) {
 				case _commonConsts.sectionActions.CREATE_SECTION:
 				case _commonConsts.adActions.CREATE_AD:
-					var payload = action.adPayload ? action.adPayload : action.payload;
+					payload = action.adPayload ? action.adPayload : action.payload;
 					return {
 						v: _extends({}, state, _defineProperty({}, payload.id, {
 							id: payload.id,
@@ -53045,6 +53145,18 @@
 							css: payload.css,
 							height: payload.height,
 							width: payload.width
+						}))
+					};
+
+				case _commonConsts.sectionActions.CREATE_INCONTENT_SECTION:
+					payload = action.adPayload;
+					return {
+						v: _extends({}, state, _defineProperty({}, payload.id, {
+							id: payload.id,
+							width: payload.width,
+							height: payload.height,
+							css: payload.css,
+							secondaryCss: payload.secondaryCss
 						}))
 					};
 
@@ -53139,8 +53251,8 @@
 							name: payload.name,
 							ads: payload.ads,
 							isIncontent: true,
-							adPayload: action.adPayload,
-							float: payload.float
+							float: payload.float,
+							sectionNo: payload.sectionNo
 						}))
 					};
 
@@ -53450,6 +53562,791 @@
 	};
 
 	exports.default = unloadHandler;
+
+/***/ },
+/* 675 */,
+/* 676 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var baseClone = __webpack_require__(677);
+
+	/**
+	 * This method is like `_.clone` except that it recursively clones `value`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 1.0.0
+	 * @category Lang
+	 * @param {*} value The value to recursively clone.
+	 * @returns {*} Returns the deep cloned value.
+	 * @see _.clone
+	 * @example
+	 *
+	 * var objects = [{ 'a': 1 }, { 'b': 2 }];
+	 *
+	 * var deep = _.cloneDeep(objects);
+	 * console.log(deep[0] === objects[0]);
+	 * // => false
+	 */
+	function cloneDeep(value) {
+	  return baseClone(value, true, true);
+	}
+
+	module.exports = cloneDeep;
+
+
+/***/ },
+/* 677 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Stack = __webpack_require__(72),
+	    arrayEach = __webpack_require__(177),
+	    assignValue = __webpack_require__(678),
+	    baseAssign = __webpack_require__(679),
+	    cloneBuffer = __webpack_require__(681),
+	    copyArray = __webpack_require__(555),
+	    copySymbols = __webpack_require__(682),
+	    getAllKeys = __webpack_require__(683),
+	    getTag = __webpack_require__(122),
+	    initCloneArray = __webpack_require__(684),
+	    initCloneByTag = __webpack_require__(685),
+	    initCloneObject = __webpack_require__(695),
+	    isArray = __webpack_require__(51),
+	    isBuffer = __webpack_require__(52),
+	    isObject = __webpack_require__(67),
+	    keys = __webpack_require__(46);
+
+	/** `Object#toString` result references. */
+	var argsTag = '[object Arguments]',
+	    arrayTag = '[object Array]',
+	    boolTag = '[object Boolean]',
+	    dateTag = '[object Date]',
+	    errorTag = '[object Error]',
+	    funcTag = '[object Function]',
+	    genTag = '[object GeneratorFunction]',
+	    mapTag = '[object Map]',
+	    numberTag = '[object Number]',
+	    objectTag = '[object Object]',
+	    regexpTag = '[object RegExp]',
+	    setTag = '[object Set]',
+	    stringTag = '[object String]',
+	    symbolTag = '[object Symbol]',
+	    weakMapTag = '[object WeakMap]';
+
+	var arrayBufferTag = '[object ArrayBuffer]',
+	    dataViewTag = '[object DataView]',
+	    float32Tag = '[object Float32Array]',
+	    float64Tag = '[object Float64Array]',
+	    int8Tag = '[object Int8Array]',
+	    int16Tag = '[object Int16Array]',
+	    int32Tag = '[object Int32Array]',
+	    uint8Tag = '[object Uint8Array]',
+	    uint8ClampedTag = '[object Uint8ClampedArray]',
+	    uint16Tag = '[object Uint16Array]',
+	    uint32Tag = '[object Uint32Array]';
+
+	/** Used to identify `toStringTag` values supported by `_.clone`. */
+	var cloneableTags = {};
+	cloneableTags[argsTag] = cloneableTags[arrayTag] =
+	cloneableTags[arrayBufferTag] = cloneableTags[dataViewTag] =
+	cloneableTags[boolTag] = cloneableTags[dateTag] =
+	cloneableTags[float32Tag] = cloneableTags[float64Tag] =
+	cloneableTags[int8Tag] = cloneableTags[int16Tag] =
+	cloneableTags[int32Tag] = cloneableTags[mapTag] =
+	cloneableTags[numberTag] = cloneableTags[objectTag] =
+	cloneableTags[regexpTag] = cloneableTags[setTag] =
+	cloneableTags[stringTag] = cloneableTags[symbolTag] =
+	cloneableTags[uint8Tag] = cloneableTags[uint8ClampedTag] =
+	cloneableTags[uint16Tag] = cloneableTags[uint32Tag] = true;
+	cloneableTags[errorTag] = cloneableTags[funcTag] =
+	cloneableTags[weakMapTag] = false;
+
+	/**
+	 * The base implementation of `_.clone` and `_.cloneDeep` which tracks
+	 * traversed objects.
+	 *
+	 * @private
+	 * @param {*} value The value to clone.
+	 * @param {boolean} [isDeep] Specify a deep clone.
+	 * @param {boolean} [isFull] Specify a clone including symbols.
+	 * @param {Function} [customizer] The function to customize cloning.
+	 * @param {string} [key] The key of `value`.
+	 * @param {Object} [object] The parent object of `value`.
+	 * @param {Object} [stack] Tracks traversed objects and their clone counterparts.
+	 * @returns {*} Returns the cloned value.
+	 */
+	function baseClone(value, isDeep, isFull, customizer, key, object, stack) {
+	  var result;
+	  if (customizer) {
+	    result = object ? customizer(value, key, object, stack) : customizer(value);
+	  }
+	  if (result !== undefined) {
+	    return result;
+	  }
+	  if (!isObject(value)) {
+	    return value;
+	  }
+	  var isArr = isArray(value);
+	  if (isArr) {
+	    result = initCloneArray(value);
+	    if (!isDeep) {
+	      return copyArray(value, result);
+	    }
+	  } else {
+	    var tag = getTag(value),
+	        isFunc = tag == funcTag || tag == genTag;
+
+	    if (isBuffer(value)) {
+	      return cloneBuffer(value, isDeep);
+	    }
+	    if (tag == objectTag || tag == argsTag || (isFunc && !object)) {
+	      result = initCloneObject(isFunc ? {} : value);
+	      if (!isDeep) {
+	        return copySymbols(value, baseAssign(result, value));
+	      }
+	    } else {
+	      if (!cloneableTags[tag]) {
+	        return object ? value : {};
+	      }
+	      result = initCloneByTag(value, tag, baseClone, isDeep);
+	    }
+	  }
+	  // Check for circular references and return its corresponding clone.
+	  stack || (stack = new Stack);
+	  var stacked = stack.get(value);
+	  if (stacked) {
+	    return stacked;
+	  }
+	  stack.set(value, result);
+
+	  var props = isArr ? undefined : (isFull ? getAllKeys : keys)(value);
+	  arrayEach(props || value, function(subValue, key) {
+	    if (props) {
+	      key = subValue;
+	      subValue = value[key];
+	    }
+	    // Recursively populate clone (susceptible to call stack limits).
+	    assignValue(result, key, baseClone(subValue, isDeep, isFull, customizer, key, value, stack));
+	  });
+	  return result;
+	}
+
+	module.exports = baseClone;
+
+
+/***/ },
+/* 678 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var baseAssignValue = __webpack_require__(558),
+	    eq = __webpack_require__(77);
+
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
+	/**
+	 * Assigns `value` to `key` of `object` if the existing value is not equivalent
+	 * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+	 * for equality comparisons.
+	 *
+	 * @private
+	 * @param {Object} object The object to modify.
+	 * @param {string} key The key of the property to assign.
+	 * @param {*} value The value to assign.
+	 */
+	function assignValue(object, key, value) {
+	  var objValue = object[key];
+	  if (!(hasOwnProperty.call(object, key) && eq(objValue, value)) ||
+	      (value === undefined && !(key in object))) {
+	    baseAssignValue(object, key, value);
+	  }
+	}
+
+	module.exports = assignValue;
+
+
+/***/ },
+/* 679 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var copyObject = __webpack_require__(680),
+	    keys = __webpack_require__(46);
+
+	/**
+	 * The base implementation of `_.assign` without support for multiple sources
+	 * or `customizer` functions.
+	 *
+	 * @private
+	 * @param {Object} object The destination object.
+	 * @param {Object} source The source object.
+	 * @returns {Object} Returns `object`.
+	 */
+	function baseAssign(object, source) {
+	  return object && copyObject(source, keys(source), object);
+	}
+
+	module.exports = baseAssign;
+
+
+/***/ },
+/* 680 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var assignValue = __webpack_require__(678),
+	    baseAssignValue = __webpack_require__(558);
+
+	/**
+	 * Copies properties of `source` to `object`.
+	 *
+	 * @private
+	 * @param {Object} source The object to copy properties from.
+	 * @param {Array} props The property identifiers to copy.
+	 * @param {Object} [object={}] The object to copy properties to.
+	 * @param {Function} [customizer] The function to customize copied values.
+	 * @returns {Object} Returns `object`.
+	 */
+	function copyObject(source, props, object, customizer) {
+	  var isNew = !object;
+	  object || (object = {});
+
+	  var index = -1,
+	      length = props.length;
+
+	  while (++index < length) {
+	    var key = props[index];
+
+	    var newValue = customizer
+	      ? customizer(object[key], source[key], key, object, source)
+	      : undefined;
+
+	    if (newValue === undefined) {
+	      newValue = source[key];
+	    }
+	    if (isNew) {
+	      baseAssignValue(object, key, newValue);
+	    } else {
+	      assignValue(object, key, newValue);
+	    }
+	  }
+	  return object;
+	}
+
+	module.exports = copyObject;
+
+
+/***/ },
+/* 681 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(module) {var root = __webpack_require__(53);
+
+	/** Detect free variable `exports`. */
+	var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+
+	/** Detect free variable `module`. */
+	var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
+
+	/** Detect the popular CommonJS extension `module.exports`. */
+	var moduleExports = freeModule && freeModule.exports === freeExports;
+
+	/** Built-in value references. */
+	var Buffer = moduleExports ? root.Buffer : undefined,
+	    allocUnsafe = Buffer ? Buffer.allocUnsafe : undefined;
+
+	/**
+	 * Creates a clone of  `buffer`.
+	 *
+	 * @private
+	 * @param {Buffer} buffer The buffer to clone.
+	 * @param {boolean} [isDeep] Specify a deep clone.
+	 * @returns {Buffer} Returns the cloned buffer.
+	 */
+	function cloneBuffer(buffer, isDeep) {
+	  if (isDeep) {
+	    return buffer.slice();
+	  }
+	  var length = buffer.length,
+	      result = allocUnsafe ? allocUnsafe(length) : new buffer.constructor(length);
+
+	  buffer.copy(result);
+	  return result;
+	}
+
+	module.exports = cloneBuffer;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20)(module)))
+
+/***/ },
+/* 682 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var copyObject = __webpack_require__(680),
+	    getSymbols = __webpack_require__(662);
+
+	/**
+	 * Copies own symbol properties of `source` to `object`.
+	 *
+	 * @private
+	 * @param {Object} source The object to copy symbols from.
+	 * @param {Object} [object={}] The object to copy symbols to.
+	 * @returns {Object} Returns `object`.
+	 */
+	function copySymbols(source, object) {
+	  return copyObject(source, getSymbols(source), object);
+	}
+
+	module.exports = copySymbols;
+
+
+/***/ },
+/* 683 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var baseGetAllKeys = __webpack_require__(660),
+	    getSymbols = __webpack_require__(662),
+	    keys = __webpack_require__(46);
+
+	/**
+	 * Creates an array of own enumerable property names and symbols of `object`.
+	 *
+	 * @private
+	 * @param {Object} object The object to query.
+	 * @returns {Array} Returns the array of property names and symbols.
+	 */
+	function getAllKeys(object) {
+	  return baseGetAllKeys(object, keys, getSymbols);
+	}
+
+	module.exports = getAllKeys;
+
+
+/***/ },
+/* 684 */
+/***/ function(module, exports) {
+
+	/** Used for built-in method references. */
+	var objectProto = Object.prototype;
+
+	/** Used to check objects for own properties. */
+	var hasOwnProperty = objectProto.hasOwnProperty;
+
+	/**
+	 * Initializes an array clone.
+	 *
+	 * @private
+	 * @param {Array} array The array to clone.
+	 * @returns {Array} Returns the initialized clone.
+	 */
+	function initCloneArray(array) {
+	  var length = array.length,
+	      result = array.constructor(length);
+
+	  // Add properties assigned by `RegExp#exec`.
+	  if (length && typeof array[0] == 'string' && hasOwnProperty.call(array, 'index')) {
+	    result.index = array.index;
+	    result.input = array.input;
+	  }
+	  return result;
+	}
+
+	module.exports = initCloneArray;
+
+
+/***/ },
+/* 685 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var cloneArrayBuffer = __webpack_require__(686),
+	    cloneDataView = __webpack_require__(687),
+	    cloneMap = __webpack_require__(688),
+	    cloneRegExp = __webpack_require__(690),
+	    cloneSet = __webpack_require__(691),
+	    cloneSymbol = __webpack_require__(693),
+	    cloneTypedArray = __webpack_require__(694);
+
+	/** `Object#toString` result references. */
+	var boolTag = '[object Boolean]',
+	    dateTag = '[object Date]',
+	    mapTag = '[object Map]',
+	    numberTag = '[object Number]',
+	    regexpTag = '[object RegExp]',
+	    setTag = '[object Set]',
+	    stringTag = '[object String]',
+	    symbolTag = '[object Symbol]';
+
+	var arrayBufferTag = '[object ArrayBuffer]',
+	    dataViewTag = '[object DataView]',
+	    float32Tag = '[object Float32Array]',
+	    float64Tag = '[object Float64Array]',
+	    int8Tag = '[object Int8Array]',
+	    int16Tag = '[object Int16Array]',
+	    int32Tag = '[object Int32Array]',
+	    uint8Tag = '[object Uint8Array]',
+	    uint8ClampedTag = '[object Uint8ClampedArray]',
+	    uint16Tag = '[object Uint16Array]',
+	    uint32Tag = '[object Uint32Array]';
+
+	/**
+	 * Initializes an object clone based on its `toStringTag`.
+	 *
+	 * **Note:** This function only supports cloning values with tags of
+	 * `Boolean`, `Date`, `Error`, `Number`, `RegExp`, or `String`.
+	 *
+	 * @private
+	 * @param {Object} object The object to clone.
+	 * @param {string} tag The `toStringTag` of the object to clone.
+	 * @param {Function} cloneFunc The function to clone values.
+	 * @param {boolean} [isDeep] Specify a deep clone.
+	 * @returns {Object} Returns the initialized clone.
+	 */
+	function initCloneByTag(object, tag, cloneFunc, isDeep) {
+	  var Ctor = object.constructor;
+	  switch (tag) {
+	    case arrayBufferTag:
+	      return cloneArrayBuffer(object);
+
+	    case boolTag:
+	    case dateTag:
+	      return new Ctor(+object);
+
+	    case dataViewTag:
+	      return cloneDataView(object, isDeep);
+
+	    case float32Tag: case float64Tag:
+	    case int8Tag: case int16Tag: case int32Tag:
+	    case uint8Tag: case uint8ClampedTag: case uint16Tag: case uint32Tag:
+	      return cloneTypedArray(object, isDeep);
+
+	    case mapTag:
+	      return cloneMap(object, isDeep, cloneFunc);
+
+	    case numberTag:
+	    case stringTag:
+	      return new Ctor(object);
+
+	    case regexpTag:
+	      return cloneRegExp(object);
+
+	    case setTag:
+	      return cloneSet(object, isDeep, cloneFunc);
+
+	    case symbolTag:
+	      return cloneSymbol(object);
+	  }
+	}
+
+	module.exports = initCloneByTag;
+
+
+/***/ },
+/* 686 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Uint8Array = __webpack_require__(118);
+
+	/**
+	 * Creates a clone of `arrayBuffer`.
+	 *
+	 * @private
+	 * @param {ArrayBuffer} arrayBuffer The array buffer to clone.
+	 * @returns {ArrayBuffer} Returns the cloned array buffer.
+	 */
+	function cloneArrayBuffer(arrayBuffer) {
+	  var result = new arrayBuffer.constructor(arrayBuffer.byteLength);
+	  new Uint8Array(result).set(new Uint8Array(arrayBuffer));
+	  return result;
+	}
+
+	module.exports = cloneArrayBuffer;
+
+
+/***/ },
+/* 687 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var cloneArrayBuffer = __webpack_require__(686);
+
+	/**
+	 * Creates a clone of `dataView`.
+	 *
+	 * @private
+	 * @param {Object} dataView The data view to clone.
+	 * @param {boolean} [isDeep] Specify a deep clone.
+	 * @returns {Object} Returns the cloned data view.
+	 */
+	function cloneDataView(dataView, isDeep) {
+	  var buffer = isDeep ? cloneArrayBuffer(dataView.buffer) : dataView.buffer;
+	  return new dataView.constructor(buffer, dataView.byteOffset, dataView.byteLength);
+	}
+
+	module.exports = cloneDataView;
+
+
+/***/ },
+/* 688 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var addMapEntry = __webpack_require__(689),
+	    arrayReduce = __webpack_require__(167),
+	    mapToArray = __webpack_require__(119);
+
+	/**
+	 * Creates a clone of `map`.
+	 *
+	 * @private
+	 * @param {Object} map The map to clone.
+	 * @param {Function} cloneFunc The function to clone values.
+	 * @param {boolean} [isDeep] Specify a deep clone.
+	 * @returns {Object} Returns the cloned map.
+	 */
+	function cloneMap(map, isDeep, cloneFunc) {
+	  var array = isDeep ? cloneFunc(mapToArray(map), true) : mapToArray(map);
+	  return arrayReduce(array, addMapEntry, new map.constructor);
+	}
+
+	module.exports = cloneMap;
+
+
+/***/ },
+/* 689 */
+/***/ function(module, exports) {
+
+	/**
+	 * Adds the key-value `pair` to `map`.
+	 *
+	 * @private
+	 * @param {Object} map The map to modify.
+	 * @param {Array} pair The key-value pair to add.
+	 * @returns {Object} Returns `map`.
+	 */
+	function addMapEntry(map, pair) {
+	  // Don't return `map.set` because it's not chainable in IE 11.
+	  map.set(pair[0], pair[1]);
+	  return map;
+	}
+
+	module.exports = addMapEntry;
+
+
+/***/ },
+/* 690 */
+/***/ function(module, exports) {
+
+	/** Used to match `RegExp` flags from their coerced string values. */
+	var reFlags = /\w*$/;
+
+	/**
+	 * Creates a clone of `regexp`.
+	 *
+	 * @private
+	 * @param {Object} regexp The regexp to clone.
+	 * @returns {Object} Returns the cloned regexp.
+	 */
+	function cloneRegExp(regexp) {
+	  var result = new regexp.constructor(regexp.source, reFlags.exec(regexp));
+	  result.lastIndex = regexp.lastIndex;
+	  return result;
+	}
+
+	module.exports = cloneRegExp;
+
+
+/***/ },
+/* 691 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var addSetEntry = __webpack_require__(692),
+	    arrayReduce = __webpack_require__(167),
+	    setToArray = __webpack_require__(120);
+
+	/**
+	 * Creates a clone of `set`.
+	 *
+	 * @private
+	 * @param {Object} set The set to clone.
+	 * @param {Function} cloneFunc The function to clone values.
+	 * @param {boolean} [isDeep] Specify a deep clone.
+	 * @returns {Object} Returns the cloned set.
+	 */
+	function cloneSet(set, isDeep, cloneFunc) {
+	  var array = isDeep ? cloneFunc(setToArray(set), true) : setToArray(set);
+	  return arrayReduce(array, addSetEntry, new set.constructor);
+	}
+
+	module.exports = cloneSet;
+
+
+/***/ },
+/* 692 */
+/***/ function(module, exports) {
+
+	/**
+	 * Adds `value` to `set`.
+	 *
+	 * @private
+	 * @param {Object} set The set to modify.
+	 * @param {*} value The value to add.
+	 * @returns {Object} Returns `set`.
+	 */
+	function addSetEntry(set, value) {
+	  // Don't return `set.add` because it's not chainable in IE 11.
+	  set.add(value);
+	  return set;
+	}
+
+	module.exports = addSetEntry;
+
+
+/***/ },
+/* 693 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Symbol = __webpack_require__(117);
+
+	/** Used to convert symbols to primitives and strings. */
+	var symbolProto = Symbol ? Symbol.prototype : undefined,
+	    symbolValueOf = symbolProto ? symbolProto.valueOf : undefined;
+
+	/**
+	 * Creates a clone of the `symbol` object.
+	 *
+	 * @private
+	 * @param {Object} symbol The symbol object to clone.
+	 * @returns {Object} Returns the cloned symbol object.
+	 */
+	function cloneSymbol(symbol) {
+	  return symbolValueOf ? Object(symbolValueOf.call(symbol)) : {};
+	}
+
+	module.exports = cloneSymbol;
+
+
+/***/ },
+/* 694 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var cloneArrayBuffer = __webpack_require__(686);
+
+	/**
+	 * Creates a clone of `typedArray`.
+	 *
+	 * @private
+	 * @param {Object} typedArray The typed array to clone.
+	 * @param {boolean} [isDeep] Specify a deep clone.
+	 * @returns {Object} Returns the cloned typed array.
+	 */
+	function cloneTypedArray(typedArray, isDeep) {
+	  var buffer = isDeep ? cloneArrayBuffer(typedArray.buffer) : typedArray.buffer;
+	  return new typedArray.constructor(buffer, typedArray.byteOffset, typedArray.length);
+	}
+
+	module.exports = cloneTypedArray;
+
+
+/***/ },
+/* 695 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var baseCreate = __webpack_require__(696),
+	    getPrototype = __webpack_require__(15),
+	    isPrototype = __webpack_require__(63);
+
+	/**
+	 * Initializes an object clone.
+	 *
+	 * @private
+	 * @param {Object} object The object to clone.
+	 * @returns {Object} Returns the initialized clone.
+	 */
+	function initCloneObject(object) {
+	  return (typeof object.constructor == 'function' && !isPrototype(object))
+	    ? baseCreate(getPrototype(object))
+	    : {};
+	}
+
+	module.exports = initCloneObject;
+
+
+/***/ },
+/* 696 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObject = __webpack_require__(67);
+
+	/** Built-in value references. */
+	var objectCreate = Object.create;
+
+	/**
+	 * The base implementation of `_.create` without support for assigning
+	 * properties to the created object.
+	 *
+	 * @private
+	 * @param {Object} proto The object to inherit from.
+	 * @returns {Object} Returns the new object.
+	 */
+	var baseCreate = (function() {
+	  function object() {}
+	  return function(proto) {
+	    if (!isObject(proto)) {
+	      return {};
+	    }
+	    if (objectCreate) {
+	      return objectCreate(proto);
+	    }
+	    object.prototype = proto;
+	    var result = new object;
+	    object.prototype = undefined;
+	    return result;
+	  };
+	}());
+
+	module.exports = baseCreate;
+
+
+/***/ },
+/* 697 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var baseForOwn = __webpack_require__(43),
+	    baseIteratee = __webpack_require__(69);
+
+	/**
+	 * Iterates over own enumerable string keyed properties of an object and
+	 * invokes `iteratee` for each property. The iteratee is invoked with three
+	 * arguments: (value, key, object). Iteratee functions may exit iteration
+	 * early by explicitly returning `false`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.3.0
+	 * @category Object
+	 * @param {Object} object The object to iterate over.
+	 * @param {Function} [iteratee=_.identity] The function invoked per iteration.
+	 * @returns {Object} Returns `object`.
+	 * @see _.forOwnRight
+	 * @example
+	 *
+	 * function Foo() {
+	 *   this.a = 1;
+	 *   this.b = 2;
+	 * }
+	 *
+	 * Foo.prototype.c = 3;
+	 *
+	 * _.forOwn(new Foo, function(value, key) {
+	 *   console.log(key);
+	 * });
+	 * // => Logs 'a' then 'b' (iteration order is not guaranteed).
+	 */
+	function forOwn(object, iteratee) {
+	  return object && baseForOwn(object, baseIteratee(iteratee, 3));
+	}
+
+	module.exports = forOwn;
+
 
 /***/ }
 /******/ ]);

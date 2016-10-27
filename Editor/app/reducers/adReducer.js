@@ -3,10 +3,11 @@ import { immutableObjectDelete } from 'libs/immutableHelpers';
 import _ from 'lodash';
 
 const adsByIds = (state = {}, action) => {
+	let payload;
 	switch (action.type) {
 		case sectionActions.CREATE_SECTION:
 		case adActions.CREATE_AD:
-			const payload = action.adPayload ? action.adPayload : action.payload;
+			payload = action.adPayload ? action.adPayload : action.payload;
 			return { ...state,
 				[payload.id]: {
 					id: payload.id,
@@ -15,6 +16,18 @@ const adsByIds = (state = {}, action) => {
 					height: payload.height,
 					width: payload.width,
 				},
+			};
+
+		case sectionActions.CREATE_INCONTENT_SECTION:
+			payload = action.adPayload;
+			return { ...state,
+				[payload.id]: {
+					id: payload.id,
+					width: payload.width,
+					height: payload.height,
+					css: payload.css,
+					secondaryCss: payload.secondaryCss
+				}
 			};
 
 		case adActions.DELETE_AD:
