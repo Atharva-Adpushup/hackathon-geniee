@@ -20,7 +20,7 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			css = (float !== 'none' ? (float === 'left' ? leftSectionCss : rightSectionCss) : defaultSectionCss);
 		return {
 			type: sectionActions.CREATE_INCONTENT_SECTION,
-			adPayload: Object.assign(adPayload, { id: adId, css, createTs: Math.floor(Date.now() / 1000), defaultCss: float !== 'none' ? defaultSectionCss : undefined }),
+			adPayload: Object.assign(adPayload, { id: adId, css, createTs: Math.floor(Date.now() / 1000), secondaryCss: float !== 'none' ? defaultSectionCss : undefined }),
 			sectionPayload: Object.assign(sectionPayload, { id: sectionId, name: `Section-${sectionId}`, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
 			sectionId,
 			adId,

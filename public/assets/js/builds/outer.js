@@ -34503,7 +34503,7 @@
 					_react2.default.createElement(
 						'h1',
 						{ className: 'variation-section-heading' },
-						'Variation In-content Settings'
+						'Add Incontent Variation'
 					),
 					_react2.default.createElement(_reduxForm.Field, { placeholder: 'Please enter section', name: 'section', component: renderField, type: 'number', label: 'Section' }),
 					_react2.default.createElement(_reduxForm.Field, { placeholder: 'Please enter minDistanceFromPrevAd', name: 'minDistanceFromPrevAd', component: renderField, type: 'number', label: 'minDistanceFromPrevAd' }),
@@ -40133,7 +40133,7 @@
 		    css = float !== 'none' ? float === 'left' ? _commonConsts.leftSectionCss : _commonConsts.rightSectionCss : _commonConsts.defaultSectionCss;
 		return {
 			type: _commonConsts.sectionActions.CREATE_INCONTENT_SECTION,
-			adPayload: Object.assign(adPayload, { id: adId, css: css, createTs: Math.floor(Date.now() / 1000), defaultCss: float !== 'none' ? _commonConsts.defaultSectionCss : undefined }),
+			adPayload: Object.assign(adPayload, { id: adId, css: css, createTs: Math.floor(Date.now() / 1000), secondaryCss: float !== 'none' ? _commonConsts.defaultSectionCss : undefined }),
 			sectionPayload: Object.assign(sectionPayload, { id: sectionId, name: 'Section-' + sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
 			sectionId: sectionId,
 			adId: adId,
@@ -53033,11 +53033,13 @@
 		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 		var action = arguments[1];
 
+		var payload = void 0;
+
 		var _ret = function () {
 			switch (action.type) {
 				case _commonConsts.sectionActions.CREATE_SECTION:
 				case _commonConsts.adActions.CREATE_AD:
-					var payload = action.adPayload ? action.adPayload : action.payload;
+					payload = action.adPayload ? action.adPayload : action.payload;
 					return {
 						v: _extends({}, state, _defineProperty({}, payload.id, {
 							id: payload.id,
@@ -53045,6 +53047,18 @@
 							css: payload.css,
 							height: payload.height,
 							width: payload.width
+						}))
+					};
+
+				case _commonConsts.sectionActions.CREATE_INCONTENT_SECTION:
+					payload = action.adPayload;
+					return {
+						v: _extends({}, state, _defineProperty({}, payload.id, {
+							id: payload.id,
+							width: payload.width,
+							height: payload.height,
+							css: payload.css,
+							secondaryCss: payload.secondaryCss
 						}))
 					};
 
@@ -53139,8 +53153,8 @@
 							name: payload.name,
 							ads: payload.ads,
 							isIncontent: true,
-							adPayload: action.adPayload,
-							float: payload.float
+							float: payload.float,
+							sectionNo: payload.sectionNo
 						}))
 					};
 
