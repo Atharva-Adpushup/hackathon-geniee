@@ -15,44 +15,31 @@ const afterSaveLoaderStatusPending = (loaderStatus) => {
 			type: status.text.PENDING
 		});
 
-		/****TODO: Uncomment below temporary commented out code*****/
-		// const paramData = getFinalJson(getState()),
-		// 	doAsyncSave = () => {
-		// 		const dfd = $.Deferred();
+		const paramData = getFinalJson(_.cloneDeep(getState())),
+			doAsyncSave = () => {
+				const dfd = $.Deferred();
 
-		// 		return masterSave(paramData)
-		// 			.done((data) => {
-		// 				dispatch({
-		// 					type: status.text.SUCCESS
-		// 				});
-		// 				return dfd.resolve(data);
-		// 			})
-		// 			.fail((jqXHR, textStatus) => {
-		// 				dispatch({
-		// 					type: status.text.FAILED
-		// 				});
-		// 				return dfd.reject(textStatus);
-		// 			});
-		// 	};
+				return masterSave(paramData)
+					.done((data) => {
+						dispatch({
+							type: status.text.SUCCESS
+						});
+						return dfd.resolve(data);
+					})
+					.fail((jqXHR, textStatus) => {
+						dispatch({
+							type: status.text.FAILED
+						});
+						return dfd.reject(textStatus);
+					});
+			};
 
-		// $.when(doAsyncSave()).then((data) => {
-		// 	// console.log('Data Saved successfully...');
-		// }, (jqXHR) => {
-		// 	// console.log('Error while saving data...');
-		// }, (status) => {
-		// 	// console.log('In Progress state...');
-		// });
-
-		const paramData = getFinalJson(_.cloneDeep(getState()));
-		return masterSave(paramData).then(() => {
-			dispatch({
-				type: status.text.SUCCESS
-			});
-		})
-		.catch(() => {
-			dispatch({
-				type: status.text.FAILED
-			});
+		$.when(doAsyncSave()).then((data) => {
+			// console.log('Data Saved successfully...');
+		}, (jqXHR) => {
+			// console.log('Error while saving data...');
+		}, (status) => {
+			// console.log('In Progress state...');
 		});
 	},
 	afterSaveLoaderStatusSuccess = (loaderStatus) => {
