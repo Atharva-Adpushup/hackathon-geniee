@@ -13,15 +13,19 @@ var Tracker = require('../libs/tracker'),
 	config = adp.config = require('../config/config.js'),
 	$ = adp.$ = require('jquery');
 
-// Extend the settings with generated settings
-	// eslint-disable-next-line no-undef
-$.extend(adp.config, ___abpConfig___, {
+// Extend adpushup object
+$.extend(adp, {
 	err: [],
 	control: control,
 	tracker: new Tracker(),
 	nodewatcher: nodewatcher,
 	platform: browserConfig.platform
 });
+
+// Extend the settings with generated settings
+// eslint-disable-next-line no-undef
+$.extend(adp.config, ___abpConfig___);
+
 
 function triggerControl(mode) {
 	// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
