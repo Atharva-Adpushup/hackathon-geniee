@@ -10,7 +10,8 @@ const getAfterSaveLoaderState = (state) => state.site.afterSaveLoader.status,
 	getFinalJson = createSelector([getAllChannels, getAllVariations, getAllSections, getAllAds], (allChannels = {}, allVariations = {}, allSections = {}, allAds = {}) => {
 		return {
 			siteId: window.ADP_SITE_ID,
-			computedChannels: (_.map(allChannels, (channel) => {
+			siteDomain: window.ADP_SITE_DOMAIN,
+			channels: (_.map(allChannels, (channel) => {
 				const channelVariations = {};
 
 				_.forEach(channel.variations, (variationId) => {

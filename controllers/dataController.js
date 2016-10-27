@@ -11,9 +11,6 @@ router
 	.get('/getData', function(req, res) {
 		var siteId = req.query.siteId,
 			computedJSON = {};
-		
-		// Dummy site id added for testing
-		siteId = 56005;
 
 		return siteModel.getSiteById(siteId, 'GET').then(function(site) {
 			return site.getAllChannels().then(function(channels) {
@@ -231,25 +228,32 @@ router
 			});
 	})
 	.post('/saveData', function(req, res) {
-		var parsedData = (typeof req.body.data === 'string') ? JSON.parse(req.body.data) : req.body.data;
+		var parsedData = (typeof req.body.data === 'string') ? JSON.parse(req.body.data) : req.body.data,
+			siteData = {
+				'siteId': parsedData.siteId,
+				'siteDomain': parsedData.siteDomain,
+				'channels': (lodash.map(parsedData.channels, function(channel) {
+					return (channel.platform + ':' + channel.pageGroup);
+				}))
+			};
 
-		// Promise.resolve(parsedData)
-		// .then(function(data) {})
-		// .then(siteModel.saveSiteData.bind(null, data.siteId, 'POST'))
-		return channelModel.saveChannels(parsedData.siteId, parsedData.channels)
-		.then(function() {
-			return res.json({
-				success: 1,
-				siteId: parsedData.siteId
-				//siteDomain: data.siteDomain
+		return siteModel.saveSiteData(siteData.siteId, 'POST', siteData)
+			.then(function() {
+				return channelModel.saveChannels(parsedData.siteId, parsedData.channels)
+				.then(function() {
+					return res.json({
+						success: 1,
+						siteId: parsedData.siteId,
+						siteDomain: parsedData.siteDomain
+					});
+				})
+			})
+			.catch(function(err) {
+				res.json({
+					success: 0,
+					message: err.toString()
+				});
 			});
-		})
-		.catch(function(err) {
-			res.json({
-				success: 0,
-				message: err.toString()
-			});
-		});
 	})
 	.get('/getUnsyncedAd', function(req, res) {
 		userModel.getUserByEmail(req.query.email)
