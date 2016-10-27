@@ -2,11 +2,9 @@ var express = require('express'),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
-	adsenseReportModel = require('../models/adsenseModel'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
-	reports = require('../models/reportsModel'),
 	router = express.Router();
 
 router

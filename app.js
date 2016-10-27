@@ -31,11 +31,6 @@ var express = require('express'),
 		prefix: 'sess::'
 	});
 
-// Start listening to events and act accordingly(calling microservices);
-require('./services/microServiceHelper/service');
-// Start apex service;
-require('./services/apexService/service');
-
 // Enable compression at top
 app.use(compression());
 
