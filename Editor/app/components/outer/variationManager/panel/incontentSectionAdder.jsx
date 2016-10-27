@@ -3,7 +3,7 @@ import { Field, reduxForm } from 'redux-form';
 import { Row, Col, Button } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { createIcontentSection } from 'actions/sectionActions';
+import { createIncontentSection } from 'actions/sectionActions';
 
 const form = reduxForm({
 	form: 'inContentForm',
@@ -57,7 +57,7 @@ class inContentForm extends React.Component {
 		return (
 			<form onSubmit={props.handleSubmit}>
 				<h1 className="variation-section-heading">Add Incontent Variation</h1>
-				<Field placeholder="Please enter section" name="section" component={renderField} type="number" label="Section" />
+				<Field placeholder="Please enter section" name="section" component={renderField} type="number" label="Section No" />
 				<Field placeholder="Please enter minDistanceFromPrevAd" name="minDistanceFromPrevAd" component={renderField} type="number" label="minDistanceFromPrevAd" />
 				<Field placeholder="Please enter width" name="width" component={renderField} type="number" label="Width" />
 				<Field placeholder="Please enter height" name="height" component={renderField} type="number" label="Height" />
@@ -103,7 +103,7 @@ const mapStateToProps = (state, ownProps) => ({
 
 	mapDispatchToProps = (dispatch, ownProps) => ({
 		onSubmit: (values) => {
-			dispatch(createIcontentSection({
+			dispatch(createIncontentSection({
 				sectionNo: values.section,
 				minDistanceFromPrevAd: values.minDistanceFromPrevAd,
 				float: values.float
