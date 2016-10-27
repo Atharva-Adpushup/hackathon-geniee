@@ -246,7 +246,7 @@ router
 			});
 	})
 	.post('/saveData', function(req, res) {
-		var data = JSON.parse(req.body.data);
+		var data = (typeof req.body.data === 'string') ? JSON.parse(req.body.data) : req.body.data;
 		userModel.verifySiteOwner(req.session.user.email, data.siteId).then(function() {
 			var siteData = {
 				'siteDomain': data.siteDomain,

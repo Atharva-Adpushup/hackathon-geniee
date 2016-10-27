@@ -43,7 +43,7 @@ const afterSaveLoaderStatusPending = (loaderStatus) => {
 		// 	// console.log('In Progress state...');
 		// });
 
-		const paramData = getFinalJson(getState());
+		const paramData = getFinalJson(_.cloneDeep(getState()));
 		return masterSave(paramData).then(() => {
 			dispatch({
 				type: status.text.SUCCESS
