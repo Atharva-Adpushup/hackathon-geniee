@@ -68,9 +68,9 @@ class inContentForm extends React.Component {
 						</Col>
 						<Col xs={6} className="u-padding-r10px">
 							<Field name="float" component="select">
-								<option name="none">None</option>
-								<option name="left">Left</option>
-								<option name="right">Right</option>
+								<option name="none">none</option>
+								<option name="left">left</option>
+								<option name="right">right</option>
 							</Field>
 						</Col>
 					</Row>

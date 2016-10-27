@@ -7371,7 +7371,7 @@
 
 	var _variationManagerContainer2 = _interopRequireDefault(_variationManagerContainer);
 
-	var _insertMenuContainer = __webpack_require__(614);
+	var _insertMenuContainer = __webpack_require__(615);
 
 	var _insertMenuContainer2 = _interopRequireDefault(_insertMenuContainer);
 
@@ -28223,7 +28223,7 @@
 
 	var _variationPanel2 = _interopRequireDefault(_variationPanel);
 
-	var _variationAdder = __webpack_require__(613);
+	var _variationAdder = __webpack_require__(614);
 
 	var _variationAdder2 = _interopRequireDefault(_variationAdder);
 
@@ -28431,7 +28431,7 @@
 
 	var _incontentSectionAdder2 = _interopRequireDefault(_incontentSectionAdder);
 
-	var _variationOptions = __webpack_require__(611);
+	var _variationOptions = __webpack_require__(612);
 
 	var _variationOptions2 = _interopRequireDefault(_variationOptions);
 
@@ -34413,7 +34413,7 @@
 
 	var _reactRedux = __webpack_require__(4);
 
-	var _sectionActions = __webpack_require__(624);
+	var _sectionActions = __webpack_require__(611);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34533,17 +34533,17 @@
 									_react2.default.createElement(
 										'option',
 										{ name: 'none' },
-										'None'
+										'none'
 									),
 									_react2.default.createElement(
 										'option',
 										{ name: 'left' },
-										'Left'
+										'left'
 									),
 									_react2.default.createElement(
 										'option',
 										{ name: 'right' },
-										'Right'
+										'right'
 									)
 								)
 							)
@@ -40104,6 +40104,70 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
+	exports.createIcontentSection = exports.renameSection = exports.deleteSection = exports.createSection = undefined;
+
+	var _commonConsts = __webpack_require__(33);
+
+	var _utils = __webpack_require__(178);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var createSection = function createSection(sectionPayload, adPayload, variationId) {
+		var adId = _utils2.default.getRandomNumber(),
+		    sectionId = _utils2.default.getRandomNumber();
+		return {
+			type: _commonConsts.sectionActions.CREATE_SECTION,
+			adPayload: Object.assign(adPayload, { id: adId, css: adPayload.css ? adPayload.css : _commonConsts.defaultSectionCss, createTs: Math.floor(Date.now() / 1000) }),
+			sectionPayload: Object.assign(sectionPayload, { name: 'Section-' + sectionId, id: sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
+			sectionId: sectionId,
+			adId: adId,
+			variationId: variationId
+		};
+	},
+	    createIcontentSection = function createIcontentSection(sectionPayload, adPayload, variationId) {
+		var adId = _utils2.default.getRandomNumber(),
+		    sectionId = _utils2.default.getRandomNumber(),
+		    float = sectionPayload.float,
+		    css = float !== 'none' ? float === 'left' ? _commonConsts.leftSectionCss : _commonConsts.rightSectionCss : _commonConsts.defaultSectionCss;
+		return {
+			type: _commonConsts.sectionActions.CREATE_INCONTENT_SECTION,
+			adPayload: Object.assign(adPayload, { id: adId, css: css, createTs: Math.floor(Date.now() / 1000), defaultCss: float !== 'none' ? _commonConsts.defaultSectionCss : undefined }),
+			sectionPayload: Object.assign(sectionPayload, { id: sectionId, name: 'Section-' + sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
+			sectionId: sectionId,
+			adId: adId,
+			variationId: variationId
+		};
+	},
+	    deleteSection = function deleteSection(sectionId) {
+		return {
+			type: _commonConsts.sectionActions.DELETE_SECTION,
+			sectionId: sectionId
+		};
+	},
+	    renameSection = function renameSection(sectionId, name) {
+		return {
+			type: _commonConsts.sectionActions.DELETE_SECTION,
+			sectionId: sectionId,
+			name: name
+		};
+	};
+
+	exports.createSection = createSection;
+	exports.deleteSection = deleteSection;
+	exports.renameSection = renameSection;
+	exports.createIcontentSection = createIcontentSection;
+
+/***/ },
+/* 612 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -40119,7 +40183,7 @@
 
 	var _variationActions = __webpack_require__(210);
 
-	var _index = __webpack_require__(612);
+	var _index = __webpack_require__(613);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -40219,7 +40283,7 @@
 	})(variationOtions);
 
 /***/ },
-/* 612 */
+/* 613 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40341,7 +40405,7 @@
 	exports.default = InlineEdit;
 
 /***/ },
-/* 613 */
+/* 614 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40382,7 +40446,7 @@
 	exports.default = VariationAdder;
 
 /***/ },
-/* 614 */
+/* 615 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40395,13 +40459,13 @@
 
 	var _reactRedux = __webpack_require__(4);
 
-	var _index = __webpack_require__(615);
+	var _index = __webpack_require__(616);
 
 	var _index2 = _interopRequireDefault(_index);
 
-	var _insertMenuActions = __webpack_require__(623);
+	var _insertMenuActions = __webpack_require__(624);
 
-	var _sectionActions = __webpack_require__(624);
+	var _sectionActions = __webpack_require__(611);
 
 	var _channelSelectors = __webpack_require__(219);
 
@@ -40440,7 +40504,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_index2.default);
 
 /***/ },
-/* 615 */
+/* 616 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40455,25 +40519,25 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _menu = __webpack_require__(616);
+	var _menu = __webpack_require__(617);
 
 	var _menu2 = _interopRequireDefault(_menu);
 
-	var _menuItem = __webpack_require__(618);
+	var _menuItem = __webpack_require__(619);
 
 	var _menuItem2 = _interopRequireDefault(_menuItem);
 
 	var _commonConsts = __webpack_require__(33);
 
-	var _adSizeSelector = __webpack_require__(619);
+	var _adSizeSelector = __webpack_require__(620);
 
 	var _adSizeSelector2 = _interopRequireDefault(_adSizeSelector);
 
-	var _parentSelector = __webpack_require__(620);
+	var _parentSelector = __webpack_require__(621);
 
 	var _parentSelector2 = _interopRequireDefault(_parentSelector);
 
-	var _sectionOptions = __webpack_require__(621);
+	var _sectionOptions = __webpack_require__(622);
 
 	var _sectionOptions2 = _interopRequireDefault(_sectionOptions);
 
@@ -40627,7 +40691,7 @@
 	exports.default = insertMenu;
 
 /***/ },
-/* 616 */
+/* 617 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40654,7 +40718,7 @@
 
 	var _utils2 = _interopRequireDefault(_utils);
 
-	var _content = __webpack_require__(617);
+	var _content = __webpack_require__(618);
 
 	var _content2 = _interopRequireDefault(_content);
 
@@ -40812,7 +40876,7 @@
 	exports.default = Menu;
 
 /***/ },
-/* 617 */
+/* 618 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -40862,7 +40926,7 @@
 	exports.default = MenuContent;
 
 /***/ },
-/* 618 */
+/* 619 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40918,7 +40982,7 @@
 	exports.default = MenuItem;
 
 /***/ },
-/* 619 */
+/* 620 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -41038,7 +41102,7 @@
 	exports.default = AdSizeSelector;
 
 /***/ },
-/* 620 */
+/* 621 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -41107,7 +41171,7 @@
 	exports.default = platformSelector;
 
 /***/ },
-/* 621 */
+/* 622 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -41124,7 +41188,7 @@
 
 	var _reactBootstrap = __webpack_require__(233);
 
-	var _select = __webpack_require__(622);
+	var _select = __webpack_require__(623);
 
 	var _select2 = _interopRequireDefault(_select);
 
@@ -41235,7 +41299,7 @@
 	exports.default = sectionOptions;
 
 /***/ },
-/* 622 */
+/* 623 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -41573,7 +41637,7 @@
 	});
 
 /***/ },
-/* 623 */
+/* 624 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -41594,70 +41658,6 @@
 
 	exports.showMenu = showMenu;
 	exports.hideMenu = hideMenu;
-
-/***/ },
-/* 624 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.createIcontentSection = exports.renameSection = exports.deleteSection = exports.createSection = undefined;
-
-	var _commonConsts = __webpack_require__(33);
-
-	var _utils = __webpack_require__(178);
-
-	var _utils2 = _interopRequireDefault(_utils);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var createSection = function createSection(sectionPayload, adPayload, variationId) {
-		var adId = _utils2.default.getRandomNumber(),
-		    sectionId = _utils2.default.getRandomNumber();
-		return {
-			type: _commonConsts.sectionActions.CREATE_SECTION,
-			adPayload: Object.assign(adPayload, { id: adId, css: adPayload.css ? adPayload.css : _commonConsts.defaultSectionCss, createTs: Math.floor(Date.now() / 1000) }),
-			sectionPayload: Object.assign(sectionPayload, { name: 'Section-' + sectionId, id: sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
-			sectionId: sectionId,
-			adId: adId,
-			variationId: variationId
-		};
-	},
-	    createIcontentSection = function createIcontentSection(sectionPayload, adPayload, variationId) {
-		var adId = _utils2.default.getRandomNumber(),
-		    sectionId = _utils2.default.getRandomNumber(),
-		    float = sectionPayload.float.toLowerCase(),
-		    css = float !== 'none' ? float === 'left' ? _commonConsts.leftSectionCss : _commonConsts.rightSectionCss : _commonConsts.defaultSectionCss;
-		return {
-			type: _commonConsts.sectionActions.CREATE_INCONTENT_SECTION,
-			adPayload: Object.assign(adPayload, { id: adId, css: css, createTs: Math.floor(Date.now() / 1000), defaultCss: float !== 'none' ? _commonConsts.defaultSectionCss : undefined }),
-			sectionPayload: Object.assign(sectionPayload, { id: sectionId, name: 'Section-' + sectionId, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
-			sectionId: sectionId,
-			adId: adId,
-			variationId: variationId
-		};
-	},
-	    deleteSection = function deleteSection(sectionId) {
-		return {
-			type: _commonConsts.sectionActions.DELETE_SECTION,
-			sectionId: sectionId
-		};
-	},
-	    renameSection = function renameSection(sectionId, name) {
-		return {
-			type: _commonConsts.sectionActions.DELETE_SECTION,
-			sectionId: sectionId,
-			name: name
-		};
-	};
-
-	exports.createSection = createSection;
-	exports.deleteSection = deleteSection;
-	exports.renameSection = renameSection;
-	exports.createIcontentSection = createIcontentSection;
 
 /***/ },
 /* 625 */
@@ -41704,7 +41704,7 @@
 
 	var _adActions = __webpack_require__(627);
 
-	var _sectionActions = __webpack_require__(624);
+	var _sectionActions = __webpack_require__(611);
 
 	var _uiActions = __webpack_require__(220);
 
@@ -41890,11 +41890,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _menu = __webpack_require__(616);
+	var _menu = __webpack_require__(617);
 
 	var _menu2 = _interopRequireDefault(_menu);
 
-	var _menuItem = __webpack_require__(618);
+	var _menuItem = __webpack_require__(619);
 
 	var _menuItem2 = _interopRequireDefault(_menuItem);
 
@@ -51663,11 +51663,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _menu = __webpack_require__(616);
+	var _menu = __webpack_require__(617);
 
 	var _menu2 = _interopRequireDefault(_menu);
 
-	var _menuItem = __webpack_require__(618);
+	var _menuItem = __webpack_require__(619);
 
 	var _menuItem2 = _interopRequireDefault(_menuItem);
 

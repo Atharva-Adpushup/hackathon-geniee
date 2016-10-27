@@ -16,7 +16,7 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 	createIcontentSection = (sectionPayload, adPayload, variationId) => {
 		const adId = Utils.getRandomNumber(),
 			sectionId = Utils.getRandomNumber(),
-			float = sectionPayload.float.toLowerCase(),
+			float = sectionPayload.float,
 			css = (float !== 'none' ? (float === 'left' ? leftSectionCss : rightSectionCss) : defaultSectionCss);
 		return {
 			type: sectionActions.CREATE_INCONTENT_SECTION,
