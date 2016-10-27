@@ -3,6 +3,7 @@ var Tracker = require('../libs/tracker'),
 	browserConfig = require('../libs/browserConfig'),
 	selectVariation = require('./variationSelector'),
 	createAds = require('./adCreater'),
+	heartBeat = require('../libs/heartBeat'),
 	hookAndInit = require('./hooksAndBlockList'),
 	utils = require('../libs/utils'),
 	w = window,
@@ -13,15 +14,19 @@ var Tracker = require('../libs/tracker'),
 	config = adp.config = require('../config/config.js'),
 	$ = adp.$ = require('jquery');
 
-// Extend the settings with generated settings
-	// eslint-disable-next-line no-undef
-$.extend(adp.config, ___abpConfig___, {
+// Extend adpushup object
+$.extend(adp, {
 	err: [],
 	control: control,
 	tracker: new Tracker(),
 	nodewatcher: nodewatcher,
 	platform: browserConfig.platform
 });
+
+// Extend the settings with generated settings
+// eslint-disable-next-line no-undef
+$.extend(adp.config, ___abpConfig___);
+
 
 function triggerControl(mode) {
 	// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
@@ -75,6 +80,10 @@ function main() {
 			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
 		}, 5000);
 	} else {
+		// start heartBeat
+		heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
+
+		//Init creation
 		startCreation();
 	}
 }
