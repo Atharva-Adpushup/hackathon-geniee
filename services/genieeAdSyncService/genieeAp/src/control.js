@@ -1,12 +1,12 @@
-var utils = require('./utils.js'),
+var utils = require('../libs/utils'),
 	w = window,
-	$ = require('../third-party/jquery');
+	$ = require('jquery');
 
 function Control() {
 	var ads = [], err = [],
 		i, j, k, ad, isControlActivated = false;
 
-	(function fetchAllControlAds() {
+	(function hookAndfetchAllControlAds() {
 		if (typeof w.adpushup.control === 'object' && w.adpushup.control instanceof Array) {
 			for (i = 0, j = w.adpushup.control, k = j[i]; i < j.length; k = j[++i]) {
 				push(k);

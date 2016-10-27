@@ -2,15 +2,12 @@ var express = require('express'),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
 	AdPushupError = require('../helpers/AdPushupError'),
-	adsenseReportModel = require('../models/adsenseModel'),
-	adxReportModel = require('../models/adxModel'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
 	moment = require('moment'),
 	utils = require('../helpers/utils'),
 	// eslint-disable-next-line new-cap
-	router = express.Router(),
-	reports = require('../models/reportsModel');
+	router = express.Router();
 
 router
 	.get('/performance', function(req, res) {

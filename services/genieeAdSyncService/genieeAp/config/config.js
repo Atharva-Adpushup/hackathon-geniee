@@ -1,4 +1,4 @@
-var utils = require('../libs/custom/utils');
+var utils = require('../libs/utils');
 module.exports = {
 	ver: 1.0,
 	// eslint-disable-next-line no-undef

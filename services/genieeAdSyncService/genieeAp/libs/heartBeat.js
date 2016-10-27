@@ -9,9 +9,9 @@ things to consider:
 5. onUnLoad : ping
 */
 
-var browserConfig = require('./browserConfig.js'),
-	utils = require('./utils.js'),
-	$ = require('../third-party/jquery');
+var browserConfig = require('../libs/browserConfig'),
+	utils = require('../libs/utils'),
+	$ = require('jquery');
 
 module.exports = function(url, minGapInterval, heartBeatDelay, apStartTime) {
 	var hadWindowFocusAtLeastOnce,

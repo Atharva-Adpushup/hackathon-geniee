@@ -5,7 +5,7 @@ const VariationAdder = (props) => {
 	return (
 		<OverlayTrigger placement="top" overlay={<Tooltip id="add-variation-tooltip">Add New Variation</Tooltip>}>
 			<div className="variation-adder" id="variationAdder" onClick={props.onNewVariation}>
-				<i className="fa fa-plus"></i>
+				Add <i className="fa fa-plus"></i>
 			</div>
 		</OverlayTrigger>
 	);

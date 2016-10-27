@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-undef
 var w = window, d = document,
-	$ = require('../third-party/jquery'),
-	browserConfig = require('./browserConfig.js');
+	$ = require('jquery'),
+	browserConfig = require('../libs/browserConfig');
 
 function TrackingNode($el, callback) {
 	if (!callback || typeof callback !== 'function') {

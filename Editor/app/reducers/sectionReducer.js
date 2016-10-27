@@ -3,9 +3,10 @@ import { immutableObjectDelete, immutableArrayDelete, immutablePush } from 'libs
 import _ from 'lodash';
 
 const sectionByIds = (state = {}, action) => {
+	let payload;
 	switch (action.type) {
 		case sectionActions.CREATE_SECTION:
-			const payload = action.sectionPayload;
+			payload = action.sectionPayload;
 			return { ...state,
 					[payload.id]: {
 						id: payload.id,
@@ -16,6 +17,19 @@ const sectionByIds = (state = {}, action) => {
 						ads: payload.ads
 					}
 				};
+
+		case sectionActions.CREATE_INCONTENT_SECTION:
+			payload = action.sectionPayload;
+			return { ...state,
+				[payload.id]: {
+					id: payload.id,
+					name: payload.name,
+					ads: payload.ads,
+					isIncontent: true,
+					adPayload: action.adPayload,
+					float: payload.float
+				}
+			};
 
 		case adActions.CREATE_AD:
 			return { ...state,

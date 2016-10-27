@@ -1,5 +1,5 @@
 
-var $ = require('../third-party/jquery'),
+var $ = require('jquery'),
 	selectedElems = [],
 	containerWidth,
 	floatVar, width, height,

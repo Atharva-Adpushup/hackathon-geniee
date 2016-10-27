@@ -1,6 +1,6 @@
 var browserConfig = require('./browserConfig.js'),
 	// eslint-disable-next-line no-undef
-	$ = require('../third-party/jquery');
+	$ = require('jquery');
 
 module.exports = {
 	base64Decode: function(data) {
@@ -85,7 +85,14 @@ module.exports = {
 		}
 		(d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s);
 	},
-
+	runScript: function(str) {
+		var d = document,
+			script = d.createElement('script');
+		script.type = 'text/javascript';
+		script.text = str;
+		script.html = str;
+		(d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(script);
+	},
 	requestServer: function(url, data, timeout, method, beforeSendCallback) {
 		$.support.cors = true;
 		return $.ajax({
