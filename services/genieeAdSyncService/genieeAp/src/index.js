@@ -3,6 +3,7 @@ var Tracker = require('../libs/tracker'),
 	browserConfig = require('../libs/browserConfig'),
 	selectVariation = require('./variationSelector'),
 	createAds = require('./adCreater'),
+	heartBeat = require('../libs/heartBeat'),
 	hookAndInit = require('./hooksAndBlockList'),
 	utils = require('../libs/utils'),
 	w = window,
@@ -79,6 +80,10 @@ function main() {
 			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
 		}, 5000);
 	} else {
+		// start heartBeat
+		heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
+
+		//Init creation
 		startCreation();
 	}
 }
