@@ -27,13 +27,10 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 
 				// Compute active channel and set default UI properties
 				Object.keys(computedResult.channelData.byIds).forEach((channelKey) => {
-					activeChannel = (computedResult.channelData.byIds[channelKey].activeVariation) ? channelKey : null;
 					// Set default UI properties
 					computedResult.channelData.byIds[channelKey].isOpen = false;
 					computedResult.channelData.byIds[channelKey].isLoading = false;
 				});
-				// Set active channel
-				computedResult.channelData.activeChannel = activeChannel;
 
 				// Change 'variations' keys object to keys array
 				_.forOwn(computedResult.channelData.byIds, (chnlData, channelName) => {
@@ -57,7 +54,7 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 		return getData('/data/getData', { siteId })
 			.then((rawData) => processData(rawData))
 			.fail((jqXHR, textStatus) => {
-				const initialData = {channels: []};
+				const initialData = { channels: [] };
 
 				console.log('Error while loading data: ', textStatus);
 				console.log('Initial data will be loaded');
