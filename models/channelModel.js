@@ -16,27 +16,22 @@ var model = require('../helpers/model'),
 			'tags',
 			'siteDomain',
 			'sampleUrl',
-			'useAlternateProxy',
-			'isAdRecover',
-			'forceSampleUrl',
-			'customJs',
-			'actions',
-			'adNetworkSettings',
-			'incontentSettings',
-			'incontentActions',
-			'structuredSections',
+			'variations',
+			'contentSelector',
+			'contentSelectorMissing',
+			'activeVariation',
 			'dateCreated',
 			'dateModified'
 		];
 		this.clientKeys = [
-			'id', 'siteDomain', 'channelName', 'platform', 'pageGroup', 'tags', 'sampleUrl', 'useAlternateProxy', 'forceSampleUrl', 'customJs',
-			'isAdRecover', 'incontentActions', 'adNetworkSettings', 'incontentSettings', 'actions', 'structuredSections'
+			'id', 'siteDomain', 'channelName', 'platform', 'pageGroup', 'variations', 'sampleUrl',
+			'contentSelector', 'contentSelectorMissing', 'activeVariation'
 		];
 		this.validations = {
 			'required': []
 		};
-		this.defaults = { customJs: [], structuredSections: [], incontentSections: [] };
-		this.classMap = { 'structuredSections': sectionModel };
+		this.defaults = { variations: {}, contentSelector: '', activeVariation: '' };
+		// this.classMap = { 'structuredSections': sectionModel };
 		this.constructor = function(data, cas) {
 			if (!(data.siteId && data.platform && data.pageGroup)) {
 				throw new Error('siteId, platform and pageGroup required for channel');
@@ -46,9 +41,9 @@ var model = require('../helpers/model'),
 			this.casValue = cas; // if user is loaded from database which will be almost every time except first, this value will be thr
 		};
 
-		this.getNetworkSettings = function() {
-			return Promise.resolve(this.get('adNetworkSettings'));
-		};
+		// this.getNetworkSettings = function() {
+		// 	return Promise.resolve(this.get('adNetworkSettings'));
+		// };
 	});
 
 function apiModule() {
@@ -79,11 +74,7 @@ function apiModule() {
 		},
 		saveChannels: function(siteId, channels) {
 			var updatedChannels = _.map(channels, function(channel) {
-				var sections = channel.sections;
-				channel.structuredSections = sections;
-				delete channel.sections;
 				channel.siteId = siteId;
-
 				return API.saveChannel(siteId, channel.platform, channel.pageGroup, channel);
 			});
 			return Promise.all(updatedChannels);

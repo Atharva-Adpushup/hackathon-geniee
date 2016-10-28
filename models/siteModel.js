@@ -30,11 +30,12 @@ var model = require('../helpers/model'),
 			'dateCreated',
 			'dateModified'
 		];
-		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'adNetworks', 'actions', 'audiences', 'channels', 'cmsInfo', 'templates', 'apConfigs', 'apex'];
+		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'adNetworks', 'actions', 'audiences', 'channels', 'cmsInfo', 'templates', 'apConfigs'];
 		this.validations = {
 			'required': []
 		};
-		this.classMap = { 'ads': adModel };
+		// this.classMap = { 'ads': adModel };
+		this.defaults = { ads: [], apConfigs: {}, channels: [] };
 		this.ignore = [];
 
 		this.constructor = function(data, cas) {
@@ -51,38 +52,6 @@ var model = require('../helpers/model'),
 		this.getNetwork = function(networkName) {
 			return Promise.resolve(_.find(this.get('adNetworks'), { 'name': networkName }));
 		};
-
-		this.hasAdrecoverChannels = function() {
-			var me = this;
-			return Promise.resolve( _.filter(this.get('channels'), function(channel) {
-				var channelArr = channel.split(':');// channel[0] is platform and channel[1] is pagegroup
-				return (channelArr[0] === 'DESKTOP' && channelArr[1].indexOf('_ADRECOVER') !== -1);
-			})).then(function(channels){
-				if(!channels || !channels.length){
-					throw new AdPushupError("no adrecover channel");
-				}
-				return _.map(channels, function(channel) {
-					var channelArr = channel.split(':');// channel[0] is platform and channel[1] is pagegroup
-					return channelModel.getChannel(me.get('siteId'), channelArr[0], channelArr[1]);
-				});
-			}).then(function(channels) {
-				return Promise.all(channels).then(function(allChannels) {
-					var channelList = _.filter(allChannels, function(chnl) {
-						// extra check if by mistake user added ADRECOVER in AdPushup
-						return chnl.get('isAdRecover');
-					});
-
-					if (channelList.length) {
-						return channelList;
-					}
-
-					throw new AdPushupError('No AdRecover channels found');
-				});
-			}).catch(function(err){
-				return Promise.reject(err);
-			})
-		};
-
 
 		this.deleteChannel = function(platform, pageGroup) {
 			return new Promise(function(resolve) {
@@ -166,10 +135,6 @@ var model = require('../helpers/model'),
 
 			return this.save();
 		}.bind(this));
-
-		this.isApex = function() {
-			return !!this.get('apex'); // forceful convert to bool
-		};
 	});
 
 function apiModule() {
@@ -180,16 +145,15 @@ function apiModule() {
 					return appBucket.getAsync('site::' + siteId, {});
 				})
 				.then(function(json) {
-					if ((!json.value.channels && !Array.isArray(json.value.channels)) && (!json.value.ads && !Array.isArray(json.value.ads)) && (requestMethod && requestMethod === 'GET')) {
-						json.value.channels = []; json.value.firstTime = true; json.value.site = {};
-						return json.value;
-					}
-
+					// if ((!json.value.channels && !Array.isArray(json.value.channels)) && (!json.value.ads && !Array.isArray(json.value.ads)) && (requestMethod && requestMethod === 'GET')) {
+					// 	json.value.channels = []; json.value.firstTime = true; json.value.site = {};
+					// 	return json.value;
+					// }
 					return new Site(json.value, json.cas);
 				});
 		},
 		createSite: function(data) {
-			if(!data.siteName || !data.siteDomain) {
+			if(!data.siteDomain) {
 				return Promise.reject(new AdPushupError({"status": 403, "message": "Required parameter not found"}));
 			}
 
@@ -200,11 +164,7 @@ function apiModule() {
 			var json = {
 				siteName: data.siteName,
 				siteDomain: data.siteDomain,
-				channels: [],
-				cmsInfo: {
-					cmsName: '',
-					pageGroups: []
-				}
+				channels: []
 			};
 
 			return globalModel.incrSiteId()

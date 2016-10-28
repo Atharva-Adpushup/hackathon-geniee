@@ -9,41 +9,23 @@ var express = require('express'),
 
 router
 	.get('/getData', function(req, res) {
-		userModel.verifySiteOwner(req.session.user.email, req.query.siteId)
-			.then(function(userJson) {
-				return userJson.user.getNetworkData('ADSENSE')
-					.then(function(info) {
-						return { adsenseAccount: info ? info : {} };
-					})
-					.then(function(json) {
-						return siteModel.getSiteById(userJson.site.siteId, 'GET').then(function(site) {
-							if (!site.merge && !site.ads && !Array.isArray(site.ads)) {
-								site.site.adRecover = (site.adRecover && (typeof site.adRecover === 'object')) ? site.adRecover : false;
-								return site;
-							}
+		var siteId = req.query.siteId,
+			computedJSON = {};
 
-							return site.getAllChannels().then(function(channels) {
-								var adRecover = site.get('adRecover');
-
-								json.siteId = userJson.site.siteId;
-								json.channels = channels;
-								json.site = site.toClientJSON();
-								json.site.adRecover = (adRecover && (typeof adRecover === 'object')) ? adRecover : false;
-								json.firstTime = false;
-								return json;
-							});
-						}, function() {
-							json.channels = []; json.firstTime = true; json.site = {};
-							return json;
-						});
-					});
-			})
-			.then(function(json) {
-				res.json(json);
-			})
-			.catch(function(err) {
-				res.json({ success: 0, message: err ? err.toString() : 'Invalid site' });
+		return siteModel.getSiteById(siteId, 'GET').then(function(site) {
+			return site.getAllChannels().then(function(channels) {
+				computedJSON.siteId = siteId;
+				computedJSON.channels = channels;
+				computedJSON.site = site.toClientJSON();
+				return res.json(computedJSON);
 			});
+		}, function() {
+			computedJSON.channels = []; computedJSON.site = {};
+			return res.json(computedJSON);
+		})
+		.catch(function(err) {
+			res.json(computedJSON);
+		});
 	})
 	.get('/getPageGroupVariationRPM', function(req, res) {
 		var channelName = req.query.channelName,
@@ -246,31 +228,25 @@ router
 			});
 	})
 	.post('/saveData', function(req, res) {
-		var data = (typeof req.body.data === 'string') ? JSON.parse(req.body.data) : req.body.data;
-		userModel.verifySiteOwner(req.session.user.email, data.siteId).then(function() {
-			var siteData = {
-				'siteDomain': data.siteDomain,
-				'siteId': data.siteId,
-				'ownerEmail': req.session.user.email,
-				'actions': data.actions,
-				'adNetworks': data.adNetworks,
-				'apConfigs': data.apConfigs,
-				'ads': data.ads,
-				'cmsInfo': data.cmsInfo,
-				'audiences': data.audiences,
-				'templates': data.templates ? data.templates : [],
-				'channels': data.channelList
+		var parsedData = (typeof req.body.data === 'string') ? JSON.parse(req.body.data) : req.body.data,
+			siteData = {
+				'siteId': parsedData.siteId,
+				'siteDomain': parsedData.siteDomain,
+				'channels': (lodash.map(parsedData.channels, function(channel) {
+					return (channel.platform + ':' + channel.pageGroup);
+				}))
 			};
-			return siteData;
-		})
-			.then(siteModel.saveSiteData.bind(null, data.siteId, 'POST'))
-			.then(channelModel.saveChannels.bind(null, data.siteId, data.channels))
+
+		return siteModel.saveSiteData(siteData.siteId, 'POST', siteData)
 			.then(function() {
-				return res.json({
-					success: 1,
-					siteId: data.siteId,
-					siteDomain: data.siteDomain
-				});
+				return channelModel.saveChannels(parsedData.siteId, parsedData.channels)
+				.then(function() {
+					return res.json({
+						success: 1,
+						siteId: parsedData.siteId,
+						siteDomain: parsedData.siteDomain
+					});
+				})
 			})
 			.catch(function(err) {
 				res.json({
