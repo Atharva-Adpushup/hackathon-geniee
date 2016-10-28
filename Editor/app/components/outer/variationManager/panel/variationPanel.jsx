@@ -4,6 +4,7 @@ import 'react-tab-panel/index.css';
 import './styles.scss';
 import IncontentAdder from './incontentSectionAdder';
 import VariationOptions from './variationOptions';
+import VariationSections from './variationSections';
 
 class VariationPanel extends React.Component {
 	render() {
@@ -14,7 +15,7 @@ class VariationPanel extends React.Component {
 					<VariationOptions channelId={channelId} variation={variation} />
 				</div>
 				<div tabTitle="Sections">
-					<div>Helllo </div>
+					<VariationSections channelId={channelId} variation={variation} />
 				</div>
 				<div tabTitle="Add Incontent Variation">
 					<IncontentAdder channelId={channelId} variation={variation} />
