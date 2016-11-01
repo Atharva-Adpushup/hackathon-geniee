@@ -3,7 +3,7 @@ var indexController = require('./indexController'),
 	dataController = require('./dataController'),
 	proxyController = require('./proxyController'),
 	reportsController = require('./reportController'),
-	genieeApiController = require('./genieeApiController'),
+	apiController = require('./apiController'),
 	pageGroupController = require('./pageGroupController');
 
 module.exports = function(app) {
@@ -25,12 +25,12 @@ module.exports = function(app) {
 		next();
 	}, reportsController);
 
-	app.use('/geniee/', function(req, res, next) {
+	app.use('/api/', function(req, res, next) {
 		// if (!req.session || !req.session.user) {
 		// 	return res.redirect('/login');
 		// }
 		next();
-	}, genieeApiController);
+	}, apiController);
 
 	app.use('/site/:siteId/pagegroup/', function(req, res, next) {
 		// if (!req.session || !req.session.user) {

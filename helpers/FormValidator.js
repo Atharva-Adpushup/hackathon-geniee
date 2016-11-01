@@ -1,60 +1,45 @@
+/* Data input validation library */
+
 var validator = require('validator'),
 	Promise = require('bluebird'),
-	FormValidator = null,
-	AdPushupError = require('./AdPushupError');
+	AdPushupError = require('../helpers/AdPushupError'),
+	utils = require('./utils');
 
-/**
- * FormValidator, a json data validation utility
- * that uses 'validator' library
- *
- * @type {}
- */
-FormValidator = {
-	'validate': function(data, config) {
-		var errors = {};
-		Object.keys(config).map(function(validationName) {
-			var validation = config[validationName], field, i, isValid = true;
-			for (i = 0; i < validation.length; i++) {
-				field = validation[i];
+module.exports = {
+	validate: function(json, rules, comparison) {
+		var errors = [];
 
-				// Only validate if json data has field name as its
-				// own property, ignore the validation otherwise
-				if (data.hasOwnProperty(field.name)) {
-					if (field.value) {
-						isValid = validator[validationName](data[field.name], field.value);
-					} else {
-						// Specific check for null validation as
-						// validator library's isNull validation returns true if
-						// passed string computes to falsy
-						if (validationName === 'isNull') {
-							isValid = !validator[validationName](data[field.name]);
-						}else if (field.matchAgainst && data.hasOwnProperty(field.matchAgainst)) {
-							isValid = validator[validationName](data[field.name], data[field.matchAgainst]);
-						}else if (validationName !== 'equals') {
-							isValid = validator[validationName](data[field.name]);
+		Object.keys(json).map(function(key) {
+			Object.keys(rules).map(function(validation) {
+				rules[validation].forEach(function(rule) {
+					if(rule.name === key) {
+						switch(validation) {
+							case 'isNull':
+								!json[key] ? errors.push({message: rule.message, status: rule.status}) : '';
+								break;
+							case 'isURL':
+								!validator.isURL(json[key], rule.value) ? errors.push({message: rule.message, status: rule.status}) : ''; 		
+								break;
+							case 'isIn': 
+								!validator.isIn(json[key].toUpperCase(), rule.allowedValues) ? errors.push({message: rule.message, status: rule.status}) : '';
+								break;
+							case 'isSameDomain':
+								if(comparison && (utils.getSiteDomain(json[key]) !== utils.getSiteDomain(comparison))) {
+									!validator.equals(json[key], comparison) ? errors.push({message: rule.message, status: rule.status}) : '';
+								}
+								break;
 						}
 					}
-
-					if (!isValid) {
-						if (errors[field.name] && errors[field.name].length > 0) {
-							errors[field.name].push(field.message);
-						} else {
-							errors[field.name] = [];
-							errors[field.name].push(field.message);
-						}
-					}
-				}
-			}
+				});
+			});
 		});
 
-		return new Promise(function(resolve) {
-			if (Object.keys(errors).length > 0) {
+		return new Promise(function(resolve, reject) {
+			if(errors.length) {
 				throw new AdPushupError(errors);
-			} else if (Object.keys(errors).length === 0) {
-				resolve();
 			}
+
+			return resolve();
 		});
 	}
 };
-
-module.exports = FormValidator;

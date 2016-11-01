@@ -12,6 +12,7 @@ public/assets/js/mcmConnect/mcmConnect.min.js
 jsconfig.json
 test.js
 logs/
+.DS_Store
 *.log
 *.map
 composer.phar

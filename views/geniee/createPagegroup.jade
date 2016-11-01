@@ -21,7 +21,7 @@ html
 			h2 API to create new pagegroup 
 			pre 
 				strong POST 
-				| /geniee/pagegroup/create
+				| /api/pagegroup/create
 			form#createPagegroup
 				input(type="text" placeholder="Enter site id" name="siteId")
 				br
@@ -31,8 +31,8 @@ html
 				br
 				select(name="device")
 					option(value="") Select device
-					option(value="desktop") Desktop
-					option(value="tablet") Tablet
+					option(value="desktopa") Desktop
+					option(value="tableta") Tablet
 					option(value="mobile") Mobile
 				br
 				button Create
@@ -40,7 +40,7 @@ html
 			h2 API to get existing pagegroup 
 			pre 
 				strong GET 
-				| /geniee/pagegroup/view
+				| /api/pagegroup/view
 			form#getPagegroup
 				input(type="text" placeholder="Enter pagegroup id" name="pageGroupId")
 				br
@@ -49,7 +49,7 @@ html
 			h2 API to update existing pagegroup 
 			pre 
 				strong POST 
-				| /geniee/pagegroup/edit
+				| /api/pagegroup/edit
 			form#updatePagegroup
 				input(type="text" placeholder="Enter pagegroup id" name="pageGroupId")
 				br
@@ -60,12 +60,12 @@ html
 			h2 API to delete pagegroup 
 			pre 
 				strong POST 
-				| /geniee/pagegroup/delete
+				| /api/pagegroup/delete
 			form#deletePagegroup
 				input(type="text" placeholder="Enter pagegroup id" name="pageGroupId")
 				br
 				button Delete
-		script(src="http://code.jquery.com/jquery.js")
+		script(src="/assets/js/jquery-3.1.0.min.js")
 		script.
 			function convertToJson(array) {
 				var json = {};
@@ -82,7 +82,7 @@ html
 
 				$.ajax({
 					type: "POST",
-					url: "/geniee/pagegroup/create",
+					url: "/api/pagegroup/create",
 					data: {
 						siteId: json.siteId,
 						pageGroupName: json.pageGroupName,
@@ -105,7 +105,7 @@ html
 
 				$.ajax({
 					type: "GET",
-					url: "/geniee/pagegroup/view",
+					url: "/api/pagegroup/view",
 					data: {
 						pageGroupId: json.pageGroupId
 					},
@@ -125,7 +125,7 @@ html
 
 				$.ajax({
 					type: "POST",
-					url: "/geniee/pagegroup/edit",
+					url: "/api/pagegroup/edit",
 					data: {
 						pageGroupId: json.pageGroupId,
 						sampleUrl: json.sampleUrl
@@ -146,7 +146,7 @@ html
 
 				$.ajax({
 					type: "POST",
-					url: "/geniee/pagegroup/delete",
+					url: "/api/pagegroup/delete",
 					data: {
 						pageGroupId: json.pageGroupId
 					},

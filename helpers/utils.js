@@ -65,11 +65,7 @@ var url = require('url'),
 		},
 		getSiteDomain: function(link) {
 			return url.parse(link).hostname;
-		},
-		validateUrl: function(url) {
-			var re = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-			return !re.test(url) ? false : true;
-		}	
+		}
 	};
 
 module.exports = API;

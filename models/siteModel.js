@@ -2,17 +2,12 @@ module.exports = apiModule();
 
 var model = require('../helpers/model'),
 	couchbase = require('../helpers/couchBaseService'),
-	ViewQuery = require('couchbase-promises').ViewQuery,
 	globalModel = require('../models/globalModel'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	channelModel = require('../models/channelModel'),
 	Promise = require('bluebird'),
 	adModel = require('../models/subClasses/site/ad'),
 	_ = require('lodash'),
-	utils = require('../helpers/utils'),
-	uuid = require('uuid'),
-	ViewQuery = require('couchbase-promises').ViewQuery,
-	platforms = ['DESKTOP', 'TABLET', 'MOBILE'],
 	Site = model.extend(function() {
 		this.keys = [
 			'siteId',
@@ -139,33 +134,8 @@ var model = require('../helpers/model'),
 
 function apiModule() {
 	var API = {
-		getSiteById: function(siteId, requestMethod) {
-			return couchbase.connectToAppBucket()
-				.then(function(appBucket) {
-					return appBucket.getAsync('site::' + siteId, {});
-				})
-				.then(function(json) {
-					// if ((!json.value.channels && !Array.isArray(json.value.channels)) && (!json.value.ads && !Array.isArray(json.value.ads)) && (requestMethod && requestMethod === 'GET')) {
-					// 	json.value.channels = []; json.value.firstTime = true; json.value.site = {};
-					// 	return json.value;
-					// }
-					return new Site(json.value, json.cas);
-				});
-		},
 		createSite: function(data) {
-			if(!data.siteDomain) {
-				return Promise.reject(new AdPushupError({"status": 403, "message": "Required parameter not found"}));
-			}
-
-			if(!utils.validateUrl(data.siteDomain)) {
-				return Promise.reject(new AdPushupError({"status": 403, "message": "Please provide a valid site domain, eg - http://sitename.com"}));
-			}
-
-			var json = {
-				siteName: data.siteName,
-				siteDomain: data.siteDomain,
-				channels: []
-			};
+			var json = { siteName: data.siteName, siteDomain: data.siteDomain, channels: [], cmsInfo: { cmsName: '', pageGroups: [] } };
 
 			return globalModel.incrSiteId()
 				.then(function(siteId) {
@@ -173,222 +143,33 @@ function apiModule() {
 					return API.saveSiteData(siteId, 'POST', json);
 				});
 		},
+		getSiteById: function(siteId, requestMethod) {
+			return couchbase.connectToAppBucket()
+				.then(function(appBucket) {
+					return appBucket.getAsync('site::' + siteId, {});
+				})
+				.then(function(json) {
+					return new Site(json.value, json.cas);
+				})
+				.catch(function(err) {
+					if(err.code === 13) {
+						throw new AdPushupError([{"status": 404, "message": "Site does not exist"}]);
+					}
+				});
+		},
 		updateSite: function(json) {
-			if(!json.siteId || !json.siteName) {
-				return Promise.reject(new AdPushupError({"status": 403, "message": "Required parameter not found"}));
-			}	
-
 			return API.getSiteById(json.siteId)
 			.then(function(site) {
 				site.set('siteName', json.siteName);
 				return site.save();
 			})
 			.catch(function(err) {
-				if(err.code === 13) {
-					throw new AdPushupError({"status": 404, "message": "Site does not exist"});
+				if(err.message[0].status === 404) {
+					throw new AdPushupError([{"status": 404, "message": "Site does not exist"}]);
 				}
 
-				throw new AdPushupError({"status": 500, "message": "Some error occurred"});
+				throw new AdPushupError([{"status": 500, "message": "Some error occurred"}]);
 			});
-		},
-		saveChannelData: function(json) {
-			return API.getSiteById(json.siteId)
-			.then(function(site) {
-				if(!json.siteId || !json.pageGroupName || !json.sampleUrl || !json.device) {
-					throw new AdPushupError({"status": 403, "message": "Required parameter not found"});
-				}
-
-				if(!utils.validateUrl(json.sampleUrl)) {
-					throw new AdPushupError({"status": 403, "message": "Please provide a valid sample URL, eg - http://sitename.com"});
-				}
-
-				if(!_.includes(platforms, json.device.toUpperCase())) {
-					throw new AdPushupError({"status": 403, "message": "Please provide a valid device name. Supported values - DESKTOP, TABLET, MOBILE"});
-				}
-
-				if(utils.getSiteDomain(json.sampleUrl) !== utils.getSiteDomain(site.data.siteDomain)) {
-					throw new AdPushupError({"status": 403, "message": "The sample URL should be from your website only"});
-				}
-
-				var channels = site.get('channels'),
-					pageGroups = site.get('cmsInfo').pageGroups,
-					channel = ':'+ json.device.toUpperCase() + ':' + json.pageGroupName.toUpperCase();
-
-				if(_.includes(channels, channel)) {
-					throw new AdPushupError({"status": 403, "message": "This pagegroup type already exists"});
-				}
-
-				channels.push(channel);
-
-				if(!_.find(pageGroups, ['sampleUrl', json.sampleUrl])) {
-					site.get('cmsInfo').pageGroups.push({
-						sampleUrl: json.sampleUrl,
-						pageGroup: json.pageGroupName.toUpperCase()
-					});
-				}
-
-				return {json: json, site: site};
-			})
-			.then(function(data) {
-				var site = data.site,
-					userData = data.json;
-
-				var channelData = {
-					siteDomain: site.data.siteDomain,
-					siteId: site.data.siteId,
-					sampleUrl: userData.sampleUrl,
-					platform: userData.device.toUpperCase(),
-					pageGroup: userData.pageGroupName.toUpperCase(),
-					id: uuid.v4(),
-					channelName: userData.pageGroupName.toUpperCase()+'_'+userData.device.toUpperCase()
-				};
-
-				return channelModel.saveChannel(userData.siteId, userData.device, userData.pageGroupName, channelData)
-					.then(function(res) {
-						site.save();
-						return res.data;
-					})
-			})
-			.catch(function(err) {
-				if(err.name !== 'AdPushupError') {
-					if(err.code === 13) {
-						throw new AdPushupError({"status": 404, "message": "Site does not exist"});
-					}
-
-					throw new AdPushupError({"status": 500, "message": "Some error occurred"});
-				}
-
-				var error = err.message;
-				throw new AdPushupError({"status": error.status, "message": error.message});
-			});
-		},
-		getPageGroupById: function(pageGroupId) {
-			if(!pageGroupId) {
-				return Promise.reject(new AdPushupError({"status": 404, "message": "Required parameter not found"}));
-			}
-
-			var query = ViewQuery.from('dev_app', 'channelById').key(pageGroupId);
-			return couchbase.connectToAppBucket()
-				.then(function(appBucket) {
-					return new Promise(function(resolve, reject) {
-						appBucket.query(query, {}, function(err, result) {
-							
-							if(err) {
-								return reject(new AdPushupError({"status": 500, "message": "Some error occurred"}));
-							}
-
-							if(result.length === 0) {
-								return reject(new AdPushupError({"status": 404, "message": "Pagegroup does not exist"}));
-							}
-
-							var data = result[0].value;
-							return resolve({
-								pageGroupId: data.id,
-								sampleUrl: data.sampleUrl,
-								pageGroup: data.pageGroup,
-								device: data.platform
-							});
-						});
-					});
-				});
-		},
-		updatePagegroup: function(json) {
-			if(!json.pageGroupId || !json.sampleUrl) {
-				return Promise.reject(new AdPushupError({"status": 404, "message": "Required parameter not found"}));
-			}
-
-			if(!utils.validateUrl(json.sampleUrl)) {
-				return Promise.reject(new AdPushupError({"status": 404, "message": "Please provide a valid sample URL, eg - http://sitename.com"}));
-			}
-
-			var query = ViewQuery.from('dev_app', 'channelById').key(json.pageGroupId);
-			return couchbase.connectToAppBucket()
-				.then(function(appBucket) {
-					return new Promise(function(resolve, reject) {
-						appBucket.query(query, {}, function(err, result) {
-							
-							if(err) {
-								return reject(new AdPushupError({"status": 500, "message": "Some error occurred"}));
-							}
-
-							if(result.length === 0) {
-								return reject(new AdPushupError({"status": 404, "message": "Pagegroup does not exist"}));
-							}
-
-							if(utils.getSiteDomain(json.sampleUrl) !== utils.getSiteDomain(result[0].value.siteDomain)) {
-								return reject(new AdPushupError({"status": 403, "message": "The sample url should be from your website only"}));
-							}
-
-							return resolve({
-								queryResult: result[0],
-								userData: json
-							});							
-						});
-					})
-					.then(function(data) {
-						return channelModel.getChannelByDocId(data.queryResult.id)
-							.then(function(channel) {
-								return {
-									channelModel: channel,
-									userData: data.userData
-								};
-							})
-					})
-					.then(function(channel) {
-						var json = channel.userData,
-							channel = channel.channelModel;
-
-						channel.set('sampleUrl', json.sampleUrl);
-						return channel.save();
-					})
-				})
-				.catch(function(err) {
-					if(err.name !== 'AdPushupError') {
-						throw new Error('Some error occurred');
-					}
-
-					var error = err.message;
-					throw new AdPushupError({"status": error.status, "message": error.message});
-				});
-		},
-		deletePagegroupById: function(pageGroupId) {
-			if(!pageGroupId) {
-				return Promise.reject(new AdPushupError({"status": 404, "message": "Required parameter not found"}));
-			}	
-
-			var query = ViewQuery.from('dev_app', 'channelById').key(pageGroupId);
-			return couchbase.connectToAppBucket()
-				.then(function(appBucket) {
-					return new Promise(function(resolve, reject) {
-						appBucket.query(query, {}, function(err, result) {
-							
-							if(err) {
-								return reject(new AdPushupError({"status": 500, "message": "Some error occurred"}));
-							}
-
-							if(result.length === 0) {
-								return reject(new AdPushupError({"status": 404, "message": "Pagegroup does not exist"}));
-							}
-
-							var data = result[0].value;
-							channelModel.deleteChannel(data.siteId, data.platform, data.pageGroup)
-								.then(function(data) {
-									return resolve({"status": 200, "message": "Pagegroup deleted successfully"});
-								})
-								.catch(function(err) {
-									return reject(new AdPushupError({"status": 500, "message": "Some error occurred"}));
-								});
-						});
-					});
-				})
-				.catch(function(err) {
-					if(err.name !== 'AdPushupError') {
-						throw new Error('Some error occurred');
-					}
-
-					var error = err.message;
-					throw new AdPushupError({"status": error.status, "message": error.message});
-				});
 		},
 		createSiteFromJson: function(json) {
 			return Promise.resolve(new Site(json));

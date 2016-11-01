@@ -32,7 +32,27 @@ module.exports = {
 				{ 'name': 'site', 'message': 'Enter url in valid format', 'value': { 'require_protocol': true } }
 			],
 			'equals': [
-				{ 'name': 'password', 'message': 'Passwords do not match', value: '', matchAgainst: 'confirmPassword' }
+				{ 'name': 'password', 'message': 'Passwords do not match', 'value': '', 'matchAgainst': 'confirmPassword' }
+			]
+		}
+	},
+	api: {
+		'validations': {
+			'isNull': [
+				{'name': 'siteName', 'message': 'Site Name cannot be blank', 'value': '', 'status': 403},	
+				{'name': 'siteId', 'message': 'Site Id cannot be blank', 'value': '', 'status': 403},
+				{'name': 'pageGroupName', 'message': 'Page Group Name cannot be blank', 'value': '', 'status': 403},
+				{'name': 'pageGroupId', 'message': 'Page Group Id cannot be blank', 'value': '', 'status': 403},
+			],
+			'isURL': [
+				{'name': 'sampleUrl', 'message': 'Please enter Sample URL in valid format - http://mywebsite.com', 'value': { 'require_protocol': true }, 'status': 403},
+				{'name': 'siteDomain', 'message': 'Please enter Site Domain in valid format - http://mywebsite.com', 'value': { 'require_protocol': true }, 'status': 403 }
+			],
+			'isIn': [
+				{'name': 'device', 'message': 'Please provide a valid device type. Supported values - DESKTOP, TABLET, MOBILE', 'value': '', 'status': 403, 'allowedValues': ['DESKTOP', 'TABLET', 'MOBILE']}
+			],
+			'isSameDomain': [
+				{'name': 'sampleUrl', 'message': 'The Sample URL should be from your website only', 'value': '', 'status': 403},
 			]
 		}
 	}
