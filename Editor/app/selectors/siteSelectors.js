@@ -15,14 +15,14 @@ const getAfterSaveLoaderState = (state) => state.site.afterSaveLoader.status,
 				const channelVariations = {};
 
 				_.forEach(channel.variations, (variationId) => {
-					const sections = {},
-						ads = {};
+					const sections = {};
 
 					channelVariations[variationId] = allVariations[variationId];
 
 					_.forEach(channelVariations[variationId].sections, (sectionId) => {
 						sections[sectionId] = allSections[sectionId];
 
+						const ads = {};
 						_.forEach(sections[sectionId].ads, (sectionAdId) => {
 							ads[sectionAdId] = allAds[sectionAdId];
 						});
