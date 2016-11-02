@@ -55,7 +55,7 @@ function apiModule() {
 			.then(function(site) {
 			return FormValidator.validate({sampleUrl: json.sampleUrl}, schema.api.validations, site.data.siteDomain)
 				.then(function(data) {
-					var channel = ':'+ json.device.toUpperCase() + ':' + json.pageGroupName.toUpperCase(), channelData, channels = site.get('channels');
+					var channel = json.device.toUpperCase() + ':' + json.pageGroupName.toUpperCase(), channelData, channels = site.get('channels');
 					if(_.includes(channels, channel)) {
 						throw new AdPushupError([{"status": 403, "message": "This pagegroup type already exists"}]);
 					}

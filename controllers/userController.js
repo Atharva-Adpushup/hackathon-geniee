@@ -98,7 +98,7 @@ router
 		return res.render('editor', {
 			isChrome: true,
 			domain: 'http://www.articlemyriad.com',
-			siteId: 1234,
+			siteId: 1,
 			environment: config.development.HOST_ENV
 		});
 	})
