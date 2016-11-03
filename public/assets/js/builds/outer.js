@@ -7792,7 +7792,7 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.getChannelVariations = exports.getChannelVariationsWithAds = exports.getActiveChannelVariationsWithAds = exports.getActiveChannelActiveVariationId = exports.getActiveChannelVariations = exports.getActiveChannelActiveVariation = exports.getVariationSectionsWithAds = exports.getAllVariations = undefined;
+	exports.getVariationStructuredSectionsWithAds = exports.getChannelVariations = exports.getChannelVariationsWithAds = exports.getActiveChannelVariationsWithAds = exports.getActiveChannelActiveVariationId = exports.getActiveChannelVariations = exports.getActiveChannelActiveVariation = exports.getVariationSectionsWithAds = exports.getAllVariations = undefined;
 
 	var _map2 = __webpack_require__(183);
 
@@ -7865,6 +7865,23 @@
 					}) });
 			}) });
 	}),
+	    getVariationStructuredSectionsWithAds = (0, _reselect.createSelector)([getVariation, getVariationSections, _sectionSelectors.getAllSections, _adsSelectors.getAllAds], function (variation) {
+		var varitionSections = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+		var allSections = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+		var allAds = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+		var sections = (0, _map3.default)(varitionSections, function (sectionId) {
+			return allSections[sectionId];
+		});
+		sections = (0, _filter3.default)(sections, function (section) {
+			return typeof section.isIncontent == 'undefined';
+		});
+		return _extends({}, variation, { sections: (0, _map3.default)(sections, function (section) {
+				return _extends({}, section, { ads: (0, _map3.default)(section.ads, function (sectionAdId) {
+						return allAds[sectionAdId];
+					}) });
+			}) });
+	}),
 	    getActiveChannelVariationsWithAds = (0, _reselect.createSelector)([getActiveChannelVariations, _sectionSelectors.getAllSections, _adsSelectors.getAllAds], function () {
 		var activeChannelVariations = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 		var allSections = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -7904,6 +7921,7 @@
 	exports.getActiveChannelVariationsWithAds = getActiveChannelVariationsWithAds;
 	exports.getChannelVariationsWithAds = getChannelVariationsWithAds;
 	exports.getChannelVariations = getChannelVariations;
+	exports.getVariationStructuredSectionsWithAds = getVariationStructuredSectionsWithAds;
 
 /***/ },
 /* 215 */
@@ -41590,7 +41608,7 @@
 						_react2.default.createElement(
 							_reactBootstrap.Col,
 							{ className: 'u-padding-r10px', xs: 4 },
-							_react2.default.createElement('input', { type: 'text', ref: 'editedText', placeholder: 'Enter {this.props.text}', defaultValue: this.props.value }),
+							_react2.default.createElement('input', { type: 'text', ref: 'editedText', placeholder: this.props.text, defaultValue: this.props.value }),
 							_react2.default.createElement(
 								'span',
 								{ className: 'error-message' },
@@ -55181,7 +55199,7 @@
 			return false;
 		}
 		var activeVariation = (0, _variationSelectors.getActiveChannelActiveVariationId)(state),
-		    sections = activeVariation ? (0, _variationSelectors.getVariationSectionsWithAds)(state, { variationId: activeVariation }) : [];
+		    sections = activeVariation ? (0, _variationSelectors.getVariationStructuredSectionsWithAds)(state, { variationId: activeVariation }) : [];
 
 		return {
 			insertMenuVisible: state.ui.insertMenu.isVisible,

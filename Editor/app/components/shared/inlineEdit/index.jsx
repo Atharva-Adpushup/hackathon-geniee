@@ -31,7 +31,7 @@ class InlineEdit extends React.Component {
 					this.state.editMode ? (
 						<Row>
 							<Col className="u-padding-r10px" xs={4}>
-								<input type="text" ref="editedText" placeholder="Enter {this.props.text}" defaultValue={this.props.value} />
+								<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={this.props.value} />
 								<span className="error-message">{this.state.inputError ? this.props.errorMessage : ''}</span>
 							</Col>
 							<Col className="u-padding-r10px" xs={2}>
