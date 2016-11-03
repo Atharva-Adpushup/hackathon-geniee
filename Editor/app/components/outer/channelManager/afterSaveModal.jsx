@@ -44,12 +44,17 @@ class afterSaveModal extends React.Component {
 	}
 
 	render() {
-		const props = this.props;
+		const props = this.props,
+			isStatusPending = (parseInt(props.status, 10) === parseInt(status.PENDING, 10)),
+			isStatusNotPending = (parseInt(props.status, 10) !== parseInt(status.PENDING, 10)),
+			isStatusSuccess = (parseInt(props.status, 10) === parseInt(status.SUCCESS, 10)),
+			isStatusReset = (parseInt(props.status, 10) === parseInt(status.RESET, 10)),
+			renderConditionalBody = (isStatusPending ? this.renderWaitMessage() : isStatusSuccess ? this.renderSuccessMessage() : this.renderErrorMessage());
 
 		return (<Modal show={this.isModalShown()} onHide={props.closeModal} className="_ap_modal_logo  _ap_modal_smily" keyboard={false} title='Saved' animation={true}>
-				<Modal.Header closeButton={props.status !== status.PENDING}></Modal.Header>
+				<Modal.Header closeButton={isStatusNotPending}></Modal.Header>
 				<Modal.Body>
-					{props.status == status.PENDING ? this.renderWaitMessage() : (props.status == status.SUCCESS) ? this.renderSuccessMessage() : this.renderErrorMessage()}
+					{isStatusReset ? null : renderConditionalBody}
 				</Modal.Body>
 		</Modal>);
 	}
