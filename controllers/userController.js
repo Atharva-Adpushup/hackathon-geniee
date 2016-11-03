@@ -10,7 +10,7 @@ var express = require('express'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	oauthHelper = require('../helpers/googleOauth'),
 	// eslint-disable-next-line new-cap
-	router = express.Router(),
+	router = express.Router({ mergeParams: true }),
 	CC = require('../configs/commonConsts'),
 	config = require('../configs/config');
 
@@ -98,7 +98,7 @@ router
 		return res.render('editor', {
 			isChrome: true,
 			domain: 'http://www.articlemyriad.com',
-			siteId: 1,
+			siteId: req.params.siteId,
 			environment: config.development.HOST_ENV
 		});
 	})
