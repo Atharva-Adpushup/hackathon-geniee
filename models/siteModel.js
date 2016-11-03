@@ -8,7 +8,7 @@ var model = require('../helpers/model'),
 	Promise = require('bluebird'),
 	adModel = require('../models/subClasses/site/ad'),
 	_ = require('lodash'),
-	Site = model.extend(function() {
+	Site = model.extend(function () {
 		this.keys = [
 			'siteId',
 			'siteName',
@@ -17,7 +17,6 @@ var model = require('../helpers/model'),
 			'ownerEmail',
 			'channels',
 			'cmsInfo',
-			'ads',
 			'actions',
 			'templates',
 			'adNetworks',
@@ -30,10 +29,10 @@ var model = require('../helpers/model'),
 			'required': []
 		};
 		// this.classMap = { 'ads': adModel };
-		this.defaults = { ads: [], apConfigs: {}, channels: [] };
+		this.defaults = { apConfigs: {}, channels: [] };
 		this.ignore = [];
 
-		this.constructor = function(data, cas) {
+		this.constructor = function (data, cas) {
 			if (!data.siteId) {
 				throw new Error('Site model need siteId');
 			}
@@ -44,13 +43,13 @@ var model = require('../helpers/model'),
 		};
 
 
-		this.getNetwork = function(networkName) {
+		this.getNetwork = function (networkName) {
 			return Promise.resolve(_.find(this.get('adNetworks'), { 'name': networkName }));
 		};
 
-		this.deleteChannel = function(platform, pageGroup) {
-			return new Promise(function(resolve) {
-				var channels = _.filter(this.get('channels'), function(chnl) {
+		this.deleteChannel = function (platform, pageGroup) {
+			return new Promise(function (resolve) {
+				var channels = _.filter(this.get('channels'), function (chnl) {
 					return (chnl !== platform + ':' + pageGroup);
 				});
 				this.set('channels', channels);
@@ -59,53 +58,53 @@ var model = require('../helpers/model'),
 			}.bind(this));
 		};
 
-		this.getAllChannels = function() {
-			var allChannels = _.map(this.get('channels'), function(channel) {
+		this.getAllChannels = function () {
+			var allChannels = _.map(this.get('channels'), function (channel) {
 				var channelArr = channel.split(':');// channel[0] is platform and channel[1] is pagegroup
 				return channelModel.getChannel(this.get('siteId'), channelArr[0], channelArr[1]);
 			}.bind(this));
-			return Promise.all(allChannels).then(function(data) {
-				return _.map(data, function(channel) {
+			return Promise.all(allChannels).then(function (data) {
+				return _.map(data, function (channel) {
 					return channel.toClientJSON();
 				});
 			});
 		};
 
-		this.areAdsSynced = function() {
-			return _.find(this.get('ads'), function(ad) {
+		this.areAdsSynced = function () {
+			return _.find(this.get('ads'), function (ad) {
 				if (ad.get('syncStatus') === true) {
 					return true;
 				}
 			});
 		};
 
-		this.hasUnsyncedAds = function() {
-			return _.find(this.get('ads'), function(ad) {
+		this.hasUnsyncedAds = function () {
+			return _.find(this.get('ads'), function (ad) {
 				if (ad.get('syncStatus') === false) {
 					return true;
 				}
 			});
 		};
 
-		this.getUnsyncedAd = function() {
-			return _.find(this.get('ads'), function(ad) {
+		this.getUnsyncedAd = function () {
+			return _.find(this.get('ads'), function (ad) {
 				return !ad.get('syncStatus');// when ad is unsynced
 			});
 		};
 
-		this.getUnsyncedAds = function(networkName) {
-			return _.filter(this.get('ads'), function(ad) {
+		this.getUnsyncedAds = function (networkName) {
+			return _.filter(this.get('ads'), function (ad) {
 				return !ad.get('syncStatus') && (ad.get('network') === networkName);// when ad is unsynced
 			});
 		};
 
-		this.getAdByVariationName = function(variationName) {
-			return _.find(this.get('ads'), function(ad) {
+		this.getAdByVariationName = function (variationName) {
+			return _.find(this.get('ads'), function (ad) {
 				return variationName === ad.get('variationName');
 			});
 		};
 
-		this.syncAdsenseAdslot = Promise.method(function(variationName, adslot) {
+		this.syncAdsenseAdslot = Promise.method(function (variationName, adslot) {
 			var ad = this.getAdByVariationName(variationName);
 			if (!ad) {
 				throw new AdPushupError('No ad with variationName: ' + variationName);
@@ -115,9 +114,9 @@ var model = require('../helpers/model'),
 			return this.save();
 		}.bind(this));
 
-		this.syncAdsenseAds = Promise.method(function(ads) {
+		this.syncAdsenseAds = Promise.method(function (ads) {
 			var ad = null, self = this;
-			_.each(ads, function(adJson) {
+			_.each(ads, function (adJson) {
 				if (!adJson.adslot) {
 					return true;
 				}
@@ -134,62 +133,62 @@ var model = require('../helpers/model'),
 
 function apiModule() {
 	var API = {
-		createSite: function(data) {
+		createSite: function (data) {
 			var json = { siteName: data.siteName, siteDomain: data.siteDomain, channels: [], cmsInfo: { cmsName: '', pageGroups: [] } };
 
 			return globalModel.incrSiteId()
-				.then(function(siteId) {
+				.then(function (siteId) {
 					json.siteId = siteId;
 					return API.saveSiteData(siteId, 'POST', json);
 				});
 		},
-		getSiteById: function(siteId, requestMethod) {
+		getSiteById: function (siteId, requestMethod) {
 			return couchbase.connectToAppBucket()
-				.then(function(appBucket) {
+				.then(function (appBucket) {
 					return appBucket.getAsync('site::' + siteId, {});
 				})
-				.then(function(json) {
+				.then(function (json) {
 					return new Site(json.value, json.cas);
 				})
-				.catch(function(err) {
-					if(err.code === 13) {
-						throw new AdPushupError([{"status": 404, "message": "Site does not exist"}]);
+				.catch(function (err) {
+					if (err.code === 13) {
+						throw new AdPushupError([{ "status": 404, "message": "Site does not exist" }]);
 					}
 				});
 		},
-		updateSite: function(json) {
+		updateSite: function (json) {
 			return API.getSiteById(json.siteId)
-			.then(function(site) {
-				site.set('siteName', json.siteName);
-				return site.save();
-			})
-			.catch(function(err) {
-				if(err.message[0].status === 404) {
-					throw new AdPushupError([{"status": 404, "message": "Site does not exist"}]);
-				}
+				.then(function (site) {
+					site.set('siteName', json.siteName);
+					return site.save();
+				})
+				.catch(function (err) {
+					if (err.message[0].status === 404) {
+						throw new AdPushupError([{ "status": 404, "message": "Site does not exist" }]);
+					}
 
-				throw new AdPushupError([{"status": 500, "message": "Some error occurred"}]);
-			});
+					throw new AdPushupError([{ "status": 500, "message": "Some error occurred" }]);
+				});
 		},
-		createSiteFromJson: function(json) {
+		createSiteFromJson: function (json) {
 			return Promise.resolve(new Site(json));
 		},
-		deleteSite: function(siteId) {
+		deleteSite: function (siteId) {
 			/**
 			 * delete all original Channel documents and creates archive documents with key _chnl
 			 * @param {object} site site model {}
 			 * @returns {array} deleted channels array
 			 */
 			function getDeleteChannelsPromises(site) {
-				return _(site.get('channels')).map(function(channel) {
+				return _(site.get('channels')).map(function (channel) {
 					var channelArr = channel.split(':'),
 						platform = channelArr[0],
 						pageGroup = channelArr[1];
 
 					return channelModel.deleteChannel(siteId, platform, pageGroup)
-						.then(function() {
+						.then(function () {
 							return (platform + ':' + pageGroup);
-						}).catch(function() {
+						}).catch(function () {
 							throw new AdPushupError('getDeleteChannelsPromises: Channel is not deleted');
 						});
 				});
@@ -202,26 +201,26 @@ function apiModule() {
 			 */
 			function deleteAllChannels(site) {
 				return Promise.all(getDeleteChannelsPromises(site))
-					.then(function(channelArr) {
+					.then(function (channelArr) {
 						return channelArr;
 					})
-					.catch(function() {
+					.catch(function () {
 						throw new AdPushupError('deleteAllChannels: Channels are not deleted');
 					});
 			}
 
 			return Promise
 				.all([API.getSiteById(siteId), couchbase.connectToAppBucket()])
-				.spread(function(site, appBucket) {
+				.spread(function (site, appBucket) {
 					return Promise.resolve(deleteAllChannels(site))
 						// .then(function(deleteChannelsArr) {
 						// deletedChannelsArr argument can be used if required
-						.then(function() {
+						.then(function () {
 							return Promise.all([appBucket.upsertAsync('_' + site.key, site.toJSON(), {}), appBucket.removeAsync(site.key, {})]);
 						});
 				});
 		},
-		getUniquePageGroups: function(siteId) {
+		getUniquePageGroups: function (siteId) {
 			function getVariationFreeApexPageGroup(pageGroup) {
 				var arr = pageGroup.split('_');
 				arr.splice(2, 1);
@@ -229,15 +228,15 @@ function apiModule() {
 			}
 
 			function getApexPageGroups(pageGroups) {
-				var computedPageGroups = _.uniq(_.map(pageGroups, function(pageGroup) {
+				var computedPageGroups = _.uniq(_.map(pageGroups, function (pageGroup) {
 					return getVariationFreeApexPageGroup(pageGroup);
 				})).sort();
 
 				return computedPageGroups;
 			}
 
-			return API.getSiteById(siteId).then(function(site) {
-				var pageGroups = _.uniq(_.map(site.get('channels'), function(val) {
+			return API.getSiteById(siteId).then(function (site) {
+				var pageGroups = _.uniq(_.map(site.get('channels'), function (val) {
 					return val.split(':')[1];
 				})).sort();
 
@@ -248,14 +247,14 @@ function apiModule() {
 				return Promise.resolve(pageGroups);
 			});
 		},
-		saveSiteData: function(siteId, requestMethod, siteData) {
-			return API.getSiteById(siteId, requestMethod).then(function(site) {
+		saveSiteData: function (siteId, requestMethod, siteData) {
+			return API.getSiteById(siteId, requestMethod).then(function (site) {
 				site.setAll(siteData);
 				return site;
-			}, function() {
+			}, function () {
 				return API.createSiteFromJson(siteData);
 			})
-				.then(function(site) {
+				.then(function (site) {
 					return site.save();
 				});
 		}
