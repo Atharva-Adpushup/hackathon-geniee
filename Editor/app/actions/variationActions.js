@@ -18,6 +18,7 @@ const getLastVariationNumber = function (variations) {
 			variationId,
 			payload: {
 				name: `Variation ${getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1}`,
+				trafficDistribution: 0,
 				id: variationId,
 				createTs: Math.floor(Date.now() / 1000),
 				sections: [],
@@ -74,6 +75,7 @@ const getLastVariationNumber = function (variations) {
 	},
 	setActiveVariation = (variationId) => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
 	updateVariation = (variationId, payload) => ({ type: variationActions.UPDATE_VARIATION, variationId, payload }),
-	editVariationName = (variationId, name) => ({ type: variationActions.EDIT_VARIATION_NAME, variationId, name });
+	editVariationName = (variationId, name) => ({ type: variationActions.EDIT_VARIATION_NAME, variationId, name }),
+	editTrafficDistribution = (variationId, trafficDistribution) => ({ type: variationActions.EDIT_TRAFFIC_DISTRIBUTION, variationId, trafficDistribution });
 
-export { addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation, editVariationName };
+export { addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation, editVariationName, editTrafficDistribution };

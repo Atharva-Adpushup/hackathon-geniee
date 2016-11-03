@@ -9,6 +9,7 @@ const variation = (state = {}, action) => {
 				return {
 					id: config.id,
 					name: config.name,
+					trafficDistribution: config.trafficDistribution,
 					createTs: config.createTs,
 					customJs: config.customJs,
 					status: config.status,
@@ -25,6 +26,7 @@ const variation = (state = {}, action) => {
 				return { ...state, [action.payload.id]: variation(undefined, action) };
 
 			case sectionActions.CREATE_SECTION:
+			case sectionActions.CREATE_INCONTENT_SECTION:
 				return { ...state, [action.variationId]: {
 					...state[action.variationId],
 					sections: immutablePush(state[action.variationId].sections, action.sectionId)
@@ -43,6 +45,12 @@ const variation = (state = {}, action) => {
 				return { ...state, [action.variationId]: {
 					...state[action.variationId],
 					name: action.name
+				} };
+			
+			case variationActions.EDIT_TRAFFIC_DISTRIBUTION:
+				return { ...state, [action.variationId]: {
+					...state[action.variationId],
+					trafficDistribution: action.trafficDistribution
 				} };
 
 			case variationActions.DELETE_VARIATION:
