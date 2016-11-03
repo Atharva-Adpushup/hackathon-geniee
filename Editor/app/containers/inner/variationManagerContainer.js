@@ -11,8 +11,8 @@ export default connect(
 	}),
 	(dispatch) => ({
 		onXpathMiss: (id) => { sendMessage(messengerCommands.SECTION_XPATH_MISSING, { sectionId: id }); },
-		onAdClick: (sectionId, adId, position, adpVitals) => {
-			sendMessage(messengerCommands.SHOW_EDIT_CONTEXTMENU, { adId, position, sectionId });
+		onAdClick: (variationId, sectionId, adId, position, adpVitals) => {
+			sendMessage(messengerCommands.SHOW_EDIT_CONTEXTMENU, { adId, position, sectionId, variationId });
 			dispatch(setElementSelectorCords(adpVitals));
 		}
 	})

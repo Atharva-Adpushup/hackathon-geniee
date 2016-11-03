@@ -1,5 +1,5 @@
 import { variationActions, sectionActions } from 'consts/commonConsts';
-import { immutablePush } from 'libs/immutableHelpers';
+import { immutableArrayDelete, immutablePush } from 'libs/immutableHelpers';
 import _ from 'lodash';
 
 const variation = (state = {}, action) => {
@@ -29,6 +29,15 @@ const variation = (state = {}, action) => {
 					...state[action.variationId],
 					sections: immutablePush(state[action.variationId].sections, action.sectionId)
 				} };
+
+			case sectionActions.DELETE_SECTION:
+				const index = state[action.variationId].sections.indexOf(action.sectionId);
+
+				if (index !== -1) {
+					return { ...state, [action.variationId]: { ...state[action.variationId], sections: immutableArrayDelete(state[action.variationId].sections, index) } };
+				}
+
+				return state;
 
 			case variationActions.EDIT_VARIATION_NAME:
 				return { ...state, [action.variationId]: {

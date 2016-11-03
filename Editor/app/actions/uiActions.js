@@ -1,6 +1,6 @@
 import { editMenuActions, insertMenuActions, newChannelMenuActions } from '../consts/commonConsts';
 
-const showEditMenu = (sectionId, adId, position) => ({ type: editMenuActions.SHOW_EDIT_MENU, sectionId, adId, position }),
+const showEditMenu = (sectionId, adId, position, variationId) => ({ type: editMenuActions.SHOW_EDIT_MENU, sectionId, adId, position, variationId }),
 	hideEditMenu = () => ({ type: editMenuActions.HIDE_EDIT_MENU }),
 	showInsertMenu = (payload) => ({ type: insertMenuActions.SHOW_MENU, payload }),
 	hideInsertMenu = () => ({ type: insertMenuActions.HIDE_MENU }),

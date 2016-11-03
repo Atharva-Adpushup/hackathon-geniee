@@ -71,7 +71,7 @@ class Section extends React.Component {
 		const css = Object.assign({}, { position: 'relative', clear: 'both', pointerEvents: 'none', width: '100%', }, { height: this.getMaxDimensions().height });
 		this.$node.css(css);
 		ReactDOM.render(<div className="_ap_reject">
-			{props.ads.map((ad) => <AdBox key={ad.id} ad={ad} clickHandler={this.props.onAdClick.bind(this, props.id)} />)}
+			{props.ads.map((ad) => <AdBox key={ad.id} ad={ad} clickHandler={this.props.onAdClick.bind(this, props.variationId, props.id)} />)}
 		</div>, this.node);
 	}
 
