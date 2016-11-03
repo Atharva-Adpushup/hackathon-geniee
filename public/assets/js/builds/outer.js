@@ -2193,7 +2193,8 @@
 		RESUME_VARIATION: 'RESUME_VARIATION',
 		UPDATE_VARIATION: 'UPDATE_VARIATION',
 		SET_ACTIVE_VARIATION: 'SET_ACTIVE_VARIATION',
-		EDIT_VARIATION_NAME: 'EDIT_VARIATION_NAME'
+		EDIT_VARIATION_NAME: 'EDIT_VARIATION_NAME',
+		EDIT_TRAFFIC_DISTRIBUTION: 'EDIT_TRAFFIC_DISTRIBUTION'
 	},
 	    sectionActions = {
 		CREATE_SECTION: 'CREATE_SECTION',
@@ -7667,7 +7668,7 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.editVariationName = exports.setActiveVariation = exports.updateVariation = exports.deleteVariation = exports.copyVariation = exports.addVariation = undefined;
+	exports.editTrafficDistribution = exports.editVariationName = exports.setActiveVariation = exports.updateVariation = exports.deleteVariation = exports.copyVariation = exports.addVariation = undefined;
 
 	var _map2 = __webpack_require__(183);
 
@@ -7703,6 +7704,7 @@
 				variationId: variationId,
 				payload: {
 					name: 'Variation ' + (getLastVariationNumber((0, _variationSelectors.getChannelVariationsWithAds)(state, { channelId: channelId })) + 1),
+					trafficDistribution: 0,
 					id: variationId,
 					createTs: Math.floor(Date.now() / 1000),
 					sections: [],
@@ -7768,6 +7770,9 @@
 	},
 	    editVariationName = function editVariationName(variationId, name) {
 		return { type: _commonConsts.variationActions.EDIT_VARIATION_NAME, variationId: variationId, name: name };
+	},
+	    editTrafficDistribution = function editTrafficDistribution(variationId, trafficDistribution) {
+		return { type: _commonConsts.variationActions.EDIT_TRAFFIC_DISTRIBUTION, variationId: variationId, trafficDistribution: trafficDistribution };
 	};
 
 	exports.addVariation = addVariation;
@@ -7776,6 +7781,7 @@
 	exports.updateVariation = updateVariation;
 	exports.setActiveVariation = setActiveVariation;
 	exports.editVariationName = editVariationName;
+	exports.editTrafficDistribution = editTrafficDistribution;
 
 /***/ },
 /* 214 */
@@ -41411,7 +41417,8 @@
 		    onCopyVariation = props.onCopyVariation,
 		    onEditVariationName = props.onEditVariationName,
 		    variation = props.variation,
-		    channelId = props.channelId;
+		    channelId = props.channelId,
+		    onEditTrafficDistribution = props.onEditTrafficDistribution;
 
 		return _react2.default.createElement(
 			'div',
@@ -41432,7 +41439,21 @@
 				_react2.default.createElement(
 					_reactBootstrap.Col,
 					{ className: 'u-padding-l10px', xs: 8 },
-					_react2.default.createElement(_index2.default, { text: variation.name, submitHandler: onEditVariationName.bind(null, variation.id), errorMessage: 'Variation Name cannot be blank' })
+					_react2.default.createElement(_index2.default, { value: variation.name, submitHandler: onEditVariationName.bind(null, variation.id), text: 'Variation Name', errorMessage: 'Variation Name cannot be blank' })
+				)
+			),
+			_react2.default.createElement(
+				_reactBootstrap.Row,
+				null,
+				_react2.default.createElement(
+					_reactBootstrap.Col,
+					{ className: 'u-padding-r10px', xs: 2 },
+					'Traffic Distribution'
+				),
+				_react2.default.createElement(
+					_reactBootstrap.Col,
+					{ className: 'u-padding-l10px', xs: 8 },
+					_react2.default.createElement(_index2.default, { value: variation.trafficDistribution, submitHandler: onEditTrafficDistribution.bind(null, variation.id), text: 'Traffic Distribution', errorMessage: 'Traffic Distribution cannot be blank' })
 				)
 			),
 			_react2.default.createElement(
@@ -41453,7 +41474,6 @@
 					)
 				)
 			),
-			_react2.default.createElement('br', null),
 			_react2.default.createElement('br', null),
 			_react2.default.createElement('br', null),
 			_react2.default.createElement(
@@ -41486,7 +41506,8 @@
 		channelId: _react.PropTypes.string.isRequired,
 		onCopyVariation: _react.PropTypes.func.isRequired,
 		onDeleteVariation: _react.PropTypes.func.isRequired,
-		onEditVariationName: _react.PropTypes.func.isRequired
+		onEditVariationName: _react.PropTypes.func.isRequired,
+		onEditTrafficDistribution: _react.PropTypes.func.isRequired
 	};
 
 	exports.default = (0, _reactRedux.connect)(function (state, ownProps) {
@@ -41495,7 +41516,8 @@
 		return (0, _redux.bindActionCreators)({
 			onCopyVariation: _variationActions.copyVariation,
 			onDeleteVariation: _variationActions.deleteVariation,
-			onEditVariationName: _variationActions.editVariationName
+			onEditVariationName: _variationActions.editVariationName,
+			onEditTrafficDistribution: _variationActions.editTrafficDistribution
 		}, dispatch);
 	})(variationOtions);
 
@@ -41568,7 +41590,7 @@
 						_react2.default.createElement(
 							_reactBootstrap.Col,
 							{ className: 'u-padding-r10px', xs: 4 },
-							_react2.default.createElement('input', { type: 'text', ref: 'editedText', placeholder: 'Enter Variation Name', defaultValue: this.props.text }),
+							_react2.default.createElement('input', { type: 'text', ref: 'editedText', placeholder: 'Enter {this.props.text}', defaultValue: this.props.value }),
 							_react2.default.createElement(
 								'span',
 								{ className: 'error-message' },
@@ -41590,17 +41612,18 @@
 						_react2.default.createElement(
 							'strong',
 							null,
-							this.props.text
+							this.props.value
 						),
-						_react2.default.createElement(
+						this.props.text ? _react2.default.createElement(
 							_reactBootstrap.OverlayTrigger,
 							{ placement: 'bottom', overlay: _react2.default.createElement(
 									_reactBootstrap.Tooltip,
 									{ id: 'edit-variation-tooltip' },
-									'Rename Variation'
+									'Edit ',
+									this.props.text
 								) },
 							_react2.default.createElement('button', { onClick: this.triggerEdit.bind(this), className: 'btn-icn-edit' })
-						)
+						) : _react2.default.createElement('button', { onClick: this.triggerEdit.bind(this), className: 'btn-icn-edit' })
 					)
 				);
 			}
@@ -41612,7 +41635,8 @@
 	InlineEdit.propTypes = {
 		text: _react.PropTypes.string.isRequired,
 		submitHandler: _react.PropTypes.func.isRequired,
-		errorMessage: _react.PropTypes.string.isRequired
+		errorMessage: _react.PropTypes.string.isRequired,
+		value: _react.PropTypes.string.isRequired
 	};
 
 	InlineEdit.defaultProps = {
@@ -54692,6 +54716,7 @@
 				return {
 					id: config.id,
 					name: config.name,
+					trafficDistribution: config.trafficDistribution,
 					createTs: config.createTs,
 					customJs: config.customJs,
 					status: config.status,
@@ -54718,6 +54743,11 @@
 			case _commonConsts.variationActions.EDIT_VARIATION_NAME:
 				return _extends({}, state, _defineProperty({}, action.variationId, _extends({}, state[action.variationId], {
 					name: action.name
+				})));
+
+			case _commonConsts.variationActions.EDIT_TRAFFIC_DISTRIBUTION:
+				return _extends({}, state, _defineProperty({}, action.variationId, _extends({}, state[action.variationId], {
+					trafficDistribution: action.trafficDistribution
 				})));
 
 			case _commonConsts.variationActions.DELETE_VARIATION:

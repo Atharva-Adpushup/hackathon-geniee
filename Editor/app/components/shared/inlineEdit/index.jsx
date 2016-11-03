@@ -31,7 +31,7 @@ class InlineEdit extends React.Component {
 					this.state.editMode ? (
 						<Row>
 							<Col className="u-padding-r10px" xs={4}>
-								<input type="text" ref="editedText" placeholder="Enter Variation Name" defaultValue={this.props.text} />
+								<input type="text" ref="editedText" placeholder="Enter {this.props.text}" defaultValue={this.props.value} />
 								<span className="error-message">{this.state.inputError ? this.props.errorMessage : ''}</span>
 							</Col>
 							<Col className="u-padding-r10px" xs={2}>
@@ -40,10 +40,14 @@ class InlineEdit extends React.Component {
 						</Row>
 					) : (
 						<div>
-							<strong>{this.props.text}</strong>
-							<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-variation-tooltip">Rename Variation</Tooltip>}>
-								<button onClick={this.triggerEdit.bind(this)} className="btn-icn-edit"></button>
-							</OverlayTrigger>
+							<strong>{this.props.value}</strong>
+							{
+								this.props.text ? (
+									<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-variation-tooltip">Edit {this.props.text}</Tooltip>}>
+										<button onClick={this.triggerEdit.bind(this)} className="btn-icn-edit"></button>
+									</OverlayTrigger>
+								) : <button onClick={this.triggerEdit.bind(this)} className="btn-icn-edit"></button>
+							}
 						</div>
 					)
 				}
@@ -55,7 +59,8 @@ class InlineEdit extends React.Component {
 InlineEdit.propTypes = {
 	text: PropTypes.string.isRequired,
 	submitHandler: PropTypes.func.isRequired,
-	errorMessage: PropTypes.string.isRequired
+	errorMessage: PropTypes.string.isRequired,
+	value: PropTypes.string.isRequired
 };
 
 InlineEdit.defaultProps = {
