@@ -8333,8 +8333,8 @@
 
 	var _commonConsts = __webpack_require__(39);
 
-	var showEditMenu = function showEditMenu(sectionId, adId, position) {
-		return { type: _commonConsts.editMenuActions.SHOW_EDIT_MENU, sectionId: sectionId, adId: adId, position: position };
+	var showEditMenu = function showEditMenu(sectionId, adId, position, variationId) {
+		return { type: _commonConsts.editMenuActions.SHOW_EDIT_MENU, sectionId: sectionId, adId: adId, position: position, variationId: variationId };
 	},
 	    hideEditMenu = function hideEditMenu() {
 		return { type: _commonConsts.editMenuActions.HIDE_EDIT_MENU };
@@ -35554,9 +35554,8 @@
 	var form = (0, _reduxForm.reduxForm)({
 		form: 'inContentForm',
 		validate: validate
-	});
-
-	var renderField = function renderField(field) {
+	}),
+	    renderField = function renderField(field) {
 		return _react2.default.createElement(
 			'div',
 			null,
@@ -35588,9 +35587,8 @@
 				)
 			)
 		);
-	};
-
-	function validate(formProps) {
+	},
+	    validate = function validate(formProps) {
 		var errors = {};
 
 		if (!formProps.section) {
@@ -35610,7 +35608,7 @@
 		}
 
 		return errors;
-	}
+	};
 
 	var inContentForm = function (_React$Component) {
 		_inherits(inContentForm, _React$Component);
@@ -35704,7 +35702,7 @@
 	var mapStateToProps = function mapStateToProps(state, ownProps) {
 		return _extends({}, ownProps, {
 			initialValues: {
-				section: 2,
+				section: '1',
 				float: 'none',
 				minDistanceFromPrevAd: 200,
 				width: 320,
@@ -35717,11 +35715,11 @@
 			onSubmit: function onSubmit(values) {
 				dispatch((0, _sectionActions.createIncontentSection)({
 					sectionNo: values.section,
-					minDistanceFromPrevAd: values.minDistanceFromPrevAd,
+					minDistanceFromPrevAd: parseInt(values.minDistanceFromPrevAd, 10),
 					float: values.float
 				}, {
-					width: values.width,
-					height: values.height
+					width: parseInt(values.width, 10),
+					height: parseInt(values.height, 10)
 				}, ownProps.variation.id));
 			}
 		};
@@ -41379,12 +41377,15 @@
 				adId: adId,
 				variationId: variationId
 			});
+
+			alert('In-content section has been created!');
 		};
 	},
-	    deleteSection = function deleteSection(sectionId) {
+	    deleteSection = function deleteSection(sectionId, variationId) {
 		return {
 			type: _commonConsts.sectionActions.DELETE_SECTION,
-			sectionId: sectionId
+			sectionId: sectionId,
+			variationId: variationId
 		};
 	},
 	    renameSection = function renameSection(sectionId, name) {
@@ -43037,7 +43038,7 @@
 					break;
 
 				case _commonConsts.messengerCommands.SHOW_EDIT_CONTEXTMENU:
-					dispatch((0, _uiActions.showEditMenu)(data.sectionId, data.adId, data.position));
+					dispatch((0, _uiActions.showEditMenu)(data.sectionId, data.adId, data.position, data.variationId));
 					break;
 
 				case _commonConsts.messengerCommands.CM_FRAMELOAD_SUCCESS:
@@ -43257,7 +43258,7 @@
 						return _react2.default.createElement(
 							_menuItem2.default,
 							{ key: index, icon: 'apSize', text: ad.width + ' ' + ad.height, contentHeading: ad.width + ' x ' + ad.height },
-							_react2.default.createElement(_adDescripterContainer2.default, { ad: ad, sectionId: props.section.id })
+							_react2.default.createElement(_adDescripterContainer2.default, { variationId: props.variationId, ad: ad, sectionId: props.section.id })
 						);
 					})
 				);
@@ -43288,8 +43289,6 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var _redux = __webpack_require__(12);
-
 	var _reactRedux = __webpack_require__(4);
 
 	var _adDescriptor = __webpack_require__(665);
@@ -43298,9 +43297,7 @@
 
 	var _adActions = __webpack_require__(661);
 
-	var adActions = _interopRequireWildcard(_adActions);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	var _sectionActions = __webpack_require__(644);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -43308,7 +43305,17 @@
 		return _extends({}, ownProps);
 	},
 	    mapDispatchToProps = function mapDispatchToProps(dispatch) {
-		return (0, _redux.bindActionCreators)(adActions, dispatch);
+		return {
+			deleteSection: function deleteSection(sectionId, variationId) {
+				dispatch((0, _sectionActions.deleteSection)(sectionId, variationId));
+			},
+			deleteAd: function deleteAd(adId, sectionId) {
+				dispatch((0, _adActions.deleteAd)(adId, sectionId));
+			},
+			updateCss: function updateCss(adId, css) {
+				dispatch((0, _adActions.updateCss)(adId, css));
+			}
+		};
 	};
 
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_adDescriptor2.default);
@@ -43361,6 +43368,25 @@
 		}
 
 		_createClass(adDescriptor, [{
+			key: 'deleteSectionWithAd',
+			value: function deleteSectionWithAd() {
+				var _props = this.props,
+				    ad = _props.ad,
+				    sectionId = _props.sectionId,
+				    variationId = _props.variationId,
+				    deleteAd = _props.deleteAd,
+				    deleteSection = _props.deleteSection;
+
+				// TODO: Optimise below two individual actions
+				// How to: Merge below actions into one (for e.g., DELETE_AD), make it a thunk
+				// and set a boolean flag in action data if that section needs to be deleted.
+				// That way, only one action will be dispatched and this approach helps in
+				// upcoming features (for e.g., Time travel, Redo-Undo) implementation
+
+				deleteAd(ad.id, sectionId);
+				deleteSection(sectionId, variationId);
+			}
+		}, {
 			key: 'toggleCssEditor',
 			value: function toggleCssEditor() {
 				this.setState({ isEditingCss: !this.state.isEditingCss });
@@ -43368,11 +43394,9 @@
 		}, {
 			key: 'render',
 			value: function render() {
-				var _props = this.props,
-				    ad = _props.ad,
-				    sectionId = _props.sectionId,
-				    updateCss = _props.updateCss,
-				    deleteAd = _props.deleteAd;
+				var _props2 = this.props,
+				    ad = _props2.ad,
+				    updateCss = _props2.updateCss;
 
 				if (this.state.isEditingCss) {
 					return _react2.default.createElement(_cssEditor2.default, { css: ad.css, onCancel: this.toggleCssEditor, onSave: updateCss.bind(null, ad.id) });
@@ -43406,7 +43430,7 @@
 							{ xs: 6 },
 							_react2.default.createElement(
 								_reactBootstrap.Button,
-								{ className: 'btn-lightBg btn-cancel', onClick: deleteAd.bind(null, ad.id, sectionId) },
+								{ className: 'btn-lightBg btn-cancel', onClick: this.deleteSectionWithAd.bind(this) },
 								'Delete Ad'
 							)
 						)
@@ -43421,7 +43445,8 @@
 	adDescriptor.propTypes = {
 		ad: _react.PropTypes.object.isRequired,
 		updateCss: _react.PropTypes.func.isRequired,
-		deleteAd: _react.PropTypes.func.isRequired
+		deleteAd: _react.PropTypes.func.isRequired,
+		deleteSection: _react.PropTypes.func.isRequired
 	};
 
 	exports.default = adDescriptor;
@@ -54764,6 +54789,15 @@
 					sections: (0, _immutableHelpers.immutablePush)(state[action.variationId].sections, action.sectionId)
 				})));
 
+			case _commonConsts.sectionActions.DELETE_SECTION:
+				var index = state[action.variationId].sections.indexOf(action.sectionId);
+
+				if (index !== -1) {
+					return _extends({}, state, _defineProperty({}, action.variationId, _extends({}, state[action.variationId], { sections: (0, _immutableHelpers.immutableArrayDelete)(state[action.variationId].sections, index) })));
+				}
+
+				return state;
+
 			case _commonConsts.variationActions.EDIT_VARIATION_NAME:
 				return _extends({}, state, _defineProperty({}, action.variationId, _extends({}, state[action.variationId], {
 					name: action.name
@@ -54771,7 +54805,7 @@
 
 			case _commonConsts.variationActions.EDIT_TRAFFIC_DISTRIBUTION:
 				return _extends({}, state, _defineProperty({}, action.variationId, _extends({}, state[action.variationId], {
-					trafficDistribution: action.trafficDistribution
+					trafficDistribution: parseInt(action.trafficDistribution, 10)
 				})));
 
 			case _commonConsts.variationActions.DELETE_VARIATION:
@@ -55035,7 +55069,7 @@
 
 		switch (action.type) {
 			case _commonConsts.editMenuActions.SHOW_EDIT_MENU:
-				return { isVisible: true, sectionId: action.sectionId, adId: action.adId, position: action.position };
+				return { isVisible: true, sectionId: action.sectionId, variationId: action.variationId, adId: action.adId, position: action.position };
 
 			case _commonConsts.editMenuActions.HIDE_EDIT_MENU:
 			case _commonConsts.adActions.DELETE_AD:

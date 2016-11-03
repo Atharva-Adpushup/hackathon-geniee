@@ -34,6 +34,8 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			adId,
 			variationId
 		});
+
+		alert('In-content section has been created!');
 	},
 	deleteSection = (sectionId, variationId) => ({
 		type: sectionActions.DELETE_SECTION,

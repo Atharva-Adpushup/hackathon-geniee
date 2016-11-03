@@ -2568,8 +2568,8 @@
 			onXpathMiss: function onXpathMiss(id) {
 				(0, _messengerHelper.sendMessage)(_commonConsts.messengerCommands.SECTION_XPATH_MISSING, { sectionId: id });
 			},
-			onAdClick: function onAdClick(sectionId, adId, position, adpVitals) {
-				(0, _messengerHelper.sendMessage)(_commonConsts.messengerCommands.SHOW_EDIT_CONTEXTMENU, { adId: adId, position: position, sectionId: sectionId });
+			onAdClick: function onAdClick(variationId, sectionId, adId, position, adpVitals) {
+				(0, _messengerHelper.sendMessage)(_commonConsts.messengerCommands.SHOW_EDIT_CONTEXTMENU, { adId: adId, position: position, sectionId: sectionId, variationId: variationId });
 				dispatch((0, _actions.setElementSelectorCords)(adpVitals));
 			}
 		};
@@ -2637,6 +2637,7 @@
 					{ id: 'variationManager', style: style },
 					sections.map(function (section) {
 						return _react2.default.createElement(_section2.default, { key: section.id,
+							variationId: props.id,
 							id: section.id,
 							xpath: section.xpath,
 							ads: section.ads,
@@ -6356,7 +6357,7 @@
 					'div',
 					{ className: '_ap_reject' },
 					props.ads.map(function (ad) {
-						return _react2.default.createElement(_adBox2.default, { key: ad.id, ad: ad, clickHandler: _this2.props.onAdClick.bind(_this2, props.id) });
+						return _react2.default.createElement(_adBox2.default, { key: ad.id, ad: ad, clickHandler: _this2.props.onAdClick.bind(_this2, props.variationId, props.id) });
 					})
 				), this.node);
 			}

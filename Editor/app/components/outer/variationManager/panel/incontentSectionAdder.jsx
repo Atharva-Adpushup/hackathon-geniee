@@ -8,47 +8,45 @@ import { createIncontentSection } from 'actions/sectionActions';
 const form = reduxForm({
 	form: 'inContentForm',
 	validate
-});
+}),
+	renderField = field => {
+		return (
+			<div>
+				<Col xs={6} className="u-padding-r10px">
+					<Row>
+						<Col xs={6} className="u-padding-r10px">
+							<strong>{field.label}</strong>
+						</Col>
+						<Col xs={6} className="u-padding-r10px">
+							<input placeholder={field.placeholder} {...field.input} />
+							{field.meta.touched && field.meta.error && <div className="error-message">{field.meta.error}</div>}
+						</Col>
+					</Row>
+				</Col>
+			</div>
+		);
+	},
+	validate = (formProps) => {
+		const errors = {};
 
-const renderField = field => {
-	return (
-		<div>
-			<Col xs={6} className="u-padding-r10px">
-				<Row>
-					<Col xs={6} className="u-padding-r10px">
-						<strong>{field.label}</strong>
-					</Col>
-					<Col xs={6} className="u-padding-r10px">
-						<input placeholder={field.placeholder} {...field.input} />
-						{field.meta.touched && field.meta.error && <div className="error-message">{field.meta.error}</div>}
-					</Col>
-				</Row>
-			</Col>
-		</div>
-	);
-};
+		if (!formProps.section) {
+			errors.section = 'Please enter section';
+		}
 
-function validate(formProps) {
-	const errors = {};
+		if (!formProps.minDistanceFromPrevAd) {
+			errors.minDistanceFromPrevAd = 'Please enter minDistanceFromPrevAd';
+		}
 
-	if (!formProps.section) {
-		errors.section = 'Please enter section';
+		if (!formProps.height) {
+			errors.height = 'Please enter height';
+		}
+
+		if (!formProps.width) {
+			errors.width = 'Please enter width';
+		}
+
+		return errors;
 	}
-
-	if (!formProps.minDistanceFromPrevAd) {
-		errors.minDistanceFromPrevAd = 'Please enter minDistanceFromPrevAd';
-	}
-
-	if (!formProps.height) {
-		errors.height = 'Please enter height';
-	}
-
-	if (!formProps.width) {
-		errors.width = 'Please enter width';
-	}
-
-	return errors;
-}
 
 
 class inContentForm extends React.Component {
@@ -93,7 +91,7 @@ inContentForm.propTypes = {
 const mapStateToProps = (state, ownProps) => ({
 		...ownProps,
 		initialValues: {
-			section: 2,
+			section: '1',
 			float: 'none',
 			minDistanceFromPrevAd: 200,
 			width: 320,
@@ -105,11 +103,11 @@ const mapStateToProps = (state, ownProps) => ({
 		onSubmit: (values) => {
 			dispatch(createIncontentSection({
 				sectionNo: values.section,
-				minDistanceFromPrevAd: values.minDistanceFromPrevAd,
+				minDistanceFromPrevAd: parseInt(values.minDistanceFromPrevAd, 10),
 				float: values.float
 			}, {
-				width: values.width,
-				height: values.height
+				width: parseInt(values.width, 10),
+				height: parseInt(values.height, 10)
 			}, ownProps.variation.id));
 		}
 	});

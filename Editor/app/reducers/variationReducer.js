@@ -50,7 +50,7 @@ const variation = (state = {}, action) => {
 			case variationActions.EDIT_TRAFFIC_DISTRIBUTION:
 				return { ...state, [action.variationId]: {
 					...state[action.variationId],
-					trafficDistribution: action.trafficDistribution
+					trafficDistribution: parseInt(action.trafficDistribution, 10)
 				} };
 
 			case variationActions.DELETE_VARIATION:
