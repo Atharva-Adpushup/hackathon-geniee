@@ -54093,16 +54093,21 @@
 		}, {
 			key: 'render',
 			value: function render() {
-				var props = this.props;
+				var props = this.props,
+				    isStatusPending = parseInt(props.status, 10) === parseInt(_commonConsts.status.PENDING, 10),
+				    isStatusNotPending = parseInt(props.status, 10) !== parseInt(_commonConsts.status.PENDING, 10),
+				    isStatusSuccess = parseInt(props.status, 10) === parseInt(_commonConsts.status.SUCCESS, 10),
+				    isStatusReset = parseInt(props.status, 10) === parseInt(_commonConsts.status.RESET, 10),
+				    renderConditionalBody = isStatusPending ? this.renderWaitMessage() : isStatusSuccess ? this.renderSuccessMessage() : this.renderErrorMessage();
 
 				return _react2.default.createElement(
 					_reactBootstrap.Modal,
 					{ show: this.isModalShown(), onHide: props.closeModal, className: '_ap_modal_logo  _ap_modal_smily', keyboard: false, title: 'Saved', animation: true },
-					_react2.default.createElement(_reactBootstrap.Modal.Header, { closeButton: props.status !== _commonConsts.status.PENDING }),
+					_react2.default.createElement(_reactBootstrap.Modal.Header, { closeButton: isStatusNotPending }),
 					_react2.default.createElement(
 						_reactBootstrap.Modal.Body,
 						null,
-						props.status == _commonConsts.status.PENDING ? this.renderWaitMessage() : props.status == _commonConsts.status.SUCCESS ? this.renderSuccessMessage() : this.renderErrorMessage()
+						isStatusReset ? null : renderConditionalBody
 					)
 				);
 			}
@@ -54736,6 +54741,7 @@
 				return _extends({}, state, _defineProperty({}, action.payload.id, variation(undefined, action)));
 
 			case _commonConsts.sectionActions.CREATE_SECTION:
+			case _commonConsts.sectionActions.CREATE_INCONTENT_SECTION:
 				return _extends({}, state, _defineProperty({}, action.variationId, _extends({}, state[action.variationId], {
 					sections: (0, _immutableHelpers.immutablePush)(state[action.variationId].sections, action.sectionId)
 				})));

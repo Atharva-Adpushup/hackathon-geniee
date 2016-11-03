@@ -26,6 +26,7 @@ const variation = (state = {}, action) => {
 				return { ...state, [action.payload.id]: variation(undefined, action) };
 
 			case sectionActions.CREATE_SECTION:
+			case sectionActions.CREATE_INCONTENT_SECTION:
 				return { ...state, [action.variationId]: {
 					...state[action.variationId],
 					sections: immutablePush(state[action.variationId].sections, action.sectionId)
