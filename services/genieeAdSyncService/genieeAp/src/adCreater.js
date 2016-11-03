@@ -20,9 +20,10 @@ var $ = require('jquery'),
 			'display': 'block',
 			'clear': ad.isIncontent ? null : 'both',
 			'width': ad.width + 'px',
-			'height': ad.height + 'px'
+			'height': ad.height + 'px',
+			'background-color': 'red'
 		}, ad.css)).attr({
-			'data-section': ad.sectionMd5,
+			'data-section': ad.id,
 			'class': '_ap_apex_ad',
 			'data-xpath': ad.xpath ? ad.xpath : '',
 			'data-section-id': ad.section ? ad.section : ''
@@ -58,7 +59,7 @@ var $ = require('jquery'),
 	createAds = function(adp, variation) {
 		var config = adp.config,
 			tracker = adp.tracker,
-			err = adp.error,
+			err = adp.err,
 			finished = false,
 			ads = variation.ads,
 			displayCounter = ads.length,
@@ -76,9 +77,9 @@ var $ = require('jquery'),
 					$.ajaxSettings.cache = true;
 					container.append(utils.base64Decode(ad.adCode));
 					$.ajaxSettings.cache = false;
-					tracker.add(container, function(sectionMd5) {
-						utils.sendBeacon(config.feedbackUrl, {eventType: 2, click: true, sectionMd5: sectionMd5 });
-					}.bind(null, ad.sectionMd5));
+					tracker.add(container, function(id) {
+						utils.sendBeacon(config.feedbackUrl, {eventType: 2, click: true, id: id });
+					}.bind(null, ad.id));
 				} catch (e) {
 					err.push({ msg: 'Error in placing ad.', ad: ad, error: e });
 				}
@@ -102,7 +103,7 @@ var $ = require('jquery'),
 			handleContentSelectorFailure = function(inContentAds) {
 				feedbackData.contentSelectorMissing = true;
 				$.each(inContentAds, function(index, ad) {
-					feedbackData.xpathMiss.push(ad.sectionMd5);
+					feedbackData.xpathMiss.push(ad.id);
 					next(ad, { success: false });
 				});
 			},
@@ -110,11 +111,11 @@ var $ = require('jquery'),
 			// Process strutural sections
 				$.each(structuredAds, function(index, ad) {
 					getAdContainer(ad, config.xpathWaitTimeout).done(function(data) {
-						// if all well then ad sectionMd5 of ad in feedback to tell system that impression was given
-						feedbackData.ads.push(ad.sectionMd5);
+						// if all well then ad id of ad in feedback to tell system that impression was given
+						feedbackData.ads.push(ad.id);
 						next(ad, data);
 					}).fail(function(data) {
-						feedbackData.xpathMiss.push(ad.sectionMd5);
+						feedbackData.xpathMiss.push(ad.id);
 						next(ad, data);
 					});
 				});
@@ -128,10 +129,10 @@ var $ = require('jquery'),
 							if (!!(sectionObj.isSecondaryCss)) {
 								ad.css = $.extend(true, {}, ad.secondaryCss);
 							}
-							feedbackData.ads.push(ad.sectionMd5);
+							feedbackData.ads.push(ad.id);
 							next(ad, { success: true, container: getContainer(ad, sectionObj.elem)});
 						} else {
-							feedbackData.xpathMiss.push(ad.sectionMd5);
+							feedbackData.xpathMiss.push(ad.id);
 							next(ad, { success: false, container: null });
 						}
 					});
@@ -153,15 +154,15 @@ var $ = require('jquery'),
 		// Process incontent sections
 		// If incontent ads thr but no xpath given for content area
 			if (ads.inContentAds.length && !variation.contentSelector) {
-				handleContentSelectorFailure();
+				handleContentSelectorFailure(ads.inContentAds);
 			} else if (ads.inContentAds.length) {
 				nodewatcher.watch(config.contentSelector, config.xpathWaitTimeout).done(function($incontentElm) {
 					placeInContentAds($incontentElm, ads.inContentAds);
 				}).fail(function() {
-					handleContentSelectorFailure();
+					handleContentSelectorFailure(ads.inContentAds);
 				});
 			}
-		});
+		})();
 	};
 
 module.exports = createAds;

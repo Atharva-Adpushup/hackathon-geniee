@@ -8,41 +8,45 @@ var adpushup = require('../../helpers/adpushupEvent'),
 	fs = Promise.promisifyAll(require('fs')),
 	_ = require('lodash');
 
-function getSectionPayload(variationSections) {
-	var sections = {}, ad = null;
+function getAdsPayload(variationSections) {
+	var ads = [], ad = null, json;
 
 	_.each(variationSections, function (section, sectionId) {
 		if (!Object.keys(section.ads).length) {
 			return true;
 		}
 		ad = section.ads[Object.keys(section.ads)[0]]; // for now we have only one ad inside a section
+		json = {};
 		if (section.isIncontent) {
-			sections[sectionId] = {
+			json = {
 				id: sectionId,
 				isIncontent: true,
 				height: parseInt(ad.height, 10),
 				width: parseInt(ad.width, 10),
-				adCode: ad.adCode,
+				adCode: new Buffer("adcode").toString('base64') /*ad.adCode*/,
 				float: section.float,
 				css: ad.css,
 				minDistanceFromPrevAd: section.minDistanceFromPrevAd,
-				ignoreXpaths: section.ignoreXpaths,
-				secondaryCss: ad.secondaryCss,
+				ignoreXpaths: section.ignoreXpaths || [],
 				section: parseInt(section.sectionNo, 10)
 			}
+			if (ad.secondaryCss) {
+				json.secondaryCss = ad.secondaryCss
+			}
 		} else {
-			sections[sectionId] = {
+			json = {
 				id: sectionId,
 				xpath: section.xpath,
 				operation: section.operation,
 				css: ad.css,
 				height: parseInt(ad.height, 10),
 				width: parseInt(ad.width, 10),
-				adCode: ad.adCode
+				adCode: new Buffer("adcode").toString('base64') /*ad.adCode*/
 			}
 		}
+		ads.push(json);
 	});
-	return sections;
+	return ads;
 }
 
 function getVariationsPayload(site) {
@@ -59,22 +63,29 @@ function getVariationsPayload(site) {
 			}
 
 			finalJson[platform][pageGroup] = {
-				variations: {},
 				contentSelector: channel.contentSelector
 			};
 
 			_.each(channel.variations, function (variation, id) {
-				var sections = getSectionPayload(variation.sections);
-				if (!Object.keys(sections).length) {
+				var ads = getAdsPayload(variation.sections);
+				if (!ads.length) {
 					return true;
 				}
-				finalJson[platform][pageGroup]['variations'][id] = {
+				if (!finalJson[platform][pageGroup].variations) {
+					finalJson[platform][pageGroup].variations = [];
+				}
+				finalJson[platform][pageGroup].variations.push({
 					id: variation.id,
 					traffic: variation.trafficDistribution,
 					customJs: variation.customJs,
-					sections: sections
-				};
+					ads: ads
+				});
 			});
+
+			finalJson[platform][pageGroup].variations.sort(function (a, b) {
+				return a.traffic - b.traffic;
+			})
+
 		});
 		return finalJson;
 	});
@@ -88,18 +99,22 @@ adpushup.on('siteSaved', function (site) {
 			getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
 			getConfig = getVariationsPayload(site).then(function (allVariations) {
 				var apConfigs = site.get('apConfigs');
-				apConfigs.variations = allVariations;
+
+				/* Temp Fields */
+				apConfigs.mode = 1;
+				apConfigs.pageGroupPattern = [{ HOME: 'components' }];
+				/* Temp Fields End */
+
+				apConfigs.experiment = allVariations;
 				return apConfigs;
 			}),
 			getFinalConfig = Promise.join(getConfig, getJsFile, function (finalConfig, jsFile) {
-				delete finalConfig.adRecover;
-				delete finalConfig.trafficDistribution;
 				jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(finalConfig));
 				jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
 				return jsFile;
 			}),
 			writeTempFile = function (jsFile) {
-				return fs.writeFileAsync(path.join(tempDestPath, 'apex.js'), jsFile);
+				return fs.writeFileAsync(path.join(tempDestPath, 'genieeAp.js'), jsFile);
 			},
 			cwd = function () {
 				return ftp.cwd('/' + site.get('siteId')).catch(function () {
