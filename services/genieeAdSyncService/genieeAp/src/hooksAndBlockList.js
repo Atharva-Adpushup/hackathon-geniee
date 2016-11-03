@@ -43,6 +43,7 @@ function init(adp, onPageGroupPush) {
 					done = true;
 					// forceFully set pagegroup in case url pattern matches to current url
 					config.pageGroup = key.toUpperCase();
+					break;
 				}
 			}
 			if (done) break;
