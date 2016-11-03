@@ -31,20 +31,28 @@ const getAllVariations = (state) => state.variationByIds,
 		return { ...variation, sections: _.map(sections, (section) => ({ ...section, ads: _.map(section.ads, (sectionAdId) => allAds[sectionAdId]) })) };
 	}),
 
-	getActiveChannelVariationsWithAds = createSelector([getActiveChannelVariations, getAllSections, getAllAds], (activeChannelVariations = [], allSections = {}, allAds = {}) => (
-		_.map(activeChannelVariations, (variation) => {
-			const sections = _.map(variation.sections, (sectionId) => allSections[sectionId]);
-			return { ...variation, sections: _.map(sections, (section) => ({ ...section, ads: _.map(section.ads, (sectionAdId) => allAds[sectionAdId]) })) };
+getVariationStructuredSectionsWithAds = createSelector([getVariation, getVariationSections, getAllSections, getAllAds], (variation, varitionSections = [], allSections = {}, allAds = {}) => {
+	let sections = _.map(varitionSections, (sectionId) => allSections[sectionId]);
+	sections = _.filter(sections, (section) => typeof section.isIncontent == 'undefined');
+	return { ...variation, sections: _.map(sections, (section) => ({ ...section, ads: _.map(section.ads, (sectionAdId) => allAds[sectionAdId]) })) };
+	}),
+
+getActiveChannelVariationsWithAds = createSelector([getActiveChannelVariations, getAllSections, getAllAds], (activeChannelVariations = [], allSections = {}, allAds = {}) => (
+	_.map(activeChannelVariations, (variation) => {
+		const sections = _.map(variation.sections, (sectionId) => allSections[sectionId]);
+		return { ...variation, sections: _.map(sections, (section) => ({ ...section, ads: _.map(section.ads, (sectionAdId) => allAds[sectionAdId]) })) };
 		})
 	)),
 
-	getChannelVariationsWithAds = createSelector([getChannelVariations, getAllSections, getAllAds], (channelVariations = [], allSections = {}, allAds = {}) => (
-		_.map(channelVariations, (variation) => {
-			const sections = _.map(variation.sections, (sectionId) => allSections[sectionId]);
-			return { ...variation, sections: _.map(sections, (section) => ({ ...section, ads: _.map(section.ads, (sectionAdId) => allAds[sectionAdId]) })) };
+getChannelVariationsWithAds = createSelector([getChannelVariations, getAllSections, getAllAds], (channelVariations = [], allSections = {}, allAds = {}) => (
+	_.map(channelVariations, (variation) => {
+		const sections = _.map(variation.sections, (sectionId) => allSections[sectionId]);
+		return { ...variation, sections: _.map(sections, (section) => ({ ...section, ads: _.map(section.ads, (sectionAdId) => allAds[sectionAdId]) })) };
 		})
 	));
 
-export { getAllVariations, getVariationSectionsWithAds, getActiveChannelActiveVariation,
+export {
+	getAllVariations, getVariationSectionsWithAds, getActiveChannelActiveVariation,
 	getActiveChannelVariations, getActiveChannelActiveVariationId, getActiveChannelVariationsWithAds,
-	getChannelVariationsWithAds, getChannelVariations };
+	getChannelVariationsWithAds, getChannelVariations, getVariationStructuredSectionsWithAds
+};
