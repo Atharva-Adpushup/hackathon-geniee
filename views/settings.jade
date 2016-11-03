@@ -3,6 +3,11 @@ extends  layout/base
 block getTitle
     - var titleVar = "Settings"
 
+block append headScripts
+    +loadAsset("js", [
+        '/assets/js/libs/custom/settings.js',
+    ])    
+
 block bodyContent
     include layout/sideBar
     .pageContainer.page-container
@@ -12,4 +17,24 @@ block bodyContent
             .pageContentInner.page-content--inner
                 .notification-wrapper
                 #widgetsArea.row
-                    
+                    .mb-30
+                        .controlAdpushupWrap
+                            h3.title.m-All-0.clearfix 
+                                a Site settings
+                            .settings-pane
+                                h4 Pagegroup pattern
+                                if !pageGroups.length
+                                    | No Pagegroups found!
+                                    
+                                for p in pageGroups
+                                    form.addPageGroupPattern
+                                        .row
+                                            .col-sm-2
+                                                .pagegroup-name!= p.pageGroup
+                                                input(type="hidden" name="pageGroupName" value=p.pageGroup)
+                                            .col-sm-3
+                                                input.form-control(value=utils.getPageGroupPattern(p.pageGroup, patterns) name="pageGroupPattern" required type="text" placeholder="Enter pagegroup pattern")
+                                            .col-sm-1
+                                                button.btn.btn-primary Save
+                                
+

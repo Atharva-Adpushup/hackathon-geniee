@@ -2209,4 +2209,26 @@ maxHeightWidth {
     border-bottom: 3px solid #eb575c;
     border-color: #eb575c; }
 
+.settings-pane {
+  padding: 20px;
+  color: #555555; }
+  .settings-pane h4 {
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ccc; }
+  .settings-pane .row {
+    margin: 15px -15px; }
+  .settings-pane input,
+  .settings-pane button {
+    width: 100%;
+    height: auto;
+    padding: 8px;
+    border-radius: 3px; }
+  .settings-pane input {
+    font-size: 1.2em; }
+  .settings-pane .pagegroup-name {
+    font-size: 1.4em;
+    margin-top: 5px;
+    font-weight: 700; }
+
 /*# sourceMappingURL=website.style.css.map */

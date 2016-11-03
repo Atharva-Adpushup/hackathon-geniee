@@ -47,7 +47,31 @@ router
 		});
 	})
 	.get('/settings', function(req, res) {
-		res.render('settings');
+		siteModel.getSiteById(req.params.siteId)
+			.then(function(site) {
+				res.render('settings', {
+					pageGroups: site.data.cmsInfo.pageGroups,
+					patterns: site.data.apConfigs.pageGroupPattern ? site.data.apConfigs.pageGroupPattern : []
+				});
+			})
+			.catch(function(err) {
+				res.send('Some error occurred!');
+			});
+	})
+	.post('/savePageGroupPattern', function(req, res) {
+		var json = { siteId: req.body.siteId, pageGroupName: req.body.pageGroupName, pageGroupPattern: req.body.pageGroupPattern };
+		siteModel.setPagegroupPattern(json)
+			.then(function(data) {
+				res.send({ success: 1 });
+			})
+			.catch(function(err) {			
+				if(err.name === 'AdPushupError') {
+					res.send({ succes: 0, message: err.message })
+				}
+				else {
+					res.send({ success: 0, message: 'Some error occurred!' });
+				}
+			});
 	})
 	.get('/billing', function(req, res) {
 		res.render('billing', {

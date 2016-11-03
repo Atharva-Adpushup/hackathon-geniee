@@ -3,6 +3,11 @@ extends  layout/base
 block getTitle
     - var titleVar = "DashBoard"
 
+block append headScripts
+    +loadAsset("js", [
+        '/assets/js/libs/custom/settings.js',
+    ])
+
 block bodyContent
     include layout/sideBar
     .pageContainer.page-container

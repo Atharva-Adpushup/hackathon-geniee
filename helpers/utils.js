@@ -4,9 +4,16 @@
 var url = require('url'),
 	logger = require('./logger'),
 	CryptoJS = require('crypto-js'),
+	_ = require('lodash'),
 	API = {
 		convertPagegroupLink: function(pageGroupId, pageGroupName, siteId) {
 			return '<a href="/site/'+siteId+'/pagegroup/'+pageGroupId+'">'+pageGroupName+'</a>';
+		},
+		getPageGroupPattern: function(pageGroup, patterns) {
+			if(patterns.length) {
+				var p = _.find(patterns, function(p) { return _.has(p, pageGroup) ? _.has(p, pageGroup) : ''; });
+				return p ? p[pageGroup] : '';
+			}
 		},
 		random: function(low, high) {
 			return Math.floor(Math.random() * (high - low) + low);

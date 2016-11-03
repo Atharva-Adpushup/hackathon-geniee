@@ -220,6 +220,22 @@ function apiModule() {
 						});
 				});
 		},
+		setPagegroupPattern: function(json) {
+			return API.getSiteById(json.siteId)
+				.then(function (site) {
+					var existingPatterns = site.get('apConfigs').pageGroupPattern,  pattern = {};
+					pattern[json.pageGroupName] = json.pageGroupPattern;
+
+					if(!existingPatterns) {
+						site.set('apConfigs', { pageGroupPattern: new Array(pattern) });
+					}
+					else {
+						var p = _.find(existingPatterns, function(p) { return _.has(p, json.pageGroupName); });
+						p ? p[json.pageGroupName] = json.pageGroupPattern : existingPatterns.push(pattern);
+					}
+					return site.save();
+				})	
+		},
 		getUniquePageGroups: function (siteId) {
 			function getVariationFreeApexPageGroup(pageGroup) {
 				var arr = pageGroup.split('_');

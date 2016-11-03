@@ -1,0 +1,32 @@
+.settings-pane {
+    padding: 20px;
+    color: $fontColor;
+
+    h4 {
+        margin-bottom: 30px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid $lightGrey;
+    }
+
+    .row {
+        margin: 15px -15px;
+    }
+
+    input,
+    button {
+        width: 100%;
+        height: auto;
+        padding: 8px;
+        border-radius: 3px;
+    }
+
+    input {
+        font-size: 1.2em;
+    }
+
+    .pagegroup-name {
+        font-size: 1.4em;
+        margin-top: 5px;
+        font-weight: 700;
+    }
+}
