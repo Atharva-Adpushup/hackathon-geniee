@@ -31,10 +31,12 @@ var express = require('express'),
 		prefix: 'sess::'
 	});
 
+require('./services/genieeAdSyncService/index')
+
 // Enable compression at top
 app.use(compression());
 
-process.on('uncaughtException', function(err) {
+process.on('uncaughtException', function (err) {
 	// handle the error safely
 	console.log(err);
 });
@@ -57,9 +59,9 @@ app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '5mb' }));
 app.use(cookieParser());
 
-couchBaseService.connectToAppBucket().then(function() {
+couchBaseService.connectToAppBucket().then(function () {
 	// set couchbaseStore for session storage
-	couchbaseStore.on('disconnect', function() {
+	couchbaseStore.on('disconnect', function () {
 		console.log('Couchbase store is disconnected now: ', arguments);
 	});
 
@@ -74,7 +76,7 @@ couchBaseService.connectToAppBucket().then(function() {
 
 
 	// Setting template local variables for jade
-	app.use(function(req, res, next) {
+	app.use(function (req, res, next) {
 		app.locals.siteId = 123;
 		app.locals.isSuperUser = (req.session.isSuperUser) ? true : false;
 		app.locals.usersList = (req.session.usersList) ? req.session.usersList : [];
@@ -99,7 +101,7 @@ couchBaseService.connectToAppBucket().then(function() {
 	// will print stacktrace
 	if (app.get('env') === 'development') {
 		app.locals.pretty = true;
-		app.use(function(err, req, res) {
+		app.use(function (err, req, res) {
 			res.status(err.status || 500);
 			res.json({
 				message: err.message,
@@ -111,7 +113,7 @@ couchBaseService.connectToAppBucket().then(function() {
 
 	// production error handler
 	// no stacktraces leaked to user
-	app.use(function(err, req, res) {
+	app.use(function (err, req, res) {
 		res.status(err.status || 500);
 		res.render('error', {
 			message: err.message,
@@ -120,8 +122,8 @@ couchBaseService.connectToAppBucket().then(function() {
 	});
 
 	server.listen(config.development.HOST_PORT);
-	console.log('Server listening at port : '+config.development.HOST_PORT);
-}).catch(function(err) {
+	console.log('Server listening at port : ' + config.development.HOST_PORT);
+}).catch(function (err) {
 	console.log('err: ' + err.toString());
 });
 
