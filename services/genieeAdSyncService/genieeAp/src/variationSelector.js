@@ -2,45 +2,31 @@ var utils = require('../libs/utils'),
 	$ = require('jquery');
 
 module.exports = function(config) {
+	var experiment = config.experiment;
 	// if no experimnet setup for given platform and pagegroup
-	if (!config.variations[config.platform] || !config.variations[config.platform][config.pageGroup]) {
+	if (!experiment || !experiment[config.platform] || !experiment[config.platform][config.pageGroup] || !experiment[config.platform][config.pageGroup].variations) {
 		return false;
 	}
 
-	var allVariations = config.variations[config.platform][config.pageGroup],
-		variationsArray = [],
-		variation,
+	var allVariations = experiment[config.platform][config.pageGroup].variations,
 		chosenVariation,
 		rand = Math.floor(Math.random() * (100)) + 1,
 		tempNumber = 0,
 		forcedvariation = utils.queryParams[config.forceVariation];
 
+		//@ TODO
 		// if variation is forced
 	if (forcedvariation && allVariations[forcedvariation]) {
-		config.chosenVariation = forcedvariation;
-		config.contentSelector = allVariations[forcedvariation].contentSelector;
-		config.customJs = allVariations[forcedvariation].customJs;
-		return allVariations[config.chosenVariation].ads && allVariations[config.chosenVariation].ads.length ? allVariations[config.chosenVariation].ads : false;
+		//
 	} else if (forcedvariation && !allVariations[forcedvariation]) {
 		alert('Varition you are trying to force doesn\'t exist, system will now choose variation automatically');
 	}
 
-		// convert object to Array
-	for (variation in allVariations) {
-		if (allVariations.hasOwnProperty(variation)) {
-			allVariations[variation].name = variation;
-			variationsArray.push(allVariations[variation]);
-		}
-	}
-
-	variationsArray.sort(function(a, b) {
-		return a.traffic - b.traffic;
-	});
-
-	$.each(variationsArray, function(j, variationObj) {
-		tempNumber =  variationObj.traffic + tempNumber;
+	$.each(allVariations, function(j, variationObj) {
+		tempNumber =  parseInt(variationObj.traffic, 10) + tempNumber;
 		if (rand <= tempNumber) {
 			chosenVariation = variationObj;
+			config.contentSelector = experiment[config.platform][config.pageGroup].contentSelector;
 			return false;
 		}
 	});

@@ -23,7 +23,7 @@ const messenger = new Messenger(),
 					break;
 
 				case messengerCommands.SHOW_EDIT_CONTEXTMENU:
-					dispatch(showEditMenu(data.sectionId, data.adId, data.position));
+					dispatch(showEditMenu(data.sectionId, data.adId, data.position, data.variationId));
 					break;
 
 				case messengerCommands.CM_FRAMELOAD_SUCCESS:

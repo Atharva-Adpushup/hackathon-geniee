@@ -16,6 +16,7 @@ class variationManager extends React.Component {
 			<div id="variationManager" style={style}>
 				{
 					sections.map((section) => <Section key={section.id}
+						variationId={props.id}
 						id={section.id}
 						xpath={section.xpath}
 						ads={section.ads}

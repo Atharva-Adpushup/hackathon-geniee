@@ -35,9 +35,10 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			variationId
 		});
 	},
-	deleteSection = (sectionId) => ({
+	deleteSection = (sectionId, variationId) => ({
 		type: sectionActions.DELETE_SECTION,
-		sectionId
+		sectionId,
+		variationId
 	}),
 	renameSection = (sectionId, name) => ({
 		type: sectionActions.DELETE_SECTION,

@@ -19,13 +19,14 @@ $.extend(adp, {
 	err: [],
 	control: control,
 	tracker: new Tracker(),
-	nodewatcher: nodewatcher,
-	platform: browserConfig.platform
+	nodewatcher: nodewatcher
 });
 
 // Extend the settings with generated settings
 // eslint-disable-next-line no-undef
-$.extend(adp.config, ___abpConfig___);
+$.extend(adp.config, ___abpConfig___, {
+	platform: browserConfig.platform
+});
 
 
 function triggerControl(mode) {
@@ -44,12 +45,14 @@ function startCreation() {
 	if (config.disable || creationProcessStarted || !config.pageGroup) {
 		return false;
 	}
-	creationProcessStarted = true;
 	var selectedVariation = selectVariation(config);
 	if (selectedVariation) {
+		creationProcessStarted = true;
 		clearTimeout(pageGroupTimer);
-		config.selectedVariation = selectedVariation;
-		createAds(adp, selectVariation);
+		config.selectedVariation = selectedVariation.id;
+		createAds(adp, selectedVariation);
+	} else {
+		triggerControl(3);
 	}
 }
 

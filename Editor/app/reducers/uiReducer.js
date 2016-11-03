@@ -24,7 +24,7 @@ const insertMenu = (state = { isVisible: false }, action) => {
 	editMenu = (state = { isVisible: false }, action) => {
 		switch (action.type) {
 			case editMenuActions.SHOW_EDIT_MENU:
-				return { isVisible: true, sectionId: action.sectionId, adId: action.adId, position: action.position };
+				return { isVisible: true, sectionId: action.sectionId, variationId: action.variationId, adId: action.adId, position: action.position };
 
 			case editMenuActions.HIDE_EDIT_MENU:
 			case adActions.DELETE_AD:
