@@ -54920,7 +54920,8 @@
 							ads: payload.ads,
 							isIncontent: true,
 							float: payload.float,
-							sectionNo: payload.sectionNo
+							sectionNo: payload.sectionNo,
+							minDistanceFromPrevAd: payload.minDistanceFromPrevAd
 						}))
 					};
 
