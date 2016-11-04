@@ -150,10 +150,9 @@ var $ = require('jquery'),
 		// Process and place structural ads
 			placeStructuralAds(ads.structuredAds);
 
-
 		// Process incontent sections
 		// If incontent ads thr but no xpath given for content area
-			if (ads.inContentAds.length && !variation.contentSelector) {
+			if (ads.inContentAds.length && !config.contentSelector) {
 				handleContentSelectorFailure(ads.inContentAds);
 			} else if (ads.inContentAds.length) {
 				nodewatcher.watch(config.contentSelector, config.xpathWaitTimeout).done(function($incontentElm) {

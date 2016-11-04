@@ -63,16 +63,14 @@ function getVariationsPayload(site) {
 			}
 
 			finalJson[platform][pageGroup] = {
-				contentSelector: channel.contentSelector
+				variations: [],
+				contentSelector: '.post-content' //channel.contentSelector
 			};
 
 			_.each(channel.variations, function (variation, id) {
 				var ads = getAdsPayload(variation.sections);
 				if (!ads.length) {
 					return true;
-				}
-				if (!finalJson[platform][pageGroup].variations) {
-					finalJson[platform][pageGroup].variations = [];
 				}
 				finalJson[platform][pageGroup].variations.push({
 					id: variation.id,
@@ -102,7 +100,7 @@ adpushup.on('siteSaved', function (site) {
 
 				/* Temp Fields */
 				apConfigs.mode = 1;
-				apConfigs.pageGroupPattern = [{ HOME: 'components' }];
+				//apConfigs.pageGroupPattern = [{ HOME: 'components' }];
 				/* Temp Fields End */
 
 				apConfigs.experiment = allVariations;
