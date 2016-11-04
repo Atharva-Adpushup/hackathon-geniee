@@ -2241,8 +2241,8 @@
 		sizes: []
 	}],
 	    defaultSectionCss = { 'margin-left': 'auto', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px', clear: 'both' },
-	    leftSectionCss = { 'margin-left': '0px', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px', clear: 'both' },
-	    rightSectionCss = { 'margin-left': 'auto', 'margin-right': '0px', 'margin-top': '0px', 'margin-bottom': '0px', clear: 'both' };
+	    leftSectionCss = { float: 'left', 'margin-left': '0px', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px' },
+	    rightSectionCss = { float: 'right', 'margin-left': 'auto', 'margin-right': '0px', 'margin-top': '0px', 'margin-bottom': '0px' };
 
 	exports.status = status;
 	exports.proxy = proxy;
@@ -41336,6 +41336,8 @@
 
 	var _commonConsts = __webpack_require__(39);
 
+	var _variationSelectors = __webpack_require__(214);
+
 	var _utils = __webpack_require__(181);
 
 	var _utils2 = _interopRequireDefault(_utils);
@@ -41356,8 +41358,8 @@
 	},
 	    createIncontentSection = function createIncontentSection(sectionPayload, adPayload, variationId) {
 		return function (dispatch, getState) {
-			var state = getState(),
-			    arr = (0, _map3.default)(state.sectionByIds, function (data) {
+			var variationSections = (0, _variationSelectors.getVariationSectionsWithAds)(getState(), { variationId: variationId }).sections,
+			    arr = (0, _map3.default)(variationSections, function (data) {
 				return data;
 			});
 			if ((0, _find3.default)(arr, { sectionNo: sectionPayload.sectionNo })) {

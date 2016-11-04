@@ -1,4 +1,5 @@
 import { sectionActions, defaultSectionCss, leftSectionCss, rightSectionCss } from 'consts/commonConsts';
+import { getVariationSectionsWithAds } from 'selectors/variationSelectors';
 import Utils from 'libs/utils';
 import _ from 'lodash';
 
@@ -15,8 +16,8 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 		};
 	},
 	createIncontentSection = (sectionPayload, adPayload, variationId) => (dispatch, getState) => {
-		const state = getState(),
-			arr = _.map(state.sectionByIds, function (data) { return data; });
+		const variationSections = getVariationSectionsWithAds(getState(), { variationId }).sections,
+			arr = _.map(variationSections, function (data) { return data; });
 		if (_.find(arr, { sectionNo: sectionPayload.sectionNo })) {
 			alert('Cannot create in content section with same section no.');
 			return;
