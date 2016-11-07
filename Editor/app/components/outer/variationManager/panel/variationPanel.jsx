@@ -8,14 +8,14 @@ import VariationSections from './variationSections';
 
 class VariationPanel extends React.Component {
 	render() {
-		const { variation, channelId } = this.props;
+		const { variation, channelId, sections } = this.props;
 		return (<div className="variation-settings">
 			<TabPanel tabPosition="left">
 				<div tabTitle="Info">
 					<VariationOptions channelId={channelId} variation={variation} />
 				</div>
 				<div tabTitle="Sections">
-					<VariationSections channelId={channelId} variation={variation} />
+					<VariationSections channelId={channelId} variation={variation} sections={sections} />
 				</div>
 				<div tabTitle="Add Incontent Variation">
 					<IncontentAdder channelId={channelId} variation={variation} />

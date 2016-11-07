@@ -29295,7 +29295,7 @@
 			variations: (0, _variationSelectors.getActiveChannelVariationsWithAds)(state),
 			activeVariation: (0, _variationSelectors.getActiveChannelActiveVariation)(state),
 			activeChannelId: (0, _channelSelectors.getActiveChannelId)(state),
-			activeVariationSections: (0, _variationSelectors.getActiveChannelActiveVariation)(state) !== null ? (0, _variationSelectors.getVariationSectionsWithAds)(state, { variationId: (0, _variationSelectors.getActiveChannelActiveVariation)(state).id }) : null
+			activeVariationSections: (0, _variationSelectors.getActiveChannelActiveVariation)(state) !== null ? (0, _variationSelectors.getVariationSectionsWithAds)(state, { variationId: (0, _variationSelectors.getActiveChannelActiveVariation)(state).id }).sections : null
 		};
 	},
 	    noop = function noop() {
@@ -29407,7 +29407,7 @@
 						null,
 						_react2.default.createElement(_glass2.default, { clickHandler: this.toggleVariationPanel, shim: true }),
 						' ',
-						_react2.default.createElement(_variationPanel2.default, { channelId: this.props.activeChannelId, variation: this.props.activeVariation })
+						_react2.default.createElement(_variationPanel2.default, { channelId: this.props.activeChannelId, variation: this.props.activeVariation, sections: this.props.activeVariationSections })
 					),
 					_react2.default.createElement(
 						'div',
@@ -29433,6 +29433,7 @@
 		variations: _react.PropTypes.array,
 		activeVariation: _react.PropTypes.object,
 		activeChannelId: _react.PropTypes.string,
+		activeVariationSections: _react.PropTypes.array,
 		createVariation: _react.PropTypes.func,
 		deleteVariation: _react.PropTypes.func,
 		copyVariation: _react.PropTypes.func,
@@ -29589,7 +29590,8 @@
 			value: function render() {
 				var _props = this.props,
 				    variation = _props.variation,
-				    channelId = _props.channelId;
+				    channelId = _props.channelId,
+				    sections = _props.sections;
 
 				return _react2.default.createElement(
 					'div',
@@ -29605,7 +29607,7 @@
 						_react2.default.createElement(
 							'div',
 							{ tabTitle: 'Sections' },
-							_react2.default.createElement(_variationSections2.default, { channelId: channelId, variation: variation })
+							_react2.default.createElement(_variationSections2.default, { channelId: channelId, variation: variation, sections: sections })
 						),
 						_react2.default.createElement(
 							'div',
