@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import TabPanel from 'react-tab-panel';
 import 'react-tab-panel/index.css';
 import './variationPanel.scss';
@@ -15,7 +15,7 @@ class VariationPanel extends React.Component {
 					<VariationOptions channelId={channelId} variation={variation} />
 				</div>
 				<div tabTitle="Sections">
-					<VariationSections channelId={channelId} variation={variation} sections={sections} />
+					<VariationSections variation={variation} sections={sections} />
 				</div>
 				<div tabTitle="Add Incontent Variation">
 					<IncontentAdder channelId={channelId} variation={variation} />

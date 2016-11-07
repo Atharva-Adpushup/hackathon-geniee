@@ -29554,7 +29554,7 @@
 
 	__webpack_require__(573);
 
-	__webpack_require__(707);
+	__webpack_require__(577);
 
 	var _incontentSectionAdder = __webpack_require__(579);
 
@@ -29607,7 +29607,7 @@
 						_react2.default.createElement(
 							'div',
 							{ tabTitle: 'Sections' },
-							_react2.default.createElement(_variationSections2.default, { channelId: channelId, variation: variation, sections: sections })
+							_react2.default.createElement(_variationSections2.default, { variation: variation, sections: sections })
 						),
 						_react2.default.createElement(
 							'div',
@@ -35478,8 +35478,46 @@
 
 
 /***/ },
-/* 577 */,
-/* 578 */,
+/* 577 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(578);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(576)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../../../node_modules/css-loader/index.js!./../../../../../node_modules/sass-loader/index.js!./variationPanel.scss", function() {
+				var newContent = require("!!./../../../../../node_modules/css-loader/index.js!./../../../../../node_modules/sass-loader/index.js!./variationPanel.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 578 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(575)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".react-tab-panel {\n  font-size: 1.2em;\n  position: relative;\n  top: -12px;\n  font-family: \"Karla\", sans-serif;\n  height: 90%; }\n\n.react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-title:not(.react-tab-panel__tab-title--active) {\n  color: #555555; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-between {\n  display: none; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title--active {\n  border-left: 3px solid #cf474b; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner--active:before,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active:after, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner--active:after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner {\n  border-color: #e6e6e6; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active {\n  border-color: transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner {\n  padding: 12px; }\n\n.react-tab-panel--theme-default .react-tab-panel__body {\n  padding: 12px 12px 12px 20px; }\n  .react-tab-panel--theme-default .react-tab-panel__body > div {\n    display: block;\n    width: 100%; }\n  .react-tab-panel--theme-default .react-tab-panel__body .row {\n    margin: 0 0 5px; }\n    .react-tab-panel--theme-default .react-tab-panel__body .row .row {\n      margin-bottom: 0; }\n    .react-tab-panel--theme-default .react-tab-panel__body .row .bnt-block {\n      width: auto; }\n  .react-tab-panel--theme-default .react-tab-panel__body input {\n    width: 100%;\n    padding: 3.5px 10px;\n    border-radius: 3px;\n    border: 1px solid #ccc; }\n", ""]);
+
+	// exports
+
+
+/***/ },
 /* 579 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -41638,16 +41676,26 @@
 		value: true
 	});
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	var _react = __webpack_require__(2);
 
 	var _react2 = _interopRequireDefault(_react);
 
 	var _reactBootstrap = __webpack_require__(264);
 
+	var _redux = __webpack_require__(12);
+
+	var _reactRedux = __webpack_require__(4);
+
+	var _sectionActions = __webpack_require__(644);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var variationSections = function variationSections(props) {
-		var sections = props.sections;
+		var variation = props.variation,
+		    sections = props.sections,
+		    onDeleteSection = props.onDeleteSection;
 
 		return _react2.default.createElement(
 			'div',
@@ -41657,6 +41705,11 @@
 				{ className: 'variation-section-heading' },
 				'Variation Sections'
 			),
+			!sections.length ? _react2.default.createElement(
+				'span',
+				null,
+				'No Sections'
+			) : '',
 			_react2.default.createElement(
 				'ul',
 				{ className: 'list-group' },
@@ -41812,7 +41865,7 @@
 								{ className: 'u-padding-r10px', xs: 2 },
 								_react2.default.createElement(
 									_reactBootstrap.Button,
-									{ className: 'btn-lightBg btn-del-line btn-block', type: 'submit' },
+									{ className: 'btn-lightBg btn-del-line btn-block', onClick: onDeleteSection.bind(null, section.id, variation.id), type: 'submit' },
 									'Delete Section'
 								)
 							)
@@ -41825,11 +41878,17 @@
 
 	variationSections.propTypes = {
 		variation: _react.PropTypes.object.isRequired,
-		channelId: _react.PropTypes.string.isRequired,
-		sections: _react.PropTypes.array.isRequired
+		sections: _react.PropTypes.array.isRequired,
+		onDeleteSection: _react.PropTypes.func.isRequired
 	};
 
-	exports.default = variationSections;
+	exports.default = (0, _reactRedux.connect)(function (state, ownProps) {
+		return _extends({}, ownProps);
+	}, function (dispatch) {
+		return (0, _redux.bindActionCreators)({
+			onDeleteSection: _sectionActions.deleteSection
+		}, dispatch);
+	})(variationSections);
 
 /***/ },
 /* 648 */
@@ -55402,46 +55461,6 @@
 	};
 
 	exports.default = unloadHandler;
-
-/***/ },
-/* 707 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(708);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(576)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../../../node_modules/css-loader/index.js!./../../../../../node_modules/sass-loader/index.js!./variationPanel.scss", function() {
-				var newContent = require("!!./../../../../../node_modules/css-loader/index.js!./../../../../../node_modules/sass-loader/index.js!./variationPanel.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 708 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(575)();
-	// imports
-
-
-	// module
-	exports.push([module.id, ".react-tab-panel {\n  font-size: 1.2em;\n  position: relative;\n  top: -12px;\n  font-family: \"Karla\", sans-serif;\n  height: 90%; }\n\n.react-tab-panel__tab-strip--theme-default .react-tab-panel__tab-title:not(.react-tab-panel__tab-title--active) {\n  color: #555555; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-between {\n  display: none; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title--active {\n  border-left: 3px solid #cf474b; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-strip-after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active:before, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner--active:before,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active:after, .react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-right .react-tab-panel__tab-title-inner--active:after,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner,\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner {\n  border-color: #e6e6e6; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner--active {\n  border-color: transparent; }\n\n.react-tab-panel__tab-strip--theme-default.react-tab-panel__tab-strip--orientation-horizontal.react-tab-panel__tab-strip--tab-position-left .react-tab-panel__tab-title-inner {\n  padding: 12px; }\n\n.react-tab-panel--theme-default .react-tab-panel__body {\n  padding: 12px 12px 12px 20px; }\n  .react-tab-panel--theme-default .react-tab-panel__body > div {\n    display: block;\n    width: 100%; }\n  .react-tab-panel--theme-default .react-tab-panel__body .row {\n    margin: 0 0 5px; }\n    .react-tab-panel--theme-default .react-tab-panel__body .row .row {\n      margin-bottom: 0; }\n    .react-tab-panel--theme-default .react-tab-panel__body .row .bnt-block {\n      width: auto; }\n  .react-tab-panel--theme-default .react-tab-panel__body input {\n    width: 100%;\n    padding: 3.5px 10px;\n    border-radius: 3px;\n    border: 1px solid #ccc; }\n", ""]);
-
-	// exports
-
 
 /***/ }
 /******/ ]);
