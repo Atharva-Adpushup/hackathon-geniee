@@ -3619,4 +3619,25 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   font-size: 1.05em;
   border-bottom: 1px solid #ccc; }
 
+.incontent-label {
+  background-color: #eb575c;
+  color: #fff;
+  font-weight: 400;
+  padding: 3px 14px 3px 3px;
+  border-radius: 4px;
+  font-size: .9em;
+  vertical-align: middle;
+  margin-left: 10px;
+  position: relative; }
+  .incontent-label i {
+    margin: 0 5px; }
+  .incontent-label .fa-check {
+    position: absolute;
+    background-color: #fff;
+    color: #eb575c;
+    border-radius: 50%;
+    padding: 2px 1.5px;
+    top: -2px;
+    border: 1px solid #eb575c; }
+
 /*# sourceMappingURL=editor.style.css.map */

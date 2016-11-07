@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import TabPanel from 'react-tab-panel';
 import 'react-tab-panel/index.css';
-import './styles.scss';
+import './variationPanel.scss';
 import IncontentAdder from './incontentSectionAdder';
 import VariationOptions from './variationOptions';
 import VariationSections from './variationSections';

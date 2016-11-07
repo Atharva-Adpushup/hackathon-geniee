@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Field, reduxForm } from 'redux-form';
 import { Row, Col, Button } from 'react-bootstrap';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { createIncontentSection } from 'actions/sectionActions';
 

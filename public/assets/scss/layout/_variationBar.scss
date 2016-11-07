@@ -76,3 +76,29 @@
     border-bottom: 1px solid $lightGrey;
 }
 
+.incontent-label {
+    background-color: $primaryColor;
+    color: $whiteColor;
+    font-weight: 400;
+    padding: 3px 14px 3px 3px;
+    border-radius: 4px;
+    font-size: .9em;
+    vertical-align: middle;
+    margin-left: 10px;
+    position: relative;
+
+    i {
+        margin: 0 5px;
+    }
+
+    .fa-check {
+        position: absolute;
+        background-color: $whiteColor;
+        color: $primaryColor;
+        border-radius: 50%;
+        padding: 2px 1.5px;
+        top: -2px;
+        border: 1px solid $primaryColor;
+    }
+}
+
