@@ -5,11 +5,10 @@ var express = require('express'),
 	_ = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
-	router = express.Router();
+	router = express.Router({ mergeParams: true });
 
 router
 	.get('/:pageGroupId', function(req, res) {
-
 		res.render('pageGroup', {
 			pageGroupName: 'Post Page - Desktop',
 			sampleUrl: 'http://mysite.com/post',

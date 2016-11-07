@@ -1,13 +1,9 @@
 import React, { PropTypes } from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 
 const variationSections = (props) => {
-	const { variation, channelId } = props;
 	return (
 		<div>
-			<h1 className="variation-section-heading">Variataion Sections</h1>
-
+			<h1 className="variation-section-heading">Variation Sections</h1>
 		</div>
 	);
 };
@@ -17,10 +13,4 @@ variationSections.propTypes = {
 	channelId: PropTypes.string.isRequired
 };
 
-export default connect(
-	(state, ownProps) => ({ ...ownProps }),
-	(dispatch) => bindActionCreators({
-
-	}, dispatch)
-	)(variationSections);
-
+export default variationSections;

@@ -7758,7 +7758,7 @@
 			if (variations.length > 1) {
 				dispatch({ type: _commonConsts.variationActions.DELETE_VARIATION, variationId: variationId, channelId: channelId });
 			} else {
-				alert('can\'t delete varaiation');
+				alert('You need at least one variation!');
 			}
 		};
 	},
@@ -7774,7 +7774,6 @@
 	    editTrafficDistribution = function editTrafficDistribution(variationId, trafficDistribution) {
 		return { type: _commonConsts.variationActions.EDIT_TRAFFIC_DISTRIBUTION, variationId: variationId, trafficDistribution: trafficDistribution };
 	};
-
 	exports.addVariation = addVariation;
 	exports.copyVariation = copyVariation;
 	exports.deleteVariation = deleteVariation;
@@ -29295,7 +29294,8 @@
 		return {
 			variations: (0, _variationSelectors.getActiveChannelVariationsWithAds)(state),
 			activeVariation: (0, _variationSelectors.getActiveChannelActiveVariation)(state),
-			activeChannelId: (0, _channelSelectors.getActiveChannelId)(state)
+			activeChannelId: (0, _channelSelectors.getActiveChannelId)(state),
+			activeVariationSections: (0, _variationSelectors.getActiveChannelActiveVariation)(state) !== null ? (0, _variationSelectors.getVariationSectionsWithAds)(state, { variationId: (0, _variationSelectors.getActiveChannelActiveVariation)(state).id }) : null
 		};
 	},
 	    noop = function noop() {
@@ -41670,35 +41670,26 @@
 /* 647 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 	var _react = __webpack_require__(2);
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _redux = __webpack_require__(12);
-
-	var _reactRedux = __webpack_require__(4);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var variationSections = function variationSections(props) {
-		var variation = props.variation,
-		    channelId = props.channelId;
-
 		return _react2.default.createElement(
-			'div',
+			"div",
 			null,
 			_react2.default.createElement(
-				'h1',
-				{ className: 'variation-section-heading' },
-				'Variataion Sections'
+				"h1",
+				{ className: "variation-section-heading" },
+				"Variation Sections"
 			)
 		);
 	};
@@ -41708,11 +41699,7 @@
 		channelId: _react.PropTypes.string.isRequired
 	};
 
-	exports.default = (0, _reactRedux.connect)(function (state, ownProps) {
-		return _extends({}, ownProps);
-	}, function (dispatch) {
-		return (0, _redux.bindActionCreators)({}, dispatch);
-	})(variationSections);
+	exports.default = variationSections;
 
 /***/ },
 /* 648 */

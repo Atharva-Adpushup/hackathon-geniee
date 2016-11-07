@@ -2,12 +2,13 @@ import { connect } from 'react-redux';
 import VariationManager from 'variationManager/variationManager.jsx';
 import { addVariation, copyVariation, deleteVariation, setActiveVariation } from 'actions/variationActions';
 import { getActiveChannelId } from 'selectors/channelSelectors';
-import { getActiveChannelVariationsWithAds, getActiveChannelActiveVariation } from 'selectors/variationSelectors';
+import { getActiveChannelVariationsWithAds, getActiveChannelActiveVariation, getVariationSectionsWithAds } from 'selectors/variationSelectors';
 
 const mapStateToProps = (state) => ({
 		variations: getActiveChannelVariationsWithAds(state),
 		activeVariation: getActiveChannelActiveVariation(state),
-		activeChannelId: getActiveChannelId(state)
+		activeChannelId: getActiveChannelId(state),
+		activeVariationSections: getActiveChannelActiveVariation(state) !== null ? getVariationSectionsWithAds(state, { variationId: getActiveChannelActiveVariation(state).id }) : null
 	}),
 	noop = () => ({ type: 'test' }),
 	mapDispatchToProps = (dispatch) => ({

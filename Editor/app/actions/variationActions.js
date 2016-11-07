@@ -70,12 +70,11 @@ const getLastVariationNumber = function (variations) {
 		if (variations.length > 1) {
 			dispatch({ type: variationActions.DELETE_VARIATION, variationId, channelId });
 		} else {
-			alert('can\'t delete varaiation');
+			alert('You need at least one variation!');
 		}
 	},
 	setActiveVariation = (variationId) => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
 	updateVariation = (variationId, payload) => ({ type: variationActions.UPDATE_VARIATION, variationId, payload }),
 	editVariationName = (variationId, name) => ({ type: variationActions.EDIT_VARIATION_NAME, variationId, name }),
 	editTrafficDistribution = (variationId, trafficDistribution) => ({ type: variationActions.EDIT_TRAFFIC_DISTRIBUTION, variationId, trafficDistribution });
-
 export { addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation, editVariationName, editTrafficDistribution };
