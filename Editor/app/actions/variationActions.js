@@ -68,7 +68,9 @@ const getLastVariationNumber = function (variations) {
 	deleteVariation = (variationId, channelId) => (dispatch, getState) => {
 		const variations = getChannelVariations(getState(), { channelId });
 		if (variations.length > 1) {
-			dispatch({ type: variationActions.DELETE_VARIATION, variationId, channelId });
+			if(confirm('Are you sure you want to delete this variation ?')) {
+				dispatch({ type: variationActions.DELETE_VARIATION, variationId, channelId });
+			}
 		} else {
 			alert('You need at least one variation!');
 		}

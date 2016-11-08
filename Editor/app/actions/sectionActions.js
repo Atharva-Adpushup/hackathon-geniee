@@ -38,13 +38,17 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 
 		alert('In-content section has been created!');
 	},
-	deleteSection = (sectionId, variationId) => ({
-		type: sectionActions.DELETE_SECTION,
-		sectionId,
-		variationId
-	}),
+	deleteSection = (sectionId, variationId) => (dispatch, getState) => {
+		if(confirm('Are you sure you want to delete this section ?')) {
+			dispatch({
+				type: sectionActions.DELETE_SECTION,
+				sectionId,
+				variationId
+			});
+		}
+	},
 	renameSection = (sectionId, name) => ({
-		type: sectionActions.DELETE_SECTION,
+		type: sectionActions.RENAME_SECTION,
 		sectionId,
 		name
 	});

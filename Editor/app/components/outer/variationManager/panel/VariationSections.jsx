@@ -2,10 +2,11 @@ import React, { PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { deleteSection } from 'actions/sectionActions.js';
+import { deleteSection, renameSection } from 'actions/sectionActions.js';
+import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 
 const variationSections = (props) => {
-	const { variation, sections, onDeleteSection } = props;
+	const { variation, sections, onDeleteSection, onRenameSection } = props;
 	return (
 		<div>
 			<h1 className="variation-section-heading">Variation Sections</h1>
@@ -15,12 +16,8 @@ const variationSections = (props) => {
 						<li className="list-group-item" key={section.id}>
 							<Row>
 								<Col className="u-padding-r10px" xs={12}>
-									<strong>{section.name}</strong>
-									{ section.isIncontent ? (
-											<label className="incontent-label">
-												<i className="fa fa-object-group"></i><span>In-Content</span><i className="fa fa-check"></i>
-											</label>
-										) : '' }
+									<InlineEdit value={section.name} submitHandler={onRenameSection.bind(null, section.id)} text="Section Name" errorMessage="Section Name cannot be blank" />
+									
 								</Col>
 							</Row>
 							<Row>
@@ -70,13 +67,15 @@ const variationSections = (props) => {
 variationSections.propTypes = {
 	variation: PropTypes.object.isRequired,
 	sections: PropTypes.array.isRequired,
-	onDeleteSection: PropTypes.func.isRequired
+	onDeleteSection: PropTypes.func.isRequired,
+	onRenameSection: PropTypes.func.isRequired
 };
 
 export default connect(
 	(state, ownProps) => ({ ...ownProps }),
 	(dispatch) => bindActionCreators({
-		onDeleteSection: deleteSection
+		onDeleteSection: deleteSection,
+		onRenameSection: renameSection
 	}, dispatch)
 	)(variationSections);
 

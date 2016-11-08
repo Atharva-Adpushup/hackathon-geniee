@@ -7756,7 +7756,9 @@
 		return function (dispatch, getState) {
 			var variations = (0, _variationSelectors.getChannelVariations)(getState(), { channelId: channelId });
 			if (variations.length > 1) {
-				dispatch({ type: _commonConsts.variationActions.DELETE_VARIATION, variationId: variationId, channelId: channelId });
+				if (confirm('Are you sure you want to delete this variation ?')) {
+					dispatch({ type: _commonConsts.variationActions.DELETE_VARIATION, variationId: variationId, channelId: channelId });
+				}
 			} else {
 				alert('You need at least one variation!');
 			}
@@ -41384,15 +41386,19 @@
 		};
 	},
 	    deleteSection = function deleteSection(sectionId, variationId) {
-		return {
-			type: _commonConsts.sectionActions.DELETE_SECTION,
-			sectionId: sectionId,
-			variationId: variationId
+		return function (dispatch, getState) {
+			if (confirm('Are you sure you want to delete this section ?')) {
+				dispatch({
+					type: _commonConsts.sectionActions.DELETE_SECTION,
+					sectionId: sectionId,
+					variationId: variationId
+				});
+			}
 		};
 	},
 	    renameSection = function renameSection(sectionId, name) {
 		return {
-			type: _commonConsts.sectionActions.DELETE_SECTION,
+			type: _commonConsts.sectionActions.RENAME_SECTION,
 			sectionId: sectionId,
 			name: name
 		};
@@ -41690,12 +41696,17 @@
 
 	var _sectionActions = __webpack_require__(644);
 
+	var _index = __webpack_require__(646);
+
+	var _index2 = _interopRequireDefault(_index);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var variationSections = function variationSections(props) {
 		var variation = props.variation,
 		    sections = props.sections,
-		    onDeleteSection = props.onDeleteSection;
+		    onDeleteSection = props.onDeleteSection,
+		    onRenameSection = props.onRenameSection;
 
 		return _react2.default.createElement(
 			'div',
@@ -41723,22 +41734,7 @@
 							_react2.default.createElement(
 								_reactBootstrap.Col,
 								{ className: 'u-padding-r10px', xs: 12 },
-								_react2.default.createElement(
-									'strong',
-									null,
-									section.name
-								),
-								section.isIncontent ? _react2.default.createElement(
-									'label',
-									{ className: 'incontent-label' },
-									_react2.default.createElement('i', { className: 'fa fa-object-group' }),
-									_react2.default.createElement(
-										'span',
-										null,
-										'In-Content'
-									),
-									_react2.default.createElement('i', { className: 'fa fa-check' })
-								) : ''
+								_react2.default.createElement(_index2.default, { value: section.name, submitHandler: onRenameSection.bind(null, section.id), text: 'Section Name', errorMessage: 'Section Name cannot be blank' })
 							)
 						),
 						_react2.default.createElement(
@@ -41879,14 +41875,16 @@
 	variationSections.propTypes = {
 		variation: _react.PropTypes.object.isRequired,
 		sections: _react.PropTypes.array.isRequired,
-		onDeleteSection: _react.PropTypes.func.isRequired
+		onDeleteSection: _react.PropTypes.func.isRequired,
+		onRenameSection: _react.PropTypes.func.isRequired
 	};
 
 	exports.default = (0, _reactRedux.connect)(function (state, ownProps) {
 		return _extends({}, ownProps);
 	}, function (dispatch) {
 		return (0, _redux.bindActionCreators)({
-			onDeleteSection: _sectionActions.deleteSection
+			onDeleteSection: _sectionActions.deleteSection,
+			onRenameSection: _sectionActions.renameSection
 		}, dispatch);
 	})(variationSections);
 
