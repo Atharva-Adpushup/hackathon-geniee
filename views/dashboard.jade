@@ -3,11 +3,6 @@ extends  layout/base
 block getTitle
     - var titleVar = "DashBoard"
 
-block append headScripts
-    +loadAsset("js", [
-        '/assets/js/libs/custom/settings.js',
-    ])
-
 block bodyContent
     include layout/sideBar
     .pageContainer.page-container
@@ -24,31 +19,28 @@ block bodyContent
 
                             //- Pagegroups table
                             .table-wrapper-paddded
-                                table.table.table-bordered.table-hover
-                                    thead
-                                        tr
-                                            th Name
-                                            th Platform
-                                            th Category
-                                            th Sub Category
-                                            th Page Views
-                                            th Variations
-                                            th Actions
-                                    tbody
-                                        for pagegroup in pageGroups
+                                if pageGroups.length
+                                    table.table.table-bordered.table-hover
+                                        thead
                                             tr
-                                                td!= utils.convertPagegroupLink(pagegroup.pageGroupId, pagegroup.pageGroupName, siteId)
-                                                td!= pagegroup.platform
-                                                td!= pagegroup.category
-                                                td!= pagegroup.subCategory
-                                                td!= pagegroup.pageviews
-                                                td!= pagegroup.variations
-                                                td.table-actions
-                                                    a(href="/" title="Edit")
-                                                        i.fa.fa-edit
-                                                    a(href="/site/#{siteId}/editor" title="Go to Editor")
-                                                        i.fa.fa-code
-                                                    a(href="/" title="Delete")
-                                                        i.fa.fa-trash
+                                                th Name
+                                                th Platform
+                                                th Variations
+                                                th Actions
+                                        tbody
+                                            for pagegroup in pageGroups
+                                                tr
+                                                    td!= utils.convertPagegroupLink(pagegroup.id, pagegroup.pageGroup, siteId)
+                                                    td!= pagegroup.platform
+                                                    td!= Object.keys(pagegroup.variations).length
+                                                    td.table-actions
+                                                        a(href="/" title="Edit")
+                                                            i.fa.fa-edit
+                                                        a(href="/site/#{siteId}/editor" title="Go to Editor")
+                                                            i.fa.fa-code
+                                                        a(href="/" title="Delete")
+                                                            i.fa.fa-trash
+                                else
+                                    h5 No PageGroup Found!
                                         
             
