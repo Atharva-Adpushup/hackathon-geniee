@@ -17,7 +17,7 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 	},
 	createIncontentSection = (sectionPayload, adPayload, variationId) => (dispatch, getState) => {
 		const variationSections = getVariationSectionsWithAds(getState(), { variationId }).sections,
-			arr = _.map(variationSections, function (data) { return data; });
+			arr = _.map(variationSections, (data) => { return data; });
 		if (_.find(arr, { sectionNo: sectionPayload.sectionNo })) {
 			alert('Cannot create in content section with same section no.');
 			return;
@@ -47,10 +47,19 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			});
 		}
 	},
-	renameSection = (sectionId, name) => ({
-		type: sectionActions.RENAME_SECTION,
-		sectionId,
-		name
-	});
+	renameSection = (section, variationId, name) => (dispatch, getState) => {
+		const variationSections = getVariationSectionsWithAds(getState(), { variationId }).sections,
+			arr = _.map(variationSections, (data) => { return data });
+		if (_.find(arr, { name: name })) {
+			alert('Cannot create section with same section name');
+			return;
+		}
+
+		dispatch({
+			type: sectionActions.RENAME_SECTION,
+			sectionId: section.id,
+			name
+		});
+	};
 
 export { createSection, deleteSection, renameSection, createIncontentSection };

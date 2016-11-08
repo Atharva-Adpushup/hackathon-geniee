@@ -3619,6 +3619,9 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   font-size: 1.05em;
   border-bottom: 1px solid #ccc; }
 
+.list-group-item:first-child {
+  border-top: 1px solid #ddd; }
+
 .incontent-label {
   background-color: #eb575c;
   color: #fff;
@@ -3627,7 +3630,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   border-radius: 4px;
   font-size: .9em;
   vertical-align: middle;
-  margin-left: 10px;
+  margin-bottom: 15px;
   position: relative; }
   .incontent-label i {
     margin: 0 5px; }

@@ -41396,11 +41396,22 @@
 			}
 		};
 	},
-	    renameSection = function renameSection(sectionId, name) {
-		return {
-			type: _commonConsts.sectionActions.RENAME_SECTION,
-			sectionId: sectionId,
-			name: name
+	    renameSection = function renameSection(section, variationId, name) {
+		return function (dispatch, getState) {
+			var variationSections = (0, _variationSelectors.getVariationSectionsWithAds)(getState(), { variationId: variationId }).sections,
+			    arr = (0, _map3.default)(variationSections, function (data) {
+				return data;
+			});
+			if ((0, _find3.default)(arr, { name: name })) {
+				alert('Cannot create section with same section name');
+				return;
+			}
+
+			dispatch({
+				type: _commonConsts.sectionActions.RENAME_SECTION,
+				sectionId: section.id,
+				name: name
+			});
 		};
 	};
 
@@ -41731,10 +41742,21 @@
 						_react2.default.createElement(
 							_reactBootstrap.Row,
 							null,
+							section.isIncontent ? _react2.default.createElement(
+								'label',
+								{ className: 'incontent-label' },
+								_react2.default.createElement('i', { className: 'fa fa-object-group' }),
+								_react2.default.createElement(
+									'span',
+									null,
+									'In-Content'
+								),
+								_react2.default.createElement('i', { className: 'fa fa-check' })
+							) : '',
 							_react2.default.createElement(
 								_reactBootstrap.Col,
 								{ className: 'u-padding-r10px', xs: 12 },
-								_react2.default.createElement(_index2.default, { value: section.name, submitHandler: onRenameSection.bind(null, section.id), text: 'Section Name', errorMessage: 'Section Name cannot be blank' })
+								_react2.default.createElement(_index2.default, { value: section.name, submitHandler: onRenameSection.bind(null, section, variation.id), text: 'Section Name', errorMessage: 'Section Name cannot be blank' })
 							)
 						),
 						_react2.default.createElement(

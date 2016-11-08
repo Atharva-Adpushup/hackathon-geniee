@@ -15,9 +15,13 @@ const variationSections = (props) => {
 				{ sections.map((section) => (
 						<li className="list-group-item" key={section.id}>
 							<Row>
+								{ section.isIncontent ? (
+									<label className="incontent-label">
+										<i className="fa fa-object-group"></i><span>In-Content</span><i className="fa fa-check"></i>
+									</label>
+								) : '' }
 								<Col className="u-padding-r10px" xs={12}>
-									<InlineEdit value={section.name} submitHandler={onRenameSection.bind(null, section.id)} text="Section Name" errorMessage="Section Name cannot be blank" />
-									
+									<InlineEdit value={section.name} submitHandler={onRenameSection.bind(null, section, variation.id)} text="Section Name" errorMessage="Section Name cannot be blank" />
 								</Col>
 							</Row>
 							<Row>
