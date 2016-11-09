@@ -73,7 +73,7 @@ function apiModule() {
 				})
 			});
 		},	
-		getPageGroupById: function(pageGroupId) {
+		getPageGroupById: function(pageGroupId, extendedParams) {
 			var query = ViewQuery.from('dev_app', 'channelById').key(pageGroupId);
 			return couchbase.connectToAppBucket()
 				.then(function(appBucket) {
@@ -83,6 +83,17 @@ function apiModule() {
 								return reject(new AdPushupError([{"status": 404, "message": "Pagegroup does not exist"}]));
 							}
 							var data = result[0].value;
+							if(extendedParams.getExtendedParams) {
+								return resolve({
+									pageGroupId: data.id,
+									sampleUrl: data.sampleUrl,
+									pageGroup: data.pageGroup,
+									device: data.platform,
+									variations: data.variations,
+									channelName: data.channelName
+								});
+							}
+
 							return resolve({
 								pageGroupId: data.id,
 								sampleUrl: data.sampleUrl,

@@ -931,6 +931,9 @@ maxHeightWidth {
   border-radius: 20px;
   margin-left: 12px; }
 
+.text-dark.device i {
+  margin-right: 5px; }
+
 .headerTopBar {
   height: 60px;
   z-index: 1039;
