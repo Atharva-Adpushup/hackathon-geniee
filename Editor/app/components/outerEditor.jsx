@@ -3,8 +3,8 @@ import ChannelManager from 'containers/channelManagerContainer.js';
 import VariationManager from 'containers/variationManagerContainer.js';
 import InsertMenu from 'containers/insertMenuContainer.js';
 import EditMenu from 'containers/editMenuContainer.js';
-import NewChannelMenu from '../containers/newChannelMenuContainer.js';
-import AfterSaveLoaderContainer from '../containers/AfterSaveLoaderContainer';
+import NewChannelMenu from 'containers/newChannelMenuContainer.js';
+import AfterSaveLoaderContainer from 'containers/afterSaveLoaderContainer.js';
 
 const OuterEditor = () => (
 	<div>
