@@ -7,7 +7,7 @@ var express = require('express'),
 	moment = require('moment'),
 	utils = require('../helpers/utils'),
 	// eslint-disable-next-line new-cap
-	router = express.Router();
+	router = express.Router({ mergeParams: true });
 
 router
 	.get('/performance', function(req, res) {
@@ -53,7 +53,8 @@ router
 			revenue: 12.54
 		}];
 		res.render('performanceReport', {
-			reportingData: data
+			reportingData: data,
+			siteId: req.params.siteId
 		});
 	})
 	.get('/adsense', function(req, res) {

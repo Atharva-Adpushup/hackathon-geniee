@@ -32,7 +32,8 @@ router
 			.then(function(site) {
 				res.render('settings', {
 					pageGroups: site.data.cmsInfo.pageGroups,
-					patterns: site.data.apConfigs.pageGroupPattern ? site.data.apConfigs.pageGroupPattern : []
+					patterns: site.data.apConfigs.pageGroupPattern ? site.data.apConfigs.pageGroupPattern : [],
+					siteId: req.params.siteId
 				});
 			})
 			.catch(function(err) {
