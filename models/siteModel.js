@@ -236,6 +236,22 @@ function apiModule() {
 					return site.save();
 				})	
 		},
+		getSitePageGroups: function(siteId) {
+			return API.getSiteById(parseInt(siteId))
+				.then(function(site) {
+					var pageGroupPromises = _.map(site.data.channels, function(channel) {
+						var pageGroup = channel.split(':');
+						return channelModel.getChannel(siteId, pageGroup[0], pageGroup[1])
+							.then(function(channel) {
+								return channel.data;
+							})
+					});
+					
+					return Promise.all(pageGroupPromises).then(function(pageGroups) {
+						return pageGroups;
+					});
+				});
+		},
 		getUniquePageGroups: function (siteId) {
 			function getVariationFreeApexPageGroup(pageGroup) {
 				var arr = pageGroup.split('_');

@@ -16,35 +16,15 @@ var express = require('express'),
 
 router
 	.get('/dashboard', function(req, res) {
-		var pageGroups = [{
-			pageGroupId: 'abc-123',
-			pageGroupName: 'Post Page - Desktop',
-			platform: 'Desktop',
-			category: 'Travel and Leisure',
-			subCategory: 'Hotels',
-			pageviews: 23401,
-			variations: 3
-		}, {
-			pageGroupId: 'pqr-456',
-			pageGroupName: 'Category Page - Mobile',
-			platform: 'Mobile',
-			category: 'Travel and Leisure',
-			subCategory: 'Hotels',
-			pageviews: 73401,
-			variations: 5
-		}, {
-			pageGroupId: 'xyz-789',
-			pageGroupName: 'Post Page - Mobile',
-			platform: 'Mobile',
-			category: 'Health and Wellness',
-			subCategory: 'Salon and Spa',
-			pageviews: 15401,
-			variations: 2
-		}];
-
-		res.render('dashboard', {
-			pageGroups: pageGroups
-		});
+		siteModel.getSitePageGroups(req.params.siteId)
+			.then(function(pageGroups) {
+				res.render('dashboard', {
+					pageGroups: pageGroups
+				});
+			})
+			.catch(function(err) {
+				res.render('404');
+			});
 	})
 	.get('/settings', function(req, res) {
 		siteModel.getSiteById(req.params.siteId)
