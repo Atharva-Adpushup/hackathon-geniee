@@ -19,11 +19,12 @@ router
 		siteModel.getSitePageGroups(req.params.siteId)
 			.then(function(pageGroups) {
 				res.render('dashboard', {
-					pageGroups: pageGroups
+					pageGroups: pageGroups,
+					siteId: req.params.siteId
 				});
 			})
 			.catch(function(err) {
-				res.render('404');
+				res.send('Site not found!');
 			});
 	})
 	.get('/settings', function(req, res) {

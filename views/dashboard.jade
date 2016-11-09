@@ -30,15 +30,16 @@ block bodyContent
                                         tbody
                                             for pagegroup in pageGroups
                                                 tr
-                                                    td!= utils.convertPagegroupLink(pagegroup.id, pagegroup.pageGroup, siteId)
+                                                    td.underline!= utils.convertPagegroupLink(pagegroup.id, pagegroup.pageGroup, siteId)
                                                     td!= pagegroup.platform
                                                     td!= Object.keys(pagegroup.variations).length
                                                     td.table-actions
-                                                        a(href="/" title="Edit")
+                                                        //- a(href="/" title="Edit")
                                                             i.fa.fa-edit
                                                         a(href="/site/#{siteId}/editor" title="Go to Editor")
-                                                            i.fa.fa-code
-                                                        a(href="/" title="Delete")
+                                                            i.fa.fa-pencil-square
+                                                        //- a.delete-pagegroup(title="Delete")
+                                                            input(type="hidden" value=pagegroup.id)
                                                             i.fa.fa-trash
                                 else
                                     h5 No PageGroup Found!

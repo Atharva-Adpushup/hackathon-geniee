@@ -29297,7 +29297,7 @@
 			variations: (0, _variationSelectors.getActiveChannelVariationsWithAds)(state),
 			activeVariation: (0, _variationSelectors.getActiveChannelActiveVariation)(state),
 			activeChannelId: (0, _channelSelectors.getActiveChannelId)(state),
-			activeVariationSections: (0, _variationSelectors.getActiveChannelActiveVariation)(state) !== null ? (0, _variationSelectors.getVariationSectionsWithAds)(state, { variationId: (0, _variationSelectors.getActiveChannelActiveVariation)(state).id }).sections : null
+			activeVariationSections: (0, _variationSelectors.getActiveChannelActiveVariation)(state) ? (0, _variationSelectors.getVariationSectionsWithAds)(state, { variationId: (0, _variationSelectors.getActiveChannelActiveVariation)(state).id }).sections : null
 		};
 	},
 	    noop = function noop() {

@@ -863,6 +863,8 @@ maxHeightWidth {
 
 .table-wrapper-paddded {
   padding: 20px; }
+  .table-wrapper-paddded .underline {
+    text-decoration: underline; }
   .table-wrapper-paddded table {
     margin-bottom: 0;
     font-size: 1.2em;
@@ -875,12 +877,13 @@ maxHeightWidth {
     .table-wrapper-paddded table tbody td {
       padding: 15px; }
     .table-wrapper-paddded table tbody a {
-      color: #444;
-      text-decoration: underline; }
+      color: #444; }
 
 .table-actions a {
   font-size: 1.2em;
-  color: #444; }
+  color: #444;
+  cursor: pointer;
+  text-decoration: none; }
   .table-actions a:not(:last-child) {
     margin-right: 10px; }
 
