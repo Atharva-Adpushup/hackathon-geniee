@@ -42,10 +42,6 @@ const SiteModes = (props) => (
 		<div className="option-right">
 			<EditorModes toggleEditorMode={props.toggleEditorMode} />
 
-			<OverlayTrigger placement="bottom" overlay={<Tooltip id="adpushupOptionsTooltip">AdPushup Options</Tooltip>}>
-				<Button id="miscOptions" className="btn-sm btn-lightBg btn-option btn--icon" onClick={props.showOptionsMenu} />
-			</OverlayTrigger>
-
 			<OverlayTrigger placement="bottom" overlay={<Tooltip id="masterSaveTooltip">Save changes</Tooltip>}>
 				<Button onClick={props.masterSave} className="btn-sm btn-save btn-lightBg btn--success btn--icon pull-left" />
 			</OverlayTrigger>
