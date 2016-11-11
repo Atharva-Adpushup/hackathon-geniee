@@ -12,7 +12,6 @@ router
 	.get('/:pageGroupId', function(req, res) {
 		channelModel.getPageGroupById(req.params.pageGroupId, { getExtendedParams: true })
 			.then(function(pageGroup) {
-				console.log(pageGroup);
 				res.render('pageGroup', {
 					pageGroup: pageGroup,
 					siteId: req.params.siteId

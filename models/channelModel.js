@@ -83,7 +83,7 @@ function apiModule() {
 								return reject(new AdPushupError([{"status": 404, "message": "Pagegroup does not exist"}]));
 							}
 							var data = result[0].value;
-							if(extendedParams.getExtendedParams) {
+							if(extendedParams && extendedParams.getExtendedParams) {
 								return resolve({
 									pageGroupId: data.id,
 									sampleUrl: data.sampleUrl,
