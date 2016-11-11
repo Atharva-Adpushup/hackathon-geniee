@@ -41476,7 +41476,7 @@
 				),
 				_react2.default.createElement(
 					_reactBootstrap.Col,
-					{ className: 'u-padding-l10px', xs: 8 },
+					{ className: 'u-padding-l10px', xs: 4 },
 					_react2.default.createElement(_index2.default, { value: variation.name, submitHandler: onEditVariationName.bind(null, variation.id), text: 'Variation Name', errorMessage: 'Variation Name cannot be blank' })
 				)
 			),
@@ -41490,7 +41490,7 @@
 				),
 				_react2.default.createElement(
 					_reactBootstrap.Col,
-					{ className: 'u-padding-l10px', xs: 8 },
+					{ className: 'u-padding-l10px', xs: 4 },
 					_react2.default.createElement(_index2.default, { value: variation.trafficDistribution, submitHandler: onEditTrafficDistribution.bind(null, variation.id), text: 'Traffic Distribution', errorMessage: 'Traffic Distribution cannot be blank' })
 				)
 			),
@@ -41504,7 +41504,7 @@
 				),
 				_react2.default.createElement(
 					_reactBootstrap.Col,
-					{ className: 'u-padding-l10px', xs: 8 },
+					{ className: 'u-padding-l10px', xs: 4 },
 					_react2.default.createElement(
 						'strong',
 						null,
@@ -41627,7 +41627,7 @@
 						null,
 						_react2.default.createElement(
 							_reactBootstrap.Col,
-							{ className: 'u-padding-r10px', xs: 4 },
+							{ className: 'u-padding-r10px', xs: 6 },
 							_react2.default.createElement('input', { type: 'text', ref: 'editedText', placeholder: this.props.text, defaultValue: this.props.value }),
 							_react2.default.createElement(
 								'span',
@@ -41637,7 +41637,7 @@
 						),
 						_react2.default.createElement(
 							_reactBootstrap.Col,
-							{ className: 'u-padding-r10px', xs: 2 },
+							{ className: 'u-padding-r10px', xs: 4 },
 							_react2.default.createElement(
 								_reactBootstrap.Button,
 								{ onClick: this.submitValue.bind(this), className: 'btn-lightBg btn-save btn-block btn btn-default' },
@@ -41734,157 +41734,124 @@
 			) : '',
 			_react2.default.createElement(
 				'ul',
-				{ className: 'list-group' },
+				{ className: 'section-list row' },
 				sections.map(function (section) {
 					return _react2.default.createElement(
-						'li',
-						{ className: 'list-group-item', key: section.id },
+						'div',
+						{ className: 'col-sm-4' },
 						_react2.default.createElement(
-							_reactBootstrap.Row,
-							null,
+							'li',
+							{ key: section.id },
+							_react2.default.createElement(
+								_reactBootstrap.Button,
+								{ className: 'btn-close', onClick: onDeleteSection.bind(null, section.id, variation.id), type: 'submit' },
+								'x'
+							),
+							_react2.default.createElement(
+								_reactBootstrap.Row,
+								null,
+								section.isIncontent ? _react2.default.createElement(
+									'label',
+									{ className: 'section-label section-incontent' },
+									_react2.default.createElement('i', { className: 'fa fa-object-group' }),
+									_react2.default.createElement(
+										'span',
+										null,
+										'In-Content'
+									)
+								) : _react2.default.createElement(
+									'label',
+									{ className: 'section-label section-structural' },
+									_react2.default.createElement('i', { className: 'fa fa-object-ungroup' }),
+									_react2.default.createElement(
+										'span',
+										null,
+										'Structural'
+									)
+								),
+								_react2.default.createElement(
+									_reactBootstrap.Col,
+									{ className: 'u-padding-r10px section-name-ie', xs: 12 },
+									_react2.default.createElement(_index2.default, { value: section.name, submitHandler: onRenameSection.bind(null, section, variation.id), text: 'Section Name', errorMessage: 'Section Name cannot be blank' })
+								)
+							),
 							section.isIncontent ? _react2.default.createElement(
-								'label',
-								{ className: 'incontent-label' },
-								_react2.default.createElement('i', { className: 'fa fa-object-group' }),
+								'div',
+								null,
 								_react2.default.createElement(
-									'span',
+									_reactBootstrap.Row,
 									null,
-									'In-Content'
+									_react2.default.createElement(
+										_reactBootstrap.Col,
+										{ className: 'u-padding-r10px', xs: 4 },
+										'Section No.'
+									),
+									_react2.default.createElement(
+										_reactBootstrap.Col,
+										{ className: 'u-padding-l10px', xs: 8 },
+										_react2.default.createElement(
+											'strong',
+											null,
+											section.sectionNo
+										)
+									)
 								),
-								_react2.default.createElement('i', { className: 'fa fa-check' })
-							) : '',
-							_react2.default.createElement(
-								_reactBootstrap.Col,
-								{ className: 'u-padding-r10px', xs: 12 },
-								_react2.default.createElement(_index2.default, { value: section.name, submitHandler: onRenameSection.bind(null, section, variation.id), text: 'Section Name', errorMessage: 'Section Name cannot be blank' })
-							)
-						),
-						_react2.default.createElement(
-							_reactBootstrap.Row,
-							null,
-							_react2.default.createElement(
-								_reactBootstrap.Col,
-								{ className: 'u-padding-r10px', xs: 2 },
-								'No. of Ads'
-							),
-							_react2.default.createElement(
-								_reactBootstrap.Col,
-								{ className: 'u-padding-l10px', xs: 8 },
 								_react2.default.createElement(
-									'strong',
+									_reactBootstrap.Row,
 									null,
-									section.ads.length
-								)
-							)
-						),
-						section.isIncontent ? _react2.default.createElement(
-							'div',
-							null,
-							_react2.default.createElement(
-								_reactBootstrap.Row,
-								null,
-								_react2.default.createElement(
-									_reactBootstrap.Col,
-									{ className: 'u-padding-r10px', xs: 2 },
-									'Section No.'
-								),
-								_react2.default.createElement(
-									_reactBootstrap.Col,
-									{ className: 'u-padding-l10px', xs: 8 },
 									_react2.default.createElement(
-										'strong',
-										null,
-										section.sectionNo
+										_reactBootstrap.Col,
+										{ className: 'u-padding-r10px', xs: 4 },
+										'Float'
+									),
+									_react2.default.createElement(
+										_reactBootstrap.Col,
+										{ className: 'u-padding-l10px', xs: 8 },
+										_react2.default.createElement(
+											'strong',
+											null,
+											section.float
+										)
 									)
 								)
-							),
-							_react2.default.createElement(
-								_reactBootstrap.Row,
+							) : _react2.default.createElement(
+								'div',
 								null,
 								_react2.default.createElement(
-									_reactBootstrap.Col,
-									{ className: 'u-padding-r10px', xs: 2 },
-									'Float'
+									_reactBootstrap.Row,
+									null,
+									_react2.default.createElement(
+										_reactBootstrap.Col,
+										{ className: 'u-padding-r10px', xs: 4 },
+										'Operation'
+									),
+									_react2.default.createElement(
+										_reactBootstrap.Col,
+										{ className: 'u-padding-l10px', xs: 8 },
+										_react2.default.createElement(
+											'strong',
+											null,
+											section.operation
+										)
+									)
 								),
 								_react2.default.createElement(
-									_reactBootstrap.Col,
-									{ className: 'u-padding-l10px', xs: 8 },
+									_reactBootstrap.Row,
+									null,
 									_react2.default.createElement(
-										'strong',
-										null,
-										section.float
-									)
-								)
-							),
-							_react2.default.createElement(
-								_reactBootstrap.Row,
-								null,
-								_react2.default.createElement(
-									_reactBootstrap.Col,
-									{ className: 'u-padding-r10px', xs: 2 },
-									'minDistanceFromPrevAd'
-								),
-								_react2.default.createElement(
-									_reactBootstrap.Col,
-									{ className: 'u-padding-l10px', xs: 8 },
+										_reactBootstrap.Col,
+										{ className: 'u-padding-r10px', xs: 4 },
+										'XPath'
+									),
 									_react2.default.createElement(
-										'strong',
-										null,
-										section.minDistanceFromPrevAd
+										_reactBootstrap.Col,
+										{ className: 'u-padding-l10px', xs: 8 },
+										_react2.default.createElement(
+											'strong',
+											null,
+											section.xpath
+										)
 									)
-								)
-							)
-						) : _react2.default.createElement(
-							'div',
-							null,
-							_react2.default.createElement(
-								_reactBootstrap.Row,
-								null,
-								_react2.default.createElement(
-									_reactBootstrap.Col,
-									{ className: 'u-padding-r10px', xs: 2 },
-									'Operation'
-								),
-								_react2.default.createElement(
-									_reactBootstrap.Col,
-									{ className: 'u-padding-l10px', xs: 8 },
-									_react2.default.createElement(
-										'strong',
-										null,
-										section.operation
-									)
-								)
-							),
-							_react2.default.createElement(
-								_reactBootstrap.Row,
-								null,
-								_react2.default.createElement(
-									_reactBootstrap.Col,
-									{ className: 'u-padding-r10px', xs: 2 },
-									'XPath'
-								),
-								_react2.default.createElement(
-									_reactBootstrap.Col,
-									{ className: 'u-padding-l10px', xs: 8 },
-									_react2.default.createElement(
-										'strong',
-										null,
-										section.xpath
-									)
-								)
-							)
-						),
-						_react2.default.createElement('br', null),
-						_react2.default.createElement(
-							_reactBootstrap.Row,
-							null,
-							_react2.default.createElement(
-								_reactBootstrap.Col,
-								{ className: 'u-padding-r10px', xs: 2 },
-								_react2.default.createElement(
-									_reactBootstrap.Button,
-									{ className: 'btn-lightBg btn-del-line btn-block', onClick: onDeleteSection.bind(null, section.id, variation.id), type: 'submit' },
-									'Delete Section'
 								)
 							)
 						)

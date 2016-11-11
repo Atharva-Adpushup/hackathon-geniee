@@ -14,7 +14,7 @@ const variationOtions = (props) => {
 				<Col className="u-padding-r10px" xs={2}>
 					Variation Name
 				</Col>
-				<Col className="u-padding-l10px" xs={8}>
+				<Col className="u-padding-l10px" xs={4}>
 					<InlineEdit value={variation.name} submitHandler={onEditVariationName.bind(null, variation.id)} text="Variation Name" errorMessage="Variation Name cannot be blank" />
 				</Col>
 			</Row>
@@ -22,7 +22,7 @@ const variationOtions = (props) => {
 				<Col className="u-padding-r10px" xs={2}>
 					Traffic Distribution
 				</Col>
-				<Col className="u-padding-l10px" xs={8}>
+				<Col className="u-padding-l10px" xs={4}>
 					<InlineEdit value={variation.trafficDistribution} submitHandler={onEditTrafficDistribution.bind(null, variation.id)} text="Traffic Distribution" errorMessage="Traffic Distribution cannot be blank" />
 				</Col>
 			</Row>
@@ -30,7 +30,7 @@ const variationOtions = (props) => {
 				<Col className="u-padding-r10px" xs={2}>
 					Sections
 				</Col>
-				<Col className="u-padding-l10px" xs={8}>
+				<Col className="u-padding-l10px" xs={4}>
 					<strong>{props.variation.sections.length}</strong>
 				</Col>
 			</Row>
