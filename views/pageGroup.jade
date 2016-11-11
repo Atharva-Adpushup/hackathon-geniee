@@ -93,34 +93,38 @@ block bodyContent
                                         #variations.tab-pane.fade(role='tabpanel')
                                             //- Variations table
                                             .table-wrapper-paddded
-                                                table.table.table-bordered.table-hover
-                                                    thead
-                                                        tr
-                                                            th Name
-                                                            th Zones
-                                                            th Traffic Distribution
-                                                            //- th Impressions
-                                                            //- th CTR
-                                                            //- th RPM
-                                                            //- th Actions
-                                                    tbody
-                                                        for variation in pageGroup.variations
+
+                                                if pageGroup.variations.length
+                                                    table.table.table-bordered.table-hover
+                                                        thead
                                                             tr
-                                                                td!= variation.name
-                                                                td!= Object.keys(variation.sections).length
-                                                                td!= variation.trafficDistribution + '%'
-                                                                //- td!= variation.impressions
-                                                                //-     if variation.topPerforming
-                                                                //-         span.top-variation Top Performing
-                                                                //- td!= variation.ctr
-                                                                //- td!= variation.rpm
-                                                                //- td.table-actions
-                                                                //-     a(href="/" title="Edit")
-                                                                //-         i.fa.fa-edit
-                                                                //-     a(href="/" title="Pause Variation")
-                                                                //-         i.fa.fa-pause-circle-o
-                                                                //-     a(href="/" title="Delete")
-                                                                //-         i.fa.fa-trash
+                                                                th Name
+                                                                th Zones
+                                                                th Traffic Distribution
+                                                                //- th Impressions
+                                                                //- th CTR
+                                                                //- th RPM
+                                                                //- th Actions
+                                                        tbody
+                                                            for variation in pageGroup.variations
+                                                                tr
+                                                                    td!= variation.name
+                                                                    td!= Object.keys(variation.sections).length
+                                                                    td!= variation.trafficDistribution + '%'
+                                                                    //- td!= variation.impressions
+                                                                    //-     if variation.topPerforming
+                                                                    //-         span.top-variation Top Performing
+                                                                    //- td!= variation.ctr
+                                                                    //- td!= variation.rpm
+                                                                    //- td.table-actions
+                                                                    //-     a(href="/" title="Edit")
+                                                                    //-         i.fa.fa-edit
+                                                                    //-     a(href="/" title="Pause Variation")
+                                                                    //-         i.fa.fa-pause-circle-o
+                                                                    //-     a(href="/" title="Delete")
+                                                                    //-         i.fa.fa-trash
+                                                else
+                                                    h5 No Variations Found!
                             else
                                 h3.title.m-All-0.clearfix
                                     a Page Group data could not be loaded!
