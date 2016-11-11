@@ -41606,6 +41606,11 @@
 				this.setState({ editMode: true });
 			}
 		}, {
+			key: 'cancelEdit',
+			value: function cancelEdit() {
+				this.setState({ editMode: false });
+			}
+		}, {
 			key: 'submitValue',
 			value: function submitValue() {
 				if (!this.refs.editedText.value) {
@@ -41637,12 +41642,17 @@
 						),
 						_react2.default.createElement(
 							_reactBootstrap.Col,
-							{ className: 'u-padding-r10px', xs: 4 },
+							{ className: 'u-padding-r5px', xs: 4 },
 							_react2.default.createElement(
 								_reactBootstrap.Button,
 								{ onClick: this.submitValue.bind(this), className: 'btn-lightBg btn-save btn-block btn btn-default' },
 								'Save'
 							)
+						),
+						_react2.default.createElement(
+							_reactBootstrap.Col,
+							{ className: 'u-padding-r10px ', xs: 2 },
+							_react2.default.createElement(_reactBootstrap.Button, { onClick: this.cancelEdit.bind(this), className: 'btn-lightBg btn-cancel btn-ie-cancel btn-block btn btn-default' })
 						)
 					) : _react2.default.createElement(
 						'div',
@@ -55420,7 +55430,7 @@
 				var nextState = getData(store.getState());
 
 				if (nextState) {
-					if (!(0, _isEqual3.default)(prevState.layout, nextState.layout)) {
+					if (action.type === _commonConsts.channelActions.OPEN_CHANNEL_SUCCESS || !(0, _isEqual3.default)(prevState.layout, nextState.layout)) {
 						(0, _messengerHelper.sendMessage)(nextState.activeChannelId, _commonConsts.messengerCommands.UPDATE_LAYOUT, nextState.layout);
 					} else if (prevState.insertMenuVisible && !nextState.insertMenuVisible || prevState.editMenuVisible && !nextState.editMenuVisible) {
 						(0, _messengerHelper.sendMessage)(nextState.activeChannelId, _commonConsts.messengerCommands.HIDE_ELEMENT_SELECTOR, {});
