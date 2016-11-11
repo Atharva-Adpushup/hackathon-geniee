@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { deleteSection, renameSection } from 'actions/sectionActions.js';
@@ -15,7 +15,9 @@ const variationSections = (props) => {
 				{ sections.map((section) => (
 						<div className="col-sm-4">
 							<li key={section.id}>
-								<Button className="btn-close" onClick={onDeleteSection.bind(null, section.id, variation.id)} type="submit">x</Button>
+								<OverlayTrigger placement="bottom" overlay={<Tooltip id="delete-section-tooltip">Delete Section</Tooltip>}>
+									<Button className="btn-close" onClick={onDeleteSection.bind(null, section.id, variation.id)} type="submit">x</Button>
+								</OverlayTrigger>
 								<Row>
 									{ section.isIncontent ? (
 										<label className="section-label section-incontent">

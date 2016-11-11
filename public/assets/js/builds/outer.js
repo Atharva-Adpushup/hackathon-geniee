@@ -41753,9 +41753,17 @@
 							'li',
 							{ key: section.id },
 							_react2.default.createElement(
-								_reactBootstrap.Button,
-								{ className: 'btn-close', onClick: onDeleteSection.bind(null, section.id, variation.id), type: 'submit' },
-								'x'
+								_reactBootstrap.OverlayTrigger,
+								{ placement: 'bottom', overlay: _react2.default.createElement(
+										_reactBootstrap.Tooltip,
+										{ id: 'delete-section-tooltip' },
+										'Delete Section'
+									) },
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									{ className: 'btn-close', onClick: onDeleteSection.bind(null, section.id, variation.id), type: 'submit' },
+									'x'
+								)
 							),
 							_react2.default.createElement(
 								_reactBootstrap.Row,
