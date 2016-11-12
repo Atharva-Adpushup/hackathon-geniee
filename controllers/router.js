@@ -59,6 +59,7 @@ module.exports = function (app) {
 
 	app.use('/genieeApi/', function (req, res, next) {
 		/* @TODO Implement some kind of check to verify geniee Call */
+		req.isGenieeSite = true;
 		next();
 	}, apiController);
 

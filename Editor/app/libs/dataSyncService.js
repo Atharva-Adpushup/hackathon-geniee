@@ -15,7 +15,7 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 	loadInitialData = (siteId) => {
 		const deferred = $.Deferred(),
 			processData = (rawData) => {
-				const parsedData = (typeof(rawData) === 'string') ? JSON.parse(rawData) : rawData,
+				const parsedData = (typeof (awData) === 'string') ? JSON.parse(rawData) : rawData,
 					result = normalize(parsedData.channels, arrayOf(channelSchema)),
 					computedResult = $.extend(true, {}, result.entities);
 				let activeChannel;
@@ -47,6 +47,12 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 					computedResult.sectionByIds[sectionName].ads = _.keys(computedResult.sectionByIds[sectionName].ads);
 				});
 
+				computedResult.site = {
+					siteData: {
+						partner: rawData.site.partner || null
+					}
+				};
+
 				deferred.resolve(computedResult);
 				return deferred.promise();
 			};
@@ -62,10 +68,10 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 			});
 	},
 
-	masterSave = (data) => {
-		return save('/data/saveData', {
+	masterSave = (data) =>
+		 save('/data/saveData', {
 			data: JSON.stringify(data)
-		});
-	};
+		})
+	;
 
 export { masterSave, changeSiteMode, isApInstalled, loadInitialData };
