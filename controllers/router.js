@@ -19,54 +19,48 @@ module.exports = function (app) {
 		next();
 	});
 
-	app.use('/site/:siteId/reports/', function (req, res, next) {
-		// if (!req.session || !req.session.user) {
-		// 	return res.redirect('/login');
-		// }
+	app.use(function (req, res, next) {
+		if ((req.path.indexOf('/user') !== -1 || req.path.indexOf('/api') !== -1 || req.path.indexOf('/proxy') !== -1) && (!req.session || !req.session.user)) {
+			return res.redirect('/login');
+		}
 		next();
-	}, reportsController);
+	});
 
-	app.use('/genieeApi/', function (req, res, next) {
-		debugger;
-		next();
-	}, apiController);
 
-	app.use('/api/', function (req, res, next) {
-		// if (!req.session || !req.session.user) {
-		// 	return res.redirect('/login');
-		// }
-		next();
-	}, apiController);
+	/*********** Under Login URL's ***************/
 
 	app.use('/user/', function (req, res, next) {
-		// if (!req.session || !req.session.user) {
-		// 	return res.redirect('/login');
-		// }
 		next();
 	}, userController);
 
 	app.use('/user/site/', function (req, res, next) {
-		// if (!req.session || !req.session.user) {
-		// 	return res.redirect('/login');
-		// }
+		// session check already done in base user route
 		next();
 	}, siteController);
 
 	app.use('/user/site/:siteId/pagegroup/', function (req, res, next) {
-		// if (!req.session || !req.session.user) {
-		// 	return res.redirect('/login');
-		// }
 		next();
 	}, pageGroupController);
 
-
+	app.use('/user/site/:siteId/reports/', function (req, res, next) {
+		next();
+	}, reportsController);
 
 	app.use('/proxy/', function (req, res, next) {
-		if (!req.session || !req.session.user) {
-			res.json({ success: 0, message: 'Not Authenticated' });
-		}
 		next();
 	}, proxyController);
+
+	app.use('/api/', function (req, res, next) {
+		next();
+	}, apiController);
+
+
+	/*****************Login URL's End *******************/
+
+	app.use('/genieeApi/', function (req, res, next) {
+		/* @TODO Implement some kind of check to verify geniee Call */
+		next();
+	}, apiController);
 
 	app.use('/data/', function (req, res, next) {
 		/* if (!req.session || !req.session.user) {
@@ -76,15 +70,15 @@ module.exports = function (app) {
 	}, dataController);
 
 	app.use('/', function (req, res, next) {
-		console.log(req);
-		res.send("test");
-		//return res.redirect('/site/' + app.locals.siteId + '/dashboard');
+		if ((req.path.indexOf('/signup') !== -1 || req.path.indexOf('/forgotPassword') !== -1 || req.path.indexOf('/login') !== -1) && req.session && req.session.user) {
+			return res.redirect('/user/dashboard');
+		}
+		next();
 	}, indexController);
 
 
 	app.use(function (req, res) {
 		res.status(404);
-
 		// respond with html page
 		if (req.accepts('html')) {
 			res.render('404', { url: req.url });

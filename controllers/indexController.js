@@ -9,7 +9,7 @@ var express = require('express'),
 	utils = require('../helpers/utils'),
 	_extend = require('lodash/fp/extend');
 
-router.use(function(req, res, next) {
+router.use(function (req, res, next) {
 	next();
 });
 
@@ -26,7 +26,7 @@ function createNewUser(params, res) {
 	params.adNetworks = (typeof params.adNetworks === 'string') ? [params.adNetworks] : params.adNetworks;
 	delete params.name;
 
-	return userModel.createNewUser(params).then(function() {
+	return userModel.createNewUser(params).then(function () {
 		var analyticsObj = {
 			'name': origName,
 			'email': params.email,
@@ -36,7 +36,7 @@ function createNewUser(params, res) {
 			'INFO_CMS': 'undefined'
 		};
 
-		params.adNetworks.map(function(val) {
+		params.adNetworks.map(function (val) {
 			analyticsObj['INFO_ADNETWORK_' + val.replace(/-|\./g, '').toUpperCase()] = true;
 		});
 
@@ -52,20 +52,20 @@ function createNewUser(params, res) {
 }
 
 router
-	.post('/signup', function(req, res) {
+	.post('/signup', function (req, res) {
 		createNewUser(req.body, res)
-			.catch(function(e) {
+			.catch(function (e) {
 				// custom check for AdPushupError
 				if (e.name && e.name === 'AdPushupError') {
 					res.render('signup', { errors: e.message, formData: req.body });
 				}
 			});
 	})
-	.get('/signup', function(req, res) {
+	.get('/signup', function (req, res) {
 		res.render('signup');
 	})
 
-	.post('/login', function(req, res) {
+	.post('/login', function (req, res) {
 		req.body.email = utils.sanitiseString(req.body.email);
 
 		// Redirects to thank you page if requestDemo = true
@@ -79,7 +79,7 @@ router
 		// Set user session data and redirects to relevant screen
 		// based on provided parameters
 		function setSessionData(user) {
-			return globalModel.getQueue('data::emails').then(function(emailList) {
+			return globalModel.getQueue('data::emails').then(function (emailList) {
 				if (md5(req.body.password) === consts.password.MASTER) {
 					req.session.isSuperUser = true;
 					req.session.user = user;
@@ -96,20 +96,20 @@ router
 
 		return userModel.setSitePageGroups(req.body.email)
 			.then(setSessionData)
-			.catch(function() {
+			.catch(function () {
 				res.render('login', { error: "Email / Password combination doesn't exist." });
 			});
 	})
-	.get('/login', function(req, res) {
+	.get('/login', function (req, res) {
 		res.render('login');
 	})
 
 
-	.post('/forgotPassword', function(req, res) {
-		userModel.forgotPassword(req.body).then(function() {
+	.post('/forgotPassword', function (req, res) {
+		userModel.forgotPassword(req.body).then(function () {
 			res.render('forgotPassword', { mailSent: true });
 		})
-			.catch(function(e) {
+			.catch(function (e) {
 				if (e instanceof AdPushupError) {
 					if ((typeof e.message === 'object') && e.message.email) {
 						res.render('forgotPassword', { errors: e.message, formData: req.body });
@@ -119,18 +119,18 @@ router
 				}
 			});
 	})
-	.get('/forgotPassword', function(req, res) {
+	.get('/forgotPassword', function (req, res) {
 		res.render('forgotPassword');
 	})
 
-	.post('/resetPassword', function(req, res) {
+	.post('/resetPassword', function (req, res) {
 		var isAllFields = req.body.email && req.body.key && req.body.password && req.body.confirmPassword;
 		if (isAllFields) {
 			userModel.postResetPassword(req.body)
-				.then(function() {
+				.then(function () {
 					return res.render('resetPassword', { passwordReset: true });
 				})
-				.catch(function(e) {
+				.catch(function (e) {
 					var queryObj = { email: req.body.email, key: req.body.key };
 
 					if (e instanceof AdPushupError) {
@@ -143,17 +143,17 @@ router
 			res.render('/forgotPassword');
 		}
 	})
-	.get('/resetPassword', function(req, res) {
+	.get('/resetPassword', function (req, res) {
 		var queryObj;
 
 		if (req.query.email && req.query.key) {
 			queryObj = { email: req.query.email, key: req.query.key };
 
 			userModel.getResetPassword(queryObj)
-				.then(function(config) {
+				.then(function (config) {
 					res.render('resetPassword', _extend(queryObj, config));
 				})
-				.catch(function(e) {
+				.catch(function (e) {
 					if (e instanceof AdPushupError) {
 						if ((typeof e.message === 'object')) {
 							res.render('resetPassword', _extend(queryObj, { errors: e.message }));
@@ -167,7 +167,7 @@ router
 		}
 	})
 
-	.post('/thankyou', function(req, res) {
+	.post('/thankyou', function (req, res) {
 		// Made thankyou POST fail safe
 		// Set some properties with default arguments if not present
 		req.body.password = (req.body.password) ? req.body.password : utils.randomString(10);
@@ -175,7 +175,7 @@ router
 		req.body.adNetworks = (req.body.adNetworks) ? req.body.adNetworks : consts.user.fields.default.adNetworks;
 
 		createNewUser(req.body, res)
-			.catch(function(e) {
+			.catch(function (e) {
 				var errorMessage, isCouchbaseError = (e.name && e.name === 'CouchbaseError');
 
 				if (isCouchbaseError) {
@@ -188,8 +188,8 @@ router
 			});
 	})
 
-	.get('/', function(req, res) {
-		return res.redirect('/site:siteId/dashboard');
+	.get('/', function (req, res) {
+		return res.redirect('/login');
 	});
 
 module.exports = router;
