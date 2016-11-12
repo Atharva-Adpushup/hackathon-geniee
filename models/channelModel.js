@@ -74,7 +74,7 @@ function apiModule() {
 			});
 		},	
 		getPageGroupById: function(pageGroupId, extendedParams) {
-			var query = ViewQuery.from('dev_app', 'channelById').key(pageGroupId);
+			var query = ViewQuery.from('dev_app', 'channelById').stale(1).key(pageGroupId);
 			return couchbase.connectToAppBucket()
 				.then(function(appBucket) {
 					return new Promise(function(resolve, reject) {
@@ -105,7 +105,7 @@ function apiModule() {
 				});
 		},
 		updatePagegroup: function(json) {
-			var query = ViewQuery.from('dev_app', 'channelById').key(json.pageGroupId);
+			var query = ViewQuery.from('dev_app', 'channelById').stale(1).key(json.pageGroupId);
 			return couchbase.connectToAppBucket()
 				.then(function(appBucket) {
 					return new Promise(function(resolve, reject) {
@@ -127,7 +127,7 @@ function apiModule() {
 				});
 		},
 		deletePagegroupById: function(pageGroupId) {
-			var query = ViewQuery.from('dev_app', 'channelById').key(pageGroupId);
+			var query = ViewQuery.from('dev_app', 'channelById').stale(1).key(pageGroupId);
 			return couchbase.connectToAppBucket()
 				.then(function(appBucket) {
 					return new Promise(function(resolve, reject) {

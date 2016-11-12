@@ -94,7 +94,7 @@ block bodyContent
                                             //- Variations table
                                             .table-wrapper-paddded
 
-                                                if pageGroup.variations.length
+                                                if Object.keys(pageGroup.variations).length
                                                     table.table.table-bordered.table-hover
                                                         thead
                                                             tr
