@@ -9,15 +9,15 @@ var express = require('express'),
 	router = express.Router({ mergeParams: true });
 
 router
-	.get('/:pageGroupId', function(req, res) {
+	.get('/:pageGroupId', function (req, res) {
 		channelModel.getPageGroupById(req.params.pageGroupId, { getExtendedParams: true })
-			.then(function(pageGroup) {
+			.then(function (pageGroup) {
 				res.render('pageGroup', {
 					pageGroup: pageGroup,
 					siteId: req.params.siteId
 				})
 			})
-			.catch(function(err) {
+			.catch(function (err) {
 				res.render('pageGroup');
 			});
 	});

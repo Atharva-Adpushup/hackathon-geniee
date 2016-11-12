@@ -21,10 +21,11 @@ var model = require('../helpers/model'),
 			'templates',
 			'adNetworks',
 			'apConfigs',
+			'partner',
 			'dateCreated',
 			'dateModified'
 		];
-		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'adNetworks', 'actions', 'audiences', 'channels', 'cmsInfo', 'templates', 'apConfigs'];
+		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'adNetworks', 'actions', 'audiences', 'channels', 'cmsInfo', 'templates', 'apConfigs', 'partner'];
 		this.validations = {
 			'required': []
 		};
@@ -135,7 +136,9 @@ function apiModule() {
 	var API = {
 		createSite: function (data) {
 			var json = { siteName: data.siteName, siteDomain: data.siteDomain, channels: [], cmsInfo: { cmsName: '', pageGroups: [] } };
-
+			if (data.partner) {
+				json.partner = data.partner;
+			}
 			return globalModel.incrSiteId()
 				.then(function (siteId) {
 					json.siteId = siteId;
@@ -220,34 +223,34 @@ function apiModule() {
 						});
 				});
 		},
-		setPagegroupPattern: function(json) {
+		setPagegroupPattern: function (json) {
 			return API.getSiteById(json.siteId)
 				.then(function (site) {
-					var existingPatterns = site.get('apConfigs').pageGroupPattern,  pattern = {};
+					var existingPatterns = site.get('apConfigs').pageGroupPattern, pattern = {};
 					pattern[json.pageGroupName] = json.pageGroupPattern;
 
-					if(!existingPatterns) {
+					if (!existingPatterns) {
 						site.set('apConfigs', { pageGroupPattern: new Array(pattern) });
 					}
 					else {
-						var p = _.find(existingPatterns, function(p) { return _.has(p, json.pageGroupName); });
+						var p = _.find(existingPatterns, function (p) { return _.has(p, json.pageGroupName); });
 						p ? p[json.pageGroupName] = json.pageGroupPattern : existingPatterns.push(pattern);
 					}
 					return site.save();
-				})	
+				})
 		},
-		getSitePageGroups: function(siteId) {
+		getSitePageGroups: function (siteId) {
 			return API.getSiteById(parseInt(siteId))
-				.then(function(site) {
-					var pageGroupPromises = _.map(site.data.channels, function(channel) {
+				.then(function (site) {
+					var pageGroupPromises = _.map(site.data.channels, function (channel) {
 						var pageGroup = channel.split(':');
 						return channelModel.getChannel(siteId, pageGroup[0], pageGroup[1])
-							.then(function(channel) {
+							.then(function (channel) {
 								return channel.data;
 							})
 					});
-					
-					return Promise.all(pageGroupPromises).then(function(pageGroups) {
+
+					return Promise.all(pageGroupPromises).then(function (pageGroups) {
 						return pageGroups;
 					});
 				});
