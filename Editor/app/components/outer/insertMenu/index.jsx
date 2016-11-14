@@ -2,9 +2,10 @@ import React, { PropTypes } from 'react';
 import Menu from 'shared/menu/menu.jsx';
 import MenuItem from 'shared/menu/menuItem.jsx';
 import { commonSupportedSizes } from 'consts/commonConsts.js';
+import CodeBox from 'shared/codeBox';
 import AdSizeSelector from './adSizeSelector.jsx';
-import ParentSelector from './parentSelector.jsx';
 import SectionOptions from './sectionOptions.jsx';
+import ParentSelector from './parentSelector.jsx';
 
 const initialState = {
 		adSize: null,
@@ -48,13 +49,14 @@ class insertMenu extends React.Component {
 		this.setState({ adSize, operation, showExtraOptions: true, activeItem: 0, prevActiveItem: this.state.activeItem });
 	}
 
-	createSectionAndAd(position) {
+	createSectionAndAd(position, adCode) {
 		const sectionPayload = {
 				position,
 				xpath: this.props.parents[0].xpath,
 				operation: this.state.operation
 			},
 			adPayload = {
+				adCode,
 				height: this.state.adSize.height,
 				width: this.state.adSize.width
 			};
@@ -69,21 +71,28 @@ class insertMenu extends React.Component {
 		}
 
 		if (!this.state.showExtraOptions) {
-			items = props.insertOptions.map((option, index) => {
-				return (
-					<MenuItem key={index} icon={getInsertOptionClass(option)} contentHeading={option}>
-						<AdSizeSelector
-							checked={option === this.state.operation ? this.state.adSize : null}
-							adSizes={commonSupportedSizes}
-							insertOption={option}
-							onCheckedItem={this.selectSize.bind(this, option)}
-      />
-					</MenuItem>);
-			});
+			items = props.insertOptions.map((option, index) => (
+				<MenuItem key={index} icon={getInsertOptionClass(option)} contentHeading={option}>
+					<AdSizeSelector
+						checked={option === this.state.operation ? this.state.adSize : null}
+						adSizes={commonSupportedSizes}
+						insertOption={option}
+						onCheckedItem={this.selectSize.bind(this, option)}
+					/>
+				</MenuItem>)
+			);
+		} else if (props.partner === 'geniee') {
+			items.push((
+				<MenuItem key={1} icon="fa-sitemap" contentHeading="Section Options">
+					<SectionOptions onCreateAd={this.createSectionAndAd.bind(this)} onCancel={this.toggleExtraOptions.bind(this)} />
+				</MenuItem>
+			));
 		} else {
-			items.push((<MenuItem key={1} icon="fa-sitemap" contentHeading="Section Options">
-				<SectionOptions onCreateAd={this.createSectionAndAd.bind(this)} onCancel={this.toggleExtraOptions.bind(this)} />
-			</MenuItem>));
+			items.push((
+				<MenuItem key={1} icon="fa-sitemap" contentHeading="Adcode">
+					<CodeBox onSubmit={this.createSectionAndAd.bind(this, null)} onCancel={this.toggleExtraOptions.bind(this)} />
+				</MenuItem>
+			));
 		}
 
 		items.push((<MenuItem key={5} icon="fa-sitemap" contentHeading="Select Parent">
@@ -92,7 +101,7 @@ class insertMenu extends React.Component {
 				channelId={this.props.channelId}
 				onHighlightElement={props.highlightInnerElement}
 				onSelectElement={props.selectInnerElement}
-   />
+			/>
 		</MenuItem>));
 
 		return (
@@ -102,7 +111,7 @@ class insertMenu extends React.Component {
 				activeItem={this.state.activeItem}
 				onMenuItemClick={this.setActiveItem.bind(this)}
 				onGlassClick={props.hideMenu}
-   >
+			>
 				{items}
 			</Menu>
 		);
@@ -110,12 +119,13 @@ class insertMenu extends React.Component {
 }
 
 insertMenu.propTypes = {
+	isVisible: PropTypes.bool.isRequired,
 	position: PropTypes.object,
 	parents: PropTypes.array,
 	variationId: PropTypes.string,
 	channelId: PropTypes.string,
 	insertOptions: PropTypes.array,
-	isVisible: PropTypes.bool.isRequired,
+	partner: PropTypes.string,
 	createSectionAndAd: PropTypes.func,
 	hideMenu: PropTypes.func,
 	selectInnerElement: PropTypes.func,
