@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import { arrayOf, normalize } from 'normalizr';
 import { channelSchema } from 'schemas/site';
+import { siteModes } from 'consts/commonConsts';
 import _ from 'lodash';
 
 const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' })),
@@ -19,6 +20,12 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 					result = normalize(parsedData.channels, arrayOf(channelSchema)),
 					computedResult = $.extend(true, {}, result.entities);
 				let activeChannel;
+
+				computedResult.site = {
+					modeStatus: {
+						mode: ((parsedData.site.hasOwnProperty('apConfigs')) ? parseInt(parsedData.site.apConfigs.mode, 10) : siteModes.DRAFT)
+					}
+				};
 
 				computedResult.channelData = {
 					activeChannel: null,

@@ -1,8 +1,16 @@
 import { siteModes } from 'consts/commonConsts.js';
 import { Tooltip, Button, OverlayTrigger } from 'react-bootstrap';
 import React, { PropTypes } from 'react';
+import $ from 'jquery';
+import Utils from 'libs/utils';
 
-const SiteModes = (props) => (
+const showSiteModesPopover = (props, ev) => {
+		const positionOffsets = Utils.ui.outerMenuRenderPosition($(ev.target));
+
+		props.showPublisherHelper(positionOffsets);
+	},
+
+	SiteModes = (props) => (
 	<div className="modes modes--stateChange">
 		<input type="radio" className="modes-input modes-input-off" name="view" value="editor" id="draftmode" checked={props.siteMode === siteModes.DRAFT} />
 		<OverlayTrigger placement="bottom" overlay={<Tooltip id="siteModesPause">{props.siteMode === siteModes.DRAFT ? 'AdPushup is currently paused' : 'Pause AdPushup'}</Tooltip>}>
@@ -46,7 +54,7 @@ const SiteModes = (props) => (
 				<Button onClick={props.masterSave} className="btn-sm btn-save btn-lightBg btn--success btn--icon pull-left" />
 			</OverlayTrigger>
 
-			<SiteModes showPublisherHelper={props.showPublisherHelper} siteMode={props.siteMode} />
+			<SiteModes showPublisherHelper={showSiteModesPopover.bind(null, props)} siteMode={props.siteMode} />
 		</div>
 	);
 

@@ -230,6 +230,7 @@ router
 	.post('/saveData', function(req, res) {
 		var parsedData = (typeof req.body.data === 'string') ? JSON.parse(req.body.data) : req.body.data,
 			siteData = {
+				'apConfigs': {mode: parsedData.siteMode},
 				'siteId': parsedData.siteId,
 				'siteDomain': parsedData.siteDomain,
 				'channels': (lodash.map(parsedData.channels, function(channel) {

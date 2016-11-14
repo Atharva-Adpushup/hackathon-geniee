@@ -1,4 +1,4 @@
-import { status } from 'consts/commonConsts';
+import { status, siteActions } from 'consts/commonConsts';
 import { masterSave } from 'libs/dataSyncService';
 import { getFinalJson } from 'selectors/siteSelectors';
 import _ from 'lodash';
@@ -57,7 +57,14 @@ const afterSaveLoaderStatusPending = (loaderStatus) => {
 	afterSaveLoaderStatusReset = () => {
 		return {
 			type: status.text.RESET
-		}
+		};
+	},
+	changeMode = (mode) => {
+		return {
+			type: siteActions.CHANGE_SITE_MODE,
+			mode
+		};
 	};
 
-export { afterSaveLoaderStatusReset, afterSaveLoaderStatusPending, masterSaveData, afterSaveLoaderStatusSuccess, afterSaveLoaderStatusFailed }
+export { afterSaveLoaderStatusReset, afterSaveLoaderStatusPending, masterSaveData,
+	afterSaveLoaderStatusSuccess, afterSaveLoaderStatusFailed, changeMode };

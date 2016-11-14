@@ -47,7 +47,7 @@ module.exports = function(app) {
 	}, userController);
 
 	app.use('/proxy/', function(req, res, next) {
-		if (!req.session || !req.session.user) {
+		if (!req.session) {
 			res.json({ success: 0, message: 'Not Authenticated' });
 		}
 		next();

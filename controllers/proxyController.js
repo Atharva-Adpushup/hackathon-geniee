@@ -91,12 +91,12 @@ router
 			});
 	})
 	.get('/detectAp', function(req, res) {
-		proxy.detectCustomAp(req.query.url)
+		return proxy.detectCustomAp(req.query.url)
 			.then(function(result) {
-				res.json({ ap: result });
+				return res.json({ ap: result });
 			})
 			.catch(function() {
-				res.json({ ap: false });
+				return res.json({ ap: false });
 			});
 	});
 
