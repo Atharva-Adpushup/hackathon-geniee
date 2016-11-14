@@ -43,9 +43,9 @@ block bodyContent
                                         a.pull-left(id="site-report-" + site.siteId, target='_blank', title='Showing last 7 days ControlVsAdPushup reports.', href='/user/reports/ControlVsAdpushupCtr?siteId=#{site.siteId}').
                                             #{utils.domanize(site.domain)} - #{site.siteId}
                                         .pull-right
-                                            a.btn.btn-lightBg.btn-default(id="site-custom-reports-" + site.siteId, href='/user/reports/ControlVsAdpushupCtr?siteId=#{site.siteId}') Custom Reports
-                                            a.btn.btn-lightBg.btn-default(id="site-adsense-reports-" + site.siteId, href='/user/reports/adsense?siteId=#{site.siteId}') Adsense Reports
-                                            a.btn.btn-lightBg.btn-default(id="editor-redirect-link", target='_blank', href='/user/editor?siteId=#{site.siteId}') Take to Editor
+                                            a.btn.btn-lightBg.btn-default(id="site-custom-reports-" + site.siteId, href='/user/site/#{site.siteId}/reports/ControlVsAdpushupCtr') Custom Reports
+                                            a.btn.btn-lightBg.btn-default(id="site-adsense-reports-" + site.siteId, href='/user/site/#{site.siteId}/reports/adsense') Adsense Reports
+                                            a.btn.btn-lightBg.btn-default(id="editor-redirect-link", target='_blank', href='/user/site/#{site.siteId}/editor') Take to Editor
                                             if isSuperUser
                                                 form(action='/user/deleteSite', method='post', style='display: inline', onsubmit="return (confirm('Are you sure you want to delete this site? This step cannot be reversed !') && trackDelete(#{site.siteId}))")
                                                     input(type='hidden', name='siteId', value='#{site.siteId}')

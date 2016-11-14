@@ -181,8 +181,7 @@ router
 			var formData = {
 				'firstName': user.get('firstName'),
 				'lastName': user.get('lastName'),
-				'email': user.get('email'),
-				'md5Email': (md5(user.get('name')))
+				'email': user.get('email')
 			};
 
 			res.render('profile', {
