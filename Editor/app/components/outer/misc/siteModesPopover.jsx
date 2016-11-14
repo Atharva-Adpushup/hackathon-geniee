@@ -9,24 +9,18 @@ import Accordion from 'react-bootstrap/lib/Accordion';
 class siteModesPopover extends React.Component {
 	constructor(props) {
 		super(props);
+		const isPublishMode = (props.mode && props.mode === siteModes.PUBLISH);
 		this.timer = null;
 		this.checkApStatus();
 		this.state = {
 			apStatus: status.PENDING,
-			controlStatus: status.FALSE,
-			modeChanged: false
+			controlStatus: (isPublishMode ? status.TRUE : status.FALSE)
 		};
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if ((typeof nextProps.mode !== 'undefined') && (nextProps.mode !== this.props.mode)) {
-			this.setState({ modeChanged: true });
-		}
+		this.checkApStatus();
 	}
-
-	// shouldComponentUpdate(nextProps, nextState) {
-	// 	return Utils.deepDiffMapper.test(nextState, this.state).isChanged;
-	// }
 
 	renderWaitMessage() {
 		return (
@@ -66,29 +60,21 @@ class siteModesPopover extends React.Component {
 
 	render() {
 		const style = {
-			position: 'absolute',
-			top: this.props.position.top,
-			left: this.props.position.left - 300,
-			zIndex: 10000,
-			backgroundColor: 'white',
-			boxShadow: '0 1px 10px 0 rgba(0, 0, 0, 0.3)',
-			width: '300px'
-		};
-		let allDone;
+				position: 'absolute',
+				top: this.props.position.top,
+				left: this.props.position.left - 300,
+				zIndex: 10000,
+				backgroundColor: 'white',
+				boxShadow: '0 1px 10px 0 rgba(0, 0, 0, 0.3)',
+				width: '300px'
+			},
+			allDone = (this.props.url && (this.state.apStatus === status.SUCCESS) && this.state.controlStatus);
 
 		if (!this.props.isVisible) {
 			return (null);
 		}
 
-		if (this.state.modeChanged && !this.props.isVisible) {
-			setTimeout(() => {
-				this.props.hideMenu();
-			}, 0);
-
-			return (null);
-		}
-
-		if (this.props.mode === siteModes.PUBLISH && !this.state.modeChanged) {
+		if (this.props.mode === siteModes.PUBLISH && !allDone) {
 			setTimeout(() => {
 				this.changeMode(siteModes.DRAFT);
 			}, 0);
@@ -103,15 +89,7 @@ class siteModesPopover extends React.Component {
 			);
 		}
 
-		if (this.props.mode === siteModes.DRAFT && this.state.modeChanged) {
-			setTimeout(() => {
-				this.changeMode(siteModes.DRAFT);
-			}, 0);
-		}
-
-		allDone = ((this.state.apStatus === status.SUCCESS) && this.state.controlStatus);
-
-		if (allDone && !this.state.modeChanged) {
+		if (this.props.mode === siteModes.DRAFT && allDone) {
 			setTimeout(() => {
 				this.changeMode(siteModes.PUBLISH);
 			}, 0);
