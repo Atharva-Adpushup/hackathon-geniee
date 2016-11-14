@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import AdsDescriptor from 'editMenu/adDescriptor.jsx';
-import { updateCss, deleteAd } from '../actions/adActions';
+import { updateCss, deleteAd, updateAdCode } from '../actions/adActions';
 import { deleteSection } from '../actions/sectionActions';
 
 const mapStateToProps = (state, ownProps) => ({ ...ownProps }),
@@ -13,6 +13,9 @@ const mapStateToProps = (state, ownProps) => ({ ...ownProps }),
 		},
 		updateCss: (adId, css) => {
 			dispatch(updateCss(adId, css));
+		},
+		updateAdCode: (adId, adCode) => {
+			dispatch(updateAdCode(adId, adCode));
 		}
 	});
 
