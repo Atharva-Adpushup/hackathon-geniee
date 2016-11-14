@@ -1,6 +1,7 @@
 // AdPushup REST API controller
 
 var express = require('express'),
+	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
 	router = express.Router(),
@@ -14,14 +15,17 @@ router
 	.post('/site/create', function (req, res) {
 		var json = req.body;
 		if (req.isGenieeSite) {
-			json.partner = 'geniee'
+			json.partner = 'geniee';
 		}
 
 		return FormValidator.validate(json, schema.api.validations)
-			.then(function () { return siteModel.createSite(json) })
-			.then(function (site) {
-				return res.status(200).send({ success: true, data: { siteId: site.data.siteId } });
+			.then(function() {
+
 			})
+			// .then(function () { return siteModel.createSite(json) })
+			// .then(function (site) {
+			// 	return res.status(200).send({ success: true, data: { siteId: site.data.siteId } });
+			// })
 			.catch(function (err) {
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });

@@ -20,7 +20,7 @@ module.exports = function (app) {
 	});
 
 	app.use(function (req, res, next) {
-		if ((req.path.indexOf('/user') !== -1 || req.path.indexOf('/api') !== -1 || req.path.indexOf('/proxy') !== -1) && (!req.session || !req.session.user)) {
+		if ((req.path.indexOf('/user') !== -1 || req.path.indexOf('/proxy') !== -1) && (!req.session || !req.session.user)) {
 			return res.redirect('/login');
 		}
 		next();
@@ -53,10 +53,6 @@ module.exports = function (app) {
 	app.use('/proxy/', function (req, res, next) {
 		next();
 	}, proxyController);
-
-	app.use('/api/', function (req, res, next) {
-		next();
-	}, apiController);
 
 
 	/*****************Login URL's End *******************/

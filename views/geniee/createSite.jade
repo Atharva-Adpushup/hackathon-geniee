@@ -18,10 +18,10 @@ html
 		h1 Geniee-AP REST APIs
 
 		section
-			h2 API to create new media 
+			h2 Api to create new media 
 			pre 
 				strong POST 
-				| /api/site/create
+				| /genieeApi/site/create
 			form#createMedia
 				input(type="text" placeholder="Enter site name" name="siteName")
 				br
@@ -29,19 +29,19 @@ html
 				br
 				button Create
 		section
-			h2 API to get existing media 
+			h2 Api to get existing media 
 			pre 
 				strong GET 
-				| /api/site/view
+				| /genieeApi/site/view
 			form#getMedia
 				input(type="text" placeholder="Enter site id" name="siteId")
 				br
 				button Get
 		section
-			h2 API to update existing media 
+			h2 Api to update existing media 
 			pre 
 				strong POST 
-				| /api/site/edit
+				| /genieeApi/site/edit
 			form#updateMedia
 				input(type="text" placeholder="Enter site id" name="siteId")
 				br
@@ -49,10 +49,10 @@ html
 				br
 				button Update
 		section
-			h2 API to delete media 
+			h2 Api to delete media 
 			pre 
 				strong POST 
-				| /api/site/delete
+				| /genieeApi/site/delete
 			form#deleteMedia
 				input(type="text" placeholder="Enter site id" name="siteId")
 				br
@@ -74,7 +74,7 @@ html
 
 				$.ajax({
 					type: "POST",
-					url: "/api/site/create",
+					url: "/genieeApi/site/create",
 					data: {
 						siteDomain: json.siteDomain,
 						siteName: json.siteName
@@ -95,7 +95,7 @@ html
 
 				$.ajax({
 					type: "GET",
-					url: "/api/site/view",
+					url: "/genieeApi/site/view",
 					data: {
 						siteId: json.siteId
 					},
@@ -115,7 +115,7 @@ html
 
 				$.ajax({
 					type: "POST",
-					url: "/api/site/edit",
+					url: "/genieeApi/site/edit",
 					data: {
 						siteId: json.siteId,
 						siteName: json.siteName,
@@ -137,7 +137,7 @@ html
 
 				$.ajax({
 					type: "POST",
-					url: "/api/site/delete",
+					url: "/genieeApi/site/delete",
 					data: {
 						siteId: json.siteId
 					},

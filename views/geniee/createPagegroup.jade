@@ -21,7 +21,7 @@ html
 			h2 API to create new pagegroup 
 			pre 
 				strong POST 
-				| /api/pagegroup/create
+				| /genieeApi/pagegroup/create
 			form#createPagegroup
 				input(type="text" placeholder="Enter site id" name="siteId")
 				br
@@ -31,8 +31,8 @@ html
 				br
 				select(name="device")
 					option(value="") Select device
-					option(value="desktopa") Desktop
-					option(value="tableta") Tablet
+					option(value="desktop") Desktop
+					option(value="tablet") Tablet
 					option(value="mobile") Mobile
 				br
 				button Create
@@ -40,7 +40,7 @@ html
 			h2 API to get existing pagegroup 
 			pre 
 				strong GET 
-				| /api/pagegroup/view
+				| /genieeApi/pagegroup/view
 			form#getPagegroup
 				input(type="text" placeholder="Enter pagegroup id" name="pageGroupId")
 				br
@@ -49,7 +49,7 @@ html
 			h2 API to update existing pagegroup 
 			pre 
 				strong POST 
-				| /api/pagegroup/edit
+				| /genieeApi/pagegroup/edit
 			form#updatePagegroup
 				input(type="text" placeholder="Enter pagegroup id" name="pageGroupId")
 				br
@@ -60,7 +60,7 @@ html
 			h2 API to delete pagegroup 
 			pre 
 				strong POST 
-				| /api/pagegroup/delete
+				| /genieeApi/pagegroup/delete
 			form#deletePagegroup
 				input(type="text" placeholder="Enter pagegroup id" name="pageGroupId")
 				br
@@ -82,7 +82,7 @@ html
 
 				$.ajax({
 					type: "POST",
-					url: "/api/pagegroup/create",
+					url: "/genieeApi/pagegroup/create",
 					data: {
 						siteId: json.siteId,
 						pageGroupName: json.pageGroupName,
@@ -105,7 +105,7 @@ html
 
 				$.ajax({
 					type: "GET",
-					url: "/api/pagegroup/view",
+					url: "/genieeApi/pagegroup/view",
 					data: {
 						pageGroupId: json.pageGroupId
 					},
@@ -125,7 +125,7 @@ html
 
 				$.ajax({
 					type: "POST",
-					url: "/api/pagegroup/edit",
+					url: "/genieeApi/pagegroup/edit",
 					data: {
 						pageGroupId: json.pageGroupId,
 						sampleUrl: json.sampleUrl
@@ -146,7 +146,7 @@ html
 
 				$.ajax({
 					type: "POST",
-					url: "/api/pagegroup/delete",
+					url: "/genieeApi/pagegroup/delete",
 					data: {
 						pageGroupId: json.pageGroupId
 					},
