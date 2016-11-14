@@ -46,6 +46,10 @@ module.exports = function (app) {
 		next();
 	}, reportsController);
 
+	app.use('/user/reports/', function (req, res, next) {
+		next();
+	}, reportsController);
+
 	app.use('/proxy/', function (req, res, next) {
 		next();
 	}, proxyController);
