@@ -16,16 +16,48 @@ var express = require('express'),
 
 router
 	.get('/dashboard', function (req, res) {
-		siteModel.getSitePageGroups(req.params.siteId)
-			.then(function (pageGroups) {
-				res.render('dashboard', {
-					pageGroups: pageGroups,
-					siteId: req.params.siteId
+		var allUserSites = req.session.user.sites;
+
+		function setEmailCookie() {
+			var cookieName = 'email',
+				// "Email" cookie has 1 year expiry and accessible through JavaScript
+				cookieOptions = { expires: new Date(Date.now() + (60 * 60 * 1000 * 24 * 365)), encode: String, httpOnly: false },
+				isCookieSet = (Object.keys(req.cookies).length > 0) && (typeof req.cookies[cookieName] !== 'undefined');
+
+			isCookieSet ? res.clearCookie(cookieName, cookieOptions) : '';
+			res.cookie(cookieName, req.session.user.email, cookieOptions);
+		}
+
+		function sitePromises() {
+			return _.map(allUserSites, function(obj) {
+				return siteModel.getSiteById(obj.siteId).then(function() {
+					return obj;
+				}).catch(function() {
+					return 'inValidSite';
 				});
-			})
-			.catch(function (err) {
-				res.send('Site not found!');
 			});
+		}
+
+		return Promise.all(sitePromises()).then(function(validSites) {
+			var sites = _.difference(validSites, ['inValidSite']),
+				unSavedSite;
+
+			sites = (Array.isArray(sites) && (sites.length > 0)) ? sites : [];
+			/**
+			 * unSavedSite, Current user site object entered during signup
+			 *
+			 * - Value is Truthy (all user site/sites) only if user has
+			 * no saved any site through Visual Editor
+			 * - Value is Falsy if user has atleast one saved site
+			*/
+			unSavedSite = (sites.length === 0) ? allUserSites : null;
+			req.session.unSavedSite = unSavedSite;
+			setEmailCookie(req, res);
+			res.render('dashboard', {
+				validSites: sites,
+				unSavedSite: unSavedSite
+			});
+		});
 	})
 	.get('/billing', function (req, res) {
 		res.render('billing', {
