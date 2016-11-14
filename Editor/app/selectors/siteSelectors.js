@@ -6,9 +6,8 @@ import { getAllSections } from './sectionSelectors';
 import { getAllAds } from './adsSelectors';
 
 const getAfterSaveLoaderState = (state) => state.site.afterSaveLoader.status,
-
 	getMode = (state) => state.site.modeStatus.mode,
-
+	getPartner = (state) => state.site.siteData.partner,
 	getFinalJson = createSelector([getAllChannels, getAllVariations, getAllSections, getAllAds, getMode], (allChannels = {}, allVariations = {}, allSections = {}, allAds = {}, siteMode = 2) => {
 		return {
 			siteMode,
@@ -38,7 +37,7 @@ const getAfterSaveLoaderState = (state) => state.site.afterSaveLoader.status,
 				channel.variations = channelVariations;
 				return channel;
 			}))
-		};
+		}
 	});
 
-export { getAfterSaveLoaderState, getFinalJson, getMode };
+export { getAfterSaveLoaderState, getFinalJson, getMode, getPartner };

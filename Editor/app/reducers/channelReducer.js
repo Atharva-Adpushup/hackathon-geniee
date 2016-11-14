@@ -19,8 +19,8 @@ const initialState = { activeChannel: null, byIds: {} },
 					variations: config.variations,
 					activeVariation: null,
 					contentSelectorMissing: false,
-					isLoading: false,
-					isOpen: false
+					isLoading: true,
+					isOpen: true
 				};
 
 			case channelActions.EDIT_SAMPLE_URL:

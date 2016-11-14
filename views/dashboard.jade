@@ -1,9 +1,30 @@
 extends  layout/base
+block append headScripts
+    +loadAsset("js", [
+        '/assets/js/libs/third-party/d3.js',
+        '/assets/js/libs/third-party/c3.js',
+        '/assets/js/libs/third-party/dataTables.js',
+        '/assets/js/libs/third-party/dataTablesColReorder.js',
+        '/assets/js/reports/dataVisualization.js',
+        '/assets/js/reports/reports.js'
+    ])
+
+    +loadAsset("css", [
+        '/assets/css/c3.css',
+        '/assets/css/dataTables.css'
+    ])
 
 block getTitle
     - var titleVar = "DashBoard"
 
 block bodyContent
+    // Alert Template text content computation
+    - noSitePresentAlertStr = "Lets Add <span class='mR-5 label label--custom'>";
+    - origUnSavedDomain = (unSavedSite) ? unSavedSite[0].domain : null;
+    - domanizedUrl = (origUnSavedDomain) ? utils.domanize(origUnSavedDomain) : null;
+    - noSitePresentAlertStr += (domanizedUrl && domanizedUrl.length > 0) ? domanizedUrl : "one";
+    - alertTemplateStr = "<div class='u-cursor-pointer alert-content-wrapper' id='alert--noSitePresent' data-site='" + origUnSavedDomain + "' data-toggle='modal' data-target='#addSite'>No site present. <h2 class='u-margin-t5px alert-heading'>" + noSitePresentAlertStr +"</span>?</h2></div> ";
+
     include layout/sideBar
     .pageContainer.page-container
         include layout/header
@@ -11,36 +32,73 @@ block bodyContent
         .pageContentWrapper.page-content
             .pageContentInner.page-content--inner
                 .notification-wrapper
+                // Control v/s Adpushp Starts here
                 #widgetsArea.row
-                    .mb-30
-                        .controlAdpushupWrap
-                            h3.title.m-All-0.clearfix 
-                                a Page Groups
+                    if validSites.length > 0
+                        for site in validSites
+                            <!--.2.and.mb-30(class="{{ loop.length % loop.last ? 'col-xs-12' : 'col-xs-6' }}")-->
+                            .mb-30
+                                .controlAdpushupWrap
+                                    h3.title.m-All-0.clearfix
+                                        a.pull-left(id="site-report-" + site.siteId, target='_blank', title='Showing last 7 days ControlVsAdPushup reports.', href='/user/reports/ControlVsAdpushupCtr?siteId=#{site.siteId}').
+                                            #{utils.domanize(site.domain)} - #{site.siteId}
+                                        .pull-right
+                                            a.btn.btn-lightBg.btn-default(id="site-custom-reports-" + site.siteId, href='/user/reports/ControlVsAdpushupCtr?siteId=#{site.siteId}') Custom Reports
+                                            a.btn.btn-lightBg.btn-default(id="site-adsense-reports-" + site.siteId, href='/user/reports/adsense?siteId=#{site.siteId}') Adsense Reports
+                                            a.btn.btn-lightBg.btn-default(id="editor-redirect-link", target='_blank', href='/user/editor?siteId=#{site.siteId}') Take to Editor
+                                            if isSuperUser
+                                                form(action='/user/deleteSite', method='post', style='display: inline', onsubmit="return (confirm('Are you sure you want to delete this site? This step cannot be reversed !') && trackDelete(#{site.siteId}))")
+                                                    input(type='hidden', name='siteId', value='#{site.siteId}')
+                                                    input(type='hidden', name='siteDomain', value='#{site.domain}')
+                                                    button.btn.btn-lightBg.btn-default(id="site-delete-btn", type='submit') Delete Site
 
-                            //- Pagegroups table
-                            .table-wrapper-paddded
-                                if pageGroups.length
-                                    table.table.table-bordered.table-hover
-                                        thead
-                                            tr
-                                                th Name
-                                                th Platform
-                                                th Variations
-                                                th Actions
-                                        tbody
-                                            for pagegroup in pageGroups
-                                                tr
-                                                    td!= utils.convertPagegroupLink(pagegroup.id, pagegroup.pageGroup, siteId)
-                                                    td!= pagegroup.platform
-                                                    td!= Object.keys(pagegroup.variations).length
-                                                    td.table-actions
-                                                        a(href="/" title="Edit")
-                                                            i.fa.fa-edit
-                                                        a(href="/site/#{siteId}/editor" title="Go to Editor")
-                                                            i.fa.fa-code
-                                                        a(href="/" title="Delete")
-                                                            i.fa.fa-trash
-                                else
-                                    h5 No PageGroup Found!
-                                        
-            
+                                    - siteDomain = (site.domain) ? site.domain : "";
+                                    .graph.dashboardgraph
+                                        div(id='controlVsAdpushupChart_#{site.siteId}', style='overflow: hidden;')
+                                            .loaderwrapper.spinner
+                                                img(src="/assets/images/loaderLogo.png")
+                                            script(type='text/javascript').
+                                                adpushup.reports.controlVsAdpushupCtr({
+                                                    "siteId": #{site.siteId},
+                                                    "siteDomain": "#{siteDomain}",
+                                                    "platform": null,
+                                                    "pageGroup": null,
+                                                    "step": "1d",
+                                                    "chartType": "areaChart",
+                                                    "showX": false,
+                                                    "showY": false,
+                                                    "chartContainer": "#controlVsAdpushupChart_"+#{site.siteId},
+                                                    "notify": false,
+                                                    "alert": true,
+                                                    "reportType": "controlVsAdpushupCtr"
+                                                });
+                                        if isSuperUser
+                                            div(id='pageViewsChart_#{site.siteId}')
+                                                script(type='text/javascript').
+                                                    adpushup.reports.controlVsAdpushupPageviews({
+                                                        "siteId": #{site.siteId},
+                                                        "siteDomain": "#{siteDomain}",
+                                                        "platform": null,
+                                                        "pageGroup": null,
+                                                        "chartType": "pieChart",
+                                                        "showLabel": false,
+                                                        "showLegend": false,
+                                                        "chartContainer": "#" + "pageViewsChart_"+#{site.siteId},
+                                                        "notify": false,
+                                                        "alert": true,
+                                                        "reportType": "controlVsAdpushupPageviews"
+                                                    });
+                    else
+                        script(type='text/javascript').
+                            adpushup.alert("!{alertTemplateStr}", "#widgetsArea", 1);
+    
+    script(type="text/javascript").
+        analytics.page('App-dashboard', intercomObj);
+
+        function trackDelete( siteId ) {
+            analytics.track('SITE_Delete', {
+               siteId: siteId,
+               IS_ADMIN: #{isSuperUser}
+           });
+           return true;
+        }

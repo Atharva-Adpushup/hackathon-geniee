@@ -15,128 +15,101 @@ var express = require('express'),
 	config = require('../configs/config');
 
 router
-	.get('/dashboard', function(req, res) {
-		siteModel.getSitePageGroups(req.params.siteId)
-			.then(function(pageGroups) {
-				res.render('dashboard', {
-					pageGroups: pageGroups
+	.get('/dashboard', function (req, res) {
+		var allUserSites = req.session.user.sites;
+
+		function setEmailCookie() {
+			var cookieName = 'email',
+				// "Email" cookie has 1 year expiry and accessible through JavaScript
+				cookieOptions = { expires: new Date(Date.now() + (60 * 60 * 1000 * 24 * 365)), encode: String, httpOnly: false },
+				isCookieSet = (Object.keys(req.cookies).length > 0) && (typeof req.cookies[cookieName] !== 'undefined');
+
+			isCookieSet ? res.clearCookie(cookieName, cookieOptions) : '';
+			res.cookie(cookieName, req.session.user.email, cookieOptions);
+		}
+
+		function sitePromises() {
+			return _.map(allUserSites, function(obj) {
+				return siteModel.getSiteById(obj.siteId).then(function() {
+					return obj;
+				}).catch(function() {
+					return 'inValidSite';
 				});
-			})
-			.catch(function(err) {
-				res.render('404');
 			});
-	})
-	.get('/settings', function(req, res) {
-		siteModel.getSiteById(req.params.siteId)
-			.then(function(site) {
-				res.render('settings', {
-					pageGroups: site.data.cmsInfo.pageGroups,
-					patterns: site.data.apConfigs.pageGroupPattern ? site.data.apConfigs.pageGroupPattern : []
-				});
-			})
-			.catch(function(err) {
-				res.send('Some error occurred!');
+		}
+
+		return Promise.all(sitePromises()).then(function(validSites) {
+			var sites = _.difference(validSites, ['inValidSite']),
+				unSavedSite;
+
+			sites = (Array.isArray(sites) && (sites.length > 0)) ? sites : [];
+			/**
+			 * unSavedSite, Current user site object entered during signup
+			 *
+			 * - Value is Truthy (all user site/sites) only if user has
+			 * no saved any site through Visual Editor
+			 * - Value is Falsy if user has atleast one saved site
+			*/
+			unSavedSite = (sites.length === 0) ? allUserSites : null;
+			req.session.unSavedSite = unSavedSite;
+			setEmailCookie(req, res);
+			res.render('dashboard', {
+				validSites: sites,
+				unSavedSite: unSavedSite
 			});
+		});
 	})
-	.post('/savePageGroupPattern', function(req, res) {
-		var json = { siteId: req.body.siteId, pageGroupName: req.body.pageGroupName, pageGroupPattern: req.body.pageGroupPattern };
-		siteModel.setPagegroupPattern(json)
-			.then(function(data) {
-				res.send({ success: 1 });
-			})
-			.catch(function(err) {			
-				if(err.name === 'AdPushupError') {
-					res.send({ succes: 0, message: err.message })
-				}
-				else {
-					res.send({ success: 0, message: 'Some error occurred!' });
-				}
-			});
-	})
-	.get('/billing', function(req, res) {
+	.get('/billing', function (req, res) {
 		res.render('billing', {
 			user: req.session.user,
 			isSuperUser: true
 		});
 	})
-	.post('/addSite', function(req, res) {
+	.post('/addSite', function (req, res) {
 		var site = (req.body.site) ? utils.getSafeUrl(req.body.site) : req.body.site;
 
-		userModel.addSite(req.session.user.email, site).spread(function(user, siteId) {
+		userModel.addSite(req.session.user.email, site).spread(function (user, siteId) {
 			req.session.user = user;
 			return res.redirect('editor?siteId=' + siteId);
-		}).catch(function(err) {
+		}).catch(function (err) {
 			res.send(err);
 		});
 	})
-	.get('/logout', function(req, res) {
+	.get('/logout', function (req, res) {
 		req.session.destroy();
 		return res.redirect('/');
 	})
-	.get('/editor', function(req, res) {
-		// userModel.verifySiteOwner(req.session.user.email, parseInt(req.query.siteId, 10))
-		// 	.then(function(json) {
-		// 		if (!json) {
-		// 			throw new Error('User for site is not verified');
-		// 		} else {
-		// 			return { user: json.user.data, siteId: req.query.siteId, domain: json.site.domain };
-		// 		}
-		// 	}).then(function(json) {
-		// 		return siteModel.getSiteById(json.siteId).then(function() {
-		// 			json.hasSiteObject = true;
-		// 			return json;
-		// 		}, function() {
-		// 			json.hasSiteObject = false;
-		// 			return json;
-		// 		});
-		// 	}).then(function(json) {
-		// 		json.isSuperUser = req.session.isSuperUser ? true : false;
-		// 		json.isChrome = _.matches(req.headers['user-agent'], 'Chrome');
-		// 		return json;
-		// 	}).then(function(json) {
-		// 		return res.render('editor', json);
-		// 	})
-		// 	.catch(function(err) {
-		// 		res.send('err: ' + err.toString());
-		// 	});
-		return res.render('editor', {
-			isChrome: true,
-			domain: 'http://www.articlemyriad.com',
-			siteId: req.params.siteId,
-			environment: config.development.HOST_ENV
-		});
-	})
-	.post('/deleteSite', function(req, res) {
+	.post('/deleteSite', function (req, res) {
 		userModel.verifySiteOwner(req.session.user.email, req.body.siteId)
-			.then(function() {
+			.then(function () {
 				return siteModel.deleteSite(req.body.siteId);
 			})
-			.then(function() {
+			.then(function () {
 				return res.redirect('dashboard');
-			}).catch(function(err) {
+			}).catch(function (err) {
 				console.log(err);
 				return res.redirect('dashboard');
 			});
 	})
-	.post('/switchTo', function(req, res) {
+	.post('/switchTo', function (req, res) {
 		var email = (req.body.email) ? utils.sanitiseString(req.body.email) : req.body.email;
 
 		if (req.session.isSuperUser === true) {
-			userModel.setSitePageGroups(email).then(function(user) {
+			userModel.setSitePageGroups(email).then(function (user) {
 				req.session.user = user;
 				return res.redirect('/');
-			}, function() {
+			}, function () {
 				return res.redirect('/');
 			});
 		} else {
 			return res.redirect('/');
 		}
 	})
-	.get('/requestOauth', function(req, res) {
+	.get('/requestOauth', function (req, res) {
 		req.session.state = uuid.v1();
 		return res.redirect(oauthHelper.getRedirectUrl(req.session.state));
 	})
-	.get('/oauth2callback', function(req, res) {
+	.get('/oauth2callback', function (req, res) {
 		if (req.session.state !== req.query.state) {
 			res.status(500);
 			res.send('Fake Request');
@@ -145,21 +118,21 @@ router
 			res.send('Seems you denied request, if done accidently please press back button to retry again.');
 		} else {
 			var getAccessToken = oauthHelper.getAccessTokens(req.query.code),
-				getAdsenseAccounts = getAccessToken.then(function(token) {
+				getAdsenseAccounts = getAccessToken.then(function (token) {
 					return request({
 						strictSSL: false,
 						uri: 'https://www.googleapis.com/adsense/v1.4/accounts?access_token=' + token.access_token,
 						json: true
-					}).then(function(adsenseInfo) {
+					}).then(function (adsenseInfo) {
 						return adsenseInfo.items;
-					}).catch(function(err) {
+					}).catch(function (err) {
 						if (err.error && err.error.error && err.error.error.message.indexOf('User does not have an AdSense account') === 0) {
 							throw new Error('No adsense account');
 						}
 						throw err;
 					});
 				}),
-				getUserInfo = getAccessToken.then(function(token) {
+				getUserInfo = getAccessToken.then(function (token) {
 					return request({
 						strictSSL: false,
 						uri: 'https://www.googleapis.com/oauth2/v2/userinfo?access_token=' + token.access_token,
@@ -168,7 +141,7 @@ router
 				}),
 				getUser = userModel.getUserByEmail(req.session.user.email);
 
-			Promise.join(getUser, getAccessToken, getAdsenseAccounts, getUserInfo, function(user, token, adsenseAccounts, userInfo) {
+			Promise.join(getUser, getAccessToken, getAdsenseAccounts, getUserInfo, function (user, token, adsenseAccounts, userInfo) {
 				user.addNetworkData({
 					'networkName': 'ADSENSE',
 					'refreshToken': token.refresh_token,
@@ -178,7 +151,7 @@ router
 					'adsenseEmail': userInfo.email,
 					'userInfo': userInfo,
 					'adsenseAccounts': adsenseAccounts
-				}).then(function() {
+				}).then(function () {
 					req.session.user = user;
 					var pubIds = _.map(adsenseAccounts, 'id');// grab all the pubIds in case there are multiple and show them to user to choose
 					if (CC.isForceMcm) {
@@ -195,7 +168,7 @@ router
 						});
 					}
 				});
-			}).catch(function(err) {
+			}).catch(function (err) {
 				res.status(500);
 				err.message === 'No adsense account' ? res.send('Sorry but it seems you have no AdSense account linked to your Google account.' +
 					'If this is a recently verified/created account, it might take upto 24 hours to come in effect.' +
@@ -203,8 +176,8 @@ router
 			});
 		}
 	})
-	.get('/profile', function(req, res) {
-		userModel.getUserByEmail(req.session.user.email).then(function(user) {
+	.get('/profile', function (req, res) {
+		userModel.getUserByEmail(req.session.user.email).then(function (user) {
 			var formData = {
 				'firstName': user.get('firstName'),
 				'lastName': user.get('lastName'),
@@ -215,16 +188,16 @@ router
 			res.render('profile', {
 				formData: formData
 			});
-		}, function() {
+		}, function () {
 			return res.redirect('/');
 		});
 	})
-	.post('/profile', function(req, res) {
+	.post('/profile', function (req, res) {
 		req.body.firstName = (req.body.firstName) ? utils.trimString(req.body.firstName) : req.body.firstName;
 		req.body.lastName = (req.body.lastName) ? utils.trimString(req.body.lastName) : req.body.lastName;
 
 		userModel.saveProfile(req.body, req.session.user.email)
-			.then(function() {
+			.then(function () {
 				/**
 				 * TODO: Fix user.save() to return updated user object
 				 * and remove below hack
@@ -235,7 +208,7 @@ router
 				req.session.user = user;
 				return res.render('profile', { profileSaved: true, formData: req.body });
 			})
-			.catch(function(e) {
+			.catch(function (e) {
 				if (e instanceof AdPushupError) {
 					res.render('profile', { profileError: e.message, formData: req.body });
 				} else if (e.name && e.name === 'CouchbaseError') {

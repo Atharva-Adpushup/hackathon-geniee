@@ -73,8 +73,8 @@ function apiModule() {
 				})
 			});
 		},	
-		getPageGroupById: function(pageGroupId) {
-			var query = ViewQuery.from('dev_app', 'channelById').key(pageGroupId);
+		getPageGroupById: function(pageGroupId, extendedParams) {
+			var query = ViewQuery.from('dev_app', 'channelById').stale(1).key(pageGroupId);
 			return couchbase.connectToAppBucket()
 				.then(function(appBucket) {
 					return new Promise(function(resolve, reject) {
@@ -83,6 +83,17 @@ function apiModule() {
 								return reject(new AdPushupError([{"status": 404, "message": "Pagegroup does not exist"}]));
 							}
 							var data = result[0].value;
+							if(extendedParams && extendedParams.getExtendedParams) {
+								return resolve({
+									pageGroupId: data.id,
+									sampleUrl: data.sampleUrl,
+									pageGroup: data.pageGroup,
+									device: data.platform,
+									variations: data.variations,
+									channelName: data.channelName
+								});
+							}
+
 							return resolve({
 								pageGroupId: data.id,
 								sampleUrl: data.sampleUrl,
@@ -94,7 +105,7 @@ function apiModule() {
 				});
 		},
 		updatePagegroup: function(json) {
-			var query = ViewQuery.from('dev_app', 'channelById').key(json.pageGroupId);
+			var query = ViewQuery.from('dev_app', 'channelById').stale(1).key(json.pageGroupId);
 			return couchbase.connectToAppBucket()
 				.then(function(appBucket) {
 					return new Promise(function(resolve, reject) {
@@ -116,7 +127,7 @@ function apiModule() {
 				});
 		},
 		deletePagegroupById: function(pageGroupId) {
-			var query = ViewQuery.from('dev_app', 'channelById').key(pageGroupId);
+			var query = ViewQuery.from('dev_app', 'channelById').stale(1).key(pageGroupId);
 			return couchbase.connectToAppBucket()
 				.then(function(appBucket) {
 					return new Promise(function(resolve, reject) {

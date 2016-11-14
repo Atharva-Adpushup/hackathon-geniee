@@ -36,8 +36,17 @@ const afterSaveLoader = (state = { status: 0 }, action) => {
 			default:
 				return state;
 		}
+	},
+	siteData = (state = { partner: null }, action) => {
+		switch (action.type) {
+			case '':
+				break;
+
+			default:
+				return state;
+		}
 	};
 
 export default combineReducers({
-	afterSaveLoader, modeStatus
+	afterSaveLoader, modeStatus, siteData
 });
