@@ -55889,12 +55889,12 @@
 
 			var _this = _possibleConstructorReturn(this, (siteModesPopover.__proto__ || Object.getPrototypeOf(siteModesPopover)).call(this, props));
 
+			var isPublishMode = props.mode && props.mode === _commonConsts.siteModes.PUBLISH;
 			_this.timer = null;
 			_this.checkApStatus();
 			_this.state = {
 				apStatus: _commonConsts.status.PENDING,
-				controlStatus: _commonConsts.status.FALSE,
-				modeChanged: false
+				controlStatus: isPublishMode ? _commonConsts.status.TRUE : _commonConsts.status.FALSE
 			};
 			return _this;
 		}
@@ -55902,15 +55902,8 @@
 		_createClass(siteModesPopover, [{
 			key: 'componentWillReceiveProps',
 			value: function componentWillReceiveProps(nextProps) {
-				if (typeof nextProps.mode !== 'undefined' && nextProps.mode !== this.props.mode) {
-					this.setState({ modeChanged: true });
-				}
+				this.checkApStatus();
 			}
-
-			// shouldComponentUpdate(nextProps, nextState) {
-			// 	return Utils.deepDiffMapper.test(nextState, this.state).isChanged;
-			// }
-
 		}, {
 			key: 'renderWaitMessage',
 			value: function renderWaitMessage() {
@@ -55973,22 +55966,14 @@
 					backgroundColor: 'white',
 					boxShadow: '0 1px 10px 0 rgba(0, 0, 0, 0.3)',
 					width: '300px'
-				};
-				var allDone = void 0;
+				},
+				    allDone = this.props.url && this.state.apStatus === _commonConsts.status.SUCCESS && this.state.controlStatus;
 
 				if (!this.props.isVisible) {
 					return null;
 				}
 
-				if (this.state.modeChanged && !this.props.isVisible) {
-					setTimeout(function () {
-						_this3.props.hideMenu();
-					}, 0);
-
-					return null;
-				}
-
-				if (this.props.mode === _commonConsts.siteModes.PUBLISH && !this.state.modeChanged) {
+				if (this.props.mode === _commonConsts.siteModes.PUBLISH && !allDone) {
 					setTimeout(function () {
 						_this3.changeMode(_commonConsts.siteModes.DRAFT);
 					}, 0);
@@ -56009,15 +55994,7 @@
 					);
 				}
 
-				if (this.props.mode === _commonConsts.siteModes.DRAFT && this.state.modeChanged) {
-					setTimeout(function () {
-						_this3.changeMode(_commonConsts.siteModes.DRAFT);
-					}, 0);
-				}
-
-				allDone = this.state.apStatus === _commonConsts.status.SUCCESS && this.state.controlStatus;
-
-				if (allDone && !this.state.modeChanged) {
+				if (this.props.mode === _commonConsts.siteModes.DRAFT && allDone) {
 					setTimeout(function () {
 						_this3.changeMode(_commonConsts.siteModes.PUBLISH);
 					}, 0);
