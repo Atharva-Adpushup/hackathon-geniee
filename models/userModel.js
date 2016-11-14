@@ -248,6 +248,10 @@ function apiModule() {
 								return user;
 							})
 							.then(function(user) {
+								if(json.userType === 'partner') {
+									return user;
+								}
+								
 								var analyticsObj, userId = user.get('email'),
 									anonId = json.anonId,
 									pipeDriveParams = {
@@ -284,7 +288,12 @@ function apiModule() {
 									return user.save();
 								});
 							})
-							.then(function() {
+							.then(function(user) {
+								if(json.userType === 'partner') {
+									globalModel.addEmail(json.email);
+									return user.get('sites')[0];
+								}
+
 								return globalModel.addEmail(json.email);
 							});
 					} else {

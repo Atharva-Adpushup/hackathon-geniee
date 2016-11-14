@@ -30,7 +30,7 @@ var model = require('../helpers/model'),
 			'required': []
 		};
 		// this.classMap = { 'ads': adModel };
-		this.defaults = { apConfigs: {}, channels: [] };
+		this.defaults = { apConfigs: {}, channels: [], cmsInfo: { cmsName: '', pageGroups: [] } };
 		this.ignore = [];
 
 		this.constructor = function (data, cas) {
@@ -135,7 +135,7 @@ var model = require('../helpers/model'),
 function apiModule() {
 	var API = {
 		createSite: function (data) {
-			var json = { siteName: data.siteName, siteDomain: data.siteDomain, channels: [], cmsInfo: { cmsName: '', pageGroups: [] } };
+			var json = { siteName: data.siteName, siteDomain: data.siteDomain };
 			if (data.partner) {
 				json.partner = data.partner;
 			}
