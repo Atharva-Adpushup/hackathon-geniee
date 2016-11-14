@@ -70,7 +70,7 @@ router
 
 		userModel.addSite(req.session.user.email, site).spread(function (user, siteId) {
 			req.session.user = user;
-			return res.redirect('editor?siteId=' + siteId);
+			return res.redirect('site/'+siteId+'/editor');
 		}).catch(function (err) {
 			res.send(err);
 		});
