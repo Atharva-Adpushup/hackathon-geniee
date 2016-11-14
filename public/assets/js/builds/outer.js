@@ -2185,6 +2185,10 @@
 		HIDE_NEW_CHANNEL_MENU: 'HIDE_NEW_CHANNEL_MENU',
 		SHOW_NEW_CHANNEL_MENU: 'SHOW_NEW_CHANNEL_MENU'
 	},
+	    siteModesPopoverActions = {
+		SHOW_SITE_MODES_POPOVER: 'SHOW_SITE_MODES_POPOVER',
+		HIDE_SITE_MODES_POPOVER: 'HIDE_SITE_MODES_POPOVER'
+	},
 	    variationActions = {
 		ADD_VARIATION: 'ADD_VARIATION',
 		COPY_VARIATION: 'COPY_VARIATION',
@@ -2223,6 +2227,24 @@
 		HIDE_ELEMENT_SELECTOR: 'HIDE_ELEMENT_SELECTOR',
 		SET_ELEMENT_SELECTOR_CORDS: 'SET_ELEMENT_SELECTOR_CORDS',
 		UPDATE_CONTENT_OVERLAY: 'UPDATE_CONTENT_OVERLAY'
+	},
+	    components = {
+		INSERT_CONTEXTMENU: 'INSERT_CONTEXTMENU',
+		EDIT_CONTEXTMENU: 'EDIT_CONTEXTMENU',
+		MISC_MENU: 'MISC_MENU',
+		NEW_CHANNEL_MENU: 'NEW_CHANNEL_MENU',
+		CHANNEL_MENU: 'CHANNEL_MENU',
+		PUBLISH_HELPER: 'PUBLISH_HELPER',
+		PAGE_GROUP_GUIDER: 'PAGE_GROUP_GUIDER',
+		AD_INSERTION_GUIDER: 'AD_INSERTION_GUIDER',
+		CONTROL_CONVERSION_GUIDER: 'CONTROL_CONVERSION_GUIDER',
+		OAUTH_GUIDER: 'OAUTH_GUIDER',
+		ADPUSHUP_INSTALLATION_GUIDER: 'ADPUSHUP_INSTALLATION_GUIDER',
+		HELP_TRIGGER: 'HELP_TRIGGER',
+		CODE_EDITOR: 'CODE_EDITOR',
+		FAQ: 'FAQ',
+		NETWORK_MANAGER: 'NETWORK_MANAGER',
+		SECTION_MANAGER: 'SECTION_MANAGER'
 	},
 	    commonSupportedSizes = [{
 		layoutType: 'SQUARE',
@@ -2266,6 +2288,8 @@
 	exports.defaultSectionCss = defaultSectionCss;
 	exports.leftSectionCss = leftSectionCss;
 	exports.rightSectionCss = rightSectionCss;
+	exports.components = components;
+	exports.siteModesPopoverActions = siteModesPopoverActions;
 
 /***/ },
 /* 40 */,
@@ -7473,9 +7497,13 @@
 
 	var _newChannelMenuContainer2 = _interopRequireDefault(_newChannelMenuContainer);
 
-	var _AfterSaveLoaderContainer = __webpack_require__(683);
+	var _afterSaveLoaderContainer = __webpack_require__(683);
 
-	var _AfterSaveLoaderContainer2 = _interopRequireDefault(_AfterSaveLoaderContainer);
+	var _afterSaveLoaderContainer2 = _interopRequireDefault(_afterSaveLoaderContainer);
+
+	var _siteModesPopoverContainer = __webpack_require__(708);
+
+	var _siteModesPopoverContainer2 = _interopRequireDefault(_siteModesPopoverContainer);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7488,7 +7516,8 @@
 			_react2.default.createElement(_variationManagerContainer2.default, null),
 			_react2.default.createElement(_editMenuContainer2.default, null),
 			_react2.default.createElement(_newChannelMenuContainer2.default, null),
-			_react2.default.createElement(_AfterSaveLoaderContainer2.default, null)
+			_react2.default.createElement(_afterSaveLoaderContainer2.default, null),
+			_react2.default.createElement(_siteModesPopoverContainer2.default, null)
 		);
 	};
 
@@ -7521,6 +7550,8 @@
 
 	var _channelSelectors = __webpack_require__(222);
 
+	var _siteSelectors = __webpack_require__(259);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -7533,7 +7564,7 @@
 			channels: (0, _channelSelectors.getAllChannels)(state),
 			openChannels: (0, _channelSelectors.getOpenChannels)(state),
 			activeChannelId: (0, _channelSelectors.getActiveChannelId)(state),
-			siteMode: 1
+			siteMode: (0, _siteSelectors.getMode)(state)
 		};
 	},
 	    mapDispatchToProps = function mapDispatchToProps(dispatch) {
@@ -7541,8 +7572,8 @@
 			toggleEditorMode: function toggleEditorMode() {
 				dispatch(noop(_arguments));
 			},
-			showPublisherHelper: function showPublisherHelper() {
-				dispatch(noop(_arguments));
+			showPublisherHelper: function showPublisherHelper(position) {
+				dispatch((0, _uiActions.showSiteModesPopover)(position));
 			},
 			showNewChannelMenu: function showNewChannelMenu(position) {
 				dispatch((0, _uiActions.showNewChannelMenu)(position));
@@ -8285,11 +8316,15 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.getClosedChannels = exports.getChannel = exports.getActiveChannelId = exports.getActiveChannel = exports.getAllChannels = exports.getOpenChannels = undefined;
+	exports.getClosedChannels = exports.getChannel = exports.getSampleUrl = exports.getActiveChannelId = exports.getActiveChannel = exports.getAllChannels = exports.getOpenChannels = undefined;
 
 	var _filter2 = __webpack_require__(45);
 
 	var _filter3 = _interopRequireDefault(_filter2);
+
+	var _find2 = __webpack_require__(215);
+
+	var _find3 = _interopRequireDefault(_find2);
 
 	var _reselect = __webpack_require__(219);
 
@@ -8307,6 +8342,9 @@
 	    getChannel = function getChannel(state, props) {
 		return getAllChannels(state)[props.channelId];
 	},
+	    getSampleUrl = (0, _reselect.createSelector)([getAllChannels], function (channelByIds) {
+		return (0, _find3.default)(channelByIds, 'sampleUrl') ? (0, _find3.default)(channelByIds, 'sampleUrl').sampleUrl : false;
+	}),
 	    getOpenChannels = (0, _reselect.createSelector)([getAllChannels], function (channelByIds) {
 		return (0, _filter3.default)(channelByIds, { isOpen: true });
 	}),
@@ -8318,6 +8356,7 @@
 	exports.getAllChannels = getAllChannels;
 	exports.getActiveChannel = getActiveChannel;
 	exports.getActiveChannelId = getActiveChannelId;
+	exports.getSampleUrl = getSampleUrl;
 	exports.getChannel = getChannel;
 	exports.getClosedChannels = getClosedChannels;
 
@@ -8330,7 +8369,7 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.hideNewChannelInsertMenu = exports.showNewChannelMenu = exports.hideInsertMenu = exports.hideEditMenu = exports.showInsertMenu = exports.showEditMenu = undefined;
+	exports.hideSiteModesPopover = exports.showSiteModesPopover = exports.hideNewChannelInsertMenu = exports.showNewChannelMenu = exports.hideInsertMenu = exports.hideEditMenu = exports.showInsertMenu = exports.showEditMenu = undefined;
 
 	var _commonConsts = __webpack_require__(39);
 
@@ -8349,6 +8388,12 @@
 	    showNewChannelMenu = function showNewChannelMenu(position) {
 		return { type: _commonConsts.newChannelMenuActions.SHOW_NEW_CHANNEL_MENU, position: position };
 	},
+	    showSiteModesPopover = function showSiteModesPopover(position) {
+		return { type: _commonConsts.siteModesPopoverActions.SHOW_SITE_MODES_POPOVER, position: position };
+	},
+	    hideSiteModesPopover = function hideSiteModesPopover() {
+		return { type: _commonConsts.siteModesPopoverActions.HIDE_SITE_MODES_POPOVER };
+	},
 	    hideNewChannelInsertMenu = function hideNewChannelInsertMenu() {
 		return { type: _commonConsts.newChannelMenuActions.HIDE_NEW_CHANNEL_MENU };
 	};
@@ -8359,6 +8404,8 @@
 	exports.hideInsertMenu = hideInsertMenu;
 	exports.showNewChannelMenu = showNewChannelMenu;
 	exports.hideNewChannelInsertMenu = hideNewChannelInsertMenu;
+	exports.showSiteModesPopover = showSiteModesPopover;
+	exports.hideSiteModesPopover = hideSiteModesPopover;
 
 /***/ },
 /* 224 */
@@ -8369,7 +8416,7 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.afterSaveLoaderStatusFailed = exports.afterSaveLoaderStatusSuccess = exports.masterSaveData = exports.afterSaveLoaderStatusPending = exports.afterSaveLoaderStatusReset = undefined;
+	exports.changeMode = exports.afterSaveLoaderStatusFailed = exports.afterSaveLoaderStatusSuccess = exports.masterSaveData = exports.afterSaveLoaderStatusPending = exports.afterSaveLoaderStatusReset = undefined;
 
 	var _cloneDeep2 = __webpack_require__(225);
 
@@ -8441,6 +8488,12 @@
 		return {
 			type: _commonConsts.status.text.RESET
 		};
+	},
+	    changeMode = function changeMode(mode) {
+		return {
+			type: _commonConsts.siteActions.CHANGE_SITE_MODE,
+			mode: mode
+		};
 	};
 
 	exports.afterSaveLoaderStatusReset = afterSaveLoaderStatusReset;
@@ -8448,6 +8501,7 @@
 	exports.masterSaveData = masterSaveData;
 	exports.afterSaveLoaderStatusSuccess = afterSaveLoaderStatusSuccess;
 	exports.afterSaveLoaderStatusFailed = afterSaveLoaderStatusFailed;
+	exports.changeMode = changeMode;
 
 /***/ },
 /* 225 */
@@ -9378,6 +9432,8 @@
 
 	var _site = __webpack_require__(258);
 
+	var _commonConsts = __webpack_require__(39);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var save = function save(url, data) {
@@ -9400,10 +9456,19 @@
 	loadInitialData = function loadInitialData(siteId) {
 		var deferred = _jquery2.default.Deferred(),
 		    processData = function processData(rawData) {
-			var parsedData = typeof rawData === 'string' ? JSON.parse(rawData) : rawData,
+			var parsedData = typeof awData === 'string' ? JSON.parse(rawData) : rawData,
 			    result = (0, _normalizr.normalize)(parsedData.channels, (0, _normalizr.arrayOf)(_site.channelSchema)),
 			    computedResult = _jquery2.default.extend(true, {}, result.entities);
 			var activeChannel = void 0;
+
+			computedResult.site = {
+				modeStatus: {
+					mode: parsedData.site.hasOwnProperty('apConfigs') ? parseInt(parsedData.site.apConfigs.mode, 10) : _commonConsts.siteModes.DRAFT
+				},
+				siteData: {
+					partner: rawData.site.partner || null
+				}
+			};
 
 			computedResult.channelData = {
 				activeChannel: null,
@@ -9926,7 +9991,7 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.getFinalJson = exports.getAfterSaveLoaderState = undefined;
+	exports.getPartner = exports.getMode = exports.getFinalJson = exports.getAfterSaveLoaderState = undefined;
 
 	var _forEach2 = __webpack_require__(178);
 
@@ -9951,13 +10016,21 @@
 	var getAfterSaveLoaderState = function getAfterSaveLoaderState(state) {
 		return state.site.afterSaveLoader.status;
 	},
-	    getFinalJson = (0, _reselect.createSelector)([_channelSelectors.getAllChannels, _variationSelectors.getAllVariations, _sectionSelectors.getAllSections, _adsSelectors.getAllAds], function () {
+	    getMode = function getMode(state) {
+		return state.site.modeStatus.mode;
+	},
+	    getPartner = function getPartner(state) {
+		return state.site.siteData.partner;
+	},
+	    getFinalJson = (0, _reselect.createSelector)([_channelSelectors.getAllChannels, _variationSelectors.getAllVariations, _sectionSelectors.getAllSections, _adsSelectors.getAllAds, getMode], function () {
 		var allChannels = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 		var allVariations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 		var allSections = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 		var allAds = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+		var siteMode = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 2;
 
 		return {
+			siteMode: siteMode,
 			siteId: window.ADP_SITE_ID,
 			siteDomain: window.ADP_SITE_DOMAIN,
 			channels: (0, _map3.default)(allChannels, function (channel) {
@@ -9989,6 +10062,8 @@
 
 	exports.getAfterSaveLoaderState = getAfterSaveLoaderState;
 	exports.getFinalJson = getFinalJson;
+	exports.getMode = getMode;
+	exports.getPartner = getPartner;
 
 /***/ },
 /* 260 */
@@ -29113,9 +29188,22 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _jquery = __webpack_require__(35);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _utils = __webpack_require__(181);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var SiteModes = function SiteModes(props) {
+	var showSiteModesPopover = function showSiteModesPopover(props, ev) {
+		var positionOffsets = _utils2.default.ui.outerMenuRenderPosition((0, _jquery2.default)(ev.target));
+
+		props.showPublisherHelper(positionOffsets);
+	},
+	    SiteModes = function SiteModes(props) {
 		return _react2.default.createElement(
 			'div',
 			{ className: 'modes modes--stateChange' },
@@ -29198,21 +29286,12 @@
 				_reactBootstrap.OverlayTrigger,
 				{ placement: 'bottom', overlay: _react2.default.createElement(
 						_reactBootstrap.Tooltip,
-						{ id: 'adpushupOptionsTooltip' },
-						'AdPushup Options'
-					) },
-				_react2.default.createElement(_reactBootstrap.Button, { id: 'miscOptions', className: 'btn-sm btn-lightBg btn-option btn--icon', onClick: props.showOptionsMenu })
-			),
-			_react2.default.createElement(
-				_reactBootstrap.OverlayTrigger,
-				{ placement: 'bottom', overlay: _react2.default.createElement(
-						_reactBootstrap.Tooltip,
 						{ id: 'masterSaveTooltip' },
 						'Save changes'
 					) },
 				_react2.default.createElement(_reactBootstrap.Button, { onClick: props.masterSave, className: 'btn-sm btn-save btn-lightBg btn--success btn--icon pull-left' })
 			),
-			_react2.default.createElement(SiteModes, { showPublisherHelper: props.showPublisherHelper, siteMode: props.siteMode })
+			_react2.default.createElement(SiteModes, { showPublisherHelper: showSiteModesPopover.bind(null, props), siteMode: props.siteMode })
 		);
 	};
 
@@ -29566,9 +29645,9 @@
 
 	var _variationOptions2 = _interopRequireDefault(_variationOptions);
 
-	var _variationSections = __webpack_require__(647);
+	var _VariationSections = __webpack_require__(647);
 
-	var _variationSections2 = _interopRequireDefault(_variationSections);
+	var _VariationSections2 = _interopRequireDefault(_VariationSections);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -29609,7 +29688,7 @@
 						_react2.default.createElement(
 							'div',
 							{ tabTitle: 'Sections' },
-							_react2.default.createElement(_variationSections2.default, { variation: variation, sections: sections })
+							_react2.default.createElement(_VariationSections2.default, { variation: variation, sections: sections })
 						),
 						_react2.default.createElement(
 							'div',
@@ -41745,10 +41824,10 @@
 			_react2.default.createElement(
 				'ul',
 				{ className: 'section-list row' },
-				sections.map(function (section) {
+				sections.map(function (section, key) {
 					return _react2.default.createElement(
 						'div',
-						{ className: 'col-sm-4' },
+						{ key: key, className: 'col-sm-4' },
 						_react2.default.createElement(
 							'li',
 							{ key: section.id },
@@ -41790,7 +41869,9 @@
 								_react2.default.createElement(
 									_reactBootstrap.Col,
 									{ className: 'u-padding-r10px section-name-ie', xs: 12 },
-									_react2.default.createElement(_index2.default, { value: section.name, submitHandler: onRenameSection.bind(null, section, variation.id), text: 'Section Name', errorMessage: 'Section Name cannot be blank' })
+									_react2.default.createElement(_index2.default, { value: section.name,
+										submitHandler: onRenameSection.bind(null, section, variation.id), text: 'Section Name', errorMessage: 'Section Name cannot be blank'
+									})
 								)
 							),
 							section.isIncontent ? _react2.default.createElement(
@@ -41960,6 +42041,8 @@
 
 	var _channelSelectors = __webpack_require__(222);
 
+	var _siteSelectors = __webpack_require__(259);
+
 	var _variationSelectors = __webpack_require__(214);
 
 	var _uiSelectors = __webpack_require__(659);
@@ -41972,7 +42055,7 @@
 
 	var mapStateToProps = function mapStateToProps(state) {
 		var json = (0, _uiSelectors.getInsertMenuState)(state);
-		return _extends({}, json, { variationId: (0, _variationSelectors.getActiveChannelActiveVariationId)(state), channelId: (0, _channelSelectors.getActiveChannelId)(state) });
+		return _extends({}, json, { partner: (0, _siteSelectors.getPartner)(state), variationId: (0, _variationSelectors.getActiveChannelActiveVariationId)(state), channelId: (0, _channelSelectors.getActiveChannelId)(state) });
 	},
 	    mapDispatchToProps = function mapDispatchToProps(dispatch) {
 		return {
@@ -42020,17 +42103,21 @@
 
 	var _commonConsts = __webpack_require__(39);
 
+	var _codeBox = __webpack_require__(707);
+
+	var _codeBox2 = _interopRequireDefault(_codeBox);
+
 	var _adSizeSelector = __webpack_require__(654);
 
 	var _adSizeSelector2 = _interopRequireDefault(_adSizeSelector);
 
-	var _parentSelector = __webpack_require__(655);
-
-	var _parentSelector2 = _interopRequireDefault(_parentSelector);
-
 	var _sectionOptions = __webpack_require__(656);
 
 	var _sectionOptions2 = _interopRequireDefault(_sectionOptions);
+
+	var _parentSelector = __webpack_require__(655);
+
+	var _parentSelector2 = _interopRequireDefault(_parentSelector);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -42094,13 +42181,14 @@
 			}
 		}, {
 			key: 'createSectionAndAd',
-			value: function createSectionAndAd(position) {
+			value: function createSectionAndAd(position, adCode) {
 				var sectionPayload = {
 					position: position,
 					xpath: this.props.parents[0].xpath,
 					operation: this.state.operation
 				},
 				    adPayload = {
+					adCode: adCode,
 					height: this.state.adSize.height,
 					width: this.state.adSize.width
 				};
@@ -42130,11 +42218,17 @@
 							})
 						);
 					});
-				} else {
+				} else if (props.partner === 'geniee') {
 					items.push(_react2.default.createElement(
 						_menuItem2.default,
 						{ key: 1, icon: 'fa-sitemap', contentHeading: 'Section Options' },
 						_react2.default.createElement(_sectionOptions2.default, { onCreateAd: this.createSectionAndAd.bind(this), onCancel: this.toggleExtraOptions.bind(this) })
+					));
+				} else {
+					items.push(_react2.default.createElement(
+						_menuItem2.default,
+						{ key: 1, icon: 'fa-sitemap', contentHeading: 'Adcode' },
+						_react2.default.createElement(_codeBox2.default, { onSubmit: this.createSectionAndAd.bind(this, null), onCancel: this.toggleExtraOptions.bind(this) })
 					));
 				}
 
@@ -42167,12 +42261,13 @@
 	}(_react2.default.Component);
 
 	insertMenu.propTypes = {
+		isVisible: _react.PropTypes.bool.isRequired,
 		position: _react.PropTypes.object,
 		parents: _react.PropTypes.array,
 		variationId: _react.PropTypes.string,
 		channelId: _react.PropTypes.string,
 		insertOptions: _react.PropTypes.array,
-		isVisible: _react.PropTypes.bool.isRequired,
+		partner: _react.PropTypes.string,
 		createSectionAndAd: _react.PropTypes.func,
 		hideMenu: _react.PropTypes.func,
 		selectInnerElement: _react.PropTypes.func,
@@ -43168,11 +43263,19 @@
 	},
 	    getNewChannelMenuState = function getNewChannelMenuState(state) {
 		return state.ui.newChannelMenu;
+	},
+	    getSiteModesPopoverPosition = function getSiteModesPopoverPosition(state) {
+		return state.ui.siteModesPopover.position;
+	},
+	    getSiteModesPopoverVisibility = function getSiteModesPopoverVisibility(state) {
+		return state.ui.siteModesPopover.isVisible;
 	};
 
 	exports.getInsertMenuState = getInsertMenuState;
 	exports.getEditMenuState = getEditMenuState;
 	exports.getNewChannelMenuState = getNewChannelMenuState;
+	exports.getSiteModesPopoverPosition = getSiteModesPopoverPosition;
+	exports.getSiteModesPopoverVisibility = getSiteModesPopoverVisibility;
 
 /***/ },
 /* 660 */
@@ -43497,6 +43600,9 @@
 			},
 			updateCss: function updateCss(adId, css) {
 				dispatch((0, _adActions.updateCss)(adId, css));
+			},
+			updateAdCode: function updateAdCode(adId, adCode) {
+				dispatch((0, _adActions.updateAdCode)(adId, adCode));
 			}
 		};
 	};
@@ -43525,6 +43631,10 @@
 
 	var _cssEditor2 = _interopRequireDefault(_cssEditor);
 
+	var _codeBox = __webpack_require__(707);
+
+	var _codeBox2 = _interopRequireDefault(_codeBox);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -43534,7 +43644,8 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var initialState = {
-		isEditingCss: false
+		isEditingCss: false,
+		isEditingCode: false
 	};
 
 	var adDescriptor = function (_React$Component) {
@@ -43547,6 +43658,7 @@
 
 			_this.state = initialState;
 			_this.toggleCssEditor = _this.toggleCssEditor.bind(_this);
+			_this.toggleCodeEditor = _this.toggleCodeEditor.bind(_this);
 			return _this;
 		}
 
@@ -43575,14 +43687,28 @@
 				this.setState({ isEditingCss: !this.state.isEditingCss });
 			}
 		}, {
+			key: 'toggleCodeEditor',
+			value: function toggleCodeEditor() {
+				this.setState({ isEditingCode: !this.state.isEditingCode });
+			}
+		}, {
 			key: 'render',
 			value: function render() {
 				var _props2 = this.props,
 				    ad = _props2.ad,
-				    updateCss = _props2.updateCss;
+				    updateCss = _props2.updateCss,
+				    updateAdCode = _props2.updateAdCode,
+				    adCode = ad.adCode;
 
+				var number = 6;
+				if (adCode) {
+					number = 4;
+				}
 				if (this.state.isEditingCss) {
 					return _react2.default.createElement(_cssEditor2.default, { css: ad.css, onCancel: this.toggleCssEditor, onSave: updateCss.bind(null, ad.id) });
+				}
+				if (this.state.isEditingCode) {
+					return _react2.default.createElement(_codeBox2.default, { code: adCode, onSubmit: updateAdCode.bind(null, ad.id), onCancel: this.toggleCodeEditor });
 				}
 				return _react2.default.createElement(
 					'div',
@@ -43590,7 +43716,12 @@
 					_react2.default.createElement(
 						_reactBootstrap.Row,
 						null,
-						_react2.default.createElement(
+						adCode && _react2.default.createElement(
+							_reactBootstrap.Col,
+							{ xs: 12 },
+							atob(adCode)
+						),
+						!adCode && _react2.default.createElement(
 							_reactBootstrap.Col,
 							{ xs: 12 },
 							ad.height + 'X' + ad.width
@@ -43601,16 +43732,25 @@
 						{ className: 'butttonsRow' },
 						_react2.default.createElement(
 							_reactBootstrap.Col,
-							{ xs: 6 },
+							{ xs: number },
 							_react2.default.createElement(
 								_reactBootstrap.Button,
 								{ className: 'btn-lightBg btn-cancel', onClick: this.toggleCssEditor },
 								'Edit Css'
 							)
 						),
+						adCode && _react2.default.createElement(
+							_reactBootstrap.Col,
+							{ xs: number },
+							_react2.default.createElement(
+								_reactBootstrap.Button,
+								{ className: 'btn-lightBg btn-cancel', onClick: this.toggleCodeEditor },
+								'Edit AdCode'
+							)
+						),
 						_react2.default.createElement(
 							_reactBootstrap.Col,
-							{ xs: 6 },
+							{ xs: number },
 							_react2.default.createElement(
 								_reactBootstrap.Button,
 								{ className: 'btn-lightBg btn-cancel', onClick: this.deleteSectionWithAd.bind(this) },
@@ -43628,6 +43768,7 @@
 	adDescriptor.propTypes = {
 		ad: _react.PropTypes.object.isRequired,
 		updateCss: _react.PropTypes.func.isRequired,
+		updateAdCode: _react.PropTypes.func.isRequired,
 		deleteAd: _react.PropTypes.func.isRequired,
 		deleteSection: _react.PropTypes.func.isRequired
 	};
@@ -53714,6 +53855,8 @@
 
 	var _uiSelectors = __webpack_require__(659);
 
+	var _siteSelectors = __webpack_require__(259);
+
 	var _channelSelectors = __webpack_require__(222);
 
 	var _uiActions = __webpack_require__(223);
@@ -53724,7 +53867,7 @@
 
 	var mapStateToProps = function mapStateToProps(state) {
 			var json = (0, _uiSelectors.getNewChannelMenuState)(state);
-			return _extends({}, json, { channels: (0, _channelSelectors.getClosedChannels)(state) });
+			return _extends({}, json, { partner: (0, _siteSelectors.getPartner)(state), channels: (0, _channelSelectors.getClosedChannels)(state) });
 	},
 	    mapDispatchToProps = function mapDispatchToProps(dispatch) {
 			return (0, _redux.bindActionCreators)({ hideMenu: _uiActions.hideNewChannelInsertMenu, openChannel: _channelActions.openChannel }, dispatch);
@@ -53765,24 +53908,39 @@
 		    channels = _ref.channels,
 		    position = _ref.position,
 		    hideMenu = _ref.hideMenu,
-		    openChannel = _ref.openChannel;
+		    openChannel = _ref.openChannel,
+		    partner = _ref.partner;
 
 		if (!isVisible) {
 			return null;
 		}
+		var items = [];
+		if (partner !== 'geniee') {
+			items.push(_react2.default.createElement(
+				_menuItem2.default,
+				{ key: 1, icon: 'fa-sitemap', contentHeading: 'Section Options' },
+				_react2.default.createElement(
+					'div',
+					null,
+					'Test'
+				)
+			));
+		}
+		items.push(_react2.default.createElement(
+			_menuItem2.default,
+			{ key: 1, icon: 'fa-sitemap', contentHeading: 'Section Options' },
+			_react2.default.createElement(_channelList2.default, { channels: channels, onClick: openChannel })
+		));
 		return _react2.default.createElement(
 			_menu2.default,
 			{ id: 'newChannelMenu', position: position, arrow: 'top', activeItem: 0, onGlassClick: hideMenu },
-			[_react2.default.createElement(
-				_menuItem2.default,
-				{ key: 1, icon: 'fa-sitemap', contentHeading: 'Section Options' },
-				_react2.default.createElement(_channelList2.default, { channels: channels, onClick: openChannel })
-			)]
+			items
 		);
 	};
 
 	newChannelMenu.propTypes = {
 		isVisible: _react.PropTypes.bool.isRequired,
+		partner: _react.PropTypes.string,
 		position: _react.PropTypes.object,
 		channels: _react.PropTypes.array,
 		hideMenu: _react.PropTypes.func,
@@ -54482,8 +54640,8 @@
 					variations: config.variations,
 					activeVariation: null,
 					contentSelectorMissing: false,
-					isLoading: false,
-					isOpen: false
+					isLoading: true,
+					isOpen: true
 				};
 
 			case _commonConsts.channelActions.EDIT_SAMPLE_URL:
@@ -55280,12 +55438,27 @@
 			default:
 				return state;
 		}
+	},
+	    siteModesPopover = function siteModesPopover() {
+		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { isVisible: false, position: { left: 0, top: 0 } };
+		var action = arguments[1];
+
+		switch (action.type) {
+			case _commonConsts.siteModesPopoverActions.SHOW_SITE_MODES_POPOVER:
+				return {
+					isVisible: true,
+					position: action.position
+				};
+			case _commonConsts.siteModesPopoverActions.HIDE_SITE_MODES_POPOVER:
+				return { isVisible: false, position: { left: 0, top: 0 } };
+
+			default:
+				return state;
+		}
 	};
 
 	exports.default = (0, _redux.combineReducers)({
-		insertMenu: insertMenu,
-		editMenu: editMenu,
-		newChannelMenu: newChannelMenu
+		insertMenu: insertMenu, editMenu: editMenu, newChannelMenu: newChannelMenu, siteModesPopover: siteModesPopover
 	});
 
 /***/ },
@@ -55302,11 +55475,8 @@
 
 	var _commonConsts = __webpack_require__(39);
 
-	var initialState = {
-		status: 0
-	},
-	    afterSaveLoader = function afterSaveLoader() {
-		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+	var afterSaveLoader = function afterSaveLoader() {
+		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { status: 0 };
 		var action = arguments[1];
 
 		switch (action.type) {
@@ -55332,10 +55502,36 @@
 			default:
 				return state;
 		}
+	},
+	    modeStatus = function modeStatus() {
+		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { mode: _commonConsts.siteModes.DRAFT };
+		var action = arguments[1];
+
+		switch (action.type) {
+			case _commonConsts.siteActions.CHANGE_SITE_MODE:
+				return {
+					mode: action.mode
+				};
+
+			default:
+				return state;
+		}
+	},
+	    siteData = function siteData() {
+		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { partner: null };
+		var action = arguments[1];
+
+		switch (action.type) {
+			case '':
+				break;
+
+			default:
+				return state;
+		}
 	};
 
 	exports.default = (0, _redux.combineReducers)({
-		afterSaveLoader: afterSaveLoader
+		afterSaveLoader: afterSaveLoader, modeStatus: modeStatus, siteData: siteData
 	});
 
 /***/ },
@@ -55466,6 +55662,452 @@
 	};
 
 	exports.default = unloadHandler;
+
+/***/ },
+/* 707 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactBootstrap = __webpack_require__(264);
+
+	var _reactCodemirror = __webpack_require__(669);
+
+	var _reactCodemirror2 = _interopRequireDefault(_reactCodemirror);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var customCodeEditor = function (_React$Component) {
+		_inherits(customCodeEditor, _React$Component);
+
+		function customCodeEditor(props) {
+			_classCallCheck(this, customCodeEditor);
+
+			var _this = _possibleConstructorReturn(this, (customCodeEditor.__proto__ || Object.getPrototypeOf(customCodeEditor)).call(this, props));
+
+			_this.state = {
+				code: _this.props.code ? atob(_this.props.code) : '',
+				error: false
+			};
+
+			_this.updateCode = _this.updateCode.bind(_this);
+			_this.save = _this.save.bind(_this);
+			return _this;
+		}
+
+		_createClass(customCodeEditor, [{
+			key: 'save',
+			value: function save() {
+				try {
+					this.props.onSubmit(btoa(this.state.code));
+				} catch (e) {
+					this.setState({ error: true });
+				}
+			}
+		}, {
+			key: 'updateCode',
+			value: function updateCode(code) {
+				try {
+					this.setState({ code: code, error: false });
+				} catch (e) {
+					this.setState({ error: true });
+				}
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var options = {
+					// style: {border: '1px solid black'},
+					textAreaClassName: ['form-control'],
+					textAreaStyle: { minHeight: '5em' },
+					value: this.state.code,
+					mode: 'javascript',
+					theme: 'solarized'
+				};
+				return _react2.default.createElement(
+					'div',
+					{ className: 'containerButtonBar' },
+					this.state.error && _react2.default.createElement(
+						'div',
+						null,
+						'Some Error in CSS, remove comma in last property if there.'
+					),
+					_react2.default.createElement(_reactCodemirror2.default, { value: this.state.code, onChange: this.updateCode, options: options }),
+					_react2.default.createElement(
+						_reactBootstrap.Row,
+						{ className: 'butttonsRow' },
+						_react2.default.createElement(
+							_reactBootstrap.Col,
+							{ xs: 6 },
+							_react2.default.createElement(
+								_reactBootstrap.Button,
+								{ disabled: this.state.error, className: 'btn-lightBg btn-save', onClick: this.save },
+								'Save'
+							)
+						),
+						_react2.default.createElement(
+							_reactBootstrap.Col,
+							{ xs: 6 },
+							_react2.default.createElement(
+								_reactBootstrap.Button,
+								{ className: 'btn-lightBg btn-cancel', onClick: this.props.onCancel },
+								'Cancel'
+							)
+						)
+					)
+				);
+			}
+		}]);
+
+		return customCodeEditor;
+	}(_react2.default.Component);
+
+	customCodeEditor.propTypes = {
+		code: _react.PropTypes.string,
+		onSubmit: _react.PropTypes.func.isRequired,
+		onCancel: _react.PropTypes.func.isRequired
+	};
+
+	exports.default = customCodeEditor;
+
+/***/ },
+/* 708 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _reactRedux = __webpack_require__(4);
+
+	var _siteModesPopover = __webpack_require__(709);
+
+	var _siteModesPopover2 = _interopRequireDefault(_siteModesPopover);
+
+	var _siteSelectors = __webpack_require__(259);
+
+	var _uiSelectors = __webpack_require__(659);
+
+	var _channelSelectors = __webpack_require__(222);
+
+	var _siteActions = __webpack_require__(224);
+
+	var _uiActions = __webpack_require__(223);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var mapStateToProps = function mapStateToProps(state) {
+		return {
+			isVisible: (0, _uiSelectors.getSiteModesPopoverVisibility)(state),
+			url: (0, _channelSelectors.getSampleUrl)(state),
+			mode: (0, _siteSelectors.getMode)(state),
+			position: (0, _uiSelectors.getSiteModesPopoverPosition)(state)
+		};
+	},
+	    mapDispatchToProps = function mapDispatchToProps(dispatch) {
+		return {
+			changeMode: function changeMode(mode) {
+				dispatch((0, _siteActions.changeMode)(mode));
+			},
+			showComponent: function showComponent() {},
+			hideMenu: function hideMenu() {
+				dispatch((0, _uiActions.hideSiteModesPopover)());
+			}
+		};
+	},
+	    SiteModesPopoverContainer = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_siteModesPopover2.default);
+
+	exports.default = SiteModesPopoverContainer;
+
+/***/ },
+/* 709 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _utils = __webpack_require__(181);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	var _glass = __webpack_require__(520);
+
+	var _glass2 = _interopRequireDefault(_glass);
+
+	var _dataSyncService = __webpack_require__(252);
+
+	var _commonConsts = __webpack_require__(39);
+
+	var _Panel = __webpack_require__(498);
+
+	var _Panel2 = _interopRequireDefault(_Panel);
+
+	var _Accordion = __webpack_require__(265);
+
+	var _Accordion2 = _interopRequireDefault(_Accordion);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var siteModesPopover = function (_React$Component) {
+		_inherits(siteModesPopover, _React$Component);
+
+		function siteModesPopover(props) {
+			_classCallCheck(this, siteModesPopover);
+
+			var _this = _possibleConstructorReturn(this, (siteModesPopover.__proto__ || Object.getPrototypeOf(siteModesPopover)).call(this, props));
+
+			_this.timer = null;
+			_this.checkApStatus();
+			_this.state = {
+				apStatus: _commonConsts.status.PENDING,
+				controlStatus: _commonConsts.status.FALSE,
+				modeChanged: false
+			};
+			return _this;
+		}
+
+		_createClass(siteModesPopover, [{
+			key: 'componentWillReceiveProps',
+			value: function componentWillReceiveProps(nextProps) {
+				if (typeof nextProps.mode !== 'undefined' && nextProps.mode !== this.props.mode) {
+					this.setState({ modeChanged: true });
+				}
+			}
+
+			// shouldComponentUpdate(nextProps, nextState) {
+			// 	return Utils.deepDiffMapper.test(nextState, this.state).isChanged;
+			// }
+
+		}, {
+			key: 'renderWaitMessage',
+			value: function renderWaitMessage() {
+				return _react2.default.createElement(
+					'div',
+					null,
+					'Changing Mode Please Wait'
+				);
+			}
+		}, {
+			key: 'checkApStatus',
+			value: function checkApStatus() {
+				var _this2 = this;
+
+				(0, _dataSyncService.isApInstalled)(this.props.url || window.ADP_SITE_DOMAIN, window.ADP_SITE_ID).then(function (apStatus) {
+					apStatus && apStatus.ap ? _this2.setState({ apStatus: _commonConsts.status.SUCCESS }) : _this2.setState({ apStatus: _commonConsts.status.FAILED });
+				});
+			}
+		}, {
+			key: 'handleControlStatusOnChange',
+			value: function handleControlStatusOnChange() {
+				this.setState({
+					controlStatus: !this.state.controlStatus
+				});
+			}
+		}, {
+			key: 'renderSuccessMessage',
+			value: function renderSuccessMessage() {
+				return _react2.default.createElement(
+					'div',
+					null,
+					'Mode Change SuccessFully'
+				);
+			}
+		}, {
+			key: 'changeMode',
+			value: function changeMode(mode) {
+				this.props.changeMode(mode);
+			}
+		}, {
+			key: 'showGuider',
+			value: function showGuider(guider) {
+				this.props.showComponent(guider);
+			}
+		}, {
+			key: 'onGlassClick',
+			value: function onGlassClick() {
+				this.props.hideMenu();
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var _this3 = this;
+
+				var style = {
+					position: 'absolute',
+					top: this.props.position.top,
+					left: this.props.position.left - 300,
+					zIndex: 10000,
+					backgroundColor: 'white',
+					boxShadow: '0 1px 10px 0 rgba(0, 0, 0, 0.3)',
+					width: '300px'
+				};
+				var allDone = void 0;
+
+				if (!this.props.isVisible) {
+					return null;
+				}
+
+				if (this.state.modeChanged && !this.props.isVisible) {
+					setTimeout(function () {
+						_this3.props.hideMenu();
+					}, 0);
+
+					return null;
+				}
+
+				if (this.props.mode === _commonConsts.siteModes.PUBLISH && !this.state.modeChanged) {
+					setTimeout(function () {
+						_this3.changeMode(_commonConsts.siteModes.DRAFT);
+					}, 0);
+
+					return _react2.default.createElement(
+						'div',
+						{ style: style, className: 'publishHelperWrap' },
+						_react2.default.createElement(
+							'div',
+							{ className: 'publishHelperHeading' },
+							' Please wait'
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'publishHelperWrapInner' },
+							this.renderWaitMessage()
+						)
+					);
+				}
+
+				if (this.props.mode === _commonConsts.siteModes.DRAFT && this.state.modeChanged) {
+					setTimeout(function () {
+						_this3.changeMode(_commonConsts.siteModes.DRAFT);
+					}, 0);
+				}
+
+				allDone = this.state.apStatus === _commonConsts.status.SUCCESS && this.state.controlStatus;
+
+				if (allDone && !this.state.modeChanged) {
+					setTimeout(function () {
+						_this3.changeMode(_commonConsts.siteModes.PUBLISH);
+					}, 0);
+				}
+
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(_glass2.default, { clickHandler: this.onGlassClick.bind(this) }),
+					_react2.default.createElement(
+						'div',
+						{ style: style, className: 'publishHelperWrap' },
+						_react2.default.createElement(
+							'div',
+							{ className: 'publishHelperHeading' },
+							'Please complete the following before AdPushup goes live on the site!'
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'publishHelperWrapInner' },
+							_react2.default.createElement(
+								_Accordion2.default,
+								null,
+								_react2.default.createElement(
+									_Panel2.default,
+									{ header: 'Page Group Setup', className: this.props.url ? 'completed' : 'notcompleted', eventKey: 1 },
+									_react2.default.createElement(
+										'div',
+										null,
+										'You should have at least one Page Group set up.',
+										_react2.default.createElement(
+											'a',
+											{ className: 'btn btn-sm btn-lightBg publishHelperhelp', onClick: this.showGuider.bind(null, _commonConsts.components.PAGE_GROUP_GUIDER) },
+											'Read more'
+										)
+									)
+								),
+								_react2.default.createElement(
+									_Panel2.default,
+									{ header: 'AdPushup snippet', className: this.state.apStatus == _commonConsts.status.PENDING ? 'pending' : this.state.apStatus == _commonConsts.status.SUCCESS ? 'completed' : 'notcompleted', eventKey: 2 },
+									_react2.default.createElement(
+										'div',
+										null,
+										'We can\'t optimize your site if AdPushup snippet isn\'t installed! :) ',
+										_react2.default.createElement(
+											'a',
+											{ className: 'btn btn-sm btn-lightBg publishHelperhelp', onClick: this.showGuider.bind(null, _commonConsts.components.ADPUSHUP_INSTALLATION_GUIDER) },
+											'Read more'
+										)
+									)
+								),
+								_react2.default.createElement(
+									_Panel2.default,
+									{ header: 'Control Ad Setup', className: this.state.controlStatus ? 'completed' : 'notcompleted', eventKey: 4 },
+									_react2.default.createElement(
+										'div',
+										null,
+										'We strongly recommend setting up Control Ads on your site. They can help you track AdPushup performance, act as fallback in case of failure and much more. Please take a moment out to understand them.',
+										_react2.default.createElement(
+											'a',
+											{ className: 'btn btn-sm btn-lightBg publishHelperhelp', onClick: this.showGuider.bind(null, _commonConsts.components.CONTROL_CONVERSION_GUIDER) },
+											'Read more'
+										),
+										_react2.default.createElement('br', null)
+									),
+									_react2.default.createElement('input', { type: 'checkbox', className: 'maincheckbox', id: 'ctrlconverted', checked: this.state.controlStatus, onChange: this.handleControlStatusOnChange.bind(this) }),
+									_react2.default.createElement(
+										'label',
+										{ htmlFor: 'ctrlconverted' },
+										'Yes, I understand what control ads are, and have set them up.'
+									)
+								)
+							)
+						)
+					)
+				);
+			}
+		}]);
+
+		return siteModesPopover;
+	}(_react2.default.Component);
+
+	siteModesPopover.defaultProps = {};
+
+	siteModesPopover.propTypes = {
+		mode: _react.PropTypes.number.isRequired,
+		position: _react.PropTypes.object
+	};
+
+	exports.default = siteModesPopover;
 
 /***/ }
 /******/ ]);
