@@ -24,6 +24,9 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 				computedResult.site = {
 					modeStatus: {
 						mode: ((parsedData.site.hasOwnProperty('apConfigs')) ? parseInt(parsedData.site.apConfigs.mode, 10) : siteModes.DRAFT)
+					},
+					siteData: {
+						partner: rawData.site.partner || null
 					}
 				};
 
@@ -53,12 +56,6 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 				_.forOwn(computedResult.sectionByIds, (sectionData, sectionName) => {
 					computedResult.sectionByIds[sectionName].ads = _.keys(computedResult.sectionByIds[sectionName].ads);
 				});
-
-				computedResult.site = {
-					siteData: {
-						partner: rawData.site.partner || null
-					}
-				};
 
 				deferred.resolve(computedResult);
 				return deferred.promise();
