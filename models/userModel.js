@@ -21,7 +21,7 @@ var modelAPI = module.exports = apiModule(),
 	User = model.extend(function() {
 		this.keys = ['firstName', 'lastName', 'email', 'salt', 'passwordMd5', 'sites', 'adNetworkSettings', 'createdAt',
 			'passwordResetKey', 'passwordResetKeyCreatedAt', 'requestDemo',
-			'requestDemoData', 'analytics', 'adNetworks', 'pageviewRange'];
+			'requestDemoData', 'analytics', 'adNetworks', 'pageviewRange', 'managedBy', 'userType'];
 		this.validations = schema.user.validations;
 		this.classMap = {
 			adNetworkSettings: networkSettings
@@ -29,8 +29,7 @@ var modelAPI = module.exports = apiModule(),
 		this.defaults = {
 			sites: [],
 			adNetworkSettings: [],
-			requestDemo: true,
-			managedBy: 'adsense.apac@adpushup.com'
+			requestDemo: true
 		};
 		this.ignore = ['password', 'oldPassword', 'confirmPassword', 'site'];
 
@@ -245,6 +244,7 @@ function apiModule() {
 								user.set('salt', consts.SALT + utils.random(0, 100000000));
 								user.set('pageviewRange', json.pageviewRange);
 								user.set('passwordMd5', md5(user.get('salt') + json.password + user.get('salt')));
+								!json.userType ? user.set('managedBy', 'adsense.apac@adpushup.com') : '';
 								return user;
 							})
 							.then(function(user) {
