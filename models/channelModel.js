@@ -61,6 +61,9 @@ function apiModule() {
 					}
 					channels.push(channel);
 
+					if(!site.get('cmsInfo')) {
+						site.set('cmsInfo', {"cmsName": "", "pageGroups": []});
+					}
 					if(!_.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])) { 
 						site.get('cmsInfo').pageGroups.push({ sampleUrl: json.sampleUrl, pageGroup: json.pageGroupName.toUpperCase() });
 					}
