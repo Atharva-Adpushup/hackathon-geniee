@@ -5,17 +5,17 @@ import { getChannelMenuState } from 'selectors/uiSelectors';
 import { getPartner } from 'selectors/siteSelectors';
 import { getAllChannels, getActiveChannel, getActiveChannelId } from 'selectors/channelSelectors';
 import { hideChannelMenu as hideMenu } from 'actions/uiActions';
-import { saveSampleUrl } from 'actions/channelActions';
+import { saveSampleUrl, closeChannel } from 'actions/channelActions';
 
 const mapStateToProps = (state) => {
 		const json = getChannelMenuState(state);
-		return { ...json, 
+		return { ...json,
 			channel: getActiveChannel(state),
 			partner: getPartner(state),
 			allChannels: getAllChannels(state),
 			activeChannelId: getActiveChannelId(state)
 		};
 	},
-	mapDispatchToProps = (dispatch) => bindActionCreators({ hideMenu, saveSampleUrl }, dispatch);
+	mapDispatchToProps = (dispatch) => bindActionCreators({ hideMenu, saveSampleUrl, closeChannel }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChannelMenu);

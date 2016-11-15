@@ -60,6 +60,7 @@ const insertMenu = (state = { isVisible: false }, action) => {
 			case channelMenuActions.HIDE_CHANNEL_MENU:
 			case channelActions.OPEN_CHANNEL:
 			case channelActions.SAVE_SAMPLE_URL:
+			case channelActions.CLOSE_CHANNEL:
 			case newChannelMenuActions.SHOW_NEW_CHANNEL_MENU:
 				return { isVisible: false };
 

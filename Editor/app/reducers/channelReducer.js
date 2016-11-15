@@ -50,6 +50,9 @@ const initialState = { activeChannel: null, byIds: {} },
 			case channelActions.OPEN_CHANNEL_SUCCESS:
 				return { ...state, isLoading: false };
 
+			case channelActions.CLOSE_CHANNEL:
+				return { ...state, isOpen: false };
+
 			case channelActions.OPEN_CHANNEL:
 				return { ...state, isLoading: true, isOpen: true };
 
@@ -93,6 +96,15 @@ const initialState = { activeChannel: null, byIds: {} },
 			case channelActions.OPEN_CHANNEL:
 				return { ...state,
 					activeChannel: action.channelId,
+					byIds: {
+						...state.byIds,
+						[action.channelId]: channel(state.byIds[action.channelId], action)
+					}
+				};
+
+			case channelActions.CLOSE_CHANNEL:
+				return { ...state,
+					activeChannel: null,
 					byIds: {
 						...state.byIds,
 						[action.channelId]: channel(state.byIds[action.channelId], action)

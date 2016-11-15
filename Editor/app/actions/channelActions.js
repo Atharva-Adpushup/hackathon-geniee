@@ -3,7 +3,7 @@ import { addVariation } from 'actions/variationActions';
 import Utils from 'libs/utils';
 
 const openChannel = (channelId) => ({ type: channelActions.OPEN_CHANNEL, channelId }),
-
+	closeChannel = (channelId) => ({ type: channelActions.CLOSE_CHANNEL, channelId }),
 	openChannelSuccess = (channelId) => {
 		return (dispatch, getState) => {
 			dispatch({
@@ -61,4 +61,4 @@ const openChannel = (channelId) => ({ type: channelActions.OPEN_CHANNEL, channel
 
 export { openChannel, openChannelSuccess, setActiveChannel, createChannel,
 	saveSampleUrl, changeContentSelector, loadCmsInfo, saveChannelBeforeAfterJs,
-	contentSelectorWorked, contentSelectorMissing };
+	contentSelectorWorked, contentSelectorMissing, closeChannel };
