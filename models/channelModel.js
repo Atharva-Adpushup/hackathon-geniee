@@ -108,7 +108,7 @@ function apiModule() {
 				});
 		},
 		updatePagegroup: function(json) {
-			var query = ViewQuery.from('app', 'channelById').stale(1).range(pageGroupId, pageGroupId, true);
+			var query = ViewQuery.from('app', 'channelById').stale(1).range(json.pageGroupId, json.pageGroupId, true);
 			return couchbase.connectToAppBucket()
 				.then(function(appBucket) {
 					return new Promise(function(resolve, reject) {
