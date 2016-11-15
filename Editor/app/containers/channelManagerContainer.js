@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import * as channelActions from 'actions/channelActions';
-import { showNewChannelMenu, showSiteModesPopover } from '../actions/uiActions';
+import { showNewChannelMenu, showSiteModesPopover, showChannelMenu } from '../actions/uiActions';
 import { masterSaveData } from 'actions/siteActions';
 import ChannelManager from 'channelManager/channelManager.jsx';
 import { getAllChannels, getOpenChannels, getActiveChannelId } from '../selectors/channelSelectors';
@@ -22,6 +22,9 @@ const noop = () => ({ type: 'Test' }),
 		},
 		showNewChannelMenu: (position) => {
 			dispatch(showNewChannelMenu(position));
+		},
+		showChannelMenu: (position) => {
+			dispatch(showChannelMenu(position));
 		},
 		masterSave: () => {
 			dispatch(masterSaveData());

@@ -120,7 +120,7 @@ const status = {
 
 		SET_ACTIVE_CHANNEL: 'SET_ACTIVE_CHANNEL',
 
-		EDIT_SAMPLE_URL: 'EDIT_SAMPLE_URL',
+		SAVE_SAMPLE_URL: 'SAVE_SAMPLE_URL',
 		CHANGE_CONTENT_SELECTOR: 'CHANGE_CONTENT_SELECTOR',
 		EDIT_CONTENT_SELECTOR: 'EDIT_CONTENT_SELECTOR',
 		SAVE_BEFORE_AFTER_JS: 'SAVE_BEFORE_AFTER_JS',
@@ -139,6 +139,10 @@ const status = {
 	newChannelMenuActions = {
 		HIDE_NEW_CHANNEL_MENU: 'HIDE_NEW_CHANNEL_MENU',
 		SHOW_NEW_CHANNEL_MENU: 'SHOW_NEW_CHANNEL_MENU'
+	},
+	channelMenuActions = {
+		HIDE_CHANNEL_MENU: 'HIDE_CHANNEL_MENU',
+		SHOW_CHANNEL_MENU: 'SHOW_CHANNEL_MENU'
 	},
 	siteModesPopoverActions = {
 		SHOW_SITE_MODES_POPOVER: 'SHOW_SITE_MODES_POPOVER',
@@ -234,5 +238,5 @@ export {
 	adBoxSizeStyles, commonSupportedSizes, variationActions,
 	hbBoxActions, innerVariationActions, innerActions,
 	defaultSectionCss, leftSectionCss, rightSectionCss,
-	components, siteModesPopoverActions
+	components, siteModesPopoverActions, channelMenuActions
 };

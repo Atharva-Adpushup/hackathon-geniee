@@ -1,8 +1,20 @@
 import { Tooltip, Button, OverlayTrigger } from 'react-bootstrap';
 import React, { PropTypes } from 'react';
+import $ from 'jquery';
+import Utils from 'libs/utils';
 import TabSiteOptions from './tabSiteOptions.jsx';
 
 const empyScreen = () => (<div className="tabContentbg" />),
+	handleLiClick = (tabPane, props) => {
+		const tabPaneSelector = `#tab_${tabPane.key}`,
+			position = Utils.ui.outerMenuRenderPosition($(tabPaneSelector));
+
+		if (props.activeKey === tabPane.key) {
+			tabPane.props.showChannelMenu(position);
+		} else {
+			tabPane.props.handleClick(tabPane.key);
+		}
+	},
 	// eslint-disable-next-line react/no-multi-comp
 	Tab = (props) => (
 		<div className="tabAreaWrap">
@@ -20,7 +32,7 @@ const empyScreen = () => (<div className="tabContentbg" />),
 						</OverlayTrigger>
 						{props.children.map((tabPane) => (
 							<OverlayTrigger key={`trig_${tabPane.key}`} placement="bottom" overlay={<Tooltip id="pageGroupOptionsTooltip">Click for Page Group options</Tooltip>}>
-								<li key={`tab_${tabPane.key}`} onClick={tabPane.props.handleClick.bind(null, tabPane)} id={`tab_${tabPane.key}`}>
+								<li key={`tab_${tabPane.key}`} onClick={handleLiClick.bind(null, tabPane, props)} id={`tab_${tabPane.key}`}>
 									<a className={props.activeKey === tabPane.key ? 'active' : 'null'} href="#">{tabPane.props.title}
 										<i className="fa fa-angle-down" />
 									</a>

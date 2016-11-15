@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { editMenuActions, insertMenuActions, sectionActions, siteModesPopoverActions,
-	adActions, newChannelMenuActions, channelActions } from '../consts/commonConsts';
+	adActions, newChannelMenuActions, channelActions, channelMenuActions } from '../consts/commonConsts';
 
 const insertMenu = (state = { isVisible: false }, action) => {
 		switch (action.type) {
@@ -43,8 +43,23 @@ const insertMenu = (state = { isVisible: false }, action) => {
 			case newChannelMenuActions.SHOW_NEW_CHANNEL_MENU:
 				return { isVisible: true, position: action.position };
 
+			case channelMenuActions.SHOW_CHANNEL_MENU:
 			case newChannelMenuActions.HIDE_NEW_CHANNEL_MENU:
 			case channelActions.OPEN_CHANNEL:
+				return { isVisible: false };
+
+			default:
+				return state;
+		}
+	},
+	channelMenu = (state = { isVisible: false }, action) => {
+		switch (action.type) {
+			case channelMenuActions.SHOW_CHANNEL_MENU:
+				return { isVisible: true, position: action.position };
+
+			case channelMenuActions.HIDE_CHANNEL_MENU:
+			case channelActions.OPEN_CHANNEL:
+			case newChannelMenuActions.SHOW_NEW_CHANNEL_MENU:
 				return { isVisible: false };
 
 			default:
@@ -67,6 +82,7 @@ const insertMenu = (state = { isVisible: false }, action) => {
 	};
 
 export default combineReducers({
-	insertMenu, editMenu, newChannelMenu, siteModesPopover
+	insertMenu, editMenu, newChannelMenu,
+	siteModesPopover, channelMenu
 });
 

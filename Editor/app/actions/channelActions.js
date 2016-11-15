@@ -28,11 +28,12 @@ const openChannel = (channelId) => ({ type: channelActions.OPEN_CHANNEL, channel
 			payload: Object.assign(payload, { id: Utils.getRandomNumber(), createTs: Math.floor(Date.now() / 1000), variations: [] })
 		};
 	},
-	editSampleUrl = (channelId, sampleUrl) => {
+	saveSampleUrl = (channelId, sampleUrl, forceSampleUrl) => {
 		return {
-			type: channelActions.EDIT_SAMPLE_URL,
+			type: channelActions.SAVE_SAMPLE_URL,
 			sampleUrl,
-			channelId
+			channelId,
+			forceSampleUrl
 		};
 	},
 	changeContentSelector = (channelId, selector) => {
@@ -60,5 +61,5 @@ const openChannel = (channelId) => ({ type: channelActions.OPEN_CHANNEL, channel
 	};
 
 export { openChannel, openChannelSuccess, setActiveChannel, createChannel,
-	editSampleUrl, changeContentSelector, loadCmsInfo, saveChannelBeforeAfterJs,
+	saveSampleUrl, changeContentSelector, loadCmsInfo, saveChannelBeforeAfterJs,
 	contentSelectorWorked, contentSelectorMissing };

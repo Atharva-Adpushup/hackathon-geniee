@@ -45,7 +45,7 @@ class channelManager extends React.Component {
 				siteMode={props.siteMode} channels={props.channels} activeKey={props.activeChannelId}
 			>
 				{props.openChannels.map((channel) => (
-					<TabPane handleClick={props.setActiveChannel.bind(null, channel.id)} key={channel.id} title={channel.channelName}>
+					<TabPane showChannelMenu={props.showChannelMenu} handleClick={props.setActiveChannel.bind(null, channel.id)} key={channel.id} title={channel.channelName}>
 						<Platform type={channel.platform}>
 							<Loader loading={channel.isLoading} />
 							<iframe data-adpid={`iframe${channel.id}`}

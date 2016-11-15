@@ -6,6 +6,7 @@ import EditMenu from 'containers/editMenuContainer.js';
 import NewChannelMenu from 'containers/newChannelMenuContainer.js';
 import AfterSaveLoaderContainer from 'containers/afterSaveLoaderContainer.js';
 import SiteModesPopoverContainer from 'containers/siteModesPopoverContainer.js';
+import ChannelMenuContainer from 'containers/channelMenuContainer.js';
 
 const OuterEditor = () => (
 	<div>
@@ -16,6 +17,7 @@ const OuterEditor = () => (
 		<NewChannelMenu />
 		<AfterSaveLoaderContainer />
 		<SiteModesPopoverContainer />
+		<ChannelMenuContainer />
 	</div>
 );
 
