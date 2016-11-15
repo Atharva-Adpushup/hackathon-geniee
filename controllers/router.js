@@ -5,7 +5,8 @@ var indexController = require('./indexController'),
 	siteController = require('./siteController'),
 	reportsController = require('./reportController'),
 	apiController = require('./apiController'),
-	pageGroupController = require('./pageGroupController');
+	pageGroupController = require('./pageGroupController'),
+	authController = require('./authController');
 
 module.exports = function (app) {
 	// Always invoked middleware added to check for user demo
@@ -56,6 +57,10 @@ module.exports = function (app) {
 
 
 	/*****************Login URL's End *******************/
+
+	app.use('/genieeApi/authenticate/:email', function(req, res, next) {
+		next();
+	}, authController);
 
 	app.use('/genieeApi/', function (req, res, next) {
 		/* @TODO Implement some kind of check to verify geniee Call */
