@@ -28,12 +28,11 @@ const openChannel = (channelId) => ({ type: channelActions.OPEN_CHANNEL, channel
 			payload: Object.assign(payload, { id: Utils.getRandomNumber(), createTs: Math.floor(Date.now() / 1000), variations: [] })
 		};
 	},
-	saveSampleUrl = (channelId, sampleUrl, forceSampleUrl) => {
+	saveSampleUrl = (channelId, sampleUrl) => {
 		return {
 			type: channelActions.SAVE_SAMPLE_URL,
-			sampleUrl,
 			channelId,
-			forceSampleUrl
+			sampleUrl
 		};
 	},
 	changeContentSelector = (channelId, selector) => {

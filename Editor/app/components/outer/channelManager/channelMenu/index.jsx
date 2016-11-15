@@ -4,14 +4,16 @@ import MenuItem from 'shared/menu/menuItem.jsx';
 import Info from './info.jsx';
 //import CloseChannel from './close.jsx';
 
-const channelMenu = ({ isVisible, allChannels, position, hideMenu, saveSampleUrl, channel, partner }) => {
+const channelMenu = ({ isVisible, allChannels, activeChannelId,
+	position, hideMenu, saveSampleUrl, channel, partner }) => {
+
 	if (!isVisible) {
 		return null;
 	}
 
 	const items = [],
-		saveSampleUrlData = (channelId = 1, sampleUrl, forceSampleUrl) => {
-			saveSampleUrl(channelId, sampleUrl, forceSampleUrl);
+		saveSampleUrlData = (sampleUrl) => {
+			saveSampleUrl(activeChannelId, sampleUrl);
 		};
 
 	items.push((

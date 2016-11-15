@@ -23,7 +23,7 @@ const initialState = { activeChannel: null, byIds: {} },
 					isOpen: true
 				};
 
-			case channelActions.EDIT_SAMPLE_URL:
+			case channelActions.SAVE_SAMPLE_URL:
 				return { ...state, sampleUrl: action.sampleUrl };
 
 			case channelActions.CHANGE_CONTENT_SELECTOR:
@@ -75,7 +75,7 @@ const initialState = { activeChannel: null, byIds: {} },
 			case channelActions.SET_ACTIVE_CHANNEL:
 				return { ...state, activeChannel: action.channelId };
 
-			case channelActions.EDIT_SAMPLE_URL:
+			case channelActions.SAVE_SAMPLE_URL:
 			case channelActions.CHANGE_CONTENT_SELECTOR:
 			case channelActions.OPEN_CHANNEL_SUCCESS:
 			case variationActions.ADD_VARIATION:

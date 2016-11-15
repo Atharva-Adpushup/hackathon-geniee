@@ -30,7 +30,7 @@ class info extends React.Component {
 	}
 
 	saveSampleUrl() {
-		this.props.onSampleUrlChange(1, this.state.sampleUrl, this.state.forceSampleUrl);
+		this.props.onSampleUrlChange(this.state.sampleUrl);
 		this.toggleSampleUrl();
 	}
 
