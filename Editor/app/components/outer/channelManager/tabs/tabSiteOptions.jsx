@@ -48,7 +48,7 @@ const showSiteModesPopover = (props, ev) => {
 	// eslint-disable-next-line react/no-multi-comp
 	TabSiteOptions = (props) => (
 		<div className="option-right">
-			<EditorModes toggleEditorMode={props.toggleEditorMode} />
+			{/*<EditorModes toggleEditorMode={props.toggleEditorMode} />*/}
 
 			<OverlayTrigger placement="bottom" overlay={<Tooltip id="masterSaveTooltip">Save changes</Tooltip>}>
 				<Button onClick={props.masterSave} className="btn-sm btn-save btn-lightBg btn--success btn--icon pull-left" />

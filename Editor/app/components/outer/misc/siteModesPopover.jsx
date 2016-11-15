@@ -37,6 +37,8 @@ class siteModesPopover extends React.Component {
 	handleControlStatusOnChange() {
 		this.setState({
 			controlStatus: !this.state.controlStatus
+		}, () => {
+			this.props.hideMenu();
 		});
 	}
 
