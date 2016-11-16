@@ -6,13 +6,18 @@ var indexController = require('./indexController'),
 	reportsController = require('./reportController'),
 	apiController = require('./apiController'),
 	pageGroupController = require('./pageGroupController'),
-	authController = require('./authController');
+	authController = require('./authController'),
+	_ = require('lodash');
 
 module.exports = function (app) {
 	// Always invoked middleware added to check for user demo
 	// If user requestDemo is true, redirects to thankyou page
 	app.use(function (req, res, next) {
-		if (!req.session.isSuperUser && req.session.user && req.session.user.requestDemo && (req.originalUrl !== '/user/logout')) {
+		if (!req.session.isSuperUser && 
+			req.session.user && 
+			req.session.user.userType !== 'partner' &&
+			req.session.user.requestDemo && 
+			(req.originalUrl !== '/user/logout')) {
 			return res.render('thankyou', {
 				isUserRequestDemo: true
 			});
@@ -23,6 +28,12 @@ module.exports = function (app) {
 	app.use(function (req, res, next) {
 		if ((req.path.indexOf('/user') !== -1 || req.path.indexOf('/proxy') !== -1) && (!req.session || !req.session.user)) {
 			return res.redirect('/login');
+		}
+		
+		
+		if((req.session && req.session.partner === 'geniee') && (_.some(['/user/site', '/genieeApi', '/data', '/authenticate'], function(v) { _.includes(req.path, v) }))) {
+			req.session.destroy();
+			return res.redirect('/403');
 		}
 		next();
 	});
@@ -58,7 +69,7 @@ module.exports = function (app) {
 
 	/*****************Login URL's End *******************/
 
-	app.use('/genieeApi/authenticate/:email', function(req, res, next) {
+	app.use('/authenticate/', function(req, res, next) {
 		next();
 	}, authController);
 

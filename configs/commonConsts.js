@@ -13,6 +13,12 @@ module.exports = {
 	password: {
 		'MASTER': 'fe4720b8bcdedb3cc47490015b0ab050'
 	},
+	partners: {
+		geniee: {
+			email: 'geniee@adpushup.com',
+			name: 'geniee'
+		}
+	},
 	user: {
 		'fields': {
 			'default': {
