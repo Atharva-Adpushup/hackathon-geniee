@@ -1,9 +1,19 @@
 import { channelActions } from 'consts/commonConsts';
 import { addVariation } from 'actions/variationActions';
+import { getOpenChannels } from 'selectors/channelSelectors';
 import Utils from 'libs/utils';
+import _ from 'lodash';
 
 const openChannel = (channelId) => ({ type: channelActions.OPEN_CHANNEL, channelId }),
-	closeChannel = (channelId) => ({ type: channelActions.CLOSE_CHANNEL, channelId }),
+	closeChannel = (channelId) => {
+		return (dispatch, getState) => {
+			const state = getState(),
+				filteredChannels = _.filter(getOpenChannels(state), (o) => (channelId !== o.id)),
+				activeChannelId = (Utils.isArray(filteredChannels) && filteredChannels.length) ? (_.find(filteredChannels, 'id')).id : null;
+
+			dispatch({ type: channelActions.CLOSE_CHANNEL, channelId, activeChannelId });
+		};
+	},
 	openChannelSuccess = (channelId) => {
 		return (dispatch, getState) => {
 			dispatch({

@@ -104,7 +104,7 @@ const initialState = { activeChannel: null, byIds: {} },
 
 			case channelActions.CLOSE_CHANNEL:
 				return { ...state,
-					activeChannel: null,
+					activeChannel: action.activeChannelId,
 					byIds: {
 						...state.byIds,
 						[action.channelId]: channel(state.byIds[action.channelId], action)
