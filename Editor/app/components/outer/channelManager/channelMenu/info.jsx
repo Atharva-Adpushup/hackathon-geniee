@@ -126,7 +126,6 @@ class info extends React.Component {
 						<i className={"fa fa-" + this.getClass(this.props.channel.platform)}></i>
 					</Col>
 				</Row>
-				<CustomToggleSwitch labelText="Force sample url" defaultLayout checked={this.state.forceSampleUrl} name="forceSampleUrl" onChange={a => this.toggleStateValues('forceSampleUrl', a)} layout="horizontal" size="m" id="js-force-sample-url" on="On" off="Off" />
 				{!this.state.manageSampleUrl ?
 					<div>
 						<Row>
@@ -144,6 +143,7 @@ class info extends React.Component {
 					</div>
 					:
 					<div>
+						<CustomToggleSwitch labelText="Force sample url" className="mB-0" defaultLayout checked={this.state.forceSampleUrl} name="forceSampleUrl" onChange={a => this.toggleStateValues('forceSampleUrl', a)} layout="horizontal" size="m" id="js-force-sample-url" on="On" off="Off" />
 						<Row>
 							<Col xs={12}>
 								<label>Sample Url</label>
