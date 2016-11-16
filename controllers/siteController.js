@@ -7,9 +7,27 @@ var express = require('express'),
 	utils = require('../helpers/utils'),
 	channelModel = require('../models/channelModel'),
 	config = require('../configs/config'),
+	userModel = require('.././models/userModel'),
 	router = express.Router({ mergeParams: true });
 
+function checkAuth(req, res, next) {
+	userModel.verifySiteOwner(req.session.user.email, req.params.siteId)
+		.then(function() {
+			next();
+		})
+		.catch(function() {
+			if(req.session.partner === 'geniee') {
+				req.session.destroy();
+				return res.redirect('/403');
+			}
+
+			req.session.destroy();
+			return res.redirect('/login');
+		});
+};
+
 router
+	.get('/:siteId/*', checkAuth)
 	.get('/:siteId/settings', function (req, res) {
 		siteModel.getSiteById(req.params.siteId)
 			.then(function (site) {

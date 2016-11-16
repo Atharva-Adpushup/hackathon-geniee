@@ -3,21 +3,24 @@
 var express = require('express'),
 	userModel = require('../models/userModel'),
     siteModel = require('../models/siteModel'),
-	router = express.Router({ mergeParams: true });
+	router = express.Router({ mergeParams: true }),
+    partners = require('../configs/commonConsts').partners;
 
 router
-	.get('/', function (req, res) {
+	.get('/geniee/', function (req, res) {
 	    if (req.session.user) {
 			req.session.destroy();
 		}
-
+        
         // Generate session for authenticated user
-		userModel.setSitePageGroups(req.params.email)
+
+		userModel.getUserByEmail(partners.geniee.email)
             .then(function(user) { return siteModel.getSiteById(req.query.siteId) })
-            .then(function(site) { return userModel.verifySiteOwner(req.params.email, req.query.siteId) })
+            .then(function(site) { return userModel.verifySiteOwner(partners.geniee.email, req.query.siteId) })
             .then(function(data) {
                 req.session.user = data.user;
-                req.session.site = data.site;
+                req.session.siteId = data.site.siteId;
+                req.session.partner = 'geniee';
                 return res.redirect('/user/site/'+data.site.siteId+'/dashboard');
             })
             .catch(function(err) {

@@ -2165,7 +2165,7 @@
 
 		SET_ACTIVE_CHANNEL: 'SET_ACTIVE_CHANNEL',
 
-		EDIT_SAMPLE_URL: 'EDIT_SAMPLE_URL',
+		SAVE_SAMPLE_URL: 'SAVE_SAMPLE_URL',
 		CHANGE_CONTENT_SELECTOR: 'CHANGE_CONTENT_SELECTOR',
 		EDIT_CONTENT_SELECTOR: 'EDIT_CONTENT_SELECTOR',
 		SAVE_BEFORE_AFTER_JS: 'SAVE_BEFORE_AFTER_JS',
@@ -2184,6 +2184,10 @@
 	    newChannelMenuActions = {
 		HIDE_NEW_CHANNEL_MENU: 'HIDE_NEW_CHANNEL_MENU',
 		SHOW_NEW_CHANNEL_MENU: 'SHOW_NEW_CHANNEL_MENU'
+	},
+	    channelMenuActions = {
+		HIDE_CHANNEL_MENU: 'HIDE_CHANNEL_MENU',
+		SHOW_CHANNEL_MENU: 'SHOW_CHANNEL_MENU'
 	},
 	    siteModesPopoverActions = {
 		SHOW_SITE_MODES_POPOVER: 'SHOW_SITE_MODES_POPOVER',
@@ -2290,6 +2294,7 @@
 	exports.rightSectionCss = rightSectionCss;
 	exports.components = components;
 	exports.siteModesPopoverActions = siteModesPopoverActions;
+	exports.channelMenuActions = channelMenuActions;
 
 /***/ },
 /* 40 */,
@@ -7505,6 +7510,10 @@
 
 	var _siteModesPopoverContainer2 = _interopRequireDefault(_siteModesPopoverContainer);
 
+	var _channelMenuContainer = __webpack_require__(710);
+
+	var _channelMenuContainer2 = _interopRequireDefault(_channelMenuContainer);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var OuterEditor = function OuterEditor() {
@@ -7517,7 +7526,8 @@
 			_react2.default.createElement(_editMenuContainer2.default, null),
 			_react2.default.createElement(_newChannelMenuContainer2.default, null),
 			_react2.default.createElement(_afterSaveLoaderContainer2.default, null),
-			_react2.default.createElement(_siteModesPopoverContainer2.default, null)
+			_react2.default.createElement(_siteModesPopoverContainer2.default, null),
+			_react2.default.createElement(_channelMenuContainer2.default, null)
 		);
 	};
 
@@ -7578,6 +7588,9 @@
 			showNewChannelMenu: function showNewChannelMenu(position) {
 				dispatch((0, _uiActions.showNewChannelMenu)(position));
 			},
+			showChannelMenu: function showChannelMenu(position) {
+				dispatch((0, _uiActions.showChannelMenu)(position));
+			},
 			masterSave: function masterSave() {
 				dispatch((0, _siteActions.masterSaveData)());
 			},
@@ -7602,7 +7615,7 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.contentSelectorMissing = exports.contentSelectorWorked = exports.saveChannelBeforeAfterJs = exports.loadCmsInfo = exports.changeContentSelector = exports.editSampleUrl = exports.createChannel = exports.setActiveChannel = exports.openChannelSuccess = exports.openChannel = undefined;
+	exports.closeChannel = exports.contentSelectorMissing = exports.contentSelectorWorked = exports.saveChannelBeforeAfterJs = exports.loadCmsInfo = exports.changeContentSelector = exports.saveSampleUrl = exports.createChannel = exports.setActiveChannel = exports.openChannelSuccess = exports.openChannel = undefined;
 
 	var _commonConsts = __webpack_require__(39);
 
@@ -7616,6 +7629,9 @@
 
 	var openChannel = function openChannel(channelId) {
 		return { type: _commonConsts.channelActions.OPEN_CHANNEL, channelId: channelId };
+	},
+	    closeChannel = function closeChannel(channelId) {
+		return { type: _commonConsts.channelActions.CLOSE_CHANNEL, channelId: channelId };
 	},
 	    openChannelSuccess = function openChannelSuccess(channelId) {
 		return function (dispatch, getState) {
@@ -7644,11 +7660,11 @@
 			payload: Object.assign(payload, { id: _utils2.default.getRandomNumber(), createTs: Math.floor(Date.now() / 1000), variations: [] })
 		};
 	},
-	    editSampleUrl = function editSampleUrl(channelId, sampleUrl) {
+	    saveSampleUrl = function saveSampleUrl(channelId, sampleUrl) {
 		return {
-			type: _commonConsts.channelActions.EDIT_SAMPLE_URL,
-			sampleUrl: sampleUrl,
-			channelId: channelId
+			type: _commonConsts.channelActions.SAVE_SAMPLE_URL,
+			channelId: channelId,
+			sampleUrl: sampleUrl
 		};
 	},
 	    changeContentSelector = function changeContentSelector(channelId, selector) {
@@ -7683,12 +7699,13 @@
 	exports.openChannelSuccess = openChannelSuccess;
 	exports.setActiveChannel = setActiveChannel;
 	exports.createChannel = createChannel;
-	exports.editSampleUrl = editSampleUrl;
+	exports.saveSampleUrl = saveSampleUrl;
 	exports.changeContentSelector = changeContentSelector;
 	exports.loadCmsInfo = loadCmsInfo;
 	exports.saveChannelBeforeAfterJs = saveChannelBeforeAfterJs;
 	exports.contentSelectorWorked = contentSelectorWorked;
 	exports.contentSelectorMissing = contentSelectorMissing;
+	exports.closeChannel = closeChannel;
 
 /***/ },
 /* 213 */
@@ -8369,7 +8386,7 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.hideSiteModesPopover = exports.showSiteModesPopover = exports.hideNewChannelInsertMenu = exports.showNewChannelMenu = exports.hideInsertMenu = exports.hideEditMenu = exports.showInsertMenu = exports.showEditMenu = undefined;
+	exports.hideChannelMenu = exports.showChannelMenu = exports.hideSiteModesPopover = exports.showSiteModesPopover = exports.hideNewChannelInsertMenu = exports.showNewChannelMenu = exports.hideInsertMenu = exports.hideEditMenu = exports.showInsertMenu = exports.showEditMenu = undefined;
 
 	var _commonConsts = __webpack_require__(39);
 
@@ -8384,6 +8401,12 @@
 	},
 	    hideInsertMenu = function hideInsertMenu() {
 		return { type: _commonConsts.insertMenuActions.HIDE_MENU };
+	},
+	    showChannelMenu = function showChannelMenu(position) {
+		return { type: _commonConsts.channelMenuActions.SHOW_CHANNEL_MENU, position: position };
+	},
+	    hideChannelMenu = function hideChannelMenu() {
+		return { type: _commonConsts.channelMenuActions.HIDE_CHANNEL_MENU };
 	},
 	    showNewChannelMenu = function showNewChannelMenu(position) {
 		return { type: _commonConsts.newChannelMenuActions.SHOW_NEW_CHANNEL_MENU, position: position };
@@ -8406,6 +8429,8 @@
 	exports.hideNewChannelInsertMenu = hideNewChannelInsertMenu;
 	exports.showSiteModesPopover = showSiteModesPopover;
 	exports.hideSiteModesPopover = hideSiteModesPopover;
+	exports.showChannelMenu = showChannelMenu;
+	exports.hideChannelMenu = hideChannelMenu;
 
 /***/ },
 /* 224 */
@@ -10164,7 +10189,7 @@
 					props.openChannels.map(function (channel) {
 						return _react2.default.createElement(
 							_tabPane2.default,
-							{ handleClick: props.setActiveChannel.bind(null, channel.id), key: channel.id, title: channel.channelName },
+							{ showChannelMenu: props.showChannelMenu, handleClick: props.setActiveChannel.bind(null, channel.id), key: channel.id, title: channel.channelName },
 							_react2.default.createElement(
 								_platform2.default,
 								{ type: channel.platform },
@@ -10313,6 +10338,14 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _jquery = __webpack_require__(35);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _utils = __webpack_require__(181);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
 	var _tabSiteOptions = __webpack_require__(516);
 
 	var _tabSiteOptions2 = _interopRequireDefault(_tabSiteOptions);
@@ -10321,6 +10354,16 @@
 
 	var empyScreen = function empyScreen() {
 		return _react2.default.createElement('div', { className: 'tabContentbg' });
+	},
+	    handleLiClick = function handleLiClick(tabPane, props) {
+		var tabPaneSelector = '#tab_' + tabPane.key,
+		    position = _utils2.default.ui.outerMenuRenderPosition((0, _jquery2.default)(tabPaneSelector));
+
+		if (props.activeKey === tabPane.key) {
+			tabPane.props.showChannelMenu(position);
+		} else {
+			tabPane.props.handleClick(tabPane.key);
+		}
 	},
 
 	// eslint-disable-next-line react/no-multi-comp
@@ -10378,7 +10421,7 @@
 									) },
 								_react2.default.createElement(
 									'li',
-									{ key: 'tab_' + tabPane.key, onClick: tabPane.props.handleClick.bind(null, tabPane), id: 'tab_' + tabPane.key },
+									{ key: 'tab_' + tabPane.key, onClick: handleLiClick.bind(null, tabPane, props), id: 'tab_' + tabPane.key },
 									_react2.default.createElement(
 										'a',
 										{ className: props.activeKey === tabPane.key ? 'active' : 'null', href: '#' },
@@ -53012,6 +53055,9 @@
 	    getNewChannelMenuState = function getNewChannelMenuState(state) {
 		return state.ui.newChannelMenu;
 	},
+	    getChannelMenuState = function getChannelMenuState(state) {
+		return state.ui.channelMenu;
+	},
 	    getSiteModesPopoverPosition = function getSiteModesPopoverPosition(state) {
 		return state.ui.siteModesPopover.position;
 	},
@@ -53023,6 +53069,7 @@
 	exports.getEditMenuState = getEditMenuState;
 	exports.getNewChannelMenuState = getNewChannelMenuState;
 	exports.getSiteModesPopoverPosition = getSiteModesPopoverPosition;
+	exports.getChannelMenuState = getChannelMenuState;
 	exports.getSiteModesPopoverVisibility = getSiteModesPopoverVisibility;
 
 /***/ },
@@ -55070,7 +55117,7 @@
 					isOpen: true
 				};
 
-			case _commonConsts.channelActions.EDIT_SAMPLE_URL:
+			case _commonConsts.channelActions.SAVE_SAMPLE_URL:
 				return _extends({}, state, { sampleUrl: action.sampleUrl });
 
 			case _commonConsts.channelActions.CHANGE_CONTENT_SELECTOR:
@@ -55097,6 +55144,9 @@
 			case _commonConsts.channelActions.OPEN_CHANNEL_SUCCESS:
 				return _extends({}, state, { isLoading: false });
 
+			case _commonConsts.channelActions.CLOSE_CHANNEL:
+				return _extends({}, state, { isOpen: false });
+
 			case _commonConsts.channelActions.OPEN_CHANNEL:
 				return _extends({}, state, { isLoading: true, isOpen: true });
 
@@ -55122,7 +55172,7 @@
 			case _commonConsts.channelActions.SET_ACTIVE_CHANNEL:
 				return _extends({}, state, { activeChannel: action.channelId });
 
-			case _commonConsts.channelActions.EDIT_SAMPLE_URL:
+			case _commonConsts.channelActions.SAVE_SAMPLE_URL:
 			case _commonConsts.channelActions.CHANGE_CONTENT_SELECTOR:
 			case _commonConsts.channelActions.OPEN_CHANNEL_SUCCESS:
 			case _commonConsts.variationActions.ADD_VARIATION:
@@ -55137,6 +55187,12 @@
 			case _commonConsts.channelActions.OPEN_CHANNEL:
 				return _extends({}, state, {
 					activeChannel: action.channelId,
+					byIds: _extends({}, state.byIds, _defineProperty({}, action.channelId, channel(state.byIds[action.channelId], action)))
+				});
+
+			case _commonConsts.channelActions.CLOSE_CHANNEL:
+				return _extends({}, state, {
+					activeChannel: null,
 					byIds: _extends({}, state.byIds, _defineProperty({}, action.channelId, channel(state.byIds[action.channelId], action)))
 				});
 
@@ -55857,8 +55913,28 @@
 			case _commonConsts.newChannelMenuActions.SHOW_NEW_CHANNEL_MENU:
 				return { isVisible: true, position: action.position };
 
+			case _commonConsts.channelMenuActions.SHOW_CHANNEL_MENU:
 			case _commonConsts.newChannelMenuActions.HIDE_NEW_CHANNEL_MENU:
 			case _commonConsts.channelActions.OPEN_CHANNEL:
+				return { isVisible: false };
+
+			default:
+				return state;
+		}
+	},
+	    channelMenu = function channelMenu() {
+		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { isVisible: false };
+		var action = arguments[1];
+
+		switch (action.type) {
+			case _commonConsts.channelMenuActions.SHOW_CHANNEL_MENU:
+				return { isVisible: true, position: action.position };
+
+			case _commonConsts.channelMenuActions.HIDE_CHANNEL_MENU:
+			case _commonConsts.channelActions.OPEN_CHANNEL:
+			case _commonConsts.channelActions.SAVE_SAMPLE_URL:
+			case _commonConsts.channelActions.CLOSE_CHANNEL:
+			case _commonConsts.newChannelMenuActions.SHOW_NEW_CHANNEL_MENU:
 				return { isVisible: false };
 
 			default:
@@ -55884,7 +55960,8 @@
 	};
 
 	exports.default = (0, _redux.combineReducers)({
-		insertMenu: insertMenu, editMenu: editMenu, newChannelMenu: newChannelMenu, siteModesPopover: siteModesPopover
+		insertMenu: insertMenu, editMenu: editMenu, newChannelMenu: newChannelMenu,
+		siteModesPopover: siteModesPopover, channelMenu: channelMenu
 	});
 
 /***/ },
@@ -56088,6 +56165,744 @@
 	};
 
 	exports.default = unloadHandler;
+
+/***/ },
+/* 710 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _redux = __webpack_require__(12);
+
+	var _reactRedux = __webpack_require__(4);
+
+	var _index = __webpack_require__(711);
+
+	var _index2 = _interopRequireDefault(_index);
+
+	var _uiSelectors = __webpack_require__(664);
+
+	var _siteSelectors = __webpack_require__(259);
+
+	var _channelSelectors = __webpack_require__(222);
+
+	var _uiActions = __webpack_require__(223);
+
+	var _channelActions = __webpack_require__(212);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var mapStateToProps = function mapStateToProps(state) {
+		var json = (0, _uiSelectors.getChannelMenuState)(state);
+		return _extends({}, json, {
+			channel: (0, _channelSelectors.getActiveChannel)(state),
+			partner: (0, _siteSelectors.getPartner)(state),
+			allChannels: (0, _channelSelectors.getAllChannels)(state),
+			activeChannelId: (0, _channelSelectors.getActiveChannelId)(state)
+		});
+	},
+	    mapDispatchToProps = function mapDispatchToProps(dispatch) {
+		return (0, _redux.bindActionCreators)({ hideMenu: _uiActions.hideChannelMenu, saveSampleUrl: _channelActions.saveSampleUrl, closeChannel: _channelActions.closeChannel }, dispatch);
+	};
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_index2.default);
+
+/***/ },
+/* 711 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _menu = __webpack_require__(651);
+
+	var _menu2 = _interopRequireDefault(_menu);
+
+	var _menuItem = __webpack_require__(653);
+
+	var _menuItem2 = _interopRequireDefault(_menuItem);
+
+	var _info = __webpack_require__(712);
+
+	var _info2 = _interopRequireDefault(_info);
+
+	var _closeChannel = __webpack_require__(714);
+
+	var _closeChannel2 = _interopRequireDefault(_closeChannel);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var channelMenu = function channelMenu(_ref) {
+		var isVisible = _ref.isVisible,
+		    allChannels = _ref.allChannels,
+		    activeChannelId = _ref.activeChannelId,
+		    position = _ref.position,
+		    hideMenu = _ref.hideMenu,
+		    saveSampleUrl = _ref.saveSampleUrl,
+		    channel = _ref.channel,
+		    partner = _ref.partner,
+		    closeChannel = _ref.closeChannel;
+
+
+		if (!isVisible) {
+			return null;
+		}
+
+		var items = [],
+		    saveSampleUrlData = function saveSampleUrlData(sampleUrl) {
+			saveSampleUrl(activeChannelId, sampleUrl);
+		},
+		    closeChannelById = function closeChannelById() {
+			closeChannel(activeChannelId);
+		};
+
+		items.push(_react2.default.createElement(
+			_menuItem2.default,
+			{ key: 1, icon: 'fa fa-info', contentHeading: 'Page Group Info' },
+			_react2.default.createElement(_info2.default, { onSampleUrlChange: saveSampleUrlData, channel: channel })
+		));
+
+		items.push(_react2.default.createElement(
+			_menuItem2.default,
+			{ key: 2, icon: 'fa fa-times', contentHeading: 'Close Channel' },
+			_react2.default.createElement(_closeChannel2.default, { closeChannelById: closeChannelById })
+		));
+
+		return _react2.default.createElement(
+			_menu2.default,
+			{ id: 'channelMenu', position: position, arrow: 'top', activeItem: 0, onGlassClick: hideMenu },
+			items
+		);
+	};
+
+	channelMenu.propTypes = {
+		isVisible: _react.PropTypes.bool.isRequired,
+		partner: _react.PropTypes.string,
+		position: _react.PropTypes.object,
+		channels: _react.PropTypes.array,
+		hideMenu: _react.PropTypes.func
+	};
+
+	channelMenu.defaultProps = {
+		isVisible: false
+	};
+
+	exports.default = channelMenu;
+
+/***/ },
+/* 712 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(3);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _jquery = __webpack_require__(35);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _utils = __webpack_require__(181);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	var _customToggleSwitch = __webpack_require__(713);
+
+	var _customToggleSwitch2 = _interopRequireDefault(_customToggleSwitch);
+
+	var _Row = __webpack_require__(503);
+
+	var _Row2 = _interopRequireDefault(_Row);
+
+	var _FormControl = __webpack_require__(428);
+
+	var _FormControl2 = _interopRequireDefault(_FormControl);
+
+	var _Button = __webpack_require__(371);
+
+	var _Button2 = _interopRequireDefault(_Button);
+
+	var _Col = __webpack_require__(385);
+
+	var _Col2 = _interopRequireDefault(_Col);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var info = function (_React$Component) {
+		_inherits(info, _React$Component);
+
+		function info(props) {
+			_classCallCheck(this, info);
+
+			var _this = _possibleConstructorReturn(this, (info.__proto__ || Object.getPrototypeOf(info)).call(this, props));
+
+			_this.state = {
+				manageSampleUrl: false,
+				hostNameValid: true,
+				forceSampleUrl: _this.props.channel.forceSampleUrl ? _this.props.channel.forceSampleUrl : false,
+				sampleUrl: _this.props.channel.sampleUrl,
+				isSampleUrlChanged: false
+			};
+			return _this;
+		}
+
+		_createClass(info, [{
+			key: 'componentWillReceiveProps',
+			value: function componentWillReceiveProps() {
+				var props = this.props;
+
+				this.setState({
+					sampleUrl: props.channel.sampleUrl,
+					forceSampleUrl: props.channel.forceSampleUrl
+				});
+			}
+		}, {
+			key: 'saveSampleUrl',
+			value: function saveSampleUrl() {
+				this.props.onSampleUrlChange(this.state.sampleUrl);
+				this.toggleSampleUrl();
+			}
+		}, {
+			key: 'resetDisabledBtns',
+			value: function resetDisabledBtns() {
+				(0, _jquery2.default)(_reactDom2.default.findDOMNode(this.refs.saveUrl)).removeAttr('disabled').removeClass('disabled');
+				(0, _jquery2.default)(_reactDom2.default.findDOMNode(this.refs.editUrl)).removeAttr('disabled').removeClass('disabled');
+			}
+		}, {
+			key: 'resetSampleUrl',
+			value: function resetSampleUrl() {
+				!this.state.isSampleUrlChanged ? this.setState({ sampleUrl: this.props.channel.sampleUrl }) : null;
+			}
+		}, {
+			key: 'toggleSampleUrl',
+			value: function toggleSampleUrl() {
+				var _this2 = this;
+
+				this.setState({ manageSampleUrl: !this.state.manageSampleUrl }, function () {
+					_this2.resetDisabledBtns();
+					_this2.resetSampleUrl();
+				});
+			}
+		}, {
+			key: 'onChange',
+			value: function onChange() {
+				var _this3 = this;
+
+				var val = (0, _jquery2.default)(_reactDom2.default.findDOMNode(this.refs.sampleUrl)).val().trim(),
+				    isValidUrl = val && _utils2.default.ValidUrl(val.trim()),
+				    isHostNameEqual = _utils2.default.parseUrl(val).hostname == _utils2.default.parseUrl(window.ADP_SITE_DOMAIN).hostname;
+
+				if (isValidUrl && (this.state.forceSampleUrl || isHostNameEqual)) {
+					this.setState({ sampleUrl: _utils2.default.appendProtocolToUrl(val), hostNameValid: true, isSampleUrlChanged: true }, function () {
+						(0, _jquery2.default)(_reactDom2.default.findDOMNode(_this3.refs.saveUrl)).removeAttr("disabled").removeClass("disabled");
+					});
+				} else if (isValidUrl && !isHostNameEqual) {
+					this.setState({ sampleUrl: val, hostNameValid: false, isSampleUrlChanged: false }, function () {
+						(0, _jquery2.default)(_reactDom2.default.findDOMNode(_this3.refs.saveUrl)).attr("disabled", true).addClass("disabled");
+					});
+				} else {
+					this.setState({ sampleUrl: val, isSampleUrlChanged: false }, function () {
+						(0, _jquery2.default)(_reactDom2.default.findDOMNode(_this3.refs.saveUrl)).attr("disabled", true).addClass("disabled");
+					});
+				}
+			}
+		}, {
+			key: 'onBlur',
+			value: function onBlur() {
+				this.setState({
+					sampleUrl: _utils2.default.parseUrl(this.state.sampleUrl).href
+				});
+			}
+		}, {
+			key: 'toggleStateValues',
+			value: function toggleStateValues(target) {
+				var isRefsAvailable = Object.keys(this.refs).length > 0,
+				    element = isRefsAvailable ? (0, _jquery2.default)(_reactDom2.default.findDOMNode(this.refs.sampleUrl)).get(0) : null,
+				    event = new Event('input', {
+					'bubbles': true,
+					'cancelable': false
+				});
+
+				switch (target) {
+					case 'forceSampleUrl':
+						this.setState({ forceSampleUrl: !this.state.forceSampleUrl }, function () {
+							if (element) {
+								element.dispatchEvent(event);
+							}
+						});
+						break;
+
+					default:
+						return false;
+				}
+			}
+		}, {
+			key: 'getClass',
+			value: function getClass(name) {
+				var icon = "desktop";
+
+				if (name === "MOBILE") icon = "mobile";else if (name === "TABLET") icon = "tablet";
+
+				return icon;
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var _this4 = this;
+
+				return _react2.default.createElement(
+					'div',
+					{ className: 'rowPadding containerButtonBar' },
+					_react2.default.createElement(
+						_Row2.default,
+						null,
+						_react2.default.createElement(
+							_Col2.default,
+							{ xs: 6 },
+							_react2.default.createElement(
+								'label',
+								null,
+								'Page Group'
+							)
+						),
+						_react2.default.createElement(
+							_Col2.default,
+							{ xs: 6, className: 'wrapfeature' },
+							this.props.channel.pageGroup
+						)
+					),
+					_react2.default.createElement(
+						_Row2.default,
+						null,
+						_react2.default.createElement(
+							_Col2.default,
+							{ xs: 6 },
+							_react2.default.createElement(
+								'label',
+								null,
+								'Platform'
+							)
+						),
+						_react2.default.createElement(
+							_Col2.default,
+							{ xs: 6 },
+							_react2.default.createElement('i', { className: "fa fa-" + this.getClass(this.props.channel.platform) })
+						)
+					),
+					_react2.default.createElement(_customToggleSwitch2.default, { labelText: 'Force sample url', defaultLayout: true, checked: this.state.forceSampleUrl, name: 'forceSampleUrl', onChange: function onChange(a) {
+							return _this4.toggleStateValues('forceSampleUrl', a);
+						}, layout: 'horizontal', size: 'm', id: 'js-force-sample-url', on: 'On', off: 'Off' }),
+					!this.state.manageSampleUrl ? _react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement(
+							_Row2.default,
+							null,
+							_react2.default.createElement(
+								_Col2.default,
+								{ xs: 12 },
+								_react2.default.createElement(
+									'label',
+									null,
+									'Sample Url'
+								)
+							),
+							_react2.default.createElement(
+								_Col2.default,
+								{ xs: 12, className: 'wrapfeature' },
+								this.props.channel.sampleUrl
+							)
+						),
+						_react2.default.createElement(
+							_Row2.default,
+							{ className: 'butttonsRow' },
+							_react2.default.createElement(
+								_Col2.default,
+								{ xs: 12 },
+								_react2.default.createElement(
+									_Button2.default,
+									{ ref: 'editUrl', onClick: function onClick(a) {
+											return _this4.toggleSampleUrl(a);
+										}, className: 'btn-lightBg btn-edit btn-block' },
+									'Edit Url'
+								)
+							)
+						)
+					) : _react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement(
+							_Row2.default,
+							null,
+							_react2.default.createElement(
+								_Col2.default,
+								{ xs: 12 },
+								_react2.default.createElement(
+									'label',
+									null,
+									'Sample Url'
+								)
+							),
+							_react2.default.createElement(
+								_Col2.default,
+								{ xs: 12 },
+								_react2.default.createElement(_FormControl2.default, { type: 'text', ref: 'sampleUrl', onBlur: function onBlur(a) {
+										return _this4.onBlur(a);
+									}, onChange: function onChange(a) {
+										return _this4.onChange(a);
+									}, value: this.state.sampleUrl })
+							),
+							!this.state.hostNameValid ? _react2.default.createElement(
+								_Col2.default,
+								{ xs: 12 },
+								_react2.default.createElement(
+									'span',
+									{ style: { color: "red" } },
+									'Url should be from your website only'
+								)
+							) : null
+						),
+						_react2.default.createElement(
+							_Row2.default,
+							{ className: 'butttonsRow' },
+							_react2.default.createElement(
+								_Col2.default,
+								{ xs: 6 },
+								_react2.default.createElement(
+									_Button2.default,
+									{ ref: 'saveUrl', onClick: function onClick(a) {
+											return _this4.saveSampleUrl(a);
+										}, className: 'btn-lightBg btn-save' },
+									'Save Url'
+								)
+							),
+							_react2.default.createElement(
+								_Col2.default,
+								{ xs: 6 },
+								_react2.default.createElement(
+									_Button2.default,
+									{ onClick: function onClick(a) {
+											return _this4.toggleSampleUrl(a);
+										}, className: 'btn-lightBg btn-cancel' },
+									'Cancel'
+								)
+							)
+						)
+					)
+				);
+			}
+		}]);
+
+		return info;
+	}(_react2.default.Component);
+
+	info.defaultProps = {};
+
+	exports.default = info;
+
+/***/ },
+/* 713 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Row = __webpack_require__(503);
+
+	var _Row2 = _interopRequireDefault(_Row);
+
+	var _Col = __webpack_require__(385);
+
+	var _Col2 = _interopRequireDefault(_Col);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var customToggleSwitch = function (_React$Component) {
+		_inherits(customToggleSwitch, _React$Component);
+
+		function customToggleSwitch(props) {
+			_classCallCheck(this, customToggleSwitch);
+
+			var _this = _possibleConstructorReturn(this, (customToggleSwitch.__proto__ || Object.getPrototypeOf(customToggleSwitch)).call(this, props));
+
+			_this.state = {
+				value: props.checked || false
+			};
+			return _this;
+		}
+
+		_createClass(customToggleSwitch, [{
+			key: 'componentWillMount',
+			value: function componentWillMount() {
+				if (this.props.attachToForm) {
+					this.props.attachToForm(this); // Attaching the component to the form
+				}
+			}
+		}, {
+			key: 'componentWillReceiveProps',
+			value: function componentWillReceiveProps(nextProps) {
+				if (this.props.checked !== nextProps.checked) {
+					this.setState({ value: nextProps.checked });
+				}
+			}
+		}, {
+			key: 'componentWillUnmount',
+			value: function componentWillUnmount() {
+				if (this.props.detachFromForm) {
+					this.props.detachFromForm(this); // Detaching if unmounting
+				}
+			}
+		}, {
+			key: 'setValue',
+			value: function setValue() {
+				this.props.onChange ? this.props.onChange(!this.state.value) : null;
+				this.setState({
+					value: !this.state.value
+				});
+			}
+		}, {
+			key: 'renderToggleSwitch',
+			value: function renderToggleSwitch() {
+				return _react2.default.createElement(
+					'div',
+					{ className: this.props.size === 's' ? 'toggle toggleSizeSmall' : 'toggle' },
+					_react2.default.createElement('input', { id: this.props.id, name: this.props.name, type: 'checkbox', checked: this.state.value, onChange: this.setValue.bind(this) }),
+					_react2.default.createElement(
+						'label',
+						{ htmlFor: this.props.id },
+						_react2.default.createElement('div', { className: 'toggleSwitch', 'data-on': this.props.on, 'data-off': this.props.off })
+					)
+				);
+			}
+
+			/**
+	   * Render horizontal layout of component
+	   * @param options
+	   * @returns {XML}
+	   */
+
+		}, {
+			key: 'renderHorizontalLayout',
+			value: function renderHorizontalLayout(options) {
+				var labelClassNames = options.defaultLayout ? '' : 'u-padding-r10px',
+				    componentClassNames = options.defaultLayout ? '' : 'u-padding-l10px';
+
+				return _react2.default.createElement(
+					'div',
+					{ className: options.errorClassName },
+					_react2.default.createElement(
+						_Col2.default,
+						{ className: labelClassNames, xs: 8 },
+						_react2.default.createElement(
+							'b',
+							null,
+							this.props.labelText
+						)
+					),
+					_react2.default.createElement(
+						_Col2.default,
+						{ className: componentClassNames, xs: 4 },
+						this.renderToggleSwitch()
+					)
+				);
+			}
+
+			/**
+	   * Render vertical layout of component
+	   * @param options
+	   * @returns {XML}
+	   */
+
+		}, {
+			key: 'renderVerticalLayout',
+			value: function renderVerticalLayout(options) {
+				var labelClassNames = options.defaultLayout ? '' : 'u-padding-b5px',
+				    componentClassNames = options.defaultLayout ? '' : 'u-padding-0px';
+
+				return _react2.default.createElement(
+					'div',
+					{ className: options.errorClassName },
+					_react2.default.createElement(
+						_Col2.default,
+						{ className: labelClassNames, xs: 12, md: 12 },
+						_react2.default.createElement(
+							'b',
+							null,
+							this.props.labelText
+						)
+					),
+					_react2.default.createElement(
+						_Col2.default,
+						{ className: componentClassNames, xs: 12, md: 12 },
+						this.renderToggleSwitch()
+					)
+				);
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+
+				// We create variables that states how the input should be marked.
+				// Should it be marked as valid? Should it be marked as required?
+				var options = {
+					errorClassName: 'clearfix',
+					layout: this.props.layout.toLowerCase() ? this.props.layout.toLowerCase() : 'horizontal',
+					layoutClassName: 'form-group',
+					defaultLayout: this.props.defaultLayout,
+					classNamesProps: this.props.className && this.props.className.length > 0 ? this.props.className : ''
+				};
+
+				if (options.layout === 'vertical') {
+					options.layoutClassName += ' form-group--vertical';
+				} else if (options.layout === 'horizontal') {
+					options.layoutClassName += ' form-group--horizontal';
+				}
+
+				// Concatenate props class names
+				options.layoutClassName += ' ' + options.classNamesProps;
+
+				return _react2.default.createElement(
+					_Row2.default,
+					{ key: this.props.name, className: options.layoutClassName },
+					options.layout === 'vertical' ? this.renderVerticalLayout(options) : this.renderHorizontalLayout(options)
+				);
+			}
+		}]);
+
+		return customToggleSwitch;
+	}(_react2.default.Component);
+
+	customToggleSwitch.defaultProps = {
+		on: 'Enable',
+		off: 'Disable',
+		defaultLayout: false
+	};
+
+	exports.default = customToggleSwitch;
+
+/***/ },
+/* 714 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Row = __webpack_require__(503);
+
+	var _Row2 = _interopRequireDefault(_Row);
+
+	var _Button = __webpack_require__(371);
+
+	var _Button2 = _interopRequireDefault(_Button);
+
+	var _Col = __webpack_require__(385);
+
+	var _Col2 = _interopRequireDefault(_Col);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var closeChannel = function (_React$Component) {
+		_inherits(closeChannel, _React$Component);
+
+		function closeChannel() {
+			_classCallCheck(this, closeChannel);
+
+			return _possibleConstructorReturn(this, (closeChannel.__proto__ || Object.getPrototypeOf(closeChannel)).apply(this, arguments));
+		}
+
+		_createClass(closeChannel, [{
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(
+						'div',
+						{ className: 'installBtnBg' },
+						_react2.default.createElement(
+							_Row2.default,
+							null,
+							_react2.default.createElement(
+								_Col2.default,
+								{ md: 12 },
+								_react2.default.createElement(
+									_Button2.default,
+									{ onClick: this.props.closeChannelById, className: 'btn-lightBg btn-save btn-block' },
+									'Close channel'
+								)
+							)
+						)
+					)
+				);
+			}
+		}]);
+
+		return closeChannel;
+	}(_react2.default.Component);
+
+	closeChannel.defaultProps = {};
+
+	exports.default = closeChannel;
 
 /***/ }
 /******/ ]);
