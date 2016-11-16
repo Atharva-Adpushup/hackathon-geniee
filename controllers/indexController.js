@@ -64,7 +64,9 @@ router
 	.get('/signup', function (req, res) {
 		res.render('signup');
 	})
-
+	.get('/403', function(req, res) {
+		res.render('403');
+	})
 	.post('/login', function (req, res) {
 		req.body.email = utils.sanitiseString(req.body.email);
 

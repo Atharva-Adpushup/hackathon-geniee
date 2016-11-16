@@ -1,0 +1,16 @@
+extends layout/base
+
+block getTitle
+    - var titleVar = "403 Frobidden"
+
+block bodyContent
+    .errorMain
+        .container
+            .row
+                .col-sm-12
+                    ul
+                        li Permission Denied!
+                        li 403
+                    section.txt.animated.In.fadeInDown
+                        h4
+                            | You are not allowed to perform this action.
