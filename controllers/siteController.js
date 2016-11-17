@@ -59,40 +59,20 @@ router
             });
     })
     .get('/:siteId/editor', function (req, res) {
-        // userModel.verifySiteOwner(req.session.user.email, parseInt(req.query.siteId, 10))
-        // 	.then(function(json) {
-        // 		if (!json) {
-        // 			throw new Error('User for site is not verified');
-        // 		} else {
-        // 			return { user: json.user.data, siteId: req.query.siteId, domain: json.site.domain };
-        // 		}
-        // 	}).then(function(json) {
-        // 		return siteModel.getSiteById(json.siteId).then(function() {
-        // 			json.hasSiteObject = true;
-        // 			return json;
-        // 		}, function() {
-        // 			json.hasSiteObject = false;
-        // 			return json;
-        // 		});
-        // 	}).then(function(json) {
-        // 		json.isSuperUser = req.session.isSuperUser ? true : false;
-        // 		json.isChrome = _.matches(req.headers['user-agent'], 'Chrome');
-        // 		return json;
-        // 	}).then(function(json) {
-        // 		return res.render('editor', json);
-        // 	})
-        // 	.catch(function(err) {
-        // 		res.send('err: ' + err.toString());
-        // 	});
-        return res.render('editor', {
-            isChrome: true,
-            domain: 'http://www.articlemyriad.com',
-            siteId: req.params.siteId,
-            environment: config.development.HOST_ENV
-        });
+        userModel.verifySiteOwner(req.session.user.email, req.params.siteId)
+            .then(function(data) {
+                return res.render('editor', {
+                    isChrome: true,
+                    domain: data.site.domain,
+                    siteId: data.site.siteId,
+                    environment: config.development.HOST_ENV
+                });
+            })
+            .catch(function() {
+                return res.redirect('/403');
+            });
     })
     .get('/:siteId/dashboard', function (req, res) {
-        return res.send('dashboard')
         siteModel.getSitePageGroups(req.params.siteId)
             .then(function (pageGroups) {
                 res.render('dashboard', {
