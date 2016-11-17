@@ -27,6 +27,8 @@ html
 				br
 				input(type="text" placeholder="Enter pagegroup name" name="pageGroupName")
 				br
+				input(type="text" placeholder="Enter pagegroup id" name="pageGroupId")
+				br
 				input(type="text" placeholder="Enter sample url" name="sampleUrl")
 				br
 				select(name="device")
@@ -86,6 +88,7 @@ html
 					data: {
 						siteId: json.siteId,
 						pageGroupName: json.pageGroupName,
+						pageGroupId: json.pageGroupId,
 						sampleUrl: json.sampleUrl,
 						device: json.device
 					},
