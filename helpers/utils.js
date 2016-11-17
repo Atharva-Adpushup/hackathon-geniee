@@ -7,7 +7,7 @@ var url = require('url'),
 	_ = require('lodash'),
 	API = {
 		convertPagegroupLink: function(pageGroupId, pageGroupName, siteId) {
-			return '<a href="/site/'+siteId+'/pagegroup/'+pageGroupId+'">'+pageGroupName+'</a>';
+			return '<a href="/user/site/'+siteId+'/pagegroup/'+pageGroupId+'">'+pageGroupName+'</a>';
 		},
 		getPageGroupPattern: function(pageGroup, patterns) {
 			if(patterns.length) {
