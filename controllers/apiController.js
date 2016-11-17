@@ -20,6 +20,7 @@ router
 			json.partner = 'geniee';
 		}
 		var partnerEmail = json.partner + '@adpushup.com', siteId;
+		json.ownerEmail = partnerEmail;
 
 		// Function to create partner user account and site
 		function createPartnerAndSite() {
