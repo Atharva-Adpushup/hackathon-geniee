@@ -77,7 +77,6 @@ couchBaseService.connectToAppBucket().then(function () {
 
 	// Setting template local variables for jade
 	app.use(function (req, res, next) {
-		app.locals.siteId = 123;
 		app.locals.isSuperUser = (req.session.isSuperUser) ? true : false;
 		app.locals.usersList = (req.session.usersList) ? req.session.usersList : [];
 		app.locals.environment = config.development.HOST_ENV;

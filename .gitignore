@@ -29,3 +29,5 @@ public/assets/js/gieneeApEditor/
 Editor/build/
 *.map
 public/assets/js/builds/genieeAp.js
+public/assets/js/builds/inner.js
+public/assets/js/builds/outer.js
