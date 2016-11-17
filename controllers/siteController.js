@@ -44,7 +44,7 @@ router
             });
     })
     .post('/:siteId/savePageGroupPattern', function (req, res) {
-        var json = { siteId: req.body.siteId, pageGroupName: req.body.pageGroupName, pageGroupPattern: req.body.pageGroupPattern };
+        var json = { siteId: req.params.siteId, pageGroupName: req.body.pageGroupName, pageGroupPattern: req.body.pageGroupPattern };
         siteModel.setPagegroupPattern(json)
             .then(function (data) {
                 res.send({ success: 1 });
@@ -75,7 +75,7 @@ router
     .get('/:siteId/dashboard', function (req, res) {
         siteModel.getSitePageGroups(req.params.siteId)
             .then(function (pageGroups) {
-                res.render('dashboard', {
+                return res.render('dashboard', {
                     pageGroups: pageGroups,
                     siteId: req.params.siteId
                 });
