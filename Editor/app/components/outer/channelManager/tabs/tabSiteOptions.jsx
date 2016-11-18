@@ -5,7 +5,9 @@ import $ from 'jquery';
 import Utils from 'libs/utils';
 
 const showSiteModesPopover = (props, ev) => {
-		const positionOffsets = Utils.ui.outerMenuRenderPosition($(ev.target));
+		const isLabelParent = $(ev.target).parent().hasClass('js-modes-label'),
+			$el = isLabelParent ? $(ev.target).parent() : $(ev.target),
+			positionOffsets = Utils.ui.outerMenuRenderPosition($el);
 
 		props.showPublisherHelper(positionOffsets);
 	},
@@ -14,14 +16,14 @@ const showSiteModesPopover = (props, ev) => {
 	<div className="modes modes--stateChange">
 		<input type="radio" className="modes-input modes-input-off" name="view" value="editor" id="draftmode" checked={props.siteMode === siteModes.DRAFT} />
 		<OverlayTrigger placement="bottom" overlay={<Tooltip id="siteModesPause">{props.siteMode === siteModes.DRAFT ? 'AdPushup is currently paused' : 'Pause AdPushup'}</Tooltip>}>
-			<label onClick={props.showPublisherHelper} htmlFor="draftmode" className="modes-label modes-label-off">
+			<label onClick={props.showPublisherHelper} htmlFor="draftmode" className="modes-label modes-label-off js-modes-label">
 				<i className="fa fa-pause" />
 			</label>
 		</OverlayTrigger>
 
 		<input type="radio" className="modes-input modes-input-on" name="view" value="browse" id="publishmode" checked={props.siteMode === siteModes.PUBLISH} />
 		<OverlayTrigger placement="bottom" overlay={<Tooltip id="siteModesLive">{props.siteMode === siteModes.PUBLISH ? 'AdPushup is currently optimizing your website' : 'Start Optimization'}</Tooltip>}>
-			<label onClick={props.showPublisherHelper} htmlFor="publishmode" className="modes-label modes-label-on">
+			<label onClick={props.showPublisherHelper} htmlFor="publishmode" className="modes-label modes-label-on js-modes-label">
 				<i className="fa fa-play" />
 			</label>
 		</OverlayTrigger>

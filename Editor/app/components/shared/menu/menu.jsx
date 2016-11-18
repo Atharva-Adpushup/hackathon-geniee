@@ -55,11 +55,11 @@ class Menu extends React.Component {
 	getArrowClass() {
 		switch (this.props.arrow) {
 			case 'top':
-				return 'arrowTop';
+				return 'arrowTop js-arrow js-arrow--top';
 			case 'none':
 				return '';
 			default:
-				return 'arrowBottom';
+				return 'arrowBottom js-arrow js-arrow--bottom';
 		}
 	}
 
@@ -77,8 +77,8 @@ class Menu extends React.Component {
 			<div >
 				<Glass clickHandler={this.props.onGlassClick} />
 				<div id={this.props.id ? this.props.id : null} ref="main" style={style}>
-					<div className={`MenuBarComponentWrap ${this.getMenuOrientationClass()}`}>
-						<ul ref="toolBar" className={`MenuBarWrapper  + ${this.getArrowClass()}`}>
+					<div className={`MenuBarComponentWrap ${this.getMenuOrientationClass()} js-menuBar`}>
+						<ul ref="toolBar" className={`MenuBarWrapper  + ${this.getArrowClass()} js-menuBar-wrapper`}>
 							{
 								this.props.children.map((el, index) => {
 									const elm = React.cloneElement(el, {

@@ -387,13 +387,20 @@ const randomStore = [],
 					targetHeight = $target.height(),
 					windowHeight = $(window).height(),
 					rightSpace = vP.width - contextRight,
-					variationBarHeight = $('#variationManager').height();
+					variationBarHeight = $('#variationManager').height(),
+					$menuBarList = $('.js-menuBar > .js-menuBar-wrapper'),
+					isArrowMenu = $menuBarList.hasClass('js-arrow'),
+					arrowMenuLeft = ((contextLeft + context.width / 2) - ($menuBarList.width() / 2)),
+					arrowMenuTop = (contextTop + context.height + 7);
 
 				let top,
 					left;
 
 				if (rightSpace >= targetWidth) {
-					left = contextRight;
+					// If menu has an arrow, then menu left offset will be
+					// the addition of context element (left and half of width) and subtraction of menu bar list(half of width)
+					// Else, left offset will be the context element right
+					left = (isArrowMenu) ? arrowMenuLeft : contextRight;
 				} else if (contextLeft >= targetWidth) {
 					left = contextLeft - targetWidth;
 				} else {
@@ -401,7 +408,10 @@ const randomStore = [],
 				}
 
 				if ((windowHeight - contextTop) >= targetHeight) {
-					top = contextTop;
+					// If menu has an arrow, then menu top offset will be
+					// the addition of context element (top, half of height) and menu bar list (arrow height)
+					// Else, top offset will be the context element top
+					top = (isArrowMenu) ? arrowMenuTop : contextTop;
 				} else {
 					top = (windowHeight - targetHeight) - variationBarHeight;
 				}

@@ -60,11 +60,26 @@ class siteModesPopover extends React.Component {
 		this.props.hideMenu();
 	}
 
+	getPositionOffsets() {
+		const leftArrowOffset = 7,
+			// Below variable adds the left offset adjustment done to make arrow
+			// appear pixel-perfect
+			targetLeftPosition = (this.props.position.width / 2) + (leftArrowOffset * 2),
+			positionObj = {
+				// 7px offset is popover arrow height
+				top: (this.props.position.top + this.props.position.height + 7),
+				left: (this.props.position.left + targetLeftPosition) - 300
+			};
+
+		return positionObj;
+	}
+
 	render() {
-		const style = {
+		const positionOffsets = this.getPositionOffsets(),
+			style = {
 				position: 'absolute',
-				top: this.props.position.top,
-				left: this.props.position.left - 300,
+				top: positionOffsets.top,
+				left: positionOffsets.left,
 				zIndex: 10000,
 				backgroundColor: 'white',
 				boxShadow: '0 1px 10px 0 rgba(0, 0, 0, 0.3)',
