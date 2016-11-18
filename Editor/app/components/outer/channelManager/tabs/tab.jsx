@@ -15,6 +15,7 @@ const empyScreen = () => (<div className="tabContentbg" />),
 			tabPane.props.handleClick(tabPane.key);
 		}
 	},
+	dashboardLink = currentUser.userType === 'partner' ? `/user/site/${currentSiteId}/dashboard` : `/user/dashboard`,
 	// eslint-disable-next-line react/no-multi-comp
 	Tab = (props) => (
 		<div className="tabAreaWrap">
@@ -22,7 +23,7 @@ const empyScreen = () => (<div className="tabContentbg" />),
 				<div className="borderBot" />
 				<div className="tabBar">
 					<OverlayTrigger placement="right" overlay={<Tooltip id="goToDashboard">Goto Dashboard</Tooltip>}>
-						<Button className="btn btn-sm btn-flat" href="/user/dashboard"><i className="fa fa-arrow-left" /></Button>
+						<Button className="btn btn-sm btn-flat" href={dashboardLink}><i className="fa fa-arrow-left" /></Button>
 					</OverlayTrigger>
 					<ul>
 						<OverlayTrigger placement="right" overlay={<Tooltip id="createLoadPageGroup" >Create/Load PageGroup</Tooltip>}>

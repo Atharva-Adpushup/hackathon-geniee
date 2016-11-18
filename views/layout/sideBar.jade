@@ -22,37 +22,55 @@ nav.pageLeftSidebar.sidebar
         //-             | Settings
         //-             span.icon-thumbnail#sidebar-settings-icon-thumbnail
         //-                 i.fa.fa-cog#sidebar-settings-icon
-        ul.menuItems
-            li.mt-30.sidebar-menu-item
-                a(id="sidebar-dashboard-link", href='/user/dashboard')
-                    | Dashboard
-                    span.icon-thumbnail#sidebar-dashboard-icon-thumbnail
-                        i.fa.fa-tachometer#sidebar-dashboard-icon
-            li.sidebar-menu-item
-                a(id="sidebar-new-website-link", href='#', data-toggle='modal', data-target='#addSite')
-                    | Add New Website
-                    span.icon-thumbnail#sidebar-new-website-icon-thumbnail
-                        i.fa.fa-plus#sidebar-new-website-icon
-            //- li.sidebar-menu-item
-            //-     a(id="sidebar-billing-link", href='/user/billing')
-            //-         | Billing
-            //-         span.icon-thumbnail#sidebar-billing-icon-thumbnail
-            //-             i.fa.fa-dollar#sidebar-billing-icon
-            li.sidebar-menu-item
-                a(id="sidebar-reports-link", href='/user/reports/adsense')
-                    | Reports
-                    span.icon-thumbnail#sidebar-reports-icon-thumbnail
-                        i.fa.fa-bar-chart#sidebar-reports-icon
-            li.sidebar-menu-item
-                a(id="sidebar-profile-link", href='/user/profile')
-                    | Update Profile
-                    span.icon-thumbnail#sidebar-settings-icon-thumbnail
-                        i.fa.fa-user#sidebar-settings-icon
-            li.sidebar-menu-item
-                a(id="sidebar-logout-link", href='/user/logout')
-                    | Logout
-                    span.icon-thumbnail#sidebar-logout-icon-thumbnail
-                        i.fa.fa-sign-out#sidebar-logout-icon
+        if !partner
+            ul.menuItems
+                li.mt-30.sidebar-menu-item
+                    a(id="sidebar-dashboard-link", href='/user/dashboard')
+                        | Dashboard
+                        span.icon-thumbnail#sidebar-dashboard-icon-thumbnail
+                            i.fa.fa-tachometer#sidebar-dashboard-icon
+                li.sidebar-menu-item
+                    a(id="sidebar-new-website-link", href='#', data-toggle='modal', data-target='#addSite')
+                        | Add New Website
+                        span.icon-thumbnail#sidebar-new-website-icon-thumbnail
+                            i.fa.fa-plus#sidebar-new-website-icon
+                //- li.sidebar-menu-item
+                //-     a(id="sidebar-billing-link", href='/user/billing')
+                //-         | Billing
+                //-         span.icon-thumbnail#sidebar-billing-icon-thumbnail
+                //-             i.fa.fa-dollar#sidebar-billing-icon
+                li.sidebar-menu-item
+                    a(id="sidebar-reports-link", href='/user/reports/adsense')
+                        | Reports
+                        span.icon-thumbnail#sidebar-reports-icon-thumbnail
+                            i.fa.fa-bar-chart#sidebar-reports-icon
+                li.sidebar-menu-item
+                    a(id="sidebar-profile-link", href='/user/profile')
+                        | Update Profile
+                        span.icon-thumbnail#sidebar-settings-icon-thumbnail
+                            i.fa.fa-user#sidebar-settings-icon
+                li.sidebar-menu-item
+                    a(id="sidebar-logout-link", href='/user/logout')
+                        | Logout
+                        span.icon-thumbnail#sidebar-logout-icon-thumbnail
+                            i.fa.fa-sign-out#sidebar-logout-icon
+        else
+             ul.menuItems
+                li.mt-30.sidebar-menu-item
+                    a(id="sidebar-dashboard-link", href='/user/site/#{siteId}/dashboard')
+                        | Dashboard
+                        span.icon-thumbnail#sidebar-dashboard-icon-thumbnail
+                            i.fa.fa-tachometer#sidebar-dashboard-icon
+                li.sidebar-menu-item
+                    a(id="sidebar-reports-link", href='/user/site/#{siteId}/reports/performance')
+                        | Reports
+                        span.icon-thumbnail#sidebar-reports-icon-thumbnail
+                            i.fa.fa-bar-chart#sidebar-reports-icon
+                li.sidebar-menu-item
+                    a(id="sidebar-settings-link", href='/user/site/#{siteId}/settings')
+                        | Settings
+                        span.icon-thumbnail#sidebar-settings-icon-thumbnail
+                            i.fa.fa-cog#sidebar-settings-icon
 // Modal
 #addSite.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
     .modal-dialog

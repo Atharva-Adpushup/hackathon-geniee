@@ -15,7 +15,7 @@ class InlineEdit extends React.Component {
 	}
 
 	cancelEdit() {
-		this.setState({ editMode: false });
+		this.setState({ editMode: false, inputError: false });
 	}
 
 	submitValue() {

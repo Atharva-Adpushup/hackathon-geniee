@@ -11,13 +11,15 @@ const getLastVariationNumber = function (variations) {
 	},
 	addVariation = (channelId) => (dispatch, getState) => {
 		const variationId = Utils.getRandomNumber(),
-			state = getState();
+			state = getState(),
+			variationCount = getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1,
+			variationName = isNaN(variationCount) ? variationId : variationCount;
 		dispatch({
 			type: variationActions.ADD_VARIATION,
 			channelId,
 			variationId,
 			payload: {
-				name: `Variation ${getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1}`,
+				name: `Variation ${variationName}`,
 				trafficDistribution: 0,
 				id: variationId,
 				createTs: Math.floor(Date.now() / 1000),
@@ -77,6 +79,14 @@ const getLastVariationNumber = function (variations) {
 	},
 	setActiveVariation = (variationId) => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
 	updateVariation = (variationId, payload) => ({ type: variationActions.UPDATE_VARIATION, variationId, payload }),
-	editVariationName = (variationId, name) => ({ type: variationActions.EDIT_VARIATION_NAME, variationId, name }),
+	editVariationName = (variationId, channelId, name) => (dispatch, getState) => {
+		const variations = getChannelVariations(getState(), { channelId }),
+			arr = _.map(variations, (data) => { return data; });
+		if (_.find(arr, { name: name })) {
+			alert('Cannot create variation with same name!');
+			return;
+		}
+		dispatch({ type: variationActions.EDIT_VARIATION_NAME, variationId, name });
+	},
 	editTrafficDistribution = (variationId, trafficDistribution) => ({ type: variationActions.EDIT_TRAFFIC_DISTRIBUTION, variationId, trafficDistribution });
 export { addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation, editVariationName, editTrafficDistribution };

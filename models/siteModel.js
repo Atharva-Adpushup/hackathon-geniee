@@ -138,6 +138,7 @@ function apiModule() {
 			var json = { siteName: data.siteName, siteDomain: data.siteDomain };
 			if (data.partner) {
 				json.partner = data.partner;
+				json.ownerEmail = data.ownerEmail;
 			}
 			return globalModel.incrSiteId()
 				.then(function (siteId) {

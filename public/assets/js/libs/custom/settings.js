@@ -2,11 +2,10 @@ $(document).ready(function () {
     (function (w) {
         $('.addPageGroupPattern').on('submit', function (e) {
             e.preventDefault();
-            var values = $(this).serializeArray(), json = {}, siteId = w.location.pathname.split('/')[2];
+            var values = $(this).serializeArray(), json = {};
             $.each(values, function () { json[this.name] = this.value || '' });
 
-            $.post('/site/' + siteId + '/savePageGroupPattern', {
-                siteId: siteId,
+            $.post('savePageGroupPattern', {
                 pageGroupName: json.pageGroupName,
                 pageGroupPattern: json.pageGroupPattern
             }, function (res) {
@@ -14,7 +13,7 @@ $(document).ready(function () {
                     alert('Pagegroup pattern saved!');
                 }
                 else {
-                    alert(res.message);
+                    alert('Some error occurred!');
                 }
             });
         });

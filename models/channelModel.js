@@ -27,11 +27,12 @@ var model = require('../helpers/model'),
 			'contentSelectorMissing',
 			'activeVariation',
 			'dateCreated',
-			'dateModified'
+			'dateModified',
+			'genieePageGroupId'
 		];
 		this.clientKeys = [
 			'id', 'siteDomain', 'channelName', 'platform', 'pageGroup', 'variations', 'sampleUrl',
-			'contentSelector', 'contentSelectorMissing', 'activeVariation'
+			'contentSelector', 'contentSelectorMissing', 'activeVariation', 'genieePageGroupId'
 		];
 		this.validations = {
 			'required': []
@@ -67,7 +68,7 @@ function apiModule() {
 					if(!_.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])) { 
 						site.get('cmsInfo').pageGroups.push({ sampleUrl: json.sampleUrl, pageGroup: json.pageGroupName.toUpperCase() });
 					}
-					channelData = { siteDomain: site.data.siteDomain, siteId: site.data.siteId, sampleUrl: json.sampleUrl, platform: json.device.toUpperCase(), pageGroup: json.pageGroupName.toUpperCase(), id: uuid.v4(), channelName: json.pageGroupName.toUpperCase()+'_'+json.device.toUpperCase() };
+					channelData = { siteDomain: site.data.siteDomain, siteId: site.data.siteId, sampleUrl: json.sampleUrl, platform: json.device.toUpperCase(), pageGroup: json.pageGroupName.toUpperCase(), id: uuid.v4(), channelName: json.pageGroupName.toUpperCase()+'_'+json.device.toUpperCase(), genieePageGroupId: json.pageGroupId };
 					return API.saveChannel(json.siteId, json.device, json.pageGroupName, channelData)
 					.then(function(res) {
 						site.save();
