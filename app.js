@@ -81,6 +81,7 @@ couchBaseService.connectToAppBucket().then(function () {
 		app.locals.usersList = (req.session.usersList) ? req.session.usersList : [];
 		app.locals.environment = config.development.HOST_ENV;
 		app.locals.currentUser = (req.session.user) ? req.session.user : {};
+		app.locals.currentSiteId = (req.session.siteId) ? req.session.siteId : null;
 		app.locals.partner = (req.session.partner) ? req.session.partner : null;
 		// unSavedSite, template local for showing unsaved site
 		// prefilled in 'Add a site' modal's url field

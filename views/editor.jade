@@ -22,6 +22,8 @@ block append headScripts
     - isEnvironmentProduction = environment == "production";
 
     script(type="text/javascript").
+        var currentUser = !{JSON.stringify(currentUser)},
+            currentSiteId = !{JSON.stringify(currentSiteId)};
         window.ADP_BASEURL = "#{consts.BASE_URL}";
         window.ADP_ORIGIN = "#{consts.PROXY_ORIGIN}";
         window.ADP_SITE_DOMAIN = "#{domain}";
