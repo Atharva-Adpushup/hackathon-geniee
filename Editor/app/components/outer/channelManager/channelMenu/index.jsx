@@ -3,8 +3,9 @@ import Menu from 'shared/menu/menu.jsx';
 import MenuItem from 'shared/menu/menuItem.jsx';
 import Info from './info.jsx';
 import CloseChannel from './closeChannel.jsx';
+import NumericCollectionManager from 'components/shared/NumericCollectionManager/index.jsx';
 
-const channelMenu = ({ isVisible, allChannels, activeChannelId,
+const channelMenu = ({ isVisible, activeChannelId, allTrafficDistributions, editTrafficDistribution,
 	position, hideMenu, saveSampleUrl, channel, partner, closeChannel }) => {
 
 	if (!isVisible) {
@@ -17,6 +18,12 @@ const channelMenu = ({ isVisible, allChannels, activeChannelId,
 		},
 		closeChannelById = () => {
 			closeChannel(activeChannelId);
+		},
+		saveTrafficDistributions = (config) => {
+			Object.keys(config).forEach((key) => {
+				const value = config[key];
+				editTrafficDistribution(key, value);
+			});
 		};
 
 	items.push((
@@ -26,7 +33,13 @@ const channelMenu = ({ isVisible, allChannels, activeChannelId,
 	));
 
 	items.push((
-		<MenuItem key={2} icon="fa fa-times" contentHeading="Close Channel">
+		<MenuItem key={2} icon="fa fa-exchange" contentHeading="Traffic Distribution">
+			<NumericCollectionManager collection={allTrafficDistributions} title={channel.channelName} onSave={a => saveTrafficDistributions(a)} />
+		</MenuItem>
+	));
+
+	items.push((
+		<MenuItem key={3} icon="fa fa-times" contentHeading="Close Channel">
 			<CloseChannel closeChannelById={closeChannelById} />
 		</MenuItem>
 	));

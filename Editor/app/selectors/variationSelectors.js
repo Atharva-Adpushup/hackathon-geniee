@@ -20,6 +20,12 @@ const getAllVariations = (state) => state.variationByIds,
 		return _.filter(allVariations, (variation, variationId) => variations.indexOf(variationId) !== -1);
 	}),
 
+	getActiveChannelVariationsTrafficDistributions = createSelector([getActiveChannelVariations], (allVariations) => {
+		return allVariations.map((variation) => {
+			return { name: variation.name, value: variation.trafficDistribution, id: variation.id };
+		});
+	}),
+
 	getChannelVariations = createSelector([getChannel, getAllVariations], (channel = {}, allVariations) => {
 		const variations = channel.variations || [];
 		return _.filter(allVariations, (variation, variationId) => variations.indexOf(variationId) !== -1);
@@ -54,5 +60,5 @@ getChannelVariationsWithAds = createSelector([getChannelVariations, getAllSectio
 export {
 	getAllVariations, getVariationSectionsWithAds, getActiveChannelActiveVariation,
 	getActiveChannelVariations, getActiveChannelActiveVariationId, getActiveChannelVariationsWithAds,
-	getChannelVariationsWithAds, getChannelVariations, getVariationStructuredSectionsWithAds
+	getChannelVariationsWithAds, getActiveChannelVariationsTrafficDistributions, getChannelVariations, getVariationStructuredSectionsWithAds
 };

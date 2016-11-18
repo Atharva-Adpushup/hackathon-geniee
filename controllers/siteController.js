@@ -65,7 +65,8 @@ router
                     isChrome: true,
                     domain: data.site.domain,
                     siteId: data.site.siteId,
-                    environment: config.development.HOST_ENV
+                    environment: config.development.HOST_ENV,
+                    currentSiteId: req.params.siteId
                 });
             })
             .catch(function() {
