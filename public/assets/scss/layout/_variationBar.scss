@@ -18,6 +18,10 @@
     font-family: $fontFamily;
     cursor: pointer;
     @include css3-prefix(transition, background-color .12s ease-in-out);
+    max-width: 200px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .active-variation {

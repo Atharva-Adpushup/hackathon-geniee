@@ -11,13 +11,15 @@ const getLastVariationNumber = function (variations) {
 	},
 	addVariation = (channelId) => (dispatch, getState) => {
 		const variationId = Utils.getRandomNumber(),
-			state = getState();
+			state = getState(),
+			variationCount = getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1,
+			variationName = isNaN(variationCount) ? variationId : variationCount;
 		dispatch({
 			type: variationActions.ADD_VARIATION,
 			channelId,
 			variationId,
 			payload: {
-				name: `Variation ${getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1}`,
+				name: `Variation ${variationName}`,
 				trafficDistribution: 0,
 				id: variationId,
 				createTs: Math.floor(Date.now() / 1000),
