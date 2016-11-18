@@ -51,7 +51,7 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 		const variationSections = getVariationSectionsWithAds(getState(), { variationId }).sections,
 			arr = _.map(variationSections, (data) => { return data });
 		if (_.find(arr, { name: name })) {
-			alert('Cannot create section with same section name');
+			alert('Cannot create section with same section name!');
 			return;
 		}
 

@@ -15,7 +15,7 @@ const variationOtions = (props) => {
 					Variation Name
 				</Col>
 				<Col className="u-padding-l10px" xs={4}>
-					<InlineEdit value={variation.name} submitHandler={onEditVariationName.bind(null, variation.id)} text="Variation Name" errorMessage="Variation Name cannot be blank" />
+					<InlineEdit value={variation.name} submitHandler={onEditVariationName.bind(null, variation.id, channelId)} text="Variation Name" errorMessage="Variation Name cannot be blank" />
 				</Col>
 			</Row>
 			<Row>

@@ -77,6 +77,14 @@ const getLastVariationNumber = function (variations) {
 	},
 	setActiveVariation = (variationId) => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
 	updateVariation = (variationId, payload) => ({ type: variationActions.UPDATE_VARIATION, variationId, payload }),
-	editVariationName = (variationId, name) => ({ type: variationActions.EDIT_VARIATION_NAME, variationId, name }),
+	editVariationName = (variationId, channelId, name) => (dispatch, getState) => {
+		const variations = getChannelVariations(getState(), { channelId }),
+			arr = _.map(variations, (data) => { return data; });
+		if (_.find(arr, { name: name })) {
+			alert('Cannot create variation with same name!');
+			return;
+		}
+		dispatch({ type: variationActions.EDIT_VARIATION_NAME, variationId, name });
+	},
 	editTrafficDistribution = (variationId, trafficDistribution) => ({ type: variationActions.EDIT_TRAFFIC_DISTRIBUTION, variationId, trafficDistribution });
 export { addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation, editVariationName, editTrafficDistribution };
