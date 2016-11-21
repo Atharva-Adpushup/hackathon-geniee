@@ -8,13 +8,13 @@ const newChannelMenu = ({ isVisible, channels, position, hideMenu, openChannel, 
 		return null;
 	}
 	const items = [];
-	if (partner !== 'geniee') {
+	/*if (partner !== 'geniee') {
 		items.push((
 			<MenuItem key={1} icon="fa-sitemap" contentHeading="Section Options">
 				<div>Test</div>
 			</MenuItem>
 		));
-	}
+	}*/
 	items.push((
 		<MenuItem key={1} icon="fa-sitemap" contentHeading="Section Options">
 			<ChannelList channels={channels} onClick={openChannel} />
