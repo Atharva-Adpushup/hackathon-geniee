@@ -15,6 +15,7 @@ const adsByIds = (state = {}, action) => {
 					css: payload.css,
 					height: payload.height,
 					width: payload.width,
+					network: payload.network
 				},
 			};
 

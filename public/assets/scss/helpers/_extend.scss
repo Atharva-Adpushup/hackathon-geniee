@@ -188,8 +188,14 @@ collapsedextended
 .u-margin-t10px {
 	margin-top: $FMLayoutDimension !important;
 }
+.u-margin-t15px {
+	margin-top: $FMLayoutDimension + $FMLayoutDimension/2  !important;	
+}
 .u-margin-t5px {
 	margin: $FMLayoutDimension/2 0 0 !important;
+}
+.u-margin-b15px {
+	margin-bottom: $FMLayoutDimension + $FMLayoutDimension/2  !important;	
 }
 
 

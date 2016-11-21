@@ -29,15 +29,21 @@ class customToggleSwitch extends React.Component {
 	}
 
 	setValue() {
-		this.props.onChange ? this.props.onChange(!this.state.value) : null;
-		this.setState({
-			value: !this.state.value
-		});
+		if (!this.props.disabled) {
+			this.props.onChange ? this.props.onChange(!this.state.value) : null;
+			this.setState({
+				value: !this.state.value
+			});
+		}
 	}
 
 	renderToggleSwitch() {
+		let rootClassName = (this.props.size === 's' ? 'toggle toggleSizeSmall' : 'toggle');
+
+		rootClassName += (this.props.disabled ? ' toggle--disabled' : '');
+
 		return (
-			<div className={this.props.size === 's' ? 'toggle toggleSizeSmall' : 'toggle'}>
+			<div className={rootClassName}>
 				<input id={this.props.id} name={this.props.name} type="checkbox" checked={this.state.value} onChange={this.setValue.bind(this)} />
 				<label htmlFor={this.props.id}>
 					<div className="toggleSwitch" data-on={this.props.on} data-off={this.props.off}>
