@@ -89,7 +89,7 @@ class insertMenu extends React.Component {
 		} else if (props.partner === 'geniee') {
 			items.push((
 				<MenuItem key={1} icon="fa-sitemap" contentHeading="Section Options">
-					<SectionOptions onCreateAd={this.createSectionAndAd.bind(this)} onCancel={this.toggleExtraOptions.bind(this)} />
+					<SectionOptions firstFold={props.firstFold} onCreateAd={this.createSectionAndAd.bind(this)} onCancel={this.toggleExtraOptions.bind(this)} />
 				</MenuItem>
 			));
 		} else {

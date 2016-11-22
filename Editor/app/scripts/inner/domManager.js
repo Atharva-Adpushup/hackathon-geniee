@@ -33,7 +33,8 @@ const selectorator = new Selectorator(),
 		const xpath = selectorator.generate($el)[0],
 			insertOptions = getInsertOptions($el.get(0)),
 			position = Utils.dom.getElementBounds($el),
-			parents = [{ xpath, tagName: $el.prop('tagName') }];
+			parents = [{ xpath, tagName: $el.prop('tagName') }],
+			firstFold = Utils.dom.isElementInFirstFold($el);
 
 		$el.parents().each((index, parent) => {
 			if (parent.tagName !== 'HTML' && parent.tagName !== 'BODY') {
@@ -44,7 +45,7 @@ const selectorator = new Selectorator(),
 			}
 		});
 
-		return { xpath, insertOptions, parents, position };
+		return { xpath, insertOptions, parents, position, firstFold };
 	},
 	initDomEvents = ({ dispatch }) => {
 		$(document).ready(() => {
@@ -74,7 +75,8 @@ const selectorator = new Selectorator(),
 							sendMessage(messengerCommands.SHOW_INSERT_CONTEXTMENU, {
 								position: vitals.position,
 								parents: vitals.parents,
-								insertOptions: vitals.insertOptions
+								insertOptions: vitals.insertOptions,
+								firstFold: vitals.firstFold
 							});
 							dispatch(setElementSelectorCords(Utils.ui.getElementSelectorCords($target)));
 						}

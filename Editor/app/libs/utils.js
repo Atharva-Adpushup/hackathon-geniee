@@ -304,6 +304,12 @@ const randomStore = [],
 			return str.trim();
 		},
 		dom: {
+			isElementInFirstFold($el) {
+				const windowHeight = $(window).height(),
+					elTop = $el.offset().top;
+
+				return !!(windowHeight > elTop);
+			},
 			getElementBounds(w) {
 				const rect = w.get(0).getBoundingClientRect();
 				return {

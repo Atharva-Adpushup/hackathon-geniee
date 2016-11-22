@@ -11,7 +11,8 @@ const insertMenu = (state = { isVisible: false }, action) => {
 					xpath: payload.xpath,
 					insertOptions: payload.insertOptions,
 					parents: payload.parents,
-					position: payload.position
+					position: payload.position,
+					firstFold: payload.firstFold
 				};
 
 			case insertMenuActions.HIDE_MENU:

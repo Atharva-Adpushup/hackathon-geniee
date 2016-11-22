@@ -40,7 +40,8 @@ const messenger = new Messenger(),
 						sendMessage(messengerCommands.SHOW_INSERT_CONTEXTMENU, {
 							position: vitals.position,
 							parents: vitals.parents,
-							insertOptions: vitals.insertOptions
+							insertOptions: vitals.insertOptions,
+							firstFold: vitals.firstFold
 						});
 						dispatch(setElementSelectorCords(Utils.ui.getElementSelectorCords($el)));
 					}

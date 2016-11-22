@@ -19,8 +19,8 @@ class sectionOptions extends React.Component {
 		this.onCustomAdCodeChange = this.onCustomAdCodeChange.bind(this);
 		// Set initial state
 		this.state = {
-			position: null,
-			isAdInFirstFold: (props.adInFirstFold || false),
+			position: undefined,
+			isAdInFirstFold: (props.firstFold || false),
 			isAdAsync: true,
 			manageCustomCode: false,
 			customAdCode: ''
@@ -56,10 +56,11 @@ class sectionOptions extends React.Component {
 	}
 
 	render() {
+		const customAdCodeText = (this.state.customAdCode ? 'Edit' : 'Add'),
+			isAdCreateBtnDisabled = !!(typeof this.state.position !== 'undefined');
+
 		if (this.state.manageCustomCode) {
-			return (
-				<CodeBox code={this.state.customAdCode} onSubmit={this.onCustomAdCodeChange} onCancel={this.toggleCustomAdCode} />
-			);
+			return (<CodeBox code={this.state.customAdCode} onSubmit={this.onCustomAdCodeChange} onCancel={this.toggleCustomAdCode} />);
 		}
 
 		return (
@@ -78,13 +79,13 @@ class sectionOptions extends React.Component {
 				</Row>
 				<CustomToggleSwitch labelText="First fold" className="u-margin-t15px u-margin-b15px" defaultLayout checked={this.state.isAdInFirstFold} name="adInFirstFold" onChange={this.onFirstFoldChange} layout="horizontal" size="m" id="js-ad-in-first-fold" on="Yes" off="No" />
 				<CustomToggleSwitch labelText="Async tag" className="u-margin-t15px u-margin-b15px" disabled defaultLayout checked={this.state.isAdAsync} name="adIsAsync" layout="horizontal" size="m" id="js-ad-is-async" on="Yes" off="No" />
-				<LabelWithButton name="customAdCode" className="u-margin-t15px u-margin-b15px" onButtonClick={this.toggleCustomAdCode} labelText="Custom Ad code" layout="horizontal" buttonText="Add" />
+				<LabelWithButton name="customAdCode" className="u-margin-t15px u-margin-b15px" onButtonClick={this.toggleCustomAdCode} labelText="Custom Ad code" layout="horizontal" buttonText={customAdCodeText} />
 				<Row className="butttonsRow">
 					<Col xs={6}>
 						<Button className="btn-lightBg btn-cancel btn-block" onClick={this.props.onCancel}>Back</Button>
 					</Col>
 					<Col xs={6}>
-						<Button disabled={!(!!this.state.position)} className="btn-lightBg btn-save btn-block" onClick={this.onSave}>Create Ad</Button>
+						<Button disabled={!(isAdCreateBtnDisabled)} className="btn-lightBg btn-save btn-block" onClick={this.onSave}>Create Ad</Button>
 					</Col>
 				</Row>
 			</div>
