@@ -96,7 +96,6 @@ class customToggleSwitch extends React.Component {
 	}
 
 	render() {
-
 		// We create variables that states how the input should be marked.
 		// Should it be marked as valid? Should it be marked as required?
 		const options = {
@@ -114,11 +113,11 @@ class customToggleSwitch extends React.Component {
 		}
 
 		// Concatenate props class names
-		options.layoutClassName += ' ' + options.classNamesProps;
+		options.layoutClassName += ` ${options.classNamesProps}`;
 
 		return (
 			<Row key={this.props.name} className={options.layoutClassName}>
-				{(options.layout === 'vertical') ? this.renderVerticalLayout(options): this.renderHorizontalLayout(options)}
+				{(options.layout === 'vertical') ? this.renderVerticalLayout(options) : this.renderHorizontalLayout(options)}
 			</Row>
 		);
 	}
