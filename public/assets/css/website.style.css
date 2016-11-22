@@ -356,8 +356,14 @@ collapsedextended {
 .u-margin-t10px {
   margin-top: 10px !important; }
 
+.u-margin-t15px {
+  margin-top: 15px !important; }
+
 .u-margin-t5px {
   margin: 5px 0 0 !important; }
+
+.u-margin-b15px {
+  margin-bottom: 15px !important; }
 
 /*******Dimension classes******/
 .u-full-width {

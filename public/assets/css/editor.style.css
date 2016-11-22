@@ -667,7 +667,8 @@ input[type=radio] + label:hover::before,
   box-sizing: border-box; }
 
 .toggle {
-  position: relative; }
+  position: relative;
+  /*****Disabled class rules*****/ }
   .toggle input[type="checkbox"] {
     filter: alpha(opacity=0);
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
@@ -744,7 +745,7 @@ input[type=radio] + label:hover::before,
       .toggle label .toggleSwitch::after {
         content: attr(data-off);
         position: absolute;
-        z-index: 5;
+        z-index: 0;
         text-transform: capitalize;
         text-align: center;
         background: #fff;
@@ -840,6 +841,13 @@ input[type=radio] + label:hover::before,
       -moz-transform: translate3d(49px, 0, 0);
       -webkit-transform: translate3d(49px, 0, 0);
       transform: translate3d(49px, 0, 0); }
+  .toggle.toggle--disabled input[type="checkbox"]:checked ~ label .toggleSwitch {
+    background-color: #098409;
+    opacity: 0.7; }
+    .toggle.toggle--disabled input[type="checkbox"]:checked ~ label .toggleSwitch:after {
+      background: #eee;
+      box-shadow: none !important;
+      color: #777; }
 
 .tooltip {
   z-index: 20000; }
@@ -1130,8 +1138,14 @@ collapsedextended, .sectionManager .wrapper .content ul.list li .statsWrapper ul
 .u-margin-t10px {
   margin-top: 10px !important; }
 
+.u-margin-t15px {
+  margin-top: 15px !important; }
+
 .u-margin-t5px {
   margin: 5px 0 0 !important; }
+
+.u-margin-b15px {
+  margin-bottom: 15px !important; }
 
 /*******Dimension classes******/
 .u-full-width {
@@ -2356,6 +2370,8 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
     .containerButtonBar.contextEditMenu .row i {
       color: #eb575c;
       cursor: pointer; }
+  .containerButtonBar.sectionOptions {
+    padding-bottom: 200px; }
 
 .sm-pad .row {
   margin: 0;
