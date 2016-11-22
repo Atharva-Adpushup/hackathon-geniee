@@ -30,7 +30,11 @@ module.exports = function(app) {
             return res.redirect('/login');
         }
 
-        if ((req.session && req.session.partner === 'geniee') && (!_.find(['/user/site', '/genieeApi', '/data', '/authenticate'], function(v) { return req.url.indexOf(v) !== -1 }))) {
+        function isAuthorised() {
+            return _.find(['/user/site', '/genieeApi', '/data', 'proxy', '/authenticate'], function(route) { return req.url.indexOf(route) !== -1 }) ? true : false;
+        };
+
+        if ((req.session && req.session.partner === 'geniee') && !isAuthorised()) {
             req.session.destroy(function() {
                 return res.redirect('/403');
             });
