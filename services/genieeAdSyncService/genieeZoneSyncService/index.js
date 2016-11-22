@@ -76,14 +76,12 @@ module.exports = function (site) {
 						'content-type': 'application/json'
 					}
 				}).then(function (zonesResult) {
-					debugger;
 					return true;
 				})
 			});
 		},
 		syncAndSaveChannelZones = function (channel, zonesToSync) {
 			return syncChannelZones(channel.genieePageGroupId, zonesToSync).then(function (zonesResult) {
-				debugger;
 				return true;
 			})
 		};
