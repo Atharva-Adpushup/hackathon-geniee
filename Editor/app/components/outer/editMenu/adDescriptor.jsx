@@ -47,7 +47,7 @@ class adDescriptor extends React.Component {
 			return (<CssEditor css={ad.css} onCancel={this.toggleCssEditor} onSave={updateCss.bind(null, ad.id)} />);
 		}
 		if (this.state.isEditingCode) {
-			return (<CodeBox code={adCode} onSubmit={updateAdCode.bind(null, ad.id)} onCancel={this.toggleCodeEditor} />);
+			return (<CodeBox showButtons={true} code={adCode} onSubmit={updateAdCode.bind(null, ad.id)} onCancel={this.toggleCodeEditor} />);
 		}
 		return (
 			<div className="containerButtonBar">

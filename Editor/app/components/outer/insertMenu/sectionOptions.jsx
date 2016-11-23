@@ -60,7 +60,7 @@ class sectionOptions extends React.Component {
 			isAdCreateBtnDisabled = !!((this.state.position !== null) && (typeof this.state.position !== 'undefined'));
 
 		if (this.state.manageCustomCode) {
-			return (<CodeBox code={this.state.customAdCode} onSubmit={this.onCustomAdCodeChange} onCancel={this.toggleCustomAdCode} />);
+			return (<CodeBox showButtons={true} code={this.state.customAdCode} onSubmit={this.onCustomAdCodeChange} onCancel={this.toggleCustomAdCode} />);
 		}
 
 		return (

@@ -95,7 +95,7 @@ class insertMenu extends React.Component {
 		} else {
 			items.push((
 				<MenuItem key={1} icon="fa-sitemap" contentHeading="Adcode">
-					<CodeBox onSubmit={this.createSectionAndAd.bind(this, null)} onCancel={this.toggleExtraOptions.bind(this)} />
+					<CodeBox showButtons={true} onSubmit={this.createSectionAndAd.bind(this, null)} onCancel={this.toggleExtraOptions.bind(this)} />
 				</MenuItem>
 			));
 		}

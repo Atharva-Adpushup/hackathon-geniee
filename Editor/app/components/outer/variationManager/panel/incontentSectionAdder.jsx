@@ -85,7 +85,7 @@ class inContentForm extends React.Component {
 		const props = this.props;
 		return (
 			<form onSubmit={props.handleSubmit}>
-				<CodeBox onSubmit={this.submit} onCancel={this.cancel}/>
+				<CodeBox showButtons={false} onSubmit={this.submit} onCancel={this.cancel}/>
 				<h1 className="variation-section-heading">Add Incontent Variation</h1>
 				<Field placeholder="Please enter section" name="section" component={renderField} type="number" label="Section No" />
 				<Field placeholder="Please enter minDistanceFromPrevAd" name="minDistanceFromPrevAd" component={renderField} type="number" label="minDistanceFromPrevAd" />
