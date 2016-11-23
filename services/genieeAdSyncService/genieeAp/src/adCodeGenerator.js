@@ -1,21 +1,43 @@
-module.exports = {
-	generateAdCode: function(adNetwork, adConfig, pageUrl) {
-		var adCode;
-		switch (adNetwork.toLowerCase()) {
-			case 'adsense':
-				if (adConfig.adslot) {
-					adCode = [];
+var utils = require('../libs/utils');
 
-					adCode.push('<scr' + 'ipt type="text/javascript"><!--');
-					adCode.push('google_ad_client = "' + adConfig.pubId + '"; \n /* ' + adConfig.adslot + ' */ \n google_ad_slot = "' + adConfig.adslot + '";');
-					adCode.push('google_ad_width = "' + adConfig.width + '"; \n google_ad_height = "' + adConfig.height + '"; \n//-->');
-					adCode.push('google_page_url = "' + pageUrl + '"; \n//-->');
-					adCode.push('</scr' + 'ipt>\n <scr' + 'ipt type="text/javascript"\n src="//pagead2.googlesyndication.com/pagead/show_ads.js"> \n</scr' + 'ipt>');
-				}
+module.exports = {
+	generateAdCode: function(ad) {
+		var adCode;
+		switch (ad.network.toLowerCase()) {
+			case 'custom':
+				adCode = utils.base64Decode(ad.adCode);
+				break;
+
+			case 'geniee':
+				adCode = [];
+				adCode.push('<div id="_ap_apexGeniee_ad_' + ad.networkData.zoneId + '" style="display:none;">');
+				adCode.push('<scr' + 'ipt type="text/javascript">');
+				adCode.push('gnsmod.cmd.push(function() {');
+				adCode.push('gnsmod.displayAds("_ap_apexGeniee_ad_' + ad.networkData.zoneId + '")');
+				adCode.push('});');
+				adCode.push('</scr' + 'ipt>');
+				adCode.push('</div>');
 				break;
 			default:
 				return false;
 		}
 		return typeof adCode === 'string' ? adCode : adCode.join('\n');
+	},
+	generateGenieeHeaderCode: function(genieeAdIds) {
+		if (!genieeAdIds || !genieeAdIds.length) {
+			return false;
+		}
+		var adCode = [], i;
+		adCode.push('<scr' + 'ipt type="text/javascript">');
+		adCode.push('var gnsmod = gnsmod || {};');
+		adCode.push('gnsmod.cmd = gnsmod.cmd || [];');
+		adCode.push('gnsmod.cmd.push(function() {');
+		for (i = 0; i < genieeAdIds.length; i++ ) {
+			adCode.push('gnsmod.defineZone("_ap_apexGeniee_ad_' + genieeAdIds[i] + '", ' + genieeAdIds[i] + ');');
+		}
+		adCode.push('});');
+		adCode.push('</scr' + 'ipt>');
+		adCode.push(' <scr' + 'ipt async type="text/javascript"\n src="http://other.geniee.jp/test/sample_html/adp/gnsmod.min.js"> \n</scr' + 'ipt>');
+		return adCode.join('\n');
 	}
 };

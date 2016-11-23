@@ -3,26 +3,29 @@ var $ = require('jquery'),
 	utils = require('../libs/utils'),
 	browserConfig = require('../libs/browserConfig'),
 	incontentAnalyser = require('../libs/aa'),
+	adCodeGenerator = require('./adCodeGenerator'),
 
 	segregateAds = function(ads) {
-		var a, ad, structuredAds = [], inContentAds = [];
+		var a, ad, structuredAds = [], inContentAds = [], genieeIds = [];
 		for (a = 0; a < ads.length; a++) {
 			ad = ads[a];
 			ad.isIncontent ? inContentAds.push(ad) : structuredAds.push(ad);
+			ad.network === 'geniee' && ad.networkData && genieeIds.push(ad.networkData.zoneId);
 		}
-		return { structuredAds: structuredAds, inContentAds: inContentAds };
+		return { structuredAds: structuredAds, inContentAds: inContentAds, genieeIds };
 	},
 	getContainer = function(ad, el) {
 		if (!el) {
 			el = $(ad.xpath);
 		}
 		var container = $('<div/>').css($.extend({
-			'display': 'block',
+			'display': ad.network === 'geniee' ? 'none' : 'block',
 			'clear': ad.isIncontent ? null : 'both',
 			'width': ad.width + 'px',
 			'height': ad.height + 'px',
 			'background-color': 'red'
 		}, ad.css)).attr({
+			'id': ad.network === 'geniee' ? '_ap_apexGeniee_ad_' + ad.networkData.zoneId : ad.id,
 			'data-section': ad.id,
 			'class': '_ap_apex_ad',
 			'data-xpath': ad.xpath ? ad.xpath : '',
@@ -72,10 +75,14 @@ var $ = require('jquery'),
 				tracking: browserConfig.trackerSupported,
 				chosenVariation: variation.id // set the chosenVariation variation in feedback data;
 			},
+			placeGenieeHeadCode = function(genieeIds) {
+				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIds);
+				genieeHeadCode && $('head').append(genieeHeadCode);
+			},
 			placeAd = function(container, ad) {
 				try {
 					$.ajaxSettings.cache = true;
-					container.append(utils.base64Decode(ad.adCode));
+					container.append(adCodeGenerator.generateAdCode(ad));
 					$.ajaxSettings.cache = false;
 					tracker.add(container, function(id) {
 						utils.sendBeacon(config.feedbackUrl, {eventType: 2, click: true, id: id });
@@ -95,7 +102,11 @@ var $ = require('jquery'),
 				if (!displayCounter && !finished) {
 					finished = true;
 					if (variation.customJs && variation.customJs.afterAp) {
-						utils.runScript(utils.base64Decode(variation.customJs.afterAp));
+						try {
+							utils.runScript(utils.base64Decode(variation.customJs.afterAp));
+						} catch (e) {
+							err.push({ msg: 'Error in afterAp js.', js: variation.customJs.afterAp, error: e });
+						}
 					}
 					utils.sendFeedback(feedbackData);
 				}
@@ -142,10 +153,18 @@ var $ = require('jquery'),
 
 		(function main() {
 			if (variation.customJs && variation.customJs.beforeAp) {
-				utils.runScript(utils.base64Decode(variation.customJs.beforeAp));
+				try {
+					utils.runScript(utils.base64Decode(variation.customJs.beforeAp));
+				} catch (e) {
+					err.push({ msg: 'Error in beforeAp js.', js: variation.customJs.beforeAp, error: e });
+				}
 			}
 
 			ads = segregateAds(ads); // segregate incontent and strutural ads so that they can be placed accordingly.
+
+			if (ads.genieeIds.length) {
+				placeGenieeHeadCode(ads.genieeIds);
+			}
 
 		// Process and place structural ads
 			placeStructuralAds(ads.structuredAds);
