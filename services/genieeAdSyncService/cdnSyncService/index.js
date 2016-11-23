@@ -11,31 +11,45 @@ module.exports = function (site) {
 	var jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'genieeAp.js'),
 		tempDestPath = path.join(__dirname, '..', '..', '..', 'public'),
 		getAdsPayload = function (variationSections) {
-			var ads = [], ad = null, json;
+			var ads = [], ad = null, json, unsyncedAds = false;
 			_.each(variationSections, function (section, sectionId) {
 				if (!Object.keys(section.ads).length) {
 					return true;
 				}
 				ad = section.ads[Object.keys(section.ads)[0]]; // for now we have only one ad inside a section
-				json = {};
+
+				//In case if even one ad inside variation is unsynced then we don't serve this variation'
+				// check to find if ad is synced or not, for genieee if networkData present then adSynced and for custom network 
+				// if adcode present then ad synced
+				if ((ad.network == 'geniee' && !ad.networkData) || (ad.network == 'custom' && !ad.adCode)) {
+					unsyncedAds = true;
+					return false; //break loop when ad is unsynced
+				}
+
+				json = { id: sectionId, network: ad.network, css: ad.css, height: parseInt(ad.height, 10), width: parseInt(ad.width, 10) };
 				if (section.isIncontent) {
-					json = {
-						id: sectionId, isIncontent: true, height: parseInt(ad.height, 10), width: parseInt(ad.width, 10),
-						adCode: new Buffer("adcode").toString('base64') /*ad.adCode*/, float: section.float, css: ad.css, minDistanceFromPrevAd: section.minDistanceFromPrevAd,
+					_.extend(json, {
+						isIncontent: true, float: section.float, minDistanceFromPrevAd: section.minDistanceFromPrevAd,
 						ignoreXpaths: section.ignoreXpaths || [], section: parseInt(section.sectionNo, 10)
-					}
+					});
 					if (ad.secondaryCss) {
-						json.secondaryCss = ad.secondaryCss
+						json.secondaryCss = ad.secondaryCss;
 					}
 				} else {
-					json = {
-						id: sectionId, xpath: section.xpath, operation: section.operation, css: ad.css, height: parseInt(ad.height, 10),
-						width: parseInt(ad.width, 10), adCode: new Buffer("adcode").toString('base64') /*ad.adCode*/
-					}
+					_.extend(json, {
+						xpath: section.xpath, operation: section.operation
+					});
 				}
+				//for geniee provide networkData
+				if ((ad.network == 'geniee')) {
+					json.networkData = ad.networkData;
+				} else { //for custom network provide adcode to replay
+					json.adCode = ad.adCode;
+				}
+
 				ads.push(json);
 			});
-			return ads;
+			return !unsyncedAds ? ads : [];
 		},
 		getVariationsPayload = function (site) {
 			var finalJson = {}, temp, platform, pageGroup, variation;
@@ -91,7 +105,6 @@ module.exports = function (site) {
 			return jsFile;
 		}),
 		writeTempFile = function (jsFile) {
-			console.log('file written');
 			return fs.writeFileAsync(path.join(tempDestPath, 'genieeAp.js'), jsFile);
 		},
 		cwd = function () {
@@ -115,18 +128,17 @@ module.exports = function (site) {
 				});
 		};
 
-	return getFinalConfig
-		//.then(uploadJS)
-		.then(writeTempFile)
-		.catch(function (err) {
-			console.log(err);
-			throw err;
-		})
-		.finally(function () {
-			if (ftp.getConnectionStatus() === 'connected') {
-				ftp.end();
-			}
-		});
+
+	return function () {
+		return getFinalConfig
+			//.then(uploadJS)
+			.then(writeTempFile)
+			.finally(function () {
+				if (ftp.getConnectionStatus() === 'connected') {
+					ftp.end();
+				}
+			});
+	}
 
 
 }	
