@@ -26,24 +26,7 @@ const renderField = field => {
 			</Col>
 		</div>
 	);
-},
-	renderTextArea = field => {
-		return (
-			<div>
-				<Col xs={9} className="u-padding-r10px">
-					<Row>
-						<Col xs={4} className="u-padding-r10px">
-							<strong>{field.label}</strong>
-						</Col>
-						<Col xs={7} className="u-padding-r10px">
-							<textarea placeholder={field.placeholder} {...field.input}></textarea>
-							{field.meta.touched && field.meta.error && <div className="error-message">{field.meta.error}</div>}
-						</Col>
-					</Row>
-				</Col>
-			</div>
-		);
-	};
+};
 
 function validate(formProps) {
 	const errors = {};
@@ -54,10 +37,6 @@ function validate(formProps) {
 
 	if (!formProps.minDistanceFromPrevAd) {
 		errors.minDistanceFromPrevAd = 'Please enter minDistanceFromPrevAd';
-	}
-
-	if (!formProps.adCode) {
-		errors.adCode = 'Please enter Ad Code';
 	}
 
 	if (!formProps.height) {
@@ -85,7 +64,6 @@ class inContentForm extends React.Component {
 		const props = this.props;
 		return (
 			<form onSubmit={props.handleSubmit}>
-				<CodeBox showButtons={false} onSubmit={this.submit} onCancel={this.cancel}/>
 				<h1 className="variation-section-heading">Add Incontent Variation</h1>
 				<Field placeholder="Please enter section" name="section" component={renderField} type="number" label="Section No" />
 				<Field placeholder="Please enter minDistanceFromPrevAd" name="minDistanceFromPrevAd" component={renderField} type="number" label="minDistanceFromPrevAd" />
@@ -110,7 +88,7 @@ class inContentForm extends React.Component {
 				<Row style={{marginTop: 20}}>
 					{
 						currentUser.userType !== 'partner' ? (
-							<Field placeholder="Please enter Ad Code" name="adCode" component={renderTextArea} type="text" label="Ad Code" />
+							<CodeBox showButtons={false} onSubmit={this.submit} onCancel={this.cancel}/>
 						) : ''
 					}
 				</Row>
