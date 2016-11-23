@@ -3,7 +3,7 @@ module.exports = apiModule();
 var model = require('../helpers/model'),
 	couchbase = require('../helpers/couchBaseService'),
 	siteModel = require('../models/siteModel'),
-	sectionModel = require('./subClasses/channel/section'),
+	variationModel = require('./subClasses/channel/variation'),
 	_ = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	schema = require('../helpers/schema'),
@@ -37,8 +37,8 @@ var model = require('../helpers/model'),
 		this.validations = {
 			'required': []
 		};
+		this.classMap = { 'variations': variationModel };
 		this.defaults = { variations: {}, contentSelector: '', activeVariation: '' };
-		// this.classMap = { 'structuredSections': sectionModel };
 		this.constructor = function(data, cas) {
 			if (!(data.siteId && data.platform && data.pageGroup)) {
 				throw new Error('siteId, platform and pageGroup required for channel');
@@ -68,7 +68,7 @@ function apiModule() {
 					if(!_.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])) { 
 						site.get('cmsInfo').pageGroups.push({ sampleUrl: json.sampleUrl, pageGroup: json.pageGroupName.toUpperCase() });
 					}
-					channelData = { siteDomain: site.data.siteDomain, siteId: site.data.siteId, sampleUrl: json.sampleUrl, platform: json.device.toUpperCase(), pageGroup: json.pageGroupName.toUpperCase(), id: uuid.v4(), channelName: json.pageGroupName.toUpperCase()+'_'+json.device.toUpperCase(), genieePageGroupId: json.pageGroupId };
+					channelData = { siteDomain: site.data.siteDomain, siteId: site.data.siteId, sampleUrl: json.sampleUrl, platform: json.device.toUpperCase(), pageGroup: json.pageGroupName.toUpperCase(), id: uuid.v4(), channelName: json.pageGroupName.toUpperCase()+'_'+json.device.toUpperCase(), genieePageGroupId: json.pageGroupId, variations: {} };
 					return API.saveChannel(json.siteId, json.device, json.pageGroupName, channelData)
 					.then(function(res) {
 						site.save();

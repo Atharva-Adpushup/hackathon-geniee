@@ -153,9 +153,7 @@ var consts = require('../configs/commonConsts'),
 		};
 
 		this.loadSubClass = function(SubClass, newVals, force) {
-			return _.map(newVals, function(newVal) {
-				return new SubClass(newVal, force);
-			});
+			return new SubClass(newVals, force);
 		};
 
 		this.setAll = function(json, force) {

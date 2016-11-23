@@ -6,7 +6,6 @@ var model = require('../helpers/model'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	channelModel = require('../models/channelModel'),
 	Promise = require('bluebird'),
-	adModel = require('../models/subClasses/site/ad'),
 	_ = require('lodash'),
 	Site = model.extend(function () {
 		this.keys = [
@@ -29,7 +28,6 @@ var model = require('../helpers/model'),
 		this.validations = {
 			'required': []
 		};
-		// this.classMap = { 'ads': adModel };
 		this.defaults = { apConfigs: {}, channels: [], cmsInfo: { cmsName: '', pageGroups: [] } };
 		this.ignore = [];
 

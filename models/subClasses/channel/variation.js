@@ -1,19 +1,19 @@
 var model = require('../../../helpers/model'),
-	adModel = require('./ad'),
+	sectionModel = require('./section'),
 	consts = require('../../../configs/commonConsts'),
-	Section = model.extend(function() {
+	Variation = model.extend(function() {
 		this.merging = true;
 		this.mergingPriority = consts.enums.priorities.NEW_OBJECT;
 		this.mergeExtraKeys = true;
 		this.mergingKey = 'id';
-		this.keys = ['id', 'xpath', 'operation', 'name', 'allXpaths', 'ads', 'partnerData'];
-		this.clientKeys = ['id', 'xpath', 'operation', 'name', 'allXpaths', 'ads', 'partnerData'];
+		this.keys = ['id', 'name', 'trafficDistribution', 'createTs', 'customJs', 'sections'];
+		this.clientKeys = ['id', 'name', 'trafficDistribution', 'createTs', 'customJs', 'sections'];
 		this.defaults = {};
-		this.classMap = { 'ads': adModel };
 
+		this.classMap = { 'sections': sectionModel };
 		this.constructor = function(data, force) {
 			this.super(data, force);
 		};
 	});
 
-module.exports = Section;
+module.exports = Variation;
