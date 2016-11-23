@@ -6,34 +6,10 @@ import { createIncontentSection } from 'actions/sectionActions';
 import CodeBox from 'shared/codeBox';
 import Codemirror from 'react-codemirror';
 
-const form = reduxForm({
-	form: 'inContentForm',
-	validate
-}),
-	renderField = field => {
-		return (
-			<div>
-				<Col xs={6} className="u-padding-r10px">
-					<Row>
-						<Col xs={6} className="u-padding-r10px">
-							<strong>{field.label}</strong>
-						</Col>
-						<Col xs={6} className="u-padding-r10px">
-							<input type={field.type} placeholder={field.placeholder} {...field.input} />
-							{field.meta.touched && field.meta.error && <div className="error-message">{field.meta.error}</div>}
-						</Col>
-					</Row>
-				</Col>
-			</div>
-		);
-	};
-
 class renderCodeBox extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			code: ''
-		};
+		this.state = { code: '' };
 	}
 
 	updateCode(code) {
@@ -44,12 +20,40 @@ class renderCodeBox extends React.Component {
 		const { label, input, meta } = this.props;
 		return (
 			<div>
-				<Codemirror value={this.state.code} onChange={this.updateCode} {...input} />
-				{meta.touched && meta.error && <div className="error-message">{meta.error}</div>}
+				<Col xs={12} className="u-padding-r10px">
+					<Row>
+						<Col xs={3} className="u-padding-r10px"><strong>{label}</strong></Col>
+						<Col xs={6} className="u-padding-r10px">
+							<Codemirror value={this.state.code} onChange={this.updateCode} options={{mode: 'javascript', theme: 'solarized'}} {...input} />
+							{meta.touched && meta.error && <div className="error-message">{meta.error}</div>}
+						</Col>
+					</Row>
+				</Col>
 			</div>
 		)
 	}
 };
+
+const form = reduxForm({
+	form: 'inContentForm',
+	validate
+}),
+	renderField = field => {
+		return (
+			<div>
+				<Col xs={6} className="u-padding-r10px">
+					<Row>
+						<Col xs={6} className="u-padding-r10px"><strong>{field.label}</strong></Col>
+						<Col xs={6} className="u-padding-r10px"><input type={field.type} placeholder={field.placeholder} {...field.input} />
+							{field.meta.touched && field.meta.error && <div className="error-message">{field.meta.error}</div>}
+						</Col>
+					</Row>
+				</Col>
+			</div>
+		);
+	}, r = field => {
+		return (<CodeBox showButtons={false} isField field={field} />);
+	};
 
 function validate(formProps) {
 	const errors = {};
@@ -91,9 +95,7 @@ class inContentForm extends React.Component {
 				<Row>
 					<Col xs={6} className="u-padding-r10px">
 						<Row>
-							<Col xs={6} className="u-padding-r10px">
-								<strong>Float</strong>
-							</Col>
+							<Col xs={6} className="u-padding-r10px"><strong>Float</strong></Col>
 							<Col xs={6} className="u-padding-r10px">
 								<Field name="float" component="select">
 									<option name="none">none</option>
@@ -105,11 +107,7 @@ class inContentForm extends React.Component {
 					</Col>
 				</Row>
 				<Row>
-					{
-						currentUser.userType !== 'partner' ? (
-							<Field name="adCode" component={renderCodeBox} label="Ad Code" />
-						) : ''
-					}
+					{ currentUser.userType !== 'partner' ? ( <Field name="adCode" component={renderCodeBox} label="Ad Code" /> ) : '' }
 				</Row>
 				<Row>
 					<Col className="u-padding-r10px" style={{ marginTop: '30px', clear: 'both' }} xs={2}>

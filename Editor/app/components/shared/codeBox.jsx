@@ -38,28 +38,48 @@ class customCodeEditor extends React.Component {
 			mode: 'javascript',
 			theme: 'solarized'
 		};
-		return (
-			<div className={this.props.showButtons ? 'containerButtonBar' : ''}>
-				{this.state.error && (<div>Some Error in CSS, remove comma in last property if there.</div>)}
-				<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
-				{
-					this.props.showButtons ? (
-					<Row className="butttonsRow">
-						<Col xs={6}>
-							<Button disabled={this.state.error} className="btn-lightBg btn-save" onClick={this.save}>Save</Button>
-						</Col>
-						<Col xs={6}>
-							<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>Cancel</Button>
-						</Col>
-					</Row> ) : ''
-				}
-			</div>
-		);
+
+		if(this.props.isField) {
+			const { label, input, meta } = this.props.field; 
+			return (
+				<div>
+					<Col xs={12} className="u-padding-r10px">
+						<Row>
+							<Col xs={3} className="u-padding-r10px"><strong>{label}</strong></Col>
+							<Col xs={6} className="u-padding-r10px">
+								<Codemirror value={this.state.code} onChange={this.updateCode} options={options} {...input} />
+								{meta.touched && meta.error && <div className="error-message">{meta.error}</div>}
+							</Col>
+						</Row>
+					</Col>
+				</div>
+			);
+		}
+		else {
+			return (
+				<div className={this.props.showButtons ? 'containerButtonBar' : ''}>
+					{this.state.error && (<div>Some Error in CSS, remove comma in last property if there.</div>)}
+					<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
+					{
+						this.props.showButtons ? (
+						<Row className="butttonsRow">
+							<Col xs={6}>
+								<Button disabled={this.state.error} className="btn-lightBg btn-save" onClick={this.save}>Save</Button>
+							</Col>
+							<Col xs={6}>
+								<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>Cancel</Button>
+							</Col>
+						</Row> ) : ''
+					}
+				</div>
+			);
+		}
 	}
 }
 
 customCodeEditor.propTypes = {
 	code: PropTypes.string,
+	isField: PropTypes.bool,
 	showButtons: PropTypes.bool,
 	onSubmit: PropTypes.func,
 	onCancel: PropTypes.func
