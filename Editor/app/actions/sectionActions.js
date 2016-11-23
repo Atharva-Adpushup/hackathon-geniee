@@ -1,4 +1,4 @@
-import { sectionActions, defaultSectionCss, leftSectionCss, rightSectionCss } from 'consts/commonConsts';
+import { sectionActions, defaultSectionCss, leftSectionCss, rightSectionCss, adActions } from 'consts/commonConsts';
 import { getVariationSectionsWithAds } from 'selectors/variationSelectors';
 import Utils from 'libs/utils';
 import _ from 'lodash';
@@ -38,8 +38,16 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 
 		alert('In-content section has been created!');
 	},
-	deleteSection = (sectionId, variationId) => (dispatch, getState) => {
-		if(confirm('Are you sure you want to delete this section ?')) {
+	deleteSection = (sectionId, variationId, adId) => (dispatch) => {
+		const isSectionDeletion = confirm('Are you sure you want to delete this section ?');
+
+		if (isSectionDeletion) {
+			// TODO: Optimise below two individual dispatch actions
+			// How to: Merge below actions into one (for e.g., DELETE_AD), make it a thunk
+			// and set a boolean flag in action data if that section needs to be deleted.
+			// That way, only one action will be dispatched and this approach helps in
+			// upcoming features (for e.g., Time travel, Redo-Undo) implementation
+			dispatch({ type: adActions.DELETE_AD, adId, sectionId });
 			dispatch({
 				type: sectionActions.DELETE_SECTION,
 				sectionId,
@@ -50,7 +58,7 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 	renameSection = (section, variationId, name) => (dispatch, getState) => {
 		const variationSections = getVariationSectionsWithAds(getState(), { variationId }).sections,
 			arr = _.map(variationSections, (data) => { return data });
-		if (_.find(arr, { name: name })) {
+		if (_.find(arr, { name })) {
 			alert('Cannot create section with same section name!');
 			return;
 		}

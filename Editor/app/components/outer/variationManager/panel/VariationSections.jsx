@@ -16,7 +16,12 @@ const variationSections = (props) => {
 					<div key={key} className="col-sm-4">
 						<li key={section.id}>
 							<OverlayTrigger placement="bottom" overlay={<Tooltip id="delete-section-tooltip">Delete Section</Tooltip>}>
-								<Button className="btn-close" onClick={onDeleteSection.bind(null, section.id, variation.id)} type="submit">x</Button>
+								{/*`section.ads[0].id` is temporarily added as 3rd argument to accomodate
+								  * one section and one ad creation/deletion
+								  * TODO: Remove `section.ads[0].id` hard-coded check and remove all ads inside
+								  * a section using its `ads` array
+								*/}
+								<Button className="btn-close" onClick={onDeleteSection.bind(null, section.id, variation.id, section.ads[0].id)} type="submit">x</Button>
 							</OverlayTrigger>
 							<Row>
 								{ section.isIncontent ? (

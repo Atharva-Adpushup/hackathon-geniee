@@ -17,15 +17,9 @@ class adDescriptor extends React.Component {
 	}
 
 	deleteSectionWithAd() {
-		const { ad, sectionId, variationId, deleteAd, deleteSection } = this.props;
+		const { ad, sectionId, variationId, deleteSection } = this.props;
 
-		// TODO: Optimise below two individual actions
-		// How to: Merge below actions into one (for e.g., DELETE_AD), make it a thunk
-		// and set a boolean flag in action data if that section needs to be deleted.
-		// That way, only one action will be dispatched and this approach helps in
-		// upcoming features (for e.g., Time travel, Redo-Undo) implementation
-		deleteAd(ad.id, sectionId);
-		deleteSection(sectionId, variationId);
+		deleteSection(sectionId, variationId, ad.id);
 	}
 
 	toggleCssEditor() {
@@ -73,7 +67,6 @@ adDescriptor.propTypes = {
 	ad: PropTypes.object.isRequired,
 	updateCss: PropTypes.func.isRequired,
 	updateAdCode: PropTypes.func.isRequired,
-	deleteAd: PropTypes.func.isRequired,
 	deleteSection: PropTypes.func.isRequired
 };
 
