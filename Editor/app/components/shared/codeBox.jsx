@@ -39,6 +39,7 @@ class customCodeEditor extends React.Component {
 			theme: 'solarized'
 		};
 
+		// Check if code box is a redux form component
 		if(this.props.isField) {
 			const { label, input, meta } = this.props.field; 
 			return (

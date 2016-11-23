@@ -4,35 +4,6 @@ import { Row, Col, Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { createIncontentSection } from 'actions/sectionActions';
 import CodeBox from 'shared/codeBox';
-import Codemirror from 'react-codemirror';
-
-class renderCodeBox extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = { code: '' };
-	}
-
-	updateCode(code) {
-		this.setState({ code });
-	}
-
-	render() {
-		const { label, input, meta } = this.props;
-		return (
-			<div>
-				<Col xs={12} className="u-padding-r10px">
-					<Row>
-						<Col xs={3} className="u-padding-r10px"><strong>{label}</strong></Col>
-						<Col xs={6} className="u-padding-r10px">
-							<Codemirror value={this.state.code} onChange={this.updateCode} options={{mode: 'javascript', theme: 'solarized'}} {...input} />
-							{meta.touched && meta.error && <div className="error-message">{meta.error}</div>}
-						</Col>
-					</Row>
-				</Col>
-			</div>
-		)
-	}
-};
 
 const form = reduxForm({
 	form: 'inContentForm',
@@ -51,7 +22,8 @@ const form = reduxForm({
 				</Col>
 			</div>
 		);
-	}, r = field => {
+	}, 
+	renderCodeBox = field => {
 		return (<CodeBox showButtons={false} isField field={field} />);
 	};
 
