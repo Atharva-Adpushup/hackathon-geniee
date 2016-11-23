@@ -3,6 +3,7 @@ import { Field, reduxForm } from 'redux-form';
 import { Row, Col, Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { createIncontentSection } from 'actions/sectionActions';
+import CodeBox from 'shared/codeBox';
 
 const form = reduxForm({
 	form: 'inContentForm',
@@ -25,7 +26,24 @@ const renderField = field => {
 			</Col>
 		</div>
 	);
-};
+},
+	renderTextArea = field => {
+		return (
+			<div>
+				<Col xs={9} className="u-padding-r10px">
+					<Row>
+						<Col xs={4} className="u-padding-r10px">
+							<strong>{field.label}</strong>
+						</Col>
+						<Col xs={7} className="u-padding-r10px">
+							<textarea placeholder={field.placeholder} {...field.input}></textarea>
+							{field.meta.touched && field.meta.error && <div className="error-message">{field.meta.error}</div>}
+						</Col>
+					</Row>
+				</Col>
+			</div>
+		);
+	};
 
 function validate(formProps) {
 	const errors = {};
@@ -36,6 +54,10 @@ function validate(formProps) {
 
 	if (!formProps.minDistanceFromPrevAd) {
 		errors.minDistanceFromPrevAd = 'Please enter minDistanceFromPrevAd';
+	}
+
+	if (!formProps.adCode) {
+		errors.adCode = 'Please enter Ad Code';
 	}
 
 	if (!formProps.height) {
@@ -51,29 +73,47 @@ function validate(formProps) {
 
 
 class inContentForm extends React.Component {
+	submit() {
+
+	}
+
+	cancel() {
+
+	}
+
 	render() {
 		const props = this.props;
 		return (
 			<form onSubmit={props.handleSubmit}>
+				<CodeBox onSubmit={this.submit} onCancel={this.cancel}/>
 				<h1 className="variation-section-heading">Add Incontent Variation</h1>
 				<Field placeholder="Please enter section" name="section" component={renderField} type="number" label="Section No" />
 				<Field placeholder="Please enter minDistanceFromPrevAd" name="minDistanceFromPrevAd" component={renderField} type="number" label="minDistanceFromPrevAd" />
 				<Field placeholder="Please enter width" name="width" component={renderField} type="number" label="Width" />
 				<Field placeholder="Please enter height" name="height" component={renderField} type="number" label="Height" />
-				<Col xs={6} className="u-padding-r10px">
-					<Row>
-						<Col xs={6} className="u-padding-r10px">
-							<strong>Float</strong>
-						</Col>
-						<Col xs={6} className="u-padding-r10px">
-							<Field name="float" component="select">
-								<option name="none">none</option>
-								<option name="left">left</option>
-								<option name="right">right</option>
-							</Field>
-						</Col>
-					</Row>
-				</Col>
+				<Row>
+					<Col xs={6} className="u-padding-r10px">
+						<Row>
+							<Col xs={6} className="u-padding-r10px">
+								<strong>Float</strong>
+							</Col>
+							<Col xs={6} className="u-padding-r10px">
+								<Field name="float" component="select">
+									<option name="none">none</option>
+									<option name="left">left</option>
+									<option name="right">right</option>
+								</Field>
+							</Col>
+						</Row>
+					</Col>
+				</Row>
+				<Row style={{marginTop: 20}}>
+					{
+						currentUser.userType !== 'partner' ? (
+							<Field placeholder="Please enter Ad Code" name="adCode" component={renderTextArea} type="text" label="Ad Code" />
+						) : ''
+					}
+				</Row>
 				<Row>
 					<Col className="u-padding-r10px" style={{ marginTop: '30px', clear: 'both' }} xs={2}>
 						<Button className="btn-lightBg btn-save btn-block" type="submit">Save</Button>

@@ -63,10 +63,20 @@ $lightGrey:#ccc;
         }
     }
 
-    input {
+    input,
+    textarea {
         width: 100%;
         padding: 3.5px 10px;
         border-radius: 3px;
         border: 1px solid $lightGrey;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    textarea {
+        resize: none;
+        height: 80px;
     }
 }

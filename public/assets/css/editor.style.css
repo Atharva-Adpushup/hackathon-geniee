@@ -2330,6 +2330,8 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
     max-height: 500px;
     overflow-y: auto;
     overflow-x: hidden; }
+    .MenuBarContainer .MenuBarInner .butttonsRow {
+      left: 15px; }
     .MenuBarContainer .MenuBarInner .SelectParent {
       padding: 0 5px; }
       .MenuBarContainer .MenuBarInner .SelectParent .row {
@@ -2343,8 +2345,12 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
       .MenuBarContainer .MenuBarInner .SelectParent.channelLst .mobile i, .MenuBarContainer .MenuBarInner .SelectParent.channelLst .tablet i {
         font-size: 16px; }
 
+.ReactCodeMirror {
+  border-right: 1px solid #ebf1f2; }
+
 .containerButtonBar {
-  padding-bottom: 70px; }
+  padding-bottom: 70px;
+  position: relative; }
   .containerButtonBar input[type="number"] {
     width: 60px; }
   .containerButtonBar .adsDescriptor .row {
@@ -2355,13 +2361,12 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
       background: rgba(85, 85, 85, 0.05); }
   .containerButtonBar .butttonsRow {
     padding: 20px 0 !important;
-    margin: 0 0 0 -11px !important;
     background: #f6f7f8;
     position: absolute;
     bottom: 0;
     z-index: 6;
     width: 100%;
-    border-top: 1px solid #DFDFE0;
+    border: 1px solid #DFDFE0;
     border-radius: 0 0 3px 3px; }
   .containerButtonBar.contextEditMenu .row {
     margin: 0;
