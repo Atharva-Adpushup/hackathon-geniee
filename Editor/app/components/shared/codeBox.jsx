@@ -35,12 +35,11 @@ class customCodeEditor extends React.Component {
 			// style: {border: '1px solid black'},
 			textAreaClassName: ['form-control'],
 			textAreaStyle: { minHeight: '5em' },
-			value: this.state.code,
 			mode: 'javascript',
 			theme: 'solarized'
 		};
 		return (
-			<div className="containerButtonBar">
+			<div className={this.props.showButtons ? 'containerButtonBar' : ''}>
 				{this.state.error && (<div>Some Error in CSS, remove comma in last property if there.</div>)}
 				<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
 				{
@@ -61,7 +60,7 @@ class customCodeEditor extends React.Component {
 
 customCodeEditor.propTypes = {
 	code: PropTypes.string,
-	showButtons: PropTypes.bool.isRequired,
+	showButtons: PropTypes.bool,
 	onSubmit: PropTypes.func,
 	onCancel: PropTypes.func
 };

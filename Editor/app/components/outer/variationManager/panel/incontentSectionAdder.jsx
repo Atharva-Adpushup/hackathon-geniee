@@ -4,28 +4,51 @@ import { Row, Col, Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { createIncontentSection } from 'actions/sectionActions';
 import CodeBox from 'shared/codeBox';
+import Codemirror from 'react-codemirror';
 
 const form = reduxForm({
 	form: 'inContentForm',
 	validate
-});
+}),
+	renderField = field => {
+		return (
+			<div>
+				<Col xs={6} className="u-padding-r10px">
+					<Row>
+						<Col xs={6} className="u-padding-r10px">
+							<strong>{field.label}</strong>
+						</Col>
+						<Col xs={6} className="u-padding-r10px">
+							<input type={field.type} placeholder={field.placeholder} {...field.input} />
+							{field.meta.touched && field.meta.error && <div className="error-message">{field.meta.error}</div>}
+						</Col>
+					</Row>
+				</Col>
+			</div>
+		);
+	};
 
-const renderField = field => {
-	return (
-		<div>
-			<Col xs={6} className="u-padding-r10px">
-				<Row>
-					<Col xs={6} className="u-padding-r10px">
-						<strong>{field.label}</strong>
-					</Col>
-					<Col xs={6} className="u-padding-r10px">
-						<input placeholder={field.placeholder} {...field.input} />
-						{field.meta.touched && field.meta.error && <div className="error-message">{field.meta.error}</div>}
-					</Col>
-				</Row>
-			</Col>
-		</div>
-	);
+class renderCodeBox extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			code: ''
+		};
+	}
+
+	updateCode(code) {
+		this.setState({ code });
+	}
+
+	render() {
+		const { label, input, meta } = this.props;
+		return (
+			<div>
+				<Codemirror value={this.state.code} onChange={this.updateCode} {...input} />
+				{meta.touched && meta.error && <div className="error-message">{meta.error}</div>}
+			</div>
+		)
+	}
 };
 
 function validate(formProps) {
@@ -37,6 +60,10 @@ function validate(formProps) {
 
 	if (!formProps.minDistanceFromPrevAd) {
 		errors.minDistanceFromPrevAd = 'Please enter minDistanceFromPrevAd';
+	}
+	
+	if (!formProps.adCode) {
+		errors.adCode = 'Please enter Ad Code';
 	}
 
 	if (!formProps.height) {
@@ -52,14 +79,6 @@ function validate(formProps) {
 
 
 class inContentForm extends React.Component {
-	submit() {
-
-	}
-
-	cancel() {
-
-	}
-
 	render() {
 		const props = this.props;
 		return (
@@ -85,10 +104,10 @@ class inContentForm extends React.Component {
 						</Row>
 					</Col>
 				</Row>
-				<Row style={{marginTop: 20}}>
+				<Row>
 					{
 						currentUser.userType !== 'partner' ? (
-							<CodeBox showButtons={false} onSubmit={this.submit} onCancel={this.cancel}/>
+							<Field name="adCode" component={renderCodeBox} label="Ad Code" />
 						) : ''
 					}
 				</Row>
@@ -110,7 +129,7 @@ inContentForm.propTypes = {
 const mapStateToProps = (state, ownProps) => ({
 		...ownProps,
 		initialValues: {
-			section: 2,
+			section: 1,
 			float: 'none',
 			minDistanceFromPrevAd: 200,
 			width: 320,
