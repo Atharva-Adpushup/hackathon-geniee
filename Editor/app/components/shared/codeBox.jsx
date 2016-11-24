@@ -36,7 +36,8 @@ class customCodeEditor extends React.Component {
 			textAreaClassName: ['form-control'],
 			textAreaStyle: { minHeight: '5em' },
 			mode: 'javascript',
-			theme: 'solarized'
+			theme: 'solarized',
+			lineNumbers: true
 		};
 
 		// Check if code box is a redux form component
