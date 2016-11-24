@@ -386,7 +386,7 @@ collapsedextended {
   word-wrap: break-word; }
 
 /*****Generic extendable classes*****/
-iconStyle, .btn.btn-lightBg.btn-del:before, .btn.btn-lightBg.btn-del-line:before, .btn.btn-lightBg.btn-copy:before, .btn.btn-lightBg.btn-edit:before, .btn.btn-lightBg.btn-save:before, .btn.btn-lightBg.btn-cancel:before, .btn.btn-lightBg.btn-add:before, .btn.btn-lightBg.btn-download:before, .btn.btn-lightBg.btn-before:before, .btn.btn-lightBg.btn-after:before, .btn.btn-lightBg.btn-transform:before, .btn.btn-lightBg.btn-option:before, .btn.btn-lightBg.btn-back:before, .btn.btn-lightBg.btn-chevron-down:before, .btn.btn-lightBg.btn-chevron-up:before {
+iconStyle, .btn.btn-lightBg.btn-del:before, .btn.btn-lightBg.btn-code:before, .btn.btn-lightBg.btn-del-line:before, .btn.btn-lightBg.btn-copy:before, .btn.btn-lightBg.btn-edit:before, .btn.btn-lightBg.btn-save:before, .btn.btn-lightBg.btn-cancel:before, .btn.btn-lightBg.btn-add:before, .btn.btn-lightBg.btn-download:before, .btn.btn-lightBg.btn-before:before, .btn.btn-lightBg.btn-after:before, .btn.btn-lightBg.btn-transform:before, .btn.btn-lightBg.btn-option:before, .btn.btn-lightBg.btn-back:before, .btn.btn-lightBg.btn-chevron-down:before, .btn.btn-lightBg.btn-chevron-up:before {
   font: normal normal normal 14px/1 FontAwesome;
   transform: translate(0, 0);
   -webkit-font-smoothing: antialiased;
@@ -459,6 +459,8 @@ maxHeightWidth {
     border-color: #14A314 !important; }
   .btn.btn-lightBg.btn-del:before {
     content: '\f1f8'; }
+  .btn.btn-lightBg.btn-code:before {
+    content: '\f121'; }
   .btn.btn-lightBg.btn-del-line:before {
     content: '\f014'; }
   .btn.btn-lightBg.btn-copy:before {

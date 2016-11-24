@@ -55,6 +55,16 @@ function validate(formProps) {
 
 
 class inContentForm extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = { addCustomAdCode: false };
+		this.showCustomAdCodeBox = this.showCustomAdCodeBox.bind(this);
+	}
+
+	showCustomAdCodeBox() {
+		this.setState({ addCustomAdCode: true });
+	}
+
 	render() {
 		const props = this.props;
 		return (
@@ -79,7 +89,7 @@ class inContentForm extends React.Component {
 					</Col>
 				</Row>
 				<Row>
-					{ currentUser.userType !== 'partner' ? ( <Field name="adCode" component={renderCodeBox} label="Ad Code" /> ) : '' }
+					{ currentUser.userType !== 'partner' || this.state.addCustomAdCode ? ( <Field name="adCode" component={renderCodeBox} label="Ad Code" /> ) : (<Col className="u-padding-r10px" style={{ marginTop: 20 }} xs={3}><Button onClick={this.showCustomAdCodeBox} className="btn-lightBg btn-code btn-block" type="button">Add Custom Ad Code</Button></Col>) }
 				</Row>
 				<Row>
 					<Col className="u-padding-r10px" style={{ marginTop: '30px', clear: 'both' }} xs={2}>

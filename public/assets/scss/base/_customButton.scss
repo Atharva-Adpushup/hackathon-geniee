@@ -36,6 +36,12 @@
             @extend iconStyle;
         }
     }
+    &.btn-code {
+        &:before {
+            content: '\f121';
+            @extend iconStyle;
+        }
+    }
     &.btn-del-line {
         &:before {
             content: '\f014';
