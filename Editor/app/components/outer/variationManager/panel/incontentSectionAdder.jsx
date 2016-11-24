@@ -115,7 +115,8 @@ const mapStateToProps = (state, ownProps) => ({
 				float: values.float
 			}, {
 				width: values.width,
-				height: values.height
+				height: values.height,
+				adCode: values.adCode
 			}, ownProps.variation.id));
 		}
 	});
