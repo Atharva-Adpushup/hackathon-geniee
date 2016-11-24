@@ -81,10 +81,10 @@ class sectionOptions extends React.Component {
 				<CustomToggleSwitch labelText="Async tag" className="u-margin-t15px u-margin-b15px" disabled defaultLayout checked={this.state.isAdAsync} name="adIsAsync" layout="horizontal" size="m" id="js-ad-is-async" on="Yes" off="No" />
 				<LabelWithButton name="customAdCode" className="u-margin-t15px u-margin-b15px" onButtonClick={this.toggleCustomAdCode} labelText="Custom Ad code" layout="horizontal" buttonText={customAdCodeText} />
 				<Row className="butttonsRow">
-					<Col xs={6}>
+					<Col xs={5}>
 						<Button className="btn-lightBg btn-cancel btn-block" onClick={this.props.onCancel}>Back</Button>
 					</Col>
-					<Col xs={6}>
+					<Col xs={7}>
 						<Button disabled={!(isAdCreateBtnDisabled)} className="btn-lightBg btn-save btn-block" onClick={this.onSave}>Create Ad</Button>
 					</Col>
 				</Row>

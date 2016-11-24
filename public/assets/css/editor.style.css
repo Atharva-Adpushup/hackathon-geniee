@@ -135,7 +135,7 @@ li, ul {
 /*User Select */
 /* Flex */
 .btn.btn-lightBg {
-  padding: 5px 15px;
+  padding: 5px 10px;
   font-size: 12px;
   text-transform: uppercase;
   -webkit-border-radius: 3px;
@@ -2326,26 +2326,24 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
     .panel-group .panel .panel-collapse .panel-body .Col {
       margin: 5px 0; }
 
-.MenuBarContainer {
-  overflow: hidden; }
-  .MenuBarContainer .MenuBarInner {
-    max-height: 500px;
-    overflow-y: auto;
-    overflow-x: hidden; }
-    .MenuBarContainer .MenuBarInner .butttonsRow {
-      left: 15px; }
-    .MenuBarContainer .MenuBarInner .SelectParent {
-      padding: 0 5px; }
-      .MenuBarContainer .MenuBarInner .SelectParent .row {
-        border-bottom: 1px solid #e6e6e6;
-        padding: 4px 0;
-        line-height: 20px; }
-        .MenuBarContainer .MenuBarInner .SelectParent .row:last-child {
-          border-bottom: 0; }
-        .MenuBarContainer .MenuBarInner .SelectParent .row:hover {
-          background: rgba(85, 85, 85, 0.05); }
-      .MenuBarContainer .MenuBarInner .SelectParent.channelLst .mobile i, .MenuBarContainer .MenuBarInner .SelectParent.channelLst .tablet i {
-        font-size: 16px; }
+.MenuBarContainer .MenuBarInner {
+  max-height: 500px; }
+  .MenuBarContainer .MenuBarInner .butttonsRow {
+    left: 3px;
+    width: 109.8%;
+    bottom: -20px; }
+  .MenuBarContainer .MenuBarInner .SelectParent {
+    padding: 0 5px; }
+    .MenuBarContainer .MenuBarInner .SelectParent .row {
+      border-bottom: 1px solid #e6e6e6;
+      padding: 4px 0;
+      line-height: 20px; }
+      .MenuBarContainer .MenuBarInner .SelectParent .row:last-child {
+        border-bottom: 0; }
+      .MenuBarContainer .MenuBarInner .SelectParent .row:hover {
+        background: rgba(85, 85, 85, 0.05); }
+    .MenuBarContainer .MenuBarInner .SelectParent.channelLst .mobile i, .MenuBarContainer .MenuBarInner .SelectParent.channelLst .tablet i {
+      font-size: 16px; }
 
 .ReactCodeMirror {
   border-right: 1px solid #ebf1f2; }
