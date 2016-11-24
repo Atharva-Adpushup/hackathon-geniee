@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Field, reduxForm } from 'redux-form';
+import validate from './inContentValidations';
 import { Row, Col, Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { createIncontentSection } from 'actions/sectionActions';
@@ -27,46 +28,45 @@ const form = reduxForm({
 		return (<CodeBox showButtons={false} isField field={field} />);
 	};
 
-function validate(formProps) {
-	const errors = {};
-
-	if (!formProps.section) {
-		errors.section = 'Please enter section';
-	}
-
-	if (!formProps.minDistanceFromPrevAd) {
-		errors.minDistanceFromPrevAd = 'Please enter minDistanceFromPrevAd';
-	}
-	
-	if (!formProps.adCode) {
-		errors.adCode = 'Please enter Ad Code';
-	}
-
-	if (!formProps.height) {
-		errors.height = 'Please enter height';
-	}
-
-	if (!formProps.width) {
-		errors.width = 'Please enter width';
-	}
-
-	return errors;
-}
-
-
 class inContentForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = { addCustomAdCode: false };
-		this.showCustomAdCodeBox = this.showCustomAdCodeBox.bind(this);
 	}
 
 	showCustomAdCodeBox() {
 		this.setState({ addCustomAdCode: true });
 	}
 
+	hideCustomAdCodeBox() {
+		this.setState({ addCustomAdCode: false });
+	}
+
 	render() {
 		const props = this.props;
+		
+		let CodeBoxField;
+		if(currentUser.userType !== 'partner') {
+			 CodeBoxField = (<Field name="adCode" component={renderCodeBox} label="Ad Code" />);
+		}
+		else {
+			if(this.state.addCustomAdCode) {
+				CodeBoxField = (
+					<div>
+						<Field name="adCode" component={renderCodeBox} label="Ad Code" /> 
+						<Row>
+							<Col xs={2} className="u-padding-r10px col-xs-offset-3">
+								<Button style={{ marginTop: 20, marginBottom: 20 }} onClick={this.hideCustomAdCodeBox.bind(this)} className="btn-lightBg btn-cancel btn-block" type="button">Cancel</Button>
+							</Col>
+						</Row>
+					</div>
+				);
+			}
+			else {
+				CodeBoxField = (<Col className="u-padding-r10px" style={{ marginTop: 20 }} xs={3}><Button onClick={this.showCustomAdCodeBox.bind(this)} className="btn-lightBg btn-code btn-block" type="button">Add Custom Ad Code</Button></Col>)
+			}
+		}
+
 		return (
 			<form onSubmit={props.handleSubmit}>
 				<h1 className="variation-section-heading">Add Incontent Variation</h1>
@@ -89,7 +89,7 @@ class inContentForm extends React.Component {
 					</Col>
 				</Row>
 				<Row>
-					{ currentUser.userType !== 'partner' || this.state.addCustomAdCode ? ( <Field name="adCode" component={renderCodeBox} label="Ad Code" /> ) : (<Col className="u-padding-r10px" style={{ marginTop: 20 }} xs={3}><Button onClick={this.showCustomAdCodeBox} className="btn-lightBg btn-code btn-block" type="button">Add Custom Ad Code</Button></Col>) }
+					{ CodeBoxField }
 				</Row>
 				<Row>
 					<Col className="u-padding-r10px" style={{ marginTop: '30px', clear: 'both' }} xs={2}>
