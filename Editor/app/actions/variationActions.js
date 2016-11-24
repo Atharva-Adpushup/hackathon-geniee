@@ -88,5 +88,7 @@ const getLastVariationNumber = function (variations) {
 		}
 		dispatch({ type: variationActions.EDIT_VARIATION_NAME, variationId, name });
 	},
-	editTrafficDistribution = (variationId, trafficDistribution) => ({ type: variationActions.EDIT_TRAFFIC_DISTRIBUTION, variationId, trafficDistribution });
-export { addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation, editVariationName, editTrafficDistribution };
+	editTrafficDistribution = (variationId, trafficDistribution) => ({ type: variationActions.EDIT_TRAFFIC_DISTRIBUTION, variationId, trafficDistribution }),
+	saveBeforeJs = (variation, beforeJs) => ({ type: variationActions.SAVE_BEFORE_JS, variation, beforeJs }),
+	saveAfterJs = (variation, afterJs) => ({ type: variationActions.SAVE_AFTER_JS, variation, afterJs });
+export { addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation, editVariationName, editTrafficDistribution, saveBeforeJs, saveAfterJs };

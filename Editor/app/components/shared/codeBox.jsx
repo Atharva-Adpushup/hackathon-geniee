@@ -5,8 +5,10 @@ import Codemirror from 'react-codemirror';
 class customCodeEditor extends React.Component {
 	constructor(props) {
 		super(props);
+
+		const code = this.props.code ? this.props.code : '';
 		this.state = {
-			code: this.props.code ? atob(this.props.code) : '',
+			code: this.props.textEdit ? code : atob(code),
 			error: false
 		};
 
@@ -16,7 +18,7 @@ class customCodeEditor extends React.Component {
 
 	save() {
 		try {
-			this.props.onSubmit(btoa(this.state.code));
+			!this.props.textEdit ? this.props.onSubmit(btoa(this.state.code)) : this.props.onSubmit(this.state.code); 
 		} catch (e) {
 			this.setState({ error: true });
 		}
@@ -82,6 +84,7 @@ class customCodeEditor extends React.Component {
 customCodeEditor.propTypes = {
 	code: PropTypes.string,
 	isField: PropTypes.bool,
+	textEdit: PropTypes.bool,
 	showButtons: PropTypes.bool,
 	onSubmit: PropTypes.func,
 	onCancel: PropTypes.func

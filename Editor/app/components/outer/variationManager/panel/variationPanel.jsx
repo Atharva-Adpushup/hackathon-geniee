@@ -5,6 +5,7 @@ import './variationPanel.scss';
 import IncontentAdder from './incontentSectionAdder';
 import VariationOptions from './variationOptions';
 import VariationSections from './VariationSections';
+import BeforeAfterJsPanel from './beforeAfterJsPanel';
 
 class VariationPanel extends React.Component {
 	render() {
@@ -21,7 +22,7 @@ class VariationPanel extends React.Component {
 					<IncontentAdder channelId={channelId} variation={variation} />
 				</div>
 				<div tabTitle="Before/After JS">
-					
+					<BeforeAfterJsPanel channelId={channelId} variation={variation}/>
 				</div>
 			</TabPanel>
 		</div>);
