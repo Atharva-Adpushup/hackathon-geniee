@@ -12,10 +12,12 @@ const BeforeAfterJsPanel = (props) => {
             <h1 className="variation-section-heading">Before/After JS</h1>
             <Row>
                 <Col xs={6}>
-                    <CodeBox showButtons textEdit code={variation.customJs.beforeAp} onSubmit={onSaveBeforeJs.bind(null, variation)} />
+					<div>Enter Before JS</div>
+                    <CodeBox showButtons textEdit textEditBtn="Save Before JS" code={variation.customJs.beforeAp} onSubmit={onSaveBeforeJs.bind(null, variation)} />
                 </Col>
                 <Col xs={6}>
-					<CodeBox showButtons textEdit code={variation.customJs.afterAp} onSubmit={onSaveAfterJs.bind(null, variation)} />
+					<div>Enter After JS</div>
+					<CodeBox showButtons textEdit textEditBtn="Save After JS" code={variation.customJs.afterAp} onSubmit={onSaveAfterJs.bind(null, variation)} />
                 </Col>
             </Row>
         </div>
