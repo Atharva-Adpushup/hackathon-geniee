@@ -135,7 +135,7 @@ li, ul {
 /*User Select */
 /* Flex */
 .btn.btn-lightBg {
-  padding: 5px 15px;
+  padding: 5px 10px;
   font-size: 12px;
   text-transform: uppercase;
   -webkit-border-radius: 3px;
@@ -171,6 +171,8 @@ li, ul {
     border-color: #14A314 !important; }
   .btn.btn-lightBg.btn-del:before {
     content: '\f1f8'; }
+  .btn.btn-lightBg.btn-code:before {
+    content: '\f121'; }
   .btn.btn-lightBg.btn-del-line:before {
     content: '\f014'; }
   .btn.btn-lightBg.btn-copy:before {
@@ -1168,7 +1170,7 @@ collapsedextended, .sectionManager .wrapper .content ul.list li .statsWrapper ul
   word-wrap: break-word; }
 
 /*****Generic extendable classes*****/
-iconStyle, .btn.btn-lightBg.btn-del:before, .btn.btn-lightBg.btn-del-line:before, .btn.btn-lightBg.btn-copy:before, .btn.btn-lightBg.btn-edit:before, .btn.btn-lightBg.btn-save:before, .btn.btn-lightBg.btn-cancel:before, .btn.btn-lightBg.btn-add:before, .btn.btn-lightBg.btn-download:before, .btn.btn-lightBg.btn-before:before, .btn.btn-lightBg.btn-after:before, .btn.btn-lightBg.btn-transform:before, .btn.btn-lightBg.btn-option:before, .btn.btn-lightBg.btn-back:before, .btn.btn-lightBg.btn-chevron-down:before, .btn.btn-lightBg.btn-chevron-up:before {
+iconStyle, .btn.btn-lightBg.btn-del:before, .btn.btn-lightBg.btn-code:before, .btn.btn-lightBg.btn-del-line:before, .btn.btn-lightBg.btn-copy:before, .btn.btn-lightBg.btn-edit:before, .btn.btn-lightBg.btn-save:before, .btn.btn-lightBg.btn-cancel:before, .btn.btn-lightBg.btn-add:before, .btn.btn-lightBg.btn-download:before, .btn.btn-lightBg.btn-before:before, .btn.btn-lightBg.btn-after:before, .btn.btn-lightBg.btn-transform:before, .btn.btn-lightBg.btn-option:before, .btn.btn-lightBg.btn-back:before, .btn.btn-lightBg.btn-chevron-down:before, .btn.btn-lightBg.btn-chevron-up:before {
   font: normal normal normal 14px/1 FontAwesome;
   transform: translate(0, 0);
   -webkit-font-smoothing: antialiased;
@@ -2324,26 +2326,24 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
     .panel-group .panel .panel-collapse .panel-body .Col {
       margin: 5px 0; }
 
-.MenuBarContainer {
-  overflow: hidden; }
-  .MenuBarContainer .MenuBarInner {
-    max-height: 500px;
-    overflow-y: auto;
-    overflow-x: hidden; }
-    .MenuBarContainer .MenuBarInner .butttonsRow {
-      left: 15px; }
-    .MenuBarContainer .MenuBarInner .SelectParent {
-      padding: 0 5px; }
-      .MenuBarContainer .MenuBarInner .SelectParent .row {
-        border-bottom: 1px solid #e6e6e6;
-        padding: 4px 0;
-        line-height: 20px; }
-        .MenuBarContainer .MenuBarInner .SelectParent .row:last-child {
-          border-bottom: 0; }
-        .MenuBarContainer .MenuBarInner .SelectParent .row:hover {
-          background: rgba(85, 85, 85, 0.05); }
-      .MenuBarContainer .MenuBarInner .SelectParent.channelLst .mobile i, .MenuBarContainer .MenuBarInner .SelectParent.channelLst .tablet i {
-        font-size: 16px; }
+.MenuBarContainer .MenuBarInner {
+  max-height: 500px; }
+  .MenuBarContainer .MenuBarInner .butttonsRow {
+    left: 3px;
+    width: 109.8%;
+    bottom: -20px; }
+  .MenuBarContainer .MenuBarInner .SelectParent {
+    padding: 0 5px; }
+    .MenuBarContainer .MenuBarInner .SelectParent .row {
+      border-bottom: 1px solid #e6e6e6;
+      padding: 4px 0;
+      line-height: 20px; }
+      .MenuBarContainer .MenuBarInner .SelectParent .row:last-child {
+        border-bottom: 0; }
+      .MenuBarContainer .MenuBarInner .SelectParent .row:hover {
+        background: rgba(85, 85, 85, 0.05); }
+    .MenuBarContainer .MenuBarInner .SelectParent.channelLst .mobile i, .MenuBarContainer .MenuBarInner .SelectParent.channelLst .tablet i {
+      font-size: 16px; }
 
 .ReactCodeMirror {
   border-right: 1px solid #ebf1f2; }

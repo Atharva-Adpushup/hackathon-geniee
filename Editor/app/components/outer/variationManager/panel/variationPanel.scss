@@ -70,3 +70,9 @@ $lightGrey:#ccc;
         border: 1px solid $lightGrey;
     }
 }
+
+.codeEditor-small {
+    .CodeMirror {
+        height: 110px;
+    }
+}

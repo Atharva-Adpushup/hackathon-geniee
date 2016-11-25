@@ -5,8 +5,10 @@ import Codemirror from 'react-codemirror';
 class customCodeEditor extends React.Component {
 	constructor(props) {
 		super(props);
+
+		const code = this.props.code ? this.props.code : '';
 		this.state = {
-			code: this.props.code ? atob(this.props.code) : '',
+			code: this.props.textEdit ? code : atob(code),
 			error: false
 		};
 
@@ -16,7 +18,7 @@ class customCodeEditor extends React.Component {
 
 	save() {
 		try {
-			this.props.onSubmit(btoa(this.state.code));
+			!this.props.textEdit ? this.props.onSubmit(btoa(this.state.code)) : this.props.onSubmit(this.state.code); 
 		} catch (e) {
 			this.setState({ error: true });
 		}
@@ -36,7 +38,8 @@ class customCodeEditor extends React.Component {
 			textAreaClassName: ['form-control'],
 			textAreaStyle: { minHeight: '5em' },
 			mode: 'javascript',
-			theme: 'solarized'
+			theme: 'solarized',
+			lineNumbers: true
 		};
 
 		// Check if code box is a redux form component
@@ -57,23 +60,34 @@ class customCodeEditor extends React.Component {
 			);
 		}
 		else {
-			return (
-				<div className={this.props.showButtons ? 'containerButtonBar' : ''}>
-					{this.state.error && (<div>Some Error in CSS, remove comma in last property if there.</div>)}
-					<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
-					{
-						this.props.showButtons ? (
-						<Row className="butttonsRow">
-							<Col xs={6}>
-								<Button disabled={this.state.error} className="btn-lightBg btn-save" onClick={this.save}>Save</Button>
-							</Col>
-							<Col xs={6}>
-								<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>Cancel</Button>
-							</Col>
-						</Row> ) : ''
-					}
-				</div>
-			);
+			// Check if code box is meant to be a regular text editor
+			if(this.props.textEdit) {
+				return (
+					<div className="codeEditor-small">
+						<Codemirror value={this.state.code} onChange={this.updateCode} options={options} /><br/>
+						<Button disabled={this.state.code == ''} className="btn-lightBg btn-save" onClick={this.save}>{this.props.textEditBtn ? this.props.textEditBtn : 'Save'}</Button>
+					</div>
+				);
+			}
+			else {
+				return (
+					<div className={this.props.showButtons ? 'containerButtonBar' : ''}>
+						{this.state.error && (<div>Some Error in CSS, remove comma in last property if there.</div>)}
+						<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
+						{
+							this.props.showButtons ? (
+							<Row className="butttonsRow">
+								<Col xs={6}>
+									<Button disabled={this.state.error} className="btn-lightBg btn-save" onClick={this.save}>Save</Button>
+								</Col>
+								<Col xs={6}>
+									<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>Cancel</Button>
+								</Col>
+							</Row> ) : ''
+						}
+					</div>
+				);
+			}
 		}
 	}
 }
@@ -81,6 +95,8 @@ class customCodeEditor extends React.Component {
 customCodeEditor.propTypes = {
 	code: PropTypes.string,
 	isField: PropTypes.bool,
+	textEdit: PropTypes.bool,
+	textEditBtn: PropTypes.string,
 	showButtons: PropTypes.bool,
 	onSubmit: PropTypes.func,
 	onCancel: PropTypes.func

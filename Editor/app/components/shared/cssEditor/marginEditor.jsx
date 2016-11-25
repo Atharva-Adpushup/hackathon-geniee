@@ -73,7 +73,7 @@ class cssMarginEditor extends React.Component {
 					</div>
 
 					<Row className="butttonsRow">
-						<Col xs={6} className="u-padding-l5px">
+						<Col xs={6}>
 							<Button type="submit" className="btn-lightBg btn-save ">Save Css</Button>
 						</Col>
 						<Col xs={6}>

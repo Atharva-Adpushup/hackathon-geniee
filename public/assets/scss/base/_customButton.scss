@@ -1,5 +1,5 @@
 .btn.btn-lightBg {
-    padding:        5px 15px;
+    padding:        5px 10px;
     font-size:      $LPFormButtonSize;
     text-transform: uppercase;
     @include border-radius(3px);
@@ -33,6 +33,12 @@
     &.btn-del {
         &:before {
             content: '\f1f8';
+            @extend iconStyle;
+        }
+    }
+    &.btn-code {
+        &:before {
+            content: '\f121';
             @extend iconStyle;
         }
     }

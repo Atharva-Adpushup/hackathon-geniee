@@ -40,6 +40,24 @@ const variation = (state = {}, action) => {
 				}
 
 				return state;
+			
+			case variationActions.SAVE_BEFORE_JS:
+				return { ...state, [action.variation.id]: {
+					...state[action.variation.id],
+					customJs: {
+						beforeAp: action.beforeJs,
+						afterAp: action.variation.customJs.afterAp
+					}
+				} };
+			
+			case variationActions.SAVE_AFTER_JS:
+				return { ...state, [action.variation.id]: {
+					...state[action.variation.id],
+					customJs: {
+						beforeAp: action.variation.customJs.beforeAp,
+						afterAp: action.afterJs
+					}
+				} };
 
 			case variationActions.EDIT_VARIATION_NAME:
 				return { ...state, [action.variationId]: {
