@@ -21,6 +21,8 @@ router
 		}
 		var partnerEmail = json.partner + '@adpushup.com', siteId;
 		json.ownerEmail = partnerEmail;
+		//TODO: Replace below hard code draft mode with constant
+		json.apConfigs = { 'mode': 2 };
 
 		// Function to create partner user account and site
 		function createPartnerAndSite() {
@@ -31,7 +33,7 @@ router
 				site: json.siteDomain,
 				userType: 'partner'
 			})
-			.then(function (firstSite) { 
+			.then(function (firstSite) {
 				json.siteId = firstSite.siteId;
 				return siteModel.saveSiteData(firstSite.siteId, 'POST', json) 
 			})
