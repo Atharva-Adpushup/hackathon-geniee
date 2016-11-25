@@ -18,6 +18,7 @@ var consts = require('../configs/commonConsts'),
 		this.mergingKey = null;
 		this.mergeExtraKeys = false;
 		this.classMap = {};
+		this.tempObjectMergingKeys = ['apConfigs'];
 
 		this.constructor = function (data, force) {
 			if (data) {
@@ -144,6 +145,8 @@ var consts = require('../configs/commonConsts'),
 				if (this.keys.indexOf(key) !== -1 && this.ignore.indexOf(key) === -1) {
 					if (Array.isArray(existingData) && existingData[0] && existingData[0] instanceof model) {
 						this.data[key] = this.merge(existingData, Array.isArray(val) ? val : [val]);
+					} else if (existingData && (typeof(existingData) === 'object') && (this.tempObjectMergingKeys.indexOf(key) > -1)) {
+						this.data[key] = extend(true, {}, existingData, val);
 					} else {
 						this.data[key] = val;
 					}
