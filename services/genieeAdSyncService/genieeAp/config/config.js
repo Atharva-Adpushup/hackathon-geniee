@@ -10,7 +10,7 @@ module.exports = {
 	heartBeatStartDelay: 2000,
 	xpathWaitTimeout: 5000,
 	contentSelector: null,
-	adpushupPercentage: 90,
+	adpushupPercentage: 100,
 	mode: 2,
 	domain: '',
 	forceVariation: 'forceVariation',

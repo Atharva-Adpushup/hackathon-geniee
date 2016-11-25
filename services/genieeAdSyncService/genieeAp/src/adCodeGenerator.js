@@ -10,13 +10,11 @@ module.exports = {
 
 			case 'geniee':
 				adCode = [];
-				adCode.push('<div id="_ap_apexGeniee_ad_' + ad.networkData.zoneId + '" style="display:none;">');
 				adCode.push('<scr' + 'ipt type="text/javascript">');
 				adCode.push('gnsmod.cmd.push(function() {');
-				adCode.push('gnsmod.displayAds("_ap_apexGeniee_ad_' + ad.networkData.zoneId + '")');
+				adCode.push('gnsmod.displayAds("_ap_apexGeniee_ad_' + ad.networkData.zoneId + '");');
 				adCode.push('});');
 				adCode.push('</scr' + 'ipt>');
-				adCode.push('</div>');
 				break;
 			default:
 				return false;
@@ -35,6 +33,7 @@ module.exports = {
 		for (i = 0; i < genieeAdIds.length; i++ ) {
 			adCode.push('gnsmod.defineZone("_ap_apexGeniee_ad_' + genieeAdIds[i] + '", ' + genieeAdIds[i] + ');');
 		}
+		adCode.push('gnsmod.fetchAds();');
 		adCode.push('});');
 		adCode.push('</scr' + 'ipt>');
 		adCode.push(' <scr' + 'ipt async type="text/javascript"\n src="http://other.geniee.jp/test/sample_html/adp/gnsmod.min.js"> \n</scr' + 'ipt>');

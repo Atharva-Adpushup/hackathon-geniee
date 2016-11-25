@@ -22,8 +22,7 @@ var $ = require('jquery'),
 			'display': ad.network === 'geniee' ? 'none' : 'block',
 			'clear': ad.isIncontent ? null : 'both',
 			'width': ad.width + 'px',
-			'height': ad.height + 'px',
-			'background-color': 'red'
+			'height': ad.height + 'px'
 		}, ad.css)).attr({
 			'id': ad.network === 'geniee' ? '_ap_apexGeniee_ad_' + ad.networkData.zoneId : ad.id,
 			'data-section': ad.id,
