@@ -170,7 +170,7 @@ function apiModule() {
 			}, function () {
 				return new Channel(channelData);
 			}).then(function (channel) {
-				return channel;
+				return channel.save();
 			});
 		},
 		saveChannels: function (siteId, channels) {

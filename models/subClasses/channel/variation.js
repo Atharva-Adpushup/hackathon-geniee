@@ -1,19 +1,15 @@
 var model = require('../../../helpers/model'),
 	sectionModel = require('./section'),
 	consts = require('../../../configs/commonConsts'),
-	Variation = model.extend(function() {
-		this.merging = true;
-		this.mergingPriority = consts.enums.priorities.NEW_OBJECT;
-		this.mergeExtraKeys = true;
-		this.mergingKey = 'id';
-		this.keys = ['id', 'name', 'trafficDistribution', 'createTs', 'customJs', 'sections'];
-		this.clientKeys = ['id', 'name', 'trafficDistribution', 'createTs', 'customJs', 'sections'];
-		this.defaults = {};
-
-		this.classMap = { 'sections': sectionModel };
-		this.constructor = function(data, force) {
-			this.super(data, force);
-		};
-	});
+	Variation = {
+		merging: true,
+		mergingPriority: consts.enums.priorities.NEW_OBJECT,
+		mergeExtraKeys: true,
+		mergingKey: 'id',
+		keys: ['id', 'name', 'trafficDistribution', 'createTs', 'customJs', 'sections'],
+		clientKeys: ['id', 'name', 'trafficDistribution', 'createTs', 'customJs', 'sections'],
+		defaults: {},
+		classMap: { 'sections': sectionModel }
+	};
 
 module.exports = Variation;

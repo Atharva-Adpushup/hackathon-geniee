@@ -133,7 +133,7 @@ var model = require('../helpers/model'),
 function apiModule() {
 	var API = {
 		createSite: function (data) {
-			var json = { siteName: data.siteName, siteDomain: data.siteDomain };
+			var json = { siteName: data.siteName, siteDomain: data.siteDomain, apConfigs: data.apConfigs };
 			if (data.partner) {
 				json.partner = data.partner;
 				json.ownerEmail = data.ownerEmail;

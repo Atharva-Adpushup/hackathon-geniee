@@ -1,6 +1,7 @@
 var consts = require('../configs/commonConsts'),
 	priorities = consts.enums.priorities,
 	_ = require('lodash'),
+	extend = require('extend'),
 	moment = require('moment'),
 	couchbase = require('../helpers/couchBaseService'),
 	adpushup = require('../helpers/adpushupEvent'),
@@ -135,9 +136,9 @@ var consts = require('../configs/commonConsts'),
 		this.set = function (key, val, forceInsert) {
 			var existingData = this.get(key), keys = val ? Object.keys(val) : [];
 			// if we use set function directly and existing array is empty and key is in classmap then convert value into
-			if (this.classMap[key] && ((Array.isArray(val) && val.length && !(val[0] instanceof model)) || (!Array.isArray(val) && val[keys[0]] && !(val[keys[0]] instanceof model)))) {
-				val = this.loadSubClass(this.classMap[key], Array.isArray(val) ? val : [val], forceInsert);
-			}
+			// if (this.classMap[key] && ((Array.isArray(val) && val.length && !(val[0] instanceof model)) || (!Array.isArray(val) && val[keys[0]] && !(val[keys[0]] instanceof model)))) {
+			// 	val = this.loadSubClass(this.classMap[key], Array.isArray(val) ? val : [val], forceInsert);
+			// }
 
 			if (this.keys.length > 0 && !forceInsert) {
 				if (this.keys.indexOf(key) !== -1 && this.ignore.indexOf(key) === -1) {
@@ -158,10 +159,50 @@ var consts = require('../configs/commonConsts'),
 			});
 		};
 
+		this.mergeObjects = function(key, newData, schema) {
+			var existingData = this.get(key),
+				computedData = extend(true, {}, newData),
+				intersectedVariationKeys, finalData;
+
+			if (!existingData) { return newData; }
+
+			intersectedVariationKeys = _.intersection(Object.keys(newData), Object.keys(existingData));
+			computedData = _.pick(computedData, intersectedVariationKeys);
+
+			_.forEach(computedData, function(variationObj, variationKey) {
+				var existingDataVariationObj = existingData[variationKey],
+					newDataVariationObj = computedData[variationKey],
+					intersectedSectionsKeys;
+
+				if (existingData.hasOwnProperty(variationKey) && existingDataVariationObj) {
+					intersectedSectionsKeys = _.intersection(Object.keys(newDataVariationObj.sections), Object.keys(existingDataVariationObj.sections));
+					computedData[variationKey].sections = _.pick(newDataVariationObj.sections, intersectedSectionsKeys);
+
+					_.forEach(computedData[variationKey].sections, function(sectionObj, sectionKey) {
+						var existingDataSectionObj = existingDataVariationObj.sections[sectionKey],
+							newDataSectionObj = newDataVariationObj.sections[sectionKey],
+							intersectedAdsKeys, computedAds = {};
+
+						if (existingDataVariationObj.sections.hasOwnProperty(sectionKey) && existingDataSectionObj) {
+							intersectedAdsKeys = _.intersection(Object.keys(newDataSectionObj.ads), Object.keys(existingDataSectionObj.ads));
+							_.forEach(intersectedAdsKeys, function(adKey) {
+								computedAds[adKey] = extend(true, existingDataSectionObj.ads[adKey], newDataSectionObj.ads[adKey]);
+							});
+
+							computedData[variationKey].sections[sectionKey].ads = computedAds;
+						}
+					});
+				}
+			});
+
+			finalData = extend(true, computedData, newData);
+			return finalData;
+		};
+
 		this.setAll = function (json, force) {
 			Object.keys(json).forEach(function (key) {
 				if (this.classMap[key]) {
-					this.set(key, this.loadSubClass(this.classMap[key], json[key], force), force);
+					this.set(key, this.mergeObjects(key, json[key], this.classMap[key]), force);
 				} else {
 					this.set(key, json[key], force);
 				}
