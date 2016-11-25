@@ -1,11 +1,12 @@
 var consts = require('../configs/commonConsts'),
 	priorities = consts.enums.priorities,
 	_ = require('lodash'),
+	extend = require('extend'),
 	moment = require('moment'),
 	couchbase = require('../helpers/couchBaseService'),
 	adpushup = require('../helpers/adpushupEvent'),
 	Class = require('./class'),
-	model = Class.extend(function() {
+	model = Class.extend(function () {
 		this.data = {};
 		this.keys = [];
 		this.defaults = {};
@@ -18,7 +19,7 @@ var consts = require('../configs/commonConsts'),
 		this.mergeExtraKeys = false;
 		this.classMap = {};
 
-		this.constructor = function(data, force) {
+		this.constructor = function (data, force) {
 			if (data) {
 				this.setAll(data, force);
 			}
@@ -26,9 +27,9 @@ var consts = require('../configs/commonConsts'),
 
 		function getJSON(keys, func) {
 			var json = {};
-			_.forEach(keys, function(key) {
+			_.forEach(keys, function (key) {
 				if (Array.isArray(this.get(key)) && this.get(key)[0] instanceof model) {
-					json[key] = _.map(this.get(key), function(otherObject) {
+					json[key] = _.map(this.get(key), function (otherObject) {
 						return otherObject[func].call(otherObject);
 					});
 				} else {
@@ -38,17 +39,17 @@ var consts = require('../configs/commonConsts'),
 			return json;
 		}
 
-		this.toJSON = function() {
+		this.toJSON = function () {
 			return getJSON.call(this, Object.keys(this.data), 'toJSON');
 		};
 
-		this.toClientJSON = function() {
+		this.toClientJSON = function () {
 			var keys = this.clientKeys ? this.clientKeys : Object.keys(this.data);
 			return getJSON.call(this, keys, 'toClientJSON');
 		};
 
-		this.setDefaults = function() {
-			Object.keys(this.defaults).forEach(function(key) {
+		this.setDefaults = function () {
+			Object.keys(this.defaults).forEach(function (key) {
 				if (typeof this.get(key) === 'undefined' || this.get(key) === null) {
 					// force defaults as some time defaults are not in keys;
 					this.set(key, this.defaults[key], true);
@@ -56,7 +57,7 @@ var consts = require('../configs/commonConsts'),
 			}.bind(this));
 		};
 
-		this.save = function() {
+		this.save = function () {
 			var self = this, name = null;
 			if (!this.data.dateCreated) {
 				this.data.dateCreated = +moment().utc();
@@ -70,14 +71,14 @@ var consts = require('../configs/commonConsts'),
 				name = 'user';
 			}
 
-			return couchbase.connectToAppBucket().then(function(appBucket) {
-				return !self.casValue ? appBucket.insertAsync(self.key, self.toJSON(), {}).then(function(obj) {
+			return couchbase.connectToAppBucket().then(function (appBucket) {
+				return !self.casValue ? appBucket.insertAsync(self.key, self.toJSON(), {}).then(function (obj) {
 					self.casValue = obj.cas;
 					if (name) {
 						adpushup.emit(name + 'Saved', self);
 					}
 					return self;
-				}) : appBucket.replaceAsync(self.key, self.toJSON(), {}).then(function(obj) {
+				}) : appBucket.replaceAsync(self.key, self.toJSON(), {}).then(function (obj) {
 					self.casValue = obj.cas;
 					if (name) {
 						adpushup.emit(name + 'Saved', self);
@@ -88,11 +89,11 @@ var consts = require('../configs/commonConsts'),
 		};
 
 
-		this.get = function(key) {
+		this.get = function (key) {
 			return this.data[key];
 		};
 
-		this.merge = function(existingArr, newArr) {
+		this.merge = function (existingArr, newArr) {
 			var secondArr = (existingArr[0].mergingPriority === priorities.NEW_OBJECT) ? existingArr : newArr,
 				firstArr = (existingArr[0].mergingPriority === priorities.NEW_OBJECT) ? newArr : existingArr;
 
@@ -106,15 +107,15 @@ var consts = require('../configs/commonConsts'),
 				return firstArr;
 			}
 
-			_.forEach(secondArr, function(second) {// loop over second array
+			_.forEach(secondArr, function (second) {// loop over second array
 				var flag = false;
-				_.forEach(firstArr, function(first) {// loop over first array
+				_.forEach(firstArr, function (first) {// loop over first array
 					// if merging keys matched, e.g section md5 for both database and new array from editor matches
 					if (second.get(first.mergingKey) === first.get(first.mergingKey)) {
 						// if there are keys from server object to merge into new object,
 						// like impression and clicks added by the java demons then merge add those in new object
 						if (first.mergeExtraKeys) {
-							_.forEach(_.difference(Object.keys(second.data), first.keys), function(key) {// find difference between allowed keys and keys of existing data
+							_.forEach(_.difference(Object.keys(second.data), first.keys), function (key) {// find difference between allowed keys and keys of existing data
 								first.set(key, second.get(key), true);// force fully set these keys as they might not be declared in allowed "keys" of an object
 							});
 						}
@@ -132,12 +133,12 @@ var consts = require('../configs/commonConsts'),
 			return firstArr;
 		};
 
-		this.set = function(key, val, forceInsert) {
-			var existingData = this.get(key);
+		this.set = function (key, val, forceInsert) {
+			var existingData = this.get(key), keys = val ? Object.keys(val) : [];
 			// if we use set function directly and existing array is empty and key is in classmap then convert value into
-			if (this.classMap[key] && ((Array.isArray(val) && val.length && !(val[0] instanceof model)) || (!Array.isArray(val) && val && !(val instanceof model)))) {
-				val = this.loadSubClass(this.classMap[key], Array.isArray(val) ? val : [val], forceInsert);
-			}
+			// if (this.classMap[key] && ((Array.isArray(val) && val.length && !(val[0] instanceof model)) || (!Array.isArray(val) && val[keys[0]] && !(val[keys[0]] instanceof model)))) {
+			// 	val = this.loadSubClass(this.classMap[key], Array.isArray(val) ? val : [val], forceInsert);
+			// }
 
 			if (this.keys.length > 0 && !forceInsert) {
 				if (this.keys.indexOf(key) !== -1 && this.ignore.indexOf(key) === -1) {
@@ -152,16 +153,56 @@ var consts = require('../configs/commonConsts'),
 			}
 		};
 
-		this.loadSubClass = function(SubClass, newVals, force) {
-			return _.map(newVals, function(newVal) {
+		this.loadSubClass = function (SubClass, newVals, force) {
+			return _.mapValues(newVals, function (newVal) {
 				return new SubClass(newVal, force);
 			});
 		};
 
-		this.setAll = function(json, force) {
-			Object.keys(json).forEach(function(key) {
+		this.mergeObjects = function(key, newData, schema) {
+			var existingData = this.get(key),
+				computedData = extend(true, {}, newData),
+				intersectedVariationKeys, finalData;
+
+			if (!existingData) { return newData; }
+
+			intersectedVariationKeys = _.intersection(Object.keys(newData), Object.keys(existingData));
+			computedData = _.pick(computedData, intersectedVariationKeys);
+
+			_.forEach(computedData, function(variationObj, variationKey) {
+				var existingDataVariationObj = existingData[variationKey],
+					newDataVariationObj = computedData[variationKey],
+					intersectedSectionsKeys;
+
+				if (existingData.hasOwnProperty(variationKey) && existingDataVariationObj) {
+					intersectedSectionsKeys = _.intersection(Object.keys(newDataVariationObj.sections), Object.keys(existingDataVariationObj.sections));
+					computedData[variationKey].sections = _.pick(newDataVariationObj.sections, intersectedSectionsKeys);
+
+					_.forEach(computedData[variationKey].sections, function(sectionObj, sectionKey) {
+						var existingDataSectionObj = existingDataVariationObj.sections[sectionKey],
+							newDataSectionObj = newDataVariationObj.sections[sectionKey],
+							intersectedAdsKeys, computedAds = {};
+
+						if (existingDataVariationObj.sections.hasOwnProperty(sectionKey) && existingDataSectionObj) {
+							intersectedAdsKeys = _.intersection(Object.keys(newDataSectionObj.ads), Object.keys(existingDataSectionObj.ads));
+							_.forEach(intersectedAdsKeys, function(adKey) {
+								computedAds[adKey] = extend(true, existingDataSectionObj.ads[adKey], newDataSectionObj.ads[adKey]);
+							});
+
+							computedData[variationKey].sections[sectionKey].ads = computedAds;
+						}
+					});
+				}
+			});
+
+			finalData = extend(true, computedData, newData);
+			return finalData;
+		};
+
+		this.setAll = function (json, force) {
+			Object.keys(json).forEach(function (key) {
 				if (this.classMap[key]) {
-					this.set(key, this.loadSubClass(this.classMap[key], json[key], force), force);
+					this.set(key, this.mergeObjects(key, json[key], this.classMap[key]), force);
 				} else {
 					this.set(key, json[key], force);
 				}
@@ -170,7 +211,7 @@ var consts = require('../configs/commonConsts'),
 			this.setDefaults();
 		};
 
-		this.delete = function(key) {
+		this.delete = function (key) {
 			delete this.data[key];
 		};
 	});
