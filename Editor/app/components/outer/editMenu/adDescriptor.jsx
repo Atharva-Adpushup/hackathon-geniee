@@ -33,15 +33,12 @@ class adDescriptor extends React.Component {
 	render() {
 		const { ad, updateCss, updateAdCode } = this.props,
 			adCode = ad.adCode;
-		let	number = 6;
-		if (adCode) {
-			number = 4;
-		}
+		const	number = 6;
 		if (this.state.isEditingCss) {
 			return (<CssEditor css={ad.css} onCancel={this.toggleCssEditor} onSave={updateCss.bind(null, ad.id)} />);
 		}
 		if (this.state.isEditingCode) {
-			return (<CodeBox showButtons={true} code={adCode} onSubmit={updateAdCode.bind(null, ad.id)} onCancel={this.toggleCodeEditor} />);
+			return (<CodeBox showButtons code={adCode} onSubmit={updateAdCode.bind(null, ad.id)} onCancel={this.toggleCodeEditor} />);
 		}
 		return (
 			<div className="containerButtonBar">
@@ -50,11 +47,11 @@ class adDescriptor extends React.Component {
 					{ !adCode && <Col xs={12}>{`${ad.height}X${ad.width}`}</Col> }
 				</Row>
 				<Row className="butttonsRow">
-					<Col xs={number}>
-						<Button className="btn-lightBg btn-cancel" onClick={this.toggleCssEditor}>Edit Css</Button>
+					{	adCode && (<Col xs={12}><Button className="btn-lightBg btn-edit btn-block" onClick={this.toggleCodeEditor}>Edit AdCode</Button></Col>)	}
+					<Col xs={number} className="mT-10">
+						<Button className="btn-lightBg btn-edit" onClick={this.toggleCssEditor}>Edit Css</Button>
 					</Col>
-					{	adCode && (<Col xs={number}><Button className="btn-lightBg btn-cancel" onClick={this.toggleCodeEditor}>Edit AdCode</Button></Col>)	}
-					<Col xs={number}>
+					<Col xs={number} className="mT-10">
 						<Button className="btn-lightBg btn-cancel" onClick={this.deleteSectionWithAd.bind(this)}>Delete Ad</Button>
 					</Col>
 				</Row>

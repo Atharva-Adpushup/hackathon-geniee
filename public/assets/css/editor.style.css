@@ -2349,7 +2349,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   border-right: 1px solid #ebf1f2; }
 
 .containerButtonBar {
-  padding-bottom: 70px;
+  padding-bottom: 120px;
   position: relative; }
   .containerButtonBar input[type="number"] {
     width: 60px; }
@@ -2572,7 +2572,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
       border-top: 7px solid #eb575c;
       margin-left: -7px; }
   .MenuBarComponentWrap .MenuBarContainerWrapper {
-    min-height: 300px;
+    min-height: 205px;
     margin-left: 33px;
     padding-left: 6px;
     width: 255px;
