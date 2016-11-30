@@ -18,7 +18,7 @@ var consts = require('../configs/commonConsts'),
 		this.mergingKey = null;
 		this.mergeExtraKeys = false;
 		this.classMap = {};
-		this.tempObjectMergingKeys = ['apConfigs'];
+		this.rootMergingObjectKeys = ['apConfigs'];
 
 		this.constructor = function (data, force) {
 			if (data) {
@@ -94,7 +94,82 @@ var consts = require('../configs/commonConsts'),
 			return this.data[key];
 		};
 
-		this.merge = function (existingArr, newArr) {
+		this.extendObject = function(existingObj, newObj) {
+			return extend(true, {}, existingObj, newObj);
+		};
+
+		this.mergeRootObject = function(key, newData) {
+			var existingData = this.get(key);
+
+			if (!existingData) { return newData; }
+
+			return this.extendObject(existingData, newData);
+		};
+
+		/**
+		 * OBJECTIVE: Merge nested objects that follows a particular schema (see /Applications/MAMP/htdocs/GenieeAdPushup/models/subClasses/channel/variation.js for schema)
+		 * PURPOSE: An implementation was required to merge nested objects that follow a schema
+		 * IMPLEMENTATION: Following is the algorithm procedure:
+		 * 1) - Intersect root object keys of existing and new data
+		 * 2) - Set final computed object base as a deep extend of new data
+		 * 3) - Iterate over intersected keys and get existing and new object based on iterator key
+		 * 4) - Union existing and newData object keys
+		 * 5) - Iterate over these keys, perform 3 checks and set computed object based on them:
+		 * 	    1) Deep Extend existing and new object if there is no schema
+		 * 		   and iterator key is in 'rootMergingObjectKeys' array
+		 *      2) Recursively call this method if key is in schema classMap
+		 *      3) If key is in existing data but not present in new data,
+		 *         set computed object property and its value as existing data property value
+		 * 6) - Return computed merged nested object
+		 * @param {existingData} server side data (saved in database)
+		 * @param {newData} client side json (product's client side, background service etc.)
+		 * @param {schema} a JSON structure that defines model
+		 * @returns {object} merged nested object
+		 */
+		this.mergeObjectsRecursively = function(existingData, newData, schema) {
+			var intersectedKeys = _.intersection(Object.keys(newData), Object.keys(existingData)),
+				computedData = extend(true, {}, newData), self = this;
+
+			_.forEach(intersectedKeys, function(intersectedKey) {
+				var existingDataObj = existingData[intersectedKey],
+					newDataObj = newData[intersectedKey],
+					allIteratableKeys = _.union(Object.keys(existingDataObj), Object.keys(newDataObj));
+
+				_.forEach(allIteratableKeys, function(propertyKey) {
+					if (!schema && (self.rootMergingObjectKeys.indexOf(propertyKey) > -1)) {
+						computedData[intersectedKey][propertyKey] = self.extendObject(existingDataObj[propertyKey], newDataObj[propertyKey]);
+					} else if (schema && schema.classMap && schema.classMap[propertyKey]) {
+						computedData[intersectedKey][propertyKey] = self.mergeObjectsRecursively(existingDataObj[propertyKey], newDataObj[propertyKey], schema.classMap[propertyKey]);
+					} else if (existingDataObj[propertyKey] && !newDataObj[propertyKey]) {
+						computedData[intersectedKey][propertyKey] = existingDataObj[propertyKey];
+					}
+				});
+			});
+
+			return computedData;
+		}
+
+
+		/**
+		 * OBJECTIVE: Merge nested objects that follows a particular schema (see /Applications/MAMP/htdocs/GenieeAdPushup/models/subClasses/channel/variation.js for schema)
+		 * IMPLEMENTATION: Merge nested objects' existing (database) and new (client) data by recursion
+		 * @param {key} model key name
+		 * @param {newData} client side json (product's client side, background service etc.)
+		 * @param {schema} a JSON structure that defines model
+		 * @returns {object} merged nested object
+		 */
+		this.mergeNestedObjects = function(key, newData, schema) {
+			var existingData = this.get(key),
+				computedData;
+
+			if (!existingData) { return newData; }
+
+			computedData = this.mergeObjectsRecursively(existingData, newData, schema);
+
+			return extend(true, computedData, newData);
+		};
+
+		this.mergeArrayModel = function (existingArr, newArr) {
 			var secondArr = (existingArr[0].mergingPriority === priorities.NEW_OBJECT) ? existingArr : newArr,
 				firstArr = (existingArr[0].mergingPriority === priorities.NEW_OBJECT) ? newArr : existingArr;
 
@@ -135,18 +210,19 @@ var consts = require('../configs/commonConsts'),
 		};
 
 		this.set = function (key, val, forceInsert) {
-			var existingData = this.get(key), keys = val ? Object.keys(val) : [];
-			// if we use set function directly and existing array is empty and key is in classmap then convert value into
-			// if (this.classMap[key] && ((Array.isArray(val) && val.length && !(val[0] instanceof model)) || (!Array.isArray(val) && val[keys[0]] && !(val[keys[0]] instanceof model)))) {
-			// 	val = this.loadSubClass(this.classMap[key], Array.isArray(val) ? val : [val], forceInsert);
-			// }
+			var existingData = this.get(key),
+				keys = val ? Object.keys(val) : [],
+				isNoForceInsertion = (this.keys.length > 0 && !forceInsert),
+				isValidKey = (this.keys.indexOf(key) !== -1 && (this.ignore.indexOf(key) === -1)),
+				isKeyAnArrayModel = (Array.isArray(existingData) && existingData[0] && (existingData[0] instanceof model)),
+				isKeyARootMergingObject = (existingData && (typeof(existingData) === 'object') && (this.rootMergingObjectKeys.indexOf(key) > -1));
 
-			if (this.keys.length > 0 && !forceInsert) {
-				if (this.keys.indexOf(key) !== -1 && this.ignore.indexOf(key) === -1) {
-					if (Array.isArray(existingData) && existingData[0] && existingData[0] instanceof model) {
-						this.data[key] = this.merge(existingData, Array.isArray(val) ? val : [val]);
-					} else if (existingData && (typeof(existingData) === 'object') && (this.tempObjectMergingKeys.indexOf(key) > -1)) {
-						this.data[key] = extend(true, {}, existingData, val);
+			if (isNoForceInsertion) {
+				if (isValidKey) {
+					if (isKeyAnArrayModel) {
+						this.data[key] = this.mergeArrayModel(existingData, Array.isArray(val) ? val : [val]);
+					} else if (isKeyARootMergingObject) {
+						this.data[key] = this.extendObject(existingData, val);
 					} else {
 						this.data[key] = val;
 					}
@@ -162,52 +238,16 @@ var consts = require('../configs/commonConsts'),
 			});
 		};
 
-		this.mergeObjects = function(key, newData, schema) {
-			var existingData = this.get(key),
-				computedData = extend(true, {}, newData),
-				intersectedVariationKeys, finalData;
-
-			if (!existingData) { return newData; }
-
-			intersectedVariationKeys = _.intersection(Object.keys(newData), Object.keys(existingData));
-			computedData = _.pick(computedData, intersectedVariationKeys);
-
-			_.forEach(computedData, function(variationObj, variationKey) {
-				var existingDataVariationObj = existingData[variationKey],
-					newDataVariationObj = computedData[variationKey],
-					intersectedSectionsKeys;
-
-				if (existingData.hasOwnProperty(variationKey) && existingDataVariationObj) {
-					intersectedSectionsKeys = _.intersection(Object.keys(newDataVariationObj.sections), Object.keys(existingDataVariationObj.sections));
-					computedData[variationKey].sections = _.pick(newDataVariationObj.sections, intersectedSectionsKeys);
-
-					_.forEach(computedData[variationKey].sections, function(sectionObj, sectionKey) {
-						var existingDataSectionObj = existingDataVariationObj.sections[sectionKey],
-							newDataSectionObj = newDataVariationObj.sections[sectionKey],
-							intersectedAdsKeys, computedAds = {};
-
-						if (existingDataVariationObj.sections.hasOwnProperty(sectionKey) && existingDataSectionObj) {
-							intersectedAdsKeys = _.intersection(Object.keys(newDataSectionObj.ads), Object.keys(existingDataSectionObj.ads));
-							_.forEach(intersectedAdsKeys, function(adKey) {
-								computedAds[adKey] = extend(true, existingDataSectionObj.ads[adKey], newDataSectionObj.ads[adKey]);
-							});
-
-							computedData[variationKey].sections[sectionKey].ads = computedAds;
-						}
-					});
-				}
-			});
-
-			finalData = extend(true, computedData, newData);
-			return finalData;
-		};
-
 		this.setAll = function (json, force) {
+			var self = this;
+
 			Object.keys(json).forEach(function (key) {
-				if (this.classMap[key]) {
-					this.set(key, this.mergeObjects(key, json[key], this.classMap[key]), force);
+				if (self.classMap[key]) {
+					self.set(key, self.mergeNestedObjects(key, json[key], self.classMap[key]), force);
+				} else if (self.rootMergingObjectKeys.indexOf(key) > -1) {
+					self.set(key, self.mergeRootObject(key, json[key]), force);
 				} else {
-					this.set(key, json[key], force);
+					self.set(key, json[key], force);
 				}
 			}.bind(this));
 
