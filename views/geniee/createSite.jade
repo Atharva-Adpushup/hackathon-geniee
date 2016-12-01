@@ -27,6 +27,8 @@ html
 				br
 				input(type="text" placeholder="Enter site url" name="siteDomain")
 				br
+				input(type="text" placeholder="Enter geniee media id" name="genieeMediaId")
+				br
 				button Create
 		section
 			h2 Api to get existing media 
@@ -77,7 +79,8 @@ html
 					url: "/genieeApi/site/create",
 					data: {
 						siteDomain: json.siteDomain,
-						siteName: json.siteName
+						siteName: json.siteName,
+						genieeMediaId: json.genieeMediaId
 					},
 					success: function (data) {
 						console.log(data);

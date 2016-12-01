@@ -21,10 +21,11 @@ var model = require('../helpers/model'),
 			'adNetworks',
 			'apConfigs',
 			'partner',
+			'genieeMediaId',
 			'dateCreated',
 			'dateModified'
 		];
-		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'adNetworks', 'actions', 'audiences', 'channels', 'cmsInfo', 'templates', 'apConfigs', 'partner'];
+		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'adNetworks', 'actions', 'audiences', 'channels', 'cmsInfo', 'templates', 'apConfigs', 'partner', 'genieeMediaId'];
 		this.validations = {
 			'required': []
 		};
@@ -133,7 +134,7 @@ var model = require('../helpers/model'),
 function apiModule() {
 	var API = {
 		createSite: function (data) {
-			var json = { siteName: data.siteName, siteDomain: data.siteDomain, apConfigs: data.apConfigs };
+			var json = { siteName: data.siteName, siteDomain: data.siteDomain, apConfigs: data.apConfigs, genieeMediaId: data.genieeMediaId };
 			if (data.partner) {
 				json.partner = data.partner;
 				json.ownerEmail = data.ownerEmail;

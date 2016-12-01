@@ -43,6 +43,7 @@ module.exports = {
 				{'name': 'siteId', 'message': 'Site Id cannot be blank', 'value': '', 'status': 403},
 				{'name': 'pageGroupName', 'message': 'Page Group Name cannot be blank', 'value': '', 'status': 403},
 				{'name': 'pageGroupId', 'message': 'Page Group Id cannot be blank', 'value': '', 'status': 403},
+				{'name': 'genieeMediaId', 'message': 'Geniee Media Id cannot be blank', 'value': '', 'status': 403},
 			],
 			'isURL': [
 				{'name': 'sampleUrl', 'message': 'Please enter Sample URL in valid format - http://mywebsite.com', 'value': { 'require_protocol': true }, 'status': 403},
