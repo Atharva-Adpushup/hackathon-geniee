@@ -55,6 +55,13 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			});
 		}
 	},
+	updatePartnerData = (sectionId, partnerData) => {
+		return {
+			type: sectionActions.UPDATE_PARTNER_DATA,
+			sectionId,
+			partnerData
+		};
+	},
 	renameSection = (section, variationId, name) => (dispatch, getState) => {
 		const variationSections = getVariationSectionsWithAds(getState(), { variationId }).sections,
 			arr = _.map(variationSections, (data) => { return data });
@@ -70,4 +77,4 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 		});
 	};
 
-export { createSection, deleteSection, renameSection, createIncontentSection };
+export { createSection, deleteSection, renameSection, createIncontentSection, updatePartnerData };

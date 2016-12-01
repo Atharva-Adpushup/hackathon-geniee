@@ -33,7 +33,7 @@ class editMenu extends React.Component {
 				{
 					_.map(props.section.ads, (ad, index) => (
 						<MenuItem key={index} icon={'apSize'} text={`${ad.width} ${ad.height}`} contentHeading={`${ad.width} x ${ad.height}`}>
-							<AdDescriptor variationId={props.variationId} ad={ad} sectionId={props.section.id} />
+							<AdDescriptor variationId={props.variationId} ad={ad} partnerData={props.section.partnerData} sectionId={props.section.id} updateSettings={props.updateSettings}/>
 						</MenuItem>
 					))
 				}
@@ -47,7 +47,8 @@ editMenu.propTypes = {
 	isVisible: PropTypes.bool.isRequired,
 	section: PropTypes.object,
 	position: PropTypes.object,
-	hideMenu: PropTypes.func
+	hideMenu: PropTypes.func,
+	updateSettings: PropTypes.func
 };
 
 export default editMenu;

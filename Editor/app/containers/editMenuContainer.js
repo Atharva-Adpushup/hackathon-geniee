@@ -4,6 +4,7 @@ import { hideEditMenu as hideMenu } from 'actions/uiActions';
 import { getEditMenuState } from 'selectors/uiSelectors';
 import { getSectionWithAds } from 'selectors/sectionSelectors';
 import { messengerCommands } from 'consts/commonConsts';
+import { updatePartnerData } from 'actions/sectionActions';
 
 const mapStateToProps = (state) => {
 		const json = getEditMenuState(state);
@@ -12,6 +13,9 @@ const mapStateToProps = (state) => {
 	mapDispatchToProps = (dispatch) => ({
 		hideMenu: () => {
 			dispatch(hideMenu());
+		},
+		updateSettings: (sectionId, partnerData) => {
+			dispatch(updatePartnerData(sectionId, partnerData));
 		}
 	});
 

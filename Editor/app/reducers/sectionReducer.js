@@ -44,14 +44,15 @@ const sectionByIds = (state = {}, action) => {
 					ads: immutablePush(state[action.sectionId].ads, action.payload.id)
 				} };
 
-
 		case sectionActions.DELETE_SECTION:
 			return immutableObjectDelete(state, 'id', action.sectionId);
 
+		case sectionActions.UPDATE_PARTNER_DATA:
+			alert('Settings have been saved!');
+			return { ...state, [action.sectionId]: { ...state[action.sectionId], partnerData: action.partnerData } };
 
 		case sectionActions.RENAME_SECTION:
 			return { ...state, [action.sectionId]: { ...state[action.sectionId], name: action.name } };
-
 
 		case adActions.DELETE_AD:
 			const index = state[action.sectionId].ads.indexOf(action.adId);
