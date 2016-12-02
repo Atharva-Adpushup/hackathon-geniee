@@ -1,13 +1,15 @@
 import React, { PropTypes } from 'react';
 import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import './inlineEdit.scss';
+import requiredIf from 'react-required-if';
 
 class InlineEdit extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			editMode: false,
-			inputError: false
+			inputError: false,
+			disableSave: false
 		};
 	}
 
@@ -29,42 +31,44 @@ class InlineEdit extends React.Component {
 		this.props.submitHandler(this.refs.editedText.value);
 	}
 
+	changeValue() {
+		const validated = this.props.validation(this.refs.editedText.value);
+		!validated ? this.setState({ disableSave: true, inputError: true }) : this.setState({ disableSave: false, inputError: false });
+	}
+
 	render() {
+		const colCompact = this.props.compact ? 12 : 6;
 		return (
 			<div>
 				{
 					this.state.editMode ? (
-						this.props.compact ? (
-							<Row style={{margin: 0}}>
-								<Col className="u-padding-r10px" xs={12}>
-									<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={this.props.value} />
-									<span className="error-message">{this.state.inputError ? this.props.errorMessage : ''}</span>
-								</Col>
-								<Col xs={12}>
-									<Row>
+						<Row style={{margin: 0}}>
+							<Col className="u-padding-r10px" xs={colCompact}>
+								<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={this.props.value} onChange={this.props.validation ? this.changeValue.bind(this) : ()=>{}} />
+								<span className="error-message">{this.state.inputError ? (this.props.validationError ? this.props.validationError : this.props.errorMessage) : ''}</span>
+							</Col>
+							{
+								this.props.compact ? (
+									<div>
 										<Col className="u-padding-r5px" xs={8}>
-											<Button onClick={this.submitValue.bind(this)} className="btn-lightBg btn-save btn-block btn btn-default">Save</Button>
+											<Button disabled={this.state.disableSave} onClick={this.submitValue.bind(this)} className="btn-lightBg btn-save btn-block btn btn-default">Save</Button>
 										</Col>
 										<Col className="u-padding-r10px " xs={4}>
 											<Button onClick={this.cancelEdit.bind(this)} className="btn-lightBg btn-cancel btn-ie-cancel btn-block btn btn-default"></Button>
 										</Col>
-									</Row>
-								</Col>
-							</Row>
-						) : (
-							<Row style={{margin: 0}}>
-								<Col className="u-padding-r10px" xs={6}>
-									<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={this.props.value} />
-									<span className="error-message">{this.state.inputError ? this.props.errorMessage : ''}</span>
-								</Col>
-								<Col className="u-padding-r5px" xs={4}>
-									<Button onClick={this.submitValue.bind(this)} className="btn-lightBg btn-save btn-block btn btn-default">Save</Button>
-								</Col>
-								<Col className="u-padding-r10px " xs={2}>
-									<Button onClick={this.cancelEdit.bind(this)} className="btn-lightBg btn-cancel btn-ie-cancel btn-block btn btn-default"></Button>
-								</Col>
-							</Row>
-						)
+									</div>
+								) : (
+									<div>
+										<Col className="u-padding-r5px" xs={4}>
+											<Button onClick={this.submitValue.bind(this)} className="btn-lightBg btn-save btn-block btn btn-default">Save</Button>
+										</Col>
+										<Col className="u-padding-r10px " xs={2}>
+											<Button onClick={this.cancelEdit.bind(this)} className="btn-lightBg btn-cancel btn-ie-cancel btn-block btn btn-default"></Button>
+										</Col>
+									</div>
+								)
+							}
+						</Row>
 					) : (
 						<div>
 							<strong style={{fontWeight: this.props.font ? this.props.font : 700}}>{
@@ -91,8 +95,9 @@ InlineEdit.propTypes = {
 	errorMessage: PropTypes.string.isRequired,
 	value: PropTypes.string.isRequired,
 	compact: PropTypes.bool,
-	font: PropTypes.number
-	
+	font: PropTypes.number,
+	validation: PropTypes.func,
+	validationError: requiredIf(PropTypes.string, props => props.validation),
 };
 
 InlineEdit.defaultProps = {

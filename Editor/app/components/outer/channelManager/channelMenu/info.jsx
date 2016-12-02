@@ -30,61 +30,11 @@ class info extends React.Component {
 		});
 	}
 
-	resetDisabledBtns() {
-		$(ReactDOM.findDOMNode(this.refs.saveUrl)).removeAttr('disabled').removeClass('disabled');
-		$(ReactDOM.findDOMNode(this.refs.editUrl)).removeAttr('disabled').removeClass('disabled');
-	}
-
-	resetSampleUrl() {
-		(!this.state.isSampleUrlChanged) ? this.setState({ sampleUrl: this.props.channel.sampleUrl }) : null;
-	}
-
-	onChange() {
-		const val = $(ReactDOM.findDOMNode(this.refs.sampleUrl)).val().trim(),
-			isValidUrl = val && utils.ValidUrl(val.trim()),
-			isHostNameEqual = (utils.parseUrl(val).hostname == utils.parseUrl(window.ADP_SITE_DOMAIN).hostname);
-
-		if (isValidUrl && (this.state.forceSampleUrl || isHostNameEqual)) {
-			this.setState({ sampleUrl: utils.appendProtocolToUrl(val), hostNameValid: true, isSampleUrlChanged: true }, () => {
-				$(ReactDOM.findDOMNode(this.refs.saveUrl)).removeAttr("disabled").removeClass("disabled");
-			});
-		} else if (isValidUrl && !isHostNameEqual) {
-			this.setState({ sampleUrl: val, hostNameValid: false, isSampleUrlChanged: false }, () => {
-				$(ReactDOM.findDOMNode(this.refs.saveUrl)).attr("disabled", true).addClass("disabled");
-			});
-		} else {
-			this.setState({ sampleUrl: val, isSampleUrlChanged: false }, () => {
-				$(ReactDOM.findDOMNode(this.refs.saveUrl)).attr("disabled", true).addClass("disabled");
-			});
-		}
-	}
-
-	onBlur() {
-		this.setState({
-			sampleUrl: utils.parseUrl(this.state.sampleUrl).href
-		});
-	}
-
-	toggleStateValues(target) {
-		const isRefsAvailable = (Object.keys(this.refs).length > 0),
-			element = (isRefsAvailable) ? $(ReactDOM.findDOMNode(this.refs.sampleUrl)).get(0) : null,
-			event = new Event('input', {
-				'bubbles': true,
-				'cancelable': false
-			});
-
-		switch (target) {
-			case 'forceSampleUrl':
-				this.setState({forceSampleUrl: !this.state.forceSampleUrl}, function () {
-					if (element) {
-						element.dispatchEvent(event);
-					}
-				});
-				break;
-
-			default:
-				return false;
-		}
+	onChange(sampleUrl) {
+		const isValidUrl = utils.ValidUrl(sampleUrl.trim()),
+			isHostNameEqual = isValidUrl ? (utils.parseUrl(sampleUrl).hostname == utils.parseUrl(window.ADP_SITE_DOMAIN).hostname) : false;
+		
+		return isHostNameEqual;
 	}
 
 	getClass(name) {
@@ -129,7 +79,7 @@ class info extends React.Component {
 						<label>Sample Url</label>
 					</Col>
 					<Col xs={12} className="wrapfeature">
-						<InlineEdit compact font={400} value={channel.sampleUrl} submitHandler={onSampleUrlChange.bind(null, channel.id)} text="Sample Url" errorMessage="Sample Url cannot be blank" />
+						<InlineEdit compact font={400} validation={this.onChange} validationError="Sample Url must be from your website only" value={channel.sampleUrl} submitHandler={onSampleUrlChange.bind(null, channel.id)} text="Sample Url" errorMessage="Sample Url cannot be blank" />
 					</Col>
 				</Row>
 			</div>
