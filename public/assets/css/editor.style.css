@@ -2788,7 +2788,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
 
 .error-message {
   display: block;
-  margin-top: 10px;
+  margin: 10px 0;
   text-align: left;
   font-size: 12px;
   line-height: 14px;

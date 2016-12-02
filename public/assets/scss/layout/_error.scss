@@ -92,7 +92,7 @@
 .error-message 
 {
 	  display: block;
-		margin-top: $FMLayoutDimension;
+		margin: $FMLayoutDimension 0;
 		text-align: left;
 		font-size: $LPErrorMessageFontSize;
 		line-height: 14px;

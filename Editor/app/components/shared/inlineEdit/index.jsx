@@ -67,7 +67,9 @@ class InlineEdit extends React.Component {
 						)
 					) : (
 						<div>
-							<strong>{this.props.value}</strong>
+							<strong>{
+								this.props.value ? this.props.value : `Edit ${this.props.text}`
+							}</strong>
 							{
 								this.props.text ? (
 									<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-variation-tooltip">Edit {this.props.text}</Tooltip>}>

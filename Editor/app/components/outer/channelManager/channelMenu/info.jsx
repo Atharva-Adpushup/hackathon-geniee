@@ -111,20 +111,21 @@ class info extends React.Component {
 	}
 
 	render() {
+		const { channel, onContentSelectorChange } = this.props;
 		return (
 			<div className="rowPadding containerButtonBar">
 				<Row>
 					<Col xs={6}>
 						<label>Page Group</label>
 					</Col>
-					<Col xs={6} className="wrapfeature">{this.props.channel.pageGroup}</Col>
+					<Col xs={6} className="wrapfeature">{channel.pageGroup}</Col>
 				</Row>
 				<Row>
 					<Col xs={6}>
 						<label>Platform</label>
 					</Col>
 					<Col xs={6}>
-						<i className={"fa fa-" + this.getClass(this.props.channel.platform)}></i>
+						<i className={"fa fa-" + this.getClass(channel.platform)}></i>
 					</Col>
 				</Row>
 				<Row>
@@ -132,7 +133,7 @@ class info extends React.Component {
 						<label>Content Selector</label>
 					</Col>
 					<Col xs={12} className="wrapfeature">
-						<InlineEdit compact value={this.props.channel.contentSelector} submitHandler={this.props.onContentSelectorChange.bind(null, this.props.channel.id)} text="Content Selector" errorMessage="Content Selector cannot be blank" />
+						<InlineEdit compact value={channel.contentSelector} submitHandler={onContentSelectorChange.bind(null, channel.id)} text="Content Selector" errorMessage="Content Selector cannot be blank" />
 					</Col>
 				</Row>
 				<div style={{paddingTop: 7}}>
@@ -142,7 +143,7 @@ class info extends React.Component {
 								<Col xs={12}>
 									<label>Sample Url</label>
 								</Col>
-								<Col xs={12} className="wrapfeature">{this.props.channel.sampleUrl}</Col>
+								<Col xs={12} className="wrapfeature">{channel.sampleUrl}</Col>
 							</Row>
 							<Row className="butttonsRow">
 								<Col xs={12}>
