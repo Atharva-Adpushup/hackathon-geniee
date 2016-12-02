@@ -132,7 +132,7 @@ class info extends React.Component {
 						<label>Content Selector</label>
 					</Col>
 					<Col xs={12} className="wrapfeature">
-						<InlineEdit value={this.props.channel.contentSelector} submitHandler={this.props.onContentSelectorChange.bind(null, this.props.channel.id)} text="Content Selector" errorMessage="Content Selector cannot be blank" />
+						<InlineEdit compact value={this.props.channel.contentSelector} submitHandler={this.props.onContentSelectorChange.bind(null, this.props.channel.id)} text="Content Selector" errorMessage="Content Selector cannot be blank" />
 					</Col>
 				</Row>
 				<div style={{paddingTop: 7}}>
