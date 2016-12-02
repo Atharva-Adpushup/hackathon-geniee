@@ -30,11 +30,6 @@ class info extends React.Component {
 		});
 	}
 
-	saveSampleUrl() {
-		this.props.onSampleUrlChange(this.state.sampleUrl);
-		this.toggleSampleUrl();
-	}
-
 	resetDisabledBtns() {
 		$(ReactDOM.findDOMNode(this.refs.saveUrl)).removeAttr('disabled').removeClass('disabled');
 		$(ReactDOM.findDOMNode(this.refs.editUrl)).removeAttr('disabled').removeClass('disabled');
@@ -42,13 +37,6 @@ class info extends React.Component {
 
 	resetSampleUrl() {
 		(!this.state.isSampleUrlChanged) ? this.setState({ sampleUrl: this.props.channel.sampleUrl }) : null;
-	}
-
-	toggleSampleUrl() {
-		this.setState({ manageSampleUrl: !this.state.manageSampleUrl }, () => {
-			this.resetDisabledBtns();
-			this.resetSampleUrl();
-		});
 	}
 
 	onChange() {
@@ -111,7 +99,7 @@ class info extends React.Component {
 	}
 
 	render() {
-		const { channel, onContentSelectorChange } = this.props;
+		const { channel, onContentSelectorChange, onSampleUrlChange } = this.props;
 		return (
 			<div className="rowPadding containerButtonBar">
 				<Row>
@@ -133,53 +121,17 @@ class info extends React.Component {
 						<label>Content Selector</label>
 					</Col>
 					<Col xs={12} className="wrapfeature">
-						<InlineEdit compact value={channel.contentSelector} submitHandler={onContentSelectorChange.bind(null, channel.id)} text="Content Selector" errorMessage="Content Selector cannot be blank" />
+						<InlineEdit compact font={400} value={channel.contentSelector} submitHandler={onContentSelectorChange.bind(null, channel.id)} text="Content Selector" errorMessage="Content Selector cannot be blank" />
 					</Col>
 				</Row>
-				<div style={{paddingTop: 7}}>
-					{!this.state.manageSampleUrl ?
-						<div>
-							<Row>
-								<Col xs={12}>
-									<label>Sample Url</label>
-								</Col>
-								<Col xs={12} className="wrapfeature">{channel.sampleUrl}</Col>
-							</Row>
-							<Row className="butttonsRow">
-								<Col xs={12}>
-									<Button ref="editUrl" onClick={a => this.toggleSampleUrl(a)} className="btn-lightBg btn-edit btn-block">Edit Url</Button>
-								</Col>
-							</Row>
-						</div>
-						:
-						<div>
-							<CustomToggleSwitch labelText="Force sample url" className="mB-0" defaultLayout checked={this.state.forceSampleUrl} name="forceSampleUrl" onChange={a => this.toggleStateValues('forceSampleUrl', a)} layout="horizontal" size="m" id="js-force-sample-url" on="On" off="Off" />
-							<Row>
-								<Col xs={12}>
-									<label>Sample Url</label>
-								</Col>
-								<Col xs={12}>
-									<Input type="text" ref="sampleUrl" onBlur={a => this.onBlur(a)} onChange={a => this.onChange(a)} value ={this.state.sampleUrl}/>
-								</Col>
-								{!this.state.hostNameValid ?
-									<Col xs={12}>
-										<span style={{color:"red"}}>Url should be from your website only</span>
-									</Col>
-									:
-									null
-									}
-							</Row>
-							<Row className="butttonsRow">
-								<Col xs={6}>
-									<Button ref="saveUrl" onClick={a => this.saveSampleUrl(a)} className="btn-lightBg btn-save">Save Url</Button>
-								</Col>
-								<Col xs={6}>
-									<Button onClick={a => this.toggleSampleUrl(a)} className="btn-lightBg btn-cancel">Cancel</Button>
-								</Col>
-							</Row>
-						</div>
-						}
-					</div>
+				<Row>
+					<Col xs={12}>
+						<label>Sample Url</label>
+					</Col>
+					<Col xs={12} className="wrapfeature">
+						<InlineEdit compact font={400} value={channel.sampleUrl} submitHandler={onSampleUrlChange.bind(null, channel.id)} text="Sample Url" errorMessage="Sample Url cannot be blank" />
+					</Col>
+				</Row>
 			</div>
 		);
 	}

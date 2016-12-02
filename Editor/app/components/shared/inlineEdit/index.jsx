@@ -67,7 +67,7 @@ class InlineEdit extends React.Component {
 						)
 					) : (
 						<div>
-							<strong>{
+							<strong style={{fontWeight: this.props.font ? this.props.font : 700}}>{
 								this.props.value ? this.props.value : `Edit ${this.props.text}`
 							}</strong>
 							{
@@ -89,7 +89,10 @@ InlineEdit.propTypes = {
 	text: PropTypes.string.isRequired,
 	submitHandler: PropTypes.func.isRequired,
 	errorMessage: PropTypes.string.isRequired,
-	value: PropTypes.string.isRequired
+	value: PropTypes.string.isRequired,
+	compact: PropTypes.bool,
+	font: PropTypes.number
+	
 };
 
 InlineEdit.defaultProps = {

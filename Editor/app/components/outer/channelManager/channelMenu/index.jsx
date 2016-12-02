@@ -13,9 +13,6 @@ const channelMenu = ({ isVisible, activeChannelId, allTrafficDistributions, edit
 	}
 
 	const items = [],
-		saveSampleUrlData = (sampleUrl) => {
-			saveSampleUrl(activeChannelId, sampleUrl);
-		},
 		closeChannelById = () => {
 			closeChannel(activeChannelId);
 		},
@@ -28,7 +25,7 @@ const channelMenu = ({ isVisible, activeChannelId, allTrafficDistributions, edit
 
 	items.push((
 		<MenuItem key={1} icon="fa fa-info" contentHeading="Page Group Info">
-			<Info onContentSelectorChange={changeContentSelector} onSampleUrlChange={saveSampleUrlData} channel={channel} />
+			<Info onContentSelectorChange={changeContentSelector} onSampleUrlChange={saveSampleUrl} channel={channel} />
 		</MenuItem>
 	));
 

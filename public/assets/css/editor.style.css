@@ -247,8 +247,10 @@ li, ul {
   border: none;
   margin: 0 10px; }
 
-.btn-icn-edit:before {
-  content: '\f040'; }
+.btn-icn-edit {
+  margin: 0; }
+  .btn-icn-edit:before {
+    content: '\f040'; }
 
 .btn.btn-lightBg.btn-cancel.btn-ie-cancel {
   padding: 5px 8px; }

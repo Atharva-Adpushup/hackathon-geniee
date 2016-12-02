@@ -204,6 +204,7 @@
 
 .btn-icn-edit {
     @extend %btn-icn;
+    margin: 0;
 
     &:before {
         content: '\f040';
