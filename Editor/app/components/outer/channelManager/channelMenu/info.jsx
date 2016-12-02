@@ -7,6 +7,7 @@ import Row from 'react-bootstrap/lib/Row';
 import Input from 'react-bootstrap/lib/FormControl';
 import Button from 'react-bootstrap/lib/Button';
 import Col from 'react-bootstrap/lib/Col';
+import InlineEdit from 'shared/inlineEdit/index.jsx';
 
 class info extends React.Component {
 	constructor(props) {
@@ -126,6 +127,14 @@ class info extends React.Component {
 						<i className={"fa fa-" + this.getClass(this.props.channel.platform)}></i>
 					</Col>
 				</Row>
+				<Row>
+					<Col xs={12}>
+						<label>Content Selector</label>
+					</Col>
+					<Col xs={12} className="wrapfeature">
+						<InlineEdit value={this.props.channel.contentSelector} submitHandler={this.props.onContentSelectorChange.bind(null, this.props.channel.id)} text="Content Selector" errorMessage="Content Selector cannot be blank" />
+					</Col>
+				</Row>
 				{!this.state.manageSampleUrl ?
 					<div>
 						<Row>
@@ -133,7 +142,6 @@ class info extends React.Component {
 								<label>Sample Url</label>
 							</Col>
 							<Col xs={12} className="wrapfeature">{this.props.channel.sampleUrl}</Col>
-
 						</Row>
 						<Row className="butttonsRow">
 							<Col xs={12}>

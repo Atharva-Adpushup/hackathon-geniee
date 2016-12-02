@@ -6,7 +6,7 @@ import CloseChannel from './closeChannel.jsx';
 import NumericCollectionManager from 'components/shared/NumericCollectionManager/index.jsx';
 
 const channelMenu = ({ isVisible, activeChannelId, allTrafficDistributions, editTrafficDistribution,
-	position, hideMenu, saveSampleUrl, channel, partner, closeChannel }) => {
+	position, hideMenu, saveSampleUrl, channel, partner, closeChannel, changeContentSelector }) => {
 
 	if (!isVisible) {
 		return null;
@@ -28,7 +28,7 @@ const channelMenu = ({ isVisible, activeChannelId, allTrafficDistributions, edit
 
 	items.push((
 		<MenuItem key={1} icon="fa fa-info" contentHeading="Page Group Info">
-			<Info onSampleUrlChange={saveSampleUrlData} channel={channel} />
+			<Info onContentSelectorChange={changeContentSelector} onSampleUrlChange={saveSampleUrlData} channel={channel} />
 		</MenuItem>
 	));
 
