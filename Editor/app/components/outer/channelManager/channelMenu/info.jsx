@@ -135,48 +135,50 @@ class info extends React.Component {
 						<InlineEdit value={this.props.channel.contentSelector} submitHandler={this.props.onContentSelectorChange.bind(null, this.props.channel.id)} text="Content Selector" errorMessage="Content Selector cannot be blank" />
 					</Col>
 				</Row>
-				{!this.state.manageSampleUrl ?
-					<div>
-						<Row>
-							<Col xs={12}>
-								<label>Sample Url</label>
-							</Col>
-							<Col xs={12} className="wrapfeature">{this.props.channel.sampleUrl}</Col>
-						</Row>
-						<Row className="butttonsRow">
-							<Col xs={12}>
-								<Button ref="editUrl" onClick={a => this.toggleSampleUrl(a)} className="btn-lightBg btn-edit btn-block">Edit Url</Button>
-							</Col>
-						</Row>
-					</div>
-					:
-					<div>
-						<CustomToggleSwitch labelText="Force sample url" className="mB-0" defaultLayout checked={this.state.forceSampleUrl} name="forceSampleUrl" onChange={a => this.toggleStateValues('forceSampleUrl', a)} layout="horizontal" size="m" id="js-force-sample-url" on="On" off="Off" />
-						<Row>
-							<Col xs={12}>
-								<label>Sample Url</label>
-							</Col>
-							<Col xs={12}>
-								<Input type="text" ref="sampleUrl" onBlur={a => this.onBlur(a)} onChange={a => this.onChange(a)} value ={this.state.sampleUrl}/>
-							</Col>
-							{!this.state.hostNameValid ?
+				<div style={{paddingTop: 7}}>
+					{!this.state.manageSampleUrl ?
+						<div>
+							<Row>
 								<Col xs={12}>
-									<span style={{color:"red"}}>Url should be from your website only</span>
+									<label>Sample Url</label>
 								</Col>
-								:
-								null
-								}
-						</Row>
-						<Row className="butttonsRow">
-							<Col xs={6}>
-								<Button ref="saveUrl" onClick={a => this.saveSampleUrl(a)} className="btn-lightBg btn-save">Save Url</Button>
-							</Col>
-							<Col xs={6}>
-								<Button onClick={a => this.toggleSampleUrl(a)} className="btn-lightBg btn-cancel">Cancel</Button>
-							</Col>
-						</Row>
+								<Col xs={12} className="wrapfeature">{this.props.channel.sampleUrl}</Col>
+							</Row>
+							<Row className="butttonsRow">
+								<Col xs={12}>
+									<Button ref="editUrl" onClick={a => this.toggleSampleUrl(a)} className="btn-lightBg btn-edit btn-block">Edit Url</Button>
+								</Col>
+							</Row>
+						</div>
+						:
+						<div>
+							<CustomToggleSwitch labelText="Force sample url" className="mB-0" defaultLayout checked={this.state.forceSampleUrl} name="forceSampleUrl" onChange={a => this.toggleStateValues('forceSampleUrl', a)} layout="horizontal" size="m" id="js-force-sample-url" on="On" off="Off" />
+							<Row>
+								<Col xs={12}>
+									<label>Sample Url</label>
+								</Col>
+								<Col xs={12}>
+									<Input type="text" ref="sampleUrl" onBlur={a => this.onBlur(a)} onChange={a => this.onChange(a)} value ={this.state.sampleUrl}/>
+								</Col>
+								{!this.state.hostNameValid ?
+									<Col xs={12}>
+										<span style={{color:"red"}}>Url should be from your website only</span>
+									</Col>
+									:
+									null
+									}
+							</Row>
+							<Row className="butttonsRow">
+								<Col xs={6}>
+									<Button ref="saveUrl" onClick={a => this.saveSampleUrl(a)} className="btn-lightBg btn-save">Save Url</Button>
+								</Col>
+								<Col xs={6}>
+									<Button onClick={a => this.toggleSampleUrl(a)} className="btn-lightBg btn-cancel">Cancel</Button>
+								</Col>
+							</Row>
+						</div>
+						}
 					</div>
-					}
 			</div>
 		);
 	}

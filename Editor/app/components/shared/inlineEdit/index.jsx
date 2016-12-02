@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import './inlineEdit.scss';
 
 class InlineEdit extends React.Component {
 	constructor(props) {
@@ -33,7 +34,7 @@ class InlineEdit extends React.Component {
 			<div>
 				{
 					this.state.editMode ? (
-						<Row>
+						<Row style={{margin: 0}}>
 							<Col className="u-padding-r10px" xs={6}>
 								<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={this.props.value} />
 								<span className="error-message">{this.state.inputError ? this.props.errorMessage : ''}</span>
