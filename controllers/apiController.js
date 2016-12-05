@@ -10,7 +10,7 @@ var express = require('express'),
 
 router
 	.get('/site/create', function (req, res) {
-		res.render('geniee/createSite');
+		res.render('geniee/api/createSite');
 	})
 	.post('/site/create', function (req, res) {
 		var json = req.body;
@@ -127,7 +127,7 @@ router
 			});
 	})
 	.get('/pagegroup/create', function (req, res) {
-		res.render('geniee/createPagegroup');
+		res.render('geniee/api/createPagegroup');
 	})
 	.post('/pagegroup/create', function (req, res) {
 		var json = req.body;

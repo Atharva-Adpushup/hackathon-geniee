@@ -76,10 +76,18 @@ router
     .get('/:siteId/dashboard', function (req, res) {
         siteModel.getSitePageGroups(req.params.siteId)
             .then(function (pageGroups) {
-                return res.render('dashboard', {
-                    pageGroups: pageGroups,
-                    siteId: req.params.siteId
-                });
+
+                if(req.session.user.userType === 'partner') {
+                    return res.render('geniee/dashboard', {
+                        pageGroups: pageGroups,
+                        siteId: req.params.siteId
+                    });
+                }
+                else {
+                    return res.render('dashboard', {
+
+                    });
+                }
             })
             .catch(function (err) {
                 res.send('Site not found!');

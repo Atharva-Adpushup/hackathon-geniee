@@ -32,7 +32,6 @@ block bodyContent
         .pageContentWrapper.page-content
             .pageContentInner.page-content--inner
 
-                if !partner
                     .notification-wrapper
                     // Control v/s Adpushp Starts here
                     #widgetsArea.row
@@ -93,39 +92,6 @@ block bodyContent
                         else
                             script(type='text/javascript').
                                 adpushup.alert("!{alertTemplateStr}", "#widgetsArea", 1);
-                else
-                    .mb-30
-                        .controlAdpushupWrap
-                            h3.title.m-All-0.clearfix 
-                                a Page Groups
-
-                            //- Pagegroups table
-                            .table-wrapper-paddded
-                                if pageGroups.length
-                                    table.table.table-bordered.table-hover
-                                        thead
-                                            tr
-                                                th Name
-                                                th Platform
-                                                th Variations
-                                                th Actions
-                                        tbody
-                                            for pagegroup in pageGroups
-                                                tr
-                                                    td.underline!= utils.convertPagegroupLink(pagegroup.id, pagegroup.pageGroup, siteId)
-                                                    td!= pagegroup.platform
-                                                    td!= Object.keys(pagegroup.variations).length
-                                                    td.table-actions
-                                                        //- a(href="/" title="Edit")
-                                                            i.fa.fa-edit
-                                                        a(href="/user/site/#{siteId}/editor" title="Go to Editor")
-                                                            i.fa.fa-pencil-square
-                                                        //- a.delete-pagegroup(title="Delete")
-                                                            input(type="hidden" value=pagegroup.id)
-                                                            i.fa.fa-trash
-                                else
-                                    h5 No PageGroup Found!
-            
     
     script(type="text/javascript").
         analytics.page('App-dashboard', intercomObj);
