@@ -275,7 +275,7 @@ function apiModule() {
 					return val.split(':')[1];
 				})).sort();
 
-				if (site.isApex()) {
+				if ('isApex' in site && site.isApex()) {
 					pageGroups = getApexPageGroups(pageGroups);
 				}
 

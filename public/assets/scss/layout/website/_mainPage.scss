@@ -185,3 +185,19 @@
     }
   }
 }
+
+.input-wrapper {
+  margin: 20px;
+  padding-bottom: 20px;
+  font-size: 1.2em;
+  border-bottom: 1px dotted $lightGrey;
+
+  input {
+    padding: 18px;
+    font-size: .9em;
+  }
+
+  button {
+    margin: 10px 0 20px;
+  }
+}

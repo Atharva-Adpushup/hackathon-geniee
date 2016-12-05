@@ -6,7 +6,8 @@ var express = require('express'),
 	channelModel = require('../models/channelModel'),
 	router = express.Router(),
 	schema = require('../helpers/schema'),
-	FormValidator = require('../helpers/FormValidator');
+	FormValidator = require('../helpers/FormValidator'),
+	_ = require('lodash');
 
 router
 	.get('/site/create', function (req, res) {
@@ -132,20 +133,43 @@ router
 	.post('/pagegroup/create', function (req, res) {
 		var json = req.body;
 
-		// Validate input params and create pagegroup
-		return FormValidator.validate(json, schema.api.validations)
-			.then(function () { return channelModel.createPageGroup(json) })
-			.then(function (data) {
-				return res.status(200).send({ success: true, data: { pageGroupId: data.id } });
-			})
-			.catch(function (err) {
-				if (err.name !== 'AdPushupError') {
-					return res.status(500).send({ success: false, message: 'Some error occurred' });
-				}
+		if(req.session.user.userType === 'partner') {
+			// Validate input params and create pagegroup
+			return FormValidator.validate(json, schema.api.validations)
+				.then(function () { return channelModel.createPageGroup(json) })
+				.then(function (data) {
+					return res.status(200).send({ success: true, data: { pageGroupId: data.id } });
+				})
+				.catch(function (err) {
+					if (err.name !== 'AdPushupError') {
+						return res.status(500).send({ success: false, message: 'Some error occurred' });
+					}
 
-				var error = err.message[0];
-				return res.status(error.status).send({ success: false, message: error.message });
-			});
+					var error = err.message[0];
+					return res.status(error.status).send({ success: false, message: error.message });
+				});
+		}
+		else {
+			channelModel.createPageGroup(json)
+				.then(function(data) {
+
+					// Reset session on addition of new pagegroup for non-partner
+					var userSites = req.session.user.sites,
+						site = _.find(userSites, {'siteId': parseInt(json.siteId)});
+						site.pageGroups.push(data.channelName);
+					
+					var index = _.findIndex(userSites, {'siteId': parseInt(json.siteId)});
+					req.session.user.sites[index] = site;
+					
+					return res.redirect('/user/dashboard');
+				})
+				.catch(function(err) {
+					console.log(err);
+					// return res.render('createPageGroup', {
+					// 	error: err.message[0].message
+					// });
+				});
+		}
 	})
 	.get('/pagegroup/view', function (req, res) {
 		var pageGroupId = req.query.pageGroupId;

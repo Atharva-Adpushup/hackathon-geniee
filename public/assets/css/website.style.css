@@ -961,6 +961,17 @@ maxHeightWidth {
     .site-status .status-text a {
       text-decoration: underline; }
 
+.input-wrapper {
+  margin: 20px;
+  padding-bottom: 20px;
+  font-size: 1.2em;
+  border-bottom: 1px dotted #ccc; }
+  .input-wrapper input {
+    padding: 18px;
+    font-size: .9em; }
+  .input-wrapper button {
+    margin: 10px 0 20px; }
+
 .headerTopBar {
   height: 60px;
   z-index: 1039;

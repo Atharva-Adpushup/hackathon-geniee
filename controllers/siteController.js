@@ -81,7 +81,9 @@ router
         if(req.session.user.userType !== 'partner') {
             siteModel.getSitePageGroups(req.params.siteId)
                 .then(function(pageGroups) {
-                    return res.render('createPageGroup');
+                    return res.render('createPageGroup', {
+                        siteId: req.params.siteId
+                    });
                 })
                 .catch(function(err) {
                     return res.send('Some error occurred!');
