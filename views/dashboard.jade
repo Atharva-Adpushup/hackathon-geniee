@@ -41,7 +41,7 @@ block bodyContent
                                 .mb-30
                                     .controlAdpushupWrap
                                         h3.title.m-All-0.clearfix
-                                            a.pull-left(id="site-report-" + site.siteId, target='_blank', title='Showing last 7 days ControlVsAdPushup reports.', href='/user/reports/ControlVsAdpushupCtr?siteId=#{site.siteId}').
+                                            a.pull-left(id="site-report-" + site.siteId, target='_blank', title='Showing last 7 days ControlVsAdPushup reports.', href='/user/site/#{site.siteId}/reports/ControlVsAdpushupCtr').
                                                 #{utils.domanize(site.domain)} - #{site.siteId}
                                             .pull-right
                                                 a.btn.btn-lightBg.btn-default(id="site-custom-reports-" + site.siteId, href='/user/site/#{site.siteId}/reports/ControlVsAdpushupCtr') Custom Reports
