@@ -972,6 +972,9 @@ maxHeightWidth {
   .input-wrapper button {
     margin: 10px 0 20px; }
 
+.site-actions a:not(:last-child) {
+  margin-right: 7px; }
+
 .headerTopBar {
   height: 60px;
   z-index: 1039;

@@ -3,6 +3,10 @@
         h3.title.m-All-0.clearfix 
             a Page Groups
 
+            if !partner
+                .pull-right
+                    a.btn.btn-lightBg.btn-default(href='/user/site/#{siteId}/createPagegroup') Create New PageGroup
+
         //- Pagegroups table
         .table-wrapper-paddded
             if pageGroups.length
