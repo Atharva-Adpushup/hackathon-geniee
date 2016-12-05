@@ -949,6 +949,18 @@ maxHeightWidth {
 .text-dark.device i {
   margin-right: 5px; }
 
+.site-status {
+  padding: 20px; }
+  .site-status h4 {
+    color: #eb575c; }
+  .site-status i {
+    margin-right: 5px; }
+  .site-status .status-text {
+    font-size: 1.2em;
+    margin-top: 15px; }
+    .site-status .status-text a {
+      text-decoration: underline; }
+
 .headerTopBar {
   height: 60px;
   z-index: 1039;

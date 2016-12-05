@@ -1,0 +1,14 @@
+extends  layout/base
+
+block getTitle
+    - var titleVar = "PageGroup"
+
+block bodyContent
+    include layout/sideBar
+    
+    .pageContainer.page-container
+        include layout/header
+
+        // Page Content Starts Here
+        .pageContentWrapper.page-content
+            .pageContentInner.page-content--inner

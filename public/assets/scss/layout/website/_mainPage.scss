@@ -165,3 +165,23 @@
   }
 }
 
+.site-status {
+  padding: 20px;
+
+  h4 {
+    color: $primaryColor;
+  }
+
+  i {
+    margin-right: 5px;
+  }
+
+  .status-text {
+    font-size: 1.2em;
+    margin-top: 15px;
+
+    a {
+      text-decoration: underline;
+    }
+  }
+}

@@ -77,16 +77,35 @@ router
                 return res.redirect('/403');
             });
     })
-    .get('/:siteId/pagegroups', function(req, res) {
-        siteModel.getSitePageGroups(req.params.siteId)
-            .then(function(pageGroups) {
-                return res.render('pageGroups', {
-                    pageGroups: pageGroups
+    .get('/:siteId/createPagegroup', function(req, res) {
+        if(req.session.user.userType !== 'partner') {
+            siteModel.getSitePageGroups(req.params.siteId)
+                .then(function(pageGroups) {
+                    return res.render('createPageGroup');
+                })
+                .catch(function(err) {
+                    return res.send('Some error occurred!');
                 });
-            })
-            .catch(function(err) {
-                return res.send('Some error occurred!');
-            });
+        }
+        else {
+            return res.render('403');
+        }
+    })
+    .get('/:siteId/pagegroups', function(req, res) {
+        if(req.session.user.userType !== 'partner') {
+            siteModel.getSitePageGroups(req.params.siteId)
+                .then(function(pageGroups) {
+                    return res.render('pageGroups', {
+                        pageGroups: pageGroups
+                    });
+                })
+                .catch(function(err) {
+                    return res.send('Some error occurred!');
+                });
+        }
+        else {
+            return res.render('403');
+        }
     })
     .get('/:siteId/dashboard', function (req, res) {
         siteModel.getSitePageGroups(req.params.siteId)
