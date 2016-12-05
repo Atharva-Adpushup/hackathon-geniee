@@ -1,17 +1,17 @@
-extends  ../layout/base
+extends layout/base
 
 block getTitle
-    - var titleVar = "DashBoard"
+    - var titleVar = "PageGroups"
 
 block bodyContent
 
-    include ../layout/sideBar
+    include layout/sideBar
 
     .pageContainer.page-container
-        include ../layout/header
+        include layout/header
 
         // Page Content Starts Here
         .pageContentWrapper.page-content
             .pageContentInner.page-content--inner
 
-                include ../layout/pageGroupsTable
+               include layout/pageGroupsTable

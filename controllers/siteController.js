@@ -77,12 +77,23 @@ router
                 return res.redirect('/403');
             });
     })
+    .get('/:siteId/pagegroups', function(req, res) {
+        siteModel.getSitePageGroups(req.params.siteId)
+            .then(function(pageGroups) {
+                return res.render('pageGroups', {
+                    pageGroups: pageGroups
+                });
+            })
+            .catch(function(err) {
+                return res.send('Some error occurred!');
+            });
+    })
     .get('/:siteId/dashboard', function (req, res) {
         siteModel.getSitePageGroups(req.params.siteId)
             .then(function (pageGroups) {
 
                 if(req.session.user.userType === 'partner') {
-                    return res.render('dashboard', {
+                    return res.render('geniee/dashboard', {
                         pageGroups: pageGroups,
                         siteId: req.params.siteId
                     });
