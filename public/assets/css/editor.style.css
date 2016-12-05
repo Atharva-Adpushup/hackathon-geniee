@@ -2743,13 +2743,26 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
       line-height: 90px; }
   .errorMain .thanku {
     font-size: 3em; }
-  .errorMain .txt {
-    margin-top: 100px;
+  .errorMain .txt,
+  .errorMain .txt-ed {
     padding: 20px 0 0px;
     border-top: 1px dotted rgba(255, 255, 255, 0.5); }
+  .errorMain .txt {
+    margin-top: 100px; }
     .errorMain .txt a {
       color: #fff;
       font-weight: bold; }
+  .errorMain .txt-ed {
+    padding-bottom: 50px; }
+    .errorMain .txt-ed a {
+      display: inline-block;
+      border: 1px solid #fff;
+      color: #fff;
+      padding: 10px 20px;
+      text-transform: uppercase;
+      margin-top: 30px;
+      font-size: 1.2em;
+      border-radius: 3px; }
   .errorMain form {
     margin-top: 40px; }
     .errorMain form .input-group .form-control {

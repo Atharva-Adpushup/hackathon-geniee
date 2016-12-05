@@ -66,8 +66,9 @@ router
             .then(function(data) {
                 return res.render('editor', {
                     isChrome: true,
-                    domain: data.site.domain,
+                    domain: data.site.siteDomain,
                     siteId: data.site.siteId,
+                    channels: data.site.channels,
                     environment: config.development.HOST_ENV,
                     currentSiteId: req.params.siteId
                 });
