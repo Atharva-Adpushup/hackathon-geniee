@@ -47,6 +47,7 @@ block bodyContent
                                                 a.btn.btn-lightBg.btn-default(id="site-custom-reports-" + site.siteId, href='/user/site/#{site.siteId}/reports/ControlVsAdpushupCtr') Custom Reports
                                                 a.btn.btn-lightBg.btn-default(id="site-adsense-reports-" + site.siteId, href='/user/site/#{site.siteId}/reports/adsense') Adsense Reports
                                                 a.btn.btn-lightBg.btn-default(id="editor-redirect-link", target='_blank', href='/user/site/#{site.siteId}/editor') Take to Editor
+                                                a.btn.btn-lightBg.btn-default(id="settings-redirect-link", href='/user/site/#{site.siteId}/settings') Settings
                                                 if isSuperUser
                                                     form(action='/user/deleteSite', method='post', style='display: inline', onsubmit="return (confirm('Are you sure you want to delete this site? This step cannot be reversed !') && trackDelete(#{site.siteId}))")
                                                         input(type='hidden', name='siteId', value='#{site.siteId}')

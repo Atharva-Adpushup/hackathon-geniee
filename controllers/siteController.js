@@ -22,9 +22,10 @@ function checkAuth(req, res, next) {
                     return res.redirect('/403');
                 });
             } else {
-                req.session.destroy(function () {
-                    return res.redirect('/login');
-                });
+                next();
+                // req.session.destroy(function () {
+                //     return res.redirect('/login');
+                // });
             }
         });
 };
@@ -37,7 +38,8 @@ router
                 res.render('settings', {
                     pageGroups: site.data.cmsInfo.pageGroups,
                     patterns: site.data.apConfigs.pageGroupPattern ? site.data.apConfigs.pageGroupPattern : [],
-                    siteId: req.params.siteId
+                    siteId: req.params.siteId,
+                    siteDomain: site.data.siteDomain
                 });
             })
             .catch(function (err) {

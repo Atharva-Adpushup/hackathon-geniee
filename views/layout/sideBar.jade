@@ -6,24 +6,8 @@ nav.pageLeftSidebar.sidebar
         img.logo.logoS(src="/assets/images/logo-min.png", alt='logo', width='34', height='33')
         img.logo.logoL(src="/assets/images/logo.png", alt='logo', width='163', height='33')
     .sidebarMenu.sidebar-menu
-        //- ul.menuItems
-        //-     li.mt-30.sidebar-menu-item
-        //-         a(id="sidebar-dashboard-link", href='/site/#{siteId}/dashboard')
-        //-             | Dashboard
-        //-             span.icon-thumbnail#sidebar-dashboard-icon-thumbnail
-        //-                 i.fa.fa-home#sidebar-dashboard-icon
-        //-     li.sidebar-menu-item
-        //-         a(id="sidebar-reports-link", href='/site/#{siteId}/reports/performance')
-        //-             | Reports
-        //-             span.icon-thumbnail#sidebar-reports-icon-thumbnail
-        //-                 i.fa.fa-bar-chart#sidebar-reports-icon
-        //-     li.sidebar-menu-item
-        //-         a(id="sidebar-profile-link", href='/site/#{siteId}/settings')
-        //-             | Settings
-        //-             span.icon-thumbnail#sidebar-settings-icon-thumbnail
-        //-                 i.fa.fa-cog#sidebar-settings-icon
-        if !partner
-            ul.menuItems
+        ul.menuItems
+            if !partner
                 li.mt-30.sidebar-menu-item
                     a(id="sidebar-dashboard-link", href='/user/dashboard')
                         | Dashboard
@@ -54,8 +38,7 @@ nav.pageLeftSidebar.sidebar
                         | Logout
                         span.icon-thumbnail#sidebar-logout-icon-thumbnail
                             i.fa.fa-sign-out#sidebar-logout-icon
-        else
-             ul.menuItems
+            else
                 li.mt-30.sidebar-menu-item
                     a(id="sidebar-dashboard-link", href='/user/site/#{siteId}/dashboard')
                         | Dashboard
