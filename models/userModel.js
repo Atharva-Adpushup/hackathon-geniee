@@ -398,30 +398,20 @@ function apiModule() {
 		setSitePageGroups: function(email) {
 			function setPageGroupsPromises(user) {
 				return (_(user.get('sites')).map(function(site) {
-					return siteModel.getUniquePageGroups(site.siteId)
-						.then(function(pageGroups) {
-							site.pageGroups = pageGroups;
-							return siteModel.getSetupStep(site.siteId)
-								.then(function(step) {
-									site.step = step;
-									return siteModel.getCmsData(site.siteId)
-										.then(function(cms) {
-											site.cmsInfo = cms;
-											return site;
-										})
-										.catch(function() {
-											site.step = 1;
-											return site;
-										});
-								})
-								.catch(function() {
-									site.step = 1;
-									return site;
-								});
-						}).catch(function() {
-							site.pageGroups = [];
-							return site;
-						});
+					var uniquePageGroups = siteModel.getUniquePageGroups(site.siteId),
+						setupStep = siteModel.getSetupStep(site.siteId),
+						cmsData = siteModel.getCmsData(site.siteId);
+					return Promise.join(uniquePageGroups, setupStep, cmsData, function(pageGroups, step, cms) {
+						site.pageGroups = pageGroups;
+						site.step = step;
+						site.cmsInfo = cms;
+						return site;
+					})
+					.catch(function(err) {
+						site.pageGroups = [];
+						site.step = 1;						
+						return site;
+					});
 				}));
 			}
 
