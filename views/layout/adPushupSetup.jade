@@ -30,8 +30,8 @@ div.detectap-alert.text-center#apdetect
 
  //- Onboarding steps 
 .onboarding-wrapper
-
-    //- Add a website
+ 
+    //- Site addition + platform detection
     .onboarding-step#step1 
         span(class="counter-icon")
             | 1 
@@ -91,52 +91,15 @@ div.detectap-alert.text-center#apdetect
             i#step2-check.fa
         div(class="ob-content")
             p.text-medium.text-center
-                |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis.
-                br
-                | Copy and paste this snippet in the &lt;HEAD&gt; section of your website
-            div.snippet-wrapper
-                span.clipboard-copy
-                    | Copied !
-                textarea(class="snippet", id="header-code", readonly, placeholder="AdPushup init code comes here..")
-                div.snippet-btn-wrapper
-                    div
-                        //- button(data-toggle="modal" data-target="#sendToDevModal" id="sendToDev", class="snippet-btn snippet-dev apbtn-main-line apbtn-small")
-                        //-     | Send code to developer
-                        //-     i.fa.fa-code
-                        button(id="clipboardCopy", class="snippet-btn apbtn-main-line apbtn-small")
-                            | Copy to clipboard 
-                            i.fa.fa-clipboard
-
-            div.error-message.detectap-error
-                p
-                    | Please make sure that the header code is present on the the specified URL
-                //- p 
-                //-     | If you have added the header code to a different URL please add it below - 
-                //- .row
-                //-     form#addUpdatedUrl
-                //-         .col-sm-6.col-sm-offset-2
-                //-             input(required, id="updatedUrl" type="url", class="input-box", placeholder="Enter Website URL here", name="updatedUrl")
-                //-         .col-sm-2.no-pad
-                //-             button(type="submit", class="apbtn-main-line", id="addUpdatedUrlBtn") Add
-                div#detectapError
-            .row
-                .col-sm-4.col-sm-offset-4
-                     button(id="apCheck", class="apbtn-main btn-vr btn-wpdt")
-                        if unSavedSite
-                            | Verify
-                        else
-                            if validSites[0].step <= 3
-                                | Verify
-                            else
-                                | Verified 
-                                i.fa.fa-check
+                | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis.
+            #platformVerificationContent
 
     //- Grant adsense oauth access
     .onboarding-step#step3
         span(class="counter-icon")
             | 3
         h3(class="ob-heading")
-            | Connect Adsense Account
+            | Connect Adsense Account 
             i#step3-check.fa
         div(class="ob-content")
             p.text-medium.text-center
@@ -146,4 +109,20 @@ div.detectap-alert.text-center#apdetect
                 .col-sm-4.col-sm-offset-4
                     button(id="adsenseoauth", class="apbtn-main apbtn-icon")
                         i.fa.fa-google
-                        | Connect Google AdSense                                             
+                        | Connect Google AdSense            
+
+    //- Grant adsense non-admin access
+    .onboarding-step#step4
+        span(class="counter-icon")
+            | 4
+        h3(class="ob-heading")
+            | Grant non-admin access
+            i#step3-check.fa
+        div(class="ob-content")
+            p.text-medium.text-center
+               |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos?
+            br
+            .row
+                .col-sm-4.col-sm-offset-4
+                    button(id="adsenseoauth", class="apbtn-main")
+                        | I've done this                                             
