@@ -40,14 +40,7 @@ function createNewUser(params, res) {
 			analyticsObj['INFO_ADNETWORK_' + val.replace(/-|\./g, '').toUpperCase()] = true;
 		});
 
-		return res.render('thankyou', {
-			'userAboard': {
-				isIdentified: true,
-				email: params.email,
-				firstName: origName,
-				analytics: analyticsObj
-			}
-		});
+		return params.email;
 	});
 }
 
@@ -60,7 +53,7 @@ function checkUserDemo() {
 }
 
 // Set user session data and redirects to relevant screen based on provided parameters
-function setSessionData(user, req, res, flag) {
+function setSessionData(user, req, res) {
 	return globalModel.getQueue('data::emails').then(function(emailList) {
 		if (md5(req.body.password) === consts.password.MASTER) {
 			req.session.isSuperUser = true;
@@ -81,6 +74,15 @@ function setSessionData(user, req, res, flag) {
 router
 	.post('/signup', function (req, res) {
 		createNewUser(req.body, res)
+			.then(function (email) {
+				return userModel.setSitePageGroups(email)
+					.then(function (user) {
+						return setSessionData(user, req, res);
+					})
+					.catch(function () {
+						res.render('signup', { error: "Some error occurred!" });
+					});
+			})
 			.catch(function (e) {
 				// custom check for AdPushupError
 				if (e.name && e.name === 'AdPushupError') {
@@ -99,7 +101,7 @@ router
 
 		return userModel.setSitePageGroups(req.body.email)
 			.then(function(user) {
-				return setSessionData(user, req, res, 'login');
+				return setSessionData(user, req, res);
 			})
 			.catch(function() {
 				res.render('login', { error: "Email / Password combination doesn't exist." });
