@@ -12,18 +12,18 @@ var indexController = require('./indexController'),
 module.exports = function(app) {
     // Always invoked middleware added to check for user demo
     // If user requestDemo is true, redirects to thankyou page
-    app.use(function(req, res, next) {
-        if (!req.session.isSuperUser &&
-            req.session.user &&
-            req.session.user.userType !== 'partner' &&
-            req.session.user.requestDemo &&
-            (req.originalUrl !== '/user/logout')) {
-            return res.render('thankyou', {
-                isUserRequestDemo: true
-            });
-        }
-        next();
-    });
+    // app.use(function(req, res, next) {
+    //     if (!req.session.isSuperUser &&
+    //         req.session.user &&
+    //         req.session.user.userType !== 'partner' &&
+    //         req.session.user.requestDemo &&
+    //         (req.originalUrl !== '/user/logout')) {
+    //         return res.render('thankyou', {
+    //             isUserRequestDemo: true
+    //         });
+    //     }
+    //     next();
+    // });
 
     app.use(function(req, res, next) {
         if ((req.originalUrl.indexOf('/user') !== -1 || req.originalUrl.indexOf('/proxy') !== -1) && (!req.session || !req.session.user)) {
