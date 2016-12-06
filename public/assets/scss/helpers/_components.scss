@@ -73,6 +73,7 @@ textarea {
 	border: 1px solid $primaryRedDark;
 
 	&:hover {
+		color: $whiteColor;
 		background-color: $primaryRedDark;
 	}
 }
@@ -84,6 +85,7 @@ textarea {
 	border: 1px solid $primaryRed;
 
 	&:hover {
+		color: $primaryRed;
 		box-shadow: inset 0px 0px 2px $primaryRed;
 	}
 }

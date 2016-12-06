@@ -1,20 +1,13 @@
 .headerTopBar.navbar-fixed-top
-	//- ul(class="nav navbar-nav navbar-right")
-	//- 	li
-	//- 		a(href="/" target="_blank") 
-	//- 			i.fa.fa-external-link 
-	//- 			| Geniee Account
-	//- 	li
-	//- 		a(href="/" target="_blank") 
-	//- 			i.fa.fa-user 
-	//- 			| Mike
-	.pull-right.col-lg-2.visible-lg.visible-md.mT-10
-			if isSuperUser
-				form(action='/user/switchTo', method='post')
-					input.form-control(type='text', id="dashboard-mail-list-input", list='targetEmail', name='email', onchange='this.form.submit()')
-					datalist#targetEmail(name='email')
-						each userEmail in usersList
-							option(value=userEmail) #{userEmail}
-		
-            
-        
+	if !isSuperUser
+        .pull-left
+            img.logo.logoL(src="/assets/images/logo.png", alt='logo', width='163', height='33', style="margin: 12px 25px;")
+    .pull-right.col-lg-2.visible-lg.visible-md.mT-10
+        if !isSuperUser
+            a.apbtn-danger(id="sidebar-logout-link", href='/user/logout') Logout
+        if isSuperUser
+            form(action='/user/switchTo', method='post')
+                input.form-control(type='text', id="dashboard-mail-list-input", list='targetEmail', name='email', onchange='this.form.submit()')
+                datalist#targetEmail(name='email')
+                    each userEmail in usersList
+                        option(value=userEmail) #{userEmail}
