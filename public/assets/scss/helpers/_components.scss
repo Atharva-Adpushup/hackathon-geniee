@@ -325,3 +325,15 @@ textarea {
 	@extend %badge-round;
 	background-color: $primaryRed;
 }
+
+/* Anchors */
+
+.link-primary {
+	font-size: 1.2em;
+    text-decoration: underline;
+    color: $primaryColor;
+
+    &:hover {
+    	color: $primaryColorDark;
+    }
+}
