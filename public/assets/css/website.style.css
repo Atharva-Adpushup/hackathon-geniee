@@ -1231,6 +1231,10 @@ maxHeightWidth {
   margin: 20px auto; }
 
 .onboarding-step {
+  background-image: url("../images/adpushupbg.png");
+  background-repeat: no-repeat;
+  background-position: -20px 128%;
+  min-height: 320px;
   position: relative;
   background-color: #fff;
   margin-bottom: 80px; }
@@ -1303,7 +1307,7 @@ maxHeightWidth {
 .snippet {
   font-family: monospace;
   background: #f3f5f7;
-  height: 210px;
+  height: 150px;
   font-size: 1.2em;
   color: #555555;
   line-height: 22px;
@@ -1408,17 +1412,30 @@ maxHeightWidth {
 
 .ob-loader {
   position: relative;
-  height: 220px;
+  height: 185px;
+  margin-top: 26px;
   margin-bottom: -20px;
   background-color: rgba(0, 0, 0, 0.15); }
 
 .ob-reset {
+  background-image: none;
   padding-bottom: 20px; }
   .ob-reset .ob-heading {
     padding: 20px 20px 8px;
     margin: 0 20px; }
   .ob-reset .text-medium, .ob-reset .text-medium-nm {
     padding: 0 20px; }
+  .ob-reset .text-medium-nm {
+    padding: 0 50px; }
+
+.apbtn-cmsver {
+  margin-bottom: 10px; }
+
+.ob-apver {
+  background-position: -20px 114%; }
+
+.ob-bg {
+  background-image: url("../images/adpushupbg.png"); }
 
 .ob-bigbtn {
   font-size: 1.6em;
@@ -1450,11 +1467,10 @@ maxHeightWidth {
 
 .snippet-btn-wrapper {
   position: relative;
+  margin-bottom: 40px;
   width: 100%;
-  background: #eaedf1;
+  background-color: rgba(0, 0, 0, 0.04);
   padding: 15px;
-  border: 1px solid #ccc;
-  border-top: none;
   height: 65px; }
   .snippet-btn-wrapper > div {
     position: absolute;

@@ -1,5 +1,7 @@
 // User onboarding component styles
 
+$onboardingBg: url('../images/adpushupbg.png');
+
 %card {
   border-radius: 4px;
   padding: 20px;
@@ -15,6 +17,10 @@
 }
 
 .onboarding-step {
+  background-image: $onboardingBg;
+  background-repeat: no-repeat;
+  background-position: -20px 128%;
+  min-height: 320px;
   position: relative;
   background-color: $whiteColor;
   @extend %card, %shadow;
@@ -110,7 +116,7 @@
 .snippet {
   font-family: $codeFont;
   background: $codeBg;
-  height: 210px;
+  height: 150px;
   font-size: 1.2em;
   color: $fontColor;
   line-height: 22px;
@@ -238,12 +244,14 @@
 
 .ob-loader {
   position: relative;
-  height: 220px;
+  height: 185px;
+  margin-top: 26px;
   margin-bottom: -20px;
   background-color: rgba(0,0,0,.15);
 }
 
 .ob-reset {
+  background-image: none;
   padding-bottom: 20px;
 
   .ob-heading {
@@ -254,6 +262,22 @@
   .text-medium {
     padding: 0 20px;
   }
+
+  .text-medium-nm {
+    padding: 0 50px;
+  }
+}
+
+.apbtn-cmsver {
+  margin-bottom: 10px;
+}
+
+.ob-apver {
+  background-position: -20px 114%;
+}
+
+.ob-bg {
+  background-image: $onboardingBg;
 }
 
 .ob-bigbtn {
@@ -293,11 +317,10 @@
 
 .snippet-btn-wrapper {
   position: relative;
+  margin-bottom: 40px;
   width: 100%;
-  background: darken($codeBg, 3%);
+  background-color: rgba(0,0,0,.04);
   padding: 15px;
-  border: 1px solid $lightGrey;
-  border-top: none;
   height: 65px;
 
   & > div {
