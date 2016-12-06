@@ -55,7 +55,8 @@ $('document').ready(function() {
                 siteId: siteId
             }, function(res) {
                 if(res.success) {
-
+                    $('#pageGroupHelp').fadeIn();
+                    
                     // Go to next step
                     newSite.nextStep(3, 2, 1000);
                 }
@@ -64,6 +65,64 @@ $('document').ready(function() {
                 }
             });
         };
+
+        // Trigger pagegroup help section
+        $('#pageGroupHelp').click(function() {
+            $('.page-grp-text').fadeIn();
+            $(this).hide();
+        });
+
+        // Add new pagegroup
+        function addPageGroup() {
+            var pageGroupInput = "!{addPageGroupStr}";
+            $('.pagegroup-input').last().after('<div class="row pagegroup-input">'+pageGroupInput+'</div>');
+        };
+
+        // Remove pagegroup 
+        function removePageGroup(el) {
+            $(el).closest('.pagegroup-input').remove();
+        }
+
+        // Create all pagegroups
+        var pageGroups = [];
+        $('#pagegroup-form').submit(function(e) {
+            e.preventDefault();
+
+            // Disable submit button
+            $('.pagegroup-actions button').html('Creating...').prop('disabled', true);
+
+            // Detect unique pagegroups
+            if(matchValues('#pagegroup-form')) {
+                var data = $(this).serializeArray();
+
+                // Converting pagegroup serialized array to json object
+                for(var i = 0; i < data.length; i ++) {
+                    if(data[i+1] !== undefined) {
+                        data[i].name === 'pagegroupName' ? pageGroups.push({pageGroupName: data[i].value, sampleUrl: data[i+1].value}) : '';
+                    }
+                }
+                //#{"pageGroups"} = pageGroups;
+                $('#pageGroupHelp, #pagegroup-err').hide();
+
+                // Goto next step
+                nextStep('#step3', '#step2', 1000);
+            } else {
+                $('#pagegroup-err').fadeIn();
+            }
+        });
+
+        // Match input values in form
+        function matchValues(selector) {
+            var values = [] ;
+            $(selector+' input').each( function(id, val) { 
+                values.push($(val).val());
+            });
+            values.sort() ;
+            for(var k = 1; k < values.length; ++k) {
+                if(values[k] == values[k-1]) return false ;
+            }
+            return true;
+        }
 
         // Function to traverse to next step
         newSite.nextStep = function(to, from, duration) {
@@ -297,6 +356,7 @@ $('document').ready(function() {
         });
 
         // Trigger to set cms
+        $('#pageGroupHelp').hide();
         $(document).on('click', '#setCms', function(){ 
             var btn = $(this),
                 cms = btn.attr('data-cms-name');
