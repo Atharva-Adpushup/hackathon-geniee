@@ -88,7 +88,7 @@ block bodyContent
                     // Control v/s Adpushp Starts here
                     #widgetsArea.row
                         if validSites.length > 0
-                            if ((!hasStep || (!isSuperUser && validSites[0].step > 3)) && !requestDemo) || (isSuperUser && (validSites || validSites[0].step > 3))
+                            if ((!hasStep || (!isSuperUser && validSites[0].step > 3)) && !requestDemo) || (isSuperUser && (validSites && validSites[0].step > 3))
                                 for site in validSites
                                     <!--.2.and.mb-30(class="{{ loop.length % loop.last ? 'col-xs-12' : 'col-xs-6' }}")-->
                                     .mb-30

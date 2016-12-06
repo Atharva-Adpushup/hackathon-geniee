@@ -79,8 +79,9 @@ $('document').ready(function() {
 
             // Check for CMS detection step in onboarding flow
             checkCmsStep: function(step) {
-                this.manipulateElem('#cms-text', 'Please wait while we detect your website\'s platform...', 'htmlFadeIn', 600);
-                this.detectCms(newSite.addedSite.domain);
+                var ob = this;
+                ob.manipulateElem('#cms-text', 'Please wait while we detect your website\'s platform... <div class="loader-bounce"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>', 'htmlFadeIn', 600);
+                setTimeout(function(){ob.detectCms(newSite.addedSite.domain);}, 3000);
             },
 
             // Right trim method
