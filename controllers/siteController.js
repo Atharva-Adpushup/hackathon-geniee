@@ -14,6 +14,8 @@ var express = require('express'),
 function checkAuth(req, res, next) {
     userModel.verifySiteOwner(req.session.user.email, req.params.siteId)
         .then(function () {
+            // This throws a warning : promise created but nothing returned from it
+            // @TODO : Fix this
             next();
         })
         .catch(function () {
@@ -33,9 +35,9 @@ function checkAuth(req, res, next) {
 router
     .get('/:siteId/*', checkAuth)
     .get('/:siteId/settings', function (req, res) {
-        siteModel.getSiteById(req.params.siteId)
+        return siteModel.getSiteById(req.params.siteId)
             .then(function (site) {
-                res.render('settings', {
+                return res.render('settings', {
                     pageGroups: site.data.cmsInfo.pageGroups,
                     patterns: site.data.apConfigs.pageGroupPattern ? site.data.apConfigs.pageGroupPattern : [],
                     siteId: req.params.siteId,

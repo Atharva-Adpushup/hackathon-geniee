@@ -150,7 +150,7 @@ router
 				});
 		}
 		else {
-			channelModel.createPageGroup(json)
+			return channelModel.createPageGroup(json)
 				.then(function(data) {
 					// Reset session on addition of new pagegroup for non-partner
 					var userSites = req.session.user.sites,
@@ -159,6 +159,7 @@ router
 					
 					var index = _.findIndex(userSites, {'siteId': parseInt(json.siteId)});
 					req.session.user.sites[index] = site;
+					req.session.pageGroupError = '';
 					
 					return res.redirect('/user/dashboard');
 				})
@@ -224,7 +225,7 @@ router
 				});
 		}
 		else {			
-			channelModel.deletePagegroupById(json.pageGroupId)
+			return channelModel.deletePagegroupById(json.pageGroupId)
 				.then(function() {
 					// Reset session on deletion of new pagegroup for non-partner
 					var userSites = req.session.user.sites,
