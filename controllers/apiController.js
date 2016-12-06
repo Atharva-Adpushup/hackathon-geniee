@@ -133,7 +133,7 @@ router
 	.post('/pagegroup/create', function (req, res) {
 		var json = req.body;
 
-		if(req.session.user.userType === 'partner') {
+		if(!req.session.user) {
 			// Validate input params and create pagegroup
 			return FormValidator.validate(json, schema.api.validations)
 				.then(function () { return channelModel.createPageGroup(json) })
@@ -207,7 +207,7 @@ router
 	.post('/pagegroup/delete', function (req, res) {
 		var json = req.body;
 
-		if(req.session.user.userType === 'partner') {
+		if(!req.session.user) {
 			// Validate input params and delete pagegroup
 			return FormValidator.validate(json, schema.api.validations)
 				.then(function () { return channelModel.deletePagegroupById(json.pageGroupId) })
