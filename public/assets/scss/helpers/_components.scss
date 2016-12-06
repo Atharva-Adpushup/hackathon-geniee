@@ -28,6 +28,7 @@ textarea {
 %apbtn {
 	@extend %input-base;
 	width: 100%;
+	display: inline-block;
 	border-radius: 2px;
 	text-transform: uppercase;
 	text-align: center;
@@ -43,7 +44,9 @@ textarea {
 	color: $whiteColor;
 	border: 1px solid $primaryColorDark;
 
-	&:hover {
+	&:hover,
+	&:focus,
+	&:active {
 		background-color: $primaryColorDark;
 		color: $whiteColor;
 	}
@@ -111,7 +114,7 @@ textarea {
 
 .apalert-inverted {
 	@extend %alert;
-	background-color: rgba(0,0,0,.78);
+	background-color: rgba(0,0,0,.8);
 
 	.close {
 		color: $iconColor;
