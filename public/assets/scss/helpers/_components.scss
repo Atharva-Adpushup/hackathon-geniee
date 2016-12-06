@@ -131,6 +131,16 @@ textarea {
 .apalert-success {
 	@extend %alert;
 	background-color: rgba(darken($successGreen, 5%), .94);
+
+	a {
+		color: $whiteColor;
+		text-decoration: underline;
+
+		&:hover {
+			color: $codeBg;
+			text-decoration: underline;	
+		}
+	}
 }
 
 .apalert-inverted {

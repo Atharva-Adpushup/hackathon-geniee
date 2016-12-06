@@ -11,6 +11,7 @@ $('document').ready(function() {
 
             // UI templates for onboarding
             templates: {
+                checkIcon: '<i class="fa fa-check"></i>',
                 cmsSelection: '<div class="row"><div class="col-sm-3 col-sm-offset-3"><button class="apbtn-main-line ob-bigbtn" id="setCms" data-cms-name="wordpress"><i class="fa fa-wordpress"></i> Wordpress</button></div><div class="col-sm-3"><button class="apbtn-main ob-bigbtn" id="setCms" data-cms-name="">Other</button></div></div>',
                 otherPlatformVerification: ' <p class="text-medium text-center" style="margin-top: -10px;">Copy and paste this snippet in the &lt;HEAD&gt; section of your website </p><div class="snippet-wrapper"> <span class="clipboard-copy"> Copied ! </span> <textarea class="snippet" id="header-code" readonly placeholder="AdPushup init code comes here.."></textarea> <div class="snippet-btn-wrapper"> <div> <button id="clipboardCopy" class="snippet-btn apbtn-main-line apbtn-small"> Copy to clipboard <i class="fa fa-clipboard"></i> </button> </div></div></div><div class="error-message detectap-error"> <p> Please make sure that the header code is present on the the specified URL </p><div id="detectapError"></div></div><div class="row"> <div class="col-sm-4 col-sm-offset-4"> <button id="apCheck" class="apbtn-main btn-vr btn-wpdt"> Verify </button> </div></div>',
                 wordpressPlatformVerification: '<p class="text-medium text-center">Please install the AdPushup JavaScript snippet via our Wordpress Plugin.</p><div class="row"><div class="col-sm-4 col-sm-offset-4"><a id="wp-plugin-link" href="https://wordpress.org/plugins/adpushup/" target="_blank" class="apbtn-main-line ob-bigbtn"><i class="fa fa-wordpress"></i> Install Plugin</a></div></div><p class="text-medium-nm text-center">After you install plugin, please configure Site ID - <strong>1</strong> by going to <strong>Wordpress</strong> &gt; <strong>Settings</strong> &gt; <strong>Adpushup Settings</strong></p><div class="row"><div class="col-sm-4 col-sm-offset-4"><button id="apCheck" class="apbtn-main apbtn-cmsver">I\'ve done this</button></div></div>'
@@ -23,6 +24,11 @@ $('document').ready(function() {
                         $(container).hide().html(content).fadeIn(duration);
                         break;
                 }
+            },
+
+            // Setup complete alert
+            setupCompleteAlert: function() {
+                ap.apAlert('Our advisors will get in touch with you soon. You can also contact us at <a href="mailto:support@adpushup.com">support@adpushup.com</a>', '#apdetect', 'success', 'slideDown');
             },
 
             // Smooth scrolling method
@@ -69,16 +75,21 @@ $('document').ready(function() {
                     $('#step' + parseInt(i) + '-check').addClass('fa-check-circle zoomIn');
                 }
                 if (step > 2) {
-                    $('#apCheck').html('Verified <i class="fa fa-check"></i>');
-                    $('#wp-plugin-link').html('<i class="fa fa-wordpress"></i> Plugin installed <i class="fa fa-check"></i>');
+                    $('#apCheck').html('Verified '+this.templates.checkIcon);
+                    $('#wp-plugin-link').html('<i class="fa fa-wordpress"></i> Plugin installed '+this.templates.checkIcon);
                 }
                 if (step >= 4) {
-                    $('#adsenseoauth').html('Google Adsense Connected <i class="fa fa-check"></i>');
+                    $('#adsenseoauth').html('Google Adsense Connected '+this.templates.checkIcon);
                 }
 
                 switch (step) {
                     case 1:
                         newSite.addedSite ? this.checkCmsStep() : '';
+                        $('#platformVerificationContent').html('<p class="text-center mT-10"><img class="platform-graphic" src="/assets/images/platform.png" width="150" height="150"/></p>');
+                        break;
+                    case 5:
+                        $('#adsensenonadmin').html('Setup Complete '+this.templates.checkIcon);
+                        this.setupCompleteAlert();
                         break;
                 }
             },
@@ -133,11 +144,11 @@ $('document').ready(function() {
                         }, function(response) {
                             if (response.success) {
                                 if (cmsName !== 'wordpress') {
-                                    btn.html('Other <i class="fa fa-check"></i>').prop('disabled', true);
+                                    btn.html('Other '+ob.templates.checkIcon).prop('disabled', true);
                                     $('#platformVerificationContent').html(ob.templates.otherPlatformVerification);
                                     ob.generateInitCode(newSite.addedSite.siteId);
                                 } else {
-                                    btn.html('<i class="fa fa-wordpress"></i> Wordpress <i class="fa fa-check"></i>').prop('disabled', true);
+                                    btn.html('<i class="fa fa-wordpress"></i> Wordpress '+ob.templates.checkIcon).prop('disabled', true);
                                     $('#platformVerificationContent').html(ob.templates.wordpressPlatformVerification);
                                 }
                                 ob.nextStep(2, 1, 1000);
@@ -163,7 +174,7 @@ $('document').ready(function() {
                             siteId: newSite.addedSite.siteId,
                             step: 3
                         }, function(response) {
-                            $(el).html('Verified <i class="fa fa-check"></i>');
+                            $(el).html('Verified '+ob.templates.checkIcon);
                             if (response.success) {
                                 ob.nextStep(3, 2, 1000);
                             } else {
@@ -193,6 +204,23 @@ $('document').ready(function() {
                 }, 1500);
                 $('#header-code').select();
                 document.execCommand('copy');
+            },
+
+            // Set non-admin access check
+            nonAdminAccess: function(btn) {
+                var ob = this;
+                btn.html('Saving...').prop('disabled', true);
+                $.post('/user/setSiteStep', {
+                    siteId: newSite.addedSite.siteId,
+                    step: 5
+                }, function(response) {
+                    if (response.success) {
+                        btn.html('Setup Complete '+ob.templates.checkIcon);
+                        ob.setupCompleteAlert();
+                    } else {
+                        alert('Some error occurred!');
+                    }
+                });
             }
 
         };
@@ -225,6 +253,11 @@ $('document').ready(function() {
         // Trigger to get adsense Oauth
         $('#adsenseoauth').click(function() {
             ap.onboarding.openOauthWindow();
+        });
+
+        // Trigger to set non-admin access check
+        $('#adsensenonadmin').click(function() {
+            ap.onboarding.nonAdminAccess($(this));
         });
 
         // Tigger to copy init code to clipboard

@@ -227,8 +227,8 @@ $onboardingBg: url('../images/adpushupbg.png');
 .detectap-alert {
   position: fixed;
   top: 60px;
-  left: 65px;
-  width: calc(100% - 65px);
+  left: 0;
+  width: 100%;
   display: none;
 }
 
@@ -344,6 +344,16 @@ $onboardingBg: url('../images/adpushupbg.png');
     color: $whiteColor;
     margin-left: 10px;
   }
+}
+
+.platform-graphic {
+  border: 3px solid $primaryColor;
+  border-right: none;
+  border-radius: 50%;
+  padding: 20px;
+  width: 125px;
+  height: 125px;
+  margin-top: 10px;
 }
 
 
