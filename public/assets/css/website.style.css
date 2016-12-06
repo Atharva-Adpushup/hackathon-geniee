@@ -1458,6 +1458,9 @@ maxHeightWidth {
     position: absolute;
     right: 10px; }
 
+.btn-vr {
+  margin-top: 20px; }
+
 .headerTopBar {
   height: 60px;
   z-index: 1039;

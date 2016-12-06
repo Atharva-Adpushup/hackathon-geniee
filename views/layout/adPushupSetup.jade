@@ -83,9 +83,9 @@ div.detectap-alert.text-center#apdetect
                 textarea(class="snippet", id="header-code", readonly)
                 div.snippet-btn-wrapper
                     div
-                        button(data-toggle="modal" data-target="#sendToDevModal" id="sendToDev", class="snippet-btn snippet-dev apbtn-main-line apbtn-small")
-                            | Send code to developer
-                            i.fa.fa-code
+                        //- button(data-toggle="modal" data-target="#sendToDevModal" id="sendToDev", class="snippet-btn snippet-dev apbtn-main-line apbtn-small")
+                        //-     | Send code to developer
+                        //-     i.fa.fa-code
                         button(id="clipboardCopy", class="snippet-btn apbtn-main-line apbtn-small")
                             | Copy to clipboard 
                             i.fa.fa-clipboard
@@ -102,8 +102,10 @@ div.detectap-alert.text-center#apdetect
                 //-         .col-sm-2.no-pad
                 //-             button(type="submit", class="apbtn-main-line", id="addUpdatedUrlBtn") Add
                 div#detectapError
-            button(id="completeSetup", class="apbtn-main btn-complete-setup")
-                | Verify        
+            .row
+                .col-sm-4.col-sm-offset-4
+                     button(id="apCheck", class="apbtn-main btn-vr")
+                        | Verify
 
     //- Grant adsense oauth access
     .onboarding-step#step4

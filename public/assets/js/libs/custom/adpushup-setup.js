@@ -10,14 +10,16 @@ $('document').ready(function() {
         // Define onboarding sequence object
         ap.onboarding = {
             
+            // UI templates for onboarding
             templates: {
                 cmsWordpress: '<button class="apbtn-main-line ob-bigbtn" id="setCms" data-cms-name="wordpress"><i class="fa fa-wordpress"></i> Wordpress</button>',
 
                 cmsOther: '<button class="apbtn-main ob-bigbtn" id="setCms" data-cms-name="">Other</button>',
 
-                wordpressPlugin: '<div class="row"><div class="col-sm-4 col-sm-offset-4"><a href="https://wordpress.org/plugins/adpushup/" target="_blank" class="apbtn-main-line ob-bigbtn"><i class="fa fa-wordpress"></i> Install Plugin</a></div></div><p class="text-medium-nm text-center">After you install plugin, please configure Site ID - <strong>'+newSite.viewObjects.unSavedSiteId+'</strong> by going to <strong>Wordpress</strong> > <strong>Settings</strong> > <strong>Adpushup Settings</strong></p><div class="row"><div class="col-sm-4 col-sm-offset-4"><button id="wpCheck" class="apbtn-main">I\'ve done this</button></div></div>'
+                wordpressPlugin: '<div class="row"><div class="col-sm-4 col-sm-offset-4"><a href="https://wordpress.org/plugins/adpushup/" target="_blank" class="apbtn-main-line ob-bigbtn"><i class="fa fa-wordpress"></i> Install Plugin</a></div></div><p class="text-medium-nm text-center">After you install plugin, please configure Site ID - <strong>'+newSite.viewObjects.unSavedSiteId+'</strong> by going to <strong>Wordpress</strong> > <strong>Settings</strong> > <strong>Adpushup Settings</strong></p><div class="row"><div class="col-sm-4 col-sm-offset-4"><button id="apCheck" class="apbtn-main">I\'ve done this</button></div></div>'
             },
 
+            // Method to enable element-level DOM manipulation
             manipulateElem: function(container, content, type, duration) {
                 switch(type) {
                     case 'html':
@@ -38,6 +40,7 @@ $('document').ready(function() {
                 }
             },
 
+            // CMS detection on site
             detectCms: function(site) {
                 var ob = this;
 
@@ -54,12 +57,21 @@ $('document').ready(function() {
                 });
             },
 
+            // Init code generation
+            generateInitCode: function(siteId) {
+                var headerCode = '!function(w,d){var adp,config,tL,siteId='+siteId+',json=null,apjQuery=null;(w.adpushup=w.adpushup||{}).configure={config:{e3Called:!1,jqLoaded:0,initVersion:1.1.1,apLoaded:0,e3Loaded:0,rand:Math.random(),pageUrl:w.location.href,referrer:d.referrer,cookieSettings:{uuidAppendStr:"UUID_",uuidKey:"apSiteUuid",cookieExpiryTime:730}}},adp=w.adpushup,config=adp.configure.config,tL=adp.timeline={},tL.tl_adpStart=+new Date,adp.utils={uniqueId:function(appendNum){var r,d=+new Date,appendMe=!appendNum||"number"==typeof appendNum&&0>appendNum?Number(1).toString(16):Number(appendNum).toString(16);return appendMe=("0000000".substr(0,8-appendMe.length)+appendMe).toUpperCase(),appendMe+"-xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(c){return r=((d=Math.floor(d/16))+16*Math.random())%16|0,("x"===c?r:3&r|8).toString(16)})},loadScript:function(src,sC,fC){var s=d.createElement("script");s.src=src,s.type="text/javascript",s.async=!0,s.onerror=function(){"function"==typeof fC&&fC.call()},"object"==typeof d.attachEvent?s.onreadystatechange=function(){"loaded"===s.readyState||"complete"===s.readyState?s.onreadystatechange=null:null}:s.onload=function(){"function"==typeof sC?sC.call():null},(d.getElementsByTagName("head")[0]||d.getElementsByTagName("body")[0]).appendChild(s)},createCookie:function(key,value,expiryDays,domain){var msDays,expires="",date=new Date;expiryDays&&(msDays=24*expiryDays*60*60*1e3,date.setTime(date.getTime()+msDays),expires="; expires="+date.toUTCString()+"; max-age="+msDays),document.cookie=key+"="+value+expires+"; path=/"+(domain?"; domain="+domain:"")},readCookie:function(key){var cookie,i,keyEQ=key+"=",cookieArr=document.cookie.split(";");for(i=0;i<cookieArr.length;i++){for(cookie=cookieArr[i];" "===cookie.charAt(0);)cookie=cookie.substring(1,cookie.length);if(0===cookie.indexOf(keyEQ))return cookie.substring(keyEQ.length,cookie.length)}},eraseCookie:function(key){this.createCookie(key,"",-1)}},adp.configure.push=function(obj){var key,cookieStr,c=this.config,ts=+new Date,cookie=c.cookie;for(key in obj)c[key]=obj[key];if(!c.e3Called&&c.siteId&&c.pageGroup&&c.packetId&&cookie){for(key in cookie)cookieStr="&"+key+"="+cookie[key];adp.utils.loadScript("//e3.adpushup.com/E3WebService/e3?ver=2&callback=e3Callback&siteId="+c.siteId+"&url="+encodeURIComponent(c.pageUrl)+"&pageGroup="+c.pageGroup+"&referrer="+encodeURIComponent(d.referrer)+"&cms="+c.cms+(c.pluginVer?"&pluginVer="+c.pluginVer:"")+"&rand="+c.rand+"&packetId="+c.packetId+cookieStr+"&_="+ts),c.e3Called=!0,tL.tl_e3Requested=ts,init()}adp.ap&&"function"==typeof adp.ap.configure&&adp.ap.configure(obj)};function init(){w.jQuery&&w.jQuery.fn.jquery.match(/^1.11./)&&!config.jqLoaded&&(tL.tl_jqLoaded=+new Date)&&(config.jqLoaded=1)&&(apjQuery=w.jQuery),"function"==typeof adp.runAp&&!config.apLoaded&&(tL.tl_apLoaded=+new Date)&&(config.apLoaded=1),!adp.configure.config.apRun&&adp.configure.config.pageGroup&&apjQuery&&"function"==typeof adp.runAp&&(adp.configure.push({apRun:!0}),adp.runAp(apjQuery)),!adp.configure.config.e3Run&&w.apjQuery&&"undefined"!=typeof adp.ap&&"function"==typeof adp.ap.triggerAdpushup&&json&&"undefined"!=typeof json&&(adp.configure.push({e3Run:!0}),adp.ap.triggerAdpushup(json))}w.e3Callback=function(){arguments[0]&&!config.e3Loaded&&(tL.tl_e3Loaded=+new Date)&&(config.e3Loaded=1),json=arguments[0],init()};function jqCallback(){config.jqLoaded?null:init(),w.jQuery&&w.jQuery.noConflict(!0)&&(w.jQuery=w.jQuery?w.jQuery:apjQuery)&&(w.$=w.$?w.$:w.jQuery)}adp.utils.loadScript("//optimize.adpushup.com/"+siteId+"/apv2.js",init),tL.tl_apRequested=+new Date,adp.utils.loadScript("//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js",jqCallback),adp.utils.loadScript("//static.adpushup.com/js/adpushupadsv2.js"),tL.tl_jqRequested=+new Date,function(adp,utils){var config=adp.configure.config.cookieSettings,cookie={},cookieVal=utils.readCookie(config.uuidKey);cookieVal||(cookieVal=config.uuidAppendStr+utils.uniqueId(siteId),utils.createCookie(config.uuidKey,cookieVal,config.cookieExpiryTime,window.location.hostname)),cookie[config.uuidKey]=cookieVal,adp.configure.push({cookie:cookie})}(adp,adp.utils);adp.configure.push({siteId:siteId,packetId:adp.utils.uniqueId(siteId),siteDomain:w.location.hostname || "",cms:"custom"});}(window,document);';
+
+                this.manipulateElem('#header-code', '<script data-cfasync="false" type="text/javascript">'+headerCode+'</script>', 'text')
+            },
+
+            // Check for CMS detection step in onboarding flow
             checkCmsStep: function() {
                 ap.showLoader('#ob-loader', 'ob-loader');
                 this.manipulateElem('#cms-text', 'Please wait while we inspect your website...', 'html');
                 this.detectCms(newSite.addedSite.domain);
             },
             
+            // Show appropriate onboarding step
             showStep: function(step) {
                 $('#step' + step + ' .ob-content').show();
 
@@ -76,16 +88,12 @@ $('document').ready(function() {
                 }
 
                 // Generate header code step if all other steps are complete
-                if(parseInt(step) === this.totalSteps) {
-
-                    // Generate header code with site id
-                    var headerCode = '!function(w,d){var adp,config,tL,siteId='+newSite.addedSite.siteId;
-                    
-                    // Populate header code in textarea
-                    this.manipulateElem('#header-code', '<script data-cfasync="false" type="text/javascript">'+headerCode+'</script>', 'text');
+                if(parseInt(step) === this.totalSteps || parseInt(step) === 3) {
+                    this.generateInitCode(newSite.addedSite.siteId);
                 }
             },
 
+            // Goto next onboarding step
             nextStep: function(to, from, duration) {
                 var ob = this;
 
@@ -103,6 +111,7 @@ $('document').ready(function() {
                 }
             },
 
+            // Add a new site 
             addSite: function(site, url) {
                 var ob = this;
 
@@ -129,6 +138,7 @@ $('document').ready(function() {
                 });
             },
 
+            // Save site platform or CMS
             saveCms: function(cmsName, siteId, btn) {
                 var ob = this;
 
@@ -139,7 +149,19 @@ $('document').ready(function() {
                 }, function(res) {
                     if(res.success) {
                         if(cmsName !== 'wordpress') {
-                            ob.nextStep(3, 2, 1000);
+
+                            $.post('/user/setSiteStep', {
+                                siteId: newSite.addedSite.siteId,
+                                step: 3
+                            }, function(response) {
+                                if(response.success) {
+                                    ob.generateInitCode(newSite.addedSite.siteId);
+                                    ob.nextStep(3, 2, 1000);
+                                }
+                                else {
+                                    alert('Some error occurred!');
+                                }
+                            });
                         }
                         else {
                             ob.manipulateElem('#cms-text', 'Please install the AdPushup JavaScript snippet via our Wordpress Plugin.', 'html');
@@ -152,6 +174,7 @@ $('document').ready(function() {
                 });
             },
 
+            // AdPushup detection on site
             detectAp: function(addedSite, el, cms) {
                 var ob = this;
 
@@ -165,7 +188,7 @@ $('document').ready(function() {
 
                         $.post('/user/setSiteStep', {
                             siteId: newSite.addedSite.siteId,
-                            step: window.selectedCms === 'wordpress' ? 4 : 3
+                            step: 4
                         }, function(response) {
                             if(response.success) {
 
@@ -173,7 +196,7 @@ $('document').ready(function() {
                                     ob.nextStep(4, 2, 1000);
                                 }
                                 else{
-                                    ob.nextStep(3, 2, 1000);
+                                    ob.nextStep(4, 3, 1000);
                                 }
                             }
                             else {
@@ -188,6 +211,7 @@ $('document').ready(function() {
                 });
             },
 
+            // Adsense OAuth window trigger
             openOauthWindow: function() {
                 var x = screen.width / 2 - 700 / 2;
                 var y = screen.height / 2 - 450 / 2;
@@ -198,19 +222,9 @@ $('document').ready(function() {
         };
         ap.onboarding.showStep(newSite.defaultStep);
 
-            
-       
-        
-
-      
-
-       
 
 
-
-        
-
-        // Add user's unsaved site
+        // Trigger to add user's unsaved site
         $('#addUserSite').click(function(e) {
             var userUnsavedSite = newSite.viewObjects.domanizedUrl,
                 userUnsavedSiteId = newSite.viewObjects.unSavedSiteId,
@@ -227,7 +241,7 @@ $('document').ready(function() {
         });
 
         // Trigger to detect ap
-        $(document).on('click', '#wpCheck', function() {
+        $(document).on('click', '#apCheck', function() {
             $(this).html('Verifying...').prop('disabled', true);
             ap.onboarding.detectAp(newSite.addedSite.domain, $(this));
         });
