@@ -74,7 +74,14 @@ router
     .post('/setSiteStep', function(req, res) {
 		siteModel.setSiteStep(req.body.siteId, req.body.step)
 			.then(function() {
-				res.send({success: 1});
+				return userModel.setSitePageGroups(req.session.user.email)
+					.then(function(user) {
+						req.session.user = user;
+						res.send({success: 1});
+					})
+					.catch(function() {
+						res.send({success: 0});
+					});
 			})
 			.catch(function() {
 				res.send({success: 0});
