@@ -209,6 +209,16 @@ $('document').ready(function() {
                 var y = screen.height / 2 - 450 / 2;
 
                 window.open("/user/requestOauth", 'Oauth Request', 'height=485,width=700,left=' + x + ',top=' + y);
+            },
+
+            // Copy init code to clipboard
+            copyInitCode: function() {
+                $('.clipboard-copy').fadeIn();
+                setTimeout(function() {
+                    $('.clipboard-copy').fadeOut();
+                }, 1500);
+                $('#header-code').select();
+                document.execCommand('copy');
             }
 
         };
@@ -241,6 +251,11 @@ $('document').ready(function() {
         // Trigger to get adsense Oauth
         $('#adsenseoauth').click(function() {
             ap.onboarding.openOauthWindow();
+        });
+
+        // Tigger to copy init code to clipboard
+        $('#clipboardCopy, #header-code').click(function() {
+            ap.onboarding.copyInitCode();
         });
 
     })(adpushup);

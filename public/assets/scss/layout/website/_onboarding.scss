@@ -194,7 +194,7 @@
 
   .clipboard-copy {
     position: absolute;
-    bottom: 64px;
+    bottom: 65px;
     right: 1px;
     width: 140px;
     display: none;
@@ -202,8 +202,7 @@
     font-size: 1.1em;
     background-color: $whiteColor;
     padding: 6px;
-    border-top: 1px solid $lightGrey;
-    border-left: 1px solid $lightGrey;
+    @include bordersStyle(1px solid $lightGrey, top, left, bottom);
     color: $fontColor;
   }
 }

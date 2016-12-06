@@ -8,6 +8,18 @@
           #{$property}: #{$value};
 }
 
+/* ADD SAME BORDER TO MULTIPLE SIDES */
+@mixin bordersStyle($style, $sides...) {
+  @if length($sides) == 0 {
+    border: $style;
+  }
+  @else {
+    @each $side in $sides {
+      border-#{$side}: $style;
+    }
+  }
+}
+
 /* BORDER RADIUS */
 @mixin border-radius($radius) {
     @include css3-prefix('border-radius', $radius);

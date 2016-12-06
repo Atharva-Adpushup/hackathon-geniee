@@ -305,6 +305,7 @@ body {
   width: 100%; }
 
 /* ADDS A BROWSER PREFIX TO THE PROPERTY */
+/* ADD SAME BORDER TO MULTIPLE SIDES */
 /* BORDER RADIUS */
 /* BOX SHADOW */
 /* TEXT SHADOW */
@@ -1369,7 +1370,7 @@ maxHeightWidth {
     border-top-right-radius: 2px; }
   .snippet-wrapper .clipboard-copy {
     position: absolute;
-    bottom: 64px;
+    bottom: 65px;
     right: 1px;
     width: 140px;
     display: none;
@@ -1379,6 +1380,7 @@ maxHeightWidth {
     padding: 6px;
     border-top: 1px solid #ccc;
     border-left: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
     color: #555555; }
 
 .detectap-alert {
