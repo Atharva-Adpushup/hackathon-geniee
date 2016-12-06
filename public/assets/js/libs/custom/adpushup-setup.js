@@ -1,7 +1,6 @@
 // Adpushup setup script - User onboarding + New site addition
 
 $('document').ready(function() {
-
     (function(ap) {
 
         // Save new site object that is attached to adpushup global object 
@@ -22,18 +21,6 @@ $('document').ready(function() {
             // Method to enable element-level DOM manipulation
             manipulateElem: function(container, content, type, duration) {
                 switch (type) {
-                    case 'html':
-                        $(container).html(content);
-                        break;
-                    case 'css':
-                        $(container).css(content);
-                        break;
-                    case 'class':
-                        $(container).addClass(content);
-                        break;
-                    case 'text':
-                        $(container).text(content);
-                        break;
                     case 'htmlFadeIn':
                         $(container).hide().html(content).fadeIn(duration);
                         break;
