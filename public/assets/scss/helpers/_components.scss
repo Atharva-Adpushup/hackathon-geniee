@@ -58,7 +58,10 @@ textarea {
 	color: $primaryColor;
 	border: 1px solid $primaryColor;
 
-	&:hover {
+	&:hover,
+	&:focus,
+	&:active {
+		color: $primaryColor;
 		box-shadow: inset 0px 0px 2px $primaryColor;
 	}
 }

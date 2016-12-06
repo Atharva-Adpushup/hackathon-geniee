@@ -68,7 +68,7 @@ $('document').ready(function() {
             }
             else {
                 $('#cms-text').html('Please install the AdPushup JavaScript snippet via our Wordpress Plugin.');
-                var wpPluginHtml = '<div class="row"><div class="col-sm-4 col-sm-offset-4"><a href="https://wordpress.org/plugins/adpushup/" target="_blank" class="apbtn-main ob-bigbtn"><i class="fa fa-wordpress"></i> Install Plugin</a></div></div>';
+                var wpPluginHtml = '<div class="row"><div class="col-sm-4 col-sm-offset-4"><a href="https://wordpress.org/plugins/adpushup/" target="_blank" class="apbtn-main-line ob-bigbtn"><i class="fa fa-wordpress"></i> Install Plugin</a></div></div><p class="text-medium-nm text-center">After you install plugin, please configure Site ID - <strong>'+newSite.viewObjects.unSavedSiteId+'</strong> by going to <strong>Wordpress</strong> > <strong>Settings</strong> > <strong>Adpushup Settings</strong></p><div class="row"><div class="col-sm-4 col-sm-offset-4"><button id="wpCheck" class="apbtn-main">I\'ve done this</button></div></div>';
                 $('#cms-res').hide().html(wpPluginHtml).fadeIn();
             }
         };
@@ -160,12 +160,12 @@ $('document').ready(function() {
             });
         };
 
-        // Function to detect Adrecover on added website
-        newSite.detectAp = function(addedSite, update) {
+        // Function to detect Adpushup on added website
+        newSite.detectAp = function(addedSite, el) {
             $.get('/proxy/detectap', {
                 'url': addedSite
             }, function(res) {
-                if (res.ar) {
+                if (res.ap) {
                    
 
                             // // Set site status as verified
@@ -192,10 +192,7 @@ $('document').ready(function() {
                     ap.apAlert('AdPushup was not detected on the website!', '#apdetect', 'inverted', 'slideDown');
 
                     $('.detectap-error').fadeIn();
-                    $('#completeSetup').html('Verify').prop('disabled', false);
-                    if (update !== '') {
-                        $('#addUpdatedUrlBtn').html('Add').prop('disabled', false);
-                    }
+                    $(el).html('Verify').prop('disabled', false);
                 }
             });
         };
@@ -289,7 +286,11 @@ $('document').ready(function() {
         // Steps complete trigger
         $('#completeSetup').click(function() {
             $(this).html('Verifying...').prop('disabled', true);
-            newSite.detectAp(newSite.addedSite.domain);
+            newSite.detectAp(newSite.addedSite.domain, $(this));
+        });
+        $(document).on('click', '#wpCheck', function() {
+            $(this).html('Verifying...').prop('disabled', true);
+            newSite.detectAp(newSite.addedSite.domain, $(this));
         });
 
         // Trigger to set cms

@@ -69,6 +69,16 @@
   line-height: 24px;
 }
 
+.text-medium-nm {
+  @extend .text-medium;
+  margin: 20px 120px;
+
+  & > strong {
+    font-size: 1.05em;
+    color: #000;
+  }
+}
+
 .pagegroup-input {
   margin-top: 30px;
 }

@@ -64,7 +64,8 @@ textarea {
   background-color: transparent;
   color: #eb575c;
   border: 1px solid #eb575c; }
-  .apbtn-main-line:hover {
+  .apbtn-main-line:hover, .apbtn-main-line:focus, .apbtn-main-line:active {
+    color: #eb575c;
     box-shadow: inset 0px 0px 2px #eb575c; }
 
 .apbtn-danger {
@@ -1254,11 +1255,17 @@ maxHeightWidth {
     margin-right: 5px;
     color: #cf474b; }
 
-.text-medium {
+.text-medium, .text-medium-nm {
   color: #555555;
   font-size: 1.2em;
   margin: 30px 0 20px;
   line-height: 24px; }
+
+.text-medium-nm {
+  margin: 20px 120px; }
+  .text-medium-nm > strong {
+    font-size: 1.05em;
+    color: #000; }
 
 .pagegroup-input {
   margin-top: 30px; }
@@ -1388,7 +1395,7 @@ maxHeightWidth {
   font-size: 1.45em;
   color: #cf474b; }
 
-.ob-subheading + .text-medium {
+.ob-subheading + .text-medium, .ob-subheading + .text-medium-nm {
   margin: 8px 0 20px; }
 
 .ob-loader {
@@ -1402,7 +1409,7 @@ maxHeightWidth {
   .ob-reset .ob-heading {
     padding: 20px 20px 8px;
     margin: 0 20px; }
-  .ob-reset .text-medium {
+  .ob-reset .text-medium, .ob-reset .text-medium-nm {
     padding: 0 20px; }
 
 .ob-bigbtn {
