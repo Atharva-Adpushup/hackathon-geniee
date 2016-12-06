@@ -25,28 +25,41 @@ div.detectap-alert.text-center#apdetect
                 div#addSiteStr
                     != addSiteTemplateStr
             else
-                div#addSiteStr
-                    h2(class="text-appear")
-                        span
-                            != utils.domanize(validSites[0].domain) 
-                        |  has been Added!
+                div#addSiteAlt
+                    div#addSiteStr
+                        
+                    //- form(id="addSiteAltForm")
+                    //-     div(class="row add-site-alt-form")
+                    //-         div(class="col-sm-8 col-sm-offset-2")
+                    //-             input(name="site", class="input-box", type="url", placeholder="Enter Website URL" required)
+                    //-         div(class="col-sm-4 col-sm-offset-4")
+                    //-             button(type="submit", class="apbtn-main mT-10")
+                    //-                     | Add Site
+
+
+            //- else
+            //-     div#addSiteStr
+            //-         h2(class="text-appear")
+            //-             span
+            //-                 != utils.domanize(validSites[0].domain) 
+            //-             |  has been Added!
             p.text-medium.text-center#cms-text 
             #cms-res
 
-            if !unSavedSite && validSites[0].cmsInfo
-                p.text-medium.text-center
-                    | Website platform selected -
-                .row(style="margin-top: -20px;")
-                    .col-sm-4.col-sm-offset-4
-                        if validSites[0].cmsInfo.cmsName == 'wordpress'
-                            button.apbtn-main.ob-bigbtn.cms-added(disabled)
-                                i.fa.fa-wordpress
-                                | Wordpress
-                                i.fa.fa-check
-                        else
-                            button.apbtn-main.ob-bigbtn.cms-added(disabled)
-                                | Other
-                                i.fa.fa-check        
+            //- if !unSavedSite && validSites[0].cmsInfo
+            //-     p.text-medium.text-center
+            //-         | Website platform selected -
+            //-     .row(style="margin-top: -20px;")
+            //-         .col-sm-4.col-sm-offset-4
+            //-             if validSites[0].cmsInfo.cmsName == 'wordpress'
+            //-                 button.apbtn-main.ob-bigbtn.cms-added(disabled)
+            //-                     i.fa.fa-wordpress
+            //-                     | Wordpress
+            //-                     i.fa.fa-check
+            //-             else
+            //-                 button.apbtn-main.ob-bigbtn.cms-added(disabled)
+            //-                     | Other
+            //-                     i.fa.fa-check        
 
     //- Adpushup detection
     .onboarding-step.ob-apver#step2

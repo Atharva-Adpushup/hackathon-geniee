@@ -59,6 +59,14 @@ $('document').ready(function() {
                 this.detectCms(newSite.addedSite.domain);
             },
 
+            rTrim: function(string, s) {
+                return string ? string.replace(new RegExp(s + '*$'), '') : '';
+            },
+
+            domanize: function(domain) {
+                return domain ? this.rTrim(domain.replace('http://', '').replace('https://', '').replace('www.', ''), '/') : '';
+            },
+
             // Show appropriate onboarding step
             showStep: function(step) {
                 step = parseInt(step);
@@ -66,6 +74,7 @@ $('document').ready(function() {
 
                 // Set appropriate cms detection check
                 if (step >= 2) {
+                    this.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + this.domanize(newSite.addedSite.domain) + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
                     currentUser.sites[0].cmsInfo.cmsName === '' ? $('#platformVerificationContent').html(this.templates.otherPlatformVerification) : $('#platformVerificationContent').html(this.templates.wordpressPlatformVerification);
                     this.generateInitCode(newSite.addedSite.siteId);
                 }
@@ -221,7 +230,17 @@ $('document').ready(function() {
                         alert('Some error occurred!');
                     }
                 });
-            }
+            },
+
+            // Check if new site addition card is to be shown
+            showAddOtherSite: function() {
+                if (!this.addOtherSite) {
+
+                }
+                else {
+
+                }
+            },
 
         };
         ap.onboarding.showStep(newSite.defaultStep);

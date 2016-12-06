@@ -108,6 +108,9 @@ router
             isSuperUser: true
         });
     })
+    .get('/addSite', function(req, res) {
+		res.render('addSite');
+	})
     .post('/addSite', function(req, res) {
         var site = (req.body.site) ? utils.getSafeUrl(req.body.site) : req.body.site;
 
