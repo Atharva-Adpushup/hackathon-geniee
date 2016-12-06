@@ -78,7 +78,7 @@ $('document').ready(function() {
                 var ob = this;
                 if(step != 1) {
                     $(window).on('load', function() {
-                        setTimeout(function() {ob.scrollTo(step, 120, 600);}, 400); 
+                        setTimeout(function() {ob.scrollTo(step, 120, 600);}, 500); 
                     });
                 }
 
