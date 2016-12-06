@@ -5,6 +5,7 @@ var express = require('express'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
+	utils = require('../helpers/utils'),
 	router = express.Router(),
 	apConfigsConst = {
 		modes:{
@@ -15,7 +16,26 @@ var express = require('express'),
              ASYNC: 2,
              SYNC: 1
          }
- 	};
+ 	},
+	 audiences = [{
+ 		'name': 'Default',
+ 		'rootCondition': {
+ 			'condition': [{
+ 				'condition': [{
+ 					'type': 'operand',
+ 					'value' : '*'
+ 				}, {
+ 					'type': 'operation',
+ 					'value' : '='
+ 				}, {
+ 					'type': 'operand',
+ 					'value' : '*'
+ 				}]
+ 			}]
+ 		},
+ 		'defination': '( * = * )',
+ 		'id': utils.getRandomNumber()
+ 	}];
 
 router
 	.get('/getData', function(req, res) {
@@ -60,8 +80,9 @@ router
  	                'adRecover' : {
  	                    'mode': apConfigsConst.modes.DRAFT,
  	                    'pageGroupPattern': []
- 	                }
- 	            }
+ 	                },
+ 	            },
+				'audiences': audiences
 			};
 			
 			return siteData;

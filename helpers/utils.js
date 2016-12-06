@@ -4,6 +4,7 @@
 var url = require('url'),
 	logger = require('./logger'),
 	CryptoJS = require('crypto-js'),
+	randomStore = [],
 	_ = require('lodash'),
 	API = {
 		convertPagegroupLink: function(pageGroupId, pageGroupName, siteId) {
@@ -18,6 +19,16 @@ var url = require('url'),
 		random: function(low, high) {
 			return Math.floor(Math.random() * (high - low) + low);
 		},
+		getRandomNumber: function() {
+ 			var number = Math.floor(Math.random() * (100000 - 100 + 1)) + 100;
+ 			var isThere = randomStore[number];
+ 			if (isThere)
+ 				this.getRandomNumber();
+ 			else {
+ 				randomStore[number] = 1;
+ 				return number;
+ 			}
+ 		},
 		randomString: function(len) {
 			len = (len && this.toNumber(len) && (len > 1)) ? len : 10;
 
