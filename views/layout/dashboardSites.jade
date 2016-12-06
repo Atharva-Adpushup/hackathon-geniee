@@ -64,17 +64,17 @@ for site in validSites
                                     "alert": true,
                                     "reportType": "controlVsAdpushupPageviews"
                                 });
-                    else
-                        h3.title.m-All-0.clearfix
-                            a.pull-left(id="site-report-" + site.siteId).
-                                #{utils.domanize(site.domain)} - #{site.siteId}
-                            .pull-right
-                                a.btn.btn-lightBg.btn-default(id="site-create-pagegroup-" + site.siteId, href='/user/site/#{site.siteId}/createPagegroup') Create PageGroup
-                        section
-                            .site-status
-                                h4
-                                    i.fa.fa-exclamation-circle 
-                                    | Setup Incomplete
-                                .status-text Page Group not found! Please 
-                                    a(href="/user/site/#{site.siteId}/createPagegroup") create
-                                    |  one to access the visual editor.
+            else
+                h3.title.m-All-0.clearfix
+                    a.pull-left(id="site-report-" + site.siteId).
+                        #{utils.domanize(site.domain)} - #{site.siteId}
+                    .pull-right
+                        a.btn.btn-lightBg.btn-default(id="site-create-pagegroup-" + site.siteId, href='/user/site/#{site.siteId}/createPagegroup') Create PageGroup
+                section
+                    .site-status
+                        h4
+                            i.fa.fa-exclamation-circle 
+                            | Setup Incomplete
+                        .status-text Page Group not found! Please 
+                            a(href="/user/site/#{site.siteId}/createPagegroup") create
+                            |  one to access the visual editor.
