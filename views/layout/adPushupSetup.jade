@@ -42,8 +42,15 @@ div.detectap-alert.text-center#apdetect
         div(class="ob-content")
             p.text-medium.text-center
                 |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos? 
-            div#addSiteStr
-                != addSiteTemplateStr
+            if unSavedSite
+                div#addSiteStr
+                    != addSiteTemplateStr
+            else
+                div#addSiteStr
+                    h2(class="text-appear")
+                        span
+                            != utils.domanize(validSites[0].domain) 
+                        |  has been Added!
             //-     a.site-add-alt Or start with another website
             //- div#addSiteAlt
             //-     form(id="addSiteAltForm")
@@ -65,9 +72,24 @@ div.detectap-alert.text-center#apdetect
             | Detect Website Platform 
             i#step2-check.fa
         div(class="ob-content")
+            p.text-medium.text-center
+                |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos?
             p.text-medium.text-center#cms-text
             #ob-loader
             #cms-res
+
+            if !unSavedSite && validSites[0].cmsInfo
+                .row
+                    .col-sm-4.col-sm-offset-4
+                        if validSites[0].cmsInfo.cmsName == 'wordpress'
+                            button.apbtn-main.ob-bigbtn.cms-added(disabled)
+                                i.fa.fa-wordpress
+                                | Wordpress
+                                i.fa.fa-check
+                        else
+                            button.apbtn-main.ob-bigbtn.cms-added(disabled)
+                                | Other
+                                i.fa.fa-check
 
     //- Adpushup detection
     .onboarding-step.ob-apver#step3
@@ -77,12 +99,14 @@ div.detectap-alert.text-center#apdetect
             | Verify Adpushup on your website 
             i#step3-check.fa
         div(class="ob-content")
-            p.text-medium
+            p.text-medium.text-center
+                |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis.
+                br
                 | Copy and paste this snippet in the &lt;HEAD&gt; section of your website
             div.snippet-wrapper
                 span.clipboard-copy
                     | Copied !
-                textarea(class="snippet", id="header-code", readonly)
+                textarea(class="snippet", id="header-code", readonly, placeholder="AdPushup init code comes here..")
                 div.snippet-btn-wrapper
                     div
                         //- button(data-toggle="modal" data-target="#sendToDevModal" id="sendToDev", class="snippet-btn snippet-dev apbtn-main-line apbtn-small")
@@ -106,8 +130,15 @@ div.detectap-alert.text-center#apdetect
                 div#detectapError
             .row
                 .col-sm-4.col-sm-offset-4
-                     button(id="apCheck", class="apbtn-main btn-vr")
-                        | Verify
+                     button(id="apCheck", class="apbtn-main btn-vr btn-wpdt")
+                        if unSavedSite
+                            | Verify
+                        else
+                            if validSites[0].step <= 3
+                                | Verify
+                            else
+                                | Verified 
+                                i.fa.fa-check
 
     //- Grant adsense oauth access
     .onboarding-step#step4
@@ -118,7 +149,8 @@ div.detectap-alert.text-center#apdetect
             i#step4-check.fa
         div(class="ob-content")
             p.text-medium.text-center
-                | Connect your Google AdSense account with AdPushup for bla bla bla bla bla bla
+               |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos?
+            br
             .row
                 .col-sm-4.col-sm-offset-4
                     button(id="adsenseoauth", class="apbtn-main apbtn-icon")

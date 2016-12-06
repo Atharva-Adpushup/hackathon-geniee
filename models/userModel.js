@@ -404,7 +404,15 @@ function apiModule() {
 							return siteModel.getSetupStep(site.siteId)
 								.then(function(step) {
 									site.step = step;
-									return site;
+									return siteModel.getCmsData(site.siteId)
+										.then(function(cms) {
+											site.cmsInfo = cms;
+											return site;
+										})
+										.catch(function() {
+											site.step = 1;
+											return site;
+										});
 								})
 								.catch(function() {
 									site.step = 1;

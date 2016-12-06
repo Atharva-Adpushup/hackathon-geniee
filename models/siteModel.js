@@ -250,6 +250,16 @@ function apiModule() {
 					throw new AdPushupError('Cannot get setup step');
 				});
 		},
+		getCmsData: function(siteId) {
+			return API.getSiteById(siteId)
+				.then(function(site) {
+					var cms = site.get('cmsInfo');
+					return cms;
+				})
+				.catch(function(err) {
+					throw new AdPushupError('Cannot get cms data');
+				});
+		},
 		setSiteStep: function(siteId, step) {
 			return API.getSiteById(siteId)
 				.then(function(site) {

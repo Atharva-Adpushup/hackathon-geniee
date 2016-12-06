@@ -23,8 +23,11 @@ $onboardingBg: url('../images/adpushupbg.png');
   min-height: 320px;
   position: relative;
   background-color: $whiteColor;
+  transition: all .25s ease-in-out;
   @extend %card, %shadow;
   margin-bottom: 80px;
+  opacity: .55;
+  pointer-events: none;
 
   .fa-check-circle {
     color: $successGreen;
@@ -116,7 +119,8 @@ $onboardingBg: url('../images/adpushupbg.png');
 .snippet {
   font-family: $codeFont;
   background: $codeBg;
-  height: 150px;
+  height: 90px;
+  margin-top: 20px;
   font-size: 1.2em;
   color: $fontColor;
   line-height: 22px;
@@ -148,8 +152,15 @@ $onboardingBg: url('../images/adpushupbg.png');
   margin: 40px 0 0;
 }
 
-.ob-content {
-    display: none;
+.active-step {
+  box-shadow: 0 10px 18px rgba(0,0,0,.12);
+  opacity: 1;
+  pointer-events: auto;
+
+  &:hover {
+    box-shadow: 0 5px 9px rgba(0,0,0,.22);
+    @include css3-prefix(transform, translateY(-3px));
+  }
 }
 
 .pagegroup-err {
@@ -250,8 +261,11 @@ $onboardingBg: url('../images/adpushupbg.png');
   background-color: rgba(0,0,0,.15);
 }
 
-.ob-reset {
+.no-bgimg {
   background-image: none;
+}
+
+.ob-reset {
   padding-bottom: 20px;
 
   .ob-heading {
@@ -281,7 +295,7 @@ $onboardingBg: url('../images/adpushupbg.png');
 }
 
 .ob-bigbtn {
-  font-size: 1.6em;
+  font-size: 1.4em;
   margin: 15px 0;
 
   i {
@@ -331,6 +345,13 @@ $onboardingBg: url('../images/adpushupbg.png');
 
 .btn-vr {
   margin-top: 20px;
+}
+
+.cms-added {
+  .fa {
+    color: $whiteColor;
+    margin-left: 10px;
+  }
 }
 
 

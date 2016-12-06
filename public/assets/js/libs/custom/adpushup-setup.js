@@ -12,7 +12,7 @@ $('document').ready(function() {
             
             // UI templates for onboarding
             templates: {
-                cmsSelection: '<div class="row"><div class="col-sm-4 col-sm-offset-2"><button class="apbtn-main-line ob-bigbtn" id="setCms" data-cms-name="wordpress"><i class="fa fa-wordpress"></i> Wordpress</button></div><div class="col-sm-4"><button class="apbtn-main ob-bigbtn" id="setCms" data-cms-name="">Other</button></div></div>',
+                cmsSelection: '<div class="row"><div class="col-sm-3 col-sm-offset-3"><button class="apbtn-main-line ob-bigbtn" id="setCms" data-cms-name="wordpress"><i class="fa fa-wordpress"></i> Wordpress</button></div><div class="col-sm-3"><button class="apbtn-main ob-bigbtn" id="setCms" data-cms-name="">Other</button></div></div>',
 
                 wordpressPlugin: '<div class="row"><div class="col-sm-4 col-sm-offset-4"><a href="https://wordpress.org/plugins/adpushup/" target="_blank" class="apbtn-main-line ob-bigbtn"><i class="fa fa-wordpress"></i> Install Plugin</a></div></div><p class="text-medium-nm text-center">After you install plugin, please configure Site ID - <strong>'+newSite.viewObjects.unSavedSiteId+'</strong> by going to <strong>Wordpress</strong> > <strong>Settings</strong> > <strong>Adpushup Settings</strong></p><div class="row"><div class="col-sm-4 col-sm-offset-4"><button id="apCheck" class="apbtn-main apbtn-cmsver">I\'ve done this</button></div></div>'
             },
@@ -38,6 +38,12 @@ $('document').ready(function() {
                 }
             },
 
+            scrollTo: function(step, offset, duration) {
+                $('html, body').animate({
+                    scrollTop: $("#step"+step).offset().top - offset
+                }, duration);
+            },
+
             // CMS detection on site
             detectCms: function(site) {
                 var ob = this;
@@ -58,30 +64,37 @@ $('document').ready(function() {
             },
 
             // Check for CMS detection step in onboarding flow
-            checkCmsStep: function() {
+            checkCmsStep: function(step) {
                 ap.showLoader('#ob-loader', 'ob-loader');
+                $('#step'+step).addClass('no-bgimg');
                 this.manipulateElem('#cms-text', 'Please wait while we inspect your website...', 'html');
                 this.detectCms(newSite.addedSite.domain);
             },
             
             // Show appropriate onboarding step
             showStep: function(step) {
-                $('#step' + step + ' .ob-content').show();
+                this.manipulateElem('#step' + step, 'active-step', 'class');
+
+                var ob = this;
+                if(step != 1) {
+                    $(window).on('load', function() {
+                        setTimeout(function() {ob.scrollTo(step, 120, 600);}, 400); 
+                    });
+                }
 
                 switch(parseInt(step)) {
                     case 2:
-                        this.checkCmsStep();
+                        this.checkCmsStep(step);
                         break;
                 }
 
                 // Set ticks for all other steps in UI
                 for(var i = 1; i < step; i++) {
-                    this.manipulateElem('#step' + parseInt(i) + ' > .ob-heading', {'border-bottom': 'none', 'padding-bottom': 0}, 'css');
                     this.manipulateElem('#step' + parseInt(i) + '-check', 'fa-check-circle zoomIn', 'class');
                 }
 
                 // Generate header code step if all other steps are complete
-                if(parseInt(step) === this.totalSteps || parseInt(step) === 3) {
+                if(parseInt(step) === newSite.totalSteps || parseInt(step) === 3) {
                     this.generateInitCode(newSite.addedSite.siteId);
                 }
             },
@@ -92,9 +105,10 @@ $('document').ready(function() {
 
                 ob.manipulateElem('#step'+from + '-check', 'fa-check-circle zoomIn', 'class');
                 setTimeout(function() {
-                    ob.manipulateElem('#step' + from + ' > .ob-heading', {'border-bottom': 'none', 'padding-bottom': 0}, 'css');
-                    $('#step'+to + ' .ob-content').slideDown();
-                    $('#step'+from + ' .ob-content').slideUp();
+                    $('#step'+to).addClass('active-step');
+                    $('#step'+from).removeClass('active-step');
+
+                    ob.scrollTo(to, 120, 600);
                 }, duration);
 
                 switch(to) {
@@ -141,6 +155,7 @@ $('document').ready(function() {
                     siteId: siteId
                 }, function(res) {
                     if(res.success) {
+                        btn.html('Saved').prop('disabled', true);
                         if(cmsName !== 'wordpress') {
 
                             $.post('/user/setSiteStep', {
@@ -183,10 +198,17 @@ $('document').ready(function() {
                             siteId: newSite.addedSite.siteId,
                             step: 4
                         }, function(response) {
+                            ob.manipulateElem(el, 'Verified <i class="fa fa-check"></i>', 'html');
                             if(response.success) {
 
                                 if(window.selectedCms === 'wordpress') {
-                                    ob.nextStep(4, 2, 1000);
+                                    ob.nextStep(3, 2, 1000);
+                                    ob.generateInitCode(newSite.addedSite.siteId);
+                                    setTimeout(function() {
+                                        ob.manipulateElem('#step3', {opacity: .55}, 'css');
+                                        ob.manipulateElem('.btn-wpdt', 'Verified <i class="fa fa-check"></i>', 'html');
+                                    }, 1500);
+                                    setTimeout(function() {ob.nextStep(4, 3, 1000);}, 3000);
                                 }
                                 else{
                                     ob.nextStep(4, 3, 1000);
