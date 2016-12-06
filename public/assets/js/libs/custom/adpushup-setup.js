@@ -23,11 +23,20 @@ $('document').ready(function() {
             // UI templates for onboarding
             templates: {
                 checkIcon: '<i class="fa fa-check"></i>',
-                cmsSelection: '<div class="row"><div class="col-sm-3 col-sm-offset-3"><button class="apbtn-main-line ob-bigbtn" id="setCms" data-cms-name="wordpress"><i class="fa fa-wordpress"></i> Wordpress</button></div><div class="col-sm-3"><button class="apbtn-main ob-bigbtn" id="setCms" data-cms-name="">Other</button></div></div>',
                 otherPlatformVerification: ' <p class="text-medium text-center" style="margin-top: -10px;">Copy and paste this snippet in the &lt;HEAD&gt; section of your website </p><div class="snippet-wrapper"> <span class="clipboard-copy"> Copied ! </span> <textarea class="snippet" id="header-code" readonly placeholder="AdPushup init code comes here.."></textarea> <div class="snippet-btn-wrapper"> <div> <button id="clipboardCopy" class="snippet-btn apbtn-main-line apbtn-small"> Copy to clipboard <i class="fa fa-clipboard"></i> </button> </div></div></div><div class="error-message detectap-error"> <p> Please make sure that the header code is present on the the specified URL </p><div id="detectapError"></div></div><div class="row"> <div class="col-sm-4 col-sm-offset-4"> <button id="apCheck" class="apbtn-main btn-vr btn-wpdt"> Verify </button> </div></div>',
                 wordpressPlatformVerification: '<p class="text-medium text-center">Please install the AdPushup JavaScript snippet via our Wordpress Plugin.</p><div class="row"><div class="col-sm-4 col-sm-offset-4"><a id="wp-plugin-link" href="https://wordpress.org/plugins/adpushup/" target="_blank" class="apbtn-main-line ob-bigbtn"><i class="fa fa-wordpress"></i> Install Plugin</a></div></div><p class="text-medium-nm text-center">After you install plugin, please configure Site ID - <strong>1</strong> by going to <strong>Wordpress</strong> &gt; <strong>Settings</strong> &gt; <strong>Adpushup Settings</strong></p><div class="row"><div class="col-sm-4 col-sm-offset-4"><button id="apCheck" class="apbtn-main apbtn-cmsver">I\'ve done this</button></div></div>',
                 addOtherSite: '<form id="addSiteAltForm"> <div class="row add-site-alt-form"> <div class="col-sm-8 col-sm-offset-2"> <input name="site" class="input-box" type="url" placeholder="Enter Website URL" required> </div><div class="col-sm-6 col-sm-offset-3"> <button type="submit" class="apbtn-main mT-10"> Add Site </button> </div></div></form>',
                 dashboardLink: '<div class="text-center mT-10"><a class="link-primary" href="/user/dashboard">Go to dashboard</a></div>'
+            },
+
+            // Set active cms button
+            setActiveCms: function(cms) {
+                if(cms === 'wordpress') {
+                     return '<div class="row"><div class="col-sm-3 col-sm-offset-3"><button class="apbtn-main ob-bigbtn" id="setCms" data-cms-name="wordpress"><i class="fa fa-wordpress"></i> Wordpress</button></div><div class="col-sm-3"><button class="apbtn-main-line ob-bigbtn" id="setCms" data-cms-name="">Other</button></div></div>';
+                }
+                else {
+                    return '<div class="row"><div class="col-sm-3 col-sm-offset-3"><button class="apbtn-main-line ob-bigbtn" id="setCms" data-cms-name="wordpress"><i class="fa fa-wordpress"></i> Wordpress</button></div><div class="col-sm-3"><button class="apbtn-main ob-bigbtn" id="setCms" data-cms-name="">Other</button></div></div>';
+                }
             },
 
             // Method to enable element-level DOM manipulation
@@ -63,11 +72,14 @@ $('document').ready(function() {
                     r = ob.cmsRequest(site);
 
                 r.done(function(res) {
+                    $('#cms-text').html('Please confirm your website’s platform -');
                     if(res.wordpress) {
                         //ob.detectedPagegroups = res.ap ? res.ap.pageGroups: [];
+                        ob.manipulateElem('#cms-res', ob.setActiveCms('wordpress'), 'htmlFadeIn', 600);
                     }
-                    $('#cms-text').html('Please confirm your website’s platform -')
-                    ob.manipulateElem('#cms-res', ob.templates.cmsSelection, 'htmlFadeIn', 600);
+                    else {
+                        ob.manipulateElem('#cms-res', ob.setActiveCms('other'), 'htmlFadeIn', 600);
+                    }
                 });
             },
 
