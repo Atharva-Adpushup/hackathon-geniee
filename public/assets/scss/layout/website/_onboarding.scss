@@ -20,7 +20,7 @@ $onboardingBg: url('../images/adpushupbg.png');
   background-image: $onboardingBg;
   background-repeat: no-repeat;
   background-position: -20px 128%;
-  min-height: 320px;
+  min-height: 360px;
   position: relative;
   background-color: $whiteColor;
   transition: all .25s ease-in-out;
@@ -287,7 +287,7 @@ $onboardingBg: url('../images/adpushupbg.png');
 }
 
 .ob-apver {
-  background-position: -20px 114%;
+  background-position: -20px 118.5%;
 }
 
 .ob-bg {
