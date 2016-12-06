@@ -60,7 +60,7 @@ block append headScripts
                 '/assets/js/build/adpushup-setup.min.js'
             ]) 
 
-        if validSites[0] && validSites[0].step == 5 && isSuperUser
+        if validSites[0].step == 5 && isSuperUser
             +loadAsset("js", [
                 '/assets/js/libs/third-party/d3.js',
                 '/assets/js/libs/third-party/c3.js',
