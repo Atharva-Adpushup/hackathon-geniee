@@ -86,6 +86,17 @@ textarea {
   font-size: .95em;
   padding: 7px; }
 
+.apbtn-icon > i {
+  margin-right: 10px;
+  font-size: 1.25em;
+  background-color: #fff;
+  height: 22px;
+  width: 22px;
+  vertical-align: middle;
+  color: #eb575c;
+  padding-top: 4.2px;
+  border-radius: 20px; }
+
 /* Alerts */
 .apalert-error, .apalert-success, .apalert-inverted {
   padding: 10px;
@@ -1297,11 +1308,6 @@ maxHeightWidth {
   line-height: 22px;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0; }
-
-.btn-complete-setup {
-  margin: 30px auto 10px;
-  display: block;
-  width: 200px; }
 
 .no-pad {
   padding: 0; }
