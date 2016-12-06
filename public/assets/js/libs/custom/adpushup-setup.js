@@ -1,7 +1,7 @@
 // Adpushup setup script - User onboarding + New site addition
 
 $('document').ready(function() {
-    (function(ap) {
+    (function(ap, w) {
 
         // Save new site object that is attached to adpushup global object 
         var newSite = ap.newSite;
@@ -10,6 +10,15 @@ $('document').ready(function() {
         ap.onboarding = {
             detectedPagegroups: [],
             cmsAdded: '',
+
+            // Intro modal check
+            showIntro: function() {
+                var showIntro = w.localStorage.getItem('showIntro');
+                if(!showIntro && newSite.showIntro) {
+                    $('#intromodal').modal('show');
+                    w.localStorage.setItem('showIntro', true);
+                }
+            },
 
             // UI templates for onboarding
             templates: {
@@ -317,6 +326,7 @@ $('document').ready(function() {
                 }
             },
         };
+        ap.onboarding.showIntro();
         ap.onboarding.showStep(newSite.defaultStep);
         ap.onboarding.showAddOtherSite();
 
@@ -368,5 +378,5 @@ $('document').ready(function() {
                 btn = $('#addSiteAltForm button');
             ap.onboarding.addSite(site, url, btn);
         });
-    })(adpushup);
+    })(adpushup, window);
 });

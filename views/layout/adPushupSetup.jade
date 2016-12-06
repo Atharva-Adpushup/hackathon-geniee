@@ -4,6 +4,24 @@
 - noSitePresentAlertStr = (domanizedUrl && domanizedUrl.length > 0) ? domanizedUrl : "one";
 - addSiteTemplateStr = "<div id='alert--noSitePresent' data-site='" + origUnSavedDomain + "' data-toggle='modal' data-target=''><button id='addUserSite' class='btn-st apbtn-main'>Lets add <span style='cursor: pointer;'>" + noSitePresentAlertStr +" ?</span></button></div> ";
 
+#intromodal.modal._ap_modal.fade.intro-modal(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+    .modal-dialog
+        .modal-content
+            .pull-right
+                button.close(type='button', data-dismiss='modal', aria-label='Close')
+                    span(aria-hidden='true') ×
+            .text-center
+                h2 Welcome to AdPushup!
+                p
+                    | AdPushup lets you Maximize Your Ad Revenue With The Power Of Ad Layout Optimization.
+                img.img-responsive(src="/assets/images/intro_graphic.png")
+                p
+                    | AdPushup’s ad layout optimization technology will help you increase the viewability of your existing website ads. Without affecting visitor experience.
+                .row
+                    .col-sm-4.col-sm-offset-4
+                        button.apbtn-main(type='button', data-dismiss='modal', aria-label='Close') Get Started
+
+
 //- Alert wrapper
 div.detectap-alert.text-center#apdetect
 

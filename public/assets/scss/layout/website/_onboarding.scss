@@ -379,6 +379,44 @@ $onboardingBg: url('../images/adpushupbg.png');
   }
 }
 
+.intro-modal {
+  .modal-backdrop.in {
+    opacity: .68;
+  }
+  .modal-dialog {
+    margin-top: 50px;
+    @media screen and (min-width: 768px) {
+      width: 690px;
+    }
+  }
+  .close {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 2em;
+  }
+  .modal-content {
+    padding: 20px 60px;
+    h2 {
+      width: 320px;
+      margin: 20px auto 30px;
+      color: $primaryColor;
+      padding-bottom: 10px;
+      border-bottom: 2px solid $primaryColor;
+      font-weight: 700;
+    }
+    p {
+      font-size: 1.25em;
+      line-height: 25px;
+      margin: 0 0 15px;
+    }
+    img {
+      width: 65%;
+      margin: 0 auto 20px;
+    }
+  }
+}
+
 
 
 
