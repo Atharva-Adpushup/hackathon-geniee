@@ -125,13 +125,12 @@ $('document').ready(function() {
                 }, duration);
             },
 
-            // Add a new site (default)
-            addSite: function(site, url, btn) {
+            // Save site data
+            saveSiteModel: function(site, url, siteId, btn) {
                 var ob = this;
-                $(btn).html('Adding ' + site + ' ...').prop('disabled', true);
                 $.post('/data/saveSite', {
                     site: url,
-                    siteId: newSite.viewObjects.unSavedSiteId,
+                    siteId: siteId,
                     step: 1
                 }, function(res) {
                     if (res.success) {
@@ -144,18 +143,32 @@ $('document').ready(function() {
                         ob.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + site + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
                         ob.checkCmsStep();
                     } else {
-                        ap.apAlert('Some error occurred!', '#apdetect', 'error', 'slideDown');
+                        ap.apAlert('Some error occurred! Please try again later.', '#apdetect', 'error', 'slideDown');
+                        $(btn).html('Add ' + site + ' ?').prop('disabled', false);
                     }
                 });
             },
 
-            // Add another site
-            addOtherSite: function(site, url) {
-                $.post('/user/addSite', {
-                    site: site
-                }, function(res) {
-                    console.log(res);
-                });
+            // Add a new site (default)
+            addSite: function(site, url, btn) {
+                $(btn).html('Adding ' + site + ' ...').prop('disabled', true);
+                if(newSite.addOtherSite) {
+                    var ob = this;
+                    $.post('/user/addSite', {
+                        site: url
+                    }, function(res) {
+                        if(res.success) {
+                            ob.saveSiteModel(site, url, res.siteId, btn);
+                        }
+                        else {
+                            ap.apAlert('Some error occurred! Please try again later.', '#apdetect', 'error', 'slideDown');
+                            $(btn).html('Lets Add ' + site + ' ?').prop('disabled', false);
+                        }
+                    });
+                }
+                else {
+                    this.saveSiteModel(site, url, newSite.viewObjects.unSavedSiteId, btn);
+                }
             },
 
             // Save site platform 
@@ -309,8 +322,9 @@ $('document').ready(function() {
             e.preventDefault();
             var newsite = $(this).serializeArray(),
                 url = newsite[0].value.replace(/\/$/, "");
-                site = url.replace(/.*?:\/\//g, "");
-            ap.onboarding.addOtherSite(site, url);
+                site = url.replace(/.*?:\/\//g, ""),
+                btn = $('#addSiteAltForm button');
+            ap.onboarding.addSite(site, url, btn);
         });
 
     })(adpushup);
