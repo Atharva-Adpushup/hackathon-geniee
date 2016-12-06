@@ -1,10 +1,10 @@
 // AdPushup REST API controller
 
 var express = require('express'),
+	router = express.Router(),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
-	router = express.Router(),
 	schema = require('../helpers/schema'),
 	FormValidator = require('../helpers/FormValidator'),
 	_ = require('lodash');
@@ -164,10 +164,8 @@ router
 					return res.redirect('/user/dashboard');
 				})
 				.catch(function(err) {
-					console.log(err);
-					// return res.render('createPageGroup', {
-					// 	error: err.message[0].message
-					// });
+					req.session.pageGroupError = err.message[0].message ?  err.message[0].message : 'Some error occurred!';
+					return res.redirect('/user/site/'+json.siteId+'/createPagegroup');
 				});
 		}
 	})

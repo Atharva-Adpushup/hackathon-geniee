@@ -82,7 +82,8 @@ router
             siteModel.getSitePageGroups(req.params.siteId)
                 .then(function(pageGroups) {
                     return res.render('createPageGroup', {
-                        siteId: req.params.siteId
+                        siteId: req.params.siteId,
+                        error: req.session.pageGroupError ? req.session.pageGroupError : '' 
                     });
                 })
                 .catch(function(err) {
