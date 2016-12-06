@@ -67,20 +67,7 @@ div.detectap-alert.text-center#apdetect
                         else
                             button.apbtn-main.ob-bigbtn.cms-added(disabled)
                                 | Other
-                                i.fa.fa-check
-
-            //-     a.site-add-alt Or start with another website
-            //- div#addSiteAlt
-            //-     form(id="addSiteAltForm")
-            //-         div(class="row add-site-alt-form")
-            //-             div(class="col-sm-8 no-pad")
-            //-                 input(name="site", class="input-box", type="url", placeholder="Enter Website URL" required)
-            //-             div(class="col-sm-2")
-            //-                 button(type="submit", class="apbtn-main")
-            //-                         | Add Site
-            //-             div(class="col-sm-2 no-pad")
-            //-                 button(id="siteAltCancel", type="reset", class="apbtn-danger-line")
-            //-                     | Cancel                 
+                                i.fa.fa-check        
 
     //- Adpushup detection
     .onboarding-step.ob-apver#step2
@@ -108,8 +95,12 @@ div.detectap-alert.text-center#apdetect
             .row
                 .col-sm-4.col-sm-offset-4
                     button(id="adsenseoauth", class="apbtn-main apbtn-icon")
-                        i.fa.fa-google
-                        | Connect Google AdSense            
+                        if validSites[0].step <= 3
+                            i.fa.fa-google
+                            | Connect Google AdSense            
+                        else
+                            | Google AdSense Connected 
+                            i.fa.fa-check
 
     //- Grant adsense non-admin access
     .onboarding-step#step4
@@ -117,7 +108,7 @@ div.detectap-alert.text-center#apdetect
             | 4
         h3(class="ob-heading")
             | Grant non-admin access
-            i#step3-check.fa
+            i#step4-check.fa
         div(class="ob-content")
             p.text-medium.text-center
                |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos?
