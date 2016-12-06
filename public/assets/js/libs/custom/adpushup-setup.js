@@ -8,6 +8,7 @@ $('document').ready(function() {
 
         // Define onboarding sequence object
         ap.onboarding = {
+            detectedPagegroups: [],
 
             // UI templates for onboarding
             templates: {
@@ -43,6 +44,9 @@ $('document').ready(function() {
             detectCms: function(site) {
                 var ob = this;
                 $.get('/proxy/detectCms?site=' + site, {}, function(res) {
+                    if(res.wordpress) {
+                        ob.detectedPagegroups = res.ap ? res.ap.pageGroups: [];
+                    }
                     $('#cms-text').html('Please confirm your website’s platform -')
                     ob.manipulateElem('#cms-res', ob.templates.cmsSelection, 'htmlFadeIn', 600);
                 });
@@ -76,7 +80,6 @@ $('document').ready(function() {
                 // Set appropriate cms detection check
                 if (step >= 2) {
                     var defaultSiteCms = currentUser.sites[0].cmsInfo.cmsName;
-                    this.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + this.domanize(newSite.addedSite.domain) + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
                     defaultSiteCms === '' ? $('#platformVerificationContent').html(this.templates.otherPlatformVerification) : $('#platformVerificationContent').html(this.templates.wordpressPlatformVerification);
                     this.generateInitCode(newSite.addedSite.siteId);
 
@@ -87,6 +90,9 @@ $('document').ready(function() {
                 // Set ticks for all other steps in UI
                 for (var i = 1; i < step; i++) {
                     $('#step' + parseInt(i) + '-check').addClass('fa-check-circle zoomIn');
+                }
+                if (newSite.addedSite && step >= 1) {
+                    this.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + this.domanize(newSite.addedSite.domain) + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
                 }
                 if (step > 2) {
                     $('#apCheck').html('Verified '+this.templates.checkIcon);
@@ -119,7 +125,7 @@ $('document').ready(function() {
                 }, duration);
             },
 
-            // Add a new site 
+            // Add a new site (default)
             addSite: function(site, url, btn) {
                 var ob = this;
                 $(btn).html('Adding ' + site + ' ...').prop('disabled', true);
@@ -143,13 +149,23 @@ $('document').ready(function() {
                 });
             },
 
+            // Add another site
+            addOtherSite: function(site, url) {
+                $.post('/user/addSite', {
+                    site: site
+                }, function(res) {
+                    console.log(res);
+                });
+            },
+
             // Save site platform 
             saveCms: function(cmsName, siteId, btn) {
                 var ob = this;
                 btn.html('Saving...').prop('disabled', true);
                 $.post('/data/saveCms', {
                     cmsName: cmsName,
-                    siteId: siteId
+                    siteId: siteId,
+                    pageGroups: JSON.stringify(ob.detectedPagegroups)
                 }, function(res) {
                     if (res.success) {
                         $.post('/user/setSiteStep', {
@@ -286,6 +302,15 @@ $('document').ready(function() {
         // Tigger to copy init code to clipboard
         $('#clipboardCopy, #header-code').on('click', function() {
             ap.onboarding.copyInitCode();
+        });
+
+        // Trigger to add another site
+        $('#addSiteAltForm').submit(function(e) {
+            e.preventDefault();
+            var newsite = $(this).serializeArray(),
+                url = newsite[0].value.replace(/\/$/, "");
+                site = url.replace(/.*?:\/\//g, "");
+            ap.onboarding.addOtherSite(site, url);
         });
 
     })(adpushup);

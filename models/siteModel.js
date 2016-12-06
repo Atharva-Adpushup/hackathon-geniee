@@ -313,12 +313,12 @@ function apiModule() {
 				return Promise.resolve(pageGroups);
 			});
 		},
-		setCms: function(siteId, cmsName) {
+		setCms: function(siteId, cmsName, pageGroups) {
 			return API.getSiteById(siteId)
 				.then(function(site) {
 					var cmsInfo = {
 						cmsName: cmsName,
-						pageGroups: []
+						pageGroups: pageGroups
 					};
 					site.set('cmsInfo', cmsInfo);
 					return site.save();

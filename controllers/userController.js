@@ -116,9 +116,10 @@ router
 
         userModel.addSite(req.session.user.email, site).spread(function(user, siteId) {
             req.session.user = user;
-            return res.redirect('site/' + siteId + '/editor');
+            
+            res.send({success: 1, siteId: siteId});
         }).catch(function(err) {
-            res.send(err);
+            res.send({success: 0});
         });
     })
     .get('/logout', function(req, res) {
