@@ -358,12 +358,20 @@ $('document').ready(function() {
                     $('#step2').nextAll("div[id^='step']").hide();
                 }
             },
+
+            // Attach oauth post message hook
+            oauthHook: function(event) {
+                console.log(event);
+            }
         };
         ap.onboarding.showIntro();
         ap.onboarding.showStep(newSite.defaultStep);
         ap.onboarding.showAddOtherSite();
 
 
+
+        // OAuth post message hook trigger
+        window.addEventListener('message', ap.onboarding.oauthHook(), false);
 
         // Trigger to add user's unsaved site
         $('#addUserSite').click(function(e) {
