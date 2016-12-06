@@ -27,6 +27,26 @@ router
 			res.json(computedJSON);
 		});
 	})
+	.post('/saveSite', function(req, res) {
+		var data = req.body,
+			siteId = parseInt(req.body.siteId);
+		userModel.verifySiteOwner(req.session.user.email, siteId).then(function() {
+			var siteData = {
+				'siteDomain': data.site,
+				'siteId': siteId,
+				'ownerEmail': req.session.user.email,
+				'step': data.step
+			};
+			return siteData;
+		})
+		.then(siteModel.saveSiteData.bind(null, siteId, 'POST'))
+		.then(function() {
+			res.send({success: 1, url: data.site, siteId: siteId});
+		})
+		.catch(function(err) {
+			res.send({success: 0});
+		});
+	})
 	.get('/getPageGroupVariationRPM', function(req, res) {
 		var channelName = req.query.channelName,
 			siteId = req.query.siteId,

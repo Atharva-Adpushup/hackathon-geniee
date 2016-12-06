@@ -5,7 +5,7 @@
 - addSiteTemplateStr = "<div id='alert--noSitePresent' data-site='" + origUnSavedDomain + "' data-toggle='modal' data-target=''><button id='addUserSite' class='btn-st apbtn-main'>Want to add <span style='cursor: pointer;'>" + noSitePresentAlertStr +" ?</span></button></div> ";
 
 //- Alert wrapper
-div.detectar-alert.text-center#ardetect
+div.detectap-alert.text-center#apdetect
 
 //- Send Code to Developer Modal
 #sendToDevModal.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
@@ -53,44 +53,50 @@ div.detectar-alert.text-center#ardetect
                                     | Add Site
                         div(class="col-sm-2 no-pad")
                             button(id="siteAltCancel", type="reset", class="apbtn-danger-line")
-                                | Cancel
-
-    //- Setup measure/monetize
+                                | Cancel                 
+    
+    //- Adpushup detection
     .onboarding-step#step2
         span(class="counter-icon")
             | 2
         h3(class="ob-heading")
-            | Select preference 
+            | Verify Adpushup on your website 
             i#step2-check.fa
         div(class="ob-content")
-            form.sm-form-wrapper#preference-form
+            p.text-medium
+                | Copy and paste this snippet in the &lt;HEAD&gt; section of your website
+            div.snippet-wrapper
+                span.clipboard-copy
+                    | Copied !
+                button(data-toggle="modal" data-target="#sendToDevModal" id="sendToDev", class="snippet-btn snippet-dev apbtn-main-line apbtn-small")
+                    | Send code to developer
+                    i.fa.fa-code
+                button(id="clipboardCopy", class="snippet-btn apbtn-main-line apbtn-small")
+                    | Copy to clipboard 
+                    i.fa.fa-clipboard
+                textarea(class="snippet", id="header-code", readonly)
+
+            div.error-message.detectap-error
+                p
+                    | Please make sure that the header code is present on the the specified URL
+                p 
+                    | If you have added the header code to a different URL please add it below - 
                 .row
-                    .col-sm-1
-                        label(class="radio-label")
-                            input(type="radio" name="preference" value="2" checked="true")
-                            div(class="radio-indicator")
-                    .col-sm-11
-                        h2.ob-subheading Monetize & Measure
-                        p.text-medium 
-                            | Monetize & Measure your AdBlocked traffic using compliant ad layouts.
-                .row
-                    .col-sm-1
-                        label(class="radio-label")
-                            input(type="radio" name="preference" value="1")
-                            div(class="radio-indicator")
-                    .col-sm-11
-                        h2.ob-subheading Measure only
-                        p.text-medium
-                            | Measure your exact AdBlocked inventory.
-                button(class="apbtn-main btn-complete-setup")
-                    | Proceed to next step                      
-    
-    //- Add Adrecover and trigger detection
+                    form#addUpdatedUrl
+                        .col-sm-6.col-sm-offset-2
+                            input(required, id="updatedUrl" type="url", class="input-box", placeholder="Enter Website URL here", name="updatedUrl")
+                        .col-sm-2.no-pad
+                            button(type="submit", class="apbtn-main-line", id="addUpdatedUrlBtn") Add
+                div#detectapError
+            button(id="completeSetup", class="apbtn-main btn-complete-setup")
+                | Verify        
+
+    //- Grant adsense oauth access
     .onboarding-step#step3
         span(class="counter-icon")
             | 3
         h3(class="ob-heading")
-            | Add AdRecover to your Website 
+            | Connect Adsense Account
             i#step3-check.fa
         div(class="ob-content")
             p.text-medium
@@ -106,7 +112,7 @@ div.detectar-alert.text-center#ardetect
                     i.fa.fa-clipboard
                 textarea(class="snippet", id="header-code", readonly)
 
-            div.error-message.detectar-error
+            div.error-message.detectap-error
                 p
                     | Please make sure that the header code is present on the the specified URL
                 p 
@@ -117,6 +123,6 @@ div.detectar-alert.text-center#ardetect
                             input(required, id="updatedUrl" type="url", class="input-box", placeholder="Enter Website URL here", name="updatedUrl")
                         .col-sm-2.no-pad
                             button(type="submit", class="apbtn-main-line", id="addUpdatedUrlBtn") Add
-                div#detectarError
+                div#detectapError
             button(id="completeSetup", class="apbtn-main btn-complete-setup")
                 | Verify                                             

@@ -12,7 +12,18 @@ var express = require('express'),
     // eslint-disable-next-line new-cap
     router = express.Router({ mergeParams: true }),
     CC = require('../configs/commonConsts'),
-    config = require('../configs/config');
+    config = require('../configs/config'),
+    Mailer = require('../helpers/Mailer'),
+	// Create mailer config
+	mailConfig = {
+		MAIL_FROM: config.email.MAIL_FROM,
+		MAIL_FROM_NAME: config.email.MAIL_FROM_NAME,
+		SMTP_SERVER: config.email.SMTP_SERVER,
+		SMTP_USERNAME: config.email.SMTP_USERNAME,
+		SMTP_PASSWORD: config.email.SMTP_PASSWORD,
+	},
+	// Instantiate mailer
+	mailer = new Mailer(mailConfig, 'text');
 
 router
     .get('/dashboard', function(req, res) {
@@ -59,6 +70,21 @@ router
             });
         });
     })
+    .post('/sendCode', function (req, res) {
+		var headerCode = req.body.headerCode;
+
+		mailConfig.to = req.body.developerEmail;
+		mailConfig.subject = 'AdPushup Header Snippet';
+
+		var mailHeader = 'Hi\nPlease find below the code snippet for your AdPushup setup. Please paste this into <head> part of your page - \n\n',
+			mailFooter = '\n\nThanks,\nTeam AdPushup\n';
+
+		mailConfig.text = mailHeader + headerCode + mailFooter;
+
+		mailer.send(function (err) {
+			!err ? res.send({ success: 1 }) : res.send({ success: 0 });
+		});
+	})
     .get('/billing', function(req, res) {
         res.render('billing', {
             user: req.session.user,

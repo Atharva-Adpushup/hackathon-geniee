@@ -26,7 +26,7 @@ $('document').ready(function() {
                 var headerCode = "(function(w, d) { var s = d.createElement('script'); s.src = '//delivery.adrecover.com/" + newSite.addedSite.siteId + "/adRecover.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);";
 
                 // Populate header code in textarea
-                $('#header-code').text('<script data-cfasync="false" type="text/javascript">'+headerCode+'</script>');
+                $('#header-code').text('<script type="text/javascript">'+headerCode+'</script>');
             }
         };
         newSite.showStep(newSite.defaultStep);
@@ -48,10 +48,9 @@ $('document').ready(function() {
         newSite.addSite = function(site, url) {
 
             // Create site model for user site
-            $.post('/user/addSite', {
+            $.post('/data/saveSite', {
                 site: url,
-                monetize: false,
-                measure: false,
+                siteId: newSite.viewObjects.unSavedSiteId,
                 step: 2
             }, function(res) {
                 if(res.success) {
@@ -63,42 +62,18 @@ $('document').ready(function() {
                     $('#addSiteStr').fadeIn();
                     $('#addSiteStr').html('<h2 class="text-appear"><span>' + site + '</span> has been Added!</h2>');
 
+                    // Generate header code with site id
+                    var headerCode = "(function(w, d) { var s = d.createElement('script'); s.src = '//delivery.adrecover.com/" + newSite.addedSite.siteId + "/adRecover.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);";
+
+                    // Populate header code in textarea
+                    $('#header-code').text('<script type="text/javascript">'+headerCode+'</script>');
+
                     // Go to next step
                     newSite.nextStep(2, 1, 1000);
                 }
                 else {
                     //alert(res.error);
-                    ap.arAlert(res.error, '#ardetect', 'error', 'slideDown');
-                }
-            });
-        };
-
-        newSite.setSitePreference = function(sitePreference) {
-            $('#preference-form button').prop('disabled', true).html('Saving...');
-
-            newSite.adRecoverPreferences = {
-                measure: sitePreference.measure,
-                monetize: sitePreference.monetize
-            };
-            
-            $.post('/user/setSitePreference', {
-                siteId: newSite.addedSite.siteId,
-                measure: sitePreference.measure,
-                monetize: sitePreference.monetize,
-                step: 3
-            }, function(res) {
-                if(res.success) {
-                    // Generate header code with site id
-                    var headerCode = "(function(w, d) { var s = d.createElement('script'); s.src = '//delivery.adrecover.com/" + newSite.addedSite.siteId + "/adRecover.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);";
-
-                    // Populate header code in textarea
-                    $('#header-code').text('<script data-cfasync="false" type="text/javascript">'+headerCode+'</script>');
-
-                    // Go to next step
-                    newSite.nextStep(3, 2, 1000);
-                }
-                else {
-                    alert('Some error occurred!');
+                    ap.apAlert(res.error, '#ardetect', 'error', 'slideDown');
                 }
             });
         };
@@ -137,7 +112,7 @@ $('document').ready(function() {
 
         // Function to detect Adrecover on added website
         newSite.detectAdRecover = function(addedSite, update) {
-            $.get('/proxy/detectAr', {
+            $.get('/proxy/detectap', {
                 'url': addedSite
             }, function(res) {
                 if (res.ar) {
@@ -160,11 +135,11 @@ $('document').ready(function() {
                                 step: 4
                             }, function(response) {
                                 if(response.success) {
-                                    ap.arAlert('AdRecover has been successfully detected on the website!', '#ardetect', 'success', 'slideDown');
+                                    ap.apAlert('AdRecover has been successfully detected on the website!', '#ardetect', 'success', 'slideDown');
                                    
                                     $('#completeSetup').html('Setup Complete! <div>Our advisors will get in touch with you soon. <br/> You can also contact us at <a href="mailto:contact@adrecover.com">contact@adrecover.com</a></div><a class="arbtn-main" style="font-size: 1em;" href="/user/dashboard">Go to Dashboard</a>').prop('disabled', true).css('opacity', 1).addClass('btn-setup-complete');
                                     $('#step'+ newSite.totalSteps + '-check').addClass('fa-check-circle zoomIn');
-                                    $('.detectar-error').slideUp();
+                                    $('.detectap-error').slideUp();
                                 }
                                 else {
                                     alert('Some error occurred!');
@@ -176,9 +151,9 @@ $('document').ready(function() {
                         }
                     });
                 } else {
-                    ap.arAlert('AdRecover was not detected on the website!', '#ardetect', 'error', 'slideDown');
+                    ap.apAlert('AdRecover was not detected on the website!', '#ardetect', 'error', 'slideDown');
 
-                    $('.detectar-error').fadeIn();
+                    $('.detectap-error').fadeIn();
                     $('#completeSetup').html('Verify').prop('disabled', false);
                     if (update !== '') {
                         $('#addUpdatedUrlBtn').html('Add').prop('disabled', false);
@@ -198,12 +173,12 @@ $('document').ready(function() {
         newSite.addAnotherSite = function(updatedSite, form) {
             if (this.getHost(this.addedSite.domain) === this.getHost(updatedSite)) {
                 $(form).find('button[type=submit]').html('Adding...').prop('disabled', true);
-                $('#detectarError').html('');
+                $('#detectapError').html('');
 
                 // If hosts match then detect Adrecover on updated website
                 this.detectAdRecover(updatedSite, 'update');
             } else {
-                $('#detectarError').html('<p>The domain of the updated URL must match the added URL</p>');
+                $('#detectapError').html('<p>The domain of the updated URL must match the added URL</p>');
             }
         };
 

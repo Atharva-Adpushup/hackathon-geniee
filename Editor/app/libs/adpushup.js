@@ -32,6 +32,17 @@
         }).html('<img src="//app.adpushup.com/public/assets/images/loaderLogo.png">'));
     };
 
+    a.apAlert = function(message, container, type, animation) {
+        switch (animation) {
+            case 'slideDown':
+                $(container).addClass('apalert-' + type).html(message + ' <span class="close">x</span>').slideDown();
+                break;
+            default:
+                $(container).addClass('apalert-' + type).html(message + ' <span class="close">x</span>').show();
+                break;
+        }
+    };
+
     $(function() {
         if(typeof w.location.hash === "string") {
             var hash = w.location.hash;
