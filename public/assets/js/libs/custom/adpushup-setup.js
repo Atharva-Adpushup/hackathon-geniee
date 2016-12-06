@@ -66,63 +66,16 @@ $('document').ready(function() {
             });
         };
 
-        // Trigger pagegroup help section
-        $('#pageGroupHelp').click(function() {
-            $('.page-grp-text').fadeIn();
-            $(this).hide();
-        });
-
-        // Add new pagegroup
-        function addPageGroup() {
-            var pageGroupInput = "!{addPageGroupStr}";
+        // Function to append page group creation template
+        newSite.appendPagegroup = function() {
+            var pageGroupInput = "<div class='col-sm-4'> <input name='pagegroupName' type='text' placeholder='Page Group Name' required='' class='input-box'> </div><div class='col-sm-7'> <input name='sampleUrl' type='url' placeholder='Sample URL' required='' class='input-box'> </div><div class='col-sm-1'><input type='button' class='remove-pagegroup apbtn-danger' value='x' /></div>";
             $('.pagegroup-input').last().after('<div class="row pagegroup-input">'+pageGroupInput+'</div>');
         };
 
-        // Remove pagegroup 
-        function removePageGroup(el) {
+        // Function to remove page group
+        newSite.removePageGroup = function(el) {
             $(el).closest('.pagegroup-input').remove();
-        }
-
-        // Create all pagegroups
-        var pageGroups = [];
-        $('#pagegroup-form').submit(function(e) {
-            e.preventDefault();
-
-            // Disable submit button
-            $('.pagegroup-actions button').html('Creating...').prop('disabled', true);
-
-            // Detect unique pagegroups
-            if(matchValues('#pagegroup-form')) {
-                var data = $(this).serializeArray();
-
-                // Converting pagegroup serialized array to json object
-                for(var i = 0; i < data.length; i ++) {
-                    if(data[i+1] !== undefined) {
-                        data[i].name === 'pagegroupName' ? pageGroups.push({pageGroupName: data[i].value, sampleUrl: data[i+1].value}) : '';
-                    }
-                }
-                //#{"pageGroups"} = pageGroups;
-                $('#pageGroupHelp, #pagegroup-err').hide();
-
-                // Goto next step
-                nextStep('#step3', '#step2', 1000);
-            } else {
-                $('#pagegroup-err').fadeIn();
-            }
-        });
-
-        // Match input values in form
-        function matchValues(selector) {
-            var values = [] ;
-            $(selector+' input').each( function(id, val) { 
-                values.push($(val).val());
-            });
-            values.sort() ;
-            for(var k = 1; k < values.length; ++k) {
-                if(values[k] == values[k-1]) return false ;
-            }
-            return true;
-        }
+        };
 
         // Function to traverse to next step
         newSite.nextStep = function(to, from, duration) {
@@ -361,6 +314,85 @@ $('document').ready(function() {
             var btn = $(this),
                 cms = btn.attr('data-cms-name');
             newSite.setCms(cms, newSite.viewObjects.unSavedSiteId, btn);
+        });
+
+         // Trigger pagegroup help section
+        $('#pageGroupHelp').click(function() {
+            $('.page-grp-text').fadeIn();
+            $(this).hide();
+        });
+
+        // Add new pagegroup
+        $('#addPagegroup').click(function() {
+            newSite.appendPagegroup();
+        });
+
+         // Match input values in form
+        function matchValues(selector) {
+            var values = [] ;
+            $(selector+' input').each( function(id, val) { 
+                values.push($(val).val());
+            });
+            values.sort() ;
+            for(var k = 1; k < values.length; ++k) {
+                if(values[k] == values[k-1]) return false ;
+            }
+            return true;
+        }
+
+        // Create all pagegroups
+        var pageGroups = [];
+
+        function pagegroupCb() {
+            $('#pageGroupHelp, #pagegroup-err').hide();
+            console.log(pageGroups);
+            // Goto next step
+            newSite.nextStep(4, 3, 1000);
+        }
+
+        $('#pagegroup-form').submit(function(e) {
+            e.preventDefault();
+
+            $('.pagegroup-actions button').html('Creating...').prop('disabled', true);
+
+            // Detect unique pagegroups
+            if(matchValues('#pagegroup-form')) {
+                var data = $(this).serializeArray();
+
+                // Converting pagegroup serialized array to json object
+                for(var i = 0; i < data.length || pagegroupCb(); i ++) {
+                    if(data[i+1] !== undefined) {
+                        if(data[i+1].name === 'sampleUrl') {
+                            
+                            if(newSite.getHost(data[i+1].value) !== newSite.getHost(newSite.viewObjects.origUnSavedDomain)) {
+                                $('#pagegroup-err').html('Please add valid sample urls from your own website').fadeIn();
+                                $('.pagegroup-actions button').html('Create').prop('disabled', false);
+                                break;
+                            }
+                            else {
+                                data[i].name === 'pagegroupName' ? pageGroups.push({pageGroup: data[i].value, sampleUrl: data[i+1].value}) : '';
+                            }
+                        }
+                    }
+                }
+            } else {
+                $('#pagegroup-err').html('Please create unique page groups').fadeIn();
+                $('.pagegroup-actions button').html('Create').prop('disabled', false);
+            }
+        });
+
+        // Detect sample urls from added domain
+        // $(document).on('change', 'input[name="sampleUrl"]', function() {
+        //     var url = $(this).val();
+        //     if(newSite.getHost(url) !== newSite.getHost(newSite.viewObjects.origUnSavedDomain)) {
+        //         $('#pagegroup-err').html('Please add valid sample urls from your own website').fadeIn();
+        //     }
+        // });
+
+        // Remove pagegroup
+        $(document).on('click', '.remove-pagegroup', function(){
+            var el = $(this);
+            newSite.removePageGroup(el);
         });
 
         // Add updated url

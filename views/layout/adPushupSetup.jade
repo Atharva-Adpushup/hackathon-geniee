@@ -3,8 +3,6 @@
 - link = domanized ? '- '+domanized : '';
 - noSitePresentAlertStr = (domanizedUrl && domanizedUrl.length > 0) ? domanizedUrl : "one";
 - addSiteTemplateStr = "<div id='alert--noSitePresent' data-site='" + origUnSavedDomain + "' data-toggle='modal' data-target=''><button id='addUserSite' class='btn-st apbtn-main'>Want to add <span style='cursor: pointer;'>" + noSitePresentAlertStr +" ?</span></button></div> ";
-- addPageGroupStr = "<div class='col-sm-4'> <input name='pagegroupName' type='text' placeholder='Page Group Name' required='' class='input-box'> </div><div class='col-sm-7'> <input name='sampleUrl' type='url' placeholder='Sample URL' required='' class='input-box'> </div><div class='col-sm-1'><input onclick='removePageGroup(this)' type='button' class='remove-pagegroup arbtn-danger' value='x' /></div>";
-- pageGroups = [];
 
 //- Alert wrapper
 div.detectap-alert.text-center#apdetect
@@ -74,7 +72,7 @@ div.detectap-alert.text-center#apdetect
         span(class="counter-icon")
             | 3
         h3(class="ob-heading")
-            | Add Page Groups 
+            | Create Page Groups 
             i#step3-check.fa
             span(class="step-info", id="pageGroupHelp")
                 | Know More
@@ -89,10 +87,9 @@ div.detectap-alert.text-center#apdetect
                         input(name="sampleUrl" class="input-box", type="url", placeholder="Sample URL" required)
                 div.pagegroup-actions
                     div.pagegroup-err#pagegroup-err
-                        | Please create unique page groups
                     .row
                         .col-sm-3.col-sm-offset-3
-                            input(onclick="addPageGroup()", type="button", class="apbtn-main-line", value="Add more")
+                            input(id="addPagegroup", type="button", class="apbtn-main-line", value="Add more")
                         .col-sm-3
                             button(class="apbtn-main", type="submit")
                                 | Create

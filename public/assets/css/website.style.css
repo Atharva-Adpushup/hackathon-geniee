@@ -1395,7 +1395,8 @@ maxHeightWidth {
     padding: 0 20px; }
 
 .ob-bigbtn {
-  font-size: 1.8em; }
+  font-size: 1.6em;
+  margin: 15px 0; }
   .ob-bigbtn i {
     margin-right: 8px; }
 
@@ -1410,7 +1411,7 @@ maxHeightWidth {
 .step-text {
   color: #555555;
   font-size: 1.2em;
-  margin: 30px 0 0;
+  margin: 20px 0 0;
   line-height: 24px; }
 
 .pagegroup-actions {
