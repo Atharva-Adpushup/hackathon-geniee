@@ -44,6 +44,10 @@
         }
     };
 
+    $(document).on('click', '.close', function() {
+        $(this).closest('.detectap-alert').slideUp();
+    });
+
     $(function() {
         if(typeof w.location.hash === "string") {
             var hash = w.location.hash;

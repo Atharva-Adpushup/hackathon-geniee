@@ -67,76 +67,51 @@ div.detectap-alert.text-center#apdetect
             #ob-loader
             #cms-res
 
-    //- Pagegroup creation
+    //- Adpushup detection
     .onboarding-step#step3
         span(class="counter-icon")
             | 3
         h3(class="ob-heading")
-            | Create Page Groups 
-            i#step3-check.fa
-            span(class="step-info", id="pageGroupHelp")
-                | Know More
-        div(class="ob-content")
-            form#pagegroup-form
-                .p(class="step-text page-grp-text")
-                    | Page Group is Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
-                .row.pagegroup-input
-                    .col-sm-4
-                        input(name="pagegroupName", class="input-box", type="text", placeholder="Page Group Name" required)
-                    .col-sm-8
-                        input(name="sampleUrl" class="input-box", type="url", placeholder="Sample URL" required)
-                div.pagegroup-actions
-                    div.pagegroup-err#pagegroup-err
-                    .row
-                        .col-sm-3.col-sm-offset-3
-                            input(id="addPagegroup", type="button", class="apbtn-main-line", value="Add more")
-                        .col-sm-3
-                            button(class="apbtn-main", type="submit")
-                                | Create
-
-    //- Adpushup detection
-    .onboarding-step#step4
-        span(class="counter-icon")
-            | 4
-        h3(class="ob-heading")
             | Verify Adpushup on your website
-            i#step4-check.fa
+            i#step3-check.fa
         div(class="ob-content")
             p.text-medium
                 | Copy and paste this snippet in the &lt;HEAD&gt; section of your website
             div.snippet-wrapper
                 span.clipboard-copy
                     | Copied !
-                button(data-toggle="modal" data-target="#sendToDevModal" id="sendToDev", class="snippet-btn snippet-dev apbtn-main-line apbtn-small")
-                    | Send code to developer
-                    i.fa.fa-code
-                button(id="clipboardCopy", class="snippet-btn apbtn-main-line apbtn-small")
-                    | Copy to clipboard 
-                    i.fa.fa-clipboard
                 textarea(class="snippet", id="header-code", readonly)
+                div.snippet-btn-wrapper
+                    div
+                        button(data-toggle="modal" data-target="#sendToDevModal" id="sendToDev", class="snippet-btn snippet-dev apbtn-main-line apbtn-small")
+                            | Send code to developer
+                            i.fa.fa-code
+                        button(id="clipboardCopy", class="snippet-btn apbtn-main-line apbtn-small")
+                            | Copy to clipboard 
+                            i.fa.fa-clipboard
 
             div.error-message.detectap-error
                 p
                     | Please make sure that the header code is present on the the specified URL
-                p 
-                    | If you have added the header code to a different URL please add it below - 
-                .row
-                    form#addUpdatedUrl
-                        .col-sm-6.col-sm-offset-2
-                            input(required, id="updatedUrl" type="url", class="input-box", placeholder="Enter Website URL here", name="updatedUrl")
-                        .col-sm-2.no-pad
-                            button(type="submit", class="apbtn-main-line", id="addUpdatedUrlBtn") Add
+                //- p 
+                //-     | If you have added the header code to a different URL please add it below - 
+                //- .row
+                //-     form#addUpdatedUrl
+                //-         .col-sm-6.col-sm-offset-2
+                //-             input(required, id="updatedUrl" type="url", class="input-box", placeholder="Enter Website URL here", name="updatedUrl")
+                //-         .col-sm-2.no-pad
+                //-             button(type="submit", class="apbtn-main-line", id="addUpdatedUrlBtn") Add
                 div#detectapError
             button(id="completeSetup", class="apbtn-main btn-complete-setup")
                 | Verify        
 
     //- Grant adsense oauth access
-    .onboarding-step#step5
+    .onboarding-step#step4
         span(class="counter-icon")
-            | 5
+            | 4
         h3(class="ob-heading")
             | Connect Adsense Account
-            i#step5-check.fa
+            i#step4-check.fa
         div(class="ob-content")
             p.text-medium
                 | Copy and paste this snippet in the &lt;HEAD&gt; section of your website
