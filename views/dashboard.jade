@@ -24,7 +24,7 @@ block append headScripts
                         unSavedSiteId: '!{unSavedSiteId}',
                         origUnSavedDomain: '!{origUnSavedDomain}'
                     },
-                    totalSteps: 5,
+                    totalSteps: 4,
                     defaultStep: '!{step}',
                     addOtherSite: true,
                     showIntro: false
@@ -36,7 +36,7 @@ block append headScripts
         ]) 
     else 
 
-        if validSites[0].step <= 5
+        if validSites[0].step <= 4
         
             //- Setup Adpushup site addition config
             script.
@@ -51,7 +51,7 @@ block append headScripts
                             domain: '!{validSites[0].domain}',
                             siteId: '!{validSites[0].siteId}'
                         },
-                        totalSteps: 5,
+                        totalSteps: 4,
                         defaultStep: '!{validSites[0].step}',
                         addOtherSite: false
                     };
@@ -61,7 +61,7 @@ block append headScripts
                 '/assets/js/build/adpushup-setup.min.js'
             ]) 
 
-        if (validSites[0].step == 5 && isSuperUser) || (!hasStep || !isSuperUser)
+        if (validSites[0].step == 4 && isSuperUser) || (!hasStep || !isSuperUser)
             +loadAsset("js", [
                 '/assets/js/libs/third-party/d3.js',
                 '/assets/js/libs/third-party/c3.js',
@@ -88,7 +88,7 @@ block bodyContent
                     // Control v/s Adpushp Starts here
                     #widgetsArea.row
                         if validSites.length > 0
-                            if ((!hasStep || (!isSuperUser && validSites[0].step > 4)) && !requestDemo) || (isSuperUser && (validSites || validSites[0].step > 4))
+                            if ((!hasStep || (!isSuperUser && validSites[0].step > 3)) && !requestDemo) || (isSuperUser && (validSites || validSites[0].step > 3))
                                 for site in validSites
                                     <!--.2.and.mb-30(class="{{ loop.length % loop.last ? 'col-xs-12' : 'col-xs-6' }}")-->
                                     .mb-30
@@ -170,7 +170,7 @@ block bodyContent
                                                             a(href="/user/site/#{site.siteId}/createPagegroup") create
                                                             |  one to access the visual editor.
                             else
-                                if validSites[0].step <= 5
+                                if validSites[0].step <= 4
                                     include layout/adPushupSetup
                                 else 
                                     .onboarding-wrapper

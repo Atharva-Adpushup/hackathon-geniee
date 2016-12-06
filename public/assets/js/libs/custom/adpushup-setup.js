@@ -129,10 +129,13 @@ $('document').ready(function() {
                         newSite.addedSite ? this.checkCmsStep() : '';
                         $('#platformVerificationContent').html('<p class="text-center mT-10"><img class="platform-graphic" src="/assets/images/platform.png" width="150" height="150"/></p>');
                         break;
-                    case 5:
-                        $('#adsensenonadmin').html('Setup Complete '+this.templates.checkIcon);
+                    case 4:
                         this.setupCompleteAlert();
                         break;
+                    // case 5:
+                    //     $('#adsensenonadmin').html('Setup Complete '+this.templates.checkIcon);
+                    //     this.setupCompleteAlert();
+                    //     break;
                 }
             },
 
@@ -257,7 +260,7 @@ $('document').ready(function() {
                     if (res.ap) {
                         $.post('/user/setSiteStep', {
                             siteId: newSite.addedSite.siteId,
-                            step: newSite.addOtherSite ? 5 : 3
+                            step: newSite.addOtherSite ? 4 : 3
                         }, function(response) {
                             if (response.success) {
                                 if(ob.cmsAdded === 'wordpress') {
