@@ -1,0 +1,30 @@
+//- Site addition view
+
+extends  layout/base
+
+block getTitle
+	- var titleVar = "Add Site"
+
+block append headScripts
+	- step = 1;
+
+	script.
+		$('document').ready(function() {
+			adpushup.newSite = {
+				totalSteps: 5,
+				defaultStep: '!{step}',
+				addOtherSite: true
+			};
+		});
+
+	+loadAsset("js", [
+		'/assets/js/build/adpushup-setup.min.js'
+	]) 
+
+block bodyContent
+	include layout/sideBar
+	.pageContainer.page-container
+		include layout/header
+		.pageContentWrapper.page-content
+			.pageContentInner.page-content--inner
+				include layout/adPushupSetup
