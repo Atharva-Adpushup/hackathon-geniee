@@ -1380,6 +1380,18 @@ maxHeightWidth {
 .ob-subheading + .text-medium {
   margin: 8px 0 20px; }
 
+.ob-loader {
+  position: relative;
+  height: 220px;
+  margin-left: -20px;
+  width: calc(100% + 40px);
+  margin-bottom: -20px; }
+
+.ob-bigbtn {
+  font-size: 1.8em; }
+  .ob-bigbtn i {
+    margin-right: 8px; }
+
 .headerTopBar {
   height: 60px;
   z-index: 1039;

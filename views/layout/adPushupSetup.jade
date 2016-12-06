@@ -60,36 +60,12 @@ div.detectap-alert.text-center#apdetect
         span(class="counter-icon")
             | 2
         h3(class="ob-heading")
-            | Detect CMS type
+            | Detect Website Platform
             i#step2-check.fa
         div(class="ob-content")
-            p.text-medium
-                | Copy and paste this snippet in the &lt;HEAD&gt; section of your website
-            div.snippet-wrapper
-                span.clipboard-copy
-                    | Copied !
-                button(data-toggle="modal" data-target="#sendToDevModal" id="sendToDev", class="snippet-btn snippet-dev apbtn-main-line apbtn-small")
-                    | Send code to developer
-                    i.fa.fa-code
-                button(id="clipboardCopy", class="snippet-btn apbtn-main-line apbtn-small")
-                    | Copy to clipboard 
-                    i.fa.fa-clipboard
-                textarea(class="snippet", id="header-code", readonly)
-
-            div.error-message.detectap-error
-                p
-                    | Please make sure that the header code is present on the the specified URL
-                p 
-                    | If you have added the header code to a different URL please add it below - 
-                .row
-                    form#addUpdatedUrl
-                        .col-sm-6.col-sm-offset-2
-                            input(required, id="updatedUrl" type="url", class="input-box", placeholder="Enter Website URL here", name="updatedUrl")
-                        .col-sm-2.no-pad
-                            button(type="submit", class="apbtn-main-line", id="addUpdatedUrlBtn") Add
-                div#detectapError
-            button(id="completeSetup", class="apbtn-main btn-complete-setup")
-                | Verify  
+            p.text-medium#cms-text
+            #ob-loader
+            #cms-res
 
     //- Adpushup detection
     .onboarding-step#step3

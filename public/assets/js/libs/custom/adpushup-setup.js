@@ -31,6 +31,22 @@ $('document').ready(function() {
         };
         newSite.showStep(newSite.defaultStep);
 
+        // Function to detect CMS type
+        newSite.detectCms = function(site) {
+            $.get('/proxy/detectCms?site='+site, {}, function(res) {
+                $('#cms-text').html('We have auto detected and selected this for you.');
+
+                $('#ob-loader').fadeOut();
+                if(!res.wordpress && !res.ap) {
+                    $('#cms-res').html('<div clas="row"><div class="col-sm-4 col-sm-offset-2"><button class="apbtn-main-line ob-bigbtn"><i class="fa fa-wordpress"></i> Wordpress</button> </div><div class="col-sm-4"><button class="apbtn-main ob-bigbtn">Other</button> </div></div>');
+                }
+                else if(res.wordpress) {
+
+                }
+                
+            });
+        };
+
         // Function to traverse to next step
         newSite.nextStep = function(to, from, duration) {
             $('#step'+from + '-check').addClass('fa-check-circle zoomIn');
@@ -42,6 +58,14 @@ $('document').ready(function() {
                 $('#step'+to + ' .ob-content').slideDown();
                 $('#step'+from + ' .ob-content').slideUp();
             }, duration);
+
+            switch(to) {
+                case 2:
+                    ap.showLoader('#ob-loader', 'ob-loader');
+                    $('#cms-text').html('Please wait while we inspect your website.');
+                    this.detectCms(this.viewObjects.origUnSavedDomain);
+                    break;
+            }
         };
 
         // Function to add new site

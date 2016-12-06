@@ -26,10 +26,11 @@
         }).html(message));
     };
 
-    a.showLoader = function(container) {
+    a.showLoader = function(container, cssClass) {
+        cssClass = cssClass ? cssClass : '';
         $(container).html($('<div/>').attr({
-            "class": "loaderwrapper spinner"
-        }).html('<img src="//app.adpushup.com/public/assets/images/loaderLogo.png">'));
+            "class": "loaderwrapper spinner "+cssClass
+        }).html('<img src="/assets/images/loaderLogo.png">'));
     };
 
     a.apAlert = function(message, container, type, animation) {
