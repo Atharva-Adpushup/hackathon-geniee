@@ -38,14 +38,18 @@ router
 				'step': parseInt(data.step)
 			};
 			
-			return userModel.addSite(req.session.user.email, data.site).spread(function(user, siteId) {
-				req.session.user = user;
-				return siteData;
-			});
+			return siteData;
 		})
 		.then(siteModel.saveSiteData.bind(null, siteId, 'POST'))
 		.then(function() {
-			res.send({success: 1, url: data.site, siteId: siteId});
+			return userModel.setSitePageGroups(req.session.user.email)
+				.then(function(user) {
+					req.session.user = user;
+					res.send({success: 1, url: data.site, siteId: siteId});
+				})
+				.catch(function() {
+					res.send({success: 0});
+				});
 		})
 		.catch(function(err) {
 			res.send({success: 0});

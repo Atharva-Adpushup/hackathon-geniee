@@ -11,6 +11,7 @@ block append headScripts
     if validSites.length === 0
 
         - unSavedSiteId = (unSavedSite) ? unSavedSite[0].siteId : null;
+        - step = 1;
         - origUnSavedDomain = (unSavedSite) ? unSavedSite[0].domain : null;
         - domanizedUrl = (origUnSavedDomain) ? utils.domanize(origUnSavedDomain) : null;
 
@@ -24,7 +25,7 @@ block append headScripts
                         origUnSavedDomain: '!{origUnSavedDomain}'
                     },
                     totalSteps: 4,
-                    defaultStep: 1,
+                    defaultStep: '!{step}',
                     addOtherSite: false
                 };
             });
@@ -45,7 +46,11 @@ block append headScripts
                             unSavedSiteId: '!{unSavedSiteId}',
                             origUnSavedDomain: '!{origUnSavedDomain}'
                         },
-                            totalSteps: 4,
+                        addedSite: {
+                            domain: '!{validSites[0].domain}',
+                            siteId: '!{validSites[0].siteId}'
+                        },
+                        totalSteps: 4,
                         defaultStep: '!{validSites[0].step}',
                         addOtherSite: false
                     };
