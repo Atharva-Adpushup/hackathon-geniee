@@ -84,7 +84,7 @@ router
 					res.render('thankyou');
 				}
 			}
-			else {
+			else if('requestDemoData' in req.session.user) {
 				var qualifyDeal = (parseInt(req.session.user.requestDemoData.INFO_PAGEVIEWS.split('-')[0]) >= 15000 || parseInt(req.session.user.requestDemoData.INFO_PAGEVIEWS.split('-')[0]) == 200);
 				if((qualifyDeal && req.session.user.requestDemoData.INFO_ADNETWORK_ADSENSE) || req.session.isSuperUser) {
 					renderDashboard();
@@ -92,6 +92,9 @@ router
 				else {
 					res.render('thankyou');
 				}
+			}
+			else {
+				res.render('thankyou');
 			}
         });
     })
