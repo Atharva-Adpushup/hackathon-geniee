@@ -12,9 +12,7 @@ $('document').ready(function() {
             
             // UI templates for onboarding
             templates: {
-                cmsWordpress: '<button class="apbtn-main-line ob-bigbtn" id="setCms" data-cms-name="wordpress"><i class="fa fa-wordpress"></i> Wordpress</button>',
-
-                cmsOther: '<button class="apbtn-main ob-bigbtn" id="setCms" data-cms-name="">Other</button>',
+                cmsSelection: '<div class="row"><div class="col-sm-4 col-sm-offset-2"><button class="apbtn-main-line ob-bigbtn" id="setCms" data-cms-name="wordpress"><i class="fa fa-wordpress"></i> Wordpress</button></div><div class="col-sm-4"><button class="apbtn-main ob-bigbtn" id="setCms" data-cms-name="">Other</button></div></div>',
 
                 wordpressPlugin: '<div class="row"><div class="col-sm-4 col-sm-offset-4"><a href="https://wordpress.org/plugins/adpushup/" target="_blank" class="apbtn-main-line ob-bigbtn"><i class="fa fa-wordpress"></i> Install Plugin</a></div></div><p class="text-medium-nm text-center">After you install plugin, please configure Site ID - <strong>'+newSite.viewObjects.unSavedSiteId+'</strong> by going to <strong>Wordpress</strong> > <strong>Settings</strong> > <strong>Adpushup Settings</strong></p><div class="row"><div class="col-sm-4 col-sm-offset-4"><button id="apCheck" class="apbtn-main">I\'ve done this</button></div></div>'
             },
@@ -45,15 +43,9 @@ $('document').ready(function() {
                 var ob = this;
 
                 $.get('/proxy/detectCms?site='+site, {}, function(res) {
-                    ob.manipulateElem('#cms-text', 'We have auto detected and selected this for you.', 'html')
                     $('#ob-loader').remove();
-
-                    if(!res.wordpress && !res.ap) {
-                        ob.manipulateElem('#cms-res', '<div class="row"><div class="col-sm-4 col-sm-offset-2">'+ob.templates.cmsWordpress+'</div><div class="col-sm-4">'+ob.templates.cmsOther+'</div></div>', 'htmlFadeIn', 600)
-                    }
-                    else if(res.wordpress) {
-                        ob.manipulateElem('#cms-res', '<div class="row"><div class="col-sm-4 col-sm-offset-4">'+ob.templates.cmsWordpress+'</div></div>', 'htmlFadeIn', 600);
-                    }
+                    ob.manipulateElem('#cms-text', 'We have auto detected and selected this for you.', 'html')
+                    ob.manipulateElem('#cms-res', ob.templates.cmsSelection, 'htmlFadeIn', 600);
                 });
             },
 
