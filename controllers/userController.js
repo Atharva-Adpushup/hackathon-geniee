@@ -66,12 +66,17 @@ router
             
             setEmailCookie(req, res);
 
-            res.render('dashboard', {
-                validSites: sites,
-                unSavedSite: unSavedSite,
-                hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-                requestDemo: req.session.user.requestDemo
-            });
+            if((parseInt(req.session.user.pageviewRange.split('-')[0]) >= 15000 && _.includes(req.session.user.adNetworks, 'Adsense')) || req.session.isSuperUser) {
+				res.render('dashboard', {
+					validSites: sites,
+					unSavedSite: unSavedSite,
+					hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+					requestDemo: req.session.user.requestDemo
+				});
+			}
+			else {
+				res.render('thankyou');
+			}
         });
     })
     .post('/setSiteStep', function(req, res) {
