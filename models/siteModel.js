@@ -23,8 +23,7 @@ var model = require('../helpers/model'),
 			'partner',
 			'genieeMediaId',
 			'dateCreated',
-			'dateModified',
-			'step'
+			'dateModified'
 		];
 		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'adNetworks', 'actions', 'audiences', 'channels', 'cmsInfo', 'templates', 'apConfigs', 'partner', 'genieeMediaId'];
 		this.validations = {
