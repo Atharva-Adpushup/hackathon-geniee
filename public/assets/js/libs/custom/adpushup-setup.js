@@ -361,7 +361,7 @@ $('document').ready(function() {
 
             // Attach oauth post message hook
             oauthHook: function(event) {
-                var adsense = JSON.parse(event.data),
+                var adsense = JSON.parse(event.data);
                 if(adsense.data) {
                     $("div[id^='step']").last().removeClass('active-step');
                     $('#adsenseoauth').html('Google Adsense Connected '+ap.onboarding.templates.checkIcon);
