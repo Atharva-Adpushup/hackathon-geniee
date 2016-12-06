@@ -56,7 +56,9 @@ router
 		});
 	})
 	.post('/saveCms', function(req, res) {
-		siteModel.setCms(parseInt(req.body.siteId), req.body.cmsName)
+		var pageGroups = JSON.parse(req.body.pageGroups);
+		
+		siteModel.setCms(parseInt(req.body.siteId), req.body.cmsName, pageGroups)
 			.then(function() {
 				res.send({success: 1});
 			})
