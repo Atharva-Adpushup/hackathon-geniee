@@ -356,6 +356,29 @@ $onboardingBg: url('../images/adpushupbg.png');
   margin-top: 10px;
 }
 
+.ob-ty {
+  background-image: url("../images/smily.png");
+  height: 430px;
+  background-position: -20px 118%;
+
+  .pageContainer .pageContentWrapper .pageContentInner .row & > .ob-heading {
+    padding-left: 0px;
+  }
+
+  & .text-medium {
+    padding: 0 140px;
+  }
+
+  & strong {
+    color: #000;
+  }
+
+  & a {
+    color: $primaryColor;
+    text-decoration: underline;
+  }
+}
+
 
 
 

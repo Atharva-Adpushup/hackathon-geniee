@@ -63,11 +63,14 @@ router
 			*/
             unSavedSite = (sites.length === 0) ? allUserSites : null;
             req.session.unSavedSite = unSavedSite;
+            
             setEmailCookie(req, res);
+
             res.render('dashboard', {
                 validSites: sites,
                 unSavedSite: unSavedSite,
-                hasStep: sites.length ? ('step' in sites[0] ? true : false) : false
+                hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+                requestDemo: req.session.user.requestDemo
             });
         });
     })

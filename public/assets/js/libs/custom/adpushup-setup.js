@@ -9,6 +9,7 @@ $('document').ready(function() {
         // Define onboarding sequence object
         ap.onboarding = {
             detectedPagegroups: [],
+            cmsAdded: '',
 
             // UI templates for onboarding
             templates: {
@@ -41,12 +42,20 @@ $('document').ready(function() {
                 }, duration);
             },
 
+            // CMS detection request
+            cmsRequest: function(site) {
+                var request = $.get('/proxy/detectCms?site=' + site);
+                return request;
+            },
+
             // CMS detection on site
             detectCms: function(site) {
-                var ob = this;
-                $.get('/proxy/detectCms?site=' + site, {}, function(res) {
+                var ob = this,
+                    r = ob.cmsRequest(site);
+
+                r.done(function(res) {
                     if(res.wordpress) {
-                        ob.detectedPagegroups = res.ap ? res.ap.pageGroups: [];
+                        //ob.detectedPagegroups = res.ap ? res.ap.pageGroups: [];
                     }
                     $('#cms-text').html('Please confirm your website’s platform -')
                     ob.manipulateElem('#cms-res', ob.templates.cmsSelection, 'htmlFadeIn', 600);
@@ -83,6 +92,7 @@ $('document').ready(function() {
                 // Set appropriate cms detection check
                 if (step >= 2) {
                     var defaultSiteCms = currentUser.sites[0].cmsInfo.cmsName;
+                    this.cmsAdded = defaultSiteCms;
                     defaultSiteCms === '' ? $('#platformVerificationContent').html(this.templates.otherPlatformVerification) : $('#platformVerificationContent').html(this.templates.wordpressPlatformVerification);
                     this.generateInitCode(newSite.addedSite.siteId);
 
@@ -174,16 +184,25 @@ $('document').ready(function() {
                 }
             },
 
-            // Save site platform 
-            saveCms: function(cmsName, siteId, btn) {
-                var ob = this;
-                btn.html('Saving...').prop('disabled', true);
-                $.post('/data/saveCms', {
+            // Request to save CMS to site model
+            saveCmsInSiteModel: function(cmsName, siteId, pageGroups) {
+                var request = $.post('/data/saveCms', {
                     cmsName: cmsName,
                     siteId: siteId,
-                    pageGroups: JSON.stringify(ob.detectedPagegroups)
-                }, function(res) {
+                    pageGroups: pageGroups
+                });
+                return request;
+            },
+
+            // Save site platform 
+            saveCms: function(cmsName, siteId, btn) {
+                var ob = this,
+                    r = ob.saveCmsInSiteModel(cmsName, siteId, []);
+                btn.html('Saving...').prop('disabled', true);
+
+                r.done(function(res) {
                     if (res.success) {
+                        ob.cmsAdded = cmsName;
                         $.post('/user/setSiteStep', {
                             siteId: newSite.addedSite.siteId,
                             step: 2
@@ -208,6 +227,18 @@ $('document').ready(function() {
                 });
             },
 
+            // Adpushup detection success
+            detectApSuccess: function(ob, el) {
+                ap.apAlert('AdPushup has been successfully detected on the website!', '#apdetect', 'success', 'slideDown');
+                if(newSite.addOtherSite) {
+                    $(el).html('Setup Complete '+ob.templates.checkIcon).after(ob.templates.dashboardLink);
+                }
+                else {
+                    $(el).html('Verified '+ob.templates.checkIcon);
+                    ob.nextStep(3, 2, 1000);
+                }
+            },
+
             // AdPushup detection on site
             detectAp: function(addedSite, el, cms) {
                 var ob = this;
@@ -215,18 +246,22 @@ $('document').ready(function() {
                     'url': addedSite
                 }, function(res) {
                     if (res.ap) {
-                        ap.apAlert('AdPushup has been successfully detected on the website!', '#apdetect', 'success', 'slideDown');
                         $.post('/user/setSiteStep', {
                             siteId: newSite.addedSite.siteId,
-                            step: 3
+                            step: newSite.addOtherSite ? 5 : 3
                         }, function(response) {
                             if (response.success) {
-                                if(newSite.addOtherSite) {
-                                    $(el).html('Setup Complete '+ob.templates.checkIcon).after(ob.templates.dashboardLink);
+                                if(ob.cmsAdded === 'wordpress') {
+                                    var r = ob.cmsRequest(addedSite);
+                                    r.done(function(res) {
+                                        r = ob.saveCmsInSiteModel(ob.cmsAdded, newSite.addedSite.siteId, JSON.stringify(res.ap.pageGroups));
+                                        r.done(function() {
+                                            ob.detectApSuccess(ob, el);
+                                        });
+                                    });
                                 }
                                 else {
-                                    $(el).html('Verified '+ob.templates.checkIcon);
-                                    ob.nextStep(3, 2, 1000);
+                                    ob.detectApSuccess(ob, el);
                                 }
                             } else {
                                 alert('Some error occurred!');
@@ -278,10 +313,9 @@ $('document').ready(function() {
             showAddOtherSite: function() {
                 if(newSite.addOtherSite) {
                     $('#addSiteStr').html(this.templates.addOtherSite);
-                    $('#step3, #step4').hide();
+                    $('#step2').nextAll("div[id^='step']").hide();
                 }
             },
-
         };
         ap.onboarding.showStep(newSite.defaultStep);
         ap.onboarding.showAddOtherSite();
@@ -334,7 +368,5 @@ $('document').ready(function() {
                 btn = $('#addSiteAltForm button');
             ap.onboarding.addSite(site, url, btn);
         });
-
     })(adpushup);
-
 });
