@@ -110,7 +110,7 @@ textarea {
   background-color: rgba(217, 67, 78, 0.94); }
 
 .apalert-success {
-  background-color: rgba(200, 52, 57, 0.94); }
+  background-color: rgba(53, 165, 83, 0.94); }
 
 .apalert-inverted {
   background-color: rgba(0, 0, 0, 0.86); }
@@ -1234,7 +1234,7 @@ maxHeightWidth {
   background-color: #fff;
   margin-bottom: 80px; }
   .onboarding-step .fa-check-circle {
-    color: #cf474b; }
+    color: #3BB85D; }
 
 .page-grp-text {
   display: none; }

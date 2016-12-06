@@ -126,7 +126,7 @@ textarea {
 
 .apalert-success {
 	@extend %alert;
-	background-color: rgba(darken($primaryColorDark, 5%), .94);
+	background-color: rgba(darken($successGreen, 5%), .94);
 }
 
 .apalert-inverted {
