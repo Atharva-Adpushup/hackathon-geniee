@@ -4,6 +4,7 @@
 - noSitePresentAlertStr = (domanizedUrl && domanizedUrl.length > 0) ? domanizedUrl : "one";
 - addSiteTemplateStr = "<div id='alert--noSitePresent' data-site='" + origUnSavedDomain + "' data-toggle='modal' data-target=''><button id='addUserSite' class='btn-st apbtn-main'>Lets add <span style='cursor: pointer;'>" + noSitePresentAlertStr +" ?</span></button></div> ";
 
+//- Intro modal
 #intromodal.modal._ap_modal.fade.intro-modal(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
     .modal-dialog
         .modal-content
@@ -21,6 +22,26 @@
                     .col-sm-4.col-sm-offset-4
                         button.apbtn-main(type='button', data-dismiss='modal', aria-label='Close') Get Started
 
+//- Send Code to Developer Modal
+#sendToDevModal.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+    .modal-dialog
+        .modal-content
+            .modal-header
+                button.close(type='button', data-dismiss='modal', aria-label='Close')
+                    span(aria-hidden='true') ×
+                h4#myModalLabel.modal-title Send Code to Developer
+            form.form-inline#sendCodeForm
+                .modal-body.addSite
+                    .form-group
+                        .input-group
+                            span.input-group-addon
+                                i.fa.fa-envelope-o
+                            input.form-control.input-lg(type='email', required=true, name='developerEmail', placeholder='Enter your developer\'s email')
+                            input(type="hidden", name="headerCode", id="headerCodeInput")
+                        .error-message 
+                .modal-footer.row
+                    .col-xs-12
+                        button.btn-lightBg.btn.btn-block.btn-lg(id="sendCodeSubmit", type='submit') Send
 
 //- Alert wrapper
 div.detectap-alert.text-center#apdetect

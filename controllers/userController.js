@@ -96,19 +96,16 @@ router
 			});
 	})
     .post('/sendCode', function (req, res) {
-		var headerCode = req.body.headerCode;
-
-		mailConfig.to = req.body.developerEmail;
-		mailConfig.subject = 'AdPushup Header Snippet';
-
-		var mailHeader = 'Hi\nPlease find below the code snippet for your AdPushup setup. Please paste this into <head> part of your page - \n\n',
-			mailFooter = '\n\nThanks,\nTeam AdPushup\n';
-
-		mailConfig.text = mailHeader + headerCode + mailFooter;
-
-		mailer.send(function (err) {
-			!err ? res.send({ success: 1 }) : res.send({ success: 0 });
-		});
+		var json = {
+			email: req.body.developerEmail,
+			code: req.body.headerCode
+		};
+		userModel.sendCodeToDev(json).then(function() {
+				res.send({success: 1});
+			})
+			.catch(function(e) {
+				res.send({success: 0});		
+			});
 	})
     .get('/billing', function(req, res) {
         res.render('billing', {

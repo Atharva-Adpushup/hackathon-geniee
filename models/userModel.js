@@ -301,6 +301,20 @@ function apiModule() {
 					}
 				});
 		},
+		sendCodeToDev: function(json) {
+			var mailer = new Mailer(Config.email, 'html'),
+			mailHeader = 'Hi, <br/> Please find below the code snippet for your AdPushup setup. Paste this into the <strong>&lt;head&gt;</strong> section of your page - \n\n',
+				mailFooter = '<br/><br/>Thanks,<br/>Team AdPushup',
+				headerCode = json.code;
+
+				headerCode = headerCode.replace(/</g, '&lt;');
+				headerCode = headerCode.replace(/>/g, '&gt;');
+
+				var content = mailHeader + '<div style="background-color: #eaeaea; padding: 20px; margin-top: 10px;">'+headerCode+'</div>' + mailFooter,
+				obj = { to: json.email, subject: 'AdPushup Header Snippet', html: content };
+			
+			return mailer.send(obj);
+		},
 		forgotPassword: function(json) {
 			return FormValidator.validate(json, schema.user.validations)
 				.then(API.getUserByEmail.bind(null, json.email))

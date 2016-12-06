@@ -194,8 +194,12 @@ $onboardingBg: url('../images/adpushupbg.png');
     border-top-right-radius: 0;
     border-bottom-left-radius: 0;
     word-spacing: 2px;
-    width: 150px;
+    width: 200px;
     background-color: $whiteColor;
+
+    &:not(:last-child) {
+      margin-right: 10px;
+    }
 
     i {
       margin-left: 4px;
