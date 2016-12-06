@@ -152,11 +152,10 @@ router
 		else {
 			channelModel.createPageGroup(json)
 				.then(function(data) {
-
 					// Reset session on addition of new pagegroup for non-partner
 					var userSites = req.session.user.sites,
 						site = _.find(userSites, {'siteId': parseInt(json.siteId)});
-						site.pageGroups.push(data.channelName);
+					site.pageGroups.push(data.channelName);
 					
 					var index = _.findIndex(userSites, {'siteId': parseInt(json.siteId)});
 					req.session.user.sites[index] = site;
@@ -208,20 +207,39 @@ router
 	.post('/pagegroup/delete', function (req, res) {
 		var json = req.body;
 
-		// Validate input params and delete pagegroup
-		return FormValidator.validate(json, schema.api.validations)
-			.then(function () { return channelModel.deletePagegroupById(json.pageGroupId) })
-			.then(function (data) {
-				return res.status(200).send({ success: true });
-			})
-			.catch(function (err) {
-				if (err.name !== 'AdPushupError') {
-					return res.status(500).send({ success: false, message: 'Some error occurred' });
-				}
+		if(req.session.user.userType === 'partner') {
+			// Validate input params and delete pagegroup
+			return FormValidator.validate(json, schema.api.validations)
+				.then(function () { return channelModel.deletePagegroupById(json.pageGroupId) })
+				.then(function (data) {
+					return res.status(200).send({ success: true });
+				})
+				.catch(function (err) {
+					if (err.name !== 'AdPushupError') {
+						return res.status(500).send({ success: false, message: 'Some error occurred' });
+					}
 
-				var error = err.message[0];
-				return res.status(error.status).send({ success: false, message: error.message });
-			});
+					var error = err.message[0];
+					return res.status(error.status).send({ success: false, message: error.message });
+				});
+		}
+		else {			
+			channelModel.deletePagegroupById(json.pageGroupId)
+				.then(function() {
+					// Reset session on deletion of new pagegroup for non-partner
+					var userSites = req.session.user.sites,
+						site = _.find(userSites, {'siteId': parseInt(json.siteId)}),
+						index = _.findIndex(userSites, {'siteId': parseInt(json.siteId)})
+					site.pageGroups.splice(index, 1);
+						
+					req.session.user.sites[index].pageGroups = site.pageGroups;
+					
+					return res.send({ success: true });
+				})
+				.catch(function() {
+					return res.send({ success: false });
+				});
+		}
 	});
 
 module.exports = router;

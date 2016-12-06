@@ -894,9 +894,16 @@ maxHeightWidth {
     .table-wrapper-paddded table tbody a {
       color: #444; }
 
+.table-actions button,
 .table-actions a {
   font-size: 1.2em;
-  color: #444;
+  color: #444; }
+
+.table-actions button {
+  background: none;
+  border: none; }
+
+.table-actions a {
   cursor: pointer;
   text-decoration: none; }
   .table-actions a:not(:last-child) {

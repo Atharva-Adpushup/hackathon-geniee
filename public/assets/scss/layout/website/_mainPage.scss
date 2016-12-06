@@ -85,9 +85,18 @@
 }
 
 .table-actions {
+  button,
   a {
     font-size: 1.2em;
     color: $ADREPrimaryBorder;
+  }
+
+  button {
+    background: none;
+    border: none;  
+  }
+
+  a {
     cursor: pointer;
     text-decoration: none;
 
