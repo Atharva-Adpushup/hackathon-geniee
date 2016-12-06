@@ -376,6 +376,9 @@ $('document').ready(function() {
                         }
                     });
                 }
+                else {
+                    ap.apAlert('Some error occurred! Please try again later.', '#apdetect', 'error', 'slideDown');
+                }
             }
         };
         ap.onboarding.showIntro();
