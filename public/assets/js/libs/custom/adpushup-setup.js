@@ -74,9 +74,13 @@ $('document').ready(function() {
 
                 // Set appropriate cms detection check
                 if (step >= 2) {
+                    var defaultSiteCms = currentUser.sites[0].cmsInfo.cmsName;
                     this.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + this.domanize(newSite.addedSite.domain) + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
-                    currentUser.sites[0].cmsInfo.cmsName === '' ? $('#platformVerificationContent').html(this.templates.otherPlatformVerification) : $('#platformVerificationContent').html(this.templates.wordpressPlatformVerification);
+                    defaultSiteCms === '' ? $('#platformVerificationContent').html(this.templates.otherPlatformVerification) : $('#platformVerificationContent').html(this.templates.wordpressPlatformVerification);
                     this.generateInitCode(newSite.addedSite.siteId);
+
+                    var cmsSelect = defaultSiteCms === '' ? '<button class="apbtn-main ob-bigbtn cms-added" disabled> Other <i class="fa fa-check"></i> </button>' : '<button class="apbtn-main ob-bigbtn cms-added" disabled> <i class="fa fa-wordpress"></i> Wordpress <i class="fa fa-check"></i> </button>';
+                    $('#cms-res').html('<p class="text-medium text-center"> Website platform selected - </p><div class="row" style="margin-top: -20px;"> <div class="col-sm-4 col-sm-offset-4">'+cmsSelect+'</div></div>');
                 }
 
                 // Set ticks for all other steps in UI
