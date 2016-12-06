@@ -66,7 +66,9 @@ router
             
             setEmailCookie(req, res);
 
-            if((parseInt(req.session.user.pageviewRange.split('-')[0]) >= 15000 && _.includes(req.session.user.adNetworks, 'Adsense')) || req.session.isSuperUser) {
+            var qualifyDeal = (parseInt(req.session.user.pageviewRange.split('-')[0]) >= 15000 || parseInt(req.session.user.pageviewRange.split('-')[0]) == 200);
+ 			
+            if((qualifyDeal && _.includes(req.session.user.adNetworks, 'Adsense')) || req.session.isSuperUser) {
 				res.render('dashboard', {
 					validSites: sites,
 					unSavedSite: unSavedSite,
