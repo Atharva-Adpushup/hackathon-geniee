@@ -5,7 +5,17 @@ var express = require('express'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
-	router = express.Router();
+	router = express.Router(),
+	apConfigsConst = {
+		modes:{
+        	DRAFT: 2,
+             PUBLISH: 1
+         },
+		displayMethod:{
+             ASYNC: 2,
+             SYNC: 1
+         }
+ 	};
 
 router
 	.get('/getData', function(req, res) {
@@ -38,7 +48,20 @@ router
 				'step': parseInt(data.step),
  				'ads': [],
  				'channels': [],
- 				'templates': []
+ 				'templates': [],
+				 'apConfigs': {
+ 	                'engineRequestTimeout': 4000,
+ 	                'xpathWaitTimeout': 5000,
+ 	                'mode': apConfigsConst.modes.DRAFT,
+ 	                'adpushupPercentage': 90,
+ 	                'displayMethod': apConfigsConst.displayMethod.ASYNC,
+ 	                'explicitPlatform': true,
+ 	                'blocklist': [],
+ 	                'adRecover' : {
+ 	                    'mode': apConfigsConst.modes.DRAFT,
+ 	                    'pageGroupPattern': []
+ 	                }
+ 	            }
 			};
 			
 			return siteData;
