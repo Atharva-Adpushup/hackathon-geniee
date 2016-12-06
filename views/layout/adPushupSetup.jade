@@ -74,12 +74,8 @@ div.detectap-alert.text-center#apdetect
             .row
                 .col-sm-4.col-sm-offset-4
                     button(id="adsenseoauth", class="apbtn-main apbtn-icon")
-                        if validSites[0].step <= 3
-                            i.fa.fa-google
-                            | Connect Google AdSense            
-                        else
-                            | Google AdSense Connected 
-                            i.fa.fa-check
+                        i.fa.fa-google
+                        | Connect Google AdSense            
 
     //- Grant adsense non-admin access
     .onboarding-step#step4

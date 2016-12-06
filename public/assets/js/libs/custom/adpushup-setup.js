@@ -49,7 +49,7 @@ $('document').ready(function() {
 
             // Check for CMS detection step in onboarding flow
             checkCmsStep: function(step) {
-                this.manipulateElem('#cms-text', 'Please wait while we detect your website platform...', 'htmlFadeIn', 600);
+                this.manipulateElem('#cms-text', 'Please wait while we detect your website\'s platform...', 'htmlFadeIn', 600);
                 this.detectCms(newSite.addedSite.domain);
             },
 
@@ -60,8 +60,8 @@ $('document').ready(function() {
 
                 // Set appropriate cms detection check
                 if (step >= 2) {
-                    this.generateInitCode(newSite.addedSite.siteId);
                     currentUser.sites[0].cmsInfo.cmsName === '' ? $('#platformVerificationContent').html(this.templates.otherPlatformVerification) : $('#platformVerificationContent').html(this.templates.wordpressPlatformVerification);
+                    this.generateInitCode(newSite.addedSite.siteId);
                 }
 
                 // Set ticks for all other steps in UI
@@ -71,6 +71,9 @@ $('document').ready(function() {
                 if (step > 2) {
                     $('#apCheck').html('Verified <i class="fa fa-check"></i>');
                     $('#wp-plugin-link').html('<i class="fa fa-wordpress"></i> Plugin installed <i class="fa fa-check"></i>');
+                }
+                if (step >= 4) {
+                    $('#adsenseoauth').html('Google Adsense Connected <i class="fa fa-check"></i>');
                 }
 
                 switch (step) {
@@ -130,9 +133,9 @@ $('document').ready(function() {
                         }, function(response) {
                             if (response.success) {
                                 if (cmsName !== 'wordpress') {
-                                    ob.generateInitCode(newSite.addedSite.siteId);
                                     btn.html('Other <i class="fa fa-check"></i>').prop('disabled', true);
                                     $('#platformVerificationContent').html(ob.templates.otherPlatformVerification);
+                                    ob.generateInitCode(newSite.addedSite.siteId);
                                 } else {
                                     btn.html('<i class="fa fa-wordpress"></i> Wordpress <i class="fa fa-check"></i>').prop('disabled', true);
                                     $('#platformVerificationContent').html(ob.templates.wordpressPlatformVerification);
@@ -225,7 +228,7 @@ $('document').ready(function() {
         });
 
         // Tigger to copy init code to clipboard
-        $('#clipboardCopy, #header-code').click(function() {
+        $('#clipboardCopy, #header-code').on('click', function() {
             ap.onboarding.copyInitCode();
         });
 
