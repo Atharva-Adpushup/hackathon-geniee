@@ -1,37 +1,60 @@
-extends  layout/base
-block append headScripts
-    +loadAsset("js", [
-        '/assets/js/libs/third-party/d3.js',
-        '/assets/js/libs/third-party/c3.js',
-        '/assets/js/libs/third-party/dataTables.js',
-        '/assets/js/libs/third-party/dataTablesColReorder.js',
-        '/assets/js/reports/dataVisualization.js',
-        '/assets/js/reports/reports.js'
-    ])
+//- Dashboard template
 
-    +loadAsset("css", [
-        '/assets/css/c3.css',
-        '/assets/css/dataTables.css'
-    ])
+extends  layout/base
 
 block getTitle
     - var titleVar = "DashBoard"
 
-block bodyContent
-    // Alert Template text content computation
-    - noSitePresentAlertStr = "Lets Add <span class='mR-5 label label--custom'>";
-    - origUnSavedDomain = (unSavedSite) ? unSavedSite[0].domain : null;
-    - domanizedUrl = (origUnSavedDomain) ? utils.domanize(origUnSavedDomain) : null;
-    - noSitePresentAlertStr += (domanizedUrl && domanizedUrl.length > 0) ? domanizedUrl : "one";
-    - alertTemplateStr = "<div class='u-cursor-pointer alert-content-wrapper' id='alert--noSitePresent' data-site='" + origUnSavedDomain + "' data-toggle='modal' data-target='#addSite'>No site present. <h2 class='u-margin-t5px alert-heading'>" + noSitePresentAlertStr +"</span>?</h2></div> ";
+//- Load AdPushup setup script if there is no valid site
+block append headScripts
+    if validSites.length === 0
 
+        - unSavedSiteId = (unSavedSite) ? unSavedSite[0].siteId : null;
+        - step = 1;
+        - origUnSavedDomain = (unSavedSite) ? unSavedSite[0].domain : null;
+        - domanizedUrl = (origUnSavedDomain) ? utils.domanize(origUnSavedDomain) : null;
+
+        //- Setup Adpushup site addition config
+        script.
+            $('document').ready(function() {
+                adpushup.newSite = {
+                    viewObjects: {
+                        domanizedUrl: '!{domanizedUrl}',
+                        unSavedSiteId: '!{unSavedSiteId}',
+                        origUnSavedDomain: '!{origUnSavedDomain}'
+                    },
+                    totalSteps: 3,
+                    defaultStep: '!{step}',
+                    addOtherSite: false
+                };
+            });
+
+        +loadAsset("js", [
+            '/assets/js/libs/custom/adpushup-setup.js',
+        ]) 
+    else 
+        +loadAsset("js", [
+            '/assets/js/libs/third-party/d3.js',
+            '/assets/js/libs/third-party/c3.js',
+            '/assets/js/libs/third-party/dataTables.js',
+            '/assets/js/libs/third-party/dataTablesColReorder.js',
+            '/assets/js/reports/dataVisualization.js',
+            '/assets/js/reports/reports.js'
+        ])
+
+        +loadAsset("css", [
+            '/assets/css/c3.css',
+            '/assets/css/dataTables.css'
+        ])   
+
+block bodyContent
+    
     include layout/sideBar
     .pageContainer.page-container
         include layout/header
         // Page Content Starts Here
         .pageContentWrapper.page-content
             .pageContentInner.page-content--inner
-
                     .notification-wrapper
                     // Control v/s Adpushp Starts here
                     #widgetsArea.row
@@ -118,8 +141,7 @@ block bodyContent
                                                         |  one to access the visual editor.
 
                         else
-                            script(type='text/javascript').
-                                adpushup.alert("!{alertTemplateStr}", "#widgetsArea", 1);
+                            include layout/adPushupSetup
     
     script(type="text/javascript").
         analytics.page('App-dashboard', intercomObj);

@@ -1,0 +1,122 @@
+//- Template for adding a new site 
+
+- link = domanized ? '- '+domanized : '';
+- noSitePresentAlertStr = (domanizedUrl && domanizedUrl.length > 0) ? domanizedUrl : "one";
+- addSiteTemplateStr = "<div id='alert--noSitePresent' data-site='" + origUnSavedDomain + "' data-toggle='modal' data-target=''><button id='addUserSite' class='btn-st apbtn-main'>Want to add <span style='cursor: pointer;'>" + noSitePresentAlertStr +" ?</span></button></div> ";
+
+//- Alert wrapper
+div.detectar-alert.text-center#ardetect
+
+//- Send Code to Developer Modal
+#sendToDevModal.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+    .modal-dialog
+        .modal-content
+            .modal-header
+                button.close(type='button', data-dismiss='modal', aria-label='Close')
+                    span(aria-hidden='true') ×
+                h4#myModalLabel.modal-title Send Code to Developer
+            form.form-inline#sendCodeForm
+                .modal-body.addSite
+                    .form-group
+                        .input-group
+                            span.input-group-addon
+                                i.fa.fa-envelope-o
+                            input.form-control.input-lg(type='email', required=true, name='developerEmail', placeholder='Enter your developer\'s email')
+                            input(type="hidden", name="headerCode", id="headerCodeInput")
+                        .error-message 
+                .modal-footer.row
+                    .col-xs-12
+                        button.btn-lightBg.btn.btn-block.btn-lg(id="sendCodeSubmit", type='submit') Send
+
+ //- Onboarding steps 
+.onboarding-wrapper
+
+    //- Add a website
+    .onboarding-step#step1 
+        span(class="counter-icon")
+            | 1 
+        h3(class="ob-heading")
+            | Add a Site 
+            span.link !{link } 
+            i#step1-check.fa
+        div(class="ob-content")
+            div#addSiteStr
+                != addSiteTemplateStr
+                a.site-add-alt Or start with another website
+            div#addSiteAlt
+                form(id="addSiteAltForm")
+                    div(class="row add-site-alt-form")
+                        div(class="col-sm-8 no-pad")
+                            input(name="site", class="input-box", type="url", placeholder="Enter Website URL" required)
+                        div(class="col-sm-2")
+                            button(type="submit", class="apbtn-main")
+                                    | Add Site
+                        div(class="col-sm-2 no-pad")
+                            button(id="siteAltCancel", type="reset", class="apbtn-danger-line")
+                                | Cancel
+
+    //- Setup measure/monetize
+    .onboarding-step#step2
+        span(class="counter-icon")
+            | 2
+        h3(class="ob-heading")
+            | Select preference 
+            i#step2-check.fa
+        div(class="ob-content")
+            form.sm-form-wrapper#preference-form
+                .row
+                    .col-sm-1
+                        label(class="radio-label")
+                            input(type="radio" name="preference" value="2" checked="true")
+                            div(class="radio-indicator")
+                    .col-sm-11
+                        h2.ob-subheading Monetize & Measure
+                        p.text-medium 
+                            | Monetize & Measure your AdBlocked traffic using compliant ad layouts.
+                .row
+                    .col-sm-1
+                        label(class="radio-label")
+                            input(type="radio" name="preference" value="1")
+                            div(class="radio-indicator")
+                    .col-sm-11
+                        h2.ob-subheading Measure only
+                        p.text-medium
+                            | Measure your exact AdBlocked inventory.
+                button(class="apbtn-main btn-complete-setup")
+                    | Proceed to next step                      
+    
+    //- Add Adrecover and trigger detection
+    .onboarding-step#step3
+        span(class="counter-icon")
+            | 3
+        h3(class="ob-heading")
+            | Add AdRecover to your Website 
+            i#step3-check.fa
+        div(class="ob-content")
+            p.text-medium
+                | Copy and paste this snippet in the &lt;HEAD&gt; section of your website
+            div.snippet-wrapper
+                span.clipboard-copy
+                    | Copied !
+                button(data-toggle="modal" data-target="#sendToDevModal" id="sendToDev", class="snippet-btn snippet-dev apbtn-main-line apbtn-small")
+                    | Send code to developer
+                    i.fa.fa-code
+                button(id="clipboardCopy", class="snippet-btn apbtn-main-line apbtn-small")
+                    | Copy to clipboard 
+                    i.fa.fa-clipboard
+                textarea(class="snippet", id="header-code", readonly)
+
+            div.error-message.detectar-error
+                p
+                    | Please make sure that the header code is present on the the specified URL
+                p 
+                    | If you have added the header code to a different URL please add it below - 
+                .row
+                    form#addUpdatedUrl
+                        .col-sm-6.col-sm-offset-2
+                            input(required, id="updatedUrl" type="url", class="input-box", placeholder="Enter Website URL here", name="updatedUrl")
+                        .col-sm-2.no-pad
+                            button(type="submit", class="apbtn-main-line", id="addUpdatedUrlBtn") Add
+                div#detectarError
+            button(id="completeSetup", class="apbtn-main btn-complete-setup")
+                | Verify                                             

@@ -1,4 +1,6 @@
 @import "helpers/variables";
+@import "helpers/components";
+@import "helpers/animations";
 @import "base/reset";
 @import "layout/website/reset";
 @import "helpers/mixins";
@@ -9,6 +11,7 @@
 @import "helpers/function";
 @import "layout/website/leftNavBar";
 @import "layout/website/mainPage";
+@import "layout/website/onboarding";
 @import "layout/website/topFixedBar";
 @import "helpers/website/dropdownIcon";
 @import "layout/website/controlVsAdpushup";

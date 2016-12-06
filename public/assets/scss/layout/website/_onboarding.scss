@@ -1,0 +1,235 @@
+// User onboarding component styles
+
+%card {
+  border-radius: 4px;
+  padding: 20px;
+}
+
+%shadow {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), -1px 0 0 rgba(0, 0, 0, 0.03), 1px 0 0 rgba(0, 0, 0, 0.03), 0 1px 0 rgba(0, 0, 0, 0.12);
+}
+
+.onboarding-wrapper {
+  width: 70%;
+  margin: 20px auto;
+}
+
+.onboarding-step {
+  position: relative;
+  background-color: $whiteColor;
+  @extend %card, %shadow;
+  margin-bottom: 80px;
+
+  .fa-check-circle {
+    color: $primaryColorDark;
+  }
+}
+
+.page-grp-text {
+  display: none;
+}
+
+.counter-icon {
+  position: absolute;
+  top: -8px;
+  left: -15px;
+  height: 44px;
+  width: 44px;
+  background-color: $whiteColor;
+  color: $fontColor;
+  font-size: 2.4em;
+  text-align: center;
+  border-radius: 50%;
+  font-weight: 700;
+  border: 2px solid $primaryColor;
+  @extend %shadow;
+}
+
+.pageContainer .pageContentWrapper .pageContentInner .row .ob-heading {
+  font-size: 2em;
+}
+
+.ob-heading {
+  font-weight: 400;
+  color: $fontColor;
+  border-bottom: 1px solid lighten($fontColor, 20%);
+  padding: 0 0 8px 20px;
+
+  .link {
+    font-size: .8em;
+    margin-right: 5px;
+    color: $primaryColorDark;
+  }
+}
+
+.text-medium {
+  color: $fontColor;
+  font-size: 1.2em;
+  margin: 30px 0 20px;
+  line-height: 24px;
+}
+
+.pagegroup-input {
+  margin-top: 30px;
+}
+
+.btn-st {
+  margin: 30px auto 20px;
+  display: block;
+  text-align: center;
+  font-weight: 400;
+  font-size: 1.25em;
+  width: 45%;
+  word-spacing: 2px;
+}
+
+
+.text-appear {
+  @extend .btn-st;
+  width: 100%;
+  font-size: 1.45em;
+
+  span {
+    color: $primaryColor;
+    border-bottom: 2px solid $primaryColor;
+    text-transform: uppercase;
+    margin-right: 2px;
+  }
+}
+
+.snippet {
+  font-family: $codeFont;
+  background: $codeBg;
+  height: 210px;
+  font-size: 1.2em;
+  color: $fontColor;
+  line-height: 22px;
+}
+
+.btn-complete-setup {
+  margin: 30px auto 10px;
+  display: block;
+  width: 200px;
+}
+
+.no-pad {
+  padding: 0;
+}
+
+.site-add-alt {
+  display: block;
+  text-align: center;
+  font-weight: 400;
+  font-size: 1.15em;
+  cursor: pointer;
+  width: 30%;
+  margin: 0 auto;
+}
+
+.add-site-alt-form {
+  margin: 30px auto 20px;
+}
+
+.pagegroup-actions {
+  border-top: 1px solid $lightGrey;
+  padding-top: 20px;
+  margin: 40px 0 0;
+}
+
+.ob-content {
+    display: none;
+}
+
+.pagegroup-err {
+  color: $primaryRed;
+  display: none;
+  font-size: 1.15em;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.pagegroup-container {
+  border-top: 1px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.pagegroup-name, .pagegroup-url {
+  font-size: 1.2em;
+  margin: 10px 0;
+  font-weight: 400;
+}
+
+.pagegroup-name {
+  color: $primaryColor;
+  border-right: 1px solid $lightGrey;
+}
+
+.snippet-wrapper {
+  position: relative;
+
+  .snippet-btn {
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    word-spacing: 2px;
+    width: 150px;
+    background-color: $whiteColor;
+
+    i {
+      margin-left: 4px;
+    }
+  }
+
+  .snippet-dev {
+    width: 200px;
+    right: 160px;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 2px;
+  }
+
+  .clipboard-copy {
+    position: absolute;
+    bottom: 40px;
+    right: 0;
+    width: 140px;
+    display: none;
+    text-align: center;
+    font-size: 1.1em;
+    color: $fontColor;
+  }
+}
+
+.detectar-alert {
+  position: fixed;
+  top: 60px;
+  left: 220px;
+  width: calc(100% - 220px);
+  display: none;
+}
+
+.error-message.detectar-error {
+  padding: 0;
+  text-align: center;
+  margin-top: 20px;
+  display: none;
+
+  p {
+      margin: 8px 0 20px;
+      font-size: 1.15em;
+  }
+}
+
+.ob-subheading {
+  font-size: 1.45em;
+  color: $primaryColorDark;
+}
+
+.ob-subheading + .text-medium {
+  margin: 8px 0 20px;
+}
+
+
+
+
