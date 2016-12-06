@@ -282,6 +282,20 @@ function apiModule() {
 				return Promise.resolve(pageGroups);
 			});
 		},
+		setCms: function(siteId, cmsName) {
+			return API.getSiteById(siteId)
+				.then(function(site) {
+					var cmsInfo = {
+						cmsName: cmsName,
+						pageGroups: []
+					};
+					site.set('cmsInfo', cmsInfo);
+					return site.save();
+				})
+				.catch(function(err) {
+					throw new AdPushupError('Cannot set cms');
+				});
+		},
 		saveSiteData: function (siteId, requestMethod, siteData) {
 			return API.getSiteById(siteId, requestMethod).then(function (site) {
 				site.setAll(siteData);

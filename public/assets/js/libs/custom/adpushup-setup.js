@@ -36,14 +36,32 @@ $('document').ready(function() {
             $.get('/proxy/detectCms?site='+site, {}, function(res) {
                 $('#cms-text').html('We have auto detected and selected this for you.');
 
-                $('#ob-loader').fadeOut();
+                $('#ob-loader').remove();
                 if(!res.wordpress && !res.ap) {
-                    $('#cms-res').html('<div clas="row"><div class="col-sm-4 col-sm-offset-2"><button class="apbtn-main-line ob-bigbtn"><i class="fa fa-wordpress"></i> Wordpress</button> </div><div class="col-sm-4"><button class="apbtn-main ob-bigbtn">Other</button> </div></div>');
+                    $('#cms-res').hide().html('<div class="row"><div class="col-sm-4 col-sm-offset-2"><button class="apbtn-main-line ob-bigbtn" id="setCms" data-cms-name="wordpress"><i class="fa fa-wordpress"></i> Wordpress</button> </div><div class="col-sm-4"><button class="apbtn-main ob-bigbtn" id="setCms" data-cms-name="">Other</button> </div></div>').fadeIn();
                 }
                 else if(res.wordpress) {
 
                 }
                 
+            });
+        };
+    
+        // Function to set website platform
+        newSite.setCms = function(cmsName, siteId, btn) {
+            btn.html('Saving...').prop('disabled', true);
+            $.post('/data/saveCms', {
+                cmsName: cmsName,
+                siteId: siteId
+            }, function(res) {
+                if(res.success) {
+
+                    // Go to next step
+                    newSite.nextStep(3, 2, 1000);
+                }
+                else {
+                    alert('Some error occurred! Please try again later.');
+                }
             });
         };
 
@@ -62,7 +80,7 @@ $('document').ready(function() {
             switch(to) {
                 case 2:
                     ap.showLoader('#ob-loader', 'ob-loader');
-                    $('#cms-text').html('Please wait while we inspect your website.');
+                    $('#cms-text').html('Please wait while we inspect your website...');
                     this.detectCms(this.viewObjects.origUnSavedDomain);
                     break;
             }
@@ -276,6 +294,13 @@ $('document').ready(function() {
         $('#completeSetup').click(function() {
             $(this).html('Verifying...').prop('disabled', true);
             newSite.detectAdRecover(newSite.addedSite.domain);
+        });
+
+        // Trigger to set cms
+        $(document).on('click', '#setCms', function(){ 
+            var btn = $(this),
+                cms = btn.attr('data-cms-name');
+            newSite.setCms(cms, newSite.viewObjects.unSavedSiteId, btn);
         });
 
         // Add updated url

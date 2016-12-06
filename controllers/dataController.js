@@ -47,6 +47,15 @@ router
 			res.send({success: 0});
 		});
 	})
+	.post('/saveCms', function(req, res) {
+		siteModel.setCms(parseInt(req.body.siteId), req.body.cmsName)
+			.then(function() {
+				res.send({success: 1});
+			})
+			.catch(function(err) {
+				res.send({success: 0});
+			});
+	})
 	.get('/getPageGroupVariationRPM', function(req, res) {
 		var channelName = req.query.channelName,
 			siteId = req.query.siteId,
