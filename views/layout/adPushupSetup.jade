@@ -42,18 +42,18 @@ div.detectap-alert.text-center#apdetect
         div(class="ob-content")
             div#addSiteStr
                 != addSiteTemplateStr
-                a.site-add-alt Or start with another website
-            div#addSiteAlt
-                form(id="addSiteAltForm")
-                    div(class="row add-site-alt-form")
-                        div(class="col-sm-8 no-pad")
-                            input(name="site", class="input-box", type="url", placeholder="Enter Website URL" required)
-                        div(class="col-sm-2")
-                            button(type="submit", class="apbtn-main")
-                                    | Add Site
-                        div(class="col-sm-2 no-pad")
-                            button(id="siteAltCancel", type="reset", class="apbtn-danger-line")
-                                | Cancel                 
+            //-     a.site-add-alt Or start with another website
+            //- div#addSiteAlt
+            //-     form(id="addSiteAltForm")
+            //-         div(class="row add-site-alt-form")
+            //-             div(class="col-sm-8 no-pad")
+            //-                 input(name="site", class="input-box", type="url", placeholder="Enter Website URL" required)
+            //-             div(class="col-sm-2")
+            //-                 button(type="submit", class="apbtn-main")
+            //-                         | Add Site
+            //-             div(class="col-sm-2 no-pad")
+            //-                 button(id="siteAltCancel", type="reset", class="apbtn-danger-line")
+            //-                     | Cancel                 
     
     //- CMS detection
     .onboarding-step.no-pad.ob-reset#step2

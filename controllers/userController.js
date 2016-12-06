@@ -66,10 +66,20 @@ router
             setEmailCookie(req, res);
             res.render('dashboard', {
                 validSites: sites,
-                unSavedSite: unSavedSite
+                unSavedSite: unSavedSite,
+                hasStep: sites.length ? ('step' in sites[0] ? true : false) : false
             });
         });
     })
+    .post('/setSiteStep', function(req, res) {
+		siteModel.setSiteStep(req.body.siteId, req.body.step)
+			.then(function() {
+				res.send({success: 1});
+			})
+			.catch(function() {
+				res.send({success: 0});
+			});
+	})
     .post('/sendCode', function (req, res) {
 		var headerCode = req.body.headerCode;
 

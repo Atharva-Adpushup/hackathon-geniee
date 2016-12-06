@@ -37,7 +37,11 @@ router
 				'ownerEmail': req.session.user.email,
 				'step': parseInt(data.step)
 			};
-			return siteData;
+			
+			return userModel.addSite(req.session.user.email, data.site).spread(function(user, siteId) {
+				req.session.user = user;
+				return siteData;
+			});
 		})
 		.then(siteModel.saveSiteData.bind(null, siteId, 'POST'))
 		.then(function() {
