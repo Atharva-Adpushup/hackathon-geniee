@@ -54,6 +54,21 @@ div.detectap-alert.text-center#apdetect
             p.text-medium.text-center#cms-text 
             #cms-res
 
+            if !unSavedSite && validSites[0].cmsInfo
+                p.text-medium.text-center
+                    | Website platform selected -
+                .row(style="margin-top: -20px;")
+                    .col-sm-4.col-sm-offset-4
+                        if validSites[0].cmsInfo.cmsName == 'wordpress'
+                            button.apbtn-main.ob-bigbtn.cms-added(disabled)
+                                i.fa.fa-wordpress
+                                | Wordpress
+                                i.fa.fa-check
+                        else
+                            button.apbtn-main.ob-bigbtn.cms-added(disabled)
+                                | Other
+                                i.fa.fa-check
+
             //-     a.site-add-alt Or start with another website
             //- div#addSiteAlt
             //-     form(id="addSiteAltForm")

@@ -81,7 +81,7 @@ $('document').ready(function() {
                 }
 
                 // Generate header code step if all other steps are complete
-                if(parseInt(step) === newSite.totalSteps || parseInt(step) === 3) {
+                if(parseInt(step) === newSite.totalSteps || parseInt(step) === 2) {
                     this.generateInitCode(newSite.addedSite.siteId);
                 }
             },
@@ -142,11 +142,11 @@ $('document').ready(function() {
 
                             $.post('/user/setSiteStep', {
                                 siteId: newSite.addedSite.siteId,
-                                step: 3
+                                step: 2
                             }, function(response) {
                                 if(response.success) {
                                     ob.generateInitCode(newSite.addedSite.siteId);
-                                    ob.nextStep(3, 2, 1000);
+                                    ob.nextStep(2, 1, 1000);
                                 }
                                 else {
                                     alert('Some error occurred!');
