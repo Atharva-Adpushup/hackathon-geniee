@@ -66,41 +66,14 @@ div.detectap-alert.text-center#apdetect
             //-             div(class="col-sm-2 no-pad")
             //-                 button(id="siteAltCancel", type="reset", class="apbtn-danger-line")
             //-                     | Cancel                 
-    
-    //- CMS detection
-    .onboarding-step.no-pad.ob-reset#step2
+
+    //- Adpushup detection
+    .onboarding-step.ob-apver#step2
         span(class="counter-icon")
             | 2
         h3(class="ob-heading")
-            | Detect Website Platform 
+            | Install and verify Adpushup on your website 
             i#step2-check.fa
-        div(class="ob-content")
-            p.text-medium.text-center
-                |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos?
-            //- p.text-medium.text-center#cms-text
-            #ob-loader
-            //- #cms-res
-
-            if !unSavedSite && validSites[0].cmsInfo
-                .row
-                    .col-sm-4.col-sm-offset-4
-                        if validSites[0].cmsInfo.cmsName == 'wordpress'
-                            button.apbtn-main.ob-bigbtn.cms-added(disabled)
-                                i.fa.fa-wordpress
-                                | Wordpress
-                                i.fa.fa-check
-                        else
-                            button.apbtn-main.ob-bigbtn.cms-added(disabled)
-                                | Other
-                                i.fa.fa-check
-
-    //- Adpushup detection
-    .onboarding-step.ob-apver#step3
-        span(class="counter-icon")
-            | 3
-        h3(class="ob-heading")
-            | Verify Adpushup on your website 
-            i#step3-check.fa
         div(class="ob-content")
             p.text-medium.text-center
                 |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis.
@@ -144,12 +117,12 @@ div.detectap-alert.text-center#apdetect
                                 i.fa.fa-check
 
     //- Grant adsense oauth access
-    .onboarding-step#step4
+    .onboarding-step#step3
         span(class="counter-icon")
-            | 4
+            | 3
         h3(class="ob-heading")
             | Connect Adsense Account
-            i#step4-check.fa
+            i#step3-check.fa
         div(class="ob-content")
             p.text-medium.text-center
                |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos?

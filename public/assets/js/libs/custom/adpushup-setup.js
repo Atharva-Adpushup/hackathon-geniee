@@ -49,8 +49,6 @@ $('document').ready(function() {
                 var ob = this;
 
                 $.get('/proxy/detectCms?site='+site, {}, function(res) {
-                    ob.manipulateElem('.ob-reset', 'ob-bg', 'class');
-                    $('#ob-loader').remove();
                     ob.manipulateElem('#cms-text', 'We have auto detected and selected this for you -', 'html')
                     ob.manipulateElem('#cms-res', ob.templates.cmsSelection, 'htmlFadeIn', 600);
                 });
@@ -65,8 +63,6 @@ $('document').ready(function() {
 
             // Check for CMS detection step in onboarding flow
             checkCmsStep: function(step) {
-                ap.showLoader('#ob-loader', 'ob-loader');
-                $('#step'+step).addClass('no-bgimg');
                 this.manipulateElem('#cms-text', 'Please wait while we inspect your website...', 'htmlFadeIn', 600);
                 this.detectCms(newSite.addedSite.domain);
             },
@@ -75,17 +71,8 @@ $('document').ready(function() {
             showStep: function(step) {
                 this.manipulateElem('#step' + step, 'active-step', 'class');
 
-                var ob = this;
-                if(step != 1) {
-                    $(window).on('load', function() {
-                        setTimeout(function() {ob.scrollTo(step, 120, 600);}, 500); 
-                    });
-                }
-
-                switch(parseInt(step)) {
-                    case 2:
-                        this.checkCmsStep(step);
-                        break;
+                if(step == 1 && newSite.addedSite) {
+                    this.checkCmsStep();
                 }
 
                 // Set ticks for all other steps in UI
@@ -110,23 +97,17 @@ $('document').ready(function() {
 
                     ob.scrollTo(to, 120, 600);
                 }, duration);
-
-                switch(to) {
-                    case 2:
-                        this.checkCmsStep();
-                        break;
-                }
             },
 
             // Add a new site 
             addSite: function(site, url, btn) {
                 var ob = this;
 
-                $(btn).html('Adding '+site+'...').prop('disabled', true);
+                $(btn).html('Adding '+site+' ...').prop('disabled', true);
                 $.post('/data/saveSite', {
                     site: url,
                     siteId: newSite.viewObjects.unSavedSiteId,
-                    step: 2
+                    step: 1
                 }, function(res) {
                     if(res.success) {
                         newSite.addedSite = {
@@ -139,7 +120,6 @@ $('document').ready(function() {
                         ob.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + site + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
 
                         ob.checkCmsStep();
-                        //ob.nextStep(2, 1, 1000);
                     }
                     else {
                         ap.apAlert('Some error occurred!', '#apdetect', 'error', 'slideDown');
