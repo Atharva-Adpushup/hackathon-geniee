@@ -36,7 +36,7 @@ div.detectap-alert.text-center#apdetect
         span(class="counter-icon")
             | 1 
         h3(class="ob-heading")
-            | Add a Site 
+            | Add your site 
             span.link !{link } 
             i#step1-check.fa
         div(class="ob-content")
@@ -51,6 +51,9 @@ div.detectap-alert.text-center#apdetect
                         span
                             != utils.domanize(validSites[0].domain) 
                         |  has been Added!
+            p.text-medium.text-center#cms-text 
+            #cms-res
+
             //-     a.site-add-alt Or start with another website
             //- div#addSiteAlt
             //-     form(id="addSiteAltForm")
@@ -74,9 +77,9 @@ div.detectap-alert.text-center#apdetect
         div(class="ob-content")
             p.text-medium.text-center
                 |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos?
-            p.text-medium.text-center#cms-text
+            //- p.text-medium.text-center#cms-text
             #ob-loader
-            #cms-res
+            //- #cms-res
 
             if !unSavedSite && validSites[0].cmsInfo
                 .row

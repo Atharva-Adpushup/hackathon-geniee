@@ -51,7 +51,7 @@ $('document').ready(function() {
                 $.get('/proxy/detectCms?site='+site, {}, function(res) {
                     ob.manipulateElem('.ob-reset', 'ob-bg', 'class');
                     $('#ob-loader').remove();
-                    ob.manipulateElem('#cms-text', 'We have auto detected and selected this for you.', 'html')
+                    ob.manipulateElem('#cms-text', 'We have auto detected and selected this for you -', 'html')
                     ob.manipulateElem('#cms-res', ob.templates.cmsSelection, 'htmlFadeIn', 600);
                 });
             },
@@ -67,7 +67,7 @@ $('document').ready(function() {
             checkCmsStep: function(step) {
                 ap.showLoader('#ob-loader', 'ob-loader');
                 $('#step'+step).addClass('no-bgimg');
-                this.manipulateElem('#cms-text', 'Please wait while we inspect your website...', 'html');
+                this.manipulateElem('#cms-text', 'Please wait while we inspect your website...', 'htmlFadeIn', 600);
                 this.detectCms(newSite.addedSite.domain);
             },
             
@@ -119,9 +119,10 @@ $('document').ready(function() {
             },
 
             // Add a new site 
-            addSite: function(site, url) {
+            addSite: function(site, url, btn) {
                 var ob = this;
 
+                $(btn).html('Adding '+site+'...').prop('disabled', true);
                 $.post('/data/saveSite', {
                     site: url,
                     siteId: newSite.viewObjects.unSavedSiteId,
@@ -135,9 +136,10 @@ $('document').ready(function() {
                         $('.add-site-alt-form').hide();
                         $('#addSiteStr').fadeIn();
 
-                        ob.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + site + '</span> has been Added!</h2>', 'html');
+                        ob.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + site + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
 
-                        ob.nextStep(2, 1, 1000);
+                        ob.checkCmsStep();
+                        //ob.nextStep(2, 1, 1000);
                     }
                     else {
                         ap.apAlert('Some error occurred!', '#apdetect', 'error', 'slideDown');
@@ -254,7 +256,7 @@ $('document').ready(function() {
             var userUnsavedSite = newSite.viewObjects.domanizedUrl,
                 userUnsavedSiteId = newSite.viewObjects.unSavedSiteId,
                 url = newSite.viewObjects.origUnSavedDomain;
-            ap.onboarding.addSite(userUnsavedSite, url);
+            ap.onboarding.addSite(userUnsavedSite, url, $(this));
         });
 
         // Trigger to set cms
