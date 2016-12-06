@@ -361,7 +361,21 @@ $('document').ready(function() {
 
             // Attach oauth post message hook
             oauthHook: function(event) {
-                console.log(event);
+                var adsense = JSON.parse(event.data),
+                    ob = this;
+                if(adsense.data) {
+                    $('#adsenseoauth').html('Google Adsense Connected '+ob.templates.checkIcon);
+                    $.post('/user/setSiteStep', {
+                        siteId: newSite.addedSite.siteId,
+                        step: 4
+                    }, function(response) {
+                        if (response.success) {
+                            ob.setupCompleteAlert();
+                        } else {
+                            alert('Some error occurred!');
+                        }
+                    });
+                }
             }
         };
         ap.onboarding.showIntro();
@@ -371,7 +385,7 @@ $('document').ready(function() {
 
 
         // OAuth post message hook trigger
-        window.addEventListener('message', ap.onboarding.oauthHook(), false);
+        window.addEventListener('message', ap.onboarding.oauthHook, false);
 
         // Trigger to add user's unsaved site
         $('#addUserSite').click(function(e) {
