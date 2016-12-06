@@ -117,7 +117,7 @@ textarea {
 
 .apalert-inverted {
 	@extend %alert;
-	background-color: rgba(0,0,0,.8);
+	background-color: rgba(0,0,0,.86);
 
 	.close {
 		color: $iconColor;

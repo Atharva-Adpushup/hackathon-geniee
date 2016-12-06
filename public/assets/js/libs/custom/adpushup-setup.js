@@ -32,7 +32,8 @@ $('document').ready(function() {
         newSite.showStep(newSite.defaultStep);
 
         // Function to detect CMS type
-        var cmsSelectors = '<div class="row"><div class="col-sm-4 col-sm-offset-2"><button class="apbtn-main-line ob-bigbtn" id="setCms" data-cms-name="wordpress"><i class="fa fa-wordpress"></i> Wordpress</button> </div><div class="col-sm-4"><button class="apbtn-main ob-bigbtn" id="setCms" data-cms-name="">Other</button> </div></div>';
+        var cmsWp = '<button class="apbtn-main-line ob-bigbtn" id="setCms" data-cms-name="wordpress"><i class="fa fa-wordpress"></i> Wordpress</button>'
+        var cmsOther = '<button class="apbtn-main ob-bigbtn" id="setCms" data-cms-name="">Other</button>';
 
         newSite.detectCms = function(site) {
             $.get('/proxy/detectCms?site='+site, {}, function(res) {
@@ -40,37 +41,36 @@ $('document').ready(function() {
 
                 $('#ob-loader').remove();
                 if(!res.wordpress && !res.ap) {
-                    $('#cms-res').hide().html(cmsSelectors).fadeIn();
+                    $('#cms-res').hide().html('<div class="row"><div class="col-sm-4 col-sm-offset-2">'+cmsWp+'</div><div class="col-sm-4">'+cmsOther+'</div></div>').fadeIn();
                 }
                 else if(res.wordpress) {
-
+                    $('#cms-res').hide().html('<div class="row"><div class="col-sm-4 col-sm-offset-4">'+cmsWp+'</div></div>').fadeIn();
                 }
-                
             });
         };
     
         // Function to set website platform
         newSite.setCms = function(cmsName, siteId, btn) {
-            if(cmsName !== 'wordpress') {
-                btn.html('Saving...').prop('disabled', true);
-                $.post('/data/saveCms', {
-                    cmsName: cmsName,
-                    siteId: siteId
-                }, function(res) {
-                    if(res.success) {
-                        // Go to next step
+            btn.html('Saving...').prop('disabled', true);
+            $.post('/data/saveCms', {
+                cmsName: cmsName,
+                siteId: siteId
+            }, function(res) {
+                if(res.success) {
+                    if(cmsName !== 'wordpress') {
                         newSite.nextStep(3, 2, 1000);
                     }
                     else {
-                        alert('Some error occurred! Please try again later.');
+                        $('#cms-text').html('Please install the AdPushup JavaScript snippet via our Wordpress Plugin.');
+                        var wpPluginHtml = '<div class="row"><div class="col-sm-4 col-sm-offset-4"><a href="https://wordpress.org/plugins/adpushup/" target="_blank" class="apbtn-main-line ob-bigbtn"><i class="fa fa-wordpress"></i> Install Plugin</a></div></div><p class="text-medium-nm text-center">After you install plugin, please configure Site ID - <strong>'+newSite.viewObjects.unSavedSiteId+'</strong> by going to <strong>Wordpress</strong> > <strong>Settings</strong> > <strong>Adpushup Settings</strong></p><div class="row"><div class="col-sm-4 col-sm-offset-4"><button id="wpCheck" class="apbtn-main">I\'ve done this</button></div></div>';
+                        $('#cms-res').hide().html(wpPluginHtml).fadeIn();
                     }
-                });
-            }
-            else {
-                $('#cms-text').html('Please install the AdPushup JavaScript snippet via our Wordpress Plugin.');
-                var wpPluginHtml = '<div class="row"><div class="col-sm-4 col-sm-offset-4"><a href="https://wordpress.org/plugins/adpushup/" target="_blank" class="apbtn-main-line ob-bigbtn"><i class="fa fa-wordpress"></i> Install Plugin</a></div></div><p class="text-medium-nm text-center">After you install plugin, please configure Site ID - <strong>'+newSite.viewObjects.unSavedSiteId+'</strong> by going to <strong>Wordpress</strong> > <strong>Settings</strong> > <strong>Adpushup Settings</strong></p><div class="row"><div class="col-sm-4 col-sm-offset-4"><button id="wpCheck" class="apbtn-main">I\'ve done this</button></div></div>';
-                $('#cms-res').hide().html(wpPluginHtml).fadeIn();
-            }
+                    
+                }
+                else {
+                    alert('Some error occurred! Please try again later.');
+                }
+            });
         };
 
         // Function to traverse to next step
@@ -89,7 +89,7 @@ $('document').ready(function() {
                 case 2:
                     ap.showLoader('#ob-loader', 'ob-loader');
                     $('#cms-text').html('Please wait while we inspect your website...');
-                    this.detectCms(this.viewObjects.origUnSavedDomain);
+                    this.detectCms(newSite.addedSite.domain);
                     break;
             }
         };
@@ -161,7 +161,7 @@ $('document').ready(function() {
         };
 
         // Function to detect Adpushup on added website
-        newSite.detectAp = function(addedSite, el) {
+        newSite.detectAp = function(addedSite, el, cms) {
             $.get('/proxy/detectap', {
                 'url': addedSite
             }, function(res) {
@@ -177,6 +177,16 @@ $('document').ready(function() {
                             // }, function(response) {
                             //     if(response.success) {
                                     ap.apAlert('AdPushup has been successfully detected on the website!', '#apdetect', 'success', 'slideDown');
+
+                                    if(window.selectedCms === 'wordpress') {
+                                        $('#step3-check').addClass('fa-check-circle zoomIn');
+                                        newSite.nextStep(4, 2, 1000);
+                                    }
+                                    else {
+                                        newSite.nextStep(4, 3, 1000);
+                                    }
+                                    
+                                   
                                    
                             //         $('#completeSetup').html('Setup Complete! <div>Our advisors will get in touch with you soon. <br/> You can also contact us at <a href="mailto:contact@adrecover.com">contact@adrecover.com</a></div><a class="arbtn-main" style="font-size: 1em;" href="/user/dashboard">Go to Dashboard</a>').prop('disabled', true).css('opacity', 1).addClass('btn-setup-complete');
                             //         $('#step'+ newSite.totalSteps + '-check').addClass('fa-check-circle zoomIn');
@@ -297,7 +307,8 @@ $('document').ready(function() {
         $(document).on('click', '#setCms', function(){ 
             var btn = $(this),
                 cms = btn.attr('data-cms-name');
-            newSite.setCms(cms, newSite.viewObjects.unSavedSiteId, btn);
+                window.selectedCms = cms;
+            newSite.setCms(cms, newSite.addedSite.siteId, btn);
         });
 
         // Add updated url
