@@ -17,6 +17,18 @@ var express = require('express'),
              SYNC: 1
          }
  	},
+	adNetworks = [{
+      'name': 'ADSENSE',
+      'displayType': 'BANNER',
+      'revenueType': 'CPC',
+      'maxAdsToDisplay': 3,
+      'supportedSizes': [
+        {
+          'layoutType': 'CUSTOM',
+          'sizes': []
+        }
+      ]
+    }],
 	 audiences = [{
  		'name': 'Default',
  		'rootCondition': {
@@ -82,7 +94,8 @@ router
  	                    'pageGroupPattern': []
  	                },
  	            },
-				'audiences': audiences
+				'audiences': audiences,
+				'adNetworks': adNetworks
 			};
 			
 			return siteData;
