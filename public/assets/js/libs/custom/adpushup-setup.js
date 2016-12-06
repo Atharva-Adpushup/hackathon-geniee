@@ -94,7 +94,7 @@ $('document').ready(function() {
             checkCmsStep: function(step) {
                 var ob = this;
                 ob.manipulateElem('#cms-text', 'Please wait while we detect your website\'s platform... <div class="loader-bounce"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>', 'htmlFadeIn', 600);
-                setTimeout(function(){ob.detectCms(newSite.addedSite.domain);}, 3000);
+                ob.detectCms(newSite.addedSite.domain);
             },
 
             // Right trim method
