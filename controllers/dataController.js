@@ -35,7 +35,7 @@ router
 				'siteDomain': data.site,
 				'siteId': siteId,
 				'ownerEmail': req.session.user.email,
-				'step': data.step
+				'step': parseInt(data.step)
 			};
 			return siteData;
 		})

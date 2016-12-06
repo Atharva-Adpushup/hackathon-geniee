@@ -23,7 +23,8 @@ var model = require('../helpers/model'),
 			'partner',
 			'genieeMediaId',
 			'dateCreated',
-			'dateModified'
+			'dateModified',
+			'step'
 		];
 		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'adNetworks', 'actions', 'audiences', 'channels', 'cmsInfo', 'templates', 'apConfigs', 'partner', 'genieeMediaId'];
 		this.validations = {
@@ -238,6 +239,16 @@ function apiModule() {
 					}
 					return site.save();
 				})
+		},
+		getSetupStep: function(siteId) {
+			return API.getSiteById(siteId)
+				.then(function(site) {
+					var step = site.get('step');
+					return step;
+				})
+				.catch(function(err) {
+					throw new AdPushupError('Cannot get setup step');
+				});
 		},
 		getSitePageGroups: function (siteId) {
 			return API.getSiteById(parseInt(siteId))

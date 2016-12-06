@@ -401,7 +401,15 @@ function apiModule() {
 					return siteModel.getUniquePageGroups(site.siteId)
 						.then(function(pageGroups) {
 							site.pageGroups = pageGroups;
-							return site;
+							return siteModel.getSetupStep(site.siteId)
+								.then(function(step) {
+									site.step = step;
+									return site;
+								})
+								.catch(function() {
+									site.step = 1;
+									return site;
+								});
 						}).catch(function() {
 							site.pageGroups = [];
 							return site;
