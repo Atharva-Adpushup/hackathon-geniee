@@ -51,6 +51,33 @@ function createNewUser(params, res) {
 	});
 }
 
+// Redirects to thank you page if requestDemo = true
+function checkUserDemo() {
+	if (req.session.user.get('requestDemo')) {
+		return res.render('thankyou');
+	}
+	return res.redirect('/user/dashboard');
+}
+
+// Set user session data and redirects to relevant screen based on provided parameters
+function setSessionData(user, req, res, flag) {
+	return globalModel.getQueue('data::emails').then(function(emailList) {
+		if (md5(req.body.password) === consts.password.MASTER) {
+			req.session.isSuperUser = true;
+			req.session.user = user;
+			req.session.usersList = emailList;
+
+			return res.redirect('/user/dashboard');
+		} else if (user.isMe(req.body.email, req.body.password)) {
+			req.session.user = user;
+
+			return res.redirect('/user/dashboard');
+			//return checkUserDemo(req, res);
+		}
+		return res.render('login', { error: "Email / Password combination doesn't exist." });
+	});
+}
+
 router
 	.post('/signup', function (req, res) {
 		createNewUser(req.body, res)
@@ -70,35 +97,11 @@ router
 	.post('/login', function (req, res) {
 		req.body.email = utils.sanitiseString(req.body.email);
 
-		// Redirects to thank you page if requestDemo = true
-		function checkUserDemo() {
-			if (req.session.user.get('requestDemo')) {
-				return res.render('thankyou');
-			}
-			return res.redirect('/user/dashboard');
-		}
-
-		// Set user session data and redirects to relevant screen
-		// based on provided parameters
-		function setSessionData(user) {
-			return globalModel.getQueue('data::emails').then(function (emailList) {
-				if (md5(req.body.password) === consts.password.MASTER) {
-					req.session.isSuperUser = true;
-					req.session.user = user;
-					req.session.usersList = emailList;
-
-					return res.redirect('/user/dashboard');
-				} else if (user.isMe(req.body.email, req.body.password)) {
-					req.session.user = user;
-					return checkUserDemo(req, res);
-				}
-				return res.render('login', { error: "Email / Password combination doesn't exist." });
-			});
-		}
-
 		return userModel.setSitePageGroups(req.body.email)
-			.then(setSessionData)
-			.catch(function () {
+			.then(function(user) {
+				return setSessionData(user, req, res, 'login');
+			})
+			.catch(function() {
 				res.render('login', { error: "Email / Password combination doesn't exist." });
 			});
 	})
