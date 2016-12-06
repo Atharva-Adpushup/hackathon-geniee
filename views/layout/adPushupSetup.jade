@@ -22,6 +22,25 @@
                     .col-sm-4.col-sm-offset-4
                         button.apbtn-main(type='button', data-dismiss='modal', aria-label='Close') Get Started
 
+//- Setup completion modal
+#completionmodal.modal._ap_modal.fade.intro-modal(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+    .modal-dialog
+        .modal-content
+            .pull-right
+                button.close(type='button', data-dismiss='modal', aria-label='Close')
+                    span(aria-hidden='true') ×
+            .text-center
+                h2 Your setup is complete!
+                p
+                    | Our advisors will get in touch with you soon.
+                img.img-responsive(src="/assets/images/completion_graphic.png")
+                p
+                    | You can also contact us at 
+                    a.link-primary(href="mailto:support@adpushup.com") support@adpushup.com
+                .row
+                    .col-sm-4.col-sm-offset-4
+                        button.apbtn-main(type='button', data-dismiss='modal', aria-label='Close') Done
+
 //- Send Code to Developer Modal
 #sendToDevModal.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
     .modal-dialog

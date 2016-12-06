@@ -26,7 +26,7 @@ $('document').ready(function() {
                 otherPlatformVerification: ' <p class="text-medium text-center" style="margin-top: -10px;">Copy and paste this snippet in the &lt;HEAD&gt; section of your website </p><div class="snippet-wrapper"> <span class="clipboard-copy"> Copied ! </span> <textarea class="snippet" id="header-code" readonly placeholder="AdPushup init code comes here.."></textarea> <div class="snippet-btn-wrapper"> <div><button data-toggle="modal" data-target="#sendToDevModal" id="sendToDev" class="snippet-btn apbtn-main-line apbtn-small"> Send Code to Developer <i class="fa fa-code"></i> </button> <button id="clipboardCopy" class="snippet-btn apbtn-main-line apbtn-small"> Copy to clipboard <i class="fa fa-clipboard"></i> </button> </div></div></div><div class="error-message detectap-error"> <p> Please make sure that the header code is present on the the specified URL </p><div id="detectapError"></div></div><div class="row"> <div class="col-sm-4 col-sm-offset-4"> <button id="apCheck" class="apbtn-main btn-vr btn-wpdt"> Verify </button> </div></div>',
                 wordpressPlatformVerification: '<p class="text-medium text-center">Please install the AdPushup JavaScript snippet via our Wordpress Plugin.</p><div class="row"><div class="col-sm-4 col-sm-offset-4"><a id="wp-plugin-link" href="https://wordpress.org/plugins/adpushup/" target="_blank" class="apbtn-main-line ob-bigbtn"><i class="fa fa-wordpress"></i> Install Plugin</a></div></div><p class="text-medium-nm text-center">After you install plugin, please configure Site ID - <strong>1</strong> by going to <strong>Wordpress</strong> &gt; <strong>Settings</strong> &gt; <strong>Adpushup Settings</strong></p><div class="row"><div class="col-sm-4 col-sm-offset-4"><button id="apCheck" class="apbtn-main apbtn-cmsver">I\'ve done this</button></div></div>',
                 addOtherSite: '<form id="addSiteAltForm"> <div class="row add-site-alt-form"> <div class="col-sm-8 col-sm-offset-2"> <input name="site" class="input-box" type="url" placeholder="Enter Website URL" required> </div><div class="col-sm-6 col-sm-offset-3"> <button type="submit" class="apbtn-main mT-10"> Add Site </button> </div></div></form>',
-                dashboardLink: '<div class="text-center mT-10"><a class="link-primary" href="/user/dashboard">Go to dashboard</a></div>'
+                dashboardLink: '<div class="text-center mT-10"><a style="font-size: 1.2em;" class="link-primary" href="/user/dashboard">Go to dashboard</a></div>'
             },
 
             // Set active cms button
@@ -50,7 +50,8 @@ $('document').ready(function() {
 
             // Setup complete alert
             setupCompleteAlert: function() {
-                ap.apAlert('Our advisors will get in touch with you soon. You can also contact us at <a href="mailto:support@adpushup.com">support@adpushup.com</a>', '#apdetect', 'success', 'slideDown');
+                $('#completionmodal').modal('show');
+                //ap.apAlert('Your setup is complete! Our advisors will get in touch with you soon. You can also contact us at <a href="mailto:support@adpushup.com">support@adpushup.com</a>', '#apdetect', 'success', 'slideDown');
             },
 
             // Smooth scrolling method
