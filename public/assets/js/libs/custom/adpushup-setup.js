@@ -362,15 +362,14 @@ $('document').ready(function() {
             // Attach oauth post message hook
             oauthHook: function(event) {
                 var adsense = JSON.parse(event.data),
-                    ob = this;
                 if(adsense.data) {
-                    $('#adsenseoauth').html('Google Adsense Connected '+ob.templates.checkIcon);
+                    $('#adsenseoauth').html('Google Adsense Connected '+ap.onboarding.templates.checkIcon);
                     $.post('/user/setSiteStep', {
                         siteId: newSite.addedSite.siteId,
                         step: 4
                     }, function(response) {
                         if (response.success) {
-                            ob.setupCompleteAlert();
+                            ap.onboarding.setupCompleteAlert();
                         } else {
                             alert('Some error occurred!');
                         }
