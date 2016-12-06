@@ -7,27 +7,6 @@
 //- Alert wrapper
 div.detectap-alert.text-center#apdetect
 
-//- Send Code to Developer Modal
-#sendToDevModal.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
-    .modal-dialog
-        .modal-content
-            .modal-header
-                button.close(type='button', data-dismiss='modal', aria-label='Close')
-                    span(aria-hidden='true') ×
-                h4#myModalLabel.modal-title Send Code to Developer
-            form.form-inline#sendCodeForm
-                .modal-body.addSite
-                    .form-group
-                        .input-group
-                            span.input-group-addon
-                                i.fa.fa-envelope-o
-                            input.form-control.input-lg(type='email', required=true, name='developerEmail', placeholder='Enter your developer\'s email')
-                            input(type="hidden", name="headerCode", id="headerCodeInput")
-                        .error-message 
-                .modal-footer.row
-                    .col-xs-12
-                        button.btn-lightBg.btn.btn-block.btn-lg(id="sendCodeSubmit", type='submit') Send
-
  //- Onboarding steps 
 .onboarding-wrapper
  
@@ -41,7 +20,7 @@ div.detectap-alert.text-center#apdetect
             i#step1-check.fa
         div(class="ob-content")
             p.text-medium.text-center
-                |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos? 
+                |  Let’s add your website here. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos? 
             if unSavedSite
                 div#addSiteStr
                     != addSiteTemplateStr
@@ -90,7 +69,7 @@ div.detectap-alert.text-center#apdetect
             i#step3-check.fa
         div(class="ob-content")
             p.text-medium.text-center
-               |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos?
+               |  Connecting your Google AdSense account will allow AdPushup to pull AdSense reports and generate more detailed reporting for comparison with AdPushup’s set-up.
             br
             .row
                 .col-sm-4.col-sm-offset-4
@@ -111,7 +90,7 @@ div.detectap-alert.text-center#apdetect
             i#step4-check.fa
         div(class="ob-content")
             p.text-medium.text-center
-               |  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos?
+               |  Access to your AdSense account will allow your dedicated AdPushup Success Manager to create and manage the ads on your website, as well as, authorize AdPushup to track the performance of the ad units ensuring optimized performance.
             br
             .row
                 .col-sm-4.col-sm-offset-4

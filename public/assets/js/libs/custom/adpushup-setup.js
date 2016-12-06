@@ -36,7 +36,7 @@ $('document').ready(function() {
             detectCms: function(site) {
                 var ob = this;
                 $.get('/proxy/detectCms?site=' + site, {}, function(res) {
-                    $('#cms-text').html('We have auto detected and selected this for you -')
+                    $('#cms-text').html('Please confirm your website’s platform -')
                     ob.manipulateElem('#cms-res', ob.templates.cmsSelection, 'htmlFadeIn', 600);
                 });
             },
@@ -49,7 +49,7 @@ $('document').ready(function() {
 
             // Check for CMS detection step in onboarding flow
             checkCmsStep: function(step) {
-                this.manipulateElem('#cms-text', 'Please wait while we inspect your website...', 'htmlFadeIn', 600);
+                this.manipulateElem('#cms-text', 'Please wait while we detect your website platform...', 'htmlFadeIn', 600);
                 this.detectCms(newSite.addedSite.domain);
             },
 
