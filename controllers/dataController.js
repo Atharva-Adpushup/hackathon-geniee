@@ -135,17 +135,6 @@ router
 			res.send({success: 0});
 		});
 	})
-	.post('/saveCms', function(req, res) {
-		var pageGroups = req.body.pageGroups ? req.body.pageGroups :  [];
-		
-		siteModel.setCms(parseInt(req.body.siteId), req.body.cmsName, pageGroups)
-			.then(function() {
-				res.send({success: 1});
-			})
-			.catch(function(err) {
-				res.send({success: 0});
-			});
-	})
 	.get('/getPageGroupVariationRPM', function(req, res) {
 		var channelName = req.query.channelName,
 			siteId = req.query.siteId,
