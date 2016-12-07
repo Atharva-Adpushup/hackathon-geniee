@@ -205,7 +205,7 @@ function apiModule() {
 			return API.getUserByEmail(email).then(function(user) {
 				return user.getSiteById(parseInt(siteId, 10)).then(function(site) {
 					if (site) {
-						return { user: user, site: site.data };
+						return { user: user, site: site };
 					}
 
 					throw new Error('Invalid Site');
