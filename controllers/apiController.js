@@ -174,7 +174,7 @@ router
 
 		// Validate input params and fetch pagegroup
 		return FormValidator.validate({ pageGroupId: pageGroupId }, schema.api.validations)
-			.then(function () { return channelModel.getPageGroupById(pageGroupId) })
+			.then(function () { return channelModel.getPageGroupById({id: pageGroupId, viewName: 'channelById'}) })
 			.then(function (data) {
 				res.status(200).send({ success: true, data: data });
 			})

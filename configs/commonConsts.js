@@ -16,7 +16,17 @@ module.exports = {
 	partners: {
 		geniee: {
 			email: 'geniee@adpushup.com',
-			name: 'geniee'
+			name: 'geniee',
+			oauth: {
+				CONSUMER_KEY: 'NDJiOGRmYTJmMGVhMzU1ZQ==',
+				CONSUMER_SECRET: 'MDc0N2MzMDYzYTQ2NDk5MDUzNzQ0YjIwMTJkY2UzZDA=',
+				SIGNATURE_METHOD: 'HMAC-SHA1',
+				VERSION: '1.0',
+				CONTENT_TYPE: 'application/json',
+				URL: {
+					"REPORTS": 'https://beta-aladdin.geniee.jp/beta2/aladdin/adpushup/report/'
+				}
+			}
 		}
 	},
 	user: {
