@@ -361,6 +361,12 @@ $('document').ready(function() {
 
             // Attach oauth post message hook
             oauthHook: function(event) {
+                try {
+                    JSON.parse(event.data);
+                }
+                catch(e) {
+                    return false;
+                }
                 var adsense = JSON.parse(event.data);
                 if(adsense.data) {
                     $("div[id^='step']").last().removeClass('active-step');

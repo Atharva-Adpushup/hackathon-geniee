@@ -26,13 +26,13 @@ block append headScripts
                     },
                     totalSteps: 4,
                     defaultStep: '!{step}',
-                    addOtherSite: true,
-                    showIntro: false
+                    addOtherSite: false,
+                    showIntro: true
                 };
             });
 
         +loadAsset("js", [
-            '/assets/js/build/adpushup-setup.min.js'
+            '/assets/js/libs/custom/adpushup-setup.js'
         ]) 
     else 
 
@@ -58,7 +58,7 @@ block append headScripts
                 });
 
             +loadAsset("js", [
-                '/assets/js/build/adpushup-setup.min.js'
+                '/assets/js/libs/custom/adpushup-setup.js'
             ]) 
 
         if (validSites[0].step == 4 && isSuperUser) || (!hasStep || !isSuperUser)
