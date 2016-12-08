@@ -27,6 +27,9 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 	function getMediaMetrics(data) {
 		var computedData = {
 			"click": 0,
+			"pageViews": 0,
+			"pageRPM": 0,
+			"pageCTR": 0,
 			"revenue": 0.0,
 			"ctr": 0.0
 		};
@@ -56,7 +59,16 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 			_.forEach(zonesArr, function(zoneObj, zoneKey) {
 				if (zoneObj.pageGroupId) {
 					if (!computedData.hasOwnProperty(zoneObj.pageGroupId) && !computedData[zoneObj.pageGroupId]) {
-						computedData[zoneObj.pageGroupId] = {'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, zones: []};
+						computedData[zoneObj.pageGroupId] = {
+							'click': 0,
+							'impression': 0,
+							'revenue': 0.0,
+							'ctr': 0.0,
+							zones: [],
+							"pageViews": 0,
+							"pageRPM": 0,
+							"pageCTR": 0
+						};
 
 						computedData[zoneObj.pageGroupId].click += Number(zoneObj.click);
 						computedData[zoneObj.pageGroupId].impression += Number(zoneObj.impression);
@@ -148,7 +160,7 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 
 		_.forOwn(pageGroupData, function(pageGroupObj, pageGroupKey) {
 			_.forOwn(pageGroupObj.variationData, function(variationObj, variationKey) {
-				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0 });
+				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, "pageViews": 0, "pageRPM": 0, "pageCTR": 0 });
 
 				_.forEach(variationObj.zones, function(zoneObj) {
 					computedData[pageGroupKey].variationData[variationKey].click += Number(zoneObj.click);
@@ -169,10 +181,106 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 		var computedData = extend(true, {}, pageGroupData);
 
 		_.forOwn(computedData, function(pageGroupObj, pageGroupKey) {
-			delete computedData[pageGroupKey].variations;
+			computedData[pageGroupKey].variations = extend(true, {}, computedData[pageGroupKey].variationData);
+			delete computedData[pageGroupKey].variationData;
 		});
 
 		return computedData;
+	}
+
+	function setVariationsTabularData(pageGroupData) {
+		var computedData = extend(true, {}, pageGroupData),
+			variationsTabularData = {
+				table: {
+					header: [' ', 'NAME', 'TRAFFIC DISTRIBUTION', 'REVENUE', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'REVENUE CONTRIBUTION (%)'],
+					rows: [],
+					footer: [' ', ' ', 0, 0, 0, 0, 0, 0, 0, 0]
+				}
+			};
+
+		_.forOwn(computedData, function(pageGroupObj, pageGroupKey) {
+			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
+				var rowItem = [];
+
+				rowItem[0] = ' ';
+				rowItem[1] = variationObj.name;
+				rowItem[2] = variationObj.trafficDistribution;
+				variationsTabularData.table.footer[2] += Number(variationObj.trafficDistribution);
+
+				rowItem[3] = variationObj.revenue;
+				variationsTabularData.table.footer[3] += Number(variationObj.revenue);
+				
+				rowItem[4] = variationObj.impression;
+				variationsTabularData.table.footer[4] += Number(variationObj.impression);
+				
+				rowItem[5] = variationObj.pageViews;
+				variationsTabularData.table.footer[5] += Number(variationObj.pageViews);
+				
+				rowItem[6] = variationObj.click;
+				variationsTabularData.table.footer[6] += Number(variationObj.click);
+				
+				rowItem[7] = variationObj.pageRPM;
+				variationsTabularData.table.footer[7] += Number(variationObj.pageRPM);
+				
+				rowItem[8] = variationObj.pageCTR;
+				variationsTabularData.table.footer[8] += Number(variationObj.pageCTR);
+				
+				rowItem[9] = Math.floor((variationObj.revenue / pageGroupObj.revenue) * 100);
+				variationsTabularData.table.footer[9] += Number(rowItem[9]);
+
+				variationsTabularData.table.rows.push(rowItem);
+			});
+
+			computedData[pageGroupKey].variations.data = extend(true, {}, variationsTabularData);
+		});
+
+		return computedData;
+	}
+
+	function setPageGroupsTabularData(data) {
+		var computedData = extend(true, {}, data),
+			pageGroupsTabularData = {
+				table: {
+					header: [' ', 'NAME', 'PLATFORM', 'REVENUE', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'NUMBER OF VARIATIONS'],
+					rows: [],
+					footer: [' ', ' ', ' ', 0, 0, 0, 0, 0, 0, 0]
+				}
+			};
+
+		_.forOwn(computedData.pageGroups, function(pageGroupObj, pageGroupKey) {
+			var rowItem = [];
+
+			rowItem[0] = ' ';
+			rowItem[1] = pageGroupObj.pageGroup;
+			rowItem[2] = pageGroupObj.device;
+
+			rowItem[3] = pageGroupObj.revenue;
+			pageGroupsTabularData.table.footer[3] += Number(pageGroupObj.revenue);
+
+			rowItem[4] = pageGroupObj.impression;
+			pageGroupsTabularData.table.footer[4] += Number(pageGroupObj.impression);
+			
+			rowItem[5] = pageGroupObj.pageViews;
+			pageGroupsTabularData.table.footer[5] += Number(pageGroupObj.pageViews);
+			
+			rowItem[6] = pageGroupObj.click;
+			pageGroupsTabularData.table.footer[6] += Number(pageGroupObj.click);
+			
+			rowItem[7] = pageGroupObj.pageRPM;
+			pageGroupsTabularData.table.footer[7] += Number(pageGroupObj.pageRPM);
+			
+			rowItem[8] = pageGroupObj.pageCTR;
+			pageGroupsTabularData.table.footer[8] += Number(pageGroupObj.pageCTR);
+			
+			rowItem[9] = _.keys(pageGroupObj.variationData).length;
+			pageGroupsTabularData.table.footer[9] += Number(rowItem[9]);
+
+			pageGroupsTabularData.table.rows.push(rowItem);
+		});
+
+		computedData.pageGroups.data = extend(true, {}, pageGroupsTabularData);
+
+		return Promise.resolve(computedData);
 	}
 
 	function getReportData(params) {
@@ -234,8 +342,14 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 					.then(getZoneVariations)
 					.then(setVariationMetrics)
 					.then(removeRedundantVariationsObj)
-					.then(function(updatedPageGroupData) {
-						return Promise.resolve({media: siteMetrics, pageGroups: updatedPageGroupData});
+					.then(setVariationsTabularData)
+					.then(function(computedDataWithoutRedundantVariationsObj) {
+						var computedData = {media: siteMetrics, pageGroups: computedDataWithoutRedundantVariationsObj};
+
+						return setPageGroupsTabularData(computedData)
+							.then(function(computedDataWithPageGroupsTabularData) {
+								return Promise.resolve(computedDataWithPageGroupsTabularData);
+							});
 					});
 			});
 	}
