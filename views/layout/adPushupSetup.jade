@@ -3,6 +3,8 @@
 - link = domanized ? '- '+domanized : '';
 - noSitePresentAlertStr = (domanizedUrl && domanizedUrl.length > 0) ? domanizedUrl : "one";
 - addSiteTemplateStr = "<div id='alert--noSitePresent' data-site='" + origUnSavedDomain + "' data-toggle='modal' data-target=''><button id='addUserSite' class='btn-st apbtn-main'>Lets add <span style='cursor: pointer;'>" + noSitePresentAlertStr +" ?</span></button></div> ";
+- pageGroups = [];
+
 
 //- Intro modal
 #intromodal.modal._ap_modal.fade.intro-modal(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
@@ -87,27 +89,62 @@ div.detectap-alert.text-center#apdetect
                     div#addSiteStr
 
             p.text-medium.text-center#cms-text 
-            #cms-res                
+            #cms-res       
 
-    //- Adpushup detection
-    .onboarding-step.ob-apver#step2
+    //- Pagegroup creation
+    .onboarding-step#step2
         span(class="counter-icon")
             | 2
         h3(class="ob-heading")
-            | Install and verify Adpushup on your website 
+            | Add Page Groups 
             i#step2-check.fa
+        div(class="ob-content")
+            p.text-medium.text-center
+                | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis.
+            form#pagegroup-form
+                .p(class="step-text page-grp-text")
+                    | Page Group is Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+                .row.pagegroup-input
+                    .col-sm-3
+                        input(name="pagegroupName", class="input-box", type="text", placeholder="Page Group Name" required)
+                    .col-sm-6
+                        input(name="sampleUrl" class="input-box", type="url", placeholder="Sample URL" required)
+                    .col-sm-3
+                        .styleSelect.ob-select
+                            select(required, name="device")
+                                option(value="") Select device
+                                option(value="desktop") Desktop
+                                option(value="tablet") Tablet
+                                option(value="mobile") Mobile
+                div.pagegroup-actions
+                    div.pagegroup-err#pagegroup-err
+                        | All page groups should be unique!
+                    .row
+                        .col-sm-3.col-sm-offset-3
+                            input#addPageGroup(type="button", class="apbtn-main-line", value="Add more")
+                        .col-sm-3
+                            button(class="apbtn-main", type="submit")
+                                | Create        
+
+    //- Adpushup detection
+    .onboarding-step.ob-apver#step3
+        span(class="counter-icon")
+            | 3
+        h3(class="ob-heading")
+            | Install and verify Adpushup on your website 
+            i#step3-check.fa
         div(class="ob-content")
             p.text-medium.text-center
                 | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis.
             #platformVerificationContent
 
     //- Grant adsense oauth access
-    .onboarding-step#step3
+    .onboarding-step#step4
         span(class="counter-icon")
-            | 3
+            | 4
         h3(class="ob-heading")
             | Connect Adsense Account 
-            i#step3-check.fa
+            i#step4-check.fa
         div(class="ob-content")
             p.text-medium.text-center
                |  Connecting your Google AdSense account will allow AdPushup to pull AdSense reports and generate more detailed reporting for comparison with AdPushup’s set-up.
