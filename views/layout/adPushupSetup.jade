@@ -39,7 +39,7 @@
                     a.link-primary(href="mailto:support@adpushup.com") support@adpushup.com
                 .row
                     .col-sm-4.col-sm-offset-4
-                        button.apbtn-main(type='button', data-dismiss='modal', aria-label='Close') Done
+                        a.apbtn-main(href="/user/dashboard", type='button', data-dismiss='modal', aria-label='Close') Go to Dashboard
 
 //- Send Code to Developer Modal
 #sendToDevModal.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
@@ -117,3 +117,7 @@ div.detectap-alert.text-center#apdetect
                     button(id="adsenseoauth", class="apbtn-main apbtn-icon")
                         i.fa.fa-google
                         | Connect Google AdSense            
+            .small.text-center.small-text#skipOauth Don't have an AdSense account ? 
+                a Skip 
+                | this step.
+            #dsBLink

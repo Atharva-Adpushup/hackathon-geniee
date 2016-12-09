@@ -416,6 +416,16 @@ $onboardingBg: url('../images/adpushupbg.png');
   }
 }
 
+.small-text {
+  font-size: 1em;
+  margin-top: 15px;
+
+  a {
+    color: $primaryColor;
+    text-decoration: underline;
+    cursor: pointer;
+  }  
+}
 
 
 

@@ -22,7 +22,8 @@ $('document').ready(function() {
                 checkIcon: '<i class="fa fa-check"></i>',
                 otherPlatformVerification: ' <p class="text-medium text-center" style="margin-top: -10px;">Copy and paste this snippet in the &lt;HEAD&gt; section of your website </p><div class="snippet-wrapper"> <span class="clipboard-copy"> Copied ! </span> <textarea class="snippet" id="header-code" readonly placeholder="AdPushup init code comes here.."></textarea> <div class="snippet-btn-wrapper"> <div><button data-toggle="modal" data-target="#sendToDevModal" id="sendToDev" class="snippet-btn apbtn-main-line apbtn-small"> Send Code to Developer <i class="fa fa-code"></i> </button> <button id="clipboardCopy" class="snippet-btn apbtn-main-line apbtn-small"> Copy to clipboard <i class="fa fa-clipboard"></i> </button> </div></div></div><div class="error-message detectap-error"> <p> Please make sure that the header code is present on the the specified URL </p><div id="detectapError"></div></div><div class="row"> <div class="col-sm-4 col-sm-offset-4"> <button id="apCheck" class="apbtn-main btn-vr btn-wpdt"> Verify </button> </div></div>',
                 addOtherSite: '<form id="addSiteAltForm"> <div class="row add-site-alt-form"> <div class="col-sm-8 col-sm-offset-2"> <input name="site" class="input-box" type="url" placeholder="Enter Website URL" required> </div><div class="col-sm-6 col-sm-offset-3"> <button type="submit" class="apbtn-main mT-10"> Add Site </button> </div></div></form>',
-                dashboardLink: '<div class="text-center mT-10"><a style="font-size: 1.2em;" class="link-primary" href="/user/dashboard">Go to dashboard</a></div>'            },
+                dashboardLink: '<div class="text-center" style="margin-top: 15px;"><a style="font-size: 1.2em;" class="link-primary" href="/user/dashboard">Go to dashboard</a></div>'
+            },
 
             // Method to enable element-level DOM manipulation
             manipulateElem: function(container, content, type, duration) {
@@ -36,7 +37,6 @@ $('document').ready(function() {
             // Setup complete alert
             setupCompleteAlert: function() {
                 $('#completionmodal').modal('show');
-                //ap.apAlert('Your setup is complete! Our advisors will get in touch with you soon. You can also contact us at <a href="mailto:support@adpushup.com">support@adpushup.com</a>', '#apdetect', 'success', 'slideDown');
             },
 
             // Smooth scrolling method
@@ -94,7 +94,6 @@ $('document').ready(function() {
 
                 switch (step) {
                     case 1:
-                    case 2:
                         $('#platformVerificationContent').html('<p class="text-center mT-10"><img class="platform-graphic" src="/assets/images/platform.png" width="150" height="150"/></p>');
                         break;
                     case 4:
@@ -282,7 +281,29 @@ $('document').ready(function() {
                 else {
                     ap.apAlert('Some error occurred! Please try again later.', '#apdetect', 'error', 'slideDown');
                 }
-            }
+            },
+
+            // Method to skip adsense oauth step
+            skipOauth: function() {
+                var ob = this;
+                setTimeout(function(){
+                    $('#adsenseoauth').prop('disabled', true);
+                    $('#skipOauth').hide();
+                    $('#dsBLink').html(ob.templates.dashboardLink);
+                }, 1000);
+                var ob = this;
+                $.post('/user/setSiteStep', {
+                    siteId: newSite.addedSite.siteId,
+                    step: 4,
+                    completeOnboarding: true
+                }, function(response) {
+                    if (response.success) {
+                        ob.setupCompleteAlert();
+                    } else {
+                        alert('Some error occurred!');
+                    }
+                });
+            }       
         };
         ap.onboarding.showIntro();
         ap.onboarding.showStep(newSite.defaultStep);
@@ -328,6 +349,11 @@ $('document').ready(function() {
             $('#headerCodeInput').val($('#header-code').val());
             var data = $(this).serialize();
             ap.onboarding.sendCodeToDev(data);
+        });
+
+        // Trigger to skip oauth
+        $('#skipOauth').on('click', function() {
+            ap.onboarding.skipOauth();
         });
 
         // Trigger to add another site

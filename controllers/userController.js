@@ -100,18 +100,19 @@ router
     })
     .post('/setSiteStep', function(req, res) {
 		siteModel.setSiteStep(req.body.siteId, req.body.step)
-			.then(function() {
-				return userModel.setSitePageGroups(req.session.user.email)
-					.then(function(user) {
-						req.session.user = user;
-						res.send({success: 1});
-					})
-					.catch(function() {
-						res.send({success: 0});
-					});
+			.then(function(){ return userModel.setSitePageGroups(req.session.user.email) })
+			.then(function(user) {
+			    req.session.user = user;
+
+                if(req.body.completeOnboarding) {
+                    user.set('requestDemo', false);
+                    user.save();
+                }
+
+                return res.send({success: 1});
 			})
 			.catch(function() {
-				res.send({success: 0});
+				return res.send({success: 0});
 			});
 	})
     .post('/sendCode', function (req, res) {
