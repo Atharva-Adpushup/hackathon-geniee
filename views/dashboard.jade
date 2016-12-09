@@ -24,7 +24,7 @@ block append headScripts
                         unSavedSiteId: '!{unSavedSiteId}',
                         origUnSavedDomain: '!{origUnSavedDomain}'
                     },
-                    totalSteps: 4,
+                    totalSteps: 3,
                     defaultStep: '!{step}',
                     addOtherSite: false,
                     showIntro: true
@@ -36,7 +36,7 @@ block append headScripts
         ]) 
     else 
 
-        if validSites[0].step <= 4
+        if validSites[0].step <= 3
         
             //- Setup Adpushup site addition config
             script.
@@ -51,7 +51,7 @@ block append headScripts
                             domain: '!{validSites[0].domain}',
                             siteId: '!{validSites[0].siteId}'
                         },
-                        totalSteps: 4,
+                        totalSteps: 3,
                         defaultStep: '!{validSites[0].step}',
                         addOtherSite: false
                     };
@@ -61,7 +61,7 @@ block append headScripts
                 '/assets/js/libs/custom/adpushup-setup.js'
             ]) 
 
-        if (validSites[0].step == 4 && isSuperUser) || (!hasStep || !isSuperUser)
+        if (validSites[0].step == 3 && isSuperUser) || (!hasStep || !isSuperUser)
             +loadAsset("js", [
                 '/assets/js/libs/third-party/d3.js',
                 '/assets/js/libs/third-party/c3.js',
@@ -91,7 +91,7 @@ block bodyContent
                         if validSites.length > 0
                             if isSuperUser
                                 if hasStep
-                                    if validSites[0].step >= 4
+                                    if validSites[0].step >= 3
                                         include layout/dashboardSites
                                     else
                                         include layout/adPushupSetup
@@ -100,7 +100,7 @@ block bodyContent
 
                             else
                                 if hasStep
-                                    if validSites[0].step >= 4 && !requestDemo
+                                    if validSites[0].step >= 3 && !requestDemo
                                         include layout/dashboardSites
                                     else 
                                         include layout/adPushupSetup

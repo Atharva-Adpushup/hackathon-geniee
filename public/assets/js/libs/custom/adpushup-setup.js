@@ -8,8 +8,6 @@ $('document').ready(function() {
 
         // Define onboarding sequence object
         ap.onboarding = {
-            detectedPagegroups: [],
-
             // Intro modal check
             showIntro: function() {
                 var showIntro = w.localStorage.getItem('showIntro');
@@ -24,9 +22,7 @@ $('document').ready(function() {
                 checkIcon: '<i class="fa fa-check"></i>',
                 otherPlatformVerification: ' <p class="text-medium text-center" style="margin-top: -10px;">Copy and paste this snippet in the &lt;HEAD&gt; section of your website </p><div class="snippet-wrapper"> <span class="clipboard-copy"> Copied ! </span> <textarea class="snippet" id="header-code" readonly placeholder="AdPushup init code comes here.."></textarea> <div class="snippet-btn-wrapper"> <div><button data-toggle="modal" data-target="#sendToDevModal" id="sendToDev" class="snippet-btn apbtn-main-line apbtn-small"> Send Code to Developer <i class="fa fa-code"></i> </button> <button id="clipboardCopy" class="snippet-btn apbtn-main-line apbtn-small"> Copy to clipboard <i class="fa fa-clipboard"></i> </button> </div></div></div><div class="error-message detectap-error"> <p> Please make sure that the header code is present on the the specified URL </p><div id="detectapError"></div></div><div class="row"> <div class="col-sm-4 col-sm-offset-4"> <button id="apCheck" class="apbtn-main btn-vr btn-wpdt"> Verify </button> </div></div>',
                 addOtherSite: '<form id="addSiteAltForm"> <div class="row add-site-alt-form"> <div class="col-sm-8 col-sm-offset-2"> <input name="site" class="input-box" type="url" placeholder="Enter Website URL" required> </div><div class="col-sm-6 col-sm-offset-3"> <button type="submit" class="apbtn-main mT-10"> Add Site </button> </div></div></form>',
-                dashboardLink: '<div class="text-center mT-10"><a style="font-size: 1.2em;" class="link-primary" href="/user/dashboard">Go to dashboard</a></div>',
-                addPageGroup: "<div class='col-sm-3'> <input name='pagegroupName' type='text' placeholder='Page Group Name' required='' class='input-box'> </div><div class='col-sm-6'> <input name='sampleUrl' type='url' placeholder='Sample URL' required='' class='input-box'> </div><div class='col-sm-2'><div class='styleSelect ob-select'><select required='' name='device'> <option value=''>Select device</option> <option value='desktop'>Desktop</option> <option value='tablet'>Tablet</option> <option value='mobile'>Mobile</option> </select></div></div><div class='col-sm-1'><input onclick='removePageGroup(this)' type='button' class='remove-pagegroup apbtn-danger' value='x' /></div>"
-            },
+                dashboardLink: '<div class="text-center mT-10"><a style="font-size: 1.2em;" class="link-primary" href="/user/dashboard">Go to dashboard</a></div>'            },
 
             // Method to enable element-level DOM manipulation
             manipulateElem: function(container, content, type, duration) {
@@ -91,7 +87,6 @@ $('document').ready(function() {
                 }
                 if (step > 2) {
                     $('#apCheck').html('Verified '+this.templates.checkIcon);
-                    $('#wp-plugin-link').html('<i class="fa fa-wordpress"></i> Plugin installed '+this.templates.checkIcon);
                 }
                 if (step >= 4) {
                     $('#adsenseoauth').html('Google Adsense Connected '+this.templates.checkIcon);
@@ -99,16 +94,12 @@ $('document').ready(function() {
 
                 switch (step) {
                     case 1:
-                        newSite.addedSite ? this.checkCmsStep() : '';
+                    case 2:
                         $('#platformVerificationContent').html('<p class="text-center mT-10"><img class="platform-graphic" src="/assets/images/platform.png" width="150" height="150"/></p>');
                         break;
                     case 4:
                         this.setupCompleteAlert();
                         break;
-                    // case 5:
-                    //     $('#adsensenonadmin').html('Setup Complete '+this.templates.checkIcon);
-                    //     this.setupCompleteAlert();
-                    //     break;
                 }
             },
 
@@ -140,7 +131,7 @@ $('document').ready(function() {
                         $('#addSiteStr').fadeIn();
                         ob.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + site + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
                         ob.nextStep(2, 1, 1000);
-                        //ob.apVerificationStep();
+                        ob.apVerificationStep();
                     } else {
                         ap.apAlert('Some error occurred! Please try again later.', '#apdetect', 'error', 'slideDown');
                         $(btn).html('Add ' + site + ' ?').prop('disabled', false);
@@ -337,65 +328,6 @@ $('document').ready(function() {
             $('#headerCodeInput').val($('#header-code').val());
             var data = $(this).serialize();
             ap.onboarding.sendCodeToDev(data);
-        });
-
-        // Add new pagegroup
-        function addPageGroup() {            
-            $('.pagegroup-input').last().after('<div class="row pagegroup-input">'+ap.onboarding.templates.addPageGroup+'</div>');
-        };
-        d.getElementById('addPageGroup').addEventListener('click', addPageGroup);
-
-        // Remove pagegroup 
-        w.removePageGroup = function(el) {
-            $(el).closest('.pagegroup-input').remove();
-             if($('.pagegroup-input').length === 1) {
-                $('#pagegroup-err').hide();
-            }
-        }
-
-        // Match input values in form
-        function matchValues(selector) {
-            var values = [] ;
-            $(selector+' input').each( function(id, val) { 
-                values.push($(val).val());
-            });
-            values.sort() ;
-            for(var k = 1; k < values.length; ++k) {
-                if(values[k] == values[k-1]) return false ;
-            }
-            return true;
-        }
-
-        // Create all pagegroups
-        var pageGroups = [];
-        $('#pagegroup-form').submit(function(e) {
-            e.preventDefault();
-
-            // Disable submit button
-            [].forEach.call($(this).find('input'), function(input) {
-                $(input).prop('disabled', true);
-            });
-            $('.pagegroup-actions button').html('Creating...').prop('disabled', true);
-
-            // Detect unique pagegroups
-            if(matchValues('#pagegroup-form')) {
-                // var data = $(this).serializeArray();
-
-                // // Converting pagegroup serialized array to json object
-                // for(var i = 0; i < data.length; i ++) {
-                //     if(data[i+1] !== undefined) {
-                //         data[i].name === 'pagegroupName' ? pageGroups.push({pageGroupName: data[i].value, sampleUrl: data[i+1].value}) : '';
-                //     }
-                // }
-                // //#{"pageGroups"} = pageGroups;
-                // $('#pageGroupHelp, #pagegroup-err').hide();
-
-                // // Goto next step
-                // nextStep('#step3', '#step2', 1000);
-            } else {
-                $('#pagegroup-err').fadeIn();
-                $('.pagegroup-actions button').html('Create').prop('disabled', false);
-            }
         });
 
         // Trigger to add another site

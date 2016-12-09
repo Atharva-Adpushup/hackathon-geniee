@@ -88,10 +88,6 @@ $onboardingBg: url('../images/adpushupbg.png');
   }
 }
 
-.pagegroup-input {
-  margin-top: 30px;
-}
-
 .btn-st {
   margin: 30px auto 20px;
   display: block;
@@ -307,7 +303,11 @@ $onboardingBg: url('../images/adpushupbg.png');
 }
 
 .pagegroup-input {
-  margin-top: 30px;
+  padding: 15px 0;
+  margin-left: -20px;
+  margin-right: -20px;
+  background-color: $mainBgColor;
+  box-shadow: inset 0 0 0 1px #eee;
 }
 
 .snippet-btn-wrapper {

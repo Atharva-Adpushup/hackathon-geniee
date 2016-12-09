@@ -1340,9 +1340,6 @@ maxHeightWidth {
     font-size: 1.05em;
     color: #000; }
 
-.pagegroup-input {
-  margin-top: 30px; }
-
 .btn-st, .text-appear {
   margin: 30px auto 20px;
   display: block;
@@ -1515,7 +1512,11 @@ maxHeightWidth {
   margin: 20px 0 0; }
 
 .pagegroup-input {
-  margin-top: 30px; }
+  padding: 15px 0;
+  margin-left: -20px;
+  margin-right: -20px;
+  background-color: #f6f7f8;
+  box-shadow: inset 0 0 0 1px #eee; }
 
 .snippet-btn-wrapper {
   position: relative;
