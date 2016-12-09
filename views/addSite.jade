@@ -3,7 +3,7 @@
 extends layout/base
 
 block getTitle
-	- var titleVar = "Add Site"
+	- var titleVar = "Add New Site"
 
 block append headScripts
 	- step = 1;
@@ -11,7 +11,7 @@ block append headScripts
 	script.
 		$('document').ready(function() {
 			adpushup.newSite = {
-				totalSteps: 4,
+				totalSteps: 3,
 				defaultStep: '!{step}',
 				addOtherSite: true,
 				showIntro: false
@@ -19,7 +19,7 @@ block append headScripts
 		});
 
 	+loadAsset("js", [
-		'/assets/js/build/adpushup-setup.min.js'
+		'/assets/js/libs/custom/adpushup-setup.js'
 	]) 
 
 block bodyContent

@@ -140,20 +140,35 @@ $('document').ready(function() {
 
             // Add a new site (default)
             addSite: function(site, url, btn) {
+                var ob = this;
                 $(btn).html('Adding ' + site + ' ...').prop('disabled', true);
                 if(newSite.addOtherSite) {
-                    var ob = this;
-                    $.post('/user/addSite', {
-                        site: url
-                    }, function(res) {
-                        if(res.success) {
-                            ob.saveSiteModel(site, url, res.siteId, btn);
+                    var siteAlreadyAdded = function() {
+                        for(var i in currentUser.sites) {
+                            if(currentUser.sites[i].domain === url+'/') {
+                                return true;
+                            }
                         }
-                        else {
-                            ap.apAlert('Some error occurred! Please try again later.', '#apdetect', 'error', 'slideDown');
-                            $(btn).html('Lets Add ' + site + ' ?').prop('disabled', false);
-                        }
-                    });
+                        return false;
+                    }
+
+                    if(siteAlreadyAdded()) {
+                        ap.apAlert(ob.domanize(url)+' has already been added! Please add a different site.', '#apdetect', 'inverted', 'slideDown');
+                        $(btn).html('Add Site').prop('disabled', false);
+                    }
+                    else {
+                        $.post('/user/addSite', {
+                            site: url
+                        }, function(res) {
+                            if(res.success) {
+                                ob.saveSiteModel(site, url, res.siteId, btn);
+                            }
+                            else {
+                                ap.apAlert('Some error occurred! Please try again later.', '#apdetect', 'error', 'slideDown');
+                                $(btn).html('Lets Add ' + site + ' ?').prop('disabled', false);
+                            }
+                        });
+                    }
                 }
                 else {
                     this.saveSiteModel(site, url, newSite.viewObjects.unSavedSiteId, btn);
