@@ -12,7 +12,7 @@ var $ = require('jquery'),
 			ad.isIncontent ? inContentAds.push(ad) : structuredAds.push(ad);
 			ad.network === 'geniee' && ad.networkData && genieeIds.push(ad.networkData.zoneId);
 		}
-		return { structuredAds: structuredAds, inContentAds: inContentAds, genieeIds };
+		return { structuredAds: structuredAds, inContentAds: inContentAds, genieeIds: genieeIds };
 	},
 	getContainer = function(ad, el) {
 		if (!el) {
