@@ -10,12 +10,12 @@ var Tracker = require('../libs/tracker'),
 	pageGroupTimer,
 	adp = (w.adpushup = w.adpushup || {}),
 	control = require('./control')(),
-	creationProcessStarted = false,
 	config = adp.config = require('../config/config.js'),
 	$ = adp.$ = require('jquery');
 
 // Extend adpushup object
 $.extend(adp, {
+	creationProcessStarted: false,
 	err: [],
 	control: control,
 	tracker: new Tracker(),
@@ -29,25 +29,35 @@ $.extend(adp.config, ___abpConfig___, {
 });
 
 
+function shouldWeNotProceed() {
+	return (config.disable || adp.creationProcessStarted || ((config.partner === 'geniee') && w.gnsmod && w.gnsmod.creationProcessStarted));
+}
+
 function triggerControl(mode) {
-	// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
-	if (config.disable || creationProcessStarted) {
+	if (shouldWeNotProceed()) {
 		return false;
 	}
-	creationProcessStarted = true;
-	control.trigger();
-	// TODO send feedback to server regarding control
-	utils.sendFeedback({ eventType: 3, mode: mode, referrer: config.referrer });
+	config.mode = mode;
+	if (config.partner === 'geniee') {
+		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
+			w.gnsmod.triggerAds();
+		}
+	} else {
+		adp.creationProcessStarted = true;
+		control.trigger();
+		// TODO send feedback to server regarding control
+		utils.sendFeedback({ eventType: 3, mode: mode, referrer: config.referrer });
+	}
 }
 
 function startCreation() {
 	// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
-	if (config.disable || creationProcessStarted || !config.pageGroup) {
+	if (shouldWeNotProceed() || !config.pageGroup) {
 		return false;
 	}
 	var selectedVariation = selectVariation(config);
 	if (selectedVariation) {
-		creationProcessStarted = true;
+		adp.creationProcessStarted = true;
 		clearTimeout(pageGroupTimer);
 		config.selectedVariation = selectedVariation.id;
 		createAds(adp, selectedVariation);
@@ -60,7 +70,7 @@ function main() {
 	// Hook Pagegroup, find pageGroup and check for blockList
 	hookAndInit(adp, startCreation);
 
-	if (config.disable  || creationProcessStarted) {
+	if (shouldWeNotProceed()) {
 		return false;
 	}
 
