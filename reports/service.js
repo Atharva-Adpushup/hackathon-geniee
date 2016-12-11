@@ -192,9 +192,9 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 		var computedData = extend(true, {}, pageGroupData),
 			variationsTabularData = {
 				table: {
-					header: [' ', 'NAME', 'TRAFFIC DISTRIBUTION', 'REVENUE', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'REVENUE CONTRIBUTION (%)'],
+					header: ['NAME', 'TRAFFIC DISTRIBUTION', 'REVENUE', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'REVENUE CONTRIBUTION (%)'],
 					rows: [],
-					footer: [' ', ' ', 0, 0, 0, 0, 0, 0, 0, 0]
+					footer: [' ', 0, 0, 0, 0, 0, 0, 0, 0]
 				}
 			};
 
@@ -202,31 +202,30 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
 				var rowItem = [];
 
-				rowItem[0] = ' ';
-				rowItem[1] = variationObj.name;
-				rowItem[2] = variationObj.trafficDistribution;
-				variationsTabularData.table.footer[2] += Number(variationObj.trafficDistribution);
+				rowItem[0] = variationObj.name;
+				rowItem[1] = variationObj.trafficDistribution;
+				variationsTabularData.table.footer[1] += Number(variationObj.trafficDistribution);
 
-				rowItem[3] = variationObj.revenue;
-				variationsTabularData.table.footer[3] += Number(variationObj.revenue);
+				rowItem[2] = variationObj.revenue;
+				variationsTabularData.table.footer[2] += Number(variationObj.revenue);
 				
-				rowItem[4] = variationObj.impression;
-				variationsTabularData.table.footer[4] += Number(variationObj.impression);
+				rowItem[3] = variationObj.impression;
+				variationsTabularData.table.footer[3] += Number(variationObj.impression);
 				
-				rowItem[5] = variationObj.pageViews;
-				variationsTabularData.table.footer[5] += Number(variationObj.pageViews);
+				rowItem[4] = variationObj.pageViews;
+				variationsTabularData.table.footer[4] += Number(variationObj.pageViews);
 				
-				rowItem[6] = variationObj.click;
-				variationsTabularData.table.footer[6] += Number(variationObj.click);
+				rowItem[5] = variationObj.click;
+				variationsTabularData.table.footer[5] += Number(variationObj.click);
 				
-				rowItem[7] = variationObj.pageRPM;
-				variationsTabularData.table.footer[7] += Number(variationObj.pageRPM);
+				rowItem[6] = variationObj.pageRPM;
+				variationsTabularData.table.footer[6] += Number(variationObj.pageRPM);
 				
-				rowItem[8] = variationObj.pageCTR;
-				variationsTabularData.table.footer[8] += Number(variationObj.pageCTR);
+				rowItem[7] = variationObj.pageCTR;
+				variationsTabularData.table.footer[7] += Number(variationObj.pageCTR);
 				
-				rowItem[9] = Math.floor((variationObj.revenue / pageGroupObj.revenue) * 100);
-				variationsTabularData.table.footer[9] += Number(rowItem[9]);
+				rowItem[8] = Math.floor((variationObj.revenue / pageGroupObj.revenue) * 100);
+				variationsTabularData.table.footer[8] += Number(rowItem[8]);
 
 				variationsTabularData.table.rows.push(rowItem);
 			});

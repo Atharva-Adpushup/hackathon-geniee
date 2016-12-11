@@ -3,10 +3,26 @@ extends  layout/base
 block getTitle
     - var titleVar = "Performance Report"
 
+block append headCss
+    +loadAsset("css", [
+        '/assets/css/dataTables.css',
+        '/assets/css/datepicker.css'
+    ])
+
+block append headScripts
+    +loadAsset("js", [
+        '/assets/js/libs/third-party/datepicker.js',
+        '/assets/js/libs/third-party/dataTables.js',
+        '/assets/js/libs/third-party/dataTablesColReorder.js'
+    ])
+
 block bodyContent
     include layout/sideBar
-    .pageContainer.page-container
+    .pageContainer.page-container.page-container--reports-geniee
         include layout/header
+
+        - reportingData = reportingData || {};
+        - siteId = siteId || '';
         // Page Content Starts Here
         .pageContentWrapper.page-content
             .pageContentInner.page-content--inner
@@ -18,30 +34,72 @@ block bodyContent
                             h3.title.m-All-0.clearfix 
                                 a Reporting and Analytics
 
+                            div(class="aligner aligner--row breadcrumb-wrapper u-margin-20px")
+                                div(class="col-xs-8 col-md-8 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
+                                    ol(class="breadcrumb js-reports-breadcrumb u-margin-0px")
+                                div(class="col-xs-4 col-md-4 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
+
+                            div(class="aligner aligner--row perf-panel-heading-wrapper")
+                                div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
+                                    h4 Performance
+                                div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
+                                    h5 Export as
+
+                            div(class="thumbnail-panel-group perf-panel-wrapper aligner aligner--row js-perf-header")
+                                div(class="thumbnail u-margin-0px u-padding-0px aligner-item js-thumbnail js-perf-header-revenue thumbnail--active")
+                                    div(class="panel u-margin-0px u-padding-0px")
+                                        div(class="panel-heading aligner aligner--row aligner--vCenter aligner--hCenter")
+                                            div(class="panel-title") REVENUE
+                                        div(class="panel-body aligner aligner--row aligner--vCenter aligner--hCenter js-panel-body")
+                                div(class="thumbnail u-margin-0px u-padding-0px aligner-item js-thumbnail js-perf-header-pageViews")
+                                    div(class="panel u-margin-0px u-padding-0px")
+                                        div(class="panel-heading aligner aligner--row aligner--vCenter aligner--hCenter")
+                                            div(class="panel-title") PAGE VIEWS
+                                        div(class="panel-body aligner aligner--row aligner--vCenter aligner--hCenter js-panel-body")
+                                div(class="thumbnail u-margin-0px u-padding-0px aligner-item js-thumbnail js-perf-header-clicks")
+                                    div(class="panel u-margin-0px u-padding-0px")
+                                        div(class="panel-heading aligner aligner--row aligner--vCenter aligner--hCenter")
+                                            div(class="panel-title") CLICKS
+                                        div(class="panel-body aligner aligner--row aligner--vCenter aligner--hCenter js-panel-body")
+                                div(class="thumbnail u-margin-0px u-padding-0px aligner-item js-thumbnail js-perf-header-pageRPM")
+                                    div(class="panel u-margin-0px u-padding-0px")
+                                        div(class="panel-heading aligner aligner--row aligner--vCenter aligner--hCenter")
+                                            div(class="panel-title") PAGE RPM
+                                        div(class="panel-body aligner aligner--row aligner--vCenter aligner--hCenter js-panel-body")
+                                div(class="thumbnail u-margin-0px u-padding-0px aligner-item js-thumbnail js-perf-header-pageCTR")
+                                    div(class="panel u-margin-0px u-padding-0px")
+                                        div(class="panel-heading aligner aligner--row aligner--vCenter aligner--hCenter")
+                                            div(class="panel-title") PAGE CTR
+                                        div(class="panel-body aligner aligner--row aligner--vCenter aligner--hCenter js-panel-body")
+
                             //- Chart wrapper
-                            div(style="margin: 20px; background-color: #eee; text-align: center; font-size: 1.5em; padding-top: 170px; height: 340px; border: 1px solid #ddd;")
+                            div(class="u-margin-20px", style="background-color: #eee; text-align: center; font-size: 1.5em; padding-top: 170px; height: 340px; border: 1px solid #ddd;")
                                 | Reporting chart will come here
 
-                            //- Reporting table
-                            .table-wrapper-paddded
-                                table.table.table-bordered.table-hover
-                                    thead
-                                        tr
-                                            th Variation
-                                            th Page Group
-                                            th Platform
-                                            th Impressions
-                                            th Page RPM
-                                            th Page Views
-                                            th Revenue
-                                    tbody
-                                        for data in reportingData
-                                            tr
-                                                td!= data.variationName
-                                                td!= data.pageGroupName
-                                                td!= data.platform
-                                                td!= data.impressions
-                                                td!= data.rpm
-                                                td!= data.pageviews
-                                                td!= data.revenue
-                                                
+                            div(class="aligner aligner--row table-heading-wrapper js-table-heading-wrapper")
+                                div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
+                                    h4(class="table-heading js-table-heading") Page Groups
+                                div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
+
+                            // Report Table Begins
+                            .ReportsWrapper.table-reports-wrapper
+                                .ReportsToggleBtnWrap
+                                    a.btn.ReportsToggleBtn.p-All-0(data-toggle='collapse', href='#collapseExample', data-placement='top', aria-expanded='true', aria-controls='collapseExample')
+                                #collapseExample.collapse.in(aria-expanded='true', style='')
+                                    .well.pd-0
+                                        #reports_table.panel.panel-default
+                            // Report Table Ends
+
+    script(type='text/javascript').
+        var reportsModel = !{JSON.stringify(reportingData)},
+            siteId = '!{siteId}';
+
+        window.adpushup.reports = {
+            model: reportsModel,
+            siteId: siteId
+        };
+
+    +loadAsset("js", [
+        '/assets/js/reports/geniee/reports.js'
+    ])
+

@@ -26,9 +26,9 @@ router
 				paramConfig.mediaId = 920; //site.get('genieeMediaId');
 				return genieeService.getReport(paramConfig)
 					.then(function(data) {
-						return res.json({
-							success: 1,
-							data: data
+						return res.render('performanceReport', {
+							reportingData: data,
+							siteId: req.params.siteId
 						});
 					})
 					.catch(function(err) {
@@ -38,11 +38,6 @@ router
 						});
 					});
 			});
-
-		// res.render('performanceReport', {
-		// 	reportingData: data,
-		// 	siteId: req.params.siteId
-		// });
 	})
 	.get('/adsense', function(req, res) {
 		var getUser = userModel.getUserByEmail(req.session.user.email),
