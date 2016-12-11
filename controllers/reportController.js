@@ -17,9 +17,9 @@ router
 	.get('/performance', function(req, res) {
 		var	paramConfig = {
 			siteId: req.params.siteId,
-			dateFrom: moment().subtract(8, 'days').format('YYYY-MM-DD'),
+			dateFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
 			dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
-		}, reportData;
+		};
 
 		return siteModel.getSiteById(paramConfig.siteId)
 			.then(function(site) {
@@ -29,6 +29,31 @@ router
 						return res.render('performanceReport', {
 							reportingData: data,
 							siteId: req.params.siteId
+						});
+					})
+					.catch(function(err) {
+						return res.json({
+							success: 0,
+							error: err
+						});
+					});
+			});
+	})
+	.get('/performanceData', function(req, res) {
+		var	paramConfig = {
+			siteId: req.params.siteId,
+			dateFrom: ((req.query && req.query.dateFrom) || moment().subtract(7, 'days').format('YYYY-MM-DD')),
+			dateTo: ((req.query && req.query.dateTo) || moment().subtract(1, 'days').format('YYYY-MM-DD'))
+		};
+
+		return siteModel.getSiteById(paramConfig.siteId)
+			.then(function(site) {
+				paramConfig.mediaId = 920; //site.get('genieeMediaId');
+				return genieeService.getReport(paramConfig)
+					.then(function(reportData) {
+						return res.json({
+							success: 1,
+							data: reportData
 						});
 					})
 					.catch(function(err) {
