@@ -36,6 +36,11 @@ $('document').ready(function() {
 
             // Setup complete alert
             setupCompleteAlert: function() {
+                var ob = this;
+                setTimeout(function() {
+                    $('#skipOauth').hide();
+                    $('#dsBLink').html(ob.templates.dashboardLink);
+                }, 1000);
                 $('#completionmodal').modal('show');
             },
 
@@ -280,8 +285,8 @@ $('document').ready(function() {
                 }
                 var adsense = JSON.parse(event.data);
                 if(adsense.data) {
-                    $("div[id^='step']").last().removeClass('active-step');
-                    $('#adsenseoauth').html('Google Adsense Connected '+ap.onboarding.templates.checkIcon);
+                    //$("div[id^='step']").last().removeClass('active-step');
+                    $('#adsenseoauth').html('Google Adsense Connected '+ap.onboarding.templates.checkIcon).prop('disabled', true);
                     $.post('/user/setSiteStep', {
                         siteId: newSite.addedSite.siteId,
                         step: 4
@@ -301,11 +306,7 @@ $('document').ready(function() {
             // Method to skip adsense oauth step
             skipOauth: function() {
                 var ob = this;
-                setTimeout(function(){
-                    $('#adsenseoauth').prop('disabled', true);
-                    $('#skipOauth').hide();
-                    $('#dsBLink').html(ob.templates.dashboardLink);
-                }, 1000);
+                setTimeout(function(){$('#adsenseoauth').prop('disabled', true);}, 1000);
                 var ob = this;
                 $.post('/user/setSiteStep', {
                     siteId: newSite.addedSite.siteId,
