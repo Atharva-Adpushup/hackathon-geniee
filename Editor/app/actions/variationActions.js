@@ -8,7 +8,6 @@ const getLastVariationNumber = function (variations) {
 		const names = variations.map(({ name }) => {
 			return isUUID(name.split(' ')[1], 4) || name.indexOf('Variation') === -1 ? NaN : parseInt(name.split(' ')[1], 10);
 		});
-		console.log(names);
 		return names.length ? names.reverse()[0] : 0;
 	},
 	addVariation = (channelId) => (dispatch, getState) => {
