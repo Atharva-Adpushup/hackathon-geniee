@@ -101,7 +101,7 @@ module.exports = function(site) {
             return apConfigs;
         }),
         getFinalConfig = Promise.join(getConfig, getJsFile, function(finalConfig, jsFile) {
-            site.get('partner') ? finalConfig.partner = site.get('partner') : '';
+            site.get('partner') ? finalConfig.partner = site.get('partner') : null;
             jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(finalConfig));
             jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
             return jsFile;

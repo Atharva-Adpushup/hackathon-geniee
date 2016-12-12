@@ -96,18 +96,26 @@ module.exports = function (site) {
                         return channel.save();
                     });
             })
+        },
+        getGenieeUnsyncedZones = function() {
+            if(site.get('partner') === 'geniee') {
+                return getAllUnsyncedZones(site)
+                    .then(function (unsyncedZones) {
+                        return _.map(unsyncedZones, function (json) {
+                            return syncAndSaveChannelZones(site, json.channel, json.unsyncedZones);
+                        })
+                    })
+                    .then(function (allChannelsSyncPromises) {
+                        return Promise.all(allChannelsSyncPromises)
+                    })
+            }
+            else {
+                return;
+            }
         };
 
     return function () {
-        return getAllUnsyncedZones(site)
-            .then(function (unsyncedZones) {
-                return _.map(unsyncedZones, function (json) {
-                    return syncAndSaveChannelZones(site, json.channel, json.unsyncedZones);
-                })
-            })
-            .then(function (allChannelsSyncPromises) {
-                return Promise.all(allChannelsSyncPromises)
-            })
+        getGenieeUnsyncedZones();
     }
 
 }
