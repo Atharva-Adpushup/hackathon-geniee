@@ -43,8 +43,8 @@ var GenieeReport = (function(w, $) {
         }
     };
 
-    function createChart(options) {
-        w.Highcharts.stockChart(options.selector, options.config);
+    function createChart(selector, config) {
+        w.Highcharts.stockChart(selector, config);
     }
 
     function initSlideoutMenu() {
@@ -255,16 +255,65 @@ var GenieeReport = (function(w, $) {
 		});
 	}
 
-    function onPerfThumbnailClick(event) {
-        var $el = $(event.target),
-            $thumbnails = $(".js-thumbnail", this.$perfHeaderContainer);
-        
-        if ($el.parentsUntil('.js-thumbnail').parent().hasClass('js-thumbnail')) {
-            $el = $el.parentsUntil('.js-thumbnail').parent();
-        }
+    function setActiveThumbnail($thumbnail) {
+        var $thumbnails = $(".js-thumbnail", this.$perfHeaderContainer);
 
         $thumbnails.removeClass('thumbnail--active');
-        $el.addClass('thumbnail--active');
+        $thumbnail.addClass('thumbnail--active');
+    }
+
+    function onPerfThumbnailClick(event) {
+        var $thumbnail = $(event.target);
+
+        if ($thumbnail.parentsUntil('.js-thumbnail').parent().hasClass('js-thumbnail')) {
+            $thumbnail = $thumbnail.parentsUntil('.js-thumbnail').parent();
+        }
+
+        setActiveThumbnail($thumbnail);
+        prepareReportsChart($thumbnail);
+    }
+
+    function getHighChartsData(reportChartType) {
+        var computedHighChartsData;
+
+        if (this.selectedReportsLevel == this.reportsLevel.pagegroup) {
+            computedHighChartsData = this.model.pageGroups.data.highCharts[reportChartType];
+        } else if ((this.selectedReportsLevel == this.reportsLevel.variation) && this.selectedPageGroupId) {
+            computedHighChartsData = this.model.pageGroups[this.selectedPageGroupId].variations.data.highCharts[reportChartType];
+        }
+
+        return computedHighChartsData;
+    }
+
+    function prepareReportsChart($thumbnail) {
+        var chartType, chartSeriesConfig, chartConfig;
+
+        chartType = $thumbnail.data('text');
+        chartSeriesConfig = getHighChartsData(chartType);
+        chartConfig = $.extend(true, {}, this.highCharts.config);
+        chartConfig.series = chartSeriesConfig;
+
+        createChart('chart-container', chartConfig);
+    }
+
+    function setThumbnailUiData() {
+        var $revenueHeader = $(".js-thumbnail.js-perf-header-revenue", this.$perfHeaderContainer),
+            $pageViewsHeader = $(".js-thumbnail.js-perf-header-pageViews", this.$perfHeaderContainer),
+            $clicksHeader = $(".js-thumbnail.js-perf-header-clicks", this.$perfHeaderContainer),
+            $pageRPMHeader = $(".js-thumbnail.js-perf-header-pageRPM", this.$perfHeaderContainer),
+            $pageCTRHeader = $(".js-thumbnail.js-perf-header-pageCTR", this.$perfHeaderContainer);
+
+        $revenueHeader.data('text', 'revenue');
+        $pageViewsHeader.data('text', 'pageviews');
+        $clicksHeader.data('text', 'clicks');
+        $pageRPMHeader.data('text', 'pagerpm');
+        $pageCTRHeader.data('text', 'pagectr');
+    }
+
+    function getRevenueHeaderThumbnail() {
+        var $revenueHeader = $(".js-thumbnail.js-perf-header-revenue", this.$perfHeaderContainer);
+
+        return $revenueHeader;
     }
 
     function bindPerfThumbnailClickHandler() {
@@ -294,7 +343,8 @@ var GenieeReport = (function(w, $) {
     }
 
     function chooseLevelAndLoadReports() {
-        var computedTableData, computedPerfHeaderData;
+        var computedTableData, computedPerfHeaderData,
+            $revenueHeaderThumbnail = getRevenueHeaderThumbnail();
 
         if (this.selectedReportsLevel == this.reportsLevel.pagegroup) {
             computedPerfHeaderData = $.extend(true, {}, this.model.media);
@@ -316,6 +366,9 @@ var GenieeReport = (function(w, $) {
 
         bindPerfThumbnailClickHandler();
         bindSelectionButtonClickHandler();
+        setThumbnailUiData();
+        setActiveThumbnail($revenueHeaderThumbnail);
+        prepareReportsChart($revenueHeaderThumbnail);
     }
 
     function init() {
