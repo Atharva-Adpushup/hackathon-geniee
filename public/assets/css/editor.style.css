@@ -3616,7 +3616,8 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   vertical-align: bottom; }
 
 .variation-bar div:nth-last-child(2) {
-  margin-right: 98px; }
+  margin-right: 98px;
+  border-right: 1px solid #e6e6e6; }
 
 .active-variation {
   box-shadow: inset 0px 0px 8px rgba(0, 0, 0, 0.35);
