@@ -1,5 +1,6 @@
 /*****Geniee Reports*****/
 $MainBackgroundColor: #b5b5b5;
+$borderColor: #e6e6e6;
 
 .page-container--reports-geniee
 {
@@ -94,6 +95,10 @@ $MainBackgroundColor: #b5b5b5;
             }
         }
     }
+    .main-heading-wrapper
+    {
+        border-bottom: 1px solid $borderColor;
+    }
 
     /*****Specific margin classes*****/
     .perf-panel-heading-wrapper
@@ -115,7 +120,7 @@ $MainBackgroundColor: #b5b5b5;
 
     .controlAdpushupWrap
     {
-        .title
+        .heading
         {
             color: inherit !important;
 
@@ -125,6 +130,45 @@ $MainBackgroundColor: #b5b5b5;
             }
         }
     }
+
+    /*****Btn specific rules*****/
+    .btn
+    {
+        height: 34px;
+        padding: 0;
+        width: 40px;
+
+        &:active,
+        &:hover,
+        &:focus
+        {
+            background: $whiteColor;
+        }
+
+        &:active,
+        &:focus,
+        &.selected
+        {
+            box-shadow: 0 0 3px #888 inset;
+        }
+
+        > .fa
+        {
+            font-size: 1.5em;
+        }
+
+        &.btn-success
+        {
+            background: $GreenColor;
+            border-color: $GreenColor;
+            box-shadow: 0 0 3px $GreenColor inset;
+        }
+
+        &.btn-error
+        {
+            background: $primaryColorDark;
+            border-color: $primaryColorDark;
+            box-shadow: 0 0 3px $primaryColorDark inset;
+        }
+    }
 }
-
-

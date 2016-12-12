@@ -7,9 +7,68 @@ var GenieeReport = (function(w, $) {
     };
     this.selectedReportsLevel = 'Page Groups';
     this.selectedPageGroupId = null;
+    // Cache DOM elements query
     this.$breadCrumbContainer = $('.js-reports-breadcrumb');
     this.$tableContainer = $('#reports_table');
     this.$perfHeaderContainer = $(".js-perf-header");
+    // Slideout elements
+    this.$slideoutPanel = $('.js-slideout-panel');
+    this.$slideoutMenu = $('.js-slideout-menu');
+    this.$filterButton = $(".js-filter-btn");
+    // Highcharts stocks config
+    this.highCharts = {
+        config: {
+            rangeSelector: {
+                selected: 4
+            },
+            yAxis: {
+                plotLines: [{
+                    value: 0,
+                    width: 2,
+                    color: 'silver'
+                }]
+            },
+            plotOptions: {
+                series: {
+                    compare: 'percent',
+                    showInNavigator: true
+                }
+            },
+            tooltip: {
+                pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
+                valueDecimals: 2,
+                split: true
+            },
+            series: []
+        }
+    };
+
+    function createChart(options) {
+        w.Highcharts.stockChart(options.selector, options.config);
+    }
+
+    function initSlideoutMenu() {
+        var self = this;
+
+        this.slideout = new w.Slideout({
+            'panel': self.$slideoutPanel.get(0),
+            'menu': self.$slideoutMenu.get(0),
+            'padding': 256,
+            'tolerance': 70,
+            'easing': 'cubic-bezier(.32,2,.55,.27)',
+            'side': 'right'
+        });
+
+        toggleSlideoutMenu();
+    }
+
+    function toggleSlideoutMenu() {
+        var self = this;
+
+        this.$filterButton.off('click').on('click', function(e) {
+            self.slideout.toggle();
+        });
+    }
 
     function tabulateData(data, options) {
         if(typeof data !== "object") {
@@ -186,7 +245,7 @@ var GenieeReport = (function(w, $) {
 		$selectionEls.each(function(idx, el) {
 			var $el = $(el);
 
-			$tpl = $("<button id='selection-btn-" + idx + "' class='btn btn-default btn--icon js-selection-btn' type='button'><i class='fa fa-check'></i></button>");
+			$tpl = $("<button id='selection-btn-" + idx + "' class='btn btn-default btn--icon js-selection-btn' type='button'><i class='fa fa-line-chart'></i></button>");
 
 			$el
 				.html($tpl)
@@ -245,6 +304,7 @@ var GenieeReport = (function(w, $) {
             computedTableData = $.extend(true, {}, this.model.pageGroups[this.selectedPageGroupId].variations.data.table);
         }
 
+        initSlideoutMenu();
         generateBreadCrumb();
         setTableHeading();
         setPerfHeaderData(computedPerfHeaderData);

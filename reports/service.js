@@ -188,6 +188,59 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 		return computedData;
 	}
 
+	function setVariationsHighChartsData(pageGroupData) {
+		var computedData = extend(true, {}, pageGroupData),
+			highChartsData = {
+				highCharts: {
+					revenue: [],
+					pageviews: [],
+					clicks: [],
+					pagerpm: [],
+					pagectr: []
+				}
+			},
+			currentComputedObj = {}, currentDate;
+
+		_.forOwn(computedData, function(pageGroupObj, pageGroupKey) {
+			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
+				_.forEach(variationObj.zones, function(zonesObj) {
+					currentDate = moment(zonesObj.date).valueOf();
+
+					currentComputedObj.revenue = {
+						name: (variationObj.name.replace(" ", "-")),
+						data: [[currentDate, Number(zonesObj.revenue)]]
+					};
+					// currentComputedObj.pageviews = {
+					// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+					// 	data: [[currentDate, 0]],
+					// 	tooltip: {valueDecimals: 2}
+					// };
+					currentComputedObj.clicks = {
+						name: (variationObj.name.replace(" ", "-")),
+						data: [[currentDate, Number(zonesObj.click)]]
+					};
+					// currentComputedObj.pagerpm = {
+					// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+					// 	data: [[currentDate, 0]],
+					// 	tooltip: {valueDecimals: 2}
+					// };
+					// currentComputedObj.pagectr = {
+					// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+					// 	data: [[currentDate, 0]],
+					// 	tooltip: {valueDecimals: 2}
+					// };
+
+					setHighChartsData(currentDate, 'revenue', highChartsData.highCharts, currentComputedObj);
+					setHighChartsData(currentDate, 'clicks', highChartsData.highCharts, currentComputedObj);
+				});
+			});
+
+			computedData[pageGroupKey].variations.data = extend(true, computedData[pageGroupKey].variations.data, highChartsData);
+		});
+			
+		return Promise.resolve(computedData);
+	}
+
 	function setVariationsTabularData(pageGroupData) {
 		var computedData = extend(true, {}, pageGroupData),
 			variationsTabularData = {
@@ -234,6 +287,86 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 		});
 
 		return computedData;
+	}
+
+	function setPageGroupsHighChartsData(data) {
+		var computedData = extend(true, {}, data),
+			highChartsData = {
+				highCharts: {
+					revenue: [],
+					pageviews: [],
+					clicks: [],
+					pagerpm: [],
+					pagectr: []
+				}
+			},
+			currentComputedObj = {}, currentDate;
+
+		_.forOwn(computedData.pageGroups, function(pageGroupObj, pageGroupKey) {
+			_.forEach(pageGroupObj.zones, function(zonesObj) {
+				currentDate = moment(zonesObj.date).valueOf();
+
+				currentComputedObj.revenue = {
+					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+					data: [[currentDate, Number(zonesObj.revenue)]]
+				};
+				// currentComputedObj.pageviews = {
+				// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+				// 	data: [[currentDate, 0]],
+				// 	tooltip: {valueDecimals: 2}
+				// };
+				currentComputedObj.clicks = {
+					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+					data: [[currentDate, Number(zonesObj.click)]]
+				};
+				// currentComputedObj.pagerpm = {
+				// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+				// 	data: [[currentDate, 0]],
+				// 	tooltip: {valueDecimals: 2}
+				// };
+				// currentComputedObj.pagectr = {
+				// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+				// 	data: [[currentDate, 0]],
+				// 	tooltip: {valueDecimals: 2}
+				// };
+
+				setHighChartsData(currentDate, 'revenue', highChartsData.highCharts, currentComputedObj);
+				setHighChartsData(currentDate, 'clicks', highChartsData.highCharts, currentComputedObj);
+			});
+		});
+
+		computedData.pageGroups.data = extend(true, computedData.pageGroups.data, highChartsData);
+
+		return Promise.resolve(computedData);
+	}
+
+	function setHighChartsData(currentDate, metric, mainObj, computedObj) {
+		var collectionIndex = -1,
+			collectionDataIndex = -1, computedItem;
+
+		_.forEach(mainObj[metric], function(metricObj, index) {
+			if (metricObj.name == computedObj[metric].name) {
+				collectionIndex = index;
+			}
+		});
+
+		if (collectionIndex > -1) {
+			computedItem = mainObj[metric][collectionIndex];
+
+			_.forEach(computedItem.data, function(dataArr, idx) {
+				if (dataArr.indexOf(currentDate) > -1) {
+					collectionDataIndex = idx;
+				}
+			});
+
+			if (collectionDataIndex > -1) {
+				mainObj[metric][collectionIndex].data[collectionDataIndex][1] += computedObj[metric].data[0][1];
+			} else {
+				mainObj[metric][collectionIndex].data.push(computedObj[metric].data[0]);
+			}
+		} else {
+			mainObj[metric].push(extend(true, {}, computedObj[metric]));
+		}
 	}
 
 	function setPageGroupsTabularData(data) {
@@ -342,12 +475,14 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 					.then(setVariationMetrics)
 					.then(removeRedundantVariationsObj)
 					.then(setVariationsTabularData)
-					.then(function(computedDataWithoutRedundantVariationsObj) {
-						var computedData = {media: siteMetrics, pageGroups: computedDataWithoutRedundantVariationsObj};
+					.then(setVariationsHighChartsData)
+					.then(function(updatedPageGroupsAndVariationsData) {
+						var computedData = {media: siteMetrics, pageGroups: updatedPageGroupsAndVariationsData};
 
 						return setPageGroupsTabularData(computedData)
-							.then(function(computedDataWithPageGroupsTabularData) {
-								return Promise.resolve(computedDataWithPageGroupsTabularData);
+							.then(setPageGroupsHighChartsData)
+							.then(function(finalComputedData) {
+								return Promise.resolve(finalComputedData);
 							});
 					});
 			});

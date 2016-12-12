@@ -185,46 +185,6 @@
 					}
 				}
 
-				.btn
-				{
-					height: 34px;
-					padding: 0;
-					width: 40px;
-
-					&:active,
-					&:hover,
-					&:focus
-					{
-						background: $whiteColor;
-					}
-
-					&:active,
-					&:focus,
-					&.selected
-					{
-						box-shadow: 0 0 3px #888 inset;
-					}
-
-					> .fa
-					{
-						font-size: 1.5em;
-					}
-
-					&.btn-success
-					{
-						background: $GreenColor;
-						border-color: $GreenColor;
-						box-shadow: 0 0 3px $GreenColor inset;
-					}
-
-					&.btn-error
-					{
-						background: $primaryColorDark;
-						border-color: $primaryColorDark;
-						box-shadow: 0 0 3px $primaryColorDark inset;
-					}
-				}
-
 				/********Reports input group********/
 				.input-group
 				{
@@ -335,3 +295,4 @@
 		}
 	}
 }
+
