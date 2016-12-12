@@ -2329,9 +2329,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
       margin: 5px 0; }
 
 .MenuBarContainer .MenuBarInner {
-  max-height: 500px;
-  overflow-y: auto;
-  overflow-x: hidden; }
+  max-height: 500px; }
   .MenuBarContainer .MenuBarInner .butttonsRow {
     left: 3px;
     width: 109.8%;
@@ -2348,6 +2346,10 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
         background: rgba(85, 85, 85, 0.05); }
     .MenuBarContainer .MenuBarInner .SelectParent.channelLst .mobile i, .MenuBarContainer .MenuBarInner .SelectParent.channelLst .tablet i {
       font-size: 16px; }
+
+#channelMenu .MenuBarInner {
+  overflow-y: auto;
+  overflow-x: hidden; }
 
 .ReactCodeMirror {
   border-right: 1px solid #ebf1f2; }

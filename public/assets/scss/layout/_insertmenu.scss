@@ -3,8 +3,6 @@
   .MenuBarInner
   {
     max-height: 500px;
-    overflow-y: auto;
-    overflow-x: hidden;
 
     .butttonsRow {
       left: 3px;
@@ -46,5 +44,12 @@
         }
       }
     }
+  }
+}
+
+#channelMenu {
+  .MenuBarInner {
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }
