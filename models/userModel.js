@@ -203,7 +203,7 @@ function apiModule() {
 		},
 		verifySiteOwner: function(email, siteId, options) {
 			return API.getUserByEmail(email).then(function(user) {
-				if(options.fullSiteData) {
+				if(options && options.fullSiteData) {
 					return siteModel.getSiteById(parseInt(siteId, 10)).then(function(site) {
 						if (site) {
 							return { user: user, site: site };

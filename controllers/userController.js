@@ -77,7 +77,7 @@ router
 
 			if(('pageviewRange' in req.session.user) && ('adNetworks' in req.session.user)) {
 				var qualifyDeal = (parseInt(req.session.user.pageviewRange.split('-')[0]) >= 15000 || parseInt(req.session.user.pageviewRange.split('-')[0]) == 200);
-				if((qualifyDeal && _.includes(req.session.user.adNetworks, 'Adsense')) || req.session.isSuperUser) {
+				if((qualifyDeal && _.includes(req.session.user.adNetworks, 'Adsense')) || req.session.isSuperUser || !req.session.user.requestDemo) {
 					renderDashboard();
 				}
 				else {
@@ -86,7 +86,7 @@ router
 			}
 			else if('requestDemoData' in req.session.user) {
 				var qualifyDeal = (parseInt(req.session.user.requestDemoData.INFO_PAGEVIEWS.split('-')[0]) >= 15000 || parseInt(req.session.user.requestDemoData.INFO_PAGEVIEWS.split('-')[0]) == 200);
-				if((qualifyDeal && req.session.user.requestDemoData.INFO_ADNETWORK_ADSENSE) || req.session.isSuperUser) {
+				if((qualifyDeal && req.session.user.requestDemoData.INFO_ADNETWORK_ADSENSE) || req.session.isSuperUser || !req.session.user.requestDemo) {
 					renderDashboard();
 				}
 				else {
