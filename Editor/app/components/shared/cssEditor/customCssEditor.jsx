@@ -35,7 +35,7 @@ class customCssEditor extends React.Component {
 			JSON.parse(this.state.css);
 			this.setState({ css: newCss, error: false });
 		} catch (e) {
-			this.setState({ error: true });
+			this.setState({ error: true, css: newCss });
 		}
 	}
 
@@ -44,9 +44,9 @@ class customCssEditor extends React.Component {
 			// style: {border: '1px solid black'},
 			textAreaClassName: ['form-control'],
 			textAreaStyle: { minHeight: '5em' },
-			value: this.state.css,
 			mode: 'javascript',
-			theme: 'solarized'
+			theme: 'solarized',
+			lineNumbers: true
 		};
 		return (
 			<div className="containerButtonBar">
