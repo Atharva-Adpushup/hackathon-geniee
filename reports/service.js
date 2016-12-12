@@ -199,6 +199,13 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 					pagectr: []
 				}
 			},
+			datesObj = {
+				revenue: {},
+				pageviews: {},
+				clicks: {},
+				pagerpm: {},
+				pagectr: {}
+			},
 			currentComputedObj = {}, currentDate;
 
 		_.forOwn(computedData, function(pageGroupObj, pageGroupKey) {
@@ -210,6 +217,8 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 						name: (variationObj.name.replace(" ", "-")),
 						data: [[currentDate, Number(zonesObj.revenue)]]
 					};
+					datesObj.revenue[currentDate] = currentComputedObj.revenue.name;
+					
 					// currentComputedObj.pageviews = {
 					// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
 					// 	data: [[currentDate, 0]],
@@ -219,6 +228,7 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 						name: (variationObj.name.replace(" ", "-")),
 						data: [[currentDate, Number(zonesObj.click)]]
 					};
+					datesObj.clicks[currentDate] = currentComputedObj.clicks.name;
 					// currentComputedObj.pagerpm = {
 					// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
 					// 	data: [[currentDate, 0]],
@@ -233,6 +243,15 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 					setHighChartsData(currentDate, 'revenue', highChartsData.highCharts, currentComputedObj);
 					setHighChartsData(currentDate, 'clicks', highChartsData.highCharts, currentComputedObj);
 				});
+			});
+
+			// Add date with empty values
+			_.forOwn(datesObj.revenue, function(revenueData, dateKey) {
+				setDateWithEmptyValue(dateKey, 'revenue', highChartsData.highCharts);
+			});
+
+			_.forOwn(datesObj.clicks, function(clicksData, dateKey) {
+				setDateWithEmptyValue(dateKey, 'clicks', highChartsData.highCharts);
 			});
 
 			computedData[pageGroupKey].variations.data = extend(true, computedData[pageGroupKey].variations.data, highChartsData);
@@ -300,6 +319,13 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 					pagectr: []
 				}
 			},
+			datesObj = {
+				revenue: {},
+				pageviews: {},
+				clicks: {},
+				pagerpm: {},
+				pagectr: {}
+			},
 			currentComputedObj = {}, currentDate;
 
 		_.forOwn(computedData.pageGroups, function(pageGroupObj, pageGroupKey) {
@@ -310,6 +336,7 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
 					data: [[currentDate, Number(zonesObj.revenue)]]
 				};
+				datesObj.revenue[currentDate] = currentComputedObj.revenue.name;
 				// currentComputedObj.pageviews = {
 				// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
 				// 	data: [[currentDate, 0]],
@@ -319,6 +346,7 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
 					data: [[currentDate, Number(zonesObj.click)]]
 				};
+				datesObj.clicks[currentDate] = currentComputedObj.clicks.name;
 				// currentComputedObj.pagerpm = {
 				// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
 				// 	data: [[currentDate, 0]],
@@ -334,6 +362,16 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 				setHighChartsData(currentDate, 'clicks', highChartsData.highCharts, currentComputedObj);
 			});
 		});
+
+		// Add date with empty values
+		_.forOwn(datesObj.revenue, function(revenueData, dateKey) {
+			setDateWithEmptyValue(dateKey, 'revenue', highChartsData.highCharts);
+		});
+
+		_.forOwn(datesObj.clicks, function(clicksData, dateKey) {
+			setDateWithEmptyValue(dateKey, 'clicks', highChartsData.highCharts);
+		});
+		
 
 		computedData.pageGroups.data = extend(true, computedData.pageGroups.data, highChartsData);
 
@@ -367,6 +405,24 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 		} else {
 			mainObj[metric].push(extend(true, {}, computedObj[metric]));
 		}
+	}
+
+	function setDateWithEmptyValue(date, metric, mainObj) {
+		var numericDate = Number(date);
+
+		_.forEach(mainObj[metric], function(metricObj, index) {
+			var computedDateIndex = -1;
+
+			_.forEach(metricObj.data, function(dataArr, dateIndex) {
+				if (dataArr.indexOf(numericDate) > -1) {
+					computedDateIndex = dateIndex;
+				}
+			});
+
+			if (computedDateIndex == -1) {
+				mainObj[metric][index].data.push([numericDate, 0]);
+			}
+		});
 	}
 
 	function setPageGroupsTabularData(data) {
