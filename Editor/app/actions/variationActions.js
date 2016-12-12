@@ -6,8 +6,10 @@ import { getChannelVariations, getChannelVariationsWithAds, getVariationSections
 
 const getLastVariationNumber = function (variations) {
 		const names = variations.map(({ name }) => {
+			//return name.indexOf('Variation') === -1 ? 0 : parseInt(Utils.stringReverse(name), 10);
 			return isUUID(name.split(' ')[1], 4) || name.indexOf('Variation') === -1 ? NaN : parseInt(name.split(' ')[1], 10);
 		});
+		//return names.length ? names.sort().reverse()[0] : 0;
 		return names.length ? names.reverse()[0] : 0;
 	},
 	addVariation = (channelId) => (dispatch, getState) => {
