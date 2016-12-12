@@ -211,7 +211,7 @@ const status = {
 	commonSupportedSizes = [
 		{
 			layoutType: 'SQUARE',
-			sizes: [{ width: 336, height: 280 }, { width: 300, height: 250 }, { width: 250, height: 250 }, { width: 200, height: 200 }]
+			sizes: [{ width: 300, height: 250 }, { width: 250, height: 250 }, { width: 200, height: 200 }]
 		},
 		{
 			layoutType: 'HORIZONTAL',

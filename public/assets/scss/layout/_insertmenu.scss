@@ -46,3 +46,10 @@
     }
   }
 }
+
+#channelMenu {
+  .MenuBarInner {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
