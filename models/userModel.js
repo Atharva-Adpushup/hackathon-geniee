@@ -201,15 +201,26 @@ function apiModule() {
 				return new User(userJson.value, userJson.cas);
 			});
 		},
-		verifySiteOwner: function(email, siteId) {
+		verifySiteOwner: function(email, siteId, options) {
 			return API.getUserByEmail(email).then(function(user) {
-				return user.getSiteById(parseInt(siteId, 10)).then(function(site) {
-					if (site) {
-						return { user: user, site: site };
-					}
+				if(options.fullSiteData) {
+					return siteModel.getSiteById(parseInt(siteId, 10)).then(function(site) {
+						if (site) {
+							return { user: user, site: site };
+						}
 
-					throw new Error('Invalid Site');
-				});
+						throw new Error('Invalid Site');
+					});
+				}
+				else {
+					return user.getSiteById(parseInt(siteId, 10)).then(function(site) {
+						if (site) {
+							return { user: user, site: site };
+						}
+
+						throw new Error('Invalid Site');
+					});
+				}	
 			});
 		},
 		addSite: function(email, domain) {

@@ -64,13 +64,13 @@ router
             });
     })
     .get('/:siteId/editor', function (req, res) {
-        userModel.verifySiteOwner(req.session.user.email, req.params.siteId)
+        userModel.verifySiteOwner(req.session.user.email, req.params.siteId, {fullSiteData: true})
             .then(function(data) {
                 return res.render('editor', {
                     isChrome: true,
-                    domain: data.site.siteDomain,
-                    siteId: data.site.siteId,
-                    channels: data.site.channels,
+                    domain: data.site.get('siteDomain'),
+                    siteId: data.site.get('siteId'),
+                    channels: data.site.get('channels'),
                     environment: config.development.HOST_ENV,
                     currentSiteId: req.params.siteId
                 });
