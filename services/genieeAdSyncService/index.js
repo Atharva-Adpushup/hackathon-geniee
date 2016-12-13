@@ -13,7 +13,7 @@ adpushup.on('siteSaved', function(site) {
             return syncCdn(site);
         })*/
 
-        // Syncing retry logic to be added 
+        // @TODO Syncing retry logic to be added 
         if (site.get('partner') === 'geniee') {
             syncGenieeZones(site)
                 .then(function(){
