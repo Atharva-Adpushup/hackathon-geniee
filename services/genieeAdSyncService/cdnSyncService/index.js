@@ -132,8 +132,6 @@ module.exports = function(site) {
                 });
         };
 
-
-    return function() {
         return getFinalConfig
             //.then(uploadJS)
             .then(writeTempFile)
@@ -142,7 +140,4 @@ module.exports = function(site) {
                     ftp.end();
                 }
             });
-    }
-
-
 }	
