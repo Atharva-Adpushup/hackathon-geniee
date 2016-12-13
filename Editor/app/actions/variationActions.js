@@ -1,16 +1,18 @@
 import { variationActions } from 'consts/commonConsts';
 import _ from 'lodash';
 import Utils from 'libs/utils';
-import { isUUID } from 'validator';
 import { getChannelVariations, getChannelVariationsWithAds, getVariationSectionsWithAds } from 'selectors/variationSelectors';
 
 const getLastVariationNumber = function (variations) {
 		const names = variations.map(({ name }) => {
-			//return name.indexOf('Variation') === -1 ? 0 : parseInt(Utils.stringReverse(name), 10);
-			return isUUID(name.split(' ')[1], 4) || name.indexOf('Variation') === -1 ? NaN : parseInt(name.split(' ')[1], 10);
+			var reversed = parseInt(name.split(' ')[1], 10),
+				vName = isNaN(reversed) ? 0 : reversed;
+
+			return name.indexOf('Variation') === -1 ? 0 : vName;
 		});
-		//return names.length ? names.sort().reverse()[0] : 0;
-		return names.length ? names.reverse()[0] : 0;
+		return names.length ? names.sort(function (a, b){ 
+			return a > b;
+		}).reverse()[0] : 0;
 	},
 	addVariation = (channelId) => (dispatch, getState) => {
 		const variationId = Utils.getRandomNumber(),
