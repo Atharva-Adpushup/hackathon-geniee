@@ -15,6 +15,7 @@ var GenieeReport = (function(w, $) {
     this.$slideoutPanel = $('.js-slideout-panel');
     this.$slideoutMenu = $('.js-slideout-menu');
     this.$filterButton = $(".js-filter-btn");
+    this.$dataTable = null;
     // Highcharts stocks config
     this.highCharts = {
         config: {
@@ -79,7 +80,15 @@ var GenieeReport = (function(w, $) {
 
         var table, header, rows, footer,
             tableId = "_ap_table_" + new Date().getTime() + "_" + Math.floor(Math.random() * (1000000 - 1)) + 1,
-            hide = options.hideTableColumns instanceof Array ? options.hideTableColumns : [];
+            hide = options.hideTableColumns instanceof Array ? options.hideTableColumns : [],
+            dataTableConfig = {
+                "sDom": 'Rlfrtip',
+                "iDisplayLength": 50
+            };
+        
+        if (options.isFirstColumnOrderDisable) {
+            dataTableConfig.columnDefs = [{"orderable": false, "targets": 0}];
+        }
 
         table = $('<table/>').attr({
             "width": "100%",
@@ -120,11 +129,9 @@ var GenieeReport = (function(w, $) {
 
         $(options.tableContainer || '#table').html(table);
 
-        table.DataTable({
-            "sDom": 'Rlfrtip',
-            "iDisplayLength": 50
-        });
+        table.DataTable(dataTableConfig);
 
+        this.$dataTable = table;
         return table;
     };
 
@@ -234,6 +241,7 @@ var GenieeReport = (function(w, $) {
 
 	function updateTableSelectionUI() {
 		var $selectionEls = $('#reports_table ._ap_table > tbody > tr > td:nth-child(1)'),
+            $sortThead = $('#reports_table ._ap_table > thead > tr:nth-child(1) > th:nth-child(1)'),
 			$tpl,
 			tooltipConfig = {
 				animation: true,
@@ -242,6 +250,8 @@ var GenieeReport = (function(w, $) {
 				trigger: 'hover'
 			};
 
+        // Remove the sort icon to make first thead appear order disabled
+        $sortThead.removeClass('sorting_asc').addClass('sorting_disabled');
 		$selectionEls.each(function(idx, el) {
 			var $el = $(el);
 
@@ -336,20 +346,23 @@ var GenieeReport = (function(w, $) {
             $pageCTREl.html(data.pageCTR);
     }
 
-    function setTableData(data) {
+    function setTableData(data, isPageGroupLevel) {
         var tableContainerSelector = "#reports_table";
 
-        tabulateData(data, {tableContainer: tableContainerSelector});
+        tabulateData(data, {tableContainer: tableContainerSelector, isFirstColumnOrderDisable: isPageGroupLevel});
     }
 
     function chooseLevelAndLoadReports() {
         var computedTableData, computedPerfHeaderData,
+            isPageGroupLevel = true,
             $revenueHeaderThumbnail = getRevenueHeaderThumbnail();
 
         if (this.selectedReportsLevel == this.reportsLevel.pagegroup) {
+            isPageGroupLevel = true;
             computedPerfHeaderData = $.extend(true, {}, this.model.media);
             computedTableData = $.extend(true, {}, this.model.pageGroups.data.table);
         } else if ((this.selectedReportsLevel == this.reportsLevel.variation) && this.selectedPageGroupId) {
+            isPageGroupLevel = false;
             computedPerfHeaderData = $.extend(true, {}, this.model.pageGroups[this.selectedPageGroupId]);
             computedTableData = $.extend(true, {}, this.model.pageGroups[this.selectedPageGroupId].variations.data.table);
         }
@@ -358,7 +371,7 @@ var GenieeReport = (function(w, $) {
         generateBreadCrumb();
         setTableHeading();
         setPerfHeaderData(computedPerfHeaderData);
-        setTableData(computedTableData);
+        setTableData(computedTableData, isPageGroupLevel);
 
         if (this.selectedReportsLevel == this.reportsLevel.pagegroup) {
             updateTableSelectionUI();
