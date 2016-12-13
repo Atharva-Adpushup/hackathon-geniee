@@ -101,6 +101,12 @@ $borderColor: #e6e6e6;
         border-radius: 0;
         font-size: 1.3em;
 
+        .breadcrumb-title-prefix
+        {
+            margin-right: 8px;
+            opacity: 0.5;
+        }
+
         a {
             color: $primaryColor;
 

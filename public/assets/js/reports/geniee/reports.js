@@ -1,12 +1,14 @@
 var GenieeReport = (function(w, $) {
     this.model = w.adpushup.reports.model;
     this.siteId = w.adpushup.reports.siteId;
+    this.siteDomain = w.adpushup.reports.siteDomain;
     this.reportsLevel = {
         'pagegroup': 'Page Groups',
         'variation': 'Variations'
     };
     this.selectedReportsLevel = 'Page Groups';
     this.selectedPageGroupId = null;
+    this.selectedPageGroupName = '';
     // Cache DOM elements query
     this.$breadCrumbContainer = $('.js-reports-breadcrumb');
     this.$tableContainer = $('#reports_table');
@@ -155,14 +157,11 @@ var GenieeReport = (function(w, $) {
     function generateBreadCrumb() {
         var breadCrumbTpl = '';
 
-        breadCrumbTpl += '<li><a id="media-name" class="js-breadcrumb-media active">Media</a></li>';
-
         if (this.siteId && !this.selectedPageGroupId) {
-            breadCrumbTpl += '<li><a id="' + this.siteId + '" class="js-breadcrumb-siteId active">' + this.siteId + '</a></li>';
+            breadCrumbTpl += '<li><span class="breadcrumb-title-prefix">Media:</span><a id="' + this.siteDomain + '" class="breadcrumb-title js-breadcrumb-siteId active">' + this.siteDomain + '</a></li>';
         } else if (this.siteId && this.selectedPageGroupId) {
-            breadCrumbTpl += '<li><a id="' + this.siteId + '" class="js-breadcrumb-siteId" href="javascript:void 0;">' + this.siteId + '</a></li>';
-            breadCrumbTpl += '<li><a id="pagegroup-name" class="js-breadcrumb-pagegroup active">Page Group</a></li>';
-            breadCrumbTpl += '<li><a id="' + this.selectedPageGroupId + '" class="js-breadcrumb-pageGroupId active">' + this.selectedPageGroupId + '</a></li>';
+            breadCrumbTpl += '<li><span class="breadcrumb-title-prefix">Media:</span><a id="' + this.siteDomain + '" class="breadcrumb-title js-breadcrumb-siteId" href="javascript:void 0;">' + this.siteDomain + '</a></li>';
+            breadCrumbTpl += '<li><span class="breadcrumb-title-prefix">Page Group:</span><a id="' + this.selectedPageGroupName + '" class="breadcrumb-title js-breadcrumb-pageGroupId active">' + this.selectedPageGroupName + '</a></li>';
         }
 
         this.$breadCrumbContainer.html(breadCrumbTpl);
@@ -219,12 +218,14 @@ var GenieeReport = (function(w, $) {
     function onSelectionButtonClick(e) {
         var $el = $(e.target),
             $tr = $el.parentsUntil('tr').parent(),
-            pageGroupName = $tr.find('td:nth-child(2)').text() + "_" + $tr.find('td:nth-child(3)').text(),
-            pageGroupId = getActivePageGroupId(pageGroupName),
+            pageGroupName = $tr.find('td:nth-child(2)').text(),
+            pageGroupFullName = $tr.find('td:nth-child(2)').text() + "_" + $tr.find('td:nth-child(3)').text(),
+            pageGroupId = getActivePageGroupId(pageGroupFullName),
             $body = $('body');
 
             if (pageGroupId) {
                 this.selectedPageGroupId = pageGroupId;
+                this.selectedPageGroupName = pageGroupName;
             }
             setReportsLevel(this.reportsLevel.variation);
             chooseLevelAndLoadReports();

@@ -53,7 +53,8 @@ block bodyContent
                                 div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
                                     h4 Performance
                                 div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
-                                    h5 Export as
+                                    //- NOTE: To be added later
+                                    //- h5 Export as
 
                             div(class="thumbnail-panel-group perf-panel-wrapper aligner aligner--row js-perf-header")
                                 div(class="thumbnail u-margin-0px u-padding-0px aligner-item js-thumbnail js-perf-header-revenue")
@@ -102,11 +103,12 @@ block bodyContent
 
     script(type='text/javascript').
         var reportsModel = !{JSON.stringify(reportingData)},
-            siteId = '!{siteId}';
+            siteId = '!{siteId}', siteDomain = '!{siteDomain}';
 
         window.adpushup.reports = {
             model: reportsModel,
-            siteId: siteId
+            siteId: siteId,
+            siteDomain: siteDomain
         };
 
     +loadAsset("js", [

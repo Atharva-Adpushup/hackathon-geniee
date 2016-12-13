@@ -19,16 +19,19 @@ router
 			siteId: req.params.siteId,
 			dateFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
 			dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
-		};
+		}, siteDomainName;
 
 		return siteModel.getSiteById(paramConfig.siteId)
 			.then(function(site) {
+				siteDomainName = utils.domanize(site.get('siteDomain'));
+
 				paramConfig.mediaId = 920; //site.get('genieeMediaId');
 				return genieeService.getReport(paramConfig)
 					.then(function(data) {
 						return res.render('performanceReport', {
 							reportingData: data,
-							siteId: req.params.siteId
+							siteId: req.params.siteId,
+							siteDomain: siteDomainName
 						});
 					})
 					.catch(function(err) {
