@@ -12,6 +12,10 @@ var $ = require('jquery'),
 			ad.isIncontent ? inContentAds.push(ad) : structuredAds.push(ad);
 			ad.network === 'geniee' && !ad.adCode && ad.networkData && genieeIds.push(ad.networkData.zoneId);
 		}
+
+		inContentAds.sort(function (next, prev) {
+			return parseInt(next.section, 10) > parseInt(prev.section, 10);
+		});
 		return { structuredAds: structuredAds, inContentAds: inContentAds, genieeIds: genieeIds };
 	},
 	getContainer = function(ad, el) {
