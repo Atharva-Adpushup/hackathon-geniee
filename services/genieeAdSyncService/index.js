@@ -12,15 +12,27 @@ adpushup.on('siteSaved', function(site) {
         /*syncGenieeZones(site).then(function () {
             return syncCdn(site);
         })*/
-        retry(syncGenieeZones(site), { max_tries: 3, interval: 15000 })
-            .then(function() {
-                return retry(syncCdn(site), { max_tries: 3, interval: 5000 })
-            })
-            .then(function() {
-                console.log('File generated successfully');
-            })
-            .catch(function(err) {
-                console.log('Sync Process Failed: ', err);
-            });
+
+        // @TODO Syncing retry logic to be added 
+        if (site.get('partner') === 'geniee') {
+            syncGenieeZones(site)
+                .then(function(){
+                    return syncCdn(site);
+                })
+                .then(function () {
+                    console.log('File generated successfully');
+                })
+                .catch(function (err) {
+                    console.log('Sync Process Failed: ', err);
+                });
+        } else {
+            syncCdn(site)
+                .then(function () {
+                    console.log('File generated successfully');
+                })
+                .catch(function (err) {
+                    console.log('Sync Process Failed: ', err);
+                });
+        }
     }, 3000);
 });
