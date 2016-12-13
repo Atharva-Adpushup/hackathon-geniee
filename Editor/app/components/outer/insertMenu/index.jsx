@@ -75,6 +75,8 @@ class insertMenu extends React.Component {
 			return null;
 		}
 
+		currentUser.userType !== 'partner' ? commonSupportedSizes[0].sizes.push({ width: 336, height: 280 }) : null;
+
 		if (!this.state.showExtraOptions) {
 			items = props.insertOptions.map((option, index) => (
 				<MenuItem key={index} icon={getInsertOptionClass(option)} contentHeading={option}>
