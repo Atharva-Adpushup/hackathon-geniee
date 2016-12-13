@@ -266,7 +266,7 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 				table: {
 					header: ['NAME', 'TRAFFIC DISTRIBUTION', 'REVENUE', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'REVENUE CONTRIBUTION (%)'],
 					rows: [],
-					footer: [' ', 0, 0, 0, 0, 0, 0, 0, 0]
+					footer: ['TOTAL', 0, 0, 0, 0, 0, 0, 0, 0]
 				}
 			};
 
@@ -431,7 +431,7 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 				table: {
 					header: [' ', 'NAME', 'PLATFORM', 'REVENUE', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'NUMBER OF VARIATIONS'],
 					rows: [],
-					footer: [' ', ' ', ' ', 0, 0, 0, 0, 0, 0, 0]
+					footer: ['TOTAL', ' ', ' ', 0, 0, 0, 0, 0, 0, 0]
 				}
 			};
 
