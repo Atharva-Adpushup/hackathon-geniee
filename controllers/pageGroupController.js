@@ -10,7 +10,7 @@ var express = require('express'),
 
 router
 	.get('/:pageGroupId', function (req, res) {
-		channelModel.getPageGroupById(req.params.pageGroupId, { getExtendedParams: true })
+		channelModel.getPageGroupById({id: req.params.pageGroupId, viewName: 'channelById', isExtendedParams: true})
 			.then(function (pageGroup) {
 				return res.render('pageGroup', {
 					pageGroup: pageGroup,

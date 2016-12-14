@@ -1,0 +1,195 @@
+/*****Geniee Reports*****/
+$MainBackgroundColor: #b5b5b5;
+$borderColor: #e6e6e6;
+
+.page-container--reports-geniee
+{
+    .thumbnail-panel-group
+    {
+        > .thumbnail
+        {
+            border-radius: 0;
+            border-left: 0;
+            cursor: pointer;
+
+            &:first-child
+            {
+                border: 1px solid $LPFormBorderColor;
+            }
+
+            &.thumbnail--active
+            {
+                border-bottom: 1px solid $primaryColor;
+
+                > .panel
+                {
+                    background: #f1f1f1;
+                    box-shadow: inset 0 -3px 0 0 $primaryColor;
+                }
+            }
+
+            > .panel
+            {
+                background: transparent;
+                border-radius: 0;
+                border: 0;
+
+                > .panel-heading
+                {
+                    padding-bottom: 0;
+
+                    .panel-title
+                    {
+                        font-size: 1.5em;
+                        font-weight: lighter;
+                    }
+                }
+
+                > .panel-body
+                {
+                    font-size: 2.5em;
+                    padding: 5px 15px 15px;
+                }
+            }
+        }
+    }
+    .ReportsWrapper
+    {
+        width: auto;
+
+        /*****Reports table background color change*****/
+        .ReportsToggleBtnWrap
+        {
+            border-bottom-color: $MainBackgroundColor;
+
+            .ReportsToggleBtn
+            {
+                background: $MainBackgroundColor;
+            }
+        }
+        .well
+        {
+            .panel
+            {
+                @include background-gradient($MainBackgroundColor, #f5f5f5);
+
+                ._ap_table
+                {
+                    tfoot
+                    {
+                        tr
+                        {
+                            th
+                            {
+                                font-weight: bold;
+                                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                            }
+                        }
+                    }
+                }
+
+                .dataTables_paginate span a.current
+                {
+                    background: $MainBackgroundColor;
+                }
+            }
+        }
+    }
+    .breadcrumb
+    {
+        background: #f1f1f1;
+        border-radius: 0;
+        font-size: 1.3em;
+
+        .breadcrumb-title-prefix
+        {
+            margin-right: 8px;
+            opacity: 0.5;
+        }
+
+        a {
+            color: $primaryColor;
+
+            &.active
+            {
+                color: inherit;
+            }
+        }
+    }
+    .main-heading-wrapper
+    {
+        border-bottom: 1px solid $borderColor;
+    }
+
+    /*****Specific margin classes*****/
+    .perf-panel-heading-wrapper
+    {
+        margin: 5px 20px;
+    }
+    .perf-panel-wrapper
+    {
+        margin: 10px 20px 20px;
+    }
+    .table-heading-wrapper
+    {
+        margin: 0 20px 10px;
+    }
+    .table-reports-wrapper
+    {
+        margin: 0 20px;
+    }
+
+    .controlAdpushupWrap
+    {
+        .heading
+        {
+            color: inherit !important;
+
+            > a
+            {
+                color: inherit !important;
+            }
+        }
+    }
+
+    /*****Btn specific rules*****/
+    .btn
+    {
+        height: 34px;
+        padding: 0;
+        width: 40px;
+
+        &:active,
+        &:hover,
+        &:focus
+        {
+            background: $whiteColor;
+        }
+
+        &:active,
+        &:focus,
+        &.selected
+        {
+            box-shadow: 0 0 3px #888 inset;
+        }
+
+        > .fa
+        {
+            font-size: 1.5em;
+        }
+
+        &.btn-success
+        {
+            background: $GreenColor;
+            border-color: $GreenColor;
+            box-shadow: 0 0 3px $GreenColor inset;
+        }
+
+        &.btn-error
+        {
+            background: $primaryColorDark;
+            border-color: $primaryColorDark;
+            box-shadow: 0 0 3px $primaryColorDark inset;
+        }
+    }
+}

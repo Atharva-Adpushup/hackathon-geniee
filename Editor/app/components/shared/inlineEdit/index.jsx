@@ -28,7 +28,7 @@ class InlineEdit extends React.Component {
 		}
 
 		this.setState({ editMode: false, inputError: false });
-		this.props.submitHandler(this.refs.editedText.value);
+		this.props.submitHandler(this.props.adCode ? btoa(this.refs.editedText.value) : this.refs.editedText.value);
 	}
 
 	changeValue() {
@@ -37,14 +37,25 @@ class InlineEdit extends React.Component {
 	}
 
 	render() {
-		const colCompact = this.props.compact ? 12 : 6;
+		const colCompact = this.props.compact ? 12 : 6,
+			adCodeStyles = {
+				width: 150,
+				textOverflow: 'ellipsis',
+				whiteSpace: 'nowrap',
+				overflow: 'hidden',
+				display: 'inline-block'
+			},
+			adCodeEdit = {
+				verticalAlign: 'super'
+			},
+			adCodeCheck = this.props.adCode ? (!this.props.value ? '' : atob(this.props.value)) : this.props.value;
 		return (
 			<div>
 				{
 					this.state.editMode ? (
 						<Row style={{margin: 0}}>
 							<Col className="u-padding-r10px" xs={colCompact}>
-								<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={this.props.value} onChange={this.props.validation ? this.changeValue.bind(this) : ()=>{}} />
+								<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={adCodeCheck} onChange={this.props.validation ? this.changeValue.bind(this) : ()=>{}} />
 								<span className="error-message">{this.state.inputError ? (this.props.validationError ? this.props.validationError : this.props.errorMessage) : ''}</span>
 							</Col>
 							{
@@ -72,12 +83,14 @@ class InlineEdit extends React.Component {
 					) : (
 						<div>
 							<strong style={{fontWeight: this.props.font ? this.props.font : 700}}>{
-								this.props.value ? this.props.value : `Edit ${this.props.text}`
+								this.props.value ? (
+									<span style={ this.props.adCode ? adCodeStyles : {} }> {this.props.adCode ? atob(this.props.value) : this.props.value} </span>
+								) : `Edit ${this.props.text}`
 							}</strong>
 							{
 								this.props.text ? (
 									<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-variation-tooltip">Edit {this.props.text}</Tooltip>}>
-										<button onClick={this.triggerEdit.bind(this)} className="btn-icn-edit"></button>
+										<button style={ this.props.adCode ? adCodeEdit : {} } onClick={this.triggerEdit.bind(this)} className="btn-icn-edit"></button>
 									</OverlayTrigger>
 								) : <button onClick={this.triggerEdit.bind(this)} className="btn-icn-edit"></button>
 							}
@@ -98,6 +111,7 @@ InlineEdit.propTypes = {
 	font: PropTypes.number,
 	validation: PropTypes.func,
 	validationError: requiredIf(PropTypes.string, props => props.validation),
+	adCode: PropTypes.bool
 };
 
 InlineEdit.defaultProps = {

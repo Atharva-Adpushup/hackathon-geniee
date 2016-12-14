@@ -19,7 +19,7 @@ class VariationPanel extends React.Component {
 					<VariationSections variation={variation} sections={sections} />
 				</div>
 				<div tabTitle="Add Incontent Variation">
-					<IncontentAdder channelId={channelId} variation={variation} />
+					<IncontentAdder activeChannel={this.props.activeChannel} channelId={channelId} variation={variation} />
 				</div>
 				<div tabTitle="Before/After JS">
 					<BeforeAfterJsPanel channelId={channelId} variation={variation}/>

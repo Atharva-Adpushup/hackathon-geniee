@@ -44,7 +44,7 @@ class inContentForm extends React.Component {
 
 	render() {
 		const props = this.props;
-		
+
 		let CodeBoxField;
 		if(currentUser.userType !== 'partner') {
 			 CodeBoxField = (<Field name="adCode" component={renderCodeBox} label="Ad Code" />);
@@ -74,20 +74,24 @@ class inContentForm extends React.Component {
 				<Field placeholder="Please enter minDistanceFromPrevAd" name="minDistanceFromPrevAd" component={renderField} type="number" label="minDistanceFromPrevAd" />
 				<Field placeholder="Please enter width" name="width" component={renderField} type="number" label="Width" />
 				<Field placeholder="Please enter height" name="height" component={renderField} type="number" label="Height" />
-				<Row>
-					<Col xs={6} className="u-padding-r10px">
+				{
+					props.activeChannel.platform !== 'MOBILE' ? (
 						<Row>
-							<Col xs={6} className="u-padding-r10px"><strong>Float</strong></Col>
 							<Col xs={6} className="u-padding-r10px">
-								<Field name="float" component="select">
-									<option name="none">none</option>
-									<option name="left">left</option>
-									<option name="right">right</option>
-								</Field>
+								<Row>
+									<Col xs={6} className="u-padding-r10px"><strong>Float</strong></Col>
+									<Col xs={6} className="u-padding-r10px">
+										<Field name="float" component="select">
+											<option name="none">none</option>
+											<option name="left">left</option>
+											<option name="right">right</option>
+										</Field>
+									</Col>
+								</Row>
 							</Col>
 						</Row>
-					</Col>
-				</Row>
+					) : null
+				}
 				<Row>
 					{ CodeBoxField }
 				</Row>

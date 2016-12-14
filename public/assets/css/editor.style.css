@@ -1140,6 +1140,9 @@ collapsedextended, .sectionManager .wrapper .content ul.list li .statsWrapper ul
 .u-margin-10px {
   margin: 10px !important; }
 
+.u-margin-20px {
+  margin: 20px !important; }
+
 .u-margin-t10px {
   margin-top: 10px !important; }
 
@@ -1156,6 +1159,23 @@ collapsedextended, .sectionManager .wrapper .content ul.list li .statsWrapper ul
 .u-full-width {
   width: 100% !important; }
 
+.u-full-width {
+  width: 100% !important; }
+
+.u-half-width {
+  width: 50% !important; }
+
+.u-block,
+.u-block--half {
+  width: 100%;
+  display: block; }
+
+.u-block {
+  height: 100%; }
+
+.u-block--half {
+  height: 50%; }
+
 /*****UI alignment classes*****/
 .u-separator--colon {
   display: inline-block;
@@ -1164,6 +1184,12 @@ collapsedextended, .sectionManager .wrapper .content ul.list li .statsWrapper ul
 /**********UI generic classes***********/
 .u-cursor-pointer {
   cursor: pointer !important; }
+
+.u-box-shadow-none {
+  box-shadow: none !important; }
+
+.u-border-none {
+  border: 0 !important; }
 
 /***Text style utils***/
 .boldTxt {
@@ -3720,7 +3746,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   border: none;
   font-weight: 700;
   border-radius: 50%;
-  padding: 2px 8px; }
+  padding: 2px 7.2px; }
 
 .section-name-ie > div {
   height: 45px; }

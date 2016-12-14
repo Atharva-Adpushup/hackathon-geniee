@@ -2,6 +2,7 @@ var express = require('express'),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
 	AdPushupError = require('../helpers/AdPushupError'),
+	genieeService = require('../reports/service'),
 	adsenseReportModel = require('../models/adsenseModel'),
 	adxReportModel = require('../models/adxModel'),
 	Promise = require('bluebird'),
@@ -14,51 +15,68 @@ var express = require('express'),
 
 router
 	.get('/performance', function(req, res) {
-		var data = [{
-			variationName: 'Variation 1',
-			pageGroupName: 'Post page',
-			platform: 'DESKTOP',
-			impressions: 12345,
-			rpm: 1.45,
-			pageviews: 2345,
-			revenue: 12.54
-		}, {
-			variationName: 'Variation 2',
-			pageGroupName: 'About page',
-			platform: 'DESKTOP',
-			impressions: 22345,
-			rpm: 1.45,
-			pageviews: 2345,
-			revenue: 18.54
-		}, {
-			variationName: 'Variation 3',
-			pageGroupName: 'Home page',
-			platform: 'MOBILE',
-			impressions: 12345,
-			rpm: 1.45,
-			pageviews: 2345,
-			revenue: 12.54
-		}, {
-			variationName: 'Variation 4',
-			pageGroupName: 'Product page',
-			platform: 'TABLET',
-			impressions: 52431,
-			rpm: 1.45,
-			pageviews: 2345,
-			revenue: 42.54
-		}, {
-			variationName: 'Variation 5',
-			pageGroupName: 'Post page',
-			platform: 'DESKTOP',
-			impressions: 12345,
-			rpm: 1.45,
-			pageviews: 2345,
-			revenue: 12.54
-		}];
-		res.render('performanceReport', {
-			reportingData: data,
-			siteId: req.params.siteId
-		});
+		var	paramConfig = {
+			siteId: req.params.siteId,
+			dateFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+			dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
+		}, siteDomainName;
+
+		return siteModel.getSiteById(paramConfig.siteId)
+			.then(function(site) {
+				siteDomainName = utils.domanize(site.get('siteDomain'));
+				// paramConfig.mediaId = 920;
+				paramConfig.mediaId = site.get('genieeMediaId');
+
+				return genieeService.getReport(paramConfig)
+					.then(function(data) {
+						return res.render('performanceReport', {
+							reportingData: data,
+							siteId: req.params.siteId,
+							siteDomain: siteDomainName
+						});
+					})
+					.catch(function(err) {
+						var textConfig = {
+							"error": "Unable to fetch reports right now! Please try again later",
+							"emptyData": "We are analysing/mining your data right now. Reports will be available shortly"
+						}, errorText;
+
+						if (err instanceof AdPushupError) {
+							errorText = textConfig.emptyData;
+						} else {
+							errorText = textConfig.error;
+						}
+
+						return res.render('performanceReport', {
+							errorText: errorText
+						});
+					});
+			});
+	})
+	.get('/performanceData', function(req, res) {
+		var	paramConfig = {
+			siteId: req.params.siteId,
+			dateFrom: ((req.query && req.query.dateFrom) || moment().subtract(7, 'days').format('YYYY-MM-DD')),
+			dateTo: ((req.query && req.query.dateTo) || moment().subtract(1, 'days').format('YYYY-MM-DD'))
+		};
+
+		return siteModel.getSiteById(paramConfig.siteId)
+			.then(function(site) {
+				paramConfig.mediaId = 920; //site.get('genieeMediaId');
+				return genieeService.getReport(paramConfig)
+					.then(function(reportData) {
+						return res.json({
+							success: 1,
+							data: reportData
+						});
+					})
+					.catch(function(err) {
+						return res.json({
+							success: 0,
+							error: err
+						});
+					});
+			});
 	})
 	.get('/adsense', function(req, res) {
 		var getUser = userModel.getUserByEmail(req.session.user.email),
