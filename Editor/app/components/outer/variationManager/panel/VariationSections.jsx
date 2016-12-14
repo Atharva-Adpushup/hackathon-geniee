@@ -3,10 +3,11 @@ import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { deleteSection, renameSection } from 'actions/sectionActions.js';
+import { updateAdCode } from 'actions/adActions';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 
 const variationSections = (props) => {
-	const { variation, sections, onDeleteSection, onRenameSection } = props;
+	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode } = props;
 	return (
 		<div>
 			<h1 className="variation-section-heading">Variation Sections</h1>
@@ -37,6 +38,14 @@ const variationSections = (props) => {
 										submitHandler={onRenameSection.bind(null, section, variation.id)} text="Section Name" errorMessage="Section Name cannot be blank"
 									/>
 								</Col>
+								<Row>
+									<Col className="u-padding-r10px" xs={4}>Ad Code</Col>
+									<Col className="u-padding-l10px" xs={8}>
+										<InlineEdit compact adCode value={section.ads[0].adCode}
+											submitHandler={onUpdateAdCode.bind(null, section.ads[0].id)} text="Ad Code" errorMessage="Ad Code cannot be blank"
+										/>
+									</Col>
+								</Row>
 							</Row>
 							{ section.isIncontent ? (
 								<div>
@@ -73,14 +82,16 @@ variationSections.propTypes = {
 	variation: PropTypes.object.isRequired,
 	sections: PropTypes.array.isRequired,
 	onDeleteSection: PropTypes.func.isRequired,
-	onRenameSection: PropTypes.func.isRequired
+	onRenameSection: PropTypes.func.isRequired,
+	onUpdateAdCode: PropTypes.func.isRequired
 };
 
 export default connect(
 	(state, ownProps) => ({ ...ownProps }),
 	(dispatch) => bindActionCreators({
 		onDeleteSection: deleteSection,
-		onRenameSection: renameSection
+		onRenameSection: renameSection,
+		onUpdateAdCode: updateAdCode
 	}, dispatch)
 	)(variationSections);
 
