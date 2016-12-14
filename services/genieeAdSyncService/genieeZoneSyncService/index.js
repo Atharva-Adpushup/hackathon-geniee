@@ -15,7 +15,7 @@ module.exports = function (site) {
         var unsyncedZones = [];
         _.each(variationSections, function (section, sectionId) {
             _.each(section.ads, function (ad) {
-                if (ad.network === 'geniee' && !ad.networkData) {
+                if (ad.network === 'geniee' && !ad.networkData && !ad.adCode) {
                     unsyncedZones.push({
                         zoneName: ad.id, sizeWidth: parseInt(ad.width, 10), sizeHeight: parseInt(ad.height, 10),
                         zoneType: 1, zonePosition: 0, firstView: 1, useFriendlyIFrameFlag: 0
@@ -96,10 +96,9 @@ module.exports = function (site) {
                         return channel.save();
                     });
             })
-        },
-        getGenieeUnsyncedZones = function() {
-            if(site.get('partner') === 'geniee') {
-                return getAllUnsyncedZones(site)
+        };
+
+        return getAllUnsyncedZones(site)
                     .then(function (unsyncedZones) {
                         return _.map(unsyncedZones, function (json) {
                             return syncAndSaveChannelZones(site, json.channel, json.unsyncedZones);
@@ -107,15 +106,7 @@ module.exports = function (site) {
                     })
                     .then(function (allChannelsSyncPromises) {
                         return Promise.all(allChannelsSyncPromises)
-                    })
-            }
-            else {
-                return;
-            }
-        };
-
-    return function () {
-        getGenieeUnsyncedZones();
-    }
+                    });
+        
 
 }

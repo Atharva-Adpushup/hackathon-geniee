@@ -9,12 +9,17 @@ module.exports = {
 				break;
 
 			case 'geniee':
-				adCode = [];
-				adCode.push('<scr' + 'ipt type="text/javascript">');
-				adCode.push('gnsmod.cmd.push(function() {');
-				adCode.push('gnsmod.displayAds("_ap_apexGeniee_ad_' + ad.networkData.zoneId + '");');
-				adCode.push('});');
-				adCode.push('</scr' + 'ipt>');
+				if(ad.adCode) {
+					adCode = utils.base64Decode(ad.adCode);
+				}
+				else {
+					adCode = [];
+					adCode.push('<scr' + 'ipt type="text/javascript">');
+					adCode.push('gnsmod.cmd.push(function() {');
+					adCode.push('gnsmod.displayAds("_ap_apexGeniee_ad_' + ad.networkData.zoneId + '");');
+					adCode.push('});');
+					adCode.push('</scr' + 'ipt>');
+				}
 				break;
 			default:
 				return false;

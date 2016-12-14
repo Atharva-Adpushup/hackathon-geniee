@@ -126,7 +126,7 @@ const mapStateToProps = (state, ownProps) => ({
 			}, {
 				width: values.width,
 				height: values.height,
-				adCode: values.adCode
+				adCode: btoa(values.adCode)
 			}, ownProps.variation.id));
 		}
 	});

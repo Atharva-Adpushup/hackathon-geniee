@@ -10,8 +10,12 @@ var $ = require('jquery'),
 		for (a = 0; a < ads.length; a++) {
 			ad = ads[a];
 			ad.isIncontent ? inContentAds.push(ad) : structuredAds.push(ad);
-			ad.network === 'geniee' && ad.networkData && genieeIds.push(ad.networkData.zoneId);
+			ad.network === 'geniee' && !ad.adCode && ad.networkData && genieeIds.push(ad.networkData.zoneId);
 		}
+
+		inContentAds.sort(function (next, prev) {
+			return parseInt(next.section, 10) > parseInt(prev.section, 10);
+		});
 		return { structuredAds: structuredAds, inContentAds: inContentAds, genieeIds: genieeIds };
 	},
 	getContainer = function(ad, el) {
@@ -19,12 +23,12 @@ var $ = require('jquery'),
 			el = $(ad.xpath);
 		}
 		var container = $('<div/>').css($.extend({
-			'display': ad.network === 'geniee' ? 'none' : 'block',
+			'display': (ad.network === 'geniee' && !ad.adCode) ? 'none' : 'block',
 			'clear': ad.isIncontent ? null : 'both',
 			'width': ad.width + 'px',
 			'height': ad.height + 'px'
 		}, ad.css)).attr({
-			'id': ad.network === 'geniee' ? '_ap_apexGeniee_ad_' + ad.networkData.zoneId : ad.id,
+			'id': (ad.network === 'geniee' && !ad.adCode) ? '_ap_apexGeniee_ad_' + ad.networkData.zoneId : ad.id,
 			'data-section': ad.id,
 			'class': '_ap_apex_ad',
 			'data-xpath': ad.xpath ? ad.xpath : '',

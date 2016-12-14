@@ -22,7 +22,7 @@ module.exports = function(site) {
                 //In case if even one ad inside variation is unsynced then we don't serve this variation'
                 // check to find if ad is synced or not, for genieee if networkData present then adSynced and for custom network 
                 // if adcode present then ad synced
-                if ((ad.network == 'geniee' && !ad.networkData) || (ad.network == 'custom' && !ad.adCode)) {
+                if ((ad.network == 'geniee' && !ad.networkData && !ad.adCode) || (ad.network == 'custom' && !ad.adCode)) {
                     unsyncedAds = true;
                     return false; //break loop when ad is unsynced
                 }
@@ -42,7 +42,7 @@ module.exports = function(site) {
                     });
                 }
                 //for geniee provide networkData
-                if ((ad.network == 'geniee')) {
+                if ((ad.network == 'geniee' && ad.networkData)) {
                     json.networkData = ad.networkData;
                 } else { //for custom network provide adcode to replay
                     json.adCode = ad.adCode;
@@ -66,7 +66,7 @@ module.exports = function(site) {
 
                     finalJson[platform][pageGroup] = {
                         variations: [],
-                        contentSelector: '.post-content' //channel.contentSelector
+                        contentSelector: channel.contentSelector
                     };
 
                     _.each(channel.variations, function(variation, id) {
@@ -132,8 +132,6 @@ module.exports = function(site) {
                 });
         };
 
-
-    return function() {
         return getFinalConfig
             //.then(uploadJS)
             .then(writeTempFile)
@@ -142,7 +140,4 @@ module.exports = function(site) {
                     ftp.end();
                 }
             });
-    }
-
-
 }	
