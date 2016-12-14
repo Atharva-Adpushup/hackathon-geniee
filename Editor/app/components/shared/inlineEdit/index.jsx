@@ -37,7 +37,17 @@ class InlineEdit extends React.Component {
 	}
 
 	render() {
-		const colCompact = this.props.compact ? 12 : 6;
+		const colCompact = this.props.compact ? 12 : 6,
+			adCodeStyles = {
+				width: 150,
+				textOverflow: 'ellipsis',
+				whiteSpace: 'nowrap',
+				overflow: 'hidden',
+				display: 'inline-block'
+			},
+			adCodeEdit = {
+				verticalAlign: 'super'
+			};
 		return (
 			<div>
 				{
@@ -73,13 +83,13 @@ class InlineEdit extends React.Component {
 						<div>
 							<strong style={{fontWeight: this.props.font ? this.props.font : 700}}>{
 								this.props.value ? (
-									this.props.adCode ? atob(this.props.value) : this.props.value
+									<span style={ this.props.adCode ? adCodeStyles : {} }> {this.props.adCode ? atob(this.props.value) : this.props.value} </span>
 								) : `Edit ${this.props.text}`
 							}</strong>
 							{
 								this.props.text ? (
 									<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-variation-tooltip">Edit {this.props.text}</Tooltip>}>
-										<button onClick={this.triggerEdit.bind(this)} className="btn-icn-edit"></button>
+										<button style={ this.props.adCode ? adCodeEdit : {} } onClick={this.triggerEdit.bind(this)} className="btn-icn-edit"></button>
 									</OverlayTrigger>
 								) : <button onClick={this.triggerEdit.bind(this)} className="btn-icn-edit"></button>
 							}
