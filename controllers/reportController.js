@@ -36,8 +36,19 @@ router
 						});
 					})
 					.catch(function(err) {
+						var textConfig = {
+							"error": "Unable to fetch reports right now! Please try again later",
+							"emptyData": "We are analysing/mining your data right now. Reports will be available shortly"
+						}, errorText;
+
+						if (err instanceof AdPushupError) {
+							errorText = textConfig.emptyData;
+						} else {
+							errorText = textConfig.error;
+						}
+
 						return res.render('performanceReport', {
-							error: err
+							errorText: errorText
 						});
 					});
 			});

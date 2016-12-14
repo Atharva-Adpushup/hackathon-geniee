@@ -1,6 +1,7 @@
 var rp = require('request-promise'),
     crypto = require('crypto'),
 	Promise = require('bluebird'),
+	AdPushupError = require('../helpers/AdPushupError'),
 	extend = require('extend'),
 	moment = require('moment'),
 	channelModel = require('../models/channelModel.js'),
@@ -518,6 +519,10 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 			getChannelData = getChannelMetrics.then(getPageGroupDataById);
 
 			return Promise.join(getResponseData, getFilteredZones, getSiteMetrics, getChannelMetrics, getChannelData, function(allZones, filteredZones, siteMetrics, pageGroupMetrics, pageGroupData) {
+				if (!allZones || !allZones.length) {
+					throw new AdPushupError('Zones should not be empty');
+				}
+				
 				return updatePageGroupData(pageGroupData, pageGroupMetrics)
 					.then(getZoneVariations)
 					.then(setVariationMetrics)
