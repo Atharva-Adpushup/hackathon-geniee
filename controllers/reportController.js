@@ -24,8 +24,9 @@ router
 		return siteModel.getSiteById(paramConfig.siteId)
 			.then(function(site) {
 				siteDomainName = utils.domanize(site.get('siteDomain'));
+				// paramConfig.mediaId = 920;
+				paramConfig.mediaId = site.get('genieeMediaId');
 
-				paramConfig.mediaId = 920; //site.get('genieeMediaId');
 				return genieeService.getReport(paramConfig)
 					.then(function(data) {
 						return res.render('performanceReport', {
@@ -35,8 +36,7 @@ router
 						});
 					})
 					.catch(function(err) {
-						return res.json({
-							success: 0,
+						return res.render('performanceReport', {
 							error: err
 						});
 					});
