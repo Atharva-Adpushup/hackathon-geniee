@@ -319,11 +319,16 @@ $('document').ready(function() {
                         alert('Some error occurred!');
                     }
                 });
-            }       
+            },
+
+            // Initialise onboarding
+            init: function() {
+                this.showIntro();
+                this.showStep(newSite.defaultStep);
+                this.showAddOtherSite();
+            } 
         };
-        ap.onboarding.showIntro();
-        ap.onboarding.showStep(newSite.defaultStep);
-        ap.onboarding.showAddOtherSite();
+        ap.onboarding.init();
 
 
 
