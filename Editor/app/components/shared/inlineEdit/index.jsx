@@ -47,14 +47,15 @@ class InlineEdit extends React.Component {
 			},
 			adCodeEdit = {
 				verticalAlign: 'super'
-			};
+			},
+			adCodeCheck = this.props.adCode ? (!this.props.value ? '' : atob(this.props.value)) : this.props.value;
 		return (
 			<div>
 				{
 					this.state.editMode ? (
 						<Row style={{margin: 0}}>
 							<Col className="u-padding-r10px" xs={colCompact}>
-								<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={ this.props.adCode ? atob(this.props.value) : this.props.value } onChange={this.props.validation ? this.changeValue.bind(this) : ()=>{}} />
+								<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={adCodeCheck} onChange={this.props.validation ? this.changeValue.bind(this) : ()=>{}} />
 								<span className="error-message">{this.state.inputError ? (this.props.validationError ? this.props.validationError : this.props.errorMessage) : ''}</span>
 							</Col>
 							{
