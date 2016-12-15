@@ -41,11 +41,11 @@ function triggerControl(mode) {
 	if (config.partner === 'geniee') {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
 			w.gnsmod.triggerAds();
+			utils.sendFeedback({ eventType: 3, mode: mode, referrer: config.referrer });
 		}
 	} else {
 		adp.creationProcessStarted = true;
 		control.trigger();
-		// TODO send feedback to server regarding control
 		utils.sendFeedback({ eventType: 3, mode: mode, referrer: config.referrer });
 	}
 }
