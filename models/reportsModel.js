@@ -100,11 +100,9 @@ var es = require('../helpers/elasticSearchService'),
 			aggs = {"PLATFORM":{"terms":{"field":"userAnalytics.platform","size":5,"order":{"_count":"desc"}},"aggs":{"CHOSEN_VARIATION":{"terms":{"field":"chosenVariation","size":5,"order":{"_count":"desc"}},"aggs":{"ADS_CLICKED":{"terms":{"field":"ads.clicked","size":5,"order":{"_count":"desc"}}}}}}}},
 			esQueryString = ((config.queryString) ? config.queryString : 'tracking:true AND mode:1'),
 			esQuery = {
-				'query': {
-					'query_string': {
-						'analyze_wildcard': true,
-						'query': esQueryString
-					}
+				'query_string': {
+					'analyze_wildcard': true,
+					'query': esQueryString
 				}
 			},
 			q;
@@ -118,7 +116,7 @@ var es = require('../helpers/elasticSearchService'),
 		esQueryString += (siteId) ? (' AND siteId:' + siteId) : '';
 
 		esqm.addFilterToBoolPath(b, 'must', rangeFilter);
-		esQuery.query.query_string.query = esQueryString;
+		esQuery.query_string.query = esQueryString;
 		q = esqm.getDefaultQuery(b, aggs, 0, {query: esQuery});
 
 		return q;
