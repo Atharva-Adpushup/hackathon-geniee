@@ -230,6 +230,12 @@ const status = {
 			sizes: []
 		}
 	],
+	nonPartnerAdSizes = [
+		{
+			layoutType: 'SQUARE',
+			sizes: [{ width: 336, height: 280 }]
+		},
+	],
 	defaultSectionCss = { 'margin-left': 'auto', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px', clear: 'both' },
 	leftSectionCss = { float: 'left', 'margin-left': '0px', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px' },
 	rightSectionCss = { float: 'right', 'margin-left': 'auto', 'margin-right': '0px', 'margin-top': '0px', 'margin-bottom': '0px' };
@@ -238,7 +244,7 @@ export {
 	status, proxy, stores, adTypes, messengerCommands, siteModes,
 	siteActions, channelActions, sectionActions, adActions,
 	insertMenuActions, editMenuActions, newChannelMenuActions,
-	adBoxSizeStyles, commonSupportedSizes, variationActions,
+	adBoxSizeStyles, commonSupportedSizes, nonPartnerAdSizes, variationActions,
 	hbBoxActions, innerVariationActions, innerActions,
 	defaultSectionCss, leftSectionCss, rightSectionCss,
 	components, siteModesPopoverActions, channelMenuActions

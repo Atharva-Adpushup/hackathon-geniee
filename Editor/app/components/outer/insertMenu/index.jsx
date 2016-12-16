@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import Menu from 'shared/menu/menu.jsx';
 import MenuItem from 'shared/menu/menuItem.jsx';
-import { commonSupportedSizes } from 'consts/commonConsts.js';
+import { commonSupportedSizes, nonPartnerAdSizes } from 'consts/commonConsts.js';
 import CodeBox from 'shared/codeBox';
 import AdSizeSelector from './adSizeSelector.jsx';
 import SectionOptions from './sectionOptions.jsx';
@@ -68,6 +68,18 @@ class insertMenu extends React.Component {
 		this.props.createSectionAndAd(sectionPayload, adPayload, this.props.variationId);
 	}
 
+	enableNonPartnerAdSizes() {
+		commonSupportedSizes.forEach(size => {
+			nonPartnerAdSizes.forEach(nPSize => {
+				if(size.layoutType === nPSize.layoutType) {
+					nPSize.sizes.forEach(s => {
+						size.sizes.unshift(s);
+					});
+				}
+			});
+		});
+	}
+
 	render() {
 		const props = this.props;
 		let items = [];
@@ -75,7 +87,7 @@ class insertMenu extends React.Component {
 			return null;
 		}
 
-		currentUser.userType !== 'partner' ? commonSupportedSizes[0].sizes.push({ width: 336, height: 280 }) : null;
+		currentUser.userType !== 'partner' ? this.enableNonPartnerAdSizes() : null;
 
 		if (!this.state.showExtraOptions) {
 			items = props.insertOptions.map((option, index) => (
