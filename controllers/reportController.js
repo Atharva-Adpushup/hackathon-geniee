@@ -48,6 +48,7 @@ router
 						}
 
 						return res.render('performanceReport', {
+							siteId: req.params.siteId,
 							errorText: errorText
 						});
 					});
