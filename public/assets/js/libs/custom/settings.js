@@ -1,16 +1,41 @@
 $(document).ready(function () {
     (function (w) {
-        $('.addPageGroupPattern').on('submit', function (e) {
-            e.preventDefault();
-            var values = $(this).serializeArray(), json = {};
-            $.each(values, function () { json[this.name] = this.value || '' });
+        function getFormData(values, type) {
+            switch(type) {
+                case 'pageGroups':
+                    var pageGroups = [];
 
-            $.post('savePageGroupPattern', {
-                pageGroupName: json.pageGroupName,
-                pageGroupPattern: json.pageGroupPattern
+                    for(var i=0; i<values.length; i+=2) {
+                        var json = {};
+                        if(values[i].name === 'pageGroupPattern') {
+                            json[values[i].value] = values[i+1].value;
+                            pageGroups.push(json);
+                        }
+                    }
+
+                    return pageGroups;
+                case 'other':
+                    var otherSettings = {};
+                    for(var i=0; i<values.length; i++) {
+                        if(values[i].name !== 'pageGroupPattern') {
+                           otherSettings[values[i].name] = values[i].value;
+                        }
+                    }
+                    
+                    return otherSettings;
+            };
+        };
+
+        $('#saveSiteSettings').on('submit', function (e) {
+            e.preventDefault();
+            var formValues = $(this).serializeArray();
+            
+            var pageGroupPattern = getFormData(formValues, 'pageGroups');
+            $.post('saveSiteSettings', {
+                pageGroupPattern: JSON.stringify(pageGroupPattern)
             }, function (res) {
                 if (res.success) {
-                    alert('Pagegroup pattern saved!');
+                    alert('Settings saved!');
                 }
                 else {
                     alert('Some error occurred!');

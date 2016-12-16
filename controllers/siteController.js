@@ -48,9 +48,12 @@ router
                 res.send('Some error occurred!');
             });
     })
-    .post('/:siteId/savePageGroupPattern', function (req, res) {
-        var json = { siteId: req.params.siteId, pageGroupName: req.body.pageGroupName, pageGroupPattern: req.body.pageGroupPattern };
-        siteModel.setPagegroupPattern(json)
+    .post('/:siteId/saveSiteSettings', function (req, res) {
+        var json = {
+            settings: req.body,
+            siteId: req.params.siteId
+        };
+        siteModel.saveSiteSettings(json)
             .then(function (data) {
                 res.send({ success: 1 });
             })
