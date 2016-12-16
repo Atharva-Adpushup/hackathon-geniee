@@ -3040,7 +3040,7 @@ maxHeightWidth {
     padding-bottom: 10px;
     border-bottom: 1px solid #ccc; }
   .settings-pane .row {
-    margin: 15px -15px; }
+    margin: 5px -15px; }
   .settings-pane input,
   .settings-pane button {
     width: 100%;
@@ -3049,7 +3049,7 @@ maxHeightWidth {
     border-radius: 3px; }
   .settings-pane input {
     font-size: 1.2em; }
-  .settings-pane .pagegroup-name {
+  .settings-pane .input-name {
     font-size: 1.4em;
     margin-top: 5px;
     font-weight: 700; }

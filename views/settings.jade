@@ -21,20 +21,25 @@ block bodyContent
                         .controlAdpushupWrap
                             h3.title.m-All-0.clearfix 
                                 a Site settings - #{utils.domanize(siteDomain)}
-                            .settings-pane
-                                h4 Pagegroup pattern
-                                if !pageGroups.length
-                                    | No Pagegroups found!
-                                    
-                                for p in pageGroups
-                                    form.addPageGroupPattern
-                                        .row
-                                            .col-sm-2
-                                                .pagegroup-name!= p.pageGroup
-                                                input(type="hidden" name="pageGroupName" value=p.pageGroup)
-                                            .col-sm-3
-                                                input.form-control(value=utils.getPageGroupPattern(p.pageGroup, patterns) name="pageGroupPattern" required type="text" placeholder="Enter pagegroup pattern")
-                                            .col-sm-1
-                                                button.btn.btn-primary Save
+                            form#saveSiteSettings.settings-pane
+                                .row
+                                    .col-sm-6
+                                        if !pageGroups.length
+                                            | No Pagegroups found!
+                                        else
+                                            .row
+                                                .col-sm-12
+                                                    h4 Pagegroup pattern
+                                        for p in pageGroups
+                                            .row
+                                                .col-sm-4
+                                                    .input-name!= p.pageGroup
+                                                    input(type="hidden" name="pageGroupPattern" value=p.pageGroup)
+                                                .col-sm-8
+                                                    input.form-control(value=utils.getPageGroupPattern(p.pageGroup, patterns) name="pageGroupPattern" type="text" placeholder="Enter pagegroup pattern")
+                                hr
+                                .row
+                                    .col-sm-3
+                                        button.btn-primary Save Settings
                                 
 
