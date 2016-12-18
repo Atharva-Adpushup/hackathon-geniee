@@ -43,6 +43,9 @@ var model = require('../helpers/model'),
 			this.key = 'site::' + this.data.siteId;
 		};
 
+		this.isApex = function() {
+			return !!this.get('apex'); // forceful convert to bool
+		};
 
 		this.getNetwork = function (networkName) {
 			return Promise.resolve(_.find(this.get('adNetworks'), { 'name': networkName }));
@@ -68,6 +71,28 @@ var model = require('../helpers/model'),
 				return _.map(data, function (channel) {
 					return channel.toClientJSON();
 				});
+			});
+		};
+
+		this.getVariationConfig = function() {
+			var computedConfig = {};
+
+			return Promise.resolve(this.getAllChannels()).then(function(channelsArr) {
+				if (Array.isArray(channelsArr) && channelsArr.length) {
+					_.forEach(channelsArr, function(channelObj, channelKey) {
+						if (channelObj.hasOwnProperty('variations') && channelObj.variations) {
+							_.forOwn(channelObj.variations, function(variationObj, variationKey) {
+								computedConfig[variationObj.id] = {
+									id: variationObj.id,
+									name: variationObj.name,
+									trafficDistribution: variationObj.trafficDistribution
+								};
+							});
+						}
+					});
+				}
+
+				return computedConfig;
 			});
 		};
 
@@ -158,6 +183,8 @@ function apiModule() {
 					if (err.code === 13) {
 						throw new AdPushupError([{ "status": 404, "message": "Site does not exist" }]);
 					}
+
+					return false;
 				});
 		},
 		updateSite: function (json) {

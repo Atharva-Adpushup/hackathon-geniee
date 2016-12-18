@@ -97,13 +97,18 @@ $(document).ready(function() {
             adpushup.reports.AdSense(adpushup.reports.config);
         } else if ('apex' === adpushup.reports.config.reportType) {
             adpushup.reports.config.pageGroup = $("#report_pageGroup option:selected").val();
-            adpushup.reports.Apex(adpushup.reports.config, function(data) {
+            adpushup.reports.Apex(adpushup.reports.config, function(apexData, dataTable) {
+                window.ApexReport.setData(apexData, dataTable);
+                window.ApexReport.setClassNames();
                 window.ApexReport.updateTrafficDistributionUI();
                 window.ApexReport.selectControlVariation();
                 window.ApexReport.updateTableSelectionUI();
                 window.ApexReport.updateTableRPMUI();
                 window.ApexReport.initTDPopovers();
                 window.ApexReport.setTDEventHandlers();
+                setTimeout(function() {
+                    window.ApexReport.calculatePageRPMPerformance();
+                }, 8000);
             });
         }
     }).click();
