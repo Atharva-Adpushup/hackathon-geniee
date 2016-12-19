@@ -4,7 +4,7 @@ import validate from './inContentValidations';
 import { Row, Col, Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { createIncontentSection } from 'actions/sectionActions';
-import { commonSupportedSizes } from 'consts/commonConsts.js';
+import { commonSupportedSizes, nonPartnerAdSizes } from 'consts/commonConsts.js';
 import CodeBox from 'shared/codeBox';
 import _ from 'lodash';
 
@@ -36,6 +36,14 @@ const form = reduxForm({
 				sizes.push(`${adSize.width} x ${adSize.height}`);
 			});
 		});
+
+		if(currentUser.userType !== 'partner') {
+			nonPartnerAdSizes.forEach(size => {
+				size.sizes.forEach(adSize => {
+					sizes.push(`${adSize.width} x ${adSize.height}`);
+				});
+			});
+		}
 		
 		return _.uniq(sizes);
 	};
