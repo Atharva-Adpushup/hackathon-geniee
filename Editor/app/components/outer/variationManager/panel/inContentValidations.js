@@ -13,14 +13,6 @@ function validate(formProps) {
 		errors.adCode = 'Please enter Ad Code';
 	}
 
-	if (!formProps.height) {
-		errors.height = 'Please enter height';
-	}
-
-	if (!formProps.width) {
-		errors.width = 'Please enter width';
-	}
-
 	return errors;
 }
 
