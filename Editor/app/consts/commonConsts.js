@@ -215,15 +215,15 @@ const status = {
 		},
 		{
 			layoutType: 'HORIZONTAL',
-			sizes: [{ width: 900, height: 90 }, { width: 728, height: 90 }, { width: 468, height: 60 }, { width: 970, height: 250 }]
+			sizes: [{ width: 728, height: 90 }, { width: 468, height: 60 }]
 		},
 		{
 			layoutType: 'VERTICAL',
-			sizes: [{ width: 300, height: 600 }, { width: 160, height: 600 }, { width: 120, height: 600 }, { width: 300, height: 1050 }]
+			sizes: [{ width: 300, height: 600 }, { width: 160, height: 600 }, { width: 120, height: 600 }]
 		},
 		{
 			layoutType: 'MOBILE',
-			sizes: [{ width: 320, height: 100 }, { width: 320, height: 50 }, { width: 300, height: 250 }, { width: 250, height: 250 }, { width: 200, height: 200 }]
+			sizes: [{ width: 320, height: 50 }, { width: 300, height: 250 }, { width: 250, height: 250 }, { width: 200, height: 200 }]
 		},
 		{
 			layoutType: 'CUSTOM',
@@ -235,6 +235,18 @@ const status = {
 			layoutType: 'SQUARE',
 			sizes: [{ width: 336, height: 280 }]
 		},
+		{
+			layoutType: 'HORIZONTAL',
+			sizes: [{ width: 900, height: 90 }, { width: 970, height: 250 }]
+		},
+		{
+			layoutType: 'VERTICAL',
+			sizes: [{ width: 300, height: 1050 }]
+		},
+		{
+			layoutType: 'MOBILE',
+			sizes: [{ width: 320, height: 100 }]
+		}
 	],
 	defaultSectionCss = { 'margin-left': 'auto', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px', clear: 'both' },
 	leftSectionCss = { float: 'left', 'margin-left': '0px', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px' },
