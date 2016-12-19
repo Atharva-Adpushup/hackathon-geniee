@@ -28,8 +28,8 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			float = sectionPayload.float,
 			css = (float !== 'none' ? (float === 'left' ? leftSectionCss : rightSectionCss) : defaultSectionCss),
 			adData = {},
-			adWidth = adPayload.adSize.substr(0, adPayload.adSize.indexOf('x')).trim(),
-			adHeight = adPayload.adSize.substr(adPayload.adSize.indexOf("x") + 1).trim();
+			adWidth = parseInt(adPayload.adSize.substr(0, adPayload.adSize.indexOf('x')).trim(), 10),
+			adHeight = parseInt(adPayload.adSize.substr(adPayload.adSize.indexOf('x') + 1).trim(), 10);
 
 		dispatch({
 			type: sectionActions.CREATE_INCONTENT_SECTION,
