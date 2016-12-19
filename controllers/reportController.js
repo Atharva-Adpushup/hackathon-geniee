@@ -413,7 +413,8 @@ router
 				variationObj = trafficDistributionData[variationKey];
 
 				if (trafficDistributionData.hasOwnProperty(variationKey) && variationObj) {
-					// Set variation traffic distribution value
+					// Set variation name and its traffic distribution value
+					computedReport.data.rows[idx][0] = variationObj.name;
 					computedReport.data.rows[idx][2] = variationObj.value;
 				}
 			});

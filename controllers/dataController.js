@@ -136,18 +136,19 @@ router
 		});
 	})
 	.get('/getPageGroupVariationRPM', function(req, res) {
-		var channelName = req.query.channelName,
-			siteId = req.query.siteId,
-			platform = channelName.split(':')[0],
-			pageGroup = channelName.split(':')[1],
+		var queryConfig = req.query,
+			siteId = queryConfig.siteId,
+			platform = queryConfig.platform,
+			pageGroup = queryConfig.pageGroup,
+			variationKey = queryConfig.variationKey,
 			dataConfig = {
-				endDate: req.query.endDate,
+				endDate: queryConfig.endDate,
 				pageGroup: pageGroup,
 				platform: platform,
-				reportType: req.query.reportType,
+				reportType: queryConfig.reportType,
 				siteId: siteId,
-				startDate: req.query.startDate,
-				step: req.query.step
+				startDate: queryConfig.startDate,
+				step: queryConfig.step
 			};
 
 		function calculateRPM(pageViews, earnings) {
@@ -158,19 +159,37 @@ router
 		}
 
 		function getTotalPageViews() {
-			var config = lodash.assign({}, dataConfig),
-				arr = pageGroup.split('_'),
-				origPageGroup = [arr[0], arr[1]].join('_'),
-				variationName = arr[2];
+			var config = lodash.assign({}, dataConfig);
 
-			config.pageGroup = origPageGroup;
-			config.queryString = 'mode:1 AND chosenVariation:' + variationName;
+			config.queryString = 'mode:1 AND chosenVariation:' + variationKey;
 
 			return Promise.resolve(reports.apexReport(config))
 				.then(function(report) {
-					var pageViews = Number(report.data.rows[0][2]);
+					var pageViews = Number(report.data.tracked.totalPageViews);
 
 					return Promise.resolve(pageViews);
+				});
+		}
+
+		function getFullAdsenseData(config, adSlotsArr) {
+			var adSlotEarningsPromises = adSlotsArr.map(function(adSlotNum) {
+				var adSenseConfig = lodash.assign({}, config);
+
+				adSenseConfig.adCodeSlot = adSlotNum;
+
+				return getAdSenseData(adSenseConfig)
+					.then(getAdSlotTotalEarnings);
+			});
+
+			return Promise.all(adSlotEarningsPromises)
+				.then(function(earningsArr) {
+					var earnings = 0;
+
+					lodash.forEach(earningsArr, function(value) {
+						earnings += Number(value);
+					});
+
+					return Promise.resolve(earnings);
 				});
 		}
 
@@ -199,6 +218,14 @@ router
 					'15256': {
 						domain: 'http://www.dekhnews.com/',
 						userEmail: 'sahilsaini.in@gmail.com'
+					},
+					'15314': {
+						domain: 'http://www.recruitment.guru/',
+						userEmail: 'lic24.in@gmail.com'
+					},
+					'14952': {
+						domain: 'http://www.pentapostagma.gr/',
+						userEmail: 'pentapostagma@gmail.com'
 					}
 				},
 				// tempdataConfig = {
@@ -237,16 +264,14 @@ router
 			var adCodeSlotArr = lodash.uniq(lodash.compact(lodash.map(channel.get('structuredSections'), function(section) {
 				var adCodeSlot, base64DecodedAdCode, isAdSlotPresent;
 
-				if (section.get('isIncontent')) {
-					base64DecodedAdCode = new Buffer(section.get('adCode'), 'base64').toString('ascii');
-					isAdSlotPresent = (base64DecodedAdCode.match(/data-ad-slot="\d*"/));
+				base64DecodedAdCode = new Buffer(section.get('adCode'), 'base64').toString('ascii');
+				isAdSlotPresent = (base64DecodedAdCode.match(/data-ad-slot="\d*"/));
 
-					if (isAdSlotPresent) {
-						adCodeSlot = (base64DecodedAdCode.match(/data-ad-slot="\d*"/)[0]).replace('data-ad-slot="', '').replace('"', '');
-						return adCodeSlot;
-					}
-					return false;
+				if (isAdSlotPresent) {
+					adCodeSlot = (base64DecodedAdCode.match(/data-ad-slot="\d*"/)[0]).replace('data-ad-slot="', '').replace('"', '');
+					return adCodeSlot;
 				}
+
 				return false;
 			})));
 
@@ -266,11 +291,7 @@ router
 		return siteModel.getSiteById(siteId)
 			.then(getAdcodeSlots)
 			.then(function(adSlotsArr) {
-				// dataConfig.siteId = '15052';
-				dataConfig.adCodeSlot = adSlotsArr[0];
-
-				return getAdSenseData(dataConfig)
-					.then(getAdSlotTotalEarnings)
+				return getFullAdsenseData(dataConfig, adSlotsArr)
 					.then(function(adSlotsEarnings) {
 						return getTotalPageViews()
 							.then(function(pageViews) {
@@ -278,7 +299,9 @@ router
 									.then(function(rpm) {
 										res.json({
 											success: true,
-											rpm: rpm
+											rpm: rpm,
+											pageViews: pageViews,
+											earnings: adSlotsEarnings
 										});
 									});
 							});

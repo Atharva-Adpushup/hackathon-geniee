@@ -451,7 +451,7 @@ var ApexReport = (function(w, $) {
 			iconTpl = "<i class='fa js-icon'></i>",
 			reports = w.adpushup.reports.config,
 			variationName = $el.parentsUntil('tr').parent().find('> .js-variationName-tbody-item').text(),
-			channelName = (reports.platform.toUpperCase() + ':' + reports.pageGroup.toUpperCase() + '_' + variationName),
+			variationKey = getVariationKeyByName(variationName),
 			classNameConfig = {
 				'icon': {
 					'spinner': 'fa-cog fa-spin',
@@ -466,7 +466,9 @@ var ApexReport = (function(w, $) {
 
 		paramConfig = {
 			siteId: reports.siteId,
-			channelName: channelName,
+			variationKey: variationKey,
+			platform: reports.platform.toUpperCase(),
+			pageGroup: reports.pageGroup.toUpperCase(),
 			endDate: reports.endDate,
 			reportType: reports.reportType,
 			startDate: reports.startDate,
@@ -556,12 +558,29 @@ var ApexReport = (function(w, $) {
 		});
 	}
 
+	function getVariationKeyByName(variationName) {
+		var formattedVariationName = variationName.toLowerCase().trim(), selectedVariationKey;
+
+		Object.keys(_apexData.trafficDistribution).forEach(function(tdKey) {
+			var variationObj = _apexData.trafficDistribution[tdKey];
+
+			if (variationObj.name.toLowerCase() === formattedVariationName) {
+				selectedVariationKey = variationObj.id;
+			}
+		});
+
+		return selectedVariationKey;
+	}
+
 	function updateTrafficDistributionUI() {
 		var $trafficDistributionEls = $('#reports_table ._ap_table > tbody .js-traffic-tbody-item'),
 			$tpl;
 
 		$trafficDistributionEls.each(function(idx, el) {
-			var $el = $(el), text = $el.text();
+			var $el = $(el), text = $el.text(),
+				variationName = $el.parent().find('.js-variationName-tbody-item').text(),
+				variationKey = getVariationKeyByName(variationName);
+
 			$tpl = $("<div class='input-group js-input-group'><input type='text' class='form-control js-traffic-distribution-input' placeholder='b/w 0-100' aria-describedby='traffic-distribution'><div class='input-group-btn'><button class='btn btn-default js-traffic-distribution-btn' type='button'><i class='fa fa-save'></i></button></div></div>");
 
 			$el
@@ -569,7 +588,7 @@ var ApexReport = (function(w, $) {
 				.find('.js-traffic-distribution-input')
 				.val(text)
 				.attr({
-					'data-variation-key': $el.parent().find('.js-variationName-tbody-item').text()
+					'data-variation-key': variationKey
 				})
 				.end();
 		});
@@ -593,10 +612,10 @@ var ApexReport = (function(w, $) {
 		var $el = $(e.target),
 			configs = w.adpushup.reports.config,
 			trafficDistribution = $el.val(),
-			variationName = ([configs.pageGroup.toUpperCase(), $el.attr('data-variation-key'), configs.platform.toUpperCase()]).join('_'),
+			variationKey = $el.attr('data-variation-key'),
 			paramConfig = {
 				'trafficDistribution': trafficDistribution,
-				'variationName': variationName,
+				'variationKey': variationKey,
 				'siteId': configs.siteId
 			};
 
