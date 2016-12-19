@@ -4,7 +4,9 @@ import validate from './inContentValidations';
 import { Row, Col, Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { createIncontentSection } from 'actions/sectionActions';
+import { commonSupportedSizes } from 'consts/commonConsts.js';
 import CodeBox from 'shared/codeBox';
+import _ from 'lodash';
 
 const form = reduxForm({
 	form: 'inContentForm',
@@ -26,6 +28,16 @@ const form = reduxForm({
 	}, 
 	renderCodeBox = field => {
 		return (<CodeBox showButtons={false} isField field={field} />);
+	},
+	getSupportedSizes = () => {
+		const sizes = [];
+		commonSupportedSizes.forEach(size => {
+			size.sizes.forEach(adSize => {
+				sizes.push(`${adSize.width} x ${adSize.height}`);
+			});
+		});
+		
+		return _.uniq(sizes);
 	};
 
 class inContentForm extends React.Component {
@@ -72,8 +84,22 @@ class inContentForm extends React.Component {
 				<h1 className="variation-section-heading">Add Incontent Variation</h1>
 				<Field placeholder="Please enter section" name="section" component={renderField} type="number" label="Section No" />
 				<Field placeholder="Please enter minDistanceFromPrevAd" name="minDistanceFromPrevAd" component={renderField} type="number" label="minDistanceFromPrevAd" />
-				<Field placeholder="Please enter width" name="width" component={renderField} type="number" label="Width" />
-				<Field placeholder="Please enter height" name="height" component={renderField} type="number" label="Height" />
+				<Row>
+					<Col xs={6} className="u-padding-r10px">
+						<Row>
+							<Col xs={6} className="u-padding-r10px"><strong>Ad Size</strong></Col>
+							<Col xs={6} className="u-padding-r10px">
+								<Field name="adSize" component="select">
+									{
+										getSupportedSizes().map((pos, index) => (
+											<option key={index} name={pos}>{pos}</option>
+										))
+									}
+								</Field>
+							</Col>
+						</Row>
+					</Col>
+				</Row>
 				{
 					props.activeChannel.platform !== 'MOBILE' ? (
 						<Row>
@@ -116,8 +142,7 @@ const mapStateToProps = (state, ownProps) => ({
 			section: 1,
 			float: 'none',
 			minDistanceFromPrevAd: 200,
-			width: 320,
-			height: 180
+			adSize: getSupportedSizes()[0]
 		}
 	}),
 
@@ -128,9 +153,8 @@ const mapStateToProps = (state, ownProps) => ({
 				minDistanceFromPrevAd: values.minDistanceFromPrevAd,
 				float: values.float
 			}, {
-				width: values.width,
-				height: values.height,
-				adCode: btoa(values.adCode)
+				adCode: btoa(values.adCode),
+				adSize: values.adSize
 			}, ownProps.variation.id));
 		}
 	});
