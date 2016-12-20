@@ -1,20 +1,13 @@
 module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
-	BASE_URL: 'http://app.adpushup.com',
+	BASE_URL: 'http://console.adpushup.com',
 	PROXY_ORIGIN: 'http://proxy.app.adpushup.com',
 	PROXY_DOCUMENT_DOMAIN: 'app.adpushup.com',
-	ADRECOVER_ORIGIN: 'http://app.adrecover.com',
-	isForceMcm: false,
 	apConfigDefaults: {
 		heartBeatMinInterval: 30000,
 		heartBeatStartDelay: 2000,
 		xpathWaitTimeout: 5000,
 		adpushupPercentage: 100
-	},
-	analytics: {
-		'SEGMENT_APP_ID': 'vkVd688NyfGcgDhQwJSaiZofdEXvAZVQ',
-		'INTERCOM_ID': 'WiCwcQZTNKXyiCLQMCD7EwD2dUAPznK34rByaIt3',
-		'PIPEDRIVE_URL': 'http://www.adpushup.com/tech_integration/crm_scripts/callback/signup.php'
 	},
 	password: {
 		'MASTER': 'fe4720b8bcdedb3cc47490015b0ab050'
@@ -50,8 +43,7 @@ module.exports = {
 		}
 	},
 	Queue: {
-		SITES_TO_SYNC_ADSENSE: 'data::sitesToSyncAdsense',
-		MCM_LINKS: 'data::mcmLinks'
+		SITES_TO_SYNC_ADSENSE: 'data::sitesToSyncAdsense'
 	},
 	errors: {
 		NO_ADSENSE_ACCOUNT_CONNECTED: 'No adsense account connected',
