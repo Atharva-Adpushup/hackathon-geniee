@@ -45,7 +45,11 @@ class adDescriptor extends React.Component {
 		return (
 			<div className="containerButtonBar">
 				<Row>
-					<SectionOptions updateMode sectionId={sectionId} ad={ad} partnerData={partnerData} updateSettings={updateSettings}/>
+					{
+						currentUser.userType === 'partner' ? (
+							<SectionOptions updateMode sectionId={sectionId} ad={ad} partnerData={partnerData} updateSettings={updateSettings}/>
+						) : null
+					}
 				</Row>
 				<Row className="butttonsRow">
 					{	adCode ? (
