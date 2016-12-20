@@ -16,7 +16,7 @@ module.exports = function (grunt) {
         },
         uglify: {
             baseLibsBuild: {
-                src: ['public/assets/js/build/base-libs-build.js'],
+                src: ['public/assets/js/builds/base-libs-build.js'],
                 dest: 'public/assets/js/build/base-libs-build.min.js'
             },
             onboardingBuild: {
