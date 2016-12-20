@@ -20,8 +20,8 @@ module.exports = function (grunt) {
                 dest: 'public/assets/js/build/base-libs-build.min.js'
             },
             onboardingBuild: {
-                src: ['public/assets/js/libs/custom/adpushup-setup.js'],
-                dest: 'public/assets/js/build/adpushup-setup.min.js'
+                src: ['public/assets/js/libs/custom/adpushup-onboarding.js'],
+                dest: 'public/assets/js/builds/adpushup-onboarding.min.js'
             }
         },
         browserify: {
