@@ -38,10 +38,11 @@ router
         return siteModel.getSiteById(req.params.siteId)
             .then(function (site) {
                 return res.render('settings', {
-                    pageGroups: site.data.cmsInfo.pageGroups,
-                    patterns: site.data.apConfigs.pageGroupPattern ? site.data.apConfigs.pageGroupPattern : [],
+                    pageGroups: site.get('cmsInfo').pageGroups,
+                    patterns: site.get('apConfigs').pageGroupPattern ? site.get('apConfigs').pageGroupPattern : [],
+                    apConfigs: site.get('apConfigs'),
                     siteId: req.params.siteId,
-                    siteDomain: site.data.siteDomain
+                    siteDomain: site.get('siteDomain')
                 });
             })
             .catch(function (err) {

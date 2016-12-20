@@ -1,5 +1,10 @@
 $(document).ready(function () {
     (function (w) {
+        var autoOptimise;
+        $('#autoOptimise').on('change', function() {
+            autoOptimise = $(this).prop('checked');
+        });
+
         function getFormData(values, type) {
             switch(type) {
                 case 'pageGroups':
@@ -28,13 +33,14 @@ $(document).ready(function () {
 
         $('#saveSiteSettings').on('submit', function (e) {
             e.preventDefault();
-            var formValues = $(this).serializeArray();
-            
-            var pageGroupPattern = JSON.stringify(getFormData(formValues, 'pageGroups')),
+            var formValues = $(this).serializeArray(),
+                autoOpt = getFormData(formValues, 'other').autoOptimise ? true : false,
+                pageGroupPattern = JSON.stringify(getFormData(formValues, 'pageGroups')),
                 otherSettings = JSON.stringify(getFormData(formValues, 'other'));
             $.post('saveSiteSettings', {
                 pageGroupPattern: pageGroupPattern,
-                otherSettings: otherSettings
+                otherSettings: otherSettings,
+                autoOptimise: autoOpt
             }, function (res) {
                 if (res.success) {
                     alert('Settings saved!');

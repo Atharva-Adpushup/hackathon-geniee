@@ -45,22 +45,27 @@ block bodyContent
                                             .col-sm-5
                                                 .input-name Adpushup Percentage
                                             .col-sm-7
-                                                input.form-control(value="100" name="adpushupPercentage" type="number" min="0" max="100" placeholder="Enter Adpushup Percentage")
+                                                input.form-control(value=(apConfigs.adpushupPercentage ? apConfigs.adpushupPercentage : 100) name="adpushupPercentage" type="number" min="0" max="100" placeholder="Enter Adpushup Percentage")
                                         .row
                                             .col-sm-5
                                                 .input-name Heart Beat Min Interval
                                             .col-sm-7
-                                                input.form-control(value="30000" name="heartBeatMinInterval" type="number" placeholder="Enter Heart Beat Min Interval")
+                                                input.form-control(value=(apConfigs.heartBeatMinInterval ? apConfigs.heartBeatMinInterval : 30000) name="heartBeatMinInterval" type="number" placeholder="Enter Heart Beat Min Interval")
                                         .row
                                             .col-sm-5
                                                 .input-name Heart Beat Start Delay
                                             .col-sm-7
-                                                input.form-control(value="2000" name="heartBeatStartDelay" type="number" placeholder="Enter Heart Beat Start Delay")
+                                                input.form-control(value=(apConfigs.heartBeatStartDelay ? apConfigs.heartBeatStartDelay : 2000) name="heartBeatStartDelay" type="number" placeholder="Enter Heart Beat Start Delay")
                                         .row
                                             .col-sm-5
                                                 .input-name X Path Wait Timeout
                                             .col-sm-7
-                                                input.form-control(value="5000" name="xpathWaitTimeout" type="number" placeholder="Enter X Path Wait Timeout")
+                                                input.form-control(value=(apConfigs.xpathWaitTimeout ? apConfigs.xpathWaitTimeout : 5000) name="xpathWaitTimeout" type="number" placeholder="Enter X Path Wait Timeout")
+                                         .row
+                                            .col-sm-5
+                                                .input-name Auto Optimise
+                                            .col-sm-7
+                                                input(type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise === "true" ? "true" : "false") checked=(apConfigs.autoOptimise === "true" ? "true" : undefined))
                                 hr
                                 .row
                                     .col-sm-3
