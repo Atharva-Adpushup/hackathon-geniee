@@ -34,6 +34,10 @@ module.exports = function (grunt) {
                     basedir: "."  
                 },
             },
+            Signup: {
+                src: ['public/assets/js/libs/custom/signup.js'],
+                dest: 'public/assets/js/build/signup-build.js'
+            },
             BaseLibs: {
                 src: [
                     'public/assets/js/libs/third-party/bootstrap.js',
