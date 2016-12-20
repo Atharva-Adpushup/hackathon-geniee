@@ -259,7 +259,10 @@ function apiModule() {
 				.then(function (site) {
 					var siteConfig = {
 						pageGroupPattern: pageGroupPattern,
-						heartBeatMinInterval: parseInt(otherSettings.heartBeatMinInterval, 10)
+						heartBeatMinInterval: otherSettings.heartBeatMinInterval ? parseInt(otherSettings.heartBeatMinInterval, 10) : commonConsts.apConfigDefaults.heartBeatMinInterval,
+						heartBeatStartDelay: otherSettings.heartBeatStartDelay ? parseInt(otherSettings.heartBeatStartDelay, 10) : commonConsts.apConfigDefaults.heartBeatStartDelay,
+						xpathWaitTimeout: otherSettings.xpathWaitTimeout ? parseInt(otherSettings.xpathWaitTimeout, 10) : commonConsts.apConfigDefaults.xpathWaitTimeout,
+						adpushupPercentage: otherSettings.adpushupPercentage ? parseInt(otherSettings.adpushupPercentage, 10) : commonConsts.apConfigDefaults.adpushupPercentage
 					};
 					site.set('apConfigs', siteConfig);
 					return site.save();
