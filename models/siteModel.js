@@ -13,13 +13,9 @@ var model = require('../helpers/model'),
 			'siteId',
 			'siteName',
 			'siteDomain',
-			'audiences',
 			'ownerEmail',
 			'channels',
 			'cmsInfo',
-			'actions',
-			'templates',
-			'adNetworks',
 			'apConfigs',
 			'partner',
 			'genieeMediaId',
@@ -27,7 +23,7 @@ var model = require('../helpers/model'),
 			'dateModified',
 			'step'
 		];
-		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'channels', 'cmsInfo', 'templates', 'apConfigs', 'partner', 'genieeMediaId'];
+		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'channels', 'cmsInfo', 'apConfigs', 'partner', 'genieeMediaId'];
 		this.validations = {
 			'required': []
 		};
