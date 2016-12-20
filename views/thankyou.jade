@@ -136,25 +136,4 @@ block bodyContent
 	div(class="intercom-launcher")
 
 	- userAboard = userAboard || {};
-	// Intercom user secure mode Hash
-	- intercomHash = utils.getHmacSHA256(userAboard.email, consts.analytics["INTERCOM_ID"]);
-	if environment == "production"
-		script(type="text/javascript").
-			var userAboard = !{JSON.stringify(userAboard)},
-				intercomHash = '#{intercomHash}',
-				intercomObj = {
-					Intercom: {
-						user_hash: intercomHash
-					}
-				};
-
-			if (Object.keys(userAboard).length > 0 && userAboard.isIdentified) {
-				analytics.alias(userAboard.email);
-				analytics.identify(userAboard.email, userAboard.analytics, intercomObj);
-				analytics.track('App-signup-completion', {
-					name: userAboard.firstName,
-					email: userAboard.email
-				}, intercomObj);
-			}
-
-			analytics.page("App-thankyou", intercomObj);
+	

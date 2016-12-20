@@ -22,14 +22,6 @@ block append headScripts
         '/assets/js/reports/reporting.js'
     ])
 
-block append analyticsIdentify
-    if environment == "production"
-        script(type="text/javascript").
-            analytics.track('APP_ControlVsAdpushupCtrReports', {
-                siteId: #{siteId ? siteId : 'null'},
-                IS_ADMIN: #{isSuperUser}
-            }, intercomObj);
-
 block bodyContent
     include layout/sideBar
     .pageContainer

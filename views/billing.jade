@@ -3,13 +3,6 @@ extends layout/base
 block getTitle
     - var titleVar = "Billing - AdPushup"
 
-block append analyticsIdentify
-    if (environment == "production")
-        script(type="text/javascript").
-            analytics.track('APP_Billing', {
-                IS_ADMIN: #{isSuperUser}
-            }, intercomObj);
-
 block bodyContent
     include layout/sideBar
 

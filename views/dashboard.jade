@@ -135,13 +135,3 @@ block bodyContent
                         else
                             include layout/adPushupSetup
     
-    script(type="text/javascript").
-        analytics.page('App-dashboard', intercomObj);
-
-        function trackDelete( siteId ) {
-            analytics.track('SITE_Delete', {
-               siteId: siteId,
-               IS_ADMIN: #{isSuperUser}
-           });
-           return true;
-        }

@@ -3,13 +3,6 @@ extends layout/base
 block getTitle
     - var titleVar = "404 Page Not Found"
 
-block append analyticsIdentify
-    if (environment == "production")
-        script(type="text/javascript").
-            analytics.track('APP_404', {
-                IS_ADMIN: #{isSuperUser}
-            });
-
 block bodyContent
     .errorMain
         .container

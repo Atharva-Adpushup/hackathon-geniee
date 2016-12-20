@@ -24,14 +24,6 @@ block append headScripts
         '/assets/js/reports/apexReports.js'
     ])
 
-block append analyticsIdentify
-    if environment == "production"
-        script(type="text/javascript").
-            analytics.track('APP_ApexReports', {
-                siteId: #{siteId ? siteId : 'null'},
-                IS_ADMIN: #{isSuperUser}
-            }, intercomObj);
-
 block bodyContent
     include layout/sideBar
     .pageContainer
