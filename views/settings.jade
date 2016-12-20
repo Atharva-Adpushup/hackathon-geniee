@@ -37,6 +37,30 @@ block bodyContent
                                                     input(type="hidden" name="pageGroupPattern" value=p.pageGroup)
                                                 .col-sm-8
                                                     input.form-control(value=utils.getPageGroupPattern(p.pageGroup, patterns) name="pageGroupPattern" type="text" placeholder="Enter pagegroup pattern")
+                                    .col-sm-6
+                                        .row
+                                            .col-sm-12
+                                                h4 Other Settings
+                                        .row
+                                            .col-sm-5
+                                                .input-name Adpushup Percentage
+                                            .col-sm-7
+                                                input.form-control(value="100" name="adpushupPercentage" type="text" placeholder="Enter Adpushup Percentage")
+                                        .row
+                                            .col-sm-5
+                                                .input-name Heart Beat Min Interval
+                                            .col-sm-7
+                                                input.form-control(value="30000" name="heartBeatMinInterval" type="text" placeholder="Enter Heart Beat Min Interval")
+                                        .row
+                                            .col-sm-5
+                                                .input-name Heart Beat Start Delay
+                                            .col-sm-7
+                                                input.form-control(value="2000" name="heartBeatStartDelay" type="text" placeholder="Enter Heart Beat Start Delay")
+                                        .row
+                                            .col-sm-5
+                                                .input-name X Path Wait Timeout
+                                            .col-sm-7
+                                                input.form-control(value="5000" name="xpathWaitTimeout" type="text" placeholder="Enter X Path Wait Timeout")
                                 hr
                                 .row
                                     .col-sm-3

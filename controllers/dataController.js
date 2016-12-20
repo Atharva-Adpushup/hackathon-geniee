@@ -2,7 +2,6 @@ var express = require('express'),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
-	siteModelConsts = require('../configs/siteModelConsts'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
@@ -42,81 +41,7 @@ router
 				'ads': [],
 				'channels': [],
 				'templates': [],
-				'apConfigs': siteModelConsts.apConfigs,
-	            'adNetworks': siteModelConsts.adNetworks,
-	            'audiences': [{
-	            	'name': 'Default',
-	            	'rootCondition': siteModelConsts.audiences.rootCondition,
-	            	'defination': siteModelConsts.audiences.defination,
-	            	'id': audienceId
-	            }],
-	            'actions': [{
-	            	'id': utils.getRandomNumber(),
-	            	'key': siteModelConsts.actions.key,
-			     	'dataType': siteModelConsts.actions.dataType,
-			      	'isDisabled': false,
-			      	'owner': siteModelConsts.actions.owner,
-			      	'ownerId': siteModelConsts.actions.ownerId,
-			      	'audienceId': audienceId,
-			      	'value': [{
-			          'id': utils.getRandomNumber(),
-			          'key': 'ADSENSE_COLORS',
-			          'dataType': 'array',
-			          'owner': siteModelConsts.actions.owner,
-				      'ownerId': siteModelConsts.actions.ownerId,
-				      'audienceId': audienceId,
-			          'value': [
-			            {
-			              'status': 'APPEND',
-			              'data': {
-			                'id': utils.getRandomNumber(),
-			                'name': 'Default',
-			                'borderColor': '#FFFFFF',
-			                'titleColor': '#0053F9',
-			                'backgroundColor': '#FFFFFF',
-			                'textColor': '#000000',
-			                'urlColor': '#828282'
-			              },
-			              'meta': {
-			                'owner': siteModelConsts.actions.owner
-			              }
-			            }
-			          ]
-			        }, {
-			          'id': utils.getRandomNumber(),
-			          'key': 'ADSENSE_ADTYPES',
-			          'dataType': 'array',
-			          'isDisabled': false,
-			          'owner': siteModelConsts.actions.owner,
-				      'ownerId': siteModelConsts.actions.ownerId,
-				      'audienceId': audienceId,
-			          'value': [
-			            {
-			              'status': 'DISABLED',
-			              'data': 'text',
-			              'meta': {
-			                'owner': siteModelConsts.actions.owner
-			              }
-			            },
-			            {
-			              'status': 'APPEND',
-			              'data': 'text_image',
-			              'meta': {
-			                'owner': siteModelConsts.actions.owner
-			              }
-			            }
-			          ]
-			        }, {
-			          'id': utils.getRandomNumber(),
-			          'key': 'ADSENSE_TOTAL_ADS',
-			          'dataType': 'INT',
-			          'isDisabled': false,
-			          'owner': siteModelConsts.actions.owner,
-				      'ownerId': siteModelConsts.actions.ownerId,
-				      'audienceId': audienceId,
-			          'value': 3
-			        }]
-	            }]
+				'apConfigs': {}
 			};
 			return siteData;
 		})

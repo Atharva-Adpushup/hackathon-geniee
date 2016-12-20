@@ -6,6 +6,7 @@ var model = require('../helpers/model'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	channelModel = require('../models/channelModel'),
 	Promise = require('bluebird'),
+	commonConsts = require('../config/commonConsts'),
 	_ = require('lodash'),
 	Site = model.extend(function () {
 		this.keys = [
@@ -26,7 +27,7 @@ var model = require('../helpers/model'),
 			'dateModified',
 			'step'
 		];
-		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'adNetworks', 'actions', 'audiences', 'channels', 'cmsInfo', 'templates', 'apConfigs', 'partner', 'genieeMediaId'];
+		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'channels', 'cmsInfo', 'templates', 'apConfigs', 'partner', 'genieeMediaId'];
 		this.validations = {
 			'required': []
 		};
@@ -252,10 +253,13 @@ function apiModule() {
 				});
 		},
 		saveSiteSettings: function (json) {
+			var pageGroupPattern = JSON.parse(json.settings.pageGroupPattern),
+				otherSettings = JSON.parse(json.settings.otherSettings);
 			return API.getSiteById(json.siteId)
 				.then(function (site) {
 					var siteConfig = {
-						pageGroupPattern: JSON.parse(json.settings.pageGroupPattern)
+						pageGroupPattern: pageGroupPattern,
+						heartBeatMinInterval: parseInt(otherSettings.heartBeatMinInterval, 10)
 					};
 					site.set('apConfigs', siteConfig);
 					return site.save();

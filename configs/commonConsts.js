@@ -5,6 +5,12 @@ module.exports = {
 	PROXY_DOCUMENT_DOMAIN: 'app.adpushup.com',
 	ADRECOVER_ORIGIN: 'http://app.adrecover.com',
 	isForceMcm: false,
+	apConfigDefaults: {
+		heartBeatMinInterval: 30000,
+		heartBeatStartDelay: 2000,
+		xpathWaitTimeout: 5000,
+		adpushupPercentage: 100
+	},
 	analytics: {
 		'SEGMENT_APP_ID': 'vkVd688NyfGcgDhQwJSaiZofdEXvAZVQ',
 		'INTERCOM_ID': 'WiCwcQZTNKXyiCLQMCD7EwD2dUAPznK34rByaIt3',
