@@ -30,9 +30,11 @@ $(document).ready(function () {
             e.preventDefault();
             var formValues = $(this).serializeArray();
             
-            var pageGroupPattern = getFormData(formValues, 'pageGroups');
+            var pageGroupPattern = JSON.stringify(getFormData(formValues, 'pageGroups')),
+                otherSettings = JSON.stringify(getFormData(formValues, 'other'));
             $.post('saveSiteSettings', {
-                pageGroupPattern: JSON.stringify(pageGroupPattern)
+                pageGroupPattern: pageGroupPattern,
+                otherSettings: otherSettings
             }, function (res) {
                 if (res.success) {
                     alert('Settings saved!');
