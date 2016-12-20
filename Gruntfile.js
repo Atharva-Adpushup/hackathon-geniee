@@ -22,7 +22,11 @@ module.exports = function (grunt) {
             onboardingBuild: {
                 src: ['public/assets/js/libs/custom/adpushup-onboarding.js'],
                 dest: 'public/assets/js/builds/adpushup-onboarding.min.js'
-            }
+            },
+            signupBuild: {
+                src: ['public/assets/js/build/signup-build.js'],
+                dest: 'public/assets/js/build/signup-build.min.js'
+            },
         },
         browserify: {
             options: {
