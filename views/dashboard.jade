@@ -31,9 +31,14 @@ block append headScripts
                 };
             });
 
-        +loadAsset("js", [
-            '/assets/js/builds/adpushup-onboarding.min.js'
-        ]) 
+        if environment == 'production'
+            +loadAsset("js", [
+                '/assets/js/builds/adpushup-onboarding.min.js'
+            ]) 
+        else
+            +loadAsset("js", [
+                '/assets/js/libs/custom/adpushup-onboarding.js'
+            ])         
     else 
 
         if validSites[0].step <= 3

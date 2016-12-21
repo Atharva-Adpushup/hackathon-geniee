@@ -10,9 +10,13 @@ $('document').ready(function() {
         ap.onboarding = {
             // Intro modal check
             showIntro: function() {
-                var showIntro = w.localStorage.getItem('showIntro');
-                if(!showIntro && newSite.showIntro) {
-                    $('#intromodal').modal('show');
+                var showIntro = w.localStorage.getItem('showIntro');                
+                if(!currentUser.sites[currentUser.sites.length-1].step) {
+                    $('#intromodal').modal({
+                        'show': true,
+                        'backdrop': 'static',
+                        'keyboard': false
+                    });
                     w.localStorage.setItem('showIntro', true);
                 }
             },
@@ -326,11 +330,55 @@ $('document').ready(function() {
                 this.showIntro();
                 this.showStep(newSite.defaultStep);
                 this.showAddOtherSite();
-            } 
+            },
+
+            // Service selection
+            serviceSelection: function(selectedServices, errorBox) {
+                var url = 'http://'+window.location.host+'/thankyou',
+                    servicesString = selectedServices.join(' | ');
+
+                $.post('/user/setSiteServices', {
+                    'servicesString': servicesString,
+                    'newSiteUnSavedDomain': newSite.viewObjects.origUnSavedDomain,
+                    'newSiteSiteId': newSite.viewObjects.unSavedSiteId,
+                    'newSiteDomanizedUrl': newSite.viewObjects.domanizedUrl,
+                }, function(response) {
+                    if (response.success) {
+                        if (selectedServices.length > 1) {
+                            window.location.replace(url);
+                        } else if (selectedServices.length == 1) {
+                            if (selectedServices[0] == 'only-adsense') {
+                                $('#intromodal').modal('hide');
+                            } else {
+                                window.location.replace(url);
+                            }
+                        }
+                    } else {
+                        errorBox.text('Some error has occurred');
+                        return;
+                    }
+                });
+            }
         };
         ap.onboarding.init();
 
+        // Trigger to check user ticked options
+        $('#onboarding-services-form').submit(function(e) {
+            e.preventDefault();
+            var selectedServices = [],
+                errorBox = $('.error-message-box');
+            $('.checkbox-custom:checked').each(function() {
+                selectedServices.push($(this).attr('name'));
+            });
 
+            if(selectedServices.length < 1) {
+                errorBox.text('Please select atleast one Service');
+                return;
+            } else {
+                errorBox.text('');
+                ap.onboarding.serviceSelection(selectedServices, errorBox);
+            }
+        });
 
         // OAuth post message hook trigger
         window.addEventListener('message', ap.onboarding.oauthHook, false);
