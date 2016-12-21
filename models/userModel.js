@@ -258,42 +258,6 @@ function apiModule() {
 								!json.userType ? user.set('managedBy', 'adsense.apac@adpushup.com') : '';
 								return user;
 							})
-							// .then(function(user) {
-							// 	if(json.userType === 'partner') {
-							// 		return user;
-							// 	}
-								
-							// 	var analyticsObj, userId = user.get('email'),
-							// 		anonId = json.anonId,
-							// 		pipeDriveParams = {
-							// 			'txt_name': user.get('firstName'),
-							// 			'txt_email_id': user.get('email'),
-							// 			'txt_website': json.site,
-							// 			'txt_pvs': user.get('pageviewRange'),
-							// 			'txt_platform': 'undefined',
-							// 			'txt_ad_network': user.get('adNetworks').join(' | ')
-							// 		},
-							// 		pipeDriveOptions = {
-							// 			'method': 'POST',
-							// 			'uri': consts.analytics.PIPEDRIVE_URL,
-							// 			'form': pipeDriveParams
-							// 		};
-
-							// 	if (anonId && !user.get('analytics')) {
-							// 		analyticsObj = {
-							// 			'anonymousId': anonId,
-							// 			'userId': userId,
-							// 			'isUserIdentified': true
-							// 		};
-							// 		user.set('analytics', analyticsObj);
-							// 	}
-
-							// 	return request(pipeDriveOptions).then(function() {
-							// 		return user;
-							// 	}).catch(function(err) {
-							// 		throw err;
-							// 	});
-							// })
 							.then(function(user) {
 								return user.addSite(json.site).then(function() {
 									return user.save();

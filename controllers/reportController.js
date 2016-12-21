@@ -264,7 +264,7 @@ router
 		var getUser = userModel.getUserByEmail(req.session.user.email),
 			getSiteData = getUser.then(getUserSiteData),
 			paramConfig = {
-				siteId: req.query.siteId,
+				siteId: req.params.siteId,
 				isSuperUser: req.session.isSuperUser,
 				startDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
 				endDate: moment().subtract(1, 'days').format('YYYY-MM-DD')
@@ -365,30 +365,30 @@ router
 	.get('/apexData', function(req, res, next) {
 		function getVariationTrafficDistribution(config) {
 			return siteModel.getSiteById(config.siteId).then(function(site) {
-				var variationName, apConfigs, trafficDistributionObj, computedObj = {};
+				return site.getVariationConfig().then(function(variationConfig) {
+					var computedObj = {};
 
-				if (site.isApex()) {
-					apConfigs = site.get('apConfigs');
-					trafficDistributionObj = (typeof apConfigs.trafficDistribution !== 'undefined') ? apConfigs.trafficDistribution : null;
+					if (site.isApex()) {
+						if (!!variationConfig) {
+							config.variations.forEach(function(variationKey) {
+								var variationObj = variationConfig[variationKey];
 
-					if (!!trafficDistributionObj) {
-						config.variations.forEach(function(variationKey) {
-							variationName = ([config.pageGroup.toUpperCase(), variationKey, config.platform.toUpperCase()]).join('_');
+								if (variationConfig.hasOwnProperty(variationKey) && variationObj && (Number(variationObj.trafficDistribution) > -1)) {
+									computedObj[variationKey] = {
+										'name': variationObj.name,
+										'id': variationObj.id,
+										'value': variationObj.trafficDistribution
+									};
+								}
+							});
 
-							if (trafficDistributionObj.hasOwnProperty(variationName) && trafficDistributionObj[variationName]) {
-								computedObj[variationKey] = {
-									'name': variationName,
-									'value': trafficDistributionObj[variationName]
-								};
-							}
-						});
-
+							return computedObj;
+						}
 						return computedObj;
 					}
-					return computedObj;
-				}
 
-				return computedObj;
+					return computedObj;
+				});
 			});
 		}
 
@@ -413,8 +413,9 @@ router
 				variationObj = trafficDistributionData[variationKey];
 
 				if (trafficDistributionData.hasOwnProperty(variationKey) && variationObj) {
-					// Set variation traffic distribution value
-					computedReport.data.rows[idx][1] = variationObj.value;
+					// Set variation name and its traffic distribution value
+					computedReport.data.rows[idx][0] = variationObj.name;
+					computedReport.data.rows[idx][2] = variationObj.value;
 				}
 			});
 
@@ -423,9 +424,9 @@ router
 			return Promise.resolve(computedReport);
 		}
 
-		function getPerformanceData(rows) {
+		function getCTRPerformanceData(rows) {
 			var ctrArr = rows.map(function(row) {
-					return row[4];
+					return row[1];
 				}),
 				controlCtr = lodash.min(ctrArr),
 				performanceArr = ctrArr.map(function(ctr) {
@@ -435,30 +436,46 @@ router
 			return performanceArr;
 		}
 
+		function insertDataFields(origArr, newFieldsArr, pushIndex, placeHolder) {
+			var len = newFieldsArr.length, pushIdx = pushIndex, i;
+
+			origArr.unshift(placeHolder);
+
+			for (i = 0; i < len; i++) {
+				// Insert fields item
+				origArr.splice(++pushIdx, 0, newFieldsArr[i]);
+			}
+
+			return origArr;
+		}
+
+		function addEmptyDataFields(reportData) {
+			var computedReport = lodash.assign({}, reportData),
+				headerFields = ['Page Views', 'Revenue', 'Page RPM (PERFORMANCE %)'],
+				rowFields = [' ', ' ', ' '],
+				footerFields = [' ', ' ', ' '],
+				header = computedReport.data.header,
+				rows = computedReport.data.rows,
+				footer = computedReport.data.footer;
+
+			rows.forEach(function(row, idx) {
+				var computedRow = insertDataFields(row, rowFields, 2, ' ');
+
+				computedReport.data.rows[idx] = computedRow;
+			});
+
+			computedReport.data.header = insertDataFields(header, headerFields, 2, ' ');
+			computedReport.data.footer = insertDataFields(footer, footerFields, 2, ' ');
+
+			return Promise.resolve(computedReport);
+		}
+
 		function setCTRPerformanceData(reportData) {
 			var computedReport = lodash.assign({}, reportData),
 				rows = computedReport.data.rows,
-				performanceArr = getPerformanceData(rows);
+				performanceArr = getCTRPerformanceData(rows);
 
-			rows.forEach(function(row, idx) {
-				// Added number placeholder for input selection
-				computedReport.data.rows[idx].unshift(idx);
-				// Added performance item
-				computedReport.data.rows[idx].push(performanceArr[idx]);
-				// Added RPM item
-				computedReport.data.rows[idx].push(idx);
-			});
-
-			computedReport.data.header.unshift(' ');
-			computedReport.data.header.push('Performance (%)');
-			computedReport.data.header.push('RPM');
-			computedReport.data.header[2] = 'Traffic (%)';
-
-			computedReport.data.footer.unshift('-');
-			computedReport.data.footer.push('-');
-			computedReport.data.footer.push('-');
 			computedReport.data.performance = performanceArr;
-
 			return Promise.resolve(computedReport);
 		}
 
@@ -482,7 +499,9 @@ router
 			return Promise.join(getReport, getTDConfig, getVariationTD, function(report, trafficDistributionConfig, trafficDistributionData) {
 				return setTrafficDistribution(report, trafficDistributionData).then(function(reportWithTD) {
 					return setCTRPerformanceData(reportWithTD).then(function(reportWithCTRPerformance) {
-						return res.json(reportWithCTRPerformance);
+						return addEmptyDataFields(reportWithCTRPerformance).then(function(reportWithAddedFields) {
+							res.json(reportWithAddedFields);
+						});
 					});
 				});
 			});

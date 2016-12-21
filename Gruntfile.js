@@ -16,19 +16,27 @@ module.exports = function (grunt) {
         },
         uglify: {
             baseLibsBuild: {
-                src: ['public/assets/js/build/base-libs-build.js'],
-                dest: 'public/assets/js/build/base-libs-build.min.js'
+                src: ['public/assets/js/builds/base-libs-build.js'],
+                dest: 'public/assets/js/builds/base-libs-build.min.js'
             },
             onboardingBuild: {
-                src: ['public/assets/js/libs/custom/adpushup-setup.js'],
-                dest: 'public/assets/js/build/adpushup-setup.min.js'
-            }
+                src: ['public/assets/js/libs/custom/adpushup-onboarding.js'],
+                dest: 'public/assets/js/builds/adpushup-onboarding.min.js'
+            },
+            signupBuild: {
+                src: ['public/assets/js/build/signup-build.js'],
+                dest: 'public/assets/js/build/signup-build.min.js'
+            },
         },
         browserify: {
             options: {
                 browserifyOptions: {
                     basedir: "."  
                 },
+            },
+            Signup: {
+                src: ['public/assets/js/libs/custom/signup.js'],
+                dest: 'public/assets/js/build/signup-build.js'
             },
             BaseLibs: {
                 src: [

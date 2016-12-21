@@ -1,65 +1,47 @@
 var ApexReport = (function(w, $) {
-	function cdfNorm(x) {
-		var a = 0.0498673470,
-			b = 0.0211410061,
-			c = 0.0032776263,
-			d = 0.0000380036,
-			e = 0.0000488906,
-			f = 0.0000053830,
-			t = 1.0 + Math.abs(x) * (a + Math.abs(x) * (b + Math.abs(x) * (c + Math.abs(x) * (d + Math.abs(x) * (e + Math.abs(x) * f)))));
-		t *= t;
-		t *= t;
-		t *= t;
-		t *= t;
-		t = 1.0 / (t + t);
-		if (x >= 0) {
-			t = 1 - t;
-		}
-		return t;
+	var _dataTable, _apexData;
+
+	function setApexData(data) {
+		_apexData = data;
 	}
 
-	function calculateStatisticalSignificance(config) {
-		var originalSessions = config.original.sessions,
-			originalConversions = config.original.conversions,
-			variantSessions = config.variant.sessions,
-			variantConversions = config.variant.conversions,
-			minimumSignificance = 95,
-			originalMean, variantMean, pValue, stdError, zValue,
-			computedConfig = {};
+	function setDataTable(dataTable) {
+		_dataTable = dataTable;
+	}
 
-		if (isNaN(originalSessions) || isNaN(originalConversions) || isNaN(variantSessions) || isNaN(variantConversions)) {
-			// throw new AdPushupError('Cannot compute significance, please enter only numbers!');
-			return false;
-		}
-		if (originalConversions > originalSessions || variantConversions > variantSessions) {
-			// throw new AdPushupError('The number of conversions cannot be greater than the number of sessions.');
-			return false;
-		}
+	function setClassNames() {
+		var $table = $('#reports_table ._ap_table'),
+			$theadTh = $table.find('> thead > tr > th'),
+			$tbodyTr = $table.find('> tbody > tr'),
+			$tfootTh = $table.find('> tfoot > tr > th'),
+			classNameArr = ['js-selection', 'js-variationName', 'js-ctr', 'js-pageViews', 'js-revenue', 'js-pageRPM', 'js-traffic'];
 
-		originalMean = originalConversions / originalSessions;
-		variantMean = variantConversions / variantSessions;
+		$theadTh.each(function(idx, el) {
+			var $el = $(el), className = classNameArr[idx] + '-thead-item';
 
-		if (originalMean === variantMean) {
-			pValue = 50;
-		} else {
-			stdError = Math.sqrt((originalMean * (1 - originalMean) / originalSessions) + (variantMean * (1 - variantMean) / variantSessions));
-			zValue = (variantMean - originalMean) / stdError;
-			pValue = parseInt(cdfNorm(zValue) * 1000, 10) / 10;
-		}
+			$el.addClass(className);
+		});
 
-		if (pValue > minimumSignificance) {
-			computedConfig.perf = 'success';
-		} else {
-			computedConfig.perf = 'warning';
-		}
+		$tbodyTr.each(function(idx, el) {
+			var $el = $(el), $td = $el.find('> td');
 
-		computedConfig.value = pValue;
-		return computedConfig;
+			$td.each(function(iidx, tdEl) {
+				var $tdEl = $(tdEl), className = classNameArr[iidx] + '-tbody-item';
+
+				$tdEl.addClass(className);
+			});
+		});
+
+		$tfootTh.each(function(idx, el) {
+			var $el = $(el), className = classNameArr[idx] + '-tfoot-item';
+
+			$el.addClass(className);
+		});
 	}
 
 	function selectControlVariation() {
 		var $tbody = $('#reports_table ._ap_table').find('tbody'),
-			$ctrEls = $tbody.find('tr > td:nth-child(6)'), $controlTr, ctrArr = [],
+			$ctrEls = $tbody.find('tr > .js-ctr-tbody-item'), $controlTr, ctrArr = [],
 			controlCtr, controlTrIndex;
 
 		$ctrEls.each(function(idx, el) {
@@ -74,7 +56,7 @@ var ApexReport = (function(w, $) {
 	}
 
 	function updateTableRPMUI() {
-		var $rpmEls = $('#reports_table ._ap_table > tbody > tr > td:nth-child(8)'),
+		var $rpmEls = $('#reports_table ._ap_table > tbody > tr > .js-pageRPM-tbody-item'),
 			$tpl,
 			tooltipConfig = {
 				animation: true,
@@ -99,34 +81,42 @@ var ApexReport = (function(w, $) {
 	}
 
 	function updateTableSelectionUI() {
-		var $selectionEls = $('#reports_table ._ap_table > tbody > tr > td:nth-child(1)'),
+		var $selectionEls = $('#reports_table ._ap_table > tbody > tr > .js-selection-tbody-item'),
 			$tpl,
 			tooltipConfig = {
 				animation: true,
 				placement: 'top',
 				title: 'Set as Control variation',
 				trigger: 'hover'
-			};
+			},
+			selectedElTipConfig = $.extend({}, tooltipConfig);
+
+		selectedElTipConfig.title = 'Control Variation';
 
 		$selectionEls.each(function(idx, el) {
-			var $el = $(el);
+			var $el = $(el), isSelectedEl = $el.parent().hasClass('selected');
+
 			$tpl = $("<button id='selection-btn-" + idx + "' class='btn btn-default btn--icon js-selection-btn' type='button'></button>");
 
-			$el
-				.html($tpl)
-				.find('.js-selection-btn')
-				.tooltip(tooltipConfig)
-				.end();
-
+			$el.html($tpl);
 			setSelectionEventListeners();
 
-			if ($el.parent().hasClass('selected')) {
-				$el.find('.js-selection-btn').click();
+			if (isSelectedEl) {
+				$el
+					.find('.js-selection-btn')
+					.tooltip(selectedElTipConfig)
+					.click()
+					.end();
+			} else {
+				$el
+					.find('.js-selection-btn')
+					.tooltip(tooltipConfig)
+					.end();
 			}
 		});
 	}
 
-	function calculatePerformance($trEls, controlConfig) {
+	function getCTRPerformance($trEls, controlConfig) {
 		var performanceArr = [],
 			config = {
 				icon: {
@@ -151,53 +141,57 @@ var ApexReport = (function(w, $) {
 
 		$trEls.each(function(idx, el) {
 			var $el = $(el),
-				$variationNameEl = $el.find('> td:nth-child(2)'),
-				$pageViewsEl = $el.find('> td:nth-child(4)'),
-				$clicksEl = $el.find('> td:nth-child(5)'),
-				$ctrEl = $el.find('> td:nth-child(6)'),
-				$perfEl = $el.find('> td:nth-child(7)'),
-				perfValue = Math.round(((Number($ctrEl.text()) - controlConfig.ctr) / controlConfig.ctr) * 100),
-				significanceData = calculateStatisticalSignificance({
-					original: {
-						sessions: controlConfig.pageViews,
-						conversions: controlConfig.clicks
-					},
-					variant: {
-						sessions: Number($pageViewsEl.text()),
-						conversions: Number($clicksEl.text())
-					}
-				}),
-				significanceStr = 'Variation ' + $variationNameEl.text() + ' is performing <b>' + (Math.abs(perfValue)).toString() + '%</b> ';
+				$variationNameEl = $el.find('> .js-variationName-tbody-item'),
+				$ctrEl = $el.find('> .js-ctr-tbody-item'),
+				ctr = Number($ctrEl.text()),
+				pageViews = _apexData.tracked[ctr].pageViews,
+				clicks = _apexData.tracked[ctr].adClicks,
+				perfValue = Math.round(((ctr - controlConfig.ctr) / controlConfig.ctr) * 100),
+				alphaValue = 0.05, significanceResult,
+				signClassNames = 'popover-content-text-block text-uppercase text-bold',
+				significanceModel = w.SS.getModel(controlConfig.pageViews, pageViews, controlConfig.clicks, clicks),
+				perfStr = '<div class="popover-content-text-block">Variation ' + $variationNameEl.text() + ' is performing <strong style="font-size:1.2em;display:inline-block;margin:0 3px;">' + (Math.abs(perfValue)).toString() + '%</strong>';
+
+			significanceResult = w.SS.test(significanceModel, alphaValue);
 
 			performanceArr.push(perfValue);
-			$perfEl.text(perfValue.toString());
 
 			if (perfValue > 0) {
-				significanceStr += 'better than control variation';
-				popoverConfig.content = significanceStr;
+				perfStr += 'better than control variation</div>';
+				signClassNames += (significanceResult.success) ? ' text-success' : ' text-error';
+				perfStr += '<div class="' + signClassNames + '">' + significanceResult.str + '</div>';
+				perfStr += '<ul class="list-group"><li class="list-group-item"><span class="badge">' + pageViews +  '</span>Page Views</li>';
+				perfStr += '<li class="list-group-item"><span class="badge"> ' + clicks + '</span>Clicks</li></ul>';
 
-				$perfEl
+				popoverConfig.content = perfStr;
+
+				$ctrEl
 					.addClass('perf')
 					.append($(config.icon.tpl.success))
 					.find('.js-icon')
+					.text(perfValue)
 					.popover(popoverConfig)
 					.end();
 
-				// if (significanceData.perf === config.icon.str.success) {
-				// 	$perfEl.addClass('perf--high');
-				// } else {
-				// 	$perfEl.addClass('perf--low');
-				// }
+				if (significanceResult.success && !significanceResult.incomplete) {
+					$ctrEl.addClass('perf--high');
+				} else if (!significanceResult.success) {
+					$ctrEl.addClass('perf--low');
+				}
 			} else if (perfValue === 0) {
-				$perfEl.addClass('perf perf--equal');
+				$ctrEl.addClass('perf perf--equal');
 			} else {
-				significanceStr += 'worse than control variation';
-				popoverConfig.content = significanceStr;
+				perfStr += 'worse than control variation</div>';
+				perfStr += '<ul class="list-group"><li class="list-group-item"><span class="badge">' + pageViews +  '</span>Page Views</li>';
+				perfStr += '<li class="list-group-item"><span class="badge"> ' + clicks + '</span>Clicks</li></ul>';
 
-				$perfEl
+				popoverConfig.content = perfStr;
+
+				$ctrEl
 					.addClass('perf perf--lowest')
 					.append($(config.icon.tpl.error))
 					.find('.js-icon')
+					.text(perfValue)
 					.popover(popoverConfig)
 					.end();
 			}
@@ -206,20 +200,150 @@ var ApexReport = (function(w, $) {
 
 	function calculateCTRPerformance($targetBtn) {
 		var $targetTr = $targetBtn.parentsUntil('tr').parent(),
-			$targetPageViewsTd = $targetTr.find(' > td:nth-child(4)'),
-			$targetClicksTd = $targetTr.find(' > td:nth-child(5)'),
-			$targetCTRTd = $targetTr.find(' > td:nth-child(6)'),
-			$targetPerfTd = $targetTr.find(' > td:nth-child(7)'),
+			$targetCTRTd = $targetTr.find(' > .js-ctr-tbody-item'),
+			ctr = Number($targetCTRTd.text()),
+			pageViews = _apexData.tracked[ctr].pageViews,
+			clicks = _apexData.tracked[ctr].adClicks,
 			targetConfig = {
-				'pageViews': Number($targetPageViewsTd.text()),
-				'clicks': Number($targetClicksTd.text()),
-				'ctr': Number($targetCTRTd.text()),
+				'pageViews': Number(pageViews),
+				'clicks': Number(clicks),
+				'ctr': ctr,
 				'$el': $targetCTRTd
 			},
 			$otherTrEls = $targetBtn.parentsUntil('tbody').parent().find('> tr').not($targetTr);
 
-		$targetPerfTd.html('');
-		return calculatePerformance($otherTrEls, targetConfig);
+		return getCTRPerformance($otherTrEls, targetConfig);
+	}
+
+	function getSelectedTr() {
+		var $trEls = $('#reports_table ._ap_table > tbody > tr'),
+			$selectedTr, $otherTrEls;
+
+		$trEls.each(function(idx, el) {
+			var $tr = $(el);
+
+			$selectedTr = ($tr.hasClass('selected')) ? $tr : $selectedTr;
+		});
+
+		$otherTrEls = $trEls.not($selectedTr);
+		return [$selectedTr, $otherTrEls];
+	}
+
+	function getPageRPMPerformance($trEls, controlConfig) {
+		var performanceArr = [],
+			config = {
+				icon: {
+					'tpl': {
+						'success': "<i class='fa fa-caret-up icon-caret js-icon'></i>",
+						'error': "<i class='fa fa-caret-down icon-caret js-icon'></i>"
+					},
+					'str': {
+						'success': 'success',
+						'warning': 'warning'
+					}
+				}
+			},
+			popoverConfig = {
+				'animation': true,
+				'content': '',
+				'placement': 'top',
+				'html': true,
+				'title': 'Significance',
+				'trigger': 'hover'
+			};
+
+		$trEls.each(function(idx, el) {
+			var $el = $(el),
+				$variationNameEl = $el.find('> .js-variationName-tbody-item'),
+				$pageRPMEl = $el.find('> .js-pageRPM-tbody-item'),
+				pageRPM = $pageRPMEl.text().trim(),
+				pageViews = $el.find('.js-pageViews-tbody-item').text().trim(),
+				revenue = $el.find('.js-revenue-tbody-item').text().trim(),
+				alphaValue = 0.05, significanceResult,
+				signClassNames = 'popover-content-text-block text-uppercase text-bold',
+				significanceModel, perfValue, perfStr;
+
+			if (!!(pageRPM) && !!(pageViews) && !!(revenue) && ($pageRPMEl.find('.js-icon').length === 0)) {
+				pageRPM = Number(pageRPM);
+				pageViews = Number(pageViews);
+				revenue = Number(revenue);
+
+				perfValue = Math.round(((pageRPM - controlConfig.rpm) / controlConfig.rpm) * 100);
+				significanceModel = w.SS.getModel(controlConfig.pageViews, pageViews, controlConfig.revenue, revenue);
+				significanceResult = w.SS.test(significanceModel, alphaValue);
+				perfStr = '<div style="display: block; margin-bottom: 5px;">Variation ' + $variationNameEl.text() + ' is performing <strong style="font-size:1.2em;display:inline-block;margin:0 3px;">' + (Math.abs(perfValue)).toString() + '%</strong>';
+				performanceArr.push(perfValue);
+
+				if (perfValue > 0) {
+					perfStr += 'better than control variation</div>';
+					signClassNames += (significanceResult.success) ? ' text-success' : ' text-error';
+					perfStr += '<div class="' + signClassNames + '">' + significanceResult.str + '</div>';
+					popoverConfig.content = perfStr;
+
+					$pageRPMEl
+						.addClass('perf')
+						.append($(config.icon.tpl.success))
+						.find('.js-icon')
+						.text(perfValue)
+						.popover(popoverConfig)
+						.end();
+
+					if (significanceResult.success && !significanceResult.incomplete) {
+						$pageRPMEl.addClass('perf--high');
+					} else if (!significanceResult.success) {
+						$pageRPMEl.addClass('perf--low');
+					}
+				} else if (perfValue === 0) {
+					$pageRPMEl.addClass('perf perf--equal');
+				} else {
+					perfStr += 'worse than control variation</div>';
+					popoverConfig.content = perfStr;
+
+					$pageRPMEl
+						.addClass('perf perf--lowest')
+						.append($(config.icon.tpl.error))
+						.find('.js-icon')
+						.text(perfValue)
+						.popover(popoverConfig)
+						.end();
+				}
+			}
+		});
+	}
+
+	function calculatePageRPMPerformance($el) {
+		var $targetTr, trArr = getSelectedTr(), pageRpm, pageViews, revenue,
+			$otherTrEls, $selectedTr, targetConfig;
+
+		if (!$el) {
+			$targetTr = trArr[0];
+		} else {
+			$targetTr = ($el.get(0).tagName.toLowerCase() === 'td') ? $el.parent() : $el.parentsUntil('tr').parent();
+		}
+
+		if ($targetTr.hasClass('selected')) {
+			$selectedTr = $targetTr;
+		} else {
+			return false;
+		}
+
+		$otherTrEls = trArr[1];
+		pageRpm = $selectedTr.find('.js-pageRPM-tbody-item').text().trim();
+		pageViews = $selectedTr.find('.js-pageViews-tbody-item').text().trim();
+		revenue = $selectedTr.find('.js-revenue-tbody-item').text().trim();
+
+		if (!!(pageRpm) && !!(pageViews) && !!(revenue)) {
+			targetConfig = {
+				rpm: Number(pageRpm),
+				pageViews: Number(pageViews),
+				revenue: Number(revenue),
+				$trEl: $selectedTr
+			};
+
+			return getPageRPMPerformance($otherTrEls, targetConfig);
+		}
+
+		return false;
 	}
 
 	function handleSelectionBtnClick(e) {
@@ -232,42 +356,64 @@ var ApexReport = (function(w, $) {
 					'tpl': '<i class="fa fa-check"></i>',
 					'iconTpl': "<i class='fa fa-info-circle js-icon'></i>"
 				}
-			};
+			},
+			tooltipConfig = {
+				animation: true,
+				placement: 'top',
+				title: 'Set as Control variation',
+				trigger: 'hover'
+			},
+			selectedElTipConfig = $.extend({}, tooltipConfig),
+			$selectedTr;
 
+		selectedElTipConfig.title = 'Control Variation';
 		$el = ($el.parent().hasClass('js-selection-btn')) ? $el.parent() : $el;
 
 		if ($el.hasClass(classNameConfig.btn.selected)) {
 			return false;
 		}
 
-		$el
-			.parentsUntil('tbody').parent()
-				.find('tr')
-				.removeClass(classNameConfig.btn.selected)
-					.find('.js-selection-btn')
-					.html('')
-					.removeClass(classNameConfig.btn.selected)
-					.end()
-					.find('> td:nth-child(6) > .js-icon')
-					.remove()
-					.end()
-					.find('> td:nth-child(7)')
-					.removeClass('perf perf--high perf--equal perf--low perf--lowest')
-						.find('> .js-icon')
-						.remove()
-						.end()
-					.end();
+		$selectedTr = $el.parentsUntil('tbody').parent().find('tr');
+
+		$selectedTr.removeClass(classNameConfig.btn.selected);
+		$selectedTr
+			.find('.js-selection-btn')
+			.html('')
+			.removeClass(classNameConfig.btn.selected)
+			.end();
+		$selectedTr
+			.find('> .js-ctr-tbody-item > .js-icon')
+			.remove()
+			.end();
+		$selectedTr
+			.find('> .js-pageRPM-tbody-item > .js-icon')
+			.remove()
+			.end();
+		$selectedTr
+			.find('> .js-ctr-tbody-item')
+			.removeClass('perf perf--high perf--equal perf--low perf--lowest')
+				.find('> .js-icon')
+				.remove()
+				.end();
+
+		$selectedTr
+			.find('> .js-pageRPM-tbody-item')
+			.removeClass('perf perf--high perf--equal perf--low perf--lowest')
+				.find('> .js-icon')
+				.remove()
+				.end()
+			.end();
 
 		$el.addClass(classNameConfig.btn.selected)
 			.html($(classNameConfig.icon.tpl))
 			.parentsUntil('tr').parent()
 			.addClass(classNameConfig.btn.selected)
-				.find('> td:nth-child(6)')
+				.find('> .js-ctr-tbody-item')
 				.append($(classNameConfig.icon.iconTpl))
 					.find('.js-icon')
 					.tooltip({
 						animation: true,
-						placement: 'right',
+						placement: 'top',
 						title: 'This CTR is selected as Control CTR',
 						trigger: 'hover'
 					})
@@ -275,6 +421,7 @@ var ApexReport = (function(w, $) {
 				.end();
 
 		calculateCTRPerformance($el);
+		calculatePageRPMPerformance($el);
 	}
 
 	function setSelectionEventListeners() {
@@ -298,11 +445,13 @@ var ApexReport = (function(w, $) {
 	function handleRPMBtnClick(e) {
 		var $el = $(e.target), paramConfig,
 			$parentEl = $el.parent(),
+			$pageViewsEl = $el.parentsUntil('tr').parent().find('.js-pageViews-tbody-item'),
+			$revenueEl = $el.parentsUntil('tr').parent().find('.js-revenue-tbody-item'),
 			text = $el.text(),
 			iconTpl = "<i class='fa js-icon'></i>",
 			reports = w.adpushup.reports.config,
-			variationName = $el.parentsUntil('tr').parent().find("> td:nth-child(2)").text(),
-			channelName = (reports.platform.toUpperCase() + ':' + reports.pageGroup.toUpperCase() + '_' + variationName),
+			variationName = $el.parentsUntil('tr').parent().find('> .js-variationName-tbody-item').text(),
+			variationKey = getVariationKeyByName(variationName),
 			classNameConfig = {
 				'icon': {
 					'spinner': 'fa-cog fa-spin',
@@ -317,7 +466,9 @@ var ApexReport = (function(w, $) {
 
 		paramConfig = {
 			siteId: reports.siteId,
-			channelName: channelName,
+			variationKey: variationKey,
+			platform: reports.platform.toUpperCase(),
+			pageGroup: reports.pageGroup.toUpperCase(),
 			endDate: reports.endDate,
 			reportType: reports.reportType,
 			startDate: reports.startDate,
@@ -335,7 +486,7 @@ var ApexReport = (function(w, $) {
 				.addClass(classNameConfig.icon.spinner)
 				.end();
 
-		function successCallback(rpmValue) {
+		function successCallback(data) {
 			$el
 				.addClass(classNameConfig.btn.success)
 					.find('.js-icon')
@@ -352,7 +503,10 @@ var ApexReport = (function(w, $) {
 						.end()
 					.remove();
 
-				$parentEl.text(rpmValue);
+				$parentEl.text(data.rpm);
+				$pageViewsEl.text(data.pageViews);
+				$revenueEl.text(data.earnings);
+				calculatePageRPMPerformance($parentEl);
 			}, 2000);
 		}
 
@@ -395,7 +549,7 @@ var ApexReport = (function(w, $) {
 			data = (typeof data === 'string') ? JSON.parse(data) : data;
 
 			if (data.success) {
-				return callbackConfig.success(data.rpm);
+				return callbackConfig.success(data);
 			}
 
 			return callbackConfig.error();
@@ -404,12 +558,29 @@ var ApexReport = (function(w, $) {
 		});
 	}
 
+	function getVariationKeyByName(variationName) {
+		var formattedVariationName = variationName.toLowerCase().trim(), selectedVariationKey;
+
+		Object.keys(_apexData.trafficDistribution).forEach(function(tdKey) {
+			var variationObj = _apexData.trafficDistribution[tdKey];
+
+			if (variationObj.name.toLowerCase() === formattedVariationName) {
+				selectedVariationKey = variationObj.id;
+			}
+		});
+
+		return selectedVariationKey;
+	}
+
 	function updateTrafficDistributionUI() {
-		var $trafficDistributionEls = $('#reports_table ._ap_table > tbody > tr > td:nth-child(3)'),
+		var $trafficDistributionEls = $('#reports_table ._ap_table > tbody .js-traffic-tbody-item'),
 			$tpl;
 
 		$trafficDistributionEls.each(function(idx, el) {
-			var $el = $(el), text = $el.text();
+			var $el = $(el), text = $el.text(),
+				variationName = $el.parent().find('.js-variationName-tbody-item').text(),
+				variationKey = getVariationKeyByName(variationName);
+
 			$tpl = $("<div class='input-group js-input-group'><input type='text' class='form-control js-traffic-distribution-input' placeholder='b/w 0-100' aria-describedby='traffic-distribution'><div class='input-group-btn'><button class='btn btn-default js-traffic-distribution-btn' type='button'><i class='fa fa-save'></i></button></div></div>");
 
 			$el
@@ -417,19 +588,19 @@ var ApexReport = (function(w, $) {
 				.find('.js-traffic-distribution-input')
 				.val(text)
 				.attr({
-					'data-variation-key': $el.prev().text()
+					'data-variation-key': variationKey
 				})
 				.end();
 		});
 	}
 
 	function initTDPopovers() {
-		var $inputGroupEl = $('#reports_table ._ap_table .js-input-group'),
+		var $inputGroupEl = $('#reports_table ._ap_table .js-traffic-tbody-item .js-input-group'),
 			popoverConfig = {
 				'animation': true,
 				'container': 'body',
 				'content': 'Change text box value, press "Enter" key and click save button',
-				'placement': 'right',
+				'placement': 'left',
 				'title': 'HOW TO USE',
 				'trigger': 'hover'
 			};
@@ -441,10 +612,10 @@ var ApexReport = (function(w, $) {
 		var $el = $(e.target),
 			configs = w.adpushup.reports.config,
 			trafficDistribution = $el.val(),
-			variationName = ([configs.pageGroup.toUpperCase(), $el.attr('data-variation-key'), configs.platform.toUpperCase()]).join('_'),
+			variationKey = $el.attr('data-variation-key'),
 			paramConfig = {
 				'trafficDistribution': trafficDistribution,
-				'variationName': variationName,
+				'variationKey': variationKey,
 				'siteId': configs.siteId
 			};
 
@@ -548,12 +719,21 @@ var ApexReport = (function(w, $) {
 	}
 
 	return {
+		'setData': function(apexData, dataTable) {
+			setApexData(apexData);
+			setDataTable(dataTable);
+		},
+		'getData': function() {
+			return [_apexData, _dataTable];
+		},
+		'setClassNames': setClassNames,
 		'updateTrafficDistributionUI': updateTrafficDistributionUI,
 		'initTDPopovers': initTDPopovers,
 		'setTDEventHandlers': setTDEventHandlers,
 		'selectControlVariation': selectControlVariation,
 		'updateTableSelectionUI': updateTableSelectionUI,
-		'updateTableRPMUI': updateTableRPMUI
+		'updateTableRPMUI': updateTableRPMUI,
+		'calculatePageRPMPerformance': calculatePageRPMPerformance
 	};
 })(window, $);
 

@@ -133,6 +133,7 @@
 
         var r = new Report(options);
         var s = r.requestServer();
+        var dataTable;
 
         s.done(function(d) {
             if (d.success) {
@@ -142,12 +143,13 @@
                     return;
                 }
 
-                adpushup.dv[options.chartType](d.data, options);
-                if(options.tableContainer) {
-                    adpushup.dv.tabulateData(d.data, options);
+                // adpushup.dv[options.chartType](d.data, options);
+
+                if (options.tableContainer) {
+                    dataTable = adpushup.dv.tabulateData(d.data, options);
 
                     if (typeof completionCallback === 'function') {
-                        completionCallback(d.data);
+                        completionCallback(d.data, dataTable);
                     }
                 }
             } else {

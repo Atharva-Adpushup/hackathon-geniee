@@ -33,6 +33,10 @@ class insertMenu extends React.Component {
 		this.state = initialState;
 	}
 
+	componentWillMount() {
+		currentUser.userType !== 'partner' ? this.enableNonPartnerAdSizes() : null;
+	}
+
 	componentWillReceiveProps() {
 		this.setState(initialState);
 	}
@@ -86,8 +90,6 @@ class insertMenu extends React.Component {
 		if (!props.isVisible) {
 			return null;
 		}
-
-		currentUser.userType !== 'partner' ? this.enableNonPartnerAdSizes() : null;
 
 		if (!this.state.showExtraOptions) {
 			items = props.insertOptions.map((option, index) => (

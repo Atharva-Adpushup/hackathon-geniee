@@ -3,13 +3,6 @@ extends layout/base
 block getTitle
     - var titleVar = "Edit Profile";
 
-block append analyticsIdentify
-    if (environment == "production")
-        script(type="text/javascript").
-            analytics.track('APP-Update-Profile', {
-                IS_ADMIN: #{isSuperUser}
-            }, intercomObj);
-
 block bodyContent
     - formData = formData || {};
     - var firstNameError = (profileError && profileError.firstName) ? profileError.firstName[0] : null;
