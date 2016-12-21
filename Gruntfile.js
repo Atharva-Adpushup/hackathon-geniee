@@ -42,6 +42,7 @@ module.exports = function (grunt) {
                 src: [
                     'public/assets/js/libs/third-party/bootstrap.js',
                     'public/assets/js/libs/third-party/bootstrap-multiselect.js',
+                    'public/assets/js/libs/third-party/notifications.js',
                     'public/assets/js/appEvent.js',
                     'Editor/app/libs/adpushup.js'
                 ],

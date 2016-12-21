@@ -30,7 +30,12 @@ html(lang="en")
                     - var baseLibsFinalStr = (environment == "production") ? (baseLibsStr + "base-libs-build.min.js") : (baseLibsStr + "base-libs-build.js");
                     +loadAsset("js", [baseLibsFinalStr])
 
+                    script(type='text/javascript').
+                        var currentUser = !{JSON.stringify(currentUser)};
+                        var sites = (Object.keys(currentUser).length > 0) ? currentUser.sites : [];
+
+                        ((window.adpushup = window.adpushup || {}).user = (window.adpushup.user || {})).sites = sites;
+
     body
-    
         block bodyContent
         div(id="freeow-tr", class="freeow freeow-top-right")
