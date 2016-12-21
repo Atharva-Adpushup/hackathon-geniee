@@ -1425,7 +1425,8 @@ maxHeightWidth {
   color: #555555;
   line-height: 22px;
   border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0; }
+  border-bottom-right-radius: 0;
+  word-break: break-all; }
 
 .no-pad {
   padding: 0; }
