@@ -610,13 +610,15 @@ var ApexReport = (function(w, $) {
 
 	function handleTDInputChange(e) {
 		var $el = $(e.target),
-			configs = w.adpushup.reports.config,
+			config = w.adpushup.reports.config,
 			trafficDistribution = $el.val(),
 			variationKey = $el.attr('data-variation-key'),
 			paramConfig = {
 				'trafficDistribution': trafficDistribution,
 				'variationKey': variationKey,
-				'siteId': configs.siteId
+				'siteId': config.siteId,
+				'pageGroup': config.pageGroup,
+				'platform': config.platform
 			};
 
 		$el.data('params', paramConfig);
