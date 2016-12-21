@@ -76,7 +76,7 @@ var $ = require('jquery'),
 				mode: 1,
 				referrer: config.referrer,
 				tracking: browserConfig.trackerSupported,
-				chosenVariation: variation.id // set the chosenVariation variation in feedback data;
+				variationId: variation.id // set the chosenVariation variation in feedback data;
 			},
 			placeGenieeHeadCode = function(genieeIds) {
 				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIds);

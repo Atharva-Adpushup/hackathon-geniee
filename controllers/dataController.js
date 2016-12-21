@@ -87,7 +87,7 @@ router
 		function getTotalPageViews() {
 			var config = lodash.assign({}, dataConfig);
 
-			config.queryString = 'mode:1 AND chosenVariation:' + variationKey;
+			config.queryString = 'mode:1 AND variationId:' + variationKey;
 
 			return Promise.resolve(reports.apexReport(config))
 				.then(function(report) {
