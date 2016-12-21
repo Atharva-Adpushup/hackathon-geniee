@@ -302,20 +302,47 @@ router
 					return (channel.platform + ':' + channel.pageGroup);
 				}))
 			};
+		
+		/**
+		 * OBJECTIVE: To check whether there is any channel already deleted in database
+		 * IMPLEMENTATION: Compute deleted channels, if any exist, throw an error
+		 * @param {siteId} siteId site document id
+		 * @param {channelNames} channel names array
+		 * @returns {boolean} When there is no deleted array
+		 */
+		function checkChannelsExistence(siteId, channelNames) {
+			var deletedChannelsArr = lodash.map(channelNames, function(channelNameVal, key) {
+				var channelKey = "chnl::" + siteId + ":" + channelNameVal;
 
-		return siteModel.saveSiteData(siteData.siteId, 'POST', siteData)
-			.then(function() {
-				return channelModel.saveChannels(parsedData.siteId, parsedData.channels)
-				.then(function() {
-					return res.json({
-						success: 1,
-						siteId: parsedData.siteId,
-						siteDomain: parsedData.siteDomain
+				return channelModel.isChannelExist(channelKey)
+					.then(function(isExist) {
+						return (!isExist ? channelNameVal : false);
 					});
-				})
+			});
+
+			return Promise.all(deletedChannelsArr).then(function(channelsArr) {
+				var compactedArr = lodash.compact(channelsArr);
+
+				if (compactedArr && compactedArr.length) {
+					throw new AdPushupError('One or more channels are deleted. Site will not be saved!')
+				}
+
+				return Promise.resolve(true);
+			});
+		}
+
+		return checkChannelsExistence(siteData.siteId, siteData.channels)
+			.then(siteModel.saveSiteData.bind(null, siteData.siteId, 'POST', siteData))
+			.then(channelModel.saveChannels.bind(null, parsedData.siteId, parsedData.channels))
+			.then(function() {
+				return res.json({
+					success: 1,
+					siteId: parsedData.siteId,
+					siteDomain: parsedData.siteDomain
+				});
 			})
 			.catch(function(err) {
-				res.json({
+				return res.json({
 					success: 0,
 					message: err.toString()
 				});
