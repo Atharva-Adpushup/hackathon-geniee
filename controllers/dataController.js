@@ -3,6 +3,7 @@ var express = require('express'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
 	Promise = require('bluebird'),
+	extend = require('extend'),
 	lodash = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
@@ -86,7 +87,7 @@ router
 		function getTotalPageViews() {
 			var config = lodash.assign({}, dataConfig);
 
-			config.queryString = 'mode:1 AND chosenVariation:' + variationKey;
+			config.queryString = 'mode:1 AND variationId:' + variationKey;
 
 			return Promise.resolve(reports.apexReport(config))
 				.then(function(report) {
@@ -242,39 +243,46 @@ router
 	.post('/saveTrafficDistribution', function(req, res) {
 		var data = JSON.parse(req.body.data);
 
-		function saveTrafficDistribution(site) {
-			var apConfigs, trafficDistributionObj, computedObj,
-				value = data.trafficDistribution;
+		function saveChannelData(variationObj) {
+			return channelModel.saveChannel(data.siteId, data.platform, data.pageGroup, variationObj);
+		}
 
-			if (site.isApex()) {
-				apConfigs = site.get('apConfigs');
-				trafficDistributionObj = (typeof apConfigs.trafficDistribution !== 'undefined') ? apConfigs.trafficDistribution : null;
+		function getTrafficDistribution(channel) {
+			var variationsObj = (channel.get('variations') ? channel.get('variations') : {}),
+				computedObj = extend(true, {}, variationsObj),
+				clientKey = data.variationKey, finalVariationObj;
 
-				if (!!trafficDistributionObj && trafficDistributionObj[data.variationName]) {
-					apConfigs.trafficDistribution[data.variationName] = value;
-					computedObj = {
-						'apConfigs': apConfigs
-					};
-
-					return computedObj;
+			lodash.forOwn(computedObj, function(variationObj, variationKey) {
+				if ((clientKey === variationKey) && computedObj[variationKey]) {
+					computedObj[variationKey].trafficDistribution = data.trafficDistribution;
 				}
+			});
+
+			if (!computedObj[clientKey]) {
 				throw new AdPushupError('Traffic Distribution value not saved');
+			} else {
+				finalVariationObj = {
+					'variations': extend(true, {}, computedObj)
+				};
 			}
-			throw new AdPushupError('Traffic Distribution value not saved');
+
+			return finalVariationObj;
 		}
 
 		userModel.verifySiteOwner(req.session.user.email, data.siteId)
 			.then(function() {
-				return siteModel.getSiteById(data.siteId);
-			})
-			.then(saveTrafficDistribution)
-			.then(siteModel.saveSiteData.bind(null, data.siteId, 'POST'))
-			.then(function() {
-				res.json({
-					success: true,
-					siteId: data.siteId,
-					variationName: data.variationName
-				});
+				return siteModel.getSiteById(data.siteId).then(function(site) {
+					return channelModel.getChannel(data.siteId, data.platform, data.pageGroup)
+						.then(getTrafficDistribution)
+						.then(saveChannelData)
+						.then(function() {
+							return res.json({
+								success: true,
+								siteId: data.siteId,
+								variationName: data.variationName
+							});
+						})
+				})
 			})
 			.catch(function(err) {
 				res.json({
