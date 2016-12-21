@@ -8,12 +8,12 @@ var path = require('path'),
     fs = Promise.promisifyAll(require('fs')),
     config = require('../../../configs/config');
 
-module.exports = function(site) {
+module.exports = function (site) {
     var jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'genieeAp.js'),
         tempDestPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'geniee', site.get('siteId').toString()),
-        getAdsPayload = function(variationSections) {
+        getAdsPayload = function (variationSections) {
             var ads = [], ad = null, json, unsyncedAds = false;
-            _.each(variationSections, function(section, sectionId) {
+            _.each(variationSections, function (section, sectionId) {
                 if (!Object.keys(section.ads).length) {
                     return true;
                 }
@@ -52,10 +52,10 @@ module.exports = function(site) {
             });
             return !unsyncedAds ? ads : [];
         },
-        getVariationsPayload = function(site) {
+        getVariationsPayload = function (site) {
             var finalJson = {}, temp, platform, pageGroup, variation;
-            return site.getAllChannels().then(function(allChannels) {
-                _.each(allChannels, function(channel) {
+            return site.getAllChannels().then(function (allChannels) {
+                _.each(allChannels, function (channel) {
                     // sample name HOME_DESKTOP
                     platform = channel.platform; // last element is platform
                     pageGroup = channel.pageGroup; // join remaing to form pageGroup
@@ -69,7 +69,7 @@ module.exports = function(site) {
                         contentSelector: channel.contentSelector
                     };
 
-                    _.each(channel.variations, function(variation, id) {
+                    _.each(channel.variations, function (variation, id) {
                         var ads = getAdsPayload(variation.sections);
                         if (!ads.length) {
                             return true;
@@ -82,7 +82,7 @@ module.exports = function(site) {
                         });
                     });
 
-                    finalJson[platform][pageGroup].variations.sort(function(a, b) {
+                    finalJson[platform][pageGroup].variations.sort(function (a, b) {
                         return a.traffic - b.traffic;
                     })
 
@@ -91,7 +91,7 @@ module.exports = function(site) {
             });
         },
         getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
-        getConfig = getVariationsPayload(site).then(function(allVariations) {
+        getConfig = getVariationsPayload(site).then(function (allVariations) {
             var apConfigs = site.get('apConfigs');
             /* Temp Fields */
             apConfigs.mode = 1;
@@ -100,44 +100,44 @@ module.exports = function(site) {
             apConfigs.experiment = allVariations;
             return apConfigs;
         }),
-        getFinalConfig = Promise.join(getConfig, getJsFile, function(finalConfig, jsFile) {
+        getFinalConfig = Promise.join(getConfig, getJsFile, function (finalConfig, jsFile) {
             site.get('partner') ? finalConfig.partner = site.get('partner') : null;
             jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(finalConfig));
             jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
             return jsFile;
         }),
-        writeTempFile = function(jsFile) {
-            return mkdirpAsync(tempDestPath).then(function() {
+        writeTempFile = function (jsFile) {
+            return mkdirpAsync(tempDestPath).then(function () {
                 return fs.writeFileAsync(path.join(tempDestPath, 'genieeAp.js'), jsFile);
             })
         },
-        cwd = function() {
-            return ftp.cwd('/' + site.get('siteId')).catch(function() {
-                return ftp.mkdir(site.get('siteId')).then(function() {
+        cwd = function () {
+            return ftp.cwd('/' + site.get('siteId')).catch(function () {
+                return ftp.mkdir(site.get('siteId')).then(function () {
                     return ftp.cwd('/' + site.get('siteId'));
                 });
             });
         },
-        connectToServer = function() {
+        connectToServer = function () {
             if (ftp.getConnectionStatus() === 'connected') {
                 return true;
             }
             return ftp.connect({ host: config.cacheFlyFtp.HOST, user: config.cacheFlyFtp.USERNAME, password: config.cacheFlyFtp.PASSWORD });
         },
-        uploadJS = function(js) {
+        uploadJS = function (js) {
             return connectToServer()
                 .then(cwd)
-                .then(function() {
+                .then(function () {
                     return ftp.put(js, 'apex.js');
                 });
         };
 
-        return getFinalConfig
-            //.then(uploadJS)
-            .then(writeTempFile)
-            .finally(function() {
-                if (ftp.getConnectionStatus() === 'connected') {
-                    ftp.end();
-                }
-            });
+    return getFinalConfig
+        .then(uploadJS)
+        .then(writeTempFile)
+        .finally(function () {
+            if (ftp.getConnectionStatus() === 'connected') {
+                ftp.end();
+            }
+        });
 }	
