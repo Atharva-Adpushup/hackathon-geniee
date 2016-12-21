@@ -2,25 +2,44 @@
 
 - link = domanized ? '- '+domanized : '';
 - noSitePresentAlertStr = (domanizedUrl && domanizedUrl.length > 0) ? domanizedUrl : "one";
-- addSiteTemplateStr = "<div id='alert--noSitePresent' data-site='" + origUnSavedDomain + "' data-toggle='modal' data-target=''><button id='addUserSite' class='btn-st apbtn-main'>Lets add <span style='cursor: pointer;'>" + noSitePresentAlertStr +" ?</span></button></div> ";
+- addSiteTemplateStr = "<div id='alert--noSitePresent' data-site='" + origUnSavedDomain + "' data-toggle='modal' data-target=''><button id='addUserSite' class='btn-st apbtn-main ob-btn'>Start with <span style='cursor: pointer;'>" + noSitePresentAlertStr +" ?</span></button></div> ";
 
 //- Intro modal
 #intromodal.modal._ap_modal.fade.intro-modal(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
-    .modal-dialog
+    .modal-dialog.modal-lg(style="width: 80%;", data-backdrop="static", data-keyboard="false")
         .modal-content
-            .pull-right
-                button.close(type='button', data-dismiss='modal', aria-label='Close')
-                    span(aria-hidden='true') ×
+            //- .pull-right
+            //-     button.close(type='button', data-dismiss='modal', aria-label='Close')
+            //-         span(aria-hidden='true') ×
             .text-center
                 h2 Welcome to AdPushup!
-                p
-                    | AdPushup lets you Maximize Your Ad Revenue With The Power Of Ad Layout Optimization.
-                img.img-responsive(src="/assets/images/intro_graphic.png")
-                p
-                    | AdPushup’s ad layout optimization technology will help you increase the viewability of your existing website ads without affecting visitor experience.
-                .row
-                    .col-sm-4.col-sm-offset-4
-                        button.apbtn-main(type='button', data-dismiss='modal', aria-label='Close') Get Started
+                    //- | AdPushup lets you Maximize Your Ad Revenue With The Power Of Ad Layout Optimization.
+                //- img.img-responsive(src="/assets/images/intro_graphic.png")
+                .row(style="margin-top: 60px;")
+                    .col-md-6
+                        img(src="/assets/images/intro_graphic.png", style="width: 100%;")
+                    .col-md-6
+                        h3(style="margin-bottom: 20px; font-size: 22px;")
+                            | Services you would like to avail
+                        hr
+                        form(id="onboarding-services-form", style="padding: 0px 35px; font-size: 16px;").text-left
+                            .form-group
+                                input.checkbox-custom(type="checkbox", name="only-adsense") 
+                                label.checkbox-custom-label(for="only-adsense") Adsense Ad Layout Optimization
+                            .form-group
+                                input.checkbox-custom(type="checkbox", name="other-networks")
+                                label.checkbox-custom-label(for="other-networks") Other Media Networks Ad layout Optimization
+                            .form-group
+                                input.checkbox-custom(type="checkbox", name="header-bidding")
+                                label.checkbox-custom-label(for="header-bidding") Header Bidding
+                            input.apbtn-main(type='submit', value="Proceed", style="margin-top: 10px", data-unsaved-domain=origUnSavedDomain)
+                            .error-message-box
+                        //- input(type="submit", value="Proceed")
+                //- p
+                //-     | AdPushup’s ad layout optimization technology will help you increase the viewability of your existing website ads without affecting visitor experience.
+                //- .row
+                //-     .col-sm-4.col-sm-offset-4
+                //-         button.apbtn-main(type='button', data-dismiss='modal', aria-label='Close') Get Started
 
 //- Setup completion modal
 #completionmodal.modal._ap_modal.fade.intro-modal(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
@@ -69,16 +88,22 @@ div.detectap-alert.text-center#apdetect
 .onboarding-wrapper
  
     //- Site addition + platform detection
-    .onboarding-step#step1 
+    .onboarding-step#step1
         span(class="counter-icon")
             | 1 
-        h3(class="ob-heading")
-            | Add your site 
-            span.link !{link } 
-            i#step1-check.fa
-        div(class="ob-content")
-            p.text-medium.text-center
-                |  Let’s add your website here. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos? 
+        div.col-md-5
+            img(src="/assets/images/ob_add_site.png", style="width: 90%;")
+            //- h3(class="ob-heading")
+            //-     | Add your site 
+            //-     span.link !{link } 
+            //-     i#step1-check.fa
+        div.col-md-7(class="ob-content")
+            h3(class="ob-heading", style="font-weight: bold;")
+                | Add Site 
+                span.link !{link } 
+                i#step1-check.fa
+            p(style="font-size: 16px; text-align: left; padding: 20px 0 0 20px;")
+                |  Add the website you want to start optimising. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos? 
             if unSavedSite
                 div#addSiteStr
                     != addSiteTemplateStr

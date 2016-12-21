@@ -1,0 +1,54 @@
+.checkbox-custom, .radio-custom {
+    opacity: 0;
+    position: absolute;
+    cursor: pointer;  
+}
+
+.checkbox-custom + .checkbox-custom-label:before, .radio-custom + .radio-custom-label:before {
+    content: '';
+    background: #fff;
+    border: 2px solid #eb575c;
+    display: inline-block;
+    vertical-align: middle;
+    width: 18px;
+    height: 18px;
+    padding: 2px;
+    margin-right: 10px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.checkbox-custom:checked + .checkbox-custom-label:before {
+    background: #eb575c;
+    cursor: pointer;
+}
+
+.radio-custom + .radio-custom-label:before {
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.radio-custom:checked + .radio-custom-label:before {
+    background: #ccc;
+    box-shadow: inset 0px 0px 0px 4px #fff;
+    cursor: pointer;
+}
+
+.checkbox-custom:focus + .checkbox-custom-label, .radio-custom:focus + .radio-custom-label {
+    outline: 1px solid #ddd; /* focus style */
+}
+
+.error-message-box {
+    margin-top: 10px;
+    color: #eb575c;
+}
+
+.ob-btn {
+    margin: 30px 20px 0 20px !important;
+    width: 50%;
+    background: #72b800;
+    border-color: #72b800;
+}
+.ob-content {
+    padding-top: 33px;
+}

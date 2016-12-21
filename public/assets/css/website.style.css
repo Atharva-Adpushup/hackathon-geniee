@@ -1343,9 +1343,6 @@ maxHeightWidth {
   margin: 20px auto; }
 
 .onboarding-step {
-  background-image: url("../images/adpushupbg.png");
-  background-repeat: no-repeat;
-  background-position: -20px 128%;
   min-height: 360px;
   position: relative;
   background-color: #fff;

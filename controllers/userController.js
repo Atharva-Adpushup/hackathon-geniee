@@ -115,6 +115,33 @@ router
 				return res.send({success: 0});
 			});
 	})
+    .post('/setSiteServices', function(req, res) {
+        if(req.body && req.body.servicesString) {
+            userModel.getUserByEmail(req.session.user.email).then(function(user) {
+                var userSites = user.get('sites');
+                for(var i in userSites) {
+                    // console.log(userSites[i]);
+                    // console.log(req.body.newSiteUnSavedDomain);
+                    if(userSites[i].domain === req.body.newSiteUnSavedDomain) {
+                        // console.log('Match Found');
+                        userSites[i].services = req.body.servicesString;
+                        userSites[i].step = 0;
+                        user.set('sites', userSites);
+                        if(user.save()) {
+                            return res.send({success: 1});
+                        }
+                    } else {
+                        return res.send({success: 0});                  
+                    }
+                }
+            }).catch(function(err) {
+                console.log(err);
+                return res.send({success: 0});  
+            });
+        } else {
+            return res.send({success: 0});
+        }
+	})
     .post('/sendCode', function (req, res) {
 		var json = {
 			email: req.body.developerEmail,

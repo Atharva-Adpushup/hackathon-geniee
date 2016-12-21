@@ -64,4 +64,7 @@ module.exports = function (grunt) {
     grunt.registerTask('default', [
         'browserify', 'sass', 'uglify', 'cssmin'
     ]);
+
+    grunt.registerTask('sassTask', ['sass']);
+    grunt.registerTask('jsuglify', ['uglify']);
 };

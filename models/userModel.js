@@ -434,7 +434,7 @@ function apiModule() {
 					})
 					.catch(function(err) {
 						site.pageGroups = [];
-						site.step = 1;						
+						site.step = false;						
 						return site;
 					});
 				}));
