@@ -108,7 +108,7 @@ module.exports = function (site) {
         }),
         writeTempFile = function (jsFile) {
             return mkdirpAsync(tempDestPath).then(function () {
-                return fs.writeFileAsync(path.join(tempDestPath, 'genieeAp.js'), jsFile);
+                return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);
             })
         },
         cwd = function () {
@@ -128,7 +128,7 @@ module.exports = function (site) {
             return connectToServer()
                 .then(cwd)
                 .then(function () {
-                    return ftp.put(js, 'apex.js');
+                    return ftp.put(js, 'adpushup.js');
                 });
         };
 
