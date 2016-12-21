@@ -6,6 +6,7 @@ var express = require('express'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
 	schema = require('../helpers/schema'),
+	CC = require('../configs/commonConsts'),
 	FormValidator = require('../helpers/FormValidator'),
 	_ = require('lodash');
 
@@ -23,7 +24,7 @@ router
 		var partnerEmail = json.partner + '@adpushup.com', siteId;
 		json.ownerEmail = partnerEmail;
 		//TODO: Replace below hard code draft mode with constant
-		json.apConfigs = { 'mode': 2 };
+		json.apConfigs = { 'mode': CC.site.mode.DRAFT };
 
 		// Function to create partner user account and site
 		function createPartnerAndSite() {

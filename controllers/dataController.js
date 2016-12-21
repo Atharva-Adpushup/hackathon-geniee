@@ -4,6 +4,7 @@ var express = require('express'),
 	channelModel = require('../models/channelModel'),
 	Promise = require('bluebird'),
 	extend = require('extend'),
+	CC = require('../configs/commonConsts'),
 	lodash = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
@@ -31,7 +32,7 @@ router
 	})
 	.post('/saveSite', function(req, res) {
 		var data = req.body,
-			siteId = parseInt(req.body.siteId);
+			siteId = parseInt(req.body.siteId, 10);
 		userModel.verifySiteOwner(req.session.user.email, siteId).then(function() {
 			var audienceId = utils.getRandomNumber();
 			var siteData = {
@@ -42,7 +43,7 @@ router
 				'ads': [],
 				'channels': [],
 				'templates': [],
-				'apConfigs': {}
+				'apConfigs': { 'mode': CC.site.mode.DRAFT }
 			};
 			return siteData;
 		})
