@@ -72,7 +72,7 @@ var modelAPI = module.exports = apiModule(),
 
 		this.getNetworkDataObj = function(networkName) {
 			var data = _.find(this.get('adNetworkSettings'), function(networkInfo) {
-				return (networkInfo.get('networkName') === networkName);
+				return (networkInfo.networkName === networkName);
 			});
 			if (!data) {
 				return false;
@@ -87,7 +87,6 @@ var modelAPI = module.exports = apiModule(),
 				return false;
 			}
 
-			data = data.toJSON();
 			if (keys) {
 				return data;
 			}
