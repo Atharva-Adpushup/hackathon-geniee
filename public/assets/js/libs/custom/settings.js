@@ -6,6 +6,7 @@ $(document).ready(function () {
 
         $('#autoOptimise').on('change', function () {
             autoOptimise = $(this).prop('checked');
+            !autoOptimise ? $('#autoOptimiseErr').html('Auto Optimise is <strong>disabled</strong> now. Please set the traffic distribution for your variations manually to prevent unpredictable results. ') : $('#autoOptimiseErr').html('');
         });
 
         function getFormData(values, type) {
