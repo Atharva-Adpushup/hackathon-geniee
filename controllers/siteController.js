@@ -85,12 +85,16 @@ router
     })
     .get('/:siteId/createPagegroup', function(req, res) {
         if(req.session.user.userType !== 'partner') {
-            siteModel.getSiteById(req.params.siteId)
-            .then(function(site) { return site.get('siteDomain') })
-            .then(function(siteDomain) {
+            return siteModel.getSiteById(req.params.siteId)
+            .then(function(site) { return { siteDomain: site.get('siteDomain'), channels: site.get('channels') }})
+            .then(function(data) {
+                var channels = _.map(data.channels, function(channel) {
+                    return channel.split(':')[1];
+                });
                 return res.render('createPageGroup', {
                     siteId: req.params.siteId,
-                    siteDomain: siteDomain
+                    siteDomain: data.siteDomain,
+                    channels: channels
                 });
             })
             .catch(function(err) {
@@ -103,7 +107,7 @@ router
     })
     .post('/:siteId/createPagegroup', function(req, res) {
            var json = req.body;
-           channelModel.createPageGroup(json)
+           return channelModel.createPageGroup(json)
 				.then(function(data) {
 					// Reset session on addition of new pagegroup for non-partner
 					var userSites = req.session.user.sites,
@@ -117,10 +121,20 @@ router
 				})
 				.catch(function(err) {
 					var error = err.message[0].message ?  err.message[0].message : 'Some error occurred!';
-                    return res.render('createPageGroup', {
-                        siteId: req.params.siteId,
-                        error: error
-                    });
+
+                    return siteModel.getSiteById(req.params.siteId)
+                        .then(function(site) { return { siteDomain: site.get('siteDomain'), channels: site.get('channels') }})
+                        .then(function(data) {
+                            var channels = _.map(data.channels, function(channel) {
+                                return channel.split(':')[1];
+                            });
+                            return res.render('createPageGroup', {
+                                siteId: req.params.siteId,
+                                siteDomain: data.siteDomain,
+                                channels: channels,
+                                error: error
+                            });
+                        });
 				});
     })
     .get('/:siteId/pagegroups', function(req, res) {

@@ -3,17 +3,14 @@ extends  layout/base
 block getTitle
     - var titleVar = "Create PageGroup"  
 
+block append headCss
+    link(rel="stylesheet" href="/assets/css/bootstrap-combobox.css")
+
 block append headScripts
+    script(src="/assets/js/libs/third-party/bootstrap-combobox.js")
     script.
         $(document).ready(function() {
-            var siteDomain, domanized = '#{utils.domanize(siteDomain)}';
-            if(!window.localStorage.getItem('selectedDomain')) {
-                window.localStorage.setItem('selectedDomain', domanized);
-                siteDomain = domanized;
-            } else {
-                siteDomain = window.localStorage.getItem('selectedDomain');
-            }
-            $('#siteDomain').html(siteDomain);
+            $('.combobox').combobox();
 
             function getDomain(url) {
                 var a = document.createElement('a');
@@ -23,6 +20,7 @@ block append headScripts
 
             $('#sampleUrl').on('blur', function() {
                 var val = $(this).val();
+
                 if(val && (getDomain(val) !== getDomain('#{siteDomain}'))) {
                     $('#createPg').prop('disabled', true);
                     $('#error-message').html('The Sample URL should be from your website only');   
@@ -49,14 +47,20 @@ block bodyContent
                         .controlAdpushupWrap
                             h3.title.m-All-0.clearfix
                                 a.pull-left Create New PageGroup - 
-                                    span#siteDomain
+                                    span!= utils.domanize(siteDomain)
                             form(method="post", action="createPagegroup")
                                 input(type="hidden" value="#{siteId}" name="siteId")
                                 .row.input-wrapper
                                     .col-sm-2
                                         label Page Group Name
                                     .col-sm-3
-                                        input.form-control(required, name="pageGroupName", type="text" placeholder="Please enter Page Group Name")
+                                        if channels.length > 0
+                                            select(class="combobox input-large form-control" name="pageGroupName")
+                                                option(value="" selected="selected") Please enter Page Group Name  
+                                                for channel in channels
+                                                    option(value="#{channel}")!= channel    
+                                        else 
+                                            input.form-control(required, name="pageGroupName", type="text" placeholder="Please enter Page Group Name")
                                 .row.input-wrapper
                                     .col-sm-2
                                         label Sample Url
