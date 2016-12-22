@@ -85,15 +85,17 @@ router
     })
     .get('/:siteId/createPagegroup', function(req, res) {
         if(req.session.user.userType !== 'partner') {
-            siteModel.getSitePageGroups(req.params.siteId)
-                .then(function(pageGroups) {
-                    return res.render('createPageGroup', {
-                        siteId: req.params.siteId
-                    });
-                })
-                .catch(function(err) {
-                    return res.send('Some error occurred!');
+            siteModel.getSiteById(req.params.siteId)
+            .then(function(site) { return site.get('siteDomain') })
+            .then(function(siteDomain) {
+                return res.render('createPageGroup', {
+                    siteId: req.params.siteId,
+                    siteDomain: siteDomain
                 });
+            })
+            .catch(function(err) {
+                return res.send('Some error occurred!');
+            });
         }
         else {
             return res.render('403');
@@ -101,7 +103,7 @@ router
     })
     .post('/:siteId/createPagegroup', function(req, res) {
            var json = req.body;
-           return channelModel.createPageGroup(json)
+           channelModel.createPageGroup(json)
 				.then(function(data) {
 					// Reset session on addition of new pagegroup for non-partner
 					var userSites = req.session.user.sites,
