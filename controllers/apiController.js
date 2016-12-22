@@ -134,7 +134,6 @@ router
 	.post('/pagegroup/create', function (req, res) {
 		var json = req.body;
 
-		if(!req.session.user) {
 			// Validate input params and create pagegroup
 			return FormValidator.validate(json, schema.api.validations)
 				.then(function () { return channelModel.createPageGroup(json) })
@@ -149,26 +148,7 @@ router
 					var error = err.message[0];
 					return res.status(error.status).send({ success: false, message: error.message });
 				});
-		}
-		else {
-			return channelModel.createPageGroup(json)
-				.then(function(data) {
-					// Reset session on addition of new pagegroup for non-partner
-					var userSites = req.session.user.sites,
-						site = _.find(userSites, {'siteId': parseInt(json.siteId)});
-					site.pageGroups.push(data.channelName);
-					
-					var index = _.findIndex(userSites, {'siteId': parseInt(json.siteId)});
-					req.session.user.sites[index] = site;
-					req.session.pageGroupError = '';
-					
-					return res.redirect('/user/dashboard');
-				})
-				.catch(function(err) {
-					req.session.pageGroupError = err.message[0].message ?  err.message[0].message : 'Some error occurred!';
-					return res.redirect('/user/site/'+json.siteId+'/createPagegroup');
-				});
-		}
+		
 	})
 	.get('/pagegroup/view', function (req, res) {
 		var pageGroupId = req.query.pageGroupId;
