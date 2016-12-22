@@ -14,6 +14,24 @@ block append headScripts
                 siteDomain = window.localStorage.getItem('selectedDomain');
             }
             $('#siteDomain').html(siteDomain);
+
+            function getDomain(url) {
+                var a = document.createElement('a');
+                a.href = url;
+                return a.hostname;
+            }
+
+            $('#sampleUrl').on('blur', function() {
+                var val = $(this).val();
+                if(val && (getDomain(val) !== getDomain('#{siteDomain}'))) {
+                    $('#createPg').prop('disabled', true);
+                    $('#error-message').html('The Sample URL should be from your website only');   
+                }
+                else {
+                    $('#createPg').prop('disabled', false);
+                    $('#error-message').html('');   
+                }
+            });
         });  
 
 block bodyContent
@@ -43,7 +61,7 @@ block bodyContent
                                     .col-sm-2
                                         label Sample Url
                                     .col-sm-3
-                                        input.form-control(required, name="sampleUrl", type="url" placeholder="Please enter Sample Url") 
+                                        input.form-control#sampleUrl(required, name="sampleUrl", type="url" placeholder="Please enter Sample Url") 
                                 .row.input-wrapper
                                     .col-sm-2
                                         label Device
@@ -56,7 +74,7 @@ block bodyContent
                                                 option(value="mobile") Mobile
                                 .row.input-wrapper
                                     .col-sm-4
-                                        h3.error-message!= error
-                                        button.btn.btn-lightBg.btn-default Create Page Group                                             
+                                        h3#error-message.error-message!= error
+                                        button#createPg.btn.btn-lightBg.btn-default Create Page Group                                             
                                                                               
                                            
