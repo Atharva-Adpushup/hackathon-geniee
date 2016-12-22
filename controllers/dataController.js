@@ -2,6 +2,8 @@ var express = require('express'),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
+	adsenseReportModel = require('../models/adsenseModel'),
+	reportsModel = require('../models/reportsModel'),
 	Promise = require('bluebird'),
 	extend = require('extend'),
 	CC = require('../configs/commonConsts'),
@@ -67,7 +69,8 @@ router
 			siteId = queryConfig.siteId,
 			platform = queryConfig.platform,
 			pageGroup = queryConfig.pageGroup,
-			variationKey = queryConfig.variationKey,
+			channelKey = (platform + ":" + pageGroup),
+			clientVariationKey = queryConfig.variationKey,
 			dataConfig = {
 				endDate: queryConfig.endDate,
 				pageGroup: pageGroup,
@@ -88,9 +91,9 @@ router
 		function getTotalPageViews() {
 			var config = lodash.assign({}, dataConfig);
 
-			config.queryString = 'mode:1 AND variationId:' + variationKey;
+			config.queryString = 'mode:1 AND variationId:' + clientVariationKey;
 
-			return Promise.resolve(reports.apexReport(config))
+			return Promise.resolve(reportsModel.apexReport(config))
 				.then(function(report) {
 					var pageViews = Number(report.data.tracked.totalPageViews);
 
@@ -188,10 +191,23 @@ router
 		}
 
 		function extractCodeSlots(channel) {
-			var adCodeSlotArr = lodash.uniq(lodash.compact(lodash.map(channel.get('structuredSections'), function(section) {
+			var channelJSON = extend(true, {}, channel.toJSON()),
+				adCodeArr = [], adCodeSlotArr;
+
+			lodash.forOwn(channelJSON.variations, function(variationObj, variationKey) {
+				if (clientVariationKey === variationKey.toString()) {
+					lodash.forOwn(variationObj.sections, function(sectionObj, sectionKey) {
+						lodash.forOwn(sectionObj.ads, function(adObj, adKey) {
+							adCodeArr.push(adObj.adCode);
+						});
+					});
+				}
+			});
+
+			adCodeSlotArr = lodash.uniq(lodash.compact(lodash.map(adCodeArr, function(adCode) {
 				var adCodeSlot, base64DecodedAdCode, isAdSlotPresent;
 
-				base64DecodedAdCode = new Buffer(section.get('adCode'), 'base64').toString('ascii');
+				base64DecodedAdCode = new Buffer(adCode, 'base64').toString('ascii');
 				isAdSlotPresent = (base64DecodedAdCode.match(/data-ad-slot="\d*"/));
 
 				if (isAdSlotPresent) {
@@ -207,7 +223,7 @@ router
 
 		function getAdcodeSlots(site) {
 			var channelList = site.get('channels'),
-				isChannelPresent = (channelList.indexOf(channelName) > -1);
+				isChannelPresent = (channelList.indexOf(channelKey) > -1);
 
 			if (isChannelPresent) {
 				return channelModel.getChannel(siteId, platform, pageGroup)
@@ -218,13 +234,15 @@ router
 		return siteModel.getSiteById(siteId)
 			.then(getAdcodeSlots)
 			.then(function(adSlotsArr) {
+				// TODO: Remove this hard coded site id after testing
+				dataConfig.siteId = 15314;
 				return getFullAdsenseData(dataConfig, adSlotsArr)
 					.then(function(adSlotsEarnings) {
 						return getTotalPageViews()
 							.then(function(pageViews) {
 								return calculateRPM(pageViews, adSlotsEarnings)
 									.then(function(rpm) {
-										res.json({
+										return res.json({
 											success: true,
 											rpm: rpm,
 											pageViews: pageViews,
@@ -235,7 +253,7 @@ router
 					});
 			})
 			.catch(function(err) {
-				res.json({
+				return res.json({
 					success: false,
 					message: err.toString()
 				});
