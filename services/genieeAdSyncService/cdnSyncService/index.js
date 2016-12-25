@@ -14,7 +14,8 @@ var path = require('path'),
 module.exports = function (site) {
     var jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'genieeAp.js'),
         tempDestPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'geniee', site.get('siteId').toString()),
-        isGenieePartner = !!(site.get('partner') && (site.get('partner') === CC.partners.geniee.name) && site.get('genieeMediaId')),
+        isAutoOptimise = !!(site.get('autoOptimise')),
+        isGenieePartner = (!!(site.get('partner') && (site.get('partner') === CC.partners.geniee.name) && site.get('genieeMediaId') && isAutoOptimise)),
 		paramConfig = {
 			siteId: site.get('siteId'),
             mediaId: site.get('genieeMediaId'),
@@ -150,6 +151,7 @@ module.exports = function (site) {
         }),
         getFinalConfig = Promise.join(getComputedConfig, getJsFile, function (finalConfig, jsFile) {
             site.get('partner') ? finalConfig.partner = site.get('partner') : null;
+            finalConfig.autoOptimise = (isAutoOptimise ? true : false);
             jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(finalConfig));
             jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
             return jsFile;
