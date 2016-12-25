@@ -14,7 +14,7 @@ var path = require('path'),
 module.exports = function (site) {
     var jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'genieeAp.js'),
         tempDestPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'geniee', site.get('siteId').toString()),
-        isAutoOptimise = !!(site.get('autoOptimise')),
+        isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
         isGenieePartner = (!!(site.get('partner') && (site.get('partner') === CC.partners.geniee.name) && site.get('genieeMediaId') && isAutoOptimise)),
 		paramConfig = {
 			siteId: site.get('siteId'),
@@ -65,7 +65,10 @@ module.exports = function (site) {
             return !unsyncedAds ? ads : [];
         },
         getVariationsPayload = function (site, reportData) {
-            var finalJson = {};
+            var finalJson = {},
+                // Auto Optimiser model variation id counter
+                variationIdCounter = 0;
+
             return site.getAllChannels().then(function (allChannels) {
                 _.each(allChannels, function (channel) {
                     var platform, pageGroup, pageGroupData;
@@ -107,8 +110,10 @@ module.exports = function (site) {
                                 revenue: variationData.revenue,
                                 pageViews: variationData.pageViews,
                                 pageRPM: variationData.pageRPM,
-                                pageCTR: variationData.pageCTR
+                                pageCTR: variationData.pageCTR,
+                                modelId: variationIdCounter
                             };
+                            variationIdCounter++;
                         } else {
                             computedVariationObj = {
                                 id: variation.id,
@@ -131,7 +136,12 @@ module.exports = function (site) {
             });
         },
         setAllConfigs = function (allVariations) {
-            var apConfigs = site.get('apConfigs');
+            var apConfigs = site.get('apConfigs'),
+                isAdPartner = !!(site.get('partner'));
+
+            isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
+            apConfigs.autoOptimise = (isAutoOptimise ? true : false);
+
             /* Temp Fields */
             apConfigs.mode = 1;
             //apConfigs.pageGroupPattern = [{ HOME: 'components' }];
@@ -150,8 +160,6 @@ module.exports = function (site) {
             }
         }),
         getFinalConfig = Promise.join(getComputedConfig, getJsFile, function (finalConfig, jsFile) {
-            site.get('partner') ? finalConfig.partner = site.get('partner') : null;
-            finalConfig.autoOptimise = (isAutoOptimise ? true : false);
             jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(finalConfig));
             jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
             return jsFile;
