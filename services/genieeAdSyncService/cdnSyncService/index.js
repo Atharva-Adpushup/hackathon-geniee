@@ -91,34 +91,26 @@ module.exports = function (site) {
                     _.each(channel.variations, function (variation, id) {
                         var ads = getAdsPayload(variation.sections),
                             variationData = (pageGroupData && _.isObject(pageGroupData)) ? pageGroupData.variations[id] : null,
+                            isVariationData = !!(variationData && _.isObject(variationData)),
                             computedVariationObj;
 
                         if (!ads.length) {
                             return true;
                         }
 
-                        if (variationData && isGenieePartner) {
-                            computedVariationObj = {
-                                id: variation.id,
-                                name: variationData.name,
-                                traffic: variation.trafficDistribution,
-                                customJs: variation.customJs,
-                                ads: ads,
-                                // Extra data required for auto optimiser model
-                                // Click is mapped as sum
-                                sum: variationData.click,
-                                // Page view is mapped as count
-                                count: variationData.pageViews
-                            };
-                        } else {
-                            computedVariationObj = {
-                                id: variation.id,
-                                name: variation.name,
-                                traffic: variation.trafficDistribution,
-                                customJs: variation.customJs,
-                                ads: ads
-                            };
-                        }
+                        computedVariationObj = {
+                            id: variation.id,
+                            name: variation.name,
+                            traffic: variation.trafficDistribution,
+                            customJs: variation.customJs,
+                            ads: ads,
+                            // Data required for auto optimiser model
+                            // Click is mapped as sum
+                            sum: ((isVariationData && parseInt(variationData.click, 10) > -1) ? variationData.click : 1),
+                            // Data required for auto optimiser model
+                            // Page view is mapped as count
+                            count: ((isVariationData && parseInt(variationData.pageViews, 10) > -1) ? variationData.pageViews : 1)
+                        };
 
                         finalJson[platform][pageGroup].variations.push(computedVariationObj);
                     });
