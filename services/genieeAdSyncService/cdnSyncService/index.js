@@ -65,9 +65,7 @@ module.exports = function (site) {
             return !unsyncedAds ? ads : [];
         },
         getVariationsPayload = function (site, reportData) {
-            var finalJson = {},
-                // Auto Optimiser model variation id counter
-                variationIdCounter = 0;
+            var finalJson = {};
 
             return site.getAllChannels().then(function (allChannels) {
                 _.each(allChannels, function (channel) {
@@ -106,14 +104,12 @@ module.exports = function (site) {
                                 traffic: variation.trafficDistribution,
                                 customJs: variation.customJs,
                                 ads: ads,
-                                clicks: variationData.click,
-                                revenue: variationData.revenue,
-                                pageViews: variationData.pageViews,
-                                pageRPM: variationData.pageRPM,
-                                pageCTR: variationData.pageCTR,
-                                modelId: variationIdCounter
+                                // Extra data required for auto optimiser model
+                                // Click is mapped as sum
+                                sum: variationData.click,
+                                // Page view is mapped as count
+                                count: variationData.pageViews
                             };
-                            variationIdCounter++;
                         } else {
                             computedVariationObj = {
                                 id: variation.id,
