@@ -1,7 +1,7 @@
 var utils = require('../libs/utils'),
 	$ = require('jquery'),
-	bayesianBanditModel = require('./variationSelectionModels/bayesianBandit'),
-	randomSelectionModel = require('./variationSelectionModels/randomSelection');
+	bayesianBanditModel = require('./variationSelectionModels/bayesianBandit')(),
+	randomSelectionModel = require('./variationSelectionModels/randomSelection')();
 
 module.exports = function(config) {
 	var experiment = config.experiment,
