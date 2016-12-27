@@ -133,11 +133,11 @@ router
             isSuperUser: true
         });
     })
-    .get('/connectAdSense', function(req, res) {
+    .get('/connectGoogle', function(req, res) {
         return userModel.getUserByEmail(req.session.user.email)
             .then(function(user) {
-                return res.render('connectAdSense', {
-                    adNetworkSettings: (user.get('adNetworkSettings') && user.get('adNetworkSettings').adsenseAccounts[0]) ? user.get('adNetworkSettings').adsenseAccounts[0] : false
+                return res.render('connectGoogle', {
+                    adNetworkSettings: user.get('adNetworkSettings').length ? user.get('adNetworkSettings').adsenseAccounts[0] : false 
                 });
             })
             .catch(function(err) {
