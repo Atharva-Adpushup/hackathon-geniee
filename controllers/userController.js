@@ -134,7 +134,15 @@ router
         });
     })
     .get('/connectAdSense', function(req, res) {
-        res.render('connectAdSense');
+        return userModel.getUserByEmail(req.session.user.email)
+            .then(function(user) {
+                return res.render('connectAdSense', {
+                    adNetworkSettings: user.get('adNetworkSettings')[0]
+                });
+            })
+            .catch(function(err) {
+                res.redirect('/404');
+            });
     })
     .get('/addSite', function(req, res) {
 		res.render('addSite');

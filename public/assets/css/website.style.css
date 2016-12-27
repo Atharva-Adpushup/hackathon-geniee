@@ -1382,12 +1382,22 @@ maxHeightWidth {
 .widget-text {
   color: #555555;
   font-size: 1.35em;
-  padding: 15px 0; }
+  padding: 15px 0;
+  line-height: 25px; }
 
 .btn.widget-btn {
   font-size: 1.2em;
   padding: 12px;
-  margin: 15px 0; }
+  margin: 15px 0;
+  position: relative; }
+  .btn.widget-btn .fa-check {
+    background-color: #eb575c;
+    color: #fff;
+    padding: 5px;
+    border-radius: 50%;
+    position: absolute;
+    top: -8px;
+    right: -10px; }
 
 .onboarding-step {
   border-radius: 4px;

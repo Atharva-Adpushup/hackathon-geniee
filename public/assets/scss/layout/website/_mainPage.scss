@@ -268,10 +268,22 @@
   color: $fontColor;
   font-size: 1.35em;
   padding: 15px 0;
+  line-height: 25px;
 }
 
 .btn.widget-btn {
   font-size: 1.2em;
   padding: 12px;
   margin: 15px 0;
+  position: relative;
+
+  .fa-check {
+    background-color: $primaryColor;
+    color: $whiteColor;
+    padding: 5px;
+    border-radius: 50%;
+    position: absolute;
+    top: -8px;
+    right: -10px;
+  }
 }
