@@ -14,10 +14,8 @@ block append headScripts
 
             function oauthHook(event) {
                 var adsense = JSON.parse(event.data);
-                console.log(adsense);
                 if(adsense.data) {
-                    console.log('Adsense connected!');
-                    $('#oauth').html('Google AdSense Connected ').css('pointer-events', 'none');
+                    $('#oauth').html('<span>Google AdSense Connected<span><i class="fa fa-check"></i>').css('pointer-events', 'none');
                 }
                 else {
                     alert('Some error occurred! Please try again later.');
