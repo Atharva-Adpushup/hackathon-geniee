@@ -137,7 +137,7 @@ router
         return userModel.getUserByEmail(req.session.user.email)
             .then(function(user) {
                 return res.render('connectAdSense', {
-                    adNetworkSettings: (user.get('adNetworkSettings') && user.get('adNetworkSettings').adsenseAccounts[0])
+                    adNetworkSettings: (user.get('adNetworkSettings') && user.get('adNetworkSettings').adsenseAccounts[0]) ? user.get('adNetworkSettings').adsenseAccounts[0] : false
                 });
             })
             .catch(function(err) {
