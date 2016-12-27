@@ -28,7 +28,7 @@ var modelAPI = module.exports = apiModule(),
 		};
 		this.defaults = {
 			sites: [],
-			adNetworkSettings: [],
+			adNetworkSettings: {},
 			requestDemo: true
 		};
 		this.ignore = ['password', 'oldPassword', 'confirmPassword', 'site'];
