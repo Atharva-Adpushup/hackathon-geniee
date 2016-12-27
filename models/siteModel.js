@@ -298,7 +298,7 @@ function apiModule() {
 		getSitePageGroups: function (siteId) {
 			return API.getSiteById(parseInt(siteId))
 				.then(function (site) {
-					var pageGroupPromises = _.map(site.data.channels, function (channel) {
+					var pageGroupPromises = _.map(site.get('channels'), function (channel) {
 						var pageGroup = channel.split(':');
 						return channelModel.getChannel(siteId, pageGroup[0], pageGroup[1])
 							.then(function (channel) {
