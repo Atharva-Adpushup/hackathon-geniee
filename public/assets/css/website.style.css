@@ -658,6 +658,19 @@ collapsedextended {
 .u-border-none {
   border: 0 !important; }
 
+/*****Text specific classes*****/
+.text-uppercase {
+  text-transform: uppercase !important; }
+
+.text-bold {
+  font-weight: bold !important; }
+
+.text-success {
+  color: #14A314 !important; }
+
+.text-error {
+  color: #cf474b !important; }
+
 /***Text style utils***/
 .boldTxt {
   font-weight: bold; }
@@ -1365,6 +1378,16 @@ maxHeightWidth {
     border-left: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
     color: #555555; }
+
+.widget-text {
+  color: #555555;
+  font-size: 1.35em;
+  padding: 15px 0; }
+
+.btn.widget-btn {
+  font-size: 1.2em;
+  padding: 12px;
+  margin: 15px 0; }
 
 .onboarding-step {
   border-radius: 4px;
@@ -2124,16 +2147,35 @@ maxHeightWidth {
           .ReportsWrapper .well .panel ._ap_table tbody tr.selected > td,
           .ReportsWrapper .well .panel ._ap_table tbody tr.selected > td:hover {
             background: transparent !important; }
-          .ReportsWrapper .well .panel ._ap_table tbody tr.selected > td:nth-child(6) {
+          .ReportsWrapper .well .panel ._ap_table tbody tr.selected > td.js-ctr-tbody-item {
             font-size: 1.3em;
             letter-spacing: 1px;
             position: relative; }
-            .ReportsWrapper .well .panel ._ap_table tbody tr.selected > td:nth-child(6) > .fa {
-              margin-left: 5px; }
+            .ReportsWrapper .well .panel ._ap_table tbody tr.selected > td.js-ctr-tbody-item > .fa.fa-info-circle {
+              position: relative;
+              left: 20px; }
         .ReportsWrapper .well .panel ._ap_table tfoot th, .ReportsWrapper .well .panel ._ap_table tfoot td {
           text-transform: uppercase;
           font-size: 13px;
           border-top: 2px solid #ddd; }
+        .ReportsWrapper .well .panel ._ap_table .btn {
+          height: 34px;
+          padding: 0;
+          width: 40px; }
+          .ReportsWrapper .well .panel ._ap_table .btn:active, .ReportsWrapper .well .panel ._ap_table .btn:hover, .ReportsWrapper .well .panel ._ap_table .btn:focus {
+            background: #fff; }
+          .ReportsWrapper .well .panel ._ap_table .btn:active, .ReportsWrapper .well .panel ._ap_table .btn:focus, .ReportsWrapper .well .panel ._ap_table .btn.selected {
+            box-shadow: 0 0 3px #888 inset; }
+          .ReportsWrapper .well .panel ._ap_table .btn > .fa {
+            font-size: 1.5em; }
+          .ReportsWrapper .well .panel ._ap_table .btn.btn-success {
+            background: #14A314;
+            border-color: #14A314;
+            box-shadow: 0 0 3px #14A314 inset; }
+          .ReportsWrapper .well .panel ._ap_table .btn.btn-error {
+            background: #cf474b;
+            border-color: #cf474b;
+            box-shadow: 0 0 3px #cf474b inset; }
         .ReportsWrapper .well .panel ._ap_table .input-group {
           max-width: 100px;
           min-width: 80px; }
@@ -2148,10 +2190,18 @@ maxHeightWidth {
         .ReportsWrapper .well .panel ._ap_table .perf {
           position: relative; }
           .ReportsWrapper .well .panel ._ap_table .perf > .fa.icon-caret {
-            font-size: 2em;
-            left: 45px;
-            position: absolute;
-            top: 27%; }
+            display: inline-block;
+            font-size: 1em;
+            font-weight: bold;
+            left: 25px;
+            position: relative;
+            transition: all .2s ease-in-out; }
+            .ReportsWrapper .well .panel ._ap_table .perf > .fa.icon-caret:before {
+              display: inline-block;
+              margin-right: 5px;
+              position: relative; }
+            .ReportsWrapper .well .panel ._ap_table .perf > .fa.icon-caret:hover {
+              font-size: 1.3em; }
           .ReportsWrapper .well .panel ._ap_table .perf.perf--high > .fa.icon-caret {
             color: #14A314; }
           .ReportsWrapper .well .panel ._ap_table .perf.perf--low > .fa.icon-caret {
@@ -2556,12 +2606,20 @@ maxHeightWidth {
     text-transform: uppercase; }
   .popover > .popover-content {
     padding: 5px; }
+    .popover > .popover-content .popover-content-text-block {
+      display: block;
+      margin-bottom: 5px; }
   .popover .list-group > .list-group-item {
     border: 1px solid #e6e9ed;
     padding: 10px; }
     .popover .list-group > .list-group-item > .list-group-item-content {
       font-size: 1.1em;
       text-transform: uppercase; }
+    .popover .list-group > .list-group-item > .badge {
+      background: none;
+      color: #000;
+      font-size: 1.1em;
+      letter-spacing: 1px; }
 
 /*************Custom Popover rules*************/
 .popover.popover--custom-adrecover {

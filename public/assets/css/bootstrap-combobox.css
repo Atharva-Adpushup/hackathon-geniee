@@ -15,6 +15,9 @@
 .combobox-container:not(.combobox-selected) .glyphicon-remove {
   display: none;
 }
+.combobox-container .dropdown-toggle {
+  cursor: pointer;
+}
 .typeahead-long {
   max-height: 300px;
   overflow-y: auto;

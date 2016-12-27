@@ -133,6 +133,9 @@ router
             isSuperUser: true
         });
     })
+    .get('/connectAdSense', function(req, res) {
+        res.render('connectAdSense');
+    })
     .get('/addSite', function(req, res) {
 		res.render('addSite');
 	})

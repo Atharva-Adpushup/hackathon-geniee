@@ -263,3 +263,15 @@
     color: $fontColor;
   }
 }
+
+.widget-text {
+  color: $fontColor;
+  font-size: 1.35em;
+  padding: 15px 0;
+}
+
+.btn.widget-btn {
+  font-size: 1.2em;
+  padding: 12px;
+  margin: 15px 0;
+}

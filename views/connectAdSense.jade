@@ -1,0 +1,30 @@
+extends  layout/base
+
+block getTitle
+    - var titleVar = "Connect AdSense"
+
+block bodyContent
+    include layout/sideBar
+    .pageContainer.page-container
+        include layout/header
+        // Page Content Starts Here
+        .pageContentWrapper.page-content
+            .pageContentInner.page-content--inner
+                .notification-wrapper
+
+                #widgetsArea.row
+                    .mb-30
+                        .controlAdpushupWrap
+                            h3.title.m-All-0.clearfix 
+                                a Connect Google AdSense
+                            .row
+                                .col-sm-3
+                                    img.img-responsive(src="/assets/images/onboarding/3.png")
+                                .col-sm-9.mT-10
+                                    p.widget-text.mT-10
+                                        | Connecting your Google AdSense account with AdPushup helps us to pull your AdSense reports so that you can conveniently view them in one place.
+                                    .mT-10
+                                        a(href="").btn.btn-lightBg.btn-default.widget-btn Connect Google AdSense
+                                    
+
+               
