@@ -27,84 +27,76 @@ var express = require('express'),
 
 router
     .get('/dashboard', function(req, res) {
-        return userModel.getAllUserSites(req.session.user.email)
-            .then(function(sites) {
-                var allUserSites = sites;
+        var allUserSites = req.session.user.sites;
 
-                function setEmailCookie() {
-                    var cookieName = 'email',
-                        // "Email" cookie has 1 year expiry and accessible through JavaScript
-                        cookieOptions = { expires: new Date(Date.now() + (60 * 60 * 1000 * 24 * 365)), encode: String, httpOnly: false },
-                        isCookieSet = (Object.keys(req.cookies).length > 0) && (typeof req.cookies[cookieName] !== 'undefined');
+        function setEmailCookie() {
+            var cookieName = 'email',
+                // "Email" cookie has 1 year expiry and accessible through JavaScript
+                cookieOptions = { expires: new Date(Date.now() + (60 * 60 * 1000 * 24 * 365)), encode: String, httpOnly: false },
+                isCookieSet = (Object.keys(req.cookies).length > 0) && (typeof req.cookies[cookieName] !== 'undefined');
 
-                    isCookieSet ? res.clearCookie(cookieName, cookieOptions) : '';
-                    res.cookie(cookieName, req.session.user.email, cookieOptions);
-                }
+            isCookieSet ? res.clearCookie(cookieName, cookieOptions) : '';
+            res.cookie(cookieName, req.session.user.email, cookieOptions);
+        }
 
-                function sitePromises() {
-                    return _.map(allUserSites, function(obj) {
-                        return siteModel.getSiteById(obj.siteId).then(function() {
-                            return obj;
-                        }).catch(function() {
-                            return 'inValidSite';
-                        });
-                    });
-                }
-
-                return Promise.all(sitePromises()).then(function(validSites) {
-                    var sites = _.difference(validSites, ['inValidSite']),
-                        unSavedSite;
-
-                    sites = (Array.isArray(sites) && (sites.length > 0)) ? sites : [];
-                    /**
-                     * unSavedSite, Current user site object entered during signup
-                     *
-                     * - Value is Truthy (all user site/sites) only if user has
-                     * no saved any site through Visual Editor
-                     * - Value is Falsy if user has atleast one saved site
-                    */
-                    unSavedSite = (sites.length === 0) ? allUserSites : null;
-                    req.session.unSavedSite = unSavedSite;
-                    
-                    setEmailCookie(req, res);
-
-                    function renderDashboard() {
-                        res.render('dashboard', {
-                            validSites: sites,
-                            unSavedSite: unSavedSite,
-                            hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-                            requestDemo: req.session.user.requestDemo
-                        });
-                    }
-
-                    // Deal qualification check for user redirection
-                    if(('pageviewRange' in req.session.user) && ('adNetworks' in req.session.user)) {
-                        var qualifyDeal = (parseInt(req.session.user.pageviewRange.split('-')[0]) >= 15000 || parseInt(req.session.user.pageviewRange.split('-')[0]) == 200);
-                        if((qualifyDeal && _.includes(req.session.user.adNetworks, 'Adsense')) || req.session.isSuperUser || !req.session.user.requestDemo) {
-                            renderDashboard();
-                        }
-                        else {
-                            res.render('thankyou');
-                        }
-                    }
-                    else if('requestDemoData' in req.session.user) {
-                        var qualifyDeal = (parseInt(req.session.user.requestDemoData.INFO_PAGEVIEWS.split('-')[0]) >= 15000 || parseInt(req.session.user.requestDemoData.INFO_PAGEVIEWS.split('-')[0]) == 200);
-                        if((qualifyDeal && req.session.user.requestDemoData.INFO_ADNETWORK_ADSENSE) || req.session.isSuperUser || !req.session.user.requestDemo) {
-                            renderDashboard();
-                        }
-                        else {
-                            res.render('thankyou');
-                        }
-                    }
-                    else {
-                        res.render('thankyou');
-                    }
+        function sitePromises() {
+            return _.map(allUserSites, function(obj) {
+                return siteModel.getSiteById(obj.siteId).then(function() {
+                    return obj;
+                }).catch(function() {
+                    return 'inValidSite';
                 });
-
-            })
-            .catch(function(err) {
-                res.redirect('/404');
             });
+        }
+
+        return Promise.all(sitePromises()).then(function(validSites) {
+            var sites = _.difference(validSites, ['inValidSite']),
+                unSavedSite;
+
+            sites = (Array.isArray(sites) && (sites.length > 0)) ? sites : [];
+			/**
+			 * unSavedSite, Current user site object entered during signup
+			 *
+			 * - Value is Truthy (all user site/sites) only if user has
+			 * no saved any site through Visual Editor
+			 * - Value is Falsy if user has atleast one saved site
+			*/
+            unSavedSite = (sites.length === 0) ? allUserSites : null;
+            req.session.unSavedSite = unSavedSite;
+            
+            setEmailCookie(req, res);
+
+            function renderDashboard() {
+				res.render('dashboard', {
+					validSites: sites,
+					unSavedSite: unSavedSite,
+					hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+					requestDemo: req.session.user.requestDemo
+				});
+			}
+
+			if(('pageviewRange' in req.session.user) && ('adNetworks' in req.session.user)) {
+				var qualifyDeal = (parseInt(req.session.user.pageviewRange.split('-')[0]) >= 15000 || parseInt(req.session.user.pageviewRange.split('-')[0]) == 200);
+				if((qualifyDeal && _.includes(req.session.user.adNetworks, 'Adsense')) || req.session.isSuperUser || !req.session.user.requestDemo) {
+					renderDashboard();
+				}
+				else {
+					res.render('thankyou');
+				}
+			}
+			else if('requestDemoData' in req.session.user) {
+				var qualifyDeal = (parseInt(req.session.user.requestDemoData.INFO_PAGEVIEWS.split('-')[0]) >= 15000 || parseInt(req.session.user.requestDemoData.INFO_PAGEVIEWS.split('-')[0]) == 200);
+				if((qualifyDeal && req.session.user.requestDemoData.INFO_ADNETWORK_ADSENSE) || req.session.isSuperUser || !req.session.user.requestDemo) {
+					renderDashboard();
+				}
+				else {
+					res.render('thankyou');
+				}
+			}
+			else {
+				res.render('thankyou');
+			}
+        });
     })
     .post('/setSiteStep', function(req, res) {
 		siteModel.setSiteStep(req.body.siteId, req.body.step)

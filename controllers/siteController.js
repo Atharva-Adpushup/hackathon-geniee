@@ -112,7 +112,8 @@ router
 					// Reset session on addition of new pagegroup for non-partner
 					var userSites = req.session.user.sites,
 						site = _.find(userSites, {'siteId': parseInt(json.siteId)});
-					
+                    site.pageGroups.push(data.channelName);
+                    
 					var index = _.findIndex(userSites, {'siteId': parseInt(json.siteId)});
 					req.session.user.sites[index] = site;
 					

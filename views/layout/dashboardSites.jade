@@ -2,7 +2,7 @@ for site in validSites
     <!--.2.and.mb-30(class="{{ loop.length % loop.last ? 'col-xs-12' : 'col-xs-6' }}")-->
     .mb-30
         .controlAdpushupWrap
-            if site.channels.length
+            if site.pageGroups.length
                 h3.title.m-All-0.clearfix
                     a.pull-left(id="site-report-" + site.siteId, target='_blank', title='Showing last 7 days ControlVsAdPushup reports.', href='/user/site/#{site.siteId}/reports/ControlVsAdpushupCtr').
                         #{utils.domanize(site.domain)} - #{site.siteId}
