@@ -9,7 +9,7 @@ const variationOtions = (props) => {
 	const { onDeleteVariation, onCopyVariation, onEditVariationName, variation, channelId, onEditTrafficDistribution } = props;
 	return (
 		<div>
-			<h1 className="variation-section-heading">Variataion Info</h1>
+			<h1 className="variation-section-heading">Variation Info</h1>
 			<Row>
 				<Col className="u-padding-r10px" xs={2}>
 					Variation Name

@@ -50,10 +50,31 @@ var model = require('../helpers/model'),
 
 		this.deleteChannel = function (platform, pageGroup) {
 			return new Promise(function (resolve) {
+
+				// Reset site channels
 				var channels = _.filter(this.get('channels'), function (chnl) {
 					return (chnl !== platform + ':' + pageGroup);
 				});
 				this.set('channels', channels);
+
+				// Reset cms pagegroups
+				var cmsInfo = this.get('cmsInfo'),
+					pageGroups = _.filter(cmsInfo.pageGroups, function(p) {
+						return p.pageGroup !== pageGroup;
+					}),
+					newCmsInfo = {
+						cmsName: cmsInfo.cmsName,
+						pageGroups: pageGroups
+					};
+				this.set('cmsInfo', newCmsInfo);
+
+				// Reset apconfigs pagegroup pattern
+				var apConfigs = this.get('apConfigs'),
+					pageGroupPattern = _.remove(apConfigs.pageGroupPattern, function(p) {
+						return _.has(p, pageGroup);
+					});
+				this.set(apConfigs.pageGroupPattern, pageGroupPattern);
+
 				this.save();
 				resolve();
 			}.bind(this));
