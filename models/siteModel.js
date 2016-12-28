@@ -259,7 +259,7 @@ function apiModule() {
 						heartBeatStartDelay: otherSettings.heartBeatStartDelay ? parseInt(otherSettings.heartBeatStartDelay, 10) : commonConsts.apConfigDefaults.heartBeatStartDelay,
 						xpathWaitTimeout: otherSettings.xpathWaitTimeout ? parseInt(otherSettings.xpathWaitTimeout, 10) : commonConsts.apConfigDefaults.xpathWaitTimeout,
 						adpushupPercentage: otherSettings.adpushupPercentage ? parseInt(otherSettings.adpushupPercentage, 10) : commonConsts.apConfigDefaults.adpushupPercentage,
-						autoOptimise: json.settings.autoOptimise
+						autoOptimise: ((json.settings.autoOptimise === 'false') ? false : true)
 					};
 					site.set('apConfigs', siteConfig);
 					return site.save();
