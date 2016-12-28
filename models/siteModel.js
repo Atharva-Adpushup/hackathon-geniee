@@ -57,24 +57,6 @@ var model = require('../helpers/model'),
 				});
 				this.set('channels', channels);
 
-				// Reset cms pagegroups
-				var cmsInfo = this.get('cmsInfo'),
-					pageGroups = _.filter(cmsInfo.pageGroups, function(p) {
-						return p.pageGroup !== pageGroup;
-					}),
-					newCmsInfo = {
-						cmsName: cmsInfo.cmsName,
-						pageGroups: pageGroups
-					};
-				this.set('cmsInfo', newCmsInfo);
-
-				// Reset apconfigs pagegroup pattern
-				var apConfigs = this.get('apConfigs'),
-					pageGroupPattern = _.remove(apConfigs.pageGroupPattern, function(p) {
-						return _.has(p, pageGroup);
-					});
-				this.set(apConfigs.pageGroupPattern, pageGroupPattern);
-
 				this.save();
 				resolve();
 			}.bind(this));
