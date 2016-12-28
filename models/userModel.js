@@ -413,6 +413,7 @@ function apiModule() {
 					return Promise.join(uniquePageGroups, setupStep, cmsData, function(pageGroups, step, cms) {
 						site.step = step;
 						site.cmsInfo = cms;
+						site.pageGroups = pageGroups;
 						return site;
 					})
 					.catch(function(err) {

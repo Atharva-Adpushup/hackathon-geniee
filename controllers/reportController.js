@@ -282,13 +282,10 @@ router
 				filteredDomains = allSites.map(function(siteObj) {
 					return siteModel.getSiteById(siteObj.siteId)
 						.then(function(site) {
-							if (site.isApex()) {
-								return {
-									'domain': site.get('siteDomain'),
-									'siteId': site.get('siteId')
-								};
-							}
-							return false;
+							return {
+								'domain': site.get('siteDomain'),
+								'siteId': site.get('siteId')
+							};
 						})
 						.catch(function() {
 							return false;

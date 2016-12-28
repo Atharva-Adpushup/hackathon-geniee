@@ -234,8 +234,6 @@ router
 		return siteModel.getSiteById(siteId)
 			.then(getAdcodeSlots)
 			.then(function(adSlotsArr) {
-				// TODO: Remove this hard coded site id after testing
-				dataConfig.siteId = 15314;
 				return getFullAdsenseData(dataConfig, adSlotsArr)
 					.then(function(adSlotsEarnings) {
 						return getTotalPageViews()
