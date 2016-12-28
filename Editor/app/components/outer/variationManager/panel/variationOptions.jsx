@@ -20,14 +20,6 @@ const variationOtions = (props) => {
 			</Row>
 			<Row>
 				<Col className="u-padding-r10px" xs={2}>
-					Traffic Distribution
-				</Col>
-				<Col className="u-padding-l10px" xs={4}>
-					<InlineEdit value={variation.trafficDistribution} submitHandler={onEditTrafficDistribution.bind(null, variation.id)} text="Traffic Distribution" errorMessage="Traffic Distribution cannot be blank" />
-				</Col>
-			</Row>
-			<Row>
-				<Col className="u-padding-r10px" xs={2}>
 					Sections
 				</Col>
 				<Col className="u-padding-l10px" xs={4}>
