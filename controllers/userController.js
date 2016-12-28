@@ -102,11 +102,11 @@ router
         return userModel.getAllUserSites(req.session.user.email)
             .then(function (sites) {
                 var allUserSites = sites;
-                dashboardRedirection(req, res, allUserSites);
+                return dashboardRedirection(req, res, allUserSites);
             })
             .catch(function (err) {
                 var allUserSites = req.session.user.sites;
-                dashboardRedirection(req, res, allUserSites);
+                return dashboardRedirection(req, res, allUserSites);
             });
     })
     .post('/setSiteStep', function (req, res) {
