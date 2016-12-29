@@ -7,6 +7,7 @@ block append headScripts
     script.
         $(document).ready(function() {
             window.selectedSiteId = !{siteId};
+            window.blocklist = '!{blocklist}'.split(',');
         });
     +loadAsset("js", [
         '/assets/js/libs/custom/settings.js',
@@ -111,9 +112,21 @@ block bodyContent
                                             .col-sm-5
                                                 .input-name Auto Optimise
                                             .col-sm-7
-                                                input(type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "true") checked=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : undefined) : "true"))
+                                                input(type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "true") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "true"))
                                         .row
                                             .col-sm-12#autoOptimiseErr.error-message
+                                        .row
+                                            .col-sm-12
+                                                h4 Manage Blocklist
+                                            .col-sm-12
+                                                .row
+                                                    .col-sm-9
+                                                        input#blocklistItem.form-control(name="blocklistItem" type="text" placeholder="Enter Url or pattern to block")
+                                                    .col-sm-3
+                                                        button#addBlocklistItem.btn-primary(type="button") Add to blocklist
+                                                .row
+                                                    ul.blocklist
+
                                 hr
                                 .row.settings-btn-pane
                                     .col-sm-3

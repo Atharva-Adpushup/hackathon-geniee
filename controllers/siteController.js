@@ -41,6 +41,7 @@ router
                     pageGroups: site.get('cmsInfo').pageGroups,
                     patterns: site.get('apConfigs').pageGroupPattern ? site.get('apConfigs').pageGroupPattern : [],
                     apConfigs: site.get('apConfigs'),
+                    blocklist: site.get('apConfigs').blocklist,
                     siteId: req.params.siteId,
                     siteDomain: site.get('siteDomain')
                 });
