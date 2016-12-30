@@ -76,7 +76,8 @@ var $ = require('jquery'),
 				mode: 1,
 				referrer: config.referrer,
 				tracking: browserConfig.trackerSupported,
-				variationId: variation.id // set the chosenVariation variation in feedback data;
+				// Replaced '-' with '_' to avoid ElasticSearch split issue
+				variationId: variation.id.replace(/-/gi, '_') // set the chosenVariation variation in feedback data;
 			},
 			placeGenieeHeadCode = function(genieeIds) {
 				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIds);
