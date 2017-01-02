@@ -253,7 +253,10 @@ function apiModule() {
 		},
 		saveSiteSettings: function (json) {
 			var pageGroupPattern = JSON.parse(json.settings.pageGroupPattern),
-				otherSettings = JSON.parse(json.settings.otherSettings);
+				otherSettings = JSON.parse(json.settings.otherSettings),
+				blocklist = JSON.parse(json.settings.blocklist);
+			
+			console.log(blocklist);
 			return API.getSiteById(json.siteId)
 				.then(function (site) {
 					var siteConfig = {
@@ -262,7 +265,8 @@ function apiModule() {
 						heartBeatStartDelay: otherSettings.heartBeatStartDelay ? parseInt(otherSettings.heartBeatStartDelay, 10) : commonConsts.apConfigDefaults.heartBeatStartDelay,
 						xpathWaitTimeout: otherSettings.xpathWaitTimeout ? parseInt(otherSettings.xpathWaitTimeout, 10) : commonConsts.apConfigDefaults.xpathWaitTimeout,
 						adpushupPercentage: otherSettings.adpushupPercentage ? parseInt(otherSettings.adpushupPercentage, 10) : commonConsts.apConfigDefaults.adpushupPercentage,
-						autoOptimise: ((json.settings.autoOptimise === 'false') ? false : true)
+						autoOptimise: ((json.settings.autoOptimise === 'false') ? false : true),
+						blocklist: blocklist.length ? blocklist : ''
 					};
 					site.set('apConfigs', siteConfig);
 					return site.save();

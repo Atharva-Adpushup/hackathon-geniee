@@ -55,7 +55,7 @@ router
             settings: req.body,
             siteId: req.params.siteId
         };
-        siteModel.saveSiteSettings(json)
+        return siteModel.saveSiteSettings(json)
             .then(function (data) {
                 res.send({ success: 1 });
             })

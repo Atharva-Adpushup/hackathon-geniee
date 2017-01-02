@@ -31,7 +31,7 @@ const channelMenu = ({ isVisible, activeChannelId, allTrafficDistributions, edit
 
 	items.push((
 		<MenuItem key={2} icon="fa fa-exchange" contentHeading="Traffic Distribution">
-			<NumericCollectionManager collection={allTrafficDistributions} title={channel.channelName} onSave={a => saveTrafficDistributions(a)} />
+			<NumericCollectionManager collection={allTrafficDistributions} required title={channel.channelName} maxValue={100} onSave={a => saveTrafficDistributions(a)} />
 		</MenuItem>
 	));
 

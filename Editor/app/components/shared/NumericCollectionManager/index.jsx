@@ -13,7 +13,7 @@ class NumericCollectionManager extends React.Component {
 		const props = this.props;
 
 		return (
-			<NumericCollection name="numericCollection" headerText={props.title} collection={props.collection} onSave={a => this.onSave(a)} />
+			<NumericCollection name="numericCollection" required={props.required} maxValue={props.maxValue} headerText={props.title} collection={props.collection} onSave={a => this.onSave(a)} />
 		);
 	}
 
