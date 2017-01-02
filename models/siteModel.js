@@ -50,10 +50,13 @@ var model = require('../helpers/model'),
 
 		this.deleteChannel = function (platform, pageGroup) {
 			return new Promise(function (resolve) {
+
+				// Reset site channels
 				var channels = _.filter(this.get('channels'), function (chnl) {
 					return (chnl !== platform + ':' + pageGroup);
 				});
 				this.set('channels', channels);
+
 				this.save();
 				resolve();
 			}.bind(this));
@@ -259,7 +262,7 @@ function apiModule() {
 						heartBeatStartDelay: otherSettings.heartBeatStartDelay ? parseInt(otherSettings.heartBeatStartDelay, 10) : commonConsts.apConfigDefaults.heartBeatStartDelay,
 						xpathWaitTimeout: otherSettings.xpathWaitTimeout ? parseInt(otherSettings.xpathWaitTimeout, 10) : commonConsts.apConfigDefaults.xpathWaitTimeout,
 						adpushupPercentage: otherSettings.adpushupPercentage ? parseInt(otherSettings.adpushupPercentage, 10) : commonConsts.apConfigDefaults.adpushupPercentage,
-						autoOptimise: json.settings.autoOptimise
+						autoOptimise: ((json.settings.autoOptimise === 'false') ? false : true)
 					};
 					site.set('apConfigs', siteConfig);
 					return site.save();
@@ -298,7 +301,7 @@ function apiModule() {
 		getSitePageGroups: function (siteId) {
 			return API.getSiteById(parseInt(siteId))
 				.then(function (site) {
-					var pageGroupPromises = _.map(site.data.channels, function (channel) {
+					var pageGroupPromises = _.map(site.get('channels'), function (channel) {
 						var pageGroup = channel.split(':');
 						return channelModel.getChannel(siteId, pageGroup[0], pageGroup[1])
 							.then(function (channel) {

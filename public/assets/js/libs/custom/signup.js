@@ -1,6 +1,4 @@
 (function(W, $) {
-	W.analytics.page('App-signup');
-
 	function validateTermsCheckbox() {
 		var termsStr = 'Please agree to our Terms of Service & Privacy Policy',
 			$form = $('.js-signup-form'),
@@ -157,14 +155,6 @@
 	}
 
 	$(document).ready(function() {
-		W.analytics.ready(function() {
-			function setAnonId() {
-				var anonId = W.mixpanel.get_distinct_id();
-				$('#signup-analyticsId').val(anonId);
-			}
-			setAnonId();
-		});
-
 		setUiData();
 		setInteractionHandlers();
 		validateTermsCheckbox();

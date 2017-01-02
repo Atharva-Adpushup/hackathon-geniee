@@ -12,8 +12,7 @@ const style = {
 	top: 0,
 	left: 0,
 	zIndex: 10000,
-	flex: 1,
-	minHeight: 300
+	flex: 1
 };
 
 class Menu extends React.Component {

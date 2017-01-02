@@ -264,7 +264,7 @@ router
 		var getUser = userModel.getUserByEmail(req.session.user.email),
 			getSiteData = getUser.then(getUserSiteData),
 			paramConfig = {
-				siteId: req.params.siteId,
+				siteId: req.query.siteId,
 				isSuperUser: req.session.isSuperUser,
 				startDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
 				endDate: moment().subtract(1, 'days').format('YYYY-MM-DD')
@@ -282,13 +282,10 @@ router
 				filteredDomains = allSites.map(function(siteObj) {
 					return siteModel.getSiteById(siteObj.siteId)
 						.then(function(site) {
-							if (site.isApex()) {
-								return {
-									'domain': site.get('siteDomain'),
-									'siteId': site.get('siteId')
-								};
-							}
-							return false;
+							return {
+								'domain': site.get('siteDomain'),
+								'siteId': site.get('siteId')
+							};
 						})
 						.catch(function() {
 							return false;
@@ -416,6 +413,8 @@ router
 					// Set variation name and its traffic distribution value
 					computedReport.data.rows[idx][0] = variationObj.name;
 					computedReport.data.rows[idx][2] = variationObj.value;
+				} else {
+					computedReport.data.rows.splice(idx, 1);
 				}
 			});
 

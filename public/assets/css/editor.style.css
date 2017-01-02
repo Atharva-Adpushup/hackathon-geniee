@@ -1191,6 +1191,19 @@ collapsedextended, .sectionManager .wrapper .content ul.list li .statsWrapper ul
 .u-border-none {
   border: 0 !important; }
 
+/*****Text specific classes*****/
+.text-uppercase {
+  text-transform: uppercase !important; }
+
+.text-bold {
+  font-weight: bold !important; }
+
+.text-success {
+  color: #14A314 !important; }
+
+.text-error {
+  color: #cf474b !important; }
+
 /***Text style utils***/
 .boldTxt {
   font-weight: bold; }
@@ -1387,12 +1400,20 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
     text-transform: uppercase; }
   .popover > .popover-content {
     padding: 5px; }
+    .popover > .popover-content .popover-content-text-block {
+      display: block;
+      margin-bottom: 5px; }
   .popover .list-group > .list-group-item {
     border: 1px solid #e6e9ed;
     padding: 10px; }
     .popover .list-group > .list-group-item > .list-group-item-content {
       font-size: 1.1em;
       text-transform: uppercase; }
+    .popover .list-group > .list-group-item > .badge {
+      background: none;
+      color: #000;
+      font-size: 1.1em;
+      letter-spacing: 1px; }
 
 /*************Custom Popover rules*************/
 .popover.popover--custom-adrecover {
@@ -3728,25 +3749,25 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   background-color: #0fbe7c; }
 
 .section-list li {
-  padding: 10px;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  position: relative; }
-
-.section-list li, .section-list li .btn.btn-lightBg {
-  font-size: .9em; }
-
-.section-list li .btn-close {
-  background-color: #eb575c;
-  color: #fff;
-  position: absolute;
-  right: -10px;
-  top: -7px;
-  border: none;
-  font-weight: 700;
-  border-radius: 50%;
-  padding: 2px 7.2px; }
+  min-height: 160px; }
+  .section-list li {
+    padding: 10px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    position: relative; }
+  .section-list li, .section-list li .btn.btn-lightBg {
+    font-size: .9em; }
+  .section-list li .btn-close {
+    background-color: #eb575c;
+    color: #fff;
+    position: absolute;
+    right: -10px;
+    top: -7px;
+    border: none;
+    font-weight: 700;
+    border-radius: 50%;
+    padding: 2px 7.2px; }
 
 .section-name-ie > div {
   height: 45px; }

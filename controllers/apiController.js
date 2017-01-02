@@ -6,6 +6,7 @@ var express = require('express'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
 	schema = require('../helpers/schema'),
+	CC = require('../configs/commonConsts'),
 	FormValidator = require('../helpers/FormValidator'),
 	_ = require('lodash');
 
@@ -23,7 +24,7 @@ router
 		var partnerEmail = json.partner + '@adpushup.com', siteId;
 		json.ownerEmail = partnerEmail;
 		//TODO: Replace below hard code draft mode with constant
-		json.apConfigs = { 'mode': 2 };
+		json.apConfigs = { 'mode': CC.site.mode.DRAFT };
 
 		// Function to create partner user account and site
 		function createPartnerAndSite() {
@@ -34,13 +35,13 @@ router
 				site: json.siteDomain,
 				userType: 'partner'
 			})
-			.then(function (firstSite) {
-				json.siteId = firstSite.siteId;
-				return siteModel.saveSiteData(firstSite.siteId, 'POST', json) 
-			})
-			.then(function (site) {
-				return res.status(200).send({ success: true, data: { siteId: site.data.siteId } });
-			});
+				.then(function (firstSite) {
+					json.siteId = firstSite.siteId;
+					return siteModel.saveSiteData(firstSite.siteId, 'POST', json)
+				})
+				.then(function (site) {
+					return res.status(200).send({ success: true, data: { siteId: site.data.siteId } });
+				});
 		};
 
 		// Validate input params and create site
@@ -133,48 +134,28 @@ router
 	.post('/pagegroup/create', function (req, res) {
 		var json = req.body;
 
-		if(!req.session.user) {
-			// Validate input params and create pagegroup
-			return FormValidator.validate(json, schema.api.validations)
-				.then(function () { return channelModel.createPageGroup(json) })
-				.then(function (data) {
-					return res.status(200).send({ success: true, data: { pageGroupId: data.id } });
-				})
-				.catch(function (err) {
-					if (err.name !== 'AdPushupError') {
-						return res.status(500).send({ success: false, message: 'Some error occurred' });
-					}
+		// Validate input params and create pagegroup
+		return FormValidator.validate(json, schema.api.validations)
+			.then(function () { return channelModel.createPageGroup(json) })
+			.then(function (data) {
+				return res.status(200).send({ success: true, data: { pageGroupId: data.id } });
+			})
+			.catch(function (err) {
+				if (err.name !== 'AdPushupError') {
+					return res.status(500).send({ success: false, message: 'Some error occurred' });
+				}
 
-					var error = err.message[0];
-					return res.status(error.status).send({ success: false, message: error.message });
-				});
-		}
-		else {
-			return channelModel.createPageGroup(json)
-				.then(function(data) {
-					// Reset session on addition of new pagegroup for non-partner
-					var userSites = req.session.user.sites,
-						site = _.find(userSites, {'siteId': parseInt(json.siteId)});
-					site.pageGroups.push(data.channelName);
-					
-					var index = _.findIndex(userSites, {'siteId': parseInt(json.siteId)});
-					req.session.user.sites[index] = site;
-					req.session.pageGroupError = '';
-					
-					return res.redirect('/user/dashboard');
-				})
-				.catch(function(err) {
-					req.session.pageGroupError = err.message[0].message ?  err.message[0].message : 'Some error occurred!';
-					return res.redirect('/user/site/'+json.siteId+'/createPagegroup');
-				});
-		}
+				var error = err.message[0];
+				return res.status(error.status).send({ success: false, message: error.message });
+			});
+
 	})
 	.get('/pagegroup/view', function (req, res) {
 		var pageGroupId = req.query.pageGroupId;
 
 		// Validate input params and fetch pagegroup
 		return FormValidator.validate({ pageGroupId: pageGroupId }, schema.api.validations)
-			.then(function () { return channelModel.getPageGroupById({id: pageGroupId, viewName: 'channelById'}) })
+			.then(function () { return channelModel.getPageGroupById({ id: pageGroupId, viewName: 'channelById' }) })
 			.then(function (data) {
 				res.status(200).send({ success: true, data: data });
 			})
@@ -208,39 +189,21 @@ router
 	.post('/pagegroup/delete', function (req, res) {
 		var json = req.body;
 
-		if(!req.session.user) {
-			// Validate input params and delete pagegroup
-			return FormValidator.validate(json, schema.api.validations)
-				.then(function () { return channelModel.deletePagegroupById(json.pageGroupId) })
-				.then(function (data) {
-					return res.status(200).send({ success: true });
-				})
-				.catch(function (err) {
-					if (err.name !== 'AdPushupError') {
-						return res.status(500).send({ success: false, message: 'Some error occurred' });
-					}
+		// Validate input params and delete pagegroup
+		return FormValidator.validate(json, schema.api.validations)
+			.then(function () { return channelModel.deletePagegroupById(json.pageGroupId) })
+			.then(function (data) {
+				return res.status(200).send({ success: true });
+			})
+			.catch(function (err) {
+				if (err.name !== 'AdPushupError') {
+					return res.status(500).send({ success: false, message: 'Some error occurred' });
+				}
 
-					var error = err.message[0];
-					return res.status(error.status).send({ success: false, message: error.message });
-				});
-		}
-		else {			
-			return channelModel.deletePagegroupById(json.pageGroupId)
-				.then(function() {
-					// Reset session on deletion of new pagegroup for non-partner
-					var userSites = req.session.user.sites,
-						site = _.find(userSites, {'siteId': parseInt(json.siteId)}),
-						index = _.findIndex(userSites, {'siteId': parseInt(json.siteId)})
-					site.pageGroups.splice(index, 1);
-						
-					req.session.user.sites[index].pageGroups = site.pageGroups;
-					
-					return res.send({ success: true });
-				})
-				.catch(function() {
-					return res.send({ success: false });
-				});
-		}
+				var error = err.message[0];
+				return res.status(error.status).send({ success: false, message: error.message });
+			});
+
 	});
 
 module.exports = router;

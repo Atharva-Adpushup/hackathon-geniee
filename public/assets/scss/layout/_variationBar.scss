@@ -120,6 +120,7 @@
 }
 
 .section-list li {
+    min-height: 160px;
     & {
         padding: 10px;
         border: 1px solid lighten($lightGrey, 5%);

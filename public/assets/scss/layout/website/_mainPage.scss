@@ -216,3 +216,74 @@
     margin-right: 7px;
   }
 }
+
+.settings-btn-pane {
+  button {
+    font-size: 1.2em;
+  }
+}
+
+.snippet-wrapper {
+  position: relative;
+
+  .snippet-btn {
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    word-spacing: 2px;
+    width: 200px;
+    background-color: $whiteColor;
+
+    &:not(:last-child) {
+      margin-right: 10px;
+    }
+
+    i {
+      margin-left: 4px;
+    }
+  }
+
+  .snippet-dev {
+    width: 200px;
+    margin-right: 10px;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 2px;
+  }
+
+  .clipboard-copy {
+    position: absolute;
+    bottom: 65px;
+    right: 1px;
+    width: 140px;
+    display: none;
+    text-align: center;
+    font-size: 1.1em;
+    background-color: $whiteColor;
+    padding: 6px;
+    @include bordersStyle(1px solid $lightGrey, top, left, bottom);
+    color: $fontColor;
+  }
+}
+
+.widget-text {
+  color: $fontColor;
+  font-size: 1.35em;
+  padding: 15px 0;
+  line-height: 25px;
+}
+
+.btn.widget-btn {
+  font-size: 1.2em;
+  padding: 12px;
+  margin: 15px 0;
+  position: relative;
+
+  .fa-check {
+    background-color: $primaryColor;
+    color: $whiteColor;
+    padding: 5px;
+    border-radius: 50%;
+    position: absolute;
+    top: -8px;
+    right: -10px;
+  }
+}

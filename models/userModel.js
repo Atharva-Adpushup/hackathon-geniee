@@ -28,7 +28,7 @@ var modelAPI = module.exports = apiModule(),
 		};
 		this.defaults = {
 			sites: [],
-			adNetworkSettings: [],
+			adNetworkSettings: {},
 			requestDemo: true
 		};
 		this.ignore = ['password', 'oldPassword', 'confirmPassword', 'site'];
@@ -72,7 +72,7 @@ var modelAPI = module.exports = apiModule(),
 
 		this.getNetworkDataObj = function(networkName) {
 			var data = _.find(this.get('adNetworkSettings'), function(networkInfo) {
-				return (networkInfo.get('networkName') === networkName);
+				return (networkInfo.networkName === networkName);
 			});
 			if (!data) {
 				return false;
@@ -87,7 +87,6 @@ var modelAPI = module.exports = apiModule(),
 				return false;
 			}
 
-			data = data.toJSON();
 			if (keys) {
 				return data;
 			}
@@ -384,6 +383,27 @@ function apiModule() {
 					return user.save();
 				});
 		},
+		getAllUserSites: function(email) {
+			return API.getUserByEmail(email)
+				.then(function(user) { return user })
+				.then(function(user) {
+					var sitePromises = _.map(user.get('sites'), function (site) {
+						return siteModel.getSiteById(site.siteId)
+							.then(function (site) {
+								return {
+									domain: site.get('siteDomain'),
+									siteId: site.get('siteId'),
+									step: site.get('step'),
+									channels: site.get('channels')
+								};
+							});
+					});
+
+					return Promise.all(sitePromises).then(function (sites) {
+						return sites;
+					});					
+				});
+		},
 		setSitePageGroups: function(email) {
 			function setPageGroupsPromises(user) {
 				return (_(user.get('sites')).map(function(site) {
@@ -391,13 +411,12 @@ function apiModule() {
 						setupStep = siteModel.getSetupStep(site.siteId),
 						cmsData = siteModel.getCmsData(site.siteId);
 					return Promise.join(uniquePageGroups, setupStep, cmsData, function(pageGroups, step, cms) {
-						site.pageGroups = pageGroups;
 						site.step = step;
 						site.cmsInfo = cms;
+						site.pageGroups = pageGroups;
 						return site;
 					})
 					.catch(function(err) {
-						site.pageGroups = [];
 						site.step = 1;						
 						return site;
 					});

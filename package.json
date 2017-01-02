@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "bayesian-bandit": "^0.10.0",
     "bluebird": "^3.3.3",
     "bluebird-retry": "^0.8.0",
     "body-parser": "~1.13.2",

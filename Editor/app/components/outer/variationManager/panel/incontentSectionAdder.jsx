@@ -88,53 +88,66 @@ class inContentForm extends React.Component {
 		}
 
 		return (
-			<form onSubmit={props.handleSubmit}>
-				<h1 className="variation-section-heading">Add Incontent Variation</h1>
-				<Field placeholder="Please enter section" name="section" component={renderField} type="number" label="Section No" />
-				<Field placeholder="Please enter minDistanceFromPrevAd" name="minDistanceFromPrevAd" component={renderField} type="number" label="minDistanceFromPrevAd" />
-				<Row>
-					<Col xs={6} className="u-padding-r10px">
-						<Row>
-							<Col xs={6} className="u-padding-r10px"><strong>Ad Size</strong></Col>
-							<Col xs={6} className="u-padding-r10px">
-								<Field name="adSize" component="select">
-									{
-										getSupportedSizes().map((pos, index) => (
-											<option key={index} name={pos}>{pos}</option>
-										))
-									}
-								</Field>
-							</Col>
-						</Row>
-					</Col>
-				</Row>
+			<div>
 				{
-					props.activeChannel.platform !== 'MOBILE' ? (
-						<Row>
-							<Col xs={6} className="u-padding-r10px">
-								<Row>
-									<Col xs={6} className="u-padding-r10px"><strong>Float</strong></Col>
-									<Col xs={6} className="u-padding-r10px">
-										<Field name="float" component="select">
-											<option name="none">none</option>
-											<option name="left">left</option>
-											<option name="right">right</option>
-										</Field>
-									</Col>
-								</Row>
-							</Col>
-						</Row>
-					) : null
+					props.activeChannel.contentSelector ? (
+						<form onSubmit={props.handleSubmit}>
+							<h1 className="variation-section-heading">Add Incontent Variation</h1>
+							<Field placeholder="Please enter section" name="section" component={renderField} type="number" label="Section No" />
+							<Field placeholder="Please enter minDistanceFromPrevAd" name="minDistanceFromPrevAd" component={renderField} type="number" label="minDistanceFromPrevAd" />
+							<Row>
+								<Col xs={6} className="u-padding-r10px">
+									<Row>
+										<Col xs={6} className="u-padding-r10px"><strong>Ad Size</strong></Col>
+										<Col xs={6} className="u-padding-r10px">
+											<Field name="adSize" component="select">
+												{
+													getSupportedSizes().map((pos, index) => (
+														<option key={index} name={pos}>{pos}</option>
+													))
+												}
+											</Field>
+										</Col>
+									</Row>
+								</Col>
+							</Row>
+							{
+								props.activeChannel.platform !== 'MOBILE' ? (
+									<Row>
+										<Col xs={6} className="u-padding-r10px">
+											<Row>
+												<Col xs={6} className="u-padding-r10px"><strong>Float</strong></Col>
+												<Col xs={6} className="u-padding-r10px">
+													<Field name="float" component="select">
+														<option name="none">none</option>
+														<option name="left">left</option>
+														<option name="right">right</option>
+													</Field>
+												</Col>
+											</Row>
+										</Col>
+									</Row>
+								) : null
+							}
+							<Row>
+								{ CodeBoxField }
+							</Row>
+							<Row>
+								<Col className="u-padding-r10px" style={{ marginTop: '30px', clear: 'both' }} xs={2}>
+									<Button className="btn-lightBg btn-save btn-block" type="submit">Save</Button>
+								</Col>
+							</Row>
+						</form>
+					) : (
+						<div>
+							<h1 className="variation-section-heading">Add Incontent Variation</h1>
+							<p className="error-message" style={{ fontSize: '1em' }}>
+								Please set your <strong>Content Selector</strong> in the channel settings first to create your in-content section.
+							</p>
+						</div>
+					)
 				}
-				<Row>
-					{ CodeBoxField }
-				</Row>
-				<Row>
-					<Col className="u-padding-r10px" style={{ marginTop: '30px', clear: 'both' }} xs={2}>
-						<Button className="btn-lightBg btn-save btn-block" type="submit">Save</Button>
-					</Col>
-				</Row>
-			</form>
+			</div>
 		);
 	}
 }

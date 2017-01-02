@@ -30,3 +30,15 @@
         font-weight: 700;
     }
 }
+
+.blocklist {
+    margin: 0 15px;
+    font-size: 1.2em;
+    color: $fontColor;
+
+    li {
+        padding: 5px;
+        margin: 5px 0;
+        border-bottom: 1px solid lighten($lightGrey, 12%);
+    }
+}

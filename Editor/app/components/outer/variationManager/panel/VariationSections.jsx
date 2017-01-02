@@ -38,17 +38,17 @@ const variationSections = (props) => {
 										submitHandler={onRenameSection.bind(null, section, variation.id)} text="Section Name" errorMessage="Section Name cannot be blank"
 									/>
 								</Col>
-								<Row>
-									<Col className="u-padding-r10px" xs={4}>Ad Code</Col>
-									<Col className="u-padding-l10px" xs={8}>
-										<InlineEdit compact adCode value={section.ads[0].adCode}
-											submitHandler={onUpdateAdCode.bind(null, section.ads[0].id)} text="Ad Code" errorMessage="Ad Code cannot be blank"
-										/>
-									</Col>
-								</Row>
 							</Row>
 							{ section.isIncontent ? (
 								<div>
+									<Row>
+										<Col className="u-padding-r10px" xs={4}>Ad Code</Col>
+										<Col className="u-padding-l10px" xs={8}>
+											<InlineEdit compact adCode value={section.ads[0].adCode}
+												submitHandler={onUpdateAdCode.bind(null, section.ads[0].id)} text="Ad Code" errorMessage="Ad Code cannot be blank"
+											/>
+										</Col>
+									</Row>
 									<Row>
 										<Col className="u-padding-r10px" xs={4}>Section No.</Col>
 										<Col className="u-padding-l10px" xs={8}><strong>{section.sectionNo}</strong></Col>

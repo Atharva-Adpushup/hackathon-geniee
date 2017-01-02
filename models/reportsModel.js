@@ -97,7 +97,7 @@ var es = require('../helpers/elasticSearchService'),
 			b = esqm.createBoolFilter(),
 			rangeFilter = esqm.createRangeFilter('createdTs', startDate, endDate),
 			timeOnSiteAgg = {"TIME_ON_SITE":{"terms":{"field":"userAnalytics.timeOnSite","size":5,"order":{"_count":"desc"}},"aggs":{}}},
-			aggs = {"PLATFORM":{"terms":{"field":"userAnalytics.platform","size":5,"order":{"_count":"desc"}},"aggs":{"CHOSEN_VARIATION":{"terms":{"field":"chosenVariation","size":5,"order":{"_count":"desc"}},"aggs":{"ADS_CLICKED":{"terms":{"field":"ads.clicked","size":5,"order":{"_count":"desc"}}}}}}}},
+			aggs = {"PLATFORM":{"terms":{"field":"userAnalytics.platform","size":5,"order":{"_count":"desc"}},"aggs":{"CHOSEN_VARIATION":{"terms":{"field":"variationId","size":5,"order":{"_count":"desc"}},"aggs":{"ADS_CLICKED":{"terms":{"field":"ads.clicked","size":5,"order":{"_count":"desc"}}}}}}}},
 			esQueryString = ((config.queryString) ? config.queryString : 'tracking:true AND mode:1'),
 			esQuery = {
 				'query_string': {
@@ -466,19 +466,19 @@ module.exports = {
 				logName: 'exlg',
 				queryBody: queryBody,
 				reportType: prepareApexReport
-			},
-			trackedReportData = {"took":20,"timed_out":false,"_shards":{"total":12,"successful":12,"failed":0},"hits":{"total":23764,"max_score":0,"hits":[]},"aggregations":{"PLATFORM":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"DESKTOP","doc_count":23764,"CHOSEN_VARIATION":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"5c1c1e05-fc53-4e97-8073-13f9ef0d32bb","doc_count":12065,"ADS_CLICKED":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"5c1c1e05-fc53-4e97-8073-13f9ef0d32bb","key_as_string":"true","doc_count":121}]}},{"key":"9b3ea7ed-34cc-42fb-8433-bfaf8a0fd799","doc_count":11699,"ADS_CLICKED":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"9b3ea7ed-34cc-42fb-8433-bfaf8a0fd799","key_as_string":"true","doc_count":169}]}}]}}]},"TIME_ON_SITE":{"doc_count_error_upper_bound":36,"sum_other_doc_count":10663,"buckets":[{"key":2001,"doc_count":2705},{"key":2002,"doc_count":1916},{"key":6003,"doc_count":744},{"key":2000,"doc_count":607},{"key":6002,"doc_count":597}]}},"level":"error","message":"","timestamp":"2016-10-05T12:18:10.194Z"},
-			untrackedReportData = {"took":32,"timed_out":false,"_shards":{"total":12,"successful":12,"failed":0},"hits":{"total":17132,"max_score":0,"hits":[]},"aggregations":{"PLATFORM":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"DESKTOP","doc_count":17132,"CHOSEN_VARIATION":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"5c1c1e05-fc53-4e97-8073-13f9ef0d32bb","doc_count":17132,"ADS_CLICKED":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"5c1c1e05-fc53-4e97-8073-13f9ef0d32bb","key_as_string":"true","doc_count":169}]}}]}}]},"TIME_ON_SITE":{"doc_count_error_upper_bound":29,"sum_other_doc_count":8762,"buckets":[{"key":2001,"doc_count":1386},{"key":2002,"doc_count":1000},{"key":6003,"doc_count":416},{"key":2000,"doc_count":335},{"key":6002,"doc_count":317}]}},"level":"error","message":"","timestamp":"2016-10-05T12:18:11.758Z"},
-			selectedReportData;
+			};
+			// trackedReportData = {"took":20,"timed_out":false,"_shards":{"total":12,"successful":12,"failed":0},"hits":{"total":23764,"max_score":0,"hits":[]},"aggregations":{"PLATFORM":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"DESKTOP","doc_count":23764,"CHOSEN_VARIATION":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"6ba336d4-8ab1-4cc4-a833-c06225f3ff73","doc_count":12065,"ADS_CLICKED":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"6ba336d4-8ab1-4cc4-a833-c06225f3ff73","key_as_string":"true","doc_count":121}]}},{"key":"2712dd32-a8b3-416b-9498-ab76ccc8ede0","doc_count":11699,"ADS_CLICKED":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"2712dd32-a8b3-416b-9498-ab76ccc8ede0","key_as_string":"true","doc_count":169}]}}]}}]},"TIME_ON_SITE":{"doc_count_error_upper_bound":36,"sum_other_doc_count":10663,"buckets":[{"key":2001,"doc_count":2705},{"key":2002,"doc_count":1916},{"key":6003,"doc_count":744},{"key":2000,"doc_count":607},{"key":6002,"doc_count":597}]}},"level":"error","message":"","timestamp":"2016-10-05T12:18:10.194Z"},
+			// untrackedReportData = {"took":32,"timed_out":false,"_shards":{"total":12,"successful":12,"failed":0},"hits":{"total":17132,"max_score":0,"hits":[]},"aggregations":{"PLATFORM":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"DESKTOP","doc_count":17132,"CHOSEN_VARIATION":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"6ba336d4-8ab1-4cc4-a833-c06225f3ff73","doc_count":17132,"ADS_CLICKED":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"6ba336d4-8ab1-4cc4-a833-c06225f3ff73","key_as_string":"true","doc_count":169}]}}]}},{"key":"DESKTOP","doc_count":33985,"CHOSEN_VARIATION":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"2712dd32-a8b3-416b-9498-ab76ccc8ede0","doc_count":33985,"ADS_CLICKED":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"2712dd32-a8b3-416b-9498-ab76ccc8ede0","key_as_string":"true","doc_count":540}]}}]}}]},"TIME_ON_SITE":{"doc_count_error_upper_bound":29,"sum_other_doc_count":8762,"buckets":[{"key":2001,"doc_count":1386},{"key":2002,"doc_count":1000},{"key":6003,"doc_count":416},{"key":2000,"doc_count":335},{"key":6002,"doc_count":317}]}},"level":"error","message":"","timestamp":"2016-10-05T12:18:11.758Z"},
+			// selectedReportData;
 
-			if (config.queryString) {
-				selectedReportData = untrackedReportData;
-			} else {
-				selectedReportData = trackedReportData;
-			}
+			// if (config.queryString) {
+			// 	selectedReportData = untrackedReportData;
+			// } else {
+			// 	selectedReportData = trackedReportData;
+			// }
 
-		return success(prepareApexReport(selectedReportData));
-		// return performEsSearch(esSearchConfig);
+		// return success(prepareApexReport(selectedReportData));
+		return performEsSearch(esSearchConfig);
 	},
 
 	controlVsAdpushupPageviewsReport: function(config) {
