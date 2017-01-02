@@ -6,23 +6,44 @@ block getTitle
 	- var titleVar = "Add New Site"
 
 block append headScripts
-	- step = 1;
+	if step
+		- continueStep = step + 1;
+		- continueSiteDomain = siteDomain;
+		- continueSiteId = siteId;
+		- introShow = false;
+	else 
+		- continueStep = 2;
+		- siteDomain = null;
+		- siteId = null;
+		- introShow = true;
 
 	script.
+
 		$('document').ready(function() {
 			adpushup.newSite = {
-				totalSteps: 3,
-				defaultStep: '!{step}',
+				addedSite: {
+					domain: '!{continueSiteDomain}',
+					siteId: '!{continueSiteId}'
+				},
+				totalSteps: 6,
+				defaultStep: !{continueStep},
 				addOtherSite: true,
-				showIntro: false
+				showIntro: !{introShow}
 			};
 		});
 
-	+loadAsset("js", [
-		'/assets/js/builds/adpushup-onboarding.min.js'
-	]) 
+	if environment == 'production'
+		+loadAsset("js", [
+			'/assets/js/builds/adpushup-onboarding.min.js'
+		])
+	else
+		+loadAsset("js", [
+			'/assets/js/libs/custom/adpushup-onboarding.js'
+		])
+
 
 block bodyContent
+	- addOtherSite = true;
 	include layout/sideBar
 	.pageContainer.page-container
 		include layout/header

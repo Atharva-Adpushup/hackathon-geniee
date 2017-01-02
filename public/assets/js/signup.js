@@ -104,13 +104,16 @@
 					'required': true,
 					'url': 'true'
 				},
-				pageviewRange: {
-					'required': true
+				websiteRevenue: {
+					required: true
 				},
-				adNetworks: {
-					'required': true,
-					'isAdNetworksNull': true
-				},
+				// pageviewRange: {
+				// 	'required': true
+				// },
+				// adNetworks: {
+				// 	'required': true,
+				// 	'isAdNetworksNull': true
+				// },
 				termsPolicy: {
 					'required': true
 				}
@@ -132,12 +135,15 @@
 					'required': 'Please fill out site url',
 					'url': 'Enter url in valid format'
 				},
-				pageviewRange: {
-					'required': 'Please select a page view range'
+				websiteRevenue: {
+					'required': 'Please select a revenue range'
 				},
-				adNetworks: {
-					'required': 'Please select atleast one ad network'
-				},
+				// pageviewRange: {
+				// 	'required': 'Please select a page view range'
+				// },
+				// adNetworks: {
+				// 	'required': 'Please select atleast one ad network'
+				// },
 				termsPolicy: {
 					'required': 'Please agree to our Terms of Service & Privacy Policy'
 				}

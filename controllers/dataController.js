@@ -6,6 +6,7 @@ var express = require('express'),
 	lodash = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
+	pipeDrive = require('../misc/vendors/pipedrive'),
 	router = express.Router();
 
 router
@@ -347,7 +348,6 @@ router
 				});
 			});
 	})
-
 	.get('/syncAdsenseAd', function(req, res) {
 		if (!req.query.adslot || req.query.adslot.length < 10) {
 			res.json({ success: 0, message: 'Illegal Adslot' });
@@ -387,6 +387,173 @@ router
 			.catch(function(err) {
 				res.json({ success: 0, message: err.toString() });
 			});
+	})
+	// .post('/crmSupportIntegration', function(req, res) {
+	// 		var searchPhrase = req.body.freshdesk_webhook.ticket_requester_email || null,
+	// 			pipeDriveObject = new pipeDrive(),
+	// 			freshDeskObject = new freshDesk(),
+	// 			pipeDriveFilteredData = null,
+	// 			pipeDriveCheckUserDetails = pipeDriveObject.apiCall('isUserPresent', searchPhrase);
+		
+	// 	freshDeskObject.init('yomesh.gupta@adpushup.com', 'hsemoyatpug');
+	// 	pipeDriveCheckUserDetails.then(function(data) {
+	// 		var flag = 0,
+	// 			parsedData = null,
+	// 			parsedContent = JSON.parse(data);
+	// 		if (parsedContent.data) {
+	// 			parsedData = parsedContent.data[0] || null;
+	// 		}
+	// 		if (parsedData && parsedData != 'null' && parsedData != null) {
+	// 			flag = 1;
+	// 			var userId = parsedData.id;
+	// 			return pipeDriveObject.apiCall('fetchUserDetails', userId);
+	// 		} else {
+	// 			return new Promise(function(resolve, reject) {
+	// 				resolve(flag);
+	// 			});
+	// 		}
+	// 	}).then(function(data) {
+	// 		if (data && data != 0) {
+	// 			var flag = 0,
+	// 				pipeDriveUserData = JSON.parse(data);
+	// 			if (pipeDriveUserData && pipeDriveUserData != '') {
+	// 				flag = 1;
+	// 				pipeDriveFilteredData = {
+	// 					'name' : pipeDriveUserData.data.name,
+	// 					'email' : pipeDriveUserData.data.email[0].value,
+	// 					'phone' : pipeDriveUserData.data.phone[0].value,
+	// 					// 'job_title' : pipeDriveUserData.contacts[0].job_title,
+
+	// 					// Custom Fields
+	// 					'owner_name' : pipeDriveUserData.data.owner_id.name,
+	// 					'owner_email' : pipeDriveUserData.data.owner_id.email,
+	// 					// 'organization_name' : pipeDriveUserData.data.org_id.name,
+	// 					'open_deals_count' : pipeDriveUserData.data.open_deals_count,
+	// 					'related_open_deals_count' : pipeDriveUserData.data.related_open_deals_count,
+	// 					'closed_deals_count' : pipeDriveUserData.data.closed_deals_count,
+	// 					'related_closed_deals_count' : pipeDriveUserData.data.related_closed_deals_count,
+	// 					'participant_open_deals_count' : pipeDriveUserData.data.participant_open_deals_count,
+	// 					'participant_closed_deals_count' : pipeDriveUserData.data.participant_closed_deals_count,
+	// 					'email_messages_count' : pipeDriveUserData.data.email_messages_count,
+	// 					'activities_count' : pipeDriveUserData.data.activities_count,
+	// 					'done_activities_count' : pipeDriveUserData.data.done_activities_count,
+	// 					'undone_activities_count' : pipeDriveUserData.data.undone_activities_count,
+	// 					'reference_activities_count' : pipeDriveUserData.data.reference_activities_count,
+	// 					'files_count' : pipeDriveUserData.data.files_count,
+	// 					'notes_count' : pipeDriveUserData.data.notes_count,
+	// 					'followers_count' : pipeDriveUserData.data.followers_count,
+	// 					'won_deals_count' : pipeDriveUserData.data.won_deals_count,
+	// 					'related_won_deals_count' : pipeDriveUserData.data.related_won_deals_count,
+	// 					'lost_deals_count' : pipeDriveUserData.data.lost_deals_count,
+	// 					'related_lost_deals_count' : pipeDriveUserData.data.related_lost_deals_count,
+	// 					'add_time' : pipeDriveUserData.data.add_time,
+	// 					'update_time' : pipeDriveUserData.data.update_time,
+	// 					'next_activity_date' : pipeDriveUserData.data.next_activity_date,
+	// 					'next_activity_time' : pipeDriveUserData.data.next_activity_time,
+	// 					'next_activity_id' : pipeDriveUserData.data.next_activity_id,
+	// 					'last_activity_id' : pipeDriveUserData.data.last_activity_id,
+	// 					'last_activity_date' : pipeDriveUserData.data.last_activity_date,
+	// 					'last_incoming_mail_time' : pipeDriveUserData.data.last_incoming_mail_time,
+	// 					'last_outgoing_mail_time' : pipeDriveUserData.data.last_outgoing_mail_time,
+	// 				}
+	// 			} else {
+	// 				pipeDriveFilteredData = null;
+	// 			}
+	// 			if (flag == 1) {
+	// 				return freshDeskObject.apiCall('isUserPresent', searchPhrase);
+	// 			} else {
+	// 				return new Promise(function(resolve, reject) {
+	// 					resolve(flag);
+	// 				});
+	// 			}
+	// 		} else {
+	// 			return new Promise(function(resolve, reject) {
+	// 				var flag = 0;
+	// 				resolve(flag);
+	// 			});
+	// 		}
+	// 	}).then(function(data) {
+	// 		if (data != 0) {
+	// 			var userFreshDeskDetails = JSON.parse(data),
+	// 				flag = 0,
+	// 				freshSaleskeys = Object.keys(pipeDriveFilteredData),
+	// 				finalDeskFields = ['name', 'email', 'phone', 'mobile', 'avatar', 'job_title'],
+	// 				finalData = {
+	// 					"custom_fields" : {}
+	// 				};
+	// 			if (!userFreshDeskDetails || userFreshDeskDetails == '' || userFreshDeskDetails == null) {
+	// 				flag = 1; // Not present in FreshDesk
+	// 			} else {
+	// 				flag = 2; // Present in FreshDesk
+	// 			}
+	// 			if(flag == 1) {
+	// 				freshSaleskeys.forEach(function(prop) {
+	// 					if (prop != 'avatar') {
+	// 						if(finalDeskFields.indexOf(prop) > -1) {
+	// 							finalData[prop] = String(pipeDriveFilteredData[prop]) || null;
+	// 						} else {
+	// 							finalData.custom_fields[prop] = String(pipeDriveFilteredData[prop]) || null;
+	// 						}
+	// 					}
+	// 				});
+	// 				return freshDeskObject.apiCall('addUser', null, finalData);           
+	// 			} else if (flag == 2) {
+	// 				freshSaleskeys.forEach(function(prop) {
+	// 					if (prop != 'avatar') {
+	// 						if(finalDeskFields.indexOf(prop) > -1) {
+	// 							if(userFreshDeskDetails) {
+	// 								if (!userFreshDeskDetails[0][prop] || userFreshDeskDetails[0][prop] == 'null' || userFreshDeskDetails[0][prop] == '') {
+	// 									finalData[prop] = String(pipeDriveFilteredData[prop]) || null; 
+	// 								} else {
+	// 									finalData[prop] = String(userFreshDeskDetails[0][prop]) || null;
+	// 								}
+	// 							}
+	// 						} else {
+	// 							finalData.custom_fields[prop] = String(pipeDriveFilteredData[prop]) || null;
+	// 						}
+	// 					}
+	// 				});
+	// 				var userId = userFreshDeskDetails[0].id;
+	// 				return freshDeskObject.apiCall('updateUser', null, finalData, userId);   
+	// 			}
+	// 		}
+	// 	}).then(function(data) {
+	// 		console.log("Done : " + data);    
+	// 	}).catch(function(err) {
+	// 		console.log(err);
+	// 	});	
+	// })
+
+	/*
+	* Deal Status Updation in pipeDrive
+	* Request Params
+	* 64 : Deal Created
+	* 71 : Deal Qualified
+	* 65 : Services Selected
+	* 66 : Site Added
+	* 67 : AP code added & verified
+	* 68 : Google Adsense Connected
+	* 69 : Non admin access
+	* 64 : Passback
+	*/
+	.post('/updateCrmDealStatus', function(req, res) {
+			var pipeDriveObject = new pipeDrive(),
+				dealStatus = req.body.status;
+
+            userModel.getUserByEmail(req.session.user.email).then(function(user) {
+				var pipeDriveParams = {
+					"searchText": user.data.crmDealId,
+					"dataToSend": {
+						"stage_id": dealStatus
+					}
+				}
+				return pipeDriveObject.apiCall('updateDealStatus', pipeDriveParams);
+			}).then(function(data) {
+				return res.send({success: 1});
+			}).catch(function(err) {
+				console.log(err);
+				return res.send({success: 0});
+			});	
 	});
 
 module.exports = router;

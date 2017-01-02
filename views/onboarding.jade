@@ -1,9 +1,9 @@
-//- Dashboard template
+//- Onboarding template
 
 extends  layout/base
 
 block getTitle
-    - var titleVar = "DashBoard"
+    - var titleVar = "Onboarding"
 
 //- Load AdPushup setup script if there is no valid site
 block append headScripts
@@ -27,7 +27,7 @@ block append headScripts
                     totalSteps: 6,
                     defaultStep: '!{step}',
                     addOtherSite: false,
-                    showIntro: true
+                    showIntro: false
                 };
             });
 
@@ -89,8 +89,6 @@ block append headScripts
             ])    
 
 block bodyContent
-    //- if isSuperUser || !requestDemo
-    include layout/sideBar
     .pageContainer.page-container
         include layout/header
         // Page Content Starts Here
@@ -112,7 +110,6 @@ block bodyContent
 
                             else
                                 if hasStep
-                                    //- if validSites[0].step >= 6 && !requestDemo
                                     if validSites[0].step >= 6
                                         include layout/dashboardSites
                                     else 

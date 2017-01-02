@@ -10,23 +10,64 @@ $('document').ready(function() {
         ap.onboarding = {
             // Intro modal check
             showIntro: function() {
-                var showIntro = w.localStorage.getItem('showIntro');                
-                if(!currentUser.sites[currentUser.sites.length-1].step) {
-                    $('#intromodal').modal({
-                        'show': true,
-                        'backdrop': 'static',
-                        'keyboard': false
+                // var showIntro = w.localStorage.getItem('showIntro');
+                var keyboardValue = false,
+                    backdropValue = 'static';
+
+                // if(newSite.addOtherSite) {
+                //     keyboardValue = true;
+                //     backdropValue = 'null';
+                // }
+
+                if(!w.currentUser.sites[(w.currentUser.sites.length-1)].step || newSite.showIntro) {
+                    if(newSite.addOtherSite) {
+                        $('#addOtherSiteModal').modal({
+                            'show': true,
+                            'backdrop': backdropValue,
+                            'keyboard': keyboardValue
+                        });
+                    } else {
+                        $('#intromodal').modal({
+                            'show': true,
+                            'backdrop': backdropValue,
+                            'keyboard': keyboardValue
+                        });
+                    }
+                    // w.localStorage.setItem('showIntro', true);
+                }
+            },
+
+            // Analytics Event Emit
+            analyticsEventEmitter: function(step, flag) {
+                var intercom = intercomObj || null;
+                if(flag) {
+                    adpushupAnalyticsEvents.emit('analyticsTrack', {
+                            eventName: step, 
+                            obj: {
+                                name: window.currentUser.firstName,
+                                email: window.currentUser.email
+                            },
+                            intercom: intercom
+                    });                    
+                } else {
+                    adpushupAnalyticsEvents.emit('analyticsTrack', {
+                            eventName: 'onboarding', 
+                            obj: {
+                                action: 'click',
+                                step: step
+                            },
+                            intercom: intercom
                     });
-                    w.localStorage.setItem('showIntro', true);
                 }
             },
 
             // UI templates for onboarding
             templates: {
                 checkIcon: '<i class="fa fa-check"></i>',
-                otherPlatformVerification: ' <p class="text-medium text-center" style="margin-top: -10px;">Copy and paste this snippet in the &lt;HEAD&gt; section of your website </p><div class="snippet-wrapper"> <span class="clipboard-copy"> Copied ! </span> <textarea class="snippet" id="header-code" readonly placeholder="AdPushup init code comes here.."></textarea> <div class="snippet-btn-wrapper"> <div><button data-toggle="modal" data-target="#sendToDevModal" id="sendToDev" class="snippet-btn apbtn-main-line apbtn-small"> Send Code to Developer <i class="fa fa-code"></i> </button> <button id="clipboardCopy" class="snippet-btn apbtn-main-line apbtn-small"> Copy to clipboard <i class="fa fa-clipboard"></i> </button> </div></div></div><div class="error-message detectap-error"> <p> Please make sure that the header code is present on the the specified URL </p><div id="detectapError"></div></div><div class="row"> <div class="col-sm-4 col-sm-offset-4"> <button id="apCheck" class="apbtn-main btn-vr btn-wpdt"> Verify </button> </div></div>',
+                otherPlatformVerification: '<div class="snippet-wrapper"> <span class="clipboard-copy"> Copied ! </span> <textarea class="snippet" id="header-code" readonly placeholder="AdPushup init code comes here.."></textarea> <div class="snippet-btn-wrapper"> <div><button data-toggle="modal" data-target="#sendToDevModal" id="sendToDev" class="snippet-btn apbtn-main-line apbtn-small"> Email Code <i class="fa fa-envelope-o"></i> </button> <button id="clipboardCopy" class="snippet-btn apbtn-main-line apbtn-small"> Copy to clipboard <i class="fa fa-clipboard"></i> </button> </div></div></div><div class="error-message detectap-error"> <span> Please make sure that the header code is present on the the specified URL </span><div id="detectapError"></div></div><div class="row"><button id="apCheck" class="apbtn-main btn-vr btn-wpdt ap-code-verify"> Verify </button> </div>',
                 addOtherSite: '<form id="addSiteAltForm"> <div class="row add-site-alt-form"> <div class="col-sm-8 col-sm-offset-2"> <input name="site" class="input-box" type="url" placeholder="Enter Website URL" required> </div><div class="col-sm-6 col-sm-offset-3"> <button type="submit" class="apbtn-main mT-10"> Add Site </button> </div></div></form>',
-                dashboardLink: '<div class="text-center" style="margin-top: 15px;"><a style="font-size: 1.2em;" class="link-primary" href="/user/dashboard">Go to dashboard</a></div>'
+                dashboardLink: '<div class="text-center" style="margin-top: 15px;"><a style="font-size: 1.2em;" class="link-primary" href="/user/dashboard">Go to dashboard</a></div>',
+                addOtherSiteFinish: '<div class="text-center"><h2>Thank you for the information. Our team will contact you soon.</h2></div>'
             },
 
             // Method to enable element-level DOM manipulation
@@ -38,14 +79,34 @@ $('document').ready(function() {
                 }
             },
 
+            anotherSiteModalOpen: function() {
+                var modalBox = $('#addOtherSiteModal'),
+                    contentBox = $('#add-other-site-modal-content');
+                contentBox.html(this.templates.addOtherSiteFinish);
+                modalBox.modal({
+                    'show': true,
+                    'backdrop': 'static',
+                    'keyboard': false
+                });
+                setTimeout(function() {
+                    window.location.replace('http://'+window.location.host+'/user/dashboard');
+                }, 4000);
+            },
+
             // Setup complete alert
             setupCompleteAlert: function() {
                 var ob = this;
-                setTimeout(function() {
-                    $('#skipOauth').hide();
-                    $('#dsBLink').html(ob.templates.dashboardLink);
-                }, 1000);
-                $('#completionmodal').modal('show');
+                // setTimeout(function() {
+                //     $('#skipOauth').hide();
+                //     $('#dsBLink').html(ob.templates.dashboardLink);
+                // }, 1000);
+                if(newSite.addOtherSite) {
+                    ob.anotherSiteModalOpen();
+                } else {
+                    var url = 'http://'+window.location.host+'/thankyou';
+                    window.location.replace(url);
+                }
+                // $('#completionmodal').modal('show');
             },
 
             // Smooth scrolling method
@@ -71,6 +132,14 @@ $('document').ready(function() {
                 return domain ? this.rTrim(domain.replace('http://', '').replace('https://', '').replace('www.', ''), '/') : '';
             },
 
+            // Extract Website Name for Email address
+            extractWebsiteName: function(domain) {
+                var r = /[^.]+/,
+                    url = this.domanize(domain),
+                    result = url.match(r)[0];
+                return result;
+            },
+
             // Show AdPushup verification step
             apVerificationStep: function() {
                 $('#platformVerificationContent').html(this.templates.otherPlatformVerification);
@@ -83,7 +152,7 @@ $('document').ready(function() {
                 $('#step' + step).addClass('active-step');
 
                 // Set appropriate cms detection check
-                if (step >= 2) {
+                if (step >= 3) {
                     this.apVerificationStep();
                 }
 
@@ -91,23 +160,28 @@ $('document').ready(function() {
                 for (var i = 1; i < step; i++) {
                     $('#step' + parseInt(i) + '-check').addClass('fa-check-circle zoomIn');
                 }
-                if (newSite.addedSite && step >= 1) {
+                if (newSite.addedSite && step >= 2) {
                     this.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + this.domanize(newSite.addedSite.domain) + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
                 }
-                if (step > 2) {
+                if (newSite.addedSite && step >= 4) {
+                    this.manipulateElem('#non-admin-email', '*Email* - ' + this.extractWebsiteName(newSite.addedSite.domain) + '@adpushup.com', 'htmlFadeIn', 600);
+                }
+                if (step > 3) {
                     $('#apCheck').html('Verified '+this.templates.checkIcon);
                 }
-                if (step >= 4) {
+                if (step > 4) {
                     $('#adsenseoauth').html('Google Adsense Connected '+this.templates.checkIcon);
                 }
+
+                this.scrollTo(step, 0, 1000);
 
                 switch (step) {
                     case 1:
                         $('#platformVerificationContent').html('<p class="text-center mT-10"><img class="platform-graphic" src="/assets/images/platform.png" width="150" height="150"/></p>');
                         break;
-                    case 4:
-                        this.setupCompleteAlert();
-                        break;
+                    // case 6:
+                    //     this.setupCompleteAlert();
+                    //     break;
                 }
             },
 
@@ -138,8 +212,9 @@ $('document').ready(function() {
                         $('.add-site-alt-form').hide();
                         $('#addSiteStr').fadeIn();
                         ob.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + site + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
-                        ob.nextStep(2, 1, 1000);
+                        ob.nextStep(3, 2, 1000);
                         ob.apVerificationStep();
+                        ob.manipulateElem('#non-admin-email', '*Email* - ' + ob.extractWebsiteName(newSite.addedSite.domain) + '@adpushup.com', 'htmlFadeIn', 600);
                     } else {
                         ap.apAlert('Some error occurred! Please try again later.', '#apdetect', 'error', 'slideDown');
                         $(btn).html('Add ' + site + ' ?').prop('disabled', false);
@@ -148,13 +223,15 @@ $('document').ready(function() {
             },
 
             // Add a new site (default)
-            addSite: function(site, url, btn) {
+            addSite: function(site, url, btn, flag) {
                 var ob = this;
-                $(btn).html('Adding ' + site + ' ...').prop('disabled', true);
-                if(newSite.addOtherSite) {
+                if(!flag) {
+                    $(btn).html('Adding ' + site + ' ...').prop('disabled', true);
+                }
+                if(newSite.addOtherSite || flag) {
                     var siteAlreadyAdded = function() {
-                        for(var i in currentUser.sites) {
-                            if(currentUser.sites[i].domain === url+'/') {
+                        for(var i in w.currentUser.sites) {
+                            if(w.currentUser.sites[i].domain === site+'/') {
                                 return true;
                             }
                         }
@@ -162,19 +239,30 @@ $('document').ready(function() {
                     }
 
                     if(siteAlreadyAdded()) {
+                        console.log('if');
                         ap.apAlert(ob.domanize(url)+' has already been added! Please add a different site.', '#apdetect', 'inverted', 'slideDown');
-                        $(btn).html('Add Site').prop('disabled', false);
+                        // $(btn).html('Add Site').prop('disabled', false);
+                        return false;
                     }
                     else {
                         $.post('/user/addSite', {
                             site: url
                         }, function(res) {
                             if(res.success) {
+                                if(!newSite.addOtherSite)
+                                {
+                                    var status = 66;
+                                    ob.updateCrmDealStatus(status);
+                                    ob.analyticsEventEmitter('Added Site');                                    
+                                }
+                                $(btn).fadeOut(100);
                                 ob.saveSiteModel(site, url, res.siteId, btn);
+                                return true;
                             }
                             else {
                                 ap.apAlert('Some error occurred! Please try again later.', '#apdetect', 'error', 'slideDown');
                                 $(btn).html('Lets Add ' + site + ' ?').prop('disabled', false);
+                                return false;
                             }
                         });
                     }
@@ -189,10 +277,11 @@ $('document').ready(function() {
                 ap.apAlert('AdPushup has been successfully detected on the website!', '#apdetect', 'success', 'slideDown');
                 if(newSite.addOtherSite) {
                     $(el).html('Setup Complete '+ob.templates.checkIcon).after(ob.templates.dashboardLink);
+                    ob.nextStep(6, 3, 1000);
                 }
                 else {
                     $(el).html('Verified '+ob.templates.checkIcon);
-                    ob.nextStep(3, 2, 1000);
+                    ob.nextStep(4, 3, 1000);
                 }
             },
 
@@ -205,17 +294,23 @@ $('document').ready(function() {
                     if (res.ap) {
                         $.post('/user/setSiteStep', {
                             siteId: newSite.addedSite.siteId,
-                            step: newSite.addOtherSite ? 4 : 3
+                            step: newSite.addOtherSite ? 5 : 3
                         }, function(response) {
                             if (response.success) {
+                                if(!newSite.addOtherSite)
+                                {
+                                    var status = 67;
+                                    ob.updateCrmDealStatus(status);
+                                    ob.analyticsEventEmitter('Added AP Code');
+                                }
                                 ob.detectApSuccess(ob, el);
                             } else {
                                 alert('Some error occurred!');
                             }
                         });
                     } else {
-                        ap.apAlert('AdPushup was not detected on the website!', '#apdetect', 'inverted', 'slideDown');
-                        $('.detectap-error').fadeIn();
+                        ap.apAlert('AdPushup was not detected on the website! Please make sure that the header code is present on the the specified URL', '#apdetect', 'inverted', 'slideDown');
+                        // $('.detectap-error').fadeIn();
                         $(el).html('Verify').prop('disabled', false);
                     }
                 });
@@ -263,8 +358,15 @@ $('document').ready(function() {
                     step: 5
                 }, function(response) {
                     if (response.success) {
-                        btn.html('Setup Complete '+ob.templates.checkIcon);
-                        ob.setupCompleteAlert();
+                        if(!newSite.addOtherSite)
+                        {
+                            var status = 69;
+                            ob.updateCrmDealStatus(status);
+                            ob.analyticsEventEmitter('Non-Admin Access');
+                        }
+                        ob.nextStep(6, 5, 1000);
+                        // btn.html('Setup Complete '+ob.templates.checkIcon);
+                        // ob.setupCompleteAlert();
                     } else {
                         alert('Some error occurred!');
                     }
@@ -275,12 +377,13 @@ $('document').ready(function() {
             showAddOtherSite: function() {
                 if(newSite.addOtherSite) {
                     $('#addSiteStr').html(this.templates.addOtherSite);
-                    $('#step2').nextAll("div[id^='step']").hide();
+                    // $('#step2').nextAll("div[id^='step']").hide();
                 }
             },
 
             // Attach oauth post message hook
             oauthHook: function(event) {
+                var ob = this;
                 try {
                     JSON.parse(event.data);
                 }
@@ -296,7 +399,14 @@ $('document').ready(function() {
                         step: 4
                     }, function(response) {
                         if (response.success) {
-                            ap.onboarding.setupCompleteAlert();
+                            if(!newSite.addOtherSite)
+                            {
+                                var status = 68;
+                                ob.updateCrmDealStatus(status);
+                                ob.analyticsEventEmitter('Added OAuth');
+                            }
+                            ob.nextStep(5, 4, 1000);
+                            // ap.onboarding.setupCompleteAlert();
                         } else {
                             alert('Some error occurred!');
                         }
@@ -311,14 +421,13 @@ $('document').ready(function() {
             skipOauth: function() {
                 var ob = this;
                 setTimeout(function(){$('#adsenseoauth').prop('disabled', true);}, 1000);
-                var ob = this;
                 $.post('/user/setSiteStep', {
                     siteId: newSite.addedSite.siteId,
-                    step: 4,
-                    completeOnboarding: true
+                    step: 5,
                 }, function(response) {
                     if (response.success) {
-                        ob.setupCompleteAlert();
+                        $('#step4').removeClass('active-step');
+                        ob.nextStep(6, 5, 1000);
                     } else {
                         alert('Some error occurred!');
                     }
@@ -329,14 +438,35 @@ $('document').ready(function() {
             init: function() {
                 this.showIntro();
                 this.showStep(newSite.defaultStep);
-                this.showAddOtherSite();
+                //this.showAddOtherSite();
+            },
+
+            // Update Crm Deal Status | Pipeline
+            updateCrmDealStatus: function(status) {
+                $.post('/data/updateCrmDealStatus', {
+                    status: status
+                });
             },
 
             // Service selection
             serviceSelection: function(selectedServices, errorBox) {
                 var url = 'http://'+window.location.host+'/thankyou',
-                    servicesString = selectedServices.join(' | ');
-
+                    servicesString = selectedServices.join(' | '),
+                    ob = this;
+                
+                // if(newSite.addOtherSite) {
+                //         if (selectedServices.length > 1) {
+                //             // Show pop up
+                //         } else if (selectedServices.length == 1) {
+                //             if (selectedServices[0] == 'only-adsense') {
+                //                 w.localStorage.setItem('selectedServices', selectedServices);
+                //                 $('#intromodal').modal('hide');
+                //                 ob.nextStep(2, 1, 1000);
+                //             } else {
+                //                 // Show pop up
+                //             }
+                //         }
+                // } else {
                 $.post('/user/setSiteServices', {
                     'servicesString': servicesString,
                     'newSiteUnSavedDomain': newSite.viewObjects.origUnSavedDomain,
@@ -348,7 +478,15 @@ $('document').ready(function() {
                             window.location.replace(url);
                         } else if (selectedServices.length == 1) {
                             if (selectedServices[0] == 'only-adsense') {
+                                if(!newSite.addOtherSite)
+                                {
+                                    var status = 65;
+                                    ob.updateCrmDealStatus(status);
+                                    ob.analyticsEventEmitter('Selected Solution');
+                                }
                                 $('#intromodal').modal('hide');
+                                ob.nextStep(2, 1, 1000);
+
                             } else {
                                 window.location.replace(url);
                             }
@@ -358,6 +496,123 @@ $('document').ready(function() {
                         return;
                     }
                 });
+                // }
+            },
+
+            // Adding user another site
+            addAnotherSite: function(newSiteByUser, btn) {
+                var re = /^(http[s]?:\/\/){0,1}(www\.){0,1}[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,5}[\.]{0,1}/;
+                if(!newSiteByUser || !re.test(newSiteByUser)) {
+                    ap.apAlert('Please add a valid website', '#apdetect', 'inverted', 'slideDown');
+                    return false;
+                }
+                var response = this.addSite(newSiteByUser, this.domanize(newSiteByUser), btn, true);
+                if(response) {
+                    $(btn).fadeOut(300);
+                    this.nextStep(3, 2, 1000);
+                }
+            },
+
+            // Convert Ad Code
+            base64_encode: function (data) {
+                try {
+                    if (window.btoa) {
+                        return window.btoa(data);
+                    }
+
+                    var b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+                    var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
+                        ac = 0,
+                        enc = '',
+                        tmp_arr = [];
+
+                    if (!data) {
+                        return data;
+                    }
+
+                    do {
+                        o1 = data.charCodeAt(i++);
+                        o2 = data.charCodeAt(i++);
+                        o3 = data.charCodeAt(i++);
+
+                        bits = o1 << 16 | o2 << 8 | o3;
+
+                        h1 = bits >> 18 & 0x3f;
+                        h2 = bits >> 12 & 0x3f;
+                        h3 = bits >> 6 & 0x3f;
+                        h4 = bits & 0x3f;
+
+                        tmp_arr[ac++] = b64.charAt(h1) + b64.charAt(h2) + b64.charAt(h3) + b64.charAt(h4);
+                    } while (i < data.length);
+
+                    enc = tmp_arr.join('');
+
+                    var r = data.length % 3;
+
+                    return (r ? enc.slice(0, r - 3) : enc) + '==='.slice(r || 3);
+                }
+                catch(err) {
+                    alert("Unable to transform, Please contact our support team.");
+                    return false;
+                }
+            },
+
+            getAdcode: function (data) {
+                var encodedAd = this.base64_encode(data);
+
+                if(!encodedAd){
+                    return false;
+                }
+
+                var newAdCode = [
+                    '<ins class="adPushupAds" data-ver="2" data-siteId="' + newSite.addedSite.siteId + '" data-ac="' + encodedAd + '"><\/ins>' +
+                    '<script data-cfasync="false" type="text/javascript">(function (w, d) { for (var i = 0, j = d.getElementsByTagName(\"ins\"), k = j[i]; i < j.length; k = j[++i]){ if(k.className == \"adPushupAds\" && k.getAttribute(\"data-push\") != \"1\") { ((w.adpushup = w.adpushup || {}).control = (w.adpushup.control || [])).push(k); k.setAttribute(\"data-push\", \"1\"); (((w.adpushup = w.adpushup || {}).timeline = (w.adpushup.timeline || {})).tl_cntPsh = (w.adpushup.timeline.tl_cntPsh || [])).push(+new Date); } } var s = document.createElement(\"script\"); s.type = \"text\/javascript\"; s.async = true; s.src = \"\/\/static.adpushup.com\/js\/adpushupadsv2.js\"; (d.getElementsByTagName(\"head\")[0]||d.getElementsByTagName(\"body\")[0]).appendChild(s); })(window, document);</script>',
+                ];
+                return newAdCode.join('\n');
+            },
+
+            // Code Coversion Finish
+            codeCoversionProceed: function() {
+                var ob = this,
+                    completeOnboarding = true;
+
+                if(newSite.addOtherSite) {
+                    completeOnboarding = false;
+                }
+
+                $.post('/user/setSiteStep', {
+                    siteId: newSite.addedSite.siteId,
+                    step: 6,
+                    completeOnboarding: completeOnboarding
+                }, function(response) {
+                    if (response.success) {
+                        if(!newSite.addOtherSite)
+                        {
+                            var status = 70;
+                            ob.updateCrmDealStatus(status);
+                            ob.analyticsEventEmitter('Code Conversion');
+                            ob.analyticsEventEmitter('App-signup-second-stage', 1);
+                        }
+                        ob.setupCompleteAlert();
+                    } else {
+                        ap.apAlert('Some error has occurred!', '#apdetect', 'inverted', 'slideDown');
+                    }
+                });
+            },
+
+            addOtherSiteFromDashboard: function(selectedServices, site, url) {              
+                var ob = this;
+                if (selectedServices.length > 1) {
+                    ob.anotherSiteModalOpen();
+                } else if (selectedServices.length == 1) {
+                    if (selectedServices[0] == 'only-adsense') {
+                        ob.addSite(site, url, null, true);
+                        $('#addOtherSiteModal').modal('hide');
+                        ob.nextStep(3, 2, 1000);
+                    } else {
+                        ob.anotherSiteModalOpen();
+                    }
+                }
             }
         };
         ap.onboarding.init();
@@ -380,15 +635,51 @@ $('document').ready(function() {
             }
         });
 
+        $('#onboarding-inner-services-form').submit(function(e) {
+            e.preventDefault();
+            var selectedServices = [],
+                errorBox = $('.error-message-box'),
+                otherSite = $('#add-other-site').val();
+            $('.checkbox-custom:checked').each(function() {
+                selectedServices.push($(this).attr('name'));
+            });
+
+            if(selectedServices.length < 1) {
+                errorBox.text('Please select atleast one Service');
+                return;
+            } else {
+                errorBox.text('');
+                var url = otherSite.replace(/\/$/, ""),
+                    site = url.replace(/.*?:\/\//g, "");
+                ap.onboarding.addOtherSiteFromDashboard(selectedServices, site, url);
+            }           
+        })
+
         // OAuth post message hook trigger
         window.addEventListener('message', ap.onboarding.oauthHook, false);
 
         // Trigger to add user's unsaved site
-        $('#addUserSite').click(function(e) {
+        $('.add-user-site').click(function(e) {
             var userUnsavedSite = newSite.viewObjects.domanizedUrl,
                 userUnsavedSiteId = newSite.viewObjects.unSavedSiteId,
                 url = newSite.viewObjects.origUnSavedDomain;
-            ap.onboarding.addSite(userUnsavedSite, url, $(this));
+            ap.onboarding.addSite(userUnsavedSite, url, $(this), true);
+            $('#another-site-box').fadeOut('200');
+        });
+
+        // Trigger to add user's another site fadeOut / fadeIn
+        $('#add-another-site').click(function(e) {
+            e.preventDefault();
+            $('#addSiteStr').fadeOut(100);
+            $('#another-site-box').fadeIn(500);
+        });
+
+        // Trigger to add user's another site processing
+        $('#add-another-site-submit').click(function(e) {
+            e.preventDefault();
+            var newSiteByUser = $('#another-site-input').val(),
+                btn = $('#another-site-box');
+            ap.onboarding.addAnotherSite(newSiteByUser, btn);
         });
 
         // Trigger to detect ap
@@ -403,7 +694,7 @@ $('document').ready(function() {
         });
 
         // Trigger to set non-admin access check
-        $('#adsensenonadmin').click(function() {
+        $('.adsensenonadmin').click(function() {
             ap.onboarding.nonAdminAccess($(this));
         });
 
@@ -433,6 +724,29 @@ $('document').ready(function() {
                 site = url.replace(/.*?:\/\//g, ""),
                 btn = $('#addSiteAltForm button');
             ap.onboarding.addSite(site, url, btn);
+        });
+
+        // Trigger code conversion
+        $('#code-conversion-button').click(function(e) {
+            var inputBox = $('#code-conversion-box'),
+                inputBoxValue = inputBox.val(),
+                convertedCode;
+            if(!inputBoxValue || inputBoxValue == '') {
+                ap.apAlert('Please enter control ad code!', '#apdetect', 'inverted', 'slideDown');
+                return;
+            }
+            convertedCode = ap.onboarding.getAdcode(inputBoxValue);
+            if(convertedCode) {
+                inputBox.val(convertedCode);
+            } else {
+                ap.apAlert('Some error has occurred!', '#apdetect', 'inverted', 'slideDown');
+            }      
+        });
+
+        // Trigger code conversion finish
+        $('#code-conversion-finish').click(function(e) {
+            e.preventDefault();
+            ap.onboarding.codeCoversionProceed();
         });
     })(adpushup, window, document);
 });

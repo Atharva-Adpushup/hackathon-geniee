@@ -21,7 +21,7 @@ var modelAPI = module.exports = apiModule(),
 	User = model.extend(function() {
 		this.keys = ['firstName', 'lastName', 'email', 'salt', 'passwordMd5', 'sites', 'adNetworkSettings', 'createdAt',
 			'passwordResetKey', 'passwordResetKeyCreatedAt', 'requestDemo',
-			'requestDemoData', 'analytics', 'adNetworks', 'pageviewRange', 'managedBy', 'userType'];
+			'requestDemoData', 'analytics', 'adNetworks', 'pageviewRange', 'managedBy', 'userType', 'websiteRevenue', 'crmDealId', 'revenueUpperLimit'];
 		this.validations = schema.user.validations;
 		this.classMap = {
 			adNetworkSettings: networkSettings
@@ -259,6 +259,57 @@ function apiModule() {
 								return user;
 							})
 							.then(function(user) {
+								if(json.userType && json.userType === 'partner') {
+									return user;
+								}
+								var analyticsObj, userId = user.get('email'),
+									anonId = json.anonId,
+									pipeDriveParams = {
+										'txt_name': user.get('firstName'),
+										'txt_email_id': user.get('email'),
+										'txt_website': json.site,
+										'txt_pvs': user.get('pageviewRange'),
+										'txt_platform': 'undefined',
+										'txt_ad_network': user.get('adNetworks').join(' | '),
+										'txt_website_revenue' : user.get('websiteRevenue'),
+										'txt_stage_id': 64
+									},
+									pipeDriveOptions = {
+										'method': 'POST',
+										'uri': consts.analytics.PIPEDRIVE_URL,
+										'form': pipeDriveParams
+									};
+
+								if (anonId && !user.get('analytics')) {
+									analyticsObj = {
+										'anonymousId': anonId,
+										'userId': userId,
+										'isUserIdentified': true
+									};
+									user.set('analytics', analyticsObj);
+								}
+								process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+								return request(pipeDriveOptions).then(function(res) {
+								if(res) {
+										var responseString = res.toString(),
+											dealId = responseString.substring(responseString.lastIndexOf(":")+1,responseString.lastIndexOf(";"));
+
+										// Development & Testing
+										// if(dealId) {
+										// 	user.set('crmDealId', dealId);												
+										// } else {
+										// 	user.set('crmDealId', '12010');
+										// }
+
+										// Production
+										user.set('crmDealId', dealId);
+									}
+									return user;
+								}).catch(function(err) {
+									throw err;
+								});
+							})
+							.then(function(user) {
 								return user.addSite(json.site).then(function() {
 									return user.save();
 								});
@@ -398,7 +449,7 @@ function apiModule() {
 					})
 					.catch(function(err) {
 						site.pageGroups = [];
-						site.step = false;						
+						site.step = site.step || false;
 						return site;
 					});
 				}));
@@ -414,6 +465,14 @@ function apiModule() {
 			}
 
 			return API.getUserByEmail(email).then(setPageGroups);
+		},
+		setUserStatus: function(status, email) {
+			return API.getUserByEmail(email)
+				.then(function(user) {
+					user.set('requestDemo', status);
+					user.save();
+					return user.get('requestDemo');
+				});
 		}
 	};
 

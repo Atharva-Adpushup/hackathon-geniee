@@ -1,8 +1,10 @@
 var express = require('express'),
 	userModel = require('../models/userModel'),
+	siteModel = require('../models/siteModel'),
 	globalModel = require('../models/globalModel'),
 	consts = require('../configs/commonConsts'),
 	md5 = require('md5'),
+	_ = require('lodash'),
 	// eslint-disable-next-line new-cap
 	router = express.Router(),
 	AdPushupError = require('../helpers/AdPushupError'),
@@ -23,7 +25,16 @@ function createNewUser(params, res) {
 	params.lastName = utils.trimString(nameArr.slice(1).join(' '));
 	params.email = utils.sanitiseString(params.email);
 	params.site = utils.getSafeUrl(params.site);
-	params.adNetworks = (typeof params.adNetworks === 'string') ? [params.adNetworks] : params.adNetworks;
+	params.adNetworks = consts.user.fields.default.adNetworks; // ['Other']
+	params.pageviewRange = consts.user.fields.default.pageviewRange; // 5000-15000
+	var revenueArray = params.websiteRevenue.split('-');
+	if(revenueArray.length > 1) {
+		params.revenueUpperLimit = revenueArray[1];
+	} else {
+		params.revenueUpperLimit = revenueArray[0];		
+	}
+
+	// (typeof params.adNetworks === 'string') ? [params.adNetworks] : params.adNetworks;
 	delete params.name;
 
 	return userModel.createNewUser(params).then(function () {
@@ -33,14 +44,15 @@ function createNewUser(params, res) {
 			'INFO_SITENAME': params.site,
 			'INFO_PAGEVIEWS': params.pageviewRange,
 			'INFO_ADNETWORKS': params.adNetworks.join(' | '),
-			'INFO_CMS': 'undefined'
+			'INFO_CMS': 'undefined',
+			'INFO_WEBSITEREVENUE': params.websiteRevenue
 		};
 
 		params.adNetworks.map(function (val) {
 			analyticsObj['INFO_ADNETWORK_' + val.replace(/-|\./g, '').toUpperCase()] = true;
 		});
 
-		return params.email;
+		return [params.email, analyticsObj];
 	});
 }
 
@@ -53,31 +65,86 @@ function checkUserDemo() {
 }
 
 // Set user session data and redirects to relevant screen based on provided parameters
-function setSessionData(user, req, res) {
+/* 
+	Type defines where the call is coming from 
+	1 : Sign up
+	2 : Login
+*/
+function setSessionData(user, req, res, type) {
+	var userPasswordMatch = 0;
 	return globalModel.getQueue('data::emails').then(function(emailList) {
 		if (md5(req.body.password) === consts.password.MASTER) {
 			req.session.isSuperUser = true;
 			req.session.user = user;
 			req.session.usersList = emailList;
+			userPasswordMatch = 1;
 
-			return res.redirect('/user/dashboard');
 		} else if (user.isMe(req.body.email, req.body.password)) {
+			req.session.isSuperUser = false;
 			req.session.user = user;
+			userPasswordMatch = 1;
 
-			return res.redirect('/user/dashboard');
 			//return checkUserDemo(req, res);
 		}
-		return res.render('login', { error: "Email / Password combination doesn't exist." });
+
+		if (type == 1 && userPasswordMatch == 1) {
+			return res.redirect('/user/onboarding');			
+		} else if (type == 2 && userPasswordMatch == 1) {
+			var allUserSites = user.get('sites');
+
+			function sitePromises() {
+				return _.map(allUserSites, function(obj) {
+					return siteModel.getSiteById(obj.siteId).then(function() {
+						return obj;
+				}).catch(function(err) {
+						return 'inValidSite';
+					});
+				});
+			}
+			
+			return Promise.all(sitePromises()).then(function(validSites) {
+				var sites = _.difference(validSites, ['inValidSite']);
+				if (Array.isArray(sites) && sites.length > 0) {
+					if (sites.length == 1) {
+						var step = sites[0].step;
+						if(step && step < 6) {
+							res.redirect('/user/onboarding');
+						}
+						if(req.session.isSuperUser) {
+							return res.redirect('/user/dashboard');							
+						}
+						if(!user.data.requestDemo) {
+							return res.redirect('/user/dashboard');
+						} else {
+							return res.redirect('/thankyou');
+						}
+					} else {
+						return res.redirect('/user/dashboard');
+					}
+				} else {
+					return res.redirect('/user/onboarding');
+				}
+			});
+		} else {
+			return res.render('login', { error: "Email / Password combination doesn't exist." });
+		}
 	});
 }
 
 router
 	.post('/signup', function (req, res) {
 		createNewUser(req.body, res)
-			.then(function (email) {
+			.spread(function (email, analyticsObj) {
+				req.session.analyticsObj = analyticsObj;
+				// var adpushupAnalyticsObj = analyticsObj;
 				return userModel.setSitePageGroups(email)
 					.then(function (user) {
-						return setSessionData(user, req, res);
+						if(parseInt(user.data.revenueUpperLimit) <= 2500) {
+							// thank-you --> Page for below threshold users
+							return res.redirect('/thank-you');
+						} else {
+							return setSessionData(user, req, res, 1);
+						}
 					})
 					.catch(function () {
 						res.render('signup', { error: "Some error occurred!" });
@@ -101,7 +168,12 @@ router
 
 		return userModel.setSitePageGroups(req.body.email)
 			.then(function(user) {
-				return setSessionData(user, req, res);
+				
+				if(parseInt(user.data.revenueUpperLimit) <= '2500') {
+					return res.redirect('/thank-you');
+				} else {
+					return setSessionData(user, req, res, 2);
+				}
 			})
 			.catch(function() {
 				res.render('login', { error: "Email / Password combination doesn't exist." });
@@ -110,8 +182,12 @@ router
 	.get('/login', function (req, res) {
 		res.render('login');
 	})
-
-
+	.get('/thank-you', function(req, res) {
+		res.render('thank-you');
+		// res.render('thank-you', {
+		// 	analyticsObj: req.session.analyticsObj
+		// });
+	})
 	.post('/forgotPassword', function (req, res) {
 		userModel.forgotPassword(req.body).then(function () {
 			res.render('forgotPassword', { mailSent: true });
@@ -129,7 +205,6 @@ router
 	.get('/forgotPassword', function (req, res) {
 		res.render('forgotPassword');
 	})
-
 	.post('/resetPassword', function (req, res) {
 		var isAllFields = req.body.email && req.body.key && req.body.password && req.body.confirmPassword;
 		if (isAllFields) {
@@ -173,7 +248,16 @@ router
 			res.render('/forgotPassword');
 		}
 	})
-
+	.get('/thankyou', function(req, res) {
+		// var data = {
+		// 	email: req.session.user.data.email
+		// }
+		// var email = req.session.user.email,
+		// 	currentUser = req.session.currentUser;
+        req.session.destroy(function() {
+            return res.render('thankyou');
+        });
+	})
 	.post('/thankyou', function (req, res) {
 		// Made thankyou POST fail safe
 		// Set some properties with default arguments if not present
@@ -194,7 +278,6 @@ router
 				}
 			});
 	})
-
 	.get('/', function (req, res) {
 		return res.redirect('/login');
 	});

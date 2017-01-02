@@ -68,25 +68,39 @@ block bodyContent
 
 					div(class="form-group")
 						div(class="col-md-12 pd-0")
-							div(class="col-md-6 u-padding-r15px")
-								select(class="form-control input-lg" id="signup-pageviewRange" name="pageviewRange" required)
-									option(value="") Site Page Views Daily
-									option(value="<1000") &lt; 1000
-									option(value="1000-5000") 1000-5000
-									option(value="5000-15000") 5000-15000
-									option(value="15000-50000") 15000-50000
-									option(value="50000-200,000") 50000-200,000
-									option(value="200,000+") 200,000+
-								- var pageviewRangeError = (errors && errors.pageviewRange) ? errors.pageviewRange[0]: null;
-								div(class="error-message js-error-message js-pageviewRange-error") #{pageviewRangeError}									
-							div(class="col-md-6 pd-0")
-								select(class="form-control" id="signup-adNetworks" name="adNetworks" multiple="multiple" required)
-									option(value="Adsense") Adsense
-									option(value="Media.net") Media.net
-									option(value="Direct Ads") Direct Ads
-									option(value="Other") Other
-								- var adNetworksError = (errors && errors.adNetworks) ? errors.adNetworks[0]: null;
-								div(class="error-message js-error-message js-adNetworks-error") #{adNetworksError}
+							select(class="form-control input-lg" id="signup-websiteRevenue" name="websiteRevenue" required)
+								option(value="") Monthly Ad Revenue (in USD)
+								option(value="999") &lt; 1,000
+								option(value="1000-2500") 1,000-2,500
+								option(value="2500-5000") 2,500-5,000
+								option(value="5000-10000") 5,000-10,000
+								option(value="10000-50000") 10,000-50,000
+								option(value="50000-200000") 50,000-200,000
+								option(value="200001") 200,000+
+							- var websiteRevenueError = (errors && errors.websiteRevenue) ? errors.websiteRevenue[0]: null;
+							div(class="error-message js-error-message js-websiteRevenue-error") #{websiteRevenue}									
+
+					//- div(class="form-group", style="display:none;")
+					//- 	div(class="col-md-12 pd-0")
+					//- 		div(class="col-md-6 u-padding-r15px")
+					//- 			select(class="form-control input-lg" id="signup-pageviewRange" name="pageviewRange" required)
+					//- 				option(value="") Site Page Views Daily
+					//- 				option(value="<1000") &lt; 1000
+					//- 				option(value="1000-5000") 1000-5000
+					//- 				option(value="5000-15000") 5000-15000
+					//- 				option(value="15000-50000") 15000-50000
+					//- 				option(value="50000-200,000") 50000-200,000
+					//- 				option(value="200,000+") 200,000+
+					//- 			- var pageviewRangeError = (errors && errors.pageviewRange) ? errors.pageviewRange[0]: null;
+					//- 			div(class="error-message js-error-message js-pageviewRange-error") #{pageviewRangeError}									
+					//- 		div(class="col-md-6 pd-0")
+					//- 			select(class="form-control" id="signup-adNetworks" name="adNetworks" multiple="multiple" required)
+					//- 				option(value="Adsense") Adsense
+					//- 				option(value="Media.net") Media.net
+					//- 				option(value="Direct Ads") Direct Ads
+					//- 				option(value="Other") Other
+					//- 			- var adNetworksError = (errors && errors.adNetworks) ? errors.adNetworks[0]: null;
+					//- 			div(class="error-message js-error-message js-adNetworks-error") #{adNetworksError}
 
 					div(class="form-group")
 						div(class="col-md-12 pd-0")
@@ -102,6 +116,7 @@ block bodyContent
 							div(class="col-md-6 pd-0")
 								button(type="submit", id="signup-submit", class="u-margin-0px btn btn-lightBg btn-red pull-right") Create an account
 						
+
 				input(type="hidden", id="signup-analyticsId", name="anonId", value="")
 
 				// Footer Section Starts Here

@@ -66,36 +66,87 @@ router
             
             setEmailCookie(req, res);
 
-            function renderDashboard() {
-				res.render('dashboard', {
-					validSites: sites,
-					unSavedSite: unSavedSite,
-					hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-					requestDemo: req.session.user.requestDemo
-				});
-			}
+            // function renderDashboard() {
+            res.render('dashboard', {
+                validSites: sites,
+                unSavedSite: unSavedSite,
+                hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+                requestDemo: req.session.user.requestDemo
+            });
+			// }
 
-			if(('pageviewRange' in req.session.user) && ('adNetworks' in req.session.user)) {
-				var qualifyDeal = (parseInt(req.session.user.pageviewRange.split('-')[0]) >= 15000 || parseInt(req.session.user.pageviewRange.split('-')[0]) == 200);
-				if((qualifyDeal && _.includes(req.session.user.adNetworks, 'Adsense')) || req.session.isSuperUser || !req.session.user.requestDemo) {
-					renderDashboard();
-				}
-				else {
-					res.render('thankyou');
-				}
-			}
-			else if('requestDemoData' in req.session.user) {
-				var qualifyDeal = (parseInt(req.session.user.requestDemoData.INFO_PAGEVIEWS.split('-')[0]) >= 15000 || parseInt(req.session.user.requestDemoData.INFO_PAGEVIEWS.split('-')[0]) == 200);
-				if((qualifyDeal && req.session.user.requestDemoData.INFO_ADNETWORK_ADSENSE) || req.session.isSuperUser || !req.session.user.requestDemo) {
-					renderDashboard();
-				}
-				else {
-					res.render('thankyou');
-				}
-			}
-			else {
-				res.render('thankyou');
-			}
+			// if(('pageviewRange' in req.session.user) && ('adNetworks' in req.session.user)) {
+			// 	var qualifyDeal = (parseInt(req.session.user.pageviewRange.split('-')[0]) >= 15000 || parseInt(req.session.user.pageviewRange.split('-')[0]) == 200);
+			// 	if((qualifyDeal && _.includes(req.session.user.adNetworks, 'Adsense')) || req.session.isSuperUser || !req.session.user.requestDemo) {
+			// 		renderDashboard();
+			// 	}
+			// 	else {
+			// 		res.render('thankyou');
+			// 	}
+			// }
+			// else if('requestDemoData' in req.session.user) {
+			// 	var qualifyDeal = (parseInt(req.session.user.requestDemoData.INFO_PAGEVIEWS.split('-')[0]) >= 15000 || parseInt(req.session.user.requestDemoData.INFO_PAGEVIEWS.split('-')[0]) == 200);
+			// 	if((qualifyDeal && req.session.user.requestDemoData.INFO_ADNETWORK_ADSENSE) || req.session.isSuperUser || !req.session.user.requestDemo) {
+			// 		renderDashboard();
+			// 	}
+			// 	else {
+			// 		res.render('thankyou');
+			// 	}
+			// }
+			// else {
+			// 	res.render('thankyou');
+			// }
+        });
+    })
+    .get('/onboarding', function(req, res) {
+        var allUserSites = req.session.user.sites;
+
+        function setEmailCookie() {
+            var cookieName = 'email',
+                // "Email" cookie has 1 year expiry and accessible through JavaScript
+                cookieOptions = { expires: new Date(Date.now() + (60 * 60 * 1000 * 24 * 365)), encode: String, httpOnly: false },
+                isCookieSet = (Object.keys(req.cookies).length > 0) && (typeof req.cookies[cookieName] !== 'undefined');
+
+            isCookieSet ? res.clearCookie(cookieName, cookieOptions) : '';
+            res.cookie(cookieName, req.session.user.email, cookieOptions);
+        }
+
+        function sitePromises() {
+            return _.map(allUserSites, function(obj) {
+                return siteModel.getSiteById(obj.siteId).then(function() {
+                    return obj;
+                }).catch(function() {
+                    return 'inValidSite';
+                });
+            });
+        }
+
+        return Promise.all(sitePromises()).then(function(validSites) {
+            var sites = _.difference(validSites, ['inValidSite']),
+                unSavedSite;
+
+            sites = (Array.isArray(sites) && (sites.length > 0)) ? sites : [];
+			/**
+			 * unSavedSite, Current user site object entered during signup
+			 *
+			 * - Value is Truthy (all user site/sites) only if user has
+			 * no saved any site through Visual Editor
+			 * - Value is Falsy if user has atleast one saved site
+			*/
+            unSavedSite = (sites.length === 0) ? allUserSites : null;
+            req.session.unSavedSite = unSavedSite;
+            
+            setEmailCookie(req, res);
+
+            // function renderDashboard() {
+            res.render('onboarding', {
+                validSites: sites,
+                unSavedSite: unSavedSite,
+                hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+                requestDemo: req.session.user.requestDemo,
+                analyticsObj: JSON.stringify(req.session.analyticsObj)
+            });
+			// }
         });
     })
     .post('/setSiteStep', function(req, res) {
@@ -105,10 +156,10 @@ router
 			    req.session.user = user;
 
                 if(req.body.completeOnboarding) {
-                    user.set('requestDemo', false);
-                    user.save();
+                    user.set('requestDemo', true);
                 }
 
+                user.save();
                 return res.send({success: 1});
 			})
 			.catch(function() {
@@ -120,16 +171,13 @@ router
             userModel.getUserByEmail(req.session.user.email).then(function(user) {
                 var userSites = user.get('sites');
                 for(var i in userSites) {
-                    // console.log(userSites[i]);
-                    // console.log(req.body.newSiteUnSavedDomain);
                     if(userSites[i].domain === req.body.newSiteUnSavedDomain) {
-                        // console.log('Match Found');
                         userSites[i].services = req.body.servicesString;
-                        userSites[i].step = 0;
+                        userSites[i].step = 1;
                         user.set('sites', userSites);
-                        if(user.save()) {
-                            return res.send({success: 1});
-                        }
+                        req.session.user = user;
+                        user.save();
+                        return res.send({success: 1});
                     } else {
                         return res.send({success: 0});                  
                     }
@@ -161,15 +209,36 @@ router
         });
     })
     .get('/addSite', function(req, res) {
-		res.render('addSite');
+        var allUserSites = req.session.user.sites,
+            params = {};
+        _.map(allUserSites, function(site) {
+            if(site.step < 6) {
+                params = {
+                    siteDomain: site.domain,
+                    siteId: site.siteId,
+                    step: site.step
+                }
+            }
+        });
+        res.render('addSite', params);
+
+        // res.render('addSite');
 	})
     .post('/addSite', function(req, res) {
         var site = (req.body.site) ? utils.getSafeUrl(req.body.site) : req.body.site;
 
         userModel.addSite(req.session.user.email, site).spread(function(user, siteId) {
-            req.session.user = user;
-            
-            res.send({success: 1, siteId: siteId});
+                var userSites = user.get('sites');
+                for(var i in userSites) {
+                    if(userSites[i].siteId === siteId) {
+                        userSites[i].step = 2;
+                        user.set('sites', userSites);
+                        req.session.user = user;
+                        user.save();
+                        res.send({success: 1, siteId: siteId});
+                    }
+                }
+                res.send({success: 0});
         }).catch(function(err) {
             res.send({success: 0});
         });
@@ -314,6 +383,58 @@ router
                     res.render('profile', { userNotFound: true, formData: req.body });
                 }
             });
+    })
+    .get('/updateUserStatus', function(req, res) {
+        if(req.session.isSuperUser) {
+            return res.render('updateUserStatus', {
+                currentStatus: req.session.user.requestDemo,
+                email: req.session.user.email
+            });
+        } else {
+            return res.redirect('/user/dashboard');
+        }
+    })
+    .post('/updateUserStatus', function(req, res) {
+        if(req.session.isSuperUser) {
+            var email = req.session.user.email;
+            if(email.trim() && req.body.status) {
+                var status = true; // By default user would be inactive
+                /* 
+                    By Default requestDemo would be True | User is inactive
+                    To make user active | Need to set requestDemo False
+                    If value in request is 0 | User should be active | Set requestDemo to be False
+                    If value in request is 1 | User should be inactive | Set requestDemo to be True
+                */
+                if(req.body.status == 0) {
+                    status = false;
+                }
+                return userModel.setUserStatus(status, email.trim()).then(function(response) {
+                    return res.render('updateUserStatus', {
+                        status: 'success',
+                        message: 'User updated successfully',
+                        currentStatus: response,
+                        email: email
+                    });
+                })
+                .catch(function(err) {
+                    if(err) {
+                        return res.render('updateUserStatus', {
+                            status: 'failure',
+                            message: 'Some error occured',
+                            currentStatus: req.session.user.requestDemo,
+                            email: email
+                        })
+                    }
+                });
+            } else {
+                return res.render('updateUserStatus', {
+                    status: 'failure',
+                    message: 'Incomplete values'
+                });
+            }
+        } else {
+            return res.redirect('/user/dashboard');
+        }
     });
 
 module.exports = router;
