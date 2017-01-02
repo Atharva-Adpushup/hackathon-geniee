@@ -31,7 +31,6 @@ html(lang="en")
                             window.currentUser = !{JSON.stringify(currentUser)};
                         });
 
-
                     - var baseLibsStr = "/assets/js/builds/";
                     - var baseLibsFinalStr = (environment == "production") ? (baseLibsStr + "base-libs-build.min.js") : (baseLibsStr + "base-libs-build.js");
                     +loadAsset("js", [baseLibsFinalStr])
