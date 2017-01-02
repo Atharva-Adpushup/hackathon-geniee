@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import _ from 'lodash';
-// import CustomSizeForm from './customSizeForm.jsx';
+import CustomSizeForm from './customSizeForm.jsx';
 import { Accordion, Row, Col, Panel } from 'react-bootstrap';
 
 
@@ -47,7 +47,7 @@ class AdSizeSelector extends React.Component {
 									))
 								}
 						</Row>
-						{rec.layoutType === 'CUSTOM' ? null /* (<CustomSizeForm updateMenu={self.props.onUpdate} flux={self.props.flux}/>)*/ : null}
+						{rec.layoutType === 'CUSTOM' ? (<CustomSizeForm onSave={this.props.onCheckedItem} />) : null}
 					</Panel>
 						)
 				)}
