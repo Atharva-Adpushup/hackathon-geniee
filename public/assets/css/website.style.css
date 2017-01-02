@@ -3135,4 +3135,7 @@ maxHeightWidth {
     margin: 5px 0;
     border-bottom: 1px solid #ebebeb; }
 
+.removeBlocklistItem:hover {
+  cursor: pointer; }
+
 /*# sourceMappingURL=website.style.css.map */

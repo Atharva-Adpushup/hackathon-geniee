@@ -1,3 +1,5 @@
+// Global settings module script
+
 $(document).ready(function () {
     (function (w, d) {
 
@@ -6,7 +8,8 @@ $(document).ready(function () {
 
             // Settings templates
             templates: {
-                headerCode: "(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/" + w.selectedSiteId + "/adpushup.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);"
+                headerCode: "(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/" + w.selectedSiteId + "/adpushup.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);",
+                closeBtn: '<span class="pull-right removeBlocklistItem"><i class="fa fa-close"></i></span>'
             },
 
             // Function to generate header code
@@ -15,12 +18,39 @@ $(document).ready(function () {
             },
 
             // Function to render block list items
-            renderBlocklistItems: function(blocklist) {
-                if(blocklist.length) {
+            renderBlocklistItems: function() {
+                var that = this;
+                if(w.blocklist[0] !== '') {
+                    $('.blocklist').html('');
                     w.blocklist.forEach(function(item) {
-                        $('.blocklist').append('<li>'+item+'</li>');
+                        $('.blocklist').append('<li>' + item + that.templates.closeBtn + '</li>');
                     });
                 }
+            },
+
+            // Function to add item to blocklist
+            addToBlocklist: function(blocklistItem, input) {
+                if(blocklistItem) {
+                    var alreadyAdded = w.blocklist.find(function(item) {
+                        return item === blocklistItem;
+                    });
+
+                    if(!alreadyAdded) {
+                        w.blocklist.push(blocklistItem);
+                        this.renderBlocklistItems();
+                        $('#blocklistErr').html('');
+                        $(input).val('');
+                    }
+                    else {
+                        $('#blocklistErr').html('This item has already been added to the blocklist');
+                    }
+                }
+            },
+
+            // Function to remove item from blocklist
+            removeFromBlocklist: function(item) {
+                w.blocklist.splice(w.blocklist.indexOf(item), 1);
+                this.renderBlocklistItems();
             },
 
             // Function to parse form data
@@ -58,7 +88,8 @@ $(document).ready(function () {
                 $.post('saveSiteSettings', {
                     pageGroupPattern: pageGroupPattern,
                     otherSettings: otherSettings,
-                    autoOptimise: autoOpt
+                    autoOptimise: autoOpt,
+                    blocklist: JSON.stringify(w.blocklist)
                 }, function (res) {
                     if (res.success) {
                         alert('Settings saved!');
@@ -97,24 +128,27 @@ $(document).ready(function () {
 
             // Initialise settings module
             init: function(list) {
-                this.renderBlocklistItems(list);
+                this.renderBlocklistItems();
                 this.generateHeaderCode();
             }
         };
-        settingsModule.init(w.blocklist);
+        settingsModule.init();
 
 
 
+        // Auto optimise check trigger
         var autoOptimise;
         $('#autoOptimise').on('change', function () {
             autoOptimise = $(this).prop('checked');
             !autoOptimise ? $('#autoOptimiseErr').html('Auto Optimise is <strong>disabled</strong> now. Please set the traffic distribution for your variations manually to prevent unpredictable results. ') : $('#autoOptimiseErr').html('');
         });
 
+        // Copy to clipboard trigger
         $(d).on('click', '#clipboardCopy, #header-code', function () {
             settingsModule.copyToClipboard();
         });
 
+        // Send code to dev trigger
         $('#sendCodeForm').submit(function (e) {
             e.preventDefault();
             $('#headerCodeInput').val($('#header-code').val());
@@ -124,6 +158,19 @@ $(document).ready(function () {
             settingsModule.sendHeaderCode(data, btn);
         });
 
+        // Add to blocklist trigger
+        $('#addBlocklistItem').on('click', function() {
+            var blocklistItem = $('#blocklistItem').val();
+            settingsModule.addToBlocklist(blocklistItem, '#blocklistItem');
+        });
+
+        // Remove from blocklist trigger
+        $(d).on('click', '.removeBlocklistItem', function () {
+            var itemToRemove = $(this).closest('li').text();
+            settingsModule.removeFromBlocklist(itemToRemove);
+        });
+
+        // Save settings trigger
         $('#saveSiteSettings').on('submit', function (e) {
             e.preventDefault();
 

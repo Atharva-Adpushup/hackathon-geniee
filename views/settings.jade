@@ -7,7 +7,7 @@ block append headScripts
     script.
         $(document).ready(function() {
             window.selectedSiteId = !{siteId};
-            window.blocklist = '!{blocklist}'.split(',');
+            window.blocklist = '!{blocklist}' ? '!{blocklist}'.split(',') : []; 
         });
     +loadAsset("js", [
         '/assets/js/libs/custom/settings.js',
@@ -125,6 +125,7 @@ block bodyContent
                                                     .col-sm-3
                                                         button#addBlocklistItem.btn-primary(type="button") Add to blocklist
                                                 .row
+                                                    div#blocklistErr.error-message(style="margin: 5px 15px 20px;")
                                                     ul.blocklist
 
                                 hr
