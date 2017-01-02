@@ -262,6 +262,31 @@ textarea {
   .link-primary:hover {
     color: #cf474b; }
 
+/* Overlay */
+.overlay-primary {
+  position: fixed;
+  z-index: 2000;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.65); }
+  .overlay-primary .overlay-inner {
+    background-color: #fff;
+    width: 60%;
+    position: absolute;
+    left: 20%;
+    top: 15%; }
+    .overlay-primary .overlay-inner .overlay-heading h2 {
+      font-weight: 400;
+      color: #fff;
+      background: #eb575c;
+      padding: 20px; }
+    .overlay-primary .overlay-inner .overlay-content {
+      padding: 20px; }
+      .overlay-primary .overlay-inner .overlay-content p {
+        font-weight: 300;
+        color: #555555;
+        font-size: 1.25em; }
+
 /* Animations component */
 .zoomIn {
   animation-duration: .4s;
@@ -1398,6 +1423,14 @@ maxHeightWidth {
     position: absolute;
     top: -8px;
     right: -10px; }
+
+.overlay-extension {
+  display: none; }
+
+.btn.btn-lightBg.over-ext-btn {
+  font-size: 1.25em;
+  padding: 10px 25px;
+  margin-top: 20px; }
 
 .onboarding-step {
   border-radius: 4px;
