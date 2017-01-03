@@ -50,28 +50,30 @@ function dashboardRedirection(req, res, allUserSites, type) {
         var sites = _.difference(validSites, ['inValidSite']),
             unSavedSite;
 
-            sites = (Array.isArray(sites) && (sites.length > 0)) ? sites : [];
-			/**
-			 * unSavedSite, Current user site object entered during signup
-			 *
-			 * - Value is Truthy (all user site/sites) only if user has
-			 * no saved any site through Visual Editor
-			 * - Value is Falsy if user has atleast one saved site
-			*/
-            unSavedSite = (sites.length === 0) ? allUserSites : null;
-            req.session.unSavedSite = unSavedSite;
-            
-            setEmailCookie(req, res);
+        sites = (Array.isArray(sites) && (sites.length > 0)) ? sites : [];
+        /**
+         * unSavedSite, Current user site object entered during signup
+         *
+         * - Value is Truthy (all user site/sites) only if user has
+         * no saved any site through Visual Editor
+         * - Value is Falsy if user has atleast one saved site
+        */
+        unSavedSite = (sites.length === 0) ? allUserSites : null;
+        req.session.unSavedSite = unSavedSite;
 
-            if(type === 'dashboard') {
+        setEmailCookie(req, res);
+
+        switch(type) {
+            case 'dashboard':
+            case 'default':
                 return res.render('dashboard', {
                     validSites: sites,
                     unSavedSite: unSavedSite,
                     hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
                     requestDemo: req.session.user.requestDemo
                 });
-            }
-            else if (type === 'onboarding') {
+            break;
+            case 'onboarding': 
                 return res.render('onboarding', {
                     validSites: sites,
                     unSavedSite: unSavedSite,
@@ -79,8 +81,8 @@ function dashboardRedirection(req, res, allUserSites, type) {
                     requestDemo: req.session.user.requestDemo,
                     analyticsObj: JSON.stringify(req.session.analyticsObj)
                 });
-            }
-        });
+            break;
+        };
     });
 };
 
@@ -89,58 +91,58 @@ router
         return userModel.getAllUserSites(req.session.user.email)
             .then(function (sites) {
                 var allUserSites = sites;
-                return dashboardRedirection(req, res, allUserSites);
+                return dashboardRedirection(req, res, allUserSites, 'dashboard');
             })
             .catch(function (err) {
                 var allUserSites = req.session.user.sites;
                 return dashboardRedirection(req, res, allUserSites, 'dashboard');
             });
     })
-    .get('/onboarding', function(req, res) {
+    .get('/onboarding', function (req, res) {
         var allUserSites = req.session.user.sites;
         return dashboardRedirection(req, res, allUserSites, 'onboarding');
-    });
+    })
     .post('/setSiteStep', function (req, res) {
         siteModel.setSiteStep(req.body.siteId, req.body.step)
             .then(function () { return userModel.setSitePageGroups(req.session.user.email) })
             .then(function (user) {
                 req.session.user = user;
 
-                if(req.body.completeOnboarding) {
+                if (req.body.completeOnboarding) {
                     user.set('requestDemo', true);
                 }
 
                 user.save();
-                return res.send({success: 1});
-			})
-			.catch(function() {
-				return res.send({success: 0});
-			});
-	})
-    .post('/setSiteServices', function(req, res) {
-        if(req.body && req.body.servicesString) {
-            userModel.getUserByEmail(req.session.user.email).then(function(user) {
+                return res.send({ success: 1 });
+            })
+            .catch(function () {
+                return res.send({ success: 0 });
+            });
+    })
+    .post('/setSiteServices', function (req, res) {
+        if (req.body && req.body.servicesString) {
+            userModel.getUserByEmail(req.session.user.email).then(function (user) {
                 var userSites = user.get('sites');
-                for(var i in userSites) {
-                    if(userSites[i].domain === req.body.newSiteUnSavedDomain) {
+                for (var i in userSites) {
+                    if (userSites[i].domain === req.body.newSiteUnSavedDomain) {
                         userSites[i].services = req.body.servicesString;
                         userSites[i].step = 1;
                         user.set('sites', userSites);
                         req.session.user = user;
                         user.save();
-                        return res.send({success: 1});
+                        return res.send({ success: 1 });
                     } else {
-                        return res.send({success: 0});                  
+                        return res.send({ success: 0 });
                     }
                 }
-            }).catch(function(err) {
+            }).catch(function (err) {
                 console.log(err);
-                return res.send({success: 0});  
+                return res.send({ success: 0 });
             });
         } else {
-            return res.send({success: 0});
+            return res.send({ success: 0 });
         }
-	})
+    })
     .post('/sendCode', function (req, res) {
         var json = {
             email: req.body.developerEmail,
@@ -169,12 +171,12 @@ router
             .catch(function (err) {
                 res.redirect('/404');
             });
-    })    
-    .get('/addSite', function(req, res) {
+    })
+    .get('/addSite', function (req, res) {
         var allUserSites = req.session.user.sites,
             params = {};
-        _.map(allUserSites, function(site) {
-            if(site.step < 6) {
+        _.map(allUserSites, function (site) {
+            if (site.step < 6) {
                 params = {
                     siteDomain: site.domain,
                     siteId: site.siteId,
@@ -183,24 +185,24 @@ router
             }
         });
         res.render('addSite', params);
-	})
+    })
     .post('/addSite', function (req, res) {
         var site = (req.body.site) ? utils.getSafeUrl(req.body.site) : req.body.site;
 
-        userModel.addSite(req.session.user.email, site).spread(function(user, siteId) {
-                var userSites = user.get('sites');
-                for(var i in userSites) {
-                    if(userSites[i].siteId === siteId) {
-                        userSites[i].step = 2;
-                        user.set('sites', userSites);
-                        req.session.user = user;
-                        user.save();
-                        return res.send({success: 1, siteId: siteId});
-                    }
+        userModel.addSite(req.session.user.email, site).spread(function (user, siteId) {
+            var userSites = user.get('sites');
+            for (var i in userSites) {
+                if (userSites[i].siteId === siteId) {
+                    userSites[i].step = 2;
+                    user.set('sites', userSites);
+                    req.session.user = user;
+                    user.save();
+                    return res.send({ success: 1, siteId: siteId });
                 }
-                return res.send({success: 0});
-        }).catch(function(err) {
-            return res.send({success: 0};)
+            }
+            return res.send({ success: 0 });
+        }).catch(function (err) {
+            return res.send({ success: 0 });
         });
     })
     .get('/logout', function (req, res) {
@@ -346,8 +348,8 @@ router
                 }
             });
     })
-    .get('/updateUserStatus', function(req, res) {
-        if(req.session.isSuperUser) {
+    .get('/updateUserStatus', function (req, res) {
+        if (req.session.isSuperUser) {
             return res.render('updateUserStatus', {
                 currentStatus: req.session.user.requestDemo,
                 email: req.session.user.email
@@ -356,10 +358,10 @@ router
             return res.redirect('/user/dashboard');
         }
     })
-    .post('/updateUserStatus', function(req, res) {
-        if(req.session.isSuperUser) {
+    .post('/updateUserStatus', function (req, res) {
+        if (req.session.isSuperUser) {
             var email = req.session.user.email;
-            if(email.trim() && req.body.status) {
+            if (email.trim() && req.body.status) {
                 var status = true; // By default user would be inactive
                 /* 
                     By Default requestDemo would be True | User is inactive
@@ -367,10 +369,10 @@ router
                     If value in request is 0 | User should be active | Set requestDemo to be False
                     If value in request is 1 | User should be inactive | Set requestDemo to be True
                 */
-                if(req.body.status == 0) {
+                if (req.body.status == 0) {
                     status = false;
                 }
-                return userModel.setUserStatus(status, email.trim()).then(function(response) {
+                return userModel.setUserStatus(status, email.trim()).then(function (response) {
                     return res.render('updateUserStatus', {
                         status: 'success',
                         message: 'User updated successfully',
@@ -378,16 +380,16 @@ router
                         email: email
                     });
                 })
-                .catch(function(err) {
-                    if(err) {
-                        return res.render('updateUserStatus', {
-                            status: 'failure',
-                            message: 'Some error occured',
-                            currentStatus: req.session.user.requestDemo,
-                            email: email
-                        })
-                    }
-                });
+                    .catch(function (err) {
+                        if (err) {
+                            return res.render('updateUserStatus', {
+                                status: 'failure',
+                                message: 'Some error occured',
+                                currentStatus: req.session.user.requestDemo,
+                                email: email
+                            })
+                        }
+                    });
             } else {
                 return res.render('updateUserStatus', {
                     status: 'failure',
