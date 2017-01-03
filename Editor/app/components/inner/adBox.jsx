@@ -15,6 +15,7 @@ const highLighterClass = '_APD_highlighter',
 		padding: '4px !important',
 		position: 'absolute !important',
 		top: '5px !important',
+		pointerEvents: 'none'
 	},
 	listStyle = {
 		position: 'absolute',
@@ -49,7 +50,7 @@ const highLighterClass = '_APD_highlighter',
 		return (
 			<div style={listStyle}>
 				<div id={`ad-${id}`} className={highLighterClass} onClick={clickHandler} style={adBoxStyles}>
-					<div className="_AP_adSize" style={adBoxSizeStyles}>
+					<div className="_AP_adSize _ap_reject" style={adBoxSizeStyles}>
 						{adBoxSizeContent}
 					</div>
 				</div>
