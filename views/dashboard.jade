@@ -100,51 +100,53 @@ block bodyContent
                     // Control v/s Adpushp Starts here
                     #widgetsArea.row
                         
-                        if validSites.length > 0
-                            if isSuperUser
-                                if hasStep
-                                    if validSites[0].step >= 6
-                                        include layout/dashboardSites
-                                    else
-                                        include layout/adPushupSetup
-                                else
-                                    include layout/dashboardSites
+                        include layout/dashboardSites
 
-                            else
-                                if hasStep
-                                    //- if validSites[0].step >= 6 && !requestDemo
-                                    if validSites[0].step >= 6
-                                        include layout/dashboardSites
-                                    else 
-                                        include layout/adPushupSetup
-                                else
-                                    if validSites.length > 0
-                                        include layout/dashboardSites
-                                    else 
-                                        .onboarding-wrapper
-                                            .onboarding-step.active-step.ob-ty
-                                                h3(class="ob-heading") Thank you for signing up with AdPushup
-                                                div(class="ob-content")
-                                                    p.text-center.text-medium
-                                                        | We are a 
-                                                        strong Google AdSense certified partner 
-                                                        | and backed by 
-                                                        strong Microsoft Ventures.
-                                                        br
-                                                        br
-                                                        | We're currently in beta and seeing great success so far with 
-                                                        | strong average RPM/eCPM uplifts of greater than 70 percent on participating website, without compromising on the user experience. 
-                                                        | However, this is a closed beta program and we're on-boarding select few users, using assisted setups.
-                                                        br
-                                                        br
-                                                        | Please check your email and suggest a suitable time for a 
-                                                        | strong 15 minute 
-                                                        | screen share. During this session, we will install AdPushup on your website and show you how to use AdPushup.
-                                                        br
-                                                        br
-                                                        | You can also contact us at 
-                                                        a(href="mailto:support@adpushup.com") support@adpushup.com
+                        //- if validSites.length > 0
+                        //-     if isSuperUser
+                        //-         if hasStep
+                        //-             if validSites[0].step >= 6
+                        //-                 include layout/dashboardSites
+                        //-             else
+                        //-                 include layout/adPushupSetup
+                        //-         else
+                        //-             include layout/dashboardSites
+
+                        //-     else
+                        //-         if hasStep
+                        //-             //- if validSites[0].step >= 6 && !requestDemo
+                        //-             if validSites[0].step >= 6
+                        //-                 include layout/dashboardSites
+                        //-             else 
+                        //-                 include layout/adPushupSetup
+                        //-         else
+                        //-             if validSites.length > 0
+                        //-                 include layout/dashboardSites
+                        //-             else 
+                        //-                 .onboarding-wrapper
+                        //-                     .onboarding-step.active-step.ob-ty
+                        //-                         h3(class="ob-heading") Thank you for signing up with AdPushup
+                        //-                         div(class="ob-content")
+                        //-                             p.text-center.text-medium
+                        //-                                 | We are a 
+                        //-                                 strong Google AdSense certified partner 
+                        //-                                 | and backed by 
+                        //-                                 strong Microsoft Ventures.
+                        //-                                 br
+                        //-                                 br
+                        //-                                 | We're currently in beta and seeing great success so far with 
+                        //-                                 | strong average RPM/eCPM uplifts of greater than 70 percent on participating website, without compromising on the user experience. 
+                        //-                                 | However, this is a closed beta program and we're on-boarding select few users, using assisted setups.
+                        //-                                 br
+                        //-                                 br
+                        //-                                 | Please check your email and suggest a suitable time for a 
+                        //-                                 | strong 15 minute 
+                        //-                                 | screen share. During this session, we will install AdPushup on your website and show you how to use AdPushup.
+                        //-                                 br
+                        //-                                 br
+                        //-                                 | You can also contact us at 
+                        //-                                 a(href="mailto:support@adpushup.com") support@adpushup.com
                             
-                        else
-                            include layout/adPushupSetup
+                        //- else
+                        //-     include layout/adPushupSetup
     

@@ -217,12 +217,12 @@ router
                         user.set('sites', userSites);
                         req.session.user = user;
                         user.save();
-                        res.send({success: 1, siteId: siteId});
+                        return res.send({success: 1, siteId: siteId});
                     }
                 }
-                res.send({success: 0});
+                return res.send({success: 0});
         }).catch(function(err) {
-            res.send({success: 0});
+            return res.send({success: 0});
         });
     })
     .get('/logout', function (req, res) {
@@ -354,6 +354,8 @@ router
 				 * File name: model.js
 				 */
                 var user = Array.prototype.slice.call(arguments)[0];
+
+                console.log(user);
 
                 req.session.user = user;
                 return res.render('profile', { profileSaved: true, formData: req.body });
