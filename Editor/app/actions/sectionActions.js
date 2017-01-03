@@ -79,6 +79,13 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			sectionId: section.id,
 			name
 		});
+	},
+	updateXPath = (sectionId, xpath) => {
+		return {
+			type: sectionActions.UPDATE_XPATH,
+			sectionId,
+			xpath
+		};
 	};
 
-export { createSection, deleteSection, renameSection, createIncontentSection, updatePartnerData };
+export { createSection, deleteSection, renameSection, createIncontentSection, updatePartnerData, updateXPath };
