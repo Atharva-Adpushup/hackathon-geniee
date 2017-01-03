@@ -454,6 +454,9 @@ var es = require('../helpers/elasticSearchService'),
 	};
 
 module.exports = {
+	doESSearch: function(config) {
+		return getESSearchResult(config);
+	},
 	controlVsAdpushupCtrReport: function(config) {
 		var queryBody = prepareControlVsAdpushupCtrSearchQuery(config),
 			esSearchConfig = {
