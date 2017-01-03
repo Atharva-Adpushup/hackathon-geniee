@@ -140,7 +140,7 @@ $(document).ready(function () {
         var autoOptimise;
         $('#autoOptimise').on('change', function () {
             autoOptimise = $(this).prop('checked');
-            !autoOptimise ? $('#autoOptimiseErr').html('Auto Optimise is <strong>disabled</strong> now. Please set the traffic distribution for your variations manually to prevent unpredictable results. ') : $('#autoOptimiseErr').html('');
+            !autoOptimise ? $('#autoOptimiseErr').html('NOTE: AdPushup might be disabled right now for this site. Kindly set the traffic manually for each variation in all the page groups present for this site. <br/><br/> To update the traffic, go to Editor > Load Page Group > Traffic Distribution.') : $('#autoOptimiseErr').html('');
         });
 
         // Copy to clipboard trigger
