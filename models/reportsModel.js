@@ -423,6 +423,13 @@ var es = require('../helpers/elasticSearchService'),
 			'msg': msg
 		};
 	},
+	getESSearchResult = function(config) {
+		return es.search(config.indexes, config.logName, config.queryBody).then(function(result) {
+			return Promise.resolve(result);
+		}).catch(function(err) {
+			return Promise.resolve(err.toString());
+		});
+	},
 	performEsSearch = function(config) {
 		var defaultConfig = {
 			'indexes': 'ap_stats_new',

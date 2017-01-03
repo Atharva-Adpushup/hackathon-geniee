@@ -575,8 +575,19 @@ router
 			}
 			next(err);
 		});
-	});
+	})
 
+	.get('/performESSearch', function(req, res) {
+		var config = {
+			indexes: 'ex_stats_new',
+			logName: 'exlg',
+			queryBody: {"size":0,"query":{"bool":{"must":[{"query_string":{"analyze_wildcard":true,"query":"tracking:true AND mode:1 AND pageGroup:POST AND userAnalytics.platform:DESKTOP AND siteId:25005"}},{"range":{"createdTs":{"gte":1483418528329,"lte":1483418528329,"format":"epoch_millis"}}}],"must_not":[]}},"aggs":{"PLATFORM":{"terms":{"field":"userAnalytics.platform","size":5,"order":{"_term":"desc"}},"aggs":{"CHOSEN_VARIATION":{"terms":{"field":"variationId","size":1000,"order":{"_term":"desc"}},"aggs":{"ADS_CLICKED":{"terms":{"field":"ads.clicked","size":5,"order":{"_term":"desc"}}}}}}}}}
+		};
+
+		return reports.getESSearchResult(config).then(function(result) {
+			return res.json(result);
+		});
+	});
 
 
 module.exports = router;
