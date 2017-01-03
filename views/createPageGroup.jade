@@ -1,7 +1,36 @@
 extends  layout/base
 
 block getTitle
-    - var titleVar = "Create PageGroup"      
+    - var titleVar = "Create PageGroup"  
+
+block append headCss
+    link(rel="stylesheet" href="/assets/css/bootstrap-combobox.css")
+
+block append headScripts
+    script(src="/assets/js/libs/third-party/bootstrap-combobox.js")
+    script.
+        $(document).ready(function() {
+            $('.combobox').combobox();
+
+            function getDomain(url) {
+                var a = document.createElement('a');
+                a.href = url;
+                return a.hostname;
+            }
+
+            $('#sampleUrl').on('blur', function() {
+                var val = $(this).val();
+
+                if(val && (getDomain(val) !== getDomain('#{siteDomain}'))) {
+                    $('#createPg').prop('disabled', true);
+                    $('#error-message').html('The Sample URL should be from your website only');   
+                }
+                else {
+                    $('#createPg').prop('disabled', false);
+                    $('#error-message').html('');   
+                }
+            });
+        });  
 
 block bodyContent
     include layout/sideBar
@@ -17,19 +46,26 @@ block bodyContent
                     .mb-30
                         .controlAdpushupWrap
                             h3.title.m-All-0.clearfix
-                                a.pull-left Create New PageGroup
-                            form(method="post", action="/genieeApi/pagegroup/create")
+                                a.pull-left Create New PageGroup - 
+                                    span!= utils.domanize(siteDomain)
+                            form(method="post", action="createPagegroup")
                                 input(type="hidden" value="#{siteId}" name="siteId")
                                 .row.input-wrapper
                                     .col-sm-2
                                         label Page Group Name
                                     .col-sm-3
-                                        input.form-control(required, name="pageGroupName", type="text" placeholder="Please enter Page Group Name")
+                                        if channels.length > 0
+                                            select(class="combobox input-large form-control" name="pageGroupName")
+                                                option(value="" selected="selected") Please enter Page Group Name  
+                                                for channel in channels
+                                                    option(value="#{channel}")!= channel    
+                                        else 
+                                            input.form-control(required, name="pageGroupName", type="text" placeholder="Please enter Page Group Name")
                                 .row.input-wrapper
                                     .col-sm-2
                                         label Sample Url
                                     .col-sm-3
-                                        input.form-control(required, name="sampleUrl", type="url" placeholder="Please enter Sample Url") 
+                                        input.form-control#sampleUrl(required, name="sampleUrl", type="url" placeholder="Please enter Sample Url") 
                                 .row.input-wrapper
                                     .col-sm-2
                                         label Device
@@ -42,7 +78,7 @@ block bodyContent
                                                 option(value="mobile") Mobile
                                 .row.input-wrapper
                                     .col-sm-4
-                                        h3.error-message!= error
-                                        button.btn.btn-lightBg.btn-default Create Page Group                                             
+                                        h3#error-message.error-message!= error
+                                        button#createPg.btn.btn-lightBg.btn-default Create Page Group                                             
                                                                               
                                            

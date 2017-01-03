@@ -150,7 +150,7 @@ var ApexReport = (function(w, $) {
 				alphaValue = 0.05, significanceResult,
 				signClassNames = 'popover-content-text-block text-uppercase text-bold',
 				significanceModel = w.SS.getModel(controlConfig.pageViews, pageViews, controlConfig.clicks, clicks),
-				perfStr = '<div class="popover-content-text-block">Variation ' + $variationNameEl.text() + ' is performing <strong style="font-size:1.2em;display:inline-block;margin:0 3px;">' + (Math.abs(perfValue)).toString() + '%</strong>';
+				perfStr = '<div class="popover-content-text-block">' + $variationNameEl.text() + ' is performing <strong style="font-size:1.2em;display:inline-block;margin:0 3px;">' + (Math.abs(perfValue)).toString() + '%</strong>';
 
 			significanceResult = w.SS.test(significanceModel, alphaValue);
 
@@ -271,7 +271,7 @@ var ApexReport = (function(w, $) {
 				perfValue = Math.round(((pageRPM - controlConfig.rpm) / controlConfig.rpm) * 100);
 				significanceModel = w.SS.getModel(controlConfig.pageViews, pageViews, controlConfig.revenue, revenue);
 				significanceResult = w.SS.test(significanceModel, alphaValue);
-				perfStr = '<div style="display: block; margin-bottom: 5px;">Variation ' + $variationNameEl.text() + ' is performing <strong style="font-size:1.2em;display:inline-block;margin:0 3px;">' + (Math.abs(perfValue)).toString() + '%</strong>';
+				perfStr = '<div style="display: block; margin-bottom: 5px;">' + $variationNameEl.text() + ' is performing <strong style="font-size:1.2em;display:inline-block;margin:0 3px;">' + (Math.abs(perfValue)).toString() + '%</strong>';
 				performanceArr.push(perfValue);
 
 				if (perfValue > 0) {
@@ -610,13 +610,15 @@ var ApexReport = (function(w, $) {
 
 	function handleTDInputChange(e) {
 		var $el = $(e.target),
-			configs = w.adpushup.reports.config,
+			config = w.adpushup.reports.config,
 			trafficDistribution = $el.val(),
 			variationKey = $el.attr('data-variation-key'),
 			paramConfig = {
 				'trafficDistribution': trafficDistribution,
 				'variationKey': variationKey,
-				'siteId': configs.siteId
+				'siteId': config.siteId,
+				'pageGroup': config.pageGroup,
+				'platform': config.platform
 			};
 
 		$el.data('params', paramConfig);

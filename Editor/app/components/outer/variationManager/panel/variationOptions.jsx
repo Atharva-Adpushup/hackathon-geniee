@@ -9,21 +9,13 @@ const variationOtions = (props) => {
 	const { onDeleteVariation, onCopyVariation, onEditVariationName, variation, channelId, onEditTrafficDistribution } = props;
 	return (
 		<div>
-			<h1 className="variation-section-heading">Variataion Info</h1>
+			<h1 className="variation-section-heading">Variation Info</h1>
 			<Row>
 				<Col className="u-padding-r10px" xs={2}>
 					Variation Name
 				</Col>
 				<Col className="u-padding-l10px" xs={4}>
 					<InlineEdit value={variation.name} submitHandler={onEditVariationName.bind(null, variation.id, channelId)} text="Variation Name" errorMessage="Variation Name cannot be blank" />
-				</Col>
-			</Row>
-			<Row>
-				<Col className="u-padding-r10px" xs={2}>
-					Traffic Distribution
-				</Col>
-				<Col className="u-padding-l10px" xs={4}>
-					<InlineEdit value={variation.trafficDistribution} submitHandler={onEditTrafficDistribution.bind(null, variation.id)} text="Traffic Distribution" errorMessage="Traffic Distribution cannot be blank" />
 				</Col>
 			</Row>
 			<Row>

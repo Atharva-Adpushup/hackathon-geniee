@@ -2,7 +2,11 @@ var express = require('express'),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
+	adsenseReportModel = require('../models/adsenseModel'),
+	reportsModel = require('../models/reportsModel'),
 	Promise = require('bluebird'),
+	extend = require('extend'),
+	CC = require('../configs/commonConsts'),
 	lodash = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
@@ -31,7 +35,7 @@ router
 	})
 	.post('/saveSite', function(req, res) {
 		var data = req.body,
-			siteId = parseInt(req.body.siteId);
+			siteId = parseInt(req.body.siteId, 10);
 		userModel.verifySiteOwner(req.session.user.email, siteId).then(function() {
 			var audienceId = utils.getRandomNumber();
 			var siteData = {
@@ -42,7 +46,7 @@ router
 				'ads': [],
 				'channels': [],
 				'templates': [],
-				'apConfigs': {}
+				'apConfigs': { 'mode': CC.site.mode.DRAFT }
 			};
 			return siteData;
 		})
@@ -66,7 +70,8 @@ router
 			siteId = queryConfig.siteId,
 			platform = queryConfig.platform,
 			pageGroup = queryConfig.pageGroup,
-			variationKey = queryConfig.variationKey,
+			channelKey = (platform + ":" + pageGroup),
+			clientVariationKey = queryConfig.variationKey,
 			dataConfig = {
 				endDate: queryConfig.endDate,
 				pageGroup: pageGroup,
@@ -87,9 +92,9 @@ router
 		function getTotalPageViews() {
 			var config = lodash.assign({}, dataConfig);
 
-			config.queryString = 'mode:1 AND chosenVariation:' + variationKey;
+			config.queryString = 'mode:1 AND variationId:' + clientVariationKey;
 
-			return Promise.resolve(reports.apexReport(config))
+			return Promise.resolve(reportsModel.apexReport(config))
 				.then(function(report) {
 					var pageViews = Number(report.data.tracked.totalPageViews);
 
@@ -187,10 +192,23 @@ router
 		}
 
 		function extractCodeSlots(channel) {
-			var adCodeSlotArr = lodash.uniq(lodash.compact(lodash.map(channel.get('structuredSections'), function(section) {
+			var channelJSON = extend(true, {}, channel.toJSON()),
+				adCodeArr = [], adCodeSlotArr;
+
+			lodash.forOwn(channelJSON.variations, function(variationObj, variationKey) {
+				if (clientVariationKey === variationKey.toString()) {
+					lodash.forOwn(variationObj.sections, function(sectionObj, sectionKey) {
+						lodash.forOwn(sectionObj.ads, function(adObj, adKey) {
+							adCodeArr.push(adObj.adCode);
+						});
+					});
+				}
+			});
+
+			adCodeSlotArr = lodash.uniq(lodash.compact(lodash.map(adCodeArr, function(adCode) {
 				var adCodeSlot, base64DecodedAdCode, isAdSlotPresent;
 
-				base64DecodedAdCode = new Buffer(section.get('adCode'), 'base64').toString('ascii');
+				base64DecodedAdCode = new Buffer(adCode, 'base64').toString('ascii');
 				isAdSlotPresent = (base64DecodedAdCode.match(/data-ad-slot="\d*"/));
 
 				if (isAdSlotPresent) {
@@ -206,7 +224,7 @@ router
 
 		function getAdcodeSlots(site) {
 			var channelList = site.get('channels'),
-				isChannelPresent = (channelList.indexOf(channelName) > -1);
+				isChannelPresent = (channelList.indexOf(channelKey) > -1);
 
 			if (isChannelPresent) {
 				return channelModel.getChannel(siteId, platform, pageGroup)
@@ -223,7 +241,7 @@ router
 							.then(function(pageViews) {
 								return calculateRPM(pageViews, adSlotsEarnings)
 									.then(function(rpm) {
-										res.json({
+										return res.json({
 											success: true,
 											rpm: rpm,
 											pageViews: pageViews,
@@ -234,7 +252,7 @@ router
 					});
 			})
 			.catch(function(err) {
-				res.json({
+				return res.json({
 					success: false,
 					message: err.toString()
 				});
@@ -243,39 +261,46 @@ router
 	.post('/saveTrafficDistribution', function(req, res) {
 		var data = JSON.parse(req.body.data);
 
-		function saveTrafficDistribution(site) {
-			var apConfigs, trafficDistributionObj, computedObj,
-				value = data.trafficDistribution;
+		function saveChannelData(variationObj) {
+			return channelModel.saveChannel(data.siteId, data.platform, data.pageGroup, variationObj);
+		}
 
-			if (site.isApex()) {
-				apConfigs = site.get('apConfigs');
-				trafficDistributionObj = (typeof apConfigs.trafficDistribution !== 'undefined') ? apConfigs.trafficDistribution : null;
+		function getTrafficDistribution(channel) {
+			var variationsObj = (channel.get('variations') ? channel.get('variations') : {}),
+				computedObj = extend(true, {}, variationsObj),
+				clientKey = data.variationKey, finalVariationObj;
 
-				if (!!trafficDistributionObj && trafficDistributionObj[data.variationName]) {
-					apConfigs.trafficDistribution[data.variationName] = value;
-					computedObj = {
-						'apConfigs': apConfigs
-					};
-
-					return computedObj;
+			lodash.forOwn(computedObj, function(variationObj, variationKey) {
+				if ((clientKey === variationKey) && computedObj[variationKey]) {
+					computedObj[variationKey].trafficDistribution = data.trafficDistribution;
 				}
+			});
+
+			if (!computedObj[clientKey]) {
 				throw new AdPushupError('Traffic Distribution value not saved');
+			} else {
+				finalVariationObj = {
+					'variations': extend(true, {}, computedObj)
+				};
 			}
-			throw new AdPushupError('Traffic Distribution value not saved');
+
+			return finalVariationObj;
 		}
 
 		userModel.verifySiteOwner(req.session.user.email, data.siteId)
 			.then(function() {
-				return siteModel.getSiteById(data.siteId);
-			})
-			.then(saveTrafficDistribution)
-			.then(siteModel.saveSiteData.bind(null, data.siteId, 'POST'))
-			.then(function() {
-				res.json({
-					success: true,
-					siteId: data.siteId,
-					variationName: data.variationName
-				});
+				return siteModel.getSiteById(data.siteId).then(function(site) {
+					return channelModel.getChannel(data.siteId, data.platform, data.pageGroup)
+						.then(getTrafficDistribution)
+						.then(saveChannelData)
+						.then(function() {
+							return res.json({
+								success: true,
+								siteId: data.siteId,
+								variationName: data.variationName
+							});
+						})
+				})
 			})
 			.catch(function(err) {
 				res.json({
@@ -294,20 +319,47 @@ router
 					return (channel.platform + ':' + channel.pageGroup);
 				}))
 			};
+		
+		/**
+		 * OBJECTIVE: To check whether there is any channel already deleted in database
+		 * IMPLEMENTATION: Compute deleted channels, if any exist, throw an error
+		 * @param {siteId} siteId site document id
+		 * @param {channelNames} channel names array
+		 * @returns {boolean} When there is no deleted array
+		 */
+		function checkChannelsExistence(siteId, channelNames) {
+			var deletedChannelsArr = lodash.map(channelNames, function(channelNameVal, key) {
+				var channelKey = "chnl::" + siteId + ":" + channelNameVal;
 
-		return siteModel.saveSiteData(siteData.siteId, 'POST', siteData)
-			.then(function() {
-				return channelModel.saveChannels(parsedData.siteId, parsedData.channels)
-				.then(function() {
-					return res.json({
-						success: 1,
-						siteId: parsedData.siteId,
-						siteDomain: parsedData.siteDomain
+				return channelModel.isChannelExist(channelKey)
+					.then(function(isExist) {
+						return (!isExist ? channelNameVal : false);
 					});
-				})
+			});
+
+			return Promise.all(deletedChannelsArr).then(function(channelsArr) {
+				var compactedArr = lodash.compact(channelsArr);
+
+				if (compactedArr && compactedArr.length) {
+					throw new AdPushupError('One or more channels are deleted. Site will not be saved!')
+				}
+
+				return Promise.resolve(true);
+			});
+		}
+
+		return checkChannelsExistence(siteData.siteId, siteData.channels)
+			.then(siteModel.saveSiteData.bind(null, siteData.siteId, 'POST', siteData))
+			.then(channelModel.saveChannels.bind(null, parsedData.siteId, parsedData.channels))
+			.then(function() {
+				return res.json({
+					success: 1,
+					siteId: parsedData.siteId,
+					siteDomain: parsedData.siteDomain
+				});
 			})
 			.catch(function(err) {
-				res.json({
+				return res.json({
 					success: 0,
 					message: err.toString()
 				});

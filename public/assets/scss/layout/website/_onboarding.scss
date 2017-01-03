@@ -122,6 +122,7 @@ $onboardingBg: url('../images/adpushupbg.png');
   line-height: 22px;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
+  word-break: break-all;
 }
 
 .no-pad {
@@ -175,47 +176,6 @@ $onboardingBg: url('../images/adpushupbg.png');
 .pagegroup-name {
   color: $primaryColor;
   border-right: 1px solid $lightGrey;
-}
-
-.snippet-wrapper {
-  position: relative;
-
-  .snippet-btn {
-    border-top-right-radius: 0;
-    border-bottom-left-radius: 0;
-    word-spacing: 2px;
-    width: 200px;
-    background-color: $whiteColor;
-
-    &:not(:last-child) {
-      margin-right: 10px;
-    }
-
-    i {
-      margin-left: 4px;
-    }
-  }
-
-  .snippet-dev {
-    width: 200px;
-    margin-right: 10px;
-    border-bottom-right-radius: 0;
-    border-top-right-radius: 2px;
-  }
-
-  .clipboard-copy {
-    position: absolute;
-    bottom: 65px;
-    right: 1px;
-    width: 140px;
-    display: none;
-    text-align: center;
-    font-size: 1.1em;
-    background-color: $whiteColor;
-    padding: 6px;
-    @include bordersStyle(1px solid $lightGrey, top, left, bottom);
-    color: $fontColor;
-  }
 }
 
 .detectap-alert {

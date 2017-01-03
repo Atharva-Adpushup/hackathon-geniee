@@ -240,6 +240,25 @@ collapsedextended
 	border: 0 !important;
 }
 
+/*****Text specific classes*****/
+.text-uppercase
+{
+	text-transform: uppercase !important;
+}
+.text-bold
+{
+	font-weight: bold !important;
+}
+.text-success
+{
+	color: $GreenColor !important;
+}
+.text-error
+{
+	color: $primaryColorDark !important;
+}
+
+
 /***Text style utils***/
 .boldTxt {
 	font-weight: bold;

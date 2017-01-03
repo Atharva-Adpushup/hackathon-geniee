@@ -15,6 +15,7 @@ class collection extends React.Component {
 		this.state = {
 			model: props.savedCollection || {}
 		};
+		this.handleInputChange = this.handleInputChange.bind(this);
 	}
 
 	// Explicitly added to avoid re-rendering
@@ -60,11 +61,49 @@ class collection extends React.Component {
 			rowInputLabelText = rowItem.name;
 
 			rows.push((
-				<CustomInputNumber key={rowItemKey} ref={rowItemKey} labelText={rowInputLabelText} layout="horizontal" min={0} max={100} step={1} value={rowInputValue} />
+				<CustomInputNumber key={rowItemKey} ref={rowItemKey} labelText={rowInputLabelText} layout="horizontal" min={0} max={100} onChange={this.handleInputChange} step={1} value={rowInputValue} />
 			));
 		}
 
 		return rows;
+	}
+
+	getCollectionSum(model) {
+		const validModel = [];
+
+		Object.keys(model).forEach((key) => {
+			const value = model[key];
+
+			if (value && (Number(value) > -1)) {
+				validModel.push(Number(value));
+			}
+		});
+
+		return (validModel).reduce((a, b) => a + b, 0);
+	}
+
+	toggleSumExtensionErrorMessage(isSumNotEqual) {
+		const $errorMessage = $(ReactDOM.findDOMNode(this.refs['td-error-message'])),
+			$saveBtn = $(ReactDOM.findDOMNode(this.refs['td-save-btn']));
+
+		if (isSumNotEqual) {
+			$saveBtn.attr({ disabled: true }).addClass('disabled');
+			$errorMessage.removeClass('hide');
+		} else {
+			$saveBtn.attr({ disabled: false }).removeClass('disabled');
+			$errorMessage.addClass('hide');
+		}
+	}
+
+	handleInputChange() {
+		const collectionSum = this.getCollectionSum(this.getModel()),
+			hasSumExtended = (collectionSum > this.props.maxValue),
+			hasSumDecremented = (collectionSum < this.props.maxValue),
+			isSumNotEqual = (hasSumExtended || hasSumDecremented);
+
+		if (this.props && this.props.maxValue && this.props.required) {
+			this.toggleSumExtensionErrorMessage(isSumNotEqual);
+		}
 	}
 
 	updateModel() {
@@ -98,6 +137,12 @@ class collection extends React.Component {
 		);
 	}
 
+	renderSumExtendedErrorMessage() {
+		return (
+			<div ref="td-error-message" className="error-message hide">Sum of all Traffic distributions should be equal to <strong>100</strong></div>
+		);
+	}
+
 	renderBackButton() {
 		if (this.props.onBack) {
 			return (
@@ -120,10 +165,11 @@ class collection extends React.Component {
 			<div>
 				<Row key={this.props.name} className={options.layoutClassName}>
 					{this.renderHorizontalLayout()}
+					{this.renderSumExtendedErrorMessage()}
 				</Row>
 				<Row>
 					<Col xs={12} className="u-padding-0px">
-						<Button className="btn-lightBg btn-save btn-block" onClick={a => this.onSave(a)}>Save</Button>
+						<Button disabled={this.state.hasSumExtended} ref="td-save-btn" className="btn-lightBg btn-save btn-block" onClick={a => this.onSave(a)}>Save</Button>
 					</Col>
 				</Row>
 				{this.renderBackButton()}

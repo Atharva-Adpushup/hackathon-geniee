@@ -38,10 +38,12 @@ router
         return siteModel.getSiteById(req.params.siteId)
             .then(function (site) {
                 return res.render('settings', {
-                    pageGroups: site.data.cmsInfo.pageGroups,
-                    patterns: site.data.apConfigs.pageGroupPattern ? site.data.apConfigs.pageGroupPattern : [],
+                    pageGroups: site.get('cmsInfo').pageGroups,
+                    patterns: site.get('apConfigs').pageGroupPattern ? site.get('apConfigs').pageGroupPattern : [],
+                    apConfigs: site.get('apConfigs'),
+                    blocklist: site.get('apConfigs').blocklist,
                     siteId: req.params.siteId,
-                    siteDomain: site.data.siteDomain
+                    siteDomain: site.get('siteDomain')
                 });
             })
             .catch(function (err) {
@@ -53,7 +55,7 @@ router
             settings: req.body,
             siteId: req.params.siteId
         };
-        siteModel.saveSiteSettings(json)
+        return siteModel.saveSiteSettings(json)
             .then(function (data) {
                 res.send({ success: 1 });
             })
@@ -84,20 +86,56 @@ router
     })
     .get('/:siteId/createPagegroup', function(req, res) {
         if(req.session.user.userType !== 'partner') {
-            siteModel.getSitePageGroups(req.params.siteId)
-                .then(function(pageGroups) {
-                    return res.render('createPageGroup', {
-                        siteId: req.params.siteId,
-                        error: req.session.pageGroupError ? req.session.pageGroupError : '' 
-                    });
-                })
-                .catch(function(err) {
-                    return res.send('Some error occurred!');
+            return siteModel.getSiteById(req.params.siteId)
+            .then(function(site) { return { siteDomain: site.get('siteDomain'), channels: site.get('channels') }})
+            .then(function(data) {
+                var channels = _.map(data.channels, function(channel) {
+                    return channel.split(':')[1];
                 });
+                return res.render('createPageGroup', {
+                    siteId: req.params.siteId,
+                    siteDomain: data.siteDomain,
+                    channels: _.uniq(channels)
+                });
+            })
+            .catch(function(err) {
+                return res.send('Some error occurred!');
+            });
         }
         else {
             return res.render('403');
         }
+    })
+    .post('/:siteId/createPagegroup', function(req, res) {
+           var json = req.body;
+           return channelModel.createPageGroup(json)
+				.then(function(data) {
+					// Reset session on addition of new pagegroup for non-partner
+					var userSites = req.session.user.sites,
+						site = _.find(userSites, {'siteId': parseInt(json.siteId)});
+                    
+					var index = _.findIndex(userSites, {'siteId': parseInt(json.siteId)});
+					req.session.user.sites[index] = site;
+					
+					return res.redirect('/user/dashboard');
+				})
+				.catch(function(err) {
+					var error = err.message[0].message ?  err.message[0].message : 'Some error occurred!';
+
+                    return siteModel.getSiteById(req.params.siteId)
+                        .then(function(site) { return { siteDomain: site.get('siteDomain'), channels: site.get('channels') }})
+                        .then(function(data) {
+                            var channels = _.map(data.channels, function(channel) {
+                                return channel.split(':')[1];
+                            });
+                            return res.render('createPageGroup', {
+                                siteId: req.params.siteId,
+                                siteDomain: data.siteDomain,
+                                channels: channels,
+                                error: error
+                            });
+                        });
+				});
     })
     .get('/:siteId/pagegroups', function(req, res) {
         if(req.session.user.userType !== 'partner') {

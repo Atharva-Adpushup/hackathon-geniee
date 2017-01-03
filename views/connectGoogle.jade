@@ -1,0 +1,56 @@
+extends  layout/base
+
+block getTitle
+    - var titleVar = "Connect Google"
+
+block append headScripts
+    script.
+        $(document).ready(function() {
+            $('#oauth').on('click', function() {
+                var x = screen.width / 2 - 700 / 2;
+                var y = screen.height / 2 - 450 / 2;
+                window.open("/user/requestOauth", 'Oauth Request', 'height=485,width=700,left=' + x + ',top=' + y);
+            });
+
+            function oauthHook(event) {
+                var adsense = JSON.parse(event.data);
+                if(adsense.data) {
+                    $('#oauth').html('<span>Google AdSense Connected<span><i class="fa fa-check"></i>').css('pointer-events', 'none');
+                }
+                else {
+                    alert('Some error occurred! Please try again later.');
+                }
+            };
+
+            window.addEventListener('message', oauthHook, false);
+        });
+
+block bodyContent
+    include layout/sideBar
+    .pageContainer.page-container
+        include layout/header
+        // Page Content Starts Here
+        .pageContentWrapper.page-content
+            .pageContentInner.page-content--inner
+                .notification-wrapper
+
+                #widgetsArea.row
+                    .mb-30
+                        .controlAdpushupWrap
+                            h3.title.m-All-0.clearfix 
+                                a Connect Google
+                            .row
+                                .col-sm-3
+                                    img.img-responsive(src="/assets/images/onboarding/3.png" alt="Connect Google AdSense")
+                                .col-sm-9.mT-10
+                                    p.widget-text.mT-10
+                                        | Connecting your Google AdSense account with AdPushup helps us to pull your AdSense reports so that you can conveniently view them in one place.
+                                    .mT-10
+                                        if !adNetworkSettings
+                                            button#oauth.btn.btn-lightBg.btn-default.widget-btn Connect Google AdSense
+                                        else
+                                            button.btn.btn-lightBg.btn-default.widget-btn(style="pointer-events: none;") Google AdSense Connected 
+                                                i.fa.fa-check
+                                    
+
+               

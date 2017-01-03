@@ -21,10 +21,17 @@ const afterSaveLoaderStatusPending = (loaderStatus) => {
 
 				return masterSave(paramData)
 					.done((data) => {
-						dispatch({
-							type: status.text.SUCCESS
-						});
-						return dfd.resolve(data);
+						if (data.success) {
+							dispatch({
+								type: status.text.SUCCESS
+							});
+							return dfd.resolve(data);
+						} else {
+							dispatch({
+								type: status.text.FAILED
+							});
+							return dfd.reject(data.message);
+						}
 					})
 					.fail((jqXHR, textStatus) => {
 						dispatch({

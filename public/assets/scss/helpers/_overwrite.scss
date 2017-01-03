@@ -224,6 +224,12 @@
     > .popover-content
     {
         padding: $FMLayoutDimension / 2;
+
+        .popover-content-text-block
+        {
+            display: block;
+            margin-bottom: $FMLayoutDimension / 2;
+        }
     }
 
     .list-group
@@ -237,6 +243,14 @@
             {
                 font-size: 1.1em;
                 text-transform: uppercase;
+            }
+
+            > .badge
+            {
+                background: none;
+                color: $blackColor;
+                font-size: 1.1em;
+                letter-spacing: 1px;
             }
         }
     }

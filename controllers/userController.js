@@ -25,33 +25,30 @@ var express = require('express'),
     // Instantiate mailer
     mailer = new Mailer(mailConfig, 'text');
 
-router
-    .get('/dashboard', function(req, res) {
-        var allUserSites = req.session.user.sites;
+function dashboardRedirection(req, res, allUserSites, type) {
+    function setEmailCookie() {
+        var cookieName = 'email',
+            // "Email" cookie has 1 year expiry and accessible through JavaScript
+            cookieOptions = { expires: new Date(Date.now() + (60 * 60 * 1000 * 24 * 365)), encode: String, httpOnly: false },
+            isCookieSet = (Object.keys(req.cookies).length > 0) && (typeof req.cookies[cookieName] !== 'undefined');
 
-        function setEmailCookie() {
-            var cookieName = 'email',
-                // "Email" cookie has 1 year expiry and accessible through JavaScript
-                cookieOptions = { expires: new Date(Date.now() + (60 * 60 * 1000 * 24 * 365)), encode: String, httpOnly: false },
-                isCookieSet = (Object.keys(req.cookies).length > 0) && (typeof req.cookies[cookieName] !== 'undefined');
+        isCookieSet ? res.clearCookie(cookieName, cookieOptions) : '';
+        res.cookie(cookieName, req.session.user.email, cookieOptions);
+    }
 
-            isCookieSet ? res.clearCookie(cookieName, cookieOptions) : '';
-            res.cookie(cookieName, req.session.user.email, cookieOptions);
-        }
-
-        function sitePromises() {
-            return _.map(allUserSites, function(obj) {
-                return siteModel.getSiteById(obj.siteId).then(function() {
-                    return obj;
-                }).catch(function() {
-                    return 'inValidSite';
-                });
+    function sitePromises() {
+        return _.map(allUserSites, function (obj) {
+            return siteModel.getSiteById(obj.siteId).then(function () {
+                return obj;
+            }).catch(function () {
+                return 'inValidSite';
             });
-        }
+        });
+    }
 
-        return Promise.all(sitePromises()).then(function(validSites) {
-            var sites = _.difference(validSites, ['inValidSite']),
-                unSavedSite;
+    return Promise.all(sitePromises()).then(function (validSites) {
+        var sites = _.difference(validSites, ['inValidSite']),
+            unSavedSite;
 
             sites = (Array.isArray(sites) && (sites.length > 0)) ? sites : [];
 			/**
@@ -65,67 +62,49 @@ router
             req.session.unSavedSite = unSavedSite;
             
             setEmailCookie(req, res);
-            res.render('dashboard', {
-                validSites: sites,
-                unSavedSite: unSavedSite,
-                hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-                requestDemo: req.session.user.requestDemo
-            });
+
+            if(type === 'dashboard') {
+                return res.render('dashboard', {
+                    validSites: sites,
+                    unSavedSite: unSavedSite,
+                    hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+                    requestDemo: req.session.user.requestDemo
+                });
+            }
+            else if (type === 'onboarding') {
+                return res.render('onboarding', {
+                    validSites: sites,
+                    unSavedSite: unSavedSite,
+                    hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+                    requestDemo: req.session.user.requestDemo,
+                    analyticsObj: JSON.stringify(req.session.analyticsObj)
+                });
+            }
         });
+    });
+};
+
+router
+    .get('/dashboard', function (req, res) {
+        return userModel.getAllUserSites(req.session.user.email)
+            .then(function (sites) {
+                var allUserSites = sites;
+                return dashboardRedirection(req, res, allUserSites);
+            })
+            .catch(function (err) {
+                var allUserSites = req.session.user.sites;
+                return dashboardRedirection(req, res, allUserSites, 'dashboard');
+            });
     })
     .get('/onboarding', function(req, res) {
         var allUserSites = req.session.user.sites;
-
-        function setEmailCookie() {
-            var cookieName = 'email',
-                // "Email" cookie has 1 year expiry and accessible through JavaScript
-                cookieOptions = { expires: new Date(Date.now() + (60 * 60 * 1000 * 24 * 365)), encode: String, httpOnly: false },
-                isCookieSet = (Object.keys(req.cookies).length > 0) && (typeof req.cookies[cookieName] !== 'undefined');
-
-            isCookieSet ? res.clearCookie(cookieName, cookieOptions) : '';
-            res.cookie(cookieName, req.session.user.email, cookieOptions);
-        }
-
-        function sitePromises() {
-            return _.map(allUserSites, function(obj) {
-                return siteModel.getSiteById(obj.siteId).then(function() {
-                    return obj;
-                }).catch(function() {
-                    return 'inValidSite';
-                });
-            });
-        }
-
-        return Promise.all(sitePromises()).then(function(validSites) {
-            var sites = _.difference(validSites, ['inValidSite']),
-                unSavedSite;
-
-            sites = (Array.isArray(sites) && (sites.length > 0)) ? sites : [];
-			/**
-			 * unSavedSite, Current user site object entered during signup
-			 *
-			 * - Value is Truthy (all user site/sites) only if user has
-			 * no saved any site through Visual Editor
-			 * - Value is Falsy if user has atleast one saved site
-			*/
-            unSavedSite = (sites.length === 0) ? allUserSites : null;
-            req.session.unSavedSite = unSavedSite;
-            
-            setEmailCookie(req, res);
-            res.render('onboarding', {
-                validSites: sites,
-                unSavedSite: unSavedSite,
-                hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-                requestDemo: req.session.user.requestDemo,
-                analyticsObj: JSON.stringify(req.session.analyticsObj)
-            });
-        });
-    })
-    .post('/setSiteStep', function(req, res) {
-		siteModel.setSiteStep(req.body.siteId, req.body.step)
-			.then(function(){ return userModel.setSitePageGroups(req.session.user.email) })
-			.then(function(user) {
-			    req.session.user = user;
+        return dashboardRedirection(req, res, allUserSites, 'onboarding');
+    });
+    .post('/setSiteStep', function (req, res) {
+        siteModel.setSiteStep(req.body.siteId, req.body.step)
+            .then(function () { return userModel.setSitePageGroups(req.session.user.email) })
+            .then(function (user) {
+                req.session.user = user;
 
                 if(req.body.completeOnboarding) {
                     user.set('requestDemo', true);
@@ -163,18 +142,18 @@ router
         }
 	})
     .post('/sendCode', function (req, res) {
-		var json = {
-			email: req.body.developerEmail,
-			code: req.body.headerCode
-		};
-		userModel.sendCodeToDev(json).then(function() {
-				res.send({success: 1});
-			})
-			.catch(function(e) {
-				res.send({success: 0});		
-			});
-	})
-    .get('/billing', function(req, res) {
+        var json = {
+            email: req.body.developerEmail,
+            code: req.body.headerCode
+        };
+        userModel.sendCodeToDev(json).then(function () {
+            res.send({ success: 1 });
+        })
+            .catch(function (e) {
+                res.send({ success: 0 });
+            });
+    })
+    .get('/billing', function (req, res) {
         res.render('billing', {
             user: req.session.user,
             isSuperUser: true
@@ -190,8 +169,7 @@ router
             .catch(function (err) {
                 res.redirect('/404');
             });
-    })
-    
+    })    
     .get('/addSite', function(req, res) {
         var allUserSites = req.session.user.sites,
             params = {};
@@ -206,7 +184,7 @@ router
         });
         res.render('addSite', params);
 	})
-    .post('/addSite', function(req, res) {
+    .post('/addSite', function (req, res) {
         var site = (req.body.site) ? utils.getSafeUrl(req.body.site) : req.body.site;
 
         userModel.addSite(req.session.user.email, site).spread(function(user, siteId) {
@@ -222,7 +200,7 @@ router
                 }
                 return res.send({success: 0});
         }).catch(function(err) {
-            return res.send({success: 0});
+            return res.send({success: 0};)
         });
     })
     .get('/logout', function (req, res) {

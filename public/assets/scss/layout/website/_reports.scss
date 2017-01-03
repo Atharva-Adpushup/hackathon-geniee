@@ -162,15 +162,16 @@
 								background: transparent !important;
 							}
 
-							> td:nth-child(6)
+							> td.js-ctr-tbody-item
 							{
 								font-size: 1.3em;
 								letter-spacing: 1px;
 								position: relative;
 
-								> .fa
+								> .fa.fa-info-circle
 								{
-									margin-left: 5px;
+									position: relative;
+									left: 20px;
 								}
 							}
 						}
@@ -182,6 +183,46 @@
 						text-transform: uppercase;
 						font-size: $RTTHFontSize;
 						border-top: 2px solid #ddd;
+					}
+				}
+
+				.btn
+				{
+					height: 34px;
+					padding: 0;
+					width: 40px;
+
+					&:active,
+					&:hover,
+					&:focus
+					{
+						background: $whiteColor;
+					}
+
+					&:active,
+					&:focus,
+					&.selected
+					{
+						box-shadow: 0 0 3px #888 inset;
+					}
+
+					> .fa
+					{
+						font-size: 1.5em;
+					}
+
+					&.btn-success
+					{
+						background: $GreenColor;
+						border-color: $GreenColor;
+						box-shadow: 0 0 3px $GreenColor inset;
+					}
+
+					&.btn-error
+					{
+						background: $primaryColorDark;
+						border-color: $primaryColorDark;
+						box-shadow: 0 0 3px $primaryColorDark inset;
 					}
 				}
 
@@ -215,10 +256,24 @@
 
 					> .fa.icon-caret
 					{
-						font-size: 2em;
-						left: 45px;
-						position: absolute;
-						top: 27%;
+						display: inline-block;
+						font-size: 1em;
+						font-weight: bold;
+						left: 25px;
+						position: relative;
+						transition: all .2s ease-in-out;
+
+						&:before
+						{
+							display: inline-block;
+							margin-right: 5px;
+							position: relative;
+						}
+
+						&:hover
+						{
+							font-size: 1.3em;
+						}
 					}
 
 					&.perf--high

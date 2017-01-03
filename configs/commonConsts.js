@@ -42,6 +42,12 @@ module.exports = {
 			}
 		}
 	},
+	site: {
+		mode: {
+			'DRAFT': 2,
+			'PUBLISH': 1
+		}
+	},
 	enums: {
 		priorities: {
 			EXISTING_OBJECT: 'EXISTING_OBJECT',

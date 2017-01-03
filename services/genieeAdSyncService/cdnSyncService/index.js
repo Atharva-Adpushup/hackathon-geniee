@@ -2,15 +2,27 @@ var path = require('path'),
     Promise = require('bluebird'),
     retry = require('bluebird-retry'),
     _ = require('lodash'),
+	moment = require('moment'),
     PromiseFtp = require('promise-ftp'),
+    genieeReportService = require('../../../reports/service'),
     ftp = new PromiseFtp(),
     mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
     fs = Promise.promisifyAll(require('fs')),
+    CC = require('../../../configs/commonConsts'),
     config = require('../../../configs/config');
 
 module.exports = function (site) {
     var jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'genieeAp.js'),
         tempDestPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'geniee', site.get('siteId').toString()),
+        isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
+        isGenieePartner = (!!(site.get('partner') && (site.get('partner') === CC.partners.geniee.name) && site.get('genieeMediaId') && isAutoOptimise)),
+		paramConfig = {
+			siteId: site.get('siteId'),
+            mediaId: site.get('genieeMediaId'),
+			dateFrom: moment().subtract(31, 'days').format('YYYY-MM-DD'),
+			dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
+		},
+        getReportsData = genieeReportService.getReport(paramConfig),
         getAdsPayload = function (variationSections) {
             var ads = [], ad = null, json, unsyncedAds = false;
             _.each(variationSections, function (section, sectionId) {
@@ -52,13 +64,20 @@ module.exports = function (site) {
             });
             return !unsyncedAds ? ads : [];
         },
-        getVariationsPayload = function (site) {
-            var finalJson = {}, temp, platform, pageGroup, variation;
+        getVariationsPayload = function (site, reportData) {
+            var finalJson = {};
+
             return site.getAllChannels().then(function (allChannels) {
                 _.each(allChannels, function (channel) {
+                    var platform, pageGroup, pageGroupData;
+                    
                     // sample name HOME_DESKTOP
                     platform = channel.platform; // last element is platform
                     pageGroup = channel.pageGroup; // join remaing to form pageGroup
+
+                    if (reportData && _.isObject(reportData) && channel.genieePageGroupId) {
+                        pageGroupData = reportData.pageGroups[channel.genieePageGroupId];
+                    }
 
                     if (!finalJson[platform]) {
                         finalJson[platform] = {};
@@ -70,16 +89,30 @@ module.exports = function (site) {
                     };
 
                     _.each(channel.variations, function (variation, id) {
-                        var ads = getAdsPayload(variation.sections);
+                        var ads = getAdsPayload(variation.sections),
+                            variationData = (pageGroupData && _.isObject(pageGroupData)) ? pageGroupData.variations[id] : null,
+                            isVariationData = !!(variationData && _.isObject(variationData)),
+                            computedVariationObj;
+
                         if (!ads.length) {
                             return true;
                         }
-                        finalJson[platform][pageGroup].variations.push({
+
+                        computedVariationObj = {
                             id: variation.id,
+                            name: variation.name,
                             traffic: variation.trafficDistribution,
                             customJs: variation.customJs,
-                            ads: ads
-                        });
+                            ads: ads,
+                            // Data required for auto optimiser model
+                            // Click is mapped as sum
+                            sum: ((isVariationData && parseInt(variationData.click, 10) > -1) ? variationData.click : 1),
+                            // Data required for auto optimiser model
+                            // Page view is mapped as count
+                            count: ((isVariationData && parseInt(variationData.pageViews, 10) > -1) ? variationData.pageViews : 1)
+                        };
+
+                        finalJson[platform][pageGroup].variations.push(computedVariationObj);
                     });
 
                     finalJson[platform][pageGroup].variations.sort(function (a, b) {
@@ -90,25 +123,38 @@ module.exports = function (site) {
                 return finalJson;
             });
         },
-        getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
-        getConfig = getVariationsPayload(site).then(function (allVariations) {
-            var apConfigs = site.get('apConfigs');
+        setAllConfigs = function (allVariations) {
+            var apConfigs = site.get('apConfigs'),
+                isAdPartner = !!(site.get('partner'));
+
+            isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
+            apConfigs.autoOptimise = (isAutoOptimise ? true : false);
+
             /* Temp Fields */
             apConfigs.mode = 1;
             //apConfigs.pageGroupPattern = [{ HOME: 'components' }];
             /* Temp Fields End */
             apConfigs.experiment = allVariations;
             return apConfigs;
+        },
+        getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
+        getComputedConfig = Promise.resolve(true).then(function() {
+            if (isGenieePartner) {
+                return getReportsData.then(function(reportData) {
+                    return getVariationsPayload(site, reportData).then(setAllConfigs);
+                });
+            } else {
+                return getVariationsPayload(site).then(setAllConfigs);
+            }
         }),
-        getFinalConfig = Promise.join(getConfig, getJsFile, function (finalConfig, jsFile) {
-            site.get('partner') ? finalConfig.partner = site.get('partner') : null;
+        getFinalConfig = Promise.join(getComputedConfig, getJsFile, function (finalConfig, jsFile) {
             jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(finalConfig));
             jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
             return jsFile;
         }),
         writeTempFile = function (jsFile) {
             return mkdirpAsync(tempDestPath).then(function () {
-                return fs.writeFileAsync(path.join(tempDestPath, 'genieeAp.js'), jsFile);
+                return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);
             })
         },
         cwd = function () {
@@ -128,7 +174,10 @@ module.exports = function (site) {
             return connectToServer()
                 .then(cwd)
                 .then(function () {
-                    return ftp.put(js, 'apex.js');
+                    return ftp.put(js, 'adpushup.js');
+                })
+                .then(function() {
+                    return js;
                 });
         };
 

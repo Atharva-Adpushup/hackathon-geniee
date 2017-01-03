@@ -1,4 +1,5 @@
 (function (w, d, $) {
+
     var a = (w.adpushup = w.adpushup || {});
 
     a.log = function(msg) {
@@ -6,6 +7,22 @@
             console.log(msg);
         }
     };
+
+    // a.detectExtension = function(extensionId, callback) { 
+    //     var img; 
+    //     img = new Image(); 
+    //     img.src = "chrome-extension://" + extensionId + "/images/icon.png"; 
+    //     img.onload = function() { 
+    //         callback(true); 
+    //     }; 
+    //     img.onerror = function() { 
+    //         callback(false); 
+    //     };
+    // }('dlngajepgieaffpcflbkccpahobnllol', function(installed) {
+    //     if(!installed) {
+    //         $('#extension-overlay').show();
+    //     }
+    // });
 
     a.notify = function(title, message, slide) {
         var opts, container;

@@ -4,6 +4,11 @@ block getTitle
     - var titleVar = "Settings"
 
 block append headScripts
+    script.
+        $(document).ready(function() {
+            window.selectedSiteId = !{siteId};
+            window.blocklist = '!{blocklist}' ? '!{blocklist}'.split(',') : []; 
+        });
     +loadAsset("js", [
         '/assets/js/libs/custom/settings.js',
     ])    
@@ -16,6 +21,48 @@ block bodyContent
         .pageContentWrapper.page-content
             .pageContentInner.page-content--inner
                 .notification-wrapper
+
+                #showHeaderCode.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+                    .modal-dialog
+                        .modal-content
+                            .modal-header
+                                button.close(type='button', data-dismiss='modal', aria-label='Close')
+                                    span(aria-hidden='true') ×
+                                h4#myModalLabel.modal-title Header Code
+                            .modal-body
+                                p.text-medium(style="margin: 10px 0 0;")
+                                    | Copy and paste this snippet in the head tag of your website
+                                div.snippet-wrapper
+                                    span.clipboard-copy Copied !
+                                    textarea.snippet(style="font-size: 1em;" id="header-code" readonly="" placeholder="AdPushup init code comes here..") 
+                                    div.snippet-btn-wrapper
+                                        div
+                                            button(style="width: 270px;" data-toggle="modal" data-target="#sendToDevModal" id="sendToDev" class="snippet-btn apbtn-main-line apbtn-small")
+                                                | Send Code to Developer
+                                                i.fa.fa-code
+                                            button(style="width: 270px;" id="clipboardCopy" class="snippet-btn apbtn-main-line apbtn-small") Copy to clipboard
+                                                i.fa.fa-clipboard
+
+                #sendToDevModal.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+                    .modal-dialog
+                        .modal-content
+                            .modal-header
+                                button.close(type='button', data-dismiss='modal', aria-label='Close')
+                                    span(aria-hidden='true') ×
+                                h4#myModalLabel.modal-title Send Code to Developer
+                            form.form-inline#sendCodeForm
+                                .modal-body.addSite
+                                    .form-group
+                                        .input-group
+                                            span.input-group-addon
+                                                i.fa.fa-envelope-o
+                                            input.form-control.input-lg(type='email', required=true, name='developerEmail', placeholder='Enter your developer\'s email')
+                                            input(type="hidden", name="headerCode", id="headerCodeInput")
+                                        .error-message 
+                                .modal-footer.row
+                                    .col-xs-12
+                                        button.btn-lightBg.btn.btn-block.btn-lg(id="sendCodeSubmit", type='submit') Send
+
                 #widgetsArea.row
                     .mb-30
                         .controlAdpushupWrap
@@ -45,25 +92,48 @@ block bodyContent
                                             .col-sm-5
                                                 .input-name Adpushup Percentage
                                             .col-sm-7
-                                                input.form-control(value="100" name="adpushupPercentage" type="number" min="0" max="100" placeholder="Enter Adpushup Percentage")
+                                                input.form-control(value=(apConfigs.adpushupPercentage ? apConfigs.adpushupPercentage : 100) name="adpushupPercentage" type="number" min="0" max="100" placeholder="Enter Adpushup Percentage")
                                         .row
                                             .col-sm-5
                                                 .input-name Heart Beat Min Interval
                                             .col-sm-7
-                                                input.form-control(value="30000" name="heartBeatMinInterval" type="number" placeholder="Enter Heart Beat Min Interval")
+                                                input.form-control(value=(apConfigs.heartBeatMinInterval ? apConfigs.heartBeatMinInterval : 30000) name="heartBeatMinInterval" type="number" placeholder="Enter Heart Beat Min Interval")
                                         .row
                                             .col-sm-5
                                                 .input-name Heart Beat Start Delay
                                             .col-sm-7
-                                                input.form-control(value="2000" name="heartBeatStartDelay" type="number" placeholder="Enter Heart Beat Start Delay")
+                                                input.form-control(value=(apConfigs.heartBeatStartDelay ? apConfigs.heartBeatStartDelay : 2000) name="heartBeatStartDelay" type="number" placeholder="Enter Heart Beat Start Delay")
                                         .row
                                             .col-sm-5
                                                 .input-name X Path Wait Timeout
                                             .col-sm-7
-                                                input.form-control(value="5000" name="xpathWaitTimeout" type="number" placeholder="Enter X Path Wait Timeout")
+                                                input.form-control(value=(apConfigs.xpathWaitTimeout ? apConfigs.xpathWaitTimeout : 5000) name="xpathWaitTimeout" type="number" placeholder="Enter X Path Wait Timeout")
+                                         .row
+                                            .col-sm-5
+                                                .input-name Auto Optimise
+                                            .col-sm-7
+                                                input(type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "true") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "true"))
+                                        .row
+                                            .col-sm-12#autoOptimiseErr.error-message
+                                        if !partner
+                                            .row
+                                                .col-sm-12
+                                                    h4 Manage Blocklist
+                                                .col-sm-12
+                                                    .row
+                                                        .col-sm-9
+                                                            input#blocklistItem.form-control(name="blocklistItem" type="text" placeholder="Enter Url or pattern to block")
+                                                        .col-sm-3
+                                                            button#addBlocklistItem.btn-primary(type="button") Add to blocklist
+                                                    .row
+                                                        div#blocklistErr.error-message(style="margin: 5px 15px 20px;")
+                                                        ul.blocklist
+
                                 hr
-                                .row
+                                .row.settings-btn-pane
                                     .col-sm-3
-                                        button.btn-primary Save Settings
+                                        button.btn-primary(type="button" data-toggle="modal" data-target="#showHeaderCode") View Init Code
+                                    .col-sm-3
+                                        button.btn-success Save Settings
                                 
 

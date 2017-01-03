@@ -156,6 +156,19 @@ function apiModule() {
 				return new Channel(json.value, json.cas);
 			});
 		},
+		isChannelExist: function (id) {
+			return couchbase.connectToAppBucket().then(function (appBucket) {
+				return appBucket.getAsync(id, {});
+			}).then(function () {
+				return true;
+			}).catch(function(e) {
+				if (e.name && e.name === 'CouchbaseError') {
+					return false;
+				}
+
+				return true;
+			});
+		},
 		getChannel: function (siteId, platform, pageGroup) {
 			return couchbase.connectToAppBucket().then(function (appBucket) {
 				return appBucket.getAsync('chnl::' + siteId + ':' + platform + ':' + pageGroup, {});
