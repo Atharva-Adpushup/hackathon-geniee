@@ -1,6 +1,7 @@
 var express = require('express'),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
+	channelModel = require('../models/channelModel'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	genieeService = require('../reports/service'),
 	adsenseReportModel = require('../models/adsenseModel'),
@@ -480,14 +481,18 @@ router
 
 		return userModel.verifySiteOwner(req.session.user.email, req.query.siteId).then(function() {
 			// TD = TrafficDistribution, FR = FinalReport
-			var config = req.query, getReport, getTDConfig, getVariationTD;
+			var config = req.query, getVariations, getReport, getTDConfig, getVariationTD;
 			config.siteId = parseInt(config.siteId, 10);
 			config.platform = (config.platform) ? config.platform.substring(0, 7) : null;
 			config.pageGroup = (config.pageGroup) ? config.pageGroup.substring(0, 30) : null;
 			config.startDate = (config.startDate) ? parseInt(config.startDate, 10) : 1448928000000;
 			config.endDate = (config.endDate) ? parseInt(config.endDate, 10) : Date.now();
 
-			getReport = Promise.resolve(reports.apexReport(config));
+			getVariations = channelModel.getVariations(config.siteId, config.platform, config.pageGroup);
+			getReport = getVariations.then(function(variationsData) {
+				config.variationCount = (variationsData && variationsData.count) ? parseInt(variationsData.count, 10) : 100;
+				return Promise.resolve(reports.apexReport(config));
+			});
 			getTDConfig = getReport.then(function(report) {
 				return getTrafficDistributionConfig(config, report);
 			});
@@ -495,7 +500,7 @@ router
 				return getVariationTrafficDistribution(trafficDistributionConfig);
 			});
 
-			return Promise.join(getReport, getTDConfig, getVariationTD, function(report, trafficDistributionConfig, trafficDistributionData) {
+			return Promise.join(getVariations, getReport, getTDConfig, getVariationTD, function(allVariations, report, trafficDistributionConfig, trafficDistributionData) {
 				return setTrafficDistribution(report, trafficDistributionData).then(function(reportWithTD) {
 					return setCTRPerformanceData(reportWithTD).then(function(reportWithCTRPerformance) {
 						return addEmptyDataFields(reportWithCTRPerformance).then(function(reportWithAddedFields) {
