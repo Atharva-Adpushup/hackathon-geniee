@@ -366,25 +366,21 @@ router
 				return site.getVariationConfig().then(function(variationConfig) {
 					var computedObj = {};
 
-					if (site.isApex()) {
-						if (!!variationConfig) {
-							config.variations.forEach(function(variationKey) {
-								var variationObj = variationConfig[variationKey];
+					if (!!variationConfig) {
+						config.variations.forEach(function(variationKey) {
+							var variationObj = variationConfig[variationKey];
 
-								if (variationConfig.hasOwnProperty(variationKey) && variationObj && (Number(variationObj.trafficDistribution) > -1)) {
-									computedObj[variationKey] = {
-										'name': variationObj.name,
-										'id': variationObj.id,
-										'value': variationObj.trafficDistribution
-									};
-								}
-							});
+							if (variationConfig.hasOwnProperty(variationKey) && variationObj && (Number(variationObj.trafficDistribution) > -1)) {
+								computedObj[variationKey] = {
+									'name': variationObj.name,
+									'id': variationObj.id,
+									'value': variationObj.trafficDistribution
+								};
+							}
+						});
 
-							return computedObj;
-						}
 						return computedObj;
 					}
-
 					return computedObj;
 				});
 			});
