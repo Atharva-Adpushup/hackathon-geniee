@@ -9,8 +9,8 @@ module.exports = function (grunt) {
         cssmin: {
             target: {
                 files: {
-                    'public/assets/css/master.min.css': ['public/assets/css/editor/master.css'],
-                    'public/assets/css/website.min.css': ['public/assets/css/website/website.css']
+                    'public/assets/css/builds/editor/editor.min.css': ['public/assets/css/libs/editor/editor.css'],
+                    'public/assets/css/builds/website/website.min.css': ['public/assets/css/libs/website/website.css']
                 }
             }
         },
@@ -50,13 +50,10 @@ module.exports = function (grunt) {
             }
         },
         sass: {
-            options: {
-                sourceMap: true
-            },
             dist: {
                 files: {
-                    'public/assets/css/editor.style.css': 'public/assets/scss/editor.style.scss',
-                    'public/assets/css/website.style.css': 'public/assets/scss/website.style.scss'
+                    'public/assets/css/libs/editor/editor.style.css': 'public/assets/scss/editor.style.scss',
+                    'public/assets/css/libs/website/website.style.css': 'public/assets/scss/website.style.scss'
                 }
             }
         }

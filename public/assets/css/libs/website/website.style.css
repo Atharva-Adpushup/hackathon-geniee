@@ -1444,7 +1444,7 @@ maxHeightWidth {
   margin: 20px auto; }
 
 .onboarding-step {
-  background-image: url("../images/adpushupbg.png");
+  background-image: url("../../../images/adpushupbg.png");
   background-repeat: no-repeat;
   background-position: -20px 128%;
   min-height: 360px;
@@ -1620,7 +1620,7 @@ maxHeightWidth {
   background-position: -20px 118.5%; }
 
 .ob-bg {
-  background-image: url("../images/adpushupbg.png"); }
+  background-image: url("../../../images/adpushupbg.png"); }
 
 .ob-bigbtn {
   font-size: 1.4em;
@@ -1674,7 +1674,7 @@ maxHeightWidth {
   margin-top: 10px; }
 
 .ob-ty {
-  background-image: url("../images/smily.png");
+  background-image: url("../../../images/smily.png");
   height: 430px;
   background-position: -20px 118%; }
   .pageContainer .pageContentWrapper .pageContentInner .row .ob-ty > .ob-heading {
@@ -1895,7 +1895,7 @@ maxHeightWidth {
       -o-border-radius: 3px;
       border-radius: 3px;
       overflow: hidden;
-      background: url(../images/select-arrow.png) no-repeat 130px #fff;
+      background: url(../../../images/select-arrow.png) no-repeat 130px #fff;
       border: 1px solid #e6e6e6; }
       #reports_control .navbar-default ul li.siteDomain .styleSelect select {
         background: transparent;
@@ -2411,7 +2411,7 @@ maxHeightWidth {
     border-bottom-left-radius: 0;
     text-align: center; }
     .LoginWrap .LoginHead > .LoginHead-logo {
-      background: url(../images/logo-full.png) center center/35% no-repeat;
+      background: url(../../../images/logo-full.png) center center/35% no-repeat;
       display: block;
       padding: 40px; }
     .LoginWrap .LoginHead h3 {
@@ -2500,7 +2500,7 @@ maxHeightWidth {
 /**************Overwrite generic bootstrap and custom components style**************************/
 /******Generic site rules*******/
 .wrapper.wrapper--page {
-  background: url(../images/banner-bg.jpg) top left/cover;
+  background: url(../../../images/banner-bg.jpg) top left/cover;
   height: 100%;
   width: 100%; }
 
@@ -2558,7 +2558,7 @@ maxHeightWidth {
   -o-border-radius: 3px;
   border-radius: 3px;
   overflow: hidden;
-  background: url(../images/select-arrow.png) no-repeat 103px #fff;
+  background: url(../../../images/select-arrow.png) no-repeat 103px #fff;
   border: 1px solid #e6e6e6; }
 
 .styleSelect:focus {
@@ -2566,7 +2566,7 @@ maxHeightWidth {
   outline: none; }
 
 #intercom-container .intercom-launcher-button {
-  background-image: url("../images/icon-launcher.png") !important; }
+  background-image: url("../../../images/icon-launcher.png") !important; }
 
 /***********Utility rules***********/
 .u-error {
@@ -2788,7 +2788,7 @@ maxHeightWidth {
     -o-border-radius: 3px;
     border-radius: 3px;
     box-shadow: none;
-    background: url("../images/adpushupbg.png") no-repeat -33px -24px #fff;
+    background: url("../../../images/adpushupbg.png") no-repeat -33px -24px #fff;
     min-height: 200px;
     overflow: hidden; }
     ._ap_modal_logo .modal-dialog .modal-content .modal-title {
@@ -2868,10 +2868,10 @@ maxHeightWidth {
         border-right-color: #eb575c; }
 
 ._ap_modal_logo._ap_modal_smily .modal-dialog .modal-content {
-  background: url("../images/smily.png") no-repeat -33px -24px #fff; }
+  background: url("../../../images/smily.png") no-repeat -33px -24px #fff; }
 
 ._ap_modal_logo._ap_modal_sad .modal-dialog .modal-content {
-  background: url("../images/sadFace.png") no-repeat -33px -24px #fff; }
+  background: url("../../../images/sadFace.png") no-repeat -33px -24px #fff; }
 
 @-webkit-keyframes spinnerM {
   0% {
@@ -3170,5 +3170,3 @@ maxHeightWidth {
 
 .removeBlocklistItem:hover {
   cursor: pointer; }
-
-/*# sourceMappingURL=website.style.css.map */

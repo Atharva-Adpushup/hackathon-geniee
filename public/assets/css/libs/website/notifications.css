@@ -38,7 +38,7 @@
     height: 48px;
     top: 3px;
     left: 6px;
-    background: transparent url(../../images/messages/notice.png) no-repeat 0 0;
+    background: transparent url(../../../images/messages/notice.png) no-repeat 0 0;
     z-index: 1;
 }
 .freeow .close {
@@ -50,19 +50,19 @@
     right: 8px;
     z-index: 2;
     opacity:0.3;
-    background: transparent url(../../images/messages/close.png) no-repeat 0 0;
+    background: transparent url(../../../images/messages/close.png) no-repeat 0 0;
 }
 .freeow div:hover .close {
-    background: transparent url(../../images/messages/close.png) no-repeat 0 0;
+    background: transparent url(../../../images/messages/close.png) no-repeat 0 0;
     opacity :0.8;
 }
 
 
 /* Icons -------------------------------------------------------------------- */
 
-.freeow .slide .icon   { background-image: url(../../images/messages/slide.png); }
-.freeow .pushpin .icon { background-image: url(../../images/messages/pushpin.png); }
-.freeow .error .icon   { background-image: url(../../images/messages/error.png); }
+.freeow .slide .icon   { background-image: url(../../../images/messages/slide.png); }
+.freeow .pushpin .icon { background-image: url(../../../images/messages/pushpin.png); }
+.freeow .error .icon   { background-image: url(../../../images/messages/error.png); }
 
 
 /* Specific Styles ---------------------------------------------------------- */

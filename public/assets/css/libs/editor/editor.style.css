@@ -63,7 +63,7 @@ li, ul {
   width: 20px;
   height: 20px;
   content: "";
-  background: url("../images/icons/append.png") no-repeat center center;
+  background: url("../../../images/icons/append.png") no-repeat center center;
   background-size: 75% 83%; }
 
 .ap-prepend:before {
@@ -71,7 +71,7 @@ li, ul {
   width: 20px;
   height: 20px;
   content: "";
-  background: url("../images/icons/prepend.png") no-repeat center center;
+  background: url("../../../images/icons/prepend.png") no-repeat center center;
   background-size: 75% 83%; }
 
 .ap-insertafter:before {
@@ -79,7 +79,7 @@ li, ul {
   width: 20px;
   height: 20px;
   content: "";
-  background: url("../images/icons/insertafter.png") no-repeat center center;
+  background: url("../../../images/icons/insertafter.png") no-repeat center center;
   background-size: 75% 83%; }
 
 .ap-insertbefore:before {
@@ -87,7 +87,7 @@ li, ul {
   width: 20px;
   height: 20px;
   content: "";
-  background: url("../images/icons/insertbefore.png") no-repeat center center;
+  background: url("../../../images/icons/insertbefore.png") no-repeat center center;
   background-size: 75% 83%; }
 
 .MenuBarComponentWrap .MenuBarContainerWrapper h5.head i.btn-edit-css {
@@ -99,25 +99,25 @@ li, ul {
 .MenuBarComponentWrap .MenuBarContainerWrapper h5.head i.ap-prepend {
   padding-top: 1px; }
   .MenuBarComponentWrap .MenuBarContainerWrapper h5.head i.ap-prepend::before {
-    background: url("../images/icons/prepend-dark.png") no-repeat center center;
+    background: url("../../../images/icons/prepend-dark.png") no-repeat center center;
     background-size: 55% 63%; }
 
 .MenuBarComponentWrap .MenuBarContainerWrapper h5.head i.ap-append {
   padding-top: 1px; }
   .MenuBarComponentWrap .MenuBarContainerWrapper h5.head i.ap-append::before {
-    background: url("../images/icons/append-dark.png") no-repeat center center;
+    background: url("../../../images/icons/append-dark.png") no-repeat center center;
     background-size: 55% 63%; }
 
 .MenuBarComponentWrap .MenuBarContainerWrapper h5.head i.ap-insertafter {
   padding-top: 1px; }
   .MenuBarComponentWrap .MenuBarContainerWrapper h5.head i.ap-insertafter::before {
-    background: url("../images/icons/insertafter-dark.png") no-repeat center center;
+    background: url("../../../images/icons/insertafter-dark.png") no-repeat center center;
     background-size: 55% 63%; }
 
 .MenuBarComponentWrap .MenuBarContainerWrapper h5.head i.ap-insertbefore {
   padding-top: 1px; }
   .MenuBarComponentWrap .MenuBarContainerWrapper h5.head i.ap-insertbefore::before {
-    background: url("../images/icons/insertbefore-dark.png") no-repeat center center;
+    background: url("../../../images/icons/insertbefore-dark.png") no-repeat center center;
     background-size: 55% 63%; }
 
 /* ADDS A BROWSER PREFIX TO THE PROPERTY */
@@ -1251,7 +1251,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
 /**************Overwrite generic bootstrap and custom components style**************************/
 /******Generic site rules*******/
 .wrapper.wrapper--page {
-  background: url(../images/banner-bg.jpg) top left/cover;
+  background: url(../../../images/banner-bg.jpg) top left/cover;
   height: 100%;
   width: 100%; }
 
@@ -1309,7 +1309,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   -o-border-radius: 3px;
   border-radius: 3px;
   overflow: hidden;
-  background: url(../images/select-arrow.png) no-repeat 103px #fff;
+  background: url(../../../images/select-arrow.png) no-repeat 103px #fff;
   border: 1px solid #e6e6e6; }
 
 .styleSelect:focus {
@@ -1317,7 +1317,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   outline: none; }
 
 #intercom-container .intercom-launcher-button {
-  background-image: url("../images/icon-launcher.png") !important; }
+  background-image: url("../../../images/icon-launcher.png") !important; }
 
 /***********Utility rules***********/
 .u-error {
@@ -1715,7 +1715,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
     bottom: 0px;
     z-index: -1; }
     .tabAreaWrap .tabContent .tabContentbg {
-      background: url("../images/clickHere.png") no-repeat 48px 6px;
+      background: url("../../../images/clickHere.png") no-repeat 48px 6px;
       background-size: 50%;
       height: 100%;
       width: 100%; }
@@ -1830,7 +1830,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
     -o-border-radius: 3px;
     border-radius: 3px;
     box-shadow: none;
-    background: url("../images/adpushupbg.png") no-repeat -33px -24px #fff;
+    background: url("../../../images/adpushupbg.png") no-repeat -33px -24px #fff;
     min-height: 200px;
     overflow: hidden; }
     ._ap_modal_logo .modal-dialog .modal-content .modal-title {
@@ -1910,10 +1910,10 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
         border-right-color: #eb575c; }
 
 ._ap_modal_logo._ap_modal_smily .modal-dialog .modal-content {
-  background: url("../images/smily.png") no-repeat -33px -24px #fff; }
+  background: url("../../../images/smily.png") no-repeat -33px -24px #fff; }
 
 ._ap_modal_logo._ap_modal_sad .modal-dialog .modal-content {
-  background: url("../images/sadFace.png") no-repeat -33px -24px #fff; }
+  background: url("../../../images/sadFace.png") no-repeat -33px -24px #fff; }
 
 @-webkit-keyframes spinnerM {
   0% {
@@ -2216,14 +2216,14 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   height: 999px;
   margin: 15px auto 15px;
   padding: 117px 27px 117px 29px;
-  background: url("../images/iPhone6s-white-portrait.png") no-repeat; }
+  background: url("../../../images/iPhone6s-white-portrait.png") no-repeat; }
 
 .ipadAirPortrait {
   width: 873px;
   height: 1244px;
   margin: 15px auto 15px;
   padding: 109px 53px 111px 52px;
-  background: url("../images/ipad-air-portrait.png") no-repeat; }
+  background: url("../../../images/ipad-air-portrait.png") no-repeat; }
 
 .platform.desktopEditor.desktopEditor--adrecover {
   /*****TODO: Replace below absolute position hack with flexbox
@@ -2512,7 +2512,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
           width: 40px;
           top: 0;
           position: absolute;
-          background: url("../images/icons/cross.png") no-repeat center center;
+          background: url("../../../images/icons/cross.png") no-repeat center center;
           background-size: 7px 7px; }
         .MenuBarComponentWrap .MenuBarWrapper li .MenuBarItem.active {
           background: #eb575c; }
@@ -2922,7 +2922,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
   #SideBarWrapper .SideBarIcon.SideBarIcon-inactive {
     visibility: hidden; }
   #SideBarWrapper .SideBarIcon .SideBarIcon-button {
-    background: url(../images/adpushuplogo.png) no-repeat;
+    background: url(../../../images/adpushuplogo.png) no-repeat;
     -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
     border-radius: 50%;
@@ -3267,7 +3267,7 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
       left: 50%;
       margin-left: -45px;
       margin-top: -45px;
-      background: url("../images/replay.png") no-repeat center center #eb575c;
+      background: url("../../../images/replay.png") no-repeat center center #eb575c;
       width: 84px;
       height: 84px;
       border: 6px solid #fff;
@@ -3771,5 +3771,3 @@ maxHeightWidth, .desktopEditor, .desktopEditor .desktopViePort, .iphone6sPortrai
 
 .section-name-ie > div {
   height: 45px; }
-
-/*# sourceMappingURL=editor.style.css.map */
