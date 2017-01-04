@@ -240,6 +240,7 @@ var es = require('../helpers/elasticSearchService'),
 		if (resultIsValid(r)) {
 			var header = ['Variation', 'CTR (PERFORMANCE %)', 'Traffic (%)'],
 				footer = new Array(3),
+				variationRegex = (/[\w]{8}_[\w]{4}_[\w]{4}_[\w]{4}_[\w]{12}/),
 				rows = [], trackedData = {}, platformArr = r.aggregations.PLATFORM.buckets,
 				rowItem, result, chosenVariationArr, adsClickedArr;
 
@@ -251,8 +252,14 @@ var es = require('../helpers/elasticSearchService'),
 					rowItem = new Array(3);
 					adsClickedArr = chosenVariationItem.ADS_CLICKED.buckets;
 
+					// Return false if variation key is not a manipulated UUID (- replaced with _)
+					if (!variationRegex.test(chosenVariationItem.key)) {
+						return false;
+					}
+
 					// Variation Name value
-					variationName = chosenVariationItem.key;
+					//NOTE: Replacement of '_' as '-' due to Elastic Search default analyzer dash split issue
+					variationName = chosenVariationItem.key.replace(/_/g, "-");
 					// Traffic value
 					traffic = 0;
 					// Page Views value
