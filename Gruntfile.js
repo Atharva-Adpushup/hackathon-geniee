@@ -2,15 +2,15 @@ module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         watch: {
-            options: {spawn: false},
+            options: { spawn: false },
             files: ['public/assets/scss/**/*.scss'],
             tasks: ['sass']
         },
         cssmin: {
             target: {
                 files: {
-                    'public/assets/css/builds/editor/editor.min.css': ['public/assets/css/libs/editor/editor.css'],
-                    'public/assets/css/builds/website/website.min.css': ['public/assets/css/libs/website/website.css']
+                    'public/assets/css/builds/editor.min.css': ['public/assets/css/libs/editor.css'],
+                    'public/assets/css/builds/website.min.css': ['public/assets/css/libs/website.css']
                 }
             }
         },
@@ -31,7 +31,7 @@ module.exports = function (grunt) {
         browserify: {
             options: {
                 browserifyOptions: {
-                    basedir: "."  
+                    basedir: "."
                 },
             },
             Signup: {
@@ -49,11 +49,33 @@ module.exports = function (grunt) {
                 dest: 'public/assets/js/builds/base-libs-build.js'
             }
         },
+        concat: {
+            websiteCSSBuild: {
+                src: ['public/assets/css/third-party/bootstrap.css', 
+                    'public/assets/css/third-party/bootstrap-multiselect.css', 
+                    'public/assets/css/third-party/fontAwesome.css',
+                    'public/assets/css/libs/website.style.css',
+                    'public/assets/css/libs/notifications.css'],
+                dest: 'public/assets/css/libs/website.css',
+            },
+            editorCSSBuild: {
+                src: ['public/assets/css/third-party/bootstrap.css', 
+                    'public/assets/css/third-party/bootflat.css', 
+                    'public/assets/css/third-party/fontAwesome.css',
+                    'public/assets/css/libs/editor.style.css',
+                    'public/assets/css/third-party/colorpicker.css',
+                    'public/assets/css/third-party/introjs.min.css',
+                    'public/assets/css/third-party/bootstrap.icons.css',
+                    'public/assets/css/third-party/codemirror.min.css',
+                    'public/assets/css/third-party/solarized.min.css'],
+                dest: 'public/assets/css/libs/editor.css',
+            },
+        },
         sass: {
             dist: {
                 files: {
-                    'public/assets/css/libs/editor/editor.style.css': 'public/assets/scss/editor.style.scss',
-                    'public/assets/css/libs/website/website.style.css': 'public/assets/scss/website.style.scss'
+                    'public/assets/css/libs/editor.style.css': 'public/assets/scss/editor.style.scss',
+                    'public/assets/css/libs/website.style.css': 'public/assets/scss/website.style.scss'
                 }
             }
         }
@@ -64,10 +86,11 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-sass');
-    
+    grunt.loadNpmTasks('grunt-contrib-concat');
+
     grunt.registerTask('sasswatch', ['watch', 'cssmin']);
 
     grunt.registerTask('default', [
-        'browserify', 'sass', 'uglify', 'cssmin'
+        'browserify', 'sass', 'concat', 'uglify', 'cssmin'
     ]);
 };

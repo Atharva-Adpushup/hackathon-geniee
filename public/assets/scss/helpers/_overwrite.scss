@@ -4,7 +4,7 @@
 {
     &.wrapper--page
     {
-        background: url(../../../images/banner-bg.jpg) top left/cover;
+        background: url(../../images/banner-bg.jpg) top left/cover;
         height: 100%;
         width: 100%;
     }
@@ -72,7 +72,7 @@
   height: 30px;
   @include border-radius(3px);
   overflow: hidden;
-  background: url(../../../images/select-arrow.png) no-repeat 103px #fff;
+  background: url(../../images/select-arrow.png) no-repeat 103px #fff;
   border: 1px solid #e6e6e6;
 }
 .styleSelect:focus {
@@ -82,7 +82,7 @@
 
 #intercom-container .intercom-launcher-button
 {
-	background-image: url("../../../images/icon-launcher.png") !important;
+	background-image: url("../../images/icon-launcher.png") !important;
 }
 
 /***********Utility rules***********/

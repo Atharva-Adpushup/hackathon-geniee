@@ -4,7 +4,7 @@
     width: 20px;
     height: 20px;
     content: "";
- 	 background: url("../../../images/icons/append.png") no-repeat center center;
+ 	 background: url("../../images/icons/append.png") no-repeat center center;
   	background-size: 75% 83%;
 }
 .ap-prepend:before
@@ -13,7 +13,7 @@
     width: 20px;
     height: 20px;
     content: "";
- 	 background: url("../../../images/icons/prepend.png") no-repeat center center;
+ 	 background: url("../../images/icons/prepend.png") no-repeat center center;
   	background-size: 75% 83%;
 }
 .ap-insertafter:before
@@ -22,7 +22,7 @@
     width: 20px;
     height: 20px;
     content: "";
- 	 background: url("../../../images/icons/insertafter.png") no-repeat center center;
+ 	 background: url("../../images/icons/insertafter.png") no-repeat center center;
   	background-size: 75% 83%;
 }
 .ap-insertbefore:before
@@ -31,7 +31,7 @@
     width: 20px;
     height: 20px;
     content: "";
- 	 background: url("../../../images/icons/insertbefore.png") no-repeat center center;
+ 	 background: url("../../images/icons/insertbefore.png") no-repeat center center;
   	background-size: 75% 83%;
 }
 
@@ -58,7 +58,7 @@
           padding-top: 1px;
           &::before 
           {
-            background: url("../../../images/icons/prepend-dark.png") no-repeat center center;
+            background: url("../../images/icons/prepend-dark.png") no-repeat center center;
             background-size: 55% 63%;
           }
         }
@@ -67,7 +67,7 @@
           padding-top: 1px;
           &::before 
           {
-            background: url("../../../images/icons/append-dark.png") no-repeat center center;
+            background: url("../../images/icons/append-dark.png") no-repeat center center;
             background-size: 55% 63%;
           }
         }
@@ -76,7 +76,7 @@
           padding-top: 1px;
           &::before 
           {
-            background: url("../../../images/icons/insertafter-dark.png") no-repeat center center;
+            background: url("../../images/icons/insertafter-dark.png") no-repeat center center;
             background-size: 55% 63%;
           }
         }
@@ -85,7 +85,7 @@
           padding-top: 1px;
           &::before 
           {
-            background: url("../../../images/icons/insertbefore-dark.png") no-repeat center center;
+            background: url("../../images/icons/insertbefore-dark.png") no-repeat center center;
             background-size: 55% 63%;
           }
         }

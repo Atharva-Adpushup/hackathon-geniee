@@ -3,14 +3,15 @@ block getTitle
     - var titleVar = utils.domanize(domain)
 
 block headCss
+    link(href="http://fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic&subset=latin,latin-ext", rel='stylesheet', type='text/css')
     if environment == "production"
         +loadAsset("css", [
             //'//vjs.zencdn.net/4.12/video-js.css',
             '/assets/css/third-party/dataTables.css',
-            '/assets/css/builds/editor/editor.min.css'
+            '/assets/css/builds/editor.min.css'
         ])
     else
-        link(href="/assets/css/libs/editor/editor.css", rel="stylesheet", type="text/css")
+        link(href="/assets/css/libs/editor.css", rel="stylesheet", type="text/css")
 
     +loadAsset("css", [
         '/assets/css/third-party/c3.css',

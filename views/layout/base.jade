@@ -10,9 +10,9 @@ html(lang="en")
                 block headCss
                     link(href='http://fonts.googleapis.com/css?family=Karla', rel='stylesheet', type='text/css')
                     if environment == "production"
-                        link(href="/assets/css/builds/website/website.min.css", rel="stylesheet", type="text/css")
+                        link(href="/assets/css/builds/website.min.css", rel="stylesheet", type="text/css")
                     else
-                        link(href="/assets/css/libs/website/website.css", rel="stylesheet", type="text/css")
+                        link(href="/assets/css/libs/website.css", rel="stylesheet", type="text/css")
 
                 link(id="favicon", rel="shortcut icon", href="/assets/images/favicon.ico", sizes="48x48", type="image/png")
                 title #{titleVar + " - AdPushup"}
