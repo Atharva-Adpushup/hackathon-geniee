@@ -70,7 +70,6 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
@@ -80,6 +79,6 @@ module.exports = function (grunt) {
     grunt.registerTask('sasswatch', ['watch', 'cssmin']);
 
     grunt.registerTask('default', [
-        'browserify', 'sass', 'concat', 'uglify', 'cssmin'
+        'sass', 'concat', 'uglify', 'cssmin'
     ]);
 };
