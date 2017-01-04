@@ -16,40 +16,29 @@ module.exports = function (grunt) {
         },
         uglify: {
             baseLibsBuild: {
-                src: ['public/assets/js/builds/base-libs-build.js'],
-                dest: 'public/assets/js/builds/base-libs-build.min.js'
+                src: ['public/assets/js/libs/custom/base-libs.js'],
+                dest: 'public/assets/js/builds/base-libs.min.js'
             },
             onboardingBuild: {
                 src: ['public/assets/js/libs/custom/adpushup-onboarding.js'],
                 dest: 'public/assets/js/builds/adpushup-onboarding.min.js'
             },
             signupBuild: {
-                src: ['public/assets/js/build/signup-build.js'],
-                dest: 'public/assets/js/build/signup-build.min.js'
+                src: ['public/assets/js/libs/custom/signup.js'],
+                dest: 'public/assets/js/builds/signup.min.js'
             },
         },
-        browserify: {
-            options: {
-                browserifyOptions: {
-                    basedir: "."
-                },
-            },
-            Signup: {
-                src: ['public/assets/js/libs/custom/signup.js'],
-                dest: 'public/assets/js/build/signup-build.js'
-            },
-            BaseLibs: {
+        concat: {
+            baseLibsBuild: {
                 src: [
                     'public/assets/js/libs/third-party/bootstrap.js',
                     'public/assets/js/libs/third-party/bootstrap-multiselect.js',
                     'public/assets/js/libs/third-party/notifications.js',
-                    'public/assets/js/appEvent.js',
+                    'public/assets/js/libs/custom/appEvent.js',
                     'Editor/app/libs/adpushup.js'
                 ],
-                dest: 'public/assets/js/builds/base-libs-build.js'
-            }
-        },
-        concat: {
+                dest: 'public/assets/js/libs/custom/base-libs.js'
+            },
             websiteCSSBuild: {
                 src: ['public/assets/css/third-party/bootstrap.css', 
                     'public/assets/css/third-party/bootstrap-multiselect.css', 

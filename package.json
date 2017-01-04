@@ -61,7 +61,6 @@
     "eslint-plugin-jsx-a11y": "^1.0.4",
     "eslint-plugin-react": "^5.0.1",
     "grunt": "~0.4.5",
-    "grunt-browserify": "~3.8.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-cssmin": "~0.12.3",
     "grunt-contrib-uglify": "~0.9.1",

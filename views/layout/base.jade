@@ -27,7 +27,7 @@ html(lang="en")
                         window.apjQuery = window.jQuery;
 
                     - var baseLibsStr = "/assets/js/builds/";
-                    - var baseLibsFinalStr = (environment == "production") ? (baseLibsStr + "base-libs-build.min.js") : (baseLibsStr + "base-libs-build.js");
+                    - var baseLibsFinalStr = (environment == "production") ? (baseLibsStr + "base-libs.min.js") : ("/assets/js/libs/custom/base-libs.js");
                     +loadAsset("js", [baseLibsFinalStr])
 
                     script(type='text/javascript').
