@@ -97,7 +97,7 @@ var es = require('../helpers/elasticSearchService'),
 			b = esqm.createBoolFilter(),
 			rangeFilter = esqm.createRangeFilter('createdTs', startDate, endDate),
 			timeOnSiteAgg = {"TIME_ON_SITE":{"terms":{"field":"userAnalytics.timeOnSite","size":5,"order":{"_count":"desc"}},"aggs":{}}},
-			aggs = {"PLATFORM":{"terms":{"field":"userAnalytics.platform","size":5,"order":{"_count":"desc"}},"aggs":{"CHOSEN_VARIATION":{"terms":{"field":"variationId","size":5,"order":{"_count":"desc"}},"aggs":{"ADS_CLICKED":{"terms":{"field":"ads.clicked","size":5,"order":{"_count":"desc"}}}}}}}},
+			aggs = {"PLATFORM":{"terms":{"field":"userAnalytics.platform","size":5,"order":{"_term":"desc"}},"aggs":{"CHOSEN_VARIATION":{"terms":{"field":"variationId","size":10},"aggs":{"ADS_CLICKED":{"terms":{"field":"ads.clicked","size":5}}}}}}},
 			esQueryString = ((config.queryString) ? config.queryString : 'tracking:true AND mode:1'),
 			esQuery = {
 				'query_string': {
