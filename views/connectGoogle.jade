@@ -43,7 +43,7 @@ block bodyContent
                                 .col-sm-3
                                     img.img-responsive(src="/assets/images/onboarding/3.png" alt="Connect Google AdSense")
                                 .col-sm-9.mT-10
-                                    p.widget-text.mT-10
+                                    p.widget-text.mT-10.top
                                         | Connecting your Google AdSense account with AdPushup helps us to pull your AdSense reports so that you can conveniently view them in one place.
                                     .mT-10
                                         if !adNetworkSettings
@@ -51,6 +51,13 @@ block bodyContent
                                         else
                                             button.btn.btn-lightBg.btn-default.widget-btn(style="pointer-events: none;") Google AdSense Connected 
                                                 i.fa.fa-check
+                                    .pub-info
+                                        p.widget-text 
+                                            | Pub Id : 
+                                            span.primary-text!= adNetworkSettings.pubId
+                                        p.widget-text
+                                            | Email : 
+                                            != adNetworkSettings.email
                                     
 
                

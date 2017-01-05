@@ -1404,11 +1404,23 @@ maxHeightWidth {
     border-bottom: 1px solid #ccc;
     color: #555555; }
 
+.primary-text {
+  color: #eb575c; }
+
 .widget-text {
   color: #555555;
   font-size: 1.35em;
-  padding: 15px 0;
   line-height: 25px; }
+  .widget-text .primary-text {
+    background-color: #f6f7f8;
+    padding: 5px;
+    border: 1px solid #ebf1f2;
+    border-radius: 2px; }
+  .widget-text.top {
+    padding: 15px 0; }
+
+.pub-info {
+  margin: 20px 0 45px; }
 
 .btn.widget-btn {
   font-size: 1.2em;
