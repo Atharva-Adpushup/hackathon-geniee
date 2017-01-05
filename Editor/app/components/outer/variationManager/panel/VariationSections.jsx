@@ -38,6 +38,12 @@ const variationSections = (props) => {
 										submitHandler={onRenameSection.bind(null, section, variation.id)} text="Section Name" errorMessage="Section Name cannot be blank"
 									/>
 								</Col>
+								<Col className="u-padding-r10px" xs={12}>
+									<Row>
+										<Col className="u-padding-r10px" xs={4}>Size</Col>
+										<Col xs={8}><strong>{section.ads[0].width} x {section.ads[0].height}</strong></Col>											
+									</Row>
+								</Col>
 							</Row>
 							{ section.isIncontent ? (
 								<div>
