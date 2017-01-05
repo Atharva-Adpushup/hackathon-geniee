@@ -28,7 +28,7 @@ var modelAPI = module.exports = apiModule(),
 		};
 		this.defaults = {
 			sites: [],
-			adNetworkSettings: {},
+			adNetworkSettings: [],
 			requestDemo: true
 		};
 		this.ignore = ['password', 'oldPassword', 'confirmPassword', 'site'];
@@ -111,7 +111,9 @@ var modelAPI = module.exports = apiModule(),
 				if (!me.get('adNetworkSettings')) {// some how we don't have this object then create an empty array;
 					me.set('adNetworkSettings', []);
 				}
-				me.set('adNetworkSettings', data);
+				var adNetworkSettings = me.get('adNetworkSettings');
+				adNetworkSettings.push(data);
+				me.set('adNetworkSettings', adNetworkSettings);
 				return me.save().then(function() {
 					return resolve(me);
 				}).catch(function(err) {

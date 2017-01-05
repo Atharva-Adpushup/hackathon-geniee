@@ -148,7 +148,7 @@ router
         return userModel.getUserByEmail(req.session.user.email)
             .then(function (user) {
                 return res.render('connectGoogle', {
-                    adNetworkSettings: !_.isEmpty(user.get('adNetworkSettings')) ? user.get('adNetworkSettings').adsenseAccounts[0] : false
+                    adNetworkSettings: !_.isEmpty(user.get('adNetworkSettings')) ? _.find(user.get('adNetworkSettings'), {'networkName': 'ADSENSE'}).adsenseAccounts[0] : false
                 });
             })
             .catch(function (err) {
