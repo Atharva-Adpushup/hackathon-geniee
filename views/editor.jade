@@ -3,19 +3,20 @@ block getTitle
     - var titleVar = utils.domanize(domain)
 
 block headCss
+    link(href="http://fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic&subset=latin,latin-ext", rel='stylesheet', type='text/css')
     if environment == "production"
         +loadAsset("css", [
             //'//vjs.zencdn.net/4.12/video-js.css',
-            '/assets/css/dataTables.css',
-            '/assets/css/master.min.css'
+            '/assets/css/third-party/dataTables.css',
+            '/assets/css/builds/editor.min.css'
         ])
     else
-        link(href="/assets/css/editor/master.css", rel="stylesheet", type="text/css")
+        link(href="/assets/css/libs/editor.css", rel="stylesheet", type="text/css")
 
     +loadAsset("css", [
-        '/assets/css/c3.css',
+        '/assets/css/third-party/c3.css',
         //'//vjs.zencdn.net/4.12/video-js.css',
-        '/assets/css/dataTables.css'
+        '/assets/css/third-party/dataTables.css'
     ])
 
 block append headScripts
@@ -36,7 +37,7 @@ block append headScripts
             '/assets/js/react-dom.js',
             //'//vjs.zencdn.net/4.12/video.js',
             //'/assets/js/builds/shim.js',
-            // '/assets/js/underscore.js',
+            // '/assets/js/libs/third-party/underscore.js',
             //'/assets/js/lodash.js',
             '/assets/js/builds/outer.js'
         ])

@@ -1,6 +1,7 @@
 var express = require('express'),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
+	channelModel = require('../models/channelModel'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	genieeService = require('../reports/service'),
 	adsenseReportModel = require('../models/adsenseModel'),
@@ -365,25 +366,21 @@ router
 				return site.getVariationConfig().then(function(variationConfig) {
 					var computedObj = {};
 
-					if (site.isApex()) {
-						if (!!variationConfig) {
-							config.variations.forEach(function(variationKey) {
-								var variationObj = variationConfig[variationKey];
+					if (!!variationConfig) {
+						config.variations.forEach(function(variationKey) {
+							var variationObj = variationConfig[variationKey];
 
-								if (variationConfig.hasOwnProperty(variationKey) && variationObj && (Number(variationObj.trafficDistribution) > -1)) {
-									computedObj[variationKey] = {
-										'name': variationObj.name,
-										'id': variationObj.id,
-										'value': variationObj.trafficDistribution
-									};
-								}
-							});
+							if (variationConfig.hasOwnProperty(variationKey) && variationObj && (Number(variationObj.trafficDistribution) > -1)) {
+								computedObj[variationKey] = {
+									'name': variationObj.name,
+									'id': variationObj.id,
+									'value': variationObj.trafficDistribution
+								};
+							}
+						});
 
-							return computedObj;
-						}
 						return computedObj;
 					}
-
 					return computedObj;
 				});
 			});
@@ -480,14 +477,18 @@ router
 
 		return userModel.verifySiteOwner(req.session.user.email, req.query.siteId).then(function() {
 			// TD = TrafficDistribution, FR = FinalReport
-			var config = req.query, getReport, getTDConfig, getVariationTD;
+			var config = req.query, getVariations, getReport, getTDConfig, getVariationTD;
 			config.siteId = parseInt(config.siteId, 10);
 			config.platform = (config.platform) ? config.platform.substring(0, 7) : null;
 			config.pageGroup = (config.pageGroup) ? config.pageGroup.substring(0, 30) : null;
 			config.startDate = (config.startDate) ? parseInt(config.startDate, 10) : 1448928000000;
 			config.endDate = (config.endDate) ? parseInt(config.endDate, 10) : Date.now();
 
-			getReport = Promise.resolve(reports.apexReport(config));
+			getVariations = channelModel.getVariations(config.siteId, config.platform, config.pageGroup);
+			getReport = getVariations.then(function(variationsData) {
+				config.variationCount = (variationsData && variationsData.count) ? parseInt(variationsData.count, 10) : 100;
+				return Promise.resolve(reports.apexReport(config));
+			});
 			getTDConfig = getReport.then(function(report) {
 				return getTrafficDistributionConfig(config, report);
 			});
@@ -495,7 +496,7 @@ router
 				return getVariationTrafficDistribution(trafficDistributionConfig);
 			});
 
-			return Promise.join(getReport, getTDConfig, getVariationTD, function(report, trafficDistributionConfig, trafficDistributionData) {
+			return Promise.join(getVariations, getReport, getTDConfig, getVariationTD, function(allVariations, report, trafficDistributionConfig, trafficDistributionData) {
 				return setTrafficDistribution(report, trafficDistributionData).then(function(reportWithTD) {
 					return setCTRPerformanceData(reportWithTD).then(function(reportWithCTRPerformance) {
 						return addEmptyDataFields(reportWithCTRPerformance).then(function(reportWithAddedFields) {
@@ -575,8 +576,22 @@ router
 			}
 			next(err);
 		});
-	});
+	})
 
+	.get('/performESSearch', function(req, res) {
+		var startDate = req.query.startDate ? req.query.startDate : moment().subtract(13, 'hours').valueOf(),
+			endDate = req.query.endDate ? req.query.endDate : moment().subtract(1, 'hours').valueOf(),
+			config = {
+			indexes: 'ex_stats_new',
+			logName: 'exlg',
+			queryBody: {"query":{"bool":{"filter":[{"bool":{"must":[{"range":{"createdTs":{"gte":startDate,"lte":endDate}}}],"should":[],"must_not":[]}}],"must":{"query_string":{"analyze_wildcard":true,"query":"mode:1 AND variationId:6ae3b7e1_d246_462d_ba48_949051885435 AND pageGroup:POST AND userAnalytics.platform:MOBILE AND siteId:25005"}}}},"aggs":{"PLATFORM":{"terms":{"field":"userAnalytics.platform","size":5,"order":{"_term":"desc"}},"aggs":{"CHOSEN_VARIATION":{"terms":{"field":"variationId","size":2},"aggs":{"ADS_CLICKED":{"terms":{"field":"ads.clicked","size":5}}}}}}}},
+			// queryBody: {"size":0,"query":{"bool":{"must":[{"query_string":{"analyze_wildcard":true,"query":"tracking:true AND mode:1 AND pageGroup:POST AND userAnalytics.platform:DESKTOP AND siteId:25005"}},{"range":{"createdTs":{"gte":startDate,"lte":endDate,"format":"epoch_millis"}}}],"must_not":[]}},"aggs":{"PLATFORM":{"terms":{"field":"userAnalytics.platform","size":5,"order":{"_term":"desc"}},"aggs":{"CHOSEN_VARIATION":{"terms":{"field":"variationId","size":1000,"order":{"_term":"desc"}},"aggs":{"ADS_CLICKED":{"terms":{"field":"ads.clicked","size":5,"order":{"_term":"desc"}}}}}}}}}
+		};
+
+		return reports.doESSearch(config).then(function(result) {
+			return res.json(result);
+		});
+	});
 
 
 module.exports = router;

@@ -147,8 +147,12 @@ router
     .get('/connectGoogle', function (req, res) {
         return userModel.getUserByEmail(req.session.user.email)
             .then(function (user) {
+                var adSenseData = _.find(user.get('adNetworkSettings'), {'networkName': 'ADSENSE'});
                 return res.render('connectGoogle', {
-                    adNetworkSettings: !_.isEmpty(user.get('adNetworkSettings')) ? user.get('adNetworkSettings').adsenseAccounts[0] : false
+                    adNetworkSettings: !_.isEmpty(user.get('adNetworkSettings')) ? { 
+                        pubId: adSenseData.adsenseAccounts[0].id,
+                        email: adSenseData.userInfo.email
+                    } : false
                 });
             })
             .catch(function (err) {

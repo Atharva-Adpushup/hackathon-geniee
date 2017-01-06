@@ -2,12 +2,12 @@ import React, { PropTypes } from 'react';
 import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { deleteSection, renameSection } from 'actions/sectionActions.js';
+import { deleteSection, renameSection, updateXPath } from 'actions/sectionActions.js';
 import { updateAdCode } from 'actions/adActions';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 
 const variationSections = (props) => {
-	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode } = props;
+	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdateXPath } = props;
 	return (
 		<div>
 			<h1 className="variation-section-heading">Variation Sections</h1>
@@ -38,6 +38,12 @@ const variationSections = (props) => {
 										submitHandler={onRenameSection.bind(null, section, variation.id)} text="Section Name" errorMessage="Section Name cannot be blank"
 									/>
 								</Col>
+								<Col className="u-padding-r10px" xs={12}>
+									<Row>
+										<Col className="u-padding-r10px" xs={4}>Size</Col>
+										<Col xs={8}><strong>{section.ads[0].width} x {section.ads[0].height}</strong></Col>											
+									</Row>
+								</Col>
 							</Row>
 							{ section.isIncontent ? (
 								<div>
@@ -65,7 +71,11 @@ const variationSections = (props) => {
 										</Row>
 										<Row>
 											<Col className="u-padding-r10px" xs={4}>XPath</Col>
-											<Col className="u-padding-l10px" xs={8}><strong>{section.xpath}</strong></Col>
+											<Col className="u-padding-l10px" xs={8}>
+												<InlineEdit compact value={section.xpath}
+													submitHandler={onUpdateXPath.bind(null, section.id)} text="XPath" errorMessage="XPath cannot be blank"
+												/>
+											</Col>
 										</Row>
 									</div>
 									) }
@@ -83,7 +93,8 @@ variationSections.propTypes = {
 	sections: PropTypes.array.isRequired,
 	onDeleteSection: PropTypes.func.isRequired,
 	onRenameSection: PropTypes.func.isRequired,
-	onUpdateAdCode: PropTypes.func.isRequired
+	onUpdateAdCode: PropTypes.func.isRequired,
+	onUpdateXPath: PropTypes.func
 };
 
 export default connect(
@@ -91,7 +102,8 @@ export default connect(
 	(dispatch) => bindActionCreators({
 		onDeleteSection: deleteSection,
 		onRenameSection: renameSection,
-		onUpdateAdCode: updateAdCode
+		onUpdateAdCode: updateAdCode,
+		onUpdateXPath: updateXPath
 	}, dispatch)
 	)(variationSections);
 

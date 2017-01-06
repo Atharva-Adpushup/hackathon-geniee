@@ -264,12 +264,31 @@
   }
 }
 
+.primary-text {
+  color: $primaryColor;
+}
+
 .widget-text {
   color: $fontColor;
   font-size: 1.35em;
-  padding: 15px 0;
   line-height: 25px;
+
+  .primary-text {
+    background-color: $mainBgColor;
+    padding: 5px;
+    border: 1px solid $dashboardBgColor;
+    border-radius: 2px;
+  }
+  
+  &.top {
+    padding: 15px 0;
+  }
 }
+
+.pub-info {
+  margin: 20px 0 45px;
+}
+
 
 .btn.widget-btn {
   font-size: 1.2em;
@@ -287,3 +306,14 @@
     right: -10px;
   }
 }
+
+.overlay-extension {
+  display: none;
+}
+
+.btn.btn-lightBg.over-ext-btn {
+  font-size: 1.25em;
+  padding: 10px 25px;
+  margin-top: 20px;
+}
+

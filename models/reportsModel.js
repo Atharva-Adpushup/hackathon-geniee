@@ -90,6 +90,7 @@ var es = require('../helpers/elasticSearchService'),
 
 	prepareApexSearchQuery = function(config) {
 		var siteId = config.siteId,
+			variationCount = config.variationCount ? config.variationCount : 100,
 			startDate = (config.startDate) ? config.startDate : Date.now() - 2592000000,
 			endDate = config.endDate ? config.endDate : Date.now(),
 			pageGroup = config.pageGroup,
@@ -97,7 +98,7 @@ var es = require('../helpers/elasticSearchService'),
 			b = esqm.createBoolFilter(),
 			rangeFilter = esqm.createRangeFilter('createdTs', startDate, endDate),
 			timeOnSiteAgg = {"TIME_ON_SITE":{"terms":{"field":"userAnalytics.timeOnSite","size":5,"order":{"_count":"desc"}},"aggs":{}}},
-			aggs = {"PLATFORM":{"terms":{"field":"userAnalytics.platform","size":5,"order":{"_count":"desc"}},"aggs":{"CHOSEN_VARIATION":{"terms":{"field":"variationId","size":5,"order":{"_count":"desc"}},"aggs":{"ADS_CLICKED":{"terms":{"field":"ads.clicked","size":5,"order":{"_count":"desc"}}}}}}}},
+			aggs = {"PLATFORM":{"terms":{"field":"userAnalytics.platform","size":5,"order":{"_term":"desc"}},"aggs":{"CHOSEN_VARIATION":{"terms":{"field":"variationId","size": variationCount,"order":{"_count":"desc"}},"aggs":{"ADS_CLICKED":{"terms":{"field":"ads.clicked","size":5}}}}}}},
 			esQueryString = ((config.queryString) ? config.queryString : 'tracking:true AND mode:1'),
 			esQuery = {
 				'query_string': {
@@ -239,6 +240,7 @@ var es = require('../helpers/elasticSearchService'),
 		if (resultIsValid(r)) {
 			var header = ['Variation', 'CTR (PERFORMANCE %)', 'Traffic (%)'],
 				footer = new Array(3),
+				variationRegex = (/[\w]{8}_[\w]{4}_[\w]{4}_[\w]{4}_[\w]{12}/),
 				rows = [], trackedData = {}, platformArr = r.aggregations.PLATFORM.buckets,
 				rowItem, result, chosenVariationArr, adsClickedArr;
 
@@ -250,8 +252,14 @@ var es = require('../helpers/elasticSearchService'),
 					rowItem = new Array(3);
 					adsClickedArr = chosenVariationItem.ADS_CLICKED.buckets;
 
+					// Return false if variation key is not a manipulated UUID (- replaced with _)
+					if (!variationRegex.test(chosenVariationItem.key)) {
+						return false;
+					}
+
 					// Variation Name value
-					variationName = chosenVariationItem.key;
+					//NOTE: Replacement of '_' as '-' due to Elastic Search default analyzer dash split issue
+					variationName = chosenVariationItem.key.replace(/_/g, "-");
 					// Traffic value
 					traffic = 0;
 					// Page Views value
@@ -423,6 +431,13 @@ var es = require('../helpers/elasticSearchService'),
 			'msg': msg
 		};
 	},
+	getESSearchResult = function(config) {
+		return es.search(config.indexes, config.logName, config.queryBody).then(function(result) {
+			return Promise.resolve(result);
+		}).catch(function(err) {
+			return Promise.resolve(err.toString());
+		});
+	},
 	performEsSearch = function(config) {
 		var defaultConfig = {
 			'indexes': 'ap_stats_new',
@@ -447,6 +462,9 @@ var es = require('../helpers/elasticSearchService'),
 	};
 
 module.exports = {
+	doESSearch: function(config) {
+		return getESSearchResult(config);
+	},
 	controlVsAdpushupCtrReport: function(config) {
 		var queryBody = prepareControlVsAdpushupCtrSearchQuery(config),
 			esSearchConfig = {

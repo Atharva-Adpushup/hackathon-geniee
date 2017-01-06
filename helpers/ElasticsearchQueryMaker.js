@@ -3,18 +3,14 @@ var ESQueryMaker = {
 	getDefaultQuery: function(bool, aggs, size, config) {
 		var q = {
 			'query': {
-				'bool': {
-					'filter': [{
-						'bool': bool
-					}]
-				}
+				'bool': bool
 			},
 			'aggs': aggs,
 			'size': size
 		};
 
 		if (config && config.query) {
-			q.query.bool.must = config.query;
+			q.query.bool.must.push(config.query);
 		}
 
 		return q;
