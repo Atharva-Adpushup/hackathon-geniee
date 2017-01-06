@@ -174,6 +174,23 @@ module.exports = {
 		}
 		return data;
 	},
+	getObjectById: function(collection, id) {
+		var isInCollection = false, objectConfig = {index: -1, id: id};
+
+		if (collection && collection.length && id) {
+			$.each(collection, function(idx, obj) {
+				if (id === obj.id) {
+					isInCollection = true;
+					objectConfig.index = idx;
+					objectConfig.obj = $.extend(true, {}, obj);
+				}
+			});
+
+			return (isInCollection ? objectConfig : isInCollection);
+		}
+
+		return isInCollection;
+	},
 	queryParams: (function() {
 		var str = window.location.search, objURL = {};
 		str.replace(new RegExp('([^?=&]+)(=([^&]*))?', 'g'), function($0, $1, $2, $3) {

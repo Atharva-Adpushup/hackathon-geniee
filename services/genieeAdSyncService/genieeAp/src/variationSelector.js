@@ -6,7 +6,7 @@ var utils = require('../libs/utils'),
 module.exports = function(config) {
 	var experiment = config.experiment,
 		isAutoOptimise = !!(config.autoOptimise),
-		allVariations, chosenVariation, forcedvariation;
+		allVariations, chosenVariation, forcedVariation, forcedVariationId;
 
 	// if no experimnet setup for given platform and pagegroup
 	if (!experiment || !experiment[config.platform] || !experiment[config.platform][config.pageGroup] || !experiment[config.platform][config.pageGroup].variations) {
@@ -14,11 +14,19 @@ module.exports = function(config) {
 	}
 
 	allVariations = experiment[config.platform][config.pageGroup].variations;
-	forcedvariation = utils.queryParams[config.forceVariation];
+	forcedVariationId = utils.queryParams[config.forceVariation];
+	forcedVariation = (forcedVariationId) ? utils.getObjectById(allVariations, forcedVariationId) : false;
 
-	//@ TODO Handle when a variation is forced
-	if (forcedvariation && allVariations[forcedvariation]) {
-	} else if (forcedvariation && !allVariations[forcedvariation]) {
+	// Force a variation using 'forceVariation' query param implementation
+	if (forcedVariationId && forcedVariation) {
+		chosenVariation = forcedVariation.obj;
+
+		if (chosenVariation) {
+			config.contentSelector = experiment[config.platform][config.pageGroup].contentSelector;
+		}
+
+		return (chosenVariation && chosenVariation.ads && chosenVariation.ads.length ? chosenVariation : false);
+	} else if (forcedVariationId && !allVariations[forcedVariationId]) {
 		alert('Variation you are trying to force doesn\'t exist, system will now choose variation automatically');
 	}
 
