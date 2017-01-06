@@ -90,6 +90,10 @@ block append headScripts
 
 block bodyContent
     .pageContainer.page-container
+        if isSuperUser || unSavedSiteId
+            - superUserOnboarding = true;
+        else
+            - superUserOnboarding = false;
         include layout/header
         // Page Content Starts Here
         .pageContentWrapper.page-content

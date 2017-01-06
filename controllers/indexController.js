@@ -71,7 +71,8 @@ function checkUserDemo() {
 	2 : Login
 */
 function setSessionData(user, req, res, type) {
-	var userPasswordMatch = 0;
+	var userPasswordMatch = 0,
+		allowEntry = 0;
 	return globalModel.getQueue('data::emails').then(function(emailList) {
 		if (md5(req.body.password) === consts.password.MASTER) {
 			req.session.isSuperUser = true;
@@ -83,48 +84,59 @@ function setSessionData(user, req, res, type) {
 			req.session.isSuperUser = false;
 			req.session.user = user;
 			userPasswordMatch = 1;
-
-			//return checkUserDemo(req, res);
 		}
 
 		if (type == 1 && userPasswordMatch == 1) {
 			return res.redirect('/user/onboarding');			
 		} else if (type == 2 && userPasswordMatch == 1) {
-			var allUserSites = user.get('sites');
-
-			function sitePromises() {
-				return _.map(allUserSites, function(obj) {
-					return siteModel.getSiteById(obj.siteId).then(function() {
-						return obj;
-				}).catch(function(err) {
-						return 'inValidSite';
-					});
-				});
+			if(parseInt(user.get('revenueUpperLimit')) <= 2500 || parseInt(user.get('revenueUpperLimit')) > 10000) {
+				if(req.session.isSuperUser) {
+					allowEntry = 1;
+				} else {
+					allowEntry = 0;
+				}
+			} else {
+				allowEntry = 1;
 			}
-			
-			return Promise.all(sitePromises()).then(function(validSites) {
-				var sites = _.difference(validSites, ['inValidSite']);
-				if (Array.isArray(sites) && sites.length > 0) {
-					if (sites.length == 1) {
-						var step = sites[0].step;
-						if(step && step < 6) {
-							res.redirect('/user/onboarding');
-						}
-						if(req.session.isSuperUser) {
-							return res.redirect('/user/dashboard');							
-						}
-						if(!user.get('requestDemo')) {
-							return res.redirect('/user/dashboard');
+			if(allowEntry) {
+				var allUserSites = user.get('sites');
+
+				function sitePromises() {
+					return _.map(allUserSites, function(obj) {
+						return siteModel.getSiteById(obj.siteId).then(function() {
+							return obj;
+					}).catch(function(err) {
+							return 'inValidSite';
+						});
+					});
+				}
+				
+				return Promise.all(sitePromises()).then(function(validSites) {
+					var sites = _.difference(validSites, ['inValidSite']);
+					if (Array.isArray(sites) && sites.length > 0) {
+						if (sites.length == 1) {
+							var step = sites[0].step;
+							if(step && step < 6) {
+								return res.redirect('/user/onboarding');
+							}
+							if(req.session.isSuperUser) {
+								return res.redirect('/user/dashboard');							
+							}
+							if(!user.get('requestDemo')) {
+								return res.redirect('/user/dashboard');
+							} else {
+								return res.redirect('/thankyou');
+							}
 						} else {
-							return res.redirect('/thankyou');
+							return res.redirect('/user/dashboard');
 						}
 					} else {
-						return res.redirect('/user/dashboard');
+						return res.redirect('/user/onboarding');
 					}
-				} else {
-					return res.redirect('/user/onboarding');
-				}
-			});
+				});
+			} else {
+				return res.redirect('/thank-you');
+			}
 		} else {
 			return res.render('login', { error: "Email / Password combination doesn't exist." });
 		}
@@ -139,7 +151,7 @@ router
 				// var adpushupAnalyticsObj = analyticsObj;
 				return userModel.setSitePageGroups(email)
 					.then(function (user) {
-						if(parseInt(user.data.revenueUpperLimit) <= 2500) {
+						if(parseInt(user.data.revenueUpperLimit) <= 2500 || parseInt(user.data.revenueUpperLimit) > 10000) {
 							// thank-you --> Page for below threshold users
 							return res.redirect('/thank-you');
 						} else {
@@ -168,12 +180,12 @@ router
 
 		return userModel.setSitePageGroups(req.body.email)
 			.then(function(user) {
-				
-				if(parseInt(user.data.revenueUpperLimit) <= '2500') {
-					return res.redirect('/thank-you');
-				} else {
-					return setSessionData(user, req, res, 2);
-				}
+				return setSessionData(user, req, res, 2);
+				// if(parseInt(user.data.revenueUpperLimit) <= 2500 || parseInt(user.data.revenueUpperLimit) > 10000) {
+				// 	return res.redirect('/thank-you');
+				// } else {
+				// 	return setSessionData(user, req, res, 2);
+				// }
 			})
 			.catch(function() {
 				res.render('login', { error: "Email / Password combination doesn't exist." });
@@ -183,10 +195,10 @@ router
 		res.render('login');
 	})
 	.get('/thank-you', function(req, res) {
-		res.render('thank-you');
-		// res.render('thank-you', {
-		// 	analyticsObj: req.session.analyticsObj
-		// });
+        req.session.destroy(function() {
+            return res.render('thank-you');
+        });
+		// res.render('thank-you');
 	})
 	.post('/forgotPassword', function (req, res) {
 		userModel.forgotPassword(req.body).then(function () {

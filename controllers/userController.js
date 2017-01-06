@@ -63,6 +63,15 @@ function dashboardRedirection(req, res, allUserSites, type) {
 
         setEmailCookie(req, res);
 
+        if(type == 'onboarding') {
+            if(sites.length >= 1) {
+                var hasStep = 'step' in sites[0] ? true : false;
+                if(hasStep && sites[0].step == 6) {
+                    return res.redirect('/user/dashboard');
+                }
+            }
+        }
+
         switch(type) {
             case 'dashboard':
             case 'default':
@@ -123,6 +132,7 @@ router
         if (req.body && req.body.servicesString) {
             userModel.getUserByEmail(req.session.user.email).then(function (user) {
                 var userSites = user.get('sites');
+                user.set('preferredModeOfReach', req.body.modeOfReach);
                 for (var i in userSites) {
                     if (userSites[i].domain === req.body.newSiteUnSavedDomain) {
                         userSites[i].services = req.body.servicesString;
@@ -228,7 +238,39 @@ router
         if (req.session.isSuperUser === true) {
             userModel.setSitePageGroups(email).then(function (user) {
                 req.session.user = user;
-                return res.redirect('/');
+                var allUserSites = user.get('sites');
+
+                function sitePromises() {
+                    return _.map(allUserSites, function(obj) {
+                        return siteModel.getSiteById(obj.siteId).then(function() {
+                            return obj;
+                    }).catch(function(err) {
+                            return 'inValidSite';
+                        });
+                    });
+                }
+                
+                return Promise.all(sitePromises()).then(function(validSites) {
+                    var sites = _.difference(validSites, ['inValidSite']);
+                    if (Array.isArray(sites) && sites.length > 0) {
+                        if (sites.length == 1) {
+                            var step = sites[0].step;
+                            if(step && step < 6) {
+                                return res.redirect('/user/onboarding');
+                            }
+                            if(!user.get('requestDemo')) {
+                                return res.redirect('/user/dashboard');
+                            } else {
+                                return res.redirect('/thankyou');
+                            }
+                        } else {
+                            return res.redirect('/user/dashboard');
+                        }
+                    } else {
+                        return res.redirect('/user/onboarding');
+                    }
+                });
+                // return res.redirect('/');
             }, function () {
                 return res.redirect('/');
             });
@@ -352,7 +394,8 @@ router
         if (req.session.isSuperUser) {
             return res.render('updateUserStatus', {
                 currentStatus: req.session.user.requestDemo,
-                email: req.session.user.email
+                email: req.session.user.email,
+                websiteRevenue: req.session.user.websiteRevenue
             });
         } else {
             return res.redirect('/user/dashboard');
@@ -360,7 +403,14 @@ router
     })
     .post('/updateUserStatus', function (req, res) {
         if (req.session.isSuperUser) {
-            var email = req.session.user.email;
+            var email = req.session.user.email,
+                websiteRevenue = req.session.user.websiteRevenue,
+                revenueUpperLimit = null;
+
+            if(req.body.websiteRevenue.trim()) {
+                websiteRevenue = req.body.websiteRevenue;
+            }
+
             if (email.trim() && req.body.status) {
                 var status = true; // By default user would be inactive
                 /* 
@@ -372,24 +422,43 @@ router
                 if (req.body.status == 0) {
                     status = false;
                 }
-                return userModel.setUserStatus(status, email.trim()).then(function (response) {
+
+                var revenueArray = websiteRevenue.split('-');
+                if(revenueArray.length > 1) {
+                    revenueUpperLimit = revenueArray[1];
+                } else {
+                    revenueUpperLimit = revenueArray[0];		
+                }
+
+                return userModel.setUserStatus({
+                    status: status,
+                    websiteRevenue: websiteRevenue,
+                    revenueUpperLimit: revenueUpperLimit
+                    }, email.trim()).then(function (user) {
+                    var currentStatus = user.get('requestDemo'),
+                        websiteRevenue = user.get('websiteRevenue');
+
+                    req.session.user = user;
+
                     return res.render('updateUserStatus', {
                         status: 'success',
                         message: 'User updated successfully',
-                        currentStatus: response,
-                        email: email
+                        currentStatus: currentStatus,
+                        email: email,
+                        websiteRevenue: websiteRevenue
                     });
                 })
-                    .catch(function (err) {
-                        if (err) {
-                            return res.render('updateUserStatus', {
-                                status: 'failure',
-                                message: 'Some error occured',
-                                currentStatus: req.session.user.requestDemo,
-                                email: email
-                            })
-                        }
-                    });
+                .catch(function (err) {
+                    if (err) {
+                        return res.render('updateUserStatus', {
+                            status: 'failure',
+                            message: 'Some error occured',
+                            currentStatus: req.session.user.requestDemo,
+                            email: email,
+                            websiteRevenue: websiteRevenue
+                        })
+                    }
+                });
             } else {
                 return res.render('updateUserStatus', {
                     status: 'failure',

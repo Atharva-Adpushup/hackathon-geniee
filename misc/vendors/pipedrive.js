@@ -23,6 +23,11 @@ var https = require('https'),
                     path += '?api_token=' + CC.analytics.PIPEDRIVE_SYNC_TOKEN;
                     method = 'PUT';
                     break;
+                case 'updateDeal':
+                    path  = '/v1/deals/' + searchPhrase;
+                    path += '?api_token=' + CC.analytics.PIPEDRIVE_SYNC_TOKEN;
+                    method = 'PUT';
+                    break;
                 default:
                     break;
             }        

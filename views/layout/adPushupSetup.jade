@@ -18,25 +18,36 @@
             .text-center
                 h2 Welcome to AdPushup!
                 .row.intro-modal-row
-                    .col-md-6.intro-modal-img
+                    .col-md-5.intro-modal-img
                         img(src="/assets/images/intro_graphic.png")
-                    .col-md-6.intro-modal-content
+                    .col-md-7.intro-modal-content
                         h3
-                            | Please select the product(s) you want to use:
+                            | Please select the product(s) you want to use
                         hr
                         form(id="onboarding-services-form").text-left
                             .form-group
                                 input.checkbox-custom(type="checkbox", name="only-adsense")
                                 label(for="only-adsense")
-                                    span.ccheckbox Ad Layout Optimization for Only Google AdSense
+                                    span.ccheckbox Ad Layout Optimization for Google AdSense
                             .form-group
                                 input.checkbox-custom(type="checkbox", name="other-networks")
                                 label(for="other-networks")
-                                    span.ccheckbox Ad Layout Optimization for Multiple Ad Networks
+                                    span.ccheckbox Ad Layout Optimization for Other Ad Networks/Servers
                             .form-group
                                 input.checkbox-custom(type="checkbox", name="header-bidding")
                                 label(for="header-bidding")
-                                    span.ccheckbox Header Bidding
+                                    span.ccheckbox Header Bidding Optimization
+                            .form-group(style="margin: 15px 0 10px 0;")
+                                p Preferred way to reach you
+                                .col-md-3.pd-0
+                                    select.form-control.input-lg#pwc(style="font-size: 16px;", name="pwc")
+                                        option(value="skype") Skype
+                                        option(value="hangout") Hangout
+                                        option(value="email") Email
+                                        option(value="phone") Phone
+                                .col-md-9.pd-0
+                                    input.form-control.input-lg#pwc-value(type="text", style="height: 46px; font-size: 16px;")
+                                div(style="clear:both;")
                             input.apbtn-main(type='submit', value="Proceed", style="margin-top: 10px", data-unsaved-domain=origUnSavedDomain)
                             .error-message-box
 
@@ -62,11 +73,11 @@ if addOtherSite
                                 .form-group
                                     input.checkbox-custom(type="checkbox", name="only-adsense")
                                     label(for="only-adsense")
-                                        span.ccheckbox Ad Layout Optimization for Only Google AdSense
+                                        span.ccheckbox Ad Layout Optimization for Google AdSense
                                 .form-group
                                     input.checkbox-custom(type="checkbox", name="other-networks")
                                     label(for="other-networks")
-                                        span.ccheckbox Ad Layout Optimization for Multiple Ad Networks
+                                        span.ccheckbox Ad Layout Optimization for Other Ad Networks/Servers
                                 .form-group
                                     input.checkbox-custom(type="checkbox", name="header-bidding")
                                     label(for="header-bidding")
@@ -76,22 +87,56 @@ if addOtherSite
 
 //- Setup completion modal
 #completionmodal.modal._ap_modal.fade.intro-modal(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
-    .modal-dialog
-        .modal-content
-            .pull-right
-                button.close(type='button', data-dismiss='modal', aria-label='Close')
-                    span(aria-hidden='true') ×
-            .text-center
-                h2 Your setup is complete!
-                p
-                    | Our advisors will get in touch with you soon.
-                img.img-responsive(src="/assets/images/completion_graphic.png")
-                p
-                    | You can also contact us at 
-                    a.link-primary(href="mailto:support@adpushup.com") support@adpushup.com
-                .row
-                    .col-sm-4.col-sm-offset-4
-                        a.apbtn-main(href="/user/dashboard", type='button') Go to Dashboard
+    .modal-dialog.wd-60.text-center(style="max-width: 500px; min-width: 500px; overflow: hidden;")
+        .pricing-box-header Pricing Plan: 9% Ad Revenue Share
+        //- .pull-right
+        //-     button.close(type='button', data-dismiss='modal', aria-label='Close')
+        //-         span(aria-hidden='true') ×
+        .modal-content.pd-0(style="padding: 0px;")
+            //- .pull-right
+            //-     button.close(type='button', data-dismiss='modal', aria-label='Close')
+            //-         span(aria-hidden='true') ×
+            //- .col-md-5.pricing-modal-img &nbsp;
+                //- img.img-responsive(src="/assets/images/completion_graphic.png")
+            .col-md-12.pricing-modal-content.pd-0
+                .pricing-box.pd-0
+                    //- .pricing-box-header Pricing Plan: 9% Ad Revenue Share
+                    .pricing-box-content
+                        ul
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Google AdSense Policy Compliance
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Dedicated Account Manager
+                            li
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Ad Layout &amp; In-content Optimization
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Visual Ad Managment
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Intelligent Page-level Learning Engine
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Advanced Analytics and Reporting
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Advanced Ad Delivery Optimization
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Custom Code Support
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Segmentation &amp; Personalization
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Support (Phone, Email, Chat)
+                        .row.pricing-box-btn
+                            a.apbtn-main(href="#", type='button', data-dismiss='modal', aria-label='Close', style="padding: 12px 0;") Proceed
+            .div(style="clear:both")
+        .div(style="clear:both")
 
 
 //- Send Code to Developer Modal
@@ -168,6 +213,8 @@ div.detectap-alert.text-center#apdetect
                 i#step3-check.fa &nbsp;
             p
                 | For AdPushup to start optimizing your website, copy-paste the following parent code in the &lt;HEAD&gt; tag of the website selected in the previous step.
+                if isSuperUser
+                    span#skip-ap-verification &nbsp;Skip Step
             #platformVerificationContent
 
     //- Grant adsense oauth access

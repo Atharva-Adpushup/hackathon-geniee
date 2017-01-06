@@ -29,6 +29,17 @@ block bodyContent
                                     div(class="form-group row")
                                         .input-group
                                             input.form-control.login-field(type='text', id="email" name='email', placeholder='Enter User Email', value='#{email}', style="width: 100%;", readonly)
+                                        .input-group
+                                            p Current Revenue : #{websiteRevenue}
+                                            select(class="form-control input-lg", id="signup-websiteRevenue", name="websiteRevenue")
+                                                option(value="") Monthly Ad Revenue (in USD)
+                                                option(value="999") &lt; 1,000
+                                                option(value="1000-2500") 1,000-2,500
+                                                option(value="2500-5000") 2,500-5,000
+                                                option(value="5000-10000") 5,000-10,000
+                                                option(value="10000-50000") 10,000-50,000
+                                                option(value="50000-200000") 50,000-200,000
+                                                option(value="200001") 200,000+
                                         .input-group                                     
                                             p Current Status : #{currentStatusValue}
                                         .form-check-label(style="vertical-align:top;")

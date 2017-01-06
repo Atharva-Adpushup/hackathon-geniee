@@ -21,7 +21,7 @@ var modelAPI = module.exports = apiModule(),
 	User = model.extend(function() {
 		this.keys = ['firstName', 'lastName', 'email', 'salt', 'passwordMd5', 'sites', 'adNetworkSettings', 'createdAt',
 			'passwordResetKey', 'passwordResetKeyCreatedAt', 'requestDemo',
-			'requestDemoData', 'analytics', 'adNetworks', 'pageviewRange', 'managedBy', 'userType', 'websiteRevenue', 'crmDealId', 'revenueUpperLimit'];
+			'requestDemoData', 'analytics', 'adNetworks', 'pageviewRange', 'managedBy', 'userType', 'websiteRevenue', 'crmDealId', 'revenueUpperLimit', 'preferredModeOfReach'];
 		this.validations = schema.user.validations;
 		this.classMap = {
 			adNetworkSettings: networkSettings
@@ -486,12 +486,14 @@ function apiModule() {
 
 			return API.getUserByEmail(email).then(setPageGroups);
 		},
-		setUserStatus: function(status, email) {
+		setUserStatus: function(data, email) {
 			return API.getUserByEmail(email)
 				.then(function(user) {
-					user.set('requestDemo', status);
+					user.set('requestDemo', data.status);
+					user.set('websiteRevenue', data.websiteRevenue);
+					user.set('revenueUpperLimit', data.revenueUpperLimit);
 					user.save();
-					return user.get('requestDemo');
+					return user;
 				});
 		}
 	};

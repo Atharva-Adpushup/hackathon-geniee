@@ -44,8 +44,8 @@ $('document').ready(function() {
                     adpushupAnalyticsEvents.emit('analyticsTrack', {
                             eventName: step, 
                             obj: {
-                                name: window.currentUser.firstName,
-                                email: window.currentUser.email
+                                name: w.currentUser.firstName,
+                                email: w.currentUser.email
                             },
                             intercom: intercom
                     });                    
@@ -173,7 +173,7 @@ $('document').ready(function() {
                     $('#adsenseoauth').html('Google Adsense Connected '+this.templates.checkIcon);
                 }
 
-                this.scrollTo(step, 0, 1000);
+                this.scrollTo(step, 90, 1000);
 
                 switch (step) {
                     case 1:
@@ -192,7 +192,7 @@ $('document').ready(function() {
                 setTimeout(function() {
                     $('#step' + to).addClass('active-step');
                     $('#step' + from).removeClass('active-step');
-                    ob.scrollTo(to, 120, 600);
+                    ob.scrollTo(to, 100, 600);
                 }, duration);
             },
 
@@ -469,6 +469,7 @@ $('document').ready(function() {
             init: function() {
                 this.showIntro();
                 this.showStep(newSite.defaultStep);
+                // $('#completionmodal').modal('show');
                 //this.showAddOtherSite();
             },
 
@@ -479,45 +480,46 @@ $('document').ready(function() {
                 });
             },
 
+            // Update Crm Deal
+            updateCrmDeal: function(data, type) {
+                $.post('/data/updateCrmDeal', {
+                    type: type,
+                    data: data
+                });
+            },
+
             // Service selection
-            serviceSelection: function(selectedServices, errorBox) {
+            serviceSelection: function(data, errorBox) {
                 var url = 'http://'+window.location.host+'/thankyou',
-                    servicesString = selectedServices.join(' | '),
+                    servicesString = data.selectedServices.join(' | '),
+                    dataToSend = {
+                        servicesString: servicesString,
+                        pwc: data.pwc
+                    },
                     ob = this;
                 
-                // if(newSite.addOtherSite) {
-                //         if (selectedServices.length > 1) {
-                //             // Show pop up
-                //         } else if (selectedServices.length == 1) {
-                //             if (selectedServices[0] == 'only-adsense') {
-                //                 w.localStorage.setItem('selectedServices', selectedServices);
-                //                 $('#intromodal').modal('hide');
-                //                 ob.nextStep(2, 1, 1000);
-                //             } else {
-                //                 // Show pop up
-                //             }
-                //         }
-                // } else {
                 $.post('/user/setSiteServices', {
                     'servicesString': servicesString,
                     'newSiteUnSavedDomain': newSite.viewObjects.origUnSavedDomain,
                     'newSiteSiteId': newSite.viewObjects.unSavedSiteId,
                     'newSiteDomanizedUrl': newSite.viewObjects.domanizedUrl,
+                    'modeOfReach': data.pwc
                 }, function(response) {
                     if (response.success) {
-                        if (selectedServices.length > 1) {
+                        if(!newSite.addOtherSite)
+                        {
+                            var status = 65;
+                            ob.updateCrmDealStatus(status);
+                            ob.updateCrmDeal(dataToSend, 'services');
+                            ob.analyticsEventEmitter('Selected Solution');
+                        }
+                        if (data.selectedServices.length > 1) {
                             window.location.replace(url);
-                        } else if (selectedServices.length == 1) {
-                            if (selectedServices[0] == 'only-adsense') {
-                                if(!newSite.addOtherSite)
-                                {
-                                    var status = 65;
-                                    ob.updateCrmDealStatus(status);
-                                    ob.analyticsEventEmitter('Selected Solution');
-                                }
+                        } else if (data.selectedServices.length == 1) {
+                            if (data.selectedServices[0] == 'only-adsense') {
                                 $('#intromodal').modal('hide');
+                                $('#completionmodal').modal('show');
                                 ob.nextStep(2, 1, 1000);
-
                             } else {
                                 window.location.replace(url);
                             }
@@ -631,6 +633,7 @@ $('document').ready(function() {
                 });
             },
 
+            // Site addition modal inside dashboard
             addOtherSiteFromDashboard: function(selectedServices, site, url) {
                 var ob = this,
                     errorBox = $("#addOtherSiteModal .error-message-box");
@@ -650,25 +653,79 @@ $('document').ready(function() {
                         ob.anotherSiteModalOpen();
                     }
                 }
+            },
+            
+            // Skipping ap verficiation
+            skipApVerification: function() {
+                var ob = this;
+                $.post('/user/setSiteStep', {
+                    siteId: newSite.addedSite.siteId,
+                    step: newSite.addOtherSite ? 5 : 3
+                }, function(response) {
+                    if (response.success) {
+                        if(!newSite.addOtherSite) {
+                            var status = 67;
+                            ob.updateCrmDealStatus(status);
+                            ob.analyticsEventEmitter('Added AP Code');
+                        }
+                        if(newSite.addOtherSite) {
+                            ob.nextStep(6, 3, 1000);
+                        } else {
+                            ob.nextStep(4, 3, 1000);
+                        }
+                    } else {
+                        alert('Some error occurred!');
+                    }
+                });
             }
         };
         ap.onboarding.init();
+
+        // Trigger to update Reach Mode value
+        $('#pwc').on('change', function(e) {
+            var pwcBox = $('#pwc :selected'),
+                pwcInputBox = $('#pwc-value'),
+                errorBox = $('.error-message-box');
+
+            errorBox.text('');
+                        
+            if(pwcBox.val() == 'email') {
+                pwcInputBox.val(w.currentUser.email);
+                // pwcInputBox.attr('readonly', true);
+            } else {
+                // pwcInputBox.attr('readonly', false);
+                pwcInputBox.val('');
+            }
+        });
 
         // Trigger to check user ticked options
         $('#onboarding-services-form').submit(function(e) {
             e.preventDefault();
             var selectedServices = [],
                 errorBox = $('.error-message-box');
+                pwcBox = $('#pwc :selected'),
+                pwcBoxValue = pwcBox.val(),
+                pwcInputBox = $('#pwc-value'),
+                pwcInputBoxValue = pwcInputBox.val().trim();
+
             $('.checkbox-custom:checked').each(function() {
                 selectedServices.push($(this).attr('name'));
             });
-
+            if(!pwcInputBoxValue || pwcInputBoxValue == '') {
+                errorBox.text('Please enter preferred mode of reach');
+                return;                
+            }
             if(selectedServices.length < 1) {
                 errorBox.text('Please select atleast one Service');
                 return;
             } else {
                 errorBox.text('');
-                ap.onboarding.serviceSelection(selectedServices, errorBox);
+                var pwcFinalValue = pwcBoxValue + '-' + pwcInputBoxValue,
+                    data = {
+                        selectedServices: selectedServices,
+                        pwc: pwcFinalValue
+                    };
+                ap.onboarding.serviceSelection(data, errorBox);
             }
         });
 
@@ -686,8 +743,8 @@ $('document').ready(function() {
                 return;
             } else {
                 errorBox.text('');
-                var url = otherSite.replace(/\/$/, ""),
-                    site = url.replace(/.*?:\/\//g, "");
+                var site = otherSite.replace(/\/$/, ""),
+                    url = site.replace(/.*?:\/\//g, "");
                 ap.onboarding.addOtherSiteFromDashboard(selectedServices, site, url);
             }           
         })
@@ -785,6 +842,11 @@ $('document').ready(function() {
         $('#code-conversion-finish').click(function(e) {
             e.preventDefault();
             ap.onboarding.codeCoversionProceed();
+        });
+
+        // Skip AP code verify
+        $('#skip-ap-verification').click(function(e) {
+            ap.onboarding.skipApVerification();
         });
     })(adpushup, window, document);
 });

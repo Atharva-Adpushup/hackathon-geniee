@@ -8,85 +8,19 @@ block getTitle
 //- Load AdPushup setup script if there is no valid site
 block append headScripts
 
-    if validSites.length === 0
+        +loadAsset("js", [
+            '/assets/js/libs/third-party/d3.js',
+            '/assets/js/libs/third-party/c3.js',
+            '/assets/js/libs/third-party/dataTables.js',
+            '/assets/js/libs/third-party/dataTablesColReorder.js',
+            '/assets/js/reports/dataVisualization.js',
+            '/assets/js/reports/reports.js'
+        ])
 
-        - unSavedSiteId = (unSavedSite) ? unSavedSite[0].siteId : null;
-        - step = 2;
-        - origUnSavedDomain = (unSavedSite) ? unSavedSite[0].domain : null;
-        - domanizedUrl = (origUnSavedDomain) ? utils.domanize(origUnSavedDomain) : null;
-
-        //- Setup Adpushup site addition config
-        script.
-            $('document').ready(function() {
-                adpushup.newSite = {
-                    viewObjects: {
-                        domanizedUrl: '!{domanizedUrl}',
-                        unSavedSiteId: '!{unSavedSiteId}',
-                        origUnSavedDomain: '!{origUnSavedDomain}'
-                    },
-                    totalSteps: 6,
-                    defaultStep: '!{step}',
-                    addOtherSite: false,
-                    showIntro: true
-                };
-            });
-
-        if environment == 'production'
-            +loadAsset("js", [
-                '/assets/js/builds/adpushup-onboarding.min.js'
-            ]) 
-        else
-            +loadAsset("js", [
-                '/assets/js/libs/custom/adpushup-onboarding.js'
-            ])         
-    else 
-
-        if validSites[0].step <= 5
-        
-            //- Setup Adpushup site addition config
-            script.
-                $('document').ready(function() {
-                    var step = !{validSites[0].step} + 1;
-                     adpushup.newSite = {
-                        viewObjects: {
-                            domanizedUrl: '!{domanizedUrl}',
-                            unSavedSiteId: '!{unSavedSiteId}',
-                            origUnSavedDomain: '!{origUnSavedDomain}'
-                        },
-                        addedSite: {
-                            domain: '!{validSites[0].domain}',
-                            siteId: '!{validSites[0].siteId}'
-                        },
-                        totalSteps: 6,
-                        defaultStep: step,
-                        addOtherSite: false
-                    };
-                });
-
-            if environment == 'production'
-                +loadAsset("js", [
-                    '/assets/js/builds/adpushup-onboarding.min.js'
-                ])
-            else
-                +loadAsset("js", [
-                    '/assets/js/libs/custom/adpushup-onboarding.js'
-                ])
-                
-
-        if (validSites[0].step == 6 && isSuperUser) || (!hasStep || !isSuperUser)
-            +loadAsset("js", [
-                '/assets/js/libs/third-party/d3.js',
-                '/assets/js/libs/third-party/c3.js',
-                '/assets/js/libs/third-party/dataTables.js',
-                '/assets/js/libs/third-party/dataTablesColReorder.js',
-                '/assets/js/reports/dataVisualization.js',
-                '/assets/js/reports/reports.js'
-            ])
-
-            +loadAsset("css", [
-                '/assets/css/c3.css',
-                '/assets/css/dataTables.css'
-            ])    
+        +loadAsset("css", [
+            '/assets/css/c3.css',
+            '/assets/css/dataTables.css'
+        ])    
 
 block bodyContent
     //- if isSuperUser || !requestDemo

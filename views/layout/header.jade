@@ -1,11 +1,14 @@
 .headerTopBar.navbar-fixed-top
-    if !isSuperUser
+    if !isSuperUser || superUserOnboarding
         .pull-left
             img.logo.logoL(src="/assets/images/logo.png", alt='logo', width='163', height='33', style="margin: 12px 25px;")
+    if superUserOnboarding && isSuperUser
+        .pull-right.col-lg-2.visible-lg.visible-md.mT-10
+                a.apbtn-danger(id="sidebar-logout-link", href='/user/logout') Logout    
     .pull-right.col-lg-2.visible-lg.visible-md.mT-10
         if !isSuperUser && requestDemo
             a.apbtn-danger(id="sidebar-logout-link", href='/user/logout') Logout
-        if isSuperUser 
+        if isSuperUser
             form(action='/user/switchTo', method='post')
                 input.form-control(type='text', id="dashboard-mail-list-input", list='targetEmail', name='email', onchange='this.form.submit()')
                 datalist#targetEmail(name='email')

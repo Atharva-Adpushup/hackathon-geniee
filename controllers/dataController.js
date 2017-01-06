@@ -11,6 +11,7 @@ var express = require('express'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
 	pipeDrive = require('../misc/vendors/pipedrive'),
+	pipeDriveObject = new pipeDrive();
 	router = express.Router();
 
 router
@@ -589,8 +590,7 @@ router
 	* 64 : Passback
 	*/
 	.post('/updateCrmDealStatus', function(req, res) {
-			var pipeDriveObject = new pipeDrive(),
-				dealStatus = req.body.status;
+			var dealStatus = req.body.status;
 
             userModel.getUserByEmail(req.session.user.email).then(function(user) {
 				var pipeDriveParams = {
@@ -600,6 +600,30 @@ router
 					}
 				}
 				return pipeDriveObject.apiCall('updateDealStatus', pipeDriveParams);
+			}).then(function(data) {
+				return res.send({success: 1});
+			}).catch(function(err) {
+				console.log(err);
+				return res.send({success: 0});
+			});	
+	})
+	.post('/updateCrmDeal', function(req, res) {
+			var dataToSend = null;
+
+            userModel.getUserByEmail(req.session.user.email).then(function(user) {
+				switch (req.body.type) {
+					case 'services':
+						dataToSend = {
+							"98d03ae31d14653dcc142c912a1f0faee3f1a088": req.body['data[servicesString]'],
+							"02921da334ea34a050d3b7ed7de2ef51ebce9fe5": req.body['data[pwc]']
+						}
+						break;
+				}
+				var pipeDriveParams = {
+					"searchText": user.data.crmDealId,
+					"dataToSend": dataToSend
+				}
+				return pipeDriveObject.apiCall('updateDeal', pipeDriveParams);
 			}).then(function(data) {
 				return res.send({success: 1});
 			}).catch(function(err) {
