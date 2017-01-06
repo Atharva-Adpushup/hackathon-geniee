@@ -55,7 +55,7 @@ class InlineEdit extends React.Component {
 					this.state.editMode ? (
 						<Row style={{margin: 0}}>
 							<Col className="u-padding-r10px" xs={colCompact}>
-								<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={adCodeCheck} onChange={this.props.validation ? this.changeValue.bind(this) : ()=>{}} />
+								<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={adCodeCheck} onFocus={this.props.validation ? this.changeValue.bind(this) : ()=>{}} onChange={this.props.validation ? this.changeValue.bind(this) : ()=>{}} />
 								<span className="error-message">{this.state.inputError ? (this.props.validationError ? this.props.validationError : this.props.errorMessage) : ''}</span>
 							</Col>
 							{
