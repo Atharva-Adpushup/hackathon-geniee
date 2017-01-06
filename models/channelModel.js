@@ -9,6 +9,7 @@ var model = require('../helpers/model'),
 	schema = require('../helpers/schema'),
 	FormValidator = require('../helpers/FormValidator'),
 	uuid = require('uuid'),
+	extend = require('extend'),
 	utils = require('../helpers/utils'),
 	Promise = require('bluebird'),
 	ViewQuery = require('couchbase-promises').ViewQuery,
@@ -192,6 +193,16 @@ function apiModule() {
 				return API.saveChannel(siteId, channel.platform, channel.pageGroup, channel);
 			});
 			return Promise.all(updatedChannels);
+		},
+		getVariations: function (siteId, platform, pageGroup) {
+			return API.getChannel(siteId, platform, pageGroup).then(function(channel) {
+				var computedData = {
+					variations: extend(true, {}, channel.get('variations'))
+				};
+
+				computedData.count = Object.keys(computedData.variations).length;
+				return Promise.resolve(computedData);
+			});
 		},
 		deleteChannel: function (siteId, platform, pageGroup) {
 			var appBucketConnect = couchbase.connectToAppBucket(),

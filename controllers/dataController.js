@@ -91,9 +91,10 @@ router
 		}
 
 		function getTotalPageViews() {
-			var config = lodash.assign({}, dataConfig);
+			var config = lodash.assign({}, dataConfig),
+				esSpecificVariationKey = clientVariationKey.replace(/-/g, '_');
 
-			config.queryString = 'mode:1 AND variationId:' + clientVariationKey;
+			config.queryString = 'mode:1 AND variationId:' + esSpecificVariationKey;
 
 			return Promise.resolve(reportsModel.apexReport(config))
 				.then(function(report) {

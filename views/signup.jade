@@ -127,5 +127,5 @@ block bodyContent
 						a(href="mailto:sales@adpushup.com", class="u-padding-0px u-margin-0px link link--primary") sales@adpushup.com
 
 	- signupJsBaseStr = "/assets/js/";
-	- signupJsStr = (environment == "production") ? (signupJsBaseStr + "build/signup-build.min.js") : (signupJsBaseStr + "signup.js");
+	- signupJsStr = (environment == "production") ? (signupJsBaseStr + "builds/signup.min.js") : ("/assets/js/libs/custom/signup.js");
 	+loadAsset("js", [signupJsStr])

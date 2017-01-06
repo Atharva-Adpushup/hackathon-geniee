@@ -10,11 +10,9 @@ html(lang="en")
                 block headCss
                     link(href='http://fonts.googleapis.com/css?family=Karla', rel='stylesheet', type='text/css')
                     if environment == "production"
-                        link(href="/assets/css/website.min.css", rel="stylesheet", type="text/css")
+                        link(href="/assets/css/builds/website.min.css", rel="stylesheet", type="text/css")
                     else
-                        link(href="/assets/css/website/website.css", rel="stylesheet", type="text/css")
-                    link(href="/assets/css/onboarding.css", rel="stylesheet", type="text/css")
-
+                        link(href="/assets/css/libs/website.css", rel="stylesheet", type="text/css")
 
                 link(id="favicon", rel="shortcut icon", href="/assets/images/favicon.ico", sizes="48x48", type="image/png")
                 title #{titleVar + " - AdPushup"}
@@ -23,7 +21,7 @@ html(lang="en")
                     if environment == "production"
                         script(type='text/javascript', src='//code.jquery.com/jquery-1.11.2.min.js')
                     else
-                        script(type='text/javascript', src='/assets/js/jquery-3.1.0.min.js')
+                        script(type='text/javascript', src='/assets/js/libs/third-party/jquery-3.1.0.min.js')
 
                     script(type='text/javascript').
                         window.apjQuery = window.jQuery;
@@ -32,7 +30,7 @@ html(lang="en")
                         });
 
                     - var baseLibsStr = "/assets/js/builds/";
-                    - var baseLibsFinalStr = (environment == "production") ? (baseLibsStr + "base-libs-build.min.js") : (baseLibsStr + "base-libs-build.js");
+                    - var baseLibsFinalStr = (environment == "production") ? (baseLibsStr + "base-libs.min.js") : ("/assets/js/libs/custom/base-libs.js");
                     +loadAsset("js", [baseLibsFinalStr])
 
                     if environment == "development"

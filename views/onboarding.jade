@@ -5,6 +5,9 @@ extends  layout/base
 block getTitle
     - var titleVar = "Onboarding"
 
+block append headCss
+    link(href="/assets/css/onboarding.css", rel="stylesheet", type="text/css")
+    
 //- Load AdPushup setup script if there is no valid site
 block append headScripts
 
