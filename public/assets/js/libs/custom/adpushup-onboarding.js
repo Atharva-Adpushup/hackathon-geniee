@@ -567,9 +567,14 @@ $('document').ready(function() {
                     return false;
                 }
             },
+            randomString: function(len) {
+                len = (len && Number(len) && (len > 1)) ? len : 10;
+
+                return Math.random().toString(32).substr(2, len);
+            },
             getAdcode: function (data) {
                 var encodedAd = this.base64_encode(data),
-                    randomControlId = Utils.randomString(5);
+                    randomControlId = this.randomString(5);
 
                 if(!encodedAd){
                     return false;
