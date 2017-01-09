@@ -50,7 +50,10 @@ const highLighterClass = '_APD_highlighter',
 		return (
 			<div style={listStyle}>
 				<div id={`ad-${id}`} className={highLighterClass} onClick={clickHandler} style={adBoxStyles}>
-					<div className="_AP_adSize _ap_reject" style={adBoxSizeStyles}>
+					<div className="_AP_adSize _ap_reject" ref={(node) => {
+						if (node) {
+							node.style.setProperty("pointerEvents", "none", "important");
+					}}}>
 						{adBoxSizeContent}
 					</div>
 				</div>
