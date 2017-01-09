@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Field, reduxForm } from 'redux-form';
+import { Field, FieldArray, reduxForm } from 'redux-form';
 import validate from './inContentValidations';
 import { Row, Col, Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
@@ -25,7 +25,40 @@ const form = reduxForm({
 				</Col>
 			</div>
 		);
-	}, 
+	},
+
+	getNotNearData = (collection) => {
+		const computedArr = [];
+
+		if (!collection || !collection.length) {
+			return false;
+		}
+
+		collection.forEach((obj) => {
+			const notNearObj = {};
+
+			notNearObj[obj.selector] = obj.pixels;
+			computedArr.push(notNearObj);
+		});
+
+		return computedArr;
+	},
+
+	renderNotNear = ({ fields, meta: { touched, error } }) => (
+		<ul>
+			<li className="mb-30">
+				<strong className="u-padding-r10px">Not near</strong><Button className="btn-lightBg" type="button" onClick={() => fields.push({})}>Add property</Button>
+				{touched && error && <span>{error}</span>}
+			</li>
+			{fields.map((property, index) =>
+				<li className="u-margin-b15px" key={index}>
+					<Field name={`${property}.selector`} type="text" component={renderField} label="HTML selector" placeholder="For example, .paragraph" />
+					<Field name={`${property}.pixels`} type="text" component={renderField} label="Pixel distance from selector" placeholder="For example, 300" />
+					<Button className="btn-lightBg" type="button" onClick={() => fields.remove(index)}>Remove property</Button>
+				</li>
+			)}
+		</ul>
+	),
 	renderCodeBox = field => {
 		return (<CodeBox showButtons={false} isField field={field} />);
 	},
@@ -37,14 +70,14 @@ const form = reduxForm({
 			});
 		});
 
-		if(currentUser.userType !== 'partner') {
+		if (currentUser.userType !== 'partner') {
 			nonPartnerAdSizes.forEach(size => {
 				size.sizes.forEach(adSize => {
 					sizes.push(`${adSize.width} x ${adSize.height}`);
 				});
 			});
 		}
-		
+
 		return _.uniq(sizes);
 	};
 
@@ -66,8 +99,8 @@ class inContentForm extends React.Component {
 		const props = this.props;
 
 		let CodeBoxField;
-		if(currentUser.userType !== 'partner') {
-			 CodeBoxField = (<Field name="adCode" component={renderCodeBox} label="Ad Code" />);
+		if (currentUser.userType !== 'partner') {
+			CodeBoxField = (<Field name="adCode" component={renderCodeBox} label="Ad Code" />);
 		}
 		else {
 			if(this.state.addCustomAdCode) {
@@ -133,6 +166,9 @@ class inContentForm extends React.Component {
 								{ CodeBoxField }
 							</Row>
 							<Row>
+								<FieldArray name="notNear" component={renderNotNear} />
+							</Row>
+							<Row>
 								<Col className="u-padding-r10px" style={{ marginTop: '30px', clear: 'both' }} xs={2}>
 									<Button className="btn-lightBg btn-save btn-block" type="submit">Save</Button>
 								</Col>
@@ -169,16 +205,20 @@ const mapStateToProps = (state, ownProps) => ({
 
 	mapDispatchToProps = (dispatch, ownProps) => ({
 		onSubmit: (values) => {
-			dispatch(createIncontentSection({
-				sectionNo: values.section,
-				minDistanceFromPrevAd: values.minDistanceFromPrevAd,
-				float: values.float
-			}, {
-				adCode: btoa(values.adCode),
-				adSize: values.adSize
-			}, ownProps.variation.id));
+			const notNear = getNotNearData(values.notNear),
+				sectionPayload = {
+					sectionNo: values.section,
+					minDistanceFromPrevAd: values.minDistanceFromPrevAd,
+					float: values.float,
+					notNear
+				},
+				adPayload = {
+					adCode: btoa(values.adCode),
+					adSize: values.adSize
+				};
+
+			dispatch(createIncontentSection(sectionPayload, adPayload, ownProps.variation.id));
 		}
 	});
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(form(inContentForm));

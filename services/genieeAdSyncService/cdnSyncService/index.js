@@ -48,6 +48,9 @@ module.exports = function (site) {
                     if (ad.secondaryCss) {
                         json.secondaryCss = ad.secondaryCss;
                     }
+                    if (section.notNear) {
+                        json.notNear = section.notNear;
+                    }
                 } else {
                     _.extend(json, {
                         xpath: section.xpath, operation: section.operation
