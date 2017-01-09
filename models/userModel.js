@@ -449,7 +449,14 @@ function apiModule() {
 									step: site.get('step'),
 									channels: site.get('channels')
 								};
-							});
+							}).catch(function() {
+								return {
+									domain: site.domain,
+									siteId: site.siteId,
+									step: site.step,
+									channels: []
+								};
+							})
 					});
 
 					return Promise.all(sitePromises).then(function (sites) {
