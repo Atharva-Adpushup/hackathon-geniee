@@ -126,6 +126,11 @@ input[type="checkbox"]:checked + label span.ccheckbox::before {
     border-color: #72b800;
     display: inline-block;
 }
+
+.ap-adsense-connect-btn {
+     width: 60%;
+ }
+
 .ob-add-another-site-original {
     padding-top: 20px;
     font-size: 15px;
