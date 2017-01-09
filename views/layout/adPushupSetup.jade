@@ -89,18 +89,9 @@ if addOtherSite
 #completionmodal.modal._ap_modal.fade.intro-modal(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
     .modal-dialog.wd-60.text-center(style="max-width: 500px; min-width: 500px; overflow: hidden;")
         .pricing-box-header Pricing Plan: 9% Ad Revenue Share
-        //- .pull-right
-        //-     button.close(type='button', data-dismiss='modal', aria-label='Close')
-        //-         span(aria-hidden='true') ×
         .modal-content.pd-0(style="padding: 0px;")
-            //- .pull-right
-            //-     button.close(type='button', data-dismiss='modal', aria-label='Close')
-            //-         span(aria-hidden='true') ×
-            //- .col-md-5.pricing-modal-img &nbsp;
-                //- img.img-responsive(src="/assets/images/completion_graphic.png")
             .col-md-12.pricing-modal-content.pd-0
                 .pricing-box.pd-0
-                    //- .pricing-box-header Pricing Plan: 9% Ad Revenue Share
                     .pricing-box-content
                         ul
                             li 
@@ -172,10 +163,6 @@ div.detectap-alert.text-center#apdetect
             | 1
         div.col-md-5
             img.wd-90(src="/assets/images/ob_add_site.png")
-            //- h3(class="ob-heading")
-            //-     | Add your site 
-            //-     span.link !{link } 
-            //-     i#step1-check.fa
         div.col-md-7(class="ob-content")
             h3(class="ob-heading")
                 | Add Site 
@@ -187,6 +174,7 @@ div.detectap-alert.text-center#apdetect
                 div#addSiteStr
                     != addSiteTemplateStr
             else
+                p
                 div#addSiteAlt
                     div#addSiteStr
 

@@ -191,7 +191,7 @@ router
             var allUserSites = req.session.user.sites,
                 params = {};
             _.map(allUserSites, function (site) {
-                if (site.step < 6) {
+                if (site.step == 1) {
                     params = {
                         siteDomain: site.domain,
                         siteId: site.siteId,
@@ -199,6 +199,8 @@ router
                     }
                 }
             });
+
+            console.log(params);
 
             res.render('addSite', params);
         } else {

@@ -162,7 +162,9 @@ $('document').ready(function() {
                     $('#step' + parseInt(i) + '-check').addClass('fa-check-circle zoomIn');
                 }
                 if (newSite.addedSite && step >= 2) {
-                    this.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + this.domanize(newSite.addedSite.domain) + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
+                    if(parseInt(newSite.addedSite.step) != 1) {
+                        this.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + this.domanize(newSite.addedSite.domain) + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
+                    }
                 }
                 if (newSite.addedSite && step >= 4) {
                     this.manipulateElem('#non-admin-email', '*Email* - ' + this.extractWebsiteName(newSite.addedSite.domain) + '@adpushup.com', 'htmlFadeIn', 600);

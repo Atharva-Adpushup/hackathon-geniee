@@ -22,14 +22,25 @@ block append headScripts
 		- siteDomain = null;
 		- siteId = null;
 		- introShow = true;
+	
+	- unSavedSite = siteDomain || null
+	- origUnSavedDomain = siteDomain || null
+	- domanizedUrl = utils.domanize(siteDomain) || null
+	- unSavedSiteId = siteId || null
 
 	script.
-
 		$('document').ready(function() {
+			var step = '#{step}';
 			adpushup.newSite = {
+				viewObjects: {
+					domanizedUrl: '!{domanizedUrl}',
+					unSavedSiteId: '!{unSavedSiteId}',
+					origUnSavedDomain: '!{origUnSavedDomain}'
+				},
 				addedSite: {
 					domain: '!{continueSiteDomain}',
-					siteId: '!{continueSiteId}'
+					siteId: '!{continueSiteId}',
+					step: '!{step}'
 				},
 				totalSteps: 6,
 				defaultStep: !{continueStep},
