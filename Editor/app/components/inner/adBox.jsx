@@ -2,8 +2,26 @@ import React, { PropTypes } from 'react';
 import $ from 'jquery';
 import Utils from 'libs/utils';
 import _ from 'lodash';
+import reactCSS from 'reactcss';
 
 const highLighterClass = '_APD_highlighter',
+	adBoxSizeStyles = reactCSS({
+		'default': {
+			size: {
+				background: '#eb575c !important',
+				borderRadius: '3px !important',
+				color: '#fff !important',
+				fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif !important",
+				fontSize: '12px !important',
+				fontWeight: '400 !important',
+				left: '5px !important',
+				padding: '4px !important',
+				position: 'absolute !important',
+				top: '5px !important',
+				pointerEvents: 'none'
+			}
+		}
+	}),
 	listStyle = {
 		position: 'absolute',
 		width: '100%',
@@ -37,7 +55,7 @@ const highLighterClass = '_APD_highlighter',
 		return (
 			<div style={listStyle}>
 				<div id={`ad-${id}`} className={highLighterClass} onClick={clickHandler} style={adBoxStyles}>
-					<div className="_AP_adSize _ap_reject _ap_size_label">
+					<div className="_AP_adSize _ap_reject" style={adBoxSizeStyles}>
 						{adBoxSizeContent}
 					</div>
 				</div>
