@@ -196,7 +196,7 @@ input[type="checkbox"]:checked + label span.ccheckbox::before {
     padding: 15px 0 0 35px;
 }
  #code-conversion-button, #code-conversion-finish {
-     width: 45%;
+     width: 42%;
      margin: 0 20px 0 0 !important;
  }
  #skip-ap-verification {
