@@ -38,27 +38,7 @@ module.exports = function (grunt) {
                     'Editor/app/libs/adpushup.js'
                 ],
                 dest: 'public/assets/js/libs/custom/base-libs.js'
-            },
-            websiteCSSBuild: {
-                src: ['public/assets/css/third-party/bootstrap.css', 
-                    'public/assets/css/third-party/bootstrap-multiselect.css', 
-                    'public/assets/css/third-party/fontAwesome.css',
-                    'public/assets/css/libs/website.style.css',
-                    'public/assets/css/libs/notifications.css'],
-                dest: 'public/assets/css/libs/website.css',
-            },
-            editorCSSBuild: {
-                src: ['public/assets/css/third-party/bootstrap.css', 
-                    'public/assets/css/third-party/bootflat.css', 
-                    'public/assets/css/third-party/fontAwesome.css',
-                    'public/assets/css/libs/editor.style.css',
-                    'public/assets/css/third-party/colorpicker.css',
-                    'public/assets/css/third-party/introjs.min.css',
-                    'public/assets/css/third-party/bootstrap.icons.css',
-                    'public/assets/css/third-party/codemirror.min.css',
-                    'public/assets/css/third-party/solarized.min.css'],
-                dest: 'public/assets/css/libs/editor.css',
-            },
+            }
         },
         sass: {
             dist: {
@@ -70,11 +50,11 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-sass');
-    grunt.loadNpmTasks('grunt-contrib-concat');
 
     grunt.registerTask('sasswatch', ['watch', 'cssmin']);
 

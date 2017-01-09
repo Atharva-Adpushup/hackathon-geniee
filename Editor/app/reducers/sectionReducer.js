@@ -33,7 +33,8 @@ const sectionByIds = (state = {}, action) => {
 					isIncontent: true,
 					float: payload.float,
 					sectionNo: payload.sectionNo,
-					minDistanceFromPrevAd: payload.minDistanceFromPrevAd
+					minDistanceFromPrevAd: payload.minDistanceFromPrevAd,
+					notNear: payload.notNear
 				}
 			};
 

@@ -7,7 +7,8 @@ var validator = require('validator'),
 
 module.exports = {
 	validate: function(json, rules, comparison) {
-		var errors = [];
+		var errors = [],
+			sampleUrlForced = json.sampleUrlForced;
 
 		Object.keys(json).map(function(key) {
 			Object.keys(rules).map(function(validation) {
@@ -24,10 +25,12 @@ module.exports = {
 								!validator.isIn(json[key].toUpperCase(), rule.allowedValues) ? errors.push({message: rule.message, status: rule.status}) : '';
 								break;
 							case 'isSameDomain':
-								if(comparison && (utils.getSiteDomain(json[key]) !== utils.getSiteDomain(comparison))) {
-									!validator.equals(json[key], comparison) ? errors.push({message: rule.message, status: rule.status}) : '';
+								if(!sampleUrlForced) {
+									if(comparison && (utils.getSiteDomain(json[key]) !== utils.getSiteDomain(comparison))) {
+										!validator.equals(json[key], comparison) ? errors.push({message: rule.message, status: rule.status}) : '';
+									}
+									break;
 								}
-								break;
 						}
 					}
 				});

@@ -16,19 +16,34 @@ block append headScripts
                 var a = document.createElement('a');
                 a.href = url;
                 return a.hostname;
-            }
+            };
 
-            $('#sampleUrl').on('blur', function() {
-                var val = $(this).val();
+            function disableSampleUrlValidation() {
+                $('#createPg').prop('disabled', false);
+                $('#error-message').html('');   
+            };
 
+            function sampleUrlValidation(val) {
                 if(val && (getDomain(val) !== getDomain('#{siteDomain}'))) {
                     $('#createPg').prop('disabled', true);
                     $('#error-message').html('The Sample URL should be from your website only');   
                 }
                 else {
-                    $('#createPg').prop('disabled', false);
-                    $('#error-message').html('');   
+                    disableSampleUrlValidation();
                 }
+            };
+
+            $('#forceSampleUrl').on('change', function() {
+                var val = $('#sampleUrl').val(),
+                    sampleUrlForced = $(this).prop('checked');
+                !sampleUrlForced ? sampleUrlValidation(val) : disableSampleUrlValidation();
+            });
+
+            $('#sampleUrl').on('keyup', function() {
+                var val = $(this).val(),
+                    sampleUrlForced = $('#forceSampleUrl').prop('checked');
+
+                !sampleUrlForced ? sampleUrlValidation(val) : disableSampleUrlValidation();
             });
         });  
 
@@ -66,6 +81,9 @@ block bodyContent
                                         label Sample Url
                                     .col-sm-3
                                         input.form-control#sampleUrl(required, name="sampleUrl", type="url" placeholder="Please enter Sample Url") 
+                                        .mT-10
+                                            label.mR-5 Force Sample Url 
+                                            input(type="checkbox" id="forceSampleUrl" name="forceSampleUrl")
                                 .row.input-wrapper
                                     .col-sm-2
                                         label Device

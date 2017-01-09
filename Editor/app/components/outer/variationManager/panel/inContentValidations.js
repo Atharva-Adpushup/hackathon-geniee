@@ -8,9 +8,30 @@ function validate(formProps) {
 	if (!formProps.minDistanceFromPrevAd) {
 		errors.minDistanceFromPrevAd = 'Please enter minDistanceFromPrevAd';
 	}
-	
+
 	if (!formProps.adCode) {
 		errors.adCode = 'Please enter Ad Code';
+	}
+
+	if (formProps.notNear && Object.keys(formProps.notNear).length) {
+		const itemsArrayErrors = [];
+
+		formProps.notNear.forEach((item, itemIndex) => {
+			const itemErrors = {};
+
+			if (!item || !item.selector) {
+				itemErrors.selector = 'Please enter a selector';
+				itemsArrayErrors[itemIndex] = itemErrors;
+			}
+			if (!item || !item.pixels) {
+				itemErrors.pixels = 'Please enter the distance in pixels';
+				itemsArrayErrors[itemIndex] = itemErrors;
+			}
+		});
+
+		if (itemsArrayErrors.length) {
+			errors.notNear = itemsArrayErrors;
+		}
 	}
 
 	return errors;

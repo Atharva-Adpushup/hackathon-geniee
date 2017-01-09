@@ -131,7 +131,7 @@ router
                             return res.render('createPageGroup', {
                                 siteId: req.params.siteId,
                                 siteDomain: data.siteDomain,
-                                channels: channels,
+                                channels: _.uniq(channels),
                                 error: error
                             });
                         });

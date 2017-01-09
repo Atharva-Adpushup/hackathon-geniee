@@ -21,20 +21,19 @@ class info extends React.Component {
 		};
 	}
 
-	componentWillReceiveProps() {
-		const props = this.props;
-
-		this.setState({
-			sampleUrl: props.channel.sampleUrl,
-			forceSampleUrl: props.channel.forceSampleUrl
-		});
+	toggleStateValues(target, val) {
+		this.setState({ forceSampleUrl: val });
 	}
 
 	onChange(sampleUrl) {
-		const isValidUrl = utils.ValidUrl(sampleUrl.trim()),
-			isHostNameEqual = isValidUrl ? (utils.parseUrl(sampleUrl).hostname == utils.parseUrl(window.ADP_SITE_DOMAIN).hostname) : false;
-		
-		return isHostNameEqual;
+		if (!this.state.forceSampleUrl) {
+			const isValidUrl = utils.ValidUrl(sampleUrl.trim()),
+				isHostNameEqual = isValidUrl ? (utils.parseUrl(sampleUrl).hostname == utils.parseUrl(window.ADP_SITE_DOMAIN).hostname) : false;
+			
+			return isHostNameEqual;
+		} else {
+			return true;
+		}
 	}
 
 	getClass(name) {
@@ -79,7 +78,12 @@ class info extends React.Component {
 						<label>Sample Url</label>
 					</Col>
 					<Col xs={12} className="wrapfeature">
-						<InlineEdit compact font={400} validation={this.onChange} validationError="Sample Url must be from your website only" value={channel.sampleUrl} submitHandler={onSampleUrlChange.bind(null, channel.id)} text="Sample Url" errorMessage="Sample Url cannot be blank" />
+						<InlineEdit compact font={400} validation={this.onChange.bind(this)} validationError="Sample Url must be from your website only" value={channel.sampleUrl} submitHandler={onSampleUrlChange.bind(null, channel.id)} text="Sample Url" errorMessage="Sample Url cannot be blank" />
+					</Col>
+				</Row>
+				<Row>
+					<Col xs={12}>
+						<CustomToggleSwitch labelText="Force sample url" className="mB-0" defaultLayout checked={this.state.forceSampleUrl} name="forceSampleUrl" onChange={a => this.toggleStateValues('forceSampleUrl', a)} layout="horizontal" size="m" id="js-force-sample-url" on="On" off="Off" />
 					</Col>
 				</Row>
 			</div>

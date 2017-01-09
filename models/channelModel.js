@@ -55,7 +55,8 @@ function apiModule() {
 		createPageGroup: function (json) {
 			return siteModel.getSiteById(json.siteId)
 				.then(function (site) {
-					return FormValidator.validate({ sampleUrl: json.sampleUrl }, schema.api.validations, site.data.siteDomain)
+					var sampleUrlForced = _.has(json, 'forceSampleUrl');
+					return FormValidator.validate({ sampleUrl: json.sampleUrl, sampleUrlForced: sampleUrlForced }, schema.api.validations, site.data.siteDomain)
 						.then(function (data) {
 							var channel = json.device.toUpperCase() + ':' + json.pageGroupName.toUpperCase(), channelData, channels = site.get('channels');
 							if (_.includes(channels, channel)) {

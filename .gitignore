@@ -28,6 +28,10 @@ public/apex.js
 public/assets/js/gieneeApEditor/
 Editor/build/
 *.map
+builds
+public/assets/css/libs/editor.style.css
+public/assets/css/libs/website.style.css
+public/assets/js/libs/custom/base-libs.js
 public/assets/js/builds/genieeAp.js
 public/assets/js/builds/inner.js
 public/assets/js/builds/outer.js
