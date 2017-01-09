@@ -299,3 +299,17 @@
     font-weight: normal !important;
     display: inline-block;
 }
+
+._ap_size_label {
+    background-color: '#eb575c !important';
+    border-radius: '3px !important';
+    color: '#fff !important';
+    font-family: "'Helvetica Neue', Helvetica, Arial, sans-serif !important";
+    font-size: '12px !important';
+    font-weight: '400 !important';
+    left: '5px !important';
+    padding: '4px !important';
+    position: 'absolute !important';
+    top: '5px !important';
+    pointer-events: 'none !important';
+}
