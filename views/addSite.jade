@@ -5,6 +5,12 @@ extends layout/base
 block getTitle
 	- var titleVar = "Add New Site"
 
+block append headCss
+	if environment == 'production'
+		link(href="/assets/css/builds/onboarding.min.css", rel="stylesheet", type="text/css")
+	else
+		link(href="/assets/css/libs/onboarding.css", rel="stylesheet", type="text/css")
+
 block append headScripts
 	if step
 		- continueStep = step + 1;
