@@ -1,0 +1,207 @@
+/* General */
+.wd-90 {
+    width: 90% !important;
+}
+.wd-80 {
+    width: 80% !important;
+}
+.wd-60 {
+    width: 60% !important;
+}
+.wd-50 {
+    width: 50% !important;
+}
+/* General End */
+
+/* Intro Modal */
+.intro-modal-row {
+    margin-top: 60px;   
+}
+.intro-modal-img img {
+    width: 100% !important;
+}
+.intro-modal-content h3, #addOtherSiteModal h3 {
+    margin-bottom: 20px; 
+    font-size: 1.65em !important;
+    text-align: left;
+    padding-left: 35px;
+}
+#onboarding-services-form, #onboarding-inner-services-form {
+    padding: 0px 35px; 
+    font-size: 16px;
+}
+label {
+    font-weight: normal !important;
+}
+.pricing-modal-img {
+    min-height: 300px;
+    background: url(/assets/images/completion_graphic.png);
+    background-size: 110%;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+.pricing-box-header {
+    padding: 15px 10px;
+    font-size: 1.65em;
+    background: #eb575c;
+    color: #fff;
+}
+/*.pricing-box-content {
+    padding: 15px;
+}*/
+.pricing-box-btn {
+    font-size: 14px;
+}
+.pricing-box-content ul li {
+    padding: 10px;
+    font-size: 1.3em !important;
+}
+.pricing-box-content ul li:nth-of-type(2n+2) {
+    background: #ebebeb;
+}
+/* Intro Modal End */
+
+/* Add another site Modal */
+#add-another-site-modal-content {
+    margin-top: 30px;
+}
+#add-another-site-modal-content h3 {
+    margin-bottom: 20px; 
+    font-size: 22px;
+}
+/* Add another site Modal End */
+
+/* Steps */
+.onboarding-step {
+    min-height: 390px;
+}
+.ob-heading {
+    font-weight: bold;
+}
+.ob-content p {
+    font-size: 16px; 
+    text-align: left;
+    padding: 20px 0 0 20px;
+}
+/* Steps End */
+
+.checkbox-custom, .radio-custom {
+    opacity: 0;
+    position: absolute;
+    cursor: pointer;
+}
+.error-message-box {
+    margin-top: 10px;
+    color: #eb575c;
+}
+.form-group span.ccheckbox::before {
+  width: 27px;
+  height: 27px;
+  background-color: #fff;
+  left: -35px;
+  margin-right: 10px;
+  box-sizing: border-box;
+  border: 2px solid #eb575c;
+  transition: border-color .2s;
+}
+.form-group span.ccheckbox:hover::before {
+  border: 2px solid #eb575c;
+}
+.form-group span.ccheckbox::before {
+  content: '\f00c';
+  font-family: 'FontAwesome';
+  left: -31px;
+  top: 2px;
+  color: transparent;
+  transition: color .2s;
+}
+input[type="checkbox"]:checked + label span.ccheckbox::before {
+  color: #eb575c;
+}
+
+.ob-btn, #add-another-site-submit, .ap-code-verify, .ap-adsense-connect-btn, #non-admin-access, #code-conversion-button, #code-conversion-finish {
+    margin: 30px 20px 0 20px !important;
+    width: 50%;
+    background: #72b800;
+    border-color: #72b800;
+    display: inline-block;
+}
+.ob-add-another-site-original {
+    padding-top: 20px;
+    font-size: 15px;
+    text-decoration: underline;
+}
+.ob-content {
+    padding-top: 33px;
+}
+#another-site-box {
+    padding-top: 30px;
+    padding-left: 20px;
+    display: none;
+}
+#add-another-site {
+    font-size: 15px;
+    text-decoration: underline;
+}
+.ob-btn:hover, .ap-adsense-connect-btn:hover, #add-another-site-submit:hover, .ap-code-verify:hover, #non-admin-access:hover, #code-conversion-button:hover, #code-conversion-finish:hover  {
+    /*color: #eb575c;*/
+    color: #fff;
+    background: #66a401 !important;
+    /*border-color: #eb575c;*/
+}
+#another-site-input, #add-other-site {
+    width: 55%;
+    border: 1px solid #ccc;
+    height: 38px;
+}
+#add-other-site {
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+#add-another-site-submit {
+    margin: 0px !important;
+    width: 30%;
+    margin-left: 10px !important;
+    vertical-align: top !important;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    color: #fff;
+    border-radius: 4px;
+}
+.snippet-btn-wrapper {
+    margin-bottom: 5px;
+}
+.snippet {
+    margin-top: 0;
+    height: auto;
+}
+.ap-code-verify {
+    margin: 15px 0 0 30px !important;
+    /*float: right;*/
+}
+.ap-adsense-connect-btn, #non-admin-access {
+    margin: 0 auto !important;
+}
+#non-admin-access {
+    margin-top: 15px !important;
+}
+.apbtn-icon > i.fa-google {
+    color: #72b800;
+}
+.code-convert-wrapper {
+    padding: 10px 0px 0px 10px;
+}
+.code-conversion-btns {
+    padding: 15px 0 0 35px;
+}
+ #code-conversion-button, #code-conversion-finish {
+     width: 45%;
+     margin: 0 20px 0 0 !important;
+ }
+ #skip-ap-verification {
+     color: #eb575c;
+     text-decoration: underline;
+     font-weight: bold;
+     cursor: pointer;
+ }

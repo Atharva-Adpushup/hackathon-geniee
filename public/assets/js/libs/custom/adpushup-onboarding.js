@@ -8,6 +8,7 @@ $('document').ready(function() {
 
         // Define onboarding sequence object
         ap.onboarding = {
+            dom: null,
             // Intro modal check
             showIntro: function() {
                 // var showIntro = w.localStorage.getItem('showIntro');
@@ -273,27 +274,6 @@ $('document').ready(function() {
                                 }
                             }
                         });
-                    //     $.post('/user/addSite', {
-                    //         site: url
-                    //     }, function(res) {
-                    //         if(res.success) {
-                    //             if(!newSite.addOtherSite)
-                    //             {
-                    //                 var status = 66;
-                    //                 ob.updateCrmDealStatus(status);
-                    //                 ob.analyticsEventEmitter('Added Site');                                    
-                    //             }
-                    //             $(btn).fadeOut(100);
-                    //             ob.saveSiteModel(site, url, res.siteId, btn);
-                    //             return true;
-                    //         }
-                    //         else {
-                    //             ap.apAlert('Some error occurred! Please try again later.', '#apdetect', 'error', 'slideDown');
-                    //             $(btn).html('Lets Add ' + site + ' ?').prop('disabled', false);
-                    //             return false;
-                    //         }
-                    //     });
-                    // }
                     }
                 }
                 else {
@@ -603,7 +583,89 @@ $('document').ready(function() {
                 ];
                 return newAdCode.join('\n');
             },
-
+            isNonEmpty: function (val) {
+                if(!val || typeof val == "undefined" || val == null || (val.trim && val.trim() == ""))
+                    return false
+                return true
+            },
+            runCode: function(data) {
+                this.dom = $("<div>" + data + "</div>");
+            },
+            isCodeAdsense: function(){
+                return this.dom.html().indexOf("pagead2.googlesyndication.com") != -1
+            },
+            isSyncAdsense: function(){
+                var script = this.dom.find("script[src]"),
+                    scriptTag = this.dom.find("script:not([src])");
+                if(script.length == 1 && scriptTag.length == 1){
+                    script = script.get(0);
+                    scriptTag = scriptTag.html();
+                    return script.src.trim().indexOf("pagead2.googlesyndication.com/pagead/show_ads.js") > -1 && scriptTag.indexOf('google_ad_client') > -1 && scriptTag.indexOf('google_ad_slot') > -1
+                }
+                return false;
+            },
+            isOldAdsenseCode: function(){
+                var script = this.dom.find("script:not([src])");
+                if(script.length == 1){
+                    script = script.html();
+                    return (script.indexOf('google_color_border') > -1 && script.indexOf('google_color_bg') > -1&& script.indexOf('google_color_link') > -1)
+                }
+                return false;
+            },
+            isAsyncCode: function(){
+                var scriptsWithoutSrc = this.dom.find("script:not([src])"),
+                    scriptsWithSrc = this.dom.find("script[src]"),
+                    ins = this.dom.find("ins.adsbygoogle");
+                if(scriptsWithoutSrc.length == scriptsWithSrc.length == ins.length == 1){
+                    scriptsWithSrc = scriptsWithSrc.get(0);
+                    return (scriptsWithSrc.src.indexOf('pagead2.googlesyndication.com/pagead/js/adsbygoogle.js') > -1 && this.isNonEmpty(ins.attr("data-ad-client")) && this.isNonEmpty(ins.attr("data-ad-slot")))
+                }
+                return false;
+            },
+            getAdsenseAsyncCode: function(adConfig){
+                var adCode = [];
+                adCode.push('<scr' + 'ipt async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></scr' + 'ipt>');
+                adCode.push('<ins class="adsbygoogle" style="display:inline-block;width:' + adConfig.width + 'px;height:' + adConfig.height + 'px" data-ad-client="' + adConfig.pubid + '" data-ad-slot="' + adConfig.adslot + '"></ins>');
+                adCode.push('<scr' + 'ipt> (adsbygoogle = window.adsbygoogle || []).push({}); </scr' + 'ipt>');
+                return adCode.join("\n");
+            },
+            changeSyncToAsync: function(){
+                var scriptsWithoutSrc = this.dom.find("script:not([src])");
+                if(scriptsWithoutSrc.length == 1){
+                    $.globalEval(scriptsWithoutSrc.get(0).textContent);
+                    if(google_ad_width && google_ad_height && google_ad_slot && google_ad_client)
+                        return this.getAdsenseAsyncCode({width:google_ad_width,height:google_ad_height,pubid:google_ad_client,adslot:google_ad_slot})
+                }
+                return false;
+            },
+            toggleTransform: function (data) {
+                this.runCode(data);
+                if(!this.isCodeAdsense()){
+                    return {
+                        error: 1,
+                        message: "We only support Adsense code as control."
+                    };
+                } else if(this.isAsyncCode()) {
+                    var code = this.getAdcode(data);
+                    return {
+                        error: 0,
+                        code: code
+                    }
+                } else if(this.isOldAdsenseCode()) {
+                    return { 
+                        error: 1,
+                        message: "We don't support Old Adsense code, please use async adsense code."
+                    };
+                } else if(this.isSyncAdsense()){
+                    var adCode = this.changeSyncToAsync();
+                    return !adCode ? {error: 1, "message": "There was some issue in control conversion plz contact support"} : {error: 0, code: adCode};
+                } else {
+                    return {
+                        error: 1,
+                        message: "Some error occurred."
+                    }
+                }
+            },
             // Code Coversion Finish
             codeCoversionProceed: function() {
                 var ob = this,
@@ -829,13 +891,19 @@ $('document').ready(function() {
                 ap.apAlert('Please enter control ad code!', '#apdetect', 'inverted', 'slideDown');
                 return;
             }
-            convertedCode = ap.onboarding.getAdcode(inputBoxValue);
-            if(convertedCode) {
-                // e.target.val('Convert Another');
-                inputBox.val(convertedCode);
+            resultObject = ap.onboarding.toggleTransform(inputBoxValue);
+            if(resultObject.error == 0) {
+                inputBox.val(resultObject.code);                
             } else {
-                ap.apAlert('Some error has occurred!', '#apdetect', 'inverted', 'slideDown');
-            }      
+                ap.apAlert(resultObject.message, '#apdetect', 'inverted', 'slideDown');
+            }
+            // convertedCode = ap.onboarding.getAdcode(inputBoxValue);
+            // if(convertedCode) {
+            //     // e.target.val('Convert Another');
+            //     inputBox.val(convertedCode);
+            // } else {
+            //     ap.apAlert('Some error has occurred!', '#apdetect', 'inverted', 'slideDown');
+            // }
         });
 
         // Trigger code conversion finish

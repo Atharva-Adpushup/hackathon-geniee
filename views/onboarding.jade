@@ -6,7 +6,7 @@ block getTitle
     - var titleVar = "Onboarding"
 
 block append headCss
-    link(href="/assets/css/onboarding.css", rel="stylesheet", type="text/css")
+    link(href="/assets/css/libs/onboarding.css", rel="stylesheet", type="text/css")
     
 //- Load AdPushup setup script if there is no valid site
 block append headScripts
@@ -75,22 +75,6 @@ block append headScripts
                     '/assets/js/libs/custom/adpushup-onboarding.js'
                 ])
                 
-
-        if (validSites[0].step == 6 && isSuperUser) || (!hasStep || !isSuperUser)
-            +loadAsset("js", [
-                '/assets/js/libs/third-party/d3.js',
-                '/assets/js/libs/third-party/c3.js',
-                '/assets/js/libs/third-party/dataTables.js',
-                '/assets/js/libs/third-party/dataTablesColReorder.js',
-                '/assets/js/reports/dataVisualization.js',
-                '/assets/js/reports/reports.js'
-            ])
-
-            +loadAsset("css", [
-                '/assets/css/c3.css',
-                '/assets/css/dataTables.css'
-            ])    
-
 block bodyContent
     .pageContainer.page-container
         if isSuperUser || unSavedSiteId
