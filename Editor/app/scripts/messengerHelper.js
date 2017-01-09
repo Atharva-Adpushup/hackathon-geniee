@@ -47,11 +47,11 @@ const messenger = new Messenger(),
 					break;
 
 				case messengerCommands.SECTION_ALL_XPATHS:
-					this.flux.actions.updateSection(data);
+					// this.flux.actions.updateSection(data);
 					break;
 
 				case messengerCommands.SECTION_XPATH_MISSING:
-					this.flux.actions.updateSection({ id: data.id, xpathMissing: true });
+					// this.flux.actions.updateSection({ id: data.id, xpathMissing: true });
 					break;
 
 				default:
