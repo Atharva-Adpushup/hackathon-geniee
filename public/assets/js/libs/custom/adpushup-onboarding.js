@@ -581,7 +581,7 @@ $('document').ready(function() {
                 }
 
                 var newAdCode = [
-                    '<ins class="adPushupAds" data-adpControl="' + randomControlId + '" data-ver="2" data-siteId="' + ADP_SITE_ID + '" data-ac="' + encodedAd + '"><\/ins>' +
+                    '<ins class="adPushupAds" data-adpControl="' + randomControlId + '" data-ver="2" data-siteId="' + newSite.addSite.siteId + '" data-ac="' + encodedAd + '"><\/ins>' +
                     '<script data-cfasync="false" type="text/javascript">(function (w, d) { for (var i = 0, j = d.getElementsByTagName(\"ins\"), k = j[i]; i < j.length; k = j[++i]){ if(k.className == \"adPushupAds\" && k.getAttribute(\"data-push\") != \"1\") { ((w.adpushup = w.adpushup || {}).control = (w.adpushup.control || [])).push(k); k.setAttribute(\"data-push\", \"1\"); (((w.adpushup = w.adpushup || {}).timeline = (w.adpushup.timeline || {})).tl_cntPsh = (w.adpushup.timeline.tl_cntPsh || [])).push(+new Date); } } var s = document.createElement(\"script\"); s.type = \"text\/javascript\"; s.async = true; s.src = \"\/\/static.adpushup.com\/js\/adpushupadsv2.js\"; (d.getElementsByTagName(\"head\")[0]||d.getElementsByTagName(\"body\")[0]).appendChild(s); })(window, document);</script>',
                 ];
                 return newAdCode.join('\n');
