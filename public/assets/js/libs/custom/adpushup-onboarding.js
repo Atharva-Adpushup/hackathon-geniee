@@ -226,6 +226,8 @@ $('document').ready(function() {
             },
 
             // Add a new site (default)
+            // site : http
+            // url : without http
             addSite: function(site, url, btn, flag) {
                 var ob = this,
                     response = true;
@@ -233,12 +235,8 @@ $('document').ready(function() {
                     $(btn).html('Adding ' + site + ' ...').prop('disabled', true);
                 }
                 if(newSite.addOtherSite || flag) {
-                    // console.log("Inside newSite");
                     var siteAlreadyAdded = function() {
                         for(var i in w.currentUser.sites) {
-                            // console.log(w.currentUser.sites[i].domain);
-                            // console.log(site);
-                            // console.log(url);
                             if(w.currentUser.sites[i].domain === site+'/') {
                                 return true;
                             }
@@ -519,7 +517,7 @@ $('document').ready(function() {
                     ap.apAlert('Please add a valid website', '#apdetect', 'inverted', 'slideDown');
                     return false;
                 }
-                var response = this.addSite(newSiteByUser, this.domanize(newSiteByUser), btn, true);
+                var response = this.addSite(this.domanize(newSiteByUser), newSiteByUser, btn, true);
                 if(response) {
                     $(btn).fadeOut(300);
                     this.nextStep(3, 2, 1000);
@@ -569,7 +567,6 @@ $('document').ready(function() {
                     return false;
                 }
             },
-
             getAdcode: function (data) {
                 var encodedAd = this.base64_encode(data);
 
@@ -830,7 +827,7 @@ $('document').ready(function() {
             $('#another-site-box').fadeIn(500);
         });
 
-        // Trigger to add user's another site processing
+        // Trigger to add user's another site processing from onboarding step
         $('#add-another-site-submit').click(function(e) {
             e.preventDefault();
             var newSiteByUser = $('#another-site-input').val(),
