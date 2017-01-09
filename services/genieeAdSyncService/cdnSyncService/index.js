@@ -22,7 +22,6 @@ module.exports = function (site) {
 			dateFrom: moment().subtract(31, 'days').format('YYYY-MM-DD'),
 			dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
 		},
-        getReportsData = genieeReportService.getReport(paramConfig),
         getAdsPayload = function (variationSections) {
             var ads = [], ad = null, json, unsyncedAds = false;
             _.each(variationSections, function (section, sectionId) {
@@ -143,7 +142,7 @@ module.exports = function (site) {
         getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
         getComputedConfig = Promise.resolve(true).then(function() {
             if (isGenieePartner) {
-                return getReportsData.then(function(reportData) {
+                return genieeReportService.getReport(paramConfig).then(function(reportData) {
                     return getVariationsPayload(site, reportData).then(setAllConfigs);
                 });
             } else {
