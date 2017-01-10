@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import './inlineEdit.scss';
-import requiredIf from 'react-required-if';
 
 class InlineEdit extends React.Component {
 	constructor(props) {
@@ -9,13 +8,19 @@ class InlineEdit extends React.Component {
 		this.state = {
 			editMode: false,
 			inputError: false,
-			disableSave: false
+			disableSave: false,
+			showDropdownList: true
 		};
+	}
+
+	hideDropdownList() {
+		this.setState({ showDropdownList: false });
 	}
 
 	triggerEdit() {
 		this.props.editClickHandler ? this.props.editClickHandler() : null;
 		this.setState({ editMode: true });
+		this.props.dropdownList.length ? this.setState({ showDropdownList: true }) : null;
 	}
 
 	cancelEdit() {
@@ -37,6 +42,11 @@ class InlineEdit extends React.Component {
 		!validated ? this.setState({ disableSave: true, inputError: true }) : this.setState({ disableSave: false, inputError: false });
 	}
 
+	selectDropdownValue(xpath) {
+		this.refs.editedText.value = xpath;
+		this.hideDropdownList();
+	}
+
 	render() {
 		const colCompact = this.props.compact ? 12 : 6,
 			adCodeStyles = {
@@ -50,13 +60,30 @@ class InlineEdit extends React.Component {
 				verticalAlign: 'super'
 			},
 			adCodeCheck = this.props.adCode ? (!this.props.value ? '' : atob(this.props.value)) : this.props.value;
+
 		return (
 			<div>
 				{
 					this.state.editMode ? (
 						<Row style={{margin: 0}}>
-							<Col className="u-padding-r10px" xs={colCompact}>
+							<Col className="u-padding-r10px" xs={colCompact} style={{position: 'relative'}}>
 								<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={adCodeCheck} onFocus={this.props.changeHandler ? this.changeValue.bind(this) : ()=>{}} onChange={this.props.changeHandler ? this.changeValue.bind(this) : ()=>{}} />
+								{
+									this.state.showDropdownList ? (
+										<div className="inline-dropdown-wrapper">
+											<button onClick={this.hideDropdownList.bind(this)}>x</button>
+											<ul className="inline-dropdown" style={this.props.dropdownList.length > 3 ? {overflowY: 'scroll',overflowX: 'hidden'} : {} }>
+												{
+													this.props.dropdownList.map((xpath, key) => (
+														<li onClick={this.selectDropdownValue.bind(this, xpath)} key={key}>
+															{xpath}
+														</li>
+													))
+												}
+											</ul>
+										</div>
+									) : null
+								}
 								<span className="error-message">{this.state.inputError ? (this.props.validationError ? this.props.validationError : this.props.errorMessage) : ''}</span>
 							</Col>
 							{
@@ -113,7 +140,8 @@ InlineEdit.propTypes = {
 	changeHandler: PropTypes.func,
 	validationError: PropTypes.string,
 	editClickHandler: PropTypes.func,
-	adCode: PropTypes.bool
+	adCode: PropTypes.bool,
+	dropdownList: PropTypes.array
 };
 
 InlineEdit.defaultProps = {

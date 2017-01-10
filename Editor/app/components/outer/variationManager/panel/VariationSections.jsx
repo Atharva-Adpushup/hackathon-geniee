@@ -15,7 +15,7 @@ const variationSections = (props) => {
 			<ul className="section-list row">
 				{ sections.map((section, key) => (
 					<div key={key} className="col-sm-4">
-						<li key={section.id}>
+						<li className="section-list-item" key={section.id}>
 							<OverlayTrigger placement="bottom" overlay={<Tooltip id="delete-section-tooltip">Delete Section</Tooltip>}>
 								{/*`section.ads[0].id` is temporarily added as 3rd argument to accomodate
 								  * one section and one ad creation/deletion
@@ -72,7 +72,7 @@ const variationSections = (props) => {
 										<Row>
 											<Col className="u-padding-r10px" xs={4}>XPath</Col>
 											<Col className="u-padding-l10px" xs={8}>
-												<InlineEdit compact value={section.xpath}
+												<InlineEdit compact dropdownList={section.allXpaths} value={section.xpath}
 													submitHandler={onUpdateXPath.bind(null, section.id)} editClickHandler={onSectionAllXPaths.bind(null, section.id, section.xpath)} text="XPath" errorMessage="XPath cannot be blank"
 												/>
 											</Col>
