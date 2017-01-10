@@ -59,7 +59,7 @@ const sectionByIds = (state = {}, action) => {
 			return { ...state, [action.sectionId]: { ...state[action.sectionId], name: action.name } };
 
 		case sectionActions.UPDATE_XPATH:
-			return { ...state, [action.sectionId]: { ...state[action.sectionId], xpath: action.xpath } };
+			return { ...state, [action.sectionId]: { ...state[action.sectionId], xpath: action.xpath, allXpaths: [] } };
 
 		case adActions.DELETE_AD:
 			const index = state[action.sectionId].ads.indexOf(action.adId);

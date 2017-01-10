@@ -20,7 +20,7 @@ class InlineEdit extends React.Component {
 	triggerEdit() {
 		this.props.editClickHandler ? this.props.editClickHandler() : null;
 		this.setState({ editMode: true });
-		this.props.dropdownList.length ? this.setState({ showDropdownList: true }) : null;
+		(this.props.dropdownList && this.props.dropdownList.length) ? this.setState({ showDropdownList: true }) : null;
 	}
 
 	cancelEdit() {
@@ -72,7 +72,7 @@ class InlineEdit extends React.Component {
 									this.state.showDropdownList ? (
 										<div className="inline-dropdown-wrapper">
 											<button onClick={this.hideDropdownList.bind(this)}>x</button>
-											<ul className="inline-dropdown" style={this.props.dropdownList.length > 3 ? {overflowY: 'scroll',overflowX: 'hidden'} : {} }>
+											<ul className="inline-dropdown" style={(this.props.dropdownList && this.props.dropdownList.length > 3) ? {overflowY: 'scroll',overflowX: 'hidden'} : {} }>
 												{
 													this.props.dropdownList.map((xpath, key) => (
 														<li onClick={this.selectDropdownValue.bind(this, xpath)} key={key}>

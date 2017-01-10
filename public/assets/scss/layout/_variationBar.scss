@@ -120,7 +120,8 @@
 }
 
 .section-list .section-list-item {
-    min-height: 180px;
+    min-height: 200px;
+    
     & {
         padding: 10px;
         border: 1px solid lighten($lightGrey, 5%);
