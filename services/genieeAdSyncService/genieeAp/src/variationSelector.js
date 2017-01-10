@@ -15,7 +15,7 @@ module.exports = function(config) {
 
 	allVariations = experiment[config.platform][config.pageGroup].variations;
 	forcedVariationId = utils.queryParams[config.forceVariation];
-	forcedVariation = (forcedVariationId) ? utils.getObjectById(allVariations, forcedVariationId) : false;
+	forcedVariation = (forcedVariationId) ? utils.getObjectByName(allVariations, forcedVariationId) : false;
 
 	// Force a variation using 'forceVariation' query param implementation
 	if (forcedVariationId && forcedVariation) {
