@@ -47,6 +47,7 @@ const selectorator = new Selectorator(),
 
 		return { xpath, insertOptions, parents, position, firstFold };
 	},
+	getAllXPaths = xPath => selectorator.generate($(xPath)),
 	initDomEvents = ({ dispatch }) => {
 		$(document).ready(() => {
 			sendMessage(messengerCommands.CM_FRAMELOAD_SUCCESS, { channelId: window.ADP_CHANNEL_ID });
@@ -88,4 +89,4 @@ const selectorator = new Selectorator(),
 		});
 	};
 
-export { initDomEvents, getAdpVitals };
+export { initDomEvents, getAdpVitals, getAllXPaths };

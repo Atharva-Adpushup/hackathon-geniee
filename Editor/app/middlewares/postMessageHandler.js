@@ -37,6 +37,9 @@ const getData = (state) => {
 			} else if ((prevState.insertMenuVisible && !nextState.insertMenuVisible) || (prevState.editMenuVisible && !nextState.editMenuVisible)) {
 				sendMessage(nextState.activeChannelId, messengerCommands.HIDE_ELEMENT_SELECTOR, {});
 			}
+			else if (action.type === sectionActions.GET_ALL_XPATHS) {
+				sendMessage(nextState.activeChannelId, messengerCommands.GET_RELEVANT_XPATHS, { xPath: action.xPath, sectionId: action.sectionId });
+			}
 		}
 
 		return store.getState();

@@ -78,7 +78,7 @@ class info extends React.Component {
 						<label>Sample Url</label>
 					</Col>
 					<Col xs={12} className="wrapfeature">
-						<InlineEdit compact font={400} validation={this.onChange.bind(this)} validationError="Sample Url must be from your website only" value={channel.sampleUrl} submitHandler={onSampleUrlChange.bind(null, channel.id)} text="Sample Url" errorMessage="Sample Url cannot be blank" />
+						<InlineEdit compact font={400} changeHandler={this.onChange.bind(this)} validationError="Sample Url must be from your website only" value={channel.sampleUrl} submitHandler={onSampleUrlChange.bind(null, channel.id)} text="Sample Url" errorMessage="Sample Url cannot be blank" />
 					</Col>
 				</Row>
 				<Row>

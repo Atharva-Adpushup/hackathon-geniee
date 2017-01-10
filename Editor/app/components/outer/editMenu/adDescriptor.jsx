@@ -57,7 +57,7 @@ class adDescriptor extends React.Component {
 							<Button className="btn-lightBg btn-edit btn-block" onClick={this.toggleCodeEditor}>Edit AdCode</Button>
 						</Col>)	: (
 							<Col xs={12}>
-								<Button className="btn-lightBg btn-edit btn-block" onClick={this.toggleCodeEditor}>Ad Custom AdCode</Button>
+								<Button className="btn-lightBg btn-edit btn-block" onClick={this.toggleCodeEditor}>Add Custom AdCode</Button>
 							</Col>
 						)
 					}

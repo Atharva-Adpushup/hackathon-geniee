@@ -14,6 +14,7 @@ class InlineEdit extends React.Component {
 	}
 
 	triggerEdit() {
+		this.props.editClickHandler ? this.props.editClickHandler() : null;
 		this.setState({ editMode: true });
 	}
 
@@ -32,7 +33,7 @@ class InlineEdit extends React.Component {
 	}
 
 	changeValue() {
-		const validated = this.props.validation(this.refs.editedText.value);
+		const validated = this.props.changeHandler(this.refs.editedText.value);
 		!validated ? this.setState({ disableSave: true, inputError: true }) : this.setState({ disableSave: false, inputError: false });
 	}
 
@@ -55,7 +56,7 @@ class InlineEdit extends React.Component {
 					this.state.editMode ? (
 						<Row style={{margin: 0}}>
 							<Col className="u-padding-r10px" xs={colCompact}>
-								<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={adCodeCheck} onFocus={this.props.validation ? this.changeValue.bind(this) : ()=>{}} onChange={this.props.validation ? this.changeValue.bind(this) : ()=>{}} />
+								<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={adCodeCheck} onFocus={this.props.changeHandler ? this.changeValue.bind(this) : ()=>{}} onChange={this.props.changeHandler ? this.changeValue.bind(this) : ()=>{}} />
 								<span className="error-message">{this.state.inputError ? (this.props.validationError ? this.props.validationError : this.props.errorMessage) : ''}</span>
 							</Col>
 							{
@@ -109,8 +110,9 @@ InlineEdit.propTypes = {
 	value: PropTypes.string.isRequired,
 	compact: PropTypes.bool,
 	font: PropTypes.number,
-	validation: PropTypes.func,
-	validationError: requiredIf(PropTypes.string, props => props.validation),
+	changeHandler: PropTypes.func,
+	validationError: PropTypes.string,
+	editClickHandler: PropTypes.func,
 	adCode: PropTypes.bool
 };
 

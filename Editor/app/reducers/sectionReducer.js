@@ -1,4 +1,4 @@
-import { sectionActions, adActions, variationActions } from 'consts/commonConsts';
+import { sectionActions, adActions, variationActions, messengerCommands } from 'consts/commonConsts';
 import { immutableObjectDelete, immutableArrayDelete, immutablePush } from 'libs/immutableHelpers';
 import _ from 'lodash';
 
@@ -37,6 +37,9 @@ const sectionByIds = (state = {}, action) => {
 					notNear: payload.notNear
 				}
 			};
+
+		case messengerCommands.SET_RELEVANT_XPATHS:
+			return { ...state, [action.sectionId]: { ...state[action.sectionId], allXpaths: action.allXpaths } };
 
 		case adActions.CREATE_AD:
 			return { ...state,
