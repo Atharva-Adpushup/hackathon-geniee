@@ -6,11 +6,12 @@ const path = require('path'),
 module.exports = {
 	//devtool: 'cheap-module-source-map',
 	entry: {
-		main: path.join(__dirname, 'main.js'),
+		adpushup: path.join(__dirname, 'main.js'),
+		adpushupHB: path.join(__dirname, 'mainHB.js'),
 	},
 	output: {
 		path: path.join(__dirname, buildPath),
-		filename: 'genieeAp.js',
+		filename: '[name].js',
 		publicPath: '/'
 	},
 	eslint: {
