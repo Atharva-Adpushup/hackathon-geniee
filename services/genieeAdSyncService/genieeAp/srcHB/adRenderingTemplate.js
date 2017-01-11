@@ -17,10 +17,17 @@ module.exports = "<html>" +
 
 				"function serverRenderCode( timeout ){" +
 					"if( serverRenderCode.isExecuted === undefined ) {" +
+						"var pbjsParams = {" +
+							"'_bidsReceived'  : pbjs._bidsReceived," +
+							"'_bidsRequested' : pbjs._bidsRequested," +
+							"'_adUnitCodes'   : pbjs._adUnitCodes," +
+							"'_winningBids'   : pbjs._winningBids," +
+							"'_adsReceived'   : pbjs._adsReceived" +
+						"};" +
 						"if( Number.isInteger(timeout) ) {" +
-							"parent.__renderPrebidAd(pbjs._bidsReceived, pbjs._adUnitCodes, timeout);" +
+							"parent.__renderPrebidAd(pbjsParams, timeout);" +
 						"} else {" +
-							"parent.__renderPrebidAd(pbjs._bidsReceived, pbjs._adUnitCodes);" +
+							"parent.__renderPrebidAd(pbjsParams);" +
 						"}" +
 
 						"serverRenderCode.isExecuted = true;" +
