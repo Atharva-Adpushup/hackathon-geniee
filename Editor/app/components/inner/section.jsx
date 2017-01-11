@@ -11,18 +11,27 @@ class Section extends React.Component {
 		this.$target = null;
 	}
 
-	componentDidMount() {
-		this.$target = $(this.props.xpath);
+	init(props) {
+		this.$target = $(props.xpath);
 		if (!this.$target.length) {
-			this.props.onXpathMiss(this.props.id);
+			props.onXpathMiss(props.id);
 			return false;
 		}
-		this.$node = this.injectSection();
+		this.$node = this.injectSection(props);
 		this.node = this.$node.get(0);
 		this.renderSection();
 	}
 
+	componentDidMount() {
+		this.init(this.props);
+	}
+
 	componentWillReceiveProps(newProps) {
+		if(this.props.xpath !== newProps.xpath) {
+			this.unMountSection();
+			this.init(newProps);
+		}
+
 		this.renderSection(newProps);
 	}
 
@@ -43,8 +52,8 @@ class Section extends React.Component {
 		return d;
 	}
 
-	injectSection() {
-		const { operation, xpath } = this.props,
+	injectSection(props) {
+		const { operation, xpath } = props,
 			$el = $('<div />');
 		if (operation === 'Insert Before') {
 			$el.insertBefore($(xpath));
