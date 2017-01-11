@@ -59,7 +59,7 @@ function startCreation() {
 	if (selectedVariation) {
 		adp.creationProcessStarted = true;
 		clearTimeout(pageGroupTimer);
-		config.selectedVariation = selectedVariation.name;
+		config.selectedVariation = selectedVariation.id;
 		createAds(adp, selectedVariation);
 	} else {
 		triggerControl(3);
