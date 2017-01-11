@@ -8,8 +8,8 @@ import { connect } from 'react-redux';
 const BeforeAfterJsPanel = (props) => {
 	const { onSaveBeforeJs, onSaveAfterJs, variation } = props,
 		wrapper = `(function($){ \n\n })(adpushup.$)`,
-		beforeJs = variation.customJs.beforeAp ? variation.customJs.beforeAp : wrapper,
-		afterJs = variation.customJs.afterAp ? variation.customJs.afterAp : wrapper;
+		beforeJs = variation.customJs.beforeAp ? atob(variation.customJs.beforeAp) : wrapper,
+		afterJs = variation.customJs.afterAp ? atob(variation.customJs.afterAp) : wrapper;
 	return (
         <div>
             <h1 className="variation-section-heading">Before/After JS</h1>

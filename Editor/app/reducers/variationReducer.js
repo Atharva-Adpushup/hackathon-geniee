@@ -42,20 +42,24 @@ const variation = (state = {}, action) => {
 				return state;
 			
 			case variationActions.SAVE_BEFORE_JS:
+				alert('Before JS has been saved!');
+
 				return { ...state, [action.variation.id]: {
 					...state[action.variation.id],
 					customJs: {
-						beforeAp: action.beforeJs,
+						beforeAp: btoa(action.beforeJs),
 						afterAp: action.variation.customJs.afterAp
 					}
 				} };
 			
 			case variationActions.SAVE_AFTER_JS:
+				alert('After JS has been saved!');
+
 				return { ...state, [action.variation.id]: {
 					...state[action.variation.id],
 					customJs: {
 						beforeAp: action.variation.customJs.beforeAp,
-						afterAp: action.afterJs
+						afterAp: btoa(action.afterJs)
 					}
 				} };
 
