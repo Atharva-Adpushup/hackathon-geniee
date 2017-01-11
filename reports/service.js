@@ -480,7 +480,7 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 			"pageGroupId": params.pageGroupId
 		},
 		httpMethod = 'GET',
-		url = 'https://beta-aladdin.geniee.jp/beta2/aladdin/adpushup/report/',
+		url = 'https://s.geniee.jp/aladdin/adpushup/report/',
 		queryParams = _.compact(_.map(_.keys(json), function(key) {
 			var value = json[key];
 
@@ -491,28 +491,36 @@ module.exports = (function(requestPromise, crypto, signatureGenerator) {
 		parameters = {
 			dateFrom: json.dateFrom,
 			dateTo: json.dateTo,
-			oauth_consumer_key: "NDJiOGRmYTJmMGVhMzU1ZQ==",
+			oauth_consumer_key: "ZmJiMGZhNDUwOWI4ZjllOA==",
 			oauth_nonce: nounce,
 			oauth_signature_method: "HMAC-SHA1",
 			oauth_timestamp: ts,
 			oauth_version: "1.0",
 			mediaId: json.mediaId
 		},
-		consumerSecret = 'MDc0N2MzMDYzYTQ2NDk5MDUzNzQ0YjIwMTJkY2UzZDA=',
+		consumerSecret = 'M2IyNjc4ZGU1YWZkZTg2OTIyNzZkMTQyOTE0YmQ4Njk=',
 		signature;
 
 		url += '?' + queryParams;
 		signature = signatureGenerator(httpMethod, url, parameters, consumerSecret);
 
 		//TODO: Commented out as ADPUSHUP wifi is under maintenance
-		var getResponseData = requestPromise({
-				uri: url,
-				json: true,
-				headers: {
-					Authorization: 'oauth_consumer_key="NDJiOGRmYTJmMGVhMzU1ZQ==", oauth_nonce="' + nounce + '", oauth_signature="' + signature + '", oauth_signature_method="HMAC-SHA1", oauth_timestamp="' + ts + '", oauth_version="1.0"',
-					'content-type': 'application/json'
-				}
+			var getResponseData = Promise.resolve(true).then(function() {
+				// This dummy data is for testing purposes only
+				// as reports data does not come up for every synced media
+				// TODO: Remove this data once integration is complete
+				var dummyData = [{"date":"20161108","zones":[{"mediaId":920,"pageGroupId":52,"zoneId":2320,"impression":14619,"click":41,"revenue":146.229601212,"ctr":2.8045693959915,"ecpm":10.002708886518,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":null,"zoneId":2321,"impression":17906,"click":2,"revenue":2.191934844,"ctr":0.11169440411035,"ecpm":0.12241342812465,"deliveryCost":0,"curenncyCode":"JPY","type":0},{"mediaId":920,"pageGroupId":null,"zoneId":2322,"impression":3435,"click":2,"revenue":13.085360244,"ctr":0.58224163027656,"ecpm":3.8094207406114,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":52,"zoneId":2323,"impression":26227,"click":58,"revenue":103.409398872,"ctr":2.2114614710032,"ecpm":3.9428603680177,"deliveryCost":0,"curenncyCode":"JPY","type":0}]},{"date":"20161109","zones":[{"mediaId":920,"pageGroupId":52,"zoneId":2324,"impression":14551,"click":26,"revenue":69.017820336,"ctr":1.7868187753419,"ecpm":4.7431668157515,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":null,"zoneId":2325,"impression":12836,"click":2,"revenue":11.235548772,"ctr":0.15581177937052,"ecpm":0.87531542318479,"deliveryCost":0,"curenncyCode":"JPY","type":0},{"mediaId":920,"pageGroupId":null,"zoneId":2326,"impression":3309,"click":5,"revenue":10.595266776,"ctr":1.5110305228166,"ecpm":3.201954299184,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":52,"zoneId":2327,"impression":26372,"click":44,"revenue":80.181149292,"ctr":1.6684362202336,"ecpm":3.0403894013347,"deliveryCost":0,"curenncyCode":"JPY","type":1}]},{"date":"20161110","zones":[{"mediaId":920,"pageGroupId":52,"zoneId":2328,"impression":15219,"click":23,"revenue":59.830904232,"ctr":1.5112688087259,"ecpm":3.9313295375517,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":null,"zoneId":2329,"impression":8410,"click":1,"revenue":1.198956492,"ctr":0.11890606420927,"ecpm":0.14256319762188,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":null,"zoneId":2330,"impression":2899,"click":5,"revenue":16.526219724,"ctr":1.7247326664367,"ecpm":5.7006622021387,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":52,"zoneId":2331,"impression":28010,"click":44,"revenue":109.315592064,"ctr":1.5708675473045,"ecpm":3.9027344542663,"deliveryCost":0,"curenncyCode":"JPY","type":0}]},{"date":"20161111","zones":[{"mediaId":920,"pageGroupId":52,"zoneId":2332,"impression":13177,"click":27,"revenue":65.939371704,"ctr":2.0490248159672,"ecpm":5.0041262581771,"deliveryCost":0,"curenncyCode":"JPY","type":0},{"mediaId":920,"pageGroupId":null,"zoneId":2333,"impression":8767,"click":6,"revenue":7.992395604,"ctr":0.68438462415878,"ecpm":0.9116454435953,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":null,"zoneId":2334,"impression":2831,"click":8,"revenue":9.663472368,"ctr":2.8258565877782,"ecpm":3.4134483814906,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":52,"zoneId":2335,"impression":24090,"click":39,"revenue":98.822338416,"ctr":1.6189290161893,"ecpm":4.1022141310087,"deliveryCost":0,"curenncyCode":"JPY","type":1}]},{"date":"20161112","zones":[{"mediaId":920,"pageGroupId":52,"zoneId":2336,"impression":13347,"click":19,"revenue":71.834762196,"ctr":1.4235408706076,"ecpm":5.382090521915,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":null,"zoneId":2337,"impression":14950,"click":2,"revenue":3.352371516,"ctr":0.13377926421405,"ecpm":0.2242388973913,"deliveryCost":0,"curenncyCode":"JPY","type":0},{"mediaId":920,"pageGroupId":null,"zoneId":2338,"impression":2574,"click":4,"revenue":5.926465548,"ctr":1.5540015540016,"ecpm":2.3024341678322,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":52,"zoneId":2339,"impression":24801,"click":40,"revenue":130.702620492,"ctr":1.6128381920084,"ecpm":5.2700544531269,"deliveryCost":0,"curenncyCode":"JPY","type":1}]},{"date":"20161113","zones":[{"mediaId":920,"pageGroupId":52,"zoneId":2340,"impression":12610,"click":25,"revenue":51.873749784,"ctr":1.9825535289453,"ecpm":4.1136994277557,"deliveryCost":0,"curenncyCode":"JPY","type":0},{"mediaId":920,"pageGroupId":null,"zoneId":2341,"impression":16581,"click":2,"revenue":3.151136196,"ctr":0.1206199867318,"ecpm":0.19004500307581,"deliveryCost":0,"curenncyCode":"JPY","type":0},{"mediaId":920,"pageGroupId":null,"zoneId":2342,"impression":2294,"click":6,"revenue":4.93674156,"ctr":2.615518744551,"ecpm":2.152023347864,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":52,"zoneId":2343,"impression":23866,"click":47,"revenue":152.06212512,"ctr":1.9693287521998,"ecpm":6.3714960663706,"deliveryCost":0,"curenncyCode":"JPY","type":1}]},{"date":"20161114","zones":[{"mediaId":920,"pageGroupId":52,"zoneId":2344,"impression":1568,"click":4,"revenue":8.417917224,"ctr":2.5510204081633,"ecpm":5.3685696581633,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":null,"zoneId":2345,"impression":1945,"click":0,"revenue":0.213751656,"ctr":0,"ecpm":0.10989802365039,"deliveryCost":0,"curenncyCode":"JPY","type":0},{"mediaId":920,"pageGroupId":null,"zoneId":2346,"impression":231,"click":0,"revenue":1.148383116,"ctr":0,"ecpm":4.9713554805195,"deliveryCost":0,"curenncyCode":"JPY","type":1},{"mediaId":920,"pageGroupId":52,"zoneId":2347,"impression":2194,"click":2,"revenue":4.33738962,"ctr":0.91157702825889,"ecpm":1.9769323701003,"deliveryCost":0,"curenncyCode":"JPY","type":0}]}];
+
+				return dummyData;
 			}),
+		// var getResponseData = requestPromise({
+		// 		uri: url,
+		// 		json: true,
+		// 		headers: {
+		// 			Authorization: 'oauth_consumer_key="ZmJiMGZhNDUwOWI4ZjllOA==", oauth_nonce="' + nounce + '", oauth_signature="' + signature + '", oauth_signature_method="HMAC-SHA1", oauth_timestamp="' + ts + '", oauth_version="1.0"',
+		// 			'content-type': 'application/json'
+		// 		}
+		// 	}),
 			getFilteredZones = getResponseData.then(removeUnnecessaryZones),
 			getSiteMetrics = getFilteredZones.then(getMediaMetrics),
 			getChannelMetrics = getFilteredZones.then(getPageGroupMetrics),

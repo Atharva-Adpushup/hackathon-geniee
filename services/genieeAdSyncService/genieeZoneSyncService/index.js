@@ -46,11 +46,11 @@ module.exports = function (site) {
             return processBatches.fromArray(zonesToSync, 5, function (batch) {
                 var json = { "pageGroupId": pageGroupId || 52, "zones": batch },
                     httpMethod = 'POST',
-                    url = 'https://beta-aladdin.geniee.jp/beta2/aladdin/adpushup/zone/create/',
+                    url = 'https://s.geniee.jp/aladdin/adpushup/zone/create/',
                     nounce = getNonce(),
                     ts = new Date().getTime(),
                     parameters = {
-                        oauth_consumer_key: "NDJiOGRmYTJmMGVhMzU1ZQ==",
+                        oauth_consumer_key: "ZmJiMGZhNDUwOWI4ZjllOA==",
                         oauth_nonce: nounce,
                         oauth_signature_method: "HMAC-SHA1",
                         oauth_timestamp: ts,
@@ -58,7 +58,7 @@ module.exports = function (site) {
                         pageGroupId: json.pageGroupId,
                         zones: json.zones
                     },
-                    consumerSecret = 'MDc0N2MzMDYzYTQ2NDk5MDUzNzQ0YjIwMTJkY2UzZDA=',
+                    consumerSecret = 'M2IyNjc4ZGU1YWZkZTg2OTIyNzZkMTQyOTE0YmQ4Njk=',
                     signature = signatureGenerator(httpMethod, url, parameters, consumerSecret);
 
                 return rp({
@@ -67,7 +67,7 @@ module.exports = function (site) {
                     body: json,
                     json: true,
                     headers: {
-                        Authorization: 'oauth_consumer_key="NDJiOGRmYTJmMGVhMzU1ZQ==", oauth_nonce="' + nounce + '", oauth_signature="' + signature + '", oauth_signature_method="HMAC-SHA1", oauth_timestamp="' + ts + '", oauth_version="1.0"',
+                        Authorization: 'oauth_consumer_key="ZmJiMGZhNDUwOWI4ZjllOA==", oauth_nonce="' + nounce + '", oauth_signature="' + signature + '", oauth_signature_method="HMAC-SHA1", oauth_timestamp="' + ts + '", oauth_version="1.0"',
                         'content-type': 'application/json'
                     }
                 }).then(function (zonesResult) {
