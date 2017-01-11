@@ -4,7 +4,7 @@ module.exports = {
 	PROXY_ORIGIN: 'http://proxy.app.adpushup.com',
 	PROXY_DOCUMENT_DOMAIN: 'app.adpushup.com',
 	apConfigDefaults: {
-		heartBeatMinInterval: 30000,
+		heartBeatMinInterval: 3000,
 		heartBeatStartDelay: 2000,
 		xpathWaitTimeout: 5000,
 		adpushupPercentage: 100
