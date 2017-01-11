@@ -6,7 +6,7 @@ module.exports = "<html>" +
 				"var pbjs = pbjs || {};" +
 				"pbjs.que = pbjs.que || [];" +
 
-				"var PREBID_TIMEOUT = __PREBID_TIMEOUT__;" +
+				"var PREBID_TIMEOUT = __PB_TIMEOUT__;" +
 
 				"var prebidScript = document.createElement('script');" +
 				"prebidScript.async = true;" +
