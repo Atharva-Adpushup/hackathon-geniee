@@ -2,7 +2,8 @@ import { combineReducers } from 'redux';
 import { editMenuActions, insertMenuActions, sectionActions, siteModesPopoverActions,
 	adActions, newChannelMenuActions, channelActions, channelMenuActions, messengerCommands } from '../consts/commonConsts';
 
-const insertMenu = (state = { isVisible: false }, action) => {
+const errorsConfig = {},
+	insertMenu = (state = { isVisible: false }, action) => {
 		switch (action.type) {
 			case insertMenuActions.SHOW_MENU:
 				const payload = action.payload;
@@ -69,13 +70,32 @@ const insertMenu = (state = { isVisible: false }, action) => {
 				return state;
 		}
 	},
-	xPathValidation = (state = { error: false }, action) => {
+	errors = (state = { 
+			xpath: { error: false } 
+		}, action) => {
 		switch (action.type) {
 			case messengerCommands.XPATH_VALIDATED:
-				return action.isValidXPath ? { error: false } : { error: true };
+				if(action.isValidXPath) {
+					return { xpath: {
+							error: false
+						}
+					}
+				}
+				else {
+					return {
+						xpath: {
+							error: true,
+							message: 'Please enter a valid xpath'
+						}
+					}
+				}
 
 			case sectionActions.UPDATE_XPATH:
-				return { error: false };
+				return {
+					xpath: {
+						error: false
+					}
+				}
 
 			default:
 				return state;
@@ -98,6 +118,6 @@ const insertMenu = (state = { isVisible: false }, action) => {
 
 export default combineReducers({
 	insertMenu, editMenu, newChannelMenu,
-	siteModesPopover, channelMenu, xPathValidation
+	siteModesPopover, channelMenu, errors
 });
 

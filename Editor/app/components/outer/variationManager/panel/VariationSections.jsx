@@ -7,7 +7,7 @@ import { updateAdCode } from 'actions/adActions';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 
 const variationSections = (props) => {
-	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdateXPath, onSectionAllXPaths, onValidateXPath } = props;
+	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdateXPath, onSectionAllXPaths, onValidateXPath, ui } = props;
 	return (
 		<div>
 			<h1 className="variation-section-heading">Variation Sections</h1>
@@ -72,8 +72,8 @@ const variationSections = (props) => {
 										<Row>
 											<Col className="u-padding-r10px" xs={4}>XPath</Col>
 											<Col className="u-padding-l10px" xs={8}>
-												<InlineEdit compact dropdownList={section.allXpaths} value={section.xpath}
-													submitHandler={onUpdateXPath.bind(null, section.id)} keyUpHandler={onValidateXPath.bind(null, section.id)} editClickHandler={onSectionAllXPaths.bind(null, section.id, section.xpath)} text="XPath" errorMessage="XPath cannot be blank"
+												<InlineEdit compact customError={ui.errors.xpath ? ui.errors.xpath.error : false} dropdownList={section.allXpaths} value={section.xpath}
+													submitHandler={onUpdateXPath.bind(null, section.id)} keyUpHandler={onValidateXPath.bind(null, section.id)} editClickHandler={onSectionAllXPaths.bind(null, section.id, section.xpath)} text="XPath" errorMessage={(ui.errors.xpath && ui.errors.xpath.error) ? ui.errors.xpath.message : 'XPath cannot be blank'}
 												/>
 											</Col>
 										</Row>
@@ -97,7 +97,8 @@ variationSections.propTypes = {
 	onUpdateAdCode: PropTypes.func.isRequired,
 	onUpdateXPath: PropTypes.func,
 	onSectionAllXPaths: PropTypes.func,
-	onValidateXPath: PropTypes.func
+	onValidateXPath: PropTypes.func,
+	ui: PropTypes.object
 };
 
 export default connect(

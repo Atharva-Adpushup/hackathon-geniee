@@ -16,6 +16,14 @@ class InlineEdit extends React.Component {
 
 	componentWillReceiveProps(nextProps) {
 		(nextProps.dropdownList && nextProps.dropdownList.length) ? this.showDropdown() : this.hideDropdown();
+
+		if(nextProps.customError) {
+			this.hideDropdown();
+			this.setState({ inputError: true, disableSave: true });
+		}
+		else {
+			this.setState({ inputError: false, disableSave: false });
+		}
 	}
 
 	showDropdown() {
@@ -178,7 +186,8 @@ InlineEdit.propTypes = {
 	editClickHandler: PropTypes.func,
 	adCode: PropTypes.bool,
 	dropdownList: PropTypes.array,
-	keyUpHandler: PropTypes.func
+	keyUpHandler: PropTypes.func,
+	customError: PropTypes.bool
 };
 
 InlineEdit.defaultProps = {

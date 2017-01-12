@@ -32,7 +32,6 @@ module.exports = (function ($, Utils, Event) {
 		this.target.postMessage(JSON.stringify(req), '*');
 	};
 	Messenger.prototype.isOriginValid = function (e) {
-		return true;
 		return ((/.adpushup.com/gi).test(e.origin) ||
 			(this.alternateOrigin && Utils.urlInfo(e.origin).domain.indexOf(this.alternateOrigin) !== -1));
 	};
@@ -47,7 +46,7 @@ module.exports = (function ($, Utils, Event) {
 			if (!req || !req.cmd) {  // some issue with google.com that's why introduces this check
 				return false;
 			}
-			console.log(req);
+			//console.log(req);
 			this.onMessage.fire(req.cmd, req.data);
 		}
 	};

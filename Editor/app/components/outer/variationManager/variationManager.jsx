@@ -32,7 +32,7 @@ class variationManager extends React.Component {
 		return (
 			<div>
 				{this.state.isPanelActive &&
-					(<div><Glass clickHandler={this.toggleVariationPanel} shim /> <VariationPanel activeChannel={this.props.activeChannel} channelId={this.props.activeChannelId} variation={this.props.activeVariation} sections={this.props.activeVariationSections} /></div>)
+					(<div><Glass clickHandler={this.toggleVariationPanel} shim /> <VariationPanel ui={props.ui} activeChannel={this.props.activeChannel} channelId={this.props.activeChannelId} variation={this.props.activeVariation} sections={this.props.activeVariationSections} /></div>)
 				}
 				<div id="variationManager" className="variation-bar">
 					{
@@ -62,7 +62,8 @@ variationManager.propTypes = {
 	deleteVariation: PropTypes.func,
 	copyVariation: PropTypes.func,
 	renameVariation: PropTypes.func,
-	setActiveVariation: PropTypes.func
+	setActiveVariation: PropTypes.func,
+	ui: PropTypes.object
 };
 
 export default variationManager;
