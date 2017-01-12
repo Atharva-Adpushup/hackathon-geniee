@@ -1,0 +1,38 @@
+extends  layout/base
+
+block getTitle
+    - var titleVar = "Header Bidding" 
+
+block bodyContent
+    include layout/sideBar
+    .pageContainer.page-container
+        include layout/header
+        // Page Content Starts Here
+        .pageContentWrapper.page-content
+            .pageContentInner.page-content--inner
+                .notification-wrapper
+
+                #widgetsArea.row
+                    .mb-30
+                        .controlAdpushupWrap
+                            h3.title.m-All-0.clearfix 
+                                a Setup Header Bidding - #{utils.domanize(siteDomain)}
+                            form
+                                h4 Select your preference
+                                .row
+                                    .col-sm-5
+                                        .input-name Country
+                                    .col-sm-7
+                                        input(type="radio" id="autoOptimise" name="autoOptimise")
+                                .row
+                                    .col-sm-5
+                                        .input-name Continent
+                                    .col-sm-7
+                                        input(type="radio" id="autoOptimise" name="autoOptimise")
+                                row
+                                    .col-sm-5
+                                        .input-name All
+                                    .col-sm-7
+                                        input(type="radio" id="autoOptimise" name="autoOptimise")
+
+                           

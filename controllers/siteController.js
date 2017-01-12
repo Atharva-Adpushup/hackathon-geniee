@@ -9,6 +9,7 @@ var express = require('express'),
     config = require('../configs/config'),
     userModel = require('.././models/userModel'),
     siteModel = require('.././models/siteModel'),
+    commonConsts = require('../configs/commonConsts'),
     router = express.Router({ mergeParams: true });
 
 function checkAuth(req, res, next) {
@@ -43,6 +44,17 @@ router
                     apConfigs: site.get('apConfigs'),
                     blocklist: site.get('apConfigs').blocklist,
                     siteId: req.params.siteId,
+                    siteDomain: site.get('siteDomain')
+                });
+            })
+            .catch(function (err) {
+                res.send('Some error occurred!');
+            });
+    })
+    .get('/:siteId/headerBidding', function(req, res) {
+        return siteModel.getSiteById(req.params.siteId)
+            .then(function (site) {
+                return res.render('headerBidding', {
                     siteDomain: site.get('siteDomain')
                 });
             })
