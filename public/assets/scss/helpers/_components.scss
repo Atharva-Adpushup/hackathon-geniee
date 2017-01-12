@@ -373,3 +373,14 @@ textarea {
 	}
   }
 }
+
+/* Select box */
+
+.select-box {
+	width: 180px;
+	background-position-x: 158px;
+
+	& > select {
+		width: 100%;
+	}
+}

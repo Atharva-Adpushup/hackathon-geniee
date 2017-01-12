@@ -10,6 +10,7 @@ var express = require('express'),
     userModel = require('.././models/userModel'),
     siteModel = require('.././models/siteModel'),
     commonConsts = require('../configs/commonConsts'),
+    countryData = require('country-data'),
     router = express.Router({ mergeParams: true });
 
 function checkAuth(req, res, next) {
@@ -54,8 +55,20 @@ router
     .get('/:siteId/headerBidding', function(req, res) {
         return siteModel.getSiteById(req.params.siteId)
             .then(function (site) {
+                var countries = _.map(countryData.lookup.countries(), function(country) {
+                    return {
+                        name: country.name,
+                        code: country.alpha2
+                    };
+                }),
+                continents = _.forIn(countryData.continents, function(continent) {
+                    return continent.name;
+                });
+
                 return res.render('headerBidding', {
-                    siteDomain: site.get('siteDomain')
+                    siteDomain: site.get('siteDomain'),
+                    countries: countries,
+                    continents: continents
                 });
             })
             .catch(function (err) {

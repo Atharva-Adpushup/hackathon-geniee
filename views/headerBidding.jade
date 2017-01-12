@@ -3,6 +3,9 @@ extends  layout/base
 block getTitle
     - var titleVar = "Header Bidding" 
 
+block append headScripts
+    script(src="/assets/js/libs/custom/header-bidding-setup.js")
+
 block bodyContent
     include layout/sideBar
     .pageContainer.page-container
@@ -16,23 +19,41 @@ block bodyContent
                     .mb-30
                         .controlAdpushupWrap
                             h3.title.m-All-0.clearfix 
-                                a Setup Header Bidding - #{utils.domanize(siteDomain)}
-                            form
-                                h4 Select your preference
+                                a Header Bidding - #{utils.domanize(siteDomain)}
+                            .settings-pane
                                 .row
-                                    .col-sm-5
-                                        .input-name Country
-                                    .col-sm-7
-                                        input(type="radio" id="autoOptimise" name="autoOptimise")
+                                    .col-sm-12
+                                        h4 Configure Header Bidding by setting all options below
                                 .row
-                                    .col-sm-5
-                                        .input-name Continent
-                                    .col-sm-7
-                                        input(type="radio" id="autoOptimise" name="autoOptimise")
-                                row
-                                    .col-sm-5
-                                        .input-name All
-                                    .col-sm-7
-                                        input(type="radio" id="autoOptimise" name="autoOptimise")
+                                    .col-sm-3
+                                        .input-name Select type of Geography
+                                    .col-sm-9
+                                        .styleSelect.select-box
+                                            select(name="geoType")#geo-selector
+                                                option(value="country") Country
+                                                option(value="continent") Continent
+                                                option(value="all") All
+
+                                .row#select-geo-country
+                                    .col-sm-3
+                                        .input-name Select Country
+                                    .col-sm-9
+                                        .styleSelect.select-box
+                                            select(name="country")#geo-country
+                                                for country in countries
+                                                    option(value="#{country.code}")!= country.name
+
+                                .row#select-geo-continent
+                                    .col-sm-3
+                                        .input-name Select Continent
+                                    .col-sm-9
+                                        .styleSelect.select-box
+                                            select(name="continent")#geo-continent
+                                                for continent in continents
+                                                    option(value="#{continent.name}")!= continent.name
+                                        
+                                               
+                                        
+                            
 
                            

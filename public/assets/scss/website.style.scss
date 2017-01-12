@@ -1,6 +1,4 @@
 @import "helpers/variables";
-@import "helpers/components";
-@import "helpers/animations";
 @import "base/reset";
 @import "layout/website/reset";
 @import "helpers/mixins";
@@ -22,6 +20,8 @@
 @import "layout/website/genieeReports";
 @import "layout/login";
 @import "helpers/overwrite";
+@import "helpers/components";
+@import "helpers/animations";
 @import "layout/modal";
 @import "layout/website/addSiteModal";
 @import "layout/website/profile";
