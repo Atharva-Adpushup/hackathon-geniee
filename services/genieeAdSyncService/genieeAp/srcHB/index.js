@@ -122,10 +122,19 @@ function main() {
 				if( matchAdSize(size, config.targetingAdSizes) ) {
 					logger.info("size matched (%s) for slot (%s) ", size.toString(), slotId );
 
-					var adUnitBids = config.biddingPartners[ size[0] + 'x' + size[1] ];
+					var biddingPartners = config.biddingPartners[ size[0] + 'x' + size[1] ],
+						pbBiddingPartners;
+
 					adpHbSlots.push(definedSlot);
 
-					createPrebidContainer( adUnitBids, size, slotId );
+					if( Array.isArray(biddingPartners[0]) ) {
+						pbBiddingPartners = biddingPartners[0];
+						config.biddingPartners[sizeString] = config.biddingPartners[sizeString].slice(1);
+					} else {
+						pbBiddingPartners = biddingPartners;
+					}
+
+					createPrebidContainer( pbBiddingPartners, size, slotId );
 				} else {
 					refreshSlot( definedSlot );
 				}
