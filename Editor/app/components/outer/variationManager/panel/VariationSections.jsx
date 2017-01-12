@@ -4,10 +4,11 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { deleteSection, renameSection, updateXPath, sectionAllXPaths, validateXPath } from 'actions/sectionActions.js';
 import { updateAdCode } from 'actions/adActions';
+import { resetErrors } from 'actions/uiActions';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 
 const variationSections = (props) => {
-	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdateXPath, onSectionAllXPaths, onValidateXPath, ui } = props;
+	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdateXPath, onSectionAllXPaths, onValidateXPath, ui, onResetErrors } = props;
 	return (
 		<div>
 			<h1 className="variation-section-heading">Variation Sections</h1>
@@ -72,7 +73,7 @@ const variationSections = (props) => {
 										<Row>
 											<Col className="u-padding-r10px" xs={4}>XPath</Col>
 											<Col className="u-padding-l10px" xs={8}>
-												<InlineEdit compact customError={ui.errors.xpath ? ui.errors.xpath.error : false} dropdownList={section.allXpaths} value={section.xpath}
+												<InlineEdit compact cancelEditHandler={onResetErrors} customError={ui.errors.xpath ? ui.errors.xpath.error : false} dropdownList={section.allXpaths} value={section.xpath}
 													submitHandler={onUpdateXPath.bind(null, section.id)} keyUpHandler={onValidateXPath.bind(null, section.id)} editClickHandler={onSectionAllXPaths.bind(null, section.id, section.xpath)} text="XPath" errorMessage={(ui.errors.xpath && ui.errors.xpath.error) ? ui.errors.xpath.message : 'XPath cannot be blank'}
 												/>
 											</Col>
@@ -98,7 +99,8 @@ variationSections.propTypes = {
 	onUpdateXPath: PropTypes.func,
 	onSectionAllXPaths: PropTypes.func,
 	onValidateXPath: PropTypes.func,
-	ui: PropTypes.object
+	ui: PropTypes.object,
+	resetErrors: PropTypes.func
 };
 
 export default connect(
@@ -109,7 +111,8 @@ export default connect(
 		onUpdateAdCode: updateAdCode,
 		onUpdateXPath: updateXPath,
 		onSectionAllXPaths: sectionAllXPaths,
-		onValidateXPath: validateXPath
+		onValidateXPath: validateXPath,
+		onResetErrors: resetErrors
 	}, dispatch)
 	)(variationSections);
 

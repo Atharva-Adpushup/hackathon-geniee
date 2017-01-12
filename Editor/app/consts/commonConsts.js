@@ -197,6 +197,9 @@ const status = {
 		SET_ELEMENT_SELECTOR_CORDS: 'SET_ELEMENT_SELECTOR_CORDS',
 		UPDATE_CONTENT_OVERLAY: 'UPDATE_CONTENT_OVERLAY',
 	},
+	uiActions = {
+		RESET_ERRORS: 'RESET_ERRORS'
+	},
 	components = {
 		INSERT_CONTEXTMENU: 'INSERT_CONTEXTMENU',
 		EDIT_CONTEXTMENU: 'EDIT_CONTEXTMENU',
@@ -266,5 +269,5 @@ export {
 	adBoxSizeStyles, commonSupportedSizes, nonPartnerAdSizes, variationActions,
 	hbBoxActions, innerVariationActions, innerActions,
 	defaultSectionCss, leftSectionCss, rightSectionCss,
-	components, siteModesPopoverActions, channelMenuActions
+	components, siteModesPopoverActions, channelMenuActions, uiActions
 };

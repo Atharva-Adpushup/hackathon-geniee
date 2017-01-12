@@ -41,6 +41,7 @@ class InlineEdit extends React.Component {
 	}
 
 	cancelEdit() {
+		this.props.cancelEditHandler ? this.props.cancelEditHandler() : null;
 		this.setState({ editMode: false, inputError: false, disableSave: false });
 	}
 
@@ -187,7 +188,8 @@ InlineEdit.propTypes = {
 	adCode: PropTypes.bool,
 	dropdownList: PropTypes.array,
 	keyUpHandler: PropTypes.func,
-	customError: PropTypes.bool
+	customError: PropTypes.bool,
+	cancelEditHandler: PropTypes.func
 };
 
 InlineEdit.defaultProps = {

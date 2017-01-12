@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { editMenuActions, insertMenuActions, sectionActions, siteModesPopoverActions,
-	adActions, newChannelMenuActions, channelActions, channelMenuActions, messengerCommands } from '../consts/commonConsts';
+	adActions, newChannelMenuActions, channelActions, channelMenuActions, messengerCommands, uiActions } from '../consts/commonConsts';
 
 const errorsConfig = {},
 	insertMenu = (state = { isVisible: false }, action) => {
@@ -91,6 +91,7 @@ const errorsConfig = {},
 				}
 
 			case sectionActions.UPDATE_XPATH:
+			case uiActions.RESET_ERRORS:
 				return {
 					xpath: {
 						error: false
