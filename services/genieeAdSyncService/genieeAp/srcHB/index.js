@@ -1,4 +1,5 @@
 function main() {
+
 	window.adpPrebid = require('./prebid');
 
 	window.googletag = window.googletag || {};
@@ -7,15 +8,28 @@ function main() {
 	var reporting = require('./reporting'),
 		printBidTable = require('./printBidTable'),
 		config = require('./config'),
+		logger = require('./libs/logger'),
 		adRenderingTemplate = require('./adRenderingTemplate');
 
 	var adpHbSlots = [];
 
 	adpPrebid();
 
-	window.__renderPrebidAd = function(pbjsParams, timeout){
+	var adpRefresh = function (slot){
+		var renderedSlots = reporting.getRenderedSlots();
+
+		if( renderedSlots.indexOf(slot.getAdUnitPath()) === -1) {
+			console.info("refreshing slot: %s", slot.getAdUnitPath());
+			googletag.pubads().refresh([ slot ]);
+		}
+	};
+
+	window.__renderPrebidAd = function(pbjsParams, slotId, timeout){
+
+		// Push in googletag.cmd so that multiple calls are processed sequentially.
 		googletag.cmd.push(function(){
 
+			// Copy prebid params in current window's prebid context
 			Object.keys(pbjsParams).forEach(function(pbjsKey) {
 			  pbjs[pbjsKey] = pbjsParams[pbjsKey];
 			});
@@ -25,51 +39,55 @@ function main() {
 			var adUnits = Object.keys(pbjs.getBidResponses());
 			pbjs.setTargetingForGPTAsync();
 
-			googletag.pubads().getSlots().forEach(function( gSlot ){
+			logger.info("recieved bid responses for %s", adUnits[0]);
 
-				if( adUnits.indexOf(gSlot.getAdUnitPath()) !== -1 ) {
+			adpHbSlots.forEach(function( gSlot ){
+
+				if( gSlot.getAdUnitPath() === slotId) {
+
 					gSlot.setTargeting('hb_ran', '1');
 
 					if( timeout ) {
+						logger.info("timeout occured for prebid for %s", slotId);
 						gSlot.setTargeting('is_timed_out', timeout);
 					}
 
-					googletag.pubads().refresh([ gSlot ]);
+					adpRefresh(gSlot);
 				}
 
 			});
 		});
-	}
+	};
 
-	function createPrebidContainer(adSlotBids, size, slotId){
-		adpHbSlots.push(slotId);
+	function createPrebidContainer(hbConfigParams, size, slotId){
 
 		var prebidHtml = adRenderingTemplate.replace('__AD_UNIT_CODE__', JSON.stringify({
 			code : slotId,
 			size : size,
-			bids : JSON.parse( JSON.stringify(adSlotBids).replace('__AD_UNIT__', slotId) )
+			bids : JSON.parse( JSON.stringify(hbConfigParams).replace('__AD_UNIT__', slotId) )
 		}))
-		.replace('__PB_TIMEOUT__', config.PREBID_TIMEOUT);
+		.replace('__PB_TIMEOUT__', config.prebidTimeout)
+		.replace('__PB_SLOT_ID__', "'" + slotId + "'");
 
 		var iframeEl = document.createElement('iframe');
 		iframeEl.style.display = "none";
+
 		iframeEl.onload = function(){
+			logger.info("frame loaded. adding prebid html for %s", slotId);
+
 			var iframeDoc = iframeEl.contentDocument;
 
 			iframeDoc.open();
 			iframeDoc.write(prebidHtml);
 			iframeDoc.close();
 		};
+
 		document.body.appendChild(iframeEl);
 	}
 
-	function refreshSlot( adSlotId ){
+	function refreshSlot( adSlot ){
 		setTimeout(function(){
-			googletag.pubads().getSlots().forEach(function( slot ) {
-				if( slot.getAdUnitPath() === adSlotId ) {
-					googletag.pubads().refresh([ slot ]);
-				}
-			});
+			googletag.pubads().refresh([ adSlot ]);
 		}, 100);
 	}
 
@@ -102,17 +120,22 @@ function main() {
 				var definedSlot = oDF.apply(this, [].slice.call(arguments));
 
 				if( matchAdSize(size, config.targetingAdSizes) ) {
+					logger.info("size matched (%s) for slot (%s) ", size.toString(), slotId );
+
 					var adUnitBids = config.biddingPartners[ size[0] + 'x' + size[1] ];
+					adpHbSlots.push(definedSlot);
+
 					createPrebidContainer( adUnitBids, size, slotId );
 				} else {
-					refreshSlot( slotId );
+					refreshSlot( definedSlot );
 				}
 
 				return definedSlot;
 			};
 
 			googletag.enableServices = function(){
-				console.log("adpHbSlots", adpHbSlots);
+				logger.info("initialising reports");
+
 				reporting.initReports( adpHbSlots );
 				eS();
 			};

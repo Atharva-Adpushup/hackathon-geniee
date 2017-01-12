@@ -7,6 +7,7 @@ module.exports = "<html>" +
 				"pbjs.que = pbjs.que || [];" +
 
 				"var PREBID_TIMEOUT = __PB_TIMEOUT__;" +
+				"var SLOT_ID = __PB_SLOT_ID__;" +
 
 				"var prebidScript = document.createElement('script');" +
 				"prebidScript.async = true;" +
@@ -25,9 +26,9 @@ module.exports = "<html>" +
 							"'_adsReceived'   : pbjs._adsReceived" +
 						"};" +
 						"if( Number.isInteger(timeout) ) {" +
-							"parent.__renderPrebidAd(pbjsParams, timeout);" +
+							"parent.__renderPrebidAd(pbjsParams, SLOT_ID, timeout);" +
 						"} else {" +
-							"parent.__renderPrebidAd(pbjsParams);" +
+							"parent.__renderPrebidAd(pbjsParams, SLOT_ID);" +
 						"}" +
 
 						"serverRenderCode.isExecuted = true;" +

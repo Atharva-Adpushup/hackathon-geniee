@@ -1,8 +1,9 @@
 var config = require('./config'),
 	ajax = require('@fdaciuk/ajax'),
-	utils = require('./utils');
+	utils = require('./libs/utils'),
+	logger = require('./libs/logger');
 
-require('./object.assign');
+require('./libs/object.assign');
 
 window.googletag = window.googletag || {};
 googletag.cmd = googletag.cmd || [];
@@ -16,6 +17,8 @@ var dfpEvents = {},
 var packetId = utils.uniqueId(+config.siteId);
 
 function sendBidData(){
+
+		logger.info("sending data for %s ", Object.keys(pbjsWinners).join('\n') );
 
     var builtUrl = utils.buildUrl(config.e3FeedbackUrl, {
       "packetId" : packetId,
@@ -42,15 +45,23 @@ function constructBidData(bidObjData) {
    return bidObj;
 }
 
+var renderedSlots = [];
+
+function getRenderedSlots(){
+	return renderedSlots;
+}
+
 function initReports( hbSlots ) {
 
-	var renderedSlots = [];
+	var hbSlotsIds = hbSlots.map(function(hbSlot){
+		return hbSlot.getAdUnitPath();
+	});
 
 	googletag.cmd.push(function(){
 		googletag.pubads().addEventListener('slotRenderEnded', function(event) {
 
 			var slotPath = event.slot.getAdUnitPath();
-			if( hbSlots.indexOf(slotPath) !== -1 ) {
+			if( hbSlotsIds.indexOf(slotPath) !== -1 ) {
 
 				renderedSlots.push(slotPath);
 
@@ -58,11 +69,12 @@ function initReports( hbSlots ) {
 					pbjsWinners[ slotPath ] =  {
 						advertiserId : event.advertiserId,
 						lineItemId : event.lineItemId,
+						creativeId : event.creativeId,
 						adUnitPath : slotPath
 					};
 				}
 
-				if( hbSlots.length === renderedSlots.length ) {
+				if( hbSlotsIds.length === renderedSlots.length ) {
 					sendBidData();
 				}
 			}
@@ -72,11 +84,13 @@ function initReports( hbSlots ) {
 
 	window.pbjs.que.push(function() {
 		window.pbjs.onEvent('bidWon', function(bidData){
+			logger.info('header bidding ran for %s', bidData.adUnitCode);
 			pbjsWinners[ bidData.adUnitCode ] = constructBidData(bidData);
 		});
 	});
 }
 
 module.exports = {
-	initReports: initReports
+	initReports: initReports,
+	getRenderedSlots: getRenderedSlots
 };
