@@ -51,6 +51,10 @@ class InlineEdit extends React.Component {
 		!validated ? this.setState({ disableSave: true, inputError: true }) : this.setState({ disableSave: false, inputError: false });
 	}
 
+	keyUp() {
+		this.props.keyUpHandler(this.refs.editedText.value);
+	}
+
 	selectDropdownValue(xpath) {
 		this.refs.editedText.value = xpath;
 		this.hideDropdown();
@@ -136,7 +140,12 @@ class InlineEdit extends React.Component {
 					this.state.editMode ? (
 						<Row style={{ margin: 0 }}>
 							<Col className="u-padding-r10px" xs={colCompact} style={{ position: 'relative' }}>
-								<input type="text" ref="editedText" placeholder={this.props.text} defaultValue={adCodeCheck} onFocus={this.props.changeHandler ? this.changeValue.bind(this) : () => { } } onChange={this.props.changeHandler ? this.changeValue.bind(this) : () => { } } />
+								<input type="text" ref="editedText" 
+									placeholder={this.props.text} 
+									defaultValue={adCodeCheck} 
+									onKeyUp={this.props.keyUpHandler ? this.keyUp.bind(this) : () => { }}
+									onFocus={this.props.changeHandler ? this.changeValue.bind(this) : () => { } } 
+									onChange={this.props.changeHandler ? this.changeValue.bind(this) : () => { } } />
 								{
 									this.state.showDropdownList ? (
 										this.renderDropdownList()
@@ -168,7 +177,8 @@ InlineEdit.propTypes = {
 	validationError: PropTypes.string,
 	editClickHandler: PropTypes.func,
 	adCode: PropTypes.bool,
-	dropdownList: PropTypes.array
+	dropdownList: PropTypes.array,
+	keyUpHandler: PropTypes.func
 };
 
 InlineEdit.defaultProps = {

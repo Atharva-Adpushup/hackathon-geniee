@@ -2,12 +2,12 @@ import React, { PropTypes } from 'react';
 import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { deleteSection, renameSection, updateXPath, sectionAllXPaths } from 'actions/sectionActions.js';
+import { deleteSection, renameSection, updateXPath, sectionAllXPaths, validateXPath } from 'actions/sectionActions.js';
 import { updateAdCode } from 'actions/adActions';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 
 const variationSections = (props) => {
-	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdateXPath, onSectionAllXPaths } = props;
+	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdateXPath, onSectionAllXPaths, onValidateXPath } = props;
 	return (
 		<div>
 			<h1 className="variation-section-heading">Variation Sections</h1>
@@ -73,12 +73,13 @@ const variationSections = (props) => {
 											<Col className="u-padding-r10px" xs={4}>XPath</Col>
 											<Col className="u-padding-l10px" xs={8}>
 												<InlineEdit compact dropdownList={section.allXpaths} value={section.xpath}
-													submitHandler={onUpdateXPath.bind(null, section.id)} editClickHandler={onSectionAllXPaths.bind(null, section.id, section.xpath)} text="XPath" errorMessage="XPath cannot be blank"
+													submitHandler={onUpdateXPath.bind(null, section.id)} keyUpHandler={onValidateXPath.bind(null, section.id)} editClickHandler={onSectionAllXPaths.bind(null, section.id, section.xpath)} text="XPath" errorMessage="XPath cannot be blank"
 												/>
 											</Col>
 										</Row>
 									</div>
-									) }
+								) 
+							}
 						</li>
 					</div>
 					))
@@ -95,7 +96,8 @@ variationSections.propTypes = {
 	onRenameSection: PropTypes.func.isRequired,
 	onUpdateAdCode: PropTypes.func.isRequired,
 	onUpdateXPath: PropTypes.func,
-	onSectionAllXPaths: PropTypes.func
+	onSectionAllXPaths: PropTypes.func,
+	onValidateXPath: PropTypes.func
 };
 
 export default connect(
@@ -105,7 +107,8 @@ export default connect(
 		onRenameSection: renameSection,
 		onUpdateAdCode: updateAdCode,
 		onUpdateXPath: updateXPath,
-		onSectionAllXPaths: sectionAllXPaths
+		onSectionAllXPaths: sectionAllXPaths,
+		onValidateXPath: validateXPath
 	}, dispatch)
 	)(variationSections);
 

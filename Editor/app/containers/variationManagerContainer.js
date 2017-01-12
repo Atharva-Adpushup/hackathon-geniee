@@ -9,7 +9,8 @@ const mapStateToProps = (state) => ({
 		activeVariation: getActiveChannelActiveVariation(state),
 		activeChannelId: getActiveChannelId(state),
 		activeChannel: getActiveChannel(state),
-		activeVariationSections: getActiveChannelActiveVariation(state) ? getVariationSectionsWithAds(state, { variationId: getActiveChannelActiveVariation(state).id }).sections : null
+		activeVariationSections: getActiveChannelActiveVariation(state) ? getVariationSectionsWithAds(state, { variationId: getActiveChannelActiveVariation(state).id }).sections : null,
+		ui: state.ui
 	}),
 	noop = () => ({ type: 'test' }),
 	mapDispatchToProps = (dispatch) => ({

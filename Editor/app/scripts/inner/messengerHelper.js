@@ -3,7 +3,7 @@ import $ from 'jquery';
 import { messengerCommands } from 'consts/commonConsts';
 import Utils from 'libs/utils';
 import { updateLayout, highlightElement, setElementSelectorCords, hideElementSelector } from '../../actions/inner/actions';
-import { getAdpVitals, getAllXPaths } from './domManager';
+import { getAdpVitals, getAllXPaths, isValidXPath } from './domManager';
 
 const messenger = new Messenger(),
 	sendMessage = (cmd, data) => {
@@ -35,7 +35,15 @@ const messenger = new Messenger(),
 				
 				case messengerCommands.GET_RELEVANT_XPATHS:
 					sendMessage(messengerCommands.SET_RELEVANT_XPATHS, {
-						allXpaths: getAllXPaths(data.xPath),
+						allXpaths: getAllXPaths(data.xpath),
+						sectionId: data.sectionId
+					});
+					break;
+
+				case messengerCommands.VALIDATE_XPATH:
+					sendMessage(messengerCommands.XPATH_VALIDATED, {
+						xpath: data.xpath,
+						isValidXPath: isValidXPath(data.xpath),
 						sectionId: data.sectionId
 					});
 					break;

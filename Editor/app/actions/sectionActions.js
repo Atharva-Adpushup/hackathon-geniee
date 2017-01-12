@@ -66,11 +66,18 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			partnerData
 		};
 	},
-	sectionAllXPaths = (sectionId, xPath) => {
+	sectionAllXPaths = (sectionId, xpath) => {
 		return {
 			type: sectionActions.GET_ALL_XPATHS,
 			sectionId,
-			xPath
+			xpath
+		};
+	},
+	validateXPath = (sectionId, xpath) => {
+		return {
+			type: sectionActions.VALIDATE_XPATH,
+			sectionId,
+			xpath
 		};
 	},
 	renameSection = (section, variationId, name) => (dispatch, getState) => {
@@ -95,4 +102,4 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 		};
 	};
 
-export { createSection, deleteSection, renameSection, createIncontentSection, updatePartnerData, updateXPath, sectionAllXPaths };
+export { createSection, deleteSection, renameSection, createIncontentSection, updatePartnerData, updateXPath, sectionAllXPaths, validateXPath };

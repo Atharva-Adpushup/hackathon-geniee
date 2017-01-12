@@ -38,7 +38,10 @@ const getData = (state) => {
 				sendMessage(nextState.activeChannelId, messengerCommands.HIDE_ELEMENT_SELECTOR, {});
 			}
 			else if (action.type === sectionActions.GET_ALL_XPATHS) {
-				sendMessage(nextState.activeChannelId, messengerCommands.GET_RELEVANT_XPATHS, { xPath: action.xPath, sectionId: action.sectionId });
+				sendMessage(nextState.activeChannelId, messengerCommands.GET_RELEVANT_XPATHS, { xpath: action.xpath, sectionId: action.sectionId });
+			}
+			else if(action.type === sectionActions.VALIDATE_XPATH) {
+				sendMessage(nextState.activeChannelId, messengerCommands.VALIDATE_XPATH, { xpath: action.xpath, sectionId: action.sectionId });
 			}
 		}
 
