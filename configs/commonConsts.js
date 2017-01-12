@@ -9,6 +9,29 @@ module.exports = {
 		xpathWaitTimeout: 5000,
 		adpushupPercentage: 100
 	},
+	hbConfig: {
+		'pulsePoint': {
+			name: 'pulsepoint',
+			isHb: true,
+			global: {
+				cf: {default: '560684', validations: ['required'], alias: "UserId", isEditable: true}
+			},
+			local: {
+				ct: {validations: ['required'], alias: "AdId"}
+			}
+		},
+		'wideOrbit': {
+			name: 'wideorbit',
+			isHb: true,
+			global: {
+				pbId: {default: '560684', validations: ['required'], alias: "UserId", isEditable: true}
+			},
+			local: {
+				pId: {validations: ['required', {type: 'number'}], alias: "AdId"}
+			}
+		},
+		
+	},
 	password: {
 		'MASTER': 'fe4720b8bcdedb3cc47490015b0ab050'
 	},
