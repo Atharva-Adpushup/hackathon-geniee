@@ -167,3 +167,28 @@ block bodyContent
 							li Truth Theory
 						a(href="http://www.adpushup.com/customers/AdPushup_RentLingo_CaseStudy.pdf", target="_blank")
 							li Rent Lingo
+script(type="text/javascript").
+    var analyticsObj = '!{analyticsObj}',
+        intercomToSegmentObj = intercomObj || null,
+		userObj = '!{userObj}';
+    if(analyticsObj) {
+        var jadeAnalyticsObj = JSON.parse(analyticsObj),
+			userInfoObj = JSON.parse(userObj),
+			stage = userInfoObj.stage || 'Post Onboarding';
+        adpushupAnalyticsEvents.emit('analyticsAlias', {
+            email: userInfoObj.email
+        });
+        adpushupAnalyticsEvents.emit('analyticsIdentify', {
+            email: userInfoObj.email, 
+            analytics: jadeAnalyticsObj, 
+            intercom: intercomToSegmentObj
+        });
+        adpushupAnalyticsEvents.emit('analyticsTrack', {
+            eventName: stage,
+             obj: {
+                name: userInfoObj.firstName,
+                email: userInfoObj.email
+            },
+            intercom: intercomToSegmentObj
+        });
+    }

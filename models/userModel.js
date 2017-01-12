@@ -21,7 +21,7 @@ var modelAPI = module.exports = apiModule(),
 	User = model.extend(function() {
 		this.keys = ['firstName', 'lastName', 'email', 'salt', 'passwordMd5', 'sites', 'adNetworkSettings', 'createdAt',
 			'passwordResetKey', 'passwordResetKeyCreatedAt', 'requestDemo',
-			'requestDemoData', 'analytics', 'adNetworks', 'pageviewRange', 'managedBy', 'userType', 'websiteRevenue', 'crmDealId', 'revenueUpperLimit', 'preferredModeOfReach'];
+			'requestDemoData', 'analytics', 'adNetworks', 'pageviewRange', 'managedBy', 'userType', 'websiteRevenue', 'crmDealId', 'revenueUpperLimit', 'preferredModeOfReach', 'revenueLowerLimit', 'revenueAverage'];
 		this.validations = schema.user.validations;
 		this.classMap = {
 			adNetworkSettings: networkSettings
@@ -294,15 +294,6 @@ function apiModule() {
 								if(res) {
 										var responseString = res.toString(),
 											dealId = responseString.substring(responseString.lastIndexOf(":")+1,responseString.lastIndexOf(";"));
-
-										// Development & Testing
-										// if(dealId) {
-										// 	user.set('crmDealId', dealId);												
-										// } else {
-										// 	user.set('crmDealId', '12010');
-										// }
-
-										// Production
 										user.set('crmDealId', dealId);
 									}
 									return user;

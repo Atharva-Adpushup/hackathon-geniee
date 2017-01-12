@@ -166,13 +166,45 @@ block bodyContent
 							li Truth Theory
 						a(href="http://www.adpushup.com/customers/AdPushup_RentLingo_CaseStudy.pdf", target="_blank")
 							li Rent Lingo
+	div(class="intercom-launcher")
+		if analyticsObj
+			- user = user || {};
+			// Intercom user secure mode Hash
+			- intercomHash = utils.getHmacSHA256(user.email, consts.analytics["INTERCOM_ID"]);
+			if environment == "production"
+				script(type="text/javascript").
+					var intercomHash = '#{intercomHash}',
+						intercomObj = {
+							Intercom: {
+								user_hash: intercomHash
+							}
+						};
+
 	div(class="clickhere")
 		| Click here to chat with us
 		img(src="/assets/images/animatedRightArrow.gif")
-	//- script(type="text/javascript").
-	//- 	adpushupAnalyticsEvents.emit('analyticsIdentify', {
-	//- 		email: window.currentUser.email
-	//- 	});
-	//- 	adpushupAnalyticsEvents.emit('analyticsTrack', {
-	//- 			eventName: 'App-signup-first-stage', 
-	//- 	});
+	script(type="text/javascript").
+		var analyticsObj = '!{analyticsObj}',
+			intercomToSegmentObj = intercomObj || null;
+		if(analyticsObj) {
+			var jadeAnalyticsObj = JSON.parse(analyticsObj);
+				userInfoObj = !{JSON.stringify(user)},
+				stage = userInfoObj.stage || 'Post Onboarding';
+			jadeAnalyticsObj.stage = userInfoObj.stage || 'Post Onboarding';
+			adpushupAnalyticsEvents.emit('analyticsAlias', {
+				email: userInfoObj.email
+			});
+			adpushupAnalyticsEvents.emit('analyticsIdentify', {
+				email: userInfoObj.email, 
+				analytics: jadeAnalyticsObj, 
+				intercom: intercomToSegmentObj
+			});
+			adpushupAnalyticsEvents.emit('analyticsTrack', {
+				eventName: stage,
+				obj: {
+					name: userInfoObj.firstName,
+					email: userInfoObj.email
+				},
+				intercom: intercomToSegmentObj
+			});
+		}

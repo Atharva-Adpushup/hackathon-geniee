@@ -133,6 +133,9 @@ router
             userModel.getUserByEmail(req.session.user.email).then(function (user) {
                 var userSites = user.get('sites');
                 user.set('preferredModeOfReach', req.body.modeOfReach);
+                if(req.body['selectedServices[]'] && req.body['selectedServices[]'].length > 1) {
+                    req.session.stage = 'Onboarding';
+                }
                 for (var i in userSites) {
                     if (userSites[i].domain === req.body.newSiteUnSavedDomain) {
                         userSites[i].services = req.body.servicesString;

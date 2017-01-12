@@ -277,42 +277,44 @@ div.detectap-alert.text-center#apdetect
 
     //- if enviroment == "development"
     //- div(class="intercom-launcher")
-    script(type="text/javascript").
-        var analyticsObj = '!{analyticsObj}',
-            intercomToSegmentObj = intercomObj || null;
-        if(analyticsObj) {
-            var jadeAnalyticsObj = JSON.parse(analyticsObj);
-            adpushupAnalyticsEvents.emit('analyticsAlias', {
+script(type="text/javascript").
+    var analyticsObj = '!{analyticsObj}',
+        intercomToSegmentObj = intercomObj || null;
+    if(analyticsObj) {
+        var jadeAnalyticsObj = JSON.parse(analyticsObj);
+        jadeAnalyticsObj.stage = 'Pre Onboarding';
+       adpushupAnalyticsEvents.emit('analyticsAlias', {
+            email: window.currentUser.email
+        });
+        adpushupAnalyticsEvents.emit('analyticsIdentify', {
+            email: window.currentUser.email,
+            analytics: jadeAnalyticsObj,
+            intercom: intercomToSegmentObj
+        });
+        adpushupAnalyticsEvents.emit('analyticsTrack', {
+            eventName: 'Pre Onboarding',
+            obj: {
+                name: window.currentUser.firstName,
+                email: window.currentUser.email,
+                value: true
+            },
+            intercom: intercomToSegmentObj
+        });
+    } else {
+        adpushupAnalyticsEvents.emit('analyticsIdentify', {
+            email: window.currentUser.email, 
+            analytics: {
+                name: window.currentUser.firstName,
                 email: window.currentUser.email
-            });
-            adpushupAnalyticsEvents.emit('analyticsIdentify', {
-                email: window.currentUser.email, 
-                analytics: jadeAnalyticsObj, 
-                intercom: intercomToSegmentObj
-            });
-            adpushupAnalyticsEvents.emit('analyticsTrack', {
-                    eventName: 'App-signup-first-stage', 
-                    obj: {
-                        name: window.currentUser.firstName,
-                        email: window.currentUser.email
-                    }, 
-                    intercom: intercomToSegmentObj
-            });
-        } else {
-            adpushupAnalyticsEvents.emit('analyticsIdentify', {
-                email: window.currentUser.email, 
-                analytics: {
-                    name: window.currentUser.firstName,
-                    email: window.currentUser.email
-                }, 
-                intercom: intercomToSegmentObj
-            });
-            //- adpushupAnalyticsEvents.emit('analyticsTrack', {
-            //-         eventName: 'App-signup-first-stage', 
-            //-         obj: {
-            //-             name: window.currentUser.firstName,
-            //-             email: window.currentUser.email
-            //-         }, 
-            //-         intercom: intercom
-            //- });            
-        }
+            }, 
+            intercom: intercomToSegmentObj
+        });
+        //- adpushupAnalyticsEvents.emit('analyticsTrack', {
+        //-         eventName: 'App-signup-first-stage', 
+        //-         obj: {
+        //-             name: window.currentUser.firstName,
+        //-             email: window.currentUser.email
+        //-         }, 
+        //-         intercom: intercom
+        //- });            
+    }

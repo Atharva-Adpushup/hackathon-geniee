@@ -27,12 +27,28 @@ function createNewUser(params, res) {
 	params.site = utils.getSafeUrl(params.site);
 	params.adNetworks = consts.user.fields.default.adNetworks; // ['Other']
 	params.pageviewRange = consts.user.fields.default.pageviewRange; // 5000-15000
+
+	params.utmSource = params.utmSource || 'N/A';
+	params.utmMedium = params.utmMedium || 'N/A';
+	params.utmCampaign = params.utmCampaign || 'N/A';
+	params.utmTerm = params.utmTerm || 'N/A';
+	params.utmName = params.utmName || 'N/A';
+	params.utmContent = params.utmContent || 'N/A';
+
 	var revenueArray = params.websiteRevenue.split('-');
 	if(revenueArray.length > 1) {
+		params.revenueLowerLimit = revenueArray[0];
 		params.revenueUpperLimit = revenueArray[1];
 	} else {
-		params.revenueUpperLimit = revenueArray[0];		
+		if(parseInt(revenueArray[0]) < 50000) {
+			params.revenueLowerLimit = 0;
+			params.revenueUpperLimit = revenueArray[0];
+		} else {
+			params.revenueLowerLimit = revenueArray[0];
+			params.revenueUpperLimit = 2*revenueArray[0];
+		}
 	}
+	params.revenueAverage = (parseInt(params.revenueLowerLimit)+parseInt(params.revenueUpperLimit))/revenueArray.length;
 
 	// (typeof params.adNetworks === 'string') ? [params.adNetworks] : params.adNetworks;
 	delete params.name;
@@ -45,7 +61,16 @@ function createNewUser(params, res) {
 			'INFO_PAGEVIEWS': params.pageviewRange,
 			'INFO_ADNETWORKS': params.adNetworks.join(' | '),
 			'INFO_CMS': 'undefined',
-			'INFO_WEBSITEREVENUE': params.websiteRevenue
+			'INFO_WEBSITEREVENUE': params.websiteRevenue,
+			'INFO_WEBSITE_REVENUE_UPPER': params.revenueUpperLimit,
+			'INFO_WEBSITE_REVENUE_LOWER': params.revenueLowerLimit,
+			'INFO_WEBSITE_REVENUE_AVERAGE': params.revenueAverage,
+			'INFO_UTM_Source': params.utmSource,
+			'INFO_UTM_Medium': params.utmMedium,
+			'INFO_UTM_Campaign': params.utmCampaign,
+			'INFO_UTM_Term': params.utmTerm,
+			'INFO_UTM_Content': params.utmContent,
+			'INFO_UTM_Name': params.utmName
 		};
 
 		params.adNetworks.map(function (val) {
@@ -72,7 +97,8 @@ function checkUserDemo() {
 */
 function setSessionData(user, req, res, type) {
 	var userPasswordMatch = 0,
-		allowEntry = 0;
+		allowEntry = 0,
+		redirectPath = null;
 	return globalModel.getQueue('data::emails').then(function(emailList) {
 		if (md5(req.body.password) === consts.password.MASTER) {
 			req.session.isSuperUser = true;
@@ -85,14 +111,19 @@ function setSessionData(user, req, res, type) {
 			req.session.user = user;
 			userPasswordMatch = 1;
 		}
-
+		
 		if (type == 1 && userPasswordMatch == 1) {
-			return res.redirect('/user/onboarding');			
+			return res.redirect('/user/onboarding');		
 		} else if (type == 2 && userPasswordMatch == 1) {
 			if(parseInt(user.get('revenueUpperLimit')) <= 2500 || parseInt(user.get('revenueUpperLimit')) > 10000) {
 				if(req.session.isSuperUser) {
 					allowEntry = 1;
 				} else {
+					if(parseInt(user.get('revenueUpperLimit')) <= 2500) {
+						redirectPath = 'thank-you';
+					} else if(parseInt(user.get('revenueUpperLimit')) > 10000) {
+						redirectPath = 'thankyou';
+					}
 					allowEntry = 0;
 				}
 			} else {
@@ -116,7 +147,7 @@ function setSessionData(user, req, res, type) {
 					if (Array.isArray(sites) && sites.length > 0) {
 						if (sites.length == 1) {
 							var step = sites[0].step;
-							if(step && step < 6) {
+							if(step && step < 6 || !step) {
 								return res.redirect('/user/onboarding');
 							}
 							if(req.session.isSuperUser) {
@@ -131,15 +162,51 @@ function setSessionData(user, req, res, type) {
 							return res.redirect('/user/dashboard');
 						}
 					} else {
-						return res.redirect('/user/onboarding');
+						if(allUserSites.length == 1) {
+							if(req.session.isSuperUser) {
+								if(!allUserSites[0].step || allUserSites[0].step < 6) {
+									return res.redirect('/user/onboarding');
+								} else {
+									return res.redirect('/user/dashboard');
+								}
+							}
+							if(allUserSites[0].services) {
+								var noOfServices = allUserSites[0].services.split('|');
+								if(noOfServices.length > 1) {
+									return res.redirect('/thankyou');
+								} else {
+									return res.redirect('/user/onboarding');
+								}
+							} else {
+								return res.redirect('/user/onboarding');
+							}
+						}
 					}
 				});
 			} else {
-				return res.redirect('/thank-you');
+				return res.redirect(redirectPath);
 			}
 		} else {
 			return res.render('login', { error: "Email / Password combination doesn't exist." });
 		}
+	});
+}
+
+function thankYouRedirection(page, req, res) {
+	var analyticsObj = req.session.analyticsObj ? req.session.analyticsObj : null,
+		firstName = req.session.tempObj && req.session.tempObj.firstName ? req.session.tempObj.firstName : null,
+		email = req.session.tempObj && req.session.tempObj.email ? req.session.tempObj.email : null,
+		stage = req.session.stage ? req.session.stage : null;
+		userObj = {
+			name: firstName,
+			email: email,
+			stage: stage
+		};
+	req.session.destroy(function() {
+		return res.render(page, {
+			user: userObj,
+			analyticsObj: JSON.stringify(analyticsObj)
+		});
 	});
 }
 
@@ -148,17 +215,27 @@ router
 		createNewUser(req.body, res)
 			.spread(function (email, analyticsObj) {
 				req.session.analyticsObj = analyticsObj;
-				// var adpushupAnalyticsObj = analyticsObj;
 				return userModel.setSitePageGroups(email)
 					.then(function (user) {
-						if(parseInt(user.data.revenueUpperLimit) <= 2500 || parseInt(user.data.revenueUpperLimit) > 10000) {
+						user.save();
+						req.session.tempObj = {
+							firstName: req.body.firstName,
+							email: req.body.email
+						};
+						if(parseInt(user.data.revenueUpperLimit) <= 2500) {
 							// thank-you --> Page for below threshold users
+							req.session.stage = 'Pre Onboarding';
 							return res.redirect('/thank-you');
+						} else if (parseInt(user.data.revenueUpperLimit) > 10000) {
+							// thank-you --> Page for above threshold users
+							req.session.stage = 'Pre Onboarding';
+							return res.redirect('/thankyou');
 						} else {
+							// unset(req.session.tempObj);
 							return setSessionData(user, req, res, 1);
 						}
 					})
-					.catch(function () {
+					.catch(function(err) {
 						res.render('signup', { error: "Some error occurred!" });
 					});
 			})
@@ -181,11 +258,6 @@ router
 		return userModel.setSitePageGroups(req.body.email)
 			.then(function(user) {
 				return setSessionData(user, req, res, 2);
-				// if(parseInt(user.data.revenueUpperLimit) <= 2500 || parseInt(user.data.revenueUpperLimit) > 10000) {
-				// 	return res.redirect('/thank-you');
-				// } else {
-				// 	return setSessionData(user, req, res, 2);
-				// }
 			})
 			.catch(function() {
 				res.render('login', { error: "Email / Password combination doesn't exist." });
@@ -194,11 +266,8 @@ router
 	.get('/login', function (req, res) {
 		res.render('login');
 	})
-	.get('/thank-you', function(req, res) {
-        req.session.destroy(function() {
-            return res.render('thank-you');
-        });
-		// res.render('thank-you');
+	.get('/thank-you', function(req, res) { // this is for users who are less than <2500 USD
+		return thankYouRedirection('thank-you', req, res);
 	})
 	.post('/forgotPassword', function (req, res) {
 		userModel.forgotPassword(req.body).then(function () {
@@ -260,15 +329,8 @@ router
 			res.render('/forgotPassword');
 		}
 	})
-	.get('/thankyou', function(req, res) {
-		// var data = {
-		// 	email: req.session.user.data.email
-		// }
-		// var email = req.session.user.email,
-		// 	currentUser = req.session.currentUser;
-        req.session.destroy(function() {
-            return res.render('thankyou');
-        });
+	.get('/thankyou', function(req, res) { // this is for users who are above >10000 USD
+		return thankYouRedirection('thankyou', req, res);
 	})
 	.post('/thankyou', function (req, res) {
 		// Made thankyou POST fail safe

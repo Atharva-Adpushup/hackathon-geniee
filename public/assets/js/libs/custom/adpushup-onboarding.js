@@ -11,14 +11,8 @@ $('document').ready(function() {
             dom: null,
             // Intro modal check
             showIntro: function() {
-                // var showIntro = w.localStorage.getItem('showIntro');
                 var keyboardValue = false,
                     backdropValue = 'static';
-
-                // if(newSite.addOtherSite) {
-                //     keyboardValue = true;
-                //     backdropValue = 'null';
-                // }
 
                 if(!w.currentUser.sites[(w.currentUser.sites.length-1)].step || newSite.showIntro) {
                     if(newSite.addOtherSite) {
@@ -34,28 +28,55 @@ $('document').ready(function() {
                             'keyboard': keyboardValue
                         });
                     }
-                    // w.localStorage.setItem('showIntro', true);
                 }
             },
 
             // Analytics Event Emit
-            analyticsEventEmitter: function(step, flag) {
+            analyticsEventEmitter: function(data, flag) {
                 var intercom = intercomObj || null;
                 if(flag) {
+                    adpushupAnalyticsEvents.emit('analyticsIdentify', {
+                        email: window.currentUser.email,
+                        analytics: {
+                            'stage': data.stage,
+                            'step': data.step
+                        }, 
+                        intercom: intercomToSegmentObj
+                    });                        
                     adpushupAnalyticsEvents.emit('analyticsTrack', {
-                            eventName: step, 
+                            eventName: data.step, 
                             obj: {
                                 name: w.currentUser.firstName,
                                 email: w.currentUser.email
                             },
                             intercom: intercom
-                    });                    
+                    });
                 } else {
+                    if(data.step == 'Selected Solution') {
+                        adpushupAnalyticsEvents.emit('analyticsIdentify', {
+                            email: window.currentUser.email,
+                            analytics: {
+                                'stage': 'Onboarding',
+                                'step': data.step,
+                                'solution': data.solution
+                            }, 
+                            intercom: intercomToSegmentObj
+                        });
+                    } else {
+                        adpushupAnalyticsEvents.emit('analyticsIdentify', {
+                            email: window.currentUser.email,
+                            analytics: {
+                                'stage': 'Onboarding',
+                                'step': data.step
+                            }, 
+                            intercom: intercomToSegmentObj
+                        });                        
+                    }
                     adpushupAnalyticsEvents.emit('analyticsTrack', {
                             eventName: 'onboarding', 
                             obj: {
                                 action: 'click',
-                                step: step
+                                step: data.step
                             },
                             intercom: intercom
                     });
@@ -262,7 +283,9 @@ $('document').ready(function() {
                                     if(!newSite.addOtherSite) {
                                         var status = 66;
                                         ob.updateCrmDealStatus(status);
-                                        ob.analyticsEventEmitter('Added Site');                                    
+                                        ob.analyticsEventEmitter({
+                                            step: 'Added Site'
+                                        });
                                     }
                                     $(btn).fadeOut(100);
                                     ob.saveSiteModel(site, url, res.siteId, btn);
@@ -312,7 +335,9 @@ $('document').ready(function() {
                                 {
                                     var status = 67;
                                     ob.updateCrmDealStatus(status);
-                                    ob.analyticsEventEmitter('Added AP Code');
+                                    ob.analyticsEventEmitter({
+                                        step: 'Added AP Code'
+                                    });
                                 }
                                 ob.detectApSuccess(ob, el);
                             } else {
@@ -373,7 +398,9 @@ $('document').ready(function() {
                         {
                             var status = 69;
                             ob.updateCrmDealStatus(status);
-                            ob.analyticsEventEmitter('Non-Admin Access');
+                            ob.analyticsEventEmitter({
+                                step: 'Non-Admin Access'
+                            });
                         }
                         ob.nextStep(6, 5, 1000);
                         // btn.html('Setup Complete '+ob.templates.checkIcon);
@@ -414,7 +441,9 @@ $('document').ready(function() {
                             {
                                 var status = 68;
                                 ob.updateCrmDealStatus(status);
-                                ob.analyticsEventEmitter('Added OAuth');
+                                ob.analyticsEventEmitter({
+                                    step: 'Added OAuth'
+                                });
                             }
                             ob.nextStep(5, 4, 1000);
                             // ap.onboarding.setupCompleteAlert();
@@ -476,22 +505,28 @@ $('document').ready(function() {
                         servicesString: servicesString,
                         pwc: data.pwc
                     },
-                    ob = this;
+                    ob = this,
+                    dataToEndPoint = {
+                        servicesString: servicesString,
+                        newSiteUnSavedDomain: newSite.viewObjects.origUnSavedDomain,
+                        newSiteSiteId: newSite.viewObjects.unSavedSiteId,
+                        newSiteDomanizedUrl: newSite.viewObjects.domanizedUrl,
+                        modeOfReach: data.pwc,
+                        selectedServices: data.selectedServices
+                    };
+                    // dataToEndPoint = $.extend(true, {}, {data: paramObject});
                 
-                $.post('/user/setSiteServices', {
-                    'servicesString': servicesString,
-                    'newSiteUnSavedDomain': newSite.viewObjects.origUnSavedDomain,
-                    'newSiteSiteId': newSite.viewObjects.unSavedSiteId,
-                    'newSiteDomanizedUrl': newSite.viewObjects.domanizedUrl,
-                    'modeOfReach': data.pwc
-                }, function(response) {
+                $.post('/user/setSiteServices', dataToEndPoint, function(response) {
                     if (response.success) {
                         if(!newSite.addOtherSite)
                         {
                             var status = 65;
                             ob.updateCrmDealStatus(status);
                             ob.updateCrmDeal(dataToSend, 'services');
-                            ob.analyticsEventEmitter('Selected Solution');
+                            ob.analyticsEventEmitter({
+                                step: 'Selected Solution',
+                                solution: servicesString
+                            });
                         }
                         if (data.selectedServices.length > 1) {
                             window.location.replace(url);
@@ -509,7 +544,6 @@ $('document').ready(function() {
                         return;
                     }
                 });
-                // }
             },
 
             // Adding user another site
@@ -690,8 +724,10 @@ $('document').ready(function() {
                         {
                             var status = 70;
                             ob.updateCrmDealStatus(status);
-                            ob.analyticsEventEmitter('Code Conversion');
-                            ob.analyticsEventEmitter('App-signup-second-stage', 1);
+                            ob.analyticsEventEmitter({
+                                stage: 'Post Onboarding',
+                                step: 'Code Conversion'
+                            }, 1);
                         }
                         ob.setupCompleteAlert();
                     } else {
@@ -699,7 +735,6 @@ $('document').ready(function() {
                     }
                 });
             },
-
             // Site addition modal inside dashboard
             addOtherSiteFromDashboard: function(selectedServices, site, url) {
                 var ob = this,
@@ -721,7 +756,6 @@ $('document').ready(function() {
                     }
                 }
             },
-            
             // Skipping ap verficiation
             skipApVerification: function() {
                 var ob = this;
@@ -733,7 +767,9 @@ $('document').ready(function() {
                         if(!newSite.addOtherSite) {
                             var status = 67;
                             ob.updateCrmDealStatus(status);
-                            ob.analyticsEventEmitter('Added AP Code');
+                            ob.analyticsEventEmitter({
+                                step: 'Added AP Code'
+                            });
                         }
                         if(newSite.addOtherSite) {
                             ob.nextStep(6, 3, 1000);
