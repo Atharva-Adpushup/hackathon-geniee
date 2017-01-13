@@ -95,7 +95,7 @@ function main() {
 
 		var matchAdSize = function( adSize, targetingAdSizes ){
 
-			var boolAdSizes = targetingAdSizes.map(function( compAdSize ){
+			var boolAdSizes = config.getTargetingAdSizes().map(function( compAdSize ){
 				if( adSize[0] === compAdSize[0] && adSize[1] === compAdSize[1] ) {
 					return true;
 				} else {
@@ -122,7 +122,9 @@ function main() {
 				if( matchAdSize(size, config.targetingAdSizes) ) {
 					logger.info("size matched (%s) for slot (%s) ", size.toString(), slotId );
 
-					var biddingPartners = config.biddingPartners[ size[0] + 'x' + size[1] ],
+					var sizeString =  size[0] + 'x' + size[1];
+
+					var biddingPartners = config.biddingPartners[ sizeString ],
 						pbBiddingPartners;
 
 					adpHbSlots.push(definedSlot);
