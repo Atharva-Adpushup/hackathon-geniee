@@ -28,7 +28,7 @@ block bodyContent
                                     .col-sm-3
                                         .input-name Select type of Geography
                                     .col-sm-9
-                                        .styleSelect.select-box
+                                        .styleSelect.select-box-lg
                                             select(name="geoType")#geo-selector
                                                 option(value="country") Country
                                                 option(value="continent") Continent
@@ -38,7 +38,7 @@ block bodyContent
                                     .col-sm-3
                                         .input-name Select Country
                                     .col-sm-9
-                                        .styleSelect.select-box
+                                        .styleSelect.select-box-lg
                                             select(name="country")#geo-country
                                                 for country in countries
                                                     option(value="#{country.code}")!= country.name
@@ -47,10 +47,19 @@ block bodyContent
                                     .col-sm-3
                                         .input-name Select Continent
                                     .col-sm-9
-                                        .styleSelect.select-box
+                                        .styleSelect.select-box-lg
                                             select(name="continent")#geo-continent
                                                 for continent in continents
                                                     option(value="#{continent.name}")!= continent.name
+                                
+                                .row
+                                    .col-sm-3
+                                        .input-name Select Ad Size
+                                    .col-sm-9
+                                        .styleSelect.select-box-lg
+                                            select(name="adSize")#ad-size
+                                                for size in adSizes
+                                                    option(value="#{size.width+'x'+size.height}")!= size.width+'x'+size.height
                                         
                                                
                                         

@@ -63,12 +63,19 @@ router
                 }),
                 continents = _.forIn(countryData.continents, function(continent) {
                     return continent.name;
-                });
+                }), adSizes = [];
+
+                _.forEach(commonConsts.supportedAdSizes, function(layout) {
+                    _.forEach(layout.sizes, function(size) {
+                        adSizes.push(size);
+                    });
+                });            
 
                 return res.render('headerBidding', {
                     siteDomain: site.get('siteDomain'),
                     countries: countries,
-                    continents: continents
+                    continents: continents,
+                    adSizes: adSizes
                 });
             })
             .catch(function (err) {

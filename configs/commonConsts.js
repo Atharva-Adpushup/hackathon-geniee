@@ -32,6 +32,24 @@ module.exports = {
 		},
 		
 	},
+	supportedAdSizes: [
+		{
+			layoutType: 'SQUARE',
+			sizes: [{ width: 300, height: 250 }, { width: 250, height: 250 }, { width: 200, height: 200 }, { width: 336, height: 280 }]
+		},
+		{
+			layoutType: 'HORIZONTAL',
+			sizes: [{ width: 728, height: 90 }, { width: 468, height: 60 }, { width: 900, height: 90 }, { width: 970, height: 250 }]
+		},
+		{
+			layoutType: 'VERTICAL',
+			sizes: [{ width: 300, height: 600 }, { width: 160, height: 600 }, { width: 120, height: 600 }, { width: 300, height: 1050 }]
+		},
+		{
+			layoutType: 'MOBILE',
+			sizes: [{ width: 320, height: 50 }, { width: 300, height: 250 }, { width: 250, height: 250 }, { width: 200, height: 200 }, { width: 320, height: 100 }]
+		},
+	],
 	password: {
 		'MASTER': 'fe4720b8bcdedb3cc47490015b0ab050'
 	},
