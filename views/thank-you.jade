@@ -167,28 +167,45 @@ block bodyContent
 							li Truth Theory
 						a(href="http://www.adpushup.com/customers/AdPushup_RentLingo_CaseStudy.pdf", target="_blank")
 							li Rent Lingo
-script(type="text/javascript").
-    var analyticsObj = '!{analyticsObj}',
-        intercomToSegmentObj = intercomObj || null,
-		userObj = '!{userObj}';
-    if(analyticsObj) {
-        var jadeAnalyticsObj = JSON.parse(analyticsObj),
-			userInfoObj = JSON.parse(userObj),
-			stage = userInfoObj.stage || 'Post Onboarding';
-        adpushupAnalyticsEvents.emit('analyticsAlias', {
-            email: userInfoObj.email
-        });
-        adpushupAnalyticsEvents.emit('analyticsIdentify', {
-            email: userInfoObj.email, 
-            analytics: jadeAnalyticsObj, 
-            intercom: intercomToSegmentObj
-        });
-        adpushupAnalyticsEvents.emit('analyticsTrack', {
-            eventName: stage,
-             obj: {
-                name: userInfoObj.firstName,
-                email: userInfoObj.email
-            },
-            intercom: intercomToSegmentObj
-        });
-    }
+	div(class="intercom-launcher")
+		if analytics
+			- user = user || {};
+			// Intercom user secure mode Hash
+			- intercomHash = utils.getHmacSHA256(user.email, consts.analytics["INTERCOM_ID"]);
+			if environment == "development"
+				script(type="text/javascript").
+					var intercomHash = '#{intercomHash}',
+						intercomObj = {
+							Intercom: {
+								user_hash: intercomHash
+							}
+						};
+
+	div(class="clickhere")
+		| Click here to chat with us
+		img(src="/assets/images/animatedRightArrow.gif")
+	- analytics = analytics || {};
+	script(type="text/javascript").
+		var analyticsObj = !{JSON.stringify(analytics)},
+			intercomToSegmentObj = intercomObj || null;
+		if(analyticsObj && analyticsObj.length > 0) {
+			var userInfoObj = !{JSON.stringify(user)},
+				stage = userInfoObj.stage || 'Pre Onboarding';
+			analyticsObj.stage = userInfoObj.stage || 'Pre Onboarding';
+			adpushupAnalyticsEvents.emit('analyticsAlias', {
+				email: userInfoObj.email
+			});
+			adpushupAnalyticsEvents.emit('analyticsIdentify', {
+				email: userInfoObj.email, 
+				analytics: analyticsObj, 
+				intercom: intercomToSegmentObj
+			});
+			adpushupAnalyticsEvents.emit('analyticsTrack', {
+				eventName: stage,
+				obj: {
+					name: userInfoObj.firstName,
+					email: userInfoObj.email
+				},
+				intercom: intercomToSegmentObj
+			});
+		}

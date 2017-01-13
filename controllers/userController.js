@@ -131,9 +131,10 @@ router
     .post('/setSiteServices', function (req, res) {
         if (req.body && req.body.servicesString) {
             userModel.getUserByEmail(req.session.user.email).then(function (user) {
-                var userSites = user.get('sites');
+                var userSites = user.get('sites'),
+                    userWebsiteRevenue = user.get('revenueUpperLimit');
                 user.set('preferredModeOfReach', req.body.modeOfReach);
-                if(req.body['selectedServices[]'] && req.body['selectedServices[]'].length > 1) {
+                if(req.body['selectedServices[]'] && req.body['selectedServices[]'].length > 1 || userWebsiteRevenue > 10000) {
                     req.session.stage = 'Onboarding';
                 }
                 for (var i in userSites) {

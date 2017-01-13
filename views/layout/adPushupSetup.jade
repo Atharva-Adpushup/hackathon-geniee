@@ -221,10 +221,11 @@ div.detectap-alert.text-center#apdetect
             .row(style="padding-left: 34px;")
                 button(id="adsenseoauth", class="apbtn-main apbtn-icon ap-adsense-connect-btn")
                     i.fa.fa-google
-                    | Connect Google AdSense            
-            //- .small.text-center.small-text#skipOauth Don't have an AdSense account ? 
-            //-     a Skip 
-            //-     | this step.
+                    | Connect Google AdSense
+            if isSuperUser
+                .small.text-center.small-text#skipOauth Don't have an AdSense account ? 
+                    a Skip 
+                    | this step.
 
     //- Grant non-admin access
     .onboarding-step#step5

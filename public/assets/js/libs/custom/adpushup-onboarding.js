@@ -521,6 +521,9 @@ $('document').ready(function() {
                         if(!newSite.addOtherSite)
                         {
                             var status = 65;
+                            if(parseInt(window.currentUser.revenueUpperLimit) > 10000 || data.selectedServices.length > 1) {
+                                status = 72;
+                            }
                             ob.updateCrmDealStatus(status);
                             ob.updateCrmDeal(dataToSend, 'services');
                             ob.analyticsEventEmitter({
@@ -528,7 +531,8 @@ $('document').ready(function() {
                                 solution: servicesString
                             });
                         }
-                        if (data.selectedServices.length > 1) {
+
+                        if (parseInt(window.currentUser.revenueUpperLimit) > 10000 || data.selectedServices.length > 1) {
                             window.location.replace(url);
                         } else if (data.selectedServices.length == 1) {
                             if (data.selectedServices[0] == 'only-adsense') {
