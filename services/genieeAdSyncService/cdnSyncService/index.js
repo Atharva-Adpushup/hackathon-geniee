@@ -8,6 +8,7 @@ var path = require('path'),
     ftp = new PromiseFtp(),
     mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
     fs = Promise.promisifyAll(require('fs')),
+	AdPushupError = require('../../../helpers/AdPushupError'),
     CC = require('../../../configs/commonConsts'),
     config = require('../../../configs/config');
 
@@ -140,11 +141,23 @@ module.exports = function (site) {
             return apConfigs;
         },
         getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
+        getGenieeReportData = function(paramConfig) {
+            return genieeReportService.getReport(paramConfig).then(function(reportData) {
+                return getVariationsPayload(site, reportData).then(setAllConfigs);
+            }).catch(function(e) {
+                /**********NOTE: SPECIAL CONDITION (GENIEE REPORTS)**********/
+                // Only return variations payload without geniee reports data when
+                // Geniee reports return an empty Array [] & consequently throws below exception message
+                if (e && (e instanceof AdPushupError) && e.message && e.message === CC.partners.geniee.exceptions.str.zonesEmpty) {
+                    return getVariationsPayload(site).then(setAllConfigs);
+                }
+
+                throw e;
+            });
+        },
         getComputedConfig = Promise.resolve(true).then(function() {
             if (isGenieePartner) {
-                return genieeReportService.getReport(paramConfig).then(function(reportData) {
-                    return getVariationsPayload(site, reportData).then(setAllConfigs);
-                });
+                return getGenieeReportData(paramConfig);
             } else {
                 return getVariationsPayload(site).then(setAllConfigs);
             }

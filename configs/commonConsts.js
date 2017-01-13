@@ -25,6 +25,11 @@ module.exports = {
 				URL: {
 					"REPORTS": 'https://beta-aladdin.geniee.jp/beta2/aladdin/adpushup/report/'
 				}
+			},
+			exceptions: {
+				str: {
+					zonesEmpty: 'Zones should not be empty'
+				}
 			}
 		}
 	},
