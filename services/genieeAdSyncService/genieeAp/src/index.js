@@ -91,7 +91,7 @@ function main() {
 	if (!config.pageGroup) {
 		pageGroupTimer = setTimeout(function() {
 			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
-		}, 5000);
+		}, config.pageGroupTimeout);
 	} else {
 		// start heartBeat
 		heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
