@@ -50,7 +50,7 @@ block bodyContent
                                         .styleSelect.select-box-lg
                                             select(name="continent")#geo-continent
                                                 for continent in continents
-                                                    option(value="#{continent.name}")!= continent.name
+                                                    option(value="#{continent.value}")!= continent.name
                                 
                                 .row
                                     .col-sm-3
@@ -59,7 +59,7 @@ block bodyContent
                                         .styleSelect.select-box-lg
                                             select(name="adSize")#ad-size
                                                 for size in adSizes
-                                                    option(value="#{size.width+'x'+size.height}")!= size.width+'x'+size.height
+                                                    option(value="#{size}")!= size
                                         
                                                
                                         

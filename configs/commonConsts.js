@@ -32,6 +32,15 @@ module.exports = {
 		},
 		
 	},
+	hbContinents: [
+		{ name: 'Europe', value: 'EUR' },
+		{ name: 'Oceania', value: 'OAN' },
+		{ name: 'Africa', value: 'AFR' },
+		{ name: 'Asia', value: 'ASA' },
+		{ name: 'North America', value: 'NAA' },
+		{ name: 'South America', value: 'SAA' },
+		{ name: 'Middle East', value: 'MEA' }
+	],
 	supportedAdSizes: [
 		{
 			layoutType: 'SQUARE',

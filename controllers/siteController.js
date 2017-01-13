@@ -60,22 +60,19 @@ router
                         name: country.name,
                         code: country.alpha2
                     };
-                }),
-                continents = _.forIn(countryData.continents, function(continent) {
-                    return continent.name;
                 }), adSizes = [];
 
                 _.forEach(commonConsts.supportedAdSizes, function(layout) {
                     _.forEach(layout.sizes, function(size) {
-                        adSizes.push(size);
+                        adSizes.push(size.width+'x'+size.height);
                     });
                 });            
 
                 return res.render('headerBidding', {
                     siteDomain: site.get('siteDomain'),
                     countries: countries,
-                    continents: continents,
-                    adSizes: adSizes
+                    continents: commonConsts.hbContinents,
+                    adSizes: _.uniq(adSizes)
                 });
             })
             .catch(function (err) {
