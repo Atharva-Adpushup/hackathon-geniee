@@ -60,8 +60,11 @@ router
                         name: country.name,
                         code: country.alpha2
                     };
-                }), adSizes = [];
+                }), adSizes = [], hbPartners = [];
 
+                _.forIn(commonConsts.hbConfig, function(hbPartner) {
+                    hbPartner.isHb ? hbPartners.push(hbPartner.name) : null;
+                });
                 _.forEach(commonConsts.supportedAdSizes, function(layout) {
                     _.forEach(layout.sizes, function(size) {
                         adSizes.push(size.width+'x'+size.height);
@@ -72,7 +75,8 @@ router
                     siteDomain: site.get('siteDomain'),
                     countries: countries,
                     continents: commonConsts.hbContinents,
-                    adSizes: _.uniq(adSizes)
+                    adSizes: _.uniq(adSizes),
+                    hbPartners: hbPartners
                 });
             })
             .catch(function (err) {

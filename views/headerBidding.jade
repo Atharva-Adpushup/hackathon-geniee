@@ -29,7 +29,7 @@ block bodyContent
                                         .input-name Select type of Geography
                                     .col-sm-9
                                         .styleSelect.select-box-lg
-                                            select(name="geoType")#geo-selector
+                                            select(name="geoType" required)#geo-selector
                                                 option(value="country") Country
                                                 option(value="continent") Continent
                                                 option(value="all") All
@@ -39,7 +39,7 @@ block bodyContent
                                         .input-name Select Country
                                     .col-sm-9
                                         .styleSelect.select-box-lg
-                                            select(name="country")#geo-country
+                                            select(name="country" required)#geo-country
                                                 for country in countries
                                                     option(value="#{country.code}")!= country.name
 
@@ -48,7 +48,7 @@ block bodyContent
                                         .input-name Select Continent
                                     .col-sm-9
                                         .styleSelect.select-box-lg
-                                            select(name="continent")#geo-continent
+                                            select(name="continent" required)#geo-continent
                                                 for continent in continents
                                                     option(value="#{continent.value}")!= continent.name
                                 
@@ -57,9 +57,19 @@ block bodyContent
                                         .input-name Select Ad Size
                                     .col-sm-9
                                         .styleSelect.select-box-lg
-                                            select(name="adSize")#ad-size
+                                            select(name="adSize" required)#ad-size
                                                 for size in adSizes
                                                     option(value="#{size}")!= size
+                                
+                                .row
+                                    .col-sm-3
+                                        .input-name Select Header Bidding Partner
+                                    .col-sm-9
+                                        .styleSelect.select-box-lg
+                                            select.text-capitalize(name="hbPartner" required)#hb-partner
+                                                option Select partner
+                                                for partner in hbPartners
+                                                    option(value="#{partner}")!= partner
                                         
                                                
                                         
