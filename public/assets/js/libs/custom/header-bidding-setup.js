@@ -43,17 +43,22 @@ $(document).ready(function() {
 
             openPartnerSettingsForm: function(partner) {
                 $('#cogs').hide();
+                $('#hbForms').show();
+
+                $('div[id^=hbform]').not('#hbform-'+partner).addClass('hide');
+                $('#hbform-'+partner).removeClass('hide');
             },
 
             setHeaderBiddingPartner: function(partner) {
                 if(partner) {
                     $('#cogs').show().find('.fa-cog').addClass('fa-spin');
+                    $('#hbForms').hide();
                     $('#selected-hb').html('Opening settings for '+partner.toUpperCase());
 
                     var that = this;
                     setTimeout(function() {
                         that.openPartnerSettingsForm(partner);
-                    }, 2000);
+                    }, 1000);
                 }
             },
             

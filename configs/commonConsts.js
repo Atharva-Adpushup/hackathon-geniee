@@ -14,7 +14,7 @@ module.exports = {
 			name: 'pulsepoint',
 			isHb: true,
 			global: {
-				cf: {default: '560684', validations: {'required': true}, alias: "UserId", isEditable: true}
+				cf: {default: '560684', validations: {'required': true}, alias: "User Id", isEditable: true}
 			},
 			local: {
 				ct: {validations: {'required': true}, alias: "AdId"}
@@ -24,10 +24,10 @@ module.exports = {
 			name: 'wideorbit',
 			isHb: true,
 			global: {
-				pbId: {default: '560684', validations: {'required': true}, alias: "UserId", isEditable: true}
+				pbId: {default: '560684', validations: {'required': true}, alias: "User Id", isEditable: true}
 			},
 			local: {
-				pId: {validations: {'required': true, type: 'number'}, alias: "AdId"}
+				pId: {validations: {'required': true, type: 'number'}, alias: "Ad Id"}
 			}
 		},
 		

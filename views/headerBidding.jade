@@ -20,14 +20,15 @@ block bodyContent
                         .controlAdpushupWrap
                             h3.title.m-All-0.clearfix 
                                 a Header Bidding - #{utils.domanize(siteDomain)}
-                            .settings-pane
+                                
+                            form.settings-pane
                                 .row
                                     .col-sm-12
                                         h4 Configure Header Bidding by setting all options below
                                 .row
                                     .col-sm-3
                                         .input-name Select type of Geography
-                                    .col-sm-9
+                                    .col-sm-3
                                         .styleSelect.select-box-lg
                                             select(name="geoType" required)#geo-selector
                                                 option(value="country") Country
@@ -37,7 +38,7 @@ block bodyContent
                                 .row#select-geo-country
                                     .col-sm-3
                                         .input-name Select Country
-                                    .col-sm-9
+                                    .col-sm-3
                                         .styleSelect.select-box-lg
                                             select(name="country" required)#geo-country
                                                 for country in countries
@@ -46,7 +47,7 @@ block bodyContent
                                 .row#select-geo-continent
                                     .col-sm-3
                                         .input-name Select Continent
-                                    .col-sm-9
+                                    .col-sm-3
                                         .styleSelect.select-box-lg
                                             select(name="continent" required)#geo-continent
                                                 for continent in continents
@@ -55,7 +56,7 @@ block bodyContent
                                 .row
                                     .col-sm-3
                                         .input-name Select Ad Size
-                                    .col-sm-9
+                                    .col-sm-3
                                         .styleSelect.select-box-lg
                                             select(name="adSize" required)#ad-size
                                                 for size in adSizes
@@ -64,7 +65,7 @@ block bodyContent
                                 .row
                                     .col-sm-3
                                         .input-name Select Header Bidding Partner
-                                    .col-sm-9
+                                    .col-sm-3
                                         .styleSelect.select-box-lg
                                             select.text-capitalize(name="hbPartner" required)#hb-partner
                                                 option(value="") Select partner
@@ -73,31 +74,54 @@ block bodyContent
 
                                 .row
                                     .col-sm-12
-                                        .hb-settings.text-center
-                                            .cog#cogs
+                                        .hb-settings
+                                            .cog#cogs.text-center
                                                 i.fa.fa-cog.cog-big
                                                 i.fa.fa-cog.cog-small
                                                 p.text-medium#selected-hb Dedicated partner settings will come here.  Please select a partner to view its settings.
                                                 
-                                            section
+                                            section#hbForms
                                                 each partner in hbConfig
-                                                    div
-                                                        if partner.isHb && partner.name === 'pulsepoint'
-                                                            each global in partner.global
-                                                                label!= global.alias
-                                                                - validation = global.validations;
-                                                                input(type=((validation && validation.type) ? validation.type : 'text') 
-                                                                    required=(validation.required ? validation.required : undefined)
-                                                                    value=(global.default)
-                                                                    readonly=(!global.isEditable ? true : undefined))
-                                                            each local in partner.local
-                                                                label!= local.alias
-                                                                - validation = local.validations;
-                                                                input(type=((validation && validation.type) ? validation.type : 'text')
-                                                                    required=(validation.required ? validation.required : undefined)
-                                                                    value=(global.default)
-                                                                    readonly=(!global.isEditable ? true : undefined))
+                                                    .hide(id="hbform-#{partner.name}", data-hb-partner="#{partner.name}")
+                                                        if partner.isHb
+                                                            p.label-main.mT-10!= partner.name
+
+                                                            //- Global param declarations
+                                                            each global, key in partner.global
+                                                                .row
+                                                                    .col-sm-12
+                                                                        .row
+                                                                            .col-sm-3
+                                                                                .input-name!= global.alias
+                                                                            .col-sm-4
+                                                                                - validation = global.validations;
+                                                                                input.form-control(name="#{key}"
+                                                                                    type=((validation && validation.type) ? validation.type : 'text') 
+                                                                                    required=(validation.required ? validation.required : undefined)
+                                                                                    value=(global.default)
+                                                                                    readonly=(('isEditable' in global && !global.isEditable) ? true : undefined)
+                                                                                    placeholder="Please enter #{global.alias}")
+
+                                                            //- Local param declarations
+                                                            each local, key in partner.local
+                                                                .row
+                                                                    .col-sm-12
+                                                                        .row
+                                                                            .col-sm-3
+                                                                                .input-name!= local.alias
+                                                                            .col-sm-4                                                             
+                                                                                - validation = local.validations;
+                                                                                input.form-control(name="#{key}"
+                                                                                    type=((validation && validation.type) ? validation.type : 'text')
+                                                                                    required=(validation.required ? validation.required : undefined)
+                                                                                    value=(local.default)
+                                                                                    readonly=(('isEditable' in local && !local.isEditable) ? true : undefined)
+                                                                                    placeholder="Please enter #{local.alias}")
+                                                            
                                                             hr
+                                                            .row
+                                                                .col-sm-3
+                                                                    button.btn.btn-lightBg.btn-default Save Header Bidding Setup
                                                         
 
                                         
