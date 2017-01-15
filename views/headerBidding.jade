@@ -21,7 +21,7 @@ block bodyContent
                             h3.title.m-All-0.clearfix 
                                 a Header Bidding - #{utils.domanize(siteDomain)}
                                 
-                            form.settings-pane
+                            form.settings-pane(method="POST" action="saveHeaderBiddingSetup")
                                 .row
                                     .col-sm-12
                                         h4 Configure Header Bidding by setting all options below

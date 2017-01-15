@@ -84,6 +84,9 @@ router
                 res.send('Some error occurred!');
             });
     })
+    .post('/:siteId/saveHeaderBiddingSetup', function(req, res) {
+        console.log(req.body);
+    })
     .post('/:siteId/saveSiteSettings', function (req, res) {
         var json = {
             settings: req.body,
