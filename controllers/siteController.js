@@ -76,7 +76,8 @@ router
                     countries: countries,
                     continents: commonConsts.hbContinents,
                     adSizes: _.uniq(adSizes),
-                    hbPartners: hbPartners
+                    hbPartners: hbPartners,
+                    hbConfig: commonConsts.hbConfig
                 });
             })
             .catch(function (err) {

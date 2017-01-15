@@ -67,9 +67,39 @@ block bodyContent
                                     .col-sm-9
                                         .styleSelect.select-box-lg
                                             select.text-capitalize(name="hbPartner" required)#hb-partner
-                                                option Select partner
+                                                option(value="") Select partner
                                                 for partner in hbPartners
                                                     option(value="#{partner}")!= partner
+
+                                .row
+                                    .col-sm-12
+                                        .hb-settings.text-center
+                                            .cog#cogs
+                                                i.fa.fa-cog.cog-big
+                                                i.fa.fa-cog.cog-small
+                                                p.text-medium#selected-hb Dedicated partner settings will come here.  Please select a partner to view its settings.
+                                                
+                                            section
+                                                each partner in hbConfig
+                                                    div
+                                                        if partner.isHb && partner.name === 'pulsepoint'
+                                                            each global in partner.global
+                                                                label!= global.alias
+                                                                - validation = global.validations;
+                                                                input(type=((validation && validation.type) ? validation.type : 'text') 
+                                                                    required=(validation.required ? validation.required : undefined)
+                                                                    value=(global.default)
+                                                                    readonly=(!global.isEditable ? true : undefined))
+                                                            each local in partner.local
+                                                                label!= local.alias
+                                                                - validation = local.validations;
+                                                                input(type=((validation && validation.type) ? validation.type : 'text')
+                                                                    required=(validation.required ? validation.required : undefined)
+                                                                    value=(global.default)
+                                                                    readonly=(!global.isEditable ? true : undefined))
+                                                            hr
+                                                        
+
                                         
                                                
                                         

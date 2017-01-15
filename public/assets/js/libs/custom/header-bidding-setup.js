@@ -40,6 +40,22 @@ $(document).ready(function() {
                         break;
                 }   
             },
+
+            openPartnerSettingsForm: function(partner) {
+                $('#cogs').hide();
+            },
+
+            setHeaderBiddingPartner: function(partner) {
+                if(partner) {
+                    $('#cogs').show().find('.fa-cog').addClass('fa-spin');
+                    $('#selected-hb').html('Opening settings for '+partner.toUpperCase());
+
+                    var that = this;
+                    setTimeout(function() {
+                        that.openPartnerSettingsForm(partner);
+                    }, 2000);
+                }
+            },
             
             init: function() {
                 this.setGeoSubSelect('country');
@@ -50,6 +66,11 @@ $(document).ready(function() {
         $('#geo-selector').on('change', function() {
             var geo = $(this).val();
             ap.headerBiddingSetup.setGeoSubSelect(geo);
+        });
+
+        $('#hb-partner').on('change', function() {
+            var hbPartner = $(this).val();
+            ap.headerBiddingSetup.setHeaderBiddingPartner(hbPartner);
         });
     })(adpushup);
 });
