@@ -74,11 +74,18 @@ function main() {
 		return false;
 	}
 
+	// AdPushup Debug Force COntrol
+	if (utils.queryParams && utils.queryParams.forceControl) {
+		triggerControl(5);
+		return false;
+	}
+
 	// AdPushup Mode Logic
 	if (parseInt(config.mode, 10) === 2) {
 		triggerControl(2);
 		return false;
 	}
+
 
 	// AdPushup Percentage Logic
 	var rand = Math.floor(Math.random() * (100)) + 1;
