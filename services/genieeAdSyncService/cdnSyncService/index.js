@@ -132,11 +132,8 @@ module.exports = function (site) {
 
             isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
             apConfigs.autoOptimise = (isAutoOptimise ? true : false);
-
-            /* Temp Fields */
-            apConfigs.mode = 1;
-            //apConfigs.pageGroupPattern = [{ HOME: 'components' }];
-            /* Temp Fields End */
+            // Default 'draft' mode is selected if config mode is not present
+            apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
             apConfigs.experiment = allVariations;
             return apConfigs;
         },
