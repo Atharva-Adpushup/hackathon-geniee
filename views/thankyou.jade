@@ -187,7 +187,7 @@ block bodyContent
 	script(type="text/javascript").
 		var analyticsObj = !{JSON.stringify(analytics)},
 			intercomToSegmentObj = intercomObj || null;
-		if(analyticsObj && analyticsObj.length > 0) {
+		if(analyticsObj && !jQuery.isEmptyObject(analyticsObj)) {
 			var userInfoObj = !{JSON.stringify(user)},
 				stage = userInfoObj.stage || 'Post Onboarding';
 			analyticsObj.stage = userInfoObj.stage || 'Post Onboarding';

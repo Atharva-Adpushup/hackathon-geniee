@@ -149,7 +149,7 @@ block bodyContent
 		.container.text-center
 			.row
 				.col-md-5.thankyou-img
-					img(src="assets/images/completion_graphic.png")
+					img(src="assets/images/completion_graphic.png", style="-webkit-filter: grayscale(90%); filter: grayscale(90%);")
 				.col-md-7.thankyou-content.text-left
 					h2 Thank you for signing up with Adpushup
 					hr
@@ -188,7 +188,7 @@ block bodyContent
 	script(type="text/javascript").
 		var analyticsObj = !{JSON.stringify(analytics)},
 			intercomToSegmentObj = intercomObj || null;
-		if(analyticsObj && analyticsObj.length > 0) {
+		if(analyticsObj && !jQuery.isEmptyObject(analyticsObj)) {
 			var userInfoObj = !{JSON.stringify(user)},
 				stage = userInfoObj.stage || 'Pre Onboarding';
 			analyticsObj.stage = userInfoObj.stage || 'Pre Onboarding';

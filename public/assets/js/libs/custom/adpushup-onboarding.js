@@ -268,7 +268,6 @@ $('document').ready(function() {
                     }
 
                     if(siteAlreadyAdded()) {
-                        // console.log('if');
                         ap.apAlert(ob.domanize(url)+' has already been added! Please add a different site.', '#apdetect', 'inverted', 'slideDown');
                         // $(btn).html('Add Site').prop('disabled', false);
                         response = false;
