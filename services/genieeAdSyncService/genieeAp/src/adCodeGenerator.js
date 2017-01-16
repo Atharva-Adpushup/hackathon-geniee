@@ -41,7 +41,7 @@ module.exports = {
 		adCode.push('gnsmod.fetchAds();');
 		adCode.push('});');
 		adCode.push('</scr' + 'ipt>');
-		adCode.push(' <scr' + 'ipt async type="text/javascript"\n src="http://other.geniee.jp/test/sample_html/adp/gnsmod.min.js"> \n</scr' + 'ipt>');
+		adCode.push(' <scr' + 'ipt async type="text/javascript"\n src="http://js.gsspcln.jp/l/gnsmod.min.js"> \n</scr' + 'ipt>');
 		return adCode.join('\n');
 	}
 };
