@@ -12,7 +12,8 @@ window.pbjs = window.pbjs || {};
 pbjs.que = pbjs.que || [];
 
 var dfpEvents = {},
-	pbjsWinners = {};
+	pbjsWinners = {},
+	dfpWinners = {};
 
 var packetId = utils.uniqueId(+config.siteId);
 
@@ -28,9 +29,8 @@ function sendBidData(){
     });
 
     ajax().post(builtUrl, {
-			hbJsonData: JSON.stringify({
-     		winners : Object.values(pbjsWinners)
-      })
+     		partners : JSON.stringify(Object.values(pbjsWinners) || []),
+     		dfp      : JSON.stringify(Object.values(dfpWinners)  || [])
     });
 }
 
@@ -45,10 +45,25 @@ function constructBidData(bidObjData) {
    return bidObj;
 }
 
-var renderedSlots = [];
+var renderedSlots = [],
+	allRenderedSlots = [];
 
-function getRenderedSlots(){
-	return renderedSlots;
+function getAllRenderedSlots(){
+	return allRenderedSlots;
+}
+
+function renderTargetingKeys(){
+	googletag.pubads().getSlots().forEach(function( slot ){
+		var targetingsKeys = slot.getTargetingKeys();
+
+		console.group(slot.getAdUnitPath());
+
+		targetingsKeys.forEach(function(tkey) {
+			logger.log(tkey, slot.getTargeting(tkey)[0]);
+		});
+
+		console.groupEnd();
+	});
 }
 
 function initReports( hbSlots ) {
@@ -61,12 +76,15 @@ function initReports( hbSlots ) {
 		googletag.pubads().addEventListener('slotRenderEnded', function(event) {
 
 			var slotPath = event.slot.getAdUnitPath();
+
+			allRenderedSlots.push(slotPath);
+
 			if( hbSlotsIds.indexOf(slotPath) !== -1 ) {
 
 				renderedSlots.push(slotPath);
 
-				if( pbjsWinners[ slotPath ] === (void 0) ) {
-					pbjsWinners[ slotPath ] =  {
+				if( dfpWinners[ slotPath ] === (void 0) ) {
+					dfpWinners[ slotPath ] =  {
 						advertiserId : event.advertiserId,
 						lineItemId : event.lineItemId,
 						creativeId : event.creativeId,
@@ -76,6 +94,7 @@ function initReports( hbSlots ) {
 
 				if( hbSlotsIds.length === renderedSlots.length ) {
 					sendBidData();
+					if( logger.shouldLog() ) { renderTargetingKeys(); }
 				}
 			}
 
@@ -92,5 +111,5 @@ function initReports( hbSlots ) {
 
 module.exports = {
 	initReports: initReports,
-	getRenderedSlots: getRenderedSlots
+	getAllRenderedSlots: getAllRenderedSlots
 };

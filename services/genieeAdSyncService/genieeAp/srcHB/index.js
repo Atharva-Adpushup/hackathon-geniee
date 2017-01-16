@@ -16,10 +16,11 @@ function main() {
 	adpPrebid();
 
 	var adpRefresh = function (slot){
-		var renderedSlots = reporting.getRenderedSlots();
+		var renderedSlots = reporting.getAllRenderedSlots();
 
+		// Don't refresh slot if already rendered
+		// emergency check
 		if( renderedSlots.indexOf(slot.getAdUnitPath()) === -1) {
-			console.info("refreshing slot: %s", slot.getAdUnitPath());
 			googletag.pubads().refresh([ slot ]);
 		}
 	};
@@ -41,6 +42,7 @@ function main() {
 
 			logger.info("recieved bid responses for %s", adUnits[0]);
 
+			// Only work on header bidding slots
 			adpHbSlots.forEach(function( gSlot ){
 
 				if( gSlot.getAdUnitPath() === slotId) {
@@ -87,15 +89,16 @@ function main() {
 
 	function refreshSlot( adSlot ){
 		setTimeout(function(){
-			googletag.pubads().refresh([ adSlot ]);
+			adpRefresh(adSlot);
 		}, 100);
 	}
 
 	if( window.location.hostname && config.siteDomains.indexOf(window.location.hostname) !== -1 ) {
 
+		// match the ad sizes for header bidding.
 		var matchAdSize = function( adSize, targetingAdSizes ){
 
-			var boolAdSizes = config.getTargetingAdSizes().map(function( compAdSize ){
+			var boolAdSizes = targetingAdSizes.map(function( compAdSize ){
 				if( adSize[0] === compAdSize[0] && adSize[1] === compAdSize[1] ) {
 					return true;
 				} else {
@@ -108,7 +111,7 @@ function main() {
 
 		googletag.cmd.push(function() {
 			googletag.pubads().disableInitialLoad();
-			googletag.pubads().setTargeting('site_id', config.siteId);
+			googletag.pubads().setTargeting('site_id', config.siteId.toString());
 		});
 
 		googletag.cmd.push(function(){
@@ -119,7 +122,7 @@ function main() {
 			googletag.defineSlot = function(slotId, size, container ){
 				var definedSlot = oDF.apply(this, [].slice.call(arguments));
 
-				if( matchAdSize(size, config.targetingAdSizes) ) {
+				if( matchAdSize(size, config.getTargetingAdSizes()) ) {
 					logger.info("size matched (%s) for slot (%s) ", size.toString(), slotId );
 
 					var sizeString =  size[0] + 'x' + size[1];
@@ -129,6 +132,8 @@ function main() {
 
 					adpHbSlots.push(definedSlot);
 
+					// If the size is defined as having multiple configuration
+					// use one by one.
 					if( Array.isArray(biddingPartners[0]) ) {
 						pbBiddingPartners = biddingPartners[0];
 						config.biddingPartners[sizeString] = config.biddingPartners[sizeString].slice(1);
@@ -144,6 +149,7 @@ function main() {
 				return definedSlot;
 			};
 
+			// Intialise reports only when all slots have been defined
 			googletag.enableServices = function(){
 				logger.info("initialising reports");
 

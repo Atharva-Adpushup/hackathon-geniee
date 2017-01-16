@@ -41,5 +41,6 @@ module.exports = {
 	info  : info,
 	log   : log,
 	table : table,
-	warn  : warn
+	warn  : warn,
+	shouldLog : shouldLog
 };
