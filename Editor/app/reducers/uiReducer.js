@@ -91,6 +91,15 @@ const errorsConfig = {},
 				return state;
 		}
 	},
+	afterSaveLoader = (state = { status: 0 }, action) => {
+		switch (action.type) {
+			case uiActions.UPDATE_AFTER_SAVE_STATUS :
+				return { status: action.status };
+
+			default:
+				return state;
+		}
+	},
 	siteModesPopover = (state = { isVisible: false, position: { left: 0, top: 0 } }, action) => {
 		switch (action.type) {
 			case siteModesPopoverActions.SHOW_SITE_MODES_POPOVER:
@@ -107,6 +116,6 @@ const errorsConfig = {},
 	};
 
 export default combineReducers({
-	insertMenu, editMenu, newChannelMenu, siteModesPopover, channelMenu, errors
+	insertMenu, editMenu, newChannelMenu, siteModesPopover, channelMenu, errors, afterSaveLoader
 });
 
