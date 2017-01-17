@@ -70,33 +70,22 @@ const errorsConfig = {},
 				return state;
 		}
 	},
-	errors = (state = { 
-			xpath: { error: false } 
-		}, action) => {
+	errors = (state = {
+		xpath: { error: false }
+	}, action) => {
 		switch (action.type) {
 			case messengerCommands.XPATH_VALIDATED:
-				if(action.isValidXPath) {
+				if (action.isValidXPath) {
 					return { xpath: {
-							error: false
-						}
+						error: false
 					}
+					};
 				}
-				else {
-					return {
-						xpath: {
-							error: true,
-							message: 'Please enter a valid xpath'
-						}
-					}
-				}
+				return { xpath: { error: true, message: 'Please enter a valid xpath' } };
 
 			case sectionActions.UPDATE_XPATH:
 			case uiActions.RESET_ERRORS:
-				return {
-					xpath: {
-						error: false
-					}
-				}
+				return { xpath: { error: false } };
 
 			default:
 				return state;
@@ -118,7 +107,6 @@ const errorsConfig = {},
 	};
 
 export default combineReducers({
-	insertMenu, editMenu, newChannelMenu,
-	siteModesPopover, channelMenu, errors
+	insertMenu, editMenu, newChannelMenu, siteModesPopover, channelMenu, errors
 });
 
