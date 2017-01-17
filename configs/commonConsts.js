@@ -17,7 +17,7 @@ module.exports = {
 				cf: {default: '560684', validations: {'required': true}, alias: "User Id", isEditable: true}
 			},
 			local: {
-				ct: {validations: {'required': true}, alias: "AdId"}
+				ct: {validations: {'required': true}, alias: "Ad Id"}
 			}
 		},
 		'wideOrbit': {
@@ -33,13 +33,13 @@ module.exports = {
 		
 	},
 	hbContinents: [
-		{ name: 'Europe', value: 'EUR' },
-		{ name: 'Oceania', value: 'OAN' },
-		{ name: 'Africa', value: 'AFR' },
-		{ name: 'Asia', value: 'ASA' },
-		{ name: 'North America', value: 'NAA' },
-		{ name: 'South America', value: 'SAA' },
-		{ name: 'Middle East', value: 'MEA' }
+		{ name: 'Europe', code: 'EUR' },
+		{ name: 'Oceania', code: 'OAN' },
+		{ name: 'Africa', code: 'AFR' },
+		{ name: 'Asia', code: 'ASA' },
+		{ name: 'North America', code: 'NAA' },
+		{ name: 'South America', code: 'SAA' },
+		{ name: 'Middle East', code: 'MEA' }
 	],
 	supportedAdSizes: [
 		{

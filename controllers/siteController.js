@@ -73,8 +73,8 @@ router
 
                 return res.render('headerBidding', {
                     siteDomain: site.get('siteDomain'),
-                    countries: countries,
-                    continents: commonConsts.hbContinents,
+                    countries: JSON.stringify(countries),
+                    continents: JSON.stringify(commonConsts.hbContinents),
                     adSizes: _.uniq(adSizes),
                     hbPartners: hbPartners,
                     hbConfig: commonConsts.hbConfig

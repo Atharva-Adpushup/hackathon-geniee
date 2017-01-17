@@ -1,9 +1,16 @@
 extends  layout/base
 
+- a = countries
+
 block getTitle
     - var titleVar = "Header Bidding" 
 
 block append headScripts
+    script.
+        $(document).ready(function() {
+            window.countries = !{countries};
+            window.continents = !{continents};
+        });
     script(src="/assets/js/libs/custom/header-bidding-setup.js")
 
 block bodyContent
@@ -20,113 +27,43 @@ block bodyContent
                         .controlAdpushupWrap
                             h3.title.m-All-0.clearfix 
                                 a Header Bidding - #{utils.domanize(siteDomain)}
-                                
-                            form.settings-pane(method="POST" action="saveHeaderBiddingSetup")
+
+                            form#hbform.settings-pane
                                 .row
                                     .col-sm-12
                                         h4 Configure Header Bidding by setting all options below
-                                .row
-                                    .col-sm-3
-                                        .input-name Select type of Geography
-                                    .col-sm-3
-                                        .styleSelect.select-box-lg
-                                            select(name="geoType" required)#geo-selector
-                                                option(value="country") Country
-                                                option(value="continent") Continent
-                                                option(value="all") All
 
-                                .row#select-geo-country
-                                    .col-sm-3
-                                        .input-name Select Country
-                                    .col-sm-3
-                                        .styleSelect.select-box-lg
-                                            select(name="country" required)#geo-country
-                                                for country in countries
-                                                    option(value="#{country.code}")!= country.name
+                                #hbform-render
 
-                                .row#select-geo-continent
-                                    .col-sm-3
-                                        .input-name Select Continent
-                                    .col-sm-3
-                                        .styleSelect.select-box-lg
-                                            select(name="continent" required)#geo-continent
-                                                for continent in continents
-                                                    option(value="#{continent.value}")!= continent.name
+                                hr
+                                button(type="button")#addgeo add
+                                                   
+                                    //- .row#select-geo-continent
+                                    //-     .col-sm-3
+                                    //-         .input-name Select Continent
+                                    //-     .col-sm-3
+                                    //-         .styleSelect.select-box-lg
+                                    //-             select(name="continent" required)#geo-continent
                                 
-                                .row
-                                    .col-sm-3
-                                        .input-name Select Ad Size
-                                    .col-sm-3
-                                        .styleSelect.select-box-lg
-                                            select(name="adSize" required)#ad-size
-                                                for size in adSizes
-                                                    option(value="#{size}")!= size
+                                //- .row
+                                //-     .col-sm-3
+                                //-         .input-name Select Ad Size
+                                //-     .col-sm-3
+                                //-         .styleSelect.select-box-lg
+                                //-             select(name="adSize" required)#ad-size
+                                //-                 for size in adSizes
+                                //-                     option(value="#{size}")!= size
                                 
-                                .row
-                                    .col-sm-3
-                                        .input-name Select Header Bidding Partner
-                                    .col-sm-3
-                                        .styleSelect.select-box-lg
-                                            select.text-capitalize(name="hbPartner" required)#hb-partner
-                                                option(value="") Select partner
-                                                for partner in hbPartners
-                                                    option(value="#{partner}")!= partner
-
-                                .row
-                                    .col-sm-12
-                                        .hb-settings
-                                            .cog#cogs.text-center
-                                                i.fa.fa-cog.cog-big
-                                                i.fa.fa-cog.cog-small
-                                                p.text-medium#selected-hb Dedicated partner settings will come here.  Please select a partner to view its settings.
+                                //- .row
+                                //-     .col-sm-3
+                                //-         .input-name Select Header Bidding Partner
+                                //-     .col-sm-3
+                                //-         .styleSelect.select-box-lg
+                                //-             select.text-capitalize(name="hbPartner" required)#hb-partner
+                                //-                 option(value="") Select partner
+                                //-                 for partner in hbPartners
+                                //-                     option(value="#{partner}")!= partner
                                                 
-                                            section#hbForms
-                                                each partner in hbConfig
-                                                    .hide(id="hbform-#{partner.name}", data-hb-partner="#{partner.name}")
-                                                        if partner.isHb
-                                                            p.label-main.mT-10!= partner.name
-
-                                                            //- Global param declarations
-                                                            each global, key in partner.global
-                                                                .row
-                                                                    .col-sm-12
-                                                                        .row
-                                                                            .col-sm-3
-                                                                                .input-name!= global.alias
-                                                                            .col-sm-4
-                                                                                - validation = global.validations;
-                                                                                input.form-control(name="#{key}"
-                                                                                    type=((validation && validation.type) ? validation.type : 'text') 
-                                                                                    required=(validation.required ? validation.required : undefined)
-                                                                                    value=(global.default)
-                                                                                    readonly=(('isEditable' in global && !global.isEditable) ? true : undefined)
-                                                                                    placeholder="Please enter #{global.alias}")
-
-                                                            //- Local param declarations
-                                                            each local, key in partner.local
-                                                                .row
-                                                                    .col-sm-12
-                                                                        .row
-                                                                            .col-sm-3
-                                                                                .input-name!= local.alias
-                                                                            .col-sm-4                                                             
-                                                                                - validation = local.validations;
-                                                                                input.form-control(name="#{key}"
-                                                                                    type=((validation && validation.type) ? validation.type : 'text')
-                                                                                    required=(validation.required ? validation.required : undefined)
-                                                                                    value=(local.default)
-                                                                                    readonly=(('isEditable' in local && !local.isEditable) ? true : undefined)
-                                                                                    placeholder="Please enter #{local.alias}")
-                                                            
-                                                            hr
-                                                            .row
-                                                                .col-sm-3
-                                                                    button.btn.btn-lightBg.btn-default Save Header Bidding Setup
-                                                        
-
-                                        
-                                               
-                                        
-                            
-
-                           
+                                //- .row
+                                //-     .col-sm-2.mT-10
+                                //-         button.btn.btn-lightBg.btn-default save
