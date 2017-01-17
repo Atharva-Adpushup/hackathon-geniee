@@ -5,6 +5,7 @@ var model = require('../helpers/model'),
 	globalModel = require('../models/globalModel'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	channelModel = require('../models/channelModel'),
+	apConfigSchema = require('./subClasses/site/apConfig'),
 	Promise = require('bluebird'),
 	commonConsts = require('../configs/commonConsts'),
 	_ = require('lodash'),
@@ -29,6 +30,7 @@ var model = require('../helpers/model'),
 		};
 		this.defaults = { apConfigs: {}, channels: [], cmsInfo: { cmsName: '', pageGroups: [] } };
 		this.ignore = [];
+		this.classMap = { 'apConfigs': apConfigSchema };
 
 		this.constructor = function (data, cas) {
 			if (!data.siteId) {
