@@ -1,18 +1,17 @@
-var config = require('./config'),
+var config = require('./config/config'),
 	ajax = require('@fdaciuk/ajax'),
 	utils = require('./libs/utils'),
 	logger = require('./libs/logger');
 
-require('./libs/object.assign');
-
 window.googletag = window.googletag || {};
-googletag.cmd = googletag.cmd || [];
+window.googletag.cmd = window.googletag.cmd || [];
 
 window.pbjs = window.pbjs || {};
-pbjs.que = pbjs.que || [];
+window.pbjs.que = window.pbjs.que || [];
 
 var dfpEvents = {},
-	pbjsWinners = {};
+	pbjsWinners = {},
+	dfpWinners = {};
 
 var packetId = utils.uniqueId(+config.siteId);
 
@@ -28,16 +27,17 @@ function sendBidData(){
     });
 
     ajax().post(builtUrl, {
-			hbJsonData: JSON.stringify({
-     		winners : Object.values(pbjsWinners)
-      })
+     		partners : JSON.stringify(Object.values(pbjsWinners) || []),
+     		dfp      : JSON.stringify(Object.values(dfpWinners)  || [])
     });
 }
 
 function constructBidData(bidObjData) {
     var bidObj = {};
 
-    bidObj.cpm           = bidObjData.cpm;
+    // Elasticsearch gets knocked out if it recieved "0" because it treats it
+    // as an integer.
+    bidObj.cpm           = (bidObjData.cpm === 0 ? 0.00001 : bidObjData.cpm);
     bidObj.bidder        = bidObjData.bidder;
     bidObj.timeToRespond = bidObjData.timeToRespond;
     bidObj.adUnitPath    = bidObjData.adUnitCode;
@@ -45,10 +45,25 @@ function constructBidData(bidObjData) {
    return bidObj;
 }
 
-var renderedSlots = [];
+var renderedSlots = [],
+	allRenderedSlots = [];
 
-function getRenderedSlots(){
-	return renderedSlots;
+function getAllRenderedSlots(){
+	return allRenderedSlots;
+}
+
+function renderTargetingKeys(){
+	googletag.pubads().getSlots().forEach(function( slot ){
+		var targetingsKeys = slot.getTargetingKeys();
+
+		console.group(slot.getAdUnitPath());
+
+		targetingsKeys.forEach(function(tkey) {
+			logger.log(tkey, slot.getTargeting(tkey)[0]);
+		});
+
+		console.groupEnd();
+	});
 }
 
 function initReports( hbSlots ) {
@@ -61,21 +76,26 @@ function initReports( hbSlots ) {
 		googletag.pubads().addEventListener('slotRenderEnded', function(event) {
 
 			var slotPath = event.slot.getAdUnitPath();
+			allRenderedSlots.push(slotPath);
+
 			if( hbSlotsIds.indexOf(slotPath) !== -1 ) {
 
 				renderedSlots.push(slotPath);
 
-				if( pbjsWinners[ slotPath ] === (void 0) ) {
-					pbjsWinners[ slotPath ] =  {
-						advertiserId : event.advertiserId,
-						lineItemId : event.lineItemId,
-						creativeId : event.creativeId,
-						adUnitPath : slotPath
+				if( dfpWinners[ slotPath ] === (void 0) ) {
+
+					dfpWinners[ slotPath ] =  {
+						// mantain consistency with having only strings for various IDs
+						advertiserId : (event.advertiserId ? event.advertiserId.toString() : "0".repeat(10)),
+						lineItemId   : (event.lineItemId   ? event.lineItemId.toString() : "0".repeat(10)),
+						creativeId   : (event.creativeId   ? event.creativeId.toString() : "0".repeat(10)),
+						adUnitPath   : slotPath
 					};
 				}
 
 				if( hbSlotsIds.length === renderedSlots.length ) {
 					sendBidData();
+					if( logger.shouldLog() ) { renderTargetingKeys(); }
 				}
 			}
 
@@ -92,5 +112,5 @@ function initReports( hbSlots ) {
 
 module.exports = {
 	initReports: initReports,
-	getRenderedSlots: getRenderedSlots
+	getAllRenderedSlots: getAllRenderedSlots
 };

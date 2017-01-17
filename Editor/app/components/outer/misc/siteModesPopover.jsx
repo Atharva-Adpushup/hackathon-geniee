@@ -11,7 +11,7 @@ class siteModesPopover extends React.Component {
 		super(props);
 		const isPublishMode = (props.mode && props.mode === siteModes.PUBLISH);
 		this.timer = null;
-		this.checkApStatus();
+		this.checkApStatus(props);
 		this.state = {
 			apStatus: status.PENDING,
 			controlStatus: (isPublishMode ? status.TRUE : status.FALSE)
@@ -19,7 +19,7 @@ class siteModesPopover extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.checkApStatus();
+		this.checkApStatus(nextProps);
 	}
 
 	renderWaitMessage() {
@@ -28,18 +28,8 @@ class siteModesPopover extends React.Component {
 		);
 	}
 
-	checkApStatus() {
-		isApInstalled(this.props.url || window.ADP_SITE_DOMAIN, window.ADP_SITE_ID).then((apStatus) => {
-			(apStatus && apStatus.ap) ? this.setState({ apStatus: status.SUCCESS }) : this.setState({ apStatus: status.FAILED });
-		});
-	}
-
-	handleControlStatusOnChange() {
-		this.setState({
-			controlStatus: !this.state.controlStatus
-		}, () => {
-			this.props.hideMenu();
-		});
+	changeMode(mode) {
+		this.props.changeMode(mode);
 	}
 
 	renderSuccessMessage() {
@@ -48,9 +38,6 @@ class siteModesPopover extends React.Component {
 		);
 	}
 
-	changeMode(mode) {
-		this.props.changeMode(mode);
-	}
 
 	showGuider(guider) {
 		this.props.showComponent(guider);
@@ -58,6 +45,20 @@ class siteModesPopover extends React.Component {
 
 	onGlassClick() {
 		this.props.hideMenu();
+	}
+
+	checkApStatus(props) {
+		if (!props.isVisible || !props.mode === siteModes.DRAFT) {
+			return false;
+		}
+		this.setState({ apStatus: status.PENDING });
+		isApInstalled(props.url || window.ADP_SITE_DOMAIN, window.ADP_SITE_ID).then((apStatus) => {
+			if (apStatus && apStatus.ap) {
+				this.setState({ apStatus: status.SUCCESS });
+			} else {
+				this.setState({ apStatus: status.FAILED });
+			}
+		});
 	}
 
 	getPositionOffsets() {
@@ -72,6 +73,12 @@ class siteModesPopover extends React.Component {
 			};
 
 		return positionObj;
+	}
+
+	handleControlStatusOnChange() {
+		this.setState({
+			controlStatus: !this.state.controlStatus
+		});
 	}
 
 	render() {
@@ -100,7 +107,7 @@ class siteModesPopover extends React.Component {
 				<div style={style} className="publishHelperWrap">
 					<div className="publishHelperHeading"> Please wait</div>
 					<div className="publishHelperWrapInner">
-					{this.renderWaitMessage()}
+						{this.renderWaitMessage()}
 					</div>
 				</div>
 			);
@@ -119,23 +126,23 @@ class siteModesPopover extends React.Component {
 				<div className="publishHelperHeading">Please complete the following before AdPushup goes live on the site!</div>
 				<div className="publishHelperWrapInner">
 					<Accordion>
-						<Panel header="Page Group Setup" className={this.props.url ? 'completed' : 'notcompleted' } eventKey={1}>
+						<Panel header="Page Group Setup" className={this.props.url ? 'completed' : 'notcompleted'} eventKey={1}>
 							<div>You should have at least one Page Group set up.<a className="btn btn-sm btn-lightBg publishHelperhelp" onClick={this.showGuider.bind(null, components.PAGE_GROUP_GUIDER)}>Read more</a></div>
 						</Panel>
-						<Panel header="AdPushup snippet" className={this.state.apStatus == status.PENDING ? 'pending' : (this.state.apStatus == status.SUCCESS) ? 'completed' : 'notcompleted' } eventKey={2}>
+						<Panel header="AdPushup snippet" className={this.state.apStatus == status.PENDING ? 'pending' : (this.state.apStatus == status.SUCCESS) ? 'completed' : 'notcompleted'} eventKey={2}>
 							<div>We can't optimize your site if AdPushup snippet isn't installed! :) <a className="btn btn-sm btn-lightBg publishHelperhelp" onClick={this.showGuider.bind(null, components.ADPUSHUP_INSTALLATION_GUIDER)}>Read more</a></div>
 						</Panel>
 						<Panel header="Control Ad Setup" className={this.state.controlStatus ? 'completed' : 'notcompleted'} eventKey={4}>
 							<div>We strongly recommend setting up Control Ads on your site. They can help you track AdPushup performance, act as fallback in case of failure and much more. Please take a moment out to understand them.
-								<a className="btn btn-sm btn-lightBg publishHelperhelp" onClick={this.showGuider.bind(null, components.CONTROL_CONVERSION_GUIDER)}>Read more</a><br/></div>
-							<input type="checkbox" className="maincheckbox" id="ctrlconverted" checked={this.state.controlStatus} onChange={this.handleControlStatusOnChange.bind(this)}/>
+								<a className="btn btn-sm btn-lightBg publishHelperhelp" onClick={this.showGuider.bind(null, components.CONTROL_CONVERSION_GUIDER)}>Read more</a><br /></div>
+							<input type="checkbox" className="maincheckbox" id="ctrlconverted" checked={this.state.controlStatus} onChange={this.handleControlStatusOnChange.bind(this)} />
 							<label htmlFor="ctrlconverted">Yes, I understand what control ads are, and have set them up.</label>
 						</Panel>
 					</Accordion>
 				</div>
 			</div>
 		</div>
-		)
+		);
 	}
 }
 

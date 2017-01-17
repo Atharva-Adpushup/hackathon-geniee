@@ -5,11 +5,10 @@ import { getAllVariations } from './variationSelectors';
 import { getAllSections } from './sectionSelectors';
 import { getAllAds } from './adsSelectors';
 
-const getAfterSaveLoaderState = (state) => state.site.afterSaveLoader.status,
-	getMode = (state) => state.site.modeStatus.mode,
+const getMode = (state) => state.site.modeStatus.mode,
 	getPartner = (state) => state.site.siteData.partner,
-	getFinalJson = createSelector([getAllChannels, getAllVariations, getAllSections, getAllAds, getMode], (allChannels = {}, allVariations = {}, allSections = {}, allAds = {}, siteMode = 2) => {
-		return {
+	getFinalJson = createSelector([getAllChannels, getAllVariations, getAllSections, getAllAds, getMode], (allChannels = {}, allVariations = {}, allSections = {}, allAds = {}, siteMode = 2) =>
+		 ({
 			siteMode,
 			siteId: window.ADP_SITE_ID,
 			siteDomain: window.ADP_SITE_DOMAIN,
@@ -37,7 +36,7 @@ const getAfterSaveLoaderState = (state) => state.site.afterSaveLoader.status,
 				channel.variations = channelVariations;
 				return channel;
 			}))
-		}
-	});
+		})
+	);
 
-export { getAfterSaveLoaderState, getFinalJson, getMode, getPartner };
+export { getFinalJson, getMode, getPartner };

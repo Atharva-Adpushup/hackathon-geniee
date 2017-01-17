@@ -37,9 +37,17 @@ function warn(){
 	}
 }
 
+function initPrebidLog(){
+  if( shouldLog() ) {
+  	pbjs.logging = true;
+  }
+}
 module.exports = {
 	info  : info,
 	log   : log,
 	table : table,
-	warn  : warn
+	warn  : warn,
+	shouldLog : shouldLog,
+
+	initPrebidLog: initPrebidLog
 };
