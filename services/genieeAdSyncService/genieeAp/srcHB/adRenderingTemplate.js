@@ -18,6 +18,8 @@ module.exports = "<html>" +
 
 				"function serverRenderCode( timeout ){" +
 					"if( serverRenderCode.isExecuted === undefined ) {" +
+						"serverRenderCode.isExecuted = true;" +
+
 						"var pbjsParams = {" +
 							"'_bidsReceived'  : pbjs._bidsReceived," +
 							"'_bidsRequested' : pbjs._bidsRequested," +
@@ -31,7 +33,6 @@ module.exports = "<html>" +
 							"parent.__renderPrebidAd(pbjsParams, SLOT_ID);" +
 						"}" +
 
-						"serverRenderCode.isExecuted = true;" +
 					"}" +
 				"}" +
 

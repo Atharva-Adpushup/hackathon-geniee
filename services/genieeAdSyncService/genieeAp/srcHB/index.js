@@ -5,15 +5,18 @@ function main() {
 	window.googletag = window.googletag || {};
 	googletag.cmd = googletag.cmd || [];
 
+	require('./libs/polyfills');
+
 	var reporting = require('./reporting'),
 		printBidTable = require('./printBidTable'),
-		config = require('./config'),
+		config = require('./config/config'),
 		logger = require('./libs/logger'),
 		adRenderingTemplate = require('./adRenderingTemplate');
 
 	var adpHbSlots = [];
 
 	adpPrebid();
+	logger.initPrebidLog();
 
 	var adpRefresh = function (slot){
 		var renderedSlots = reporting.getAllRenderedSlots();
@@ -25,6 +28,36 @@ function main() {
 		}
 	};
 
+	// Prebid's GPTAsync iterates over all GPT slots and nullifies
+	// hb params for others.
+	//
+	// Custom function to only set targeting params for one slot Id
+	var setGPTTargetingForPBSlot = function(gSlot, pbSlotId){
+		var slotIds = pbjs.getAdserverTargeting(pbSlotId),
+			_hbVals = Object.values( slotIds )[0];
+
+		if( _hbVals ) {
+			_keys = Object.keys( _hbVals );
+			_keys.forEach(function(_key){
+				gSlot.setTargeting(_key, _hbVals[_key]);
+			});
+
+			logger.info("hb keys set for %s", pbSlotId);
+		} else {
+			logger.info("no keys set for %s. probably because of no bids", pbSlotId);
+		}
+
+	};
+
+	// Remove HB frame since we only needed it to get bid values.
+	var removeHBIframe = function(slotId){
+		var adpElements = [].slice.call(document.getElementsByClassName("__adp_frame__" + slotId));
+
+		adpElements.map(function(element){
+			document.body.removeChild(element);
+		});
+	};
+
 	window.__renderPrebidAd = function(pbjsParams, slotId, timeout){
 
 		// Push in googletag.cmd so that multiple calls are processed sequentially.
@@ -32,13 +65,16 @@ function main() {
 
 			// Copy prebid params in current window's prebid context
 			Object.keys(pbjsParams).forEach(function(pbjsKey) {
-			  pbjs[pbjsKey] = pbjsParams[pbjsKey];
+				if( pbjsKey === '_bidsReceived' ) {
+					pbjs[pbjsKey] = pbjsParams[pbjsKey].concat(pbjs[pbjsKey]);
+				} else {
+			  	pbjs[pbjsKey] = pbjsParams[pbjsKey];
+				}
 			});
 
 			printBidTable();
 
 			var adUnits = Object.keys(pbjs.getBidResponses());
-			pbjs.setTargetingForGPTAsync();
 
 			logger.info("recieved bid responses for %s", adUnits[0]);
 
@@ -46,6 +82,8 @@ function main() {
 			adpHbSlots.forEach(function( gSlot ){
 
 				if( gSlot.getAdUnitPath() === slotId) {
+
+					setGPTTargetingForPBSlot(gSlot, slotId);
 
 					gSlot.setTargeting('hb_ran', '1');
 
@@ -56,8 +94,10 @@ function main() {
 
 					adpRefresh(gSlot);
 				}
-
 			});
+
+			removeHBIframe(slotId);
+
 		});
 	};
 
@@ -73,15 +113,22 @@ function main() {
 
 		var iframeEl = document.createElement('iframe');
 		iframeEl.style.display = "none";
+		iframeEl.className = "__adp_frame__" + slotId;
 
 		iframeEl.onload = function(){
-			logger.info("frame loaded. adding prebid html for %s", slotId);
+			logger.info("frame loaded for  %s", slotId);
 
-			var iframeDoc = iframeEl.contentDocument;
+			if( iframeEl._adp_loaded === undefined ){
+				logger.info("adding prebid html for %s", slotId);
 
-			iframeDoc.open();
-			iframeDoc.write(prebidHtml);
-			iframeDoc.close();
+				var iframeDoc = iframeEl.contentDocument;
+
+				iframeDoc.open();
+				iframeDoc.write(prebidHtml);
+				iframeDoc.close();
+			}
+
+			iframeEl._adp_loaded = true; // sometimes onload is triggered twice.
 		};
 
 		document.body.appendChild(iframeEl);
@@ -92,6 +139,7 @@ function main() {
 			adpRefresh(adSlot);
 		}, 100);
 	}
+
 
 	if( window.location.hostname && config.siteDomains.indexOf(window.location.hostname) !== -1 ) {
 
@@ -117,7 +165,7 @@ function main() {
 		googletag.cmd.push(function(){
 
 			var oDF = googletag.defineSlot,
-				eS = googletag.enableServices;
+				oES = googletag.enableServices;
 
 			googletag.defineSlot = function(slotId, size, container ){
 				var definedSlot = oDF.apply(this, [].slice.call(arguments));
@@ -154,9 +202,24 @@ function main() {
 				logger.info("initialising reports");
 
 				reporting.initReports( adpHbSlots );
-				eS();
+				oES();
 			};
 
+		});
+
+		googletag.cmd.push(function(){
+			googletag.defineSlot('/103512698/AP-14217--sidebar-1',
+          [300, 250],
+      'div-gpt-ad-1460505748561-2').addService(googletag.pubads());
+
+      googletag.defineSlot('/103512698/AP-14217--sidebar-2',
+          [300, 250],
+      'div-gpt-ad-1460505748561-1').addService(googletag.pubads());
+
+      googletag.defineSlot('/103512698/AP-14217--below-content',
+          [728, 90], 'div-gpt-ad-1460505748561-0').addService(googletag.pubads());
+
+      googletag.enableServices();
 		});
 	}
 }
