@@ -75,7 +75,7 @@ router
                     siteDomain: site.get('siteDomain'),
                     countries: JSON.stringify(countries),
                     continents: JSON.stringify(commonConsts.hbContinents),
-                    adSizes: _.uniq(adSizes),
+                    adSizes: JSON.stringify(_.uniq(adSizes)),
                     hbPartners: hbPartners,
                     hbConfig: commonConsts.hbConfig
                 });

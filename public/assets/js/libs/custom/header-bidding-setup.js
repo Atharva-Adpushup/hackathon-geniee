@@ -4,7 +4,7 @@
         name: 'US',
         info: {
             '336x280': [
-                [{
+                [
                     {
                         bidder: pulsepoint,
                         params: {
@@ -19,7 +19,7 @@
                             ct: 123231
                         }
                     }
-                }],
+                ],
             ]
         }
     }
@@ -45,7 +45,8 @@ $(document).ready(function() {
                 selectBoxes : {
                     geoSelect: '<div class="row"> <div class="col-sm-3"> <div class="input-name">Select type of Geography</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="geoType" required="required" class="geo-selector"> <option value="country">Country</option> <option value="continent">Continent</option> <option value="all">All</option> </select> </div></div></div>',
                     countrySelect: '<div class="row select-geo-country"> <div class="col-sm-3"> <div class="input-name">Select Country</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="country" required="required" class="geo-country"></select> </div></div></div>',
-                    continentSelect: '<div class="row select-geo-continent"> <div class="col-sm-3"> <div class="input-name">Select Continent</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="continent" required="required" class="geo-continent"></select> </div></div></div>'
+                    continentSelect: '<div class="row select-geo-continent"> <div class="col-sm-3"> <div class="input-name">Select Continent</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="continent" required="required" class="geo-continent"></select> </div></div></div>',
+                    adSizesSelect: '<div class="row"> <div class="col-sm-3"> <div class="input-name">Select Ad Size</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="adSize" required="required" class="ad-size"></select> </div></div></div>'
                 }
             },
 
@@ -59,15 +60,31 @@ $(document).ready(function() {
                 w.continents.forEach(function(continent) {
                     $('.geo-continent').append('<option value='+continent.code+'>'+continent.name+'</option>');
                 });
-                return;
             },
 
-            renderGeoSetupPanel: function() {
-                var s = this.templates.selectBoxes;
-                $('#hbform-render').append('<div class="hb-config-pane">' + s.geoSelect + s.countrySelect + s.continentSelect + '</div>');
+            // Set adsize select box data 
+            setAdSizeSelectBoxOptions: function() {
+                w.adSizes.forEach(function(size) {
+                    $('.ad-size').append('<option value='+size+'>'+size+'</option>');
+                });
+            },
 
+            // Function to render ad size setup panel
+            renderAdSizeSetupPanel: function(hbForm) {
+                $(hbForm).append('<div class="hb-config-pane mT-10">'+this.templates.selectBoxes.adSizesSelect+'</div>');
+                this.setAdSizeSelectBoxOptions();
+            },
+
+            // Function to render geo setup panel
+            renderGeoSetupPanel: function() {
+                var s = this.templates.selectBoxes,
+                    w = $('<div class="hb-config-pane">');
+
+                w.append(s.geoSelect + s.countrySelect + s.continentSelect);
+                $('#hbform-render').append(w);
                 this.setGeoSelectBoxOptions();
-                return this.setGeoSubSelect(this.defaults.geo, $('.geo-selector'));
+                this.setGeoSubSelect(this.defaults.geo, $('.geo-selector'));
+                this.renderAdSizeSetupPanel(w);
             },
 
             // Functon to convert serialized array to json with header bidding config specific checks
@@ -145,6 +162,7 @@ $(document).ready(function() {
                 this.arrayToJson(data);
             },
             
+            // Initialise header bidding setup
             init: function() {
                 this.renderGeoSetupPanel();
             }

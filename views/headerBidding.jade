@@ -10,6 +10,7 @@ block append headScripts
         $(document).ready(function() {
             window.countries = !{countries};
             window.continents = !{continents};
+            window.adSizes = !{adSizes};
         });
     script(src="/assets/js/libs/custom/header-bidding-setup.js")
 
@@ -37,13 +38,6 @@ block bodyContent
 
                                 hr
                                 button(type="button")#addgeo add
-                                                   
-                                    //- .row#select-geo-continent
-                                    //-     .col-sm-3
-                                    //-         .input-name Select Continent
-                                    //-     .col-sm-3
-                                    //-         .styleSelect.select-box-lg
-                                    //-             select(name="continent" required)#geo-continent
                                 
                                 //- .row
                                 //-     .col-sm-3
@@ -51,8 +45,8 @@ block bodyContent
                                 //-     .col-sm-3
                                 //-         .styleSelect.select-box-lg
                                 //-             select(name="adSize" required)#ad-size
-                                //-                 for size in adSizes
-                                //-                     option(value="#{size}")!= size
+                                                for size in adSizes
+                                                    option(value="#{size}")!= size
                                 
                                 //- .row
                                 //-     .col-sm-3
