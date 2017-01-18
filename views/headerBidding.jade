@@ -11,6 +11,7 @@ block append headScripts
             window.countries = !{countries};
             window.continents = !{continents};
             window.adSizes = !{adSizes};
+            window.hbPartners = !{hbPartners}
         });
     script(src="/assets/js/libs/custom/header-bidding-setup.js")
 
@@ -37,16 +38,8 @@ block bodyContent
                                 #hbform-render
 
                                 hr
-                                button(type="button")#addgeo add
-                                
-                                //- .row
-                                //-     .col-sm-3
-                                //-         .input-name Select Ad Size
-                                //-     .col-sm-3
-                                //-         .styleSelect.select-box-lg
-                                //-             select(name="adSize" required)#ad-size
-                                                for size in adSizes
-                                                    option(value="#{size}")!= size
+                                button.btn.btn-lightBg.btn-default(type="button")#addgeo Add another Geo config
+                            
                                 
                                 //- .row
                                 //-     .col-sm-3

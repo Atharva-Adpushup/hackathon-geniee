@@ -46,7 +46,8 @@ $(document).ready(function() {
                     geoSelect: '<div class="row"> <div class="col-sm-3"> <div class="input-name">Select type of Geography</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="geoType" required="required" class="geo-selector"> <option value="country">Country</option> <option value="continent">Continent</option> <option value="all">All</option> </select> </div></div></div>',
                     countrySelect: '<div class="row select-geo-country"> <div class="col-sm-3"> <div class="input-name">Select Country</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="country" required="required" class="geo-country"></select> </div></div></div>',
                     continentSelect: '<div class="row select-geo-continent"> <div class="col-sm-3"> <div class="input-name">Select Continent</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="continent" required="required" class="geo-continent"></select> </div></div></div>',
-                    adSizesSelect: '<div class="row"> <div class="col-sm-3"> <div class="input-name">Select Ad Size</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="adSize" required="required" class="ad-size"></select> </div></div></div>'
+                    adSizesSelect: '<div class="row"> <div class="col-sm-3"> <div class="input-name">Select Ad Size</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="adSize" required="required" class="ad-size"></select> </div></div></div>',
+                    hbPartnerSelect: '<div class="row"> <div class="col-sm-3"> <div class="input-name">Select Header Bidding Partner</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select class="text-capitalize" name="hbPartner" required="required" class="hb-partner"></select> </div></div></div>'
                 }
             },
 
@@ -69,9 +70,24 @@ $(document).ready(function() {
                 });
             },
 
+            // Set hb partners select box data
+            setHbPartnersSelectBoxData: function() {
+                w.hbPartners.forEach(function(partner) {
+                    $('.hb-partner').append('<option value='+partner+'>'+partner+'</option>');
+                });
+            },
+
             // Function to render ad size setup panel
-            renderAdSizeSetupPanel: function(hbForm) {
-                $(hbForm).append('<div class="hb-config-pane mT-10">'+this.templates.selectBoxes.adSizesSelect+'</div>');
+            renderAdSizeSetupPanel: function(el, action) {
+                var adSizePanel = '<div class="hb-config-pane mT-10">'+this.templates.selectBoxes.adSizesSelect+'</div>';
+                switch(action) {
+                    case 'append':
+                        $(el).append(adSizePanel);
+                        break;
+                    case 'insertBefore':
+                        $(adSizePanel).insertBefore(el);
+                        break;
+                }
                 this.setAdSizeSelectBoxOptions();
             },
 
@@ -84,7 +100,8 @@ $(document).ready(function() {
                 $('#hbform-render').append(w);
                 this.setGeoSelectBoxOptions();
                 this.setGeoSubSelect(this.defaults.geo, $('.geo-selector'));
-                this.renderAdSizeSetupPanel(w);
+                this.renderAdSizeSetupPanel(w, 'append');
+                $(w).append('<button type="button" class="add-size mT-10 btn btn-lightBg btn-default">Add another size</button>');
             },
 
             // Functon to convert serialized array to json with header bidding config specific checks
@@ -187,6 +204,10 @@ $(document).ready(function() {
 
         $('#addgeo').on('click', function() {
             ap.headerBiddingSetup.renderGeoSetupPanel();
+        });
+
+        $('body').on('click', '.add-size', function(){
+            ap.headerBiddingSetup.renderAdSizeSetupPanel($(this), 'insertBefore');
         });
 
     })(adpushup, window);
