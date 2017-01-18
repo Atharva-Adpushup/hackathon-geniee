@@ -31,7 +31,7 @@ const initComponents = (store) => {
 					}
 				});
 			})
-			.catch((err) => {
+			.fail((err) => {
 				document.querySelector('.spinner').style.display = 'none';
 				$('#editor').html('Some error while loading editor, please try reloading');
 			});
