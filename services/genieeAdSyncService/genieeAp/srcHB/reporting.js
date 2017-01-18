@@ -56,13 +56,13 @@ function renderTargetingKeys(){
 	googletag.pubads().getSlots().forEach(function( slot ){
 		var targetingsKeys = slot.getTargetingKeys();
 
-		console.group(slot.getAdUnitPath());
+		logger.group(slot.getAdUnitPath());
 
 		targetingsKeys.forEach(function(tkey) {
 			logger.log(tkey, slot.getTargeting(tkey)[0]);
 		});
 
-		console.groupEnd();
+		logger.groupEnd();
 	});
 }
 
@@ -93,6 +93,8 @@ function initReports( hbSlots ) {
 					};
 				}
 
+				// If all header bidding slots have been rendered
+				// send bid data.
 				if( hbSlotsIds.length === renderedSlots.length ) {
 					sendBidData();
 					if( logger.shouldLog() ) { renderTargetingKeys(); }
