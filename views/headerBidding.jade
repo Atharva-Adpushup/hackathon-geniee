@@ -5,13 +5,20 @@ extends  layout/base
 block getTitle
     - var titleVar = "Header Bidding" 
 
+block append headCss
+    style.
+        .btn.btn-lightBg {
+            width: 220px;
+        }
+
 block append headScripts
     script.
         $(document).ready(function() {
             window.countries = !{countries};
             window.continents = !{continents};
             window.adSizes = !{adSizes};
-            window.hbPartners = !{hbPartners}
+            window.hbPartners = !{hbPartners};
+            window.hbConfig = !{hbConfig};
         });
     script(src="/assets/js/libs/custom/header-bidding-setup.js")
 
@@ -39,18 +46,6 @@ block bodyContent
 
                                 hr
                                 button.btn.btn-lightBg.btn-default(type="button")#addgeo Add another Geo config
-                            
-                                
-                                //- .row
-                                //-     .col-sm-3
-                                //-         .input-name Select Header Bidding Partner
-                                //-     .col-sm-3
-                                //-         .styleSelect.select-box-lg
-                                //-             select.text-capitalize(name="hbPartner" required)#hb-partner
-                                //-                 option(value="") Select partner
-                                //-                 for partner in hbPartners
-                                //-                     option(value="#{partner}")!= partner
                                                 
-                                //- .row
-                                //-     .col-sm-2.mT-10
-                                //-         button.btn.btn-lightBg.btn-default save
+                                hr 
+                                button.btn.btn-lightBg.btn-default Save Header bidding Setup

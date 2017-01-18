@@ -10,7 +10,7 @@ module.exports = {
 		adpushupPercentage: 100
 	},
 	hbConfig: {
-		'pulsePoint': {
+		'pulsepoint': {
 			name: 'pulsepoint',
 			isHb: true,
 			global: {
@@ -20,7 +20,7 @@ module.exports = {
 				ct: {validations: {'required': true}, alias: "Ad Id"}
 			}
 		},
-		'wideOrbit': {
+		'wideorbit': {
 			name: 'wideorbit',
 			isHb: true,
 			global: {
