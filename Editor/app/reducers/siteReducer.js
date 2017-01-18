@@ -4,11 +4,14 @@ import { status, siteModes, uiActions } from 'consts/commonConsts';
 const modeStatus = (state = { mode: siteModes.DRAFT }, action) => {
 		switch (action.type) {
 			case uiActions.UPDATE_AFTER_SAVE_STATUS:
-				if ((action.status === status.SUCCESS) && (state.mode === siteModes.DRAFT)) {
+				const isCurrentModeDraft = (action.status === status.SUCCESS) && (state.mode === siteModes.DRAFT) && action.updateModeStatus,
+					isCurrentModePublish = (action.status === status.SUCCESS) && (state.mode === siteModes.PUBLISH) && action.updateModeStatus;
+
+				if (isCurrentModeDraft) {
 					return {
 						mode: siteModes.PUBLISH
 					};
-				} else if ((action.status === status.SUCCESS) && (state.mode === siteModes.PUBLISH)) {
+				} else if (isCurrentModePublish) {
 					return {
 						mode: siteModes.DRAFT
 					};
