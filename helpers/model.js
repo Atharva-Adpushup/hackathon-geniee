@@ -127,6 +127,8 @@ var consts = require('../configs/commonConsts'),
 					isNewDataAnObject = !!(newDataObj && _.isObject(newDataObj) && _.isPlainObject(newDataObj)),
 					isNewDataAnArray = !!(newDataObj && _.isObject(newDataObj) && _.isArray(newDataObj)),
 
+					isNewDataTruthy = !!(newDataObj !== null && typeof(newDataObj) !== 'undefined'),
+
 					isKeyInData = !!(existingDataObj && newDataObj),
 					isKeyInSchema = !!(schema && schema.keys && (schema.keys.indexOf(unionKey) > -1)),
 					isOverrideKey = !!(isKeyInSchema && schema.override && (schema.override.indexOf(unionKey) > -1)),
@@ -137,7 +139,7 @@ var consts = require('../configs/commonConsts'),
 						computedData[unionKey] = extend(true, {}, newDataObj);
 					} else if (isNewDataAnArray) {
 						computedData[unionKey] = _.union([], newDataObj);
-					} else if (!!(newDataObj !== null && typeof(newDataObj) !== 'undefined')) {
+					} else if (isNewDataTruthy) {
 						computedData[unionKey] = newDataObj;
 					}
 				} else if (isMergeKey) {
@@ -145,6 +147,8 @@ var consts = require('../configs/commonConsts'),
 						computedData[unionKey] = extend(true, {}, existingDataObj, newDataObj);
 					} else if (isKeyInData && isExistingDataAnArray && isNewDataAnArray) {
 						computedData[unionKey] = _.union(existingDataObj, newDataObj);
+					} else if (isNewDataTruthy) {
+						computedData[unionKey] = newDataObj;
 					}
 				}
 			});
