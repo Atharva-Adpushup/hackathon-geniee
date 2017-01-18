@@ -44,7 +44,7 @@ class siteModesPopover extends React.Component {
 			} else {
 				this.setState({ apStatus: status.FAILED });
 			}
-		}).catch(() => {
+		}).fail(() => {
 			this.setState({ apStatus: status.FAILED });
 		});
 	}
