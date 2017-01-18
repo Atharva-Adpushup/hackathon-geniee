@@ -16,6 +16,15 @@ module.exports = "<html>" +
 
 				"adpPrebid();" +
 
+				"var original = document.createElement;" +
+        "document.createElement = function (tag) {" +
+        	"tag = '__script';" +
+        	"setTimeout(function(){" +
+        		"parent.__createScriptInParent([].slice.call(document.getElementsByTagName('__script')), SLOT_ID);" +
+        	"}, 10);" +
+        	"return original.call(document, tag);" +
+        "};" +
+
 				"function serverRenderCode( timeout ){" +
 					"if( serverRenderCode.isExecuted === undefined ) {" +
 						"serverRenderCode.isExecuted = true;" +
@@ -28,6 +37,7 @@ module.exports = "<html>" +
 							"'_adsReceived'   : pbjs._adsReceived" +
 						"};" +
 						"if( Number.isInteger(timeout) ) {" +
+
 							"parent.__renderPrebidAd(pbjsParams, SLOT_ID, timeout);" +
 						"} else {" +
 							"parent.__renderPrebidAd(pbjsParams, SLOT_ID);" +
@@ -45,6 +55,7 @@ module.exports = "<html>" +
 					"pbjs.addAdUnits(__AD_UNIT_CODE__);" +
 
 					"pbjs.requestBids({" +
+						"timeout : PREBID_TIMEOUT," +
 						"bidsBackHandler: serverRenderCode" +
 					"});" +
 				"})" +

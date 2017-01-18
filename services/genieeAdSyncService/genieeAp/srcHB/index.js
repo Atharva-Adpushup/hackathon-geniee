@@ -9,6 +9,7 @@ function main() {
 
 	var reporting = require('./reporting'),
 		printBidTable = require('./printBidTable'),
+		utils = require('./libs/utils'),
 		config = require('./config/config'),
 		logger = require('./libs/logger'),
 		adRenderingTemplate = require('./adRenderingTemplate');
@@ -54,7 +55,9 @@ function main() {
 		var adpElements = [].slice.call(document.getElementsByClassName("__adp_frame__" + slotId));
 
 		adpElements.map(function(element){
-			document.body.removeChild(element);
+			setTimeout(function(){
+				document.body.removeChild(element);
+			}, 5000); // A smalls delay to remove iframe to avoid _possible_ reprucussions of premature removal
 		});
 	};
 
@@ -74,17 +77,16 @@ function main() {
 
 			printBidTable();
 
-			var adUnits = Object.keys(pbjs.getBidResponses());
-
-			logger.info("recieved bid responses for %s", adUnits[0]);
+			logger.info("recieved bid responses for %s", slotId);
 
 			// Only work on header bidding slots
 			adpHbSlots.forEach(function( gSlot ){
 
 				if( gSlot.getAdUnitPath() === slotId) {
 
-					setGPTTargetingForPBSlot(gSlot, slotId);
+					logger.info("GPT slot found. setting targeting for %s", slotId);
 
+					setGPTTargetingForPBSlot(gSlot, slotId);
 					gSlot.setTargeting('hb_ran', '1');
 
 					if( timeout ) {
@@ -98,6 +100,34 @@ function main() {
 
 			removeHBIframe(slotId);
 
+		});
+	};
+
+	// Safari doesn't send referrer from non-src iframes, which is what
+	// WideOrbit explicitly relies on.
+	//
+	// This function processes all script elements and executes them in either
+	// parent window or the container iFrames.
+	window.__createScriptInParent = function(scriptEls, slotId){
+		scriptEls.forEach(function(scriptEl){
+			if( scriptEl.isExecuted === undefined ) {
+
+				var script = document.createElement('script');
+				script.type = "text/javascript";
+				script.src = scriptEl.src.replace('window.pbjs', '__adp_frame_context_'  + Math.abs(utils.hashCode(slotId)) + '.pbjs' );
+				script.onload = scriptEl.onload;
+				script.onreadystatechange = scriptEl.onreadystatechange;
+
+				if( scriptEl.src.match(/atemda/) ) { // Wideorbit's bid request URL.
+					logger.info("Executing script (%s) in parent window context", scriptEl.src);
+					document.body.appendChild(script);
+				} else {
+					logger.info("Executing script (%s) in frame window context", scriptEl.src);
+					window['__adp_frame_context_'  + Math.abs(utils.hashCode(slotId)) ].document.head.appendChild(script);
+				}
+
+				scriptEl.isExecuted = true;
+			}
 		});
 	};
 
@@ -117,6 +147,8 @@ function main() {
 
 		iframeEl.onload = function(){
 			logger.info("frame loaded for  %s", slotId);
+
+			window['__adp_frame_context_' + Math.abs(utils.hashCode(slotId)) ] = iframeEl.contentWindow;
 
 			if( iframeEl._adp_loaded === undefined ){
 				logger.info("adding prebid html for %s", slotId);
@@ -139,7 +171,6 @@ function main() {
 			adpRefresh(adSlot);
 		}, 100);
 	}
-
 
 	if( window.location.hostname && config.siteDomains.indexOf(window.location.hostname) !== -1 ) {
 
@@ -205,21 +236,6 @@ function main() {
 				oES();
 			};
 
-		});
-
-		googletag.cmd.push(function(){
-			googletag.defineSlot('/103512698/AP-14217--sidebar-1',
-          [300, 250],
-      'div-gpt-ad-1460505748561-2').addService(googletag.pubads());
-
-      googletag.defineSlot('/103512698/AP-14217--sidebar-2',
-          [300, 250],
-      'div-gpt-ad-1460505748561-1').addService(googletag.pubads());
-
-      googletag.defineSlot('/103512698/AP-14217--below-content',
-          [728, 90], 'div-gpt-ad-1460505748561-0').addService(googletag.pubads());
-
-      googletag.enableServices();
 		});
 	}
 }
