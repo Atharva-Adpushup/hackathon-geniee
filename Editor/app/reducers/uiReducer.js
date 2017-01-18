@@ -108,6 +108,7 @@ const errorsConfig = {},
 					position: action.position
 				};
 			case siteModesPopoverActions.HIDE_SITE_MODES_POPOVER:
+			case uiActions.UPDATE_AFTER_SAVE_STATUS:
 				return { isVisible: false, position: { left: 0, top: 0 } };
 
 			default:

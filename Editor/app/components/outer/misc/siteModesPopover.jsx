@@ -10,7 +10,6 @@ class siteModesPopover extends React.Component {
 	constructor(props) {
 		super(props);
 		const isPublishMode = (props.mode && props.mode === siteModes.PUBLISH);
-		this.timer = null;
 		this.checkApStatus(props);
 		this.state = {
 			apStatus: status.PENDING,
@@ -22,25 +21,12 @@ class siteModesPopover extends React.Component {
 		this.checkApStatus(nextProps);
 	}
 
-	renderWaitMessage() {
-		return (
-			<div>Changing Mode Please Wait</div>
-		);
+	masterSave(mode) {
+		this.props.masterSave(mode);
 	}
-
-	changeMode(mode) {
-		this.props.changeMode(mode);
-	}
-
-	renderSuccessMessage() {
-		return (
-			<div>Mode Change SuccessFully</div>
-		);
-	}
-
 
 	showGuider(guider) {
-		this.props.showComponent(guider);
+		// this.props.showComponent(guider);
 	}
 
 	onGlassClick() {
@@ -58,6 +44,8 @@ class siteModesPopover extends React.Component {
 			} else {
 				this.setState({ apStatus: status.FAILED });
 			}
+		}).catch(() => {
+			this.setState({ apStatus: status.FAILED });
 		});
 	}
 
@@ -92,30 +80,26 @@ class siteModesPopover extends React.Component {
 				boxShadow: '0 1px 10px 0 rgba(0, 0, 0, 0.3)',
 				width: '300px'
 			},
+			isNotPendingStatus = (this.state.apStatus !== status.PENDING),
 			allDone = (this.props.url && (this.state.apStatus === status.SUCCESS) && this.state.controlStatus);
 
 		if (!this.props.isVisible) {
 			return (null);
 		}
 
-		if (this.props.mode === siteModes.PUBLISH && !allDone) {
+		if (this.props.mode === siteModes.PUBLISH) {
 			setTimeout(() => {
-				this.changeMode(siteModes.DRAFT);
+				if (confirm('Do you wish to pause AdPushup ?')) {
+					this.masterSave(siteModes.DRAFT);
+				}
 			}, 0);
 
-			return (
-				<div style={style} className="publishHelperWrap">
-					<div className="publishHelperHeading"> Please wait</div>
-					<div className="publishHelperWrapInner">
-						{this.renderWaitMessage()}
-					</div>
-				</div>
-			);
+			return null;
 		}
 
-		if (this.props.mode === siteModes.DRAFT && allDone) {
+		if (this.props.mode === siteModes.DRAFT && allDone && isNotPendingStatus) {
 			setTimeout(() => {
-				this.changeMode(siteModes.PUBLISH);
+				this.masterSave(siteModes.PUBLISH);
 			}, 0);
 		}
 
