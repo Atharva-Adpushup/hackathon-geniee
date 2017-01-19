@@ -1,7 +1,6 @@
 function main() {
 
 	window.adpPrebid = require('./prebid');
-
 	window.googletag = window.googletag || {};
 	googletag.cmd = googletag.cmd || [];
 

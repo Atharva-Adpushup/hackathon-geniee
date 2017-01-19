@@ -35,7 +35,7 @@ function sendBidData(){
 function constructBidData(bidObjData) {
     var bidObj = {};
 
-    // Elasticsearch gets knocked out if it recieved "0" because it treats it
+    // Elasticsearch gets knocked out if it recieves _0_ because it treats it
     // as an integer.
     bidObj.cpm           = (bidObjData.cpm === 0 ? 0.00001 : bidObjData.cpm);
     bidObj.bidder        = bidObjData.bidder;
@@ -82,23 +82,20 @@ function initReports( hbSlots ) {
 
 				renderedSlots.push(slotPath);
 
-				if( dfpWinners[ slotPath ] === (void 0) ) {
+				dfpWinners[ slotPath ] = dfpWinners[ slotPath ]  || {
+					// mantain consistency with having only strings for various IDs
+					advertiserId : (event.advertiserId ? event.advertiserId.toString() : "0".repeat(10)),
+					lineItemId   : (event.lineItemId   ? event.lineItemId.toString() : "0".repeat(10)),
+					creativeId   : (event.creativeId   ? event.creativeId.toString() : "0".repeat(10)),
+					adUnitPath   : slotPath
+				};
+			}
 
-					dfpWinners[ slotPath ] =  {
-						// mantain consistency with having only strings for various IDs
-						advertiserId : (event.advertiserId ? event.advertiserId.toString() : "0".repeat(10)),
-						lineItemId   : (event.lineItemId   ? event.lineItemId.toString() : "0".repeat(10)),
-						creativeId   : (event.creativeId   ? event.creativeId.toString() : "0".repeat(10)),
-						adUnitPath   : slotPath
-					};
-				}
-
-				// If all header bidding slots have been rendered
-				// send bid data.
-				if( hbSlotsIds.length === renderedSlots.length ) {
-					sendBidData();
-					if( logger.shouldLog() ) { renderTargetingKeys(); }
-				}
+			// If all header bidding slots have been rendered
+			// send bid data.
+			if( hbSlotsIds.length === renderedSlots.length ) {
+				sendBidData();
+				renderTargetingKeys();
 			}
 
 		});
