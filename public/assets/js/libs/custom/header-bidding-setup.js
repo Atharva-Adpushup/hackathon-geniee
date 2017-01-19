@@ -120,21 +120,47 @@ $(document).ready(function () {
             renderPartnerSetupPanel: function (hbPartner, wrapper) {
                 var inputs = this.generatePartnerSpecificOptionsPane(hbPartner);
                 wrapper.find('.partner-settings').html(inputs.globalTempl + inputs.localTempl);
-                //console.log(wrapper.find('.partner-settings'));
             },
 
             // Function to render hb partner setup panel
-            renderHbPartnerSetupPanel: function (el) {
+            renderHbPartnerSetupPanel: function (el, type) {
                 var w = $('<div class="hb-config-pane mT-10">' + this.templates.selectBoxes.hbPartnerSelect + '<div class="partner-settings"></div></div>');
-                el.append(w);
-
+                switch(type) {
+                    case 'insertBefore':
+                        w.insertBefore(el);
+                        break;
+                    default:
+                        el.append(w);
+                        break;
+                }
                 var hbPartner = w.find('.hb-partner');
                 this.setHbPartnersSelectBoxData(hbPartner);
             },
 
+            // Function to render multi-config panel
+            renderMultiConfigPanel: function(el, action) {
+                var w = $('<div class="hb-config-pane mT-10 select-partner"></div>');
+
+                switch(action) {
+                    case 'insertBefore':
+                        $(w).insertBefore(el);
+                        break;
+                    default:
+                        el.append(w);
+                        break;
+                }
+                
+                this.renderHbPartnerSetupPanel(w);
+                $(w).append('<button type="button" class="add-partner mT-10 btn btn-lightBg btn-default">Add another partner</button>');
+
+                if(el.children('.select-partner').length === 1) {
+                    el.append('<button type="button" class="add-setup mT-10 btn btn-lightBg btn-default">Add another Setup</button>')
+                } 
+            },
+
             // Function to render ad size setup panel
             renderAdSizeSetupPanel: function (el, action) {
-                var w = $('<div class="hb-config-pane mT-10">'),
+                var w = $('<div class="hb-config-pane mT-10 select-size">'),
                     s = this.templates.selectBoxes.adSizesSelect;
                 w.append(s);
 
@@ -149,7 +175,10 @@ $(document).ready(function () {
 
                 var adSize = w.find('.ad-size');
                 this.setAdSizeSelectBoxOptions(adSize);
-                this.renderHbPartnerSetupPanel(w);
+                //this.renderHbPartnerSetupPanel(w);
+                //$(w).append('<button type="button" class="add-partner mT-10 btn btn-lightBg btn-default">Add another Setup</button>');
+
+                this.renderMultiConfigPanel(w);
             },
 
             // Function to render geo setup panel
@@ -175,29 +204,30 @@ $(document).ready(function () {
 
                 for (var i = 0; i < arr.length; i++) {
                     var data = arr[i];
-                    switch (data.name) {
-                        case 'geoType':
-                            if (data.value === 'country') {
-                                isCountry = true; isContinent = false;
-                            }
-                            else if (data.value === 'continent') {
-                                isCountry = false; isContinent = true;
-                            }
+                    console.log(data);
+                    // switch (data.name) {
+                    //     case 'geoType':
+                    //         if (data.value === 'country') {
+                    //             isCountry = true; isContinent = false;
+                    //         }
+                    //         else if (data.value === 'continent') {
+                    //             isCountry = false; isContinent = true;
+                    //         }
 
-                            json[data.name] = data.value
-                            break;
-                        case 'country':
-                            isCountry ? json[data.name] = data.value : null;
-                            break;
-                        case 'continent':
-                            isContinent ? json[data.name] = data.value : null;
-                            break;
-                        default:
-                            json[data.name] = data.value;
-                            break;
-                    }
+                    //         json[data.name] = data.value
+                    //         break;
+                    //     case 'country':
+                    //         isCountry ? json[data.name] = data.value : null;
+                    //         break;
+                    //     case 'continent':
+                    //         isContinent ? json[data.name] = data.value : null;
+                    //         break;
+                    //     default:
+                    //         json[data.name] = data.value;
+                    //         break;
+                    // }
                 }
-                console.log(json);
+                //console.log(json);
             },
 
             // Switch geo selection dropdown in UI
@@ -276,6 +306,14 @@ $(document).ready(function () {
 
         $('body').on('click', '.add-size', function () {
             ap.headerBiddingSetup.renderAdSizeSetupPanel($(this), 'insertBefore');
+        });
+
+        $('body').on('click', '.add-partner', function () {
+            ap.headerBiddingSetup.renderHbPartnerSetupPanel($(this), 'insertBefore');
+        });
+
+        $('body').on('click', '.add-setup', function () {
+            ap.headerBiddingSetup.renderMultiConfigPanel($(this), 'insertBefore');
         });
 
     })(adpushup, window);
