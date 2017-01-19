@@ -1,4 +1,4 @@
-var	siteModel = require('../../../../../models/siteModel');
+var	siteModel = require('../../../../../../models/siteModel');
 
 module.exports = {
 	getTrafficDistribution: function(config) {
