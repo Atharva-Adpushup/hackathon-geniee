@@ -124,7 +124,7 @@ $(document).ready(function () {
 
             // Function to render hb partner setup panel
             renderHbPartnerSetupPanel: function (el, type) {
-                var w = $('<div class="hb-config-pane mT-10">' + this.templates.selectBoxes.hbPartnerSelect + '<div class="partner-settings"></div></div>');
+                var w = $('<div class="hb-config-pane mT-10 select-partner-settings">' + this.templates.selectBoxes.hbPartnerSelect + '<div class="partner-settings"></div></div>');
                 switch(type) {
                     case 'insertBefore':
                         w.insertBefore(el);
@@ -175,16 +175,13 @@ $(document).ready(function () {
 
                 var adSize = w.find('.ad-size');
                 this.setAdSizeSelectBoxOptions(adSize);
-                //this.renderHbPartnerSetupPanel(w);
-                //$(w).append('<button type="button" class="add-partner mT-10 btn btn-lightBg btn-default">Add another Setup</button>');
-
                 this.renderMultiConfigPanel(w);
             },
 
             // Function to render geo setup panel
             renderGeoSetupPanel: function () {
                 var s = this.templates.selectBoxes,
-                    w = $('<div class="hb-config-pane mb-30">');
+                    w = $('<div class="hb-config-pane select-geo-wrapper mb-30">');
 
                 w.append(s.geoSelect + s.countrySelect + s.continentSelect);
                 $('#hbform-render').append(w);
@@ -230,6 +227,64 @@ $(document).ready(function () {
                 //console.log(json);
             },
 
+            // Function to parse header bidding form data
+            parseHbFormData: function(form) {
+                var data = [];
+                [].slice.call(form.find('.select-geo-wrapper')).forEach(function(geoWrapper) {
+                    var obj = {},
+                        geo = $(geoWrapper).find('.geo-selector').val();
+                        
+                    obj['type'] = geo;
+                    switch(geo) {
+                        case 'country':
+                            obj[geo] = $(geoWrapper).find('.geo-country').val();
+                            break;
+                        case 'continent':
+                            obj[geo] = $(geoWrapper).find('.geo-continent').val();
+                            break;
+                    }
+
+                    obj['info'] = {};
+                    [].slice.call($(geoWrapper).find('.select-size')).forEach(function(sizeWrapper) {
+                        var size = $(sizeWrapper).find('.ad-size').val();
+                        
+                        var setups = [];
+                        [].slice.call($(sizeWrapper).find('.select-partner')).forEach(function(partnerWrapper) {
+
+                            var arr = [];
+                            [].slice.call($(partnerWrapper).find('.select-partner-settings')).forEach(function(partnerSetting) {
+                                
+                                [].slice.call($(partnerSetting).find('.partner-settings')).forEach(function(partnerData) {
+                                    var params = {};
+
+                                    [].slice.call($(partnerData).children()).forEach(function(setting) {
+                                        var key = $(setting).find('input').attr('name'),
+                                            value = $(setting).find('input').val();
+
+                                         params[key] = value;
+                                    });
+
+                                    var data = {
+                                        bidder: $(partnerSetting).find('.hb-partner').val(),
+                                        params: params
+                                    };
+
+                                    arr.push(data);
+                                });
+
+                                
+                            });
+
+                            setups.push(arr);
+                        }); 
+
+                        obj.info[size] = setups;
+                    });
+
+                    console.log(obj);
+                });
+            },
+
             // Switch geo selection dropdown in UI
             setGeoSubSelect: function (geo, els) {
                 var that = this;
@@ -253,26 +308,9 @@ $(document).ready(function () {
                 });
             },
 
-            openPartnerSettingsForm: function (partner) {
-                $('#cogs').hide();
-                $('#hbForms').show();
-
-                $('div[id^=hbform]').not('#hbform-' + partner).addClass('hide');
-                $('#hbform-' + partner).removeClass('hide');
-            },
-
-            setHeaderBiddingPartner: function (partner) {
-                if (partner) {
-                    $('#cogs').show();
-                    $('#hbForms').hide();
-                    $('#selected-hb').html('Opening settings for ' + partner.toUpperCase());
-
-                    this.openPartnerSettingsForm(partner);
-                }
-            },
-
-            saveHeaderBiddingSetup: function (data) {
-                this.arrayToJson(data);
+            saveHeaderBiddingSetup: function (form) {
+                this.parseHbFormData(form);
+                //this.arrayToJson(data);
             },
 
             // Initialise header bidding setup
@@ -294,12 +332,6 @@ $(document).ready(function () {
             hbPartner ? ap.headerBiddingSetup.renderPartnerSetupPanel(hbPartner, topMostConfigWrapper) : null;
         });
 
-        $('#hbform').on('submit', function (e) {
-            e.preventDefault();
-            var data = $(this).serializeArray();
-            ap.headerBiddingSetup.saveHeaderBiddingSetup(data);
-        });
-
         $('#addgeo').on('click', function () {
             ap.headerBiddingSetup.renderGeoSetupPanel();
         });
@@ -314,6 +346,11 @@ $(document).ready(function () {
 
         $('body').on('click', '.add-setup', function () {
             ap.headerBiddingSetup.renderMultiConfigPanel($(this), 'insertBefore');
+        });
+
+        $('#hbform').on('submit', function (e) {
+            e.preventDefault();
+            ap.headerBiddingSetup.saveHeaderBiddingSetup($(this));
         });
 
     })(adpushup, window);
