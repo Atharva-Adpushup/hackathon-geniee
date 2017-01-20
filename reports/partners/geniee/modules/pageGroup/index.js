@@ -32,7 +32,7 @@ module.exports = {
 						computedData[zoneObj.pageGroupId].ctr += Number(zoneObj.ctr);
 						computedData[zoneObj.pageGroupId].zones.push(extend(true, {}, zoneObj, {date: dateKey}));
 
-						computedData[zoneObj.pageGroupId].revenue = Math.round(computedData[zoneObj.pageGroupId].revenue);
+						computedData[zoneObj.pageGroupId].revenue = Number(computedData[zoneObj.pageGroupId].revenue.toFixed(2));
 						computedData[zoneObj.pageGroupId].ctr = Number(computedData[zoneObj.pageGroupId].ctr.toFixed(2));
 					} else {
 						computedData[zoneObj.pageGroupId].click += Number(zoneObj.click);
@@ -41,7 +41,7 @@ module.exports = {
 						computedData[zoneObj.pageGroupId].ctr += Number(zoneObj.ctr);
 						computedData[zoneObj.pageGroupId].zones.push(extend(true, {}, zoneObj, {date: dateKey}));
 
-						computedData[zoneObj.pageGroupId].revenue = Math.round(computedData[zoneObj.pageGroupId].revenue);
+						computedData[zoneObj.pageGroupId].revenue = Number(computedData[zoneObj.pageGroupId].revenue.toFixed(2));
 						computedData[zoneObj.pageGroupId].ctr = Number(computedData[zoneObj.pageGroupId].ctr.toFixed(2));
 					}
 				}

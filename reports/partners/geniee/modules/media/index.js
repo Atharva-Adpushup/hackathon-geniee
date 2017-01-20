@@ -21,7 +21,7 @@ module.exports = {
 			});
 		});
 
-		computedData.revenue = Math.round(computedData.revenue);
+		computedData.revenue = Number(computedData.revenue.toFixed(2));
 		computedData.ctr = Number(computedData.ctr.toFixed(2));
 
 		return computedData;

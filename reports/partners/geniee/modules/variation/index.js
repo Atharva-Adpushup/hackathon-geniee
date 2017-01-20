@@ -8,23 +8,27 @@ module.exports = {
 	setVariationMetrics: function(pageGroupData) {
 		var computedData = extend(true, {}, pageGroupData);
 
-		_.forOwn(pageGroupData, function(pageGroupObj, pageGroupKey) {
-			_.forOwn(pageGroupObj.variationData, function(variationObj, variationKey) {
+		return Promise.all(_.map(pageGroupData, function(pageGroupObj, pageGroupKey) {
+			return Promise.all(_.map(pageGroupObj.variationData, function(variationObj, variationKey) {
 				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, "pageViews": 0, "pageRPM": 0, "pageCTR": 0 });
 
-				_.forEach(variationObj.zones, function(zoneObj) {
+				return Promise.all(_.map(variationObj.zones, function(zoneObj) {
 					computedData[pageGroupKey].variationData[variationKey].click += Number(zoneObj.click);
 					computedData[pageGroupKey].variationData[variationKey].impression += Number(zoneObj.impression);
 					computedData[pageGroupKey].variationData[variationKey].revenue += Number(zoneObj.revenue);
 					computedData[pageGroupKey].variationData[variationKey].ctr += Number(zoneObj.ctr);
 
-					computedData[pageGroupKey].variationData[variationKey].revenue = Math.round(computedData[pageGroupKey].variationData[variationKey].revenue);
+					computedData[pageGroupKey].variationData[variationKey].revenue = Number(computedData[pageGroupKey].variationData[variationKey].revenue.toFixed(2));
 					computedData[pageGroupKey].variationData[variationKey].ctr = Number(computedData[pageGroupKey].variationData[variationKey].ctr.toFixed(2));
+				})).then(function() {
+					return computedData;
 				});
+			})).then(function() {
+				return computedData;
 			});
+		})).then(function() {
+			return computedData;
 		});
-		
-		return computedData;
 	},
 	removeRedundantVariationsObj: function(pageGroupData) {
 		var computedData = extend(true, {}, pageGroupData);
