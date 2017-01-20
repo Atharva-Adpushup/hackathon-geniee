@@ -13,7 +13,7 @@ var $ = require('jquery'),
 			ad.network === 'geniee' && !ad.adCode && ad.networkData && genieeIds.push(ad.networkData.zoneId);
 		}
 
-		inContentAds.sort(function (next, prev) {
+		inContentAds.sort(function(next, prev) {
 			return parseInt(next.section, 10) > parseInt(prev.section, 10);
 		});
 		return { structuredAds: structuredAds, inContentAds: inContentAds, genieeIds: genieeIds };
@@ -89,7 +89,7 @@ var $ = require('jquery'),
 					container.append(adCodeGenerator.generateAdCode(ad));
 					$.ajaxSettings.cache = false;
 					tracker.add(container, function(id) {
-						utils.sendBeacon(config.feedbackUrl, {eventType: 2, click: true, id: id });
+						utils.sendBeacon(config.feedbackUrl, { eventType: 2, click: true, id: id });
 					}.bind(null, ad.id));
 				} catch (e) {
 					err.push({ msg: 'Error in placing ad.', ad: ad, error: e });
@@ -101,6 +101,8 @@ var $ = require('jquery'),
 					displayCounter--;
 					if (data.success) {
 						placeAd(data.container, adObj);
+					} else {
+						adObj.xpathMiss = true;
 					}
 				}
 				if (!displayCounter && !finished) {
@@ -123,7 +125,7 @@ var $ = require('jquery'),
 				});
 			},
 			placeStructuralAds = function(structuredAds) {
-			// Process strutural sections
+				// Process strutural sections
 				$.each(structuredAds, function(index, ad) {
 					getAdContainer(ad, config.xpathWaitTimeout).done(function(data) {
 						// if all well then ad id of ad in feedback to tell system that impression was given
@@ -145,7 +147,7 @@ var $ = require('jquery'),
 								ad.css = $.extend(true, {}, ad.secondaryCss);
 							}
 							feedbackData.ads.push(ad.id);
-							next(ad, { success: true, container: getContainer(ad, sectionObj.elem)});
+							next(ad, { success: true, container: getContainer(ad, sectionObj.elem) });
 						} else {
 							feedbackData.xpathMiss.push(ad.id);
 							next(ad, { success: false, container: null });
@@ -170,11 +172,11 @@ var $ = require('jquery'),
 				placeGenieeHeadCode(ads.genieeIds);
 			}
 
-		// Process and place structural ads
+			// Process and place structural ads
 			placeStructuralAds(ads.structuredAds);
 
-		// Process incontent sections
-		// If incontent ads thr but no xpath given for content area
+			// Process incontent sections
+			// If incontent ads thr but no xpath given for content area
 			if (ads.inContentAds.length && !config.contentSelector) {
 				handleContentSelectorFailure(ads.inContentAds);
 			} else if (ads.inContentAds.length) {

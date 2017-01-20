@@ -46,7 +46,7 @@ const highLighterClass = '_APD_highlighter',
 			height,
 			pointerEvents: 'auto',
 			position: 'relative'
-		}, css);
+		});
 
 		return (
 			<div style={listStyle}>

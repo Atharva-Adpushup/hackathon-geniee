@@ -4,15 +4,16 @@ var path = require('path'),
     _ = require('lodash'),
 	moment = require('moment'),
     PromiseFtp = require('promise-ftp'),
-    genieeReportService = require('../../../reports/service'),
+    genieeReportService = require('../../../reports/partners/geniee/service'),
     ftp = new PromiseFtp(),
     mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
     fs = Promise.promisifyAll(require('fs')),
+	AdPushupError = require('../../../helpers/AdPushupError'),
     CC = require('../../../configs/commonConsts'),
     config = require('../../../configs/config');
 
 module.exports = function (site) {
-    var jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'genieeAp.js'),
+    var jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.js'),
         tempDestPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'geniee', site.get('siteId').toString()),
         isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
         isGenieePartner = (!!(site.get('partner') && (site.get('partner') === CC.partners.geniee.name) && site.get('genieeMediaId') && isAutoOptimise)),
@@ -131,20 +132,29 @@ module.exports = function (site) {
 
             isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
             apConfigs.autoOptimise = (isAutoOptimise ? true : false);
-
-            /* Temp Fields */
-            apConfigs.mode = 1;
-            //apConfigs.pageGroupPattern = [{ HOME: 'components' }];
-            /* Temp Fields End */
+            // Default 'draft' mode is selected if config mode is not present
+            apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
             apConfigs.experiment = allVariations;
             return apConfigs;
         },
         getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
+        getGenieeReportData = function(paramConfig) {
+            return genieeReportService.getReport(paramConfig).then(function(reportData) {
+                return getVariationsPayload(site, reportData).then(setAllConfigs);
+            }).catch(function(e) {
+                /**********NOTE: SPECIAL CONDITION (GENIEE REPORTS)**********/
+                // Only return variations payload without geniee reports data when
+                // Geniee reports return an empty Array [] & consequently throws below exception message
+                if (e && (e instanceof AdPushupError) && e.message && e.message === CC.partners.geniee.exceptions.str.zonesEmpty) {
+                    return getVariationsPayload(site).then(setAllConfigs);
+                }
+
+                throw e;
+            });
+        },
         getComputedConfig = Promise.resolve(true).then(function() {
             if (isGenieePartner) {
-                return genieeReportService.getReport(paramConfig).then(function(reportData) {
-                    return getVariationsPayload(site, reportData).then(setAllConfigs);
-                });
+                return getGenieeReportData(paramConfig);
             } else {
                 return getVariationsPayload(site).then(setAllConfigs);
             }

@@ -3,9 +3,10 @@ var express = require('express'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
 	AdPushupError = require('../helpers/AdPushupError'),
-	genieeService = require('../reports/service'),
+	genieeService = require('../reports/partners/geniee/service'),
 	adsenseReportModel = require('../models/adsenseModel'),
 	adxReportModel = require('../models/adxModel'),
+	apexReportService = require('../reports/default/apex/ctrPerformanceInTabularData/service'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
 	moment = require('moment'),
@@ -361,149 +362,9 @@ router
 	})
 
 	.get('/apexData', function(req, res, next) {
-		function getVariationTrafficDistribution(config) {
-			return siteModel.getSiteById(config.siteId).then(function(site) {
-				return site.getVariationConfig().then(function(variationConfig) {
-					var computedObj = {};
-
-					if (!!variationConfig) {
-						config.variations.forEach(function(variationKey) {
-							var variationObj = variationConfig[variationKey];
-
-							if (variationConfig.hasOwnProperty(variationKey) && variationObj && (Number(variationObj.trafficDistribution) > -1)) {
-								computedObj[variationKey] = {
-									'name': variationObj.name,
-									'id': variationObj.id,
-									'value': variationObj.trafficDistribution
-								};
-							}
-						});
-
-						return computedObj;
-					}
-					return computedObj;
-				});
-			});
-		}
-
-		function getTrafficDistributionConfig(config, report) {
-			var computedConfig = lodash.assign({}, config), rows = report.data.rows,
-				variationKey;
-
-			computedConfig.variations = [];
-			rows.forEach(function(row) {
-				variationKey = row[0];
-				computedConfig.variations.push(variationKey);
-			});
-
-			return computedConfig;
-		}
-
-		function setTrafficDistribution(report, trafficDistributionData) {
-			var computedReport = lodash.assign({}, report), variationKey, variationObj;
-
-			computedReport.data.rows.forEach(function(row, idx) {
-				variationKey = row[0];
-				variationObj = trafficDistributionData[variationKey];
-
-				if (trafficDistributionData.hasOwnProperty(variationKey) && variationObj) {
-					// Set variation name and its traffic distribution value
-					computedReport.data.rows[idx][0] = variationObj.name;
-					computedReport.data.rows[idx][2] = variationObj.value;
-				} else {
-					computedReport.data.rows.splice(idx, 1);
-				}
-			});
-
-			// Set traffic distribution data in computed report
-			computedReport.data.trafficDistribution = trafficDistributionData;
-			return Promise.resolve(computedReport);
-		}
-
-		function getCTRPerformanceData(rows) {
-			var ctrArr = rows.map(function(row) {
-					return row[1];
-				}),
-				controlCtr = lodash.min(ctrArr),
-				performanceArr = ctrArr.map(function(ctr) {
-					return lodash.round(((ctr - controlCtr) / controlCtr) * 100);
-				});
-
-			return performanceArr;
-		}
-
-		function insertDataFields(origArr, newFieldsArr, pushIndex, placeHolder) {
-			var len = newFieldsArr.length, pushIdx = pushIndex, i;
-
-			origArr.unshift(placeHolder);
-
-			for (i = 0; i < len; i++) {
-				// Insert fields item
-				origArr.splice(++pushIdx, 0, newFieldsArr[i]);
-			}
-
-			return origArr;
-		}
-
-		function addEmptyDataFields(reportData) {
-			var computedReport = lodash.assign({}, reportData),
-				headerFields = ['Page Views', 'Revenue', 'Page RPM (PERFORMANCE %)'],
-				rowFields = [' ', ' ', ' '],
-				footerFields = [' ', ' ', ' '],
-				header = computedReport.data.header,
-				rows = computedReport.data.rows,
-				footer = computedReport.data.footer;
-
-			rows.forEach(function(row, idx) {
-				var computedRow = insertDataFields(row, rowFields, 2, ' ');
-
-				computedReport.data.rows[idx] = computedRow;
-			});
-
-			computedReport.data.header = insertDataFields(header, headerFields, 2, ' ');
-			computedReport.data.footer = insertDataFields(footer, footerFields, 2, ' ');
-
-			return Promise.resolve(computedReport);
-		}
-
-		function setCTRPerformanceData(reportData) {
-			var computedReport = lodash.assign({}, reportData),
-				rows = computedReport.data.rows,
-				performanceArr = getCTRPerformanceData(rows);
-
-			computedReport.data.performance = performanceArr;
-			return Promise.resolve(computedReport);
-		}
-
 		return userModel.verifySiteOwner(req.session.user.email, req.query.siteId).then(function() {
-			// TD = TrafficDistribution, FR = FinalReport
-			var config = req.query, getVariations, getReport, getTDConfig, getVariationTD;
-			config.siteId = parseInt(config.siteId, 10);
-			config.platform = (config.platform) ? config.platform.substring(0, 7) : null;
-			config.pageGroup = (config.pageGroup) ? config.pageGroup.substring(0, 30) : null;
-			config.startDate = (config.startDate) ? parseInt(config.startDate, 10) : 1448928000000;
-			config.endDate = (config.endDate) ? parseInt(config.endDate, 10) : Date.now();
-
-			getVariations = channelModel.getVariations(config.siteId, config.platform, config.pageGroup);
-			getReport = getVariations.then(function(variationsData) {
-				config.variationCount = (variationsData && variationsData.count) ? parseInt(variationsData.count, 10) : 100;
-				return Promise.resolve(reports.apexReport(config));
-			});
-			getTDConfig = getReport.then(function(report) {
-				return getTrafficDistributionConfig(config, report);
-			});
-			getVariationTD = getTDConfig.then(function(trafficDistributionConfig) {
-				return getVariationTrafficDistribution(trafficDistributionConfig);
-			});
-
-			return Promise.join(getVariations, getReport, getTDConfig, getVariationTD, function(allVariations, report, trafficDistributionConfig, trafficDistributionData) {
-				return setTrafficDistribution(report, trafficDistributionData).then(function(reportWithTD) {
-					return setCTRPerformanceData(reportWithTD).then(function(reportWithCTRPerformance) {
-						return addEmptyDataFields(reportWithCTRPerformance).then(function(reportWithAddedFields) {
-							res.json(reportWithAddedFields);
-						});
-					});
-				});
+			return apexReportService.getReportData(req.query).then(function(reportData) {
+				return res.json(reportData);
 			});
 		}).catch(function(err) {
 			if (err instanceof AdPushupError) {

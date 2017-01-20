@@ -1,3 +1,5 @@
+var logger = require('./libs/logger');
+
 var printBidTable = function(){
 	var responses = pbjs.getBidResponses();
 	var output = [];
@@ -14,15 +16,15 @@ var printBidTable = function(){
 		 }
 	}
 	if (output.length) {
-		 if (console.table) {
-			console.table(output);
+		 if (logger.table) {
+			logger.table(output);
 		 } else {
 			for (var j = 0; j < output.length; j++) {
-				console.log(output[j]);
+				logger.log(output[j]);
 			}
 		 }
 	} else {
-		 console.warn('NO prebid responses');
+		 logger.warn('NO prebid responses');
 	}
 };
 

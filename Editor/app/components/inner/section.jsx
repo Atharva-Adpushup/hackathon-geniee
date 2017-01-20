@@ -27,7 +27,7 @@ class Section extends React.Component {
 	}
 
 	componentWillReceiveProps(newProps) {
-		if(this.props.xpath !== newProps.xpath) {
+		if(this.props.xpath !== newProps.xpath || (!_.isEqual(this.props.ads[0].css, newProps.ads[0].css))) {
 			this.unMountSection();
 			this.init(newProps);
 		}
@@ -48,6 +48,8 @@ class Section extends React.Component {
 			d.width = ad.width + (parseInt(ad.css['margin-right'], 10) || 0) + (parseInt(ad.css['margin-left'], 10) || 0);
 			ad = _.max(ads, (adObj) => adObj.adObjHeight + (parseInt(adObj.css['margin-top'], 10)) || 0 + (parseInt(adObj.css['margin-bottom'], 10) || 0));
 			d.height = parseInt(ad.height, 10) + (parseInt(ad.css['margin-top'], 10) || 0) + (parseInt(ad.css['margin-bottom'], 10) || 0);
+			d.clientHeight = parseInt(ad.height, 10);
+			d.clientWidth = parseInt(ad.width, 10);
 		}
 		return d;
 	}
@@ -77,7 +79,7 @@ class Section extends React.Component {
 	}
 
 	renderSection(props = this.props) {
-		const css = Object.assign({}, { position: 'relative', clear: 'both', pointerEvents: 'none', width: '100%', }, { height: this.getMaxDimensions().height });
+		const css = Object.assign({}, { position: 'relative', clear: 'both', pointerEvents: 'none', width: '100%', }, { height: this.getMaxDimensions().clientHeight, width: this.getMaxDimensions().clientWidth }, props.ads[0].css);
 		this.$node.css(css);
 		ReactDOM.render(<div className="_ap_reject">
 			{props.ads.map((ad) => <AdBox key={ad.id} ad={ad} clickHandler={this.props.onAdClick.bind(this, props.variationId, props.id)} />)}

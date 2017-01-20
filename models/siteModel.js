@@ -5,6 +5,7 @@ var model = require('../helpers/model'),
 	globalModel = require('../models/globalModel'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	channelModel = require('../models/channelModel'),
+	apConfigSchema = require('./subClasses/site/apConfig'),
 	Promise = require('bluebird'),
 	commonConsts = require('../configs/commonConsts'),
 	_ = require('lodash'),
@@ -29,6 +30,7 @@ var model = require('../helpers/model'),
 		};
 		this.defaults = { apConfigs: {}, channels: [], cmsInfo: { cmsName: '', pageGroups: [] } };
 		this.ignore = [];
+		this.classMap = { 'apConfigs': apConfigSchema };
 
 		this.constructor = function (data, cas) {
 			if (!data.siteId) {
@@ -51,11 +53,25 @@ var model = require('../helpers/model'),
 		this.deleteChannel = function (platform, pageGroup) {
 			return new Promise(function (resolve) {
 
-				// Reset site channels
+				// Reset site channels and page group pattern
 				var channels = _.filter(this.get('channels'), function (chnl) {
-					return (chnl !== platform + ':' + pageGroup);
-				});
+						return (chnl !== platform + ':' + pageGroup);
+					}),
+					apConfigs = this.get('apConfigs'),
+					isPageGroupPattern = !!(apConfigs && apConfigs.pageGroupPattern && _.isArray(apConfigs.pageGroupPattern)),
+					pageGroupPatterns = (isPageGroupPattern ? (_.filter(apConfigs.pageGroupPattern, function(patternObj) {
+						var patternKey = Object.keys(patternObj)[0];
+
+						return (patternKey !== pageGroup);
+					})) : false),
+					computedApConfig;
+
 				this.set('channels', channels);
+
+				if (pageGroupPatterns && _.isArray(pageGroupPatterns)) {
+					computedApConfig = {'pageGroupPattern': pageGroupPatterns};
+					this.set('apConfigs', computedApConfig);
+				}
 
 				this.save();
 				resolve();

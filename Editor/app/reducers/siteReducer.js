@@ -1,37 +1,23 @@
 import { combineReducers } from 'redux';
-import { status, siteModes, siteActions } from 'consts/commonConsts';
+import { status, siteModes, uiActions } from 'consts/commonConsts';
 
-const afterSaveLoader = (state = { status: 0 }, action) => {
+const modeStatus = (state = { mode: siteModes.DRAFT }, action) => {
 		switch (action.type) {
-			case status.text.RESET:
-				return {
-					status: status.RESET
-				};
-			case status.text.PENDING:
-				return {
-					status: status.PENDING
-				};
+			case uiActions.UPDATE_AFTER_SAVE_STATUS:
+				const isCurrentModeDraft = (action.status === status.SUCCESS) && (state.mode === siteModes.DRAFT) && action.updateModeStatus,
+					isCurrentModePublish = (action.status === status.SUCCESS) && (state.mode === siteModes.PUBLISH) && action.updateModeStatus;
 
-			case status.text.SUCCESS:
-				return {
-					status: status.SUCCESS
-				};
+				if (isCurrentModeDraft) {
+					return {
+						mode: siteModes.PUBLISH
+					};
+				} else if (isCurrentModePublish) {
+					return {
+						mode: siteModes.DRAFT
+					};
+				}
 
-			case status.text.FAILED:
-				return {
-					status: status.FAILED
-				};
-
-			default:
 				return state;
-		}
-	},
-	modeStatus = (state = { mode: siteModes.DRAFT }, action) => {
-		switch (action.type) {
-			case siteActions.CHANGE_SITE_MODE:
-				return {
-					mode: action.mode
-				};
 
 			default:
 				return state;
@@ -48,5 +34,5 @@ const afterSaveLoader = (state = { status: 0 }, action) => {
 	};
 
 export default combineReducers({
-	afterSaveLoader, modeStatus, siteData
+	modeStatus, siteData
 });
