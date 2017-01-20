@@ -321,6 +321,22 @@
   padding: 15px;
   border: 1px solid $lightGrey;
   border-radius: 3px;
+  position: relative;
+}
+
+.settings-pane .close.hb-close-pane {
+  position: absolute;
+  width: 26px;
+  border-radius: 50%;
+  background-color: $whiteColor;
+  color: $primaryColor;
+  opacity: 1;
+  right: -10px;
+  font-size: 1.2em;
+  top: -5px;
+  border: 1px solid $primaryColor;
+  z-index: 1;
+  padding: 5px;
 }
 
 .hb-settings {

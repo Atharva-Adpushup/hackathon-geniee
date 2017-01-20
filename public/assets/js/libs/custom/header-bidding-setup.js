@@ -1,31 +1,3 @@
-/*
-    {
-        type: 'country',
-        name: 'US',
-        info: {
-            '336x280': [
-                [
-                    {
-                        bidder: pulsepoint,
-                        params: {
-                            cf: 123123123,
-                            ct: 432534563445
-                        }
-                    }, 
-                    {
-                        bidder: wideorbit,
-                        params: {
-                            cf: 6785453,
-                            ct: 123231
-                        }
-                    }
-                ],
-            ]
-        }
-    }
-}
-*/
-
 // Header Bidding setup module script
 
 $(document).ready(function () {
@@ -133,6 +105,15 @@ $(document).ready(function () {
                         el.append(w);
                         break;
                 }
+                
+                if(!$(el).children().length) {
+                    var otherPanels = $(el).parent().children('.select-partner-settings');
+
+                    for(var i = 1; i < otherPanels.length; i++) {
+                        $(otherPanels[i]).prepend('<button type="button" class="close hb-close-pane">x</button>');
+                    }
+                }
+                
                 var hbPartner = w.find('.hb-partner');
                 this.setHbPartnersSelectBoxData(hbPartner);
             },
@@ -148,6 +129,14 @@ $(document).ready(function () {
                     default:
                         el.append(w);
                         break;
+                }
+
+                if(!$(el).children().length) {
+                    var otherPanels = $(el).parent().children('.select-partner');
+
+                    for(var i = 1; i < otherPanels.length; i++) {
+                        $(otherPanels[i]).prepend('<button type="button" class="close hb-close-pane">x</button>');
+                    }
                 }
                 
                 this.renderHbPartnerSetupPanel(w);
@@ -173,6 +162,14 @@ $(document).ready(function () {
                         break;
                 }
 
+                if(!$(el).children().length) {
+                    var otherPanels = $(el).parent().children('.select-size');
+
+                    for(var i = 1; i < otherPanels.length; i++) {
+                        $(otherPanels[i]).prepend('<button type="button" class="close hb-close-pane">x</button>');
+                    }
+                }
+
                 var adSize = w.find('.ad-size');
                 this.setAdSizeSelectBoxOptions(adSize);
                 this.renderMultiConfigPanel(w);
@@ -190,41 +187,15 @@ $(document).ready(function () {
                     continent = w.find('.geo-continent');
                 this.setGeoSelectBoxOptions(country, continent);
 
+                var otherPanels = $(w).parent().children('.select-geo-wrapper');
+
+                for(var i = 1; i < otherPanels.length; i++) {
+                    $(otherPanels[i]).prepend('<button type="button" class="close hb-close-pane">x</button>');
+                }
+
                 this.setGeoSubSelect(this.defaults.geo, $('.geo-selector'));
                 this.renderAdSizeSetupPanel(w, 'append');
                 $(w).append('<button type="button" class="add-size mT-10 btn btn-lightBg btn-default">Add another size</button>');
-            },
-
-            // Functon to convert serialized array to json with header bidding config specific checks
-            arrayToJson: function (arr) {
-                var json = {}, isCountry, isContinent;
-
-                for (var i = 0; i < arr.length; i++) {
-                    var data = arr[i];
-                    console.log(data);
-                    // switch (data.name) {
-                    //     case 'geoType':
-                    //         if (data.value === 'country') {
-                    //             isCountry = true; isContinent = false;
-                    //         }
-                    //         else if (data.value === 'continent') {
-                    //             isCountry = false; isContinent = true;
-                    //         }
-
-                    //         json[data.name] = data.value
-                    //         break;
-                    //     case 'country':
-                    //         isCountry ? json[data.name] = data.value : null;
-                    //         break;
-                    //     case 'continent':
-                    //         isContinent ? json[data.name] = data.value : null;
-                    //         break;
-                    //     default:
-                    //         json[data.name] = data.value;
-                    //         break;
-                    // }
-                }
-                //console.log(json);
             },
 
             // Function to parse header bidding form data
@@ -310,7 +281,6 @@ $(document).ready(function () {
 
             saveHeaderBiddingSetup: function (form) {
                 this.parseHbFormData(form);
-                //this.arrayToJson(data);
             },
 
             // Initialise header bidding setup
@@ -346,6 +316,10 @@ $(document).ready(function () {
 
         $('body').on('click', '.add-setup', function () {
             ap.headerBiddingSetup.renderMultiConfigPanel($(this), 'insertBefore');
+        });
+
+        $('body').on('click', '.hb-close-pane', function () {
+            $(this).parent().remove();
         });
 
         $('#hbform').on('submit', function (e) {
