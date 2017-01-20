@@ -107,8 +107,8 @@ $(document).ready(function () {
             },
 
             // Generic function to render new setting panel
-            renderNewPanel: function(el, wrapper, action, selector, otherEl) {
-                if(otherEl) {
+            renderNewPanel: function (el, wrapper, action, selector, otherEl) {
+                if (otherEl) {
                     wrapper.append(otherEl);
                 }
 
@@ -266,6 +266,17 @@ $(document).ready(function () {
 
             saveHeaderBiddingSetup: function (form) {
                 var data = this.parseHbFormData(form);
+                $.ajax({
+                    method: 'POST',
+                    url: 'saveHeaderBiddingSetup',
+                    data: { hbConfig: JSON.stringify(data) }
+                }).done(function (res) {
+                    if(res.success) {
+                        ap.apAlert('Header bidding setup has been saved successfully!', '#hbalert', 'success', 'slideDown');
+                    } else {
+                        ap.apAlert('Some error occurred! Please try again later.', '#hbalert', 'error', 'slideDown');
+                    }
+                });
             },
 
             // Initialise header bidding setup
@@ -278,7 +289,7 @@ $(document).ready(function () {
 
 
         // Header bidding setup triggers
-        
+
         // Geo-selector change trigger
         $('body').on('change', '.geo-selector', function (e) {
             var geo = $(this).val();

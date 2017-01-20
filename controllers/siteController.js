@@ -85,7 +85,21 @@ router
             });
     })
     .post('/:siteId/saveHeaderBiddingSetup', function(req, res) {
-        console.log(req.body);
+        var siteId = req.params.siteId,
+            hbConfig = JSON.parse(req.body.hbConfig);
+
+        return siteModel.saveHbConfig(siteId, hbConfig)
+            .then(function (data) {
+                res.send({ success: 1 });
+            })
+            .catch(function (err) {
+                if (err.name === 'AdPushupError') {
+                    res.send({ succes: 0, message: err.message })
+                }
+                else {
+                    res.send({ success: 0, message: 'Some error occurred!' });
+                }
+            });
     })
     .post('/:siteId/saveSiteSettings', function (req, res) {
         var json = {
