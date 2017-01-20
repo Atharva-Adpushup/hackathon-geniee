@@ -2,10 +2,11 @@ var _ = require('lodash'),
 	extend = require('extend'),
 	moment = require('moment'),
 	Promise = require('bluebird'),
+	pageViewsModule = require('../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index'),
 	utils = require('../utils/index');
 
 module.exports = {
-	setVariationMetrics: function(pageGroupData) {
+	setVariationMetrics: function(config, pageGroupData) {
 		var computedData = extend(true, {}, pageGroupData);
 
 		return Promise.all(_.map(pageGroupData, function(pageGroupObj, pageGroupKey) {
@@ -13,13 +14,38 @@ module.exports = {
 				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, "pageViews": 0, "pageRPM": 0, "pageCTR": 0 });
 
 				return Promise.all(_.map(variationObj.zones, function(zoneObj) {
-					computedData[pageGroupKey].variationData[variationKey].click += Number(zoneObj.click);
-					computedData[pageGroupKey].variationData[variationKey].impression += Number(zoneObj.impression);
-					computedData[pageGroupKey].variationData[variationKey].revenue += Number(zoneObj.revenue);
-					computedData[pageGroupKey].variationData[variationKey].ctr += Number(zoneObj.ctr);
+					var pageViewsReportConfig = {
+						siteId: config.siteId,
+						startDate: (config.dateFrom ? moment(config.dateFrom).valueOf() : moment().subtract(31, 'days').valueOf()),
+						endDate: (config.dateTo ? moment(config.dateTo).valueOf(): moment().subtract(1, 'days').valueOf()),
+						variationKey: variationObj.id,
+						platform: pageGroupObj.device,
+						pageGroup: pageGroupObj.pageGroup,
+						reportType: 'apex',
+						step: '1d'
+					};
 
-					computedData[pageGroupKey].variationData[variationKey].revenue = Number(computedData[pageGroupKey].variationData[variationKey].revenue.toFixed(2));
-					computedData[pageGroupKey].variationData[variationKey].ctr = Number(computedData[pageGroupKey].variationData[variationKey].ctr.toFixed(2));
+					return pageViewsModule.getTotalCount(pageViewsReportConfig)
+						.then(function(pageViews) {
+							var revenue, clicks;
+
+							computedData[pageGroupKey].variationData[variationKey].click += Number(zoneObj.click);
+							computedData[pageGroupKey].variationData[variationKey].impression += Number(zoneObj.impression);
+							computedData[pageGroupKey].variationData[variationKey].revenue += Number(zoneObj.revenue);
+							computedData[pageGroupKey].variationData[variationKey].ctr += Number(zoneObj.ctr);
+
+							computedData[pageGroupKey].variationData[variationKey].revenue = Number(computedData[pageGroupKey].variationData[variationKey].revenue.toFixed(2));
+							computedData[pageGroupKey].variationData[variationKey].ctr = Number(computedData[pageGroupKey].variationData[variationKey].ctr.toFixed(2));
+							computedData[pageGroupKey].variationData[variationKey].pageViews = Number(pageViews);
+
+							revenue = computedData[pageGroupKey].variationData[variationKey].revenue;
+							clicks = computedData[pageGroupKey].variationData[variationKey].click;
+
+							computedData[pageGroupKey].variationData[variationKey].pageRPM = Number((revenue / pageViews * 1000).toFixed(2));
+							computedData[pageGroupKey].variationData[variationKey].pageCTR = Number((clicks / pageViews * 100).toFixed(2));
+
+							return computedData;
+						});
 				})).then(function() {
 					return computedData;
 				});

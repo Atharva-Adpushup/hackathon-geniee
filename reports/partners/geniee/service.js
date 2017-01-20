@@ -62,7 +62,7 @@ module.exports = (function(requestPromise, signatureGenerator, oauthModule, zone
 				
 				return pageGroupModule.updatePageGroupData(pageGroupData, pageGroupMetrics)
 					.then(zoneModule.getZoneVariations)
-					.then(variationModule.setVariationMetrics)
+					.then(variationModule.setVariationMetrics.bind(variationModule, params))
 					.then(variationModule.removeRedundantVariationsObj)
 					.then(variationModule.setVariationsTabularData)
 					.then(variationModule.setVariationsHighChartsData)
