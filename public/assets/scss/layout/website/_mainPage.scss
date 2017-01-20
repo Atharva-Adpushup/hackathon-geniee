@@ -339,6 +339,23 @@
   padding: 5px;
 }
 
+.select-partner {
+  background-color: $mainBgColor;
+}
+
+.select-partner-settings {
+  background-color: $whiteColor;
+}
+
+.btn.btn-lightBg.btn-hb-pane {
+  top: -1px;
+  position: relative;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border: 1px solid $lightGrey !important;
+  color: $iconColor; 
+}
+
 .hb-settings {
   margin: 20px 0 0;
   border-top: 1px dashed $lightGrey;

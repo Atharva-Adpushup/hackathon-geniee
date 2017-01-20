@@ -24,9 +24,9 @@ $(document).ready(function () {
                 closeBtn: '<button type="button" class="close hb-close-pane">x</button>',
                 defaultSelectBoxOption: '<option selected value="">Select partner</option>',
                 buttons: {
-                    addPartner: '<button type="button" class="add-partner mT-10 btn btn-lightBg btn-default">Add another partner</button>',
-                    addSetup: '<button type="button" class="add-setup mT-10 btn btn-lightBg btn-default">Add another Setup</button>',
-                    addSize: '<button type="button" class="add-size mT-10 btn btn-lightBg btn-default">Add another size</button>'
+                    addPartner: '<button type="button" class="add-partner btn-hb-pane btn btn-lightBg btn-default">Add another partner</button>',
+                    addSetup: '<button type="button" class="add-setup btn-hb-pane btn btn-lightBg btn-default">Add another Setup</button>',
+                    addSize: '<button type="button" class="add-size btn-hb-pane btn btn-lightBg btn-default">Add another size</button>'
                 },
                 selectors: {
                     country: '.select-geo-country',
@@ -132,7 +132,7 @@ $(document).ready(function () {
 
             // Function to render hb partner setup panel
             renderHbPartnerSetupPanel: function (el, action) {
-                var w = $('<div class="hb-config-pane mT-10 select-partner-settings">' + this.templates.selectBoxes.hbPartnerSelect + '<div class="partner-settings"></div></div>');
+                var w = $('<div class="hb-config-pane mT-20 select-partner-settings">' + this.templates.selectBoxes.hbPartnerSelect + '<div class="partner-settings"></div></div>');
                 this.renderNewPanel(el, w, action, '.select-partner-settings');
 
                 var hbPartner = w.find('.hb-partner');
@@ -141,7 +141,7 @@ $(document).ready(function () {
 
             // Function to render multi-config panel
             renderMultiConfigPanel: function (el, action) {
-                var w = $('<div class="hb-config-pane mT-10 select-partner"></div>');
+                var w = $('<div class="hb-config-pane mT-20 select-partner"></div>');
                 this.renderNewPanel(el, w, action, '.select-partner');
 
                 this.renderHbPartnerSetupPanel(w);
@@ -154,7 +154,7 @@ $(document).ready(function () {
 
             // Function to render ad size setup panel
             renderAdSizeSetupPanel: function (el, action) {
-                var w = $('<div class="hb-config-pane mT-10 select-size">'),
+                var w = $('<div class="hb-config-pane mT-20 select-size">'),
                     s = this.templates.selectBoxes.adSizesSelect;
                 this.renderNewPanel(el, w, action, '.select-size', s);
 
