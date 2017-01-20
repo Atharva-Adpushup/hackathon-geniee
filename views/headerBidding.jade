@@ -21,7 +21,11 @@ block append headScripts
             window.hbPartners = !{hbPartners};
             window.hbConfig = !{hbConfig};
         });
-    script(src="/assets/js/libs/custom/header-bidding-setup.js")
+
+    if environment == "development"
+        script(src="/assets/js/builds/header-bidding-setup.min.js")
+    else 
+        script(src="/assets/js/libs/custom/header-bidding-setup.js")
 
 block bodyContent
     include layout/sideBar
