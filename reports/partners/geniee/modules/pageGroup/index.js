@@ -22,8 +22,8 @@ module.exports = {
 							'ctr': 0.0,
 							zones: [],
 							"pageViews": 0,
-							"pageRPM": 0,
-							"pageCTR": 0
+							"pageRPM": 0.0,
+							"pageCTR": 0.0
 						};
 
 						computedData[zoneObj.pageGroupId].click += Number(zoneObj.click);
@@ -49,6 +49,35 @@ module.exports = {
 		});
 
 		return computedData;
+	},
+	updateMetrics: function(reportData) {
+		var computedData = extend(true, {}, reportData),
+			dataStr = 'data';
+
+		_.forOwn(reportData.pageGroups, function(pageGroupObj, pageGroupKey) {
+			if (pageGroupKey === dataStr) { return false; }
+
+			computedData.pageGroups[pageGroupKey] = extend(true, {}, computedData.pageGroups[pageGroupKey], { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, "pageViews": 0, "pageRPM": 0.0, "pageCTR": 0.0 });
+
+			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
+				if (variationKey === dataStr) { return false; }
+
+				computedData.pageGroups[pageGroupKey].click += Number(variationObj.click);
+				computedData.pageGroups[pageGroupKey].impression += Number(variationObj.impression);
+				computedData.pageGroups[pageGroupKey].revenue += Number(variationObj.revenue);
+				computedData.pageGroups[pageGroupKey].ctr += Number(variationObj.ctr);
+				computedData.pageGroups[pageGroupKey].pageViews += Number(variationObj.pageViews);
+				computedData.pageGroups[pageGroupKey].pageRPM += Number(variationObj.pageRPM);
+				computedData.pageGroups[pageGroupKey].pageCTR += Number(variationObj.pageCTR);
+			});
+
+			computedData.pageGroups[pageGroupKey].revenue = Number(computedData.pageGroups[pageGroupKey].revenue.toFixed(2));
+			computedData.pageGroups[pageGroupKey].ctr = Number(computedData.pageGroups[pageGroupKey].ctr.toFixed(2));
+			computedData.pageGroups[pageGroupKey].pageRPM = Number(computedData.pageGroups[pageGroupKey].pageRPM.toFixed(2));
+			computedData.pageGroups[pageGroupKey].pageCTR = Number(computedData.pageGroups[pageGroupKey].pageCTR.toFixed(2));
+		});
+
+		return Promise.resolve(computedData);
 	},
 	getPageGroupDataById: function(data) {
 		var allPageGroupsData = _.map(_.keys(data), function(channelKey) {

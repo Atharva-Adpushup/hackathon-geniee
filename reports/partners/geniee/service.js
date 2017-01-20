@@ -69,7 +69,9 @@ module.exports = (function(requestPromise, signatureGenerator, oauthModule, zone
 					.then(function(updatedPageGroupsAndVariationsData) {
 						var computedData = {media: siteMetrics, pageGroups: updatedPageGroupsAndVariationsData};
 
-						return pageGroupModule.setPageGroupsTabularData(computedData)
+						return pageGroupModule.updateMetrics(computedData)
+							.then(mediaModule.updateMetrics)
+							.then(pageGroupModule.setPageGroupsTabularData)
 							.then(pageGroupModule.setPageGroupsHighChartsData)
 							.then(function(finalComputedData) {
 								return Promise.resolve(finalComputedData);

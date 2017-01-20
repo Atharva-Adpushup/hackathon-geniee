@@ -11,7 +11,7 @@ module.exports = {
 
 		return Promise.all(_.map(pageGroupData, function(pageGroupObj, pageGroupKey) {
 			return Promise.all(_.map(pageGroupObj.variationData, function(variationObj, variationKey) {
-				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, "pageViews": 0, "pageRPM": 0, "pageCTR": 0 });
+				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, "pageViews": 0, "pageRPM": 0.0, "pageCTR": 0.0 });
 
 				return Promise.all(_.map(variationObj.zones, function(zoneObj) {
 					var pageViewsReportConfig = {
