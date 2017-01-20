@@ -22,7 +22,7 @@ block append headScripts
             window.hbConfig = !{hbConfig};
         });
 
-    if environment == "development"
+    if environment == "production"
         script(src="/assets/js/builds/header-bidding-setup.min.js")
     else 
         script(src="/assets/js/libs/custom/header-bidding-setup.js")
