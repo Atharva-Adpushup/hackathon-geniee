@@ -55,12 +55,17 @@ module.exports = {
 												return finalVariationObj;
 											});
 									})).then(function(computedVariationsData) {
-										return _.reduce(computedVariationsData, function(hashMap, obj) {
-											var key = Object.keys(obj)[0];
+										var channelKey = channel.pageGroup + "_" + channel.platform,
+											computedVariationsObj = {};
 
-											hashMap[key] = obj[key];
+										computedVariationsObj[channelKey] = {};
+
+										return _.reduce(computedVariationsData, function(hashMap, obj) {
+											var key = Object.keys(hashMap)[0];
+
+											hashMap[key] = extend(true, hashMap[key], obj);
 											return hashMap;
-										}, {});
+										}, computedVariationsObj);
 									});
 								});
 						})).then(function(finalVariationData) {
