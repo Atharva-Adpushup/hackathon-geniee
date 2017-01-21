@@ -98,29 +98,35 @@ module.exports = {
 					};
 					datesObj.revenue[currentDate] = currentComputedObj.revenue.name;
 					
-					// currentComputedObj.pageviews = {
-					// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					// 	data: [[currentDate, 0]],
-					// 	tooltip: {valueDecimals: 2}
-					// };
+					currentComputedObj.pageviews = {
+						name: (variationObj.name.replace(" ", "-")),
+						data: [[currentDate, Number(variationObj.pageViews)]]
+					};
+					datesObj.pageviews[currentDate] = currentComputedObj.pageviews.name;
+
 					currentComputedObj.clicks = {
 						name: (variationObj.name.replace(" ", "-")),
 						data: [[currentDate, Number(zonesObj.click)]]
 					};
 					datesObj.clicks[currentDate] = currentComputedObj.clicks.name;
-					// currentComputedObj.pagerpm = {
-					// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					// 	data: [[currentDate, 0]],
-					// 	tooltip: {valueDecimals: 2}
-					// };
-					// currentComputedObj.pagectr = {
-					// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					// 	data: [[currentDate, 0]],
-					// 	tooltip: {valueDecimals: 2}
-					// };
+
+					currentComputedObj.pagerpm = {
+						name: (variationObj.name.replace(" ", "-")),
+						data: [[currentDate, Number(variationObj.pageRPM)]]
+					};
+					datesObj.pagerpm[currentDate] = currentComputedObj.pagerpm.name;
+
+					currentComputedObj.pagectr = {
+						name: (variationObj.name.replace(" ", "-")),
+						data: [[currentDate, Number(variationObj.pageCTR)]]
+					};
+					datesObj.pagectr[currentDate] = currentComputedObj.pagectr.name;
 
 					utils.setHighChartsData(currentDate, 'revenue', highChartsData.highCharts, currentComputedObj);
 					utils.setHighChartsData(currentDate, 'clicks', highChartsData.highCharts, currentComputedObj);
+					utils.setHighChartsData(currentDate, 'pageviews', highChartsData.highCharts, currentComputedObj);
+					utils.setHighChartsData(currentDate, 'pagerpm', highChartsData.highCharts, currentComputedObj);
+					utils.setHighChartsData(currentDate, 'pagectr', highChartsData.highCharts, currentComputedObj);
 				});
 			});
 
@@ -129,8 +135,20 @@ module.exports = {
 				utils.setDateWithEmptyValue(dateKey, 'revenue', highChartsData.highCharts);
 			});
 
+			_.forOwn(datesObj.pageviews, function(pageviewsData, dateKey) {
+				utils.setDateWithEmptyValue(dateKey, 'pageviews', highChartsData.highCharts);
+			});
+
 			_.forOwn(datesObj.clicks, function(clicksData, dateKey) {
 				utils.setDateWithEmptyValue(dateKey, 'clicks', highChartsData.highCharts);
+			});
+
+			_.forOwn(datesObj.pagerpm, function(pagerpmData, dateKey) {
+				utils.setDateWithEmptyValue(dateKey, 'pagerpm', highChartsData.highCharts);
+			});
+
+			_.forOwn(datesObj.pagectr, function(pagectrData, dateKey) {
+				utils.setDateWithEmptyValue(dateKey, 'pagectr', highChartsData.highCharts);
 			});
 
 			computedData[pageGroupKey].variations.data = extend(true, computedData[pageGroupKey].variations.data, highChartsData);

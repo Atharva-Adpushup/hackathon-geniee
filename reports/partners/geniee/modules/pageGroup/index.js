@@ -133,29 +133,36 @@ module.exports = {
 					data: [[currentDate, Number(zonesObj.revenue)]]
 				};
 				datesObj.revenue[currentDate] = currentComputedObj.revenue.name;
-				// currentComputedObj.pageviews = {
-				// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-				// 	data: [[currentDate, 0]],
-				// 	tooltip: {valueDecimals: 2}
-				// };
+
+				currentComputedObj.pageviews = {
+					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+					data: [[currentDate, Number(pageGroupObj.pageViews)]]
+				};
+				datesObj.pageviews[currentDate] = currentComputedObj.pageviews.name;
+
 				currentComputedObj.clicks = {
 					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
 					data: [[currentDate, Number(zonesObj.click)]]
 				};
 				datesObj.clicks[currentDate] = currentComputedObj.clicks.name;
-				// currentComputedObj.pagerpm = {
-				// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-				// 	data: [[currentDate, 0]],
-				// 	tooltip: {valueDecimals: 2}
-				// };
-				// currentComputedObj.pagectr = {
-				// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-				// 	data: [[currentDate, 0]],
-				// 	tooltip: {valueDecimals: 2}
-				// };
+
+				currentComputedObj.pagerpm = {
+					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+					data: [[currentDate, Number(pageGroupObj.pageRPM)]]
+				};
+				datesObj.pagerpm[currentDate] = currentComputedObj.pagerpm.name;
+
+				currentComputedObj.pagectr = {
+					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+					data: [[currentDate, Number(pageGroupObj.pageCTR)]]
+				};
+				datesObj.pagectr[currentDate] = currentComputedObj.pagectr.name;
 
 				utils.setHighChartsData(currentDate, 'revenue', highChartsData.highCharts, currentComputedObj);
 				utils.setHighChartsData(currentDate, 'clicks', highChartsData.highCharts, currentComputedObj);
+				utils.setHighChartsData(currentDate, 'pageviews', highChartsData.highCharts, currentComputedObj);
+				utils.setHighChartsData(currentDate, 'pagerpm', highChartsData.highCharts, currentComputedObj);
+				utils.setHighChartsData(currentDate, 'pagectr', highChartsData.highCharts, currentComputedObj);
 			});
 		});
 
@@ -167,6 +174,19 @@ module.exports = {
 		_.forOwn(datesObj.clicks, function(clicksData, dateKey) {
 			utils.setDateWithEmptyValue(dateKey, 'clicks', highChartsData.highCharts);
 		});
+
+		_.forOwn(datesObj.pageviews, function(pageviewsData, dateKey) {
+			utils.setDateWithEmptyValue(dateKey, 'pageviews', highChartsData.highCharts);
+		});
+
+		_.forOwn(datesObj.pagerpm, function(pagerpmData, dateKey) {
+			utils.setDateWithEmptyValue(dateKey, 'pagerpm', highChartsData.highCharts);
+		});
+
+		_.forOwn(datesObj.pagectr, function(pagectrData, dateKey) {
+			utils.setDateWithEmptyValue(dateKey, 'pagectr', highChartsData.highCharts);
+		});
+
 
 		computedData.pageGroups.data = extend(true, computedData.pageGroups.data, highChartsData);
 
