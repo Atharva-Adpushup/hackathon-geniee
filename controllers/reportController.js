@@ -7,6 +7,7 @@ var express = require('express'),
 	adsenseReportModel = require('../models/adsenseModel'),
 	adxReportModel = require('../models/adxModel'),
 	apexReportService = require('../reports/default/apex/ctrPerformanceInTabularData/service'),
+	apexVariationReportService = require('../reports/default/apex/service'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
 	moment = require('moment'),
@@ -437,6 +438,13 @@ router
 			}
 			next(err);
 		});
+	})
+
+	.get('/getApexVariationData', function(req, res) {
+		return apexVariationReportService.getReportData(req.query.siteId)
+			.then(function(reportData) {
+				return res.json(reportData);
+			});
 	})
 
 	.get('/performESSearch', function(req, res) {
