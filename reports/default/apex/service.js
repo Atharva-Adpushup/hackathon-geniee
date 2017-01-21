@@ -68,9 +68,7 @@ module.exports = {
 										}, computedVariationsObj);
 									});
 								});
-						})).then(function(finalVariationData) {
-							return finalVariationData;
-						});
+						})).then(variationModule.getFinalData);
 					})
 			})
 	}

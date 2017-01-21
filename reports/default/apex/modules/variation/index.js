@@ -29,5 +29,14 @@ module.exports = {
 		});
 
 		return computedData;
+	},
+	getFinalData: function(reportData) {
+		var computedData = {};
+
+		_.forEach(reportData, function(pageGroupVariationsObj) {
+			computedData = extend(true, computedData, pageGroupVariationsObj);
+		});
+
+		return computedData;
 	}
 };
