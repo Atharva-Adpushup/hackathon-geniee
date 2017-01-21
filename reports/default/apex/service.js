@@ -15,10 +15,12 @@ module.exports = {
 			step: '1d',
 			startDate: moment().subtract(7, 'days').valueOf(),
 			endDate: moment().subtract(0, 'days').valueOf()
-		};
+		}, email;
 
 		return siteModel.getSiteById(config.siteId)
 			.then(function(site) {
+				email = site.get('ownerEmail');
+
 				return site.getAllChannels()
 					.then(function(allChannels) {
 						return Promise.all(_.map(allChannels, function(channel) {
@@ -38,7 +40,7 @@ module.exports = {
 
 										finalVariationObj[variationKey] = extend(true, {}, variationObj);
 
-										return pageGroupVariationRPMService.getReportData(variationRPMConfig)
+										return pageGroupVariationRPMService.getReportData(variationRPMConfig, email)
 											.then(function(variationRPMReportData) {
 												var clicks = finalVariationObj[variationKey].click,
 													pageViews;
