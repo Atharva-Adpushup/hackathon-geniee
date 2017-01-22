@@ -5,6 +5,7 @@ var path = require('path'),
 	moment = require('moment'),
     PromiseFtp = require('promise-ftp'),
     genieeReportService = require('../../../reports/partners/geniee/service'),
+	apexVariationReportService = require('../../../reports/default/apex/service'),
     ftp = new PromiseFtp(),
     mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
     fs = Promise.promisifyAll(require('fs')),
@@ -72,15 +73,24 @@ module.exports = function (site) {
 
             return site.getAllChannels().then(function (allChannels) {
                 _.each(allChannels, function (channel) {
-                    var platform, pageGroup, pageGroupData;
-                    
-                    // sample name HOME_DESKTOP
+                    var platform, pageGroup, channelKey, pageGroupData,
+                        pageGroupId, isReportData, isGenieeReportData;
+
                     platform = channel.platform; // last element is platform
                     pageGroup = channel.pageGroup; // join remaing to form pageGroup
+                    // channelKey sample name HOME_DESKTOP
+                    channelKey = pageGroup + '_' + platform;
+                    isReportData = !!(reportData && _.isObject(reportData));
+                    isGenieeReportData = !!(isReportData && channel.genieePageGroupId);
 
-                    if (reportData && _.isObject(reportData) && channel.genieePageGroupId) {
-                        pageGroupData = reportData.pageGroups[channel.genieePageGroupId];
+                    //TODO: Move below partner specific logic in universal app service
+                    if (isGenieeReportData) {
+                        pageGroupId = channel.genieePageGroupId;
+                    } else if (isReportData) {
+                        pageGroupId = channelKey;
                     }
+
+                    pageGroupData = reportData.pageGroups[pageGroupId];
 
                     if (!finalJson[platform]) {
                         finalJson[platform] = {};
@@ -138,6 +148,22 @@ module.exports = function (site) {
             return apConfigs;
         },
         getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
+        getReportData = function(paramConfig) {
+            return apexVariationReportService.getReportData(paramConfig.siteId)
+                .then(function(reportData) {
+                    return getVariationsPayload(site, reportData).then(setAllConfigs);
+                }).catch(function(e) {
+                    /**********NOTE: SPECIAL CONDITION (APEX REPORTS)**********/
+                    // Only return variations payload without apex reports data when
+                    // Apex reports return an empty report for any variation
+                    // & consequently throws below exception message
+                    if (e && (e instanceof AdPushupError) && e.message && e.message === CC.exceptions.str.apexServiceDataEmpty) {
+                        return getVariationsPayload(site).then(setAllConfigs);
+                    }
+
+                    throw e;
+                });
+        },
         getGenieeReportData = function(paramConfig) {
             return genieeReportService.getReport(paramConfig).then(function(reportData) {
                 return getVariationsPayload(site, reportData).then(setAllConfigs);
