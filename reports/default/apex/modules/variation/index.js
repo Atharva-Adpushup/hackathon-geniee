@@ -43,12 +43,14 @@ module.exports = {
 		var channelKey = channel.pageGroup + "_" + channel.platform,
 			computedVariationsObj = {};
 
-		computedVariationsObj[channelKey] = {};
+		computedVariationsObj[channelKey] = {
+			'variations': {}
+		};
 
 		return _.reduce(computedVariationsData, function(hashMap, obj) {
 			var key = Object.keys(hashMap)[0];
 
-			hashMap[key] = extend(true, hashMap[key], obj);
+			hashMap[key].variations = extend(true, hashMap[key].variations, obj);
 			return hashMap;
 		}, computedVariationsObj);
 	}
