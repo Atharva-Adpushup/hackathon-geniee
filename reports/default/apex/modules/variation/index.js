@@ -39,7 +39,7 @@ module.exports = {
 
 		return computedData;
 	},
-	computeReportData: function(computedVariationsData) {
+	computeReportData: function(channel, computedVariationsData) {
 		var channelKey = channel.pageGroup + "_" + channel.platform,
 			computedVariationsObj = {};
 

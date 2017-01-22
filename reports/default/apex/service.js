@@ -17,7 +17,7 @@ module.exports = {
 			endDate: moment().subtract(0, 'days').valueOf()
 		}, email;
 
-		function generateRPMReport(ctrPerformanceConfig, variationData) {
+		function generateRPMReport(ctrPerformanceConfig, channel, variationData) {
 			return Promise.all(_.map(variationData, function(variationObj, variationKey) {
 				var variationRPMConfig = extend(true, {}, ctrPerformanceConfig, {
 					variationKey: variationKey
@@ -40,7 +40,7 @@ module.exports = {
 
 						return finalVariationObj;
 					});
-			})).then(variationModule.computeReportData);
+			})).then(variationModule.computeReportData.bind(null, channel));
 		}
 
 		function generateFullReport(allChannels) {
@@ -52,7 +52,7 @@ module.exports = {
 
 				return ctrPerformanceService.getReportData(ctrPerformanceConfig)
 					.then(variationModule.getMetrics)
-					.then(generateRPMReport.bind(null, ctrPerformanceConfig));
+					.then(generateRPMReport.bind(null, ctrPerformanceConfig, channel));
 			})).then(variationModule.getFinalData);
 		}
 
