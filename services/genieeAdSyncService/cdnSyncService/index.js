@@ -182,7 +182,7 @@ module.exports = function (site) {
             if (isGenieePartner) {
                 return getGenieeReportData(paramConfig);
             } else {
-                return getVariationsPayload(site).then(setAllConfigs);
+                return getReportData(paramConfig);
             }
         }),
         getFinalConfig = Promise.join(getComputedConfig, getJsFile, function (finalConfig, jsFile) {
