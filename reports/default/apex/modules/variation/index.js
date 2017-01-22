@@ -38,5 +38,18 @@ module.exports = {
 		});
 
 		return computedData;
+	},
+	computeReportData: function(computedVariationsData) {
+		var channelKey = channel.pageGroup + "_" + channel.platform,
+			computedVariationsObj = {};
+
+		computedVariationsObj[channelKey] = {};
+
+		return _.reduce(computedVariationsData, function(hashMap, obj) {
+			var key = Object.keys(hashMap)[0];
+
+			hashMap[key] = extend(true, hashMap[key], obj);
+			return hashMap;
+		}, computedVariationsObj);
 	}
 };
