@@ -41,16 +41,18 @@ module.exports = {
 	},
 	computeReportData: function(channel, computedVariationsData) {
 		var channelKey = channel.pageGroup + "_" + channel.platform,
-			computedVariationsObj = {};
+			computedVariationsObj = {
+				pageGroups: {}
+			};
 
-		computedVariationsObj[channelKey] = {
+		computedVariationsObj.pageGroups[channelKey] = {
 			'variations': {}
 		};
 
 		return _.reduce(computedVariationsData, function(hashMap, obj) {
-			var key = Object.keys(hashMap)[0];
+			var key = channelKey;
 
-			hashMap[key].variations = extend(true, hashMap[key].variations, obj);
+			hashMap.pageGroups[key].variations = extend(true, hashMap.pageGroups[key].variations, obj);
 			return hashMap;
 		}, computedVariationsObj);
 	}
