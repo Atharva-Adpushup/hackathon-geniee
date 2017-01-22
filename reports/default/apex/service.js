@@ -17,7 +17,7 @@ module.exports = {
 			endDate: moment().subtract(0, 'days').valueOf()
 		}, email;
 
-		function generateRPMReport(variationData) {
+		function generateRPMReport(ctrPerformanceConfig, variationData) {
 			return Promise.all(_.map(variationData, function(variationObj, variationKey) {
 				var variationRPMConfig = extend(true, {}, ctrPerformanceConfig, {
 					variationKey: variationKey
@@ -52,7 +52,7 @@ module.exports = {
 
 				return ctrPerformanceService.getReportData(ctrPerformanceConfig)
 					.then(variationModule.getMetrics)
-					.then(generateRPMReport);
+					.then(generateRPMReport.bind(null, ctrPerformanceConfig));
 			})).then(variationModule.getFinalData);
 		}
 
