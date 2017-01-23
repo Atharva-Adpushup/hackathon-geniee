@@ -16,7 +16,7 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 	loadInitialData = (siteId) => {
 		const deferred = $.Deferred(),
 			processData = (rawData) => {
-				const parsedData = (typeof (awData) === 'string') ? JSON.parse(rawData) : rawData,
+				const parsedData = (typeof (rawData) === 'string') ? JSON.parse(rawData) : rawData,
 					result = normalize(parsedData.channels, arrayOf(channelSchema)),
 					computedResult = $.extend(true, {}, result.entities);
 
