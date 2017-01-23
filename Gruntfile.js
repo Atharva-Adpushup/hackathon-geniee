@@ -64,5 +64,4 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('sassTask', ['sass']);
-    grunt.registerTask('jsuglify', ['uglify']);
 };
