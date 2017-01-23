@@ -1,0 +1,141 @@
+//- Onboarding template
+
+extends  layout/base
+
+block getTitle
+    - var titleVar = "Onboarding"
+
+block append headCss
+    if environment == 'production'
+        link(href="/assets/css/builds/onboarding.min.css", rel="stylesheet", type="text/css")
+    else
+        link(href="/assets/css/libs/onboarding.css", rel="stylesheet", type="text/css")
+    
+//- Load AdPushup setup script if there is no valid site
+block append headScripts
+
+    if validSites.length === 0
+
+        - unSavedSiteId = (unSavedSite) ? unSavedSite[0].siteId : null;
+        - step = 2;
+        - origUnSavedDomain = (unSavedSite) ? unSavedSite[0].domain : null;
+        - domanizedUrl = (origUnSavedDomain) ? utils.domanize(origUnSavedDomain) : null;
+
+        //- Setup Adpushup site addition config
+        script.
+            $('document').ready(function() {
+                adpushup.newSite = {
+                    viewObjects: {
+                        domanizedUrl: '!{domanizedUrl}',
+                        unSavedSiteId: '!{unSavedSiteId}',
+                        origUnSavedDomain: '!{origUnSavedDomain}'
+                    },
+                    totalSteps: 6,
+                    defaultStep: '!{step}',
+                    addOtherSite: false,
+                    showIntro: false
+                };
+            });
+
+        if environment == 'production'
+            +loadAsset("js", [
+                '/assets/js/builds/adpushup-onboarding.min.js'
+            ]) 
+        else
+            +loadAsset("js", [
+                '/assets/js/libs/custom/adpushup-onboarding.js'
+            ])         
+    else 
+
+        if validSites[0].step <= 5
+        
+            //- Setup Adpushup site addition config
+            script.
+                $('document').ready(function() {
+                    var step = !{validSites[0].step} + 1;
+                     adpushup.newSite = {
+                        viewObjects: {
+                            domanizedUrl: '!{domanizedUrl}',
+                            unSavedSiteId: '!{unSavedSiteId}',
+                            origUnSavedDomain: '!{origUnSavedDomain}'
+                        },
+                        addedSite: {
+                            domain: '!{validSites[0].domain}',
+                            siteId: '!{validSites[0].siteId}'
+                        },
+                        totalSteps: 6,
+                        defaultStep: step,
+                        addOtherSite: false
+                    };
+                });
+
+            if environment == 'production'
+                +loadAsset("js", [
+                    '/assets/js/builds/adpushup-onboarding.min.js'
+                ])
+            else
+                +loadAsset("js", [
+                    '/assets/js/libs/custom/adpushup-onboarding.js'
+                ])
+                
+block bodyContent
+    .pageContainer.page-container
+        if isSuperUser || unSavedSiteId
+            - superUserOnboarding = true;
+        else
+            - superUserOnboarding = false;
+        include layout/header
+        // Page Content Starts Here
+        .pageContentWrapper.page-content
+            .pageContentInner.page-content--inner
+                    .notification-wrapper
+                    // Control v/s Adpushp Starts here
+                    #widgetsArea.row
+                        
+                        if validSites.length > 0
+                            if isSuperUser
+                                if hasStep
+                                    if validSites[0].step >= 6
+                                        include layout/dashboardSites
+                                    else
+                                        include layout/adPushupSetup
+                                else
+                                    include layout/dashboardSites
+
+                            else
+                                if hasStep
+                                    if validSites[0].step >= 6
+                                        include layout/dashboardSites
+                                    else 
+                                        include layout/adPushupSetup
+                                else
+                                    if validSites.length > 0
+                                        include layout/dashboardSites
+                                    else 
+                                        .onboarding-wrapper
+                                            .onboarding-step.active-step.ob-ty
+                                                h3(class="ob-heading") Thank you for signing up with AdPushup
+                                                div(class="ob-content")
+                                                    p.text-center.text-medium
+                                                        | We are a 
+                                                        strong Google AdSense certified partner 
+                                                        | and backed by 
+                                                        strong Microsoft Ventures.
+                                                        br
+                                                        br
+                                                        | We're currently in beta and seeing great success so far with 
+                                                        | strong average RPM/eCPM uplifts of greater than 70 percent on participating website, without compromising on the user experience. 
+                                                        | However, this is a closed beta program and we're on-boarding select few users, using assisted setups.
+                                                        br
+                                                        br
+                                                        | Please check your email and suggest a suitable time for a 
+                                                        | strong 15 minute 
+                                                        | screen share. During this session, we will install AdPushup on your website and show you how to use AdPushup.
+                                                        br
+                                                        br
+                                                        | You can also contact us at 
+                                                        a(href="mailto:support@adpushup.com") support@adpushup.com
+                            
+                        else
+                            include layout/adPushupSetup
+    

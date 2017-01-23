@@ -72,7 +72,7 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 	},
 
 	masterSave = (data) =>
-		 save('/data/saveData', {
+		save('/data/saveData', {
 			data: JSON.stringify(data)
 		})
 	;

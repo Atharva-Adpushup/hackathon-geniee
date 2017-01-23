@@ -2,44 +2,133 @@
 
 - link = domanized ? '- '+domanized : '';
 - noSitePresentAlertStr = (domanizedUrl && domanizedUrl.length > 0) ? domanizedUrl : "one";
-- addSiteTemplateStr = "<div id='alert--noSitePresent' data-site='" + origUnSavedDomain + "' data-toggle='modal' data-target=''><button id='addUserSite' class='btn-st apbtn-main'>Lets add <span style='cursor: pointer;'>" + noSitePresentAlertStr +" ?</span></button></div> ";
+- addSiteTemplateStr = "<div id='alert--noSitePresent' data-site='" + origUnSavedDomain + "' data-toggle='modal' data-target=''><button id='addUserSite' class='btn-st apbtn-main ob-btn add-user-site'>Start with <span style='cursor: pointer;'>" + noSitePresentAlertStr +"</span></button><span id='add-another-site' style='cursor:pointer;'>Select Another</a></span></div> ";
+- addSiteAnotherSiteTemplate = "<div id='alert--noSitePresent' data-site='" + origUnSavedDomain + "' data-toggle='modal' data-target='' style='padding-top: 15px; font-size: 15px;'>Or, <span class='ob-add-another-site-original add-user-site'>Start with <span style='cursor: pointer;'>" + noSitePresentAlertStr +"</span></span></div> ";
+- name = currentUser.name;
 
 //- Intro modal
 #intromodal.modal._ap_modal.fade.intro-modal(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
-    .modal-dialog
+    .modal-dialog.modal-lg.wd-80(data-backdrop="static", data-keyboard="false")
         .modal-content
-            .pull-right
-                button.close(type='button', data-dismiss='modal', aria-label='Close')
-                    span(aria-hidden='true') ×
+            if addOtherSite
+                .pull-right
+                    button.close(type='button')
+                        a(href='/user/dashboard')
+                            span(aria-hidden='true') ×
             .text-center
                 h2 Welcome to AdPushup!
-                p
-                    | AdPushup lets you Maximize Your Ad Revenue With The Power Of Ad Layout Optimization.
-                img.img-responsive(src="/assets/images/intro_graphic.png")
-                p
-                    | AdPushup’s ad layout optimization technology will help you increase the viewability of your existing website ads without affecting visitor experience.
-                .row
-                    .col-sm-4.col-sm-offset-4
-                        button.apbtn-main(type='button', data-dismiss='modal', aria-label='Close') Get Started
+                .row.intro-modal-row
+                    .col-md-5.intro-modal-img
+                        img(src="/assets/images/intro_graphic.png")
+                    .col-md-7.intro-modal-content
+                        h3
+                            | Please select the product(s) you want to use
+                        hr
+                        form(id="onboarding-services-form").text-left
+                            .form-group
+                                input.checkbox-custom(type="checkbox", name="only-adsense")
+                                label(for="only-adsense")
+                                    span.ccheckbox Ad Layout Optimization for Google AdSense
+                            .form-group
+                                input.checkbox-custom(type="checkbox", name="other-networks")
+                                label(for="other-networks")
+                                    span.ccheckbox Ad Layout Optimization for Other Ad Networks/Servers
+                            .form-group
+                                input.checkbox-custom(type="checkbox", name="header-bidding")
+                                label(for="header-bidding")
+                                    span.ccheckbox Header Bidding Optimization
+                            .form-group(style="margin: 15px 0 10px 0;")
+                                p Preferred way to reach you
+                                .col-md-3.pd-0
+                                    select.form-control.input-lg#pwc(style="font-size: 16px;", name="pwc")
+                                        option(value="skype") Skype
+                                        option(value="hangout") Hangout
+                                        option(value="email") Email
+                                        option(value="phone") Phone
+                                .col-md-9.pd-0
+                                    input.form-control.input-lg#pwc-value(type="text", style="height: 46px; font-size: 16px;")
+                                div(style="clear:both;")
+                            input.apbtn-main(type='submit', value="Proceed", style="margin-top: 10px", data-unsaved-domain=origUnSavedDomain)
+                            .error-message-box
+
+if addOtherSite
+    //- Another Site Modal
+    #addOtherSiteModal.modal._ap_modal.fade.intro-modal(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+        .modal-dialog.modal-lg.wd-60(data-backdrop="static", data-keyboard="false")
+            .modal-content
+                .pull-right
+                    button.close(type='button')
+                        a(href='/user/dashboard')
+                            span(aria-hidden='true') ×
+                .text-center
+                    //- h2 Welcome to AdPushup!
+                    .row#add-other-site-modal-content
+                        .col-md-12
+                            h3
+                                | Please enter website and services
+                            hr
+                            form.text-left#onboarding-inner-services-form
+                                .form-group
+                                    input.input-lg#add-other-site(type="url", name="userWebsite", placeholder="Enter your site", required) 
+                                .form-group
+                                    input.checkbox-custom(type="checkbox", name="only-adsense")
+                                    label(for="only-adsense")
+                                        span.ccheckbox Ad Layout Optimization for Google AdSense
+                                .form-group
+                                    input.checkbox-custom(type="checkbox", name="other-networks")
+                                    label(for="other-networks")
+                                        span.ccheckbox Ad Layout Optimization for Other Ad Networks/Servers
+                                .form-group
+                                    input.checkbox-custom(type="checkbox", name="header-bidding")
+                                    label(for="header-bidding")
+                                        span.ccheckbox Header Bidding
+                                input.apbtn-main(type='submit', value="Proceed", style="margin-top: 10px", data-unsaved-domain=origUnSavedDomain)
+                                .error-message-box
 
 //- Setup completion modal
 #completionmodal.modal._ap_modal.fade.intro-modal(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
-    .modal-dialog
-        .modal-content
-            .pull-right
-                button.close(type='button', data-dismiss='modal', aria-label='Close')
-                    span(aria-hidden='true') ×
-            .text-center
-                h2 Your setup is complete!
-                p
-                    | Our advisors will get in touch with you soon.
-                img.img-responsive(src="/assets/images/completion_graphic.png")
-                p
-                    | You can also contact us at 
-                    a.link-primary(href="mailto:support@adpushup.com") support@adpushup.com
-                .row
-                    .col-sm-4.col-sm-offset-4
-                        a.apbtn-main(href="/user/dashboard", type='button') Go to Dashboard
+    .modal-dialog.wd-60.text-center(style="max-width: 500px; min-width: 500px; overflow: hidden;")
+        .pricing-box-header Pricing Plan: 9% Ad Revenue Share
+        .modal-content.pd-0(style="padding: 0px;")
+            .col-md-12.pricing-modal-content.pd-0
+                .pricing-box.pd-0
+                    .pricing-box-content
+                        ul
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Google AdSense Policy Compliance
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Dedicated Account Manager
+                            li
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Ad Layout &amp; In-content Optimization
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Visual Ad Managment
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Intelligent Page-level Learning Engine
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Advanced Analytics and Reporting
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Advanced Ad Delivery Optimization
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Custom Code Support
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Segmentation &amp; Personalization
+                            li 
+                                i(class="fa fa-check",aria-hidden="true") 
+                                |  Support (Phone, Email, Chat)
+                        .row.pricing-box-btn
+                            a.apbtn-main(href="#", type='button', data-dismiss='modal', aria-label='Close', style="padding: 12px 0;") Proceed
+            .div(style="clear:both")
+        .div(style="clear:both")
+
 
 //- Send Code to Developer Modal
 #sendToDevModal.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
@@ -69,55 +158,164 @@ div.detectap-alert.text-center#apdetect
 .onboarding-wrapper
  
     //- Site addition + platform detection
-    .onboarding-step#step1 
+    .onboarding-step#step2
         span(class="counter-icon")
-            | 1 
-        h3(class="ob-heading")
-            | Add your site 
-            span.link !{link } 
-            i#step1-check.fa
-        div(class="ob-content")
-            p.text-medium.text-center
-                |  Let’s add your website here. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis, fugiat at dolor officia! Error optio architecto voluptatem nulla, impedit facilis quos? 
+            | 1
+        div.col-md-5
+            img.wd-90(src="/assets/images/ob_add_site.png")
+        div.col-md-7(class="ob-content")
+            h3(class="ob-heading")
+                | Add Site 
+                span.link !{link } 
+                i#step2-check.fa &nbsp;
+            p
+                | Let us know the website on which you want to use AdPushup. If you have more than one site then you can easily add them later through the dashboard. 
             if unSavedSite
                 div#addSiteStr
                     != addSiteTemplateStr
             else
+                p
                 div#addSiteAlt
                     div#addSiteStr
+
+            div#another-site-box
+                form.form-inline#another-site-form
+                    input.input-lg#another-site-input(type='url', required, placeholder='http://www.example.com')
+                    button.btn.btn-lg#add-another-site-submit Add Site
+                if unSavedSite
+                    div#addSiteStr
+                        != addSiteAnotherSiteTemplate
 
             p.text-medium.text-center#cms-text 
             #cms-res            
 
     //- Adpushup detection
-    .onboarding-step.ob-apver#step2
+    .onboarding-step.ob-apver#step3
         span(class="counter-icon")
             | 2
-        h3(class="ob-heading")
-            | Install and verify Adpushup on your website 
-            i#step2-check.fa
-        div(class="ob-content")
-            p.text-medium.text-center
-                | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio cupiditate, ea, ut numquam ad vel odit dicta blanditiis.
+        div.col-md-5
+            img.wd-90(src="/assets/images/ob_ap_code_verify.png")
+        div.col-md-7(class="ob-content")
+            h3(class="ob-heading")
+                | Install AdPushup code on website 
+                i#step3-check.fa &nbsp;
+            p
+                | For AdPushup to start optimizing your website, copy-paste the following parent code in the &lt;HEAD&gt; tag of the website selected in the previous step.
+                if isSuperUser
+                    span#skip-ap-verification &nbsp;Skip Step
             #platformVerificationContent
 
     //- Grant adsense oauth access
-    .onboarding-step#step3
+    .onboarding-step#step4
         span(class="counter-icon")
             | 3
-        h3(class="ob-heading")
-            | Connect Adsense Account 
-            i#step3-check.fa
-        div(class="ob-content")
-            p.text-medium.text-center
+        div.col-md-5
+            img.wd-90(src="/assets/images/ob_gads_acc.png")
+        div.col-md-7(class="ob-content")
+            h3(class="ob-heading", style="font-weight: bold;")
+                | Setup Performance Tracking and Reporting
+                i#step4-check.fa &nbsp;
+            p
                |  Connecting your Google AdSense account will allow AdPushup to pull AdSense reports and generate more detailed reporting for comparison with AdPushup’s set-up.
             br
-            .row
-                .col-sm-4.col-sm-offset-4
-                    button(id="adsenseoauth", class="apbtn-main apbtn-icon")
-                        i.fa.fa-google
-                        | Connect Google AdSense            
-            .small.text-center.small-text#skipOauth Don't have an AdSense account ? 
-                a Skip 
-                | this step.
+            .row(style="padding-left: 34px;")
+                button(id="adsenseoauth", class="apbtn-main apbtn-icon ap-adsense-connect-btn")
+                    i.fa.fa-google
+                    | Connect Google AdSense
+            if isSuperUser
+                .small.text-center.small-text#skipOauth Don't have an AdSense account ? 
+                    a Skip 
+                    | this step.
+
+    //- Grant non-admin access
+    .onboarding-step#step5
+        span(class="counter-icon")
+            | 4
+        div.col-md-5
+            img.wd-90(src="/assets/images/ob_non_admin.png")
+        div.col-md-7(class="ob-content")
+            h3(class="ob-heading")
+                | Adding a Non Admin User
+                i#step5-check.fa &nbsp;
+            p
+               |  Your dedicated AdPushup account manager requires a “Standard User” (non-admin) access to your Google AdSense account to create, manage and actively optimize your ad layouts.
+               |  To add a user -
+            p(style="padding-top: 10px;")
+                b Go to AdSense account > Settings >  Access & Authorization > User Management > *Email* > Invite
+            p#non-admin-email(style="padding-top: 5px;") *Email* - yourwebsitename@adpushup.com
+            .row(style="padding-left: 36px;")
+                button(id="non-admin-access", class="apbtn-main apbtn-icon adsensenonadmin")
+                    | Proceed
+
+
+    //- Passback
+    .onboarding-step#step6
+        span(class="counter-icon")
+            | 5
+        div.col-md-5
+            img.wd-90(src="/assets/images/ob_code_coversion.png")
+        div.col-md-7(class="ob-content")
+            h3(class="ob-heading")
+                | Setup Passback 
+                i#step6-check.fa &nbsp;
+            p
+                | Use the widget below to convert all of your current ad codes into AdPushup ad codes.
+                br
+                | Copy paste your existing ad codes one by one into the box then click on convert
+                div.snippet-wrapper.code-convert-wrapper
+                    span.clipboard-copy Copied !
+                    textarea.snippet#code-conversion-box(placeholder="Enter Passback/Control Ad code here")
+
+            //-    |  To enable Adpushup to serve ads using your Adsense account, replace your Adsense ad code with
+            //-    |  Adpushup's ad code. For every Adsense banner running on the website, replace Google Adsense ad code with
+            //-    |  newly generated Adpushup ad code.
+            .row.code-conversion-btns(style="padding-top: 5px;")
+                button(id="code-conversion-button", class="apbtn-main apbtn-icon")
+                    | Convert
+                button(id="code-conversion-finish", class="apbtn-main apbtn-icon")
+                    | Finish
             #dsBLink
+
+    //- if enviroment == "development"
+    //- div(class="intercom-launcher")
+script(type="text/javascript").
+    var analyticsObj = '!{analyticsObj}',
+        intercomToSegmentObj = intercomObj || null;
+    if(analyticsObj) {
+        var jadeAnalyticsObj = JSON.parse(analyticsObj);
+        jadeAnalyticsObj.stage = 'Pre Onboarding';
+       adpushupAnalyticsEvents.emit('analyticsAlias', {
+            email: window.currentUser.email
+        });
+        adpushupAnalyticsEvents.emit('analyticsIdentify', {
+            email: window.currentUser.email,
+            analytics: jadeAnalyticsObj,
+            intercom: intercomToSegmentObj
+        });
+        adpushupAnalyticsEvents.emit('analyticsTrack', {
+            eventName: 'Pre Onboarding',
+            obj: {
+                name: window.currentUser.firstName,
+                email: window.currentUser.email,
+                value: true
+            },
+            intercom: intercomToSegmentObj
+        });
+    } else {
+        adpushupAnalyticsEvents.emit('analyticsIdentify', {
+            email: window.currentUser.email, 
+            analytics: {
+                name: window.currentUser.firstName,
+                email: window.currentUser.email
+            }, 
+            intercom: intercomToSegmentObj
+        });
+        //- adpushupAnalyticsEvents.emit('analyticsTrack', {
+        //-         eventName: 'App-signup-first-stage', 
+        //-         obj: {
+        //-             name: window.currentUser.firstName,
+        //-             email: window.currentUser.email
+        //-         }, 
+        //-         intercom: intercom
+        //- });            
+    }
