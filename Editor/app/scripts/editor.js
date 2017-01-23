@@ -19,7 +19,7 @@ const initComponents = (store) => {
 				const store = configureStore(initialData);
 
 				// Initiate unloadHandler
-				window.onbeforeunload = unloadHandler(store);
+				window.onbeforeunload = unloadHandler;
 
 				// Initiate Postmessage Listener
 				initMessageHandler(store);
