@@ -736,30 +736,22 @@ $('document').ready(function () {
             // Site addition modal inside dashboard
             addOtherSiteFromDashboard: function (selectedServices, site, url) {
                 var ob = this,
-                    errorBox = $("#addOtherSiteModal .error-message-box");
-                if (selectedServices.length > 1) {
-                    ob.anotherSiteModalOpen();
-                } else {
-                    var response = ob.addSite(site, url, null, true);
-                    if (response) {
-                        $('#addOtherSiteModal').modal('hide');
-                        $('#apdetect').fadeOut();
-                        ob.nextStep(3, 2, 1000);
+                    errorBox = $("#addOtherSiteModal .error-message-box"),
+                    response = ob.addSite(site, url, null, true);
+                if (response) {
+                    if (selectedServices.length > 1) {
+                        ob.anotherSiteModalOpen();
+                    } else {
+                        if (selectedServices[0] == 'only-adsense') {
+                            $('#addOtherSiteModal').modal('hide');
+                            $('#apdetect').fadeOut();
+                            ob.nextStep(3, 2, 1000);
+                        } else {
+                            ob.anotherSiteModalOpen();
+                        }
                     }
-                    // else if (selectedServices.length == 1) {
-                    //     if (selectedServices[0] == 'only-adsense') {
-                    //         var response = ob.addSite(url, site, null, true);
-                    //         if (response) {
-                    //             $('#addOtherSiteModal').modal('hide');
-                    //             $('#apdetect').fadeOut();
-                    //             ob.nextStep(3, 2, 1000);
-                    //         } else {
-                    //             errorBox.html('Site already added. Please enter another site');
-                    //         }
-                    //     } else {
-                    //         ob.anotherSiteModalOpen();
-                    //     }
-                    // }
+                } else {
+                    errorBox.html('Site already added. Please enter another site');
                 }
             },
             // Skipping ap verficiation
