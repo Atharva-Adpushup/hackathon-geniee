@@ -79,6 +79,9 @@ class Section extends React.Component {
 	}
 
 	renderSection(props = this.props) {
+		if(!this.node) {
+			return false;
+		}
 		const css = Object.assign({}, { position: 'relative', clear: 'both', pointerEvents: 'none', width: '100%', }, { height: this.getMaxDimensions().clientHeight, width: this.getMaxDimensions().clientWidth }, props.ads[0].css);
 		this.$node.css(css);
 		ReactDOM.render(<div className="_ap_reject">
