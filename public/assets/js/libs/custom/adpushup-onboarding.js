@@ -746,7 +746,7 @@ $('document').ready(function() {
                     ob.anotherSiteModalOpen();
                 } else if (selectedServices.length == 1) {
                     if (selectedServices[0] == 'only-adsense') {
-                        var response = ob.addSite(url, site, null, true);
+                        var response = ob.addSite(site, url, null, true);
                         if(response) {
                             $('#addOtherSiteModal').modal('hide');
                             $('#apdetect').fadeOut();
