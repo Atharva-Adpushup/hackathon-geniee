@@ -33,7 +33,7 @@ html(lang="en")
                     - var baseLibsFinalStr = (environment == "production") ? (baseLibsStr + "base-libs.min.js") : ("/assets/js/libs/custom/base-libs.js");
                     +loadAsset("js", [baseLibsFinalStr])
 
-                    if environment == "development"
+                    if environment == "production"
                         script(type='text/javascript').
                             var currentUser = !{JSON.stringify(currentUser)};
                             var sites = (Object.keys(currentUser).length > 0) ? currentUser.sites : [];
@@ -75,7 +75,7 @@ html(lang="en")
                             }();
                             window.overrideTrackers();
     body
-        if environment == "development"
+        if environment == "production"
             block analyticsIdentify
                 // Intercom user secure mode Hash
                 - intercomHash = utils.getHmacSHA256(currentUser.email, consts.analytics["INTERCOM_ID"]);

@@ -174,7 +174,7 @@ block bodyContent
 			- user = user || {};
 			// Intercom user secure mode Hash
 			- intercomHash = utils.getHmacSHA256(user.email, consts.analytics["INTERCOM_ID"]);
-			if environment == "development"
+			if environment == "production"
 				script(type="text/javascript").
 					var intercomHash = '#{intercomHash}',
 						intercomObj = {
