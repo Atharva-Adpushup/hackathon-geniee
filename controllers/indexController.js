@@ -202,15 +202,17 @@ function thankYouRedirection(page, req, res) {
 	var analyticsObj = req.session.analyticsObj ? req.session.analyticsObj : null,
 		firstName = req.session.tempObj && req.session.tempObj.firstName ? req.session.tempObj.firstName : null,
 		email = req.session.tempObj && req.session.tempObj.email ? req.session.tempObj.email : null,
-		stage = req.session.stage ? req.session.stage : null;
-	userObj = {
-		name: firstName,
-		email: email,
-		stage: stage
-	};
+		stage = req.session.stage ? req.session.stage : null,
+		requestDemo = (req.session.user && req.session.user.requestDemo) ? req.session.user.requestDemo : true,
+		userObj = {
+			name: firstName,
+			email: email,
+			stage: stage
+		};
 	return res.render(page, {
 		user: userObj,
-		analytics: analyticsObj
+		analytics: analyticsObj,
+		requestDemo: requestDemo
 	});
 }
 
