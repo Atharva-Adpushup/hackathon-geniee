@@ -26,6 +26,14 @@ const messenger = new Messenger(),
 					dispatch(showEditMenu(data.sectionId, data.adId, data.position, data.variationId));
 					break;
 
+				case messengerCommands.SET_RELEVANT_XPATHS:
+					dispatch({ type: messengerCommands.SET_RELEVANT_XPATHS, sectionId: data.sectionId, allXpaths: data.allXpaths });
+					break;
+				
+				case messengerCommands.XPATH_VALIDATED:
+					dispatch({ type: messengerCommands.XPATH_VALIDATED, sectionId: data.sectionId, isValidXPath: data.isValidXPath, xpath: data.xpath });
+					break;
+
 				case messengerCommands.CM_FRAMELOAD_SUCCESS:
 					dispatch(openChannelSuccess(data.channelId));
 					break;
@@ -47,11 +55,11 @@ const messenger = new Messenger(),
 					break;
 
 				case messengerCommands.SECTION_ALL_XPATHS:
-					this.flux.actions.updateSection(data);
+					// this.flux.actions.updateSection(data);
 					break;
 
 				case messengerCommands.SECTION_XPATH_MISSING:
-					this.flux.actions.updateSection({ id: data.id, xpathMissing: true });
+					// this.flux.actions.updateSection({ id: data.id, xpathMissing: true });
 					break;
 
 				default:

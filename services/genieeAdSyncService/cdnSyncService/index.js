@@ -4,15 +4,17 @@ var path = require('path'),
     _ = require('lodash'),
 	moment = require('moment'),
     PromiseFtp = require('promise-ftp'),
-    genieeReportService = require('../../../reports/service'),
+    genieeReportService = require('../../../reports/partners/geniee/service'),
+	apexVariationReportService = require('../../../reports/default/apex/service'),
     ftp = new PromiseFtp(),
     mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
     fs = Promise.promisifyAll(require('fs')),
+	AdPushupError = require('../../../helpers/AdPushupError'),
     CC = require('../../../configs/commonConsts'),
     config = require('../../../configs/config');
 
 module.exports = function (site) {
-    var jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'genieeAp.js'),
+    var jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.js'),
         tempDestPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'geniee', site.get('siteId').toString()),
         isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
         isGenieePartner = (!!(site.get('partner') && (site.get('partner') === CC.partners.geniee.name) && site.get('genieeMediaId') && isAutoOptimise)),
@@ -22,7 +24,6 @@ module.exports = function (site) {
 			dateFrom: moment().subtract(31, 'days').format('YYYY-MM-DD'),
 			dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
 		},
-        getReportsData = genieeReportService.getReport(paramConfig),
         getAdsPayload = function (variationSections) {
             var ads = [], ad = null, json, unsyncedAds = false;
             _.each(variationSections, function (section, sectionId) {
@@ -72,15 +73,24 @@ module.exports = function (site) {
 
             return site.getAllChannels().then(function (allChannels) {
                 _.each(allChannels, function (channel) {
-                    var platform, pageGroup, pageGroupData;
-                    
-                    // sample name HOME_DESKTOP
+                    var platform, pageGroup, channelKey, pageGroupData,
+                        pageGroupId, isReportData, isGenieeReportData;
+
                     platform = channel.platform; // last element is platform
                     pageGroup = channel.pageGroup; // join remaing to form pageGroup
+                    // channelKey sample name HOME_DESKTOP
+                    channelKey = pageGroup + '_' + platform;
+                    isReportData = !!(reportData && _.isObject(reportData));
+                    isGenieeReportData = !!(isReportData && channel.genieePageGroupId);
 
-                    if (reportData && _.isObject(reportData) && channel.genieePageGroupId) {
-                        pageGroupData = reportData.pageGroups[channel.genieePageGroupId];
+                    //TODO: Move below partner specific logic in universal app service
+                    if (isGenieeReportData) {
+                        pageGroupId = channel.genieePageGroupId;
+                    } else if (isReportData) {
+                        pageGroupId = channelKey;
                     }
+
+                    pageGroupData = reportData.pageGroups[pageGroupId];
 
                     if (!finalJson[platform]) {
                         finalJson[platform] = {};
@@ -132,22 +142,47 @@ module.exports = function (site) {
 
             isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
             apConfigs.autoOptimise = (isAutoOptimise ? true : false);
-
-            /* Temp Fields */
-            apConfigs.mode = 1;
-            //apConfigs.pageGroupPattern = [{ HOME: 'components' }];
-            /* Temp Fields End */
+            // Default 'draft' mode is selected if config mode is not present
+            apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
             apConfigs.experiment = allVariations;
             return apConfigs;
         },
         getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
+        getReportData = function(paramConfig) {
+            return apexVariationReportService.getReportData(paramConfig.siteId)
+                .then(function(reportData) {
+                    return getVariationsPayload(site, reportData).then(setAllConfigs);
+                }).catch(function(e) {
+                    /**********NOTE: SPECIAL CONDITION (APEX REPORTS)**********/
+                    // Only return variations payload without apex reports data when
+                    // Apex reports return an empty report for any variation
+                    // & consequently throws below exception message
+                    if (e && (e instanceof AdPushupError) && e.message && e.message === CC.exceptions.str.apexServiceDataEmpty) {
+                        return getVariationsPayload(site).then(setAllConfigs);
+                    }
+
+                    throw e;
+                });
+        },
+        getGenieeReportData = function(paramConfig) {
+            return genieeReportService.getReport(paramConfig).then(function(reportData) {
+                return getVariationsPayload(site, reportData).then(setAllConfigs);
+            }).catch(function(e) {
+                /**********NOTE: SPECIAL CONDITION (GENIEE REPORTS)**********/
+                // Only return variations payload without geniee reports data when
+                // Geniee reports return an empty Array [] & consequently throws below exception message
+                if (e && (e instanceof AdPushupError) && e.message && e.message === CC.partners.geniee.exceptions.str.zonesEmpty) {
+                    return getVariationsPayload(site).then(setAllConfigs);
+                }
+
+                throw e;
+            });
+        },
         getComputedConfig = Promise.resolve(true).then(function() {
             if (isGenieePartner) {
-                return getReportsData.then(function(reportData) {
-                    return getVariationsPayload(site, reportData).then(setAllConfigs);
-                });
+                return getGenieeReportData(paramConfig);
             } else {
-                return getVariationsPayload(site).then(setAllConfigs);
+                return getReportData(paramConfig);
             }
         }),
         getFinalConfig = Promise.join(getComputedConfig, getJsFile, function (finalConfig, jsFile) {

@@ -5,17 +5,18 @@ import _ from 'lodash';
 
 const highLighterClass = '_APD_highlighter',
 	adBoxSizeStyles = {
-		background: '#eb575c !important',
-		borderRadius: '3px !important',
-		color: '#fff !important',
-		fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif !important",
-		fontSize: '12px !important',
-		fontWeight: '400 !important',
-		left: '5px !important',
-		padding: '4px !important',
-		position: 'absolute !important',
-		top: '5px !important',
-		pointerEvents: 'none'
+		background: '#eb575c',
+		borderRadius: '3px',
+		color: '#fff',
+		fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+		fontSize: '12px',
+		fontWeight: '400',
+		left: '5px',
+		padding: '4px',
+		position: 'absolute',
+		top: '5px',
+		pointerEvents: 'none',
+		lineHeight: '20px'
 	},
 	listStyle = {
 		position: 'absolute',
@@ -45,7 +46,7 @@ const highLighterClass = '_APD_highlighter',
 			height,
 			pointerEvents: 'auto',
 			position: 'relative'
-		}, css);
+		});
 
 		return (
 			<div style={listStyle}>

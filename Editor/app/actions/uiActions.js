@@ -1,4 +1,4 @@
-import { editMenuActions, insertMenuActions, newChannelMenuActions, siteModesPopoverActions, channelMenuActions } from '../consts/commonConsts';
+import { editMenuActions, insertMenuActions, newChannelMenuActions, siteModesPopoverActions, channelMenuActions, uiActions, status } from '../consts/commonConsts';
 
 const showEditMenu = (sectionId, adId, position, variationId) => ({ type: editMenuActions.SHOW_EDIT_MENU, sectionId, adId, position, variationId }),
 	hideEditMenu = () => ({ type: editMenuActions.HIDE_EDIT_MENU }),
@@ -9,8 +9,10 @@ const showEditMenu = (sectionId, adId, position, variationId) => ({ type: editMe
 	showNewChannelMenu = (position) => ({ type: newChannelMenuActions.SHOW_NEW_CHANNEL_MENU, position }),
 	showSiteModesPopover = (position) => ({ type: siteModesPopoverActions.SHOW_SITE_MODES_POPOVER, position }),
 	hideSiteModesPopover = () => ({ type: siteModesPopoverActions.HIDE_SITE_MODES_POPOVER }),
+	resetErrors = () => ({ type: uiActions.RESET_ERRORS }),
+	resetAfterSaveModal = () => ({ type: uiActions.UPDATE_AFTER_SAVE_STATUS, status: status.RESET }),
 	hideNewChannelInsertMenu = () => ({ type: newChannelMenuActions.HIDE_NEW_CHANNEL_MENU });
 
 export { showEditMenu, showInsertMenu, hideEditMenu, hideInsertMenu,
 	showNewChannelMenu, hideNewChannelInsertMenu, showSiteModesPopover,
-	hideSiteModesPopover, showChannelMenu, hideChannelMenu };
+	hideSiteModesPopover, showChannelMenu, hideChannelMenu, resetErrors, resetAfterSaveModal };

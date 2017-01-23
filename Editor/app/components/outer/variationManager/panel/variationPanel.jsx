@@ -9,14 +9,14 @@ import BeforeAfterJsPanel from './beforeAfterJsPanel';
 
 class VariationPanel extends React.Component {
 	render() {
-		const { variation, channelId, sections } = this.props;
+		const { variation, channelId, sections, ui } = this.props;
 		return (<div className="variation-settings">
 			<TabPanel tabPosition="left">
 				<div tabTitle="Info">
 					<VariationOptions channelId={channelId} variation={variation} />
 				</div>
 				<div tabTitle="Sections">
-					<VariationSections variation={variation} sections={sections} />
+					<VariationSections variation={variation} sections={sections} ui={ui} />
 				</div>
 				<div tabTitle="Add Incontent Variation">
 					<IncontentAdder activeChannel={this.props.activeChannel} channelId={channelId} variation={variation} />

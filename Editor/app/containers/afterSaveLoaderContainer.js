@@ -1,14 +1,14 @@
 import { connect } from 'react-redux';
 import AfterSaveModal from 'channelManager/afterSaveModal.jsx';
-import { getAfterSaveLoaderState } from '../selectors/siteSelectors';
-import { afterSaveLoaderStatusReset } from 'actions/siteActions';
+import { resetAfterSaveModal } from 'actions/uiActions';
+import { getAfterSaveLoaderState } from '../selectors/uiSelectors';
 
 const mapStateToProps = (state) => ({
 		status: getAfterSaveLoaderState(state)
 	}),
 	mapDispatchToProps = (dispatch) => ({
 		closeModal: () => {
-			dispatch(afterSaveLoaderStatusReset());
+			dispatch(resetAfterSaveModal());
 		}
 	}),
 

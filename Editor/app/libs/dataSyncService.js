@@ -19,7 +19,6 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 				const parsedData = (typeof (awData) === 'string') ? JSON.parse(rawData) : rawData,
 					result = normalize(parsedData.channels, arrayOf(channelSchema)),
 					computedResult = $.extend(true, {}, result.entities);
-				let activeChannel;
 
 				computedResult.site = {
 					modeStatus: {

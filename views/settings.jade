@@ -97,7 +97,7 @@ block bodyContent
                                             .col-sm-5
                                                 .input-name Heart Beat Min Interval
                                             .col-sm-7
-                                                input.form-control(value=(apConfigs.heartBeatMinInterval ? apConfigs.heartBeatMinInterval : 30000) name="heartBeatMinInterval" type="number" placeholder="Enter Heart Beat Min Interval")
+                                                input.form-control(value=(apConfigs.heartBeatMinInterval ? apConfigs.heartBeatMinInterval : 3000) name="heartBeatMinInterval" type="number" placeholder="Enter Heart Beat Min Interval")
                                         .row
                                             .col-sm-5
                                                 .input-name Heart Beat Start Delay
@@ -115,19 +115,18 @@ block bodyContent
                                                 input(type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "true") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "true"))
                                         .row
                                             .col-sm-12#autoOptimiseErr.error-message
-                                        if !partner
-                                            .row
-                                                .col-sm-12
-                                                    h4 Manage Blocklist
-                                                .col-sm-12
-                                                    .row
-                                                        .col-sm-9
-                                                            input#blocklistItem.form-control(name="blocklistItem" type="text" placeholder="Enter Url or pattern to block")
-                                                        .col-sm-3
-                                                            button#addBlocklistItem.btn-primary(type="button") Add to blocklist
-                                                    .row
-                                                        div#blocklistErr.error-message(style="margin: 5px 15px 20px;")
-                                                        ul.blocklist
+                                        .row
+                                            .col-sm-12
+                                                h4 Manage Blocklist
+                                            .col-sm-12
+                                                .row
+                                                    .col-sm-9
+                                                        input#blocklistItem.form-control(name="blocklistItem" type="text" placeholder="Enter Url or pattern to block")
+                                                    .col-sm-3
+                                                        button#addBlocklistItem.btn-primary(type="button") Add to blocklist
+                                                .row
+                                                    div#blocklistErr.error-message(style="margin: 5px 15px 20px;")
+                                                    ul.blocklist
 
                                 hr
                                 .row.settings-btn-pane

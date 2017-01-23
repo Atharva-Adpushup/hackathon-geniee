@@ -18,3 +18,44 @@ button {
     box-shadow: none;
     border: none;
 }
+
+.inline-dropdown-wrapper {
+    position: relative;
+    
+    button {
+        position: absolute;
+        right: -15px;
+        width: 15px;
+        padding: 0;
+        border-radius: 0 3px 3px 0;
+        color: #fff;
+        background-color: #999;
+    }
+}
+
+.inline-dropdown {
+    list-style: none;
+    position: absolute;
+    top: -2px;
+    z-index: 1000;
+    width: 100%;
+    border: 1px solid #ddd;
+    box-shadow: 1px 2px 4px rgba(0,0,0,.15);
+    border-bottom: none;
+    max-height: 85px;
+
+    li {
+        -webkit-transition: all .12s ease-in-out;
+        transition: all .12s ease-in-out;
+        background-color: #fafafa;
+        padding: 5px;
+        border-bottom: 1px solid #ddd;
+        border-left: 4px solid #eaeaea;
+
+        &:hover {
+            background-color: #f4f4f4;
+            cursor: pointer;
+            border-left-width: 6px;
+        }
+    }
+}

@@ -4,7 +4,7 @@ module.exports = {
 	PROXY_ORIGIN: 'http://proxy.app.adpushup.com',
 	PROXY_DOCUMENT_DOMAIN: 'app.adpushup.com',
 	apConfigDefaults: {
-		heartBeatMinInterval: 30000,
+		heartBeatMinInterval: 3000,
 		heartBeatStartDelay: 2000,
 		xpathWaitTimeout: 5000,
 		adpushupPercentage: 100
@@ -18,6 +18,11 @@ module.exports = {
 	password: {
 		'MASTER': 'fe4720b8bcdedb3cc47490015b0ab050'
 	},
+	exceptions: {
+		str: {
+			apexServiceDataEmpty: 'Apex service data should not be empty'
+		}
+	},
 	partners: {
 		geniee: {
 			email: 'geniee@adpushup.com',
@@ -30,6 +35,11 @@ module.exports = {
 				CONTENT_TYPE: 'application/json',
 				URL: {
 					"REPORTS": 'https://beta-aladdin.geniee.jp/beta2/aladdin/adpushup/report/'
+				}
+			},
+			exceptions: {
+				str: {
+					zonesEmpty: 'Zones should not be empty'
 				}
 			}
 		}

@@ -46,7 +46,7 @@ module.exports = (function ($, Utils, Event) {
 			if (!req || !req.cmd) {  // some issue with google.com that's why introduces this check
 				return false;
 			}
-			console.log(req);
+			//console.log(req);
 			this.onMessage.fire(req.cmd, req.data);
 		}
 	};

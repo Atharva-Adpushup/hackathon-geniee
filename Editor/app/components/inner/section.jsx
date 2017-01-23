@@ -11,18 +11,27 @@ class Section extends React.Component {
 		this.$target = null;
 	}
 
-	componentDidMount() {
-		this.$target = $(this.props.xpath);
+	init(props) {
+		this.$target = $(props.xpath);
 		if (!this.$target.length) {
-			this.props.onXpathMiss(this.props.id);
+			props.onXpathMiss(props.id);
 			return false;
 		}
-		this.$node = this.injectSection();
+		this.$node = this.injectSection(props);
 		this.node = this.$node.get(0);
 		this.renderSection();
 	}
 
+	componentDidMount() {
+		this.init(this.props);
+	}
+
 	componentWillReceiveProps(newProps) {
+		if(this.props.xpath !== newProps.xpath || (!_.isEqual(this.props.ads[0].css, newProps.ads[0].css))) {
+			this.unMountSection();
+			this.init(newProps);
+		}
+
 		this.renderSection(newProps);
 	}
 
@@ -39,12 +48,14 @@ class Section extends React.Component {
 			d.width = ad.width + (parseInt(ad.css['margin-right'], 10) || 0) + (parseInt(ad.css['margin-left'], 10) || 0);
 			ad = _.max(ads, (adObj) => adObj.adObjHeight + (parseInt(adObj.css['margin-top'], 10)) || 0 + (parseInt(adObj.css['margin-bottom'], 10) || 0));
 			d.height = parseInt(ad.height, 10) + (parseInt(ad.css['margin-top'], 10) || 0) + (parseInt(ad.css['margin-bottom'], 10) || 0);
+			d.clientHeight = parseInt(ad.height, 10);
+			d.clientWidth = parseInt(ad.width, 10);
 		}
 		return d;
 	}
 
-	injectSection() {
-		const { operation, xpath } = this.props,
+	injectSection(props) {
+		const { operation, xpath } = props,
 			$el = $('<div />');
 		if (operation === 'Insert Before') {
 			$el.insertBefore($(xpath));
@@ -68,7 +79,7 @@ class Section extends React.Component {
 	}
 
 	renderSection(props = this.props) {
-		const css = Object.assign({}, { position: 'relative', clear: 'both', pointerEvents: 'none', width: '100%', }, { height: this.getMaxDimensions().height });
+		const css = Object.assign({}, { position: 'relative', clear: 'both', pointerEvents: 'none', width: '100%', }, { height: this.getMaxDimensions().clientHeight, width: this.getMaxDimensions().clientWidth }, props.ads[0].css);
 		this.$node.css(css);
 		ReactDOM.render(<div className="_ap_reject">
 			{props.ads.map((ad) => <AdBox key={ad.id} ad={ad} clickHandler={this.props.onAdClick.bind(this, props.variationId, props.id)} />)}

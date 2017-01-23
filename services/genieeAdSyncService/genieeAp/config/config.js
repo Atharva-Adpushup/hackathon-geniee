@@ -11,10 +11,10 @@ module.exports = {
 	xpathWaitTimeout: 5000,
 	contentSelector: null,
 	adpushupPercentage: 100,
+	pageGroupTimeout: 0,
 	mode: 2,
 	domain: '',
 	forceVariation: 'forceVariation',
 	pageUrl: window.location.href,
 	referrer: document.referrer
-
 };

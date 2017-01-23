@@ -2,12 +2,13 @@ import React, { PropTypes } from 'react';
 import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { deleteSection, renameSection, updateXPath } from 'actions/sectionActions.js';
+import { deleteSection, renameSection, updateXPath, sectionAllXPaths, validateXPath } from 'actions/sectionActions.js';
 import { updateAdCode } from 'actions/adActions';
+import { resetErrors } from 'actions/uiActions';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 
 const variationSections = (props) => {
-	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdateXPath } = props;
+	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdateXPath, onSectionAllXPaths, onValidateXPath, ui, onResetErrors } = props;
 	return (
 		<div>
 			<h1 className="variation-section-heading">Variation Sections</h1>
@@ -15,7 +16,7 @@ const variationSections = (props) => {
 			<ul className="section-list row">
 				{ sections.map((section, key) => (
 					<div key={key} className="col-sm-4">
-						<li key={section.id}>
+						<li className="section-list-item" key={section.id}>
 							<OverlayTrigger placement="bottom" overlay={<Tooltip id="delete-section-tooltip">Delete Section</Tooltip>}>
 								{/*`section.ads[0].id` is temporarily added as 3rd argument to accomodate
 								  * one section and one ad creation/deletion
@@ -72,13 +73,14 @@ const variationSections = (props) => {
 										<Row>
 											<Col className="u-padding-r10px" xs={4}>XPath</Col>
 											<Col className="u-padding-l10px" xs={8}>
-												<InlineEdit compact value={section.xpath}
-													submitHandler={onUpdateXPath.bind(null, section.id)} text="XPath" errorMessage="XPath cannot be blank"
+												<InlineEdit compact cancelEditHandler={onResetErrors} customError={ui.errors.xpath ? ui.errors.xpath.error : false} dropdownList={section.allXpaths} value={section.xpath}
+													submitHandler={onUpdateXPath.bind(null, section.id)} keyUpHandler={onValidateXPath.bind(null, section.id)} editClickHandler={onSectionAllXPaths.bind(null, section.id, section.xpath)} text="XPath" errorMessage={(ui.errors.xpath && ui.errors.xpath.error) ? ui.errors.xpath.message : 'XPath cannot be blank'}
 												/>
 											</Col>
 										</Row>
 									</div>
-									) }
+								) 
+							}
 						</li>
 					</div>
 					))
@@ -94,7 +96,11 @@ variationSections.propTypes = {
 	onDeleteSection: PropTypes.func.isRequired,
 	onRenameSection: PropTypes.func.isRequired,
 	onUpdateAdCode: PropTypes.func.isRequired,
-	onUpdateXPath: PropTypes.func
+	onUpdateXPath: PropTypes.func,
+	onSectionAllXPaths: PropTypes.func,
+	onValidateXPath: PropTypes.func,
+	ui: PropTypes.object,
+	resetErrors: PropTypes.func
 };
 
 export default connect(
@@ -103,7 +109,10 @@ export default connect(
 		onDeleteSection: deleteSection,
 		onRenameSection: renameSection,
 		onUpdateAdCode: updateAdCode,
-		onUpdateXPath: updateXPath
+		onUpdateXPath: updateXPath,
+		onSectionAllXPaths: sectionAllXPaths,
+		onValidateXPath: validateXPath,
+		onResetErrors: resetErrors
 	}, dispatch)
 	)(variationSections);
 

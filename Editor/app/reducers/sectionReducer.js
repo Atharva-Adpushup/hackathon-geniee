@@ -1,4 +1,4 @@
-import { sectionActions, adActions, variationActions } from 'consts/commonConsts';
+import { sectionActions, adActions, variationActions, messengerCommands } from 'consts/commonConsts';
 import { immutableObjectDelete, immutableArrayDelete, immutablePush } from 'libs/immutableHelpers';
 import _ from 'lodash';
 
@@ -38,6 +38,9 @@ const sectionByIds = (state = {}, action) => {
 				}
 			};
 
+		case messengerCommands.SET_RELEVANT_XPATHS:
+			return { ...state, [action.sectionId]: { ...state[action.sectionId], allXpaths: action.allXpaths } };
+
 		case adActions.CREATE_AD:
 			return { ...state,
 				[action.sectionId]: {
@@ -56,7 +59,7 @@ const sectionByIds = (state = {}, action) => {
 			return { ...state, [action.sectionId]: { ...state[action.sectionId], name: action.name } };
 
 		case sectionActions.UPDATE_XPATH:
-			return { ...state, [action.sectionId]: { ...state[action.sectionId], xpath: action.xpath } };
+			return { ...state, [action.sectionId]: { ...state[action.sectionId], xpath: action.xpath, allXpaths: [] } };
 
 		case adActions.DELETE_AD:
 			const index = state[action.sectionId].ads.indexOf(action.adId);

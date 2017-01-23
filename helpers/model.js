@@ -18,7 +18,8 @@ var consts = require('../configs/commonConsts'),
 		this.mergingKey = null;
 		this.mergeExtraKeys = false;
 		this.classMap = {};
-		this.rootMergingObjectKeys = ['apConfigs'];
+		this.mergeObjectViaClassMapArr = ['apConfigs'];
+		this.mergeObjectViaDeepExtendArr = [];
 
 		this.constructor = function (data, force) {
 			if (data) {
@@ -94,6 +95,67 @@ var consts = require('../configs/commonConsts'),
 			return this.data[key];
 		};
 
+		/**
+		 * OBJECTIVE: Merge any object that follows a particular schema (see /Applications/MAMP/htdocs/GenieeAdPushup/models/subClasses/site/apConfig.js for schema)
+		 * PURPOSE: An implementation was required to merge any object that follow a schema configuration
+		 * IMPLEMENTATION: Following is the algorithm procedure:
+		 * 1) - Union object keys of existing and new data
+		 * 2) - Set final computed object base as a deep extend of existing data
+		 * 3) - Iterate over union keys and get existing and new object based on iterator key
+		 * 4) - Evaluate existing and new data types and existence in variables
+		 * 5) - Perform 2 checks and set computed object based on them:
+		 * 	    1) If current union key is in 'override' array,
+		 * 		set new data as final computed value differentiated by data types
+		 *      2) If current union key is in 'merge' array,
+		 * 		set merged data as final computed value differentiated by data types
+		 * 6) - Return computed merged nested object
+		 * @param {existingData} server side data (saved in database)
+		 * @param {newData} client side json (product's client side, background service etc.)
+		 * @param {schema} a JSON structure that defines model
+		 * @returns {object} merged nested object
+		 */
+		this.mergeObjectViaClassMap = function(existingData, newData, schema) {
+			var unionKeys = _.union(Object.keys(existingData), Object.keys(newData)),
+				computedData = extend(true, {}, existingData), self = this;
+			
+			_.forEach(unionKeys, function(unionKey) {
+				var newDataObj = newData[unionKey],
+					existingDataObj = existingData[unionKey],
+
+					isExistingDataAnObject = !!(existingDataObj && _.isObject(existingDataObj) && _.isPlainObject(existingDataObj)),
+					isExistingDataAnArray = !!(existingDataObj && _.isObject(existingDataObj) && _.isArray(existingDataObj)),
+					isNewDataAnObject = !!(newDataObj && _.isObject(newDataObj) && _.isPlainObject(newDataObj)),
+					isNewDataAnArray = !!(newDataObj && _.isObject(newDataObj) && _.isArray(newDataObj)),
+
+					isNewDataTruthy = !!(newDataObj !== null && typeof(newDataObj) !== 'undefined'),
+
+					isKeyInData = !!(existingDataObj && newDataObj),
+					isKeyInSchema = !!(schema && schema.keys && (schema.keys.indexOf(unionKey) > -1)),
+					isOverrideKey = !!(isKeyInSchema && schema.override && (schema.override.indexOf(unionKey) > -1)),
+					isMergeKey = !!(isKeyInSchema && schema.merge && (schema.merge.indexOf(unionKey) > -1));
+
+				if (isOverrideKey) {
+					if (isNewDataAnObject) {
+						computedData[unionKey] = extend(true, {}, newDataObj);
+					} else if (isNewDataAnArray) {
+						computedData[unionKey] = _.union([], newDataObj);
+					} else if (isNewDataTruthy) {
+						computedData[unionKey] = newDataObj;
+					}
+				} else if (isMergeKey) {
+					if (isKeyInData && isExistingDataAnObject && isNewDataAnObject) {
+						computedData[unionKey] = extend(true, {}, existingDataObj, newDataObj);
+					} else if (isKeyInData && isExistingDataAnArray && isNewDataAnArray) {
+						computedData[unionKey] = _.union(existingDataObj, newDataObj);
+					} else if (isNewDataTruthy) {
+						computedData[unionKey] = newDataObj;
+					}
+				}
+			});
+
+			return computedData;
+		};
+
 		this.extendObject = function(existingObj, newObj) {
 			return extend(true, {}, existingObj, newObj);
 		};
@@ -116,7 +178,7 @@ var consts = require('../configs/commonConsts'),
 		 * 4) - Union existing and newData object keys
 		 * 5) - Iterate over these keys, perform 3 checks and set computed object based on them:
 		 * 	    1) Deep Extend existing and new object if there is no schema
-		 * 		   and iterator key is in 'rootMergingObjectKeys' array
+		 * 		   and iterator key is in 'mergeObjectViaDeepExtendArr' array
 		 *      2) Recursively call this method if key is in schema classMap
 		 *      3) If key is in existing data but not present in new data,
 		 *         set computed object property and its value as existing data property value
@@ -136,7 +198,7 @@ var consts = require('../configs/commonConsts'),
 					allIteratableKeys = _.union(Object.keys(existingDataObj), Object.keys(newDataObj));
 
 				_.forEach(allIteratableKeys, function(propertyKey) {
-					if (!schema && (self.rootMergingObjectKeys.indexOf(propertyKey) > -1)) {
+					if (!schema && (self.mergeObjectViaDeepExtendArr.indexOf(propertyKey) > -1)) {
 						computedData[intersectedKey][propertyKey] = self.extendObject(existingDataObj[propertyKey], newDataObj[propertyKey]);
 					} else if (schema && schema.classMap && schema.classMap[propertyKey]) {
 						computedData[intersectedKey][propertyKey] = self.mergeObjectsRecursively(existingDataObj[propertyKey], newDataObj[propertyKey], schema.classMap[propertyKey]);
@@ -160,12 +222,17 @@ var consts = require('../configs/commonConsts'),
 		 */
 		this.mergeNestedObjects = function(key, newData, schema) {
 			var existingData = this.get(key),
+				isKeyMergedViaClassMap = !!(key && (this.mergeObjectViaClassMapArr.indexOf(key) > -1)),
 				computedData;
 
 			if (!existingData) { return newData; }
 
-			computedData = this.mergeObjectsRecursively(existingData, newData, schema);
+			if (isKeyMergedViaClassMap) {
+				computedData = this.mergeObjectViaClassMap(existingData, newData, schema);
+				return computedData;
+			}
 
+			computedData = this.mergeObjectsRecursively(existingData, newData, schema);
 			return extend(true, computedData, newData);
 		};
 
@@ -214,14 +281,18 @@ var consts = require('../configs/commonConsts'),
 				keys = val ? Object.keys(val) : [],
 				isNoForceInsertion = (this.keys.length > 0 && !forceInsert),
 				isValidKey = (this.keys.indexOf(key) !== -1 && (this.ignore.indexOf(key) === -1)),
-				isKeyAnArrayModel = (Array.isArray(existingData) && existingData[0] && (existingData[0] instanceof model)),
-				isKeyARootMergingObject = (existingData && (typeof(existingData) === 'object') && (this.rootMergingObjectKeys.indexOf(key) > -1));
+				isExistingDataAnObject = !!(existingData && _.isObject(existingData)),
+				isKeyAnArrayModel = !!(Array.isArray(existingData) && existingData[0] && (existingData[0] instanceof model)),
+				isKeyMergedViaClassMap = !!(isExistingDataAnObject && key && (this.mergeObjectViaClassMapArr.indexOf(key) > -1) && this.classMap[key]),
+				isKeyMergedViaDeepExtend = !!(isExistingDataAnObject && (this.mergeObjectViaDeepExtendArr.indexOf(key) > -1));
 
 			if (isNoForceInsertion) {
 				if (isValidKey) {
 					if (isKeyAnArrayModel) {
 						this.data[key] = this.mergeArrayModel(existingData, Array.isArray(val) ? val : [val]);
-					} else if (isKeyARootMergingObject) {
+					} else if (isKeyMergedViaClassMap) {
+						this.data[key] = this.mergeObjectViaClassMap(existingData, val, this.classMap[key]);
+					} else if (isKeyMergedViaDeepExtend) {
 						this.data[key] = this.extendObject(existingData, val);
 					} else {
 						this.data[key] = val;
@@ -244,7 +315,7 @@ var consts = require('../configs/commonConsts'),
 			Object.keys(json).forEach(function (key) {
 				if (self.classMap[key]) {
 					self.set(key, self.mergeNestedObjects(key, json[key], self.classMap[key]), force);
-				} else if (self.rootMergingObjectKeys.indexOf(key) > -1) {
+				} else if (self.mergeObjectViaDeepExtendArr.indexOf(key) > -1) {
 					self.set(key, self.mergeRootObject(key, json[key]), force);
 				} else {
 					self.set(key, json[key], force);

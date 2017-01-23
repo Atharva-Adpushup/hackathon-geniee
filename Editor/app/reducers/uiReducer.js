@@ -1,8 +1,9 @@
 import { combineReducers } from 'redux';
 import { editMenuActions, insertMenuActions, sectionActions, siteModesPopoverActions,
-	adActions, newChannelMenuActions, channelActions, channelMenuActions } from '../consts/commonConsts';
+	adActions, newChannelMenuActions, channelActions, channelMenuActions, messengerCommands, uiActions } from '../consts/commonConsts';
 
-const insertMenu = (state = { isVisible: false }, action) => {
+const errorsConfig = {},
+	insertMenu = (state = { isVisible: false }, action) => {
 		switch (action.type) {
 			case insertMenuActions.SHOW_MENU:
 				const payload = action.payload;
@@ -69,6 +70,36 @@ const insertMenu = (state = { isVisible: false }, action) => {
 				return state;
 		}
 	},
+	errors = (state = {
+		xpath: { error: false }
+	}, action) => {
+		switch (action.type) {
+			case messengerCommands.XPATH_VALIDATED:
+				if (action.isValidXPath) {
+					return { xpath: {
+						error: false
+					}
+					};
+				}
+				return { xpath: { error: true, message: 'Please enter a valid xpath' } };
+
+			case sectionActions.UPDATE_XPATH:
+			case uiActions.RESET_ERRORS:
+				return { xpath: { error: false } };
+
+			default:
+				return state;
+		}
+	},
+	afterSaveLoader = (state = { status: 0 }, action) => {
+		switch (action.type) {
+			case uiActions.UPDATE_AFTER_SAVE_STATUS :
+				return { status: action.status };
+
+			default:
+				return state;
+		}
+	},
 	siteModesPopover = (state = { isVisible: false, position: { left: 0, top: 0 } }, action) => {
 		switch (action.type) {
 			case siteModesPopoverActions.SHOW_SITE_MODES_POPOVER:
@@ -77,6 +108,7 @@ const insertMenu = (state = { isVisible: false }, action) => {
 					position: action.position
 				};
 			case siteModesPopoverActions.HIDE_SITE_MODES_POPOVER:
+			case uiActions.UPDATE_AFTER_SAVE_STATUS:
 				return { isVisible: false, position: { left: 0, top: 0 } };
 
 			default:
@@ -85,7 +117,6 @@ const insertMenu = (state = { isVisible: false }, action) => {
 	};
 
 export default combineReducers({
-	insertMenu, editMenu, newChannelMenu,
-	siteModesPopover, channelMenu
+	insertMenu, editMenu, newChannelMenu, siteModesPopover, channelMenu, errors, afterSaveLoader
 });
 
