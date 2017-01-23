@@ -745,24 +745,22 @@ $('document').ready(function () {
                         $('#addOtherSiteModal').modal('hide');
                         $('#apdetect').fadeOut();
                         ob.nextStep(3, 2, 1000);
-                    } else {
-                        errorBox.html('Site already added. Please enter another site');
                     }
+                    // else if (selectedServices.length == 1) {
+                    //     if (selectedServices[0] == 'only-adsense') {
+                    //         var response = ob.addSite(url, site, null, true);
+                    //         if (response) {
+                    //             $('#addOtherSiteModal').modal('hide');
+                    //             $('#apdetect').fadeOut();
+                    //             ob.nextStep(3, 2, 1000);
+                    //         } else {
+                    //             errorBox.html('Site already added. Please enter another site');
+                    //         }
+                    //     } else {
+                    //         ob.anotherSiteModalOpen();
+                    //     }
+                    // }
                 }
-                // else if (selectedServices.length == 1) {
-                //     if (selectedServices[0] == 'only-adsense') {
-                //         var response = ob.addSite(url, site, null, true);
-                //         if (response) {
-                //             $('#addOtherSiteModal').modal('hide');
-                //             $('#apdetect').fadeOut();
-                //             ob.nextStep(3, 2, 1000);
-                //         } else {
-                //             errorBox.html('Site already added. Please enter another site');
-                //         }
-                //     } else {
-                //         ob.anotherSiteModalOpen();
-                //     }
-                // }
             },
             // Skipping ap verficiation
             skipApVerification: function () {
