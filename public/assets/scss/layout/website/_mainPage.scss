@@ -322,6 +322,11 @@
   border: 1px solid $lightGrey;
   border-radius: 3px;
   position: relative;
+
+  .select-size > .row {
+    border-bottom: 1px solid $lightGrey;
+    padding-bottom: 20px;
+  }
 }
 
 .settings-pane .close.hb-close-pane {
