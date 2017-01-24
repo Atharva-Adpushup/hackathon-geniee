@@ -63,16 +63,16 @@ function dashboardRedirection(req, res, allUserSites, type) {
 
         setEmailCookie(req, res);
 
-        if(type == 'onboarding') {
-            if(sites.length >= 1) {
+        if (type == 'onboarding') {
+            if (sites.length >= 1) {
                 var hasStep = 'step' in sites[0] ? true : false;
-                if(hasStep && sites[0].step == 6) {
+                if (hasStep && sites[0].step == 6) {
                     return res.redirect('/user/dashboard');
                 }
             }
         }
 
-        switch(type) {
+        switch (type) {
             case 'dashboard':
             case 'default':
                 return res.render('dashboard', {
@@ -81,8 +81,8 @@ function dashboardRedirection(req, res, allUserSites, type) {
                     hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
                     requestDemo: req.session.user.requestDemo
                 });
-            break;
-            case 'onboarding': 
+                break;
+            case 'onboarding':
                 return res.render('onboarding', {
                     validSites: sites,
                     unSavedSite: unSavedSite,
@@ -90,7 +90,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
                     requestDemo: req.session.user.requestDemo,
                     analyticsObj: JSON.stringify(req.session.analyticsObj)
                 });
-            break;
+                break;
         };
     });
 };
@@ -133,9 +133,11 @@ router
             userModel.getUserByEmail(req.session.user.email).then(function (user) {
                 var userSites = user.get('sites'),
                     userWebsiteRevenue = user.get('revenueUpperLimit');
-                user.set('preferredModeOfReach', req.body.modeOfReach);
-                if(req.body['selectedServices[]'] && req.body['selectedServices[]'].length > 1 || userWebsiteRevenue > 10000) {
-                    req.session.stage = 'Onboarding';
+                if (!req.body.fromDashboard) {
+                    user.set('preferredModeOfReach', req.body.modeOfReach);
+                    if (req.body['selectedServices[]'] && req.body['selectedServices[]'].length > 1 || userWebsiteRevenue > 10000) {
+                        req.session.stage = 'Onboarding';
+                    }
                 }
                 for (var i in userSites) {
                     if (userSites[i].domain === req.body.newSiteUnSavedDomain) {
@@ -145,10 +147,9 @@ router
                         req.session.user = user;
                         user.save();
                         return res.send({ success: 1 });
-                    } else {
-                        return res.send({ success: 0 });
                     }
                 }
+                return res.send({ success: 0 });
             }).catch(function (err) {
                 console.log(err);
                 return res.send({ success: 0 });
@@ -178,9 +179,9 @@ router
     .get('/connectGoogle', function (req, res) {
         return userModel.getUserByEmail(req.session.user.email)
             .then(function (user) {
-                var adSenseData = _.find(user.get('adNetworkSettings'), {'networkName': 'ADSENSE'});
+                var adSenseData = _.find(user.get('adNetworkSettings'), { 'networkName': 'ADSENSE' });
                 return res.render('connectGoogle', {
-                    adNetworkSettings: !_.isEmpty(user.get('adNetworkSettings')) ? { 
+                    adNetworkSettings: !_.isEmpty(user.get('adNetworkSettings')) ? {
                         pubId: adSenseData.adsenseAccounts[0].id,
                         email: adSenseData.userInfo.email
                     } : false
@@ -191,7 +192,7 @@ router
             });
     })
     .get('/addSite', function (req, res) {
-        if(req.session.isSuperUser) {
+        if (req.session.isSuperUser) {
             var allUserSites = req.session.user.sites,
                 params = {};
             _.map(allUserSites, function (site) {
@@ -203,9 +204,6 @@ router
                     }
                 }
             });
-
-            console.log(params);
-
             res.render('addSite', params);
         } else {
             res.redirect('/403');
@@ -256,24 +254,24 @@ router
                 var allUserSites = user.get('sites');
 
                 function sitePromises() {
-                    return _.map(allUserSites, function(obj) {
-                        return siteModel.getSiteById(obj.siteId).then(function() {
+                    return _.map(allUserSites, function (obj) {
+                        return siteModel.getSiteById(obj.siteId).then(function () {
                             return obj;
-                    }).catch(function(err) {
+                        }).catch(function (err) {
                             return 'inValidSite';
                         });
                     });
                 }
-                
-                return Promise.all(sitePromises()).then(function(validSites) {
+
+                return Promise.all(sitePromises()).then(function (validSites) {
                     var sites = _.difference(validSites, ['inValidSite']);
                     if (Array.isArray(sites) && sites.length > 0) {
                         if (sites.length == 1) {
                             var step = sites[0].step;
-                            if(step && step < 6) {
+                            if (step && step < 6) {
                                 return res.redirect('/user/onboarding');
                             }
-                            if(!user.get('requestDemo')) {
+                            if (!user.get('requestDemo')) {
                                 return res.redirect('/user/dashboard');
                             } else {
                                 return res.redirect('/thankyou');
@@ -422,7 +420,7 @@ router
                 websiteRevenue = req.session.user.websiteRevenue,
                 revenueUpperLimit = null;
 
-            if(req.body.websiteRevenue.trim()) {
+            if (req.body.websiteRevenue.trim()) {
                 websiteRevenue = req.body.websiteRevenue;
             }
 
@@ -439,17 +437,17 @@ router
                 }
 
                 var revenueArray = websiteRevenue.split('-');
-                if(revenueArray.length > 1) {
+                if (revenueArray.length > 1) {
                     revenueUpperLimit = revenueArray[1];
                 } else {
-                    revenueUpperLimit = revenueArray[0];		
+                    revenueUpperLimit = revenueArray[0];
                 }
 
                 return userModel.setUserStatus({
                     status: status,
                     websiteRevenue: websiteRevenue,
                     revenueUpperLimit: revenueUpperLimit
-                    }, email.trim()).then(function (user) {
+                }, email.trim()).then(function (user) {
                     var currentStatus = user.get('requestDemo'),
                         websiteRevenue = user.get('websiteRevenue');
 
@@ -463,17 +461,17 @@ router
                         websiteRevenue: websiteRevenue
                     });
                 })
-                .catch(function (err) {
-                    if (err) {
-                        return res.render('updateUserStatus', {
-                            status: 'failure',
-                            message: 'Some error occured',
-                            currentStatus: req.session.user.requestDemo,
-                            email: email,
-                            websiteRevenue: websiteRevenue
-                        })
-                    }
-                });
+                    .catch(function (err) {
+                        if (err) {
+                            return res.render('updateUserStatus', {
+                                status: 'failure',
+                                message: 'Some error occured',
+                                currentStatus: req.session.user.requestDemo,
+                                email: email,
+                                websiteRevenue: websiteRevenue
+                            })
+                        }
+                    });
             } else {
                 return res.render('updateUserStatus', {
                     status: 'failure',

@@ -224,7 +224,7 @@ $('document').ready(function () {
             saveSiteModel: function (site, url, siteId, btn) {
                 var ob = this;
                 $.post('/data/saveSite', {
-                    site: url,
+                    site: site,
                     siteId: siteId,
                     step: 2
                 }, function (res) {
@@ -275,7 +275,7 @@ $('document').ready(function () {
                         $.ajax({
                             url: '/user/addSite',
                             type: 'POST',
-                            data: { site: url },
+                            data: { site: site },
                             async: false,
                             success: function (res) {
                                 if (res.success) {
@@ -508,9 +508,9 @@ $('document').ready(function () {
                         newSiteSiteId: newSite.viewObjects.unSavedSiteId,
                         newSiteDomanizedUrl: newSite.viewObjects.domanizedUrl,
                         modeOfReach: data.pwc,
-                        selectedServices: data.selectedServices
+                        selectedServices: data.selectedServices,
+                        fromDashboard: false
                     };
-                // dataToEndPoint = $.extend(true, {}, {data: paramObject});
 
                 $.post('/user/setSiteServices', dataToEndPoint, function (response) {
                     if (response.success) {
@@ -530,6 +530,7 @@ $('document').ready(function () {
                         if (parseInt(window.currentUser.revenueUpperLimit) > 10000 || data.selectedServices.length > 1) {
                             window.location.replace(url);
                         } else if (data.selectedServices.length == 1) {
+                            console.log("working");
                             if (data.selectedServices[0] == 'only-adsense') {
                                 $('#intromodal').modal('hide');
                                 $('#completionmodal').modal('show');
@@ -552,13 +553,12 @@ $('document').ready(function () {
                     ap.apAlert('Please add a valid website', '#apdetect', 'inverted', 'slideDown');
                     return false;
                 }
-                var response = this.addSite(this.domanize(newSiteByUser), newSiteByUser, btn, true);
+                var response = this.addSite(newSiteByUser, this.domanize(newSiteByUser), btn, true);
                 if (response) {
                     $(btn).fadeOut(300);
                     this.nextStep(3, 2, 1000);
                 }
             },
-
             // Convert Ad Code
             base64_encode: function (data) {
                 try {
@@ -739,17 +739,28 @@ $('document').ready(function () {
                     errorBox = $("#addOtherSiteModal .error-message-box"),
                     response = ob.addSite(site, url, null, true);
                 if (response) {
-                    if (selectedServices.length > 1) {
-                        ob.anotherSiteModalOpen();
-                    } else {
-                        if (selectedServices[0] == 'only-adsense') {
-                            $('#addOtherSiteModal').modal('hide');
-                            $('#apdetect').fadeOut();
-                            ob.nextStep(3, 2, 1000);
-                        } else {
-                            ob.anotherSiteModalOpen();
+                    var servicesString = selectedServices.join(' | '),
+                        dataToEndPoint = {
+                            servicesString: servicesString,
+                            newSiteUnSavedDomain: site + '/',
+                            selectedServices: selectedServices,
+                            fromDashboard: true
+                        };
+                    $.post('/user/setSiteServices', dataToEndPoint, function (response) {
+                        if (response.success) {
+                            if (selectedServices.length > 1) {
+                                ob.anotherSiteModalOpen();
+                            } else {
+                                if (selectedServices[0] == 'only-adsense') {
+                                    $('#addOtherSiteModal').modal('hide');
+                                    $('#apdetect').fadeOut();
+                                    ob.nextStep(3, 2, 1000);
+                                } else {
+                                    ob.anotherSiteModalOpen();
+                                }
+                            }
                         }
-                    }
+                    });
                 } else {
                     errorBox.html('Site already added. Please enter another site');
                 }
@@ -858,7 +869,7 @@ $('document').ready(function () {
             var userUnsavedSite = newSite.viewObjects.domanizedUrl,
                 userUnsavedSiteId = newSite.viewObjects.unSavedSiteId,
                 url = newSite.viewObjects.origUnSavedDomain;
-            ap.onboarding.addSite(userUnsavedSite, url, $(this), true);
+            ap.onboarding.addSite(url, userUnsavedSite, $(this), true);
             $('#another-site-box').fadeOut('200');
         });
 
