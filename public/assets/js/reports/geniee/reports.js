@@ -1,7 +1,10 @@
 var GenieeReport = (function(w, $) {
+    var self = this;
+
     this.model = w.adpushup.reports.model;
     this.siteId = w.adpushup.reports.siteId;
     this.siteDomain = w.adpushup.reports.siteDomain;
+    this.paramConfig = w.adpushup.reports.paramConfig;
     this.reportsLevel = {
         'pagegroup': 'Page Groups',
         'variation': 'Variations'
@@ -9,10 +12,21 @@ var GenieeReport = (function(w, $) {
     this.selectedReportsLevel = 'Page Groups';
     this.selectedPageGroupId = null;
     this.selectedPageGroupName = '';
+    this.filterData = {
+        paramConfig: $.extend(true, {}, this.paramConfig),
+        date: {},
+        platform: {}
+    };
+
     // Cache DOM elements query
     this.$breadCrumbContainer = $('.js-reports-breadcrumb');
     this.$tableContainer = $('#reports_table');
     this.$perfHeaderContainer = $(".js-perf-header");
+    this.$filterDateWrapper = $(".js-filter-date-wrapper");
+    this.$filterDateSelectedWrapper = $(".js-filter-selected-wrapper");
+    this.$filterApplyBtn = $(".js-filter-apply-btn");
+    this.$filterResetBtn = $(".js-filter-reset-btn");
+
     // Slideout elements
     this.$slideoutPanel = $('.js-slideout-panel');
     this.$slideoutMenu = $('.js-slideout-menu');
@@ -48,6 +62,107 @@ var GenieeReport = (function(w, $) {
 
     function createChart(selector, config) {
         w.Highcharts.stockChart(selector, config);
+    }
+
+    function setFilterSelectedLabel(name) {
+        var $labelTpl = $("<span class='label label-default js-filter-selected js-filter-selected--date'></span>"),
+            $labelBadgeTpl = $("<span class='badge js-badge'>X</span>");
+
+        $labelTpl
+            .text(name)
+            .append($labelBadgeTpl);
+        this.$filterDateSelectedWrapper.html($labelTpl);
+    }
+
+    function setFilterParamConfigData(dateRange) {
+        this.filterData.paramConfig.dateFrom = dateRange.dateFrom;
+        this.filterData.paramConfig.dateTo = dateRange.dateTo;
+    }
+
+    function setFilterDateData(obj) {
+        this.filterData.date = obj;
+    }
+
+    function handleDateFilterLinksClick(e) {
+        var $link = $(e.target),
+            dateRange = $link.data('daterange'),
+            dateRangeName = $link.data('name'),
+            dateRangeObj = {},
+            text = $link.text();
+
+        dateRangeObj[dateRangeName] = dateRange;
+        setFilterDateData(dateRangeObj);
+        setFilterParamConfigData(dateRange);
+        setFilterSelectedLabel(text);
+    }
+
+    function bindDateFilterLinks() {
+        var $links = $('.js-filter-date', this.$filterDateWrapper);
+
+        $links.off('click').on('click', handleDateFilterLinksClick);
+    }
+
+    function handleDateFilterLabelsBadgeClick(e) {
+        var $badge = $(e.target);
+
+        // Reset date filter data
+        setFilterDateData({});
+        setFilterParamConfigData(this.paramConfig);
+        $badge.parent().remove();
+    }
+
+    function bindDateFilterLabelsBadge() {
+        this.$filterDateSelectedWrapper.off('click').on('click', '.js-badge', handleDateFilterLabelsBadgeClick.bind(this));
+    }
+
+	function getReports(paramsData, callbackConfig) {
+		var url = '/user/reports/getPerformanceData',
+			type = 'GET';
+
+		$.ajax({
+			type: type,
+			url: url,
+			dataType: 'json',
+			data: paramsData,
+			cache: false
+		}).done(function(data) {
+			data = (typeof data === 'string') ? JSON.parse(data) : data;
+
+			if (data.success) {
+				return callbackConfig.success(data);
+			}
+
+			return callbackConfig.error();
+		}).fail(function() {
+			callbackConfig.error();
+		});
+	}
+
+    function reportsSuccessCallback(reportData) {
+        console.log('Got report data: ', reportData);
+    }
+
+    function reportsErrorCallback() {
+        console.error('Error loading reports');
+    }
+
+    function handleFilterApplyBtnClick(e) {
+        var isLabelElem = (this.$filterDateSelectedWrapper.find('.js-filter-selected--date').length > 0),
+            isDateFilterData = (Object.keys(this.filterData.date).length > 0),
+            $btn = $(e.target),
+            paramConfig = this.paramConfig;
+
+        if (isLabelElem && isDateFilterData) {
+            console.log('Filter date range request: ', $btn);
+            getReports(paramConfig, {
+                success: reportsSuccessCallback,
+                error: reportsErrorCallback
+            });
+        }
+    }
+
+    function bindFilterApplyBtn() {
+        this.$filterApplyBtn.off('click').on('click', handleFilterApplyBtnClick.bind(this));
     }
 
     function initSlideoutMenu() {
@@ -380,6 +495,9 @@ var GenieeReport = (function(w, $) {
 
         bindPerfThumbnailClickHandler();
         bindSelectionButtonClickHandler();
+        bindDateFilterLinks();
+        bindDateFilterLabelsBadge();
+        bindFilterApplyBtn();
         setThumbnailUiData();
         setActiveThumbnail($revenueHeaderThumbnail);
         prepareReportsChart($revenueHeaderThumbnail);

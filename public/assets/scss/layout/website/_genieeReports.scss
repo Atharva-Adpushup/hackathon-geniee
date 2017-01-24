@@ -131,7 +131,19 @@ $borderColor: #e6e6e6;
 
         > .filter-selected-wrapper
         {
-            height: 100px;
+            min-height: 100px;
+
+            > .label.label-default
+            {
+                > .badge
+                {
+                    background: #eb575c;
+                    cursor: pointer;
+                    position: absolute;
+                    top: -9px;
+                    right: -10px;
+                }
+            }
         }
 
         .btn-theme--primary
@@ -248,5 +260,18 @@ $borderColor: #e6e6e6;
                 }
             }
         }
+    }
+    .label.label-default
+    {
+        background: #f1f1f1;
+        border: 1px solid #ddd;
+        color: inherit;
+        display: inline-block;
+        font-size: 1.168em;
+        height: auto;
+        margin: 0 15px 10px 0;
+        padding: 10px;
+        position: relative;
+        width: auto;
     }
 }
