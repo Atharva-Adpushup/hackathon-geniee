@@ -1,0 +1,70 @@
+// Header Bidding specific styles
+
+.hb-config-pane {
+  padding: 15px;
+  border: 1px solid $lightGrey;
+  border-radius: 3px;
+  position: relative;
+
+  .select-size > .row {
+    border-bottom: 1px solid $lightGrey;
+    padding-bottom: 20px;
+  }
+}
+
+.settings-pane .close.hb-close-pane {
+  position: absolute;
+  width: 26px;
+  border-radius: 50%;
+  background-color: $whiteColor;
+  color: $primaryColor;
+  opacity: 1;
+  right: -10px;
+  font-size: 1.2em;
+  top: -5px;
+  border: 1px solid $primaryColor;
+  z-index: 1;
+  padding: 5px;
+}
+
+.select-partner {
+  background-color: $mainBgColor;
+}
+
+.select-partner-settings {
+  background-color: $whiteColor;
+}
+
+.btn.btn-lightBg.btn-hb-pane {
+  top: -1px;
+  position: relative;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border: 1px solid $lightGrey !important;
+  color: $iconColor; 
+  margin-bottom: 15px;
+}
+
+.hb-settings {
+  margin: 20px 0 0;
+  border-top: 1px dashed $lightGrey;
+
+  .text-medium {
+    margin: 20px 0 -20px;
+  }
+
+  .cog {
+    padding: 20px;
+    color: darken($lightGrey, 4%);
+
+    .cog-big {
+      font-size: 6em;
+    }
+
+    .cog-small {
+      font-size: 4em;
+      @include css3-prefix(transform, rotate(-8deg));
+      margin-left: 3px;
+    }
+  }
+}
