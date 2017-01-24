@@ -10,7 +10,8 @@ module.exports = function (grunt) {
             target: {
                 files: {
                     'public/assets/css/builds/editor.min.css': ['public/assets/css/libs/editor.css'],
-                    'public/assets/css/builds/website.min.css': ['public/assets/css/libs/website.css']
+                    'public/assets/css/builds/website.min.css': ['public/assets/css/libs/website.css'],
+                    'public/assets/css/builds/onboarding.min.css': ['public/assets/css/libs/onboarding.css']
                 }
             }
         },
@@ -65,4 +66,6 @@ module.exports = function (grunt) {
     grunt.registerTask('default', [
         'sass', 'concat', 'uglify', 'cssmin'
     ]);
+
+    grunt.registerTask('sassTask', ['sass']);
 };

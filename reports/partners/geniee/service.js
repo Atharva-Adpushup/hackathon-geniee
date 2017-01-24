@@ -62,14 +62,16 @@ module.exports = (function(requestPromise, signatureGenerator, oauthModule, zone
 				
 				return pageGroupModule.updatePageGroupData(pageGroupData, pageGroupMetrics)
 					.then(zoneModule.getZoneVariations)
-					.then(variationModule.setVariationMetrics)
+					.then(variationModule.setVariationMetrics.bind(variationModule, params))
 					.then(variationModule.removeRedundantVariationsObj)
 					.then(variationModule.setVariationsTabularData)
 					.then(variationModule.setVariationsHighChartsData)
 					.then(function(updatedPageGroupsAndVariationsData) {
 						var computedData = {media: siteMetrics, pageGroups: updatedPageGroupsAndVariationsData};
 
-						return pageGroupModule.setPageGroupsTabularData(computedData)
+						return pageGroupModule.updateMetrics(computedData)
+							.then(mediaModule.updateMetrics)
+							.then(pageGroupModule.setPageGroupsTabularData)
 							.then(pageGroupModule.setPageGroupsHighChartsData)
 							.then(function(finalComputedData) {
 								return Promise.resolve(finalComputedData);

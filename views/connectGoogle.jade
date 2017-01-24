@@ -51,13 +51,15 @@ block bodyContent
                                         else
                                             button.btn.btn-lightBg.btn-default.widget-btn(style="pointer-events: none;") Google AdSense Connected 
                                                 i.fa.fa-check
-                                    .pub-info
-                                        p.widget-text 
-                                            | Pub Id : 
-                                            span.primary-text!= adNetworkSettings.pubId
-                                        p.widget-text
-                                            | Email : 
-                                            != adNetworkSettings.email
+                                    
+                                    if adNetworkSettings
+                                        .pub-info
+                                            p.widget-text 
+                                                | Pub Id : 
+                                                span.primary-text!= adNetworkSettings.pubId
+                                            p.widget-text
+                                                | Email : 
+                                                != adNetworkSettings.email
                                     
 
                

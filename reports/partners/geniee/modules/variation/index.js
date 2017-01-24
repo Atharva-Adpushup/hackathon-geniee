@@ -2,29 +2,59 @@ var _ = require('lodash'),
 	extend = require('extend'),
 	moment = require('moment'),
 	Promise = require('bluebird'),
+	pageViewsModule = require('../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index'),
 	utils = require('../utils/index');
 
 module.exports = {
-	setVariationMetrics: function(pageGroupData) {
+	setVariationMetrics: function(config, pageGroupData) {
 		var computedData = extend(true, {}, pageGroupData);
 
-		_.forOwn(pageGroupData, function(pageGroupObj, pageGroupKey) {
-			_.forOwn(pageGroupObj.variationData, function(variationObj, variationKey) {
-				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, "pageViews": 0, "pageRPM": 0, "pageCTR": 0 });
+		return Promise.all(_.map(pageGroupData, function(pageGroupObj, pageGroupKey) {
+			return Promise.all(_.map(pageGroupObj.variationData, function(variationObj, variationKey) {
+				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, "pageViews": 0, "pageRPM": 0.0, "pageCTR": 0.0 });
 
-				_.forEach(variationObj.zones, function(zoneObj) {
-					computedData[pageGroupKey].variationData[variationKey].click += Number(zoneObj.click);
-					computedData[pageGroupKey].variationData[variationKey].impression += Number(zoneObj.impression);
-					computedData[pageGroupKey].variationData[variationKey].revenue += Number(zoneObj.revenue);
-					computedData[pageGroupKey].variationData[variationKey].ctr += Number(zoneObj.ctr);
+				return Promise.all(_.map(variationObj.zones, function(zoneObj) {
+					var pageViewsReportConfig = {
+						siteId: config.siteId,
+						startDate: (config.dateFrom ? moment(config.dateFrom).valueOf() : moment().subtract(31, 'days').valueOf()),
+						endDate: (config.dateTo ? moment(config.dateTo).valueOf(): moment().subtract(1, 'days').valueOf()),
+						variationKey: variationObj.id,
+						platform: pageGroupObj.device,
+						pageGroup: pageGroupObj.pageGroup,
+						reportType: 'apex',
+						step: '1d'
+					};
 
-					computedData[pageGroupKey].variationData[variationKey].revenue = Math.round(computedData[pageGroupKey].variationData[variationKey].revenue);
-					computedData[pageGroupKey].variationData[variationKey].ctr = Number(computedData[pageGroupKey].variationData[variationKey].ctr.toFixed(2));
+					return pageViewsModule.getTotalCount(pageViewsReportConfig)
+						.then(function(pageViews) {
+							var revenue, clicks;
+
+							computedData[pageGroupKey].variationData[variationKey].click += Number(zoneObj.click);
+							computedData[pageGroupKey].variationData[variationKey].impression += Number(zoneObj.impression);
+							computedData[pageGroupKey].variationData[variationKey].revenue += Number(zoneObj.revenue);
+							computedData[pageGroupKey].variationData[variationKey].ctr += Number(zoneObj.ctr);
+
+							computedData[pageGroupKey].variationData[variationKey].revenue = Number(computedData[pageGroupKey].variationData[variationKey].revenue.toFixed(2));
+							computedData[pageGroupKey].variationData[variationKey].ctr = Number(computedData[pageGroupKey].variationData[variationKey].ctr.toFixed(2));
+							computedData[pageGroupKey].variationData[variationKey].pageViews = Number(pageViews);
+
+							revenue = computedData[pageGroupKey].variationData[variationKey].revenue;
+							clicks = computedData[pageGroupKey].variationData[variationKey].click;
+
+							computedData[pageGroupKey].variationData[variationKey].pageRPM = Number((revenue / pageViews * 1000).toFixed(2));
+							computedData[pageGroupKey].variationData[variationKey].pageCTR = Number((clicks / pageViews * 100).toFixed(2));
+
+							return computedData;
+						});
+				})).then(function() {
+					return computedData;
 				});
+			})).then(function() {
+				return computedData;
 			});
+		})).then(function() {
+			return computedData;
 		});
-		
-		return computedData;
 	},
 	removeRedundantVariationsObj: function(pageGroupData) {
 		var computedData = extend(true, {}, pageGroupData);
@@ -68,29 +98,35 @@ module.exports = {
 					};
 					datesObj.revenue[currentDate] = currentComputedObj.revenue.name;
 					
-					// currentComputedObj.pageviews = {
-					// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					// 	data: [[currentDate, 0]],
-					// 	tooltip: {valueDecimals: 2}
-					// };
+					currentComputedObj.pageviews = {
+						name: (variationObj.name.replace(" ", "-")),
+						data: [[currentDate, Number(variationObj.pageViews)]]
+					};
+					datesObj.pageviews[currentDate] = currentComputedObj.pageviews.name;
+
 					currentComputedObj.clicks = {
 						name: (variationObj.name.replace(" ", "-")),
 						data: [[currentDate, Number(zonesObj.click)]]
 					};
 					datesObj.clicks[currentDate] = currentComputedObj.clicks.name;
-					// currentComputedObj.pagerpm = {
-					// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					// 	data: [[currentDate, 0]],
-					// 	tooltip: {valueDecimals: 2}
-					// };
-					// currentComputedObj.pagectr = {
-					// 	name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					// 	data: [[currentDate, 0]],
-					// 	tooltip: {valueDecimals: 2}
-					// };
+
+					currentComputedObj.pagerpm = {
+						name: (variationObj.name.replace(" ", "-")),
+						data: [[currentDate, Number(variationObj.pageRPM)]]
+					};
+					datesObj.pagerpm[currentDate] = currentComputedObj.pagerpm.name;
+
+					currentComputedObj.pagectr = {
+						name: (variationObj.name.replace(" ", "-")),
+						data: [[currentDate, Number(variationObj.pageCTR)]]
+					};
+					datesObj.pagectr[currentDate] = currentComputedObj.pagectr.name;
 
 					utils.setHighChartsData(currentDate, 'revenue', highChartsData.highCharts, currentComputedObj);
 					utils.setHighChartsData(currentDate, 'clicks', highChartsData.highCharts, currentComputedObj);
+					utils.setHighChartsData(currentDate, 'pageviews', highChartsData.highCharts, currentComputedObj);
+					utils.setHighChartsData(currentDate, 'pagerpm', highChartsData.highCharts, currentComputedObj);
+					utils.setHighChartsData(currentDate, 'pagectr', highChartsData.highCharts, currentComputedObj);
 				});
 			});
 
@@ -99,8 +135,20 @@ module.exports = {
 				utils.setDateWithEmptyValue(dateKey, 'revenue', highChartsData.highCharts);
 			});
 
+			_.forOwn(datesObj.pageviews, function(pageviewsData, dateKey) {
+				utils.setDateWithEmptyValue(dateKey, 'pageviews', highChartsData.highCharts);
+			});
+
 			_.forOwn(datesObj.clicks, function(clicksData, dateKey) {
 				utils.setDateWithEmptyValue(dateKey, 'clicks', highChartsData.highCharts);
+			});
+
+			_.forOwn(datesObj.pagerpm, function(pagerpmData, dateKey) {
+				utils.setDateWithEmptyValue(dateKey, 'pagerpm', highChartsData.highCharts);
+			});
+
+			_.forOwn(datesObj.pagectr, function(pagectrData, dateKey) {
+				utils.setDateWithEmptyValue(dateKey, 'pagectr', highChartsData.highCharts);
 			});
 
 			computedData[pageGroupKey].variations.data = extend(true, computedData[pageGroupKey].variations.data, highChartsData);

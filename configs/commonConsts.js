@@ -59,8 +59,19 @@ module.exports = {
 			sizes: [{ width: 320, height: 50 }, { width: 300, height: 250 }, { width: 250, height: 250 }, { width: 200, height: 200 }, { width: 320, height: 100 }]
 		},
 	],
+	analytics: {
+		'SEGMENT_APP_ID': 'vkVd688NyfGcgDhQwJSaiZofdEXvAZVQ',
+		'INTERCOM_ID': 'WiCwcQZTNKXyiCLQMCD7EwD2dUAPznK34rByaIt3',
+		'PIPEDRIVE_URL': 'https://www.adpushup.com/tech_integration/crm_scripts/callback/signup.php',
+		'PIPEDRIVE_SYNC_TOKEN': 'f4a90157f53a437a1f6b5c0d889b6d7db005f67e'
+	},
 	password: {
 		'MASTER': 'fe4720b8bcdedb3cc47490015b0ab050'
+	},
+	exceptions: {
+		str: {
+			apexServiceDataEmpty: 'Apex service data should not be empty'
+		}
 	},
 	partners: {
 		geniee: {
