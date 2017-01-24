@@ -133,7 +133,7 @@ router
             userModel.getUserByEmail(req.session.user.email).then(function (user) {
                 var userSites = user.get('sites'),
                     userWebsiteRevenue = user.get('revenueUpperLimit');
-                if (!req.body.fromDashboard) {
+                if (req.body.fromDashboard == 'false') {
                     user.set('preferredModeOfReach', req.body.modeOfReach);
                     if (req.body['selectedServices[]'] && req.body['selectedServices[]'].length > 1 || userWebsiteRevenue > 10000) {
                         req.session.stage = 'Onboarding';
