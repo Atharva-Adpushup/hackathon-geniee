@@ -102,12 +102,17 @@ var GenieeReport = (function(w, $) {
         $links.off('click').on('click', handleDateFilterLinksClick);
     }
 
+    function resetFilterConfig() {
+        // Reset date filter data
+        setFilterDateData({});
+        //Reset filter param config
+        setFilterParamConfigData(this.paramConfig);
+    }
+
     function handleDateFilterLabelsBadgeClick(e) {
         var $badge = $(e.target);
 
-        // Reset date filter data
-        setFilterDateData({});
-        setFilterParamConfigData(this.paramConfig);
+        resetFilterConfig();
         $badge.parent().remove();
     }
 
@@ -165,6 +170,15 @@ var GenieeReport = (function(w, $) {
         this.$filterApplyBtn.off('click').on('click', handleFilterApplyBtnClick.bind(this));
     }
 
+    function handleFilterResetBtnClick() {
+        resetFilterConfig();
+        this.$filterDateSelectedWrapper.html('');
+    }
+
+    function bindFilterResetBtn() {
+        this.$filterResetBtn.off('click').on('click', handleFilterResetBtnClick.bind(this));
+    }
+
     function initSlideoutMenu() {
         var self = this;
 
@@ -176,6 +190,7 @@ var GenieeReport = (function(w, $) {
             'easing': 'cubic-bezier(.32,2,.55,.27)',
             'side': 'right'
         });
+        self.$slideoutMenu.css({visibility: 'visible'});
 
         toggleSlideoutMenu();
     }
@@ -498,6 +513,7 @@ var GenieeReport = (function(w, $) {
         bindDateFilterLinks();
         bindDateFilterLabelsBadge();
         bindFilterApplyBtn();
+        bindFilterResetBtn();
         setThumbnailUiData();
         setActiveThumbnail($revenueHeaderThumbnail);
         prepareReportsChart($revenueHeaderThumbnail);
