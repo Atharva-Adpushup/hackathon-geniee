@@ -1,8 +1,6 @@
 function main() {
 
 	window.adpPrebid = require('./prebid');
-	window.googletag = window.googletag || {};
-	googletag.cmd = googletag.cmd || [];
 
 	require('./libs/polyfills');
 
@@ -60,10 +58,10 @@ function main() {
 		});
 	};
 
-	window.__renderPrebidAd = function(pbjsParams, slotId, timeout){
+	window.__renderPrebidAd = function(pbjsParams, slotId, containerId, timeout){
 
 		// Push in googletag.cmd so that multiple calls are processed sequentially.
-		googletag.cmd.push(function(){
+		pbjs.cmd.push(function(){
 
 			// Copy prebid params in current window's prebid context
 			Object.keys(pbjsParams).forEach(function(pbjsKey) {
@@ -93,7 +91,44 @@ function main() {
 						gSlot.setTargeting('is_timed_out', timeout);
 					}
 
-					adpRefresh(gSlot);
+					if( config.postbid ) {
+						var params = pbjs.getAdserverTargetingForAdUnitCode(slotId),
+							adIframe = utils.createEmptyIframe();
+
+						document.getElementById(containerId).appendChild(adIframe);
+
+						var iframeDoc = adIframe.contentWindow.document;
+		        var slotEvents = googletag.pubads().B;
+
+						if (params && params.hb_adid){
+		          pbjs.renderAd(iframeDoc, params.hb_adid);
+		          adIframe.contentWindow.onload = function(){
+
+		          	if (slotEvents.slotRenderEnded){
+		          		slotEvents.slotRenderEnded[0]({
+			          		"slot" : gSlot,
+			          		"hbAdLoaded" : true
+			          	});
+		          	}
+
+		          };
+		        } else {
+		          // If no bidder return any creatives, run passback.
+		          adIframe.width = 0;
+		          adIframe.height = 0;
+
+		          if (slotEvents.slotRenderEnded){
+	          		slotEvents.slotRenderEnded[0]({
+		          		"slot" : gSlot,
+		          		"hbAdLoaded" : false
+		          	});
+	          	}
+		        }
+
+					} else {
+						adpRefresh(gSlot);
+					}
+
 				}
 			});
 
@@ -130,7 +165,7 @@ function main() {
 		});
 	};
 
-	function createPrebidContainer(hbConfigParams, size, slotId){
+	function createPrebidContainer(hbConfigParams, size, slotId, containerId){
 
 		var prebidHtml = adRenderingTemplate.replace('__AD_UNIT_CODE__', JSON.stringify({
 			code : slotId,
@@ -138,7 +173,8 @@ function main() {
 			bids : JSON.parse( JSON.stringify(hbConfigParams).replace('__AD_UNIT__', slotId) )
 		}))
 		.replace('__PB_TIMEOUT__', config.prebidTimeout)
-		.replace('__PB_SLOT_ID__', "'" + slotId + "'");
+		.replace('__PB_CONTAINER_ID__', JSON.stringify(containerId))
+		.replace('__PB_SLOT_ID__', JSON.stringify(slotId));
 
 		var iframeEl = document.createElement('iframe');
 		iframeEl.style.display = "none";
@@ -194,11 +230,12 @@ function main() {
 
 		googletag.cmd.push(function(){
 
-			var oDF = googletag.defineSlot,
-				oES = googletag.enableServices;
+			window.__oDF = googletag.defineSlot;
 
-			googletag.defineSlot = function(slotId, size, container ){
-				var definedSlot = oDF.apply(this, [].slice.call(arguments));
+			var oES = googletag.enableServices;
+
+			googletag.defineSlot = function(slotId, size, containerId ){
+				var definedSlot = window.__oDF.apply(this, [].slice.call(arguments));
 
 				if( matchAdSize(size, config.getTargetingAdSizes()) ) {
 					logger.info("size matched (%s) for slot (%s) ", size.toString(), slotId );
@@ -219,7 +256,7 @@ function main() {
 						pbBiddingPartners = biddingPartners;
 					}
 
-					createPrebidContainer( pbBiddingPartners, size, slotId );
+					createPrebidContainer( pbBiddingPartners, size, slotId, containerId );
 				} else {
 					refreshSlot( definedSlot );
 				}
@@ -236,6 +273,29 @@ function main() {
 			};
 
 		});
+
+		googletag.cmd.push(function(){
+
+			if( config.slotInitConfig ) {
+				config.slotInitConfig.forEach(function( _slot ){
+
+					if( config.postbid ) {
+						googletag.defineSlot( _slot.slotPath, _slot.slotSize, _slot.slotContainer ).addService(googletag.content());
+					} else {
+						googletag.defineSlot( _slot.slotPath, _slot.slotSize, _slot.slotContainer ).addService(googletag.pubads());
+					}
+
+				});
+
+				googletag.enableServices();
+			}
+
+			if( config.targetAllDFP === false ) {
+				googletag.defineSlot = window.__oDF;
+			}
+
+		});
+
 	}
 }
 

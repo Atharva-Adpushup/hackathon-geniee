@@ -82,13 +82,15 @@ function initReports( hbSlots ) {
 
 				renderedSlots.push(slotPath);
 
-				dfpWinners[ slotPath ] = dfpWinners[ slotPath ]  || {
-					// mantain consistency with having only strings for various IDs
-					advertiserId : (event.advertiserId ? event.advertiserId.toString() : "0".repeat(10)),
-					lineItemId   : (event.lineItemId   ? event.lineItemId.toString() : "0".repeat(10)),
-					creativeId   : (event.creativeId   ? event.creativeId.toString() : "0".repeat(10)),
-					adUnitPath   : slotPath
-				};
+				if( ! config.postbid ) {
+					dfpWinners[ slotPath ] = dfpWinners[ slotPath ]  || {
+						// mantain consistency with having only strings for various IDs
+						advertiserId : (event.advertiserId ? event.advertiserId.toString() : "0".repeat(10)),
+						lineItemId   : (event.lineItemId   ? event.lineItemId.toString() : "0".repeat(10)),
+						creativeId   : (event.creativeId   ? event.creativeId.toString() : "0".repeat(10)),
+						adUnitPath   : slotPath
+					};
+				}
 			}
 
 			// If all header bidding slots have been rendered
