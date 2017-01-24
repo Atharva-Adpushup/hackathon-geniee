@@ -120,6 +120,26 @@ $borderColor: #e6e6e6;
     {
         border-bottom: 1px solid $borderColor;
     }
+    .slideout-menu
+    {
+        @include block-ui;
+        @include shadow;
+        padding-bottom: 150px;
+        // Offset Height of reports container block element
+        top: 90px;
+        width: 300px;
+
+        > .filter-selected-wrapper
+        {
+            height: 100px;
+        }
+
+        .btn-theme--primary
+        {
+            color: $whiteColor;
+            margin-right: 10px;
+        }
+    }
 
     /*****Specific margin classes*****/
     .perf-panel-heading-wrapper
@@ -152,7 +172,7 @@ $borderColor: #e6e6e6;
         }
     }
 
-    /*****Btn specific rules*****/
+    /*****Generic bootstrap rules override*****/
     .btn
     {
         height: 34px;
@@ -190,6 +210,43 @@ $borderColor: #e6e6e6;
             background: $primaryColorDark;
             border-color: $primaryColorDark;
             box-shadow: 0 0 3px $primaryColorDark inset;
+        }
+
+        &.btn-theme--primary
+        {
+            background: $primaryColor;
+            border-color: $primaryColor;
+            box-shadow: 0 0 3px $primaryColor inset;
+        }
+    }
+    .panel-default
+    {
+        > .panel-heading
+        {
+            background: #f1f1f1;
+            border: 0;
+            box-shadow: none;
+            outline: none;
+
+            > .panel-title
+            {
+                font-size: 1.168em;
+            }
+        }
+    }
+    .panel-collapse
+    {
+        > .panel-body
+        {
+            a {
+                color: $primaryColor;
+                font-size: 1.168em;
+
+                &.active
+                {
+                    color: inherit;
+                }
+            }
         }
     }
 }
