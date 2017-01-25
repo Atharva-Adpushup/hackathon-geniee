@@ -1,3 +1,4 @@
+//TODO: Break this module to small sub-modules
 var GenieeReport = (function(w, $) {
     var self = this;
 
@@ -120,6 +121,22 @@ var GenieeReport = (function(w, $) {
         this.$filterDateSelectedWrapper.off('click').on('click', '.js-badge', handleDateFilterLabelsBadgeClick.bind(this));
     }
 
+    function reInitReports(reportData) {
+        var self = this;
+        triggerFilterBtnClick();
+
+        w.setTimeout(function() {
+            self.model = $.extend(true, {}, reportData);
+            setAndLoadPageGroupReports();
+        }, 1000);
+    }
+
+    function setAndLoadPageGroupReports() {
+        this.selectedPageGroupId = null;
+        setReportsLevel(this.reportsLevel.pagegroup);
+        chooseLevelAndLoadReports();
+    }
+
 	function getReports(paramsData, callbackConfig) {
 		var url = '/user/site/' + this.siteId + '/reports/getPerformanceData',
 			type = 'GET';
@@ -134,7 +151,7 @@ var GenieeReport = (function(w, $) {
 			data = (typeof data === 'string') ? JSON.parse(data) : data;
 
 			if (data.success) {
-				return callbackConfig.success(data);
+				return callbackConfig.success(data.data);
 			}
 
 			return callbackConfig.error();
@@ -144,8 +161,9 @@ var GenieeReport = (function(w, $) {
 	}
 
     function reportsSuccessCallback(reportData) {
-        console.log('Got report data: ', reportData);
+        reInitReports(reportData);
     }
+
 
     function reportsErrorCallback() {
         console.error('Error loading reports');
@@ -195,6 +213,10 @@ var GenieeReport = (function(w, $) {
         self.$slideoutMenu.css({visibility: 'visible'});
 
         toggleSlideoutMenu();
+    }
+
+    function triggerFilterBtnClick() {
+        this.$filterButton.click();
     }
 
     function toggleSlideoutMenu() {
@@ -304,11 +326,8 @@ var GenieeReport = (function(w, $) {
     function onMediaBreadCrumbClick(e) {
         var $el = $(e.target);
 
-        if ($el.hasClass('active')) {return false;}
-
-        this.selectedPageGroupId = null;
-        setReportsLevel(this.reportsLevel.pagegroup);
-        chooseLevelAndLoadReports();
+        if ($el.hasClass('active')) { return false; }
+        setAndLoadPageGroupReports();
     }
 
     function setTooltipOnMediaBreadCrumb() {
