@@ -120,6 +120,38 @@ $borderColor: #e6e6e6;
     {
         border-bottom: 1px solid $borderColor;
     }
+    .slideout-menu
+    {
+        @include block-ui;
+        @include shadow;
+        padding-bottom: 150px;
+        // Offset Height of reports container block element
+        top: 90px;
+        width: 300px;
+
+        > .filter-selected-wrapper
+        {
+            min-height: 100px;
+
+            > .label.label-default
+            {
+                > .badge
+                {
+                    background: #eb575c;
+                    cursor: pointer;
+                    position: absolute;
+                    top: -9px;
+                    right: -10px;
+                }
+            }
+        }
+
+        .btn-theme--primary
+        {
+            color: $whiteColor;
+            margin-right: 10px;
+        }
+    }
 
     /*****Specific margin classes*****/
     .perf-panel-heading-wrapper
@@ -152,7 +184,7 @@ $borderColor: #e6e6e6;
         }
     }
 
-    /*****Btn specific rules*****/
+    /*****Generic bootstrap rules override*****/
     .btn
     {
         height: 34px;
@@ -191,5 +223,55 @@ $borderColor: #e6e6e6;
             border-color: $primaryColorDark;
             box-shadow: 0 0 3px $primaryColorDark inset;
         }
+
+        &.btn-theme--primary
+        {
+            background: $primaryColor;
+            border-color: $primaryColor;
+            box-shadow: 0 0 3px $primaryColor inset;
+        }
+    }
+    .panel-default
+    {
+        > .panel-heading
+        {
+            background: #f1f1f1;
+            border: 0;
+            box-shadow: none;
+            outline: none;
+
+            > .panel-title
+            {
+                font-size: 1.168em;
+            }
+        }
+    }
+    .panel-collapse
+    {
+        > .panel-body
+        {
+            a {
+                color: $primaryColor;
+                font-size: 1.168em;
+
+                &.active
+                {
+                    color: inherit;
+                }
+            }
+        }
+    }
+    .label.label-default
+    {
+        background: #f1f1f1;
+        border: 1px solid #ddd;
+        color: inherit;
+        display: inline-block;
+        font-size: 1.168em;
+        height: auto;
+        margin: 0 15px 10px 0;
+        padding: 10px;
+        position: relative;
+        width: auto;
     }
 }

@@ -23,6 +23,7 @@ var model = require('../helpers/model'),
 			'dateCreated',
 			'dateModified',
 			'step',
+			'hbConfig',
 			'websiteRevenue'
 		];
 		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'channels', 'cmsInfo', 'apConfigs', 'partner', 'genieeMediaId'];
@@ -288,6 +289,16 @@ function apiModule() {
 					site.set('apConfigs', siteConfig);
 					return site.save();
 				})
+		},
+		saveHbConfig: function(siteId, hbConfig) {
+			return API.getSiteById(siteId)
+				.then(function(site) {
+					site.set('hbConfig', hbConfig);
+					return site.save();
+				})
+				.catch(function(err) {
+					throw new AdPushupError('Some error occurred! Unable to save header bidding setup config.');
+				});
 		},
 		getSetupStep: function(siteId) {
 			return API.getSiteById(siteId)

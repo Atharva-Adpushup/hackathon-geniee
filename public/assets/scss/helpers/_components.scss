@@ -373,3 +373,32 @@ textarea {
 	}
   }
 }
+
+/* Select box */
+
+.select-box-lg {
+	width: 100%;
+	background-position-x: 97%;
+
+	& > select {
+		width: 100%;
+	}
+}
+
+/* Text labels */
+
+.label-main {
+	display: inline-block;
+	padding: 4px;
+	background-color: $primaryColor;
+	color: $whiteColor;
+	border-left: 2px solid $primaryColorDark;
+	display: inline-block;
+    padding: 2px 8px;
+    background-color: #eb575c;
+    color: #fff;
+    border-left: 6px solid #cf474b;
+    font-size: 1.2em;
+    border-radius: 2px;
+	text-transform: capitalize;
+}

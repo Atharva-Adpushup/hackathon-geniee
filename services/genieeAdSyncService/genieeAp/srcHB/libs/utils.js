@@ -34,8 +34,28 @@ function hashCode(str){
     return hash;
 }
 
+function createEmptyIframe() {
+  var f = document.createElement('iframe');
+
+  f.id = "_adp_frame_" + ((Math.random() * 1000) | 0);
+  f.height = 0;
+  f.width = 0;
+  f.border = '0px';
+  f.hspace = '0';
+  f.vspace = '0';
+  f.marginWidth = '0';
+  f.marginHeight = '0';
+  f.style.border = '0';
+  f.scrolling = 'no';
+  f.frameBorder = '0';
+  f.src = 'about:blank';
+
+  return f;
+}
+
 module.exports = {
 	buildUrl: buildUrl,
 	uniqueId: uniqueId,
-    hashCode: hashCode
+    hashCode: hashCode,
+    createEmptyIframe : createEmptyIframe
 };

@@ -1,0 +1,59 @@
+extends  layout/base
+
+- a = countries
+
+block getTitle
+    - var titleVar = "Header Bidding" 
+
+block append headCss
+    style.
+        .settings-pane .btn,
+        .btn.btn-lightBg {
+            width: 220px;
+        }
+
+block append headScripts
+    script.
+        $(document).ready(function() {
+            window.countries = !{countries};
+            window.continents = !{continents};
+            window.adSizes = !{adSizes};
+            window.hbPartners = !{hbPartners};
+            window.hbConfig = !{hbConfig};
+        });
+
+    if environment == "production"
+        script(src="/assets/js/builds/header-bidding-setup.min.js")
+    else 
+        script(src="/assets/js/libs/custom/header-bidding-setup.js")
+
+block bodyContent
+    include layout/sideBar
+    .pageContainer.page-container
+        include layout/header
+        // Page Content Starts Here
+        .pageContentWrapper.page-content
+            .pageContentInner.page-content--inner
+                .notification-wrapper
+
+                //- Alert wrapper
+                div.detectap-alert.text-center#hbalert
+
+                #widgetsArea.row
+                    .mb-30
+                        .controlAdpushupWrap
+                            h3.title.m-All-0.clearfix 
+                                a Header Bidding - #{utils.domanize(siteDomain)}
+
+                            form#hbform.settings-pane
+                                .row
+                                    .col-sm-12
+                                        h4 Configure Header Bidding by setting all options below
+
+                                #hbform-render
+
+                                hr
+                                button.btn.btn-lightBg.btn-default.mb-30(type="button")#addgeo Add another Geo config
+                                                
+                                hr 
+                                button.btn.btn-primary Save Header bidding Setup

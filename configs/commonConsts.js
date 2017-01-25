@@ -9,6 +9,56 @@ module.exports = {
 		xpathWaitTimeout: 5000,
 		adpushupPercentage: 100
 	},
+	hbConfig: {
+		'pulsepoint': {
+			name: 'pulsepoint',
+			isHb: true,
+			global: {
+				cf: {default: '560684', validations: {'required': true}, alias: "User Id", isEditable: true}
+			},
+			local: {
+				ct: {validations: {'required': true}, alias: "Ad Id"}
+			}
+		},
+		'wideorbit': {
+			name: 'wideorbit',
+			isHb: true,
+			global: {
+				pbId: {default: '560684', validations: {'required': true}, alias: "User Id", isEditable: true}
+			},
+			local: {
+				pId: {validations: {'required': true, type: 'number'}, alias: "Ad Id"}
+			}
+		},
+		
+	},
+	hbContinents: [
+		{ name: 'Europe', code: 'EUR' },
+		{ name: 'Oceania', code: 'OAN' },
+		{ name: 'Africa', code: 'AFR' },
+		{ name: 'Asia', code: 'ASA' },
+		{ name: 'North America', code: 'NAA' },
+		{ name: 'South America', code: 'SAA' },
+		{ name: 'Middle East', code: 'MEA' }
+	],
+	supportedAdSizes: [
+		{
+			layoutType: 'SQUARE',
+			sizes: [{ width: 300, height: 250 }, { width: 250, height: 250 }, { width: 200, height: 200 }, { width: 336, height: 280 }]
+		},
+		{
+			layoutType: 'HORIZONTAL',
+			sizes: [{ width: 728, height: 90 }, { width: 468, height: 60 }, { width: 900, height: 90 }, { width: 970, height: 250 }]
+		},
+		{
+			layoutType: 'VERTICAL',
+			sizes: [{ width: 300, height: 600 }, { width: 160, height: 600 }, { width: 120, height: 600 }, { width: 300, height: 1050 }]
+		},
+		{
+			layoutType: 'MOBILE',
+			sizes: [{ width: 320, height: 50 }, { width: 300, height: 250 }, { width: 250, height: 250 }, { width: 200, height: 200 }, { width: 320, height: 100 }]
+		},
+	],
 	analytics: {
 		'SEGMENT_APP_ID': 'vkVd688NyfGcgDhQwJSaiZofdEXvAZVQ',
 		'INTERCOM_ID': 'WiCwcQZTNKXyiCLQMCD7EwD2dUAPznK34rByaIt3',

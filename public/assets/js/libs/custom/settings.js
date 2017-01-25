@@ -1,4 +1,4 @@
-// Global settings module script
+// Settings module script
 
 $(document).ready(function () {
     (function (w, d) {

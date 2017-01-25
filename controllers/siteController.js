@@ -9,6 +9,8 @@ var express = require('express'),
     config = require('../configs/config'),
     userModel = require('.././models/userModel'),
     siteModel = require('.././models/siteModel'),
+    commonConsts = require('../configs/commonConsts'),
+    countryData = require('country-data'),
     router = express.Router({ mergeParams: true });
 
 function checkAuth(req, res, next) {
@@ -48,6 +50,55 @@ router
             })
             .catch(function (err) {
                 res.send('Some error occurred!');
+            });
+    })
+    .get('/:siteId/headerBidding', function(req, res) {
+        return siteModel.getSiteById(req.params.siteId)
+            .then(function (site) {
+                var countries = _.map(countryData.lookup.countries(), function(country) {
+                    return {
+                        name: country.name,
+                        code: country.alpha2
+                    };
+                }), adSizes = [], hbPartners = [];
+
+                _.forIn(commonConsts.hbConfig, function(hbPartner) {
+                    hbPartner.isHb ? hbPartners.push(hbPartner.name) : null;
+                });
+                _.forEach(commonConsts.supportedAdSizes, function(layout) {
+                    _.forEach(layout.sizes, function(size) {
+                        adSizes.push(size.width+'x'+size.height);
+                    });
+                });            
+
+                return res.render('headerBidding', {
+                    siteDomain: site.get('siteDomain'),
+                    countries: JSON.stringify(countries),
+                    continents: JSON.stringify(commonConsts.hbContinents),
+                    adSizes: JSON.stringify(_.uniq(adSizes)),
+                    hbPartners: JSON.stringify(hbPartners),
+                    hbConfig: JSON.stringify(commonConsts.hbConfig)
+                });
+            })
+            .catch(function (err) {
+                res.send('Some error occurred!');
+            });
+    })
+    .post('/:siteId/saveHeaderBiddingSetup', function(req, res) {
+        var siteId = req.params.siteId,
+            hbConfig = JSON.parse(req.body.hbConfig);
+
+        return siteModel.saveHbConfig(siteId, hbConfig)
+            .then(function (data) {
+                res.send({ success: 1 });
+            })
+            .catch(function (err) {
+                if (err.name === 'AdPushupError') {
+                    res.send({ succes: 0, message: err.message })
+                }
+                else {
+                    res.send({ success: 0, message: 'Some error occurred!' });
+                }
             });
     })
     .post('/:siteId/saveSiteSettings', function (req, res) {

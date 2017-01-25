@@ -28,6 +28,10 @@ module.exports = function (grunt) {
                 src: ['public/assets/js/libs/custom/signup.js'],
                 dest: 'public/assets/js/builds/signup.min.js'
             },
+            hbSetupBuild: {
+                src: ['public/assets/js/libs/custom/header-bidding-setup.js'],
+                dest: 'public/assets/js/builds/header-bidding-setup.min.js'
+            }
         },
         concat: {
             baseLibsBuild: {
