@@ -345,7 +345,7 @@ router
 	})
 	.get('/thankyou', function (req, res) { // this is for users who are above >10000 USD
 		thankYouRedirection('thankyou', req, res);
-		if (req.session) {
+		if (req.session && !req.session.isSuperUser) {
 			req.session.destroy();
 		}
 	})
