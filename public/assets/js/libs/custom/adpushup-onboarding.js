@@ -73,7 +73,7 @@ $('document').ready(function () {
                         });
                     }
                     adpushupAnalyticsEvents.emit('analyticsTrack', {
-                        eventName: 'onboarding',
+                        eventName: 'Onboarding',
                         obj: {
                             action: 'click',
                             step: data.step
