@@ -230,6 +230,23 @@ $borderColor: #e6e6e6;
             border-color: $primaryColor;
             box-shadow: 0 0 3px $primaryColor inset;
         }
+        &.btn--notification
+        {
+            border-color: $primaryColor;
+            position: relative;
+
+            &::before
+            {
+                background: $primaryColor;
+                border-radius: 100%;
+                content: '';
+                height: 10px;
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                width: 10px;
+            }
+        }
     }
     .panel-default
     {

@@ -16,7 +16,14 @@ var GenieeReport = (function(w, $) {
     this.filterData = {
         paramConfig: $.extend(true, {}, this.paramConfig),
         date: {},
-        platform: {}
+        platform: {},
+        constants: {
+            notification: {
+                btn: {
+                    class: 'btn--notification'
+                }
+            }
+        }
     };
 
     // Cache DOM elements query
@@ -63,6 +70,22 @@ var GenieeReport = (function(w, $) {
 
     function createChart(selector, config) {
         w.Highcharts.stockChart(selector, config);
+    }
+
+    function addFilterBtnNotification() {
+        var className = this.filterData.constants.notification.btn.class;
+
+        if (!this.$filterButton.hasClass(className)) {
+            this.$filterButton.addClass(className);
+        }
+    }
+
+    function removeFilterBtnNotification() {
+        var className = this.filterData.constants.notification.btn.class;
+
+        if (this.$filterButton.hasClass(className)) {
+            this.$filterButton.removeClass(className);
+        }
     }
 
     function setFilterSelectedLabel(name) {
@@ -128,6 +151,7 @@ var GenieeReport = (function(w, $) {
         w.setTimeout(function() {
             self.model = $.extend(true, {}, reportData);
             setAndLoadPageGroupReports();
+            addFilterBtnNotification();
         }, 1000);
     }
 
@@ -192,6 +216,7 @@ var GenieeReport = (function(w, $) {
 
     function handleFilterResetBtnClick() {
         resetFilterConfig();
+        removeFilterBtnNotification();
         this.$filterDateSelectedWrapper.html('');
     }
 
