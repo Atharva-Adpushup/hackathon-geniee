@@ -159,7 +159,7 @@ var GenieeReport = (function(w, $) {
             paramConfig = this.paramConfig;
 
         if (isLabelElem && isDateFilterData) {
-            paramConfig = this.filterData.date[filterData[0]];
+            paramConfig = $.extend(true, {}, this.filterData.paramConfig);
 
             getReports(paramConfig, {
                 success: reportsSuccessCallback,
