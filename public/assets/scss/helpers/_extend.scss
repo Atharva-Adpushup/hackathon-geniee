@@ -73,7 +73,7 @@ collapsedextended
 
 /*****Generic style utilities*****/
 /**TODO: Prefix all utility classes with "u-"
- *@Author: Zahin Omar Alwa
+ * @Author: Zahin Omar Alwa
  */
 /***Padding***/
 .pdLR-0 {
@@ -142,6 +142,12 @@ collapsedextended
 }
 .u-padding-0px {
 	padding: 0 !important;
+}
+.u-padding-10px {
+	padding: 10px !important;
+}
+.u-padding-20px {
+	padding: 20px !important;
 }
 
 
@@ -225,11 +231,21 @@ collapsedextended
 .u-block--half {
 	height: 50%
 }
+// Use this class to block UI consistency
+.u-block-ui {
+	@include block-ui;
+	@include shadow;
+	position: relative;
+}
+
 
 /*****UI alignment classes*****/
 .u-separator--colon {
 	display: inline-block;
 	margin: 0 $FMLayoutDimension/2;
+}
+.u-border-bottom {
+	border-bottom: 1px solid $borderColor;
 }
 
 /**********UI generic classes***********/

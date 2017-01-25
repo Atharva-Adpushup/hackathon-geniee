@@ -19,6 +19,12 @@ nav.pageLeftSidebar.sidebar
                             | Add New Website
                             span.icon-thumbnail#sidebar-new-website-icon-thumbnail
                                 i.fa.fa-plus#sidebar-new-website-icon
+                if isSuperUser
+                    li.sidebar-menu-item
+                        a(id="sidebar-new-website-link", href='/user/updateUserStatus', data-toggle='', data-target='')
+                            | User Controls
+                            span.icon-thumbnail#sidebar-user-controls-icon-thumbnail
+                                i.fa.fa-sliders#sidebar-user-controls
                 //- li.sidebar-menu-item
                 //-     a(id="sidebar-billing-link", href='/user/billing')
                 //-         | Billing

@@ -4,6 +4,7 @@ var express = require('express'),
 	channelModel = require('../models/channelModel'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	genieeService = require('../reports/partners/geniee/service'),
+	genieeFilterDates = require('../reports/partners/geniee/modules/filters/date/index'),
 	adsenseReportModel = require('../models/adsenseModel'),
 	adxReportModel = require('../models/adxModel'),
 	apexReportService = require('../reports/default/apex/ctrPerformanceInTabularData/service'),
@@ -22,7 +23,9 @@ router
 			siteId: req.params.siteId,
 			dateFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
 			dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
-		}, siteDomainName;
+		},
+		siteDomainName,
+		filterDates = genieeFilterDates.getFilterDates();
 
 		return siteModel.getSiteById(paramConfig.siteId)
 			.then(function(site) {
@@ -35,7 +38,9 @@ router
 						return res.render('performanceReport', {
 							reportingData: data,
 							siteId: req.params.siteId,
-							siteDomain: siteDomainName
+							siteDomain: siteDomainName,
+							paramConfig: paramConfig,
+							filterDates: filterDates
 						});
 					})
 					.catch(function(err) {
@@ -57,7 +62,7 @@ router
 					});
 			});
 	})
-	.get('/performanceData', function(req, res) {
+	.get('/getPerformanceData', function(req, res) {
 		var	paramConfig = {
 			siteId: req.params.siteId,
 			dateFrom: ((req.query && req.query.dateFrom) || moment().subtract(7, 'days').format('YYYY-MM-DD')),
@@ -66,7 +71,8 @@ router
 
 		return siteModel.getSiteById(paramConfig.siteId)
 			.then(function(site) {
-				paramConfig.mediaId = 920; //site.get('genieeMediaId');
+				paramConfig.mediaId = site.get('genieeMediaId');
+
 				return genieeService.getReport(paramConfig)
 					.then(function(reportData) {
 						return res.json({

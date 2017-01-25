@@ -52,8 +52,8 @@ block bodyContent
                                 h4#myModalLabel.modal-title Send Code to Developer
                             form.form-inline#sendCodeForm
                                 .modal-body.addSite
-                                    .form-group
-                                        .input-group
+                                    .form-group(style="display: block;")
+                                        .input-group(style="width: 100%;")
                                             span.input-group-addon
                                                 i.fa.fa-envelope-o
                                             input.form-control.input-lg(type='email', required=true, name='developerEmail', placeholder='Enter your developer\'s email')
