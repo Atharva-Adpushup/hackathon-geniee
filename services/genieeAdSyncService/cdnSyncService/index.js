@@ -181,8 +181,10 @@ module.exports = function (site) {
         getComputedConfig = Promise.resolve(true).then(function() {
             if (isGenieePartner) {
                 return getGenieeReportData(paramConfig);
-            } else {
+            } else if (isAutoOptimise) {
                 return getReportData(paramConfig);
+            } else {
+                return getVariationsPayload(site).then(setAllConfigs);
             }
         }),
         getFinalConfig = Promise.join(getComputedConfig, getJsFile, function (finalConfig, jsFile) {
