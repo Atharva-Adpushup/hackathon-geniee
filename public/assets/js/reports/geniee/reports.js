@@ -153,12 +153,14 @@ var GenieeReport = (function(w, $) {
 
     function handleFilterApplyBtnClick(e) {
         var isLabelElem = (this.$filterDateSelectedWrapper.find('.js-filter-selected--date').length > 0),
-            isDateFilterData = (Object.keys(this.filterData.date).length > 0),
+            filterData = Object.keys(this.filterData.date),
+            isDateFilterData = !!filterData.length,
             $btn = $(e.target),
             paramConfig = this.paramConfig;
 
         if (isLabelElem && isDateFilterData) {
-            console.log('Filter date range request: ', $btn);
+            paramConfig = this.filterData.date[filterData[0]];
+
             getReports(paramConfig, {
                 success: reportsSuccessCallback,
                 error: reportsErrorCallback
