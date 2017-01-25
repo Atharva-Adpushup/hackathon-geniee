@@ -121,7 +121,7 @@ var GenieeReport = (function(w, $) {
     }
 
 	function getReports(paramsData, callbackConfig) {
-		var url = '/user/reports/getPerformanceData',
+		var url = '/user/site/' + this.siteId + '/reports/getPerformanceData',
 			type = 'GET';
 
 		$.ajax({
