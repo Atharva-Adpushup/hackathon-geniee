@@ -77,7 +77,8 @@ router
                     continents: JSON.stringify(commonConsts.hbContinents),
                     adSizes: JSON.stringify(_.uniq(adSizes)),
                     hbPartners: JSON.stringify(hbPartners),
-                    hbConfig: JSON.stringify(commonConsts.hbConfig)
+                    hbConfig: JSON.stringify(commonConsts.hbConfig),
+                    hbSetupData: JSON.stringify(site.get('hbConfig'))
                 });
             })
             .catch(function (err) {

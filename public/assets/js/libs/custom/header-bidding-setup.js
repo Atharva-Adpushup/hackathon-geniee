@@ -35,22 +35,28 @@ $(document).ready(function () {
             },
 
             // Set geo select box data
-            setGeoSelectBoxOptions: function (countrySelect, continentSelect) {
+            setGeoSelectBoxOptions: function (el, countrySelect, continentSelect, geoSelection) {
                 w.countries.forEach(function (country) {
                     $(countrySelect).append('<option value=' + country.code + '>' + country.name + '</option>');
                 });
-                $('select option[value=' + this.defaults.country + ']').attr('selected', true);
-
                 w.continents.forEach(function (continent) {
                     $(continentSelect).append('<option value=' + continent.code + '>' + continent.name + '</option>');
                 });
+
+                if(geoSelection) {
+                    $(el).find('select option[value=' + geoSelection + ']').attr('selected', true)
+                }
+                else {
+                    $(el).find('select option[value=' + this.defaults.country + ']').attr('selected', true);
+                }
             },
 
             // Set adsize select box data 
-            setAdSizeSelectBoxOptions: function (adSizesSelect) {
+            setAdSizeSelectBoxOptions: function (adSizesSelect, size) {
                 w.adSizes.forEach(function (size) {
                     $(adSizesSelect).append('<option value=' + size + '>' + size + '</option>');
                 });
+                size ? $(adSizesSelect).find(' option[value=' + size + ']').attr('selected', true) : null;
             },
 
             // Set hb partners select box data
@@ -153,27 +159,42 @@ $(document).ready(function () {
             },
 
             // Function to render ad size setup panel
-            renderAdSizeSetupPanel: function (el, action) {
-                var w = $('<div class="hb-config-pane mT-20 select-size">'),
-                    s = this.templates.selectBoxes.adSizesSelect;
-                this.renderNewPanel(el, w, action, '.select-size', s);
+            renderAdSizeSetupPanel: function (el, adSizeSetup, action) {
+                if(adSizeSetup) {
+                    for(var size in adSizeSetup) {
+                        var w = $('<div class="hb-config-pane mT-20 select-size">'),
+                            s = this.templates.selectBoxes.adSizesSelect;
+                        this.renderNewPanel(el, w, action, '.select-size', s);
 
-                var adSize = w.find('.ad-size');
-                this.setAdSizeSelectBoxOptions(adSize);
-                this.renderMultiConfigPanel(w);
+                        var adSize = w.find('.ad-size');
+                        this.setAdSizeSelectBoxOptions(adSize, size);
+                        this.renderMultiConfigPanel(w);
+                    }
+                }
+                
+                // var w = $('<div class="hb-config-pane mT-20 select-size">'),
+                //     s = this.templates.selectBoxes.adSizesSelect;
+                // this.renderNewPanel(el, w, action, '.select-size', s);
+
+                // var adSize = w.find('.ad-size');
+                // this.setAdSizeSelectBoxOptions(adSize, size);
+                // this.renderMultiConfigPanel(w);
             },
 
             // Function to render geo setup panel
-            renderGeoSetupPanel: function () {
+            renderGeoSetupPanel: function (geoSetup) {
                 var s = this.templates.selectBoxes,
-                    w = $('<div class="hb-config-pane select-geo-wrapper mb-30">');
+                    w = $('<div class="hb-config-pane select-geo-wrapper mb-30">'),
+                    geoSelection = geoSetup ? geoSetup.type : this.defaults.geo;
 
                 w.append(s.geoSelect + s.countrySelect + s.continentSelect);
                 $('#hbform-render').append(w);
+                $('select option[value=' + geoSelection + ']').attr('selected', true);
 
                 var country = w.find('.geo-country'),
-                    continent = w.find('.geo-continent');
-                this.setGeoSelectBoxOptions(country, continent);
+                    continent = w.find('.geo-continent'),
+                    geoValue = geoSetup ? (geoSetup.type === 'country' ? geoSetup.country : geoSetup.continent) : null; 
+                this.setGeoSelectBoxOptions(w, country, continent, geoValue);
 
                 var otherPanels = $(w).parent().children('.select-geo-wrapper');
 
@@ -181,9 +202,19 @@ $(document).ready(function () {
                     $(otherPanels[i]).prepend(this.templates.closeBtn);
                 }
 
-                this.setGeoSubSelect(this.defaults.geo, $('.geo-selector'));
-                this.renderAdSizeSetupPanel(w);
+                this.setGeoSubSelect(geoSelection, $('.geo-selector'), geoValue);
+
+                var adSizeSetup = geoSetup ? geoSetup.info : null;
+                this.renderAdSizeSetupPanel(w, adSizeSetup);
                 $(w).append(this.templates.buttons.addSize);
+            },
+
+            // Load setup data from server 
+            loadSetupData: function(hbConfig) {
+                var that = this;
+                hbConfig.forEach(function(config) {
+                    that.renderGeoSetupPanel(config);
+                });
             },
 
             // Function to parse header bidding form data
@@ -242,14 +273,14 @@ $(document).ready(function () {
             },
 
             // Switch geo selection dropdown in UI
-            setGeoSubSelect: function (geo, els) {
+            setGeoSubSelect: function (geo, els, geoValue) {
                 var that = this;
                 [].slice.call(els).forEach(function (el) {
                     var geoSelect = $(el).closest('.row').siblings('.select-geo-' + geo);
                     switch (geo) {
                         case 'country':
                             geoSelect.show();
-                            geoSelect.find('option[value=' + that.defaults.country + ']').attr('selected', true);
+                            geoSelect.find('option[value=' + geoValue ? geoValue : that.defaults.country + ']').attr('selected', true);
                             geoSelect.siblings(that.templates.selectors.continent).hide();
                             break;
                         case 'continent':
@@ -281,7 +312,7 @@ $(document).ready(function () {
 
             // Initialise header bidding setup
             init: function () {
-                this.renderGeoSetupPanel();
+                !w.hbSetupData ? this.renderGeoSetupPanel() : this.loadSetupData(w.hbSetupData);
             }
         };
         ap.headerBiddingSetup.init();
@@ -311,7 +342,7 @@ $(document).ready(function () {
 
         // Size panel addition trigger
         $('body').on('click', '.add-size', function () {
-            ap.headerBiddingSetup.renderAdSizeSetupPanel($(this), 'insertBefore');
+            ap.headerBiddingSetup.renderAdSizeSetupPanel($(this), null, 'insertBefore');
         });
 
         // Partner panel addition trigger

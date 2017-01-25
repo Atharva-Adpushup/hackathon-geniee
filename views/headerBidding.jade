@@ -22,6 +22,12 @@ block append headScripts
             window.hbConfig = !{hbConfig};
         });
 
+    if hbSetupData
+        script.
+            $(document).ready(function() {
+                window.hbSetupData = !{hbSetupData}
+            });
+
     if environment == "production"
         script(src="/assets/js/builds/header-bidding-setup.min.js")
     else 
