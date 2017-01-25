@@ -279,7 +279,7 @@ router
 	})
 	.get('/thank-you', function (req, res) { // this is for users who are less than <2500 USD
 		thankYouRedirection('thank-you', req, res);
-		if (req.session) {
+		if (req.session && !req.session.isSuperUser) {
 			req.session.destroy();
 		}
 	})
