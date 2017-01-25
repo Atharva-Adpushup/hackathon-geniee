@@ -44,7 +44,7 @@ $('document').ready(function () {
                         intercom: intercomToSegmentObj
                     });
                     adpushupAnalyticsEvents.emit('analyticsTrack', {
-                        eventName: data.step,
+                        eventName: data.stage,
                         obj: {
                             name: w.currentUser.firstName,
                             email: w.currentUser.email
