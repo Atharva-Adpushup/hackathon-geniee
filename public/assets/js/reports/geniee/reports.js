@@ -7,6 +7,7 @@ var GenieeReport = (function(w, $) {
     this.siteDomain = w.adpushup.reports.siteDomain;
     this.paramConfig = w.adpushup.reports.paramConfig;
     Object.freeze(this.paramConfig);
+
     this.reportsLevel = {
         'pagegroup': 'Page Groups',
         'variation': 'Variations'
@@ -27,7 +28,7 @@ var GenieeReport = (function(w, $) {
         }
     };
 
-    // Cache DOM elements query
+    // Cache static DOM elements
     this.$breadCrumbContainer = $('.js-reports-breadcrumb');
     this.$tableContainer = $('#reports_table');
     this.$perfHeaderContainer = $(".js-perf-header");
@@ -35,6 +36,8 @@ var GenieeReport = (function(w, $) {
     this.$filterDateSelectedWrapper = $(".js-filter-selected-wrapper");
     this.$filterApplyBtn = $(".js-filter-apply-btn");
     this.$filterResetBtn = $(".js-filter-reset-btn");
+    this.$headingWrapper = $(".js-main-heading-wrapper");
+    this.$headingOptions = $(".js-main-heading-options");
 
     // Slideout elements
     this.$slideoutPanel = $('.js-slideout-panel');
@@ -71,6 +74,23 @@ var GenieeReport = (function(w, $) {
 
     function createChart(selector, config) {
         w.Highcharts.stockChart(selector, config);
+    }
+
+    function prependResetReportsBtn() {
+        var $template = $("<button id='report-reset-btn' type='button' class='btn btn-default btn-theme btn-theme--primary u-margin-r10px js-report-reset-btn'>Reset filters</button>"),
+            isBtnPresent = !!($(".js-report-reset-btn", this.$headingOptions).length);
+
+        if (!isBtnPresent) {
+            this.$headingOptions.prepend($template);
+        }
+    }
+
+    function removeResetReportsBtn() {
+        var $btn = $(".js-report-reset-btn", this.$headingOptions);
+
+        if ($btn.length) {
+            $btn.remove();
+        }
     }
 
     function disableFilterApplyBtn() {
@@ -147,8 +167,12 @@ var GenieeReport = (function(w, $) {
         setFilterParamConfigData(this.paramConfig);
     }
 
+    function isFilterData() {
+        return Object.keys(this.filterData.date).length;
+    }
+
     function resetFilterUI() {
-        var isDateFilter = Object.keys(this.filterData.date).length;
+        var isDateFilter = isFilterData();
 
         if (!isDateFilter) {
             disableFilterApplyBtn();
@@ -170,9 +194,11 @@ var GenieeReport = (function(w, $) {
 
     function reInitReports(reportData) {
         var self = this,
-            isDateFilter = Object.keys(this.filterData.date).length;
-        
-        triggerFilterBtnClick();
+            isDateFilter = isFilterData();
+
+        if (isDateFilter) {
+            triggerFilterBtnClick();
+        }
 
         w.setTimeout(function() {
             self.model = $.extend(true, {}, reportData);
@@ -184,6 +210,15 @@ var GenieeReport = (function(w, $) {
                 removeFilterBtnNotification();
             }
         }, 1000);
+    }
+
+    function loadReportsWithInitialData() {
+        var paramConfig = this.paramConfig;
+
+        getReports(paramConfig, {
+            success: reportsSuccessCallback,
+            error: reportsErrorCallback
+        });
     }
 
     function setAndLoadPageGroupReports() {
@@ -219,7 +254,6 @@ var GenieeReport = (function(w, $) {
         reInitReports(reportData);
     }
 
-
     function reportsErrorCallback() {
         console.error('Error loading reports');
     }
@@ -233,6 +267,7 @@ var GenieeReport = (function(w, $) {
 
         if (isLabelElem && isDateFilterData) {
             paramConfig = $.extend(true, {}, this.filterData.paramConfig);
+            prependResetReportsBtn();
 
             getReports(paramConfig, {
                 success: reportsSuccessCallback,
@@ -241,24 +276,44 @@ var GenieeReport = (function(w, $) {
         }
     }
 
+    function handleFilterResetBtnClick() {
+        resetFilterConfig();
+        removeFilterBtnNotification();
+        this.$filterDateSelectedWrapper.html('');
+        if (this.slideout.isOpen()) {
+            this.slideout.close();
+        }
+
+        w.setTimeout(function() {
+            loadReportsWithInitialData();
+            removeResetReportsBtn();
+        }, 500);
+    }
+
+    function handleReportResetBtnclick() {
+        resetFilterConfig();
+        removeFilterBtnNotification();
+        this.$filterDateSelectedWrapper.html('');
+        if (this.slideout.isOpen()) {
+            this.slideout.close();
+        }
+
+        w.setTimeout(function() {
+            loadReportsWithInitialData();
+            removeResetReportsBtn();
+        }, 500);
+    }
+
     function bindFilterApplyBtn() {
         this.$filterApplyBtn.off('click').on('click', handleFilterApplyBtnClick.bind(this));
     }
 
-    function handleFilterResetBtnClick() {
-        var paramConfig = this.paramConfig;
-
-        resetFilterConfig();
-        removeFilterBtnNotification();
-        this.$filterDateSelectedWrapper.html('');
-        getReports(paramConfig, {
-            success: reportsSuccessCallback,
-            error: reportsErrorCallback
-        });
-    }
-
     function bindFilterResetBtn() {
         this.$filterResetBtn.off('click').on('click', handleFilterResetBtnClick.bind(this));
+    }
+
+    function bindReportResetBtn() {
+        this.$headingWrapper.off('click').on('click', '.js-report-reset-btn', handleReportResetBtnclick.bind(this));
     }
 
     function initSlideoutMenu() {
@@ -598,6 +653,8 @@ var GenieeReport = (function(w, $) {
         bindDateFilterLabelsBadge();
         bindFilterApplyBtn();
         bindFilterResetBtn();
+        bindReportResetBtn();
+
         setThumbnailUiData();
         setActiveThumbnail($revenueHeaderThumbnail);
         prepareReportsChart($revenueHeaderThumbnail);
