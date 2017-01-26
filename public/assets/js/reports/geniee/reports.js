@@ -6,6 +6,7 @@ var GenieeReport = (function(w, $) {
     this.siteId = w.adpushup.reports.siteId;
     this.siteDomain = w.adpushup.reports.siteDomain;
     this.paramConfig = w.adpushup.reports.paramConfig;
+    Object.freeze(this.paramConfig);
     this.reportsLevel = {
         'pagegroup': 'Page Groups',
         'variation': 'Variations'
@@ -72,6 +73,18 @@ var GenieeReport = (function(w, $) {
         w.Highcharts.stockChart(selector, config);
     }
 
+    function disableFilterApplyBtn() {
+        this.$filterApplyBtn
+            .attr({ disabled: true })
+            .addClass('disabled');
+    }
+
+    function enableFilterApplyBtn() {
+        this.$filterApplyBtn
+            .attr({ disabled: false })
+            .removeClass('disabled');
+    }
+
     function addFilterBtnNotification() {
         var className = this.filterData.constants.notification.btn.class;
 
@@ -118,6 +131,7 @@ var GenieeReport = (function(w, $) {
         setFilterDateData(dateRangeObj);
         setFilterParamConfigData(dateRange);
         setFilterSelectedLabel(text);
+        enableFilterApplyBtn();
     }
 
     function bindDateFilterLinks() {
@@ -133,10 +147,20 @@ var GenieeReport = (function(w, $) {
         setFilterParamConfigData(this.paramConfig);
     }
 
+    function resetFilterUI() {
+        var isDateFilter = Object.keys(this.filterData.date).length;
+
+        if (!isDateFilter) {
+            disableFilterApplyBtn();
+            removeFilterBtnNotification();
+        }
+    }
+
     function handleDateFilterLabelsBadgeClick(e) {
         var $badge = $(e.target);
 
         resetFilterConfig();
+        resetFilterUI();
         $badge.parent().remove();
     }
 
@@ -145,13 +169,20 @@ var GenieeReport = (function(w, $) {
     }
 
     function reInitReports(reportData) {
-        var self = this;
+        var self = this,
+            isDateFilter = Object.keys(this.filterData.date).length;
+        
         triggerFilterBtnClick();
 
         w.setTimeout(function() {
             self.model = $.extend(true, {}, reportData);
             setAndLoadPageGroupReports();
-            addFilterBtnNotification();
+
+            if (isDateFilter) {
+                addFilterBtnNotification();
+            } else {
+                removeFilterBtnNotification();
+            }
         }, 1000);
     }
 
@@ -215,9 +246,15 @@ var GenieeReport = (function(w, $) {
     }
 
     function handleFilterResetBtnClick() {
+        var paramConfig = this.paramConfig;
+
         resetFilterConfig();
         removeFilterBtnNotification();
         this.$filterDateSelectedWrapper.html('');
+        getReports(paramConfig, {
+            success: reportsSuccessCallback,
+            error: reportsErrorCallback
+        });
     }
 
     function bindFilterResetBtn() {
@@ -238,6 +275,7 @@ var GenieeReport = (function(w, $) {
         self.$slideoutMenu.css({visibility: 'visible'});
 
         toggleSlideoutMenu();
+        disableFilterApplyBtn();
     }
 
     function triggerFilterBtnClick() {
