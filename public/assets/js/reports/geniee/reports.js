@@ -32,6 +32,7 @@ var GenieeReport = (function(w, $) {
     this.$breadCrumbContainer = $('.js-reports-breadcrumb');
     this.$tableContainer = $('#reports_table');
     this.$perfHeaderContainer = $(".js-perf-header");
+    this.$dateDescWrapper = $(".js-date-desc-wrapper");
     this.$filterDateWrapper = $(".js-filter-date-wrapper");
     this.$filterDateSelectedWrapper = $(".js-filter-selected-wrapper");
     this.$filterApplyBtn = $(".js-filter-apply-btn");
@@ -74,6 +75,48 @@ var GenieeReport = (function(w, $) {
 
     function createChart(selector, config) {
         w.Highcharts.stockChart(selector, config);
+    }
+
+    function getDateString(dateMillis) {
+        var date = new Date(dateMillis);
+
+        return date.toDateString().replace(" ", ", &nbsp;");
+    }
+
+    function insertDateDesciption() {
+        var isParamConfig = this.paramConfig,
+            isDateFilter = isFilterData(),
+            filterDateKey = (!!isDateFilter ? Object.keys(this.filterData.date)[0] : null),
+            dateConfig = (!!(isDateFilter && filterDateKey) ? this.filterData.date[filterDateKey] : {
+                dateFrom: this.paramConfig.dateFrom,
+                dateTo: this.paramConfig.dateTo
+            }),
+            dateFromString = getDateString(dateConfig.dateFrom),
+            dateToString = getDateString(dateConfig.dateTo),
+            dateString = (dateFromString + "&nbsp; - &nbsp;" + dateToString),
+            $baseTemplate = $("<ol class='breadcrumb js-date-desc u-margin-0px'><li><span class='breadcrumb-title-prefix js-date-desc-title-prefix'>Date:</span></li></ol>"),
+            $contentTemplate = $("<a id='articlemyriad.com' class='breadcrumb-title js-date-desc-title active'></a>");
+
+            $contentTemplate.html(dateString);
+            $baseTemplate.find("li").append($contentTemplate);
+            this.$dateDescWrapper.html($baseTemplate);
+    }
+
+    function insertFilterSelectedUiPlaceholder() {
+        var $template = $("<div class='aligner aligner--column aligner--hCenter aligner--vCenter filter-selected-ui filter-selected-ui--placeholder js-filter-selected-ui-placeholder'>No filters to show.</div>"),
+            isPlaceholderPresent = !!($(".js-filter-selected-ui-placeholder", this.$filterDateSelectedWrapper).length);
+
+        if (!isPlaceholderPresent) {
+            this.$filterDateSelectedWrapper.html($template);
+        }
+    }
+
+    function removeFilterSelectedUiPlaceholder() {
+        var $placeholder = $(".js-filter-selected-ui-placeholder", this.$filterDateSelectedWrapper);
+
+        if ($placeholder.length) {
+            $placeholder.remove();
+        }
     }
 
     function prependResetReportsBtn() {
@@ -160,6 +203,21 @@ var GenieeReport = (function(w, $) {
         $links.off('click').on('click', handleDateFilterLinksClick);
     }
 
+    function resetFiltersFunctionality() {
+        resetFilterConfig();
+        removeFilterBtnNotification();
+        this.$filterDateSelectedWrapper.html('');
+        insertFilterSelectedUiPlaceholder();
+        if (this.slideout.isOpen()) {
+            this.slideout.close();
+        }
+
+        w.setTimeout(function() {
+            loadReportsWithInitialData();
+            removeResetReportsBtn();
+        }, 500);
+    }
+
     function resetFilterConfig() {
         // Reset date filter data
         setFilterDateData({});
@@ -177,6 +235,7 @@ var GenieeReport = (function(w, $) {
         if (!isDateFilter) {
             disableFilterApplyBtn();
             removeFilterBtnNotification();
+            insertFilterSelectedUiPlaceholder();
         }
     }
 
@@ -277,31 +336,11 @@ var GenieeReport = (function(w, $) {
     }
 
     function handleFilterResetBtnClick() {
-        resetFilterConfig();
-        removeFilterBtnNotification();
-        this.$filterDateSelectedWrapper.html('');
-        if (this.slideout.isOpen()) {
-            this.slideout.close();
-        }
-
-        w.setTimeout(function() {
-            loadReportsWithInitialData();
-            removeResetReportsBtn();
-        }, 500);
+        resetFiltersFunctionality();
     }
 
     function handleReportResetBtnclick() {
-        resetFilterConfig();
-        removeFilterBtnNotification();
-        this.$filterDateSelectedWrapper.html('');
-        if (this.slideout.isOpen()) {
-            this.slideout.close();
-        }
-
-        w.setTimeout(function() {
-            loadReportsWithInitialData();
-            removeResetReportsBtn();
-        }, 500);
+        resetFiltersFunctionality();
     }
 
     function bindFilterApplyBtn() {
@@ -640,6 +679,7 @@ var GenieeReport = (function(w, $) {
         initSlideoutMenu();
         generateBreadCrumb();
         setTableHeading();
+        insertDateDesciption();
         setPerfHeaderData(computedPerfHeaderData);
         setTableData(computedTableData, isPageGroupLevel);
 
