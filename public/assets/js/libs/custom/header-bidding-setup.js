@@ -239,14 +239,18 @@ $(document).ready(function () {
 
                 w.append(s.geoSelect + s.countrySelect + s.continentSelect);
                 $('#hbform-render').append(w);
+                
 
                 var country = w.find('.geo-country'),
                     continent = w.find('.geo-continent'),
                     geoValue = geoSetup ? geoSetup : null; 
                 this.setGeoSelectBoxOptions(w, country, continent, geoValue);
 
-
-                w.find('.geo-selector').find('option[value=' + geoSetup.type + ']').attr('selected', true);
+                if(geoSetup) {
+                 w.find('.geo-selector').find('option[value=' + geoSetup.type + ']').attr('selected', true);
+                } else {
+                    $('select option[value=' + geoSelection + ']').attr('selected', true);
+                }
 
 
                 var otherPanels = $(w).parent().children('.select-geo-wrapper');
