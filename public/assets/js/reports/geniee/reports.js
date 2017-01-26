@@ -120,7 +120,7 @@ var GenieeReport = (function(w, $) {
     }
 
     function prependResetReportsBtn() {
-        var $template = $("<button id='report-reset-btn' type='button' class='btn btn-default btn-theme btn-theme--primary u-margin-r10px js-report-reset-btn'>Reset filters</button>"),
+        var $template = $("<button id='report-reset-btn' data-loading-text='Resetting...' autocomplete='off' type='button' class='btn btn-default btn-theme btn-theme--primary u-margin-r10px js-report-reset-btn js-filter-reset'>Reset filters</button>"),
             isBtnPresent = !!($(".js-report-reset-btn", this.$headingOptions).length);
 
         if (!isBtnPresent) {
@@ -272,12 +272,14 @@ var GenieeReport = (function(w, $) {
     }
 
     function loadReportsWithInitialData() {
-        var paramConfig = this.paramConfig;
+        var paramConfig = this.paramConfig,
+            $filterResetBtn = $('.js-filter-reset');
 
+        $filterResetBtn.button('loading');
         getReports(paramConfig, {
             success: reportsSuccessCallback,
             error: reportsErrorCallback
-        });
+        }, $filterResetBtn);
     }
 
     function setAndLoadPageGroupReports() {
@@ -286,7 +288,7 @@ var GenieeReport = (function(w, $) {
         chooseLevelAndLoadReports();
     }
 
-	function getReports(paramsData, callbackConfig) {
+	function getReports(paramsData, callbackConfig, $btn) {
 		var url = '/user/site/' + this.siteId + '/reports/getPerformanceData',
 			type = 'GET';
 
@@ -300,11 +302,14 @@ var GenieeReport = (function(w, $) {
 			data = (typeof data === 'string') ? JSON.parse(data) : data;
 
 			if (data.success) {
+                if ($btn) { $btn.button('reset'); }
 				return callbackConfig.success(data.data);
 			}
 
+            if ($btn) { $btn.button('reset'); }
 			return callbackConfig.error();
 		}).fail(function() {
+            if ($btn) { $btn.button('reset'); }
 			callbackConfig.error();
 		});
 	}
@@ -327,11 +332,12 @@ var GenieeReport = (function(w, $) {
         if (isLabelElem && isDateFilterData) {
             paramConfig = $.extend(true, {}, this.filterData.paramConfig);
             prependResetReportsBtn();
+            $btn.button('loading');
 
             getReports(paramConfig, {
                 success: reportsSuccessCallback,
                 error: reportsErrorCallback
-            });
+            }, $btn);
         }
     }
 
