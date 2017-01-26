@@ -35,7 +35,7 @@ $(document).ready(function () {
             },
 
             // Set geo select box data
-            setGeoSelectBoxOptions: function (el, countrySelect, continentSelect, geoSelection) {
+            setGeoSelectBoxOptions: function (el, countrySelect, continentSelect, geoSetup) {
                 w.countries.forEach(function (country) {
                     $(countrySelect).append('<option value=' + country.code + '>' + country.name + '</option>');
                 });
@@ -43,8 +43,13 @@ $(document).ready(function () {
                     $(continentSelect).append('<option value=' + continent.code + '>' + continent.name + '</option>');
                 });
 
-                if(geoSelection) {
-                    $(el).find('select option[value=' + geoSelection + ']').attr('selected', true)
+                if(geoSetup) {
+                    if(geoSetup.type === 'continent') {
+                        $(continentSelect).find('option[value=' + geoSetup.continent + ']').attr('selected', true);
+                    }
+                    else {
+                        $(countrySelect).find('option[value=' + geoSetup.country + ']').attr('selected', true);
+                    }
                 }
                 else {
                     $(el).find('select option[value=' + this.defaults.country + ']').attr('selected', true);
@@ -60,28 +65,43 @@ $(document).ready(function () {
             },
 
             // Set hb partners select box data
-            setHbPartnersSelectBoxData: function (hbPartnerSelect) {
+            setHbPartnersSelectBoxData: function (hbPartnerSelect, configParams) {
                 w.hbPartners.forEach(function (partner) {
                     $(hbPartnerSelect).append('<option value=' + partner + '>' + partner + '</option>');
                 });
                 $(hbPartnerSelect).prepend(this.templates.defaultSelectBoxOption);
+
+                if(configParams) {
+                    var that = this;
+                    setTimeout(function() {
+                        var pane = $(hbPartnerSelect).closest('.hb-config-pane');
+                        $(hbPartnerSelect).find(' option[value=' + configParams.bidder + ']').attr('selected', true);
+                        that.renderPartnerSetupPanel(configParams.bidder, pane, configParams.params);
+                    }, 0);
+                }
             },
 
             // Function to dynamically generate input templates for given partner config
-            generateInputTemplate: function (obj, i) {
+            generateInputTemplate: function (obj, i, params) {
                 var g = obj[i],
                     type = g.validations && g.validations.type ? g.validations.type : 'text',
-                    required = g.validations && g.validations.required ? '" required="' + g.validations.required : ""
-                readonly = 'isEditable' in g && !g.isEditable ? '" readonly="' + g.isEditable : ""
-                value = g.default ? g.default : '',
+                    required = g.validations && g.validations.required ? '" required="' + g.validations.required : "",
+                    readonly = 'isEditable' in g && !g.isEditable ? '" readonly="' + g.isEditable : "",
+                    value = g.default ? g.default : '',
                     name = i;
+
+                for(var param in params) {
+                    if(param === name) {
+                        value = params[param];
+                    }
+                }
 
                 var input = '<input class="form-control" type="' + type + required + readonly + '" value="' + value + '" name="' + name + '" placeholder="Please enter ' + g.alias + '"/>';
                 return '<div class="row"><div class="col-sm-3 input-name">' + g.alias + '</div><div class="col-sm-3">' + input + '</div></div>';
             },
 
             // Function to render partner options pane
-            generatePartnerSpecificOptionsPane: function (pt) {
+            generatePartnerSpecificOptionsPane: function (pt, params) {
                 var partnerInputTempl = {};
 
                 for (var p in w.hbConfig) {
@@ -89,11 +109,11 @@ $(document).ready(function () {
 
                     if (partner.isHb) {
                         for (var global in partner.global) {
-                            globals += this.generateInputTemplate(partner.global, global);
+                            globals += this.generateInputTemplate(partner.global, global, params);
                         }
 
                         for (var local in partner.local) {
-                            locals += this.generateInputTemplate(partner.local, local);
+                            locals += this.generateInputTemplate(partner.local, local, params);
                         }
                     }
 
@@ -107,8 +127,8 @@ $(document).ready(function () {
             },
 
             // Function to render hb partner specific options
-            renderPartnerSetupPanel: function (hbPartner, wrapper) {
-                var inputs = this.generatePartnerSpecificOptionsPane(hbPartner);
+            renderPartnerSetupPanel: function (hbPartner, wrapper, params) {
+                var inputs = this.generatePartnerSpecificOptionsPane(hbPartner, params);
                 wrapper.find('.partner-settings').html(inputs.globalTempl + inputs.localTempl);
             },
 
@@ -137,24 +157,51 @@ $(document).ready(function () {
             },
 
             // Function to render hb partner setup panel
-            renderHbPartnerSetupPanel: function (el, action) {
-                var w = $('<div class="hb-config-pane mT-20 select-partner-settings">' + this.templates.selectBoxes.hbPartnerSelect + '<div class="partner-settings"></div></div>');
-                this.renderNewPanel(el, w, action, '.select-partner-settings');
+            renderHbPartnerSetupPanel: function (el, action, adConfig) {
+                if(adConfig) {
+                    for(var config in adConfig) {
+                        configParams = adConfig[config];
+                        var w = $('<div class="hb-config-pane mT-20 select-partner-settings">' + this.templates.selectBoxes.hbPartnerSelect + '<div class="partner-settings"></div></div>');
+                        this.renderNewPanel(el, w, action, '.select-partner-settings');
 
-                var hbPartner = w.find('.hb-partner');
-                this.setHbPartnersSelectBoxData(hbPartner);
+                        var hbPartner = w.find('.hb-partner');
+                        this.setHbPartnersSelectBoxData(hbPartner, configParams);
+                    }
+                } else {
+                    var w = $('<div class="hb-config-pane mT-20 select-partner-settings">' + this.templates.selectBoxes.hbPartnerSelect + '<div class="partner-settings"></div></div>');
+                    this.renderNewPanel(el, w, action, '.select-partner-settings');
+
+                    var hbPartner = w.find('.hb-partner');
+                    this.setHbPartnersSelectBoxData(hbPartner);
+                }
             },
 
             // Function to render multi-config panel
-            renderMultiConfigPanel: function (el, action) {
-                var w = $('<div class="hb-config-pane mT-20 select-partner"></div>');
-                this.renderNewPanel(el, w, action, '.select-partner');
+            renderMultiConfigPanel: function (el, action, adSetups) {
+                if(adSetups) {
+                    for(var setup in adSetups) {
+                        var w = $('<div class="hb-config-pane mT-20 select-partner"></div>');
+                        this.renderNewPanel(el, w, action, '.select-partner');
 
-                this.renderHbPartnerSetupPanel(w);
-                $(w).append(this.templates.buttons.addPartner);
+                        var adConfig = adSetups[setup];
+                        this.renderHbPartnerSetupPanel(w, null, adConfig);
+                        $(w).append(this.templates.buttons.addPartner);
 
-                if (el.children('.select-partner').length === 1) {
-                    el.append(this.templates.buttons.addSetup);
+                        if (el.children('.select-partner').length === 1) {
+                            el.append(this.templates.buttons.addSetup);
+                        }
+                    }
+                }
+                else {
+                    var w = $('<div class="hb-config-pane mT-20 select-partner"></div>');
+                    this.renderNewPanel(el, w, action, '.select-partner');
+
+                    this.renderHbPartnerSetupPanel(w);
+                    $(w).append(this.templates.buttons.addPartner);
+
+                    if (el.children('.select-partner').length === 1) {
+                        el.append(this.templates.buttons.addSetup);
+                    }
                 }
             },
 
@@ -168,17 +215,20 @@ $(document).ready(function () {
 
                         var adSize = w.find('.ad-size');
                         this.setAdSizeSelectBoxOptions(adSize, size);
-                        this.renderMultiConfigPanel(w);
+
+                        var adSetups = adSizeSetup[size];
+                        this.renderMultiConfigPanel(w, null, adSetups);
                     }
                 }
-                
-                // var w = $('<div class="hb-config-pane mT-20 select-size">'),
-                //     s = this.templates.selectBoxes.adSizesSelect;
-                // this.renderNewPanel(el, w, action, '.select-size', s);
+                else {
+                    var w = $('<div class="hb-config-pane mT-20 select-size">'),
+                        s = this.templates.selectBoxes.adSizesSelect;
+                    this.renderNewPanel(el, w, action, '.select-size', s);
 
-                // var adSize = w.find('.ad-size');
-                // this.setAdSizeSelectBoxOptions(adSize, size);
-                // this.renderMultiConfigPanel(w);
+                    var adSize = w.find('.ad-size');
+                    this.setAdSizeSelectBoxOptions(adSize, size);
+                    this.renderMultiConfigPanel(w);
+                }
             },
 
             // Function to render geo setup panel
@@ -189,12 +239,15 @@ $(document).ready(function () {
 
                 w.append(s.geoSelect + s.countrySelect + s.continentSelect);
                 $('#hbform-render').append(w);
-                $('select option[value=' + geoSelection + ']').attr('selected', true);
 
                 var country = w.find('.geo-country'),
                     continent = w.find('.geo-continent'),
-                    geoValue = geoSetup ? (geoSetup.type === 'country' ? geoSetup.country : geoSetup.continent) : null; 
+                    geoValue = geoSetup ? geoSetup : null; 
                 this.setGeoSelectBoxOptions(w, country, continent, geoValue);
+
+
+                w.find('.geo-selector').find('option[value=' + geoSetup.type + ']').attr('selected', true);
+
 
                 var otherPanels = $(w).parent().children('.select-geo-wrapper');
 
@@ -202,7 +255,7 @@ $(document).ready(function () {
                     $(otherPanels[i]).prepend(this.templates.closeBtn);
                 }
 
-                this.setGeoSubSelect(geoSelection, $('.geo-selector'), geoValue);
+                this.setGeoSubSelect(geoSelection, w.find('.geo-selector'), geoValue);
 
                 var adSizeSetup = geoSetup ? geoSetup.info : null;
                 this.renderAdSizeSetupPanel(w, adSizeSetup);
@@ -275,8 +328,10 @@ $(document).ready(function () {
             // Switch geo selection dropdown in UI
             setGeoSubSelect: function (geo, els, geoValue) {
                 var that = this;
+
                 [].slice.call(els).forEach(function (el) {
                     var geoSelect = $(el).closest('.row').siblings('.select-geo-' + geo);
+
                     switch (geo) {
                         case 'country':
                             geoSelect.show();
@@ -331,6 +386,7 @@ $(document).ready(function () {
         $('body').on('change', '.hb-partner', function (e) {
             var hbPartner = $(this).val(),
                 topMostConfigWrapper = $(this).closest('.hb-config-pane');
+                console.log(topMostConfigWrapper);
 
             hbPartner ? ap.headerBiddingSetup.renderPartnerSetupPanel(hbPartner, topMostConfigWrapper) : null;
         });
