@@ -26,39 +26,21 @@
     }
 }
 .loaderwrapper {
-	width: 100%;
+	background: rgba(235, 87, 92, 0.7);
 	height: 100%;
-	position: absolute; 
-	z-index:999999;
-	background:rgba(0,0,0,0.2);
-  &.loaderwrapper--fixed
-  {
-    background: rgba(235, 87, 92, 0.7);
-    bottom: 0;
-    left: 0;
-    position: fixed !important;
-    right: 0;
-    top: 0;
+  left: 0;
+	position: absolute;
+  top: 0;
+	width: 100%;
+	z-index: 999999;
 
-    > .loaderwrapper-text
-    {
-      color: #fff;
-      font-size: 1.6em;
-      font-weight: bold;
-      left: 43%;
-      position: absolute;
-      top: 59%;
-    }
-  }
-
-  img 
+  > .loaderwrapper-text
   {
+    color: #fff;
+    font-size: 1.6em;
+    font-weight: bold;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index:4;
-    margin-top: -45px;
-    margin-left: -55px;
+    top: 60%;
   }
 }
 

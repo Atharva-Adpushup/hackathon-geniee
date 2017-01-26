@@ -39,6 +39,7 @@ var GenieeReport = (function(w, $) {
     this.$filterResetBtn = $(".js-filter-reset-btn");
     this.$headingWrapper = $(".js-main-heading-wrapper");
     this.$headingOptions = $(".js-main-heading-options");
+    this.$loaderWrapper = $(".js-loaderwrapper");
 
     // Slideout elements
     this.$slideoutPanel = $('.js-slideout-panel');
@@ -75,6 +76,14 @@ var GenieeReport = (function(w, $) {
 
     function createChart(selector, config) {
         w.Highcharts.stockChart(selector, config);
+    }
+
+    function showLoader() {
+        this.$loaderWrapper.removeClass('hide');
+    }
+
+    function hideLoader() {
+        this.$loaderWrapper.addClass('hide');
     }
 
     function getDateString(dateMillis) {
@@ -292,6 +301,8 @@ var GenieeReport = (function(w, $) {
 		var url = '/user/site/' + this.siteId + '/reports/getPerformanceData',
 			type = 'GET';
 
+        showLoader();
+
 		$.ajax({
 			type: type,
 			url: url,
@@ -303,12 +314,15 @@ var GenieeReport = (function(w, $) {
 
 			if (data.success) {
                 if ($btn) { $btn.button('reset'); }
+                hideLoader();
 				return callbackConfig.success(data.data);
 			}
 
+            hideLoader();
             if ($btn) { $btn.button('reset'); }
 			return callbackConfig.error();
 		}).fail(function() {
+            hideLoader();
             if ($btn) { $btn.button('reset'); }
 			callbackConfig.error();
 		});
