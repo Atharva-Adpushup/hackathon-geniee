@@ -36,6 +36,7 @@ block bodyContent
                 div(class="u-border-bottom aligner aligner--row u-margin-10px u-padding-b10px")
                     h4.heading.heading--h2 Selected
                 div(class="u-margin-10px u-padding-10px filter-selected-wrapper js-filter-selected-wrapper")
+                    div(class="aligner aligner--column aligner--hCenter aligner--vCenter filter-selected-ui filter-selected-ui--placeholder js-filter-selected-ui-placeholder") No filters to show.
 
                 div(class="u-border-bottom aligner aligner--row u-margin-10px u-padding-b10px")
                     h4.heading.heading--h2 Date
@@ -52,7 +53,7 @@ block bodyContent
                                         a(data-dateRange="#{JSON.stringify(filterDates.today)}", data-name="today", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-today") Today
                                     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
                                         a(data-dateRange="#{JSON.stringify(filterDates.thisWeek)}", data-name="thisWeek", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-thisWeek") This Week
-                                div(class="aligner aligner--row u-margin-b15px")
+                                div(class="aligner aligner--row mB-5")
                                     div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
                                         a(data-dateRange="#{JSON.stringify(filterDates.thisMonth)}", data-name="thisMonth", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-thisMonth") This month
                                     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
@@ -64,7 +65,7 @@ block bodyContent
                                 //-         a(data-dateRange="#{JSON.stringify(filterDates.today)}", data-name="today", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last-1-hour") Last 1 hour
                                 //-     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
                                 //-         a(data-dateRange="#{JSON.stringify(filterDates.today)}", data-name="today", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last-4-hours") Last 4 hours
-                                //- div(class="aligner aligner--row u-margin-b15px")
+                                //- div(class="aligner aligner--row mB-5")
                                 //-     div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
                                 //-         a(data-dateRange="#{JSON.stringify(filterDates.today)}", data-name="today", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last-12-hours") Last 12 hours
                                 //-     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
@@ -75,7 +76,7 @@ block bodyContent
                                         a(data-dateRange="#{JSON.stringify(filterDates.last7Days)}", data-name="last7Days", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last7Days") Last 7 days
                                     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
                                         a(data-dateRange="#{JSON.stringify(filterDates.last30Days)}", data-name="last30Days", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last30Days") Last 30 days
-                                div(class="aligner aligner--row u-margin-b15px")
+                                div(class="aligner aligner--row mB-5")
                                     div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
                                         a(data-dateRange="#{JSON.stringify(filterDates.last60Days)}", data-name="last60Days", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last60Days") Last 60 days
                                     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
@@ -86,7 +87,7 @@ block bodyContent
                                         a(data-dateRange="#{JSON.stringify(filterDates.last6Months)}", data-name="last6Months", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last6Months") Last 6 months
                                     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
                                         a(data-dateRange="#{JSON.stringify(filterDates.last1Year)}", data-name="last1Year", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last1Year") Last 1 year
-                                div(class="aligner aligner--row u-margin-b15px")
+                                div(class="aligner aligner--row mB-5")
                                     div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
                                         a(data-dateRange="#{JSON.stringify(filterDates.last2Years)}", data-name="last2Years", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last2Years") Last 2 years
                                     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
@@ -109,8 +110,8 @@ block bodyContent
                         //-         div(class="aligner aligner--row u-margin-10px u-padding-10px")
 
                 div(class="aligner aligner--row u-margin-b10px u-padding-10px")
-                    button(id="filter-apply-btn", class="btn btn-default btn-theme btn-theme--primary aligner-item js-filter-apply-btn", type="button") Apply
-                    button(id="filter-reset-btn", class="btn btn-default aligner-item js-filter-reset-btn", type="button") Reset
+                    button(id="filter-apply-btn", data-loading-text="Applying...", autocomplete="off", class="btn btn-default btn-theme btn-theme--primary aligner-item js-filter-apply-btn", type="button") Apply
+                    button(id="filter-reset-btn", data-loading-text="Resetting...", autocomplete="off", class="btn btn-default aligner-item js-filter-reset js-filter-reset-btn", type="button") Reset
 
  
         // Page Content Starts Here
@@ -122,18 +123,18 @@ block bodyContent
                     .mb-30
                         .controlAdpushupWrap
                             if reportingData
-                                div(class="aligner aligner--row u-margin-20px u-padding-b10px main-heading-wrapper")
+                                div(class="aligner aligner--row u-margin-20px u-padding-b10px main-heading-wrapper js-main-heading-wrapper")
                                     div(class="col-xs-9 col-md-9 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
                                         h3.heading.heading--h3
                                             a Reporting and Analytics
-                                    div(class="col-xs-3 col-md-3 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
-                                        button(id="filter-btn", class="btn btn-default aligner aligner--column aligner--hCenter aligner--vCenter js-filter-btn", type="button")
+                                    div(class="col-xs-3 col-md-3 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom js-main-heading-options")
+                                        button(id="filter-btn", class="btn btn-default btn--with-icon aligner aligner--row aligner--hCenter aligner--vCenter js-filter-btn", type="button") Filters
                                             i(class="fa fa-filter")
 
                                 div(class="aligner aligner--row breadcrumb-wrapper u-margin-20px")
                                     div(class="col-xs-8 col-md-8 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
                                         ol(class="breadcrumb js-reports-breadcrumb u-margin-0px")
-                                    div(class="col-xs-4 col-md-4 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
+                                    div(class="col-xs-4 col-md-4 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom js-date-desc-wrapper")
 
                                 div(class="aligner aligner--row perf-panel-heading-wrapper")
                                     div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
@@ -186,6 +187,9 @@ block bodyContent
                                         .well.pd-0
                                             #reports_table.panel.panel-default
                                 // Report Table Ends
+                                div(class="aligner aligner--column aligner--hCenter aligner--vCenter loaderwrapper spinner hide js-loaderwrapper")
+                                    img(src="/assets/images/loaderLogo.png")
+                                    div(class="loaderwrapper-text") Fetching reports...
                             else
                                 div(class="aligner aligner--row aligner--hCenter aligner--vCenter jumbotron u-margin-0px", style="height: 200px; background: #fcfcfc;")
                                     i(class="fa fa-ban", style="font-size: 2.5em;")

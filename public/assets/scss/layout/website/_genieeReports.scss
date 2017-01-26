@@ -1,6 +1,9 @@
 /*****Geniee Reports*****/
 $MainBackgroundColor: #b5b5b5;
+$secondaryBackgroundColor: #f1f1f1;
 $borderColor: #e6e6e6;
+$LabelFontColor: 1.5em;
+$fourteenPxAlias: 1.168em;
 
 .page-container--reports-geniee
 {
@@ -23,7 +26,7 @@ $borderColor: #e6e6e6;
 
                 > .panel
                 {
-                    background: #f1f1f1;
+                    background: $secondaryBackgroundColor;
                     box-shadow: inset 0 -3px 0 0 $primaryColor;
                 }
             }
@@ -40,7 +43,7 @@ $borderColor: #e6e6e6;
 
                     .panel-title
                     {
-                        font-size: 1.5em;
+                        font-size: $LabelFontColor;
                         font-weight: lighter;
                     }
                 }
@@ -97,7 +100,7 @@ $borderColor: #e6e6e6;
     }
     .breadcrumb
     {
-        background: #f1f1f1;
+        background: $secondaryBackgroundColor;
         border-radius: 0;
         font-size: 1.3em;
 
@@ -133,11 +136,22 @@ $borderColor: #e6e6e6;
         {
             min-height: 100px;
 
+            > .filter-selected-ui
+            {
+                &.filter-selected-ui--placeholder
+                {
+                    font-size: $LabelFontColor;
+                    min-height: 80px;
+                    opacity: 0.5;
+                    width: 100%;
+                }
+            }
+
             > .label.label-default
             {
                 > .badge
                 {
-                    background: #eb575c;
+                    background: $primaryColor;
                     cursor: pointer;
                     position: absolute;
                     top: -9px;
@@ -188,8 +202,6 @@ $borderColor: #e6e6e6;
     .btn
     {
         height: 34px;
-        padding: 0;
-        width: 40px;
 
         &:active,
         &:hover,
@@ -207,7 +219,7 @@ $borderColor: #e6e6e6;
 
         > .fa
         {
-            font-size: 1.5em;
+            font-size: inherit;
         }
 
         &.btn-success
@@ -215,6 +227,7 @@ $borderColor: #e6e6e6;
             background: $GreenColor;
             border-color: $GreenColor;
             box-shadow: 0 0 3px $GreenColor inset;
+            color: $whiteColor;
         }
 
         &.btn-error
@@ -222,6 +235,7 @@ $borderColor: #e6e6e6;
             background: $primaryColorDark;
             border-color: $primaryColorDark;
             box-shadow: 0 0 3px $primaryColorDark inset;
+            color: $whiteColor;
         }
 
         &.btn-theme--primary
@@ -229,20 +243,45 @@ $borderColor: #e6e6e6;
             background: $primaryColor;
             border-color: $primaryColor;
             box-shadow: 0 0 3px $primaryColor inset;
+            color: $whiteColor;
+        }
+        &.btn--notification
+        {
+            border-color: $primaryColor;
+            position: relative;
+
+            &::before
+            {
+                background: $primaryColor;
+                border-radius: 100%;
+                content: '';
+                height: 10px;
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                width: 10px;
+            }
+        }
+        &.btn--with-icon
+        {
+            > .fa
+            {
+                 margin-left: 5px;
+            }
         }
     }
     .panel-default
     {
         > .panel-heading
         {
-            background: #f1f1f1;
+            background: $secondaryBackgroundColor;
             border: 0;
             box-shadow: none;
             outline: none;
 
             > .panel-title
             {
-                font-size: 1.168em;
+                font-size: $fourteenPxAlias;
             }
         }
     }
@@ -252,7 +291,7 @@ $borderColor: #e6e6e6;
         {
             a {
                 color: $primaryColor;
-                font-size: 1.168em;
+                font-size: $fourteenPxAlias;
 
                 &.active
                 {
@@ -263,11 +302,11 @@ $borderColor: #e6e6e6;
     }
     .label.label-default
     {
-        background: #f1f1f1;
+        background: $secondaryBackgroundColor;
         border: 1px solid #ddd;
         color: inherit;
         display: inline-block;
-        font-size: 1.168em;
+        font-size: $fourteenPxAlias;
         height: auto;
         margin: 0 15px 10px 0;
         padding: 10px;

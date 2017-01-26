@@ -188,6 +188,7 @@ collapsedextended
 .mb-30 {
   margin-bottom: 30px;
 }
+/*****Layout alignment*****/
 .u-margin-0px {
 	margin: 0 !important;
 }
@@ -209,6 +210,25 @@ collapsedextended
 .u-margin-b15px {
 	margin-bottom: $FMLayoutDimension + $FMLayoutDimension/2  !important;	
 }
+.u-margin-l5px {
+	margin-left: $FMLayoutDimension/2 !important;
+}
+.u-margin-l10px {
+	margin-left: $FMLayoutDimension !important;
+}
+.u-margin-l15px {
+	margin-left: $FMLayoutDimension + $FMLayoutDimension/2 !important;
+}
+.u-margin-r5px {
+	margin-right: $FMLayoutDimension/2 !important;
+}
+.u-margin-r10px {
+	margin-right: $FMLayoutDimension !important;
+}
+.u-margin-r15px {
+	margin-right: $FMLayoutDimension + $FMLayoutDimension/2 !important;
+}
+
 
 /*******Dimension classes******/
 .u-full-width {

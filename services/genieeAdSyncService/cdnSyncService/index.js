@@ -74,7 +74,7 @@ module.exports = function (site) {
             return site.getAllChannels().then(function (allChannels) {
                 _.each(allChannels, function (channel) {
                     var platform, pageGroup, channelKey, pageGroupData,
-                        pageGroupId, isReportData, isGenieeReportData;
+                        pageGroupId, isReportData, isGenieeReportData, isApexReportData;
 
                     platform = channel.platform; // last element is platform
                     pageGroup = channel.pageGroup; // join remaing to form pageGroup
@@ -82,15 +82,16 @@ module.exports = function (site) {
                     channelKey = pageGroup + '_' + platform;
                     isReportData = !!(reportData && _.isObject(reportData));
                     isGenieeReportData = !!(isReportData && channel.genieePageGroupId);
+                    isApexReportData = !!(isReportData && channelKey && isAutoOptimise);
 
                     //TODO: Move below partner specific logic in universal app service
                     if (isGenieeReportData) {
                         pageGroupId = channel.genieePageGroupId;
-                    } else if (isReportData) {
+                    } else if (isApexReportData) {
                         pageGroupId = channelKey;
                     }
 
-                    pageGroupData = reportData.pageGroups[pageGroupId];
+                    pageGroupData = pageGroupId ? reportData.pageGroups[pageGroupId] : null;
 
                     if (!finalJson[platform]) {
                         finalJson[platform] = {};
@@ -181,8 +182,10 @@ module.exports = function (site) {
         getComputedConfig = Promise.resolve(true).then(function() {
             if (isGenieePartner) {
                 return getGenieeReportData(paramConfig);
-            } else {
+            } else if (isAutoOptimise) {
                 return getReportData(paramConfig);
+            } else {
+                return getVariationsPayload(site).then(setAllConfigs);
             }
         }),
         getFinalConfig = Promise.join(getComputedConfig, getJsFile, function (finalConfig, jsFile) {

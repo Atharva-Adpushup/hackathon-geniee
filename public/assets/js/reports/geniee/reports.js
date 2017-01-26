@@ -6,6 +6,8 @@ var GenieeReport = (function(w, $) {
     this.siteId = w.adpushup.reports.siteId;
     this.siteDomain = w.adpushup.reports.siteDomain;
     this.paramConfig = w.adpushup.reports.paramConfig;
+    Object.freeze(this.paramConfig);
+
     this.reportsLevel = {
         'pagegroup': 'Page Groups',
         'variation': 'Variations'
@@ -16,17 +18,28 @@ var GenieeReport = (function(w, $) {
     this.filterData = {
         paramConfig: $.extend(true, {}, this.paramConfig),
         date: {},
-        platform: {}
+        platform: {},
+        constants: {
+            notification: {
+                btn: {
+                    class: 'btn--notification'
+                }
+            }
+        }
     };
 
-    // Cache DOM elements query
+    // Cache static DOM elements
     this.$breadCrumbContainer = $('.js-reports-breadcrumb');
     this.$tableContainer = $('#reports_table');
     this.$perfHeaderContainer = $(".js-perf-header");
+    this.$dateDescWrapper = $(".js-date-desc-wrapper");
     this.$filterDateWrapper = $(".js-filter-date-wrapper");
     this.$filterDateSelectedWrapper = $(".js-filter-selected-wrapper");
     this.$filterApplyBtn = $(".js-filter-apply-btn");
     this.$filterResetBtn = $(".js-filter-reset-btn");
+    this.$headingWrapper = $(".js-main-heading-wrapper");
+    this.$headingOptions = $(".js-main-heading-options");
+    this.$loaderWrapper = $(".js-loaderwrapper");
 
     // Slideout elements
     this.$slideoutPanel = $('.js-slideout-panel');
@@ -65,6 +78,101 @@ var GenieeReport = (function(w, $) {
         w.Highcharts.stockChart(selector, config);
     }
 
+    function showLoader() {
+        this.$loaderWrapper.removeClass('hide');
+    }
+
+    function hideLoader() {
+        this.$loaderWrapper.addClass('hide');
+    }
+
+    function getDateString(dateMillis) {
+        var date = new Date(dateMillis);
+
+        return date.toDateString().replace(" ", ", &nbsp;");
+    }
+
+    function insertDateDesciption() {
+        var isParamConfig = this.paramConfig,
+            isDateFilter = isFilterData(),
+            filterDateKey = (!!isDateFilter ? Object.keys(this.filterData.date)[0] : null),
+            dateConfig = (!!(isDateFilter && filterDateKey) ? this.filterData.date[filterDateKey] : {
+                dateFrom: this.paramConfig.dateFrom,
+                dateTo: this.paramConfig.dateTo
+            }),
+            dateFromString = getDateString(dateConfig.dateFrom),
+            dateToString = getDateString(dateConfig.dateTo),
+            dateString = (dateFromString + "&nbsp; - &nbsp;" + dateToString),
+            $baseTemplate = $("<ol class='breadcrumb js-date-desc u-margin-0px'><li><span class='breadcrumb-title-prefix js-date-desc-title-prefix'>Date:</span></li></ol>"),
+            $contentTemplate = $("<a id='articlemyriad.com' class='breadcrumb-title js-date-desc-title active'></a>");
+
+            $contentTemplate.html(dateString);
+            $baseTemplate.find("li").append($contentTemplate);
+            this.$dateDescWrapper.html($baseTemplate);
+    }
+
+    function insertFilterSelectedUiPlaceholder() {
+        var $template = $("<div class='aligner aligner--column aligner--hCenter aligner--vCenter filter-selected-ui filter-selected-ui--placeholder js-filter-selected-ui-placeholder'>No filters to show.</div>"),
+            isPlaceholderPresent = !!($(".js-filter-selected-ui-placeholder", this.$filterDateSelectedWrapper).length);
+
+        if (!isPlaceholderPresent) {
+            this.$filterDateSelectedWrapper.html($template);
+        }
+    }
+
+    function removeFilterSelectedUiPlaceholder() {
+        var $placeholder = $(".js-filter-selected-ui-placeholder", this.$filterDateSelectedWrapper);
+
+        if ($placeholder.length) {
+            $placeholder.remove();
+        }
+    }
+
+    function prependResetReportsBtn() {
+        var $template = $("<button id='report-reset-btn' data-loading-text='Resetting...' autocomplete='off' type='button' class='btn btn-default btn-theme btn-theme--primary u-margin-r10px js-report-reset-btn js-filter-reset'>Reset filters</button>"),
+            isBtnPresent = !!($(".js-report-reset-btn", this.$headingOptions).length);
+
+        if (!isBtnPresent) {
+            this.$headingOptions.prepend($template);
+        }
+    }
+
+    function removeResetReportsBtn() {
+        var $btn = $(".js-report-reset-btn", this.$headingOptions);
+
+        if ($btn.length) {
+            $btn.remove();
+        }
+    }
+
+    function disableFilterApplyBtn() {
+        this.$filterApplyBtn
+            .attr({ disabled: true })
+            .addClass('disabled');
+    }
+
+    function enableFilterApplyBtn() {
+        this.$filterApplyBtn
+            .attr({ disabled: false })
+            .removeClass('disabled');
+    }
+
+    function addFilterBtnNotification() {
+        var className = this.filterData.constants.notification.btn.class;
+
+        if (!this.$filterButton.hasClass(className)) {
+            this.$filterButton.addClass(className);
+        }
+    }
+
+    function removeFilterBtnNotification() {
+        var className = this.filterData.constants.notification.btn.class;
+
+        if (this.$filterButton.hasClass(className)) {
+            this.$filterButton.removeClass(className);
+        }
+    }
+
     function setFilterSelectedLabel(name) {
         var $labelTpl = $("<span class='label label-default js-filter-selected js-filter-selected--date'></span>"),
             $labelBadgeTpl = $("<span class='badge js-badge'>X</span>");
@@ -95,12 +203,28 @@ var GenieeReport = (function(w, $) {
         setFilterDateData(dateRangeObj);
         setFilterParamConfigData(dateRange);
         setFilterSelectedLabel(text);
+        enableFilterApplyBtn();
     }
 
     function bindDateFilterLinks() {
         var $links = $('.js-filter-date', this.$filterDateWrapper);
 
         $links.off('click').on('click', handleDateFilterLinksClick);
+    }
+
+    function resetFiltersFunctionality() {
+        resetFilterConfig();
+        removeFilterBtnNotification();
+        this.$filterDateSelectedWrapper.html('');
+        insertFilterSelectedUiPlaceholder();
+        if (this.slideout.isOpen()) {
+            this.slideout.close();
+        }
+
+        w.setTimeout(function() {
+            loadReportsWithInitialData();
+            removeResetReportsBtn();
+        }, 500);
     }
 
     function resetFilterConfig() {
@@ -110,10 +234,25 @@ var GenieeReport = (function(w, $) {
         setFilterParamConfigData(this.paramConfig);
     }
 
+    function isFilterData() {
+        return Object.keys(this.filterData.date).length;
+    }
+
+    function resetFilterUI() {
+        var isDateFilter = isFilterData();
+
+        if (!isDateFilter) {
+            disableFilterApplyBtn();
+            removeFilterBtnNotification();
+            insertFilterSelectedUiPlaceholder();
+        }
+    }
+
     function handleDateFilterLabelsBadgeClick(e) {
         var $badge = $(e.target);
 
         resetFilterConfig();
+        resetFilterUI();
         $badge.parent().remove();
     }
 
@@ -122,13 +261,34 @@ var GenieeReport = (function(w, $) {
     }
 
     function reInitReports(reportData) {
-        var self = this;
-        triggerFilterBtnClick();
+        var self = this,
+            isDateFilter = isFilterData();
+
+        if (isDateFilter) {
+            triggerFilterBtnClick();
+        }
 
         w.setTimeout(function() {
             self.model = $.extend(true, {}, reportData);
             setAndLoadPageGroupReports();
+
+            if (isDateFilter) {
+                addFilterBtnNotification();
+            } else {
+                removeFilterBtnNotification();
+            }
         }, 1000);
+    }
+
+    function loadReportsWithInitialData() {
+        var paramConfig = this.paramConfig,
+            $filterResetBtn = $('.js-filter-reset');
+
+        $filterResetBtn.button('loading');
+        getReports(paramConfig, {
+            success: reportsSuccessCallback,
+            error: reportsErrorCallback
+        }, $filterResetBtn);
     }
 
     function setAndLoadPageGroupReports() {
@@ -137,9 +297,11 @@ var GenieeReport = (function(w, $) {
         chooseLevelAndLoadReports();
     }
 
-	function getReports(paramsData, callbackConfig) {
+	function getReports(paramsData, callbackConfig, $btn) {
 		var url = '/user/site/' + this.siteId + '/reports/getPerformanceData',
 			type = 'GET';
+
+        showLoader();
 
 		$.ajax({
 			type: type,
@@ -151,11 +313,17 @@ var GenieeReport = (function(w, $) {
 			data = (typeof data === 'string') ? JSON.parse(data) : data;
 
 			if (data.success) {
+                if ($btn) { $btn.button('reset'); }
+                hideLoader();
 				return callbackConfig.success(data.data);
 			}
 
+            hideLoader();
+            if ($btn) { $btn.button('reset'); }
 			return callbackConfig.error();
 		}).fail(function() {
+            hideLoader();
+            if ($btn) { $btn.button('reset'); }
 			callbackConfig.error();
 		});
 	}
@@ -163,7 +331,6 @@ var GenieeReport = (function(w, $) {
     function reportsSuccessCallback(reportData) {
         reInitReports(reportData);
     }
-
 
     function reportsErrorCallback() {
         console.error('Error loading reports');
@@ -178,25 +345,34 @@ var GenieeReport = (function(w, $) {
 
         if (isLabelElem && isDateFilterData) {
             paramConfig = $.extend(true, {}, this.filterData.paramConfig);
+            prependResetReportsBtn();
+            $btn.button('loading');
 
             getReports(paramConfig, {
                 success: reportsSuccessCallback,
                 error: reportsErrorCallback
-            });
+            }, $btn);
         }
+    }
+
+    function handleFilterResetBtnClick() {
+        resetFiltersFunctionality();
+    }
+
+    function handleReportResetBtnclick() {
+        resetFiltersFunctionality();
     }
 
     function bindFilterApplyBtn() {
         this.$filterApplyBtn.off('click').on('click', handleFilterApplyBtnClick.bind(this));
     }
 
-    function handleFilterResetBtnClick() {
-        resetFilterConfig();
-        this.$filterDateSelectedWrapper.html('');
-    }
-
     function bindFilterResetBtn() {
         this.$filterResetBtn.off('click').on('click', handleFilterResetBtnClick.bind(this));
+    }
+
+    function bindReportResetBtn() {
+        this.$headingWrapper.off('click').on('click', '.js-report-reset-btn', handleReportResetBtnclick.bind(this));
     }
 
     function initSlideoutMenu() {
@@ -213,6 +389,7 @@ var GenieeReport = (function(w, $) {
         self.$slideoutMenu.css({visibility: 'visible'});
 
         toggleSlideoutMenu();
+        disableFilterApplyBtn();
     }
 
     function triggerFilterBtnClick() {
@@ -522,6 +699,7 @@ var GenieeReport = (function(w, $) {
         initSlideoutMenu();
         generateBreadCrumb();
         setTableHeading();
+        insertDateDesciption();
         setPerfHeaderData(computedPerfHeaderData);
         setTableData(computedTableData, isPageGroupLevel);
 
@@ -535,6 +713,8 @@ var GenieeReport = (function(w, $) {
         bindDateFilterLabelsBadge();
         bindFilterApplyBtn();
         bindFilterResetBtn();
+        bindReportResetBtn();
+
         setThumbnailUiData();
         setActiveThumbnail($revenueHeaderThumbnail);
         prepareReportsChart($revenueHeaderThumbnail);
