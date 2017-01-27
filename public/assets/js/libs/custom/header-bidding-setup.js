@@ -24,7 +24,7 @@ $(document).ready(function () {
                 closeBtn: '<button type="button" class="close hb-close-pane">x</button>',
                 defaultSelectBoxOption: '<option selected value="">Select partner</option>',
                 buttons: {
-                    addPartner: '<button type="button" class="add-partner btn-hb-pane btn btn-lightBg btn-default">Add another partner</button>',
+                    addPartner: '<button type="button" class="add-partner btn-hb-pane btn btn-lightBg btn-default">Add another bidder</button>',
                     addSetup: '<button type="button" class="add-setup btn-hb-pane btn btn-lightBg btn-default">Add another Setup</button>',
                     addSize: '<button type="button" class="add-size btn-hb-pane btn btn-lightBg btn-default">Add another size</button>'
                 },
