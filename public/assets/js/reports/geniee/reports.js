@@ -29,6 +29,7 @@ var GenieeReport = (function(w, $) {
     };
 
     // Cache static DOM elements
+    this.$reportsWrapper = $(".js-reports-wrapper");
     this.$breadCrumbContainer = $('.js-reports-breadcrumb');
     this.$tableContainer = $('#reports_table');
     this.$perfHeaderContainer = $(".js-perf-header");
@@ -40,6 +41,7 @@ var GenieeReport = (function(w, $) {
     this.$headingWrapper = $(".js-main-heading-wrapper");
     this.$headingOptions = $(".js-main-heading-options");
     this.$loaderWrapper = $(".js-loaderwrapper");
+    this.$notificationWrapper = $(".js-notification-wrapper");
 
     // Slideout elements
     this.$slideoutPanel = $('.js-slideout-panel');
@@ -76,6 +78,14 @@ var GenieeReport = (function(w, $) {
 
     function createChart(selector, config) {
         w.Highcharts.stockChart(selector, config);
+    }
+
+    function showNotificationWrapper() {
+        this.$notificationWrapper.removeClass('hide');
+    }
+
+    function hideNotificationWrapper() {
+        this.$notificationWrapper.addClass('hide');
     }
 
     function showLoader() {
@@ -333,7 +343,10 @@ var GenieeReport = (function(w, $) {
     }
 
     function reportsErrorCallback() {
-        console.error('Error loading reports');
+        if (this.slideout.isOpen()) {
+            this.slideout.close();
+        }
+        showNotificationWrapper();
     }
 
     function handleFilterApplyBtnClick(e) {
@@ -349,17 +362,19 @@ var GenieeReport = (function(w, $) {
             $btn.button('loading');
 
             getReports(paramConfig, {
-                success: reportsSuccessCallback,
-                error: reportsErrorCallback
+                success: reportsSuccessCallback.bind(this),
+                error: reportsErrorCallback.bind(this)
             }, $btn);
         }
     }
 
     function handleFilterResetBtnClick() {
+        hideNotificationWrapper();
         resetFiltersFunctionality();
     }
 
     function handleReportResetBtnclick() {
+        hideNotificationWrapper();
         resetFiltersFunctionality();
     }
 
@@ -373,6 +388,7 @@ var GenieeReport = (function(w, $) {
 
     function bindReportResetBtn() {
         this.$headingWrapper.off('click').on('click', '.js-report-reset-btn', handleReportResetBtnclick.bind(this));
+        $('.js-report-reset-btn', this.$notificationWrapper).off('click').on('click', handleReportResetBtnclick.bind(this));
     }
 
     function initSlideoutMenu() {

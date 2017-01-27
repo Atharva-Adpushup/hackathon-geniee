@@ -3,7 +3,7 @@ var lodash = require('lodash'),
 	Utils = {
 		addEmptyDataFields: function(reportData) {
 			var computedReport = lodash.assign({}, reportData),
-				headerFields = ['Page Views', 'Revenue', 'Page RPM (PERFORMANCE %)'],
+				headerFields = ['Page Views', 'Revenue (USD)', 'Page RPM (PERFORMANCE %)'],
 				rowFields = [' ', ' ', ' '],
 				footerFields = [' ', ' ', ' '],
 				header = computedReport.data.header,
