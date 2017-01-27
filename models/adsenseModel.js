@@ -128,6 +128,7 @@ module.exports = {
 			startDate: moment.unix(config.startDate / 1000).format('YYYY-MM-DD'),
 			endDate: moment.unix(config.endDate / 1000).format('YYYY-MM-DD'),
 			useTimezoneReporting: true,
+			currency: 'USD',
 			filter: [],
 			metric: []
 		};
