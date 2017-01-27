@@ -362,8 +362,8 @@ var GenieeReport = (function(w, $) {
             $btn.button('loading');
 
             getReports(paramConfig, {
-                success: reportsSuccessCallback,
-                error: reportsErrorCallback
+                success: reportsSuccessCallback.bind(this),
+                error: reportsErrorCallback.bind(this)
             }, $btn);
         }
     }
