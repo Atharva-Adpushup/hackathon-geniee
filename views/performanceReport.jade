@@ -117,11 +117,10 @@ block bodyContent
         // Page Content Starts Here
         .pageContentWrapper.page-content.js-slideout-panel
             .pageContentInner.page-content--inner
-                .notification-wrapper
                 #widgetsArea.row
 
                     .mb-30
-                        .controlAdpushupWrap
+                        .controlAdpushupWrap.js-reports-wrapper
                             if reportingData
                                 div(class="aligner aligner--row u-margin-20px u-padding-b10px main-heading-wrapper js-main-heading-wrapper")
                                     div(class="col-xs-9 col-md-9 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
@@ -190,6 +189,9 @@ block bodyContent
                                 div(class="loaderwrapper loaderwrapper--fixed spinner hide js-loaderwrapper")
                                     img(src="/assets/images/loaderLogo.png")
                                     div(class="loaderwrapper-text") Fetching reports...
+                                div(class="aligner aligner--column aligner--hCenter aligner--vCenter notification-wrapper hide js-notification-wrapper")
+                                    h3(class="notification-heading") Unable to fetch reports right now
+                                    button(data-loading-text='Resetting...', autocomplete='off', class="btn btn-default btn-theme btn-theme--primary js-report-reset-btn js-filter-reset") Reset Filters
                             else
                                 div(class="aligner aligner--row aligner--hCenter aligner--vCenter jumbotron u-margin-0px", style="height: 200px; background: #fcfcfc;")
                                     i(class="fa fa-ban", style="font-size: 2.5em;")
