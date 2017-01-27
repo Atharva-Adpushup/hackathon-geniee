@@ -10,6 +10,7 @@ var express = require('express'),
     userModel = require('.././models/userModel'),
     siteModel = require('.././models/siteModel'),
     commonConsts = require('../configs/commonConsts'),
+    couchbase = require('../helpers/couchBaseService'),
     countryData = require('country-data'),
     router = express.Router({ mergeParams: true });
 
@@ -34,6 +35,23 @@ function checkAuth(req, res, next) {
         });
 };
 
+function renderHbPanel(site, UiData, res, hbConfig) {
+    var data = {
+        siteDomain: site.get('siteDomain'),
+        countries: JSON.stringify(UiData.countries),
+        continents: JSON.stringify(commonConsts.hbContinents),
+        adSizes: JSON.stringify(_.uniq(UiData.adSizes)),
+        hbPartners: JSON.stringify(UiData.hbPartners),
+        hbConfig: JSON.stringify(commonConsts.hbConfig)
+    };
+
+    if(hbConfig) {
+        data.hbSetupData = JSON.stringify(hbConfig.value.hbConfig);
+    }
+
+    res.render('headerBidding', data);
+};
+
 router
     .get('/:siteId/*', checkAuth)
     .get('/:siteId/settings', function (req, res) {
@@ -52,54 +70,77 @@ router
                 res.send('Some error occurred!');
             });
     })
-    .get('/:siteId/headerBidding', function(req, res) {
+    .get('/:siteId/headerBidding', function (req, res) {
+        var countries = _.map(countryData.lookup.countries(), function (country) {
+            return {
+                name: country.name,
+                code: country.alpha2
+            };
+        }), adSizes = [], hbPartners = [];
+
+        _.forIn(commonConsts.hbConfig, function (hbPartner) {
+            hbPartner.isHb ? hbPartners.push(hbPartner.name) : null;
+        });
+        _.forEach(commonConsts.supportedAdSizes, function (layout) {
+            _.forEach(layout.sizes, function (size) {
+                adSizes.push(size.width + 'x' + size.height);
+            });
+        });
+
+        var UiData = {
+            countries: countries,
+            hbPartners: hbPartners,
+            adSizes: adSizes
+        };
+
         return siteModel.getSiteById(req.params.siteId)
             .then(function (site) {
-                var countries = _.map(countryData.lookup.countries(), function(country) {
-                    return {
-                        name: country.name,
-                        code: country.alpha2
-                    };
-                }), adSizes = [], hbPartners = [];
-
-                _.forIn(commonConsts.hbConfig, function(hbPartner) {
-                    hbPartner.isHb ? hbPartners.push(hbPartner.name) : null;
-                });
-                _.forEach(commonConsts.supportedAdSizes, function(layout) {
-                    _.forEach(layout.sizes, function(size) {
-                        adSizes.push(size.width+'x'+size.height);
+            return couchbase.connectToAppBucket()
+            .then(function(appBucket) {
+            return appBucket.getAsync('hbcf::' + req.params.siteId, {})
+                .then(function(hbConfig) {
+                    return renderHbPanel(site, UiData, res, hbConfig);
                     });
-                });            
-
-                return res.render('headerBidding', {
-                    siteDomain: site.get('siteDomain'),
-                    countries: JSON.stringify(countries),
-                    continents: JSON.stringify(commonConsts.hbContinents),
-                    adSizes: JSON.stringify(_.uniq(adSizes)),
-                    hbPartners: JSON.stringify(hbPartners),
-                    hbConfig: JSON.stringify(commonConsts.hbConfig),
-                    hbSetupData: JSON.stringify(site.get('hbConfig'))
                 });
             })
             .catch(function (err) {
-                res.send('Some error occurred!');
+                if(err.code === 13) {
+                    return siteModel.getSiteById(req.params.siteId)
+                        .then(function (site) {
+                            return renderHbPanel(site, UiData, res);
+                        });
+                }
+                else {
+                    console.log(err);
+                    res.send('Some error occurred!');
+                }
             });
     })
-    .post('/:siteId/saveHeaderBiddingSetup', function(req, res) {
+    .post('/:siteId/saveHeaderBiddingSetup', function (req, res) {
         var siteId = req.params.siteId,
-            hbConfig = JSON.parse(req.body.hbConfig);
+            hbConfig = JSON.parse(req.body.hbConfig),
+            operation = req.body.op;
 
-        return siteModel.saveHbConfig(siteId, hbConfig)
+        return siteModel.getSiteById(req.params.siteId)
+            .then(function (site) {
+                var json = {
+                    hbConfig: hbConfig,
+                    siteId: site.get('siteId'),
+                    siteDomain: site.get('siteDomain'),
+                    email: site.get('ownerEmail')
+                };
+
+            return couchbase.connectToAppBucket()
+            .then(function(appBucket) {
+                return operation === 'create' ? appBucket.insertPromise('hbcf::' + req.params.siteId, json) : appBucket.replacePromise('hbcf::' + req.params.siteId, json);
+                })
+            })
             .then(function (data) {
                 res.send({ success: 1 });
             })
             .catch(function (err) {
-                if (err.name === 'AdPushupError') {
-                    res.send({ succes: 0, message: err.message })
-                }
-                else {
-                    res.send({ success: 0, message: 'Some error occurred!' });
-                }
+                console.log(err);
+                res.send({ success: 0 });
             });
     })
     .post('/:siteId/saveSiteSettings', function (req, res) {
@@ -121,8 +162,8 @@ router
             });
     })
     .get('/:siteId/editor', function (req, res) {
-        userModel.verifySiteOwner(req.session.user.email, req.params.siteId, {fullSiteData: true})
-            .then(function(data) {
+        userModel.verifySiteOwner(req.session.user.email, req.params.siteId, { fullSiteData: true })
+            .then(function (data) {
                 return res.render('editor', {
                     isChrome: true,
                     domain: data.site.get('siteDomain'),
@@ -132,73 +173,73 @@ router
                     currentSiteId: req.params.siteId
                 });
             })
-            .catch(function() {
+            .catch(function () {
                 return res.redirect('/403');
             });
     })
-    .get('/:siteId/createPagegroup', function(req, res) {
-        if(req.session.user.userType !== 'partner') {
+    .get('/:siteId/createPagegroup', function (req, res) {
+        if (req.session.user.userType !== 'partner') {
             return siteModel.getSiteById(req.params.siteId)
-            .then(function(site) { return { siteDomain: site.get('siteDomain'), channels: site.get('channels') }})
-            .then(function(data) {
-                var channels = _.map(data.channels, function(channel) {
-                    return channel.split(':')[1];
+                .then(function (site) { return { siteDomain: site.get('siteDomain'), channels: site.get('channels') } })
+                .then(function (data) {
+                    var channels = _.map(data.channels, function (channel) {
+                        return channel.split(':')[1];
+                    });
+                    return res.render('createPageGroup', {
+                        siteId: req.params.siteId,
+                        siteDomain: data.siteDomain,
+                        channels: _.uniq(channels)
+                    });
+                })
+                .catch(function (err) {
+                    return res.send('Some error occurred!');
                 });
-                return res.render('createPageGroup', {
-                    siteId: req.params.siteId,
-                    siteDomain: data.siteDomain,
-                    channels: _.uniq(channels)
-                });
-            })
-            .catch(function(err) {
-                return res.send('Some error occurred!');
-            });
         }
         else {
             return res.render('403');
         }
     })
-    .post('/:siteId/createPagegroup', function(req, res) {
-           var json = req.body;
-           return channelModel.createPageGroup(json)
-				.then(function(data) {
-					// Reset session on addition of new pagegroup for non-partner
-					var userSites = req.session.user.sites,
-						site = _.find(userSites, {'siteId': parseInt(json.siteId)});
-                    
-					var index = _.findIndex(userSites, {'siteId': parseInt(json.siteId)});
-					req.session.user.sites[index] = site;
-					
-					return res.redirect('/user/dashboard');
-				})
-				.catch(function(err) {
-					var error = err.message[0].message ?  err.message[0].message : 'Some error occurred!';
+    .post('/:siteId/createPagegroup', function (req, res) {
+        var json = req.body;
+        return channelModel.createPageGroup(json)
+            .then(function (data) {
+                // Reset session on addition of new pagegroup for non-partner
+                var userSites = req.session.user.sites,
+                    site = _.find(userSites, { 'siteId': parseInt(json.siteId) });
 
-                    return siteModel.getSiteById(req.params.siteId)
-                        .then(function(site) { return { siteDomain: site.get('siteDomain'), channels: site.get('channels') }})
-                        .then(function(data) {
-                            var channels = _.map(data.channels, function(channel) {
-                                return channel.split(':')[1];
-                            });
-                            return res.render('createPageGroup', {
-                                siteId: req.params.siteId,
-                                siteDomain: data.siteDomain,
-                                channels: _.uniq(channels),
-                                error: error
-                            });
+                var index = _.findIndex(userSites, { 'siteId': parseInt(json.siteId) });
+                req.session.user.sites[index] = site;
+
+                return res.redirect('/user/dashboard');
+            })
+            .catch(function (err) {
+                var error = err.message[0].message ? err.message[0].message : 'Some error occurred!';
+
+                return siteModel.getSiteById(req.params.siteId)
+                    .then(function (site) { return { siteDomain: site.get('siteDomain'), channels: site.get('channels') } })
+                    .then(function (data) {
+                        var channels = _.map(data.channels, function (channel) {
+                            return channel.split(':')[1];
                         });
-				});
+                        return res.render('createPageGroup', {
+                            siteId: req.params.siteId,
+                            siteDomain: data.siteDomain,
+                            channels: _.uniq(channels),
+                            error: error
+                        });
+                    });
+            });
     })
-    .get('/:siteId/pagegroups', function(req, res) {
-        if(req.session.user.userType !== 'partner') {
+    .get('/:siteId/pagegroups', function (req, res) {
+        if (req.session.user.userType !== 'partner') {
             siteModel.getSitePageGroups(req.params.siteId)
-                .then(function(pageGroups) {
+                .then(function (pageGroups) {
                     return res.render('pageGroups', {
                         pageGroups: pageGroups,
                         siteId: req.params.siteId
                     });
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     return res.send('Some error occurred!');
                 });
         }
@@ -210,7 +251,7 @@ router
         siteModel.getSitePageGroups(req.params.siteId)
             .then(function (pageGroups) {
 
-                if(req.session.user.userType === 'partner') {
+                if (req.session.user.userType === 'partner') {
                     return res.render('geniee/dashboard', {
                         pageGroups: pageGroups,
                         siteId: req.params.siteId
@@ -230,16 +271,16 @@ router
                     }
 
                     function sitePromises() {
-                        return _.map(allUserSites, function(obj) {
-                            return siteModel.getSiteById(obj.siteId).then(function() {
+                        return _.map(allUserSites, function (obj) {
+                            return siteModel.getSiteById(obj.siteId).then(function () {
                                 return obj;
-                            }).catch(function() {
+                            }).catch(function () {
                                 return 'inValidSite';
                             });
                         });
                     }
 
-                    return Promise.all(sitePromises()).then(function(validSites) {
+                    return Promise.all(sitePromises()).then(function (validSites) {
                         var sites = _.difference(validSites, ['inValidSite']),
                             unSavedSite;
 

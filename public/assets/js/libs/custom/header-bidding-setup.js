@@ -355,11 +355,12 @@ $(document).ready(function () {
             },
 
             saveHeaderBiddingSetup: function (form) {
-                var data = this.parseHbFormData(form);
+                var data = this.parseHbFormData(form),
+                    operation = $('#setupOp').val();
                 $.ajax({
                     method: 'POST',
                     url: 'saveHeaderBiddingSetup',
-                    data: { hbConfig: JSON.stringify(data) }
+                    data: { hbConfig: JSON.stringify(data), op: operation }
                 }).done(function (res) {
                     if(res.success) {
                         ap.apAlert('Header bidding setup has been saved successfully!', '#hbalert', 'success', 'slideDown');
@@ -390,7 +391,6 @@ $(document).ready(function () {
         $('body').on('change', '.hb-partner', function (e) {
             var hbPartner = $(this).val(),
                 topMostConfigWrapper = $(this).closest('.hb-config-pane');
-                console.log(topMostConfigWrapper);
 
             hbPartner ? ap.headerBiddingSetup.renderPartnerSetupPanel(hbPartner, topMostConfigWrapper) : null;
         });
