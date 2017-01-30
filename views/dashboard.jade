@@ -26,8 +26,8 @@ block bodyContent
     //- if isSuperUser || !requestDemo
     include layout/sideBar
 
-    //- if environment === 'production'
-    //-     include layout/extensionDetection    
+    if environment === 'production'
+        include layout/extensionDetection    
 
     .pageContainer.page-container
         include layout/header
