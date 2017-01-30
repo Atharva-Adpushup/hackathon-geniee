@@ -15,6 +15,7 @@ var express = require('express'),
     Promise = require('bluebird'),
     router = express.Router({ mergeParams: true });
 
+// Function to authenticate user for proper access
 function checkAuth(req, res, next) {
     userModel.verifySiteOwner(req.session.user.email, req.params.siteId)
         .then(function () {
@@ -36,6 +37,7 @@ function checkAuth(req, res, next) {
         });
 };
 
+// Function to render header bidding setup panel
 function renderHbPanel(site, UiData, res, hbConfig) {
     var data = {
         siteDomain: site.get('siteDomain'),
@@ -46,11 +48,36 @@ function renderHbPanel(site, UiData, res, hbConfig) {
         hbConfig: JSON.stringify(commonConsts.hbConfig)
     };
 
-    if(hbConfig) {
+    if (hbConfig) {
         data.hbSetupData = JSON.stringify(hbConfig.value.hbConfig);
     }
 
     res.render('headerBidding', data);
+};
+
+// Function to populate data for header bidding panel UI
+function getHbUiData() {
+    var countries = _.map(countryData.lookup.countries(), function (country) {
+        return {
+            name: country.name,
+            code: country.alpha2
+        };
+    }), adSizes = [], hbPartners = [];
+
+    _.forIn(commonConsts.hbConfig, function (hbPartner) {
+        hbPartner.isHb ? hbPartners.push(hbPartner.name) : null;
+    });
+    _.forEach(commonConsts.supportedAdSizes, function (layout) {
+        _.forEach(layout.sizes, function (size) {
+            adSizes.push(size.width + 'x' + size.height);
+        });
+    });
+
+    return {
+        countries: countries,
+        hbPartners: hbPartners,
+        adSizes: adSizes
+    };
 };
 
 router
@@ -72,41 +99,20 @@ router
             });
     })
     .get('/:siteId/headerBidding', function (req, res) {
-        var countries = _.map(countryData.lookup.countries(), function (country) {
-            return {
-                name: country.name,
-                code: country.alpha2
-            };
-        }), adSizes = [], hbPartners = [];
-
-        _.forIn(commonConsts.hbConfig, function (hbPartner) {
-            hbPartner.isHb ? hbPartners.push(hbPartner.name) : null;
-        });
-        _.forEach(commonConsts.supportedAdSizes, function (layout) {
-            _.forEach(layout.sizes, function (size) {
-                adSizes.push(size.width + 'x' + size.height);
-            });
-        });
-
-        var UiData = {
-            countries: countries,
-            hbPartners: hbPartners,
-            adSizes: adSizes
-        };
-
         var sitePromise = siteModel.getSiteById(req.params.siteId),
-            appBucketPromise = couchbase.connectToAppBucket();
-        
+            appBucketPromise = couchbase.connectToAppBucket(),
+            UiData = getHbUiData();
+
         return Promise.all([sitePromise, appBucketPromise])
-            .spread(function(site, appBucket) {
-                return Promise.all([site, appBucket.getAsync('hbcf::' + req.params.siteId, {})]);
+            .spread(function (site, appBucket) {
+                var hbConfigPromise = appBucket.getAsync('hbcf::' + req.params.siteId, {});
+                return Promise.all([site, hbConfigPromise]);
             })
-            .spread(function(site, hbConfig) {
-                return renderHbPanel(site, UiData, res, hbConfig); 
+            .spread(function (site, hbConfig) {
+                return renderHbPanel(site, UiData, res, hbConfig);
             })
-            .catch(function(err) {
-                console.log(err);
-                if(err.code === 13) {
+            .catch(function (err) {
+                if (err.code === 13) {
                     return siteModel.getSiteById(req.params.siteId)
                         .then(function (site) {
                             return renderHbPanel(site, UiData, res);
@@ -121,10 +127,12 @@ router
     .post('/:siteId/saveHeaderBiddingSetup', function (req, res) {
         var siteId = req.params.siteId,
             hbConfig = JSON.parse(req.body.hbConfig),
-            operation = req.body.op;
+            operation = req.body.op,
+            sitePromise = siteModel.getSiteById(req.params.siteId),
+            appBucketPromise = couchbase.connectToAppBucket();
 
-        return siteModel.getSiteById(req.params.siteId)
-            .then(function (site) {
+        return Promise.all([sitePromise, appBucketPromise])
+            .spread(function(site, appBucket) {
                 var json = {
                     hbConfig: hbConfig,
                     siteId: site.get('siteId'),
@@ -132,10 +140,7 @@ router
                     email: site.get('ownerEmail')
                 };
 
-            return couchbase.connectToAppBucket()
-            .then(function(appBucket) {
                 return operation === 'create' ? appBucket.insertPromise('hbcf::' + req.params.siteId, json) : appBucket.replacePromise('hbcf::' + req.params.siteId, json);
-                })
             })
             .then(function (data) {
                 res.send({ success: 1 });
