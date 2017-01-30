@@ -12,6 +12,7 @@ var express = require('express'),
     commonConsts = require('../configs/commonConsts'),
     couchbase = require('../helpers/couchBaseService'),
     countryData = require('country-data'),
+    Promise = require('bluebird'),
     router = express.Router({ mergeParams: true });
 
 function checkAuth(req, res, next) {
@@ -93,17 +94,18 @@ router
             adSizes: adSizes
         };
 
-        return siteModel.getSiteById(req.params.siteId)
-            .then(function (site) {
-            return couchbase.connectToAppBucket()
-            .then(function(appBucket) {
-            return appBucket.getAsync('hbcf::' + req.params.siteId, {})
-                .then(function(hbConfig) {
-                    return renderHbPanel(site, UiData, res, hbConfig);
-                    });
-                });
+        var sitePromise = siteModel.getSiteById(req.params.siteId),
+            appBucketPromise = couchbase.connectToAppBucket();
+        
+        return Promise.all([sitePromise, appBucketPromise])
+            .spread(function(site, appBucket) {
+                return Promise.all([site, appBucket.getAsync('hbcf::' + req.params.siteId, {})]);
             })
-            .catch(function (err) {
+            .spread(function(site, hbConfig) {
+                return renderHbPanel(site, UiData, res, hbConfig); 
+            })
+            .catch(function(err) {
+                console.log(err);
                 if(err.code === 13) {
                     return siteModel.getSiteById(req.params.siteId)
                         .then(function (site) {
