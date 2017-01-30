@@ -8,21 +8,22 @@
         }
     };
 
-    // a.detectExtension = function(extensionId, callback) { 
-    //     var img; 
-    //     img = new Image(); 
-    //     img.src = "chrome-extension://" + extensionId + "/images/icon.png"; 
-    //     img.onload = function() { 
-    //         callback(true); 
-    //     }; 
-    //     img.onerror = function() { 
-    //         callback(false); 
-    //     };
-    // }('dlngajepgieaffpcflbkccpahobnllol', function(installed) {
-    //     if(!installed) {
-    //         $('#extension-overlay').show();
-    //     }
-    // });
+    a.detectExtension = function(extensionId, callback) { 
+        var img; 
+        img = new Image(); 
+        img.src = "chrome-extension://" + extensionId + "/images/icon.png"; 
+        img.onload = function() { 
+            callback(true); 
+        }; 
+        img.onerror = function() { 
+            callback(false); 
+        };
+    }('nbbbgcccgkkkemfmbjmbelkcgjlpibon', function(installed) {
+        if(!installed) {
+            $('#extension-overlay').show();
+            $('body').css('overflow', 'hidden');
+        }
+    });
 
     a.notify = function(title, message, slide) {
         var opts, container;
