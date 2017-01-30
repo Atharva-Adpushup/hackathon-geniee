@@ -25,7 +25,7 @@ function main() {
 		config = require('./config/config'),
 		logger = require('./libs/logger'),
 
-		sandBoxbids = require('./sandBoxbids'),
+		sandBoxbids = require('./sandboxbids'),
 
 		dfpSlotHook = require('./dfpSlotHook');
 

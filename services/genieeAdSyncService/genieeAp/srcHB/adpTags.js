@@ -1,7 +1,7 @@
 var logger = require('./libs/logger'),
 	utils = require('./libs/utils'),
 
-	sandBoxbids = require('./sandBoxbids'),
+	sandBoxbids = require('./sandboxbids'),
 	config = require('./config/config'),
 
 	extend = require('extend'),
