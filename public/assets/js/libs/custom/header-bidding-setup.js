@@ -272,9 +272,9 @@ $(document).ready(function () {
                 this.setGeoSelectBoxOptions(w, country, continent, geoValue);
 
                 if(geoSetup) {
-                 w.find('.geo-selector').find('option[value=' + geoSetup.type + ']').attr('selected', true);
+                    w.find('.geo-selector').find('option[value=' + geoSetup.type + ']').attr('selected', true);
                 } else {
-                    $('select option[value=' + geoSelection + ']').attr('selected', true);
+                     w.find('.geo-selector').find('option[value=' + geoSelection + ']').attr('selected', true);
                 }
 
                 var otherPanels = $(w).parent().children('.select-geo-wrapper');
@@ -298,7 +298,7 @@ $(document).ready(function () {
 
                 w.append(s.geoSelect + s.countrySelect + s.continentSelect);
                 $('#hbform-render').append(w);
-            
+                
                 this.setGeoPanelOptions(w, geoSelection, geoSetup);
             },
 
