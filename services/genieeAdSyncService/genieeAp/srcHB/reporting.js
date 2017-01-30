@@ -1,19 +1,18 @@
 var config = require('./config/config'),
 	ajax = require('@fdaciuk/ajax'),
 	utils = require('./libs/utils'),
-	logger = require('./libs/logger');
+	logger = require('./libs/logger'),
 
-window.googletag = window.googletag || {};
-window.googletag.cmd = window.googletag.cmd || [];
-
-window.pbjs = window.pbjs || {};
-window.pbjs.que = window.pbjs.que || [];
+	adpTags = require('./adpTags');
 
 var dfpEvents = {},
 	pbjsWinners = {},
 	dfpWinners = {};
 
 var packetId = utils.uniqueId(+config.siteId);
+
+window.pbjs = window.pbjs || {};
+window.pbjs.que = window.pbjs.que || [];
 
 function sendBidData(){
 
@@ -45,13 +44,6 @@ function constructBidData(bidObjData) {
    return bidObj;
 }
 
-var renderedSlots = [],
-	allRenderedSlots = [];
-
-function getAllRenderedSlots(){
-	return allRenderedSlots;
-}
-
 function renderTargetingKeys(){
 	googletag.pubads().getSlots().forEach(function( slot ){
 		var targetingsKeys = slot.getTargetingKeys();
@@ -66,52 +58,41 @@ function renderTargetingKeys(){
 	});
 }
 
-function initReports( hbSlots ) {
+function initReports() {
 
-	var hbSlotsIds = hbSlots.map(function(hbSlot){
-		return hbSlot.getAdUnitPath();
+	adpTags.on('dfpSlotRender', function(event) {
+
+		var slotPath = event.slotPath;
+		dfpWinners[ slotPath ] = dfpWinners[ slotPath ]  || {
+			// mantain consistency with having only strings for various IDs
+			advertiserId : (event.advertiserId ? event.advertiserId.toString() : "0".repeat(10)),
+			lineItemId   : (event.lineItemId   ? event.lineItemId.toString() : "0".repeat(10)),
+			creativeId   : (event.creativeId   ? event.creativeId.toString() : "0".repeat(10)),
+			adUnitPath   : slotPath
+		};
+
+		if( adpTags.haveAllSlotsRendered() ) {
+			renderTargetingKeys();
+			sendBidData();
+		}
+
 	});
 
-	googletag.cmd.push(function(){
-		googletag.pubads().addEventListener('slotRenderEnded', function(event) {
-
-			var slotPath = event.slot.getAdUnitPath();
-			allRenderedSlots.push(slotPath);
-
-			if( hbSlotsIds.indexOf(slotPath) !== -1 ) {
-
-				renderedSlots.push(slotPath);
-
-				if( ! config.postbid ) {
-					dfpWinners[ slotPath ] = dfpWinners[ slotPath ]  || {
-						// mantain consistency with having only strings for various IDs
-						advertiserId : (event.advertiserId ? event.advertiserId.toString() : "0".repeat(10)),
-						lineItemId   : (event.lineItemId   ? event.lineItemId.toString() : "0".repeat(10)),
-						creativeId   : (event.creativeId   ? event.creativeId.toString() : "0".repeat(10)),
-						adUnitPath   : slotPath
-					};
-				}
-			}
-
-			// If all header bidding slots have been rendered
-			// send bid data.
-			if( hbSlotsIds.length === renderedSlots.length ) {
-				sendBidData();
-				renderTargetingKeys();
-			}
-
-		});
-	});
-
-	window.pbjs.que.push(function() {
-		window.pbjs.onEvent('bidWon', function(bidData){
-			logger.info('header bidding ran for %s', bidData.adUnitCode);
-			pbjsWinners[ bidData.adUnitCode ] = constructBidData(bidData);
-		});
+	adpTags.on('postBidSlotRender', function(event) {
+		if( adpTags.haveAllSlotsRendered() ) {
+			sendBidData();
+		}
 	});
 }
 
+window.pbjs.que.push(function() {
+	window.pbjs.onEvent('bidWon', function(bidData){
+		logger.info('header bidding ran for %s', bidData.adUnitCode);
+
+		pbjsWinners[ bidData.adUnitCode ] = constructBidData(bidData);
+	});
+});
+
 module.exports = {
-	initReports: initReports,
-	getAllRenderedSlots: getAllRenderedSlots
+	initReports: initReports
 };

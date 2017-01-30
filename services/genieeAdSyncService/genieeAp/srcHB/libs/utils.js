@@ -56,6 +56,6 @@ function createEmptyIframe() {
 module.exports = {
 	buildUrl: buildUrl,
 	uniqueId: uniqueId,
-    hashCode: hashCode,
-    createEmptyIframe : createEmptyIframe
+  hashCode: hashCode,
+  createEmptyIframe : createEmptyIframe
 };
