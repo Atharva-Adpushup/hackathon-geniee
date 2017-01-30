@@ -13,7 +13,9 @@ var express = require('express'),
 	utils = require('../helpers/utils'),
 	pipeDrive = require('../misc/vendors/pipedrive'),
 	pipeDriveObject = new pipeDrive();
-	router = express.Router();
+	router = express.Router(),
+	couchbase = require('../helpers/couchBaseService'),
+	N1qlQuery = require('couchbase-promises').N1qlQuery;
 
 router
 	.get('/getData', function(req, res) {
@@ -314,6 +316,24 @@ router
 				console.log(err);
 				return res.send({success: 0});
 			});	
+	})
+	.get('/performNiQlQuery', function(req, res) {
+		var query = N1qlQuery.fromString('select * from apAppBucket'),
+			hosts = ['127.0.0.1'];
+
+		return couchbase.connectToAppBucket()
+			.then(function(appBucket) {
+				return appBucket.enableN1qlPromise(hosts, {})
+					.then(function() {
+						return appBucket.queryPromise(query, {})
+							.then(function(responseData) {
+								return res.json({ 'response_type': 'good', 'msg': responseData });
+							});
+					})
+			})
+			.catch(function(e) {
+				return res.json({success: 0, err: e.toString()});
+			});
 	});
 
 module.exports = router;
