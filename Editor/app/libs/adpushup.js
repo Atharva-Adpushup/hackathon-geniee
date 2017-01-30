@@ -21,7 +21,6 @@
     }('nbbbgcccgkkkemfmbjmbelkcgjlpibon', function(installed) {
         if(!installed) {
             $('#extension-overlay').show();
-            $('body').css('overflow', 'hidden');
         }
     });
 
