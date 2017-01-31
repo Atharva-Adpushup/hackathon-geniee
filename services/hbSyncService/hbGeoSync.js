@@ -43,7 +43,7 @@ module.exports = function (siteId) {
     var jsTplPath = path.join(__dirname, '..', '..', 'public', 'assets', 'js', 'builds', 'adpushupHB.js'),
 			hbRootPath = path.join('/adpushup', 'hb_files', siteId.toString());
 
-		couchbase
+		return couchbase
 		  .connectToBucket('AppBucket')
 			.then(function(appBucket) {
 		        return Promise.all([
@@ -76,7 +76,5 @@ module.exports = function (siteId) {
           	);
           }
     		}) );
-    	}).catch(function(e){
-    		console.log(e);
     	});
 };
