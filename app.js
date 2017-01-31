@@ -31,7 +31,8 @@ var express = require('express'),
 		prefix: 'sess::'
 	});
 
-require('./services/genieeAdSyncService/index')
+require('./services/genieeAdSyncService/index');
+require('./services/hbSyncService/index');
 
 // Enable compression at top
 app.use(compression());
