@@ -16,41 +16,46 @@ function constructHBJsFile(jsContents, indiHbConfig, siteData){
 		domainNames.push('www.' + hostname);
 	}
 
-	jsContent = jsContents
+	jsContents = jsContents
 		.replace('__HB_SITE_ID__', siteData.siteId)
 		.replace('__HB_SITE_DOMAINS__', JSON.stringify(domainNames) )
 		.replace('__HB_BIDDING_PARTNERS__', JSON.stringify(indiHbConfig.info) )
+		.replace('__HB_FEEDBACK_URL__', JSON.stringify('//x3.adpushup.com/ApexWebService/feedback') )
 		.replace('__HB_PREBID_TIMEOUT__', indiHbConfig.pbTimeout || 5000);
 
 	if( indiHbConfig.targetAllDFP ) {
-		jsContent = jsContents.replace('__HB_TARGET_ALL_DFP__', indiHbConfig.targetAllDFP || false);
+		jsContents = jsContents.replace('__HB_TARGET_ALL_DFP__', indiHbConfig.targetAllDFP);
 	} else {
-		jsContent = jsContents.replace('__HB_AD_UNIT_TARGETING__', JSON.stringify(indiHbConfig.adUnitTargeting || {
+		jsContents = jsContents.replace('__HB_TARGET_ALL_DFP__', false);
+		jsContents = jsContents.replace('__HB_AD_UNIT_TARGETING__', JSON.stringify(indiHbConfig.adUnitTargeting || {
 			"networkId"        : indiHbConfig.networkId || 103512698,
 			"adUnits"          : indiHbConfig.adUnits || {},
 			"targetAllAdUnits" : indiHbConfig.targetAllAdUnits || false,
 		}) );
 	}
 
-	return jsContent;
+	return jsContents;
 
 }
 
 module.exports = function (siteId) {
-    var jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushupHB.js'),
+    var jsTplPath = path.join(__dirname, '..', '..', 'public', 'assets', 'js', 'builds', 'adpushupHB.js'),
 			hbRootPath = path.join('/adpushup', 'hb_files', siteId.toString());
 
 		couchbase
-			.connectToAppBucket()
-	    .then(function(appBucket) {
-	        return Promise.join([
-	        	appBucket.getAsync('hbcf::' + siteId, {}),
-						readFileAsync(jsTplPath),
-	        	mkdirpAsync(hbRootPath)
-	        ]);
-	    })
+		  .connectToBucket('AppBucket')
+			.then(function(appBucket) {
+		        return Promise.all([
+		        	appBucket.getAsync('hbcf::' + siteId, {}),
+							readFileAsync(jsTplPath),
+		        	mkdirpAsync(hbRootPath)
+		        ]);
+		    })
 		  .spread(function(siteData, jsContents){
+
 	    	jsContents = jsContents.toString();
+	    	siteData = siteData.value;
+
     		return Promise.all( siteData.hbConfig.map(function( indiHbConfig ){
 
     			if( indiHbConfig.type === "all" ) {
