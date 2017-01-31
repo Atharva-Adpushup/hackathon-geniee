@@ -7,25 +7,27 @@ const sectionByIds = (state = {}, action) => {
 	switch (action.type) {
 		case sectionActions.CREATE_SECTION:
 			payload = action.sectionPayload;
-			return { ...state,
-					[payload.id]: {
-						id: payload.id,
-						xpath: payload.xpath,
-						operation: payload.operation,
-						name: payload.name,
-						allXpaths: payload.allXpaths,
-						ads: payload.ads,
-						partnerData: {
-							position: payload.position,
-							firstFold: payload.firstFold,
-							asyncTag: payload.asyncTag
-						}
+			return {
+				...state,
+				[payload.id]: {
+					id: payload.id,
+					xpath: payload.xpath,
+					operation: payload.operation,
+					name: payload.name,
+					allXpaths: payload.allXpaths,
+					ads: payload.ads,
+					partnerData: {
+						position: payload.position,
+						firstFold: payload.firstFold,
+						asyncTag: payload.asyncTag
 					}
-				};
+				}
+			};
 
 		case sectionActions.CREATE_INCONTENT_SECTION:
 			payload = action.sectionPayload;
-			return { ...state,
+			return {
+				...state,
 				[payload.id]: {
 					id: payload.id,
 					name: payload.name,
@@ -41,12 +43,20 @@ const sectionByIds = (state = {}, action) => {
 		case messengerCommands.SET_RELEVANT_XPATHS:
 			return { ...state, [action.sectionId]: { ...state[action.sectionId], allXpaths: action.allXpaths } };
 
+		case messengerCommands.XPATH_SECTION_VALIDATED:
+			return { ...state, [action.sectionId]: { ...state[action.sectionId], error: !action.isValidXPath } };
+
+		case messengerCommands.XPATH_VALIDATED:
+			return { ...state, [action.sectionId]: { ...state[action.sectionId], error: !action.isValidXPath } };
+
 		case adActions.CREATE_AD:
-			return { ...state,
+			return {
+				...state,
 				[action.sectionId]: {
 					...state[action.sectionId],
 					ads: immutablePush(state[action.sectionId].ads, action.payload.id)
-				} };
+				}
+			};
 
 		case sectionActions.DELETE_SECTION:
 			return immutableObjectDelete(state, 'id', action.sectionId);
@@ -59,7 +69,7 @@ const sectionByIds = (state = {}, action) => {
 			return { ...state, [action.sectionId]: { ...state[action.sectionId], name: action.name } };
 
 		case sectionActions.UPDATE_XPATH:
-			return { ...state, [action.sectionId]: { ...state[action.sectionId], xpath: action.xpath, allXpaths: [] } };
+			return { ...state, [action.sectionId]: { ...state[action.sectionId], xpath: action.xpath, allXpaths: [], error: false } };
 
 		case adActions.DELETE_AD:
 			const index = state[action.sectionId].ads.indexOf(action.adId);

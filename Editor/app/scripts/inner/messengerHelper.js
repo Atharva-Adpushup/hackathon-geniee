@@ -48,6 +48,14 @@ const messenger = new Messenger(),
 					});
 					break;
 
+				case messengerCommands.VALIDATE_XPATH_SECTION:
+					sendMessage(messengerCommands.XPATH_SECTION_VALIDATED, {
+						xpath: data.xpath,
+						isValidXPath: isValidXPath(data.xpath),
+						sectionId: data.sectionId
+					});
+					break;
+
 				case messengerCommands.SELECT_ELEMENT:
 					const $el = $(data.xpath),
 						vitals = getAdpVitals($el);

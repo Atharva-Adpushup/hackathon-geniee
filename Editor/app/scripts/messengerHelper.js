@@ -34,6 +34,10 @@ const messenger = new Messenger(),
 					dispatch({ type: messengerCommands.XPATH_VALIDATED, sectionId: data.sectionId, isValidXPath: data.isValidXPath, xpath: data.xpath });
 					break;
 
+				case messengerCommands.XPATH_SECTION_VALIDATED:
+					dispatch({ type: messengerCommands.XPATH_SECTION_VALIDATED, sectionId: data.sectionId, isValidXPath: data.isValidXPath, xpath: data.xpath });
+					break;
+
 				case messengerCommands.CM_FRAMELOAD_SUCCESS:
 					dispatch(openChannelSuccess(data.channelId));
 					break;

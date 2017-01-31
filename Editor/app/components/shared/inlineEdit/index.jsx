@@ -17,7 +17,7 @@ class InlineEdit extends React.Component {
 	componentWillReceiveProps(nextProps) {
 		(nextProps.dropdownList && nextProps.dropdownList.length) ? this.showDropdown() : this.hideDropdown();
 
-		if(nextProps.customError) {
+		if (nextProps.customError) {
 			this.hideDropdown();
 			this.setState({ inputError: true, disableSave: true });
 		}
@@ -98,15 +98,15 @@ class InlineEdit extends React.Component {
 					</Col>
 				</div>
 			) : (
-				<div>
-					<Col className="u-padding-r5px" xs={4}>
-						<Button onClick={this.submitValue.bind(this)} className="btn-lightBg btn-save btn-block btn btn-default">Save</Button>
-					</Col>
-					<Col className="u-padding-r10px " xs={2}>
-						<Button onClick={this.cancelEdit.bind(this)} className="btn-lightBg btn-cancel btn-ie-cancel btn-block btn btn-default"></Button>
-					</Col>
-				</div>
-			)
+					<div>
+						<Col className="u-padding-r5px" xs={4}>
+							<Button onClick={this.submitValue.bind(this)} className="btn-lightBg btn-save btn-block btn btn-default">Save</Button>
+						</Col>
+						<Col className="u-padding-r10px " xs={2}>
+							<Button onClick={this.cancelEdit.bind(this)} className="btn-lightBg btn-cancel btn-ie-cancel btn-block btn btn-default"></Button>
+						</Col>
+					</div>
+				)
 		);
 	}
 
@@ -149,14 +149,14 @@ class InlineEdit extends React.Component {
 					this.state.editMode ? (
 						<Row style={{ margin: 0 }}>
 							<Col className="u-padding-r10px" xs={colCompact} style={{ position: 'relative' }}>
-								<input type="text" ref="editedText" 
-									placeholder={this.props.text} 
-									defaultValue={adCodeCheck} 
-									onKeyUp={this.props.keyUpHandler ? this.keyUp.bind(this) : () => { }}
-									onFocus={this.props.changeHandler ? this.changeValue.bind(this) : () => { } } 
+								<input type="text" ref="editedText"
+									placeholder={this.props.text}
+									defaultValue={adCodeCheck}
+									onKeyUp={this.props.keyUpHandler ? this.keyUp.bind(this) : () => { } }
+									onFocus={this.props.changeHandler ? this.changeValue.bind(this) : () => { } }
 									onChange={this.props.changeHandler ? this.changeValue.bind(this) : () => { } } />
 								{
-									this.state.showDropdownList ? (
+									this.state.showDropdownList && this.props.dropdownList[0].trim().length > 0 ? (
 										this.renderDropdownList()
 									) : null
 								}
@@ -167,8 +167,8 @@ class InlineEdit extends React.Component {
 							}
 						</Row>
 					) : (
-						this.renderNormalMode(adCodeStyles, adCodeEdit)
-					)
+							this.renderNormalMode(adCodeStyles, adCodeEdit)
+						)
 				}
 			</div>
 		);
