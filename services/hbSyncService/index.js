@@ -6,7 +6,7 @@ adpushup.on('hbSiteSaved', function(siteId) {
     // so to roughly bypassing this situation run the generator only after 5 seconds, assuming all is saved in 5 seconds
     setTimeout(function() {
         // @TODO Syncing retry logic to be added
-        hbGeoSync(site)
+        hbGeoSync(siteId)
             .then(function () {
                 console.log('File generated successfully');
             })
