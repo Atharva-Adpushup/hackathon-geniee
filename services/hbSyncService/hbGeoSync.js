@@ -1,4 +1,5 @@
-var Promise = require('bluebird'),
+var path = require('path'),
+		Promise = require('bluebird'),
     url = require('url'),
     retry = require('bluebird-retry'),
 
