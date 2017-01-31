@@ -30,7 +30,7 @@ function constructHBJsFile(jsContents, indiHbConfig, siteData){
 		jsContents = jsContents.replace('__HB_TARGET_ALL_DFP__', false);
 		jsContents = jsContents.replace('__HB_AD_UNIT_TARGETING__', JSON.stringify(indiHbConfig.adUnitTargeting || {
 			"networkId"        : indiHbConfig.networkId || 103512698,
-			"adUnits"          : indiHbConfig.adUnits || {},
+			"adUnits"          : indiHbConfig.adUnits || [],
 			"targetAllAdUnits" : indiHbConfig.targetAllAdUnits || false,
 		}) );
 	}
