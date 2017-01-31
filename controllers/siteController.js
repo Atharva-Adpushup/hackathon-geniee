@@ -129,7 +129,12 @@ router
             hbConfig = JSON.parse(req.body.hbConfig),
             operation = req.body.op,
             sitePromise = siteModel.getSiteById(req.params.siteId),
-            appBucketPromise = couchbase.connectToAppBucket();
+            appBucketPromise = couchbase.connectToAppBucket(),
+            hasGlobalConfig = _.find(hbConfig, function(config) { return config.type === 'all' });
+
+        if(!hasGlobalConfig) {
+            hbConfig.push({ 'type': 'all', info: {} });
+        }
 
         return Promise.all([sitePromise, appBucketPromise])
             .spread(function(site, appBucket) {
