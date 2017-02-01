@@ -162,9 +162,16 @@ var adpTags = {
 
 		    	slot.isRendered = true;
 
-		    	if( config.postbidPassbacks && config.postbidPassbacks[slotId] ) {
-		    		document.getElementById(slot.containerId).innerHTML = config.postbidPassbacks[slotId];
-		    		bodyEval( document.getElementById(slot.containerId) );
+		    	if( config.postbidPassbacks ) {
+
+		    		if( config.postbidPassbacks[slotId] ) {
+			    		document.getElementById(slot.containerId).innerHTML = config.postbidPassbacks[slotId];
+			    		bodyEval( document.getElementById(slot.containerId) );
+		    		} else if( config.postbidPassbacks['*'] ) {
+			    		document.getElementById(slot.containerId).innerHTML = config.postbidPassbacks['*'];
+			    		bodyEval( document.getElementById(slot.containerId) );
+		    		}
+
 		    	}
 
 		    	me.emit('postBidSlotRender', {
