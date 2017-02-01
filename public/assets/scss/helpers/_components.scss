@@ -402,3 +402,15 @@ textarea {
     border-radius: 2px;
 	text-transform: capitalize;
 }
+
+/* Accordion */
+
+.accordion {
+	.accordion-pane {
+		h4 {
+			margin: 0;
+			border: none;
+			padding: 0;
+		}
+	}
+}
