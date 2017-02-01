@@ -12,7 +12,7 @@ module.exports = "<html>" +
 
 				"var prebidScript = document.createElement('script');" +
 				"prebidScript.async = true;" +
-				"prebidScript.text = parent.adpPrebid.toString();" +
+				"prebidScript.text = 'var adpPrebid = ' + parent.adpPrebid.toString() + ';';" +
 				"head.appendChild(prebidScript);" +
 
 				"adpPrebid();" +

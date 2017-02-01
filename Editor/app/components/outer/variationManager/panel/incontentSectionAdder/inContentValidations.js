@@ -1,3 +1,5 @@
+// In-content section adder validations
+
 function validate(formProps) {
 	const errors = {};
 
