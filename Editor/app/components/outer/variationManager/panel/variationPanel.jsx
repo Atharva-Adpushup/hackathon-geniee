@@ -4,7 +4,7 @@ import 'react-tab-panel/index.css';
 import './variationPanel.scss';
 import IncontentAdder from './incontentSectionAdder/index';
 import VariationOptions from './variationOptions';
-import VariationSections from './VariationSections';
+import VariationSections from './variationSections/index';
 import BeforeAfterJsPanel from './beforeAfterJsPanel';
 
 class VariationPanel extends React.Component {

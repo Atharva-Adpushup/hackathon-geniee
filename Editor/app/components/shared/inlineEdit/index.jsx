@@ -17,7 +17,7 @@ class InlineEdit extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		(nextProps.dropdownList && nextProps.dropdownList.length) ? this.showDropdown() : this.hideDropdown();
+		(nextProps.dropdownList && nextProps.dropdownList.length && nextProps.dropdownList[0].trim().length > 0) ? this.showDropdown() : this.hideDropdown();
 
 		if (nextProps.customError) {
 			this.hideDropdown();

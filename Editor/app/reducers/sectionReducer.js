@@ -1,4 +1,4 @@
-import { sectionActions, adActions, variationActions, messengerCommands } from 'consts/commonConsts';
+import { sectionActions, adActions, variationActions, messengerCommands, uiActions } from 'consts/commonConsts';
 import { immutableObjectDelete, immutableArrayDelete, immutablePush } from 'libs/immutableHelpers';
 import _ from 'lodash';
 
@@ -48,6 +48,9 @@ const sectionByIds = (state = {}, action) => {
 
 		case messengerCommands.XPATH_VALIDATED:
 			return { ...state, [action.sectionId]: { ...state[action.sectionId], error: !action.isValidXPath } };
+
+		case uiActions.RESET_ERRORS:
+			return { ...state, [action.sectionId]: { ...state[action.sectionId], error: false } };
 
 		case adActions.CREATE_AD:
 			return {

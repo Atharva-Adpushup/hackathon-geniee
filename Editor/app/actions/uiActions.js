@@ -9,7 +9,7 @@ const showEditMenu = (sectionId, adId, position, variationId) => ({ type: editMe
 	showNewChannelMenu = (position) => ({ type: newChannelMenuActions.SHOW_NEW_CHANNEL_MENU, position }),
 	showSiteModesPopover = (position) => ({ type: siteModesPopoverActions.SHOW_SITE_MODES_POPOVER, position }),
 	hideSiteModesPopover = () => ({ type: siteModesPopoverActions.HIDE_SITE_MODES_POPOVER }),
-	resetErrors = () => ({ type: uiActions.RESET_ERRORS }),
+	resetErrors = sectionId => ({ type: uiActions.RESET_ERRORS, sectionId }),
 	resetAfterSaveModal = () => ({ type: uiActions.UPDATE_AFTER_SAVE_STATUS, status: status.RESET }),
 	hideNewChannelInsertMenu = () => ({ type: newChannelMenuActions.HIDE_NEW_CHANNEL_MENU });
 

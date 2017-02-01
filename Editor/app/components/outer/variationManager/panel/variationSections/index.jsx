@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { deleteSection, renameSection, updateXPath, sectionAllXPaths, validateXPath, validateSectionXPath } from 'actions/sectionActions.js';
 import { updateAdCode } from 'actions/adActions';
 import { resetErrors } from 'actions/uiActions';
-import VariationSection from './variationSingleSection';
+import VariationSection from './variationSectionElement';
 
 const variationSections = (props) => {
 	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdateXPath, onSectionAllXPaths, onValidateXPath, ui, onResetErrors, onSectionXPathValidate } = props;
