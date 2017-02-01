@@ -2,6 +2,7 @@ var adpushup = require('../../helpers/adpushupEvent'),
 	syncGeneratedFileWithCdn = require('./service'),
 	Promise = require('bluebird'),
 	utils = require('../../helpers/utils'),
+	moment = require('moment'),
 	cron = require('node-cron'),
 	getAutoOptimisedLiveSites = require('../../reports/default/apex/MAB/getAutoOptimisedLiveSites/service');
 
@@ -18,15 +19,17 @@ function updateAllAutoOptimisedSites() {
 		});
 
 	return Promise.join(getSites, uploadSites, function(sitesArr, uploadedSites) {
-		console.log('All `autoOptimise` Sites are synced now!');
+		var dateTime = moment().format('MMMM Do YYYY, h:mm:ss a');
+
+		console.log('All `autoOptimise` Sites were synced at ' + dateTime);
 	})
 	.catch(function(e) {
-		console.log('Sync process failed: ', e.toString());
+		console.log('Sync process failed: ', e.toString() + ' at ' + dateTime);
 	});
 }
 
 adpushup.on('siteSaved', onSiteSaved);
-cron.schedule('*/10 * * * *', function() {
-	console.log('Running below task every 10 minutes');
+cron.schedule('* */1 * * *', function() {
+	console.log('Running below task at every hour');
 	updateAllAutoOptimisedSites();
 }, true);
