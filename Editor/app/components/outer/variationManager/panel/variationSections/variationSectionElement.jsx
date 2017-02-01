@@ -78,6 +78,7 @@ class variationSingleSection extends Component {
                                 customError={this.props.ui.errors.xpath ? this.props.ui.errors.xpath.error : false} 
                                 dropdownList={this.props.section.allXpaths} 
                                 value={this.props.section.xpath}
+                                keyUpHandler={this.props.onValidateXPath.bind(null, this.props.section.id)}
                                 submitHandler={this.props.onUpdateXPath.bind(null, this.props.section.id)} 
                                 editClickHandler={this.props.onSectionAllXPaths.bind(null, this.props.section.id, this.props.section.xpath)} 
                                 text="XPath" 

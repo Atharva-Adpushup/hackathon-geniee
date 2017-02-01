@@ -32,6 +32,7 @@ module.exports = (function ($, Utils, Event) {
 		this.target.postMessage(JSON.stringify(req), '*');
 	};
 	Messenger.prototype.isOriginValid = function (e) {
+		// return true;
 		return ((/.adpushup.com/gi).test(e.origin) ||
 			(this.alternateOrigin && Utils.urlInfo(e.origin).domain.indexOf(this.alternateOrigin) !== -1));
 	};
