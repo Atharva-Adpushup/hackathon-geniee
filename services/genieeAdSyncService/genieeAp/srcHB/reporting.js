@@ -5,8 +5,7 @@ var config = require('./config/config'),
 
 	adpTags = require('./adpTags');
 
-var dfpEvents = {},
-	pbjsWinners = {},
+var pbjsWinners = {},
 	dfpWinners = {};
 
 var packetId = utils.uniqueId(+config.siteId);
