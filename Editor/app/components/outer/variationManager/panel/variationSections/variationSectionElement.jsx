@@ -3,7 +3,8 @@ import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import InlineEdit from 'shared/inlineEdit/index.jsx';
 
 const errorBorder = {
-    border: '1px solid #eb575c'
+    border: '1px solid #eb575c',
+    boxShadow: 'inset 0px 0px 1px 1px #eb575c'
 }
 
 class variationSingleSection extends Component {
