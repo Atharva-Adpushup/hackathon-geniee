@@ -20,7 +20,6 @@ function main() {
 
 	var reporting = require('./reporting'),
 		printBidTable = require('./printBidTable'),
-		utils = require('./libs/utils'),
 		config = require('./config/config'),
 		logger = require('./libs/logger');
 
