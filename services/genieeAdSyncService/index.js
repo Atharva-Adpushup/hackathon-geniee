@@ -29,7 +29,7 @@ function updateAllAutoOptimisedSites() {
 }
 
 adpushup.on('siteSaved', onSiteSaved);
-cron.schedule('* * */1 * * *', function() {
+cron.schedule('0 0 */1 * * *', function() {
 	console.log('Running below task at every hour');
 	updateAllAutoOptimisedSites();
 }, true);
