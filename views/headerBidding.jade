@@ -57,10 +57,44 @@ block bodyContent
                                     .col-sm-12
                                         h4 Configure Header Bidding by setting all options below
 
-                                #hbform-render
+                                #accordion.accordion.panel-group(role='tablist', aria-multiselectable='true')
+                                    .accordion-pane.panel.panel-default
+                                        #hbConfigHeading.panel-heading(role='tab')
+                                            h4.panel-title
+                                                a(role='button', data-toggle='collapse', data-parent='accordion', href='hbConfigPanel', aria-expanded='false', aria-controls='#hbConfigPanel')
+                                                    | Header Bidding Config
+                                        #hbConfigPanel.panel-collapse.collapse.in(role='tabpanel', aria-labelledby='hbConfigHeading')
+                                            .panel-body
+                                                #hbform-render
+                                    .accordion-pane.panel.panel-default
+                                        #hbSettingsHeader.panel-heading(role='tab')
+                                            h4.panel-title
+                                                a.collapsed(role='button', data-toggle='collapse', data-parent='accordion', href='hbSettingsPanel', aria-expanded='false', aria-controls='hbSettingsPanel')
+                                                    | Header Bidding Global Settings
+                                        #hbSettingsPanel.panel-collapse.collapse.in(role='tabpanel', aria-labelledby='hbSettingsHeader')
+                                            .panel-body
+                                                .row
+                                                    .col-sm-3
+                                                        .input-name Prebid Timeout
+                                                    .col-sm-4
+                                                        input.form-control(required value="#{hbGlobalSettingDefaults.prebidTimeout}" name="prebidTimeout" type="number" placeholder="Enter Prebid Timeout")
+                                                .row
+                                                    .col-sm-3
+                                                        .input-name E3 Feedback URL
+                                                    .col-sm-4
+                                                        input.form-control(required value="#{hbGlobalSettingDefaults.e3FeedbackUrl}" name="e3FeedbackUrl" type="text" placeholder="Enter E3 Feedback URL")
+                                                .row
+                                                    .col-sm-3
+                                                        .input-name Target All DFP Units
+                                                    .col-sm-4
+                                                        input.input-radio(checked=(hbGlobalSettingDefaults.targetAllDfpUnits ? true : undefined) required name="targetAllDfpUnits" value="yes" type="radio") 
+                                                        span Yes
+                                                        input.input-radio(checked=(!hbGlobalSettingDefaults.targetAllDfpUnits ? true : undefined) required name="targetAllDfpUnits" value="no" type="radio") 
+                                                        span No
 
                                 hr
                                 button.btn.btn-lightBg.btn-default.mb-30(type="button")#addgeo Add another Geo config
                                                 
                                 hr 
                                 button.btn.btn-primary Save Header bidding Setup
+                                

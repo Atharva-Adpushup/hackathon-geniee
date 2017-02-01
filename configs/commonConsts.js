@@ -9,6 +9,11 @@ module.exports = {
 		xpathWaitTimeout: 5000,
 		adpushupPercentage: 100
 	},
+	hbGlobalSettingDefaults: {
+		prebidTimeout: 5000,
+		e3FeedbackUrl: '//x3.adpushup.com/ApexWebService/feedback',
+		targetAllDFP: false
+	},
 	hbConfig: {
 		'pulsepoint': {
 			name: 'pulsepoint',

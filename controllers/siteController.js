@@ -46,7 +46,8 @@ function renderHbPanel(site, UiData, res, hbConfig) {
         continents: JSON.stringify(commonConsts.hbContinents),
         adSizes: JSON.stringify(_.uniq(UiData.adSizes)),
         hbPartners: JSON.stringify(UiData.hbPartners),
-        hbConfig: JSON.stringify(commonConsts.hbConfig)
+        hbConfig: JSON.stringify(commonConsts.hbConfig),
+        hbGlobalSettingDefaults: commonConsts.hbGlobalSettingDefaults
     };
 
     if (hbConfig) {
