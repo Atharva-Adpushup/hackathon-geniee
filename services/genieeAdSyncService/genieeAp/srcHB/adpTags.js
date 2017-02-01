@@ -4,10 +4,10 @@ var logger = require('./libs/logger'),
 	sandBoxbids = require('./sandboxbids'),
 	config = require('./config/config'),
 
+	bodyEval = require('./libs/bodyEval'),
+
 	extend = require('extend'),
-
 	waitUntil = require('wait-until');
-
 
 var EventEmitter = require('events').EventEmitter;
 
@@ -75,6 +75,8 @@ var adpTags = {
 		if( partnersNotPresent ) {
 			if( this.adpSlots[slotId].gSlot ) {
 				this.renderGPTAd(slotId);
+			} else {
+				this.adpSlots[slotId].isRendered = true;
 			}
 		}
 
@@ -160,15 +162,16 @@ var adpTags = {
 
 		    	slot.isRendered = true;
 
+		    	if( config.postbidPassbacks && config.postbidPassbacks[slotId] ) {
+		    		document.getElementById(slot.containerId).innerHTML = config.postbidPassbacks[slotId];
+		    		bodyEval( document.getElementById(slot.containerId) );
+		    	}
+
 		    	me.emit('postBidSlotRender', {
 						slotId   : slotId,
 						postBid  : true,
 						passback : true
 					});
-
-		      // If no bidder return any creatives, run passback.
-		      adIframe.width = 0;
-		      adIframe.height = 0;
 		    }
 			});
 	},

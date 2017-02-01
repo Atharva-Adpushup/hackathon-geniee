@@ -46,7 +46,7 @@ function createPrebidContainer(hbConfigParams, slotId, size, containerId){
 		.interval(50)
 		.times(20)
 		.condition(function(){
-			return ( document.body !== undefined );
+			return ( document.body !== null );
 		})
 		.done(function(){
 			document.body.appendChild(iframeEl);
