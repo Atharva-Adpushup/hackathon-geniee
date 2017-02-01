@@ -33,7 +33,7 @@ module.exports = {
                     return syncCdn(site);
                 })
                 .then(getSuccessStatusObj.bind(null, siteId))
-                .catch(getFailureStatusObj.bind(null, siteId, err));
+                .catch(getFailureStatusObj.bind(null, siteId));
         } else {
             return syncCdn(site)
                 .then(getSuccessStatusObj.bind(null, siteId))
