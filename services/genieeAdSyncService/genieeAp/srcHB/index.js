@@ -15,7 +15,6 @@ function main() {
 	window.googletag = window.googletag || {};
 	googletag.cmd = googletag.cmd || [];
 
-	window.adpTags.processQue();
 
 	require('./libs/polyfills');
 
@@ -23,9 +22,9 @@ function main() {
 		printBidTable = require('./printBidTable'),
 		utils = require('./libs/utils'),
 		config = require('./config/config'),
-		logger = require('./libs/logger'),
+		logger = require('./libs/logger');
 
-		sandBoxbids = require('./sandboxbids'),
+		sandBoxbids = require('./sandboxbids');
 
 		dfpSlotHook = require('./dfpSlotHook');
 
@@ -34,6 +33,8 @@ function main() {
 	logger.initPrebidLog();
 	adpTags.setGPTListeners();
 	reporting.initReports();
+
+	window.adpTags.processQue();
 
 	var setPbjsKeys = function( pbjsParams ){
 

@@ -30,30 +30,53 @@ var adpTags = {
 			isRendered  : false
 		};
 
+		var partnersNotPresent = false;
+
 		var sizeString = size.join('x'),
 			biddingPartners = config.biddingPartners[ sizeString ],
 
 			dAUT = config.dfpAdUnitTargeting;
 
-		// If the size is defined as having multiple configuration
-		// use one by one.
-		if( Array.isArray(biddingPartners[0]) ) {
-			this.adpSlots[slotId].bidPartners  = biddingPartners[0];
-			config.biddingPartners[sizeString] = config.biddingPartners[sizeString].slice(1);
-		} else {
-			this.adpSlots[slotId].bidPartners = biddingPartners;
+		try {
+
+			// If the size is defined as having multiple configuration
+			// use one by one.
+			if( Array.isArray(biddingPartners[0]) ) {
+				this.adpSlots[slotId].bidPartners  = biddingPartners[0];
+				config.biddingPartners[sizeString] = config.biddingPartners[sizeString].slice(1);
+			} else {
+				this.adpSlots[slotId].bidPartners = biddingPartners;
+			}
+
+			// If there are two 300x250 ad slots and only one bidding array is present
+			// biddingPartners would likely would be zero
+
+			if( biddingPartners[0] !== undefined ) {
+				sandBoxbids.createPrebidContainer( this.adpSlots[slotId].bidPartners, slotId, size, containerId );
+			} else {
+				throw new Error();
+			}
+
+		} catch(e) {
+			partnersNotPresent = true;
+			logger.warn("bidding partners not present for the defined size");
 		}
 
 		if( dAUT && dAUT.adUnits ) {
-				if( dAUT.targetAllAdUnits || dAUT.adUnits.indexOf(slotId) !== -1 ) {
-					newSlotId = "/" + dAUT.networkId + "/" + slotId;
+			if( dAUT.targetAllAdUnits || dAUT.adUnits.indexOf(slotId) !== -1 ) {
+				newSlotId = "/" + dAUT.networkId + "/" + slotId;
+				this.adpSlots[slotId].slotId = newSlotId;
 
-					this.adpSlots[slotId].slotId = newSlotId;
-					me.setDFPForSlot(slotId);
-				}
+				logger.info("creating DFP slot for slot (%s)", slotId);
+				me.setDFPForSlot(slotId);
+			}
 		}
 
-		sandBoxbids.createPrebidContainer( this.adpSlots[slotId].bidPartners, slotId, size, containerId );
+		if( partnersNotPresent ) {
+			if( this.adpSlots[slotId].gSlot ) {
+				this.renderGPTAd(slotId);
+			}
+		}
 
 		return this;
 	},
@@ -114,7 +137,7 @@ var adpTags = {
 			.interval(50)
 			.times(20)
 			.condition(function(){
-				return ( document.getElementById(slot.containerId) !== undefined );
+				return ( document.getElementById(slot.containerId) !== null );
 			})
 			.done(function(){
 				document.getElementById(slot.containerId).appendChild(adIframe);
