@@ -18,17 +18,17 @@ var express = require('express'),
 	reports = require('../models/reportsModel');
 
 router
-	.get('/performance', function(req, res) {
-		var siteId = req.params.siteId,
-			url = '/user/site/' + siteId + '/reports/performanceReport?siteId=' + siteId;
+	// .get('/performance', function(req, res) {
+	// 	var siteId = req.params.siteId,
+	// 		url = '/user/site/' + siteId + '/reports/performanceReport?siteId=' + siteId;
 
-		res.render('pageLoader', {
-			loaderText: 'Please wait while we fetch Geniee reports...',
-			title: 'Geniee Report',
-			pageUrl: url
-		});
-	})
-	.get('/performanceReport', function(req, res) {
+	// 	res.render('pageLoader', {
+	// 		loaderText: 'Please wait while we fetch Geniee reports...',
+	// 		title: 'Geniee Report',
+	// 		pageUrl: url
+	// 	});
+	// })
+	.get('/performance', function(req, res) {
 		var	paramConfig = {
 			siteId: req.params.siteId,
 			dateFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),

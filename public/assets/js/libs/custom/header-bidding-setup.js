@@ -24,7 +24,7 @@ $(document).ready(function () {
                 closeBtn: '<button type="button" class="close hb-close-pane">x</button>',
                 defaultSelectBoxOption: '<option selected value="">Select partner</option>',
                 buttons: {
-                    addPartner: '<button type="button" class="add-partner btn-hb-pane btn btn-lightBg btn-default">Add another partner</button>',
+                    addPartner: '<button type="button" class="add-partner btn-hb-pane btn btn-lightBg btn-default">Add another bidder</button>',
                     addSetup: '<button type="button" class="add-setup btn-hb-pane btn btn-lightBg btn-default">Add another Setup</button>',
                     addSize: '<button type="button" class="add-size btn-hb-pane btn btn-lightBg btn-default">Add another size</button>'
                 },
@@ -35,47 +35,98 @@ $(document).ready(function () {
             },
 
             // Set geo select box data
-            setGeoSelectBoxOptions: function (countrySelect, continentSelect) {
+            setGeoSelectBoxOptions: function (el, countrySelect, continentSelect, geoSetup) {
                 w.countries.forEach(function (country) {
                     $(countrySelect).append('<option value=' + country.code + '>' + country.name + '</option>');
                 });
-                $('select option[value=' + this.defaults.country + ']').attr('selected', true);
-
                 w.continents.forEach(function (continent) {
                     $(continentSelect).append('<option value=' + continent.code + '>' + continent.name + '</option>');
                 });
+
+                if(geoSetup) {
+                    if(geoSetup.type === 'continent') {
+                        $(continentSelect).find('option[value=' + geoSetup.continent + ']').attr('selected', true);
+                    }
+                    else {
+                        $(countrySelect).find('option[value=' + geoSetup.country + ']').attr('selected', true);
+                    }
+                }
+                else {
+                    $(el).find('select option[value=' + this.defaults.country + ']').attr('selected', true);
+                }
             },
 
             // Set adsize select box data 
-            setAdSizeSelectBoxOptions: function (adSizesSelect) {
+            setAdSizeSelectBoxOptions: function (adSizesSelect, size) {
                 w.adSizes.forEach(function (size) {
                     $(adSizesSelect).append('<option value=' + size + '>' + size + '</option>');
                 });
+                size ? $(adSizesSelect).find(' option[value=' + size + ']').attr('selected', true) : null;
             },
 
             // Set hb partners select box data
-            setHbPartnersSelectBoxData: function (hbPartnerSelect) {
+            setHbPartnersSelectBoxData: function (hbPartnerSelect, configParams) {
                 w.hbPartners.forEach(function (partner) {
                     $(hbPartnerSelect).append('<option value=' + partner + '>' + partner + '</option>');
                 });
                 $(hbPartnerSelect).prepend(this.templates.defaultSelectBoxOption);
+
+                if(configParams) {
+                    var that = this;
+                    setTimeout(function() {
+                        var pane = $(hbPartnerSelect).closest('.hb-config-pane');
+                        $(hbPartnerSelect).find(' option[value=' + configParams.bidder + ']').attr('selected', true);
+                        that.renderPartnerSetupPanel(configParams.bidder, pane, configParams.params);
+                    }, 0);
+                }
+            },
+
+             // Switch geo selection dropdown in UI
+            setGeoSubSelect: function (geo, els, geoValue) {
+                var that = this;
+
+                [].slice.call(els).forEach(function (el) {
+                    var geoSelect = $(el).closest('.row').siblings('.select-geo-' + geo);
+
+                    switch (geo) {
+                        case 'country':
+                            geoSelect.show();
+                            geoSelect.find('option[value=' + geoValue ? geoValue : that.defaults.country + ']').attr('selected', true);
+                            geoSelect.siblings(that.templates.selectors.continent).hide();
+                            break;
+                        case 'continent':
+                            geoSelect.show();
+                            geoSelect.siblings(that.templates.selectors.country).hide();
+                            break;
+                        case 'all':
+                            $(el).closest('.row').siblings(that.templates.selectors.country).hide();
+                            $(el).closest('.row').siblings(that.templates.selectors.continent).hide();
+                            break;
+                    }
+                });
             },
 
             // Function to dynamically generate input templates for given partner config
-            generateInputTemplate: function (obj, i) {
+            generateInputTemplate: function (obj, i, params) {
                 var g = obj[i],
                     type = g.validations && g.validations.type ? g.validations.type : 'text',
-                    required = g.validations && g.validations.required ? '" required="' + g.validations.required : ""
-                readonly = 'isEditable' in g && !g.isEditable ? '" readonly="' + g.isEditable : ""
-                value = g.default ? g.default : '',
+                    required = g.validations && g.validations.required ? '" required="' + g.validations.required : "",
+                    readonly = 'isEditable' in g && !g.isEditable ? '" readonly="' + g.isEditable : "",
+                    value = g.default ? g.default : '',
                     name = i;
+
+                for(var param in params) {
+                    if(param === name) {
+                        value = params[param];
+                    }
+                }
 
                 var input = '<input class="form-control" type="' + type + required + readonly + '" value="' + value + '" name="' + name + '" placeholder="Please enter ' + g.alias + '"/>';
                 return '<div class="row"><div class="col-sm-3 input-name">' + g.alias + '</div><div class="col-sm-3">' + input + '</div></div>';
             },
 
             // Function to render partner options pane
-            generatePartnerSpecificOptionsPane: function (pt) {
+            generatePartnerSpecificOptionsPane: function (pt, params) {
                 var partnerInputTempl = {};
 
                 for (var p in w.hbConfig) {
@@ -83,11 +134,11 @@ $(document).ready(function () {
 
                     if (partner.isHb) {
                         for (var global in partner.global) {
-                            globals += this.generateInputTemplate(partner.global, global);
+                            globals += this.generateInputTemplate(partner.global, global, params);
                         }
 
                         for (var local in partner.local) {
-                            locals += this.generateInputTemplate(partner.local, local);
+                            locals += this.generateInputTemplate(partner.local, local, params);
                         }
                     }
 
@@ -101,8 +152,8 @@ $(document).ready(function () {
             },
 
             // Function to render hb partner specific options
-            renderPartnerSetupPanel: function (hbPartner, wrapper) {
-                var inputs = this.generatePartnerSpecificOptionsPane(hbPartner);
+            renderPartnerSetupPanel: function (hbPartner, wrapper, params) {
+                var inputs = this.generatePartnerSpecificOptionsPane(hbPartner, params);
                 wrapper.find('.partner-settings').html(inputs.globalTempl + inputs.localTempl);
             },
 
@@ -130,21 +181,38 @@ $(document).ready(function () {
                 }
             },
 
-            // Function to render hb partner setup panel
-            renderHbPartnerSetupPanel: function (el, action) {
+            // Function to generate partner settings template
+            renderPartnerSettings: function(el, action, configParams) {
                 var w = $('<div class="hb-config-pane mT-20 select-partner-settings">' + this.templates.selectBoxes.hbPartnerSelect + '<div class="partner-settings"></div></div>');
                 this.renderNewPanel(el, w, action, '.select-partner-settings');
 
                 var hbPartner = w.find('.hb-partner');
-                this.setHbPartnersSelectBoxData(hbPartner);
+                this.setHbPartnersSelectBoxData(hbPartner, configParams);
             },
 
-            // Function to render multi-config panel
-            renderMultiConfigPanel: function (el, action) {
+            // Function to render hb partner setup panel
+            renderHbPartnerSetupPanel: function (el, action, adConfig) {
+                if(adConfig) {
+                    for(var config in adConfig) {
+                        var configParams = adConfig[config];
+                        this.renderPartnerSettings(el, action, configParams);   
+                    }
+                } else {
+                    this.renderPartnerSettings(el, action);
+                }
+            },
+
+            // Function to render select partner template
+            renderSelectPartner: function(el, action, adConfig) {
                 var w = $('<div class="hb-config-pane mT-20 select-partner"></div>');
                 this.renderNewPanel(el, w, action, '.select-partner');
 
-                this.renderHbPartnerSetupPanel(w);
+                if(adConfig) {
+                    this.renderHbPartnerSetupPanel(w, null, adConfig);
+                } else {
+                    this.renderHbPartnerSetupPanel(w);
+                }
+
                 $(w).append(this.templates.buttons.addPartner);
 
                 if (el.children('.select-partner').length === 1) {
@@ -152,28 +220,62 @@ $(document).ready(function () {
                 }
             },
 
-            // Function to render ad size setup panel
-            renderAdSizeSetupPanel: function (el, action) {
+            // Function to render multi-config setup panel
+            renderMultiConfigPanel: function (el, action, adSetups) {
+                if(adSetups) {
+                    for(var setup in adSetups) {
+                        var adConfig = adSetups[setup];
+                        
+                        this.renderSelectPartner(el, action, adConfig);
+                    }
+                }
+                else {
+                    this.renderSelectPartner(el, action);
+                }
+            },
+
+            // Function to render select size template
+            renderSelectSize: function(el, action, adSetups, size) {
                 var w = $('<div class="hb-config-pane mT-20 select-size">'),
                     s = this.templates.selectBoxes.adSizesSelect;
                 this.renderNewPanel(el, w, action, '.select-size', s);
 
                 var adSize = w.find('.ad-size');
-                this.setAdSizeSelectBoxOptions(adSize);
-                this.renderMultiConfigPanel(w);
+                this.setAdSizeSelectBoxOptions(adSize, size);
+
+                 if(adSetups) {
+                    this.renderMultiConfigPanel(w, null, adSetups);
+                } else {
+                    this.renderMultiConfigPanel(w);
+                }
             },
 
-            // Function to render geo setup panel
-            renderGeoSetupPanel: function () {
-                var s = this.templates.selectBoxes,
-                    w = $('<div class="hb-config-pane select-geo-wrapper mb-30">');
+            // Function to render ad size setup panel
+            renderAdSizeSetupPanel: function (el, adSizeSetup, action) {
+                if(adSizeSetup) {
+                    for(var size in adSizeSetup) {
+                        var adSetups = adSizeSetup[size];
+                        
+                        this.renderSelectSize(el, action, adSetups, size)
+                    }
+                }
+                else {
+                    this.renderSelectSize(el, action);
+                }
+            },
 
-                w.append(s.geoSelect + s.countrySelect + s.continentSelect);
-                $('#hbform-render').append(w);
-
+            // Function to set geo panel options
+            setGeoPanelOptions: function(w, geoSelection, geoSetup) {
                 var country = w.find('.geo-country'),
-                    continent = w.find('.geo-continent');
-                this.setGeoSelectBoxOptions(country, continent);
+                    continent = w.find('.geo-continent'),
+                    geoValue = geoSetup ? geoSetup : null; 
+                this.setGeoSelectBoxOptions(w, country, continent, geoValue);
+
+                if(geoSetup) {
+                    w.find('.geo-selector').find('option[value=' + geoSetup.type + ']').attr('selected', true);
+                } else {
+                     w.find('.geo-selector').find('option[value=' + geoSelection + ']').attr('selected', true);
+                }
 
                 var otherPanels = $(w).parent().children('.select-geo-wrapper');
 
@@ -181,9 +283,31 @@ $(document).ready(function () {
                     $(otherPanels[i]).prepend(this.templates.closeBtn);
                 }
 
-                this.setGeoSubSelect(this.defaults.geo, $('.geo-selector'));
-                this.renderAdSizeSetupPanel(w);
+                this.setGeoSubSelect(geoSelection, w.find('.geo-selector'), geoValue);
+
+                var adSizeSetup = geoSetup ? geoSetup.info : null;
+                this.renderAdSizeSetupPanel(w, adSizeSetup);
                 $(w).append(this.templates.buttons.addSize);
+            },
+
+            // Function to render geo setup panel
+            renderGeoSetupPanel: function (geoSetup) {
+                var s = this.templates.selectBoxes,
+                    w = $('<div class="hb-config-pane select-geo-wrapper mb-30">'),
+                    geoSelection = geoSetup ? geoSetup.type : this.defaults.geo;
+
+                w.append(s.geoSelect + s.countrySelect + s.continentSelect);
+                $('#hbform-render').append(w);
+                
+                this.setGeoPanelOptions(w, geoSelection, geoSetup);
+            },
+
+            // Load setup data from server 
+            loadSetupData: function(hbConfig) {
+                var that = this;
+                hbConfig.forEach(function(config) {
+                    that.renderGeoSetupPanel(config);
+                });
             },
 
             // Function to parse header bidding form data
@@ -241,35 +365,13 @@ $(document).ready(function () {
                 return data;
             },
 
-            // Switch geo selection dropdown in UI
-            setGeoSubSelect: function (geo, els) {
-                var that = this;
-                [].slice.call(els).forEach(function (el) {
-                    var geoSelect = $(el).closest('.row').siblings('.select-geo-' + geo);
-                    switch (geo) {
-                        case 'country':
-                            geoSelect.show();
-                            geoSelect.find('option[value=' + that.defaults.country + ']').attr('selected', true);
-                            geoSelect.siblings(that.templates.selectors.continent).hide();
-                            break;
-                        case 'continent':
-                            geoSelect.show();
-                            geoSelect.siblings(that.templates.selectors.country).hide();
-                            break;
-                        case 'all':
-                            $(el).closest('.row').siblings(that.templates.selectors.country).hide();
-                            $(el).closest('.row').siblings(that.templates.selectors.continent).hide();
-                            break;
-                    }
-                });
-            },
-
             saveHeaderBiddingSetup: function (form) {
-                var data = this.parseHbFormData(form);
+                var data = this.parseHbFormData(form),
+                    operation = $('#setupOp').val();
                 $.ajax({
                     method: 'POST',
                     url: 'saveHeaderBiddingSetup',
-                    data: { hbConfig: JSON.stringify(data) }
+                    data: { hbConfig: JSON.stringify(data), op: operation }
                 }).done(function (res) {
                     if(res.success) {
                         ap.apAlert('Header bidding setup has been saved successfully!', '#hbalert', 'success', 'slideDown');
@@ -281,7 +383,7 @@ $(document).ready(function () {
 
             // Initialise header bidding setup
             init: function () {
-                this.renderGeoSetupPanel();
+                !w.hbSetupData ? this.renderGeoSetupPanel() : this.loadSetupData(w.hbSetupData);
             }
         };
         ap.headerBiddingSetup.init();
@@ -311,7 +413,7 @@ $(document).ready(function () {
 
         // Size panel addition trigger
         $('body').on('click', '.add-size', function () {
-            ap.headerBiddingSetup.renderAdSizeSetupPanel($(this), 'insertBefore');
+            ap.headerBiddingSetup.renderAdSizeSetupPanel($(this), null, 'insertBefore');
         });
 
         // Partner panel addition trigger

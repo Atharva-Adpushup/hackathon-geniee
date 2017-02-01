@@ -13,6 +13,8 @@
   "devDependencies": {
     "eslint": "^3.7.1",
     "eslint-config-airbnb-es5": "^1.0.9",
+    "extend": "^3.0.0",
+    "wait-until": "0.0.2",
     "webpack": "^1.13.2"
   }
 }

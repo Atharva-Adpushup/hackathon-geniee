@@ -22,6 +22,12 @@ block append headScripts
             window.hbConfig = !{hbConfig};
         });
 
+    if hbSetupData
+        script.
+            $(document).ready(function() {
+                window.hbSetupData = !{hbSetupData}
+            });
+
     if environment == "production"
         script(src="/assets/js/builds/header-bidding-setup.min.js")
     else 
@@ -46,6 +52,7 @@ block bodyContent
                                 a Header Bidding - #{utils.domanize(siteDomain)}
 
                             form#hbform.settings-pane
+                                input(type="hidden", id="setupOp" value=(hbSetupData ? 'edit' : 'create'))
                                 .row
                                     .col-sm-12
                                         h4 Configure Header Bidding by setting all options below
