@@ -2,7 +2,7 @@ import React from 'react';
 import TabPanel from 'react-tab-panel';
 import 'react-tab-panel/index.css';
 import './variationPanel.scss';
-import IncontentAdder from './incontentSectionAdder';
+import IncontentAdder from './incontentSectionAdder/index';
 import VariationOptions from './variationOptions';
 import VariationSections from './VariationSections';
 import BeforeAfterJsPanel from './beforeAfterJsPanel';
