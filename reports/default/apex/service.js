@@ -8,13 +8,13 @@ var _ = require('lodash'),
 	variationModule = require('./modules/variation/index');
 
 module.exports = {
-	getReportData: function(siteId) {
+	getReportData: function(reportConfig) {
 		var config = {
-			siteId: siteId,
+			siteId: reportConfig.siteId,
 			reportType: 'apex',
 			step: '1d',
-			startDate: moment().subtract(7, 'days').valueOf(),
-			endDate: moment().subtract(0, 'days').valueOf()
+			startDate: (reportConfig.startDate ? reportConfig.startDate : moment().subtract(7, 'days').valueOf()),
+			endDate: (reportConfig.endDate ? reportConfig.endDate : moment().subtract(0, 'days').valueOf())
 		}, email;
 
 		function generateRPMReport(ctrPerformanceConfig, channel, variationData) {

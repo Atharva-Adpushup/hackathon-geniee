@@ -6,7 +6,6 @@ var path = require('path'),
     PromiseFtp = require('promise-ftp'),
     genieeReportService = require('../../../reports/partners/geniee/service'),
 	apexVariationReportService = require('../../../reports/default/apex/service'),
-    ftp = new PromiseFtp(),
     mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
     fs = Promise.promisifyAll(require('fs')),
 	AdPushupError = require('../../../helpers/AdPushupError'),
@@ -14,14 +13,20 @@ var path = require('path'),
     config = require('../../../configs/config');
 
 module.exports = function (site) {
+    ftp = new PromiseFtp();
+
     var jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.js'),
         tempDestPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'geniee', site.get('siteId').toString()),
         isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
         isGenieePartner = (!!(site.get('partner') && (site.get('partner') === CC.partners.geniee.name) && site.get('genieeMediaId') && isAutoOptimise)),
+        // NOTE: A date after which console.adpushup.com was made live
+        // This date is chosen as startDate to get data parameters (page views, clicks etc) for every site
+        // from its day one
+        startDate = "20161201",
 		paramConfig = {
 			siteId: site.get('siteId'),
             mediaId: site.get('genieeMediaId'),
-			dateFrom: moment().subtract(31, 'days').format('YYYY-MM-DD'),
+			dateFrom: moment(startDate).format('YYYY-MM-DD'),
 			dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
 		},
         getAdsPayload = function (variationSections) {
@@ -150,7 +155,13 @@ module.exports = function (site) {
         },
         getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
         getReportData = function(paramConfig) {
-            return apexVariationReportService.getReportData(paramConfig.siteId)
+            var reportConfig = {
+                siteId: paramConfig.siteId,
+                startDate: moment(paramConfig.dateFrom).valueOf(),
+                endDate: moment().subtract(0, 'days').valueOf()
+            };
+
+            return apexVariationReportService.getReportData(reportConfig)
                 .then(function(reportData) {
                     return getVariationsPayload(site, reportData).then(setAllConfigs);
                 }).catch(function(e) {
@@ -207,7 +218,7 @@ module.exports = function (site) {
         },
         connectToServer = function () {
             if (ftp.getConnectionStatus() === 'connected') {
-                return true;
+                return Promise.resolve(true);
             }
             return ftp.connect({ host: config.cacheFlyFtp.HOST, user: config.cacheFlyFtp.USERNAME, password: config.cacheFlyFtp.PASSWORD });
         },

@@ -4,6 +4,7 @@
 var url = require('url'),
 	logger = require('./logger'),
 	CryptoJS = require('crypto-js'),
+	Promise = require('bluebird'),
 	randomStore = [],
 	_ = require('lodash'),
 	API = {
@@ -83,6 +84,28 @@ var url = require('url'),
 		},
 		getSiteDomain: function(link) {
 			return url.parse(link).hostname;
+		},
+		/**
+		 * OBJECTIVE: Sequentially iterate array values with a promise function
+		 * IMPLEMENTATION: Iterate array values by a recursive function that invokes
+		 * a Promise function
+		 * @param {array} Array to iterate upon
+		 * @param {fn} Promise function to get invoked with array values
+		 * @returns {null} An empty Promise response
+		 */
+		syncArrayPromise: function(array, fn) {
+			var index = 0;
+
+			return new Promise(function (resolve, reject) {
+				function next() {
+					if (index < array.length) {
+						fn(array[index++]).then(next, reject);
+					} else {
+						resolve();
+					}
+				}
+				next();
+			});
 		}
 	};
 

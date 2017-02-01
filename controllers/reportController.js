@@ -457,7 +457,7 @@ router
 	})
 
 	.get('/getApexVariationData', function(req, res) {
-		return apexVariationReportService.getReportData(req.query.siteId)
+		return apexVariationReportService.getReportData({siteId: req.query.siteId})
 			.then(function(reportData) {
 				return res.json(reportData);
 			});
