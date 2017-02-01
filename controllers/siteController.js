@@ -9,6 +9,7 @@ var express = require('express'),
     config = require('../configs/config'),
     userModel = require('.././models/userModel'),
     siteModel = require('.././models/siteModel'),
+    adpushupEvent = require('../helpers/adpushupEvent'),
     commonConsts = require('../configs/commonConsts'),
     couchbase = require('../helpers/couchBaseService'),
     countryData = require('country-data'),
@@ -148,6 +149,9 @@ router
                 return operation === 'create' ? appBucket.insertPromise('hbcf::' + req.params.siteId, json) : appBucket.replacePromise('hbcf::' + req.params.siteId, json);
             })
             .then(function (data) {
+                // Emit event to generate hbConfig file for siteId
+                adpushupEvent.emit('hbSiteSaved', req.params.siteId);
+                
                 res.send({ success: 1 });
             })
             .catch(function (err) {

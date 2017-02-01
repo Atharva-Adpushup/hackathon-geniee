@@ -31,7 +31,9 @@ var adpTags = {
 		};
 
 		var sizeString = size.join('x'),
-			biddingPartners = config.biddingPartners[ sizeString ];
+			biddingPartners = config.biddingPartners[ sizeString ],
+
+			dAUT = config.dfpAdUnitTargeting;
 
 		// If the size is defined as having multiple configuration
 		// use one by one.
@@ -42,11 +44,11 @@ var adpTags = {
 			this.adpSlots[slotId].bidPartners = biddingPartners;
 		}
 
-		if( config.dfpAdUnitTargeting && config.dfpAdUnitTargeting.adUnits ) {
-				if( config.dfpAdUnitTargeting.targetAllAdUnits || config.dfpAdUnitTargeting.adUnits[slotId] ) {
-					newSlotId = "/" + config.dfpAdUnitTargeting.networkId + "/" + slotId;
-					this.adpSlots[slotId].slotId = newSlotId;
+		if( dAUT && dAUT.adUnits ) {
+				if( dAUT.targetAllAdUnits || dAUT.adUnits.indexOf(slotId) !== -1 ) {
+					newSlotId = "/" + dAUT.networkId + "/" + slotId;
 
+					this.adpSlots[slotId].slotId = newSlotId;
 					me.setDFPForSlot(slotId);
 				}
 		}

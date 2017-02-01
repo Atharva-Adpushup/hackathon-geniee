@@ -14,23 +14,24 @@ module.exports = {
 			name: 'pulsepoint',
 			isHb: true,
 			global: {
-				cf: {default: '560684', validations: {'required': true}, alias: "User Id", isEditable: true}
+				cp: {default: '560684', validations: {'required': true}, alias: "User Id", isEditable: true}
 			},
 			local: {
-				ct: {validations: {'required': true}, alias: "Ad Id"}
+				ct: {validations: {'required': true}, alias: "Tag Id"},
+				cf: {validations: {'required': true}, alias: "Tag Size"},
 			}
 		},
 		'wideorbit': {
 			name: 'wideorbit',
 			isHb: true,
 			global: {
-				pbId: {default: '560684', validations: {'required': true}, alias: "User Id", isEditable: true}
+				pbId: {default: '577', validations: {'required': true}, alias: "Publisher Id", isEditable: true}
 			},
 			local: {
-				pId: {validations: {'required': true, type: 'number'}, alias: "Ad Id"}
+				pId: {validations: {'required': true, type: 'number'}, alias: "Tag Id"}
 			}
 		},
-		
+
 	},
 	hbContinents: [
 		{ name: 'Europe', code: 'EUR' },

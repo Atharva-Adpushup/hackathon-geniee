@@ -1,4 +1,5 @@
-var Promise = require('bluebird'),
+var path = require('path'),
+		Promise = require('bluebird'),
     url = require('url'),
     retry = require('bluebird-retry'),
 
@@ -29,7 +30,7 @@ function constructHBJsFile(jsContents, indiHbConfig, siteData){
 		jsContents = jsContents.replace('__HB_TARGET_ALL_DFP__', false);
 		jsContents = jsContents.replace('__HB_AD_UNIT_TARGETING__', JSON.stringify(indiHbConfig.adUnitTargeting || {
 			"networkId"        : indiHbConfig.networkId || 103512698,
-			"adUnits"          : indiHbConfig.adUnits || {},
+			"adUnits"          : indiHbConfig.adUnits || [],
 			"targetAllAdUnits" : indiHbConfig.targetAllAdUnits || false,
 		}) );
 	}
@@ -42,7 +43,7 @@ module.exports = function (siteId) {
     var jsTplPath = path.join(__dirname, '..', '..', 'public', 'assets', 'js', 'builds', 'adpushupHB.js'),
 			hbRootPath = path.join('/adpushup', 'hb_files', siteId.toString());
 
-		couchbase
+		return couchbase
 		  .connectToBucket('AppBucket')
 			.then(function(appBucket) {
 		        return Promise.all([
@@ -75,7 +76,5 @@ module.exports = function (siteId) {
           	);
           }
     		}) );
-    	}).catch(function(e){
-    		console.log(e);
     	});
 };
