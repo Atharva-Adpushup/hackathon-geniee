@@ -19,7 +19,7 @@ function updateAllAutoOptimisedSites() {
 		});
 
 	return Promise.join(getSites, uploadSites, function(sitesArr, uploadedSites) {
-		var dateTime = moment().format('MMMM Do YYYY, h:mm:ss a');
+		var dateTime = moment().format('LLL');
 
 		console.log('All `autoOptimise` Sites were synced at ' + dateTime);
 	})
@@ -29,7 +29,7 @@ function updateAllAutoOptimisedSites() {
 }
 
 adpushup.on('siteSaved', onSiteSaved);
-cron.schedule('* */1 * * *', function() {
+cron.schedule('* * */1 * * *', function() {
 	console.log('Running below task at every hour');
 	updateAllAutoOptimisedSites();
 }, true);
