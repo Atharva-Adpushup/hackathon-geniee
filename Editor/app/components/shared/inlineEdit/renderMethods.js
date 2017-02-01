@@ -42,9 +42,10 @@ const renderDropdownList = that => {
 		);
 	},
 	renderNormalMode = (that, adCodeStyles, adCodeEdit) => {
+		const valueStyle = { fontWeight: that.props.font ? that.props.font : 700, wordBreak: 'break-all' };
 		return (
 			<div>
-				<strong style={{ fontWeight: that.props.font ? that.props.font : 700 }}>{
+				<strong style={valueStyle}>{
 					that.props.value ? (
 						<span style={that.props.adCode ? adCodeStyles : {}}> {that.props.adCode ? atob(that.props.value) : that.props.value} </span>
 					) : `Edit ${that.props.text}`
