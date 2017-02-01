@@ -16,7 +16,7 @@ class variationSingleSection extends Component {
     }
     render() {
         return (
-            <li className="section-list-item" key={this.props.section.id} style={this.props.section.error ? errorBorder : { ...errorBorder, border: '1px solid #d9d9d9' }}>
+            <li className="section-list-item" key={this.props.section.id} style={this.props.section.error ? errorBorder : { ...errorBorder, border: '1px solid #d9d9d9', boxShadow: 'none' }}>
                 <OverlayTrigger placement="bottom" overlay={<Tooltip id="delete-section-tooltip">Delete Section</Tooltip>}>
                     {/*`section.ads[0].id` is temporarily added as 3rd argument to accomodate
                         * one section and one ad creation/deletion
