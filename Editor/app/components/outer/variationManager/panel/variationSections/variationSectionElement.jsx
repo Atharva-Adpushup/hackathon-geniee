@@ -34,6 +34,13 @@ class variationSingleSection extends Component {
                             <i className="fa fa-object-ungroup" /><span>Structural {this.props.section.error}</span>
                         </label>
                     }
+                    {
+                        this.props.section.error ? (
+                            <label className="section-label section-error">
+                                <i className="fa fa-exclamation-triangle" /><span>Invalid XPath</span>
+                            </label>
+                        ) : ''
+                    }
                     <Col className="u-padding-r10px section-name-ie" xs={12}>
                         <InlineEdit value={this.props.section.name}
                             submitHandler={this.props.onRenameSection.bind(null, this.props.section, this.props.variation.id)} text="Section Name" errorMessage="Section Name cannot be blank"
@@ -74,15 +81,15 @@ class variationSingleSection extends Component {
                         <Col className="u-padding-r10px" xs={4}>XPath</Col>
                         <Col className="u-padding-l10px" xs={8}>
                             <InlineEdit
-                                compact 
-                                cancelEditHandler={this.props.onResetErrors.bind(null, this.props.section.id)} 
-                                customError={this.props.ui.errors.xpath ? this.props.ui.errors.xpath.error : false} 
-                                dropdownList={this.props.section.allXpaths} 
+                                compact
+                                cancelEditHandler={this.props.onResetErrors.bind(null, this.props.section.id)}
+                                customError={this.props.ui.errors.xpath ? this.props.ui.errors.xpath.error : false}
+                                dropdownList={this.props.section.allXpaths}
                                 value={this.props.section.xpath}
                                 keyUpHandler={this.props.onValidateXPath.bind(null, this.props.section.id)}
-                                submitHandler={this.props.onUpdateXPath.bind(null, this.props.section.id)} 
-                                editClickHandler={this.props.onSectionAllXPaths.bind(null, this.props.section.id, this.props.section.xpath)} 
-                                text="XPath" 
+                                submitHandler={this.props.onUpdateXPath.bind(null, this.props.section.id)}
+                                editClickHandler={this.props.onSectionAllXPaths.bind(null, this.props.section.id, this.props.section.xpath)}
+                                text="XPath"
                                 errorMessage={(this.props.ui.errors.xpath && this.props.ui.errors.xpath.error) ? this.props.ui.errors.xpath.message : 'XPath cannot be blank'}
                                 />
                             { /*
