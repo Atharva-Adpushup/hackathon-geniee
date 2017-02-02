@@ -16,7 +16,19 @@ var adpTags = {
 	que : [],
 
 	defineSlot : function(slotId, size, containerId) {
-		var me = this, newSlotId;
+		var me = this,
+			dAUT = config.dfpAdUnitTargeting,
+			setDFP = false;
+
+		if( dAUT.targetAllAdUnits ||
+				dAUT.adUnits.indexOf(slotId) !== -1 || dAUT.adUnits.indexOf('*') !== -1
+			) {
+			slotId = "/" + dAUT.networkId + "/" + slotId;
+			setDFP = true;
+
+			this.setDFPForSlot(slotId);
+			logger.info("creating DFP slot for slot (%s)", slotId);
+		}
 
 		this.adpSlots[slotId] = {
 			slotId      : slotId,
@@ -25,57 +37,45 @@ var adpTags = {
 
 			bidPartners : [],
 
-			setDFP      : false,
+			setDFP      : setDFP,
 			gSlot       : null,
 			isRendered  : false
 		};
 
-		var partnersNotPresent = false;
+		var partnersPresent = true;
 
 		var sizeString = size.join('x'),
-			biddingPartners = config.biddingPartners[ sizeString ],
+			biddingPartners = config.biddingPartners[ sizeString ];
 
-			dAUT = config.dfpAdUnitTargeting;
+		if( ! biddingPartners ) {
 
-		try {
+			partnersPresent = false;
+			logger.warn("no bidding partners present for this size");
 
-			// If the size is defined as having multiple configuration
-			// use one by one.
-			if( Array.isArray(biddingPartners[0]) ) {
-				this.adpSlots[slotId].bidPartners  = biddingPartners[0];
-				config.biddingPartners[sizeString] = config.biddingPartners[sizeString].slice(1);
-			} else {
-				this.adpSlots[slotId].bidPartners = biddingPartners;
-			}
+		} else if( ! biddingPartners[0]) {
 
-			// If there are two 300x250 ad slots and only one bidding array is present
-			// biddingPartners would likely would be zero
+			partnersPresent = false;
+			logger.warn("not enough bidding partners defined for the this size");
 
-			if( biddingPartners[0] !== undefined ) {
-				sandBoxbids.createPrebidContainer( this.adpSlots[slotId].bidPartners, slotId, size, containerId );
-			} else {
-				throw new Error();
-			}
+		} else if( Array.isArray(biddingPartners[0]) ) {
 
-		} catch(e) {
-			partnersNotPresent = true;
-			logger.warn("bidding partners not present for the defined size");
+			this.adpSlots[slotId].bidPartners  = biddingPartners[0];
+			config.biddingPartners[sizeString] = config.biddingPartners[sizeString].slice(1);
+
+		} else if( Object.prototype.toString.call({}) === "[object Object]") {
+
+			this.adpSlots[slotId].bidPartners = biddingPartners;
+
 		}
 
-		if( dAUT && dAUT.adUnits ) {
-			if( dAUT.targetAllAdUnits || dAUT.adUnits.indexOf(slotId) !== -1 ) {
-				newSlotId = "/" + dAUT.networkId + "/" + slotId;
-				this.adpSlots[slotId].slotId = newSlotId;
-
-				logger.info("creating DFP slot for slot (%s)", slotId);
-				me.setDFPForSlot(slotId);
-			}
-		}
-
-		if( partnersNotPresent ) {
-			if( this.adpSlots[slotId].gSlot ) {
+		if( partnersPresent ) {
+			sandBoxbids.createPrebidContainer( this.adpSlots[slotId].bidPartners, slotId, size, containerId );
+		} else {
+			if( this.adpSlots[slotId].setDFP ) {
 				this.renderGPTAd(slotId);
 			} else {
+				logger.info("no bid partners present. Trying to load passback");
+
 				this.adpSlots[slotId].isRendered = true;
 				this.renderPostbidAd(slotId); // Render passback if necesarry
 			}
@@ -101,11 +101,11 @@ var adpTags = {
 	},
 
 	setDFPForSlot : function( slotId ){
-		var slot = this.adpSlots[slotId];
+		var me = this;
 
 		googletag.cmd.push(function(){
+			var slot = me.adpSlots[slotId];
 			slot.gSlot = googletag.defineSlot(slot.slotId, slot.size, slot.containerId);
-			slot.setDFP = true;
 		});
 
 	},
@@ -136,6 +136,11 @@ var adpTags = {
 			adIframe = utils.createEmptyIframe(),
 
 			me = this;
+
+		var renderPassback = function(html) {
+  		document.getElementById(slot.containerId).innerHTML = html;
+  		bodyEval( document.getElementById(slot.containerId) );
+		};
 
 		waitUntil()
 			.interval(50)
@@ -168,21 +173,14 @@ var adpTags = {
 
 		    	slot.isRendered = true;
 
-		    	if( config.postbidPassbacks ) {
+	    		if( config.postbidPassbacks[slotId] ) {
+	    			logger.info("no bids for the ad slot. rendering defined passback for slot (%s)", slotId);
+	    			renderPassback(config.postbidPassbacks[slotId]);
 
-		    		if( config.postbidPassbacks[slotId] ) {
-		    			logger.info("no bids for the ad slot. rendering defined passback for slot(%s)", slotId);
-
-			    		document.getElementById(slot.containerId).innerHTML = config.postbidPassbacks[slotId];
-			    		bodyEval( document.getElementById(slot.containerId) );
-		    		} else if( config.postbidPassbacks['*'] ) {
-		    			logger.info("no bids for the ad slot. rendering defined passback for all(%s)". slotId);
-
-			    		document.getElementById(slot.containerId).innerHTML = config.postbidPassbacks['*'];
-			    		bodyEval( document.getElementById(slot.containerId) );
-		    		}
-
-		    	}
+	    		} else if( config.postbidPassbacks['*'] ) {
+	    			logger.info("no bids for the ad slot. rendering defined passback for all (%s)", slotId);
+		    		renderPassback(config.postbidPassbacks['*']);
+	    		}
 
 		    	me.emit('postBidSlotRender', {
 						slotId   : slotId,
@@ -267,12 +265,14 @@ var adpTags = {
 	renderGPTAd : function(slotId, timeout){
 		logger.info("GPT slot found. setting targeting for %s", slotId);
 
-		var slot = this.adpSlots[slotId];
+		var slot = this.adpSlots[slotId], me = this;
 
-		this.setGPTTargetingForPBSlot(slotId);
-		this.setGPTKeys(slotId, {
-			'hb_ran' : 1,
-			'is_timed_out' : timeout
+		googletag.cmd.push(function(){
+			me.setGPTTargetingForPBSlot(slotId);
+			me.setGPTKeys(slotId, {
+				'hb_ran' : 1,
+				'is_timed_out' : timeout
+			});
 		});
 
 		if( slot.setDFP ) {
