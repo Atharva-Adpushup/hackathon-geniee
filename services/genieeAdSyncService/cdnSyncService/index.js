@@ -124,8 +124,8 @@ module.exports = function (site) {
                             customJs: variation.customJs,
                             ads: ads,
                             // Data required for auto optimiser model
-                            // Click is mapped as sum
-                            sum: ((isVariationData && parseInt(variationData.click, 10) > -1) ? variationData.click : 1),
+                            // pageRPM is mapped as sum
+                            sum: ((isVariationData && parseFloat(variationData.pageRPM) > -1) ? variationData.pageRPM : 1),
                             // Data required for auto optimiser model
                             // Page view is mapped as count
                             count: ((isVariationData && parseInt(variationData.pageViews, 10) > -1) ? variationData.pageViews : 1)

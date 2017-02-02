@@ -11,7 +11,7 @@ module.exports = function() {
 		$.each(allVariations, function(variationId, variationObj) {
 			var modelObj = {
 				count: parseInt(variationObj.count, 10),
-				sum: parseInt(variationObj.sum, 10)
+				sum: parseFloat(variationObj.sum)
 			};
 
 			armsCollection.push(modelObj);
