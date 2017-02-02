@@ -77,6 +77,7 @@ var adpTags = {
 				this.renderGPTAd(slotId);
 			} else {
 				this.adpSlots[slotId].isRendered = true;
+				this.renderPostbidAd(slotId); // Render passback if necesarry
 			}
 		}
 
