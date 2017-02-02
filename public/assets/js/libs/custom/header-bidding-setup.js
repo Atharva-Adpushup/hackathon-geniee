@@ -30,8 +30,20 @@ $(document).ready(function () {
                 },
                 selectors: {
                     country: '.select-geo-country',
-                    continent: '.select-geo-continent'
+                    continent: '.select-geo-continent',
+                    hbSettings: '.hb-settings-pane',
+                    dfpTargetingPane: '.dfptargeting-pane',
+                    apAlert: '.detectap-alert'
+                },
+                dfp: {
+                    targeting: '<div class="dfptargeting-pane row"><div class="col-sm-3 input-name">Network Id</div><div class="col-sm-4"><input class="form-control" type="text" name="networkId" required placeholder="Please enter the network Id" /></div></div>'
                 }
+            },
+
+            // Check whether to show dfp panel or not
+            showDFPAdUnitsTargeting: function() {
+                var targetAllDfpUnits = $('input[name="targetAllDfpUnits"]:checked').val();
+                return targetAllDfpUnits === 'no' ? true : false;
             },
 
             // Set geo select box data
@@ -310,6 +322,22 @@ $(document).ready(function () {
                 });
             },
 
+            // Function to set Hb config settings
+            setHbConfigSettings: function() {
+                var settings = {
+                    'prebidTimeout': parseInt($('input[name="prebidTimeout').val(), 10),
+                    'e3FeedbackUrl': $('input[name="e3FeedbackUrl"]').val()
+                }, targetAllDfpUnits = $('input[name="targetAllDfpUnits"]:checked').val();
+
+                settings.targetAllDfpUnits = this.showDFPAdUnitsTargeting() ? false : true; 
+
+                if(targetAllDfpUnits) {
+                    settings.networkId = $('input[name="networkId"]').val()
+                }                
+
+                return settings;
+            },
+
             // Function to parse header bidding form data
             parseHbFormData: function (form) {
                 var data = [];
@@ -361,16 +389,17 @@ $(document).ready(function () {
                     });
                     data.push(obj);
                 });
-
+                    
                 return {
                     setup: data,
-                    settings: {}
+                    settings: this.setHbConfigSettings()
                 };
             },
 
             saveHeaderBiddingSetup: function (form) {
                 var data = this.parseHbFormData(form),
-                    operation = $('#setupOp').val();
+                    operation = $('#setupOp').val(),
+                    that = this;
                 $.ajax({
                     method: 'POST',
                     url: 'saveHeaderBiddingSetup',
@@ -382,11 +411,24 @@ $(document).ready(function () {
                         ap.apAlert('Some error occurred! Please try again later.', '#hbalert', 'error', 'slideDown');
                     }
                 });
+
+                setTimeout(function() { $(that.templates.selectors.apAlert).slideUp() }, 2500);
+            },
+
+            // Show dfp settings pane
+            showDfpTargetingPane: function() {
+                if(this.showDFPAdUnitsTargeting()) {
+                    $(this.templates.selectors.hbSettings).append(this.templates.dfp.targeting);
+                } else {
+                    var dfpTargetingPane = $(this.templates.selectors.dfpTargetingPane);
+                    dfpTargetingPane ? $(dfpTargetingPane).remove() : null;
+                }
             },
 
             // Initialise header bidding setup
             init: function () {
-                !w.hbSetupData ? this.renderGeoSetupPanel() : this.loadSetupData(w.hbSetupData);
+                this.showDfpTargetingPane();
+                !w.hbSetupData ? this.renderGeoSetupPanel() : this.loadSetupData(w.hbSetupData.setup);
             }
         };
         ap.headerBiddingSetup.init();
@@ -412,6 +454,11 @@ $(document).ready(function () {
         // Geo panel addition trigger
         $('#addgeo').on('click', function () {
             ap.headerBiddingSetup.renderGeoSetupPanel();
+        });
+
+        // Dfp targeting trigger
+        $('input[name="targetAllDfpUnits"]').on('change', function () {
+            ap.headerBiddingSetup.showDfpTargetingPane();
         });
 
         // Size panel addition trigger

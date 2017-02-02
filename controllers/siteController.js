@@ -51,7 +51,7 @@ function renderHbPanel(site, UiData, res, hbConfig) {
     };
 
     if (hbConfig) {
-        data.hbSetupData = JSON.stringify(hbConfig.value.hbConfig.setup);
+        data.hbSetupData = JSON.stringify(hbConfig.value.hbConfig);
     }
 
     res.render('headerBidding', data);
