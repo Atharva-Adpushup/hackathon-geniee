@@ -1,4 +1,4 @@
-var logger = require('./libs/logger'),
+	var logger = require('./libs/logger'),
 	utils = require('./libs/utils'),
 
 	sandBoxbids = require('./sandboxbids'),
@@ -90,6 +90,7 @@ var adpTags = {
 	},
 
 	processQue : function(){
+		logger.info("processing adpushup queue");
 
 		while( this.que.length ) {
 			var queuedFunc = this.que.pop();
@@ -139,6 +140,8 @@ var adpTags = {
 			.interval(50)
 			.times(20)
 			.condition(function(){
+				logger.info("waiting for the slot container to appear (%s)", slot.containerId);
+
 				return ( document.getElementById(slot.containerId) !== null );
 			})
 			.done(function(){
@@ -147,11 +150,13 @@ var adpTags = {
 				var iframeDoc = adIframe.contentWindow.document;
 
 				if (params && params.hb_adid){
+					logger.info("rendering postbid ad for slot(%s)", slotId);
 
 		      pbjs.renderAd(iframeDoc, params.hb_adid);
 		      adIframe.contentWindow.onload = function(){
-		      	slot.isRendered = true;
+		      	logger.info("postbid slot (%s) rendered. emitting postBidSlotRender", slotId);
 
+		      	slot.isRendered = true;
 		      	me.emit('postBidSlotRender', {
 							slotId  : slotId,
 							postBid : true
@@ -165,9 +170,13 @@ var adpTags = {
 		    	if( config.postbidPassbacks ) {
 
 		    		if( config.postbidPassbacks[slotId] ) {
+		    			logger.info("no bids for the ad slot. rendering defined passback for slot(%s)", slotId);
+
 			    		document.getElementById(slot.containerId).innerHTML = config.postbidPassbacks[slotId];
 			    		bodyEval( document.getElementById(slot.containerId) );
 		    		} else if( config.postbidPassbacks['*'] ) {
+		    			logger.info("no bids for the ad slot. rendering defined passback for all(%s)". slotId);
+
 			    		document.getElementById(slot.containerId).innerHTML = config.postbidPassbacks['*'];
 			    		bodyEval( document.getElementById(slot.containerId) );
 		    		}
