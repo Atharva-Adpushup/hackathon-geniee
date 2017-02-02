@@ -78,27 +78,51 @@ block bodyContent
                                                     | Header Bidding Global Settings
                                         #hbSettingsPanel.panel-collapse.collapse.in(role='tabpanel', aria-labelledby='hbSettingsHeader')
                                             .hb-settings-pane.panel-body
-                                                - hbcf = JSON.parse(hbSetupData)
+                                                - hbSettings = hbSetupData ? JSON.parse(hbSetupData).settings : null;
                                                 .row
                                                     .col-sm-3
                                                         .input-name Prebid Timeout
                                                     .col-sm-4
-                                                        input.form-control(required value=(hbcf.settings ? hbcf.settings.prebidTimeout : hbGlobalSettingDefaults.prebidTimeout) name="prebidTimeout" type="number" placeholder="Enter Prebid Timeout")
+                                                        input.form-control(required value=(hbSettings ? hbSettings.prebidTimeout : hbGlobalSettingDefaults.prebidTimeout) name="prebidTimeout" type="number" placeholder="Enter Prebid Timeout")
                                                 .row
                                                     .col-sm-3
                                                         .input-name E3 Feedback URL
                                                     .col-sm-4
-                                                        input.form-control(required value=(hbcf.settings ? hbcf.settings.e3FeedbackUrl : hbGlobalSettingDefaults.e3FeedbackUrl) name="e3FeedbackUrl" type="text" placeholder="Enter E3 Feedback URL")
+                                                        input.form-control(required value=(hbSettings ? hbSettings.e3FeedbackUrl : hbGlobalSettingDefaults.e3FeedbackUrl) name="e3FeedbackUrl" type="text" placeholder="Enter E3 Feedback URL")
                                                 .row
                                                     .col-sm-3
                                                         .input-name Target All DFP Units
                                                     .col-sm-4
-                                                        - checkYes = (hbcf.settings ? (hbcf.settings.targetAllDfpUnits ? true : undefined) : (hbGlobalSettingDefaults.targetAllDfpUnits ? true : undefined)) 
-                                                        - checkNo = (hbcf.settings ? (!hbcf.settings.targetAllDfpUnits ? true : undefined) : (!hbGlobalSettingDefaults.targetAllDfpUnits ? true : undefined))
-                                                        input.input-radio(checked=(checkYes) required name="targetAllDfpUnits" value="yes" type="radio") 
+                                                        - checkYes = (hbSettings ? (hbSettings.targetAllDFP ? true : undefined) : (hbGlobalSettingDefaults.targetAllDFP ? true : undefined)) 
+                                                        - checkNo = (hbSettings ? !(hbSettings.targetAllDFP ? true : undefined) : (!hbGlobalSettingDefaults.targetAllDFP ? true : undefined))
+                                                        input.input-radio(checked=(checkYes) required name="targetAllDFP" value="yes" type="radio") 
                                                         span Yes
-                                                        input.input-radio(checked=(checkNo) required name="targetAllDfpUnits" value="no" type="radio") 
+                                                        input.input-radio(checked=(checkNo) required name="targetAllDFP" value="no" type="radio") 
                                                         span No
+                                            .container.mb-30
+                                                .row
+                                                    .col-sm-3
+                                                        .input-name Postbid passbacks
+                                                - passbacks = hbSetupData ? JSON.parse(hbSetupData).settings.postBidPassbacks : null;
+                                                .pbpassback-wrapper
+                                                    if !passbacks || !Object.keys(passbacks).length
+                                                        .row.pbpassback-input
+                                                            .col-sm-3
+                                                                input.form-control(required type="text" name="pbAdUnit" placeholder="Ad Unit")
+                                                            .col-sm-4
+                                                                input.form-control(required type="text" name="pbCode" placeholder="Code")
+                                                    else 
+                                                        each code, adUnit in passbacks
+                                                            .row.pbpassback-input
+                                                                .col-sm-3
+                                                                    input.form-control(required type="text" value="#{adUnit}" name="pbAdUnit" placeholder="Ad Unit")
+                                                                .col-sm-4
+                                                                    input.form-control(required type="text" value="#{code}" name="pbCode" placeholder="Code")
+                                                                - keyIndex = Object.keys(passbacks).indexOf(adUnit);
+                                                                if keyIndex
+                                                                    button(type="button").close.hb-close-pane.hb-close-pane-static x
+                                                        
+                                                button.mT-10.btn.btn-lightBg.btn-default#addpostbid-passback(type="button") Add another postbid passback
                                                 
                                 hr 
                                 button.btn.btn-primary Save Header bidding Setup

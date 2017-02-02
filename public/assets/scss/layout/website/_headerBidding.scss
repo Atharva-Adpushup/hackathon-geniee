@@ -38,6 +38,15 @@
     z-index: 1;
     padding: 5px;
   }
+
+  .close.hb-close-pane-static {
+    right: auto;
+    top: 5px;
+  }
+
+  .row.pbpassback-input {
+    margin-top: 10px;
+  }
 }
 
 .select-partner {
@@ -81,3 +90,4 @@
     }
   }
 }
+
