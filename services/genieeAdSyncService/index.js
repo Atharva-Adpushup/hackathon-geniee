@@ -4,11 +4,7 @@ var adpushup = require('../../helpers/adpushupEvent'),
 	utils = require('../../helpers/utils'),
 	moment = require('moment'),
 	cron = require('node-cron'),
-	getAutoOptimisedLiveSites = require('../../reports/default/apex/MAB/getAutoOptimisedLiveSites/service'),
-	cronTask = cron.schedule('0 0 */1 * * *', function() {
-		console.log('Running below task at every hour');
-		updateAllAutoOptimisedSites();
-	}, false);
+	getAutoOptimisedLiveSites = require('../../reports/default/apex/MAB/getAutoOptimisedLiveSites/service');
 
 function onSiteSaved(site) {
 	// save only after 5 second of siteSaved event as still channels are not saved as siteSaved called first and then channel data is saved.
@@ -33,4 +29,13 @@ function updateAllAutoOptimisedSites() {
 }
 
 adpushup.on('siteSaved', onSiteSaved);
-cronTask.start();
+cron.schedule('0 0 */1 * * *', function() {
+	console.log('Running below task at every hour');
+	updateAllAutoOptimisedSites();
+}, true);
+// NOTE: Even with boolean `true` as third argument,
+// cron doesn't immediately start the job.
+// Hence, a manual invokation for this method is done below
+// TODO: Test this issue out and if persists,
+// do a pull request to 'node-cron' npm package to fix this :)
+updateAllAutoOptimisedSites();
