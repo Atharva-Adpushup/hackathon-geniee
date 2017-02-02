@@ -356,7 +356,7 @@ $(document).ready(function () {
                     });
 
                     if($.inArray('*', adUnits) === -1) {
-                        adUnits.push('*');
+                        adUnits.unshift('*');
                     }
 
                     settings.dfpAdUnitTargeting.adUnits = adUnits;
