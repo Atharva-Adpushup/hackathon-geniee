@@ -15,13 +15,13 @@ function main() {
 	window.googletag = window.googletag || {};
 	googletag.cmd = googletag.cmd || [];
 
-
 	require('./libs/polyfills');
 
 	var reporting = require('./reporting'),
 		printBidTable = require('./printBidTable'),
 		config = require('./config/config'),
-		logger = require('./libs/logger');
+		logger = require('./libs/logger'),
+		loadGPT = require('./loadGPT'),
 
 		sandBoxbids = require('./sandboxbids');
 
@@ -34,6 +34,11 @@ function main() {
 	reporting.initReports();
 
 	window.adpTags.processQue();
+
+	// Load GPT script if specfic ad units need to be targeted
+	if( config.dfpAdUnitTargeting.adUnits.length ) {
+		loadGPT();
+	}
 
 	var setPbjsKeys = function( pbjsParams ){
 
