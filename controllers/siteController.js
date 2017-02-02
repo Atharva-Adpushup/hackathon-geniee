@@ -51,14 +51,14 @@ function renderHbPanel(site, UiData, res, hbConfig) {
     };
 
     if (hbConfig) {
-        data.hbSetupData = JSON.stringify(hbConfig.value.hbConfig);
+        data.hbSetupData = JSON.stringify(hbConfig.value.hbConfig.setup);
     }
 
     res.render('headerBidding', data);
 };
 
 // Function to fetch HbConfig data and render appropriate panel
-function hbConfigPanel(sitePromise, appBucketPromise, UiData, siteId, res) {
+function populateHbConfigPanel(sitePromise, appBucketPromise, UiData, siteId, res) {
     return Promise.all([sitePromise, appBucketPromise])
         .spread(function (site, appBucket) {
             var hbConfigPromise = appBucket.getAsync('hbcf::' + siteId, {});
@@ -130,8 +130,8 @@ router
                 var sitePromise = siteModel.getSiteById(req.params.siteId),
                 appBucketPromise = couchbase.connectToAppBucket(),
                 UiData = getHbUiData();
-                
-                return hbConfigPanel(sitePromise, appBucketPromise, UiData, req.params.siteId, res);
+
+                return populateHbConfigPanel(sitePromise, appBucketPromise, UiData, req.params.siteId, res);
             })
             .catch(function (err) {
                 res.redirect('/403');
@@ -143,10 +143,10 @@ router
             operation = req.body.op,
             sitePromise = siteModel.getSiteById(req.params.siteId),
             appBucketPromise = couchbase.connectToAppBucket(),
-            hasGlobalConfig = _.find(hbConfig, function (config) { return config.type === 'all' });
+            hasGlobalConfig = _.find(hbConfig.setup, function (config) { return config.type === 'all' });
 
         if (!hasGlobalConfig) {
-            hbConfig.push({ 'type': 'all', info: {} });
+            hbConfig.setup.push({ 'type': 'all', info: {} });
         }
 
         return Promise.all([sitePromise, appBucketPromise])

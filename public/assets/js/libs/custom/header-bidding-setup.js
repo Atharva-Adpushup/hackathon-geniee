@@ -19,7 +19,7 @@ $(document).ready(function () {
                     countrySelect: '<div class="row select-geo-country"> <div class="col-sm-3"> <div class="input-name">Select Country</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="country" required="required" class="geo-country"></select> </div></div></div>',
                     continentSelect: '<div class="row select-geo-continent"> <div class="col-sm-3"> <div class="input-name">Select Continent</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="continent" required="required" class="geo-continent"></select> </div></div></div>',
                     adSizesSelect: '<div class="row"> <div class="col-sm-3"> <div class="input-name">Select Ad Size</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="adSize" required="required" class="ad-size"></select> </div></div></div>',
-                    hbPartnerSelect: '<div class="row"> <div class="col-sm-4"> <div class="input-name">Select Header Bidding Partner</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select class="hb-partner text-capitalize" name="hbPartner" required="required"></select> </div></div></div>'
+                    hbPartnerSelect: '<div class="row"> <div class="col-sm-3"> <div class="input-name">Select Header Bidding Partner</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select class="hb-partner text-capitalize" name="hbPartner" required="required"></select> </div></div></div>'
                 },
                 closeBtn: '<button type="button" class="close hb-close-pane">x</button>',
                 defaultSelectBoxOption: '<option selected value="">Select partner</option>',
@@ -362,7 +362,10 @@ $(document).ready(function () {
                     data.push(obj);
                 });
 
-                return data;
+                return {
+                    setup: data,
+                    settings: {}
+                };
             },
 
             saveHeaderBiddingSetup: function (form) {
