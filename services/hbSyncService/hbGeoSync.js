@@ -31,8 +31,7 @@ function constructHBJsFile(jsContents, indiHbConfig, siteData){
 		jsContents = jsContents.replace('__HB_POSTBID_PASSBACKS__', JSON.stringify(indiHbConfig.postbidPassbacks || {}) );
 		jsContents = jsContents.replace('__HB_AD_UNIT_TARGETING__', JSON.stringify(indiHbConfig.adUnitTargeting || {
 			"networkId"        : indiHbConfig.networkId || 103512698,
-			"adUnits"          : indiHbConfig.adUnits || [],
-			"targetAllAdUnits" : indiHbConfig.targetAllAdUnits || false,
+			"adUnits"          : indiHbConfig.adUnits || []
 		}) );
 	}
 
