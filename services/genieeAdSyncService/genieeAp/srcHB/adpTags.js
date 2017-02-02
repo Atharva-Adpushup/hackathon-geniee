@@ -165,7 +165,7 @@ var adpTags = {
 		      	slot.isRendered = true;
 		      	me.emit('postBidSlotRender', {
 							slotId  : slotId,
-							postBid : true
+							postbid : true
 						});
 		      };
 
@@ -184,7 +184,7 @@ var adpTags = {
 
 		    	me.emit('postBidSlotRender', {
 						slotId   : slotId,
-						postBid  : true,
+						postbid  : true,
 						passback : true
 					});
 		    }
@@ -271,6 +271,7 @@ var adpTags = {
 			me.setGPTTargetingForPBSlot(slotId);
 			me.setGPTKeys(slotId, {
 				'hb_ran' : 1,
+				'site_id' : config.siteId,
 				'is_timed_out' : timeout
 			});
 		});
