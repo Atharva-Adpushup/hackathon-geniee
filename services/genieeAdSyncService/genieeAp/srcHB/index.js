@@ -34,6 +34,10 @@ function main() {
 	reporting.initReports();
 
 	window.adpTags.processQue();
+	window.adpTags.que.push = function( queFunc ){
+		[].push.call(window.adpTags.que, queFunc);
+		adpTags.processQue();
+	};
 
 	// Load GPT script if specfic ad units need to be targeted
 	if( config.dfpAdUnitTargeting.adUnits.length ) {
