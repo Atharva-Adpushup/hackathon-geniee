@@ -15,7 +15,7 @@ window.pbjs.que = window.pbjs.que || [];
 
 function sendBidData(){
 
-		logger.info("sending data for %s ", Object.keys(pbjsWinners).join('\n') );
+		logger.info("sending data for %s ", Object.keys(pbjsWinners).join(' ') );
 
     var builtUrl = utils.buildUrl(config.e3FeedbackUrl, {
       "packetId" : packetId,
@@ -78,6 +78,15 @@ function initReports() {
 	});
 
 	adpTags.on('postBidSlotRender', function(event) {
+		if( event.passback ) {
+			pbjsWinners[ event.slotId ] = {
+				"adUnitPath" : event.slotId,
+				"bidder" : "PASSBACK",
+				"cpm" : 0.00001,
+				"timeToRespond" : 1001
+			};
+		}
+
 		if( adpTags.haveAllSlotsRendered() ) {
 			sendBidData();
 		}
