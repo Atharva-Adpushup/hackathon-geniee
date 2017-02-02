@@ -57,6 +57,30 @@ function renderHbPanel(site, UiData, res, hbConfig) {
     res.render('headerBidding', data);
 };
 
+// Function to fetch HbConfig data and render appropriate panel
+function hbConfigPanel(sitePromise, appBucketPromise, UiData, siteId, res) {
+    return Promise.all([sitePromise, appBucketPromise])
+        .spread(function (site, appBucket) {
+            var hbConfigPromise = appBucket.getAsync('hbcf::' + siteId, {});
+            return Promise.all([site, hbConfigPromise]);
+        })
+        .spread(function (site, hbConfig) {
+            return renderHbPanel(site, UiData, res, hbConfig);
+        })
+        .catch(function (err) {
+            if (err.code === 13) {
+                return siteModel.getSiteById(siteId)
+                    .then(function (site) {
+                        return renderHbPanel(site, UiData, res);
+                    });
+            }
+            else {
+                console.log(err);
+                res.send('Some error occurred!');
+            }
+        });
+};
+
 // Function to populate data for header bidding panel UI
 function getHbUiData() {
     var countries = _.map(countryData.lookup.countries(), function (country) {
@@ -101,29 +125,16 @@ router
             });
     })
     .get('/:siteId/headerBidding', function (req, res) {
-        var sitePromise = siteModel.getSiteById(req.params.siteId),
-            appBucketPromise = couchbase.connectToAppBucket(),
-            UiData = getHbUiData();
-
-        return Promise.all([sitePromise, appBucketPromise])
-            .spread(function (site, appBucket) {
-                var hbConfigPromise = appBucket.getAsync('hbcf::' + req.params.siteId, {});
-                return Promise.all([site, hbConfigPromise]);
-            })
-            .spread(function (site, hbConfig) {
-                return renderHbPanel(site, UiData, res, hbConfig);
+        userModel.verifySiteOwner(req.session.user.email, req.params.siteId)
+            .then(function () {
+                var sitePromise = siteModel.getSiteById(req.params.siteId),
+                appBucketPromise = couchbase.connectToAppBucket(),
+                UiData = getHbUiData();
+                
+                return hbConfigPanel(sitePromise, appBucketPromise, UiData, req.params.siteId, res);
             })
             .catch(function (err) {
-                if (err.code === 13) {
-                    return siteModel.getSiteById(req.params.siteId)
-                        .then(function (site) {
-                            return renderHbPanel(site, UiData, res);
-                        });
-                }
-                else {
-                    console.log(err);
-                    res.send('Some error occurred!');
-                }
+                res.redirect('/403');
             });
     })
     .post('/:siteId/saveHeaderBiddingSetup', function (req, res) {
@@ -132,14 +143,14 @@ router
             operation = req.body.op,
             sitePromise = siteModel.getSiteById(req.params.siteId),
             appBucketPromise = couchbase.connectToAppBucket(),
-            hasGlobalConfig = _.find(hbConfig, function(config) { return config.type === 'all' });
+            hasGlobalConfig = _.find(hbConfig, function (config) { return config.type === 'all' });
 
-        if(!hasGlobalConfig) {
+        if (!hasGlobalConfig) {
             hbConfig.push({ 'type': 'all', info: {} });
         }
 
         return Promise.all([sitePromise, appBucketPromise])
-            .spread(function(site, appBucket) {
+            .spread(function (site, appBucket) {
                 var json = {
                     hbConfig: hbConfig,
                     siteId: site.get('siteId'),
@@ -152,7 +163,7 @@ router
             .then(function (data) {
                 // Emit event to generate hbConfig file for siteId
                 adpushupEvent.emit('hbSiteSaved', req.params.siteId);
-                
+
                 res.send({ success: 1 });
             })
             .catch(function (err) {

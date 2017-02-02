@@ -61,15 +61,20 @@ block bodyContent
                                     .accordion-pane.panel.panel-default
                                         #hbConfigHeading.panel-heading(role='tab')
                                             h4.panel-title
-                                                a(role='button', data-toggle='collapse', data-parent='accordion', href='#hbConfigPanel', aria-expanded='false', aria-controls='#hbConfigPanel')
+                                                a(role='button', data-toggle='collapse', data-parent='accordion', href='hbConfigPanel', aria-expanded='false', aria-controls='#hbConfigPanel')
                                                     | Header Bidding Config
                                         #hbConfigPanel.panel-collapse.collapse.in(role='tabpanel', aria-labelledby='hbConfigHeading')
                                             .panel-body
                                                 #hbform-render
+
+                                hr
+                                button.btn.btn-lightBg.btn-default.mb-30(type="button")#addgeo Add another Geo config
+
+                                #accordion.accordion.panel-group(role='tablist', aria-multiselectable='true')
                                     .accordion-pane.panel.panel-default
                                         #hbSettingsHeader.panel-heading(role='tab')
                                             h4.panel-title
-                                                a.collapsed(role='button', data-toggle='collapse', data-parent='accordion', href='#hbSettingsPanel', aria-expanded='false', aria-controls='hbSettingsPanel')
+                                                a.collapsed(role='button', data-toggle='collapse', data-parent='accordion', href='hbSettingsPanel', aria-expanded='false', aria-controls='hbSettingsPanel')
                                                     | Header Bidding Global Settings
                                         #hbSettingsPanel.panel-collapse.collapse.in(role='tabpanel', aria-labelledby='hbSettingsHeader')
                                             .panel-body
@@ -91,9 +96,6 @@ block bodyContent
                                                         span Yes
                                                         input.input-radio(checked=(!hbGlobalSettingDefaults.targetAllDfpUnits ? true : undefined) required name="targetAllDfpUnits" value="no" type="radio") 
                                                         span No
-
-                                hr
-                                button.btn.btn-lightBg.btn-default.mb-30(type="button")#addgeo Add another Geo config
                                                 
                                 hr 
                                 button.btn.btn-primary Save Header bidding Setup
