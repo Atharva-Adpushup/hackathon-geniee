@@ -20,10 +20,10 @@ function updateAllAutoOptimisedSites() {
 
 	return Promise.join(getSites, uploadSites, function(sitesArr, uploadedSites) {
 		var dateTime = moment().format('LLL');
-
 		console.log('All `autoOptimise` Sites were synced at ' + dateTime);
 	})
 	.catch(function(e) {
+		var dateTime = moment().format('LLL');
 		console.log('Sync process failed: ', e.toString() + ' at ' + dateTime);
 	});
 }
