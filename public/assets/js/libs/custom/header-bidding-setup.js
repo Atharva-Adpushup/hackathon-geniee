@@ -355,10 +355,6 @@ $(document).ready(function () {
                         adUnits.push(val);
                     });
 
-                    if($.inArray('*', adUnits) === -1) {
-                        adUnits.unshift('*');
-                    }
-
                     settings.dfpAdUnitTargeting.adUnits = adUnits;
                 } else {
                     delete settings['dfpAdUnitTargeting'];
