@@ -48,7 +48,8 @@ function renderHbPanel(site, UiData, res, op, hbConfig) {
         hbPartners: JSON.stringify(UiData.hbPartners),
         hbConfig: JSON.stringify(commonConsts.hbConfig),
         hbGlobalSettingDefaults: commonConsts.hbGlobalSettingDefaults,
-        operation: op
+        defaultNetworkId: commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId,
+        operation: op,
     };
 
     if (hbConfig) {

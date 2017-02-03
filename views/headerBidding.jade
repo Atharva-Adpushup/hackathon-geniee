@@ -20,6 +20,7 @@ block append headScripts
             window.adSizes = !{adSizes};
             window.hbPartners = !{hbPartners};
             window.hbConfig = !{hbConfig};
+            window.defaultNetworkId = !{defaultNetworkId}
         });
 
     if hbSetupData
@@ -99,7 +100,7 @@ block bodyContent
                                                         span Yes
                                                         input.input-radio(checked=(checkNo) required name="targetAllDFP" value="no" type="radio") 
                                                         span No
-                                            .container.mb-30
+                                            .container.mb-30(style="width: 100%;")
                                                 .row
                                                     .col-sm-3
                                                         .input-name Postbid passbacks
@@ -108,16 +109,16 @@ block bodyContent
                                                     if !passbacks || !Object.keys(passbacks).length
                                                         .row.pbpassback-input
                                                             .col-sm-3
-                                                                input.form-control(required type="text" name="pbAdUnit" placeholder="Ad Unit")
+                                                                input.form-control(type="text" name="pbAdUnit" placeholder="Ad Unit")
                                                             .col-sm-4
-                                                                input.form-control(required type="text" name="pbCode" placeholder="Code")
+                                                                input.form-control(type="text" name="pbCode" placeholder="Code")
                                                     else 
                                                         each code, adUnit in passbacks
                                                             .row.pbpassback-input
                                                                 .col-sm-3
-                                                                    input.form-control(required type="text" value="#{adUnit}" name="pbAdUnit" placeholder="Ad Unit")
+                                                                    input.form-control(type="text" value="#{adUnit}" name="pbAdUnit" placeholder="Ad Unit")
                                                                 .col-sm-4
-                                                                    input.form-control(required type="text" value="#{code}" name="pbCode" placeholder="Code")
+                                                                    input.form-control(type="text" value="#{code}" name="pbCode" placeholder="Code")
                                                                 - keyIndex = Object.keys(passbacks).indexOf(adUnit);
                                                                 if keyIndex
                                                                     button(type="button").close.hb-close-pane.hb-close-pane-static x

@@ -12,7 +12,10 @@ module.exports = {
 	hbGlobalSettingDefaults: {
 		prebidTimeout: 5000,
 		e3FeedbackUrl: '//x3.adpushup.com/ApexWebService/feedback',
-		targetAllDFP: false
+		targetAllDFP: false,
+		dfpAdUnitTargeting: {
+			networkId: 103512698
+		}
 	},
 	hbConfig: {
 		'pulsepoint': {

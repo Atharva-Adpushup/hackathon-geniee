@@ -42,10 +42,10 @@ $(document).ready(function () {
                     pbPassbackWrapper: '.pbpassback-wrapper'
                 },
                 dfpTargeting: {
-                    networkId: '<div class="dfptargeting-pane row"><div class="col-sm-3 input-name">Network Id</div><div class="col-sm-4"><input class="form-control" type="text" name="networkId" required placeholder="Please enter the network Id" /></div></div>',
-                    adUnit: '<div class="row dfptargeting-pane dfp-adunit"><div class="col-sm-3 input-name">Ad Unit</div><div class="col-sm-4"><input class="form-control" type="text" name="dfpAdUnit" required placeholder="Please enter DFP Ad unit" /></div></div>'
+                    networkId: '<div class="dfptargeting-pane row"><div class="col-sm-3 input-name">Network Id</div><div class="col-sm-4"><input class="form-control" type="text" name="networkId" placeholder="Please enter the network Id" /></div></div>',
+                    adUnit: '<div class="row dfptargeting-pane dfp-adunit"><div class="col-sm-3 input-name">Ad Unit</div><div class="col-sm-4"><input class="form-control" type="text" name="dfpAdUnit" placeholder="Please enter DFP Ad unit" /></div></div>'
                 },
-                pbPassbackInput: '<div class="row pbpassback-input"> <div class="col-sm-3"> <input class="form-control" required="required" type="text" name="pbAdUnit" placeholder="Ad Unit"/> </div><div class="col-sm-4"> <input class="form-control" required="required" type="text" name="pbCode" placeholder="Code"/> </div><button type="button" class="close hb-close-pane hb-close-pane-static">x</button></div>'
+                pbPassbackInput: '<div class="row pbpassback-input"> <div class="col-sm-3"> <input class="form-control" type="text" name="pbAdUnit" placeholder="Ad Unit"/> </div><div class="col-sm-4"> <input class="form-control" required="required" type="text" name="pbCode" placeholder="Code"/> </div><button type="button" class="close hb-close-pane hb-close-pane-static">x</button></div>'
             },
 
             // Check whether to show dfp panel or not
@@ -344,15 +344,16 @@ $(document).ready(function () {
                 settings.targetAllDFP = this.showDFPAdUnitsTargeting() ? false : true; 
 
                 if(this.showDFPAdUnitsTargeting()) {
+                    var networkId = parseInt($('input[name="networkId"]').val(), 10);
                     settings.dfpAdUnitTargeting = {
-                        networkId: parseInt($('input[name="networkId"]').val(), 10)
+                        networkId: networkId ? networkId : w.defaultNetworkId
                     };
 
                     var dfpAdUnitInputs = $('input[name="dfpAdUnit"]'), 
                         adUnits = [];
                     dfpAdUnitInputs.each(function(i, el) {
                         var val = $(el).val();
-                        adUnits.push(val);
+                        val ? adUnits.push(val) : null;
                     });
 
                     settings.dfpAdUnitTargeting.adUnits = adUnits;
@@ -367,7 +368,7 @@ $(document).ready(function () {
                     var pbAdUnit = $(p).find('input[name="pbAdUnit"]').val(),
                         pbCode = $(p).find('input[name="pbCode"]').val();
 
-                    postBidPassbacks[pbAdUnit] = pbCode;
+                    (pbAdUnit && pbCode) ? postBidPassbacks[pbAdUnit] = pbCode : null;
                 });
                 settings.postbidPassbacks = postBidPassbacks;
 
@@ -460,19 +461,23 @@ $(document).ready(function () {
                     var s = $(this.templates.selectors.dfpTargetingPane),
                         that = this;
 
-                    adUnits.forEach(function(adUnit, key) {
-                        var dfpAdUnitInput = $(that.templates.dfpTargeting.adUnit),
-                            siblings = $(s).siblings(that.templates.selectors.dfpTargetingPane);
+                    if(adUnits.length) {
+                        adUnits.forEach(function(adUnit, key) {
+                            var dfpAdUnitInput = $(that.templates.dfpTargeting.adUnit),
+                                siblings = $(s).siblings(that.templates.selectors.dfpTargetingPane);
 
-                        if(siblings.length >= 1) {
-                            dfpAdUnitInput.insertAfter(siblings[key-1]);
-                            dfpAdUnitInput.append(that.templates.buttons.closeBtnStatic);
-                        } else {
-                            dfpAdUnitInput.insertAfter(s);
-                        }
+                            if(siblings.length >= 1) {
+                                dfpAdUnitInput.insertAfter(siblings[key-1]);
+                                dfpAdUnitInput.append(that.templates.buttons.closeBtnStatic);
+                            } else {
+                                dfpAdUnitInput.insertAfter(s);
+                            }
 
-                        $(dfpAdUnitInput).find('input').val(adUnit);
-                    });
+                            $(dfpAdUnitInput).find('input').val(adUnit);
+                        });
+                    } else {
+                        $(that.templates.dfpTargeting.adUnit).insertAfter(s);
+                    }
                 }
             },
 
@@ -480,7 +485,7 @@ $(document).ready(function () {
             showDfpTargetingPane: function(settings) {
                 if(this.showDFPAdUnitsTargeting()) {
                     $(this.templates.selectors.hbSettings).append(this.templates.dfpTargeting.networkId);
-                    settings && settings.dfpAdUnitTargeting ? $('input[name="networkId"]').val(settings.dfpAdUnitTargeting.networkId) : null; 
+                    (settings && settings.dfpAdUnitTargeting && settings.dfpAdUnitTargeting.networkId) ? $('input[name="networkId"]').val(settings.dfpAdUnitTargeting.networkId) : $('input[name="networkId"]').val(w.defaultNetworkId); 
 
                     if(settings && settings.dfpAdUnitTargeting && settings.dfpAdUnitTargeting.adUnits) {
                         this.renderDFPAdUnitInput(settings.dfpAdUnitTargeting.adUnits);
