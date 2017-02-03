@@ -11,7 +11,7 @@ module.exports = {
 	},
 	hbGlobalSettingDefaults: {
 		prebidTimeout: 5000,
-		e3FeedbackUrl: '//x3.adpushup.com/ApexWebService/feedback',
+		e3FeedbackUrl: '//e3.adpushup.com/ApexWebService/feedback',
 		targetAllDFP: false,
 		dfpAdUnitTargeting: {
 			networkId: 103512698
@@ -29,8 +29,8 @@ module.exports = {
 				cf: {validations: {'required': true}, alias: "Tag Size"},
 			}
 		},
-		'sekindo': {
-			name: 'sekindo',
+		'sekindoUM': {
+			name: 'sekindoUM',
 			isHb: true,
 			global: {},
 			local: {
