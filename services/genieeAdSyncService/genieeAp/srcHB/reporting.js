@@ -2,7 +2,7 @@ var config = require('./config/config'),
 	ajax = require('@fdaciuk/ajax'),
 	utils = require('./libs/utils'),
 	logger = require('./libs/logger'),
-
+	access = require('safe-access'),
 	adpTags = require('./adpTags');
 
 var pbjsWinners = {},
@@ -18,7 +18,7 @@ function sendBidData(){
 		logger.info("sending data for %s ", Object.keys(pbjsWinners).join(' ') );
 
     var builtUrl = utils.buildUrl(config.e3FeedbackUrl, {
-      "packetId" : packetId,
+      "packetId" : access(window, 'adpushup.config.packetId') || packetId,
       "siteId" : config.siteId,
       "eventType" : 10,
       "ts" : +(new Date()),
