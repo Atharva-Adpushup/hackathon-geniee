@@ -52,7 +52,7 @@ block bodyContent
                                 a Header Bidding - #{utils.domanize(siteDomain)}
 
                             form#hbform.settings-pane
-                                input(type="hidden", id="setupOp" value=(hbSetupData ? 'edit' : 'create'))
+                                input(type="hidden", id="setupOp" value="#{operation}")
                                 .row
                                     .col-sm-12
                                         h4 Configure Header Bidding by setting all options below

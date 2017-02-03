@@ -39,7 +39,7 @@ function checkAuth(req, res, next) {
 };
 
 // Function to render header bidding setup panel
-function renderHbPanel(site, UiData, res, hbConfig) {
+function renderHbPanel(site, UiData, res, op, hbConfig) {
     var data = {
         siteDomain: site.get('siteDomain'),
         countries: JSON.stringify(UiData.countries),
@@ -47,7 +47,8 @@ function renderHbPanel(site, UiData, res, hbConfig) {
         adSizes: JSON.stringify(_.uniq(UiData.adSizes)),
         hbPartners: JSON.stringify(UiData.hbPartners),
         hbConfig: JSON.stringify(commonConsts.hbConfig),
-        hbGlobalSettingDefaults: commonConsts.hbGlobalSettingDefaults
+        hbGlobalSettingDefaults: commonConsts.hbGlobalSettingDefaults,
+        operation: op
     };
 
     if (hbConfig) {
@@ -65,13 +66,15 @@ function populateHbConfigPanel(sitePromise, appBucketPromise, UiData, siteId, re
             return Promise.all([site, hbConfigPromise]);
         })
         .spread(function (site, hbConfig) {
-            return renderHbPanel(site, UiData, res, hbConfig);
+            var op = 'edit';
+            return renderHbPanel(site, UiData, res, op, hbConfig);
         })
         .catch(function (err) {
             if (err.code === 13) {
                 return siteModel.getSiteById(siteId)
                     .then(function (site) {
-                        return renderHbPanel(site, UiData, res);
+                        var op = 'create';
+                        return renderHbPanel(site, UiData, res, op);
                     });
             }
             else {
