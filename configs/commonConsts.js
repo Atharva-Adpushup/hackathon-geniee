@@ -29,6 +29,14 @@ module.exports = {
 				cf: {validations: {'required': true}, alias: "Tag Size"},
 			}
 		},
+		'sekindo': {
+			name: 'sekindo',
+			isHb: true,
+			global: {},
+			local: {
+				spaceId: {validations: {'required': true}, alias: "Space Id"},
+			}
+		},
 		'wideorbit': {
 			name: 'wideorbit',
 			isHb: true,
