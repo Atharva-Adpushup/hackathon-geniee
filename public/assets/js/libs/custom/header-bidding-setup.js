@@ -369,7 +369,7 @@ $(document).ready(function () {
 
                     postBidPassbacks[pbAdUnit] = pbCode;
                 });
-                settings.postBidPassbacks = postBidPassbacks;
+                settings.postbidPassbacks = postBidPassbacks;
 
                 return settings;
             },
