@@ -9,6 +9,7 @@ var express = require('express'),
 	adxReportModel = require('../models/adxModel'),
 	apexReportService = require('../reports/default/apex/ctrPerformanceInTabularData/service'),
 	apexVariationReportService = require('../reports/default/apex/service'),
+	universalReportService = require('../reports/universal/index'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
 	moment = require('moment'),
@@ -461,6 +462,18 @@ router
 			.then(function(reportData) {
 				return res.json(reportData);
 			});
+	})
+
+	.get('/getUniversalReportData', function(req, res) {
+		var siteId = req.query.siteId;
+
+		return siteModel.getSiteById(siteId)
+			.then(function(site) {
+				return universalReportService.getReportData(site)
+					.then(function(reportData) {
+						return res.json(reportData);
+					});
+			})
 	})
 
 	.get('/performESSearch', function(req, res) {
