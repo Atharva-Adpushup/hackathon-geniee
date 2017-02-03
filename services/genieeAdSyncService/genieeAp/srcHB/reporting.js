@@ -24,10 +24,12 @@ function sendBidData(){
       "ts" : +(new Date()),
     });
 
-    ajax().post(builtUrl, {
-     		partners : JSON.stringify(Object.values(pbjsWinners) || []),
-     		dfp      : JSON.stringify(Object.values(dfpWinners)  || [])
-    });
+    ajax().post(builtUrl,{
+	    	hbJsonData: JSON.stringify({
+	     		partners : Object.values(pbjsWinners) || [],
+	     		dfp      : Object.values(dfpWinners)  || []
+	    })
+	  });
 }
 
 function constructBidData(bidObjData) {
