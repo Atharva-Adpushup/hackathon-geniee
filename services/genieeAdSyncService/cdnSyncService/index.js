@@ -4,8 +4,7 @@ var path = require('path'),
     _ = require('lodash'),
 	moment = require('moment'),
     PromiseFtp = require('promise-ftp'),
-    genieeReportService = require('../../../reports/partners/geniee/service'),
-	apexVariationReportService = require('../../../reports/default/apex/service'),
+    universalReportService = require('../../../reports/universal/index'),
     mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
     fs = Promise.promisifyAll(require('fs')),
 	AdPushupError = require('../../../helpers/AdPushupError'),
@@ -15,20 +14,12 @@ var path = require('path'),
 module.exports = function (site) {
     ftp = new PromiseFtp();
 
-    var jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.js'),
-        tempDestPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'geniee', site.get('siteId').toString()),
+    var paramConfig = {
+            siteId: site.get('siteId')
+        },
         isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
-        isGenieePartner = (!!(site.get('partner') && (site.get('partner') === CC.partners.geniee.name) && site.get('genieeMediaId') && isAutoOptimise)),
-        // NOTE: A date after which console.adpushup.com was made live
-        // This date is chosen as startDate to get data parameters (page views, clicks etc) for every site
-        // from its day one
-        startDate = "20161201",
-		paramConfig = {
-			siteId: site.get('siteId'),
-            mediaId: site.get('genieeMediaId'),
-			dateFrom: moment(startDate).format('YYYY-MM-DD'),
-			dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
-		},
+        jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.js'),
+        tempDestPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'geniee', site.get('siteId').toString()),
         getAdsPayload = function (variationSections) {
             var ads = [], ad = null, json, unsyncedAds = false;
             _.each(variationSections, function (section, sectionId) {
@@ -154,50 +145,15 @@ module.exports = function (site) {
             return apConfigs;
         },
         getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
-        getReportData = function(paramConfig) {
-            var reportConfig = {
-                siteId: paramConfig.siteId,
-                startDate: moment(paramConfig.dateFrom).valueOf(),
-                endDate: moment().subtract(0, 'days').valueOf()
-            };
-
-            return apexVariationReportService.getReportData(reportConfig)
-                .then(function(reportData) {
-                    return getVariationsPayload(site, reportData).then(setAllConfigs);
-                }).catch(function(e) {
-                    /**********NOTE: SPECIAL CONDITION (APEX REPORTS)**********/
-                    // Only return variations payload without apex reports data when
-                    // Apex reports return an empty report for any variation
-                    // & consequently throws below exception message
-                    if (e && (e instanceof AdPushupError) && e.message && e.message === CC.exceptions.str.apexServiceDataEmpty) {
-                        return getVariationsPayload(site).then(setAllConfigs);
-                    }
-
-                    throw e;
-                });
-        },
-        getGenieeReportData = function(paramConfig) {
-            return genieeReportService.getReport(paramConfig).then(function(reportData) {
-                return getVariationsPayload(site, reportData).then(setAllConfigs);
-            }).catch(function(e) {
-                /**********NOTE: SPECIAL CONDITION (GENIEE REPORTS)**********/
-                // Only return variations payload without geniee reports data when
-                // Geniee reports return an empty Array [] & consequently throws below exception message
-                if (e && (e instanceof AdPushupError) && e.message && e.message === CC.partners.geniee.exceptions.str.zonesEmpty) {
-                    return getVariationsPayload(site).then(setAllConfigs);
-                }
-
-                throw e;
-            });
-        },
         getComputedConfig = Promise.resolve(true).then(function() {
-            if (isGenieePartner) {
-                return getGenieeReportData(paramConfig);
-            } else if (isAutoOptimise) {
-                return getReportData(paramConfig);
-            } else {
-                return getVariationsPayload(site).then(setAllConfigs);
-            }
+            return universalReportService.getReportData(site)
+                .then(function(reportData) {
+                    if (!reportData.status && !reportData.data) {
+                        return getVariationsPayload(site).then(setAllConfigs);
+                    } else if (reportData.status && reportData.data) {
+                        return getVariationsPayload(site, reportData.data).then(setAllConfigs);
+                    }
+                });
         }),
         getFinalConfig = Promise.join(getComputedConfig, getJsFile, function (finalConfig, jsFile) {
             jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(finalConfig));
