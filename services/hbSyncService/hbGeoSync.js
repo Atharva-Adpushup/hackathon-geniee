@@ -22,7 +22,7 @@ function constructHBJsFile(jsContents, indiHbConfig, siteData){
 	jsContents = jsContents
 		.replace('__HB_SITE_ID__', siteData.siteId)
 		.replace('__HB_SITE_DOMAINS__', JSON.stringify(domainNames) )
-		.replace('__HB_BIDDING_PARTNERS__', JSON.stringify(indiHbConfig) )
+		.replace('__HB_BIDDING_PARTNERS__', JSON.stringify(indiHbConfig.info) )
 		.replace('__HB_FEEDBACK_URL__', JSON.stringify(hbGlobalSettings.e3FeedbackUrl) )
 		.replace('__HB_PREBID_TIMEOUT__', hbGlobalSettings.prebidTimeout || 5000);
 
