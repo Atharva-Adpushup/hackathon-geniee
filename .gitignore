@@ -15,6 +15,7 @@ logs/
 .DS_Store
 *.log
 *.map
+fabfile.pyc
 composer.phar
 composer.lock
 config.urls.php
