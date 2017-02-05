@@ -3,11 +3,9 @@ from fabric.api import *
 from fabric.context_managers import lcd
 from fabric.state import env
 
-def localhost():
-	env.hosts = ['localhost']
+env.hosts = ['localhost']
 
-
-def deployApp():
+def build():
 	path = "./"
 	jsPath = path + "/services/genieeAdSyncService/genieeAp/"
 	editorPath = path + "/Editor/"
