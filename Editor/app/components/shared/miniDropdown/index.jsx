@@ -2,6 +2,7 @@
 
 import React, { PropTypes } from 'react';
 import './miniDropdown.scss';
+import ClickOutside from 'react-click-outside';
 
 class MiniDropdown extends React.Component {
 	constructor(props) {
@@ -23,18 +24,19 @@ class MiniDropdown extends React.Component {
 		const context = this.props.context;
 		return (
 			this.state.showDropdown ? (
-				<div className="mini-dropdown-wrapper">
-					<button onClick={this.hideDropdown}>x</button>
-					<ul className="mini-dropdown" style={(this.props.dropDownItems && this.props.dropDownItems.length > 3) ? { overflowY: 'scroll', overflowX: 'hidden' } : {}}>
-						{
-							this.props.dropDownItems.map((item, key) => (
-								<li onClick={this.props.selectHandler.bind(context, item)} key={key}>
-									{item}
-								</li>
-							))
-						}
-					</ul>
-				</div>
+				<ClickOutside onClickOutside={this.hideDropdown}>
+					<div className="mini-dropdown-wrapper">
+						<ul className="mini-dropdown" style={(this.props.dropDownItems && this.props.dropDownItems.length > 3) ? { overflowY: 'scroll', overflowX: 'hidden' } : {}}>
+							{
+								this.props.dropDownItems.map((item, key) => (
+									<li onClick={this.props.selectHandler.bind(context, item)} key={key}>
+										{item}
+									</li>
+								))
+							}
+						</ul>
+					</div>
+				</ClickOutside>
 			) : null
 		);
     }
