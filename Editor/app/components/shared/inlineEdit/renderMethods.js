@@ -1,7 +1,7 @@
 // Inline edit render methods
 
 import { Row, Button, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import MiniDropdown from 'shared/MiniDropdown';
+import MiniDropdown from 'shared/MiniDropdown/index';
 
 const renderDropdownList = that => {
 	return <MiniDropdown showDropdown dropDownItems={that.props.dropdownList} selectHandler={that.selectDropdownValue} context={that} />;
