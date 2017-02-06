@@ -1,4 +1,4 @@
-	var logger = require('./libs/logger'),
+var logger = require('./libs/logger'),
 	utils = require('./libs/utils'),
 
 	sandBoxbids = require('./sandboxbids'),
@@ -22,7 +22,6 @@ var adpTags = {
 		if( dAUT.targetAllAdUnits ||
 				dAUT.adUnits.indexOf(slotId) !== -1 || dAUT.adUnits.indexOf('*') !== -1
 			) {
-			slotId = "/" + dAUT.networkId + "/" + slotId;
 			setDFP = true;
 
 			this.setDFPForSlot(slotId);
@@ -106,8 +105,10 @@ var adpTags = {
 		var me = this;
 
 		googletag.cmd.push(function(){
-			var slot = me.adpSlots[slotId];
-			slot.gSlot = googletag.defineSlot(slot.slotId, slot.size, slot.containerId);
+			var slot = me.adpSlots[slotId],
+				dAUT = config.dfpAdUnitTargeting;
+
+			slot.gSlot = googletag.defineSlot("/" + dAUT.networkId + "/" + slotId, slot.size, slot.containerId);
 		});
 
 	},
@@ -168,6 +169,7 @@ var adpTags = {
 			logger.info("adding GPT service for slot (%s)", slotId);
 
 			googletag.cmd.push(function(){
+
 				slot.gSlot.addService(googletag.pubads());
 				googletag.enableServices();
 
@@ -246,16 +248,15 @@ var adpTags = {
 		var me = this;
 
 		googletag.cmd.push(function(){
-
 			googletag.pubads().addEventListener('slotRenderEnded', function ( event ) {
-				var slotId = event.slot.getAdUnitPath();
+				var slotId = event.slot.getAdUnitPath().match('/[0-9]+/(.*)$');
 
-				if( me.adpSlots[ slotId ] ) {
-					logger.info("emitting event dfpSlotRender for slot (%s) ", slotId);
+				if( me.adpSlots[ slotId[1] ] ) {
+					logger.info("emitting event dfpSlotRender for slot (%s) ", slotId[1]);
 
-					me.adpSlots[ slotId ].isRendered = true;
+					me.adpSlots[ slotId[1] ].isRendered = true;
 					me.emit('dfpSlotRender', {
-						slotId       : slotId,
+						slotId       : slotId[1],
 						advertiserId : event.advertiserId,
 						lineItemId   : event.lineItemId,
 						creativeId   : event.creativeId,
