@@ -1,3 +1,7 @@
+/**!
+ * version: 0.0.1
+*/
+
 function main() {
 	var adpQue;
 
