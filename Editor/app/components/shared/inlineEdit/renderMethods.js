@@ -1,22 +1,10 @@
 // Inline edit render methods
 
 import { Row, Button, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import MiniDropdown from 'shared/MiniDropdown';
 
 const renderDropdownList = that => {
-	return (
-		<div className="inline-dropdown-wrapper">
-			<button onClick={that.hideDropdown.bind(that)}>x</button>
-			<ul className="inline-dropdown" style={(that.props.dropdownList && that.props.dropdownList.length > 3) ? { overflowY: 'scroll', overflowX: 'hidden' } : {}}>
-				{
-					that.props.dropdownList.map((xpath, key) => (
-						<li onClick={that.selectDropdownValue.bind(that, xpath)} key={key}>
-							{xpath}
-						</li>
-					))
-				}
-			</ul>
-		</div>
-	);
+	return <MiniDropdown showDropdown dropDownItems={that.props.dropdownList} selectHandler={that.selectDropdownValue} context={that} />;
 },
 	renderActionButtons = that => {
 		return (
