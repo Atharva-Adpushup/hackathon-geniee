@@ -4,6 +4,7 @@ import MenuItem from 'shared/menu/menuItem.jsx';
 import Info from './info.jsx';
 import CloseChannel from './closeChannel.jsx';
 import NumericCollectionManager from 'components/shared/NumericCollectionManager/index.jsx';
+import { uiCollections } from 'consts/commonConsts';
 
 const channelMenu = ({ isVisible, activeChannelId, allTrafficDistributions, editTrafficDistribution,
 	position, hideMenu, saveSampleUrl, channel, partner, closeChannel, changeContentSelector }) => {
@@ -21,7 +22,13 @@ const channelMenu = ({ isVisible, activeChannelId, allTrafficDistributions, edit
 				const value = config[key];
 				editTrafficDistribution(key, value);
 			});
+		},
+		trafficDistributionConfig = {
+			description: uiCollections.trafficDistribution.description,
+			sumMismatchErrorMessage: uiCollections.trafficDistribution.errorMessage.sumMismatch
 		};
+
+	trafficDistributionConfig.sumMismatchErrorMessage.push(<strong key="td-max-value">100</strong>);
 
 	items.push((
 		<MenuItem key={1} icon="fa fa-info" contentHeading="Page Group Info">
@@ -31,7 +38,8 @@ const channelMenu = ({ isVisible, activeChannelId, allTrafficDistributions, edit
 
 	items.push((
 		<MenuItem key={2} icon="fa fa-exchange" contentHeading="Traffic Distribution">
-			<NumericCollectionManager collection={allTrafficDistributions} required title={channel.channelName} maxValue={100} onSave={a => saveTrafficDistributions(a)} />
+			<NumericCollectionManager description={trafficDistributionConfig.description} sumMismatchErrorMessage={trafficDistributionConfig.sumMismatchErrorMessage}
+				collection={allTrafficDistributions} uiMinimal required maxValue={100} onSave={a => saveTrafficDistributions(a)} />
 		</MenuItem>
 	));
 

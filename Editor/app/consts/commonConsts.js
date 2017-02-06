@@ -222,6 +222,19 @@ const status = {
 		NETWORK_MANAGER: 'NETWORK_MANAGER',
 		SECTION_MANAGER: 'SECTION_MANAGER'
 	},
+	ui = {
+		components: {
+			collections: {
+				trafficDistribution: {
+					errorMessage: {
+						sumMismatch: ['The total traffic allocation for all variations must equal ']
+					},
+					description: 'Specify the traffic you want to set for each variation in the page group:'
+				}
+			}
+		}
+	},
+	uiCollections = ui.components.collections,
 	commonSupportedSizes = [
 		{
 			layoutType: 'SQUARE',
@@ -273,5 +286,5 @@ export {
 	adBoxSizeStyles, commonSupportedSizes, nonPartnerAdSizes, variationActions,
 	hbBoxActions, innerVariationActions, innerActions,
 	defaultSectionCss, leftSectionCss, rightSectionCss,
-	components, siteModesPopoverActions, channelMenuActions, uiActions
+	components, siteModesPopoverActions, channelMenuActions, uiActions, ui, uiCollections
 };

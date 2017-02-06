@@ -109,6 +109,14 @@
         padding: $FMLayoutDimension/2 0;
     }
 }
+.form-group-wrapper
+{
+    > .form-group-desc
+    {
+        color: $dimFontColor;
+        margin: 0 0 10px;
+    }
+}
 .form-group.form-group--horizontal
 {
     .form-control
@@ -132,6 +140,22 @@
             .form-control
             {
                 width: 47%;
+            }
+        }
+    }
+    &.form-group--numeric-range
+    {
+        .error-message
+        {
+            line-height: 1.45em;
+        }
+
+        &.is-ui-minimal
+        {
+            .panel
+            {
+                border: 0 !important;
+                box-shadow: none !important;
             }
         }
     }
