@@ -102,7 +102,7 @@ var GenieeReport = (function(w, $) {
         return date.toDateString().replace(" ", ", &nbsp;");
     }
 
-    function insertDateDesciption() {
+    function insertDateDescription() {
         var isParamConfig = this.paramConfig,
             isDateFilter = isFilterData(),
             filterDateKey = (!!isDateFilter ? Object.keys(this.filterData.date)[0] : null),
@@ -113,7 +113,7 @@ var GenieeReport = (function(w, $) {
             dateFromString = getDateString(dateConfig.dateFrom),
             dateToString = getDateString(dateConfig.dateTo),
             dateString = (dateFromString + "&nbsp; - &nbsp;" + dateToString),
-            $baseTemplate = $("<ol class='breadcrumb js-date-desc u-margin-0px'><li><span class='breadcrumb-title-prefix js-date-desc-title-prefix'>Date:</span></li></ol>"),
+            $baseTemplate = $("<ol class='breadcrumb js-date-desc u-margin-0px'><li><span class='breadcrumb-title-prefix js-date-desc-title-prefix'>Report Date:</span></li></ol>"),
             $contentTemplate = $("<a id='articlemyriad.com' class='breadcrumb-title js-date-desc-title active'></a>");
 
             $contentTemplate.html(dateString);
@@ -715,7 +715,7 @@ var GenieeReport = (function(w, $) {
         initSlideoutMenu();
         generateBreadCrumb();
         setTableHeading();
-        insertDateDesciption();
+        insertDateDescription();
         setPerfHeaderData(computedPerfHeaderData);
         setTableData(computedTableData, isPageGroupLevel);
 
