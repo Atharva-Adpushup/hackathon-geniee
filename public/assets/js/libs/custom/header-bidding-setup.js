@@ -503,6 +503,20 @@ $(document).ready(function () {
                 }
             },
 
+            // Sync all hb sites
+            syncAllHBSites: function() {
+                 $.ajax({
+                    method: 'GET',
+                    url: 'syncAllHBSites'
+                }).done(function (res) {
+                    if(res.success) {
+                        ap.apAlert('All header bidding - enabled sites have been synced!', '#hbalert', 'success', 'slideDown');
+                    } else {
+                        ap.apAlert('Some error occurred! Please try again later.', '#hbalert', 'error', 'slideDown');
+                    }
+                });
+            },
+
             // Initialise header bidding setup
             init: function () {
                 var setupData = w.hbSetupData ? w.hbSetupData.setup : null,
@@ -570,6 +584,11 @@ $(document).ready(function () {
         // Close panel trigger
         $('body').on('click', '.hb-close-pane', function () {
             $(this).parent().remove();
+        });
+
+        // Sync all HB  sites trigger
+        $('#syncAllHbSites').on('click', function() {
+            ap.headerBiddingSetup.syncAllHBSites();
         });
 
         // Setup form submit trigger

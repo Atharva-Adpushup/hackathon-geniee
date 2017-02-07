@@ -14,6 +14,7 @@ var express = require('express'),
     couchbase = require('../helpers/couchBaseService'),
     countryData = require('country-data'),
     Promise = require('bluebird'),
+    N1qlQuery = require('couchbase-promises').N1qlQuery,
     router = express.Router({ mergeParams: true });
 
 // Function to authenticate user for proper access
@@ -171,7 +172,26 @@ router
                 res.send({ success: 1 });
             })
             .catch(function (err) {
-                console.log(err);
+                res.send({ success: 0 });
+            });
+    })
+    .get('/:siteId/syncAllHBSites', function(req, res) {
+        var queryString = N1qlQuery.fromString('select siteId from apAppBucket where hbConfig is not null');
+        return couchbase.connectToAppBucket()
+            .then(function(appBucket) {
+                return appBucket.queryPromise(queryString);
+            })
+            .then(function(allHBSites) {
+                var hbSiteIds = _.map(allHBSites, function(hbSite) {
+                    return parseInt(hbSite.siteId, 10);
+                });
+                
+                // Emit event to sync all hb sites
+                adpushupEvent.emit('hbAllSites', hbSiteIds);
+
+                res.send({ success: 1 });
+            })
+            .catch(function(err) {
                 res.send({ success: 0 });
             });
     })

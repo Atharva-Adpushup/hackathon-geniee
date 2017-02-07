@@ -56,7 +56,10 @@ block bodyContent
                                 input(type="hidden", id="setupOp" value="#{operation}")
                                 .row
                                     .col-sm-12
-                                        h4 Configure Header Bidding by setting all options below
+                                        h4 
+                                            | Configure Header Bidding by setting all options below
+                                            button#syncAllHbSites.btn.btn-lightBg.btn-default.pull-right.mb-10(style="margin-top: -10px;" type="button") 
+                                                | Sync All HB Sites
 
                                 #accordion.accordion.panel-group(role='tablist', aria-multiselectable='true')
                                     .accordion-pane.panel.panel-default
