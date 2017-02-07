@@ -71,10 +71,14 @@ module.exports = {
 				computedData.pageGroups[pageGroupKey].pageCTR += Number(variationObj.pageCTR);
 			});
 
-			computedData.pageGroups[pageGroupKey].revenue = Number(computedData.pageGroups[pageGroupKey].revenue.toFixed(2));
-			computedData.pageGroups[pageGroupKey].ctr = Number(computedData.pageGroups[pageGroupKey].ctr.toFixed(2));
-			computedData.pageGroups[pageGroupKey].pageRPM = Number(computedData.pageGroups[pageGroupKey].pageRPM.toFixed(2));
-			computedData.pageGroups[pageGroupKey].pageCTR = Number(computedData.pageGroups[pageGroupKey].pageCTR.toFixed(2));
+			// Set Default value if falsy
+			computedData.pageGroups[pageGroupKey].revenue = Number(computedData.pageGroups[pageGroupKey].revenue.toFixed(2)) || 0;
+			computedData.pageGroups[pageGroupKey].ctr = Number(computedData.pageGroups[pageGroupKey].ctr.toFixed(2)) || 0;
+			computedData.pageGroups[pageGroupKey].pageRPM = Number(computedData.pageGroups[pageGroupKey].pageRPM.toFixed(2)) || 0;
+			computedData.pageGroups[pageGroupKey].pageCTR = Number(computedData.pageGroups[pageGroupKey].pageCTR.toFixed(2)) || 0;
+			computedData.pageGroups[pageGroupKey].click = computedData.pageGroups[pageGroupKey].click || 0;
+			computedData.pageGroups[pageGroupKey].impression = computedData.pageGroups[pageGroupKey].impression || 0;
+			computedData.pageGroups[pageGroupKey].pageViews = computedData.pageGroups[pageGroupKey].pageViews || 0;
 		});
 
 		return Promise.resolve(computedData);
