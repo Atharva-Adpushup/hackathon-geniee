@@ -28,7 +28,8 @@ const channelMenu = ({ isVisible, activeChannelId, allTrafficDistributions, edit
 			sumMismatchErrorMessage: uiCollections.trafficDistribution.errorMessage.sumMismatch
 		};
 
-	trafficDistributionConfig.sumMismatchErrorMessage.push(<strong key="td-max-value">100</strong>);
+	trafficDistributionConfig.sumMismatchErrorMessage = trafficDistributionConfig.sumMismatchErrorMessage.map((text, id) => <span key={`td-error-${id}`}>{text}</span>);
+	trafficDistributionConfig.sumMismatchErrorMessage.push(<strong key="td-error-max-value">100</strong>);
 
 	items.push((
 		<MenuItem key={1} icon="fa fa-info" contentHeading="Page Group Info">
