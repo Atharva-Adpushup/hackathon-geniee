@@ -176,7 +176,7 @@ router
             });
     })
     .get('/:siteId/syncAllHBSites', function(req, res) {
-        var queryString = N1qlQuery.fromString('select siteId from apAppBucket where hbConfig is not null');
+        var queryString = N1qlQuery.fromString('select siteId from AppBucket where hbConfig is not null');
         return couchbase.connectToAppBucket()
             .then(function(appBucket) {
                 return appBucket.queryPromise(queryString);
