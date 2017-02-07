@@ -74,20 +74,11 @@
   .text-medium {
     margin: 20px 0 -20px;
   }
+}
 
-  .cog {
-    padding: 20px;
-    color: darken($lightGrey, 4%);
-
-    .cog-big {
-      font-size: 6em;
-    }
-
-    .cog-small {
-      font-size: 4em;
-      @include css3-prefix(transform, rotate(-8deg));
-      margin-left: 3px;
-    }
+.btn-hbsync {
+  & > i {
+    margin-left: 5px;
   }
 }
 

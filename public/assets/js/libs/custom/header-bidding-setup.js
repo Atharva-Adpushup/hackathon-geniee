@@ -39,7 +39,8 @@ $(document).ready(function () {
                     dfpAdUnit: '.dfp-adunit',
                     btnStatic: '.btn-close-static',
                     pbPassbackInput: '.pbpassback-input',
-                    pbPassbackWrapper: '.pbpassback-wrapper'
+                    pbPassbackWrapper: '.pbpassback-wrapper',
+                    btnHbSync: '.btn-hbsync'
                 },
                 dfpTargeting: {
                     networkId: '<div class="dfptargeting-pane row"><div class="col-sm-3 input-name">Network Id</div><div class="col-sm-4"><input class="form-control" type="text" name="networkId" placeholder="Please enter the network Id" /></div></div>',
@@ -505,10 +506,13 @@ $(document).ready(function () {
 
             // Sync all hb sites
             syncAllHBSites: function() {
+                var that = this;
+                $(that.templates.selectors.btnHbSync).find('.fa-refresh').addClass('fa-spin');
                  $.ajax({
                     method: 'GET',
                     url: 'syncAllHBSites'
                 }).done(function (res) {
+                     $(that.templates.selectors.btnHbSync).find('.fa-refresh').removeClass('fa-spin');
                     if(res.success) {
                         ap.apAlert('All header bidding - enabled sites have been synced!', '#hbalert', 'success', 'slideDown');
                     } else {
