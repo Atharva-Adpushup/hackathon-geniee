@@ -45,7 +45,7 @@ function renderHbPanel(site, UiData, res, op, hbConfig) {
         siteDomain: site.get('siteDomain'),
         countries: JSON.stringify(UiData.countries),
         continents: JSON.stringify(commonConsts.hbContinents),
-        adSizes: JSON.stringify(_.uniq(UiData.adSizes)),
+        adSizes: JSON.stringify(UiData.adSizes),
         hbPartners: JSON.stringify(UiData.hbPartners),
         hbConfig: JSON.stringify(commonConsts.hbConfig),
         hbGlobalSettingDefaults: commonConsts.hbGlobalSettingDefaults,
@@ -93,11 +93,10 @@ function getHbUiData() {
             name: country.name,
             code: country.alpha2
         };
-    }), adSizes = [], hbPartners = [];
+    }), hbPartners = _.map(commonConsts.hbConfig, function (hbPartner) {
+        return hbPartner.isHb ? hbPartner.name : null;
+    }), adSizes = [];
 
-    _.forIn(commonConsts.hbConfig, function (hbPartner) {
-        hbPartner.isHb ? hbPartners.push(hbPartner.name) : null;
-    });
     _.forEach(commonConsts.supportedAdSizes, function (layout) {
         _.forEach(layout.sizes, function (size) {
             adSizes.push(size.width + 'x' + size.height);
@@ -107,7 +106,7 @@ function getHbUiData() {
     return {
         countries: countries,
         hbPartners: hbPartners,
-        adSizes: adSizes
+        adSizes: _.uniq(adSizes)
     };
 };
 
