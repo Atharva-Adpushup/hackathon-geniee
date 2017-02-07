@@ -61,7 +61,8 @@ class collection extends React.Component {
 			rowInputLabelText = rowItem.name;
 
 			rows.push((
-				<CustomInputNumber key={rowItemKey} ref={rowItemKey} labelText={rowInputLabelText} layout="horizontal" min={0} max={100} onChange={this.handleInputChange} step={1} value={rowInputValue} />
+				<CustomInputNumber key={rowItemKey} ref={rowItemKey} labelText={rowInputLabelText}
+					layout="horizontal" min={0} max={100} onChange={this.handleInputChange} step={1} value={rowInputValue} />
 			));
 		}
 
@@ -207,9 +208,14 @@ collection.defaultProps = {
 };
 
 collection.propTypes = {
-	name: PropTypes.string,
-	collection: PropTypes.array,
-	onChange: PropTypes.func
+	name: PropTypes.string.isRequired,
+	maxValue: PropTypes.number.isRequired,
+	collection: PropTypes.array.isRequired,
+	onSave: PropTypes.func.isRequired,
+	description: PropTypes.string,
+	sumMismatchErrorMessage: PropTypes.any,
+	required: PropTypes.bool,
+	uiMinimal: PropTypes.bool
 };
 
 export default collection;
