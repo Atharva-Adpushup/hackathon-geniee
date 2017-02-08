@@ -220,15 +220,22 @@ var adpTags = {
 
     } else {
 
+    	var passbackHTML;
     	slot.isRendered = true;
 
   		if( config.postbidPassbacks[slotId] ) {
   			logger.info("no bids for the ad slot. rendering defined passback for slot (%s)", slotId);
-  			renderPassback(config.postbidPassbacks[slotId]);
+  			passbackHTML = config.postbidPassbacks[slotId];
 
   		} else if( config.postbidPassbacks['*'] ) {
   			logger.info("no bids for the ad slot. rendering defined passback for all (%s)", slotId);
-    		renderPassback(config.postbidPassbacks['*']);
+    		passbackHTML = config.postbidPassbacks['*'];
+  		}
+
+  		try {
+  			renderPassback( atob(passbackHTML) );
+  		} catch(e) {
+  			logger.info("failed to render passback for slot (%s)", slotId);
   		}
 
     	me.emit('postBidSlotRender', {
