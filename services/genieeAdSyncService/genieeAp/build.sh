@@ -1,2 +1,2 @@
-cd srcHB/PrebidSource && npm install && gulp
+cd srcHB/PrebidSource && git pull && npm install && gulp
 cd ../../ && webpack -p
