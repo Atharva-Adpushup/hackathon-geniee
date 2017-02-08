@@ -1,38 +1,35 @@
-import { combineReducers } from 'redux';
 import { status, siteModes, uiActions } from 'consts/commonConsts';
 
-const modeStatus = (state = { mode: siteModes.DRAFT }, action) => {
+const initialState = { mode: siteModes.DRAFT, partner: null },
+	site = (state = {}, action) => {
 		switch (action.type) {
 			case uiActions.UPDATE_AFTER_SAVE_STATUS:
 				const isCurrentModeDraft = (action.status === status.SUCCESS) && (state.mode === siteModes.DRAFT) && action.updateModeStatus,
 					isCurrentModePublish = (action.status === status.SUCCESS) && (state.mode === siteModes.PUBLISH) && action.updateModeStatus;
 
 				if (isCurrentModeDraft) {
-					return {
-						mode: siteModes.PUBLISH
-					};
+					return siteModes.PUBLISH;
 				} else if (isCurrentModePublish) {
-					return {
-						mode: siteModes.DRAFT
-					};
+					return siteModes.DRAFT;
 				}
 
-				return state;
+				return state.mode;
 
 			default:
 				return state;
 		}
 	},
-	siteData = (state = { partner: null }, action) => {
+	siteData = (state = initialState, action) => {
 		switch (action.type) {
-			case '':
-				break;
+			case uiActions.UPDATE_AFTER_SAVE_STATUS:
+				return {
+					...state,
+					mode: site(state, action)
+				};
 
 			default:
 				return state;
 		}
 	};
 
-export default combineReducers({
-	modeStatus, siteData
-});
+export default siteData;

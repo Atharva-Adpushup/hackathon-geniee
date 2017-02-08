@@ -20,13 +20,9 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 					result = normalize(parsedData.channels, arrayOf(channelSchema)),
 					computedResult = $.extend(true, {}, result.entities);
 
-				computedResult.site = {
-					modeStatus: {
-						mode: ((parsedData.site.hasOwnProperty('apConfigs')) ? parseInt(parsedData.site.apConfigs.mode, 10) : siteModes.DRAFT)
-					},
-					siteData: {
-						partner: rawData.site.partner || null
-					}
+				computedResult.siteData = {
+					mode: ((parsedData.site.hasOwnProperty('apConfigs')) ? parseInt(parsedData.site.apConfigs.mode, 10) : siteModes.DRAFT),
+					partner: rawData.site.partner || null
 				};
 
 				computedResult.channelData = {
