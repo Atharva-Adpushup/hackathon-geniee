@@ -1,7 +1,6 @@
 // Mini dropdown component
 
 import React, { PropTypes } from 'react';
-import './miniDropdown.scss';
 import ClickOutside from 'react-click-outside';
 
 class MiniDropdown extends React.Component {

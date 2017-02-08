@@ -1,7 +1,6 @@
 // Inline edit component
 
 import React, { PropTypes } from 'react';
-import './inlineEdit.scss';
 import { renderDropdownList, renderActionButtons, renderNormalMode, renderInlineEditPanel } from './renderMethods.js';
 
 class InlineEdit extends React.Component {
