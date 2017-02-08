@@ -9,6 +9,7 @@ module.exports = {
 		xpathWaitTimeout: 5000,
 		adpushupPercentage: 100
 	},
+	bidCpmAdjustments: {},
 	hbGlobalSettingDefaults: {
 		prebidTimeout: 5000,
 		e3FeedbackUrl: '//e3.adpushup.com/ApexWebService/feedback',

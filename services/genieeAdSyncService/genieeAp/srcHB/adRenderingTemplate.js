@@ -15,7 +15,7 @@ module.exports = "<html>" +
 				"prebidScript.text = 'var adpPrebid = ' + parent.adpPrebid.toString() + ';';" +
 				"head.appendChild(prebidScript);" +
 
-				"adpPrebid();" +
+				"adpPrebid(); parent.pbBidAdjustments.set(pbjs);" +
 
 				"var original = document.createElement;" +
         "document.createElement = function (tag) {" +

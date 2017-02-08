@@ -1,4 +1,4 @@
-/**!
+ /**!
  * version: 0.0.1
 */
 
@@ -15,6 +15,8 @@ function main() {
 
 	window.adpTags = require('./adpTags');
 	window.adpTags.que = window.adpTags.que.concat(adpQue);
+
+	window.pbBidAdjustments = require('./pbBidAdjustments');
 
 	window.googletag = window.googletag || {};
 	googletag.cmd = googletag.cmd || [];

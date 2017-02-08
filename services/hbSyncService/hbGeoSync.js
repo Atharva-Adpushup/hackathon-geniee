@@ -3,6 +3,8 @@ var path = require('path'),
     url = require('url'),
     retry = require('bluebird-retry'),
 
+    commonConsts = require('../../configs/commonConsts'),
+
     fs = Promise.promisifyAll(require('fs')),
     mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
 
@@ -24,7 +26,8 @@ function constructHBJsFile(jsContents, indiHbConfig, siteData){
 		.replace('__HB_SITE_DOMAINS__', JSON.stringify(domainNames) )
 		.replace('__HB_BIDDING_PARTNERS__', JSON.stringify(indiHbConfig.info) )
 		.replace('__HB_FEEDBACK_URL__', JSON.stringify(hbGlobalSettings.e3FeedbackUrl) )
-		.replace('__HB_PREBID_TIMEOUT__', hbGlobalSettings.prebidTimeout || 5000);
+		.replace('__HB_PREBID_TIMEOUT__', hbGlobalSettings.prebidTimeout || 5000)
+		.replace('__HB_BID_CPM_ADJUSTMENTS__', commonConsts.bidCpmAdjustments || {} );
 
 	if( siteData.hbConfig.targetAllDFP ) {
 		jsContents = jsContents.replace('__HB_TARGET_ALL_DFP__', true);
