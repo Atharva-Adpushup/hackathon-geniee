@@ -122,7 +122,7 @@ block bodyContent
                                                                 .col-sm-3
                                                                     input.form-control(type="text" value="#{adUnit}" name="pbAdUnit" placeholder="Ad Unit")
                                                                 .col-sm-4
-                                                                    input.form-control(type="text" value="#{code}" name="pbCode" placeholder="Code")
+                                                                    input.form-control.pbCode(type="text" value="#{code}" name="pbCode" placeholder="Code")
                                                                 - keyIndex = Object.keys(passbacks).indexOf(adUnit);
                                                                 if keyIndex
                                                                     button(type="button").close.hb-close-pane.hb-close-pane-static x

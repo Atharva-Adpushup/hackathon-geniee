@@ -369,7 +369,7 @@ $(document).ready(function () {
                     var pbAdUnit = $(p).find('input[name="pbAdUnit"]').val(),
                         pbCode = $(p).find('input[name="pbCode"]').val();
 
-                    (pbAdUnit && pbCode) ? postBidPassbacks[pbAdUnit] = pbCode : null;
+                    (pbAdUnit && pbCode) ? postBidPassbacks[pbAdUnit] = w.btoa(pbCode) : null;
                 });
                 settings.postbidPassbacks = postBidPassbacks;
 
@@ -593,6 +593,12 @@ $(document).ready(function () {
         // Sync all HB  sites trigger
         $('#syncAllHbSites').on('click', function() {
             ap.headerBiddingSetup.syncAllHBSites();
+        });
+
+        // Convert passback trigger
+        $('.pbCode').each(function(key, input) {
+            var val = $(input).val();
+            $(input).val(w.atob(val));
         });
 
         // Setup form submit trigger
