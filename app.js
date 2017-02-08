@@ -20,6 +20,12 @@ var express = require('express'),
 		frequency: '1mn',
 		verbose: false
 	}),
+	apiLogStream = FileStreamRotator.getStream({
+		date_format: 'YYYYMMDD',
+		filename: config.development.LOGS_DIR + '/api-access-%DATE%.log',
+		frequency: '1mn',
+		verbose: false
+	}),
 	// couchbase store
 	couchbaseStore = new CouchbaseStore({
 		bucket: config.couchBase.DEFAULT_BUCKET,
@@ -53,7 +59,27 @@ app.set('view engine', 'jade');
 
 // Setup the logger file
 fs.existsSync(config.development.LOGS_DIR) || fs.mkdirSync(config.development.LOGS_DIR);
-app.use(logger('combined', { stream: accessLogStream }));
+
+// Use combined morgan logging for all non-genieeApi requests and stream to log file
+app.use(logger('combined', {
+	skip: function (req, res) { 
+		return req.baseUrl === '/genieeApi';
+	}, stream: accessLogStream
+}));
+
+// Use combined morgan logging for all genieeApi requests and stream to log file
+app.use(logger('combined', {
+	skip: function (req, res) { 
+		return req.baseUrl !== '/genieeApi';
+	}, stream: apiLogStream
+}));
+
+// Use dev morgan logging for all genieeApi requests and stream to stdout
+app.use(logger('dev', {
+	skip: function (req, res) { 
+		return req.baseUrl !== '/genieeApi';
+	}
+}));
 
 // setup basics of express middlewares
 app.use(bodyParser.json({ limit: '5mb' }));
