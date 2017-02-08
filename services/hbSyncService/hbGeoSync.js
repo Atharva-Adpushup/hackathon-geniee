@@ -27,7 +27,7 @@ function constructHBJsFile(jsContents, indiHbConfig, siteData){
 		.replace('__HB_BIDDING_PARTNERS__', JSON.stringify(indiHbConfig.info) )
 		.replace('__HB_FEEDBACK_URL__', JSON.stringify(hbGlobalSettings.e3FeedbackUrl) )
 		.replace('__HB_PREBID_TIMEOUT__', hbGlobalSettings.prebidTimeout || 5000)
-		.replace('__HB_BID_CPM_ADJUSTMENTS__', commonConsts.bidCpmAdjustments || {} );
+		.replace('__HB_BID_CPM_ADJUSTMENTS__', JSON.stringify(commonConsts.bidCpmAdjustments || {}) );
 
 	if( siteData.hbConfig.targetAllDFP ) {
 		jsContents = jsContents.replace('__HB_TARGET_ALL_DFP__', true);
