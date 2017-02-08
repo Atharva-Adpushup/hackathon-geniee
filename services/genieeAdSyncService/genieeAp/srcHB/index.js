@@ -5,7 +5,7 @@
 function main() {
 	var adpQue;
 
-	window.adpPrebid = require('./prebid');
+	window.adpPrebid = require('./PrebidSource/build/dist/prebid');
 
 	if( window.adpTags ) {
 		adpQue = window.adpTags.que;
