@@ -40,7 +40,8 @@ $(document).ready(function () {
                     btnStatic: '.btn-close-static',
                     pbPassbackInput: '.pbpassback-input',
                     pbPassbackWrapper: '.pbpassback-wrapper',
-                    btnHbSync: '.btn-hbsync'
+                    btnHbSync: '.btn-hbsync',
+                    passbackCodeInput: '.pbCode'
                 },
                 dfpTargeting: {
                     networkId: '<div class="dfptargeting-pane row"><div class="col-sm-3 input-name">Network Id</div><div class="col-sm-4"><input class="form-control" type="text" name="networkId" placeholder="Please enter the network Id" /></div></div>',
@@ -331,6 +332,13 @@ $(document).ready(function () {
             // Load setup data from server 
             loadSetupData: function(hbConfig) {
                 var that = this;
+
+                 // Convert passback trigger
+                $(this.templates.selectors.passbackCodeInput).each(function(key, input) {
+                    var val = $(input).val();
+                    $(input).val(w.atob(val));
+                });
+
                 hbConfig.forEach(function(config) {
                     that.renderGeoSetupPanel(config);
                 });
@@ -595,17 +603,21 @@ $(document).ready(function () {
             ap.headerBiddingSetup.syncAllHBSites();
         });
 
-        // Convert passback trigger
-        $('.pbCode').each(function(key, input) {
-            var val = $(input).val();
-            $(input).val(w.atob(val));
-        });
-
         // Setup form submit trigger
         $('#hbform').on('submit', function (e) {
             e.preventDefault();
             ap.headerBiddingSetup.saveHeaderBiddingSetup($(this));
         });
+
+        // Accordion icon toggle switch
+        function toggleAccordionIcon(e) {
+            $(e.target)
+                .prev('.panel-heading')
+                .find('.accordion-toggle')
+                .toggleClass('fa-chevron-right fa-chevron-down');
+        }
+        $('.panel-group').on('hidden.bs.collapse', toggleAccordionIcon);
+        $('.panel-group').on('shown.bs.collapse', toggleAccordionIcon);
 
     })(adpushup, window);
 });
