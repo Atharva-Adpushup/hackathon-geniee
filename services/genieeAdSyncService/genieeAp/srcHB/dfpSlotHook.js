@@ -19,7 +19,6 @@ function matchAdSize( adSize, targetingAdSizes ){
 }
 
 function init(){
-	var oDF;
 
 	googletag.cmd.push(function() {
 		googletag.pubads().disableInitialLoad();
@@ -27,7 +26,7 @@ function init(){
 
 	googletag.cmd.push(function(){
 
-		oDF = googletag.defineSlot;
+		var oDF = googletag.defineSlot;
 
 		googletag.defineSlot = function( slotId, size, containerId ){
 
