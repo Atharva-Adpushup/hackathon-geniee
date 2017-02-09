@@ -33,10 +33,11 @@ function init(){
 			var definedSlot = oDF.apply(window, [].slice.call(arguments));
 
 			if( matchAdSize(size, config.getTargetingAdSizes()) ) {
-				logger.info("size matched (%s) for slot (%s) ", size.toString(), slotId );
+				// when setting up adpTags slotIds we eliminate networkId
+				var adUnitParams = slotId.match('/[0-9]+/(.*)$');
 
-				adpTags.defineSlot( slotId, size, containerId );
-				adpTags.setGPTSlot( slotId, definedSlot );
+				logger.info("size matched (%s) for slot (%s) ", size.toString(), slotId );
+				adpTags.defineSlot( adUnitParams[1], size, containerId, definedSlot );
 
 			} else {
 				setTimeout( function(){
