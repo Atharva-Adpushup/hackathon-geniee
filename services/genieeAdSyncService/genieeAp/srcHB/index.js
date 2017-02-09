@@ -71,15 +71,14 @@ function main() {
 			setPbjsKeys( pbjsParams );
 			printBidTable();
 
+			logger.info("recieved bid responses for %s", slotId);
+
 			if( ! adpTags.adpSlots[slotId].gSlot ) {
-				logger.info("rendering postbid ad for %s", slotId);
 				adpTags.renderPostbidAd(slotId, containerId);
 			} else {
-				logger.info("rendering GPT ad for %s", slotId);
 				adpTags.renderGPTAd(slotId, timeout);
 			}
 
-			logger.info("recieved bid responses for %s", slotId);
 			sandBoxbids.removeHBIframe(slotId);
 
 		});
