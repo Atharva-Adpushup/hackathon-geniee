@@ -21,9 +21,7 @@ module.exports = "<html>" +
         "document.createElement = function (tag) {" +
         	"if ( tag.toLowerCase() === 'script' ) { " +
 	        	"tag = '__script';" +
-	        	"setTimeout(function(){" +
-	        		"parent.__createScriptInParent([].slice.call(document.getElementsByTagName('__script')), SLOT_ID);" +
-	        	"}, 10);" +
+	        	"parent.__createScriptInParent([].slice.call(document.getElementsByTagName('__script')), SLOT_ID);" +
 	        "}" +
         	"return original.call(document, tag);" +
         "};" +

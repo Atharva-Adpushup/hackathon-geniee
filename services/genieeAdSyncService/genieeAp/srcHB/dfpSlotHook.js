@@ -19,7 +19,6 @@ function matchAdSize( adSize, targetingAdSizes ){
 }
 
 function init(){
-	var oDF;
 
 	googletag.cmd.push(function() {
 		googletag.pubads().disableInitialLoad();
@@ -27,17 +26,18 @@ function init(){
 
 	googletag.cmd.push(function(){
 
-		oDF = googletag.defineSlot;
+		var oDF = googletag.defineSlot;
 
 		googletag.defineSlot = function( slotId, size, containerId ){
 
 			var definedSlot = oDF.apply(window, [].slice.call(arguments));
 
 			if( matchAdSize(size, config.getTargetingAdSizes()) ) {
-				logger.info("size matched (%s) for slot (%s) ", size.toString(), slotId );
+				// when setting up adpTags slotIds we eliminate networkId
+				var adUnitParams = slotId.match('/[0-9]+/(.*)$');
 
-				adpTags.defineSlot( slotId, size, containerId );
-				adpTags.setGPTSlot( slotId, definedSlot );
+				logger.info("size matched (%s) for slot (%s) ", size.toString(), slotId );
+				adpTags.defineSlot( adUnitParams[1], size, containerId, definedSlot );
 
 			} else {
 				setTimeout( function(){

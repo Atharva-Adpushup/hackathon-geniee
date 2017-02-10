@@ -1,3 +1,6 @@
+var beginTime, lastTime;
+beginTime = lastTime = (+new Date());
+
 function shouldLog(){
 	if(  window.location.hash && window.location.hash === "#adpdebug" ) {
 		return true;
@@ -6,8 +9,14 @@ function shouldLog(){
 
 function info(){
 	if( shouldLog() ) {
+		var currTime = +new Date(),
+			elapsedTime = currTime - beginTime,
+			diffTime = currTime - lastTime;
+
 		var arrArgs = [].slice.call(arguments);
-		arrArgs[0] = "adphb: " + arrArgs[0];
+		arrArgs[0] = "( " + elapsedTime + "ms +" + diffTime + " ) adphb: " + arrArgs[0];
+
+		lastTime = currTime;
 
 		console.info.apply(this, arrArgs);
 	}

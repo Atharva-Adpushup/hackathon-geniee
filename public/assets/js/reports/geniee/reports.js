@@ -97,9 +97,19 @@ var GenieeReport = (function(w, $) {
     }
 
     function getDateString(dateMillis) {
-        var date = new Date(dateMillis);
+        var date = new Date(dateMillis),
+            dateArr = date.toDateString().split(' '),
+            // Date day and month are swapped, from 'Feb 08' to '08 Feb'
+            swappedDateArr = swapArrayItems(dateArr, 1, 2),
+            dateString = swappedDateArr.join(' ').replace(" ", ", &nbsp;");
 
-        return date.toDateString().replace(" ", ", &nbsp;");
+        return dateString;
+    }
+
+    function swapArrayItems(array, indexOne, indexTwo) {
+        array[indexTwo] = array.splice(indexOne, 1, array[indexTwo])[0];
+
+        return array;
     }
 
     function insertDateDescription() {
