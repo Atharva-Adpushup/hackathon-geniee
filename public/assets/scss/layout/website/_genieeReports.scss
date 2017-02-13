@@ -4,6 +4,7 @@ $secondaryBackgroundColor: #f1f1f1;
 $borderColor: #e6e6e6;
 $LabelFontColor: 1.5em;
 $fourteenPxAlias: 1.168em;
+$uiComponentHeight: 34px;
 
 .page-container--reports-geniee
 {
@@ -217,7 +218,7 @@ $fourteenPxAlias: 1.168em;
     /*****Generic bootstrap rules override*****/
     .btn
     {
-        height: 34px;
+        height: $uiComponentHeight;
 
         &:active,
         &:hover,
@@ -329,4 +330,20 @@ $fourteenPxAlias: 1.168em;
         position: relative;
         width: auto;
     }
+    .input-group
+    {
+        > .input-group-addon
+        {
+            font-size: 1em;
+            height: $uiComponentHeight;
+            width: $FMLayoutDimension*5 + $FMLayoutDimension/2;
+        }
+
+        > .form-control
+        {
+            font-size: 1em;
+            height: $uiComponentHeight;
+        }
+    }
 }
+

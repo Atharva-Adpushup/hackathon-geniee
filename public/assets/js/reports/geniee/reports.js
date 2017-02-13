@@ -18,6 +18,12 @@ var GenieeReport = (function(w, $) {
     this.filterData = {
         paramConfig: $.extend(true, {}, this.paramConfig),
         date: {},
+        dateType: {
+            absolute: {
+                'date-from': '',
+                'date-to': ''
+            }
+        },
         platform: {},
         constants: {
             notification: {
@@ -42,6 +48,8 @@ var GenieeReport = (function(w, $) {
     this.$headingOptions = $(".js-main-heading-options");
     this.$loaderWrapper = $(".js-loaderwrapper");
     this.$notificationWrapper = $(".js-notification-wrapper");
+    this.$absoluteDateInputs = $('.js-datepicker-element');
+    this.$datePickerInstance = null;
 
     // Slideout elements
     this.$slideoutPanel = $('.js-slideout-panel');
@@ -96,12 +104,19 @@ var GenieeReport = (function(w, $) {
         this.$loaderWrapper.addClass('hide');
     }
 
-    function getDateString(dateMillis) {
-        var date = new Date(dateMillis),
+    function getDateString(dateStamps, isRemoveDay) {
+        var date = new Date(dateStamps),
             dateArr = date.toDateString().split(' '),
             // Date day and month are swapped, from 'Feb 08' to '08 Feb'
             swappedDateArr = swapArrayItems(dateArr, 1, 2),
-            dateString = swappedDateArr.join(' ').replace(" ", ", &nbsp;");
+            dateString;
+
+            if (isRemoveDay) {
+                swappedDateArr.shift();
+                dateString = swappedDateArr.join(' ');
+            } else {
+                dateString = swappedDateArr.join(' ').replace(" ", ", &nbsp;");
+            }
 
         return dateString;
     }
@@ -129,6 +144,64 @@ var GenieeReport = (function(w, $) {
             $contentTemplate.html(dateString);
             $baseTemplate.find("li").append($contentTemplate);
             this.$dateDescWrapper.html($baseTemplate);
+    }
+
+    function initDatePicker() {
+        this.$datePickerInstance = this.$absoluteDateInputs.datepicker({
+            format: "yyyy-mm-dd",
+            orientation: "bottom right",
+            clearBtn: true,
+            autoClose: true
+        });
+    }
+
+    function handleDatePickerDateChange(e) {
+        var $elem = $(e.target),
+            name = $elem.attr('data-name'),
+            value = $elem.val(),
+            type = $elem.attr('data-type'),
+            dateFromValue, dateToValue, isDateDataExists, dateRangeObj,
+            selectedLabelTextArr = [],
+            dateRangeTypeObj = {};
+
+        setAbsoluteDateData(name, value);
+        dateFromValue = this.filterData.dateType.absolute['date-from'];
+        dateToValue = this.filterData.dateType.absolute['date-to'];
+        isDateDataExists = !!(dateFromValue && dateToValue);
+
+        if (isDateDataExists) {
+            dateRangeObj = {
+                dateFrom: dateFromValue,
+                dateTo: dateToValue
+            };
+            dateRangeTypeObj[type] = dateRangeObj;
+
+            selectedLabelTextArr.push(getDateString(dateFromValue, true));
+            selectedLabelTextArr.push(getDateString(dateToValue, true));
+
+            setFilterDateData(dateRangeTypeObj);
+            setFilterParamConfigData(dateRangeObj);
+            setFilterSelectedLabel(selectedLabelTextArr.join(' - '));
+            enableFilterApplyBtn();
+        }
+    }
+
+    function handleDatePickerDateCleared(e) {
+        var $elem = $(e.target);
+    }
+
+    function setAbsoluteDateData(name, value) {
+        this.filterData.dateType.absolute[name] = value;
+    }
+
+    function resetAbsoluteDateData() {
+        this.filterData.dateType.absolute = {};
+        this.$absoluteDateInputs.val('');
+    }
+
+    function bindDatePickerEvents() {
+        this.$datePickerInstance.off('changeDate').on('changeDate', handleDatePickerDateChange.bind(this));
+        this.$datePickerInstance.off('clearDate').on('clearDate', handleDatePickerDateCleared.bind(this));
     }
 
     function insertFilterSelectedUiPlaceholder() {
@@ -224,6 +297,7 @@ var GenieeReport = (function(w, $) {
         setFilterParamConfigData(dateRange);
         setFilterSelectedLabel(text);
         enableFilterApplyBtn();
+        resetAbsoluteDateData();
     }
 
     function bindDateFilterLinks() {
@@ -235,6 +309,7 @@ var GenieeReport = (function(w, $) {
     function resetFiltersFunctionality() {
         resetFilterConfig();
         removeFilterBtnNotification();
+        resetAbsoluteDateData();
         this.$filterDateSelectedWrapper.html('');
         insertFilterSelectedUiPlaceholder();
         if (this.slideout.isOpen()) {
@@ -726,6 +801,7 @@ var GenieeReport = (function(w, $) {
         generateBreadCrumb();
         setTableHeading();
         insertDateDescription();
+        initDatePicker();
         setPerfHeaderData(computedPerfHeaderData);
         setTableData(computedTableData, isPageGroupLevel);
 
@@ -740,6 +816,7 @@ var GenieeReport = (function(w, $) {
         bindFilterApplyBtn();
         bindFilterResetBtn();
         bindReportResetBtn();
+        bindDatePickerEvents();
 
         setThumbnailUiData();
         setActiveThumbnail($revenueHeaderThumbnail);
