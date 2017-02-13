@@ -50,6 +50,7 @@ var GenieeReport = (function(w, $) {
     this.$notificationWrapper = $(".js-notification-wrapper");
     this.$absoluteDateInputs = $('.js-datepicker-element');
     this.$datePickerInstance = null;
+    this.$collapsibleElems = $('.js-panel-collapsible');
 
     // Slideout elements
     this.$slideoutPanel = $('.js-slideout-panel');
@@ -83,6 +84,20 @@ var GenieeReport = (function(w, $) {
             series: []
         }
     };
+
+    function handleCollapsibleClick(e) {
+        var $elem = $(e.target);
+
+        if (!$elem.hasClass('js-panel-collapsible')) {
+            return false;
+        }
+
+        this.$collapsibleElems.not($elem).collapse('hide');
+    }
+
+    function emulateAccordion() {
+        this.$collapsibleElems.off('show.bs.collapse').on('show.bs.collapse', handleCollapsibleClick.bind(this));
+    }
 
     function createChart(selector, config) {
         w.Highcharts.stockChart(selector, config);
@@ -184,10 +199,14 @@ var GenieeReport = (function(w, $) {
             setFilterSelectedLabel(selectedLabelTextArr.join(' - '));
             enableFilterApplyBtn();
         }
+
+        $elem.datepicker('hide');
     }
 
     function handleDatePickerDateCleared(e) {
         var $elem = $(e.target);
+
+        $elem.datepicker('update', '');
     }
 
     function setAbsoluteDateData(name, value) {
@@ -196,6 +215,8 @@ var GenieeReport = (function(w, $) {
 
     function resetAbsoluteDateData() {
         this.filterData.dateType.absolute = {};
+        this.$absoluteDateInputs.datepicker('update', '');
+        this.$absoluteDateInputs.datepicker('hide');
         this.$absoluteDateInputs.val('');
     }
 
@@ -804,6 +825,7 @@ var GenieeReport = (function(w, $) {
         initDatePicker();
         setPerfHeaderData(computedPerfHeaderData);
         setTableData(computedTableData, isPageGroupLevel);
+        emulateAccordion();
 
         if (this.selectedReportsLevel == this.reportsLevel.pagegroup) {
             updateTableSelectionUI();
