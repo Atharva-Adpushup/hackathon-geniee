@@ -6,14 +6,13 @@ var config = require('./config/config'),
 
 	waitUntil = require('wait-until');
 
-
 var FRAME_PREFIX = "__adp_frame__";
 
 function createPrebidContainer(hbConfigParams, slotId, size, containerId){
 
 	var prebidHtml = adRenderingTemplate.replace('__AD_UNIT_CODE__', JSON.stringify({
 		code : slotId,
-		size : size,
+		sizes : [ size ],
 		bids : JSON.parse( JSON.stringify(hbConfigParams).replace('__AD_UNIT__', slotId) )
 	}))
 	.replace('__PB_TIMEOUT__', config.prebidTimeout)

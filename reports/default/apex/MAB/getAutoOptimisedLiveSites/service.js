@@ -14,7 +14,7 @@ function getDbQueryDateMillis() {
 	var startDate = "20161201",
 		computedObj = {
 			startDate: moment(startDate).valueOf(),
-			endDate: moment().subtract(1, 'days').valueOf()
+			endDate: moment().subtract(4, 'hours').valueOf()
 		};
 
 	return computedObj;

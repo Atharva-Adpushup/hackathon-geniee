@@ -21,17 +21,39 @@ $(document).ready(function () {
                     adSizesSelect: '<div class="row"> <div class="col-sm-3"> <div class="input-name">Select Ad Size</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select name="adSize" required="required" class="ad-size"></select> </div></div></div>',
                     hbPartnerSelect: '<div class="row"> <div class="col-sm-3"> <div class="input-name">Select Header Bidding Partner</div></div><div class="col-sm-3"> <div class="styleSelect select-box-lg"> <select class="hb-partner text-capitalize" name="hbPartner" required="required"></select> </div></div></div>'
                 },
-                closeBtn: '<button type="button" class="close hb-close-pane">x</button>',
                 defaultSelectBoxOption: '<option selected value="">Select partner</option>',
                 buttons: {
                     addPartner: '<button type="button" class="add-partner btn-hb-pane btn btn-lightBg btn-default">Add another bidder</button>',
                     addSetup: '<button type="button" class="add-setup btn-hb-pane btn btn-lightBg btn-default">Add another Setup</button>',
-                    addSize: '<button type="button" class="add-size btn-hb-pane btn btn-lightBg btn-default">Add another size</button>'
+                    addSize: '<button type="button" class="add-size btn-hb-pane btn btn-lightBg btn-default">Add another size</button>',
+                    addDFPAdUnit: '<button type="button" id="addDFPAdUnit" class="btn btn-lightBg btn-default btn-close-static">Add another DFP Ad Unit</button>',
+                    closeBtn: '<button type="button" class="close hb-close-pane">x</button>',
+                    closeBtnStatic: '<button type="button" class="close hb-close-pane hb-close-pane-static">x</button>'
                 },
                 selectors: {
                     country: '.select-geo-country',
-                    continent: '.select-geo-continent'
-                }
+                    continent: '.select-geo-continent',
+                    hbSettings: '.hb-settings-pane',
+                    dfpTargetingPane: '.dfptargeting-pane',
+                    apAlert: '.detectap-alert',
+                    dfpAdUnit: '.dfp-adunit',
+                    btnStatic: '.btn-close-static',
+                    pbPassbackInput: '.pbpassback-input',
+                    pbPassbackWrapper: '.pbpassback-wrapper',
+                    btnHbSync: '.btn-hbsync',
+                    passbackCodeInput: '.pbCode'
+                },
+                dfpTargeting: {
+                    networkId: '<div class="dfptargeting-pane row"><div class="col-sm-3 input-name">Network Id</div><div class="col-sm-4"><input class="form-control" type="text" name="networkId" placeholder="Please enter the network Id" /></div></div>',
+                    adUnit: '<div class="row dfptargeting-pane dfp-adunit"><div class="col-sm-3 input-name">Ad Unit</div><div class="col-sm-4"><input class="form-control" type="text" name="dfpAdUnit" placeholder="Please enter DFP Ad unit" /></div></div>'
+                },
+                pbPassbackInput: '<div class="row pbpassback-input"> <div class="col-sm-3"> <input class="form-control" type="text" name="pbAdUnit" placeholder="Ad Unit"/> </div><div class="col-sm-4"> <input class="form-control" required="required" type="text" name="pbCode" placeholder="Code"/> </div><button type="button" class="close hb-close-pane hb-close-pane-static">x</button></div>'
+            },
+
+            // Check whether to show dfp panel or not
+            showDFPAdUnitsTargeting: function() {
+                var targetAllDfpUnits = $('input[name="targetAllDFP"]:checked').val();
+                return targetAllDfpUnits === 'no' ? true : false;
             },
 
             // Set geo select box data
@@ -156,6 +178,11 @@ $(document).ready(function () {
                 var inputs = this.generatePartnerSpecificOptionsPane(hbPartner, params);
                 wrapper.find('.partner-settings').html(inputs.globalTempl + inputs.localTempl);
             },
+            
+            // Function to render postbid passback input
+            renderPbPassbackInput: function() {
+                $(this.templates.selectors.pbPassbackWrapper).append(this.templates.pbPassbackInput);
+            },  
 
             // Generic function to render new setting panel
             renderNewPanel: function (el, wrapper, action, selector, otherEl) {
@@ -176,7 +203,7 @@ $(document).ready(function () {
                     var otherPanels = $(el).parent().children(selector);
 
                     for (var i = 1; i < otherPanels.length; i++) {
-                        $(otherPanels[i]).prepend(this.templates.closeBtn);
+                        $(otherPanels[i]).prepend(this.templates.buttons.closeBtn);
                     }
                 }
             },
@@ -280,7 +307,7 @@ $(document).ready(function () {
                 var otherPanels = $(w).parent().children('.select-geo-wrapper');
 
                 for (var i = 1; i < otherPanels.length; i++) {
-                    $(otherPanels[i]).prepend(this.templates.closeBtn);
+                    $(otherPanels[i]).prepend(this.templates.buttons.closeBtn);
                 }
 
                 this.setGeoSubSelect(geoSelection, w.find('.geo-selector'), geoValue);
@@ -305,9 +332,56 @@ $(document).ready(function () {
             // Load setup data from server 
             loadSetupData: function(hbConfig) {
                 var that = this;
+
+                 // Convert passback trigger
+                $(this.templates.selectors.passbackCodeInput).each(function(key, input) {
+                    var val = $(input).val();
+                    $(input).val(w.atob(val));
+                });
+
                 hbConfig.forEach(function(config) {
                     that.renderGeoSetupPanel(config);
                 });
+            },
+
+            // Function to save Hb config settings
+            saveHbConfigSettings: function() {
+                var settings = {
+                    'prebidTimeout': parseInt($('input[name="prebidTimeout').val(), 10),
+                    'e3FeedbackUrl': $('input[name="e3FeedbackUrl"]').val()
+                };
+                settings.targetAllDFP = this.showDFPAdUnitsTargeting() ? false : true; 
+
+                if(this.showDFPAdUnitsTargeting()) {
+                    var networkId = parseInt($('input[name="networkId"]').val(), 10);
+                    settings.dfpAdUnitTargeting = {
+                        networkId: networkId ? networkId : w.defaultNetworkId
+                    };
+
+                    var dfpAdUnitInputs = $('input[name="dfpAdUnit"]'), 
+                        adUnits = [];
+                    dfpAdUnitInputs.each(function(i, el) {
+                        var val = $(el).val();
+                        val ? adUnits.push(val) : null;
+                    });
+
+                    settings.dfpAdUnitTargeting.adUnits = adUnits;
+                } else {
+                    delete settings['dfpAdUnitTargeting'];
+                }   
+
+                var passBacks = $('.pbpassback-input'),
+                    postBidPassbacks = {};
+                
+                passBacks.each(function(i, p) {
+                    var pbAdUnit = $(p).find('input[name="pbAdUnit"]').val(),
+                        pbCode = $(p).find('input[name="pbCode"]').val();
+
+                    (pbAdUnit && pbCode) ? postBidPassbacks[pbAdUnit] = w.btoa(pbCode) : null;
+                });
+                settings.postbidPassbacks = postBidPassbacks;
+
+                return settings;
             },
 
             // Function to parse header bidding form data
@@ -361,13 +435,17 @@ $(document).ready(function () {
                     });
                     data.push(obj);
                 });
-
-                return data;
+                    
+                return {
+                    setup: data,
+                    settings: this.saveHbConfigSettings()
+                };
             },
 
             saveHeaderBiddingSetup: function (form) {
                 var data = this.parseHbFormData(form),
-                    operation = $('#setupOp').val();
+                    operation = $('#setupOp').val(),
+                    that = this;
                 $.ajax({
                     method: 'POST',
                     url: 'saveHeaderBiddingSetup',
@@ -379,11 +457,85 @@ $(document).ready(function () {
                         ap.apAlert('Some error occurred! Please try again later.', '#hbalert', 'error', 'slideDown');
                     }
                 });
+
+                setTimeout(function() { $(that.templates.selectors.apAlert).slideUp() }, 2500);
+            },
+
+            // Render DFP ad unit input
+            renderDFPAdUnitInput: function(adUnits, el, action) {
+                if(!adUnits) {
+                    action !== 'insertBefore' ? $(this.templates.selectors.hbSettings).append(this.templates.dfpTargeting.adUnit) : $(this.templates.dfpTargeting.adUnit).insertBefore(el);
+                    $(this.templates.selectors.dfpAdUnit+':not(:first)').append(this.templates.buttons.closeBtnStatic);  
+                } else {
+                    var s = $(this.templates.selectors.dfpTargetingPane),
+                        that = this;
+
+                    if(adUnits.length) {
+                        adUnits.forEach(function(adUnit, key) {
+                            var dfpAdUnitInput = $(that.templates.dfpTargeting.adUnit),
+                                siblings = $(s).siblings(that.templates.selectors.dfpTargetingPane);
+
+                            if(siblings.length >= 1) {
+                                dfpAdUnitInput.insertAfter(siblings[key-1]);
+                                dfpAdUnitInput.append(that.templates.buttons.closeBtnStatic);
+                            } else {
+                                dfpAdUnitInput.insertAfter(s);
+                            }
+
+                            $(dfpAdUnitInput).find('input').val(adUnit);
+                        });
+                    } else {
+                        $(that.templates.dfpTargeting.adUnit).insertAfter(s);
+                    }
+                }
+            },
+
+            // Show dfp settings pane
+            showDfpTargetingPane: function(settings) {
+                if(this.showDFPAdUnitsTargeting()) {
+                    $(this.templates.selectors.hbSettings).append(this.templates.dfpTargeting.networkId);
+                    (settings && settings.dfpAdUnitTargeting && settings.dfpAdUnitTargeting.networkId) ? $('input[name="networkId"]').val(settings.dfpAdUnitTargeting.networkId) : $('input[name="networkId"]').val(w.defaultNetworkId); 
+
+                    if(settings && settings.dfpAdUnitTargeting && settings.dfpAdUnitTargeting.adUnits) {
+                        this.renderDFPAdUnitInput(settings.dfpAdUnitTargeting.adUnits);
+                    } else {
+                        this.renderDFPAdUnitInput();
+                    }
+                    
+                    $(this.templates.selectors.dfpAdUnit+':last-child').after(this.templates.buttons.addDFPAdUnit);
+                } else {
+                    var dfpTargetingPane = $(this.templates.selectors.dfpTargetingPane);
+                    if(dfpTargetingPane) {
+                        $(dfpTargetingPane).remove();
+                        $(this.templates.selectors.btnStatic).remove();
+                    }
+                }
+            },
+
+            // Sync all hb sites
+            syncAllHBSites: function() {
+                var that = this;
+                $(that.templates.selectors.btnHbSync).find('.fa-refresh').addClass('fa-spin');
+                 $.ajax({
+                    method: 'GET',
+                    url: 'syncAllHBSites'
+                }).done(function (res) {
+                     $(that.templates.selectors.btnHbSync).find('.fa-refresh').removeClass('fa-spin');
+                    if(res.success) {
+                        ap.apAlert('All header bidding - enabled sites have been synced!', '#hbalert', 'success', 'slideDown');
+                    } else {
+                        ap.apAlert('Some error occurred! Please try again later.', '#hbalert', 'error', 'slideDown');
+                    }
+                });
             },
 
             // Initialise header bidding setup
             init: function () {
-                !w.hbSetupData ? this.renderGeoSetupPanel() : this.loadSetupData(w.hbSetupData);
+                var setupData = w.hbSetupData ? w.hbSetupData.setup : null,
+                    settings = w.hbSetupData ? w.hbSetupData.settings : null;
+
+                this.showDfpTargetingPane(settings);
+                !w.hbSetupData ? this.renderGeoSetupPanel() : this.loadSetupData(setupData);
             }
         };
         ap.headerBiddingSetup.init();
@@ -411,14 +563,29 @@ $(document).ready(function () {
             ap.headerBiddingSetup.renderGeoSetupPanel();
         });
 
+        // Dfp targeting trigger
+        $('input[name="targetAllDFP"]').on('change', function () {
+            ap.headerBiddingSetup.showDfpTargetingPane();
+        });
+
         // Size panel addition trigger
         $('body').on('click', '.add-size', function () {
             ap.headerBiddingSetup.renderAdSizeSetupPanel($(this), null, 'insertBefore');
         });
 
+        // Postbid passback addition trigger
+        $('#addpostbid-passback').on('click', function() {
+            ap.headerBiddingSetup.renderPbPassbackInput();
+        });
+
         // Partner panel addition trigger
         $('body').on('click', '.add-partner', function () {
             ap.headerBiddingSetup.renderHbPartnerSetupPanel($(this), 'insertBefore');
+        });
+
+        // DFP Ad unit addition trigger
+        $('body').on('click', '#addDFPAdUnit', function () {
+            ap.headerBiddingSetup.renderDFPAdUnitInput(null, $(this), 'insertBefore');
         });
 
         // Setup panel addition trigger
@@ -431,11 +598,26 @@ $(document).ready(function () {
             $(this).parent().remove();
         });
 
+        // Sync all HB  sites trigger
+        $('#syncAllHbSites').on('click', function() {
+            ap.headerBiddingSetup.syncAllHBSites();
+        });
+
         // Setup form submit trigger
         $('#hbform').on('submit', function (e) {
             e.preventDefault();
             ap.headerBiddingSetup.saveHeaderBiddingSetup($(this));
         });
+
+        // Accordion icon toggle switch
+        function toggleAccordionIcon(e) {
+            $(e.target)
+                .prev('.panel-heading')
+                .find('.accordion-toggle')
+                .toggleClass('fa-chevron-right fa-chevron-down');
+        }
+        $('.panel-group').on('hidden.bs.collapse', toggleAccordionIcon);
+        $('.panel-group').on('shown.bs.collapse', toggleAccordionIcon);
 
     })(adpushup, window);
 });

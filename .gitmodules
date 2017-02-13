@@ -1,0 +1,3 @@
+[submodule "services/genieeAdSyncService/genieeAp/srcHB/PrebidSource"]
+	path = services/genieeAdSyncService/genieeAp/srcHB/PrebidSource
+	url = https://github.com/adpushup/Prebid.js

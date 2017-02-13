@@ -2,7 +2,7 @@ var config = require('./config/config'),
 	ajax = require('@fdaciuk/ajax'),
 	utils = require('./libs/utils'),
 	logger = require('./libs/logger'),
-
+	access = require('safe-access'),
 	adpTags = require('./adpTags');
 
 var pbjsWinners = {},
@@ -15,19 +15,21 @@ window.pbjs.que = window.pbjs.que || [];
 
 function sendBidData(){
 
-		logger.info("sending data for %s ", Object.keys(pbjsWinners).join('\n') );
+		logger.info("sending data for %s ", Object.keys(pbjsWinners).join(' ') );
 
     var builtUrl = utils.buildUrl(config.e3FeedbackUrl, {
-      "packetId" : packetId,
+      "packetId" : access(window, 'adpushup.config.packetId') || packetId,
       "siteId" : config.siteId,
       "eventType" : 10,
       "ts" : +(new Date()),
     });
 
-    ajax().post(builtUrl, {
-     		partners : JSON.stringify(Object.values(pbjsWinners) || []),
-     		dfp      : JSON.stringify(Object.values(dfpWinners)  || [])
-    });
+    ajax().post(builtUrl,{
+	    	hbJsonData: JSON.stringify({
+	     		partners : Object.values(pbjsWinners) || [],
+	     		dfp      : Object.values(dfpWinners)  || []
+	    })
+	  });
 }
 
 function constructBidData(bidObjData) {
@@ -78,6 +80,15 @@ function initReports() {
 	});
 
 	adpTags.on('postBidSlotRender', function(event) {
+		if( event.passback ) {
+			pbjsWinners[ event.slotId ] = {
+				"adUnitPath" : event.slotId,
+				"bidder" : "PASSBACK",
+				"cpm" : 0.00001,
+				"timeToRespond" : 1001
+			};
+		}
+
 		if( adpTags.haveAllSlotsRendered() ) {
 			sendBidData();
 		}

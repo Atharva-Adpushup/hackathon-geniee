@@ -61,7 +61,8 @@ class collection extends React.Component {
 			rowInputLabelText = rowItem.name;
 
 			rows.push((
-				<CustomInputNumber key={rowItemKey} ref={rowItemKey} labelText={rowInputLabelText} layout="horizontal" min={0} max={100} onChange={this.handleInputChange} step={1} value={rowInputValue} />
+				<CustomInputNumber key={rowItemKey} ref={rowItemKey} labelText={rowInputLabelText}
+					layout="horizontal" min={0} max={100} onChange={this.handleInputChange} step={1} value={rowInputValue} />
 			));
 		}
 
@@ -117,11 +118,10 @@ class collection extends React.Component {
 	renderCollectionPanels() {
 		const collectionPanels = [],
 			eventKey = (1).toString(),
-			panelKey = `${eventKey}_${Utils.getRandomNumber()}`,
-			panelHeaderText = this.props.headerText;
+			panelKey = `${eventKey}_${Utils.getRandomNumber()}`;
 
 		collectionPanels.push((
-			<Panel key={panelKey} header={panelHeaderText} eventKey={eventKey}>
+			<Panel key={panelKey} eventKey={eventKey}>
 				{this.getPanelRows(this.props.collection)}
 			</Panel>
 		));
@@ -131,15 +131,32 @@ class collection extends React.Component {
 
 	renderHorizontalLayout() {
 		return (
-			<Accordion defaultActiveKey="1">
+			<Accordion defaultActiveKey="1" className="u-margin-b15px">
 				{this.renderCollectionPanels()}
 			</Accordion>
 		);
 	}
 
+	renderDescription() {
+		const isDescription = !!(this.props.description);
+
+		if (isDescription) {
+			return (
+				<p key="numeric-collection-desc" className="form-group-desc">{this.props.description}</p>
+			);
+		}
+
+		return null;
+	}
+
 	renderSumExtendedErrorMessage() {
+		const props = this.props,
+			maxValue = (props.maxValue ? props.maxValue : 100),
+			defaultMessage = `Sum must equal ${maxValue}`,
+			sumMismatchErrorMessage = props.sumMismatchErrorMessage ? props.sumMismatchErrorMessage : defaultMessage;
+
 		return (
-			<div ref="td-error-message" className="error-message hide">Sum of all Traffic distributions should be equal to <strong>100</strong></div>
+			<div ref="td-error-message" className="error-message hide">{sumMismatchErrorMessage}</div>
 		);
 	}
 
@@ -157,13 +174,20 @@ class collection extends React.Component {
 	}
 
 	render() {
-		const options = {
-			layoutClassName: 'form-group form-group--horizontal'
-		};
+		const props = this.props,
+			options = {
+				layoutClassName: 'form-group form-group--horizontal form-group--numeric-range'
+			};
+
+		if (props.uiMinimal) {
+			options.layoutClassName = `${options.layoutClassName} is-ui-minimal`;
+		}
+
 
 		return (
-			<div>
-				<Row key={this.props.name} className={options.layoutClassName}>
+			<div className="form-group-wrapper form-group-wrapper--numeric-range">
+				{this.renderDescription()}
+				<Row key={props.name} className={options.layoutClassName}>
 					{this.renderHorizontalLayout()}
 					{this.renderSumExtendedErrorMessage()}
 				</Row>
@@ -184,9 +208,14 @@ collection.defaultProps = {
 };
 
 collection.propTypes = {
-	name: PropTypes.string,
-	collection: PropTypes.array,
-	onChange: PropTypes.func
+	name: PropTypes.string.isRequired,
+	maxValue: PropTypes.number.isRequired,
+	collection: PropTypes.array.isRequired,
+	onSave: PropTypes.func.isRequired,
+	description: PropTypes.string,
+	sumMismatchErrorMessage: PropTypes.any,
+	required: PropTypes.bool,
+	uiMinimal: PropTypes.bool
 };
 
 export default collection;

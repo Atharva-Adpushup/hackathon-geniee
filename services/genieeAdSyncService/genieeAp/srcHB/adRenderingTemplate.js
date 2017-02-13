@@ -15,15 +15,13 @@ module.exports = "<html>" +
 				"prebidScript.text = 'var adpPrebid = ' + parent.adpPrebid.toString() + ';';" +
 				"head.appendChild(prebidScript);" +
 
-				"adpPrebid();" +
+				"adpPrebid(); parent.pbBidAdjustments.set(pbjs);" +
 
 				"var original = document.createElement;" +
         "document.createElement = function (tag) {" +
         	"if ( tag.toLowerCase() === 'script' ) { " +
 	        	"tag = '__script';" +
-	        	"setTimeout(function(){" +
-	        		"parent.__createScriptInParent([].slice.call(document.getElementsByTagName('__script')), SLOT_ID);" +
-	        	"}, 10);" +
+	        	"parent.__createScriptInParent([].slice.call(document.getElementsByTagName('__script')), SLOT_ID);" +
 	        "}" +
         	"return original.call(document, tag);" +
         "};" +

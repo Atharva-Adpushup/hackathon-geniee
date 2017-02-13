@@ -1,25 +1,6 @@
-// Inline edit component styling
+// Mini dropdown component styling
 
-input,
-textarea {
-    width: 100%;
-    padding: 3.5px 10px;
-    border-radius: 3px;
-    border: 1px solid #ccc;
-}
-
-button {
-    padding: 5px 10px;
-    font-size: 12px;
-    text-transform: uppercase;
-    border-radius: 3px;
-    transition: all 0.2s ease;
-    font-weight: 700;
-    box-shadow: none;
-    border: none;
-}
-
-.inline-dropdown-wrapper {
+.mini-dropdown-wrapper {
     position: relative;
     
     button {
@@ -33,7 +14,7 @@ button {
     }
 }
 
-.inline-dropdown {
+.mini-dropdown {
     list-style: none;
     position: absolute;
     top: -2px;

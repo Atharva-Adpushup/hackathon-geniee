@@ -12,7 +12,7 @@ class variationSingleSection extends Component {
         super(props);
     }
     componentWillMount() {
-        this.props.onSectionXPathValidate(this.props.section.id, this.props.section.xpath);
+        this.props.section.isIncontent ? null : this.props.onSectionXPathValidate(this.props.section.id, this.props.section.xpath);
     }
     render() {
         return (

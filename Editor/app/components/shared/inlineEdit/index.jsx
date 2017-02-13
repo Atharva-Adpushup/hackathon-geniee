@@ -1,19 +1,20 @@
 // Inline edit component
 
 import React, { PropTypes } from 'react';
-import onClickOutside from 'react-onclickoutside';
-import './inlineEdit.scss';
 import { renderDropdownList, renderActionButtons, renderNormalMode, renderInlineEditPanel } from './renderMethods.js';
 
-const InlineEdit = onClickOutside(React.createClass({
-	getInitialState() {
-		return {
+class InlineEdit extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
 			editMode: false,
 			inputError: false,
 			disableSave: false,
 			showDropdownList: false
 		};
-	},
+	}
+
 	componentWillReceiveProps(nextProps) {
 		(nextProps.dropdownList && nextProps.dropdownList.length && nextProps.dropdownList[0].trim().length > 0) ? this.showDropdown() : this.hideDropdown();
 
@@ -24,22 +25,27 @@ const InlineEdit = onClickOutside(React.createClass({
 		else {
 			this.setState({ inputError: false, disableSave: false });
 		}
-	},
+	}
+
 	showDropdown() {
 		this.setState({ showDropdownList: true });
-	},
+	}
+
 	hideDropdown() {
 		this.setState({ showDropdownList: false });
-	},
+	}
+
 	triggerEdit() {
 		this.props.editClickHandler ? this.props.editClickHandler() : null;
 		this.setState({ editMode: true });
 		(this.props.dropdownList && this.props.dropdownList.length) ? this.showDropdown() : null;
-	},
+	}
+
 	cancelEdit() {
 		this.props.cancelEditHandler ? this.props.cancelEditHandler() : null;
 		this.setState({ editMode: false, inputError: false, disableSave: false });
-	},
+	}
+
 	submitValue() {
 		if (!this.refs.editedText.value) {
 			this.setState({ inputError: true });
@@ -48,27 +54,34 @@ const InlineEdit = onClickOutside(React.createClass({
 
 		this.setState({ editMode: false, inputError: false });
 		this.props.submitHandler(this.props.adCode ? btoa(this.refs.editedText.value) : this.refs.editedText.value);
-	},
+	}
+
 	changeValue() {
 		const validated = this.props.changeHandler(this.refs.editedText.value);
 		!validated ? this.setState({ disableSave: true, inputError: true }) : this.setState({ disableSave: false, inputError: false });
-	},
+	}
+
 	keyUp() {
 		this.props.keyUpHandler(this.refs.editedText.value);
-	},
+	}
+
 	selectDropdownValue(xpath) {
 		this.refs.editedText.value = xpath;
 		this.hideDropdown();
-	},
+	}
+
 	renderDropdownList() {
 		return renderDropdownList(this);
-	},
+	}
+
 	renderActionButtons() {
 		return renderActionButtons(this);
-	},
+	}
+
 	renderNormalMode(adCodeStyles, adCodeEdit) {
 		return renderNormalMode(this, adCodeStyles, adCodeEdit)
-	},
+	}
+
 	render() {
 		const colCompact = this.props.compact ? 12 : 6,
 			adCodeStyles = {
@@ -85,9 +98,7 @@ const InlineEdit = onClickOutside(React.createClass({
 
 		return renderInlineEditPanel(this, colCompact, adCodeStyles, adCodeEdit, adCodeCheck);
 	}
-}), {
-	handleClickOutside: (instance) => instance.hideDropdown
-});
+}
 
 InlineEdit.propTypes = {
 	text: PropTypes.string.isRequired,

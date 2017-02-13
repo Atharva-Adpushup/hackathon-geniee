@@ -38,6 +38,15 @@
     z-index: 1;
     padding: 5px;
   }
+
+  .close.hb-close-pane-static {
+    right: auto;
+    top: 5px;
+  }
+
+  .row.pbpassback-input {
+    margin-top: 10px;
+  }
 }
 
 .select-partner {
@@ -65,19 +74,17 @@
   .text-medium {
     margin: 20px 0 -20px;
   }
+}
 
-  .cog {
-    padding: 20px;
-    color: darken($lightGrey, 4%);
-
-    .cog-big {
-      font-size: 6em;
-    }
-
-    .cog-small {
-      font-size: 4em;
-      @include css3-prefix(transform, rotate(-8deg));
-      margin-left: 3px;
-    }
+.btn-hbsync {
+  & > i {
+    margin-left: 5px;
   }
 }
+
+.accordion-toggle {
+    vertical-align: bottom;
+    margin-left: 10px;
+    color: $iconColor;
+}
+

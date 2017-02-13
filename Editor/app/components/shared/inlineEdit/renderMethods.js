@@ -1,42 +1,31 @@
 // Inline edit render methods
 
 import { Row, Button, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import MiniDropdown from '../miniDropdown/index.jsx';
 
 const renderDropdownList = that => {
-	return (
-		<div className="inline-dropdown-wrapper">
-			<ul className="inline-dropdown" style={(that.props.dropdownList && that.props.dropdownList.length > 3) ? { overflowY: 'scroll', overflowX: 'hidden' } : {}}>
-				{
-					that.props.dropdownList.map((xpath, key) => (
-						<li onClick={() => that.selectDropdownValue(xpath)} key={key}>
-							{xpath}
-						</li>
-					))
-				}
-			</ul>
-		</div>
-	);
+	return <MiniDropdown showDropdown dropDownItems={that.props.dropdownList} selectHandler={that.selectDropdownValue} context={that} />;
 },
 	renderActionButtons = that => {
 		return (
 			that.props.compact ? (
 				<div>
 					<Col className="u-padding-r5px" xs={8}>
-						<Button disabled={that.state.disableSave} onClick={() => that.submitValue()} className="btn-lightBg btn-save btn-block btn btn-default">Save</Button>
+						<Button disabled={that.state.disableSave} onClick={that.submitValue.bind(that)} className="btn-lightBg btn-save btn-block btn btn-default">Save</Button>
 					</Col>
 					<Col className="u-padding-r10px " xs={4}>
-						<Button onClick={() => that.cancelEdit()} className="btn-lightBg btn-cancel btn-ie-cancel btn-block btn btn-default"></Button>
+						<Button onClick={that.cancelEdit.bind(that)} className="btn-lightBg btn-cancel btn-ie-cancel btn-block btn btn-default"></Button>
 					</Col>
 				</div>
 			) : (
-					<div>
-						<Col className="u-padding-r5px" xs={4}>
-							<Button onClick={() => that.submitValue()} className="btn-lightBg btn-save btn-block btn btn-default">Save</Button>
-						</Col>
-						<Col className="u-padding-r10px " xs={2}>
-							<Button onClick={() => that.cancelEdit()} className="btn-lightBg btn-cancel btn-ie-cancel btn-block btn btn-default"></Button>
-						</Col>
-					</div>
+				<div>
+					<Col className="u-padding-r5px" xs={4}>
+						<Button onClick={that.submitValue.bind(that)} className="btn-lightBg btn-save btn-block btn btn-default">Save</Button>
+					</Col>
+					<Col className="u-padding-r10px " xs={2}>
+						<Button onClick={that.cancelEdit.bind(that)} className="btn-lightBg btn-cancel btn-ie-cancel btn-block btn btn-default"></Button>
+					</Col>
+				</div>
 				)
 		);
 	},
@@ -52,9 +41,9 @@ const renderDropdownList = that => {
 				{
 					that.props.text ? (
 						<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-variation-tooltip">Edit {that.props.text}</Tooltip>}>
-							<button style={that.props.adCode ? adCodeEdit : {}} onClick={() => that.triggerEdit()} className="btn-icn-edit"></button>
+							<button style={that.props.adCode ? adCodeEdit : {}} onClick={that.triggerEdit.bind(that)} className="btn-icn-edit"></button>
 						</OverlayTrigger>
-					) : <button onClick={() => that.triggerEdit()} className="btn-icn-edit"></button>
+					) : <button onClick={that.triggerEdit.bind(that)} className="btn-icn-edit"></button>
 				}
 			</div>
 		);
@@ -69,9 +58,9 @@ const renderDropdownList = that => {
 								<input type="text" ref="editedText"
 									placeholder={that.props.text}
 									defaultValue={adCodeCheck}
-									onKeyUp={that.props.keyUpHandler ? () => that.keyUp() : () => { } }
-									onFocus={that.props.changeHandler ? () => that.changeValue() : () => { } }
-									onChange={that.props.changeHandler ? () => that.changeValue() : () => { } } />
+									onKeyUp={that.props.keyUpHandler ? that.keyUp.bind(that) : () => { } }
+									onFocus={that.props.changeHandler ? that.changeValue.bind(that) : () => { } }
+									onChange={that.props.changeHandler ? that.changeValue.bind(that) : () => { } } />
 								{
 									that.state.showDropdownList ? (
 										that.renderDropdownList()

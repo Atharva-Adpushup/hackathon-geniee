@@ -9,10 +9,14 @@ module.exports = {
 		xpathWaitTimeout: 5000,
 		adpushupPercentage: 100
 	},
+	bidCpmAdjustments: {},
 	hbGlobalSettingDefaults: {
 		prebidTimeout: 5000,
-		e3FeedbackUrl: '//x3.adpushup.com/ApexWebService/feedback',
-		targetAllDFP: false
+		e3FeedbackUrl: '//e3.adpushup.com/ApexWebService/feedback',
+		targetAllDFP: false,
+		dfpAdUnitTargeting: {
+			networkId: 103512698
+		}
 	},
 	hbConfig: {
 		'pulsepoint': {
@@ -24,6 +28,14 @@ module.exports = {
 			local: {
 				ct: {validations: {'required': true}, alias: "Tag Id"},
 				cf: {validations: {'required': true}, alias: "Tag Size"},
+			}
+		},
+		'sekindoUM': {
+			name: 'sekindoUM',
+			isHb: true,
+			global: {},
+			local: {
+				spaceId: {validations: {'required': true}, alias: "Space Id"},
 			}
 		},
 		'wideorbit': {

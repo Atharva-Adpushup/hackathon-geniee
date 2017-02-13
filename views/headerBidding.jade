@@ -20,6 +20,7 @@ block append headScripts
             window.adSizes = !{adSizes};
             window.hbPartners = !{hbPartners};
             window.hbConfig = !{hbConfig};
+            window.defaultNetworkId = !{defaultNetworkId}
         });
 
     if hbSetupData
@@ -52,48 +53,83 @@ block bodyContent
                                 a Header Bidding - #{utils.domanize(siteDomain)}
 
                             form#hbform.settings-pane
-                                input(type="hidden", id="setupOp" value=(hbSetupData ? 'edit' : 'create'))
+                                input(type="hidden", id="setupOp" value="#{operation}")
                                 .row
                                     .col-sm-12
-                                        h4 Configure Header Bidding by setting all options below
+                                        h4 
+                                            | Configure Header Bidding by setting all options below
+                                            button#syncAllHbSites.btn.btn-lightBg.btn-default.pull-right.mb-10.btn-hbsync(style="margin-top: -10px;" type="button") 
+                                                | Sync All HB Sites
+                                                i.fa.fa-refresh
 
                                 #accordion.accordion.panel-group(role='tablist', aria-multiselectable='true')
                                     .accordion-pane.panel.panel-default
                                         #hbConfigHeading.panel-heading(role='tab')
                                             h4.panel-title
                                                 a(role='button', data-toggle='collapse', data-parent='accordion', href='#hbConfigPanel', aria-expanded='false', aria-controls='#hbConfigPanel')
-                                                    | Header Bidding Config
-                                        #hbConfigPanel.panel-collapse.collapse.in(role='tabpanel', aria-labelledby='hbConfigHeading')
+                                                    | Header Bidding Config 
+                                                    i.accordion-toggle.fa.fa-chevron-right
+                                        #hbConfigPanel.panel-collapse.collapse(role='tabpanel', aria-labelledby='hbConfigHeading')
                                             .panel-body
                                                 #hbform-render
+
+                                hr
+                                button.btn.btn-lightBg.btn-default.mb-30(type="button")#addgeo Add another Geo config
+
+                                #accordion.accordion.panel-group(role='tablist', aria-multiselectable='true')
                                     .accordion-pane.panel.panel-default
                                         #hbSettingsHeader.panel-heading(role='tab')
                                             h4.panel-title
                                                 a.collapsed(role='button', data-toggle='collapse', data-parent='accordion', href='#hbSettingsPanel', aria-expanded='false', aria-controls='hbSettingsPanel')
-                                                    | Header Bidding Global Settings
-                                        #hbSettingsPanel.panel-collapse.collapse.in(role='tabpanel', aria-labelledby='hbSettingsHeader')
-                                            .panel-body
+                                                    | Header Bidding Global Settings 
+                                                    i.accordion-toggle.fa.fa-chevron-right
+                                        #hbSettingsPanel.panel-collapse.collapse(role='tabpanel', aria-labelledby='hbSettingsHeader')
+                                            .hb-settings-pane.panel-body
+                                                - hbSettings = hbSetupData ? JSON.parse(hbSetupData).settings : null;
                                                 .row
                                                     .col-sm-3
                                                         .input-name Prebid Timeout
                                                     .col-sm-4
-                                                        input.form-control(required value="#{hbGlobalSettingDefaults.prebidTimeout}" name="prebidTimeout" type="number" placeholder="Enter Prebid Timeout")
+                                                        input.form-control(required value=(hbSettings ? hbSettings.prebidTimeout : hbGlobalSettingDefaults.prebidTimeout) name="prebidTimeout" type="number" placeholder="Enter Prebid Timeout")
                                                 .row
                                                     .col-sm-3
                                                         .input-name E3 Feedback URL
                                                     .col-sm-4
-                                                        input.form-control(required value="#{hbGlobalSettingDefaults.e3FeedbackUrl}" name="e3FeedbackUrl" type="text" placeholder="Enter E3 Feedback URL")
+                                                        input.form-control(required value=(hbSettings ? hbSettings.e3FeedbackUrl : hbGlobalSettingDefaults.e3FeedbackUrl) name="e3FeedbackUrl" type="text" placeholder="Enter E3 Feedback URL")
                                                 .row
                                                     .col-sm-3
                                                         .input-name Target All DFP Units
                                                     .col-sm-4
-                                                        input.input-radio(checked=(hbGlobalSettingDefaults.targetAllDfpUnits ? true : undefined) required name="targetAllDfpUnits" value="yes" type="radio") 
+                                                        - checkYes = (hbSettings ? (hbSettings.targetAllDFP ? true : undefined) : (hbGlobalSettingDefaults.targetAllDFP ? true : undefined)) 
+                                                        - checkNo = (hbSettings ? !(hbSettings.targetAllDFP ? true : undefined) : (!hbGlobalSettingDefaults.targetAllDFP ? true : undefined))
+                                                        input.input-radio(checked=(checkYes) required name="targetAllDFP" value="yes" type="radio") 
                                                         span Yes
-                                                        input.input-radio(checked=(!hbGlobalSettingDefaults.targetAllDfpUnits ? true : undefined) required name="targetAllDfpUnits" value="no" type="radio") 
+                                                        input.input-radio(checked=(checkNo) required name="targetAllDFP" value="no" type="radio") 
                                                         span No
-
-                                hr
-                                button.btn.btn-lightBg.btn-default.mb-30(type="button")#addgeo Add another Geo config
+                                            .container.mb-30(style="width: 100%;")
+                                                .row
+                                                    .col-sm-3
+                                                        .input-name Postbid passbacks
+                                                - passbacks = hbSetupData ? JSON.parse(hbSetupData).settings.postbidPassbacks : null;
+                                                .pbpassback-wrapper
+                                                    if !passbacks || !Object.keys(passbacks).length
+                                                        .row.pbpassback-input
+                                                            .col-sm-3
+                                                                input.form-control(type="text" name="pbAdUnit" placeholder="Ad Unit")
+                                                            .col-sm-4
+                                                                input.form-control(type="text" name="pbCode" placeholder="Code")
+                                                    else 
+                                                        each code, adUnit in passbacks
+                                                            .row.pbpassback-input
+                                                                .col-sm-3
+                                                                    input.form-control(type="text" value="#{adUnit}" name="pbAdUnit" placeholder="Ad Unit")
+                                                                .col-sm-4
+                                                                    input.form-control.pbCode(type="text" value="#{code}" name="pbCode" placeholder="Code")
+                                                                - keyIndex = Object.keys(passbacks).indexOf(adUnit);
+                                                                if keyIndex
+                                                                    button(type="button").close.hb-close-pane.hb-close-pane-static x
+                                                        
+                                                button.mT-10.btn.btn-lightBg.btn-default#addpostbid-passback(type="button") Add another postbid passback
                                                 
                                 hr 
                                 button.btn.btn-primary Save Header bidding Setup

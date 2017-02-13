@@ -10,7 +10,7 @@ const variationSections = (props) => {
 	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdateXPath, onSectionAllXPaths, onValidateXPath, ui, onResetErrors, onSectionXPathValidate } = props;
 	return (
 		<div>
-			<h1 className="variation-section-heading">Demo Panel Text</h1>
+			<h1 className="variation-section-heading">Variation Sections</h1>
 			{!sections.length ? (<span>No Sections</span>) : ''}
 			<ul className="section-list row">
 				{sections.map((section, key) => (

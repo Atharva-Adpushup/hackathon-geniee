@@ -20,16 +20,22 @@ function updateAllAutoOptimisedSites() {
 
 	return Promise.join(getSites, uploadSites, function(sitesArr, uploadedSites) {
 		var dateTime = moment().format('LLL');
-
 		console.log('All `autoOptimise` Sites were synced at ' + dateTime);
 	})
 	.catch(function(e) {
+		var dateTime = moment().format('LLL');
 		console.log('Sync process failed: ', e.toString() + ' at ' + dateTime);
 	});
 }
 
 adpushup.on('siteSaved', onSiteSaved);
-cron.schedule('0 0 */1 * * *', function() {
-	console.log('Running below task at every hour');
+cron.schedule('0 0 */4 * * *', function() {
+	console.log('Running below task every 4 hours');
 	updateAllAutoOptimisedSites();
 }, true);
+// NOTE: Even with boolean `true` as third argument,
+// cron doesn't immediately start the job.
+// Hence, a manual invokation for this method is done below
+// TODO: Test this issue out and if persists,
+// do a pull request to 'node-cron' npm package to fix this :)
+updateAllAutoOptimisedSites();

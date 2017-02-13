@@ -8,9 +8,14 @@ module.exports = {
 		var computedData = {};
 
 		_.forEach(data, function(zonesObj, rootKey) {
-			var formattedDate = moment(zonesObj.date.toString()).format('YYYY-MM-DD');
+			var formattedDate = moment(zonesObj.date.toString()).format('YYYY-MM-DD'),
+				validZones = _.filter(zonesObj.zones, 'type');
+			
+			if (!validZones || !validZones.length) {
+				return false;
+			}
 
-			computedData[formattedDate] = _.filter(zonesObj.zones, 'type');
+			computedData[formattedDate] = validZones;
 		});
 
 		return Promise.resolve(computedData);

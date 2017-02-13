@@ -34,15 +34,17 @@ module.exports = {
 							computedData[pageGroupKey].variationData[variationKey].revenue += Number(zoneObj.revenue);
 							computedData[pageGroupKey].variationData[variationKey].ctr += Number(zoneObj.ctr);
 
-							computedData[pageGroupKey].variationData[variationKey].revenue = Number(computedData[pageGroupKey].variationData[variationKey].revenue.toFixed(2));
-							computedData[pageGroupKey].variationData[variationKey].ctr = Number(computedData[pageGroupKey].variationData[variationKey].ctr.toFixed(2));
-							computedData[pageGroupKey].variationData[variationKey].pageViews = Number(pageViews);
+							computedData[pageGroupKey].variationData[variationKey].click = computedData[pageGroupKey].variationData[variationKey].click || 0;
+							computedData[pageGroupKey].variationData[variationKey].impression = computedData[pageGroupKey].variationData[variationKey].impression || 0;
+							computedData[pageGroupKey].variationData[variationKey].revenue = Number(computedData[pageGroupKey].variationData[variationKey].revenue.toFixed(2)) || 0;
+							computedData[pageGroupKey].variationData[variationKey].ctr = Number(computedData[pageGroupKey].variationData[variationKey].ctr.toFixed(2)) || 0;
+							computedData[pageGroupKey].variationData[variationKey].pageViews = Number(pageViews) || 0;
 
 							revenue = computedData[pageGroupKey].variationData[variationKey].revenue;
 							clicks = computedData[pageGroupKey].variationData[variationKey].click;
 
-							computedData[pageGroupKey].variationData[variationKey].pageRPM = Number((revenue / pageViews * 1000).toFixed(2));
-							computedData[pageGroupKey].variationData[variationKey].pageCTR = Number((clicks / pageViews * 100).toFixed(2));
+							computedData[pageGroupKey].variationData[variationKey].pageRPM = Number((revenue / pageViews * 1000).toFixed(2)) || 0;
+							computedData[pageGroupKey].variationData[variationKey].pageCTR = Number((clicks / pageViews * 100).toFixed(2)) || 0;
 
 							return computedData;
 						});

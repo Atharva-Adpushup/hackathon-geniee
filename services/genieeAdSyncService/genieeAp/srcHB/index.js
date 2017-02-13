@@ -1,7 +1,11 @@
+ /**!
+ * version: 0.0.1
+*/
+
 function main() {
 	var adpQue;
 
-	window.adpPrebid = require('./prebid');
+	window.adpPrebid = require('./PrebidSource/build/dist/prebid');
 
 	if( window.adpTags ) {
 		adpQue = window.adpTags.que;
@@ -12,16 +16,18 @@ function main() {
 	window.adpTags = require('./adpTags');
 	window.adpTags.que = window.adpTags.que.concat(adpQue);
 
+	window.pbBidAdjustments = require('./pbBidAdjustments');
+
 	window.googletag = window.googletag || {};
 	googletag.cmd = googletag.cmd || [];
-
 
 	require('./libs/polyfills');
 
 	var reporting = require('./reporting'),
 		printBidTable = require('./printBidTable'),
 		config = require('./config/config'),
-		logger = require('./libs/logger');
+		logger = require('./libs/logger'),
+		loadGPT = require('./loadGPT'),
 
 		sandBoxbids = require('./sandboxbids');
 
@@ -34,6 +40,15 @@ function main() {
 	reporting.initReports();
 
 	window.adpTags.processQue();
+	window.adpTags.que.push = function( queFunc ){
+		[].push.call(window.adpTags.que, queFunc);
+		adpTags.processQue();
+	};
+
+	// Load GPT script if specfic ad units need to be targeted
+	if( config.dfpAdUnitTargeting.adUnits.length ) {
+		loadGPT();
+	}
 
 	var setPbjsKeys = function( pbjsParams ){
 
@@ -56,15 +71,14 @@ function main() {
 			setPbjsKeys( pbjsParams );
 			printBidTable();
 
+			logger.info("recieved bid responses for %s", slotId);
+
 			if( ! adpTags.adpSlots[slotId].gSlot ) {
-				logger.info("rendering postbid ad for %s", slotId);
 				adpTags.renderPostbidAd(slotId, containerId);
 			} else {
-				logger.info("rendering GPT ad for %s", slotId);
 				adpTags.renderGPTAd(slotId, timeout);
 			}
 
-			logger.info("recieved bid responses for %s", slotId);
 			sandBoxbids.removeHBIframe(slotId);
 
 		});

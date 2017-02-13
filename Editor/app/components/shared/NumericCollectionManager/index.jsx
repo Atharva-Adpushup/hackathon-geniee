@@ -1,7 +1,4 @@
-import React from 'react';
-import Row from 'react-bootstrap/lib/Row';
-import Col from 'react-bootstrap/lib/Col';
-import Button from 'react-bootstrap/lib/Button';
+import React, { PropTypes } from 'react';
 import NumericCollection from 'components/shared/NumericCollectionManager/collection.jsx';
 
 class NumericCollectionManager extends React.Component {
@@ -13,7 +10,10 @@ class NumericCollectionManager extends React.Component {
 		const props = this.props;
 
 		return (
-			<NumericCollection name="numericCollection" required={props.required} maxValue={props.maxValue} headerText={props.title} collection={props.collection} onSave={a => this.onSave(a)} />
+			<NumericCollection name="numericCollection" description={props.description}
+				sumMismatchErrorMessage={props.sumMismatchErrorMessage} required={props.required}
+				maxValue={props.maxValue} collection={props.collection} uiMinimal={props.uiMinimal}
+				onSave={a => this.onSave(a)} />
 		);
 	}
 
@@ -28,6 +28,16 @@ class NumericCollectionManager extends React.Component {
 
 NumericCollectionManager.defaultProps = {
 	collection: []
+};
+
+NumericCollectionManager.propTypes = {
+	description: PropTypes.string,
+	sumMismatchErrorMessage: PropTypes.any,
+	required: PropTypes.bool,
+	uiMinimal: PropTypes.bool,
+	maxValue: PropTypes.number.isRequired,
+	collection: PropTypes.array.isRequired,
+	onSave: PropTypes.func.isRequired
 };
 
 export default NumericCollectionManager;

@@ -14,14 +14,14 @@ const showSiteModesPopover = (props, ev) => {
 
 	SiteModes = (props) => (
 	<div className="modes modes--stateChange">
-		<input type="radio" className="modes-input modes-input-off" name="view" value="editor" id="draftmode" checked={props.siteMode === siteModes.DRAFT} />
+		<input type="radio" className="modes-input modes-input-off" name="view" value="editor" id="draftmode" checked={props.siteMode === siteModes.DRAFT} onChange={() => {}} />
 		<OverlayTrigger placement="bottom" overlay={<Tooltip id="siteModesPause">{props.siteMode === siteModes.DRAFT ? 'AdPushup is currently paused' : 'Pause AdPushup'}</Tooltip>}>
 			<label onClick={props.showPublisherHelper} htmlFor="draftmode" className="modes-label modes-label-off js-modes-label">
 				<i className="fa fa-pause" />
 			</label>
 		</OverlayTrigger>
 
-		<input type="radio" className="modes-input modes-input-on" name="view" value="browse" id="publishmode" checked={props.siteMode === siteModes.PUBLISH} />
+		<input type="radio" className="modes-input modes-input-on" name="view" value="browse" id="publishmode" checked={props.siteMode === siteModes.PUBLISH} onChange={() => {}} />
 		<OverlayTrigger placement="bottom" overlay={<Tooltip id="siteModesLive">{props.siteMode === siteModes.PUBLISH ? 'AdPushup is currently optimizing your website' : 'Start Optimization'}</Tooltip>}>
 			<label onClick={props.showPublisherHelper} htmlFor="publishmode" className="modes-label modes-label-on js-modes-label">
 				<i className="fa fa-play" />

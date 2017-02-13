@@ -5,8 +5,8 @@ import { getAllVariations } from './variationSelectors';
 import { getAllSections } from './sectionSelectors';
 import { getAllAds } from './adsSelectors';
 
-const getMode = (state) => state.site.modeStatus.mode,
-	getPartner = (state) => state.site.siteData.partner,
+const getMode = (state) => state.siteData.mode,
+	getPartner = (state) => state.siteData.partner,
 	getFinalJson = createSelector([getAllChannels, getAllVariations, getAllSections, getAllAds, getMode], (allChannels = {}, allVariations = {}, allSections = {}, allAds = {}, siteMode = 2) =>
 	({
 		siteMode,

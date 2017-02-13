@@ -16,3 +16,19 @@ adpushup.on('hbSiteSaved', function(siteId) {
 
     }, 3000);
 });
+
+adpushup.on('hbAllSites', function(siteIds) {
+
+    setTimeout(function() {
+        siteIds.forEach(function(siteId){
+            hbGeoSync(siteId)
+                .then(function () {
+                    console.log('File generated successfully');
+                })
+                .catch(function (err) {
+                    console.log('Sync Promisecess Failed: ', err);
+                });
+        });
+
+    }, 3000);
+});
