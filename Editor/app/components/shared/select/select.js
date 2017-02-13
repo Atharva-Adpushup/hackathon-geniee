@@ -41,7 +41,8 @@ module.exports = React.createClass({
 
 	getDefaultProps () {
 		return {
-			closeText: 'Close'
+			closeText: 'Close',
+			showClear: true
 		};
 	},
 
@@ -365,7 +366,7 @@ module.exports = React.createClass({
 	},
 
 	renderClearButton () {
-		if (this.hasValue()) {
+		if (this.hasValue() && this.props.showClear) {
 			return button({
 				className: 'react-select-box-clear',
 				'aria-hidden': true,

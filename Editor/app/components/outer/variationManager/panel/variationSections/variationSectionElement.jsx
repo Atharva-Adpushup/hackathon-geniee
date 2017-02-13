@@ -87,7 +87,7 @@ class variationSectionElement extends Component {
                         <Row style={{marginTop: 5}}>
                             <Col className="u-padding-r10px" xs={4}>Float</Col>
                             <Col className="u-padding-l10px" xs={8}>
-                                <SelectBox value={this.state.float} label="Select Float" onChange={this.onFloatSelectChange}>
+                                <SelectBox value={this.state.float} label="Select Float" onChange={this.onFloatSelectChange} showClear={false}>
                                     {
                                         floats.map((float, index) => (
                                             <option key={index} value={float}>{float}</option>
