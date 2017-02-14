@@ -57,29 +57,21 @@ var GenieeReport = (function(w, $) {
     this.$slideoutMenu = $('.js-slideout-menu');
     this.$filterButton = $(".js-filter-btn");
     this.$dataTable = null;
-    // Highcharts stocks config
+    // Highcharts config
+    w.Highcharts.setOptions({
+            credits: {
+            enabled: false
+        },
+        colors: ['#eb575c', '#555', '#c5c5c5', '#5cb85c']
+    });
+
     this.highCharts = {
         config: {
-            rangeSelector: {
-                selected: 4
+            title: {
+                text: ''
             },
-            yAxis: {
-                plotLines: [{
-                    value: 0,
-                    width: 2,
-                    color: 'silver'
-                }]
-            },
-            plotOptions: {
-                series: {
-                    compare: 'percent',
-                    showInNavigator: true
-                }
-            },
-            tooltip: {
-                pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
-                valueDecimals: 2,
-                split: true
+            xAxis: {
+                categories: []
             },
             series: []
         }
@@ -100,7 +92,7 @@ var GenieeReport = (function(w, $) {
     }
 
     function createChart(selector, config) {
-        w.Highcharts.stockChart(selector, config);
+        w.Highcharts.chart(selector, config);
     }
 
     function showNotificationWrapper() {
@@ -734,16 +726,109 @@ var GenieeReport = (function(w, $) {
         prepareReportsChart($thumbnail);
     }
 
-    function getHighChartsData(reportChartType) {
-        var computedHighChartsData;
+    function setXAxisCategories(dataArr) {
+        var computedData = [];
 
-        if (this.selectedReportsLevel == this.reportsLevel.pagegroup) {
-            computedHighChartsData = this.model.pageGroups.data.highCharts[reportChartType];
-        } else if ((this.selectedReportsLevel == this.reportsLevel.variation) && this.selectedPageGroupId) {
-            computedHighChartsData = this.model.pageGroups[this.selectedPageGroupId].variations.data.highCharts[reportChartType];
+        if (dataArr && dataArr.length) {
+            dataArr[0].data.forEach(function(itemArr) {
+                var category = getDateString(itemArr[0], true);
+                computedData.push(category);
+            });
         }
 
-        return computedHighChartsData;
+        return computedData;
+    }
+
+    function computeColumnChart(data) {
+        var computedData = [],
+            isDataExists = !!(data && data.length);
+
+        if (isDataExists) {
+            data.forEach(function(dataItemObj) {
+                var columnObj = {
+                    type: 'column',
+                    name: dataItemObj.name,
+                    data: []
+                };
+
+                dataItemObj.data.forEach(function(itemArr) {
+                    var value = itemArr[1];
+
+                    value = (value.toString().indexOf('.') > -1) ? Number(value.toFixed(2)) : value;
+                    columnObj.data.push(value);
+                });
+
+                computedData.push(columnObj);
+            });
+        }
+
+        return computedData;
+    }
+
+    function computeSplineChart(data) {
+        var collectionArr, collectionArrLength, iterator,
+            isDataExists = !!(data && data.length),
+            chartConfig = {
+            type: 'spline',
+            name: 'Average',
+            data: [],
+            marker: {
+                lineWidth: 2,
+                lineColor: Highcharts.getOptions().colors[3],
+                fillColor: 'white'
+            }
+            };
+
+        if (isDataExists) {
+            // Set collectionArr length to first object's data array length
+            // This us part of computing an average spline chart data
+            collectionArrLength = data[0].data.length;
+            // Initialise collection array with computed length
+            collectionArr = new Array(collectionArrLength);
+
+            // Set every item as an array
+            for (iterator = 0; iterator < collectionArrLength; iterator++) { collectionArr[iterator] = []; }
+
+            // Push every data item in collection array as per index
+            data.forEach(function(dataItemObj, dataItemIdx) {
+            dataItemObj.data.forEach(function(item, itemIdx) {
+                collectionArr[itemIdx].push(item);
+            });
+            });
+
+            collectionArr.forEach(function(collectionItemArr, collectionItemIndex) {
+            var sum = collectionItemArr.reduce(function(accumulation, value) { return accumulation + value; }, 0),
+                average = Math.floor(sum/collectionItemArr.length);
+
+            chartConfig.data.push(average);
+            });
+        }
+
+        return [chartConfig];
+    }
+
+    function getHighChartsData(reportChartType) {
+        var computedData = {}, reportTypeData,
+            chartData = {
+                xAxisCategories: [],
+                column: [],
+                spline: []
+            };
+
+        if (this.selectedReportsLevel == this.reportsLevel.pagegroup) {
+            reportTypeData = this.model.pageGroups.data.highCharts[reportChartType];
+        } else if ((this.selectedReportsLevel == this.reportsLevel.variation) && this.selectedPageGroupId) {
+            reportTypeData = this.model.pageGroups[this.selectedPageGroupId].variations.data.highCharts[reportChartType];
+        }
+
+        chartData.xAxisCategories = setXAxisCategories(reportTypeData);
+        chartData.column = computeColumnChart(reportTypeData);
+        chartData.spline = computeSplineChart(chartData.column);
+
+        computedData.xAxisCategories = chartData.xAxisCategories;
+        computedData.series = chartData.column.concat(chartData.spline);
+
+        return computedData;
     }
 
     function prepareReportsChart($thumbnail) {
@@ -752,7 +837,9 @@ var GenieeReport = (function(w, $) {
         chartType = $thumbnail.data('text');
         chartSeriesConfig = getHighChartsData(chartType);
         chartConfig = $.extend(true, {}, this.highCharts.config);
-        chartConfig.series = chartSeriesConfig;
+        chartConfig.series = chartSeriesConfig.series;
+        chartConfig.xAxis.categories = chartSeriesConfig.xAxisCategories;
+        chartConfig.title.text = (this.selectedReportsLevel + ' performance');
 
         createChart('chart-container', chartConfig);
     }
