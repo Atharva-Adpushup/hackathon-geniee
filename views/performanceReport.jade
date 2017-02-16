@@ -50,36 +50,26 @@ block bodyContent
                             div(class="panel-body")
                                 div(class="aligner aligner--row mB-5")
                                     div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
-                                        a(data-dateRange="#{JSON.stringify(filterDates.today)}", data-name="today", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-today") Today
-                                    div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
                                         a(data-dateRange="#{JSON.stringify(filterDates.thisWeek)}", data-name="thisWeek", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-thisWeek") This Week
-                                div(class="aligner aligner--row mB-5")
-                                    div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
+                                    div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
                                         a(data-dateRange="#{JSON.stringify(filterDates.thisMonth)}", data-name="thisMonth", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-thisMonth") This month
-                                    div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
+                                    
+                                div(class="aligner aligner--row mB-5")
+                                    div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
                                         a(data-dateRange="#{JSON.stringify(filterDates.thisYear)}", data-name="thisYear", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-thisYear") This year
-
-                                div(class="aligner aligner--row mB-5")
-                                    div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
+                                    div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
                                         a(data-dateRange="#{JSON.stringify(filterDates.last7Days)}", data-name="last7Days", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last7Days") Last 7 days
-                                    div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
-                                        a(data-dateRange="#{JSON.stringify(filterDates.last30Days)}", data-name="last30Days", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last30Days") Last 30 days
-                                div(class="aligner aligner--row mB-5")
-                                    div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
-                                        a(data-dateRange="#{JSON.stringify(filterDates.last60Days)}", data-name="last60Days", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last60Days") Last 60 days
-                                    div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
-                                        a(data-dateRange="#{JSON.stringify(filterDates.last90Days)}", data-name="last90Days", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last90Days") Last 90 days
 
                                 div(class="aligner aligner--row mB-5")
                                     div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
-                                        a(data-dateRange="#{JSON.stringify(filterDates.last6Months)}", data-name="last6Months", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last6Months") Last 6 months
+                                        a(data-dateRange="#{JSON.stringify(filterDates.last30Days)}", data-name="last30Days", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last30Days") Last 30 days
                                     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
-                                        a(data-dateRange="#{JSON.stringify(filterDates.last1Year)}", data-name="last1Year", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last1Year") Last 1 year
+                                        a(data-dateRange="#{JSON.stringify(filterDates.last60Days)}", data-name="last60Days", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last60Days") Last 60 days
                                 div(class="aligner aligner--row mB-5")
                                     div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
-                                        a(data-dateRange="#{JSON.stringify(filterDates.last2Years)}", data-name="last2Years", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last2Years") Last 2 years
+                                        a(data-dateRange="#{JSON.stringify(filterDates.last90Days)}", data-name="last90Days", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last90Days") Last 90 days
                                     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
-                                        a(data-dateRange="#{JSON.stringify(filterDates.last5Years)}", data-name="last5Years", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last5Years") Last 5 years
+                                        a(data-dateRange="#{JSON.stringify(filterDates.last6Months)}", data-name="last6Months", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last6Months") Last 6 months
 
                         div(class="panel panel-default")
                             div(class="u-padding-0px panel-heading", role="tab", id="date-absolute-panel")
