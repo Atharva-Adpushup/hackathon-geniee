@@ -127,6 +127,22 @@ router
                 res.send('Some error occurred!');
             });
     })
+    .get('/:siteId/settings/regexVerfier', function (req, res) {
+        return siteModel.getSiteById(req.params.siteId)
+            .then(function (site) {
+                return res.render('regExVerfier', {
+                    pageGroups: site.get('cmsInfo').pageGroups,
+                    patterns: site.get('apConfigs').pageGroupPattern ? site.get('apConfigs').pageGroupPattern : [],
+                    apConfigs: site.get('apConfigs'),
+                    blocklist: site.get('apConfigs').blocklist,
+                    siteId: req.params.siteId,
+                    siteDomain: site.get('siteDomain')
+                });
+            })
+            .catch(function (err) {
+                res.send('Some error occurred!');
+            });
+    })
     .get('/:siteId/headerBidding', function (req, res) {
         userModel.verifySiteOwner(req.session.user.email, req.params.siteId)
             .then(function () {
