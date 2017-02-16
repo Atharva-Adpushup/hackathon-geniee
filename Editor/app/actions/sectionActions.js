@@ -107,6 +107,13 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			sectionId,
 			xpath
 		};
+	},
+	updateIncontentFloat = (sectionId, float) => {
+		return {
+			type: sectionActions.UPDATE_INCONTENT_FLOAT,
+			sectionId,
+			float
+		};
 	};
 
-export { createSection, deleteSection, renameSection, createIncontentSection, updatePartnerData, updateXPath, sectionAllXPaths, validateXPath, validateSectionXPath };
+export { createSection, deleteSection, renameSection, createIncontentSection, updatePartnerData, updateXPath, sectionAllXPaths, validateXPath, validateSectionXPath, updateIncontentFloat };

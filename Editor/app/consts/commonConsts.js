@@ -47,6 +47,7 @@ const status = {
 		TEXT: 'text',
 		IMAGE: 'image'
 	},
+	floats = ['none', 'left', 'right'],
 	messengerCommands = {
 		SHOW_INSERT_CONTEXTMENU: 'SHOW_INSERT_CONTEXTMENU',
 		SHOW_EDIT_CONTEXTMENU: 'SHOW_EDIT_CONTEXTMENU',
@@ -178,7 +179,8 @@ const status = {
 		UPDATE_XPATH: 'UPDATE_XPATH',
 		GET_ALL_XPATHS: 'GET_ALL_XPATHS',
 		VALIDATE_XPATH: 'VALIDATE_XPATH',
-		VALIDATE_XPATH_SECTION: 'VALIDATE_XPATH_SECTION'
+		VALIDATE_XPATH_SECTION: 'VALIDATE_XPATH_SECTION',
+		UPDATE_INCONTENT_FLOAT: 'UPDATE_INCONTENT_FLOAT'
 	},
 	adActions = {
 		CREATE_AD: 'CREATE_AD',
@@ -286,5 +288,5 @@ export {
 	adBoxSizeStyles, commonSupportedSizes, nonPartnerAdSizes, variationActions,
 	hbBoxActions, innerVariationActions, innerActions,
 	defaultSectionCss, leftSectionCss, rightSectionCss,
-	components, siteModesPopoverActions, channelMenuActions, uiActions, ui, uiCollections
+	components, siteModesPopoverActions, channelMenuActions, uiActions, ui, uiCollections, floats
 };

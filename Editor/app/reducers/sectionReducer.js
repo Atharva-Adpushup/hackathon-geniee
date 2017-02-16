@@ -74,6 +74,9 @@ const sectionByIds = (state = {}, action) => {
 		case sectionActions.UPDATE_XPATH:
 			return { ...state, [action.sectionId]: { ...state[action.sectionId], xpath: action.xpath, allXpaths: [], error: false } };
 
+		case sectionActions.UPDATE_INCONTENT_FLOAT:
+			return { ...state, [action.sectionId]: { ...state[action.sectionId], float: action.float } };
+
 		case adActions.DELETE_AD:
 			const index = state[action.sectionId].ads.indexOf(action.adId);
 			if (index !== -1) {

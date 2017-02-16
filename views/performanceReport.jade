@@ -16,8 +16,8 @@ block append headScripts
             '/assets/js/libs/third-party/datepicker.js',
             '/assets/js/libs/third-party/dataTables.js',
             '/assets/js/libs/third-party/dataTablesColReorder.js',
-            'https://code.highcharts.com/stock/highstock.js',
-            'https://code.highcharts.com/stock/modules/exporting.js',
+            '/assets/js/libs/third-party/highcharts/highcharts.js',
+            '/assets/js/libs/third-party/highcharts/exporting.js',
             'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'
         ])
 
@@ -43,10 +43,10 @@ block bodyContent
                 div(class="aligner aligner--row u-margin-10px u-padding-10px")
                     div(class="u-full-width panel-group u-margin-0px js-filter-date-wrapper", id="accordion", role="tablist", aria-multiselectable="true")
                         div(class="panel panel-default")
-                            div(class="u-padding-10px panel-heading", role="tab", id="headingOne")
-                                h4(class="panel-title")
-                                    a(role="button", data-toggle="collapse", data-parent="#accordion", href="#collapseOne", aria-expanded="true", aria-controls="collapseOne") Quick
-                        div(id="collapseOne", class="panel-collapse collapse in", role="tabpanel", aria-labelledby="headingOne")
+                            div(class="u-padding-0px panel-heading", role="tab", id="date-relative-panel")
+                                h4(class="panel-title u-block")
+                                    a(role="button", class="u-block u-padding-10px", data-toggle="collapse", data-parent="#accordion", href="#date-relative-collapsible", aria-expanded="true", aria-controls="date-relative-collapsible") Quick
+                        div(id="date-relative-collapsible", class="panel-collapse collapse in js-panel-collapsible", role="tabpanel", aria-labelledby="date-relative-panel")
                             div(class="panel-body")
                                 div(class="aligner aligner--row mB-5")
                                     div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
@@ -58,18 +58,6 @@ block bodyContent
                                         a(data-dateRange="#{JSON.stringify(filterDates.thisMonth)}", data-name="thisMonth", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-thisMonth") This month
                                     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
                                         a(data-dateRange="#{JSON.stringify(filterDates.thisYear)}", data-name="thisYear", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-thisYear") This year
-
-                                //- NOTE: Disabled as Geniee Reports does not support hourly reports fetch
-                                //- div(class="aligner aligner--row mB-5")
-                                //-     div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
-                                //-         a(data-dateRange="#{JSON.stringify(filterDates.today)}", data-name="today", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last-1-hour") Last 1 hour
-                                //-     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
-                                //-         a(data-dateRange="#{JSON.stringify(filterDates.today)}", data-name="today", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last-4-hours") Last 4 hours
-                                //- div(class="aligner aligner--row mB-5")
-                                //-     div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
-                                //-         a(data-dateRange="#{JSON.stringify(filterDates.today)}", data-name="today", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last-12-hours") Last 12 hours
-                                //-     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
-                                //-         a(data-dateRange="#{JSON.stringify(filterDates.today)}", data-name="today", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last-24-hours") Last 24 hours
 
                                 div(class="aligner aligner--row mB-5")
                                     div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
@@ -93,21 +81,22 @@ block bodyContent
                                     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
                                         a(data-dateRange="#{JSON.stringify(filterDates.last5Years)}", data-name="last5Years", class="link filter-link js-filter-date", href="javascript:void 0", id="filter-date-last5Years") Last 5 years
 
-                        //- div(class="panel panel-default")
-                        //-     div(class="u-padding-10px panel-heading", role="tab", id="headingTwo")
-                        //-         h4(class="panel-title")
-                        //-             a(class="collapsed", role="button", data-toggle="collapse", data-parent="#accordion", href="#collapseTwo", aria-expanded="false", aria-controls="collapseTwo") Relative
-                        //- div(id="collapseTwo", class="panel-collapse collapse", role="tabpanel", aria-labelledby="headingTwo")
-                        //-     div(class="panel-body")
-                        //-         div(class="aligner aligner--row u-margin-10px u-padding-10px")
+                        div(class="panel panel-default")
+                            div(class="u-padding-0px panel-heading", role="tab", id="date-absolute-panel")
+                                h4(class="panel-title u-block")
+                                    a(class="collapsed u-block u-padding-10px", role="button", data-toggle="collapse", data-parent="#accordion", href="#date-absolute-collapsible", aria-expanded="false", aria-controls="date-absolute-collapsible") Absolute
+                        div(id="date-absolute-collapsible", class="panel-collapse collapse js-panel-collapsible", role="tabpanel", aria-labelledby="date-absolute-panel")
+                            div(class="panel-body")
+                                div(class="aligner aligner--column mB-5")
+                                    div(class="col-xs-12 col-md-12 u-padding-0px u-margin-b15px aligner aligner--row aligner--vCenter aligner--hStart")
+                                        div(class="input-group u-full-width")
+                                            span(class="input-group-addon", id="label-date-absolute-from") From
+                                            input(type="text", data-name="date-from", data-type="absolute", class="form-control js-datepicker-element js-label-date-absolute-from", placeholder="For example, 01/01/2017", aria-describedby="label-date-absolute-from")
 
-                        //- div(class="panel panel-default")
-                        //-     div(class="u-padding-10px panel-heading", role="tab", id="headingThree")
-                        //-         h4(class="panel-title")
-                        //-             a(class="collapsed", role="button", data-toggle="collapse", data-parent="#accordion", href="#collapseThree", aria-expanded="false", aria-controls="collapseThree") Absolute
-                        //- div(id="collapseThree", class="panel-collapse collapse", role="tabpanel", aria-labelledby="headingThree")
-                        //-     div(class="panel-body")
-                        //-         div(class="aligner aligner--row u-margin-10px u-padding-10px")
+                                    div(class="col-xs-12 col-md-12 u-padding-0px u-margin-b15px aligner aligner--row aligner--vCenter aligner--hStart")
+                                        div(class="input-group u-full-width")
+                                            span(class="input-group-addon", id="label-date-absolute-to") To
+                                            input(type="text", data-name="date-to", data-type="absolute", class="form-control js-datepicker-element js-label-date-absolute-to", placeholder="For example, 31/01/2017", aria-describedby="label-date-absolute-to")
 
                 div(class="aligner aligner--row u-margin-b10px u-padding-10px")
                     button(id="filter-apply-btn", data-loading-text="Applying...", autocomplete="off", class="btn btn-default btn-theme btn-theme--primary aligner-item js-filter-apply-btn", type="button") Apply

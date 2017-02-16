@@ -49,13 +49,20 @@ const renderDropdownList = that => {
 		);
 	},
 	renderInlineEditPanel = (that, colCompact, adCodeStyles, adCodeEdit, adCodeCheck) => {
+		const inlineInputStyles = {
+			width: '100%',
+    		padding: '3.5px 10px',
+    		borderRadius: '3px',
+    		border: '1px solid #ccc'
+		};
+
 		return (
 			<div>
 				{
 					that.state.editMode ? (
 						<Row style={{ margin: 0 }}>
 							<Col className="u-padding-r10px" xs={colCompact} style={{ position: 'relative' }}>
-								<input type="text" ref="editedText"
+								<input style={inlineInputStyles} type="text" ref="editedText"
 									placeholder={that.props.text}
 									defaultValue={adCodeCheck}
 									onKeyUp={that.props.keyUpHandler ? that.keyUp.bind(that) : () => { } }

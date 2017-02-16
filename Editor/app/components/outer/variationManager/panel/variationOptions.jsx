@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Row, Col, Button, Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { deleteVariation, copyVariation, editVariationName, editTrafficDistribution } from 'actions/variationActions.js';

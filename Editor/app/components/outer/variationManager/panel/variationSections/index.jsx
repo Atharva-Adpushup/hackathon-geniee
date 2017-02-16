@@ -1,13 +1,13 @@
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { deleteSection, renameSection, updateXPath, sectionAllXPaths, validateXPath, validateSectionXPath } from 'actions/sectionActions.js';
+import { deleteSection, renameSection, updateXPath, sectionAllXPaths, validateXPath, validateSectionXPath, updateIncontentFloat } from 'actions/sectionActions.js';
 import { updateAdCode } from 'actions/adActions';
 import { resetErrors } from 'actions/uiActions';
-import VariationSection from './variationSectionElement';
+import VariationSectionElement from './variationSectionElement';
 
 const variationSections = (props) => {
-	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdateXPath, onSectionAllXPaths, onValidateXPath, ui, onResetErrors, onSectionXPathValidate } = props;
+	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdateXPath, onSectionAllXPaths, onValidateXPath, onIncontentFloatUpdate, ui, onResetErrors, onSectionXPathValidate } = props;
 	return (
 		<div>
 			<h1 className="variation-section-heading">Variation Sections</h1>
@@ -15,7 +15,7 @@ const variationSections = (props) => {
 			<ul className="section-list row">
 				{sections.map((section, key) => (
 					<div key={key} className="col-sm-4" >
-						<VariationSection
+						<VariationSectionElement
 							section={section}
 							key={key}
 							variation={variation}
@@ -27,6 +27,7 @@ const variationSections = (props) => {
 							onValidateXPath={onValidateXPath}
 							onResetErrors={onResetErrors}
 							onSectionXPathValidate={onSectionXPathValidate}
+							onIncontentFloatUpdate={onIncontentFloatUpdate}
 							ui={ui}
 							/>
 					</div>
@@ -61,6 +62,7 @@ export default connect(
 		onSectionAllXPaths: sectionAllXPaths,
 		onValidateXPath: validateXPath,
 		onResetErrors: resetErrors,
-		onSectionXPathValidate: validateSectionXPath
+		onSectionXPathValidate: validateSectionXPath,
+		onIncontentFloatUpdate: updateIncontentFloat
 	}, dispatch)
 )(variationSections);
