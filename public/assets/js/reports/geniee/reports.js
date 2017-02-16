@@ -1,83 +1,84 @@
-//TODO: Break this module to small sub-modules
-var GenieeReport = (function(w, $) {
-    var self = this;
+(function(w, $) {
+    var reportInstance;
 
-    this.model = w.adpushup.reports.model;
-    this.siteId = w.adpushup.reports.siteId;
-    this.siteDomain = w.adpushup.reports.siteDomain;
-    this.paramConfig = w.adpushup.reports.paramConfig;
-    Object.freeze(this.paramConfig);
+    function ReportClass() {
+        this.model = w.adpushup.reports.model;
+        this.siteId = w.adpushup.reports.siteId;
+        this.siteDomain = w.adpushup.reports.siteDomain;
+        this.paramConfig = w.adpushup.reports.paramConfig;
+        Object.freeze(this.paramConfig);
 
-    this.reportsLevel = {
-        'pagegroup': 'Page Groups',
-        'variation': 'Variations'
-    };
-    this.selectedReportsLevel = 'Page Groups';
-    this.selectedPageGroupId = null;
-    this.selectedPageGroupName = '';
-    this.filterData = {
-        paramConfig: $.extend(true, {}, this.paramConfig),
-        date: {},
-        dateType: {
-            absolute: {
-                'date-from': '',
-                'date-to': ''
-            }
-        },
-        platform: {},
-        constants: {
-            notification: {
-                btn: {
-                    class: 'btn--notification'
+        this.reportsLevel = {
+            'pagegroup': 'Page Groups',
+            'variation': 'Variations'
+        };
+        this.selectedReportsLevel = 'Page Groups';
+        this.selectedPageGroupId = null;
+        this.selectedPageGroupName = '';
+        this.filterData = {
+            paramConfig: $.extend(true, {}, this.paramConfig),
+            date: {},
+            dateType: {
+                absolute: {
+                    'date-from': '',
+                    'date-to': ''
+                }
+            },
+            platform: {},
+            constants: {
+                notification: {
+                    btn: {
+                        class: 'btn--notification'
+                    }
                 }
             }
-        }
-    };
+        };
 
-    // Cache static DOM elements
-    this.$reportsWrapper = $(".js-reports-wrapper");
-    this.$breadCrumbContainer = $('.js-reports-breadcrumb');
-    this.$tableContainer = $('#reports_table');
-    this.$perfHeaderContainer = $(".js-perf-header");
-    this.$dateDescWrapper = $(".js-date-desc-wrapper");
-    this.$filterDateWrapper = $(".js-filter-date-wrapper");
-    this.$filterDateSelectedWrapper = $(".js-filter-selected-wrapper");
-    this.$filterApplyBtn = $(".js-filter-apply-btn");
-    this.$filterResetBtn = $(".js-filter-reset-btn");
-    this.$headingWrapper = $(".js-main-heading-wrapper");
-    this.$headingOptions = $(".js-main-heading-options");
-    this.$loaderWrapper = $(".js-loaderwrapper");
-    this.$notificationWrapper = $(".js-notification-wrapper");
-    this.$absoluteDateInputs = $('.js-datepicker-element');
-    this.$datePickerInstance = null;
-    this.$collapsibleElems = $('.js-panel-collapsible');
+        // Cache static DOM elements
+        this.$reportsWrapper = $(".js-reports-wrapper");
+        this.$breadCrumbContainer = $('.js-reports-breadcrumb');
+        this.$tableContainer = $('#reports_table');
+        this.$perfHeaderContainer = $(".js-perf-header");
+        this.$dateDescWrapper = $(".js-date-desc-wrapper");
+        this.$filterDateWrapper = $(".js-filter-date-wrapper");
+        this.$filterDateSelectedWrapper = $(".js-filter-selected-wrapper");
+        this.$filterApplyBtn = $(".js-filter-apply-btn");
+        this.$filterResetBtn = $(".js-filter-reset-btn");
+        this.$headingWrapper = $(".js-main-heading-wrapper");
+        this.$headingOptions = $(".js-main-heading-options");
+        this.$loaderWrapper = $(".js-loaderwrapper");
+        this.$notificationWrapper = $(".js-notification-wrapper");
+        this.$absoluteDateInputs = $('.js-datepicker-element');
+        this.$datePickerInstance = null;
+        this.$collapsibleElems = $('.js-panel-collapsible');
 
-    // Slideout elements
-    this.$slideoutPanel = $('.js-slideout-panel');
-    this.$slideoutMenu = $('.js-slideout-menu');
-    this.$filterButton = $(".js-filter-btn");
-    this.$dataTable = null;
-    // Highcharts config
-    w.Highcharts.setOptions({
-            credits: {
-            enabled: false
-        },
-        colors: ['#eb575c', '#555', '#c5c5c5', '#5cb85c']
-    });
-
-    this.highCharts = {
-        config: {
-            title: {
-                text: ''
+        // Slideout elements
+        this.$slideoutPanel = $('.js-slideout-panel');
+        this.$slideoutMenu = $('.js-slideout-menu');
+        this.$filterButton = $(".js-filter-btn");
+        this.$dataTable = null;
+        // Highcharts config
+        w.Highcharts.setOptions({
+                credits: {
+                enabled: false
             },
-            xAxis: {
-                categories: []
-            },
-            series: []
-        }
-    };
+            colors: ['#eb575c', '#555', '#c5c5c5', '#5cb85c']
+        });
 
-    function handleCollapsibleClick(e) {
+        this.highCharts = {
+            config: {
+                title: {
+                    text: ''
+                },
+                xAxis: {
+                    categories: []
+                },
+                series: []
+            }
+        };
+    }
+
+    ReportClass.prototype.handleCollapsibleClick = function(e) {
         var $elem = $(e.target);
 
         if (!$elem.hasClass('js-panel-collapsible')) {
@@ -87,35 +88,35 @@ var GenieeReport = (function(w, $) {
         this.$collapsibleElems.not($elem).collapse('hide');
     }
 
-    function emulateAccordion() {
-        this.$collapsibleElems.off('show.bs.collapse').on('show.bs.collapse', handleCollapsibleClick.bind(this));
+    ReportClass.prototype.emulateAccordion = function() {
+        this.$collapsibleElems.off('show.bs.collapse').on('show.bs.collapse', this.handleCollapsibleClick.bind(this));
     }
 
-    function createChart(selector, config) {
+    ReportClass.prototype.createChart = function(selector, config) {
         w.Highcharts.chart(selector, config);
     }
 
-    function showNotificationWrapper() {
+    ReportClass.prototype.showNotificationWrapper = function() {
         this.$notificationWrapper.removeClass('hide');
     }
 
-    function hideNotificationWrapper() {
+    ReportClass.prototype.hideNotificationWrapper = function() {
         this.$notificationWrapper.addClass('hide');
     }
 
-    function showLoader() {
+    ReportClass.prototype.showLoader = function() {
         this.$loaderWrapper.removeClass('hide');
     }
 
-    function hideLoader() {
+    ReportClass.prototype.hideLoader = function() {
         this.$loaderWrapper.addClass('hide');
     }
 
-    function getDateString(dateStamps, isRemoveDay) {
+    ReportClass.prototype.getDateString = function(dateStamps, isRemoveDay) {
         var date = new Date(dateStamps),
             dateArr = date.toDateString().split(' '),
             // Date day and month are swapped, from 'Feb 08' to '08 Feb'
-            swappedDateArr = swapArrayItems(dateArr, 1, 2),
+            swappedDateArr = this.swapArrayItems(dateArr, 1, 2),
             dateString;
 
             if (isRemoveDay) {
@@ -128,22 +129,22 @@ var GenieeReport = (function(w, $) {
         return dateString;
     }
 
-    function swapArrayItems(array, indexOne, indexTwo) {
+    ReportClass.prototype.swapArrayItems = function(array, indexOne, indexTwo) {
         array[indexTwo] = array.splice(indexOne, 1, array[indexTwo])[0];
 
         return array;
     }
 
-    function insertDateDescription() {
+    ReportClass.prototype.insertDateDescription = function() {
         var isParamConfig = this.paramConfig,
-            isDateFilter = isFilterData(),
+            isDateFilter = this.isFilterData(),
             filterDateKey = (!!isDateFilter ? Object.keys(this.filterData.date)[0] : null),
             dateConfig = (!!(isDateFilter && filterDateKey) ? this.filterData.date[filterDateKey] : {
                 dateFrom: this.paramConfig.dateFrom,
                 dateTo: this.paramConfig.dateTo
             }),
-            dateFromString = getDateString(dateConfig.dateFrom),
-            dateToString = getDateString(dateConfig.dateTo),
+            dateFromString = this.getDateString(dateConfig.dateFrom),
+            dateToString = this.getDateString(dateConfig.dateTo),
             dateString = (dateFromString + "&nbsp; - &nbsp;" + dateToString),
             $baseTemplate = $("<ol class='breadcrumb js-date-desc u-margin-0px'><li><span class='breadcrumb-title-prefix js-date-desc-title-prefix'>Report Date:</span></li></ol>"),
             $contentTemplate = $("<a id='articlemyriad.com' class='breadcrumb-title js-date-desc-title active'></a>");
@@ -153,7 +154,7 @@ var GenieeReport = (function(w, $) {
             this.$dateDescWrapper.html($baseTemplate);
     }
 
-    function initDatePicker() {
+    ReportClass.prototype.initDatePicker = function() {
         this.$datePickerInstance = this.$absoluteDateInputs.datepicker({
             format: "yyyy-mm-dd",
             orientation: "bottom right",
@@ -162,7 +163,7 @@ var GenieeReport = (function(w, $) {
         });
     }
 
-    function handleDatePickerDateChange(e) {
+    ReportClass.prototype.handleDatePickerDateChange = function(e) {
         var $elem = $(e.target),
             name = $elem.attr('data-name'),
             value = $elem.val(),
@@ -171,7 +172,7 @@ var GenieeReport = (function(w, $) {
             selectedLabelTextArr = [],
             dateRangeTypeObj = {};
 
-        setAbsoluteDateData(name, value);
+        this.setAbsoluteDateData(name, value);
         dateFromValue = this.filterData.dateType.absolute['date-from'];
         dateToValue = this.filterData.dateType.absolute['date-to'];
         isDateDataExists = !!(dateFromValue && dateToValue);
@@ -183,41 +184,41 @@ var GenieeReport = (function(w, $) {
             };
             dateRangeTypeObj[type] = dateRangeObj;
 
-            selectedLabelTextArr.push(getDateString(dateFromValue, true));
-            selectedLabelTextArr.push(getDateString(dateToValue, true));
+            selectedLabelTextArr.push(this.getDateString(dateFromValue, true));
+            selectedLabelTextArr.push(this.getDateString(dateToValue, true));
 
-            setFilterDateData(dateRangeTypeObj);
-            setFilterParamConfigData(dateRangeObj);
-            setFilterSelectedLabel(selectedLabelTextArr.join(' - '));
-            enableFilterApplyBtn();
+            this.setFilterDateData(dateRangeTypeObj);
+            this.setFilterParamConfigData(dateRangeObj);
+            this.setFilterSelectedLabel(selectedLabelTextArr.join(' - '));
+            this.enableFilterApplyBtn();
         }
 
         $elem.datepicker('hide');
     }
 
-    function handleDatePickerDateCleared(e) {
+    ReportClass.prototype.handleDatePickerDateCleared = function(e) {
         var $elem = $(e.target);
 
         $elem.datepicker('update', '');
     }
 
-    function setAbsoluteDateData(name, value) {
+    ReportClass.prototype.setAbsoluteDateData = function(name, value) {
         this.filterData.dateType.absolute[name] = value;
     }
 
-    function resetAbsoluteDateData() {
+    ReportClass.prototype.resetAbsoluteDateData = function() {
         this.filterData.dateType.absolute = {};
         this.$absoluteDateInputs.datepicker('update', '');
         this.$absoluteDateInputs.datepicker('hide');
         this.$absoluteDateInputs.val('');
     }
 
-    function bindDatePickerEvents() {
-        this.$datePickerInstance.off('changeDate').on('changeDate', handleDatePickerDateChange.bind(this));
-        this.$datePickerInstance.off('clearDate').on('clearDate', handleDatePickerDateCleared.bind(this));
+    ReportClass.prototype.bindDatePickerEvents = function() {
+        this.$datePickerInstance.off('changeDate').on('changeDate', this.handleDatePickerDateChange.bind(this));
+        this.$datePickerInstance.off('clearDate').on('clearDate', this.handleDatePickerDateCleared.bind(this));
     }
 
-    function insertFilterSelectedUiPlaceholder() {
+    ReportClass.prototype.insertFilterSelectedUiPlaceholder = function() {
         var $template = $("<div class='aligner aligner--column aligner--hCenter aligner--vCenter filter-selected-ui filter-selected-ui--placeholder js-filter-selected-ui-placeholder'>No filters to show.</div>"),
             isPlaceholderPresent = !!($(".js-filter-selected-ui-placeholder", this.$filterDateSelectedWrapper).length);
 
@@ -226,7 +227,7 @@ var GenieeReport = (function(w, $) {
         }
     }
 
-    function removeFilterSelectedUiPlaceholder() {
+    ReportClass.prototype.removeFilterSelectedUiPlaceholder = function() {
         var $placeholder = $(".js-filter-selected-ui-placeholder", this.$filterDateSelectedWrapper);
 
         if ($placeholder.length) {
@@ -234,7 +235,7 @@ var GenieeReport = (function(w, $) {
         }
     }
 
-    function prependResetReportsBtn() {
+    ReportClass.prototype.prependResetReportsBtn = function() {
         var $template = $("<button id='report-reset-btn' data-loading-text='Resetting...' autocomplete='off' type='button' class='btn btn-default btn-theme btn-theme--primary u-margin-r10px js-report-reset-btn js-filter-reset'>Reset filters</button>"),
             isBtnPresent = !!($(".js-report-reset-btn", this.$headingOptions).length);
 
@@ -243,7 +244,7 @@ var GenieeReport = (function(w, $) {
         }
     }
 
-    function removeResetReportsBtn() {
+    ReportClass.prototype.removeResetReportsBtn = function() {
         var $btn = $(".js-report-reset-btn", this.$headingOptions);
 
         if ($btn.length) {
@@ -251,19 +252,19 @@ var GenieeReport = (function(w, $) {
         }
     }
 
-    function disableFilterApplyBtn() {
+    ReportClass.prototype.disableFilterApplyBtn = function() {
         this.$filterApplyBtn
             .attr({ disabled: true })
             .addClass('disabled');
     }
 
-    function enableFilterApplyBtn() {
+    ReportClass.prototype.enableFilterApplyBtn = function() {
         this.$filterApplyBtn
             .attr({ disabled: false })
             .removeClass('disabled');
     }
 
-    function addFilterBtnNotification() {
+    ReportClass.prototype.addFilterBtnNotification = function() {
         var className = this.filterData.constants.notification.btn.class;
 
         if (!this.$filterButton.hasClass(className)) {
@@ -271,7 +272,7 @@ var GenieeReport = (function(w, $) {
         }
     }
 
-    function removeFilterBtnNotification() {
+    ReportClass.prototype.removeFilterBtnNotification = function() {
         var className = this.filterData.constants.notification.btn.class;
 
         if (this.$filterButton.hasClass(className)) {
@@ -279,7 +280,7 @@ var GenieeReport = (function(w, $) {
         }
     }
 
-    function setFilterSelectedLabel(name) {
+    ReportClass.prototype.setFilterSelectedLabel = function(name) {
         var $labelTpl = $("<span class='label label-default js-filter-selected js-filter-selected--date'></span>"),
             $labelBadgeTpl = $("<span class='badge js-badge'>X</span>");
 
@@ -289,16 +290,16 @@ var GenieeReport = (function(w, $) {
         this.$filterDateSelectedWrapper.html($labelTpl);
     }
 
-    function setFilterParamConfigData(dateRange) {
+    ReportClass.prototype.setFilterParamConfigData = function(dateRange) {
         this.filterData.paramConfig.dateFrom = dateRange.dateFrom;
         this.filterData.paramConfig.dateTo = dateRange.dateTo;
     }
 
-    function setFilterDateData(obj) {
+    ReportClass.prototype.setFilterDateData = function(obj) {
         this.filterData.date = obj;
     }
 
-    function handleDateFilterLinksClick(e) {
+    ReportClass.prototype.handleDateFilterLinksClick = function(e) {
         var $link = $(e.target),
             dateRange = $link.data('daterange'),
             dateRangeName = $link.data('name'),
@@ -306,110 +307,112 @@ var GenieeReport = (function(w, $) {
             text = $link.text();
 
         dateRangeObj[dateRangeName] = dateRange;
-        setFilterDateData(dateRangeObj);
-        setFilterParamConfigData(dateRange);
-        setFilterSelectedLabel(text);
-        enableFilterApplyBtn();
-        resetAbsoluteDateData();
+        this.setFilterDateData(dateRangeObj);
+        this.setFilterParamConfigData(dateRange);
+        this.setFilterSelectedLabel(text);
+        this.enableFilterApplyBtn();
+        this.resetAbsoluteDateData();
     }
 
-    function bindDateFilterLinks() {
+    ReportClass.prototype.bindDateFilterLinks = function() {
         var $links = $('.js-filter-date', this.$filterDateWrapper);
 
-        $links.off('click').on('click', handleDateFilterLinksClick);
+        $links.off('click').on('click', this.handleDateFilterLinksClick.bind(this));
     }
 
-    function resetFiltersFunctionality() {
-        resetFilterConfig();
-        removeFilterBtnNotification();
-        resetAbsoluteDateData();
+    ReportClass.prototype.resetFiltersFunctionality = function() {
+        var self = this;
+
+        this.resetFilterConfig();
+        this.removeFilterBtnNotification();
+        this.resetAbsoluteDateData();
         this.$filterDateSelectedWrapper.html('');
-        insertFilterSelectedUiPlaceholder();
+        this.insertFilterSelectedUiPlaceholder();
         if (this.slideout.isOpen()) {
             this.slideout.close();
         }
 
         w.setTimeout(function() {
-            loadReportsWithInitialData();
-            removeResetReportsBtn();
+            self.loadReportsWithInitialData();
+            self.removeResetReportsBtn();
         }, 500);
     }
 
-    function resetFilterConfig() {
+    ReportClass.prototype.resetFilterConfig = function() {
         // Reset date filter data
-        setFilterDateData({});
+        this.setFilterDateData({});
         //Reset filter param config
-        setFilterParamConfigData(this.paramConfig);
+        this.setFilterParamConfigData(this.paramConfig);
     }
 
-    function isFilterData() {
+    ReportClass.prototype.isFilterData = function() {
         return Object.keys(this.filterData.date).length;
     }
 
-    function resetFilterUI() {
-        var isDateFilter = isFilterData();
+    ReportClass.prototype.resetFilterUI = function() {
+        var isDateFilter = this.isFilterData();
 
         if (!isDateFilter) {
-            disableFilterApplyBtn();
-            removeFilterBtnNotification();
-            insertFilterSelectedUiPlaceholder();
+            this.disableFilterApplyBtn();
+            this.removeFilterBtnNotification();
+            this.insertFilterSelectedUiPlaceholder();
         }
     }
 
-    function handleDateFilterLabelsBadgeClick(e) {
+    ReportClass.prototype.handleDateFilterLabelsBadgeClick = function(e) {
         var $badge = $(e.target);
 
-        resetFilterConfig();
-        resetFilterUI();
+        this.resetFilterConfig();
+        this.resetFilterUI();
         $badge.parent().remove();
     }
 
-    function bindDateFilterLabelsBadge() {
-        this.$filterDateSelectedWrapper.off('click').on('click', '.js-badge', handleDateFilterLabelsBadgeClick.bind(this));
+    ReportClass.prototype.bindDateFilterLabelsBadge = function() {
+        this.$filterDateSelectedWrapper.off('click').on('click', '.js-badge', this.handleDateFilterLabelsBadgeClick.bind(this));
     }
 
-    function reInitReports(reportData) {
+    ReportClass.prototype.reInitReports = function(reportData) {
         var self = this,
-            isDateFilter = isFilterData();
+            isDateFilter = this.isFilterData();
 
         if (isDateFilter) {
-            triggerFilterBtnClick();
+            this.triggerFilterBtnClick();
         }
 
         w.setTimeout(function() {
             self.model = $.extend(true, {}, reportData);
-            setAndLoadPageGroupReports();
+            self.setAndLoadPageGroupReports();
 
             if (isDateFilter) {
-                addFilterBtnNotification();
+                self.addFilterBtnNotification();
             } else {
-                removeFilterBtnNotification();
+                self.removeFilterBtnNotification();
             }
         }, 1000);
     }
 
-    function loadReportsWithInitialData() {
+    ReportClass.prototype.loadReportsWithInitialData = function() {
         var paramConfig = this.paramConfig,
             $filterResetBtn = $('.js-filter-reset');
 
         $filterResetBtn.button('loading');
-        getReports(paramConfig, {
-            success: reportsSuccessCallback,
-            error: reportsErrorCallback
+        this.getReports(paramConfig, {
+            success: this.reportsSuccessCallback.bind(this),
+            error: this.reportsErrorCallback.bind(this)
         }, $filterResetBtn);
     }
 
-    function setAndLoadPageGroupReports() {
+    ReportClass.prototype.setAndLoadPageGroupReports = function() {
         this.selectedPageGroupId = null;
-        setReportsLevel(this.reportsLevel.pagegroup);
-        chooseLevelAndLoadReports();
+        this.setReportsLevel(this.reportsLevel.pagegroup);
+        this.chooseLevelAndLoadReports();
     }
 
-	function getReports(paramsData, callbackConfig, $btn) {
+	ReportClass.prototype.getReports = function(paramsData, callbackConfig, $btn) {
 		var url = '/user/site/' + this.siteId + '/reports/getPerformanceData',
-			type = 'GET';
+			type = 'GET', self = this;
 
-        showLoader();
+        this.showLoader();
 
 		$.ajax({
 			type: type,
@@ -418,78 +421,79 @@ var GenieeReport = (function(w, $) {
 			data: paramsData,
 			cache: false
 		}).done(function(data) {
-			data = (typeof data === 'string') ? JSON.parse(data) : data;
+			data = (typeof data === 'string') ? w.JSON.parse(data) : data;
 
 			if (data.success) {
                 if ($btn) { $btn.button('reset'); }
-                hideLoader();
+                self.hideLoader();
 				return callbackConfig.success(data.data);
 			}
 
-            hideLoader();
+            self.hideLoader();
             if ($btn) { $btn.button('reset'); }
 			return callbackConfig.error();
 		}).fail(function() {
-            hideLoader();
+            self.hideLoader();
             if ($btn) { $btn.button('reset'); }
 			callbackConfig.error();
 		});
 	}
 
-    function reportsSuccessCallback(reportData) {
-        reInitReports(reportData);
+    ReportClass.prototype.reportsSuccessCallback = function(reportData) {
+        this.reInitReports(reportData);
     }
 
-    function reportsErrorCallback() {
+    ReportClass.prototype.reportsErrorCallback = function() {
         if (this.slideout.isOpen()) {
             this.slideout.close();
         }
-        showNotificationWrapper();
+        this.showNotificationWrapper();
     }
 
-    function handleFilterApplyBtnClick(e) {
+    ReportClass.prototype.handleFilterApplyBtnClick = function(e) {
         var isLabelElem = (this.$filterDateSelectedWrapper.find('.js-filter-selected--date').length > 0),
             filterData = Object.keys(this.filterData.date),
             isDateFilterData = !!filterData.length,
             $btn = $(e.target),
-            paramConfig = this.paramConfig;
+            paramConfig = this.paramConfig,
+            self = this;
 
         if (isLabelElem && isDateFilterData) {
             paramConfig = $.extend(true, {}, this.filterData.paramConfig);
-            prependResetReportsBtn();
+            this.prependResetReportsBtn();
             $btn.button('loading');
 
-            getReports(paramConfig, {
-                success: reportsSuccessCallback.bind(this),
-                error: reportsErrorCallback.bind(this)
+            this.getReports(paramConfig, {
+                success: self.reportsSuccessCallback.bind(self),
+                error: self.reportsErrorCallback.bind(self)
             }, $btn);
         }
     }
 
-    function handleFilterResetBtnClick() {
-        hideNotificationWrapper();
-        resetFiltersFunctionality();
+    ReportClass.prototype.handleFilterResetBtnClick = function() {
+        this.hideNotificationWrapper();
+        this.resetFiltersFunctionality();
     }
 
-    function handleReportResetBtnclick() {
-        hideNotificationWrapper();
-        resetFiltersFunctionality();
+    ReportClass.prototype.handleReportResetBtnclick = function() {
+        this.hideNotificationWrapper();
+        this.resetFiltersFunctionality();
     }
 
-    function bindFilterApplyBtn() {
-        this.$filterApplyBtn.off('click').on('click', handleFilterApplyBtnClick.bind(this));
+    ReportClass.prototype.bindFilterApplyBtn = function() {
+        this.$filterApplyBtn.off('click').on('click', this.handleFilterApplyBtnClick.bind(this));
     }
 
-    function bindFilterResetBtn() {
-        this.$filterResetBtn.off('click').on('click', handleFilterResetBtnClick.bind(this));
+    ReportClass.prototype.bindFilterResetBtn = function() {
+        this.$filterResetBtn.off('click').on('click', this.handleFilterResetBtnClick.bind(this));
     }
 
-    function bindReportResetBtn() {
-        this.$headingWrapper.off('click').on('click', '.js-report-reset-btn', handleReportResetBtnclick.bind(this));
-        $('.js-report-reset-btn', this.$notificationWrapper).off('click').on('click', handleReportResetBtnclick.bind(this));
+    ReportClass.prototype.bindReportResetBtn = function() {
+        this.$headingWrapper.off('click').on('click', '.js-report-reset-btn', this.handleReportResetBtnclick.bind(this));
+        $('.js-report-reset-btn', this.$notificationWrapper).off('click').on('click', this.handleReportResetBtnclick.bind(this));
     }
 
-    function initSlideoutMenu() {
+    ReportClass.prototype.initSlideoutMenu = function() {
         var self = this;
 
         this.slideout = new w.Slideout({
@@ -502,15 +506,15 @@ var GenieeReport = (function(w, $) {
         });
         self.$slideoutMenu.css({visibility: 'visible'});
 
-        toggleSlideoutMenu();
-        disableFilterApplyBtn();
+        self.toggleSlideoutMenu();
+        self.disableFilterApplyBtn();
     }
 
-    function triggerFilterBtnClick() {
+    ReportClass.prototype.triggerFilterBtnClick = function() {
         this.$filterButton.click();
     }
 
-    function toggleSlideoutMenu() {
+    ReportClass.prototype.toggleSlideoutMenu = function() {
         var self = this;
 
         this.$filterButton.off('click').on('click', function(e) {
@@ -518,7 +522,7 @@ var GenieeReport = (function(w, $) {
         });
     }
 
-    function tabulateData(data, options) {
+    ReportClass.prototype.tabulateData = function(data, options) {
         if(typeof data !== "object") {
             return false;
         }
@@ -582,7 +586,7 @@ var GenieeReport = (function(w, $) {
         return table;
     };
 
-    function setTableHeading() {
+    ReportClass.prototype.setTableHeading = function() {
         var $tableHeading = $('.js-table-heading-wrapper .js-table-heading'),
             computedHeadingText;
 
@@ -595,11 +599,11 @@ var GenieeReport = (function(w, $) {
         $tableHeading.text(computedHeadingText);
     }
 
-    function setReportsLevel(level) {
+    ReportClass.prototype.setReportsLevel = function(level) {
         this.selectedReportsLevel = level;
     }
 
-    function generateBreadCrumb() {
+    ReportClass.prototype.generateBreadCrumb = function() {
         var breadCrumbTpl = '';
 
         if (this.siteId && !this.selectedPageGroupId) {
@@ -610,18 +614,18 @@ var GenieeReport = (function(w, $) {
         }
 
         this.$breadCrumbContainer.html(breadCrumbTpl);
-        setTooltipOnMediaBreadCrumb();
-        bindMediaBreadCrumbClickHandler();
+        this.setTooltipOnMediaBreadCrumb();
+        this.bindMediaBreadCrumbClickHandler();
     }
 
-    function onMediaBreadCrumbClick(e) {
+    ReportClass.prototype.onMediaBreadCrumbClick = function(e) {
         var $el = $(e.target);
 
         if ($el.hasClass('active')) { return false; }
-        setAndLoadPageGroupReports();
+        this.setAndLoadPageGroupReports();
     }
 
-    function setTooltipOnMediaBreadCrumb() {
+    ReportClass.prototype.setTooltipOnMediaBreadCrumb = function() {
         var $mediaBreadCrumb = $('.js-breadcrumb-siteId', this.$breadCrumbContainer),
 			tooltipConfig = {
 				animation: true,
@@ -635,13 +639,13 @@ var GenieeReport = (function(w, $) {
         $mediaBreadCrumb.tooltip(tooltipConfig);
     }
 
-    function bindMediaBreadCrumbClickHandler() {
+    ReportClass.prototype.bindMediaBreadCrumbClickHandler = function() {
         var $mediaBreadCrumb = $('.js-breadcrumb-siteId', this.$breadCrumbContainer);
 
-        $mediaBreadCrumb.off('click').on('click', onMediaBreadCrumbClick.bind(this));
+        $mediaBreadCrumb.off('click').on('click', this.onMediaBreadCrumbClick.bind(this));
     }
 
-    function getActivePageGroupId(pageGroupName) {
+    ReportClass.prototype.getActivePageGroupId = function(pageGroupName) {
         var pageGroupData = $.extend(true, {}, this.model.pageGroups),
             activePageGroupId;
 
@@ -657,32 +661,32 @@ var GenieeReport = (function(w, $) {
         return activePageGroupId;
     }
 
-    function onSelectionButtonClick(e) {
+    ReportClass.prototype.onSelectionButtonClick = function(e) {
         var $el = $(e.target),
             $tr = $el.parentsUntil('tr').parent(),
             pageGroupName = $tr.find('td:nth-child(2)').text(),
             pageGroupFullName = $tr.find('td:nth-child(2)').text() + "_" + $tr.find('td:nth-child(3)').text(),
-            pageGroupId = getActivePageGroupId(pageGroupFullName),
+            pageGroupId = this.getActivePageGroupId(pageGroupFullName),
             $body = $('body');
 
             if (pageGroupId) {
                 this.selectedPageGroupId = pageGroupId;
                 this.selectedPageGroupName = pageGroupName;
             }
-            setReportsLevel(this.reportsLevel.variation);
-            chooseLevelAndLoadReports();
-            setTimeout(function() {
+            this.setReportsLevel(this.reportsLevel.variation);
+            this.chooseLevelAndLoadReports();
+            w.setTimeout(function() {
                 $body.stop().animate({scrollTop:0}, '500', 'swing');
             }, 500);
     }
 
-    function bindSelectionButtonClickHandler() {
+    ReportClass.prototype.bindSelectionButtonClickHandler = function() {
         var $selectionBtn = $('.js-selection-btn', this.$tableContainer);
 
-        $selectionBtn.off('click').on('click', onSelectionButtonClick.bind(this));
+        $selectionBtn.off('click').on('click', this.onSelectionButtonClick.bind(this));
     }
 
-	function updateTableSelectionUI() {
+	ReportClass.prototype.updateTableSelectionUI = function() {
 		var $selectionEls = $('#reports_table ._ap_table > tbody > tr > td:nth-child(1)'),
             $sortThead = $('#reports_table ._ap_table > thead > tr:nth-child(1) > th:nth-child(1)'),
 			$tpl,
@@ -708,30 +712,30 @@ var GenieeReport = (function(w, $) {
 		});
 	}
 
-    function setActiveThumbnail($thumbnail) {
+    ReportClass.prototype.setActiveThumbnail = function($thumbnail) {
         var $thumbnails = $(".js-thumbnail", this.$perfHeaderContainer);
 
         $thumbnails.removeClass('thumbnail--active');
         $thumbnail.addClass('thumbnail--active');
     }
 
-    function onPerfThumbnailClick(event) {
+    ReportClass.prototype.onPerfThumbnailClick = function(event) {
         var $thumbnail = $(event.target);
 
         if ($thumbnail.parentsUntil('.js-thumbnail').parent().hasClass('js-thumbnail')) {
             $thumbnail = $thumbnail.parentsUntil('.js-thumbnail').parent();
         }
 
-        setActiveThumbnail($thumbnail);
-        prepareReportsChart($thumbnail);
+        this.setActiveThumbnail($thumbnail);
+        this.prepareReportsChart($thumbnail);
     }
 
-    function setXAxisCategories(dataArr) {
-        var computedData = [];
+    ReportClass.prototype.setXAxisCategories = function(dataArr) {
+        var computedData = [], self = this;
 
         if (dataArr && dataArr.length) {
             dataArr[0].data.forEach(function(itemArr) {
-                var category = getDateString(itemArr[0], true);
+                var category = self.getDateString(itemArr[0], true);
                 computedData.push(category);
             });
         }
@@ -739,7 +743,7 @@ var GenieeReport = (function(w, $) {
         return computedData;
     }
 
-    function computeColumnChart(data) {
+    ReportClass.prototype.computeColumnChart = function(data) {
         var computedData = [],
             isDataExists = !!(data && data.length);
 
@@ -765,7 +769,7 @@ var GenieeReport = (function(w, $) {
         return computedData;
     }
 
-    function computeSplineChart(data) {
+    ReportClass.prototype.computeSplineChart = function(data) {
         var collectionArr, collectionArrLength, iterator,
             isDataExists = !!(data && data.length),
             chartConfig = {
@@ -774,7 +778,7 @@ var GenieeReport = (function(w, $) {
             data: [],
             marker: {
                 lineWidth: 2,
-                lineColor: Highcharts.getOptions().colors[3],
+                lineColor: w.Highcharts.getOptions().colors[3],
                 fillColor: 'white'
             }
             };
@@ -797,17 +801,17 @@ var GenieeReport = (function(w, $) {
             });
 
             collectionArr.forEach(function(collectionItemArr, collectionItemIndex) {
-            var sum = collectionItemArr.reduce(function(accumulation, value) { return accumulation + value; }, 0),
-                average = Math.floor(sum/collectionItemArr.length);
+                var sum = collectionItemArr.reduce(function(accumulation, value) { return accumulation + value; }, 0),
+                    average = Math.floor(sum/collectionItemArr.length);
 
-            chartConfig.data.push(average);
+                chartConfig.data.push(average);
             });
         }
 
         return [chartConfig];
     }
 
-    function getHighChartsData(reportChartType) {
+    ReportClass.prototype.getHighChartsData = function(reportChartType) {
         var computedData = {}, reportTypeData,
             chartData = {
                 xAxisCategories: [],
@@ -821,9 +825,9 @@ var GenieeReport = (function(w, $) {
             reportTypeData = this.model.pageGroups[this.selectedPageGroupId].variations.data.highCharts[reportChartType];
         }
 
-        chartData.xAxisCategories = setXAxisCategories(reportTypeData);
-        chartData.column = computeColumnChart(reportTypeData);
-        chartData.spline = computeSplineChart(chartData.column);
+        chartData.xAxisCategories = this.setXAxisCategories(reportTypeData);
+        chartData.column = this.computeColumnChart(reportTypeData);
+        chartData.spline = this.computeSplineChart(chartData.column);
 
         computedData.xAxisCategories = chartData.xAxisCategories;
         computedData.series = chartData.column.concat(chartData.spline);
@@ -831,20 +835,20 @@ var GenieeReport = (function(w, $) {
         return computedData;
     }
 
-    function prepareReportsChart($thumbnail) {
+    ReportClass.prototype.prepareReportsChart = function($thumbnail) {
         var chartType, chartSeriesConfig, chartConfig;
 
         chartType = $thumbnail.data('text');
-        chartSeriesConfig = getHighChartsData(chartType);
+        chartSeriesConfig = this.getHighChartsData(chartType);
         chartConfig = $.extend(true, {}, this.highCharts.config);
         chartConfig.series = chartSeriesConfig.series;
         chartConfig.xAxis.categories = chartSeriesConfig.xAxisCategories;
         chartConfig.title.text = (this.selectedReportsLevel + ' performance');
 
-        createChart('chart-container', chartConfig);
+        this.createChart('chart-container', chartConfig);
     }
 
-    function setThumbnailUiData() {
+    ReportClass.prototype.setThumbnailUiData = function() {
         var $revenueHeader = $(".js-thumbnail.js-perf-header-revenue", this.$perfHeaderContainer),
             $pageViewsHeader = $(".js-thumbnail.js-perf-header-pageViews", this.$perfHeaderContainer),
             $clicksHeader = $(".js-thumbnail.js-perf-header-clicks", this.$perfHeaderContainer),
@@ -858,19 +862,19 @@ var GenieeReport = (function(w, $) {
         $pageCTRHeader.data('text', 'pagectr');
     }
 
-    function getRevenueHeaderThumbnail() {
+    ReportClass.prototype.getRevenueHeaderThumbnail = function() {
         var $revenueHeader = $(".js-thumbnail.js-perf-header-revenue", this.$perfHeaderContainer);
 
         return $revenueHeader;
     }
 
-    function bindPerfThumbnailClickHandler() {
+    ReportClass.prototype.bindPerfThumbnailClickHandler = function() {
         var $thumbnails = $(".js-thumbnail", this.$perfHeaderContainer);
 
-        $thumbnails.off('click').on('click', onPerfThumbnailClick);
+        $thumbnails.off('click').on('click', this.onPerfThumbnailClick.bind(this));
     }
 
-    function setPerfHeaderData(data) {
+    ReportClass.prototype.setPerfHeaderData = function(data) {
         var $revenueEl = $(".js-perf-header-revenue .js-panel-body", this.$perfHeaderContainer),
             $pageViewsEl = $(".js-perf-header-pageViews .js-panel-body", this.$perfHeaderContainer),
             $clicksEl = $(".js-perf-header-clicks .js-panel-body", this.$perfHeaderContainer),
@@ -884,16 +888,16 @@ var GenieeReport = (function(w, $) {
             $pageCTREl.html(data.pageCTR);
     }
 
-    function setTableData(data, isPageGroupLevel) {
+    ReportClass.prototype.setTableData = function(data, isPageGroupLevel) {
         var tableContainerSelector = "#reports_table";
 
-        tabulateData(data, {tableContainer: tableContainerSelector, isFirstColumnOrderDisable: isPageGroupLevel});
+        this.tabulateData(data, {tableContainer: tableContainerSelector, isFirstColumnOrderDisable: isPageGroupLevel});
     }
 
-    function chooseLevelAndLoadReports() {
+    ReportClass.prototype.chooseLevelAndLoadReports = function() {
         var computedTableData, computedPerfHeaderData,
             isPageGroupLevel = true,
-            $revenueHeaderThumbnail = getRevenueHeaderThumbnail();
+            $revenueHeaderThumbnail = this.getRevenueHeaderThumbnail();
 
         if (this.selectedReportsLevel == this.reportsLevel.pagegroup) {
             isPageGroupLevel = true;
@@ -905,42 +909,37 @@ var GenieeReport = (function(w, $) {
             computedTableData = $.extend(true, {}, this.model.pageGroups[this.selectedPageGroupId].variations.data.table);
         }
 
-        initSlideoutMenu();
-        generateBreadCrumb();
-        setTableHeading();
-        insertDateDescription();
-        initDatePicker();
-        setPerfHeaderData(computedPerfHeaderData);
-        setTableData(computedTableData, isPageGroupLevel);
-        emulateAccordion();
+        this.initSlideoutMenu();
+        this.generateBreadCrumb();
+        this.setTableHeading();
+        this.insertDateDescription();
+        this.initDatePicker();
+        this.setPerfHeaderData(computedPerfHeaderData);
+        this.setTableData(computedTableData, isPageGroupLevel);
+        this.emulateAccordion();
 
         if (this.selectedReportsLevel == this.reportsLevel.pagegroup) {
-            updateTableSelectionUI();
+            this.updateTableSelectionUI();
         }
 
-        bindPerfThumbnailClickHandler();
-        bindSelectionButtonClickHandler();
-        bindDateFilterLinks();
-        bindDateFilterLabelsBadge();
-        bindFilterApplyBtn();
-        bindFilterResetBtn();
-        bindReportResetBtn();
-        bindDatePickerEvents();
+        this.bindPerfThumbnailClickHandler();
+        this.bindSelectionButtonClickHandler();
+        this.bindDateFilterLinks();
+        this.bindDateFilterLabelsBadge();
+        this.bindFilterApplyBtn();
+        this.bindFilterResetBtn();
+        this.bindReportResetBtn();
+        this.bindDatePickerEvents();
 
-        setThumbnailUiData();
-        setActiveThumbnail($revenueHeaderThumbnail);
-        prepareReportsChart($revenueHeaderThumbnail);
+        this.setThumbnailUiData();
+        this.setActiveThumbnail($revenueHeaderThumbnail);
+        this.prepareReportsChart($revenueHeaderThumbnail);
     }
 
-    function init() {
-        chooseLevelAndLoadReports();
+    ReportClass.prototype.init = function() {
+        this.chooseLevelAndLoadReports();
     }
 
-    init();
-
-    return {
-        tabulateData: tabulateData
-    };
+    reportInstance = new ReportClass();
+    reportInstance.init();
 })(window, $);
-
-window.GenieeReport = GenieeReport;
