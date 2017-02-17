@@ -425,8 +425,20 @@ const randomStore = [],
 				return { top, left };
 			}
 
-		}
+		},
+		queryParams: (function () {
+			const str = window.location.search,
+				objURL = {};
+
+			str.replace(new RegExp('([^?=&]+)(=([^&]*))?', 'g'), ($0, $1, $2, $3) => {
+				objURL[$1] = window.decodeURIComponent($3.replace(/\+/g, ' '));
+			});
+			return objURL;
+		})
 	};
+
+// Initialise query params closure
+Utils.queryParams();
 
 export default Utils;
 

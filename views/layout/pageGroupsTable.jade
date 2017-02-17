@@ -36,6 +36,7 @@ if !partner
                             th Actions
                     tbody
                         for pagegroup in pageGroups
+                            - pageGroupHash = utils.getPageGroupHash(pagegroup.pageGroup, pagegroup.platform)
                             tr
                                 td.underline!= utils.convertPagegroupLink(pagegroup.id, pagegroup.pageGroup, siteId)
                                 td!= pagegroup.platform
@@ -43,7 +44,7 @@ if !partner
                                 td.table-actions
                                     //- a(href="/" title="Edit")
                                         i.fa.fa-edit
-                                    a(href="/user/site/#{siteId}/editor" title="Go to Editor")
+                                    a(target="_blank" href="/user/site/#{siteId}/editor?updateHash=#{pageGroupHash}" title="Go to Editor")
                                         i.fa.fa-code
                                     if !partner
                                         form.delPg(style="display: inline-block;")

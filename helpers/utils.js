@@ -8,6 +8,15 @@ var url = require('url'),
 	randomStore = [],
 	_ = require('lodash'),
 	API = {
+		getPageGroupHash: function(pageGroup, platform) {
+			var name = pageGroup + "_" + platform,
+ 				object = {pageGroups: [name]};
+
+			return this.btoa(JSON.stringify(object));
+		},
+		btoa: function(stringifiedData) {
+			return new Buffer(stringifiedData).toString('base64');
+		},
 		convertPagegroupLink: function(pageGroupId, pageGroupName, siteId) {
 			return '<a href="/user/site/'+siteId+'/pagegroup/'+pageGroupId+'">'+pageGroupName+'</a>';
 		},
