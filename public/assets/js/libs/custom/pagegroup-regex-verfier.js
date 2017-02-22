@@ -2,6 +2,8 @@
 
 $(document).ready(function () {
     (function (w, d) {
+        // Intializing tooltip
+        $('[data-toggle="tooltip"]').tooltip();
 
         // Pagegroup matching module object
         var pgModule = {
@@ -15,53 +17,52 @@ $(document).ready(function () {
                     var pgValue = $(this).val();
                     if(pgValue && pgValue.trim() != '') {
                         that.pagegroupPatterns.push($(this).val());
-                    }
+                    } 
                 });
             },
             crossPageGroupTest: function(alreadyMatchedPattern, url, errorBox) {
                 var response;
-                $.each(this.pagegroupPatterns, function(i, v) {
+                $.each(this.pagegroupPatterns, function(k, v) {
                     if(v != alreadyMatchedPattern) {
-                        var pagegroupTest = new RegExp(v);
+                        var pagegroupTest = new RegExp(v, 'i');
                         response = pagegroupTest.test(url);
-                        console.log(v + ' : ' + url + ' : ' + response);
-                        if(response) {
-                            errorBox.append('<p>Given url satifies more than one pagegroup pattern</p>');
-                            return false;
-                        }
                     }
                 });
                 return response ? !response : undefined;
             },
             createPagegroupTest: function(patternText) {
             },
-            pagegroupPatternMatch: function(fields, pattern, errorBox) {
+            pagegroupPatternMatch: function(fields, pattern, errorBox, mainErrorBox) {
                 var response,
                     that = this;
                     errorBox.html(' ');
                 if(pattern && pattern.trim() != '') {
-                    var patternTest = new RegExp(pattern);
+                    var patternTest = new RegExp(pattern, 'i');
                     fields.each(function() {
                         var field = $(this),
-                            url = field.val(),
+                            inputUrl = field.val(),
                             span = field.closest('div.input-group').find('span');
 
-                        if (url && url.trim() != '') {
-                            response = patternTest.test(url);
-                            var crossResponse = that.crossPageGroupTest(pattern, url, errorBox);
+                        if (inputUrl && inputUrl.trim() != '') {
+                            response = patternTest.test(inputUrl);
+                            var crossResponse = that.crossPageGroupTest(pattern, inputUrl, errorBox),
+                                i = span.find('i');
                             if(crossResponse == undefined) {
                                 response = response;
                             } else {
                                 response = crossResponse;
+                                i.attr('data-original-title', 'Current url satifies more than one Pagegroup pattern');
+                                i.addClass('failure-cross');
                             }
-                            var i = span.find('i');
                             if (response) {
                                 if(i.hasClass('fa-times')) {
                                     i.addClass('fa-check');
                                     i.removeClass('fa-times');
                                     i.removeClass('failure');
+                                    i.removeClass('failure-cross');
                                     field.removeClass('border-failure');
                                 }
+                                i.attr('data-original-title', 'All well here');
                                 i.addClass('success');
                                 field.addClass('border-success');
                             } else {
@@ -71,6 +72,9 @@ $(document).ready(function () {
                                 i.removeClass('success');
                                 field.addClass('border-failure');
                                 field.removeClass('border-success');
+                            }
+                            if(!mainErrorBox.hasClass('hidden')) {
+                                mainErrorBox.addClass('hidden');
                             }
                             span.removeClass('invisible');
                         } else {
@@ -85,18 +89,24 @@ $(document).ready(function () {
                     fields.each(function() {
                         var field = $(this),
                             url = field.val(),
-                            span = field.closest('div.input-group').find('span');
+                            span = field.closest('div.input-group').find('span'),
+                            i = span.find('i');
 
                         if (url && url.trim() != '') {
-                            var i = span.find('i');
-                                i.removeClass('fa-check');
-                                i.addClass('fa-times');
-                                i.addClass('failure');
-                                i.removeClass('success');
-                                field.addClass('border-failure');
-                                field.removeClass('border-success');
-                                span.removeClass('invisible');
-                            }
+                            i.removeClass('fa-check');
+                            i.addClass('fa-times');
+                            i.addClass('failure');
+                            i.removeClass('success');
+                            field.addClass('border-failure');
+                            field.removeClass('border-success');
+                            span.removeClass('invisible');
+                            mainErrorBox.html('<p>All Pagegroups with corresponding urls must have a pattern</p>');
+                            mainErrorBox.removeClass('hidden');
+                        } else {
+                            span.addClass('invisible');
+                            field.removeClass('border-success');
+                            field.removeClass('border-failure');
+                        }
                     });
                 }
             },
@@ -107,36 +117,27 @@ $(document).ready(function () {
             e.preventDefault();
             pgModule.pagegroupPatterns = [];
             pgModule.fetchPageGroups();
-            console.log(pgModule.pagegroupPatterns);
-            var allPageGroups = $('.single-pagegroup-box');
-                allPageGroups.each(function() {
-                    var pagegroupBox = $(this),
-                        pagegroupPattern = pagegroupBox.find('input[name="pageGroupPattern"]').val(),
-                        errorBox = pagegroupBox.find('.error-box'),
-                        urlFields = pagegroupBox.find('.pg-url');
+            var allPageGroups = $('.single-pagegroup-box'),
+                mainErrorBox = $('.main-error-box');
+                mainErrorBox.html(' ');
+            allPageGroups.each(function() {
+                var pagegroupBox = $(this),
+                    pagegroupPattern = pagegroupBox.find('input[name="pageGroupPattern"]').val(),
+                    errorBox = pagegroupBox.find('.error-box'),
+                    urlFields = pagegroupBox.find('.pg-url');
 
-                if(!pagegroupPattern || pagegroupPattern.trim() == '') {
-                    errorBox.html('<p>Pagegroup pattern missing</p>');
-                }
-
-                pgModule.pagegroupPatternMatch(urlFields, pagegroupPattern, errorBox);
+                pgModule.pagegroupPatternMatch(urlFields, pagegroupPattern, errorBox, mainErrorBox);
             });
         });
 
-        // Pagegroup pattern verification
-        $('.verify-pagegroup-pattern-btn').on('click', this, function(e) {
-            e.preventDefault();
-            var verifyBtn = $(this),
-                pagegroupBox = verifyBtn.closest('div.pagegroup-col'),
-                pagegroupPattern = pagegroupBox.find('input[name="pageGroupPattern"]').val(),
-                pagegroupUrlsBox = pagegroupBox.find('div.pagegroup-urls');
+        // Update input field UI state on type
+        $('.pg-url').on('keyup', this, function(e) {
+            var field = $(this),
+                inputUrlParentBox = field.closest('.pagegroup-col'),
+                span = field.closest('div.input-group').find('span');
 
-            if(!pagegroupPattern || pagegroupPattern.trim() == '') {
-                alert('Please enter pagegroup pattern');
-                return;
-            }
-            pagegroupUrlsBox.removeClass('hidden');
-            pgModule.createPagegroupTest(pagegroupPattern);
+                field.hasClass('border-success') ? field.removeClass('border-success') : field.removeClass('border-failure');
+                span.addClass('invisible');
         });
 
     })(window, document);

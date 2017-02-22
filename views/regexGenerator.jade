@@ -1,0 +1,65 @@
+extends  layout/base
+
+block getTitle
+    - var titleVar = "Settings | RegEx Generator"
+
+block append headCss
+    style.
+        .mg-b-10 {
+            margin-bottom: 10px !important;
+        }
+        .mg-t-10 {
+            margin-top: 10px !important;
+        }
+        .instructions-box {
+            padding: 10px;
+            border: 1px solid #000;
+        }
+        .instructions-box h5 {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .instructions-box ul li {
+            font-size: 14px;
+        }
+
+block bodyContent
+    include layout/sideBar
+    .pageContainer.page-container
+        include layout/header
+        // Page Content Starts Here
+        .pageContentWrapper.page-content
+            .pageContentInner.page-content--inner
+                .notification-wrapper
+
+                #widgetsArea.row
+                    .mb-30.col-md-8(style="margin: 0 auto; float: none;")
+                        .controlAdpushupWrap
+                            h3.title.m-All-0.clearfix 
+                                a RegEx Generator Helper Tool
+                            .settings-pane
+                                    .row
+                                        .col-sm-12
+                                            .instructions-box.mg-b-10
+                                                h5.mg-b-10 General Instructions
+                                                ul
+                                                    li Urls must contain www or relevant subdomain
+                                                    li Domain name is compulsory as of now
+                                                    li All urls must be of same pagegroup
+                                            form(method="post", action="regexGenerator")
+                                                input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", value=userInputs[0])
+                                                input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", value=userInputs[1])
+                                                input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", value=userInputs[2])
+                                                input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", value=userInputs[3])
+                                                hr
+                                                if ok
+                                                    pre.mg-b-10
+                                                        code !{regexResult}
+                                                else if (ok != undefined && !ok)
+                                                    pre.mg-b-10
+                                                        code !{msg}
+                                                .row.settings-btn-pane
+                                                    .col-sm-3
+                                                        input.form-control.btn-primary(type="submit", value="Generate Expression")
+
+                div(style="clear:both;")

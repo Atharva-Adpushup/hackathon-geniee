@@ -3,7 +3,9 @@
 var express = require('express'),
     siteModel = require('../models/siteModel'),
     _ = require('lodash'),
+    urlModule = require('url'),
     AdPushupError = require('../helpers/AdPushupError'),
+    reGenerator = require('../misc/tools/regexGenerator'),
     utils = require('../helpers/utils'),
     channelModel = require('../models/channelModel'),
     config = require('../configs/config'),
@@ -13,6 +15,7 @@ var express = require('express'),
     couchbase = require('../helpers/couchBaseService'),
     countryData = require('country-data'),
     Promise = require('bluebird'),
+    regexgen = require("regexgen"),
     N1qlQuery = require('couchbase-promises').N1qlQuery,
     router = express.Router({ mergeParams: true });
 
@@ -127,10 +130,10 @@ router
                 res.send('Some error occurred!');
             });
     })
-    .get('/:siteId/settings/regexVerfier', function (req, res) {
+    .get('/:siteId/settings/regexVerifier', function (req, res) {
         return siteModel.getSiteById(req.params.siteId)
             .then(function (site) {
-                return res.render('regExVerfier', {
+                return res.render('regExVerifier', {
                     pageGroups: site.get('cmsInfo').pageGroups,
                     patterns: site.get('apConfigs').pageGroupPattern ? site.get('apConfigs').pageGroupPattern : [],
                     apConfigs: site.get('apConfigs'),
@@ -142,6 +145,29 @@ router
             .catch(function (err) {
                 res.send('Some error occurred!');
             });
+    })
+    .get('/:siteId/settings/regexGenerator', function (req, res) {
+        return res.render('regexGenerator', {
+            ok: undefined,
+            userInputs: []
+        });
+    })
+    .post('/:siteId/settings/regexGenerator', function(req, res) {
+        var userInputs = req.body.url.filter(Boolean);
+        if (!userInputs.length) {
+            return res.render('regexGenerator', {
+                ok: undefined,
+                userInputs: []
+            });
+        } else {
+            var response = reGenerator.init(userInputs);
+            return res.render('regexGenerator', {
+                ok: response.ok,
+                msg: response.errorMessage,
+                regexResult: response.regex,
+                userInputs: userInputs
+            });
+        }
     })
     .get('/:siteId/headerBidding', function (req, res) {
         userModel.verifySiteOwner(req.session.user.email, req.params.siteId)

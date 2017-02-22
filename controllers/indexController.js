@@ -78,6 +78,9 @@ function createNewUser(params, res) {
 		});
 
 		return [params.email, analyticsObj];
+	}).catch(function(err) {
+		console.log(err);
+		console.log("Error Occured");
 	});
 }
 
