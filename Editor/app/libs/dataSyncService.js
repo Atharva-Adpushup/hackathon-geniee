@@ -3,6 +3,7 @@ import { arrayOf, normalize } from 'normalizr';
 import { channelSchema } from 'schemas/site';
 import { siteModes } from 'consts/commonConsts';
 import _ from 'lodash';
+import { openPageGroupIfPresent } from '../misc/beforeEditorInit';
 
 const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' })),
 	getData = (url, data) => ($.get(url, data)),
@@ -17,8 +18,8 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 		const deferred = $.Deferred(),
 			processData = (rawData) => {
 				const parsedData = (typeof (rawData) === 'string') ? JSON.parse(rawData) : rawData,
-					result = normalize(parsedData.channels, arrayOf(channelSchema)),
-					computedResult = $.extend(true, {}, result.entities);
+					result = normalize(parsedData.channels, arrayOf(channelSchema));
+				let computedResult = $.extend(true, {}, result.entities);
 
 				computedResult.siteData = {
 					mode: ((parsedData.site.hasOwnProperty('apConfigs')) ? parseInt(parsedData.site.apConfigs.mode, 10) : siteModes.DRAFT),
@@ -51,6 +52,8 @@ const save = (url, data) => ($.ajax({ type: 'POST', url, data, dataType: 'json' 
 				_.forOwn(computedResult.sectionByIds, (sectionData, sectionName) => {
 					computedResult.sectionByIds[sectionName].ads = _.keys(computedResult.sectionByIds[sectionName].ads);
 				});
+
+				computedResult = openPageGroupIfPresent(computedResult);
 
 				deferred.resolve(computedResult);
 				return deferred.promise();
