@@ -46,8 +46,8 @@ block append headScripts
 
 block bodyContent
 
-    //- if environment === 'production'
-    //-     include layout/extensionDetectionPopup
+    if environment === 'production'
+        include layout/extensionDetectionPopup
 
     if isChrome
         if channels.length
