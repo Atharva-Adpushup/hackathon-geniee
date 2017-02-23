@@ -45,6 +45,10 @@ block append headScripts
     link(rel="chrome-webstore-item", href="https://chrome.google.com/webstore/detail/lbfaiagkagpgeefmnpefcibmpeccpjpi")
 
 block bodyContent
+
+    //- if environment === 'production'
+    //-     include layout/extensionDetectionPopup
+
     if isChrome
         if channels.length
             .loaderwrapper.spinner(data-id='loader', style='display: block')
