@@ -231,7 +231,7 @@ module.exports = {
 			rowItem[8] = pageGroupObj.pageCTR;
 			pageGroupsTabularData.table.footer[8] += Number(pageGroupObj.pageCTR);
 			
-			rowItem[9] = _.keys(pageGroupObj.variationData).length;
+			rowItem[9] = _.keys(pageGroupObj.variations).length;
 			pageGroupsTabularData.table.footer[9] += Number(rowItem[9]);
 
 			pageGroupsTabularData.table.rows.push(rowItem);
