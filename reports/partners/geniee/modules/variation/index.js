@@ -71,6 +71,10 @@ module.exports = {
 	setVariationsHighChartsData: function(pageGroupData) {
 		var self = this,
             computedData = extend(true, {}, pageGroupData),
+			highChartsData, datesObj, currentComputedObj, currentDate;
+
+		_.forOwn(computedData, function(pageGroupObj, pageGroupKey) {
+			// Reset config for every page group
 			highChartsData = {
 				highCharts: {
 					revenue: [],
@@ -79,17 +83,16 @@ module.exports = {
 					pagerpm: [],
 					pagectr: []
 				}
-			},
+			};
 			datesObj = {
 				revenue: {},
 				pageviews: {},
 				clicks: {},
 				pagerpm: {},
 				pagectr: {}
-			},
-			currentComputedObj = {}, currentDate;
+			};
+			currentComputedObj = {};
 
-		_.forOwn(computedData, function(pageGroupObj, pageGroupKey) {
 			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
 				_.forEach(variationObj.zones, function(zonesObj) {
 					currentDate = moment(zonesObj.date).valueOf();
@@ -160,6 +163,9 @@ module.exports = {
 	},
 	setVariationsTabularData: function(pageGroupData) {
 		var computedData = extend(true, {}, pageGroupData),
+			variationsTabularData;
+
+		_.forOwn(computedData, function(pageGroupObj, pageGroupKey) {
 			variationsTabularData = {
 				table: {
 					header: ['NAME', 'TRAFFIC DISTRIBUTION', 'REVENUE', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'REVENUE CONTRIBUTION (%)'],
@@ -167,8 +173,7 @@ module.exports = {
 					footer: ['TOTAL', 0, 0, 0, 0, 0, 0, 0, 0]
 				}
 			};
-
-		_.forOwn(computedData, function(pageGroupObj, pageGroupKey) {
+			
 			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
 				var rowItem = [];
 
