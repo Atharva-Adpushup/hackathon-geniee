@@ -31,7 +31,7 @@ module.exports = function(app) {
         }
 
         function isAuthorised() {
-            return _.find(['/user/site', '/genieeApi', '/data', 'proxy', '/authenticate'], function(route) { return req.url.indexOf(route) !== -1 }) ? true : false;
+            return _.find(['/user/site', '/genieeApi', '/user/connectGoogle', '/user/requestOauth', '/user/oauth2callback', '/data', 'proxy', '/authenticate'], function(route) { return req.url.indexOf(route) !== -1 }) ? true : false;
         };
 
         if ((req.session && req.session.partner === 'geniee') && !isAuthorised()) {
