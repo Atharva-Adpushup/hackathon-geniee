@@ -42,6 +42,9 @@ const adsByIds = (state = {}, action) => {
 		case adActions.UPDATE_CSS:
 			return { ...state, [action.adId]: { ...state[action.adId], css: action.css } };
 
+		case sectionActions.UPDATE_INCONTENT_FLOAT:
+			return { ...state, [action.adId]: { ...state[action.adId], css: action.floatCss } };
+
 		case variationActions.COPY_VARIATION:
 			const ads = {};
 			_.each(action.ads, (section) => (ads[section.id] = section));

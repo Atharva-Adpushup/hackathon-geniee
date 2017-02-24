@@ -108,11 +108,27 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			xpath
 		};
 	},
-	updateIncontentFloat = (sectionId, float) => {
+	updateIncontentFloat = (sectionId, adId, float) => {
+		let floatCss = '';
+
+		switch (float) {
+			case 'right':
+				floatCss = rightSectionCss;
+				break;
+			case 'left':
+				floatCss = leftSectionCss;
+				break;
+			default:
+				floatCss = defaultSectionCss;
+				break;
+		};
+		
 		return {
 			type: sectionActions.UPDATE_INCONTENT_FLOAT,
 			sectionId,
-			float
+			adId,
+			float,
+			floatCss
 		};
 	};
 

@@ -26,8 +26,9 @@ class variationSectionElement extends Component {
 	onFloatSelectChange(float) {
 		this.setState({ float });
 
-		const sectionId = this.props.section.id;
-		this.props.onIncontentFloatUpdate(sectionId, float);
+		const sectionId = this.props.section.id,
+            adId = this.props.section.ads[0].id;
+		this.props.onIncontentFloatUpdate(sectionId, adId, float);
 	}
 
 	render() {
