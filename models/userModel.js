@@ -20,8 +20,9 @@ var modelAPI = module.exports = apiModule(),
 	request = require('request-promise'),
 	User = model.extend(function() {
 		this.keys = ['firstName', 'lastName', 'email', 'salt', 'passwordMd5', 'sites', 'adNetworkSettings', 'createdAt',
-			'passwordResetKey', 'passwordResetKeyCreatedAt', 'requestDemo',
-			'requestDemoData', 'analytics', 'adNetworks', 'pageviewRange', 'managedBy', 'userType', 'websiteRevenue', 'crmDealId', 'revenueUpperLimit', 'preferredModeOfReach', 'revenueLowerLimit', 'revenueAverage'];
+			'passwordResetKey', 'passwordResetKeyCreatedAt', 'requestDemo', 'requestDemoData', 'analytics', 'adNetworks', 
+			'pageviewRange', 'managedBy', 'userType', 'websiteRevenue', 'crmDealId', 'revenueUpperLimit', 'preferredModeOfReach', 
+			'revenueLowerLimit', 'revenueAverage', 'adnetworkCredentials'];
 		this.validations = schema.user.validations;
 		this.classMap = {
 			adNetworkSettings: networkSettings
@@ -453,6 +454,30 @@ function apiModule() {
 					return Promise.all(sitePromises).then(function (sites) {
 						return sites;
 					});					
+				});
+		},
+		saveCredentials: function(json, email) {
+			return API.getUserByEmail(email)
+				.then(function(user) {
+					Object.keys(json).forEach(function(key) {
+						if (json[key].username) {
+							if (!json[key].password || json[key].password === '') {
+								throw new AdPushupError({
+									errorField: key,
+									incompleteCredentials: ['Please enter Username and Password both']
+								});
+							}
+						} else {
+							if (json[key].password) {
+								throw new AdPushupError({
+									errorField: key,
+									incompleteCredentials: ['Please enter Username and Password both']
+								});
+							}							
+						}
+					});
+					user.set('adnetworkCredentials', json);
+					return user.save();
 				});
 		},
 		setSitePageGroups: function(email) {

@@ -3,6 +3,11 @@ extends  layout/base
 block getTitle
     - var titleVar = "Settings | RegEx Generator"
 
+block append headScripts
+    +loadAsset("js", [
+        '/assets/js/libs/custom/pagegroup-regex-editor.js',
+    ])
+
 block append headCss
     style.
         .mg-b-10 {
@@ -21,6 +26,15 @@ block append headCss
         }
         .instructions-box ul li {
             font-size: 14px;
+        }
+        pre code {
+            text-align: left;
+        }
+        pre code p {
+            margin: 0 !important;
+            padding 0;
+            display: inline;
+            float: left;
         }
 
 block bodyContent
@@ -52,14 +66,56 @@ block bodyContent
                                                 input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", value=userInputs[2])
                                                 input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", value=userInputs[3])
                                                 hr
-                                                if ok
-                                                    pre.mg-b-10
-                                                        code !{regexResult}
-                                                else if (ok != undefined && !ok)
-                                                    pre.mg-b-10
-                                                        code !{msg}
-                                                .row.settings-btn-pane
+                                                #output-box
+                                                    if ok
+                                                        - completeObj = regexResult.completeObj
+                                                        - completeRegex = regexResult.completeRegex
+                                                        - completeRegexAlt = regexResult.completeRegexAlt
+                                                        pre.mg-b-10
+                                                            code Exact Match Regex :
+                                                                #complete-regex !{completeRegex}
+                                                        pre.mg-b-10
+                                                            code Alternative Regex :
+                                                                #complete-regex-alt !{completeRegexAlt}
+                                                        pre.mg-b-10#individual-components
+                                                            code Individual Components (Exact Match):
+                                                                each value, key in completeObj
+                                                                    if typeof value === 'object'
+                                                                        for innerValue, innerKey in value
+                                                                            - innerPrintThis = innerKey + ' --> <strong>' + innerValue + '</strong>';
+                                                                            p!= innerPrintThis
+                                                                    else
+                                                                        - printThis = key + ' --> <strong>' + value + '</strong>';
+                                                                        p!= printThis
+                                                    else if (ok != undefined && !ok)
+                                                        pre.mg-b-10
+                                                            code !{msg}
+                                                    .row.settings-btn-pane
+                                                        if ok
+                                                            .col-sm-3#edit-btn-box
+                                                                input.form-control.btn-primary#edit-regex(type="button", value="Edit Expression")
+                                                        .col-sm-3
+                                                            input.form-control.btn-primary(type="submit", value="Generate Expression")
+                                            if ok
+                                                #edit-box.mg-b-10.hidden
+                                                    each value, key in completeObj
+                                                        if typeof value === 'object'
+                                                            for innerValue, innerKey in value
+                                                                .mg-b-10
+                                                                    .col-md-6
+                                                                        .input-name!= innerKey
+                                                                    .col-md-6
+                                                                        input.form-control(type="text", value='#{innerValue}', data-id="path-value")
+                                                                    div(style="clear:both;")
+                                                                    
+                                                        else
+                                                            .mg-b-10
+                                                                .col-md-6
+                                                                    .input-name!= key
+                                                                .col-md-6
+                                                                    input.form-control(type="text", value='#{value}', data-id="#{key}")
+                                                                div(style="clear:both;")
                                                     .col-sm-3
-                                                        input.form-control.btn-primary(type="submit", value="Generate Expression")
+                                                        input.form-control.btn-primary#save-regex(type="button", value="Save")
 
                 div(style="clear:both;")

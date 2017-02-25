@@ -84,6 +84,12 @@ block bodyContent
                                                     input(type="hidden" name="pageGroupPattern" value=p.pageGroup)
                                                 .col-sm-8
                                                     input.form-control(value=utils.getPageGroupPattern(p.pageGroup, patterns) name="pageGroupPattern" type="text" placeholder="Enter pagegroup pattern")
+                                        hr
+                                        .row
+                                            .col-md-4
+                                                a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexVerifier", target="_blank") Regex Verification Tool
+                                            //- .col-md-4
+                                            //-     a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexGenerator", target="_blank") Regex Generation Tool
                                     .col-sm-6
                                         .row
                                             .col-sm-12

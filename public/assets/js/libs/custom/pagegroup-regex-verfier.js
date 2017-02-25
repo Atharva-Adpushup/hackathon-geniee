@@ -30,8 +30,6 @@ $(document).ready(function () {
                 });
                 return response ? !response : undefined;
             },
-            createPagegroupTest: function(patternText) {
-            },
             pagegroupPatternMatch: function(fields, pattern, errorBox, mainErrorBox) {
                 var response,
                     that = this;

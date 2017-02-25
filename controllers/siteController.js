@@ -136,8 +136,6 @@ router
                 return res.render('regExVerifier', {
                     pageGroups: site.get('cmsInfo').pageGroups,
                     patterns: site.get('apConfigs').pageGroupPattern ? site.get('apConfigs').pageGroupPattern : [],
-                    apConfigs: site.get('apConfigs'),
-                    blocklist: site.get('apConfigs').blocklist,
                     siteId: req.params.siteId,
                     siteDomain: site.get('siteDomain')
                 });
@@ -161,6 +159,7 @@ router
             });
         } else {
             var response = reGenerator.init(userInputs);
+            // console.log(response);
             return res.render('regexGenerator', {
                 ok: response.ok,
                 msg: response.errorMessage,

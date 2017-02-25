@@ -481,6 +481,181 @@ router
         } else {
             return res.redirect('/user/dashboard');
         }
-    });
+    })
+	.get('/credentials', function(req, res) {
+		userModel.getUserByEmail(req.session.user.email)
+            .then(function(user) {
+                    var credentialsFromModel = user.get('adnetworkCredentials') || [],
+                        userAdnetworkCredentials = {
+                            taboola: {
+                                'username': credentialsFromModel.taboola.username || '',
+                                'password': credentialsFromModel.taboola.password || ''
+                            },
+                            revContent: {
+                                'username': credentialsFromModel.revContent.username || '',
+                                'password': credentialsFromModel.revContent.password || ''
+                            },
+                            outBrain: {
+                                'username': credentialsFromModel.outBrain.username || '',
+                                'password': credentialsFromModel.outBrain.password || ''
+                            },
+                            contentAds: {
+                                'username': credentialsFromModel.contentAds.username || '',
+                                'password': credentialsFromModel.contentAds.password || ''
+                            },
+                            mediaNet: {
+                                'username': credentialsFromModel.mediaNet.username || '',
+                                'password': credentialsFromModel.contentAds.password || ''
+                            },
+                            yellowhammer: {
+                                'username': credentialsFromModel.yellowhammer.username || '',
+                                'password': credentialsFromModel.yellowhammer.password || ''
+                            },
+                            criteo: {
+                                'username': credentialsFromModel.criteo.username || '',
+                                'password': credentialsFromModel.criteo.password || ''
+                            },
+                            infolinks: {
+                                'username': credentialsFromModel.infolinks.username || '',
+                                'password': credentialsFromModel.infolinks.password || ''
+                            }
+                        };
+
+                userAdnetworkCredentials.commonRandomPassword = 'xxxxxxxxxx';
+                return res.render('credentials', {
+                    formData: userAdnetworkCredentials
+                });
+            });
+	})
+	.post('/credentials', function(req, res) {
+		userModel.getUserByEmail(req.session.user.email).then(function(user) {
+			var userAdnetworkCredentials = user.get('adnetworkCredentials'),
+				taboolaPassword = '',
+				revcontentPassword = '',
+				outbrainPassword = '',
+				contentadsPassword = '',
+				mediaNetPassword = '',
+				yellowhammerPassword = '',
+				criteoPassword = '',
+				infolinksPassword = '';
+
+			if (!req.body.taboolaPassword || req.body.taboolaPassword === '') {
+				taboolaPassword = '';
+			} else if (req.body.taboolaPassword === 'xxxxxxxxxx') {
+				taboolaPassword = userAdnetworkCredentials.taboola.password;
+			} else {
+				taboolaPassword = req.body.taboolaPassword;
+			}
+
+			if (!req.body.revcontentPassword || req.body.revcontentPassword === '') {
+				revcontentPassword = '';
+			} else if (req.body.revcontentPassword === 'xxxxxxxxxx') {
+				revcontentPassword = userAdnetworkCredentials.revContent.password;
+			} else {
+				revcontentPassword = req.body.revcontentPassword;
+			}
+
+			if (!req.body.outbrainPassword || req.body.outbrainPassword === '') {
+				outbrainPassword = '';
+			} else if (req.body.outbrainPassword === 'xxxxxxxxxx') {
+				outbrainPassword = userAdnetworkCredentials.outBrain.password;
+			} else {
+				outbrainPassword = req.body.outbrainPassword;
+			}
+
+			if (!req.body.contentadsPassword || req.body.contentadsPassword === '') {
+				contentadsPassword = '';
+			} else if (req.body.contentadsPassword === 'xxxxxxxxxx') {
+				contentadsPassword = userAdnetworkCredentials.contentAds.password;
+			} else {
+				contentadsPassword = req.body.contentadsPassword;
+			}
+
+			if (!req.body.medianetPassword || req.body.medianetPassword === '') {
+				mediaNetPassword = '';
+			} else if (req.body.medianetPassword === 'xxxxxxxxxx') {
+				mediaNetPassword = userAdnetworkCredentials.mediaNet.password;
+			} else {
+				mediaNetPassword = req.body.medianetPassword;
+			}
+
+			if (!req.body.yellowhammerPassword || req.body.yellowhammerPassword === '') {
+				yellowhammerPassword = '';
+			} else if (req.body.yellowhammerPassword === 'xxxxxxxxxx') {
+				yellowhammerPassword = userAdnetworkCredentials.yellowhammer.password;
+			} else {
+				yellowhammerPassword = req.body.yellowhammerPassword;
+			}
+
+			if (!req.body.criteoPassword || req.body.criteoPassword === '') {
+				criteoPassword = '';
+			} else if (req.body.criteoPassword === 'xxxxxxxxxx') {
+				criteoPassword = userAdnetworkCredentials.criteo.password;
+			} else {
+				criteoPassword = req.body.criteoPassword;
+			}
+
+			if (!req.body.infolinksPassword || req.body.infolinksPassword === '') {
+				infolinksPassword = '';
+			} else if (req.body.infolinksPassword === 'xxxxxxxxxx') {
+				infolinksPassword = userAdnetworkCredentials.infolinks.password;
+			} else {
+				infolinksPassword = req.body.infolinksPassword;
+			}
+
+			var credentials = {
+				taboola: {
+					'username': req.body.taboolaUsername,
+					'password': taboolaPassword
+				},
+				revContent: {
+					'username': req.body.revcontentUsername,
+					'password': revcontentPassword
+				},
+				outBrain: {
+					'username': req.body.outbrainUsername,
+					'password': outbrainPassword
+				},
+				contentAds: {
+					'username': req.body.contentadsUsername,
+					'password': contentadsPassword
+				},
+				mediaNet: {
+					'username': req.body.medianetUsername,
+					'password': mediaNetPassword
+				},
+				yellowhammer: {
+					'username': req.body.yellowhammerUsername,
+					'password': yellowhammerPassword
+				},
+				criteo: {
+					'username': req.body.criteoUsername,
+					'password': criteoPassword
+				},
+				infolinks: {
+					'username': req.body.infolinksUsername,
+					'password': infolinksPassword
+				}
+			};
+			req.body = credentials;
+			return userModel.saveCredentials(credentials, req.session.user.email);
+		})
+		.then(function() {
+			var user = Array.prototype.slice.call(arguments)[0],
+				dataToSend = req.body;
+			req.session.user = user;
+			dataToSend.commonRandomPassword = 'xxxxxxxxxx';
+			return res.render('credentials', { profileSaved: true, formData: req.body });
+		})
+		.catch(function(e) {
+			var dataToSend = req.body;
+			dataToSend.commonRandomPassword = 'xxxxxxxxxx';
+			if (e instanceof AdPushupError) {
+				res.render('credentials', { credentialError: e.message, formData: dataToSend });
+			} else if (e.name && e.name === 'CouchbaseError') {
+				res.render('credentials', { userNotFound: true, formData: dataToSend });
+			}
+		});
+	});
 
 module.exports = router;

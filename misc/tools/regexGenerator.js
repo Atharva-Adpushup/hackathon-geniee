@@ -5,13 +5,17 @@ var regexGenerator = {
     protocolSet: new Set(), // http | https | ftp
     wSet: new Set(), // wwww or subdomain
     dSet:  new Set(), // domain name
+    specialCharacterSet: new Set(),
+    specialCharacterArray: [],
     protocolArray: [],
     wArray: [],
     dArray: [],
     pathArray: [],
     queryArray: [],
+    completeObj: {},
     ok: true,
     errorMessage: '',
+    pRegexAlt: '',
     pathSpecialCharacterCount: 0,
     makeSet: function(value, set) {
         if(value != '' && value != null && value != 'null') {
@@ -50,6 +54,15 @@ var regexGenerator = {
             regexGenerator.dArray.push(value);
         }
     },
+
+
+    makeSpecialCharArray: function(value, key, set) {
+        if(key && key != null && key.trim() != '') {
+            regexGenerator.specialCharacterArray.push(value);
+        }
+    },
+    
+    
     makeProtocolRegex: function() {
         var protocolRegex;
         if(regexGenerator.protocolSet.size) {
@@ -120,28 +133,84 @@ var regexGenerator = {
         return dRegex ? dRegex : false;
     },
     makePRegex: function(inputArrayLength) {
-        var pRegex, pParts, that=this;
+        var pRegex, pParts, that=this, pathObj = {};
         if(regexGenerator.pathArray.length) {
+
+            // console.log(regexGenerator.pathArray);
+            var validSymbols = '[',
+                re = new RegExp('[^a-zA-Z0-9\\s\/]', 'i');
+            _.forEach(regexGenerator.pathArray, function(soloPath) {
+                _.forEach(soloPath, function(char) {
+                    if(re.test(char)) {
+                        regexGenerator.specialCharacterSet.add(char);
+                    }
+                });
+            });
+
+            regexGenerator.specialCharacterSet.forEach(regexGenerator.makeSpecialCharArray);
+
+            validSymbols = validSymbols + regexGenerator.specialCharacterArray.join('') + ']';
+
             pParts = regexGenerator.pathArray[0].split('/');
             if (pParts.length == 1) {
                 var onlyPart = pParts[0];
                 if(onlyPart.match('[^a-z0-9\/+]')) {
-                    pRegex = '\\/(?:\\w+[!@#$%^&*()+\\[\\]<>,.|{}-]+\\w+)+\\/?';
+
+                    pathObj[onlyPart] = '\\/(?:\\w+' + validSymbols + '+\\w+)+\\/?';
+                    pRegex = '\\/(?:\\w+' + validSymbols + '+\\w+)+\\/?';
+
+                    // pathObj[onlyPart] = '\\/(?:\\w+[!@#$%^&*()+\\[\\]<>,.|{}-]+\\w+)+\\/?';
+                    // pRegex = '\\/(?:\\w+[!@#$%^&*()+\\[\\]<>,.|{}-]+\\w+)+\\/?';
+
+                    // Alternate Regex
+                    regexGenerator.pRegexAlt = '\\/(?:\\w+[!@#$%^&*()+\\[\\]<>,.|{}-]+\\w+)+\\/?';
                 } else {
-                    pRegex = '\\/(?:\\w)+\\/?';                    
+                    pathObj[onlyPart] = onlyPart + '\\/';
+                    pRegex = pRegex + onlyPart + '\\/';
+
+                    // Alternate Regex
+                    regexGenerator.pRegexAlt = '\\/(?:\\w)+\\/?';
+
+                    // pathObj[onlyPart] = '(?:\\w)+\\/';
+                    // pRegex = '\\/(?:\\w)+\\/?';                    
                 }
             } else if (pParts.length > 1) {
                 pRegex = '\\/';
+
+                // Alternate Regex
+                regexGenerator.pRegexAlt = '\\/';
+
                 _.forEach(pParts, function(part) {
                     if(part.trim().length > 0) {
                         if(part.match('[^a-z0-9\/+]')) {
-                            pRegex = pRegex + '(?:\\w+[!@#$%^&*()+\\[\\]<>,.|{}-]+\\w+)+\\/';
+
+                            pathObj[part] = '(?:\\w+' + validSymbols + '+\\w+)+\\/';
+                            pRegex = pRegex + '(?:\\w+' + validSymbols + '+\\w+)+\\/';
+
+                            // pathObj[part] = '(?:\\w+[!@#$%^&*()+\\[\\]<>,.|{}-]+\\w+)+\\/';
+                            // pRegex = pRegex + '(?:\\w+[!@#$%^&*()+\\[\\]<>,.|{}-]+\\w+)+\\/';
+
+                            // Alternate Regex
+                            regexGenerator.pRegexAlt = regexGenerator.pRegexAlt + '(?:\\w+[!@#$%^&*()+\\[\\]<>,.|{}-]+\\w+)+\\/';
                         } else {
-                            pRegex = pRegex + '(?:\\w)+\\/';                            
+                            // pathObj[part] = '(?:\\w)+\\/';
+                            // pRegex = pRegex + '(?:\\w)+\\/';
+
+                            // Strict
+                            pathObj[part] = part + '\\/';
+                            pRegex = pRegex + part + '\\/';
+
+                            // Alternate Regex
+                            regexGenerator.pRegexAlt = regexGenerator.pRegexAlt + '(?:\\w)+\\/';
                         }
                     }
                 });
                 pRegex = pRegex + '?';
+
+                // Alternate Regex
+                regexGenerator.pRegexAlt = regexGenerator.pRegexAlt + '?';
+
+                regexGenerator.completeObj.path = pathObj;
             }
         }
         return pRegex ? pRegex : false;
@@ -159,41 +228,57 @@ var regexGenerator = {
         return qRegex ? qRegex : false;
     },
     combineRegexes: function(p, w, d, pth, q) {
-        var completeRegex;
-        if(p) {
-            completeRegex = p;
-        }
-        if(w) {
-            completeRegex = completeRegex + w;
-        }
-        if(d) {
-            completeRegex = completeRegex + d;
-        }
+        var completeRegex, completeRegexAlt;
+
+        // if(p) {
+        //     regexGenerator.completeObj.protocol = p;
+        //     completeRegex = p;
+        // }
+        // if(w) {
+        //     regexGenerator.completeObj.w = w;
+        //     completeRegex = completeRegex + w;
+        // }
+        // if(d) {
+        //     regexGenerator.completeObj.domain = d;
+        //     completeRegex = completeRegex + d;
+        // }
         if(pth) {
-            completeRegex = completeRegex + pth;
+            // completeRegex = completeRegex + pth;
+            completeRegex = pth;
+            completeRegexAlt = regexGenerator.pRegexAlt;
         }
         if(q) {
+            regexGenerator.completeObj.query = q;
             completeRegex = completeRegex + q;
+            completeRegexAlt = completeRegexAlt + q;
         }
         completeRegex = completeRegex + '$';
+        completeRegexAlt = completeRegexAlt + '$';
 
-        return completeRegex;
+        return {
+            completeRegex: completeRegex,
+            completeRegexAlt: completeRegexAlt,
+            completeObj: regexGenerator.completeObj
+        };
     },
     init: function(inputArray) {
         regexGenerator.protocolSet = new Set(); // http | https | ftp
         regexGenerator.wSet = new Set(); // wwww or subdomain
         regexGenerator.dSet =  new Set(); // domain name
+        regexGenerator.specialCharacterSet = new Set();
+        regexGenerator.specialCharacterArray = [];
         regexGenerator.protocolArray = [];
         regexGenerator.wArray = [];
         regexGenerator.dArray = [];
         regexGenerator.pathArray = [];
         regexGenerator.queryArray = [];
+        regexGenerator.completeObj = {};
         regexGenerator.ok = true;
         regexGenerator.errorMessage = '';
+        regexGenerator.pRegexAlt = '';
         regexGenerator.pathSpecialCharacterCount = 0;
         _.forEach(inputArray, function(url) {
             var parsedUrl = urlModule.parse(url, false, true);
-            // console.log(parsedUrl);
             regexGenerator.makeSet(parsedUrl.protocol, regexGenerator.protocolSet);
             regexGenerator.makeWSet(parsedUrl.host, regexGenerator.wSet, regexGenerator.dSet, parsedUrl.pathname);
             regexGenerator.makePathArray(parsedUrl.pathname);
