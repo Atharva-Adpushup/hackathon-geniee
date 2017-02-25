@@ -154,6 +154,30 @@ textarea {
 	}
 }
 
+/* Mini alert */
+
+%alert-mini {
+	position: fixed;
+    z-index: 2000;
+    box-shadow: 1px 2px 4px rgba(0,0,0,.25);
+    font-size: 1.2em;
+    width: 400px;
+    background: $darkGreyColor;
+    border: none;
+    color: $whiteColor;
+
+	a {
+		color: $whiteColor;
+		text-decoration: underline;
+	}
+}
+
+.alert-mini-right {
+	@extend %alert-mini;
+	right: 10px;
+    top: 70px;
+}
+
 /* Alert card */
 
 %alert-card {

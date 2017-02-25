@@ -184,7 +184,8 @@ router
                     adNetworkSettings: !_.isEmpty(user.get('adNetworkSettings')) ? {
                         pubId: adSenseData.adsenseAccounts[0].id,
                         email: adSenseData.userInfo.email
-                    } : false
+                    } : false,
+                    siteId: req.session.siteId
                 });
             })
             .catch(function (err) {

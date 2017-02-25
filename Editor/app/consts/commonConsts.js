@@ -278,8 +278,8 @@ const status = {
 		}
 	],
 	defaultSectionCss = { 'margin-left': 'auto', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px', clear: 'both' },
-	leftSectionCss = { float: 'left', 'margin-left': '0px', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px' },
-	rightSectionCss = { float: 'right', 'margin-left': 'auto', 'margin-right': '0px', 'margin-top': '0px', 'margin-bottom': '0px' };
+	leftSectionCss = { float: 'left', 'margin-left': '0px', 'margin-right': '5px', 'margin-top': '0px', 'margin-bottom': '5px' },
+	rightSectionCss = { float: 'right', 'margin-left': '5px', 'margin-right': '0px', 'margin-top': '0px', 'margin-bottom': '5px' };
 
 export {
 	status, proxy, stores, adTypes, messengerCommands, siteModes,

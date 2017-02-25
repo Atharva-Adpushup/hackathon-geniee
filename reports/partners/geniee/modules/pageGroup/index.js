@@ -207,7 +207,10 @@ module.exports = {
 			};
 
 		_.forOwn(computedData.pageGroups, function(pageGroupObj, pageGroupKey) {
-			var rowItem = [];
+			var rowItem = [],
+				tempVariationsObj = extend(true, {}, pageGroupObj.variations);
+
+			delete tempVariationsObj.data;
 
 			rowItem[0] = ' ';
 			rowItem[1] = pageGroupObj.pageGroup;
@@ -231,7 +234,7 @@ module.exports = {
 			rowItem[8] = pageGroupObj.pageCTR;
 			pageGroupsTabularData.table.footer[8] += Number(pageGroupObj.pageCTR);
 			
-			rowItem[9] = _.keys(pageGroupObj.variationData).length;
+			rowItem[9] = _.keys(tempVariationsObj).length;
 			pageGroupsTabularData.table.footer[9] += Number(rowItem[9]);
 
 			pageGroupsTabularData.table.rows.push(rowItem);

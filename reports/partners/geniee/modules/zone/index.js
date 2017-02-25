@@ -12,7 +12,7 @@ module.exports = {
 				validZones = _.filter(zonesObj.zones, 'type');
 			
 			if (!validZones || !validZones.length) {
-				return false;
+				return true;
 			}
 
 			computedData[formattedDate] = validZones;

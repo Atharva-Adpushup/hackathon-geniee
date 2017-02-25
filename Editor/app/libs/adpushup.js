@@ -1,4 +1,5 @@
-(function (w, d, $) {
+$(document).ready(function() {
+    (function (w, d, $) {
 
     var a = (w.adpushup = w.adpushup || {});
 
@@ -75,3 +76,5 @@
         }
     });
 })(window, document, jQuery);
+
+});

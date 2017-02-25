@@ -251,6 +251,11 @@ collapsedextended
 .u-block--half {
 	height: 50%
 }
+
+.ap-hide {
+	display: none;
+}
+
 // Use this class to block UI consistency
 .u-block-ui {
 	@include block-ui;

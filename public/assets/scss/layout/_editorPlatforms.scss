@@ -43,3 +43,39 @@
 		width: 1366px !important;
 	}
 }
+
+.overlay-primary {
+  position: fixed;
+  z-index: 3000;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0,0,0,.65);
+
+  .overlay-inner {
+	background-color: $whiteColor;
+	width: 60%;
+	position: absolute;
+	left: 20%;
+	top: 15%;
+
+	.overlay-heading {
+		h2 {
+			font-weight: 400;
+			color: $whiteColor;
+			background: $primaryColor;
+			padding: 20px;
+			font-size: 2.2em;
+		}
+	}
+
+	.overlay-content {
+		padding: 20px;
+
+		p {
+			font-weight: 300;
+			color: $fontColor;
+			font-size: 1.25em;
+		}	
+	}
+  }
+}
