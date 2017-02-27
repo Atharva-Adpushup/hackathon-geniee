@@ -22,7 +22,7 @@ module.exports = {
 			});
 
 			if (collectionDataIndex > -1) {
-				mainObj[metric][collectionIndex].data[collectionDataIndex][1] += computedObj[metric].data[0][1];
+				mainObj[metric][collectionIndex].data[collectionDataIndex][1] = computedObj[metric].data[0][1];
 			} else {
 				mainObj[metric][collectionIndex].data.push(computedObj[metric].data[0]);
 			}
