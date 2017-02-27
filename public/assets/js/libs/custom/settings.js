@@ -13,29 +13,29 @@ $(document).ready(function () {
             },
 
             // Function to generate header code
-            generateHeaderCode: function() {
+            generateHeaderCode: function () {
                 $('#header-code').text('<script data-cfasync="false" type="text/javascript">' + this.templates.headerCode + '</script>');
             },
 
             // Function to render block list items
-            renderBlocklistItems: function() {
+            renderBlocklistItems: function () {
                 var that = this;
-                if(w.blocklist[0] !== '') {
+                if (w.blocklist[0] !== '') {
                     $('.blocklist').html('');
-                    w.blocklist.forEach(function(item) {
+                    w.blocklist.forEach(function (item) {
                         $('.blocklist').append('<li>' + item + that.templates.closeBtn + '</li>');
                     });
                 }
             },
 
             // Function to add item to blocklist
-            addToBlocklist: function(blocklistItem, input) {
-                if(blocklistItem) {
-                    var alreadyAdded = w.blocklist.find(function(item) {
+            addToBlocklist: function (blocklistItem, input) {
+                if (blocklistItem) {
+                    var alreadyAdded = w.blocklist.find(function (item) {
                         return item === blocklistItem;
                     });
 
-                    if(!alreadyAdded) {
+                    if (!alreadyAdded) {
                         w.blocklist.push(blocklistItem);
                         this.renderBlocklistItems();
                         $('#blocklistErr').html('');
@@ -48,13 +48,13 @@ $(document).ready(function () {
             },
 
             // Function to remove item from blocklist
-            removeFromBlocklist: function(item) {
+            removeFromBlocklist: function (item) {
                 w.blocklist.splice(w.blocklist.indexOf(item), 1);
                 this.renderBlocklistItems();
             },
 
             // Function to parse form data
-            parseFormData: function(values, type) {
+            parseFormData: function (values, type) {
                 switch (type) {
                     case 'pageGroups':
                         var pageGroups = [];
@@ -62,6 +62,10 @@ $(document).ready(function () {
                         for (var i = 0; i < values.length; i += 2) {
                             var json = {};
                             if (values[i].name === 'pageGroupPattern') {
+                                if (!values[i + 1].value) {
+                                    return '';
+                                }
+
                                 json[values[i].value] = values[i + 1].value;
                                 pageGroups.push(json);
                             }
@@ -81,32 +85,40 @@ $(document).ready(function () {
             },
 
             // Function to save site settings
-            saveSiteSettings: function(formValues) {
-                 var autoOpt = this.parseFormData(formValues, 'other').autoOptimise ? true : false,
-                    pageGroupPattern = JSON.stringify(this.parseFormData(formValues, 'pageGroups')),
-                    otherSettings = JSON.stringify(this.parseFormData(formValues, 'other'));
-                $.post('saveSiteSettings', {
-                    pageGroupPattern: pageGroupPattern,
-                    otherSettings: otherSettings,
-                    autoOptimise: autoOpt,
-                    blocklist: JSON.stringify(w.blocklist)
-                }, function (res) {
-                    if (res.success) {
-                        alert('Settings saved!');
-                    }
-                    else {
-                        alert('Some error occurred!');
-                    }
-                });
+            saveSiteSettings: function (formValues) {
+                var $error = $('#error');
+
+                if (!this.parseFormData(formValues, 'pageGroups')) {
+                    $error.html('Pagegroup pattern cannot be blank. Please provide valid regex patterns for all the pagegroups.');
+                } else {
+                    var autoOpt = this.parseFormData(formValues, 'other').autoOptimise ? true : false,
+                        pageGroupPattern = JSON.stringify(this.parseFormData(formValues, 'pageGroups')),
+                        otherSettings = JSON.stringify(this.parseFormData(formValues, 'other'));
+
+                    $error.html('');
+                    $.post('saveSiteSettings', {
+                        pageGroupPattern: pageGroupPattern,
+                        otherSettings: otherSettings,
+                        autoOptimise: autoOpt,
+                        blocklist: JSON.stringify(w.blocklist)
+                    }, function (res) {
+                        if (res.success) {
+                            alert('Settings saved!');
+                        }
+                        else {
+                            alert('Some error occurred!');
+                        }
+                    });
+                }
             },
 
             // Copy header code to clipboard
-            copyToClipboard: function(flag) {
+            copyToClipboard: function (flag) {
                 $('.clipboard-copy').fadeIn();
                 setTimeout(function () {
                     $('.clipboard-copy').fadeOut();
                 }, 1500);
-                if(flag) {
+                if (flag) {
                     $('#code-conversion-box').select();
                 } else {
                     $('#header-code').select();
@@ -115,7 +127,7 @@ $(document).ready(function () {
             },
 
             // Send header code to developer
-            sendHeaderCode: function(data, btn) {
+            sendHeaderCode: function (data, btn) {
                 $(btn).prop('disabled', true).html('Sending...');
                 $.post('/user/sendCode', data, function (res) {
                     if (res.success) {
@@ -276,7 +288,7 @@ $(document).ready(function () {
             },
 
             // Initialise settings module
-            init: function(list) {
+            init: function (list) {
                 this.renderBlocklistItems();
                 this.generateHeaderCode();
             }
@@ -308,7 +320,7 @@ $(document).ready(function () {
         });
 
         // Add to blocklist trigger
-        $('#addBlocklistItem').on('click', function() {
+        $('#addBlocklistItem').on('click', function () {
             var blocklistItem = $('#blocklistItem').val();
             settingsModule.addToBlocklist(blocklistItem, '#blocklistItem');
         });
@@ -346,7 +358,7 @@ $(document).ready(function () {
             }
         });
 
-        $('#clipboard-copy-adcode').click(function(e) {
+        $('#clipboard-copy-adcode').click(function (e) {
             e.preventDefault();
             settingsModule.copyToClipboard(1);
         });
