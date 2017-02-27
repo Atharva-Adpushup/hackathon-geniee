@@ -15,7 +15,6 @@ var express = require('express'),
     couchbase = require('../helpers/couchBaseService'),
     countryData = require('country-data'),
     Promise = require('bluebird'),
-    regexgen = require("regexgen"),
     N1qlQuery = require('couchbase-promises').N1qlQuery,
     router = express.Router({ mergeParams: true });
 
