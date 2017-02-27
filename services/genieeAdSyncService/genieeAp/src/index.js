@@ -30,7 +30,9 @@ $.extend(adp.config, ___abpConfig___, {
 
 
 function shouldWeNotProceed() {
-	return (config.disable || adp.creationProcessStarted || ((config.partner === 'geniee') && w.gnsmod && w.gnsmod.creationProcessStarted));
+	var hasGenieeStarted = !!((config.partner === 'geniee') && w.gnsmod && w.gnsmod.creationProcessStarted && !config.isAdPushupControlWithPartnerSSP);
+
+	return (config.disable || adp.creationProcessStarted || hasGenieeStarted);
 }
 
 function triggerControl(mode) {
@@ -38,7 +40,7 @@ function triggerControl(mode) {
 		return false;
 	}
 	config.mode = mode;
-	if (config.partner === 'geniee') {
+	if (config.partner === 'geniee' && !config.isAdPushupControlWithPartnerSSP) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
 			w.gnsmod.triggerAds();
 			utils.sendFeedback({ eventType: 3, mode: mode, referrer: config.referrer });

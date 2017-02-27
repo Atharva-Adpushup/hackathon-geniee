@@ -29,7 +29,21 @@ var model = require('../helpers/model'),
 		this.validations = {
 			'required': []
 		};
-		this.defaults = { apConfigs: {}, channels: [], cmsInfo: { cmsName: '', pageGroups: [] } };
+		this.defaults = {
+			apConfigs: {
+				// 'isAdPushupControlWithPartnerSSP', checks whether AdPushup control will be triggered
+				// on any SSP partner website
+				// Manually update it without any UI incase this condition gets true
+				// NOTE: AdPushup does not recommend this use case but we have to support it to complete
+				// our SSP integrations
+				isAdPushupControlWithPartnerSSP: false
+			},
+			channels: [],
+			cmsInfo: {
+				cmsName: '',
+				pageGroups: []
+			}
+		};
 		this.ignore = [];
 		this.classMap = { 'apConfigs': apConfigSchema };
 
@@ -182,6 +196,11 @@ function apiModule() {
 				json.partner = data.partner;
 				json.ownerEmail = data.ownerEmail;
 			}
+
+			if (!json.apConfigs.hasOwnProperty('isAdPushupControlWithPartnerSSP')) {
+				json.apConfigs.isAdPushupControlWithPartnerSSP = false;
+			}
+
 			return globalModel.incrSiteId()
 				.then(function (siteId) {
 					json.siteId = siteId;
@@ -283,7 +302,8 @@ function apiModule() {
 						xpathWaitTimeout: otherSettings.xpathWaitTimeout ? parseInt(otherSettings.xpathWaitTimeout, 10) : commonConsts.apConfigDefaults.xpathWaitTimeout,
 						adpushupPercentage: otherSettings.adpushupPercentage ? parseInt(otherSettings.adpushupPercentage, 10) : commonConsts.apConfigDefaults.adpushupPercentage,
 						autoOptimise: ((json.settings.autoOptimise === 'false') ? false : true),
-						blocklist: blocklist.length ? blocklist : ''
+						blocklist: blocklist.length ? blocklist : '',
+						isAdPushupControlWithPartnerSSP: (!!(site.get('apConfigs').isAdPushupControlWithPartnerSSP) ? site.get('apConfigs').isAdPushupControlWithPartnerSSP : commonConsts.apConfigDefaults.isAdPushupControlWithPartnerSSP)
 					};
 					site.set('apConfigs', siteConfig);
 					return site.save();

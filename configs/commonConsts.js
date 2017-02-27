@@ -7,7 +7,8 @@ module.exports = {
 		heartBeatMinInterval: 3000,
 		heartBeatStartDelay: 2000,
 		xpathWaitTimeout: 5000,
-		adpushupPercentage: 100
+		adpushupPercentage: 100,
+		isAdPushupControlWithPartnerSSP: false
 	},
 	bidCpmAdjustments: {},
 	hbGlobalSettingDefaults: {

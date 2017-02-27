@@ -23,8 +23,7 @@ router
 		}
 		var partnerEmail = json.partner + '@adpushup.com', siteId;
 		json.ownerEmail = partnerEmail;
-		//TODO: Replace below hard code draft mode with constant
-		json.apConfigs = { 'mode': CC.site.mode.DRAFT };
+		json.apConfigs = { 'mode': CC.site.mode.DRAFT, isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP };
 
 		// Function to create partner user account and site
 		function createPartnerAndSite() {

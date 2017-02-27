@@ -50,7 +50,7 @@ router
 				'ads': [],
 				'channels': [],
 				'templates': [],
-				'apConfigs': { 'mode': CC.site.mode.DRAFT }
+				'apConfigs': { 'mode': CC.site.mode.DRAFT, isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP }
 			};
 			return siteData;
 		})
