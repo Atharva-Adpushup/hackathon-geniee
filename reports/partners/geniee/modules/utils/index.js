@@ -26,7 +26,7 @@ module.exports = {
 			});
 
 			if (collectionDataIndex > -1) {
-				if ((metricConstants.revenue === metric) && (metricConstants.clicks === metric)) {
+				if ((metricConstants.revenue === metric) || (metricConstants.clicks === metric)) {
 					mainObj[metric][collectionIndex].data[collectionDataIndex][1] += computedObj[metric].data[0][1];
 				} else {
 					mainObj[metric][collectionIndex].data[collectionDataIndex][1] = computedObj[metric].data[0][1];
