@@ -73,6 +73,7 @@ module.exports = (function(requestPromise, signatureGenerator, oauthModule, zone
 						var computedData = {media: siteMetrics, pageGroups: updatedPageGroupsAndVariationsData};
 
 						return pageGroupModule.updateMetrics(computedData)
+							.then(pageGroupModule.updateZones)
 							.then(mediaModule.updateMetrics)
 							.then(pageGroupModule.setPageGroupsTabularData)
 							.then(pageGroupModule.setPageGroupsHighChartsData)

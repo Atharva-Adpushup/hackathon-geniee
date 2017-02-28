@@ -107,6 +107,25 @@ module.exports = {
 
 		return Promise.resolve(computedData);
 	},
+	updateZones: function(reportData) {
+		var computedData = extend(true, {}, reportData);
+
+		_.forOwn(computedData.pageGroups, function(pageGroupObj, pageGroupKey) {
+			var variationZonesArr = [];
+
+			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
+				var isDataKey = !!(variationKey === 'data');
+
+				if (isDataKey) { return true; }
+
+				variationZonesArr = variationZonesArr.concat(variationObj.zones);
+			});
+
+			computedData.pageGroups[pageGroupKey].zones = variationZonesArr;
+		});
+
+		return Promise.resolve(computedData);
+	},
 	setPageGroupsHighChartsData: function(data) {
 		var self = this,
 			computedData = extend(true, {}, data),
