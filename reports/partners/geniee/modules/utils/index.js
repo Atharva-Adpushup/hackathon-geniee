@@ -4,7 +4,11 @@ var _ = require('lodash'),
 module.exports = {
 	setHighChartsData: function(currentDate, metric, mainObj, computedObj) {
 		var collectionIndex = -1,
-			collectionDataIndex = -1, computedItem;
+			collectionDataIndex = -1, computedItem,
+			metricConstants = {
+				revenue: 'revenue',
+				clicks: 'clicks'
+			};
 
 		_.forEach(mainObj[metric], function(metricObj, index) {
 			if (metricObj.name == computedObj[metric].name) {
@@ -22,7 +26,12 @@ module.exports = {
 			});
 
 			if (collectionDataIndex > -1) {
-				mainObj[metric][collectionIndex].data[collectionDataIndex][1] = computedObj[metric].data[0][1];
+				if ((metricConstants.revenue === metric) && (metricConstants.clicks === metric)) {
+					mainObj[metric][collectionIndex].data[collectionDataIndex][1] += computedObj[metric].data[0][1];
+				} else {
+					mainObj[metric][collectionIndex].data[collectionDataIndex][1] = computedObj[metric].data[0][1];
+				}
+
 			} else {
 				mainObj[metric][collectionIndex].data.push(computedObj[metric].data[0]);
 			}
