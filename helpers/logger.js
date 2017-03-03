@@ -1,37 +1,58 @@
-var winston = require('winston'),
-	// Set up logger
-	customColors = {
-		trace: 'white',
-		debug: 'green',
-		info: 'green',
-		warn: 'yellow',
-		crit: 'red',
-		fatal: 'red'
+// Custom logger middleware
+
+const couchbase = require('./couchBaseService');
+
+const generateLog = (req, res, startTime) => {
+		const processingTime = `${+new Date() - startTime}ms`, // Calculate request processing time
+			{ method, url, ip, body, params, query, httpVersion, baseUrl } = req,
+			{ statusCode } = res,
+            timeStamp = new Date();
+
+		// Generate JSON log entry
+		const log = {
+			statusCode,
+			method,
+			url,
+			ip,
+			body,
+			params,
+			query,
+			httpVersion,
+			timeStamp,
+			userAgent: req.get('user-agent'),
+			processingTime,
+			baseUrl
+		},
+        logString = `${ip} - ${timeStamp} "${method} ${url} HTTP${httpVersion} ${statusCode}`;
+        
+		return logString;
 	},
-	logger = new (winston.Logger)({
-		colors: customColors,
-		transports: [
-			new (winston.transports.File)({
-				filename: __dirname + '/../logs/adpushupError.log',
-				colorize: true,
-				timestamp: true
-			})
-		]
-	}),
-	origLog;
+    logToDatabase = () => {
+        couchbase.connectToBucket('apGlobalBucket')
+            .then(data => {
+                console.log(data);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    },
+	logger = (req, res, next) => {
+		const startTime = +new Date(), // Get request start time
+			stream = process.stdout; // Set standard output stream
 
-winston.addColors(customColors);
-// Extend logger object to properly log 'Error' types
-origLog = logger.log;
+		// Listen to request 'end' event and log data
+		req.on('end', function () {
+			var log = generateLog(req, res, startTime);
 
-logger.log = function(level, err) {
-	var objType = Object.prototype.toString.call(err);
-	if (objType === '[object Error]') {
-		origLog.call(logger, level, err.toString() + ', Stack: ' + err.stack);
-	} else {
-		origLog.call(logger, level, err);
-	}
-};
+            logToDatabase();
 
+			// Write request log to output stream
+			//stream.write(log);
+		});
+        
+
+		next();
+	};
 
 module.exports = logger;
+

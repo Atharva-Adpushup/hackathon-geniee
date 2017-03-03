@@ -14,6 +14,7 @@ var express = require('express'),
 	consts = require('./configs/commonConsts'),
 	utils = require('./helpers/utils'),
 	couchBaseService = require('./helpers/couchBaseService'),
+	logger = require('./helpers/logger'),
 	accessLogStream = FileStreamRotator.getStream({
 		date_format: 'YYYYMMDD',
 		filename: config.development.LOGS_DIR + '/access-%DATE%.log',
@@ -36,6 +37,7 @@ var express = require('express'),
 		ttl: 86400,
 		prefix: 'sess::'
 	});
+	
 
 require('./services/genieeAdSyncService/index');
 require('./services/hbSyncService/index');
@@ -61,25 +63,28 @@ app.set('view engine', 'jade');
 fs.existsSync(config.development.LOGS_DIR) || fs.mkdirSync(config.development.LOGS_DIR);
 
 // Use combined morgan logging for all non-genieeApi requests and stream to log file
-app.use(logger('combined', {
-	skip: function (req, res) { 
-		return req.baseUrl === '/genieeApi';
-	}, stream: accessLogStream
-}));
+// app.use(logger('combined', {
+// 	skip: function (req, res) { 
+// 		return req.baseUrl === '/genieeApi';
+// 	}, stream: accessLogStream
+// }));
 
-// Use combined morgan logging for all genieeApi requests and stream to log file
-app.use(logger('combined', {
-	skip: function (req, res) { 
-		return req.baseUrl !== '/genieeApi';
-	}, stream: apiLogStream
-}));
+// // Use combined morgan logging for all genieeApi requests and stream to log file
+// app.use(logger('combined', {
+// 	skip: function (req, res) { 
+// 		return req.baseUrl !== '/genieeApi';
+// 	}, stream: apiLogStream
+// }));
 
-// Use dev morgan logging for all genieeApi requests and stream to stdout
-app.use(logger('dev', {
-	skip: function (req, res) { 
-		return req.baseUrl !== '/genieeApi';
-	}
-}));
+// // Use dev morgan logging for all genieeApi requests and stream to stdout
+// app.use(logger('dev', {
+// 	skip: function (req, res) { 
+// 		return req.baseUrl !== '/genieeApi';
+// 	}
+// }));
+
+ // Initialise logger middleware module
+app.use(logger);
 
 // setup basics of express middlewares
 app.use(bodyParser.json({ limit: '5mb' }));
