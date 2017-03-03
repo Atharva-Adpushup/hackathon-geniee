@@ -1,6 +1,7 @@
 // Custom logger middleware
 
-const couchbase = require('./couchBaseService');
+const couchbase = require('./couchBaseService'),
+	uuid = require('uuid');
 
 const generateLog = (req, res, startTime) => {
 		const processingTime = `${+new Date() - startTime}ms`, // Calculate request processing time
@@ -29,9 +30,14 @@ const generateLog = (req, res, startTime) => {
 	},
     logToDatabase = () => {
         couchbase.connectToBucket('apGlobalBucket')
-            .then(data => {
-                console.log(data);
-            })
+            .then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
+				date: new Date(),
+				source: 'Geniee Logs',
+				message: 'Dummy'
+			}))
+			.then(success => {
+				console.log('Log added');
+			})
             .catch(err => {
                 console.log(err);
             });
