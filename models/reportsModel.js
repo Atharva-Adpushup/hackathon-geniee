@@ -1,6 +1,7 @@
 var es = require('../helpers/elasticSearchService'),
 	esqm = require('../helpers/ElasticsearchQueryMaker'),
 	AdPushupError = require('../helpers/AdPushupError'),
+	moment = require('moment'),
 	utils = require('../helpers/utils'),
 	// eslint-disable-next-line no-unused-vars
 	getE3lgIndexArrToSearch = function(startDate, endDate) {
@@ -89,10 +90,14 @@ var es = require('../helpers/elasticSearchService'),
 	},
 
 	prepareApexSearchQuery = function(config) {
-		var siteId = config.siteId,
+		var defaultStartDate = moment(moment().subtract(7, 'days').format('YYYY-MM-DD') + ' 00:00:00').valueOf(),
+			defaultEndDate = moment(moment().subtract(0, 'days').format('YYYY-MM-DD') + ' 23:59:00').valueOf(),
+			siteId = config.siteId,
 			variationCount = config.variationCount ? config.variationCount : 100,
-			startDate = (config.startDate) ? config.startDate : Date.now() - 2592000000,
-			endDate = config.endDate ? config.endDate : Date.now(),
+			// Added 00:00:00 to get timestamp for start of day
+			startDate = (config.startDate) ? moment(moment(config.startDate).format('YYYY-MM-DD') + ' 00:00:00').valueOf() : defaultStartDate,
+			// Added 23:59:00 to get timestamp for end of day
+			endDate = config.endDate ? moment(moment(config.endDate).format('YYYY-MM-DD') + ' 23:59:00').valueOf() : defaultEndDate,
 			pageGroup = config.pageGroup,
 			platform = config.platform,
 			b = esqm.createBoolFilter(),
