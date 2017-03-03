@@ -1,11 +1,9 @@
 // Custom logger middleware
 
 const couchbase = require('../couchBaseService'),
-    { generateStdOutLog } = require('./logGenerator'),
+    { generateStdOutLog, generateStreamJSONLog } = require('./logGenerator'),
     { logToStream } = require('./streamHandler'),
     uuid = require('uuid');
-    
-let loggerOptions = {};
 
 const logToDatabase = () => {
     couchbase.connectToBucket('apGlobalBucket')
@@ -22,27 +20,21 @@ const logToDatabase = () => {
         });
 };
 
-const logger = {
-    options: options => {
-        const { stream, logToStdOut } = options;
+const logger = options => {
+    const { stream, logToStdOut } = options,
+        logToConsole =  ('logToStdOut' in options) ? logToStdOut : true;
 
-        loggerOptions = {
-            stream,
-            logToStdOut: ('logToStdOut' in options) ? logToStdOut : true
-        };
-    },
-
-    init: (req, res, next) => {
+    return (req, res, next) => {
         const startTime = +new Date(), // Get request start time
             outputStream = process.stdout; // Set standard output stream
 
         // Listen to request 'end' event and log data
         req.on('end', function () {
-            const log = generateStdOutLog(req, res, startTime),
-                { stream, logToStdOut } = loggerOptions;
+            const stdOutLog = generateStdOutLog(req, res, startTime, options),
+                streamLog = generateStreamJSONLog(req, res, startTime, options);
 
-            stream ? logToStream(log, stream) : null; // Write to specified stream in options
-            !logToStdOut ? null : outputStream.write(log); // Write request log to stdout stream
+            stream ? logToStream(streamLog, stream) : null; // Write to specified stream in options
+            logToConsole ? outputStream.write(stdOutLog) : null; // Write request log to stdout stream
 
             //logToDatabase();
         });

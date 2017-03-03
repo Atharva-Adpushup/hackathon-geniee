@@ -6,9 +6,9 @@ const fs = require('fs'),
 const logToStream = (log, stream) => {
     const appendFile = Promise.promisify(fs.appendFile);
 
-    return appendFile(stream, log)
+    return appendFile(stream, JSON.stringify(log, null, 4))
         .then(d => {
-            console.log('saved');
+            console.log('Log saved to file');
         })
         .catch(err => {
             console.log(err);

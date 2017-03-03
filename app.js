@@ -82,14 +82,10 @@ fs.existsSync(config.development.LOGS_DIR) || fs.mkdirSync(config.development.LO
 // 	}
 // }));
 
-// Set logger options
-logger.options({
-	stream: './logs/test.log',
-	logToStdOut: false
-});
-
- // Initialise logger middleware module
-app.use(logger.init);
+ // Initialise logger middleware module with options
+app.use(logger({
+	stream: './logs/test.log'
+}));
 
 // setup basics of express middlewares
 app.use(bodyParser.json({ limit: '5mb' }));
