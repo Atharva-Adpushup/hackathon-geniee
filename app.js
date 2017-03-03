@@ -5,7 +5,6 @@ var express = require('express'),
 	server = require('http').createServer(app),
 	path = require('path'),
 	compression = require('compression'),
-	logger = require('morgan'),
 	cookieParser = require('cookie-parser'),
 	bodyParser = require('body-parser'),
 	session = require('express-session'),
@@ -14,7 +13,7 @@ var express = require('express'),
 	consts = require('./configs/commonConsts'),
 	utils = require('./helpers/utils'),
 	couchBaseService = require('./helpers/couchBaseService'),
-	logger = require('./helpers/logger'),
+	logger = require('./helpers/logger/index'),
 	accessLogStream = FileStreamRotator.getStream({
 		date_format: 'YYYYMMDD',
 		filename: config.development.LOGS_DIR + '/access-%DATE%.log',
@@ -39,8 +38,8 @@ var express = require('express'),
 	});
 	
 
-require('./services/genieeAdSyncService/index');
-require('./services/hbSyncService/index');
+//require('./services/genieeAdSyncService/index');
+//require('./services/hbSyncService/index');
 
 // Enable compression at top
 app.use(compression());
@@ -83,8 +82,14 @@ fs.existsSync(config.development.LOGS_DIR) || fs.mkdirSync(config.development.LO
 // 	}
 // }));
 
+// Set logger options
+logger.options({
+	stream: './logs/test.log',
+	logToStdOut: false
+});
+
  // Initialise logger middleware module
-app.use(logger);
+app.use(logger.init);
 
 // setup basics of express middlewares
 app.use(bodyParser.json({ limit: '5mb' }));
