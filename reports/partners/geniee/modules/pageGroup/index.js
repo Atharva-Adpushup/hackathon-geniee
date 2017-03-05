@@ -55,30 +55,49 @@ module.exports = {
 			dataStr = 'data';
 
 		_.forOwn(reportData.pageGroups, function(pageGroupObj, pageGroupKey) {
+			var computedPageGroupObj;
+
 			if (pageGroupKey === dataStr) { return false; }
 
-			computedData.pageGroups[pageGroupKey] = extend(true, {}, computedData.pageGroups[pageGroupKey], { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, "pageViews": 0, "pageRPM": 0.0, "pageCTR": 0.0 });
+			// Cache current computed page group object
+			computedPageGroupObj = extend(true, {}, computedData.pageGroups[pageGroupKey]);
+			computedPageGroupObj = extend(true, {}, computedPageGroupObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, 'pageViews': 0, 'pageRPM': 0.0, 'pageCTR': 0.0, 'dayWisePageViews': {} });
 
 			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
 				if (variationKey === dataStr) { return false; }
 
-				computedData.pageGroups[pageGroupKey].click += Number(variationObj.click);
-				computedData.pageGroups[pageGroupKey].impression += Number(variationObj.impression);
-				computedData.pageGroups[pageGroupKey].revenue += Number(variationObj.revenue);
-				computedData.pageGroups[pageGroupKey].ctr += Number(variationObj.ctr);
-				computedData.pageGroups[pageGroupKey].pageViews += Number(variationObj.pageViews);
-				computedData.pageGroups[pageGroupKey].pageRPM += Number(variationObj.pageRPM);
-				computedData.pageGroups[pageGroupKey].pageCTR += Number(variationObj.pageCTR);
+				computedPageGroupObj.click += Number(variationObj.click);
+				computedPageGroupObj.impression += Number(variationObj.impression);
+				computedPageGroupObj.revenue += Number(variationObj.revenue);
+				computedPageGroupObj.ctr += Number(variationObj.ctr);
+				computedPageGroupObj.pageViews += Number(variationObj.pageViews);
+				computedPageGroupObj.pageRPM += Number(variationObj.pageRPM);
+				computedPageGroupObj.pageCTR += Number(variationObj.pageCTR);
+
+				// Set day wise page views for PageGroup
+				_.forOwn(variationObj.dayWisePageViews, function(pageViews, dateKey) {
+					var doesDateKeyNotPresent = !computedPageGroupObj.dayWisePageViews.hasOwnProperty(dateKey),
+						doesDateKeyNotExist = !!(doesDateKeyNotPresent && !computedPageGroupObj.dayWisePageViews[dateKey]);
+
+					if (doesDateKeyNotExist) {
+						computedPageGroupObj.dayWisePageViews[dateKey] = pageViews;
+					} else {
+						computedPageGroupObj.dayWisePageViews[dateKey] += pageViews;
+					}
+				});
 			});
 
 			// Set Default value if falsy
-			computedData.pageGroups[pageGroupKey].revenue = Number(computedData.pageGroups[pageGroupKey].revenue.toFixed(2)) || 0;
-			computedData.pageGroups[pageGroupKey].ctr = Number(computedData.pageGroups[pageGroupKey].ctr.toFixed(2)) || 0;
-			computedData.pageGroups[pageGroupKey].pageRPM = Number(computedData.pageGroups[pageGroupKey].pageRPM.toFixed(2)) || 0;
-			computedData.pageGroups[pageGroupKey].pageCTR = Number(computedData.pageGroups[pageGroupKey].pageCTR.toFixed(2)) || 0;
-			computedData.pageGroups[pageGroupKey].click = computedData.pageGroups[pageGroupKey].click || 0;
-			computedData.pageGroups[pageGroupKey].impression = computedData.pageGroups[pageGroupKey].impression || 0;
-			computedData.pageGroups[pageGroupKey].pageViews = computedData.pageGroups[pageGroupKey].pageViews || 0;
+			computedPageGroupObj.revenue = Number(computedPageGroupObj.revenue.toFixed(2)) || 0;
+			computedPageGroupObj.ctr = Number(computedPageGroupObj.ctr.toFixed(2)) || 0;
+			computedPageGroupObj.pageRPM = Number(computedPageGroupObj.pageRPM.toFixed(2)) || 0;
+			computedPageGroupObj.pageCTR = Number(computedPageGroupObj.pageCTR.toFixed(2)) || 0;
+			computedPageGroupObj.click = computedPageGroupObj.click || 0;
+			computedPageGroupObj.impression = computedPageGroupObj.impression || 0;
+			computedPageGroupObj.pageViews = computedPageGroupObj.pageViews || 0;
+
+			// Set computed page group object in its original object hierarchy
+			computedData.pageGroups[pageGroupKey] = extend(true, {}, computedPageGroupObj);
 		});
 
 		return Promise.resolve(computedData);
