@@ -1,5 +1,6 @@
 var _ = require('lodash'),
 	moment = require('moment'),
+	lodash = require('lodash'),
 	extend = require('extend');
 
 module.exports = {
@@ -83,5 +84,11 @@ module.exports = {
 		result = {collection: dateCollection, days: (numberOfDays - 1)}
 
 		return result;
-	}	
+	},
+	// Get an object from object collection
+	getObjectFromCollection: function(collection) {
+		return lodash.reduce(collection, function(object, collectionItem) {
+			return extend({}, object, collectionItem);
+		}, {});
+	}
 };

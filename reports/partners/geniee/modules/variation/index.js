@@ -58,7 +58,7 @@ module.exports = {
 							});
 					}))
 					.then(function(pageViewsCollection) {
-						return lodash.compact(pageViewsCollection);
+						return utils.getObjectFromCollection(lodash.compact(pageViewsCollection));
 					});
 				}
 
