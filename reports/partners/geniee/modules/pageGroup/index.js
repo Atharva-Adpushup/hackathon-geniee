@@ -178,7 +178,7 @@ module.exports = {
 
 				currentComputedObj.pageviews = {
 					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					data: [[currentDate, Number(pageGroupObj.pageViews)]]
+					data: [[currentDate, Number(pageGroupObj.dayWisePageViews[zonesObj.date])]]
 				};
 				datesObj.pageviews[currentDate] = currentComputedObj.pageviews.name;
 
