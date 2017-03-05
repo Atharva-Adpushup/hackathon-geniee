@@ -13,20 +13,25 @@ module.exports = {
 			return Promise.all(_.map(pageGroupObj.variationData, function(variationObj, variationKey) {
 				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, "pageViews": 0, "pageRPM": 0.0, "pageCTR": 0.0 });
 
-				return Promise.all(_.map(variationObj.zones, function(zoneObj) {
+				// Get total page views for any variation
+				function getTotalPageViews(config, variation, pageGroup) {
 					var pageViewsReportConfig = {
 						siteId: config.siteId,
 						startDate: (config.dateFrom ? moment(config.dateFrom).valueOf() : moment().subtract(31, 'days').valueOf()),
 						endDate: (config.dateTo ? moment(config.dateTo).valueOf(): moment().subtract(1, 'days').valueOf()),
-						variationKey: variationObj.id,
-						platform: pageGroupObj.device,
-						pageGroup: pageGroupObj.pageGroup,
+						variationKey: variation.id,
+						platform: pageGroup.device,
+						pageGroup: pageGroup.pageGroup,
 						reportType: 'apex',
 						step: '1d'
 					};
+					
+					return pageViewsModule.getTotalCount(pageViewsReportConfig);
+				}
 
-					return pageViewsModule.getTotalCount(pageViewsReportConfig)
-						.then(function(pageViews) {
+				return getTotalPageViews(config, variationObj, pageGroupObj)
+					.then(function(pageViews) {
+						return Promise.all(_.map(variationObj.zones, function(zoneObj) {
 							var revenue, clicks;
 
 							computedData[pageGroupKey].variationData[variationKey].click += Number(zoneObj.click);
@@ -47,10 +52,10 @@ module.exports = {
 							computedData[pageGroupKey].variationData[variationKey].pageCTR = Number((clicks / pageViews * 100).toFixed(2)) || 0;
 
 							return computedData;
+						})).then(function() {
+							return computedData;
 						});
-				})).then(function() {
-					return computedData;
-				});
+					});
 			})).then(function() {
 				return computedData;
 			});
