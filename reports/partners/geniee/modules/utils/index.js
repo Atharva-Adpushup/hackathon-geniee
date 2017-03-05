@@ -1,4 +1,5 @@
 var _ = require('lodash'),
+	moment = require('moment'),
 	extend = require('extend');
 
 module.exports = {
@@ -55,5 +56,32 @@ module.exports = {
 				mainObj[metric][index].data.push([numericDate, 0]);
 			}
 		});
-	}
+	},
+	getDayWiseTimestamps: function(dateFrom, dateTo) {
+		var dateCollection = [], computedDate, numberOfDays = 1,
+			result;
+
+		while (computedDate !== dateTo) {
+			if (numberOfDays === 1) {
+				dateCollection.push({
+					dateFrom: moment(dateFrom).startOf('day').valueOf(),
+					dateTo: moment(dateFrom).endOf('day').valueOf()
+				});
+				computedDate = dateFrom;
+			} else {
+				computedDate = moment(computedDate).add(1, 'days').format('YYYY-MM-DD');
+				dateCollection.push({
+					dateFrom: moment(computedDate).startOf('day').valueOf(),
+					dateTo: moment(computedDate).endOf('day').valueOf()
+				});
+			}
+
+			numberOfDays++;
+		}
+
+		// NOTE: 1 is deducted from number of days as it had an initial value of 1
+		result = {collection: dateCollection, days: (numberOfDays - 1)}
+
+		return result;
+	}	
 };

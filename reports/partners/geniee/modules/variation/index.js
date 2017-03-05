@@ -2,6 +2,7 @@ var _ = require('lodash'),
 	extend = require('extend'),
 	moment = require('moment'),
 	Promise = require('bluebird'),
+	lodash = require('lodash'),
 	pageViewsModule = require('../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index'),
 	utils = require('../utils/index');
 
@@ -29,32 +30,69 @@ module.exports = {
 					return pageViewsModule.getTotalCount(pageViewsReportConfig);
 				}
 
+				function getDayWisePageViews(config, variation, pageGroup) {
+					var timeStampCollection = utils.getDayWiseTimestamps(config.dateFrom, config.dateTo).collection;
+
+					return Promise.all(timeStampCollection.map(function(object) {
+						var dayWisePageViewsConfig = {
+							siteId: config.siteId,
+							startDate: object.dateFrom,
+							endDate: object.dateTo,
+							variationKey: variation.id,
+							platform: pageGroup.device,
+							pageGroup: pageGroup.pageGroup,
+							reportType: 'apex',
+							step: '1d'
+						};
+
+						return pageViewsModule.getTotalCount(dayWisePageViewsConfig)
+							.then(function(pageViews) {
+								var date = moment(object.dateFrom, 'x').format('YYYY-MM-DD'),
+									result = {};
+
+								result[date] = pageViews;
+								return result;
+							})
+							.catch(function() {
+								return false;
+							});
+					}))
+					.then(function(pageViewsCollection) {
+						return lodash.compact(pageViewsCollection);
+					});
+				}
+
 				return getTotalPageViews(config, variationObj, pageGroupObj)
-					.then(function(pageViews) {
-						return Promise.all(_.map(variationObj.zones, function(zoneObj) {
-							var revenue, clicks;
+					.then(function(totalPageViews) {
+						return getDayWisePageViews(config, variationObj, pageGroupObj)
+							.then(function(dayWisePageViews) {
+								computedData[pageGroupKey].variationData[variationKey].dayWisePageViews = dayWisePageViews || 0;
 
-							computedData[pageGroupKey].variationData[variationKey].click += Number(zoneObj.click);
-							computedData[pageGroupKey].variationData[variationKey].impression += Number(zoneObj.impression);
-							computedData[pageGroupKey].variationData[variationKey].revenue += Number(zoneObj.revenue);
-							computedData[pageGroupKey].variationData[variationKey].ctr += Number(zoneObj.ctr);
+								return Promise.all(_.map(variationObj.zones, function(zoneObj) {
+									var revenue, clicks;
 
-							computedData[pageGroupKey].variationData[variationKey].click = computedData[pageGroupKey].variationData[variationKey].click || 0;
-							computedData[pageGroupKey].variationData[variationKey].impression = computedData[pageGroupKey].variationData[variationKey].impression || 0;
-							computedData[pageGroupKey].variationData[variationKey].revenue = Number(computedData[pageGroupKey].variationData[variationKey].revenue.toFixed(2)) || 0;
-							computedData[pageGroupKey].variationData[variationKey].ctr = Number(computedData[pageGroupKey].variationData[variationKey].ctr.toFixed(2)) || 0;
-							computedData[pageGroupKey].variationData[variationKey].pageViews = Number(pageViews) || 0;
+									computedData[pageGroupKey].variationData[variationKey].click += Number(zoneObj.click);
+									computedData[pageGroupKey].variationData[variationKey].impression += Number(zoneObj.impression);
+									computedData[pageGroupKey].variationData[variationKey].revenue += Number(zoneObj.revenue);
+									computedData[pageGroupKey].variationData[variationKey].ctr += Number(zoneObj.ctr);
 
-							revenue = computedData[pageGroupKey].variationData[variationKey].revenue;
-							clicks = computedData[pageGroupKey].variationData[variationKey].click;
+									computedData[pageGroupKey].variationData[variationKey].click = computedData[pageGroupKey].variationData[variationKey].click || 0;
+									computedData[pageGroupKey].variationData[variationKey].impression = computedData[pageGroupKey].variationData[variationKey].impression || 0;
+									computedData[pageGroupKey].variationData[variationKey].revenue = Number(computedData[pageGroupKey].variationData[variationKey].revenue.toFixed(2)) || 0;
+									computedData[pageGroupKey].variationData[variationKey].ctr = Number(computedData[pageGroupKey].variationData[variationKey].ctr.toFixed(2)) || 0;
+									computedData[pageGroupKey].variationData[variationKey].pageViews = Number(totalPageViews) || 0;
 
-							computedData[pageGroupKey].variationData[variationKey].pageRPM = Number((revenue / pageViews * 1000).toFixed(2)) || 0;
-							computedData[pageGroupKey].variationData[variationKey].pageCTR = Number((clicks / pageViews * 100).toFixed(2)) || 0;
+									revenue = computedData[pageGroupKey].variationData[variationKey].revenue;
+									clicks = computedData[pageGroupKey].variationData[variationKey].click;
 
-							return computedData;
-						})).then(function() {
-							return computedData;
-						});
+									computedData[pageGroupKey].variationData[variationKey].pageRPM = Number((revenue / totalPageViews * 1000).toFixed(2)) || 0;
+									computedData[pageGroupKey].variationData[variationKey].pageCTR = Number((clicks / totalPageViews * 100).toFixed(2)) || 0;
+
+									return computedData;
+								})).then(function() {
+									return computedData;
+								});
+							});
 					});
 			})).then(function() {
 				return computedData;
