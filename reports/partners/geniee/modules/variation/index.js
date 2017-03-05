@@ -148,7 +148,7 @@ module.exports = {
 					
 					currentComputedObj.pageviews = {
 						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(variationObj.pageViews)]]
+						data: [[currentDate, Number(variationObj.dayWisePageViews[zonesObj.date])]]
 					};
 					datesObj.pageviews[currentDate] = currentComputedObj.pageviews.name;
 
