@@ -59,17 +59,26 @@ function apiModule() {
 					return FormValidator.validate({ sampleUrl: json.sampleUrl, sampleUrlForced: sampleUrlForced }, schema.api.validations, site.data.siteDomain)
 						.then(function (data) {
 							var channel = json.device.toUpperCase() + ':' + json.pageGroupName.toUpperCase(), channelData, channels = site.get('channels');
-							if (_.includes(channels, channel)) {
-								throw new AdPushupError([{ "status": 403, "message": "This pagegroup type already exists" }]);
-							}
-							channels.push(channel);
 
 							if (!site.get('cmsInfo')) {
 								site.set('cmsInfo', { "cmsName": "", "pageGroups": [] });
 							}
+
 							if (!_.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])) {
 								site.get('cmsInfo').pageGroups.push({ sampleUrl: json.sampleUrl, pageGroup: json.pageGroupName.toUpperCase() });
-							} 
+							} else {
+								var existingPageGroup = _.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl]).pageGroup,
+									existingChannel =  json.device.toUpperCase() + ':' + existingPageGroup;
+
+								if(_.includes(channels, existingChannel)) {
+									throw new AdPushupError([{ "status": 403, "message": "A pagegroup with this Sample URL and device already exists." }]);
+								}
+							}
+
+							if (_.includes(channels, channel)) {
+								throw new AdPushupError([{ "status": 403, "message": "This pagegroup type already exists" }]);
+							}
+							channels.push(channel);
 
 							channelData = { siteDomain: site.data.siteDomain, siteId: site.data.siteId, sampleUrl: json.sampleUrl, platform: json.device.toUpperCase(), pageGroup: json.pageGroupName.toUpperCase(), id: uuid.v4(), channelName: json.pageGroupName.toUpperCase() + '_' + json.device.toUpperCase(), genieePageGroupId: json.pageGroupId, variations: {} };
 
