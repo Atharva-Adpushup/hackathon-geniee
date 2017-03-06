@@ -194,12 +194,12 @@ module.exports = {
 			_.forOwn(datesObj.pagerpm, function(pagerpmData, dateKey) {
 				utils.setDateWithEmptyValue(dateKey, 'pagerpm', highChartsData.highCharts);
 			});
-			utils.updatePageRPMHighChartsData(highChartsData.highCharts);
+			highChartsData.highCharts = utils.updatePageRPMHighChartsData(highChartsData.highCharts);
 
 			_.forOwn(datesObj.pagectr, function(pagectrData, dateKey) {
 				utils.setDateWithEmptyValue(dateKey, 'pagectr', highChartsData.highCharts);
 			});
-			utils.updatePageCTRHighChartsData(highChartsData.highCharts);
+			highChartsData.highCharts = utils.updatePageCTRHighChartsData(highChartsData.highCharts);
 
 			computedData[pageGroupKey].variations.data = extend(true, computedData[pageGroupKey].variations.data, highChartsData);
 		});
