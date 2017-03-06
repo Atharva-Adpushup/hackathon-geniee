@@ -1,7 +1,7 @@
 // Custom logger middleware
 
 const couchbase = require('../couchBaseService'),
-    { generateStdOutLog, generateStreamJSONLog } = require('./logGenerator'),
+    { generateLog } = require('./logGenerator'),
     { logToStream } = require('./streamHandler'),
     uuid = require('uuid');
 
@@ -30,10 +30,10 @@ const logger = options => {
 
         // Listen to request 'end' event and log data
         req.on('end', function () {
-            const stdOutLog = generateStdOutLog(req, res, startTime, options),
-                streamLog = generateStreamJSONLog(req, res, startTime, options);
+            const stdOutLog = generateLog(req, res, startTime, options, 'stdout'),
+                streamJSONLog = generateLog(req, res, startTime, options, 'json');
 
-            stream ? logToStream(streamLog, stream) : null; // Write to specified stream in options
+            stream ? logToStream(streamJSONLog, stream) : null; // Write to specified stream in options
             logToConsole ? outputStream.write(stdOutLog) : null; // Write request log to stdout stream
 
             //logToDatabase();
