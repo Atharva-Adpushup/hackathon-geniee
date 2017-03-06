@@ -40,7 +40,8 @@ loggerEvents.on('log', function(log) {
         .then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
             date: +new Date(),
             source: 'Geniee API Logs',
-            message: `${log.method} ${log.url} - ${log.statusCode}`,
+            message: `${log.method} ${log.url}`,
+			type: log.statusCode,
 			details: ''
         }))
         .then(success => {
