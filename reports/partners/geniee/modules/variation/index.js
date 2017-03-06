@@ -2,6 +2,7 @@ var _ = require('lodash'),
 	extend = require('extend'),
 	moment = require('moment'),
 	Promise = require('bluebird'),
+	lodash = require('lodash'),
 	pageViewsModule = require('../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index'),
 	utils = require('../utils/index');
 
@@ -13,44 +14,86 @@ module.exports = {
 			return Promise.all(_.map(pageGroupObj.variationData, function(variationObj, variationKey) {
 				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, "pageViews": 0, "pageRPM": 0.0, "pageCTR": 0.0 });
 
-				return Promise.all(_.map(variationObj.zones, function(zoneObj) {
+				// Get total page views for any variation
+				function getTotalPageViews(config, variation, pageGroup) {
 					var pageViewsReportConfig = {
 						siteId: config.siteId,
 						startDate: (config.dateFrom ? moment(config.dateFrom).valueOf() : moment().subtract(31, 'days').valueOf()),
 						endDate: (config.dateTo ? moment(config.dateTo).valueOf(): moment().subtract(1, 'days').valueOf()),
-						variationKey: variationObj.id,
-						platform: pageGroupObj.device,
-						pageGroup: pageGroupObj.pageGroup,
+						variationKey: variation.id,
+						platform: pageGroup.device,
+						pageGroup: pageGroup.pageGroup,
 						reportType: 'apex',
 						step: '1d'
 					};
+					
+					return pageViewsModule.getTotalCount(pageViewsReportConfig);
+				}
 
-					return pageViewsModule.getTotalCount(pageViewsReportConfig)
-						.then(function(pageViews) {
-							var revenue, clicks;
+				function getDayWisePageViews(config, variation, pageGroup) {
+					var timeStampCollection = utils.getDayWiseTimestamps(config.dateFrom, config.dateTo).collection;
 
-							computedData[pageGroupKey].variationData[variationKey].click += Number(zoneObj.click);
-							computedData[pageGroupKey].variationData[variationKey].impression += Number(zoneObj.impression);
-							computedData[pageGroupKey].variationData[variationKey].revenue += Number(zoneObj.revenue);
-							computedData[pageGroupKey].variationData[variationKey].ctr += Number(zoneObj.ctr);
+					return Promise.all(timeStampCollection.map(function(object) {
+						var dayWisePageViewsConfig = {
+							siteId: config.siteId,
+							startDate: object.dateFrom,
+							endDate: object.dateTo,
+							variationKey: variation.id,
+							platform: pageGroup.device,
+							pageGroup: pageGroup.pageGroup,
+							reportType: 'apex',
+							step: '1d'
+						};
 
-							computedData[pageGroupKey].variationData[variationKey].click = computedData[pageGroupKey].variationData[variationKey].click || 0;
-							computedData[pageGroupKey].variationData[variationKey].impression = computedData[pageGroupKey].variationData[variationKey].impression || 0;
-							computedData[pageGroupKey].variationData[variationKey].revenue = Number(computedData[pageGroupKey].variationData[variationKey].revenue.toFixed(2)) || 0;
-							computedData[pageGroupKey].variationData[variationKey].ctr = Number(computedData[pageGroupKey].variationData[variationKey].ctr.toFixed(2)) || 0;
-							computedData[pageGroupKey].variationData[variationKey].pageViews = Number(pageViews) || 0;
+						return pageViewsModule.getTotalCount(dayWisePageViewsConfig)
+							.then(function(pageViews) {
+								var date = moment(object.dateFrom, 'x').format('YYYY-MM-DD'),
+									result = {};
 
-							revenue = computedData[pageGroupKey].variationData[variationKey].revenue;
-							clicks = computedData[pageGroupKey].variationData[variationKey].click;
+								result[date] = pageViews;
+								return result;
+							})
+							.catch(function() {
+								return false;
+							});
+					}))
+					.then(function(pageViewsCollection) {
+						return utils.getObjectFromCollection(lodash.compact(pageViewsCollection));
+					});
+				}
 
-							computedData[pageGroupKey].variationData[variationKey].pageRPM = Number((revenue / pageViews * 1000).toFixed(2)) || 0;
-							computedData[pageGroupKey].variationData[variationKey].pageCTR = Number((clicks / pageViews * 100).toFixed(2)) || 0;
+				return getTotalPageViews(config, variationObj, pageGroupObj)
+					.then(function(totalPageViews) {
+						return getDayWisePageViews(config, variationObj, pageGroupObj)
+							.then(function(dayWisePageViews) {
+								computedData[pageGroupKey].variationData[variationKey].dayWisePageViews = dayWisePageViews || 0;
 
-							return computedData;
-						});
-				})).then(function() {
-					return computedData;
-				});
+								return Promise.all(_.map(variationObj.zones, function(zoneObj) {
+									var revenue, clicks;
+
+									computedData[pageGroupKey].variationData[variationKey].click += Number(zoneObj.click);
+									computedData[pageGroupKey].variationData[variationKey].impression += Number(zoneObj.impression);
+									computedData[pageGroupKey].variationData[variationKey].revenue += Number(zoneObj.revenue);
+									computedData[pageGroupKey].variationData[variationKey].ctr += Number(zoneObj.ctr);
+
+									computedData[pageGroupKey].variationData[variationKey].click = computedData[pageGroupKey].variationData[variationKey].click || 0;
+									computedData[pageGroupKey].variationData[variationKey].impression = computedData[pageGroupKey].variationData[variationKey].impression || 0;
+									computedData[pageGroupKey].variationData[variationKey].revenue = Number(computedData[pageGroupKey].variationData[variationKey].revenue.toFixed(2)) || 0;
+									computedData[pageGroupKey].variationData[variationKey].ctr = Number(computedData[pageGroupKey].variationData[variationKey].ctr.toFixed(2)) || 0;
+									computedData[pageGroupKey].variationData[variationKey].pageViews = Number(totalPageViews) || 0;
+
+									revenue = computedData[pageGroupKey].variationData[variationKey].revenue;
+									clicks = computedData[pageGroupKey].variationData[variationKey].click;
+
+									computedData[pageGroupKey].variationData[variationKey].pageRPM = Number((revenue / totalPageViews * 1000).toFixed(2)) || 0;
+									computedData[pageGroupKey].variationData[variationKey].pageCTR = Number((clicks / totalPageViews * 100).toFixed(2)) || 0;
+
+									return computedData;
+								})).then(function() {
+									return computedData;
+								});
+							});
+					});
 			})).then(function() {
 				return computedData;
 			});
@@ -105,7 +148,7 @@ module.exports = {
 					
 					currentComputedObj.pageviews = {
 						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(variationObj.pageViews)]]
+						data: [[currentDate, Number(variationObj.dayWisePageViews[zonesObj.date])]]
 					};
 					datesObj.pageviews[currentDate] = currentComputedObj.pageviews.name;
 
