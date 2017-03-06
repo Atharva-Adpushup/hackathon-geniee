@@ -8,7 +8,7 @@ const couchbase = require('../couchBaseService'),
 const logToDatabase = () => {
     couchbase.connectToBucket('apGlobalBucket')
         .then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
-            date: new Date(),
+            date: +new Date(),
             source: 'Geniee Logs',
             message: 'Dummy'
         }))
@@ -36,7 +36,7 @@ const logger = options => {
             stream ? logToStream(streamLog, stream) : null; // Write to specified stream in options
             logToConsole ? outputStream.write(stdOutLog) : null; // Write request log to stdout stream
 
-            logToDatabase();
+            //logToDatabase();
         });
 
         next();
