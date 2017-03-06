@@ -84,7 +84,7 @@ fs.existsSync(config.development.LOGS_DIR) || fs.mkdirSync(config.development.LO
 
  // Initialise logger middleware module with options
 app.use(logger({
-	stream: './logs/test.log'
+	stream: ['./logs/test.log', './logs/test2.log']
 }));
 
 // setup basics of express middlewares

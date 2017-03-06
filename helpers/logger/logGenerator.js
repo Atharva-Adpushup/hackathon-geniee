@@ -15,12 +15,12 @@ const getLogParameters = (req, res, startTime, options) => {
 
 const generateLog = (req, res, startTime, options, type) => {
     const params = getLogParameters(req, res, startTime, options),
-        { ip, timeStamp, method, url, httpVersion, statusCode } = params;
+        { ip, timeStamp, method, url, httpVersion, statusCode, userAgent } = params;
 
     // Generate log entry based on type
     switch(type) {
         case 'stdout':
-            return `${ip} - ${timeStamp} "${method} ${url} HTTP${httpVersion} ${statusCode}\n`;
+            return `${ip} - ${timeStamp} ${method} ${url} HTTP${httpVersion} ${statusCode} - ${userAgent}\n`;
             break;
         case 'json':
             return params;
