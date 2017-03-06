@@ -46,7 +46,7 @@ module.exports = {
 		lodash.forEach(mainObj[metric], function(metricObj, index) {
 			var computedDateIndex = -1;
 
-			_.forEach(metricObj.data, function(dataArr, dateIndex) {
+			lodash.forEach(metricObj.data, function(dataArr, dateIndex) {
 				if (dataArr.indexOf(numericDate) > -1) {
 					computedDateIndex = dateIndex;
 				}
