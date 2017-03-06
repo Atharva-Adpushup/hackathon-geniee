@@ -1,5 +1,4 @@
-var _ = require('lodash'),
-	moment = require('moment'),
+var moment = require('moment'),
 	lodash = require('lodash'),
 	extend = require('extend');
 
@@ -12,7 +11,7 @@ module.exports = {
 				clicks: 'clicks'
 			};
 
-		_.forEach(mainObj[metric], function(metricObj, index) {
+		lodash.forEach(mainObj[metric], function(metricObj, index) {
 			if (metricObj.name == computedObj[metric].name) {
 				collectionIndex = index;
 			}
@@ -21,7 +20,7 @@ module.exports = {
 		if (collectionIndex > -1) {
 			computedItem = mainObj[metric][collectionIndex];
 
-			_.forEach(computedItem.data, function(dataArr, idx) {
+			lodash.forEach(computedItem.data, function(dataArr, idx) {
 				if (dataArr.indexOf(currentDate) > -1) {
 					collectionDataIndex = idx;
 				}
@@ -44,7 +43,7 @@ module.exports = {
 	setDateWithEmptyValue: function(date, metric, mainObj) {
 		var numericDate = Number(date);
 
-		_.forEach(mainObj[metric], function(metricObj, index) {
+		lodash.forEach(mainObj[metric], function(metricObj, index) {
 			var computedDateIndex = -1;
 
 			_.forEach(metricObj.data, function(dataArr, dateIndex) {
@@ -90,5 +89,44 @@ module.exports = {
 		return lodash.reduce(collection, function(object, collectionItem) {
 			return extend({}, object, collectionItem);
 		}, {});
+	},
+	updatePageRPMHighChartsData: function(collection) {
+		var computedCollection = extend(true, {}, collection);
+
+		lodash.forEach(collection.pagerpm, function(pageRPMObject, pageRPMObjectIndex) {
+			var revenueObject = lodash.filter(collection.revenue, ['name', pageRPMObject.name])[0],
+				pageViewsObject = lodash.filter(collection.pageviews, ['name', pageRPMObject.name])[0];
+
+			lodash.forEach(pageRPMObject.data, function(dataItem, dataItemIndex) {
+				var revenue = revenueObject.data[dataItemIndex][1],
+					pageViews = pageViewsObject.data[dataItemIndex][1],
+					pageRPM = Number((revenue / pageViews * 1000).toFixed(2));
+
+				pageRPM = (pageRPM && pageRPM !== Infinity) ? pageRPM : 0;
+				computedCollection.pagerpm[pageRPMObjectIndex].data[dataItemIndex][1] = pageRPM;
+			});
+		});
+
+		return computedCollection;
+	},
+	updatePageCTRHighChartsData: function(collection) {
+		var computedCollection = extend(true, {}, collection);
+
+		lodash.forEach(collection.pagectr, function(pageCTRObject, pageCTRObjectIndex) {
+			var clicksObject = lodash.filter(collection.clicks, ['name', pageCTRObject.name])[0],
+				pageViewsObject = lodash.filter(collection.pageviews, ['name', pageCTRObject.name])[0];
+
+			lodash.forEach(pageCTRObject.data, function(dataItem, dataItemIndex) {
+				var clicks = clicksObject.data[dataItemIndex][1],
+					pageViews = pageViewsObject.data[dataItemIndex][1],
+					pageCTR = Number((clicks / pageViews * 100).toFixed(2));
+
+				pageCTR = (pageCTR && pageCTR !== Infinity) ? pageCTR : 0;
+				computedCollection.pagectr[pageCTRObjectIndex].data[dataItemIndex][1] = pageCTR;
+			});
+		});
+
+		return computedCollection;
 	}
+
 };
