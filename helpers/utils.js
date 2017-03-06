@@ -2,7 +2,7 @@
  * Created by Dhiraj on 3/4/2016.
  */
 var url = require('url'),
-	logger = require('./logger'),
+	// logger = require('./logger'),
 	CryptoJS = require('crypto-js'),
 	Promise = require('bluebird'),
 	randomStore = [],
@@ -69,7 +69,7 @@ var url = require('url'),
 			logger.info(message);
 		},
 		logError: function(err) {
-			logger.log('error', err);
+			//logger.log('error', err);
 		},
 		getHmacSHA256: function(message, secretKey) {
 			var hash = CryptoJS.HmacSHA256(message, secretKey),

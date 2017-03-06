@@ -69,7 +69,10 @@ function apiModule() {
 							}
 							if (!_.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])) {
 								site.get('cmsInfo').pageGroups.push({ sampleUrl: json.sampleUrl, pageGroup: json.pageGroupName.toUpperCase() });
+							} else {
+								throw new AdPushupError([{ "status": 403, "message": "A pagegroup with this Sample URL already exists." }]);
 							}
+
 							channelData = { siteDomain: site.data.siteDomain, siteId: site.data.siteId, sampleUrl: json.sampleUrl, platform: json.device.toUpperCase(), pageGroup: json.pageGroupName.toUpperCase(), id: uuid.v4(), channelName: json.pageGroupName.toUpperCase() + '_' + json.device.toUpperCase(), genieePageGroupId: json.pageGroupId, variations: {} };
 							return API.saveChannel(json.siteId, json.device, json.pageGroupName, channelData)
 								.then(function (res) {
