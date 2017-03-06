@@ -249,10 +249,7 @@ module.exports = {
 				variationsTabularData.table.footer[5] += Number(variationObj.click);
 				
 				rowItem[6] = variationObj.pageRPM;
-				variationsTabularData.table.footer[6] += Number(variationObj.pageRPM);
-				
 				rowItem[7] = variationObj.pageCTR;
-				variationsTabularData.table.footer[7] += Number(variationObj.pageCTR);
 				
 				rowItem[8] = Math.floor((variationObj.revenue / pageGroupObj.revenue) * 100);
 				variationsTabularData.table.footer[8] += Number(rowItem[8]);
@@ -262,8 +259,10 @@ module.exports = {
 
 			// Round of metrics to 2 decimal places
 			variationsTabularData.table.footer[2] = Number((variationsTabularData.table.footer[2]).toFixed(2));
-			variationsTabularData.table.footer[6] = Number((variationsTabularData.table.footer[6]).toFixed(2));
-			variationsTabularData.table.footer[7] = Number((variationsTabularData.table.footer[6]).toFixed(2));
+			// Calculate footer pageRPM
+			variationsTabularData.table.footer[6] = Number((variationsTabularData.table.footer[2] / variationsTabularData.table.footer[4] * 1000).toFixed(2));
+			// Calculate footer pageCTR
+			variationsTabularData.table.footer[7] = Number((variationsTabularData.table.footer[5] / variationsTabularData.table.footer[4] * 100).toFixed(2));
 
 			computedData[pageGroupKey].variations.data = extend(true, {}, variationsTabularData);
 		});
