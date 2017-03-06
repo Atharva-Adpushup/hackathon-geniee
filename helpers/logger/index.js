@@ -36,7 +36,7 @@ const logger = options => {
             stream ? logToStream(streamLog, stream) : null; // Write to specified stream in options
             logToConsole ? outputStream.write(stdOutLog) : null; // Write request log to stdout stream
 
-            //logToDatabase();
+            logToDatabase();
         });
 
         next();
