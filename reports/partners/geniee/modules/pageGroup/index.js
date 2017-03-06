@@ -279,6 +279,11 @@ module.exports = {
 			pageGroupsTabularData.table.rows.push(rowItem);
 		});
 
+		// Round of metrics to 2 decimal places
+		pageGroupsTabularData.table.footer[3] = Number((pageGroupsTabularData.table.footer[3]).toFixed(2));
+		pageGroupsTabularData.table.footer[7] = Number((pageGroupsTabularData.table.footer[7]).toFixed(2));
+		pageGroupsTabularData.table.footer[8] = Number((pageGroupsTabularData.table.footer[8]).toFixed(2));
+
 		computedData.pageGroups.data = extend(true, {}, pageGroupsTabularData);
 
 		return Promise.resolve(computedData);

@@ -260,6 +260,11 @@ module.exports = {
 				variationsTabularData.table.rows.push(rowItem);
 			});
 
+			// Round of metrics to 2 decimal places
+			variationsTabularData.table.footer[2] = Number((variationsTabularData.table.footer[2]).toFixed(2));
+			variationsTabularData.table.footer[6] = Number((variationsTabularData.table.footer[6]).toFixed(2));
+			variationsTabularData.table.footer[7] = Number((variationsTabularData.table.footer[6]).toFixed(2));
+
 			computedData[pageGroupKey].variations.data = extend(true, {}, variationsTabularData);
 		});
 
