@@ -13,19 +13,9 @@ var express = require('express'),
 	consts = require('./configs/commonConsts'),
 	utils = require('./helpers/utils'),
 	couchBaseService = require('./helpers/couchBaseService'),
-	logger = require('./helpers/logger/index'),
-	accessLogStream = FileStreamRotator.getStream({
-		date_format: 'YYYYMMDD',
-		filename: config.development.LOGS_DIR + '/access-%DATE%.log',
-		frequency: '1mn',
-		verbose: false
-	}),
-	apiLogStream = FileStreamRotator.getStream({
-		date_format: 'YYYYMMDD',
-		filename: config.development.LOGS_DIR + '/api-access-%DATE%.log',
-		frequency: '1mn',
-		verbose: false
-	}),
+	logger = require('./helpers/logger/index').logger,
+	loggerEvents = require('./helpers/logger/index').loggerEvents,
+	uuid = require('uuid'),
 	// couchbase store
 	couchbaseStore = new CouchbaseStore({
 		bucket: config.couchBase.DEFAULT_BUCKET,
@@ -37,6 +27,29 @@ var express = require('express'),
 		prefix: 'sess::'
 	});
 	
+// Initialise logger middleware module with options
+app.use(logger({
+	stream: './logs/genieeApi.log',
+	logToStdOut: false,
+	logFor: '/genieeApi'
+}));
+
+// Write log to database on logger's 'log' event
+loggerEvents.on('log', function(log) {
+	couchBaseService.connectToBucket('apGlobalBucket')
+        .then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
+            date: +new Date(),
+            source: 'Geniee API Logs',
+            message: `${log.method} ${log.url} - ${log.statusCode}`,
+			details: ''
+        }))
+        .then(success => {
+            //console.log('Log added');
+        })
+        .catch(err => {
+            console.log('Error writing log to database');
+        });
+});
 
 require('./services/genieeAdSyncService/index');
 require('./services/hbSyncService/index');
@@ -60,32 +73,6 @@ app.set('view engine', 'jade');
 
 // Setup the logger file
 fs.existsSync(config.development.LOGS_DIR) || fs.mkdirSync(config.development.LOGS_DIR);
-
-// Use combined morgan logging for all non-genieeApi requests and stream to log file
-// app.use(logger('combined', {
-// 	skip: function (req, res) { 
-// 		return req.baseUrl === '/genieeApi';
-// 	}, stream: accessLogStream
-// }));
-
-// // Use combined morgan logging for all genieeApi requests and stream to log file
-// app.use(logger('combined', {
-// 	skip: function (req, res) { 
-// 		return req.baseUrl !== '/genieeApi';
-// 	}, stream: apiLogStream
-// }));
-
-// // Use dev morgan logging for all genieeApi requests and stream to stdout
-// app.use(logger('dev', {
-// 	skip: function (req, res) { 
-// 		return req.baseUrl !== '/genieeApi';
-// 	}
-// }));
-
- // Initialise logger middleware module with options
-app.use(logger({
-	stream: ['./logs/test.log', './logs/test2.log']
-}));
 
 // setup basics of express middlewares
 app.use(bodyParser.json({ limit: '5mb' }));
