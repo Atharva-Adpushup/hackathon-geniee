@@ -804,17 +804,22 @@
                 var sum = collectionItemArr.reduce(function(accumulation, value) { return accumulation + value; }, 0),
                     average, weightedValueArr = [], weightedSum;
                 
-                collectionItemArr.forEach(function(item) {
-                    var contributionPercentage = Math.round((item / sum) * 100),
-                        weightedValue;
+                if (sum === 0) {
+                    average = sum;
+                } else {
+                    collectionItemArr.forEach(function(item) {
+                        var contributionPercentage = ((item / sum) * 100),
+                            weightedValue;
 
-                    contributionPercentage = (contributionPercentage && contributionPercentage !== Infinity) ? contributionPercentage : 0;
-                    weightedValue = Math.round(item * contributionPercentage);
-                    weightedValueArr.push(weightedValue);
-                });
+                        contributionPercentage = (contributionPercentage && contributionPercentage !== Infinity) ? contributionPercentage : 0;
+                        weightedValue = (item * contributionPercentage);
+                        weightedValueArr.push(weightedValue);
+                    });
 
-                weightedSum = weightedValueArr.reduce(function(accumulation, value) { return accumulation + value}, 0);
-                average = Number((weightedSum / 100).toFixed(2));
+                    weightedSum = weightedValueArr.reduce(function(accumulation, value) { return accumulation + value}, 0);
+                    average = Number((weightedSum / 100).toFixed(2));
+                }
+
                 chartConfig.data.push(average);
             });
         }
