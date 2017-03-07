@@ -814,7 +814,7 @@
                 });
 
                 weightedSum = weightedValueArr.reduce(function(accumulation, value) { return accumulation + value}, 0);
-                average = Math.round(weightedSum / 100);
+                average = Number((weightedSum / 100).toFixed(2));
                 chartConfig.data.push(average);
             });
         }
