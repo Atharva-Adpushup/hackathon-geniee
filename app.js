@@ -56,7 +56,7 @@ app.use(cookieParser());
 
 // Initialise logger middleware module with options
 app.use(logger({
-	stream: './logs/genieeApi.log',
+	stream: ['./logs/genieeApi.log'],
 	logToStdOut: false,
 	logFor: ['/genieeApi']
 }));
