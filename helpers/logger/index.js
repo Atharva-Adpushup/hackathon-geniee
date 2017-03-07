@@ -6,6 +6,7 @@ const generateLog = require('./logGenerator'),
     loggerEvents = new events.EventEmitter,
     _ = require('lodash');
 
+// Initialise logger with options
 const loggerInit = (req, res, next, options) => {
     const startTime = +new Date(), // Get request start time
         outputStream = process.stdout; // Set standard output stream
@@ -15,15 +16,21 @@ const loggerInit = (req, res, next, options) => {
         const stdOutLog = generateLog(req, res, startTime, options, 'stdout'),
             streamJSONLog = generateLog(req, res, startTime, options, 'json');
 
-        options.stream ? logToStream(streamJSONLog, options.stream) : null; // Write to specified stream in options
-        options.logToConsole ? outputStream.write(stdOutLog) : null; // Write request log to stdout stream
+        options.stream ? logToStream(streamJSONLog, options.stream) : null; // Write to specified stream
+        options.logToConsole ? outputStream.write(stdOutLog) : null; // Write request log to stdout
 
-        loggerEvents.emit('log', streamJSONLog);
+        loggerEvents.emit('log', streamJSONLog); // Emit log event with JSON log output
+        loggerEvents.emit(res.statusCode, streamJSONLog); // Emit 'statusCode' event with JSON log output 
+
+        if(res.statusCode >= 400) {
+            loggerEvents.emit('error', streamJSONLog); // Emit 'error' event with JSON log output
+        }
     });
 
     next();
 };
 
+// Logger middleware entry
 const logger = options => {
     const { stream, logToStdOut, logFor } = options,
         logToConsole = ('logToStdOut' in options) ? logToStdOut : true;
@@ -32,6 +39,7 @@ const logger = options => {
 
     return (req, res, next) => {
 
+        // Create log entry for all valid log routes present in 'logFor' options
         if(typeof logFor === 'object' && logFor.length) {
             const validLogRoute = _.find(logFor, logRoute => req.url.indexOf(logRoute) !== -1);
             if(validLogRoute) {
@@ -39,7 +47,9 @@ const logger = options => {
             } else {
                 next();
             }
-        } else {
+        }
+        // Else create log entry for all routes
+        else {
             return loggerInit(req, res, next, options);
         }
     }
