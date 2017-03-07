@@ -28,4 +28,4 @@ const generateLog = (req, res, startTime, options, type) => {
     }
 };
 
-module.exports = { generateLog };
+module.exports = generateLog;

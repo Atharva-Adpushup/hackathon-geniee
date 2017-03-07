@@ -13,8 +13,7 @@ var express = require('express'),
 	consts = require('./configs/commonConsts'),
 	utils = require('./helpers/utils'),
 	couchBaseService = require('./helpers/couchBaseService'),
-	logger = require('./helpers/logger/index').logger,
-	loggerEvents = require('./helpers/logger/index').loggerEvents,
+	{ logger, loggerEvents } = require('./helpers/logger/index'),
 	uuid = require('uuid'),
 	// couchbase store
 	couchbaseStore = new CouchbaseStore({
@@ -59,7 +58,7 @@ app.use(cookieParser());
 app.use(logger({
 	stream: './logs/genieeApi.log',
 	logToStdOut: false,
-	logFor: '/genieeApi'
+	logFor: ['/genieeApi']
 }));
 
 // Write log to database on logger's 'log' event

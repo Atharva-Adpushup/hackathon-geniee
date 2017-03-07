@@ -26,4 +26,4 @@ const logToStream = (log, stream) => {
     }
 };
 
-module.exports = { logToStream };
+module.exports = logToStream;
