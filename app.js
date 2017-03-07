@@ -55,7 +55,11 @@ app.use(bodyParser.urlencoded({ extended: false, limit: '5mb' }));
 app.use(cookieParser());
 
 // Initialise logger middleware module for logging genieeApi requests
-app.use(logger());
+app.use(logger({
+	stream: ['./logs/genieeApi.log'],
+	logToStdOut: false,
+	logFor: ['/genieeApi']
+}));
 
 // Write log to couchbase database on logger's 'error' event
 loggerEvents.on('error', function(log) {
