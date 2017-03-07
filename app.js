@@ -68,9 +68,9 @@ loggerEvents.on('error', function(log) {
         .then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
             date: +new Date(),
             source: 'Geniee API Logs',
-            message: `${log.method} ${log.url} - ${log.body} - ${log.query}`,
+            message: `${log.method} ${log.url}`,
 			type: (log.statusCode >= 400 && log.statusCode < 500 ) ? 2 : 3,
-			details: log.statusCode
+			details: `${log.statusCode} - body:${JSON.stringify(log.body)} - query:${JSON.stringify(log.query)}`
         }))
         .then(success => {
             //console.log('Log added');
