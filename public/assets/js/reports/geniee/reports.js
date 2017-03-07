@@ -773,14 +773,14 @@
         var collectionArr, collectionArrLength, iterator,
             isDataExists = !!(data && data.length),
             chartConfig = {
-            type: 'spline',
-            name: 'Average',
-            data: [],
-            marker: {
-                lineWidth: 2,
-                lineColor: w.Highcharts.getOptions().colors[3],
-                fillColor: 'white'
-            }
+                type: 'spline',
+                name: 'Average',
+                data: [],
+                marker: {
+                    lineWidth: 2,
+                    lineColor: w.Highcharts.getOptions().colors[3],
+                    fillColor: 'white'
+                }
             };
 
         if (isDataExists) {
@@ -795,15 +795,26 @@
 
             // Push every data item in collection array as per index
             data.forEach(function(dataItemObj, dataItemIdx) {
-            dataItemObj.data.forEach(function(item, itemIdx) {
-                collectionArr[itemIdx].push(item);
-            });
+                dataItemObj.data.forEach(function(item, itemIdx) {
+                    collectionArr[itemIdx].push(item);
+                });
             });
 
             collectionArr.forEach(function(collectionItemArr, collectionItemIndex) {
                 var sum = collectionItemArr.reduce(function(accumulation, value) { return accumulation + value; }, 0),
-                    average = Math.floor(sum/collectionItemArr.length);
+                    average, weightedValueArr = [], weightedSum;
+                
+                collectionItemArr.forEach(function(item) {
+                    var contributionPercentage = Math.round((item / sum) * 100),
+                        weightedValue;
 
+                    contributionPercentage = (contributionPercentage && contributionPercentage !== Infinity) ? contributionPercentage : 0;
+                    weightedValue = Math.round(item * contributionPercentage);
+                    weightedValueArr.push(weightedValue);
+                });
+
+                weightedSum = weightedValueArr.reduce(function(accumulation, value) { return accumulation + value}, 0);
+                average = Math.round(weightedSum / 100);
                 chartConfig.data.push(average);
             });
         }
