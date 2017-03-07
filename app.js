@@ -58,6 +58,7 @@ app.use(cookieParser());
 app.use(logger({
 	stream: ['./logs/genieeApi.log'],
 	logToStdOut: false,
+	logHeaders: false,
 	logFor: ['/genieeApi']
 }));
 

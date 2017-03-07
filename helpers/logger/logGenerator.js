@@ -10,7 +10,7 @@ const getLogParameters = (req, res, startTime, options) => {
         userAgent = req.get('user-agent'),
         referrer = req.get('referer');
 
-    return { responseTime, method, url, ip, body, params, query, httpVersion, headers: options.headers ? headers: undefined, statusCode, timeStamp, contentType, contentLength, userAgent, referrer: referrer ? referrer : null };
+    return { responseTime, method, url, ip, body, params, query, httpVersion, headers: options.logHeaders ? headers: undefined, statusCode, timeStamp, contentType, contentLength, userAgent, referrer: referrer ? referrer : null };
 };
 
 const generateLog = (req, res, startTime, options, type) => {
