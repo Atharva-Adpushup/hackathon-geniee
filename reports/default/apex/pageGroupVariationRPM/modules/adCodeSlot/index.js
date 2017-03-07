@@ -21,7 +21,9 @@ var extend = require('extend'),
 				if (config.variationKey === variationKey.toString()) {
 					lodash.forOwn(variationObj.sections, function(sectionObj, sectionKey) {
 						lodash.forOwn(sectionObj.ads, function(adObj, adKey) {
-							adCodeArr.push(adObj.adCode);
+							if (adObj.adCode) {
+								adCodeArr.push(adObj.adCode);
+							}
 						});
 					});
 				}
