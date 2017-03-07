@@ -69,8 +69,8 @@ loggerEvents.on('error', function(log) {
             date: +new Date(),
             source: 'Geniee API Logs',
             message: `${log.method} ${log.url}`,
-			type: log.statusCode,
-			details: ''
+			type: (log.statusCode >= 400 && log.statusCode < 500 ) ? 2 : 3,
+			details: `${log.statusCode} - body:${JSON.stringify(log.body)} - query:${JSON.stringify(log.query)}`
         }))
         .then(success => {
             //console.log('Log added');
