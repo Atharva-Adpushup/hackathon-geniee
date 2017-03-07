@@ -54,7 +54,7 @@ app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '5mb' }));
 app.use(cookieParser());
 
-// Initialise logger middleware module with options
+// Initialise logger middleware module for logging genieeApi requests
 app.use(logger({
 	stream: ['./logs/genieeApi.log'],
 	logToStdOut: false,
@@ -62,8 +62,8 @@ app.use(logger({
 	logFor: ['/genieeApi']
 }));
 
-// Write log to database on logger's 'log' event
-loggerEvents.on('log', function(log) {
+// Write log to couchbase database on logger's 'error' event
+loggerEvents.on('error', function(log) {
 	couchBaseService.connectToBucket('apGlobalBucket')
         .then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
             date: +new Date(),

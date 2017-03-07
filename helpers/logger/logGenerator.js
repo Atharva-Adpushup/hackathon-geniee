@@ -1,5 +1,6 @@
-// Log generator module for the custom logger middleware
+// Log generator module for custom logger middleware
 
+// Get required parameters from request and response object to generate log entry
 const getLogParameters = (req, res, startTime, options) => {
     const responseTime = `${+new Date() - startTime}ms`, // Calculate request processing time
         { method, url, ip, body, params, query, httpVersion, headers } = req,
@@ -13,6 +14,7 @@ const getLogParameters = (req, res, startTime, options) => {
     return { responseTime, method, url, ip, body, params, query, httpVersion, headers: options.logHeaders ? headers: undefined, statusCode, timeStamp, contentType, contentLength, userAgent, referrer: referrer ? referrer : null };
 };
 
+// Function to generate log entry for stdout and specified streams
 const generateLog = (req, res, startTime, options, type) => {
     const params = getLogParameters(req, res, startTime, options),
         { ip, timeStamp, method, url, httpVersion, statusCode, userAgent } = params;
