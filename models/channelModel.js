@@ -59,18 +59,29 @@ function apiModule() {
 					return FormValidator.validate({ sampleUrl: json.sampleUrl, sampleUrlForced: sampleUrlForced }, schema.api.validations, site.data.siteDomain)
 						.then(function (data) {
 							var channel = json.device.toUpperCase() + ':' + json.pageGroupName.toUpperCase(), channelData, channels = site.get('channels');
+
+							if (!site.get('cmsInfo')) {
+								site.set('cmsInfo', { "cmsName": "", "pageGroups": [] });
+							}
+
+							if (!_.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])) {
+								site.get('cmsInfo').pageGroups.push({ sampleUrl: json.sampleUrl, pageGroup: json.pageGroupName.toUpperCase() });
+							} else {
+								var existingPageGroup = _.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl]).pageGroup,
+									existingChannel =  json.device.toUpperCase() + ':' + existingPageGroup;
+
+								if(_.includes(channels, existingChannel)) {
+									throw new AdPushupError([{ "status": 403, "message": "A pagegroup with this Sample URL and device already exists." }]);
+								}
+							}
+
 							if (_.includes(channels, channel)) {
 								throw new AdPushupError([{ "status": 403, "message": "This pagegroup type already exists" }]);
 							}
 							channels.push(channel);
 
-							if (!site.get('cmsInfo')) {
-								site.set('cmsInfo', { "cmsName": "", "pageGroups": [] });
-							}
-							if (!_.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])) {
-								site.get('cmsInfo').pageGroups.push({ sampleUrl: json.sampleUrl, pageGroup: json.pageGroupName.toUpperCase() });
-							}
 							channelData = { siteDomain: site.data.siteDomain, siteId: site.data.siteId, sampleUrl: json.sampleUrl, platform: json.device.toUpperCase(), pageGroup: json.pageGroupName.toUpperCase(), id: uuid.v4(), channelName: json.pageGroupName.toUpperCase() + '_' + json.device.toUpperCase(), genieePageGroupId: json.pageGroupId, variations: {} };
+
 							return API.saveChannel(json.siteId, json.device, json.pageGroupName, channelData)
 								.then(function (res) {
 									site.save();
@@ -143,10 +154,26 @@ function apiModule() {
 							}
 
 							var data = result[0].value;
+
 							return API.deleteChannel(data.siteId, data.platform, data.pageGroup)
-								.then(function (data) {
-									return resolve();
+								.then(function () {
+									return siteModel.getSitePageGroups(data.siteId);
 								})
+								.then(function(pageGroups) {
+									var selectedPagegroups = _.filter(pageGroups, { pageGroup: data.pageGroup });
+
+									return selectedPagegroups.length === 0 ? siteModel.getSiteById(data.siteId) : resolve();
+								})
+								.then(function(site) {
+									var cmsPageGroups = site.get('cmsInfo').pageGroups;
+									_.remove(cmsPageGroups, function(p) {
+										return p.pageGroup === data.pageGroup;
+									});	
+									
+									site.set('cmsInfo', { "cmsName": "", "pageGroups": cmsPageGroups });
+									site.save();
+									return resolve();
+								});
 						});
 					});
 				})

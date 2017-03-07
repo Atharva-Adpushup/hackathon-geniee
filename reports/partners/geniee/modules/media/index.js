@@ -43,17 +43,17 @@ module.exports = {
 			computedData.media.revenue += Number(pageGroupObj.revenue);
 			computedData.media.ctr += Number(pageGroupObj.ctr);
 			computedData.media.pageViews += Number(pageGroupObj.pageViews);
-			computedData.media.pageRPM += Number(pageGroupObj.pageRPM);
-			computedData.media.pageCTR += Number(pageGroupObj.pageCTR);
+			// computedData.media.pageRPM += Number(pageGroupObj.pageRPM);
+			// computedData.media.pageCTR += Number(pageGroupObj.pageCTR);
 
 			// Set Default value if falsy
 			computedData.media.revenue = Number(computedData.media.revenue.toFixed(2)) || 0;
 			computedData.media.ctr = Number(computedData.media.ctr.toFixed(2)) || 0;
-			computedData.media.pageRPM = Number(computedData.media.pageRPM.toFixed(2)) || 0;
-			computedData.media.pageCTR = Number(computedData.media.pageCTR.toFixed(2)) || 0;
 			computedData.media.click = computedData.media.click || 0;
 			computedData.media.impression = computedData.media.impression || 0;
 			computedData.media.pageViews = computedData.media.pageViews || 0;
+			computedData.media.pageRPM = Number((computedData.media.revenue / computedData.media.pageViews * 1000).toFixed(2)) || 0;
+			computedData.media.pageCTR = Number((computedData.media.click / computedData.media.pageViews * 100).toFixed(2)) || 0;
 		});
 
 		return Promise.resolve(computedData);

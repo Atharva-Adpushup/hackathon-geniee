@@ -71,8 +71,6 @@ module.exports = {
 				computedPageGroupObj.revenue += Number(variationObj.revenue);
 				computedPageGroupObj.ctr += Number(variationObj.ctr);
 				computedPageGroupObj.pageViews += Number(variationObj.pageViews);
-				computedPageGroupObj.pageRPM += Number(variationObj.pageRPM);
-				computedPageGroupObj.pageCTR += Number(variationObj.pageCTR);
 
 				// Set day wise page views for PageGroup
 				_.forOwn(variationObj.dayWisePageViews, function(pageViews, dateKey) {
@@ -90,11 +88,15 @@ module.exports = {
 			// Set Default value if falsy
 			computedPageGroupObj.revenue = Number(computedPageGroupObj.revenue.toFixed(2)) || 0;
 			computedPageGroupObj.ctr = Number(computedPageGroupObj.ctr.toFixed(2)) || 0;
-			computedPageGroupObj.pageRPM = Number(computedPageGroupObj.pageRPM.toFixed(2)) || 0;
-			computedPageGroupObj.pageCTR = Number(computedPageGroupObj.pageCTR.toFixed(2)) || 0;
 			computedPageGroupObj.click = computedPageGroupObj.click || 0;
 			computedPageGroupObj.impression = computedPageGroupObj.impression || 0;
 			computedPageGroupObj.pageViews = computedPageGroupObj.pageViews || 0;
+			computedPageGroupObj.pageRPM = Number((computedPageGroupObj.revenue / computedPageGroupObj.pageViews * 1000).toFixed(2)) || 0;
+			computedPageGroupObj.pageCTR = Number((computedPageGroupObj.click / computedPageGroupObj.pageViews * 100).toFixed(2)) || 0;
+
+			// Make Page RPM and CTR fail safe
+			computedPageGroupObj.pageRPM = (computedPageGroupObj.pageRPM && computedPageGroupObj.pageRPM !== Infinity) ? computedPageGroupObj.pageRPM : 0;
+			computedPageGroupObj.pageCTR = (computedPageGroupObj.pageCTR && computedPageGroupObj.pageCTR !== Infinity) ? computedPageGroupObj.pageCTR : 0;
 
 			// Set computed page group object in its original object hierarchy
 			computedData.pageGroups[pageGroupKey] = extend(true, {}, computedPageGroupObj);
@@ -224,11 +226,12 @@ module.exports = {
 		_.forOwn(datesObj.pagerpm, function(pagerpmData, dateKey) {
 			utils.setDateWithEmptyValue(dateKey, 'pagerpm', highChartsData.highCharts);
 		});
+		highChartsData.highCharts = utils.updatePageRPMHighChartsData(highChartsData.highCharts);
 
 		_.forOwn(datesObj.pagectr, function(pagectrData, dateKey) {
 			utils.setDateWithEmptyValue(dateKey, 'pagectr', highChartsData.highCharts);
 		});
-
+		highChartsData.highCharts = utils.updatePageCTRHighChartsData(highChartsData.highCharts);
 
 		computedData.pageGroups.data = extend(true, computedData.pageGroups.data, highChartsData);
 
@@ -267,16 +270,20 @@ module.exports = {
 			pageGroupsTabularData.table.footer[6] += Number(pageGroupObj.click);
 			
 			rowItem[7] = pageGroupObj.pageRPM;
-			pageGroupsTabularData.table.footer[7] += Number(pageGroupObj.pageRPM);
-			
 			rowItem[8] = pageGroupObj.pageCTR;
-			pageGroupsTabularData.table.footer[8] += Number(pageGroupObj.pageCTR);
 			
 			rowItem[9] = _.keys(tempVariationsObj).length;
 			pageGroupsTabularData.table.footer[9] += Number(rowItem[9]);
 
 			pageGroupsTabularData.table.rows.push(rowItem);
 		});
+
+		// Round of metrics to 2 decimal places
+		pageGroupsTabularData.table.footer[3] = Number((pageGroupsTabularData.table.footer[3]).toFixed(2));
+		// Calculate footer pageRPM
+		pageGroupsTabularData.table.footer[7] = Number((pageGroupsTabularData.table.footer[3] / pageGroupsTabularData.table.footer[5] * 1000).toFixed(2));
+		// Calculate footer pageCTR
+		pageGroupsTabularData.table.footer[8] = Number((pageGroupsTabularData.table.footer[6] / pageGroupsTabularData.table.footer[5] * 100).toFixed(2));
 
 		computedData.pageGroups.data = extend(true, {}, pageGroupsTabularData);
 
