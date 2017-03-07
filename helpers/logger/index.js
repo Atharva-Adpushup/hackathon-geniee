@@ -32,6 +32,13 @@ const loggerInit = (req, res, next, options) => {
 
 // Logger middleware entry
 const logger = options => {
+    if(!options || !options.stream) {
+        console.log('Please provide a valid stream value for the logger to start logging.');
+        return (req, res, next) => { 
+            next(); 
+        }
+    }
+
     const { stream, logToStdOut, logFor } = options,
         logToConsole = ('logToStdOut' in options) ? logToStdOut : true;
     
