@@ -17,6 +17,11 @@ module.exports = {
 		return siteModel.getSiteById(queryConfig.siteId)
 			.then(adCodeSlotModule.get.bind(adCodeSlotModule, queryConfig))
 			.then(function(adSlotsArr) {
+				// Set default metric values
+				if (!adSlotsArr || !adSlotsArr.length) {
+					return {success: true, rpm: 0, pageViews: 0, earnings: 0};
+				}
+
 				return adsenseModule.getData(queryConfig, adSlotsArr)
 					.then(function(adSlotsEarnings) {
 						return pageViewsModule.getTotalCount(queryConfig)
