@@ -12,7 +12,7 @@ const loggerInit = (req, res, next, options, stream, logToConsole) => {
         outputStream = process.stdout; // Set standard output stream
 
     // Listen to request 'end' event and log data
-    req.on('end', function () {
+    res.on('finish', function () {
         const stdOutLog = generateLog(req, res, startTime, options, 'stdout'),
             streamJSONLog = generateLog(req, res, startTime, options, 'json');
 

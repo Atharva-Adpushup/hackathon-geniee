@@ -26,31 +26,6 @@ var express = require('express'),
 		ttl: 86400,
 		prefix: 'sess::'
 	});
-	
-// Initialise logger middleware module with options
-app.use(logger({
-	stream: './logs/genieeApi.log',
-	logToStdOut: false,
-	logFor: '/genieeApi'
-}));
-
-// Write log to database on logger's 'log' event
-loggerEvents.on('log', function(log) {
-	couchBaseService.connectToBucket('apGlobalBucket')
-        .then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
-            date: +new Date(),
-            source: 'Geniee API Logs',
-            message: `${log.method} ${log.url}`,
-			type: log.statusCode,
-			details: ''
-        }))
-        .then(success => {
-            //console.log('Log added');
-        })
-        .catch(err => {
-            console.log('Error writing log to database');
-        });
-});
 
 require('./services/genieeAdSyncService/index');
 require('./services/hbSyncService/index');
@@ -79,6 +54,31 @@ fs.existsSync(config.development.LOGS_DIR) || fs.mkdirSync(config.development.LO
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '5mb' }));
 app.use(cookieParser());
+
+// Initialise logger middleware module with options
+app.use(logger({
+	stream: './logs/genieeApi.log',
+	logToStdOut: false,
+	logFor: '/genieeApi'
+}));
+
+// Write log to database on logger's 'log' event
+loggerEvents.on('log', function(log) {
+	couchBaseService.connectToBucket('apGlobalBucket')
+        .then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
+            date: +new Date(),
+            source: 'Geniee API Logs',
+            message: `${log.method} ${log.url}`,
+			type: log.statusCode,
+			details: ''
+        }))
+        .then(success => {
+            //console.log('Log added');
+        })
+        .catch(err => {
+            console.log('Error writing log to database');
+        });
+});
 
 couchBaseService.connectToAppBucket().then(function () {
 	// set couchbaseStore for session storage
