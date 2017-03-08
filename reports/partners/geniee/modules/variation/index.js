@@ -3,6 +3,7 @@ var _ = require('lodash'),
 	moment = require('moment'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
+	selfPageViewsModule = require('./modules/pageViews/index'),
 	pageViewsModule = require('../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index'),
 	utils = require('../utils/index');
 
@@ -18,57 +19,9 @@ module.exports = {
 				// Cache computed variation object
 				computedVariationObject = extend(true, {}, computedData[pageGroupKey].variationData[variationKey]);
 
-				// Get total page views for any variation
-				function getTotalPageViews(config, variation, pageGroup) {
-					var pageViewsReportConfig = {
-						siteId: config.siteId,
-						startDate: (config.dateFrom ? moment(config.dateFrom).valueOf() : moment().subtract(31, 'days').valueOf()),
-						endDate: (config.dateTo ? moment(config.dateTo).valueOf(): moment().subtract(1, 'days').valueOf()),
-						variationKey: variation.id,
-						platform: pageGroup.device,
-						pageGroup: pageGroup.pageGroup,
-						reportType: 'apex',
-						step: '1d'
-					};
-					
-					return pageViewsModule.getTotalCount(pageViewsReportConfig);
-				}
-
-				function getDayWisePageViews(config, variation, pageGroup) {
-					var timeStampCollection = utils.getDayWiseTimestamps(config.dateFrom, config.dateTo).collection;
-
-					return Promise.all(timeStampCollection.map(function(object) {
-						var dayWisePageViewsConfig = {
-							siteId: config.siteId,
-							startDate: object.dateFrom,
-							endDate: object.dateTo,
-							variationKey: variation.id,
-							platform: pageGroup.device,
-							pageGroup: pageGroup.pageGroup,
-							reportType: 'apex',
-							step: '1d'
-						};
-
-						return pageViewsModule.getTotalCount(dayWisePageViewsConfig)
-							.then(function(pageViews) {
-								var date = moment(object.dateFrom, 'x').format('YYYY-MM-DD'),
-									result = {};
-
-								result[date] = pageViews;
-								return result;
-							})
-							.catch(function() {
-								return false;
-							});
-					}))
-					.then(function(pageViewsCollection) {
-						return utils.getObjectFromCollection(lodash.compact(pageViewsCollection));
-					});
-				}
-
-				return getTotalPageViews(config, variationObj, pageGroupObj)
+				return selfPageViewsModule.getTotalPageViews(config, variationObj, pageGroupObj)
 					.then(function(totalPageViews) {
-						return getDayWisePageViews(config, variationObj, pageGroupObj)
+						return selfPageViewsModule.getDayWisePageViews(config, variationObj, pageGroupObj)
 							.then(function(dayWisePageViews) {
 								computedVariationObject.dayWisePageViews = dayWisePageViews || 0;
 
