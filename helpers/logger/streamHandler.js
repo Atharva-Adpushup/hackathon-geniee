@@ -14,7 +14,7 @@ const logToStream = (log, streams) => {
     return Promise.all(filePromises)
         .then(data => { })
         .catch(err => {
-            process.stdout.write('Error occurred while writing logs to file.')
+            process.stdout.write('Error occurred while writing log entry to file stream.')
         });
 };
 

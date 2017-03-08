@@ -110,7 +110,7 @@ Example -
 Require ``loggerEvents`` from the module in order to use the events associated with the logger.
 
 ```javscript
-const { logger, loggerEvents } = require('./helpers/logger/index'),
+const { logger, loggerEvents } = require('./helpers/logger/index');
 ```
 
 ### ``log``
