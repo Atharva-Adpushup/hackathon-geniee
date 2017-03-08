@@ -13,8 +13,5 @@ module.exports = {
 		};
 
 		return apexReport.getReportData(config);
-	},
-	updateMetrics: function() {
-
 	}
 };

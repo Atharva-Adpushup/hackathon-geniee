@@ -22,7 +22,25 @@ module.exports = {
 				if (variationObj.isCustom) {
 					return apexReport.getReport(config)
 						.then(function(reportData) {
-							console.log('Got apex report data: ', reportData);
+							var channelName = pageGroupObj.pageGroup + '_' + pageGroupObj.device,
+								isReportData = !!(reportData && _.isObject(reportData) && _.keys(reportData).length),
+								variations;
+
+							if (isReportData) {
+								variations = reportData[channelName].variations;
+
+								_.forOwn(variations, function(apexVariationObj, apexVariationKey) {
+									var isVariationMatch = !!((variationKey === apexVariationKey) && (variationObj.name === apexVariationObj.name));
+
+									if (isVariationMatch) {
+										computedData[pageGroupKey].variationData[variationKey] = extend(true, computedData[pageGroupKey].variationData[variationKey], apexVariationObj);
+										return false;
+									}
+								});
+
+								return computedData;
+							}
+
 							return computedData;
 						});
 				}
