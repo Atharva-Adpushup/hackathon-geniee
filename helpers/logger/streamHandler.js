@@ -8,7 +8,7 @@ const fs = require('fs'),
 const logToStream = (log, streams) => {
     const appendFile = Promise.promisify(fs.appendFile),
         filePromises = _.map(streams, stream => {
-            return appendFile(stream, JSON.stringify(log, null, 4));
+            return appendFile(stream, JSON.stringify(log, null, 4), 'utf8');
         });
 
     return Promise.all(filePromises)
