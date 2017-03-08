@@ -1,6 +1,7 @@
 var moment = require('moment'),
 	Promise = require('bluebird'),
 	utils = require('../../../utils/index'),
+	lodash = require('lodash'),
 	pageViewsModule = require('../../../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index');
 
 module.exports = {
