@@ -12,6 +12,6 @@ module.exports = {
 			endDate: (config.dateTo ? moment(config.dateTo).valueOf(): moment().subtract(1, 'days').valueOf())
 		};
 
-		return apexReport.getReportData(config);
+		return apexReport.getReportData(reportConfig);
 	}
 };
