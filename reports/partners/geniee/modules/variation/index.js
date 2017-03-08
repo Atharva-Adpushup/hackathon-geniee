@@ -15,7 +15,13 @@ module.exports = {
 			return Promise.all(_.map(pageGroupObj.variationData, function(variationObj, variationKey) {
 				var computedVariationObject;
 
-				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, "pageViews": 0, "pageRPM": 0.0, "pageCTR": 0.0 });
+				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, 'pageViews': 0, 'pageRPM': 0.0, 'pageCTR': 0.0, 'dayWisePageViews': {} });
+				// If variation is custom (Contains AdSense ad codes only),
+				// return computed data with default metric values
+				if (variationObj.isCustom) {
+					return computedData;
+				}
+
 				// Cache computed variation object
 				computedVariationObject = extend(true, {}, computedData[pageGroupKey].variationData[variationKey]);
 

@@ -30,8 +30,12 @@ module.exports = {
 				_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
 					_.forOwn(variationObj.sections, function(sectionObj, sectionKey) {
 						_.forOwn(sectionObj.ads, function(adObj, adKey) {
-							if (adObj.networkData && _.isObject(adObj.networkData) && adObj.networkData.zoneId) {
-								if (zonesObj.zoneId == adObj.networkData.zoneId) {
+							var isGenieeAd = !!(adObj.networkData && _.isObject(adObj.networkData) && adObj.networkData.zoneId),
+								isZoneMatch = (isGenieeAd && (zonesObj.zoneId == adObj.networkData.zoneId)),
+								isCustomAd = !!(!adObj.networkData && adObj.adCode);
+
+							if (isGenieeAd) {
+								if (isZoneMatch) {
 									if (!computedData[pageGroupKey].variationData.hasOwnProperty(variationKey) && !computedData[pageGroupKey].variationData[variationKey]) {
 										computedData[pageGroupKey].variationData[variationKey] = {
 											id: variationObj.id,
@@ -43,6 +47,16 @@ module.exports = {
 									} else {
 										computedData[pageGroupKey].variationData[variationKey].zones.push(zonesObj);
 									}
+								}
+							} else if (isCustomAd) {
+								if (!computedData[pageGroupKey].variationData.hasOwnProperty(variationKey) && !computedData[pageGroupKey].variationData[variationKey]) {
+									computedData[pageGroupKey].variationData[variationKey] = {
+										id: variationObj.id,
+										name: variationObj.name,
+										trafficDistribution: variationObj.trafficDistribution,
+										zones: [],
+										isCustom: true
+									};
 								}
 							}
 						});
