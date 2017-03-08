@@ -27,7 +27,7 @@ module.exports = {
 								variations;
 
 							if (isReportData) {
-								variations = reportData[channelName].variations;
+								variations = reportData.pageGroups[channelName].variations;
 
 								_.forOwn(variations, function(apexVariationObj, apexVariationKey) {
 									var isVariationMatch = !!((variationKey === apexVariationKey) && (variationObj.name === apexVariationObj.name));
