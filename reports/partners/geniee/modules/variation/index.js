@@ -5,6 +5,7 @@ var _ = require('lodash'),
 	lodash = require('lodash'),
 	selfPageViewsModule = require('./modules/pageViews/index'),
 	pageViewsModule = require('../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index'),
+	apexReport = require('./modules/apexReportIntegration/index'),
 	utils = require('../utils/index');
 
 module.exports = {
@@ -19,7 +20,11 @@ module.exports = {
 				// If variation is custom (Contains AdSense ad codes only),
 				// return computed data with default metric values
 				if (variationObj.isCustom) {
-					return computedData;
+					return apexReport.getReport(config)
+						.then(function(reportData) {
+							console.log('Got apex report data: ', reportData);
+							return computedData;
+						});
 				}
 
 				// Cache computed variation object
