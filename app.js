@@ -61,6 +61,12 @@ app.use(logger({
 	logFor: ['/genieeApi']
 }));
 
+app.use(logger({
+	stream: ['./logs/genieeReportApi.log'],
+	logToStdOut: false,
+	logFor: ['/reports/performance']
+}));
+
 // Write log to couchbase database on logger's 'error' event
 loggerEvents.on('error', function(log) {
 	couchBaseService.connectToBucket('apGlobalBucket')
