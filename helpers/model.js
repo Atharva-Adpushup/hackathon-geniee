@@ -59,6 +59,30 @@ var consts = require('../configs/commonConsts'),
 			}.bind(this));
 		};
 
+		this.createBackup = function(name) {
+			var json = this.toJSON(), key = 'back::';
+
+			switch(name) {
+				case 'site':
+					key += 'site:' + json.siteId + ':' + Date.now();
+					break;
+				case 'channel':
+					key += 'chnl:' + json.siteId + ':' + json.platform + ':' + json.pageGroup + ':' + Date.now();
+					break;
+				case 'user':
+					key += 'user:' + json.email + ':' + Date.now();
+					break;
+				default:
+					return;
+			}
+			
+			return couchbase.connectToAppBucket().then(function (appBucket) {
+				return appBucket.insertAsync(key, json, {expiry: 1296000}).then(function (obj) {
+					return obj;
+				});
+			});
+		};
+
 		this.save = function () {
 			var self = this, name = null;
 			if (!this.data.dateCreated) {
@@ -77,12 +101,14 @@ var consts = require('../configs/commonConsts'),
 				return !self.casValue ? appBucket.insertAsync(self.key, self.toJSON(), {}).then(function (obj) {
 					self.casValue = obj.cas;
 					if (name) {
+						self.createBackup(name);
 						adpushup.emit(name + 'Saved', self);
 					}
 					return self;
 				}) : appBucket.replaceAsync(self.key, self.toJSON(), {}).then(function (obj) {
 					self.casValue = obj.cas;
 					if (name) {
+						self.createBackup(name);
 						adpushup.emit(name + 'Saved', self);
 					}
 					return self;
