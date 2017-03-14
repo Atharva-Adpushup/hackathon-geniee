@@ -197,6 +197,10 @@ function apiModule() {
 				json.ownerEmail = data.ownerEmail;
 			}
 
+			if (!json.genieeMediaId) {
+				throw new AdPushupError([{ "status": 403, "message": "Please provide a valid Geniee Media id" }]);
+			}
+
 			if (!json.apConfigs.hasOwnProperty('isAdPushupControlWithPartnerSSP')) {
 				json.apConfigs.isAdPushupControlWithPartnerSSP = false;
 			}
