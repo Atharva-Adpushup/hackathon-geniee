@@ -1,5 +1,6 @@
 var Promise = require('bluebird'),
 	retry = require('bluebird-retry'),
+	{ fileLogger } = require('../../helpers/logger/file/index'),
 	syncGenieeZones = require('./genieeZoneSyncService/index'),
 	syncCdn = require('./cdnSyncService/index');
 
@@ -13,12 +14,19 @@ function getStatusObj(status, siteId) {
 }
 
 function getSuccessStatusObj(siteId) {
-	console.log('File with site id: ' + siteId + ' generated successfully');
+    const infoText = `File with site id: ${siteId} generated successfully`;
+
+	fileLogger.info(infoText);
+    console.log(infoText);
 	return getStatusObj(1, siteId);
 }
 
 function getFailureStatusObj(siteId, err) {
-	console.log('Sync Process Failed: ', err);
+    const errorText = `Sync Process Failed: ${err.toString()}`;
+
+	fileLogger.info(errorText);
+    fileLogger.error(err);
+    console.log(errorText);
 	return getStatusObj(0, siteId);
 }
 

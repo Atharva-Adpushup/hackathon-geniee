@@ -14,6 +14,7 @@ var express = require('express'),
 	lodash = require('lodash'),
 	moment = require('moment'),
 	utils = require('../helpers/utils'),
+	{ fileLogger } = require('../helpers/logger/file/index'),
 	// eslint-disable-next-line new-cap
 	router = express.Router({ mergeParams: true }),
 	reports = require('../models/reportsModel');
@@ -44,6 +45,10 @@ router
 				// paramConfig.mediaId = 920;
 				paramConfig.mediaId = site.get('genieeMediaId');
 
+				// Log data for debugging purposes
+				fileLogger.info('/***** Geniee Performance Report parameters *****/');
+				fileLogger.info(paramConfig);
+
 				return genieeService.getReport(paramConfig)
 					.then(function(data) {
 						return res.render('performanceReport', {
@@ -55,6 +60,9 @@ router
 						});
 					})
 					.catch(function(err) {
+						fileLogger.info('/***** Geniee Performance Report exception *****/');
+						fileLogger.info(err);
+
 						var textConfig = {
 							"error": "Unable to fetch reports right now! Please try again later",
 							"emptyData": "We are analysing/mining your data right now. Reports will be available shortly"

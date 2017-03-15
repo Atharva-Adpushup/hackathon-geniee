@@ -4,6 +4,7 @@ var adpushup = require('../../helpers/adpushupEvent'),
 	utils = require('../../helpers/utils'),
 	moment = require('moment'),
 	cron = require('node-cron'),
+	{ fileLogger } = require('../../helpers/logger/file/index'),
 	getAutoOptimisedLiveSites = require('../../reports/default/apex/MAB/getAutoOptimisedLiveSites/service');
 
 function onSiteSaved(site) {
@@ -19,18 +20,28 @@ function updateAllAutoOptimisedSites() {
 		});
 
 	return Promise.join(getSites, uploadSites, function(sitesArr, uploadedSites) {
-		var dateTime = moment().format('LLL');
-		console.log('All `autoOptimise` Sites were synced at ' + dateTime);
+		const dateTime = moment().format('LLL'),
+			successInfo = `All autoOptimise Sites were synced at ${dateTime}`;
+
+		fileLogger.info(successInfo);
+		console.log(successInfo);
 	})
 	.catch(function(e) {
-		var dateTime = moment().format('LLL');
-		console.log('Sync process failed: ', e.toString() + ' at ' + dateTime);
+		const dateTime = moment().format('LLL'),
+			errorInfo = `Sync process failed: ${e.toString()} at ${dateTime}`;
+
+		fileLogger.info(errorInfo);
+		fileLogger.error(e);
+		console.log(errorInfo);
 	});
 }
 
 adpushup.on('siteSaved', onSiteSaved);
 cron.schedule('0 0 */4 * * *', function() {
-	console.log('Running below task every 4 hours');
+	const infoText = 'Running below task every 4 hours';
+
+	fileLogger.info(infoText);
+	console.log(infoText);
 	updateAllAutoOptimisedSites();
 }, true);
 // NOTE: Even with boolean `true` as third argument,
