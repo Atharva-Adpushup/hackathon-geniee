@@ -3,7 +3,24 @@ const path = require('path'),
 	buildPath = '../../../public/assets/js/builds/';
 //const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = {
+module.exports = [{
+	//devtool: 'cheap-module-source-map',
+	entry: {
+		adpushup: path.join(__dirname, 'main.js'),
+		adpushupHB: path.join(__dirname, 'mainHB.js'),
+	},
+	output: {
+		path: path.join(__dirname, buildPath),
+		filename: '[name]-debug.js',
+		publicPath: '/'
+	},
+	eslint: {
+		configFile: '.eslintrc.js',
+		failOnWarning: false,
+		failOnError: false
+	},
+	plugins: []
+}, {
 	//devtool: 'cheap-module-source-map',
 	entry: {
 		adpushup: path.join(__dirname, 'main.js'),
@@ -20,11 +37,12 @@ module.exports = {
 		failOnError: false
 	},
 	plugins: [
-		/*new webpack.DefinePlugin({
-			'process.env': {
-				NODE_ENV: JSON.stringify('production')
-			}
-		})*/
+		new webpack.optimize.UglifyJsPlugin({
+			compress: {
+				warnings: false
+			},
+			mangle: false,
+			sourceMap: true
+		})
 	]
-
-};
+}];

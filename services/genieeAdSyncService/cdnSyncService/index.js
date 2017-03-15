@@ -19,6 +19,7 @@ module.exports = function (site) {
         },
         isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
         jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.js'),
+        uncompressedJsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup-debug.js'),
         tempDestPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'geniee', site.get('siteId').toString()),
         getAdsPayload = function (variationSections) {
             var ads = [], ad = null, json, unsyncedAds = false;
@@ -145,6 +146,7 @@ module.exports = function (site) {
             return apConfigs;
         },
         getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
+        getUncompressedJsFile = fs.readFileAsync(uncompressedJsTplPath, 'utf8'),
         getComputedConfig = Promise.resolve(true).then(function() {
             return universalReportService.getReportData(site)
                 .then(function(reportData) {
@@ -155,10 +157,14 @@ module.exports = function (site) {
                     }
                 });
         }),
-        getFinalConfig = Promise.join(getComputedConfig, getJsFile, function (finalConfig, jsFile) {
+        getFinalConfig = Promise.join(getComputedConfig, getJsFile, getUncompressedJsFile, function (finalConfig, jsFile, uncompressedJsFile) {
             jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(finalConfig));
             jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
-            return jsFile;
+
+            uncompressedJsFile = _.replace(uncompressedJsFile, '___abpConfig___', JSON.stringify(finalConfig));
+            uncompressedJsFile = _.replace(uncompressedJsFile, /_xxxxx_/g, site.get('siteId'));
+
+            return { default: jsFile, uncompressed: uncompressedJsFile };
         }),
         writeTempFile = function (jsFile) {
             return mkdirpAsync(tempDestPath).then(function () {
@@ -178,14 +184,14 @@ module.exports = function (site) {
             }
             return ftp.connect({ host: config.cacheFlyFtp.HOST, user: config.cacheFlyFtp.USERNAME, password: config.cacheFlyFtp.PASSWORD });
         },
-        uploadJS = function (js) {
+        uploadJS = function (fileConfig) {
             return connectToServer()
                 .then(cwd)
                 .then(function () {
-                    return ftp.put(js, 'adpushup.js');
+                    return ftp.put(fileConfig.default, 'adpushup.js');
                 })
                 .then(function() {
-                    return js;
+                    return fileConfig.uncompressed;
                 });
         };
 
