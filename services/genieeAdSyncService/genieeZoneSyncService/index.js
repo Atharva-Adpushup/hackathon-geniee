@@ -5,6 +5,7 @@ var config = require('../../../configs/config'),
     rp = require('request-promise'),
     processBatches = require('process-batches'),
     signatureGenerator = require('./signatureGenerator'),
+    { fileLogger } = require('../../../helpers/logger/file/index'),
     crypto = require('crypto'),
     retry = require('bluebird-retry');
 
@@ -60,6 +61,10 @@ module.exports = function (site) {
                     },
                     consumerSecret = 'M2IyNjc4ZGU1YWZkZTg2OTIyNzZkMTQyOTE0YmQ4Njk=',
                     signature = signatureGenerator(httpMethod, url, parameters, consumerSecret);
+                
+                fileLogger.info('/***** Geniee Zone Sync service data *****/');
+                fileLogger.info(parameters);
+                fileLogger.info(json);
 
                 return rp({
                     method: httpMethod,
