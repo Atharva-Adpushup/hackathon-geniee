@@ -19,6 +19,11 @@ const status = {
 		FALSE: false,
 		TRUE: true
 	},
+	partners = {
+		geniee: {
+			name: 'geniee'
+		}
+	},
 	proxy = {
 		HTTP_PROXY_URL: `${window.ADP_ORIGIN}/loadFromApProxy/`,
 		SIMULATED_PROXY_URL: `${window.ADP_BASEURL}/proxy/loadPage`
@@ -288,5 +293,6 @@ export {
 	adBoxSizeStyles, commonSupportedSizes, nonPartnerAdSizes, variationActions,
 	hbBoxActions, innerVariationActions, innerActions,
 	defaultSectionCss, leftSectionCss, rightSectionCss,
-	components, siteModesPopoverActions, channelMenuActions, uiActions, ui, uiCollections, floats
+	components, siteModesPopoverActions, channelMenuActions,
+	uiActions, ui, uiCollections, floats, partners
 };

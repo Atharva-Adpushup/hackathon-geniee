@@ -21,7 +21,7 @@ class sectionOptions extends React.Component {
 		
 		// Set initial state
 
-		if(!this.props.updateMode) {
+		if (!this.props.updateMode) {
 			this.state = {
 				position: undefined,
 				isAdInFirstFold: (props.firstFold || false),

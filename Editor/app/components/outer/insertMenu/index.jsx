@@ -95,6 +95,8 @@ class insertMenu extends React.Component {
 			items = props.insertOptions.map((option, index) => (
 				<MenuItem key={index} icon={getInsertOptionClass(option)} contentHeading={option}>
 					<AdSizeSelector
+						partner={props.partner}
+						isCustomAdCodeInVariationAds={props.isCustomAdCodeInVariationAds}
 						checked={option === this.state.operation ? this.state.adSize : null}
 						adSizes={commonSupportedSizes}
 						insertOption={option}
@@ -141,6 +143,7 @@ class insertMenu extends React.Component {
 
 insertMenu.propTypes = {
 	isVisible: PropTypes.bool.isRequired,
+	isCustomAdCodeInVariationAds: PropTypes.bool.isRequired,
 	position: PropTypes.object,
 	parents: PropTypes.array,
 	variationId: PropTypes.string,
