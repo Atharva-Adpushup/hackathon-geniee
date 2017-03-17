@@ -7,7 +7,7 @@ var _ = require('lodash'),
 	pageViewsModule = require('../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index'),
 	apexReport = require('./modules/apexReportIntegration/index'),
 	utils = require('../utils/index');
-const { fileLogger } = require('../../../../../../../helpers/logger/file/index');
+const { fileLogger } = require('../../../../../helpers/logger/file/index');
 
 module.exports = {
 	setVariationMetrics: function(config, pageGroupData) {
