@@ -3,6 +3,7 @@ var es = require('../helpers/elasticSearchService'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
 	moment = require('moment'),
+	{ fileLogger } = require('../helpers/logger/file/index'),
 	// eslint-disable-next-line no-unused-vars
 	getE3lgIndexArrToSearch = function(startDate, endDate) {
 		var newStartDate = startDate, newEndDate = endDate, e3lgIndexArr = [],
@@ -120,6 +121,9 @@ var es = require('../helpers/elasticSearchService'),
 		esQueryString += (siteId) ? (' AND siteId:' + siteId) : '';
 
 		esqm.addFilterToBoolPath(b, 'must', rangeFilter);
+
+		fileLogger.info('/***** Geniee Report: Elastic Search query *****/');
+		fileLogger.info(esQueryString);
 		esQuery.query_string.query = esQueryString;
 		q = esqm.getDefaultQuery(b, aggs, 0, {query: esQuery});
 
