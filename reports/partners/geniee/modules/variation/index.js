@@ -7,6 +7,7 @@ var _ = require('lodash'),
 	pageViewsModule = require('../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index'),
 	apexReport = require('./modules/apexReportIntegration/index'),
 	utils = require('../utils/index');
+const { fileLogger } = require('../../../../../../../helpers/logger/file/index');
 
 module.exports = {
 	setVariationMetrics: function(config, pageGroupData) {
@@ -50,9 +51,14 @@ module.exports = {
 
 				return selfPageViewsModule.getTotalPageViews(config, variationObj, pageGroupObj)
 					.then(function(totalPageViews) {
+						fileLogger.info('/***** Geniee Report Total page views *****/');
+						fileLogger.info(totalPageViews);
+
 						return selfPageViewsModule.getDayWisePageViews(config, variationObj, pageGroupObj)
 							.then(function(dayWisePageViews) {
 								computedVariationObject.dayWisePageViews = dayWisePageViews || 0;
+								fileLogger.info('/***** Geniee Report Total daily page views *****/');
+								fileLogger.info(dayWisePageViews);
 
 								return Promise.all(_.map(variationObj.zones, function(zoneObj) {
 									var revenue, clicks;

@@ -3,6 +3,7 @@ var moment = require('moment'),
 	utils = require('../../../utils/index'),
 	lodash = require('lodash'),
 	pageViewsModule = require('../../../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index');
+const { fileLogger } = require('../../../../../../../helpers/logger/file/index');
 
 module.exports = {
 	// Get total page views for any variation
@@ -17,7 +18,9 @@ module.exports = {
 			reportType: 'apex',
 			step: '1d'
 		};
-		
+		fileLogger.info('/***** Geniee Report Total page views config *****/');
+		fileLogger.info(pageViewsReportConfig);
+
 		return pageViewsModule.getTotalCount(pageViewsReportConfig);
 	},
 	getDayWisePageViews: function(config, variation, pageGroup) {
@@ -34,11 +37,16 @@ module.exports = {
 				reportType: 'apex',
 				step: '1d'
 			};
+			fileLogger.info('/***** Geniee Report single day page views config *****/');
+			fileLogger.info(dayWisePageViewsConfig);
 
 			return pageViewsModule.getTotalCount(dayWisePageViewsConfig)
 				.then(function(pageViews) {
 					var date = moment(object.dateFrom, 'x').format('YYYY-MM-DD'),
 						result = {};
+
+					fileLogger.info('/***** Geniee Report single day page views *****/');
+					fileLogger.info(dayWisePageViewsConfig);
 
 					result[date] = pageViews;
 					return result;
