@@ -4,9 +4,12 @@ import Utils from '../libs/utils';
 
 const getParsedQueryParam = (hash) => JSON.parse(atob(hash)),
 	getEncodedQueryParam = (queryParamKey) => {
-		const encodedHash = Utils.queryParams()[queryParamKey];
+		let encodedHash = Utils.queryParams()[queryParamKey];
 
 		if (encodedHash) {
+			// Replace whitespace characters
+			encodedHash = encodedHash.replace(/\s/g, '+');
+
 			return getParsedQueryParam(encodedHash);
 		}
 
