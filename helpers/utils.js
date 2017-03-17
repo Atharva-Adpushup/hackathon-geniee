@@ -12,7 +12,10 @@ var url = require('url'),
 			var name = pageGroup + "_" + platform,
  				object = {pageGroups: [name]};
 
-			return this.btoa(JSON.stringify(object));
+			return this.btoa(this.encodeString(JSON.stringify(object)));
+		},
+		encodeString: function(string) {
+			return encodeURIComponent(string);
 		},
 		btoa: function(stringifiedData) {
 			return new Buffer(stringifiedData).toString('base64');
