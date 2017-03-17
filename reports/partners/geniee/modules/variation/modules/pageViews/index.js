@@ -18,8 +18,6 @@ module.exports = {
 			reportType: 'apex',
 			step: '1d'
 		};
-		fileLogger.info('/***** Geniee Report Total page views config *****/');
-		fileLogger.info(pageViewsReportConfig);
 
 		return pageViewsModule.getTotalCount(pageViewsReportConfig);
 	},
@@ -42,9 +40,6 @@ module.exports = {
 				.then(function(pageViews) {
 					var date = moment(object.dateFrom, 'x').format('YYYY-MM-DD'),
 						result = {};
-
-					fileLogger.info('/***** Geniee Report single day page views *****/');
-					fileLogger.info(dayWisePageViewsConfig);
 
 					result[date] = pageViews;
 					return result;
