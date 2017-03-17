@@ -51,14 +51,9 @@ module.exports = {
 
 				return selfPageViewsModule.getTotalPageViews(config, variationObj, pageGroupObj)
 					.then(function(totalPageViews) {
-						fileLogger.info('/***** Geniee Report Total page views *****/');
-						fileLogger.info(totalPageViews);
-
 						return selfPageViewsModule.getDayWisePageViews(config, variationObj, pageGroupObj)
 							.then(function(dayWisePageViews) {
 								computedVariationObject.dayWisePageViews = dayWisePageViews || 0;
-								fileLogger.info('/***** Geniee Report Total daily page views *****/');
-								fileLogger.info(dayWisePageViews);
 
 								return Promise.all(_.map(variationObj.zones, function(zoneObj) {
 									var revenue, clicks;
