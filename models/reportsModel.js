@@ -122,9 +122,6 @@ var es = require('../helpers/elasticSearchService'),
 		esQueryString += (siteId) ? (' AND siteId:' + siteId) : '';
 
 		esqm.addFilterToBoolPath(b, 'must', rangeFilter);
-
-		fileLogger.info('/***** Geniee Report: Elastic Search query *****/');
-		fileLogger.info(esQueryString);
 		esQuery.query_string.query = esQueryString;
 		q = esqm.getDefaultQuery(b, aggs, 0, {query: esQuery});
 
@@ -246,58 +243,61 @@ var es = require('../helpers/elasticSearchService'),
 	},
 	prepareApexReport = function(r) {
 		if (resultIsValid(r)) {
-			var header = ['Variation', 'CTR (PERFORMANCE %)', 'Traffic (%)'],
-				footer = new Array(3),
-				variationRegex = (/[\w]{8}_[\w]{4}_[\w]{4}_[\w]{4}_[\w]{12}/),
-				rows = [], trackedData = {}, platformArr = r.aggregations.PLATFORM.buckets,
-				rowItem, result, chosenVariationArr, adsClickedArr;
+			return Promise.resolve(r)
+				.then((r) => {
+					var header = ['Variation', 'CTR (PERFORMANCE %)', 'Traffic (%)'],
+						footer = new Array(3),
+						variationRegex = (/[\w]{8}_[\w]{4}_[\w]{4}_[\w]{4}_[\w]{12}/),
+						rows = [], trackedData = {}, platformArr = r.aggregations.PLATFORM.buckets,
+						rowItem, result, chosenVariationArr, adsClickedArr;
 
-			platformArr.forEach(function(chosenVariation) {
-				chosenVariationArr = chosenVariation.CHOSEN_VARIATION.buckets;
+					platformArr.forEach(function(chosenVariation) {
+						chosenVariationArr = chosenVariation.CHOSEN_VARIATION.buckets;
 
-				chosenVariationArr.forEach(function(chosenVariationItem) {
-					var variationName, pageViews, adClicks, ctr, traffic, trackedDataItem = {};
-					rowItem = new Array(3);
-					adsClickedArr = chosenVariationItem.ADS_CLICKED.buckets;
+						chosenVariationArr.forEach(function(chosenVariationItem) {
+							var variationName, pageViews, adClicks, ctr, traffic, trackedDataItem = {};
+							rowItem = new Array(3);
+							adsClickedArr = chosenVariationItem.ADS_CLICKED.buckets;
 
-					// Return false if variation key is not a manipulated UUID (- replaced with _)
-					if (!variationRegex.test(chosenVariationItem.key)) {
-						return false;
-					}
+							// Return false if variation key is not a manipulated UUID (- replaced with _)
+							if (!variationRegex.test(chosenVariationItem.key)) {
+								return false;
+							}
 
-					// Variation Name value
-					//NOTE: Replacement of '_' as '-' due to Elastic Search default analyzer dash split issue
-					variationName = chosenVariationItem.key.replace(/_/g, "-");
-					// Traffic value
-					traffic = 0;
-					// Page Views value
-					pageViews = chosenVariationItem.doc_count;
-					// Ad Clicks value
-					adClicks = adsClickedArr[0].doc_count;
-					// CTR value
-					ctr = Number((adClicks / pageViews * 100).toFixed(2));
+							// Variation Name value
+							//NOTE: Replacement of '_' as '-' due to Elastic Search default analyzer dash split issue
+							variationName = chosenVariationItem.key.replace(/_/g, "-");
+							// Traffic value
+							traffic = 0;
+							// Page Views value
+							pageViews = chosenVariationItem.doc_count;
+							// Ad Clicks value
+							adClicks = adsClickedArr[0].doc_count;
+							// CTR value
+							ctr = Number((adClicks / pageViews * 100).toFixed(2));
 
-					rowItem[0] = variationName;
-					rowItem[1] = ctr;
-					rowItem[2] = traffic;
+							rowItem[0] = variationName;
+							rowItem[1] = ctr;
+							rowItem[2] = traffic;
 
-					rows.push(rowItem);
+							rows.push(rowItem);
 
-					trackedDataItem.pageViews = pageViews;
-					trackedDataItem.adClicks = adClicks;
+							trackedDataItem.pageViews = pageViews;
+							trackedDataItem.adClicks = adClicks;
 
-					trackedData[ctr] = trackedDataItem;
+							trackedData[ctr] = trackedDataItem;
+						});
+					});
+
+					footer.fill(' ');
+					trackedData.totalPageViews = parseInt(r.hits.total, 10);
+
+					result = {'header': header, 'rows': rows, 'footer': footer, 'tracked': trackedData};
+					return result;
 				});
-			});
-
-			footer.fill(' ');
-			trackedData.totalPageViews = parseInt(r.hits.total, 10);
-
-			result = {'header': header, 'rows': rows, 'footer': footer, 'tracked': trackedData};
-			return result;
 		}
 
-		return false;
+		return Promise.resolve(false);
 	},
 	prepareEditorStatsSearchQuery = function(config) {
 		var siteId = config.siteId,
@@ -456,11 +456,9 @@ var es = require('../helpers/elasticSearchService'),
 
 		// utils.logError(config.queryBody);
 		return es.search(config.indexes, config.logName, config.queryBody)
-			.then(function(result) {
-				return Promise.resolve(config.reportType(result))
-					.then((reportData) => {
-						return (reportData) ? success(reportData) : performEsSearch(defaultConfig);
-					});
+			.then(config.reportType)
+			.then((reportData) => {
+				return (reportData) ? success(reportData) : performEsSearch(defaultConfig);
 			}).catch(function() {
 				if (config.indexes === 'ap_stats_new') {
 					throw new AdPushupError(fail('Some error loading reports'));
