@@ -3,6 +3,7 @@ var es = require('../helpers/elasticSearchService'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
 	moment = require('moment'),
+	Promise = require('bluebird'),
 	{ fileLogger } = require('../helpers/logger/file/index'),
 	// eslint-disable-next-line no-unused-vars
 	getE3lgIndexArrToSearch = function(startDate, endDate) {
@@ -454,18 +455,19 @@ var es = require('../helpers/elasticSearchService'),
 		};
 
 		// utils.logError(config.queryBody);
-		return es.search(config.indexes, config.logName, config.queryBody).then(function(result) {
-			var report = config.reportType(result);
+		return es.search(config.indexes, config.logName, config.queryBody)
+			.then(function(result) {
+				return Promise.resolve(config.reportType(result))
+					.then((reportData) => {
+						return (reportData) ? success(reportData) : performEsSearch(defaultConfig);
+					});
+			}).catch(function() {
+				if (config.indexes === 'ap_stats_new') {
+					throw new AdPushupError(fail('Some error loading reports'));
+				}
 
-			// utils.logError(report);
-			return (report) ? success(report) : performEsSearch(defaultConfig);
-		}).catch(function() {
-			if (config.indexes === 'ap_stats_new') {
-				throw new AdPushupError(fail('Some error loading reports'));
-			}
-
-			return performEsSearch(defaultConfig);
-		});
+				return performEsSearch(defaultConfig);
+			});
 	};
 
 module.exports = {
