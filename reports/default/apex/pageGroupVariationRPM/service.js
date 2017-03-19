@@ -13,6 +13,7 @@ module.exports = {
 
 		queryConfig.channelKey = (queryConfig.platform + ":" + queryConfig.pageGroup);
 		queryConfig.email = email;
+		queryConfig.getOnlyPageViews = true;
 
 		return siteModel.getSiteById(queryConfig.siteId)
 			.then(adCodeSlotModule.get.bind(adCodeSlotModule, queryConfig))

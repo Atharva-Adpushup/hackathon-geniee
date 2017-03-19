@@ -16,7 +16,8 @@ module.exports = {
 			platform: pageGroup.device,
 			pageGroup: pageGroup.pageGroup,
 			reportType: 'apex',
-			step: '1d'
+			step: '1d',
+			getOnlyPageViews: true
 		};
 
 		return pageViewsModule.getTotalCount(pageViewsReportConfig);
@@ -33,7 +34,8 @@ module.exports = {
 				platform: pageGroup.device,
 				pageGroup: pageGroup.pageGroup,
 				reportType: 'apex',
-				step: '1d'
+				step: '1d',
+				getOnlyPageViews: true
 			};
 
 			return pageViewsModule.getTotalCount(dayWisePageViewsConfig)
