@@ -207,7 +207,7 @@ module.exports = {
 				table: {
 					header: [' ', 'NAME', 'TRAFFIC DISTRIBUTION', 'REVENUE', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'REVENUE CONTRIBUTION (%)'],
 					rows: [],
-					footer: ['TOTAL', ' ', 0, 0, 0, 0, 0, 0, 0, 0]
+					footer: [' ', 'TOTAL', 0, 0, 0, 0, 0, 0, 0, 0]
 				}
 			}, footerMetrics = {
 				revenue: 0,
