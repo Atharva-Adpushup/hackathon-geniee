@@ -241,10 +241,17 @@ module.exports = {
 				rowItem[7] = variationObj.pageRPM;
 				rowItem[8] = variationObj.pageCTR;
 
-				rowItem[9] = Math.floor((variationObj.revenue / pageGroupObj.revenue) * 100);
+				rowItem[9] = (variationObj.revenue);
 				variationsTabularData.table.footer[9] += Number(rowItem[9]);
 
 				variationsTabularData.table.rows.push(rowItem);
+			});
+
+			// Iterate over rows and set Revenue Contribution for each item
+			_.forEach(variationsTabularData.table.rows, (rowItem, rowItemIndex) => {
+				const variationRevenue = variationsTabularData.table.rows[rowItemIndex][9];
+
+				variationsTabularData.table.rows[rowItemIndex][9] = Math.floor((variationRevenue / variationsTabularData.table.footer[9]) * 100);
 			});
 
 			// Round of metrics to 2 decimal places
