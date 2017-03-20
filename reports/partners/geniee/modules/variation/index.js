@@ -205,9 +205,9 @@ module.exports = {
 		_.forOwn(computedData, function(pageGroupObj, pageGroupKey) {
 			var variationsTabularData = {
 				table: {
-					header: ['NAME', 'TRAFFIC DISTRIBUTION', 'REVENUE', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'REVENUE CONTRIBUTION (%)'],
+					header: [' ', 'NAME', 'TRAFFIC DISTRIBUTION', 'REVENUE', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'REVENUE CONTRIBUTION (%)'],
 					rows: [],
-					footer: ['TOTAL', 0, 0, 0, 0, 0, 0, 0, 0]
+					footer: ['TOTAL', ' ', 0, 0, 0, 0, 0, 0, 0, 0]
 				}
 			}, footerMetrics = {
 				revenue: 0,
@@ -221,27 +221,28 @@ module.exports = {
 			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
 				var rowItem = [];
 
-				rowItem[0] = variationObj.name;
-				rowItem[1] = variationObj.trafficDistribution;
-				variationsTabularData.table.footer[1] += Number(variationObj.trafficDistribution);
+				rowItem[0] = ' ';
+				rowItem[1] = variationObj.name;
+				rowItem[2] = variationObj.trafficDistribution;
+				variationsTabularData.table.footer[2] += Number(variationObj.trafficDistribution);
 
-				rowItem[2] = variationObj.revenue;
+				rowItem[3] = variationObj.revenue;
 				footerMetrics.revenue += Number(variationObj.revenue);
 				
-				rowItem[3] = variationObj.impression;
+				rowItem[4] = variationObj.impression;
 				footerMetrics.impressions += Number(variationObj.impression);
 
-				rowItem[4] = variationObj.pageViews;
+				rowItem[5] = variationObj.pageViews;
 				footerMetrics.pageViews += Number(variationObj.pageViews);
 
-				rowItem[5] = variationObj.click;
+				rowItem[6] = variationObj.click;
 				footerMetrics.clicks += Number(variationObj.click);
 
-				rowItem[6] = variationObj.pageRPM;
-				rowItem[7] = variationObj.pageCTR;
+				rowItem[7] = variationObj.pageRPM;
+				rowItem[8] = variationObj.pageCTR;
 
-				rowItem[8] = Math.floor((variationObj.revenue / pageGroupObj.revenue) * 100);
-				variationsTabularData.table.footer[8] += Number(rowItem[8]);
+				rowItem[9] = Math.floor((variationObj.revenue / pageGroupObj.revenue) * 100);
+				variationsTabularData.table.footer[9] += Number(rowItem[9]);
 
 				variationsTabularData.table.rows.push(rowItem);
 			});
@@ -256,12 +257,12 @@ module.exports = {
 			footerMetrics.pageCTR = Number((footerMetrics.clicks / footerMetrics.pageViews * 100).toFixed(2));
 			footerMetrics.pageCTR = (footerMetrics.pageCTR && (footerMetrics.pageCTR !== Infinity)) ? footerMetrics.pageCTR : 0;
 
-			variationsTabularData.table.footer[2] = footerMetrics.revenue;
-			variationsTabularData.table.footer[3] = footerMetrics.impressions;
-			variationsTabularData.table.footer[4] = footerMetrics.pageViews;
-			variationsTabularData.table.footer[5] = footerMetrics.clicks;
-			variationsTabularData.table.footer[6] = footerMetrics.pageRPM;
-			variationsTabularData.table.footer[7] = footerMetrics.pageCTR;
+			variationsTabularData.table.footer[3] = footerMetrics.revenue;
+			variationsTabularData.table.footer[4] = footerMetrics.impressions;
+			variationsTabularData.table.footer[5] = footerMetrics.pageViews;
+			variationsTabularData.table.footer[6] = footerMetrics.clicks;
+			variationsTabularData.table.footer[7] = footerMetrics.pageRPM;
+			variationsTabularData.table.footer[8] = footerMetrics.pageCTR;
 
 			computedData[pageGroupKey].variations.data = extend(true, {}, variationsTabularData);
 		});

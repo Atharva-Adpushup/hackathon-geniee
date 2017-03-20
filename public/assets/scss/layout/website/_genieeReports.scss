@@ -286,6 +286,24 @@ $uiComponentHeight: 34px;
                  margin-left: 5px;
             }
         }
+        &.btn--transparent,
+        &.btn--transparent:active,
+        &.btn--transparent:hover,
+        &.btn--transparent:focus {
+            background: transparent !important;
+            border: 0 none !important;
+            box-shadow: none !important;
+            cursor: default !important;
+            outline: 0 none !important;
+        }
+        &.btn--icon
+        {
+            &.btn--icon--brand--google
+            {
+                background: $ColorGoogle !important;
+                color: $whiteColor !important;
+            }
+        }
     }
     .panel-default
     {
