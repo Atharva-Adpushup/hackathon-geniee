@@ -712,6 +712,57 @@
 		});
 	}
 
+	ReportClass.prototype.getAdSenseVariationData = function(model, selectedPageGroupId, $) {
+		var selectedPageGroup = model.pageGroups[selectedPageGroupId],
+			selectedPageGroupVariations = $.extend(true, {}, selectedPageGroup.variations),
+			variationNameArr = [];
+
+		Object.keys(selectedPageGroupVariations).forEach(function(variationKey) {
+			var variation = selectedPageGroupVariations[variationKey];
+
+			if (variation.isCustom) {
+				variationNameArr.push(variation.name);
+			}
+		});
+
+		return { name: variationNameArr };
+	}
+
+    // Set Variation identifier UI (button)
+	ReportClass.prototype.setVariationIdentifierUI = function(model, selectedPageGroupId, $) {
+		var $thead = $('#reports_table ._ap_table > thead'),
+			$tbody = $('#reports_table ._ap_table > tbody'),
+			$selectionEls = $('tr > td:nth-child(1)', $tbody),
+			$sortThead = $('tr:nth-child(1) > th:nth-child(1)', $thead),
+			$tpl,
+			tooltipConfig = {
+				animation: true,
+				placement: 'top',
+				title: 'Google AdSense',
+				trigger: 'hover'
+			},
+			adsenseNameArr = this.getAdSenseVariationData(model, selectedPageGroupId, $).name;
+
+		// Remove the sort icon to make first thead appear order disabled
+		$sortThead.removeClass('sorting_asc sorting_desc').addClass('sorting_disabled');
+
+		$selectionEls.each(function(idx, el) {
+			var $el = $(el),
+				$nameTdEl = $el.next(),
+				name = $nameTdEl.text();
+
+			if (adsenseNameArr && adsenseNameArr.length && (adsenseNameArr.indexOf(name) > -1)) {
+				$tpl = $("<button id='google-adsense-btn-" + idx + "' class='btn btn-default btn--transparent btn--icon btn--icon--brand--google js-google-adsense-btn' type='button'><i class='fa fa-google'></i></button>");
+
+				$el
+					.html($tpl)
+					.find('.js-google-adsense-btn')
+					.tooltip(tooltipConfig)
+					.end();
+			}
+		});
+	}
+
     ReportClass.prototype.setActiveThumbnail = function($thumbnail) {
         var $thumbnails = $(".js-thumbnail", this.$perfHeaderContainer);
 
@@ -936,6 +987,8 @@
 
         if (this.selectedReportsLevel == this.reportsLevel.pagegroup) {
             this.updateTableSelectionUI();
+        } else if (this.selectedReportsLevel == this.reportsLevel.variation) {
+            this.setVariationIdentifierUI(this.model, this.selectedPageGroupId, $);
         }
 
         this.bindPerfThumbnailClickHandler();
