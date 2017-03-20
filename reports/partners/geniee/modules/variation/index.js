@@ -251,7 +251,7 @@ module.exports = {
 			_.forEach(variationsTabularData.table.rows, (rowItem, rowItemIndex) => {
 				const variationRevenue = variationsTabularData.table.rows[rowItemIndex][9];
 
-				variationsTabularData.table.rows[rowItemIndex][9] = Math.floor((variationRevenue / variationsTabularData.table.footer[9]) * 100);
+				variationsTabularData.table.rows[rowItemIndex][9] = Math.round((variationRevenue / variationsTabularData.table.footer[9]) * 100);
 			});
 
 			// Explicitly set total revenue contribution value
