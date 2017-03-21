@@ -10,8 +10,8 @@ module.exports = {
 	getTotalPageViews: function(config, variation, pageGroup) {
 		var pageViewsReportConfig = {
 			siteId: config.siteId,
-			startDate: (config.dateFrom ? moment(config.dateFrom).valueOf() : moment().subtract(31, 'days').valueOf()),
-			endDate: (config.dateTo ? moment(config.dateTo).valueOf(): moment().subtract(1, 'days').valueOf()),
+			startDate: (config.dateFrom ? moment(config.dateFrom).startOf('day').valueOf() : moment().subtract(31, 'days').startOf('day').valueOf()),
+			endDate: (config.dateTo ? moment(config.dateTo).endOf('day').valueOf(): moment().subtract(1, 'days').endOf('day').valueOf()),
 			variationKey: variation.id,
 			platform: pageGroup.device,
 			pageGroup: pageGroup.pageGroup,
@@ -20,6 +20,8 @@ module.exports = {
 			getOnlyPageViews: true
 		};
 
+		fileLogger.info('/*****Variation total pageViews config*****/');
+		fileLogger.info(pageViewsReportConfig);
 		return pageViewsModule.getTotalCount(pageViewsReportConfig);
 	},
 	getDayWisePageViews: function(config, variation, pageGroup) {
@@ -38,6 +40,8 @@ module.exports = {
 				getOnlyPageViews: true
 			};
 
+			fileLogger.info('/*****Variation daywise pageViews config*****/');
+			fileLogger.info(dayWisePageViewsConfig);
 			return pageViewsModule.getTotalCount(dayWisePageViewsConfig)
 				.then(function(pageViews) {
 					var date = moment(object.dateFrom, 'x').format('YYYY-MM-DD'),
