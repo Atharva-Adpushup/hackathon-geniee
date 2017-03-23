@@ -315,7 +315,7 @@ $uiComponentHeight: 34px;
         &.btn--transparent:active,
         &.btn--transparent:hover,
         &.btn--transparent:focus {
-            background: transparent !important;
+            background: transparent;
             border: 0 none;
             box-shadow: none;
             cursor: default;
