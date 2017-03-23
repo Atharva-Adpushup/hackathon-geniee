@@ -241,7 +241,7 @@ module.exports = {
 		var computedData = extend(true, {}, data),
 			pageGroupsTabularData = {
 				table: {
-					header: [' ', 'NAME', 'PLATFORM', 'REVENUE', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'NUMBER OF VARIATIONS'],
+					header: [' ', 'NAME', 'PLATFORM', 'REVENUE (¥)', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'NUMBER OF VARIATIONS'],
 					rows: [],
 					footer: ['TOTAL', ' ', ' ', 0, 0, 0, 0, 0, 0, 0]
 				}
