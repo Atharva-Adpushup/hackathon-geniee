@@ -1,4 +1,5 @@
 var consts = require('../configs/commonConsts'),
+	config = require('../configs/config'),
 	priorities = consts.enums.priorities,
 	_ = require('lodash'),
 	extend = require('extend'),
@@ -101,14 +102,14 @@ var consts = require('../configs/commonConsts'),
 				return !self.casValue ? appBucket.insertAsync(self.key, self.toJSON(), {}).then(function (obj) {
 					self.casValue = obj.cas;
 					if (name) {
-						self.createBackup(name);
+						config.development.HOST_ENV !== 'development' ? self.createBackup(name) : null;
 						adpushup.emit(name + 'Saved', self);
 					}
 					return self;
 				}) : appBucket.replaceAsync(self.key, self.toJSON(), {}).then(function (obj) {
 					self.casValue = obj.cas;
 					if (name) {
-						self.createBackup(name);
+						config.development.HOST_ENV !== 'development' ? self.createBackup(name) : null
 						adpushup.emit(name + 'Saved', self);
 					}
 					return self;
