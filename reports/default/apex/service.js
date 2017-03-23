@@ -14,7 +14,8 @@ module.exports = {
 			reportType: 'apex',
 			step: '1d',
 			startDate: (reportConfig.startDate ? reportConfig.startDate : moment().subtract(7, 'days').valueOf()),
-			endDate: (reportConfig.endDate ? reportConfig.endDate : moment().subtract(0, 'days').valueOf())
+			endDate: (reportConfig.endDate ? reportConfig.endDate : moment().subtract(0, 'days').valueOf()),
+			currencyCode: reportConfig.currencyCode
 		}, email;
 
 		function generateRPMReport(ctrPerformanceConfig, channel, variationData) {
