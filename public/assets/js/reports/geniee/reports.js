@@ -157,7 +157,7 @@
     ReportClass.prototype.initDatePicker = function() {
         this.$datePickerInstance = this.$absoluteDateInputs.datepicker({
             format: "yyyy-mm-dd",
-            orientation: "top auto",
+            orientation: "top right",
             clearBtn: true,
             autoClose: true,
             startDate: "01/01/2017",
@@ -170,7 +170,9 @@
             name = $elem.attr('data-name'),
             value = $elem.val(),
             type = $elem.attr('data-type'),
-            dateFromValue, dateToValue, isDateDataExists, dateRangeObj,
+            dateFromValue, dateToValue,
+            isDateDataExists, isDateToGreaterThanDateFrom,
+            dateRangeObj,
             selectedLabelTextArr = [],
             dateRangeTypeObj = {};
 
@@ -178,8 +180,9 @@
         dateFromValue = this.filterData.dateType.absolute['date-from'];
         dateToValue = this.filterData.dateType.absolute['date-to'];
         isDateDataExists = !!(dateFromValue && dateToValue);
+        isDateToGreaterThanDateFrom = (+new Date(dateToValue) > +new Date(dateFromValue));
 
-        if (isDateDataExists) {
+        if (isDateDataExists && isDateToGreaterThanDateFrom) {
             dateRangeObj = {
                 dateFrom: dateFromValue,
                 dateTo: dateToValue
