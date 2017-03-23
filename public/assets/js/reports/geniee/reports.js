@@ -381,7 +381,7 @@
 
         w.setTimeout(function() {
             self.model = $.extend(true, {}, reportData);
-            self.setAndLoadPageGroupReports();
+            self.chooseLevelAndLoadReports();
 
             if (isDateFilter) {
                 self.addFilterBtnNotification();
