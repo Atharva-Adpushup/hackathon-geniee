@@ -955,6 +955,12 @@
             $pageCTREl.html(data.pageCTR);
     }
 
+    ReportClass.prototype.initPerfHeaderInfoTooltips = function() {
+        var $infoEls = $('.js-thumbnail-info-btn', this.$perfHeaderContainer);
+
+        $infoEls.tooltip();
+    };
+
     ReportClass.prototype.setTableData = function(data, isPageGroupLevel) {
         var tableContainerSelector = "#reports_table";
 
@@ -1006,6 +1012,7 @@
     }
 
     ReportClass.prototype.init = function() {
+        this.initPerfHeaderInfoTooltips();
         this.chooseLevelAndLoadReports();
     }
 

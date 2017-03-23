@@ -37,6 +37,7 @@ $uiComponentHeight: 34px;
                 background: transparent;
                 border-radius: 0;
                 border: 0;
+                position: relative;
 
                 > .panel-heading
                 {
@@ -53,6 +54,22 @@ $uiComponentHeight: 34px;
                 {
                     font-size: 2.5em;
                     padding: 5px 15px 15px;
+                }
+
+                > .btn {
+                    &.btn-default.btn--icon
+                    {
+                        background: $whiteColor;
+                        border: 1px solid $borderColor;
+                        border-radius: 100%;
+                        color: $fontColor;
+                        height: $uiComponentHeight - 9;
+                        padding: 0;
+                        position: absolute;
+                        right: .5em;
+                        top: .5em;
+                        width: $uiComponentHeight - 9;
+                    }
                 }
             }
         }
@@ -291,10 +308,10 @@ $uiComponentHeight: 34px;
         &.btn--transparent:hover,
         &.btn--transparent:focus {
             background: transparent !important;
-            border: 0 none !important;
-            box-shadow: none !important;
-            cursor: default !important;
-            outline: 0 none !important;
+            border: 0 none;
+            box-shadow: none;
+            cursor: default;
+            outline: 0 none;
         }
         &.btn--icon
         {
