@@ -9,7 +9,8 @@ module.exports = {
 		var reportConfig = {
 			siteId: config.siteId,
 			startDate: (config.dateFrom ? moment(config.dateFrom).valueOf() : moment().subtract(7, 'days').valueOf()),
-			endDate: (config.dateTo ? moment(config.dateTo).valueOf(): moment().subtract(1, 'days').valueOf())
+			endDate: (config.dateTo ? moment(config.dateTo).valueOf(): moment().subtract(1, 'days').valueOf()),
+			currencyCode: 'JPY'
 		};
 
 		return apexReport.getReportData(reportConfig);

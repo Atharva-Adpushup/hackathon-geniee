@@ -17,6 +17,7 @@ var google = require('googleapis'),
 		this.oauthClient = oauthClient;
 		google.options({ auth: oauthClient });
 	};
+	const { fileLogger } = require('../helpers/logger/file/index');
 
 function processReports(metric, data) {
 	var finalData, averages, currency, headers;
@@ -95,6 +96,9 @@ AdsenseApi.prototype = {
 			});
 	},
 	getReport: function(config) {
+		fileLogger.info(`AdSense PubId: ${this.accountId}`);
+		fileLogger.info(config);
+
 		return this.generate(config)
 			.then(function(data) {
 				return processReports(config.metric[0], data);
@@ -128,7 +132,7 @@ module.exports = {
 			startDate: moment.unix(config.startDate / 1000).format('YYYY-MM-DD'),
 			endDate: moment.unix(config.endDate / 1000).format('YYYY-MM-DD'),
 			useTimezoneReporting: true,
-			currency: 'USD',
+			currency: (config.currencyCode) ? config.currencyCode : 'USD',
 			filter: [],
 			metric: []
 		};
