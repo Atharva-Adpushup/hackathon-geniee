@@ -157,9 +157,11 @@
     ReportClass.prototype.initDatePicker = function() {
         this.$datePickerInstance = this.$absoluteDateInputs.datepicker({
             format: "yyyy-mm-dd",
-            orientation: "bottom right",
+            orientation: "top auto",
             clearBtn: true,
-            autoClose: true
+            autoClose: true,
+            startDate: "01/01/2017",
+            endDate: "0d"
         });
     }
 
