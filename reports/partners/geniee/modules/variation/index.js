@@ -21,11 +21,11 @@ module.exports = {
 				// If variation is custom (Contains AdSense ad codes only),
 				// return computed data with default metric values
 				if (variationObj.isCustom) {
-					return apexReport.getReport(config)
+					return apexReport.getReport(config, variationObj, pageGroupObj)
 						.then(function(reportDataConfig) {
 							var fullReportData = reportDataConfig.full,
 								dayWiseReportData = reportDataConfig.dayWise,
-								channelName = pageGroupObj.pageGroup + '_' + pageGroupObj.device,
+								channelName = `${pageGroupObj.pageGroup}_${pageGroupObj.device}`,
 								isReportData = !!(fullReportData && _.isObject(fullReportData) && _.keys(fullReportData).length),
 								variations;
 

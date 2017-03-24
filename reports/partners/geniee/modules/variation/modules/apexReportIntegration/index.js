@@ -6,7 +6,7 @@ var Promise = require('bluebird'),
 	apexReport = require('../../../../../../default/apex/service');
 
 module.exports = {
-	getReport: function(config) {
+	getReport: function(config, variationObj, pageGroupObj) {
 		const defaultDateConfig = {
 			startDate: moment().subtract(7, 'days').startOf('day').valueOf(),
 			endDate: moment().subtract(1, 'days').endOf('day').valueOf()
@@ -39,10 +39,32 @@ module.exports = {
 					return false;					
 				});
 		})).then((dayWiseReport) => utils.getObjectFromCollection(lodash.compact(dayWiseReport))),
+		getVariationDayWiseReport = getDayWiseReport.then((dayWiseReport) => {
+			const computedData = {};
+
+			lodash.forOwn(dayWiseReport, (dayWiseObject, dayWiseKey) => {
+				const channelName = `${pageGroupObj.pageGroup}_${pageGroupObj.device}`,
+					isReportData = !!(dayWiseObject && lodash.isObject(dayWiseObject) && lodash.keys(dayWiseObject).length);
+
+				if (isReportData) {
+					const variations = dayWiseObject.pageGroups[channelName].variations;
+
+					lodash.forOwn(variations, (apexVariationObj, apexVariationKey) => {
+						const isVariationMatch = !!((variationObj.id === apexVariationKey) && (variationObj.name === apexVariationObj.name));
+
+						if (isVariationMatch) {
+							computedData[dayWiseKey] = extend(true, { date: dayWiseKey, currencyCode: reportConfig.currencyCode }, apexVariationObj);
+						}
+					});
+				}
+			});
+
+			return computedData;
+		}),
 		getFullReport = apexReport.getReportData(reportConfig);
 
-		return Promise.join(getDayWiseReport, getFullReport, (dayWiseReport, fullReport) => {
-			return { dayWise: dayWiseReport, full: fullReport };
+		return Promise.join(getDayWiseReport, getVariationDayWiseReport, getFullReport, (dayWiseReport, variationDayWiseReport, fullReport) => {
+			return { dayWise: variationDayWiseReport, full: fullReport };
 		});
 	}
 };
