@@ -140,7 +140,7 @@ module.exports = {
 						data: [[currentDate, Number(zonesObj.revenue)]]
 					};
 					datesObj.revenue[currentDate] = currentComputedObj.revenue.name;
-					
+
 					currentComputedObj.pageviews = {
 						name: (variationObj.name.replace(" ", "-")),
 						data: [[currentDate, Number(zonesObj.pageViews || variationObj.dayWisePageViews[zonesObj.date])]]
@@ -189,20 +189,12 @@ module.exports = {
 			_.forOwn(datesObj.pagerpm, function(pagerpmData, dateKey) {
 				utils.setDateWithEmptyValue(dateKey, 'pagerpm', highChartsData.highCharts);
 			});
-
-			// Only update highCharts PageRPM if variation is not custom (Non-Geniee network)
-			if (!variationObj.isCustom) {
-				highChartsData.highCharts = utils.updatePageRPMHighChartsData(highChartsData.highCharts);
-			}
+			highChartsData.highCharts = utils.updatePageRPMHighChartsData(highChartsData.highCharts);
 
 			_.forOwn(datesObj.pagectr, function(pagectrData, dateKey) {
 				utils.setDateWithEmptyValue(dateKey, 'pagectr', highChartsData.highCharts);
 			});
-
-			// Only update highCharts PageCTR if variation is not custom (Non-Geniee network)
-			if (!variationObj.isCustom) {
-				highChartsData.highCharts = utils.updatePageCTRHighChartsData(highChartsData.highCharts);
-			}
+			highChartsData.highCharts = utils.updatePageCTRHighChartsData(highChartsData.highCharts);
 
 			computedData[pageGroupKey].variations.data = extend(true, computedData[pageGroupKey].variations.data, highChartsData);
 		});

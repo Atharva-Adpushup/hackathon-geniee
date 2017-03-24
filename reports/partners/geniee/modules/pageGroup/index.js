@@ -180,7 +180,7 @@ module.exports = {
 
 				currentComputedObj.pageviews = {
 					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					data: [[currentDate, Number(pageGroupObj.dayWisePageViews[zonesObj.date])]]
+					data: [[currentDate, Number(zonesObj.pageViews || pageGroupObj.dayWisePageViews[zonesObj.date])]]
 				};
 				datesObj.pageviews[currentDate] = currentComputedObj.pageviews.name;
 
@@ -192,13 +192,13 @@ module.exports = {
 
 				currentComputedObj.pagerpm = {
 					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					data: [[currentDate, Number(pageGroupObj.pageRPM)]]
+					data: [[currentDate, Number(zonesObj.pageRPM || pageGroupObj.pageRPM)]]
 				};
 				datesObj.pagerpm[currentDate] = currentComputedObj.pagerpm.name;
 
 				currentComputedObj.pagectr = {
 					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					data: [[currentDate, Number(pageGroupObj.pageCTR)]]
+					data: [[currentDate, Number(zonesObj.pageCTR || pageGroupObj.pageCTR)]]
 				};
 				datesObj.pagectr[currentDate] = currentComputedObj.pagectr.name;
 
