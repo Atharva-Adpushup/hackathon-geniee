@@ -275,9 +275,9 @@ var es = require('../helpers/elasticSearchService'),
 							rowItem = new Array(3);
 							adsClickedArr = chosenVariationItem.ADS_CLICKED.buckets;
 
-							// Return false if variation key is not a manipulated UUID (- replaced with _)
+							// Return if variation key is not a manipulated UUID (- replaced with _)
 							if (!variationRegex.test(chosenVariationItem.key)) {
-								return false;
+								return true;
 							}
 
 							// Variation Name value
