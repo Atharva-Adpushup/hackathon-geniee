@@ -26,7 +26,14 @@ module.exports = {
 				currencyCode: reportConfig.currencyCode
 			};
 
-			return apexReport.getReportData(config);
+			return apexReport.getReportData(config)
+				.then((reportData) => {
+					const result = {},
+						dateKey = moment(timeStampObject.dateFrom, 'x').format('YYYY-MM-DD');
+					
+					result[dateKey] = reportData;
+					return result;
+				});
 		})).then((dayWiseReport) => lodash.compact(dayWiseReport)),
 		getFullReport = apexReport.getReportData(reportConfig);
 
