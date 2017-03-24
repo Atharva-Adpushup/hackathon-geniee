@@ -21,11 +21,10 @@ module.exports = {
 			endDate: (reportConfig.endDate ? reportConfig.endDate : defaultDateConfig.endDate),
 			currencyCode: reportConfig.currencyCode
 		};
-		let email;
 
-		function generateRPMReport(ctrPerformanceConfig, channel, variationData) {
-			return Promise.all(_.map(variationData, function(variationObj, variationKey) {
-				var variationRPMConfig = extend(true, {}, ctrPerformanceConfig, {
+		function generateRPMReport(ctrPerformanceConfig, channel, email, variationData) {
+			return Promise.all(_.map(variationData, (variationObj, variationKey) => {
+				const variationRPMConfig = extend(true, {}, ctrPerformanceConfig, {
 					variationKey: variationKey
 				}),
 				finalVariationObj = {};
@@ -33,9 +32,9 @@ module.exports = {
 				finalVariationObj[variationKey] = extend(true, {}, variationObj);
 
 				return pageGroupVariationRPMService.getReportData(variationRPMConfig, email)
-					.then(function(variationRPMReportData) {
-						var clicks = finalVariationObj[variationKey].click,
-							pageViews;
+					.then((variationRPMReportData) => {
+						const clicks = finalVariationObj[variationKey].click;
+						let pageViews;
 
 						finalVariationObj[variationKey].revenue = variationRPMReportData.earnings;
 						finalVariationObj[variationKey].pageViews = variationRPMReportData.pageViews;
@@ -49,25 +48,25 @@ module.exports = {
 			})).then(variationModule.computeReportData.bind(null, channel));
 		}
 
-		function generateFullReport(config, allChannels) {
-			return Promise.all(_.map(allChannels, function(channel) {
-				var ctrPerformanceConfig = extend(true, {}, config, {
+		function generateFullReport(config, email, allChannels) {
+			return Promise.all(_.map(allChannels, (channel) => {
+				const ctrPerformanceConfig = extend(true, {}, config, {
 					platform: channel.platform,
 					pageGroup: channel.pageGroup
 				});
 
 				return ctrPerformanceService.getReportData(ctrPerformanceConfig)
 					.then(variationModule.getMetrics)
-					.then(generateRPMReport.bind(null, ctrPerformanceConfig, channel));
+					.then(generateRPMReport.bind(null, ctrPerformanceConfig, channel, email));
 			})).then(variationModule.getFinalData);
 		}
 
 		return siteModel.getSiteById(config.siteId)
-			.then(function(site) {
-				email = site.get('ownerEmail');
+			.then((site) => {
+				const email = site.get('ownerEmail');
 
 				return site.getAllChannels()
-					.then(generateFullReport.bind(null, config));
+					.then(generateFullReport.bind(null, config, email));
 			})
 	}
 };
