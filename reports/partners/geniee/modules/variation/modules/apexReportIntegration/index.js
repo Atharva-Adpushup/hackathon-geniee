@@ -40,7 +40,7 @@ module.exports = {
 				});
 		})).then((dayWiseReport) => utils.getObjectFromCollection(lodash.compact(dayWiseReport))),
 		getVariationDayWiseReport = getDayWiseReport.then((dayWiseReport) => {
-			const computedData = {};
+			const computedData = [];
 
 			lodash.forOwn(dayWiseReport, (dayWiseObject, dayWiseKey) => {
 				const channelName = `${pageGroupObj.pageGroup}_${pageGroupObj.device}`,
@@ -53,7 +53,9 @@ module.exports = {
 						const isVariationMatch = !!((variationObj.id === apexVariationKey) && (variationObj.name === apexVariationObj.name));
 
 						if (isVariationMatch) {
-							computedData[dayWiseKey] = extend(true, { date: dayWiseKey, currencyCode: reportConfig.currencyCode }, apexVariationObj);
+							const metricData = extend(true, { date: dayWiseKey, currencyCode: reportConfig.currencyCode }, apexVariationObj);
+
+							computedData.push(metricData);
 						}
 					});
 				}

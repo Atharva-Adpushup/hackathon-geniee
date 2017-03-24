@@ -36,7 +36,7 @@ module.exports = {
 									var isVariationMatch = !!((variationKey === apexVariationKey) && (variationObj.name === apexVariationObj.name));
 
 									if (isVariationMatch) {
-										computedData[pageGroupKey].variationData[variationKey] = extend(true, { dayWiseData: dayWiseReportData }, computedData[pageGroupKey].variationData[variationKey], apexVariationObj);
+										computedData[pageGroupKey].variationData[variationKey] = extend(true, { zones: dayWiseReportData }, computedData[pageGroupKey].variationData[variationKey], apexVariationObj);
 										return false;
 									}
 								});
@@ -143,7 +143,7 @@ module.exports = {
 					
 					currentComputedObj.pageviews = {
 						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(variationObj.dayWisePageViews[zonesObj.date])]]
+						data: [[currentDate, Number(zonesObj.pageViews || variationObj.dayWisePageViews[zonesObj.date])]];
 					};
 					datesObj.pageviews[currentDate] = currentComputedObj.pageviews.name;
 
@@ -155,13 +155,13 @@ module.exports = {
 
 					currentComputedObj.pagerpm = {
 						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(variationObj.pageRPM)]]
+						data: [[currentDate, Number(zonesObj.pageRPM || variationObj.pageRPM)]]
 					};
 					datesObj.pagerpm[currentDate] = currentComputedObj.pagerpm.name;
 
 					currentComputedObj.pagectr = {
 						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(variationObj.pageCTR)]]
+						data: [[currentDate, Number(zonesObj.pageCTR || variationObj.pageCTR)]]
 					};
 					datesObj.pagectr[currentDate] = currentComputedObj.pagectr.name;
 
@@ -189,12 +189,20 @@ module.exports = {
 			_.forOwn(datesObj.pagerpm, function(pagerpmData, dateKey) {
 				utils.setDateWithEmptyValue(dateKey, 'pagerpm', highChartsData.highCharts);
 			});
-			highChartsData.highCharts = utils.updatePageRPMHighChartsData(highChartsData.highCharts);
+
+			// Only update highCharts PageRPM if variation is not custom (Non-Geniee network)
+			if (!variationObj.isCustom) {
+				highChartsData.highCharts = utils.updatePageRPMHighChartsData(highChartsData.highCharts);
+			}
 
 			_.forOwn(datesObj.pagectr, function(pagectrData, dateKey) {
 				utils.setDateWithEmptyValue(dateKey, 'pagectr', highChartsData.highCharts);
 			});
-			highChartsData.highCharts = utils.updatePageCTRHighChartsData(highChartsData.highCharts);
+
+			// Only update highCharts PageCTR if variation is not custom (Non-Geniee network)
+			if (!variationObj.isCustom) {
+				highChartsData.highCharts = utils.updatePageCTRHighChartsData(highChartsData.highCharts);
+			}
 
 			computedData[pageGroupKey].variations.data = extend(true, computedData[pageGroupKey].variations.data, highChartsData);
 		});
