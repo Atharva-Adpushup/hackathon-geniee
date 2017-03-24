@@ -459,7 +459,16 @@ router
 	})
 
 	.get('/getApexVariationData', function(req, res) {
-		return apexVariationReportService.getReportData({siteId: req.query.siteId})
+		const queryData = req.query,
+			config = {
+				siteId: queryData.siteId,
+				startDate: queryData.startDate,
+				endDate: queryData.endDate,
+				currencyCode: queryData.currencyCode,
+				queryString: 'mode:1'
+			};
+
+		return apexVariationReportService.getReportData(config)
 			.then(function(reportData) {
 				return res.json(reportData);
 			});

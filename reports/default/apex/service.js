@@ -22,6 +22,10 @@ module.exports = {
 			currencyCode: reportConfig.currencyCode
 		};
 
+		if (reportConfig.queryString) {
+			config.queryString = reportConfig.queryString;
+		}
+
 		function generateRPMReport(ctrPerformanceConfig, channel, email, variationData) {
 			return Promise.all(_.map(variationData, (variationObj, variationKey) => {
 				const variationRPMConfig = extend(true, {}, ctrPerformanceConfig, {
