@@ -20,7 +20,8 @@ module.exports = {
 			startDate: (reportConfig.startDate ? reportConfig.startDate : defaultDateConfig.startDate),
 			endDate: (reportConfig.endDate ? reportConfig.endDate : defaultDateConfig.endDate),
 			currencyCode: reportConfig.currencyCode
-		}, email;
+		};
+		let email;
 
 		function generateRPMReport(ctrPerformanceConfig, channel, variationData) {
 			return Promise.all(_.map(variationData, function(variationObj, variationKey) {
