@@ -28,13 +28,17 @@ module.exports = {
 
 			return apexReport.getReportData(config)
 				.then((reportData) => {
-					const result = {},
-						dateKey = moment(timeStampObject.dateFrom, 'x').format('YYYY-MM-DD');
-					
-					result[dateKey] = reportData;
-					return result;
+					if (reportData) {
+						const result = {},
+							dateKey = moment(timeStampObject.dateFrom, 'x').format('YYYY-MM-DD');
+
+						result[dateKey] = reportData;
+						return result;
+					}
+
+					return false;					
 				});
-		})).then((dayWiseReport) => lodash.compact(dayWiseReport)),
+		})).then((dayWiseReport) => utils.getObjectFromCollection(lodash.compact(dayWiseReport))),
 		getFullReport = apexReport.getReportData(reportConfig);
 
 		return Promise.join(getDayWiseReport, getFullReport, (dayWiseReport, fullReport) => {
