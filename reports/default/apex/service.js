@@ -9,12 +9,16 @@ var _ = require('lodash'),
 
 module.exports = {
 	getReportData: function(reportConfig) {
-		var config = {
+		const defaultDateConfig = {
+			startDate: moment().subtract(7, 'days').startOf('day').valueOf(),
+			endDate: moment().subtract(0, 'days').endOf('day').valueOf()
+		},
+		config = {
 			siteId: reportConfig.siteId,
 			reportType: 'apex',
 			step: '1d',
-			startDate: (reportConfig.startDate ? reportConfig.startDate : moment().subtract(7, 'days').valueOf()),
-			endDate: (reportConfig.endDate ? reportConfig.endDate : moment().subtract(0, 'days').valueOf()),
+			startDate: (reportConfig.startDate ? reportConfig.startDate : defaultDateConfig.startDate),
+			endDate: (reportConfig.endDate ? reportConfig.endDate : defaultDateConfig.endDate),
 			currencyCode: reportConfig.currencyCode
 		}, email;
 
@@ -44,7 +48,7 @@ module.exports = {
 			})).then(variationModule.computeReportData.bind(null, channel));
 		}
 
-		function generateFullReport(allChannels) {
+		function generateFullReport(config, allChannels) {
 			return Promise.all(_.map(allChannels, function(channel) {
 				var ctrPerformanceConfig = extend(true, {}, config, {
 					platform: channel.platform,
@@ -62,7 +66,7 @@ module.exports = {
 				email = site.get('ownerEmail');
 
 				return site.getAllChannels()
-					.then(generateFullReport);
+					.then(generateFullReport.bind(null, config));
 			})
 	}
 };

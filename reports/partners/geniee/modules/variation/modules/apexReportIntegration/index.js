@@ -6,10 +6,14 @@ var Promise = require('bluebird'),
 
 module.exports = {
 	getReport: function(config) {
-		var reportConfig = {
+		const defaultDateConfig = {
+			startDate: moment().subtract(7, 'days').startOf('day').valueOf(),
+			endDate: moment().subtract(1, 'days').endOf('day').valueOf()
+		},
+		reportConfig = {
 			siteId: config.siteId,
-			startDate: (config.dateFrom ? moment(config.dateFrom).valueOf() : moment().subtract(7, 'days').valueOf()),
-			endDate: (config.dateTo ? moment(config.dateTo).valueOf(): moment().subtract(1, 'days').valueOf()),
+			startDate: (config.dateFrom ? moment(config.dateFrom).startOf('day').valueOf() : defaultDateConfig.startDate),
+			endDate: (config.dateTo ? moment(config.dateTo).endOf('day').valueOf(): defaultDateConfig.endDate),
 			currencyCode: 'JPY'
 		};
 

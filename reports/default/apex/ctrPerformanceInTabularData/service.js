@@ -12,6 +12,7 @@ module.exports = {
 	getReportData: function(params) {
 		// TD = TrafficDistribution, FR = FinalReport
 		var config = extend(true, {}, params), getVariations, getReport, getTDConfig, getVariationTD;
+
 		config.siteId = parseInt(config.siteId, 10);
 		config.platform = (config.platform) ? config.platform.substring(0, 7) : null;
 		config.pageGroup = (config.pageGroup) ? config.pageGroup.substring(0, 30) : null;
