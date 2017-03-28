@@ -14,10 +14,12 @@ var lodash = require('lodash'),
 						impressionReport = self.getData(impressionConfig);
 
 					return Promise.join(genericReport, impressionReport, (genericReportData, impressionReportData) => {
-						const adCodeSlotEarnings = adCodeSlotModule.getTotalEarnings(genericReportData),
-							impressions = impressionModule.getTotal(impressionReportData);
+						const getAdCodeSlotEarnings = adCodeSlotModule.getTotalEarnings(genericReportData),
+							getImpressions = impressionModule.getTotal(impressionReportData);
 
-						return { earnings: adCodeSlotEarnings, impressions };
+						return Promise.join(getAdCodeSlotEarnings, getImpressions, (adCodeSlotEarnings, impressions) => {
+							return { earnings: adCodeSlotEarnings, impressions };
+						});
 					});
 				});
 
