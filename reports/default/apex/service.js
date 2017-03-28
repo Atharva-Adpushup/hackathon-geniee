@@ -46,7 +46,7 @@ module.exports = {
 						
 						finalVariationObj[variationKey].pageRPM = variationRPMReportData.rpm;
 						finalVariationObj[variationKey].pageCTR = Number((clicks / pageViews * 100).toFixed(2));
-						finalVariationObj[variationKey].impressions = variationRPMReportData.impressions;
+						finalVariationObj[variationKey].impression = variationRPMReportData.impressions;
 
 						return finalVariationObj;
 					});
