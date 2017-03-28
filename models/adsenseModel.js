@@ -45,6 +45,20 @@ function processReports(metric, data) {
 	currency = data.headers[5].currency;
 	headers = ['DATE', 'PAGE VIEWS', 'CLICKS', 'CTR (%)', 'CPC (' + currency + ')', 'RPM (' + currency + ')', 'EARNINGS (' + currency + ')'];
 
+	switch (metric) {
+		case 'AD_REQUESTS':
+			headers[1] = 'AD REQUESTS';
+			break;
+		case 'INDIVIDUAL_AD_IMPRESSIONS':
+			headers[1] = 'AD IMPRESSIONS';
+			break;
+		case 'PAGE_VIEWS':
+			headers[1] = 'PAGE VIEWS';
+			break;
+		default:
+			break;
+	}
+
 	return { rows: finalData, footer: averages, header: headers };
 }
 
