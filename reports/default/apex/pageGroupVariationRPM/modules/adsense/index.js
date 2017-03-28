@@ -16,7 +16,7 @@ var lodash = require('lodash'),
 				}),
 				getImpressionData = Promise.resolve(config)
 					.then((config) => {
-						const impressionConfig = lodash.assign(true, { adsenseMetric: 'AD IMPRESSIONS' }, config);
+						const impressionConfig = lodash.assign({ adsenseMetric: 'AD IMPRESSIONS' }, config);
 
 						return self.getData(impressionConfig);
 					});
