@@ -13,18 +13,35 @@ var lodash = require('lodash'),
 
 					return self.getData(adSenseConfig)
 						.then(adCodeSlotModule.getTotalEarnings);
-				});
+				}),
+				getImpressionData = Promise.resolve(config)
+					.then((config) => {
+						const impressionConfig = lodash.assign(true, { adsenseMetric: 'AD IMPRESSIONS' }, config);
 
-			return Promise.all(adSlotEarningsPromises)
-				.then(function(earningsArr) {
-					var earnings = 0;
+						return self.getData(impressionConfig);
+					});
 
-					lodash.forEach(earningsArr, function(value) {
+			return Promise.join(Promise.all(adSlotEarningsPromises), getImpressionData, (earningsArr, impressionData) => {
+				function getTotalEarnings(earningsArr) {
+					let earnings = 0;
+
+					lodash.forEach(earningsArr, (value) => {
 						earnings += Number(value);
 					});
 
 					return Promise.resolve(earnings);
-				});
+				}
+
+				return getTotalEarnings(earningsArr)
+					.then((earnings) => {
+						const result = {
+							earnings,
+							impressionData
+						};
+
+						return result;
+					});
+			});
 		},
 		getData: function(config) {
 			var userEmail = config.email,

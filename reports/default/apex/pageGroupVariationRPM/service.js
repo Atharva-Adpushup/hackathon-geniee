@@ -24,16 +24,17 @@ module.exports = {
 				}
 
 				return adsenseModule.getData(queryConfig, adSlotsArr)
-					.then(function(adSlotsEarnings) {
+					.then(function(adsenseData) {
 						return pageViewsModule.getTotalCount(queryConfig)
 							.then(function(pageViews) {
-								return rpmModule.calculate(pageViews, adSlotsEarnings)
+								return rpmModule.calculate(pageViews, adsenseData.earnings)
 									.then(function(rpm) {
 										return {
 											success: true,
 											rpm: rpm,
 											pageViews: pageViews,
-											earnings: adSlotsEarnings
+											earnings: adsenseData.earnings,
+											impressions: adsenseData.impressionData
 										};
 									});
 							});
