@@ -36,7 +36,7 @@ var lodash = require('lodash'),
 					return Promise.resolve(result);
 				}
 
-				return getTotalEarningsAndImpressions(earningsArr);
+				return getTotalEarningsAndImpressions(reportDataArr);
 			});
 		},
 		getData: function(config) {
