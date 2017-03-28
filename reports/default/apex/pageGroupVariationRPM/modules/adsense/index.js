@@ -1,46 +1,42 @@
 var lodash = require('lodash'),
 	Promise = require('bluebird'),
 	adCodeSlotModule = require('../adCodeSlot/index'),
+	impressionModule = require('../impression/index'),
 	adsenseReportModel = require('../../../../../../models/adsenseModel'),
 	userModel = require('../../../../../../models/userModel'),
 	adsense = {
 		getFullData: function(config, adSlotsArr) {
-			var self = this,
-				adSlotEarningsPromises = adSlotsArr.map(function(adSlotNum) {
-					var adSenseConfig = lodash.assign({}, config);
+			const self = this,
+				reportPromises = adSlotsArr.map((adSlotNum) => {
+					const genericConfig = lodash.assign({ adCodeSlot: adSlotNum }, config),
+						impressionConfig = lodash.assign({ adsenseMetric: 'AD IMPRESSIONS', adCodeSlot: adSlotNum }, config),
+						genericReport = self.getData(genericConfig),
+						impressionReport = self.getData(impressionConfig);
 
-					adSenseConfig.adCodeSlot = adSlotNum;
+					return Promise.join(genericReport, impressionReport, (genericReportData, impressionReportData) => {
+						const adCodeSlotEarnings = adCodeSlotModule.getTotalEarnings(genericReportData),
+							impressions = impressionModule.getTotal(impressionReportData);
 
-					return self.getData(adSenseConfig)
-						.then(adCodeSlotModule.getTotalEarnings);
-				}),
-				getImpressionData = Promise.resolve(config)
-					.then((config) => {
-						const impressionConfig = lodash.assign({ adsenseMetric: 'AD IMPRESSIONS' }, config);
+						return { earnings: adCodeSlotEarnings, impressions };
+					});
+				});
 
-						return self.getData(impressionConfig);
+			return Promise.join(Promise.all(reportPromises), (reportDataArr) => {
+				function getTotalEarningsAndImpressions(reportDataArr) {
+					const result = {
+						earnings: 0,
+						impressions: 0
+					};
+
+					lodash.forEach(reportDataArr, (dataItem) => {
+						result.earnings += dataItem.earnings;
+						result.impressions += dataItem.impressions;
 					});
 
-			return Promise.join(Promise.all(adSlotEarningsPromises), getImpressionData, (earningsArr, impressionData) => {
-				function getTotalEarnings(earningsArr) {
-					let earnings = 0;
-
-					lodash.forEach(earningsArr, (value) => {
-						earnings += Number(value);
-					});
-
-					return Promise.resolve(earnings);
+					return Promise.resolve(result);
 				}
 
-				return getTotalEarnings(earningsArr)
-					.then((earnings) => {
-						const result = {
-							earnings,
-							impressionData
-						};
-
-						return result;
-					});
+				return getTotalEarningsAndImpressions(earningsArr);
 			});
 		},
 		getData: function(config) {

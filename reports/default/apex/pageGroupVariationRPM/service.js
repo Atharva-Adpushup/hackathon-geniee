@@ -34,7 +34,7 @@ module.exports = {
 											rpm: rpm,
 											pageViews: pageViews,
 											earnings: adsenseData.earnings,
-											impressions: adsenseData.impressionData
+											impressions: adsenseData.impressions
 										};
 									});
 							});
