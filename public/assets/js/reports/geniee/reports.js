@@ -180,7 +180,7 @@
         dateFromValue = this.filterData.dateType.absolute['date-from'];
         dateToValue = this.filterData.dateType.absolute['date-to'];
         isDateDataExists = !!(dateFromValue && dateToValue);
-        isDateToGreaterThanDateFrom = (+new Date(dateToValue) > +new Date(dateFromValue));
+        isDateToGreaterThanDateFrom = (+new Date(dateToValue) >= +new Date(dateFromValue));
 
         if (isDateDataExists && isDateToGreaterThanDateFrom) {
             dateRangeObj = {
