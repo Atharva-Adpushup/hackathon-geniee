@@ -173,6 +173,7 @@
             dateFromValue, dateToValue,
             isDateDataExists, isDateToGreaterThanDateFrom,
             dateRangeObj,
+            $dateToElement = $('.js-datepicker-element.js-label-date-absolute-to'),
             selectedLabelTextArr = [],
             dateRangeTypeObj = {};
 
@@ -181,6 +182,12 @@
         dateToValue = this.filterData.dateType.absolute['date-to'];
         isDateDataExists = !!(dateFromValue && dateToValue);
         isDateToGreaterThanDateFrom = (+new Date(dateToValue) >= +new Date(dateFromValue));
+
+        // Make 'dateFrom' value as start date for 'dateTo' DatePicker element
+        // if 'dateFrom' value exists
+        if (dateFromValue) {
+            $dateToElement.datepicker('setStartDate', dateFromValue);
+        }
 
         if (isDateDataExists && isDateToGreaterThanDateFrom) {
             dateRangeObj = {
