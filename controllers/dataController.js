@@ -316,24 +316,6 @@ router
 				console.log(err);
 				return res.send({success: 0});
 			});	
-	})
-	.get('/performNiQlQuery', function(req, res) {
-		var query = N1qlQuery.fromString('select * from apAppBucket'),
-			hosts = ['127.0.0.1'];
-
-		return couchbase.connectToAppBucket()
-			.then(function(appBucket) {
-				return appBucket.enableN1qlPromise(hosts, {})
-					.then(function() {
-						return appBucket.queryPromise(query, {})
-							.then(function(responseData) {
-								return res.json({ 'response_type': 'good', 'msg': responseData });
-							});
-					})
-			})
-			.catch(function(e) {
-				return res.json({success: 0, err: e.toString()});
-			});
 	});
 
 module.exports = router;
