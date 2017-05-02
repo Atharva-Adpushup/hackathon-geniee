@@ -389,16 +389,15 @@ $datePickerDisabledColor: rgba(229,229,229,0.5);
             height: $uiComponentHeight;
         }
     }
-
-    /*****Third party rules override*****/
-    .datepicker table tr td.disabled
-    {
-        color: $datePickerDisabledColor;
-
-        &:hover
-        {
-            color: $datePickerDisabledColor;
-        }
-    }
 }
 
+/*****Third party rules override*****/
+.datepicker table tr td.disabled
+{
+    color: $datePickerDisabledColor;
+
+    &:hover
+    {
+        color: $datePickerDisabledColor;
+    }
+}
