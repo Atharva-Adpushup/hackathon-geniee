@@ -967,10 +967,30 @@
             $pageCTREl.html(data.pageCTR);
     }
 
+    ReportClass.prototype.changeTooltipPosition = function() {
+        var $siteHeaderEl = $('.js-site-header'),
+            $reportsWrapperEl = $('.js-reports-wrapper'),
+            elRectOffsets = $reportsWrapperEl.get(0).getBoundingClientRect(),
+            elTopOffset = elRectOffsets.top,
+            headerElHeight = $siteHeaderEl.height(),
+            $el = $(this),
+            constants = {
+                top: 'top',
+                bottom: 'bottom'
+            };
+
+            if (headerElHeight >= elTopOffset) {
+                $el.data('bs.tooltip').options.placement = constants.bottom;
+            } else {
+                $el.data('bs.tooltip').options.placement = constants.top;
+            }
+    }
+
     ReportClass.prototype.initPerfHeaderInfoTooltips = function() {
         var $infoEls = $('.js-thumbnail-info-btn', this.$perfHeaderContainer);
 
         $infoEls.tooltip();
+        $infoEls.off('show.bs.tooltip').on('show.bs.tooltip', this.changeTooltipPosition);
     };
 
     ReportClass.prototype.setTableData = function(data, isPageGroupLevel) {
