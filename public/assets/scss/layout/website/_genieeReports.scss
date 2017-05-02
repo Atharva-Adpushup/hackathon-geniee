@@ -5,6 +5,7 @@ $borderColor: #e6e6e6;
 $LabelFontSize: 1.5em;
 $fourteenPxAlias: 1.168em;
 $uiComponentHeight: 34px;
+$datePickerDisabledColor: rgba(229,229,229,0.5);
 
 .page-container--reports-geniee
 {
@@ -386,6 +387,17 @@ $uiComponentHeight: 34px;
         {
             font-size: 1em;
             height: $uiComponentHeight;
+        }
+    }
+
+    /*****Third party rules override*****/
+    .datepicker table tr td.disabled
+    {
+        color: $datePickerDisabledColor;
+
+        &:hover
+        {
+            color: $datePickerDisabledColor;
         }
     }
 }
