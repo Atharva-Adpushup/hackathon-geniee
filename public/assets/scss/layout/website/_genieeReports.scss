@@ -394,10 +394,10 @@ $datePickerDisabledColor: rgba(229,229,229,0.5);
 /*****Third party rules override*****/
 .datepicker table tr td.disabled
 {
-    color: $datePickerDisabledColor;
+    color: $datePickerDisabledColor !important;
 
     &:hover
     {
-        color: $datePickerDisabledColor;
+        color: $datePickerDisabledColor !important;
     }
 }
