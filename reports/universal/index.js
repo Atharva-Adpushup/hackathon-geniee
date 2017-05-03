@@ -9,8 +9,8 @@ var moment = require('moment'),
 function getReportData(paramConfig) {
 	var reportConfig = {
 			siteId: paramConfig.siteId,
-			startDate: moment(paramConfig.dateFrom).valueOf(),
-			endDate: moment().subtract(0, 'days').valueOf()
+			startDate: moment(paramConfig.dateFrom).startOf('day').valueOf(),
+			endDate: moment().subtract(0, 'days').endOf('day').valueOf()
 		},
 		statusObj = {
 			status: null,
@@ -74,7 +74,7 @@ function getComputedConfig(flags, paramConfig) {
 }
 
 module.exports = {
-	getReportData: function(site) {
+	getReportData: function(site, inputStartDate, inputEndDate) {
 		var isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 			isGenieePartner = (!!(site.get('partner') && (site.get('partner') === CC.partners.geniee.name) && site.get('genieeMediaId') && isAutoOptimise)),
 			// NOTE: A date after which console.adpushup.com was made live
@@ -84,8 +84,8 @@ module.exports = {
 			paramConfig = {
 				siteId: site.get('siteId'),
 				mediaId: site.get('genieeMediaId'),
-				dateFrom: moment(startDate).format('YYYY-MM-DD'),
-				dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
+				dateFrom: (inputStartDate) ? moment(inputStartDate).format('YYYY-MM-DD') : moment(startDate).format('YYYY-MM-DD'),
+				dateTo: (inputEndDate) ? moment(inputEndDate).format('YYYY-MM-DD') : moment().subtract(1, 'days').format('YYYY-MM-DD')
 			},
 			flags = {
 				isGenieePartner: isGenieePartner,

@@ -475,11 +475,13 @@ router
 	})
 
 	.get('/getUniversalReportData', function(req, res) {
-		var siteId = req.query.siteId;
+		var siteId = req.query.siteId,
+			startDate = req.query.startDate,
+			endDate = req.query.endDate;
 
 		return siteModel.getSiteById(siteId)
 			.then(function(site) {
-				return universalReportService.getReportData(site)
+				return universalReportService.getReportData(site, startDate, endDate)
 					.then(function(reportData) {
 						return res.json(reportData);
 					});
