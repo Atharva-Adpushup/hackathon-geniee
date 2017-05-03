@@ -22,7 +22,7 @@ function getSuccessStatusObj(siteId) {
 }
 
 function getFailureStatusObj(siteId, err) {
-    const errorText = `Sync Process Failed: ${err.toString()}`;
+    const errorText = `Sync Process Failed: ${err.toString()} for siteId ${siteId}`;
 
 	fileLogger.info(errorText);
     fileLogger.error(err);
