@@ -84,8 +84,8 @@ module.exports = {
 			paramConfig = {
 				siteId: site.get('siteId'),
 				mediaId: site.get('genieeMediaId'),
-				dateFrom: (inputStartDate) ? moment(inputStartDate).format('YYYY-MM-DD') : moment(startDate).format('YYYY-MM-DD'),
-				dateTo: (inputEndDate) ? moment(inputEndDate).format('YYYY-MM-DD') : moment().subtract(1, 'days').format('YYYY-MM-DD')
+				dateFrom: (inputStartDate) ? moment(inputStartDate, 'x').format('YYYY-MM-DD') : moment(startDate).format('YYYY-MM-DD'),
+				dateTo: (inputEndDate) ? moment(inputEndDate, 'x').format('YYYY-MM-DD') : moment().subtract(1, 'days').format('YYYY-MM-DD')
 			},
 			flags = {
 				isGenieePartner: isGenieePartner,
