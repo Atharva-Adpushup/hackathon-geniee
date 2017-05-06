@@ -29,7 +29,7 @@ var express = require('express'),
 	});
 
 require('./services/genieeAdSyncService/index');
-require('./services/hbSyncService/index');
+//require('./services/hbSyncService/index');
 
 // Enable compression at top
 app.use(compression());
