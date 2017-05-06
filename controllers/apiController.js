@@ -86,7 +86,7 @@ router
 				return res.status(200).send({ success: true, data: { siteId: site.data.siteId, siteName: site.data.siteName, siteDomain: site.data.siteDomain } });
 			})
 			.catch(function (err) {
-				woodlot.err('Geniee /site/view error - ' + err);
+				woodlot.err('Geniee /site/view error - ' + JSON.stringify(err));
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}

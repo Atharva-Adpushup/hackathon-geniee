@@ -100,6 +100,10 @@ woodlotEvents.on('reqErr', function(log) {
         });
 });
 
+woodlotEvents.on('err', function(log) {
+    console.log('Error log - ' + log);
+});
+
 
 couchBaseService.connectToAppBucket().then(function () {
 	// set couchbaseStore for session storage
