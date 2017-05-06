@@ -59,7 +59,7 @@ app.use(cookieParser());
 // Initialise woodlot module for geniee api HTTP logging
 app.use(woodlotMiddlewareLogger({
     streams: ['./logs/geniee-api.log'],
-    stdout: true,
+    stdout: false,
     routes: {
         whitelist: ['/genieeApi'],
         strictChecking: false
@@ -69,7 +69,7 @@ app.use(woodlotMiddlewareLogger({
 // Initialise woodlot module for geniee report api HTTP logging
 app.use(woodlotMiddlewareLogger({
     streams: ['./logs/geniee-report-api.log'],
-    stdout: true,
+    stdout: false,
     routes: {
         whitelist: ['/reports/performance'],
         strictChecking: false
@@ -79,7 +79,7 @@ app.use(woodlotMiddlewareLogger({
 // Initialise woodlot module for geniee api custom logging
 woodlotCustomLogger.config({
     streams: ['./logs/geniee-api-custom.log'],
-    stdout: true
+    stdout: false
 });
 
 // Write log to couchbase database on woodlot's 'reqErr' event
