@@ -25,7 +25,7 @@ function getFailureStatusObj(siteId, err) {
     const errorText = `Sync Process Failed: ${err.toString()} for siteId ${siteId}`;
 
 	fileLogger.info(errorText);
-    fileLogger.error(err);
+    fileLogger.err(err);
     console.log(errorText);
 	return getStatusObj(0, siteId);
 }

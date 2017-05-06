@@ -37,7 +37,7 @@ function updateAllAutoOptimisedSites() {
 			errorInfo = `Sync process failed: ${e.toString()} at ${dateTime}`;
 
 		fileLogger.info(errorInfo);
-		fileLogger.error(e);
+		fileLogger.err(e);
 		console.log(errorInfo);
 	});
 }
