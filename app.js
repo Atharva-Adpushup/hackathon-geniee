@@ -84,6 +84,7 @@ woodlotCustomLogger.config({
 
 // Write log to couchbase database on woodlot's 'reqErr' event
 woodlotEvents.on('err', function(log) {
+	log = log.message;
     couchBaseService.connectToBucket('apGlobalBucket')
         .then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
             date: +new Date(),
