@@ -9,7 +9,13 @@ var express = require('express'),
 	CC = require('../configs/commonConsts'),
 	FormValidator = require('../helpers/FormValidator'),
 	_ = require('lodash'),
-	woodlot = require('woodlot').customLogger;
+	woodlotCustomLogger = require('woodlot').customLogger;
+
+// Initialise woodlot module for geniee api custom logging
+var woodlot = new woodlotCustomLogger({
+    streams: ['./logs/geniee-api-custom.log'],
+    stdout: false
+});
 
 router
 	.get('/site/create', function (req, res) {

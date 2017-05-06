@@ -76,12 +76,6 @@ app.use(woodlotMiddlewareLogger({
     }
 }));
 
-// Initialise woodlot module for geniee api custom logging
-woodlotCustomLogger.config({
-    streams: ['./logs/geniee-api-custom.log'],
-    stdout: false
-});
-
 // Write log to couchbase database on woodlot's 'reqErr' event
 woodlotEvents.on('err', function(log) {
 	log = log.message;
