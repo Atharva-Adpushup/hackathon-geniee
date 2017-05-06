@@ -83,14 +83,15 @@ woodlotCustomLogger.config({
 });
 
 // Write log to couchbase database on woodlot's 'reqErr' event
-woodlotEvents.on('reqErr', function(log) {
-	couchBaseService.connectToBucket('apGlobalBucket')
+woodlotEvents.on('err', function(log) {
+    couchBaseService.connectToBucket('apGlobalBucket')
         .then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
             date: +new Date(),
             source: 'Geniee API Logs',
             message: `${log.method} ${log.url}`,
-			type: (log.statusCode >= 400 && log.statusCode < 500 ) ? 2 : 3,
-			details: `${log.statusCode} - body:${JSON.stringify(log.body)} - query:${JSON.stringify(log.query)}`
+			type: 3,
+			details: `N/A`,
+			debugData: log.debugData
         }))
         .then(success => {
             //console.log('Log added');
@@ -98,10 +99,6 @@ woodlotEvents.on('reqErr', function(log) {
         .catch(err => {
             console.log('Error writing log to database');
         });
-});
-
-woodlotEvents.on('err', function(log) {
-    console.log('Error log - ' + log);
 });
 
 

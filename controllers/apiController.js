@@ -80,13 +80,16 @@ router
 		return FormValidator.validate(json, schema.api.validations)
 			.then(function () { return siteModel.getSiteById(json.siteId) })
 			.then(function (site) {
-				woodlot.info('Geniee /site/view successful');
-
 				// Send relevant site data as API output
 				return res.status(200).send({ success: true, data: { siteId: site.data.siteId, siteName: site.data.siteName, siteDomain: site.data.siteDomain } });
 			})
 			.catch(function (err) {
-				woodlot.err('Geniee /site/view error - ' + JSON.stringify(err));
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method
+				});
+				
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
