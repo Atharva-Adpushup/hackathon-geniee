@@ -58,6 +58,12 @@ router
 				return res.status(200).send({ success: true, data: { siteId: data.site.data.siteId } });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method
+				});
+				
 				if (err.name !== 'AdPushupError') {
 					if (err.code === 13) {
 						// If partner is not present then create partner account and site
@@ -108,6 +114,12 @@ router
 				return res.status(200).send({ success: true });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method
+				});
+
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
@@ -126,6 +138,12 @@ router
 				return res.status(200).send({ success: true });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method
+				});
+
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
@@ -147,6 +165,12 @@ router
 				return res.status(200).send({ success: true, data: { pageGroupId: data.id } });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method
+				});
+
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
@@ -166,6 +190,12 @@ router
 				res.status(200).send({ success: true, data: data });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method
+				});
+
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
@@ -184,6 +214,12 @@ router
 				res.status(200).send({ success: true });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method
+				});
+
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
@@ -202,6 +238,12 @@ router
 				return res.status(200).send({ success: true });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method
+				});
+				
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
