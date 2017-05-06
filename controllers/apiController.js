@@ -8,7 +8,8 @@ var express = require('express'),
 	schema = require('../helpers/schema'),
 	CC = require('../configs/commonConsts'),
 	FormValidator = require('../helpers/FormValidator'),
-	_ = require('lodash');
+	_ = require('lodash'),
+	woodlot = require('woodlot').customLogger;
 
 router
 	.get('/site/create', function (req, res) {
@@ -79,10 +80,13 @@ router
 		return FormValidator.validate(json, schema.api.validations)
 			.then(function () { return siteModel.getSiteById(json.siteId) })
 			.then(function (site) {
+				woodlot.info('Geniee /site/view successful');
+
 				// Send relevant site data as API output
 				return res.status(200).send({ success: true, data: { siteId: site.data.siteId, siteName: site.data.siteName, siteDomain: site.data.siteDomain } });
 			})
 			.catch(function (err) {
+				woodlot.err('Geniee /site/view error - ' + err);
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}

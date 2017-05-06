@@ -13,7 +13,8 @@ var express = require('express'),
 	consts = require('./configs/commonConsts'),
 	utils = require('./helpers/utils'),
 	couchBaseService = require('./helpers/couchBaseService'),
-	woodlot = require('woodlot').middlewareLogger,
+	woodlotMiddlewareLogger = require('woodlot').middlewareLogger,
+	woodlotCustomLogger = require('woodlot').customLogger,
 	woodlotEvents = require('woodlot').events,
 	uuid = require('uuid'),
 	// couchbase store
@@ -55,8 +56,8 @@ app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '5mb' }));
 app.use(cookieParser());
 
-// Initialise woodlot module for HTTP logging
-app.use(woodlot({
+// Initialise woodlot module for geniee api HTTP logging
+app.use(woodlotMiddlewareLogger({
     streams: ['./logs/geniee-api.log'],
     stdout: true,
     routes: {
@@ -65,7 +66,8 @@ app.use(woodlot({
     }
 }));
 
-app.use(woodlot({
+// Initialise woodlot module for geniee report api HTTP logging
+app.use(woodlotMiddlewareLogger({
     streams: ['./logs/geniee-report-api.log'],
     stdout: true,
     routes: {
@@ -74,7 +76,13 @@ app.use(woodlot({
     }
 }));
 
-// Write log to couchbase database on logger's 'error' event
+// Initialise woodlot module for geniee api custom logging
+woodlotCustomLogger.config({
+    streams: ['./logs/geniee-api-custom.log'],
+    stdout: true
+});
+
+// Write log to couchbase database on woodlot's 'reqErr' event
 woodlotEvents.on('reqErr', function(log) {
 	couchBaseService.connectToBucket('apGlobalBucket')
         .then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
