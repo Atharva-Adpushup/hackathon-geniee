@@ -67,7 +67,8 @@ router
 				woodlot.err({
 					debugData: JSON.stringify(err),
 					url: req.url,
-					method: req.method
+					method: req.method,
+					name: 'GenieeAPI'
 				});
 				
 				if (err.name !== 'AdPushupError') {
@@ -99,7 +100,8 @@ router
 				woodlot.err({
 					debugData: JSON.stringify(err),
 					url: req.url,
-					method: req.method
+					method: req.method,
+					name: 'GenieeAPI'
 				});
 				
 				if (err.name !== 'AdPushupError') {
@@ -123,7 +125,8 @@ router
 				woodlot.err({
 					debugData: JSON.stringify(err),
 					url: req.url,
-					method: req.method
+					method: req.method,
+					name: 'GenieeAPI'
 				});
 
 				if (err.name !== 'AdPushupError') {
@@ -147,7 +150,8 @@ router
 				woodlot.err({
 					debugData: JSON.stringify(err),
 					url: req.url,
-					method: req.method
+					method: req.method,
+					name: 'GenieeAPI'
 				});
 
 				if (err.name !== 'AdPushupError') {
@@ -174,7 +178,8 @@ router
 				woodlot.err({
 					debugData: JSON.stringify(err),
 					url: req.url,
-					method: req.method
+					method: req.method,
+					name: 'GenieeAPI'
 				});
 
 				if (err.name !== 'AdPushupError') {
@@ -199,7 +204,8 @@ router
 				woodlot.err({
 					debugData: JSON.stringify(err),
 					url: req.url,
-					method: req.method
+					method: req.method,
+					name: 'GenieeAPI'
 				});
 
 				if (err.name !== 'AdPushupError') {
@@ -223,7 +229,8 @@ router
 				woodlot.err({
 					debugData: JSON.stringify(err),
 					url: req.url,
-					method: req.method
+					method: req.method,
+					name: 'GenieeAPI'
 				});
 
 				if (err.name !== 'AdPushupError') {
@@ -247,7 +254,8 @@ router
 				woodlot.err({
 					debugData: JSON.stringify(err),
 					url: req.url,
-					method: req.method
+					method: req.method,
+					name: 'GenieeAPI'
 				});
 				
 				if (err.name !== 'AdPushupError') {

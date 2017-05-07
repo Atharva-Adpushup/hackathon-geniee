@@ -78,22 +78,24 @@ app.use(woodlotMiddlewareLogger({
 
 // Write log to couchbase database on woodlot's 'reqErr' event
 woodlotEvents.on('err', function(log) {
-	log = log.message;
-    couchBaseService.connectToBucket('apGlobalBucket')
-        .then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
-            date: +new Date(),
-            source: 'Geniee API Logs',
-            message: `${log.method} ${log.url}`,
-			type: 3,
-			details: `N/A`,
-			debugData: log.debugData
-        }))
-        .then(success => {
-            //console.log('Log added');
-        })
-        .catch(err => {
-            console.log('Error writing log to database');
-        });
+	if('name' in log && log.name === 'GenieeAPI') {
+		var logData = log.message;
+		couchBaseService.connectToBucket('apGlobalBucket')
+			.then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
+				date: +new Date(),
+				source: 'Geniee API Logs',
+				message: `${logData.method} ${logData.url}`,
+				type: 3,
+				details: `N/A`,
+				debugData: logData.debugData
+			}))
+			.then(success => {
+				//console.log('Log added');
+			})
+			.catch(err => {
+				console.log('Error writing log to database');
+			});
+	}
 });
 
 
