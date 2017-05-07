@@ -78,7 +78,7 @@ app.use(woodlotMiddlewareLogger({
 
 // Write log to couchbase database on woodlot's 'reqErr' event
 woodlotEvents.on('err', function(log) {
-	if('name' in log && log.name === 'GenieeAPI') {
+	if('name' in log.message && log.message.name === 'GenieeAPI') {
 		var logData = log.message;
 		couchBaseService.connectToBucket('apGlobalBucket')
 			.then(appBucket => appBucket.insertPromise(`slog::${uuid.v4()}`, {
