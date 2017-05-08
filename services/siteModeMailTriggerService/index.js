@@ -6,7 +6,12 @@ const Promise = require('bluebird'),
 	CC = require('../../configs/commonConsts'),
 	{ MESSAGES, SITE, DATE, DATA } = require('./constants/index'),
 	{ KEYS, PERCENTAGE, MAIL } = DATA,
-	universalReportService = require('../../reports/universal/index');
+	universalReportService = require('../../reports/universal/index'),
+	woodlot = require('woodlot').customLogger,
+	mailContentLogger = new woodlot({
+		streams: ['./logs/mailContent.log'],
+		stdout: false
+	});
 
 function validateReportData(oneDayBeforeData, twoDaysBeforeData, siteData) {
 	const isOneDayBeforeData = !!(oneDayBeforeData && isObject(oneDayBeforeData) && oneDayBeforeData.data && isObject(oneDayBeforeData.data)),
@@ -74,6 +79,17 @@ function generateMailContent(dataObject) {
 			mailContentObj.content = `${lodash(MAIL.CONTENT.DATA_INCONSISTENT.CONTENT).replace('___sitename___', siteData.domain)} ${reportTemplateString}`;
 		}
 
+		// File logger addition
+		mailContentLogger.info({
+			'One day before data': JSON.stringify(oneDayBefore),
+			'Two days before data': JSON.stringify(twoDaysBefore),
+			'Page View percentage': pageViewsPercentage,
+			'Revenue percentage': revenuePercentage,
+			'Is in Draft mode': isInDraftMode,
+			'Is Data Inconsistency': isDataInConsistency,
+			'Mail content object': JSON.stringify(mailContentObj)
+		});
+
 		return mailContentObj;
 }
 
@@ -105,6 +121,11 @@ function initModule(site, resolve, reject) {
 		return Promise.join(getOneDayBeforeReport, getTwoDaysBeforeReport, (oneDayBeforeReport, twoDaysBeforeReport) => {
 			return validateReportData(oneDayBeforeReport, twoDaysBeforeReport, siteData)
 				.then(generateMailContent)
+				.then((message) => {
+					mailContentLogger.info(`/*****Mail trigger module finished*****/`);
+
+					return message;
+				})
 				.then(resolve);
 		});
 }
@@ -112,6 +133,7 @@ function initModule(site, resolve, reject) {
 
 module.exports = {
 	init: (site) => {
+		mailContentLogger.info(`/*****Mail trigger module initialised*****/`);
 		return new Promise(initModule.bind(null, site));
 	}
 };
