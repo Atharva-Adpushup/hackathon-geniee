@@ -81,6 +81,7 @@ function generateMailContent(dataObject) {
 
 		// File logger addition
 		mailContentLogger.info({
+			siteData,
 			'One day before data': JSON.stringify(oneDayBefore),
 			'Two days before data': JSON.stringify(twoDaysBefore),
 			'Page View percentage': pageViewsPercentage,
