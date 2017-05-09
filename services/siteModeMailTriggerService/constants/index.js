@@ -1,5 +1,6 @@
 const MESSAGES = {
 	SITE_INVALID: 'MailTrigger: Site is non Geniee. Mail sending failed.',
+	EMPTY_MAIL_DATA: 'MailTrigger: Email data is empty so it will not be send',
 	MAIL_SUCCESS: 'MailTrigger: Mail sent successfully',
 	VALID_DATA: 'MailTrigger: Report data is valid',
 	INVALID_DATA: 'MailTrigger: Report data is invalid'
@@ -38,10 +39,11 @@ DATA = {
 				CONTENT: '<h2>The site ___sitename___ is in draft mode!</h2>\n <p>This site had valid report data for last 2 days.</p>\n'
 			},
 			DATA_INCONSISTENT: {
-				HEADER: 'Data InConsistent | ___sitename___ (SiteId: ___siteId___)',
-				CONTENT: '<h2>The site ___sitename___ has inconsistent data!</h2>\n'
+				HEADER: 'Data Discrepancy | ___sitename___ (SiteId: ___siteId___)',
+				CONTENT: '<h2>The site ___sitename___ has data discrepancy!</h2>\n'
 			}
-		}
+		},
+		ID: 'zahin@adpushup.com'
 	}
 };
 

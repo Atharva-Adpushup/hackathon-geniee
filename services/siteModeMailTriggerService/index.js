@@ -4,10 +4,12 @@ const Promise = require('bluebird'),
 	lodash = require('lodash'),
 	{ isObject, replace } = lodash,
 	CC = require('../../configs/commonConsts'),
+	config = require('../../configs/config'),
 	{ MESSAGES, SITE, DATE, DATA } = require('./constants/index'),
 	{ KEYS, PERCENTAGE, MAIL } = DATA,
 	universalReportService = require('../../reports/universal/index'),
 	woodlot = require('woodlot').customLogger,
+	Mailer = require('../../helpers/Mailer'),
 	mailContentLogger = new woodlot({
 		streams: ['./logs/mailContent.log'],
 		stdout: false
@@ -94,6 +96,31 @@ function generateMailContent(dataObject) {
 		return mailContentObj;
 }
 
+function sendMail(dataObject) {
+	const { header, content } = dataObject,
+		isDataExists = !!(header && content);
+
+	if (!isDataExists) {
+		mailContentLogger.info(MESSAGES.EMPTY_MAIL_DATA);
+		return MESSAGES.EMPTY_MAIL_DATA;
+	}
+
+	const mailConfig = {
+        MAIL_FROM: config.email.MAIL_FROM,
+        MAIL_FROM_NAME: config.email.MAIL_FROM_NAME,
+        SMTP_SERVER: config.email.SMTP_SERVER,
+        SMTP_USERNAME: config.email.SMTP_USERNAME,
+        SMTP_PASSWORD: config.email.SMTP_PASSWORD
+    },
+	mailer = new Mailer(mailConfig, 'html'),
+	mailDataConfig = { to: MAIL.ID, subject: header, html: content };
+
+	return mailer.send(mailDataConfig)
+		.then(() => {
+			return MESSAGES.MAIL_SUCCESS;
+		});
+}
+
 function initModule(site, resolve, reject) {
 	const isGenieePartner = !!(site.get('partner') && (site.get('partner') === CC.partners.geniee.name) && site.get('genieeMediaId'));
 
@@ -122,6 +149,7 @@ function initModule(site, resolve, reject) {
 		return Promise.join(getOneDayBeforeReport, getTwoDaysBeforeReport, (oneDayBeforeReport, twoDaysBeforeReport) => {
 			return validateReportData(oneDayBeforeReport, twoDaysBeforeReport, siteData)
 				.then(generateMailContent)
+				.then(sendMail)
 				.then((message) => {
 					mailContentLogger.info(`/*****Mail trigger module finished*****/`);
 
