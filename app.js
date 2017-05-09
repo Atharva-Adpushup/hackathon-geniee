@@ -28,8 +28,13 @@ var express = require('express'),
 		prefix: 'sess::'
 	});
 
-require('./services/genieeAdSyncService/index');
-//require('./services/hbSyncService/index');
+// Set Node process environment
+process.env.NODE_ENV = config.environment.HOST_ENV;
+
+if (process.env.NODE_ENV === consts.environment.production) {
+	require('./services/genieeAdSyncService/index');
+	//require('./services/hbSyncService/index');
+}
 
 // Enable compression at top
 app.use(compression());
@@ -43,13 +48,12 @@ process.on('uncaughtException', function (err) {
 // set static directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-process.env.NODE_ENV = config.development.HOST_ENV;
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // Setup the logger file
-fs.existsSync(config.development.LOGS_DIR) || fs.mkdirSync(config.development.LOGS_DIR);
+fs.existsSync(config.environment.LOGS_DIR) || fs.mkdirSync(config.environment.LOGS_DIR);
 
 // setup basics of express middlewares
 app.use(bodyParser.json({ limit: '5mb' }));
@@ -119,7 +123,7 @@ couchBaseService.connectToAppBucket().then(function () {
 	app.use(function (req, res, next) {
 		app.locals.isSuperUser = (req.session.isSuperUser) ? true : false;
 		app.locals.usersList = (req.session.usersList) ? req.session.usersList : [];
-		app.locals.environment = config.development.HOST_ENV;
+		app.locals.environment = config.environment.HOST_ENV;
 		app.locals.currentUser = (req.session.user) ? req.session.user : {};
 		app.locals.currentSiteId = (req.session.siteId) ? req.session.siteId : null;
 		app.locals.partner = (req.session.partner) ? req.session.partner : null;
@@ -162,8 +166,8 @@ couchBaseService.connectToAppBucket().then(function () {
 		});
 	});
 
-	server.listen(config.development.HOST_PORT);
-	console.log('Server listening at port : ' + config.development.HOST_PORT);
+	server.listen(config.environment.HOST_PORT);
+	console.log('Server listening at port : ' + config.environment.HOST_PORT);
 }).catch(function (err) {
 	console.log('err: ' + err.toString());
 });

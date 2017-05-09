@@ -102,14 +102,14 @@ var consts = require('../configs/commonConsts'),
 				return !self.casValue ? appBucket.insertAsync(self.key, self.toJSON(), {}).then(function (obj) {
 					self.casValue = obj.cas;
 					if (name) {
-						config.development.HOST_ENV !== 'development' ? self.createBackup(name) : null;
+						config.environment.HOST_ENV !== 'development' ? self.createBackup(name) : null;
 						adpushup.emit(name + 'Saved', self);
 					}
 					return self;
 				}) : appBucket.replaceAsync(self.key, self.toJSON(), {}).then(function (obj) {
 					self.casValue = obj.cas;
 					if (name) {
-						config.development.HOST_ENV !== 'development' ? self.createBackup(name) : null
+						config.environment.HOST_ENV !== 'development' ? self.createBackup(name) : null
 						adpushup.emit(name + 'Saved', self);
 					}
 					return self;

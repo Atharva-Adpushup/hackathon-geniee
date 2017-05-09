@@ -259,7 +259,7 @@ router
                     domain: data.site.get('siteDomain'),
                     siteId: data.site.get('siteId'),
                     channels: data.site.get('channels'),
-                    environment: config.development.HOST_ENV,
+                    environment: config.environment.HOST_ENV,
                     currentSiteId: req.params.siteId
                 });
             })

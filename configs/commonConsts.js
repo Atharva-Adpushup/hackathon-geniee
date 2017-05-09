@@ -141,6 +141,9 @@ module.exports = {
 		NO_ADS_TO_SYNC: 'No ads to sync yet',
 		NO_INVITES_TO_CANCEL: 'No invites to cancel',
 		USER_NOT_MANAGED: 'User is not managed'
+	},
+	environment: {
+		'development': 'development',
+		'production': 'production'
 	}
 };
-

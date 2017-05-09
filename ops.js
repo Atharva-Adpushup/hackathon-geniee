@@ -99,7 +99,7 @@ app.use(function(err, req, res) {
 	});
 });
 
-server.listen(config.development.OPS_HOST_PORT);
+server.listen(config.environment.OPS_HOST_PORT);
 
 
 module.exports = app;
