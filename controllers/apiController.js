@@ -22,7 +22,8 @@ router
 		res.render('geniee/api/createSite');
 	})
 	.post('/site/create', function (req, res) {
-		var json = req.body;
+		var json = req.body,
+			adsensePublisherId = json.publisherId || null;
 
 		// Set partner to geniee
 		if (req.isGenieeSite) {
@@ -31,6 +32,11 @@ router
 		var partnerEmail = json.partner + '@adpushup.com', siteId;
 		json.ownerEmail = partnerEmail;
 		json.apConfigs = { 'mode': CC.site.mode.DRAFT, isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP };
+
+		if (adsensePublisherId) {
+			json.adsensePublisherId = adsensePublisherId;
+			delete json.publisherId;
+		}
 
 		// Function to create partner user account and site
 		function createPartnerAndSite() {
