@@ -236,6 +236,12 @@ function apiModule() {
 		updateSite: function (json) {
 			return API.getSiteById(json.siteId)
 				.then(function (site) {
+					var isAdSensePublisherId = !!(json.adsensePublisherId && site.get('adsensePublisherId'));
+
+					if (isAdSensePublisherId) {
+						site.set('adsensePublisherId', json.adsensePublisherId);
+					}
+
 					site.set('siteName', json.siteName);
 					return site.save();
 				})
