@@ -31,7 +31,7 @@ module.exports = {
 			var deletedZonesVariationData = {
 				key: uuid.v4(),
 				name: 'Deleted Zones'
-			};
+			}, genieeMatchedZones = [], deletedZones;
 
 			computedData[pageGroupKey].variationData = {};
 
@@ -41,13 +41,11 @@ module.exports = {
 						_.forOwn(sectionObj.ads, function(adObj, adKey) {
 							var isGenieeAd = !!(adObj.networkData && _.isObject(adObj.networkData) && adObj.networkData.zoneId),
 								isZoneMatch = (isGenieeAd && (zonesObj.zoneId == adObj.networkData.zoneId)),
-								isCustomAd = !!(!adObj.networkData && adObj.adCode),
-								doesVariationNotExists = !!(!computedData[pageGroupKey].variationData.hasOwnProperty(variationKey) && !computedData[pageGroupKey].variationData[variationKey]),
-								doesDeletedZonesVariationNotExists = !!(!computedData[pageGroupKey].variationData.hasOwnProperty(deletedZonesVariationData.key) && !computedData[pageGroupKey].variationData[deletedZonesVariationData.key]);
+								isCustomAd = !!(!adObj.networkData && adObj.adCode);
 
 							if (isGenieeAd) {
 								if (isZoneMatch) {
-									if (doesVariationNotExists) {
+									if (!computedData[pageGroupKey].variationData.hasOwnProperty(variationKey) && !computedData[pageGroupKey].variationData[variationKey]) {
 										computedData[pageGroupKey].variationData[variationKey] = {
 											id: variationObj.id,
 											name: variationObj.name,
@@ -58,27 +56,11 @@ module.exports = {
 									} else {
 										computedData[pageGroupKey].variationData[variationKey].zones.push(zonesObj);
 									}
-								} else {
-									const deletedZonesId = `${zonesObj.zoneId}-${zonesObj.date}`;
 
-									if (doesDeletedZonesVariationNotExists) {
-										computedData[pageGroupKey].variationData[deletedZonesVariationData.key] = {
-											id: deletedZonesVariationData.key,
-											name: deletedZonesVariationData.name,
-											trafficDistribution: 0,
-											zones: {}
-										};
-										const doesZoneNotExists = !!(!computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones.hasOwnProperty(deletedZonesId) && !computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones[deletedZonesId]);
-
-										if (doesZoneNotExists) {
-											computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones[deletedZonesId] = zonesObj;
-										}
-									} else {
-										computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones[deletedZonesId] = zonesObj;
-									}
+									genieeMatchedZones.push(zonesObj);
 								}
 							} else if (isCustomAd) {
-								if (doesVariationNotExists) {
+								if (!computedData[pageGroupKey].variationData.hasOwnProperty(variationKey) && !computedData[pageGroupKey].variationData[variationKey]) {
 									computedData[pageGroupKey].variationData[variationKey] = {
 										id: variationObj.id,
 										name: variationObj.name,
@@ -93,7 +75,18 @@ module.exports = {
 				});
 			});
 
-			computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones = _.values(computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones);
+			deletedZones = _.reduce(genieeMatchedZones, (allZones, arrayItem) => {
+				return _.reject(allZones, arrayItem);
+			}, pageGroupObj.zones);
+
+			if (deletedZones && deletedZones.length) {
+				computedData[pageGroupKey].variationData[deletedZonesVariationData.key] = {
+					id: deletedZonesVariationData.key,
+					name: deletedZonesVariationData.name,
+					trafficDistribution: 0,
+					zones: deletedZones
+				};
+			}
 		});
 
 		return Promise.resolve(computedData);
