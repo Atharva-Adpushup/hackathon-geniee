@@ -1,7 +1,8 @@
 var Promise = require('bluebird'),
 	extend = require('extend'),
 	moment = require('moment'),
-	_ = require('lodash');
+	_ = require('lodash'),
+	uuidV4 = require('uuid/v4');
 
 module.exports = {
 	removeUnnecessaryZones: function(data) {
@@ -24,6 +25,14 @@ module.exports = {
 		var computedData = extend(true, {}, pageGroupData);
 
 		_.forOwn(pageGroupData, function(pageGroupObj, pageGroupKey) {
+			// Below 'Deleted Zones' variation has been created to incorporate
+			// zones which are deleted from AdPushup variations data (Channel document)
+			// but appear in Geniee Reports API response
+			var deletedZonesVariationData = {
+				key: uuidV4(),
+				name: 'Deleted Zones'
+			};
+
 			computedData[pageGroupKey].variationData = {};
 
 			_.forEach(pageGroupObj.zones, function(zonesObj) {
@@ -32,11 +41,13 @@ module.exports = {
 						_.forOwn(sectionObj.ads, function(adObj, adKey) {
 							var isGenieeAd = !!(adObj.networkData && _.isObject(adObj.networkData) && adObj.networkData.zoneId),
 								isZoneMatch = (isGenieeAd && (zonesObj.zoneId == adObj.networkData.zoneId)),
-								isCustomAd = !!(!adObj.networkData && adObj.adCode);
+								isCustomAd = !!(!adObj.networkData && adObj.adCode),
+								doesVariationNotExists = !!(!computedData[pageGroupKey].variationData.hasOwnProperty(variationKey) && !computedData[pageGroupKey].variationData[variationKey]),
+								doesDeletedZonesVariationNotExists = !!(!computedData[pageGroupKey].variationData.hasOwnProperty(deletedZonesVariationData.key) && !computedData[pageGroupKey].variationData[deletedZonesVariationData.key]);
 
 							if (isGenieeAd) {
 								if (isZoneMatch) {
-									if (!computedData[pageGroupKey].variationData.hasOwnProperty(variationKey) && !computedData[pageGroupKey].variationData[variationKey]) {
+									if (doesVariationNotExists) {
 										computedData[pageGroupKey].variationData[variationKey] = {
 											id: variationObj.id,
 											name: variationObj.name,
@@ -47,9 +58,21 @@ module.exports = {
 									} else {
 										computedData[pageGroupKey].variationData[variationKey].zones.push(zonesObj);
 									}
+								} else {
+									if (doesDeletedZonesVariationNotExists) {
+										computedData[pageGroupKey].variationData[deletedZonesVariationData.key] = {
+											id: deletedZonesVariationData.key,
+											name: deletedZonesVariationData.name,
+											trafficDistribution: 0,
+											zones: []
+										};
+										computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones.push(zonesObj);
+									} else {
+										computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones.push(zonesObj);
+									}
 								}
 							} else if (isCustomAd) {
-								if (!computedData[pageGroupKey].variationData.hasOwnProperty(variationKey) && !computedData[pageGroupKey].variationData[variationKey]) {
+								if (doesVariationNotExists) {
 									computedData[pageGroupKey].variationData[variationKey] = {
 										id: variationObj.id,
 										name: variationObj.name,
