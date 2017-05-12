@@ -2,7 +2,7 @@ var Promise = require('bluebird'),
 	extend = require('extend'),
 	moment = require('moment'),
 	_ = require('lodash'),
-	uuidV4 = require('uuid/v4');
+	uuid = require('uuid');
 
 module.exports = {
 	removeUnnecessaryZones: function(data) {
@@ -29,7 +29,7 @@ module.exports = {
 			// zones which are deleted from AdPushup variations data (Channel document)
 			// but appear in Geniee Reports API response
 			var deletedZonesVariationData = {
-				key: uuidV4(),
+				key: uuid.v4(),
 				name: 'Deleted Zones'
 			};
 
