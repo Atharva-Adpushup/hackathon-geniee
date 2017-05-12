@@ -59,16 +59,22 @@ module.exports = {
 										computedData[pageGroupKey].variationData[variationKey].zones.push(zonesObj);
 									}
 								} else {
+									const deletedZonesId = `${zonesObj.zoneId}-${zonesObj.date}`;
+
 									if (doesDeletedZonesVariationNotExists) {
 										computedData[pageGroupKey].variationData[deletedZonesVariationData.key] = {
 											id: deletedZonesVariationData.key,
 											name: deletedZonesVariationData.name,
 											trafficDistribution: 0,
-											zones: []
+											zones: {}
 										};
-										computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones.push(zonesObj);
+										const doesZoneNotExists = !!(!computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones.hasOwnProperty(deletedZonesId) && !computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones[deletedZonesId]);
+
+										if (doesZoneNotExists) {
+											computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones[deletedZonesId] = zonesObj;
+										}
 									} else {
-										computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones.push(zonesObj);
+										computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones[deletedZonesId] = zonesObj;
 									}
 								}
 							} else if (isCustomAd) {
@@ -86,6 +92,8 @@ module.exports = {
 					});
 				});
 			});
+
+			computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones = _.values(computedData[pageGroupKey].variationData[deletedZonesVariationData.key].zones);
 		});
 
 		return Promise.resolve(computedData);
