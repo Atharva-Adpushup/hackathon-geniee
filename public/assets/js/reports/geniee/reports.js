@@ -467,6 +467,7 @@
 	}
 
     ReportClass.prototype.reportsSuccessCallback = function(reportData) {
+        this.hideNotificationWrapper();
         this.reInitReports(reportData);
     }
 
