@@ -4,22 +4,20 @@ block getTitle
     - var titleVar = "Performance Report"
 
 block append headCss
-    if reportingData
-        +loadAsset("css", [
-            '/assets/css/third-party/dataTables.css',
-            'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css'
-        ])
+    +loadAsset("css", [
+        '/assets/css/third-party/dataTables.css',
+        'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css'
+    ])
 
 block append headScripts
-    if reportingData
-        +loadAsset("js", [
-            '/assets/js/libs/third-party/dataTables.js',
-            '/assets/js/libs/third-party/dataTablesColReorder.js',
-            '/assets/js/libs/third-party/highcharts/highcharts.js',
-            '/assets/js/libs/third-party/highcharts/exporting.js',
-            'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js',
-            'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js'
-        ])
+    +loadAsset("js", [
+        '/assets/js/libs/third-party/dataTables.js',
+        '/assets/js/libs/third-party/dataTablesColReorder.js',
+        '/assets/js/libs/third-party/highcharts/highcharts.js',
+        '/assets/js/libs/third-party/highcharts/exporting.js',
+        'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js'
+    ])
 
 block bodyContent
     include layout/sideBar
@@ -30,43 +28,45 @@ block bodyContent
         - paramConfig = paramConfig || null;
         - siteId = siteId || null;
         - filterDates = filterDates || null;
+        - errorText = errorText || null;
 
-        if reportingData
-            include performance/slideoutMenu
+        include performance/slideoutMenu
         // Page Content Starts Here
         .pageContentWrapper.page-content.js-slideout-panel
             .pageContentInner.page-content--inner
                 #widgetsArea.row
-
                     .mb-30
                         .controlAdpushupWrap.js-reports-wrapper
-                            if reportingData
-                                include performance/headingWithFilterButton
-                                include performance/breadcrumbWithReportDate
-                                include performance/metricsThumbnailsWithChart
-                                include performance/interactiveDataTable
-                                include performance/loaderWithAlert
+                            include performance/headingWithFilterButton
+                            include performance/breadcrumbWithReportDate
+                            include performance/metricsThumbnailsWithChart
+                            include performance/interactiveDataTable
+                            include performance/loaderWithAlert
 
-                            else
-                                div(class="aligner aligner--row aligner--hCenter aligner--vCenter jumbotron u-margin-0px", style="height: 200px; background: #fcfcfc;")
-                                    i(class="fa fa-ban", style="font-size: 2.5em;")
-                                    h3(class="heading heading--h3", style="font-size: 1.5em; line-height: 1.5em; padding: 0 15px;") !{errorText}
+                            //div(class="aligner aligner--row aligner--hCenter aligner--vCenter jumbotron u-margin-0px", style="height: 200px; background: #fcfcfc;")
+                                i(class="fa fa-ban", style="font-size: 2.5em;")
+                                h3(class="heading heading--h3", style="font-size: 1.5em; line-height: 1.5em; padding: 0 15px;") !{errorText}
 
-    if reportingData
-        script(type='text/javascript').
-            var reportsModel = !{JSON.stringify(reportingData)},
-                siteId = '!{siteId}', siteDomain = '!{siteDomain}',
-                paramConfig = !!reportsModel ? !{JSON.stringify(paramConfig)} : null;
+    script(type='text/javascript').
+        var reportsModel = !{JSON.stringify(reportingData)} || null,
+            siteId = '!{siteId}', siteDomain = '!{siteDomain}',
+            paramConfig = !{JSON.stringify(paramConfig)},
+            errorText = '!{errorText}';
 
-            window.adpushup.reports = {
-                model: reportsModel,
-                siteId: siteId,
-                siteDomain: siteDomain,
-                paramConfig: paramConfig
-            };
+        window.adpushup = window.adpushup || {};
+        window.adpushup.reports = {
+            model: reportsModel,
+            siteId: siteId,
+            siteDomain: siteDomain,
+            paramConfig: paramConfig
+        };
 
-        +loadAsset("js", [
-            'https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js',
-            '/assets/js/reports/geniee/reports.js'
-        ])
+        // Error text is added in case of valid error message
+        if (errorText) {
+            window.adpushup.reports.errorText = errorText;
+        }
 
+    +loadAsset("js", [
+        'https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js',
+        '/assets/js/reports/geniee/reports.js'
+    ])

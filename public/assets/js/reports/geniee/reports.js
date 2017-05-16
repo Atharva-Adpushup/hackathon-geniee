@@ -7,7 +7,12 @@
         this.siteDomain = w.adpushup.reports.siteDomain;
         this.paramConfig = w.adpushup.reports.paramConfig;
         Object.freeze(this.paramConfig);
-
+        this.errorConfig = {
+            text: {
+                user: w.adpushup.reports.errorText,
+                default: 'Unable to fetch reports right now!'
+            }
+        };
         this.reportsLevel = {
             'pagegroup': 'Page Groups',
             'variation': 'Variations'
@@ -48,6 +53,7 @@
         this.$headingOptions = $(".js-main-heading-options");
         this.$loaderWrapper = $(".js-loaderwrapper");
         this.$notificationWrapper = $(".js-notification-wrapper");
+        this.$notificationHeading = $(".js-notification-heading", this.$notificationWrapper);
         this.$absoluteDateInputs = $('.js-datepicker-element');
         this.$datePickerInstance = null;
         this.$collapsibleElems = $('.js-panel-collapsible');
@@ -94,6 +100,15 @@
 
     ReportClass.prototype.createChart = function(selector, config) {
         w.Highcharts.chart(selector, config);
+    }
+
+    ReportClass.prototype.setNotificationHeadingText = function() {
+        var defaultText = this.errorConfig.text.default,
+            elemText = this.$notificationHeading.text();
+
+        if (defaultText !== elemText) {
+            this.$notificationHeading.text(defaultText);
+        }
     }
 
     ReportClass.prototype.showNotificationWrapper = function() {
@@ -459,6 +474,8 @@
         if (this.slideout.isOpen()) {
             this.slideout.close();
         }
+
+        this.setNotificationHeadingText();
         this.showNotificationWrapper();
     }
 
@@ -999,6 +1016,31 @@
         this.tabulateData(data, {tableContainer: tableContainerSelector, isFirstColumnOrderDisable: isPageGroupLevel});
     }
 
+    ReportClass.prototype.renderUI = function() {
+        var $revenueHeaderThumbnail = this.getRevenueHeaderThumbnail();
+
+        this.initPerfHeaderInfoTooltips();
+        this.initSlideoutMenu();
+        this.generateBreadCrumb();
+        this.setTableHeading();
+        this.insertDateDescription();
+        this.initDatePicker();
+        this.emulateAccordion();
+        this.setThumbnailUiData();
+        this.setActiveThumbnail($revenueHeaderThumbnail);
+    }
+
+    ReportClass.prototype.bindUiHandlers = function() {
+        this.bindPerfThumbnailClickHandler();
+        this.bindSelectionButtonClickHandler();
+        this.bindDateFilterLinks();
+        this.bindDateFilterLabelsBadge();
+        this.bindFilterApplyBtn();
+        this.bindFilterResetBtn();
+        this.bindReportResetBtn();
+        this.bindDatePickerEvents();
+    }
+
     ReportClass.prototype.chooseLevelAndLoadReports = function() {
         var computedTableData, computedPerfHeaderData,
             isPageGroupLevel = true,
@@ -1014,14 +1056,10 @@
             computedTableData = $.extend(true, {}, this.model.pageGroups[this.selectedPageGroupId].variations.data.table);
         }
 
-        this.initSlideoutMenu();
-        this.generateBreadCrumb();
-        this.setTableHeading();
-        this.insertDateDescription();
-        this.initDatePicker();
+        this.renderUI();
+        this.prepareReportsChart($revenueHeaderThumbnail);
         this.setPerfHeaderData(computedPerfHeaderData);
         this.setTableData(computedTableData, isPageGroupLevel);
-        this.emulateAccordion();
 
         if (this.selectedReportsLevel == this.reportsLevel.pagegroup) {
             this.updateTableSelectionUI();
@@ -1029,22 +1067,20 @@
             this.setVariationIdentifierUI(this.model, this.selectedPageGroupId, $);
         }
 
-        this.bindPerfThumbnailClickHandler();
-        this.bindSelectionButtonClickHandler();
-        this.bindDateFilterLinks();
-        this.bindDateFilterLabelsBadge();
-        this.bindFilterApplyBtn();
-        this.bindFilterResetBtn();
-        this.bindReportResetBtn();
-        this.bindDatePickerEvents();
-
-        this.setThumbnailUiData();
-        this.setActiveThumbnail($revenueHeaderThumbnail);
-        this.prepareReportsChart($revenueHeaderThumbnail);
+        this.bindUiHandlers();
     }
 
     ReportClass.prototype.init = function() {
-        this.initPerfHeaderInfoTooltips();
+        var isValidData = !!(this.model && this.paramConfig && !this.errorConfig.text.user);
+
+        this.renderUI();
+        this.bindUiHandlers();
+
+        if (!isValidData) {
+            this.showNotificationWrapper();
+            return false;
+        }
+
         this.chooseLevelAndLoadReports();
     }
 

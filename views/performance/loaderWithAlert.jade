@@ -2,5 +2,8 @@ div(class="loaderwrapper loaderwrapper--fixed spinner hide js-loaderwrapper")
     img(src="/assets/images/loaderLogo.png")
     div(class="loaderwrapper-text") Fetching reports...
 div(class="aligner aligner--column aligner--hCenter aligner--vCenter notification-wrapper hide js-notification-wrapper")
-    h3(class="notification-heading") Unable to fetch reports right now.
-    button(data-loading-text='Resetting...', autocomplete='off', class="btn btn-default btn-theme btn-theme--primary js-report-reset-btn js-filter-reset") Reset Filters
+    h3(class="notification-heading js-notification-heading") !{errorText}
+    div(class="notification-btnWrapper u-full-width aligner aligner--vCenter aligner--hCenter")
+        button(id="filter-btn", type="button", class="btn btn-default btn--with-icon btn-theme--primary aligner aligner--row aligner--hCenter aligner--vCenter js-filter-btn") Change Filters
+            i(class="fa fa-filter")
+        button(data-loading-text="Resetting...", autocomplete="off", class="u-margin-l15px btn btn-default btn-theme report-reset-btn js-report-reset-btn js-filter-reset") Reset Filters
