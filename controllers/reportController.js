@@ -31,13 +31,14 @@ router
 	// 	});
 	// })
 	.get('/performance', function(req, res) {
-		var	paramConfig = {
-			siteId: req.params.siteId,
-			dateFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
-			dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
-		},
-		siteDomainName,
-		filterDates = genieeFilterDates.getFilterDates();
+		var	siteId = req.params.siteId,
+			paramConfig = {
+				siteId: siteId,
+				dateFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+				dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
+			},
+			siteDomainName,
+			filterDates = genieeFilterDates.getFilterDates();
 
 		return siteModel.getSiteById(paramConfig.siteId)
 			.then(function(site) {
@@ -49,16 +50,16 @@ router
 					.then(function(data) {
 						return res.render('performanceReport', {
 							reportingData: data,
-							siteId: req.params.siteId,
+							siteId,
 							siteDomain: siteDomainName,
-							paramConfig: paramConfig,
-							filterDates: filterDates
+							paramConfig,
+							filterDates
 						});
 					})
 					.catch(function(err) {
 						var textConfig = {
-							"error": "Unable to fetch reports right now! Please try again later",
-							"emptyData": "We are analysing/mining your data right now. Reports will be available shortly"
+							"error": "Unable to fetch reports right now!<br> Please try again later",
+							"emptyData": "We are analysing/mining your data right now.<br> Reports will be available shortly"
 						}, errorText;
 
 						if (err instanceof AdPushupError) {
@@ -68,8 +69,11 @@ router
 						}
 
 						return res.render('performanceReport', {
-							siteId: req.params.siteId,
-							errorText: errorText
+							siteId,
+							errorText,
+							siteDomain: siteDomainName,
+							paramConfig,
+							filterDates
 						});
 					});
 			});

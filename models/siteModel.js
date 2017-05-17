@@ -23,9 +23,10 @@ var model = require('../helpers/model'),
 			'dateCreated',
 			'dateModified',
 			'step',
-			'websiteRevenue'
+			'websiteRevenue',
+			'adsensePublisherId'
 		];
-		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'channels', 'cmsInfo', 'apConfigs', 'partner', 'genieeMediaId'];
+		this.clientKeys = ['siteId', 'siteName', 'siteDomain', 'channels', 'cmsInfo', 'apConfigs', 'partner', 'genieeMediaId', 'adsensePublisherId'];
 		this.validations = {
 			'required': []
 		};
@@ -192,9 +193,14 @@ function apiModule() {
 	var API = {
 		createSite: function (data) {
 			var json = { siteName: data.siteName, siteDomain: data.siteDomain, apConfigs: data.apConfigs, genieeMediaId: data.genieeMediaId };
+
 			if (data.partner) {
 				json.partner = data.partner;
 				json.ownerEmail = data.ownerEmail;
+			}
+
+			if (data.adsensePublisherId) {
+				json.adsensePublisherId = data.adsensePublisherId;
 			}
 
 			if (!json.genieeMediaId) {
@@ -230,6 +236,12 @@ function apiModule() {
 		updateSite: function (json) {
 			return API.getSiteById(json.siteId)
 				.then(function (site) {
+					var isAdSensePublisherId = !!(json.publisherId && site.get('adsensePublisherId'));
+
+					if (isAdSensePublisherId) {
+						site.set('adsensePublisherId', json.publisherId);
+					}
+
 					site.set('siteName', json.siteName);
 					return site.save();
 				})

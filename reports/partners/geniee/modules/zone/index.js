@@ -1,7 +1,9 @@
-var Promise = require('bluebird'),
+const Promise = require('bluebird'),
 	extend = require('extend'),
 	moment = require('moment'),
-	_ = require('lodash');
+	_ = require('lodash'),
+	uuid = require('uuid'),
+	{ fileLogger } = require('../../../../../helpers/logger/file/index');
 
 module.exports = {
 	removeUnnecessaryZones: function(data) {
@@ -23,8 +25,19 @@ module.exports = {
 	getZoneVariations: function(pageGroupData) {
 		var computedData = extend(true, {}, pageGroupData);
 
+		fileLogger.info(`Geniee Report Service: GetZoneVariations: Module initialisation`);
 		_.forOwn(pageGroupData, function(pageGroupObj, pageGroupKey) {
+			// Below 'Deleted Zones' variation has been created to incorporate
+			// zones which are deleted from AdPushup variations data (Channel document)
+			// but appear in Geniee Reports API response
+			var deletedZonesVariationData = {
+				key: uuid.v4(),
+				name: 'Deleted Zones'
+			}, genieeMatchedZones = [], deletedZones;
+
 			computedData[pageGroupKey].variationData = {};
+			fileLogger.info(`Geniee Report Service: GetZoneVariations: All valid zones`);
+			fileLogger.info(pageGroupObj.zones);
 
 			_.forEach(pageGroupObj.zones, function(zonesObj) {
 				_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
@@ -47,6 +60,8 @@ module.exports = {
 									} else {
 										computedData[pageGroupKey].variationData[variationKey].zones.push(zonesObj);
 									}
+
+									genieeMatchedZones.push(zonesObj);
 								}
 							} else if (isCustomAd) {
 								if (!computedData[pageGroupKey].variationData.hasOwnProperty(variationKey) && !computedData[pageGroupKey].variationData[variationKey]) {
@@ -63,6 +78,25 @@ module.exports = {
 					});
 				});
 			});
+
+			fileLogger.info(`Geniee Report Service: GetZoneVariations: All matched zones`);
+			fileLogger.info(genieeMatchedZones);
+
+			deletedZones = _.reduce(genieeMatchedZones, (allZones, arrayItem) => {
+				return _.reject(allZones, arrayItem);
+			}, pageGroupObj.zones);
+
+			fileLogger.info(`Geniee Report Service: GetZoneVariations: All deleted zones`);
+			fileLogger.info(deletedZones);
+
+			if (deletedZones && deletedZones.length) {
+				computedData[pageGroupKey].variationData[deletedZonesVariationData.key] = {
+					id: deletedZonesVariationData.key,
+					name: deletedZonesVariationData.name,
+					trafficDistribution: 0,
+					zones: deletedZones
+				};
+			}
 		});
 
 		return Promise.resolve(computedData);

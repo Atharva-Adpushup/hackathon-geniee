@@ -183,6 +183,9 @@ module.exports = {
                 MESSAGE_RECEIVED: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Received message data'
             }
         }
-    }
+    },
+	environment: {
+		'development': 'development',
+		'production': 'production'
+	}
 };
-

@@ -56,10 +56,10 @@ module.exports = (function(requestPromise, signatureGenerator, oauthModule, zone
 			getChannelData = getChannelMetrics.then(pageGroupModule.getPageGroupDataById);
 
 			return Promise.join(getResponseData, getFilteredZones, getSiteMetrics, getChannelMetrics, getChannelData, function(allZones, filteredZones, siteMetrics, pageGroupMetrics, pageGroupData) {
-				var isValidZonesData = !!(!allZones || !allZones.length),
-					isValidFilteredZonesData = !!(!filteredZones || !(Object.keys(filteredZones).length));
+				var isInValidZonesData = !!(!allZones || !allZones.length),
+					isInValidFilteredZonesData = !!(!filteredZones || !(Object.keys(filteredZones).length));
 
-				if (isValidZonesData || isValidFilteredZonesData) {
+				if (isInValidZonesData || isInValidFilteredZonesData) {
 					throw new AdPushupError('Zones should not be empty');
 				}
 				

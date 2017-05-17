@@ -8,14 +8,22 @@ var express = require('express'),
 	schema = require('../helpers/schema'),
 	CC = require('../configs/commonConsts'),
 	FormValidator = require('../helpers/FormValidator'),
-	_ = require('lodash');
+	_ = require('lodash'),
+	woodlotCustomLogger = require('woodlot').customLogger;
+
+// Initialise woodlot module for geniee api custom logging
+var woodlot = new woodlotCustomLogger({
+    streams: ['./logs/geniee-api-custom.log'],
+    stdout: false
+});
 
 router
 	.get('/site/create', function (req, res) {
 		res.render('geniee/api/createSite');
 	})
 	.post('/site/create', function (req, res) {
-		var json = req.body;
+		var json = req.body,
+			adsensePublisherId = json.publisherId || null;
 
 		// Set partner to geniee
 		if (req.isGenieeSite) {
@@ -24,6 +32,11 @@ router
 		var partnerEmail = json.partner + '@adpushup.com', siteId;
 		json.ownerEmail = partnerEmail;
 		json.apConfigs = { 'mode': CC.site.mode.DRAFT, isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP };
+
+		if (adsensePublisherId) {
+			json.adsensePublisherId = adsensePublisherId;
+			delete json.publisherId;
+		}
 
 		// Function to create partner user account and site
 		function createPartnerAndSite() {
@@ -57,6 +70,13 @@ router
 				return res.status(200).send({ success: true, data: { siteId: data.site.data.siteId } });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method,
+					name: 'GenieeAPI'
+				});
+				
 				if (err.name !== 'AdPushupError') {
 					if (err.code === 13) {
 						// If partner is not present then create partner account and site
@@ -83,6 +103,13 @@ router
 				return res.status(200).send({ success: true, data: { siteId: site.data.siteId, siteName: site.data.siteName, siteDomain: site.data.siteDomain } });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method,
+					name: 'GenieeAPI'
+				});
+				
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
@@ -101,6 +128,13 @@ router
 				return res.status(200).send({ success: true });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method,
+					name: 'GenieeAPI'
+				});
+
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
@@ -119,6 +153,13 @@ router
 				return res.status(200).send({ success: true });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method,
+					name: 'GenieeAPI'
+				});
+
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
@@ -140,6 +181,13 @@ router
 				return res.status(200).send({ success: true, data: { pageGroupId: data.id } });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method,
+					name: 'GenieeAPI'
+				});
+
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
@@ -159,6 +207,13 @@ router
 				res.status(200).send({ success: true, data: data });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method,
+					name: 'GenieeAPI'
+				});
+
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
@@ -177,6 +232,13 @@ router
 				res.status(200).send({ success: true });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method,
+					name: 'GenieeAPI'
+				});
+
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
@@ -195,6 +257,13 @@ router
 				return res.status(200).send({ success: true });
 			})
 			.catch(function (err) {
+				woodlot.err({
+					debugData: JSON.stringify(err),
+					url: req.url,
+					method: req.method,
+					name: 'GenieeAPI'
+				});
+				
 				if (err.name !== 'AdPushupError') {
 					return res.status(500).send({ success: false, message: 'Some error occurred' });
 				}
