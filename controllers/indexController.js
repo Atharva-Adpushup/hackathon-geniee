@@ -9,6 +9,7 @@ var express = require('express'),
 	router = express.Router(),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
+    adpushupEvent = require('../helpers/adpushupEvent'),
 	_extend = require('lodash/fp/extend');
 
 router.use(function (req, res, next) {
@@ -372,6 +373,13 @@ router
 				}
 			});
 	})
+    .get('/syncTest', function(req, res, next) { // remove this in production
+        return siteModel.getSiteById(3)
+        .then(function(site) {
+            adpushupEvent.emit('siteSaved', site);
+            return res.redirect('/login');
+        });
+    })
 	.get('/', function (req, res) {
 		return res.redirect('/login');
 	});

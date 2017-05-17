@@ -13,9 +13,9 @@ function onSiteSaved(site) {
 	// so to roughly bypassing this situation run the generator only after 5 seconds, assuming all is saved in 5 seconds
 	setTimeout(() => {
 		syncGeneratedFileWithCdn.init(site);
-		siteModeMailTriggerService.init(site)
-		.then(console.log)
-		.catch(console.log);
+		// siteModeMailTriggerService.init(site)
+		// .then(console.log)
+		// .catch(console.log);
 	}, 3000);
 }
 

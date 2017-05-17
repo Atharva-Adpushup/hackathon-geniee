@@ -4,7 +4,7 @@ var urlModule = require("url"),
 var regexGenerator = {
     protocolSet: new Set(), // http | https | ftp
     wSet: new Set(), // wwww or subdomain
-    dSet:  new Set(), // domain name
+    dSet: new Set(), // domain name
     specialCharacterSet: new Set(),
     specialCharacterArray: [],
     protocolArray: [],
@@ -17,18 +17,18 @@ var regexGenerator = {
     errorMessage: '',
     pRegexAlt: '',
     pathSpecialCharacterCount: 0,
-    makeSet: function(value, set) {
-        if(value != '' && value != null && value != 'null') {
+    makeSet: function (value, set) {
+        if (value != '' && value != null && value != 'null') {
             set.add(value);
         }
     },
-    makeWSet: function(value, wSet, dSet, pathName) {
-        if(value == null || value == 'null') {
+    makeWSet: function (value, wSet, dSet, pathName) {
+        if (value == null || value == 'null') {
             value = pathName;
         }
         try {
             value = value.split('.');
-            if(value.length > 2) {
+            if (value.length > 2) {
                 valueToSend = value[0];
                 wSet.add(valueToSend);
                 dSet.add(value[1]);
@@ -39,33 +39,33 @@ var regexGenerator = {
             console.log('Url does not contain protocol or www');
         }
     },
-    makeProtocolSetArray: function(value, key, set) {
-        if(key && key != null && key.trim() != '') {
+    makeProtocolSetArray: function (value, key, set) {
+        if (key && key != null && key.trim() != '') {
             regexGenerator.protocolArray.push(value.substring(0, value.length - 1));
         }
     },
-    makeWSetArray: function(value, key, set) {
-        if(key && key != null && key.trim() != '') {
+    makeWSetArray: function (value, key, set) {
+        if (key && key != null && key.trim() != '') {
             regexGenerator.wArray.push(value);
         }
     },
-    makeDSetArray: function(value, key, set) {
-        if(key && key != null && key.trim() != '') {
+    makeDSetArray: function (value, key, set) {
+        if (key && key != null && key.trim() != '') {
             regexGenerator.dArray.push(value);
         }
     },
 
 
-    makeSpecialCharArray: function(value, key, set) {
-        if(key && key != null && key.trim() != '') {
+    makeSpecialCharArray: function (value, key, set) {
+        if (key && key != null && key.trim() != '') {
             regexGenerator.specialCharacterArray.push(value);
         }
     },
-    
-    
-    makeProtocolRegex: function() {
+
+
+    makeProtocolRegex: function () {
         var protocolRegex;
-        if(regexGenerator.protocolSet.size) {
+        if (regexGenerator.protocolSet.size) {
             regexGenerator.protocolSet.forEach(regexGenerator.makeProtocolSetArray);
             protocolRegex = regexGenerator.protocolArray ? regexGenerator.protocolArray : [];
             protocolRegex = "(" + protocolRegex.join('|') + ")?" + "(:\\/\\/)?";
@@ -74,43 +74,43 @@ var regexGenerator = {
         }
         return protocolRegex;
     },
-    makePathArray: function(path) {
+    makePathArray: function (path) {
         var pathName = path,
             flag = 0;
-        if(pathName != '/' && pathName != null && pathName != 'null') {
+        if (pathName != '/' && pathName != null && pathName != 'null') {
             var firstChar = pathName.substring(0, 1);
-            if(firstChar == '/') {
+            if (firstChar == '/') {
                 flag = 1;
             } else {
                 var firstSlash = pathName.indexOf('/');
-                if(firstSlash != -1) {
+                if (firstSlash != -1) {
                     pathName = pathName.substring(firstSlash, pathName.length);
                     flag = 1;
-                }                
+                }
             }
-            if(flag) {
+            if (flag) {
                 pathName = pathName.substring(1, path.length);
-                if(path.match('[^a-z0-9\/+]')) {
+                if (path.match('[^a-z0-9\/+]')) {
                     regexGenerator.pathSpecialCharacterCount++;
                 }
-                regexGenerator.pathArray.push(pathName);                
+                regexGenerator.pathArray.push(pathName);
             }
         }
     },
-    makeQueryArray: function(search, query) {
+    makeQueryArray: function (search, query) {
         var qArray;
-        if(search && search != null) {
+        if (search && search != null) {
             qArray = query.split('&');
-            _.forEach(qArray, function(q) {
-                if(q && q.trim().length > 0) {
+            _.forEach(qArray, function (q) {
+                if (q && q.trim().length > 0) {
                     regexGenerator.queryArray.push(q.match('(?:[^=])+')[0]);
                 }
             });
         }
     },
-    makeWRegex: function() {
+    makeWRegex: function () {
         var wRegex;
-        if(regexGenerator.wSet.size) {
+        if (regexGenerator.wSet.size) {
             regexGenerator.wSet.forEach(regexGenerator.makeWSetArray);
             wRegex = regexGenerator.wArray ? regexGenerator.wArray : [];
             wRegex = "((" + wRegex.join('|') + ")\\.)?";
@@ -119,29 +119,29 @@ var regexGenerator = {
         }
         return wRegex.length ? wRegex : false;
     },
-    makeDRegex: function() {
+    makeDRegex: function () {
         var dRegex;
-        if(regexGenerator.dSet.size > 1) {
+        if (regexGenerator.dSet.size > 1) {
             regexGenerator.ok = false;
             regexGenerator.errorMessage = 'All urls must have same domain';
             return false;
         } else {
             regexGenerator.dSet.forEach(regexGenerator.makeDSetArray);
             dRegex = regexGenerator.dArray ? regexGenerator.dArray : [];
-            dRegex = dRegex[0] + '\\.(?:[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,}){0,})+';            
+            dRegex = dRegex[0] + '\\.(?:[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,}){0,})+';
         }
         return dRegex ? dRegex : false;
     },
-    makePRegex: function(inputArrayLength) {
-        var pRegex, pParts, that=this, pathObj = {};
-        if(regexGenerator.pathArray.length) {
+    makePRegex: function (inputArrayLength) {
+        var pRegex, pParts, that = this, pathObj = {};
+        if (regexGenerator.pathArray.length) {
 
             // console.log(regexGenerator.pathArray);
             var validSymbols = '[',
                 re = new RegExp('[^a-zA-Z0-9\\s\/]', 'i');
-            _.forEach(regexGenerator.pathArray, function(soloPath) {
-                _.forEach(soloPath, function(char) {
-                    if(re.test(char)) {
+            _.forEach(regexGenerator.pathArray, function (soloPath) {
+                _.forEach(soloPath, function (char) {
+                    if (re.test(char)) {
                         regexGenerator.specialCharacterSet.add(char);
                     }
                 });
@@ -154,7 +154,7 @@ var regexGenerator = {
             pParts = regexGenerator.pathArray[0].split('/');
             if (pParts.length == 1) {
                 var onlyPart = pParts[0];
-                if(onlyPart.match('[^a-z0-9\/+]')) {
+                if (onlyPart.match('[^a-z0-9\/+]')) {
 
                     pathObj[onlyPart] = '\\/(?:\\w+' + validSymbols + '+\\w+)+\\/?';
                     pRegex = '\\/(?:\\w+' + validSymbols + '+\\w+)+\\/?';
@@ -180,9 +180,9 @@ var regexGenerator = {
                 // Alternate Regex
                 regexGenerator.pRegexAlt = '\\/';
 
-                _.forEach(pParts, function(part) {
-                    if(part.trim().length > 0) {
-                        if(part.match('[^a-z0-9\/+]')) {
+                _.forEach(pParts, function (part) {
+                    if (part.trim().length > 0) {
+                        if (part.match('[^a-z0-9\/+]')) {
 
                             pathObj[part] = '(?:\\w+' + validSymbols + '+\\w+)+\\/';
                             pRegex = pRegex + '(?:\\w+' + validSymbols + '+\\w+)+\\/';
@@ -215,11 +215,11 @@ var regexGenerator = {
         }
         return pRegex ? pRegex : false;
     },
-    makeQRegex: function() {
+    makeQRegex: function () {
         var qRegex;
-        if(regexGenerator.queryArray.length) {
+        if (regexGenerator.queryArray.length) {
             qRegex = "(?:\\?";
-            _.forEach(regexGenerator.queryArray, function(value) {
+            _.forEach(regexGenerator.queryArray, function (value) {
                 qRegex = qRegex + value + "=[^\/]&";
             });
             qRegex = qRegex.substring(0, qRegex.length - 1);
@@ -227,7 +227,7 @@ var regexGenerator = {
         }
         return qRegex ? qRegex : false;
     },
-    combineRegexes: function(p, w, d, pth, q) {
+    combineRegexes: function (p, w, d, pth, q) {
         var completeRegex, completeRegexAlt;
 
         // if(p) {
@@ -242,12 +242,12 @@ var regexGenerator = {
         //     regexGenerator.completeObj.domain = d;
         //     completeRegex = completeRegex + d;
         // }
-        if(pth) {
+        if (pth) {
             // completeRegex = completeRegex + pth;
             completeRegex = pth;
             completeRegexAlt = regexGenerator.pRegexAlt;
         }
-        if(q) {
+        if (q) {
             regexGenerator.completeObj.query = q;
             completeRegex = completeRegex + q;
             completeRegexAlt = completeRegexAlt + q;
@@ -261,10 +261,10 @@ var regexGenerator = {
             completeObj: regexGenerator.completeObj
         };
     },
-    init: function(inputArray) {
+    init: function (inputArray) {
         regexGenerator.protocolSet = new Set(); // http | https | ftp
         regexGenerator.wSet = new Set(); // wwww or subdomain
-        regexGenerator.dSet =  new Set(); // domain name
+        regexGenerator.dSet = new Set(); // domain name
         regexGenerator.specialCharacterSet = new Set();
         regexGenerator.specialCharacterArray = [];
         regexGenerator.protocolArray = [];
@@ -277,7 +277,7 @@ var regexGenerator = {
         regexGenerator.errorMessage = '';
         regexGenerator.pRegexAlt = '';
         regexGenerator.pathSpecialCharacterCount = 0;
-        _.forEach(inputArray, function(url) {
+        _.forEach(inputArray, function (url) {
             var parsedUrl = urlModule.parse(url, false, true);
             regexGenerator.makeSet(parsedUrl.protocol, regexGenerator.protocolSet);
             regexGenerator.makeWSet(parsedUrl.host, regexGenerator.wSet, regexGenerator.dSet, parsedUrl.pathname);
@@ -290,7 +290,7 @@ var regexGenerator = {
             pathRegex = regexGenerator.makePRegex(inputArray.length),
             queryRegex = regexGenerator.makeQRegex(),
             completeRegex = regexGenerator.combineRegexes(protocolRegex, wRegex, dRegex, pathRegex, queryRegex);
-        if(!regexGenerator.ok) {
+        if (!regexGenerator.ok) {
             return {
                 ok: regexGenerator.ok,
                 errorMessage: regexGenerator.errorMessage,
@@ -304,6 +304,6 @@ var regexGenerator = {
             }
         }
     }
- }
+}
 
- module.exports = regexGenerator;
+module.exports = regexGenerator;

@@ -75,6 +75,7 @@ function getComputedConfig(flags, paramConfig) {
 
 module.exports = {
 	getReportData: function(site, inputStartDate, inputEndDate) {
+        // return Promise.resolve();
 		var isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 			isGenieePartner = (!!(site.get('partner') && (site.get('partner') === CC.partners.geniee.name) && site.get('genieeMediaId') && isAutoOptimise)),
 			// NOTE: A date after which console.adpushup.com was made live

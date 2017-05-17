@@ -6,6 +6,8 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "amqplib": "^0.5.1",
+    "azure-storage": "^2.1.0",      
     "bayesian-bandit": "^0.10.0",
     "bluebird": "^3.3.3",
     "bluebird-retry": "^0.8.0",

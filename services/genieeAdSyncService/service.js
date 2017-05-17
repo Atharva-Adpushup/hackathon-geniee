@@ -1,51 +1,45 @@
 var Promise = require('bluebird'),
 	retry = require('bluebird-retry'),
+    lodash = require('lodash'),
 	{ fileLogger } = require('../../helpers/logger/file/index'),
-	syncGenieeZones = require('./genieeZoneSyncService/index'),
+	configPublishService = require('../apV2SiteConfigPublishService/index'),
 	syncCdn = require('./cdnSyncService/index');
 
-function getStatusObj(status, siteId) {
-	var computedObj = {
-		status: status,
-		siteId: siteId
-	};
-
-	return computedObj;
+function publishGenieeSyncJobs(site) {
+    var paramConfig = {
+        zones: {},
+        siteId: 0,
+        channelKey: '',
+        pageGroupId: ''
+    };
+    return configPublishService.publish(site, paramConfig);
 }
 
-function getSuccessStatusObj(siteId) {
-    const infoText = `File with site id: ${siteId} generated successfully`;
-
-	fileLogger.info(infoText);
-    console.log(infoText);
-	return getStatusObj(1, siteId);
-}
-
-function getFailureStatusObj(siteId, err) {
-    const errorText = `Sync Process Failed: ${err.toString()} for siteId ${siteId}`;
-
-	fileLogger.info(errorText);
-    fileLogger.error(err);
-    console.log(errorText);
-	return getStatusObj(0, siteId);
+function publishCDNSyncJobs(site) {
+    return syncCdn(site);
 }
 
 module.exports = {
     init: function(site) {
-        var siteId = site.get('siteId');
-
         // @TODO Syncing retry logic to be added 
         if (site.get('partner') === 'geniee') {
-            return syncGenieeZones(site)
-                .then(function() {
-                    return syncCdn(site);
-                })
-                .then(getSuccessStatusObj.bind(null, siteId))
-                .catch(getFailureStatusObj.bind(null, siteId));
+            return publishGenieeSyncJobs(site)
+            .then(function(response) {
+                if (response.empty) {
+                    console.log(response.message);
+                    return publishCDNSyncJobs(site);
+                }
+                return response.message;
+            })
+            .then(console.log)
+            .catch(console.log);
         } else {
-            return syncCdn(site)
-                .then(getSuccessStatusObj.bind(null, siteId))
-                .catch(getFailureStatusObj.bind(null, siteId));
+            return publishCDNSyncJobs(site)
+            .then(function() {
+                console.log(`APEX CDN Sync jobs published in queue for site : ${site.get('siteId')}`);
+                return;
+            })
+            .catch(console.log);
         }
     }
 };
