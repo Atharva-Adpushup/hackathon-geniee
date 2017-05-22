@@ -7,7 +7,6 @@ var express = require('express'),
 	genieeFilterDates = require('../reports/partners/geniee/modules/filters/date/index'),
 	adsenseReportModel = require('../models/adsenseModel'),
 	adxReportModel = require('../models/adxModel'),
-	globalModel = require('../models/globalModel'),
 	apexReportService = require('../reports/default/apex/ctrPerformanceInTabularData/service'),
 	apexVariationReportService = require('../reports/default/apex/service'),
 	universalReportService = require('../reports/universal/index'),
@@ -506,12 +505,6 @@ router
 		return reports.doESSearch(config).then(function(result) {
 			return res.json(result);
 		});
-	})
-	.get('/apAppBucketSiteId', function(req, res) {
-		return globalModel.incrSiteIdInApAppBucket()
-			.then(function(siteId) {
-				res.json({siteId: siteId});
-			});
 	});
 
 
