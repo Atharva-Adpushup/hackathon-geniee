@@ -211,7 +211,7 @@ function apiModule() {
 				json.apConfigs.isAdPushupControlWithPartnerSSP = false;
 			}
 
-			return globalModel.incrSiteId()
+			return globalModel.incrSiteIdInApAppBucket()
 				.then(function (siteId) {
 					json.siteId = siteId;
 					return API.saveSiteData(siteId, 'POST', json);
