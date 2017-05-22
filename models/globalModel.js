@@ -12,6 +12,18 @@ var couchbase = require('../helpers/couchBaseService'),
 					return doc.value;
 				});
 		},
+		incrSiteIdInApAppBucket: function() {
+			var bucketName = 'apAppBucket',
+				docName = 'data::siteid';
+
+			return couchbase.connectToBucket(bucketName)
+				.then(function(apAppBucket) {
+					return apAppBucket.getAsync(docName, {});
+				})
+				.then(function(doc) {
+					return doc.value;
+				});
+		},
 		addEmail: function(email) {
 			function saveEmailList(appBucket, emailList) {
 				var mailList = (emailList && emailList.message) ? [] : emailList.value;
