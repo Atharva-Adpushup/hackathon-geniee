@@ -108,9 +108,11 @@ module.exports = {
 				keenIoFeedbackData.xpathMissCount = keenIoFeedbackData.xpathMiss.length;
 			}
 
-			keenIoFeedbackData = this.base64Encode(JSON.stringify(keenIoFeedbackData));
-			keenIoFeedbackUrl = keenIOConfig.baseUrl + keenIOConfig.projectId + '/events/pageviews?api_key=' + keenIOConfig.apiKey + '&data=' + keenIoFeedbackData;
-			new Image().src = keenIoFeedbackUrl;
+			try {
+				keenIoFeedbackData = this.base64Encode(JSON.stringify(keenIoFeedbackData));
+				keenIoFeedbackUrl = keenIOConfig.baseUrl + keenIOConfig.projectId + '/events/pageviews?api_key=' + keenIOConfig.apiKey + '&data=' + keenIoFeedbackData;
+				new Image().src = keenIoFeedbackUrl;
+			} catch(e) {}
 		}
 
 		options = options || {};
