@@ -36,6 +36,9 @@ block bodyContent
             .pageContentInner.page-content--inner
                 #widgetsArea.row
                     .mb-30
+                        div(class="aligner aligner--row aligner--vCenter aligner--hStart u-margin-b15px")
+                            div(class="alert alert-warning notification-alert u-margin-0px u-full-width") Please note that due to infrastructure upgrade, reports data such as page views, page RPM and page CTR might not reflect accurately for now. This message will disappear once data services are stable.
+
                         .controlAdpushupWrap.js-reports-wrapper
                             include performance/headingWithFilterButton
                             include performance/breadcrumbWithReportDate

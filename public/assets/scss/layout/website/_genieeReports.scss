@@ -9,6 +9,11 @@ $datePickerDisabledColor: rgba(229,229,229,0.5);
 
 .page-container--reports-geniee
 {
+    .alert.notification-alert
+    {
+        font-size: ($LabelFontSize - 0.47);
+        padding: (($uiComponentHeight - 4) / 3);
+    }
     .thumbnail-panel-group
     {
         > .thumbnail
