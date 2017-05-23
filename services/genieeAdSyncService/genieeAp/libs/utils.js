@@ -106,6 +106,10 @@ module.exports = {
 			if ((keenIoFeedbackData.eventType === 1) && keenIoFeedbackData.ads && keenIoFeedbackData.xpathMiss) {
 				keenIoFeedbackData.impressionCount = keenIoFeedbackData.ads.length;
 				keenIoFeedbackData.xpathMissCount = keenIoFeedbackData.xpathMiss.length;
+
+				if (keenIoFeedbackData.hasOwnProperty('pageGroup')) {
+					keenIoFeedbackData.pageGroup = encodeURIComponent(keenIoFeedbackData.pageGroup);
+				}
 			}
 
 			try {
