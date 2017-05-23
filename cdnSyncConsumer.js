@@ -1,0 +1,1 @@
+var cdnSyncConsumer = require('./queueWorker/rabbitMQ/vendor/cdnSyncQueueConsumer');

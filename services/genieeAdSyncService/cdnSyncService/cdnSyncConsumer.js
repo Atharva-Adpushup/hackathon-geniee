@@ -56,7 +56,9 @@ module.exports = function (site) {
                 }
                 //for geniee provide networkData
                 if ((ad.network == 'geniee' && ad.networkData)) {
-                    json.networkData = ad.networkData;
+                    json.networkData = {
+                        zoneId: ad.networkData.zoneId
+                    };
                 } else { //for custom network provide adcode to replay
                     json.adCode = ad.adCode;
                 }

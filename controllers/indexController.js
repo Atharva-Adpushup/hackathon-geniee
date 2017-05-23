@@ -373,13 +373,6 @@ router
 				}
 			});
 	})
-    .get('/syncTest', function(req, res, next) { // remove this in production
-        return siteModel.getSiteById(3)
-        .then(function(site) {
-            adpushupEvent.emit('siteSaved', site);
-            return res.redirect('/login');
-        });
-    })
 	.get('/', function (req, res) {
 		return res.redirect('/login');
 	});
