@@ -15,7 +15,7 @@ module.exports = {
                 parameterConfig.channelKey = siteConfigItem.channelKey;
                 parameterConfig.pageGroupId = siteConfigItem.pageGroupId;
 
-                if (Object.keys(parameterConfig.zones).length == 0) {
+                if (parameterConfig.zones.length == 0) {
                     var response = {
                         empty: true,
                         message: 'ZONE_CONFIG_QUEUE_PUBLISH: No geniee unsynced zone for site: ' + siteConfigItem.siteId
