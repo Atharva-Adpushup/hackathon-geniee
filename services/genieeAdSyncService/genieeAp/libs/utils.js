@@ -1,49 +1,14 @@
 var browserConfig = require('./browserConfig.js'),
 	// eslint-disable-next-line no-undef
-	$ = require('jquery');
+	$ = require('jquery'),
+	Base64 = require('Base64');
 
 module.exports = {
+	base64Encode: function(data) {
+		return Base64.btoa(data);
+	},
 	base64Decode: function(data) {
-		if (window.atob) {
-			return window.atob(data);
-		}
-
-		var b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
-			o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
-			ac = 0,
-			dec = '',
-			tmpArr = [];
-
-		if (!data) {
-			return data;
-		}
-
-		data += '';
-
-		do {
-			h1 = b64.indexOf(data.charAt(i++));
-			h2 = b64.indexOf(data.charAt(i++));
-			h3 = b64.indexOf(data.charAt(i++));
-			h4 = b64.indexOf(data.charAt(i++));
-
-			bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
-
-			o1 = bits >> 16 & 0xff;
-			o2 = bits >> 8 & 0xff;
-			o3 = bits & 0xff;
-
-			if (h3 === 64) {
-				tmpArr[ac++] = String.fromCharCode(o1);
-			} else if (h4 === 64) {
-				tmpArr[ac++] = String.fromCharCode(o1, o2);
-			} else {
-				tmpArr[ac++] = String.fromCharCode(o1, o2, o3);
-			}
-		} while (i < data.length);
-
-		dec = tmpArr.join('');
-
-		return decodeURIComponent(escape(dec.replace(/\0+$/, '')));
+		return Base64.atob(data);
 	},
 	// All feedback packets are generated from this function except event 2, 3 and 4.
 	sendFeedback: function(options) {
@@ -112,7 +77,13 @@ module.exports = {
 		}
 
 		var toFeedback, request, evt,
-			adpConfig = window.adpushup.config;
+			adpConfig = window.adpushup.config,
+			keenIOConfig = {
+				baseUrl: 'https://api.keen.io/3.0/projects/',
+				projectId: '592298b0be8c3e260bcadfbc',
+				apiKey: '49857281FFEEDDB5784689357D4B429D682B7FE67D6D94631494D1DD1B5E5B24'
+			},
+			keenIoFeedbackData, keenIoFeedbackUrl;
 
 		data.packetId = adpConfig.packetId;
 		data.siteId = adpConfig.siteId;
@@ -125,6 +96,27 @@ module.exports = {
 				console.log('Required params for feedback missing');
 			}
 			return false;
+		}
+
+		// Keen IO integration start
+		if (data.eventType && ((data.eventType === 1) || (data.eventType === 3))) {
+			keenIoFeedbackData = $.extend(true, {}, data);
+			keenIoFeedbackData.ts = +new Date();
+
+			if ((keenIoFeedbackData.eventType === 1) && keenIoFeedbackData.ads && keenIoFeedbackData.xpathMiss) {
+				keenIoFeedbackData.impressionCount = keenIoFeedbackData.ads.length;
+				keenIoFeedbackData.xpathMissCount = keenIoFeedbackData.xpathMiss.length;
+
+				if (keenIoFeedbackData.hasOwnProperty('pageGroup')) {
+					keenIoFeedbackData.pageGroup = encodeURIComponent(keenIoFeedbackData.pageGroup);
+				}
+			}
+
+			try {
+				keenIoFeedbackData = this.base64Encode(JSON.stringify(keenIoFeedbackData));
+				keenIoFeedbackUrl = keenIOConfig.baseUrl + keenIOConfig.projectId + '/events/pageviews?api_key=' + keenIOConfig.apiKey + '&data=' + keenIoFeedbackData;
+				new Image().src = keenIoFeedbackUrl;
+			} catch(e) {}
 		}
 
 		options = options || {};

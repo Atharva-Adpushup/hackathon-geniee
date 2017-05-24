@@ -60,7 +60,7 @@ var modelAPI = module.exports = apiModule(),
 				if (site) {
 					return site;
 				}
-				return globalModel.incrSiteId().then(function(siteId) {
+				return globalModel.incrSiteIdInApAppBucket().then(function(siteId) {
 					me.get('sites').push({ siteId: siteId, domain: normalizedDomain });
 					return ({ siteId: siteId, domain: normalizedDomain });
 				});

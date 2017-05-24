@@ -12,6 +12,21 @@ var couchbase = require('../helpers/couchBaseService'),
 					return doc.value;
 				});
 		},
+		//NOTE: Increment siteId in 'apAppBucket' bucket rather than
+		// current 'appBucket' bucket
+		// This is done to achieve a central database for site id incrementation
+		incrSiteIdInApAppBucket: function() {
+			var bucketName = 'apAppBucket',
+				docName = 'data::siteid';
+
+			return couchbase.connectToBucket(bucketName)
+				.then(function(apAppBucket) {
+					return apAppBucket.counterAsync(docName, 1, { initial: 1 });
+				})
+				.then(function(doc) {
+					return doc.value;
+				});
+		},
 		addEmail: function(email) {
 			function saveEmailList(appBucket, emailList) {
 				var mailList = (emailList && emailList.message) ? [] : emailList.value;
