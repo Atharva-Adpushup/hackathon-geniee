@@ -1,4 +1,4 @@
-var queueWorker = require('../../queueWorker/rabbitMQ/vendor/genieeAdSyncQueuePublisher'),
+var queueWorker = require('../../queueWorker/rabbitMQ/workers/genieeAdSyncQueuePublisher'),
 	siteConfigGenerationModule = require('./modules/siteConfigGeneration/index'),
 	lodash = require('lodash'),
 	Promise = require('bluebird'),

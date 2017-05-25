@@ -1,5 +1,5 @@
 var AdPushupError = require('../../../helpers/AdPushupError'),
-    queueWorker = require('../../../queueWorker/rabbitMQ/vendor/cdnSyncQueuePublisher'), 
+    queueWorker = require('../../../queueWorker/rabbitMQ/workers/cdnSyncQueuePublisher'), 
     CC = require('../../../configs/commonConsts'),
     config = require('../../../configs/config');
 
