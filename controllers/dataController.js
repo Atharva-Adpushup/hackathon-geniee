@@ -5,6 +5,7 @@ var express = require('express'),
 	adsenseReportModel = require('../models/adsenseModel'),
 	reportsModel = require('../models/reportsModel'),
 	apexVariationRpmService = require('../reports/default/apex/pageGroupVariationRPM/service'),
+	liveSitesService = require('../services/liveSites/index'),
 	Promise = require('bluebird'),
 	extend = require('extend'),
 	CC = require('../configs/commonConsts'),
@@ -315,7 +316,13 @@ router
 			}).catch(function(err) {
 				console.log(err);
 				return res.send({success: 0});
-			});	
+			});
+	})
+	.get('/generateLiveSitesScripts', function(req, res) {
+		const message = 'Scripts for all live websites will be generated now. Please check the server logs for confirmation';
+
+		liveSitesService.init();
+		return res.json({message});
 	});
 
 module.exports = router;
