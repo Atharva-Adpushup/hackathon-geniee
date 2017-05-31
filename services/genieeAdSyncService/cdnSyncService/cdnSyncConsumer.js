@@ -98,7 +98,7 @@ module.exports = function (site) {
                     }
 
                     function getPageGroupPattern(patterns) {
-                        for(var i=0; i<patterns.length; i++) {
+                        for(var i = 0; i < patterns.length; i ++) {
                             if(patterns[i].pageGroup === pageGroup) {
                                 return patterns[i].pattern;
                             }

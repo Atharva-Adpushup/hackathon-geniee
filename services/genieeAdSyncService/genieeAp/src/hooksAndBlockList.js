@@ -1,6 +1,6 @@
 var $ = require('jquery');
 
-function init(adp, onPageGroupPush) {
+function init(adp, onPageGroupPush, platform) {
 	// store configure object in temp variable.
 	var tempConfig = adp.configure,
 		config = adp.config;
@@ -35,18 +35,20 @@ function init(adp, onPageGroupPush) {
 	};
 
 	// PageGroup via URL pattern implementation. This must run before we merge tempConfig with config as priority of pageGroupPattern is high then config.
-	var done, w = window;
-	if (config.pageGroupPattern) {
-		for (i = 0; i < config.pageGroupPattern.length; i++) {
-			for (var key in config.pageGroupPattern[i]) {
-				if (w.location.href.match(new RegExp(config.pageGroupPattern[i][key], 'i'))) {
-					done = true;
-					// forceFully set pagegroup in case url pattern matches to current url
-					config.pageGroup = key.toUpperCase();
-					break;
-				}
+	var done, w = window, 
+		platformExperiments = config.experiment[platform],
+		experimentPageGroups = Object.keys(platformExperiments);
+	if (experimentPageGroups.length) {
+
+		for(var i = 0; i < experimentPageGroups.length; i ++) {
+			var key = experimentPageGroups[i],
+				patternToMatch = platformExperiments[key].pageGroupPattern;
+
+			if (w.location.href.match(new RegExp(patternToMatch, 'i'))) {
+				// forceFully set pagegroup in case url pattern matches to current url
+				config.pageGroup = key.toUpperCase();
+				break;
 			}
-			if (done) break;
 		}
 	}
 

@@ -70,7 +70,7 @@ function startCreation() {
 
 function main() {
 	// Hook Pagegroup, find pageGroup and check for blockList
-	hookAndInit(adp, startCreation);
+	hookAndInit(adp, startCreation, browserConfig.platform);
 
 	if (shouldWeNotProceed()) {
 		return false;
