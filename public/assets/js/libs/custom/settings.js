@@ -57,21 +57,26 @@ $(document).ready(function () {
             parseFormData: function (values, type) {
                 switch (type) {
                     case 'pageGroups':
-                        var pageGroups = [];
+                        var pageGroupPatterns = [];
 
                         for (var i = 0; i < values.length; i += 2) {
-                            var json = {};
                             if (values[i].name === 'pageGroupPattern') {
-                                if (!values[i + 1].value) {
+                                if (!values[i + 2].value) {
                                     return '';
                                 }
 
-                                json[values[i].value] = values[i + 1].value;
-                                pageGroups.push(json);
+                                var parsedData = JSON.parse(values[i].value),
+                                    pattern = values[i + 1].value;
+
+                                pageGroupPatterns.push({
+                                    pageGroup: parsedData.pageGroup,
+                                    platform: parsedData.platform,
+                                    pattern: pattern
+                                });
                             }
                         }
 
-                        return pageGroups;
+                        return pageGroupPatterns;
                     case 'other':
                         var otherSettings = {};
                         for (var i = 0; i < values.length; i++) {
@@ -86,13 +91,14 @@ $(document).ready(function () {
 
             // Function to save site settings
             saveSiteSettings: function (formValues) {
-                var $error = $('#error');
+                var $error = $('#error'),
+                    parsedPageGroups = this.parseFormData(formValues, 'pageGroups');
 
-                if (!this.parseFormData(formValues, 'pageGroups')) {
+                if (!parsedPageGroups) {
                     $error.html('Pagegroup pattern cannot be blank. Please provide valid regex patterns for all the pagegroups.');
                 } else {
                     var autoOpt = this.parseFormData(formValues, 'other').autoOptimise ? true : false,
-                        pageGroupPattern = JSON.stringify(this.parseFormData(formValues, 'pageGroups')),
+                        pageGroupPattern = JSON.stringify(parsedPageGroups),
                         otherSettings = JSON.stringify(this.parseFormData(formValues, 'other'));
 
                     $error.html('');

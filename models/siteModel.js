@@ -304,13 +304,21 @@ function apiModule() {
 				});
 		},
 		saveSiteSettings: function (json) {
-			var pageGroupPattern = JSON.parse(json.settings.pageGroupPattern),
+			const setPagegroupPattern = patterns => {
+				Object.keys(patterns).forEach(pattern => {
+					patterns[pattern].forEach(p => {
+						delete p.platform
+					});
+				});
+				return patterns;
+			};
+
+			const pageGroupPattern = setPagegroupPattern(JSON.parse(json.settings.pageGroupPattern)),
 				otherSettings = JSON.parse(json.settings.otherSettings),
 				blocklist = JSON.parse(json.settings.blocklist);
 			
-			console.log(blocklist);
 			return API.getSiteById(json.siteId)
-				.then(function (site) {
+				.then(site => {
 					var siteConfig = {
 						pageGroupPattern: pageGroupPattern,
 						heartBeatMinInterval: otherSettings.heartBeatMinInterval ? parseInt(otherSettings.heartBeatMinInterval, 10) : commonConsts.apConfigDefaults.heartBeatMinInterval,

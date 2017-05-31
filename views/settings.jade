@@ -80,10 +80,11 @@ block bodyContent
                                         for p in pageGroups
                                             .row
                                                 .col-sm-4
-                                                    .input-name!= p.pageGroup
-                                                    input(type="hidden" name="pageGroupPattern" value=p.pageGroup)
+                                                    .input-name!= p.pageGroup + ' - ' + p.platform
+                                                    input(type="hidden" name="pageGroupPattern" 
+                                                        value=`{"pageGroup": "${p.pageGroup}", "platform": "${p.platform}"}`)
                                                 .col-sm-8
-                                                    input.form-control(value=utils.getPageGroupPattern(p.pageGroup, patterns) name="pageGroupPattern" type="text" placeholder="Enter pagegroup pattern")
+                                                    input.form-control(value=utils.getPageGroupPattern(p.pageGroup, p.platform, patterns) name="pageGroupPattern" type="text" placeholder="Enter pagegroup pattern")
                                         hr
                                         .row
                                             .col-md-4

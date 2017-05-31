@@ -113,20 +113,21 @@ function getHbUiData() {
 
 router
     .get('/:siteId/*', checkAuth)
-    .get('/:siteId/settings', function (req, res) {
+    .get('/:siteId/settings', (req, res) => {
         return siteModel.getSiteById(req.params.siteId)
-            .then(function (site) {
+            .then(site => [siteModel.getSitePageGroups(req.params.siteId), site])
+            .spread((sitePageGroups, site) => {
                 return res.render('settings', {
-                    pageGroups: site.get('cmsInfo').pageGroups,
-                    patterns: site.get('apConfigs').pageGroupPattern ? site.get('apConfigs').pageGroupPattern : [],
+                    pageGroups: sitePageGroups,
+                    patterns: site.get('apConfigs').pageGroupPattern || {},
                     apConfigs: site.get('apConfigs'),
                     blocklist: site.get('apConfigs').blocklist,
                     siteId: req.params.siteId,
                     siteDomain: site.get('siteDomain')
                 });
             })
-            .catch(function (err) {
-                res.send('Some error occurred!');
+            .catch(err => {
+                return res.send('Some error occurred!');
             });
     })
     .get('/:siteId/settings/regexVerifier', function (req, res) {
@@ -234,10 +235,10 @@ router
             });
     })
     .post('/:siteId/saveSiteSettings', function (req, res) {
-        var json = {
-            settings: req.body,
-            siteId: req.params.siteId
-        };
+        var json = { settings: req.body, siteId: req.params.siteId };
+        json.settings.pageGroupPattern = JSON.stringify(_.groupBy(JSON.parse(json.settings.pageGroupPattern), (pattern) => { 
+            return pattern.platform 
+        }));
         return siteModel.saveSiteSettings(json)
             .then(function (data) {
                 res.send({ success: 1 });

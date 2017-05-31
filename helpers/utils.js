@@ -23,10 +23,12 @@ var url = require('url'),
 		convertPagegroupLink: function(pageGroupId, pageGroupName, siteId) {
 			return '<a href="/user/site/'+siteId+'/pagegroup/'+pageGroupId+'">'+pageGroupName+'</a>';
 		},
-		getPageGroupPattern: function(pageGroup, patterns) {
-			if(patterns.length) {
-				var p = _.find(patterns, function(p) { return _.has(p, pageGroup) ? _.has(p, pageGroup) : ''; });
-				return p ? p[pageGroup] : '';
+		getPageGroupPattern: function(pageGroup, platform, patterns) {
+			if(Object.keys(patterns).length) {
+				const matchedPagegroup = _.find(patterns[platform], p => {
+					return p.pageGroup === pageGroup;
+				});
+				return matchedPagegroup ? matchedPagegroup.pattern : '';
 			}
 		},
 		random: function(low, high) {
