@@ -68,7 +68,8 @@ module.exports = function (site) {
             return !unsyncedAds ? ads : [];
         },
         getVariationsPayload = function (site, reportData) {
-            var finalJson = {};
+            var finalJson = {},
+                pageGroupPattern = site.get('apConfigs').pageGroupPattern;
 
             return site.getAllChannels().then(function (allChannels) {
                 _.each(allChannels, function (channel) {
@@ -96,9 +97,19 @@ module.exports = function (site) {
                         finalJson[platform] = {};
                     }
 
+                    function getPageGroupPattern(patterns) {
+                        for(var i=0; i<patterns.length; i++) {
+                            if(patterns[i].pageGroup === pageGroup) {
+                                return patterns[i].pattern;
+                            }
+                        }
+                        return null;
+                    }
+
                     finalJson[platform][pageGroup] = {
                         variations: [],
-                        contentSelector: channel.contentSelector
+                        contentSelector: channel.contentSelector,
+                        pageGroupPattern: getPageGroupPattern(pageGroupPattern[channel])
                     };
 
                     _.each(channel.variations, function (variation, id) {
