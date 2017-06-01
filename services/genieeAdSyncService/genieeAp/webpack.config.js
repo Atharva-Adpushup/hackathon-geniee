@@ -7,7 +7,7 @@ module.exports = [{
 	//devtool: 'cheap-module-source-map',
 	entry: {
 		adpushup: path.join(__dirname, 'main.js'),
-		adpushupHB: path.join(__dirname, 'mainHB.js'),
+		// adpushupHB: path.join(__dirname, 'mainHB.js'),
 	},
 	output: {
 		path: path.join(__dirname, buildPath),
@@ -24,7 +24,7 @@ module.exports = [{
 	//devtool: 'cheap-module-source-map',
 	entry: {
 		adpushup: path.join(__dirname, 'main.js'),
-		adpushupHB: path.join(__dirname, 'mainHB.js'),
+		// adpushupHB: path.join(__dirname, 'mainHB.js'),
 	},
 	output: {
 		path: path.join(__dirname, buildPath),
