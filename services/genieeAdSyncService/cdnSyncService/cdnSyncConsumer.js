@@ -109,7 +109,7 @@ module.exports = function (site) {
                     finalJson[platform][pageGroup] = {
                         variations: [],
                         contentSelector: channel.contentSelector,
-                        pageGroupPattern: getPageGroupPattern(pageGroupPattern[channel])
+                        pageGroupPattern: getPageGroupPattern(pageGroupPattern[platform])
                     };
 
                     _.each(channel.variations, function (variation, id) {
@@ -156,6 +156,7 @@ module.exports = function (site) {
             // Default 'draft' mode is selected if config mode is not present
             apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
             apConfigs.experiment = allVariations;
+            delete apConfigs.pageGroupPattern;
             return apConfigs;
         },
         getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
