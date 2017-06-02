@@ -69,7 +69,8 @@ module.exports = function (site) {
         },
         getVariationsPayload = function (site, reportData) {
             var finalJson = {},
-                pageGroupPattern = site.get('apConfigs').pageGroupPattern;
+                pageGroupPattern = site.get('apConfigs').pageGroupPattern,
+                isPageGroupPattern = !!(pageGroupPattern && _.isObject(pageGroupPattern));
 
             return site.getAllChannels().then(function (allChannels) {
                 _.each(allChannels, function (channel) {
@@ -109,7 +110,7 @@ module.exports = function (site) {
                     finalJson[platform][pageGroup] = {
                         variations: [],
                         contentSelector: channel.contentSelector,
-                        pageGroupPattern: getPageGroupPattern(pageGroupPattern[platform])
+                        pageGroupPattern: (isPageGroupPattern ? getPageGroupPattern(pageGroupPattern[platform]) : '')
                     };
 
                     _.each(channel.variations, function (variation, id) {
