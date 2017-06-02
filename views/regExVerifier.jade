@@ -74,8 +74,8 @@ block bodyContent
                                             for p in pageGroups
                                                 .row.single-pagegroup-box
                                                     .col-sm-4
-                                                        .input-name!= p.pageGroup
-                                                        input.form-control.pagegroup-pattern.mg-t-10.mg-b-10(value=utils.getPageGroupPattern(p.pageGroup, patterns), name="pageGroupPattern", type="text", placeholder="Enter pagegroup pattern")
+                                                        .input-name!= p.pageGroup + ' - ' + p.platform
+                                                        input.form-control.pagegroup-pattern.mg-t-10.mg-b-10(value=utils.getPageGroupPattern(p.pageGroup, p.platform, patterns), name="pageGroupPattern", type="text", placeholder="Enter pagegroup pattern")
                                                         .error-box
                                                     .col-sm-8.pagegroup-col
                                                         .input-group.mg-b-10

@@ -132,9 +132,10 @@ router
     })
     .get('/:siteId/settings/regexVerifier', function (req, res) {
         return siteModel.getSiteById(req.params.siteId)
-            .then(function (site) {
+            .then(site => [siteModel.getSitePageGroups(req.params.siteId), site])
+            .spread((sitePageGroups, site) => {
                 return res.render('regExVerifier', {
-                    pageGroups: site.get('cmsInfo').pageGroups,
+                    pageGroups: sitePageGroups,
                     patterns: site.get('apConfigs').pageGroupPattern ? site.get('apConfigs').pageGroupPattern : [],
                     siteId: req.params.siteId,
                     siteDomain: site.get('siteDomain')
