@@ -90,7 +90,7 @@ function getFailureStatusObj(siteId, err) {
 
 function syncCDN(decodedMessage, originalMessage) {
     if (!decodedMessage.siteId) {
-        throw new CustomError({'message': 'Unable to sync cdn', 'originalMessage': originalMessage, 'siteId': false});
+        throw new CustomError({'message': 'Unable to sync file with cdn', 'originalMessage': originalMessage, 'siteId': false});
     }
     const siteId = decodedMessage.siteId;
     return siteModel.getSiteById(siteId)
@@ -102,7 +102,7 @@ function syncCDN(decodedMessage, originalMessage) {
             return originalMessage;
         })
         .catch(err => {
-            throw new CustomError({'message': 'Unable to sync cdn', 'originalMessage': originalMessage, 'siteId': decodedMessage.siteId});
+            throw new CustomError({'message': 'Unable to sync file with cdn', 'originalMessage': originalMessage, 'siteId': decodedMessage.siteId});
         })
     })
 }
@@ -136,7 +136,7 @@ function consumeRabbitMQMessage() {
                     return setTimeout(consumeRabbitMQMessage, 0);
 				}
 				console.log(customErrorMessage.message);
-			} else if (customErrorMessage.message === CONSTANTS.ERROR_MESSAGES.MESSAGE.GENIEE_SYNC_ERROR) {
+			} else if (customErrorMessage.message === CONSTANTS.ERROR_MESSAGES.MESSAGE.CDN_SYNC_ERROR) {
                 console.log(`Geniee Sync error : ${customErrorMessage.message} for site id : ${customErrorMessage.siteId}`);
                 consumer.reject(customErrorMessage.originalMessage);
             }
