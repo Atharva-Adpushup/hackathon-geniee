@@ -236,13 +236,15 @@ function apiModule() {
 		updateSite: function (json) {
 			return API.getSiteById(json.siteId)
 				.then(function (site) {
-					var isAdSensePublisherId = !!(json.publisherId && site.get('adsensePublisherId'));
+					// var isAdSensePublisherId = !!(json.publisherId && site.get('adsensePublisherId'));
 
-					if (isAdSensePublisherId) {
+					if (json.publisherId) {
 						site.set('adsensePublisherId', json.publisherId);
 					}
+                    if (json.name) {
+    					site.set('siteName', json.siteName);
+                    }
 
-					site.set('siteName', json.siteName);
 					return site.save();
 				})
 				.catch(function (err) {
