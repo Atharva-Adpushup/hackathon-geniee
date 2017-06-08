@@ -188,5 +188,8 @@ module.exports = {
 	environment: {
 		'development': 'development',
 		'production': 'production'
+	},
+	locale: {
+		support: ["en", "en_US", "ja", "ja_JP", "vi", "vi_VN"]
 	}
 };

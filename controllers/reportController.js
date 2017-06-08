@@ -40,6 +40,9 @@ router
 			siteDomainName,
 			filterDates = genieeFilterDates.getFilterDates();
 
+		fileLogger.info('/*****Geniee Reports: Performance request*****/');
+		fileLogger.info(`Locale supported: ${req.locale}`);
+
 		return siteModel.getSiteById(paramConfig.siteId)
 			.then(function(site) {
 				siteDomainName = utils.domanize(site.get('siteDomain'));

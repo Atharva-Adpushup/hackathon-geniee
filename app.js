@@ -17,6 +17,7 @@ var express = require('express'),
 	woodlotCustomLogger = require('woodlot').customLogger,
 	woodlotEvents = require('woodlot').events,
 	uuid = require('uuid'),
+	locale = require('locale'),
 	// couchbase store
 	couchbaseStore = new CouchbaseStore({
 		bucket: config.couchBase.DEFAULT_BUCKET,
@@ -38,6 +39,8 @@ if (process.env.NODE_ENV === consts.environment.production) {
 
 // Enable compression at top
 app.use(compression());
+// Locale support
+app.use(locale(consts.locale.support));
 
 process.on('uncaughtException', function (err) {
 	// handle the error safely
