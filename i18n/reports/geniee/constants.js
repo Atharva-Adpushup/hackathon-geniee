@@ -126,49 +126,49 @@ const mapping = {
 	ja: {
 		NOTIFICATION_ALERT: {
 			DATA_DISCREPANCY: {
-				PAGEVIEWS: 'インフラストラクチャのアップグレードにより、ページビュー、ページRPM、ページのクリック率などのレポートデータが正確に反映されない場合があります。 このメッセージは、データサービスが安定すると消えます。'
+				PAGEVIEWS: 'メンテナンスにより、現在レポートが正常に反映されない可能性がございます。このメッセージはデータが正常に稼働するようになり次第消えます。'
 			}
 		},
 		HEADER: {
-			TITLE: 'レポートと分析',
-			BUTTON_FILTER: 'フィルタ'
+			TITLE: 'レポート',
+			BUTTON_FILTER: '絞り込み'
 		},
 		BREADCRUMB: {
 			MEDIA: {
 				NAME: 'メディア',
-				TOOLTIP_TEXT: 'クリックするとメディアレベルのレポートが表示されます'
+				TOOLTIP_TEXT: 'メディアごとのレポートを見る'
 			},
 			PAGE_GROUPS: 'ページグループ',
-			REPORT_DATE: '報告日'
+			REPORT_DATE: '期間'
 		},
 		METRIC_THUMBNAILS: {
 			TITLE: 'パフォーマンス',
 			REVENUE: {
 				NAME: '収益',
-				TOOLTIP_TEXT: 'これは、Adpushupを介して配信された広告によって獲得された純収益の見積もりです。'
+				TOOLTIP_TEXT: 'これはAdpushupにより配信された分の推定広告収益です。'
 			},
 			PAGE_VIEWS: {
 				NAME: 'ページビュー',
-				TOOLTIP_TEXT: 'これは、広告を含むページがAdpushup経由で読み込まれた回数です。 ページビューは、ページに表示される広告の量や数に関係なくカウントされます。'
+				TOOLTIP_TEXT: 'これは、Adpushupタグが設置されたページが読み込まれた回数です。広告の枚数とは関係なく計測されます。'
 			},
 			CLICKS: {
-				NAME: 'CLICKS',
+				NAME: 'クリック',
 				TOOLTIP_TEXT: 'Adpushup経由で配信された広告がクリックされた回数です。'
 			},
 			PAGE_RPM: {
 				NAME: 'ページRPM',
-				TOOLTIP_TEXT: 'ページRPMは、1,000ページビューあたりの平均収入です。'
+				TOOLTIP_TEXT: 'これは、1,000ページビューあたりの収益です。'
 			},
 			PAGE_CTR: {
 				NAME: 'ページのクリック率',
-				TOOLTIP_TEXT: 'ページクリック率（CTR）は、ページビュー数に対する広告クリック数の割合です。'
+				TOOLTIP_TEXT: 'これは、ページビュー数に対する広告クリック数の割合です。'
 			}
 		},
 		DATA_TABLE: {
 			TITLE: 'ページグループ',
 			PAGE_GROUPS: {
 				NAME: 'ページグループ',
-				TOOLTIP_TEXT: 'クリックしてページグループレベルのレポートを表示する',
+				TOOLTIP_TEXT: 'ページグループ毎のレポートを表示',
 				HEADER: {
 					PLATFORM: 'プラットフォーム',
 					VARIATION_COUNT: '数多くのバリエーション'
@@ -195,19 +195,19 @@ const mapping = {
 		PAGE_LOADER: {
 			TITLE: 'レポートを取得中...',
 			BUTTON_FILTER: 'フィルタの変更',
-			BUTTON_RESET_FILTER: 'フィルターをリセットする'
+			BUTTON_RESET_FILTER: 'フィルタをリセットする'
 		},
 		SLIDEOUT_MENU: {
 			COMPONENTS: {
 				SELECTED: {
-					NAME: '選択された',
+					NAME: '絞り込み',
 					UI_PLACEHOLDER_TEXT: '表示するフィルタがありません。'
 				},
 				FILTERS: {
 					DATE: {
 						NAME: '日付',
 						RELATIVE: {
-							NAME: 'クイック',
+							NAME: '簡易選択',
 							OPTIONS: {
 								WEEK_THIS: '今週',
 								MONTH_THIS: '今月',
@@ -220,14 +220,14 @@ const mapping = {
 							}
 						},
 						ABSOLUTE: {
-							NAME: '絶対の',
+							NAME: '日付から選択',
 							INPUT_FROM: {
-								NAME: 'から',
-								PLACEHOLDER_TEXT: 'たとえば、01/01/2017'
+								NAME: '開始日',
+								PLACEHOLDER_TEXT: '例）01/01/2017'
 							},
 							INPUT_TO: {
-								NAME: 'に',
-								PLACEHOLDER_TEXT: 'たとえば、31/01/01'
+								NAME: '終了日',
+								PLACEHOLDER_TEXT: '例）31/01/2017'
 							}
 						}
 					}
@@ -243,8 +243,8 @@ const mapping = {
 			}
 		},
 		ERROR: {
-			REPORT_EXCEPTION: '今すぐレポートを取得できません！<br>後でもう一度お試しください',
-			REPORT_DATA_NOT_AVAILABLE: '今すぐデータを分析/マイニングしています。<br> レポートはまもなく利用可能になります'
+			REPORT_EXCEPTION: '一時的にレポートを取得できません。<br>あとでもう一度お試しください。',
+			REPORT_DATA_NOT_AVAILABLE: '現在データを分析しています。<br>レポートは間もなく利用可能になります。'
 		}
 	},
 	vi: {}
