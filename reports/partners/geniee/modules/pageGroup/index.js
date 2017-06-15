@@ -237,7 +237,7 @@ module.exports = {
 
 		return Promise.resolve(computedData);
 	},
-	setPageGroupsTabularData: function(data) {
+	setPageGroupsTabularData: function(localeCode, data) {
 		var computedData = extend(true, {}, data),
 			pageGroupsTabularData = {
 				table: {

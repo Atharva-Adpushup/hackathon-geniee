@@ -7,7 +7,8 @@ var _ = require('lodash'),
 	pageViewsModule = require('../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index'),
 	apexReport = require('./modules/apexReportIntegration/index'),
 	utils = require('../utils/index');
-const { fileLogger } = require('../../../../../helpers/logger/file/index');
+const { fileLogger } = require('../../../../../helpers/logger/file/index'),
+	localizedData = require('../../../../../i18n/reports/geniee/constants');
 
 module.exports = {
 	setVariationMetrics: function(config, pageGroupData) {
@@ -201,15 +202,16 @@ module.exports = {
 			
 		return Promise.resolve(computedData);
 	},
-	setVariationsTabularData: function(pageGroupData) {
-		var computedData = extend(true, {}, pageGroupData);
+	setVariationsTabularData: function(localeCode, pageGroupData) {
+		var computedData = extend(true, {}, pageGroupData),
+			constants = localizedData[localeCode];
 
 		_.forOwn(computedData, function(pageGroupObj, pageGroupKey) {
 			var variationsTabularData = {
 				table: {
-					header: [' ', 'NAME', 'TRAFFIC DISTRIBUTION', 'REVENUE (¥)', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'REVENUE CONTRIBUTION (%)'],
+					header: [' ', constants.DATA_TABLE.COMMON.NAME, constants.DATA_TABLE.VARIATIONS.HEADER.TRAFFIC_DISTRIBUTION, constants.DATA_TABLE.COMMON.REVENUE, constants.DATA_TABLE.COMMON.IMPRESSIONS, constants.DATA_TABLE.COMMON.PAGE_VIEWS, constants.DATA_TABLE.COMMON.CLICKS, constants.DATA_TABLE.COMMON.PAGE_RPM, constants.DATA_TABLE.COMMON.PAGE_CTR, constants.DATA_TABLE.VARIATIONS.HEADER.REVENUE_CONTRIBUTION],
 					rows: [],
-					footer: [' ', 'TOTAL', 0, 0, 0, 0, 0, 0, 0, 0]
+					footer: [' ', constants.DATA_TABLE.COMMON.TOTAL, 0, 0, 0, 0, 0, 0, 0, 0]
 				}
 			}, footerMetrics = {
 				revenue: 0,

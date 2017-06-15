@@ -48,9 +48,10 @@ router
 
 		localeCode = isLocaleCodeSupported ? localeCode : defaultLanguageCode;
 		localeData = reportsLocalizedObject[localeCode];
+		paramConfig.localeCode = localeCode;
 
 		fileLogger.info('/*****Geniee Reports: Performance request*****/');
-		fileLogger.info(`Locale supported: ${req.locale}`);
+		fileLogger.info(`Locale supported: ${localeCode}`);
 
 		return siteModel.getSiteById(paramConfig.siteId)
 			.then(function(site) {

@@ -8,6 +8,7 @@ var rp = require('request-promise'),
 	variationModule = require('./modules/variation/index'),
 	_ = require('lodash'),
 	signatureGenerator = require('../../../services/genieeAdSyncService/genieeZoneSyncService/signatureGenerator.js');
+	const { defaultLanguageCode } = require('../../../i18n/language-mapping');
 
 module.exports = (function(requestPromise, signatureGenerator, oauthModule, zoneModule, mediaModule, pageGroupModule, variationModule) {
 	function getReportData(params) {
@@ -17,6 +18,7 @@ module.exports = (function(requestPromise, signatureGenerator, oauthModule, zone
 			"mediaId": params.mediaId, //920
 			"pageGroupId": params.pageGroupId
 		},
+		localeCode = params.localeCode ? params.localeCode : defaultLanguageCode,
 		httpMethod = 'GET',
 		url = 'https://s.geniee.jp/aladdin/adpushup/report/',
 		queryParams = _.compact(_.map(_.keys(json), function(key) {
@@ -67,7 +69,7 @@ module.exports = (function(requestPromise, signatureGenerator, oauthModule, zone
 					.then(zoneModule.getZoneVariations)
 					.then(variationModule.setVariationMetrics.bind(variationModule, params))
 					.then(variationModule.removeRedundantVariationsObj)
-					.then(variationModule.setVariationsTabularData)
+					.then(variationModule.setVariationsTabularData.bind(null, localeCode))
 					.then(variationModule.setVariationsHighChartsData)
 					.then(function(updatedPageGroupsAndVariationsData) {
 						var computedData = {media: siteMetrics, pageGroups: updatedPageGroupsAndVariationsData};
@@ -75,7 +77,7 @@ module.exports = (function(requestPromise, signatureGenerator, oauthModule, zone
 						return pageGroupModule.updateMetrics(computedData)
 							.then(pageGroupModule.updateZones)
 							.then(mediaModule.updateMetrics)
-							.then(pageGroupModule.setPageGroupsTabularData)
+							.then(pageGroupModule.setPageGroupsTabularData.bind(null, localeCode))
 							.then(pageGroupModule.setPageGroupsHighChartsData)
 							.then(function(finalComputedData) {
 								return Promise.resolve(finalComputedData);
