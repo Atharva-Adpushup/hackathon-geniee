@@ -14,7 +14,7 @@ var express = require('express'),
 	lodash = require('lodash'),
 	moment = require('moment'),
 	utils = require('../helpers/utils'),
-	{ languageMapping } = require('../i18n/language-mapping'),
+	{ languageMapping, languageCodeSupport, defaultLanguageCode } = require('../i18n/language-mapping'),
 	reportsLocalizedObject = require('../i18n/reports/geniee/constants'),
 	{ fileLogger } = require('../helpers/logger/file/index'),
 	// eslint-disable-next-line new-cap
@@ -42,7 +42,12 @@ router
 			siteDomainName,
 			filterDates = genieeFilterDates.getFilterDates(),
 			localeCode = utils.getLanguageLocale(languageMapping, req.locale),
-			localeData = reportsLocalizedObject[localeCode];
+			isLocaleCode = !!(localeCode),
+			isLocaleCodeSupported = !!(isLocaleCode && (languageCodeSupport.indexOf(localeCode) > -1)),
+			localeData;
+
+		localeCode = isLocaleCodeSupported ? localeCode : defaultLanguageCode;
+		localeData = reportsLocalizedObject[localeCode];
 
 		fileLogger.info('/*****Geniee Reports: Performance request*****/');
 		fileLogger.info(`Locale supported: ${req.locale}`);
