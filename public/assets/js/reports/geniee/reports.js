@@ -7,6 +7,7 @@
         this.siteDomain = w.adpushup.reports.siteDomain;
         this.paramConfig = w.adpushup.reports.paramConfig;
         Object.freeze(this.paramConfig);
+        this.languageCode = w.adpushup.reports.languageCode;
         this.errorConfig = {
             text: {
                 user: w.adpushup.reports.errorText,

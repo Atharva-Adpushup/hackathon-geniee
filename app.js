@@ -11,6 +11,7 @@ var express = require('express'),
 	CouchbaseStore = require('connect-couchbase')(session),
 	config = require('./configs/config'),
 	consts = require('./configs/commonConsts'),
+	{ languageSupport } = require('./i18n/language-mapping'),
 	utils = require('./helpers/utils'),
 	couchBaseService = require('./helpers/couchBaseService'),
 	woodlotMiddlewareLogger = require('woodlot').middlewareLogger,
@@ -40,7 +41,7 @@ if (process.env.NODE_ENV === consts.environment.production) {
 // Enable compression at top
 app.use(compression());
 // Locale support
-app.use(locale(consts.locale.support));
+app.use(locale(languageSupport));
 
 process.on('uncaughtException', function (err) {
 	// handle the error safely

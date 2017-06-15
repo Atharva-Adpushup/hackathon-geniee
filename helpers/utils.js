@@ -120,6 +120,20 @@ var url = require('url'),
 				}
 				next();
 			});
+		},
+		getLanguageLocale: (mappingObject, locale) => {
+			let selectedLocale = '';
+
+			Object.keys(mappingObject).forEach((languageCode) => {
+				const languageArray = mappingObject[languageCode];
+
+				if (languageArray.indexOf(locale) > -1) {
+					selectedLocale = languageCode;
+					return false;
+				}
+			});
+
+			return selectedLocale;
 		}
 	};
 

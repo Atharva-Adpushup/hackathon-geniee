@@ -14,6 +14,8 @@ var express = require('express'),
 	lodash = require('lodash'),
 	moment = require('moment'),
 	utils = require('../helpers/utils'),
+	{ languageMapping } = require('../i18n/language-mapping'),
+	reportsLocalizedObject = require('../i18n/reports/geniee/constants'),
 	{ fileLogger } = require('../helpers/logger/file/index'),
 	// eslint-disable-next-line new-cap
 	router = express.Router({ mergeParams: true }),
@@ -38,7 +40,9 @@ router
 				dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
 			},
 			siteDomainName,
-			filterDates = genieeFilterDates.getFilterDates();
+			filterDates = genieeFilterDates.getFilterDates(),
+			localeCode = utils.getLanguageLocale(languageMapping, req.locale),
+			localeData = reportsLocalizedObject[localeCode];
 
 		fileLogger.info('/*****Geniee Reports: Performance request*****/');
 		fileLogger.info(`Locale supported: ${req.locale}`);
@@ -56,13 +60,15 @@ router
 							siteId,
 							siteDomain: siteDomainName,
 							paramConfig,
-							filterDates
+							filterDates,
+							localeData,
+							localeCode
 						});
 					})
 					.catch(function(err) {
 						var textConfig = {
-							"error": "Unable to fetch reports right now!<br> Please try again later",
-							"emptyData": "We are analysing/mining your data right now.<br> Reports will be available shortly"
+							"error": localeData.ERROR.REPORT_EXCEPTION,
+							"emptyData": localeData.ERROR.REPORT_DATA_NOT_AVAILABLE
 						}, errorText;
 
 						if (err instanceof AdPushupError) {
@@ -76,7 +82,9 @@ router
 							errorText,
 							siteDomain: siteDomainName,
 							paramConfig,
-							filterDates
+							filterDates,
+							localeData,
+							localeCode
 						});
 					});
 			});

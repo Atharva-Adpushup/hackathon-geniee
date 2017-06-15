@@ -1,6 +1,6 @@
 div(class="aligner aligner--row perf-panel-heading-wrapper")
     div(class="col-xs-6 col-md-6 u-padding-r15px aligner aligner--row aligner--vCenter aligner--hStart")
-        h4 Performance
+        h4 !{localeData.METRIC_THUMBNAILS.TITLE}
     div(class="col-xs-6 col-md-6 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom")
         //- NOTE: To be added later
         //- h5 Export as
@@ -9,40 +9,40 @@ div(class="thumbnail-panel-group perf-panel-wrapper aligner aligner--row js-perf
     div(class="thumbnail u-margin-0px u-padding-0px aligner-item js-thumbnail js-perf-header-revenue")
         div(class="panel u-margin-0px u-padding-0px")
             div(class="panel-heading aligner aligner--row aligner--vCenter aligner--hCenter")
-                div(class="panel-title") REVENUE (¥)
-            button(id="thumbnail-info-btn", data-animation="true", class="btn btn-default btn--transparent btn--icon js-thumbnail-info-btn", type="button", data-placement="top", data-title="This is an estimate of the net revenue earned by the ads served via Adpushup.")
+                div(class="panel-title") !{localeData.METRIC_THUMBNAILS.REVENUE.NAME} (¥)
+            button(id="thumbnail-info-btn", data-animation="true", class="btn btn-default btn--transparent btn--icon js-thumbnail-info-btn", type="button", data-placement="top", data-title="#{localeData.METRIC_THUMBNAILS.REVENUE.TOOLTIP_TEXT}")
                 i(class="fa fa-info")
             div(class="panel-body aligner aligner--row aligner--vCenter aligner--hCenter js-panel-body")
 
     div(class="thumbnail u-margin-0px u-padding-0px aligner-item js-thumbnail js-perf-header-pageViews")
         div(class="panel u-margin-0px u-padding-0px")
             div(class="panel-heading aligner aligner--row aligner--vCenter aligner--hCenter")
-                div(class="panel-title") PAGE VIEWS
-            button(id="thumbnail-info-btn", data-animation="true", class="btn btn-default btn--transparent btn--icon js-thumbnail-info-btn", type="button", data-placement="top", data-title="This is the number of times pages containing ads are loaded via Adpushup. A page view is counted irrespective of how few or how many ads are served on a page.")
+                div(class="panel-title") !{localeData.METRIC_THUMBNAILS.PAGE_VIEWS.NAME}
+            button(id="thumbnail-info-btn", data-animation="true", class="btn btn-default btn--transparent btn--icon js-thumbnail-info-btn", type="button", data-placement="top", data-title="#{localeData.METRIC_THUMBNAILS.PAGE_VIEWS.TOOLTIP_TEXT}")
                 i(class="fa fa-info")
             div(class="panel-body aligner aligner--row aligner--vCenter aligner--hCenter js-panel-body")
 
     div(class="thumbnail u-margin-0px u-padding-0px aligner-item js-thumbnail js-perf-header-clicks")
         div(class="panel u-margin-0px u-padding-0px")
             div(class="panel-heading aligner aligner--row aligner--vCenter aligner--hCenter")
-                div(class="panel-title") CLICKS
-            button(id="thumbnail-info-btn", data-animation="true", class="btn btn-default btn--transparent btn--icon js-thumbnail-info-btn", type="button", data-placement="top", data-title="This is the number of times ads served via Adpushup are clicked.")
+                div(class="panel-title") !{localeData.METRIC_THUMBNAILS.CLICKS.NAME}
+            button(id="thumbnail-info-btn", data-animation="true", class="btn btn-default btn--transparent btn--icon js-thumbnail-info-btn", type="button", data-placement="top", data-title="#{localeData.METRIC_THUMBNAILS.CLICKS.TOOLTIP_TEXT}")
                 i(class="fa fa-info")
             div(class="panel-body aligner aligner--row aligner--vCenter aligner--hCenter js-panel-body")
 
     div(class="thumbnail u-margin-0px u-padding-0px aligner-item js-thumbnail js-perf-header-pageRPM")
         div(class="panel u-margin-0px u-padding-0px")
             div(class="panel-heading aligner aligner--row aligner--vCenter aligner--hCenter")
-                div(class="panel-title") PAGE RPM
-            button(id="thumbnail-info-btn", data-animation="true", class="btn btn-default btn--transparent btn--icon js-thumbnail-info-btn", type="button", data-placement="top", data-title="Page RPM is the average earnings per thousand page views.")
+                div(class="panel-title") !{localeData.METRIC_THUMBNAILS.PAGE_RPM.NAME}
+            button(id="thumbnail-info-btn", data-animation="true", class="btn btn-default btn--transparent btn--icon js-thumbnail-info-btn", type="button", data-placement="top", data-title="#{localeData.METRIC_THUMBNAILS.PAGE_RPM.TOOLTIP_TEXT}")
                 i(class="fa fa-info")
             div(class="panel-body aligner aligner--row aligner--vCenter aligner--hCenter js-panel-body")
 
     div(class="thumbnail u-margin-0px u-padding-0px aligner-item js-thumbnail js-perf-header-pageCTR")
         div(class="panel u-margin-0px u-padding-0px")
             div(class="panel-heading aligner aligner--row aligner--vCenter aligner--hCenter")
-                div(class="panel-title") PAGE CTR
-            button(id="thumbnail-info-btn", data-animation="true", class="btn btn-default btn--transparent btn--icon js-thumbnail-info-btn", type="button", data-placement="top", data-title="Page click through rate (CTR) is the percentage of the number of ad clicks to the number of page views.")
+                div(class="panel-title") !{localeData.METRIC_THUMBNAILS.PAGE_CTR.NAME}
+            button(id="thumbnail-info-btn", data-animation="true", class="btn btn-default btn--transparent btn--icon js-thumbnail-info-btn", type="button", data-placement="top", data-title="#{localeData.METRIC_THUMBNAILS.PAGE_CTR.TOOLTIP_TEXT}")
                 i(class="fa fa-info")
             div(class="panel-body aligner aligner--row aligner--vCenter aligner--hCenter js-panel-body")
 

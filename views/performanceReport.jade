@@ -29,6 +29,8 @@ block bodyContent
         - siteId = siteId || null;
         - filterDates = filterDates || null;
         - errorText = errorText || null;
+        - localeData = localeData || null;
+        - localeCode = localeCode || 'en';
 
         include performance/slideoutMenu
         // Page Content Starts Here
@@ -37,7 +39,7 @@ block bodyContent
                 #widgetsArea.row
                     .mb-30
                         div(class="aligner aligner--row aligner--vCenter aligner--hStart u-margin-b15px")
-                            div(class="alert alert-warning notification-alert u-margin-0px u-full-width") Please note that due to infrastructure upgrade, reports data such as page views, page RPM and page CTR might not reflect accurately for now. This message will disappear once data services are stable.
+                            div(class="alert alert-warning notification-alert u-margin-0px u-full-width") !{localeData.NOTIFICATION_ALERT.DATA_DISCREPANCY.PAGEVIEWS}
 
                         .controlAdpushupWrap.js-reports-wrapper
                             include performance/headingWithFilterButton
@@ -54,14 +56,16 @@ block bodyContent
         var reportsModel = !{JSON.stringify(reportingData)} || null,
             siteId = '!{siteId}', siteDomain = '!{siteDomain}',
             paramConfig = !{JSON.stringify(paramConfig)},
-            errorText = '!{errorText}';
+            errorText = '!{errorText}',
+            languageCode = '!{localeCode}';
 
         window.adpushup = window.adpushup || {};
         window.adpushup.reports = {
             model: reportsModel,
             siteId: siteId,
             siteDomain: siteDomain,
-            paramConfig: paramConfig
+            paramConfig: paramConfig,
+            languageCode: languageCode
         };
 
         // Error text is added in case of valid error message
