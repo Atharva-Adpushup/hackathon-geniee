@@ -4,6 +4,7 @@ var _ = require('lodash'),
 	Promise = require('bluebird'),
 	channelModel = require('../../../../../models/channelModel.js'),
 	utils = require('../utils/index');
+const localizedData = require('../../../../../i18n/reports/geniee/constants');
 
 module.exports = {
 	getPageGroupMetrics: function(data) {
@@ -239,11 +240,12 @@ module.exports = {
 	},
 	setPageGroupsTabularData: function(localeCode, data) {
 		var computedData = extend(true, {}, data),
+			constants = localizedData[localeCode],
 			pageGroupsTabularData = {
 				table: {
-					header: [' ', 'NAME', 'PLATFORM', 'REVENUE (¥)', 'IMPRESSIONS', 'PAGE VIEWS', 'CLICKS', 'PAGE RPM', 'PAGE CTR', 'NUMBER OF VARIATIONS'],
+					header: [' ', constants.DATA_TABLE.COMMON.NAME, constants.DATA_TABLE.PAGE_GROUPS.HEADER.PLATFORM, constants.DATA_TABLE.COMMON.REVENUE, constants.DATA_TABLE.COMMON.IMPRESSIONS, constants.DATA_TABLE.COMMON.PAGE_VIEWS, constants.DATA_TABLE.COMMON.CLICKS, constants.DATA_TABLE.COMMON.PAGE_RPM, constants.DATA_TABLE.COMMON.PAGE_CTR, constants.DATA_TABLE.PAGE_GROUPS.HEADER.VARIATION_COUNT],
 					rows: [],
-					footer: ['TOTAL', ' ', ' ', 0, 0, 0, 0, 0, 0, 0]
+					footer: [constants.DATA_TABLE.COMMON.TOTAL, ' ', ' ', 0, 0, 0, 0, 0, 0, 0]
 				}
 			};
 

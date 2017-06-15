@@ -186,7 +186,7 @@ const mapping = {
 				REVENUE: '収益 (¥)',
 				IMPRESSIONS: '印象',
 				PAGE_VIEWS: 'ページビュー',
-				CLICKS: 'CLICKS',
+				CLICKS: 'クリック',
 				PAGE_RPM: 'ページRPM',
 				PAGE_CTR: 'ページのクリック率',
 				TOTAL: '合計'
