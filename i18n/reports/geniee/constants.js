@@ -110,10 +110,12 @@ const mapping = {
 				},
 				BUTTON_ACTION: {
 					APPLY: {
-						NAME: 'Apply'
+						NAME: 'Apply',
+						LOADING_TEXT: 'Applying...'
 					},
 					RESET: {
-						NAME: 'Reset'
+						NAME: 'Reset',
+						LOADING_TEXT: 'Resetting...'
 					}
 				}
 			}
@@ -234,10 +236,12 @@ const mapping = {
 				},
 				BUTTON_ACTION: {
 					APPLY: {
-						NAME: '適用'
+						NAME: '適用',
+						LOADING_TEXT: '申請中...'
 					},
 					RESET: {
-						NAME: 'リセット'
+						NAME: 'リセット',
+						LOADING_TEXT: 'リセット中...'
 					}
 				}
 			}
