@@ -14,6 +14,7 @@ var express = require('express'),
 	lodash = require('lodash'),
 	moment = require('moment'),
 	utils = require('../helpers/utils'),
+	extend = require('extend'),
 	{ languageMapping, languageCodeSupport, defaultLanguageCode } = require('../i18n/language-mapping'),
 	reportsLocalizedObject = require('../i18n/reports/geniee/constants'),
 	{ fileLogger } = require('../helpers/logger/file/index'),
@@ -44,11 +45,29 @@ router
 			localeCode = utils.getLanguageLocale(languageMapping, req.locale),
 			isLocaleCode = !!(localeCode),
 			isLocaleCodeSupported = !!(isLocaleCode && (languageCodeSupport.indexOf(localeCode) > -1)),
-			localeData;
+			localeData, uiConstants;
 
 		localeCode = isLocaleCodeSupported ? localeCode : defaultLanguageCode;
 		localeData = reportsLocalizedObject[localeCode];
 		paramConfig.localeCode = localeCode;
+		uiConstants = {
+			BREADCRUMB: extend(true, {}, localeData.BREADCRUMB),
+			PAGE_GROUPS: {
+				NAME: localeData.DATA_TABLE.PAGE_GROUPS.NAME,
+				TOOLTIP_TEXT: localeData.DATA_TABLE.PAGE_GROUPS.TOOLTIP_TEXT
+			},
+			VARIATIONS: {
+				NAME: localeData.DATA_TABLE.VARIATIONS.NAME
+			},
+			PERFORMANCE: localeData.METRIC_THUMBNAILS.TITLE,
+			BUTTON_RESET_FILTER: localeData.PAGE_LOADER.BUTTON_RESET_FILTER,
+			SLIDEOUT_MENU: {
+				UI_PLACEHOLDER_TEXT: localeData.SLIDEOUT_MENU.COMPONENTS.SELECTED.UI_PLACEHOLDER_TEXT
+			},
+			ERROR: {
+				REPORT_EXCEPTION: localeData.ERROR.REPORT_EXCEPTION
+			}
+		};
 
 		fileLogger.info('/*****Geniee Reports: Performance request*****/');
 		fileLogger.info(`Locale supported: ${localeCode}`);
@@ -68,7 +87,8 @@ router
 							paramConfig,
 							filterDates,
 							localeData,
-							localeCode
+							localeCode,
+							uiConstants
 						});
 					})
 					.catch(function(err) {
@@ -90,7 +110,8 @@ router
 							paramConfig,
 							filterDates,
 							localeData,
-							localeCode
+							localeCode,
+							uiConstants
 						});
 					});
 			});

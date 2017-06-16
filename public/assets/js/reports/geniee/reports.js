@@ -8,17 +8,18 @@
         this.paramConfig = w.adpushup.reports.paramConfig;
         Object.freeze(this.paramConfig);
         this.languageCode = w.adpushup.reports.languageCode;
+        this.constants = w.adpushup.reports.constants;
         this.errorConfig = {
             text: {
                 user: w.adpushup.reports.errorText,
-                default: 'Unable to fetch reports right now!'
+                default: this.constants.ERROR.REPORT_EXCEPTION
             }
         };
         this.reportsLevel = {
-            'pagegroup': 'Page Groups',
-            'variation': 'Variations'
+            'pagegroup': this.constants.PAGE_GROUPS.NAME,
+            'variation': this.constants.VARIATIONS.NAME
         };
-        this.selectedReportsLevel = 'Page Groups';
+        this.selectedReportsLevel = this.constants.PAGE_GROUPS.NAME;
         this.selectedPageGroupId = null;
         this.selectedPageGroupName = '';
         this.filterData = {
@@ -162,7 +163,7 @@
             dateFromString = this.getDateString(dateConfig.dateFrom),
             dateToString = this.getDateString(dateConfig.dateTo),
             dateString = (dateFromString + "&nbsp; - &nbsp;" + dateToString),
-            $baseTemplate = $("<ol class='breadcrumb js-date-desc u-margin-0px'><li><span class='breadcrumb-title-prefix js-date-desc-title-prefix'>Report Date:</span></li></ol>"),
+            $baseTemplate = $("<ol class='breadcrumb js-date-desc u-margin-0px'><li><span class='breadcrumb-title-prefix js-date-desc-title-prefix'>" + this.constants.BREADCRUMB.REPORT_DATE + ":</span></li></ol>"),
             $contentTemplate = $("<a id='articlemyriad.com' class='breadcrumb-title js-date-desc-title active'></a>");
 
             $contentTemplate.html(dateString);
@@ -247,7 +248,7 @@
     }
 
     ReportClass.prototype.insertFilterSelectedUiPlaceholder = function() {
-        var $template = $("<div class='aligner aligner--column aligner--hCenter aligner--vCenter filter-selected-ui filter-selected-ui--placeholder js-filter-selected-ui-placeholder'>No filters to show.</div>"),
+        var $template = $("<div class='aligner aligner--column aligner--hCenter aligner--vCenter filter-selected-ui filter-selected-ui--placeholder js-filter-selected-ui-placeholder'>" + this.constants.SLIDEOUT_MENU.UI_PLACEHOLDER_TEXT + "</div>"),
             isPlaceholderPresent = !!($(".js-filter-selected-ui-placeholder", this.$filterDateSelectedWrapper).length);
 
         if (!isPlaceholderPresent) {
@@ -264,7 +265,7 @@
     }
 
     ReportClass.prototype.prependResetReportsBtn = function() {
-        var $template = $("<button id='report-reset-btn' data-loading-text='Resetting...' autocomplete='off' type='button' class='btn btn-default btn-theme btn-theme--primary u-margin-r10px js-report-reset-btn js-filter-reset'>Reset filters</button>"),
+        var $template = $("<button id='report-reset-btn' data-loading-text='Resetting...' autocomplete='off' type='button' class='btn btn-default btn-theme btn-theme--primary u-margin-r10px js-report-reset-btn js-filter-reset'>" + this.constants.BUTTON_RESET_FILTER + "</button>"),
             isBtnPresent = !!($(".js-report-reset-btn", this.$headingOptions).length);
 
         if (!isBtnPresent) {
@@ -638,10 +639,10 @@
         var breadCrumbTpl = '';
 
         if (this.siteId && !this.selectedPageGroupId) {
-            breadCrumbTpl += '<li><span class="breadcrumb-title-prefix">Media:</span><a id="' + this.siteDomain + '" class="breadcrumb-title js-breadcrumb-siteId active">' + this.siteDomain + '</a></li>';
+            breadCrumbTpl += '<li><span class="breadcrumb-title-prefix">' + this.constants.BREADCRUMB.MEDIA.NAME + ':</span><a id="' + this.siteDomain + '" class="breadcrumb-title js-breadcrumb-siteId active">' + this.siteDomain + '</a></li>';
         } else if (this.siteId && this.selectedPageGroupId) {
-            breadCrumbTpl += '<li><span class="breadcrumb-title-prefix">Media:</span><a id="' + this.siteDomain + '" class="breadcrumb-title js-breadcrumb-siteId" href="javascript:void 0;">' + this.siteDomain + '</a></li>';
-            breadCrumbTpl += '<li><span class="breadcrumb-title-prefix">Page Group:</span><a id="' + this.selectedPageGroupName + '" class="breadcrumb-title js-breadcrumb-pageGroupId active">' + this.selectedPageGroupName + '</a></li>';
+            breadCrumbTpl += '<li><span class="breadcrumb-title-prefix">' + this.constants.BREADCRUMB.MEDIA.NAME + ':</span><a id="' + this.siteDomain + '" class="breadcrumb-title js-breadcrumb-siteId" href="javascript:void 0;">' + this.siteDomain + '</a></li>';
+            breadCrumbTpl += '<li><span class="breadcrumb-title-prefix">' + this.constants.BREADCRUMB.PAGE_GROUPS + ':</span><a id="' + this.selectedPageGroupName + '" class="breadcrumb-title js-breadcrumb-pageGroupId active">' + this.selectedPageGroupName + '</a></li>';
         }
 
         this.$breadCrumbContainer.html(breadCrumbTpl);
@@ -661,7 +662,7 @@
 			tooltipConfig = {
 				animation: true,
 				placement: 'top',
-				title: 'Click to see Media level reports',
+				title: this.constants.BREADCRUMB.MEDIA.TOOLTIP_TEXT,
 				trigger: 'hover'
 			};
 
@@ -724,7 +725,7 @@
 			tooltipConfig = {
 				animation: true,
 				placement: 'top',
-				title: 'Click to see Page group level reports',
+				title: this.constants.PAGE_GROUPS.TOOLTIP_TEXT,
 				trigger: 'hover'
 			};
 
@@ -941,7 +942,7 @@
         chartConfig = $.extend(true, {}, this.highCharts.config);
         chartConfig.series = chartSeriesConfig.series;
         chartConfig.xAxis.categories = chartSeriesConfig.xAxisCategories;
-        chartConfig.title.text = (this.selectedReportsLevel + ' performance');
+        chartConfig.title.text = (this.selectedReportsLevel + ' ' + this.constants.PERFORMANCE);
 
         this.createChart('chart-container', chartConfig);
     }

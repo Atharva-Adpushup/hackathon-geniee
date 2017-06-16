@@ -31,6 +31,7 @@ block bodyContent
         - errorText = errorText || null;
         - localeData = localeData || null;
         - localeCode = localeCode || 'en';
+        - uiConstants = uiConstants || {};
 
         include performance/slideoutMenu
         // Page Content Starts Here
@@ -56,6 +57,7 @@ block bodyContent
         var reportsModel = !{JSON.stringify(reportingData)} || null,
             siteId = '!{siteId}', siteDomain = '!{siteDomain}',
             paramConfig = !{JSON.stringify(paramConfig)},
+            constants = !{JSON.stringify(uiConstants)},
             errorText = '!{errorText}',
             languageCode = '!{localeCode}';
 
@@ -65,7 +67,8 @@ block bodyContent
             siteId: siteId,
             siteDomain: siteDomain,
             paramConfig: paramConfig,
-            languageCode: languageCode
+            languageCode: languageCode,
+            constants: constants
         };
 
         // Error text is added in case of valid error message
