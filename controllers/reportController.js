@@ -41,8 +41,11 @@ router
 				dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
 			},
 			siteDomainName,
+			isQueryObject = !!(req.query && lodash.isObject(req.query) && lodash.keys(req.query).length),
+			isLocaleCodeQueryParameter = !!(isQueryObject && req.query.localeCode && lodash.isString(req.query.localeCode)),
+			localeCodeQueryParameter = isLocaleCodeQueryParameter ? utils.sanitiseString(req.query.localeCode) : false,
 			filterDates = genieeFilterDates.getFilterDates(),
-			localeCode = utils.getLanguageLocale(languageMapping, req.locale),
+			localeCode = (localeCodeQueryParameter || utils.getLanguageLocale(languageMapping, req.locale)),
 			isLocaleCode = !!(localeCode),
 			isLocaleCodeSupported = !!(isLocaleCode && (languageCodeSupport.indexOf(localeCode) > -1)),
 			localeData, uiConstants;
