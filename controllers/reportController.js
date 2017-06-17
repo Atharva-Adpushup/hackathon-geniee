@@ -52,6 +52,7 @@ router
 		paramConfig.localeCode = localeCode;
 		uiConstants = {
 			BREADCRUMB: extend(true, {}, localeData.BREADCRUMB),
+			TABLE: localeData.DATA_TABLE.TABLE,
 			PAGE_GROUPS: {
 				NAME: localeData.DATA_TABLE.PAGE_GROUPS.NAME,
 				TOOLTIP_TEXT: localeData.DATA_TABLE.PAGE_GROUPS.TOOLTIP_TEXT

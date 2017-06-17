@@ -566,7 +566,8 @@
             hide = options.hideTableColumns instanceof Array ? options.hideTableColumns : [],
             dataTableConfig = {
                 "sDom": 'Rlfrtip',
-                "iDisplayLength": 50
+                "iDisplayLength": 50,
+                language: options.language
             };
         
         if (options.isFirstColumnOrderDisable) {
@@ -1014,9 +1015,10 @@
     };
 
     ReportClass.prototype.setTableData = function(data, isPageGroupLevel) {
-        var tableContainerSelector = "#reports_table";
+        var tableContainerSelector = "#reports_table",
+            languageConstants = this.constants.TABLE;
 
-        this.tabulateData(data, {tableContainer: tableContainerSelector, isFirstColumnOrderDisable: isPageGroupLevel});
+        this.tabulateData(data, {tableContainer: tableContainerSelector, isFirstColumnOrderDisable: isPageGroupLevel, language: languageConstants});
     }
 
     ReportClass.prototype.renderUI = function() {

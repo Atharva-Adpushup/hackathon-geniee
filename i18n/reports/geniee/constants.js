@@ -66,6 +66,30 @@ const mapping = {
 				PAGE_RPM: 'PAGE RPM',
 				PAGE_CTR: 'PAGE CTR',
 				TOTAL: 'TOTAL'
+			},
+			TABLE: {
+				"decimal":        "",
+				"emptyTable":     "No data available in table",
+				"info":           "Showing _START_ to _END_ of _TOTAL_ entries",
+				"infoEmpty":      "Showing 0 to 0 of 0 entries",
+				"infoFiltered":   "(filtered from _MAX_ total entries)",
+				"infoPostFix":    "",
+				"thousands":      ",",
+				"lengthMenu":     "Show _MENU_ entries",
+				"loadingRecords": "Loading...",
+				"processing":     "Processing...",
+				"search":         "Search:",
+				"zeroRecords":    "No matching records found",
+				"paginate": {
+					"first":      "First",
+					"last":       "Last",
+					"next":       "Next",
+					"previous":   "Previous"
+				},
+				"aria": {
+					"sortAscending":  ": activate to sort column ascending",
+					"sortDescending": ": activate to sort column descending"
+				}
 			}
 		},
 		PAGE_LOADER: {
@@ -192,6 +216,30 @@ const mapping = {
 				PAGE_RPM: 'ページRPM',
 				PAGE_CTR: 'ページのクリック率',
 				TOTAL: '合計'
+			},
+			TABLE: {
+				"decimal":        "",
+				"emptyTable":     "テーブルにデータがありません",
+				"info":           " _TOTAL_ 件中 _START_ から _END_ まで表示",
+				"infoEmpty":      " 0 件中 0 から 0 まで表示",
+				"infoFiltered":   "（全 _MAX_ 件より抽出）",
+				"infoPostFix":    "",
+				"thousands":      ",",
+				"lengthMenu":     "_MENU_ 件表示",
+				"loadingRecords": "読み込み中...",
+				"processing":     "処理中...",
+				"search":         "検索:",
+				"zeroRecords":    "一致するレコードがありません",
+				"paginate": {
+					"first":      "先頭",
+					"last":       "最終",
+					"next":       "次",
+					"previous":   "前"
+				},
+				"aria": {
+					"sortAscending":  ": 列を昇順に並べ替えるにはアクティブにする",
+					"sortDescending": ": 列を降順に並べ替えるにはアクティブにする"
+				}
 			}
 		},
 		PAGE_LOADER: {
