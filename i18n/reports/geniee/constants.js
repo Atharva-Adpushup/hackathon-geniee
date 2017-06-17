@@ -40,6 +40,11 @@ const mapping = {
 				TOOLTIP_TEXT: 'Page click through rate (CTR) is the percentage of the number of ad clicks to the number of page views.'
 			}
 		},
+		HIGHCHARTS: {
+			AXIS: {
+				Y: 'Values'
+			}
+		},
 		DATA_TABLE: {
 			TITLE: 'Page Groups',
 			PAGE_GROUPS: {
@@ -188,6 +193,11 @@ const mapping = {
 			PAGE_CTR: {
 				NAME: 'ページのクリック率',
 				TOOLTIP_TEXT: 'これは、ページビュー数に対する広告クリック数の割合です。'
+			}
+		},
+		HIGHCHARTS: {
+			AXIS: {
+				Y: '値'
 			}
 		},
 		DATA_TABLE: {

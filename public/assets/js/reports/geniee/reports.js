@@ -81,6 +81,11 @@
                 xAxis: {
                     categories: []
                 },
+                yAxis: {
+                    title: {
+                        text: this.constants.HIGHCHARTS.AXIS.Y
+                    }
+                },
                 series: []
             }
         };
