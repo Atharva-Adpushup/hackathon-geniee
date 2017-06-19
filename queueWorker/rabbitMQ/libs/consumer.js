@@ -81,7 +81,7 @@ Consumer.prototype.getMessage = function(queueName) {
 	});
 };
 
-function sendMail(data) {
+Consumer.prototype.sendMail = function(data) {
     return mailService({
         header: `${data.header || this.config.name} | Error Counter : ${this.negCounter}`,
         content: `${data.content}`,
