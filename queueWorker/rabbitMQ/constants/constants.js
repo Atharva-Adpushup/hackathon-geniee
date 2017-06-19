@@ -41,7 +41,8 @@ var CONSTANTS = {
 			}
 		},
         MESSAGE: {
-            INVALID_DATA: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Invalid Message consumer'
+            INVALID_DATA: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Invalid Message consumer',
+            CDN_SYNC_ERROR: 'Unable to sync file with cdn'
         }
 	},
 	SUCCESS_MESSAGES: {

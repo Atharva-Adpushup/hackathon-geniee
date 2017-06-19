@@ -102,6 +102,7 @@ function syncCDN(decodedMessage, originalMessage) {
             return originalMessage;
         })
         .catch(err => {
+            console.log(err);
             throw new CustomError({'message': 'Unable to sync file with cdn', 'originalMessage': originalMessage, 'siteId': decodedMessage.siteId});
         })
     })
