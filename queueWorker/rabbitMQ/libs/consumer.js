@@ -93,7 +93,7 @@ Consumer.prototype.sendMail = function(data) {
 
 Consumer.prototype.acknowledge = function(msg) {
     if (this.negCounter && this.negCounter % 5 == 0) {
-        sendMail({
+        this.sendMail({
             header: this.config.mail.ack.header,
             content: this.config.mail.ack.content,
             emailId: this.config.mail.emailId
@@ -105,7 +105,7 @@ Consumer.prototype.acknowledge = function(msg) {
 
 Consumer.prototype.reject = function(msg) {
     if (this.negCounter && this.negCounter % 5 == 0 && this.negCounter < 50) {
-        sendMail({
+        this.sendMail({
             header: this.config.mail.nack.header,
             content: this.config.mail.nack.content,
             emailId: this.config.mail.emailId
