@@ -94,9 +94,9 @@ function sendMail(data) {
 Consumer.prototype.acknowledge = function(msg) {
     if (this.negCounter && this.negCounter % 5 == 0) {
         sendMail({
-            header: this.config.ack.header,
-            content: this.config.ack.content,
-            emailId: this.config.emailId
+            header: this.config.mail.ack.header,
+            content: this.config.mail.ack.content,
+            emailId: this.config.mail.emailId
         });
         this.negCounter = 0;
     }
@@ -106,9 +106,9 @@ Consumer.prototype.acknowledge = function(msg) {
 Consumer.prototype.reject = function(msg) {
     if (this.negCounter && this.negCounter % 5 == 0 && this.negCounter < 50) {
         sendMail({
-            header: this.config.nack.header,
-            content: this.config.nack.content,
-            emailId: this.config.emailId
+            header: this.config.mail.nack.header,
+            content: this.config.mail.nack.content,
+            emailId: this.config.mail.emailId
         });
     }
     this.negCounter++;
