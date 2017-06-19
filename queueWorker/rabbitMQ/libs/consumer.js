@@ -1,10 +1,12 @@
 var queueInstance = require('amqplib');
 var Promise = require('bluebird');
+var mailService = require('../../../services/mailService/index');
 
 function Consumer(config) {
 	this.config = config;
 	this.channel = null;
 	this.connection = null;
+    this.negCounter = 0;
 	this.getQueueMessage = function(queueName) {
 		const self = this;
 
@@ -84,6 +86,15 @@ Consumer.prototype.acknowledge = function(msg) {
 };
 
 Consumer.prototype.reject = function(msg) {
+    if (this.negCounter && this.negCounter % 5 == 0) {
+        mailService({
+            header: `${this.config.mail.header || this.config.name} | Error Counter : ${this.negCounter}`,
+            content: `${this.config.mail.content}`,
+            emailId: this.config.mail.emailIds
+        })
+        .then(response => console.log(response.message))
+        .catch(console.log);
+    }
 	return this.channel.nack(msg, false, true);
 };
 

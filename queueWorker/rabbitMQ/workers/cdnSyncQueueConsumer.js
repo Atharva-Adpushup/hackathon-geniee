@@ -11,7 +11,13 @@ var Promise = require('bluebird'),
     queueConfig = {
         url: CONFIG.RABBITMQ.URL,
         exchange: CONFIG.RABBITMQ.CDN_SYNC.EXCHANGE,
-        queue: CONFIG.RABBITMQ.CDN_SYNC.QUEUE
+        queue: CONFIG.RABBITMQ.CDN_SYNC.QUEUE,
+        name: "CDN SYNC Consumer",
+        mail: {
+            header: "CDN SYN Consumer Failed",
+            content: "<p>Consumer failed multiple times. Please check on priority. Thank you. Warm Regards.</p>",
+            emailIds: "yomesh.gupta@adpushup.com, zahin@adpushup.com"
+        }
     },
     options = {
         queueName: CONFIG.RABBITMQ.CDN_SYNC.QUEUE.name
