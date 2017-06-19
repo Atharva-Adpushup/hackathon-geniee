@@ -81,20 +81,37 @@ Consumer.prototype.getMessage = function(queueName) {
 	});
 };
 
+function sendMail(data) {
+    return mailService({
+        header: `${data.header || this.config.name} | Error Counter : ${this.negCounter}`,
+        content: `${data.content}`,
+        emailId: data.emailId
+    })
+    .then(response => console.log(response.message))
+    .catch(console.log);
+}
+
 Consumer.prototype.acknowledge = function(msg) {
+    if (this.negCounter && this.negCounter % 5 == 0) {
+        sendMail({
+            header: this.config.ack.header,
+            content: this.config.ack.content,
+            emailId: this.config.emailId
+        });
+        this.negCounter = 0;
+    }
 	return this.channel.ack(msg);
 };
 
 Consumer.prototype.reject = function(msg) {
-    if (this.negCounter && this.negCounter % 5 == 0) {
-        mailService({
-            header: `${this.config.mail.header || this.config.name} | Error Counter : ${this.negCounter}`,
-            content: `${this.config.mail.content}`,
-            emailId: this.config.mail.emailIds
-        })
-        .then(response => console.log(response.message))
-        .catch(console.log);
+    if (this.negCounter && this.negCounter % 5 == 0 && this.negCounter < 50) {
+        sendMail({
+            header: this.config.nack.header,
+            content: this.config.nack.content,
+            emailId: this.config.emailId
+        });
     }
+    this.negCounter++;
 	return this.channel.nack(msg, false, true);
 };
 
