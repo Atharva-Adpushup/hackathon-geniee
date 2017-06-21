@@ -114,7 +114,7 @@
             elemText = this.$notificationHeading.text();
 
         if (defaultText !== elemText) {
-            this.$notificationHeading.text(defaultText);
+            this.$notificationHeading.html(defaultText);
         }
     }
 
