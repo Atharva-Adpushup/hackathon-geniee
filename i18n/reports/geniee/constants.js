@@ -7,7 +7,8 @@ const mapping = {
 		},
 		HEADER: {
 			TITLE: 'Reporting and Analytics',
-			BUTTON_FILTER: 'Filters'
+			BUTTON_FILTER: 'Filters',
+			CHANGE_LANGUAGE_DROPDOWN: 'Select Language'
 		},
 		BREADCRUMB: {
 			MEDIA: {
@@ -162,7 +163,8 @@ const mapping = {
 		},
 		HEADER: {
 			TITLE: 'レポート',
-			BUTTON_FILTER: '絞り込み'
+			BUTTON_FILTER: '絞り込み',
+			CHANGE_LANGUAGE_DROPDOWN: '言語を選択する'
 		},
 		BREADCRUMB: {
 			MEDIA: {

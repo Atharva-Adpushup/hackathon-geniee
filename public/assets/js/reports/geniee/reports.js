@@ -9,6 +9,9 @@
         Object.freeze(this.paramConfig);
         this.languageCode = w.adpushup.reports.languageCode;
         this.constants = w.adpushup.reports.constants;
+        this.languageConfig = {
+            support: ['en', 'ja']
+        };
         this.errorConfig = {
             text: {
                 user: w.adpushup.reports.errorText,
@@ -59,6 +62,9 @@
         this.$absoluteDateInputs = $('.js-datepicker-element');
         this.$datePickerInstance = null;
         this.$collapsibleElems = $('.js-panel-collapsible');
+        this.$languageChangeWrapper = $('.js-language-change-wrapper');
+        this.$languageChangeButton = $('.js-language-change-btn', this.$languageChangeWrapper);
+        this.$languageChangeMenu = $('.js-language-change-menu', this.$languageChangeWrapper);
 
         // Slideout elements
         this.$slideoutPanel = $('.js-slideout-panel');
@@ -529,6 +535,54 @@
         this.$headingWrapper.off('click').on('click', '.js-report-reset-btn', this.handleReportResetBtnclick.bind(this));
         $('.js-report-reset-btn', this.$notificationWrapper).off('click').on('click', this.handleReportResetBtnclick.bind(this));
     }
+
+    ReportClass.prototype.initLanguageDropdown = function() {
+        this.$languageChangeButton.dropdown();
+    };
+
+    ReportClass.prototype.bindLanguageDropdown = function() {
+        this.$languageChangeWrapper.off('hidden.bs.dropdown').on('hidden.bs.dropdown', function(e) {
+        });
+    };
+
+    ReportClass.prototype.bindLanguageMenu = function() {
+        var self = this;
+
+        this.$languageChangeMenu.off('click').on('click', '.language-change-link', function(e) {
+            var $linkEl = $(e.target),
+                languageCode = $linkEl.attr('data-languagecode'),
+                languageText = $linkEl.text();
+
+            self.$languageChangeButton.contents().first().replaceWith(languageText);
+            self.updateLocation(languageCode);
+        });
+    };
+
+    ReportClass.prototype.setLanguageDropdownUI = function() {
+        var searchParams = location.search,
+            regex = /\?localeCode=[a-z]{2}/,
+            isLocaleCodeParams = !!(searchParams && regex.test(searchParams) && searchParams.match(regex)),
+            languageCode = isLocaleCodeParams ? searchParams.match(regex) : null,
+            selectedText;
+
+            if (languageCode && languageCode.length) {
+                languageCode = languageCode[0].replace('?localeCode=', '');
+                
+                if (this.languageConfig.support.indexOf(languageCode) > -1) {
+                    selectedText = $('[data-languageCode='+ languageCode +']').text();
+                    this.$languageChangeButton.contents().first().replaceWith(selectedText);
+                }
+            }
+    };
+
+    ReportClass.prototype.updateLocation = function(languageCode) {
+        var href = location.href,
+            regex = (/.*(?=\?)/),
+            isSearchParams = !!(location.search),
+            hrefWithPath = isSearchParams ? href.match(regex)[0] : href;
+
+            w.location.href = hrefWithPath + '?localeCode=' + languageCode;
+    };
 
     ReportClass.prototype.initSlideoutMenu = function() {
         var self = this;
@@ -1030,6 +1084,8 @@
         var $revenueHeaderThumbnail = this.getRevenueHeaderThumbnail();
 
         this.initPerfHeaderInfoTooltips();
+        this.setLanguageDropdownUI();
+        this.initLanguageDropdown();
         this.initSlideoutMenu();
         this.generateBreadCrumb();
         this.setTableHeading();
@@ -1041,6 +1097,8 @@
     }
 
     ReportClass.prototype.bindUiHandlers = function() {
+        this.bindLanguageDropdown();
+        this.bindLanguageMenu();
         this.bindPerfThumbnailClickHandler();
         this.bindSelectionButtonClickHandler();
         this.bindDateFilterLinks();

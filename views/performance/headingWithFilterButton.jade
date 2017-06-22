@@ -3,5 +3,13 @@ div(class="aligner aligner--row u-margin-20px u-padding-b10px main-heading-wrapp
         h3.heading.heading--h3
             a !{localeData.HEADER.TITLE}
     div(class="col-xs-3 col-md-3 u-padding-0px aligner aligner--row aligner--vCenter aligner--hBottom js-main-heading-options")
+        div(class="dropdown language-change-wrapper u-margin-r10px js-language-change-wrapper")
+            button(class="btn btn-default dropdown-toggle js-language-change-btn" type="button" id="language-change-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") !{localeData.HEADER.CHANGE_LANGUAGE_DROPDOWN}
+                span(class="caret")
+            ul(class="dropdown-menu js-language-change-menu" aria-labelledby="language-change-dropdown")
+                li
+                    a(class="language-change-link", data-languageCode="en", href="javascript:void 0") English (en)
+                    a(class="language-change-link", data-languageCode="ja", href="javascript:void 0") Japanese (ja)
+    
         button(id="filter-btn", class="btn btn-default btn--with-icon aligner aligner--row aligner--hCenter aligner--vCenter js-filter-btn", type="button") !{localeData.HEADER.BUTTON_FILTER}
             i(class="fa fa-filter")

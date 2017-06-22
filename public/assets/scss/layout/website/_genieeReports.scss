@@ -6,6 +6,7 @@ $LabelFontSize: 1.5em;
 $fourteenPxAlias: 1.168em;
 $uiComponentHeight: 34px;
 $datePickerDisabledColor: rgba(229,229,229,0.5);
+$layoutDimension: 10px;
 
 .page-container--reports-geniee
 {
@@ -59,7 +60,7 @@ $datePickerDisabledColor: rgba(229,229,229,0.5);
                 > .panel-body
                 {
                     font-size: 2.5em;
-                    padding: 5px 15px 15px;
+                    padding: ($layoutDimension/2) ($layoutDimension/2 + $layoutDimension) ($layoutDimension/2 + $layoutDimension);
                 }
 
                 > .btn {
@@ -138,7 +139,7 @@ $datePickerDisabledColor: rgba(229,229,229,0.5);
 
         .breadcrumb-title-prefix
         {
-            margin-right: 8px;
+            margin-right: ($layoutDimension - 2);
             opacity: 0.5;
         }
 
@@ -159,21 +160,21 @@ $datePickerDisabledColor: rgba(229,229,229,0.5);
     {
         @include block-ui;
         @include shadow;
-        padding-bottom: 150px;
+        padding-bottom: ($layoutDimension * 15);
         // Offset Height of reports container block element
-        top: 90px;
-        width: 300px;
+        top: ($layoutDimension * 9);
+        width: ($layoutDimension * 30);
 
         > .filter-selected-wrapper
         {
-            min-height: 100px;
+            min-height: ($layoutDimension * 10);
 
             > .filter-selected-ui
             {
                 &.filter-selected-ui--placeholder
                 {
                     font-size: $LabelFontSize;
-                    min-height: 80px;
+                    min-height: ($layoutDimension * 8);
                     opacity: 0.5;
                     width: 100%;
                 }
@@ -187,7 +188,7 @@ $datePickerDisabledColor: rgba(229,229,229,0.5);
                     cursor: pointer;
                     position: absolute;
                     top: -9px;
-                    right: -10px;
+                    right: -$layoutDimension;
                 }
             }
         }
@@ -195,7 +196,7 @@ $datePickerDisabledColor: rgba(229,229,229,0.5);
         .btn-theme--primary
         {
             color: $whiteColor;
-            margin-right: 10px;
+            margin-right: $layoutDimension;
         }
     }
     .notification-wrapper
@@ -219,23 +220,33 @@ $datePickerDisabledColor: rgba(229,229,229,0.5);
             margin-top: ($uiComponentHeight - 4);
         }
     }
+    .language-change-wrapper
+    {
+        .dropdown-toggle
+        {
+            .caret
+            {
+                margin: 0 0 0 ($layoutDimension/2);
+            }
+        }
+    }
 
     /*****Specific margin classes*****/
     .perf-panel-heading-wrapper
     {
-        margin: 5px 20px;
+        margin: ($layoutDimension/2) ($layoutDimension*2);
     }
     .perf-panel-wrapper
     {
-        margin: 10px 20px 20px;
+        margin: $layoutDimension ($layoutDimension*2) ($layoutDimension*2);
     }
     .table-heading-wrapper
     {
-        margin: 0 20px 10px;
+        margin: 0 ($layoutDimension*2) $layoutDimension;
     }
     .table-reports-wrapper
     {
-        margin: 0 20px;
+        margin: 0 ($layoutDimension*2);
     }
 
     .controlAdpushupWrap
@@ -308,18 +319,18 @@ $datePickerDisabledColor: rgba(229,229,229,0.5);
                 background: $primaryColor;
                 border-radius: 100%;
                 content: '';
-                height: 10px;
+                height: $layoutDimension;
                 position: absolute;
-                top: -5px;
-                right: -5px;
-                width: 10px;
+                top: -($layoutDimension/2);
+                right: -($layoutDimension/2);
+                width: $layoutDimension;
             }
         }
         &.btn--with-icon
         {
             > .fa
             {
-                 margin-left: 5px;
+                 margin-left: ($layoutDimension/2);
             }
         }
         &.btn--transparent,
@@ -379,8 +390,8 @@ $datePickerDisabledColor: rgba(229,229,229,0.5);
         display: inline-block;
         font-size: $fourteenPxAlias;
         height: auto;
-        margin: 0 15px 10px 0;
-        padding: 10px;
+        margin: 0 ($layoutDimension + $layoutDimension/2) $layoutDimension 0;
+        padding: $layoutDimension;
         position: relative;
         width: auto;
     }
