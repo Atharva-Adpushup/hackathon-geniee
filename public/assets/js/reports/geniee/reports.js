@@ -10,7 +10,8 @@
         this.languageCode = w.adpushup.reports.languageCode;
         this.constants = w.adpushup.reports.constants;
         this.languageConfig = {
-            support: ['en', 'ja']
+            support: ['en', 'ja'],
+            current: ''
         };
         this.errorConfig = {
             text: {
@@ -432,7 +433,7 @@
     }
 
     ReportClass.prototype.loadReportsWithInitialData = function() {
-        var paramConfig = this.paramConfig,
+        var paramConfig = $.extend(true, {}, this.paramConfig, {languageCode: this.languageConfig.current}),
             $filterResetBtn = $('.js-filter-reset');
 
         $filterResetBtn.button('loading');
@@ -498,11 +499,11 @@
             filterData = Object.keys(this.filterData.date),
             isDateFilterData = !!filterData.length,
             $btn = $(e.target),
-            paramConfig = this.paramConfig,
+            paramConfig = $.extend(true, {}, this.paramConfig, {languageCode: this.languageConfig.current}),
             self = this;
 
         if (isLabelElem && isDateFilterData) {
-            paramConfig = $.extend(true, {}, this.filterData.paramConfig);
+            paramConfig = $.extend(true, {}, this.filterData.paramConfig, {languageCode: this.languageConfig.current});
             this.prependResetReportsBtn();
             $btn.button('loading');
 
@@ -554,6 +555,7 @@
                 languageText = $linkEl.text();
 
             self.$languageChangeButton.contents().first().replaceWith(languageText);
+            self.languageConfig.current = languageCode;
             self.updateLocation(languageCode);
         });
     };
@@ -570,6 +572,8 @@
                 
                 if (this.languageConfig.support.indexOf(languageCode) > -1) {
                     selectedText = $('[data-languageCode='+ languageCode +']').text();
+
+                    this.languageConfig.current = languageCode;
                     this.$languageChangeButton.contents().first().replaceWith(selectedText);
                 }
             }

@@ -127,7 +127,7 @@ router
 			dateFrom: ((req.query && req.query.dateFrom) || moment().subtract(7, 'days').format('YYYY-MM-DD')),
 			dateTo: ((req.query && req.query.dateTo) || moment().subtract(1, 'days').format('YYYY-MM-DD'))
 		},
-		localeCode = utils.getLanguageLocale(languageMapping, req.locale),
+		localeCode = (req.query.languageCode || req.query.localeCode) || utils.getLanguageLocale(languageMapping, req.locale),
 		isLocaleCode = !!(localeCode),
 		isLocaleCodeSupported = !!(isLocaleCode && (languageCodeSupport.indexOf(localeCode) > -1));
 
