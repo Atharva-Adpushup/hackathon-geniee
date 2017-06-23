@@ -603,6 +603,7 @@
 
         self.toggleSlideoutMenu();
         self.disableFilterApplyBtn();
+        self.$slideoutMenu.removeClass('hide');
     }
 
     ReportClass.prototype.triggerFilterBtnClick = function() {
