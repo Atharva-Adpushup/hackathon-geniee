@@ -158,7 +158,7 @@ const mapping = {
 	ja: {
 		NOTIFICATION_ALERT: {
 			DATA_DISCREPANCY: {
-				PAGEVIEWS: 'メンテナンスにより、現在レポートが正常に反映されない可能性がございます。このメッセージはデータが正常に稼働するようになり次第消えます。'
+				PAGEVIEWS: 'メンテナンスにより、現在レポートが正常に反映されない可能性がございます。'
 			}
 		},
 		HEADER: {
@@ -177,24 +177,24 @@ const mapping = {
 		METRIC_THUMBNAILS: {
 			TITLE: 'パフォーマンス',
 			REVENUE: {
-				NAME: '収益',
-				TOOLTIP_TEXT: 'これはAdpushupにより配信された分の推定広告収益です。'
+				NAME: '売上',
+				TOOLTIP_TEXT: 'Adpushupにより配信された分の推定広告収益です。'
 			},
 			PAGE_VIEWS: {
-				NAME: 'ページビュー',
-				TOOLTIP_TEXT: 'これは、Adpushupタグが設置されたページが読み込まれた回数です。広告の枚数とは関係なく計測されます。'
+				NAME: 'PV',
+				TOOLTIP_TEXT: 'Adpushupタグが設置されたページが読み込まれた回数です。広告枠の数とは関係なく計測されます。'
 			},
 			CLICKS: {
-				NAME: 'クリック',
+				NAME: 'CLICK',
 				TOOLTIP_TEXT: 'Adpushup経由で配信された広告がクリックされた回数です。'
 			},
 			PAGE_RPM: {
-				NAME: 'ページRPM',
-				TOOLTIP_TEXT: 'これは、1,000ページビューあたりの収益です。'
+				NAME: 'PAGE RPM',
+				TOOLTIP_TEXT: '1,000PVあたりの収益です。'
 			},
 			PAGE_CTR: {
-				NAME: 'ページのクリック率',
-				TOOLTIP_TEXT: 'これは、ページビュー数に対する広告クリック数の割合です。'
+				NAME: 'PAGE CTR',
+				TOOLTIP_TEXT: 'PV数に対する広告クリック数の割合です。'
 			}
 		},
 		HIGHCHARTS: {
@@ -203,30 +203,30 @@ const mapping = {
 			}
 		},
 		DATA_TABLE: {
-			TITLE: 'ページグループ',
+			TITLE: 'Page Groups',
 			PAGE_GROUPS: {
-				NAME: 'ページグループ',
-				TOOLTIP_TEXT: 'ページグループ毎のレポートを表示',
+				NAME: 'Page Groups',
+				TOOLTIP_TEXT: 'Page Group毎のレポートを表示',
 				HEADER: {
-					PLATFORM: 'プラットフォーム',
-					VARIATION_COUNT: '数多くのバリエーション'
+					PLATFORM: 'デバイス',
+					VARIATION_COUNT: 'バリエーション数'
 				}
 			},
 			VARIATIONS: {
 				NAME: 'バリエーション',
 				HEADER: {
-					TRAFFIC_DISTRIBUTION: '交通流通',
-					REVENUE_CONTRIBUTION: '収益貢献 (%)'
+					TRAFFIC_DISTRIBUTION: '配信比率',
+					REVENUE_CONTRIBUTION: '売上比率 (%)'
 				}
 			},
 			COMMON: {
 				NAME: '名',
-				REVENUE: '収益 (¥)',
-				IMPRESSIONS: '印象',
-				PAGE_VIEWS: 'ページビュー',
-				CLICKS: 'クリック',
-				PAGE_RPM: 'ページRPM',
-				PAGE_CTR: 'ページのクリック率',
+				REVENUE: '売上 (¥)',
+				IMPRESSIONS: 'IMP',
+				PAGE_VIEWS: 'PV',
+				CLICKS: 'CLICK',
+				PAGE_RPM: 'PAGE RPM',
+				PAGE_CTR: 'PAGE CTR',
 				TOTAL: '合計'
 			},
 			TABLE: {
@@ -255,7 +255,7 @@ const mapping = {
 			}
 		},
 		PAGE_LOADER: {
-			TITLE: 'レポートを取得中...',
+			TITLE: 'レポート取得中...',
 			BUTTON_FILTER: 'フィルタの変更',
 			BUTTON_RESET_FILTER: 'フィルタをリセットする'
 		},
@@ -263,13 +263,13 @@ const mapping = {
 			COMPONENTS: {
 				SELECTED: {
 					NAME: '絞り込み',
-					UI_PLACEHOLDER_TEXT: '表示するフィルタがありません。'
+					UI_PLACEHOLDER_TEXT: '絞り込みなし'
 				},
 				FILTERS: {
 					DATE: {
-						NAME: '日付',
+						NAME: '期間',
 						RELATIVE: {
-							NAME: '簡易選択',
+							NAME: '期間選択',
 							OPTIONS: {
 								WEEK_THIS: '今週',
 								MONTH_THIS: '今月',
@@ -285,11 +285,11 @@ const mapping = {
 							NAME: '日付から選択',
 							INPUT_FROM: {
 								NAME: '開始日',
-								PLACEHOLDER_TEXT: '例）01/01/2017'
+								PLACEHOLDER_TEXT: '例）2017-01-01'
 							},
 							INPUT_TO: {
 								NAME: '終了日',
-								PLACEHOLDER_TEXT: '例）31/01/2017'
+								PLACEHOLDER_TEXT: '例）2017-01-31'
 							}
 						}
 					}
@@ -297,7 +297,7 @@ const mapping = {
 				BUTTON_ACTION: {
 					APPLY: {
 						NAME: '適用',
-						LOADING_TEXT: '申請中...'
+						LOADING_TEXT: '適用中...'
 					},
 					RESET: {
 						NAME: 'リセット',
@@ -307,8 +307,8 @@ const mapping = {
 			}
 		},
 		ERROR: {
-			REPORT_EXCEPTION: '一時的にレポートを取得できません。<br>あとでもう一度お試しください。',
-			REPORT_DATA_NOT_AVAILABLE: '現在データを分析しています。<br>レポートは間もなく利用可能になります。'
+			REPORT_EXCEPTION: '一時的にレポートを取得できません。<br> 時間をおいてもう一度お試しください。',
+			REPORT_DATA_NOT_AVAILABLE: '現在データを分析しています。<br> しばらくお待ちください'
 		}
 	},
 	vi: {}
