@@ -35,12 +35,14 @@ function init(adp, onPageGroupPush, platform) {
 	};
 
 	// PageGroup via URL pattern implementation. This must run before we merge tempConfig with config as priority of pageGroupPattern is high then config.
-	var done, w = window, 
-		platformExperiments = config.experiment[platform],
-		experimentPageGroups = Object.keys(platformExperiments);
-	if (experimentPageGroups.length) {
+	var done, w = window,
+		isPlatformExperiment = !!(config.experiment[platform]),
+		platformExperiments = isPlatformExperiment ? config.experiment[platform] : false,
+		experimentPageGroups = isPlatformExperiment ? Object.keys(platformExperiments) : [],
+		isExperimentPageGroups = !!(experimentPageGroups && experimentPageGroups.length);
 
-		for(var i = 0; i < experimentPageGroups.length; i ++) {
+	if (isExperimentPageGroups) {
+		for (var i = 0; i < experimentPageGroups.length; i++) {
 			var key = experimentPageGroups[i],
 				patternToMatch = platformExperiments[key].pageGroupPattern;
 
