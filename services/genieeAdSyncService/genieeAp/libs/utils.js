@@ -185,9 +185,14 @@ module.exports = {
 	},
 	queryParams: (function() {
 		var str = window.location.search, objURL = {};
+
 		str.replace(new RegExp('([^?=&]+)(=([^&]*))?', 'g'), function($0, $1, $2, $3) {
-			objURL[$1] = window.decodeURIComponent($3.replace(/\+/g, ' '));
+			var queryStringKey = $1 || '',
+				queryStringValue = $3 || '';
+
+			objURL[queryStringKey] = window.decodeURIComponent(queryStringValue.replace(/\+/g, ' '));
 		});
+
 		return objURL;
 	})()
 };
