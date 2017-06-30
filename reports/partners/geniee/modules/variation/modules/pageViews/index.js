@@ -54,17 +54,21 @@ module.exports = {
 			fileLogger.info('/*****Variation daywise pageViews config*****/');
 			fileLogger.info(dayWisePageViewsConfig);
 
+			function getPageViewObject(pageViews) {
+				var date = moment(object.dateFrom, 'x').format('YYYY-MM-DD'),
+					result = {};
+
+				result[date] = pageViews;
+				return result;
+			}
+
 			//return pageViewsModule.getTotalCount(dayWisePageViewsConfig)
 			return keenIOPageViewsModule.getPageViews(dayWisePageViewsConfig)
-				.then(function(pageViews) {
-					var date = moment(object.dateFrom, 'x').format('YYYY-MM-DD'),
-						result = {};
-
-					result[date] = pageViews;
-					return result;
-				})
+				.then(getPageViewObject)
 				.catch(function() {
-					return false;
+					var defaultPageView = 0;
+
+					return getPageViewObject(defaultPageView);
 				});
 		}))
 		.then(function(pageViewsCollection) {
