@@ -41,8 +41,8 @@ module.exports = {
 			var dayWisePageViewsConfig = {
 				mode: 1,
 				siteId: config.siteId,
-				startDate: object.dateFrom,
-				endDate: moment(object.dateTo).add(1, 'days').format('YYYY-MM-DD'),
+				startDate: moment(object.dateFrom, 'x').format('YYYY-MM-DD'),
+				endDate: moment(object.dateTo, 'x').add(1, 'days').format('YYYY-MM-DD'),
 				variationKey: variation.id,
 				platform: pageGroup.device,
 				pageGroup: pageGroup.pageGroup,
