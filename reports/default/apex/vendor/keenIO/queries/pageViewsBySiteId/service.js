@@ -8,7 +8,7 @@ module.exports = {
 		const parsedUrl = URL(decodedUrl, true);
 		const queryObj = Object.assign({}, parsedUrl.query);
 
-		queryObj.filters = queryObj.filters.replace('__mode__', dataConfig.mode).replace('__siteId__', dataConfig.siteId);
+		queryObj.filters = queryObj.filters.replace('__mode__', dataConfig.mode).replace('__siteId__', dataConfig.siteId).replace('__variationId__', dataConfig.variationId).replace('__platform__', dataConfig.platform);
 		queryObj.timeframe = queryObj.timeframe.replace('__startDate__', dataConfig.startDate).replace('__endDate__', dataConfig.endDate);
 		parsedUrl.set('query', queryObj);
 
