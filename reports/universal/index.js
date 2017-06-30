@@ -82,10 +82,15 @@ module.exports = {
 			// This date is chosen as startDate to get data parameters (page views, clicks etc) for every site
 			// from its day one
 			startDate = "20161201",
+			// NOTE: 'keenIODate', A date on which Keen IO page views integration was 
+			// made live in production. This date has been temporarily chosen as Geniee Reports 'dateFrom'
+			// till SQL reporting is not production ready
+			keenIODate = "20170601",
+			computedStartDate = isGenieePartner ? keenIODate : startDate,
 			paramConfig = {
 				siteId: site.get('siteId'),
 				mediaId: site.get('genieeMediaId'),
-				dateFrom: (inputStartDate) ? moment(inputStartDate).format('YYYY-MM-DD') : moment(startDate).format('YYYY-MM-DD'),
+				dateFrom: (inputStartDate) ? moment(inputStartDate).format('YYYY-MM-DD') : moment(computedStartDate).format('YYYY-MM-DD'),
 				dateTo: (inputEndDate) ? moment(inputEndDate).format('YYYY-MM-DD') : moment().subtract(1, 'days').format('YYYY-MM-DD')
 			},
 			flags = {

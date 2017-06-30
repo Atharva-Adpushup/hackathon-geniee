@@ -54,6 +54,7 @@
     "serve-favicon": "~2.3.0",
     "simple-jade-parser": "0.0.4",
     "socket.io": "^1.4.5",
+    "url-parse": "^1.1.9",
     "uuid": "^2.0.3",
     "validator": "^4.8.0",
     "woodlot": "^3.0.1"

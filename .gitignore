@@ -20,7 +20,6 @@ composer.phar
 composer.lock
 config.urls.php
 application/
-vendor/
 services/apexService/ap/build/
 services/apexService/ap/dist/
 log/access-Invalid date.log
