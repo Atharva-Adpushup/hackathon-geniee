@@ -25,7 +25,7 @@ module.exports = {
 				getOnlyPageViews: true
 			};
 
-		console.log(`getTotalPageViews: Page views count`);
+		console.log(`getTotalPageViews: Page views count for siteId: ${pageViewsReportConfig.siteId}`);
 		console.log(`Date From: ${pageViewsReportConfig.startDate}, Date To: ${pageViewsReportConfig.endDate}`);
 
 		fileLogger.info('/*****Variation total pageViews config*****/');
