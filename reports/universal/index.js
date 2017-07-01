@@ -2,6 +2,7 @@ var moment = require('moment'),
 	CC = require('../../configs/commonConsts'),
 	extend = require('extend'),
 	Promise = require('bluebird'),
+	lodash = require('lodash'),
 	AdPushupError = require('../../helpers/AdPushupError'),
 	genieeReportService = require('../partners/geniee/service'),
 	apexVariationReportService = require('../default/apex/service');
@@ -42,9 +43,28 @@ function getGenieeReportData(paramConfig) {
 	var statusObj = {
 		status: null,
 		data: null
-	};
+	},
+	isDisableConfig = !!(paramConfig.disableConfig && lodash.isObject(paramConfig.disableConfig) && Object.keys(paramConfig.disableConfig).length),
+	isGenieeDisableConfig = !!(isDisableConfig && paramConfig.disableConfig.geniee),
+	parameterConfig;
 
-	return genieeReportService.getReport(paramConfig).then(function(reportData) {
+	if (isGenieeDisableConfig) {
+		delete paramConfig.disableConfig;
+		parameterConfig = extend(true, paramConfig, {
+			// 'disableConfig', this config will return a minimalistic and light weight version
+			// of Geniee Reports. Report data will have default/empty values for modules which are
+			// passed inside this config.
+			disableConfig: {
+				isDayWisePageViews: true,
+				isHighCharts: true,
+				isDataTable: true
+			}
+		});
+	} else {
+		parameterConfig = extend(true, {}, paramConfig);
+	}
+
+	return genieeReportService.getReport(parameterConfig).then(function(reportData) {
 		statusObj.status = 1;
 		statusObj.data = extend(true, {}, reportData);
 		
@@ -74,7 +94,7 @@ function getComputedConfig(flags, paramConfig) {
 }
 
 module.exports = {
-	getReportData: function(site, inputStartDate, inputEndDate) {
+	getReportData: function(site, inputStartDate, inputEndDate, disableConfig) {
         // return Promise.resolve();
 		var isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 			isGenieePartner = (!!(site.get('partner') && (site.get('partner') === CC.partners.geniee.name) && site.get('genieeMediaId') && isAutoOptimise)),
@@ -90,6 +110,7 @@ module.exports = {
 			paramConfig = {
 				siteId: site.get('siteId'),
 				mediaId: site.get('genieeMediaId'),
+				disableConfig: disableConfig,
 				dateFrom: (inputStartDate) ? moment(inputStartDate).format('YYYY-MM-DD') : moment(computedStartDate).format('YYYY-MM-DD'),
 				dateTo: (inputEndDate) ? moment(inputEndDate).format('YYYY-MM-DD') : moment().subtract(1, 'days').format('YYYY-MM-DD')
 			},

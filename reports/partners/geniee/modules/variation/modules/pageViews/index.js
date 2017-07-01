@@ -49,7 +49,9 @@ module.exports = {
 				reportType: 'apex',
 				step: '1d',
 				getOnlyPageViews: true
-			};
+			},
+			isDisableConfig = !!(config.disableConfig && lodash.isObject(config.disableConfig) && Object.keys(config.disableConfig).length),
+			isDisableDayWisePageViews = !!(isDisableConfig && config.disableConfig.isDayWisePageViews);
 
 			fileLogger.info('/*****Variation daywise pageViews config*****/');
 			fileLogger.info(dayWisePageViewsConfig);
@@ -62,14 +64,22 @@ module.exports = {
 				return result;
 			}
 
+			function getDefaultPageViewObject() {
+				var defaultPageView = 0;
+
+				return getPageViewObject(defaultPageView);
+			}
+
+			// This check ensures that a default pageView value (0) is returned
+			// for all day wise pageViews if this module exists in disable config
+			if (isDisableDayWisePageViews) {
+				return Promise.resolve(getDefaultPageViewObject());
+			}
+
 			//return pageViewsModule.getTotalCount(dayWisePageViewsConfig)
 			return keenIOPageViewsModule.getPageViews(dayWisePageViewsConfig)
 				.then(getPageViewObject)
-				.catch(function() {
-					var defaultPageView = 0;
-
-					return getPageViewObject(defaultPageView);
-				});
+				.catch(getDefaultPageViewObject);
 		}))
 		.then(function(pageViewsCollection) {
 			return utils.getObjectFromCollection(lodash.compact(pageViewsCollection));

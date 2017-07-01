@@ -534,7 +534,7 @@ router
 
 		return siteModel.getSiteById(siteId)
 			.then(function(site) {
-				return universalReportService.getReportData(site, startDate, endDate)
+				return universalReportService.getReportData(site, startDate, endDate, {geniee: true})
 					.then(function(reportData) {
 						return res.json(reportData);
 					});
