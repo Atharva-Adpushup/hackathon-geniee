@@ -2,22 +2,37 @@ var moment = require('moment'),
 	Promise = require('bluebird'),
 	utils = require('../../../utils/index'),
 	lodash = require('lodash'),
-	pageViewsModule = require('../../../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index'),
-	keenIOPageViewsModule = require('../../../../../../default/apex/vendor/keenIO/queries/pageViewsBySiteId/service');
+	pageViewsModule = require('../../../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index');
 const { fileLogger } = require('../../../../../../../helpers/logger/file/index');
 
 module.exports = {
 	// Get total page views for any variation
 	getTotalPageViews: function(config, variation, pageGroup) {
-		// 'defaultStartDate', this is a KeenIO specific start date
-		// From this day, KeenIO integration for pageviews went live in production
-		var defaultStartDate = '2017-06-01',
-			pageViewsReportConfig = {
-				mode: 1,
+		var pageViewsReportConfig = {
+			siteId: config.siteId,
+			startDate: (config.dateFrom ? moment(config.dateFrom).startOf('day').valueOf() : moment().subtract(31, 'days').startOf('day').valueOf()),
+			endDate: (config.dateTo ? moment(config.dateTo).endOf('day').valueOf(): moment().subtract(1, 'days').endOf('day').valueOf()),
+			variationKey: variation.id,
+			platform: pageGroup.device,
+			pageGroup: pageGroup.pageGroup,
+			reportType: 'apex',
+			step: '1d',
+			getOnlyPageViews: true
+		};
+
+		fileLogger.info('/*****Variation total pageViews config*****/');
+		fileLogger.info(pageViewsReportConfig);
+		return pageViewsModule.getTotalCount(pageViewsReportConfig);
+	},
+	getDayWisePageViews: function(config, variation, pageGroup) {
+		var timeStampCollection = utils.getDayWiseTimestamps(config.dateFrom, config.dateTo).collection;
+
+		return Promise.all(timeStampCollection.map(function(object) {
+			var dayWisePageViewsConfig = {
 				siteId: config.siteId,
-				startDate: (config.dateFrom ? moment(config.dateFrom).format('YYYY-MM-DD') : defaultStartDate),
-				endDate: (config.dateTo ? moment(config.dateTo).add(1, 'days').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD')),
-				variationId: variation.id.replace(/-/g, '_'),
+				startDate: object.dateFrom,
+				endDate: object.dateTo,
+				variationKey: variation.id,
 				platform: pageGroup.device,
 				pageGroup: pageGroup.pageGroup,
 				reportType: 'apex',
@@ -25,61 +40,19 @@ module.exports = {
 				getOnlyPageViews: true
 			};
 
-		console.log(`getTotalPageViews: Page views count for siteId: ${pageViewsReportConfig.siteId}`);
-		console.log(`Date From: ${pageViewsReportConfig.startDate}, Date To: ${pageViewsReportConfig.endDate}`);
-
-		fileLogger.info('/*****Variation total pageViews config*****/');
-		fileLogger.info(pageViewsReportConfig);
-
-		return keenIOPageViewsModule.getPageViews(pageViewsReportConfig);
-		//return pageViewsModule.getTotalCount(pageViewsReportConfig);
-	},
-	getDayWisePageViews: function(config, variation, pageGroup) {
-		var timeStampCollection = utils.getDayWiseTimestamps(config.dateFrom, config.dateTo).collection;
-
-		return Promise.all(timeStampCollection.map(function(object) {
-			var dayWisePageViewsConfig = {
-				mode: 1,
-				siteId: config.siteId,
-				startDate: moment(object.dateFrom, 'x').format('YYYY-MM-DD'),
-				endDate: moment(object.dateTo, 'x').add(1, 'days').format('YYYY-MM-DD'),
-				variationId: variation.id.replace(/-/g, '_'),
-				platform: pageGroup.device,
-				pageGroup: pageGroup.pageGroup,
-				reportType: 'apex',
-				step: '1d',
-				getOnlyPageViews: true
-			},
-			isDisableConfig = !!(config.disableConfig && lodash.isObject(config.disableConfig) && Object.keys(config.disableConfig).length),
-			isDisableDayWisePageViews = !!(isDisableConfig && config.disableConfig.isDayWisePageViews);
-
 			fileLogger.info('/*****Variation daywise pageViews config*****/');
 			fileLogger.info(dayWisePageViewsConfig);
+			return pageViewsModule.getTotalCount(dayWisePageViewsConfig)
+				.then(function(pageViews) {
+					var date = moment(object.dateFrom, 'x').format('YYYY-MM-DD'),
+						result = {};
 
-			function getPageViewObject(pageViews) {
-				var date = moment(object.dateFrom, 'x').format('YYYY-MM-DD'),
-					result = {};
-
-				result[date] = pageViews;
-				return result;
-			}
-
-			function getDefaultPageViewObject() {
-				var defaultPageView = 0;
-
-				return getPageViewObject(defaultPageView);
-			}
-
-			// This check ensures that a default pageView value (0) is returned
-			// for all day wise pageViews if this module exists in disable config
-			if (isDisableDayWisePageViews) {
-				return Promise.resolve(getDefaultPageViewObject());
-			}
-
-			//return pageViewsModule.getTotalCount(dayWisePageViewsConfig)
-			return keenIOPageViewsModule.getPageViews(dayWisePageViewsConfig)
-				.then(getPageViewObject)
-				.catch(getDefaultPageViewObject);
+					result[date] = pageViews;
+					return result;
+				})
+				.catch(function() {
+					return false;
+				});
 		}))
 		.then(function(pageViewsCollection) {
 			return utils.getObjectFromCollection(lodash.compact(pageViewsCollection));

@@ -163,7 +163,7 @@ module.exports = function (site) {
         getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
         getUncompressedJsFile = fs.readFileAsync(uncompressedJsTplPath, 'utf8'),
         getComputedConfig = Promise.resolve(true).then(function() {
-            return universalReportService.getReportData(site, null, null, {geniee: true})
+            return universalReportService.getReportData(site)
                 .then(function(reportData) {
                     if (!reportData.status && !reportData.data) {
                         return getVariationsPayload(site).then(setAllConfigs);
