@@ -5,6 +5,7 @@ import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
 import LabelWithButton from 'components/shared/labelWithButton.jsx';
 import CodeBox from 'shared/codeBox';
 import requiredIf from 'react-required-if';
+import InlineEdit from 'shared/inlineEdit/index.jsx';
 
 const positions = ['Unknown', 'Header', 'Under the article/column', 'Sidebar', 'Footer'];
 
@@ -18,7 +19,8 @@ class sectionOptions extends React.Component {
 		this.onFirstFoldChange = this.onFirstFoldChange.bind(this);
 		this.toggleCustomAdCode = this.toggleCustomAdCode.bind(this);
 		this.onCustomAdCodeChange = this.onCustomAdCodeChange.bind(this);
-		
+		this.onCustomZoneIdSubmit = this.onCustomZoneIdSubmit.bind(this);
+
 		// Set initial state
 
 		if (!this.props.updateMode) {
@@ -27,20 +29,25 @@ class sectionOptions extends React.Component {
 				isAdInFirstFold: (props.firstFold || false),
 				isAdAsync: true,
 				manageCustomCode: false,
-				customAdCode: ''
+				customAdCode: '',
+				customZoneId: (props.customZoneId || '')
 			};
-		}
-		else {
+		} else {
 			this.state = {
 				position: this.props.partnerData.position,
 				isAdInFirstFold: this.props.partnerData.firstFold,
-				isAdAsync: this.props.partnerData.asyncTag
+				isAdAsync: this.props.partnerData.asyncTag,
+				customZoneId: this.props.partnerData.customZoneId
 			};
 		}
 	}
 
+	onCustomZoneIdSubmit(customZoneId) {
+		this.setState({ customZoneId });
+	}
+
 	onSave() {
-		this.props.onCreateAd(this.state.position, this.state.customAdCode, this.state.isAdInFirstFold, this.state.isAdAsync);
+		this.props.onCreateAd(this.state.position, this.state.customAdCode, this.state.isAdInFirstFold, this.state.isAdAsync, this.state.customZoneId);
 	}
 
 	onChange(position) {
@@ -71,7 +78,7 @@ class sectionOptions extends React.Component {
 		const customAdCodeText = (this.state.customAdCode ? 'Edit' : 'Add'),
 			isAdCreateBtnDisabled = !!((this.state.position !== null) && (typeof this.state.position !== 'undefined')),
 			{ updateMode, updateSettings, sectionId } = this.props,
-			{ position, isAdInFirstFold: firstFold, isAdAsync: asyncTag } = this.state;
+			{ position, isAdInFirstFold: firstFold, isAdAsync: asyncTag, customZoneId } = this.state;
 
 		if (this.state.manageCustomCode) {
 			return (<CodeBox showButtons code={this.state.customAdCode} onSubmit={this.onCustomAdCodeChange} onCancel={this.toggleCustomAdCode} />);
@@ -93,9 +100,10 @@ class sectionOptions extends React.Component {
 				</Row>
 				<CustomToggleSwitch labelText="First fold" className="u-margin-t15px u-margin-b15px" defaultLayout checked={this.state.isAdInFirstFold} name="adInFirstFold" onChange={this.onFirstFoldChange} layout="horizontal" size="m" id="js-ad-in-first-fold" on="Yes" off="No" />
 				<CustomToggleSwitch labelText="Async tag" className="u-margin-t15px u-margin-b15px" disabled defaultLayout checked={this.state.isAdAsync} name="adIsAsync" layout="horizontal" size="m" id="js-ad-is-async" on="Yes" off="No" />
+				<InlineEdit compact font={400} value={customZoneId} submitHandler={this.onCustomZoneIdSubmit} text="Custom Zone Id" errorMessage="Custom zone id cannot be blank" />
 				{
 					updateMode ? (
-						<Button style={{marginBottom: 20}} disabled={!(isAdCreateBtnDisabled)} className="btn-lightBg btn-save btn-block" onClick={updateSettings.bind(null, sectionId, { position, firstFold, asyncTag })}>Update Settings</Button>
+						<Button style={{ marginBottom: 20 }} disabled={!(isAdCreateBtnDisabled)} className="btn-lightBg btn-save btn-block" onClick={updateSettings.bind(null, sectionId, { position, firstFold, asyncTag, customZoneId })}>Update Settings</Button>
 					) : (
 						<div>
 							<LabelWithButton name="customAdCode" className="u-margin-t15px u-margin-b15px" onButtonClick={this.toggleCustomAdCode} labelText="Custom Ad code" layout="horizontal" buttonText={customAdCodeText} />

@@ -53,7 +53,7 @@ class insertMenu extends React.Component {
 		this.setState({ adSize, operation, showExtraOptions: true, activeItem: 0, prevActiveItem: this.state.activeItem });
 	}
 
-	createSectionAndAd(position, adCode, firstFold, asyncTag) {
+	createSectionAndAd(position, adCode, firstFold, asyncTag, customZoneId) {
 		const props = this.props,
 			network = ((props.partner && (props.partner === 'geniee') && !adCode) ? 'geniee' : 'custom'),
 			sectionPayload = {
@@ -61,7 +61,8 @@ class insertMenu extends React.Component {
 				firstFold: (firstFold || false),
 				asyncTag: (asyncTag || false),
 				xpath: this.props.parents[0].xpath,
-				operation: this.state.operation
+				operation: this.state.operation,
+				customZoneId: (customZoneId || '')
 			},
 			adPayload = {
 				adCode,

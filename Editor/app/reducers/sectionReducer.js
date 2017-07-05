@@ -19,7 +19,8 @@ const sectionByIds = (state = {}, action) => {
 					partnerData: {
 						position: payload.position,
 						firstFold: payload.firstFold,
-						asyncTag: payload.asyncTag
+						asyncTag: payload.asyncTag,
+						customZoneId: payload.customZoneId
 					}
 				}
 			};
