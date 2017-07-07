@@ -60,7 +60,7 @@ class variationSectionElement extends Component {
                         ) : ''
                     }
                     <Col className="u-padding-r10px section-name-ie" xs={12}>
-                        <InlineEdit value={props.section.name}
+                        <InlineEdit validate value={props.section.name}
                             submitHandler={props.onRenameSection.bind(null, props.section, props.variation.id)} text="Section Name" errorMessage="Section Name cannot be blank"
                             />
                     </Col>
@@ -76,7 +76,7 @@ class variationSectionElement extends Component {
                         <Row>
                             <Col className="u-padding-r10px" xs={4}>Ad Code</Col>
                             <Col className="u-padding-l10px" xs={8}>
-                                <InlineEdit compact adCode value={props.section.ads[0].adCode}
+                                <InlineEdit compact validate adCode value={props.section.ads[0].adCode}
                                     submitHandler={props.onUpdateAdCode.bind(null, props.section.ads[0].id)} text="Ad Code" errorMessage="Ad Code cannot be blank"
                                     />
                             </Col>
@@ -108,6 +108,7 @@ class variationSectionElement extends Component {
                         <Col className="u-padding-l10px" xs={8}>
                             <InlineEdit
                                 compact
+                                validate
                                 cancelEditHandler={props.onResetErrors.bind(null, props.section.id)}
                                 customError={props.ui.errors.xpath ? props.ui.errors.xpath.error : false}
                                 dropdownList={props.section.allXpaths}

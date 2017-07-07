@@ -8,8 +8,8 @@ const adsByIds = (state = {}, action) => {
 		case sectionActions.CREATE_SECTION:
 		case adActions.CREATE_AD:
 			payload = action.adPayload ? action.adPayload : action.payload;
-			return { ...state,
-				[payload.id]: {
+			// TODO: Make this reducer pure by moving out all below conditional logic in action thunk
+			const createAdObject = {
 					id: payload.id,
 					adCode: payload.adCode,
 					css: payload.css,
@@ -17,6 +17,17 @@ const adsByIds = (state = {}, action) => {
 					width: payload.width,
 					network: payload.network
 				},
+				// Network data object is only added when custom zone id value is added
+				// through Visual Editor
+				isNetworkData = !!(payload.networkData && Object.keys(payload.networkData).length),
+				isZoneId = !!(isNetworkData && payload.networkData.zoneId);
+
+			if (isZoneId) {
+				createAdObject.networkData = { zoneId: payload.networkData.zoneId };
+			}
+
+			return { ...state,
+				[payload.id]: createAdObject
 			};
 
 		case sectionActions.CREATE_INCONTENT_SECTION:
@@ -35,6 +46,19 @@ const adsByIds = (state = {}, action) => {
 
 		case adActions.DELETE_AD:
 			return immutableObjectDelete(state, 'id', action.adId);
+
+		case sectionActions.UPDATE_PARTNER_DATA:
+			// TODO: Make this reducer pure by moving out all below conditional logic in action thunk
+			const isCustomZoneId = !!(action.partnerData && action.partnerData.customZoneId),
+				updateAdObject = _.extend({}, state[action.adId]);
+
+			if (isCustomZoneId) {
+				updateAdObject.networkData = { zoneId: action.partnerData.customZoneId };
+			} else if (updateAdObject.networkData) {
+				delete updateAdObject.networkData;
+			}
+
+			return { ...state, [action.adId]: updateAdObject };
 
 		case adActions.UPDATE_ADCODE:
 			return { ...state, [action.adId]: { ...state[action.adId], adCode: action.adCode } };

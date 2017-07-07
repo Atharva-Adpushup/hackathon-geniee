@@ -77,7 +77,7 @@ class sectionOptions extends React.Component {
 	render() {
 		const customAdCodeText = (this.state.customAdCode ? 'Edit' : 'Add'),
 			isAdCreateBtnDisabled = !!((this.state.position !== null) && (typeof this.state.position !== 'undefined')),
-			{ updateMode, updateSettings, sectionId } = this.props,
+			{ updateMode, updateSettings, sectionId, ad } = this.props,
 			{ position, isAdInFirstFold: firstFold, isAdAsync: asyncTag, customZoneId } = this.state;
 
 		if (this.state.manageCustomCode) {
@@ -100,10 +100,10 @@ class sectionOptions extends React.Component {
 				</Row>
 				<CustomToggleSwitch labelText="First fold" className="u-margin-t15px u-margin-b15px" defaultLayout checked={this.state.isAdInFirstFold} name="adInFirstFold" onChange={this.onFirstFoldChange} layout="horizontal" size="m" id="js-ad-in-first-fold" on="Yes" off="No" />
 				<CustomToggleSwitch labelText="Async tag" className="u-margin-t15px u-margin-b15px" disabled defaultLayout checked={this.state.isAdAsync} name="adIsAsync" layout="horizontal" size="m" id="js-ad-is-async" on="Yes" off="No" />
-				<InlineEdit compact font={400} value={customZoneId} submitHandler={this.onCustomZoneIdSubmit} text="Custom Zone Id" errorMessage="Custom zone id cannot be blank" />
+				<InlineEdit compact validate font={400} value={customZoneId} submitHandler={this.onCustomZoneIdSubmit} text="Custom Zone Id" errorMessage="Custom zone id cannot be blank" />
 				{
 					updateMode ? (
-						<Button style={{ marginBottom: 20 }} disabled={!(isAdCreateBtnDisabled)} className="btn-lightBg btn-save btn-block" onClick={updateSettings.bind(null, sectionId, { position, firstFold, asyncTag, customZoneId })}>Update Settings</Button>
+						<Button style={{ marginBottom: 20 }} disabled={!(isAdCreateBtnDisabled)} className="btn-lightBg btn-save btn-block" onClick={updateSettings.bind(null, sectionId, ad.id, { position, firstFold, asyncTag, customZoneId })}>Update Settings</Button>
 					) : (
 						<div>
 							<LabelWithButton name="customAdCode" className="u-margin-t15px u-margin-b15px" onButtonClick={this.toggleCustomAdCode} labelText="Custom Ad code" layout="horizontal" buttonText={customAdCodeText} />

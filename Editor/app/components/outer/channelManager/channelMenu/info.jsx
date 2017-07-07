@@ -70,7 +70,7 @@ class info extends React.Component {
 						<label>Content Selector</label>
 					</Col>
 					<Col xs={12} className="wrapfeature">
-						<InlineEdit compact font={400} value={channel.contentSelector} submitHandler={onContentSelectorChange.bind(null, channel.id)} text="Content Selector" errorMessage="Content Selector cannot be blank" />
+						<InlineEdit compact validate font={400} value={channel.contentSelector} submitHandler={onContentSelectorChange.bind(null, channel.id)} text="Content Selector" errorMessage="Content Selector cannot be blank" />
 					</Col>
 				</Row>
 				<Row>
@@ -78,7 +78,7 @@ class info extends React.Component {
 						<label>Sample Url</label>
 					</Col>
 					<Col xs={12} className="wrapfeature">
-						<InlineEdit compact font={400} changeHandler={this.onChange.bind(this)} validationError="Sample Url must be from your website only" value={channel.sampleUrl} submitHandler={onSampleUrlChange.bind(null, channel.id)} text="Sample Url" errorMessage="Sample Url cannot be blank" />
+						<InlineEdit compact validate font={400} changeHandler={this.onChange.bind(this)} validationError="Sample Url must be from your website only" value={channel.sampleUrl} submitHandler={onSampleUrlChange.bind(null, channel.id)} text="Sample Url" errorMessage="Sample Url cannot be blank" />
 					</Col>
 				</Row>
 				<Row>

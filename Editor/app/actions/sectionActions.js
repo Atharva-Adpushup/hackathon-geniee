@@ -59,10 +59,11 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			});
 		}
 	},
-	updatePartnerData = (sectionId, partnerData) => {
+	updatePartnerData = (sectionId, adId, partnerData) => {
 		return {
 			type: sectionActions.UPDATE_PARTNER_DATA,
 			sectionId,
+			adId,
 			partnerData
 		};
 	},

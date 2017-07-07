@@ -47,7 +47,7 @@ class InlineEdit extends React.Component {
 	}
 
 	submitValue() {
-		if (!this.refs.editedText.value) {
+		if (!this.refs.editedText.value && this.props.validate) {
 			this.setState({ inputError: true });
 			return;
 		}
@@ -104,6 +104,7 @@ InlineEdit.propTypes = {
 	text: PropTypes.string.isRequired,
 	submitHandler: PropTypes.func.isRequired,
 	errorMessage: PropTypes.string.isRequired,
+	validate: PropTypes.bool,
 	value: PropTypes.string.isRequired,
 	compact: PropTypes.bool,
 	font: PropTypes.number,

@@ -70,6 +70,8 @@ class insertMenu extends React.Component {
 				height: this.state.adSize.height,
 				width: this.state.adSize.width
 			};
+
+		customZoneId ? adPayload.networkData = { zoneId: customZoneId } : null;
 		this.props.createSectionAndAd(sectionPayload, adPayload, this.props.variationId);
 	}
 

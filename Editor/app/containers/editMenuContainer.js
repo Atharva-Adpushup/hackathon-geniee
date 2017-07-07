@@ -14,8 +14,8 @@ const mapStateToProps = (state) => {
 		hideMenu: () => {
 			dispatch(hideMenu());
 		},
-		updateSettings: (sectionId, partnerData) => {
-			dispatch(updatePartnerData(sectionId, partnerData));
+		updateSettings: (sectionId, adId, partnerData) => {
+			dispatch(updatePartnerData(sectionId, adId, partnerData));
 		}
 	});
 
