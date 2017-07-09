@@ -222,14 +222,25 @@ var consts = require('../configs/commonConsts'),
 			_.forEach(intersectedKeys, function(intersectedKey) {
 				var existingDataObj = existingData[intersectedKey],
 					newDataObj = newData[intersectedKey],
-					allIteratableKeys = _.union(Object.keys(existingDataObj), Object.keys(newDataObj));
+					allIteratableKeys = _.union(Object.keys(existingDataObj), Object.keys(newDataObj)),
+					isSchema, isSchemaKeyHasProperty, isSchemaClassMapHasProperty, isClassMapHasProperty,
+					isPropertySupportDeepExtend, isPropertyNonExistent;
 
 				_.forEach(allIteratableKeys, function(propertyKey) {
-					if (!schema && (self.mergeObjectViaDeepExtendArr.indexOf(propertyKey) > -1)) {
+					isSchema = !!(schema && _.isObject(schema) && schema.keys);
+					isSchemaKeyHasProperty = !!(isSchema && (schema.keys.indexOf(propertyKey) > -1));
+					isSchemaClassMapHasProperty = !!(isSchema && schema.classMap && schema.classMap[propertyKey]);
+					isPropertySupportDeepExtend = !!(isSchemaKeyHasProperty && (self.mergeObjectViaDeepExtendArr.indexOf(propertyKey) > -1));
+					isPropertyNonExistent = !!(existingDataObj[propertyKey] && !newDataObj[propertyKey]);
+					isClassMapHasProperty = !!(self.classMap && self.classMap[propertyKey]);
+
+					if (isPropertySupportDeepExtend) {
 						computedData[intersectedKey][propertyKey] = self.extendObject(existingDataObj[propertyKey], newDataObj[propertyKey]);
-					} else if (schema && schema.classMap && schema.classMap[propertyKey]) {
+					} else if (isClassMapHasProperty) {
+						computedData[intersectedKey][propertyKey] = self.mergeObjectViaClassMap(existingDataObj[propertyKey], newDataObj[propertyKey], self.classMap[propertyKey]);
+					} else if (isSchemaClassMapHasProperty) {
 						computedData[intersectedKey][propertyKey] = self.mergeObjectsRecursively(existingDataObj[propertyKey], newDataObj[propertyKey], schema.classMap[propertyKey]);
-					} else if (existingDataObj[propertyKey] && !newDataObj[propertyKey]) {
+					} else if (isPropertyNonExistent) {
 						computedData[intersectedKey][propertyKey] = existingDataObj[propertyKey];
 					}
 				});

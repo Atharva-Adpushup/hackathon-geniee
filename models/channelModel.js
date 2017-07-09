@@ -4,6 +4,7 @@ var model = require('../helpers/model'),
 	couchbase = require('../helpers/couchBaseService'),
 	siteModel = require('../models/siteModel'),
 	variationModel = require('./subClasses/channel/variation'),
+	networkDataModel = require('./subClasses/channel/networkData'),
 	_ = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	schema = require('../helpers/schema'),
@@ -38,7 +39,7 @@ var model = require('../helpers/model'),
 		this.validations = {
 			'required': []
 		};
-		this.classMap = { 'variations': variationModel };
+		this.classMap = { 'variations': variationModel, 'networkData': networkDataModel };
 		this.defaults = { variations: {}, contentSelector: '', activeVariation: '' };
 		this.constructor = function (data, cas) {
 			if (!(data.siteId && data.platform && data.pageGroup)) {
