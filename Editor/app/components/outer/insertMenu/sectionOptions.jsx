@@ -43,7 +43,7 @@ class sectionOptions extends React.Component {
 	}
 
 	onCustomZoneIdSubmit(customZoneId) {
-		this.setState({ customZoneId });
+		this.setState({ customZoneId: parseInt(customZoneId, 10) });
 	}
 
 	onSave() {
@@ -100,7 +100,7 @@ class sectionOptions extends React.Component {
 				</Row>
 				<CustomToggleSwitch labelText="First fold" className="u-margin-t15px u-margin-b15px" defaultLayout checked={this.state.isAdInFirstFold} name="adInFirstFold" onChange={this.onFirstFoldChange} layout="horizontal" size="m" id="js-ad-in-first-fold" on="Yes" off="No" />
 				<CustomToggleSwitch labelText="Async tag" className="u-margin-t15px u-margin-b15px" disabled defaultLayout checked={this.state.isAdAsync} name="adIsAsync" layout="horizontal" size="m" id="js-ad-is-async" on="Yes" off="No" />
-				<InlineEdit rootClassNames="u-margin-b15px" compact validate font={400} value={customZoneId} submitHandler={this.onCustomZoneIdSubmit} text="Custom Zone Id" errorMessage="Custom zone id cannot be blank" />
+				<InlineEdit rootClassNames="u-margin-b15px" type="number" compact validate font={400} value={customZoneId} submitHandler={this.onCustomZoneIdSubmit} text="Custom Zone Id" errorMessage="Custom zone id cannot be blank" />
 				{
 					updateMode ? (
 						<Button style={{ marginBottom: 20 }} disabled={!(isAdCreateBtnDisabled)} className="btn-lightBg btn-save btn-block" onClick={updateSettings.bind(null, sectionId, ad.id, { position, firstFold, asyncTag, customZoneId })}>Update Settings</Button>

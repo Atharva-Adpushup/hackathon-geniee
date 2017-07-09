@@ -117,7 +117,8 @@ InlineEdit.propTypes = {
 	keyUpHandler: PropTypes.func,
 	customError: PropTypes.bool,
 	cancelEditHandler: PropTypes.func,
-	rootClassNames: PropTypes.string
+	rootClassNames: PropTypes.string,
+	type: PropTypes.string
 };
 
 InlineEdit.defaultProps = {
