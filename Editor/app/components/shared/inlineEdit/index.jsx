@@ -94,9 +94,10 @@ class InlineEdit extends React.Component {
 			adCodeEdit = {
 				verticalAlign: 'super'
 			},
-			adCodeCheck = this.props.adCode ? (!this.props.value ? '' : atob(this.props.value)) : this.props.value;
+			adCodeCheck = this.props.adCode ? (!this.props.value ? '' : atob(this.props.value)) : this.props.value,
+			rootClassNames = this.props.rootClassNames || '';
 
-		return renderInlineEditPanel(this, colCompact, adCodeStyles, adCodeEdit, adCodeCheck);
+		return renderInlineEditPanel(this, colCompact, adCodeStyles, adCodeEdit, adCodeCheck, rootClassNames);
 	}
 }
 
@@ -115,7 +116,8 @@ InlineEdit.propTypes = {
 	dropdownList: PropTypes.array,
 	keyUpHandler: PropTypes.func,
 	customError: PropTypes.bool,
-	cancelEditHandler: PropTypes.func
+	cancelEditHandler: PropTypes.func,
+	rootClassNames: PropTypes.string
 };
 
 InlineEdit.defaultProps = {

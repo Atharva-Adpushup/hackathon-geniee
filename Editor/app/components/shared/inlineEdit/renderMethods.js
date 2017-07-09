@@ -29,10 +29,10 @@ const renderDropdownList = that => {
 				)
 		);
 	},
-	renderNormalMode = (that, adCodeStyles, adCodeEdit) => {
+	renderNormalMode = (that, adCodeStyles, adCodeEdit, rootClassNames) => {
 		const valueStyle = { fontWeight: that.props.font ? that.props.font : 700, wordBreak: 'break-all' };
 		return (
-			<div>
+			<div className={rootClassNames}>
 				<strong style={valueStyle}>{
 					that.props.value ? (
 						<span style={that.props.adCode ? adCodeStyles : {}}> {that.props.adCode ? atob(that.props.value) : that.props.value} </span>
@@ -48,7 +48,7 @@ const renderDropdownList = that => {
 			</div>
 		);
 	},
-	renderInlineEditPanel = (that, colCompact, adCodeStyles, adCodeEdit, adCodeCheck) => {
+	renderInlineEditPanel = (that, colCompact, adCodeStyles, adCodeEdit, adCodeCheck, rootClassNames) => {
 		const inlineInputStyles = {
 			width: '100%',
     		padding: '3.5px 10px',
@@ -57,7 +57,7 @@ const renderDropdownList = that => {
 		};
 
 		return (
-			<div>
+			<div className={rootClassNames}>
 				{
 					that.state.editMode ? (
 						<Row style={{ margin: 0 }}>
@@ -80,7 +80,7 @@ const renderDropdownList = that => {
 							}
 						</Row>
 					) : (
-							that.renderNormalMode(adCodeStyles, adCodeEdit)
+							that.renderNormalMode(adCodeStyles, adCodeEdit, rootClassNames)
 						)
 				}
 			</div>
