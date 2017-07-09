@@ -16,7 +16,11 @@ module.exports = {
         var unsyncedZones = [];
         _.each(variationSections, function (section, sectionId) {
             _.each(section.ads, function (ad) {
-                if (ad.network === 'geniee' && !ad.networkData && !ad.adCode) {
+                var isSectionPartnerData = !!(section && section.partnerData),
+                    isCustomZoneIdData = !!(isSectionPartnerData && section.partnerData.customZoneId),
+                    isValidUnsyncedZone = !!(ad.network === 'geniee' && !ad.networkData && !ad.adCode && !isCustomZoneIdData);
+
+                if (isValidUnsyncedZone) {
                     unsyncedZones.push({
                         zoneName: ad.id, sizeWidth: parseInt(ad.width, 10), sizeHeight: parseInt(ad.height, 10),
                         zoneType: 1, zonePosition: 0, firstView: 1, useFriendlyIFrameFlag: 0
