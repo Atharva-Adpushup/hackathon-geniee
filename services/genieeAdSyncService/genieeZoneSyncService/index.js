@@ -20,9 +20,9 @@ module.exports = {
                     isCustomZoneIdData = !!(isSectionPartnerData && section.partnerData.customZoneId),
                     isValidUnsyncedZone = !!(ad.network === 'geniee' && !ad.networkData && !ad.adCode && !isCustomZoneIdData),
                     partnerData = {
-                        zonePosition: section.partnerData.position,
-                        firstView: Number(section.partnerData.firstFold),
-                        useFriendlyIFrameFlag: Number(section.partnerData.asyncTag)
+                        zonePosition: (isSectionPartnerData ? section.partnerData.position : 0),
+                        firstView: (isSectionPartnerData ? Number(section.partnerData.firstFold) : 1),
+                        useFriendlyIFrameFlag: (isSectionPartnerData ? Number(section.partnerData.asyncTag) : 1)
                     };
 
                 if (isValidUnsyncedZone) {
