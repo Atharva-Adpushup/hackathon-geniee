@@ -18,13 +18,18 @@ module.exports = {
             _.each(section.ads, function (ad) {
                 var isSectionPartnerData = !!(section && section.partnerData),
                     isCustomZoneIdData = !!(isSectionPartnerData && section.partnerData.customZoneId),
-                    isValidUnsyncedZone = !!(ad.network === 'geniee' && !ad.networkData && !ad.adCode && !isCustomZoneIdData);
+                    isValidUnsyncedZone = !!(ad.network === 'geniee' && !ad.networkData && !ad.adCode && !isCustomZoneIdData),
+                    partnerData = {
+                        zonePosition: section.partnerData.position,
+                        firstView: Number(section.partnerData.firstFold),
+                        useFriendlyIFrameFlag: Number(section.partnerData.asyncTag)
+                    };
 
                 if (isValidUnsyncedZone) {
                     unsyncedZones.push({
                         zoneName: ad.id, sizeWidth: parseInt(ad.width, 10), sizeHeight: parseInt(ad.height, 10),
-                        zoneType: 1, zonePosition: 0, firstView: 1, useFriendlyIFrameFlag: 0
-                    })
+                        zoneType: 1, zonePosition: partnerData.zonePosition, firstView: partnerData.firstView, useFriendlyIFrameFlag: partnerData.useFriendlyIFrameFlag
+                    });
                 }
             })
         });
