@@ -43,7 +43,7 @@ class sectionOptions extends React.Component {
 	}
 
 	onCustomZoneIdSubmit(customZoneId) {
-		this.setState({ customZoneId: parseInt(customZoneId, 10) });
+		this.setState({ customZoneId });
 	}
 
 	onSave() {
