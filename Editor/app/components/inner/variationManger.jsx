@@ -19,6 +19,7 @@ class variationManager extends React.Component {
 						variationId={props.id}
 						id={section.id}
 						xpath={section.xpath}
+						partnerData={section.partnerData ? section.partnerData : {}}
 						ads={section.ads}
 						operation={section.operation}
 						onXpathMiss={this.props.onXpathMiss}

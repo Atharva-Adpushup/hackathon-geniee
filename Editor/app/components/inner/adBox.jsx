@@ -23,6 +23,9 @@ const highLighterClass = '_APD_highlighter',
 		width: '100%',
 		pointerEvents: 'none'
 	},
+	renderCustomZoneIdLabel = (customZoneIdStyles, customZoneIdText) => {
+		return (<div className="_AP_customZoneId _ap_reject" style={customZoneIdStyles}>{customZoneIdText}</div>);
+	},
 	AdBox = (props) => {
 		const { id, width, height, css } = props.ad,
 			adBoxSizeContent = (`${width} X ${height}`),
@@ -30,8 +33,15 @@ const highLighterClass = '_APD_highlighter',
 				const $el = $(ev.target),
 					position = Utils.dom.getElementBounds($(ev.target));
 				props.clickHandler(id, position, Utils.ui.getElementSelectorCords($el));
-			};
-
+			},
+			isPartnerData = !!(props.partnerData),
+			isNetworkGeniee = !!(props.ad.network && props.ad.network === 'geniee'),
+			isCustomZoneId = !!(isPartnerData && isNetworkGeniee && props.partnerData.customZoneId),
+			customZoneIdText = (isCustomZoneId) ? 'Zone ID' : '';
+		let customZoneIdStyles = $.extend(true, {}, adBoxSizeStyles, {
+			background: '#3498db',
+			left: '70px'
+		});
 
 		_.each(css, (value, key) => {
 			delete css[key];
@@ -54,6 +64,7 @@ const highLighterClass = '_APD_highlighter',
 					<div className="_AP_adSize _ap_reject" style={adBoxSizeStyles}>
 						{adBoxSizeContent}
 					</div>
+					{ isCustomZoneId ? renderCustomZoneIdLabel(customZoneIdStyles, customZoneIdText) : null }
 				</div>
 			</div>
 		);
@@ -61,7 +72,8 @@ const highLighterClass = '_APD_highlighter',
 
 AdBox.propTypes = {
 	ad: PropTypes.object.isRequired,
-	clickHandler: PropTypes.func.isRequired
+	clickHandler: PropTypes.func.isRequired,
+	partnerData: PropTypes.object
 };
 
 export default AdBox;

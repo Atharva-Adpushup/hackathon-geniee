@@ -85,7 +85,7 @@ class Section extends React.Component {
 		const css = Object.assign({}, { position: 'relative', clear: 'both', pointerEvents: 'none', width: '100%', }, { height: this.getMaxDimensions().clientHeight, width: this.getMaxDimensions().clientWidth }, props.ads[0].css);
 		this.$node.css(css);
 		ReactDOM.render(<div className="_ap_reject">
-			{props.ads.map((ad) => <AdBox key={ad.id} ad={ad} clickHandler={this.props.onAdClick.bind(this, props.variationId, props.id)} />)}
+			{props.ads.map((ad) => <AdBox key={ad.id} ad={ad} partnerData={this.props.partnerData} clickHandler={this.props.onAdClick.bind(this, props.variationId, props.id)} />)}
 		</div>, this.node);
 	}
 
@@ -101,7 +101,8 @@ Section.propTypes = {
 	id: PropTypes.string.isRequired,
 	ads: PropTypes.array.isRequired,
 	onXpathMiss: PropTypes.func.isRequired,
-	onAdClick: PropTypes.func.isRequired
+	onAdClick: PropTypes.func.isRequired,
+	partnerData: PropTypes.object
 };
 
 export default Section;
