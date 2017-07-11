@@ -32,7 +32,12 @@ class variationSectionElement extends Component {
 	}
 
 	render() {
-		const props = this.props;
+		const props = this.props,
+            adsObject = props.section.ads[0],
+            isPartnerData = !!(props.section && props.section.partnerData),
+            isCustomZoneId = !!(isPartnerData && Object.keys(props.section.partnerData).length && props.section.partnerData.customZoneId && (adsObject.network === 'geniee')),
+            customZoneIdText = isCustomZoneId ? 'Zone ID' : '';
+
 		return (
             <li className="section-list-item" key={props.section.id} style={props.section.error ? errorBorder : { ...errorBorder, border: '1px solid #d9d9d9', boxShadow: 'none' }}>
                 <OverlayTrigger placement="bottom" overlay={<Tooltip id="delete-section-tooltip">Delete Section</Tooltip>}>
@@ -51,6 +56,12 @@ class variationSectionElement extends Component {
                     ) : <label className="section-label section-structural">
                             <i className="fa fa-object-ungroup" /><span>Structural {props.section.error}</span>
                         </label>
+                    }
+                    {isCustomZoneId ? (
+                        <label className="u-margin-l5px section-label section-incontent">
+                            <i className="fa fa-pencil" /><span>{customZoneIdText}</span>
+                        </label>
+                    ) : null
                     }
                     {
                         props.section.error ? (
