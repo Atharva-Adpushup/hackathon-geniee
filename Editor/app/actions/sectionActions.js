@@ -18,6 +18,7 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 	createIncontentSection = (sectionPayload, adPayload, variationId) => (dispatch, getState) => {
 		const variationSections = getVariationSectionsWithAds(getState(), { variationId }).sections,
 			arr = _.map(variationSections, (data) => { return data; });
+
 		if (_.find(arr, { sectionNo: sectionPayload.sectionNo })) {
 			alert('Cannot create in content section with same section no.');
 			return;
@@ -33,7 +34,7 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 
 		dispatch({
 			type: sectionActions.CREATE_INCONTENT_SECTION,
-			adPayload: Object.assign(adData, { width: adWidth, height: adHeight, adCode: atob(adPayload.adCode) === 'undefined' ? undefined : adPayload.adCode, id: adId, css, createTs: Math.floor(Date.now() / 1000), network: currentUser.userType === 'partner' ? 'geniee' : 'custom', secondaryCss: float !== 'none' ? defaultSectionCss : undefined }),
+			adPayload: Object.assign(adData, { width: adWidth, height: adHeight, adCode: atob(adPayload.adCode) === 'undefined' ? undefined : adPayload.adCode, id: adId, css, createTs: Math.floor(Date.now() / 1000), network: currentUser.userType === 'partner' ? 'geniee' : 'custom', secondaryCss: float !== 'none' ? defaultSectionCss : undefined, networkData: adPayload.networkData }),
 			sectionPayload: Object.assign(sectionPayload, { id: sectionId, name: `Section-${sectionId}`, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
 			sectionId,
 			adId,

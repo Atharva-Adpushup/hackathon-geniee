@@ -104,6 +104,7 @@ renderInContentAdder = (that, getSupportedSizes) => {
 			<Row>
 			    <FieldArray name="notNear" component={renderNotNear} />
 			</Row>
+			<Field placeholder="Custom Zone Id" name="customZoneId" component={renderField} type="number" label="Custom Zone Id" />
 			<Row>
 			    <Col className="u-padding-r10px" style={{ marginTop: '30px', clear: 'both' }} xs={2}>
 				    <Button className="btn-lightBg btn-save btn-block" type="submit">Save</Button>

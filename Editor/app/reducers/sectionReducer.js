@@ -37,7 +37,8 @@ const sectionByIds = (state = {}, action) => {
 					float: payload.float,
 					sectionNo: payload.sectionNo,
 					minDistanceFromPrevAd: payload.minDistanceFromPrevAd,
-					notNear: payload.notNear
+					notNear: payload.notNear,
+					partnerData: payload.partnerData
 				}
 			};
 

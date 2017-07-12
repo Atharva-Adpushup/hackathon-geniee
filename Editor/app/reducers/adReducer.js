@@ -32,8 +32,9 @@ const adsByIds = (state = {}, action) => {
 
 		case sectionActions.CREATE_INCONTENT_SECTION:
 			payload = action.adPayload;
-			return { ...state,
-				[payload.id]: {
+
+			// TODO: Make this reducer pure by moving out all below conditional logic in action thunk
+			const createInContentAdObject = {
 					id: payload.id,
 					width: payload.width,
 					height: payload.height,
@@ -41,7 +42,18 @@ const adsByIds = (state = {}, action) => {
 					adCode: payload.adCode ? payload.adCode : undefined,
 					network: payload.network,
 					secondaryCss: payload.secondaryCss
-				}
+				},
+				// Network data object is only added when custom zone id value is added
+				// through Visual Editor
+				isInContentAdNetworkData = !!(payload.networkData && Object.keys(payload.networkData).length),
+				isInContentAdZoneId = !!(isInContentAdNetworkData && payload.networkData.zoneId);
+
+			if (isInContentAdZoneId) {
+				createInContentAdObject.networkData = { zoneId: payload.networkData.zoneId };
+			}
+
+			return { ...state,
+				[payload.id]: createInContentAdObject
 			};
 
 		case adActions.DELETE_AD:

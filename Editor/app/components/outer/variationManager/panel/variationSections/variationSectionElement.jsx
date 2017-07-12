@@ -3,6 +3,7 @@ import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import InlineEdit from 'shared/inlineEdit/index.jsx';
 import SelectBox from 'shared/select/select.js';
 import { floats } from 'consts/commonConsts';
+import $ from 'jquery';
 
 const errorBorder = {
 	border: '1px solid #eb575c',
@@ -17,6 +18,7 @@ class variationSectionElement extends Component {
 		};
 
 		this.onFloatSelectChange = this.onFloatSelectChange.bind(this);
+        this.onPartnerDataUpdate = this.onPartnerDataUpdate.bind(this);
     }
 
 	componentWillMount() {
@@ -31,11 +33,21 @@ class variationSectionElement extends Component {
 		this.props.onIncontentFloatUpdate(sectionId, adId, float);
 	}
 
+    onPartnerDataUpdate(customZoneId) {
+        const sectionId = this.props.section.id,
+            adId = this.props.section.ads[0].id,
+            partnerData = $.extend(true, {}, this.props.section.partnerData);
+
+        partnerData.customZoneId = customZoneId;
+        this.props.onUpdatePartnerData(sectionId, adId, partnerData);
+    }
+
 	render() {
 		const props = this.props,
             adsObject = props.section.ads[0],
             isPartnerData = !!(props.section && props.section.partnerData),
             isCustomZoneId = !!(isPartnerData && Object.keys(props.section.partnerData).length && props.section.partnerData.customZoneId && (adsObject.network === 'geniee')),
+            customZoneId = isCustomZoneId ? props.section.partnerData.customZoneId : '',
             customZoneIdText = isCustomZoneId ? 'Zone ID' : '';
 
 		return (
@@ -81,6 +93,17 @@ class variationSectionElement extends Component {
                             <Col xs={8}><strong>{props.section.ads[0].width} x {props.section.ads[0].height}</strong></Col>
                         </Row>
                     </Col>
+                    { isCustomZoneId ? (
+                        <Col>
+                            <Row>
+                                <Col className="u-padding-r10px" xs={4}>Zone Id</Col>
+                                <Col className="u-padding-l10px" xs={8}>
+                                    <InlineEdit type="number" compact validate value={customZoneId} submitHandler={this.onPartnerDataUpdate} text="Custom Zone Id" errorMessage="Custom zone id cannot be blank" />
+                                </Col>
+                            </Row>
+                        </Col>
+                    ) : null }
+                    
                 </Row>
                 {props.section.isIncontent ? (
                     <div>

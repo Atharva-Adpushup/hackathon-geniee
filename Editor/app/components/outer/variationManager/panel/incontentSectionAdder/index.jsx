@@ -101,16 +101,29 @@ const mapStateToProps = (state, ownProps) => ({
 	mapDispatchToProps = (dispatch, ownProps) => ({
 		onSubmit: (values) => {
 			const notNear = getNotNearData(values.notNear),
+				isCustomZoneId = !!(values.customZoneId),
 				sectionPayload = {
 					sectionNo: values.section,
 					minDistanceFromPrevAd: values.minDistanceFromPrevAd,
 					float: values.float,
-					notNear
+					notNear,
+					partnerData: {
+						position: 0,
+						firstFold: 0,
+						asyncTag: 1,
+						customZoneId: (values.customZoneId ? values.customZoneId : '')
+					}
 				},
 				adPayload = {
 					adCode: btoa(values.adCode),
 					adSize: values.adSize
 				};
+
+			if (isCustomZoneId) {
+				adPayload.networkData = {
+					zoneId: values.customZoneId
+				};
+			}
 
 			dispatch(createIncontentSection(sectionPayload, adPayload, ownProps.variation.id));
 		}
