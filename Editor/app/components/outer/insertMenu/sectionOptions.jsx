@@ -20,6 +20,7 @@ class sectionOptions extends React.Component {
 		this.toggleCustomAdCode = this.toggleCustomAdCode.bind(this);
 		this.onCustomAdCodeChange = this.onCustomAdCodeChange.bind(this);
 		this.onCustomZoneIdSubmit = this.onCustomZoneIdSubmit.bind(this);
+		this.renderCustomZoneIdInput = this.renderCustomZoneIdInput.bind(this);
 
 		// Set initial state
 
@@ -74,6 +75,10 @@ class sectionOptions extends React.Component {
 		});
 	}
 
+	renderCustomZoneIdInput(customZoneId) {
+		return (<InlineEdit rootClassNames="u-margin-b15px" type="number" compact validate font={400} value={customZoneId} submitHandler={this.onCustomZoneIdSubmit} text="Custom Zone Id" errorMessage="Custom zone id cannot be blank" />);
+	}
+
 	render() {
 		const customAdCodeText = (this.state.customAdCode ? 'Edit' : 'Add'),
 			isAdCreateBtnDisabled = !!((this.state.position !== null) && (typeof this.state.position !== 'undefined')),
@@ -100,7 +105,8 @@ class sectionOptions extends React.Component {
 				</Row>
 				<CustomToggleSwitch labelText="First fold" className="u-margin-t15px u-margin-b15px" defaultLayout checked={this.state.isAdInFirstFold} name="adInFirstFold" onChange={this.onFirstFoldChange} layout="horizontal" size="m" id="js-ad-in-first-fold" on="Yes" off="No" />
 				<CustomToggleSwitch labelText="Async tag" className="u-margin-t15px u-margin-b15px" disabled defaultLayout checked={this.state.isAdAsync} name="adIsAsync" layout="horizontal" size="m" id="js-ad-is-async" on="Yes" off="No" />
-				<InlineEdit rootClassNames="u-margin-b15px" type="number" compact validate font={400} value={customZoneId} submitHandler={this.onCustomZoneIdSubmit} text="Custom Zone Id" errorMessage="Custom zone id cannot be blank" />
+				{(updateMode && !customZoneId) ? null : this.renderCustomZoneIdInput(customZoneId)}
+
 				{
 					updateMode ? (
 						<Button style={{ marginBottom: 20 }} disabled={!(isAdCreateBtnDisabled)} className="btn-lightBg btn-save btn-block" onClick={updateSettings.bind(null, sectionId, ad.id, { position, firstFold, asyncTag, customZoneId })}>Update Settings</Button>
