@@ -2,6 +2,9 @@ extends  layout/base
 
 block getTitle
     - var titleVar = "Performance Report"
+    - var excludeJquery = false;
+    - var excludeBaseLibs = true;
+    - var excludeAnalytics = true;
 
 block append headCss
     +loadAsset("css", [
@@ -12,7 +15,6 @@ block append headCss
 block append headScripts
     +loadAsset("js", [
         '/assets/js/libs/third-party/dataTables.js',
-        '/assets/js/libs/third-party/dataTablesColReorder.js',
         '/assets/js/libs/third-party/highcharts/highcharts.js',
         '/assets/js/libs/third-party/highcharts/exporting.js',
         'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js',
@@ -78,5 +80,5 @@ block bodyContent
 
     +loadAsset("js", [
         'https://cdnjs.cloudflare.com/ajax/libs/slideout/1.0.1/slideout.min.js',
-        '/assets/js/reports/geniee/reports.js'
+        '/assets/js/builds/genieeReports.js'
     ])
