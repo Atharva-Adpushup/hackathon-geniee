@@ -11,7 +11,8 @@ var Tracker = require('../libs/tracker'),
 	adp = (w.adpushup = w.adpushup || {}),
 	control = require('./control')(),
 	config = adp.config = require('../config/config.js'),
-	$ = adp.$ = require('jquery');
+	$ = adp.$ = require('jquery'),
+	genieeObject = require('./genieeObject');
 
 // Extend adpushup object
 $.extend(adp, {
@@ -19,7 +20,8 @@ $.extend(adp, {
 	err: [],
 	control: control,
 	tracker: new Tracker(),
-	nodewatcher: nodewatcher
+	nodewatcher: nodewatcher,
+	geniee: genieeObject
 });
 
 // Extend the settings with generated settings
