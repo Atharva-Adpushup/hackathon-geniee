@@ -12,7 +12,8 @@ var Tracker = require('../libs/tracker'),
 	control = require('./control')(),
 	config = adp.config = require('../config/config.js'),
 	$ = adp.$ = require('jquery'),
-	genieeObject = require('./genieeObject');
+	genieeObject = require('./genieeObject'),
+	isGenieeSite;
 
 // Extend adpushup object
 $.extend(adp, {
@@ -30,6 +31,9 @@ $.extend(adp.config, ___abpConfig___, {
 	platform: browserConfig.platform
 });
 
+//Geniee ad network specific site check
+isGenieeSite = !!(adp.config.partner && (adp.config.partner === 'geniee'));
+adp.config.isGeniee = isGenieeSite;
 
 function shouldWeNotProceed() {
 	var hasGenieeStarted = !!((config.partner === 'geniee') && w.gnsmod && w.gnsmod.creationProcessStarted && !config.isAdPushupControlWithPartnerSSP);

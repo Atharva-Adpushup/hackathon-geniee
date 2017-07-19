@@ -90,6 +90,7 @@ module.exports = {
 		data.pageGroup = adpConfig.pageGroup;
 		data.platform = adpConfig.platform;
 		data.url = adpConfig.pageUrl;
+		data.isGeniee = (adpConfig.isGeniee || false);
 
 		if (!data.packetId || !data.siteId) {
 			if (console && console.log()) {
