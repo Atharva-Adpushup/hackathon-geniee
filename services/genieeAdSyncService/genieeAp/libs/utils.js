@@ -100,7 +100,7 @@ module.exports = {
 		}
 
 		// Keen IO integration start
-		if (data.eventType && ((data.eventType === 1) || (data.eventType === 3))) {
+		if (data.eventType && ((data.eventType === 1) || (data.eventType === 3) || (data.eventType === 11))) {
 			keenIoFeedbackData = $.extend(true, {}, data);
 			keenIoFeedbackData.ts = +new Date();
 
