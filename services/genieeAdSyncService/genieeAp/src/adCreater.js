@@ -79,6 +79,13 @@ var $ = require('jquery'),
 				// Replaced '-' with '_' to avoid ElasticSearch split issue
 				variationId: variation.id.replace(/-/gi, '_') // set the chosenVariation variation in feedback data;
 			},
+			pushAdToGlobalConfig = function(obj) {
+				var isAdsObject = !!(adp.config && adp.config.ads),
+					adObject = $.extend(true, {}, obj);
+
+				!(isAdsObject) ? adp.config.ads = [] : null;
+				adp.config.ads.push(adObject);
+			},
 			placeGenieeHeadCode = function(genieeIds) {
 				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIds);
 				genieeHeadCode && $('head').append(genieeHeadCode);
@@ -130,6 +137,8 @@ var $ = require('jquery'),
 					getAdContainer(ad, config.xpathWaitTimeout).done(function(data) {
 						// if all well then ad id of ad in feedback to tell system that impression was given
 						feedbackData.ads.push(ad.id);
+						// Add 'ad' object to global config ads array
+						pushAdToGlobalConfig(ad);
 						next(ad, data);
 					}).fail(function(data) {
 						feedbackData.xpathMiss.push(ad.id);
@@ -147,6 +156,8 @@ var $ = require('jquery'),
 								ad.css = $.extend(true, {}, ad.secondaryCss);
 							}
 							feedbackData.ads.push(ad.id);
+							// Add 'ad' object to global config ads array
+							pushAdToGlobalConfig(ad);
 							next(ad, { success: true, container: getContainer(ad, sectionObj.elem) });
 						} else {
 							feedbackData.xpathMiss.push(ad.id);
