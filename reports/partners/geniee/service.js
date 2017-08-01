@@ -7,6 +7,7 @@ var rp = require('request-promise'),
 	pageGroupModule = require('./modules/pageGroup/index'),
 	variationModule = require('./modules/variation/index'),
 	_ = require('lodash'),
+	sqlQueryModule = require('../../default/apex/vendor/mssql/report'),
 	signatureGenerator = require('../../../services/genieeAdSyncService/genieeZoneSyncService/signatureGenerator.js');
 	const { defaultLanguageCode } = require('../../../i18n/language-mapping');
 
@@ -39,7 +40,13 @@ module.exports = (function(requestPromise, signatureGenerator, oauthModule, zone
 			mediaId: json.mediaId
 		},
 		consumerSecret = 'M2IyNjc4ZGU1YWZkZTg2OTIyNzZkMTQyOTE0YmQ4Njk=',
-		signature;
+		signature,
+		sqlQueryParamters = {
+			siteId: params.siteId,
+			startDate: '2017-07-26',
+			endDate: '2017-07-29',
+			mode: 1
+		};
 
 		url += '?' + queryParams;
 		signature = signatureGenerator(httpMethod, url, parameters, consumerSecret);
@@ -55,11 +62,14 @@ module.exports = (function(requestPromise, signatureGenerator, oauthModule, zone
 			getFilteredZones = getResponseData.then(zoneModule.removeUnnecessaryZones),
 			getSiteMetrics = getFilteredZones.then(mediaModule.getMediaMetrics),
 			getChannelMetrics = getFilteredZones.then(pageGroupModule.getPageGroupMetrics),
-			getChannelData = getChannelMetrics.then(pageGroupModule.getPageGroupDataById);
+			getChannelData = getChannelMetrics.then(pageGroupModule.getPageGroupDataById),
+			getSqlReportData = sqlQueryModule.getMetricsData(sqlQueryParamters);
 
-			return Promise.join(getResponseData, getFilteredZones, getSiteMetrics, getChannelMetrics, getChannelData, function(allZones, filteredZones, siteMetrics, pageGroupMetrics, pageGroupData) {
+			return Promise.join(getResponseData, getFilteredZones, getSiteMetrics, getChannelMetrics, getChannelData, getSqlReportData, function(allZones, filteredZones, siteMetrics, pageGroupMetrics, pageGroupData, sqlReportData) {
 				var isInValidZonesData = !!(!allZones || !allZones.length),
 					isInValidFilteredZonesData = !!(!filteredZones || !(Object.keys(filteredZones).length));
+
+				console.log(`Sql report data: ${JSON.stringify(sqlReportData)}`);
 
 				if (isInValidZonesData || isInValidFilteredZonesData) {
 					throw new AdPushupError('Zones should not be empty');
