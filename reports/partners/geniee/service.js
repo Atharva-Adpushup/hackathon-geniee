@@ -7,46 +7,54 @@ var rp = require('request-promise'),
 	pageGroupModule = require('./modules/pageGroup/index'),
 	variationModule = require('./modules/variation/index'),
 	_ = require('lodash'),
+	moment = require('moment'),
 	sqlQueryModule = require('../../default/apex/vendor/mssql/report'),
+	{ getSqlValidParameterDates } = require('../../default/apex/vendor/mssql/utils/utils'),
 	signatureGenerator = require('../../../services/genieeAdSyncService/genieeZoneSyncService/signatureGenerator.js');
 	const { defaultLanguageCode } = require('../../../i18n/language-mapping');
 
 module.exports = (function(requestPromise, signatureGenerator, oauthModule, zoneModule, mediaModule, pageGroupModule, variationModule) {
 	function getReportData(params) {
-		var json = {
-			"dateFrom": params.dateFrom, //"2016-11-01",
-			"dateTo": params.dateTo, //"2016-12-04",
-			"mediaId": params.mediaId, //920
-			"pageGroupId": params.pageGroupId
-		},
-		localeCode = params.localeCode ? params.localeCode : defaultLanguageCode,
-		httpMethod = 'GET',
-		url = 'https://s.geniee.jp/aladdin/adpushup/report/',
-		queryParams = _.compact(_.map(_.keys(json), function(key) {
-			var value = json[key];
+		var dateParams = {dateFrom: params.dateFrom, dateTo: params.dateTo};
 
-			return (value ? (key + '=' + value) : false);
-		})).join("&"),
-		nounce = oauthModule.getOauthNonce(),
-		ts = new Date().getTime(),
-		parameters = {
-			dateFrom: json.dateFrom,
-			dateTo: json.dateTo,
-			oauth_consumer_key: "ZmJiMGZhNDUwOWI4ZjllOA==",
-			oauth_nonce: nounce,
-			oauth_signature_method: "HMAC-SHA1",
-			oauth_timestamp: ts,
-			oauth_version: "1.0",
-			mediaId: json.mediaId
-		},
-		consumerSecret = 'M2IyNjc4ZGU1YWZkZTg2OTIyNzZkMTQyOTE0YmQ4Njk=',
-		signature,
-		sqlQueryParamters = {
-			siteId: params.siteId,
-			startDate: '2017-07-26',
-			endDate: '2017-07-29',
-			mode: 1
-		};
+		params.dateFrom = getSqlValidParameterDates(dateParams).dateFrom;
+		params.dateTo = getSqlValidParameterDates(dateParams).dateTo;
+		console.log(`Sql report supported dates: ${JSON.stringify(params)}`);
+
+		var json = {
+				'dateFrom': params.dateFrom, //'2016-11-01',
+				'dateTo': params.dateTo, //'2016-12-04',
+				'mediaId': params.mediaId, //920
+				'pageGroupId': params.pageGroupId
+			},
+			localeCode = params.localeCode ? params.localeCode : defaultLanguageCode,
+			httpMethod = 'GET',
+			url = 'https://s.geniee.jp/aladdin/adpushup/report/',
+			queryParams = _.compact(_.map(_.keys(json), function(key) {
+				var value = json[key];
+
+				return (value ? (key + '=' + value) : false);
+			})).join("&"),
+			nounce = oauthModule.getOauthNonce(),
+			ts = new Date().getTime(),
+			parameters = {
+				dateFrom: json.dateFrom,
+				dateTo: json.dateTo,
+				oauth_consumer_key: "ZmJiMGZhNDUwOWI4ZjllOA==",
+				oauth_nonce: nounce,
+				oauth_signature_method: "HMAC-SHA1",
+				oauth_timestamp: ts,
+				oauth_version: "1.0",
+				mediaId: json.mediaId
+			},
+			consumerSecret = 'M2IyNjc4ZGU1YWZkZTg2OTIyNzZkMTQyOTE0YmQ4Njk=',
+			signature,
+			sqlQueryParamters = {
+				siteId: params.siteId,
+				startDate: '2017-07-26',
+				endDate: '2017-07-29',
+				mode: 1
+			};
 
 		url += '?' + queryParams;
 		signature = signatureGenerator(httpMethod, url, parameters, consumerSecret);
