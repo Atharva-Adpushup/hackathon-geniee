@@ -51,8 +51,8 @@ module.exports = (function(requestPromise, signatureGenerator, oauthModule, zone
 			signature,
 			sqlQueryParamters = {
 				siteId: params.siteId,
-				startDate: '2017-07-26',
-				endDate: '2017-07-29',
+				startDate: params.dateFrom,
+				endDate: params.dateTo,
 				mode: 1
 			};
 

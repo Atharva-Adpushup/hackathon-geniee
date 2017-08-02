@@ -97,6 +97,7 @@ router
 						});
 					})
 					.catch(function(err) {
+						console.log(`Performance Report error: ${err.toString()}`);
 						var textConfig = {
 							"error": localeData.ERROR.REPORT_EXCEPTION,
 							"emptyData": localeData.ERROR.REPORT_DATA_NOT_AVAILABLE
