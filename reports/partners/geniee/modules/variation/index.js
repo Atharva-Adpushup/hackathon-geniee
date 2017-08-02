@@ -2,23 +2,23 @@ var _ = require('lodash'),
 	extend = require('extend'),
 	moment = require('moment'),
 	Promise = require('bluebird'),
-	lodash = require('lodash'),
-	selfPageViewsModule = require('./modules/pageViews/index'),
-	pageViewsModule = require('../../../../default/apex/pageGroupVariationRPM/modules/pageViews/index'),
+	selfChosenVariationModule = require('./modules/chosenVariation/index'),
 	apexReport = require('./modules/apexReportIntegration/index'),
 	utils = require('../utils/index');
 const { fileLogger } = require('../../../../../helpers/logger/file/index'),
 	localizedData = require('../../../../../i18n/reports/geniee/constants');
 
 module.exports = {
-	setVariationMetrics: function(config, pageGroupData) {
-		var computedData = extend(true, {}, pageGroupData);
+	setVariationMetrics: function(config, sqlReportData, pageGroupData) {
+		var computedData = extend(true, {}, pageGroupData),
+			isSqlReportData = !!(sqlReportData && Object.keys(sqlReportData).length);
 
 		return Promise.all(_.map(pageGroupData, function(pageGroupObj, pageGroupKey) {
 			return Promise.all(_.map(pageGroupObj.variationData, function(variationObj, variationKey) {
 				var computedVariationObject;
 
-				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, 'pageViews': 0, 'pageRPM': 0.0, 'pageCTR': 0.0, 'dayWisePageViews': {} });
+				// Extend variation object with default metric values
+				computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, variationObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, 'pageViews': 0, 'pageRPM': 0.0, 'pageCTR': 0.0, 'dayWisePageViews': {}, 'days': {} });
 				// If variation is custom (Contains AdSense ad codes only),
 				// return computed data with default metric values
 				if (variationObj.isCustom) {
@@ -48,47 +48,41 @@ module.exports = {
 							return computedData;
 						});
 				}
+				if (!isSqlReportData) { return computedData; }
 
 				// Cache computed variation object
 				computedVariationObject = extend(true, {}, computedData[pageGroupKey].variationData[variationKey]);
 
-				return selfPageViewsModule.getTotalPageViews(config, variationObj, pageGroupObj)
-					.then(function(totalPageViews) {
-						return selfPageViewsModule.getDayWisePageViews(config, variationObj, pageGroupObj)
-							.then(function(dayWisePageViews) {
-								computedVariationObject.dayWisePageViews = dayWisePageViews || 0;
+				return selfChosenVariationModule.getData(config, sqlReportData, variationObj, pageGroupObj)
+					.then(function(chosenVariationData) {
+						const isValidVariationData = !!(chosenVariationData && Object.keys(chosenVariationData).length);
+						let revenue, clicks, pageViews;
 
-								return Promise.all(_.map(variationObj.zones, function(zoneObj) {
-									var revenue, clicks;
+						if (!isValidVariationData) { return computedData; }
 
-									computedVariationObject.click += Number(zoneObj.click);
-									computedVariationObject.impression += Number(zoneObj.impression);
-									computedVariationObject.revenue += Number(zoneObj.revenue);
-									computedVariationObject.ctr += Number(zoneObj.ctr);
+						computedVariationObject.dayWisePageViews = extend(true, {}, chosenVariationData.dayWisePageViews) || 0;
+						computedVariationObject.days = extend(true, {}, chosenVariationData.days) || {};
 
-									computedVariationObject.click = computedVariationObject.click || 0;
-									computedVariationObject.impression = computedVariationObject.impression || 0;
-									computedVariationObject.revenue = Number(computedVariationObject.revenue.toFixed(2)) || 0;
-									computedVariationObject.ctr = Number(computedVariationObject.ctr.toFixed(2)) || 0;
-									computedVariationObject.pageViews = Number(totalPageViews) || 0;
+						computedVariationObject.click = Number(chosenVariationData.click);
+						computedVariationObject.impression = Number(chosenVariationData.impression);
+						computedVariationObject.revenue = Number(chosenVariationData.revenue.toFixed(2));
+						computedVariationObject.ctr = 0;
+						computedVariationObject.pageViews = Number(chosenVariationData.pageViews);
 
-									revenue = computedVariationObject.revenue;
-									clicks = computedVariationObject.click;
+						revenue = computedVariationObject.revenue;
+						clicks = computedVariationObject.click;
+						pageViews = computedVariationObject.pageViews;
 
-									computedVariationObject.pageRPM = Number((revenue / totalPageViews * 1000).toFixed(2));
-									computedVariationObject.pageCTR = Number((clicks / totalPageViews * 100).toFixed(2));
+						computedVariationObject.pageRPM = Number((revenue / pageViews * 1000).toFixed(2));
+						computedVariationObject.pageCTR = Number((clicks / pageViews * 100).toFixed(2));
 
-									computedVariationObject.pageRPM = (computedVariationObject.pageRPM && computedVariationObject.pageRPM !== Infinity) ? computedVariationObject.pageRPM : 0;
-									computedVariationObject.pageCTR = (computedVariationObject.pageCTR && computedVariationObject.pageCTR !== Infinity) ? computedVariationObject.pageCTR : 0;
+						computedVariationObject.pageRPM = (computedVariationObject.pageRPM && computedVariationObject.pageRPM !== Infinity) ? computedVariationObject.pageRPM : 0;
+						computedVariationObject.pageCTR = (computedVariationObject.pageCTR && computedVariationObject.pageCTR !== Infinity) ? computedVariationObject.pageCTR : 0;
 
-									// Set back computed variation object in its original hierarchy
-									computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, computedVariationObject);
+						// Set back computed variation object in its original hierarchy
+						computedData[pageGroupKey].variationData[variationKey] = extend(true, {}, computedVariationObject);
 
-									return computedData;
-								})).then(function() {
-									return computedData;
-								});
-							});
+						return computedData;
 					});
 			})).then(function() {
 				return computedData;
@@ -108,8 +102,7 @@ module.exports = {
 		return computedData;
 	},
 	setVariationsHighChartsData: function(pageGroupData) {
-		var self = this,
-            computedData = extend(true, {}, pageGroupData),
+		var computedData = extend(true, {}, pageGroupData),
 			highChartsData, datesObj, currentComputedObj, currentDate;
 
 		_.forOwn(computedData, function(pageGroupObj, pageGroupKey) {
@@ -132,7 +125,7 @@ module.exports = {
 			};
 			currentComputedObj = {};
 
-			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
+			_.forOwn(pageGroupObj.variations, function(variationObj) {
 				_.forEach(variationObj.zones, function(zonesObj) {
 					currentDate = moment(zonesObj.date).valueOf();
 
@@ -222,7 +215,7 @@ module.exports = {
 				pageCTR: 0
 			};
 			
-			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
+			_.forOwn(pageGroupObj.variations, function(variationObj) {
 				var rowItem = [];
 
 				rowItem[0] = ' ';
