@@ -65,7 +65,7 @@ module.exports = {
 
 						computedVariationObject.click = Number(chosenVariationData.click);
 						computedVariationObject.impression = Number(chosenVariationData.impression);
-						computedVariationObject.revenue = Number(chosenVariationData.revenue.toFixed(2));
+						computedVariationObject.revenue = Number((chosenVariationData.revenue / 1000).toFixed(2));
 						computedVariationObject.ctr = 0;
 						computedVariationObject.pageViews = Number(chosenVariationData.pageViews);
 
