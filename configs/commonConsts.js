@@ -108,7 +108,7 @@ module.exports = {
 			},
 			exceptions: {
 				str: {
-					zonesEmpty: 'Zones should not be empty'
+					zonesEmpty: 'Report data should not be empty'
 				}
 			}
 		}

@@ -189,7 +189,8 @@
             orientation: "top right",
             clearBtn: true,
             autoClose: true,
-            startDate: "01/01/2017",
+            // Made default date 1st August 2017 for sql reports compatibility
+            startDate: "2017-08-01",
             endDate: "0d"
         });
     }
