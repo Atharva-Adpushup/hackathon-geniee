@@ -126,36 +126,43 @@ module.exports = {
 			currentComputedObj = {};
 
 			_.forOwn(pageGroupObj.variations, function(variationObj) {
-				_.forEach(variationObj.zones, function(zonesObj) {
-					currentDate = moment(zonesObj.date).valueOf();
+				const isDaysObject = !!(variationObj && variationObj.days);
+				if (!isDaysObject) { return; }
+
+				const dayWiseDataKeys = Object.keys(variationObj.days);
+
+				_.forEach(dayWiseDataKeys, function(dateKey) {
+					const dayWiseDataObject = variationObj.days[dateKey];
+
+					currentDate = moment(dateKey).valueOf();
 
 					currentComputedObj.revenue = {
-						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(zonesObj.revenue)]]
+						name: (variationObj.name.replace(' ', '-')),
+						data: [[currentDate, Number(dayWiseDataObject.revenue)]]
 					};
 					datesObj.revenue[currentDate] = currentComputedObj.revenue.name;
 
 					currentComputedObj.pageviews = {
-						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(zonesObj.pageViews || variationObj.dayWisePageViews[zonesObj.date])]]
+						name: (variationObj.name.replace(' ', '-')),
+						data: [[currentDate, Number(dayWiseDataObject.pageViews)]]
 					};
 					datesObj.pageviews[currentDate] = currentComputedObj.pageviews.name;
 
 					currentComputedObj.clicks = {
-						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(zonesObj.click)]]
+						name: (variationObj.name.replace(' ', '-')),
+						data: [[currentDate, Number(dayWiseDataObject.click)]]
 					};
 					datesObj.clicks[currentDate] = currentComputedObj.clicks.name;
 
 					currentComputedObj.pagerpm = {
-						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(zonesObj.pageRPM || variationObj.pageRPM)]]
+						name: (variationObj.name.replace(' ', '-')),
+						data: [[currentDate, Number(dayWiseDataObject.pageRPM)]]
 					};
 					datesObj.pagerpm[currentDate] = currentComputedObj.pagerpm.name;
 
 					currentComputedObj.pagectr = {
-						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(zonesObj.pageCTR || variationObj.pageCTR)]]
+						name: (variationObj.name.replace(' ', '-')),
+						data: [[currentDate, Number(dayWiseDataObject.pageCTR)]]
 					};
 					datesObj.pagectr[currentDate] = currentComputedObj.pagectr.name;
 
@@ -183,12 +190,12 @@ module.exports = {
 			_.forOwn(datesObj.pagerpm, function(pagerpmData, dateKey) {
 				utils.setDateWithEmptyValue(dateKey, 'pagerpm', highChartsData.highCharts);
 			});
-			highChartsData.highCharts = utils.updatePageRPMHighChartsData(highChartsData.highCharts);
+			//highChartsData.highCharts = utils.updatePageRPMHighChartsData(highChartsData.highCharts);
 
 			_.forOwn(datesObj.pagectr, function(pagectrData, dateKey) {
 				utils.setDateWithEmptyValue(dateKey, 'pagectr', highChartsData.highCharts);
 			});
-			highChartsData.highCharts = utils.updatePageCTRHighChartsData(highChartsData.highCharts);
+			//highChartsData.highCharts = utils.updatePageCTRHighChartsData(highChartsData.highCharts);
 
 			computedData[pageGroupKey].variations.data = extend(true, computedData[pageGroupKey].variations.data, highChartsData);
 		});

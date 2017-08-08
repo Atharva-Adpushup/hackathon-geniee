@@ -3,7 +3,8 @@ var _ = require('lodash'),
 	moment = require('moment'),
 	Promise = require('bluebird'),
 	channelModel = require('../../../../../models/channelModel.js'),
-	utils = require('../utils/index');
+	utils = require('../utils/index'),
+	AdPushupError = require('../../../../../helpers/AdPushupError');
 const localizedData = require('../../../../../i18n/reports/geniee/constants');
 
 module.exports = {
@@ -62,7 +63,7 @@ module.exports = {
 
 			// Cache current computed page group object
 			computedPageGroupObj = extend(true, {}, computedData.pageGroups[pageGroupKey]);
-			computedPageGroupObj = extend(true, {}, computedPageGroupObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'ctr': 0.0, 'pageViews': 0, 'pageRPM': 0.0, 'pageCTR': 0.0, 'dayWisePageViews': {} });
+			computedPageGroupObj = extend(true, {}, computedPageGroupObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'pageViews': 0, 'pageRPM': 0.0, 'pageCTR': 0.0, 'dayWisePageViews': {}, 'days': {} });
 
 			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
 				if (variationKey === dataStr) { return false; }
@@ -70,7 +71,6 @@ module.exports = {
 				computedPageGroupObj.click += Number(variationObj.click);
 				computedPageGroupObj.impression += Number(variationObj.impression);
 				computedPageGroupObj.revenue += Number(variationObj.revenue);
-				computedPageGroupObj.ctr += Number(variationObj.ctr);
 				computedPageGroupObj.pageViews += Number(variationObj.pageViews);
 
 				// Set day wise page views for PageGroup
@@ -84,11 +84,57 @@ module.exports = {
 						computedPageGroupObj.dayWisePageViews[dateKey] += pageViews;
 					}
 				});
+
+				// Set days wise data for PageGroup
+				_.forOwn(variationObj.days, function(dataObject, dateKey) {
+					var doesDateKeyNotPresent = !computedPageGroupObj.days.hasOwnProperty(dateKey),
+						doesDateKeyNotExist = !!(doesDateKeyNotPresent && !computedPageGroupObj.days[dateKey]);
+
+					// Set metric object as default object if date key does not exist
+					if (doesDateKeyNotExist) {
+						computedPageGroupObj.days[dateKey] = extend(true, {}, dataObject);
+					} else {
+						// Increment all metric object values and set incremented data in final metric object
+						const metricObject = extend(true, {}, computedPageGroupObj.days[dateKey]);
+						{
+							let revenue = metricObject.revenue,
+								click = metricObject.click,
+								impression = metricObject.impression,
+								pageViews = metricObject.pageViews,
+								revenueComputedValue, pageRPMComputedValue, pageCTRComputedValue;
+
+							click += dataObject.click;
+							impression += dataObject.impression;
+							pageViews += dataObject.pageViews;
+
+							revenueComputedValue = Number((dataObject.revenue / 1000).toFixed(2));
+							revenue = Number((revenue + revenueComputedValue).toFixed(2));
+
+							// Computed current metric value
+							pageRPMComputedValue = Number((revenue / pageViews * 1000).toFixed(2));
+							// Check for boundary cases and convert accordingly
+							pageRPMComputedValue = (pageRPMComputedValue && pageRPMComputedValue !== Infinity) ? pageRPMComputedValue : 0.0;
+
+							pageCTRComputedValue = Number((click / pageViews * 100).toFixed(2));
+							pageCTRComputedValue = (pageCTRComputedValue && pageCTRComputedValue !== Infinity) ? pageCTRComputedValue : 0.0;
+
+							// Update cached object
+							metricObject.revenue = revenue;
+							metricObject.click = click;
+							metricObject.impression = impression;
+							metricObject.pageViews = pageViews;
+							metricObject.pageRPM = pageRPMComputedValue;
+							metricObject.pageCTR = pageCTRComputedValue;
+
+							// Assign back computed cached object value to final date object
+							computedPageGroupObj.days[dateKey] = extend(true, {}, metricObject);
+						}
+					}
+				});
 			});
 
 			// Set Default value if falsy
 			computedPageGroupObj.revenue = Number(computedPageGroupObj.revenue.toFixed(2)) || 0;
-			computedPageGroupObj.ctr = Number(computedPageGroupObj.ctr.toFixed(2)) || 0;
 			computedPageGroupObj.click = computedPageGroupObj.click || 0;
 			computedPageGroupObj.impression = computedPageGroupObj.impression || 0;
 			computedPageGroupObj.pageViews = computedPageGroupObj.pageViews || 0;
@@ -105,6 +151,25 @@ module.exports = {
 
 		return Promise.resolve(computedData);
 	},
+	transformAllPageGroupsData: (inputChannelData) => {
+		const emptyChannelDataStr = 'Channel data should not be empty';
+		if (!inputChannelData || !inputChannelData.length) { throw new AdPushupError(emptyChannelDataStr); }
+
+		const computedData = inputChannelData.concat([]);
+
+		return computedData.reduce((accumulatorObject, channelObject) => {
+			accumulatorObject[channelObject.channelName] = {
+				id: channelObject.id,
+				sampleUrl: channelObject.sampleUrl,
+				pageGroup: channelObject.pageGroup,
+				device: channelObject.platform,
+				channelName: channelObject.channelName,
+				variations: extend(true, {}, channelObject.variations)
+			};
+
+			return accumulatorObject;
+		}, {});
+	},
 	getPageGroupDataById: function(data) {
 		var allPageGroupsData = _.map(_.keys(data), function(channelKey) {
 			return channelModel.getPageGroupById({id: channelKey, viewName: 'channelByGenieePageGroupId', isExtendedParams: true})
@@ -118,13 +183,19 @@ module.exports = {
 
 		return Promise.all(allPageGroupsData);
 	},
-	updatePageGroupData: function(pageGroupData, pageGroupMetrics) {
-		var computedData = extend(true, {}, pageGroupMetrics);
+	updatePageGroupData: function(siteId, sqlReportData, allChannelsData) {
+		const pageGroupData = extend(true, {}, sqlReportData[siteId].pageGroups),
+			channelKeys = _.keys(pageGroupData),
+			computedData = {};
 
-		_.forEach(pageGroupData, function(pageGroupDataObj) {
-			var pageGroupKey = _.keys(pageGroupDataObj)[0];
+		_.forEach(channelKeys, (channelKey) => {
+			const doesChannelKeyMatch = !!(allChannelsData.hasOwnProperty(channelKey) && allChannelsData[channelKey]),
+				reportPageGroupObject = extend(true, {}, pageGroupData[channelKey]),
+				channelPageGroupObject = extend(true, {}, allChannelsData[channelKey]);
 
-			computedData[pageGroupKey] = extend(true, {}, pageGroupMetrics[pageGroupKey], pageGroupDataObj[pageGroupKey]);
+			if (doesChannelKeyMatch) {
+				computedData[channelKey] = extend(true, reportPageGroupObject, channelPageGroupObject);
+			}
 		});
 
 		return Promise.resolve(computedData);
@@ -169,37 +240,44 @@ module.exports = {
 			},
 			currentComputedObj = {}, currentDate;
 
-		_.forOwn(computedData.pageGroups, function(pageGroupObj, pageGroupKey) {
-			_.forEach(pageGroupObj.zones, function(zonesObj) {
-				currentDate = moment(zonesObj.date).valueOf();
+		_.forOwn(computedData.pageGroups, function(pageGroupObj) {
+			const isDaysObject = !!(pageGroupObj && pageGroupObj.days);
+			if (!isDaysObject) { return; }
+
+			const dayWiseDataKeys = Object.keys(pageGroupObj.days);
+			
+			_.forEach(dayWiseDataKeys, function(dateKey) {
+				const dayWiseDataObject = pageGroupObj.days[dateKey];
+
+				currentDate = moment(dateKey).valueOf();
 
 				currentComputedObj.revenue = {
 					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					data: [[currentDate, Number(zonesObj.revenue)]]
+					data: [[currentDate, Number(dayWiseDataObject.revenue)]]
 				};
 				datesObj.revenue[currentDate] = currentComputedObj.revenue.name;
 
 				currentComputedObj.pageviews = {
 					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					data: [[currentDate, Number(zonesObj.pageViews || pageGroupObj.dayWisePageViews[zonesObj.date])]]
+					data: [[currentDate, Number(dayWiseDataObject.pageViews || pageGroupObj.dayWisePageViews[dayWiseDataObject.date])]]
 				};
 				datesObj.pageviews[currentDate] = currentComputedObj.pageviews.name;
 
 				currentComputedObj.clicks = {
 					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					data: [[currentDate, Number(zonesObj.click)]]
+					data: [[currentDate, Number(dayWiseDataObject.click)]]
 				};
 				datesObj.clicks[currentDate] = currentComputedObj.clicks.name;
 
 				currentComputedObj.pagerpm = {
 					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					data: [[currentDate, Number(zonesObj.pageRPM || pageGroupObj.pageRPM)]]
+					data: [[currentDate, Number(dayWiseDataObject.pageRPM || pageGroupObj.pageRPM)]]
 				};
 				datesObj.pagerpm[currentDate] = currentComputedObj.pagerpm.name;
 
 				currentComputedObj.pagectr = {
 					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					data: [[currentDate, Number(zonesObj.pageCTR || pageGroupObj.pageCTR)]]
+					data: [[currentDate, Number(dayWiseDataObject.pageCTR || pageGroupObj.pageCTR)]]
 				};
 				datesObj.pagectr[currentDate] = currentComputedObj.pagectr.name;
 
@@ -227,12 +305,12 @@ module.exports = {
 		_.forOwn(datesObj.pagerpm, function(pagerpmData, dateKey) {
 			utils.setDateWithEmptyValue(dateKey, 'pagerpm', highChartsData.highCharts);
 		});
-		highChartsData.highCharts = utils.updatePageRPMHighChartsData(highChartsData.highCharts);
+		//highChartsData.highCharts = utils.updatePageRPMHighChartsData(highChartsData.highCharts);
 
 		_.forOwn(datesObj.pagectr, function(pagectrData, dateKey) {
 			utils.setDateWithEmptyValue(dateKey, 'pagectr', highChartsData.highCharts);
 		});
-		highChartsData.highCharts = utils.updatePageCTRHighChartsData(highChartsData.highCharts);
+		//highChartsData.highCharts = utils.updatePageCTRHighChartsData(highChartsData.highCharts);
 
 		computedData.pageGroups.data = extend(true, computedData.pageGroups.data, highChartsData);
 

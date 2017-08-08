@@ -1,4 +1,5 @@
 const { GET_METRICS_QUERY } = require('./constants/constants'),
+	extend = require('extend'),
 	dbHelper = require('./dbhelper');
 
 function transformResultData(reportData) {
@@ -29,48 +30,91 @@ function transformResultData(reportData) {
 			isVariationKey = !!(reportObject.variationId),
 			variationKey = isVariationKey ? (reportObject.variationId.replace(/_/gi, '-')) : '';
 
-		let isChannelExists, isVariationIdExists, isMatchedDateExists, isDayWisePageViewsExists, 
-			sitePageGroupObjectPlaceHolder, revenuePlaceHolder;
+		let isChannelExists, isVariationIdExists, isMatchedDateExists, isDayWisePageViewsExists,
+			// Object placeholder variables to improve computation speed and reduce data query time
+			sitePageGroupObjectPlaceHolder, siteVariationObjectPlaceHolder, currentVariationObjectPlaceHolder;
 
-		if (!isRootLevelObject) {
-			accumulator[reportObject.siteId] = {pageGroups: {}};
-		}
-		sitePageGroupObjectPlaceHolder = Object.assign({}, accumulator[reportObject.siteId].pageGroups);
+		if (!isRootLevelObject) { accumulator[reportObject.siteId] = {pageGroups: {}}; }
+		// Cache current page group object
+		sitePageGroupObjectPlaceHolder = extend(true, {}, accumulator[reportObject.siteId].pageGroups);
 
 		isChannelExists = !!(isRootLevelObject && sitePageGroupObjectPlaceHolder && sitePageGroupObjectPlaceHolder.hasOwnProperty(channelName));
-		if (!isChannelExists) {
-			sitePageGroupObjectPlaceHolder[channelName] = {variations: {}};
-		}
+		if (!isChannelExists) { sitePageGroupObjectPlaceHolder[channelName] = {variations: {}}; }
+		// Cache current page group variations object
+		siteVariationObjectPlaceHolder = extend(true, {}, sitePageGroupObjectPlaceHolder[channelName].variations);
 
-		isVariationIdExists = !!(isChannelExists && sitePageGroupObjectPlaceHolder[channelName].variations && sitePageGroupObjectPlaceHolder[channelName].variations.hasOwnProperty(variationKey));
+		isVariationIdExists = !!(isChannelExists && siteVariationObjectPlaceHolder && siteVariationObjectPlaceHolder.hasOwnProperty(variationKey));
 		if (!isVariationIdExists) {
-			sitePageGroupObjectPlaceHolder[channelName].variations[variationKey] = {dayWisePageViews: {}, days: {}, click: 0, impression: 0, revenue: 0.0, pageViews: 0};
+			siteVariationObjectPlaceHolder[variationKey] = {dayWisePageViews: {}, days: {}, click: 0, impression: 0, revenue: 0.0, pageViews: 0, pageRPM: 0.0, pageCTR: 0.0};
 		}
+		// Cache current variation object
+		currentVariationObjectPlaceHolder = extend(true, {}, siteVariationObjectPlaceHolder[variationKey]);
 
-		isMatchedDateExists = !!(isVariationIdExists && sitePageGroupObjectPlaceHolder[channelName].variations[variationKey].days &&  sitePageGroupObjectPlaceHolder[channelName].variations[variationKey].days.hasOwnProperty(matchedDateValue));
+		isMatchedDateExists = !!(isVariationIdExists && currentVariationObjectPlaceHolder.days &&  currentVariationObjectPlaceHolder.days.hasOwnProperty(matchedDateValue));
 		if (!isMatchedDateExists) {
-			sitePageGroupObjectPlaceHolder[channelName].variations[variationKey].days[matchedDateValue] = {
-				pageViews: reportObject.pageViews,
+			// TODO: Remove below revenue conversion (divide by 1000)
+			// by moving this logic to ads replay side
+			let revenue = Number((reportObject.revenue / 1000).toFixed(2)),
+				pageViews = reportObject.pageViews,
+				click = reportObject.clicks,
+				pageRPM = Number((revenue / pageViews * 1000).toFixed(2)),
+				pageCTR = Number((click / pageViews * 100).toFixed(2));
+
+			pageRPM = (pageRPM && pageRPM !== Infinity) ? pageRPM : 0.0;
+			pageCTR = (pageCTR && pageCTR !== Infinity) ? pageCTR : 0.0;
+
+			currentVariationObjectPlaceHolder.days[matchedDateValue] = {
+				pageViews,
 				impression: reportObject.impressions,
-				click: reportObject.clicks,
-				revenue: Number(reportObject.revenue.toFixed(2))
+				click,
+				revenue,
+				pageRPM,
+				pageCTR
 			};
 		}
 
-		isDayWisePageViewsExists = !!(isVariationIdExists && sitePageGroupObjectPlaceHolder[channelName].variations[variationKey].dayWisePageViews &&  sitePageGroupObjectPlaceHolder[channelName].variations[variationKey].dayWisePageViews.hasOwnProperty(matchedDateValue));
+		isDayWisePageViewsExists = !!(isVariationIdExists && currentVariationObjectPlaceHolder.dayWisePageViews &&  currentVariationObjectPlaceHolder.dayWisePageViews.hasOwnProperty(matchedDateValue));
 		if (!isDayWisePageViewsExists) {
-			sitePageGroupObjectPlaceHolder[channelName].variations[variationKey].dayWisePageViews[matchedDateValue] = reportObject.pageViews;
+			currentVariationObjectPlaceHolder.dayWisePageViews[matchedDateValue] = reportObject.pageViews;
 		}
 
-		sitePageGroupObjectPlaceHolder[channelName].variations[variationKey].click += reportObject.clicks;
-		sitePageGroupObjectPlaceHolder[channelName].variations[variationKey].impression += reportObject.impressions;
-		sitePageGroupObjectPlaceHolder[channelName].variations[variationKey].pageViews += reportObject.pageViews;
+		{
+			let revenue = currentVariationObjectPlaceHolder.revenue,
+				click = currentVariationObjectPlaceHolder.click,
+				impression = currentVariationObjectPlaceHolder.impression,
+				pageViews = currentVariationObjectPlaceHolder.pageViews,
+				// pageRPM = currentVariationObjectPlaceHolder.pageRPM,
+				// pageCTR = currentVariationObjectPlaceHolder.pageCTR,
+				revenueComputedValue, pageRPMComputedValue, pageCTRComputedValue;
 
-		sitePageGroupObjectPlaceHolder[channelName].variations[variationKey].revenue += reportObject.revenue;
-		revenuePlaceHolder = Number(sitePageGroupObjectPlaceHolder[channelName].variations[variationKey].revenue.toFixed(2));
-		sitePageGroupObjectPlaceHolder[channelName].variations[variationKey].revenue = revenuePlaceHolder;
+			click += reportObject.clicks;
+			impression += reportObject.impressions;
+			pageViews += reportObject.pageViews;
 
-		accumulator[reportObject.siteId].pageGroups = Object.assign({}, sitePageGroupObjectPlaceHolder);
+			revenueComputedValue = Number((reportObject.revenue / 1000).toFixed(2));
+			revenue = Number((revenue + revenueComputedValue).toFixed(2));
+
+			// Computed current metric value
+			pageRPMComputedValue = Number((revenue / pageViews * 1000).toFixed(2));
+			// Check for boundary cases and convert accordingly
+			pageRPMComputedValue = (pageRPMComputedValue && pageRPMComputedValue !== Infinity) ? pageRPMComputedValue : 0.0;
+
+			pageCTRComputedValue = Number((click / pageViews * 100).toFixed(2));
+			pageCTRComputedValue = (pageCTRComputedValue && pageCTRComputedValue !== Infinity) ? pageCTRComputedValue : 0.0;
+
+			// Assign back final computed metric values to variation object
+			currentVariationObjectPlaceHolder.revenue = revenue;
+			currentVariationObjectPlaceHolder.click = click;
+			currentVariationObjectPlaceHolder.impression = impression;
+			currentVariationObjectPlaceHolder.pageViews = pageViews;
+			currentVariationObjectPlaceHolder.pageRPM = pageRPMComputedValue;
+			currentVariationObjectPlaceHolder.pageCTR = pageCTRComputedValue;
+		}
+
+		// Assign back cached objects to computed data
+		siteVariationObjectPlaceHolder[variationKey] = extend(true, {}, currentVariationObjectPlaceHolder);
+		sitePageGroupObjectPlaceHolder[channelName].variations = extend(true, {}, siteVariationObjectPlaceHolder);
+		accumulator[reportObject.siteId].pageGroups = extend(true, {}, sitePageGroupObjectPlaceHolder);
 
 		return accumulator;
 	}, {});
