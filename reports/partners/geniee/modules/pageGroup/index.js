@@ -194,7 +194,19 @@ module.exports = {
 				channelPageGroupObject = extend(true, {}, allChannelsData[channelKey]);
 
 			if (doesChannelKeyMatch) {
+				const reportPageGroupVariationKeys = _.keys(reportPageGroupObject.variations);
+				//NOTE: A deep extend will also effect source objects, they also extend each other properties
+				// reportPageGroupObject will extend channelPageGroupObject properties and vice versa
 				computedData[channelKey] = extend(true, reportPageGroupObject, channelPageGroupObject);
+
+				// Iterate over all page group variations and delete the variation which is
+				// non-existent in Sql reports variation data, i.e., Only include the variations which
+				// are present in both sql report and database channels data
+				_.forOwn(channelPageGroupObject.variations, (variationObject, variationKey) => {
+					const doesVariationKeyMatch = _.includes(reportPageGroupVariationKeys, variationKey);
+
+					if (!doesVariationKeyMatch) { delete computedData[channelKey].variations[variationKey]; }
+				});
 			}
 		});
 
