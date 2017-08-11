@@ -59,19 +59,33 @@ module.exports = {
 		_.forOwn(reportData.pageGroups, function(pageGroupObj, pageGroupKey) {
 			var computedPageGroupObj;
 
-			if (pageGroupKey === dataStr) { return false; }
+			if (pageGroupKey === dataStr) { return; }
 
 			// Cache current computed page group object
 			computedPageGroupObj = extend(true, {}, computedData.pageGroups[pageGroupKey]);
-			computedPageGroupObj = extend(true, {}, computedPageGroupObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'pageViews': 0, 'pageRPM': 0.0, 'pageCTR': 0.0, 'dayWisePageViews': {}, 'days': {} });
+			computedPageGroupObj = extend(true, {}, computedPageGroupObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'pageViews': 0, 'pageRPM': 0.0, 'pageCTR': 0.0, 'dayWisePageViews': {}, 'days': {}, 'tracked': { 'pageViews': 0, 'click': 0, 'pageCTR': 0.0, 'impression': 0 }});
 
 			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
-				if (variationKey === dataStr) { return false; }
+				// Removed 'false' from return false; below statement as it stops the forOwn loop
+				// execution
+				if (variationKey === dataStr) { return; }
+
+				let trackedPageCTR;
 
 				computedPageGroupObj.click += Number(variationObj.click);
+				computedPageGroupObj.tracked.click += Number(variationObj.tracked.click);
+
 				computedPageGroupObj.impression += Number(variationObj.impression);
+				computedPageGroupObj.tracked.impression += Number(variationObj.tracked.impression);
+				
 				computedPageGroupObj.revenue += Number(variationObj.revenue);
+
 				computedPageGroupObj.pageViews += Number(variationObj.pageViews);
+				computedPageGroupObj.tracked.pageViews += Number(variationObj.tracked.pageViews);
+
+				trackedPageCTR = Number((computedPageGroupObj.tracked.click / computedPageGroupObj.tracked.pageViews * 100).toFixed(2));
+				trackedPageCTR = (trackedPageCTR && trackedPageCTR !== Infinity) ? trackedPageCTR : 0.0;
+				computedPageGroupObj.tracked.pageCTR = trackedPageCTR;
 
 				// Set day wise page views for PageGroup
 				_.forOwn(variationObj.dayWisePageViews, function(pageViews, dateKey) {
@@ -94,18 +108,27 @@ module.exports = {
 					if (doesDateKeyNotExist) {
 						computedPageGroupObj.days[dateKey] = extend(true, {}, dataObject);
 					} else {
-						// Increment all metric object values and set incremented data in final metric object
+						// Increment and compute all metric object values and set incremented data in final metric object
 						const metricObject = extend(true, {}, computedPageGroupObj.days[dateKey]);
 						{
 							let revenue = metricObject.revenue,
 								click = metricObject.click,
+								trackedClick = metricObject.tracked.click,
 								impression = metricObject.impression,
+								trackedImpression = metricObject.tracked.impression,
 								pageViews = metricObject.pageViews,
-								revenueComputedValue, pageRPMComputedValue, pageCTRComputedValue;
+								trackedPageViews = metricObject.tracked.pageViews,
+								revenueComputedValue, pageRPMComputedValue, pageCTRComputedValue,
+								trackedPageCTRComputedValue;
 
 							click += dataObject.click;
+							trackedClick += dataObject.tracked.click;
+
 							impression += dataObject.impression;
+							trackedImpression += dataObject.tracked.impression;
+
 							pageViews += dataObject.pageViews;
+							trackedPageViews += dataObject.tracked.pageViews;
 
 							revenueComputedValue = Number((dataObject.revenue / 1000).toFixed(2));
 							revenue = Number((revenue + revenueComputedValue).toFixed(2));
@@ -118,13 +141,25 @@ module.exports = {
 							pageCTRComputedValue = Number((click / pageViews * 100).toFixed(2));
 							pageCTRComputedValue = (pageCTRComputedValue && pageCTRComputedValue !== Infinity) ? pageCTRComputedValue : 0.0;
 
+							trackedPageCTRComputedValue = Number((trackedClick / trackedPageViews * 100).toFixed(2));
+							trackedPageCTRComputedValue = (trackedPageCTRComputedValue && trackedPageCTRComputedValue !== Infinity) ? trackedPageCTRComputedValue : 0.0;
+
 							// Update cached object
 							metricObject.revenue = revenue;
+
 							metricObject.click = click;
+							metricObject.tracked.click = trackedClick;
+
 							metricObject.impression = impression;
+							metricObject.tracked.impression = trackedImpression;
+
 							metricObject.pageViews = pageViews;
+							metricObject.tracked.pageViews = trackedPageViews;
+
 							metricObject.pageRPM = pageRPMComputedValue;
+
 							metricObject.pageCTR = pageCTRComputedValue;
+							metricObject.tracked.pageCTR = trackedPageCTRComputedValue;
 
 							// Assign back computed cached object value to final date object
 							computedPageGroupObj.days[dateKey] = extend(true, {}, metricObject);

@@ -45,7 +45,7 @@ function transformResultData(reportData) {
 
 		isVariationIdExists = !!(isChannelExists && siteVariationObjectPlaceHolder && siteVariationObjectPlaceHolder.hasOwnProperty(variationKey));
 		if (!isVariationIdExists) {
-			siteVariationObjectPlaceHolder[variationKey] = {dayWisePageViews: {}, days: {}, click: 0, impression: 0, revenue: 0.0, pageViews: 0, pageRPM: 0.0, pageCTR: 0.0};
+			siteVariationObjectPlaceHolder[variationKey] = { dayWisePageViews: {}, days: {}, tracked: { pageViews: 0, click: 0, pageCTR: 0.0, impression: 0 }, click: 0, impression: 0, revenue: 0.0, pageViews: 0, pageRPM: 0.0, pageCTR: 0.0 };
 		}
 		// Cache current variation object
 		currentVariationObjectPlaceHolder = extend(true, {}, siteVariationObjectPlaceHolder[variationKey]);
@@ -56,12 +56,16 @@ function transformResultData(reportData) {
 			// by moving this logic to ads replay side
 			let revenue = Number((reportObject.revenue / 1000).toFixed(2)),
 				pageViews = reportObject.pageViews,
+				trackedPageViews = reportObject.trackedPageViews,
 				click = reportObject.clicks,
+				trackedClicks = reportObject.trackedClicks,
 				pageRPM = Number((revenue / pageViews * 1000).toFixed(2)),
-				pageCTR = Number((click / pageViews * 100).toFixed(2));
+				pageCTR = Number((click / pageViews * 100).toFixed(2)),
+				trackedPageCTR = Number((trackedClicks / trackedPageViews * 100).toFixed(2));
 
 			pageRPM = (pageRPM && pageRPM !== Infinity) ? pageRPM : 0.0;
 			pageCTR = (pageCTR && pageCTR !== Infinity) ? pageCTR : 0.0;
+			trackedPageCTR = (trackedPageCTR && trackedPageCTR !== Infinity) ? trackedPageCTR : 0.0;
 
 			currentVariationObjectPlaceHolder.days[matchedDateValue] = {
 				pageViews,
@@ -69,7 +73,13 @@ function transformResultData(reportData) {
 				click,
 				revenue,
 				pageRPM,
-				pageCTR
+				pageCTR,
+				tracked: {
+					pageViews: trackedPageViews,
+					click: trackedClicks,
+					pageCTR: trackedPageCTR,
+					impression: reportObject.trackedImpressions
+				}
 			};
 		}
 
@@ -81,15 +91,24 @@ function transformResultData(reportData) {
 		{
 			let revenue = currentVariationObjectPlaceHolder.revenue,
 				click = currentVariationObjectPlaceHolder.click,
+				trackedClick = currentVariationObjectPlaceHolder.tracked.click,
 				impression = currentVariationObjectPlaceHolder.impression,
+				trackedImpression = currentVariationObjectPlaceHolder.tracked.impression,
 				pageViews = currentVariationObjectPlaceHolder.pageViews,
+				trackedPageViews = currentVariationObjectPlaceHolder.tracked.pageViews,
 				// pageRPM = currentVariationObjectPlaceHolder.pageRPM,
 				// pageCTR = currentVariationObjectPlaceHolder.pageCTR,
-				revenueComputedValue, pageRPMComputedValue, pageCTRComputedValue;
+				revenueComputedValue, pageRPMComputedValue,
+				pageCTRComputedValue, trackedPageCTRComputedValue;
 
 			click += reportObject.clicks;
+			trackedClick += reportObject.trackedClicks;
+
 			impression += reportObject.impressions;
+			trackedImpression += reportObject.trackedImpressions;
+
 			pageViews += reportObject.pageViews;
+			trackedPageViews += reportObject.trackedPageViews;
 
 			revenueComputedValue = Number((reportObject.revenue / 1000).toFixed(2));
 			revenue = Number((revenue + revenueComputedValue).toFixed(2));
@@ -101,14 +120,24 @@ function transformResultData(reportData) {
 
 			pageCTRComputedValue = Number((click / pageViews * 100).toFixed(2));
 			pageCTRComputedValue = (pageCTRComputedValue && pageCTRComputedValue !== Infinity) ? pageCTRComputedValue : 0.0;
+			trackedPageCTRComputedValue = Number((trackedClick / trackedPageViews * 100).toFixed(2));
+			trackedPageCTRComputedValue = (trackedPageCTRComputedValue && trackedPageCTRComputedValue !== Infinity) ? trackedPageCTRComputedValue : 0.0;
 
 			// Assign back final computed metric values to variation object
 			currentVariationObjectPlaceHolder.revenue = revenue;
+
 			currentVariationObjectPlaceHolder.click = click;
+			currentVariationObjectPlaceHolder.tracked.click = trackedClick;
+
 			currentVariationObjectPlaceHolder.impression = impression;
+			currentVariationObjectPlaceHolder.tracked.impression = trackedImpression;
+
 			currentVariationObjectPlaceHolder.pageViews = pageViews;
+			currentVariationObjectPlaceHolder.tracked.pageViews = trackedPageViews;
+
 			currentVariationObjectPlaceHolder.pageRPM = pageRPMComputedValue;
 			currentVariationObjectPlaceHolder.pageCTR = pageCTRComputedValue;
+			currentVariationObjectPlaceHolder.tracked.pageCTR = trackedPageCTRComputedValue;
 		}
 
 		// Assign back cached objects to computed data
