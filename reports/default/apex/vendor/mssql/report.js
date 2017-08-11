@@ -73,7 +73,9 @@ function transformResultData(reportData) {
 				click,
 				revenue,
 				pageRPM,
-				pageCTR,
+				// Below pageCTR metric value is computed by using tracked (Chrome based click tracking) ad clicks and page views.
+				// This is done to ensure that pageCTR metric provides a correct value by using tracked clicks and page views metrics.
+				pageCTR: trackedPageCTR,
 				tracked: {
 					pageViews: trackedPageViews,
 					click: trackedClicks,
@@ -96,8 +98,6 @@ function transformResultData(reportData) {
 				trackedImpression = currentVariationObjectPlaceHolder.tracked.impression,
 				pageViews = currentVariationObjectPlaceHolder.pageViews,
 				trackedPageViews = currentVariationObjectPlaceHolder.tracked.pageViews,
-				// pageRPM = currentVariationObjectPlaceHolder.pageRPM,
-				// pageCTR = currentVariationObjectPlaceHolder.pageCTR,
 				revenueComputedValue, pageRPMComputedValue,
 				pageCTRComputedValue, trackedPageCTRComputedValue;
 
@@ -136,7 +136,7 @@ function transformResultData(reportData) {
 			currentVariationObjectPlaceHolder.tracked.pageViews = trackedPageViews;
 
 			currentVariationObjectPlaceHolder.pageRPM = pageRPMComputedValue;
-			currentVariationObjectPlaceHolder.pageCTR = pageCTRComputedValue;
+			currentVariationObjectPlaceHolder.pageCTR = trackedPageCTRComputedValue;
 			currentVariationObjectPlaceHolder.tracked.pageCTR = trackedPageCTRComputedValue;
 		}
 

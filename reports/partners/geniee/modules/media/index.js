@@ -43,8 +43,8 @@ module.exports = {
 			computedData.media.pageViews = computedData.media.pageViews || 0;
 			computedData.media.pageRPM = Number((computedData.media.revenue / computedData.media.pageViews * 1000).toFixed(2)) || 0;
 
-			computedData.media.pageCTR = Number((computedData.media.click / computedData.media.pageViews * 100).toFixed(2)) || 0;
 			computedData.media.tracked.pageCTR = Number((computedData.media.tracked.click / computedData.media.tracked.pageViews * 100).toFixed(2)) || 0;
+			computedData.media.pageCTR = computedData.media.tracked.pageCTR;
 		});
 
 		return Promise.resolve(computedData);

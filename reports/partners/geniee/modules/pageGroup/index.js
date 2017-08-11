@@ -158,7 +158,7 @@ module.exports = {
 
 							metricObject.pageRPM = pageRPMComputedValue;
 
-							metricObject.pageCTR = pageCTRComputedValue;
+							metricObject.pageCTR = trackedPageCTRComputedValue;
 							metricObject.tracked.pageCTR = trackedPageCTRComputedValue;
 
 							// Assign back computed cached object value to final date object
@@ -174,7 +174,7 @@ module.exports = {
 			computedPageGroupObj.impression = computedPageGroupObj.impression || 0;
 			computedPageGroupObj.pageViews = computedPageGroupObj.pageViews || 0;
 			computedPageGroupObj.pageRPM = Number((computedPageGroupObj.revenue / computedPageGroupObj.pageViews * 1000).toFixed(2)) || 0;
-			computedPageGroupObj.pageCTR = Number((computedPageGroupObj.click / computedPageGroupObj.pageViews * 100).toFixed(2)) || 0;
+			computedPageGroupObj.pageCTR = Number((computedPageGroupObj.tracked.click / computedPageGroupObj.tracked.pageViews * 100).toFixed(2)) || 0;
 
 			// Make Page RPM and CTR fail safe
 			computedPageGroupObj.pageRPM = (computedPageGroupObj.pageRPM && computedPageGroupObj.pageRPM !== Infinity) ? computedPageGroupObj.pageRPM : 0;
@@ -352,12 +352,10 @@ module.exports = {
 		_.forOwn(datesObj.pagerpm, function(pagerpmData, dateKey) {
 			utils.setDateWithEmptyValue(dateKey, 'pagerpm', highChartsData.highCharts);
 		});
-		//highChartsData.highCharts = utils.updatePageRPMHighChartsData(highChartsData.highCharts);
 
 		_.forOwn(datesObj.pagectr, function(pagectrData, dateKey) {
 			utils.setDateWithEmptyValue(dateKey, 'pagectr', highChartsData.highCharts);
 		});
-		//highChartsData.highCharts = utils.updatePageCTRHighChartsData(highChartsData.highCharts);
 
 		computedData.pageGroups.data = extend(true, computedData.pageGroups.data, highChartsData);
 
@@ -372,10 +370,15 @@ module.exports = {
 					rows: [],
 					footer: [constants.DATA_TABLE.COMMON.TOTAL, ' ', ' ', 0, 0, 0, 0, 0, 0, 0]
 				}
+			},
+			footerMetrics = {
+				trackedPageViews: 0,
+				trackedClick: 0,
+				trackedPageCTR: 0
 			};
 
-		_.forOwn(computedData.pageGroups, function(pageGroupObj, pageGroupKey) {
-			var rowItem = [],
+		_.forOwn(computedData.pageGroups, function(pageGroupObj) {
+			const rowItem = [],
 				tempVariationsObj = extend(true, {}, pageGroupObj.variations);
 
 			delete tempVariationsObj.data;
@@ -389,16 +392,18 @@ module.exports = {
 
 			rowItem[4] = pageGroupObj.impression;
 			pageGroupsTabularData.table.footer[4] += Number(pageGroupObj.impression);
-			
+
 			rowItem[5] = pageGroupObj.pageViews;
 			pageGroupsTabularData.table.footer[5] += Number(pageGroupObj.pageViews);
-			
+			footerMetrics.trackedPageViews += Number(pageGroupObj.tracked.pageViews);
+
 			rowItem[6] = pageGroupObj.click;
 			pageGroupsTabularData.table.footer[6] += Number(pageGroupObj.click);
-			
+			footerMetrics.trackedClick += Number(pageGroupObj.tracked.click);
+
 			rowItem[7] = pageGroupObj.pageRPM;
 			rowItem[8] = pageGroupObj.pageCTR;
-			
+
 			rowItem[9] = _.keys(tempVariationsObj).length;
 			pageGroupsTabularData.table.footer[9] += Number(rowItem[9]);
 
@@ -410,7 +415,7 @@ module.exports = {
 		// Calculate footer pageRPM
 		pageGroupsTabularData.table.footer[7] = Number((pageGroupsTabularData.table.footer[3] / pageGroupsTabularData.table.footer[5] * 1000).toFixed(2));
 		// Calculate footer pageCTR
-		pageGroupsTabularData.table.footer[8] = Number((pageGroupsTabularData.table.footer[6] / pageGroupsTabularData.table.footer[5] * 100).toFixed(2));
+		pageGroupsTabularData.table.footer[8] = Number((footerMetrics.trackedClick / footerMetrics.trackedPageViews * 100).toFixed(2));
 
 		computedData.pageGroups.data = extend(true, {}, pageGroupsTabularData);
 
