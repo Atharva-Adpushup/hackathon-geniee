@@ -74,25 +74,13 @@ module.exports = function (site) {
 
             return site.getAllChannels().then(function (allChannels) {
                 _.each(allChannels, function (channel) {
-                    var platform, pageGroup, channelKey, pageGroupData,
-                        pageGroupId, isReportData, isGenieeReportData, isApexReportData;
+                    var platform, pageGroup, channelKey, pageGroupData;
 
                     platform = channel.platform; // last element is platform
                     pageGroup = channel.pageGroup; // join remaing to form pageGroup
                     // channelKey sample name HOME_DESKTOP
                     channelKey = pageGroup + '_' + platform;
-                    isReportData = !!(reportData && _.isObject(reportData));
-                    isGenieeReportData = !!(isReportData && channel.genieePageGroupId);
-                    isApexReportData = !!(isReportData && channelKey && isAutoOptimise);
-
-                    //TODO: Move below partner specific logic in universal app service
-                    if (isGenieeReportData) {
-                        pageGroupId = channel.genieePageGroupId;
-                    } else if (isApexReportData) {
-                        pageGroupId = channelKey;
-                    }
-
-                    pageGroupData = pageGroupId ? reportData.pageGroups[pageGroupId] : null;
+                    pageGroupData = channelKey ? reportData.pageGroups[channelKey] : null;
 
                     if (!finalJson[platform]) {
                         finalJson[platform] = {};
