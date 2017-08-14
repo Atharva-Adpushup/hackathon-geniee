@@ -1,4 +1,4 @@
-const singleVariationData = require('../queryHelpers/singleVariationData'),
+const singleVariationData = require('../../../modules/mssql/singleVariationData'),
 	moment = require('moment'),
 	paramConfig = {
 		'siteId': 25019,
