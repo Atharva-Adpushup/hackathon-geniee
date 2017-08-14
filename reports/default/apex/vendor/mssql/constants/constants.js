@@ -1,4 +1,4 @@
-const GET_METRICS_QUERY = `
+const SITE_METRICS_QUERY = `
 Select 
 	s.siteid as siteId,
 	g.name as pageGroup,
@@ -34,4 +34,4 @@ group by
 	s.report_date
 `;
 
-module.exports = { GET_METRICS_QUERY };
+module.exports = { SITE_METRICS_QUERY };

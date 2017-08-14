@@ -1,6 +1,6 @@
-const { GET_METRICS_QUERY } = require('./constants/constants'),
+const { SITE_METRICS_QUERY } = require('../constants/constants'),
 	extend = require('extend'),
-	dbHelper = require('./dbhelper');
+	dbHelper = require('../dbhelper');
 
 function transformResultData(reportData) {
 	const optionsConfig = {
@@ -180,7 +180,7 @@ module.exports = {
 			// Also, the parameter for which IN operator is applied is also number.
 			// NOTE: Always insert query values through input of prepared statement but
 			// manually insert probelmatic/typical values
-			dbQuery = `${GET_METRICS_QUERY.replace(/@__siteId__/g, paramConfig.siteId)}`,
+			dbQuery = `${SITE_METRICS_QUERY.replace(/@__siteId__/g, paramConfig.siteId)}`,
 			databaseConfig = {
 				inputParameters: inputParameterCollection.concat([]),
 				query: dbQuery
