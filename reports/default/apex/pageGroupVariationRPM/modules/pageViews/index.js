@@ -1,26 +1,17 @@
 var lodash = require('lodash'),
-	moment = require('moment'),
 	Promise = require('bluebird'),
-	sqlQueryModule = require('../../../modules/mssql/singleVariationData');
-const { getSqlValidParameterDates } = require('../../../vendor/mssql/utils/utils');
+	reportsModel = require('../../../../../../models/reportsModel');
 
 module.exports = {
 	getTotalCount: function(dataConfig) {
-		var config = lodash.assign({}, dataConfig);
+		var config = lodash.assign({}, dataConfig),
+			esSpecificVariationKey = dataConfig.variationKey.replace(/-/g, '_');
 
-		config.variationId = `${config.variationKey}`;
-		delete config.variationKey;
+		config.queryString = 'mode:1 AND variationId:' + esSpecificVariationKey;
 
-		config.startDate = moment(config.startDate, 'x').format('YYYY-MM-DD');
-		config.endDate = moment(config.endDate, 'x').format('YYYY-MM-DD');
-		const dateParams = { dateFrom: config.startDate, dateTo: config.endDate };
-		config.startDate = getSqlValidParameterDates(dateParams).dateFrom;
-		config.endDate = getSqlValidParameterDates(dateParams).dateTo;
-		
-		config.mode = 1;
-		return sqlQueryModule.getData(config)
+		return Promise.resolve(reportsModel.apexReport(config))
 			.then(function(report) {
-				var pageViews = Number(report.pageViews);
+				var pageViews = Number(report.data.tracked.totalPageViews);
 
 				return Promise.resolve(pageViews);
 			});
