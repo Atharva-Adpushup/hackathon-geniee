@@ -13,11 +13,9 @@ module.exports = {
 	getReportData: function(reportConfig) {
 		const defaultDateConfig = {
 			startDate: moment().subtract(7, 'days').startOf('day').valueOf(),
-			endDate: moment().subtract(0, 'days').endOf('day').valueOf()
-		},
-		defaultSqlReportConfig = {
-			startDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
-			endDate: moment().subtract(0, 'days').format('YYYY-MM-DD')
+			endDate: moment().subtract(0, 'days').endOf('day').valueOf(),
+			sqlValidStartDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+			sqlValidEndDate: moment().subtract(0, 'days').format('YYYY-MM-DD')
 		},
 		config = {
 			siteId: reportConfig.siteId,
@@ -25,23 +23,19 @@ module.exports = {
 			step: '1d',
 			startDate: (reportConfig.startDate ? reportConfig.startDate : defaultDateConfig.startDate),
 			endDate: (reportConfig.endDate ? reportConfig.endDate : defaultDateConfig.endDate),
-			currencyCode: reportConfig.currencyCode
-		},
-		sqlReportConfig = {
-			siteId: reportConfig.siteId,
-			startDate: (reportConfig.startDate) ? moment(reportConfig.startDate, 'x').format('YYYY-MM-DD') : defaultSqlReportConfig.startDate,
-			endDate: (reportConfig.endDate) ? moment(reportConfig.endDate, 'x').format('YYYY-MM-DD') : defaultSqlReportConfig.endDate,
+			// Sql report compatible format of date params
+			sqlValidStartDate: (reportConfig.startDate) ? moment(reportConfig.startDate, 'x').format('YYYY-MM-DD') : defaultDateConfig.sqlValidStartDate,
+			sqlValidEndDate: (reportConfig.endDate) ? moment(reportConfig.endDate, 'x').format('YYYY-MM-DD') : defaultDateConfig.sqlValidEndDate,
+			currencyCode: reportConfig.currencyCode,
 			mode: (reportConfig.mode) ? reportConfig.mode : 1
 		},
-		sqlValidDateConfig = { dateFrom: sqlReportConfig.startDate, dateTo: sqlReportConfig.endDate },
+		sqlValidDateConfig = { dateFrom: config.sqlValidStartDate, dateTo: config.sqlValidEndDate },
 		sqlValidDatesObject = getSqlValidParameterDates(sqlValidDateConfig);
 
-		sqlReportConfig.startDate = sqlValidDatesObject.dateFrom;
-		sqlReportConfig.endDate = sqlValidDatesObject.dateTo;
+		config.sqlValidStartDate = sqlValidDatesObject.dateFrom;
+		config.sqlValidEndDate = sqlValidDatesObject.dateTo;
 
-		if (reportConfig.queryString) {
-			config.queryString = reportConfig.queryString;
-		}
+		if (reportConfig.queryString) { config.queryString = reportConfig.queryString; }
 
 		function generateRPMReport(ctrPerformanceConfig, channel, email, variationData) {
 			return Promise.all(_.map(variationData, (variationObj, variationKey) => {
@@ -83,7 +77,13 @@ module.exports = {
 			})).then(variationModule.getFinalData);
 		}
 
-		const siteReportData = sqlQueryModule.getMetricsData(sqlReportConfig),
+		const sqlReportData = {
+				mode: config.mode,
+				startDate: config.sqlValidStartDate,
+				endDate: config.sqlValidEndDate,
+				siteId: config.siteId
+			},
+			siteReportData = sqlQueryModule.getMetricsData(sqlReportData),
 			getSiteModel = siteModel.getSiteById(config.siteId);
 
 		return Promise.join(siteReportData, getSiteModel, (sqlReportData, siteModelInstance) => {
