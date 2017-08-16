@@ -5,13 +5,19 @@ var _ = require('lodash'),
 	siteModel = require('../../../models/siteModel'),
 	ctrPerformanceService = require('./ctrPerformanceInTabularData/service'),
 	pageGroupVariationRPMService = require('./pageGroupVariationRPM/service'),
-	variationModule = require('./modules/variation/index');
+	variationModule = require('./modules/variation/index'),
+	sqlQueryModule = require('../../default/apex/vendor/mssql/queryHelpers/fullSiteData'),
+	{ getSqlValidParameterDates } = require('../../default/apex/vendor/mssql/utils/utils');
 
 module.exports = {
 	getReportData: function(reportConfig) {
 		const defaultDateConfig = {
 			startDate: moment().subtract(7, 'days').startOf('day').valueOf(),
 			endDate: moment().subtract(0, 'days').endOf('day').valueOf()
+		},
+		defaultSqlReportConfig = {
+			startDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+			endDate: moment().subtract(0, 'days').format('YYYY-MM-DD')
 		},
 		config = {
 			siteId: reportConfig.siteId,
@@ -20,7 +26,18 @@ module.exports = {
 			startDate: (reportConfig.startDate ? reportConfig.startDate : defaultDateConfig.startDate),
 			endDate: (reportConfig.endDate ? reportConfig.endDate : defaultDateConfig.endDate),
 			currencyCode: reportConfig.currencyCode
-		};
+		},
+		sqlReportConfig = {
+			siteId: reportConfig.siteId,
+			startDate: (reportConfig.startDate) ? moment(reportConfig.startDate, 'x').format('YYYY-MM-DD') : defaultSqlReportConfig.startDate,
+			endDate: (reportConfig.endDate) ? moment(reportConfig.endDate, 'x').format('YYYY-MM-DD') : defaultSqlReportConfig.endDate,
+			mode: (reportConfig.mode) ? reportConfig.mode : 1
+		},
+		sqlValidDateConfig = { dateFrom: sqlReportConfig.startDate, dateTo: sqlReportConfig.endDate },
+		sqlValidDatesObject = getSqlValidParameterDates(sqlValidDateConfig);
+
+		sqlReportConfig.startDate = sqlValidDatesObject.dateFrom;
+		sqlReportConfig.endDate = sqlValidDatesObject.dateTo;
 
 		if (reportConfig.queryString) {
 			config.queryString = reportConfig.queryString;
@@ -66,12 +83,20 @@ module.exports = {
 			})).then(variationModule.getFinalData);
 		}
 
-		return siteModel.getSiteById(config.siteId)
-			.then((site) => {
-				const email = site.get('ownerEmail');
+		const siteReportData = sqlQueryModule.getMetricsData(sqlReportConfig),
+			getSiteModel = siteModel.getSiteById(config.siteId);
 
-				return site.getAllChannels()
-					.then(generateFullReport.bind(null, config, email));
-			})
+		return Promise.join(siteReportData, getSiteModel, (sqlReportData, siteModelInstance) => {
+			console.log(`Apex Report:: Sql Report data: ${JSON.stringify(sqlReportData)}`);
+
+			return Promise.resolve(siteModelInstance)
+				.then((site) => {
+					const email = site.get('ownerEmail');
+
+					return site.getAllChannels()
+						.then(generateFullReport.bind(null, config, email));
+				});
+		});
+
 	}
 };
