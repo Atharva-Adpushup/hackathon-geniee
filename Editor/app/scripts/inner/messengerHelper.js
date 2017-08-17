@@ -3,7 +3,7 @@ import $ from 'jquery';
 import { messengerCommands } from 'consts/commonConsts';
 import Utils from 'libs/utils';
 import { updateLayout, highlightElement, setElementSelectorCords, hideElementSelector } from '../../actions/inner/actions';
-import { getAdpVitals, getAllXPaths, isValidXPath } from './domManager';
+import { getAdpVitals, getAllXPaths, isValidXPath, scrollToView } from './domManager';
 
 const messenger = new Messenger(),
 	sendMessage = (cmd, data) => {
@@ -54,7 +54,12 @@ const messenger = new Messenger(),
 						isValidXPath: isValidXPath(data.xpath),
 						sectionId: data.sectionId
 					});
-					break;
+                    break;
+                    
+                case messengerCommands.SCROLL_TO_VIEW:
+                    scrollToView(data.adId);
+                    // dispatch();
+                    break;
 
 				case messengerCommands.SELECT_ELEMENT:
 					const $el = $(data.xpath),

@@ -45,13 +45,15 @@ const empyScreen = () => (<div className="tabContentbg" />),
 				</div>
 			</div>
 			<div className="tabContent">
-				{props.children.length.length === 0 ? empyScreen() : props.children.map((tabPane) => (
-					React.cloneElement(tabPane, {
-						key: `tab_content_${tabPane.key}`,
-						id: `tab_content_${tabPane.key}`,
-						selected: (props.activeKey === tabPane.key)
-					})
-				))}
+                <div className="tabContentbg">
+                    {props.children.length.length === 0 ? empyScreen() : props.children.map((tabPane) => (
+                        React.cloneElement(tabPane, {
+                            key: `tab_content_${tabPane.key}`,
+                            id: `tab_content_${tabPane.key}`,
+                            selected: (props.activeKey === tabPane.key)
+                        })
+                    ))}
+                </div>
 			</div>
 		</div>
 	);

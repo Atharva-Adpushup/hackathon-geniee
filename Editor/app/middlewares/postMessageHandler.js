@@ -42,7 +42,9 @@ const getData = (state) => {
 				sendMessage(nextState.activeChannelId, messengerCommands.VALIDATE_XPATH, { xpath: action.xpath, sectionId: action.sectionId });
 			} else if (action.type === sectionActions.VALIDATE_XPATH_SECTION) {
 				sendMessage(nextState.activeChannelId, messengerCommands.VALIDATE_XPATH_SECTION, { xpath: action.xpath, sectionId: action.sectionId });				
-			}
+			} else if (action.type == sectionActions.SCROLL_TO_VIEW) {
+				sendMessage(nextState.activeChannelId, messengerCommands.SCROLL_TO_VIEW, { adId: action.adId });				                
+            }
 		}
 
 		return store.getState();

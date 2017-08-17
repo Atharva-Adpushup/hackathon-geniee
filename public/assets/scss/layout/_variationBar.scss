@@ -119,6 +119,18 @@
     background-color: $ADREPrimaryFontColor;
 }
 
+.section-select-ad {
+    background-color: transparent;
+    color: $primaryRedDark;
+    border: 1px solid $primaryRedDark;
+    cursor: pointer;
+}
+
+.section-select-ad:hover {
+    background-color: $primaryRedDark;
+    color: #fff;    
+}
+
 .section-error {
     margin-left: 10px;
     background-color: $primaryColor;

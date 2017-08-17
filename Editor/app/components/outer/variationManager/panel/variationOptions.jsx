@@ -6,7 +6,13 @@ import { deleteVariation, copyVariation, editVariationName, editTrafficDistribut
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 
 const variationOtions = (props) => {
-	const { onDeleteVariation, onCopyVariation, onEditVariationName, variation, channelId, onEditTrafficDistribution } = props;
+    const { onDeleteVariation, onCopyVariation, onEditVariationName, variation, channelId, onEditTrafficDistribution } = props;
+    
+    function copyVariationConfirmation(fn, variationId, channelId) {
+        let confirm = window.confirm("Are you sure you want to copy this variation?");
+        confirm ? fn(variationId, channelId) : null;
+    }
+
 	return (
 		<div>
 			<h1 className="variation-section-heading">Variation Info</h1>
@@ -29,7 +35,7 @@ const variationOtions = (props) => {
 			<br /><br />
 			<Row>
 				<Col className="u-padding-r10px" xs={2}>
-					<Button className="btn-lightBg btn-copy btn-block" onClick={onCopyVariation.bind(null, variation.id, channelId)} type="submit">Copy Variation</Button>
+					<Button className="btn-lightBg btn-copy btn-block" onClick={copyVariationConfirmation.bind(null, onCopyVariation, variation.id, channelId)} type="submit">Copy Variation</Button>
 				</Col>
 				<Col className="u-padding-l10px" xs={2}>
 					<Button className="btn-lightBg btn-del-line btn-block" onClick={onDeleteVariation.bind(null, variation.id, channelId)} type="submit">Delete Variation</Button>
@@ -57,4 +63,3 @@ export default connect(
 		onEditTrafficDistribution: editTrafficDistribution
 	}, dispatch)
 	)(variationOtions);
-

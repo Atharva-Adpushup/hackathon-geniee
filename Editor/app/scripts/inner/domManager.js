@@ -55,7 +55,18 @@ const selectorator = new Selectorator(),
 		catch (err) {
 			return false;
 		}
-	},
+    },
+    scrollToView = adId => {
+        let id = `#ad-${adId}`,
+            ele = $(id);
+
+        $('html, body').animate({
+            scrollTop: ele.offset().top
+        }, 500);
+
+        ele.css("border", "3px solid #cf474b");
+        return true;
+    },
 	initDomEvents = ({ dispatch }) => {
 		$(document).ready(() => {
 			sendMessage(messengerCommands.CM_FRAMELOAD_SUCCESS, { channelId: window.ADP_CHANNEL_ID });
@@ -97,4 +108,4 @@ const selectorator = new Selectorator(),
 		});
 	};
 
-export { initDomEvents, getAdpVitals, getAllXPaths, isValidXPath };
+export { initDomEvents, getAdpVitals, getAllXPaths, isValidXPath, scrollToView };

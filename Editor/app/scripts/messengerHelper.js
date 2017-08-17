@@ -56,8 +56,8 @@ const messenger = new Messenger(),
 
 				case messengerCommands.CONTENT_SELECTOR_WORKED:
 					dispatch(contentSelectorWorked(data.channelId));
-					break;
-
+                    break;
+                    
 				case messengerCommands.SECTION_ALL_XPATHS:
 					// this.flux.actions.updateSection(data);
 					break;

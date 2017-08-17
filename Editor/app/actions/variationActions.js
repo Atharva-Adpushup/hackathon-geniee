@@ -81,8 +81,8 @@ const getLastVariationNumber = function (variations) {
 		} else {
 			alert('You need at least one variation!');
 		}
-	},
-	setActiveVariation = (variationId) => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
+    },
+    setActiveVariation = (variationId) => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
 	updateVariation = (variationId, payload) => ({ type: variationActions.UPDATE_VARIATION, variationId, payload }),
 	editVariationName = (variationId, channelId, name) => (dispatch, getState) => {
 		const variations = getChannelVariations(getState(), { channelId }),

@@ -1,13 +1,13 @@
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { deleteSection, renameSection, updateXPath, sectionAllXPaths, validateXPath, validateSectionXPath, updateIncontentFloat, updatePartnerData } from 'actions/sectionActions.js';
+import { deleteSection, renameSection, updateXPath, sectionAllXPaths, validateXPath, validateSectionXPath, updateIncontentFloat, updatePartnerData, scrollSectionIntoView } from 'actions/sectionActions.js';
 import { updateAdCode } from 'actions/adActions';
 import { resetErrors } from 'actions/uiActions';
 import VariationSectionElement from './variationSectionElement';
 
 const variationSections = (props) => {
-	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdatePartnerData, onUpdateXPath, onSectionAllXPaths, onValidateXPath, onIncontentFloatUpdate, ui, onResetErrors, onSectionXPathValidate } = props;
+	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdatePartnerData, onUpdateXPath, onSectionAllXPaths, onValidateXPath, onIncontentFloatUpdate, ui, onResetErrors, onSectionXPathValidate, onScrollSectionIntoView } = props;
 	return (
 		<div>
 			<h1 className="variation-section-heading">Variation Sections</h1>
@@ -29,6 +29,7 @@ const variationSections = (props) => {
 							onResetErrors={onResetErrors}
 							onSectionXPathValidate={onSectionXPathValidate}
 							onIncontentFloatUpdate={onIncontentFloatUpdate}
+                            onScrollSectionIntoView={onScrollSectionIntoView}
 							ui={ui}
 							/>
 					</div>
@@ -66,6 +67,7 @@ export default connect(
 		onValidateXPath: validateXPath,
 		onResetErrors: resetErrors,
 		onSectionXPathValidate: validateSectionXPath,
-		onIncontentFloatUpdate: updateIncontentFloat
+        onIncontentFloatUpdate: updateIncontentFloat,
+        onScrollSectionIntoView: scrollSectionIntoView
 	}, dispatch)
 )(variationSections);

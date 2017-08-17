@@ -80,8 +80,7 @@ function createNewUser(params, res) {
 
 		return [params.email, analyticsObj];
 	}).catch(function(err) {
-		console.log(err);
-		console.log("Error Occured");
+        throw err;
 	});
 }
 
@@ -116,21 +115,22 @@ function setSessionData(user, req, res, type) {
 			userPasswordMatch = 1;
 		}
 
-		if (type == 1 && userPasswordMatch == 1) {
+		if (type == 1 && userPasswordMatch == 1) { // Sign Up
 			return res.redirect('/user/onboarding');
-		} else if (type == 2 && userPasswordMatch == 1) {
-			if (parseInt(user.get('revenueUpperLimit')) <= 2500 || parseInt(user.get('revenueUpperLimit')) > 10000) {
+		} else if (type == 2 && userPasswordMatch == 1) { // Login
+			if (parseInt(user.get('revenueLowerLimit')) == 0 || parseInt(user.get('revenueUpperLimit')) < 1000) {
 				if (req.session.isSuperUser) {
 					allowEntry = 1;
 				} else {
-					if (parseInt(user.get('revenueUpperLimit')) <= 2500) {
-						redirectPath = 'thank-you';
-					} else if (parseInt(user.get('revenueUpperLimit')) > 10000) {
-						redirectPath = 'thankyou';
-						if (!req.session.user.requestDemo) {
-							allowEntry = 1;
-						}
-					}
+                    redirectPath = 'thank-you';
+                    // if (parseInt(user.get('revenueUpperLimit')) <= 2500) {
+					// 	redirectPath = 'thank-you';
+					// } else if (parseInt(user.get('revenueUpperLimit')) > 10000) {
+					// 	redirectPath = 'thankyou';
+					// 	if (!req.session.user.requestDemo) {
+					// 		allowEntry = 1;
+					// 	}
+					// }
 				}
 			} else {
 				allowEntry = 1;
@@ -153,7 +153,7 @@ function setSessionData(user, req, res, type) {
 					if (Array.isArray(sites) && sites.length > 0) {
 						if (sites.length == 1) {
 							var step = sites[0].step;
-							if (step && step < 6 || !step) {
+							if (step && step < consts.onboarding.totalSteps || !step) {
 								return res.redirect('/user/onboarding');
 							}
 							if (req.session.isSuperUser) {
@@ -170,26 +170,28 @@ function setSessionData(user, req, res, type) {
 					} else {
 						if (allUserSites.length == 1) {
 							if (req.session.isSuperUser) {
-								if (!allUserSites[0].step || allUserSites[0].step < 6) {
+								if (!allUserSites[0].step || allUserSites[0].step < consts.onboarding.totalSteps) {
 									return res.redirect('/user/onboarding');
 								} else {
 									return res.redirect('/user/dashboard');
 								}
-							}
-							if (allUserSites[0].services) {
-								var noOfServices = allUserSites[0].services.split('|');
-								if (noOfServices.length > 1) {
-									return res.redirect('/thankyou');
-								} else {
-									if (allUserSites[0].services == 'header-bidding' || allUserSites[0].services == 'other-networks') {
-										return res.redirect('/thankyou');
-									} else {
-										return res.redirect('/user/onboarding');
-									}
-								}
 							} else {
-								return res.redirect('/user/onboarding');
-							}
+                                return res.redirect('/user/onboarding');
+                            }
+							// if (allUserSites[0].services) {
+							// 	var noOfServices = allUserSites[0].services.split('|');
+							// 	if (noOfServices.length > 1) {
+							// 		return res.redirect('/thankyou');
+							// 	} else {
+							// 		if (allUserSites[0].services == 'header-bidding' || allUserSites[0].services == 'other-networks') {
+							// 			return res.redirect('/thankyou');
+							// 		} else {
+							// 			return res.redirect('/user/onboarding');
+							// 		}
+							// 	}
+							// } else {
+							// 	return res.redirect('/user/onboarding');
+							// }
 						}
 					}
 				});
@@ -232,15 +234,13 @@ router
 							firstName: req.body.firstName,
 							email: req.body.email
 						};
-						if (parseInt(user.data.revenueUpperLimit) <= 2500) {
+						if (parseInt(user.data.revenueUpperLimit) <= consts.onboarding.revenueLowerBound) {
 							// thank-you --> Page for below threshold users
 							req.session.stage = 'Pre Onboarding';
 							return res.redirect('/thank-you');
 						} else {
 							/*
-								Users with revenue b/w 2,500-10,000
-								or
-								Users with revenue > 10,000
+								Users with revenue > 1,000
 							*/
 							return setSessionData(user, req, res, 1);
 						}

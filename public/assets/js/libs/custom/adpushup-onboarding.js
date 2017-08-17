@@ -4,7 +4,12 @@ $('document').ready(function () {
     (function (ap, w, d) {
 
         // Save new site object that is attached to adpushup global object 
-        var newSite = ap.newSite;
+        var newSite = ap.newSite,
+            onboardingStages = {
+                siteAdded: 83,
+                apCodeAdded: 84,
+                passback: 85
+            };
 
         // Define onboarding sequence object
         ap.onboarding = {
@@ -118,17 +123,12 @@ $('document').ready(function () {
             // Setup complete alert
             setupCompleteAlert: function () {
                 var ob = this;
-                // setTimeout(function() {
-                //     $('#skipOauth').hide();
-                //     $('#dsBLink').html(ob.templates.dashboardLink);
-                // }, 1000);
                 if (newSite.addOtherSite) {
                     ob.anotherSiteModalOpen();
                 } else {
                     var url = 'http://' + window.location.host + '/thankyou';
                     window.location.replace(url);
                 }
-                // $('#completionmodal').modal('show');
             },
 
             // Smooth scrolling method
@@ -174,7 +174,7 @@ $('document').ready(function () {
                 $('#step' + step).addClass('active-step');
 
                 // Set appropriate cms detection check
-                if (step >= 3) {
+                if (step >= 2) {
                     this.apVerificationStep();
                 }
 
@@ -187,26 +187,23 @@ $('document').ready(function () {
                         this.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + this.domanize(newSite.addedSite.domain) + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
                     }
                 }
-                if (newSite.addedSite && step >= 4) {
-                    this.manipulateElem('#non-admin-email', '*Email* - ' + this.extractWebsiteName(newSite.addedSite.domain) + '@adpushup.com', 'htmlFadeIn', 600);
-                }
-                if (step > 3) {
-                    $('#apCheck').html('Verified ' + this.templates.checkIcon);
-                }
-                if (step > 4) {
-                    $('#adsenseoauth').html('Google Adsense Connected ' + this.templates.checkIcon);
-                }
+                // if (newSite.addedSite && step >= 4) {
+                //     this.manipulateElem('#non-admin-email', '*Email* - ' + this.extractWebsiteName(newSite.addedSite.domain) + '@adpushup.com', 'htmlFadeIn', 600);
+                // }
+                // if (step > 3) {
+                //     $('#apCheck').html('Verified ' + this.templates.checkIcon);
+                // }
+                // if (step > 4) {
+                //     $('#adsenseoauth').html('Google Adsense Connected ' + this.templates.checkIcon);
+                // }
 
                 this.scrollTo(step, 90, 1000);
 
-                switch (step) {
-                    case 1:
-                        $('#platformVerificationContent').html('<p class="text-center mT-10"><img class="platform-graphic" src="/assets/images/platform.png" width="150" height="150"/></p>');
-                        break;
-                    // case 6:
-                    //     this.setupCompleteAlert();
-                    //     break;
-                }
+                // switch (step) {
+                //     case 1:
+                //         $('#platformVerificationContent').html('<p class="text-center mT-10"><img class="platform-graphic" src="/assets/images/platform.png" width="150" height="150"/></p>');
+                //         break;
+                // }
             },
 
             // Goto next onboarding step
@@ -226,7 +223,7 @@ $('document').ready(function () {
                 $.post('/data/saveSite', {
                     site: site,
                     siteId: siteId,
-                    step: 2
+                    step: 1
                 }, function (res) {
                     if (res.success) {
                         newSite.addedSite = {
@@ -236,7 +233,7 @@ $('document').ready(function () {
                         $('.add-site-alt-form').hide();
                         $('#addSiteStr').fadeIn();
                         ob.manipulateElem('#addSiteStr', '<h2 class="text-appear"><span>' + site + '</span> has been Added!</h2>', 'htmlFadeIn', 600);
-                        ob.nextStep(3, 2, 1000);
+                        ob.nextStep(2, 1, 1000);
                         ob.apVerificationStep();
                         ob.manipulateElem('#non-admin-email', '*Email* - ' + ob.extractWebsiteName(newSite.addedSite.domain) + '@adpushup.com', 'htmlFadeIn', 600);
                         return true;
@@ -280,7 +277,7 @@ $('document').ready(function () {
                             success: function (res) {
                                 if (res.success) {
                                     if (!newSite.addOtherSite) {
-                                        var status = 66;
+                                        var status = onboardingStages.siteAdded;
                                         ob.updateCrmDealStatus(status);
                                         ob.analyticsEventEmitter({
                                             step: 'Added Site'
@@ -310,12 +307,11 @@ $('document').ready(function () {
                 ap.apAlert('AdPushup has been successfully detected on the website!', '#apdetect', 'success', 'slideDown');
                 if (newSite.addOtherSite) {
                     $(el).html('Setup Complete ' + ob.templates.checkIcon).after(ob.templates.dashboardLink);
-                    ob.nextStep(6, 3, 1000);
                 }
                 else {
                     $(el).html('Verified ' + ob.templates.checkIcon);
-                    ob.nextStep(4, 3, 1000);
                 }
+                ob.nextStep(3, 2, 1000);
             },
 
             // AdPushup detection on site
@@ -327,11 +323,11 @@ $('document').ready(function () {
                     if (res.ap) {
                         $.post('/user/setSiteStep', {
                             siteId: newSite.addedSite.siteId,
-                            step: newSite.addOtherSite ? 5 : 3
+                            step: 2
                         }, function (response) {
                             if (response.success) {
                                 if (!newSite.addOtherSite) {
-                                    var status = 67;
+                                    var status = onboardingStages.apCodeAdded;
                                     ob.updateCrmDealStatus(status);
                                     ob.analyticsEventEmitter({
                                         step: 'Added AP Code'
@@ -530,7 +526,6 @@ $('document').ready(function () {
                         if (parseInt(window.currentUser.revenueUpperLimit) > 10000 || data.selectedServices.length > 1) {
                             window.location.replace(url);
                         } else if (data.selectedServices.length == 1) {
-                            console.log("working");
                             if (data.selectedServices[0] == 'only-adsense') {
                                 $('#intromodal').modal('hide');
                                 $('#completionmodal').modal('show');
@@ -713,12 +708,12 @@ $('document').ready(function () {
 
                 $.post('/user/setSiteStep', {
                     siteId: newSite.addedSite.siteId,
-                    step: 6,
+                    step: 3,
                     completeOnboarding: completeOnboarding
                 }, function (response) {
                     if (response.success) {
                         if (!newSite.addOtherSite) {
-                            var status = 70;
+                            var status = onboardingStages.passback;
                             ob.updateCrmDealStatus(status);
                             ob.analyticsEventEmitter({
                                 stage: 'Post Onboarding',
@@ -737,28 +732,31 @@ $('document').ready(function () {
                     errorBox = $("#addOtherSiteModal .error-message-box"),
                     response = ob.addSite(site, url, null, true);
                 if (response) {
-                    var servicesString = selectedServices.join(' | '),
-                        dataToEndPoint = {
-                            servicesString: servicesString,
-                            newSiteUnSavedDomain: site + '/',
-                            selectedServices: selectedServices,
-                            fromDashboard: true
-                        };
-                    $.post('/user/setSiteServices', dataToEndPoint, function (response) {
-                        if (response.success) {
-                            if (selectedServices.length > 1) {
-                                ob.anotherSiteModalOpen();
-                            } else {
-                                if (selectedServices[0] == 'only-adsense') {
-                                    $('#addOtherSiteModal').modal('hide');
-                                    $('#apdetect').fadeOut();
-                                    ob.nextStep(3, 2, 1000);
-                                } else {
-                                    ob.anotherSiteModalOpen();
-                                }
-                            }
-                        }
-                    });
+                    $('#addOtherSiteModal').modal('hide');
+                    $('#apdetect').fadeOut();
+                    ob.nextStep(3, 2, 1000);
+                    // var servicesString = selectedServices.join(' | '),
+                    //     dataToEndPoint = {
+                    //         servicesString: servicesString,
+                    //         newSiteUnSavedDomain: site + '/',
+                    //         selectedServices: selectedServices,
+                    //         fromDashboard: true
+                    //     };
+                    // $.post('/user/setSiteServices', dataToEndPoint, function (response) {
+                    //     if (response.success) {
+                    //         if (selectedServices.length > 1) {
+                    //             ob.anotherSiteModalOpen();
+                    //         } else {
+                    //             if (selectedServices[0] == 'only-adsense') {
+                    //                 $('#addOtherSiteModal').modal('hide');
+                    //                 $('#apdetect').fadeOut();
+                    //                 ob.nextStep(3, 2, 1000);
+                    //             } else {
+                    //                 ob.anotherSiteModalOpen();
+                    //             }
+                    //         }
+                    //     }
+                    // });
                 } else {
                     errorBox.html('Site already added. Please enter another site');
                 }
@@ -768,21 +766,22 @@ $('document').ready(function () {
                 var ob = this;
                 $.post('/user/setSiteStep', {
                     siteId: newSite.addedSite.siteId,
-                    step: newSite.addOtherSite ? 5 : 3
+                    step: 2 // change this
                 }, function (response) {
                     if (response.success) {
                         if (!newSite.addOtherSite) {
-                            var status = 67;
+                            var status = onboardingStages.apCodeAdded;
                             ob.updateCrmDealStatus(status);
                             ob.analyticsEventEmitter({
                                 step: 'Added AP Code'
                             });
                         }
-                        if (newSite.addOtherSite) {
-                            ob.nextStep(6, 3, 1000);
-                        } else {
-                            ob.nextStep(4, 3, 1000);
-                        }
+                        ob.nextStep(3, 2, 1000);
+                        // if (newSite.addOtherSite) {
+                        //     ob.nextStep(6, 3, 1000);
+                        // } else {
+                        //     ob.nextStep(3, 2, 1000);
+                        // }
                     } else {
                         alert('Some error occurred!');
                     }
@@ -843,20 +842,26 @@ $('document').ready(function () {
             e.preventDefault();
             var selectedServices = [],
                 errorBox = $('.error-message-box'),
-                otherSite = $('#add-other-site').val();
-            $('.checkbox-custom:checked').each(function () {
-                selectedServices.push($(this).attr('name'));
-            });
+                otherSite = $('#add-other-site').val(),
+                site = otherSite.replace(/\/$/, ""),
+                url = site.replace(/.*?:\/\//g, "");
 
-            if (selectedServices.length < 1) {
-                errorBox.text('Please select atleast one Service');
-                return;
-            } else {
                 errorBox.text('');
-                var site = otherSite.replace(/\/$/, ""),
-                    url = site.replace(/.*?:\/\//g, "");
                 ap.onboarding.addOtherSiteFromDashboard(selectedServices, site, url);
-            }
+
+            // $('.checkbox-custom:checked').each(function () {
+            //     selectedServices.push($(this).attr('name'));
+            // });
+
+            // if (selectedServices.length < 1) {
+            //     errorBox.text('Please select atleast one Service');
+            //     return;
+            // } else {
+            //     errorBox.text('');
+            //     var site = otherSite.replace(/\/$/, ""),
+            //         url = site.replace(/.*?:\/\//g, "");
+            //     ap.onboarding.addOtherSiteFromDashboard(selectedServices, site, url);
+            // }
         })
 
         // OAuth post message hook trigger
@@ -945,13 +950,6 @@ $('document').ready(function () {
             } else {
                 ap.apAlert(resultObject.message, '#apdetect', 'inverted', 'slideDown');
             }
-            // convertedCode = ap.onboarding.getAdcode(inputBoxValue);
-            // if(convertedCode) {
-            //     // e.target.val('Convert Another');
-            //     inputBox.val(convertedCode);
-            // } else {
-            //     ap.apAlert('Some error has occurred!', '#apdetect', 'inverted', 'slideDown');
-            // }
         });
 
         // Trigger code conversion finish

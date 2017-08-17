@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
-import { editMenuActions, insertMenuActions, sectionActions, siteModesPopoverActions,
+import { manipulateElement } from 'scripts/domManager';
+import { editMenuActions, insertMenuActions, sectionActions, siteModesPopoverActions, variationActions,
 	adActions, newChannelMenuActions, channelActions, channelMenuActions, messengerCommands, uiActions } from '../consts/commonConsts';
 
 const errorsConfig = {},
@@ -114,9 +115,23 @@ const errorsConfig = {},
 			default:
 				return state;
 		}
-	};
+    },
+    variationPanelExpansion = (state = { expanded: false }, action) => {
+        switch(action.type) {
+            case variationActions.EXPAND_VARIATION_PANEL:
+                manipulateElement(action.panelCssSelector, "expand", action.params);
+                return { expanded: true };
+
+            case variationActions.SHRINK_VARIATION_PANEL:
+                manipulateElement(action.panelCssSelector, "shrink", action.params);
+                return { expanded: false };
+
+            default:
+                return state;
+        }
+    }    
 
 export default combineReducers({
-	insertMenu, editMenu, newChannelMenu, siteModesPopover, channelMenu, errors, afterSaveLoader
+	insertMenu, editMenu, newChannelMenu, siteModesPopover, channelMenu, errors, afterSaveLoader, variationPanelExpansion
 });
 

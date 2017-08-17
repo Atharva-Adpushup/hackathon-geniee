@@ -1,8 +1,11 @@
 import React, { PropTypes } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import Glass from 'shared/glass';
 import Variation from './variation.jsx';
 import VariationPanel from './panel/variationPanel';
 import VariationAdder from './variationAdder.jsx';
+import { shrinkVariationPanel } from 'actions/uiActions.js';
 
 class variationManager extends React.Component {
 	constructor(props) {
@@ -13,7 +16,6 @@ class variationManager extends React.Component {
 		this.toggleVariationPanel = this.toggleVariationPanel.bind(this);
 	}
 
-
 	componentWillReceiveProps(nextProps) {
 		if ((this.props.variations.length !== nextProps.variations.length) || (!this.props.activeVariation || !nextProps.activeVariation || (this.props.activeVariation.id !== nextProps.activeVariation.id))) {
 			this.setState({ isPanelActive: false });
@@ -22,7 +24,8 @@ class variationManager extends React.Component {
 
 	toggleVariationPanel() {
 		this.setState({ isPanelActive: !this.state.isPanelActive });
-	}
+        this.props.onShrinkVariationPanel('.variation-settings', {"property": "height", "value" : "400"});
+    }
 
 	render() {
 		const props = this.props;
@@ -66,5 +69,9 @@ variationManager.propTypes = {
 	ui: PropTypes.object
 };
 
-export default variationManager;
-
+export default connect(
+	(state, ownProps) => ({ ...ownProps }),
+	(dispatch) => bindActionCreators({
+		onShrinkVariationPanel: shrinkVariationPanel,
+	}, dispatch)
+    )(variationManager);

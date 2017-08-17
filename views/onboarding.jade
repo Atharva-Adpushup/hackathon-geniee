@@ -17,7 +17,7 @@ block append headScripts
     if validSites.length === 0
 
         - unSavedSiteId = (unSavedSite) ? unSavedSite[0].siteId : null;
-        - step = 2;
+        - step = 1;
         - origUnSavedDomain = (unSavedSite) ? unSavedSite[0].domain : null;
         - domanizedUrl = (origUnSavedDomain) ? utils.domanize(origUnSavedDomain) : null;
 
@@ -30,7 +30,7 @@ block append headScripts
                         unSavedSiteId: '!{unSavedSiteId}',
                         origUnSavedDomain: '!{origUnSavedDomain}'
                     },
-                    totalSteps: 6,
+                    totalSteps: 3,
                     defaultStep: '!{step}',
                     addOtherSite: false,
                     showIntro: false
@@ -47,7 +47,7 @@ block append headScripts
             ])         
     else 
 
-        if validSites[0].step <= 5
+        if validSites[0].step <= 3
         
             //- Setup Adpushup site addition config
             script.
@@ -63,7 +63,7 @@ block append headScripts
                             domain: '!{validSites[0].domain}',
                             siteId: '!{validSites[0].siteId}'
                         },
-                        totalSteps: 6,
+                        totalSteps: 3,
                         defaultStep: step,
                         addOtherSite: false
                     };

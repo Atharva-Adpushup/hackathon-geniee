@@ -54,6 +54,18 @@
             @extend iconStyle;
         }
     }
+    &.btn-expand {
+        &:before {
+            content: '\f065';
+            @extend iconStyle;            
+        }
+    }    
+    &.btn-compress {
+        &:before {
+            content: '\f066';
+            @extend iconStyle;            
+        }
+    }    
     &.btn-edit {
         &:before {
             content: '\f121';

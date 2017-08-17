@@ -64,9 +64,9 @@ function dashboardRedirection(req, res, allUserSites, type) {
         setEmailCookie(req, res);
 
         if (type == 'onboarding') {
-            if (sites.length >= 1) {
+            if (sites.length >= CC.onboarding.initialStep) {
                 var hasStep = 'step' in sites[0] ? true : false;
-                if (hasStep && sites[0].step == 6) {
+                if (hasStep && sites[0].step == CC.onboarding.totalSteps) {
                     return res.redirect('/user/dashboard');
                 }
             }
@@ -217,7 +217,7 @@ router
             var userSites = user.get('sites');
             for (var i in userSites) {
                 if (userSites[i].siteId === siteId) {
-                    userSites[i].step = 2;
+                    userSites[i].step = CC.onboarding.initialStep; // initial site step i.e. 1 now
                     user.set('sites', userSites);
                     req.session.user = user;
                     user.save();

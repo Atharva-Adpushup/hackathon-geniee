@@ -188,5 +188,15 @@ module.exports = {
 	environment: {
 		'development': 'development',
 		'production': 'production'
-	}
+    },
+    onboarding: {
+        steps: [
+            'Add Site',
+            'Add AP code',
+            'Setup Passback'
+        ],
+        revenueLowerBound : 1000,
+        initialStep: 1,
+        totalSteps: 3
+    }
 };

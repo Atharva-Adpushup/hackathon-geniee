@@ -30,9 +30,7 @@ html(lang="en")
 
                     script(type='text/javascript').
                         window.apjQuery = window.jQuery;
-                        $('document').ready(function() {
-                            window.currentUser = !{JSON.stringify(currentUser)};
-                        });
+                        window.currentUser = !{JSON.stringify(currentUser)};
                     
                     if !excludeBaseLibs
                         - var baseLibsStr = "/assets/js/builds/";

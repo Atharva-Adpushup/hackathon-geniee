@@ -132,6 +132,12 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			float,
 			floatCss
 		};
-	};
+    },
+    scrollSectionIntoView = (adId) => {
+        return {
+            type: sectionActions.SCROLL_TO_VIEW,
+            adId
+        }
+    };
 
-export { createSection, deleteSection, renameSection, createIncontentSection, updatePartnerData, updateXPath, sectionAllXPaths, validateXPath, validateSectionXPath, updateIncontentFloat };
+export { createSection, deleteSection, renameSection, createIncontentSection, updatePartnerData, updateXPath, sectionAllXPaths, validateXPath, validateSectionXPath, updateIncontentFloat, scrollSectionIntoView };

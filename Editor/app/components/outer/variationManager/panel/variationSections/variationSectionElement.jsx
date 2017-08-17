@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import InlineEdit from 'shared/inlineEdit/index.jsx';
 import SelectBox from 'shared/select/select.js';
+import LabelWithButton from 'components/shared/labelWithButton.jsx';
 import { floats } from 'consts/commonConsts';
 import $ from 'jquery';
 
@@ -19,6 +20,7 @@ class variationSectionElement extends Component {
 
 		this.onFloatSelectChange = this.onFloatSelectChange.bind(this);
         this.onPartnerDataUpdate = this.onPartnerDataUpdate.bind(this);
+        // this.scrollSectionInToView = this.scrollSectionInToView.bind(this);
     }
 
 	componentWillMount() {
@@ -41,7 +43,7 @@ class variationSectionElement extends Component {
         partnerData.customZoneId = customZoneId;
         this.props.onUpdatePartnerData(sectionId, adId, partnerData);
     }
-
+    
 	render() {
 		const props = this.props,
             adsObject = props.section.ads[0],
@@ -103,7 +105,6 @@ class variationSectionElement extends Component {
                             </Row>
                         </Col>
                     ) : null }
-                    
                 </Row>
                 {props.section.isIncontent ? (
                     <div>
@@ -161,6 +162,13 @@ class variationSectionElement extends Component {
                 </div>
                     )
                 }
+                <Row>
+                    <Col className="u-padding-t10px">
+                        <label className="section-label section-select-ad" onClick={props.onScrollSectionIntoView.bind(null, props.section.ads[0].id)}>
+                            <i className="fa fa-eye" aria-hidden="true"></i><span>Select Ad</span>
+                        </label> 
+                    </Col>                
+                </Row>
             </li>
         );
     }

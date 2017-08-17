@@ -266,7 +266,7 @@ router
 	})
 	/*
 	* Deal Status Updation in pipeDrive
-	* Request Params
+	* Request Params (Deprecated)
 	* 64 : Deal Created
 	* 71 : Deal Qualified
 	* 65 : Services Selected

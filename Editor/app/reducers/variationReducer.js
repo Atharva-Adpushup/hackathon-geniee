@@ -13,7 +13,8 @@ const variation = (state = {}, action) => {
 					createTs: config.createTs,
 					customJs: config.customJs,
 					status: config.status,
-					sections: config.sections
+                    sections: config.sections,
+                    expanded: false
 				};
 
 			default:
@@ -79,8 +80,8 @@ const variation = (state = {}, action) => {
 				return _.omitBy(state, { id: action.variationId });
 
 			case variationActions.COPY_VARIATION:
-				return { ...state, [action.variationId]: action.variation };
-
+                return { ...state, [action.variationId]: action.variation };
+                
 			default:
 				return state;
 		}

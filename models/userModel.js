@@ -274,7 +274,7 @@ function apiModule() {
 										'txt_platform': 'undefined',
 										'txt_ad_network': user.get('adNetworks').join(' | '),
 										'txt_website_revenue' : user.get('websiteRevenue'),
-										'txt_stage_id': 64
+										'txt_stage_id': 81 // Onboarding Pipeline | First Stage | Deal Created
 									},
 									pipeDriveOptions = {
 										'method': 'POST',

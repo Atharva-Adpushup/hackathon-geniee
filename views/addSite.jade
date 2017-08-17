@@ -13,12 +13,12 @@ block append headCss
 
 block append headScripts
 	if step
-		- continueStep = step + 1;
+		- continueStep = step;
 		- continueSiteDomain = siteDomain;
 		- continueSiteId = siteId;
 		- introShow = false;
 	else 
-		- continueStep = 2;
+		- continueStep = 1;
 		- siteDomain = null;
 		- siteId = null;
 		- introShow = true;
@@ -42,7 +42,7 @@ block append headScripts
 					siteId: '!{continueSiteId}',
 					step: '!{step}'
 				},
-				totalSteps: 6,
+				totalSteps: 3,
 				defaultStep: !{continueStep},
 				addOtherSite: true,
 				showIntro: !{introShow}
