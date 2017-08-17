@@ -83,10 +83,10 @@ module.exports = {
 				endDate: config.sqlValidEndDate,
 				siteId: config.siteId
 			},
-			siteReportData = sqlQueryModule.getMetricsData(sqlReportData),
+			getSqlReportData = sqlQueryModule.getMetricsData(sqlReportData),
 			getSiteModel = siteModel.getSiteById(config.siteId);
 
-		return Promise.join(siteReportData, getSiteModel, (sqlReportData, siteModelInstance) => {
+		return Promise.join(getSqlReportData, getSiteModel, (sqlReportData, siteModelInstance) => {
 			console.log(`Apex Report:: Sql Report data: ${JSON.stringify(sqlReportData)}`);
 
 			return Promise.resolve(siteModelInstance)
