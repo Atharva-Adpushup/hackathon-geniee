@@ -68,5 +68,6 @@ module.exports = {
 	getData: (paramConfig) => {
 		return sqlQueryModule.getData(paramConfig)
 			.then(transformVariationData);
-	}
+	},
+	transformData: transformVariationData
 };

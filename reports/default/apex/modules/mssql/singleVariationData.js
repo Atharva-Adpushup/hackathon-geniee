@@ -34,5 +34,7 @@ module.exports = {
 		return singleChannelVariationData.getData(inputParamConfig)
 			.then(validateReportData)
 			.then(getMatchedVariationMetrics.bind(null, inputParamConfig.variationId));
-	}
+	},
+	validateReportData,
+	getMetrics: getMatchedVariationMetrics
 };

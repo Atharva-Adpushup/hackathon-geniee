@@ -189,5 +189,6 @@ module.exports = {
 
 		return dbHelper.queryDB(databaseConfig)
 			.then(transformResultData);
-	}
+	},
+	transformData: transformResultData
 };
