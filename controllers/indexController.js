@@ -199,7 +199,7 @@ function setSessionData(user, req, res, type) {
 				return res.redirect(redirectPath);
 			}
 		} else {
-			return res.render('login', { error: "Email / Password combination doesn't exist." });
+            res.render('login', { error: "Email / Password combination doesn't exist."});
 		}
 	});
 }
@@ -275,7 +275,7 @@ router
 				return setSessionData(user, req, res, 2);
 			})
 			.catch(function () {
-				res.render('login', { error: "Email / Password combination doesn't exist." });
+                res.render('login', { error: "Email / Password combination doesn't exist."});
 			});
 	})
 	.get('/login', function (req, res) {

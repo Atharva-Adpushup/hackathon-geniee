@@ -16,7 +16,10 @@ block bodyContent
 			form(class="form-horizontal ", action="/login", method="post")
 				div(class="LoginForm")
 					- var errorMessage = error ? error : null;
-					div(class="error-message top") #{errorMessage}
+					if errorMessage
+						div(class="error-message top") #{errorMessage}
+							|Please try our previous dashboard.
+							a(href="http://app.adpushup.com")  Click here
 
 					div(class="form-group")
 						div(class="input-group")
@@ -24,13 +27,11 @@ block bodyContent
 								i(class="fa fa-envelope")
 							input(type="email", id="login-email", required, name="email", class="form-control input-lg", placeholder="xyz@adpushup.com")
 
-
 					div(class="form-group")
 						div(class="input-group")
 							span(class="input-group-addon")
 								i(class="fa fa-key")
 							input(type="password", id="login-password", name="password", class="form-control input-lg", placeholder="Password", required)
-
 
 					div(class="form-group")
 						button(type="submit", id="login-submit", class="btn btn-lightBg btn-red pull-right") Login
@@ -40,4 +41,3 @@ block bodyContent
 				div(class="LoginFooter row")
 					div(class="pull-right") Don't have an account?
 						a(href="/signup", id="login-signup-redirect-link", class="btn btn-lightBg") Sign up
-
