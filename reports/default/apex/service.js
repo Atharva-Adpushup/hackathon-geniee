@@ -5,13 +5,17 @@ var _ = require('lodash'),
 	siteModel = require('../../../models/siteModel'),
 	ctrPerformanceService = require('./ctrPerformanceInTabularData/service'),
 	pageGroupVariationRPMService = require('./pageGroupVariationRPM/service'),
-	variationModule = require('./modules/variation/index');
+	variationModule = require('./modules/variation/index'),
+	sqlQueryModule = require('../../default/apex/vendor/mssql/queryHelpers/fullSiteData'),
+	{ getSqlValidParameterDates } = require('../../default/apex/vendor/mssql/utils/utils');
 
 module.exports = {
 	getReportData: function(reportConfig) {
 		const defaultDateConfig = {
 			startDate: moment().subtract(7, 'days').startOf('day').valueOf(),
-			endDate: moment().subtract(0, 'days').endOf('day').valueOf()
+			endDate: moment().subtract(0, 'days').endOf('day').valueOf(),
+			sqlValidStartDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+			sqlValidEndDate: moment().subtract(0, 'days').format('YYYY-MM-DD')
 		},
 		config = {
 			siteId: reportConfig.siteId,
@@ -19,12 +23,19 @@ module.exports = {
 			step: '1d',
 			startDate: (reportConfig.startDate ? reportConfig.startDate : defaultDateConfig.startDate),
 			endDate: (reportConfig.endDate ? reportConfig.endDate : defaultDateConfig.endDate),
-			currencyCode: reportConfig.currencyCode
-		};
+			// Sql report compatible format of date params
+			sqlValidStartDate: (reportConfig.startDate) ? moment(reportConfig.startDate, 'x').format('YYYY-MM-DD') : defaultDateConfig.sqlValidStartDate,
+			sqlValidEndDate: (reportConfig.endDate) ? moment(reportConfig.endDate, 'x').format('YYYY-MM-DD') : defaultDateConfig.sqlValidEndDate,
+			currencyCode: reportConfig.currencyCode,
+			mode: (reportConfig.mode) ? reportConfig.mode : 1
+		},
+		sqlValidDateConfig = { dateFrom: config.sqlValidStartDate, dateTo: config.sqlValidEndDate },
+		sqlValidDatesObject = getSqlValidParameterDates(sqlValidDateConfig);
 
-		if (reportConfig.queryString) {
-			config.queryString = reportConfig.queryString;
-		}
+		config.sqlValidStartDate = sqlValidDatesObject.dateFrom;
+		config.sqlValidEndDate = sqlValidDatesObject.dateTo;
+
+		if (reportConfig.queryString) { config.queryString = reportConfig.queryString; }
 
 		function generateRPMReport(ctrPerformanceConfig, channel, email, variationData) {
 			return Promise.all(_.map(variationData, (variationObj, variationKey) => {
@@ -66,12 +77,26 @@ module.exports = {
 			})).then(variationModule.getFinalData);
 		}
 
-		return siteModel.getSiteById(config.siteId)
-			.then((site) => {
-				const email = site.get('ownerEmail');
+		const sqlReportData = {
+				mode: config.mode,
+				startDate: config.sqlValidStartDate,
+				endDate: config.sqlValidEndDate,
+				siteId: config.siteId
+			},
+			siteReportData = sqlQueryModule.getMetricsData(sqlReportData),
+			getSiteModel = siteModel.getSiteById(config.siteId);
 
-				return site.getAllChannels()
-					.then(generateFullReport.bind(null, config, email));
-			})
+		return Promise.join(siteReportData, getSiteModel, (sqlReportData, siteModelInstance) => {
+			console.log(`Apex Report:: Sql Report data: ${JSON.stringify(sqlReportData)}`);
+
+			return Promise.resolve(siteModelInstance)
+				.then((site) => {
+					const email = site.get('ownerEmail');
+
+					return site.getAllChannels()
+						.then(generateFullReport.bind(null, config, email));
+				});
+		});
+
 	}
 };

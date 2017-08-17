@@ -23,7 +23,6 @@ const getSqlValidParameterDates = function(params) {
 		isInputToDateEqualsToDate = !!(moment(todayDate).isSame(inputToDate)),
 		isInputToDateComparison = !!(moment(inputToDate).isAfter(inputFromDate) || moment(inputToDate).isSame(inputFromDate)),
 		isValidInputToDate = !!((isInputToDateInRange && isInputToDateComparison) || (isInputToDateComparison && isInputToDateEqualsFromDate) || (isInputToDateComparison && isInputToDateEqualsToDate));
-	console.log(`${isValidInputFromDate}, ${isValidInputToDate}`);
 
 	params.dateFrom = (isValidInputFromDate) ? inputFromDate: fromDate;
 	params.dateTo = (isValidInputToDate) ? inputToDate: todayDate;

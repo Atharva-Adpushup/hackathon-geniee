@@ -70,29 +70,20 @@ module.exports = function (site) {
         getVariationsPayload = function (site, reportData) {
             var finalJson = {},
                 pageGroupPattern = site.get('apConfigs').pageGroupPattern,
-                isPageGroupPattern = !!(pageGroupPattern && _.isObject(pageGroupPattern));
+                isPageGroupPattern = !!(pageGroupPattern && _.isObject(pageGroupPattern)),
+                isReportData = !!(reportData && _.isObject(reportData) && _.keys(reportData).length);
 
             return site.getAllChannels().then(function (allChannels) {
                 _.each(allChannels, function (channel) {
                     var platform, pageGroup, channelKey, pageGroupData,
-                        pageGroupId, isReportData, isGenieeReportData, isApexReportData;
+                        isValidData;
 
                     platform = channel.platform; // last element is platform
                     pageGroup = channel.pageGroup; // join remaing to form pageGroup
                     // channelKey sample name HOME_DESKTOP
                     channelKey = pageGroup + '_' + platform;
-                    isReportData = !!(reportData && _.isObject(reportData));
-                    isGenieeReportData = !!(isReportData && channel.genieePageGroupId);
-                    isApexReportData = !!(isReportData && channelKey && isAutoOptimise);
-
-                    //TODO: Move below partner specific logic in universal app service
-                    if (isGenieeReportData) {
-                        pageGroupId = channel.genieePageGroupId;
-                    } else if (isApexReportData) {
-                        pageGroupId = channelKey;
-                    }
-
-                    pageGroupData = pageGroupId ? reportData.pageGroups[pageGroupId] : null;
+                    isValidData = !!(channelKey && isReportData);
+                    pageGroupData = isValidData ? reportData.pageGroups[channelKey] : null;
 
                     if (!finalJson[platform]) {
                         finalJson[platform] = {};

@@ -126,36 +126,43 @@ module.exports = {
 			currentComputedObj = {};
 
 			_.forOwn(pageGroupObj.variations, function(variationObj) {
-				_.forEach(variationObj.zones, function(zonesObj) {
-					currentDate = moment(zonesObj.date).valueOf();
+				const isDaysObject = !!(variationObj && variationObj.days);
+				if (!isDaysObject) { return; }
+
+				const dayWiseDataKeys = Object.keys(variationObj.days);
+
+				_.forEach(dayWiseDataKeys, function(dateKey) {
+					const dayWiseDataObject = variationObj.days[dateKey];
+
+					currentDate = moment(dateKey).valueOf();
 
 					currentComputedObj.revenue = {
-						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(zonesObj.revenue)]]
+						name: (variationObj.name.replace(' ', '-')),
+						data: [[currentDate, Number(dayWiseDataObject.revenue)]]
 					};
 					datesObj.revenue[currentDate] = currentComputedObj.revenue.name;
 
 					currentComputedObj.pageviews = {
-						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(zonesObj.pageViews || variationObj.dayWisePageViews[zonesObj.date])]]
+						name: (variationObj.name.replace(' ', '-')),
+						data: [[currentDate, Number(dayWiseDataObject.pageViews)]]
 					};
 					datesObj.pageviews[currentDate] = currentComputedObj.pageviews.name;
 
 					currentComputedObj.clicks = {
-						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(zonesObj.click)]]
+						name: (variationObj.name.replace(' ', '-')),
+						data: [[currentDate, Number(dayWiseDataObject.click)]]
 					};
 					datesObj.clicks[currentDate] = currentComputedObj.clicks.name;
 
 					currentComputedObj.pagerpm = {
-						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(zonesObj.pageRPM || variationObj.pageRPM)]]
+						name: (variationObj.name.replace(' ', '-')),
+						data: [[currentDate, Number(dayWiseDataObject.pageRPM)]]
 					};
 					datesObj.pagerpm[currentDate] = currentComputedObj.pagerpm.name;
 
 					currentComputedObj.pagectr = {
-						name: (variationObj.name.replace(" ", "-")),
-						data: [[currentDate, Number(zonesObj.pageCTR || variationObj.pageCTR)]]
+						name: (variationObj.name.replace(' ', '-')),
+						data: [[currentDate, Number(dayWiseDataObject.pageCTR)]]
 					};
 					datesObj.pagectr[currentDate] = currentComputedObj.pagectr.name;
 
@@ -183,12 +190,10 @@ module.exports = {
 			_.forOwn(datesObj.pagerpm, function(pagerpmData, dateKey) {
 				utils.setDateWithEmptyValue(dateKey, 'pagerpm', highChartsData.highCharts);
 			});
-			highChartsData.highCharts = utils.updatePageRPMHighChartsData(highChartsData.highCharts);
 
 			_.forOwn(datesObj.pagectr, function(pagectrData, dateKey) {
 				utils.setDateWithEmptyValue(dateKey, 'pagectr', highChartsData.highCharts);
 			});
-			highChartsData.highCharts = utils.updatePageCTRHighChartsData(highChartsData.highCharts);
 
 			computedData[pageGroupKey].variations.data = extend(true, computedData[pageGroupKey].variations.data, highChartsData);
 		});
@@ -210,13 +215,15 @@ module.exports = {
 				revenue: 0,
 				impressions: 0,
 				pageViews: 0,
+				trackedPageViews: 0,
 				clicks: 0,
+				trackedClicks: 0,
 				pageRPM: 0,
 				pageCTR: 0
 			};
 			
 			_.forOwn(pageGroupObj.variations, function(variationObj) {
-				var rowItem = [];
+				const rowItem = [];
 
 				rowItem[0] = ' ';
 				rowItem[1] = variationObj.name;
@@ -231,9 +238,11 @@ module.exports = {
 
 				rowItem[5] = variationObj.pageViews;
 				footerMetrics.pageViews += Number(variationObj.pageViews);
+				footerMetrics.trackedPageViews += Number(variationObj.tracked.pageViews);
 
 				rowItem[6] = variationObj.click;
 				footerMetrics.clicks += Number(variationObj.click);
+				footerMetrics.trackedClicks += Number(variationObj.tracked.click);
 
 				rowItem[7] = variationObj.pageRPM;
 				rowItem[8] = variationObj.pageCTR;
@@ -254,14 +263,14 @@ module.exports = {
 			// Explicitly set total revenue contribution value
 			variationsTabularData.table.footer[9] = 100;
 
-			// Round of metrics to 2 decimal places
+			// Round off metrics to 2 decimal places
 			footerMetrics.revenue = Number((footerMetrics.revenue).toFixed(2));
 			// Calculate footer pageRPM
 			footerMetrics.pageRPM  = Number((footerMetrics.revenue / footerMetrics.pageViews * 1000).toFixed(2));
 			footerMetrics.pageRPM = (footerMetrics.pageRPM && (footerMetrics.pageRPM !== Infinity)) ? footerMetrics.pageRPM : 0;
 
 			// Calculate footer pageCTR
-			footerMetrics.pageCTR = Number((footerMetrics.clicks / footerMetrics.pageViews * 100).toFixed(2));
+			footerMetrics.pageCTR = Number((footerMetrics.trackedClicks / footerMetrics.trackedPageViews * 100).toFixed(2));
 			footerMetrics.pageCTR = (footerMetrics.pageCTR && (footerMetrics.pageCTR !== Infinity)) ? footerMetrics.pageCTR : 0;
 
 			variationsTabularData.table.footer[3] = footerMetrics.revenue;
