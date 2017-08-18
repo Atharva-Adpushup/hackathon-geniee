@@ -88,6 +88,10 @@ module.exports = {
 
 		return Promise.join(getSqlReportData, getSiteModel, (sqlReportData, siteModelInstance) => {
 			console.log(`Apex Report:: Sql Report data: ${JSON.stringify(sqlReportData)}`);
+			const isValidReportData = !!(sqlReportData && _.isObject(sqlReportData) && _.keys(sqlReportData).length),
+				defaultEmptyData = null;
+
+			if (!isValidReportData) { return defaultEmptyData; }
 
 			return Promise.resolve(siteModelInstance)
 				.then((site) => {
