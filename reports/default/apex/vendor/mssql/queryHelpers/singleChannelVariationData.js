@@ -5,16 +5,27 @@ const fullSiteDataQueryHelper = require('./fullSiteData'),
 	Promise = require('bluebird'),
 	extend = require('extend');
 
-function getVariationData(parameterConfig, reportData) {
+function getVariationsData(channelName, reportData) {
 	const pageGroupObject = extend(true, {}, reportData),
-		channelKey = parameterConfig.channelName,
+		channelKey = channelName,
 		doesChannelKeyExist = !!(pageGroupObject.hasOwnProperty(channelKey) && pageGroupObject[channelKey]);
 	let computedData;
 
-	if (!doesChannelKeyExist) { throw new AdPushupError('getVariationData: Channelkey does not exist in sql report data'); }
+	if (!doesChannelKeyExist) { throw new AdPushupError('getVariationsData: Channelkey does not exist in sql report data'); }
 
 	computedData = extend(true, {}, pageGroupObject[channelKey].variations);
 	return computedData;
+}
+
+function getMatchedVariationsData(siteId, channelKey, sqlReportData) {
+	const getSiteModel = siteModel.getSiteById(siteId),
+		getAllChannels = getSiteModel.then(site => site.getAllChannels()),
+		getTransformedChannelData = getAllChannels.then(pageGroupModule.transformAllPageGroupsData);
+
+	return Promise.join(getTransformedChannelData, (allChannelsData) => {
+		return pageGroupModule.updatePageGroupData(siteId, sqlReportData, allChannelsData)
+			.then(getVariationsData.bind(null, channelKey));
+	});
 }
 
 module.exports = {
@@ -26,14 +37,11 @@ module.exports = {
 				siteId: inputParamConfig.siteId,
 				channelName: `${inputParamConfig.pageGroup}_${inputParamConfig.platform}`
 			},
-			getReportData = fullSiteDataQueryHelper.getMetricsData(parameterConfig),
-			getSiteModel = siteModel.getSiteById(parameterConfig.siteId),
-			getAllChannels = getSiteModel.then(site => site.getAllChannels()),
-			getTransformedChannelData = getAllChannels.then(pageGroupModule.transformAllPageGroupsData);
+			siteId = parameterConfig.siteId,
+			channelName = parameterConfig.channelName;
 
-		return Promise.join(getReportData, getTransformedChannelData, (sqlReportData, allChannelsData) => {
-			return pageGroupModule.updatePageGroupData(parameterConfig.siteId, sqlReportData, allChannelsData)
-				.then(getVariationData.bind(null, parameterConfig));
-		});
-	}
+		return fullSiteDataQueryHelper.getMetricsData(parameterConfig)
+			.then(getMatchedVariationsData.bind(null, siteId, channelName));
+	},
+	getMatchedVariations: getMatchedVariationsData
 };

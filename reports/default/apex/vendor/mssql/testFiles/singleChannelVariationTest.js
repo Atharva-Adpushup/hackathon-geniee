@@ -1,4 +1,7 @@
-const singleChannelVariationData = require('../../../modules/mssql/singleChannelVariationData'),
+const apexSingleChannelVariationModule = require('../../../modules/mssql/singleChannelVariationData'),
+	singleChannelVariationQueryHelper = require('../queryHelpers/singleChannelVariationData'),
+	{ sqlReportData } = require('./dummyData'),
+	Promise = require('bluebird'),
 	moment = require('moment'),
 	paramConfig = {
 		'siteId': 25019,
@@ -14,13 +17,43 @@ const singleChannelVariationData = require('../../../modules/mssql/singleChannel
 		'mode': 1
 	};
 
-function getQueryData() {
-	return singleChannelVariationData.getData(paramConfig)
+function testApexModule() {
+	return apexSingleChannelVariationModule.getData(paramConfig)
 		.then(result => {
-			console.log(`Result is: ${JSON.stringify(result)}`);
+			console.log(`testApexModule: Result is: ${JSON.stringify(result)}`);
 		})
 		.catch((err) => {
-			console.log(`SingleChannelVariationData Test Module: Error occurred ${err.toString()}`);
+			console.log(`testApexModule: Error occurred ${err.toString()}`);
 		});
 }
-setTimeout(getQueryData, 3000);
+
+function getVariationsDataWithDummyReportData() {
+	const siteId = paramConfig.siteId,
+		channelName = `${paramConfig.pageGroup}_${paramConfig.platform}`;
+
+	return Promise.resolve(sqlReportData)
+		.then(singleChannelVariationQueryHelper.getMatchedVariations.bind(null, siteId, channelName))
+		.then(apexSingleChannelVariationModule.transformData)
+		.then(result => {
+			console.log(`getVariationsDataWithDummyReportData: Result is: ${JSON.stringify(result)}`);
+		})
+		.catch((err) => {
+			console.log(`getVariationsDataWithDummyReportData: Error occurred ${err.toString()}`);
+		});
+}
+
+function queryHelper() {
+	return singleChannelVariationQueryHelper.getData(paramConfig)
+		.then(result => {
+			console.log(`queryHelper: Result is: ${JSON.stringify(result)}`);
+		})
+		.catch((err) => {
+			console.log(`queryHelper: Error occurred ${err.toString()}`);
+		});
+}
+
+
+// setTimeout(testApexModule, 3000);
+// setTimeout(queryHelper, 3000);
+setTimeout(getVariationsDataWithDummyReportData, 3000);
+
