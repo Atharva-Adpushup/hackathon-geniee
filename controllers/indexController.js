@@ -279,7 +279,7 @@ router
 			});
 	})
 	.get('/login', function (req, res) {
-		res.render('login');
+		return res.render('login');
 	})
 	.get('/thank-you', function (req, res) { // this is for users who are less than <2500 USD
 		thankYouRedirection('thank-you', req, res);

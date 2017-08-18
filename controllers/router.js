@@ -6,7 +6,8 @@ var indexController = require('./indexController'),
     reportsController = require('./reportController'),
     apiController = require('./apiController'),
     pageGroupController = require('./pageGroupController'),
-    authController = require('./authController'),
+	authController = require('./authController'),
+	commonConsts = require('../configs/commonConsts'),
     _ = require('lodash');
 
 module.exports = function(app) {
@@ -91,7 +92,18 @@ module.exports = function(app) {
 
     app.use('/', function(req, res, next) {
         if ((req.path.indexOf('/signup') !== -1 || req.path.indexOf('/forgotPassword') !== -1 || req.path.indexOf('/login') !== -1) && req.session && req.session.user) {
-            return res.redirect('/user/dashboard');
+			if (req.path.indexOf('/login') !== -1) {
+				var sites = req.session.user.sites,
+					step = sites[0].step;
+				if (sites.length > 1) {
+					return res.redirect('/user/dashboard');
+				} else if (!step || step < commonConsts.onboarding.totalSteps) {
+					return res.redirect('/user/onboarding');
+				} else {
+					return res.redirect('/user/dashboard');					
+				}
+			}
+			return res.redirect('/user/dashboard');
         }
         next();
     }, indexController);
