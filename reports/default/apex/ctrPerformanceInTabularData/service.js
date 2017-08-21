@@ -40,7 +40,6 @@ module.exports = {
 		});
 
 		return Promise.join(getReport, getTDConfig, getVariationTD, function(report, trafficDistributionConfig, trafficDistributionData) {
-			console.log(`Apex Report:: Ctr performance Report: ${JSON.stringify(report)}`);
 			const reportData = {'status': true, 'data': extend(true, {}, report)};
 
 			return trafficDistributionModule.set(reportData, trafficDistributionData).then(function(reportWithTD) {
