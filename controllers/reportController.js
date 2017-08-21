@@ -440,8 +440,11 @@ router
 		return userModel.verifySiteOwner(req.session.user.email, req.query.siteId).then(function() {
 			const reportConfig = extend(true, {}, req.query),
 				parameterConfig = apexParameterModule.getParameterConfig(reportConfig),
-				apexConfig = parameterConfig.apex,
+				apexConfig = extend(true, {}, extend(true, {}, parameterConfig.apex),
+					{ platform: reportConfig.platform, siteDomain: reportConfig.siteDomain, pageGroup: reportConfig.pageGroup}),
 				sqlReportConfig = parameterConfig.sql;
+
+				console.log(`Apex config: ${JSON.stringify(apexConfig)}, sqlReportConfig: ${JSON.stringify(sqlReportConfig)}`);
 
 			return sqlQueryModule.getMetricsData(sqlReportConfig)
 				.then((sqlReportData) => {

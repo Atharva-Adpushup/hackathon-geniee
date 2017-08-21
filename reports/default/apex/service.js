@@ -14,7 +14,6 @@ module.exports = {
 		const paramConfig = parameterModule.getParameterConfig(reportConfig),
 			config = extend(true, {}, paramConfig.apex),
 			sqlReportConfig = extend(true, {}, paramConfig.sql);
-		console.log(`Apex config: ${JSON.stringify(config)}, sqlReportConfig: ${JSON.stringify(sqlReportConfig)}`);
 
 		function generateRPMReport(ctrPerformanceConfig, channel, email, tableFormatReportData, variationData) {
 			return Promise.all(_.map(variationData, (variationObj, variationKey) => {
