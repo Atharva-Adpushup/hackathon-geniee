@@ -8,8 +8,9 @@ var extend = require('extend'),
 	rpmModule = require('./modules/rpm/index');
 
 module.exports = {
-	getReportData: function(params, email) {
-		var queryConfig = extend(true, {}, params);
+	getReportData: function(params, email, tableFormatReportData) {
+		var queryConfig = extend(true, {}, params),
+			variationId = `${queryConfig.variationKey}`;
 
 		queryConfig.channelKey = (queryConfig.platform + ":" + queryConfig.pageGroup);
 		queryConfig.email = email;
@@ -25,7 +26,7 @@ module.exports = {
 
 				return adsenseModule.getData(queryConfig, adSlotsArr)
 					.then(function(adsenseData) {
-						return pageViewsModule.getTotalCount(queryConfig)
+						return pageViewsModule.getTotalCount(variationId, tableFormatReportData)
 							.then(function(pageViews) {
 								return rpmModule.calculate(pageViews, adsenseData.earnings)
 									.then(function(rpm) {

@@ -37,7 +37,7 @@ module.exports = {
 
 		if (reportConfig.queryString) { config.queryString = reportConfig.queryString; }
 
-		function generateRPMReport(ctrPerformanceConfig, channel, email, variationData) {
+		function generateRPMReport(ctrPerformanceConfig, channel, email, tableFormatReportData, variationData) {
 			return Promise.all(_.map(variationData, (variationObj, variationKey) => {
 				const variationRPMConfig = extend(true, {}, ctrPerformanceConfig, {
 					variationKey: variationKey
@@ -46,7 +46,7 @@ module.exports = {
 
 				finalVariationObj[variationKey] = extend(true, {}, variationObj);
 
-				return pageGroupVariationRPMService.getReportData(variationRPMConfig, email)
+				return pageGroupVariationRPMService.getReportData(variationRPMConfig, email, tableFormatReportData)
 					.then((variationRPMReportData) => {
 						const clicks = finalVariationObj[variationKey].click;
 						let pageViews;
@@ -64,16 +64,18 @@ module.exports = {
 			})).then(variationModule.computeReportData.bind(null, channel));
 		}
 
-		function generateFullReport(config, email, allChannels) {
+		function generateFullReport(config, email, sqlReportData, allChannels) {
 			return Promise.all(_.map(allChannels, (channel) => {
 				const ctrPerformanceConfig = extend(true, {}, config, {
 					platform: channel.platform,
 					pageGroup: channel.pageGroup
 				});
 
-				return ctrPerformanceService.getReportData(ctrPerformanceConfig)
-					.then(variationModule.getMetrics)
-					.then(generateRPMReport.bind(null, ctrPerformanceConfig, channel, email));
+				return ctrPerformanceService.getReportData(ctrPerformanceConfig, sqlReportData)
+					.spread((updatedReportData, tableFormatReportData) => {
+						return variationModule.getMetrics(updatedReportData)
+							.then(generateRPMReport.bind(null, ctrPerformanceConfig, channel, email, tableFormatReportData));
+					});
 			})).then(variationModule.getFinalData);
 		}
 
@@ -98,7 +100,7 @@ module.exports = {
 					const email = site.get('ownerEmail');
 
 					return site.getAllChannels()
-						.then(generateFullReport.bind(null, config, email));
+						.then(generateFullReport.bind(null, config, email, sqlReportData));
 				});
 		});
 
