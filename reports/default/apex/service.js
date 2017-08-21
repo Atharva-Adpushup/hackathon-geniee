@@ -64,8 +64,23 @@ module.exports = {
 			})).then(variationModule.computeReportData.bind(null, channel));
 		}
 
+		function isChannelDataInReport(channelName, pageGroupsObject) {
+			const isChannelData = !!(pageGroupsObject.hasOwnProperty(channelName) && pageGroupsObject[channelName]),
+				isVariation = !!(isChannelData && pageGroupsObject[channelName].variations),
+				isVariationData = !!(isVariation && _.isObject(pageGroupsObject[channelName].variations) && _.keys(pageGroupsObject[channelName].variations).length);
+
+			return isVariationData;
+		}
+
 		function generateFullReport(config, email, sqlReportData, allChannels) {
-			return Promise.all(_.map(allChannels, (channel) => {
+			return Promise.all(_.compact(_.map(allChannels, (channel) => {
+				const siteId = config.siteId,
+					channelName = `${channel.pageGroup}_${channel.platform}`,
+					pageGroupsObject = sqlReportData[siteId].pageGroups,
+					isValidChannelData = isChannelDataInReport(channelName, pageGroupsObject);
+
+				if (!isValidChannelData) { return false; }
+
 				const ctrPerformanceConfig = extend(true, {}, config, {
 					platform: channel.platform,
 					pageGroup: channel.pageGroup
@@ -76,7 +91,7 @@ module.exports = {
 						return Promise.resolve(variationModule.getMetrics(updatedReportData))
 							.then(generateRPMReport.bind(null, ctrPerformanceConfig, channel, email, tableFormatReportData));
 					});
-			})).then(variationModule.getFinalData);
+			}))).then(variationModule.getFinalData);
 		}
 
 		const sqlReportData = {
