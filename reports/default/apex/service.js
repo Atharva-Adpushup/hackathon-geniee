@@ -7,35 +7,15 @@ var _ = require('lodash'),
 	pageGroupVariationRPMService = require('./pageGroupVariationRPM/service'),
 	variationModule = require('./modules/variation/index'),
 	sqlQueryModule = require('../../default/apex/vendor/mssql/queryHelpers/fullSiteData'),
-	{ getSqlValidParameterDates } = require('../../default/apex/vendor/mssql/utils/utils');
+	{ getSqlValidParameterDates } = require('../../default/apex/vendor/mssql/utils/utils'),
+	parameterModule = require('./modules/params/index');
 
 module.exports = {
 	getReportData: function(reportConfig) {
-		const defaultDateConfig = {
-			startDate: moment().subtract(7, 'days').startOf('day').valueOf(),
-			endDate: moment().subtract(0, 'days').endOf('day').valueOf(),
-			sqlValidStartDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
-			sqlValidEndDate: moment().subtract(0, 'days').format('YYYY-MM-DD')
-		},
-		config = {
-			siteId: reportConfig.siteId,
-			reportType: 'apex',
-			step: '1d',
-			startDate: (reportConfig.startDate ? reportConfig.startDate : defaultDateConfig.startDate),
-			endDate: (reportConfig.endDate ? reportConfig.endDate : defaultDateConfig.endDate),
-			// Sql report compatible format of date params
-			sqlValidStartDate: (reportConfig.startDate) ? moment(reportConfig.startDate, 'x').format('YYYY-MM-DD') : defaultDateConfig.sqlValidStartDate,
-			sqlValidEndDate: (reportConfig.endDate) ? moment(reportConfig.endDate, 'x').format('YYYY-MM-DD') : defaultDateConfig.sqlValidEndDate,
-			currencyCode: reportConfig.currencyCode,
-			mode: (reportConfig.mode) ? reportConfig.mode : 1
-		},
-		sqlValidDateConfig = { dateFrom: config.sqlValidStartDate, dateTo: config.sqlValidEndDate },
-		sqlValidDatesObject = getSqlValidParameterDates(sqlValidDateConfig);
-
-		config.sqlValidStartDate = sqlValidDatesObject.dateFrom;
-		config.sqlValidEndDate = sqlValidDatesObject.dateTo;
-
-		if (reportConfig.queryString) { config.queryString = reportConfig.queryString; }
+		const paramConfig = parameterModule.getParameterConfig(reportConfig),
+			config = extend(true, {}, paramConfig.apex),
+			sqlReportConfig = extend(true, {}, paramConfig.sql);
+		console.log(`Apex config: ${JSON.stringify(config)}, sqlReportConfig: ${JSON.stringify(sqlReportConfig)}`);
 
 		function generateRPMReport(ctrPerformanceConfig, channel, email, tableFormatReportData, variationData) {
 			return Promise.all(_.map(variationData, (variationObj, variationKey) => {
@@ -94,13 +74,7 @@ module.exports = {
 			}))).then(variationModule.getFinalData);
 		}
 
-		const sqlReportData = {
-				mode: config.mode,
-				startDate: config.sqlValidStartDate,
-				endDate: config.sqlValidEndDate,
-				siteId: config.siteId
-			},
-			getSqlReportData = sqlQueryModule.getMetricsData(sqlReportData),
+		const getSqlReportData = sqlQueryModule.getMetricsData(sqlReportConfig),
 			getSiteModel = siteModel.getSiteById(config.siteId);
 
 		return Promise.join(getSqlReportData, getSiteModel, (sqlReportData, siteModelInstance) => {
