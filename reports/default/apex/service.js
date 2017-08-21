@@ -7,7 +7,6 @@ var _ = require('lodash'),
 	pageGroupVariationRPMService = require('./pageGroupVariationRPM/service'),
 	variationModule = require('./modules/variation/index'),
 	sqlQueryModule = require('../../default/apex/vendor/mssql/queryHelpers/fullSiteData'),
-	{ getSqlValidParameterDates } = require('../../default/apex/vendor/mssql/utils/utils'),
 	parameterModule = require('./modules/params/index');
 
 module.exports = {

@@ -7,9 +7,11 @@ var express = require('express'),
 	genieeFilterDates = require('../reports/partners/geniee/modules/filters/date/index'),
 	adsenseReportModel = require('../models/adsenseModel'),
 	adxReportModel = require('../models/adxModel'),
-	apexReportService = require('../reports/default/apex/ctrPerformanceInTabularData/service'),
+	apexCTRReportService = require('../reports/default/apex/ctrPerformanceInTabularData/service'),
 	apexVariationReportService = require('../reports/default/apex/service'),
+	apexParameterModule = require('../reports/default/apex/modules/params/index'),
 	universalReportService = require('../reports/universal/index'),
+	sqlQueryModule = require('../reports/default/apex/vendor/mssql/queryHelpers/fullSiteData'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
 	moment = require('moment'),
@@ -436,9 +438,16 @@ router
 
 	.get('/apexData', function(req, res, next) {
 		return userModel.verifySiteOwner(req.session.user.email, req.query.siteId).then(function() {
-			return apexReportService.getReportData(req.query).then(function(reportData) {
-				return res.json(reportData);
-			});
+			const reportConfig = extend(true, {}, req.query),
+				parameterConfig = apexParameterModule.getParameterConfig(reportConfig),
+				apexConfig = parameterConfig.apex,
+				sqlReportConfig = parameterConfig.sql;
+
+			return sqlQueryModule.getMetricsData(sqlReportConfig)
+				.then((sqlReportData) => {
+					return apexCTRReportService.getReportData(apexConfig, sqlReportData)
+						.spread((reportData, tableFormatData) => res.json(reportData));
+				});
 		}).catch(function(err) {
 			if (err instanceof AdPushupError) {
 				return res.json(err.message);
