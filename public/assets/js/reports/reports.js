@@ -136,7 +136,7 @@
         var dataTable;
 
         s.done(function(d) {
-            if (d.success) {
+            if (d.status) {
                 if(d.data.rows.length == 0) {
                     options.notify && adpushup.notify("Notification", "Report data not available.");
                     options.alert && adpushup.alert("Report data not available.", options.chartContainer, 3);
