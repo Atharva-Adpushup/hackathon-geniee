@@ -444,8 +444,6 @@ router
 					{ platform: reportConfig.platform, siteDomain: reportConfig.siteDomain, pageGroup: reportConfig.pageGroup}),
 				sqlReportConfig = parameterConfig.sql;
 
-				console.log(`Apex config: ${JSON.stringify(apexConfig)}, sqlReportConfig: ${JSON.stringify(sqlReportConfig)}`);
-
 			return sqlQueryModule.getMetricsData(sqlReportConfig)
 				.then((sqlReportData) => {
 					return apexCTRReportService.getReportData(apexConfig, sqlReportData)

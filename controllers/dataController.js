@@ -5,6 +5,10 @@ var express = require('express'),
 	adsenseReportModel = require('../models/adsenseModel'),
 	reportsModel = require('../models/reportsModel'),
 	apexVariationRpmService = require('../reports/default/apex/pageGroupVariationRPM/service'),
+	apexParameterModule = require('../reports/default/apex/modules/params/index'),
+	sqlQueryModule = require('../reports/default/apex/vendor/mssql/queryHelpers/fullSiteData'),
+	apexSingleChannelVariationModule = require('../reports/default/apex/modules/mssql/singleChannelVariationData'),
+	singleChannelVariationQueryHelper = require('../reports/default/apex/vendor/mssql/queryHelpers/singleChannelVariationData'),
 	liveSitesService = require('../services/liveSites/index'),
 	Promise = require('bluebird'),
 	extend = require('extend'),
@@ -71,9 +75,29 @@ router
 		});
 	})
 	.get('/getPageGroupVariationRPM', function(req, res) {
-		return apexVariationRpmService.getReportData(req.query, req.session.user.email)
+		const reportConfig = extend(true, {}, req.query),
+			email = req.session.user.email,
+			parameterConfig = apexParameterModule.getParameterConfig(reportConfig),
+			apexConfig = extend(true, {}, extend(true, {}, parameterConfig.apex),
+				{ platform: reportConfig.platform, variationKey: reportConfig.variationKey,
+				pageGroup: reportConfig.pageGroup, channelName: `${reportConfig.pageGroup}_${reportConfig.platform}` }),
+			sqlReportConfig = parameterConfig.sql;
+
+		console.log(`Page Group variation RPM config: ${JSON.stringify(apexConfig)}, sqlReportConfig: ${JSON.stringify(sqlReportConfig)}`);
+
+		const getSqlReportData = sqlQueryModule.getMetricsData(sqlReportConfig),
+			getTabularMetricsData = getSqlReportData.then((sqlReportData) => {
+				return singleChannelVariationQueryHelper
+					.getMatchedVariations(apexConfig.siteId, apexConfig.channelName, sqlReportData)
+					.then(apexSingleChannelVariationModule.transformData);
+			}),
+			getVariationRPMData = getTabularMetricsData.then((tableFormatReportData) => {
+				return apexVariationRpmService.getReportData(apexConfig, email, tableFormatReportData);
+			});
+
+		return getVariationRPMData
 			.then(function(reportData) {
-				return res.json(extend(true, {success: true}, reportData));
+				return res.json(extend(true, { success: true }, reportData));
 			})
 			.catch(function(err) {
 				return res.json({
