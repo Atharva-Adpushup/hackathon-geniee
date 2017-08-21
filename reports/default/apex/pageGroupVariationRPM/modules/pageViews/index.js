@@ -4,7 +4,7 @@ var lodash = require('lodash'),
 
 module.exports = {
 	getTotalCount: function(variationId, tableFormatReportData) {
-		return apexSingleVariationModule.validateReportData(tableFormatReportData)
+		return Promise.resolve(apexSingleVariationModule.validateReportData(tableFormatReportData))
 			.then(apexSingleVariationModule.getMetrics.bind(null, variationId))
 			.then(function(report) {
 				var pageViews = Number(report.pageViews);

@@ -73,7 +73,7 @@ module.exports = {
 
 				return ctrPerformanceService.getReportData(ctrPerformanceConfig, sqlReportData)
 					.spread((updatedReportData, tableFormatReportData) => {
-						return variationModule.getMetrics(updatedReportData)
+						return Promise.resolve(variationModule.getMetrics(updatedReportData))
 							.then(generateRPMReport.bind(null, ctrPerformanceConfig, channel, email, tableFormatReportData));
 					});
 			})).then(variationModule.getFinalData);

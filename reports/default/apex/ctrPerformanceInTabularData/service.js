@@ -31,7 +31,9 @@ module.exports = {
 			.then(apexSingleChannelVariationModule.transformData);
 
 		getTDConfig = getReport.then(function(report) {
-			return trafficDistributionModule.getConfig(config, report);
+			const reportData = {'status': true, 'data': extend(true, {}, report)};
+
+			return trafficDistributionModule.getConfig(config, reportData);
 		});
 		getVariationTD = getTDConfig.then(function(trafficDistributionConfig) {
 			return variationModule.getTrafficDistribution(trafficDistributionConfig);
@@ -39,8 +41,9 @@ module.exports = {
 
 		return Promise.join(getReport, getTDConfig, getVariationTD, function(report, trafficDistributionConfig, trafficDistributionData) {
 			console.log(`Apex Report:: Ctr performance Report: ${JSON.stringify(report)}`);
+			const reportData = {'status': true, 'data': extend(true, {}, report)};
 
-			return trafficDistributionModule.set(report, trafficDistributionData).then(function(reportWithTD) {
+			return trafficDistributionModule.set(reportData, trafficDistributionData).then(function(reportWithTD) {
 				return ctrModule.setPerformanceData(reportWithTD).then(function(reportWithCTRPerformance) {
 					return utilsModule.addEmptyDataFields(reportWithCTRPerformance).then(function(reportWithAddedFields) {
 						return [reportWithAddedFields, report];

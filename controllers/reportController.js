@@ -540,6 +540,10 @@ router
 						return res.json(reportData);
 					});
 			})
+			.catch((err) => {
+				console.log('GetUniversalReportData route:: Error occurred: ', err);
+				return res.json({status: 0, data: 'Some error occurred! Please check app logs to learn more.'});
+			});
 	})
 
 	.get('/performESSearch', function(req, res) {
