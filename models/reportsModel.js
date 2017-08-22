@@ -1,6 +1,4 @@
-var es = require('../helpers/elasticSearchService'),
-	esqm = require('../helpers/ElasticsearchQueryMaker'),
-	AdPushupError = require('../helpers/AdPushupError'),
+var AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
 	moment = require('moment'),
 	Promise = require('bluebird'),

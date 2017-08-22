@@ -1,7 +1,6 @@
 var extend = require('extend'),
 	moment = require('moment'),
 	Promise = require('bluebird'),
-	reports = require('../../../../models/reportsModel'),
 	apexSingleChannelVariationModule = require('../../apex/modules/mssql/singleChannelVariationData'),
 	singleChannelVariationQueryHelper = require('../vendor/mssql/queryHelpers/singleChannelVariationData'),
 	channelModel = require('../../../../models/channelModel'),

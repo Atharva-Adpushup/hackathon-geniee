@@ -3,7 +3,6 @@ var express = require('express'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
 	adsenseReportModel = require('../models/adsenseModel'),
-	reportsModel = require('../models/reportsModel'),
 	apexVariationRpmService = require('../reports/default/apex/pageGroupVariationRPM/service'),
 	apexParameterModule = require('../reports/default/apex/modules/params/index'),
 	sqlQueryModule = require('../reports/default/apex/vendor/mssql/queryHelpers/fullSiteData'),
@@ -82,8 +81,6 @@ router
 				{ platform: reportConfig.platform, variationKey: reportConfig.variationKey,
 				pageGroup: reportConfig.pageGroup, channelName: `${reportConfig.pageGroup}_${reportConfig.platform}` }),
 			sqlReportConfig = parameterConfig.sql;
-
-		console.log(`Page Group variation RPM config: ${JSON.stringify(apexConfig)}, sqlReportConfig: ${JSON.stringify(sqlReportConfig)}`);
 
 		const getSqlReportData = sqlQueryModule.getMetricsData(sqlReportConfig),
 			getTabularMetricsData = getSqlReportData.then((sqlReportData) => {

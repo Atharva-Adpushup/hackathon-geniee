@@ -31,39 +31,39 @@ for site in validSites
                 - siteDomain = (site.domain) ? site.domain : "";
                 .graph.dashboardgraph
                     div(id='controlVsAdpushupChart_#{site.siteId}', style='overflow: hidden;')
-                        .loaderwrapper.spinner
-                            img(src="/assets/images/loaderLogo.png")
-                        script(type='text/javascript').
-                            adpushup.reports.controlVsAdpushupCtr({
-                                "siteId": #{site.siteId},
-                                "siteDomain": "#{siteDomain}",
-                                "platform": null,
-                                "pageGroup": null,
-                                "step": "1d",
-                                "chartType": "areaChart",
-                                "showX": false,
-                                "showY": false,
-                                "chartContainer": "#controlVsAdpushupChart_"+#{site.siteId},
-                                "notify": false,
-                                "alert": true,
-                                "reportType": "controlVsAdpushupCtr"
-                            });
+                        //- .loaderwrapper.spinner
+                        //-     img(src="/assets/images/loaderLogo.png")
+                        //- script(type='text/javascript').
+                        //-     adpushup.reports.controlVsAdpushupCtr({
+                        //-         "siteId": #{site.siteId},
+                        //-         "siteDomain": "#{siteDomain}",
+                        //-         "platform": null,
+                        //-         "pageGroup": null,
+                        //-         "step": "1d",
+                        //-         "chartType": "areaChart",
+                        //-         "showX": false,
+                        //-         "showY": false,
+                        //-         "chartContainer": "#controlVsAdpushupChart_"+#{site.siteId},
+                        //-         "notify": false,
+                        //-         "alert": true,
+                        //-         "reportType": "controlVsAdpushupCtr"
+                        //-     });
                     if isSuperUser
                         div(id='pageViewsChart_#{site.siteId}')
-                            script(type='text/javascript').
-                                adpushup.reports.controlVsAdpushupPageviews({
-                                    "siteId": #{site.siteId},
-                                    "siteDomain": "#{siteDomain}",
-                                    "platform": null,
-                                    "pageGroup": null,
-                                    "chartType": "pieChart",
-                                    "showLabel": false,
-                                    "showLegend": false,
-                                    "chartContainer": "#" + "pageViewsChart_"+#{site.siteId},
-                                    "notify": false,
-                                    "alert": true,
-                                    "reportType": "controlVsAdpushupPageviews"
-                                });
+                            //- script(type='text/javascript').
+                            //-     adpushup.reports.controlVsAdpushupPageviews({
+                            //-         "siteId": #{site.siteId},
+                            //-         "siteDomain": "#{siteDomain}",
+                            //-         "platform": null,
+                            //-         "pageGroup": null,
+                            //-         "chartType": "pieChart",
+                            //-         "showLabel": false,
+                            //-         "showLegend": false,
+                            //-         "chartContainer": "#" + "pageViewsChart_"+#{site.siteId},
+                            //-         "notify": false,
+                            //-         "alert": true,
+                            //-         "reportType": "controlVsAdpushupPageviews"
+                            //-     });
             else
                 h3.title.m-All-0.clearfix
                     a.pull-left(id="site-report-" + site.siteId).
