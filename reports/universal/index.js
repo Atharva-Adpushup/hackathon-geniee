@@ -94,7 +94,12 @@ module.exports = {
 			};
 
 		return Promise.resolve(true).then(function() {
-			return getComputedConfig(flags, paramConfig);
+			//NOTE: This is done to ensure that sql aggregation report data move
+			//from 'test' to 'production' database succesfully.
+			//Please remove below dummy string and throw once report data is stable in production
+			const dummyData = { status: 0, data: null };
+			return dummyData;
+			//return getComputedConfig(flags, paramConfig);
 		});
 	}
 };

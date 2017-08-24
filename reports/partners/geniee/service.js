@@ -10,6 +10,12 @@ const { defaultLanguageCode } = require('../../../i18n/language-mapping');
 
 module.exports = (function(mediaModule, pageGroupModule, variationModule) {
 	function getReportData(params) {
+		//NOTE: This is done to ensure that sql aggregation report data move
+		//from 'test' to 'production' database succesfully.
+		//Please remove below dummy string and throw once report data is stable in production
+		const dummyErrorString = 'Geniee Report Service is down. Data will be up by next week';
+		throw new Error(dummyErrorString);
+
 		var dateParams = {dateFrom: params.dateFrom, dateTo: params.dateTo};
 
 		params.dateFrom = getSqlValidParameterDates(dateParams).dateFrom;

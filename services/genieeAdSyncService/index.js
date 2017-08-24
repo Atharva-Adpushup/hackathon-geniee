@@ -13,9 +13,9 @@ function onSiteSaved(site) {
 	// so to roughly bypassing this situation run the generator only after 5 seconds, assuming all is saved in 5 seconds
 	setTimeout(() => {
 		syncGeneratedFileWithCdn.init(site);
-		siteModeMailTriggerService.init(site)
-		.then(console.log)
-		.catch(console.log);
+		// siteModeMailTriggerService.init(site)
+		// .then(console.log)
+		// .catch(console.log);
 	}, 3000);
 }
 
@@ -43,16 +43,16 @@ function updateAllAutoOptimisedSites() {
 }
 
 adpushup.on('siteSaved', onSiteSaved);
-cron.schedule('0 0 */4 * * *', function() {
-	const infoText = 'Running below task every 4 hours';
+// cron.schedule('0 0 */4 * * *', function() {
+// 	const infoText = 'Running below task every 4 hours';
 
-	fileLogger.info(infoText);
-	console.log(infoText);
-	updateAllAutoOptimisedSites();
-}, true);
+// 	fileLogger.info(infoText);
+// 	console.log(infoText);
+// 	updateAllAutoOptimisedSites();
+// }, true);
 // NOTE: Even with boolean `true` as third argument,
 // cron doesn't immediately start the job.
 // Hence, a manual invokation for this method is done below
 // TODO: Test this issue out and if persists,
 // do a pull request to 'node-cron' npm package to fix this :)
-updateAllAutoOptimisedSites();
+//updateAllAutoOptimisedSites();
