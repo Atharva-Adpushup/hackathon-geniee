@@ -4,7 +4,7 @@ import $ from 'jquery';
 import Utils from 'libs/utils';
 import TabSiteOptions from './tabSiteOptions.jsx';
 
-const empyScreen = () => (<div className="tabContentbg" />),
+const emptyScreen = () => (<div className="tabContentbg" />),
 	handleLiClick = (tabPane, props) => {
 		const tabPaneSelector = `#tab_${tabPane.key}`,
 			position = Utils.ui.outerMenuRenderPosition($(tabPaneSelector));
@@ -45,8 +45,8 @@ const empyScreen = () => (<div className="tabContentbg" />),
 				</div>
 			</div>
 			<div className="tabContent">
-                <div className="tabContentbg">
-                    {props.children.length.length === 0 ? empyScreen() : props.children.map((tabPane) => (
+                <div className="tabContentWrapper">
+                    {props.children.length === 0 ? emptyScreen() : props.children.map((tabPane) => (
                         React.cloneElement(tabPane, {
                             key: `tab_content_${tabPane.key}`,
                             id: `tab_content_${tabPane.key}`,
