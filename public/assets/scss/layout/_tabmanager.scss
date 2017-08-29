@@ -281,6 +281,10 @@
 		top: 43px;
 		bottom: 0px;
 		z-index: -1;
+		.tabContentWrapper {
+			height: 100%;
+			width: 100%;
+		}
 		.tabContentbg
 		{
 			background: url("../../images/clickHere.png") no-repeat 48px 6px;
