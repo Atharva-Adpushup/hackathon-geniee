@@ -291,16 +291,16 @@ function apiModule() {
 									user.set('analytics', analyticsObj);
 								}
 								process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-								return request(pipeDriveOptions).then(function(res) {
-								if(res) {
+								return request(pipeDriveOptions)
+								.then(res => {
+									if(res) {
 										var responseString = res.toString(),
 											dealId = responseString.substring(responseString.lastIndexOf(":")+1,responseString.lastIndexOf(";"));
 										user.set('crmDealId', dealId);
 									}
 									return user;
-								}).catch(function(err) {
-									throw err;
-								});
+								})
+								.catch(err => { throw err; });
 							})
 							.then(function(user) {
 								return user.addSite(json.site).then(function() {

@@ -122,8 +122,8 @@ function setSessionData(user, req, res, type) {
 				if (req.session.isSuperUser) {
 					allowEntry = 1;
 				} else {
-                    redirectPath = 'thank-you';
-                    // if (parseInt(user.get('revenueUpperLimit')) <= 2500) {
+					redirectPath = 'thank-you';
+					// if (parseInt(user.get('revenueUpperLimit')) <= 2500) {
 					// 	redirectPath = 'thank-you';
 					// } else if (parseInt(user.get('revenueUpperLimit')) > 10000) {
 					// 	redirectPath = 'thankyou';
@@ -361,17 +361,16 @@ router
 		req.body.adNetworks = (req.body.adNetworks) ? req.body.adNetworks : consts.user.fields.default.adNetworks;
 
 		createNewUser(req.body, res)
-			.catch(function (e) {
-				var errorMessage, isCouchbaseError = (e.name && e.name === 'CouchbaseError');
-
-				if (isCouchbaseError) {
-					errorMessage = 'Some error occurred. Please Try again!';
-					res.render('error', { message: errorMessage });
-				} else if (e instanceof AdPushupError) {
-					errorMessage = e.message[Object.keys(e.message)[0]][0];
-					res.render('error', { message: errorMessage, error: new Error(errorMessage) });
-				}
-			});
+		.catch(function (e) {
+			var errorMessage, isCouchbaseError = (e.name && e.name === 'CouchbaseError');
+			if (isCouchbaseError) {
+				errorMessage = 'Some error occurred. Please Try again!';
+				res.render('error', { message: errorMessage });
+			} else if (e instanceof AdPushupError) {
+				errorMessage = e.message[Object.keys(e.message)[0]][0];
+				res.render('error', { message: errorMessage, error: new Error(errorMessage) });
+			}
+		});
 	})
 	.get('/', function (req, res) {
 		return res.redirect('/login');

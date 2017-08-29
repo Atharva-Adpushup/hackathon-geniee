@@ -1,78 +1,57 @@
-var https = require('https'),
-    CC = require('../../configs/commonConsts'),
-    pipeDriveObject = function() {
+const _ = require('lodash');
+const Promise = require('bluebird');
+const request = require('request-promise');
+const CC = require('../../configs/commonConsts');
 
-        var path = null,
-            searchPhrase = null,
-            method = null;
+function getOptions(action, payload) {
+	let options = {
+		method: '',
+		uri: 'https://api.pipedrive.com',
+		json: true,
+	};
 
-        var setAction = function(action) {
-            switch(action) {
-                case 'isUserPresent':
-                    path  = '/v1/searchResults?term=' + searchPhrase;
-                    path += '&item_type=person&start=0&api_token=' + CC.analytics.PIPEDRIVE_SYNC_TOKEN;
-                    method = 'GET';
-                    break;
-                case 'fetchUserDetails':
-                    path  = '/v1/persons/' + searchPhrase;
-                    path += '?api_token=' + CC.analytics.PIPEDRIVE_SYNC_TOKEN;
-                    method = 'GET';
-                    break;
-                case 'updateDealStatus':
-                    path  = '/v1/deals/' + searchPhrase;
-                    path += '?api_token=' + CC.analytics.PIPEDRIVE_SYNC_TOKEN;
-                    method = 'PUT';
-                    break;
-                case 'updateDeal':
-                    path  = '/v1/deals/' + searchPhrase;
-                    path += '?api_token=' + CC.analytics.PIPEDRIVE_SYNC_TOKEN;
-                    method = 'PUT';
-                    break;
-                default:
-                    break;
-            }        
-        };
+	function updateOptions(method, requestContent) {
+		requestContent.api_token = CC.analytics.PIPEDRIVE_SYNC_TOKEN;
+		options.method = method;
+		switch(method) {
+			case 'GET':
+				options.qs = requestContent;
+				break;
+			case 'POST':
+				options.body = requestContent;
+				break;
+			case 'PUT':
+				options.qs = { api_token: requestContent.api_token };
+				options.body = requestContent;
+				break;
+		}
+	}
 
-        var apiCall = function(action, params) {
-            var str = '',
-                dataToSend = params.dataToSend || null,
-                stringBodyContent = '';
-            searchPhrase = params.searchText;
-            setAction(action);
-            return new Promise(function(resolve, reject) {
-                if(dataToSend && dataToSend != null) {
-                    stringBodyContent = JSON.stringify(dataToSend);
-                }            
-                var options = {
-                    hostname: 'api.pipedrive.com',
-                    path: path,
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                };
-                var req = https.request(options, (res) => {
-                    res.setEncoding('utf8');
-                    res.on('data', (chunk) => {
-                        str += chunk;
-                    });
-                    res.on('end', () => {
-                        resolve(str);
-                    });
-                });
-                req.on('error', (e) => {
-                    reject(e.message);
-                });
-                if(dataToSend && dataToSend != null) {
-                    req.write(stringBodyContent);
-                }
-                req.end();
-            });
-        };
+	switch (action) {
+		case 'getUserByTerm':
+			options.uri += '/v1/persons/find';
+			updateOptions('GET', payload);
+			break;
+		case 'getUserById':
+			options.uri += '/v1/persons/' + payload.user_id;
+			updateOptions('GET', payload);
+			break;
+		case 'updateDeal':
+			options.uri += '/v1/deals/' + payload.deal_id;
+			updateOptions('PUT', payload);
+			break;
+		default:
+			break;
+	}
 
-        return {
-            apiCall: apiCall
-        };
-    };
+	return Promise.resolve(options);
+};
 
-module.exports = pipeDriveObject;
+function callPipedriveAPI(action, payload) {
+	return getOptions(action, payload)
+	.then(request)
+	.then(Promise.resolve)
+	.catch(err => err);
+}
+
+module.exports = callPipedriveAPI;
