@@ -18,6 +18,8 @@ var modelAPI = module.exports = apiModule(),
 	jadeParser = require('simple-jade-parser'),
 	Promise = require('bluebird'),
 	request = require('request-promise'),
+	pipedriveAPI = require('../misc/vendors/pipedrive'),
+	mailService = require('../services/mailService/index'),
 	User = model.extend(function() {
 		this.keys = ['firstName', 'lastName', 'email', 'salt', 'passwordMd5', 'sites', 'adNetworkSettings', 'createdAt',
 			'passwordResetKey', 'passwordResetKeyCreatedAt', 'requestDemo', 'requestDemoData', 'analytics', 'adNetworks', 
@@ -238,6 +240,66 @@ function apiModule() {
 		createUserFromJson: function(json) {
 			return Promise.resolve(new User(json));
 		},
+		pipedriveDealCreation: function(user, pipedriveParams) {
+			process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+			return pipedriveAPI('getUserByTerm', {
+				term: pipedriveParams.userInfo.email,
+				search_by_email: 1,
+				start: 0
+			})
+			.then(response => {
+				if (response && response.success) {
+					if (response.data && response.data != null && response.data != 'null' && response.data.length) {
+						return response.data[0].id;
+					} else {
+						return pipedriveAPI('createPerson', pipedriveParams.userInfo);
+					}
+				}
+				return Promise.reject('Error while creating new user in Pipedrive');
+			})
+			.then(response => {
+				if (response) {
+					if (typeof response == 'object') {
+						if (response.success) {
+							return response.data.id;
+						}
+						return Promise.reject('Error while creating new user in Pipedrive');
+					} else if (typeof response == 'string' || typeof response == 'number') {
+						return response;
+					}
+				}
+				return Promise.reject('Error while creating new user in Pipedrive');
+			})
+			.then(userPipedriveId => {
+				if (userPipedriveId) {
+					pipedriveParams.dealInfo['person_id'] = userPipedriveId;
+					return true;
+				}
+				return Promise.reject('Error while creating new deal in Pipedrive');
+			})
+			.then(() => {
+				return pipedriveAPI('createDeal', pipedriveParams.dealInfo);
+			})
+			.then(response => {
+				if (response && response.success) {
+					user.set('crmDealId', response.data.id);
+					return user;
+				}
+				return Promise.reject('Error while creating new deal in Pipedrive');
+			})
+			.catch(err => {  // Send mail to sales@adPushup.com here regarding error
+				pipedriveParams.errorMessage = "Error while creating deal in Pipedrive. \
+					Please make deal manually. After that update corresponding userdoc and add field `crmDealId`. \
+					Below is all the information you need.";
+				return mailService({
+					header: "Error while creating new deal in Pipedrive",
+					content: JSON.stringify(pipedriveParams),
+					emailId: "yomesh.gupta@gmail.com"
+				});
+			})
+			.then(() => user)
+			.catch(err => user);
+		},
 		createNewUser: function(json) {
 			return FormValidator.validate(json, schema.user.validations)
 				.then(API.getUserByEmail.bind(null, json.email))
@@ -266,22 +328,22 @@ function apiModule() {
 								}
 								var analyticsObj, userId = user.get('email'),
 									anonId = json.anonId,
-									pipeDriveParams = {
-										'txt_name': user.get('firstName'),
-										'txt_email_id': user.get('email'),
-										'txt_website': json.site,
-										'txt_pvs': user.get('pageviewRange'),
-										'txt_platform': 'undefined',
-										'txt_ad_network': user.get('adNetworks').join(' | '),
-										'txt_website_revenue' : user.get('websiteRevenue'),
-										'txt_stage_id': 81 // Onboarding Pipeline | First Stage | Deal Created
-									},
-									pipeDriveOptions = {
-										'method': 'POST',
-										'uri': consts.analytics.PIPEDRIVE_URL,
-										'form': pipeDriveParams
+									pipedriveParams = {
+										userInfo: {
+											name: user.get('firstName'),
+											email: user.get('email'),
+										},
+										dealInfo: {
+											title: `CO_${json.site}`,
+											value: user.get('websiteRevenue'),
+											stage_id: 81,  // [2017] AP User Onboarding Pipeline | First Stage | Deal Created
+											[consts.analytics.pipedriveCustomFields.websiteName]: json.site,
+											[consts.analytics.pipedriveCustomFields.dailyPageviews]: user.get('pageviewRange'),
+											[consts.analytics.pipedriveCustomFields.adNetworks]: user.get('adNetworks').join(' | '),
+											[consts.analytics.pipedriveCustomFields.websiteRevenue]: user.get('websiteRevenue'),
+											currency: 'USD'
+										}
 									};
-
 								if (anonId && !user.get('analytics')) {
 									analyticsObj = {
 										'anonymousId': anonId,
@@ -290,17 +352,7 @@ function apiModule() {
 									};
 									user.set('analytics', analyticsObj);
 								}
-								process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-								return request(pipeDriveOptions)
-								.then(res => {
-									if(res) {
-										var responseString = res.toString(),
-											dealId = responseString.substring(responseString.lastIndexOf(":")+1,responseString.lastIndexOf(";"));
-										user.set('crmDealId', dealId);
-									}
-									return user;
-								})
-								.catch(err => { throw err; });
+								return API.pipedriveDealCreation(user, pipedriveParams);
 							})
 							.then(function(user) {
 								return user.addSite(json.site).then(function() {

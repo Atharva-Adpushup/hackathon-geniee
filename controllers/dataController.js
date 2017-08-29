@@ -289,6 +289,9 @@ router
 	.post('/updateCrmDealStatus', function (req, res) {
 		return userModel.getUserByEmail(req.session.user.email)
 		.then(user => {
+			if (!user || !user.data || !user.data.crmDealId) {
+				return Promise.reject("No CRM deal id found");
+			}
 			return pipedriveAPI('updateDeal', {
 				deal_id: user.data.crmDealId,
 				stage_id: req.body.status

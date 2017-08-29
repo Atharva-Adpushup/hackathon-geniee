@@ -82,7 +82,13 @@ module.exports = {
 		'SEGMENT_APP_ID': 'vkVd688NyfGcgDhQwJSaiZofdEXvAZVQ',
 		'INTERCOM_ID': 'WiCwcQZTNKXyiCLQMCD7EwD2dUAPznK34rByaIt3',
 		'PIPEDRIVE_URL': 'https://www.adpushup.com/tech_integration/crm_scripts/callback/signup.php',
-		'PIPEDRIVE_SYNC_TOKEN': 'f4a90157f53a437a1f6b5c0d889b6d7db005f67e'
+		'PIPEDRIVE_SYNC_TOKEN': 'f4a90157f53a437a1f6b5c0d889b6d7db005f67e',
+		pipedriveCustomFields: {
+			websiteName: '5298ce43bbf31a9afa7edb2e6784b9368b55c8f3',
+			dailyPageviews: '438f3045809011521f38cfe118e74943b7891627',
+			websiteRevenue: '293fd8aadfb6982d31fd0b4f8f58f200f49dcb2f',
+			adNetworks: '8253d39661cfb11976f8cda3342d0c3d2bd6895d'
+		}
 	},
 	password: {
 		'MASTER': 'fe4720b8bcdedb3cc47490015b0ab050'

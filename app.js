@@ -158,6 +158,7 @@ couchBaseService.connectToAppBucket().then(function () {
 				stacktrace: err.stack
 			});
 		});
+		process.on('uncaughtException', (error) => console.log(error.stack));
 	}
 
 	// production error handler

@@ -18,10 +18,9 @@ function getOptions(action, payload) {
 				options.qs = requestContent;
 				break;
 			case 'POST':
-				options.body = requestContent;
-				break;
 			case 'PUT':
 				options.qs = { api_token: requestContent.api_token };
+				delete requestContent.api_token;
 				options.body = requestContent;
 				break;
 		}
@@ -35,6 +34,14 @@ function getOptions(action, payload) {
 		case 'getUserById':
 			options.uri += '/v1/persons/' + payload.user_id;
 			updateOptions('GET', payload);
+			break;
+		case 'createPerson':
+			options.uri += '/v1/persons';
+			updateOptions('POST', payload);
+			break;
+		case 'createDeal':
+			options.uri += '/v1/deals';
+			updateOptions('POST', payload);
 			break;
 		case 'updateDeal':
 			options.uri += '/v1/deals/' + payload.deal_id;
