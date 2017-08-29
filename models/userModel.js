@@ -328,16 +328,17 @@ function apiModule() {
 								}
 								var analyticsObj, userId = user.get('email'),
 									anonId = json.anonId,
+									siteName = utils.domanize(json.site),
 									pipedriveParams = {
 										userInfo: {
 											name: user.get('firstName'),
 											email: user.get('email'),
 										},
 										dealInfo: {
-											title: `CO_${json.site}`,
+											title: `[CO] ${siteName}`,
 											value: user.get('websiteRevenue'),
 											stage_id: 81,  // [2017] AP User Onboarding Pipeline | First Stage | Deal Created
-											[consts.analytics.pipedriveCustomFields.websiteName]: json.site,
+											[consts.analytics.pipedriveCustomFields.websiteName]: siteName,
 											[consts.analytics.pipedriveCustomFields.dailyPageviews]: user.get('pageviewRange'),
 											[consts.analytics.pipedriveCustomFields.adNetworks]: user.get('adNetworks').join(' | '),
 											[consts.analytics.pipedriveCustomFields.websiteRevenue]: user.get('websiteRevenue'),
