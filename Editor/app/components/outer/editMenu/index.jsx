@@ -33,7 +33,7 @@ class editMenu extends React.Component {
 				{
 					_.map(props.section.ads, (ad, index) => (
 						<MenuItem key={index} icon={'apSize'} text={`${ad.width} ${ad.height}`} contentHeading={`${ad.width} x ${ad.height}`}>
-							<AdDescriptor variationId={props.variationId} ad={ad} partnerData={props.section.partnerData} sectionId={props.section.id} updateSettings={props.updateSettings}/>
+							<AdDescriptor variationId={props.variationId} ad={ad} partnerData={props.section.partnerData} sectionId={props.section.id} updateSettings={props.updateSettings} xpath={props.section.xpath}/>
 						</MenuItem>
 					))
 				}

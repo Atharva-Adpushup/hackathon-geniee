@@ -1,0 +1,9 @@
+.inputBasic {
+	padding: $SBPaddingTB $SBPaddingLR;
+	display: inline-block;
+	cursor: pointer;
+	width: 100%;
+	text-align: left;
+	background-color:$whiteColor;
+	border:1px solid $SBBorderColor;
+}

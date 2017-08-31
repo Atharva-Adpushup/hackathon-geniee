@@ -7,6 +7,7 @@ const createAd = (payload) => ({
 	}),
 	deleteAd = (adId, sectionId) => ({ type: adActions.DELETE_AD, adId, sectionId }),
 	updateCss = (adId, css) => ({ type: adActions.UPDATE_CSS, adId, css }),
-	updateAdCode = (adId, adCode) => ({ type: adActions.UPDATE_ADCODE, adId, adCode });
+	updateNetwork = (adId, priceFloor, network) => ({ type: adActions.UPDATE_NETWORK, adId, priceFloor, network }),
+	updateAdCode = (adId, adCode, network) => ({ type: adActions.UPDATE_ADCODE, adId, adCode, network });
 
-export { createAd, deleteAd, updateCss, updateAdCode };
+export { createAd, deleteAd, updateCss, updateAdCode, updateNetwork };

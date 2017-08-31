@@ -25,7 +25,9 @@ const adsByIds = (state = {}, action) => {
 			if (isZoneId) {
 				createAdObject.networkData = { zoneId: payload.networkData.zoneId };
 			}
-
+			if (isNetworkData) {
+				createAdObject.networkData = Object.assign({}, createAdObject.networkData, payload.networkData);
+			}
 			return { ...state,
 				[payload.id]: createAdObject
 			};
@@ -51,6 +53,9 @@ const adsByIds = (state = {}, action) => {
 			if (isInContentAdZoneId) {
 				createInContentAdObject.networkData = { zoneId: payload.networkData.zoneId };
 			}
+			if (isNetworkData) {
+				createAdObject.networkData = Object.assign({}, createAdObject.networkData, payload.networkData);
+			}
 
 			return { ...state,
 				[payload.id]: createInContentAdObject
@@ -73,7 +78,10 @@ const adsByIds = (state = {}, action) => {
 			return { ...state, [action.adId]: updateAdObject };
 
 		case adActions.UPDATE_ADCODE:
-			return { ...state, [action.adId]: { ...state[action.adId], adCode: action.adCode } };
+			return { ...state, [action.adId]: { ...state[action.adId], adCode: action.adCode, network: action.network } };
+
+		case adActions.UPDATE_NETWORK:
+			return { ...state, [action.adId]: { ...state[action.adId], network: action.network, networkData: { ...state[action.adId].networkData, priceFloor: parseFloat(action.priceFloor) } } };
 
 		case adActions.UPDATE_CSS:
 			return { ...state, [action.adId]: { ...state[action.adId], css: action.css } };

@@ -6,6 +6,7 @@ import _ from 'lodash';
 const createSection = (sectionPayload, adPayload, variationId) => {
 		const adId = Utils.getRandomNumber(),
 			sectionId = Utils.getRandomNumber();
+		
 		return {
 			type: sectionActions.CREATE_SECTION,
 			adPayload: Object.assign(adPayload, { id: adId, css: adPayload.css ? adPayload.css : defaultSectionCss, createTs: Math.floor(Date.now() / 1000) }),
