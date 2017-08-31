@@ -269,7 +269,7 @@ router
                     if (Array.isArray(sites) && sites.length > 0) {
                         if (sites.length == 1) {
                             var step = sites[0].step;
-                            if (step && step < 6) {
+                            if (step && step < CC.onboarding.totalSteps) {
                                 return res.redirect('/user/onboarding');
                             }
                             if (!user.get('requestDemo')) {
