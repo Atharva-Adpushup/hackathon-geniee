@@ -29,7 +29,7 @@ const variationSections = (props) => {
 							onResetErrors={onResetErrors}
 							onSectionXPathValidate={onSectionXPathValidate}
 							onIncontentFloatUpdate={onIncontentFloatUpdate}
-                            onScrollSectionIntoView={onScrollSectionIntoView}
+							onScrollSectionIntoView={onScrollSectionIntoView}
 							ui={ui}
 							/>
 					</div>

@@ -1,45 +1,32 @@
 var Promise = require('bluebird'),
 	retry = require('bluebird-retry'),
-    lodash = require('lodash'),
-	{ fileLogger } = require('../../helpers/logger/file/index'),
-	configPublishService = require('../apV2SiteConfigPublishService/index'),
+	configPublishService = require('./apV2SiteConfigPublishService/index'),
 	syncCdn = require('./cdnSyncService/index');
 
-function publishGenieeSyncJobs(site) {
-    var paramConfig = {
-        zones: {},
-        siteId: 0,
-        channelKey: '',
-        pageGroupId: ''
-    };
-    return configPublishService.publish(site, paramConfig);
-}
-
-function publishCDNSyncJobs(site) {
-    return syncCdn(site);
+function publishCDNWrapper(site) {
+	return configPublishService.publish(site)
+	.then(response => {
+		if (response.empty) {
+			console.log(response.message);
+			return syncCdn(site);
+		}
+		return response.message;
+	})
+	.then(console.log)
+	.catch(console.log);
 }
 
 module.exports = {
-    init: function(site) {
-        // @TODO Syncing retry logic to be added 
-        if (site.get('partner') === 'geniee') {
-            return publishGenieeSyncJobs(site)
-            .then(function(response) {
-                if (response.empty) {
-                    console.log(response.message);
-                    return publishCDNSyncJobs(site);
-                }
-                return response.message;
-            })
-            .then(console.log)
-            .catch(console.log);
-        } else {
-            return publishCDNSyncJobs(site)
-            .then(function() {
-                console.log(`APEX CDN Sync jobs published in queue for site : ${site.get('siteId')}`);
-                return;
-            })
-            .catch(console.log);
-        }
-    }
+	init: (site) => publishCDNWrapper(site)
 };
+
+/*
+ * ADP Tags Data requried for Sync
+ * Ads/Zone 
+ * 	- adId
+ * 	- sectionId
+ * 	- width
+ * 	- height
+ * siteId
+ * channelKey
+ */

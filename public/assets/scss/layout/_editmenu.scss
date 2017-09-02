@@ -24,7 +24,6 @@
 	}
 	.adDetails-icon {
 		float: right;
-		margin-right: 5px;
 		.btn-icn-edit {
 			color: $dimFontColor;
 			&:hover {
@@ -114,4 +113,13 @@
 	}
 }
 
+#ad-details {
+	.btn-icn-edit {
+		float: right !important;
+		color: $dimFontColor;
+		&:hover {
+			color: $primaryColorDark;
+		}
+	}
+}
 

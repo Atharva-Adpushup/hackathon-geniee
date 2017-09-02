@@ -23,9 +23,9 @@ class adDescriptor extends React.Component {
 	}
 
 	deleteSectionWithAd() {
-		const { ad, sectionId, variationId, deleteSection, xpath } = this.props;
+		const { ad, section, variationId, deleteSection } = this.props;
 
-		deleteSection(sectionId, variationId, ad.id);
+		deleteSection(section.id, variationId, ad.id);
 	}
 
 	toggleCssEditor() {
@@ -47,10 +47,10 @@ class adDescriptor extends React.Component {
 	}
 
 	render() {
-		const { ad, updateCss, updateAdCode, partnerData, updateSettings, sectionId, xpath } = this.props,
+		const { ad, updateCss, updateAdCode, section, updateSettings, onUpdateXPath, onSectionAllXPaths, onValidateXPath, onResetErrors, ui  } = this.props,
 			adCode = ad.adCode,
 			number = 12;
-			
+
 		if (this.state.isEditingCss) {
 			return (<CssEditor css={ad.css} onCancel={this.toggleCssEditor} onSave={updateCss.bind(null, ad.id)} />);
 		}
@@ -65,12 +65,23 @@ class adDescriptor extends React.Component {
 				<Row>
 					{
 						currentUser.userType === 'partner' ? (
-							<SectionOptions updateMode sectionId={sectionId} ad={ad} partnerData={partnerData} updateSettings={updateSettings}/>
+							<SectionOptions updateMode sectionId={section.sectionId} ad={ad} partnerData={section.partnerData} updateSettings={updateSettings}/>
 						) : null
 					}
 				</Row>
 				<Row style={{margin: "10px 0"}}>
-					<AdDetails ad={ad} xpath={xpath} editCss={this.toggleCssEditor} editNetwork={this.toggleNetworkEditor} />
+					<AdDetails
+						userType={currentUser.userType || false}
+						ad={ad}
+						ui={ui}
+						section={section}
+						editCss={this.toggleCssEditor}
+						editNetwork={this.toggleNetworkEditor}
+						onUpdateXPath={onUpdateXPath}
+						onSectionAllXPaths={onSectionAllXPaths}
+						onValidateXPath={onValidateXPath}
+						onResetErrors={onResetErrors}
+					/>
 				</Row>
 				<Row className="butttonsRow">
 					<Col xs={number} className="mT-10">
@@ -84,7 +95,7 @@ class adDescriptor extends React.Component {
 
 adDescriptor.propTypes = {
 	ad: PropTypes.object.isRequired,
-	partnerData: PropTypes.object.isRequired,
+	section: PropTypes.object.isRequired,
 	updateCss: PropTypes.func.isRequired,
 	updateAdCode: PropTypes.func.isRequired,
 	deleteSection: PropTypes.func.isRequired,
