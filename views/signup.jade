@@ -8,17 +8,6 @@ block append headScripts
 	- var jqueryValidateStr = (environment == "production") ? (validateBaseStr + 'jquery.validate.min.js') : (validateBaseStr + 'jquery.validate.js');
 	+loadAsset("js", [jqueryValidateStr])
 
-	if environment == "production"
-		script(type="text/javascript").
-			(function(b,o,u,n,c,e){ 
-			b.__ba = (b.__ba || {}); 
-			b.__ba.pixelName = "Signed Up"; 
-			b.__ba.siteId = 34; 
-			b.__ba.pageLoadStart = Date.now(); 
-			c=o.createElement(u); 
-			e=o.getElementsByTagName(u)[0]; 
-			c.async=1;c.src=n + b.__ba.siteId + "/ba.js?t="+Math.floor(Date.now() / (3600 * 1000));e.parentNode.insertBefore(c,e);})(window,document,"script","//static.blipmetrics.com/"); 
-
 block bodyContent
 	- formData = formData || {}
 	main(class="aligner aligner--vCenter aligner--hCenter wrapper wrapper--page")

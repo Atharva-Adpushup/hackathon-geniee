@@ -1,3 +1,5 @@
+//Segment (https://segment.com/) events specific analytics code
+
 var adpushupAnalyticsEvents = {
   events: {},
   on: function (eventName, fn) {
