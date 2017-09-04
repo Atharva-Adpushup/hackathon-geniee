@@ -41,7 +41,7 @@ module.exports = {
 		}
 		return false;
 	},
-	getVariationUnsyncedZones: function (variationId, variationSections) {
+	getVariationUnsyncedZones: function (variationId, channelKey, variationSections) {
 		// Sample json for geniee zone
 		// {"zoneName":"test zone api0","sizeWidth":300,"sizeHeight":250,"zoneType":1,"zonePosition":0,"firstView":1,"useFriendlyIFrameFlag":0}
 		var unsyncedZones = {
@@ -57,7 +57,11 @@ module.exports = {
 						break;
 					case 'ADP Tags':
 						var unsyncedZone = self.checkAdpTagsUnsyncedZones(section, ad);
-						unsyncedZone ? unsyncedZones.adpTagsUnsyncedZones.push(unsyncedZone) : null;
+						if (unsyncedZone) {
+							unsyncedZone.variationId = variationId;
+							unsyncedZone.channelKey = channelKey;
+							unsyncedZones.adpTagsUnsyncedZones.push(unsyncedZone)
+						}
 						break;
 				}
 			})
@@ -70,8 +74,9 @@ module.exports = {
 			_.each(allChannels, function (channel) {
 				channelUnsyncedZones = [];
 				_.each(channel.variations, function (variation, id) {
-					channelUnsyncedZones = self.getVariationUnsyncedZones(id, variation.sections);
-					// channelUnsyncedZones = _.concat(channelUnsyncedZones, self.getVariationUnsyncedZones(id, variation.sections));
+					let channelKey = `chnl::${site.get('siteId')}:${channel.platform}:${channel.pageGroup}`;
+					// channelUnsyncedZones = self.getVariationUnsyncedZones(id, variation.sections);
+					channelUnsyncedZones = _.concat(channelUnsyncedZones, self.getVariationUnsyncedZones(id, channelKey, variation.sections));
 				});
 				finalZones.push({ channel: channel, unsyncedZones: channelUnsyncedZones });
 			});

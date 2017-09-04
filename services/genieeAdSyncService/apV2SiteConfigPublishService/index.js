@@ -6,35 +6,33 @@ var genieePublisher = require('../../../queueWorker/rabbitMQ/workers/genieeAdSyn
 	Promise = require('bluebird'),
 	extend = require('extend');
 
+function processing(siteConfigItems, site) {
+	
+}
+
 function publishToQueueWrapper(siteConfigItems, site) {
 	var response = {
 		empty: true,
 		message: "ZONE_CONFIG_QUEUE_PUBLISH: No unsynced zone for site: " + site.get('siteId')
-	}
-	if (!siteConfigItems.length) {
+	};
+	if (!Object.keys(siteConfigItems).length) {
 		return response;
 	}
-	return Promise.all(_.map(siteConfigItems, function (item) {
-		if (item.zones.genieeUnsyncedZones.length || item.zones.adpTagsUnsyncedZones.length) {
-			if (item.zones.genieeUnsyncedZones.length) {
-				return genieePublisher.publish({
-					channelKey: item.channelKey,
-					pageGroupId: item.pageGroupId,
-					siteId: item.siteId,
-					zones: item.zones.genieeUnsyncedZones
-				});
+	function processing() {
+		let genieeUnsynced = !!(siteConfigItems.geniee && siteConfigItems.geniee && siteConfigItems.geniee.length),
+			adpUnsynced = !!(siteConfigItems.adp && siteConfigItems.adp.ads && siteConfigItems.adp.ads.length);
+		if (genieeUnsynced || adpUnsynced) {
+			if (genieeUnsynced) {
+				return Promise.map(siteConfigItems.geniee, (item) => genieePublisher.publish(item));
 			}
-			if (item.zones.adpTagsUnsyncedZones.length) {
-				return adpTagPublisher.publish({
-					channelKey: item.channelKey,
-					siteId: item.siteId,
-					zones: item.zones.adpTagsUnsyncedZones
-				});
+			if (adpUnsynced) {
+				return adpTagPublisher.publish(siteConfigItems.adp);
 			}
 		} else {
 			return syncCdn(site);
 		}
-	}))
+	}
+	return processing()
 	.then(() => Object.assign(response, {
 		empty: false,
 		message: "ZONE_CONFIG_QUEUE_PUBLISH: Successfully published zones into queue for site: " + site.get('siteId')

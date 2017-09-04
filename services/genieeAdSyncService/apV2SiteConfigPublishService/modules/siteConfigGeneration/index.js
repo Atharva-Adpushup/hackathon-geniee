@@ -3,21 +3,39 @@ var _ = require('lodash'),
 	genieeZoneSyncService = require('../../../genieeZoneSyncService/index');
 
 function generateSiteChannelJSON(channelAndZones, siteModelItem) {
-	const doIt = function (channelWithZones) {
+	let unsyncedGenieeZones = [],
+		adpTagsUnsyncedZones = {
+			siteId: siteModelItem.get('siteId'),
+			ads: []
+		};
+	function doIt (channelWithZones) {
 		if (!(channelWithZones && channelWithZones.unsyncedZones && Object.keys(channelWithZones.unsyncedZones).length)) {
 			return false;
 		}
 		var isChannel = !!(channelWithZones.channel),
-			isPageGroupId = !!(isChannel && channelWithZones.channel.genieePageGroupId),
-			resultData = {
-				zones: channelWithZones.unsyncedZones,
-				siteId: siteModelItem.get('siteId'),
-				pageGroupId: isPageGroupId ? channelWithZones.channel.genieePageGroupId : '',
-				channelKey: isChannel ? 'chnl::' + siteModelItem.get('siteId') + ':' + channelWithZones.channel.platform + ':' + channelWithZones.channel.pageGroup : ''
-			};
-		return resultData;
+			isPageGroupId = !!(isChannel && channelWithZones.channel.genieePageGroupId);
+
+		_.forEach(channelWithZones.unsyncedZones, (zones, index) => {
+			if (Object.keys(zones.genieeUnsyncedZones).length) {
+				unsyncedGenieeZones.push({
+					zones: zones.genieeUnsyncedZones,
+					siteId: siteModelItem.get('siteId'),
+					pageGroupId: isPageGroupId ? channelWithZones.channel.genieePageGroupId : '',
+					channelKey: isChannel ? 'chnl::' + siteModelItem.get('siteId') + ':' + channelWithZones.channel.platform + ':' + channelWithZones.channel.pageGroup : ''
+				});
+			}
+			if (Object.keys(zones.adpTagsUnsyncedZones).length) {
+				adpTagsUnsyncedZones.ads = _.concat(adpTagsUnsyncedZones.ads, zones.adpTagsUnsyncedZones);
+			}
+		});
 	}
-	return _.compact(_.map(channelAndZones, doIt));
+	return Promise.map(channelAndZones, doIt)
+	.then(() => {
+		return { 
+			geniee: unsyncedGenieeZones,
+			adp: adpTagsUnsyncedZones
+		}
+	});
 }
 
 function getGeneratedPromises(siteModelItem) {
