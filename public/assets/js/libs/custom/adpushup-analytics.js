@@ -28,6 +28,7 @@ var adpushupAnalyticsEvents = {
 adpushupAnalyticsEvents.on('analyticsAlias', analyticsAlias);
 adpushupAnalyticsEvents.on('analyticsIdentify', analyticsIdentify);
 adpushupAnalyticsEvents.on('analyticsTrack', analyticsTrack);
+adpushupAnalyticsEvents.on('analyticsPage', analyticsPage);
 
 function analyticsAlias(data) {
     analytics.alias(data.email);
@@ -39,4 +40,8 @@ function analyticsIdentify(data) {
 
 function analyticsTrack(data) {
     analytics.track(data.eventName, data.obj, data.intercom);
+}
+
+function analyticsPage(data) {
+    analytics.page(data.pageName);
 }

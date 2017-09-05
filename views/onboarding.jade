@@ -138,4 +138,8 @@ block bodyContent
                             
                         else
                             include layout/adPushupSetup
-    
+
+	script.
+        adpushupAnalyticsEvents.emit('analyticsPage', {
+            pageName: 'Console - Onboarding'
+        });
