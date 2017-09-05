@@ -47,7 +47,7 @@ class adDescriptor extends React.Component {
 	}
 
 	render() {
-		const { ad, updateCss, updateAdCode, section, updateSettings, onUpdateXPath, onSectionAllXPaths, onValidateXPath, onResetErrors, ui  } = this.props,
+		const { ad, updateCss, updateAdCode, section, updateSettings, onUpdateXPath, onSectionAllXPaths, onValidateXPath, onResetErrors, onRenameSection, ui, variationId} = this.props,
 			adCode = ad.adCode,
 			number = 12;
 
@@ -75,12 +75,14 @@ class adDescriptor extends React.Component {
 						ad={ad}
 						ui={ui}
 						section={section}
+						variationId={variationId}
 						editCss={this.toggleCssEditor}
 						editNetwork={this.toggleNetworkEditor}
 						onUpdateXPath={onUpdateXPath}
 						onSectionAllXPaths={onSectionAllXPaths}
 						onValidateXPath={onValidateXPath}
 						onResetErrors={onResetErrors}
+						onRenameSection={onRenameSection}
 					/>
 				</Row>
 				<Row className="butttonsRow">

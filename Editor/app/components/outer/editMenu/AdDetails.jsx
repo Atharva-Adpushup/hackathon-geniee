@@ -11,37 +11,43 @@ class AdDetails extends Component {
 		return (
 			<div id="ad-details">
 				<div>
-				<p>Network : <strong>{ad.network}</strong>
-					<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-network">Edit Network</Tooltip>}>
-						<span className="adDetails-icon" onClick={editNetwork}><i className="btn-icn-edit" /></span>
-					</OverlayTrigger>
-				</p>
-				{
-					ad.network == 'ADP Tags'
-					?
-						(
-							<div>
-								<p>Price Floor : <strong>{ad.networkData && ad.networkData.priceFloor ? ad.networkData.priceFloor : 0}</strong></p>
-								<p>Header Bidding : <strong>{ad.networkData && ad.networkData.hasOwnProperty('headerBidding') ? String(ad.networkData.headerBidding) : 'true'}</strong></p>
-							</div>
-						)
-					:
-						userType != 'partner'
-						? (
-							<div className="mB-10">
-								<span className="mB-10">Ad Code : </span>
-								{
-									ad.adCode != null && ad.adCode != 'null' && ad.adCode != ""
-									? <pre style={{ whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
-										{
-											atob(ad.adCode)
-										}
-									</pre>
-									: <strong> Not added</strong>
-								}
-							</div>
-						) : null
-				}
+					<div className="mB-10">
+						<InlineEdit validate value={this.props.section.name}
+							submitHandler={this.props.onRenameSection.bind(null, this.props.section, this.props.variationId)} text="Section Name" errorMessage="Section Name cannot be blank"
+						/>
+					</div>
+					
+					<p>Network : <strong>{ad.network}</strong>
+						<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-network">Edit Network</Tooltip>}>
+							<span className="adDetails-icon" onClick={editNetwork}><i className="btn-icn-edit" /></span>
+						</OverlayTrigger>
+					</p>
+					{
+						ad.network == 'ADP Tags'
+						?
+							(
+								<div>
+									<p>Price Floor : <strong>{ad.networkData && ad.networkData.priceFloor ? ad.networkData.priceFloor : 0}</strong></p>
+									<p>Header Bidding : <strong>{ad.networkData && ad.networkData.hasOwnProperty('headerBidding') ? String(ad.networkData.headerBidding) : 'true'}</strong></p>
+								</div>
+							)
+						:
+							userType != 'partner'
+							? (
+								<div className="mB-10">
+									<span className="mB-10">Ad Code : </span>
+									{
+										ad.adCode != null && ad.adCode != 'null' && ad.adCode != ""
+										? <pre style={{ whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
+											{
+												atob(ad.adCode)
+											}
+										</pre>
+										: <strong> Not added</strong>
+									}
+								</div>
+							) : null
+					}
 				</div>
 				<div className="mB-10">
 					<pre>

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import AdsDescriptor from 'editMenu/adDescriptor.jsx';
 import { updateCss, updateAdCode, updateNetwork } from '../actions/adActions';
 import { resetErrors } from 'actions/uiActions';
-import { deleteSection, updateXPath, sectionAllXPaths, validateXPath } from 'actions/sectionActions.js';
+import { deleteSection, updateXPath, sectionAllXPaths, validateXPath, renameSection } from 'actions/sectionActions.js';
 
 export default connect(
 	(state, ownProps) => ({ ...ownProps, ui: state.ui }),
@@ -16,5 +16,6 @@ export default connect(
 		onSectionAllXPaths: sectionAllXPaths,
 		onValidateXPath: validateXPath,
 		onResetErrors: resetErrors,
+		onRenameSection: renameSection
 	}, dispatch)
 )(AdsDescriptor);
