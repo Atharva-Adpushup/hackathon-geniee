@@ -22,6 +22,7 @@ class AdDetails extends Component {
 						(
 							<div>
 								<p>Price Floor : <strong>{ad.networkData && ad.networkData.priceFloor ? ad.networkData.priceFloor : 0}</strong></p>
+								<p>Header Bidding : <strong>{ad.networkData && ad.networkData.hasOwnProperty('headerBidding') ? String(ad.networkData.headerBidding) : 'true'}</strong></p>
 							</div>
 						)
 					:

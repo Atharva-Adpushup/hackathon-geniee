@@ -81,7 +81,7 @@ const adsByIds = (state = {}, action) => {
 			return { ...state, [action.adId]: { ...state[action.adId], adCode: action.adCode, network: action.network, networkData: { ...state[action.adId].networkData, priceFloor: 0 } } };
 
 		case adActions.UPDATE_NETWORK:
-			return { ...state, [action.adId]: { ...state[action.adId], network: action.network, adCode: "", networkData: { ...state[action.adId].networkData, priceFloor: parseFloat(action.priceFloor) } } };
+			return { ...state, [action.adId]: { ...state[action.adId], network: action.network, adCode: "", networkData: { ...state[action.adId].networkData, priceFloor: parseFloat(action.priceFloor), headerBidding: !!action.isHeaderBiddingActivated } } };
 
 		case adActions.UPDATE_CSS:
 			return { ...state, [action.adId]: { ...state[action.adId], css: action.css } };

@@ -40,9 +40,9 @@ class adDescriptor extends React.Component {
 		this.setState({ isEditingNetwork: !this.state.isEditingNetwork });
 	}
 
-	submitHandler(value, network, isADP) {
+	submitHandler(value, network, isADP, isHeaderBiddingActivated) {
 		isADP
-		? this.props.updateNetwork(this.props.ad.id, value, network)
+		? this.props.updateNetwork(this.props.ad.id, value, network, isHeaderBiddingActivated)
 		: this.props.updateAdCode(this.props.ad.id, value, network)
 	}
 

@@ -16,16 +16,16 @@ class NetworkOptions extends Component {
 		this.setState({ network: value });
 	}
 
-	submitHandler(value, isCodeBox = true) {
+	submitHandler(value, isCodeBox = true, isHeaderBiddingActivated) {
 		this.props.adDescriptor
 		?
 			isCodeBox
 			? this.props.onSubmit(value, this.state.network, false)
-			: this.props.onSubmit(value, this.state.network, true)
+			: this.props.onSubmit(value, this.state.network, true, isHeaderBiddingActivated)
 		:
 			isCodeBox
-			? this.props.onSubmit(null, value, null, null, null, null, this.state.network)
-			: this.props.onSubmit(null, null, null, null, null, value, this.state.network)
+			? this.props.onSubmit(null, value, null, null, null, null, this.state.network, isHeaderBiddingActivated)
+			: this.props.onSubmit(null, null, null, null, null, value, this.state.network, isHeaderBiddingActivated)
 	}
 
 	render() {
@@ -42,7 +42,14 @@ class NetworkOptions extends Component {
 				</SelectBox>
 				{
 					this.state.network == 'ADP Tags'
-					? <AdpTags value={this.props.ad && this.props.ad.networkData && this.props.ad.networkData.priceFloor ? this.props.ad.networkData.priceFloor : 0} showButtons={true} submitHandler={this.submitHandler} onCancel={this.props.onCancel} />
+					? 
+						<AdpTags
+							priceFloorFromProps={this.props.ad && this.props.ad.networkData && this.props.ad.networkData.priceFloor ? this.props.ad.networkData.priceFloor : 0}
+							headerBiddingFlag={this.props.ad && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('headerBidding') ? this.props.ad.networkData.headerBiddingFlag : 1}
+							showButtons={true} 
+							submitHandler={this.submitHandler} 
+							onCancel={this.props.onCancel}
+						/>
 					: this.state.network
 						? 
 							(
