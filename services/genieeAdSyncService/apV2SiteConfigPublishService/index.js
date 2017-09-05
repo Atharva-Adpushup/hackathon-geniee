@@ -1,10 +1,9 @@
-var genieePublisher = require('../../../queueWorker/rabbitMQ/workers/genieeAdSyncQueuePublisher'),
+var _ = require('lodash'),
+	Promise = require('bluebird'),
+	genieePublisher = require('../../../queueWorker/rabbitMQ/workers/genieeAdSyncQueuePublisher'),
 	adpTagPublisher = require('../../../queueWorker/rabbitMQ/workers/adpTagAdSyncQueuePublisher'),
 	siteConfigGenerationModule = require('./modules/siteConfigGeneration/index'),
 	syncCdn = require('../cdnSyncService/index');
-_ = require('lodash'),
-	Promise = require('bluebird'),
-	extend = require('extend');
 
 function genieePublishWrapper(item) {
 	return genieePublisher.publish(item);
@@ -45,7 +44,7 @@ function publishToQueueWrapper(siteConfigItems, site) {
 module.exports = {
 	publish: function (siteModel) {
 		return siteConfigGenerationModule
-			.generate(siteModel)
-			.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, siteModel));
+		.generate(siteModel)
+		.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, siteModel));
 	}
 };
