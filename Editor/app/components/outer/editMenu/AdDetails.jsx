@@ -12,16 +12,23 @@ class AdDetails extends Component {
 			<div id="ad-details">
 				<div>
 					<div className="mB-10">
+						<p style={{marginBottom: "0px"}}>Section Name</p>
 						<InlineEdit validate value={this.props.section.name}
 							submitHandler={this.props.onRenameSection.bind(null, this.props.section, this.props.variationId)} text="Section Name" errorMessage="Section Name cannot be blank"
 						/>
 					</div>
-					
-					<p>Network : <strong>{ad.network}</strong>
-						<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-network">Edit Network</Tooltip>}>
-							<span className="adDetails-icon" onClick={editNetwork}><i className="btn-icn-edit" /></span>
-						</OverlayTrigger>
-					</p>
+					{ 
+						userType != 'partner'
+						? 
+							(
+								<p>Network : <strong>{ad.network}</strong>
+									<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-network">Edit Network</Tooltip>}>
+										<span className="adDetails-icon" onClick={editNetwork}><i className="btn-icn-edit" /></span>
+									</OverlayTrigger>
+								</p>
+							)
+						: null
+					}
 					{
 						ad.network == 'ADP Tags'
 						?
