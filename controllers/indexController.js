@@ -18,7 +18,17 @@ router.use(function (req, res, next) {
 
 function createNewUser(params, res) {
 	var origName = utils.trimString(params.name),
-		nameArr = origName.split(' ');
+		nameArr = origName.split(' '),
+		exactRevenue = params.exactRevenue,
+		revenue = params.websiteRevenue,
+		revenueArray = revenue.split('-'),
+		leastRevenueConstant = '999',
+		// Exact Revenue refers to exact revenue amount (less than $1000 USD) given by end user
+		isExactRevenue = !!(exactRevenue),
+		isRevenue = !!(revenue),
+		isMinimumRevenueMatch = !!(isRevenue && (leastRevenueConstant === revenue)),
+		isExactRevenueCondition = !!(isExactRevenue && isMinimumRevenueMatch);
+
 	// firstName and lastName fields are added to params json
 	// as user name will be saved in database as
 	// separate firstName and lastName fields
@@ -36,20 +46,30 @@ function createNewUser(params, res) {
 	params.utmName = params.utmName || 'N/A';
 	params.utmContent = params.utmContent || 'N/A';
 
-	var revenueArray = params.websiteRevenue.split('-');
-	if (revenueArray.length > 1) {
-		params.revenueLowerLimit = revenueArray[0];
-		params.revenueUpperLimit = revenueArray[1];
+	// Below conditions
+	// IF: Set all revenue parameters equal to exact revenue 
+	// given by end user if the revenue is less than $1000 USD
+	// ELSE: Compute all revenue parameters with given revenue range
+	if (isExactRevenueCondition) {
+		params.revenueLowerLimit = '0';
+		params.revenueUpperLimit = exactRevenue;
+		params.revenueAverage = Number(Number(exactRevenue).toFixed(2));
+		params.websiteRevenue = exactRevenue;
 	} else {
-		if (parseInt(revenueArray[0]) < 50000) {
-			params.revenueLowerLimit = 0;
-			params.revenueUpperLimit = revenueArray[0];
-		} else {
+		if (revenueArray.length > 1) {
 			params.revenueLowerLimit = revenueArray[0];
-			params.revenueUpperLimit = 2 * revenueArray[0];
+			params.revenueUpperLimit = revenueArray[1];
+		} else {
+			if (parseInt(revenueArray[0]) < 50000) {
+				params.revenueLowerLimit = 0;
+				params.revenueUpperLimit = revenueArray[0];
+			} else {
+				params.revenueLowerLimit = revenueArray[0];
+				params.revenueUpperLimit = 2 * revenueArray[0];
+			}
 		}
+		params.revenueAverage = (parseInt(params.revenueLowerLimit) + parseInt(params.revenueUpperLimit)) / revenueArray.length;
 	}
-	params.revenueAverage = (parseInt(params.revenueLowerLimit) + parseInt(params.revenueUpperLimit)) / revenueArray.length;
 
 	// (typeof params.adNetworks === 'string') ? [params.adNetworks] : params.adNetworks;
 	delete params.name;

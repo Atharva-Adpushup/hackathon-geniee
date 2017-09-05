@@ -56,18 +56,26 @@ block bodyContent
 								div(class="error-message js-error-message js-password-error") #{passwordError}
 
 					div(class="form-group")
-						div(class="col-md-12 pd-0")
-							select(class="form-control input-lg" id="signup-websiteRevenue" name="websiteRevenue" required)
-								option(value="") Monthly Ad Revenue (in USD)
-								option(value="999") &lt; 1,000
-								option(value="1000-2500") 1,000-2,500
-								option(value="2500-5000") 2,500-5,000
-								option(value="5000-10000") 5,000-10,000
-								option(value="10000-50000") 10,000-50,000
-								option(value="50000-200000") 50,000-200,000
-								option(value="200001") 200,000+
-							- var websiteRevenueError = (errors && errors.websiteRevenue) ? errors.websiteRevenue[0]: null;
-							div(class="error-message js-error-message js-websiteRevenue-error") #{websiteRevenue}									
+						div(class="col-md-12 pd-0 js-websiteRevenue-wrapper")
+							div(class="col-md-12 pd-0 js-websiteRevenue-dropdown-wrapper")
+								select(class="form-control input-lg" id="signup-websiteRevenue" name="websiteRevenue" required)
+									option(value="") Monthly Ad Revenue (in USD)
+									option(value="999") &lt; 1,000
+									option(value="1000-2500") 1,000-2,500
+									option(value="2500-5000") 2,500-5,000
+									option(value="5000-10000") 5,000-10,000
+									option(value="10000-50000") 10,000-50,000
+									option(value="50000-200000") 50,000-200,000
+									option(value="200001") 200,000+
+								- var websiteRevenueError = (errors && errors.websiteRevenue) ? errors.websiteRevenue[0]: null;
+								div(class="error-message js-error-message js-websiteRevenue-error") #{websiteRevenue}
+							div(class="col-md-6 pd-0 js-websiteRevenue-exact-wrapper hide")
+								div(class="input-group")
+									span(class="input-group-addon")
+										i(class="fa fa-dollar")
+									input(type="number", id="signup-exactRevenue", value=formData.exactRevenue, name="exactRevenue", class="form-control input-lg", placeholder="Exact revenue amount in USD ($)", required, autofocus=pass_autof ? true : false)
+								- var exactRevenueError = (errors && errors.exactRevenue) ? errors.exactRevenue[0] : null;
+								div(class="error-message js-error-message js-exactRevenue-error") #{exactRevenueError}
 
 					//- div(class="form-group", style="display:none;")
 					//- 	div(class="col-md-12 pd-0")

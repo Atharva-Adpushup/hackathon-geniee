@@ -1,4 +1,7 @@
 (function(W, $) {
+	var $dropDownFieldWrapper = $('.js-websiteRevenue-dropdown-wrapper'),
+		$exactRevenueFieldWrapper = $('.js-websiteRevenue-exact-wrapper');
+
 	function validateTermsCheckbox() {
 		var termsStr = 'Please agree to our Terms of Service & Privacy Policy',
 			$form = $('.js-signup-form'),
@@ -30,11 +33,41 @@
 		});
 	}
 
+	function toggleExactRevenueField($element) {
+		var value = $element.val(),
+			leastRevenueConstant = '999',
+			isValue = !!(value),
+			isMinimunRevenueMatch = !!(isValue && (leastRevenueConstant === value));
+
+		if (isMinimunRevenueMatch) {
+			$dropDownFieldWrapper
+				.removeClass('col-md-12 pd-0')
+				.addClass('col-md-6 u-padding-r15px');
+			$exactRevenueFieldWrapper
+				.removeClass('hide');
+		} else {
+			$dropDownFieldWrapper
+				.removeClass('col-md-6 u-padding-r15px')
+				.addClass('col-md-12 pd-0');
+			$exactRevenueFieldWrapper
+				.addClass('hide');
+		}
+	}
+
 	function setInteractionHandlers() {
-		$('#signup-website').off('change').on('change', function() {
+		var $dropdownField = $('#signup-websiteRevenue'),
+			$urlField = $('#signup-website');
+
+		$urlField.off('change').on('change', function() {
 			if (this.value.indexOf('http://') !== 0 && this.value.indexOf('https://') !== 0) {
 				this.value = 'http://' + this.value;
 			}
+		});
+
+		$dropdownField.off('change').on('change', function () {
+			var $el = $(this);
+
+			toggleExactRevenueField($el);
 		});
 	}
 
@@ -111,6 +144,10 @@
 				},
 				termsPolicy: {
 					'required': true
+				},
+				exactRevenue: {
+					'required': true,
+					'range': [0, 999]
 				}
 			},
 			messages: {
@@ -138,6 +175,10 @@
 				},
 				termsPolicy: {
 					'required': 'Please agree to our Terms of Service & Privacy Policy'
+				},
+				exactRevenue: {
+					'required': 'Please enter your exact revenue amount',
+					'range': 'Enter revenue amount between 0 and 999'
 				}
 			},
 			onkeyup: validateElement,
@@ -158,7 +199,7 @@
 		setUiData();
 		setInteractionHandlers();
 		validateTermsCheckbox();
-		addValidationMethods();
+		// addValidationMethods();
 		validateSignupForm();
 	});
 })(window, jQuery);
