@@ -6,7 +6,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 const BeforeAfterJsPanel = (props) => {
-	const { onSaveBeforeJs, onSaveAfterJs, variation } = props,
+	const { onSaveBeforeJs, onSaveAfterJs, variation, ui } = props,
 		wrapper = `(function($){ \n\n })(adpushup.$)`,
 		beforeJs = variation.customJs.beforeAp ? atob(variation.customJs.beforeAp) : wrapper,
 		afterJs = variation.customJs.afterAp ? atob(variation.customJs.afterAp) : wrapper;
@@ -16,11 +16,11 @@ const BeforeAfterJsPanel = (props) => {
             <Row>
                 <Col xs={6}>
 					<div>Enter Before JS</div>
-                    <CodeBox showButtons textEdit textEditBtn="Save Before JS" code={beforeJs} onSubmit={onSaveBeforeJs.bind(null, variation)} />
+                    <CodeBox showButtons textEdit parentExpanded={ui.variationPanelExpansion.expanded} textEditBtn="Save Before JS" code={beforeJs} onSubmit={onSaveBeforeJs.bind(null, variation)} />
                 </Col>
                 <Col xs={6}>
 					<div>Enter After JS</div>
-					<CodeBox showButtons textEdit textEditBtn="Save After JS" code={afterJs} onSubmit={onSaveAfterJs.bind(null, variation)} />
+					<CodeBox showButtons textEdit parentExpanded={ui.variationPanelExpansion.expanded} textEditBtn="Save After JS" code={afterJs} onSubmit={onSaveAfterJs.bind(null, variation)} />
                 </Col>
             </Row>
         </div>

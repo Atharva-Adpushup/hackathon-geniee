@@ -62,8 +62,10 @@ class customCodeEditor extends React.Component {
 		else {
 			// Check if code box is meant to be a regular text editor
 			if(this.props.textEdit) {
+				let className = "codeEditor-small ";
+				className += this.props.parentExpanded ?  " codeEditor-large" : " ";
 				return (
-					<div className="codeEditor-small">
+					<div className={className}>
 						<Codemirror value={this.state.code} onChange={this.updateCode} options={options} /><br/>
 						<Button disabled={this.state.code == ''} className="btn-lightBg btn-save" onClick={this.save}>{this.props.textEditBtn ? this.props.textEditBtn : 'Save'}</Button>
 					</div>
@@ -98,6 +100,7 @@ customCodeEditor.propTypes = {
 	textEdit: PropTypes.bool,
 	textEditBtn: PropTypes.string,
 	showButtons: PropTypes.bool,
+	parentExpanded: PropTypes.bool,
 	onSubmit: PropTypes.func,
 	onCancel: PropTypes.func
 };
