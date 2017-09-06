@@ -1,6 +1,7 @@
-(function(W, $) {
+(function (W, $) {
 	var $dropDownFieldWrapper = $('.js-websiteRevenue-dropdown-wrapper'),
-		$exactRevenueFieldWrapper = $('.js-websiteRevenue-exact-wrapper');
+		$exactRevenueFieldWrapper = $('.js-websiteRevenue-exact-wrapper'),
+		$exactRevenueField = $('#signup-exactRevenue', $exactRevenueFieldWrapper);
 
 	function validateTermsCheckbox() {
 		var termsStr = 'Please agree to our Terms of Service & Privacy Policy',
@@ -45,6 +46,8 @@
 				.addClass('col-md-6 u-padding-r15px');
 			$exactRevenueFieldWrapper
 				.removeClass('hide');
+			$exactRevenueField
+				.val('');
 		} else {
 			$dropDownFieldWrapper
 				.removeClass('col-md-6 u-padding-r15px')
