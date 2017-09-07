@@ -29,7 +29,7 @@ module.exports = {
 	},
 	checkAdpTagsUnsyncedZones: function (section, ad) {
 		if (ad.networkData && Object.keys(ad.networkData).length) {
-			if (!ad.networkData.dfpId) {
+			if (!ad.networkData.dfpAdunit) {
 				return {
 					adId: ad.id,
 					sizeWidth: parseInt(ad.width, 10),
@@ -55,7 +55,7 @@ module.exports = {
 						var unsyncedZone = self.checkGenieeUnsyncedZones(section, ad);
 						unsyncedZone ? unsyncedZones.genieeUnsyncedZones.push(unsyncedZone) : null;
 						break;
-					case 'ADP Tags':
+					case 'adpTags':
 						var unsyncedZone = self.checkAdpTagsUnsyncedZones(section, ad);
 						if (unsyncedZone) {
 							unsyncedZone.variationId = variationId;

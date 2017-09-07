@@ -29,19 +29,19 @@ class NetworkOptions extends Component {
 	}
 
 	render() {
-		const dropDownItems = ['Adsense', 'ADX', 'ADP Tags', 'DFP', 'Critieo', 'Custom'];
+		const dropDownItems = ['adsense', 'adx', 'adpTags', 'dfp', 'critieo', 'custom'];
 		let code = this.props.ad && this.props.ad.adCode ? this.props.ad.adCode : "";
 		return (
 			<div className="networkOptionsRow">
 				<SelectBox value={this.state.network} label="Select Network" onChange={this.onChange}>
 					{
 						dropDownItems.map((item, index) => (
-							<option key={index} value={item}>{item}</option>
+							<option key={index} value={item}>{item.charAt(0).toUpperCase() + item.slice(1).replace(/([A-Z])/g, " $1")}</option>
 						))
 					}
 				</SelectBox>
 				{
-					this.state.network == 'ADP Tags'
+					this.state.network == 'adpTags'
 					? 
 						<AdpTags
 							priceFloorFromProps={this.props.ad && this.props.ad.networkData && this.props.ad.networkData.priceFloor ? this.props.ad.networkData.priceFloor : 0}

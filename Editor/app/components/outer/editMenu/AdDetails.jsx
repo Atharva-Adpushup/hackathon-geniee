@@ -21,7 +21,7 @@ class AdDetails extends Component {
 						userType != 'partner'
 						? 
 							(
-								<p>Network : <strong>{ad.network}</strong>
+								<p>Network : <strong>{ad.network.charAt(0).toUpperCase() + ad.network.slice(1).replace(/([A-Z])/g, " $1")}</strong>
 									<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-network">Edit Network</Tooltip>}>
 										<span className="adDetails-icon" onClick={editNetwork}><i className="btn-icn-edit" /></span>
 									</OverlayTrigger>
@@ -30,7 +30,7 @@ class AdDetails extends Component {
 						: null
 					}
 					{
-						ad.network == 'ADP Tags'
+						ad.network == 'adpTags'
 						?
 							(
 								<div>
