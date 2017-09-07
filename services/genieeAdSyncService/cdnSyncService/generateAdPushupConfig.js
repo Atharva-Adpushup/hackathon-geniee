@@ -68,7 +68,12 @@ const _ = require('lodash'),
 					headerBidding: ad.networkData.headerBidding,
 					floor: ad.networkData.floor
 				};
-				ADPTags.push({ height: json.height, width: json.width, dfpAdunit: ad.networkData.dfpAdunit });
+				ADPTags.push({
+					key: `${json.width}x${json.height}`,
+					height: json.height,
+					width: json.width,
+					dfpAdunit: ad.networkData.dfpAdunit
+				});
 			} else {
 				json.adCode = ad.adCode;
 			}
