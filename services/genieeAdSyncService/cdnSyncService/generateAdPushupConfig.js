@@ -7,7 +7,7 @@ const _ = require('lodash'),
 	isAdSynced = ad => {
 		if (
 			(ad.network == 'geniee' && ad.networkData && ad.networkData.zoneId) ||
-			(ad.network == 'ADP tags' && ad.networkData && ad.networkData.dfpAdunit) ||
+			(ad.network == 'adpTags' && ad.networkData && ad.networkData.dfpAdunit) ||
 			(ad.network && ad.adCode && typeof ad.adCode == 'string' && ad.adCode.length)
 		) {
 			return true;
@@ -62,7 +62,7 @@ const _ = require('lodash'),
 				json.networkData = {
 					zoneId: ad.networkData.zoneId
 				};
-			} else if (ad.network == 'ADP tags') {
+			} else if (ad.network == 'adpTags') {
 				json.networkData = {
 					dfpAdunit: ad.networkData.dfpAdunit,
 					headerBidding: ad.networkData.headerBidding,
