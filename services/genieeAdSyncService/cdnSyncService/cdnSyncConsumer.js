@@ -9,6 +9,8 @@ var path = require('path'),
 	fs = Promise.promisifyAll(require('fs')),
 	AdPushupError = require('../../../helpers/AdPushupError'),
 	CC = require('../../../configs/commonConsts'),
+	generateADPTagsConfig = require('./generateADPTagsConfig'),
+	generateAdPushupConfig = require('./generateAdPushupConfig'),
 	config = require('../../../configs/config');
 
 module.exports = function(site) {
@@ -19,6 +21,7 @@ module.exports = function(site) {
 		},
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.js'),
+		adpTagsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adptags.js'),
 		uncompressedJsTplPath = path.join(
 			__dirname,
 			'..',
@@ -42,38 +45,62 @@ module.exports = function(site) {
 			'geniee',
 			site.get('siteId').toString()
 		),
-		setAllConfigs = function(allVariations) {
+		setAllConfigs = function(combinedConfig) {
 			var apConfigs = site.get('apConfigs'),
 				isAdPartner = !!site.get('partner');
+			let { experiment, adpTagsConfig } = combinedConfig;
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
 			// Default 'draft' mode is selected if config mode is not present
 			apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
-			apConfigs.experiment = allVariations;
+			apConfigs.experiment = experiment;
 			delete apConfigs.pageGroupPattern;
-			return apConfigs;
+			return { apConfigs, adpTagsConfig };
 		},
 		getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
+		getAdpTagsJsFile = fs.readFileAsync(adpTagsTplPath, 'utf8'),
 		getUncompressedJsFile = fs.readFileAsync(uncompressedJsTplPath, 'utf8'),
-		getComputedConfig = Promise.resolve(true).then(function() {
-			return universalReportService.getReportData(site).then(function(reportData) {
-				if (reportData.status && reportData.data) {
-					return getVariationsPayload(site, reportData.data).then(setAllConfigs);
-				}
-				return getVariationsPayload(site).then(setAllConfigs);
-			});
-		}),
-		getFinalConfig = Promise.join(getComputedConfig, getJsFile, getUncompressedJsFile, function(
+		generateCombinedJson = (experiment, adpTags) => {
+			if (!(Array.isArray(adpTags) && adpTags.length)) {
+				return { experiment, adpTagsConfig: false };
+			}
+			return generateADPTagsConfig(adpTags, site.get('siteId')).then(adpTagsConfig => ({
+				adpTagsConfig,
+				experiment
+			}));
+		},
+		getComputedConfig = () => {
+			return universalReportService
+				.getReportData(site)
+				.then(reportData => {
+					if (reportData.status && reportData.data) {
+						return generateAdPushupConfig(site, reportData.data);
+					}
+					return generateAdPushupConfig(site);
+				})
+				.spread(generateCombinedJson)
+				.then(setAllConfigs);
+		},
+		getFinalConfig = Promise.join(getComputedConfig, getJsFile, getUncompressedJsFile, getAdpTagsJsFile, function(
 			finalConfig,
 			jsFile,
-			uncompressedJsFile
+			uncompressedJsFile,
+			adpTagsFile
 		) {
-			jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(finalConfig));
+			let { apConfigs, adpTagsConfig } = finalConfig;
+			jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(apConfigs));
 			jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
 
-			uncompressedJsFile = _.replace(uncompressedJsFile, '___abpConfig___', JSON.stringify(finalConfig));
+			uncompressedJsFile = _.replace(uncompressedJsFile, '___abpConfig___', JSON.stringify(apConfigs));
 			uncompressedJsFile = _.replace(uncompressedJsFile, /_xxxxx_/g, site.get('siteId'));
+
+			if (adpTagsConfig) {
+				adpTagsFile = _.replace(adpTagsFile, '__INVENTORY__', JSON.stringify(adpTagsConfig));
+				adpTagsFile = _.replace(adpTagsFile, '__SITE_ID__', site.get('siteId'));
+				jsFile = `${jsFile};${adpTagsFile}`;
+				uncompressedJsFile = `${uncompressedJsFile};${adpTagsFile}`;
+			}
 
 			return { default: jsFile, uncompressed: uncompressedJsFile };
 		}),
