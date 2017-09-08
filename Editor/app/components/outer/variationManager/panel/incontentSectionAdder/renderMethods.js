@@ -55,7 +55,7 @@ renderCodeBox = field => {
 renderSwitch = field => {
 	console.log(field);
 	return (
-		<CustomToggleSwitch labelText={field.label} className="mT-10 mB-10" labelSize={5} componentSize={7} customComponentClass="u-padding-r10px" checked={field.value} name="headerBiddingSwitch" layout="horizontal" size="m" id="js-header-bidding-switch" on="Yes" off="No" {...field.input} />
+		<CustomToggleSwitch labelText={field.label} className="mT-10 mB-10" labelSize={5} componentSize={7} customComponentClass="u-padding-r10px" checked={true} name="headerBiddingSwitch" layout="horizontal" size="m" id="js-header-bidding-switch" on="Yes" off="No" {...field.input} />
 	)
 },
 renderNetworkOptions = (that, CodeBoxField) => {
@@ -87,7 +87,7 @@ renderNetworkOptions = (that, CodeBoxField) => {
 											<Field placeholder="Please enter price floor" name="priceFloor" component={renderField} type="text" label="Price Floor" />
 										</div>
 										<div>
-											<Field label="Header Bidding" name="headerBiddingSwitch" value={that.state.headerBidding} component={renderSwitch} onChange={that.switchChangeHandler.bind(that)} />
+											<Field label="Header Bidding" name="headerBiddingSwitch" component={renderSwitch} onChange={that.switchChangeHandler.bind(that)} />
 											{/* <CustomToggleSwitch labelText="Header Bidding" className="mT-10 mB-10" labelSize={5} componentSize={7} customComponentClass="u-padding-r10px" checked={true} name="headerBiddingSwitch" onChange={that.switchChangeHandler} layout="horizontal" size="m" id="js-header-bidding-switch" on="Yes" off="No" /> */}
 										</div>
 									</div>
