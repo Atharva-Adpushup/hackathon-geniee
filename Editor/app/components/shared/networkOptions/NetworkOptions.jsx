@@ -46,7 +46,7 @@ class NetworkOptions extends Component {
 						<AdpTags
 							priceFloorFromProps={this.props.ad && this.props.ad.networkData && this.props.ad.networkData.priceFloor ? this.props.ad.networkData.priceFloor : 0}
 							headerBiddingFlag={this.props.ad && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('headerBidding') ? this.props.ad.networkData.headerBidding : 1}
-							showButtons={true} 
+							showButtons={this.props.showButtons || true}
 							submitHandler={this.submitHandler} 
 							onCancel={this.props.onCancel}
 						/>
@@ -54,7 +54,7 @@ class NetworkOptions extends Component {
 						? 
 							(
 								<div className="mT-10">
-									<CodeBox showButtons={true} onSubmit={this.submitHandler} onCancel={this.props.onCancel} code={code} customClass="customButtonsRow" />
+									<CodeBox showButtons={this.props.showButtons || true} onSubmit={this.submitHandler} onCancel={this.props.onCancel} code={code} customClass="customButtonsRow" />
 								</div>
 							)
 						: null

@@ -49,8 +49,8 @@ class customCodeEditor extends React.Component {
 				<div>
 					<Col xs={12} className="u-padding-r10px">
 						<Row>
-							<Col xs={3} className="u-padding-r10px"><strong>{label}</strong></Col>
-							<Col xs={6} className="u-padding-r10px">
+							<Col xs={5} className="u-padding-r10px"><strong>{label}</strong></Col>
+							<Col xs={7} className="u-padding-r10px">
 								<Codemirror value={this.state.code} onChange={this.updateCode} options={options} {...input} />
 								{meta.touched && meta.error && <div className="error-message">{meta.error}</div>}
 							</Col>

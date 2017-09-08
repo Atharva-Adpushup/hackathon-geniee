@@ -51,7 +51,7 @@ const form = reduxForm({
 class inContentForm extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { addCustomAdCode: false };
+		this.state = { addCustomAdCode: false, network: false, headerBidding: true, selectedElement: false };
 	}
 
 	showCustomAdCodeBox() {
@@ -60,6 +60,19 @@ class inContentForm extends React.Component {
 
 	hideCustomAdCodeBox() {
 		this.setState({ addCustomAdCode: false });
+	}
+
+	setNetwork(event) {
+		this.setState({ network: event.target.value });
+	}
+
+	switchChangeHandler(value) {
+		this.setState({ headerBidding: !!value });
+	}
+
+	setFocusElement(event) {
+		let value = event.type == 'focus' ? event.target.name : false;
+		this.setState({ selectedElement: value });
 	}
 
 	render() {
@@ -100,6 +113,8 @@ const mapStateToProps = (state, ownProps) => ({
 
 	mapDispatchToProps = (dispatch, ownProps) => ({
 		onSubmit: (values) => {
+			console.log(values);
+			console.log(this.state);
 			const notNear = getNotNearData(values.notNear),
 				isCustomZoneId = !!(values.customZoneId),
 				sectionPayload = {
@@ -116,7 +131,7 @@ const mapStateToProps = (state, ownProps) => ({
 				},
 				adPayload = {
 					adCode: btoa(values.adCode),
-					adSize: values.adSize
+					adSize: values.adSize,
 				};
 
 			if (isCustomZoneId) {
@@ -125,7 +140,7 @@ const mapStateToProps = (state, ownProps) => ({
 				};
 			}
 
-			dispatch(createIncontentSection(sectionPayload, adPayload, ownProps.variation.id));
+			// dispatch(createIncontentSection(sectionPayload, adPayload, ownProps.variation.id));
 		}
 	});
 

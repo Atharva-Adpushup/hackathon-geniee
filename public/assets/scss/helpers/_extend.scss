@@ -80,7 +80,7 @@ collapsedextended
 	padding-left: 0;
 }
 .pd-0 {
-	padding: 0;
+	padding: 0 !important;
 }
 .pd-2 {
 	padding: 0 2px;
@@ -201,6 +201,9 @@ collapsedextended
 .u-margin-t10px {
 	margin-top: $FMLayoutDimension !important;
 }
+.u-margin-b10px {
+	margin-top: $FMLayoutDimension !important;
+}
 .u-margin-t15px {
 	margin-top: $FMLayoutDimension + $FMLayoutDimension/2  !important;	
 }
@@ -228,7 +231,6 @@ collapsedextended
 .u-margin-r15px {
 	margin-right: $FMLayoutDimension + $FMLayoutDimension/2 !important;
 }
-
 
 /*******Dimension classes******/
 .u-full-width {

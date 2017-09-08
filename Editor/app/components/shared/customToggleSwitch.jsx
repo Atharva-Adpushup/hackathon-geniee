@@ -59,15 +59,16 @@ class customToggleSwitch extends React.Component {
 	 * @returns {XML}
 	 */
 	renderHorizontalLayout(options) {
-		const labelClassNames = (options.defaultLayout) ? '' : 'u-padding-r10px',
+		let labelClassNames = (options.defaultLayout) ? '' : 'u-padding-r10px',
 			componentClassNames = (options.defaultLayout) ? '' : 'u-padding-l10px';
 
+		componentClassNames += ` ${options.customComponentClass}`;
 		return (
 			<div className={options.errorClassName}>
-				<Col className={labelClassNames} xs={8}>
+				<Col className={labelClassNames} xs={options.labelSize}>
 					<b>{this.props.labelText}</b>
 				</Col>
-				<Col className={componentClassNames} xs={4}>
+				<Col className={componentClassNames} xs={options.componentSize}>
 					{this.renderToggleSwitch()}
 				</Col>
 			</div>
@@ -103,7 +104,10 @@ class customToggleSwitch extends React.Component {
 			layout: (this.props.layout.toLowerCase()) ? this.props.layout.toLowerCase() : 'horizontal',
 			layoutClassName: 'form-group',
 			defaultLayout: this.props.defaultLayout,
-			classNamesProps: (this.props.className && this.props.className.length > 0) ? this.props.className : ''
+			classNamesProps: (this.props.className && this.props.className.length > 0) ? this.props.className : '',
+			labelSize: this.props.labelSize,
+			componentSize: this.props.componentSize,
+			customComponentClass: this.props.customComponentClass
 		};
 
 		if (options.layout === 'vertical') {
@@ -126,7 +130,10 @@ class customToggleSwitch extends React.Component {
 customToggleSwitch.defaultProps = {
 	on: 'Enable',
 	off: 'Disable',
-	defaultLayout: false
+	defaultLayout: false,
+	labelSize: 8,
+	componentSize: 4,
+	customComponentClass: ''
 };
 
 export default customToggleSwitch;
