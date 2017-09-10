@@ -96,7 +96,6 @@ class inContentForm extends React.Component {
 	}
 }
 
-
 inContentForm.propTypes = {
 	handleSubmit: PropTypes.func.isRequired
 };
@@ -113,8 +112,10 @@ const mapStateToProps = (state, ownProps) => ({
 
 	mapDispatchToProps = (dispatch, ownProps) => ({
 		onSubmit: (values) => {
-			console.log(values);
-			console.log(this.state);
+			if (currentUser.userType != 'partner' && !values.network) {
+				alert("Please select a network");
+				return false;
+			}
 			const notNear = getNotNearData(values.notNear),
 				isCustomZoneId = !!(values.customZoneId),
 				sectionPayload = {
@@ -132,6 +133,7 @@ const mapStateToProps = (state, ownProps) => ({
 				adPayload = {
 					adCode: btoa(values.adCode),
 					adSize: values.adSize,
+					network: values.network
 				};
 
 			if (isCustomZoneId) {
@@ -139,8 +141,13 @@ const mapStateToProps = (state, ownProps) => ({
 					zoneId: values.customZoneId
 				};
 			}
-
-			// dispatch(createIncontentSection(sectionPayload, adPayload, ownProps.variation.id));
+			if (values.network && values.network == 'adpTags') {
+				adPayload.networkData = {
+					priceFloor: parseInt(values.priceFloor) || 0,
+					headerBidding: values.hasOwnProperty('headerBidding') ? !!(values.headerBidding) : true
+				}
+			}
+			dispatch(createIncontentSection(sectionPayload, adPayload, ownProps.variation.id));
 		}
 	});
 

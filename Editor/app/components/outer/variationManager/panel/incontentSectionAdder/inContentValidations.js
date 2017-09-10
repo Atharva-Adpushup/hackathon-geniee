@@ -15,6 +15,10 @@ function validate(formProps) {
 		errors.adCode = 'Please enter Ad Code';
 	}
 
+	if (formProps.network == 'adpTags' && (isNaN(formProps.priceFloor) || !formProps.priceFloor)) {
+		errors.priceFloor = 'Invalid Price Floor';
+	}
+
 	if (formProps.notNear && Object.keys(formProps.notNear).length) {
 		const itemsArrayErrors = [];
 

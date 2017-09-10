@@ -31,11 +31,18 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			css = (float !== 'none' ? (float === 'left' ? leftSectionCss : rightSectionCss) : defaultSectionCss),
 			adData = {},
 			adWidth = parseInt(adPayload.adSize.substr(0, adPayload.adSize.indexOf('x')).trim(), 10),
-			adHeight = parseInt(adPayload.adSize.substr(adPayload.adSize.indexOf('x') + 1).trim(), 10);
+			adHeight = parseInt(adPayload.adSize.substr(adPayload.adSize.indexOf('x') + 1).trim(), 10),
+			network = currentUser.userType === 'partner'
+			? 'geniee'
+			: (
+				adPayload.network
+				? adPayload.network
+				: 'custom'
+			);
 
 		dispatch({
 			type: sectionActions.CREATE_INCONTENT_SECTION,
-			adPayload: Object.assign(adData, { width: adWidth, height: adHeight, adCode: atob(adPayload.adCode) === 'undefined' ? undefined : adPayload.adCode, id: adId, css, createTs: Math.floor(Date.now() / 1000), network: currentUser.userType === 'partner' ? 'geniee' : 'custom', secondaryCss: float !== 'none' ? defaultSectionCss : undefined, networkData: adPayload.networkData }),
+			adPayload: Object.assign(adData, { width: adWidth, height: adHeight, adCode: atob(adPayload.adCode) === 'undefined' ? undefined : adPayload.adCode, id: adId, css, createTs: Math.floor(Date.now() / 1000), network: network, secondaryCss: float !== 'none' ? defaultSectionCss : undefined, networkData: adPayload.networkData }),
 			sectionPayload: Object.assign(sectionPayload, { id: sectionId, name: `Section-${sectionId}`, ads: [adId], createTs: Math.floor(Date.now() / 1000), allXpaths: [] }),
 			sectionId,
 			adId,
