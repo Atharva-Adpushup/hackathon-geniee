@@ -1,22 +1,23 @@
 const path = require('path'),
+	buildPath = '../../public/assets/js/builds/',
 	webpack = require('webpack');
 
 module.exports = [
 	{
 		entry: {
-			adpushupHB: path.join(__dirname, 'hbScript', 'index.js')
+			adptags: path.join(__dirname, 'hbScript', 'index.js')
 		},
 		output: {
-			path: path.join(__dirname, 'hbScript', 'build'),
+			path: path.join(__dirname, buildPath),
 			filename: '[name].js'
 		}
 	},
 	{
 		entry: {
-			adpushupHB: path.join(__dirname, 'hbScript', 'index.js')
+			adptags: path.join(__dirname, 'hbScript', 'index.js')
 		},
 		output: {
-			path: path.join(__dirname, 'hbScript', 'build'),
+			path: path.join(__dirname, buildPath),
 			filename: '[name].min.js'
 		},
 		plugins: [
@@ -31,7 +32,7 @@ module.exports = [
 	}
 	// {
 	// 	entry: {
-	// 		adpushupHB: path.join(__dirname, 'hbScriptNormal', 'src', 'index.js'),
+	// 		adptags: path.join(__dirname, 'hbScriptNormal', 'src', 'index.js'),
 	// 	},
 	// 	output: {
 	// 		path: path.join(__dirname, 'hbScriptNormal', 'build'),
