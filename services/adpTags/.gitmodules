@@ -1,0 +1,4 @@
+[submodule "Prebid.js"]
+	path = Prebid.js
+	url = https://github.com/adpushup/Prebid.js
+	
