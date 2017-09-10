@@ -82,7 +82,7 @@ module.exports = function(site) {
 				.spread(generateCombinedJson)
 				.then(setAllConfigs);
 		},
-		getFinalConfig = Promise.join(getComputedConfig, getJsFile, getUncompressedJsFile, getAdpTagsJsFile, function(
+		getFinalConfig = Promise.join(getComputedConfig(), getJsFile, getUncompressedJsFile, getAdpTagsJsFile, function(
 			finalConfig,
 			jsFile,
 			uncompressedJsFile,

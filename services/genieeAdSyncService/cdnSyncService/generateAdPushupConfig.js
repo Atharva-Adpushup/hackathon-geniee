@@ -147,14 +147,15 @@ const _ = require('lodash'),
 		});
 		return finalJson;
 	},
-	generatePayload = site => {
+	generatePayload = (site, pageGroupData) => {
 		//Empty finaJson and dfpAunits
 		finalJson = {};
 		ADPTags = [];
+		let pageGroupPattern = site.get('apConfigs').pageGroupPattern;
 
-		site
+		return site
 			.getAllChannels()
-			.then(channels => promiseForeach(channels, channel => getChannelPayload(channel), err => false))
+			.then(channels => promiseForeach(channels, channel => getChannelPayload(channel, pageGroupData, pageGroupPattern), err => false))
 			.then(() => [finalJson, ADPTags]);
 	};
 

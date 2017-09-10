@@ -1,16 +1,16 @@
-const { couchBase } = require('../../../configs/config'),
+const couchBase = require('../../../configs/config').couchBase,
 	{ couchbaseService } = require('node-utils'),
 	Promise = require('bluebird'),
 	_ = require('lodash'),
 	CB_ERRORS = require('couchbase').errors,
 	dbHelper = couchbaseService(
-		couchBase.AppBucket.HOST,
-		couchBase.AppBucket.DEFAULT_BUCKET,
-		couchBase.AppBucket.DEFAULT_BUCKET_PASSWORD
+		'couchbase://127.0.0.1/apAppBucket',
+		couchBase.DEFAULT_BUCKET,
+		couchBase.DEFAULT_BUCKET_PASSWORD
 	),
 	generateDfpConfig = adpTags => {
 		let json = {},
-			dfpTagsBySize = _.groupBy(dfpTags, 'key');
+			dfpTagsBySize = _.groupBy(adpTags, 'key');
 		_.each(dfpTagsBySize, (val, key) => {
 			json[key] = _.map(val, 'dfpAdunit');
 		});
