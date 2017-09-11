@@ -342,6 +342,12 @@ function apiModule() {
 											[consts.analytics.pipedriveCustomFields.dailyPageviews]: user.get('pageviewRange'),
 											[consts.analytics.pipedriveCustomFields.adNetworks]: user.get('adNetworks').join(' | '),
 											[consts.analytics.pipedriveCustomFields.websiteRevenue]: user.get('websiteRevenue'),
+											[consts.analytics.pipedriveCustomFields.utmSource]: json.utmSource,
+											[consts.analytics.pipedriveCustomFields.utmMedium]: json.utmMedium,
+											[consts.analytics.pipedriveCustomFields.utmCampaign]: json.utmCampaign,
+											[consts.analytics.pipedriveCustomFields.utmTerm]: json.utmTerm,
+											[consts.analytics.pipedriveCustomFields.utmName]: json.utmName,
+											[consts.analytics.pipedriveCustomFields.utmContent]: json.utmContent,
 											currency: 'USD'
 										}
 									};

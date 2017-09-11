@@ -87,7 +87,13 @@ module.exports = {
 			websiteName: '5298ce43bbf31a9afa7edb2e6784b9368b55c8f3',
 			dailyPageviews: '438f3045809011521f38cfe118e74943b7891627',
 			websiteRevenue: '293fd8aadfb6982d31fd0b4f8f58f200f49dcb2f',
-			adNetworks: '8253d39661cfb11976f8cda3342d0c3d2bd6895d'
+			adNetworks: '8253d39661cfb11976f8cda3342d0c3d2bd6895d',
+			utmSource: '7decb93a103f97be47db094a7a53381f903280b2',
+			utmMedium: '4432c8a46c4b9929937423b11acd336c47f8885a',
+			utmCampaign: '1d87caef2ffc5dddf26b6548b9ddb1b1d7c97720',
+			utmTerm: 'bd94cdbdfd726b04250ad6963f83c59d6284c020',
+			utmName: 'ec498a8fc48461b2f3c9db550046a9875f36efc5',
+			utmContent: '78fd0246cbe306230b5a27350f1ae60014531143'
 		}
 	},
 	password: {
