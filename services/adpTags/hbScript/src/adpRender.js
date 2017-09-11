@@ -6,8 +6,7 @@ var logger = require('../helpers/logger'),
 	feedback = require('./feedback'),
 	hbStatus = require('./hbStatus'),
 	getFloorWithGranularity = function(floor) {
-		var val = floor;
-		//var val = parseFloat((Math.abs(floor)).toFixed(1));
+		var val = parseFloat(Math.abs(floor).toFixed(1));
 		if (val > 20) {
 			return 20;
 		} else if (val == 0) {
@@ -15,46 +14,6 @@ var logger = require('../helpers/logger'),
 		}
 		console.log('Sent floor : ' + val);
 		return val;
-	},
-	setGPTTargetingForPBSlot = function(containerId) {
-		var gSlot = window.adpTags.adpSlots[containerId].gSlot,
-			targeting = pbjs.getAdserverTargeting()[containerId],
-			floor = parseFloat(config.ADX_FLOOR.cpm);
-
-		// targeting = {
-		//     hb_adid: 'abc',
-		//     hb_bidder: 'test',
-		//     hb_pb: '3.00',
-		//     hb_size: '300x250'
-		// }
-
-		if (!targeting) {
-			var floor = getFloorWithGranularity(floor);
-			floor > 0 ? gSlot.setTargeting(config.ADX_FLOOR.key, floor) : null;
-			return false;
-		}
-
-		var keys = Object.keys(targeting),
-			hb_pb = parseFloat(targeting['hb_pb']);
-
-		keys.forEach(function(key) {
-			gSlot.setTargeting(key, targeting[key]);
-		});
-
-		if (floor && floor < hb_pb) {
-			floor = hb_pb.toFixed(1);
-		}
-
-		console.log('Setting floor to : ' + floor);
-
-		gSlot.setTargeting(config.ADX_FLOOR.key, getFloorWithGranularity(floor));
-	},
-	setGPTKeys = function(containerId, gptKeyGroup) {
-		var gSlot = window.adpTags.adpSlots[containerId].gSlot;
-
-		for (var gptKey in gptKeyGroup) {
-			gSlot.setTargeting(gptKey, String(gptKeyGroup[gptKey]));
-		}
 	},
 	renderGPT = function(slot) {
 		if (!slot.containerPresent || !slot.biddingComplete || slot.hasRendered) {
@@ -91,22 +50,28 @@ var logger = require('../helpers/logger'),
 	},
 	setGPTargeting = function(slot) {
 		var targeting = {
-			hb_placement: slot.placement,
-			hb_siteId: config.SITE_ID,
-			hb_ran: 0
-		};
+				hb_siteId: config.SITE_ID,
+				hb_ran: 0
+			},
+			adServerTargeting = pbjs.getAdserverTargeting()[slot.containerId];
 
 		if (utils.isSupportedBrowser() && slot.bidders.length) {
-			setGPTTargetingForPBSlot(slot.containerId);
-			setGPTKeys(
-				slot.containerId,
-				Object.assign(targeting, {
-					hb_ran: 1
-				})
-			);
-		} else {
-			setGPTKeys(slot.containerId, targeting);
+			Object.assign(targeting, { hb_ran: 1 });
 		}
+
+		if (adServerTargeting) {
+			Object.assign(targeting, adServerTargeting);
+		}
+
+		if (slot.optionalParam.priceFloor) {
+			var obj = {};
+			obj[config.ADX_FLOOR.key] = getFloorWithGranularity(slot.optionalParam.priceFloor);
+			Object.assign(targeting, obj);
+		}
+
+		Object.keys(targeting).forEach(function(key) {
+			slot.gSlot.setTargeting(key, String(targeting[key]));
+		});
 	},
 	enableGoogServicesForSlot = function(slot) {
 		slot.gSlot = googletag.defineSlot('/' + config.NETWORK_ID + '/' + slot.slotId, slot.size, slot.containerId);
