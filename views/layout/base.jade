@@ -97,7 +97,7 @@ html(lang="en")
                             };
                         if (Object.keys(window.currentUser).length > 0 && (sites.length > 0)) {
                             sites.map(function (obj, idx) {
-                                siteInfo += obj.siteId + " " + obj.domain + " | ";
+                                siteInfo += obj.siteId + " " + utils.domanize(obj.domain) + " | ";
                             });
                         }
                 script(type="text/javascript" src="/assets/js/libs/custom/adpushup-analytics.js")
