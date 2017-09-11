@@ -10,6 +10,7 @@ var modelAPI = module.exports = apiModule(),
 	schema = require('../helpers/schema'),
 	_ = require('lodash'),
 	md5 = require('md5'),
+	extend = require('extend'),
 	normalizeurl = require('normalizeurl'),
 	FormValidator = require('../helpers/FormValidator'),
 	AdPushupError = require('../helpers/AdPushupError'),
@@ -279,6 +280,24 @@ function apiModule() {
 			})
 			.then(() => {
 				return pipedriveAPI('createDeal', pipedriveParams.dealInfo);
+			})
+			.then(response => {
+				const isResponseSuccess = !!(response && response.success && response.data),
+					userRevenue = user.get('websiteRevenue'),
+					isRevenueValid = !!(userRevenue),
+					isRevenueLow = !!(isRevenueValid && Number(userRevenue) <= 999),
+					isDealUnqualified = !!(isResponseSuccess && isRevenueLow);
+
+				if (!isResponseSuccess) { return Promise.reject('Error while checking unqualified deal in Pipedrive'); }
+				if (!isDealUnqualified) { return response; }
+
+				const paramConfig = extend(true, {}, pipedriveParams.dealInfo);
+
+				paramConfig.id = response.data.id;
+				paramConfig.deal_id = paramConfig.id;
+				paramConfig.status = 'lost';
+				paramConfig.lost_reason = 'Low Revenue (less than $1000 USD)';
+				return pipedriveAPI('updateDeal', paramConfig);
 			})
 			.then(response => {
 				if (response && response.success) {
