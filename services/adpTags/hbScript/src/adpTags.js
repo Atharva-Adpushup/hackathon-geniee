@@ -1,165 +1,169 @@
 // Adp tags library
 
 var prebidSandbox = require('./prebidSandbox'),
-    utils = require('../helpers/utils'),
-    logger = require('../helpers/logger'),
-    config = require('./config'),
-    inventory = config.INVENTORY,
-    find = require('lodash.find'),
-    adpRender = require('./adpRender'),
+	utils = require('../helpers/utils'),
+	logger = require('../helpers/logger'),
+	config = require('./config'),
+	inventory = config.INVENTORY,
+	find = require('lodash.find'),
+	adpRender = require('./adpRender'),
+	// Maps a particular adp slot to a dfp ad unit and a prebid bidder config
+	inventoryMapper = function(size, dfpAdunitToUse) {
+		var width = size[0],
+			height = size[1],
+			size = width + 'x' + height,
+			dfpAdUnit = null,
+			availableSlots = inventory.dfpAdUnits[size];
 
-    // Maps a particular adp slot to a dfp ad unit and a prebid bidder config
-    inventoryMapper = function (size) {
-        var width = size[0],
-            height = size[1],
-            size = width + 'x' + height;
+		if (availableSlots) {
+			if (dfpAdunitToUse && availableSlots.indexOf(dfpAdunitToUse) !== -1) {
+				dfpAdUnit = availableSlots.splice(availableSlots.indexOf(dfpAdunitToUse), 1);
+			} else {
+				dfpAdUnit = inventory.dfpAdUnits[size].pop();
+			}
+		}
+		return {
+			dfpAdUnit: dfpAdUnit,
+			bidders: inventory.bidderAdUnits[size] ? inventory.bidderAdUnits[size].pop() : null
+		};
+	},
+	// Adds batch Id to all the adp slots in a batch
+	addBatchIdToAdpSlots = function(adpSlots, batchId) {
+		Object.keys(adpSlots).forEach(function(slot) {
+			adpSlots[slot].batchId = batchId;
+		});
+	},
+	// Initiate prebidding for an adpSlots batch
+	prebidBatching = function(adpSlotsBatch) {
+		prebidSandbox.createPrebidContainer(adpSlotsBatch);
+	},
+	createSlot = function(containerId, size, placement, optionalParam) {
+		var adUnits = inventoryMapper(size, optionalParam.dfpAdUnit),
+			slotId = adUnits.dfpAdUnit,
+			bidders = adUnits.bidders,
+			adsenseAdCode = optionalParam && optionalParam.adsenseAdCode ? optionalParam.adsenseAdCode : null;
 
-        return {
-            dfpAdUnit: inventory.dfpAdUnits[size] ? inventory.dfpAdUnits[size].pop() : null,
-            bidders: inventory.bidderAdUnits[size] ? inventory.bidderAdUnits[size].pop() : null
-        };
-    },
+		adpTags.adpSlots[containerId] = {
+			slotId: slotId,
+			bidders: bidders || [],
+			placement: placement,
+			size: size,
+			containerId: containerId,
+			timeout: config.PREBID_TIMEOUT,
+			adsenseAdCode: adsenseAdCode, // Recieved in base64 format from the user
+			gSlot: null,
+			hasRendered: false,
+			biddingComplete: false,
+			containerPresent: false,
+			feedbackSent: false,
+			hasTimedOut: false,
+			feedback: {
+				winner: config.DEFAULT_WINNER
+			}
+		};
+		return adpTags.adpSlots[containerId];
+	},
+	processBatchForBidding = function() {
+		var batchId = adpTags.currentBatchId,
+			adpSlots = adpTags.currentBatchAdpSlots;
 
-    // Adds batch Id to all the adp slots in a batch
-    addBatchIdToAdpSlots = function (adpSlots, batchId) {
-        Object.keys(adpSlots).forEach(function (slot) {
-            adpSlots[slot].batchId = batchId;
-        });
-    },
+		adpTags.adpBatches.push({
+			batchId: batchId,
+			adpSlots: adpSlots
+		});
 
-    // Initiate prebidding for an adpSlots batch
-    prebidBatching = function (adpSlotsBatch) {
-        prebidSandbox.createPrebidContainer(adpSlotsBatch);
-    },
+		// Add batch id to all batched adpSlots
+		addBatchIdToAdpSlots(adpSlots, batchId);
 
-    createSlot = function (containerId, size, placement, optionalParam) {
-        var adUnits = inventoryMapper(size),
-            slotId = adUnits.dfpAdUnit,
-            bidders = adUnits.bidders,
-            adsenseAdCode = (optionalParam && optionalParam.adsenseAdCode) ? optionalParam.adsenseAdCode : null;
+		// Initiate prebidding for current adpSlots batch
+		prebidBatching(utils.getCurrentAdpSlotBatch(adpTags.adpBatches, batchId));
 
-        adpTags.adpSlots[containerId] = {
-            slotId: slotId,
-            bidders: bidders || [],
-            placement: placement,
-            size: size,
-            containerId: containerId,
-            timeout: config.PREBID_TIMEOUT,
-            adsenseAdCode: adsenseAdCode, // Recieved in base64 format from the user
-            gSlot: null,
-            hasRendered: false,
-            biddingComplete: false,
-            containerPresent: false,
-            feedbackSent: false,
-            hasTimedOut: false,
-            feedback: {
-                winner: config.DEFAULT_WINNER
-            }
-        };
-        return adpTags.adpSlots[containerId];
-    },
+		// Reset the adpSlots batch
+		adpTags.currentBatchId = null;
+		adpTags.currentBatchAdpSlots = [];
+		adpTags.slotInterval = null;
 
-    processBatchForBidding = function () {
-        var batchId = adpTags.currentBatchId,
-            adpSlots = adpTags.currentBatchAdpSlots;
+		logger.log('Timeout interval ended');
+	},
+	queSlotForBidding = function(slot) {
+		if (!adpTags.slotInterval) {
+			adpTags.currentBatchId = !adpTags.currentBatchId
+				? Math.abs(utils.hashCode(+new Date() + ''))
+				: adpTags.currentBatchId;
+		} else {
+			logger.log('Timeout interval already defined, resetting it');
+			clearTimeout(adpTags.slotInterval);
+		}
+		adpTags.currentBatchAdpSlots.push(slot);
+		adpTags.slotInterval = setTimeout(processBatchForBidding, config.SLOT_INTERVAL);
+	},
+	// Adp tags main object instance - instantiates adpslots
+	adpTags = {
+		adpSlots: {},
+		que: [],
+		slotInterval: null,
+		adpBatches: [],
+		currentBatchAdpSlots: [],
+		currentBatchId: null,
+		batchPrebiddingComplete: false,
+		// Function to define new adp slot
+		defineSlot: function(containerId, size, placement, optionalParam) {
+			var optionalParam = optionalParam || {},
+				slot = createSlot(containerId, size, placement, optionalParam);
+			logger.log('Slot defined for container : ' + containerId);
 
-        adpTags.adpBatches.push({
-            batchId: batchId,
-            adpSlots: adpSlots
-        });
+			if (utils.isSupportedBrowser()) {
+				if (slot.bidders.length) {
+					if (slot.slotId) {
+						logger.log('Type 1: Attaching gSlot and running prebid sandboxing');
+						slot.type = 1;
+					} else {
+						logger.log('Type 2: Running prebid sandboxing and then postbid as dfp slot is not present');
+						slot.type = 2;
+					}
+				} else {
+					// Type 3 handled from within case 2
+					slot.biddingComplete = true;
+					if (slot.slotId) {
+						logger.log('Type 4: No prebid bidder config, rendering adx tag');
+						slot.type = 4;
+					} else {
+						logger.log('Type 5: No prebid bidder config or dfp slot, collapsing div');
+						slot.type = 5;
+					}
+				}
+			} else {
+				logger.log('Browser not supported by AdPushup.');
+				slot.biddingComplete = true;
 
-        // Add batch id to all batched adpSlots
-        addBatchIdToAdpSlots(adpSlots, batchId);
+				slot.type = slot.slotId ? 6 : 7;
+			}
+			queSlotForBidding(this.adpSlots[containerId]);
+			return this.adpSlots[containerId];
+		},
+		processQue: function() {
+			while (this.que.length) {
+				this.que.shift().call(this);
+			}
+		},
+		extendConfig: function(newConfig) {
+			Object.assign(config, newConfig);
+		},
+		// Function to display adp slot for given container id
+		display: function(containerId) {
+			var slot = this.adpSlots[containerId];
 
-        // Initiate prebidding for current adpSlots batch
-        prebidBatching(utils.getCurrentAdpSlotBatch(adpTags.adpBatches, batchId));
+			if (slot && !slot.containerPresent) {
+				slot.containerPresent = true;
+				slot.sectionId = utils.getSectionId(containerId);
+				slot.variationId = utils.getVariationId(containerId);
 
-        // Reset the adpSlots batch
-        adpTags.currentBatchId = null;
-        adpTags.currentBatchAdpSlots = [];
-        adpTags.slotInterval = null;
-
-        logger.log('Timeout interval ended');
-    },
-
-    queSlotForBidding = function (slot) {
-        if (!adpTags.slotInterval) {
-            adpTags.currentBatchId = !adpTags.currentBatchId ? Math.abs(utils.hashCode(+new Date() + '')) : adpTags.currentBatchId;
-        } else {
-            logger.log('Timeout interval already defined, resetting it');
-            clearTimeout(adpTags.slotInterval);
-        }
-        adpTags.currentBatchAdpSlots.push(slot);
-        adpTags.slotInterval = setTimeout(processBatchForBidding, config.SLOT_INTERVAL);
-    },
-
-    // Adp tags main object instance - instantiates adpslots
-    adpTags = {
-        adpSlots: {},
-        que: [],
-        slotInterval: null,
-        adpBatches: [],
-        currentBatchAdpSlots: [],
-        currentBatchId: null,
-        batchPrebiddingComplete: false,
-        // Function to define new adp slot
-        defineSlot: function (containerId, size, placement, optionalParam) {
-            var slot = createSlot(containerId, size, placement, optionalParam);
-            logger.log('Slot defined for container : ' + containerId);
-
-            if (utils.isSupportedBrowser()) {
-                if (slot.bidders.length) {
-                    if (slot.slotId) {
-                        logger.log('Type 1: Attaching gSlot and running prebid sandboxing');
-                        slot.type = 1;
-                    } else {
-                        logger.log('Type 2: Running prebid sandboxing and then postbid as dfp slot is not present');
-                        slot.type = 2;
-                    }
-                }
-                // Type 3 handled from within case 2
-                else {
-                    slot.biddingComplete = true;
-                    if (slot.slotId) {
-                        logger.log('Type 4: No prebid bidder config, rendering adx tag');
-                        slot.type = 4;
-                    } else {
-                        logger.log('Type 5: No prebid bidder config or dfp slot, collapsing div');
-                        slot.type = 5;
-                    }
-                }
-            } else {
-                logger.log('Browser not supported by AdPushup.');
-                slot.biddingComplete = true;
-
-                slot.type = slot.slotId ? 6 : 7;
-            }
-            queSlotForBidding(this.adpSlots[containerId])
-            return this.adpSlots[containerId];
-        },
-        processQue: function () {
-            while (this.que.length) {
-                this.que.shift().call(this);
-            }
-        },
-        extendConfig: function (newConfig) {
-            Object.assign(config, newConfig);
-        },
-        // Function to display adp slot for given container id
-        display: function (containerId) {
-            var slot = this.adpSlots[containerId];
-
-            if (slot && !slot.containerPresent) {
-                slot.containerPresent = true;
-                slot.sectionId = utils.getSectionId(containerId);
-                slot.variationId = utils.getVariationId(containerId);
-
-                slot.pageGroup = utils.getPageGroup();
-                slot.platform = utils.getPlatform();
-                //logger.log('Rendering adp tag for container : ' + containerId);
-                adpRender.renderGPT(slot);
-            }
-        }
-    };
+				slot.pageGroup = utils.getPageGroup();
+				slot.platform = utils.getPlatform();
+				//logger.log('Rendering adp tag for container : ' + containerId);
+				adpRender.renderGPT(slot);
+			}
+		}
+	};
 
 module.exports = adpTags;
