@@ -12,6 +12,7 @@ var express = require('express'),
 	Promise = require('bluebird'),
 	extend = require('extend'),
 	CC = require('../configs/commonConsts'),
+	config = require('../configs/config'),
 	lodash = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
@@ -289,11 +290,19 @@ router
 	.post('/updateCrmDealStatus', function (req, res) {
 		return userModel.getUserByEmail(req.session.user.email)
 		.then(user => {
-			if (!user || !user.data || !user.data.crmDealId) {
+			if (
+				config.hasOwnProperty('analytics')
+				&& config.analytics.hasOwnProperty('pipedriveActivated')
+				&& !config.analytics.pipedriveActivated
+				&& !user.get('crmDealId')
+			) {
+				return Promise.resolve();
+			}
+			if (!user || !user.get('crmDealId')) {
 				return Promise.reject("No CRM deal id found");
 			}
 			return pipedriveAPI('updateDeal', {
-				deal_id: user.data.crmDealId,
+				deal_id: user.get('crmDealId'),
 				stage_id: req.body.status
 			});
 		})
@@ -303,30 +312,6 @@ router
 			return res.send({ success: 0 });
 		});
 	})
-	// .post('/updateCrmDeal', function (req, res) {
-	// 	var dataToSend = null;
-
-	// 	userModel.getUserByEmail(req.session.user.email).then(function (user) {
-	// 		switch (req.body.type) {
-	// 			case 'services':
-	// 				dataToSend = {
-	// 					"98d03ae31d14653dcc142c912a1f0faee3f1a088": req.body['data[servicesString]'],
-	// 					"02921da334ea34a050d3b7ed7de2ef51ebce9fe5": req.body['data[pwc]']
-	// 				}
-	// 				break;
-	// 		}
-	// 		var pipeDriveParams = {
-	// 			"searchText": user.data.crmDealId,
-	// 			"dataToSend": dataToSend
-	// 		}
-	// 		return pipeDriveObject.apiCall('updateDeal', pipeDriveParams);
-	// 	}).then(function (data) {
-	// 		return res.send({ success: 1 });
-	// 	}).catch(function (err) {
-	// 		console.log(err);
-	// 		return res.send({ success: 0 });
-	// 	});
-	// })
 	.get('/generateLiveSitesScripts', function (req, res) {
 		const message = 'Scripts for all live websites will be generated now. Please check the server logs for confirmation';
 

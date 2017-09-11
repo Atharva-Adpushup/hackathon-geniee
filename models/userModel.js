@@ -294,7 +294,7 @@ function apiModule() {
 				return mailService({
 					header: "Error while creating new deal in Pipedrive",
 					content: JSON.stringify(pipedriveParams),
-					emailId: "yomesh.gupta@gmail.com"
+					emailId: "sales@adpushup.com"
 				});
 			})
 			.then(() => user)
@@ -352,6 +352,14 @@ function apiModule() {
 										'isUserIdentified': true
 									};
 									user.set('analytics', analyticsObj);
+								}
+								if (
+									Config.hasOwnProperty('analytics')
+									&& Config.analytics.hasOwnProperty('pipedriveActivated')
+									&& !Config.analytics.pipedriveActivated
+								) {
+									user.set('crmDealId', false);
+									return Promise.resolve(user);
 								}
 								return API.pipedriveDealCreation(user, pipedriveParams);
 							})
