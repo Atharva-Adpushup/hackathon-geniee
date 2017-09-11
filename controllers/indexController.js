@@ -39,12 +39,12 @@ function createNewUser(params, res) {
 	params.adNetworks = consts.user.fields.default.adNetworks; // ['Other']
 	params.pageviewRange = consts.user.fields.default.pageviewRange; // 5000-15000
 
-	params.utmSource = params.utmSource || 'N/A';
-	params.utmMedium = params.utmMedium || 'N/A';
-	params.utmCampaign = params.utmCampaign || 'N/A';
-	params.utmTerm = params.utmTerm || 'N/A';
-	params.utmName = params.utmName || 'N/A';
-	params.utmContent = params.utmContent || 'N/A';
+	params.utmSource = params.utmSource || '';
+	params.utmMedium = params.utmMedium || '';
+	params.utmCampaign = params.utmCampaign || '';
+	params.utmTerm = params.utmTerm || '';
+	params.utmName = params.utmName || '';
+	params.utmContent = params.utmContent || '';
 
 	// Below conditions
 	// IF: Set all revenue parameters equal to exact revenue 
@@ -78,7 +78,7 @@ function createNewUser(params, res) {
 		var analyticsObj = {
 			'name': origName,
 			'email': params.email,
-			'INFO_SITENAME': params.site,
+			'INFO_SITENAME': utils.domanize(params.site),
 			'INFO_PAGEVIEWS': params.pageviewRange,
 			'INFO_ADNETWORKS': params.adNetworks.join(' | '),
 			'INFO_CMS': 'undefined',
