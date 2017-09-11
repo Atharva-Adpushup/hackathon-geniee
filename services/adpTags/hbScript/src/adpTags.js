@@ -45,6 +45,7 @@ var prebidSandbox = require('./prebidSandbox'),
 
 		adpTags.adpSlots[containerId] = {
 			slotId: slotId,
+			optionalParam: optionalParam,
 			bidders: bidders || [],
 			placement: placement,
 			size: size,
@@ -113,7 +114,10 @@ var prebidSandbox = require('./prebidSandbox'),
 			logger.log('Slot defined for container : ' + containerId);
 
 			if (utils.isSupportedBrowser()) {
-				if (slot.bidders.length) {
+				if (!optionalParam.headerBidding) {
+					slot.type = 9;
+					logger.log('Type 9: HB disabled by editor.');
+				} else if (slot.bidders.length) {
 					if (slot.slotId) {
 						logger.log('Type 1: Attaching gSlot and running prebid sandboxing');
 						slot.type = 1;
