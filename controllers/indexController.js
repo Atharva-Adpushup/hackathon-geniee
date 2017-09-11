@@ -78,7 +78,7 @@ function createNewUser(params, res) {
 		var analyticsObj = {
 			'name': origName,
 			'email': params.email,
-			'INFO_SITENAME': params.site,
+			'INFO_SITENAME': utils.domanize(params.site),
 			'INFO_PAGEVIEWS': params.pageviewRange,
 			'INFO_ADNETWORKS': params.adNetworks.join(' | '),
 			'INFO_CMS': 'undefined',
