@@ -34,6 +34,7 @@ const errorsConfig = {},
 			case adActions.DELETE_AD:
 			case adActions.UPDATE_ADCODE:
 			case adActions.UPDATE_CSS:
+			case adActions.UPDATE_NETWORK:
 			case sectionActions.DELETE_SECTION:
 				return { isVisible: false };
 

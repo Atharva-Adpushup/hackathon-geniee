@@ -24,8 +24,8 @@ class variationManager extends React.Component {
 
 	toggleVariationPanel() {
 		this.setState({ isPanelActive: !this.state.isPanelActive });
-        this.props.onShrinkVariationPanel('.variation-settings', {"property": "height", "value" : "400"});
-    }
+		this.props.onShrinkVariationPanel('.variation-settings', {"property": "height", "value" : "400"});
+	}
 
 	render() {
 		const props = this.props;
@@ -45,7 +45,7 @@ class variationManager extends React.Component {
 								active={variation.id === props.activeVariation.id}
 								onClick={props.setActiveVariation}
 								toggleVariationPanel={this.toggleVariationPanel}
-       />
+							/>
 						))
 					}
 					<VariationAdder onNewVariation={props.createVariation.bind(null, props.activeChannelId)} />

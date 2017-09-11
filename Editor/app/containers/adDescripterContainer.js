@@ -1,21 +1,21 @@
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AdsDescriptor from 'editMenu/adDescriptor.jsx';
-import { updateCss, updateAdCode } from '../actions/adActions';
-import { deleteSection } from '../actions/sectionActions';
+import { updateCss, updateAdCode, updateNetwork } from '../actions/adActions';
+import { resetErrors } from 'actions/uiActions';
+import { deleteSection, updateXPath, sectionAllXPaths, validateXPath, renameSection } from 'actions/sectionActions.js';
 
-const mapStateToProps = (state, ownProps) => ({ ...ownProps }),
-	mapDispatchToProps = (dispatch) => ({
-		deleteSection: (sectionId, variationId, adId) => {
-			dispatch(deleteSection(sectionId, variationId, adId));
-		},
-		updateCss: (adId, css) => {
-			dispatch(updateCss(adId, css));
-		},
-		updateAdCode: (adId, adCode) => {
-			dispatch(updateAdCode(adId, adCode));
-		}
-	});
-
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdsDescriptor);
-
+export default connect(
+	(state, ownProps) => ({ ...ownProps, ui: state.ui }),
+	(dispatch) => bindActionCreators({
+		deleteSection: deleteSection,
+		updateCss: updateCss,
+		updateAdCode: updateAdCode,
+		updateNetwork: updateNetwork,
+		onUpdateXPath: updateXPath,
+		onSectionAllXPaths: sectionAllXPaths,
+		onValidateXPath: validateXPath,
+		onResetErrors: resetErrors,
+		onRenameSection: renameSection
+	}, dispatch)
+)(AdsDescriptor);

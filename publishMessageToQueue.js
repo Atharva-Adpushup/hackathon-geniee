@@ -4,7 +4,7 @@ var siteModel = require('./models/siteModel'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
 	N1qlQuery = CouchbasePromises.N1qlQuery,
-	configPublishService = require('./services/apV2SiteConfigPublishService/index'),
+	configPublishService = require('./services/genieeAdSyncService/apV2SiteConfigPublishService/index'),
 	WORKER_CONSTANTS = require('./queueWorker/rabbitMQ/constants/constants'),
 	CONSTANTS = {
 		COUCHBASE: {

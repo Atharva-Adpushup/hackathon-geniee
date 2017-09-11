@@ -5,11 +5,11 @@ var Promise = require('bluebird'),
 	publishJobs = require('../libs/publisherCommon'),
 	queueConfig = {
 		url: CONFIG.RABBITMQ.URL,
-		exchange: CONFIG.RABBITMQ.GENIEE_AD_SYNC.EXCHANGE,
-		queue: CONFIG.RABBITMQ.GENIEE_AD_SYNC.QUEUES.GENIEE_AD_SYNC
+		exchange: CONFIG.RABBITMQ.ADP_TAG_SYNC.EXCHANGE,
+		queue: CONFIG.RABBITMQ.ADP_TAG_SYNC.QUEUE
 	},
 	options = {
-		queueName: CONFIG.RABBITMQ.GENIEE_AD_SYNC.QUEUES.GENIEE_AD_SYNC.name
+		queueName: CONFIG.RABBITMQ.ADP_TAG_SYNC.QUEUE.name
 	},
 	publisher = new Publisher(queueConfig);
 

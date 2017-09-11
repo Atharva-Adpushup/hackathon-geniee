@@ -6,6 +6,7 @@ import CodeBox from 'shared/codeBox';
 import AdSizeSelector from './adSizeSelector.jsx';
 import SectionOptions from './sectionOptions.jsx';
 import ParentSelector from './parentSelector.jsx';
+import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 
 const initialState = {
 		adSize: null,
@@ -31,6 +32,8 @@ class insertMenu extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = initialState;
+		this.createSectionAndAd = this.createSectionAndAd.bind(this);
+		this.toggleExtraOptions = this.toggleExtraOptions.bind(this);
 	}
 
 	componentWillMount() {
@@ -53,10 +56,13 @@ class insertMenu extends React.Component {
 		this.setState({ adSize, operation, showExtraOptions: true, activeItem: 0, prevActiveItem: this.state.activeItem });
 	}
 
-	createSectionAndAd(position, adCode, firstFold, asyncTag, customZoneId) {
-		const props = this.props,
-			network = ((props.partner && (props.partner === 'geniee') && !adCode) ? 'geniee' : 'custom'),
-			sectionPayload = {
+	createSectionAndAd(position, adCode, firstFold, asyncTag, customZoneId, priceFloor, networkFromDropdown, isHeaderBiddingActivated) {
+		const props = this.props;
+		
+		let network = ((props.partner && (props.partner === 'geniee') && !adCode) ? 'geniee' : 'custom');
+		network = networkFromDropdown ? networkFromDropdown : network;
+
+		const sectionPayload = {
 				position,
 				firstFold: (firstFold || false),
 				asyncTag: (asyncTag || false),
@@ -72,6 +78,22 @@ class insertMenu extends React.Component {
 			};
 
 		customZoneId ? adPayload.networkData = { zoneId: customZoneId } : null;
+		priceFloor && priceFloor.trim()
+		? adPayload.networkData
+			?
+				(
+					adPayload.networkData.priceFloor = parseFloat(priceFloor),
+					adPayload.networkData.headerBidding = !!isHeaderBiddingActivated
+				)
+			: 
+				(
+					adPayload.networkData = { 
+						priceFloor: parseFloat(priceFloor),
+						headerBidding: !!isHeaderBiddingActivated
+					}
+				)
+		: null
+
 		this.props.createSectionAndAd(sectionPayload, adPayload, this.props.variationId);
 	}
 
@@ -115,8 +137,8 @@ class insertMenu extends React.Component {
 			));
 		} else {
 			items.push((
-				<MenuItem key={1} icon="fa-sitemap" contentHeading="Adcode">
-					<CodeBox showButtons={true} onSubmit={this.createSectionAndAd.bind(this, null)} onCancel={this.toggleExtraOptions.bind(this)} />
+				<MenuItem key={1} icon="fa-sitemap" contentHeading="Network Options">
+					<NetworkOptions onSubmit={this.createSectionAndAd} onCancel={this.toggleExtraOptions} />
 				</MenuItem>
 			));
 		}

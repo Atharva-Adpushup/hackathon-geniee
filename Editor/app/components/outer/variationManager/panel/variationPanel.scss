@@ -64,8 +64,18 @@ $lightGrey:#ccc;
     }
 }
 
+.CodeMirror {
+	transition: all 1s;
+}
+
 .codeEditor-small {
     .CodeMirror {
         height: 110px;
+    }
+}
+
+.codeEditor-large {
+    .CodeMirror {
+        height: 300px;
     }
 }
