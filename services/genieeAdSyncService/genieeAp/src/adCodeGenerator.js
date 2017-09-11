@@ -71,7 +71,7 @@ module.exports = {
 					adpTags.defineSlot(ad.networkData.dfpAdunit, [ad.width, ad.height], ad.networkData.dfpAdunit, {
 						dfpAdunit: ad.networkData.dfpAdunit,
 						headerBidding: ad.networkData.headerBidding,
-						priceFloor: ad.networkData.dfpAdunit
+						priceFloor: ad.networkData.priceFloor
 					});
 				}
 			};
