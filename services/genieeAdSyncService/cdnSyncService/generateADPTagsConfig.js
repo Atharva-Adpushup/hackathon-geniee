@@ -4,7 +4,7 @@ const couchBase = require('../../../configs/config').couchBase,
 	_ = require('lodash'),
 	CB_ERRORS = require('couchbase').errors,
 	dbHelper = couchbaseService(
-		'couchbase://127.0.0.1/apAppBucket',
+		`couchbase://${couchBase.HOST}`,
 		couchBase.DEFAULT_BUCKET,
 		couchBase.DEFAULT_BUCKET_PASSWORD
 	),

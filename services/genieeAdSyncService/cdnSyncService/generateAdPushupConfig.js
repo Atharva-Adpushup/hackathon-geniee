@@ -66,7 +66,7 @@ const _ = require('lodash'),
 				json.networkData = {
 					dfpAdunit: ad.networkData.dfpAdunit,
 					headerBidding: ad.networkData.headerBidding,
-					floor: ad.networkData.floor
+					priceFloor: ad.networkData.priceFloor
 				};
 				ADPTags.push({
 					key: `${json.width}x${json.height}`,
@@ -139,12 +139,17 @@ const _ = require('lodash'),
 		_.each(channel.variations, (variation, id) => {
 			let variationData = pageGroupData && _.isObject(pageGroupData) ? pageGroupData.variations[id] : null;
 			let variationPayload = getVariationPayload(variation, platform, pageGroup, variationData, finalJson);
-			finalJson[platform][pageGroup].variations.push(variationPayload);
+			if (typeof variationPayload == 'object' && Object.keys(variationPayload).length) {
+				finalJson[platform][pageGroup].variations.push(variationPayload);
+			}
 		});
-
-		finalJson[platform][pageGroup].variations.sort(function(a, b) {
-			return a.traffic - b.traffic;
-		});
+		if (!(Object.keys(finalJson[platform][pageGroup].variations).length)) {
+			delete finalJson[platform][pageGroup];
+		} else {
+			finalJson[platform][pageGroup].variations.sort(function(a, b) {
+				return a.traffic - b.traffic;
+			});
+		}
 		return finalJson;
 	},
 	generatePayload = (site, pageGroupData) => {
