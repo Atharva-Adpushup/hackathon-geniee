@@ -72,8 +72,12 @@ class customCodeEditor extends React.Component {
 				);
 			}
 			else {
+				let className = this.props.showButtons ? 'containerButtonBar' : '';
+				if (this.props.size == 'small') {
+					className += ' pd-b100';
+				}
 				return (
-					<div className={this.props.showButtons ? 'containerButtonBar' : ''}>
+					<div className={className}>
 						{this.state.error && (<div>Some Error in CSS, remove comma in last property if there.</div>)}
 						<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
 						{
@@ -99,6 +103,7 @@ customCodeEditor.propTypes = {
 	isField: PropTypes.bool,
 	textEdit: PropTypes.bool,
 	textEditBtn: PropTypes.string,
+	size: PropTypes.string,
 	showButtons: PropTypes.bool,
 	parentExpanded: PropTypes.bool,
 	onSubmit: PropTypes.func,

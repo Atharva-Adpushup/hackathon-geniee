@@ -54,7 +54,7 @@ class NetworkOptions extends Component {
 						? 
 							(
 								<div className="mT-10">
-									<CodeBox showButtons={this.props.showButtons || true} onSubmit={this.submitHandler} onCancel={this.props.onCancel} code={code} customClass="customButtonsRow" />
+									<CodeBox showButtons={this.props.showButtons || true} onSubmit={this.submitHandler} onCancel={this.props.onCancel} code={code} size='small' />
 								</div>
 							)
 						: null

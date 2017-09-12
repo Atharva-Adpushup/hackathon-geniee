@@ -221,5 +221,6 @@ module.exports = {
 		revenueLowerBound: 1000,
 		initialStep: 1,
 		totalSteps: 3
-	}
+	},
+	CDN_SYNC_MAX_ATTEMPTS: 10
 };

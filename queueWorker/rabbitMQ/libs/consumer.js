@@ -82,7 +82,7 @@ Consumer.prototype.getMessage = function(queueName) {
 };
 
 Consumer.prototype.sendMail = function(data) {
-    return mailService({
+	return mailService({
         header: `${data.header || this.config.name} | Error Counter : ${this.negCounter}`,
         content: `${data.content}`,
         emailId: data.emailId

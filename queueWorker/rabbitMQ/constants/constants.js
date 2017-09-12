@@ -42,8 +42,9 @@ var CONSTANTS = {
 		},
         MESSAGE: {
             INVALID_DATA: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Invalid Message consumer',
-            CDN_SYNC_ERROR: 'Unable to sync file with cdn'
-        }
+            CDN_SYNC_ERROR: 'Unable to sync file with cdn',
+			UNSYNCED_SETUP: 'Unsynced ads in setup'
+		}
 	},
 	SUCCESS_MESSAGES: {
 		RABBITMQ: {
@@ -58,7 +59,8 @@ var CONSTANTS = {
 	STORAGE_SERVICE: {
 		AMAZON_S3: 'AMAZON_S3',
 		AZURE_STORAGE: 'AZURE_STORAGE'
-	}
+	},
+	CDN_SYNC_MAX_ATTEMPTS: 10
 };
 
 

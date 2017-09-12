@@ -1,5 +1,5 @@
 const sql = require('mssql'),
-	dbConnection = require('./dbconnect'),
+	// dbConnection = require('./dbconnect'),
 	Promise = require('bluebird');
 
 function addInputParameters(parameterCollection, sqlInstance) {
