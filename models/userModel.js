@@ -296,7 +296,7 @@ function apiModule() {
 				paramConfig.id = response.data.id;
 				paramConfig.deal_id = paramConfig.id;
 				paramConfig.status = 'lost';
-				paramConfig.lost_reason = 'Low Revenue (less than $1000 USD)';
+				paramConfig.lost_reason = '[CO] Revenue < $1000 Monthly';
 				return pipedriveAPI('updateDeal', paramConfig);
 			})
 			.then(response => {
@@ -313,7 +313,7 @@ function apiModule() {
 				return mailService({
 					header: "Error while creating new deal in Pipedrive",
 					content: JSON.stringify(pipedriveParams),
-					emailId: "yomesh.gupta@gmail.com"
+					emailId: "sales@adpushup.com"
 				});
 			})
 			.then(() => user)
