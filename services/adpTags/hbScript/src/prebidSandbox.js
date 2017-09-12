@@ -7,7 +7,6 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 	__FRAME_PREFIX__ = '__adp_frame__',
 	logger = require('../helpers/logger'),
 	utils = require('../helpers/utils'),
-	//prebidHooking = require('./prebidHooking'),
 	hbStatus = require('./hbStatus'),
 	createPrebidContainer = function(adpSlotsBatch) {
 		var adUnitCodeForPrebid = [],
@@ -82,9 +81,6 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 
 		adpTags.batchPrebiddingComplete = true;
 		if (Object.keys(adpSlots).length) {
-			// Apply adsense/adx hooking in prebid
-			//prebidHooking(adpSlots, pbjsParams);
-
 			logger.log('Bidding complete');
 			pbjs.que.push(function() {
 				setPbjsKeys(pbjsParams);
