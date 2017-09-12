@@ -23,9 +23,9 @@ var modelAPI = module.exports = apiModule(),
 	mailService = require('../services/mailService/index'),
 	User = model.extend(function() {
 		this.keys = ['firstName', 'lastName', 'email', 'salt', 'passwordMd5', 'sites', 'adNetworkSettings', 'createdAt',
-			'passwordResetKey', 'passwordResetKeyCreatedAt', 'requestDemo', 'requestDemoData', 'analytics', 'adNetworks', 
+			'passwordResetKey', 'passwordResetKeyCreatedAt', 'requestDemo', 'requestDemoData', 'adNetworks', 
 			'pageviewRange', 'managedBy', 'userType', 'websiteRevenue', 'crmDealId', 'revenueUpperLimit', 'preferredModeOfReach', 
-			'revenueLowerLimit', 'revenueAverage', 'adnetworkCredentials'];
+			'revenueLowerLimit', 'revenueAverage', 'adnetworkCredentials', 'miscellaneous'];
 		this.validations = schema.user.validations;
 		this.classMap = {
 			adNetworkSettings: networkSettings
@@ -334,6 +334,17 @@ function apiModule() {
 					} else if (e.name && e.name === 'CouchbaseError') {
 						return API.createUserFromJson(json)
 							.then(function(user) {
+								const miscellaneousObj = {
+									utmSource: json.utmSource,
+									utmMedium: json.utmMedium,
+									utmCampaign: json.utmCampaign,
+									utmTerm: json.utmTerm,
+									utmName: json.utmName,
+									utmContent: json.utmContent
+								};
+
+								// Miscellanous field will comprise of non-major user data attributes
+								user.set('miscellaneous', miscellaneousObj);
 								user.set('createdAt', +new Date());
 								user.set('salt', consts.SALT + utils.random(0, 100000000));
 								user.set('pageviewRange', json.pageviewRange);
@@ -345,8 +356,7 @@ function apiModule() {
 								if(json.userType && json.userType === 'partner') {
 									return user;
 								}
-								var analyticsObj, userId = user.get('email'),
-									anonId = json.anonId,
+								var userId = user.get('email'),
 									siteName = utils.domanize(json.site),
 									pipedriveParams = {
 										userInfo: {
@@ -370,14 +380,7 @@ function apiModule() {
 											currency: 'USD'
 										}
 									};
-								if (anonId && !user.get('analytics')) {
-									analyticsObj = {
-										'anonymousId': anonId,
-										'userId': userId,
-										'isUserIdentified': true
-									};
-									user.set('analytics', analyticsObj);
-								}
+
 								return API.pipedriveDealCreation(user, pipedriveParams);
 							})
 							.then(function(user) {
