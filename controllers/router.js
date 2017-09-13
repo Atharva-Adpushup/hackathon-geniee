@@ -27,13 +27,22 @@ module.exports = function(app) {
     // });
 
     app.use(function(req, res, next) {
-        if ((req.originalUrl.indexOf('/user') !== -1 || req.originalUrl.indexOf('/proxy') !== -1) && (!req.session || !req.session.user)) {
-            return res.redirect('/login');
+        function isOpenRoute() {
+            return _.find(['/tools'], function(route) { return req.url.indexOf(route) !== -1 }) ? true : false;
         }
 
         function isAuthorised() {
             return _.find(['/user/site', '/genieeApi', '/user/connectGoogle', '/user/requestOauth', '/user/oauth2callback', '/data', 'proxy', '/authenticate'], function(route) { return req.url.indexOf(route) !== -1 }) ? true : false;
-        };
+        }
+
+        const isSessionInvalid = !!(!req.session || !req.session.user),
+            isOpenRouteValid = (isOpenRoute());
+
+        if (isOpenRouteValid) { return next(); }
+
+        if ((req.originalUrl.indexOf('/user') !== -1 || req.originalUrl.indexOf('/proxy') !== -1) && isSessionInvalid) {
+            return res.redirect('/login');
+        }
 
         if ((req.session && req.session.partner === 'geniee') && !isAuthorised()) {
             req.session.destroy(function() {

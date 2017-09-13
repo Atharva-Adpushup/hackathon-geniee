@@ -392,6 +392,9 @@ router
 			}
 		});
 	})
+	.get('/tools', function (req, res) {
+		return res.render('tools', { headerBannerLogo: true });
+	})
 	.get('/', function (req, res) {
 		return res.redirect('/login');
 	});
