@@ -275,10 +275,14 @@ router
 					});
 			})
 			.catch(function (e) {
+				var errorMessage = 'Some error occurred. Please Try again later!';
+
 				// custom check for AdPushupError
 				if (e.name && e.name === 'AdPushupError') {
-					res.render('signup', { errors: e.message, formData: req.body });
+					return res.render('signup', { errors: e.message, formData: req.body });
 				}
+
+				return res.render('error', { message: errorMessage });
 			});
 	})
 	.get('/signup', function (req, res) {
