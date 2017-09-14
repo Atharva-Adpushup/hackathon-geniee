@@ -44,4 +44,10 @@
 * DFP slot: no
 * Bidding: N/A
 * DFP targeting: no
+
+#### Type 9: User disabled header bidding for that slot using defineSlot (can be done via editor)
+* Bidder config: N/A
+* DFP slot: yes
+* Bidding: N/A
+* DFP targeting: no
 		

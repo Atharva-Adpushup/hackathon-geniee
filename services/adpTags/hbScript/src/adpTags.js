@@ -40,8 +40,7 @@ var prebidSandbox = require('./prebidSandbox'),
 	createSlot = function(containerId, size, placement, optionalParam) {
 		var adUnits = inventoryMapper(size, optionalParam.dfpAdUnit),
 			slotId = adUnits.dfpAdUnit,
-			bidders = adUnits.bidders,
-			adsenseAdCode = optionalParam && optionalParam.adsenseAdCode ? optionalParam.adsenseAdCode : null;
+			bidders = adUnits.bidders;
 
 		adpTags.adpSlots[containerId] = {
 			slotId: slotId,
@@ -51,7 +50,6 @@ var prebidSandbox = require('./prebidSandbox'),
 			size: size,
 			containerId: containerId,
 			timeout: config.PREBID_TIMEOUT,
-			adsenseAdCode: adsenseAdCode, // Recieved in base64 format from the user
 			gSlot: null,
 			hasRendered: false,
 			biddingComplete: false,

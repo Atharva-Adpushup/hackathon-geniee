@@ -24,20 +24,25 @@ const highLighterClass = '_APD_highlighter',
 		pointerEvents: 'none'
 	},
 	renderCustomZoneIdLabel = (customZoneIdStyles, customZoneIdText) => {
-		return (<div className="_AP_customZoneId _ap_reject" style={customZoneIdStyles}>{customZoneIdText}</div>);
+		return (
+			<div className="_AP_customZoneId _ap_reject" style={customZoneIdStyles}>
+				{customZoneIdText}
+			</div>
+		);
 	},
-	AdBox = (props) => {
-		const { id, width, height, css } = props.ad,
-			adBoxSizeContent = (`${width} X ${height}`),
-			clickHandler = (ev) => {
+	AdBox = props => {
+		const { id, width, height } = props.ad,
+			css = Object.assign({}, props.ad.css),
+			adBoxSizeContent = `${width} X ${height}`,
+			clickHandler = ev => {
 				const $el = $(ev.target),
 					position = Utils.dom.getElementBounds($(ev.target));
 				props.clickHandler(id, position, Utils.ui.getElementSelectorCords($el));
 			},
-			isPartnerData = !!(props.partnerData),
+			isPartnerData = !!props.partnerData,
 			isNetworkGeniee = !!(props.ad.network && props.ad.network === 'geniee'),
 			isCustomZoneId = !!(isPartnerData && isNetworkGeniee && props.partnerData.customZoneId),
-			customZoneIdText = (isCustomZoneId) ? 'Zone ID' : '';
+			customZoneIdText = isCustomZoneId ? 'Zone ID' : '';
 		let customZoneIdStyles = $.extend(true, {}, adBoxSizeStyles, {
 			background: '#3498db',
 			left: '70px'
@@ -47,7 +52,6 @@ const highLighterClass = '_APD_highlighter',
 			delete css[key];
 			css[_.camelCase(key)] = value;
 		});
-
 
 		const adBoxStyles = Object.assign({
 			boxShadow: '#000 0px 0px 0px 2px inset',
@@ -64,7 +68,7 @@ const highLighterClass = '_APD_highlighter',
 					<div className="_AP_adSize _ap_reject" style={adBoxSizeStyles}>
 						{adBoxSizeContent}
 					</div>
-					{ isCustomZoneId ? renderCustomZoneIdLabel(customZoneIdStyles, customZoneIdText) : null }
+					{isCustomZoneId ? renderCustomZoneIdLabel(customZoneIdStyles, customZoneIdText) : null}
 				</div>
 			</div>
 		);
