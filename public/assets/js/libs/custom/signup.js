@@ -34,6 +34,7 @@
 				return this.$select.valid();
 			}
 		});
+		appendQueryParameters();
 	}
 
 	function toggleExactRevenueField($element) {
@@ -232,6 +233,52 @@
 		$nameFieldWrapper.removeClass(constants.padding.pxr15).addClass(constants.padding.px0);
 		$emailFieldWrapper.removeClass(constants.padding.pxr15).addClass(constants.padding.px0);
 		if (isExactRevenueVisible) { $dropDownFieldWrapper.removeClass(constants.padding.pxr15).addClass(constants.padding.px0); }
+	}
+
+	function appendQueryParameters() {
+		var utmParams = {
+			'utm_source': 'utmSource',
+			'utm_medium': 'utmMedium',
+			'utm_campaign': 'utmCampaign',
+			'utm_term': 'utmTerm',
+			'utm_name': 'utmName',
+			'utm_content': 'utmContent'
+		};
+
+		function mapKeyToParams(key) {
+			return utmParams[key] || false;
+		}
+
+		function fetchQueryParams() {
+			var match,
+				queryParams = {},
+				pl     = /\+/g,  // Regex for replacing addition symbol with a space
+				search = /([^&=]+)=?([^&]*)/g,
+				decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+				query  = window.location.search.substring(1);
+
+			while (match = search.exec(query)) {
+				queryParams[decode(match[1])] = decode(match[2]);
+			}
+
+			return queryParams;
+		}
+
+		var queryParams = fetchQueryParams(),
+			form = document.querySelector('.js-signup-form'),
+			keys = Object.keys(queryParams);
+
+		keys.forEach(function (param) {
+			var ele = document.createElement('input'),
+				name = mapKeyToParams(param);
+
+			if (name) {
+				ele.name = name;
+				ele.type = 'hidden';
+				ele.value = queryParams[param];
+				form.append(ele);
+			}
+		});
 	}
 
 	$(document).ready(function () {
