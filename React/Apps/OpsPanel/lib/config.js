@@ -2,7 +2,7 @@ const config = {
 	hbConfig: {
 		pulsepoint: {
 			name: 'pulsepoint',
-			isHb: true,
+			isHb: false,
 			global: {
 				cp: { default: '560684', validations: { required: true }, alias: 'User Id', isEditable: true }
 			},
@@ -13,7 +13,7 @@ const config = {
 		},
 		sekindoUM: {
 			name: 'sekindoUM',
-			isHb: true,
+			isHb: false,
 			global: {},
 			local: {
 				spaceId: { validations: { required: true }, alias: 'Space Id' }
@@ -21,7 +21,7 @@ const config = {
 		},
 		wideorbit: {
 			name: 'wideorbit',
-			isHb: true,
+			isHb: false,
 			global: {
 				pbId: { default: '577', validations: { required: true }, alias: 'Publisher Id', isEditable: true }
 			},
