@@ -68,6 +68,9 @@ const highLighterClass = '_APD_highlighter',
 					<div className="_AP_adSize _ap_reject" style={adBoxSizeStyles}>
 						{adBoxSizeContent}
 					</div>
+					<div className="_AP_adSize _ap_reject" style={adBoxSizeStyles}>
+						{props.sectionName}
+					</div>
 					{isCustomZoneId ? renderCustomZoneIdLabel(customZoneIdStyles, customZoneIdText) : null}
 				</div>
 			</div>
