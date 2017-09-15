@@ -1,9 +1,9 @@
 $(document).ready(function () {
 	(function (w, d) {
-
         // Settings module object
 		var toolsModule = {
-				siteId: 0,
+				siteId: '',
+				isViewMode: false,
 				// Settings templates
 				templates: {
 					headerCode: "<script data-cfasync='false' type='text/javascript'>(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/__siteId__/adpushup.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);</script>"
@@ -190,27 +190,81 @@ $(document).ready(function () {
 
 				isSiteIdNotValid: function (siteId) {
 					var siteIdValue = siteId || this.siteId,
-						isNotValid = !(siteIdValue && Number(siteIdValue));
+						isNotValid = !(siteIdValue && Number(siteIdValue)),
+						isSiteIdInput = !!($userSiteIdInput.length);
 
 					if (isNotValid) {
 						alert('Please enter a valid site id for code generation');
-						$userSiteIdInput
-							.val('')
-							.focus();
+						if (isSiteIdInput) { $userSiteIdInput.val('').focus(); }
 					}
 
 					return isNotValid;
 				},
 
+				setHiddenParamData: function () {
+					var $viewModeHiddenInput = $('.js-input-hidden-viewMode'),
+						$siteIdHiddenInput = $('.js-input-hidden-siteId'),
+						isViewMode = Number($viewModeHiddenInput.val()),
+						siteId = Number($siteIdHiddenInput.val()),
+						isViewModeValid = !!(isViewMode && siteId);
+
+					if (!isViewModeValid) { return; }
+					this.isViewMode = isViewMode;
+					this.siteId = siteId;
+				},
+
+				// checkViewMode refers to whether user session is currently active (user has logged in or not)
+				// and 'siteid' is present as a query parameter or not
+				checkViewMode: function () {
+					var isValid = !!(this.isViewMode && this.siteId);
+
+					return isValid;
+				},
+
+				scrollToCodeSection: function (isScroll) {
+					if (!isScroll) { return false; }
+
+					var adCodeWrapperOffsets = $adCodeWrapperRow.offset(),
+						adCodeWrapperTop = adCodeWrapperOffsets.top,
+						headerHeight = $headerDiv.height(),
+						heightOffset = 15,
+						computedScrollTop = (adCodeWrapperTop - (headerHeight + heightOffset));
+
+						$body.stop().animate({scrollTop: 170}, '500', 'swing');
+				},
+
+				enableViewMode: function () {
+					var isMode = this.checkViewMode(),
+						siteId = this.siteId;
+
+					if (!isMode) { return; }
+
+					$userSiteIdInput
+						.val(siteId)
+						.attr('disabled', true)
+						.prop('disabled', true)
+						.addClass('disabled');
+					$initCodeButton
+						.trigger('click')
+						.addClass('hide disabled')
+						.attr('disabled', true);
+					this.scrollToCodeSection(isMode);
+				},
+
 				// Initialise tools module
-				init: function () {}
+				init: function () {
+					this.setHiddenParamData();
+					this.enableViewMode();
+				}
 			},
 			$initCodeTextArea = $('.js-header-code-textarea'),
 			$userSiteIdInput = $('.js-user-siteId'),
 			$initCodeWrapper = $('.js-header-code-wrapper'),
-			$adCodeConversionTextArea = $('.js-textarea-adcode-conversion');
-
-		toolsModule.init();
+			$adCodeConversionTextArea = $('.js-textarea-adcode-conversion'),
+			$initCodeButton = $('.js-init-code-btn'),
+			$adCodeWrapperRow = $('.js-adcode-wrapper-row'),
+			$headerDiv = $('.js-site-header'),
+			$body = $('body');
 
 		$userSiteIdInput.off('change').on('change', function () {
 			var $el = $(this),
@@ -277,7 +331,7 @@ $(document).ready(function () {
 			toolsModule.copyToClipboard($targetEl, $clipBoardEl);
 		});
 
-		$('.js-init-code-btn').off('click').on('click', function () {
+		$initCodeButton.off('click').on('click', function () {
 			var siteIdValue = toolsModule.siteId,
 				isSiteIdNotValid = toolsModule.isSiteIdNotValid(),
 				generatedHeaderCode;
@@ -293,5 +347,7 @@ $(document).ready(function () {
 			$initCodeTextArea.val('').val(generatedHeaderCode);
 			$initCodeWrapper.removeClass('hide');
 		});
+
+		toolsModule.init();
 	})(window, document);
 });

@@ -144,8 +144,12 @@ block append headCss
 //- 			img(height="1", width="1", style="display:none", src="https://www.facebook.com/tr?id=1502711840022891&ev=PageView&noscript=1")
 //- 		//End Facebook Pixel Code
 
-
 block bodyContent
+	- primarySiteId = user.primarySiteId || null;
+	- primarySiteDomain = user.primarySiteDomain || null;
+	- primarySiteStep = user.primarySiteStep || null;
+	- operationToolsPath = 'http://localhost:8080/tools?siteId=' + primarySiteId;
+
 	.thankyouWrapper
 		include layout/header
 		.container.text-center
@@ -173,6 +177,14 @@ block bodyContent
 							li Truth Theory
 						a(href="http://www.adpushup.com/customers/AdPushup_RentLingo_CaseStudy.pdf", target="_blank")
 							li Rent Lingo
+
+					p(style="margin: 20px 0 10px 0px; font-weight: bold;") Operation Tools:
+					ul
+						a(href=operationToolsPath, target="_blank")
+							li Convert Ad Code
+						a(href=operationToolsPath, target="_blank")
+							li Generate Header code
+
 	div(class="intercom-launcher")
 		if analytics
 			- user = user || {};
