@@ -299,7 +299,7 @@ $(document).ready(function () {
 			if (isSiteIdNotValid) { return; }
 
             if (!inputBoxValue || inputBoxValue === '') {
-				alert('Please enter control ad code!');
+				alert('Please enter your ad code!');
 				inputBox.focus();
                 return;
 			}
