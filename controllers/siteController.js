@@ -59,6 +59,15 @@ router
                 return res.send('Some error occurred!');
             });
     })
+    .get('/:siteId/opsPanel', (req, res) => {
+        const { session, params } = req;
+
+        if (session.isSuperUser) {
+            return res.render('opsPanel', { siteId: params.siteId });
+        } else {
+            return res.render('404');
+        }
+    })
 	.get('/:siteId/opsPanel/hbConfig', (req, res) => {
 		const { siteId } = req.params;
 	
