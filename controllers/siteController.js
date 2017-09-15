@@ -40,77 +40,6 @@ function checkAuth(req, res, next) {
         });
 };
 
-// Function to render header bidding setup panel
-function renderHbPanel(site, UiData, res, op, hbConfig) {
-    var data = {
-        siteDomain: site.get('siteDomain'),
-        countries: JSON.stringify(UiData.countries),
-        continents: JSON.stringify(commonConsts.hbContinents),
-        adSizes: JSON.stringify(UiData.adSizes),
-        hbPartners: JSON.stringify(UiData.hbPartners),
-        hbConfig: JSON.stringify(commonConsts.hbConfig),
-        hbGlobalSettingDefaults: commonConsts.hbGlobalSettingDefaults,
-        defaultNetworkId: commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId,
-        operation: op,
-    };
-
-    if (hbConfig) {
-        data.hbSetupData = JSON.stringify(hbConfig.value.hbConfig);
-    }
-
-    res.render('headerBidding', data);
-};
-
-// Function to fetch HbConfig data and render appropriate panel
-function populateHbConfigPanel(sitePromise, appBucketPromise, UiData, siteId, res) {
-    return Promise.all([sitePromise, appBucketPromise])
-        .spread(function (site, appBucket) {
-            var hbConfigPromise = appBucket.getAsync('hbcf::' + siteId, {});
-            return Promise.all([site, hbConfigPromise]);
-        })
-        .spread(function (site, hbConfig) {
-            var op = 'edit';
-            return renderHbPanel(site, UiData, res, op, hbConfig);
-        })
-        .catch(function (err) {
-            if (err.code === 13) {
-                return siteModel.getSiteById(siteId)
-                    .then(function (site) {
-                        var op = 'create';
-                        return renderHbPanel(site, UiData, res, op);
-                    });
-            }
-            else {
-                console.log(err);
-                res.send('Some error occurred!');
-            }
-        });
-};
-
-// Function to populate data for header bidding panel UI
-function getHbUiData() {
-    var countries = _.map(countryData.lookup.countries(), function (country) {
-        return {
-            name: country.name,
-            code: country.alpha2
-        };
-    }), hbPartners = _.map(commonConsts.hbConfig, function (hbPartner) {
-        return hbPartner.isHb ? hbPartner.name : null;
-    }), adSizes = [];
-
-    _.forEach(commonConsts.supportedAdSizes, function (layout) {
-        _.forEach(layout.sizes, function (size) {
-            adSizes.push(size.width + 'x' + size.height);
-        });
-    });
-
-    return {
-        countries: countries,
-        hbPartners: hbPartners,
-        adSizes: _.uniq(adSizes)
-    };
-};
-
 router
     .get('/:siteId/*', checkAuth)
     .get('/:siteId/settings', (req, res) => {
@@ -130,7 +59,41 @@ router
                 return res.send('Some error occurred!');
             });
     })
-    .get('/:siteId/settings/regexVerifier', function (req, res) {
+	.get('/:siteId/opsPanel/hbConfig', (req, res) => {
+		const { siteId } = req.params;
+	
+		return couchbase.connectToAppBucket()
+		.then(appBucket => appBucket.getAsync(`hbcf::${siteId}`, {}))
+		.then(hbConfig => res.status(200).send({ success: 1, data: hbConfig.value, message: 'Header bidding config fetched' }))
+		.catch(err => {
+			const { code } = err;
+
+			if (code === 13) {
+				return res.status(404).send({ success: 0, data: null, message: `Header bidding config for siteId : ${siteId} not found` })
+			} else {
+				return res.status(500).send({ success: 0, data: null, message: 'Some error occurred! Please try again later' })
+			}
+		});
+	})
+	.post('/:siteId/opsPanel/hbConfig', (req, res) => {
+		const { siteId } = req.params,
+			sitePromise = siteModel.getSiteById(req.params.siteId),
+			appBucketPromise = couchbase.connectToAppBucket(),
+			{ hbConfig, editMode } = JSON.parse(req.body.data);
+
+		return Promise.all([sitePromise, appBucketPromise])
+		.spread((site, appBucket) => {
+			const json = { hbConfig: { bidderAdUnits: hbConfig }, siteId: siteId, siteDomain: site.get('siteDomain'), email: site.get('ownerEmail') };
+			
+			return editMode === 'update' ? appBucket.replacePromise(`hbcf::${siteId}`, json) : appBucket.insertPromise(`hbcf::${siteId}`, json);
+		})
+		.then(data => res.status(200).send({ success: 1, data: null, message: `Header bidding config updated` }))
+		.catch(err => {
+			console.log(err);
+			return res.status(500).send({ success: 0, data: null, message: 'Some error occurred! Please try again later' })
+		});
+	})
+	.get('/:siteId/settings/regexVerifier', function (req, res) {
         return siteModel.getSiteById(req.params.siteId)
             .then(site => [siteModel.getSitePageGroups(req.params.siteId), site])
             .spread((sitePageGroups, site) => {
@@ -168,72 +131,6 @@ router
                 userInputs: userInputs
             });
         }
-    })
-    .get('/:siteId/headerBidding', function (req, res) {
-        userModel.verifySiteOwner(req.session.user.email, req.params.siteId)
-            .then(function () {
-                var sitePromise = siteModel.getSiteById(req.params.siteId),
-                appBucketPromise = couchbase.connectToAppBucket(),
-                UiData = getHbUiData();
-
-                return populateHbConfigPanel(sitePromise, appBucketPromise, UiData, req.params.siteId, res);
-            })
-            .catch(function (err) {
-                res.redirect('/403');
-            });
-    })
-    .post('/:siteId/saveHeaderBiddingSetup', function (req, res) {
-        var siteId = req.params.siteId,
-            hbConfig = JSON.parse(req.body.hbConfig),
-            operation = req.body.op,
-            sitePromise = siteModel.getSiteById(req.params.siteId),
-            appBucketPromise = couchbase.connectToAppBucket(),
-            hasGlobalConfig = _.find(hbConfig.setup, function (config) { return config.type === 'all' });
-
-        if (!hasGlobalConfig) {
-            hbConfig.setup.push({ 'type': 'all', info: {} });
-        }
-
-        return Promise.all([sitePromise, appBucketPromise])
-            .spread(function (site, appBucket) {
-                var json = {
-                    hbConfig: hbConfig,
-                    siteId: site.get('siteId'),
-                    siteDomain: site.get('siteDomain'),
-                    email: site.get('ownerEmail')
-                };
-
-                return operation === 'create' ? appBucket.insertPromise('hbcf::' + req.params.siteId, json) : appBucket.replacePromise('hbcf::' + req.params.siteId, json);
-            })
-            .then(function (data) {
-                // Emit event to generate hbConfig file for siteId
-                adpushupEvent.emit('hbSiteSaved', req.params.siteId);
-
-                res.send({ success: 1 });
-            })
-            .catch(function (err) {
-                res.send({ success: 0 });
-            });
-    })
-    .get('/:siteId/syncAllHBSites', function(req, res) {
-        var queryString = N1qlQuery.fromString('select siteId from AppBucket where hbConfig is not null');
-        return couchbase.connectToAppBucket()
-            .then(function(appBucket) {
-                return appBucket.queryPromise(queryString);
-            })
-            .then(function(allHBSites) {
-                var hbSiteIds = _.map(allHBSites, function(hbSite) {
-                    return parseInt(hbSite.siteId, 10);
-                });
-                
-                // Emit event to sync all hb sites
-                adpushupEvent.emit('hbAllSites', hbSiteIds);
-
-                res.send({ success: 1 });
-            })
-            .catch(function(err) {
-                res.send({ success: 0 });
-            });
     })
     .post('/:siteId/saveSiteSettings', function (req, res) {
         var json = { settings: req.body, siteId: req.params.siteId };
