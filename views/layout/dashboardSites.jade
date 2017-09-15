@@ -23,6 +23,9 @@ for site in validSites
                             i.fa.fa-cog
                             |  Settings
                         if isSuperUser
+                            a.btn.btn-lightBg.btn-default(id="opspanel-link", href='/user/site/#{site.siteId}/opsPanel') 
+                                i.fa.fa-wrench
+                                |  Ops Panel
                             form(action='/user/deleteSite', method='post', style='display: inline', onsubmit="return (confirm('Are you sure you want to delete this site? This step cannot be reversed !') && trackDelete(#{site.siteId}))")
                                 input(type='hidden', name='siteId', value='#{site.siteId}')
                                 input(type='hidden', name='siteDomain', value='#{site.domain}')
