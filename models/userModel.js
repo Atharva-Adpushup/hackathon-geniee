@@ -10,6 +10,7 @@ var modelAPI = module.exports = apiModule(),
 	schema = require('../helpers/schema'),
 	_ = require('lodash'),
 	md5 = require('md5'),
+	extend = require('extend'),
 	normalizeurl = require('normalizeurl'),
 	FormValidator = require('../helpers/FormValidator'),
 	AdPushupError = require('../helpers/AdPushupError'),
@@ -22,9 +23,9 @@ var modelAPI = module.exports = apiModule(),
 	mailService = require('../services/mailService/index'),
 	User = model.extend(function() {
 		this.keys = ['firstName', 'lastName', 'email', 'salt', 'passwordMd5', 'sites', 'adNetworkSettings', 'createdAt',
-			'passwordResetKey', 'passwordResetKeyCreatedAt', 'requestDemo', 'requestDemoData', 'analytics', 'adNetworks', 
+			'passwordResetKey', 'passwordResetKeyCreatedAt', 'requestDemo', 'requestDemoData', 'adNetworks', 
 			'pageviewRange', 'managedBy', 'userType', 'websiteRevenue', 'crmDealId', 'revenueUpperLimit', 'preferredModeOfReach', 
-			'revenueLowerLimit', 'revenueAverage', 'adnetworkCredentials'];
+			'revenueLowerLimit', 'revenueAverage', 'adnetworkCredentials', 'miscellaneous'];
 		this.validations = schema.user.validations;
 		this.classMap = {
 			adNetworkSettings: networkSettings
@@ -281,6 +282,24 @@ function apiModule() {
 				return pipedriveAPI('createDeal', pipedriveParams.dealInfo);
 			})
 			.then(response => {
+				const isResponseSuccess = !!(response && response.success && response.data),
+					userRevenue = user.get('websiteRevenue'),
+					isRevenueValid = !!(userRevenue),
+					isRevenueLow = !!(isRevenueValid && Number(userRevenue) <= 999),
+					isDealUnqualified = !!(isResponseSuccess && isRevenueLow);
+
+				if (!isResponseSuccess) { return Promise.reject('Error while checking unqualified deal in Pipedrive'); }
+				if (!isDealUnqualified) { return response; }
+
+				const paramConfig = extend(true, {}, pipedriveParams.dealInfo);
+
+				paramConfig.id = response.data.id;
+				paramConfig.deal_id = paramConfig.id;
+				paramConfig.status = 'lost';
+				paramConfig.lost_reason = '[CO] Revenue < $1000 Monthly';
+				return pipedriveAPI('updateDeal', paramConfig);
+			})
+			.then(response => {
 				if (response && response.success) {
 					user.set('crmDealId', response.data.id);
 					return user;
@@ -294,7 +313,7 @@ function apiModule() {
 				return mailService({
 					header: "Error while creating new deal in Pipedrive",
 					content: JSON.stringify(pipedriveParams),
-					emailId: "yomesh.gupta@gmail.com"
+					emailId: "sales@adpushup.com"
 				});
 			})
 			.then(() => user)
@@ -315,6 +334,17 @@ function apiModule() {
 					} else if (e.name && e.name === 'CouchbaseError') {
 						return API.createUserFromJson(json)
 							.then(function(user) {
+								const miscellaneousObj = {
+									utmSource: json.utmSource,
+									utmMedium: json.utmMedium,
+									utmCampaign: json.utmCampaign,
+									utmTerm: json.utmTerm,
+									utmName: json.utmName,
+									utmContent: json.utmContent
+								};
+
+								// Miscellanous field will comprise of non-major user data attributes
+								user.set('miscellaneous', miscellaneousObj);
 								user.set('createdAt', +new Date());
 								user.set('salt', consts.SALT + utils.random(0, 100000000));
 								user.set('pageviewRange', json.pageviewRange);
@@ -326,8 +356,7 @@ function apiModule() {
 								if(json.userType && json.userType === 'partner') {
 									return user;
 								}
-								var analyticsObj, userId = user.get('email'),
-									anonId = json.anonId,
+								var userId = user.get('email'),
 									siteName = utils.domanize(json.site),
 									pipedriveParams = {
 										userInfo: {
@@ -342,17 +371,16 @@ function apiModule() {
 											[consts.analytics.pipedriveCustomFields.dailyPageviews]: user.get('pageviewRange'),
 											[consts.analytics.pipedriveCustomFields.adNetworks]: user.get('adNetworks').join(' | '),
 											[consts.analytics.pipedriveCustomFields.websiteRevenue]: user.get('websiteRevenue'),
+											[consts.analytics.pipedriveCustomFields.utmSource]: json.utmSource,
+											[consts.analytics.pipedriveCustomFields.utmMedium]: json.utmMedium,
+											[consts.analytics.pipedriveCustomFields.utmCampaign]: json.utmCampaign,
+											[consts.analytics.pipedriveCustomFields.utmTerm]: json.utmTerm,
+											[consts.analytics.pipedriveCustomFields.utmName]: json.utmName,
+											[consts.analytics.pipedriveCustomFields.utmContent]: json.utmContent,
 											currency: 'USD'
 										}
 									};
-								if (anonId && !user.get('analytics')) {
-									analyticsObj = {
-										'anonymousId': anonId,
-										'userId': userId,
-										'isUserIdentified': true
-									};
-									user.set('analytics', analyticsObj);
-								}
+
 								return API.pipedriveDealCreation(user, pipedriveParams);
 							})
 							.then(function(user) {

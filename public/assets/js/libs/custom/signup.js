@@ -1,5 +1,7 @@
 (function (W, $) {
-	var $dropDownFieldWrapper = $('.js-websiteRevenue-dropdown-wrapper'),
+	var $nameFieldWrapper = $('.js-signup-name-wrapper'),
+		$emailFieldWrapper = $('.js-signup-emailId-wrapper'),
+		$dropDownFieldWrapper = $('.js-websiteRevenue-dropdown-wrapper'),
 		$exactRevenueFieldWrapper = $('.js-websiteRevenue-exact-wrapper'),
 		$exactRevenueField = $('#signup-exactRevenue', $exactRevenueFieldWrapper);
 
@@ -32,6 +34,7 @@
 				return this.$select.valid();
 			}
 		});
+		appendQueryParameters();
 	}
 
 	function toggleExactRevenueField($element) {
@@ -59,7 +62,8 @@
 
 	function setInteractionHandlers() {
 		var $dropdownField = $('#signup-websiteRevenue'),
-			$urlField = $('#signup-website');
+			$urlField = $('#signup-website'),
+			$window = $(W);
 
 		$urlField.off('change').on('change', function() {
 			if (this.value.indexOf('http://') !== 0 && this.value.indexOf('https://') !== 0) {
@@ -71,7 +75,10 @@
 			var $el = $(this);
 
 			toggleExactRevenueField($el);
+			adjustLayoutForSmallScreens();
 		});
+
+		$window.off('resize').on('resize', adjustLayoutForSmallScreens);
 	}
 
 	function showUiErrors(validatorRef, $form, errorsObj) {
@@ -198,11 +205,88 @@
 		});
 	}
 
-	$(document).ready(function() {
+	function adjustLayoutForSmallScreens() {
+		var windowWidth = W.innerWidth,
+			constants = {
+				padding: {
+					pxr15: 'u-padding-r15px',
+					'px0': 'u-padding-0px'
+				},
+				width: {
+					breakPoint: 992
+				}
+			},
+			hasNameWrapperPaddingClass = !!($nameFieldWrapper.hasClass(constants.padding.pxr15)),
+			hasEmailWrapperPaddingClass = !!($emailFieldWrapper.hasClass(constants.padding.pxr15)),
+			hasDropDownWrapperPaddingClass = !!($dropDownFieldWrapper.hasClass(constants.padding.pxr15)),
+			isWidthLessThanBreakPoint = !!(constants.width.breakPoint > windowWidth),
+			isExactRevenueWrapperVisible = !!(($exactRevenueFieldWrapper.width() > 0) && $exactRevenueFieldWrapper.height() > 0),
+			isExactRevenueVisible = (isExactRevenueWrapperVisible && hasDropDownWrapperPaddingClass);
+
+		if (!isWidthLessThanBreakPoint) {
+			if (!hasNameWrapperPaddingClass) { $nameFieldWrapper.removeClass(constants.padding.px0).addClass(constants.padding.pxr15); }
+			if (!hasEmailWrapperPaddingClass) { $emailFieldWrapper.removeClass(constants.padding.px0).addClass(constants.padding.pxr15); }
+			if (isExactRevenueWrapperVisible) { $dropDownFieldWrapper.removeClass(constants.padding.px0).addClass(constants.padding.pxr15); }
+			return;
+		}
+
+		$nameFieldWrapper.removeClass(constants.padding.pxr15).addClass(constants.padding.px0);
+		$emailFieldWrapper.removeClass(constants.padding.pxr15).addClass(constants.padding.px0);
+		if (isExactRevenueVisible) { $dropDownFieldWrapper.removeClass(constants.padding.pxr15).addClass(constants.padding.px0); }
+	}
+
+	function appendQueryParameters() {
+		var utmParams = {
+			'utm_source': 'utmSource',
+			'utm_medium': 'utmMedium',
+			'utm_campaign': 'utmCampaign',
+			'utm_term': 'utmTerm',
+			'utm_name': 'utmName',
+			'utm_content': 'utmContent'
+		};
+
+		function mapKeyToParams(key) {
+			return utmParams[key] || false;
+		}
+
+		function fetchQueryParams() {
+			var match,
+				queryParams = {},
+				pl     = /\+/g,  // Regex for replacing addition symbol with a space
+				search = /([^&=]+)=?([^&]*)/g,
+				decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+				query  = window.location.search.substring(1);
+
+			while (match = search.exec(query)) {
+				queryParams[decode(match[1])] = decode(match[2]);
+			}
+
+			return queryParams;
+		}
+
+		var queryParams = fetchQueryParams(),
+			form = document.querySelector('.js-signup-form'),
+			keys = Object.keys(queryParams);
+
+		keys.forEach(function (param) {
+			var ele = document.createElement('input'),
+				name = mapKeyToParams(param);
+
+			if (name) {
+				ele.name = name;
+				ele.type = 'hidden';
+				ele.value = queryParams[param];
+				form.append(ele);
+			}
+		});
+	}
+
+	$(document).ready(function () {
 		setUiData();
 		setInteractionHandlers();
 		validateTermsCheckbox();
 		// addValidationMethods();
 		validateSignupForm();
+		adjustLayoutForSmallScreens();
 	});
 })(window, jQuery);
