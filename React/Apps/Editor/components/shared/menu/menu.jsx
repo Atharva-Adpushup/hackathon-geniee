@@ -48,7 +48,7 @@ class Menu extends React.Component {
 	}
 
 	getMenuOrientationClass() {
-		return `Top ${(this.props.x > ($(window).width() / 2)) ? 'Right' : 'Left'}`;
+		return `Top ${this.props.x > $(window).width() / 2 ? 'Right' : 'Left'}`;
 	}
 
 	getArrowClass() {
@@ -62,43 +62,50 @@ class Menu extends React.Component {
 		}
 	}
 
-
 	fixCss() {
 		const $menu = $(this.refs.main),
 			css = Utils.ui.menuRenderPosition($menu, this.props.position);
 		$menu.css(css);
 	}
 
-
 	render() {
 		const contentElms = [];
 		return (
-			<div >
+			<div>
 				<Glass clickHandler={this.props.onGlassClick} />
 				<div id={this.props.id ? this.props.id : null} ref="main" style={style}>
 					<div className={`MenuBarComponentWrap ${this.getMenuOrientationClass()} js-menuBar`}>
 						<ul ref="toolBar" className={`MenuBarWrapper  + ${this.getArrowClass()} js-menuBar-wrapper`}>
-							{
-								this.props.children.map((el, index) => {
-									const elm = React.cloneElement(el, {
-										key: index,
-										onClick: this.onMenuItemClick.bind(this, index),
-										isActive: (this.state.activeItem === index),
-										onUpdate: this.fixCss
-									});
-									contentElms.push(elm);
-									return elm;
-								})
-							}
+							{this.props.children.map((el, index) => {
+								const elm = React.cloneElement(el, {
+									key: index,
+									onClick: this.onMenuItemClick.bind(this, index),
+									isActive: this.state.activeItem === index,
+									onUpdate: this.fixCss.bind(this)
+								});
+								contentElms.push(elm);
+								return elm;
+							})}
 						</ul>
-						{
-							contentElms.map((el, index) => {
-								const props = el.props;
-								return (<div key={`menuContent-${index}`} style={this.state.activeItem === index ? { display: 'block', position: 'absolute', top: 0, zIndex: -1 } : { display: 'none' }} >
-									<Content contentHeading={props.contentHeading}>{React.cloneElement(props.children, { onUpdate: props.onUpdate })}</Content>
-								</div>);
-							})
-						}
+						{contentElms.map((el, index) => {
+							const props = el.props;
+							return (
+								<div
+									key={`menuContent-${index}`}
+									style={
+										this.state.activeItem === index ? (
+											{ display: 'block', position: 'absolute', top: 0, zIndex: -1 }
+										) : (
+											{ display: 'none' }
+										)
+									}
+								>
+									<Content contentHeading={props.contentHeading}>
+										{React.cloneElement(props.children, { onUpdate: props.onUpdate })}
+									</Content>
+								</div>
+							);
+						})}
 					</div>
 				</div>
 			</div>
