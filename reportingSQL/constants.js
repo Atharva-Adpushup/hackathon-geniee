@@ -31,12 +31,12 @@ const section_level_query = `
 		FROM
 			ApexHourlySiteReport c, ApexSectionReport d
 		WHERE
-			axvid=@__axvid__
-			axpgid=@__axpgid__
-			siteid=@__siteid__
-			c.axsid=@__section__
+			c.axvid=@__axvid__
+			c.axpgid=@__axpgid__
+			c.siteid=@__siteid__
+			c.axsid=@__axsid__
+			c.report_date BETWEEN @__from__ AND @__to__
 			c.axhsrid=d.axhsrid
-			report_date BETWEEN @__from__ AND @__to__
 		GROUP BY
 			c.report_date,
 			c.siteid,
@@ -46,7 +46,7 @@ const section_level_query = `
 	) a
 	INNER JOIN (
 		SELECT
-			report_date
+			report_date,
 			siteid,
 			axvid,
 			axpgid,
@@ -99,10 +99,10 @@ const variation_level_query = `
 		FROM
 			ApexHourlySiteReport c
 		WHERE
-			axvid=@__axvid__
-			axpgid=@__axpgid__
-			siteid=@__siteid__
-			report_date BETWEEN @__from__ AND @__to__
+			c.axvid=@__axvid__
+			c.axpgid=@__axpgid__
+			c.siteid=@__siteid__
+			c.report_date BETWEEN @__from__ AND @__to__
 		GROUP BY
 			c.report_date,
 			c.siteid,
@@ -111,7 +111,7 @@ const variation_level_query = `
 	) a
 	INNER JOIN (
 		SELECT
-			report_date
+			report_date,
 			siteid,
 			axvid,
 			axpgid,
@@ -124,7 +124,7 @@ const variation_level_query = `
 			siteid=@__siteid__
 			report_date BETWEEN @__from__ AND @__to__
 		GROUP BY
-			report_date
+			report_date,
 			siteid,
 			axvid,
 			axpgid
@@ -160,9 +160,9 @@ const pagegroup_level_query = `
 		FROM
 			ApexHourlySiteReport c
 		WHERE
-			axpgid=@__axpgid__
-			siteid=@__siteid__
-			report_date BETWEEN @__from__ AND @__to__
+			c.axpgid=@__axpgid__
+			c.siteid=@__siteid__
+			c.report_date BETWEEN @__from__ AND @__to__
 		GROUP BY
 			c.report_date,
 			c.siteid,
@@ -170,7 +170,7 @@ const pagegroup_level_query = `
 	) a
 	INNER JOIN (
 		SELECT
-			report_date
+			report_date,
 			siteid,
 			axpgid,
 			SUM(total_cpm) AS total_cpm
@@ -181,7 +181,7 @@ const pagegroup_level_query = `
 			siteid=@__siteid__
 			report_date BETWEEN @__from__ AND @__to__
 		GROUP BY
-			report_date
+			report_date,
 			axpgid,
 			siteid
 	) b
@@ -198,7 +198,7 @@ const pagegroup_level_query = `
 		Revenue from AdpTagReport
 		Impressions, Xpath_miss, Siteid, Date from ApexHourlySiteReport  
 */
-const pagegroup_level_query = `
+const site_level_query = `
 	SELECT
 		a.report_date,
 		a.siteid,
@@ -214,15 +214,15 @@ const pagegroup_level_query = `
 		FROM
 			ApexHourlySiteReport c
 		WHERE
-			siteid=@__siteid__
-			report_date BETWEEN @__from__ AND @__to__
+			c.siteid=@__siteid__
+			c.report_date BETWEEN @__from__ AND @__to__
 		GROUP BY
 			c.report_date,
 			c.siteid,
 	) a
 	INNER JOIN (
 		SELECT
-			report_date
+			report_date,
 			siteid,
 			SUM(total_cpm) AS total_cpm
 		FROM
@@ -231,7 +231,7 @@ const pagegroup_level_query = `
 			siteid=@__siteid__
 			report_date BETWEEN @__from__ AND @__to__
 		GROUP BY
-			report_date
+			report_date,
 			siteid
 	) b
 	ON a.report_date=b.report_date and a.siteid=b.siteid
