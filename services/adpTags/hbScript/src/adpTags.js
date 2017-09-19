@@ -13,18 +13,18 @@ var prebidSandbox = require('./prebidSandbox'),
 			height = size[1],
 			size = width + 'x' + height,
 			dfpAdUnit = null,
-			availableSlots = inventory.dfpAdUnits[size];
+			availableSlots = inventory.hbConfig.dfpAdUnits[size];
 
 		if (availableSlots) {
 			if (dfpAdunitToUse && availableSlots.indexOf(dfpAdunitToUse) !== -1) {
 				dfpAdUnit = availableSlots.splice(availableSlots.indexOf(dfpAdunitToUse), 1);
 			} else {
-				dfpAdUnit = inventory.dfpAdUnits[size].pop();
+				dfpAdUnit = inventory.hbConfig.dfpAdUnits[size].pop();
 			}
 		}
 		return {
 			dfpAdUnit: dfpAdUnit,
-			bidders: inventory.bidderAdUnits[size] ? inventory.bidderAdUnits[size].pop() : null
+			bidders: inventory.hbConfig.bidderAdUnits[size] ? inventory.hbConfig.bidderAdUnits[size].pop() : null
 		};
 	},
 	// Adds batch Id to all the adp slots in a batch

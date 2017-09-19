@@ -24,7 +24,7 @@ const randomStore = [],
 					// HACK: In order to use an Object prototype method on the arbitrary
 					//   value, the compiler requires the value be cast to type Object,
 					//   even though the ECMA spec explicitly allows it.
-					const className = Object.prototype.toString.call(/** @type {Object} */(value));
+					const className = Object.prototype.toString.call(/** @type {Object} */ (value));
 					// In Firefox 3.6, attempting to access iframe window objects' length
 					// property throws an NS_ERROR_FAILURE, so we need to special-case it
 					// here.
@@ -50,15 +50,16 @@ const randomStore = [],
 					//         "[object ", Result(1), and "]".
 					//      3. Return Result(2).
 					// and this behavior survives the destruction of the execution context.
-					if ((className == '[object Array]' ||
+					if (
+						className == '[object Array]' ||
 						// In IE all non value types are wrapped as objects across window
 						// boundaries (not iframe though) so we have to do object detection
 						// for this edge case.
-						typeof value.length == 'number' &&
-						typeof value.splice != 'undefined' &&
-						typeof value.propertyIsEnumerable != 'undefined' && !value.propertyIsEnumerable('splice')
-
-					)) {
+						(typeof value.length == 'number' &&
+							typeof value.splice != 'undefined' &&
+							typeof value.propertyIsEnumerable != 'undefined' &&
+							!value.propertyIsEnumerable('splice'))
+					) {
 						return 'array';
 					}
 					// HACK: There is still an array case that fails.
@@ -75,9 +76,12 @@ const randomStore = [],
 					// (it appears just as an object) so we cannot use just typeof val ==
 					// 'function'. However, if the object has a call property, it is a
 					// function.
-					if ((className == '[object Function]' ||
-						typeof value.call != 'undefined' &&
-						typeof value.propertyIsEnumerable != 'undefined' && !value.propertyIsEnumerable('call'))) {
+					if (
+						className == '[object Function]' ||
+						(typeof value.call != 'undefined' &&
+							typeof value.propertyIsEnumerable != 'undefined' &&
+							!value.propertyIsEnumerable('call'))
+					) {
 						return 'function';
 					}
 				} else {
@@ -109,7 +113,7 @@ const randomStore = [],
 		},
 		isObject(val) {
 			const type = typeof val;
-			return type == 'object' && val != null || type == 'function';
+			return (type == 'object' && val != null) || type == 'function';
 		},
 		isNull(val) {
 			return val === null;
@@ -147,7 +151,11 @@ const randomStore = [],
 			test(obj1, obj2) {
 				this.OVERALL_CHANGED = false;
 				this.CHANGES = { EDITED: [], DELETED: [], ADDED: [] };
-				return { details: this.map(obj1, obj2, 'root'), isChanged: this.OVERALL_CHANGED, changes: this.CHANGES };
+				return {
+					details: this.map(obj1, obj2, 'root'),
+					isChanged: this.OVERALL_CHANGED,
+					changes: this.CHANGES
+				};
 			},
 			map(obj1, obj2, name) {
 				if (Utils.isFunction(obj1) || Utils.isFunction(obj2)) {
@@ -168,13 +176,14 @@ const randomStore = [],
 					}
 					let value2;
 
-					if (Utils.isDef(obj2[key]))
-					{ value2 = obj2[key]; }
+					if (Utils.isDef(obj2[key])) {
+						value2 = obj2[key];
+					}
 
 					diff[key] = this.map(obj1[key], value2, key);
 				}
 				for (var key in obj2) {
-					if (Utils.isFunction(obj2[key]) || (typeof (diff[key]) != 'undefined')) {
+					if (Utils.isFunction(obj2[key]) || typeof diff[key] != 'undefined') {
 						continue;
 					}
 					diff[key] = this.map(undefined, obj2[key], key);
@@ -204,15 +213,18 @@ const randomStore = [],
 			return /** @type {!Function} */ (fn.call.apply(fn.bind, arguments));
 		},
 		stringReverse(s) {
-			return s.split('').reverse().join('');
+			return s
+				.split('')
+				.reverse()
+				.join('');
 		},
 		pluckMany() {
 			// get the property names to pluck
 			const source = arguments[0];
 			const propertiesToPluck = _.rest(arguments, 1);
-			return _.map(source, (item) => {
+			return _.map(source, item => {
 				const obj = {};
-				_.each(propertiesToPluck, (property) => {
+				_.each(propertiesToPluck, property => {
 					obj[property] = item[property];
 				});
 				return obj;
@@ -230,12 +242,15 @@ const randomStore = [],
 			});
 		},
 		ValidUrl(str) {
-			const pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+			const pattern = new RegExp(
+				'^(https?:\\/\\/)?' + // protocol
 				'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
 				'((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
 				'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
 				'(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-				'(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+					'(\\#[-a-z\\d_]*)?$',
+				'i'
+			); // fragment locator
 			if (!pattern.test(str)) {
 				return false;
 			} else {
@@ -271,20 +286,22 @@ const randomStore = [],
 				host: a.hostname,
 				port: a.port,
 				query: a.search,
-				params: (function () {
+				params: (function() {
 					let ret = {},
 						seg = a.search.replace(/^\?/, '').split('&'),
 						len = seg.length,
 						i = 0,
 						s;
 					for (; i < len; i++) {
-						if (!seg[i]) { continue; }
+						if (!seg[i]) {
+							continue;
+						}
 						s = seg[i].split('=');
 						ret[s[0]] = s[1];
 					}
 					return ret;
-				}()),
-				domain: (function () {
+				})(),
+				domain: (function() {
 					url = url.replace(/(https?:\/\/)?(www.)?/i, '');
 					url = url.split('.');
 					url = url.slice(url.length - 2).join('.');
@@ -292,7 +309,7 @@ const randomStore = [],
 						return url.split('/')[0];
 					}
 					return url;
-				}()),
+				})(),
 				hash: a.hash.replace('#', ''),
 				path: a.pathname.replace(/^([^/])/, '/$1')
 			};
@@ -339,7 +356,7 @@ const randomStore = [],
 			},
 			getViewPort() {
 				const o = Math.max($(window).height(), $(document).height()),
-					n = Math.max($(window).width(), $(document).width());
+					n = $(window).width();
 				return {
 					height: o,
 					width: n
@@ -390,43 +407,41 @@ const randomStore = [],
 					contextRight = context.right,
 					vP = Utils.dom.getViewPort(),
 					targetWidth = $target.width(),
-					targetHeight = $target.height(),
+					targetHeight = $target.find('.MenuBarComponentWrap > div:visible').height(),
 					windowHeight = $(window).height(),
 					rightSpace = vP.width - contextRight,
 					variationBarHeight = $('#variationManager').height(),
 					$menuBarList = $('.js-menuBar > .js-menuBar-wrapper'),
 					isArrowMenu = $menuBarList.hasClass('js-arrow'),
-					arrowMenuLeft = ((contextLeft + context.width / 2) - ($menuBarList.width() / 2)),
-					arrowMenuTop = (contextTop + context.height + 7);
+					arrowMenuLeft = contextLeft + (context.width / 2 - $menuBarList.width() / 2),
+					arrowMenuTop = contextTop + context.height + 7;
 
-				let top,
-					left;
+				let top, left;
 
 				if (rightSpace >= targetWidth) {
 					// If menu has an arrow, then menu left offset will be
 					// the addition of context element (left and half of width) and subtraction of menu bar list(half of width)
 					// Else, left offset will be the context element right
-					left = (isArrowMenu) ? arrowMenuLeft : contextRight;
+					left = isArrowMenu ? arrowMenuLeft : contextRight;
 				} else if (contextLeft >= targetWidth) {
 					left = contextLeft - targetWidth;
 				} else {
 					left = contextRight - (targetWidth - rightSpace);
 				}
 
-				if ((windowHeight - contextTop) >= targetHeight) {
+				if (windowHeight - contextTop >= targetHeight) {
 					// If menu has an arrow, then menu top offset will be
 					// the addition of context element (top, half of height) and menu bar list (arrow height)
 					// Else, top offset will be the context element top
-					top = (isArrowMenu) ? arrowMenuTop : contextTop;
+					top = isArrowMenu ? arrowMenuTop : contextTop;
 				} else {
-					top = (windowHeight - targetHeight) - variationBarHeight;
+					top = windowHeight - targetHeight - variationBarHeight;
 				}
 
 				return { top, left };
 			}
-
 		},
-		queryParams: (function () {
+		queryParams: function() {
 			const str = window.location.search,
 				objURL = {};
 
@@ -434,11 +449,10 @@ const randomStore = [],
 				objURL[$1] = window.decodeURIComponent($3.replace(/\+/g, ' '));
 			});
 			return objURL;
-		})
+		}
 	};
 
 // Initialise query params closure
 Utils.queryParams();
 
 export default Utils;
-
