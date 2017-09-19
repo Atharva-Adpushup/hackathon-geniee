@@ -18,7 +18,7 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 			}
 			adUnitCodeForPrebid.push({
 				code: adpSlot.containerId,
-				sizes: adpSlot.size,
+				sizes: [adpSlot.size],
 				bids: adpSlot.bidders
 			});
 		});
