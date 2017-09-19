@@ -13,13 +13,13 @@ var prebidSandbox = require('./prebidSandbox'),
 			height = size[1],
 			size = width + 'x' + height,
 			dfpAdUnit = null,
-			availableSlots = inventory.hbConfig.dfpAdUnits[size];
+			availableSlots = inventory.dfpAdUnits[size];
 
 		if (availableSlots) {
 			if (dfpAdunitToUse && availableSlots.indexOf(dfpAdunitToUse) !== -1) {
 				dfpAdUnit = availableSlots.splice(availableSlots.indexOf(dfpAdunitToUse), 1);
 			} else {
-				dfpAdUnit = inventory.hbConfig.dfpAdUnits[size].pop();
+				dfpAdUnit = inventory.dfpAdUnits[size].pop();
 			}
 		}
 		return {
