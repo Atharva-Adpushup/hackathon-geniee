@@ -356,7 +356,7 @@ const randomStore = [],
 			},
 			getViewPort() {
 				const o = Math.max($(window).height(), $(document).height()),
-					n = Math.max($(window).width(), $(document).width());
+					n = $(window).width();
 				return {
 					height: o,
 					width: n
