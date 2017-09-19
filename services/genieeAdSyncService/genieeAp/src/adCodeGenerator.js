@@ -66,8 +66,8 @@ module.exports = {
 		}
 		var doIt = function(adpTagUnits) {
 			return function() {
-				var ad = adpTagUnits[i];
 				for (var i = 0; i < adpTagUnits.length; i++) {
+					var ad = adpTagUnits[i];
 					adpTags.defineSlot(ad.networkData.dfpAdunit, [ad.width, ad.height], ad.networkData.dfpAdunit, {
 						dfpAdunit: ad.networkData.dfpAdunit,
 						headerBidding: ad.networkData.headerBidding,
