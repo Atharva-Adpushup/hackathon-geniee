@@ -30,22 +30,4 @@ module.exports = [
 			})
 		]
 	}
-	// {
-	// 	entry: {
-	// 		adptags: path.join(__dirname, 'hbScriptNormal', 'src', 'index.js'),
-	// 	},
-	// 	output: {
-	// 		path: path.join(__dirname, 'hbScriptNormal', 'build'),
-	// 		filename: '[name].min.js'
-	// 	},
-	// 	plugins: [
-	// 		new webpack.optimize.UglifyJsPlugin({
-	// 			compress: {
-	// 				warnings: false
-	// 			},
-	// 			mangle: false,
-	// 			sourceMap: true
-	// 		})
-	// 	]
-	// }
 ];
