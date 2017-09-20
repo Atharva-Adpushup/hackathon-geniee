@@ -1,7 +1,7 @@
 var Promise = require('bluebird'),
 	_ = require('lodash'),
 	moment = require('moment'),
-	{ schema } = require('./constans'),
+	{ schema } = require('./constants'),
 	common = {};
 	firstQuery = {},
 	secondQuery = {},
@@ -19,7 +19,7 @@ var Promise = require('bluebird'),
 			};
 			firstQuery = {
 				select: "SELECT ",
-				from: ` FROM ${schema.firstQuery.firstTable} ${schema.schema.firstQuery.firstTableAlias} `,
+				from: ` FROM ${schema.firstQuery.firstTable} ${schema.firstQuery.firstTableAlias} `,
 				where: " WHERE ",
 				groupBy: " GROUP BY ",
 				orderBy: " ORDER BY ",
@@ -38,7 +38,7 @@ var Promise = require('bluebird'),
 			return Promise.resolve();
 		},
 		generateDate: (from, to) => `report_date BETWEEN ${from} AND ${to} `,
-		setFirstQueryLevel: (data) => {
+		setLevel: (data) => {
 			let index = 0;
 			if (data.hasOwnProperty('axsid')) {
 				common.level.section = true;
@@ -50,25 +50,26 @@ var Promise = require('bluebird'),
 				common.level.pagegroup = true;
 				index = 1;
 			}
-			index ? common.commonFields = schema.commonFields.slice(0, index) : null;
+			index ? common.fields = schema.commonFields.slice(0, index) : null;
 			return Promise.resolve();
 		},
 		select: (data) => {
-			return resetVariables()
-			.then(() => {
+			// return queryHelper.resetVariables()
+			// .then(() => {
+				let alias = common.level.section ? schema.firstQuery.secondTableAlias : schema.firstQuery.firstTableAlias;
 				_.forEach(data, (field) => {
-					if (schema.firstQuery.nonAggregate.index(field) != -1) {
-						firstQuery.select += ` ${schema.schema.firstQuery.firstTableAlias}.${field}, `;
+					if (schema.firstQuery.nonAggregate.indexOf(field) != -1) {
+						firstQuery.select += ` ${schema.firstQuery.firstTableAlias}.${field}, `;
 						firstQuery.nonAggregate.push(field);
-					} else if (schema.firstQuery.aggregate.index(field) != -1) {
-						firstQuery.select += ` SUM(${schema.schema.firstQuery.firstTableAlias}.${field}) AS ${field}, `;
+					} else if (schema.firstQuery.aggregate.indexOf(field) != -1) {
+						firstQuery.select += ` SUM(${alias}.${field}) AS ${field}, `;
 						firstQuery.aggregate.push(field);
 					}
 
-					if (schema.secondQuery.nonAggregate.index(field) != -1) {
+					if (schema.secondQuery.nonAggregate.indexOf(field) != -1) {
 						secondQuery.select += ` ${field}, `;
 						secondQuery.nonAggregate.push(field);
-					} else if (schema.secondQuery.aggregate.index(field) != -1) {
+					} else if (schema.secondQuery.aggregate.indexOf(field) != -1) {
 						secondQuery.select += ` SUM(${field}) AS ${field}, `;
 						secondQuery.aggregate.push(field);
 					}
@@ -77,49 +78,52 @@ var Promise = require('bluebird'),
 					firstQuery.select += ` ${schema.firstQuery.firstTableAlias}.` + _.reduce(common.fields, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.firstQuery.firstTableAlias}.${value} `);
 					secondQuery.select +=  common.fields.join(', ');
 				} else {
-					firstQuery = firstQuery.slice(0, -1);
-					secondQuery = secondQuery.slice(0, -1);
+					firstQuery.select = firstQuery.select.slice(0, -1);
+					secondQuery.select = secondQuery.select.slice(0, -1);
 				}
 				return true;
-			});
+			// });
 		},
 		from: () => {
 			common.level.section
-			? firstQuery.from += ` ${schema.firstQuery.secondTable} ${schema.firstQuery.secondTableAlias} `
+			? firstQuery.from += ` ,${schema.firstQuery.secondTable} ${schema.firstQuery.secondTableAlias} `
 			: null;
 			return Promise.resolve();
 		},
 		where: (data) => {
-			let from = data.from ? (date.from).format('YYYY-MM-DD') : moment().subtract(7, days).format('YYYY-MM-DD');
-			let to = data.to ? (data.to).format('YYYY-MM-DD') : moment().subtract(1, days).format('YYYY-MM-DD');
+			return queryHelper.resetVariables()
+			.then(() => {
+				let from = data.from ? moment(data.from).format('YYYY-MM-DD') : moment().subtract(7, days).format('YYYY-MM-DD');
+				let to = data.to ? moment(data.to).format('YYYY-MM-DD') : moment().subtract(1, days).format('YYYY-MM-DD');
 
-			firstQuery.where += ` ${schema.schema.firstQuery.firstTableAlias}.${queryHelper.generateDate(from, to)} `;
-			secondQuery.where += ` ${queryHelper.generateDate(from, to)} `;
+				firstQuery.where += ` ${schema.firstQuery.firstTableAlias}.${queryHelper.generateDate(from, to)} `;
+				secondQuery.where += ` ${queryHelper.generateDate(from, to)} `;
 
-			delete date.from;
-			delete data.to;
+				delete data.from;
+				delete data.to;
 
-			return setFirstQueryLevel(data)
+				return queryHelper.setLevel(data);
+			})
 			.then(() => {
 				_.forEach(data, (value, key) => {
-					firstQuery.where += ` ,${schema.schema.firstQuery.firstTableAlias}.${key}=@__${key}__ `;
-					secondQuery.where += ` ,${key}=@__${key}__ `;
+					firstQuery.where += ` and ${schema.firstQuery.firstTableAlias}.${key}=@__${key}__ `;
+					secondQuery.where += ` and ${key}=@__${key}__ `;
 				});
 
 				common.level.section
-				? firstQuery.where += ` ,${schema.schema.firstQuery.firstTableAlias}.axhsrid=${schema.firstQuery.secondTableAlias}.axhsrid `
+				? firstQuery.where += ` and ${schema.firstQuery.firstTableAlias}.axhsrid=${schema.firstQuery.secondTableAlias}.axhsrid `
 				: null;
 
 				return true;
 			});
 		},
-		__groupBy: (data) => {
-			firstQuery.groupBy += ` ${schema.firstQuery.firstTableAlias}.` + _.reduce(firstQuery.aggregate, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.firstQuery.firstTableAlias}.${value} `);
-			secondQuery.groupBy += secondQuery.aggregate.join(', ');
+		__groupBy: () => {
+			firstQuery.groupBy += ` ${schema.firstQuery.firstTableAlias}.` + _.reduce(firstQuery.nonAggregate, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.firstQuery.firstTableAlias}.${value} `);
+			secondQuery.groupBy += secondQuery.nonAggregate.join(', ');
 
 			if (common.level.section || common.level.variation || common.level.pagegroup) {
-				firstQuery.groupBy += ` ${schema.firstQuery.firstTableAlias}.` + _.reduce(common.fields, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.firstQuery.firstTableAlias}.${value} `);
-				secondQuery.groupBy += common.fields.join(', ');
+				firstQuery.groupBy += ` ,${schema.firstQuery.firstTableAlias}.` + _.reduce(common.fields, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.firstQuery.firstTableAlias}.${value} `);
+				secondQuery.groupBy += ` ,${common.fields.join(', ')}`;
 			}
 
 			return Promise.resolve();
@@ -141,24 +145,24 @@ var Promise = require('bluebird'),
 				response += ` ${schema.firstQuery.alias}.` + _.reduce(firstQuery.aggregate, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.firstQuery.alias}.${value} `);
 			}
 			if (firstQuery.nonAggregate) {
-				response += ` ${schema.firstQuery.alias}.` + _.reduce(firstQuery.nonAggregate, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.firstQuery.alias}.${value} `);
+				response += ` ,${schema.firstQuery.alias}.` + _.reduce(firstQuery.nonAggregate, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.firstQuery.alias}.${value} `);
 			}
 			if (secondQuery.aggregate) {
-				response += ` ${schema.secondQuery.alias}.` + _.reduce(secondQuery.aggregate, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.secondQuery.alias}.${value} `);
+				response += ` ,${schema.secondQuery.alias}.` + _.reduce(secondQuery.aggregate, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.secondQuery.alias}.${value} `);
 			}
 			if (secondQuery.nonAggregate) {
 				let disjointFields = _.difference(secondQuery.nonAggregate, firstQuery.nonAggregate);
 				if (disjointFields.length) {
-					response += ` ${schema.secondQuery.alias}.` + _.reduce(disjointFields, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.secondQuery.alias}.${value} `);
+					response += ` ,${schema.secondQuery.alias}.` + _.reduce(disjointFields, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.secondQuery.alias}.${value} `);
 				}
 			}
 			return response;
 		},
 		generateCompleteQuery: () => {
-			return __checkParamsPresent()
+			return queryHelper.__checkParamsPresent()
 			.then(() => {
 				// SELECT
-				common.query += __generateMainSelect();
+				common.query += queryHelper.__generateMainSelect();
 
 				// First Query
 				common.query += " FROM ( ";
@@ -190,3 +194,5 @@ var Promise = require('bluebird'),
 			});
 		}
 	}
+
+module.exports = queryHelper;

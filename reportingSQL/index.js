@@ -1,6 +1,6 @@
 const Promise = require('bluebird'),
 	_ = require('lodash'),
-	queryHelper = require('queryHelper');
+	queryHelper = require('./queryHelper');
 
 function checkParameters(data) {
 	if (
@@ -27,17 +27,19 @@ function whereWrapper(data) {
 	// .then(response => {
 	// 	console.log(response);
 	// });
-	return queryHelper.where({
-		axpgid: 1,
-		axvid: 2,
-		axsod: 3
-	});
+	return queryHelper.where(data);
+	// return queryHelper.where({
+	// 	axpgid: 1,
+	// 	axvid: 2,
+	// 	axsod: 3
+	// });
 }
 
 function queryBuilder(data) {
-	return queryHelper.select(data.select)
-	.then(() => whereWrapper(data.where))
-	.then(() => queryHelper.groupBy(data.groupBy))
+	return whereWrapper(data.where)
+	.then(() => queryHelper.select(data.select))
+	.then(() => queryHelper.from())
+	.then(() => queryHelper.__groupBy(data.groupBy))
 	.then(() => queryHelper.generateCompleteQuery())
 }
 
@@ -49,4 +51,13 @@ function init(data) {
 	});
 }
 
-init();
+init({
+	select: ['report_date', 'siteid', 'total_impressions', 'total_xpath_miss', 'total_cpm'],
+	where: {
+		from: '2017-03-03',
+		to: '2017-03-05',
+		axpgid: 'DESKTOP',
+		axvid: '1',
+		axsid: '2'
+	}
+});
