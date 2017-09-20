@@ -10,7 +10,7 @@ module.exports = [{
 	},
 	output: {
 		path: path.join(__dirname, buildPath),
-		filename: '[name]-debug.js',
+		filename: '[name].js',
 		publicPath: '/'
 	},
 	eslint: {
@@ -26,7 +26,7 @@ module.exports = [{
 	},
 	output: {
 		path: path.join(__dirname, buildPath),
-		filename: '[name].js',
+		filename: '[name].min.js',
 		publicPath: '/'
 	},
 	eslint: {
