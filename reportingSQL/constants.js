@@ -25,7 +25,7 @@ const section_level_query = `
 			c.siteid,
 			c.axvid,
 			c.axpgid,
-			d.axsid,
+			c.axsid,
 			SUM(d.total_impressions) AS total_impressions,
 			SUM(d.total_xpath_miss) AS total_xpath_miss
 		FROM
@@ -42,7 +42,7 @@ const section_level_query = `
 			c.siteid,
 			c.axvid,
 			c.axpgid,
-			d.axsid
+			c.axsid
 	) a
 	INNER JOIN (
 		SELECT
@@ -238,10 +238,10 @@ const site_level_query = `
 `;
 
 const schema = {
+	commonFields: ['axpgid', 'axvid', 'axsid'],
 	firstQuery: {
 		aggregate: ['total_impressions', 'total_xpath_miss'],
 		nonAggregate: ['report_date', 'siteid', 'device_type'],
-		complusion: ['axvid', 'axpgid', 'axsid'],
 		firstTable: "ApexHourlySiteReport",
 		secondTable: "ApexSectionReport",
 		firstTableAlias: "c",
@@ -251,7 +251,6 @@ const schema = {
 	secondQuery: {
 		aggregate: ['total_cpm'],
 		nonAggregate: ['report_date', 'siteid'],
-		complusion: ['axvid', 'axpgid', 'axsid'],
 		table: "AdpTagReport",
 		alias: "b"
 	}
