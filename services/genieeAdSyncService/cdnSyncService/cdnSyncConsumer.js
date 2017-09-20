@@ -20,8 +20,8 @@ module.exports = function(site) {
 			siteId: site.get('siteId')
 		},
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
-		jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.js'),
-		adpTagsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adptags.js'),
+		jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.min.js'),
+		adpTagsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adptags.min.js'),
 		uncompressedJsTplPath = path.join(
 			__dirname,
 			'..',
@@ -31,7 +31,7 @@ module.exports = function(site) {
 			'assets',
 			'js',
 			'builds',
-			'adpushup-debug.js'
+			'adpushup.js'
 		),
 		tempDestPath = path.join(
 			__dirname,
