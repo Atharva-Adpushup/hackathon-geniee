@@ -36,8 +36,10 @@ class InlineEdit extends React.Component {
 	}
 
 	triggerEdit() {
-		this.props.editClickHandler ? this.props.editClickHandler() : null;
+		console.log("here");
+		// this.props.editClickHandler ? this.props.editClickHandler() : null;
 		this.setState({ editMode: true });
+		console.log(this.state);
 		(this.props.dropdownList && this.props.dropdownList.length) ? this.showDropdown() : null;
 	}
 

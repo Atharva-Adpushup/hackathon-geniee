@@ -61,25 +61,27 @@ const renderDropdownList = that => {
 			<div className={rootClassNames}>
 				{
 					that.state.editMode ? (
-						<Row style={{ margin: 0 }}>
-							<Col className="u-padding-r10px" xs={colCompact} style={{ position: 'relative' }}>
-								<input style={inlineInputStyles} type={inputType} ref="editedText"
-									placeholder={that.props.text}
-									defaultValue={adCodeCheck}
-									onKeyUp={that.props.keyUpHandler ? that.keyUp.bind(that) : () => { } }
-									onFocus={that.props.changeHandler ? that.changeValue.bind(that) : () => { } }
-									onChange={that.props.changeHandler ? that.changeValue.bind(that) : () => { } } />
+						<div>
+							<Row style={{ margin: 0 }}>
+								<Col className="u-padding-r10px" xs={colCompact} style={{ position: 'relative' }}>
+									<input style={inlineInputStyles} type={inputType} ref="editedText"
+										placeholder={that.props.text}
+										defaultValue={adCodeCheck}
+										onKeyUp={that.props.keyUpHandler ? that.keyUp.bind(that) : () => { } }
+										onFocus={that.props.changeHandler ? that.changeValue.bind(that) : () => { } }
+										onChange={that.props.changeHandler ? that.changeValue.bind(that) : () => { } } />
+									{
+										that.state.showDropdownList ? (
+											that.renderDropdownList()
+										) : null
+									}
+									<span className="error-message">{that.state.inputError ? (that.props.validationError ? that.props.validationError : that.props.errorMessage) : ''}</span>
+								</Col>
 								{
-									that.state.showDropdownList ? (
-										that.renderDropdownList()
-									) : null
+									that.renderActionButtons()
 								}
-								<span className="error-message">{that.state.inputError ? (that.props.validationError ? that.props.validationError : that.props.errorMessage) : ''}</span>
-							</Col>
-							{
-								that.renderActionButtons()
-							}
-						</Row>
+							</Row>
+						</div>
 					) : (
 							that.renderNormalMode(adCodeStyles, adCodeEdit, rootClassNames)
 						)
