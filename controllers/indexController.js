@@ -248,7 +248,17 @@ function thankYouRedirection(page, req, res) {
 			primarySiteId,
 			primarySiteDomain,
 			primarySiteStep
-		};
+		},
+		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser);
+
+	if (isUserSession) {
+		// Only user sub object is deleted, not the entire session object.
+		// This is done to ensure session object is maintained and consist of
+		// user primary site details that are used on open routes pages
+		// such as '/tools' and '/thank-you' pages
+		delete req.session.user;
+	}
+
 	return res.render(page, {
 		user: userObj,
 		analytics: analyticsObj,
@@ -329,13 +339,6 @@ router
 	})
 	.get('/thank-you', function (req, res) { // this is for users who are less than <2500 USD
 		thankYouRedirection('thank-you', req, res);
-		if (req.session && !req.session.isSuperUser) {
-			// Only user sub object is deleted, not the entire session object.
-			// This is done to ensure session object is maintained and consist of
-			// user primary site details that are used on open routes pages
-			// such as '/tools' and '/thank-you' pages
-			delete req.session.user;
-		}
 	})
 	.post('/forgotPassword', function (req, res) {
 		userModel.forgotPassword(req.body).then(function () {
@@ -399,9 +402,6 @@ router
 	})
 	.get('/thankyou', function (req, res) { // this is for users who are above >10000 USD
 		thankYouRedirection('thankyou', req, res);
-		if (req.session && !req.session.isSuperUser) {
-			delete req.session.user;
-		}
 	})
 	.post('/thankyou', function (req, res) {
 		// Made thankyou POST fail safe
