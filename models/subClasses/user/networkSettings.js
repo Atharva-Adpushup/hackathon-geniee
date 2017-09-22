@@ -6,7 +6,16 @@ var model = require('../../../helpers/model'),
 		this.mergeExtraKeys = true;
 		this.mergingKey = 'networkName';
 
-		this.keys = ['networkName', 'refreshToken', 'expiresIn', 'accessToken', 'adsenseEmail', 'userInfo', 'adsenseAccounts', 'pubId'];
+		this.keys = [
+			'networkName',
+			'refreshToken',
+			'expiresIn',
+			'accessToken',
+			'adsenseEmail',
+			'userInfo',
+			'adsenseAccounts',
+			'pubId'
+		];
 		this.defaults = {
 			adsenseAccounts: [],
 			isInMcm: false,
@@ -18,4 +27,3 @@ var model = require('../../../helpers/model'),
 	});
 
 module.exports = NetworkSettings;
-

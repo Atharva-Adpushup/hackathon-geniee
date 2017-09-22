@@ -3,20 +3,21 @@ var couchbase = require('../../helpers/couchBaseService'),
 	Promise = require('bluebird'),
 	API = {
 		getAutoAnalysisPageGroupsForSite: function(siteId) {
-			var query = ViewQuery.from('ops', 'autoAnalysisPageGroups').range([siteId, null, null], [siteId, [], []], true).group(2);
+			var query = ViewQuery.from('ops', 'autoAnalysisPageGroups')
+				.range([siteId, null, null], [siteId, [], []], true)
+				.group(2);
 			delete query.options.group;
 
-			return couchbase.connectToAppBucket()
-				.then(function(appBucket) {
-					return new Promise(function(resolve, reject) {
-						appBucket.query(query, {}, function(err, result) {
-							if (err) {
-								reject(err);
-							}
-							resolve({ 'response_type': 'good', 'msg': result });
-						});
+			return couchbase.connectToAppBucket().then(function(appBucket) {
+				return new Promise(function(resolve, reject) {
+					appBucket.query(query, {}, function(err, result) {
+						if (err) {
+							reject(err);
+						}
+						resolve({ response_type: 'good', msg: result });
 					});
 				});
+			});
 		}
 	};
 

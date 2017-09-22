@@ -7,28 +7,25 @@ var https = require('https'),
 	zlib = require('zlib'),
 	CC = require('./configs/commonConsts'),
 	Config = require('./configs/config'),
-
 	httpKeepAliveAgent = new http.Agent({ keepAlive: true }),
 	httpsKeepAliveAgent = new https.Agent({ keepAlive: true }),
-
 	app = express(),
 	proxy = httpProxy.createProxyServer({
 		changeOrigin: true
 	}),
-
 	BASE_URL = CC.BASE_URL,
 	PROXY_URL = CC.PROXY_ORIGIN,
-
 	redirectRegex = /^30(1|2|7|8)$/;
 
 function parseCookies(request) {
 	var list = {},
 		rc = request.headers.cookie;
 
-	rc && rc.split(';').forEach(function(cookie) {
-		var parts = cookie.split('=');
-		list[parts.shift().trim()] = decodeURI(parts.join('='));
-	});
+	rc &&
+		rc.split(';').forEach(function(cookie) {
+			var parts = cookie.split('=');
+			list[parts.shift().trim()] = decodeURI(parts.join('='));
+		});
 
 	return list;
 }
@@ -88,16 +85,21 @@ app.use(function(req, res, next) {
 app.get('/loadFromApProxy', function(req, res) {
 	var rawUrl = new Buffer(req.query.url, 'base64').toString(),
 		urlObj = url.parse(rawUrl, true),
-		userAgent, target, baseUrl;
+		userAgent,
+		target,
+		baseUrl;
 	switch (req.query.platform.toLowerCase()) {
 		case 'mobile':
-			userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53';
+			userAgent =
+				'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53';
 			break;
 		case 'tablet':
-			userAgent = 'Mozilla/5.0 (iPad; CPU OS 4_3_5 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8L1 Safari/6533.18.5';
+			userAgent =
+				'Mozilla/5.0 (iPad; CPU OS 4_3_5 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8L1 Safari/6533.18.5';
 			break;
 		default:
-			userAgent = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36';
+			userAgent =
+				'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36';
 	}
 
 	if (urlObj.hostname && urlObj.protocol) {
@@ -139,7 +141,8 @@ function runProxy(req, res, target, baseUrl) {
 		hostname = target.split('://')[1],
 		headers = { 'user-agent': req.headers['user-agent'] },
 		proxyOptions = { target: target, headers: headers },
-		proxyResListener, id = Math.random();
+		proxyResListener,
+		id = Math.random();
 
 	headers.hostname = hostname;
 	headers['Access-Control-Allow-Origin'] = '*';
@@ -162,7 +165,7 @@ function runProxy(req, res, target, baseUrl) {
 					targetCookie,
 					userAgentCookie,
 					baseUrlCookie;
-				if (newUrl.indexOf(req.url) === -1){
+				if (newUrl.indexOf(req.url) === -1) {
 					newUrl = newUrl + req.url;
 				}
 				newUrl = new Buffer(newUrl).toString('base64');
@@ -180,7 +183,7 @@ function runProxy(req, res, target, baseUrl) {
 
 				for (var key in proxyRes.headers) {
 					console.log(key.toLowerCase());
-					if (key.toLowerCase() === 'x-frame-options'){
+					if (key.toLowerCase() === 'x-frame-options') {
 						delete proxyRes.headers[key];
 					}
 				}
@@ -217,7 +220,7 @@ app.listen(5050, function() {
 });
 
 function modifyHtml(req, str) {
-	var isEnvironmentProduction = (Config.development.HOST_ENV === 'production'),
+	var isEnvironmentProduction = Config.development.HOST_ENV === 'production',
 		reactJsStr = isEnvironmentProduction ? 'react-0-13-1.min.js' : 'react.js',
 		innerBuildStr = isEnvironmentProduction ? 'inner-build.min.js' : 'inner-build.js',
 		// head code to be injected at the start of the head

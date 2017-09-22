@@ -3,9 +3,13 @@ var $ = require('jquery'),
 
 module.exports = function() {
 	function getChosenVariation(allVariations) {
-		var isValidModel = false, bandit, banditArm,
-			chosenVariation, armsCollection = [],
-			variationsCollection = {}, variationIdCounter = 0;
+		var isValidModel = false,
+			bandit,
+			banditArm,
+			chosenVariation,
+			armsCollection = [],
+			variationsCollection = {},
+			variationIdCounter = 0;
 
 		// Set model arms and get selected arm if auto optimise is true
 		$.each(allVariations, function(variationId, variationObj) {
@@ -19,9 +23,9 @@ module.exports = function() {
 			variationIdCounter++;
 		});
 
-		bandit = new Bandit({arms: armsCollection});
+		bandit = new Bandit({ arms: armsCollection });
 		banditArm = parseInt(bandit.selectArm(), 10);
-		isValidModel = !!(bandit && (banditArm > -1));
+		isValidModel = !!(bandit && banditArm > -1);
 
 		if (isValidModel) {
 			chosenVariation = $.extend(true, {}, variationsCollection[banditArm.toString()]);

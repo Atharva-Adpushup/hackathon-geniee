@@ -1,7 +1,13 @@
 'use strict';
 var $ = require('jquery'),
 	html = window.document.documentElement,
-	matchFunction = html.matches || html.matchesSelector || html.webkitMatchesSelector || html.mozMatchesSelector || html.msMatchesSelector || html.oMatchesSelector,
+	matchFunction =
+		html.matches ||
+		html.matchesSelector ||
+		html.webkitMatchesSelector ||
+		html.mozMatchesSelector ||
+		html.msMatchesSelector ||
+		html.oMatchesSelector,
 	sequence = 100,
 	isAnimationSupported = false,
 	animationstring = 'animationName',
@@ -35,7 +41,8 @@ if (typeof document.addEventListener === 'function') {
 }
 
 function viaAnimation(selector, timeout, dfd) {
-	var styleAnimation, animationName = 'insQ_' + (sequence++),
+	var styleAnimation,
+		animationName = 'insQ_' + sequence++,
 		eventHandler = function(event) {
 			if (event.animationName === animationName || event[animationstring] === animationName) {
 				if (matchFunction.call(event.target, selector)) {
@@ -46,9 +53,23 @@ function viaAnimation(selector, timeout, dfd) {
 		};
 
 	styleAnimation = document.createElement('style');
-	styleAnimation.innerHTML = '@' + keyframeprefix + 'keyframes ' + animationName + ' {  from {  opacity: 0.99;  } to {  opacity: 1; }  }' +
-		'\n' + selector + ' { animation-duration: 0.001s; animation-name: ' + animationName + '; ' +
-		keyframeprefix + 'animation-duration: 0.001s; ' + keyframeprefix + 'animation-name: ' + animationName + '; ' +
+	styleAnimation.innerHTML =
+		'@' +
+		keyframeprefix +
+		'keyframes ' +
+		animationName +
+		' {  from {  opacity: 0.99;  } to {  opacity: 1; }  }' +
+		'\n' +
+		selector +
+		' { animation-duration: 0.001s; animation-name: ' +
+		animationName +
+		'; ' +
+		keyframeprefix +
+		'animation-duration: 0.001s; ' +
+		keyframeprefix +
+		'animation-name: ' +
+		animationName +
+		'; ' +
 		' } ';
 	document.head.appendChild(styleAnimation);
 
@@ -81,7 +102,11 @@ function viaAnimation(selector, timeout, dfd) {
 }
 
 function viaTimer(selector, timeout, dfd) {
-	var interval, $el = $(selector), intervalTime = 500, attempt = 1, maxAttempts = (timeout || 10000) / intervalTime;
+	var interval,
+		$el = $(selector),
+		intervalTime = 500,
+		attempt = 1,
+		maxAttempts = (timeout || 10000) / intervalTime;
 	if ($el.length) {
 		dfd.resolve($el, 1);
 	} else {

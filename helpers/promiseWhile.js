@@ -14,7 +14,10 @@ function promiseWhile(condition, action, errorHandler) {
 	// default errorhandler terminates on first error
 	if (typeof errorHandler === 'undefined') {
 		// eslint-disable-next-line no-param-reassign
-		errorHandler = function() { console.log('errorHandler'); return false; };
+		errorHandler = function() {
+			console.log('errorHandler');
+			return false;
+		};
 	}
 
 	var promiseCondition;
@@ -30,12 +33,14 @@ function promiseWhile(condition, action, errorHandler) {
 				if (!shouldContinue) {
 					return resolve();
 				}
-				return action().then(loop).catch(function() {
-					if (errorHandler.apply(this, arguments)) {
-						return loop();
-					}
-					return reject(arguments);
-				});
+				return action()
+					.then(loop)
+					.catch(function() {
+						if (errorHandler.apply(this, arguments)) {
+							return loop();
+						}
+						return reject(arguments);
+					});
 			});
 		};
 		// first time

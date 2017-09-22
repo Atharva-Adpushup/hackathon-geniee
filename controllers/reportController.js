@@ -36,21 +36,30 @@ router
 	// 	});
 	// })
 	.get('/performance', function(req, res) {
-		var	siteId = req.params.siteId,
+		var siteId = req.params.siteId,
 			paramConfig = {
 				siteId: siteId,
-				dateFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
-				dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
+				dateFrom: moment()
+					.subtract(7, 'days')
+					.format('YYYY-MM-DD'),
+				dateTo: moment()
+					.subtract(1, 'days')
+					.format('YYYY-MM-DD')
 			},
 			siteDomainName,
 			isQueryObject = !!(req.query && lodash.isObject(req.query) && lodash.keys(req.query).length),
-			isLocaleCodeQueryParameter = !!(isQueryObject && req.query.localeCode && lodash.isString(req.query.localeCode)),
+			isLocaleCodeQueryParameter = !!(
+				isQueryObject &&
+				req.query.localeCode &&
+				lodash.isString(req.query.localeCode)
+			),
 			localeCodeQueryParameter = isLocaleCodeQueryParameter ? utils.sanitiseString(req.query.localeCode) : false,
 			filterDates = genieeFilterDates.getFilterDates(),
-			localeCode = (localeCodeQueryParameter || utils.getLanguageLocale(languageMapping, req.locale)),
-			isLocaleCode = !!(localeCode),
-			isLocaleCodeSupported = !!(isLocaleCode && (languageCodeSupport.indexOf(localeCode) > -1)),
-			localeData, uiConstants;
+			localeCode = localeCodeQueryParameter || utils.getLanguageLocale(languageMapping, req.locale),
+			isLocaleCode = !!localeCode,
+			isLocaleCodeSupported = !!(isLocaleCode && languageCodeSupport.indexOf(localeCode) > -1),
+			localeData,
+			uiConstants;
 
 		localeCode = isLocaleCodeSupported ? localeCode : defaultLanguageCode;
 		localeData = reportsLocalizedObject[localeCode];
@@ -79,82 +88,92 @@ router
 		fileLogger.info('/*****Geniee Reports: Performance request*****/');
 		fileLogger.info(`Locale supported: ${localeCode}`);
 
-		return siteModel.getSiteById(paramConfig.siteId)
-			.then(function(site) {
-				siteDomainName = utils.domanize(site.get('siteDomain'));
-				// paramConfig.mediaId = 920;
-				paramConfig.mediaId = site.get('genieeMediaId');
+		return siteModel.getSiteById(paramConfig.siteId).then(function(site) {
+			siteDomainName = utils.domanize(site.get('siteDomain'));
+			// paramConfig.mediaId = 920;
+			paramConfig.mediaId = site.get('genieeMediaId');
 
-				return genieeService.getReport(paramConfig)
-					.then(function(data) {
-						return res.render('performanceReport', {
-							reportingData: data,
-							siteId,
-							siteDomain: siteDomainName,
-							paramConfig,
-							filterDates,
-							localeData,
-							localeCode,
-							uiConstants
-						});
-					})
-					.catch(function(err) {
-						console.log(`Performance Report error: ${err.toString()}`);
-						var textConfig = {
-							"error": localeData.ERROR.REPORT_EXCEPTION,
-							"emptyData": localeData.ERROR.REPORT_DATA_NOT_AVAILABLE
-						}, errorText;
-
-						if (err instanceof AdPushupError) {
-							errorText = textConfig.emptyData;
-						} else {
-							errorText = textConfig.error;
-						}
-
-						return res.render('performanceReport', {
-							siteId,
-							errorText,
-							siteDomain: siteDomainName,
-							paramConfig,
-							filterDates,
-							localeData,
-							localeCode,
-							uiConstants
-						});
+			return genieeService
+				.getReport(paramConfig)
+				.then(function(data) {
+					return res.render('performanceReport', {
+						reportingData: data,
+						siteId,
+						siteDomain: siteDomainName,
+						paramConfig,
+						filterDates,
+						localeData,
+						localeCode,
+						uiConstants
 					});
-			});
+				})
+				.catch(function(err) {
+					console.log(`Performance Report error: ${err.toString()}`);
+					var textConfig = {
+							error: localeData.ERROR.REPORT_EXCEPTION,
+							emptyData: localeData.ERROR.REPORT_DATA_NOT_AVAILABLE
+						},
+						errorText;
+
+					if (err instanceof AdPushupError) {
+						errorText = textConfig.emptyData;
+					} else {
+						errorText = textConfig.error;
+					}
+
+					return res.render('performanceReport', {
+						siteId,
+						errorText,
+						siteDomain: siteDomainName,
+						paramConfig,
+						filterDates,
+						localeData,
+						localeCode,
+						uiConstants
+					});
+				});
+		});
 	})
 	.get('/getPerformanceData', function(req, res) {
-		var	paramConfig = {
-			siteId: req.params.siteId,
-			dateFrom: ((req.query && req.query.dateFrom) || moment().subtract(7, 'days').format('YYYY-MM-DD')),
-			dateTo: ((req.query && req.query.dateTo) || moment().subtract(1, 'days').format('YYYY-MM-DD'))
-		},
-		localeCode = (req.query.languageCode || req.query.localeCode) || utils.getLanguageLocale(languageMapping, req.locale),
-		isLocaleCode = !!(localeCode),
-		isLocaleCodeSupported = !!(isLocaleCode && (languageCodeSupport.indexOf(localeCode) > -1));
+		var paramConfig = {
+				siteId: req.params.siteId,
+				dateFrom:
+					(req.query && req.query.dateFrom) ||
+					moment()
+						.subtract(7, 'days')
+						.format('YYYY-MM-DD'),
+				dateTo:
+					(req.query && req.query.dateTo) ||
+					moment()
+						.subtract(1, 'days')
+						.format('YYYY-MM-DD')
+			},
+			localeCode =
+				req.query.languageCode || req.query.localeCode || utils.getLanguageLocale(languageMapping, req.locale),
+			isLocaleCode = !!localeCode,
+			isLocaleCodeSupported = !!(isLocaleCode && languageCodeSupport.indexOf(localeCode) > -1);
 
 		localeCode = isLocaleCodeSupported ? localeCode : defaultLanguageCode;
 		paramConfig.localeCode = localeCode;
 
-		return siteModel.getSiteById(paramConfig.siteId)
-			.then(function(site) {
-				paramConfig.mediaId = site.get('genieeMediaId');
+		return siteModel.getSiteById(paramConfig.siteId).then(function(site) {
+			paramConfig.mediaId = site.get('genieeMediaId');
 
-				return genieeService.getReport(paramConfig)
-					.then(function(reportData) {
-						return res.json({
-							success: 1,
-							data: reportData
-						});
-					})
-					.catch(function(err) {
-						return res.json({
-							success: 0,
-							error: err
-						});
+			return genieeService
+				.getReport(paramConfig)
+				.then(function(reportData) {
+					return res.json({
+						success: 1,
+						data: reportData
 					});
-			});
+				})
+				.catch(function(err) {
+					return res.json({
+						success: 0,
+						error: err
+					});
+				});
+		});
 	})
 	.get('/adsense', function(req, res) {
 		var getUser = userModel.getUserByEmail(req.session.user.email),
@@ -172,8 +191,11 @@ router
 		// Get queried domain info by matching that particular site domain
 		// against all AdSense domains
 		function getQueryDomain(siteId, domains) {
-			if (!siteId) { return null;}
-			var domainIndex = -1, domainValue;
+			if (!siteId) {
+				return null;
+			}
+			var domainIndex = -1,
+				domainValue;
 
 			return siteModel.getSiteById(siteId).then(function(site) {
 				var queryDomain = utils.domanize(site.get('siteDomain'));
@@ -185,11 +207,17 @@ router
 					}
 				});
 
-				return ((domainIndex !== -1) && domainValue) ? [domainIndex, domainValue] : null;
+				return domainIndex !== -1 && domainValue ? [domainIndex, domainValue] : null;
 			});
 		}
 
-		Promise.join(getUser, getNetworkData, getAdsense, getAdsenseDomains, getQueryDomainInfo, function(user, networkData, adsense, adsenseDomains, domainInfo) {
+		Promise.join(getUser, getNetworkData, getAdsense, getAdsenseDomains, getQueryDomainInfo, function(
+			user,
+			networkData,
+			adsense,
+			adsenseDomains,
+			domainInfo
+		) {
 			if (!networkData) {
 				throw new AdPushupError('Adsense account not connected');
 			}
@@ -198,8 +226,12 @@ router
 				sites: JSON.stringify(adsenseDomains.rows),
 				pubId: networkData.pubId,
 				isSuperUser: req.session.isSuperUser,
-				startDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
-				endDate: moment().subtract(1, 'days').format('YYYY-MM-DD')
+				startDate: moment()
+					.subtract(7, 'days')
+					.format('YYYY-MM-DD'),
+				endDate: moment()
+					.subtract(1, 'days')
+					.format('YYYY-MM-DD')
 			};
 
 			if (domainInfo && Array.isArray(domainInfo)) {
@@ -234,8 +266,12 @@ router
 			paramConfig = {
 				siteId: req.query.siteId,
 				isSuperUser: req.session.isSuperUser,
-				startDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
-				endDate: moment().subtract(1, 'days').format('YYYY-MM-DD')
+				startDate: moment()
+					.subtract(7, 'days')
+					.format('YYYY-MM-DD'),
+				endDate: moment()
+					.subtract(1, 'days')
+					.format('YYYY-MM-DD')
 			};
 
 		/**
@@ -244,15 +280,14 @@ router
 		 * @returns {array} site domain list
 		 */
 		function getAllUserDomains(user) {
-			return Promise.resolve(user.get('sites'))
-				.then(function(sitesArr) {
-					if (sitesArr.length > 0) {
-						return sitesArr.map(function(val) {
-							return val.domain;
-						});
-					}
-					return [];
-				});
+			return Promise.resolve(user.get('sites')).then(function(sitesArr) {
+				if (sitesArr.length > 0) {
+					return sitesArr.map(function(val) {
+						return val.domain;
+					});
+				}
+				return [];
+			});
 		}
 
 		/**
@@ -297,13 +332,27 @@ router
 		 * @returns {html} Render adxReport jade page
 		 */
 		function showAdxReportWithAdSenseDomainFilter() {
-			return Promise.join(getUser, getNetworkData, getAdsense, getAdsenseDomains, getAdxDomains, function(user, networkData, adsense, adsenseDomains, adxDomains) {
-				if (!networkData) {throw new AdPushupError('Adsense account not connected');}
-				adsenseDomains = adsenseDomains.rows && Array.isArray(adsenseDomains.rows) ? adsenseDomains.rows.map(function(val) { return utils.domanize(val[0]); }) : [];
+			return Promise.join(getUser, getNetworkData, getAdsense, getAdsenseDomains, getAdxDomains, function(
+				user,
+				networkData,
+				adsense,
+				adsenseDomains,
+				adxDomains
+			) {
+				if (!networkData) {
+					throw new AdPushupError('Adsense account not connected');
+				}
+				adsenseDomains =
+					adsenseDomains.rows && Array.isArray(adsenseDomains.rows)
+						? adsenseDomains.rows.map(function(val) {
+								return utils.domanize(val[0]);
+							})
+						: [];
 
 				var validSiteDomains = getValidDomains(adsenseDomains, adxDomains);
 
-				paramConfig.sites = validSiteDomains && validSiteDomains.length ? JSON.stringify(validSiteDomains) : null;
+				paramConfig.sites =
+					validSiteDomains && validSiteDomains.length ? JSON.stringify(validSiteDomains) : null;
 				return res.render('adxReports', paramConfig);
 			}).catch(function(err) {
 				if (err instanceof AdPushupError) {
@@ -326,7 +375,8 @@ router
 			return Promise.join(getUser, getUserDomains, getAdxDomains, function(user, userDomains, adxDomains) {
 				var validSiteDomains = getValidDomains(userDomains, adxDomains);
 
-				paramConfig.sites = validSiteDomains && validSiteDomains.length ? JSON.stringify(validSiteDomains) : null;
+				paramConfig.sites =
+					validSiteDomains && validSiteDomains.length ? JSON.stringify(validSiteDomains) : null;
 				return res.render('adxReports', paramConfig);
 			}).catch(function(e) {
 				res.render('adxReports', {
@@ -343,8 +393,12 @@ router
 			paramConfig = {
 				siteId: req.query.siteId,
 				isSuperUser: req.session.isSuperUser,
-				startDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
-				endDate: moment().subtract(1, 'days').format('YYYY-MM-DD')
+				startDate: moment()
+					.subtract(7, 'days')
+					.format('YYYY-MM-DD'),
+				endDate: moment()
+					.subtract(1, 'days')
+					.format('YYYY-MM-DD')
 			};
 
 		/**
@@ -357,11 +411,12 @@ router
 
 			if (allSites && allSites.length && Array.isArray(allSites)) {
 				filteredDomains = allSites.map(function(siteObj) {
-					return siteModel.getSiteById(siteObj.siteId)
+					return siteModel
+						.getSiteById(siteObj.siteId)
 						.then(function(site) {
 							return {
-								'domain': site.get('siteDomain'),
-								'siteId': site.get('siteId')
+								domain: site.get('siteDomain'),
+								siteId: site.get('siteId')
 							};
 						})
 						.catch(function() {
@@ -382,8 +437,7 @@ router
 		 * @returns {array} site data list
 		 */
 		function getUserSiteData(user) {
-			return Promise.resolve(user.get('sites'))
-				.then(getFilteredDomains);
+			return Promise.resolve(user.get('sites')).then(getFilteredDomains);
 		}
 
 		/**
@@ -408,16 +462,22 @@ router
 		var currentSiteId = req.query.siteId ? req.query.siteId : '';
 
 		return res.render('adpushupVsControlReports', {
-			'currentSiteId': currentSiteId,
-			'startDate': moment().subtract(7, 'days').format('YYYY-MM-DD'),
-			'endDate': moment().subtract(1, 'days').format('YYYY-MM-DD')
+			currentSiteId: currentSiteId,
+			startDate: moment()
+				.subtract(7, 'days')
+				.format('YYYY-MM-DD'),
+			endDate: moment()
+				.subtract(1, 'days')
+				.format('YYYY-MM-DD')
 		});
 	})
 	.get('/adxData', function(req, res) {
-		adxReportModel.getReport(req.query)
+		adxReportModel
+			.getReport(req.query)
 			.then(function(data) {
 				return res.json({ success: true, data: data });
-			}).catch(function(err) {
+			})
+			.catch(function(err) {
 				return res.json({ success: false, err: err });
 			});
 	})
@@ -427,101 +487,110 @@ router
 			prepareConfig = adsenseReportModel.prepareQuery(req.query);
 
 		Promise.join(getUser, getAdsense, prepareConfig, function(user, adsense, config) {
-			return adsense.getReport(config)
-				.then(function(report) {
-					return res.json({ success: true, data: report });
-				});
+			return adsense.getReport(config).then(function(report) {
+				return res.json({ success: true, data: report });
+			});
 		}).catch(function(err) {
 			next(err);
 		});
 	})
-
 	.get('/apexData', function(req, res, next) {
-		return userModel.verifySiteOwner(req.session.user.email, req.query.siteId).then(function() {
-			const reportConfig = extend(true, {}, req.query),
-				parameterConfig = apexParameterModule.getParameterConfig(reportConfig),
-				apexConfig = extend(true, {}, extend(true, {}, parameterConfig.apex),
-					{ platform: reportConfig.platform, siteDomain: reportConfig.siteDomain, pageGroup: reportConfig.pageGroup}),
-				sqlReportConfig = parameterConfig.sql;
+		return userModel
+			.verifySiteOwner(req.session.user.email, req.query.siteId)
+			.then(function() {
+				const reportConfig = extend(true, {}, req.query),
+					parameterConfig = apexParameterModule.getParameterConfig(reportConfig),
+					apexConfig = extend(true, {}, extend(true, {}, parameterConfig.apex), {
+						platform: reportConfig.platform,
+						siteDomain: reportConfig.siteDomain,
+						pageGroup: reportConfig.pageGroup
+					}),
+					sqlReportConfig = parameterConfig.sql;
 
-			return sqlQueryModule.getMetricsData(sqlReportConfig)
-				.then((sqlReportData) => {
-					return apexCTRReportService.getReportData(apexConfig, sqlReportData)
+				return sqlQueryModule.getMetricsData(sqlReportConfig).then(sqlReportData => {
+					return apexCTRReportService
+						.getReportData(apexConfig, sqlReportData)
 						.spread((reportData, tableFormatData) => res.json(reportData));
 				});
-		}).catch(function(err) {
-			if (err instanceof AdPushupError) {
-				return res.json(err.message);
-			}
-			next(err);
-		});
+			})
+			.catch(function(err) {
+				if (err instanceof AdPushupError) {
+					return res.json(err.message);
+				}
+				next(err);
+			});
 	})
-
 	.get('/controlVsAdpushupCtrData', function(req, res, next) {
-		return userModel.verifySiteOwner(req.session.user.email, req.query.siteId).then(function() {
-			// cleaning config
-			var config = req.query;
-			config.siteId = parseInt(config.siteId, 10);
-			config.platform = (config.platform) ? config.platform.substring(0, 7) : null;
-			config.pageGroup = (config.pageGroup) ? config.pageGroup.substring(0, 30) : null;
-			config.step = (config.step) ? config.step.substring(0, 10) : null;
-			config.startDate = (config.startDate) ? parseInt(config.startDate, 10) : 1448928000000;
-			config.endDate = (config.endDate) ? parseInt(config.endDate, 10) : Date.now();
+		return userModel
+			.verifySiteOwner(req.session.user.email, req.query.siteId)
+			.then(function() {
+				// cleaning config
+				var config = req.query;
+				config.siteId = parseInt(config.siteId, 10);
+				config.platform = config.platform ? config.platform.substring(0, 7) : null;
+				config.pageGroup = config.pageGroup ? config.pageGroup.substring(0, 30) : null;
+				config.step = config.step ? config.step.substring(0, 10) : null;
+				config.startDate = config.startDate ? parseInt(config.startDate, 10) : 1448928000000;
+				config.endDate = config.endDate ? parseInt(config.endDate, 10) : Date.now();
 
-			return Promise.resolve(reports.controlVsAdpushupCtrReport(config)).then(function(report) {
-				return res.json(report);
+				return Promise.resolve(reports.controlVsAdpushupCtrReport(config)).then(function(report) {
+					return res.json(report);
+				});
+			})
+			.catch(function(err) {
+				if (err instanceof AdPushupError) {
+					return res.json(err.message);
+				}
+				next(err);
 			});
-		}).catch(function(err) {
-			if (err instanceof AdPushupError) {
-				return res.json(err.message);
-			}
-			next(err);
-		});
 	})
-
 	.get('/controlVsAdpushupPageviewsData', function(req, res, next) {
-		return userModel.verifySiteOwner(req.session.user.email, req.query.siteId).then(function() {
-			// cleaning config
-			var config = req.query;
-			config.siteId = parseInt(config.siteId, 10);
-			config.platform = (config.platform) ? config.platform.substring(0, 7) : null;
-			config.pageGroup = (config.pageGroup) ? config.pageGroup.substring(0, 30) : null;
-			config.step = (config.step) ? config.step.substring(0, 10) : null;
-			config.startDate = (config.startDate) ? parseInt(config.startDate, 10) : 1448928000000;
-			config.endDate = (config.endDate) ? parseInt(config.endDate, 10) : Date.now();
+		return userModel
+			.verifySiteOwner(req.session.user.email, req.query.siteId)
+			.then(function() {
+				// cleaning config
+				var config = req.query;
+				config.siteId = parseInt(config.siteId, 10);
+				config.platform = config.platform ? config.platform.substring(0, 7) : null;
+				config.pageGroup = config.pageGroup ? config.pageGroup.substring(0, 30) : null;
+				config.step = config.step ? config.step.substring(0, 10) : null;
+				config.startDate = config.startDate ? parseInt(config.startDate, 10) : 1448928000000;
+				config.endDate = config.endDate ? parseInt(config.endDate, 10) : Date.now();
 
-			return Promise.resolve(reports.controlVsAdpushupPageviewsReport(config)).then(function(report) {
-				return res.json(report);
+				return Promise.resolve(reports.controlVsAdpushupPageviewsReport(config)).then(function(report) {
+					return res.json(report);
+				});
+			})
+			.catch(function(err) {
+				if (err instanceof AdPushupError) {
+					return res.json(err.message);
+				}
+				next(err);
 			});
-		}).catch(function(err) {
-			if (err instanceof AdPushupError) {
-				return res.json(err.message);
-			}
-			next(err);
-		});
 	})
-
 	.get('/editorStatsData', function(req, res, next) {
-		return userModel.verifySiteOwner(req.session.user.email, req.query.siteId).then(function() {
-			// cleaning config
-			var config = req.query;
-			config.siteId = parseInt(config.siteId, 10);
-			config.platform = (config.platform) ? config.platform.substring(0, 7) : null;
-			config.pageGroup = (config.pageGroup) ? config.pageGroup.substring(0, 30) : null;
-			config.startDate = (config.startDate) ? parseInt(config.startDate, 10) : 1448928000000;
-			config.endDate = (config.endDate) ? parseInt(config.endDate, 10) : Date.now();
+		return userModel
+			.verifySiteOwner(req.session.user.email, req.query.siteId)
+			.then(function() {
+				// cleaning config
+				var config = req.query;
+				config.siteId = parseInt(config.siteId, 10);
+				config.platform = config.platform ? config.platform.substring(0, 7) : null;
+				config.pageGroup = config.pageGroup ? config.pageGroup.substring(0, 30) : null;
+				config.startDate = config.startDate ? parseInt(config.startDate, 10) : 1448928000000;
+				config.endDate = config.endDate ? parseInt(config.endDate, 10) : Date.now();
 
-			return Promise.resolve(reports.editorStatsReport(config)).then(function(report) {
-				return res.json(report);
+				return Promise.resolve(reports.editorStatsReport(config)).then(function(report) {
+					return res.json(report);
+				});
+			})
+			.catch(function(err) {
+				if (err instanceof AdPushupError) {
+					return res.json(err.message);
+				}
+				next(err);
 			});
-		}).catch(function(err) {
-			if (err instanceof AdPushupError) {
-				return res.json(err.message);
-			}
-			next(err);
-		});
 	})
-
 	.get('/getApexVariationData', function(req, res) {
 		const queryData = req.query,
 			config = {
@@ -532,44 +601,80 @@ router
 				queryString: 'mode:1'
 			};
 
-		return apexVariationReportService.getReportData(config)
-			.then(function(reportData) {
-				return res.json(reportData);
-			});
+		return apexVariationReportService.getReportData(config).then(function(reportData) {
+			return res.json(reportData);
+		});
 	})
-
 	.get('/getUniversalReportData', function(req, res) {
 		var siteId = req.query.siteId,
 			startDate = req.query.startDate,
 			endDate = req.query.endDate;
 
-		return siteModel.getSiteById(siteId)
+		return siteModel
+			.getSiteById(siteId)
 			.then(function(site) {
-				return universalReportService.getReportData(site, startDate, endDate)
-					.then(function(reportData) {
-						return res.json(reportData);
-					});
+				return universalReportService.getReportData(site, startDate, endDate).then(function(reportData) {
+					return res.json(reportData);
+				});
 			})
-			.catch((err) => {
+			.catch(err => {
 				console.log('GetUniversalReportData route:: Error occurred: ', err);
-				return res.json({status: 0, data: 'Some error occurred! Please check app logs to learn more.'});
+				return res.json({ status: 0, data: 'Some error occurred! Please check app logs to learn more.' });
 			});
 	})
-
 	.get('/performESSearch', function(req, res) {
-		var startDate = req.query.startDate ? req.query.startDate : moment().subtract(13, 'hours').valueOf(),
-			endDate = req.query.endDate ? req.query.endDate : moment().subtract(1, 'hours').valueOf(),
+		var startDate = req.query.startDate
+				? req.query.startDate
+				: moment()
+						.subtract(13, 'hours')
+						.valueOf(),
+			endDate = req.query.endDate
+				? req.query.endDate
+				: moment()
+						.subtract(1, 'hours')
+						.valueOf(),
 			config = {
-			indexes: 'ex_stats_new',
-			logName: 'exlg',
-			queryBody: {"query":{"bool":{"filter":[{"bool":{"must":[{"range":{"createdTs":{"gte":startDate,"lte":endDate}}}],"should":[],"must_not":[]}}],"must":{"query_string":{"analyze_wildcard":true,"query":"mode:1 AND variationId:6ae3b7e1_d246_462d_ba48_949051885435 AND pageGroup:POST AND userAnalytics.platform:MOBILE AND siteId:25005"}}}},"aggs":{"PLATFORM":{"terms":{"field":"userAnalytics.platform","size":5,"order":{"_term":"desc"}},"aggs":{"CHOSEN_VARIATION":{"terms":{"field":"variationId","size":2},"aggs":{"ADS_CLICKED":{"terms":{"field":"ads.clicked","size":5}}}}}}}},
-			// queryBody: {"size":0,"query":{"bool":{"must":[{"query_string":{"analyze_wildcard":true,"query":"tracking:true AND mode:1 AND pageGroup:POST AND userAnalytics.platform:DESKTOP AND siteId:25005"}},{"range":{"createdTs":{"gte":startDate,"lte":endDate,"format":"epoch_millis"}}}],"must_not":[]}},"aggs":{"PLATFORM":{"terms":{"field":"userAnalytics.platform","size":5,"order":{"_term":"desc"}},"aggs":{"CHOSEN_VARIATION":{"terms":{"field":"variationId","size":1000,"order":{"_term":"desc"}},"aggs":{"ADS_CLICKED":{"terms":{"field":"ads.clicked","size":5,"order":{"_term":"desc"}}}}}}}}}
-		};
+				indexes: 'ex_stats_new',
+				logName: 'exlg',
+				queryBody: {
+					query: {
+						bool: {
+							filter: [
+								{
+									bool: {
+										must: [{ range: { createdTs: { gte: startDate, lte: endDate } } }],
+										should: [],
+										must_not: []
+									}
+								}
+							],
+							must: {
+								query_string: {
+									analyze_wildcard: true,
+									query:
+										'mode:1 AND variationId:6ae3b7e1_d246_462d_ba48_949051885435 AND pageGroup:POST AND userAnalytics.platform:MOBILE AND siteId:25005'
+								}
+							}
+						}
+					},
+					aggs: {
+						PLATFORM: {
+							terms: { field: 'userAnalytics.platform', size: 5, order: { _term: 'desc' } },
+							aggs: {
+								CHOSEN_VARIATION: {
+									terms: { field: 'variationId', size: 2 },
+									aggs: { ADS_CLICKED: { terms: { field: 'ads.clicked', size: 5 } } }
+								}
+							}
+						}
+					}
+				}
+				// queryBody: {"size":0,"query":{"bool":{"must":[{"query_string":{"analyze_wildcard":true,"query":"tracking:true AND mode:1 AND pageGroup:POST AND userAnalytics.platform:DESKTOP AND siteId:25005"}},{"range":{"createdTs":{"gte":startDate,"lte":endDate,"format":"epoch_millis"}}}],"must_not":[]}},"aggs":{"PLATFORM":{"terms":{"field":"userAnalytics.platform","size":5,"order":{"_term":"desc"}},"aggs":{"CHOSEN_VARIATION":{"terms":{"field":"variationId","size":1000,"order":{"_term":"desc"}},"aggs":{"ADS_CLICKED":{"terms":{"field":"ads.clicked","size":5,"order":{"_term":"desc"}}}}}}}}}
+			};
 
 		return reports.doESSearch(config).then(function(result) {
 			return res.json(result);
 		});
 	});
-
 
 module.exports = router;

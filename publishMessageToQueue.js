@@ -4,7 +4,7 @@ var siteModel = require('./models/siteModel'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
 	N1qlQuery = CouchbasePromises.N1qlQuery,
-	configPublishService = require('./services/apV2SiteConfigPublishService/index'),
+	configPublishService = require('./services/genieeAdSyncService/apV2SiteConfigPublishService/index'),
 	WORKER_CONSTANTS = require('./queueWorker/rabbitMQ/constants/constants'),
 	CONSTANTS = {
 		COUCHBASE: {
@@ -14,41 +14,46 @@ var siteModel = require('./models/siteModel'),
 	};
 
 function init() {
-	var queryString = N1qlQuery.fromString('select siteId from apAppBucket where ARRAY_COUNT(channels) > 0 AND meta().id like "site::3";');
+	var queryString = N1qlQuery.fromString(
+		'select siteId from apAppBucket where ARRAY_COUNT(channels) > 0 AND meta().id like "site::3";'
+	);
 
-	return couchbase.connectToAppBucket()
-		.then(function (appBucket) {
+	return couchbase
+		.connectToAppBucket()
+		.then(function(appBucket) {
 			console.log(CONSTANTS.COUCHBASE.CONNECTION_SUCCESS);
 
 			return appBucket.queryPromise(queryString);
 		})
-		.then(function (liveSitesArray) {
-			var publishAllSitesPromises = lodash.map(liveSitesArray, function (siteObject) {
-					if (!siteObject.siteId) { return false; }
+		.then(function(liveSitesArray) {
+			var publishAllSitesPromises = lodash.map(liveSitesArray, function(siteObject) {
+					if (!siteObject.siteId) {
+						return false;
+					}
 
-					return siteModel.getSiteById(siteObject.siteId)
-						.then(function (model) {
-							if (!model || !model.get('apConfigs')) { return false; }
+					return siteModel.getSiteById(siteObject.siteId).then(function(model) {
+						if (!model || !model.get('apConfigs')) {
+							return false;
+						}
 
-							var paramConfig = {
-                                zones: {},
-                                siteId: 0,
-                                // channelKey: ''
-							};
+						var paramConfig = {
+							zones: {},
+							siteId: 0
+							// channelKey: ''
+						};
 
-							return configPublishService.publish([model], paramConfig);
-						});
+						return configPublishService.publish([model], paramConfig);
+					});
 				}),
 				publishAllSites = Promise.all(publishAllSitesPromises);
 
-			return publishAllSites
-				.then(function () {
-					console.log('LIVE_SITES_PUBLISH: Successful completion!');
+			return publishAllSites.then(function() {
+				console.log('LIVE_SITES_PUBLISH: Successful completion!');
 
-					return true;
-				});
+				return true;
+			});
 		})
-		.catch(function (err) {
+		.catch(function(err) {
 			console.log('Error occurred during sites publication', err);
 		})
 		.finally(process.exit);

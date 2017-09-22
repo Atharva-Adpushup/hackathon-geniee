@@ -31,8 +31,7 @@ function updateAllAutoOptimisedSites() {
 
 		fileLogger.info(successInfo);
 		console.log(successInfo);
-	})
-	.catch(function(e) {
+	}).catch(function(e) {
 		const dateTime = moment().format('LLL'),
 			errorInfo = `Sync process failed: ${e.toString()} at ${dateTime}`;
 

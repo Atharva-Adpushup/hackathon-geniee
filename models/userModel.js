@@ -1,4 +1,4 @@
-var modelAPI = module.exports = apiModule(),
+var modelAPI = (module.exports = apiModule()),
 	model = require('../helpers/model'),
 	couchbase = require('../helpers/couchBaseService'),
 	query = require('couchbase-promises').ViewQuery.from('app', 'sitesByUser'),
@@ -10,6 +10,7 @@ var modelAPI = module.exports = apiModule(),
 	schema = require('../helpers/schema'),
 	_ = require('lodash'),
 	md5 = require('md5'),
+	extend = require('extend'),
 	normalizeurl = require('normalizeurl'),
 	FormValidator = require('../helpers/FormValidator'),
 	AdPushupError = require('../helpers/AdPushupError'),
@@ -21,10 +22,32 @@ var modelAPI = module.exports = apiModule(),
 	pipedriveAPI = require('../misc/vendors/pipedrive'),
 	mailService = require('../services/mailService/index'),
 	User = model.extend(function() {
-		this.keys = ['firstName', 'lastName', 'email', 'salt', 'passwordMd5', 'sites', 'adNetworkSettings', 'createdAt',
-			'passwordResetKey', 'passwordResetKeyCreatedAt', 'requestDemo', 'requestDemoData', 'analytics', 'adNetworks', 
-			'pageviewRange', 'managedBy', 'userType', 'websiteRevenue', 'crmDealId', 'revenueUpperLimit', 'preferredModeOfReach', 
-			'revenueLowerLimit', 'revenueAverage', 'adnetworkCredentials'];
+		this.keys = [
+			'firstName',
+			'lastName',
+			'email',
+			'salt',
+			'passwordMd5',
+			'sites',
+			'adNetworkSettings',
+			'createdAt',
+			'passwordResetKey',
+			'passwordResetKeyCreatedAt',
+			'requestDemo',
+			'requestDemoData',
+			'adNetworks',
+			'pageviewRange',
+			'managedBy',
+			'userType',
+			'websiteRevenue',
+			'crmDealId',
+			'revenueUpperLimit',
+			'preferredModeOfReach',
+			'revenueLowerLimit',
+			'revenueAverage',
+			'adnetworkCredentials',
+			'miscellaneous'
+		];
 		this.validations = schema.user.validations;
 		this.classMap = {
 			adNetworkSettings: networkSettings
@@ -47,11 +70,11 @@ var modelAPI = module.exports = apiModule(),
 		};
 
 		this.getSiteByDomain = function(domain) {
-			return Promise.resolve(_.find(this.get('sites'), { 'domain': domain }));
+			return Promise.resolve(_.find(this.get('sites'), { domain: domain }));
 		};
 
 		this.getSiteById = function(siteId) {
-			return Promise.resolve(_.find(this.get('sites'), { 'siteId': siteId }));
+			return Promise.resolve(_.find(this.get('sites'), { siteId: siteId }));
 		};
 
 		this.addSite = function(domain) {
@@ -64,7 +87,7 @@ var modelAPI = module.exports = apiModule(),
 				}
 				return globalModel.incrSiteIdInApAppBucket().then(function(siteId) {
 					me.get('sites').push({ siteId: siteId, domain: normalizedDomain });
-					return ({ siteId: siteId, domain: normalizedDomain });
+					return { siteId: siteId, domain: normalizedDomain };
 				});
 			});
 		};
@@ -75,7 +98,7 @@ var modelAPI = module.exports = apiModule(),
 
 		this.getNetworkDataObj = function(networkName) {
 			var data = _.find(this.get('adNetworkSettings'), function(networkInfo) {
-				return (networkInfo.networkName === networkName);
+				return networkInfo.networkName === networkName;
 			});
 			if (!data) {
 				return false;
@@ -84,7 +107,8 @@ var modelAPI = module.exports = apiModule(),
 		};
 
 		this.getNetworkDataSync = function(networkName, keys) {
-			var data = this.getNetworkDataObj(networkName), dataPubId;
+			var data = this.getNetworkDataObj(networkName),
+				dataPubId;
 
 			if (!data) {
 				return false;
@@ -111,17 +135,21 @@ var modelAPI = module.exports = apiModule(),
 		this.addNetworkData = function(data) {
 			var me = this;
 			return new Promise(function(resolve) {
-				if (!me.get('adNetworkSettings')) {// some how we don't have this object then create an empty array;
+				if (!me.get('adNetworkSettings')) {
+					// some how we don't have this object then create an empty array;
 					me.set('adNetworkSettings', []);
 				}
 				var adNetworkSettings = me.get('adNetworkSettings');
 				adNetworkSettings.push(data);
 				me.set('adNetworkSettings', adNetworkSettings);
-				return me.save().then(function() {
-					return resolve(me);
-				}).catch(function(err) {
-					throw new AdPushupError(err);
-				});
+				return me
+					.save()
+					.then(function() {
+						return resolve(me);
+					})
+					.catch(function(err) {
+						throw new AdPushupError(err);
+					});
 			});
 		};
 
@@ -135,15 +163,17 @@ var modelAPI = module.exports = apiModule(),
 		});
 
 		this.isMe = function(email, pass) {
-			return this.get('email') === email && this.get('passwordMd5') === md5(this.get('salt') + pass + this.get('salt'));
+			return (
+				this.get('email') === email &&
+				this.get('passwordMd5') === md5(this.get('salt') + pass + this.get('salt'))
+			);
 		};
 
 		this.getAllSites = function() {
 			query.range(this.get('email'), this.get('email'), true);
-			return couchbase.queryViewFromAppBucket(query)
-				.then(function(results) {
-					return _.map(results, 'value');
-				});
+			return couchbase.queryViewFromAppBucket(query).then(function(results) {
+				return _.map(results, 'value');
+			});
 		};
 
 		this.getPendingAdsCount = function() {
@@ -183,7 +213,8 @@ var modelAPI = module.exports = apiModule(),
 					return Promise.all(validSites);
 				})
 				.then(function(sites) {
-					var ad = null, activeSite = null;
+					var ad = null,
+						activeSite = null;
 					_.forEach(sites, function(site) {
 						ad = site.getUnsyncedAd();
 						if (ad) {
@@ -199,15 +230,18 @@ var modelAPI = module.exports = apiModule(),
 function apiModule() {
 	var API = {
 		getUserByEmail: function(email) {
-			return couchbase.connectToAppBucket().then(function(appBucket) {
-				return appBucket.getAsync('user::' + email, {});
-			}).then(function(userJson) {
-				return new User(userJson.value, userJson.cas);
-			});
+			return couchbase
+				.connectToAppBucket()
+				.then(function(appBucket) {
+					return appBucket.getAsync('user::' + email, {});
+				})
+				.then(function(userJson) {
+					return new User(userJson.value, userJson.cas);
+				});
 		},
 		verifySiteOwner: function(email, siteId, options) {
 			return API.getUserByEmail(email).then(function(user) {
-				if(options && options.fullSiteData) {
+				if (options && options.fullSiteData) {
 					return siteModel.getSiteById(parseInt(siteId, 10)).then(function(site) {
 						if (site) {
 							return { user: user, site: site };
@@ -215,8 +249,7 @@ function apiModule() {
 
 						throw new Error('Invalid Site');
 					});
-				}
-				else {
+				} else {
 					return user.getSiteById(parseInt(siteId, 10)).then(function(site) {
 						if (site) {
 							return { user: user, site: site };
@@ -224,11 +257,11 @@ function apiModule() {
 
 						throw new Error('Invalid Site');
 					});
-				}	
+				}
 			});
 		},
 		addSite: function(email, domain) {
-			var normalizedDomain = utils.rightTrim(normalizeurl(domain), '/');// normalize and remove slash from the end
+			var normalizedDomain = utils.rightTrim(normalizeurl(domain), '/'); // normalize and remove slash from the end
 			return API.getUserByEmail(email).then(function(user) {
 				return user.addSite(normalizedDomain).then(function(site) {
 					return user.save().then(function(userObj) {
@@ -247,48 +280,72 @@ function apiModule() {
 				search_by_email: 1,
 				start: 0
 			})
-			.then(response => {
-				if (response && response.success) {
-					if (response.data && response.data != null && response.data != 'null' && response.data.length) {
-						return response.data[0].id;
-					} else {
-						return pipedriveAPI('createPerson', pipedriveParams.userInfo);
-					}
-				}
-				return Promise.reject('Error while creating new user in Pipedrive');
-			})
-			.then(response => {
-				if (response) {
-					if (typeof response == 'object') {
-						if (response.success) {
-							return response.data.id;
+				.then(response => {
+					if (response && response.success) {
+						if (response.data && response.data != null && response.data != 'null' && response.data.length) {
+							return response.data[0].id;
+						} else {
+							return pipedriveAPI('createPerson', pipedriveParams.userInfo);
 						}
-						return Promise.reject('Error while creating new user in Pipedrive');
-					} else if (typeof response == 'string' || typeof response == 'number') {
+					}
+					return Promise.reject('Error while creating new user in Pipedrive');
+				})
+				.then(response => {
+					if (response) {
+						if (typeof response == 'object') {
+							if (response.success) {
+								return response.data.id;
+							}
+							return Promise.reject('Error while creating new user in Pipedrive');
+						} else if (typeof response == 'string' || typeof response == 'number') {
+							return response;
+						}
+					}
+					return Promise.reject('Error while creating new user in Pipedrive');
+				})
+				.then(userPipedriveId => {
+					if (userPipedriveId) {
+						pipedriveParams.dealInfo['person_id'] = userPipedriveId;
+						return true;
+					}
+					return Promise.reject('Error while creating new deal in Pipedrive');
+				})
+				.then(() => {
+					return pipedriveAPI('createDeal', pipedriveParams.dealInfo);
+				})
+				.then(response => {
+					const isResponseSuccess = !!(response && response.success && response.data),
+						userRevenue = user.get('websiteRevenue'),
+						isRevenueValid = !!userRevenue,
+						isRevenueLow = !!(isRevenueValid && Number(userRevenue) <= 999),
+						isDealUnqualified = !!(isResponseSuccess && isRevenueLow);
+
+					if (!isResponseSuccess) {
+						return Promise.reject('Error while checking unqualified deal in Pipedrive');
+					}
+					if (!isDealUnqualified) {
 						return response;
 					}
-				}
-				return Promise.reject('Error while creating new user in Pipedrive');
-			})
-			.then(userPipedriveId => {
-				if (userPipedriveId) {
-					pipedriveParams.dealInfo['person_id'] = userPipedriveId;
-					return true;
-				}
-				return Promise.reject('Error while creating new deal in Pipedrive');
-			})
-			.then(() => {
-				return pipedriveAPI('createDeal', pipedriveParams.dealInfo);
-			})
-			.then(response => {
-				if (response && response.success) {
-					user.set('crmDealId', response.data.id);
-					return user;
-				}
-				return Promise.reject('Error while creating new deal in Pipedrive');
-			})
-			.catch(err => {  // Send mail to sales@adPushup.com here regarding error
-				pipedriveParams.errorMessage = "Error while creating deal in Pipedrive. \
+
+					const paramConfig = extend(true, {}, pipedriveParams.dealInfo);
+
+					paramConfig.id = response.data.id;
+					paramConfig.deal_id = paramConfig.id;
+					paramConfig.status = 'lost';
+					paramConfig.lost_reason = '[CO] Revenue < $1000 Monthly';
+					return pipedriveAPI('updateDeal', paramConfig);
+				})
+				.then(response => {
+					if (response && response.success) {
+						user.set('crmDealId', response.data.id);
+						return user;
+					}
+					return Promise.reject('Error while creating new deal in Pipedrive');
+				})
+				.catch(err => {
+					// Send mail to sales@adPushup.com here regarding error
+					pipedriveParams.errorMessage =
+						'Error while creating deal in Pipedrive. \
 					Please make deal manually. After that update corresponding userdoc and add field `crmDealId`. \
 					Below is all the information you need.";
 				return mailService({
@@ -305,7 +362,7 @@ function apiModule() {
 				.then(API.getUserByEmail.bind(null, json.email))
 				.then(function(user) {
 					if (user) {
-						var error = { 'email': ['User with email ' + json.email + ' already exists'] };
+						var error = { email: ['User with email ' + json.email + ' already exists'] };
 						throw new AdPushupError(error);
 					}
 				})
@@ -315,6 +372,17 @@ function apiModule() {
 					} else if (e.name && e.name === 'CouchbaseError') {
 						return API.createUserFromJson(json)
 							.then(function(user) {
+								const miscellaneousObj = {
+									utmSource: json.utmSource,
+									utmMedium: json.utmMedium,
+									utmCampaign: json.utmCampaign,
+									utmTerm: json.utmTerm,
+									utmName: json.utmName,
+									utmContent: json.utmContent
+								};
+
+								// Miscellanous field will comprise of non-major user data attributes
+								user.set('miscellaneous', miscellaneousObj);
 								user.set('createdAt', +new Date());
 								user.set('salt', consts.SALT + utils.random(0, 100000000));
 								user.set('pageviewRange', json.pageviewRange);
@@ -323,25 +391,36 @@ function apiModule() {
 								return user;
 							})
 							.then(function(user) {
-								if(json.userType && json.userType === 'partner') {
+								if (json.userType && json.userType === 'partner') {
 									return user;
 								}
-								var analyticsObj, userId = user.get('email'),
-									anonId = json.anonId,
+								var userId = user.get('email'),
 									siteName = utils.domanize(json.site),
 									pipedriveParams = {
 										userInfo: {
 											name: user.get('firstName'),
-											email: user.get('email'),
+											email: user.get('email')
 										},
 										dealInfo: {
 											title: `[CO] ${siteName}`,
 											value: user.get('websiteRevenue'),
-											stage_id: 81,  // [2017] AP User Onboarding Pipeline | First Stage | Deal Created
+											stage_id: 81, // [2017] AP User Onboarding Pipeline | First Stage | Deal Created
 											[consts.analytics.pipedriveCustomFields.websiteName]: siteName,
-											[consts.analytics.pipedriveCustomFields.dailyPageviews]: user.get('pageviewRange'),
-											[consts.analytics.pipedriveCustomFields.adNetworks]: user.get('adNetworks').join(' | '),
-											[consts.analytics.pipedriveCustomFields.websiteRevenue]: user.get('websiteRevenue'),
+											[consts.analytics.pipedriveCustomFields.dailyPageviews]: user.get(
+												'pageviewRange'
+											),
+											[consts.analytics.pipedriveCustomFields.adNetworks]: user
+												.get('adNetworks')
+												.join(' | '),
+											[consts.analytics.pipedriveCustomFields.websiteRevenue]: user.get(
+												'websiteRevenue'
+											),
+											[consts.analytics.pipedriveCustomFields.utmSource]: json.utmSource,
+											[consts.analytics.pipedriveCustomFields.utmMedium]: json.utmMedium,
+											[consts.analytics.pipedriveCustomFields.utmCampaign]: json.utmCampaign,
+											[consts.analytics.pipedriveCustomFields.utmTerm]: json.utmTerm,
+											[consts.analytics.pipedriveCustomFields.utmName]: json.utmName,
+											[consts.analytics.pipedriveCustomFields.utmContent]: json.utmContent,
 											currency: 'USD'
 										}
 									};
@@ -369,7 +448,7 @@ function apiModule() {
 								});
 							})
 							.then(function(user) {
-								if(json.userType === 'partner') {
+								if (json.userType === 'partner') {
 									globalModel.addEmail(json.email);
 									return user.get('sites')[0];
 								}
@@ -383,16 +462,22 @@ function apiModule() {
 		},
 		sendCodeToDev: function(json) {
 			var mailer = new Mailer(Config.email, 'html'),
-			mailHeader = 'Hi, <br/> Please find below the code snippet for your AdPushup setup. Paste this into the <strong>&lt;head&gt;</strong> section of your page - \n\n',
+				mailHeader =
+					'Hi, <br/> Please find below the code snippet for your AdPushup setup. Paste this into the <strong>&lt;head&gt;</strong> section of your page - \n\n',
 				mailFooter = '<br/><br/>Thanks,<br/>Team AdPushup',
 				headerCode = json.code;
 
-				headerCode = headerCode.replace(/</g, '&lt;');
-				headerCode = headerCode.replace(/>/g, '&gt;');
+			headerCode = headerCode.replace(/</g, '&lt;');
+			headerCode = headerCode.replace(/>/g, '&gt;');
 
-				var content = mailHeader + '<div style="background-color: #eaeaea; padding: 20px; margin-top: 10px;">'+headerCode+'</div>' + mailFooter,
+			var content =
+					mailHeader +
+					'<div style="background-color: #eaeaea; padding: 20px; margin-top: 10px;">' +
+					headerCode +
+					'</div>' +
+					mailFooter,
 				obj = { to: json.email, subject: 'AdPushup Header Snippet', html: content };
-			
+
 			return mailer.send(obj);
 		},
 		forgotPassword: function(json) {
@@ -430,18 +515,22 @@ function apiModule() {
 			return FormValidator.validate({ email: options.email }, schema.user.validations)
 				.then(API.getUserByEmail.bind(null, options.email))
 				.then(function(user) {
-					if (user.get('passwordResetKey') && user.get('passwordResetKeyCreatedAt') && (user.get('passwordResetKey') === options.key)) {
-						if ((parseInt(user.get('passwordResetKeyCreatedAt'), 10) + (60 * 60 * 24 * 1000)) < +new Date()) {
-							config = { 'keyExpired': true };
+					if (
+						user.get('passwordResetKey') &&
+						user.get('passwordResetKeyCreatedAt') &&
+						user.get('passwordResetKey') === options.key
+					) {
+						if (parseInt(user.get('passwordResetKeyCreatedAt'), 10) + 60 * 60 * 24 * 1000 < +new Date()) {
+							config = { keyExpired: true };
 						} else {
-							config = { 'email': options.email, 'key': options.key };
+							config = { email: options.email, key: options.key };
 						}
 					} else {
 						config = { keyNotFound: true };
 					}
 
 					return new Promise(function(resolve) {
-						if (config && (typeof config === 'object') && Object.keys(config).length > 0) {
+						if (config && typeof config === 'object' && Object.keys(config).length > 0) {
 							resolve(config);
 						} else if (!config) {
 							throw new AdPushupError({ keyNotFound: ['Email or key not found'] });
@@ -453,7 +542,11 @@ function apiModule() {
 			return FormValidator.validate(json, schema.user.validations)
 				.then(API.getUserByEmail.bind(null, json.email))
 				.then(function(user) {
-					if (user.get('passwordResetKey') && user.get('passwordResetKeyCreatedAt') && (user.get('passwordResetKey') === json.key)) {
+					if (
+						user.get('passwordResetKey') &&
+						user.get('passwordResetKeyCreatedAt') &&
+						user.get('passwordResetKey') === json.key
+					) {
 						user.delete('passwordResetKey');
 						user.delete('passwordResetKeyCreatedAt');
 						user.set('passwordMd5', md5(user.get('salt') + json.password + user.get('salt')));
@@ -469,7 +562,7 @@ function apiModule() {
 					var oldPasswordMd5 = md5(user.get('salt') + json.oldPassword + user.get('salt')),
 						passwordMd5 = user.get('passwordMd5');
 
-					if (oldPasswordMd5 && (oldPasswordMd5 === passwordMd5)) {
+					if (oldPasswordMd5 && oldPasswordMd5 === passwordMd5) {
 						json.passwordMd5 = md5(user.get('salt') + json.password + user.get('salt'));
 
 						return user;
@@ -478,7 +571,7 @@ function apiModule() {
 				})
 				.then(function(user) {
 					_.forOwn(json, function(value, key) {
-						if (user.get(key) && (user.get(key) !== value)) {
+						if (user.get(key) && user.get(key) !== value) {
 							user.set(key, value);
 						}
 					});
@@ -491,59 +584,62 @@ function apiModule() {
 		},
 		getAllUserSites: function(email) {
 			return API.getUserByEmail(email)
-				.then(function(user) { return user })
 				.then(function(user) {
-					var sitePromises = _.map(user.get('sites'), function (site) {
-						return siteModel.getSiteById(site.siteId)
-							.then(function (site) {
+					return user;
+				})
+				.then(function(user) {
+					var sitePromises = _.map(user.get('sites'), function(site) {
+						return siteModel
+							.getSiteById(site.siteId)
+							.then(function(site) {
 								return {
 									domain: site.get('siteDomain'),
 									siteId: site.get('siteId'),
 									step: site.get('step'),
 									channels: site.get('channels')
 								};
-							}).catch(function() {
+							})
+							.catch(function() {
 								return {
 									domain: site.domain,
 									siteId: site.siteId,
 									step: site.step,
 									channels: []
 								};
-							})
+							});
 					});
 
-					return Promise.all(sitePromises).then(function (sites) {
+					return Promise.all(sitePromises).then(function(sites) {
 						return sites;
-					});					
+					});
 				});
 		},
 		saveCredentials: function(json, email) {
-			return API.getUserByEmail(email)
-				.then(function(user) {
-					Object.keys(json).forEach(function(key) {
-						if (json[key].username) {
-							if (!json[key].password || json[key].password === '') {
-								throw new AdPushupError({
-									errorField: key,
-									incompleteCredentials: ['Please enter Username and Password both']
-								});
-							}
-						} else {
-							if (json[key].password) {
-								throw new AdPushupError({
-									errorField: key,
-									incompleteCredentials: ['Please enter Username and Password both']
-								});
-							}							
+			return API.getUserByEmail(email).then(function(user) {
+				Object.keys(json).forEach(function(key) {
+					if (json[key].username) {
+						if (!json[key].password || json[key].password === '') {
+							throw new AdPushupError({
+								errorField: key,
+								incompleteCredentials: ['Please enter Username and Password both']
+							});
 						}
-					});
-					user.set('adnetworkCredentials', json);
-					return user.save();
+					} else {
+						if (json[key].password) {
+							throw new AdPushupError({
+								errorField: key,
+								incompleteCredentials: ['Please enter Username and Password both']
+							});
+						}
+					}
 				});
+				user.set('adnetworkCredentials', json);
+				return user.save();
+			});
 		},
 		setSitePageGroups: function(email) {
 			function setPageGroupsPromises(user) {
-				return (_(user.get('sites')).map(function(site) {
+				return _(user.get('sites')).map(function(site) {
 					var uniquePageGroups = siteModel.getUniquePageGroups(site.siteId),
 						setupStep = siteModel.getSetupStep(site.siteId),
 						cmsData = siteModel.getCmsData(site.siteId);
@@ -552,35 +648,35 @@ function apiModule() {
 						site.cmsInfo = cms;
 						site.pageGroups = pageGroups;
 						return site;
-					})
-					.catch(function(err) {
+					}).catch(function(err) {
 						site.pageGroups = [];
 						site.step = site.step || false;
 						return site;
 					});
-				}));
+				});
 			}
 
 			function setPageGroups(user) {
-				return Promise.all(setPageGroupsPromises(user)).then(function(sites) {
-					user.set('sites', sites);
-					return user;
-				}).catch(function() {
-					return user;
-				});
+				return Promise.all(setPageGroupsPromises(user))
+					.then(function(sites) {
+						user.set('sites', sites);
+						return user;
+					})
+					.catch(function() {
+						return user;
+					});
 			}
 
 			return API.getUserByEmail(email).then(setPageGroups);
 		},
 		setUserStatus: function(data, email) {
-			return API.getUserByEmail(email)
-				.then(function(user) {
-					user.set('requestDemo', data.status);
-					user.set('websiteRevenue', data.websiteRevenue);
-					user.set('revenueUpperLimit', data.revenueUpperLimit);
-					user.save();
-					return user;
-				});
+			return API.getUserByEmail(email).then(function(user) {
+				user.set('requestDemo', data.status);
+				user.set('websiteRevenue', data.websiteRevenue);
+				user.set('revenueUpperLimit', data.revenueUpperLimit);
+				user.save();
+				return user;
+			});
 		}
 	};
 

@@ -3,7 +3,8 @@ var lodash = require('lodash'),
 
 module.exports = {
 	getConfig: function(config, report) {
-		var computedConfig = lodash.assign({}, config), rows = report.data.rows,
+		var computedConfig = lodash.assign({}, config),
+			rows = report.data.rows,
 			variationKey;
 
 		computedConfig.variations = [];
@@ -15,7 +16,9 @@ module.exports = {
 		return computedConfig;
 	},
 	set: function(report, trafficDistributionData) {
-		var computedReport = lodash.assign({}, report), variationKey, variationObj;
+		var computedReport = lodash.assign({}, report),
+			variationKey,
+			variationObj;
 
 		computedReport.data.rows.forEach(function(row, idx) {
 			variationKey = row[0];

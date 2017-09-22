@@ -1,12 +1,11 @@
 var ESQueryMaker = {
-
 	getDefaultQuery: function(bool, aggs, size, config) {
 		var q = {
-			'query': {
-				'bool': bool
+			query: {
+				bool: bool
 			},
-			'aggs': aggs,
-			'size': size
+			aggs: aggs,
+			size: size
 		};
 
 		if (config && config.query) {
@@ -18,9 +17,9 @@ var ESQueryMaker = {
 
 	createBoolFilter: function() {
 		return {
-			'must': [],
-			'should': [],
-			'must_not': []
+			must: [],
+			should: [],
+			must_not: []
 		};
 	},
 
@@ -29,22 +28,25 @@ var ESQueryMaker = {
 	},
 
 	createTermFilter: function(fieldName, fieldVal) {
-		var bundle = {}, f = {};
+		var bundle = {},
+			f = {};
 		f[fieldName] = fieldVal;
 		bundle.term = f;
 		return bundle;
 	},
 
 	createExistsFilter: function(fieldVal) {
-		var bundle = {}, f = {};
+		var bundle = {},
+			f = {};
 		f.field = fieldVal;
 		bundle.exists = f;
 		return bundle;
 	},
 
 	createRangeFilter: function(fieldName, gte, lte) {
-		var bundle = {}, f = {};
-		f[fieldName] = { 'gte': gte, 'lte': lte };
+		var bundle = {},
+			f = {};
+		f[fieldName] = { gte: gte, lte: lte };
 		bundle.range = f;
 		return bundle;
 	},
@@ -58,16 +60,15 @@ var ESQueryMaker = {
 
 	createDateHistogramAggr: function(field, interval) {
 		var agg = {};
-		agg.date_histogram = { 'field': field, 'interval': interval };
+		agg.date_histogram = { field: field, interval: interval };
 		return agg;
 	},
 
 	createTermsAggr: function(field, size) {
 		var agg = {};
-		agg.terms = { 'field': field, 'size': size };
+		agg.terms = { field: field, size: size };
 		return agg;
 	}
-
 };
 
 module.exports = ESQueryMaker;

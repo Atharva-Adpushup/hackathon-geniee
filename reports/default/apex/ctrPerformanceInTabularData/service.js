@@ -12,14 +12,26 @@ var extend = require('extend'),
 module.exports = {
 	getReportData: function(params, sqlReportData) {
 		// TD = TrafficDistribution, FR = FinalReport
-		var config = extend(true, {}, params), siteId, channelName,
-			getReport, getTDConfig, getVariationTD;
+		var config = extend(true, {}, params),
+			siteId,
+			channelName,
+			getReport,
+			getTDConfig,
+			getVariationTD;
 
 		config.siteId = parseInt(config.siteId, 10);
-		config.platform = (config.platform) ? config.platform.substring(0, 7) : null;
-		config.pageGroup = (config.pageGroup) ? config.pageGroup.substring(0, 30) : null;
-		config.startDate = (config.startDate) ? parseInt(config.startDate, 10) : moment().subtract(7, 'days').valueOf();
-		config.endDate = (config.endDate) ? parseInt(config.endDate, 10) : moment().subtract(0, 'days').valueOf();
+		config.platform = config.platform ? config.platform.substring(0, 7) : null;
+		config.pageGroup = config.pageGroup ? config.pageGroup.substring(0, 30) : null;
+		config.startDate = config.startDate
+			? parseInt(config.startDate, 10)
+			: moment()
+					.subtract(7, 'days')
+					.valueOf();
+		config.endDate = config.endDate
+			? parseInt(config.endDate, 10)
+			: moment()
+					.subtract(0, 'days')
+					.valueOf();
 		config.channelName = `${config.pageGroup}_${config.platform}`;
 
 		siteId = config.siteId;
@@ -30,7 +42,7 @@ module.exports = {
 			.then(apexSingleChannelVariationModule.transformData);
 
 		getTDConfig = getReport.then(function(report) {
-			const reportData = {'status': true, 'data': extend(true, {}, report)};
+			const reportData = { status: true, data: extend(true, {}, report) };
 
 			return trafficDistributionModule.getConfig(config, reportData);
 		});
@@ -38,14 +50,20 @@ module.exports = {
 			return variationModule.getTrafficDistribution(trafficDistributionConfig);
 		});
 
-		return Promise.join(getReport, getTDConfig, getVariationTD, function(report, trafficDistributionConfig, trafficDistributionData) {
-			const reportData = {'status': true, 'data': extend(true, {}, report)};
+		return Promise.join(getReport, getTDConfig, getVariationTD, function(
+			report,
+			trafficDistributionConfig,
+			trafficDistributionData
+		) {
+			const reportData = { status: true, data: extend(true, {}, report) };
 
 			return trafficDistributionModule.set(reportData, trafficDistributionData).then(function(reportWithTD) {
 				return ctrModule.setPerformanceData(reportWithTD).then(function(reportWithCTRPerformance) {
-					return utilsModule.addEmptyDataFields(reportWithCTRPerformance).then(function(reportWithAddedFields) {
-						return [reportWithAddedFields, report];
-					});
+					return utilsModule
+						.addEmptyDataFields(reportWithCTRPerformance)
+						.then(function(reportWithAddedFields) {
+							return [reportWithAddedFields, report];
+						});
 				});
 			});
 		});

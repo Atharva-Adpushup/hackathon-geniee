@@ -19,38 +19,75 @@ function transformResultData(reportData) {
 		}
 	};
 
-	if (!reportData || !reportData.length) { return reportData; }
+	if (!reportData || !reportData.length) {
+		return reportData;
+	}
 
 	return reportData.reduce((accumulator, reportObject) => {
 		const isReportObject = !!(reportObject && Object.keys(reportObject).length),
-			isRootLevelObject = !!(isReportObject && accumulator.hasOwnProperty(reportObject.siteId) && accumulator[reportObject.siteId]),
+			isRootLevelObject = !!(
+				isReportObject &&
+				accumulator.hasOwnProperty(reportObject.siteId) &&
+				accumulator[reportObject.siteId]
+			),
 			matchedDateValue = reportObject.reportDate.toISOString().match(optionsConfig.date.regex)[0],
-			platformValue = (optionsConfig.platform[reportObject.platform]),
-			channelName = (`${reportObject.pageGroup}_${platformValue}`),
-			isVariationKey = !!(reportObject.variationId),
-			variationKey = isVariationKey ? (reportObject.variationId.replace(/_/gi, '-')) : '';
+			platformValue = optionsConfig.platform[reportObject.platform],
+			channelName = `${reportObject.pageGroup}_${platformValue}`,
+			isVariationKey = !!reportObject.variationId,
+			variationKey = isVariationKey ? reportObject.variationId.replace(/_/gi, '-') : '';
 
-		let isChannelExists, isVariationIdExists, isMatchedDateExists, isDayWisePageViewsExists,
+		let isChannelExists,
+			isVariationIdExists,
+			isMatchedDateExists,
+			isDayWisePageViewsExists,
 			// Object placeholder variables to improve computation speed and reduce data query time
-			sitePageGroupObjectPlaceHolder, siteVariationObjectPlaceHolder, currentVariationObjectPlaceHolder;
+			sitePageGroupObjectPlaceHolder,
+			siteVariationObjectPlaceHolder,
+			currentVariationObjectPlaceHolder;
 
-		if (!isRootLevelObject) { accumulator[reportObject.siteId] = {pageGroups: {}}; }
+		if (!isRootLevelObject) {
+			accumulator[reportObject.siteId] = { pageGroups: {} };
+		}
 		// Cache current page group object
 		sitePageGroupObjectPlaceHolder = extend(true, {}, accumulator[reportObject.siteId].pageGroups);
 
-		isChannelExists = !!(isRootLevelObject && sitePageGroupObjectPlaceHolder && sitePageGroupObjectPlaceHolder.hasOwnProperty(channelName));
-		if (!isChannelExists) { sitePageGroupObjectPlaceHolder[channelName] = {variations: {}}; }
+		isChannelExists = !!(
+			isRootLevelObject &&
+			sitePageGroupObjectPlaceHolder &&
+			sitePageGroupObjectPlaceHolder.hasOwnProperty(channelName)
+		);
+		if (!isChannelExists) {
+			sitePageGroupObjectPlaceHolder[channelName] = { variations: {} };
+		}
 		// Cache current page group variations object
 		siteVariationObjectPlaceHolder = extend(true, {}, sitePageGroupObjectPlaceHolder[channelName].variations);
 
-		isVariationIdExists = !!(isChannelExists && siteVariationObjectPlaceHolder && siteVariationObjectPlaceHolder.hasOwnProperty(variationKey));
+		isVariationIdExists = !!(
+			isChannelExists &&
+			siteVariationObjectPlaceHolder &&
+			siteVariationObjectPlaceHolder.hasOwnProperty(variationKey)
+		);
 		if (!isVariationIdExists) {
-			siteVariationObjectPlaceHolder[variationKey] = { dayWisePageViews: {}, days: {}, tracked: { pageViews: 0, click: 0, pageCTR: 0.0, impression: 0 }, click: 0, impression: 0, revenue: 0.0, pageViews: 0, pageRPM: 0.0, pageCTR: 0.0 };
+			siteVariationObjectPlaceHolder[variationKey] = {
+				dayWisePageViews: {},
+				days: {},
+				tracked: { pageViews: 0, click: 0, pageCTR: 0.0, impression: 0 },
+				click: 0,
+				impression: 0,
+				revenue: 0.0,
+				pageViews: 0,
+				pageRPM: 0.0,
+				pageCTR: 0.0
+			};
 		}
 		// Cache current variation object
 		currentVariationObjectPlaceHolder = extend(true, {}, siteVariationObjectPlaceHolder[variationKey]);
 
-		isMatchedDateExists = !!(isVariationIdExists && currentVariationObjectPlaceHolder.days &&  currentVariationObjectPlaceHolder.days.hasOwnProperty(matchedDateValue));
+		isMatchedDateExists = !!(
+			isVariationIdExists &&
+			currentVariationObjectPlaceHolder.days &&
+			currentVariationObjectPlaceHolder.days.hasOwnProperty(matchedDateValue)
+		);
 		if (!isMatchedDateExists) {
 			// TODO: Remove below revenue conversion (divide by 1000)
 			// by moving this logic to ads replay side
@@ -63,9 +100,9 @@ function transformResultData(reportData) {
 				pageCTR = Number((click / pageViews * 100).toFixed(2)),
 				trackedPageCTR = Number((trackedClicks / trackedPageViews * 100).toFixed(2));
 
-			pageRPM = (pageRPM && pageRPM !== Infinity) ? pageRPM : 0.0;
-			pageCTR = (pageCTR && pageCTR !== Infinity) ? pageCTR : 0.0;
-			trackedPageCTR = (trackedPageCTR && trackedPageCTR !== Infinity) ? trackedPageCTR : 0.0;
+			pageRPM = pageRPM && pageRPM !== Infinity ? pageRPM : 0.0;
+			pageCTR = pageCTR && pageCTR !== Infinity ? pageCTR : 0.0;
+			trackedPageCTR = trackedPageCTR && trackedPageCTR !== Infinity ? trackedPageCTR : 0.0;
 
 			currentVariationObjectPlaceHolder.days[matchedDateValue] = {
 				pageViews,
@@ -85,7 +122,11 @@ function transformResultData(reportData) {
 			};
 		}
 
-		isDayWisePageViewsExists = !!(isVariationIdExists && currentVariationObjectPlaceHolder.dayWisePageViews &&  currentVariationObjectPlaceHolder.dayWisePageViews.hasOwnProperty(matchedDateValue));
+		isDayWisePageViewsExists = !!(
+			isVariationIdExists &&
+			currentVariationObjectPlaceHolder.dayWisePageViews &&
+			currentVariationObjectPlaceHolder.dayWisePageViews.hasOwnProperty(matchedDateValue)
+		);
 		if (!isDayWisePageViewsExists) {
 			currentVariationObjectPlaceHolder.dayWisePageViews[matchedDateValue] = reportObject.pageViews;
 		}
@@ -98,8 +139,10 @@ function transformResultData(reportData) {
 				trackedImpression = currentVariationObjectPlaceHolder.tracked.impression,
 				pageViews = currentVariationObjectPlaceHolder.pageViews,
 				trackedPageViews = currentVariationObjectPlaceHolder.tracked.pageViews,
-				revenueComputedValue, pageRPMComputedValue,
-				pageCTRComputedValue, trackedPageCTRComputedValue;
+				revenueComputedValue,
+				pageRPMComputedValue,
+				pageCTRComputedValue,
+				trackedPageCTRComputedValue;
 
 			click += reportObject.clicks;
 			trackedClick += reportObject.trackedClicks;
@@ -116,12 +159,17 @@ function transformResultData(reportData) {
 			// Computed current metric value
 			pageRPMComputedValue = Number((revenue / pageViews * 1000).toFixed(2));
 			// Check for boundary cases and convert accordingly
-			pageRPMComputedValue = (pageRPMComputedValue && pageRPMComputedValue !== Infinity) ? pageRPMComputedValue : 0.0;
+			pageRPMComputedValue =
+				pageRPMComputedValue && pageRPMComputedValue !== Infinity ? pageRPMComputedValue : 0.0;
 
 			pageCTRComputedValue = Number((click / pageViews * 100).toFixed(2));
-			pageCTRComputedValue = (pageCTRComputedValue && pageCTRComputedValue !== Infinity) ? pageCTRComputedValue : 0.0;
+			pageCTRComputedValue =
+				pageCTRComputedValue && pageCTRComputedValue !== Infinity ? pageCTRComputedValue : 0.0;
 			trackedPageCTRComputedValue = Number((trackedClick / trackedPageViews * 100).toFixed(2));
-			trackedPageCTRComputedValue = (trackedPageCTRComputedValue && trackedPageCTRComputedValue !== Infinity) ? trackedPageCTRComputedValue : 0.0;
+			trackedPageCTRComputedValue =
+				trackedPageCTRComputedValue && trackedPageCTRComputedValue !== Infinity
+					? trackedPageCTRComputedValue
+					: 0.0;
 
 			// Assign back final computed metric values to variation object
 			currentVariationObjectPlaceHolder.revenue = revenue;
@@ -150,7 +198,7 @@ function transformResultData(reportData) {
 }
 
 module.exports = {
-	getMetricsData: (paramConfig) => {
+	getMetricsData: paramConfig => {
 		const inputParameterCollection = [
 				//---------------------NOTE---------------------//
 				// Please ensure that below mentioned 'type' property value
@@ -187,8 +235,7 @@ module.exports = {
 			};
 		console.log(`Query for siteid: ${paramConfig.siteId}`);
 
-		return dbHelper.queryDB(databaseConfig)
-			.then(transformResultData);
+		return dbHelper.queryDB(databaseConfig).then(transformResultData);
 	},
 	transformData: transformResultData
 };

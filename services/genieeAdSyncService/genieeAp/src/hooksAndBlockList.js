@@ -21,7 +21,9 @@ function init(adp, onPageGroupPush, platform) {
 						onPageGroupPush(); // if pagegroup is pushed later the start creation
 						break;
 					case 'siteDomain':
-						obj.siteDomain = obj.siteDomain ? encodeURIComponent(obj.siteDomain.replace(/^www\./i, '')) : null;
+						obj.siteDomain = obj.siteDomain
+							? encodeURIComponent(obj.siteDomain.replace(/^www\./i, ''))
+							: null;
 						break;
 					case 'pageUrl':
 						obj.pageUrl = obj.pageUrl ? encodeURIComponent(obj.pageUrl) : null;
@@ -35,8 +37,9 @@ function init(adp, onPageGroupPush, platform) {
 	};
 
 	// PageGroup via URL pattern implementation. This must run before we merge tempConfig with config as priority of pageGroupPattern is high then config.
-	var done, w = window,
-		isPlatformExperiment = !!(config.experiment[platform]),
+	var done,
+		w = window,
+		isPlatformExperiment = !!config.experiment[platform],
 		platformExperiments = isPlatformExperiment ? config.experiment[platform] : false,
 		experimentPageGroups = isPlatformExperiment ? Object.keys(platformExperiments) : [],
 		isExperimentPageGroups = !!(experimentPageGroups && experimentPageGroups.length);

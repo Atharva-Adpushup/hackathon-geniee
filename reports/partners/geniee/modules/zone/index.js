@@ -12,7 +12,7 @@ module.exports = {
 		_.forEach(data, function(zonesObj, rootKey) {
 			var formattedDate = moment(zonesObj.date.toString()).format('YYYY-MM-DD'),
 				validZones = _.filter(zonesObj.zones, 'type');
-			
+
 			if (!validZones || !validZones.length) {
 				return true;
 			}
@@ -31,9 +31,11 @@ module.exports = {
 			// zones which are deleted from AdPushup variations data (Channel document)
 			// but appear in Geniee Reports API response
 			var deletedZonesVariationData = {
-				key: uuid.v4(),
-				name: 'Deleted Zones'
-			}, genieeMatchedZones = [], deletedZones;
+					key: uuid.v4(),
+					name: 'Deleted Zones'
+				},
+				genieeMatchedZones = [],
+				deletedZones;
 
 			computedData[pageGroupKey].variationData = {};
 			fileLogger.info(`Geniee Report Service: GetZoneVariations: All valid zones`);
@@ -43,13 +45,20 @@ module.exports = {
 				_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
 					_.forOwn(variationObj.sections, function(sectionObj, sectionKey) {
 						_.forOwn(sectionObj.ads, function(adObj, adKey) {
-							var isGenieeAd = !!(adObj.networkData && _.isObject(adObj.networkData) && adObj.networkData.zoneId),
-								isZoneMatch = (isGenieeAd && (zonesObj.zoneId == adObj.networkData.zoneId)),
+							var isGenieeAd = !!(
+									adObj.networkData &&
+									_.isObject(adObj.networkData) &&
+									adObj.networkData.zoneId
+								),
+								isZoneMatch = isGenieeAd && zonesObj.zoneId == adObj.networkData.zoneId,
 								isCustomAd = !!(!adObj.networkData && adObj.adCode);
 
 							if (isGenieeAd) {
 								if (isZoneMatch) {
-									if (!computedData[pageGroupKey].variationData.hasOwnProperty(variationKey) && !computedData[pageGroupKey].variationData[variationKey]) {
+									if (
+										!computedData[pageGroupKey].variationData.hasOwnProperty(variationKey) &&
+										!computedData[pageGroupKey].variationData[variationKey]
+									) {
 										computedData[pageGroupKey].variationData[variationKey] = {
 											id: variationObj.id,
 											name: variationObj.name,
@@ -64,7 +73,10 @@ module.exports = {
 									genieeMatchedZones.push(zonesObj);
 								}
 							} else if (isCustomAd) {
-								if (!computedData[pageGroupKey].variationData.hasOwnProperty(variationKey) && !computedData[pageGroupKey].variationData[variationKey]) {
+								if (
+									!computedData[pageGroupKey].variationData.hasOwnProperty(variationKey) &&
+									!computedData[pageGroupKey].variationData[variationKey]
+								) {
 									computedData[pageGroupKey].variationData[variationKey] = {
 										id: variationObj.id,
 										name: variationObj.name,
@@ -82,9 +94,13 @@ module.exports = {
 			fileLogger.info(`Geniee Report Service: GetZoneVariations: All matched zones`);
 			fileLogger.info(genieeMatchedZones);
 
-			deletedZones = _.reduce(genieeMatchedZones, (allZones, arrayItem) => {
-				return _.reject(allZones, arrayItem);
-			}, pageGroupObj.zones);
+			deletedZones = _.reduce(
+				genieeMatchedZones,
+				(allZones, arrayItem) => {
+					return _.reject(allZones, arrayItem);
+				},
+				pageGroupObj.zones
+			);
 
 			fileLogger.info(`Geniee Report Service: GetZoneVariations: All deleted zones`);
 			fileLogger.info(deletedZones);

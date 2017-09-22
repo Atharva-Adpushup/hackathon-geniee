@@ -14,7 +14,10 @@ var Promise = require('bluebird'),
  * @return {Promise}
  */
 function promiseForEach(arr, action, errorHandler) {
-	var i = 0, condition, actionIterator, errIterator;
+	var i = 0,
+		condition,
+		actionIterator,
+		errIterator;
 
 	condition = function() {
 		return i < arr.length;
@@ -32,6 +35,5 @@ function promiseForEach(arr, action, errorHandler) {
 
 	return promiseWhile(condition, actionIterator, errIterator);
 }
-
 
 module.exports = promiseForEach;

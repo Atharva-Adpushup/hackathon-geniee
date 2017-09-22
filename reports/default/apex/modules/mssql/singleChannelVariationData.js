@@ -24,7 +24,9 @@ function transformVariationData(reportData) {
 		},
 		isReportData = !!(reportData && lodash.isObject(reportData) && lodash.keys(reportData).length);
 
-	if (!isReportData) { throw new AdPushupError('Invalid variation data'); }
+	if (!isReportData) {
+		throw new AdPushupError('Invalid variation data');
+	}
 	computedData.footer.fill(' ');
 
 	lodash.forOwn(reportData, (variationObject, variationKey) => {
@@ -33,7 +35,9 @@ function transformVariationData(reportData) {
 			isValidVariation = !!(variationObject && variationObject.id);
 		let variationObjectPlaceHolder;
 
-		if (!isValidVariation) { return; }
+		if (!isValidVariation) {
+			return;
+		}
 
 		variationObjectPlaceHolder = extend(true, {}, variationObject);
 		delete variationObjectPlaceHolder.dayWisePageViews;
@@ -65,9 +69,8 @@ function transformVariationData(reportData) {
 }
 
 module.exports = {
-	getData: (paramConfig) => {
-		return sqlQueryModule.getData(paramConfig)
-			.then(transformVariationData);
+	getData: paramConfig => {
+		return sqlQueryModule.getData(paramConfig).then(transformVariationData);
 	},
 	transformData: transformVariationData
 };

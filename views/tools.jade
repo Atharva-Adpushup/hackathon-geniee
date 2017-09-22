@@ -1,0 +1,76 @@
+extends  layout/base
+
+block getTitle
+    - var titleVar = "Tools"
+
+block bodyContent
+    - isViewMode = isViewMode || false;
+    - siteId = siteId || '';
+    - var timestamp = +new Date();
+    - var scriptLocation = '/assets/js/libs/custom/tools.js?v=' + timestamp;
+
+    .pageContainer.page-container
+        include layout/header
+        // Page Content Starts Here
+        .pageContentWrapper.page-content
+            .pageContentInner.page-content--inner
+                .notification-wrapper
+
+                #widgetsArea.row
+                    .mb-30
+                        .controlAdpushupWrap
+                            h3.title.m-All-0.clearfix
+                                a Operation Tools
+
+                            input.js-input-hidden-viewMode(type="hidden", value=isViewMode)
+                            input.js-input-hidden-siteId(type="hidden", value=siteId)
+                            form#saveSiteSettings.settings-pane
+                                .row
+                                    .col-sm-12
+                                        .row(style="margin-bottom: 30px")
+                                            .col-sm-6
+                                                input#user-siteId.form-control.js-user-siteId(name="user-siteId" type="number" min="1" max="100000" placeholder="Enter site id here like 13527, 21865, 25054")
+                                            .col-sm-6
+
+                                        .row.js-adcode-wrapper-row(style="margin-bottom: 30px")
+                                            .col-sm-12
+                                                h4 Add JavaScript wrapper to your ad code
+                                            .col-sm-12
+                                                div.snippet-wrapper.code-convert-wrapper.js-snippet-wrapper
+                                                    span.clipboard-copy.js-clipboard-copy Copied !
+                                                    textarea.snippet#textarea-adcode-conversion.js-code-textarea.js-textarea-adcode-conversion(placeholder="Enter Passback/Control Ad code here", style="margin-top: 0px;")
+                                                    .row
+                                                        .col-sm-4(style="float: right;")
+                                                            button.btn-primary(id="code-conversion-button") Convert
+                                                        .col-sm-4(style="float: right;", class="aligner aligner--hBottom aligner--vCenter")
+                                                            button.js-clipboard-copy-btn.snippet-btn.apbtn-main-line#clipboard-copy-adcode(style="width: 270px;") Copy to clipboard
+                                        .row
+                                            .col-sm-12
+                                                h4 Generate init code
+                                            .col-sm-12
+                                                .row
+                                                    .col-sm-3
+                                                        button#init-code-btn.btn-primary.js-init-code-btn(type="button") Generate Init Code
+                                                    .col-sm-9
+                                                .row
+                                                    .col-sm-9
+                                                        div.u-margin-b10px.js-header-code-wrapper.hide(class="well")
+                                                            p.text-medium(style="margin: 10px 0 0;")
+                                                                | Copy and paste this snippet in the head tag of your website
+                                                            div.snippet-wrapper.js-snippet-wrapper
+                                                                span.clipboard-copy.js-clipboard-copy Copied !
+                                                                textarea.snippet.js-code-textarea.js-header-code-textarea(style="font-size: 1em;" id="header-code-textarea" readonly="" placeholder="AdPushup init code comes here..") 
+                                                                div.snippet-btn-wrapper
+                                                                    div
+                                                                        //- button(style="width: 270px;" id="sendToDev" class="snippet-btn apbtn-main-line apbtn-small")
+                                                                        //-     | Send Code to Developer
+                                                                        //-     i.fa.fa-code
+                                                                        button.js-clipboard-copy-btn(style="width: 270px;" id="clipboardCopy" class="snippet-btn apbtn-main-line apbtn-small") Copy to clipboard
+                                                                            i.fa.fa-clipboard
+                                                    .col-sm-3
+
+    script.
+        $(document).ready(function() {});
+    +loadAsset("js", [
+        scriptLocation,
+    ])

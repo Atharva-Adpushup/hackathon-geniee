@@ -13,7 +13,6 @@ app.use(bodyParser.json({ limit: '5mb' }));
 
 app.use(bodyParser.urlencoded({ extended: false, limit: '5mb' }));
 
-
 // Authenticator source : http://stackoverflow.com/questions/24283848/express-basicauth-throwing-error
 app.use(function(req, res, next) {
 	var auth;
@@ -40,28 +39,37 @@ app.use(function(req, res, next) {
 	// * auth array exists
 	// * first value matches the expected user
 	// * second value the expected password
-	if (!(auth && Array.isArray(auth)) ||
-		!(((auth[0] === config.ops.auth.username) && (auth[1] === config.ops.auth.pass)) || 
-		((auth[0] === genieeCreds.userName) && (auth[1] === genieeCreds.pass)))
+	if (
+		!(auth && Array.isArray(auth)) ||
+		!(
+			(auth[0] === config.ops.auth.username && auth[1] === config.ops.auth.pass) ||
+			(auth[0] === genieeCreds.userName && auth[1] === genieeCreds.pass)
+		)
 	) {
 		sendUnauthorized();
 		return;
 	}
-	if ((auth[0] === genieeCreds.userName) && (auth[1] === genieeCreds.pass) &&
-		((req.path.indexOf('enableLogin') === -1) && (!req.headers.referer || req.headers.referer.indexOf('enableLogin') === -1))) {
+	if (
+		auth[0] === genieeCreds.userName &&
+		auth[1] === genieeCreds.pass &&
+		(req.path.indexOf('enableLogin') === -1 &&
+			(!req.headers.referer || req.headers.referer.indexOf('enableLogin') === -1))
+	) {
 		sendUnauthorized();
 	} else {
 		next();
 	}
 });
 
-
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/ops/data', function(req, res, next) {
-	next();
-}, dataController);
-
+app.use(
+	'/ops/data',
+	function(req, res, next) {
+		next();
+	},
+	dataController
+);
 
 app.use(function(req, res) {
 	res.status(404);
@@ -82,8 +90,8 @@ if (app.get('env') === 'development') {
 	app.use(function(err, req, res) {
 		res.status(err.status || 500);
 		res.json({
-			'error': true,
-			'message': err.message
+			error: true,
+			message: err.message
 		});
 	});
 }
@@ -94,12 +102,11 @@ app.use(function(err, req, res) {
 	res.status(err.status || 500);
 
 	res.json({
-		'error': true,
-		'message': err.message
+		error: true,
+		message: err.message
 	});
 });
 
 server.listen(config.environment.OPS_HOST_PORT);
-
 
 module.exports = app;

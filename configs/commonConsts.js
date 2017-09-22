@@ -19,38 +19,6 @@ module.exports = {
 			networkId: 103512698
 		}
 	},
-	hbConfig: {
-		'pulsepoint': {
-			name: 'pulsepoint',
-			isHb: true,
-			global: {
-				cp: {default: '560684', validations: {'required': true}, alias: "User Id", isEditable: true}
-			},
-			local: {
-				ct: {validations: {'required': true}, alias: "Tag Id"},
-				cf: {validations: {'required': true}, alias: "Tag Size"},
-			}
-		},
-		'sekindoUM': {
-			name: 'sekindoUM',
-			isHb: true,
-			global: {},
-			local: {
-				spaceId: {validations: {'required': true}, alias: "Space Id"},
-			}
-		},
-		'wideorbit': {
-			name: 'wideorbit',
-			isHb: true,
-			global: {
-				pbId: {default: '577', validations: {'required': true}, alias: "Publisher Id", isEditable: true}
-			},
-			local: {
-				pId: {validations: {'required': true, type: 'number'}, alias: "Tag Id"}
-			}
-		},
-
-	},
 	hbContinents: [
 		{ name: 'Europe', code: 'EUR' },
 		{ name: 'Oceania', code: 'OAN' },
@@ -60,38 +28,26 @@ module.exports = {
 		{ name: 'South America', code: 'SAA' },
 		{ name: 'Middle East', code: 'MEA' }
 	],
-	supportedAdSizes: [
-		{
-			layoutType: 'SQUARE',
-			sizes: [{ width: 300, height: 250 }, { width: 250, height: 250 }, { width: 200, height: 200 }, { width: 336, height: 280 }]
-		},
-		{
-			layoutType: 'HORIZONTAL',
-			sizes: [{ width: 728, height: 90 }, { width: 468, height: 60 }, { width: 900, height: 90 }, { width: 970, height: 250 }]
-		},
-		{
-			layoutType: 'VERTICAL',
-			sizes: [{ width: 300, height: 600 }, { width: 160, height: 600 }, { width: 120, height: 600 }, { width: 300, height: 1050 }]
-		},
-		{
-			layoutType: 'MOBILE',
-			sizes: [{ width: 320, height: 50 }, { width: 300, height: 250 }, { width: 250, height: 250 }, { width: 200, height: 200 }, { width: 320, height: 100 }]
-		},
-	],
 	analytics: {
-		'SEGMENT_APP_ID': 'vkVd688NyfGcgDhQwJSaiZofdEXvAZVQ',
-		'INTERCOM_ID': 'WiCwcQZTNKXyiCLQMCD7EwD2dUAPznK34rByaIt3',
-		'PIPEDRIVE_URL': 'https://www.adpushup.com/tech_integration/crm_scripts/callback/signup.php',
-		'PIPEDRIVE_SYNC_TOKEN': 'f4a90157f53a437a1f6b5c0d889b6d7db005f67e',
+		SEGMENT_APP_ID: 'vkVd688NyfGcgDhQwJSaiZofdEXvAZVQ',
+		INTERCOM_ID: 'WiCwcQZTNKXyiCLQMCD7EwD2dUAPznK34rByaIt3',
+		PIPEDRIVE_URL: 'https://www.adpushup.com/tech_integration/crm_scripts/callback/signup.php',
+		PIPEDRIVE_SYNC_TOKEN: 'f4a90157f53a437a1f6b5c0d889b6d7db005f67e',
 		pipedriveCustomFields: {
 			websiteName: '5298ce43bbf31a9afa7edb2e6784b9368b55c8f3',
 			dailyPageviews: '438f3045809011521f38cfe118e74943b7891627',
 			websiteRevenue: '293fd8aadfb6982d31fd0b4f8f58f200f49dcb2f',
-			adNetworks: '8253d39661cfb11976f8cda3342d0c3d2bd6895d'
+			adNetworks: '8253d39661cfb11976f8cda3342d0c3d2bd6895d',
+			utmSource: '7decb93a103f97be47db094a7a53381f903280b2',
+			utmMedium: '4432c8a46c4b9929937423b11acd336c47f8885a',
+			utmCampaign: '1d87caef2ffc5dddf26b6548b9ddb1b1d7c97720',
+			utmTerm: 'bd94cdbdfd726b04250ad6963f83c59d6284c020',
+			utmName: 'ec498a8fc48461b2f3c9db550046a9875f36efc5',
+			utmContent: '78fd0246cbe306230b5a27350f1ae60014531143'
 		}
 	},
 	password: {
-		'MASTER': 'fe4720b8bcdedb3cc47490015b0ab050'
+		MASTER: 'fe4720b8bcdedb3cc47490015b0ab050'
 	},
 	exceptions: {
 		str: {
@@ -109,7 +65,7 @@ module.exports = {
 				VERSION: '1.0',
 				CONTENT_TYPE: 'application/json',
 				URL: {
-					"REPORTS": 'https://beta-aladdin.geniee.jp/beta2/aladdin/adpushup/report/'
+					REPORTS: 'https://beta-aladdin.geniee.jp/beta2/aladdin/adpushup/report/'
 				}
 			},
 			exceptions: {
@@ -120,17 +76,17 @@ module.exports = {
 		}
 	},
 	user: {
-		'fields': {
-			'default': {
-				'pageviewRange': '5000-15000',
-				'adNetworks': ['Other']
+		fields: {
+			default: {
+				pageviewRange: '5000-15000',
+				adNetworks: ['Other']
 			}
 		}
 	},
 	site: {
 		mode: {
-			'DRAFT': 2,
-			'PUBLISH': 1
+			DRAFT: 2,
+			PUBLISH: 1
 		}
 	},
 	enums: {
@@ -148,61 +104,59 @@ module.exports = {
 		NO_INVITES_TO_CANCEL: 'No invites to cancel',
 		USER_NOT_MANAGED: 'User is not managed'
 	},
-    ERROR_MESSAGES: {
-        BLOB: {
-            CONNECT_ERROR: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Unable to connect to Blob service',
-            CREATION_SUCCESSFUL: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Successfully created a Blob',
-            ALREADY_EXIST: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Blob already exists'
-        },
-        DIRECTORY: {
-            CONNECT_ERROR: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Unable to connect to Directory service',
-            CREATION_SUCCESSFUL: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Successfully created a Directory',
-            ALREADY_EXIST: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Directory already exists'
-        },
-        FILE: {
-            CONNECT_ERROR: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Unable to connect to FileUpload service',
-            CREATION_SUCCESSFUL: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Successfully uploaded a File',
-            ALREADY_EXIST: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: File already exists'
-        },
-        STORAGE_SERVICE: {
-            CONNECT_ERROR: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Unable to connect to given Storage service'
-        },
-        RABBITMQ: {
-            PUBLISHER: {
-                CONNECT_ERROR: 'ADPUSHUP_APP.RABBITMQ.PUBLISHER: Unable to connect to RabbitMQ service'
-            },
-            CONSUMER: {
-                CONNECT_ERROR: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Unable to connect to RabbitMQ service',
-                EMPTY_MESSAGE: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Empty message received'
-            }
-        },
-        MESSAGE: {
-            INVALID_DATA: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Invalid Message consumer',
-            CDN_SYNC_ERROR: 'Unable to sync file with cdn',
-        }
-    },
-    SUCCESS_MESSAGES: {
-        RABBITMQ: {
-            PUBLISHER: {
-                MESSAGE_PUBLISHED: 'ADPUSHUP_APP.RABBITMQ.PUBLISHER: Successfully published data'
-            },
-            CONSUMER: {
-                MESSAGE_RECEIVED: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Received message data'
-            }
-        }
-    },
+	ERROR_MESSAGES: {
+		BLOB: {
+			CONNECT_ERROR: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Unable to connect to Blob service',
+			CREATION_SUCCESSFUL: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Successfully created a Blob',
+			ALREADY_EXIST: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Blob already exists'
+		},
+		DIRECTORY: {
+			CONNECT_ERROR: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Unable to connect to Directory service',
+			CREATION_SUCCESSFUL: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Successfully created a Directory',
+			ALREADY_EXIST: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Directory already exists'
+		},
+		FILE: {
+			CONNECT_ERROR: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Unable to connect to FileUpload service',
+			CREATION_SUCCESSFUL: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Successfully uploaded a File',
+			ALREADY_EXIST: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: File already exists'
+		},
+		STORAGE_SERVICE: {
+			CONNECT_ERROR: 'ADPUSHUP_APP.CLOUD_STORAGE_UPLOAD: Unable to connect to given Storage service'
+		},
+		RABBITMQ: {
+			PUBLISHER: {
+				CONNECT_ERROR: 'ADPUSHUP_APP.RABBITMQ.PUBLISHER: Unable to connect to RabbitMQ service'
+			},
+			CONSUMER: {
+				CONNECT_ERROR: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Unable to connect to RabbitMQ service',
+				EMPTY_MESSAGE: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Empty message received'
+			}
+		},
+		MESSAGE: {
+			INVALID_DATA: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Invalid Message consumer',
+			CDN_SYNC_ERROR: 'Unable to sync file with cdn',
+			UNSYNCED_SETUP: 'Unsynced ads in setup'
+		}
+	},
+	SUCCESS_MESSAGES: {
+		RABBITMQ: {
+			PUBLISHER: {
+				MESSAGE_PUBLISHED: 'ADPUSHUP_APP.RABBITMQ.PUBLISHER: Successfully published data'
+			},
+			CONSUMER: {
+				MESSAGE_RECEIVED: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Received message data'
+			}
+		}
+	},
 	environment: {
-		'development': 'development',
-		'production': 'production'
-    },
-    onboarding: {
-        steps: [
-            'Add Site',
-            'Add AP code',
-            'Setup Passback'
-        ],
-        revenueLowerBound : 1000,
-        initialStep: 1,
-        totalSteps: 3
-    }
+		development: 'development',
+		production: 'production'
+	},
+	onboarding: {
+		steps: ['Add Site', 'Add AP code', 'Setup Passback'],
+		revenueLowerBound: 1000,
+		initialStep: 1,
+		totalSteps: 3
+	},
+	CDN_SYNC_MAX_ATTEMPTS: 10
 };
