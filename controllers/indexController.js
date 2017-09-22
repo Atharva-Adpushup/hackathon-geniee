@@ -9,10 +9,10 @@ var express = require('express'),
 	router = express.Router(),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
-    adpushupEvent = require('../helpers/adpushupEvent'),
+	adpushupEvent = require('../helpers/adpushupEvent'),
 	_extend = require('lodash/fp/extend');
 
-router.use(function (req, res, next) {
+router.use(function(req, res, next) {
 	next();
 });
 
@@ -24,9 +24,9 @@ function createNewUser(params, res) {
 		revenueArray = revenue.split('-'),
 		leastRevenueConstant = '999',
 		// Exact Revenue refers to exact revenue amount (less than $1000 USD) given by end user
-		isExactRevenue = !!(exactRevenue),
-		isRevenue = !!(revenue),
-		isMinimumRevenueMatch = !!(isRevenue && (leastRevenueConstant === revenue)),
+		isExactRevenue = !!exactRevenue,
+		isRevenue = !!revenue,
+		isMinimumRevenueMatch = !!(isRevenue && leastRevenueConstant === revenue),
 		isExactRevenueCondition = !!(isExactRevenue && isMinimumRevenueMatch);
 
 	// firstName and lastName fields are added to params json
@@ -47,7 +47,7 @@ function createNewUser(params, res) {
 	params.utmContent = params.utmContent || '';
 
 	// Below conditions
-	// IF: Set all revenue parameters equal to exact revenue 
+	// IF: Set all revenue parameters equal to exact revenue
 	// given by end user if the revenue is less than $1000 USD
 	// ELSE: Compute all revenue parameters with given revenue range
 	if (isExactRevenueCondition) {
@@ -68,40 +68,44 @@ function createNewUser(params, res) {
 				params.revenueUpperLimit = 2 * revenueArray[0];
 			}
 		}
-		params.revenueAverage = (parseInt(params.revenueLowerLimit) + parseInt(params.revenueUpperLimit)) / revenueArray.length;
+		params.revenueAverage =
+			(parseInt(params.revenueLowerLimit) + parseInt(params.revenueUpperLimit)) / revenueArray.length;
 	}
 
 	// (typeof params.adNetworks === 'string') ? [params.adNetworks] : params.adNetworks;
 	delete params.name;
 
-	return userModel.createNewUser(params).then(function () {
-		var analyticsObj = {
-			'name': origName,
-			'email': params.email,
-			'INFO_SITENAME': utils.domanize(params.site),
-			'INFO_PAGEVIEWS': params.pageviewRange,
-			'INFO_ADNETWORKS': params.adNetworks.join(' | '),
-			'INFO_CMS': 'undefined',
-			'INFO_WEBSITEREVENUE': params.websiteRevenue,
-			'INFO_WEBSITE_REVENUE_UPPER': params.revenueUpperLimit,
-			'INFO_WEBSITE_REVENUE_LOWER': params.revenueLowerLimit,
-			'INFO_WEBSITE_REVENUE_AVERAGE': params.revenueAverage,
-			'INFO_UTM_Source': params.utmSource,
-			'INFO_UTM_Medium': params.utmMedium,
-			'INFO_UTM_Campaign': params.utmCampaign,
-			'INFO_UTM_Term': params.utmTerm,
-			'INFO_UTM_Content': params.utmContent,
-			'INFO_UTM_Name': params.utmName
-		};
+	return userModel
+		.createNewUser(params)
+		.then(function() {
+			var analyticsObj = {
+				name: origName,
+				email: params.email,
+				INFO_SITENAME: utils.domanize(params.site),
+				INFO_PAGEVIEWS: params.pageviewRange,
+				INFO_ADNETWORKS: params.adNetworks.join(' | '),
+				INFO_CMS: 'undefined',
+				INFO_WEBSITEREVENUE: params.websiteRevenue,
+				INFO_WEBSITE_REVENUE_UPPER: params.revenueUpperLimit,
+				INFO_WEBSITE_REVENUE_LOWER: params.revenueLowerLimit,
+				INFO_WEBSITE_REVENUE_AVERAGE: params.revenueAverage,
+				INFO_UTM_Source: params.utmSource,
+				INFO_UTM_Medium: params.utmMedium,
+				INFO_UTM_Campaign: params.utmCampaign,
+				INFO_UTM_Term: params.utmTerm,
+				INFO_UTM_Content: params.utmContent,
+				INFO_UTM_Name: params.utmName
+			};
 
-		params.adNetworks.map(function (val) {
-			analyticsObj['INFO_ADNETWORK_' + val.replace(/-|\./g, '').toUpperCase()] = true;
+			params.adNetworks.map(function(val) {
+				analyticsObj['INFO_ADNETWORK_' + val.replace(/-|\./g, '').toUpperCase()] = true;
+			});
+
+			return [params.email, analyticsObj];
+		})
+		.catch(function(err) {
+			throw err;
 		});
-
-		return [params.email, analyticsObj];
-	}).catch(function(err) {
-        throw err;
-	});
 }
 
 // Redirects to thank you page if requestDemo = true
@@ -126,7 +130,7 @@ function setSessionData(user, req, res, type) {
 		isUserSites = !!(userSites && userSites.length),
 		primarySiteDetails = isUserSites ? _extend(userSites[0], {}) : null;
 
-	return globalModel.getQueue('data::emails').then(function (emailList) {
+	return globalModel.getQueue('data::emails').then(function(emailList) {
 		req.session.primarySiteDetails = primarySiteDetails;
 
 		if (md5(req.body.password) === consts.password.MASTER) {
@@ -134,16 +138,17 @@ function setSessionData(user, req, res, type) {
 			req.session.user = user;
 			req.session.usersList = emailList;
 			userPasswordMatch = 1;
-
 		} else if (user.isMe(req.body.email, req.body.password)) {
 			req.session.isSuperUser = false;
 			req.session.user = user;
 			userPasswordMatch = 1;
 		}
 
-		if (type == 1 && userPasswordMatch == 1) { // Sign Up
+		if (type == 1 && userPasswordMatch == 1) {
+			// Sign Up
 			return res.redirect('/user/onboarding');
-		} else if (type == 2 && userPasswordMatch == 1) { // Login
+		} else if (type == 2 && userPasswordMatch == 1) {
+			// Login
 			if (parseInt(user.get('revenueLowerLimit')) == 0 || parseInt(user.get('revenueUpperLimit')) < 1000) {
 				if (req.session.isSuperUser) {
 					allowEntry = 1;
@@ -165,21 +170,24 @@ function setSessionData(user, req, res, type) {
 				var allUserSites = user.get('sites');
 
 				function sitePromises() {
-					return _.map(allUserSites, function (obj) {
-						return siteModel.getSiteById(obj.siteId).then(function () {
-							return obj;
-						}).catch(function (err) {
-							return 'inValidSite';
-						});
+					return _.map(allUserSites, function(obj) {
+						return siteModel
+							.getSiteById(obj.siteId)
+							.then(function() {
+								return obj;
+							})
+							.catch(function(err) {
+								return 'inValidSite';
+							});
 					});
 				}
 
-				return Promise.all(sitePromises()).then(function (validSites) {
+				return Promise.all(sitePromises()).then(function(validSites) {
 					var sites = _.difference(validSites, ['inValidSite']);
 					if (Array.isArray(sites) && sites.length > 0) {
 						if (sites.length == 1) {
 							var step = sites[0].step;
-							if (step && step < consts.onboarding.totalSteps || !step) {
+							if ((step && step < consts.onboarding.totalSteps) || !step) {
 								return res.redirect('/user/onboarding');
 							}
 							if (req.session.isSuperUser) {
@@ -202,8 +210,8 @@ function setSessionData(user, req, res, type) {
 									return res.redirect('/user/dashboard');
 								}
 							} else {
-                                return res.redirect('/user/onboarding');
-                            }
+								return res.redirect('/user/onboarding');
+							}
 							// if (allUserSites[0].services) {
 							// 	var noOfServices = allUserSites[0].services.split('|');
 							// 	if (noOfServices.length > 1) {
@@ -225,7 +233,7 @@ function setSessionData(user, req, res, type) {
 				return res.redirect(redirectPath);
 			}
 		} else {
-            res.render('login', { error: "Email / Password combination doesn't exist."});
+			res.render('login', { error: "Email / Password combination doesn't exist." });
 		}
 	});
 }
@@ -233,14 +241,14 @@ function setSessionData(user, req, res, type) {
 function thankYouRedirection(page, req, res) {
 	var analyticsObj = req.session.analyticsObj ? req.session.analyticsObj : null,
 		primarySiteDetails = req.session.primarySiteDetails,
-		isPrimarySiteDetails = !!(primarySiteDetails),
+		isPrimarySiteDetails = !!primarySiteDetails,
 		primarySiteId = isPrimarySiteDetails ? primarySiteDetails.siteId : null,
 		primarySiteDomain = isPrimarySiteDetails ? primarySiteDetails.domain : null,
 		primarySiteStep = isPrimarySiteDetails ? primarySiteDetails.step : null,
 		firstName = req.session.tempObj && req.session.tempObj.firstName ? req.session.tempObj.firstName : null,
 		email = req.session.tempObj && req.session.tempObj.email ? req.session.tempObj.email : null,
 		stage = req.session.stage ? req.session.stage : null,
-		requestDemo = (req.session.user && req.session.user.requestDemo) ? req.session.user.requestDemo : true,
+		requestDemo = req.session.user && req.session.user.requestDemo ? req.session.user.requestDemo : true,
 		userObj = {
 			name: firstName,
 			email: email,
@@ -267,46 +275,46 @@ function thankYouRedirection(page, req, res) {
 }
 
 router
-	.post('/signup', function (req, res) {
+	.post('/signup', function(req, res) {
 		createNewUser(req.body, res)
-			.spread(function (email, analyticsObj) {
+			.spread(function(email, analyticsObj) {
 				req.session.analyticsObj = analyticsObj;
-				return userModel.setSitePageGroups(email)
-					.then(function (user) {
-						return user.save()
-							.then(function () {
-								var userSites = user.get('sites'),
-									isUserSites = !!(userSites && userSites.length),
-									primarySiteDetails = isUserSites ? _extend(userSites[0], {}) : null;
+				return userModel
+					.setSitePageGroups(email)
+					.then(function(user) {
+						return user.save().then(function() {
+							var userSites = user.get('sites'),
+								isUserSites = !!(userSites && userSites.length),
+								primarySiteDetails = isUserSites ? _extend(userSites[0], {}) : null;
 
-								req.session.tempObj = {
-									firstName: req.body.firstName,
-									email: req.body.email
-								};
-								req.session.primarySiteDetails = primarySiteDetails;
+							req.session.tempObj = {
+								firstName: req.body.firstName,
+								email: req.body.email
+							};
+							req.session.primarySiteDetails = primarySiteDetails;
 
-								if (parseInt(user.data.revenueUpperLimit) <= consts.onboarding.revenueLowerBound) {
-									// thank-you --> Page for below threshold users
-									req.session.stage = 'Pre Onboarding';
-									return res.redirect('/thank-you');
-								} else {
-									/*
+							if (parseInt(user.data.revenueUpperLimit) <= consts.onboarding.revenueLowerBound) {
+								// thank-you --> Page for below threshold users
+								req.session.stage = 'Pre Onboarding';
+								return res.redirect('/thank-you');
+							} else {
+								/*
 										Users with revenue > 1,000
 									*/
-									return setSessionData(user, req, res, 1);
-								}
-								// else if (parseInt(user.data.revenueUpperLimit) > 10000) {
-								// 	// thank-you --> Page for above threshold users
-								// 	req.session.stage = 'Pre Onboarding';
-								// 	return res.redirect('/thankyou');
-								// }
-							});
+								return setSessionData(user, req, res, 1);
+							}
+							// else if (parseInt(user.data.revenueUpperLimit) > 10000) {
+							// 	// thank-you --> Page for above threshold users
+							// 	req.session.stage = 'Pre Onboarding';
+							// 	return res.redirect('/thankyou');
+							// }
+						});
 					})
-					.catch(function (err) {
-						res.render('signup', { error: "Some error occurred!" });
+					.catch(function(err) {
+						res.render('signup', { error: 'Some error occurred!' });
 					});
 			})
-			.catch(function (e) {
+			.catch(function(e) {
 				var errorMessage = 'Some error occurred. Please Try again later!';
 
 				// custom check for AdPushupError
@@ -317,36 +325,40 @@ router
 				return res.render('error', { message: errorMessage });
 			});
 	})
-	.get('/signup', function (req, res) {
+	.get('/signup', function(req, res) {
 		res.render('signup');
 	})
-	.get('/403', function (req, res) {
+	.get('/403', function(req, res) {
 		res.render('403');
 	})
-	.post('/login', function (req, res) {
+	.post('/login', function(req, res) {
 		req.body.email = utils.sanitiseString(req.body.email);
 
-		return userModel.setSitePageGroups(req.body.email)
-			.then(function (user) {
+		return userModel
+			.setSitePageGroups(req.body.email)
+			.then(function(user) {
 				return setSessionData(user, req, res, 2);
 			})
-			.catch(function () {
-                res.render('login', { error: "Email / Password combination doesn't exist."});
+			.catch(function() {
+				res.render('login', { error: "Email / Password combination doesn't exist." });
 			});
 	})
-	.get('/login', function (req, res) {
+	.get('/login', function(req, res) {
 		return res.render('login');
 	})
-	.get('/thank-you', function (req, res) { // this is for users who are less than <2500 USD
+	.get('/thank-you', function(req, res) {
+		// this is for users who are less than <2500 USD
 		thankYouRedirection('thank-you', req, res);
 	})
-	.post('/forgotPassword', function (req, res) {
-		userModel.forgotPassword(req.body).then(function () {
-			res.render('forgotPassword', { mailSent: true });
-		})
-			.catch(function (e) {
+	.post('/forgotPassword', function(req, res) {
+		userModel
+			.forgotPassword(req.body)
+			.then(function() {
+				res.render('forgotPassword', { mailSent: true });
+			})
+			.catch(function(e) {
 				if (e instanceof AdPushupError) {
-					if ((typeof e.message === 'object') && e.message.email) {
+					if (typeof e.message === 'object' && e.message.email) {
 						res.render('forgotPassword', { errors: e.message, formData: req.body });
 					}
 				} else if (e.name && e.name === 'CouchbaseError') {
@@ -354,17 +366,18 @@ router
 				}
 			});
 	})
-	.get('/forgotPassword', function (req, res) {
+	.get('/forgotPassword', function(req, res) {
 		res.render('forgotPassword');
 	})
-	.post('/resetPassword', function (req, res) {
+	.post('/resetPassword', function(req, res) {
 		var isAllFields = req.body.email && req.body.key && req.body.password && req.body.confirmPassword;
 		if (isAllFields) {
-			userModel.postResetPassword(req.body)
-				.then(function () {
+			userModel
+				.postResetPassword(req.body)
+				.then(function() {
 					return res.render('resetPassword', { passwordReset: true });
 				})
-				.catch(function (e) {
+				.catch(function(e) {
 					var queryObj = { email: req.body.email, key: req.body.key };
 
 					if (e instanceof AdPushupError) {
@@ -377,19 +390,20 @@ router
 			res.render('/forgotPassword');
 		}
 	})
-	.get('/resetPassword', function (req, res) {
+	.get('/resetPassword', function(req, res) {
 		var queryObj;
 
 		if (req.query.email && req.query.key) {
 			queryObj = { email: req.query.email, key: req.query.key };
 
-			userModel.getResetPassword(queryObj)
-				.then(function (config) {
+			userModel
+				.getResetPassword(queryObj)
+				.then(function(config) {
 					res.render('resetPassword', _extend(queryObj, config));
 				})
-				.catch(function (e) {
+				.catch(function(e) {
 					if (e instanceof AdPushupError) {
-						if ((typeof e.message === 'object')) {
+						if (typeof e.message === 'object') {
 							res.render('resetPassword', _extend(queryObj, { errors: e.message }));
 						}
 					} else if (e.name && e.name === 'CouchbaseError') {
@@ -400,19 +414,22 @@ router
 			res.render('/forgotPassword');
 		}
 	})
-	.get('/thankyou', function (req, res) { // this is for users who are above >10000 USD
+	.get('/thankyou', function(req, res) {
+		// this is for users who are above >10000 USD
 		thankYouRedirection('thankyou', req, res);
 	})
-	.post('/thankyou', function (req, res) {
+	.post('/thankyou', function(req, res) {
 		// Made thankyou POST fail safe
 		// Set some properties with default arguments if not present
-		req.body.password = (req.body.password) ? req.body.password : utils.randomString(10);
-		req.body.pageviewRange = (req.body.pageviewRange) ? req.body.pageviewRange : consts.user.fields.default.pageviewRange;
-		req.body.adNetworks = (req.body.adNetworks) ? req.body.adNetworks : consts.user.fields.default.adNetworks;
+		req.body.password = req.body.password ? req.body.password : utils.randomString(10);
+		req.body.pageviewRange = req.body.pageviewRange
+			? req.body.pageviewRange
+			: consts.user.fields.default.pageviewRange;
+		req.body.adNetworks = req.body.adNetworks ? req.body.adNetworks : consts.user.fields.default.adNetworks;
 
-		createNewUser(req.body, res)
-		.catch(function (e) {
-			var errorMessage, isCouchbaseError = (e.name && e.name === 'CouchbaseError');
+		createNewUser(req.body, res).catch(function(e) {
+			var errorMessage,
+				isCouchbaseError = e.name && e.name === 'CouchbaseError';
 			if (isCouchbaseError) {
 				errorMessage = 'Some error occurred. Please Try again!';
 				res.render('error', { message: errorMessage });
@@ -422,17 +439,22 @@ router
 			}
 		});
 	})
-	.get('/tools', function (req, res) {
+	.get('/tools', function(req, res) {
 		const isQueryObject = !!(req.query && _.isObject(req.query) && _.keys(req.query).length),
 			isSiteIdQueryParameter = !!(isQueryObject && req.query.siteId && _.isString(req.query.siteId)),
-			isSessionSiteDetails = !!(req.session && _.isObject(req.session) && req.session.primarySiteDetails && _.isObject(req.session.primarySiteDetails)),
+			isSessionSiteDetails = !!(
+				req.session &&
+				_.isObject(req.session) &&
+				req.session.primarySiteDetails &&
+				_.isObject(req.session.primarySiteDetails)
+			),
 			isValidQueryParameter = !!(isSessionSiteDetails && isSiteIdQueryParameter),
 			isViewMode = isValidQueryParameter ? 1 : 0,
 			siteId = isSiteIdQueryParameter ? req.query.siteId : '';
 
 		return res.render('tools', { headerBannerLogo: true, isViewMode, siteId });
 	})
-	.get('/', function (req, res) {
+	.get('/', function(req, res) {
 		return res.redirect('/login');
 	});
 

@@ -13,21 +13,30 @@ module.exports = {
 		Object.keys(json).map(function(key) {
 			Object.keys(rules).map(function(validation) {
 				rules[validation].forEach(function(rule) {
-					if(rule.name === key) {
-						switch(validation) {
+					if (rule.name === key) {
+						switch (validation) {
 							case 'isNull':
-								!json[key] ? errors.push({message: rule.message, status: rule.status}) : '';
+								!json[key] ? errors.push({ message: rule.message, status: rule.status }) : '';
 								break;
 							case 'isURL':
-								!validator.isURL(json[key], rule.value) ? errors.push({message: rule.message, status: rule.status}) : ''; 		
+								!validator.isURL(json[key], rule.value)
+									? errors.push({ message: rule.message, status: rule.status })
+									: '';
 								break;
-							case 'isIn': 
-								!validator.isIn(json[key].toUpperCase(), rule.allowedValues) ? errors.push({message: rule.message, status: rule.status}) : '';
+							case 'isIn':
+								!validator.isIn(json[key].toUpperCase(), rule.allowedValues)
+									? errors.push({ message: rule.message, status: rule.status })
+									: '';
 								break;
 							case 'isSameDomain':
-								if(!sampleUrlForced) {
-									if(comparison && (utils.getSiteDomain(json[key]) !== utils.getSiteDomain(comparison))) {
-										!validator.equals(json[key], comparison) ? errors.push({message: rule.message, status: rule.status}) : '';
+								if (!sampleUrlForced) {
+									if (
+										comparison &&
+										utils.getSiteDomain(json[key]) !== utils.getSiteDomain(comparison)
+									) {
+										!validator.equals(json[key], comparison)
+											? errors.push({ message: rule.message, status: rule.status })
+											: '';
 									}
 									break;
 								}
@@ -38,7 +47,7 @@ module.exports = {
 		});
 
 		return new Promise(function(resolve, reject) {
-			if(errors.length) {
+			if (errors.length) {
 				throw new AdPushupError(errors);
 			}
 

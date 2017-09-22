@@ -10,8 +10,8 @@ var Tracker = require('../libs/tracker'),
 	pageGroupTimer,
 	adp = (w.adpushup = w.adpushup || {}),
 	control = require('./control')(),
-	config = adp.config = require('../config/config.js'),
-	$ = adp.$ = require('jquery'),
+	config = (adp.config = require('../config/config.js')),
+	$ = (adp.$ = require('jquery')),
 	genieeObject = require('./genieeObject'),
 	isGenieeSite;
 
@@ -32,7 +32,7 @@ $.extend(adp.config, ___abpConfig___, {
 });
 
 //Geniee ad network specific site check
-isGenieeSite = !!(adp.config.partner && (adp.config.partner === 'geniee'));
+isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
 adp.config.isGeniee = isGenieeSite;
 
 // Empty ads array creation
@@ -41,9 +41,14 @@ adp.config.isGeniee = isGenieeSite;
 adp.config.ads = [];
 
 function shouldWeNotProceed() {
-	var hasGenieeStarted = !!((config.partner === 'geniee') && w.gnsmod && w.gnsmod.creationProcessStarted && !config.isAdPushupControlWithPartnerSSP);
+	var hasGenieeStarted = !!(
+		config.partner === 'geniee' &&
+		w.gnsmod &&
+		w.gnsmod.creationProcessStarted &&
+		!config.isAdPushupControlWithPartnerSSP
+	);
 
-	return (config.disable || adp.creationProcessStarted || hasGenieeStarted);
+	return config.disable || adp.creationProcessStarted || hasGenieeStarted;
 }
 
 function triggerControl(mode) {
@@ -99,14 +104,12 @@ function main() {
 		return false;
 	}
 
-
 	// AdPushup Percentage Logic
-	var rand = Math.floor(Math.random() * (100)) + 1;
+	var rand = Math.floor(Math.random() * 100) + 1;
 	if (rand > config.adpushupPercentage) {
 		triggerControl(4);
 		return false;
 	}
-
 
 	if (!config.pageGroup) {
 		pageGroupTimer = setTimeout(function() {

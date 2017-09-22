@@ -8,18 +8,18 @@ var express = require('express'),
 	channelModel = require('../models/channelModel'),
 	router = express.Router({ mergeParams: true });
 
-router
-	.get('/:pageGroupId', function (req, res) {
-		channelModel.getPageGroupById({id: req.params.pageGroupId, viewName: 'channelById', isExtendedParams: true})
-			.then(function (pageGroup) {
-				return res.render('pageGroup', {
-					pageGroup: pageGroup,
-					siteId: req.params.siteId
-				})
-			})
-			.catch(function (err) {
-				res.render('pageGroup');
+router.get('/:pageGroupId', function(req, res) {
+	channelModel
+		.getPageGroupById({ id: req.params.pageGroupId, viewName: 'channelById', isExtendedParams: true })
+		.then(function(pageGroup) {
+			return res.render('pageGroup', {
+				pageGroup: pageGroup,
+				siteId: req.params.siteId
 			});
-	});
+		})
+		.catch(function(err) {
+			res.render('pageGroup');
+		});
+});
 
 module.exports = router;

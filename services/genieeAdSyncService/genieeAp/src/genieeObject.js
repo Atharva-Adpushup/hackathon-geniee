@@ -1,23 +1,32 @@
 var utils = require('../libs/utils'),
-// Below object will hold all Geniee partner specific functionality
+	// Below object will hold all Geniee partner specific functionality
 	genieeObject = {
-	// Get zone id and ecpm values for every successful zone impression
-		registerZoneECPM: function (inputZoneId, inputZoneECPM) {
-			if (!inputZoneId || !inputZoneECPM) { return false; }
+		// Get zone id and ecpm values for every successful zone impression
+		registerZoneECPM: function(inputZoneId, inputZoneECPM) {
+			if (!inputZoneId || !inputZoneECPM) {
+				return false;
+			}
 
 			inputZoneId = parseInt(inputZoneId, 10);
 			inputZoneECPM = parseFloat(inputZoneECPM);
 
 			var globalConfig = window.adpushup.config,
-				getMatchedAdId = function (adsArray, zoneId) {
+				getMatchedAdId = function(adsArray, zoneId) {
 					var adId = null;
 
-					if (!adsArray.length || !zoneId) { return null; }
+					if (!adsArray.length || !zoneId) {
+						return null;
+					}
 
-					adsArray.forEach(function (adObject) {
-						var isGenieeObject = !!(adObject && adObject.network && (adObject.network === 'geniee') && adObject.networkData),
+					adsArray.forEach(function(adObject) {
+						var isGenieeObject = !!(
+								adObject &&
+								adObject.network &&
+								adObject.network === 'geniee' &&
+								adObject.networkData
+							),
 							isNetworkData = !!(isGenieeObject && adObject.networkData.zoneId),
-							isZoneIdMatch = !!(isNetworkData && (adObject.networkData.zoneId === zoneId));
+							isZoneIdMatch = !!(isNetworkData && adObject.networkData.zoneId === zoneId);
 
 						if (isZoneIdMatch) {
 							adId = adObject.id;
@@ -30,7 +39,9 @@ var utils = require('../libs/utils'),
 				matchedAdId = getMatchedAdId(globalConfig.ads, inputZoneId),
 				resultObject;
 
-			if (!matchedAdId) { return false; }
+			if (!matchedAdId) {
+				return false;
+			}
 
 			resultObject = {
 				eventType: 11,

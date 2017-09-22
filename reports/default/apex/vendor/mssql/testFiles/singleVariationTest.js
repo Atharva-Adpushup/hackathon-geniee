@@ -5,26 +5,27 @@ const apexSingleVariationModule = require('../../../modules/mssql/singleVariatio
 	moment = require('moment'),
 	Promise = require('bluebird'),
 	paramConfig = {
-		'siteId': 25019,
-		'siteDomain': 'http://koredakedeok.blog.jp/',
-		'reportType': 'geniee',
-		'platform': 'DESKTOP',
-		'pageGroup': 'HOME',
-		'startDate': moment(1501659059660, 'x').format('YYYY-MM-DD'),
-		'endDate': moment(1502263859660, 'x').format('YYYY-MM-DD'),
-		'step': '1d',
-		'_': '1502263858621',
-		'variationCount': 3,
-		'mode': 1,
-		'variationId': '284fa527-6d9b-4276-9f98-efc12aa57965'
+		siteId: 25019,
+		siteDomain: 'http://koredakedeok.blog.jp/',
+		reportType: 'geniee',
+		platform: 'DESKTOP',
+		pageGroup: 'HOME',
+		startDate: moment(1501659059660, 'x').format('YYYY-MM-DD'),
+		endDate: moment(1502263859660, 'x').format('YYYY-MM-DD'),
+		step: '1d',
+		_: '1502263858621',
+		variationCount: 3,
+		mode: 1,
+		variationId: '284fa527-6d9b-4276-9f98-efc12aa57965'
 	};
 
 function testApexModule() {
-	return apexSingleVariationModule.getData(paramConfig)
+	return apexSingleVariationModule
+		.getData(paramConfig)
 		.then(result => {
 			console.log(`testApexModule is: ${JSON.stringify(result)}`);
 		})
-		.catch((err) => {
+		.catch(err => {
 			console.log(`testApexModule: Error occurred ${err.toString()}`);
 		});
 }
@@ -36,7 +37,7 @@ function testPageGroupVariationsData() {
 		.then(result => {
 			console.log(`testPageGroupVariationsData: ${JSON.stringify(result)}`);
 		})
-		.catch((err) => {
+		.catch(err => {
 			console.log(`testPageGroupVariationsData: Error occurred ${err.toString()}`);
 		});
 }
@@ -53,13 +54,11 @@ function testVariationDataWithDummyReportData() {
 		.then(result => {
 			console.log(`testVariationDataWithDummyReportData: Result is: ${JSON.stringify(result)}`);
 		})
-		.catch((err) => {
+		.catch(err => {
 			console.log(`testVariationDataWithDummyReportData: Error occurred ${err.toString()}`);
 		});
 }
 
-
 // setTimeout(testApexModule, 3000);
 //setTimeout(testPageGroupVariationsData, 3000);
 setTimeout(testVariationDataWithDummyReportData, 3000);
-

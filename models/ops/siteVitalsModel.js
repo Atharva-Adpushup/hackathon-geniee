@@ -3,7 +3,8 @@ var couchbase = require('../../helpers/couchBaseService'),
 	es = require('../../helpers/elasticSearchService'),
 	esqm = require('../../helpers/ElasticsearchQueryMaker'),
 	Promise = require('bluebird'),
-	resultIsValid, API;
+	resultIsValid,
+	API;
 
 function getSiteQuicks(siteDoc) {
 	var quicks = {},
@@ -25,8 +26,13 @@ function getSiteQuicks(siteDoc) {
 
 function getQuickChannelData(queryResult) {
 	var chnls = {},
-		i, d, result, platform, pageGroup,
-		contentSelector, channelName;
+		i,
+		d,
+		result,
+		platform,
+		pageGroup,
+		contentSelector,
+		channelName;
 
 	for (i = 0; i < queryResult.length; i++) {
 		result = queryResult[i];
@@ -55,7 +61,12 @@ function siteWiseFill(config, toFill) {
 		q,
 		siteFilter = esqm.createTermFilter('siteId', siteId),
 		rangeFilter = esqm.createRangeFilter('createdTs', dateStart, dateEnd),
-		aggr = { 'PAGE_GROUPS': { 'terms': { 'field': 'pageGroup', 'size': 0 }, 'aggs': { 'PLATFORMS': { 'terms': { 'field': 'userAnalytics.platform', 'size': 0 } } } } };
+		aggr = {
+			PAGE_GROUPS: {
+				terms: { field: 'pageGroup', size: 0 },
+				aggs: { PLATFORMS: { terms: { field: 'userAnalytics.platform', size: 0 } } }
+			}
+		};
 
 	esqm.addFilterToBoolPath(b, 'must', siteFilter);
 	esqm.addFilterToBoolPath(b, 'must', rangeFilter);
@@ -65,8 +76,17 @@ function siteWiseFill(config, toFill) {
 	return es.search('ap_stats_new', 'e3lg', q).then(function(result) {
 		if (resultIsValid(result)) {
 			var totalDocs = result.hits.total,
-				i, j, res, pageGroup, d, platformsResult,
-				ress, platform, p, pageGroups, pageGroupsResult;
+				i,
+				j,
+				res,
+				pageGroup,
+				d,
+				platformsResult,
+				ress,
+				platform,
+				p,
+				pageGroups,
+				pageGroupsResult;
 
 			toFill.siteWise.doc_count = totalDocs;
 			pageGroups = {};
@@ -108,7 +128,29 @@ function channelWiseFill(config, toFill) {
 		b = esqm.createBoolFilter(),
 		siteFilter = esqm.createTermFilter('siteId', siteId),
 		rangeFilter = esqm.createRangeFilter('createdTs', dateStart, dateEnd),
-		aggr = { 'TOP_URLS': { 'terms': { 'field': 'urlNormalized', 'size': 15, 'collect_mode': 'breadth_first' } }, 'TOP_BROWSERS': { 'terms': { 'field': 'userAnalytics.apBrowser', 'size': 15, 'collect_mode': 'breadth_first' } }, 'CONTROL_MODES': { 'terms': { 'field': 'finalMode', 'size': 20 } }, 'AP': { 'filter': { 'term': { 'ads.success': true } }, 'aggs': { 'TRACKING': { 'filter': { 'term': { 'tracking': true } }, 'aggs': { 'CLICKS': { 'filter': { 'term': { 'ads.clicked': true } } } } } } }, 'CONTROL': { 'filter': { 'range': { 'finalMode': { 'gt': 1 } } }, 'aggs': { 'TRACKING': { 'filter': { 'term': { 'tracking': true } }, 'aggs': { 'CLICKS': { 'filter': { 'exists': { 'field': 'clickTs' } } } } } } } },
+		aggr = {
+			TOP_URLS: { terms: { field: 'urlNormalized', size: 15, collect_mode: 'breadth_first' } },
+			TOP_BROWSERS: { terms: { field: 'userAnalytics.apBrowser', size: 15, collect_mode: 'breadth_first' } },
+			CONTROL_MODES: { terms: { field: 'finalMode', size: 20 } },
+			AP: {
+				filter: { term: { 'ads.success': true } },
+				aggs: {
+					TRACKING: {
+						filter: { term: { tracking: true } },
+						aggs: { CLICKS: { filter: { term: { 'ads.clicked': true } } } }
+					}
+				}
+			},
+			CONTROL: {
+				filter: { range: { finalMode: { gt: 1 } } },
+				aggs: {
+					TRACKING: {
+						filter: { term: { tracking: true } },
+						aggs: { CLICKS: { filter: { exists: { field: 'clickTs' } } } }
+					}
+				}
+			}
+		},
 		q = esqm.getDefaultQuery(b, aggr, 0);
 
 	esqm.addFilterToBoolPath(b, 'must', siteFilter);
@@ -126,34 +168,40 @@ function channelWiseFill(config, toFill) {
 			var totalDocs = result.hits.total,
 				topBrowsers = result.aggregations.TOP_BROWSERS.buckets,
 				apNumbers = {
-					'perc': 0,
-					'doc_count': 0,
-					'TRACKING': {
-						'perc': 0,
-						'doc_count': 0,
-						'CLICKS': {
-							'ctr': 0,
-							'doc_count': 0
+					perc: 0,
+					doc_count: 0,
+					TRACKING: {
+						perc: 0,
+						doc_count: 0,
+						CLICKS: {
+							ctr: 0,
+							doc_count: 0
 						}
 					}
 				},
 				controlNumbers = {
-					'perc': 0,
-					'doc_count': 0,
-					'TRACKING': {
-						'perc': 0,
-						'doc_count': 0,
-						'CLICKS': {
-							'ctr': 0,
-							'doc_count': 0
+					perc: 0,
+					doc_count: 0,
+					TRACKING: {
+						perc: 0,
+						doc_count: 0,
+						CLICKS: {
+							ctr: 0,
+							doc_count: 0
 						}
 					}
 				},
 				miscNumbers = {
-					'doc_count': 0,
-					'perc': 0
-				}, apResult, apTrackingResult, apClickResult,
-				controlResult, controlTrackingResult, controlClickResult, overallModes,
+					doc_count: 0,
+					perc: 0
+				},
+				apResult,
+				apTrackingResult,
+				apClickResult,
+				controlResult,
+				controlTrackingResult,
+				controlClickResult,
+				overallModes,
 				topUrls;
 
 			if (totalDocs !== 0) {
@@ -187,10 +235,12 @@ function channelWiseFill(config, toFill) {
 					if (controlTrackingResult.doc_count !== 0) {
 						controlClickResult = controlTrackingResult.CLICKS;
 						controlNumbers.TRACKING.CLICKS.doc_count = controlClickResult.doc_count;
-						controlNumbers.TRACKING.CLICKS.ctr = calcPerc(controlClickResult.doc_count, controlTrackingResult.doc_count);
+						controlNumbers.TRACKING.CLICKS.ctr = calcPerc(
+							controlClickResult.doc_count,
+							controlTrackingResult.doc_count
+						);
 					}
 				}
-
 
 				miscNumbers.doc_count = totalDocs - (apNumbers.doc_count + controlNumbers.doc_count);
 				miscNumbers.perc = calcPerc(miscNumbers.doc_count, totalDocs);
@@ -241,7 +291,8 @@ resultIsValid = function(result) {
 API = {
 	getResult: function(req) {
 		var config = req.config,
-			appBucket = null, toReturn;
+			appBucket = null,
+			toReturn;
 
 		if (config.dateEnd === null) {
 			config.dateEnd = Date.now();
@@ -255,43 +306,49 @@ API = {
 			config: config,
 			siteWise: {},
 			channelWise: {
-				'numbers': {}
+				numbers: {}
 			}
 		};
 
-		return couchbase.connectToAppBucket()
-			.then(function(bucket) {
-				appBucket = bucket;
-			})
-			// get site quicks
-			.then(function() {
-				return appBucket.getAsync('site::' + config.siteId, {})
-					.then(function(siteDocObj) {
+		return (
+			couchbase
+				.connectToAppBucket()
+				.then(function(bucket) {
+					appBucket = bucket;
+				})
+				// get site quicks
+				.then(function() {
+					return appBucket.getAsync('site::' + config.siteId, {}).then(function(siteDocObj) {
 						toReturn.siteWise.siteDoc = getSiteQuicks(siteDocObj.value);
 						return true;
 					});
-			})
-			.then(function() {
-				var query = ViewQuery.from('ops', 'channelsPerSite').range([config.siteId, null, null], [config.siteId, [], []], true);
-				return new Promise(function(resolve, reject) {
-					appBucket.query(query, {}, function(err, result) {
-						if (err) {
-							reject(err);
-						}
-						toReturn.siteWise.chnls = getQuickChannelData(result);
-						resolve(true);
+				})
+				.then(function() {
+					var query = ViewQuery.from('ops', 'channelsPerSite').range(
+						[config.siteId, null, null],
+						[config.siteId, [], []],
+						true
+					);
+					return new Promise(function(resolve, reject) {
+						appBucket.query(query, {}, function(err, result) {
+							if (err) {
+								reject(err);
+							}
+							toReturn.siteWise.chnls = getQuickChannelData(result);
+							resolve(true);
+						});
 					});
-				});
-			})
-			.then(function() {
-				return siteWiseFill(config, toReturn);
-			})
-			.then(function() {
-				return channelWiseFill(config, toReturn);
-			})
-			.then(function() {
-				return { 'response_type': 'good', 'msg': toReturn };
-			});
+				})
+				.then(function() {
+					return siteWiseFill(config, toReturn);
+				})
+				.then(function() {
+					return channelWiseFill(config, toReturn);
+				})
+				.then(function() {
+					return { response_type: 'good', msg: toReturn };
+				})
+		);
 	}
 };
 

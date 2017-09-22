@@ -11,10 +11,12 @@ function getDbQueryDateMillis() {
 	// NOTE: A date after which console.adpushup.com was made live
 	// This date is chosen as startDate to get data parameters (page views, clicks etc) for every site
 	// from its day one
-	var startDate = "20161201",
+	var startDate = '20161201',
 		computedObj = {
 			startDate: moment(startDate).valueOf(),
-			endDate: moment().subtract(4, 'hours').valueOf()
+			endDate: moment()
+				.subtract(4, 'hours')
+				.valueOf()
 		};
 
 	return computedObj;
@@ -32,11 +34,12 @@ module.exports = {
 			query = sitesByAutoOptimiseParameterQuery.range(queryDateRange.startDate, queryDateRange.endDate, true),
 			performQuery = couchBaseService.queryViewFromAppBucket(query).then(getAllSiteModels);
 
-		return Promise.all(performQuery).then(function(siteModels) {
-			return siteModels;
-		})
-		.catch(function(e) {
-			throw e;
-		});
+		return Promise.all(performQuery)
+			.then(function(siteModels) {
+				return siteModels;
+			})
+			.catch(function(e) {
+				throw e;
+			});
 	}
 };

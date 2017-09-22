@@ -40,24 +40,33 @@ API = {
 		if (bucketName === config.couchBase.DEFAULT_BUCKET || bucketName === 'apLocalBucket') {
 			return connect(bucketName, config.couchBase.DEFAULT_BUCKET_PASSWORD, config.couchBase.HOST);
 		} else if (bucketName === 'apAppBucket') {
-			return connect(bucketName,  config.ops.couchBaseBuckets.apAppBucket.BUCKET_PASSWORD,  config.ops.couchBaseBuckets.apAppBucket.HOST);
+			return connect(
+				bucketName,
+				config.ops.couchBaseBuckets.apAppBucket.BUCKET_PASSWORD,
+				config.ops.couchBaseBuckets.apAppBucket.HOST
+			);
 		} else if (bucketName === 'apStatsBucket') {
-			return connect(bucketName,  config.ops.couchBaseBuckets.apStatsBucket.BUCKET_PASSWORD,  config.ops.couchBaseBuckets.apStatsBucket.HOST);
+			return connect(
+				bucketName,
+				config.ops.couchBaseBuckets.apStatsBucket.BUCKET_PASSWORD,
+				config.ops.couchBaseBuckets.apStatsBucket.HOST
+			);
 		} else if (bucketName === 'apGlobalBucket') {
-			return connect(bucketName, config.ops.couchBaseBuckets.apGlobalBucket.BUCKET_PASSWORD, config.ops.couchBaseBuckets.apGlobalBucket.HOST);
+			return connect(
+				bucketName,
+				config.ops.couchBaseBuckets.apGlobalBucket.BUCKET_PASSWORD,
+				config.ops.couchBaseBuckets.apGlobalBucket.HOST
+			);
 		}
 	},
 	connectToAppBucket: function() {
 		return connect(config.couchBase.DEFAULT_BUCKET, config.couchBase.DEFAULT_BUCKET_PASSWORD);
 	},
 	queryViewFromAppBucket: function(query) {
-		return API.connectToAppBucket()
-			.then(function(appBucket) {
-				return appBucket.queryPromise(query);
-			});
+		return API.connectToAppBucket().then(function(appBucket) {
+			return appBucket.queryPromise(query);
+		});
 	}
-
 };
 
 module.exports = API;
-

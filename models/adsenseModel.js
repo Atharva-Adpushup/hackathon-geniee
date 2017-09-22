@@ -17,7 +17,7 @@ var google = require('googleapis'),
 		this.oauthClient = oauthClient;
 		google.options({ auth: oauthClient });
 	};
-	const { fileLogger } = require('../helpers/logger/file/index');
+const { fileLogger } = require('../helpers/logger/file/index');
 
 function processReports(metric, data) {
 	var finalData, averages, currency, headers;
@@ -25,13 +25,37 @@ function processReports(metric, data) {
 	finalData = _.map(data.rows, function(rowNum) {
 		switch (metric) {
 			case 'AD_REQUESTS':
-				return [rowNum[0], Number(rowNum[1]), Number(rowNum[2]), Number(parseFloat(rowNum[3] * 100).toFixed(2)), Number(parseFloat(rowNum[4]).toFixed(2)), Number(parseFloat(rowNum[5]).toFixed(2)), Number(parseFloat(rowNum[6]).toFixed(2))];
+				return [
+					rowNum[0],
+					Number(rowNum[1]),
+					Number(rowNum[2]),
+					Number(parseFloat(rowNum[3] * 100).toFixed(2)),
+					Number(parseFloat(rowNum[4]).toFixed(2)),
+					Number(parseFloat(rowNum[5]).toFixed(2)),
+					Number(parseFloat(rowNum[6]).toFixed(2))
+				];
 
 			case 'PAGE_VIEWS':
-				return [rowNum[0], Number(rowNum[1]), Number(rowNum[2]), Number(parseFloat(rowNum[3] * 100).toFixed(2)), Number(parseFloat(rowNum[4]).toFixed(2)), Number(parseFloat(rowNum[5]).toFixed(2)), Number(parseFloat(rowNum[6]).toFixed(2))];
+				return [
+					rowNum[0],
+					Number(rowNum[1]),
+					Number(rowNum[2]),
+					Number(parseFloat(rowNum[3] * 100).toFixed(2)),
+					Number(parseFloat(rowNum[4]).toFixed(2)),
+					Number(parseFloat(rowNum[5]).toFixed(2)),
+					Number(parseFloat(rowNum[6]).toFixed(2))
+				];
 
 			case 'INDIVIDUAL_AD_IMPRESSIONS':
-				return [rowNum[0], Number(rowNum[1]), Number(rowNum[2]), Number(parseFloat(rowNum[3] * 100).toFixed(2)), Number(parseFloat(rowNum[4]).toFixed(2)), Number(parseFloat(rowNum[5]).toFixed(2)), Number(parseFloat(rowNum[6]).toFixed(2))];
+				return [
+					rowNum[0],
+					Number(rowNum[1]),
+					Number(rowNum[2]),
+					Number(parseFloat(rowNum[3] * 100).toFixed(2)),
+					Number(parseFloat(rowNum[4]).toFixed(2)),
+					Number(parseFloat(rowNum[5]).toFixed(2)),
+					Number(parseFloat(rowNum[6]).toFixed(2))
+				];
 
 			default:
 				break;
@@ -43,7 +67,15 @@ function processReports(metric, data) {
 	});
 
 	currency = data.headers[5].currency;
-	headers = ['DATE', 'PAGE VIEWS', 'CLICKS', 'CTR (%)', 'CPC (' + currency + ')', 'RPM (' + currency + ')', 'EARNINGS (' + currency + ')'];
+	headers = [
+		'DATE',
+		'PAGE VIEWS',
+		'CLICKS',
+		'CTR (%)',
+		'CPC (' + currency + ')',
+		'RPM (' + currency + ')',
+		'EARNINGS (' + currency + ')'
+	];
 
 	switch (metric) {
 		case 'AD_REQUESTS':
@@ -64,24 +96,25 @@ function processReports(metric, data) {
 
 AdsenseApi.prototype = {
 	listAccounts: function() {
-		return Accounts.listAsync({ auth: this.oauthClient })
-			.then(function(json) {
-				if (json.items) {
-					return json.items;
-				}
-				throw new AdPushupError('No accounts found.');
-			});
+		return Accounts.listAsync({ auth: this.oauthClient }).then(function(json) {
+			if (json.items) {
+				return json.items;
+			}
+			throw new AdPushupError('No accounts found.');
+		});
 	},
 	doesAccountExists: function(pubId) {
-		return Accounts.getAsync({ accountId: pubId }).then(function() {
-			return true;
-		}).catch(function(err) {
-			// obvious error is 404 but if some other error then console log it
-			if (err.code !== 404) {
-				console.log(err);
-			}
-			return false;
-		});
+		return Accounts.getAsync({ accountId: pubId })
+			.then(function() {
+				return true;
+			})
+			.catch(function(err) {
+				// obvious error is 404 but if some other error then console log it
+				if (err.code !== 404) {
+					console.log(err);
+				}
+				return false;
+			});
 		/* return this.listAccounts()
 			.then(function(accounts) {
 				return _.find(accounts, { id: pubId }) ? true : false;
@@ -93,7 +126,9 @@ AdsenseApi.prototype = {
 			dimension: 'DOMAIN_NAME',
 			metric: 'INDIVIDUAL_AD_IMPRESSIONS',
 			sort: 'DOMAIN_NAME',
-			startDate: moment().subtract(1, 'month').format('YYYY-MM-DD'),
+			startDate: moment()
+				.subtract(1, 'month')
+				.format('YYYY-MM-DD'),
 			endDate: 'today'
 		});
 	},
@@ -104,25 +139,22 @@ AdsenseApi.prototype = {
 		if (!config.accountId) {
 			config.accountId = this.accountId;
 		}
-		return Reports.generateAsync(config)
-			.then(function(data) {
-				return data;
-			});
+		return Reports.generateAsync(config).then(function(data) {
+			return data;
+		});
 	},
 	getReport: function(config) {
 		fileLogger.info(`AdSense PubId: ${this.accountId}`);
 		fileLogger.info(config);
 
-		return this.generate(config)
-			.then(function(data) {
-				return processReports(config.metric[0], data);
-			});
+		return this.generate(config).then(function(data) {
+			return processReports(config.metric[0], data);
+		});
 	},
 	getStats: function(config) {
-		return this.generate(config)
-			.then(function(data) {
-				return data.rows;
-			});
+		return this.generate(config).then(function(data) {
+			return data.rows;
+		});
 	},
 	createAd: function(adObj) {
 		return adUnits.insertAsync({
@@ -131,22 +163,20 @@ AdsenseApi.prototype = {
 			resource: adObj.getAdsenseFormatJson()
 		});
 	}
-
 };
 
 module.exports = {
 	getAdsense: function(user) {
-		return googOauthHelper.getClient(user, true)
-			.spread(function(oauthClient, accountId) {
-				return new AdsenseApi(user, accountId, oauthClient);
-			});
+		return googOauthHelper.getClient(user, true).spread(function(oauthClient, accountId) {
+			return new AdsenseApi(user, accountId, oauthClient);
+		});
 	},
 	prepareQuery: function(config) {
 		var adsenseConfig = {
 			startDate: moment.unix(config.startDate / 1000).format('YYYY-MM-DD'),
 			endDate: moment.unix(config.endDate / 1000).format('YYYY-MM-DD'),
 			useTimezoneReporting: true,
-			currency: (config.currencyCode) ? config.currencyCode : 'USD',
+			currency: config.currencyCode ? config.currencyCode : 'USD',
 			filter: [],
 			metric: []
 		};

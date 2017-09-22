@@ -40,20 +40,24 @@ module.exports = {
 		return computedData;
 	},
 	computeReportData: function(channel, computedVariationsData) {
-		var channelKey = channel.pageGroup + "_" + channel.platform,
+		var channelKey = channel.pageGroup + '_' + channel.platform,
 			computedVariationsObj = {
 				pageGroups: {}
 			};
 
 		computedVariationsObj.pageGroups[channelKey] = {
-			'variations': {}
+			variations: {}
 		};
 
-		return _.reduce(computedVariationsData, function(hashMap, obj) {
-			var key = channelKey;
+		return _.reduce(
+			computedVariationsData,
+			function(hashMap, obj) {
+				var key = channelKey;
 
-			hashMap.pageGroups[key].variations = extend(true, hashMap.pageGroups[key].variations, obj);
-			return hashMap;
-		}, computedVariationsObj);
+				hashMap.pageGroups[key].variations = extend(true, hashMap.pageGroups[key].variations, obj);
+				return hashMap;
+			},
+			computedVariationsObj
+		);
 	}
 };

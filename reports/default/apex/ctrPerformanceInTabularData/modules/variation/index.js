@@ -1,4 +1,4 @@
-var	siteModel = require('../../../../../../models/siteModel');
+var siteModel = require('../../../../../../models/siteModel');
 
 module.exports = {
 	getTrafficDistribution: function(config) {
@@ -10,11 +10,15 @@ module.exports = {
 					config.variations.forEach(function(variationKey) {
 						var variationObj = variationConfig[variationKey];
 
-						if (variationConfig.hasOwnProperty(variationKey) && variationObj && (Number(variationObj.trafficDistribution) > -1)) {
+						if (
+							variationConfig.hasOwnProperty(variationKey) &&
+							variationObj &&
+							Number(variationObj.trafficDistribution) > -1
+						) {
 							computedObj[variationKey] = {
-								'name': variationObj.name,
-								'id': variationObj.id,
-								'value': variationObj.trafficDistribution
+								name: variationObj.name,
+								id: variationObj.id,
+								value: variationObj.trafficDistribution
 							};
 						}
 					});

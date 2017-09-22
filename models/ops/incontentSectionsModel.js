@@ -17,17 +17,16 @@ var couchbase = require('../../helpers/couchBaseService'),
 
 			// delete query.options.group;
 
-			return couchbase.connectToAppBucket()
-				.then(function(appBucket) {
-					return new Promise(function(resolve, reject) {
-						appBucket.query(query, {}, function(err, result) {
-							if (err) {
-								reject(err);
-							}
-							resolve({ 'response_type': 'good', 'msg': result });
-						});
+			return couchbase.connectToAppBucket().then(function(appBucket) {
+				return new Promise(function(resolve, reject) {
+					appBucket.query(query, {}, function(err, result) {
+						if (err) {
+							reject(err);
+						}
+						resolve({ response_type: 'good', msg: result });
 					});
 				});
+			});
 		}
 	};
 

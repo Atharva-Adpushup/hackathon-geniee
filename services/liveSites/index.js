@@ -27,6 +27,5 @@ module.exports = {
 				fileLogger.err(e);
 				console.log(errorInfo);
 			});
-		
 	}
-}
+};

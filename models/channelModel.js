@@ -14,7 +14,7 @@ var model = require('../helpers/model'),
 	utils = require('../helpers/utils'),
 	Promise = require('bluebird'),
 	ViewQuery = require('couchbase-promises').ViewQuery,
-	Channel = model.extend(function () {
+	Channel = model.extend(function() {
 		this.keys = [
 			'id',
 			'siteId',
@@ -33,15 +33,24 @@ var model = require('../helpers/model'),
 			'genieePageGroupId'
 		];
 		this.clientKeys = [
-			'id', 'siteDomain', 'channelName', 'platform', 'pageGroup', 'variations', 'sampleUrl',
-			'contentSelector', 'contentSelectorMissing', 'activeVariation', 'genieePageGroupId'
+			'id',
+			'siteDomain',
+			'channelName',
+			'platform',
+			'pageGroup',
+			'variations',
+			'sampleUrl',
+			'contentSelector',
+			'contentSelectorMissing',
+			'activeVariation',
+			'genieePageGroupId'
 		];
 		this.validations = {
-			'required': []
+			required: []
 		};
-		this.classMap = { 'variations': variationModel, 'networkData': networkDataModel };
+		this.classMap = { variations: variationModel, networkData: networkDataModel };
 		this.defaults = { variations: {}, contentSelector: '', activeVariation: '' };
-		this.constructor = function (data, cas) {
+		this.constructor = function(data, cas) {
 			if (!(data.siteId && data.platform && data.pageGroup)) {
 				throw new Error('siteId, platform and pageGroup required for channel');
 			}
@@ -53,177 +62,221 @@ var model = require('../helpers/model'),
 
 function apiModule() {
 	var API = {
-		createPageGroup: function (json) {
-			return siteModel.getSiteById(json.siteId)
-				.then(function (site) {
-					var sampleUrlForced = _.has(json, 'forceSampleUrl');
-					return FormValidator.validate({ sampleUrl: json.sampleUrl, sampleUrlForced: sampleUrlForced }, schema.api.validations, site.data.siteDomain)
-						.then(function (data) {
-							var channel = json.device.toUpperCase() + ':' + json.pageGroupName.toUpperCase(), channelData, channels = site.get('channels');
+		createPageGroup: function(json) {
+			return siteModel.getSiteById(json.siteId).then(function(site) {
+				var sampleUrlForced = _.has(json, 'forceSampleUrl');
+				return FormValidator.validate(
+					{ sampleUrl: json.sampleUrl, sampleUrlForced: sampleUrlForced },
+					schema.api.validations,
+					site.data.siteDomain
+				).then(function(data) {
+					var channel = json.device.toUpperCase() + ':' + json.pageGroupName.toUpperCase(),
+						channelData,
+						channels = site.get('channels');
 
-							if (!site.get('cmsInfo')) {
-								site.set('cmsInfo', { "cmsName": "", "pageGroups": [] });
-							}
+					if (!site.get('cmsInfo')) {
+						site.set('cmsInfo', { cmsName: '', pageGroups: [] });
+					}
 
-							if (!_.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])) {
-								site.get('cmsInfo').pageGroups.push({ sampleUrl: json.sampleUrl, pageGroup: json.pageGroupName.toUpperCase() });
-							} else {
-								var existingPageGroup = _.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl]).pageGroup,
-									existingChannel =  json.device.toUpperCase() + ':' + existingPageGroup;
+					if (!_.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])) {
+						site
+							.get('cmsInfo')
+							.pageGroups.push({
+								sampleUrl: json.sampleUrl,
+								pageGroup: json.pageGroupName.toUpperCase()
+							});
+					} else {
+						var existingPageGroup = _.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])
+								.pageGroup,
+							existingChannel = json.device.toUpperCase() + ':' + existingPageGroup;
 
-								if(_.includes(channels, existingChannel)) {
-									throw new AdPushupError([{ "status": 403, "message": "A pagegroup with this Sample URL and device already exists." }]);
-								}
-							}
+						if (_.includes(channels, existingChannel)) {
+							throw new AdPushupError([
+								{ status: 403, message: 'A pagegroup with this Sample URL and device already exists.' }
+							]);
+						}
+					}
 
-							if (_.includes(channels, channel)) {
-								throw new AdPushupError([{ "status": 403, "message": "This pagegroup type already exists" }]);
-							}
-							channels.push(channel);
+					if (_.includes(channels, channel)) {
+						throw new AdPushupError([{ status: 403, message: 'This pagegroup type already exists' }]);
+					}
+					channels.push(channel);
 
-							channelData = { siteDomain: site.data.siteDomain, siteId: site.data.siteId, sampleUrl: json.sampleUrl, platform: json.device.toUpperCase(), pageGroup: json.pageGroupName.toUpperCase(), id: uuid.v4(), channelName: json.pageGroupName.toUpperCase() + '_' + json.device.toUpperCase(), genieePageGroupId: json.pageGroupId, variations: {} };
+					channelData = {
+						siteDomain: site.data.siteDomain,
+						siteId: site.data.siteId,
+						sampleUrl: json.sampleUrl,
+						platform: json.device.toUpperCase(),
+						pageGroup: json.pageGroupName.toUpperCase(),
+						id: uuid.v4(),
+						channelName: json.pageGroupName.toUpperCase() + '_' + json.device.toUpperCase(),
+						genieePageGroupId: json.pageGroupId,
+						variations: {}
+					};
 
-							return API.saveChannel(json.siteId, json.device, json.pageGroupName, channelData)
-								.then(function (res) {
-									site.save();
-									return res.data;
-								});
-						})
+					return API.saveChannel(json.siteId, json.device, json.pageGroupName, channelData).then(function(
+						res
+					) {
+						site.save();
+						return res.data;
+					});
 				});
+			});
 		},
-		getPageGroupById: function (paramsObj) {
-			var query = ViewQuery.from('app', paramsObj.viewName).stale(1).range(paramsObj.id, paramsObj.id, true);
-			return couchbase.connectToAppBucket()
-				.then(function (appBucket) {
-					return new Promise(function (resolve, reject) {
-						appBucket.query(query, {}, function (err, result) {
-							if (result.length === 0) {
-								return reject(new AdPushupError([{ "status": 404, "message": "Pagegroup does not exist" }]));
-							}
-							var data = result[0].value;
-							if (paramsObj && paramsObj.isExtendedParams) {
-								return resolve({
-									pageGroupId: data.id,
-									sampleUrl: data.sampleUrl,
-									pageGroup: data.pageGroup,
-									device: data.platform,
-									variations: data.variations,
-									channelName: data.channelName
-								});
-							}
-
+		getPageGroupById: function(paramsObj) {
+			var query = ViewQuery.from('app', paramsObj.viewName)
+				.stale(1)
+				.range(paramsObj.id, paramsObj.id, true);
+			return couchbase.connectToAppBucket().then(function(appBucket) {
+				return new Promise(function(resolve, reject) {
+					appBucket.query(query, {}, function(err, result) {
+						if (result.length === 0) {
+							return reject(new AdPushupError([{ status: 404, message: 'Pagegroup does not exist' }]));
+						}
+						var data = result[0].value;
+						if (paramsObj && paramsObj.isExtendedParams) {
 							return resolve({
 								pageGroupId: data.id,
 								sampleUrl: data.sampleUrl,
 								pageGroup: data.pageGroup,
-								device: data.platform
+								device: data.platform,
+								variations: data.variations,
+								channelName: data.channelName
 							});
+						}
+
+						return resolve({
+							pageGroupId: data.id,
+							sampleUrl: data.sampleUrl,
+							pageGroup: data.pageGroup,
+							device: data.platform
 						});
 					});
 				});
+			});
 		},
-		updatePagegroup: function (json) {
-			var query = ViewQuery.from('app', 'channelById').stale(1).range(json.pageGroupId, json.pageGroupId, true);
-			return couchbase.connectToAppBucket()
-				.then(function (appBucket) {
-					return new Promise(function (resolve, reject) {
-						appBucket.query(query, {}, function (err, result) {
-							if (result.length === 0) {
-								return reject(new AdPushupError([{ "status": 404, "message": "Pagegroup does not exist" }]));
-							}
-							if (utils.getSiteDomain(json.sampleUrl) !== utils.getSiteDomain(result[0].value.siteDomain)) {
-								return reject(new AdPushupError([{ "status": 403, "message": "The Sample URL should be from your website only" }]));
-							}
+		updatePagegroup: function(json) {
+			var query = ViewQuery.from('app', 'channelById')
+				.stale(1)
+				.range(json.pageGroupId, json.pageGroupId, true);
+			return couchbase.connectToAppBucket().then(function(appBucket) {
+				return new Promise(function(resolve, reject) {
+					appBucket.query(query, {}, function(err, result) {
+						if (result.length === 0) {
+							return reject(new AdPushupError([{ status: 404, message: 'Pagegroup does not exist' }]));
+						}
+						if (utils.getSiteDomain(json.sampleUrl) !== utils.getSiteDomain(result[0].value.siteDomain)) {
+							return reject(
+								new AdPushupError([
+									{ status: 403, message: 'The Sample URL should be from your website only' }
+								])
+							);
+						}
 
-							return API.getChannelByDocId(result[0].id)
-								.then(function (channel) {
-									channel.set('sampleUrl', json.sampleUrl);
-									return resolve(channel.save());
-								});
+						return API.getChannelByDocId(result[0].id).then(function(channel) {
+							channel.set('sampleUrl', json.sampleUrl);
+							return resolve(channel.save());
 						});
 					});
 				});
+			});
 		},
-		deletePagegroupById: function (pageGroupId) {
-			var query = ViewQuery.from('app', 'channelById').stale(1).range(pageGroupId, pageGroupId, true);
-			return couchbase.connectToAppBucket()
-				.then(function (appBucket) {
-					return new Promise(function (resolve, reject) {
-						appBucket.query(query, {}, function (err, result) {
-							if (result.length === 0) {
-								return reject(new AdPushupError([{ "status": 404, "message": "Pagegroup does not exist" }]));
-							}
+		deletePagegroupById: function(pageGroupId) {
+			var query = ViewQuery.from('app', 'channelById')
+				.stale(1)
+				.range(pageGroupId, pageGroupId, true);
+			return couchbase.connectToAppBucket().then(function(appBucket) {
+				return new Promise(function(resolve, reject) {
+					appBucket.query(query, {}, function(err, result) {
+						if (result.length === 0) {
+							return reject(new AdPushupError([{ status: 404, message: 'Pagegroup does not exist' }]));
+						}
 
-							var data = result[0].value;
+						var data = result[0].value;
 
-							return API.deleteChannel(data.siteId, data.platform, data.pageGroup)
-								.then(function () {
-									return siteModel.getSitePageGroups(data.siteId);
-								})
-								.then(function(pageGroups) {
-									var selectedPagegroups = _.filter(pageGroups, { pageGroup: data.pageGroup });
+						return API.deleteChannel(data.siteId, data.platform, data.pageGroup)
+							.then(function() {
+								return siteModel.getSitePageGroups(data.siteId);
+							})
+							.then(function(pageGroups) {
+								var selectedPagegroups = _.filter(pageGroups, { pageGroup: data.pageGroup });
 
-									return selectedPagegroups.length === 0 ? siteModel.getSiteById(data.siteId) : resolve();
-								})
-								.then(function(site) {
-									var cmsPageGroups = site.get('cmsInfo').pageGroups;
-									_.remove(cmsPageGroups, function(p) {
-										return p.pageGroup === data.pageGroup;
-									});	
-									
-									site.set('cmsInfo', { "cmsName": "", "pageGroups": cmsPageGroups });
-									site.save();
-									return resolve();
+								return selectedPagegroups.length === 0 ? siteModel.getSiteById(data.siteId) : resolve();
+							})
+							.then(function(site) {
+								var cmsPageGroups = site.get('cmsInfo').pageGroups;
+								_.remove(cmsPageGroups, function(p) {
+									return p.pageGroup === data.pageGroup;
 								});
-						});
+
+								site.set('cmsInfo', { cmsName: '', pageGroups: cmsPageGroups });
+								site.save();
+								return resolve();
+							});
 					});
+				});
+			});
+		},
+		getChannelByDocId: function(id) {
+			return couchbase
+				.connectToAppBucket()
+				.then(function(appBucket) {
+					return appBucket.getAsync(id, {});
 				})
+				.then(function(json) {
+					return new Channel(json.value, json.cas);
+				});
 		},
-		getChannelByDocId: function (id) {
-			return couchbase.connectToAppBucket().then(function (appBucket) {
-				return appBucket.getAsync(id, {});
-			}).then(function (json) {
-				return new Channel(json.value, json.cas);
-			});
-		},
-		isChannelExist: function (id) {
-			return couchbase.connectToAppBucket().then(function (appBucket) {
-				return appBucket.getAsync(id, {});
-			}).then(function () {
-				return true;
-			}).catch(function(e) {
-				if (e.name && e.name === 'CouchbaseError') {
-					return false;
-				}
+		isChannelExist: function(id) {
+			return couchbase
+				.connectToAppBucket()
+				.then(function(appBucket) {
+					return appBucket.getAsync(id, {});
+				})
+				.then(function() {
+					return true;
+				})
+				.catch(function(e) {
+					if (e.name && e.name === 'CouchbaseError') {
+						return false;
+					}
 
-				return true;
-			});
+					return true;
+				});
 		},
-		getChannel: function (siteId, platform, pageGroup) {
-			return couchbase.connectToAppBucket().then(function (appBucket) {
-				return appBucket.getAsync('chnl::' + siteId + ':' + platform + ':' + pageGroup, {});
-			}).then(function (json) {
-				return new Channel(json.value, json.cas);
-			});
+		getChannel: function(siteId, platform, pageGroup) {
+			return couchbase
+				.connectToAppBucket()
+				.then(function(appBucket) {
+					return appBucket.getAsync('chnl::' + siteId + ':' + platform + ':' + pageGroup, {});
+				})
+				.then(function(json) {
+					return new Channel(json.value, json.cas);
+				});
 		},
-		saveChannel: function (siteId, platform, pageGroup, channelData) {
-			return API.getChannel(siteId, platform, pageGroup).then(function (channel) {
-				channel.setAll(channelData);
-				return channel;
-			}, function () {
-				return new Channel(channelData);
-			}).then(function (channel) {
-				return channel.save();
-			});
+		saveChannel: function(siteId, platform, pageGroup, channelData) {
+			return API.getChannel(siteId, platform, pageGroup)
+				.then(
+					function(channel) {
+						channel.setAll(channelData);
+						return channel;
+					},
+					function() {
+						return new Channel(channelData);
+					}
+				)
+				.then(function(channel) {
+					return channel.save();
+				});
 		},
-		saveChannels: function (siteId, channels) {
-			var updatedChannels = _.map(channels, function (channel) {
+		saveChannels: function(siteId, channels) {
+			var updatedChannels = _.map(channels, function(channel) {
 				channel.siteId = siteId;
 				return API.saveChannel(siteId, channel.platform, channel.pageGroup, channel);
 			});
 			return Promise.all(updatedChannels);
 		},
-		getVariations: function (siteId, platform, pageGroup) {
+		getVariations: function(siteId, platform, pageGroup) {
 			return API.getChannel(siteId, platform, pageGroup).then(function(channel) {
 				var computedData = {
 					variations: extend(true, {}, channel.get('variations'))
@@ -233,20 +286,22 @@ function apiModule() {
 				return Promise.resolve(computedData);
 			});
 		},
-		deleteChannel: function (siteId, platform, pageGroup) {
+		deleteChannel: function(siteId, platform, pageGroup) {
 			var appBucketConnect = couchbase.connectToAppBucket(),
-				getChannel = appBucketConnect.then(function () {
+				getChannel = appBucketConnect.then(function() {
 					return API.getChannel(siteId, platform, pageGroup);
 				}),
-				getSite = getChannel.then(function () {
+				getSite = getChannel.then(function() {
 					return siteModel.getSiteById(siteId);
 				});
 
-			return Promise.join(appBucketConnect, getChannel, getSite, function (appBucket, channel, site) {
-				return site.deleteChannel(platform, pageGroup).then(function () {
-					return appBucket.upsertAsync('_chnl::' + siteId + ':' + platform + ':' + pageGroup, channel.toJSON(), {}).then(function () {
-						return appBucket.removeAsync('chnl::' + siteId + ':' + platform + ':' + pageGroup, {});
-					});
+			return Promise.join(appBucketConnect, getChannel, getSite, function(appBucket, channel, site) {
+				return site.deleteChannel(platform, pageGroup).then(function() {
+					return appBucket
+						.upsertAsync('_chnl::' + siteId + ':' + platform + ':' + pageGroup, channel.toJSON(), {})
+						.then(function() {
+							return appBucket.removeAsync('chnl::' + siteId + ':' + platform + ':' + pageGroup, {});
+						});
 				});
 			});
 		}

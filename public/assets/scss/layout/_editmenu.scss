@@ -22,13 +22,28 @@
 			}
 		}
 	}
+	.adDetails-icon {
+		float: right;
+		.btn-icn-edit {
+			color: $dimFontColor;
+			&:hover {
+				color: $primaryColorDark;
+			}
+		}
+	}
+	.networkOptionsRow {
+		width: 90%;
+		margin: 0px auto; 
+		display: block; 
+		z-index: 10;
+	}
   	.butttonsRow
 	{
 		padding: $ESPadding 0 !important;
 		background: $ESBg;
 		position: absolute;
 		bottom: 0;
-		z-index: 6;
+		z-index: 3;
 		width: 100%;
 		border: 1px solid $MBButtonRowBorder;
 		border-radius: 0 0 3px 3px;
@@ -98,4 +113,13 @@
 	}
 }
 
+#ad-details {
+	.btn-icn-edit {
+		float: right !important;
+		color: $dimFontColor;
+		&:hover {
+			color: $primaryColorDark;
+		}
+	}
+}
 

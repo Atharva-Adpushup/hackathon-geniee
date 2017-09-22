@@ -22,7 +22,8 @@ module.exports = function(url, minGapInterval, heartBeatDelay, apStartTime) {
 		siteStartTime = apStartTime || +new Date(),
 		timeOnSite = 0,
 		lastRequestTime = siteStartTime,
-		onEvent, heartBeat;
+		onEvent,
+		heartBeat;
 
 	onEvent = function(eventName) {
 		var now = +new Date();
@@ -78,13 +79,13 @@ module.exports = function(url, minGapInterval, heartBeatDelay, apStartTime) {
 				}
 
 				if (!hadWindowFocusAtLeastOnce) {
-						// if browser does not support .hasFocus (eg IE5), we assume that the window has focus.
-					hadWindowFocusAtLeastOnce = (!document.hasFocus || document.hasFocus());
+					// if browser does not support .hasFocus (eg IE5), we assume that the window has focus.
+					hadWindowFocusAtLeastOnce = !document.hasFocus || document.hasFocus();
 				}
 
 				if (!hadWindowFocusAtLeastOnce) {
-						// only send a ping if the tab actually had focus at least once. For example do not send a ping
-						// if window was opened via "right click => open in new window" and never had focus see #9504
+					// only send a ping if the tab actually had focus at least once. For example do not send a ping
+					// if window was opened via "right click => open in new window" and never had focus see #9504
 					self.start();
 					return;
 				}
@@ -107,7 +108,7 @@ module.exports = function(url, minGapInterval, heartBeatDelay, apStartTime) {
 			timeOnSite += now - lastRequestTime;
 			lastRequestTime = now;
 
-			utils.sendFeedback({eventType: 9, timeOnSite: timeOnSite});
+			utils.sendFeedback({ eventType: 9, timeOnSite: timeOnSite });
 		}
 	};
 

@@ -9,8 +9,8 @@ var url = require('url'),
 	_ = require('lodash'),
 	API = {
 		getPageGroupHash: function(pageGroup, platform) {
-			var name = pageGroup + "_" + platform,
- 				object = {pageGroups: [name]};
+			var name = pageGroup + '_' + platform,
+				object = { pageGroups: [name] };
 
 			return this.btoa(this.encodeString(JSON.stringify(object)));
 		},
@@ -21,10 +21,10 @@ var url = require('url'),
 			return new Buffer(stringifiedData).toString('base64');
 		},
 		convertPagegroupLink: function(pageGroupId, pageGroupName, siteId) {
-			return '<a href="/user/site/'+siteId+'/pagegroup/'+pageGroupId+'">'+pageGroupName+'</a>';
+			return '<a href="/user/site/' + siteId + '/pagegroup/' + pageGroupId + '">' + pageGroupName + '</a>';
 		},
 		getPageGroupPattern: function(pageGroup, platform, patterns) {
-			if(Object.keys(patterns).length) {
+			if (Object.keys(patterns).length) {
 				const matchedPagegroup = _.find(patterns[platform], p => {
 					return p.pageGroup === pageGroup;
 				});
@@ -35,22 +35,31 @@ var url = require('url'),
 			return Math.floor(Math.random() * (high - low) + low);
 		},
 		getRandomNumber: function() {
- 			var number = Math.floor(Math.random() * (100000 - 100 + 1)) + 100;
- 			var isThere = randomStore[number];
- 			if (isThere)
- 				this.getRandomNumber();
- 			else {
- 				randomStore[number] = 1;
- 				return number;
- 			}
- 		},
+			var number = Math.floor(Math.random() * (100000 - 100 + 1)) + 100;
+			var isThere = randomStore[number];
+			if (isThere) this.getRandomNumber();
+			else {
+				randomStore[number] = 1;
+				return number;
+			}
+		},
 		randomString: function(len) {
-			len = (len && this.toNumber(len) && (len > 1)) ? len : 10;
+			len = len && this.toNumber(len) && len > 1 ? len : 10;
 
-			return Math.random().toString(16).substr(2, len);
+			return Math.random()
+				.toString(16)
+				.substr(2, len);
 		},
 		domanize: function(domain) {
-			return domain ? API.rightTrim(domain.replace('http://', '').replace('https://', '').replace('www.', ''), '/') : '';
+			return domain
+				? API.rightTrim(
+						domain
+							.replace('http://', '')
+							.replace('https://', '')
+							.replace('www.', ''),
+						'/'
+					)
+				: '';
 		},
 		rightTrim: function(string, s) {
 			return string ? string.replace(new RegExp(s + '*$'), '') : '';
@@ -64,11 +73,15 @@ var url = require('url'),
 			return isNaN(a) ? 0 : a;
 		},
 		htmlEntities: function(str) {
-			return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+			return String(str)
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;');
 		},
 		toFloat: function(a, precison) {
 			a = parseFloat(a);
-			return (isNaN(a) || 0) ? 0 : parseFloat(a.toFixed(precison || 2));
+			return isNaN(a) || 0 ? 0 : parseFloat(a.toFixed(precison || 2));
 		},
 		logInfo: function(message) {
 			logger.info(message);
@@ -92,7 +105,7 @@ var url = require('url'),
 		// @return String
 		// @param String
 		getSafeUrl: function(unsafeUrl) {
-			var str = url.parse((typeof unsafeUrl === 'string') ? unsafeUrl.trim() : '');
+			var str = url.parse(typeof unsafeUrl === 'string' ? unsafeUrl.trim() : '');
 
 			return str.href;
 		},
@@ -110,7 +123,7 @@ var url = require('url'),
 		syncArrayPromise: function(array, fn) {
 			var index = 0;
 
-			return new Promise(function (resolve, reject) {
+			return new Promise(function(resolve, reject) {
 				function next() {
 					if (index < array.length) {
 						fn(array[index++]).then(next, reject);
@@ -124,7 +137,7 @@ var url = require('url'),
 		getLanguageLocale: (mappingObject, locale) => {
 			let selectedLocale = '';
 
-			Object.keys(mappingObject).forEach((languageCode) => {
+			Object.keys(mappingObject).forEach(languageCode => {
 				const languageArray = mappingObject[languageCode];
 
 				if (languageArray.indexOf(locale) > -1) {

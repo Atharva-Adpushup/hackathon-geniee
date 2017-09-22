@@ -1,8 +1,9 @@
-
 var $ = require('jquery'),
 	selectedElems = [],
 	containerWidth,
-	floatVar, width, height,
+	floatVar,
+	width,
+	height,
 	distanceAddFactor = 0,
 	rootBackgroundColor,
 	placements = {};
@@ -15,20 +16,23 @@ if (!window.console || !console.log) {
 }
 
 function createVisibleDiv(float, counter) {
-	return $('<div />').attr({
-		class: '__content_' + counter
-	}).css({
-		float: float,
-		width: 300,
-		height: 250,
-		background: 'red'
-	});
+	return $('<div />')
+		.attr({
+			class: '__content_' + counter
+		})
+		.css({
+			float: float,
+			width: 300,
+			height: 250,
+			background: 'red'
+		});
 }
 
 var computeBackgroundColor = function(element) {
 	var i = 0;
 
-	while (++i < 100) {  // Sanity check
+	while (++i < 100) {
+		// Sanity check
 		var backgroundColor = $(element).css('background-color');
 
 		if (backgroundColor !== 'rgba(0, 0, 0, 0)' && backgroundColor !== undefined) {
@@ -48,7 +52,6 @@ var computeBackgroundColor = function(element) {
 
 	return 'rgb(255, 255, 255)';
 };
-
 
 function excludeElems(elementSet) {
 	var filteredElems = [];
@@ -73,9 +76,12 @@ function excludeElems(elementSet) {
 		It's best to ignore such words that cannot be wrapped.
 	 */
 	var isWrappable = function(text, reqLength) {
-		var maxWordLength = Math.max.apply(this, text.split(/\s+/).map(function(word) {
-			return word.length || 0;
-		}));
+		var maxWordLength = Math.max.apply(
+			this,
+			text.split(/\s+/).map(function(word) {
+				return word.length || 0;
+			})
+		);
 
 		if (maxWordLength > reqLength) {
 			return false;
@@ -93,7 +99,7 @@ function excludeElems(elementSet) {
 		var nextOffset = $(nextElem).offset();
 
 		if (nextOffset && currOffset) {
-			return ((nextOffset.top + $(nextElem).height()) - (currOffset.top + currHeight)) * currWidth;
+			return (nextOffset.top + $(nextElem).height() - (currOffset.top + currHeight)) * currWidth;
 		} else {
 			return 0;
 		}
@@ -103,7 +109,7 @@ function excludeElems(elementSet) {
 		if (floatVar !== 'none') {
 			// Container is the main content area. Substracting the width
 			// of Ad box, we get the area that needs to be filled.
-			var reqArea = ((containerWidth - width) * height) * 1.3,
+			var reqArea = (containerWidth - width) * height * 1.3,
 				iter = 0,
 				nextElem = $(element).next(),
 				coveredArea = 0;
@@ -132,7 +138,11 @@ function excludeElems(elementSet) {
 				wrap the text but without background. This results in an obvious overlap.
 				which can be prevented by checking the background */
 				if (rootBackgroundColor !== computeBackgroundColor(nextElem)) {
-					console.log('Break Because Different background.', rootBackgroundColor, computeBackgroundColor(nextElem));
+					console.log(
+						'Break Because Different background.',
+						rootBackgroundColor,
+						computeBackgroundColor(nextElem)
+					);
 					break;
 				}
 
@@ -173,7 +183,6 @@ function excludeElems(elementSet) {
 		}
 	});
 
-
 	return filteredElems;
 }
 
@@ -202,7 +211,12 @@ $.fn.selectBetween = function(top, bottom) {
 	}
 
 	var blockChildren = this.find('*').filter(function() {
-		return ($(this).css('display') == 'block' && $(this).height() > 10 && $(this).width() > 200 && $(this).height() < 1000);
+		return (
+			$(this).css('display') == 'block' &&
+			$(this).height() > 10 &&
+			$(this).width() > 200 &&
+			$(this).height() < 1000
+		);
 	});
 
 	var rootPos = $(this).offset();
@@ -211,7 +225,7 @@ $.fn.selectBetween = function(top, bottom) {
 		var childPos = $(this).offset();
 		var childHeight = $(this).height();
 
-		if ((childPos.top - rootPos.top) >= top && (childPos.top - rootPos.top) <= bottom) {
+		if (childPos.top - rootPos.top >= top && childPos.top - rootPos.top <= bottom) {
 			selectedElems.push(this);
 		}
 	});
@@ -228,7 +242,9 @@ $.fn.minWordCount = function(wordCount) {
 	var filteredElems = [];
 
 	$(selectedElems).each(function() {
-		var elemWordCount = $(this).text().split(/\s+/).length;
+		var elemWordCount = $(this)
+			.text()
+			.split(/\s+/).length;
 
 		if (elemWordCount > wordCount) {
 			filteredElems.push(this);
@@ -240,17 +256,22 @@ $.fn.minWordCount = function(wordCount) {
 	return this;
 };
 
-$.fn.createAds = function( _width, _height, _floatVar ){
-  width     = _width;
-  height    = _height;
-  floatVar  = _floatVar || "none";
+$.fn.createAds = function(_width, _height, _floatVar) {
+	width = _width;
+	height = _height;
+	floatVar = _floatVar || 'none';
 
-  return this;
+	return this;
 };
 
-
 $.fn.makeAdAware = function() {
-	var adSelectors = ['ins.adsbygoogle', "[id^='_mN_main_']", '.taboola_ads', "div[class^='openx']", "div[id^='div-gpt-ad-']"],
+	var adSelectors = [
+			'ins.adsbygoogle',
+			"[id^='_mN_main_']",
+			'.taboola_ads',
+			"div[class^='openx']",
+			"div[id^='div-gpt-ad-']"
+		],
 		$content = $(this);
 
 	adSelectors.forEach(function(adSelector) {
@@ -277,23 +298,29 @@ $.fn.makeAdAware = function() {
 Don't float beside large elements that are already floating.
  */
 $.fn.makeFloatAware = function() {
-	$(this).find('*').each(function() {
-		if (($(this).css('float') === 'left' || $(this).css('float') === 'right')
-			&& (containerWidth - width) * 1.5 > $(this).width() /* Is the floated element larger than what container and ad to be floated would allow */
-		) {
-			var $floatEl = $(this);
-			var currOffset = $floatEl.offset();
+	$(this)
+		.find('*')
+		.each(function() {
+			if (
+				($(this).css('float') === 'left' || $(this).css('float') === 'right') &&
+				(containerWidth - width) * 1.5 >
+					$(
+						this
+					).width() /* Is the floated element larger than what container and ad to be floated would allow */
+			) {
+				var $floatEl = $(this);
+				var currOffset = $floatEl.offset();
 
-			$(selectedElems).each(function(i, selectedElem) {
-				var selectedOffset = $(selectedElem).offset();
-				// Distance check between Ad and current element.
+				$(selectedElems).each(function(i, selectedElem) {
+					var selectedOffset = $(selectedElem).offset();
+					// Distance check between Ad and current element.
 
-				if (Math.abs(currOffset.top - selectedOffset.top + $floatEl.height()) < 50) {
-					selectedElems.splice(selectedElems.indexOf(selectedElem), 1);
-				}
-			});
-		}
-	});
+					if (Math.abs(currOffset.top - selectedOffset.top + $floatEl.height()) < 50) {
+						selectedElems.splice(selectedElems.indexOf(selectedElem), 1);
+					}
+				});
+			}
+		});
 
 	return this;
 };
@@ -310,29 +337,29 @@ $.fn.ignoreXpaths = function(xPathArr, minGap) {
 		return allElems;
 	};
 
-  resolveXpaths(xPathArr).forEach(function(xPath) {
-    var $xpathEl = $(xPath),
-      $xpathOffset = $xpathEl.offset(),
-      $xpathHeight = $xpathEl.height();
+	resolveXpaths(xPathArr).forEach(function(xPath) {
+		var $xpathEl = $(xPath),
+			$xpathOffset = $xpathEl.offset(),
+			$xpathHeight = $xpathEl.height();
 
-    $(selectedElems).each(function(i, selectedElem) {
-      var selectedOffset = $(selectedElem).offset(),
-        selectedHeight = $(selectedElem).height();
+		$(selectedElems).each(function(i, selectedElem) {
+			var selectedOffset = $(selectedElem).offset(),
+				selectedHeight = $(selectedElem).height();
 
-      if ( $xpathEl.has(selectedElem).length) {
-        selectedElems.splice(selectedElems.indexOf(selectedElem), 1);
-      }
+			if ($xpathEl.has(selectedElem).length) {
+				selectedElems.splice(selectedElems.indexOf(selectedElem), 1);
+			}
 
-      if ($xpathOffset.top > selectedOffset.top ) { // if xpath element is below selected element
-        /* Currently choosing to ignore this because
+			if ($xpathOffset.top > selectedOffset.top) {
+				// if xpath element is below selected element
+				/* Currently choosing to ignore this because
         in case  of wrapping, mostly the elmenents that matter are the ones above */
-        if( ( $xpathOffset.top - (selectedOffset.top + selectedHeight) ) <= minGap ) {
-          selectedElems.splice(selectedElems.indexOf(selectedElem), 1);
-        }
-      } else if ( (selectedOffset.top - ($xpathOffset.top + $xpathHeight) )  <= minGap) {
-        selectedElems.splice(selectedElems.indexOf(selectedElem), 1);
-      }
-
+				if ($xpathOffset.top - (selectedOffset.top + selectedHeight) <= minGap) {
+					selectedElems.splice(selectedElems.indexOf(selectedElem), 1);
+				}
+			} else if (selectedOffset.top - ($xpathOffset.top + $xpathHeight) <= minGap) {
+				selectedElems.splice(selectedElems.indexOf(selectedElem), 1);
+			}
 		});
 	});
 
@@ -340,20 +367,20 @@ $.fn.ignoreXpaths = function(xPathArr, minGap) {
 };
 
 $.fn.notNear = function(xPathArr, minGap) {
-  this.ignoreXpaths(xPathArr, minGap);
-  return this;
-}
+	this.ignoreXpaths(xPathArr, minGap);
+	return this;
+};
 
 $.fn.setPlacementForSection = function(adObj, minDistance) {
 	var section = adObj.section;
 
-	if ($.isEmptyObject(placements)  && selectedElems.length ) {
+	if ($.isEmptyObject(placements) && selectedElems.length) {
 		placements[section] = {
 			elem: selectedElems[0],
 			isSecondaryCss: false
 		};
 
-		if( adObj.css.float !== "none" ){
+		if (adObj.css.float !== 'none') {
 			distanceAddFactor = adObj.height;
 		} else {
 			distanceAddFactor = 0;
@@ -367,19 +394,22 @@ $.fn.setPlacementForSection = function(adObj, minDistance) {
 			// If last section didn't have any placement, then there is enough gap for one element
 			if (!lastPlacement) {
 				placements[section] = {
-					elem : currElem,
-					isSecondaryCss : false
+					elem: currElem,
+					isSecondaryCss: false
 				};
 				break;
 			}
 
-			if (($(currElem).offset().top - ($(lastPlacement).offset().top + $(lastPlacement).height()) ) > (minDistance || 200) + distanceAddFactor) {
+			if (
+				$(currElem).offset().top - ($(lastPlacement).offset().top + $(lastPlacement).height()) >
+				(minDistance || 200) + distanceAddFactor
+			) {
 				placements[section] = {
 					elem: currElem,
 					isSecondaryCss: false
 				};
 
-				if( adObj.css.float !== "none" ){
+				if (adObj.css.float !== 'none') {
 					distanceAddFactor = adObj.height;
 				} else {
 					distanceAddFactor = 0;
@@ -405,28 +435,28 @@ $.fn.insertAds = function() {
 function placementStart($selector, placementConfig, doneCallback) {
 	var bootstrapPlacements = function() {
 			$(placementConfig).each(function(i, adObj) {
-				var placeFn = function(adObj){
+				var placeFn = function(adObj) {
 					$selector
 						.createAds(adObj.width, adObj.height, adObj.css.float)
-						.selectBetween((adObj.section - 1) * 500, (adObj.section) * 600)
+						.selectBetween((adObj.section - 1) * 500, adObj.section * 600)
 						.ignoreXpaths(adObj.ignoreXpaths, 100)
 						.notNear(adObj.notNear ? adObj.notNear[0] : [], adObj.notNear ? adObj.notNear[1] : 200)
 						.setPlacementForSection(adObj, adObj.minDistanceFromPrevAd);
 				};
 				placeFn(adObj);
 
-				if( ! placements[adObj.section] ){
-					adObj.css.float = "none";
+				if (!placements[adObj.section]) {
+					adObj.css.float = 'none';
 					placeFn(adObj);
 
-					if( placements[adObj.section] ){
+					if (placements[adObj.section]) {
 						placements[adObj.section].isSecondaryCss = true;
 					}
 				}
 			});
 
 			doneCallback(placements);
-/*
+			/*
 			$(placementConfig).each(function(i, adPlacement) {
 				createVisibleDiv(adPlacement.float, adPlacement.section).insertAfter(placements[adPlacement.section]);
 			});*/
@@ -435,9 +465,11 @@ function placementStart($selector, placementConfig, doneCallback) {
 			// Check what image tags haven't been loaded.
 			// If there are still that don't have a height
 			// don't start making placements.
-			if ($selector.find('img:visible').filter(function() {
-				return $(this).get(0).naturalHeight === 0;
-			}).length === 0) {
+			if (
+				$selector.find('img:visible').filter(function() {
+					return $(this).get(0).naturalHeight === 0;
+				}).length === 0
+			) {
 				clearInterval(window.intervalId);
 				bootstrapPlacements();
 			}

@@ -14,8 +14,10 @@ function Publisher(config) {
 				me.channel.publish(me.config.exchange.name, queueName, msg, options);
 				return resolve('done');
 			} else {
-				me.offlineQueue.push({queueName, msg, options});
-				return reject('issue with rabbitmq connection or channel, messages queued up to be delivered on reconnection');
+				me.offlineQueue.push({ queueName, msg, options });
+				return reject(
+					'issue with rabbitmq connection or channel, messages queued up to be delivered on reconnection'
+				);
 			}
 		});
 	};
@@ -33,7 +35,7 @@ function Publisher(config) {
 			return Promise.resolve(me.connection);
 		}
 
-		return queueInstance.connect(me.config.url).then(function(conn){
+		return queueInstance.connect(me.config.url).then(function(conn) {
 			conn.on('close', function() {
 				me.connection = null;
 				me.channel = null;
@@ -41,7 +43,8 @@ function Publisher(config) {
 			});
 			me.connection = conn;
 
-			return me.registerChannel(conn)
+			return me
+				.registerChannel(conn)
 				.then(function(ch) {
 					me.channel = ch;
 					return me.registerExchange(ch);
@@ -60,18 +63,24 @@ Publisher.prototype.registerChannel = function(conn) {
 };
 
 Publisher.prototype.registerExchange = function(ch) {
-	return ch.assertExchange(this.config.exchange.name , this.config.exchange.type, this.config.exchange.options)
+	return ch
+		.assertExchange(this.config.exchange.name, this.config.exchange.type, this.config.exchange.options)
 		.then(function() {
 			return ch;
 		});
 };
 
 Publisher.prototype.registerQueues = function(ch) {
-    const queueRegistration = this.registerQueue(ch, this.config.queue.name, this.config.queue.options, this.config.exchange);
+	const queueRegistration = this.registerQueue(
+		ch,
+		this.config.queue.name,
+		this.config.queue.options,
+		this.config.exchange
+	);
 
-	return Promise.join(queueRegistration, function(){
+	return Promise.join(queueRegistration, function() {
 		return '';
-	})
+	});
 };
 
 Publisher.prototype.registerQueue = function(ch, queueName, options) {
@@ -80,7 +89,7 @@ Publisher.prototype.registerQueue = function(ch, queueName, options) {
 	return ch.assertQueue(queueName, options).then(function() {
 		return ch.bindQueue(queueName, me.config.exchange.name, queueName);
 	});
-}
+};
 
 Publisher.prototype.makeConnection = function() {
 	return this.connectRabbit();
@@ -91,6 +100,6 @@ Publisher.prototype.publish = function(queueName, msg, options) {
 		msg = JSON.stringify(msg);
 	}
 	return this.publishMsg(queueName, new Buffer(msg, 'utf8'), options);
-}
+};
 
 module.exports = Publisher;

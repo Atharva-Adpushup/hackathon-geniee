@@ -18,33 +18,41 @@ module.exports = {
 				if (zoneObj.pageGroupId) {
 					if (!computedData.hasOwnProperty(zoneObj.pageGroupId) && !computedData[zoneObj.pageGroupId]) {
 						computedData[zoneObj.pageGroupId] = {
-							'click': 0,
-							'impression': 0,
-							'revenue': 0.0,
-							'ctr': 0.0,
+							click: 0,
+							impression: 0,
+							revenue: 0.0,
+							ctr: 0.0,
 							zones: [],
-							"pageViews": 0,
-							"pageRPM": 0.0,
-							"pageCTR": 0.0
+							pageViews: 0,
+							pageRPM: 0.0,
+							pageCTR: 0.0
 						};
 
 						computedData[zoneObj.pageGroupId].click += Number(zoneObj.click);
 						computedData[zoneObj.pageGroupId].impression += Number(zoneObj.impression);
 						computedData[zoneObj.pageGroupId].revenue += Number(zoneObj.revenue);
 						computedData[zoneObj.pageGroupId].ctr += Number(zoneObj.ctr);
-						computedData[zoneObj.pageGroupId].zones.push(extend(true, {}, zoneObj, {date: dateKey}));
+						computedData[zoneObj.pageGroupId].zones.push(extend(true, {}, zoneObj, { date: dateKey }));
 
-						computedData[zoneObj.pageGroupId].revenue = Number(computedData[zoneObj.pageGroupId].revenue.toFixed(2));
-						computedData[zoneObj.pageGroupId].ctr = Number(computedData[zoneObj.pageGroupId].ctr.toFixed(2));
+						computedData[zoneObj.pageGroupId].revenue = Number(
+							computedData[zoneObj.pageGroupId].revenue.toFixed(2)
+						);
+						computedData[zoneObj.pageGroupId].ctr = Number(
+							computedData[zoneObj.pageGroupId].ctr.toFixed(2)
+						);
 					} else {
 						computedData[zoneObj.pageGroupId].click += Number(zoneObj.click);
 						computedData[zoneObj.pageGroupId].impression += Number(zoneObj.impression);
 						computedData[zoneObj.pageGroupId].revenue += Number(zoneObj.revenue);
 						computedData[zoneObj.pageGroupId].ctr += Number(zoneObj.ctr);
-						computedData[zoneObj.pageGroupId].zones.push(extend(true, {}, zoneObj, {date: dateKey}));
+						computedData[zoneObj.pageGroupId].zones.push(extend(true, {}, zoneObj, { date: dateKey }));
 
-						computedData[zoneObj.pageGroupId].revenue = Number(computedData[zoneObj.pageGroupId].revenue.toFixed(2));
-						computedData[zoneObj.pageGroupId].ctr = Number(computedData[zoneObj.pageGroupId].ctr.toFixed(2));
+						computedData[zoneObj.pageGroupId].revenue = Number(
+							computedData[zoneObj.pageGroupId].revenue.toFixed(2)
+						);
+						computedData[zoneObj.pageGroupId].ctr = Number(
+							computedData[zoneObj.pageGroupId].ctr.toFixed(2)
+						);
 					}
 				}
 			});
@@ -59,16 +67,30 @@ module.exports = {
 		_.forOwn(reportData.pageGroups, function(pageGroupObj, pageGroupKey) {
 			var computedPageGroupObj;
 
-			if (pageGroupKey === dataStr) { return; }
+			if (pageGroupKey === dataStr) {
+				return;
+			}
 
 			// Cache current computed page group object
 			computedPageGroupObj = extend(true, {}, computedData.pageGroups[pageGroupKey]);
-			computedPageGroupObj = extend(true, {}, computedPageGroupObj, { 'click': 0, 'impression': 0, 'revenue': 0.0, 'pageViews': 0, 'pageRPM': 0.0, 'pageCTR': 0.0, 'dayWisePageViews': {}, 'days': {}, 'tracked': { 'pageViews': 0, 'click': 0, 'pageCTR': 0.0, 'impression': 0 }});
+			computedPageGroupObj = extend(true, {}, computedPageGroupObj, {
+				click: 0,
+				impression: 0,
+				revenue: 0.0,
+				pageViews: 0,
+				pageRPM: 0.0,
+				pageCTR: 0.0,
+				dayWisePageViews: {},
+				days: {},
+				tracked: { pageViews: 0, click: 0, pageCTR: 0.0, impression: 0 }
+			});
 
 			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
 				// Removed 'false' from return false; below statement as it stops the forOwn loop
 				// execution
-				if (variationKey === dataStr) { return; }
+				if (variationKey === dataStr) {
+					return;
+				}
 
 				let trackedPageCTR;
 
@@ -77,20 +99,24 @@ module.exports = {
 
 				computedPageGroupObj.impression += Number(variationObj.impression);
 				computedPageGroupObj.tracked.impression += Number(variationObj.tracked.impression);
-				
+
 				computedPageGroupObj.revenue += Number(variationObj.revenue);
 
 				computedPageGroupObj.pageViews += Number(variationObj.pageViews);
 				computedPageGroupObj.tracked.pageViews += Number(variationObj.tracked.pageViews);
 
-				trackedPageCTR = Number((computedPageGroupObj.tracked.click / computedPageGroupObj.tracked.pageViews * 100).toFixed(2));
-				trackedPageCTR = (trackedPageCTR && trackedPageCTR !== Infinity) ? trackedPageCTR : 0.0;
+				trackedPageCTR = Number(
+					(computedPageGroupObj.tracked.click / computedPageGroupObj.tracked.pageViews * 100).toFixed(2)
+				);
+				trackedPageCTR = trackedPageCTR && trackedPageCTR !== Infinity ? trackedPageCTR : 0.0;
 				computedPageGroupObj.tracked.pageCTR = trackedPageCTR;
 
 				// Set day wise page views for PageGroup
 				_.forOwn(variationObj.dayWisePageViews, function(pageViews, dateKey) {
 					var doesDateKeyNotPresent = !computedPageGroupObj.dayWisePageViews.hasOwnProperty(dateKey),
-						doesDateKeyNotExist = !!(doesDateKeyNotPresent && !computedPageGroupObj.dayWisePageViews[dateKey]);
+						doesDateKeyNotExist = !!(
+							doesDateKeyNotPresent && !computedPageGroupObj.dayWisePageViews[dateKey]
+						);
 
 					if (doesDateKeyNotExist) {
 						computedPageGroupObj.dayWisePageViews[dateKey] = pageViews;
@@ -118,7 +144,9 @@ module.exports = {
 								trackedImpression = metricObject.tracked.impression,
 								pageViews = metricObject.pageViews,
 								trackedPageViews = metricObject.tracked.pageViews,
-								revenueComputedValue, pageRPMComputedValue, pageCTRComputedValue,
+								revenueComputedValue,
+								pageRPMComputedValue,
+								pageCTRComputedValue,
 								trackedPageCTRComputedValue;
 
 							click += dataObject.click;
@@ -136,13 +164,18 @@ module.exports = {
 							// Computed current metric value
 							pageRPMComputedValue = Number((revenue / pageViews * 1000).toFixed(2));
 							// Check for boundary cases and convert accordingly
-							pageRPMComputedValue = (pageRPMComputedValue && pageRPMComputedValue !== Infinity) ? pageRPMComputedValue : 0.0;
+							pageRPMComputedValue =
+								pageRPMComputedValue && pageRPMComputedValue !== Infinity ? pageRPMComputedValue : 0.0;
 
 							pageCTRComputedValue = Number((click / pageViews * 100).toFixed(2));
-							pageCTRComputedValue = (pageCTRComputedValue && pageCTRComputedValue !== Infinity) ? pageCTRComputedValue : 0.0;
+							pageCTRComputedValue =
+								pageCTRComputedValue && pageCTRComputedValue !== Infinity ? pageCTRComputedValue : 0.0;
 
 							trackedPageCTRComputedValue = Number((trackedClick / trackedPageViews * 100).toFixed(2));
-							trackedPageCTRComputedValue = (trackedPageCTRComputedValue && trackedPageCTRComputedValue !== Infinity) ? trackedPageCTRComputedValue : 0.0;
+							trackedPageCTRComputedValue =
+								trackedPageCTRComputedValue && trackedPageCTRComputedValue !== Infinity
+									? trackedPageCTRComputedValue
+									: 0.0;
 
 							// Update cached object
 							metricObject.revenue = revenue;
@@ -173,12 +206,22 @@ module.exports = {
 			computedPageGroupObj.click = computedPageGroupObj.click || 0;
 			computedPageGroupObj.impression = computedPageGroupObj.impression || 0;
 			computedPageGroupObj.pageViews = computedPageGroupObj.pageViews || 0;
-			computedPageGroupObj.pageRPM = Number((computedPageGroupObj.revenue / computedPageGroupObj.pageViews * 1000).toFixed(2)) || 0;
-			computedPageGroupObj.pageCTR = Number((computedPageGroupObj.tracked.click / computedPageGroupObj.tracked.pageViews * 100).toFixed(2)) || 0;
+			computedPageGroupObj.pageRPM =
+				Number((computedPageGroupObj.revenue / computedPageGroupObj.pageViews * 1000).toFixed(2)) || 0;
+			computedPageGroupObj.pageCTR =
+				Number(
+					(computedPageGroupObj.tracked.click / computedPageGroupObj.tracked.pageViews * 100).toFixed(2)
+				) || 0;
 
 			// Make Page RPM and CTR fail safe
-			computedPageGroupObj.pageRPM = (computedPageGroupObj.pageRPM && computedPageGroupObj.pageRPM !== Infinity) ? computedPageGroupObj.pageRPM : 0;
-			computedPageGroupObj.pageCTR = (computedPageGroupObj.pageCTR && computedPageGroupObj.pageCTR !== Infinity) ? computedPageGroupObj.pageCTR : 0;
+			computedPageGroupObj.pageRPM =
+				computedPageGroupObj.pageRPM && computedPageGroupObj.pageRPM !== Infinity
+					? computedPageGroupObj.pageRPM
+					: 0;
+			computedPageGroupObj.pageCTR =
+				computedPageGroupObj.pageCTR && computedPageGroupObj.pageCTR !== Infinity
+					? computedPageGroupObj.pageCTR
+					: 0;
 
 			// Set computed page group object in its original object hierarchy
 			computedData.pageGroups[pageGroupKey] = extend(true, {}, computedPageGroupObj);
@@ -186,9 +229,11 @@ module.exports = {
 
 		return Promise.resolve(computedData);
 	},
-	transformAllPageGroupsData: (inputChannelData) => {
+	transformAllPageGroupsData: inputChannelData => {
 		const emptyChannelDataStr = 'Channel data should not be empty';
-		if (!inputChannelData || !inputChannelData.length) { throw new AdPushupError(emptyChannelDataStr); }
+		if (!inputChannelData || !inputChannelData.length) {
+			throw new AdPushupError(emptyChannelDataStr);
+		}
 
 		const computedData = inputChannelData.concat([]);
 
@@ -207,7 +252,8 @@ module.exports = {
 	},
 	getPageGroupDataById: function(data) {
 		var allPageGroupsData = _.map(_.keys(data), function(channelKey) {
-			return channelModel.getPageGroupById({id: channelKey, viewName: 'channelByGenieePageGroupId', isExtendedParams: true})
+			return channelModel
+				.getPageGroupById({ id: channelKey, viewName: 'channelByGenieePageGroupId', isExtendedParams: true })
 				.then(function(channelData) {
 					var computedData = {};
 
@@ -223,7 +269,7 @@ module.exports = {
 			channelKeys = _.keys(pageGroupData),
 			computedData = {};
 
-		_.forEach(channelKeys, (channelKey) => {
+		_.forEach(channelKeys, channelKey => {
 			const doesChannelKeyMatch = !!(allChannelsData.hasOwnProperty(channelKey) && allChannelsData[channelKey]),
 				reportPageGroupObject = extend(true, {}, pageGroupData[channelKey]),
 				channelPageGroupObject = extend(true, {}, allChannelsData[channelKey]);
@@ -240,7 +286,9 @@ module.exports = {
 				_.forOwn(channelPageGroupObject.variations, (variationObject, variationKey) => {
 					const doesVariationKeyMatch = _.includes(reportPageGroupVariationKeys, variationKey);
 
-					if (!doesVariationKeyMatch) { delete computedData[channelKey].variations[variationKey]; }
+					if (!doesVariationKeyMatch) {
+						delete computedData[channelKey].variations[variationKey];
+					}
 				});
 			}
 		});
@@ -256,7 +304,9 @@ module.exports = {
 			_.forOwn(pageGroupObj.variations, function(variationObj, variationKey) {
 				var isDataKey = !!(variationKey === 'data');
 
-				if (isDataKey) { return true; }
+				if (isDataKey) {
+					return true;
+				}
 
 				variationZonesArr = variationZonesArr.concat(variationObj.zones);
 			});
@@ -285,45 +335,53 @@ module.exports = {
 				pagerpm: {},
 				pagectr: {}
 			},
-			currentComputedObj = {}, currentDate;
+			currentComputedObj = {},
+			currentDate;
 
 		_.forOwn(computedData.pageGroups, function(pageGroupObj) {
 			const isDaysObject = !!(pageGroupObj && pageGroupObj.days);
-			if (!isDaysObject) { return; }
+			if (!isDaysObject) {
+				return;
+			}
 
 			const dayWiseDataKeys = Object.keys(pageGroupObj.days);
-			
+
 			_.forEach(dayWiseDataKeys, function(dateKey) {
 				const dayWiseDataObject = pageGroupObj.days[dateKey];
 
 				currentDate = moment(dateKey).valueOf();
 
 				currentComputedObj.revenue = {
-					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+					name: pageGroupObj.pageGroup + '-' + pageGroupObj.device,
 					data: [[currentDate, Number(dayWiseDataObject.revenue)]]
 				};
 				datesObj.revenue[currentDate] = currentComputedObj.revenue.name;
 
 				currentComputedObj.pageviews = {
-					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
-					data: [[currentDate, Number(dayWiseDataObject.pageViews || pageGroupObj.dayWisePageViews[dayWiseDataObject.date])]]
+					name: pageGroupObj.pageGroup + '-' + pageGroupObj.device,
+					data: [
+						[
+							currentDate,
+							Number(dayWiseDataObject.pageViews || pageGroupObj.dayWisePageViews[dayWiseDataObject.date])
+						]
+					]
 				};
 				datesObj.pageviews[currentDate] = currentComputedObj.pageviews.name;
 
 				currentComputedObj.clicks = {
-					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+					name: pageGroupObj.pageGroup + '-' + pageGroupObj.device,
 					data: [[currentDate, Number(dayWiseDataObject.click)]]
 				};
 				datesObj.clicks[currentDate] = currentComputedObj.clicks.name;
 
 				currentComputedObj.pagerpm = {
-					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+					name: pageGroupObj.pageGroup + '-' + pageGroupObj.device,
 					data: [[currentDate, Number(dayWiseDataObject.pageRPM || pageGroupObj.pageRPM)]]
 				};
 				datesObj.pagerpm[currentDate] = currentComputedObj.pagerpm.name;
 
 				currentComputedObj.pagectr = {
-					name: (pageGroupObj.pageGroup + '-' + pageGroupObj.device),
+					name: pageGroupObj.pageGroup + '-' + pageGroupObj.device,
 					data: [[currentDate, Number(dayWiseDataObject.pageCTR || pageGroupObj.pageCTR)]]
 				};
 				datesObj.pagectr[currentDate] = currentComputedObj.pagectr.name;
@@ -366,7 +424,18 @@ module.exports = {
 			constants = localizedData[localeCode],
 			pageGroupsTabularData = {
 				table: {
-					header: [' ', constants.DATA_TABLE.COMMON.NAME, constants.DATA_TABLE.PAGE_GROUPS.HEADER.PLATFORM, constants.DATA_TABLE.COMMON.REVENUE, constants.DATA_TABLE.COMMON.IMPRESSIONS, constants.DATA_TABLE.COMMON.PAGE_VIEWS, constants.DATA_TABLE.COMMON.CLICKS, constants.DATA_TABLE.COMMON.PAGE_RPM, constants.DATA_TABLE.COMMON.PAGE_CTR, constants.DATA_TABLE.PAGE_GROUPS.HEADER.VARIATION_COUNT],
+					header: [
+						' ',
+						constants.DATA_TABLE.COMMON.NAME,
+						constants.DATA_TABLE.PAGE_GROUPS.HEADER.PLATFORM,
+						constants.DATA_TABLE.COMMON.REVENUE,
+						constants.DATA_TABLE.COMMON.IMPRESSIONS,
+						constants.DATA_TABLE.COMMON.PAGE_VIEWS,
+						constants.DATA_TABLE.COMMON.CLICKS,
+						constants.DATA_TABLE.COMMON.PAGE_RPM,
+						constants.DATA_TABLE.COMMON.PAGE_CTR,
+						constants.DATA_TABLE.PAGE_GROUPS.HEADER.VARIATION_COUNT
+					],
 					rows: [],
 					footer: [constants.DATA_TABLE.COMMON.TOTAL, ' ', ' ', 0, 0, 0, 0, 0, 0, 0]
 				}
@@ -411,11 +480,15 @@ module.exports = {
 		});
 
 		// Round of metrics to 2 decimal places
-		pageGroupsTabularData.table.footer[3] = Number((pageGroupsTabularData.table.footer[3]).toFixed(2));
+		pageGroupsTabularData.table.footer[3] = Number(pageGroupsTabularData.table.footer[3].toFixed(2));
 		// Calculate footer pageRPM
-		pageGroupsTabularData.table.footer[7] = Number((pageGroupsTabularData.table.footer[3] / pageGroupsTabularData.table.footer[5] * 1000).toFixed(2));
+		pageGroupsTabularData.table.footer[7] = Number(
+			(pageGroupsTabularData.table.footer[3] / pageGroupsTabularData.table.footer[5] * 1000).toFixed(2)
+		);
 		// Calculate footer pageCTR
-		pageGroupsTabularData.table.footer[8] = Number((footerMetrics.trackedClick / footerMetrics.trackedPageViews * 100).toFixed(2));
+		pageGroupsTabularData.table.footer[8] = Number(
+			(footerMetrics.trackedClick / footerMetrics.trackedPageViews * 100).toFixed(2)
+		);
 
 		computedData.pageGroups.data = extend(true, {}, pageGroupsTabularData);
 

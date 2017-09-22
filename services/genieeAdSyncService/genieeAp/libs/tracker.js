@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-undef
-var w = window, d = document,
+var w = window,
+	d = document,
 	$ = require('jquery'),
 	browserConfig = require('../libs/browserConfig');
 
@@ -35,7 +36,7 @@ function Tracker() {
 }
 
 Tracker.prototype.setupListener = function() {
-	if ( !browserConfig.trackerSupported ) {
+	if (!browserConfig.trackerSupported) {
 		return false;
 	}
 
@@ -46,12 +47,17 @@ Tracker.prototype.setupListener = function() {
 
 	$(w).on('blur', function() {
 		me.eventBlurTs = +new Date();
-		if (browserConfig.name === 'firefox') {// firefox returns iframe as activeElement bit late
+		if (browserConfig.name === 'firefox') {
+			// firefox returns iframe as activeElement bit late
 			setTimeout(function() {
 				me.event = 'blur';
 				me.isTrackingNodeClicked();
 			}, 700);
-		} else if ((browserConfig.name === 'safari-mobile' || browserConfig.name === 'safari-wv') && typeof w.requestAnimationFrame === 'function') {// safari mobile and webview stop requestanimation immidiately after click
+		} else if (
+			(browserConfig.name === 'safari-mobile' || browserConfig.name === 'safari-wv') &&
+			typeof w.requestAnimationFrame === 'function'
+		) {
+			// safari mobile and webview stop requestanimation immidiately after click
 			(function() {
 				var reqAnim = null;
 				function logReqAnim() {
@@ -59,7 +65,7 @@ Tracker.prototype.setupListener = function() {
 					reqAnim = w.requestAnimationFrame(logReqAnim);
 				}
 				me.eventlastReqAnimTime = +new Date();
-				reqAnim =  w.requestAnimationFrame(logReqAnim);
+				reqAnim = w.requestAnimationFrame(logReqAnim);
 				setTimeout(function() {
 					w.cancelAnimationFrame(reqAnim);
 				}, 1500);
@@ -72,16 +78,23 @@ Tracker.prototype.setupListener = function() {
 		}
 	});
 
-	browserConfig.pageVisibility.onChange(function() {
-		me.event = 'visibility';
-		me.isTrackingNodeClicked();
-	}, function() {});
+	browserConfig.pageVisibility.onChange(
+		function() {
+			me.event = 'visibility';
+			me.isTrackingNodeClicked();
+		},
+		function() {}
+	);
 
 	if (typeof w.addEventListener === 'function') {
-		w.addEventListener(browserConfig.unloadMethod, function() {
-			me.event = 'onBU';
-			me.isTrackingNodeClicked();
-		}, true);
+		w.addEventListener(
+			browserConfig.unloadMethod,
+			function() {
+				me.event = 'onBU';
+				me.isTrackingNodeClicked();
+			},
+			true
+		);
 	} else if (w.attachEvent) {
 		w.attachEvent('on' + browserConfig.unloadMethod, function() {
 			me.event = 'onBU';
@@ -99,7 +112,8 @@ Tracker.prototype.isTrackingNodeClicked = function() {
 				return false;
 			}
 
-			if (this.lastPageHiddenTs && ((+new Date() - this.lastPageHiddenTs) <= this.checkTimeout)) { // (firefox and old ie)some time ie old browsers create condition that visibility which is based on blur fires first and after then blur fires, firefox we run blur event bit late as it gives iframe as activeelemnt very late
+			if (this.lastPageHiddenTs && +new Date() - this.lastPageHiddenTs <= this.checkTimeout) {
+				// (firefox and old ie)some time ie old browsers create condition that visibility which is based on blur fires first and after then blur fires, firefox we run blur event bit late as it gives iframe as activeelemnt very late
 				activeNode.callback(activeNode);
 			} else {
 				activeNode.blurTs = this.eventBlurTs;
@@ -107,19 +121,30 @@ Tracker.prototype.isTrackingNodeClicked = function() {
 			}
 			break;
 		case 'visibility':
-			if (this.lastNodeActive && !this.lastNodeActive.callbackCalled && Math.abs(+new Date() - this.lastNodeActive.blurTs) <= this.checkTimeout) {
+			if (
+				this.lastNodeActive &&
+				!this.lastNodeActive.callbackCalled &&
+				Math.abs(+new Date() - this.lastNodeActive.blurTs) <= this.checkTimeout
+			) {
 				this.lastNodeActive.callback(this.lastNodeActive);
 			} else {
 				this.lastPageHiddenTs = +new Date();
 			}
 			break;
 		case 'onBU':
-			if (this.lastNodeActive && !this.lastNodeActive.callbackCalled &&
-					((Math.abs(+new Date() - this.lastNodeActive.blurTs) <= this.checkTimeout)
-					|| ((browserConfig.name === 'safari-mobile' || browserConfig.name === 'safari-wv')
-					&& (Math.abs(this.eventlastReqAnimTime - this.lastNodeActive.blurTs) <= 1000)))) {
+			if (
+				this.lastNodeActive &&
+				!this.lastNodeActive.callbackCalled &&
+				(Math.abs(+new Date() - this.lastNodeActive.blurTs) <= this.checkTimeout ||
+					((browserConfig.name === 'safari-mobile' || browserConfig.name === 'safari-wv') &&
+						Math.abs(this.eventlastReqAnimTime - this.lastNodeActive.blurTs) <= 1000))
+			) {
 				this.lastNodeActive.callback(this.lastNodeActive);
-			} else if (browserConfig.name === 'firefox' && Math.abs(+new Date() - this.eventBlurTs ) <= this.checkTimeout) { // some loose check but firefox don't give more than this)
+			} else if (
+				browserConfig.name === 'firefox' &&
+				Math.abs(+new Date() - this.eventBlurTs) <= this.checkTimeout
+			) {
+				// some loose check but firefox don't give more than this)
 				activeNode = this.getActiveNode();
 				if (!activeNode || (activeNode && activeNode.callbackCalled)) {
 					return false;
@@ -153,11 +178,14 @@ Tracker.prototype.add = function($el, callback, cancelCallback) {
 		var el = new TrackingNode($el, callback, cancelCallback);
 		this.nodesToTrack.push(el);
 
-		$el.on('mouseout', function() { // ???
-			$(w).focus();
-		}).on('mouseover', function() {
-			$(w).focus();
-		});
+		$el
+			.on('mouseout', function() {
+				// ???
+				$(w).focus();
+			})
+			.on('mouseover', function() {
+				$(w).focus();
+			});
 	}
 };
 

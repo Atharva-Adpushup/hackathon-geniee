@@ -32,14 +32,17 @@ router
 
 		switch (req.query.platform) {
 			case 'mobile':
-				userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53';
+				userAgent =
+					'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53';
 				break;
 			case 'tablet':
 				// Apple iPad 1/2/Mini
-				userAgent = 'Mozilla/5.0 (iPad; CPU OS 4_3_5 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8L1 Safari/6533.18.5';
+				userAgent =
+					'Mozilla/5.0 (iPad; CPU OS 4_3_5 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8L1 Safari/6533.18.5';
 				break;
 			default:
-				userAgent = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36';
+				userAgent =
+					'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36';
 		}
 
 		function injectInit($) {
@@ -54,20 +57,23 @@ router
 		if (req.query.useAlternateProxy === 'true') {
 			try {
 				// Cheerio will be used if alternate proxy is used
-				proxy.load(url, userAgent, true).then(function(response) {
-					var body = response.body,
-						$ = cheerio.load(body, {
-							decodeEntities: false,
-							recognizeSelfClosing: true
-						});
-					injectInit($);
-					res.set('Content-Type', response.headers['content-type']);
-					res.send($.html());
-					res.end();
-				}).catch(function(err) {
-					res.status(500);
-					res.send('err:' + err.toString());
-				});
+				proxy
+					.load(url, userAgent, true)
+					.then(function(response) {
+						var body = response.body,
+							$ = cheerio.load(body, {
+								decodeEntities: false,
+								recognizeSelfClosing: true
+							});
+						injectInit($);
+						res.set('Content-Type', response.headers['content-type']);
+						res.send($.html());
+						res.end();
+					})
+					.catch(function(err) {
+						res.status(500);
+						res.send('err:' + err.toString());
+					});
 			} catch (err) {
 				res.status(500);
 				res.send('err:' + err.toString());
@@ -76,7 +82,8 @@ router
 	})
 	.get('/detectCms', function(req, res) {
 		var json = {};
-		proxy.detectWp(req.query.site)
+		proxy
+			.detectWp(req.query.site)
 			.then(function(result) {
 				json.wordpress = result;
 				return json;
@@ -91,7 +98,8 @@ router
 			});
 	})
 	.get('/detectAp', function(req, res) {
-		return proxy.detectCustomAp(req.query.url)
+		return proxy
+			.detectCustomAp(req.query.url)
 			.then(function(result) {
 				return res.json({ ap: result });
 			})
