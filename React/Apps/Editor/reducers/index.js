@@ -7,7 +7,6 @@ import sectionByIds from './sectionReducer';
 import ui from './uiReducer';
 import siteData from './siteReducer';
 
-
 export default combineReducers({
 	adByIds,
 	sectionByIds,

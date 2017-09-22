@@ -1,20 +1,28 @@
 import { variationActions } from 'consts/commonConsts';
 import _ from 'lodash';
 import Utils from 'libs/utils';
-import { getChannelVariations, getChannelVariationsWithAds, getVariationSectionsWithAds } from 'selectors/variationSelectors';
+import {
+	getChannelVariations,
+	getChannelVariationsWithAds,
+	getVariationSectionsWithAds
+} from 'selectors/variationSelectors';
 
-const getLastVariationNumber = function (variations) {
+const getLastVariationNumber = function(variations) {
 		const names = variations.map(({ name }) => {
 			var reversed = parseInt(name.split(' ')[1], 10),
 				vName = isNaN(reversed) ? 0 : reversed;
 
 			return name.indexOf('Variation') === -1 ? 0 : vName;
 		});
-		return names.length ? names.sort(function (a, b){ 
-			return a > b;
-		}).reverse()[0] : 0;
+		return names.length
+			? names
+					.sort(function(a, b) {
+						return a > b;
+					})
+					.reverse()[0]
+			: 0;
 	},
-	addVariation = (channelId) => (dispatch, getState) => {
+	addVariation = channelId => (dispatch, getState) => {
 		const variationId = Utils.getRandomNumber(),
 			state = getState(),
 			variationCount = getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1,
@@ -48,14 +56,14 @@ const getLastVariationNumber = function (variations) {
 			type: variationActions.COPY_VARIATION,
 			variationId: newVariationId,
 			channelId,
-			sections: _.map(copyFromVariation.sections, (section) => {
+			sections: _.map(copyFromVariation.sections, section => {
 				const sectionId = Utils.getRandomNumber();
 				sectionIds.push(sectionId);
 				return {
 					...section,
 					id: sectionId,
 					name: `Section-${sectionId}`,
-					ads: _.map(section.ads, (ad) => {
+					ads: _.map(section.ads, ad => {
 						const adId = Utils.getRandomNumber();
 						ads.push({ ...ad, id: adId });
 						return adId;
@@ -75,25 +83,41 @@ const getLastVariationNumber = function (variations) {
 	deleteVariation = (variationId, channelId) => (dispatch, getState) => {
 		const variations = getChannelVariations(getState(), { channelId });
 		if (variations.length > 1) {
-			if(confirm('Are you sure you want to delete this variation ?')) {
+			if (confirm('Are you sure you want to delete this variation ?')) {
 				dispatch({ type: variationActions.DELETE_VARIATION, variationId, channelId });
 			}
 		} else {
 			alert('You need at least one variation!');
 		}
-    },
-    setActiveVariation = (variationId) => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
+	},
+	setActiveVariation = variationId => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
 	updateVariation = (variationId, payload) => ({ type: variationActions.UPDATE_VARIATION, variationId, payload }),
 	editVariationName = (variationId, channelId, name) => (dispatch, getState) => {
 		const variations = getChannelVariations(getState(), { channelId }),
-			arr = _.map(variations, (data) => { return data; });
+			arr = _.map(variations, data => {
+				return data;
+			});
 		if (_.find(arr, { name: name })) {
 			alert('Cannot create variation with same name!');
 			return;
 		}
 		dispatch({ type: variationActions.EDIT_VARIATION_NAME, variationId, name });
 	},
-	editTrafficDistribution = (variationId, trafficDistribution) => ({ type: variationActions.EDIT_TRAFFIC_DISTRIBUTION, variationId, trafficDistribution }),
+	editTrafficDistribution = (variationId, trafficDistribution) => ({
+		type: variationActions.EDIT_TRAFFIC_DISTRIBUTION,
+		variationId,
+		trafficDistribution
+	}),
 	saveBeforeJs = (variation, beforeJs) => ({ type: variationActions.SAVE_BEFORE_JS, variation, beforeJs }),
 	saveAfterJs = (variation, afterJs) => ({ type: variationActions.SAVE_AFTER_JS, variation, afterJs });
-export { addVariation, copyVariation, deleteVariation, updateVariation, setActiveVariation, editVariationName, editTrafficDistribution, saveBeforeJs, saveAfterJs };
+export {
+	addVariation,
+	copyVariation,
+	deleteVariation,
+	updateVariation,
+	setActiveVariation,
+	editVariationName,
+	editTrafficDistribution,
+	saveBeforeJs,
+	saveAfterJs
+};

@@ -35,7 +35,7 @@ class collection extends React.Component {
 			computedModel = {},
 			self = this;
 
-		modelKeys.forEach((key) => {
+		modelKeys.forEach(key => {
 			const $el = $(ReactDOM.findDOMNode(self.refs[key])).find("input[type='number']");
 
 			computedModel[key] = $el.val();
@@ -48,11 +48,7 @@ class collection extends React.Component {
 		const rows = [],
 			rowLength = rowsArr.length;
 
-		let rowInputValue,
-			rowInputLabelText,
-			i,
-			rowItem,
-			rowItemKey;
+		let rowInputValue, rowInputLabelText, i, rowItem, rowItemKey;
 
 		for (i = 0; i < rowLength; i++) {
 			rowItem = rowsArr[i];
@@ -60,10 +56,19 @@ class collection extends React.Component {
 			rowInputValue = parseInt(rowItem.value, 10);
 			rowInputLabelText = rowItem.name;
 
-			rows.push((
-				<CustomInputNumber key={rowItemKey} ref={rowItemKey} labelText={rowInputLabelText}
-					layout="horizontal" min={0} max={100} onChange={this.handleInputChange} step={1} value={rowInputValue} />
-			));
+			rows.push(
+				<CustomInputNumber
+					key={rowItemKey}
+					ref={rowItemKey}
+					labelText={rowInputLabelText}
+					layout="horizontal"
+					min={0}
+					max={100}
+					onChange={this.handleInputChange}
+					step={1}
+					value={rowInputValue}
+				/>
+			);
 		}
 
 		return rows;
@@ -72,15 +77,15 @@ class collection extends React.Component {
 	getCollectionSum(model) {
 		const validModel = [];
 
-		Object.keys(model).forEach((key) => {
+		Object.keys(model).forEach(key => {
 			const value = model[key];
 
-			if (value && (Number(value) > -1)) {
+			if (value && Number(value) > -1) {
 				validModel.push(Number(value));
 			}
 		});
 
-		return (validModel).reduce((a, b) => a + b, 0);
+		return validModel.reduce((a, b) => a + b, 0);
 	}
 
 	toggleSumExtensionErrorMessage(isSumNotEqual) {
@@ -98,9 +103,9 @@ class collection extends React.Component {
 
 	handleInputChange() {
 		const collectionSum = this.getCollectionSum(this.getModel()),
-			hasSumExtended = (collectionSum > this.props.maxValue),
-			hasSumDecremented = (collectionSum < this.props.maxValue),
-			isSumNotEqual = (hasSumExtended || hasSumDecremented);
+			hasSumExtended = collectionSum > this.props.maxValue,
+			hasSumDecremented = collectionSum < this.props.maxValue,
+			isSumNotEqual = hasSumExtended || hasSumDecremented;
 
 		if (this.props && this.props.maxValue && this.props.required) {
 			this.toggleSumExtensionErrorMessage(isSumNotEqual);
@@ -108,11 +113,14 @@ class collection extends React.Component {
 	}
 
 	updateModel() {
-		this.setState({
-			model: this.getModel()
-		}, () => {
-			this.props.onSave($.extend(true, {}, this.state.model));
-		});
+		this.setState(
+			{
+				model: this.getModel()
+			},
+			() => {
+				this.props.onSave($.extend(true, {}, this.state.model));
+			}
+		);
 	}
 
 	renderCollectionPanels() {
@@ -120,11 +128,11 @@ class collection extends React.Component {
 			eventKey = (1).toString(),
 			panelKey = `${eventKey}_${Utils.getRandomNumber()}`;
 
-		collectionPanels.push((
+		collectionPanels.push(
 			<Panel key={panelKey} eventKey={eventKey}>
 				{this.getPanelRows(this.props.collection)}
 			</Panel>
-		));
+		);
 
 		return collectionPanels;
 	}
@@ -138,11 +146,13 @@ class collection extends React.Component {
 	}
 
 	renderDescription() {
-		const isDescription = !!(this.props.description);
+		const isDescription = !!this.props.description;
 
 		if (isDescription) {
 			return (
-				<p key="numeric-collection-desc" className="form-group-desc">{this.props.description}</p>
+				<p key="numeric-collection-desc" className="form-group-desc">
+					{this.props.description}
+				</p>
 			);
 		}
 
@@ -151,12 +161,14 @@ class collection extends React.Component {
 
 	renderSumExtendedErrorMessage() {
 		const props = this.props,
-			maxValue = (props.maxValue ? props.maxValue : 100),
+			maxValue = props.maxValue ? props.maxValue : 100,
 			defaultMessage = `Sum must equal ${maxValue}`,
 			sumMismatchErrorMessage = props.sumMismatchErrorMessage ? props.sumMismatchErrorMessage : defaultMessage;
 
 		return (
-			<div ref="td-error-message" className="error-message hide">{sumMismatchErrorMessage}</div>
+			<div ref="td-error-message" className="error-message hide">
+				{sumMismatchErrorMessage}
+			</div>
 		);
 	}
 
@@ -165,7 +177,9 @@ class collection extends React.Component {
 			return (
 				<Row className="butttonsRow">
 					<Col xs={12}>
-						<Button className="btn-lightBg btn-cancel btn-block" onClick={this.props.onBack} >Back</Button>
+						<Button className="btn-lightBg btn-cancel btn-block" onClick={this.props.onBack}>
+							Back
+						</Button>
 					</Col>
 				</Row>
 			);
@@ -183,7 +197,6 @@ class collection extends React.Component {
 			options.layoutClassName = `${options.layoutClassName} is-ui-minimal`;
 		}
 
-
 		return (
 			<div className="form-group-wrapper form-group-wrapper--numeric-range">
 				{this.renderDescription()}
@@ -193,7 +206,14 @@ class collection extends React.Component {
 				</Row>
 				<Row>
 					<Col xs={12} className="u-padding-0px">
-						<Button disabled={this.state.hasSumExtended} ref="td-save-btn" className="btn-lightBg btn-save btn-block" onClick={a => this.onSave(a)}>Save</Button>
+						<Button
+							disabled={this.state.hasSumExtended}
+							ref="td-save-btn"
+							className="btn-lightBg btn-save btn-block"
+							onClick={a => this.onSave(a)}
+						>
+							Save
+						</Button>
 					</Col>
 				</Row>
 				{this.renderBackButton()}

@@ -9,8 +9,11 @@ const gStyle = {
 		height: $(window).height(),
 		zIndex: 1000
 	},
-	Glass = (props) => (
-		<div style={!props.shim ? gStyle : { ...gStyle, backgroundColor: 'rgba(0, 0, 0, .45)' }} onClick={props.clickHandler} />
+	Glass = props => (
+		<div
+			style={!props.shim ? gStyle : { ...gStyle, backgroundColor: 'rgba(0, 0, 0, .45)' }}
+			onClick={props.clickHandler}
+		/>
 	);
 
 Glass.propTypes = {
@@ -22,6 +25,5 @@ Glass.defaultProps = {
 	clickHandler: () => {},
 	shim: false
 };
-
 
 export default Glass;

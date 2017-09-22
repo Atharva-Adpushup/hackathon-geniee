@@ -7,15 +7,19 @@ import { deleteSection, updateXPath, sectionAllXPaths, validateXPath, renameSect
 
 export default connect(
 	(state, ownProps) => ({ ...ownProps, ui: state.ui }),
-	(dispatch) => bindActionCreators({
-		deleteSection: deleteSection,
-		updateCss: updateCss,
-		updateAdCode: updateAdCode,
-		updateNetwork: updateNetwork,
-		onUpdateXPath: updateXPath,
-		onSectionAllXPaths: sectionAllXPaths,
-		onValidateXPath: validateXPath,
-		onResetErrors: resetErrors,
-		onRenameSection: renameSection
-	}, dispatch)
+	dispatch =>
+		bindActionCreators(
+			{
+				deleteSection: deleteSection,
+				updateCss: updateCss,
+				updateAdCode: updateAdCode,
+				updateNetwork: updateNetwork,
+				onUpdateXPath: updateXPath,
+				onSectionAllXPaths: sectionAllXPaths,
+				onValidateXPath: validateXPath,
+				onResetErrors: resetErrors,
+				onRenameSection: renameSection
+			},
+			dispatch
+		)
 )(AdsDescriptor);

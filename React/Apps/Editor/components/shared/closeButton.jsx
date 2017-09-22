@@ -6,15 +6,15 @@ let Fluxxor = require('../../libs/third-party/fluxxor'),
 module.exports = React.createClass({
 	mixins: [FluxMixin],
 
-	getDefaultProps () {
-	return {
-	clickHandler () {
-	return;
-}
-};
-},
+	getDefaultProps() {
+		return {
+			clickHandler() {
+				return;
+			}
+		};
+	},
 
-	render () {
-	return (<i {...this.props} onClick={this.props.clickHandler} className="fa fa-times" />);
-}
+	render() {
+		return <i {...this.props} onClick={this.props.clickHandler} className="fa fa-times" />;
+	}
 });

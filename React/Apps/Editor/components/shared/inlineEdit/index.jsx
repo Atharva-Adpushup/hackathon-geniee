@@ -16,13 +16,14 @@ class InlineEdit extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		(nextProps.dropdownList && nextProps.dropdownList.length && nextProps.dropdownList[0].trim().length > 0) ? this.showDropdown() : this.hideDropdown();
+		nextProps.dropdownList && nextProps.dropdownList.length && nextProps.dropdownList[0].trim().length > 0
+			? this.showDropdown()
+			: this.hideDropdown();
 
 		if (nextProps.customError) {
 			this.hideDropdown();
 			this.setState({ inputError: true, disableSave: true });
-		}
-		else {
+		} else {
 			this.setState({ inputError: false, disableSave: false });
 		}
 	}
@@ -36,11 +37,11 @@ class InlineEdit extends React.Component {
 	}
 
 	triggerEdit() {
-		console.log("here");
+		console.log('here');
 		// this.props.editClickHandler ? this.props.editClickHandler() : null;
 		this.setState({ editMode: true });
 		console.log(this.state);
-		(this.props.dropdownList && this.props.dropdownList.length) ? this.showDropdown() : null;
+		this.props.dropdownList && this.props.dropdownList.length ? this.showDropdown() : null;
 	}
 
 	cancelEdit() {
@@ -60,7 +61,9 @@ class InlineEdit extends React.Component {
 
 	changeValue() {
 		const validated = this.props.changeHandler(this.refs.editedText.value);
-		!validated ? this.setState({ disableSave: true, inputError: true }) : this.setState({ disableSave: false, inputError: false });
+		!validated
+			? this.setState({ disableSave: true, inputError: true })
+			: this.setState({ disableSave: false, inputError: false });
 	}
 
 	keyUp() {
@@ -81,7 +84,7 @@ class InlineEdit extends React.Component {
 	}
 
 	renderNormalMode(adCodeStyles, adCodeEdit) {
-		return renderNormalMode(this, adCodeStyles, adCodeEdit)
+		return renderNormalMode(this, adCodeStyles, adCodeEdit);
 	}
 
 	render() {

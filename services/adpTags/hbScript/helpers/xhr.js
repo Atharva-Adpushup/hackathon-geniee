@@ -1,44 +1,44 @@
 // XHR module
 
 var utils = require('../helpers/utils'),
-    xhr = function (method, url, payload, callback, option) {
-        if (!method || !url) {
-            console.log('AdpTags: Please provide valid HTTP method and url in xhr module');
-            return;
-        }
+	xhr = function(method, url, payload, callback, option) {
+		if (!method || !url) {
+			console.log('AdpTags: Please provide valid HTTP method and url in xhr module');
+			return;
+		}
 
-        var http = new XMLHttpRequest();
+		var http = new XMLHttpRequest();
 
-        switch (method) {
-            case 'GET':
-            case 'get':
-                payload = utils.stringifyJSON(payload);
-                url += payload;
-                
-                http.open(method, url, true);
-                http.send();
-                break;
-            case 'POST':
-            case 'post':
-                http.open(method, url, true);
+		switch (method) {
+			case 'GET':
+			case 'get':
+				payload = utils.stringifyJSON(payload);
+				url += payload;
 
-                if(!option) {
-                    http.setRequestHeader("Content-type", "application/json");
-                    http.send(JSON.stringify(payload));
-                } else {
-                    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                    http.send();
-                }
-                break;
-        }
+				http.open(method, url, true);
+				http.send();
+				break;
+			case 'POST':
+			case 'post':
+				http.open(method, url, true);
 
-        http.onload = function () {
-            callback(null, http.response);
-        };
+				if (!option) {
+					http.setRequestHeader('Content-type', 'application/json');
+					http.send(JSON.stringify(payload));
+				} else {
+					http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+					http.send();
+				}
+				break;
+		}
 
-        http.onerror = function () {
-            callback(http.response);
-        };
-    };
+		http.onload = function() {
+			callback(null, http.response);
+		};
+
+		http.onerror = function() {
+			callback(http.response);
+		};
+	};
 
 module.exports = xhr;

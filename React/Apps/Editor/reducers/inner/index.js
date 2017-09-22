@@ -9,7 +9,7 @@ const hbBoxInitState = { top: 0, left: 0, width: 0, height: 0 },
 					top: action.payload.top,
 					left: action.payload.left,
 					width: action.payload.width,
-					height: action.payload.height,
+					height: action.payload.height
 				};
 
 			case hbBoxActions.HIDE_HB_BOX:
@@ -28,7 +28,6 @@ const hbBoxInitState = { top: 0, left: 0, width: 0, height: 0 },
 				return state;
 		}
 	},
-
 	contentSelector = (state = { position: hbBoxInitState, selector: null }, action) => {
 		switch (action.type) {
 			case innerActions.UPDATE_CONTENT_OVERLAY:
@@ -38,9 +37,7 @@ const hbBoxInitState = { top: 0, left: 0, width: 0, height: 0 },
 				return state;
 		}
 	},
-
 	adpElmInitState = { BOTTOM: 0, TOP: 0, LEFT: 0, RIGHT: 0 },
-
 	elmSelector = (state = adpElmInitState, action) => {
 		switch (action.type) {
 			case innerActions.SET_ELEMENT_SELECTOR_CORDS:
@@ -56,4 +53,3 @@ const hbBoxInitState = { top: 0, left: 0, width: 0, height: 0 },
 	};
 
 export default combineReducers({ hbBox, variation, elmSelector, contentSelector });
-

@@ -11,7 +11,9 @@ function getVariationsData(channelName, reportData) {
 		doesChannelKeyExist = !!(pageGroupObject.hasOwnProperty(channelKey) && pageGroupObject[channelKey]);
 	let computedData;
 
-	if (!doesChannelKeyExist) { throw new AdPushupError('getVariationsData: Channelkey does not exist in sql report data'); }
+	if (!doesChannelKeyExist) {
+		throw new AdPushupError('getVariationsData: Channelkey does not exist in sql report data');
+	}
 
 	computedData = extend(true, {}, pageGroupObject[channelKey].variations);
 	return computedData;
@@ -22,14 +24,15 @@ function getMatchedVariationsData(siteId, channelKey, sqlReportData) {
 		getAllChannels = getSiteModel.then(site => site.getAllChannels()),
 		getTransformedChannelData = getAllChannels.then(pageGroupModule.transformAllPageGroupsData);
 
-	return Promise.join(getTransformedChannelData, (allChannelsData) => {
-		return pageGroupModule.updatePageGroupData(siteId, sqlReportData, allChannelsData)
+	return Promise.join(getTransformedChannelData, allChannelsData => {
+		return pageGroupModule
+			.updatePageGroupData(siteId, sqlReportData, allChannelsData)
 			.then(getVariationsData.bind(null, channelKey));
 	});
 }
 
 module.exports = {
-	getData: (inputParamConfig) => {
+	getData: inputParamConfig => {
 		const parameterConfig = {
 				mode: inputParamConfig.mode ? inputParamConfig.mode : 1,
 				startDate: inputParamConfig.startDate,
@@ -40,7 +43,8 @@ module.exports = {
 			siteId = parameterConfig.siteId,
 			channelName = parameterConfig.channelName;
 
-		return fullSiteDataQueryHelper.getMetricsData(parameterConfig)
+		return fullSiteDataQueryHelper
+			.getMetricsData(parameterConfig)
 			.then(getMatchedVariationsData.bind(null, siteId, channelName));
 	},
 	getMatchedVariations: getMatchedVariationsData

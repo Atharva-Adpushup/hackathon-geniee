@@ -1,7 +1,7 @@
 function CustomError(message) {
 	this.name = 'CustomError';
 	this.message = message || 'adpushup error message';
-	this.stack = (new Error()).stack;
+	this.stack = new Error().stack;
 }
 CustomError.prototype = Object.create(Error.prototype);
 CustomError.prototype.constructor = CustomError;

@@ -11,7 +11,9 @@ class labelWithButton extends React.Component {
 					<b>{this.props.labelText}</b>
 				</Col>
 				<Col className="u-padding-l10px" xs={4}>
-					<Button className="btn-lightBg" onClick={this.props.onButtonClick}>{this.props.buttonText}</Button>
+					<Button className="btn-lightBg" onClick={this.props.onButtonClick}>
+						{this.props.buttonText}
+					</Button>
 				</Col>
 			</div>
 		);
@@ -24,7 +26,9 @@ class labelWithButton extends React.Component {
 					<b>{this.props.labelText}</b>
 				</Col>
 				<Col className="u-padding-0px" xs={12} md={12}>
-					<Button className="btn-lightBg" onClick={this.props.onButtonClick}>{this.props.buttonText}</Button>
+					<Button className="btn-lightBg" onClick={this.props.onButtonClick}>
+						{this.props.buttonText}
+					</Button>
 				</Col>
 			</div>
 		);
@@ -32,9 +36,9 @@ class labelWithButton extends React.Component {
 
 	render() {
 		const options = {
-			layout: (this.props.layout.toLowerCase()) ? this.props.layout.toLowerCase() : 'horizontal',
+			layout: this.props.layout.toLowerCase() ? this.props.layout.toLowerCase() : 'horizontal',
 			layoutClassName: 'form-group',
-			classNamesProps: (this.props.className && this.props.className.length > 0) ? this.props.className : ''
+			classNamesProps: this.props.className && this.props.className.length > 0 ? this.props.className : ''
 		};
 
 		if (options.layout === 'vertical') {
@@ -48,7 +52,7 @@ class labelWithButton extends React.Component {
 
 		return (
 			<Row key={this.props.name} className={options.layoutClassName}>
-				{(options.layout === 'vertical') ? this.renderVerticalLayout() : this.renderHorizontalLayout()}
+				{options.layout === 'vertical' ? this.renderVerticalLayout() : this.renderHorizontalLayout()}
 			</Row>
 		);
 	}

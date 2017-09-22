@@ -7,7 +7,7 @@ var lodash = require('lodash'),
 				}),
 				controlCtr = lodash.min(ctrArr),
 				performanceArr = ctrArr.map(function(ctr) {
-					return lodash.round(((ctr - controlCtr) / controlCtr) * 100);
+					return lodash.round((ctr - controlCtr) / controlCtr * 100);
 				});
 
 			return performanceArr;

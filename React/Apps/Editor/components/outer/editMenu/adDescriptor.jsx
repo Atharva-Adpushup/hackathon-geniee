@@ -42,34 +42,65 @@ class adDescriptor extends React.Component {
 
 	submitHandler(value, network, isADP, isHeaderBiddingActivated) {
 		isADP
-		? this.props.updateNetwork(this.props.ad.id, value, network, isHeaderBiddingActivated)
-		: this.props.updateAdCode(this.props.ad.id, value, network)
+			? this.props.updateNetwork(this.props.ad.id, value, network, isHeaderBiddingActivated)
+			: this.props.updateAdCode(this.props.ad.id, value, network);
 	}
 
 	render() {
-		const { ad, updateCss, updateAdCode, section, updateSettings, onUpdateXPath, onSectionAllXPaths, onValidateXPath, onResetErrors, onRenameSection, ui, variationId} = this.props,
+		const {
+				ad,
+				updateCss,
+				updateAdCode,
+				section,
+				updateSettings,
+				onUpdateXPath,
+				onSectionAllXPaths,
+				onValidateXPath,
+				onResetErrors,
+				onRenameSection,
+				ui,
+				variationId
+			} = this.props,
 			adCode = ad.adCode,
 			number = 12;
 
 		if (this.state.isEditingCss) {
-			return (<CssEditor css={ad.css} onCancel={this.toggleCssEditor} onSave={updateCss.bind(null, ad.id)} />);
+			return <CssEditor css={ad.css} onCancel={this.toggleCssEditor} onSave={updateCss.bind(null, ad.id)} />;
 		}
 		if (this.state.isEditingCode) {
-			return (<CodeBox showButtons code={adCode} onSubmit={updateAdCode.bind(null, ad.id)} onCancel={this.toggleCodeEditor} />);
+			return (
+				<CodeBox
+					showButtons
+					code={adCode}
+					onSubmit={updateAdCode.bind(null, ad.id)}
+					onCancel={this.toggleCodeEditor}
+				/>
+			);
 		}
 		if (this.state.isEditingNetwork) {
-			return (<NetworkOptions onSubmit={this.submitHandler} onCancel={this.toggleNetworkEditor} ad={ad} adDescriptor={true} />)
+			return (
+				<NetworkOptions
+					onSubmit={this.submitHandler}
+					onCancel={this.toggleNetworkEditor}
+					ad={ad}
+					adDescriptor={true}
+				/>
+			);
 		}
 		return (
 			<div className="containerButtonBar">
 				<Row>
-					{
-						currentUser.userType === 'partner' ? (
-							<SectionOptions updateMode sectionId={section.sectionId} ad={ad} partnerData={section.partnerData} updateSettings={updateSettings}/>
-						) : null
-					}
+					{currentUser.userType === 'partner' ? (
+						<SectionOptions
+							updateMode
+							sectionId={section.sectionId}
+							ad={ad}
+							partnerData={section.partnerData}
+							updateSettings={updateSettings}
+						/>
+					) : null}
 				</Row>
-				<Row style={{margin: "10px 0"}}>
+				<Row style={{ margin: '10px 0' }}>
 					<AdDetails
 						userType={currentUser.userType || false}
 						ad={ad}
@@ -87,7 +118,13 @@ class adDescriptor extends React.Component {
 				</Row>
 				<Row className="butttonsRow">
 					<Col xs={number} className="mT-10">
-						<Button className="btn-lightBg btn-cancel" onClick={this.deleteSectionWithAd.bind(this)} style={{width: "100%"}}>Delete Ad</Button>
+						<Button
+							className="btn-lightBg btn-cancel"
+							onClick={this.deleteSectionWithAd.bind(this)}
+							style={{ width: '100%' }}
+						>
+							Delete Ad
+						</Button>
 					</Col>
 				</Row>
 			</div>

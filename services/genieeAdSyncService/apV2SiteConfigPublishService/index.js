@@ -9,13 +9,14 @@ function genieePublishWrapper(item) {
 	return genieePublisher.publish(item);
 }
 function adpTagPublisherWrapper(item) {
-	return adpTagPublisher.publish(item)
+	return adpTagPublisher.publish(item);
 }
 function publishToQueueWrapper(siteConfigItems, site) {
 	var response = {
-		empty: true,
-		message: "ZONE_CONFIG_QUEUE_PUBLISH: No unsynced zone for site: " + site.get('siteId')
-	}, jobs = [];
+			empty: true,
+			message: 'ZONE_CONFIG_QUEUE_PUBLISH: No unsynced zone for site: ' + site.get('siteId')
+		},
+		jobs = [];
 	if (!Object.keys(siteConfigItems).length) {
 		return response;
 	}
@@ -23,28 +24,27 @@ function publishToQueueWrapper(siteConfigItems, site) {
 		let genieeUnsynced = !!(siteConfigItems.geniee && siteConfigItems.geniee && siteConfigItems.geniee.length),
 			adpUnsynced = !!(siteConfigItems.adp && siteConfigItems.adp.ads && siteConfigItems.adp.ads.length);
 
-		genieeUnsynced ? _.forEach(siteConfigItems.geniee, (item) => jobs.push(genieePublishWrapper(item))) : null;
+		genieeUnsynced ? _.forEach(siteConfigItems.geniee, item => jobs.push(genieePublishWrapper(item))) : null;
 		adpUnsynced ? jobs.push(adpTagPublisherWrapper(siteConfigItems.adp)) : null;
 
 		if (!(genieeUnsynced || adpUnsynced) || !jobs.length) {
 			return Promise.resolve(response);
 		}
-		return Promise.all(jobs)
-		.then(() => {
+		return Promise.all(jobs).then(() => {
 			return Object.assign(response, {
 				empty: false,
-				message: "ZONE_CONFIG_QUEUE_PUBLISH: Successfully published zones into queue for site: " + site.get('siteId')
+				message:
+					'ZONE_CONFIG_QUEUE_PUBLISH: Successfully published zones into queue for site: ' + site.get('siteId')
 			});
 		});
 	}
-	return processing()
-	.then(response => response.empty ? syncCdn(site) : response);
+	return processing().then(response => (response.empty ? syncCdn(site) : response));
 }
 
 module.exports = {
-	publish: function (siteModel) {
+	publish: function(siteModel) {
 		return siteConfigGenerationModule
-		.generate(siteModel)
-		.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, siteModel));
+			.generate(siteModel)
+			.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, siteModel));
 	}
 };

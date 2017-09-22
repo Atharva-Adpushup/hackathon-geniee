@@ -4,7 +4,6 @@ import CustomSizeForm from './customSizeForm.jsx';
 import { partners } from '../../../consts/commonConsts';
 import { Accordion, Row, Col, Panel } from 'react-bootstrap';
 
-
 class AdSizeSelector extends React.Component {
 	constructor(props) {
 		super(props);
@@ -21,7 +20,6 @@ class AdSizeSelector extends React.Component {
 		}
 	}
 
-
 	onChecked(adProps) {
 		this.props.onCheckedItem(adProps);
 	}
@@ -31,36 +29,44 @@ class AdSizeSelector extends React.Component {
 	}
 
 	renderSizePanels(rec, index, isShowCustomAdPanel) {
-		return (<Panel key={`panel-${index}`} header={`${rec.layoutType} Ads`} eventKey={index}>
-			<Row>
-				{_.map(rec.sizes, (adProps, innerIndex) => (
-					<Col key={`col-${this.props.insertOption}-${innerIndex}`} xs={6} className="Col">
-						<input id={this.props.insertOption + rec.layoutType + innerIndex}
-							type="radio"
-							checked={(this.props.checked === adProps) ? 'checked' : null}
-							onClick={this.props.onCheckedItem.bind(null, adProps)} />
-						<label htmlFor={this.props.insertOption + rec.layoutType + innerIndex}>{`${adProps.width} X ${adProps.height}`}</label>
-					</Col>
-						))
-					}
-			</Row>
-			{isShowCustomAdPanel ? (<CustomSizeForm onSave={this.props.onCheckedItem} />) : null}
-		</Panel>);
+		return (
+			<Panel key={`panel-${index}`} header={`${rec.layoutType} Ads`} eventKey={index}>
+				<Row>
+					{_.map(rec.sizes, (adProps, innerIndex) => (
+						<Col key={`col-${this.props.insertOption}-${innerIndex}`} xs={6} className="Col">
+							<input
+								id={this.props.insertOption + rec.layoutType + innerIndex}
+								type="radio"
+								checked={this.props.checked === adProps ? 'checked' : null}
+								onClick={this.props.onCheckedItem.bind(null, adProps)}
+							/>
+							<label
+								htmlFor={this.props.insertOption + rec.layoutType + innerIndex}
+							>{`${adProps.width} X ${adProps.height}`}</label>
+						</Col>
+					))}
+				</Row>
+				{isShowCustomAdPanel ? <CustomSizeForm onSave={this.props.onCheckedItem} /> : null}
+			</Panel>
+		);
 	}
 
 	render() {
 		const props = this.props,
-			showCustomAdCode = (!props.partner || ((props.partner === partners.geniee.name) && props.isCustomAdCodeInVariationAds));
+			showCustomAdCode =
+				!props.partner || (props.partner === partners.geniee.name && props.isCustomAdCodeInVariationAds);
 
 		return (
 			<Accordion activeKey={this.state.activeTab} onSelect={this.handleTabClick}>
-				{_.compact(_.map(this.props.adSizes, (rec, index) => {
-					const isCustomAdSize = !!(rec.layoutType === 'CUSTOM'),
-						isShowCustomAdPanel = !!(isCustomAdSize && showCustomAdCode),
-						isRenderPanel = !!((isCustomAdSize && isShowCustomAdPanel) || !isCustomAdSize);
+				{_.compact(
+					_.map(this.props.adSizes, (rec, index) => {
+						const isCustomAdSize = !!(rec.layoutType === 'CUSTOM'),
+							isShowCustomAdPanel = !!(isCustomAdSize && showCustomAdCode),
+							isRenderPanel = !!((isCustomAdSize && isShowCustomAdPanel) || !isCustomAdSize);
 
-					return isRenderPanel ? this.renderSizePanels(rec, index, isShowCustomAdPanel) : false;
-				}))}
+						return isRenderPanel ? this.renderSizePanels(rec, index, isShowCustomAdPanel) : false;
+					})
+				)}
 			</Accordion>
 		);
 	}

@@ -93,11 +93,9 @@ class Menu extends React.Component {
 								<div
 									key={`menuContent-${index}`}
 									style={
-										this.state.activeItem === index ? (
-											{ display: 'block', position: 'absolute', top: 0, zIndex: -1 }
-										) : (
-											{ display: 'none' }
-										)
+										this.state.activeItem === index
+											? { display: 'block', position: 'absolute', top: 0, zIndex: -1 }
+											: { display: 'none' }
 									}
 								>
 									<Content contentHeading={props.contentHeading}>

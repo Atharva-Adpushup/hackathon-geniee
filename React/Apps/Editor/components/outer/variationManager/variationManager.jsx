@@ -17,14 +17,19 @@ class variationManager extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if ((this.props.variations.length !== nextProps.variations.length) || (!this.props.activeVariation || !nextProps.activeVariation || (this.props.activeVariation.id !== nextProps.activeVariation.id))) {
+		if (
+			this.props.variations.length !== nextProps.variations.length ||
+			(!this.props.activeVariation ||
+				!nextProps.activeVariation ||
+				this.props.activeVariation.id !== nextProps.activeVariation.id)
+		) {
 			this.setState({ isPanelActive: false });
 		}
 	}
 
 	toggleVariationPanel() {
 		this.setState({ isPanelActive: !this.state.isPanelActive });
-		this.props.onShrinkVariationPanel('.variation-settings', {"property": "height", "value" : "400"});
+		this.props.onShrinkVariationPanel('.variation-settings', { property: 'height', value: '400' });
 	}
 
 	render() {
@@ -34,27 +39,34 @@ class variationManager extends React.Component {
 		}
 		return (
 			<div>
-				{this.state.isPanelActive &&
-					(<div><Glass clickHandler={this.toggleVariationPanel} shim /> <VariationPanel ui={props.ui} activeChannel={this.props.activeChannel} channelId={this.props.activeChannelId} variation={this.props.activeVariation} sections={this.props.activeVariationSections} /></div>)
-				}
+				{this.state.isPanelActive && (
+					<div>
+						<Glass clickHandler={this.toggleVariationPanel} shim />{' '}
+						<VariationPanel
+							ui={props.ui}
+							activeChannel={this.props.activeChannel}
+							channelId={this.props.activeChannelId}
+							variation={this.props.activeVariation}
+							sections={this.props.activeVariationSections}
+						/>
+					</div>
+				)}
 				<div id="variationManager" className="variation-bar">
-					{
-						props.variations.map((variation) => (
-							<Variation key={variation.id}
-								variation={variation}
-								active={variation.id === props.activeVariation.id}
-								onClick={props.setActiveVariation}
-								toggleVariationPanel={this.toggleVariationPanel}
-							/>
-						))
-					}
+					{props.variations.map(variation => (
+						<Variation
+							key={variation.id}
+							variation={variation}
+							active={variation.id === props.activeVariation.id}
+							onClick={props.setActiveVariation}
+							toggleVariationPanel={this.toggleVariationPanel}
+						/>
+					))}
 					<VariationAdder onNewVariation={props.createVariation.bind(null, props.activeChannelId)} />
 				</div>
 			</div>
 		);
 	}
 }
-
 
 variationManager.propTypes = {
 	variations: PropTypes.array,
@@ -71,7 +83,11 @@ variationManager.propTypes = {
 
 export default connect(
 	(state, ownProps) => ({ ...ownProps }),
-	(dispatch) => bindActionCreators({
-		onShrinkVariationPanel: shrinkVariationPanel,
-	}, dispatch)
-    )(variationManager);
+	dispatch =>
+		bindActionCreators(
+			{
+				onShrinkVariationPanel: shrinkVariationPanel
+			},
+			dispatch
+		)
+)(variationManager);

@@ -53,20 +53,16 @@ class NetworkOptions extends Component {
 				{this.state.network == 'adpTags' ? (
 					<AdpTags
 						priceFloorFromProps={
-							this.props.ad && this.props.ad.networkData && this.props.ad.networkData.priceFloor ? (
-								this.props.ad.networkData.priceFloor
-							) : (
-								0
-							)
+							this.props.ad && this.props.ad.networkData && this.props.ad.networkData.priceFloor
+								? this.props.ad.networkData.priceFloor
+								: 0
 						}
 						headerBiddingFlag={
 							this.props.ad &&
 							this.props.ad.networkData &&
-							this.props.ad.networkData.hasOwnProperty('headerBidding') ? (
-								this.props.ad.networkData.headerBidding
-							) : (
-								1
-							)
+							this.props.ad.networkData.hasOwnProperty('headerBidding')
+								? this.props.ad.networkData.headerBidding
+								: 1
 						}
 						showButtons={this.props.showButtons || true}
 						submitHandler={this.submitHandler}

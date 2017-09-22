@@ -3,18 +3,14 @@ import AfterSaveModal from 'channelManager/afterSaveModal.jsx';
 import { resetAfterSaveModal } from 'actions/uiActions';
 import { getAfterSaveLoaderState } from '../selectors/uiSelectors';
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
 		status: getAfterSaveLoaderState(state)
 	}),
-	mapDispatchToProps = (dispatch) => ({
+	mapDispatchToProps = dispatch => ({
 		closeModal: () => {
 			dispatch(resetAfterSaveModal());
 		}
 	}),
-
-	AfterSaveLoaderContainer = connect(
-		mapStateToProps,
-		mapDispatchToProps
-	)(AfterSaveModal);
+	AfterSaveLoaderContainer = connect(mapStateToProps, mapDispatchToProps)(AfterSaveModal);
 
 export default AfterSaveLoaderContainer;

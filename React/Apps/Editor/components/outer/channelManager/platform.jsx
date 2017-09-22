@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react';
 
-const Platform = (props) => {
+const Platform = props => {
 	const platform = props.type;
-	let	platformClass = 'defaultPlatform',
+	let platformClass = 'defaultPlatform',
 		viewPortClass = 'defaultViewPort';
 
 	switch (platform.toLowerCase()) {
@@ -32,7 +32,6 @@ const Platform = (props) => {
 		</div>
 	);
 };
-
 
 Platform.propTypes = {
 	type: PropTypes.string.isRequired,

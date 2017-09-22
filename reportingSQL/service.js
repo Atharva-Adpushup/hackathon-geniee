@@ -3,10 +3,10 @@ var sql = require('mssql'),
 	Promise = require('bluebird'),
 	dbConfig = require('./config').sqlReporting,
 	config = {
-		server   : dbConfig.server,
-		user     : dbConfig.user,
-		password : dbConfig.password,
-		database : dbConfig.database,
+		server: dbConfig.server,
+		user: dbConfig.user,
+		password: dbConfig.password,
+		database: dbConfig.database,
 		connectionTimeout: dbConfig.connectionTimeout,
 		requestTimeout: dbConfig.requestTimeout,
 		options: {
@@ -20,8 +20,7 @@ function getConnection() {
 		return Promise.resolve(connectionPool.request());
 	}
 
-	return sql.connect(config)
-	.then(pool => {
+	return sql.connect(config).then(pool => {
 		connectionPool = pool;
 		return pool.request();
 	});
@@ -47,15 +46,15 @@ function resultProcessing(result) {
 
 function init(query) {
 	return getConnection()
-	.then(connection => {
-		console.log(query);
-		return executeQuery(connection, query);
-	})
-	.then(resultProcessing)
-	.catch(error => {
-		console.log(error.message);
-		throw error;
-	});
+		.then(connection => {
+			console.log(query);
+			return executeQuery(connection, query);
+		})
+		.then(resultProcessing)
+		.catch(error => {
+			console.log(error.message);
+			throw error;
+		});
 }
 
 module.exports = init;

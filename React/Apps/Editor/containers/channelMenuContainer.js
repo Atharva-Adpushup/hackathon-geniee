@@ -9,15 +9,20 @@ import { hideChannelMenu as hideMenu } from 'actions/uiActions';
 import { saveSampleUrl, closeChannel, changeContentSelector } from 'actions/channelActions';
 import { editTrafficDistribution } from 'actions/variationActions';
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 		const json = getChannelMenuState(state);
-		return { ...json,
+		return {
+			...json,
 			channel: getActiveChannel(state),
 			allTrafficDistributions: getActiveChannelVariationsTrafficDistributions(state),
 			partner: getPartner(state),
 			activeChannelId: getActiveChannelId(state)
 		};
 	},
-	mapDispatchToProps = (dispatch) => bindActionCreators({ hideMenu, saveSampleUrl, closeChannel, editTrafficDistribution, changeContentSelector }, dispatch);
+	mapDispatchToProps = dispatch =>
+		bindActionCreators(
+			{ hideMenu, saveSampleUrl, closeChannel, editTrafficDistribution, changeContentSelector },
+			dispatch
+		);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChannelMenu);

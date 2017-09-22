@@ -14,9 +14,9 @@ const style = {
 		minWidth: '0',
 		padding: '0',
 		opacity: '.8',
-		overflow: 'hidden',
+		overflow: 'hidden'
 	},
-	ElementSelector = (props) => {
+	ElementSelector = props => {
 		const cords = props.cords;
 		return (
 			<div>

@@ -99,7 +99,7 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 		var adpSlots = utils.getCurrentAdpSlotBatch(adpTags.adpBatches, adpBatchId);
 
 		adpSlots.forEach(function(adpSlot) {
-			if(adpSlot.bidders && adpSlot.bidders.length) {
+			if (adpSlot.bidders && adpSlot.bidders.length) {
 				adpSlot.feedback.timedOutBidders = timedOutBidders;
 				adpSlot.feedback.timeout = timeout;
 				adpSlot.hasTimedOut = true;

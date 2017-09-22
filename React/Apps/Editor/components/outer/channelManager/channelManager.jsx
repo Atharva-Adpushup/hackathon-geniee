@@ -7,7 +7,7 @@ import Platform from './platform.jsx';
 import Tabs from './tabs/tab.jsx';
 import TabPane from './tabs/tabPane.jsx';
 
-const getIframeUrl = (channel) => {
+const getIframeUrl = channel => {
 	let urlParts = channel.sampleUrl.split('#'),
 		hashPart,
 		iframeUrl;
@@ -39,16 +39,27 @@ class channelManager extends React.Component {
 		const props = this.props;
 
 		return (
-			<Tabs toggleEditorMode={props.toggleEditorMode} showPublisherHelper={props.showPublisherHelper}
-				masterSave={props.masterSave} handleNewChannelMenu={this.handleMenuClick}
+			<Tabs
+				toggleEditorMode={props.toggleEditorMode}
+				showPublisherHelper={props.showPublisherHelper}
+				masterSave={props.masterSave}
+				handleNewChannelMenu={this.handleMenuClick}
 				showOptionsMenu={props.showOptionsMenu}
-				siteMode={props.siteMode} channels={props.channels} activeKey={props.activeChannelId}
+				siteMode={props.siteMode}
+				channels={props.channels}
+				activeKey={props.activeChannelId}
 			>
-				{props.openChannels.map((channel) => (
-					<TabPane showChannelMenu={props.showChannelMenu} handleClick={props.setActiveChannel.bind(null, channel.id)} key={channel.id} title={channel.channelName}>
+				{props.openChannels.map(channel => (
+					<TabPane
+						showChannelMenu={props.showChannelMenu}
+						handleClick={props.setActiveChannel.bind(null, channel.id)}
+						key={channel.id}
+						title={channel.channelName}
+					>
 						<Platform type={channel.platform}>
 							<Loader loading={channel.isLoading} />
-							<iframe data-adpid={`iframe${channel.id}`}
+							<iframe
+								data-adpid={`iframe${channel.id}`}
 								src={getIframeUrl(channel)}
 								style={{
 									width: '100%',
@@ -57,7 +68,7 @@ class channelManager extends React.Component {
 							/>
 						</Platform>
 					</TabPane>
-					))}
+				))}
 			</Tabs>
 		);
 	}

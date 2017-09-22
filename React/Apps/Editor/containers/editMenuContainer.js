@@ -6,11 +6,11 @@ import { getSectionWithAds } from 'selectors/sectionSelectors';
 import { messengerCommands } from 'consts/commonConsts';
 import { updatePartnerData } from 'actions/sectionActions';
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 		const json = getEditMenuState(state);
 		return { ...json, section: getSectionWithAds(state, { sectionId: json.sectionId }) };
 	},
-	mapDispatchToProps = (dispatch) => ({
+	mapDispatchToProps = dispatch => ({
 		hideMenu: () => {
 			dispatch(hideMenu());
 		},
@@ -20,4 +20,3 @@ const mapStateToProps = (state) => {
 	});
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditMenu);
-

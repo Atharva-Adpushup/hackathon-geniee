@@ -40,9 +40,9 @@ var CONSTANTS = {
 				EMPTY_MESSAGE: 'RABBITMQ.CONSUMER: Empty message received'
 			}
 		},
-        MESSAGE: {
-            INVALID_DATA: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Invalid Message consumer',
-            CDN_SYNC_ERROR: 'Unable to sync file with cdn',
+		MESSAGE: {
+			INVALID_DATA: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Invalid Message consumer',
+			CDN_SYNC_ERROR: 'Unable to sync file with cdn',
 			UNSYNCED_SETUP: 'Unsynced ads in setup'
 		}
 	},
@@ -62,6 +62,5 @@ var CONSTANTS = {
 	},
 	CDN_SYNC_MAX_ATTEMPTS: 10
 };
-
 
 module.exports = CONSTANTS;

@@ -28,7 +28,8 @@ const adsByIds = (state = {}, action) => {
 			if (isNetworkData) {
 				createAdObject.networkData = Object.assign({}, createAdObject.networkData, payload.networkData);
 			}
-			return { ...state,
+			return {
+				...state,
 				[payload.id]: createAdObject
 			};
 
@@ -58,7 +59,8 @@ const adsByIds = (state = {}, action) => {
 				createInContentAdObject.networkData = Object.assign({}, networkData, payload.networkData);
 			}
 
-			return { ...state,
+			return {
+				...state,
 				[payload.id]: createInContentAdObject
 			};
 
@@ -79,10 +81,30 @@ const adsByIds = (state = {}, action) => {
 			return { ...state, [action.adId]: updateAdObject };
 
 		case adActions.UPDATE_ADCODE:
-			return { ...state, [action.adId]: { ...state[action.adId], adCode: action.adCode, network: action.network, networkData: { ...state[action.adId].networkData, priceFloor: 0 } } };
+			return {
+				...state,
+				[action.adId]: {
+					...state[action.adId],
+					adCode: action.adCode,
+					network: action.network,
+					networkData: { ...state[action.adId].networkData, priceFloor: 0 }
+				}
+			};
 
 		case adActions.UPDATE_NETWORK:
-			return { ...state, [action.adId]: { ...state[action.adId], network: action.network, adCode: "", networkData: { ...state[action.adId].networkData, priceFloor: parseFloat(action.priceFloor), headerBidding: !!action.isHeaderBiddingActivated } } };
+			return {
+				...state,
+				[action.adId]: {
+					...state[action.adId],
+					network: action.network,
+					adCode: '',
+					networkData: {
+						...state[action.adId].networkData,
+						priceFloor: parseFloat(action.priceFloor),
+						headerBidding: !!action.isHeaderBiddingActivated
+					}
+				}
+			};
 
 		case adActions.UPDATE_CSS:
 			return { ...state, [action.adId]: { ...state[action.adId], css: action.css } };
@@ -92,7 +114,7 @@ const adsByIds = (state = {}, action) => {
 
 		case variationActions.COPY_VARIATION:
 			const ads = {};
-			_.each(action.ads, (section) => (ads[section.id] = section));
+			_.each(action.ads, section => (ads[section.id] = section));
 			return { ...state, ...ads };
 
 		default:

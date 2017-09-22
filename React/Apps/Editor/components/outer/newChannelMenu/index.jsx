@@ -15,18 +15,17 @@ const newChannelMenu = ({ isVisible, channels, position, hideMenu, openChannel, 
 			</MenuItem>
 		));
 	}*/
-	items.push((
+	items.push(
 		<MenuItem key={1} icon="fa-sitemap" contentHeading="Section Options">
 			<ChannelList channels={channels} onClick={openChannel} />
 		</MenuItem>
-	));
+	);
 	return (
 		<Menu id="newChannelMenu" position={position} arrow="top" activeItem={0} onGlassClick={hideMenu}>
 			{items}
 		</Menu>
 	);
 };
-
 
 newChannelMenu.propTypes = {
 	isVisible: PropTypes.bool.isRequired,

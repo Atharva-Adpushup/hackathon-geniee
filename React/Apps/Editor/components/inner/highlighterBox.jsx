@@ -11,8 +11,16 @@ const style = {
 		pointerEvents: 'none',
 		position: 'absolute'
 	},
-	HB = (props) => (
-		<div className="_APD_highlighter" style={Object.assign({}, style, { width: props.width, height: props.height, top: props.top, left: props.left })} />
+	HB = props => (
+		<div
+			className="_APD_highlighter"
+			style={Object.assign({}, style, {
+				width: props.width,
+				height: props.height,
+				top: props.top,
+				left: props.left
+			})}
+		/>
 	);
 
 HB.propTypes = {

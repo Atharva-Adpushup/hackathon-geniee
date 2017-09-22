@@ -4,129 +4,129 @@ import SetupCreator from './SetupCreator.jsx';
 import { cloneElement, cleanHbConfigData } from '../../lib/helpers';
 
 class ConfigCreator extends React.Component {
-    constructor(props) {
-        super(props);
+	constructor(props) {
+		super(props);
 
-        this.state = {
-            setupCreators: [],
-            hbConfig: []
-        };
+		this.state = {
+			setupCreators: [],
+			hbConfig: []
+		};
 
-        this.addAnotherSetup = this.addAnotherSetup.bind(this);
-        this.removeSetupCreatorCallback = this.removeSetupCreatorCallback.bind(this);
-        this.setupAddedCallback = this.setupAddedCallback.bind(this);
-        this.removeOptionsFromSetup = this.removeOptionsFromSetup.bind(this);
-        this.renderSetupCreator = this.renderSetupCreator.bind(this);
-    }
+		this.addAnotherSetup = this.addAnotherSetup.bind(this);
+		this.removeSetupCreatorCallback = this.removeSetupCreatorCallback.bind(this);
+		this.setupAddedCallback = this.setupAddedCallback.bind(this);
+		this.removeOptionsFromSetup = this.removeOptionsFromSetup.bind(this);
+		this.renderSetupCreator = this.renderSetupCreator.bind(this);
+	}
 
-    addAnotherSetup() {
-        this.setState({ setupCreators: this.state.setupCreators.concat(cloneElement(<SetupCreator />)) });
-    }
+	addAnotherSetup() {
+		this.setState({ setupCreators: this.state.setupCreators.concat(cloneElement(<SetupCreator />)) });
+	}
 
-    removeSetupCreatorCallback(index, size) {
-        if(size) {
-            const hbConfig = Object.assign([], this.state.hbConfig);
+	removeSetupCreatorCallback(index, size) {
+		if (size) {
+			const hbConfig = Object.assign([], this.state.hbConfig);
 
-            let updatedHbConfig = [],
-                removal = {};
+			let updatedHbConfig = [],
+				removal = {};
 
-            hbConfig.forEach(setups => {
-                for(let s in setups) {
-                    if(s !== size) {
-                        updatedHbConfig.push({[s]: setups[s]});
-                    } else {
-                        removal[s] = setups[s];
-                    }
-                }
-            });
+			hbConfig.forEach(setups => {
+				for (let s in setups) {
+					if (s !== size) {
+						updatedHbConfig.push({ [s]: setups[s] });
+					} else {
+						removal[s] = setups[s];
+					}
+				}
+			});
 
-            this.setState({ hbConfig: updatedHbConfig });
-            this.props.updateGlobalHbConfig(cleanHbConfigData(updatedHbConfig), removal);
-            //this.props.saveHbConfigCallback(cleanHbConfigData(updatedHbConfig));
-        }
-        
-        delete this.state.setupCreators[index];
-        this.setState({ setupCreators: this.state.setupCreators });
-    }
+			this.setState({ hbConfig: updatedHbConfig });
+			this.props.updateGlobalHbConfig(cleanHbConfigData(updatedHbConfig), removal);
+			//this.props.saveHbConfigCallback(cleanHbConfigData(updatedHbConfig));
+		}
 
-    setupAddedCallback(data, size) {
-        const { hbConfig } = this.state,
-            sizeSetup = hbConfig,
-            sizeData = data[size],
-            { saveHbConfigCallback } = this.props;
-    
-        sizeSetup.push({[size]: sizeData});
-        saveHbConfigCallback(cleanHbConfigData(sizeSetup));
-    }
+		delete this.state.setupCreators[index];
+		this.setState({ setupCreators: this.state.setupCreators });
+	}
 
-    removeOptionsFromSetup(size, sizeData) {
-        const { state } = this,
-            hbConfig = Object.assign([], state.hbConfig);
+	setupAddedCallback(data, size) {
+		const { hbConfig } = this.state,
+			sizeSetup = hbConfig,
+			sizeData = data[size],
+			{ saveHbConfigCallback } = this.props;
 
-        hbConfig.forEach(config => {
-            for(let s in config) {
-                if(s === size) {
-                    config[s] = sizeData;
-                }
-            }
-        });
+		sizeSetup.push({ [size]: sizeData });
+		saveHbConfigCallback(cleanHbConfigData(sizeSetup));
+	}
 
-        this.props.saveHbConfigCallback(cleanHbConfigData(hbConfig));
-    }
+	removeOptionsFromSetup(size, sizeData) {
+		const { state } = this,
+			hbConfig = Object.assign([], state.hbConfig);
 
-    componentWillReceiveProps(nextProps) {
-        this.setState({ hbConfig: nextProps.hbConfig });
-        this.renderSetupCreator(nextProps.hbConfig);
-    }
+		hbConfig.forEach(config => {
+			for (let s in config) {
+				if (s === size) {
+					config[s] = sizeData;
+				}
+			}
+		});
 
-    renderSetupCreator(hbConfig) {
-        const that = this;
-        let setupCreators = [];
+		this.props.saveHbConfigCallback(cleanHbConfigData(hbConfig));
+	}
 
-        hbConfig.forEach(sizeData => {
-            const selectedSize = Object.keys(sizeData)[0],
-                setupData = sizeData[selectedSize];
+	componentWillReceiveProps(nextProps) {
+		this.setState({ hbConfig: nextProps.hbConfig });
+		this.renderSetupCreator(nextProps.hbConfig);
+	}
 
-            setupCreators.push(<SetupCreator selectedSize={selectedSize} setupData={setupData}/>);
-        });
+	renderSetupCreator(hbConfig) {
+		const that = this;
+		let setupCreators = [];
 
-        this.setState({ setupCreators });
-    }
+		hbConfig.forEach(sizeData => {
+			const selectedSize = Object.keys(sizeData)[0],
+				setupData = sizeData[selectedSize];
 
-    render() {
-        const { state, props } = this;
+			setupCreators.push(<SetupCreator selectedSize={selectedSize} setupData={setupData} />);
+		});
 
-        return (
-            <div className="hb-config-creator">
-                <div className="row">
-                    {
-                        state.setupCreators.map((setupCreator, index) => {
-                            return cloneElement(setupCreator, { 
-                                key: index,
-                                index,
-                                partners: props.partners,
-                                adSizes: props.adSizes,
-                                removeSetupCreatorCallback: this.removeSetupCreatorCallback,
-                                setupAddedCallback: this.setupAddedCallback,
-                                removeOptionsFromSetup: this.removeOptionsFromSetup
-                            });
-                        })
-                    }
-                    <div className="col-sm-4">
-                        <button className="btn btn-lightBg btn-default btn-add-setup" onClick={this.addAnotherSetup}>Add partner setup</button>    
-                    </div>
-                </div>
-            </div>
-        );
-    }
+		this.setState({ setupCreators });
+	}
+
+	render() {
+		const { state, props } = this;
+
+		return (
+			<div className="hb-config-creator">
+				<div className="row">
+					{state.setupCreators.map((setupCreator, index) => {
+						return cloneElement(setupCreator, {
+							key: index,
+							index,
+							partners: props.partners,
+							adSizes: props.adSizes,
+							removeSetupCreatorCallback: this.removeSetupCreatorCallback,
+							setupAddedCallback: this.setupAddedCallback,
+							removeOptionsFromSetup: this.removeOptionsFromSetup
+						});
+					})}
+					<div className="col-sm-4">
+						<button className="btn btn-lightBg btn-default btn-add-setup" onClick={this.addAnotherSetup}>
+							Add partner setup
+						</button>
+					</div>
+				</div>
+			</div>
+		);
+	}
 }
 
 ConfigCreator.proptypes = {
-    hbConfig: PropTypes.array.isRequired,
-    partners: PropTypes.array.isRequired,
-    adSizes: PropTypes.array.isRequired,
-    saveHbConfigCallback: PropTypes.func.isRequired,
-    updateGlobalHbConfig: PropTypes.func
+	hbConfig: PropTypes.array.isRequired,
+	partners: PropTypes.array.isRequired,
+	adSizes: PropTypes.array.isRequired,
+	saveHbConfigCallback: PropTypes.func.isRequired,
+	updateGlobalHbConfig: PropTypes.func
 };
 
 export default ConfigCreator;

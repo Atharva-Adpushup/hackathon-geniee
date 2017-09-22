@@ -3,7 +3,7 @@ import { masterSave } from 'libs/dataSyncService';
 import { getFinalJson } from 'selectors/siteSelectors';
 import _ from 'lodash';
 
-const masterSaveData = (mode) => (dispatch, getState) => {
+const masterSaveData = mode => (dispatch, getState) => {
 	dispatch({ type: uiActions.UPDATE_AFTER_SAVE_STATUS, status: status.PENDING });
 	const paramData = getFinalJson(_.cloneDeep(getState()));
 	let updateModeStatus = false;
@@ -14,14 +14,16 @@ const masterSaveData = (mode) => (dispatch, getState) => {
 	}
 
 	return masterSave(paramData)
-				.done((data) => {
-					if (data.success) {
-						dispatch({ type: uiActions.UPDATE_AFTER_SAVE_STATUS, status: status.SUCCESS, updateModeStatus });
-					} else {
-						dispatch({ type: uiActions.UPDATE_AFTER_SAVE_STATUS, status: status.FAILED });
-					}
-				})
-				.fail(() => { dispatch({ type: uiActions.UPDATE_AFTER_SAVE_STATUS, status: status.FAILED }); });
+		.done(data => {
+			if (data.success) {
+				dispatch({ type: uiActions.UPDATE_AFTER_SAVE_STATUS, status: status.SUCCESS, updateModeStatus });
+			} else {
+				dispatch({ type: uiActions.UPDATE_AFTER_SAVE_STATUS, status: status.FAILED });
+			}
+		})
+		.fail(() => {
+			dispatch({ type: uiActions.UPDATE_AFTER_SAVE_STATUS, status: status.FAILED });
+		});
 };
 
 export { masterSaveData };

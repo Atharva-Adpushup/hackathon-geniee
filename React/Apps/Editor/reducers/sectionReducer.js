@@ -74,7 +74,10 @@ const sectionByIds = (state = {}, action) => {
 			return { ...state, [action.sectionId]: { ...state[action.sectionId], name: action.name } };
 
 		case sectionActions.UPDATE_XPATH:
-			return { ...state, [action.sectionId]: { ...state[action.sectionId], xpath: action.xpath, allXpaths: [], error: false } };
+			return {
+				...state,
+				[action.sectionId]: { ...state[action.sectionId], xpath: action.xpath, allXpaths: [], error: false }
+			};
 
 		case sectionActions.UPDATE_INCONTENT_FLOAT:
 			return { ...state, [action.sectionId]: { ...state[action.sectionId], float: action.float } };
@@ -82,13 +85,19 @@ const sectionByIds = (state = {}, action) => {
 		case adActions.DELETE_AD:
 			const index = state[action.sectionId].ads.indexOf(action.adId);
 			if (index !== -1) {
-				return { ...state, [action.sectionId]: { ...state[action.sectionId], ads: immutableArrayDelete(state[action.sectionId].ads, index) } };
+				return {
+					...state,
+					[action.sectionId]: {
+						...state[action.sectionId],
+						ads: immutableArrayDelete(state[action.sectionId].ads, index)
+					}
+				};
 			}
 			return state;
 
 		case variationActions.COPY_VARIATION:
 			const sections = {};
-			_.each(action.sections, (section) => (sections[section.id] = section));
+			_.each(action.sections, section => (sections[section.id] = section));
 			return { ...state, ...sections };
 
 		default:

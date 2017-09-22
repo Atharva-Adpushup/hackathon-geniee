@@ -84,8 +84,8 @@ const status = {
 		XPATH_VALIDATED: 'XPATH_VALIDATED',
 		VALIDATE_XPATH_SECTION: 'VALIDATE_XPATH_SECTION',
 		XPATH_SECTION_VALIDATED: 'XPATH_SECTION_VALIDATED',
-        SCROLL_TO_VIEW: 'SCROLL_TO_VIEW'
-    },
+		SCROLL_TO_VIEW: 'SCROLL_TO_VIEW'
+	},
 	siteModes = {
 		DRAFT: 2,
 		PUBLISH: 1
@@ -139,7 +139,6 @@ const status = {
 		SAVE_BEFORE_AFTER_JS: 'SAVE_BEFORE_AFTER_JS',
 		CONTENT_SELECTOR_MISSING: 'CONTENT_SELECTOR_MISSING',
 		CONTENT_SELECTOR_WORKED: 'CONTENT_SELECTOR_WORKED'
-
 	},
 	insertMenuActions = {
 		HIDE_MENU: 'HIDE_MENU',
@@ -172,9 +171,9 @@ const status = {
 		EDIT_VARIATION_NAME: 'EDIT_VARIATION_NAME',
 		EDIT_TRAFFIC_DISTRIBUTION: 'EDIT_TRAFFIC_DISTRIBUTION',
 		SAVE_BEFORE_JS: 'SAVE_BEFORE_JS',
-        SAVE_AFTER_JS: 'SAVE_AFTER_JS',
-        EXPAND_VARIATION_PANEL: 'EXPAND_VARIATION_PANEL',
-        SHRINK_VARIATION_PANEL: 'SHRINK_VARIATION_PANEL'
+		SAVE_AFTER_JS: 'SAVE_AFTER_JS',
+		EXPAND_VARIATION_PANEL: 'EXPAND_VARIATION_PANEL',
+		SHRINK_VARIATION_PANEL: 'SHRINK_VARIATION_PANEL'
 	},
 	sectionActions = {
 		CREATE_SECTION: 'CREATE_SECTION',
@@ -188,8 +187,8 @@ const status = {
 		GET_ALL_XPATHS: 'GET_ALL_XPATHS',
 		VALIDATE_XPATH: 'VALIDATE_XPATH',
 		VALIDATE_XPATH_SECTION: 'VALIDATE_XPATH_SECTION',
-        UPDATE_INCONTENT_FLOAT: 'UPDATE_INCONTENT_FLOAT',
-        SCROLL_TO_VIEW: 'SCROLL_TO_VIEW'
+		UPDATE_INCONTENT_FLOAT: 'UPDATE_INCONTENT_FLOAT',
+		SCROLL_TO_VIEW: 'SCROLL_TO_VIEW'
 	},
 	adActions = {
 		CREATE_AD: 'CREATE_AD',
@@ -210,7 +209,7 @@ const status = {
 	innerActions = {
 		HIDE_ELEMENT_SELECTOR: 'HIDE_ELEMENT_SELECTOR',
 		SET_ELEMENT_SELECTOR_CORDS: 'SET_ELEMENT_SELECTOR_CORDS',
-		UPDATE_CONTENT_OVERLAY: 'UPDATE_CONTENT_OVERLAY',
+		UPDATE_CONTENT_OVERLAY: 'UPDATE_CONTENT_OVERLAY'
 	},
 	uiActions = {
 		RESET_ERRORS: 'RESET_ERRORS',
@@ -262,7 +261,12 @@ const status = {
 		},
 		{
 			layoutType: 'MOBILE',
-			sizes: [{ width: 320, height: 50 }, { width: 300, height: 250 }, { width: 250, height: 250 }, { width: 200, height: 200 }]
+			sizes: [
+				{ width: 320, height: 50 },
+				{ width: 300, height: 250 },
+				{ width: 250, height: 250 },
+				{ width: 200, height: 200 }
+			]
 		},
 		{
 			layoutType: 'CUSTOM',
@@ -287,17 +291,58 @@ const status = {
 			sizes: [{ width: 320, height: 100 }]
 		}
 	],
-	defaultSectionCss = { 'margin-left': 'auto', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px', clear: 'both' },
-	leftSectionCss = { float: 'left', 'margin-left': '0px', 'margin-right': '5px', 'margin-top': '0px', 'margin-bottom': '5px' },
-	rightSectionCss = { float: 'right', 'margin-left': '5px', 'margin-right': '0px', 'margin-top': '0px', 'margin-bottom': '5px' };
+	defaultSectionCss = {
+		'margin-left': 'auto',
+		'margin-right': 'auto',
+		'margin-top': '0px',
+		'margin-bottom': '0px',
+		clear: 'both'
+	},
+	leftSectionCss = {
+		float: 'left',
+		'margin-left': '0px',
+		'margin-right': '5px',
+		'margin-top': '0px',
+		'margin-bottom': '5px'
+	},
+	rightSectionCss = {
+		float: 'right',
+		'margin-left': '5px',
+		'margin-right': '0px',
+		'margin-top': '0px',
+		'margin-bottom': '5px'
+	};
 
 export {
-	status, proxy, stores, adTypes, messengerCommands, siteModes,
-	siteActions, channelActions, sectionActions, adActions,
-	insertMenuActions, editMenuActions, newChannelMenuActions,
-	adBoxSizeStyles, commonSupportedSizes, nonPartnerAdSizes, variationActions,
-	hbBoxActions, innerVariationActions, innerActions,
-	defaultSectionCss, leftSectionCss, rightSectionCss,
-	components, siteModesPopoverActions, channelMenuActions,
-	uiActions, ui, uiCollections, floats, partners
+	status,
+	proxy,
+	stores,
+	adTypes,
+	messengerCommands,
+	siteModes,
+	siteActions,
+	channelActions,
+	sectionActions,
+	adActions,
+	insertMenuActions,
+	editMenuActions,
+	newChannelMenuActions,
+	adBoxSizeStyles,
+	commonSupportedSizes,
+	nonPartnerAdSizes,
+	variationActions,
+	hbBoxActions,
+	innerVariationActions,
+	innerActions,
+	defaultSectionCss,
+	leftSectionCss,
+	rightSectionCss,
+	components,
+	siteModesPopoverActions,
+	channelMenuActions,
+	uiActions,
+	ui,
+	uiCollections,
+	floats,
+	partners
 };

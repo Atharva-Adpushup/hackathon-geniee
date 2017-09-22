@@ -1,20 +1,45 @@
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { deleteSection, renameSection, updateXPath, sectionAllXPaths, validateXPath, validateSectionXPath, updateIncontentFloat, updatePartnerData, scrollSectionIntoView } from 'actions/sectionActions.js';
+import {
+	deleteSection,
+	renameSection,
+	updateXPath,
+	sectionAllXPaths,
+	validateXPath,
+	validateSectionXPath,
+	updateIncontentFloat,
+	updatePartnerData,
+	scrollSectionIntoView
+} from 'actions/sectionActions.js';
 import { updateAdCode } from 'actions/adActions';
 import { resetErrors } from 'actions/uiActions';
 import VariationSectionElement from './variationSectionElement';
 
-const variationSections = (props) => {
-	const { variation, sections, onDeleteSection, onRenameSection, onUpdateAdCode, onUpdatePartnerData, onUpdateXPath, onSectionAllXPaths, onValidateXPath, onIncontentFloatUpdate, ui, onResetErrors, onSectionXPathValidate, onScrollSectionIntoView } = props;
+const variationSections = props => {
+	const {
+		variation,
+		sections,
+		onDeleteSection,
+		onRenameSection,
+		onUpdateAdCode,
+		onUpdatePartnerData,
+		onUpdateXPath,
+		onSectionAllXPaths,
+		onValidateXPath,
+		onIncontentFloatUpdate,
+		ui,
+		onResetErrors,
+		onSectionXPathValidate,
+		onScrollSectionIntoView
+	} = props;
 	return (
 		<div>
 			<h1 className="variation-section-heading">Variation Sections</h1>
-			{!sections.length ? (<span>No Sections</span>) : ''}
+			{!sections.length ? <span>No Sections</span> : ''}
 			<ul className="section-list row">
 				{sections.map((section, key) => (
-					<div key={key} className="col-sm-4" >
+					<div key={key} className="col-sm-4">
 						<VariationSectionElement
 							section={section}
 							key={key}
@@ -31,10 +56,9 @@ const variationSections = (props) => {
 							onIncontentFloatUpdate={onIncontentFloatUpdate}
 							onScrollSectionIntoView={onScrollSectionIntoView}
 							ui={ui}
-							/>
+						/>
 					</div>
-				))
-				}
+				))}
 			</ul>
 		</div>
 	);
@@ -57,17 +81,21 @@ variationSections.propTypes = {
 
 export default connect(
 	(state, ownProps) => ({ ...ownProps }),
-	(dispatch) => bindActionCreators({
-		onDeleteSection: deleteSection,
-		onRenameSection: renameSection,
-		onUpdateAdCode: updateAdCode,
-		onUpdatePartnerData: updatePartnerData,
-		onUpdateXPath: updateXPath,
-		onSectionAllXPaths: sectionAllXPaths,
-		onValidateXPath: validateXPath,
-		onResetErrors: resetErrors,
-		onSectionXPathValidate: validateSectionXPath,
-        onIncontentFloatUpdate: updateIncontentFloat,
-        onScrollSectionIntoView: scrollSectionIntoView
-	}, dispatch)
+	dispatch =>
+		bindActionCreators(
+			{
+				onDeleteSection: deleteSection,
+				onRenameSection: renameSection,
+				onUpdateAdCode: updateAdCode,
+				onUpdatePartnerData: updatePartnerData,
+				onUpdateXPath: updateXPath,
+				onSectionAllXPaths: sectionAllXPaths,
+				onValidateXPath: validateXPath,
+				onResetErrors: resetErrors,
+				onSectionXPathValidate: validateSectionXPath,
+				onIncontentFloatUpdate: updateIncontentFloat,
+				onScrollSectionIntoView: scrollSectionIntoView
+			},
+			dispatch
+		)
 )(variationSections);

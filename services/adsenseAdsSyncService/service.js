@@ -13,21 +13,30 @@ adpushup.on('siteSaved', function(site) {
 		return;
 	}
 
-	userModel.getUserByEmail(site.get('ownerEmail')).then(function(user) {
-		return user.getAgencyuser().then(function(agencyuser) {
-			return adsenseModel.getAdsense(agencyuser);
-		}).then(function(agencyAdsense) {
-			var network = user.getNetworkDataObj('ADSENSE');
-			if (!network) {
-				return false;
-			}
-			return agencyAdsense.doesAccountExists(network.get('pubId'));
-		}).then(function(status) {
-			return status ? globalModel.addToQueue(consts.Queue.SITES_TO_SYNC_ADSENSE, site.get('siteId')) : false;
+	userModel
+		.getUserByEmail(site.get('ownerEmail'))
+		.then(function(user) {
+			return user
+				.getAgencyuser()
+				.then(function(agencyuser) {
+					return adsenseModel.getAdsense(agencyuser);
+				})
+				.then(function(agencyAdsense) {
+					var network = user.getNetworkDataObj('ADSENSE');
+					if (!network) {
+						return false;
+					}
+					return agencyAdsense.doesAccountExists(network.get('pubId'));
+				})
+				.then(function(status) {
+					return status
+						? globalModel.addToQueue(consts.Queue.SITES_TO_SYNC_ADSENSE, site.get('siteId'))
+						: false;
+				});
+		})
+		.catch(function(err) {
+			console.log(err);
 		});
-	}).catch(function(err) {
-		console.log(err);
-	});
 });
 
 function syncAdsenseAds() {
@@ -35,10 +44,10 @@ function syncAdsenseAds() {
 		return false;
 	}
 
-
 	adsenseSyncInProgress = true;
 
-	globalModel.getQueue(consts.Queue.SITES_TO_SYNC_ADSENSE)
+	globalModel
+		.getQueue(consts.Queue.SITES_TO_SYNC_ADSENSE)
 		.then(function(sites) {
 			return promiseForEach(sites, adsenseAdSyncWorker, function(siteId, err) {
 				console.log(siteId + ':' + err.name + ':' + err.message);

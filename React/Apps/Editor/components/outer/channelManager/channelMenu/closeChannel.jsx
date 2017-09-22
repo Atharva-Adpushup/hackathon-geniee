@@ -5,15 +5,19 @@ import Col from 'react-bootstrap/lib/Col';
 
 class closeChannel extends React.Component {
 	render() {
-		return (<div>
-			<div className="installBtnBg">
-				<Row>
-				<Col md={12}>
-					<Button onClick={this.props.closeChannelById} className="btn-lightBg btn-save btn-block">Close channel</Button>
-				</Col>
-				</Row>
+		return (
+			<div>
+				<div className="installBtnBg">
+					<Row>
+						<Col md={12}>
+							<Button onClick={this.props.closeChannelById} className="btn-lightBg btn-save btn-block">
+								Close channel
+							</Button>
+						</Col>
+					</Row>
+				</div>
 			</div>
-		</div>);
+		);
 	}
 }
 

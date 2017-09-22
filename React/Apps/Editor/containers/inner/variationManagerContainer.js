@@ -9,8 +9,10 @@ export default connect(
 		id: variation.id,
 		sections: variation.sections
 	}),
-	(dispatch) => ({
-		onXpathMiss: (id) => { sendMessage(messengerCommands.SECTION_XPATH_MISSING, { sectionId: id }); },
+	dispatch => ({
+		onXpathMiss: id => {
+			sendMessage(messengerCommands.SECTION_XPATH_MISSING, { sectionId: id });
+		},
 		onAdClick: (variationId, sectionId, adId, position, adpVitals) => {
 			sendMessage(messengerCommands.SHOW_EDIT_CONTEXTMENU, { adId, position, sectionId, variationId });
 			dispatch(setElementSelectorCords(adpVitals));

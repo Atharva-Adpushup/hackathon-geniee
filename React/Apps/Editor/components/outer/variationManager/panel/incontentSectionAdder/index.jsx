@@ -10,17 +10,17 @@ import _ from 'lodash';
 import { renderInContentAdder } from './renderMethods';
 
 const form = reduxForm({
-	form: 'inContentForm',
-	validate
-}),
-	getNotNearData = (collection) => {
+		form: 'inContentForm',
+		validate
+	}),
+	getNotNearData = collection => {
 		const computedArr = [];
 
 		if (!collection || !collection.length) {
 			return false;
 		}
 
-		collection.forEach((obj) => {
+		collection.forEach(obj => {
 			const notNearObj = {};
 
 			notNearObj[obj.selector] = obj.pixels;
@@ -79,18 +79,17 @@ class inContentForm extends React.Component {
 		const props = this.props;
 		return (
 			<div>
-				{
-					props.activeChannel.contentSelector ? (
-						renderInContentAdder(this, getSupportedSizes)
-					) : (
-						<div>
-							<h1 className="variation-section-heading">Add Incontent Variation</h1>
-							<p className="error-message" style={{ fontSize: '1em' }}>
-								Please set your <strong>Content Selector</strong> in the channel settings first to create your in-content section.
-							</p>
-						</div>
-					)
-				}
+				{props.activeChannel.contentSelector ? (
+					renderInContentAdder(this, getSupportedSizes)
+				) : (
+					<div>
+						<h1 className="variation-section-heading">Add Incontent Variation</h1>
+						<p className="error-message" style={{ fontSize: '1em' }}>
+							Please set your <strong>Content Selector</strong> in the channel settings first to create
+							your in-content section.
+						</p>
+					</div>
+				)}
 			</div>
 		);
 	}
@@ -109,15 +108,14 @@ const mapStateToProps = (state, ownProps) => ({
 			adSize: getSupportedSizes()[0]
 		}
 	}),
-
 	mapDispatchToProps = (dispatch, ownProps) => ({
-		onSubmit: (values) => {
+		onSubmit: values => {
 			if (currentUser.userType != 'partner' && !values.network) {
-				alert("Please select a network");
+				alert('Please select a network');
 				return false;
 			}
 			const notNear = getNotNearData(values.notNear),
-				isCustomZoneId = !!(values.customZoneId),
+				isCustomZoneId = !!values.customZoneId,
 				sectionPayload = {
 					sectionNo: values.section,
 					minDistanceFromPrevAd: values.minDistanceFromPrevAd,
@@ -127,7 +125,7 @@ const mapStateToProps = (state, ownProps) => ({
 						position: 0,
 						firstFold: 0,
 						asyncTag: 1,
-						customZoneId: (values.customZoneId ? values.customZoneId : '')
+						customZoneId: values.customZoneId ? values.customZoneId : ''
 					}
 				},
 				adPayload = {
@@ -144,8 +142,8 @@ const mapStateToProps = (state, ownProps) => ({
 			if (values.network && values.network == 'adpTags') {
 				adPayload.networkData = {
 					priceFloor: parseInt(values.priceFloor) || 0,
-					headerBidding: values.hasOwnProperty('headerBidding') ? !!(values.headerBidding) : true
-				}
+					headerBidding: values.hasOwnProperty('headerBidding') ? !!values.headerBidding : true
+				};
 			}
 			dispatch(createIncontentSection(sectionPayload, adPayload, ownProps.variation.id));
 		}

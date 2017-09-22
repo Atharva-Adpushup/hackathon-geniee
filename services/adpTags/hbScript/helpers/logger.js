@@ -1,8 +1,8 @@
 var beginTime, lastTime;
-beginTime = lastTime = (+new Date());
+beginTime = lastTime = +new Date();
 
 function shouldLog() {
-	if (window.location.hash && window.location.hash === "#adpdebug") {
+	if (window.location.hash && window.location.hash === '#adpdebug') {
 		return true;
 	}
 }
@@ -11,9 +11,7 @@ function info() {
 	if (shouldLog()) {
 		try {
 			console.info.apply(this, arguments);
-		} catch (error) {
-
-		}
+		} catch (error) {}
 	}
 }
 
@@ -21,35 +19,27 @@ function table(object) {
 	if (shouldLog()) {
 		try {
 			console.table(object);
-		} catch (error) {
-
-		}
+		} catch (error) {}
 	}
 }
-
 
 function log() {
 	if (shouldLog()) {
 		var arrArgs = [].slice.call(arguments);
-		arrArgs[0] = "adpTags: " + arrArgs[0];
+		arrArgs[0] = 'adpTags: ' + arrArgs[0];
 		try {
 			console.info.apply(this, arguments);
-		} catch (error) {
-
-		}
-
+		} catch (error) {}
 	}
 }
 
 function warn() {
 	if (shouldLog()) {
 		var arrArgs = [].slice.call(arguments);
-		arrArgs[0] = "adphb: " + arrArgs[0];
+		arrArgs[0] = 'adphb: ' + arrArgs[0];
 		try {
 			console.warn.apply(this, arrArgs);
-		} catch (error) {
-
-		}
+		} catch (error) {}
 	}
 }
 
@@ -68,12 +58,10 @@ function groupEnd() {
 function warn() {
 	if (shouldLog()) {
 		var arrArgs = [].slice.call(arguments);
-		arrArgs[0] = "adphb: " + arrArgs[0];
+		arrArgs[0] = 'adphb: ' + arrArgs[0];
 		try {
 			console.warn.apply(this, arrArgs);
-		} catch (error) {
-
-		}
+		} catch (error) {}
 	}
 }
 

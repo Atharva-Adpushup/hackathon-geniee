@@ -6,15 +6,14 @@ import { getSampleUrl } from 'selectors/channelSelectors';
 import { masterSaveData } from 'actions/siteActions';
 import { hideSiteModesPopover } from 'actions/uiActions';
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
 		isVisible: getSiteModesPopoverVisibility(state),
 		url: getSampleUrl(state),
 		mode: getMode(state),
 		position: getSiteModesPopoverPosition(state)
 	}),
-
-	mapDispatchToProps = (dispatch) => ({
-		masterSave: (mode) => {
+	mapDispatchToProps = dispatch => ({
+		masterSave: mode => {
 			dispatch(masterSaveData(mode));
 		},
 		showComponent: () => {},
@@ -22,10 +21,6 @@ const mapStateToProps = (state) => ({
 			dispatch(hideSiteModesPopover());
 		}
 	}),
-
-	SiteModesPopoverContainer = connect(
-		mapStateToProps,
-		mapDispatchToProps
-	)(SiteModesPopover);
+	SiteModesPopoverContainer = connect(mapStateToProps, mapDispatchToProps)(SiteModesPopover);
 
 export default SiteModesPopoverContainer;

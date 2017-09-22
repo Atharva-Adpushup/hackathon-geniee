@@ -37,8 +37,8 @@ class CodeEditor extends React.Component {
 	updateCode(newCode) {
 		try {
 			JSON.parse(this.state.code);
-		
-			if(!newCode || !Object.keys(newCode).length) {
+
+			if (!newCode || !Object.keys(newCode).length) {
 				this.setState({ empty: true });
 			} else {
 				this.setState({ empty: false });
@@ -61,20 +61,28 @@ class CodeEditor extends React.Component {
 		};
 		return (
 			<div className="containerButtonBar">
-				{this.state.error && (<div className="error-message">{this.props.error}</div>)}
+				{this.state.error && <div className="error-message">{this.props.error}</div>}
 				<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
 
 				<Row className="butttonsRow">
 					<Col xs={6}>
-						<Button disabled={this.state.error || this.state.empty} className="btn-lightBg btn-save" onClick={this.save}>Save</Button>
+						<Button
+							disabled={this.state.error || this.state.empty}
+							className="btn-lightBg btn-save"
+							onClick={this.save}
+						>
+							Save
+						</Button>
 					</Col>
-					{
-						this.props.onCancel ? (
-							<Col xs={6}>
-								<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>Cancel</Button>
-							</Col>
-						) : ''
-					}
+					{this.props.onCancel ? (
+						<Col xs={6}>
+							<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>
+								Cancel
+							</Button>
+						</Col>
+					) : (
+						''
+					)}
 				</Row>
 			</div>
 		);

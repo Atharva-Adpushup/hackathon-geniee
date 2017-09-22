@@ -27,11 +27,11 @@ class sectionOptions extends React.Component {
 		if (!this.props.updateMode) {
 			this.state = {
 				position: undefined,
-				isAdInFirstFold: (props.firstFold || false),
+				isAdInFirstFold: props.firstFold || false,
 				isAdAsync: true,
 				manageCustomCode: false,
 				customAdCode: '',
-				customZoneId: (props.customZoneId || '')
+				customZoneId: props.customZoneId || ''
 			};
 		} else {
 			this.state = {
@@ -48,7 +48,13 @@ class sectionOptions extends React.Component {
 	}
 
 	onSave() {
-		this.props.onCreateAd(this.state.position, this.state.customAdCode, this.state.isAdInFirstFold, this.state.isAdAsync, this.state.customZoneId);
+		this.props.onCreateAd(
+			this.state.position,
+			this.state.customAdCode,
+			this.state.isAdInFirstFold,
+			this.state.isAdAsync,
+			this.state.customZoneId
+		);
 	}
 
 	onChange(position) {
@@ -62,11 +68,14 @@ class sectionOptions extends React.Component {
 	}
 
 	onCustomAdCodeChange(adCode) {
-		this.setState({
-			customAdCode: adCode
-		}, () => {
-			this.toggleCustomAdCode();
-		});
+		this.setState(
+			{
+				customAdCode: adCode
+			},
+			() => {
+				this.toggleCustomAdCode();
+			}
+		);
 	}
 
 	toggleCustomAdCode() {
@@ -76,58 +85,130 @@ class sectionOptions extends React.Component {
 	}
 
 	renderCustomZoneIdInput(customZoneId) {
-		return (<InlineEdit rootClassNames="u-margin-b15px" type="number" compact validate font={400} value={customZoneId} submitHandler={this.onCustomZoneIdSubmit} text="Custom Zone Id" errorMessage="Custom zone id cannot be blank" />);
+		return (
+			<InlineEdit
+				rootClassNames="u-margin-b15px"
+				type="number"
+				compact
+				validate
+				font={400}
+				value={customZoneId}
+				submitHandler={this.onCustomZoneIdSubmit}
+				text="Custom Zone Id"
+				errorMessage="Custom zone id cannot be blank"
+			/>
+		);
 	}
 
 	render() {
-		const customAdCodeText = (this.state.customAdCode ? 'Edit' : 'Add'),
-			isAdCreateBtnDisabled = !!((this.state.position !== null) && (typeof this.state.position !== 'undefined')),
+		const customAdCodeText = this.state.customAdCode ? 'Edit' : 'Add',
+			isAdCreateBtnDisabled = !!(this.state.position !== null && typeof this.state.position !== 'undefined'),
 			{ updateMode, updateSettings, sectionId, ad } = this.props,
 			{ position, isAdInFirstFold: firstFold, isAdAsync: asyncTag, customZoneId } = this.state;
 
 		if (this.state.manageCustomCode) {
-			return (<CodeBox showButtons code={this.state.customAdCode} onSubmit={this.onCustomAdCodeChange} onCancel={this.toggleCustomAdCode} />);
+			return (
+				<CodeBox
+					showButtons
+					code={this.state.customAdCode}
+					onSubmit={this.onCustomAdCodeChange}
+					onCancel={this.toggleCustomAdCode}
+				/>
+			);
 		}
 
 		return (
-			<div className="containerButtonBar sectionOptions" style={updateMode ? {paddingBottom: 0, marginRight: 15, marginLeft: 15} : {}}>
+			<div
+				className="containerButtonBar sectionOptions"
+				style={updateMode ? { paddingBottom: 0, marginRight: 15, marginLeft: 15 } : {}}
+			>
 				<Row>
-					<Col md={3}><b>Position</b></Col>
+					<Col md={3}>
+						<b>Position</b>
+					</Col>
 					<Col md={9}>
 						<SelectBox value={this.state.position} label="Select Position" onChange={this.onChange}>
-							{
-								positions.map((pos, index) => (
-									<option key={index} value={index}>{pos}</option>
-								))
-							}
+							{positions.map((pos, index) => (
+								<option key={index} value={index}>
+									{pos}
+								</option>
+							))}
 						</SelectBox>
 					</Col>
 				</Row>
-				<CustomToggleSwitch labelText="First fold" className="u-margin-t15px u-margin-b15px" defaultLayout checked={this.state.isAdInFirstFold} name="adInFirstFold" onChange={this.onFirstFoldChange} layout="horizontal" size="m" id="js-ad-in-first-fold" on="Yes" off="No" />
-				<CustomToggleSwitch labelText="Async tag" className="u-margin-t15px u-margin-b15px" disabled defaultLayout checked={this.state.isAdAsync} name="adIsAsync" layout="horizontal" size="m" id="js-ad-is-async" on="Yes" off="No" />
-				{(updateMode && !customZoneId) ? null : this.renderCustomZoneIdInput(customZoneId)}
+				<CustomToggleSwitch
+					labelText="First fold"
+					className="u-margin-t15px u-margin-b15px"
+					defaultLayout
+					checked={this.state.isAdInFirstFold}
+					name="adInFirstFold"
+					onChange={this.onFirstFoldChange}
+					layout="horizontal"
+					size="m"
+					id="js-ad-in-first-fold"
+					on="Yes"
+					off="No"
+				/>
+				<CustomToggleSwitch
+					labelText="Async tag"
+					className="u-margin-t15px u-margin-b15px"
+					disabled
+					defaultLayout
+					checked={this.state.isAdAsync}
+					name="adIsAsync"
+					layout="horizontal"
+					size="m"
+					id="js-ad-is-async"
+					on="Yes"
+					off="No"
+				/>
+				{updateMode && !customZoneId ? null : this.renderCustomZoneIdInput(customZoneId)}
 
-				{
-					updateMode ? (
-						<Button style={{ marginBottom: 20 }} disabled={!(isAdCreateBtnDisabled)} className="btn-lightBg btn-save btn-block" onClick={updateSettings.bind(null, sectionId, ad.id, { position, firstFold, asyncTag, customZoneId })}>Update Settings</Button>
-					) : (
-						<div>
-							<LabelWithButton name="customAdCode" className="u-margin-t15px u-margin-b15px" onButtonClick={this.toggleCustomAdCode} labelText="Custom Ad code" layout="horizontal" buttonText={customAdCodeText} />
-							<Row className="butttonsRow">
-								<Col xs={5}>
-									<Button className="btn-lightBg btn-cancel btn-block" onClick={this.props.onCancel}>Back</Button>
-								</Col>
-								<Col xs={7}>
-									<Button disabled={!(isAdCreateBtnDisabled)} className="btn-lightBg btn-save btn-block" onClick={this.onSave}>Create Ad</Button>
-								</Col>
-							</Row>
-						</div>
-					)
-				}
+				{updateMode ? (
+					<Button
+						style={{ marginBottom: 20 }}
+						disabled={!isAdCreateBtnDisabled}
+						className="btn-lightBg btn-save btn-block"
+						onClick={updateSettings.bind(null, sectionId, ad.id, {
+							position,
+							firstFold,
+							asyncTag,
+							customZoneId
+						})}
+					>
+						Update Settings
+					</Button>
+				) : (
+					<div>
+						<LabelWithButton
+							name="customAdCode"
+							className="u-margin-t15px u-margin-b15px"
+							onButtonClick={this.toggleCustomAdCode}
+							labelText="Custom Ad code"
+							layout="horizontal"
+							buttonText={customAdCodeText}
+						/>
+						<Row className="butttonsRow">
+							<Col xs={5}>
+								<Button className="btn-lightBg btn-cancel btn-block" onClick={this.props.onCancel}>
+									Back
+								</Button>
+							</Col>
+							<Col xs={7}>
+								<Button
+									disabled={!isAdCreateBtnDisabled}
+									className="btn-lightBg btn-save btn-block"
+									onClick={this.onSave}
+								>
+									Create Ad
+								</Button>
+							</Col>
+						</Row>
+					</div>
+				)}
 			</div>
 		);
 	}
-
 }
 
 sectionOptions.propTypes = {

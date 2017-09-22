@@ -15,7 +15,7 @@ const initialState = {
 		prevActiveItem: 0,
 		showExtraOptions: false
 	},
-	getInsertOptionClass = function (option) {
+	getInsertOptionClass = function(option) {
 		switch (option) {
 			case 'Prepend':
 				return 'ap-prepend';
@@ -49,26 +49,45 @@ class insertMenu extends React.Component {
 	}
 
 	toggleExtraOptions() {
-		this.setState({ showExtraOptions: !this.state.showExtraOptions, activeItem: this.state.prevActiveItem, prevActiveItem: this.state.activeItem });
+		this.setState({
+			showExtraOptions: !this.state.showExtraOptions,
+			activeItem: this.state.prevActiveItem,
+			prevActiveItem: this.state.activeItem
+		});
 	}
 
 	selectSize(operation, adSize) {
-		this.setState({ adSize, operation, showExtraOptions: true, activeItem: 0, prevActiveItem: this.state.activeItem });
+		this.setState({
+			adSize,
+			operation,
+			showExtraOptions: true,
+			activeItem: 0,
+			prevActiveItem: this.state.activeItem
+		});
 	}
 
-	createSectionAndAd(position, adCode, firstFold, asyncTag, customZoneId, priceFloor, networkFromDropdown, isHeaderBiddingActivated) {
+	createSectionAndAd(
+		position,
+		adCode,
+		firstFold,
+		asyncTag,
+		customZoneId,
+		priceFloor,
+		networkFromDropdown,
+		isHeaderBiddingActivated
+	) {
 		const props = this.props;
-		
-		let network = ((props.partner && (props.partner === 'geniee') && !adCode) ? 'geniee' : 'custom');
+
+		let network = props.partner && props.partner === 'geniee' && !adCode ? 'geniee' : 'custom';
 		network = networkFromDropdown ? networkFromDropdown : network;
 
 		const sectionPayload = {
 				position,
-				firstFold: (firstFold || false),
-				asyncTag: (asyncTag || false),
+				firstFold: firstFold || false,
+				asyncTag: asyncTag || false,
 				xpath: this.props.parents[0].xpath,
 				operation: this.state.operation,
-				customZoneId: (customZoneId || '')
+				customZoneId: customZoneId || ''
 			},
 			adPayload = {
 				adCode,
@@ -77,22 +96,16 @@ class insertMenu extends React.Component {
 				width: this.state.adSize.width
 			};
 
-		customZoneId ? adPayload.networkData = { zoneId: customZoneId } : null;
+		customZoneId ? (adPayload.networkData = { zoneId: customZoneId }) : null;
 		priceFloor && priceFloor.trim()
-		? adPayload.networkData
-			?
-				(
-					adPayload.networkData.priceFloor = parseFloat(priceFloor),
-					adPayload.networkData.headerBidding = !!isHeaderBiddingActivated
-				)
-			: 
-				(
-					adPayload.networkData = { 
+			? adPayload.networkData
+				? ((adPayload.networkData.priceFloor = parseFloat(priceFloor)),
+					(adPayload.networkData.headerBidding = !!isHeaderBiddingActivated))
+				: (adPayload.networkData = {
 						priceFloor: parseFloat(priceFloor),
 						headerBidding: !!isHeaderBiddingActivated
-					}
-				)
-		: null
+					})
+			: null;
 
 		this.props.createSectionAndAd(sectionPayload, adPayload, this.props.variationId);
 	}
@@ -100,7 +113,7 @@ class insertMenu extends React.Component {
 	enableNonPartnerAdSizes() {
 		commonSupportedSizes.forEach(size => {
 			nonPartnerAdSizes.forEach(nPSize => {
-				if(size.layoutType === nPSize.layoutType) {
+				if (size.layoutType === nPSize.layoutType) {
 					nPSize.sizes.forEach(s => {
 						size.sizes.unshift(s);
 					});
@@ -127,33 +140,40 @@ class insertMenu extends React.Component {
 						insertOption={option}
 						onCheckedItem={this.selectSize.bind(this, option)}
 					/>
-				</MenuItem>)
-			);
-		} else if (props.partner === 'geniee') {
-			items.push((
-				<MenuItem key={1} icon="fa-sitemap" contentHeading="Section Options">
-					<SectionOptions firstFold={props.firstFold} onCreateAd={this.createSectionAndAd.bind(this)} onCancel={this.toggleExtraOptions.bind(this)} />
 				</MenuItem>
 			));
+		} else if (props.partner === 'geniee') {
+			items.push(
+				<MenuItem key={1} icon="fa-sitemap" contentHeading="Section Options">
+					<SectionOptions
+						firstFold={props.firstFold}
+						onCreateAd={this.createSectionAndAd.bind(this)}
+						onCancel={this.toggleExtraOptions.bind(this)}
+					/>
+				</MenuItem>
+			);
 		} else {
-			items.push((
+			items.push(
 				<MenuItem key={1} icon="fa-sitemap" contentHeading="Network Options">
 					<NetworkOptions onSubmit={this.createSectionAndAd} onCancel={this.toggleExtraOptions} />
 				</MenuItem>
-			));
+			);
 		}
 
-		items.push((<MenuItem key={5} icon="fa-sitemap" contentHeading="Select Parent">
-			<ParentSelector
-				selectors={props.parents}
-				channelId={this.props.channelId}
-				onHighlightElement={props.highlightInnerElement}
-				onSelectElement={props.selectInnerElement}
-			/>
-		</MenuItem>));
+		items.push(
+			<MenuItem key={5} icon="fa-sitemap" contentHeading="Select Parent">
+				<ParentSelector
+					selectors={props.parents}
+					channelId={this.props.channelId}
+					onHighlightElement={props.highlightInnerElement}
+					onSelectElement={props.selectInnerElement}
+				/>
+			</MenuItem>
+		);
 
 		return (
-			<Menu id="insertMenu"
+			<Menu
+				id="insertMenu"
 				position={Object.assign({}, this.props.position, { top: this.props.position.top + 43 })}
 				arrow="none"
 				activeItem={this.state.activeItem}
@@ -182,4 +202,3 @@ insertMenu.propTypes = {
 };
 
 export default insertMenu;
-

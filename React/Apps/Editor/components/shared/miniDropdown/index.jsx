@@ -10,7 +10,7 @@ class MiniDropdown extends React.Component {
 
 		this.state = {
 			showDropdown: this.props.showDropdown ? this.props.showDropdown : false
-		}
+		};
 	}
 
 	handleClickOutside() {
@@ -21,22 +21,25 @@ class MiniDropdown extends React.Component {
 
 	render() {
 		const context = this.props.context;
-		return (
-			this.state.showDropdown ? (
-				<div className="mini-dropdown-wrapper">
-					<ul className="mini-dropdown" style={(this.props.dropDownItems && this.props.dropDownItems.length > 3) ? { overflowY: 'scroll', overflowX: 'hidden' } : {}}>
-						{
-							this.props.dropDownItems.map((item, key) => (
-								<li onClick={this.props.selectHandler.bind(context, item)} key={key}>
-									{item}
-								</li>
-							))
-						}
-					</ul>
-				</div>
-			) : null
-		);
-    }
+		return this.state.showDropdown ? (
+			<div className="mini-dropdown-wrapper">
+				<ul
+					className="mini-dropdown"
+					style={
+						this.props.dropDownItems && this.props.dropDownItems.length > 3
+							? { overflowY: 'scroll', overflowX: 'hidden' }
+							: {}
+					}
+				>
+					{this.props.dropDownItems.map((item, key) => (
+						<li onClick={this.props.selectHandler.bind(context, item)} key={key}>
+							{item}
+						</li>
+					))}
+				</ul>
+			</div>
+		) : null;
+	}
 }
 
 MiniDropdown.PropTypes = {

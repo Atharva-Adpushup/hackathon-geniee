@@ -50,15 +50,19 @@ class customCssEditor extends React.Component {
 		};
 		return (
 			<div className="containerButtonBar">
-				{this.state.error && (<div>Some Error in CSS, remove comma in last property if there.</div>)}
+				{this.state.error && <div>Some Error in CSS, remove comma in last property if there.</div>}
 				<Codemirror value={this.state.css} onChange={this.updateCode} options={options} />
 
 				<Row className="butttonsRow">
 					<Col xs={6}>
-						<Button disabled={this.state.error} className="btn-lightBg btn-save" onClick={this.save}>Save</Button>
+						<Button disabled={this.state.error} className="btn-lightBg btn-save" onClick={this.save}>
+							Save
+						</Button>
 					</Col>
 					<Col xs={6}>
-						<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>Cancel</Button>
+						<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>
+							Cancel
+						</Button>
 					</Col>
 				</Row>
 			</div>

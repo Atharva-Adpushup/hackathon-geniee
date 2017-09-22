@@ -91,7 +91,12 @@ class TextRangeListManager extends React.Component {
 
 	renderTextRange() {
 		return (
-			<TextRange name="textRange" minRange={this.state.minRangeVal} maxRange={this.state.maxRangeVal} onValueChange={a => this.onChange(a)} />
+			<TextRange
+				name="textRange"
+				minRange={this.state.minRangeVal}
+				maxRange={this.state.maxRangeVal}
+				onValueChange={a => this.onChange(a)}
+			/>
 		);
 	}
 
@@ -109,18 +114,29 @@ class TextRangeListManager extends React.Component {
 				{this.renderTextRange()}
 				<Row>
 					<Col xs={12} className="u-padding-0px">
-						<Button disabled={!allset} className="btn-lightBg btn-save btn-block" onClick={a => this.onSave(a)} >Add New</Button>
+						<Button
+							disabled={!allset}
+							className="btn-lightBg btn-save btn-block"
+							onClick={a => this.onSave(a)}
+						>
+							Add New
+						</Button>
 					</Col>
 				</Row>
 
 				<Row>
-					<ListView items={this.props.list || []} removeHandler={a => this.onremove(a)} addHandler={a => this.onActive(a)} />
+					<ListView
+						items={this.props.list || []}
+						removeHandler={a => this.onremove(a)}
+						addHandler={a => this.onActive(a)}
+					/>
 				</Row>
-
 
 				<Row className="butttonsRow">
 					<Col xs={12}>
-						<Button className="btn-lightBg btn-cancel btn-block" onClick={this.props.onBack} >Back</Button>
+						<Button className="btn-lightBg btn-cancel btn-block" onClick={this.props.onBack}>
+							Back
+						</Button>
 					</Col>
 				</Row>
 			</div>

@@ -14,9 +14,9 @@ var Promise = require('bluebird'),
 	publisher = new Publisher(queueConfig);
 
 module.exports = {
-	publish: function (paramConfig) {
+	publish: function(paramConfig) {
 		return publishJobs(publisher, options, paramConfig)
-		.then(console.log)
-		.catch(console.log);
+			.then(console.log)
+			.catch(console.log);
 	}
 };

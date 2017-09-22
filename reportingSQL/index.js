@@ -5,12 +5,8 @@ const Promise = require('bluebird'),
 	queryHelper = require('./queryHelper');
 
 function checkParameters(data) {
-	if (
-		!data
-		|| !data.select
-		|| !data.select.length
-	) {
-		return Promise.reject("Invalid query parameters");
+	if (!data || !data.select || !data.select.length) {
+		return Promise.reject('Invalid query parameters');
 	}
 	return Promise.resolve();
 }
@@ -31,44 +27,44 @@ function getId(key, value, type, siteid) {
 			type: 'INT',
 			value: siteid
 		}
-	]
+	];
 	return executeQuery({
 		inputParameters: inputParameters.concat([]),
 		query: fetchSectionQuery
-	})
-	.then(response => _.isArray(response) && response.length ? response[0].axsid : false);
+	}).then(response => (_.isArray(response) && response.length ? response[0].axsid : false));
 }
 
 function whereWrapper(data) {
 	let promises = {};
 
 	// find section Id
-	data.hasOwnProperty('section') ? promises.axsid = getId('__sec_key__', data.section, 'NVARCHAR', data.siteid) : null;
+	data.hasOwnProperty('section')
+		? (promises.axsid = getId('__sec_key__', data.section, 'NVARCHAR', data.siteid))
+		: null;
 	// find variation Id
-	data.hasOwnProperty('variation') ? promises.axvid = getVariationId(data.variation) : null;
+	data.hasOwnProperty('variation') ? (promises.axvid = getVariationId(data.variation)) : null;
 	// find pagegroup Id
-	data.hasOwnProperty('pagegroup') ? promises.axpgid = getPagegroupId(data.pagegroup) : null;
+	data.hasOwnProperty('pagegroup') ? (promises.axpgid = getPagegroupId(data.pagegroup)) : null;
 
-	return Promise.props(promises)
-	.then(response => {
+	return Promise.props(promises).then(response => {
 		console.log(response);
 	});
 }
 
 function queryBuilder(data) {
 	return whereWrapper(data.where)
-	.then(() => queryHelper.select(data.select))
-	.then(() => queryHelper.from())
-	.then(() => queryHelper.__groupBy(data.groupBy))
-	.then(() => queryHelper.generateCompleteQuery())
+		.then(() => queryHelper.select(data.select))
+		.then(() => queryHelper.from())
+		.then(() => queryHelper.__groupBy(data.groupBy))
+		.then(() => queryHelper.generateCompleteQuery());
 }
 
 function init(data) {
 	return checkParameters(data)
-	.then(() => queryBuilder(data))
-	.then(query => {
-		console.log(query);
-	});
+		.then(() => queryBuilder(data))
+		.then(query => {
+			console.log(query);
+		});
 }
 
 // init({

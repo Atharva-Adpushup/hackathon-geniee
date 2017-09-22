@@ -29,23 +29,31 @@ class editMenu extends React.Component {
 		}
 
 		return (
-			<Menu id="editMenu" arrow="none" onGlassClick={props.hideMenu} position={Object.assign({}, props.position, { top: props.position.top + 43 })}>
-				{
-					_.map(props.section.ads, (ad, index) => (
-						<MenuItem key={index} icon={'apSize'} text={`${ad.width} ${ad.height}`} contentHeading={`${ad.width} x ${ad.height}`}>
-							<AdDescriptor 
-								variationId={props.variationId}
-								ad={ad}
-								section={props.section}
-								updateSettings={props.updateSettings}
-								onUpdateXPath={props.onUpdateXPath}
-								onSectionAllXPaths={props.onSectionAllXPaths}
-								onValidateXPath={props.onValidateXPath}
-								onResetErrors={props.onResetErrors}
-							 />
-						</MenuItem>
-					))
-				}
+			<Menu
+				id="editMenu"
+				arrow="none"
+				onGlassClick={props.hideMenu}
+				position={Object.assign({}, props.position, { top: props.position.top + 43 })}
+			>
+				{_.map(props.section.ads, (ad, index) => (
+					<MenuItem
+						key={index}
+						icon={'apSize'}
+						text={`${ad.width} ${ad.height}`}
+						contentHeading={`${ad.width} x ${ad.height}`}
+					>
+						<AdDescriptor
+							variationId={props.variationId}
+							ad={ad}
+							section={props.section}
+							updateSettings={props.updateSettings}
+							onUpdateXPath={props.onUpdateXPath}
+							onSectionAllXPaths={props.onSectionAllXPaths}
+							onValidateXPath={props.onValidateXPath}
+							onResetErrors={props.onResetErrors}
+						/>
+					</MenuItem>
+				))}
 			</Menu>
 		);
 	}
@@ -60,4 +68,3 @@ editMenu.propTypes = {
 };
 
 export default editMenu;
-

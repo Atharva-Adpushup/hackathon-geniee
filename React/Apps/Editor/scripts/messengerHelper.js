@@ -5,9 +5,8 @@ import { deleteAd } from 'actions/adActions';
 import { deleteSection } from 'actions/sectionActions';
 import { showEditMenu, showInsertMenu } from '../actions/uiActions';
 
-
 const messenger = new Messenger(),
-	getTarget = (channelId) => {
+	getTarget = channelId => {
 		const channelFrame = document.querySelector(`iframe[data-adpid="iframe${channelId}"]`);
 		if (!channelFrame) {
 			return false;
@@ -27,15 +26,29 @@ const messenger = new Messenger(),
 					break;
 
 				case messengerCommands.SET_RELEVANT_XPATHS:
-					dispatch({ type: messengerCommands.SET_RELEVANT_XPATHS, sectionId: data.sectionId, allXpaths: data.allXpaths });
+					dispatch({
+						type: messengerCommands.SET_RELEVANT_XPATHS,
+						sectionId: data.sectionId,
+						allXpaths: data.allXpaths
+					});
 					break;
-				
+
 				case messengerCommands.XPATH_VALIDATED:
-					dispatch({ type: messengerCommands.XPATH_VALIDATED, sectionId: data.sectionId, isValidXPath: data.isValidXPath, xpath: data.xpath });
+					dispatch({
+						type: messengerCommands.XPATH_VALIDATED,
+						sectionId: data.sectionId,
+						isValidXPath: data.isValidXPath,
+						xpath: data.xpath
+					});
 					break;
 
 				case messengerCommands.XPATH_SECTION_VALIDATED:
-					dispatch({ type: messengerCommands.XPATH_SECTION_VALIDATED, sectionId: data.sectionId, isValidXPath: data.isValidXPath, xpath: data.xpath });
+					dispatch({
+						type: messengerCommands.XPATH_SECTION_VALIDATED,
+						sectionId: data.sectionId,
+						isValidXPath: data.isValidXPath,
+						xpath: data.xpath
+					});
 					break;
 
 				case messengerCommands.CM_FRAMELOAD_SUCCESS:
@@ -56,8 +69,8 @@ const messenger = new Messenger(),
 
 				case messengerCommands.CONTENT_SELECTOR_WORKED:
 					dispatch(contentSelectorWorked(data.channelId));
-                    break;
-                    
+					break;
+
 				case messengerCommands.SECTION_ALL_XPATHS:
 					// this.flux.actions.updateSection(data);
 					break;
@@ -68,7 +81,6 @@ const messenger = new Messenger(),
 
 				default:
 					break;
-
 			}
 		});
 	},
@@ -81,7 +93,6 @@ const messenger = new Messenger(),
 		messenger.setTarget(target);
 		switch (cmd) {
 			case 'Hello':
-
 				break;
 
 			default:
@@ -89,6 +100,5 @@ const messenger = new Messenger(),
 				break;
 		}
 	};
-
 
 export { initMessageHandler, sendMessage };

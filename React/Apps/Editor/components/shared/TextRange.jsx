@@ -55,9 +55,19 @@ class TextRange extends React.Component {
 		return (
 			<div className="clearfix">
 				<Col className="u-padding-0px" xs={12} md={12}>
-					<input type="text" className="form-control" onChange={this.setValue.bind(null, 'minRange')} value={this.state.minRange} />
+					<input
+						type="text"
+						className="form-control"
+						onChange={this.setValue.bind(null, 'minRange')}
+						value={this.state.minRange}
+					/>
 					<span className="u-separator--colon">:</span>
-					<input type="text" className="form-control" onChange={this.setValue.bind(null, 'maxRange')} value={this.state.maxRange} />
+					<input
+						type="text"
+						className="form-control"
+						onChange={this.setValue.bind(null, 'maxRange')}
+						value={this.state.maxRange}
+					/>
 				</Col>
 			</div>
 		);

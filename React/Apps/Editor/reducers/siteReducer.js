@@ -4,8 +4,10 @@ const initialState = { mode: siteModes.DRAFT, partner: null },
 	site = (state = {}, action) => {
 		switch (action.type) {
 			case uiActions.UPDATE_AFTER_SAVE_STATUS:
-				const isCurrentModeDraft = (action.status === status.SUCCESS) && (state.mode === siteModes.DRAFT) && action.updateModeStatus,
-					isCurrentModePublish = (action.status === status.SUCCESS) && (state.mode === siteModes.PUBLISH) && action.updateModeStatus;
+				const isCurrentModeDraft =
+						action.status === status.SUCCESS && state.mode === siteModes.DRAFT && action.updateModeStatus,
+					isCurrentModePublish =
+						action.status === status.SUCCESS && state.mode === siteModes.PUBLISH && action.updateModeStatus;
 
 				if (isCurrentModeDraft) {
 					return siteModes.PUBLISH;

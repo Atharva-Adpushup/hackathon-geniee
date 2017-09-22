@@ -7,11 +7,10 @@ import { getClosedChannels } from 'selectors/channelSelectors';
 import { hideNewChannelInsertMenu as hideMenu } from 'actions/uiActions';
 import { openChannel } from 'actions/channelActions';
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 		const json = getNewChannelMenuState(state);
 		return { ...json, partner: getPartner(state), channels: getClosedChannels(state) };
 	},
-	mapDispatchToProps = (dispatch) => bindActionCreators({ hideMenu, openChannel }, dispatch);
+	mapDispatchToProps = dispatch => bindActionCreators({ hideMenu, openChannel }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewChannelMenu);
-

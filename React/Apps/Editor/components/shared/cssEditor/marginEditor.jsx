@@ -2,18 +2,32 @@ import React, { PropTypes } from 'react';
 import { Field, reduxForm } from 'redux-form';
 import { Row, Col, Button } from 'react-bootstrap';
 
-
 class cssMarginEditor extends React.Component {
 	setAlignment(alignment) {
 		switch (alignment) {
 			case 'left':
-				this.props.initialize({ 'margin-left': '0px', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px', });
+				this.props.initialize({
+					'margin-left': '0px',
+					'margin-right': 'auto',
+					'margin-top': '0px',
+					'margin-bottom': '0px'
+				});
 				break;
 			case 'right':
-				this.props.initialize({ 'margin-left': 'auto', 'margin-right': '0px', 'margin-top': '0px', 'margin-bottom': '0px' });
+				this.props.initialize({
+					'margin-left': 'auto',
+					'margin-right': '0px',
+					'margin-top': '0px',
+					'margin-bottom': '0px'
+				});
 				break;
 			case 'center':
-				this.props.initialize({ 'margin-left': 'auto', 'margin-right': 'auto', 'margin-top': '0px', 'margin-bottom': '0px' });
+				this.props.initialize({
+					'margin-left': 'auto',
+					'margin-right': 'auto',
+					'margin-top': '0px',
+					'margin-bottom': '0px'
+				});
 				break;
 			default:
 				break;
@@ -28,7 +42,9 @@ class cssMarginEditor extends React.Component {
 					<div>
 						<div className="manualSettings">
 							<Row className="cssPropertiesWrap">
-								<Col xs={12} className="pdLR-0 mB-5">Margin: </Col>
+								<Col xs={12} className="pdLR-0 mB-5">
+									Margin:{' '}
+								</Col>
 								<Col xs={12} className="pd-0">
 									<Row className="cssPropertiesWrapInner">
 										<Col xs={3} className="pd-2">
@@ -54,19 +70,36 @@ class cssMarginEditor extends React.Component {
 
 						<Row className="cssPropertiesAlign">
 							<Col xs={4} className="pd-0 btnCol">
-								<Button className="btn-align btn-align-left" onClick={this.setAlignment.bind(this, 'left')}>Left</Button>
+								<Button
+									className="btn-align btn-align-left"
+									onClick={this.setAlignment.bind(this, 'left')}
+								>
+									Left
+								</Button>
 							</Col>
 							<Col xs={4} className="pd-0 btnCol">
-								<Button className="btn-align btn-align-center" onClick={this.setAlignment.bind(this, 'center')}>Center</Button>
+								<Button
+									className="btn-align btn-align-center"
+									onClick={this.setAlignment.bind(this, 'center')}
+								>
+									Center
+								</Button>
 							</Col>
 							<Col xs={4} className="pd-0 btnCol">
-								<Button className="btn-align btn-align-right" onClick={this.setAlignment.bind(this, 'right')}>Right</Button>
+								<Button
+									className="btn-align btn-align-right"
+									onClick={this.setAlignment.bind(this, 'right')}
+								>
+									Right
+								</Button>
 							</Col>
 						</Row>
 						<Row>
 							<Col xs={4} className="pd-0 btnCol" />
 							<Col xs={4} className="pd-0 btnCol">
-								<Button className="btn-lightBg btn-settings" onClick={props.onAdvanced}>Advanced</Button>
+								<Button className="btn-lightBg btn-settings" onClick={props.onAdvanced}>
+									Advanced
+								</Button>
 							</Col>
 							<Col xs={4} className="pd-0 btnCol" />
 						</Row>
@@ -74,14 +107,19 @@ class cssMarginEditor extends React.Component {
 
 					<Row className="butttonsRow">
 						<Col xs={6}>
-							<Button type="submit" className="btn-lightBg btn-save ">Save Css</Button>
+							<Button type="submit" className="btn-lightBg btn-save ">
+								Save Css
+							</Button>
 						</Col>
 						<Col xs={6}>
-							<Button className="btn-lightBg btn-cancel " onClick={props.onCancel}>Cancel</Button>
+							<Button className="btn-lightBg btn-cancel " onClick={props.onCancel}>
+								Cancel
+							</Button>
 						</Col>
 					</Row>
 				</div>
-			</form >);
+			</form>
+		);
 	}
 }
 
@@ -94,4 +132,3 @@ cssMarginEditor.propTypes = {
 export default reduxForm({
 	form: 'cssMarginEditor' // a unique name for this form
 })(cssMarginEditor);
-

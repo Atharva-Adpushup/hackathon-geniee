@@ -6,7 +6,7 @@ class customToggleSwitch extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			value: (props.checked || false)
+			value: props.checked || false
 		};
 	}
 
@@ -38,19 +38,24 @@ class customToggleSwitch extends React.Component {
 	}
 
 	renderToggleSwitch() {
-		let rootClassName = (this.props.size === 's' ? 'toggle toggleSizeSmall' : 'toggle');
+		let rootClassName = this.props.size === 's' ? 'toggle toggleSizeSmall' : 'toggle';
 
-		rootClassName += (this.props.disabled ? ' toggle--disabled' : '');
+		rootClassName += this.props.disabled ? ' toggle--disabled' : '';
 
 		return (
 			<div className={rootClassName}>
-				<input id={this.props.id} name={this.props.name} type="checkbox" checked={this.state.value} onChange={this.setValue.bind(this)} />
+				<input
+					id={this.props.id}
+					name={this.props.name}
+					type="checkbox"
+					checked={this.state.value}
+					onChange={this.setValue.bind(this)}
+				/>
 				<label htmlFor={this.props.id}>
-					<div className="toggleSwitch" data-on={this.props.on} data-off={this.props.off}>
-					</div>
+					<div className="toggleSwitch" data-on={this.props.on} data-off={this.props.off} />
 				</label>
 			</div>
-		)
+		);
 	}
 
 	/**
@@ -59,8 +64,8 @@ class customToggleSwitch extends React.Component {
 	 * @returns {XML}
 	 */
 	renderHorizontalLayout(options) {
-		let labelClassNames = (options.defaultLayout) ? '' : 'u-padding-r10px',
-			componentClassNames = (options.defaultLayout) ? '' : 'u-padding-l10px';
+		let labelClassNames = options.defaultLayout ? '' : 'u-padding-r10px',
+			componentClassNames = options.defaultLayout ? '' : 'u-padding-l10px';
 
 		componentClassNames += ` ${options.customComponentClass}`;
 		return (
@@ -72,7 +77,7 @@ class customToggleSwitch extends React.Component {
 					{this.renderToggleSwitch()}
 				</Col>
 			</div>
-		)
+		);
 	}
 
 	/**
@@ -81,8 +86,8 @@ class customToggleSwitch extends React.Component {
 	 * @returns {XML}
 	 */
 	renderVerticalLayout(options) {
-		const labelClassNames = (options.defaultLayout) ? '' : 'u-padding-b5px',
-			componentClassNames = (options.defaultLayout) ? '' : 'u-padding-0px';
+		const labelClassNames = options.defaultLayout ? '' : 'u-padding-b5px',
+			componentClassNames = options.defaultLayout ? '' : 'u-padding-0px';
 
 		return (
 			<div className={options.errorClassName}>
@@ -93,7 +98,7 @@ class customToggleSwitch extends React.Component {
 					{this.renderToggleSwitch()}
 				</Col>
 			</div>
-		)
+		);
 	}
 
 	render() {
@@ -101,10 +106,10 @@ class customToggleSwitch extends React.Component {
 		// Should it be marked as valid? Should it be marked as required?
 		const options = {
 			errorClassName: 'clearfix',
-			layout: (this.props.layout.toLowerCase()) ? this.props.layout.toLowerCase() : 'horizontal',
+			layout: this.props.layout.toLowerCase() ? this.props.layout.toLowerCase() : 'horizontal',
 			layoutClassName: 'form-group',
 			defaultLayout: this.props.defaultLayout,
-			classNamesProps: (this.props.className && this.props.className.length > 0) ? this.props.className : '',
+			classNamesProps: this.props.className && this.props.className.length > 0 ? this.props.className : '',
 			labelSize: this.props.labelSize,
 			componentSize: this.props.componentSize,
 			customComponentClass: this.props.customComponentClass
@@ -121,7 +126,9 @@ class customToggleSwitch extends React.Component {
 
 		return (
 			<Row key={this.props.name} className={options.layoutClassName}>
-				{(options.layout === 'vertical') ? this.renderVerticalLayout(options) : this.renderHorizontalLayout(options)}
+				{options.layout === 'vertical'
+					? this.renderVerticalLayout(options)
+					: this.renderHorizontalLayout(options)}
 			</Row>
 		);
 	}

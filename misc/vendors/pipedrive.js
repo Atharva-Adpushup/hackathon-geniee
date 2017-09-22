@@ -7,13 +7,13 @@ function getOptions(action, payload) {
 	let options = {
 		method: '',
 		uri: 'https://api.pipedrive.com',
-		json: true,
+		json: true
 	};
 
 	function updateOptions(method, requestContent) {
 		requestContent.api_token = CC.analytics.PIPEDRIVE_SYNC_TOKEN;
 		options.method = method;
-		switch(method) {
+		switch (method) {
 			case 'GET':
 				options.qs = requestContent;
 				break;
@@ -52,13 +52,13 @@ function getOptions(action, payload) {
 	}
 
 	return Promise.resolve(options);
-};
+}
 
 function callPipedriveAPI(action, payload) {
 	return getOptions(action, payload)
-	.then(request)
-	.then(Promise.resolve)
-	.catch(err => err);
+		.then(request)
+		.then(Promise.resolve)
+		.catch(err => err);
 }
 
 module.exports = callPipedriveAPI;

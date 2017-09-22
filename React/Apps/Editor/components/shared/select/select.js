@@ -30,27 +30,27 @@ function interceptEvent(event) {
 
 module.exports = React.createClass({
 	displayName: 'exports',
-	getInitialState () {
+	getInitialState() {
 		return {
-			id: `react-select-box-${  ++idInc}`,
+			id: `react-select-box-${++idInc}`,
 			open: false,
 			focusedIndex: -1,
 			pedningValue: []
 		};
 	},
 
-	getDefaultProps () {
+	getDefaultProps() {
 		return {
 			closeText: 'Close',
 			showClear: true
 		};
 	},
 
-	changeOnClose () {
+	changeOnClose() {
 		return this.isMultiple() && String(this.props.changeOnClose) === 'true';
 	},
 
-	updatePendingValue (value, cb) {
+	updatePendingValue(value, cb) {
 		if (this.changeOnClose()) {
 			this.setState({ pendingValue: value }, cb);
 			return true;
@@ -58,11 +58,11 @@ module.exports = React.createClass({
 		return false;
 	},
 
-	componentWillMount () {
+	componentWillMount() {
 		this.updatePendingValue(this.props.value);
 	},
 
-	componentWillReceiveProps (next) {
+	componentWillReceiveProps(next) {
 		this.updatePendingValue(next.value);
 	},
 
@@ -70,21 +70,21 @@ module.exports = React.createClass({
 
 	blurTimeout: null,
 
-	handleFocus () {
+	handleFocus() {
 		clearTimeout(this.blurTimeout);
 	},
 
-	handleBlur () {
+	handleBlur() {
 		clearTimeout(this.blurTimeout);
 		this.blurTimeout = setTimeout(this.handleClose, 0);
 	},
 
-	handleMouseDown () {
+	handleMouseDown() {
 		this.clickingOption = true;
 	},
 
-	handleChange (val, cb) {
-		return function (event) {
+	handleChange(val, cb) {
+		return function(event) {
 			this.clickingOption = false;
 			interceptEvent(event);
 			if (this.isMultiple()) {
@@ -107,7 +107,7 @@ module.exports = React.createClass({
 		}.bind(this);
 	},
 
-	handleNativeChange (event) {
+	handleNativeChange(event) {
 		let val = event.target.value;
 		if (this.isMultiple()) {
 			let children = [].slice.call(event.target.childNodes, 0);
@@ -121,27 +121,27 @@ module.exports = React.createClass({
 		this.props.onChange(val);
 	},
 
-	handleClear (event) {
+	handleClear(event) {
 		interceptEvent(event);
-		this.handleChange(null, function () {
+		this.handleChange(null, function() {
 			// only called when change="true"
 			this.props.onChange(this.state.pendingValue);
 		})(event);
 	},
 
-	toggleOpenClose (event) {
+	toggleOpenClose(event) {
 		interceptEvent(event);
 		this.setState({ open: !this.state.open });
 	},
 
-	handleOpen (event) {
+	handleOpen(event) {
 		interceptEvent(event);
-		this.setState({ open: true }, function () {
+		this.setState({ open: true }, function() {
 			this.refs.menu.focus();
 		});
 	},
 
-	handleClose (event) {
+	handleClose(event) {
 		interceptEvent(event);
 		if (!this.clickingOption) {
 			this.setState({ open: false, focusedIndex: -1 });
@@ -151,25 +151,24 @@ module.exports = React.createClass({
 		}
 	},
 
-
-	moveFocus (move) {
+	moveFocus(move) {
 		let len = React.Children.count(this.props.children);
 		let idx = (this.state.focusedIndex + move + len) % len;
 		this.setState({ focusedIndex: idx });
 	},
 
-	handleKeyDown (event) {
+	handleKeyDown(event) {
 		if (keyHandlers[event.which]) {
 			this[keyHandlers[event.which]](event);
 		}
 	},
 
-	handleUpKey (event) {
+	handleUpKey(event) {
 		interceptEvent(event);
 		this.moveFocus(-1);
 	},
 
-	handleDownKey (event) {
+	handleDownKey(event) {
 		interceptEvent(event);
 		if (!this.state.open) {
 			this.handleOpen(event);
@@ -177,7 +176,7 @@ module.exports = React.createClass({
 		this.moveFocus(1);
 	},
 
-	handleSpaceKey (event) {
+	handleSpaceKey(event) {
 		interceptEvent(event);
 		if (!this.state.open) {
 			this.handleOpen(event);
@@ -186,13 +185,13 @@ module.exports = React.createClass({
 		}
 	},
 
-	handleEnterKey (event) {
+	handleEnterKey(event) {
 		if (this.state.focusedIndex !== -1) {
 			this.handleChange(this.options()[this.state.focusedIndex].value)(event);
 		}
 	},
 
-	handleEscKey (event) {
+	handleEscKey(event) {
 		if (this.state.open) {
 			this.handleClose(event);
 		} else {
@@ -200,24 +199,24 @@ module.exports = React.createClass({
 		}
 	},
 
-	label () {
+	label() {
 		let selected = this.options()
-			.filter((option) => {
-				return this.isSelected(option.value)
+			.filter(option => {
+				return this.isSelected(option.value);
 			})
-			.map((option) => {
+			.map(option => {
 				return option.label;
 			});
 		return selected.length > 0 ? selected.join(', ') : this.props.label;
 	},
 
-	isMultiple () {
+	isMultiple() {
 		return String(this.props.multiple) === 'true';
 	},
 
-	options () {
+	options() {
 		let options = [];
-		React.Children.forEach(this.props.children, (option) => {
+		React.Children.forEach(this.props.children, option => {
 			options.push({
 				value: option.props.value,
 				label: option.props.children
@@ -226,40 +225,40 @@ module.exports = React.createClass({
 		return options;
 	},
 
-	value () {
-		let value = this.changeOnClose() ?
-			this.state.pendingValue :
-			this.props.value;
+	value() {
+		let value = this.changeOnClose() ? this.state.pendingValue : this.props.value;
 
 		if (!this.isMultiple() || Array.isArray(value)) {
 			return value;
-		} if (value != null) {
+		}
+		if (value != null) {
 			return [value];
 		}
 		return [];
 	},
 
-	hasValue () {
+	hasValue() {
 		if (this.isMultiple()) {
 			return this.value().length > 0;
 		}
 		return this.value() != null;
 	},
 
-	isSelected (value) {
+	isSelected(value) {
 		if (this.isMultiple()) {
 			return this.value().indexOf(value) !== -1;
 		}
 		return this.value() === value;
 	},
-	onFocus () {
-		if (this.props.onFocus)
-			{this.props.onFocus();}
+	onFocus() {
+		if (this.props.onFocus) {
+			this.props.onFocus();
+		}
 	},
-	render () {
+	render() {
 		let className = 'react-select-box-container';
 		if (this.props.className) {
-			className += ` ${  this.props.className}`;
+			className += ` ${this.props.className}`;
 		}
 		if (this.isMultiple()) {
 			className += ' react-select-box-multi';
@@ -267,51 +266,54 @@ module.exports = React.createClass({
 		if (!this.hasValue()) {
 			className += ' react-select-box-empty';
 		}
-		return (
-			div(
+		return div(
+			{
+				onKeyDown: this.handleKeyDown,
+				className,
+				onFocus: this.onFocus
+			},
+			button(
 				{
-					onKeyDown: this.handleKeyDown,
-					className,
-					onFocus: this.onFocus
+					id: this.state.id,
+					ref: 'button',
+					className: 'react-select-box',
+					onClick: this.toggleOpenClose,
+					onBlur: this.handleBlur,
+					tabIndex: '0',
+					'aria-hidden': true
 				},
-				button(
-					{
-						id: this.state.id,
-						ref: 'button',
-						className: 'react-select-box',
-						onClick: this.toggleOpenClose,
-						onBlur: this.handleBlur,
-						tabIndex: '0',
-						'aria-hidden': true
-					},
-					div({ className: 'react-select-box-label' }, this.label())
-				),
-				this.renderOptionMenu(),
-				this.renderClearButton(),
-				this.renderNativeSelect()
-			)
+				div({ className: 'react-select-box-label' }, this.label())
+			),
+			this.renderOptionMenu(),
+			this.renderClearButton(),
+			this.renderNativeSelect()
 		);
 	},
 
-	renderNativeSelect () {
-		let id = `${this.state.id  }-native-select`;
+	renderNativeSelect() {
+		let id = `${this.state.id}-native-select`;
 		let multiple = this.isMultiple();
 		let empty = multiple ? null : option({ key: '', value: '' }, 'No Selection');
 		let options = [empty].concat(this.props.children);
 		return div(
 			{ className: 'react-select-box-native' },
 			label({ htmlFor: id }, this.props.label),
-			select({
-				id,
-				multiple,
-				onKeyDown (e) { e.stopPropagation(); },
-				value: this.props.value || (multiple ? [] : ''),
-				onChange: this.handleNativeChange
-			}, options)
+			select(
+				{
+					id,
+					multiple,
+					onKeyDown(e) {
+						e.stopPropagation();
+					},
+					value: this.props.value || (multiple ? [] : ''),
+					onChange: this.handleNativeChange
+				},
+				options
+			)
 		);
 	},
 
-	renderOptionMenu () {
+	renderOptionMenu() {
 		let className = 'react-select-box-options';
 		if (!this.state.open) {
 			className += ' react-select-box-hidden';
@@ -341,7 +343,7 @@ module.exports = React.createClass({
 		);
 	},
 
-	renderOption (option, i) {
+	renderOption(option, i) {
 		let className = 'react-select-box-option';
 		if (i === this.state.focusedIndex) {
 			className += ' react-select-box-option-focused';
@@ -351,7 +353,7 @@ module.exports = React.createClass({
 		}
 		return a(
 			{
-				id: `${this.state.id  }-${  i}`,
+				id: `${this.state.id}-${i}`,
 				href: '#',
 				onClick: this.handleChange(option.value),
 				onMouseDown: this.handleMouseDown,
@@ -365,7 +367,7 @@ module.exports = React.createClass({
 		);
 	},
 
-	renderClearButton () {
+	renderClearButton() {
 		if (this.hasValue() && this.props.showClear) {
 			return button({
 				className: 'react-select-box-clear',
@@ -375,7 +377,7 @@ module.exports = React.createClass({
 		}
 	},
 
-	renderCloseButton () {
+	renderCloseButton() {
 		if (this.isMultiple() && this.props.closeText) {
 			return button(
 				{

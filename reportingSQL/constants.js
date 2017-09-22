@@ -244,18 +244,18 @@ const schema = {
 	firstQuery: {
 		aggregate: ['total_impressions', 'total_xpath_miss'],
 		nonAggregate: ['report_date', 'siteid', 'device_type'],
-		firstTable: "ApexHourlySiteReport",
-		secondTable: "ApexSectionReport",
-		firstTableAlias: "c",
-		secondTableAlias: "d",
-		alias: "a"
+		firstTable: 'ApexHourlySiteReport',
+		secondTable: 'ApexSectionReport',
+		firstTableAlias: 'c',
+		secondTableAlias: 'd',
+		alias: 'a'
 	},
 	secondQuery: {
 		aggregate: ['total_cpm'],
 		nonAggregate: ['report_date', 'siteid'],
-		table: "AdpTagReport",
-		alias: "b"
+		table: 'AdpTagReport',
+		alias: 'b'
 	}
-}
+};
 
 module.exports = { schema, fetchSectionQuery };

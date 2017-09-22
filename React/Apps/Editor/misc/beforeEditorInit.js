@@ -2,8 +2,8 @@ import _ from 'lodash';
 import $ from 'jquery';
 import Utils from '../libs/utils';
 
-const getParsedQueryParam = (hash) => JSON.parse(decodeURIComponent(atob(hash))),
-	getEncodedQueryParam = (queryParamKey) => {
+const getParsedQueryParam = hash => JSON.parse(decodeURIComponent(atob(hash))),
+	getEncodedQueryParam = queryParamKey => {
 		let encodedHash = Utils.queryParams()[queryParamKey];
 
 		if (encodedHash) {
@@ -15,7 +15,7 @@ const getParsedQueryParam = (hash) => JSON.parse(decodeURIComponent(atob(hash)))
 
 		return false;
 	},
-	openPageGroupIfPresent = (initialData) => {
+	openPageGroupIfPresent = initialData => {
 		const computedData = $.extend(true, {}, initialData),
 			updateHashData = getEncodedQueryParam('updateHash'),
 			isChannelData = !!(computedData && computedData.channelData),

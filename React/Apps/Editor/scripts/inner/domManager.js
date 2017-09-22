@@ -7,7 +7,7 @@ import { messengerCommands } from '../../consts/commonConsts';
 
 const selectorator = new Selectorator(),
 	events = 'click mouseup mouseleave mousedown mouseover',
-	getInsertOptions = (el) => {
+	getInsertOptions = el => {
 		switch (el.nodeName.toLowerCase()) {
 			case 'table':
 			case 'ul':
@@ -27,7 +27,13 @@ const selectorator = new Selectorator(),
 		}
 	},
 	getAdpVitals = ($el, force = false) => {
-		if (!force && ($el.get(0).tagName === 'HTML' || $el.get(0).tagName === 'BODY' || $el.hasClass('_ap_reject') || $el.parents().hasClass('_ap_reject'))) {
+		if (
+			!force &&
+			($el.get(0).tagName === 'HTML' ||
+				$el.get(0).tagName === 'BODY' ||
+				$el.hasClass('_ap_reject') ||
+				$el.parents().hasClass('_ap_reject'))
+		) {
 			return false;
 		}
 		const xpath = selectorator.generate($el)[0],
@@ -51,61 +57,64 @@ const selectorator = new Selectorator(),
 	isValidXPath = xpath => {
 		try {
 			return $(xpath).length ? true : false;
-		}
-		catch (err) {
+		} catch (err) {
 			return false;
 		}
-    },
-    scrollToView = adId => {
-        let id = `#ad-${adId}`,
-            ele = $(id);
+	},
+	scrollToView = adId => {
+		let id = `#ad-${adId}`,
+			ele = $(id);
 
-        $('html, body').animate({
-            scrollTop: ele.offset().top
-        }, 500);
+		$('html, body').animate(
+			{
+				scrollTop: ele.offset().top
+			},
+			500
+		);
 
-        ele.css("border", "3px solid #cf474b");
-        return true;
-    },
+		ele.css('border', '3px solid #cf474b');
+		return true;
+	},
 	initDomEvents = ({ dispatch }) => {
 		$(document).ready(() => {
 			sendMessage(messengerCommands.CM_FRAMELOAD_SUCCESS, { channelId: window.ADP_CHANNEL_ID });
 		});
 
-		$('html').off().on(events, (e) => {
-			// isScriptedEvent, a variable that checks whether e was triggered by a script or not
-			const isScriptedEvent = (typeof e.originalEvent === 'undefined')
-				|| (e.originalEvent.hasOwnProperty('isTrusted')
-					&& !e.originalEvent.isTrusted)
-				|| (e.originalEvent.screenX === 0
-					&& e.originalEvent.screenY === 0),
-				$target = $(e.target);
+		$('html')
+			.off()
+			.on(events, e => {
+				// isScriptedEvent, a variable that checks whether e was triggered by a script or not
+				const isScriptedEvent =
+						typeof e.originalEvent === 'undefined' ||
+						(e.originalEvent.hasOwnProperty('isTrusted') && !e.originalEvent.isTrusted) ||
+						(e.originalEvent.screenX === 0 && e.originalEvent.screenY === 0),
+					$target = $(e.target);
 
-			if (!isScriptedEvent) {
-				e.preventDefault();
+				if (!isScriptedEvent) {
+					e.preventDefault();
 
-				switch (e.type) {
-					case 'mouseover':
-						dispatch(highlightElement($target));
-						break;
+					switch (e.type) {
+						case 'mouseover':
+							dispatch(highlightElement($target));
+							break;
 
-					case 'click':
-						const vitals = getAdpVitals($target);
-						if (vitals) {
-							sendMessage(messengerCommands.SHOW_INSERT_CONTEXTMENU, {
-								position: vitals.position,
-								parents: vitals.parents,
-								insertOptions: vitals.insertOptions,
-								firstFold: vitals.firstFold
-							});
-							dispatch(setElementSelectorCords(Utils.ui.getElementSelectorCords($target)));
-						}
-						break;
-					default:
-						return;
+						case 'click':
+							const vitals = getAdpVitals($target);
+							if (vitals) {
+								sendMessage(messengerCommands.SHOW_INSERT_CONTEXTMENU, {
+									position: vitals.position,
+									parents: vitals.parents,
+									insertOptions: vitals.insertOptions,
+									firstFold: vitals.firstFold
+								});
+								dispatch(setElementSelectorCords(Utils.ui.getElementSelectorCords($target)));
+							}
+							break;
+						default:
+							return;
+					}
 				}
-			}
-		});
+			});
 	};
 
 export { initDomEvents, getAdpVitals, getAllXPaths, isValidXPath, scrollToView };

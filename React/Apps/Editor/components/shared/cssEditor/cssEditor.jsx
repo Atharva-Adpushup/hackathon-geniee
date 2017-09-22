@@ -2,9 +2,7 @@ import React, { PropTypes } from 'react';
 import MarginEditor from './marginEditor.jsx';
 import CustomCssEditor from './customCssEditor.jsx';
 
-
 class cssEditor extends React.Component {
-
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -24,14 +22,20 @@ class cssEditor extends React.Component {
 
 	render() {
 		const props = this.props;
-		return (<div>
-			{
-				(!this.state.isCustomEditor) ?
-					(<MarginEditor initialValues={props.css} onAdvanced={this.renderCustomEditor} onSubmit={this.handleSubmit} onCancel={props.onCancel} />)
-					:
-					(<CustomCssEditor css={props.css} onSubmit={this.handleSubmit} onCancel={props.onCancel} />)
-			}
-		</div>);
+		return (
+			<div>
+				{!this.state.isCustomEditor ? (
+					<MarginEditor
+						initialValues={props.css}
+						onAdvanced={this.renderCustomEditor}
+						onSubmit={this.handleSubmit}
+						onCancel={props.onCancel}
+					/>
+				) : (
+					<CustomCssEditor css={props.css} onSubmit={this.handleSubmit} onCancel={props.onCancel} />
+				)}
+			</div>
+		);
 	}
 }
 

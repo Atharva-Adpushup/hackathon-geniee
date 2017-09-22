@@ -33,14 +33,14 @@ const config = {
 			name: 'springserve',
 			isHb: true,
 			global: {
-				placementId: {validations: {'required': true}, alias: 'Placement Id', isEditable: true}
+				placementId: { validations: { required: true }, alias: 'Placement Id', isEditable: true }
 			}
 		},
 		brealtime: {
 			name: 'brealtime',
 			isHb: true,
 			global: {
-				placementId: {validations: {'required': true}, alias: 'Placement Id', isEditable: true}
+				placementId: { validations: { required: true }, alias: 'Placement Id', isEditable: true }
 			}
 		}
 	},
@@ -83,6 +83,6 @@ const config = {
 			]
 		}
 	]
-}
+};
 
 export default config;

@@ -1,7 +1,9 @@
 import React, { PropTypes } from 'react';
 
-const TabPane = (props) => (
-	<div className="tabContentArea" style={{ display: (props.selected) ? 'block' : 'none' }}>{props.children}</div>
+const TabPane = props => (
+	<div className="tabContentArea" style={{ display: props.selected ? 'block' : 'none' }}>
+		{props.children}
+	</div>
 );
 
 TabPane.propTypes = {

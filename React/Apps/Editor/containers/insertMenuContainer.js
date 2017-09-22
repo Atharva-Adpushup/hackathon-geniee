@@ -9,7 +9,7 @@ import { getInsertMenuState } from 'selectors/uiSelectors';
 import { sendMessage } from '../scripts/messengerHelper';
 import { messengerCommands } from '../consts/commonConsts';
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 		const json = getInsertMenuState(state);
 		return {
 			...json,
@@ -19,7 +19,7 @@ const mapStateToProps = (state) => {
 			channelId: getActiveChannelId(state)
 		};
 	},
-	mapDispatchToProps = (dispatch) => ({
+	mapDispatchToProps = dispatch => ({
 		hideMenu: () => {
 			dispatch(hideMenu());
 		},
@@ -32,8 +32,6 @@ const mapStateToProps = (state) => {
 		highlightInnerElement: (xpath, channelId) => {
 			sendMessage(channelId, messengerCommands.HIGHLIGHT_ELEMENT, { xpath });
 		}
-
 	});
 
 export default connect(mapStateToProps, mapDispatchToProps)(InsertMenu);
-

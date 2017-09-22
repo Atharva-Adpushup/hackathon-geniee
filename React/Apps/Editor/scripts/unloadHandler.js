@@ -1,4 +1,4 @@
-const unloadHandler = (e) => {
+const unloadHandler = e => {
 	const dialogStr = 'Changes made might not saved.';
 
 	e.returnValue = dialogStr;

@@ -11,7 +11,7 @@ class afterSaveModal extends React.Component {
 	isModalShown() {
 		const props = this.props;
 
-		return !!(parseInt(props.status, 10));
+		return !!parseInt(props.status, 10);
 	}
 
 	renderWaitMessage() {
@@ -22,7 +22,8 @@ class afterSaveModal extends React.Component {
 					<p>Optimization is few seconds away.</p>
 				</div>
 				<div className="spin" />
-			</div>);
+			</div>
+		);
 	}
 
 	renderSuccessMessage() {
@@ -50,14 +51,23 @@ class afterSaveModal extends React.Component {
 			isStatusNotPending = props.status !== status.PENDING,
 			isStatusSuccess = props.status === status.SUCCESS,
 			isStatusReset = props.status === status.RESET,
-			renderConditionalBody = (isStatusPending ? this.renderWaitMessage() : isStatusSuccess ? this.renderSuccessMessage() : this.renderErrorMessage());
+			renderConditionalBody = isStatusPending
+				? this.renderWaitMessage()
+				: isStatusSuccess ? this.renderSuccessMessage() : this.renderErrorMessage();
 
-		return (<Modal show={this.isModalShown()} onHide={props.closeModal} className="_ap_modal_logo  _ap_modal_smily" keyboard={false} title="Saved" animation>
-			<Modal.Header closeButton={isStatusNotPending} />
-			<Modal.Body>
-				{isStatusReset ? null : renderConditionalBody}
-			</Modal.Body>
-		</Modal>);
+		return (
+			<Modal
+				show={this.isModalShown()}
+				onHide={props.closeModal}
+				className="_ap_modal_logo  _ap_modal_smily"
+				keyboard={false}
+				title="Saved"
+				animation
+			>
+				<Modal.Header closeButton={isStatusNotPending} />
+				<Modal.Body>{isStatusReset ? null : renderConditionalBody}</Modal.Body>
+			</Modal>
+		);
 	}
 }
 

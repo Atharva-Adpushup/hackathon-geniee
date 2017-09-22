@@ -21,8 +21,12 @@ class CustomSizeForm extends React.Component {
 		 The minimum width is 120 pixels
 		 The minimum height is 50 pixels
 		 Neither height nor width can exceed 1200 pixels.*/
-		if ((this.state.width >= 120 && this.state.width <= 1200) && (this.state.height >= 50 && this.state.height <= 1200)) {
-			if ((this.state.height > 300 && this.state.width > 300)) {
+		if (
+			this.state.width >= 120 &&
+			this.state.width <= 1200 &&
+			(this.state.height >= 50 && this.state.height <= 1200)
+		) {
+			if (this.state.height > 300 && this.state.width > 300) {
 				return false;
 			}
 			return true;
@@ -80,7 +84,9 @@ class CustomSizeForm extends React.Component {
 				<div>
 					<Row style={{ textAlign: 'center' }}>
 						<Col xs={12}>
-							<Button className="btn-lightBg btn-add" onClick={a => this.toggleForm(a)}>Add New Size</Button>
+							<Button className="btn-lightBg btn-add" onClick={a => this.toggleForm(a)}>
+								Add New Size
+							</Button>
 						</Col>
 					</Row>
 				</div>
@@ -90,20 +96,36 @@ class CustomSizeForm extends React.Component {
 		return (
 			<div className="sm-pad" style={{ backgroundColor: 'rgba(85, 85, 85, 0.05)' }}>
 				<Row>
-					<Col xs={6}><b>Width</b></Col>
-					<Col xs={6}><b>Height</b></Col>
+					<Col xs={6}>
+						<b>Width</b>
+					</Col>
+					<Col xs={6}>
+						<b>Height</b>
+					</Col>
 				</Row>
 				<Row>
 					<Col xs={6}>
-						<input style={{ width: '100%' }} onChange={a => this.handleOnChange(a, 'width')} placeholder="Width" type="number" />
+						<input
+							style={{ width: '100%' }}
+							onChange={a => this.handleOnChange(a, 'width')}
+							placeholder="Width"
+							type="number"
+						/>
 					</Col>
 					<Col xs={6}>
-						<input style={{ width: '100%' }} onChange={a => this.handleOnChange(a, 'height')} placeholder="Height" type="number" />
+						<input
+							style={{ width: '100%' }}
+							onChange={a => this.handleOnChange(a, 'height')}
+							placeholder="Height"
+							type="number"
+						/>
 					</Col>
 				</Row>
 				<Row style={{ textAlign: 'center' }}>
 					<Col xs={12}>
-						<Button className="btn-lightBg btn-add" onClick={a => this.save(a)}>ADD</Button>
+						<Button className="btn-lightBg btn-add" onClick={a => this.save(a)}>
+							ADD
+						</Button>
 						{/****this.props.isApex ? null : this.renderPolicyInfoTip()***/}
 					</Col>
 				</Row>

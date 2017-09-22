@@ -23,7 +23,9 @@ var lodash = require('lodash'),
 			return Promise.resolve(computedReport);
 		},
 		insertDataFields: function(origArr, newFieldsArr, pushIndex, placeHolder) {
-			var len = newFieldsArr.length, pushIdx = pushIndex, i;
+			var len = newFieldsArr.length,
+				pushIdx = pushIndex,
+				i;
 
 			origArr.unshift(placeHolder);
 

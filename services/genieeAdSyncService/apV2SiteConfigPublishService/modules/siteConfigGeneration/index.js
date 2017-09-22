@@ -8,11 +8,13 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 			siteId: siteModelItem.get('siteId'),
 			ads: []
 		};
-	function doIt (channelWithZones) {
-		if (!(channelWithZones && channelWithZones.unsyncedZones && Object.keys(channelWithZones.unsyncedZones).length)) {
+	function doIt(channelWithZones) {
+		if (
+			!(channelWithZones && channelWithZones.unsyncedZones && Object.keys(channelWithZones.unsyncedZones).length)
+		) {
 			return false;
 		}
-		var isChannel = !!(channelWithZones.channel),
+		var isChannel = !!channelWithZones.channel,
 			isPageGroupId = !!(isChannel && channelWithZones.channel.genieePageGroupId);
 
 		_.forEach(channelWithZones.unsyncedZones, (zones, index) => {
@@ -21,7 +23,14 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 					zones: zones.genieeUnsyncedZones,
 					siteId: siteModelItem.get('siteId'),
 					pageGroupId: isPageGroupId ? channelWithZones.channel.genieePageGroupId : '',
-					channelKey: isChannel ? 'chnl::' + siteModelItem.get('siteId') + ':' + channelWithZones.channel.platform + ':' + channelWithZones.channel.pageGroup : ''
+					channelKey: isChannel
+						? 'chnl::' +
+							siteModelItem.get('siteId') +
+							':' +
+							channelWithZones.channel.platform +
+							':' +
+							channelWithZones.channel.pageGroup
+						: ''
 				});
 			}
 			if (Object.keys(zones.adpTagsUnsyncedZones).length) {
@@ -29,19 +38,18 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 			}
 		});
 	}
-	return Promise.map(channelAndZones, doIt)
-	.then(() => {
-		return { 
+	return Promise.map(channelAndZones, doIt).then(() => {
+		return {
 			geniee: unsyncedGenieeZones,
 			adp: adpTagsUnsyncedZones
-		}
+		};
 	});
 }
 
 function getGeneratedPromises(siteModelItem) {
 	return genieeZoneSyncService
-	.getAllUnsyncedZones(siteModelItem)
-	.then(channelAndZones => generateSiteChannelJSON(channelAndZones, siteModelItem));
+		.getAllUnsyncedZones(siteModelItem)
+		.then(channelAndZones => generateSiteChannelJSON(channelAndZones, siteModelItem));
 }
 
 module.exports = {

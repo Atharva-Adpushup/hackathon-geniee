@@ -43,14 +43,17 @@ class customInputNumber extends React.Component {
 	// Whenever the input changes we update the value state
 	// of this component
 	setValue(event) {
-		this.setState({
-			value: parseInt(event.currentTarget.value, 10)
-		}, () => {
-			if (this.props.validate) {
-				this.props.validate(this);
+		this.setState(
+			{
+				value: parseInt(event.currentTarget.value, 10)
+			},
+			() => {
+				if (this.props.validate) {
+					this.props.validate(this);
+				}
+				this.props.onChange ? this.props.onChange(event) : null;
 			}
-			this.props.onChange ? this.props.onChange(event) : null;
-		});
+		);
 	}
 
 	/**
@@ -65,11 +68,21 @@ class customInputNumber extends React.Component {
 					<b>{this.props.labelText}</b>
 				</Col>
 				<Col className="u-padding-l10px" xs={4}>
-					<input type="number" className="form-control" name={this.props.name} min={this.props.min} max={this.props.max} onChange={this.setValue.bind(this)} value={this.state.value}/>
+					<input
+						type="number"
+						className="form-control"
+						name={this.props.name}
+						min={this.props.min}
+						max={this.props.max}
+						onChange={this.setValue.bind(this)}
+						value={this.state.value}
+					/>
 				</Col>
-				<span className="form-group-feedback">{options.markAsValid || options.markAsRequired ? null : this.props.validationError}</span>
+				<span className="form-group-feedback">
+					{options.markAsValid || options.markAsRequired ? null : this.props.validationError}
+				</span>
 			</div>
-		)
+		);
 	}
 
 	/**
@@ -84,11 +97,19 @@ class customInputNumber extends React.Component {
 					<b>{this.props.labelText}</b>
 				</Col>
 				<Col className="u-padding-0px" xs={12} md={12}>
-					<input type="number" className="form-control" name={this.props.name} min={this.props.min} max={this.props.max} onChange={this.setValue.bind(this)} value={this.state.value}/>
+					<input
+						type="number"
+						className="form-control"
+						name={this.props.name}
+						min={this.props.min}
+						max={this.props.max}
+						onChange={this.setValue.bind(this)}
+						value={this.state.value}
+					/>
 				</Col>
 				<span className="form-group-feedback">{options.markAsValid ? null : this.props.validationError}</span>
 			</div>
-		)
+		);
 	}
 
 	render() {
@@ -97,7 +118,7 @@ class customInputNumber extends React.Component {
 		const options = {
 			markAsValid: this.state.isValid,
 			errorClassName: 'clearfix',
-			layout: (this.props.layout.toLowerCase()) ? this.props.layout.toLowerCase() : 'horizontal',
+			layout: this.props.layout.toLowerCase() ? this.props.layout.toLowerCase() : 'horizontal',
 			layoutClassName: 'form-group'
 		};
 
@@ -115,7 +136,9 @@ class customInputNumber extends React.Component {
 
 		return (
 			<Row key={this.props.name} className={options.layoutClassName}>
-				{(options.layout === 'vertical') ? this.renderVerticalLayout(options) : this.renderHorizontalLayout(options)}
+				{options.layout === 'vertical'
+					? this.renderVerticalLayout(options)
+					: this.renderHorizontalLayout(options)}
 			</Row>
 		);
 	}

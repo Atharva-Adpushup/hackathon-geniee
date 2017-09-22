@@ -16,7 +16,6 @@ var $ = require('jquery'),
 		trackerSupported: false
 	};
 
-
 (function detectPlatform() {
 	var md = new MobileDetect(window.navigator.userAgent);
 	try {
@@ -25,27 +24,36 @@ var $ = require('jquery'),
 		} else if (md.tablet()) {
 			browserConfig.platform = 'TABLET';
 		}
-	} catch (e) { } // eslint-disable-line no-empty
+	} catch (e) {} // eslint-disable-line no-empty
 })();
 
 (function detectBrowser() {
 	var ua = navigator.userAgent;
 	try {
-		if ((!!window.opera || ua.indexOf(' OPR/') >= 0) && (ua.indexOf('Opera Mini') === -1)) {
+		if ((!!window.opera || ua.indexOf(' OPR/') >= 0) && ua.indexOf('Opera Mini') === -1) {
 			browserConfig.name = 'opera';
 		} else if (ua.indexOf('Edge') !== -1) {
 			browserConfig.name = 'edge';
 		} else if (typeof InstallTrigger !== 'undefined') {
 			browserConfig.name = 'firefox';
-		} else if (/Android/i.test(ua) && typeof navigator.vendor !== 'undefined' && navigator.vendor.indexOf('Google') > -1 && / Version\/[^ ]+ Chrome/i.test(ua)) {
+		} else if (
+			/Android/i.test(ua) &&
+			typeof navigator.vendor !== 'undefined' &&
+			navigator.vendor.indexOf('Google') > -1 &&
+			/ Version\/[^ ]+ Chrome/i.test(ua)
+		) {
 			browserConfig.name = 'chrome-wv';
 		} else if (ua.indexOf(' CriOS/') !== -1) {
 			browserConfig.name = 'safari-chrome';
-		} else if (!!window.chrome && ua.match(/chrome/i)) { // Later condition because Dolphin browser has window.chrome a valid object
+		} else if (!!window.chrome && ua.match(/chrome/i)) {
+			// Later condition because Dolphin browser has window.chrome a valid object
 			browserConfig.name = 'chrome';
-		} else if ( /* @cc_on!@*/ false || !!document.documentMode) {
+		} else if (/* @cc_on!@*/ false || !!document.documentMode) {
 			browserConfig.name = 'ie';
-		} else if (Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0 && /AppleWebKit/i.test(ua)) {
+		} else if (
+			Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0 &&
+			/AppleWebKit/i.test(ua)
+		) {
 			if (/(iPhone|iPod|iPad)/i.test(ua) && ua.indexOf('Safari') !== -1 && ua.indexOf('Version') !== -1) {
 				browserConfig.name = 'safari-mobile';
 			} else if (ua.indexOf('Safari') !== -1 && ua.indexOf('Version') !== -1) {
@@ -57,11 +65,12 @@ var $ = require('jquery'),
 		if (browserConfig.name !== 'chrome') {
 			browserConfig.name = 'other';
 		}
-	} catch (e) { } // eslint-disable-line no-empty
+	} catch (e) {} // eslint-disable-line no-empty
 })();
 
 (function detectVisibilitySupport() {
-	var pV = browserConfig.pageVisibility, vendorPrefix;
+	var pV = browserConfig.pageVisibility,
+		vendorPrefix;
 
 	pV.supported = true;
 	pV.type = 'standard';
@@ -91,7 +100,12 @@ var $ = require('jquery'),
 (function detectDataSendingMethod() {
 	if (navigator && typeof navigator.sendBeacon === 'function') {
 		browserConfig.dataSendingMethod = 'sendBeacon';
-	} else if ((browserConfig.name.match(/^safari*/) || browserConfig.name.match(/chrome*/) || browserConfig.name === 'opera') && typeof document.createElement('a').ping !== 'undefined') {
+	} else if (
+		(browserConfig.name.match(/^safari*/) ||
+			browserConfig.name.match(/chrome*/) ||
+			browserConfig.name === 'opera') &&
+		typeof document.createElement('a').ping !== 'undefined'
+	) {
 		browserConfig.dataSendingMethod = 'ping';
 	}
 })();
@@ -100,11 +114,12 @@ var $ = require('jquery'),
 	browserConfig.unloadMethod = browserConfig.name.match('safari*') ? 'pagehide' : 'beforeunload';
 })();
 
-
 (function initBeacon() {
 	if (browserConfig.dataSendingMethod === 'ping') {
 		$(function() {
-			$('body').append('<a id="_ap_ping_tracker" href="javascript::void(0)" style="display:none" ping="">ping<\/a>');
+			$('body').append(
+				'<a id="_ap_ping_tracker" href="javascript::void(0)" style="display:none" ping="">ping</a>'
+			);
 			browserConfig.$pingEl = $('#_ap_ping_tracker');
 			browserConfig.$pingEl.click(function(e) {
 				e.stopPropagation();
@@ -114,9 +129,13 @@ var $ = require('jquery'),
 	}
 })();
 
-
 (function checkTrackerSupport() {
-	browserConfig.trackerSupported = !(browserConfig.name === 'other' || !browserConfig.pageVisibility.supported || ((browserConfig.name === 'safari-mobile' || browserConfig.name === 'safari-wv') && typeof window.requestAnimationFrame !== 'function'));
+	browserConfig.trackerSupported = !(
+		browserConfig.name === 'other' ||
+		!browserConfig.pageVisibility.supported ||
+		((browserConfig.name === 'safari-mobile' || browserConfig.name === 'safari-wv') &&
+			typeof window.requestAnimationFrame !== 'function')
+	);
 })();
 
 browserConfig.pageVisibility.isPageVisible = function() {
@@ -158,11 +177,11 @@ browserConfig.pageVisibility.onChange = function(hiddenCallback, visibleCallback
 
 	function onchange(event) {
 		var evtMap = {
-			focus: 'visible',
-			pageshow: 'visible',
-			blur: 'hidden',
-			pagehide: 'hidden'
-		},
+				focus: 'visible',
+				pageshow: 'visible',
+				blur: 'hidden',
+				pagehide: 'hidden'
+			},
 			evt = event || window.event,
 			evtType = evt.type,
 			triggerCallback;

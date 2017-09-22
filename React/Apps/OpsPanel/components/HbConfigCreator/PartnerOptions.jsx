@@ -4,62 +4,65 @@ import { generateOptionInputs } from '../../lib/helpers';
 import SelectBox from '../../../../Components/SelectBox.jsx';
 
 const generatePartnerOptions = (partnerConfig, onChangeHandler, selectedPartnerOptions) => {
-    const { global, local } = partnerConfig;    
+	const { global, local } = partnerConfig;
 
-    return React.createElement('div', { 
-        children: [generateOptionInputs(global, onChangeHandler, selectedPartnerOptions), generateOptionInputs(local, onChangeHandler, selectedPartnerOptions)] 
-    });
+	return React.createElement('div', {
+		children: [
+			generateOptionInputs(global, onChangeHandler, selectedPartnerOptions),
+			generateOptionInputs(local, onChangeHandler, selectedPartnerOptions)
+		]
+	});
 };
 
 class PartnerOptions extends React.Component {
-    constructor(props) {
-        super(props);
+	constructor(props) {
+		super(props);
 
-        let partnerOptions = {};
+		let partnerOptions = {};
 
-        if(props.selectedPartnerOptions) {
-            partnerOptions = props.selectedPartnerOptions;
-        }
+		if (props.selectedPartnerOptions) {
+			partnerOptions = props.selectedPartnerOptions;
+		}
 
-        this.state = {
-            partnerOptions,
-            typingTimeOut: 0
-        };
+		this.state = {
+			partnerOptions,
+			typingTimeOut: 0
+		};
 
-        this.onChangeHandler = this.onChangeHandler.bind(this);
-    }
+		this.onChangeHandler = this.onChangeHandler.bind(this);
+	}
 
-    onChangeHandler(e) {
-        const { state, props } = this,
-            { target } = e,
-            that = this,
-            { partnerOptions } = state,
-            options = Object.assign(partnerOptions, { [target.name]: target.value, optionsIndex: props.optionsIndex });
+	onChangeHandler(e) {
+		const { state, props } = this,
+			{ target } = e,
+			that = this,
+			{ partnerOptions } = state,
+			options = Object.assign(partnerOptions, { [target.name]: target.value, optionsIndex: props.optionsIndex });
 
-        if (state.typingTimeout) {
-            clearTimeout(state.typingTimeout);
-         }
-              
-         this.setState({
-            partnerOptions: options,
-            typingTimeout: setTimeout( () => {
-                this.props.optionsCallback(partnerOptions);
-            }, 500)
-         });
-    }
+		if (state.typingTimeout) {
+			clearTimeout(state.typingTimeout);
+		}
 
-    render() {
-        const { partnerConfig, optionsIndex, selectedPartnerOptions } = this.props;
+		this.setState({
+			partnerOptions: options,
+			typingTimeout: setTimeout(() => {
+				this.props.optionsCallback(partnerOptions);
+			}, 500)
+		});
+	}
 
-        return <div>{generatePartnerOptions(partnerConfig, this.onChangeHandler, selectedPartnerOptions)}</div>
-    }
+	render() {
+		const { partnerConfig, optionsIndex, selectedPartnerOptions } = this.props;
+
+		return <div>{generatePartnerOptions(partnerConfig, this.onChangeHandler, selectedPartnerOptions)}</div>;
+	}
 }
 
 PartnerOptions.proptypes = {
-    partnerConfig: PropTypes.object.isRequired,
-    optionsCallback: PropTypes.func.isRequired,
-    optionsIndex: PropTypes.string.isRequired,
-    selectedPartnerOptions: PropTypes.object
+	partnerConfig: PropTypes.object.isRequired,
+	optionsCallback: PropTypes.func.isRequired,
+	optionsIndex: PropTypes.string.isRequired,
+	selectedPartnerOptions: PropTypes.object
 };
 
 export default PartnerOptions;

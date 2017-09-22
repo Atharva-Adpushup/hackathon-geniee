@@ -31,7 +31,11 @@ const initialState = { activeChannel: null, byIds: {} },
 
 			case variationActions.ADD_VARIATION:
 			case variationActions.COPY_VARIATION:
-				return { ...state, activeVariation: action.variationId, variations: [...state.variations, action.variationId] };
+				return {
+					...state,
+					activeVariation: action.variationId,
+					variations: [...state.variations, action.variationId]
+				};
 
 			case variationActions.DELETE_VARIATION:
 				index = state.variations.indexOf(action.variationId);
@@ -40,7 +44,11 @@ const initialState = { activeChannel: null, byIds: {} },
 				}
 				if (action.variationId === state.activeVariation) {
 					const nextActiveIndex = state.variations[index + 1] ? index + 1 : index - 1;
-					return { ...state, activeVariation: state.variations[nextActiveIndex], variations: immutableArrayDelete(state.variations, index) };
+					return {
+						...state,
+						activeVariation: state.variations[nextActiveIndex],
+						variations: immutableArrayDelete(state.variations, index)
+					};
 				}
 				return { ...state, variations: immutableArrayDelete(state.variations, index) };
 
@@ -69,11 +77,13 @@ const initialState = { activeChannel: null, byIds: {} },
 	channelData = (state = initialState, action) => {
 		switch (action.type) {
 			case channelActions.CREATE_CHANNEL:
-				return { ...state,
+				return {
+					...state,
 					byIds: {
 						...state.byIds,
 						[action.channelId]: channel(undefined, action)
-					} };
+					}
+				};
 
 			case channelActions.SET_ACTIVE_CHANNEL:
 				return { ...state, activeChannel: action.channelId };
@@ -86,7 +96,8 @@ const initialState = { activeChannel: null, byIds: {} },
 			case channelActions.CONTENT_SELECTOR_MISSING:
 			case channelActions.CONTENT_SELECTOR_WORKED:
 			case variationActions.DELETE_VARIATION:
-				return { ...state,
+				return {
+					...state,
 					byIds: {
 						...state.byIds,
 						[action.channelId]: channel(state.byIds[action.channelId], action)
@@ -94,7 +105,8 @@ const initialState = { activeChannel: null, byIds: {} },
 				};
 
 			case channelActions.OPEN_CHANNEL:
-				return { ...state,
+				return {
+					...state,
 					activeChannel: action.channelId,
 					byIds: {
 						...state.byIds,
@@ -103,7 +115,8 @@ const initialState = { activeChannel: null, byIds: {} },
 				};
 
 			case channelActions.CLOSE_CHANNEL:
-				return { ...state,
+				return {
+					...state,
 					activeChannel: action.activeChannelId,
 					byIds: {
 						...state.byIds,
@@ -112,7 +125,8 @@ const initialState = { activeChannel: null, byIds: {} },
 				};
 
 			case variationActions.SET_ACTIVE_VARIATION:
-				return { ...state,
+				return {
+					...state,
 					byIds: {
 						...state.byIds,
 						[state.activeChannel]: channel(state.byIds[state.activeChannel], action)

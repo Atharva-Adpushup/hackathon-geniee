@@ -4,17 +4,20 @@ import { getOpenChannels } from 'selectors/channelSelectors';
 import Utils from 'libs/utils';
 import _ from 'lodash';
 
-const openChannel = (channelId) => ({ type: channelActions.OPEN_CHANNEL, channelId }),
-	closeChannel = (channelId) => {
+const openChannel = channelId => ({ type: channelActions.OPEN_CHANNEL, channelId }),
+	closeChannel = channelId => {
 		return (dispatch, getState) => {
 			const state = getState(),
-				filteredChannels = _.filter(getOpenChannels(state), (o) => (channelId !== o.id)),
-				activeChannelId = (Utils.isArray(filteredChannels) && filteredChannels.length) ? (_.find(filteredChannels, 'id')).id : null;
+				filteredChannels = _.filter(getOpenChannels(state), o => channelId !== o.id),
+				activeChannelId =
+					Utils.isArray(filteredChannels) && filteredChannels.length
+						? _.find(filteredChannels, 'id').id
+						: null;
 
 			dispatch({ type: channelActions.CLOSE_CHANNEL, channelId, activeChannelId });
 		};
 	},
-	openChannelSuccess = (channelId) => {
+	openChannelSuccess = channelId => {
 		return (dispatch, getState) => {
 			dispatch({
 				type: channelActions.OPEN_CHANNEL_SUCCESS,
@@ -26,16 +29,20 @@ const openChannel = (channelId) => ({ type: channelActions.OPEN_CHANNEL, channel
 			}
 		};
 	},
-	setActiveChannel = (channelId) => {
+	setActiveChannel = channelId => {
 		return {
 			type: channelActions.SET_ACTIVE_CHANNEL,
 			channelId
 		};
 	},
-	createChannel = (payload) => {
+	createChannel = payload => {
 		return {
 			type: channelActions.CREATE_CHANNEL,
-			payload: Object.assign(payload, { id: Utils.getRandomNumber(), createTs: Math.floor(Date.now() / 1000), variations: [] })
+			payload: Object.assign(payload, {
+				id: Utils.getRandomNumber(),
+				createTs: Math.floor(Date.now() / 1000),
+				variations: []
+			})
 		};
 	},
 	saveSampleUrl = (channelId, sampleUrl) => {
@@ -52,14 +59,14 @@ const openChannel = (channelId) => ({ type: channelActions.OPEN_CHANNEL, channel
 			channelId
 		};
 	},
-	loadCmsInfo = (cmsInfo) => {
+	loadCmsInfo = cmsInfo => {
 		return {
 			type: channelActions.LOAD_CMS_INFO,
 			cmsInfo
 		};
 	},
-	contentSelectorMissing = (channelId) => ({ type: channelActions.CONTENT_SELECTOR_MISSING, channelId }),
-	contentSelectorWorked = (channelId) => ({ type: channelActions.CONTENT_SELECTOR_WORKED, channelId }),
+	contentSelectorMissing = channelId => ({ type: channelActions.CONTENT_SELECTOR_MISSING, channelId }),
+	contentSelectorWorked = channelId => ({ type: channelActions.CONTENT_SELECTOR_WORKED, channelId }),
 	saveChannelBeforeAfterJs = (channelId, jsType, code) => {
 		return {
 			type: channelActions.SAVE_BEFORE_AFTER_JS,
@@ -69,6 +76,16 @@ const openChannel = (channelId) => ({ type: channelActions.OPEN_CHANNEL, channel
 		};
 	};
 
-export { openChannel, openChannelSuccess, setActiveChannel, createChannel,
-	saveSampleUrl, changeContentSelector, loadCmsInfo, saveChannelBeforeAfterJs,
-	contentSelectorWorked, contentSelectorMissing, closeChannel };
+export {
+	openChannel,
+	openChannelSuccess,
+	setActiveChannel,
+	createChannel,
+	saveSampleUrl,
+	changeContentSelector,
+	loadCmsInfo,
+	saveChannelBeforeAfterJs,
+	contentSelectorWorked,
+	contentSelectorMissing,
+	closeChannel
+};

@@ -2,19 +2,25 @@ import { connect } from 'react-redux';
 import VariationManager from 'variationManager/variationManager.jsx';
 import { addVariation, copyVariation, deleteVariation, setActiveVariation } from 'actions/variationActions';
 import { getActiveChannelId, getActiveChannel } from 'selectors/channelSelectors';
-import { getActiveChannelVariationsWithAds, getActiveChannelActiveVariation, getVariationSectionsWithAds } from 'selectors/variationSelectors';
+import {
+	getActiveChannelVariationsWithAds,
+	getActiveChannelActiveVariation,
+	getVariationSectionsWithAds
+} from 'selectors/variationSelectors';
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
 		variations: getActiveChannelVariationsWithAds(state),
 		activeVariation: getActiveChannelActiveVariation(state),
 		activeChannelId: getActiveChannelId(state),
 		activeChannel: getActiveChannel(state),
-		activeVariationSections: getActiveChannelActiveVariation(state) ? getVariationSectionsWithAds(state, { variationId: getActiveChannelActiveVariation(state).id }).sections : null,
+		activeVariationSections: getActiveChannelActiveVariation(state)
+			? getVariationSectionsWithAds(state, { variationId: getActiveChannelActiveVariation(state).id }).sections
+			: null,
 		ui: state.ui
 	}),
 	noop = () => ({ type: 'test' }),
-	mapDispatchToProps = (dispatch) => ({
-		deleteVariation: (variationId) => {
+	mapDispatchToProps = dispatch => ({
+		deleteVariation: variationId => {
 			dispatch(deleteVariation(variationId));
 		},
 		copyVariation: (variationId, newName, channelId) => {
@@ -23,7 +29,7 @@ const mapStateToProps = (state) => ({
 		setActiveVariation: (variationId, channelId) => {
 			dispatch(setActiveVariation(variationId, channelId));
 		},
-		renameVariation: (variationId) => {
+		renameVariation: variationId => {
 			dispatch(noop(variationId));
 		},
 		createVariation: (payload, channelId) => {

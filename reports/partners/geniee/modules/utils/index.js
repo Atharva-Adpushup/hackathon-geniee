@@ -5,7 +5,8 @@ var moment = require('moment'),
 module.exports = {
 	setHighChartsData: function(currentDate, metric, mainObj, computedObj) {
 		var collectionIndex = -1,
-			collectionDataIndex = -1, computedItem,
+			collectionDataIndex = -1,
+			computedItem,
 			metricConstants = {
 				revenue: 'revenue',
 				clicks: 'clicks'
@@ -27,12 +28,11 @@ module.exports = {
 			});
 
 			if (collectionDataIndex > -1) {
-				if ((metricConstants.revenue === metric) || (metricConstants.clicks === metric)) {
+				if (metricConstants.revenue === metric || metricConstants.clicks === metric) {
 					mainObj[metric][collectionIndex].data[collectionDataIndex][1] += computedObj[metric].data[0][1];
 				} else {
 					mainObj[metric][collectionIndex].data[collectionDataIndex][1] = computedObj[metric].data[0][1];
 				}
-
 			} else {
 				mainObj[metric][collectionIndex].data.push(computedObj[metric].data[0]);
 			}
@@ -58,21 +58,33 @@ module.exports = {
 		});
 	},
 	getDayWiseTimestamps: function(dateFrom, dateTo) {
-		var dateCollection = [], computedDate, numberOfDays = 1,
+		var dateCollection = [],
+			computedDate,
+			numberOfDays = 1,
 			result;
 
 		while (computedDate !== dateTo) {
 			if (numberOfDays === 1) {
 				dateCollection.push({
-					dateFrom: moment(dateFrom).startOf('day').valueOf(),
-					dateTo: moment(dateFrom).endOf('day').valueOf()
+					dateFrom: moment(dateFrom)
+						.startOf('day')
+						.valueOf(),
+					dateTo: moment(dateFrom)
+						.endOf('day')
+						.valueOf()
 				});
 				computedDate = dateFrom;
 			} else {
-				computedDate = moment(computedDate).add(1, 'days').format('YYYY-MM-DD');
+				computedDate = moment(computedDate)
+					.add(1, 'days')
+					.format('YYYY-MM-DD');
 				dateCollection.push({
-					dateFrom: moment(computedDate).startOf('day').valueOf(),
-					dateTo: moment(computedDate).endOf('day').valueOf()
+					dateFrom: moment(computedDate)
+						.startOf('day')
+						.valueOf(),
+					dateTo: moment(computedDate)
+						.endOf('day')
+						.valueOf()
 				});
 			}
 
@@ -80,15 +92,19 @@ module.exports = {
 		}
 
 		// NOTE: 1 is deducted from number of days as it had an initial value of 1
-		result = {collection: dateCollection, days: (numberOfDays - 1)}
+		result = { collection: dateCollection, days: numberOfDays - 1 };
 
 		return result;
 	},
 	// Get an object from object collection
 	getObjectFromCollection: function(collection) {
-		return lodash.reduce(collection, function(object, collectionItem) {
-			return extend({}, object, collectionItem);
-		}, {});
+		return lodash.reduce(
+			collection,
+			function(object, collectionItem) {
+				return extend({}, object, collectionItem);
+			},
+			{}
+		);
 	},
 	updatePageRPMHighChartsData: function(collection) {
 		var computedCollection = extend(true, {}, collection);
@@ -102,7 +118,7 @@ module.exports = {
 					pageViews = pageViewsObject.data[dataItemIndex][1],
 					pageRPM = Number((revenue / pageViews * 1000).toFixed(2));
 
-				pageRPM = (pageRPM && pageRPM !== Infinity) ? pageRPM : 0;
+				pageRPM = pageRPM && pageRPM !== Infinity ? pageRPM : 0;
 				computedCollection.pagerpm[pageRPMObjectIndex].data[dataItemIndex][1] = pageRPM;
 			});
 		});
@@ -121,12 +137,11 @@ module.exports = {
 					pageViews = pageViewsObject.data[dataItemIndex][1],
 					pageCTR = Number((clicks / pageViews * 100).toFixed(2));
 
-				pageCTR = (pageCTR && pageCTR !== Infinity) ? pageCTR : 0;
+				pageCTR = pageCTR && pageCTR !== Infinity ? pageCTR : 0;
 				computedCollection.pagectr[pageCTRObjectIndex].data[dataItemIndex][1] = pageCTR;
 			});
 		});
 
 		return computedCollection;
 	}
-
 };

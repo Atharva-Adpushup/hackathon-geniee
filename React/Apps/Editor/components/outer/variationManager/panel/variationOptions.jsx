@@ -2,16 +2,28 @@ import React, { PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { deleteVariation, copyVariation, editVariationName, editTrafficDistribution } from 'actions/variationActions.js';
+import {
+	deleteVariation,
+	copyVariation,
+	editVariationName,
+	editTrafficDistribution
+} from 'actions/variationActions.js';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 
-const variationOtions = (props) => {
-    const { onDeleteVariation, onCopyVariation, onEditVariationName, variation, channelId, onEditTrafficDistribution } = props;
-    
-    function copyVariationConfirmation(fn, variationId, channelId) {
-        let confirm = window.confirm("Are you sure you want to copy this variation?");
-        confirm ? fn(variationId, channelId) : null;
-    }
+const variationOtions = props => {
+	const {
+		onDeleteVariation,
+		onCopyVariation,
+		onEditVariationName,
+		variation,
+		channelId,
+		onEditTrafficDistribution
+	} = props;
+
+	function copyVariationConfirmation(fn, variationId, channelId) {
+		let confirm = window.confirm('Are you sure you want to copy this variation?');
+		confirm ? fn(variationId, channelId) : null;
+	}
 
 	return (
 		<div>
@@ -21,7 +33,13 @@ const variationOtions = (props) => {
 					Variation Name
 				</Col>
 				<Col className="u-padding-l10px" xs={4}>
-					<InlineEdit validate value={variation.name} submitHandler={onEditVariationName.bind(null, variation.id, channelId)} text="Variation Name" errorMessage="Variation Name cannot be blank" />
+					<InlineEdit
+						validate
+						value={variation.name}
+						submitHandler={onEditVariationName.bind(null, variation.id, channelId)}
+						text="Variation Name"
+						errorMessage="Variation Name cannot be blank"
+					/>
 				</Col>
 			</Row>
 			<Row>
@@ -32,13 +50,26 @@ const variationOtions = (props) => {
 					<strong>{props.variation.sections.length}</strong>
 				</Col>
 			</Row>
-			<br /><br />
+			<br />
+			<br />
 			<Row>
 				<Col className="u-padding-r10px" xs={2}>
-					<Button className="btn-lightBg btn-copy btn-block" onClick={copyVariationConfirmation.bind(null, onCopyVariation, variation.id, channelId)} type="submit">Copy Variation</Button>
+					<Button
+						className="btn-lightBg btn-copy btn-block"
+						onClick={copyVariationConfirmation.bind(null, onCopyVariation, variation.id, channelId)}
+						type="submit"
+					>
+						Copy Variation
+					</Button>
 				</Col>
 				<Col className="u-padding-l10px" xs={2}>
-					<Button className="btn-lightBg btn-del-line btn-block" onClick={onDeleteVariation.bind(null, variation.id, channelId)} type="submit">Delete Variation</Button>
+					<Button
+						className="btn-lightBg btn-del-line btn-block"
+						onClick={onDeleteVariation.bind(null, variation.id, channelId)}
+						type="submit"
+					>
+						Delete Variation
+					</Button>
 				</Col>
 			</Row>
 		</div>
@@ -56,10 +87,14 @@ variationOtions.propTypes = {
 
 export default connect(
 	(state, ownProps) => ({ ...ownProps }),
-	(dispatch) => bindActionCreators({
-		onCopyVariation: copyVariation,
-		onDeleteVariation: deleteVariation,
-		onEditVariationName: editVariationName,
-		onEditTrafficDistribution: editTrafficDistribution
-	}, dispatch)
-	)(variationOtions);
+	dispatch =>
+		bindActionCreators(
+			{
+				onCopyVariation: copyVariation,
+				onDeleteVariation: deleteVariation,
+				onEditVariationName: editVariationName,
+				onEditTrafficDistribution: editTrafficDistribution
+			},
+			dispatch
+		)
+)(variationOtions);

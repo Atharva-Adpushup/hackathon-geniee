@@ -2,7 +2,7 @@ import $ from 'jquery';
 import Utils from './utils';
 import Event from './event';
 
-const Document = function () {
+const Document = function() {
 	this.allowMouseEvents = true;
 	this.events = 'click mouseup mouseleave mousedown mouseover';
 	this.onMouseMove = new Event();
@@ -15,15 +15,17 @@ const Document = function () {
 	this.readyHandler = Utils.bind(this.handleReady, this);
 	this.onReady.bind(this.readyHandler, this);
 };
-Document.prototype.handleReady = function () {
-	$('html').off(this.events).on(this.events, this.eventHandler);
+Document.prototype.handleReady = function() {
+	$('html')
+		.off(this.events)
+		.on(this.events, this.eventHandler);
 };
 
-Document.prototype.changeEditorMode = function (mode) {
+Document.prototype.changeEditorMode = function(mode) {
 	this.allowMouseEvents = mode;
 };
 
-Document.prototype.highlightElement = function ($el) {
+Document.prototype.highlightElement = function($el) {
 	/* setInterval(function(){blink()}, 1000);
 	var actualColor = $el.css("background-color");
 	$el.css({"background-color":"black"})
@@ -32,10 +34,8 @@ Document.prototype.highlightElement = function ($el) {
 	}*/
 };
 
-
-Document.prototype.scrollElementToScreen = function (el) {
-	if (!el || !el.length)
-		return false;
+Document.prototype.scrollElementToScreen = function(el) {
+	if (!el || !el.length) return false;
 
 	let elOffset = el.offset().top,
 		elHeight = el.height(),
@@ -43,19 +43,20 @@ Document.prototype.scrollElementToScreen = function (el) {
 		offset;
 
 	if (elHeight < windowHeight) {
-		offset = elOffset - ((windowHeight / 2) - (elHeight / 2));
-	}
-	else {
+		offset = elOffset - (windowHeight / 2 - elHeight / 2);
+	} else {
 		offset = elOffset;
 	}
 	$(window).scrollTop(offset);
 	this.highlightElement(el);
 };
 
-Document.prototype.handleEvent = function (e) {
+Document.prototype.handleEvent = function(e) {
 	// isScriptedEvent, a variable that checks whether e was triggered by a script or not
-	const isScriptedEvent = (typeof e.originalEvent === 'undefined') || (e.originalEvent.hasOwnProperty('isTrusted')
-		&& !e.originalEvent.isTrusted) || (e.originalEvent.screenX === 0 && e.originalEvent.screenY === 0),
+	const isScriptedEvent =
+			typeof e.originalEvent === 'undefined' ||
+			(e.originalEvent.hasOwnProperty('isTrusted') && !e.originalEvent.isTrusted) ||
+			(e.originalEvent.screenX === 0 && e.originalEvent.screenY === 0),
 		isMouseEventsAllowed = this.allowMouseEvents,
 		$target = $(e.target);
 

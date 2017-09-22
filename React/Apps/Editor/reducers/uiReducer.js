@@ -1,7 +1,18 @@
 import { combineReducers } from 'redux';
 import { manipulateElement } from 'scripts/domManager';
-import { editMenuActions, insertMenuActions, sectionActions, siteModesPopoverActions, variationActions,
-	adActions, newChannelMenuActions, channelActions, channelMenuActions, messengerCommands, uiActions } from '../consts/commonConsts';
+import {
+	editMenuActions,
+	insertMenuActions,
+	sectionActions,
+	siteModesPopoverActions,
+	variationActions,
+	adActions,
+	newChannelMenuActions,
+	channelActions,
+	channelMenuActions,
+	messengerCommands,
+	uiActions
+} from '../consts/commonConsts';
 
 const errorsConfig = {},
 	insertMenu = (state = { isVisible: false }, action) => {
@@ -28,7 +39,13 @@ const errorsConfig = {},
 	editMenu = (state = { isVisible: false }, action) => {
 		switch (action.type) {
 			case editMenuActions.SHOW_EDIT_MENU:
-				return { isVisible: true, sectionId: action.sectionId, variationId: action.variationId, adId: action.adId, position: action.position };
+				return {
+					isVisible: true,
+					sectionId: action.sectionId,
+					variationId: action.variationId,
+					adId: action.adId,
+					position: action.position
+				};
 
 			case editMenuActions.HIDE_EDIT_MENU:
 			case adActions.DELETE_AD:
@@ -72,15 +89,19 @@ const errorsConfig = {},
 				return state;
 		}
 	},
-	errors = (state = {
-		xpath: { error: false }
-	}, action) => {
+	errors = (
+		state = {
+			xpath: { error: false }
+		},
+		action
+	) => {
 		switch (action.type) {
 			case messengerCommands.XPATH_VALIDATED:
 				if (action.isValidXPath) {
-					return { xpath: {
-						error: false
-					}
+					return {
+						xpath: {
+							error: false
+						}
 					};
 				}
 				return { xpath: { error: true, message: 'Please enter a valid xpath' } };
@@ -95,7 +116,7 @@ const errorsConfig = {},
 	},
 	afterSaveLoader = (state = { status: 0 }, action) => {
 		switch (action.type) {
-			case uiActions.UPDATE_AFTER_SAVE_STATUS :
+			case uiActions.UPDATE_AFTER_SAVE_STATUS:
 				return { status: action.status };
 
 			default:
@@ -116,23 +137,29 @@ const errorsConfig = {},
 			default:
 				return state;
 		}
-    },
-    variationPanelExpansion = (state = { expanded: false }, action) => {
-        switch(action.type) {
-            case variationActions.EXPAND_VARIATION_PANEL:
-                manipulateElement(action.panelCssSelector, "expand", action.params);
-                return { expanded: true };
+	},
+	variationPanelExpansion = (state = { expanded: false }, action) => {
+		switch (action.type) {
+			case variationActions.EXPAND_VARIATION_PANEL:
+				manipulateElement(action.panelCssSelector, 'expand', action.params);
+				return { expanded: true };
 
-            case variationActions.SHRINK_VARIATION_PANEL:
-                manipulateElement(action.panelCssSelector, "shrink", action.params);
-                return { expanded: false };
+			case variationActions.SHRINK_VARIATION_PANEL:
+				manipulateElement(action.panelCssSelector, 'shrink', action.params);
+				return { expanded: false };
 
-            default:
-                return state;
-        }
-    }    
+			default:
+				return state;
+		}
+	};
 
 export default combineReducers({
-	insertMenu, editMenu, newChannelMenu, siteModesPopover, channelMenu, errors, afterSaveLoader, variationPanelExpansion
+	insertMenu,
+	editMenu,
+	newChannelMenu,
+	siteModesPopover,
+	channelMenu,
+	errors,
+	afterSaveLoader,
+	variationPanelExpansion
 });
-

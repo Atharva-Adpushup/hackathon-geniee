@@ -5,7 +5,7 @@ const path = require('path'),
 module.exports = [
 	{
 		entry: {
-			outer: path.join(__dirname, './Apps/Editor/outer.js'),
+			outer: path.join(__dirname, './Apps/Editor/outer.js')
 		},
 		output: {
 			path: path.join(__dirname, buildPath),
@@ -20,7 +20,7 @@ module.exports = [
 		resolve: {
 			alias: {
 				react: path.resolve('./node_modules/react'),
-				React: path.resolve('./node_modules/react'),
+				React: path.resolve('./node_modules/react')
 			},
 			// root: path.resolve('./Editor'),
 			modules: ['./Apps/Editor', './components/', './components/outer', './components/shared', 'node_modules'],
@@ -43,8 +43,8 @@ module.exports = [
 					}
 				},
 				{
-					test: /\.css$/, 
-					loaders: ['style-loader', 'css-loader'] 
+					test: /\.css$/,
+					loaders: ['style-loader', 'css-loader']
 				},
 				{
 					test: /\.scss$/,
@@ -55,7 +55,7 @@ module.exports = [
 	},
 	{
 		entry: {
-			inner: path.join(__dirname, './Apps/Editor/inner.js'),
+			inner: path.join(__dirname, './Apps/Editor/inner.js')
 		},
 		output: {
 			path: path.join(__dirname, buildPath),
@@ -70,7 +70,7 @@ module.exports = [
 		resolve: {
 			alias: {
 				react: path.resolve('./node_modules/react'),
-				React: path.resolve('./node_modules/react'),
+				React: path.resolve('./node_modules/react')
 			},
 			// root: path.resolve('./Editor'),
 			modules: ['./Apps/Editor', './components/', './components/outer', './components/shared', 'node_modules'],
@@ -87,9 +87,9 @@ module.exports = [
 						presets: ['es2015', 'react', 'stage-2']
 					}
 				},
-				{ 
-					test: /\.css$/, 
-					loaders: ['style-loader', 'css-loader'] 
+				{
+					test: /\.css$/,
+					loaders: ['style-loader', 'css-loader']
 				},
 				{
 					test: /\.scss$/,
@@ -100,7 +100,7 @@ module.exports = [
 	},
 	{
 		entry: {
-			inner: path.join(__dirname, './Apps/OpsPanel/index.js'),
+			inner: path.join(__dirname, './Apps/OpsPanel/index.js')
 		},
 		output: {
 			path: path.join(__dirname, buildPath),
@@ -119,9 +119,9 @@ module.exports = [
 					}
 				},
 				{
-	 				test: /\.scss$/,
-	 				loaders: ['style-loader', 'css-loader', 'sass-loader']
-	 			}
+					test: /\.scss$/,
+					loaders: ['style-loader', 'css-loader', 'sass-loader']
+				}
 			]
 		}
 	}

@@ -11,25 +11,29 @@ import BeforeAfterJsPanel from './beforeAfterJsPanel';
 class VariationPanel extends React.Component {
 	render() {
 		const { variation, channelId, sections, ui } = this.props;
-        return (
-            <div className="variation-settings">
-                <VariationBar panelCssSelector=".variation-settings" expanded={ui.variationPanelExpansion.expanded}/>
-                <TabPanel tabPosition="left">
-                    <div tabTitle="Info">
-                        <VariationOptions channelId={channelId} variation={variation} />
-                    </div>
-                    <div tabTitle="Sections">
-                        <VariationSections variation={variation} sections={sections} ui={ui} />
-                    </div>
-                    <div tabTitle="Add Incontent Variation">
-                        <IncontentAdder activeChannel={this.props.activeChannel} channelId={channelId} variation={variation} />
-                    </div>
-                    <div tabTitle="Before/After JS">
-                        <BeforeAfterJsPanel channelId={channelId} variation={variation} ui={ui} />
-                    </div>
-                </TabPanel>
-            </div>
-        );
+		return (
+			<div className="variation-settings">
+				<VariationBar panelCssSelector=".variation-settings" expanded={ui.variationPanelExpansion.expanded} />
+				<TabPanel tabPosition="left">
+					<div tabTitle="Info">
+						<VariationOptions channelId={channelId} variation={variation} />
+					</div>
+					<div tabTitle="Sections">
+						<VariationSections variation={variation} sections={sections} ui={ui} />
+					</div>
+					<div tabTitle="Add Incontent Variation">
+						<IncontentAdder
+							activeChannel={this.props.activeChannel}
+							channelId={channelId}
+							variation={variation}
+						/>
+					</div>
+					<div tabTitle="Before/After JS">
+						<BeforeAfterJsPanel channelId={channelId} variation={variation} ui={ui} />
+					</div>
+				</TabPanel>
+			</div>
+		);
 	}
 }
 

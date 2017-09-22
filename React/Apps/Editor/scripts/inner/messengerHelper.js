@@ -2,14 +2,18 @@ import Messenger from 'libs/messenger';
 import $ from 'jquery';
 import { messengerCommands } from 'consts/commonConsts';
 import Utils from 'libs/utils';
-import { updateLayout, highlightElement, setElementSelectorCords, hideElementSelector } from '../../actions/inner/actions';
+import {
+	updateLayout,
+	highlightElement,
+	setElementSelectorCords,
+	hideElementSelector
+} from '../../actions/inner/actions';
 import { getAdpVitals, getAllXPaths, isValidXPath, scrollToView } from './domManager';
 
 const messenger = new Messenger(),
 	sendMessage = (cmd, data) => {
 		switch (cmd) {
 			case 'Hello':
-
 				break;
 
 			default:
@@ -32,7 +36,7 @@ const messenger = new Messenger(),
 				case messengerCommands.HIDE_ELEMENT_SELECTOR:
 					dispatch(hideElementSelector());
 					break;
-				
+
 				case messengerCommands.GET_RELEVANT_XPATHS:
 					sendMessage(messengerCommands.SET_RELEVANT_XPATHS, {
 						allXpaths: getAllXPaths(data.xpath),
@@ -54,12 +58,12 @@ const messenger = new Messenger(),
 						isValidXPath: isValidXPath(data.xpath),
 						sectionId: data.sectionId
 					});
-                    break;
-                    
-                case messengerCommands.SCROLL_TO_VIEW:
-                    scrollToView(data.adId);
-                    // dispatch();
-                    break;
+					break;
+
+				case messengerCommands.SCROLL_TO_VIEW:
+					scrollToView(data.adId);
+					// dispatch();
+					break;
 
 				case messengerCommands.SELECT_ELEMENT:
 					const $el = $(data.xpath),

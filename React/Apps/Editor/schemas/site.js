@@ -15,7 +15,7 @@ channelSchema.define({
 // after normalization
 variationSchema.define({
 	sections: valuesOf(sectionSchema)
-})
+});
 
 //TODO: Find a way to change 'ads' type from {} to []
 // after normalization

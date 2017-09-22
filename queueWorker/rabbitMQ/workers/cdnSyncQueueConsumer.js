@@ -52,8 +52,7 @@ function validateMessageData(originalMessage) {
 }
 
 function syncCDNWrapper(decodedMessage) {
-	return siteModel.getSiteById(decodedMessage.siteId)
-	.then(site => syncCDNService(site));
+	return siteModel.getSiteById(decodedMessage.siteId).then(site => syncCDNService(site));
 }
 
 function errorHandler(error, originalMessage) {
@@ -73,7 +72,7 @@ function errorHandler(error, originalMessage) {
 		decodedMessage = JSON.parse(decodedMessage);
 		customErrorMessage = customErrorMessage == undefined ? 'Unsynced ad units must be present' : customErrorMessage;
 		logger({
-			source: "CDN SYNC ERROR LOGS",
+			source: 'CDN SYNC ERROR LOGS',
 			message: `Error while CDN SYNC and error messgae : ${customErrorMessage}`,
 			debugData: `Site id : ${decodedMessage.siteId}`
 		});
@@ -87,33 +86,33 @@ function errorHandler(error, originalMessage) {
 
 function doProcessingAndAck(originalMessage) {
 	return validateMessageData(originalMessage)
-	.then(syncCDNWrapper)
-	.then(() => {
-		counter = 0;
-		consumer.acknowledge(originalMessage);
-		return 0;
-	})
-	.catch(error => errorHandler(error, originalMessage));
+		.then(syncCDNWrapper)
+		.then(() => {
+			counter = 0;
+			consumer.acknowledge(originalMessage);
+			return 0;
+		})
+		.catch(error => errorHandler(error, originalMessage));
 }
 
 function consumeRabbitMQMessage() {
 	return consumer
-	.getMessage(QUEUE)
-	.then(doProcessingAndAck)
-	.then((timer = 0) => setTimeout(consumeRabbitMQMessage, timer));
+		.getMessage(QUEUE)
+		.then(doProcessingAndAck)
+		.then((timer = 0) => setTimeout(consumeRabbitMQMessage, timer));
 }
 
 function init() {
 	return consumer
-	.makeConnection()
-	.then(consumeRabbitMQMessage)
-	.catch(error => {
-		let message = error.message || "CDN SYNC FAILED";
-		console.log(message);
-		setTimeout(() => {
-			init();
-		}, 5000);
-	});
+		.makeConnection()
+		.then(consumeRabbitMQMessage)
+		.catch(error => {
+			let message = error.message || 'CDN SYNC FAILED';
+			console.log(message);
+			setTimeout(() => {
+				init();
+			}, 5000);
+		});
 }
 
 init();

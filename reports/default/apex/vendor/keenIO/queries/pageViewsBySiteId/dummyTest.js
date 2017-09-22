@@ -7,8 +7,9 @@ const dataConfig = {
 };
 console.log(`SiteId: ${dataConfig.siteId}`);
 
-pageViewsModule.getPageViews(dataConfig)
+pageViewsModule
+	.getPageViews(dataConfig)
 	.then(console.log)
-	.catch((err) => {
+	.catch(err => {
 		console.log(err);
 	});

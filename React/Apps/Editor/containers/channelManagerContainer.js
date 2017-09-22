@@ -7,23 +7,23 @@ import { getAllChannels, getOpenChannels, getActiveChannelId } from '../selector
 import { getMode } from '../selectors/siteSelectors';
 
 const noop = () => ({ type: 'Test' }),
-	mapStateToProps = (state) => ({
+	mapStateToProps = state => ({
 		channels: getAllChannels(state),
 		openChannels: getOpenChannels(state),
 		activeChannelId: getActiveChannelId(state),
 		siteMode: getMode(state)
 	}),
-	mapDispatchToProps = (dispatch) => ({
+	mapDispatchToProps = dispatch => ({
 		toggleEditorMode: () => {
 			dispatch(noop(arguments));
 		},
-		showPublisherHelper: (position) => {
+		showPublisherHelper: position => {
 			dispatch(showSiteModesPopover(position));
 		},
-		showNewChannelMenu: (position) => {
+		showNewChannelMenu: position => {
 			dispatch(showNewChannelMenu(position));
 		},
-		showChannelMenu: (position) => {
+		showChannelMenu: position => {
 			dispatch(showChannelMenu(position));
 		},
 		masterSave: () => {
@@ -32,14 +32,10 @@ const noop = () => ({ type: 'Test' }),
 		showOptionsMenu: () => {
 			dispatch(noop(arguments));
 		},
-		setActiveChannel: (channelId) => {
+		setActiveChannel: channelId => {
 			dispatch(channelActions.setActiveChannel(channelId));
 		}
 	}),
-
-	ChannelManagerContainer = connect(
-		mapStateToProps,
-		mapDispatchToProps
-	)(ChannelManager);
+	ChannelManagerContainer = connect(mapStateToProps, mapDispatchToProps)(ChannelManager);
 
 export default ChannelManagerContainer;

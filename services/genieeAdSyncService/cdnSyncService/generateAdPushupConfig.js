@@ -143,7 +143,7 @@ const _ = require('lodash'),
 				finalJson[platform][pageGroup].variations.push(variationPayload);
 			}
 		});
-		if (!(Object.keys(finalJson[platform][pageGroup].variations).length)) {
+		if (!Object.keys(finalJson[platform][pageGroup].variations).length) {
 			delete finalJson[platform][pageGroup];
 		} else {
 			finalJson[platform][pageGroup].variations.sort(function(a, b) {
@@ -160,7 +160,13 @@ const _ = require('lodash'),
 
 		return site
 			.getAllChannels()
-			.then(channels => promiseForeach(channels, channel => getChannelPayload(channel, pageGroupData, pageGroupPattern), err => false))
+			.then(channels =>
+				promiseForeach(
+					channels,
+					channel => getChannelPayload(channel, pageGroupData, pageGroupPattern),
+					err => false
+				)
+			)
 			.then(() => [finalJson, ADPTags]);
 	};
 

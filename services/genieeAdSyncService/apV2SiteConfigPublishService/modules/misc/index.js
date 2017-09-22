@@ -1,7 +1,8 @@
 module.exports = {
-	isRequirePostScribe: function (ads) {
+	isRequirePostScribe: function(ads) {
 		var isRequired = false,
-			iterator, adsLength;
+			iterator,
+			adsLength;
 
 		for (iterator = 0, adsLength = ads.length; iterator < adsLength; iterator++) {
 			if (!ads[iterator].syncStatus || !ads[iterator].adslot) {
@@ -12,9 +13,13 @@ module.exports = {
 
 		return isRequired;
 	},
-	getSetupMap: function (channels) {
+	getSetupMap: function(channels) {
 		var setupMap = {},
-			iterator, channelsLength, channelArray, platform, pageGroup;
+			iterator,
+			channelsLength,
+			channelArray,
+			platform,
+			pageGroup;
 
 		for (iterator = 0, channelsLength = channels.length; iterator < channelsLength; iterator++) {
 			channelArray = channels[iterator].split(':');

@@ -15,7 +15,7 @@ class info extends React.Component {
 		this.state = {
 			manageSampleUrl: false,
 			hostNameValid: true,
-			forceSampleUrl: (this.props.channel.forceSampleUrl) ? this.props.channel.forceSampleUrl : false,
+			forceSampleUrl: this.props.channel.forceSampleUrl ? this.props.channel.forceSampleUrl : false,
 			sampleUrl: this.props.channel.sampleUrl,
 			isSampleUrlChanged: false
 		};
@@ -28,8 +28,10 @@ class info extends React.Component {
 	onChange(sampleUrl) {
 		if (!this.state.forceSampleUrl) {
 			const isValidUrl = utils.ValidUrl(sampleUrl.trim()),
-				isHostNameEqual = isValidUrl ? (utils.parseUrl(sampleUrl).hostname == utils.parseUrl(window.ADP_SITE_DOMAIN).hostname) : false;
-			
+				isHostNameEqual = isValidUrl
+					? utils.parseUrl(sampleUrl).hostname == utils.parseUrl(window.ADP_SITE_DOMAIN).hostname
+					: false;
+
 			return isHostNameEqual;
 		} else {
 			return true;
@@ -37,12 +39,10 @@ class info extends React.Component {
 	}
 
 	getClass(name) {
-		let icon = "desktop";
+		let icon = 'desktop';
 
-		if (name === "MOBILE")
-			icon = "mobile";
-		else if (name === "TABLET")
-			icon = "tablet";
+		if (name === 'MOBILE') icon = 'mobile';
+		else if (name === 'TABLET') icon = 'tablet';
 
 		return icon;
 	}
@@ -55,14 +55,16 @@ class info extends React.Component {
 					<Col xs={6}>
 						<label>Page Group</label>
 					</Col>
-					<Col xs={6} className="wrapfeature">{channel.pageGroup}</Col>
+					<Col xs={6} className="wrapfeature">
+						{channel.pageGroup}
+					</Col>
 				</Row>
 				<Row>
 					<Col xs={6}>
 						<label>Platform</label>
 					</Col>
 					<Col xs={6}>
-						<i className={"fa fa-" + this.getClass(channel.platform)}></i>
+						<i className={'fa fa-' + this.getClass(channel.platform)} />
 					</Col>
 				</Row>
 				<Row>
@@ -70,7 +72,15 @@ class info extends React.Component {
 						<label>Content Selector</label>
 					</Col>
 					<Col xs={12} className="wrapfeature">
-						<InlineEdit compact validate font={400} value={channel.contentSelector} submitHandler={onContentSelectorChange.bind(null, channel.id)} text="Content Selector" errorMessage="Content Selector cannot be blank" />
+						<InlineEdit
+							compact
+							validate
+							font={400}
+							value={channel.contentSelector}
+							submitHandler={onContentSelectorChange.bind(null, channel.id)}
+							text="Content Selector"
+							errorMessage="Content Selector cannot be blank"
+						/>
 					</Col>
 				</Row>
 				<Row>
@@ -78,12 +88,34 @@ class info extends React.Component {
 						<label>Sample Url</label>
 					</Col>
 					<Col xs={12} className="wrapfeature">
-						<InlineEdit compact validate font={400} changeHandler={this.onChange.bind(this)} validationError="Sample Url must be from your website only" value={channel.sampleUrl} submitHandler={onSampleUrlChange.bind(null, channel.id)} text="Sample Url" errorMessage="Sample Url cannot be blank" />
+						<InlineEdit
+							compact
+							validate
+							font={400}
+							changeHandler={this.onChange.bind(this)}
+							validationError="Sample Url must be from your website only"
+							value={channel.sampleUrl}
+							submitHandler={onSampleUrlChange.bind(null, channel.id)}
+							text="Sample Url"
+							errorMessage="Sample Url cannot be blank"
+						/>
 					</Col>
 				</Row>
 				<Row>
 					<Col xs={12}>
-						<CustomToggleSwitch labelText="Force sample url" className="mB-0" defaultLayout checked={this.state.forceSampleUrl} name="forceSampleUrl" onChange={a => this.toggleStateValues('forceSampleUrl', a)} layout="horizontal" size="m" id="js-force-sample-url" on="On" off="Off" />
+						<CustomToggleSwitch
+							labelText="Force sample url"
+							className="mB-0"
+							defaultLayout
+							checked={this.state.forceSampleUrl}
+							name="forceSampleUrl"
+							onChange={a => this.toggleStateValues('forceSampleUrl', a)}
+							layout="horizontal"
+							size="m"
+							id="js-force-sample-url"
+							on="On"
+							off="Off"
+						/>
 					</Col>
 				</Row>
 			</div>
