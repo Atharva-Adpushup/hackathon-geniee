@@ -2,27 +2,30 @@ var couchbase = require('../../helpers/couchBaseService'),
 	// eslint-disable-next-line no-unused-vars
 	ViewQuery = require('couchbase-promises').ViewQuery,
 	// eslint-disable-next-line no-unused-vars
-	Promise = require('bluebird'), API;
+	Promise = require('bluebird'),
+	API;
 
 function pullDoc(bucketName, key) {
 	console.log('pulling doc from bucket : ' + bucketName + ' for docId : ' + key);
 
-	return couchbase.connectToBucket(bucketName)
+	return couchbase
+		.connectToBucket(bucketName)
 		.then(function(bucket) {
 			return bucket.getAsync(key, {});
 		})
 		.then(function(d) {
-			return { 'response_type': 'good', 'msg': d.value };
+			return { response_type: 'good', msg: d.value };
 		});
 }
 function pushDoc(bucketName, key, val) {
 	if (val !== null) {
-		return couchbase.connectToBucket(bucketName)
+		return couchbase
+			.connectToBucket(bucketName)
 			.then(function(bucket) {
 				return bucket.upsertAsync(key, val, {});
 			})
 			.then(function(d) {
-				return { 'response_type': 'good', 'msg': JSON.stringify(d) };
+				return { response_type: 'good', msg: JSON.stringify(d) };
 			});
 	}
 	throw Error("doc value can't be null");

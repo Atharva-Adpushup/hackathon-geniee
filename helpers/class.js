@@ -25,9 +25,7 @@ module.exports = (function() {
 		// Recursivly execute parent methods.
 		if (method.parent instanceof Function) {
 			initialize.apply(this, [method.parent]);
-			this.super = cloneCopy(this,
-				superCopy(this, this.constructor)
-			);
+			this.super = cloneCopy(this, superCopy(this, this.constructor));
 		}
 		method.apply(this, arguments);
 	}
@@ -50,7 +48,8 @@ module.exports = (function() {
 	function superCopy(scope, method) {
 		var scopeSuper = scope.super;
 		method.super = function() {
-			var oldScope = scope.super, methodReturn;
+			var oldScope = scope.super,
+				methodReturn;
 			scope.super = scopeSuper;
 			methodReturn = method.apply(scope, arguments);
 			scope.super = oldScope;
@@ -60,7 +59,7 @@ module.exports = (function() {
 	}
 
 	// Create Class object
-	var Class = function() { };
+	var Class = function() {};
 	Class.extend = function ext(to) {
 		function child() {
 			// Prevent the prototype scope set executing the constructor.
@@ -96,7 +95,7 @@ module.exports = (function() {
 	};
 	// Bootstrap Class by inheriting itself with empty constructor.
 	Class = Class.extend(function() {
-		this.constructor = function() { };
+		this.constructor = function() {};
 	});
 
 	return Class;

@@ -39,3 +39,6 @@ public/assets/js/builds/geniee/
 TODO
 package-lock.json
 pipedriveTest.js
+services/adpTags/hbScript/build
+services/adpTags/Prebid.js
+Prebid.js

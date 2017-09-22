@@ -4,25 +4,26 @@ const apexSingleChannelVariationModule = require('../../../modules/mssql/singleC
 	Promise = require('bluebird'),
 	moment = require('moment'),
 	paramConfig = {
-		'siteId': 25019,
-		'siteDomain': 'http://koredakedeok.blog.jp/',
-		'reportType': 'geniee',
-		'platform': 'DESKTOP',
-		'pageGroup': 'HOME',
-		'startDate': moment(1501659059660, 'x').format('YYYY-MM-DD'),
-		'endDate': moment(1502263859660, 'x').format('YYYY-MM-DD'),
-		'step': '1d',
-		'_': '1502263858621',
-		'variationCount': 3,
-		'mode': 1
+		siteId: 25019,
+		siteDomain: 'http://koredakedeok.blog.jp/',
+		reportType: 'geniee',
+		platform: 'DESKTOP',
+		pageGroup: 'HOME',
+		startDate: moment(1501659059660, 'x').format('YYYY-MM-DD'),
+		endDate: moment(1502263859660, 'x').format('YYYY-MM-DD'),
+		step: '1d',
+		_: '1502263858621',
+		variationCount: 3,
+		mode: 1
 	};
 
 function testApexModule() {
-	return apexSingleChannelVariationModule.getData(paramConfig)
+	return apexSingleChannelVariationModule
+		.getData(paramConfig)
 		.then(result => {
 			console.log(`testApexModule: Result is: ${JSON.stringify(result)}`);
 		})
-		.catch((err) => {
+		.catch(err => {
 			console.log(`testApexModule: Error occurred ${err.toString()}`);
 		});
 }
@@ -37,23 +38,22 @@ function getVariationsDataWithDummyReportData() {
 		.then(result => {
 			console.log(`getVariationsDataWithDummyReportData: Result is: ${JSON.stringify(result)}`);
 		})
-		.catch((err) => {
+		.catch(err => {
 			console.log(`getVariationsDataWithDummyReportData: Error occurred ${err.toString()}`);
 		});
 }
 
 function queryHelper() {
-	return singleChannelVariationQueryHelper.getData(paramConfig)
+	return singleChannelVariationQueryHelper
+		.getData(paramConfig)
 		.then(result => {
 			console.log(`queryHelper: Result is: ${JSON.stringify(result)}`);
 		})
-		.catch((err) => {
+		.catch(err => {
 			console.log(`queryHelper: Error occurred ${err.toString()}`);
 		});
 }
 
-
 // setTimeout(testApexModule, 3000);
 // setTimeout(queryHelper, 3000);
 setTimeout(getVariationsDataWithDummyReportData, 3000);
-

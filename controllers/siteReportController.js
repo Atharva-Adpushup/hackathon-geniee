@@ -8,12 +8,15 @@ var express = require('express'),
 
 router
 	.get('/controlVsAdPushup/', function(req, res) {
-		userModel.getUserByEmail(req.query.email).then(function(user) {
-			user.merge({ test: 'hi' });
-			res.json(user);
-		}).catch(function(err) {
-			res.send(err.toString());
-		});
+		userModel
+			.getUserByEmail(req.query.email)
+			.then(function(user) {
+				user.merge({ test: 'hi' });
+				res.json(user);
+			})
+			.catch(function(err) {
+				res.send(err.toString());
+			});
 		/* site.test(req.query.id).then(function (doc) {
 		res.json(doc);
 		}).catch(function (err) {

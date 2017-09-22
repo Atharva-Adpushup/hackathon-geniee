@@ -15,13 +15,16 @@ function getAllSiteModels(results) {
 
 module.exports = {
 	init: function() {
-		const performQuery = couchBaseService.queryViewFromAppBucket(liveSitesByNonEmptyChannelsQuery).then(getAllSiteModels);
+		const performQuery = couchBaseService
+			.queryViewFromAppBucket(liveSitesByNonEmptyChannelsQuery)
+			.then(getAllSiteModels);
 
-		return Promise.all(performQuery).then((siteModels) => {
-			return siteModels;
-		})
-		.catch(function(e) {
-			throw e;
-		});
+		return Promise.all(performQuery)
+			.then(siteModels => {
+				return siteModels;
+			})
+			.catch(function(e) {
+				throw e;
+			});
 	}
 };

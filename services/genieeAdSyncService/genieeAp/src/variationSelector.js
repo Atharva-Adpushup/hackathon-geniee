@@ -5,17 +5,25 @@ var utils = require('../libs/utils'),
 
 module.exports = function(config) {
 	var experiment = config.experiment,
-		isAutoOptimise = !!(config.autoOptimise),
-		allVariations, chosenVariation, forcedVariation, forcedVariationId;
+		isAutoOptimise = !!config.autoOptimise,
+		allVariations,
+		chosenVariation,
+		forcedVariation,
+		forcedVariationId;
 
 	// if no experimnet setup for given platform and pagegroup
-	if (!experiment || !experiment[config.platform] || !experiment[config.platform][config.pageGroup] || !experiment[config.platform][config.pageGroup].variations) {
+	if (
+		!experiment ||
+		!experiment[config.platform] ||
+		!experiment[config.platform][config.pageGroup] ||
+		!experiment[config.platform][config.pageGroup].variations
+	) {
 		return false;
 	}
 
 	allVariations = experiment[config.platform][config.pageGroup].variations;
 	forcedVariationId = utils.queryParams[config.forceVariation];
-	forcedVariation = (forcedVariationId) ? utils.getObjectByName(allVariations, forcedVariationId) : false;
+	forcedVariation = forcedVariationId ? utils.getObjectByName(allVariations, forcedVariationId) : false;
 
 	// Force a variation using 'forceVariation' query param implementation
 	if (forcedVariationId && forcedVariation) {
@@ -25,9 +33,9 @@ module.exports = function(config) {
 			config.contentSelector = experiment[config.platform][config.pageGroup].contentSelector;
 		}
 
-		return (chosenVariation && chosenVariation.ads && chosenVariation.ads.length ? chosenVariation : false);
+		return chosenVariation && chosenVariation.ads && chosenVariation.ads.length ? chosenVariation : false;
 	} else if (forcedVariationId && !allVariations[forcedVariationId]) {
-		alert('Variation you are trying to force doesn\'t exist, system will now choose variation automatically');
+		alert("Variation you are trying to force doesn't exist, system will now choose variation automatically");
 	}
 
 	try {
