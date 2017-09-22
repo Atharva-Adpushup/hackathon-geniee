@@ -2,17 +2,13 @@ extends  layout/base
 
 block getTitle
     - var titleVar = "Tools"
+
+block bodyContent
+    - isViewMode = isViewMode || false;
+    - siteId = siteId || '';
     - var timestamp = +new Date();
     - var scriptLocation = '/assets/js/libs/custom/tools.js?v=' + timestamp;
 
-block append headScripts
-    script.
-        $(document).ready(function() {});
-    +loadAsset("js", [
-        scriptLocation,
-    ])
-
-block bodyContent
     .pageContainer.page-container
         include layout/header
         // Page Content Starts Here
@@ -23,9 +19,11 @@ block bodyContent
                 #widgetsArea.row
                     .mb-30
                         .controlAdpushupWrap
-                            h3.title.m-All-0.clearfix 
+                            h3.title.m-All-0.clearfix
                                 a Operation Tools
 
+                            input.js-input-hidden-viewMode(type="hidden", value=isViewMode)
+                            input.js-input-hidden-siteId(type="hidden", value=siteId)
                             form#saveSiteSettings.settings-pane
                                 .row
                                     .col-sm-12
@@ -34,9 +32,9 @@ block bodyContent
                                                 input#user-siteId.form-control.js-user-siteId(name="user-siteId" type="number" min="1" max="100000" placeholder="Enter site id here like 13527, 21865, 25054")
                                             .col-sm-6
 
-                                        .row(style="margin-bottom: 30px")
+                                        .row.js-adcode-wrapper-row(style="margin-bottom: 30px")
                                             .col-sm-12
-                                                h4 Adcode Conversion
+                                                h4 Add JavaScript wrapper to your ad code
                                             .col-sm-12
                                                 div.snippet-wrapper.code-convert-wrapper.js-snippet-wrapper
                                                     span.clipboard-copy.js-clipboard-copy Copied !
@@ -48,14 +46,12 @@ block bodyContent
                                                             button.js-clipboard-copy-btn.snippet-btn.apbtn-main-line#clipboard-copy-adcode(style="width: 270px;") Copy to clipboard
                                         .row
                                             .col-sm-12
-                                                h4 Init Code generation
+                                                h4 Generate init code
                                             .col-sm-12
                                                 .row
                                                     .col-sm-3
                                                         button#init-code-btn.btn-primary.js-init-code-btn(type="button") Generate Init Code
                                                     .col-sm-9
-                                                .row
-                                                    div#init-code-error.error-message.js-init-code-error(style="margin: 5px 15px 20px;")
                                                 .row
                                                     .col-sm-9
                                                         div.u-margin-b10px.js-header-code-wrapper.hide(class="well")
@@ -73,3 +69,8 @@ block bodyContent
                                                                             i.fa.fa-clipboard
                                                     .col-sm-3
 
+    script.
+        $(document).ready(function() {});
+    +loadAsset("js", [
+        scriptLocation,
+    ])

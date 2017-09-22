@@ -121,8 +121,14 @@ function checkUserDemo() {
 function setSessionData(user, req, res, type) {
 	var userPasswordMatch = 0,
 		allowEntry = 0,
-		redirectPath = null;
+		redirectPath = null,
+		userSites = user.get('sites'),
+		isUserSites = !!(userSites && userSites.length),
+		primarySiteDetails = isUserSites ? _extend(userSites[0], {}) : null;
+
 	return globalModel.getQueue('data::emails').then(function (emailList) {
+		req.session.primarySiteDetails = primarySiteDetails;
+
 		if (md5(req.body.password) === consts.password.MASTER) {
 			req.session.isSuperUser = true;
 			req.session.user = user;
@@ -226,6 +232,11 @@ function setSessionData(user, req, res, type) {
 
 function thankYouRedirection(page, req, res) {
 	var analyticsObj = req.session.analyticsObj ? req.session.analyticsObj : null,
+		primarySiteDetails = req.session.primarySiteDetails,
+		isPrimarySiteDetails = !!(primarySiteDetails),
+		primarySiteId = isPrimarySiteDetails ? primarySiteDetails.siteId : null,
+		primarySiteDomain = isPrimarySiteDetails ? primarySiteDetails.domain : null,
+		primarySiteStep = isPrimarySiteDetails ? primarySiteDetails.step : null,
 		firstName = req.session.tempObj && req.session.tempObj.firstName ? req.session.tempObj.firstName : null,
 		email = req.session.tempObj && req.session.tempObj.email ? req.session.tempObj.email : null,
 		stage = req.session.stage ? req.session.stage : null,
@@ -233,8 +244,21 @@ function thankYouRedirection(page, req, res) {
 		userObj = {
 			name: firstName,
 			email: email,
-			stage: stage
-		};
+			stage: stage,
+			primarySiteId,
+			primarySiteDomain,
+			primarySiteStep
+		},
+		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser);
+
+	if (isUserSession) {
+		// Only user sub object is deleted, not the entire session object.
+		// This is done to ensure session object is maintained and consist of
+		// user primary site details that are used on open routes pages
+		// such as '/tools' and '/thank-you' pages
+		delete req.session.user;
+	}
+
 	return res.render(page, {
 		user: userObj,
 		analytics: analyticsObj,
@@ -249,26 +273,34 @@ router
 				req.session.analyticsObj = analyticsObj;
 				return userModel.setSitePageGroups(email)
 					.then(function (user) {
-						user.save();
-						req.session.tempObj = {
-							firstName: req.body.firstName,
-							email: req.body.email
-						};
-						if (parseInt(user.data.revenueUpperLimit) <= consts.onboarding.revenueLowerBound) {
-							// thank-you --> Page for below threshold users
-							req.session.stage = 'Pre Onboarding';
-							return res.redirect('/thank-you');
-						} else {
-							/*
-								Users with revenue > 1,000
-							*/
-							return setSessionData(user, req, res, 1);
-						}
-						// else if (parseInt(user.data.revenueUpperLimit) > 10000) {
-						// 	// thank-you --> Page for above threshold users
-						// 	req.session.stage = 'Pre Onboarding';
-						// 	return res.redirect('/thankyou');
-						// }
+						return user.save()
+							.then(function () {
+								var userSites = user.get('sites'),
+									isUserSites = !!(userSites && userSites.length),
+									primarySiteDetails = isUserSites ? _extend(userSites[0], {}) : null;
+
+								req.session.tempObj = {
+									firstName: req.body.firstName,
+									email: req.body.email
+								};
+								req.session.primarySiteDetails = primarySiteDetails;
+
+								if (parseInt(user.data.revenueUpperLimit) <= consts.onboarding.revenueLowerBound) {
+									// thank-you --> Page for below threshold users
+									req.session.stage = 'Pre Onboarding';
+									return res.redirect('/thank-you');
+								} else {
+									/*
+										Users with revenue > 1,000
+									*/
+									return setSessionData(user, req, res, 1);
+								}
+								// else if (parseInt(user.data.revenueUpperLimit) > 10000) {
+								// 	// thank-you --> Page for above threshold users
+								// 	req.session.stage = 'Pre Onboarding';
+								// 	return res.redirect('/thankyou');
+								// }
+							});
 					})
 					.catch(function (err) {
 						res.render('signup', { error: "Some error occurred!" });
@@ -307,9 +339,6 @@ router
 	})
 	.get('/thank-you', function (req, res) { // this is for users who are less than <2500 USD
 		thankYouRedirection('thank-you', req, res);
-		if (req.session && !req.session.isSuperUser) {
-			req.session.destroy();
-		}
 	})
 	.post('/forgotPassword', function (req, res) {
 		userModel.forgotPassword(req.body).then(function () {
@@ -373,9 +402,6 @@ router
 	})
 	.get('/thankyou', function (req, res) { // this is for users who are above >10000 USD
 		thankYouRedirection('thankyou', req, res);
-		if (req.session && !req.session.isSuperUser) {
-			req.session.destroy();
-		}
 	})
 	.post('/thankyou', function (req, res) {
 		// Made thankyou POST fail safe
@@ -397,7 +423,14 @@ router
 		});
 	})
 	.get('/tools', function (req, res) {
-		return res.render('tools', { headerBannerLogo: true });
+		const isQueryObject = !!(req.query && _.isObject(req.query) && _.keys(req.query).length),
+			isSiteIdQueryParameter = !!(isQueryObject && req.query.siteId && _.isString(req.query.siteId)),
+			isSessionSiteDetails = !!(req.session && _.isObject(req.session) && req.session.primarySiteDetails && _.isObject(req.session.primarySiteDetails)),
+			isValidQueryParameter = !!(isSessionSiteDetails && isSiteIdQueryParameter),
+			isViewMode = isValidQueryParameter ? 1 : 0,
+			siteId = isSiteIdQueryParameter ? req.query.siteId : '';
+
+		return res.render('tools', { headerBannerLogo: true, isViewMode, siteId });
 	})
 	.get('/', function (req, res) {
 		return res.redirect('/login');
