@@ -15,7 +15,8 @@ var Promise = require('bluebird'),
 					variation: false,
 					pagegroup: false,
 					site: true
-				}
+				},
+				where: {}
 			};
 			firstQuery = {
 				select: "SELECT ",
@@ -54,35 +55,32 @@ var Promise = require('bluebird'),
 			return Promise.resolve();
 		},
 		select: (data) => {
-			// return queryHelper.resetVariables()
-			// .then(() => {
-				let alias = common.level.section ? schema.firstQuery.secondTableAlias : schema.firstQuery.firstTableAlias;
-				_.forEach(data, (field) => {
-					if (schema.firstQuery.nonAggregate.indexOf(field) != -1) {
-						firstQuery.select += ` ${schema.firstQuery.firstTableAlias}.${field}, `;
-						firstQuery.nonAggregate.push(field);
-					} else if (schema.firstQuery.aggregate.indexOf(field) != -1) {
-						firstQuery.select += ` SUM(${alias}.${field}) AS ${field}, `;
-						firstQuery.aggregate.push(field);
-					}
-
-					if (schema.secondQuery.nonAggregate.indexOf(field) != -1) {
-						secondQuery.select += ` ${field}, `;
-						secondQuery.nonAggregate.push(field);
-					} else if (schema.secondQuery.aggregate.indexOf(field) != -1) {
-						secondQuery.select += ` SUM(${field}) AS ${field}, `;
-						secondQuery.aggregate.push(field);
-					}
-				});
-				if (common.level.section || common.level.variation || common.level.pagegroup) {
-					firstQuery.select += ` ${schema.firstQuery.firstTableAlias}.` + _.reduce(common.fields, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.firstQuery.firstTableAlias}.${value} `);
-					secondQuery.select +=  common.fields.join(', ');
-				} else {
-					firstQuery.select = firstQuery.select.slice(0, -1);
-					secondQuery.select = secondQuery.select.slice(0, -1);
+			let alias = common.level.section ? schema.firstQuery.secondTableAlias : schema.firstQuery.firstTableAlias;
+			_.forEach(data, (field) => {
+				if (schema.firstQuery.nonAggregate.indexOf(field) != -1) {
+					firstQuery.select += ` ${schema.firstQuery.firstTableAlias}.${field}, `;
+					firstQuery.nonAggregate.push(field);
+				} else if (schema.firstQuery.aggregate.indexOf(field) != -1) {
+					firstQuery.select += ` SUM(${alias}.${field}) AS ${field}, `;
+					firstQuery.aggregate.push(field);
 				}
-				return true;
-			// });
+
+				if (schema.secondQuery.nonAggregate.indexOf(field) != -1) {
+					secondQuery.select += ` ${field}, `;
+					secondQuery.nonAggregate.push(field);
+				} else if (schema.secondQuery.aggregate.indexOf(field) != -1) {
+					secondQuery.select += ` SUM(${field}) AS ${field}, `;
+					secondQuery.aggregate.push(field);
+				}
+			});
+			if (common.level.section || common.level.variation || common.level.pagegroup) {
+				firstQuery.select += ` ${schema.firstQuery.firstTableAlias}.` + _.reduce(common.fields, (accumulator, value, key) => value == undefined ? `${accumulator} `: `${accumulator}, ${schema.firstQuery.firstTableAlias}.${value} `);
+				secondQuery.select +=  common.fields.join(', ');
+			} else {
+				firstQuery.select = firstQuery.select.slice(0, -1);
+				secondQuery.select = secondQuery.select.slice(0, -1);
+			}
+			return true;
 		},
 		from: () => {
 			common.level.section

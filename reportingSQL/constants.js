@@ -237,6 +237,8 @@ const site_level_query = `
 	ON a.report_date=b.report_date and a.siteid=b.siteid
 `;
 
+let fetchSectionQuery = `SELECT axsid FROM ApexSection where sec_key=@__sec_key__ and siteid=@__siteid__`;
+
 const schema = {
 	commonFields: ['axpgid', 'axvid', 'axsid'],
 	firstQuery: {
@@ -256,4 +258,4 @@ const schema = {
 	}
 }
 
-module.exports = { schema };
+module.exports = { schema, fetchSectionQuery };
