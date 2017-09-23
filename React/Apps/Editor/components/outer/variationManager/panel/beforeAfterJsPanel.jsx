@@ -19,7 +19,7 @@ const BeforeAfterJsPanel = props => {
 					<CodeBox
 						showButtons
 						textEdit
-						parentExpanded={ui.variationPanelExpansion.expanded}
+						parentExpanded={ui.variationPanel.expanded}
 						textEditBtn="Save Before JS"
 						code={beforeJs}
 						onSubmit={onSaveBeforeJs.bind(null, variation)}
@@ -30,7 +30,7 @@ const BeforeAfterJsPanel = props => {
 					<CodeBox
 						showButtons
 						textEdit
-						parentExpanded={ui.variationPanelExpansion.expanded}
+						parentExpanded={ui.variationPanel.expanded}
 						textEditBtn="Save After JS"
 						code={afterJs}
 						onSubmit={onSaveAfterJs.bind(null, variation)}
