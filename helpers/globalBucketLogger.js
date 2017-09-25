@@ -1,6 +1,6 @@
 const uuid = require('uuid');
 const { couchbaseService } = require('node-utils');
-const globalBucket = require('../configs/config').ops.apGlobalBucket;
+const globalBucket = require('../configs/config').ops.couchBaseBuckets.apGlobalBucket;
 const dbHelper = couchbaseService(
 	`couchbase://${globalBucket.HOST}`,
 	globalBucket.BUCKET_NAME,
