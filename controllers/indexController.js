@@ -45,6 +45,8 @@ function createNewUser(params, res) {
 	params.utmTerm = params.utmTerm || '';
 	params.utmName = params.utmName || '';
 	params.utmContent = params.utmContent || '';
+	params.utmFirstHit = params.utmFirstHit || '';
+	params.utmFirstReferrer = params.utmFirstReferrer || '';
 
 	// Below conditions
 	// IF: Set all revenue parameters equal to exact revenue
@@ -94,7 +96,9 @@ function createNewUser(params, res) {
 				INFO_UTM_Campaign: params.utmCampaign,
 				INFO_UTM_Term: params.utmTerm,
 				INFO_UTM_Content: params.utmContent,
-				INFO_UTM_Name: params.utmName
+				INFO_UTM_Name: params.utmName,
+				INFO_UTM_FirstHit: params.utmFirstHit,
+				INFO_UTM_FirstReferrer: params.utmFirstReferrer
 			};
 
 			params.adNetworks.map(function(val) {

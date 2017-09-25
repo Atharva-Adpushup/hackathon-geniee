@@ -378,7 +378,9 @@ function apiModule() {
 									utmCampaign: json.utmCampaign,
 									utmTerm: json.utmTerm,
 									utmName: json.utmName,
-									utmContent: json.utmContent
+									utmContent: json.utmContent,
+									utmFirstHit: json.utmFirstHit,
+									utmFirstReferrer: json.utmFirstReferrer
 								};
 
 								// Miscellanous field will comprise of non-major user data attributes
@@ -421,17 +423,12 @@ function apiModule() {
 											[consts.analytics.pipedriveCustomFields.utmTerm]: json.utmTerm,
 											[consts.analytics.pipedriveCustomFields.utmName]: json.utmName,
 											[consts.analytics.pipedriveCustomFields.utmContent]: json.utmContent,
+											[consts.analytics.pipedriveCustomFields.utmFirstHit]: json.utmFirstHit,
+											[consts.analytics.pipedriveCustomFields.utmFirstReferrer]:
+												json.utmFirstReferrer,
 											currency: 'USD'
 										}
 									};
-								if (anonId && !user.get('analytics')) {
-									analyticsObj = {
-										anonymousId: anonId,
-										userId: userId,
-										isUserIdentified: true
-									};
-									user.set('analytics', analyticsObj);
-								}
 								if (
 									Config.hasOwnProperty('analytics') &&
 									Config.analytics.hasOwnProperty('pipedriveActivated') &&

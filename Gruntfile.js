@@ -25,7 +25,7 @@ module.exports = function(grunt) {
 				dest: 'public/assets/js/builds/adpushup-onboarding.min.js'
 			},
 			signupBuild: {
-				src: ['public/assets/js/libs/custom/signup.js'],
+				src: ['public/assets/js/builds/signup.js'],
 				dest: 'public/assets/js/builds/signup.min.js'
 			}
 		},
@@ -39,6 +39,14 @@ module.exports = function(grunt) {
 					'Editor/app/libs/adpushup.js'
 				],
 				dest: 'public/assets/js/libs/custom/base-libs.js'
+			},
+			signupBuild: {
+				src: [
+					'public/assets/js/libs/third-party/js.cookie.js',
+					'public/assets/js/libs/third-party/jquery.validate.js',
+					'public/assets/js/libs/custom/signup.js'
+				],
+				dest: 'public/assets/js/builds/signup.js'
 			}
 		},
 		sass: {
