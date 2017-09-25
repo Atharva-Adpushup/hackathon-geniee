@@ -331,30 +331,6 @@ router
 				return res.send({ success: 0 });
 			});
 	})
-	// .post('/updateCrmDeal', function (req, res) {
-	// 	var dataToSend = null;
-
-	// 	userModel.getUserByEmail(req.session.user.email).then(function (user) {
-	// 		switch (req.body.type) {
-	// 			case 'services':
-	// 				dataToSend = {
-	// 					"98d03ae31d14653dcc142c912a1f0faee3f1a088": req.body['data[servicesString]'],
-	// 					"02921da334ea34a050d3b7ed7de2ef51ebce9fe5": req.body['data[pwc]']
-	// 				}
-	// 				break;
-	// 		}
-	// 		var pipeDriveParams = {
-	// 			"searchText": user.data.crmDealId,
-	// 			"dataToSend": dataToSend
-	// 		}
-	// 		return pipeDriveObject.apiCall('updateDeal', pipeDriveParams);
-	// 	}).then(function (data) {
-	// 		return res.send({ success: 1 });
-	// 	}).catch(function (err) {
-	// 		console.log(err);
-	// 		return res.send({ success: 0 });
-	// 	});
-	// })
 	.get('/generateLiveSitesScripts', function(req, res) {
 		const message =
 			'Scripts for all live websites will be generated now. Please check the server logs for confirmation';

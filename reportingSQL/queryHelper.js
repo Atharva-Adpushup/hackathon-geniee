@@ -16,7 +16,8 @@ var Promise = require('bluebird'),
 					pagegroup: false,
 					site: true
 				},
-				where: {}
+				where: [],
+				groupBy: false
 			};
 			firstQuery = {
 				select: 'SELECT ',
@@ -38,7 +39,7 @@ var Promise = require('bluebird'),
 			};
 			return Promise.resolve();
 		},
-		generateDate: (from, to) => `report_date BETWEEN ${from} AND ${to} `,
+		generateDate: () => `report_date BETWEEN @__from__ AND @__to__ `,
 		setLevel: data => {
 			let index = 0;
 			if (data.hasOwnProperty('axsid')) {
@@ -111,8 +112,17 @@ var Promise = require('bluebird'),
 								.subtract(1, days)
 								.format('YYYY-MM-DD');
 
-					firstQuery.where += ` ${schema.firstQuery.firstTableAlias}.${queryHelper.generateDate(from, to)} `;
-					secondQuery.where += ` ${queryHelper.generateDate(from, to)} `;
+					firstQuery.where += ` ${schema.firstQuery.firstTableAlias}.${queryHelper.generateDate()} `;
+					secondQuery.where += ` ${queryHelper.generateDate()} `;
+
+					common.where.push(
+						Object.assign(schema.where.from, {
+							value: from
+						}),
+						Object.assign(schema.where.to, {
+							value: to
+						})
+					);
 
 					delete data.from;
 					delete data.to;
@@ -121,12 +131,17 @@ var Promise = require('bluebird'),
 				})
 				.then(() => {
 					_.forEach(data, (value, key) => {
-						firstQuery.where += ` and ${schema.firstQuery.firstTableAlias}.${key}=@__${key}__ `;
-						secondQuery.where += ` and ${key}=@__${key}__ `;
+						firstQuery.where += ` AND ${schema.firstQuery.firstTableAlias}.${key}=@__${key}__ `;
+						secondQuery.where += ` AND ${key}=@__${key}__ `;
+						common.where.push(
+							Object.assign(schema.where[key], {
+								value: value
+							})
+						);
 					});
 
 					common.level.section
-						? (firstQuery.where += ` and ${schema.firstQuery.firstTableAlias}.axhsrid=${schema.firstQuery
+						? (firstQuery.where += ` AND ${schema.firstQuery.firstTableAlias}.axhsrid=${schema.firstQuery
 								.secondTableAlias}.axhsrid `)
 						: null;
 
@@ -222,6 +237,15 @@ var Promise = require('bluebird'),
 			}
 			return response;
 		},
+		groupBy: data => {
+			return queryHelper.__groupBy().then(() => {
+				if (!data || !data.length) {
+					return;
+				}
+				common.groupBy = ` GROUP BY ${groupBy.join(', ')} `;
+				return;
+			});
+		},
 		generateCompleteQuery: () => {
 			return queryHelper.__checkParamsPresent().then(() => {
 				// SELECT
@@ -244,16 +268,21 @@ var Promise = require('bluebird'),
 				common.query += ` ) ${schema.secondQuery.alias} `;
 
 				// ON
-				common.query += 'ON a.report_date=b.report_date and a.siteid=b.siteid';
+				common.query += 'ON a.report_date=b.report_date AND a.siteid=b.siteid';
 
 				if (common.fields.length) {
 					_.forEach(common.fields, field => {
-						common.query += ` and ${schema.firstQuery.alias}.${field}=${schema.secondQuery
+						common.query += ` AND ${schema.firstQuery.alias}.${field}=${schema.secondQuery
 							.alias}.${field} `;
 					});
 				}
 
-				return common.query;
+				common.query += common.groupBy ? common.groupBy : ' ';
+
+				return {
+					query: common.query,
+					inputParameters: common.where.concat([])
+				};
 			});
 		}
 	});
