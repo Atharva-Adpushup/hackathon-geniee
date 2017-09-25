@@ -347,15 +347,15 @@ function apiModule() {
 					pipedriveParams.errorMessage =
 						'Error while creating deal in Pipedrive. \
 					Please make deal manually. After that update corresponding userdoc and add field `crmDealId`. \
-					Below is all the information you need.";
-				return mailService({
-					header: "Error while creating new deal in Pipedrive",
-					content: JSON.stringify(pipedriveParams),
-					emailId: "sales@adpushup.com"
-				});
-			})
-			.then(() => user)
-			.catch(err => user);
+					Below is all the information you need.';
+					return mailService({
+						header: 'Error while creating new deal in Pipedrive',
+						content: JSON.stringify(pipedriveParams),
+						emailId: 'sales@adpushup.com'
+					});
+				})
+				.then(() => user)
+				.catch(err => user);
 		},
 		createNewUser: function(json) {
 			return FormValidator.validate(json, schema.user.validations)
@@ -426,16 +426,16 @@ function apiModule() {
 									};
 								if (anonId && !user.get('analytics')) {
 									analyticsObj = {
-										'anonymousId': anonId,
-										'userId': userId,
-										'isUserIdentified': true
+										anonymousId: anonId,
+										userId: userId,
+										isUserIdentified: true
 									};
 									user.set('analytics', analyticsObj);
 								}
 								if (
-									Config.hasOwnProperty('analytics')
-									&& Config.analytics.hasOwnProperty('pipedriveActivated')
-									&& !Config.analytics.pipedriveActivated
+									Config.hasOwnProperty('analytics') &&
+									Config.analytics.hasOwnProperty('pipedriveActivated') &&
+									!Config.analytics.pipedriveActivated
 								) {
 									user.set('crmDealId', false);
 									return Promise.resolve(user);
