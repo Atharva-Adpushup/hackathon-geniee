@@ -61,7 +61,8 @@
 			return cookieData;
 		}
 
-		return false;
+		cookieData = utils.atob(inputCookieData);
+		return cookieData;
 	}
 
 	function getFirstHitUtmParameters() {
