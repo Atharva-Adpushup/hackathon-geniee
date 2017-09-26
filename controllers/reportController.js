@@ -35,6 +35,7 @@ router
 	// 		pageUrl: url
 	// 	});
 	// })
+	.get('/adpushupReport', (req, res) => res.render('adpushupReport'))
 	.get('/performance', function(req, res) {
 		var siteId = req.params.siteId,
 			paramConfig = {

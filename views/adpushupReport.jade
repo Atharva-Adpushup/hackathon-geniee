@@ -1,0 +1,16 @@
+//- Report interface
+
+extends layout/base
+
+block getTitle
+	- var titleVar = "Report"	
+
+block bodyContent
+	include layout/sideBar
+	.pageContainer.page-container
+		include layout/header
+		.pageContentWrapper.page-content
+			.pageContentInner.page-content--inner
+				#reportingPanel
+
+	//- script(src="/assets/js/builds/reportingPanel.js")
