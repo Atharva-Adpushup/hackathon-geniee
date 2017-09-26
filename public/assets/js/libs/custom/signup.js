@@ -371,7 +371,7 @@
 				ele.name = name;
 				ele.type = 'hidden';
 				ele.value = queryParams[param];
-				form.append(ele);
+				form.appendChild(ele);
 			}
 		});
 	}
