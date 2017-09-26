@@ -41,7 +41,7 @@
 	}
 
 	function setCookie(name, value, expiryDays) {
-		Ck.set(name, value, { expires: expiryDays });
+		Ck.set(name, value, { expires: expiryDays, domain: 'adpushup.com' });
 	}
 
 	function getFirstHitCookieData() {
