@@ -3,108 +3,135 @@ const path = require('path'),
 	buildPath = '../public/assets/js/builds/';
 
 module.exports = [
+	// {
+	// 	entry: {
+	// 		outer: path.join(__dirname, './Apps/Editor/outer.js')
+	// 	},
+	// 	output: {
+	// 		path: path.join(__dirname, buildPath),
+	// 		filename: '[name].js',
+	// 		publicPath: '/'
+	// 	},
+	// 	// eslint: {
+	// 	// 	configFile: './Editor/.eslintrc.json',
+	// 	// 	failOnWarning: false,
+	// 	// 	failOnError: false
+	// 	// },
+	// 	resolve: {
+	// 		alias: {
+	// 			react: path.resolve('./node_modules/react'),
+	// 			React: path.resolve('./node_modules/react')
+	// 		},
+	// 		// root: path.resolve('./Editor'),
+	// 		modules: ['./Apps/Editor', './components/', './components/outer', './components/shared', 'node_modules'],
+	// 		extensions: ['.js', '.jsx', '.css']
+	// 	},
+	// 	externals: {
+	// 		react: 'React',
+	// 		'react-dom': 'ReactDOM',
+	// 		jquery: 'jQuery'
+	// 	},
+	// 	module: {
+	// 		loaders: [
+	// 			{
+	// 				test: /.jsx?$/,
+	// 				loader: 'babel-loader',
+	// 				exclude: /node_modules/,
+	// 				query: {
+	// 					plugins: ['lodash'],
+	// 					presets: ['es2015', 'react', 'stage-2']
+	// 				}
+	// 			},
+	// 			{
+	// 				test: /\.css$/,
+	// 				loaders: ['style-loader', 'css-loader']
+	// 			},
+	// 			{
+	// 				test: /\.scss$/,
+	// 				loaders: ['style-loader', 'css-loader', 'sass-loader']
+	// 			}
+	// 		]
+	// 	}
+	// },
+	// {
+	// 	entry: {
+	// 		inner: path.join(__dirname, './Apps/Editor/inner.js')
+	// 	},
+	// 	output: {
+	// 		path: path.join(__dirname, buildPath),
+	// 		filename: '[name].js',
+	// 		publicPath: '/'
+	// 	},
+	// 	// eslint: {
+	// 	// 	configFile: './Editor/.eslintrc.json',
+	// 	// 	failOnWarning: false,
+	// 	// 	failOnError: false
+	// 	// },
+	// 	resolve: {
+	// 		alias: {
+	// 			react: path.resolve('./node_modules/react'),
+	// 			React: path.resolve('./node_modules/react')
+	// 		},
+	// 		// root: path.resolve('./Editor'),
+	// 		modules: ['./Apps/Editor', './components/', './components/outer', './components/shared', 'node_modules'],
+	// 		extensions: ['.js', '.jsx', '.css']
+	// 	},
+	// 	module: {
+	// 		loaders: [
+	// 			{
+	// 				test: /.jsx?$/,
+	// 				loader: 'babel-loader',
+	// 				exclude: /node_modules/,
+	// 				query: {
+	// 					plugins: ['lodash'],
+	// 					presets: ['es2015', 'react', 'stage-2']
+	// 				}
+	// 			},
+	// 			{
+	// 				test: /\.css$/,
+	// 				loaders: ['style-loader', 'css-loader']
+	// 			},
+	// 			{
+	// 				test: /\.scss$/,
+	// 				loaders: ['style-loader', 'css-loader', 'sass-loader']
+	// 			}
+	// 		]
+	// 	}
+	// },
+	// {
+	// 	entry: {
+	// 		inner: path.join(__dirname, './Apps/OpsPanel/index.js')
+	// 	},
+	// 	output: {
+	// 		path: path.join(__dirname, buildPath),
+	// 		filename: 'opsPanel.js',
+	// 		publicPath: '/'
+	// 	},
+	// 	module: {
+	// 		loaders: [
+	// 			{
+	// 				test: /.jsx?$/,
+	// 				loader: 'babel-loader',
+	// 				exclude: /node_modules/,
+	// 				query: {
+	// 					plugins: ['lodash'],
+	// 					presets: ['es2015', 'react', 'stage-2']
+	// 				}
+	// 			},
+	// 			{
+	// 				test: /\.scss$/,
+	// 				loaders: ['style-loader', 'css-loader', 'sass-loader']
+	// 			}
+	// 		]
+	// 	}
+	// },
 	{
 		entry: {
-			outer: path.join(__dirname, './Apps/Editor/outer.js')
+			inner: path.join(__dirname, './Apps/ReportingPanel/index.js')
 		},
 		output: {
 			path: path.join(__dirname, buildPath),
-			filename: '[name].js',
-			publicPath: '/'
-		},
-		// eslint: {
-		// 	configFile: './Editor/.eslintrc.json',
-		// 	failOnWarning: false,
-		// 	failOnError: false
-		// },
-		resolve: {
-			alias: {
-				react: path.resolve('./node_modules/react'),
-				React: path.resolve('./node_modules/react')
-			},
-			// root: path.resolve('./Editor'),
-			modules: ['./Apps/Editor', './components/', './components/outer', './components/shared', 'node_modules'],
-			extensions: ['.js', '.jsx', '.css']
-		},
-		externals: {
-			react: 'React',
-			'react-dom': 'ReactDOM',
-			jquery: 'jQuery'
-		},
-		module: {
-			loaders: [
-				{
-					test: /.jsx?$/,
-					loader: 'babel-loader',
-					exclude: /node_modules/,
-					query: {
-						plugins: ['lodash'],
-						presets: ['es2015', 'react', 'stage-2']
-					}
-				},
-				{
-					test: /\.css$/,
-					loaders: ['style-loader', 'css-loader']
-				},
-				{
-					test: /\.scss$/,
-					loaders: ['style-loader', 'css-loader', 'sass-loader']
-				}
-			]
-		}
-	},
-	{
-		entry: {
-			inner: path.join(__dirname, './Apps/Editor/inner.js')
-		},
-		output: {
-			path: path.join(__dirname, buildPath),
-			filename: '[name].js',
-			publicPath: '/'
-		},
-		// eslint: {
-		// 	configFile: './Editor/.eslintrc.json',
-		// 	failOnWarning: false,
-		// 	failOnError: false
-		// },
-		resolve: {
-			alias: {
-				react: path.resolve('./node_modules/react'),
-				React: path.resolve('./node_modules/react')
-			},
-			// root: path.resolve('./Editor'),
-			modules: ['./Apps/Editor', './components/', './components/outer', './components/shared', 'node_modules'],
-			extensions: ['.js', '.jsx', '.css']
-		},
-		module: {
-			loaders: [
-				{
-					test: /.jsx?$/,
-					loader: 'babel-loader',
-					exclude: /node_modules/,
-					query: {
-						plugins: ['lodash'],
-						presets: ['es2015', 'react', 'stage-2']
-					}
-				},
-				{
-					test: /\.css$/,
-					loaders: ['style-loader', 'css-loader']
-				},
-				{
-					test: /\.scss$/,
-					loaders: ['style-loader', 'css-loader', 'sass-loader']
-				}
-			]
-		}
-	},
-	{
-		entry: {
-			inner: path.join(__dirname, './Apps/OpsPanel/index.js')
-		},
-		output: {
-			path: path.join(__dirname, buildPath),
-			filename: 'opsPanel.js',
+			filename: 'reportingPanel.js',
 			publicPath: '/'
 		},
 		module: {
