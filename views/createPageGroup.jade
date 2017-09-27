@@ -9,6 +9,37 @@ block append headCss
 block append headScripts
     script(src="/assets/js/libs/third-party/bootstrap-combobox.js")
     script.
+        function getChannelsObject(collection) {
+            var computedObject = {};
+
+            collection.forEach(function(itemObject) {
+                var pageGroup = itemObject.pageGroup,
+                    platform = itemObject.platform,
+                    isRootProperty = !!(computedObject.hasOwnProperty(pageGroup) && computedObject[pageGroup]),
+                    pageGroupObject, isPlatformValue;
+
+                if (!isRootProperty) {
+                    computedObject[pageGroup] = {
+                        sampleUrl: itemObject.sampleUrl,
+                        platforms: []
+                    };
+                }
+
+                pageGroupObject = computedObject[pageGroup];
+                isPlatformValue = !!(pageGroupObject.platforms && (pageGroupObject.platforms.indexOf(platform) > -1));
+
+                if (!isPlatformValue) { pageGroupObject.platforms.push(platform); }
+            });
+
+            return computedObject;
+        }
+
+        function DataModel() {
+            this.channels = !{JSON.stringify(channelsCollection)};
+            this.model = getChannelsObject(this.channels);
+        }
+        var dataModel = new DataModel();
+
         $(document).ready(function() {
             $('.combobox').combobox();
 
@@ -33,6 +64,36 @@ block append headScripts
                 }
             };
 
+            function resetUIBasedOnPageGroup() {
+                $('#sampleUrl').val('');
+                $('.js-select-platform')
+                    .val('')
+                    .find('> .js-select-option')
+                    .removeAttr('disabled')
+                    .removeClass('disabled');
+                return;
+            }
+
+            function updateUIBasedOnPageGroup(pageGroup) {
+                var $sampleUrlEl = $('#sampleUrl'),
+                    pageGroupData = dataModel.model[pageGroup],
+                    isPageGroupData = !!(pageGroupData && Object.keys(pageGroupData).length);
+
+                if (!isPageGroupData) {
+                    resetUIBasedOnPageGroup();
+                    return;
+                }
+
+                $sampleUrlEl.val(pageGroupData.sampleUrl);
+                pageGroupData.platforms.forEach(function(platform) {
+                    var optionSelector = '.js-select-option-' + platform;
+
+                    $(optionSelector)
+                        .attr('disabled', true)
+                        .addClass('disabled');
+                });
+            }
+
             $('#forceSampleUrl').on('change', function() {
                 var val = $('#sampleUrl').val(),
                     sampleUrlForced = $(this).prop('checked');
@@ -44,6 +105,23 @@ block append headScripts
                     sampleUrlForced = $('#forceSampleUrl').prop('checked');
 
                 !sampleUrlForced ? sampleUrlValidation(val) : disableSampleUrlValidation();
+            });
+
+            $('.combobox').off('change').on('change', function(e) {
+                var $el = $(e.target),
+                    isDropDownEl = !!($el.get(0).tagName === 'SELECT'),
+                    isInputEl = !!($el.get(0).tagName === 'INPUT'),
+                    isValueValid = !!($el.val()),
+                    elValue;
+                
+                if (isInputEl && !isValueValid) {
+                    resetUIBasedOnPageGroup();
+                }
+
+                if (!isDropDownEl) { return; }
+                
+                elValue = $el.val();
+                updateUIBasedOnPageGroup(elValue);
             });
         });  
 
@@ -71,9 +149,9 @@ block bodyContent
                                     .col-sm-3
                                         if channels.length > 0
                                             select(class="combobox input-large form-control" name="pageGroupName")
-                                                option(value="" selected="selected") Please enter Page Group Name  
+                                                option(value="" selected="selected") Please enter Page Group Name
                                                 for channel in channels
-                                                    option(value="#{channel}")!= channel    
+                                                    option(value="#{channel}")!= channel
                                         else 
                                             input.form-control(required, name="pageGroupName", type="text" placeholder="Please enter Page Group Name")
                                 .row.input-wrapper
@@ -89,11 +167,11 @@ block bodyContent
                                         label Device
                                     .col-sm-3
                                         .styleSelect
-                                            select(required, name="device")
+                                            select.js-select-platform(required, name="device")
                                                 option(value="") Select device
-                                                option(value="desktop") Desktop
-                                                option(value="tablet") Tablet
-                                                option(value="mobile") Mobile
+                                                option.js-select-option.js-select-option-DESKTOP(value="desktop") Desktop
+                                                option.js-select-option.js-select-option-TABLET(value="tablet") Tablet
+                                                option.js-select-option.js-select-option-MOBILE(value="mobile") Mobile
                                 .row.input-wrapper
                                     .col-sm-4
                                         h3#error-message.error-message!= error

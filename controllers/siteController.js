@@ -206,24 +206,45 @@ router
 	})
 	.get('/:siteId/createPagegroup', function(req, res) {
 		if (req.session.user.userType !== 'partner') {
-			return siteModel
-				.getSiteById(req.params.siteId)
-				.then(function(site) {
-					return { siteDomain: site.get('siteDomain'), channels: site.get('channels') };
-				})
-				.then(function(data) {
-					var channels = _.map(data.channels, function(channel) {
-						return channel.split(':')[1];
+			const getSiteModel = siteModel.getSiteById(req.params.siteId),
+				getAllSiteChannels = getSiteModel.then(site => site.getAllChannels()),
+				getChannelsData = getAllSiteChannels.then(channelsArr => {
+					return channelsArr.map(channelObj => {
+						return {
+							sampleUrl: channelObj.sampleUrl,
+							platform: channelObj.platform,
+							pageGroup: channelObj.pageGroup,
+							channelName: channelObj.channelName,
+							id: channelObj.id,
+							variationCount: _.keys(channelObj.variations).length,
+							contentSelector: channelObj.contentSelector
+						};
 					});
-					return res.render('createPageGroup', {
-						siteId: req.params.siteId,
-						siteDomain: data.siteDomain,
-						channels: _.uniq(channels)
-					});
-				})
-				.catch(function(err) {
-					return res.send('Some error occurred!');
+				}),
+				getUniqueChannels = getChannelsData.then(channelsData => {
+					return _.uniq(channelsData.map(channelObj => channelObj.pageGroup));
 				});
+
+			return Promise.join(
+				getSiteModel,
+				getChannelsData,
+				getUniqueChannels,
+				(site, channelsData, uniqueChannels) => {
+					const siteId = site.get('siteId'),
+						siteDomain = site.get('siteDomain'),
+						channels = uniqueChannels.concat([]),
+						channelsCollection = channelsData.concat([]);
+
+					return res.render('createPageGroup', {
+						siteId,
+						siteDomain,
+						channels,
+						channelsCollection
+					});
+				}
+			).catch(function(err) {
+				return res.send('Some error occurred!');
+			});
 		} else {
 			return res.render('403');
 		}
