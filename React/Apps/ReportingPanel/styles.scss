@@ -1,0 +1,27 @@
+$primaryColor: #eb575c;
+$borderColor: #ddd;
+$greyBg: #eee;
+
+.report-table {
+	margin: 20px;
+	font-size: 1.2em;
+	border: 1px solid $borderColor;
+
+	.col-md-4 {
+		padding: 15px 25px;
+
+		&:nth-child(2) {
+			text-align: center;
+		}
+	}
+
+	input[id='select-filter-reportTable'] {
+		padding: 16px;
+		font-size: 1em;
+	}
+
+	thead {
+		background-color: $greyBg;
+		border-top: 2px solid $borderColor;
+	}
+}

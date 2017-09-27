@@ -120,14 +120,18 @@ class ReportingPanel extends React.Component {
 
 		return (
 			<ActionCard title="AdPushup Report">
-				<ReactHighcharts config={config} />
-				<Datatable
-					tableHeader={header}
-					tableBody={data}
-					keyName="reportTable"
-					rowsPerPage={5}
-					rowsPerPageOption={[2, 3, 4, 5]}
-				/>,
+				<div className="report-chart">
+					<ReactHighcharts config={config} />
+				</div>
+				<div className="report-table">
+					<Datatable
+						tableHeader={header}
+						tableBody={data}
+						keyName="reportTable"
+						rowsPerPage={5}
+						rowsPerPageOption={[2, 3, 4, 5]}
+					/>
+				</div>
 			</ActionCard>
 		);
 	}
