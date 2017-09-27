@@ -1,6 +1,68 @@
 import React from 'react';
 import ReactHighcharts from 'react-highcharts';
+import { Grid, Row, Col, Button } from 'react-bootstrap';
+import Datatable from 'react-bs-datatable';
 import ActionCard from '../../../Components/ActionCard.jsx';
+import '../styles.scss';
+
+const header = [
+		{ title: 'Date', prop: 'date', sortable: true, filterable: true },
+		{ title: 'Impression', prop: 'impression', sortable: true, filterable: true },
+		{ title: 'CPM', prop: 'cpm', sortable: true, filterable: true },
+		{ title: 'Xpath Miss', prop: 'xPathMiss', sortable: true, filterable: true },
+		{ title: 'Clicks', prop: 'clicks', sortable: true, filterable: true }
+	],
+	data = [
+		{
+			date: '10 Sep',
+			impressions: 22010,
+			cpm: 4.5,
+			xPathMiss: 6343,
+			clicks: 1344
+		},
+		{
+			date: '11 Sep',
+			impressions: 20343,
+			cpm: 5.5,
+			xPathMiss: 7444,
+			clicks: 1235
+		},
+		{
+			date: '12 Sep',
+			impressions: 19563,
+			cpm: 2,
+			xPathMiss: 5984,
+			clicks: 1545
+		},
+		{
+			date: '13 Sep',
+			impressions: 18124,
+			cpm: 3.4,
+			xPathMiss: 6100,
+			clicks: 1434
+		},
+		{
+			date: '14 Sep',
+			impressions: 21047,
+			cpm: 6.2,
+			xPathMiss: 7676,
+			clicks: 1429
+		},
+		{
+			date: '15 Sep',
+			impressions: 22098,
+			cpm: 4.4,
+			xPathMiss: 7896,
+			clicks: 1349
+		},
+		{
+			date: '16 Sep',
+			impressions: 19932,
+			cpm: 5.2,
+			xPathMiss: 6811,
+			clicks: 1412
+		}
+	];
 
 class ReportingPanel extends React.Component {
 	constructor(props) {
@@ -18,12 +80,12 @@ class ReportingPanel extends React.Component {
 			yAxis: [
 				{
 					title: {
-						text: ''
+						text: 'Impressions / Xpath miss / Clicks'
 					}
 				},
 				{
 					title: {
-						text: ''
+						text: 'CPM'
 					},
 					opposite: true
 				}
@@ -40,17 +102,17 @@ class ReportingPanel extends React.Component {
 				{
 					name: 'CPM',
 					yAxis: 1,
-					data: [4.5, 5.5, 2, 3.4, 6.7, 4.4, 5.2]
+					data: [4.5, 5.5, 2, 3.4, 6.2, 4.4, 5.2]
 				},
 				{
 					name: 'Xpath miss',
 					yAxis: 0,
-					data: [2343, 3444, 2984, 3100, 2676, 2896, 2811]
+					data: [6343, 7444, 5984, 6100, 7676, 7896, 6811]
 				},
 				{
 					name: 'Clicks',
 					yAxis: 0,
-					data: [344, 235, 545, 434, 429, 349, 412]
+					data: [1344, 1235, 1545, 1434, 1429, 1349, 1412]
 				}
 			],
 			credits: false
@@ -59,6 +121,13 @@ class ReportingPanel extends React.Component {
 		return (
 			<ActionCard title="AdPushup Report">
 				<ReactHighcharts config={config} />
+				<Datatable
+					tableHeader={header}
+					tableBody={data}
+					keyName="reportTable"
+					rowsPerPage={5}
+					rowsPerPageOption={[2, 3, 4, 5]}
+				/>,
 			</ActionCard>
 		);
 	}

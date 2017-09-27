@@ -10,6 +10,7 @@
 		"prop-types": "^15.5.10",
 		"react": "^15.6.1",
 		"react-bootstrap": "^0.31.3",
+		"react-bs-datatable": "^1.1.18",
 		"react-click-outside": "^3.0.0",
 		"react-codemirror": "^1.0.0",
 		"react-dom": "^15.6.1",
