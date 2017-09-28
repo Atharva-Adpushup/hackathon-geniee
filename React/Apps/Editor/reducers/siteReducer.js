@@ -1,6 +1,8 @@
-import { status, siteModes, uiActions } from 'consts/commonConsts';
+import { status, siteModes, uiActions, sectionActions } from 'consts/commonConsts';
+import { immutablePush } from 'libs/immutableHelpers';
+import utils from 'libs/utils';
 
-const initialState = { mode: siteModes.DRAFT, partner: null },
+const initialState = { mode: siteModes.DRAFT, partner: null, customSizes: [] },
 	site = (state = {}, action) => {
 		switch (action.type) {
 			case uiActions.UPDATE_AFTER_SAVE_STATUS:
@@ -27,6 +29,18 @@ const initialState = { mode: siteModes.DRAFT, partner: null },
 				return {
 					...state,
 					mode: site(state, action)
+				};
+			case sectionActions.CREATE_SECTION:
+				const size = { width: action.adPayload.width, height: action.adPayload.height };
+				if (
+					!action.adPayload.isCustomSize ||
+					JSON.stringify(state.customSizes).indexOf(JSON.stringify(size)) > -1
+				) {
+					return state;
+				}
+				return {
+					...state,
+					customSizes: immutablePush(state.customSizes, size)
 				};
 
 			default:

@@ -21,7 +21,8 @@ const save = (url, data) => $.ajax({ type: 'POST', url, data, dataType: 'json' }
 					mode: parsedData.site.hasOwnProperty('apConfigs')
 						? parseInt(parsedData.site.apConfigs.mode, 10)
 						: siteModes.DRAFT,
-					partner: rawData.site.partner || null
+					partner: rawData.site.partner || null,
+					customSizes: parsedData.site.customSizes || []
 				};
 
 				computedResult.channelData = {
