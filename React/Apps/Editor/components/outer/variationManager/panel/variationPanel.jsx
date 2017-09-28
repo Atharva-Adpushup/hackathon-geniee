@@ -13,7 +13,7 @@ class VariationPanel extends React.Component {
 		const { variation, channelId, sections, ui } = this.props;
 		return (
 			<div className="variation-settings">
-				<VariationBar panelCssSelector=".variation-settings" expanded={ui.variationPanelExpansion.expanded} />
+				<VariationBar panelCssSelector=".variation-settings" expanded={ui.variationPanel.expanded} />
 				<TabPanel tabPosition="left">
 					<div tabTitle="Info">
 						<VariationOptions channelId={channelId} variation={variation} />

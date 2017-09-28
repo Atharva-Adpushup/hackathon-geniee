@@ -6,10 +6,12 @@ import CodeBox from 'shared/codeBox';
 import AdSizeSelector from './adSizeSelector.jsx';
 import SectionOptions from './sectionOptions.jsx';
 import ParentSelector from './parentSelector.jsx';
+import { immutablePush } from 'libs/immutableHelpers';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 
 const initialState = {
 		adSize: null,
+		isCustomSize: false,
 		operation: null,
 		activeItem: 0,
 		prevActiveItem: 0,
@@ -56,10 +58,11 @@ class insertMenu extends React.Component {
 		});
 	}
 
-	selectSize(operation, adSize) {
+	selectSize(operation, adSize, isCustomSize = false) {
 		this.setState({
 			adSize,
 			operation,
+			isCustomSize,
 			showExtraOptions: true,
 			activeItem: 0,
 			prevActiveItem: this.state.activeItem
@@ -90,6 +93,7 @@ class insertMenu extends React.Component {
 				customZoneId: customZoneId || ''
 			},
 			adPayload = {
+				isCustomSize: true,
 				adCode,
 				network,
 				height: this.state.adSize.height,
@@ -136,7 +140,10 @@ class insertMenu extends React.Component {
 						partner={props.partner}
 						isCustomAdCodeInVariationAds={props.isCustomAdCodeInVariationAds}
 						checked={option === this.state.operation ? this.state.adSize : null}
-						adSizes={commonSupportedSizes}
+						adSizes={immutablePush(commonSupportedSizes, {
+							layoutType: 'CUSTOM',
+							sizes: props.customSizes
+						})}
 						insertOption={option}
 						onCheckedItem={this.selectSize.bind(this, option)}
 					/>
@@ -191,6 +198,7 @@ insertMenu.propTypes = {
 	isCustomAdCodeInVariationAds: PropTypes.bool.isRequired,
 	position: PropTypes.object,
 	parents: PropTypes.array,
+	customSizes: PropTypes.array,
 	variationId: PropTypes.string,
 	channelId: PropTypes.string,
 	insertOptions: PropTypes.array,

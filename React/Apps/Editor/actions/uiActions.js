@@ -27,6 +27,9 @@ const showEditMenu = (sectionId, adId, position, variationId) => ({
 	resetErrors = sectionId => ({ type: uiActions.RESET_ERRORS, sectionId }),
 	resetAfterSaveModal = () => ({ type: uiActions.UPDATE_AFTER_SAVE_STATUS, status: status.RESET }),
 	hideNewChannelInsertMenu = () => ({ type: newChannelMenuActions.HIDE_NEW_CHANNEL_MENU }),
+	toggleVariationPanel = () => ({ type: variationActions.TOGGLE_VARIATION_PANEL }),
+	openVariationPanel = () => ({ type: variationActions.OPEN_VARIATION_PANEL }),
+	closeVariationPanel = () => ({ type: variationActions.CLOSE_VARIATION_PANEL }),
 	expandVariationPanel = (panelCssSelector, params) => ({
 		type: variationActions.EXPAND_VARIATION_PANEL,
 		panelCssSelector,
@@ -52,5 +55,8 @@ export {
 	resetErrors,
 	resetAfterSaveModal,
 	expandVariationPanel,
-	shrinkVariationPanel
+	shrinkVariationPanel,
+	toggleVariationPanel,
+	openVariationPanel,
+	closeVariationPanel
 };
