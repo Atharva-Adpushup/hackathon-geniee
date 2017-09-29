@@ -26,9 +26,10 @@
 					: '';
 			}
 		},
+		isDocumentReferrer = !!W.document.referrer,
 		utmParameters = {
 			firstHit: utils.domanize(W.location.href),
-			firstReferrer: utils.domanize(W.document.referrer)
+			firstReferrer: isDocumentReferrer ? utils.domanize(W.document.referrer) : 'direct'
 		},
 		constants = {
 			cookie: {
