@@ -55,9 +55,14 @@ function groupByWrapper(data) {
 	return queryHelper.groupBy(setCorrectColumnNames(data));
 }
 
+function selectWrapper(selectData, groupByData) {
+	let flag = _.isArray(groupByData) && groupByData.length && groupByData.indexOf('section') != -1 ? true : false;
+	return queryHelper.select(selectData, flag);
+}
+
 function queryBuilder(data) {
 	return whereWrapper(data.where)
-		.then(() => queryHelper.select(data.select))
+		.then(() => selectWrapper(data.select, data.groupBy))
 		.then(() => groupByWrapper(data.groupBy))
 		.then(() => queryHelper.from())
 		.then(() => orderByWrapper(data.orderBy))
@@ -75,20 +80,23 @@ function init(data) {
 		})
 		.catch(err => {
 			let message = err.message || err;
-			console.log(err);
+			return Promise.reject(message);
 		});
 }
 
 init({
-	select: ['report_date', 'siteid', 'total_impressions', 'total_xpath_miss', 'total_cpm'],
+	select: ['report_date', 'siteid', 'total_impressions', 'total_xpath_miss', 'total_cpm', 'device_type'],
 	where: {
 		// section: '429e5150-e40b-4afb-b165-93b8bde3cf21',
 		siteid: 28822,
-		// variation: '2e68228f-84da-415e-bfcf-bfcf67c87570',
+		variation: '2e68228f-84da-415e-bfcf-bfcf67c87570',
 		pagegroup: 'MIC',
 		from: '2017-09-01',
-		to: '2017-09-10'
+		to: '2017-09-10',
+		device_type: 4
 	},
-	groupBy: ['variation']
+	groupBy: ['section']
 	// orderBy: ['variation']
 });
+
+module.exports = init;

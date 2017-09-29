@@ -309,6 +309,7 @@ const schema = {
 	firstQuery: {
 		aggregate: ['total_impressions', 'total_xpath_miss'],
 		nonAggregate: ['report_date', 'siteid', 'device_type'],
+		where: ['device_type'],
 		tables: {
 			apexSiteReport: {
 				table: 'ApexHourlySiteReport',
@@ -324,6 +325,7 @@ const schema = {
 	secondQuery: {
 		aggregate: ['total_cpm'],
 		nonAggregate: ['report_date', 'siteid'],
+		where: [],
 		tables: {
 			adpTagReport: {
 				table: 'AdpTagReport',
@@ -361,6 +363,11 @@ const schema = {
 		to: {
 			name: '__to__',
 			type: 'DATE',
+			value: false
+		},
+		device_type: {
+			name: '__device_type__',
+			type: 'TINYINT',
 			value: false
 		}
 	}

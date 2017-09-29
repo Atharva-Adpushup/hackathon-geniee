@@ -2,10 +2,10 @@ var Promise = require('bluebird'),
 	_ = require('lodash'),
 	moment = require('moment'),
 	{ schema } = require('./constants'),
-	common = {};
-(firstQuery = {}),
-	(secondQuery = {}),
-	(queryHelper = {
+	common = {},
+	firstQuery = {},
+	secondQuery = {},
+	queryHelper = {
 		__resetVariables: () => {
 			common = {
 				query: 'SELECT ',
@@ -245,10 +245,11 @@ var Promise = require('bluebird'),
 		__setLevelFromGroupBy: data => {
 			return !_.isArray(data) || !data.length ? Promise.resolve(false) : queryHelper.__setLevel(data);
 		},
-		select: data => {
-			let alias = common.level.section
-				? schema.firstQuery.tables.sectionReport.alias
-				: schema.firstQuery.tables.apexSiteReport.alias;
+		select: (data, flag) => {
+			let alias =
+				common.level.section || flag
+					? schema.firstQuery.tables.sectionReport.alias
+					: schema.firstQuery.tables.apexSiteReport.alias;
 			_.forEach(data, field => {
 				if (schema.firstQuery.nonAggregate.indexOf(field) != -1) {
 					firstQuery.select += ` ${schema.firstQuery.tables.apexSiteReport.alias}.${field}, `;
@@ -267,33 +268,6 @@ var Promise = require('bluebird'),
 					secondQuery.aggregate.push(field);
 				}
 			});
-			// if (common.level.section || common.level.variation || common.level.pagegroup) {
-			// 	let index = common.fields.forOn.indexOf('axsid');
-			// 	let slicedArray = common.fields.forOn.concat([]);
-			// 	// for On
-			// 	if (index != -1) {
-			// 		slicedArray.splice(index, 1);
-			// 		firstQuery.select += ` ${schema.firstQuery.tables.sectionReport.alias}.axsid, `;
-			// 	}
-			// 	firstQuery.select += queryHelper.__reduceArrayToString(
-			// 		slicedArray,
-			// 		schema.firstQuery.tables.apexSiteReport.alias
-			// 	);
-			// 	secondQuery.select += queryHelper.__reduceArrayToString(
-			// 		common.fields.forOn,
-			// 		schema.secondQuery.tables.adpTagReport.alias
-			// 	);
-
-			// 	// for sending to user
-			// 	_.forEach(common.fields.forUser, (value, key) => {
-			// 		let currentAlias = queryHelper.__getAlias(value);
-			// 		firstQuery.select += ` ,${currentAlias}.${value} `;
-			// 		secondQuery.select += ` ,${currentAlias}.${value} `;
-			// 	});
-			// } else {
-			// 	firstQuery.select = firstQuery.select.slice(0, -2);
-			// 	secondQuery.select = secondQuery.select.slice(0, -2);
-			// }
 			return true;
 		},
 		from: () => {
@@ -346,9 +320,23 @@ var Promise = require('bluebird'),
 							value: to
 						})
 					);
-
 					delete data.from;
 					delete data.to;
+
+					// handling where conditions specfic to first Query
+					let disjointFields = _.intersection(Object.keys(data), schema.firstQuery.where);
+					_.forEach(disjointFields, (value, key) => {
+						let alias = queryHelper.__getAlias(value);
+						firstQuery.where += ` AND ${alias
+							? alias
+							: schema.firstQuery.tables.apexSiteReport.alias}.${value}=@__${value}__ `;
+						common.where.push(
+							Object.assign(schema.where[value], {
+								value: data[value]
+							})
+						);
+						delete data[value];
+					});
 
 					return queryHelper.__setLevel(data);
 				})
@@ -380,12 +368,16 @@ var Promise = require('bluebird'),
 			return queryHelper
 				.__setLevelFromGroupBy(data)
 				.then(response => {
-					response
-						? (common.groupBy = ` GROUP BY ${queryHelper.__reduceArrayToString(
-								data,
-								schema.firstQuery.alias
-							)} `)
-						: null;
+					if (response) {
+						common.groupBy = ` GROUP BY ${queryHelper.__reduceArrayToString(
+							common.fields.forUser,
+							schema.firstQuery.alias
+						)} `;
+						common.groupBy += ` , ${queryHelper.__reduceArrayToString(
+							firstQuery.nonAggregate,
+							schema.firstQuery.alias
+						)}`;
+					}
 					return queryHelper.__groupBy();
 				})
 				.then(response => queryHelper.__completeReaminingSelect())
@@ -407,7 +399,9 @@ var Promise = require('bluebird'),
 				common.query += ' FROM ( ';
 				common.query += firstQuery.select;
 				common.query += firstQuery.from;
-				common.query += firstQuery.where;
+				common.query += common.level.section
+					? firstQuery.where.replace('c.axsid=g.axsid', 'd.axsid=g.axsid')
+					: firstQuery.where;
 				common.query += firstQuery.groupBy;
 				common.query += ` ) ${schema.firstQuery.alias} `;
 
@@ -427,12 +421,6 @@ var Promise = require('bluebird'),
 					schema.secondQuery.alias
 				);
 
-				// if (common.fields.forOn.length) {
-				// 	_.forEach(common.fields.forOn, field => {
-				// 		common.query += ` AND ${}.${field}=${}.${field} `;
-				// 	});
-				// }
-
 				common.query += common.groupBy ? common.groupBy : ' ';
 				common.query += common.orderBy ? common.orderBy : ' ';
 
@@ -442,6 +430,6 @@ var Promise = require('bluebird'),
 				};
 			});
 		}
-	});
+	};
 
 module.exports = queryHelper;
