@@ -43,7 +43,9 @@ module.exports = {
 			utmCampaign: '1d87caef2ffc5dddf26b6548b9ddb1b1d7c97720',
 			utmTerm: 'bd94cdbdfd726b04250ad6963f83c59d6284c020',
 			utmName: 'ec498a8fc48461b2f3c9db550046a9875f36efc5',
-			utmContent: '78fd0246cbe306230b5a27350f1ae60014531143'
+			utmContent: '78fd0246cbe306230b5a27350f1ae60014531143',
+			utmFirstHit: '2f15f7c3386d3c1b8f431385f19b64f4b5a99fea',
+			utmFirstReferrer: 'c3daf387ef687bffc465193a6b1ac525960a1d05'
 		}
 	},
 	password: {

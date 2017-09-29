@@ -3,11 +3,6 @@ extends layout/base
 block getTitle
 	- var titleVar = "Sign Up"
 
-block append headScripts
-	- var validateBaseStr = "/assets/js/libs/third-party/";
-	- var jqueryValidateStr = (environment == "production") ? (validateBaseStr + 'jquery.validate.min.js') : (validateBaseStr + 'jquery.validate.js');
-	+loadAsset("js", [jqueryValidateStr])
-
 block bodyContent
 	- formData = formData || {}
 	main(class="aligner aligner--vCenter aligner--hCenter wrapper wrapper--page")
@@ -124,5 +119,5 @@ block bodyContent
 						a(href="mailto:sales@adpushup.com", class="u-padding-0px u-margin-0px link link--primary") sales@adpushup.com
 
 	- signupJsBaseStr = "/assets/js/";
-	- signupJsStr = (environment == "production") ? (signupJsBaseStr + "builds/signup.min.js") : ("/assets/js/libs/custom/signup.js");
+	- signupJsStr = (environment == "production") ? (signupJsBaseStr + "builds/signup.min.js") : (signupJsBaseStr + "builds/signup.js");
 	+loadAsset("js", [signupJsStr])

@@ -50,7 +50,8 @@
 		"webpack": "^3.6.0"
 	},
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "./node_modules/.bin/parallel-webpack --progress",
+		"watch": "./node_modules/.bin/parallel-webpack --watch",
 		"start": "node server.js"
 	},
 	"author": "Yomesh Gupta <yomesh.gupta@gmail.com> (http://www.yomeshgupta.com/)",
