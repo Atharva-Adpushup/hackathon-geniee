@@ -28,7 +28,7 @@ def build():
 			lrun("git clone "+prebidGitPath)
 		with lcd(prebidPath):
 			lrun("npm install")
-			lrun("gulp build --adapters adapter2.json")
+			lrun("node_modules/.bin/gulp build --adapters adapter2.json")
 		buildAdpTags()
 		
 	with lcd(path):
