@@ -118,6 +118,7 @@ const mapStateToProps = (state, ownProps) => ({
 				isCustomZoneId = !!values.customZoneId,
 				sectionPayload = {
 					sectionNo: values.section,
+					name: values.name,
 					minDistanceFromPrevAd: values.minDistanceFromPrevAd,
 					float: values.float,
 					notNear,

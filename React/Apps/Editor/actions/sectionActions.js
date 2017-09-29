@@ -36,6 +36,10 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			alert('Cannot create in content section with same section no.');
 			return;
 		}
+		if (_.find(arr, { sectionNo: sectionPayload.name })) {
+			alert('Cannot create in content section with same section name.');
+			return;
+		}
 
 		const adId = Utils.getRandomNumber(),
 			sectionId = Utils.getRandomNumber(),
@@ -61,7 +65,6 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			}),
 			sectionPayload: Object.assign(sectionPayload, {
 				id: sectionId,
-				name: `Section-${sectionId}`,
 				ads: [adId],
 				createTs: Math.floor(Date.now() / 1000),
 				allXpaths: []

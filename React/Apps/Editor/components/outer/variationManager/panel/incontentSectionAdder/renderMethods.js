@@ -22,7 +22,7 @@ const renderField = field => {
 								className="inputMinimal"
 							/>
 							{field.meta.touched &&
-								field.meta.error && <div className="error-message">{field.meta.error}</div>}
+							field.meta.error && <div className="error-message">{field.meta.error}</div>}
 						</Col>
 					</Row>
 				</Col>
@@ -116,32 +116,30 @@ const renderField = field => {
 						</Col>
 					</Row>
 					<Row>
-						{that.state.network ? (
-							that.state.network == 'adpTags' ? (
-								<div className="clearfix">
-									<div className="mT-10 mB-10 clearfix">
-										<Field
-											placeholder="Please enter price floor"
-											name="priceFloor"
-											component={renderField}
-											type="text"
-											label="Price Floor"
-										/>
-									</div>
-									<div>
-										<Field
-											label="Header Bidding"
-											name="headerBidding"
-											component={renderSwitch}
-											onChange={that.switchChangeHandler.bind(that)}
-										/>
-									</div>
+						{that.state.network ? that.state.network == 'adpTags' ? (
+							<div className="clearfix">
+								<div className="mT-10 mB-10 clearfix">
+									<Field
+										placeholder="Please enter price floor"
+										name="priceFloor"
+										component={renderField}
+										type="text"
+										label="Price Floor"
+									/>
 								</div>
-							) : (
-								<div style={{ margin: '10px 0px' }} className="clearfix">
-									{CodeBoxField}
+								<div>
+									<Field
+										label="Header Bidding"
+										name="headerBidding"
+										component={renderSwitch}
+										onChange={that.switchChangeHandler.bind(that)}
+									/>
 								</div>
-							)
+							</div>
+						) : (
+							<div style={{ margin: '10px 0px' }} className="clearfix">
+								{CodeBoxField}
+							</div>
 						) : null}
 					</Row>
 				</Col>
@@ -231,6 +229,15 @@ const renderField = field => {
 						component={renderField}
 						type="number"
 						label="Section No"
+						onFocus={that.setFocusElement.bind(that)}
+						onBlur={that.setFocusElement.bind(that)}
+					/>
+					<Field
+						placeholder="Please enter section name"
+						name="name"
+						component={renderField}
+						type="text"
+						label="Section Name"
 						onFocus={that.setFocusElement.bind(that)}
 						onBlur={that.setFocusElement.bind(that)}
 					/>
