@@ -256,7 +256,7 @@ const renderField = field => {
 								</Col>
 								<Col xs={7} className="u-padding-r10px">
 									<Field name="adSize" component="select" className="inputMinimal">
-										{getSupportedSizes().map((pos, index) => (
+										{getSupportedSizes(that.props.customSizes).map((pos, index) => (
 											<option key={index} name={pos}>
 												{pos}
 											</option>
