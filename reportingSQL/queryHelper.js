@@ -20,7 +20,8 @@ var Promise = require('bluebird'),
 					site: true
 				},
 				where: [],
-				groupBy: false
+				groupBy: false,
+				orderBy: false
 			};
 			firstQuery = {
 				select: 'SELECT ',
@@ -54,14 +55,28 @@ var Promise = require('bluebird'),
 				)
 			);
 		},
+		__reduceArrayToStringAggregate: (array, alias) => {
+			let response = ' ';
+			_.forEach(array, (field, key) => {
+				response += ` SUM(${alias}.${field}) AS ${field}, `;
+			});
+			return response.slice(0, -2);
+		},
 		__getAlias: field => {
 			let alias = false;
-			if (field == 'name') {
-				alias = schema.common.tables.pagegroup.alias;
-			} else if (field == 'variation_id') {
-				alias = schema.common.tables.variation.alias;
-			} else if (field == 'section_md5') {
-				alias = schema.common.tables.section.alias;
+			switch (field) {
+				case 'name':
+				case 'axpgid':
+					alias = schema.common.tables.pagegroup.alias;
+					break;
+				case 'variation_id':
+				case 'axvid':
+					alias = schema.common.tables.variation.alias;
+					break;
+				case 'section_md5':
+				case 'axsid':
+					alias = schema.common.tables.section.alias;
+					break;
 			}
 			return alias;
 		},
@@ -81,13 +96,13 @@ var Promise = require('bluebird'),
 				// for On
 				if (index != -1) {
 					slicedArray.splice(index, 1);
-					firstQuery.groupBy += ` ,${schema.firstQuery.tables.sectionReport.alias}.axsid, `;
+					firstQuery.groupBy += ` ,${schema.firstQuery.tables.sectionReport.alias}.axsid `;
 				}
-				firstQuery.groupBy += `, ${queryHelper.__reduceArrayToString(
+				firstQuery.groupBy += `,${queryHelper.__reduceArrayToString(
 					slicedArray,
 					schema.firstQuery.tables.apexSiteReport.alias
 				)}`;
-				secondQuery.groupBy += `, ${queryHelper.__reduceArrayToString(
+				secondQuery.groupBy += `,${queryHelper.__reduceArrayToString(
 					common.fields.forOn,
 					schema.secondQuery.tables.adpTagReport.alias
 				)}`;
@@ -117,7 +132,10 @@ var Promise = require('bluebird'),
 			let response = ' ';
 
 			firstQuery.aggregate.length
-				? (response += queryHelper.__reduceArrayToString(firstQuery.aggregate, schema.firstQuery.alias))
+				? (response += queryHelper.__reduceArrayToStringAggregate(
+						firstQuery.aggregate,
+						schema.firstQuery.alias
+					))
 				: null;
 			firstQuery.nonAggregate.length
 				? (response += `, ${queryHelper.__reduceArrayToString(
@@ -126,7 +144,7 @@ var Promise = require('bluebird'),
 					)}`)
 				: null;
 			secondQuery.aggregate.length
-				? (response += `, ${queryHelper.__reduceArrayToString(
+				? (response += `, ${queryHelper.__reduceArrayToStringAggregate(
 						secondQuery.aggregate,
 						schema.secondQuery.alias
 					)}`)
@@ -146,42 +164,32 @@ var Promise = require('bluebird'),
 		__generateDate: () => `report_date BETWEEN @__from__ AND @__to__ `,
 		__setLevel: data => {
 			let index = 0;
-			if (data.hasOwnProperty('section_md5')) {
+			if (data.hasOwnProperty('section_md5') || (_.isArray(data) && data.indexOf('section_md5') != -1)) {
 				common.level.section = true;
 				index = 3;
-			} else if (data.hasOwnProperty('variation_id')) {
+			} else if (data.hasOwnProperty('variation_id') || (_.isArray(data) && data.indexOf('variation_id') != -1)) {
 				common.level.variation = true;
 				index = 2;
-			} else if (data.hasOwnProperty('name')) {
+			} else if (data.hasOwnProperty('name') || (_.isArray(data) && data.indexOf('name') != -1)) {
 				common.level.pagegroup = true;
 				index = 1;
 			}
 			index ? (common.fields.forUser = schema.common.fields.forUser.slice(0, index)) : null;
 			index ? (common.fields.forOn = schema.common.fields.forOn.slice(0, index)) : null;
-			return Promise.resolve();
+			return Promise.resolve(true);
 		},
-		select: data => {
-			let alias = common.level.section
-				? schema.firstQuery.tables.sectionReport.alias
-				: schema.firstQuery.tables.apexSiteReport.alias;
-			_.forEach(data, field => {
-				if (schema.firstQuery.nonAggregate.indexOf(field) != -1) {
-					firstQuery.select += ` ${schema.firstQuery.tables.apexSiteReport.alias}.${field}, `;
-					firstQuery.nonAggregate.push(field);
-				} else if (schema.firstQuery.aggregate.indexOf(field) != -1) {
-					firstQuery.select += ` SUM(${alias}.${field}) AS ${field}, `;
-					firstQuery.aggregate.push(field);
-				}
-
-				if (schema.secondQuery.nonAggregate.indexOf(field) != -1) {
-					secondQuery.select += ` ${schema.secondQuery.tables.adpTagReport.alias}.${field}, `;
-					secondQuery.nonAggregate.push(field);
-				} else if (schema.secondQuery.aggregate.indexOf(field) != -1) {
-					secondQuery.select += ` SUM(${schema.secondQuery.tables.adpTagReport
-						.alias}.${field}) AS ${field}, `;
-					secondQuery.aggregate.push(field);
+		__getLevel: () => {
+			let keys = Object.keys(common.level),
+				level = 'site';
+			keys.some((value, index) => {
+				if (common.level[value]) {
+					level = value;
+					return true;
 				}
 			});
+			return level;
+		},
+		__completeReaminingSelect: () => {
 			if (common.level.section || common.level.variation || common.level.pagegroup) {
 				let index = common.fields.forOn.indexOf('axsid');
 				let slicedArray = common.fields.forOn.concat([]);
@@ -209,6 +217,83 @@ var Promise = require('bluebird'),
 				firstQuery.select = firstQuery.select.slice(0, -2);
 				secondQuery.select = secondQuery.select.slice(0, -2);
 			}
+		},
+		__setCommonColumnsCondition: () => {
+			let level = queryHelper.__getLevel();
+			if (level == 'section') {
+				firstQuery.where += ` AND ${schema.firstQuery.tables.apexSiteReport.alias}.axhsrid=${schema.firstQuery
+					.tables.sectionReport.alias}.axhsrid `;
+			}
+			firstQuery.where += queryHelper.__generateCommonColumnsCondition(
+				schema.firstQuery.tables.apexSiteReport.alias
+			);
+			secondQuery.where += queryHelper.__generateCommonColumnsCondition(
+				schema.secondQuery.tables.adpTagReport.alias
+			);
+			return true;
+		},
+		__generateCommonColumnsCondition: (firstAlias, secondAlias) => {
+			let query = ' ';
+			if (common.fields.forOn.length) {
+				_.forEach(common.fields.forOn, field => {
+					let alias = secondAlias || queryHelper.__getAlias(field);
+					query += ` AND ${firstAlias}.${field}=${alias}.${field} `;
+				});
+			}
+			return query;
+		},
+		__setLevelFromGroupBy: data => {
+			return !_.isArray(data) || !data.length ? Promise.resolve(false) : queryHelper.__setLevel(data);
+		},
+		select: data => {
+			let alias = common.level.section
+				? schema.firstQuery.tables.sectionReport.alias
+				: schema.firstQuery.tables.apexSiteReport.alias;
+			_.forEach(data, field => {
+				if (schema.firstQuery.nonAggregate.indexOf(field) != -1) {
+					firstQuery.select += ` ${schema.firstQuery.tables.apexSiteReport.alias}.${field}, `;
+					firstQuery.nonAggregate.push(field);
+				} else if (schema.firstQuery.aggregate.indexOf(field) != -1) {
+					firstQuery.select += ` SUM(${alias}.${field}) AS ${field}, `;
+					firstQuery.aggregate.push(field);
+				}
+
+				if (schema.secondQuery.nonAggregate.indexOf(field) != -1) {
+					secondQuery.select += ` ${schema.secondQuery.tables.adpTagReport.alias}.${field}, `;
+					secondQuery.nonAggregate.push(field);
+				} else if (schema.secondQuery.aggregate.indexOf(field) != -1) {
+					secondQuery.select += ` SUM(${schema.secondQuery.tables.adpTagReport
+						.alias}.${field}) AS ${field}, `;
+					secondQuery.aggregate.push(field);
+				}
+			});
+			// if (common.level.section || common.level.variation || common.level.pagegroup) {
+			// 	let index = common.fields.forOn.indexOf('axsid');
+			// 	let slicedArray = common.fields.forOn.concat([]);
+			// 	// for On
+			// 	if (index != -1) {
+			// 		slicedArray.splice(index, 1);
+			// 		firstQuery.select += ` ${schema.firstQuery.tables.sectionReport.alias}.axsid, `;
+			// 	}
+			// 	firstQuery.select += queryHelper.__reduceArrayToString(
+			// 		slicedArray,
+			// 		schema.firstQuery.tables.apexSiteReport.alias
+			// 	);
+			// 	secondQuery.select += queryHelper.__reduceArrayToString(
+			// 		common.fields.forOn,
+			// 		schema.secondQuery.tables.adpTagReport.alias
+			// 	);
+
+			// 	// for sending to user
+			// 	_.forEach(common.fields.forUser, (value, key) => {
+			// 		let currentAlias = queryHelper.__getAlias(value);
+			// 		firstQuery.select += ` ,${currentAlias}.${value} `;
+			// 		secondQuery.select += ` ,${currentAlias}.${value} `;
+			// 	});
+			// } else {
+			// 	firstQuery.select = firstQuery.select.slice(0, -2);
+			// 	secondQuery.select = secondQuery.select.slice(0, -2);
+			// }
 			return true;
 		},
 		from: () => {
@@ -283,22 +368,35 @@ var Promise = require('bluebird'),
 						);
 					});
 
-					common.level.section
-						? (firstQuery.where += ` AND ${schema.firstQuery.tables.apexSiteReport.alias}.axhsrid=${schema
-								.firstQuery.tables.sectionReport.alias}.axhsrid `)
-						: null;
+					// common.level.section
+					// 	? (firstQuery.where += ` AND ${schema.firstQuery.tables.apexSiteReport.alias}.axhsrid=${schema
+					// 			.firstQuery.tables.sectionReport.alias}.axhsrid `)
+					// 	: null;
 
 					return true;
 				});
 		},
 		groupBy: data => {
-			return queryHelper.__groupBy().then(() => {
-				if (!data || !data.length) {
-					return false;
-				}
-				common.groupBy = ` GROUP BY ${data.join(', ')} `;
-				return false;
-			});
+			return queryHelper
+				.__setLevelFromGroupBy(data)
+				.then(response => {
+					response
+						? (common.groupBy = ` GROUP BY ${queryHelper.__reduceArrayToString(
+								data,
+								schema.firstQuery.alias
+							)} `)
+						: null;
+					return queryHelper.__groupBy();
+				})
+				.then(response => queryHelper.__completeReaminingSelect())
+				.then(response => queryHelper.__setCommonColumnsCondition());
+		},
+		orderBy: data => {
+			if (!_.isArray(data) || !data.length) {
+				return Promise.resolve();
+			}
+			common.orderBy = ` ORDER BY ${queryHelper.__reduceArrayToString(data, schema.firstQuery.alias)} `;
+			return Promise.resolve();
 		},
 		generateCompleteQuery: () => {
 			return queryHelper.__checkParamsPresent().then(() => {
@@ -324,14 +422,19 @@ var Promise = require('bluebird'),
 				// ON
 				common.query += 'ON a.report_date=b.report_date AND a.siteid=b.siteid';
 
-				if (common.fields.forOn.length) {
-					_.forEach(common.fields.forOn, field => {
-						common.query += ` AND ${schema.firstQuery.alias}.${field}=${schema.secondQuery
-							.alias}.${field} `;
-					});
-				}
+				common.query += queryHelper.__generateCommonColumnsCondition(
+					schema.firstQuery.alias,
+					schema.secondQuery.alias
+				);
+
+				// if (common.fields.forOn.length) {
+				// 	_.forEach(common.fields.forOn, field => {
+				// 		common.query += ` AND ${}.${field}=${}.${field} `;
+				// 	});
+				// }
 
 				common.query += common.groupBy ? common.groupBy : ' ';
+				common.query += common.orderBy ? common.orderBy : ' ';
 
 				return {
 					query: common.query,

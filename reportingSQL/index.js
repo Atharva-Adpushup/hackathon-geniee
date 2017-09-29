@@ -15,55 +15,7 @@ function executeQuery(params) {
 	return dbHelper.queryDB(params);
 }
 
-function getId(key, value, type, query, siteid) {
-	let inputParameters = [
-		{
-			name: key,
-			type: type,
-			value: value
-		},
-		{
-			name: '__siteid__',
-			type: 'INT',
-			value: siteid
-		}
-	];
-	return executeQuery({
-		inputParameters: inputParameters.concat([]),
-		query: query
-	}).then(response => (_.isArray(response) && response.length ? response[0][_.keys(response[0])[0]] : false));
-}
-
 function whereWrapper(data) {
-	// let promises = {};
-	// // find section Id
-	// promises.axsid = data.hasOwnProperty('section')
-	// 	? getId('__section_md5__', data.section, 'VARCHAR', fetchSectionQuery, data.siteid)
-	// 	: Promise.resolve(false);
-	// // find variation Id
-	// promises.axvid = data.hasOwnProperty('variation')
-	// 	? getId('__variation_id__', data.variation, 'NVARCHAR', fetchVariationQuery, data.siteid)
-	// 	: Promise.resolve(false);
-	// // find pagegroup Id
-	// promises.axpgid = data.hasOwnProperty('pagegroup')
-	// 	? getId('__name__', data.pagegroup, 'NVARCHAR', fetchPagegroupQuery, data.siteid)
-	// 	: Promise.resolve(false);
-	// return Promise.props(promises).then(response => {
-	// 	let whereData = _.extend({}, data);
-	// 	let sectionNotFound = !!(data.section && !response.axsid);
-	// 	let variationNotFound = !!(data.variation && !response.axvid);
-	// 	let pagegroupNotFound = !!(data.pagegroup && !response.axpgid);
-	// 	if (sectionNotFound || variationNotFound || pagegroupNotFound) {
-	// 		return Promise.reject('Invalid where values');
-	// 	}
-	// 	response.axsid ? (whereData.axsid = response.axsid) : null;
-	// 	response.axvid ? (whereData.axvid = response.axvid) : null;
-	// 	response.axpgid ? (whereData.axpgid = response.axpgid) : null;
-	// 	delete whereData.section;
-	// 	delete whereData.variation;
-	// 	delete whereData.pagegroup;
-	// 	return queryHelper.where(whereData);
-	// });
 	data.hasOwnProperty('section') ? (data.section_md5 = data.section) : null;
 	data.hasOwnProperty('variation') ? (data.variation_id = data.variation) : null;
 	data.hasOwnProperty('pagegroup') ? (data.name = data.pagegroup) : null;
@@ -75,11 +27,40 @@ function whereWrapper(data) {
 	return queryHelper.where(data);
 }
 
+function setCorrectColumnNames(data) {
+	let columns = _.isArray(data) && data.length ? data.concat([]) : false;
+	if (columns) {
+		_.forEach(columns, (value, key) => {
+			switch (value) {
+				case 'section':
+					columns[key] = 'section_md5';
+					break;
+				case 'variation':
+					columns[key] = 'variation_id';
+					break;
+				case 'pagegroup':
+					columns[key] = 'name';
+					break;
+			}
+		});
+	}
+	return columns;
+}
+
+function orderByWrapper(data) {
+	return queryHelper.orderBy(setCorrectColumnNames(data));
+}
+
+function groupByWrapper(data) {
+	return queryHelper.groupBy(setCorrectColumnNames(data));
+}
+
 function queryBuilder(data) {
 	return whereWrapper(data.where)
 		.then(() => queryHelper.select(data.select))
+		.then(() => groupByWrapper(data.groupBy))
 		.then(() => queryHelper.from())
-		.then(() => queryHelper.groupBy(data.groupBy))
+		.then(() => orderByWrapper(data.orderBy))
 		.then(() => queryHelper.generateCompleteQuery());
 }
 
@@ -104,8 +85,10 @@ init({
 		// section: '429e5150-e40b-4afb-b165-93b8bde3cf21',
 		siteid: 28822,
 		// variation: '2e68228f-84da-415e-bfcf-bfcf67c87570',
-		// pagegroup: 'MIC',
+		pagegroup: 'MIC',
 		from: '2017-09-01',
-		to: '2017-09-01'
-	}
+		to: '2017-09-10'
+	},
+	groupBy: ['variation']
+	// orderBy: ['variation']
 });

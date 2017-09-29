@@ -25,6 +25,19 @@ AND g.section_md5='429e5150-e40b-4afb-b165-93b8bde3cf21'  AND f.variation_id='2e
 AND e.name='MIC'  GROUP BY  h.report_date, h.siteid ,  h.axpgid, h.axvid , h.axsid  ,e.name  ,f.variation_id  
 ,g.section_md5  ) b ON a.report_date=b.report_date AND a.siteid=b.siteid AND a.axpgid=b.axpgid  AND a.axvid=b.axvid  
 AND a.axsid=b.axsid
+
+
+Based on Group By
+
+Select							WHERE						GROUP BY
+
+report_date						from						report_date
+siteid							to							siteid
+total_xpath_miss				pagegroup					pagegroup
+total_cpm						variation					variation
+total_impressions				section						section
+								device						device
+
 */
 const section_level_query = `
 SELECT
