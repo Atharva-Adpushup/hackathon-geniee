@@ -4,6 +4,8 @@ import { Grid, Row, Col, Button } from 'react-bootstrap';
 import Datatable from 'react-bs-datatable';
 import ActionCard from '../../../Components/ActionCard.jsx';
 import '../styles.scss';
+import HighchartsMore from 'highcharts-more';
+HighchartsMore(ReactHighcharts.Highcharts);
 
 const header = [
 		{ title: 'Date', prop: 'date', sortable: true, filterable: true },
@@ -97,25 +99,60 @@ class ReportingPanel extends React.Component {
 				{
 					name: 'Impressions',
 					yAxis: 0,
-					data: [22010, 20343, 19563, 18124, 21047, 22098, 19932]
+					data: [22010, 20343, 19563, 18124, 21047, 22098, 19932],
+					lineWidth: 1.5,
+					marker: {
+						symbol: 'circle',
+						radius: 3.2
+					}
 				},
 				{
 					name: 'CPM',
 					yAxis: 1,
-					data: [4.5, 5.5, 2, 3.4, 6.2, 4.4, 5.2]
+					data: [4.5, 5.5, 2, 3.4, 6.2, 4.4, 5.2],
+					lineWidth: 1.5,
+					marker: {
+						symbol: 'circle',
+						radius: 3.2
+					}
 				},
 				{
 					name: 'Xpath miss',
 					yAxis: 0,
-					data: [6343, 7444, 5984, 6100, 7676, 7896, 6811]
+					data: [6343, 7444, 5984, 6100, 7676, 7896, 6811],
+					lineWidth: 1.5,
+					marker: {
+						symbol: 'circle',
+						radius: 3.2
+					}
 				},
 				{
 					name: 'Clicks',
 					yAxis: 0,
-					data: [1344, 1235, 1545, 1434, 1429, 1349, 1412]
+					data: [1344, 1235, 1545, 1434, 1429, 1349, 1412],
+					lineWidth: 1.5,
+					marker: {
+						symbol: 'circle',
+						radius: 3.2
+					}
 				}
 			],
-			credits: false
+			lang: {
+				thousandsSep: ','
+			},
+			chart: {
+				spacingTop: 35,
+				style: {
+					fontFamily: 'Karla'
+				}
+			},
+			tooltip: {
+				shared: true
+			},
+			colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e'],
+			credits: {
+				enabled: false
+			}
 		};
 
 		return (
