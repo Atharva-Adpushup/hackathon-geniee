@@ -4,7 +4,7 @@ var logger = require('../helpers/logger'),
 	utils = require('../helpers/utils'),
 	config = require('./config'),
 	feedback = require('./feedback'),
-	hbStatus = require('./hbStatus'),
+	// hbStatus = require('./hbStatus'),
 	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(1));
 		if (val > 20) {
@@ -134,7 +134,7 @@ var logger = require('../helpers/logger'),
 			googletag.enableServices();
 
 			var adUnits = utils.getBatchAdUnits(adpSlotsWithDFPSlots).join(',');
-			hbStatus.hbRender(adUnits);
+			// hbStatus.hbRender(adUnits);
 
 			//In last try rendering all slots.
 			adpSlotsWithDFPSlots.forEach(function(slot) {
