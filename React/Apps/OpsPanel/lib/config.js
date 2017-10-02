@@ -38,7 +38,7 @@ const config = {
 		},
 		brealtime: {
 			name: 'brealtime',
-			isHb: true,
+			isHb: false,
 			global: {
 				placementId: { validations: { required: true }, alias: 'Placement Id', isEditable: true }
 			}
