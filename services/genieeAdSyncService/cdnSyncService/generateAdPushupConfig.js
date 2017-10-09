@@ -65,6 +65,7 @@ const _ = require('lodash'),
 			} else if (ad.network == 'adpTags') {
 				json.networkData = {
 					dfpAdunit: ad.networkData.dfpAdunit,
+					dfpAdunitCode: ad.networkData.dfpAdunitCode,
 					headerBidding: ad.networkData.headerBidding,
 					priceFloor: ad.networkData.priceFloor
 				};
@@ -72,7 +73,8 @@ const _ = require('lodash'),
 					key: `${json.width}x${json.height}`,
 					height: json.height,
 					width: json.width,
-					dfpAdunit: ad.networkData.dfpAdunit
+					dfpAdunit: ad.networkData.dfpAdunit,
+					dfpAdunitCode: ad.networkData.dfpAdunitCode
 				});
 			} else {
 				json.adCode = ad.adCode;

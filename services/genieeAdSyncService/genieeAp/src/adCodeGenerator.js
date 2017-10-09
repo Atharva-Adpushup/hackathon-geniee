@@ -68,11 +68,17 @@ module.exports = {
 			return function() {
 				for (var i = 0; i < adpTagUnits.length; i++) {
 					var ad = adpTagUnits[i];
-					adpTags.defineSlot(ad.networkData.dfpAdunit, [ad.width, ad.height], ad.networkData.dfpAdunit, {
-						dfpAdunit: ad.networkData.dfpAdunit,
-						headerBidding: ad.networkData.headerBidding,
-						priceFloor: ad.networkData.priceFloor
-					});
+					adpTags.defineSlot(
+						ad.networkData.dfpAdunitCode,
+						[ad.width, ad.height],
+						ad.networkData.dfpAdunitCode,
+						{
+							dfpAdunit: ad.networkData.dfpAdunit,
+							dfpAdunitCode: ad.networkData.dfpAdunitCode,
+							headerBidding: ad.networkData.headerBidding,
+							priceFloor: ad.networkData.priceFloor
+						}
+					);
 				}
 			};
 		};
