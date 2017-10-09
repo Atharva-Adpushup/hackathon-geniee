@@ -74,7 +74,11 @@ var logger = require('../helpers/logger'),
 		});
 	},
 	enableGoogServicesForSlot = function(slot) {
-		slot.gSlot = googletag.defineSlot('/' + config.NETWORK_ID + '/' + slot.slotId, slot.size, slot.containerId);
+		slot.gSlot = googletag.defineSlot(
+			'/' + config.NETWORK_ID + '/' + slot.optionalParam.dfpAdunitCode,
+			slot.size,
+			slot.containerId
+		);
 		setGPTargeting(slot);
 		slot.gSlot.addService(googletag.pubads());
 	},
