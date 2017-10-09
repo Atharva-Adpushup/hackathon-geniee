@@ -19,7 +19,10 @@ var config = require('./config'),
 			w.googletag.pubads().addEventListener('slotRenderEnded', function(event) {
 				var slot;
 				Object.keys(w.adpTags.adpSlots).forEach(function(adpSlot) {
-					if ('/' + config.NETWORK_ID + '/' + w.adpTags.adpSlots[adpSlot].slotId === event.slot.getName()) {
+					if (
+						'/' + config.NETWORK_ID + '/' + w.adpTags.adpSlots[adpSlot].optionalParam.dfpAdunitCode ===
+						event.slot.getName()
+					) {
 						slot = w.adpTags.adpSlots[adpSlot];
 					}
 				});
