@@ -69,22 +69,6 @@ class info extends React.Component {
 				</Row>
 				<Row>
 					<Col xs={12}>
-						<label>Content Selector</label>
-					</Col>
-					<Col xs={12} className="wrapfeature">
-						<InlineEdit
-							compact
-							validate
-							font={400}
-							value={channel.contentSelector}
-							submitHandler={onContentSelectorChange.bind(null, channel.id)}
-							text="Content Selector"
-							errorMessage="Content Selector cannot be blank"
-						/>
-					</Col>
-				</Row>
-				<Row>
-					<Col xs={12}>
 						<label>Sample Url</label>
 					</Col>
 					<Col xs={12} className="wrapfeature">

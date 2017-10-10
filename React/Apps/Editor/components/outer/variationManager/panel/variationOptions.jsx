@@ -17,7 +17,8 @@ const variationOtions = props => {
 		onEditVariationName,
 		variation,
 		channelId,
-		onEditTrafficDistribution
+		onEditTrafficDistribution,
+		onUpdateContentSelector
 	} = props;
 
 	function copyVariationConfirmation(fn, variationId, channelId) {
@@ -48,6 +49,20 @@ const variationOtions = props => {
 				</Col>
 				<Col className="u-padding-l10px" xs={4}>
 					<strong>{props.variation.sections.length}</strong>
+				</Col>
+			</Row>
+			<Row>
+				<Col className="u-padding-r10px" xs={2}>
+					Content Selector
+				</Col>
+				<Col className="u-padding-l10px" xs={4}>
+					<InlineEdit
+						validate
+						value={variation.contentSelector}
+						submitHandler={onUpdateContentSelector.bind(null, variation.id, channelId)}
+						text="Content selector"
+						errorMessage="Content selector cannot be blank"
+					/>
 				</Col>
 			</Row>
 			<br />
@@ -82,7 +97,8 @@ variationOtions.propTypes = {
 	onCopyVariation: PropTypes.func.isRequired,
 	onDeleteVariation: PropTypes.func.isRequired,
 	onEditVariationName: PropTypes.func.isRequired,
-	onEditTrafficDistribution: PropTypes.func.isRequired
+	onEditTrafficDistribution: PropTypes.func.isRequired,
+	onUpdateContentSelector: PropTypes.func.isRequired
 };
 
 export default connect(
