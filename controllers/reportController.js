@@ -25,15 +25,15 @@ var express = require('express'),
 	router = express.Router({ mergeParams: true }),
 	reports = require('../models/reportsModel');
 
-function queryResultProcessing(queryResult, response) {
-	return lodash.isArray(queryResult) && queryResult.length
-		? Object.assign(response, {
-				columns: Object.keys(queryResult.columns),
-				rows: queryResult
-			})
-		: Object.assign(response, {
-				rows: []
-			});
+function queryResultProcessing(queryResult, response, res) {
+	let columnsAndRows =
+		lodash.isArray(queryResult) && queryResult.length
+			? {
+					columns: Object.keys(queryResult.columns),
+					rows: queryResult
+				}
+			: { rows: [], message: 'empty result from query' };
+	return res.send(Object.assign(response, columnsAndRows));
 }
 
 function errorHandling(err, response, res) {
