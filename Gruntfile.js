@@ -25,12 +25,12 @@ module.exports = function(grunt) {
 				dest: 'public/assets/js/builds/adpushup-onboarding.min.js'
 			},
 			signupBuild: {
-				src: ['public/assets/js/libs/custom/signup.js'],
+				src: ['public/assets/js/builds/signup.js'],
 				dest: 'public/assets/js/builds/signup.min.js'
 			},
-			hbSetupBuild: {
-				src: ['public/assets/js/libs/custom/header-bidding-setup.js'],
-				dest: 'public/assets/js/builds/header-bidding-setup.min.js'
+			utmParamterCookieBuild: {
+				src: ['public/assets/js/builds/utmParamCookie.js'],
+				dest: 'public/assets/js/builds/utmParamCookie.min.js'
 			}
 		},
 		concat: {
@@ -43,6 +43,21 @@ module.exports = function(grunt) {
 					'Editor/app/libs/adpushup.js'
 				],
 				dest: 'public/assets/js/libs/custom/base-libs.js'
+			},
+			signupBuild: {
+				src: [
+					'public/assets/js/libs/third-party/js.cookie.js',
+					'public/assets/js/libs/third-party/jquery.validate.js',
+					'public/assets/js/libs/custom/signup.js'
+				],
+				dest: 'public/assets/js/builds/signup.js'
+			},
+			utmParamterCookieBuild: {
+				src: [
+					'public/assets/js/libs/third-party/js.cookie.js',
+					'public/assets/js/libs/custom/utm-parameters-cookie.js'
+				],
+				dest: 'public/assets/js/builds/utmParamCookie.js'
 			}
 		},
 		sass: {

@@ -1,9 +1,96 @@
-(function (W, $) {
+(function(W, $, Ck) {
 	var $nameFieldWrapper = $('.js-signup-name-wrapper'),
 		$emailFieldWrapper = $('.js-signup-emailId-wrapper'),
 		$dropDownFieldWrapper = $('.js-websiteRevenue-dropdown-wrapper'),
 		$exactRevenueFieldWrapper = $('.js-websiteRevenue-exact-wrapper'),
-		$exactRevenueField = $('#signup-exactRevenue', $exactRevenueFieldWrapper);
+		$exactRevenueField = $('#signup-exactRevenue', $exactRevenueFieldWrapper),
+		constants = {
+			cookie: {
+				firstHit: 'adp_fh'
+			},
+			protocol: {
+				http: 'http:'
+			}
+		},
+		utils = {
+			btoa: function(value) {
+				return btoa(encodeURI(JSON.stringify(value)));
+			},
+			atob: function(value) {
+				return JSON.parse(decodeURI(atob(value)));
+			},
+			rightTrim: function(string, s) {
+				return string ? string.replace(new RegExp(s + '*$'), '') : '';
+			},
+			domanize: function(domain) {
+				return domain
+					? this.rightTrim(
+							domain
+								.replace('http://', '')
+								.replace('https://', '')
+								.replace('www.', ''),
+							'/'
+						)
+					: '';
+			}
+		},
+		locationProtocol = W.location.protocol,
+		isProtocolHttp = !!(locationProtocol && locationProtocol === constants.protocol.http),
+		isDocumentReferrer = !!W.document.referrer,
+		// Direct-Http condition is when document protocol is 'http' and referrer is empty ('').
+		// This condition arises when a user is navigated to an insecure (http) page from a secured (https)
+		// one and document referrer becomes empty.
+		// We need to track this use case in our code for analytics purposes, hence below is its implementation
+		isDirectHttpCondition = !!(isProtocolHttp && !isDocumentReferrer),
+		directReferrerValue = isDirectHttpCondition ? 'direct-http' : 'direct',
+		utmParameters = {
+			firstHit: utils.domanize(W.location.href),
+			firstReferrer: isDocumentReferrer ? utils.domanize(W.document.referrer) : directReferrerValue
+		};
+
+	function getCookie(name) {
+		return Ck.get(name);
+	}
+
+	function setCookie(name, value, expiryDays) {
+		Ck.set(name, value, { expires: expiryDays, domain: 'adpushup.com' });
+	}
+
+	function getFirstHitCookieData() {
+		var inputCookieData = getCookie(constants.cookie.firstHit),
+			isCookie = !!inputCookieData,
+			cookieName = constants.cookie.firstHit,
+			cookieData,
+			encodedData;
+
+		if (!isCookie) {
+			cookieData = {
+				firstHit: utmParameters.firstHit,
+				firstReferrer: utmParameters.firstReferrer
+			};
+			encodedData = utils.btoa(cookieData);
+			setCookie(cookieName, encodedData, 30);
+			return cookieData;
+		}
+
+		cookieData = utils.atob(inputCookieData);
+		return cookieData;
+	}
+
+	function getFirstHitUtmParameters() {
+		var cookieData = getFirstHitCookieData(),
+			computedObj;
+
+		if (!cookieData) {
+			return false;
+		}
+
+		computedObj = {
+			utm_firstHit: cookieData.firstHit,
+			utm_firstReferrer: cookieData.firstReferrer
+		};
+		return computedObj;
+	}
 
 	function validateTermsCheckbox() {
 		var termsStr = 'Please agree to our Terms of Service & Privacy Policy',
@@ -40,23 +127,16 @@
 	function toggleExactRevenueField($element) {
 		var value = $element.val(),
 			leastRevenueConstant = '999',
-			isValue = !!(value),
-			isMinimunRevenueMatch = !!(isValue && (leastRevenueConstant === value));
+			isValue = !!value,
+			isMinimunRevenueMatch = !!(isValue && leastRevenueConstant === value);
 
 		if (isMinimunRevenueMatch) {
-			$dropDownFieldWrapper
-				.removeClass('col-md-12 pd-0')
-				.addClass('col-md-6 u-padding-r15px');
-			$exactRevenueFieldWrapper
-				.removeClass('hide');
-			$exactRevenueField
-				.val('');
+			$dropDownFieldWrapper.removeClass('col-md-12 pd-0').addClass('col-md-6 u-padding-r15px');
+			$exactRevenueFieldWrapper.removeClass('hide');
+			$exactRevenueField.val('');
 		} else {
-			$dropDownFieldWrapper
-				.removeClass('col-md-6 u-padding-r15px')
-				.addClass('col-md-12 pd-0');
-			$exactRevenueFieldWrapper
-				.addClass('hide');
+			$dropDownFieldWrapper.removeClass('col-md-6 u-padding-r15px').addClass('col-md-12 pd-0');
+			$exactRevenueFieldWrapper.addClass('hide');
 		}
 	}
 
@@ -71,7 +151,7 @@
 			}
 		});
 
-		$dropdownField.off('change').on('change', function () {
+		$dropdownField.off('change').on('change', function() {
 			var $el = $(this);
 
 			toggleExactRevenueField($el);
@@ -92,9 +172,7 @@
 			var errorMessage = errorsObj[val],
 				$errorEl = $('.js-' + val + '-error', $form);
 
-			$errorEl
-				.empty()
-				.html(errorMessage);
+			$errorEl.empty().html(errorMessage);
 		});
 	}
 
@@ -103,23 +181,29 @@
 	}
 
 	function addValidationMethods() {
-		$.validator.addMethod('isAdNetworksNull', function(value, element) {
-			return (value && element.value) ? true : false;
-		}, 'Please select atleast one ad network');
+		$.validator.addMethod(
+			'isAdNetworksNull',
+			function(value, element) {
+				return value && element.value ? true : false;
+			},
+			'Please select atleast one ad network'
+		);
 	}
 
 	function getFormParams(form) {
 		var json = {};
-		$(form).serializeArray().forEach(function(obj) {
-			if (json.hasOwnProperty(obj.name) && json[obj.name]) {
-				(obj.name === 'adNetworks') ? json[obj.name].push(obj.value) : json[obj.name] = obj.value;
-			} else if (obj.name === 'adNetworks') {
-				json[obj.name] = [];
-				json[obj.name].push(obj.value);
-			} else {
-				json[obj.name] = obj.value;
-			}
-		});
+		$(form)
+			.serializeArray()
+			.forEach(function(obj) {
+				if (json.hasOwnProperty(obj.name) && json[obj.name]) {
+					obj.name === 'adNetworks' ? json[obj.name].push(obj.value) : (json[obj.name] = obj.value);
+				} else if (obj.name === 'adNetworks') {
+					json[obj.name] = [];
+					json[obj.name].push(obj.value);
+				} else {
+					json[obj.name] = obj.value;
+				}
+			});
 
 		return json;
 	}
@@ -130,65 +214,65 @@
 		$form.validate({
 			rules: {
 				name: {
-					'required': true,
-					'rangelength': [1, 150]
+					required: true,
+					rangelength: [1, 150]
 				},
 				email: {
-					'required': true,
-					'email': true
+					required: true,
+					email: true
 				},
 				password: {
-					'required': true,
-					'rangelength': [6, 32]
+					required: true,
+					rangelength: [6, 32]
 				},
 				site: {
-					'required': true,
-					'url': 'true'
+					required: true,
+					url: 'true'
 				},
 				pageviewRange: {
-					'required': true
+					required: true
 				},
 				adNetworks: {
-					'required': true,
-					'isAdNetworksNull': true
+					required: true,
+					isAdNetworksNull: true
 				},
 				termsPolicy: {
-					'required': true
+					required: true
 				},
 				exactRevenue: {
-					'required': true,
-					'range': [0, 999]
+					required: true,
+					range: [0, 999]
 				}
 			},
 			messages: {
 				name: {
-					'required': 'Please fill out name',
-					'rangelength': 'Enter name between 1 and 150'
+					required: 'Please fill out name',
+					rangelength: 'Enter name between 1 and 150'
 				},
 				email: {
-					'required': 'Please fill out email id',
-					'email': 'Enter email in name@example.com format'
+					required: 'Please fill out email id',
+					email: 'Enter email in name@example.com format'
 				},
 				password: {
-					'required': 'Please fill out password',
-					'rangelength': 'Enter password between 6 and 32'
+					required: 'Please fill out password',
+					rangelength: 'Enter password between 6 and 32'
 				},
 				site: {
-					'required': 'Please fill out site url',
-					'url': 'Enter url in valid format'
+					required: 'Please fill out site url',
+					url: 'Enter url in valid format'
 				},
 				pageviewRange: {
-					'required': 'Please select a page view range'
+					required: 'Please select a page view range'
 				},
 				adNetworks: {
-					'required': 'Please select atleast one ad network'
+					required: 'Please select atleast one ad network'
 				},
 				termsPolicy: {
-					'required': 'Please agree to our Terms of Service & Privacy Policy'
+					required: 'Please agree to our Terms of Service & Privacy Policy'
 				},
 				exactRevenue: {
-					'required': 'Please enter your exact revenue amount',
-					'range': 'Enter revenue amount between 0 and 999'
+					required: 'Please enter your exact revenue amount',
+					range: 'Enter revenue amount between 0 and 999'
 				}
 			},
 			onkeyup: validateElement,
@@ -200,8 +284,7 @@
 				form.submit();
 				return false;
 			},
-			invalidHandler: function() {
-			}
+			invalidHandler: function() {}
 		});
 	}
 
@@ -210,39 +293,51 @@
 			constants = {
 				padding: {
 					pxr15: 'u-padding-r15px',
-					'px0': 'u-padding-0px'
+					px0: 'u-padding-0px'
 				},
 				width: {
 					breakPoint: 992
 				}
 			},
-			hasNameWrapperPaddingClass = !!($nameFieldWrapper.hasClass(constants.padding.pxr15)),
-			hasEmailWrapperPaddingClass = !!($emailFieldWrapper.hasClass(constants.padding.pxr15)),
-			hasDropDownWrapperPaddingClass = !!($dropDownFieldWrapper.hasClass(constants.padding.pxr15)),
+			hasNameWrapperPaddingClass = !!$nameFieldWrapper.hasClass(constants.padding.pxr15),
+			hasEmailWrapperPaddingClass = !!$emailFieldWrapper.hasClass(constants.padding.pxr15),
+			hasDropDownWrapperPaddingClass = !!$dropDownFieldWrapper.hasClass(constants.padding.pxr15),
 			isWidthLessThanBreakPoint = !!(constants.width.breakPoint > windowWidth),
-			isExactRevenueWrapperVisible = !!(($exactRevenueFieldWrapper.width() > 0) && $exactRevenueFieldWrapper.height() > 0),
-			isExactRevenueVisible = (isExactRevenueWrapperVisible && hasDropDownWrapperPaddingClass);
+			isExactRevenueWrapperVisible = !!(
+				$exactRevenueFieldWrapper.width() > 0 && $exactRevenueFieldWrapper.height() > 0
+			),
+			isExactRevenueVisible = isExactRevenueWrapperVisible && hasDropDownWrapperPaddingClass;
 
 		if (!isWidthLessThanBreakPoint) {
-			if (!hasNameWrapperPaddingClass) { $nameFieldWrapper.removeClass(constants.padding.px0).addClass(constants.padding.pxr15); }
-			if (!hasEmailWrapperPaddingClass) { $emailFieldWrapper.removeClass(constants.padding.px0).addClass(constants.padding.pxr15); }
-			if (isExactRevenueWrapperVisible) { $dropDownFieldWrapper.removeClass(constants.padding.px0).addClass(constants.padding.pxr15); }
+			if (!hasNameWrapperPaddingClass) {
+				$nameFieldWrapper.removeClass(constants.padding.px0).addClass(constants.padding.pxr15);
+			}
+			if (!hasEmailWrapperPaddingClass) {
+				$emailFieldWrapper.removeClass(constants.padding.px0).addClass(constants.padding.pxr15);
+			}
+			if (isExactRevenueWrapperVisible) {
+				$dropDownFieldWrapper.removeClass(constants.padding.px0).addClass(constants.padding.pxr15);
+			}
 			return;
 		}
 
 		$nameFieldWrapper.removeClass(constants.padding.pxr15).addClass(constants.padding.px0);
 		$emailFieldWrapper.removeClass(constants.padding.pxr15).addClass(constants.padding.px0);
-		if (isExactRevenueVisible) { $dropDownFieldWrapper.removeClass(constants.padding.pxr15).addClass(constants.padding.px0); }
+		if (isExactRevenueVisible) {
+			$dropDownFieldWrapper.removeClass(constants.padding.pxr15).addClass(constants.padding.px0);
+		}
 	}
 
 	function appendQueryParameters() {
 		var utmParams = {
-			'utm_source': 'utmSource',
-			'utm_medium': 'utmMedium',
-			'utm_campaign': 'utmCampaign',
-			'utm_term': 'utmTerm',
-			'utm_name': 'utmName',
-			'utm_content': 'utmContent'
+			utm_source: 'utmSource',
+			utm_medium: 'utmMedium',
+			utm_campaign: 'utmCampaign',
+			utm_term: 'utmTerm',
+			utm_name: 'utmName',
+			utm_content: 'utmContent',
+			utm_firstHit: 'utmFirstHit',
+			utm_firstReferrer: 'utmFirstReferrer'
 		};
 
 		function mapKeyToParams(key) {
@@ -252,13 +347,25 @@
 		function fetchQueryParams() {
 			var match,
 				queryParams = {},
-				pl     = /\+/g,  // Regex for replacing addition symbol with a space
+				pl = /\+/g, // Regex for replacing addition symbol with a space
 				search = /([^&=]+)=?([^&]*)/g,
-				decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
-				query  = window.location.search.substring(1);
+				decode = function(s) {
+					return decodeURIComponent(s.replace(pl, ' '));
+				},
+				query = window.location.search.substring(1),
+				firstHitUtmParameters = getFirstHitUtmParameters(),
+				isFirstHitValid = !!(
+					firstHitUtmParameters &&
+					firstHitUtmParameters.hasOwnProperty('utm_firstHit') &&
+					firstHitUtmParameters.hasOwnProperty('utm_firstReferrer')
+				);
 
-			while (match = search.exec(query)) {
+			while ((match = search.exec(query))) {
 				queryParams[decode(match[1])] = decode(match[2]);
+			}
+
+			if (isFirstHitValid) {
+				queryParams = $.extend(true, {}, queryParams, firstHitUtmParameters);
 			}
 
 			return queryParams;
@@ -268,7 +375,7 @@
 			form = document.querySelector('.js-signup-form'),
 			keys = Object.keys(queryParams);
 
-		keys.forEach(function (param) {
+		keys.forEach(function(param) {
 			var ele = document.createElement('input'),
 				name = mapKeyToParams(param);
 
@@ -276,12 +383,12 @@
 				ele.name = name;
 				ele.type = 'hidden';
 				ele.value = queryParams[param];
-				form.append(ele);
+				form.appendChild(ele);
 			}
 		});
 	}
 
-	$(document).ready(function () {
+	$(document).ready(function() {
 		setUiData();
 		setInteractionHandlers();
 		validateTermsCheckbox();
@@ -289,4 +396,4 @@
 		validateSignupForm();
 		adjustLayoutForSmallScreens();
 	});
-})(window, jQuery);
+})(window, jQuery, Cookies);

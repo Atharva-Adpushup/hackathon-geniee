@@ -14,9 +14,13 @@ class CustomSizeForm extends React.Component {
 			height: 0,
 			width: 0
 		};
+		this.policiesPassed = this.policiesPassed.bind(this);
 	}
 
 	policiesPassed() {
+		if (this.state.width <= 0 || this.state.height <= 0) {
+			return false;
+		}
 		/*Only one dimension can be greater than 300 pixels
 		 The minimum width is 120 pixels
 		 The minimum height is 50 pixels
@@ -47,7 +51,7 @@ class CustomSizeForm extends React.Component {
 				height: self.state.height
 			};
 
-		this.props.onSave(adSize);
+		this.props.onSave(adSize, true);
 	}
 
 	// renderPolicyInfoTip() {
@@ -92,7 +96,7 @@ class CustomSizeForm extends React.Component {
 				</div>
 			);
 		}
-
+		const policiesPassed = this.policiesPassed();
 		return (
 			<div className="sm-pad" style={{ backgroundColor: 'rgba(85, 85, 85, 0.05)' }}>
 				<Row>
@@ -123,7 +127,11 @@ class CustomSizeForm extends React.Component {
 				</Row>
 				<Row style={{ textAlign: 'center' }}>
 					<Col xs={12}>
-						<Button className="btn-lightBg btn-add" onClick={a => this.save(a)}>
+						<Button
+							disabled={!policiesPassed ? 'disabled' : ''}
+							className="btn-lightBg btn-add"
+							onClick={a => this.save(a)}
+						>
 							ADD
 						</Button>
 						{/****this.props.isApex ? null : this.renderPolicyInfoTip()***/}

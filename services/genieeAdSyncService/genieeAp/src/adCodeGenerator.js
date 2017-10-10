@@ -35,7 +35,12 @@ module.exports = {
 				break;
 
 			default:
-				return false;
+				if(ad.adCode) {
+					adCode = utils.base64Decode(ad.adCode);
+				}
+				else {
+					return false;
+				}
 		}
 		return typeof adCode === 'string' ? adCode : adCode.join('\n');
 	},
@@ -70,6 +75,7 @@ module.exports = {
 					var ad = adpTagUnits[i];
 					adpTags.defineSlot(ad.networkData.dfpAdunit, [ad.width, ad.height], ad.networkData.dfpAdunit, {
 						dfpAdunit: ad.networkData.dfpAdunit,
+						dfpAdunitCode: ad.networkData.dfpAdunitCode,
 						headerBidding: ad.networkData.headerBidding,
 						priceFloor: ad.networkData.priceFloor
 					});

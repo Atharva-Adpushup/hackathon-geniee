@@ -73,6 +73,7 @@ const getLastVariationNumber = function(variations) {
 			ads,
 			variation: {
 				...copyFromVariation,
+				trafficDistribution: 0,
 				id: newVariationId,
 				name: newName,
 				createTs: Math.floor(Date.now() / 1000),

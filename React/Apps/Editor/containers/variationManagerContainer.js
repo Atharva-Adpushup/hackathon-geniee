@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import VariationManager from 'variationManager/variationManager.jsx';
 import { addVariation, copyVariation, deleteVariation, setActiveVariation } from 'actions/variationActions';
+import { openVariationPanel, closeVariationPanel } from 'actions/uiActions';
 import { getActiveChannelId, getActiveChannel } from 'selectors/channelSelectors';
 import {
 	getActiveChannelVariationsWithAds,
@@ -28,6 +29,12 @@ const mapStateToProps = state => ({
 		},
 		setActiveVariation: (variationId, channelId) => {
 			dispatch(setActiveVariation(variationId, channelId));
+		},
+		openVariationPanel: () => {
+			dispatch(openVariationPanel());
+		},
+		closeVariationPanel: () => {
+			dispatch(closeVariationPanel());
 		},
 		renameVariation: variationId => {
 			dispatch(noop(variationId));

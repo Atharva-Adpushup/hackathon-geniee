@@ -4,7 +4,7 @@ var logger = require('../helpers/logger'),
 	utils = require('../helpers/utils'),
 	config = require('./config'),
 	feedback = require('./feedback'),
-	hbStatus = require('./hbStatus'),
+	// hbStatus = require('./hbStatus'),
 	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(1));
 		if (val > 20) {
@@ -74,7 +74,11 @@ var logger = require('../helpers/logger'),
 		});
 	},
 	enableGoogServicesForSlot = function(slot) {
-		slot.gSlot = googletag.defineSlot('/' + config.NETWORK_ID + '/' + slot.slotId, slot.size, slot.containerId);
+		slot.gSlot = googletag.defineSlot(
+			'/' + config.NETWORK_ID + '/' + slot.optionalParam.dfpAdunitCode,
+			slot.size,
+			slot.containerId
+		);
 		setGPTargeting(slot);
 		slot.gSlot.addService(googletag.pubads());
 	},
@@ -134,7 +138,7 @@ var logger = require('../helpers/logger'),
 			googletag.enableServices();
 
 			var adUnits = utils.getBatchAdUnits(adpSlotsWithDFPSlots).join(',');
-			hbStatus.hbRender(adUnits);
+			// hbStatus.hbRender(adUnits);
 
 			//In last try rendering all slots.
 			adpSlotsWithDFPSlots.forEach(function(slot) {

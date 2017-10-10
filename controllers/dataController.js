@@ -12,6 +12,7 @@ var express = require('express'),
 	Promise = require('bluebird'),
 	extend = require('extend'),
 	CC = require('../configs/commonConsts'),
+	config = require('../configs/config'),
 	lodash = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
@@ -177,6 +178,7 @@ router
 				apConfigs: { mode: parsedData.siteMode },
 				siteId: parsedData.siteId,
 				siteDomain: parsedData.siteDomain,
+				customSizes: parsedData.customSizes || [],
 				channels: lodash.map(parsedData.channels, function(channel) {
 					return channel.platform + ':' + channel.pageGroup;
 				})
@@ -317,7 +319,7 @@ router
 		return userModel
 			.getUserByEmail(req.session.user.email)
 			.then(user => {
-				if (!user || !user.data || !user.data.crmDealId) {
+				if (!user || !user.get('data') || !user.get('data').crmDealId) {
 					return Promise.reject('No CRM deal id found');
 				}
 				return pipedriveAPI('updateDeal', {

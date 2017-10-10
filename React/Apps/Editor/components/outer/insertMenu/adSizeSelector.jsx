@@ -10,7 +10,6 @@ class AdSizeSelector extends React.Component {
 		this.state = {
 			activeTab: props.activeTab || 0
 		};
-		this.onChecked = this.onChecked.bind(this);
 		this.handleTabClick = this.handleTabClick.bind(this);
 	}
 
@@ -18,10 +17,6 @@ class AdSizeSelector extends React.Component {
 		if (nextProps.activeTab) {
 			this.setState({ activeTab: nextProps.activeTab });
 		}
-	}
-
-	onChecked(adProps) {
-		this.props.onCheckedItem(adProps);
 	}
 
 	handleTabClick(key) {
@@ -38,7 +33,7 @@ class AdSizeSelector extends React.Component {
 								id={this.props.insertOption + rec.layoutType + innerIndex}
 								type="radio"
 								checked={this.props.checked === adProps ? 'checked' : null}
-								onClick={this.props.onCheckedItem.bind(null, adProps)}
+								onClick={this.props.onCheckedItem.bind(null, adProps, false)}
 							/>
 							<label
 								htmlFor={this.props.insertOption + rec.layoutType + innerIndex}
@@ -46,7 +41,9 @@ class AdSizeSelector extends React.Component {
 						</Col>
 					))}
 				</Row>
-				{isShowCustomAdPanel ? <CustomSizeForm onSave={this.props.onCheckedItem} /> : null}
+				{isShowCustomAdPanel ? (
+					<CustomSizeForm customSizes={this.props.customSizes} onSave={this.props.onCheckedItem} />
+				) : null}
 			</Panel>
 		);
 	}
