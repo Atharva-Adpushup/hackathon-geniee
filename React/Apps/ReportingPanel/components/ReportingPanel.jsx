@@ -4,8 +4,6 @@ import { Grid, Row, Col, Button } from 'react-bootstrap';
 import Datatable from 'react-bs-datatable';
 import ActionCard from '../../../Components/ActionCard.jsx';
 import '../styles.scss';
-import HighchartsMore from 'highcharts-more';
-HighchartsMore(ReactHighcharts.Highcharts);
 
 const header = [
 		{ title: 'Date', prop: 'date', sortable: true, filterable: true },
@@ -69,6 +67,31 @@ const header = [
 class ReportingPanel extends React.Component {
 	constructor(props) {
 		super(props);
+	}
+
+	componentDidMount() {
+		$.ajax({
+			method: 'POST',
+			url: '/user/reports/generate',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify({
+				select: ['total_xpath_miss', 'total_impressions', 'total_cpm'],
+				where: {
+					siteid: 28822,
+					pagegroup: 'MIC', // this.props.activeChannel.pageGroup
+					variation: '2e68228f-84da-415e-bfcf-bfcf67c87570' // this.props.variation.id
+					// device_type: this.props.activeChannel.platform
+				},
+				groupBy: ['section']
+			}),
+			contentType: 'json',
+			dataType: 'json',
+			success: response => {
+				console.log(response);
+			}
+		});
 	}
 
 	render() {

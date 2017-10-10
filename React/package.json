@@ -4,7 +4,6 @@
 	"description": "<br/>",
 	"main": "server.js",
 	"dependencies": {
-		"highcharts-more": "^0.1.2",
 		"jquery": "^3.2.1",
 		"lodash": "^4.17.4",
 		"normalizr": "2.2.1",
