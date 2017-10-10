@@ -35,7 +35,12 @@ module.exports = {
 				break;
 
 			default:
-				return false;
+				if(ad.adCode) {
+					adCode = utils.base64Decode(ad.adCode);
+				}
+				else {
+					return false;
+				}
 		}
 		return typeof adCode === 'string' ? adCode : adCode.join('\n');
 	},
