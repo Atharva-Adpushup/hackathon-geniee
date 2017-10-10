@@ -32,7 +32,7 @@ class customCssEditor extends React.Component {
 
 	updateCode(newCss) {
 		try {
-			JSON.parse(this.state.css);
+			JSON.parse(newCss);
 			this.setState({ css: newCss, error: false });
 		} catch (e) {
 			this.setState({ error: true, css: newCss });

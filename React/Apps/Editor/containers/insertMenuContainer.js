@@ -3,7 +3,7 @@ import InsertMenu from 'insertMenu/index';
 import { hideMenu } from 'actions/insertMenuActions';
 import { createSection } from 'actions/sectionActions';
 import { getActiveChannelId } from 'selectors/channelSelectors';
-import { getPartner } from 'selectors/siteSelectors';
+import { getPartner, getCustomSizes } from 'selectors/siteSelectors';
 import { getActiveChannelActiveVariationId, getCustomAdCodeFromActiveVariation } from 'selectors/variationSelectors';
 import { getInsertMenuState } from 'selectors/uiSelectors';
 import { sendMessage } from '../scripts/messengerHelper';
@@ -13,6 +13,7 @@ const mapStateToProps = state => {
 		const json = getInsertMenuState(state);
 		return {
 			...json,
+			customSizes: getCustomSizes(state),
 			partner: getPartner(state),
 			isCustomAdCodeInVariationAds: getCustomAdCodeFromActiveVariation(state),
 			variationId: getActiveChannelActiveVariationId(state),

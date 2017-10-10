@@ -3,7 +3,7 @@
 var config = require('./config'),
 	logger = require('../helpers/logger'),
 	feedback = require('./feedback'),
-	hbStatus = require('./hbStatus'),
+	// hbStatus = require('./hbStatus'),
 	init = function(w, d) {
 		w.googletag = w.googletag || {};
 		googletag.cmd = googletag.cmd || [];
@@ -19,13 +19,16 @@ var config = require('./config'),
 			w.googletag.pubads().addEventListener('slotRenderEnded', function(event) {
 				var slot;
 				Object.keys(w.adpTags.adpSlots).forEach(function(adpSlot) {
-					if ('/' + config.NETWORK_ID + '/' + w.adpTags.adpSlots[adpSlot].slotId === event.slot.getName()) {
+					if (
+						'/' + config.NETWORK_ID + '/' + w.adpTags.adpSlots[adpSlot].optionalParam.dfpAdunitCode ===
+						event.slot.getName()
+					) {
 						slot = w.adpTags.adpSlots[adpSlot];
 					}
 				});
 
 				if (slot && slot.feedback.winner !== config.ADSENSE.bidderName) {
-					hbStatus.hbDfpRender(slot.containerId);
+					// hbStatus.hbDfpRender(slot.containerId);
 
 					logger.log('DFP ad slot rendered');
 					return cb(feedback(slot));

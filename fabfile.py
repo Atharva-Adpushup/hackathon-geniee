@@ -9,7 +9,7 @@ env.hosts = ['localhost']
 
 path = "./"
 jsPath = path + "services/genieeAdSyncService/genieeAp/"
-editorPath = path + "Editor/"
+reactAppsPath = path + "React/"
 adpTagsPath = path+"/services/adpTags/"
 prebidPath = adpTagsPath+"Prebid.js"
 assetsPath = path + "public/assets/"
@@ -28,7 +28,7 @@ def build():
 			lrun("git clone "+prebidGitPath)
 		with lcd(prebidPath):
 			lrun("npm install")
-			lrun("gulp build --adapters adapter2.json")
+			lrun("node_modules/.bin/gulp build --adapters adapter2.json")
 		buildAdpTags()
 		
 	with lcd(path):
@@ -42,14 +42,14 @@ def build():
 	with lcd(assetsPath):
 		lrun('echo "/******************** Building public assets files ********************/"')
 		lrun('npm install')
-		lrun('webpack')
+		lrun('webpack --progress')
 
 	with lcd(jsPath):
 		lrun('echo "/******************** Building Geniee ad sync service files ********************/"')
 		lrun('npm install')
-		lrun('webpack')
+		lrun('webpack --progress')
 
-	with lcd(editorPath):
-		lrun('echo "/******************** Building Visual Editor files ********************/"')
+	with lcd(reactAppsPath):
+		lrun('echo "/******************** Building React Apps files ********************/"')
 		lrun('npm install')
-		lrun('webpack')
+		lrun('webpack --progress')

@@ -38,7 +38,7 @@ var prebidSandbox = require('./prebidSandbox'),
 		prebidSandbox.createPrebidContainer(adpSlotsBatch);
 	},
 	createSlot = function(containerId, size, placement, optionalParam) {
-		var adUnits = inventoryMapper(size, optionalParam.dfpAdUnit),
+		var adUnits = inventoryMapper(size, optionalParam.dfpAdunitCode),
 			slotId = adUnits.dfpAdUnit,
 			bidders = optionalParam.headerBidding ? adUnits.bidders : [];
 

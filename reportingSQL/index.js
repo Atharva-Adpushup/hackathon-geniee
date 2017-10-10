@@ -1,11 +1,11 @@
 const Promise = require('bluebird'),
 	_ = require('lodash'),
 	dbHelper = require('../reports/default/apex/vendor/mssql/dbHelper'),
-	{ fetchSectionQuery } = require('./constants'),
+	{ fetchSectionQuery, fetchVariationQuery, fetchPagegroupQuery } = require('./constants'),
 	queryHelper = require('./queryHelper');
 
 function checkParameters(data) {
-	if (!data || !data.select || !data.select.length) {
+	if (!data || !data.select || !data.select.length || !data.where || !data.where.siteid) {
 		return Promise.reject('Invalid query parameters');
 	}
 	return Promise.resolve();
@@ -15,68 +15,108 @@ function executeQuery(params) {
 	return dbHelper.queryDB(params);
 }
 
-function getId(key, value, type, siteid) {
-	let inputParameters = [
-		{
-			name: key,
-			type: type,
-			value: value
-		},
-		{
-			name: '__siteid__',
-			type: 'INT',
-			value: siteid
-		}
-	];
-	return executeQuery({
-		inputParameters: inputParameters.concat([]),
-		query: fetchSectionQuery
-	}).then(response => (_.isArray(response) && response.length ? response[0].axsid : false));
+function whereWrapper(data) {
+	data.hasOwnProperty('section') ? (data.section_md5 = data.section) : null;
+	data.hasOwnProperty('variation') ? (data.variation_id = data.variation) : null;
+	data.hasOwnProperty('pagegroup') ? (data.name = data.pagegroup) : null;
+
+	delete data.section;
+	delete data.variation;
+	delete data.pagegroup;
+
+	return queryHelper.where(data);
 }
 
-function whereWrapper(data) {
-	let promises = {};
+function setCorrectColumnNames(data) {
+	let columns = _.isArray(data) && data.length ? data.concat([]) : false;
+	if (columns) {
+		_.forEach(columns, (value, key) => {
+			switch (value) {
+				case 'section':
+					columns[key] = 'section_md5';
+					break;
+				case 'variation':
+					columns[key] = 'variation_id';
+					break;
+				case 'pagegroup':
+					columns[key] = 'name';
+					break;
+			}
+		});
+	}
+	return columns;
+}
 
-	// find section Id
-	data.hasOwnProperty('section')
-		? (promises.axsid = getId('__sec_key__', data.section, 'NVARCHAR', data.siteid))
-		: null;
-	// find variation Id
-	data.hasOwnProperty('variation') ? (promises.axvid = getVariationId(data.variation)) : null;
-	// find pagegroup Id
-	data.hasOwnProperty('pagegroup') ? (promises.axpgid = getPagegroupId(data.pagegroup)) : null;
+function orderByWrapper(data) {
+	return queryHelper.orderBy(setCorrectColumnNames(data));
+}
 
-	return Promise.props(promises).then(response => {
-		console.log(response);
-	});
+function groupByWrapper(data) {
+	return queryHelper.groupBy(setCorrectColumnNames(data));
+}
+
+function selectWrapper(selectData, groupByData) {
+	let flag = _.isArray(groupByData) && groupByData.length && groupByData.indexOf('section') != -1 ? true : false;
+	return queryHelper.select(selectData, flag);
 }
 
 function queryBuilder(data) {
 	return whereWrapper(data.where)
-		.then(() => queryHelper.select(data.select))
+		.then(() => selectWrapper(data.select, data.groupBy))
+		.then(() => groupByWrapper(data.groupBy))
 		.then(() => queryHelper.from())
-		.then(() => queryHelper.__groupBy(data.groupBy))
+		.then(() => orderByWrapper(data.orderBy))
 		.then(() => queryHelper.generateCompleteQuery());
 }
 
 function init(data) {
 	return checkParameters(data)
 		.then(() => queryBuilder(data))
-		.then(query => {
-			console.log(query);
+		.then(queryWithParameters => executeQuery(queryWithParameters))
+		.catch(err => {
+			let message = err.message || err;
+			return Promise.reject(message);
 		});
 }
 
+function getQuery(type) {
+	let query;
+	if (type == 1) {
+		query = fetchPagegroupQuery;
+	} else if (type == 2) {
+		query = fetchVariationQuery;
+	} else if (type == 3) {
+		query = fetchSectionQuery;
+	}
+	return query;
+}
+
+function getPVS(siteid, type) {
+	return executeQuery({
+		query: getQuery(type),
+		inputParameters: [
+			{
+				name: '__siteid__',
+				type: 'INT',
+				value: siteid
+			}
+		]
+	});
+}
+
 // init({
-// 	select: ['report_date', 'siteid', 'total_impressions', 'total_xpath_miss', 'total_cpm'],
+// 	select: ['report_date', 'siteid', 'total_impressions', 'total_xpath_miss', 'total_cpm', 'device_type'],
 // 	where: {
-// 		from: '2017-03-03',
-// 		to: '2017-03-05',
-// 		axpgid: 'DESKTOP',
-// 		axvid: '1',
-// 		axsid: '05f900bf0f7f56664b14395de8c57c9b',
-// 		siteid: '13372'
-// 	}
+// 		// section: '429e5150-e40b-4afb-b165-93b8bde3cf21',
+// 		siteid: 28822,
+// 		variation: '2e68228f-84da-415e-bfcf-bfcf67c87570',
+// 		pagegroup: 'MIC',
+// 		from: '2017-09-01',
+// 		to: '2017-09-10',
+// 		device_type: 4
+// 	},
+// 	groupBy: ['section']
+// 	// orderBy: ['variation']
 // });
 
-getSectionId('05f900bf0f7f56664b14395de8c57c9b', '13372');
+module.exports = { init, getPVS };

@@ -178,6 +178,7 @@ router
 				apConfigs: { mode: parsedData.siteMode },
 				siteId: parsedData.siteId,
 				siteDomain: parsedData.siteDomain,
+				customSizes: parsedData.customSizes || [],
 				channels: lodash.map(parsedData.channels, function(channel) {
 					return channel.platform + ':' + channel.pageGroup;
 				})

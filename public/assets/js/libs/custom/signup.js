@@ -4,6 +4,14 @@
 		$dropDownFieldWrapper = $('.js-websiteRevenue-dropdown-wrapper'),
 		$exactRevenueFieldWrapper = $('.js-websiteRevenue-exact-wrapper'),
 		$exactRevenueField = $('#signup-exactRevenue', $exactRevenueFieldWrapper),
+		constants = {
+			cookie: {
+				firstHit: 'adp_fh'
+			},
+			protocol: {
+				http: 'http:'
+			}
+		},
 		utils = {
 			btoa: function(value) {
 				return btoa(encodeURI(JSON.stringify(value)));
@@ -26,14 +34,18 @@
 					: '';
 			}
 		},
+		locationProtocol = W.location.protocol,
+		isProtocolHttp = !!(locationProtocol && locationProtocol === constants.protocol.http),
+		isDocumentReferrer = !!W.document.referrer,
+		// Direct-Http condition is when document protocol is 'http' and referrer is empty ('').
+		// This condition arises when a user is navigated to an insecure (http) page from a secured (https)
+		// one and document referrer becomes empty.
+		// We need to track this use case in our code for analytics purposes, hence below is its implementation
+		isDirectHttpCondition = !!(isProtocolHttp && !isDocumentReferrer),
+		directReferrerValue = isDirectHttpCondition ? 'direct-http' : 'direct',
 		utmParameters = {
 			firstHit: utils.domanize(W.location.href),
-			firstReferrer: utils.domanize(W.document.referrer)
-		},
-		constants = {
-			cookie: {
-				firstHit: 'adp_fh'
-			}
+			firstReferrer: isDocumentReferrer ? utils.domanize(W.document.referrer) : directReferrerValue
 		};
 
 	function getCookie(name) {
@@ -61,7 +73,8 @@
 			return cookieData;
 		}
 
-		return false;
+		cookieData = utils.atob(inputCookieData);
+		return cookieData;
 	}
 
 	function getFirstHitUtmParameters() {
@@ -370,7 +383,7 @@
 				ele.name = name;
 				ele.type = 'hidden';
 				ele.value = queryParams[param];
-				form.append(ele);
+				form.appendChild(ele);
 			}
 		});
 	}

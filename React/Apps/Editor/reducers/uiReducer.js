@@ -138,15 +138,24 @@ const errorsConfig = {},
 				return state;
 		}
 	},
-	variationPanelExpansion = (state = { expanded: false }, action) => {
+	variationPanel = (state = { expanded: false, open: false }, action) => {
 		switch (action.type) {
 			case variationActions.EXPAND_VARIATION_PANEL:
 				manipulateElement(action.panelCssSelector, 'expand', action.params);
-				return { expanded: true };
+				return { ...state, expanded: true };
 
 			case variationActions.SHRINK_VARIATION_PANEL:
 				manipulateElement(action.panelCssSelector, 'shrink', action.params);
-				return { expanded: false };
+				return { ...state, expanded: false };
+
+			case variationActions.TOGGLE_VARIATION_PANEL:
+				return { ...state, open: !state.open };
+
+			case variationActions.OPEN_VARIATION_PANEL:
+				return { ...state, open: true };
+
+			case variationActions.CLOSE_VARIATION_PANEL:
+				return { ...state, open: false, expanded: false };
 
 			default:
 				return state;
@@ -161,5 +170,5 @@ export default combineReducers({
 	channelMenu,
 	errors,
 	afterSaveLoader,
-	variationPanelExpansion
+	variationPanel
 });

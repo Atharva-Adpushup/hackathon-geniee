@@ -149,7 +149,7 @@ var consts = require('../configs/commonConsts'),
 		 * @param {schema} a JSON structure that defines model
 		 * @returns {object} merged nested object
 		 */
-		this.mergeObjectViaClassMap = function(existingData, newData, schema) {
+		this.mergeObjectViaClassMap = function(existingData = {}, newData = {}, schema) {
 			var unionKeys = _.union(Object.keys(existingData), Object.keys(newData)),
 				computedData = extend(true, {}, existingData),
 				self = this;
@@ -212,25 +212,25 @@ var consts = require('../configs/commonConsts'),
 		};
 
 		/**
-		 * OBJECTIVE: Merge nested objects that follows a particular schema (see /Applications/MAMP/htdocs/GenieeAdPushup/models/subClasses/channel/variation.js for schema)
-		 * PURPOSE: An implementation was required to merge nested objects that follow a schema
-		 * IMPLEMENTATION: Following is the algorithm procedure:
-		 * 1) - Intersect root object keys of existing and new data
-		 * 2) - Set final computed object base as a deep extend of new data
-		 * 3) - Iterate over intersected keys and get existing and new object based on iterator key
-		 * 4) - Union existing and newData object keys
-		 * 5) - Iterate over these keys, perform 3 checks and set computed object based on them:
-		 * 	    1) Deep Extend existing and new object if there is no schema
-		 * 		   and iterator key is in 'mergeObjectViaDeepExtendArr' array
-		 *      2) Recursively call this method if key is in schema classMap
-		 *      3) If key is in existing data but not present in new data,
-		 *         set computed object property and its value as existing data property value
-		 * 6) - Return computed merged nested object
-		 * @param {existingData} server side data (saved in database)
-		 * @param {newData} client side json (product's client side, background service etc.)
-		 * @param {schema} a JSON structure that defines model
-		 * @returns {object} merged nested object
-		 */
+	 * OBJECTIVE: Merge nested objects that follows a particular schema (see /Applications/MAMP/htdocs/GenieeAdPushup/models/subClasses/channel/variation.js for schema)
+	 * PURPOSE: An implementation was required to merge nested objects that follow a schema
+	 * IMPLEMENTATION: Following is the algorithm procedure:
+	 * 1) - Intersect root object keys of existing and new data
+	 * 2) - Set final computed object base as a deep extend of new data
+	 * 3) - Iterate over intersected keys and get existing and new object based on iterator key
+	 * 4) - Union existing and newData object keys
+	 * 5) - Iterate over these keys, perform 3 checks and set computed object based on them:
+	 * 	    1) Deep Extend existing and new object if there is no schema
+	 * 		   and iterator key is in 'mergeObjectViaDeepExtendArr' array
+	 *      2) Recursively call this method if key is in schema classMap
+	 *      3) If key is in existing data but not present in new data,
+	 *         set computed object property and its value as existing data property value
+	 * 6) - Return computed merged nested object
+	 * @param {existingData} server side data (saved in database)
+	 * @param {newData} client side json (product's client side, background service etc.)
+	 * @param {schema} a JSON structure that defines model
+	 * @returns {object} merged nested object
+	 */
 		this.mergeObjectsRecursively = function(existingData, newData, schema) {
 			var intersectedKeys = _.intersection(Object.keys(newData), Object.keys(existingData)),
 				computedData = extend(true, {}, newData),
@@ -284,13 +284,13 @@ var consts = require('../configs/commonConsts'),
 		};
 
 		/**
-		 * OBJECTIVE: Merge nested objects that follows a particular schema (see /Applications/MAMP/htdocs/GenieeAdPushup/models/subClasses/channel/variation.js for schema)
-		 * IMPLEMENTATION: Merge nested objects' existing (database) and new (client) data by recursion
-		 * @param {key} model key name
-		 * @param {newData} client side json (product's client side, background service etc.)
-		 * @param {schema} a JSON structure that defines model
-		 * @returns {object} merged nested object
-		 */
+	 * OBJECTIVE: Merge nested objects that follows a particular schema (see /Applications/MAMP/htdocs/GenieeAdPushup/models/subClasses/channel/variation.js for schema)
+	 * IMPLEMENTATION: Merge nested objects' existing (database) and new (client) data by recursion
+	 * @param {key} model key name
+	 * @param {newData} client side json (product's client side, background service etc.)
+	 * @param {schema} a JSON structure that defines model
+	 * @returns {object} merged nested object
+	 */
 		this.mergeNestedObjects = function(key, newData, schema) {
 			var existingData = this.get(key),
 				isKeyMergedViaClassMap = !!(key && this.mergeObjectViaClassMapArr.indexOf(key) > -1),
