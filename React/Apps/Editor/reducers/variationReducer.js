@@ -14,7 +14,8 @@ const variation = (state = {}, action) => {
 					customJs: config.customJs,
 					status: config.status,
 					sections: config.sections,
-					expanded: false
+					expanded: false,
+					contentSelector: config.contentSelector || ''
 				};
 
 			default:
@@ -94,6 +95,15 @@ const variation = (state = {}, action) => {
 					[action.variationId]: {
 						...state[action.variationId],
 						trafficDistribution: parseInt(action.trafficDistribution, 10)
+					}
+				};
+
+			case variationActions.UPDATE_CONTENT_SELECTOR:
+				return {
+					...state,
+					[action.variationId]: {
+						...state[action.variationId],
+						contentSelector: action.contentSelector
 					}
 				};
 

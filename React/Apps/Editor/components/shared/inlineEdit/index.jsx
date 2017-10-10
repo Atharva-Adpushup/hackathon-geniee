@@ -109,7 +109,7 @@ class InlineEdit extends React.Component {
 InlineEdit.propTypes = {
 	text: PropTypes.string.isRequired,
 	submitHandler: PropTypes.func.isRequired,
-	errorMessage: PropTypes.string.isRequired,
+	errorMessage: PropTypes.string,
 	validate: PropTypes.bool,
 	value: PropTypes.string.isRequired,
 	compact: PropTypes.bool,
