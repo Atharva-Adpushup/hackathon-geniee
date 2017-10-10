@@ -149,7 +149,7 @@ var consts = require('../configs/commonConsts'),
 		 * @param {schema} a JSON structure that defines model
 		 * @returns {object} merged nested object
 		 */
-		this.mergeObjectViaClassMap = function(existingData, newData, schema) {
+		this.mergeObjectViaClassMap = function(existingData = {}, newData = {}, schema) {
 			var unionKeys = _.union(Object.keys(existingData), Object.keys(newData)),
 				computedData = extend(true, {}, existingData),
 				self = this;

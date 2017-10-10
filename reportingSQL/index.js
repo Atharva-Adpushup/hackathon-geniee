@@ -72,31 +72,51 @@ function queryBuilder(data) {
 function init(data) {
 	return checkParameters(data)
 		.then(() => queryBuilder(data))
-		.then(queryWithParameters => {
-			return executeQuery(queryWithParameters);
-		})
-		.then(response => {
-			console.log(response);
-		})
+		.then(queryWithParameters => executeQuery(queryWithParameters))
 		.catch(err => {
 			let message = err.message || err;
 			return Promise.reject(message);
 		});
 }
 
-init({
-	select: ['report_date', 'siteid', 'total_impressions', 'total_xpath_miss', 'total_cpm', 'device_type'],
-	where: {
-		// section: '429e5150-e40b-4afb-b165-93b8bde3cf21',
-		siteid: 28822,
-		variation: '2e68228f-84da-415e-bfcf-bfcf67c87570',
-		pagegroup: 'MIC',
-		from: '2017-09-01',
-		to: '2017-09-10',
-		device_type: 4
-	},
-	groupBy: ['section']
-	// orderBy: ['variation']
-});
+function getQuery(type) {
+	let query;
+	if (type == 1) {
+		query = fetchPagegroupQuery;
+	} else if (type == 2) {
+		query = fetchVariationQuery;
+	} else if (type == 3) {
+		query = fetchSectionQuery;
+	}
+	return query;
+}
 
-module.exports = init;
+function getPVS(siteid, type) {
+	return executeQuery({
+		query: getQuery(type),
+		inputParameters: [
+			{
+				name: '__siteid__',
+				type: 'INT',
+				value: siteid
+			}
+		]
+	});
+}
+
+// init({
+// 	select: ['report_date', 'siteid', 'total_impressions', 'total_xpath_miss', 'total_cpm', 'device_type'],
+// 	where: {
+// 		// section: '429e5150-e40b-4afb-b165-93b8bde3cf21',
+// 		siteid: 28822,
+// 		variation: '2e68228f-84da-415e-bfcf-bfcf67c87570',
+// 		pagegroup: 'MIC',
+// 		from: '2017-09-01',
+// 		to: '2017-09-10',
+// 		device_type: 4
+// 	},
+// 	groupBy: ['section']
+// 	// orderBy: ['variation']
+// });
+
+module.exports = { init, getPVS };

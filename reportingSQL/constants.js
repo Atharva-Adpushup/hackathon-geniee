@@ -281,9 +281,9 @@ INNER JOIN (
 ON a.report_date=b.report_date and a.siteid=b.siteid
 `;
 
-let fetchSectionQuery = `SELECT axsid FROM ApexSection where section_md5=@__section_md5__ and siteid=@__siteid__`;
-let fetchVariationQuery = `SELECT axvid FROM ApexVariation where variation_id=@__variation_id__ and siteid=@__siteid__`;
-let fetchPagegroupQuery = `SELECT axpgid FROM ApexPageGroup where name=@__name__ and siteid=@__siteid__`;
+let fetchSectionQuery = `SELECT axsid, sec_key, section_md5 FROM ApexSection where siteid=@__siteid__`;
+let fetchVariationQuery = `SELECT axvid, var_key, variation_id FROM ApexVariation where siteid=@__siteid__`;
+let fetchPagegroupQuery = `SELECT axpgid, pg_key, name FROM ApexPageGroup where siteid=@__siteid__`;
 
 const schema = {
 	common: {
