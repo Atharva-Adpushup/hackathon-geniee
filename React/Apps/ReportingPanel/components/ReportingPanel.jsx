@@ -88,8 +88,12 @@ class ReportingPanel extends React.Component {
 			}),
 			contentType: 'json',
 			dataType: 'json',
-			success: response => {
-				console.log(response);
+			success: res => {
+				console.log(res);
+			},
+			fail: res => {
+				console.log('error');
+				console.log(res);
 			}
 		});
 	}
