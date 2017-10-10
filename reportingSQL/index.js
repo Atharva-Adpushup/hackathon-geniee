@@ -72,7 +72,9 @@ function queryBuilder(data) {
 function init(data) {
 	return checkParameters(data)
 		.then(() => queryBuilder(data))
-		.then(queryWithParameters => executeQuery(queryWithParameters))
+		.then(queryWithParameters => {
+			return executeQuery(queryWithParameters);
+		})
 		.catch(err => {
 			let message = err.message || err;
 			return Promise.reject(message);
