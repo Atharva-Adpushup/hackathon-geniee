@@ -299,12 +299,12 @@ var Promise = require('bluebird'),
 					let from = data.from
 						? moment(data.from).format('YYYY-MM-DD')
 						: moment()
-								.subtract(7, days)
+								.subtract(7, 'days')
 								.format('YYYY-MM-DD');
 					let to = data.to
 						? moment(data.to).format('YYYY-MM-DD')
 						: moment()
-								.subtract(1, days)
+								.subtract(1, 'days')
 								.format('YYYY-MM-DD');
 
 					firstQuery.where += ` ${schema.firstQuery.tables.apexSiteReport
