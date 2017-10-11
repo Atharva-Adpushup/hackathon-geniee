@@ -170,7 +170,7 @@ class ReportingPanel extends React.Component {
 		return (
 			<ActionCard title="AdPushup Report">
 				<Row>
-					<Col sm={4} smOffset={8}>
+					<Col sm={8} smOffset={4}>
 						<ReportControls />
 					</Col>
 				</Row>
