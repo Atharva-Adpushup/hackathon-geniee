@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { generateOptionInputs } from '../../lib/helpers';
-import SelectBox from '../../../../Components/SelectBox.jsx';
+import SelectBox from '../../../../Components/SelectBox/index.jsx';
 
 const generatePartnerOptions = (partnerConfig, onChangeHandler, selectedPartnerOptions) => {
 	const { global, local } = partnerConfig;

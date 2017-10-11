@@ -2,6 +2,8 @@
 
 let React = require('react');
 
+import './styles.scss';
+
 let div = React.createElement.bind(null, 'div');
 let button = React.createElement.bind(null, 'button');
 let a = React.createElement.bind(null, 'a');

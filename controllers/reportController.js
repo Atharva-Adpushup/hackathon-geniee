@@ -57,7 +57,12 @@ router
 	// 		pageUrl: url
 	// 	});
 	// })
-	.get('/adpushupReport', (req, res) => res.render('adpushupReport'))
+	.get('/adpushupReport', (req, res) => {
+		return siteModel
+			.getUniquePageGroups(req.params.siteId)
+			.then(pageGroups => res.render('adpushupReport', { pageGroups }))
+			.catch(() => res.send('Some error occurred! Please try again later.'));
+	})
 	.get('/performance', function(req, res) {
 		var siteId = req.params.siteId,
 			paramConfig = {
