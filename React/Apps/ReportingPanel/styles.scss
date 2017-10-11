@@ -1,6 +1,8 @@
 $primaryColor: #eb575c;
 $borderColor: #ddd;
 $greyBg: #eee;
+$greyBorder: #e6e6e6;
+$fontColor: #555;
 
 .report-table {
 	margin: 20px;
@@ -28,4 +30,40 @@ $greyBg: #eee;
 
 .report-controls-wrapper {
 	margin: 20px 0;
+
+	button {
+		width: 100%;
+	}
+}
+
+.react-datepicker-wrapper {
+	width: 100%;
+
+	.react-datepicker__input-container {
+		width: 100%;
+
+		input {
+			width: 100%;
+			padding: 4.5px 8px;
+			border: 1px solid $greyBorder;
+			font-weight: 700;
+			color: $fontColor;
+			font-size: 1.08em;
+		}
+	}
+}
+
+.react-datepicker {
+	font-size: 1.08em;
+	font-family: 'Karla', sans-serif;
+
+	.react-datepicker__current-month {
+		font-size: 1.08em;
+	}
+
+	.react-datepicker__day-name,
+	.react-datepicker__day {
+		width: 2.2rem;
+		line-height: 2.2rem;
+	}
 }
