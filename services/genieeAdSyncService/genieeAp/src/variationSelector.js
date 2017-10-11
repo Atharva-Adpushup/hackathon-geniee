@@ -30,7 +30,7 @@ module.exports = function(config) {
 		chosenVariation = forcedVariation.obj;
 
 		if (chosenVariation) {
-			config.contentSelector = experiment[config.platform][config.pageGroup].contentSelector;
+			config.contentSelector = chosenVariation.contentSelector;
 		}
 
 		return chosenVariation && chosenVariation.ads && chosenVariation.ads.length ? chosenVariation : false;
@@ -46,7 +46,7 @@ module.exports = function(config) {
 		}
 
 		if (chosenVariation) {
-			config.contentSelector = experiment[config.platform][config.pageGroup].contentSelector;
+			config.contentSelector = chosenVariation.contentSelector;
 		}
 
 		return chosenVariation && chosenVariation.ads && chosenVariation.ads.length ? chosenVariation : false;
