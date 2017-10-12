@@ -12,14 +12,25 @@ class ReportControls extends Component {
 		super(props);
 
 		this.state = {
+			pageGroup: null,
+			platform: null,
 			startDate: moment().startOf('day'),
 			endDate: moment()
 				.add(6, 'days')
 				.startOf('day')
 		};
-
+		this.pageGroupUpdated = this.pageGroupUpdated.bind(this);
+		this.platformUpdated = this.platformUpdated.bind(this);
 		this.datesUpdated = this.datesUpdated.bind(this);
 		this.focusUpdated = this.focusUpdated.bind(this);
+	}
+
+	pageGroupUpdated(pageGroup) {
+		this.setState({ pageGroup });
+	}
+
+	platformUpdated(platform) {
+		this.setState({ platform });
 	}
 
 	datesUpdated({ startDate, endDate }) {
@@ -31,22 +42,59 @@ class ReportControls extends Component {
 	}
 
 	render() {
-		const { focusedInput, startDate, endDate } = this.state;
+		const { state } = this,
+			pageGroups = window.pageGroups,
+			{ platforms } = config;
 
 		return (
-			<div>
-				<DateRangePicker
-					onDatesChange={this.datesUpdated}
-					onFocusChange={this.focusUpdated}
-					focusedInput={focusedInput}
-					startDate={startDate}
-					endDate={endDate}
-					showDefaultInputIcon={true}
-					hideKeyboardShortcutsPanel={true}
-					showClearDates={true}
-					displayFormat={'DD-MM-YYYY'}
-					isOutsideRange={() => {}}
-				/>
+			<div className="report-controls-wrapper">
+				<div className="container-fluid">
+					<Row>
+						<Col sm={2} smOffset={2}>
+							<SelectBox
+								value={state.selectedPageGroup}
+								label="Select PageGroup"
+								onChange={this.pageGroupChanged}
+							>
+								{pageGroups.map((pageGroup, index) => (
+									<option key={index} value={index}>
+										{pageGroup}
+									</option>
+								))}
+							</SelectBox>
+						</Col>
+						<Col sm={2}>
+							<SelectBox
+								value={state.selectedPlatform}
+								label="Select Platform"
+								onChange={this.platformChanged}
+							>
+								{platforms.map((platform, index) => (
+									<option key={index} value={index}>
+										{platform}
+									</option>
+								))}
+							</SelectBox>
+						</Col>
+						<Col sm={4}>
+							<DateRangePicker
+								onDatesChange={this.datesUpdated}
+								onFocusChange={this.focusUpdated}
+								focusedInput={state.focusedInput}
+								startDate={state.startDate}
+								endDate={state.endDate}
+								showDefaultInputIcon={true}
+								hideKeyboardShortcutsPanel={true}
+								showClearDates={true}
+								displayFormat={'DD-MM-YYYY'}
+								isOutsideRange={() => {}}
+							/>
+						</Col>
+						<Col sm={2}>
+							<button className="btn btn-lightBg btn-default">Generate Report</button>
+						</Col>
+					</Row>
+				</div>
 			</div>
 		);
 	}

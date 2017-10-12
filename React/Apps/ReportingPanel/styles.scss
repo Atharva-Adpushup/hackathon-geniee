@@ -4,6 +4,11 @@ $greyBg: #eee;
 $greyBorder: #e6e6e6;
 $fontColor: #555;
 
+html,
+body {
+	overflow-x: hidden;
+}
+
 .report-table {
 	margin: 20px;
 	font-size: 1.2em;
@@ -31,39 +36,66 @@ $fontColor: #555;
 .report-controls-wrapper {
 	margin: 20px 0;
 
-	button {
+	button.btn.btn-lightBg {
 		width: 100%;
+		padding: 7px 10px;
 	}
 }
 
-.react-datepicker-wrapper {
-	width: 100%;
+.react-select-box-container .react-select-box {
+	padding: 8px;
+	border-radius: 3px;
+}
 
-	.react-datepicker__input-container {
-		width: 100%;
+.DateRangePicker {
+	display: block;
 
-		input {
-			width: 100%;
-			padding: 4.5px 8px;
-			border: 1px solid $greyBorder;
-			font-weight: 700;
-			color: $fontColor;
-			font-size: 1.08em;
+	.DateRangePickerInput {
+		display: block;
+		border-color: $greyBorder;
+		border-radius: 3px;
+
+		.DateRangePickerInput_calendarIcon,
+		.DateRangePickerInput_clearDates {
+			width: auto;
+			padding: 0 8px;
+
+			&:hover {
+				background: none;
+			}
+		}
+
+		.DateInput {
+			padding: 0 8px;
+			font-size: 1em;
+			width: 90px;
+			font-family: 'Karla', sans-serif;
+			font-size: 1.1em;
+
+			input {
+				cursor: pointer;
+			}
 		}
 	}
+
+	.DayPickerNavigation_button__default {
+		width: 50px;
+	}
 }
 
-.react-datepicker {
-	font-size: 1.08em;
-	font-family: 'Karla', sans-serif;
+.DateRangePicker_picker {
+	top: 45px !important;
+}
 
-	.react-datepicker__current-month {
-		font-size: 1.08em;
-	}
+.DateInput__openDown_3.DateInput__openDown_3.DateInput__openDown_3:after {
+	top: 36px;
+}
 
-	.react-datepicker__day-name,
-	.react-datepicker__day {
-		width: 2.2rem;
-		line-height: 2.2rem;
-	}
+.DateInput__openDown_3.DateInput__openDown_3.DateInput__openDown_3:before {
+	top: 35px;
+}
+
+.DateInput_displayText__focused_3.DateInput_displayText__focused_3.DateInput_displayText__focused_3 {
+	color: #fff;
+	border-radius: 0;
 }
