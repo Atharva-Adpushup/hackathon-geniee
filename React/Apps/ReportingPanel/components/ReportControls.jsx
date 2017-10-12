@@ -12,19 +12,21 @@ class ReportControls extends Component {
 		super(props);
 
 		this.state = {
-			startDate: moment(),
+			startDate: moment().startOf('day'),
 			endDate: moment()
+				.add(6, 'days')
+				.startOf('day')
 		};
 
-		this.onDatesChange = this.onDatesChange.bind(this);
-		this.onFocusChange = this.onFocusChange.bind(this);
+		this.datesUpdated = this.datesUpdated.bind(this);
+		this.focusUpdated = this.focusUpdated.bind(this);
 	}
 
-	onDatesChange({ startDate, endDate }) {
+	datesUpdated({ startDate, endDate }) {
 		this.setState({ startDate, endDate });
 	}
 
-	onFocusChange(focusedInput) {
+	focusUpdated(focusedInput) {
 		this.setState({ focusedInput });
 	}
 
@@ -34,11 +36,16 @@ class ReportControls extends Component {
 		return (
 			<div>
 				<DateRangePicker
-					onDatesChange={this.onDatesChange}
-					onFocusChange={this.onFocusChange}
+					onDatesChange={this.datesUpdated}
+					onFocusChange={this.focusUpdated}
 					focusedInput={focusedInput}
 					startDate={startDate}
 					endDate={endDate}
+					showDefaultInputIcon={true}
+					hideKeyboardShortcutsPanel={true}
+					showClearDates={true}
+					displayFormat={'DD-MM-YYYY'}
+					isOutsideRange={() => {}}
 				/>
 			</div>
 		);
