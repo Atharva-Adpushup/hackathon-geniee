@@ -90,7 +90,8 @@ function dashboardRedirection(req, res, allUserSites, type) {
 					validSites: sites,
 					unSavedSite: unSavedSite,
 					hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-					requestDemo: req.session.user.requestDemo
+					requestDemo: req.session.user.requestDemo,
+					imageHeaderLogo: true
 				});
 				break;
 			case 'onboarding':
@@ -99,7 +100,9 @@ function dashboardRedirection(req, res, allUserSites, type) {
 					unSavedSite: unSavedSite,
 					hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
 					requestDemo: req.session.user.requestDemo,
-					analyticsObj: JSON.stringify(req.session.analyticsObj)
+					analyticsObj: JSON.stringify(req.session.analyticsObj),
+					imageHeaderLogo: true,
+					buttonHeaderLogout: true
 				});
 				break;
 		}
@@ -124,7 +127,7 @@ router
 		return dashboardRedirection(req, res, allUserSites, 'onboarding');
 	})
 	.get('/requestdemo', function(req, res) {
-		return res.render('request-demo', { headerBannerLogo: true, requestDemo: true });
+		return res.render('request-demo', { imageHeaderLogo: true, buttonHeaderLogout: true });
 	})
 	.post('/setSiteStep', function(req, res) {
 		siteModel

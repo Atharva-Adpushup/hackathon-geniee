@@ -303,7 +303,9 @@ function thankYouRedirection(page, req, res) {
 	return res.render(page, {
 		user: userObj,
 		analytics: analyticsObj,
-		requestDemo: requestDemo
+		requestDemo: requestDemo,
+		imageHeaderLogo: true,
+		buttonHeaderLogout: true
 	});
 }
 
@@ -485,7 +487,7 @@ router
 			isViewMode = isValidQueryParameter ? 1 : 0,
 			siteId = isSiteIdQueryParameter ? req.query.siteId : '';
 
-		return res.render('tools', { headerBannerLogo: true, isViewMode, siteId });
+		return res.render('tools', { imageHeaderLogo: true, isViewMode, siteId, buttonHeaderLogout: true });
 	})
 	.get('/', function(req, res) {
 		return res.redirect('/login');
