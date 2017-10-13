@@ -60,7 +60,7 @@ router
 	.get('/adpushupReport', (req, res) => {
 		return siteModel
 			.getUniquePageGroups(req.params.siteId)
-			.then(pageGroups => res.render('adpushupReport', { pageGroups }))
+			.then(pageGroups => res.render('adpushupReport', { pageGroups, siteId: req.params.siteId }))
 			.catch(() => res.send('Some error occurred! Please try again later.'));
 	})
 	.get('/performance', function(req, res) {

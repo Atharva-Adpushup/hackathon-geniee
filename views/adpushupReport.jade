@@ -8,6 +8,7 @@ block getTitle
 block append headScripts
 	script.
 		window.pageGroups = !{JSON.stringify(pageGroups)}
+		window.siteId = !{siteId}
 
 block bodyContent
 	include layout/sideBar

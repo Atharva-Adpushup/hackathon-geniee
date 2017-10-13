@@ -5,6 +5,8 @@ import Datatable from 'react-bs-datatable';
 import ActionCard from '../../../Components/ActionCard.jsx';
 import ReportControls from './ReportControls.jsx';
 import '../styles.scss';
+import config from '../lib/config';
+import { apiQueryGenerator } from '../lib/helpers';
 
 const header = [
 		{ title: 'Date', prop: 'date', sortable: true, filterable: true },
@@ -60,27 +62,18 @@ const header = [
 class ReportingPanel extends React.Component {
 	constructor(props) {
 		super(props);
+
+		this.state = {
+			reportLevel: 'site'
+		};
 	}
 
 	componentDidMount() {
 		$.ajax({
 			method: 'POST',
-			url: '/user/reports/generate',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			data: JSON.stringify({
-				select: ['total_xpath_miss', 'total_impressions', 'total_cpm'],
-				where: {
-					siteid: 28822,
-					pagegroup: 'MIC',
-					// variation: '2e68228f-84da-415e-bfcf-bfcf67c87570',
-					// device_type: this.props.activeChannel.platform,
-					from: '2017-09-01',
-					to: '2017-09-06'
-				},
-				groupBy: ['section']
-			}),
+			url: config.API_ENDPOINT,
+			headers: { 'Content-Type': 'application/json' },
+			data: apiQueryGenerator(),
 			contentType: 'json',
 			dataType: 'json',
 			success: res => {
