@@ -110,9 +110,7 @@ function getPVS(siteid, type) {
 function generate(data) {
 	return checkParameters(data)
 		.then(() => queryBuilder(data))
-		.then(queryWithParameters => {
-			return executeQuery(queryWithParameters);
-		})
+		.then(queryWithParameters => executeQuery(queryWithParameters))
 		.catch(err => {
 			let message = err.message || err;
 			return Promise.reject(message);

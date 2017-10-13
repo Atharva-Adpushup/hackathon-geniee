@@ -323,7 +323,7 @@ const schema = {
 		alias: 'a'
 	},
 	secondQuery: {
-		aggregate: ['total_cpm'],
+		aggregate: ['total_revenue'],
 		nonAggregate: ['report_date', 'siteid'],
 		where: [],
 		tables: {

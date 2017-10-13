@@ -16,11 +16,11 @@ class VariationPanel extends React.Component {
 			<div className="variation-settings">
 				<VariationBar panelCssSelector=".variation-settings" expanded={ui.variationPanel.expanded} />
 				<TabPanel tabPosition="left">
-					<div tabTitle="Info">
-						<VariationOptions channelId={channelId} variation={variation} />
-					</div>
 					<div tabTitle="Sections">
 						<VariationSections variation={variation} sections={sections} ui={ui} reporting={reporting} />
+					</div>
+					<div tabTitle="Info">
+						<VariationOptions channelId={channelId} variation={variation} />
 					</div>
 					<div tabTitle="Add Incontent Variation">
 						<IncontentAdder
