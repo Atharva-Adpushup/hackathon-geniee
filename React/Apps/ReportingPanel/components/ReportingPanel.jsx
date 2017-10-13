@@ -7,6 +7,7 @@ import ReportControls from './ReportControls.jsx';
 import '../styles.scss';
 import config from '../lib/config';
 import { apiQueryGenerator } from '../lib/helpers';
+import moment from 'moment';
 
 const header = [
 		{ title: 'Date', prop: 'date', sortable: true, filterable: true },
@@ -64,7 +65,11 @@ class ReportingPanel extends React.Component {
 		super(props);
 
 		this.state = {
-			reportLevel: 'site'
+			reportLevel: 'site',
+			startDate: moment()
+				.subtract(7, 'days')
+				.startOf('day'),
+			endDate: moment().startOf('day')
 		};
 	}
 
@@ -160,11 +165,13 @@ class ReportingPanel extends React.Component {
 			}
 		};
 
+		const { startDate, endDate } = this.state;
+
 		return (
 			<ActionCard title="AdPushup Report">
 				<Row>
 					<Col sm={10} smOffset={2}>
-						<ReportControls />
+						<ReportControls startDate={startDate} endDate={endDate} />
 					</Col>
 				</Row>
 				{/* <div className="report-chart">

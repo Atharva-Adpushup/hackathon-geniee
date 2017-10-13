@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import SelectBox from '../../../Components/SelectBox/index.jsx';
 import { Row, Col } from 'react-bootstrap';
 import config from '../lib/config';
 import 'react-dates/initialize';
-import moment from 'moment';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 
@@ -14,10 +14,8 @@ class ReportControls extends Component {
 		this.state = {
 			pageGroup: null,
 			platform: null,
-			startDate: moment().startOf('day'),
-			endDate: moment()
-				.add(6, 'days')
-				.startOf('day')
+			startDate: props.startDate,
+			endDate: props.endDate
 		};
 		this.pageGroupUpdated = this.pageGroupUpdated.bind(this);
 		this.platformUpdated = this.platformUpdated.bind(this);
@@ -99,5 +97,10 @@ class ReportControls extends Component {
 		);
 	}
 }
+
+ReportControls.propTypes = {
+	startDate: PropTypes.object.isRequired,
+	endDate: PropTypes.object.isRequired
+};
 
 export default ReportControls;
