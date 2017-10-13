@@ -8,6 +8,7 @@ import '../styles.scss';
 import config from '../lib/config';
 import { apiQueryGenerator } from '../lib/helpers';
 import moment from 'moment';
+import PaneLoader from '../../../Components/PaneLoader.jsx';
 
 const header = [
 		{ title: 'Date', prop: 'date', sortable: true, filterable: true },
@@ -65,6 +66,7 @@ class ReportingPanel extends React.Component {
 		super(props);
 
 		this.state = {
+			reportLoading: true,
 			reportLevel: 'site',
 			startDate: moment()
 				.subtract(7, 'days')
@@ -74,19 +76,24 @@ class ReportingPanel extends React.Component {
 	}
 
 	componentDidMount() {
+		const { startDate, endDate } = this.state,
+			params = { startDate, endDate };
+
 		$.ajax({
 			method: 'POST',
 			url: config.API_ENDPOINT,
 			headers: { 'Content-Type': 'application/json' },
-			data: apiQueryGenerator(),
+			data: apiQueryGenerator(params),
 			contentType: 'json',
 			dataType: 'json',
 			success: res => {
 				console.log(res);
+				this.setState({ reportLoading: false });
 			},
 			fail: res => {
 				console.log('error');
 				console.log(res);
+				this.setState({ reportLoading: false });
 			}
 		});
 	}
@@ -165,7 +172,7 @@ class ReportingPanel extends React.Component {
 			}
 		};
 
-		const { startDate, endDate } = this.state;
+		const { startDate, endDate, reportLoading } = this.state;
 
 		return (
 			<ActionCard title="AdPushup Report">
@@ -173,6 +180,7 @@ class ReportingPanel extends React.Component {
 					<Col sm={10} smOffset={2}>
 						<ReportControls startDate={startDate} endDate={endDate} />
 					</Col>
+					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : ''}</Col>
 				</Row>
 				{/* <div className="report-chart">
 					<ReactHighcharts config={config} />
