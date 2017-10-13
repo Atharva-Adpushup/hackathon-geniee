@@ -1,0 +1,101 @@
+extends layout/base
+
+block getTitle
+	- var titleVar = "Request Demo"
+
+block append headCss
+	+loadAsset("css", [
+		'//assets.calendly.com/assets/external/widget.css',
+	])
+	style.
+		.thankyouWrapper {
+			width: 100%;
+			height: 100%;
+		}
+		.thankyouWrapper .container {
+			padding: 60px 0;
+			margin-top: 60px;
+		}
+		.thankyouWrapper .container .row {
+			padding: 15px;
+			background: #ffffff;
+			box-shadow: 0 0.5px 0 0 #ffffff inset, 0 1px 2px 0 #B3B3B3;
+		}
+		.thankyou-img img {
+			width: 90%;
+		}
+		.thankyou-content {
+			padding: 20px 0px;
+		}
+		.thankyou-content {
+			font-size: 16px;
+		}
+		.thankyou-content ul {
+			padding: 20px 0px;
+		}
+		.thankyou-content ul li {
+			cursor: pointer;
+			display: inline;
+			padding: 10px;
+			border: 2px solid #cf474b;
+			color: #cf474b;
+			margin-right: 10px;
+			font-weight: bold;
+		}
+		.thankyou-content ul li.active {
+			background: #cf474b;
+			color: #fff;
+			cursor: pointer;
+			margin-right: 15px;
+		}
+		.thankyou-content ul li.active a {
+			color: #fff;
+		}
+		.thankyou-content ul li:hover {
+			background: #cf474b;
+			color: #fff;
+		}
+
+block append headScripts
+	+loadAsset("js", [
+		'//assets.calendly.com/assets/external/widget.js'
+	])
+	script.
+		window.__lc = window.__lc || {};
+		window.__lc.license = 6965991;
+		(function() {
+		var lc = document.createElement('script'); lc.type = 'text/javascript'; lc.async = true;
+		lc.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdn.livechatinc.com/tracking.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(lc, s);
+		})();
+	
+
+block bodyContent
+	.thankyouWrapper
+		include layout/header
+		.container.text-center
+			if isSuperUser
+				.row
+					.pull-right.col-lg-6.visible-lg.visible-md.mT-10.text-right
+						a.apbtn-danger.u-margin-r5px(style="width: 30%", href='/user/updateUserStatus') User Controls
+						a.apbtn-danger(style="width: 30%", href='/user/dashboard') Dashboard
+			.row
+				.col-md-5.thankyou-img
+					img(src="/assets/images/completion_graphic.png")
+				.col-md-7.thankyou-content.text-left
+					h2 Thank you for signing up with Adpushup
+					hr
+					p Hey there, we’re mighty glad that you have shown interest in AdPushup.
+					blockquote(style="margin-top: 20px")
+						p(style="font-style: italic;")
+							| We have seen an extremely great success rate, with more than 77% of our participating websites seeing an average of
+							strong(style="color: #72b800; margin: 0 5px")
+								| 43% uplift
+								i.fa.fa-arrow-up(style="margin: 0 0 0 5px")
+							| in RPM.
+					h3(style="margin: 40px 0 10px; font-weight: bold;") Schedule a live demo with us
+					ul
+						li.active(data-id="TemFBoDWjZw" class="livechat_button") Live chat now
+						//- div(data-id="TemFBoDWjZw" class="livechat_button")
+						//- 	a(href="https://www.livechatinc.com/customer-service/?partner=lc_6965991&amp;utm_source=chat_button") Speak Now
+						li(onclick="Calendly.showPopupWidget('https://calendly.com/adpushup/adpushup-demo');return false;") Schedule Later

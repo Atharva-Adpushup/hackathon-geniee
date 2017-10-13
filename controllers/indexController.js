@@ -112,6 +112,10 @@ function createNewUser(params, res) {
 		});
 }
 
+function requestDemoRedirection(res) {
+	return res.redirect('/user/requestdemo');
+}
+
 // Redirects to thank you page if requestDemo = true
 function checkUserDemo() {
 	if (req.session.user.get('requestDemo')) {
@@ -132,6 +136,7 @@ function setSessionData(user, req, res, type) {
 		redirectPath = null,
 		userSites = user.get('sites'),
 		isUserSites = !!(userSites && userSites.length),
+		isRequestDemo = !!user.get('requestDemo'),
 		primarySiteDetails = isUserSites ? _extend(userSites[0], {}) : null;
 
 	return globalModel.getQueue('data::emails').then(function(emailList) {
@@ -150,6 +155,11 @@ function setSessionData(user, req, res, type) {
 
 		if (type == 1 && userPasswordMatch == 1) {
 			// Sign Up
+
+			if (isRequestDemo) {
+				return requestDemoRedirection(res);
+			}
+
 			return res.redirect('/user/onboarding');
 		} else if (type == 2 && userPasswordMatch == 1) {
 			// Login
@@ -190,8 +200,17 @@ function setSessionData(user, req, res, type) {
 					var sites = _.difference(validSites, ['inValidSite']);
 					if (Array.isArray(sites) && sites.length > 0) {
 						if (sites.length == 1) {
-							var step = sites[0].step;
-							if ((step && step < consts.onboarding.totalSteps) || !step) {
+							var step = sites[0].step,
+								isIncompleteOnboardingSteps = !!(
+									(step && step < consts.onboarding.totalSteps) ||
+									!step
+								);
+
+							if (isRequestDemo && isIncompleteOnboardingSteps) {
+								return requestDemoRedirection(res);
+							}
+
+							if (isIncompleteOnboardingSteps) {
 								return res.redirect('/user/onboarding');
 							}
 							if (req.session.isSuperUser) {
@@ -208,12 +227,22 @@ function setSessionData(user, req, res, type) {
 					} else {
 						if (allUserSites.length == 1) {
 							if (req.session.isSuperUser) {
-								if (!allUserSites[0].step || allUserSites[0].step < consts.onboarding.totalSteps) {
+								var isIncompleteOnboardingSteps = !!(
+									!allUserSites[0].step || allUserSites[0].step < consts.onboarding.totalSteps
+								);
+
+								if (isRequestDemo && isIncompleteOnboardingSteps) {
+									return requestDemoRedirection(res);
+								} else if (isIncompleteOnboardingSteps) {
 									return res.redirect('/user/onboarding');
 								} else {
 									return res.redirect('/user/dashboard');
 								}
 							} else {
+								if (isRequestDemo) {
+									return requestDemoRedirection(res);
+								}
+
 								return res.redirect('/user/onboarding');
 							}
 							// if (allUserSites[0].services) {

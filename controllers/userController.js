@@ -25,6 +25,10 @@ var express = require('express'),
 	// Instantiate mailer
 	mailer = new Mailer(mailConfig, 'text');
 
+function requestDemoRedirection(res) {
+	return res.redirect('/user/requestdemo');
+}
+
 function dashboardRedirection(req, res, allUserSites, type) {
 	function setEmailCookie() {
 		var cookieName = 'email',
@@ -118,6 +122,9 @@ router
 	.get('/onboarding', function(req, res) {
 		var allUserSites = req.session.user.sites;
 		return dashboardRedirection(req, res, allUserSites, 'onboarding');
+	})
+	.get('/requestdemo', function(req, res) {
+		return res.render('request-demo', { headerBannerLogo: true, requestDemo: true });
 	})
 	.post('/setSiteStep', function(req, res) {
 		siteModel
@@ -280,7 +287,8 @@ router
 			userModel.setSitePageGroups(email).then(
 				function(user) {
 					req.session.user = user;
-					var allUserSites = user.get('sites');
+					var allUserSites = user.get('sites'),
+						isRequestDemo = !!user.get('requestDemo');
 
 					function sitePromises() {
 						return _.map(allUserSites, function(obj) {
@@ -299,8 +307,13 @@ router
 						var sites = _.difference(validSites, ['inValidSite']);
 						if (Array.isArray(sites) && sites.length > 0) {
 							if (sites.length == 1) {
-								var step = sites[0].step;
-								if (step && step < CC.onboarding.totalSteps) {
+								var step = sites[0].step,
+									isIncompleteOnboardingSteps = !!(step && step < CC.onboarding.totalSteps);
+
+								if (isRequestDemo && isIncompleteOnboardingSteps) {
+									return requestDemoRedirection(res);
+								}
+								if (isIncompleteOnboardingSteps) {
 									return res.redirect('/user/onboarding');
 								}
 								if (!user.get('requestDemo')) {
@@ -312,6 +325,10 @@ router
 								return res.redirect('/user/dashboard');
 							}
 						} else {
+							if (isRequestDemo) {
+								return requestDemoRedirection(res);
+							}
+
 							return res.redirect('/user/onboarding');
 						}
 					});
