@@ -6,8 +6,6 @@ import 'react-dates/initialize';
 import moment from 'moment';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
-import DefaultTheme from 'react-dates/lib/theme/DefaultTheme';
-import { withStyles } from 'react-with-styles';
 
 class ReportControls extends Component {
 	constructor(props) {
@@ -102,17 +100,4 @@ class ReportControls extends Component {
 	}
 }
 
-export default withStyles(() => ({
-	...DefaultTheme,
-	color: {
-		...DefaultTheme.color,
-		highlighted: {
-			backgroundColor: '#50a4e2',
-			backgroundColor_active: '#50a4e2',
-			backgroundColor_hover: '#50a4e2',
-			color: '#50a4e2',
-			color_active: '#50a4e2',
-			color_hover: '#50a4e2'
-		}
-	}
-}))(ReportControls);
+export default ReportControls;

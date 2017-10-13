@@ -98,4 +98,15 @@ body {
 .DateInput_displayText__focused_3.DateInput_displayText__focused_3.DateInput_displayText__focused_3 {
 	color: #fff;
 	border-radius: 0;
+	background-color: lighten($primaryColor, 5%);
+}
+
+.CalendarDay__selected_span_2.CalendarDay__selected_span_2 {
+	background-color: lighten($primaryColor, 5%);
+	border-color: lighten($primaryColor, 5%);
+
+	&:hover {
+		background-color: lighten($primaryColor, 8%);
+		border-color: lighten($primaryColor, 8%);
+	}
 }
