@@ -723,7 +723,7 @@ router
 			orderBy: req.body.orderBy || false
 		};
 		return sqlReportingModule
-			.init(params)
+			.generate(params)
 			.then(queryResult => queryResultProcessing(queryResult, response, res))
 			.catch(err => errorHandling(err, response, res));
 	})

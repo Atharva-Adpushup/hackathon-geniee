@@ -6,7 +6,8 @@ import {
 	updateLayout,
 	highlightElement,
 	setElementSelectorCords,
-	hideElementSelector
+	hideElementSelector,
+	setViewingMode
 } from '../../actions/inner/actions';
 import { getAdpVitals, getAllXPaths, isValidXPath, scrollToView } from './domManager';
 
@@ -62,7 +63,10 @@ const messenger = new Messenger(),
 
 				case messengerCommands.SCROLL_TO_VIEW:
 					scrollToView(data.adId);
-					// dispatch();
+					break;
+
+				case messengerCommands.SET_MODE:
+					dispatch(setViewingMode(data.mode));
 					break;
 
 				case messengerCommands.SELECT_ELEMENT:

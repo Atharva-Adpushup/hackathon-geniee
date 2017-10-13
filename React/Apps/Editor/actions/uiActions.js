@@ -30,6 +30,7 @@ const showEditMenu = (sectionId, adId, position, variationId) => ({
 	toggleVariationPanel = () => ({ type: variationActions.TOGGLE_VARIATION_PANEL }),
 	openVariationPanel = () => ({ type: variationActions.OPEN_VARIATION_PANEL }),
 	closeVariationPanel = () => ({ type: variationActions.CLOSE_VARIATION_PANEL }),
+	setMode = mode => ({ type: uiActions.SET_MODE, mode }),
 	expandVariationPanel = (panelCssSelector, params) => ({
 		type: variationActions.EXPAND_VARIATION_PANEL,
 		panelCssSelector,
@@ -42,6 +43,7 @@ const showEditMenu = (sectionId, adId, position, variationId) => ({
 	});
 
 export {
+	setMode,
 	showEditMenu,
 	showInsertMenu,
 	hideEditMenu,

@@ -10,38 +10,8 @@ import VariationBar from './variationBar';
 import BeforeAfterJsPanel from './beforeAfterJsPanel';
 
 class VariationPanel extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = { reporting: false };
-	}
-
-	componentDidMount() {
-		$.ajax({
-			method: 'POST',
-			url: '/user/reports/generate',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			data: JSON.stringify({
-				select: ['total_xpath_miss', 'total_impressions', 'total_cpm'],
-				where: {
-					siteid: 28822,
-					pagegroup: 'MIC', // this.props.activeChannel.pageGroup
-					variation: '2e68228f-84da-415e-bfcf-bfcf67c87570' // this.props.variation.id
-					// device_type: this.props.activeChannel.platform
-				},
-				groupBy: ['section']
-			}),
-			contentType: 'json',
-			dataType: 'json',
-			success: response => {
-				console.log(response);
-			}
-		});
-	}
-
 	render() {
-		const { variation, channelId, sections, ui } = this.props;
+		const { variation, channelId, sections, ui, reporting } = this.props;
 		return (
 			<div className="variation-settings">
 				<VariationBar panelCssSelector=".variation-settings" expanded={ui.variationPanel.expanded} />
@@ -50,7 +20,7 @@ class VariationPanel extends React.Component {
 						<VariationOptions channelId={channelId} variation={variation} />
 					</div>
 					<div tabTitle="Sections">
-						<VariationSections variation={variation} sections={sections} ui={ui} />
+						<VariationSections variation={variation} sections={sections} ui={ui} reporting={reporting} />
 					</div>
 					<div tabTitle="Add Incontent Variation">
 						<IncontentAdder

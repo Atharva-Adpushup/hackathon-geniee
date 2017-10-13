@@ -11,7 +11,8 @@ import {
 	channelActions,
 	channelMenuActions,
 	messengerCommands,
-	uiActions
+	uiActions,
+	uiModes
 } from '../consts/commonConsts';
 
 const errorsConfig = {},
@@ -138,6 +139,14 @@ const errorsConfig = {},
 				return state;
 		}
 	},
+	editorViewing = (state = { mode: uiModes.EDITOR_MODE }, { type, mode }) => {
+		switch (type) {
+			case uiActions.SET_MODE:
+				return { ...state, mode: mode };
+			default:
+				return state;
+		}
+	},
 	variationPanel = (state = { expanded: false, open: false }, action) => {
 		switch (action.type) {
 			case variationActions.EXPAND_VARIATION_PANEL:
@@ -170,5 +179,6 @@ export default combineReducers({
 	channelMenu,
 	errors,
 	afterSaveLoader,
-	variationPanel
+	variationPanel,
+	editorViewing
 });
