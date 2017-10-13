@@ -304,7 +304,7 @@ var Promise = require('bluebird'),
 					let to = data.to
 						? moment(data.to).format('YYYY-MM-DD')
 						: moment()
-								.subtract(1, 'days')
+								.subtract(0, 'days')
 								.format('YYYY-MM-DD');
 
 					firstQuery.where += ` ${schema.firstQuery.tables.apexSiteReport
@@ -343,24 +343,36 @@ var Promise = require('bluebird'),
 				.then(() => {
 					_.forEach(data, (value, key) => {
 						let alias = queryHelper.__getAlias(key);
+						let condition = `.${key}=@__${key}__`;
+						if (key == 'variation_id' || key == 'name' || key == 'section') {
+							let lengthOfValue = value.length;
+							condition = `.${key} IN (`;
+							for (i = 0; i < lengthOfValue; i++) {
+								let name = `@__${key}_${i}__`;
+								condition += `${name},`;
+								common.where.push({
+									name: name.substr(1),
+									type: schema.where[key].type,
+									value: value[i]
+								});
+							}
+							condition = condition.slice(0, -1);
+							condition += ')';
+						}
 						firstQuery.where += ` AND ${alias
 							? alias
-							: schema.firstQuery.tables.apexSiteReport.alias}.${key}=@__${key}__ `;
+							: schema.firstQuery.tables.apexSiteReport.alias}${condition} `;
 						secondQuery.where += ` AND ${alias
 							? alias
-							: schema.secondQuery.tables.adpTagReport.alias}.${key}=@__${key}__ `;
-						common.where.push(
-							Object.assign(schema.where[key], {
-								value: value
-							})
-						);
+							: schema.secondQuery.tables.adpTagReport.alias}${condition} `;
+						if (!_.isArray(value)) {
+							common.where.push(
+								Object.assign(schema.where[key], {
+									value: value
+								})
+							);
+						}
 					});
-
-					// common.level.section
-					// 	? (firstQuery.where += ` AND ${schema.firstQuery.tables.apexSiteReport.alias}.axhsrid=${schema
-					// 			.firstQuery.tables.sectionReport.alias}.axhsrid `)
-					// 	: null;
-
 					return true;
 				});
 		},

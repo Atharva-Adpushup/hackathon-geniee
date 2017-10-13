@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import * as channelActions from 'actions/channelActions';
-import { showNewChannelMenu, showSiteModesPopover, showChannelMenu } from '../actions/uiActions';
+import { showNewChannelMenu, showSiteModesPopover, showChannelMenu, setMode } from '../actions/uiActions';
 import { masterSaveData } from 'actions/siteActions';
 import ChannelManager from 'channelManager/channelManager.jsx';
 import { getAllChannels, getOpenChannels, getActiveChannelId } from '../selectors/channelSelectors';
@@ -14,8 +14,8 @@ const noop = () => ({ type: 'Test' }),
 		siteMode: getMode(state)
 	}),
 	mapDispatchToProps = dispatch => ({
-		toggleEditorMode: () => {
-			dispatch(noop(arguments));
+		toggleEditorMode: e => {
+			dispatch(setMode(e.target.value));
 		},
 		showPublisherHelper: position => {
 			dispatch(showSiteModesPopover(position));

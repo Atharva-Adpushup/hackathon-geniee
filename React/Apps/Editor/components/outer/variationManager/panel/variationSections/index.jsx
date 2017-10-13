@@ -20,6 +20,7 @@ const variationSections = props => {
 	const {
 		variation,
 		sections,
+		reporting,
 		onDeleteSection,
 		onRenameSection,
 		onUpdateAdCode,
@@ -56,6 +57,7 @@ const variationSections = props => {
 							onIncontentFloatUpdate={onIncontentFloatUpdate}
 							onScrollSectionIntoView={onScrollSectionIntoView}
 							ui={ui}
+							reporting={reporting}
 						/>
 					</div>
 				))}
@@ -76,7 +78,8 @@ variationSections.propTypes = {
 	onValidateXPath: PropTypes.func,
 	onSectionXPathValidate: PropTypes.func,
 	ui: PropTypes.object,
-	resetErrors: PropTypes.func
+	resetErrors: PropTypes.func,
+	reporting: PropTypes.object
 };
 
 export default connect(

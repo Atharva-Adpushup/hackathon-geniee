@@ -1,11 +1,24 @@
 const Promise = require('bluebird'),
 	_ = require('lodash'),
-	dbHelper = require('../reports/default/apex/vendor/mssql/dbHelper'),
+	dbHelper = require('../reports/default/apex/vendor/mssql/dbhelper'),
 	{ fetchSectionQuery, fetchVariationQuery, fetchPagegroupQuery } = require('./constants'),
 	queryHelper = require('./queryHelper');
 
+function checkWhere(where) {
+	if (
+		!where ||
+		!where.siteid ||
+		(where.hasOwnProperty('variation') && !_.isArray(where.variation)) ||
+		(where.hasOwnProperty('pagegroup') && !_.isArray(where.pagegroup)) ||
+		(where.hasOwnProperty('section') && !_.isArray(where.section))
+	) {
+		return true;
+	}
+	return false;
+}
+
 function checkParameters(data) {
-	if (!data || !data.select || !data.select.length || !data.where || !data.where.siteid) {
+	if (!data || !data.select || !data.select.length || checkWhere(data.where)) {
 		return Promise.reject('Invalid query parameters');
 	}
 	return Promise.resolve();
@@ -69,18 +82,6 @@ function queryBuilder(data) {
 		.then(() => queryHelper.generateCompleteQuery());
 }
 
-function init(data) {
-	return checkParameters(data)
-		.then(() => queryBuilder(data))
-		.then(queryWithParameters => {
-			return executeQuery(queryWithParameters);
-		})
-		.catch(err => {
-			let message = err.message || err;
-			return Promise.reject(message);
-		});
-}
-
 function getQuery(type) {
 	let query;
 	if (type == 1) {
@@ -106,19 +107,16 @@ function getPVS(siteid, type) {
 	});
 }
 
-// init({
-// 	select: ['report_date', 'siteid', 'total_impressions', 'total_xpath_miss', 'total_cpm', 'device_type'],
-// 	where: {
-// 		// section: '429e5150-e40b-4afb-b165-93b8bde3cf21',
-// 		siteid: 28822,
-// 		variation: '2e68228f-84da-415e-bfcf-bfcf67c87570',
-// 		pagegroup: 'MIC',
-// 		from: '2017-09-01',
-// 		to: '2017-09-10',
-// 		device_type: 4
-// 	},
-// 	groupBy: ['section']
-// 	// orderBy: ['variation']
-// });
+function generate(data) {
+	return checkParameters(data)
+		.then(() => queryBuilder(data))
+		.then(queryWithParameters => {
+			return executeQuery(queryWithParameters);
+		})
+		.catch(err => {
+			let message = err.message || err;
+			return Promise.reject(message);
+		});
+}
 
-module.exports = { init, getPVS };
+module.exports = { generate, getPVS };
