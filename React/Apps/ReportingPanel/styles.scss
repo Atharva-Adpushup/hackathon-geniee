@@ -66,7 +66,8 @@ body {
 		}
 
 		.DateInput {
-			padding: 0 8px;
+			padding: 0;
+			text-align: center;
 			font-size: 1em;
 			width: 90px;
 			font-family: 'Karla', sans-serif;
@@ -95,18 +96,40 @@ body {
 	top: 35px;
 }
 
-.DateInput_displayText__focused_3.DateInput_displayText__focused_3.DateInput_displayText__focused_3 {
+.DateInput_displayText__focused_3.DateInput_displayText__focused_3.DateInput_displayText__focused_3,
+.DateInput_displayText__focused_2.DateInput_displayText__focused_2 {
 	color: #fff;
 	border-radius: 0;
-	background-color: lighten($primaryColor, 5%);
+	background-color: lighten($primaryColor, 7%);
+	border-color: lighten($primaryColor, 7%);
 }
 
-.CalendarDay__selected_span_2.CalendarDay__selected_span_2 {
-	background-color: lighten($primaryColor, 5%);
-	border-color: lighten($primaryColor, 5%);
+.CalendarDay__hovered_span.CalendarDay__hovered_span_2 {
+	&,
+	&:hover {
+		background-color: lighten($primaryColor, 7%);
+		color: #fff;
+		border-color: lighten($primaryColor, 7%);
+	}
+}
+
+.CalendarDay__selected_span_2.CalendarDay__selected_span_2,
+.CalendarDay__selected_span_3.CalendarDay__selected_span_3.CalendarDay__selected_span_3 {
+	background-color: lighten($primaryColor, 7%);
+	border-color: lighten($primaryColor, 7%);
 
 	&:hover {
-		background-color: lighten($primaryColor, 8%);
-		border-color: lighten($primaryColor, 8%);
+		background-color: lighten($primaryColor, 10%);
+		border-color: lighten($primaryColor, 10%);
+	}
+}
+
+.CalendarDay__selected_2.CalendarDay__selected_2,
+.CalendarDay__selected_3.CalendarDay__selected_3.CalendarDay__selected_3,
+.CalendarDay__hovered_span.CalendarDay__hovered_span_3.CalendarDay__selected.CalendarDay__selected_4 {
+	&,
+	&:hover {
+		background-color: $primaryColor;
+		border-color: $primaryColor;
 	}
 }
