@@ -99,7 +99,7 @@ const renderDropdownList = that => {
 							<Col className="u-padding-r10px" xs={colCompact} style={{ position: 'relative' }}>
 								{showTextarea ? (
 									<textarea
-										style={Object.assign(inlineInputStyles, { height: '50px' })}
+										style={Object.assign(inlineInputStyles, { height: '50px', resize: 'none' })}
 										type={inputType}
 										ref="editedText"
 										placeholder={that.props.text}
