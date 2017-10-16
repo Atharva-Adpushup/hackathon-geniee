@@ -63,6 +63,9 @@ function queryResultProcessing(resultset) {
 }
 
 function getReportingData(channels, siteId) {
+	if (config && config.hasOwnProperty('reporting') && !config.reporting.activated) {
+		return Promise.resolve({});
+	}
 	let channelNames = lodash.map(channels, 'pageGroup');
 	let variationNames = lodash.flatten(lodash.map(channels, channel => Object.keys(channel.variations)));
 	let reportingParams = {
