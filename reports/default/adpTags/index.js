@@ -1,6 +1,6 @@
 const Promise = require('bluebird'),
 	_ = require('lodash'),
-	dbHelper = require('../reports/default/apex/vendor/mssql/dbhelper'),
+	dbHelper = require('../common/mssql/dbhelper'),
 	{ fetchSectionQuery, fetchVariationQuery, fetchPagegroupQuery } = require('./constants'),
 	queryHelper = require('./queryHelper');
 

@@ -1,7 +1,7 @@
 const fullSiteDataQueryHelper = require('./fullSiteData'),
-	AdPushupError = require('../../../../../../helpers/AdPushupError'),
-	siteModel = require('../../../../../../models/siteModel'),
-	pageGroupModule = require('../../../../../partners/geniee/modules/pageGroup/index'),
+	AdPushupError = require('../../../../../helpers/AdPushupError'),
+	siteModel = require('../../../../../models/siteModel'),
+	pageGroupModule = require('../../../../partners/geniee/modules/pageGroup/index'),
 	Promise = require('bluebird'),
 	extend = require('extend');
 

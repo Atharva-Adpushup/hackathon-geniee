@@ -1,4 +1,4 @@
-const sqlQueryModule = require('../../vendor/mssql/queryHelpers/singleChannelVariationData'),
+const sqlQueryModule = require('../../../common/mssql/queryHelpers/singleChannelVariationData'),
 	Promise = require('bluebird'),
 	AdPushupError = require('../../../../../helpers/AdPushupError'),
 	extend = require('extend'),
