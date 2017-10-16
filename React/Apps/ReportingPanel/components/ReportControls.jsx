@@ -40,7 +40,7 @@ class ReportControls extends Component {
 	}
 
 	render() {
-		const { state } = this,
+		const { state, props } = this,
 			pageGroups = window.pageGroups,
 			{ PLATFORMS } = config;
 
@@ -89,7 +89,13 @@ class ReportControls extends Component {
 							/>
 						</Col>
 						<Col sm={2}>
-							<button className="btn btn-lightBg btn-default">Generate Report</button>
+							<button
+								className="btn btn-lightBg btn-default"
+								onClick={props.generateButtonHandler}
+								disabled={props.disableGenerateButton}
+							>
+								Generate Report
+							</button>
 						</Col>
 					</Row>
 				</div>
@@ -100,7 +106,9 @@ class ReportControls extends Component {
 
 ReportControls.propTypes = {
 	startDate: PropTypes.object.isRequired,
-	endDate: PropTypes.object.isRequired
+	endDate: PropTypes.object.isRequired,
+	disableGenerateButton: PropTypes.bool.isRequired,
+	generateButtonHandler: PropTypes.func.isRequired
 };
 
 export default ReportControls;

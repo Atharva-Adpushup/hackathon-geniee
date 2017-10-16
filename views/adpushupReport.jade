@@ -9,6 +9,7 @@ block append headScripts
 	script.
 		window.pageGroups = !{JSON.stringify(pageGroups)}
 		window.siteId = !{siteId}
+		window.isSuperUser = !{isSuperUser}
 
 block bodyContent
 	include layout/sideBar

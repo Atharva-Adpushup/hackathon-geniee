@@ -67,15 +67,22 @@ class ReportingPanel extends React.Component {
 
 		this.state = {
 			reportLoading: true,
+			disableGenerateButton: true,
 			reportLevel: 'site',
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
 			endDate: moment().startOf('day')
 		};
+		this.generateReport = this.generateReport.bind(this);
 	}
 
-	componentDidMount() {
+	generateReport() {
+		this.setState({
+			reportLoading: true,
+			disableGenerateButton: true
+		});
+
 		const { startDate, endDate } = this.state,
 			params = { startDate, endDate };
 
@@ -88,23 +95,27 @@ class ReportingPanel extends React.Component {
 			dataType: 'json',
 			success: res => {
 				console.log(res);
-				this.setState({ reportLoading: false });
+				this.setState({ reportLoading: false, disableGenerateButton: false });
 			},
 			fail: res => {
 				console.log('error');
 				console.log(res);
-				this.setState({ reportLoading: false });
+				this.setState({ reportLoading: false, disableGenerateButton: false });
 			}
 		});
+	}
+
+	componentDidMount() {
+		this.generateReport();
 	}
 
 	render() {
 		const config = {
 			title: {
-				text: 'AdPushup report'
+				text: ''
 			},
 			subtitle: {
-				text: 'Day wise'
+				text: ''
 			},
 			yAxis: [
 				{
@@ -172,15 +183,26 @@ class ReportingPanel extends React.Component {
 			}
 		};
 
-		const { startDate, endDate, reportLoading } = this.state;
+		const { startDate, endDate, reportLoading, disableGenerateButton } = this.state;
 
 		return (
 			<ActionCard title="AdPushup Report">
 				<Row>
 					<Col sm={10} smOffset={2}>
-						<ReportControls startDate={startDate} endDate={endDate} />
+						<ReportControls
+							startDate={startDate}
+							endDate={endDate}
+							disableGenerateButton={disableGenerateButton}
+							generateButtonHandler={this.generateReport}
+						/>
 					</Col>
-					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : ''}</Col>
+					<Col sm={12}>
+						{reportLoading ? (
+							<PaneLoader message="Loading report data..." />
+						) : (
+							<ReactHighcharts config={config} />
+						)}
+					</Col>
 				</Row>
 				{/* <div className="report-chart">
 					<ReactHighcharts config={config} />
