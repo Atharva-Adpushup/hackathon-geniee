@@ -5,9 +5,9 @@ var express = require('express'),
 	adsenseReportModel = require('../models/adsenseModel'),
 	apexVariationRpmService = require('../reports/default/apex/pageGroupVariationRPM/service'),
 	apexParameterModule = require('../reports/default/apex/modules/params/index'),
-	sqlQueryModule = require('../reports/default/apex/vendor/mssql/queryHelpers/fullSiteData'),
+	sqlQueryModule = require('../reports/default/common/mssql/queryHelpers/fullSiteData'),
 	apexSingleChannelVariationModule = require('../reports/default/apex/modules/mssql/singleChannelVariationData'),
-	singleChannelVariationQueryHelper = require('../reports/default/apex/vendor/mssql/queryHelpers/singleChannelVariationData'),
+	singleChannelVariationQueryHelper = require('../reports/default/common/mssql/queryHelpers/singleChannelVariationData'),
 	liveSitesService = require('../services/liveSites/index'),
 	Promise = require('bluebird'),
 	extend = require('extend'),
@@ -17,7 +17,7 @@ var express = require('express'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
 	pipedriveAPI = require('../misc/vendors/pipedrive'),
-	sqlReporting = require('../reportingSQL/index'),
+	sqlReporting = require('../reports/default/adpTags/index'),
 	router = express.Router(),
 	couchbase = require('../helpers/couchBaseService'),
 	N1qlQuery = require('couchbase-promises').N1qlQuery;
@@ -28,14 +28,21 @@ function createAggregateNonAggregateObjects(dataset, key, container) {
 		innerObj[identifier] = {
 			aggregate: {
 				total_xpath_miss: 0,
-				total_impressions: 0
+				total_impressions: 0,
+				total_revenue: 0,
+				total_cpm: 0
 			},
 			nonAggregate: nonAggregateDataset
 		};
 		nonAggregateDataset.forEach(row => {
 			innerObj[identifier].aggregate.total_xpath_miss += parseInt(row['total_xpath_miss']);
 			innerObj[identifier].aggregate.total_impressions += parseInt(row['total_impressions']);
+			innerObj[identifier].aggregate.total_revenue += parseInt(row['total_revenue']);
 		});
+		// CPM = Revenue * 1000 / Impressions --> rounding off to 3 decimal places
+		innerObj[identifier].aggregate.total_cpm = Number(
+			innerObj[identifier].aggregate.total_revenue * 1000 / innerObj[identifier].aggregate.total_impressions
+		).toFixed(2);
 	});
 	container[key] = innerObj;
 }
@@ -56,16 +63,17 @@ function queryResultProcessing(resultset) {
 }
 
 function getReportingData(channels, siteId) {
+	if (config && config.hasOwnProperty('reporting') && !config.reporting.activated) {
+		return Promise.resolve({});
+	}
 	let channelNames = lodash.map(channels, 'pageGroup');
 	let variationNames = lodash.flatten(lodash.map(channels, channel => Object.keys(channel.variations)));
 	let reportingParams = {
-		select: ['total_xpath_miss', 'total_impressions', 'total_cpm', 'report_date', 'siteid'],
+		select: ['total_xpath_miss', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
 		where: {
 			siteid: siteId,
 			pagegroup: channelNames,
 			variation: variationNames
-			// from: '2017-10-01', // remove
-			// to: '2017-10-06' // remove
 		},
 		groupBy: ['section']
 	};

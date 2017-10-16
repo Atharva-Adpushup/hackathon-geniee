@@ -6,7 +6,7 @@ var _ = require('lodash'),
 	ctrPerformanceService = require('./ctrPerformanceInTabularData/service'),
 	pageGroupVariationRPMService = require('./pageGroupVariationRPM/service'),
 	variationModule = require('./modules/variation/index'),
-	sqlQueryModule = require('../../default/apex/vendor/mssql/queryHelpers/fullSiteData'),
+	sqlQueryModule = require('../common/mssql/queryHelpers/fullSiteData'),
 	parameterModule = require('./modules/params/index');
 
 module.exports = {

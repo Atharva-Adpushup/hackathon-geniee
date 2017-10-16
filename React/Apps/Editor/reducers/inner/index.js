@@ -19,7 +19,7 @@ const hbBoxInitState = { top: 0, left: 0, width: 0, height: 0 },
 				return state;
 		}
 	},
-	editorViewingMode = (state = { mode: uiModes.EDITOR_MODE }, action) => {
+	editorViewing = (state = { mode: uiModes.EDITOR_MODE }, action) => {
 		switch (action.type) {
 			case innerActions.SET_MODE:
 				return { ...state, mode: action.mode };
@@ -62,4 +62,4 @@ const hbBoxInitState = { top: 0, left: 0, width: 0, height: 0 },
 		}
 	};
 
-export default combineReducers({ hbBox, variation, elmSelector, contentSelector, editorViewingMode });
+export default combineReducers({ hbBox, variation, elmSelector, contentSelector, editorViewing });

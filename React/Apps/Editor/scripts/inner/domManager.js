@@ -92,7 +92,7 @@ const selectorator = new Selectorator(),
 					state = getState(),
 					$target = $(e.target);
 
-				if (!isScriptedEvent && parseInt(state.editorViewingMode.mode) == uiModes.EDITOR_MODE) {
+				if (!isScriptedEvent && parseInt(state.editorViewing.mode) == uiModes.EDITOR_MODE) {
 					e.preventDefault();
 
 					switch (e.type) {
