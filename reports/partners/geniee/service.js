@@ -3,8 +3,8 @@ var Promise = require('bluebird'),
 	mediaModule = require('./modules/media/index'),
 	pageGroupModule = require('./modules/pageGroup/index'),
 	variationModule = require('./modules/variation/index'),
-	sqlQueryModule = require('../../default/apex/vendor/mssql/queryHelpers/fullSiteData'),
-	{ getSqlValidParameterDates } = require('../../default/apex/vendor/mssql/utils/utils'),
+	sqlQueryModule = require('../../default/common/mssql/queryHelpers/fullSiteData'),
+	{ getSqlValidParameterDates } = require('../../default/common/mssql/utils/utils'),
 	siteModel = require('../../../models/siteModel');
 const { defaultLanguageCode } = require('../../../i18n/language-mapping');
 

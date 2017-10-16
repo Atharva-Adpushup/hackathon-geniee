@@ -169,6 +169,7 @@ class variationSectionElement extends Component {
 								<InlineEdit
 									compact
 									validate
+									showTextarea
 									adCode
 									value={props.section.ads[0].adCode}
 									submitHandler={props.onUpdateAdCode.bind(null, props.section.ads[0].id)}
@@ -248,6 +249,46 @@ class variationSectionElement extends Component {
 						</Row>
 					</div>
 				)}
+				{Object.keys(props.reporting).length &&
+				Object.keys(props.reporting.sections).length &&
+				props.reporting.sections[props.section.id] ? (
+					<div>
+						<Row>
+							<Col className="u-padding-r10px" xs={4}>
+								Total Impressions
+							</Col>
+							<Col className="u-padding-l10px" xs={8}>
+								<strong>
+									{props.reporting.sections[props.section.id].aggregate.total_impressions}
+								</strong>
+							</Col>
+						</Row>
+						<Row>
+							<Col className="u-padding-r10px" xs={4}>
+								Total XPath Misses
+							</Col>
+							<Col className="u-padding-l10px" xs={8}>
+								<strong>{props.reporting.sections[props.section.id].aggregate.total_xpath_miss}</strong>
+							</Col>
+						</Row>
+						<Row>
+							<Col className="u-padding-r10px" xs={4}>
+								Total CPM
+							</Col>
+							<Col className="u-padding-l10px" xs={8}>
+								<strong>{props.reporting.sections[props.section.id].aggregate.total_cpm}</strong>
+							</Col>
+						</Row>
+						<Row>
+							<Col className="u-padding-r10px" xs={4}>
+								Total Revenue
+							</Col>
+							<Col className="u-padding-l10px" xs={8}>
+								<strong>{props.reporting.sections[props.section.id].aggregate.total_revenue}</strong>
+							</Col>
+						</Row>
+					</div>
+				) : null}
 				<Row>
 					<Col className="u-padding-t10px">
 						<label

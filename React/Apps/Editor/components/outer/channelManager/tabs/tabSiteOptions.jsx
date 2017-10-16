@@ -1,4 +1,4 @@
-import { siteModes } from 'consts/commonConsts.js';
+import { siteModes, uiModes } from 'consts/commonConsts.js';
 import { Tooltip, Button, OverlayTrigger } from 'react-bootstrap';
 import React, { PropTypes } from 'react';
 import $ from 'jquery';
@@ -80,7 +80,7 @@ const showSiteModesPopover = (props, ev) => {
 				type="radio"
 				className="modes-input"
 				name="editorMode"
-				value="editor"
+				value={uiModes.EDITOR_MODE}
 				id="editormode"
 				defaultChecked
 			/>
@@ -95,7 +95,7 @@ const showSiteModesPopover = (props, ev) => {
 				type="radio"
 				className="modes-input"
 				name="editorMode"
-				value="browse"
+				value={uiModes.BROWSE_MODE}
 				id="browsemode"
 			/>
 			<OverlayTrigger placement="bottom" overlay={<Tooltip id="browseModeTooltip">Browse Mode</Tooltip>}>
@@ -110,7 +110,7 @@ const showSiteModesPopover = (props, ev) => {
 	// eslint-disable-next-line react/no-multi-comp
 	TabSiteOptions = props => (
 		<div className="option-right">
-			{/*<EditorModes toggleEditorMode={props.toggleEditorMode} />*/}
+			<EditorModes toggleEditorMode={props.toggleEditorMode} />
 
 			<OverlayTrigger placement="bottom" overlay={<Tooltip id="masterSaveTooltip">Save changes</Tooltip>}>
 				<Button
