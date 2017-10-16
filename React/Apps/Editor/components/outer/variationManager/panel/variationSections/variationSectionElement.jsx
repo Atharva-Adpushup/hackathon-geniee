@@ -169,6 +169,7 @@ class variationSectionElement extends Component {
 								<InlineEdit
 									compact
 									validate
+									showTextarea
 									adCode
 									value={props.section.ads[0].adCode}
 									submitHandler={props.onUpdateAdCode.bind(null, props.section.ads[0].id)}
