@@ -41,8 +41,7 @@ class ReportControls extends Component {
 
 	render() {
 		const { state, props } = this,
-			pageGroups = window.pageGroups,
-			{ PLATFORMS } = config;
+			{ PLATFORMS, PAGEGROUPS } = config;
 
 		return (
 			<div className="report-controls-wrapper">
@@ -54,7 +53,7 @@ class ReportControls extends Component {
 								label="Select PageGroup"
 								onChange={this.pageGroupChanged}
 							>
-								{pageGroups.map((pageGroup, index) => (
+								{PAGEGROUPS.map((pageGroup, index) => (
 									<option key={index} value={index}>
 										{pageGroup}
 									</option>
