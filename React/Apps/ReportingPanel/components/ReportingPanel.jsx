@@ -205,6 +205,11 @@ class ReportingPanel extends React.Component {
 			colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e'],
 			credits: {
 				enabled: false
+			},
+			plotOptions: {
+				line: {
+					animation: true
+				}
 			}
 		};
 

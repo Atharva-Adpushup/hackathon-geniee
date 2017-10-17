@@ -52,9 +52,9 @@ class ReportControls extends Component {
 					<Row>
 						<Col sm={2} smOffset={2}>
 							<SelectBox
-								value={state.selectedPageGroup}
+								value={state.pageGroup}
 								label="Select PageGroup"
-								onChange={this.pageGroupChanged}
+								onChange={this.pageGroupUpdated}
 							>
 								{PAGEGROUPS.map((pageGroup, index) => (
 									<option key={index} value={index}>
@@ -64,11 +64,7 @@ class ReportControls extends Component {
 							</SelectBox>
 						</Col>
 						<Col sm={2}>
-							<SelectBox
-								value={state.selectedPlatform}
-								label="Select Platform"
-								onChange={this.platformChanged}
-							>
+							<SelectBox value={state.platform} label="Select Platform" onChange={this.platformUpdated}>
 								{PLATFORMS.map((platform, index) => (
 									<option key={index} value={index}>
 										{platform}
