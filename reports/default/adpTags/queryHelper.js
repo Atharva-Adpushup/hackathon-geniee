@@ -381,14 +381,16 @@ var Promise = require('bluebird'),
 				.__setLevelFromGroupBy(data)
 				.then(response => {
 					if (response || queryHelper.__getLevel() == 'site') {
-						common.fields.forUser.length
-							? (common.groupBy = ` GROUP BY ${queryHelper.__reduceArrayToString(
+						common.groupBy = common.fields.forUser.length
+							? ` GROUP BY ${queryHelper.__reduceArrayToString(
 									common.fields.forUser,
 									schema.firstQuery.alias
-								)} `)
-							: null;
+								)} `
+							: ' GROUP BY ';
 						firstQuery.nonAggregate.length
-							? (common.groupBy += ` , ${queryHelper.__reduceArrayToString(
+							? (common.groupBy += ` ${common.fields.forUser.length
+									? ' , '
+									: ' '} ${queryHelper.__reduceArrayToString(
 									firstQuery.nonAggregate,
 									schema.firstQuery.alias
 								)}`)
