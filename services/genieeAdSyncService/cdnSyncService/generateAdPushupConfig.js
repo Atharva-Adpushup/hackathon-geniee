@@ -137,6 +137,7 @@ const _ = require('lodash'),
 
 		finalJson[platform][pageGroup] = {
 			variations: [],
+			contentSelector: channel.contentSelector,
 			pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup)
 		};
 
