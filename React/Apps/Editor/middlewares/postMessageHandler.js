@@ -15,6 +15,9 @@ const getData = state => {
 		}
 		const activeVariationId = getActiveChannelActiveVariationId(state),
 			activeVariation = getActiveChannelActiveVariation(state),
+			isActiveVariation = !!activeVariation,
+			isContentSelector = !!(isActiveVariation && activeVariation.contentSelector),
+			contentSelector = isContentSelector ? activeVariation.contentSelector : '',
 			sections = activeVariationId
 				? getVariationStructuredSectionsWithAds(state, { variationId: activeVariationId })
 				: [];
@@ -24,7 +27,7 @@ const getData = state => {
 			editMenuVisible: state.ui.editMenu.isVisible,
 			layout: {
 				...sections,
-				contentSelector: activeVariation.contentSelector,
+				contentSelector: contentSelector,
 				channelId: activeChannel.id
 			},
 			activeChannelId: activeChannel.id
