@@ -67,6 +67,7 @@ class ReportingPanel extends React.Component {
 
 		this.state = {
 			reportLoading: true,
+			reportError: false,
 			disableGenerateButton: true,
 			reportLevel: 'site',
 			pageGroup: null,
@@ -98,18 +99,24 @@ class ReportingPanel extends React.Component {
 			dataType: 'json',
 			success: res => {
 				console.log(res);
-				this.setState({ reportLoading: false, disableGenerateButton: false });
+				let state = {
+					reportLoading: false,
+					disableGenerateButton: false
+				};
+
+				if (!res.error) {
+					this.setState(state);
+				} else {
+					state.reportError = true;
+					this.setState(state);
+				}
 			},
 			fail: res => {
 				console.log('error');
 				console.log(res);
-				this.setState({ reportLoading: false, disableGenerateButton: false });
+				this.setState({ reportLoading: false, disableGenerateButton: false, reportError: true });
 			}
 		});
-	}
-
-	componentDidMount() {
-		this.generateReport();
 	}
 
 	updateReportParams(params) {
@@ -121,6 +128,10 @@ class ReportingPanel extends React.Component {
 			startDate: params.startDate ? params.startDate : state.startDate,
 			endDate: params.endDate ? params.endDate : state.endDate
 		});
+	}
+
+	componentDidMount() {
+		this.generateReport();
 	}
 
 	render() {
@@ -197,7 +208,16 @@ class ReportingPanel extends React.Component {
 			}
 		};
 
-		const { startDate, endDate, reportLoading, disableGenerateButton } = this.state;
+		const { startDate, endDate, reportLoading, disableGenerateButton, reportError } = this.state,
+			chartPane = reportError ? (
+				<PaneLoader
+					message="Error occurred while fetching report data!"
+					state="error"
+					styles={{ height: 'auto' }}
+				/>
+			) : (
+				<ReactHighcharts config={config} />
+			);
 
 		return (
 			<ActionCard title="AdPushup Report">
@@ -211,13 +231,7 @@ class ReportingPanel extends React.Component {
 							reportParamsUpdateHandler={this.updateReportParams}
 						/>
 					</Col>
-					<Col sm={12}>
-						{reportLoading ? (
-							<PaneLoader message="Loading report data..." />
-						) : (
-							<ReactHighcharts config={config} />
-						)}
-					</Col>
+					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : chartPane}</Col>
 				</Row>
 				{/* <div className="report-chart">
 					<ReactHighcharts config={config} />
