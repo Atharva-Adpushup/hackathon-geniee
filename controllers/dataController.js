@@ -37,7 +37,7 @@ function createAggregateNonAggregateObjects(dataset, key, container) {
 		nonAggregateDataset.forEach(row => {
 			innerObj[identifier].aggregate.total_xpath_miss += parseInt(row['total_xpath_miss']);
 			innerObj[identifier].aggregate.total_impressions += parseInt(row['total_impressions']);
-			innerObj[identifier].aggregate.total_revenue += parseInt(row['total_revenue']);
+			innerObj[identifier].aggregate.total_revenue += parseFloat(row['total_revenue']);
 		});
 		// CPM = Revenue * 1000 / Impressions --> rounding off to 3 decimal places
 		innerObj[identifier].aggregate.total_cpm = Number(
