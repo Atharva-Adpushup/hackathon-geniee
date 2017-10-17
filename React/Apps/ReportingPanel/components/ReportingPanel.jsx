@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactHighcharts from 'react-highcharts';
-import { Grid, Row, Col, Button } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
 import Datatable from 'react-bs-datatable';
 import ActionCard from '../../../Components/ActionCard.jsx';
 import ReportControls from './ReportControls.jsx';
 import '../styles.scss';
 import config from '../lib/config';
-import { apiQueryGenerator } from '../lib/helpers';
+import { apiQueryGenerator, chartConfigGenerator } from '../lib/helpers';
 import moment from 'moment';
 import PaneLoader from '../../../Components/PaneLoader.jsx';
 
@@ -98,7 +98,8 @@ class ReportingPanel extends React.Component {
 			contentType: 'json',
 			dataType: 'json',
 			success: res => {
-				console.log(res);
+				chartConfigGenerator(res);
+
 				let state = {
 					reportLoading: false,
 					disableGenerateButton: false
