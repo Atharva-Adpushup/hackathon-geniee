@@ -29,8 +29,8 @@ function createAggregateNonAggregateObjects(dataset, key, container) {
 			aggregate: {
 				total_xpath_miss: 0,
 				total_impressions: 0,
-				total_revenue: 0,
-				total_cpm: 0
+				total_revenue: 0, // change this to -1
+				total_cpm: 0 // change this to -1
 			},
 			nonAggregate: nonAggregateDataset
 		};
