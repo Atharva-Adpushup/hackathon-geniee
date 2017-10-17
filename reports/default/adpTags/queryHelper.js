@@ -380,15 +380,19 @@ var Promise = require('bluebird'),
 			return queryHelper
 				.__setLevelFromGroupBy(data)
 				.then(response => {
-					if (response) {
-						common.groupBy = ` GROUP BY ${queryHelper.__reduceArrayToString(
-							common.fields.forUser,
-							schema.firstQuery.alias
-						)} `;
-						common.groupBy += ` , ${queryHelper.__reduceArrayToString(
-							firstQuery.nonAggregate,
-							schema.firstQuery.alias
-						)}`;
+					if (response || queryHelper.__getLevel() == 'site') {
+						common.fields.forUser.length
+							? (common.groupBy = ` GROUP BY ${queryHelper.__reduceArrayToString(
+									common.fields.forUser,
+									schema.firstQuery.alias
+								)} `)
+							: null;
+						firstQuery.nonAggregate.length
+							? (common.groupBy += ` , ${queryHelper.__reduceArrayToString(
+									firstQuery.nonAggregate,
+									schema.firstQuery.alias
+								)}`)
+							: null;
 					}
 					return queryHelper.__groupBy();
 				})
