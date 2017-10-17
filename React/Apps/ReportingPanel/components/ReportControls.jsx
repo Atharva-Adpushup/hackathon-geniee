@@ -25,14 +25,17 @@ class ReportControls extends Component {
 
 	pageGroupUpdated(pageGroup) {
 		this.setState({ pageGroup });
+		this.props.reportParamsUpdateHandler({ pageGroup });
 	}
 
 	platformUpdated(platform) {
 		this.setState({ platform });
+		this.props.reportParamsUpdateHandler({ platform });
 	}
 
 	datesUpdated({ startDate, endDate }) {
 		this.setState({ startDate, endDate });
+		this.props.reportParamsUpdateHandler({ startDate, endDate });
 	}
 
 	focusUpdated(focusedInput) {
@@ -107,7 +110,8 @@ ReportControls.propTypes = {
 	startDate: PropTypes.object.isRequired,
 	endDate: PropTypes.object.isRequired,
 	disableGenerateButton: PropTypes.bool.isRequired,
-	generateButtonHandler: PropTypes.func.isRequired
+	generateButtonHandler: PropTypes.func.isRequired,
+	reportParamsUpdateHandler: PropTypes.func.isRequired
 };
 
 export default ReportControls;

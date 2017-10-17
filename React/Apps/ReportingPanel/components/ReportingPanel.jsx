@@ -69,12 +69,15 @@ class ReportingPanel extends React.Component {
 			reportLoading: true,
 			disableGenerateButton: true,
 			reportLevel: 'site',
+			pageGroup: null,
+			platform: null,
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
 			endDate: moment().startOf('day')
 		};
 		this.generateReport = this.generateReport.bind(this);
+		this.updateReportParams = this.updateReportParams.bind(this);
 	}
 
 	generateReport() {
@@ -107,6 +110,17 @@ class ReportingPanel extends React.Component {
 
 	componentDidMount() {
 		this.generateReport();
+	}
+
+	updateReportParams(params) {
+		const { state } = this;
+
+		this.setState({
+			pageGroup: params.pageGroup ? params.pageGroup : state.pageGroup,
+			platform: params.platform ? params.platform : state.platform,
+			startDate: params.startDate ? params.startDate : state.startDate,
+			endDate: params.endDate ? params.endDate : state.endDate
+		});
 	}
 
 	render() {
@@ -194,6 +208,7 @@ class ReportingPanel extends React.Component {
 							endDate={endDate}
 							disableGenerateButton={disableGenerateButton}
 							generateButtonHandler={this.generateReport}
+							reportParamsUpdateHandler={this.updateReportParams}
 						/>
 					</Col>
 					<Col sm={12}>
