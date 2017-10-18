@@ -12,7 +12,7 @@ import PaneLoader from '../../../Components/PaneLoader.jsx';
 
 const header = [
 		{ title: 'Date', prop: 'date', sortable: true, filterable: true },
-		{ title: 'Impression', prop: 'impression', sortable: true, filterable: true },
+		{ title: 'Impressions', prop: 'impressions', sortable: true, filterable: true },
 		{ title: 'CPM', prop: 'cpm', sortable: true, filterable: true },
 		{ title: 'Xpath Miss', prop: 'xPathMiss', sortable: true, filterable: true }
 	],
@@ -214,7 +214,18 @@ class ReportingPanel extends React.Component {
 					styles={{ height: 'auto' }}
 				/>
 			) : (
-				<ReactHighcharts config={chartConfig} />
+				<div>
+					<ReactHighcharts config={chartConfig} />
+					<div className="report-table">
+						<Datatable
+							tableHeader={header}
+							tableBody={data}
+							keyName="reportTable"
+							rowsPerPage={5}
+							rowsPerPageOption={[2, 3, 4, 5]}
+						/>
+					</div>
+				</div>
 			);
 
 		return (
@@ -231,18 +242,6 @@ class ReportingPanel extends React.Component {
 					</Col>
 					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : chartPane}</Col>
 				</Row>
-				{/* <div className="report-chart">
-					<ReactHighcharts config={config} />
-				</div>
-				<div className="report-table">
-					<Datatable
-						tableHeader={header}
-						tableBody={data}
-						keyName="reportTable"
-						rowsPerPage={5}
-						rowsPerPageOption={[2, 3, 4, 5]}
-					/>
-				</div> */}
 			</ActionCard>
 		);
 	}
