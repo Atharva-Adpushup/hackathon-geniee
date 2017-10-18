@@ -1,5 +1,6 @@
 import config from './config';
 import moment from 'moment';
+import { remove } from 'lodash';
 
 const apiQueryGenerator = params => {
 		let where = {
@@ -26,7 +27,56 @@ const apiQueryGenerator = params => {
 			//groupBy: ['pagegroup']
 		});
 	},
-	chartConfigGenerator = data => {
+	capitalCase = str => {
+		return str
+			.toLowerCase()
+			.split(' ')
+			.map(word => word[0].toUpperCase() + word.substr(1))
+			.join(' ');
+	},
+	formatColumnNames = columns => {
+		let updatedColumns = [];
+		for (let i = 0; i < columns.length; i++) {
+			let str = capitalCase(columns[i].replace(/_/g, ' '));
+			if (str === 'Total Revenue') {
+				str = 'Total CPM';
+			}
+			updatedColumns.push(str.replace(/Total /g, ''));
+		}
+
+		remove(updatedColumns, col => col === 'Siteid' || col === 'Report Date');
+		return updatedColumns;
+	},
+	processSiteLevelData = data => {
+		console.log(data);
+		const columns = formatColumnNames(data.columns);
+
+		let yAxis = [],
+			xPathImpressions = '';
+		for (let i = 0; i < columns.length; i++) {
+			if (columns[i] === 'Xpath Miss' && config.IS_SUPERUSER) {
+				xPathImpressions += columns[i] + ' / ';
+			}
+			if (columns[i] === 'Impressions') {
+				xPathImpressions += columns[i];
+				yAxis.push({
+					title: {
+						text: xPathImpressions
+					}
+				});
+			}
+			if (columns[i] === 'CPM') {
+				yAxis.push({
+					title: {
+						text: columns[i]
+					},
+					opposite: true
+				});
+			}
+		}
+		console.log(JSON.stringify(yAxis));
+	},
+	chartConfigGenerator = (data, reportLevel) => {
 		let config = {
 			title: {
 				text: ''
@@ -37,7 +87,11 @@ const apiQueryGenerator = params => {
 		};
 
 		if (!data.error) {
-			console.log(data);
+			switch (reportLevel) {
+				case 'site':
+					processSiteLevelData(data);
+					break;
+			}
 		}
 	};
 

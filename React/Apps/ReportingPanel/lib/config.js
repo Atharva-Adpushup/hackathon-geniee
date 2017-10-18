@@ -4,7 +4,7 @@ const config = {
 	API_ENDPOINT: '/user/reports/generate',
 	SITE_ID: window.siteId,
 	PAGEGROUPS: window.pageGroups,
-	IS_SUPERUSER: window.IS_SUPERUSER
+	IS_SUPERUSER: window.isSuperUser
 };
 
 export default config;
