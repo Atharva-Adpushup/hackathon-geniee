@@ -1,6 +1,6 @@
 import config from './config';
 import moment from 'moment';
-import { remove } from 'lodash';
+import { remove, map } from 'lodash';
 
 const apiQueryGenerator = params => {
 		let where = {
@@ -47,10 +47,7 @@ const apiQueryGenerator = params => {
 		remove(updatedColumns, col => col === 'Siteid' || col === 'Report Date');
 		return updatedColumns;
 	},
-	processSiteLevelData = data => {
-		console.log(data);
-		const columns = formatColumnNames(data.columns);
-
+	generateYAxis = columns => {
 		let yAxis = [],
 			xPathImpressions = '';
 		for (let i = 0; i < columns.length; i++) {
@@ -74,7 +71,19 @@ const apiQueryGenerator = params => {
 				});
 			}
 		}
-		console.log(JSON.stringify(yAxis));
+
+		return yAxis;
+	},
+	generateXAxis = rows => map(rows, row => moment(row.report_date).format('DD-MM-YYYY')),
+	processSiteLevelData = data => {
+		console.log(data);
+		const columns = formatColumnNames(data.columns);
+
+		let chartConfig = {
+			yAxis: generateYAxis(columns),
+			xAxis: generateXAxis(data.rows)
+		};
+		console.log(chartConfig);
 	},
 	chartConfigGenerator = (data, reportLevel) => {
 		let config = {
