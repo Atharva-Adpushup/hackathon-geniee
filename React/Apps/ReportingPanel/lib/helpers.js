@@ -108,7 +108,12 @@ const apiQueryGenerator = params => {
 			cpm.data.push(Number((rows[i].total_revenue / 1000).toFixed(2)));
 			xpathMiss.data.push(rows[i].total_xpath_miss);
 		}
-		series.push(impressions, cpm, xpathMiss);
+		series.push(impressions, cpm);
+
+		if (config.IS_SUPERUSER) {
+			series.push(xpathMiss);
+		}
+
 		return series;
 	},
 	processSiteLevelData = data => {
