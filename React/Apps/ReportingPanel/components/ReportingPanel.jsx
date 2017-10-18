@@ -70,6 +70,7 @@ class ReportingPanel extends React.Component {
 			reportError: false,
 			disableGenerateButton: true,
 			reportLevel: 'site',
+			chartConfig: null,
 			pageGroup: null,
 			platform: null,
 			startDate: moment()
@@ -152,8 +153,12 @@ class ReportingPanel extends React.Component {
 				]
 			};
 
-		chartConfigGenerator(res, reportLevel);
-		this.setState({ reportLoading: false, disableGenerateButton: false, reportError: false });
+		this.setState({
+			reportLoading: false,
+			disableGenerateButton: false,
+			reportError: false,
+			chartConfig: chartConfigGenerator(res, reportLevel)
+		});
 
 		// $.ajax({
 		// 	method: 'POST',
@@ -201,85 +206,7 @@ class ReportingPanel extends React.Component {
 	}
 
 	render() {
-		const config = {
-			title: {
-				text: ''
-			},
-			subtitle: {
-				text: ''
-			},
-			yAxis: [
-				{
-					title: {
-						text: 'Impressions / Xpath miss'
-					}
-				},
-				{
-					title: {
-						text: 'CPM'
-					},
-					opposite: true
-				}
-			],
-			xAxis: {
-				categories: ['10 Sep', '11 Sep', '12 Sep', '13 Sep', '14 Sep', '15 Sep', '16 Sep']
-			},
-			series: [
-				{
-					name: 'Impressions',
-					yAxis: 0,
-					data: [22010, 20343, 19563, 18124, 21047, 22098, 19932],
-					lineWidth: 1.5,
-					marker: {
-						symbol: 'circle',
-						radius: 3.2
-					}
-				},
-				{
-					name: 'CPM',
-					yAxis: 1,
-					data: [4.5, 5.5, 2, 3.4, 6.2, 4.4, 5.2],
-					lineWidth: 1.5,
-					marker: {
-						symbol: 'circle',
-						radius: 3.2
-					}
-				},
-				{
-					name: 'Xpath miss',
-					yAxis: 0,
-					data: [6343, 7444, 5984, 6100, 7676, 7896, 6811],
-					lineWidth: 1.5,
-					marker: {
-						symbol: 'circle',
-						radius: 3.2
-					}
-				}
-			],
-			lang: {
-				thousandsSep: ','
-			},
-			chart: {
-				spacingTop: 35,
-				style: {
-					fontFamily: 'Karla'
-				}
-			},
-			tooltip: {
-				shared: true
-			},
-			colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e'],
-			credits: {
-				enabled: false
-			},
-			plotOptions: {
-				line: {
-					animation: true
-				}
-			}
-		};
-
-		const { startDate, endDate, reportLoading, disableGenerateButton, reportError } = this.state,
+		const { startDate, endDate, reportLoading, disableGenerateButton, reportError, chartConfig } = this.state,
 			chartPane = reportError ? (
 				<PaneLoader
 					message="Error occurred while fetching report data!"
@@ -287,7 +214,7 @@ class ReportingPanel extends React.Component {
 					styles={{ height: 'auto' }}
 				/>
 			) : (
-				<ReactHighcharts config={config} />
+				<ReactHighcharts config={chartConfig} />
 			);
 
 		return (

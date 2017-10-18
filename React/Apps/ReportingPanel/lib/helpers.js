@@ -75,33 +75,94 @@ const apiQueryGenerator = params => {
 		return yAxis;
 	},
 	generateXAxis = rows => map(rows, row => moment(row.report_date).format('DD-MM-YYYY')),
+	generateSeries = rows => {
+		const pointOptions = {
+			lineWidth: 1.5,
+			marker: {
+				symbol: 'circle',
+				radius: 3.2
+			}
+		};
+
+		let series = [],
+			impressions = {
+				...pointOptions,
+				name: 'Impressions',
+				yAxis: 0,
+				data: []
+			},
+			cpm = {
+				...pointOptions,
+				name: 'CPM',
+				yAxis: 1,
+				data: []
+			},
+			xpathMiss = {
+				...pointOptions,
+				name: 'Xpath Miss',
+				yAxis: 0,
+				data: []
+			};
+		for (let i = 0; i < rows.length; i++) {
+			impressions.data.push(rows[i].total_impressions);
+			cpm.data.push(Number((rows[i].total_revenue / 1000).toFixed(2)));
+			xpathMiss.data.push(rows[i].total_xpath_miss);
+		}
+		series.push(impressions, cpm, xpathMiss);
+		return series;
+	},
 	processSiteLevelData = data => {
-		console.log(data);
 		const columns = formatColumnNames(data.columns);
 
 		let chartConfig = {
 			yAxis: generateYAxis(columns),
-			xAxis: generateXAxis(data.rows)
+			xAxis: { categories: generateXAxis(data.rows) },
+			series: generateSeries(data.rows)
 		};
-		console.log(chartConfig);
+		return chartConfig;
 	},
 	chartConfigGenerator = (data, reportLevel) => {
 		let config = {
-			title: {
-				text: ''
+				title: {
+					text: ''
+				},
+				subtitle: {
+					text: ''
+				},
+				lang: {
+					thousandsSep: ','
+				},
+				chart: {
+					spacingTop: 35,
+					style: {
+						fontFamily: 'Karla'
+					}
+				},
+				tooltip: {
+					shared: true
+				},
+				colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e'],
+				credits: {
+					enabled: false
+				},
+				plotOptions: {
+					line: {
+						animation: true
+					}
+				}
 			},
-			subtitle: {
-				text: ''
-			}
-		};
+			chartData = null;
 
 		if (!data.error) {
 			switch (reportLevel) {
 				case 'site':
-					processSiteLevelData(data);
+					chartData = processSiteLevelData(data);
 					break;
 			}
 		}
+
+		config = { ...config, ...chartData };
+		return config;
 	};
 
 export { apiQueryGenerator, chartConfigGenerator };
