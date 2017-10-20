@@ -103,12 +103,14 @@ class ReportingPanel extends React.Component {
 				]
 			};
 
+		const data = dataGenerator(res, reportLevel);
+
 		this.setState({
 			reportLoading: false,
 			disableGenerateButton: false,
 			reportError: false,
-			chartConfig: dataGenerator(res, reportLevel).chartData,
-			tableConfig: dataGenerator(res, reportLevel).tableData
+			chartConfig: data.chartData,
+			tableConfig: data.tableData
 		});
 
 		// $.ajax({
@@ -145,7 +147,7 @@ class ReportingPanel extends React.Component {
 		const { state } = this;
 
 		this.setState({
-			pageGroup: params.pageGroup ? params.pageGroup : state.pageGroup,
+			pageGroup: params.pageGroup,
 			platform: params.platform ? params.platform : state.platform,
 			startDate: params.startDate ? params.startDate : state.startDate,
 			endDate: params.endDate ? params.endDate : state.endDate,

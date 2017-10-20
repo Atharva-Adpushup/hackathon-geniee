@@ -24,10 +24,11 @@ class ReportControls extends Component {
 	}
 
 	pageGroupUpdated(pageGroup) {
-		const reportLevel = pageGroup !== null ? 'pageGroup' : 'site';
+		const reportLevel = pageGroup !== null ? 'pageGroup' : 'site',
+			pageGroupName = pageGroup !== null ? config.PAGEGROUPS[pageGroup] : null;
 
 		this.setState({ pageGroup });
-		this.props.reportParamsUpdateHandler({ pageGroup, reportLevel });
+		this.props.reportParamsUpdateHandler({ pageGroup: pageGroupName, reportLevel });
 	}
 
 	platformUpdated(platform) {
