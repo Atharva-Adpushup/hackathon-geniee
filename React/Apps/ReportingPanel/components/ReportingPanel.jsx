@@ -38,8 +38,8 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: true
 		});
 
-		const { startDate, endDate, reportLevel } = this.state,
-			params = { startDate, endDate },
+		const { startDate, endDate, reportLevel, pageGroup } = this.state,
+			params = { startDate, endDate, pageGroup },
 			res = {
 				error: false,
 				columns: ['total_xpath_miss', 'total_impressions', 'report_date', 'siteid', 'total_revenue'],
