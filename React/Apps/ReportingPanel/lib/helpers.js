@@ -17,7 +17,7 @@ const apiQueryGenerator = params => {
 			where.device_type = params.platform;
 		}
 
-		if (params.variationId) {
+		if (params.variationIds) {
 			where.variation = params.variationIds;
 		}
 
@@ -34,7 +34,7 @@ const apiQueryGenerator = params => {
 			.map(word => word[0].toUpperCase() + word.substr(1))
 			.join(' ');
 	},
-	chartConfigGenerator = (data, reportLevel) => {
+	dataGenerator = (data, reportLevel) => {
 		let config = {
 				title: {
 					text: ''
@@ -64,18 +64,20 @@ const apiQueryGenerator = params => {
 					}
 				}
 			},
-			chartData = null;
+			chartData = null,
+			tableData = null;
 
 		if (!data.error) {
 			switch (reportLevel) {
 				case 'site':
-					chartData = parseSiteLevelData(data);
+					chartData = parseSiteLevelData(data).chartConfig;
+					tableData = parseSiteLevelData(data).tableConfig;
 					break;
 			}
 		}
 
 		config = { ...config, ...chartData };
-		return config;
+		return { chartData: config, tableData };
 	};
 
-export { apiQueryGenerator, chartConfigGenerator, capitalCase };
+export { apiQueryGenerator, dataGenerator, capitalCase };

@@ -1,6 +1,6 @@
 import { capitalCase } from '../helpers';
 import config from '../config';
-import { remove, map } from 'lodash';
+import { remove, map, each } from 'lodash';
 import moment from 'moment';
 
 const formatColumnNames = columns => {
@@ -8,12 +8,16 @@ const formatColumnNames = columns => {
 		for (let i = 0; i < columns.length; i++) {
 			let str = capitalCase(columns[i].replace(/_/g, ' '));
 			if (str === 'Total Revenue') {
-				str = 'Total CPM';
+				str = 'Total CPM ($)';
+			}
+
+			if (str === 'Report Date') {
+				str = 'Date';
 			}
 			updatedColumns.push(str.replace(/Total /g, ''));
 		}
 
-		remove(updatedColumns, col => col === 'Siteid' || col === 'Report Date');
+		remove(updatedColumns, col => col === 'Siteid');
 		return updatedColumns;
 	},
 	generateYAxis = columns => {
@@ -31,7 +35,7 @@ const formatColumnNames = columns => {
 					}
 				});
 			}
-			if (columns[i] === 'CPM') {
+			if (columns[i] === 'CPM ($)') {
 				yAxis.push({
 					title: {
 						text: columns[i]
@@ -62,7 +66,7 @@ const formatColumnNames = columns => {
 			},
 			cpm = {
 				...pointOptions,
-				name: 'CPM',
+				name: 'CPM ($)',
 				yAxis: 1,
 				data: []
 			},
@@ -85,16 +89,55 @@ const formatColumnNames = columns => {
 
 		return series;
 	},
+	generateTableData = (cols, rows) => {
+		let header = [],
+			body = [];
+
+		each(cols, col => {
+			if (col === 'Date' || (col === 'Xpath Miss' && !config.IS_SUPERUSER)) {
+				return true;
+			}
+			header.push({
+				title: col,
+				prop: col,
+				sortable: true,
+				filterable: true
+			});
+		});
+
+		each(cols, col => {
+			if (col === 'Date') {
+				header.unshift({
+					title: col,
+					prop: col,
+					sortable: true,
+					filterable: true
+				});
+			}
+		});
+
+		each(rows, row => {
+			body.push({
+				Date: moment(row.report_date).format('DD-MM-YYYY'),
+				Impressions: row.total_impressions,
+				'CPM ($)': Number((row.total_revenue / 1000).toFixed(2)),
+				'Xpath Miss': config.IS_SUPERUSER ? row.total_xpath_miss : undefined
+			});
+		});
+
+		return { header, body };
+	},
 	parseSiteLevelData = data => {
-		console.log(data);
 		const columns = formatColumnNames(data.columns);
 
 		let chartConfig = {
-			yAxis: generateYAxis(columns),
-			xAxis: { categories: generateXAxis(data.rows) },
-			series: generateSeries(data.rows)
-		};
-		return chartConfig;
+				yAxis: generateYAxis(columns),
+				xAxis: { categories: generateXAxis(data.rows) },
+				series: generateSeries(data.rows)
+			},
+			tableConfig = generateTableData(columns, data.rows);
+
+		return { chartConfig, tableConfig };
 	};
 
 export default parseSiteLevelData;

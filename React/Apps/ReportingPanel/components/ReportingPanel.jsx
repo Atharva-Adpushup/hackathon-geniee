@@ -6,60 +6,9 @@ import ActionCard from '../../../Components/ActionCard.jsx';
 import ReportControls from './ReportControls.jsx';
 import '../styles.scss';
 import config from '../lib/config';
-import { apiQueryGenerator, chartConfigGenerator } from '../lib/helpers';
+import { apiQueryGenerator, dataGenerator } from '../lib/helpers';
 import moment from 'moment';
 import PaneLoader from '../../../Components/PaneLoader.jsx';
-
-const header = [
-		{ title: 'Date', prop: 'date', sortable: true, filterable: true },
-		{ title: 'Impressions', prop: 'impressions', sortable: true, filterable: true },
-		{ title: 'CPM', prop: 'cpm', sortable: true, filterable: true },
-		{ title: 'Xpath Miss', prop: 'xPathMiss', sortable: true, filterable: true }
-	],
-	data = [
-		{
-			date: '10 Sep',
-			impressions: 22010,
-			cpm: 4.5,
-			xPathMiss: 6343
-		},
-		{
-			date: '11 Sep',
-			impressions: 20343,
-			cpm: 5.5,
-			xPathMiss: 7444
-		},
-		{
-			date: '12 Sep',
-			impressions: 19563,
-			cpm: 2,
-			xPathMiss: 5984
-		},
-		{
-			date: '13 Sep',
-			impressions: 18124,
-			cpm: 3.4,
-			xPathMiss: 6100
-		},
-		{
-			date: '14 Sep',
-			impressions: 21047,
-			cpm: 6.2,
-			xPathMiss: 7676
-		},
-		{
-			date: '15 Sep',
-			impressions: 22098,
-			cpm: 4.4,
-			xPathMiss: 7896
-		},
-		{
-			date: '16 Sep',
-			impressions: 19932,
-			cpm: 5.2,
-			xPathMiss: 6811
-		}
-	];
 
 class ReportingPanel extends React.Component {
 	constructor(props) {
@@ -71,6 +20,7 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: true,
 			reportLevel: 'site',
 			chartConfig: null,
+			tableConfig: null,
 			pageGroup: null,
 			platform: null,
 			startDate: moment()
@@ -157,7 +107,8 @@ class ReportingPanel extends React.Component {
 			reportLoading: false,
 			disableGenerateButton: false,
 			reportError: false,
-			chartConfig: chartConfigGenerator(res, reportLevel)
+			chartConfig: dataGenerator(res, reportLevel).chartData,
+			tableConfig: dataGenerator(res, reportLevel).tableData
 		});
 
 		// $.ajax({
@@ -168,7 +119,7 @@ class ReportingPanel extends React.Component {
 		// 	contentType: 'json',
 		// 	dataType: 'json',
 		// 	success: res => {
-		// 		chartConfigGenerator(res);
+		// 		dataGenerator(res);
 
 		// 		let state = {
 		// 			reportLoading: false,
@@ -206,7 +157,15 @@ class ReportingPanel extends React.Component {
 	}
 
 	render() {
-		const { startDate, endDate, reportLoading, disableGenerateButton, reportError, chartConfig } = this.state,
+		const {
+				startDate,
+				endDate,
+				reportLoading,
+				disableGenerateButton,
+				reportError,
+				chartConfig,
+				tableConfig
+			} = this.state,
 			chartPane = reportError ? (
 				<PaneLoader
 					message="Error occurred while fetching report data!"
@@ -217,13 +176,17 @@ class ReportingPanel extends React.Component {
 				<div>
 					<ReactHighcharts config={chartConfig} />
 					<div className="report-table">
-						<Datatable
-							tableHeader={header}
-							tableBody={data}
-							keyName="reportTable"
-							rowsPerPage={5}
-							rowsPerPageOption={[2, 3, 4, 5]}
-						/>
+						{tableConfig ? (
+							<Datatable
+								tableHeader={tableConfig.header}
+								tableBody={tableConfig.body}
+								keyName="reportTable"
+								rowsPerPage={10}
+								rowsPerPageOption={[10, 15, 20, 25]}
+							/>
+						) : (
+							''
+						)}
 					</div>
 				</div>
 			);
