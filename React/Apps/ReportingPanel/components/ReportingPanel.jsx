@@ -148,7 +148,8 @@ class ReportingPanel extends React.Component {
 			pageGroup: params.pageGroup ? params.pageGroup : state.pageGroup,
 			platform: params.platform ? params.platform : state.platform,
 			startDate: params.startDate ? params.startDate : state.startDate,
-			endDate: params.endDate ? params.endDate : state.endDate
+			endDate: params.endDate ? params.endDate : state.endDate,
+			reportLevel: params.reportLevel ? params.reportLevel : state.reportLevel
 		});
 	}
 
