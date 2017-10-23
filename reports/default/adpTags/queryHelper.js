@@ -323,13 +323,19 @@ var Promise = require('bluebird'),
 					delete data.from;
 					delete data.to;
 
-					// handling where conditions specfic to first Query
-					let disjointFields = _.intersection(Object.keys(data), schema.firstQuery.where);
+					// handling where conditions specfic to queries
+					// first query --> device_type
+					// second query -->  ntwid
+					let disjointFields = _.difference(Object.keys(data), schema.common.fields.where);
 					_.forEach(disjointFields, (value, key) => {
 						let alias = queryHelper.__getAlias(value);
-						firstQuery.where += ` AND ${alias
-							? alias
-							: schema.firstQuery.tables.apexSiteReport.alias}.${value}=@__${value}__ `;
+						schema.firstQuery.where.indexOf(value) !== -1
+							? (firstQuery.where += ` AND ${alias
+									? alias
+									: schema.firstQuery.tables.apexSiteReport.alias}.${value}=@__${value}__ `)
+							: (secondQuery.where += ` AND ${alias
+									? alias
+									: schema.secondQuery.tables.adpTagReport.alias}.${value}=@__${value}__ `);
 						common.where.push(
 							Object.assign(schema.where[value], {
 								value: data[value]
@@ -380,22 +386,22 @@ var Promise = require('bluebird'),
 			return queryHelper
 				.__setLevelFromGroupBy(data)
 				.then(response => {
-					if (response || queryHelper.__getLevel() == 'site') {
-						common.groupBy = common.fields.forUser.length
-							? ` GROUP BY ${queryHelper.__reduceArrayToString(
-									common.fields.forUser,
-									schema.firstQuery.alias
-								)} `
-							: ' GROUP BY ';
-						firstQuery.nonAggregate.length
-							? (common.groupBy += ` ${common.fields.forUser.length
-									? ' , '
-									: ' '} ${queryHelper.__reduceArrayToString(
-									firstQuery.nonAggregate,
-									schema.firstQuery.alias
-								)}`)
-							: null;
-					}
+					// if (response || queryHelper.__getLevel() == 'site') {
+					common.groupBy = common.fields.forUser.length
+						? ` GROUP BY ${queryHelper.__reduceArrayToString(
+								common.fields.forUser,
+								schema.firstQuery.alias
+							)} `
+						: ' GROUP BY ';
+					firstQuery.nonAggregate.length
+						? (common.groupBy += ` ${common.fields.forUser.length
+								? ' , '
+								: ' '} ${queryHelper.__reduceArrayToString(
+								firstQuery.nonAggregate,
+								schema.firstQuery.alias
+							)}`)
+						: null;
+					// }
 					return queryHelper.__groupBy();
 				})
 				.then(response => queryHelper.__completeReaminingSelect())
