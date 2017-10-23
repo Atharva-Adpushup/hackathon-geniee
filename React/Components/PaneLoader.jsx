@@ -1,15 +1,35 @@
 import React from 'react';
 
 const PaneLoader = props => {
-	const styles = {
-			height: '300px',
-			background: '#eee',
-			textAlign: 'center',
-			fontSize: '1.4em',
-			padding: '140px',
-			color: '#555'
-		},
-		message = props.message ? props.message : 'Loading...';
+	let styles = {
+		height: '300px',
+		background: '#eee',
+		textAlign: 'center',
+		fontSize: '1.4em',
+		padding: '140px',
+		color: '#555'
+	};
+
+	let stateIcon = null;
+
+	if (props.styles) {
+		styles = { ...styles, ...props.styles };
+	}
+
+	if (props.state) {
+		switch (props.state) {
+			case 'error':
+				stateIcon = <i className="fa fa-exclamation-circle pane-loader-icon" />;
+				break;
+		}
+	}
+
+	let message = (
+		<div>
+			{stateIcon}
+			{props.message ? props.message : 'Loading...'}
+		</div>
+	);
 
 	return <div style={styles}>{message}</div>;
 };

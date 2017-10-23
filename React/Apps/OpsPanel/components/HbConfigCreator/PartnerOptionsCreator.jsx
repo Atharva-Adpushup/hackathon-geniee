@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PartnerOptions from './PartnerOptions.jsx';
-import SelectBox from '../../../../Components/SelectBox.jsx';
+import SelectBox from '../../../../Components/SelectBox/index.jsx';
 import { findIndex } from 'lodash';
 
 class PartnerOptionsCreator extends React.Component {

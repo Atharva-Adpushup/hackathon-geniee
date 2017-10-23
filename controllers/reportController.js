@@ -57,6 +57,18 @@ router
 	// 		pageUrl: url
 	// 	});
 	// })
+	.get('/adpushupReport', (req, res) => {
+		return siteModel
+			.getUniquePageGroups(req.params.siteId)
+			.then(pageGroups =>
+				res.render('adpushupReport', {
+					pageGroups,
+					siteId: req.params.siteId,
+					isSuperUser: req.session.isSuperUser
+				})
+			)
+			.catch(() => res.send('Some error occurred! Please try again later.'));
+	})
 	.get('/performance', function(req, res) {
 		var siteId = req.params.siteId,
 			paramConfig = {
