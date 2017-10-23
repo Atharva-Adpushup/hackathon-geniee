@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactHighcharts from 'react-highcharts';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col, Alert } from 'react-bootstrap';
 import Datatable from 'react-bs-datatable';
 import ActionCard from '../../../Components/ActionCard.jsx';
 import ReportControls from './ReportControls.jsx';
@@ -26,10 +26,18 @@ class ReportingPanel extends React.Component {
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
-			endDate: moment().startOf('day')
+			endDate: moment().startOf('day'),
+			hideVariationsAlert: true
 		};
 		this.generateReport = this.generateReport.bind(this);
 		this.updateReportParams = this.updateReportParams.bind(this);
+		this.hideVariationsAlert = this.hideVariationsAlert.bind(this);
+	}
+
+	hideVariationsAlert() {
+		this.setState({
+			hideVariationsAlert: true
+		});
 	}
 
 	generateReport() {
@@ -49,14 +57,13 @@ class ReportingPanel extends React.Component {
 			contentType: 'json',
 			dataType: 'json',
 			success: res => {
-				const data = dataGenerator(res, reportLevel);
-
 				let state = {
 					reportLoading: false,
 					disableGenerateButton: false
 				};
 
-				if (!res.error) {
+				if (!res.error && res.rows.length) {
+					const data = dataGenerator(res, reportLevel);
 					this.setState({
 						...state,
 						reportError: false,
@@ -83,7 +90,8 @@ class ReportingPanel extends React.Component {
 			platform: params.platform ? params.platform : state.platform,
 			startDate: params.startDate ? params.startDate : state.startDate,
 			endDate: params.endDate ? params.endDate : state.endDate,
-			reportLevel: params.reportLevel ? params.reportLevel : state.reportLevel
+			reportLevel: params.reportLevel ? params.reportLevel : state.reportLevel,
+			hideVariationsAlert: params.reportLevel && params.reportLevel === 'pageGroup' ? false : true
 		});
 	}
 
@@ -99,7 +107,8 @@ class ReportingPanel extends React.Component {
 				disableGenerateButton,
 				reportError,
 				chartConfig,
-				tableConfig
+				tableConfig,
+				hideVariationsAlert
 			} = this.state,
 			chartPane = reportError ? (
 				<PaneLoader
@@ -109,6 +118,18 @@ class ReportingPanel extends React.Component {
 				/>
 			) : (
 				<div>
+					{!hideVariationsAlert ? (
+						<Alert
+							bsStyle="info"
+							className="variation-alert text-center"
+							onDismiss={this.hideVariationsAlert}
+						>
+							Please select a <strong>Platform</strong> in order to check <strong>Variations</strong> data
+							of the PageGroup.
+						</Alert>
+					) : (
+						''
+					)}
 					<ReactHighcharts config={chartConfig} />
 					<div className="report-table">
 						{tableConfig ? (
