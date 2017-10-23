@@ -304,7 +304,7 @@ var Promise = require('bluebird'),
 					let to = data.to
 						? moment(data.to).format('YYYY-MM-DD')
 						: moment()
-								.subtract(0, 'days')
+								.subtract(1, 'days')
 								.format('YYYY-MM-DD');
 
 					firstQuery.where += ` ${schema.firstQuery.tables.apexSiteReport
@@ -380,22 +380,22 @@ var Promise = require('bluebird'),
 			return queryHelper
 				.__setLevelFromGroupBy(data)
 				.then(response => {
-					if (response || queryHelper.__getLevel() == 'site') {
-						common.groupBy = common.fields.forUser.length
-							? ` GROUP BY ${queryHelper.__reduceArrayToString(
-									common.fields.forUser,
-									schema.firstQuery.alias
-								)} `
-							: ' GROUP BY ';
-						firstQuery.nonAggregate.length
-							? (common.groupBy += ` ${common.fields.forUser.length
-									? ' , '
-									: ' '} ${queryHelper.__reduceArrayToString(
-									firstQuery.nonAggregate,
-									schema.firstQuery.alias
-								)}`)
-							: null;
-					}
+					// if (response || queryHelper.__getLevel() == 'site') {
+					common.groupBy = common.fields.forUser.length
+						? ` GROUP BY ${queryHelper.__reduceArrayToString(
+								common.fields.forUser,
+								schema.firstQuery.alias
+							)} `
+						: ' GROUP BY ';
+					firstQuery.nonAggregate.length
+						? (common.groupBy += ` ${common.fields.forUser.length
+								? ' , '
+								: ' '} ${queryHelper.__reduceArrayToString(
+								firstQuery.nonAggregate,
+								schema.firstQuery.alias
+							)}`)
+						: null;
+					// }
 					return queryHelper.__groupBy();
 				})
 				.then(response => queryHelper.__completeReaminingSelect())
