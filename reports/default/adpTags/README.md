@@ -13,32 +13,38 @@ Generates query based on parameters and returns data from SQL Server.
 
 - Site level | Group by Pagegroup
 ```
-select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid'],
-where: {
-	siteid: 28822
-},
-groupBy: ['pagegroup']
+{
+	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid'],
+	where: {
+		siteid: 28822
+	},
+	groupBy: ['pagegroup']
+}
 ```
 
 - Pagegroup level | Group by Variation
 ```
-select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid'],
-where: {
-	siteid: 28822,
-	pagegroup: ['MIC']
-},
-groupBy: ['variation']
+{
+	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid'],
+	where: {
+		siteid: 28822,
+		pagegroup: ['MIC']
+	},
+	groupBy: ['variation']
+}
 ```
 - Variation level | Group by Section
 ```
-select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid'],
-where: {
-	siteid: 28822,
-	pagegroup: ['MIC'],
-	variation: ['18ff8e93-77d6-4230-9cd3-7b6d87025ae4']
-},
-groupBy: ['section']
-orderBy: ['report_date']
+{
+	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid'],
+	where: {
+		siteid: 28822,
+		pagegroup: ['MIC'],
+		variation: ['18ff8e93-77d6-4230-9cd3-7b6d87025ae4']
+	},
+	groupBy: ['section']
+	orderBy: ['report_date']
+}
 ```
 
 #### Parameters
