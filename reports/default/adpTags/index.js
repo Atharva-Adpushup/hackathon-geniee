@@ -117,4 +117,33 @@ function generate(data) {
 		});
 }
 
+// function writeFile(name, data) {
+// 	return jsonFile.writeFile(`${name}.json`, data, { spaces: 4, flag: 'a' }, err => {
+// 		if (err) {
+// 			console.log('error');
+// 		}
+// 		console.log('File saved');
+// 		return;
+// 	});
+// }
+
+// let params = {
+// 	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid'],
+// 	where: {
+// 		siteid: 28822,
+// 		pagegroup: ['MIC'],
+// 		variation: ['2e68228f-84da-415e-bfcf-bfcf67c87570'],
+// 		device_type: 2,
+// 		ntwid: 2
+// 	}
+// };
+
+// generate(params)
+// 	.then(response => {
+// 		debugger;
+// 	})
+// 	.catch(err => {
+// 		debugger;
+// 	});
+
 module.exports = { generate, getPVS };
