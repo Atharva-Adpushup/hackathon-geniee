@@ -78,7 +78,7 @@ const formatColumnNames = columns => {
 			};
 		for (let i = 0; i < rows.length; i++) {
 			impressions.data.push(rows[i].total_impressions);
-			cpm.data.push(Number((rows[i].total_revenue / 1000).toFixed(2)));
+			cpm.data.push(Number((rows[i].total_revenue * 1000 / rows[i].total_impressions).toFixed(2)));
 			xpathMiss.data.push(rows[i].total_xpath_miss);
 		}
 		series.push(impressions, cpm);
@@ -120,7 +120,7 @@ const formatColumnNames = columns => {
 			body.push({
 				Date: moment(row.report_date).format('DD-MM-YYYY'),
 				Impressions: row.total_impressions,
-				'CPM ($)': Number((row.total_revenue / 1000).toFixed(2)),
+				'CPM ($)': Number((row.total_revenue * 1000 / row.total_impressions).toFixed(2)),
 				'Xpath Miss': config.IS_SUPERUSER ? row.total_xpath_miss : undefined
 			});
 		});
