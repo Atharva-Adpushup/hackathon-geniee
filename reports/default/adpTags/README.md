@@ -2,14 +2,10 @@
 SQL Reporting
 ===================
 
-This module is used for **Console In-Editor** and **User Panel** reporting generation.
-
-----------
-
-You can use this module to generate query and fetch data for various levels.
+This module is used for **Console In-Editor** and **User Panel** reporting generation. You can use this module to generate query and fetch data for various levels.
 
 ## API
--------- 
+--------
 
 ### generate(parameters)
 Generates query based on parameters and returns data from SQL Server.
