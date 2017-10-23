@@ -6,7 +6,7 @@ import { Promise } from 'es6-promise';
 
 const apiQueryGenerator = params => {
 		let where = {
-			siteid: 28822, // config.SITE_ID
+			siteid: config.SITE_ID,
 			from: moment(params.startDate).format('YYYY-MM-DD'),
 			to: moment(params.endDate).format('YYYY-MM-DD')
 		};
