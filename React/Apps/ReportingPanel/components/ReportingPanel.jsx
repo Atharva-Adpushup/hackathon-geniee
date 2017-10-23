@@ -108,7 +108,8 @@ class ReportingPanel extends React.Component {
 				reportError,
 				chartConfig,
 				tableConfig,
-				hideVariationsAlert
+				hideVariationsAlert,
+				platform
 			} = this.state,
 			chartPane = reportError ? (
 				<PaneLoader
@@ -118,7 +119,7 @@ class ReportingPanel extends React.Component {
 				/>
 			) : (
 				<div>
-					{!hideVariationsAlert ? (
+					{!hideVariationsAlert && !platform ? (
 						<Alert
 							bsStyle="info"
 							className="variation-alert text-center"

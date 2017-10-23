@@ -32,8 +32,9 @@ class ReportControls extends Component {
 	}
 
 	platformUpdated(platform) {
+		const platformName = config.PLATFORMS[platform];
 		this.setState({ platform });
-		this.props.reportParamsUpdateHandler({ platform });
+		this.props.reportParamsUpdateHandler({ platform: platformName });
 	}
 
 	datesUpdated({ startDate, endDate }) {
