@@ -7,9 +7,6 @@ for site in validSites
                     a.pull-left(id="site-report-" + site.siteId, target='_blank', title='Showing last 7 days ControlVsAdPushup reports.', href='/user/site/#{site.siteId}/reports/ControlVsAdpushupCtr').
                         #{utils.domanize(site.domain)} - #{site.siteId}
                     .pull-right.site-actions
-                        a.btn.btn-lightBg.btn-default(id="site-custom-reports-" + site.siteId, href='/user/site/#{site.siteId}/reports/adpushupReport')
-                            i.fa.fa-area-chart
-                            |  AdPushup Report
                         a.btn.btn-lightBg.btn-default(id="editor-redirect-link", target='_blank', href='/user/site/#{site.siteId}/editor') 
                             i.fa.fa-code
                             |  Take to Editor
@@ -20,6 +17,9 @@ for site in validSites
                             i.fa.fa-cog
                             |  Settings
                         if isSuperUser
+                             a.btn.btn-lightBg.btn-default(id="site-custom-reports-" + site.siteId, href='/user/site/#{site.siteId}/reports/adpushupReport')
+                                i.fa.fa-area-chart
+                                |  AdPushup Report
                             a.btn.btn-lightBg.btn-default(id="opspanel-link", href='/user/site/#{site.siteId}/opsPanel') 
                                 i.fa.fa-wrench 
                                 |  Ops Panel
