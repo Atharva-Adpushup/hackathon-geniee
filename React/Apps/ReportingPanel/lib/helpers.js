@@ -23,7 +23,8 @@ const apiQueryGenerator = params => {
 
 		return JSON.stringify({
 			select: config.SELECT,
-			where
+			where,
+			orderBy: ['report_date']
 			//groupBy: ['pagegroup']
 		});
 	},
