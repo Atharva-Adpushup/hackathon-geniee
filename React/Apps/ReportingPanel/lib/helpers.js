@@ -1,6 +1,8 @@
 import config from './config';
 import moment from 'moment';
 import parseSiteLevelData from './dataParsers/parseSiteLevelData';
+import $ from 'jquery';
+import { Promise } from 'es6-promise';
 
 const apiQueryGenerator = params => {
 		let where = {
@@ -80,6 +82,26 @@ const apiQueryGenerator = params => {
 
 		config = { ...config, ...chartData };
 		return { chartData: config, tableData };
+	},
+	ajax = params => {
+		const { method, url, data } = params;
+
+		return new Promise((resolve, resject) => {
+			$.ajax({
+				method,
+				url,
+				headers: { 'Content-Type': 'application/json' },
+				data,
+				contentType: 'json',
+				dataType: 'json',
+				success: res => {
+					return resolve(res);
+				},
+				fail: res => {
+					return reject(res);
+				}
+			});
+		});
 	};
 
-export { apiQueryGenerator, dataGenerator, capitalCase };
+export { apiQueryGenerator, dataGenerator, capitalCase, ajax };

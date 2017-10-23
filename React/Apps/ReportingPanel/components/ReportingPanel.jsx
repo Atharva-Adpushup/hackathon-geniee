@@ -6,7 +6,7 @@ import ActionCard from '../../../Components/ActionCard.jsx';
 import ReportControls from './ReportControls.jsx';
 import '../styles.scss';
 import config from '../lib/config';
-import { apiQueryGenerator, dataGenerator } from '../lib/helpers';
+import { apiQueryGenerator, dataGenerator, ajax } from '../lib/helpers';
 import moment from 'moment';
 import PaneLoader from '../../../Components/PaneLoader.jsx';
 
@@ -23,6 +23,7 @@ class ReportingPanel extends React.Component {
 			tableConfig: null,
 			pageGroup: null,
 			platform: null,
+			variations: [],
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
@@ -32,6 +33,7 @@ class ReportingPanel extends React.Component {
 		this.generateReport = this.generateReport.bind(this);
 		this.updateReportParams = this.updateReportParams.bind(this);
 		this.hideVariationsAlert = this.hideVariationsAlert.bind(this);
+		this.fetchVariations = this.fetchVariations.bind(this);
 	}
 
 	hideVariationsAlert() {
@@ -39,6 +41,8 @@ class ReportingPanel extends React.Component {
 			hideVariationsAlert: true
 		});
 	}
+
+	fetchVariations() {}
 
 	generateReport() {
 		this.setState({
@@ -49,19 +53,17 @@ class ReportingPanel extends React.Component {
 		const { startDate, endDate, reportLevel, pageGroup } = this.state,
 			params = { startDate, endDate, pageGroup };
 
-		$.ajax({
-			method: 'POST',
-			url: config.API_ENDPOINT,
-			headers: { 'Content-Type': 'application/json' },
-			data: apiQueryGenerator(params),
-			contentType: 'json',
-			dataType: 'json',
-			success: res => {
-				let state = {
-					reportLoading: false,
-					disableGenerateButton: false
-				};
+		let state = {
+			reportLoading: false,
+			disableGenerateButton: false
+		};
 
+		ajax({
+			method: 'POST',
+			url: config.REPORT_ENDPOINT,
+			data: apiQueryGenerator(params)
+		})
+			.then(res => {
 				if (!res.error && res.rows.length) {
 					const data = dataGenerator(res, reportLevel);
 					this.setState({
@@ -73,17 +75,20 @@ class ReportingPanel extends React.Component {
 				} else {
 					this.setState({ ...state, reportError: true });
 				}
-			},
-			fail: res => {
+			})
+			.catch(res => {
 				console.log('error');
 				console.log(res);
-				this.setState({ reportLoading: false, disableGenerateButton: false, reportError: true });
-			}
-		});
+				this.setState({ ...state, reportError: true });
+			});
 	}
 
 	updateReportParams(params) {
 		const { state } = this;
+
+		if ((params.pageGroup || state.pageGroup) && (params.platform || state.platform)) {
+			this.fetchVariations();
+		}
 
 		this.setState({
 			pageGroup: params.pageGroup,
