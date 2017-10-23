@@ -38,6 +38,14 @@ const highlightElement = $el => {
 		}
 	},
 	hideElementSelector = () => ({ type: innerActions.HIDE_ELEMENT_SELECTOR }),
-	setElementSelectorCords = cords => ({ type: innerActions.SET_ELEMENT_SELECTOR_CORDS, payload: cords });
+	setElementSelectorCords = cords => ({ type: innerActions.SET_ELEMENT_SELECTOR_CORDS, payload: cords }),
+	setViewingMode = mode => ({ type: innerActions.SET_MODE, mode });
 
-export { highlightElement, setElementSelectorCords, updateLayout, hideHighlighter, hideElementSelector };
+export {
+	highlightElement,
+	setElementSelectorCords,
+	updateLayout,
+	hideHighlighter,
+	hideElementSelector,
+	setViewingMode
+};

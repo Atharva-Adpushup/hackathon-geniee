@@ -5,9 +5,10 @@ import { setElementSelectorCords } from 'actions/inner/actions';
 import { messengerCommands } from 'consts/commonConsts.js';
 
 export default connect(
-	({ variation }) => ({
+	({ variation, editorViewing }) => ({
 		id: variation.id,
-		sections: variation.sections
+		sections: variation.sections,
+		mode: editorViewing.mode
 	}),
 	dispatch => ({
 		onXpathMiss: id => {

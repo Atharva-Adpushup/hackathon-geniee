@@ -84,7 +84,8 @@ const status = {
 		XPATH_VALIDATED: 'XPATH_VALIDATED',
 		VALIDATE_XPATH_SECTION: 'VALIDATE_XPATH_SECTION',
 		XPATH_SECTION_VALIDATED: 'XPATH_SECTION_VALIDATED',
-		SCROLL_TO_VIEW: 'SCROLL_TO_VIEW'
+		SCROLL_TO_VIEW: 'SCROLL_TO_VIEW',
+		SET_MODE: 'SET_MODE'
 	},
 	siteModes = {
 		DRAFT: 2,
@@ -212,11 +213,13 @@ const status = {
 	innerActions = {
 		HIDE_ELEMENT_SELECTOR: 'HIDE_ELEMENT_SELECTOR',
 		SET_ELEMENT_SELECTOR_CORDS: 'SET_ELEMENT_SELECTOR_CORDS',
-		UPDATE_CONTENT_OVERLAY: 'UPDATE_CONTENT_OVERLAY'
+		UPDATE_CONTENT_OVERLAY: 'UPDATE_CONTENT_OVERLAY',
+		SET_MODE: 'SET_MODE'
 	},
 	uiActions = {
 		RESET_ERRORS: 'RESET_ERRORS',
-		UPDATE_AFTER_SAVE_STATUS: 'UPDATE_AFTER_SAVE_STATUS'
+		UPDATE_AFTER_SAVE_STATUS: 'UPDATE_AFTER_SAVE_STATUS',
+		SET_MODE: 'SET_MODE'
 	},
 	components = {
 		INSERT_CONTEXTMENU: 'INSERT_CONTEXTMENU',
@@ -310,6 +313,10 @@ const status = {
 		'margin-right': '0px',
 		'margin-top': '0px',
 		'margin-bottom': '5px'
+	},
+	uiModes = {
+		EDITOR_MODE: 1,
+		BROWSE_MODE: 2
 	};
 
 export {
@@ -343,5 +350,6 @@ export {
 	ui,
 	uiCollections,
 	floats,
-	partners
+	partners,
+	uiModes
 };

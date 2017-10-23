@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import Selectorator from 'libs/cssSelectorator';
 import Utils from 'libs/utils';
+import { uiModes } from 'consts/commonConsts';
 import { highlightElement, setElementSelectorCords, hideHighlighter } from '../../actions/inner/actions';
 import { sendMessage } from './messengerHelper';
 import { messengerCommands } from '../../consts/commonConsts';
@@ -75,7 +76,7 @@ const selectorator = new Selectorator(),
 		ele.css('border', '3px solid #cf474b');
 		return true;
 	},
-	initDomEvents = ({ dispatch }) => {
+	initDomEvents = ({ getState, dispatch }) => {
 		$(document).ready(() => {
 			sendMessage(messengerCommands.CM_FRAMELOAD_SUCCESS, { channelId: window.ADP_CHANNEL_ID });
 		});
@@ -88,9 +89,10 @@ const selectorator = new Selectorator(),
 						typeof e.originalEvent === 'undefined' ||
 						(e.originalEvent.hasOwnProperty('isTrusted') && !e.originalEvent.isTrusted) ||
 						(e.originalEvent.screenX === 0 && e.originalEvent.screenY === 0),
+					state = getState(),
 					$target = $(e.target);
 
-				if (!isScriptedEvent) {
+				if (!isScriptedEvent && parseInt(state.editorViewing.mode) == uiModes.EDITOR_MODE) {
 					e.preventDefault();
 
 					switch (e.type) {
