@@ -10,7 +10,7 @@ const apiQueryGenerator = params => {
 		};
 
 		if (params.pageGroup) {
-			where.pageGroup = [params.pageGroup];
+			where.pagegroup = [params.pageGroup];
 		}
 
 		if (params.platform) {
