@@ -39,7 +39,7 @@ function createAggregateNonAggregateObjects(dataset, key, container) {
 			innerObj[identifier].aggregate.total_impressions += parseInt(row['total_impressions']);
 			innerObj[identifier].aggregate.total_revenue += parseInt(row['total_revenue']);
 		});
-		// CPM = Revenue * 1000 / Impressions --> rounding off to 3 decimal places
+		// CPM = Revenue * 1000 / Impressions --> rounding off to 2 decimal places
 		innerObj[identifier].aggregate.total_cpm = Number(
 			innerObj[identifier].aggregate.total_revenue * 1000 / innerObj[identifier].aggregate.total_impressions
 		).toFixed(2);

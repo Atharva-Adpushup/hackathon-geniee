@@ -74,8 +74,6 @@ If date range is missing then by default last 7 days data is returned
 
 **groupBy** {array}
 
-Any value in **groupBy** should exist in **select** array 
-
 - siteid
 - report_date
 - pagegroup
@@ -85,8 +83,6 @@ Any value in **groupBy** should exist in **select** array
 - ntwid
 
 **orderBy** {array}
-
-Any value in **orderBy** should exist in **select** array 
 
 - siteid
 - report_date
