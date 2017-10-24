@@ -10,6 +10,9 @@ const formatColumnNames = columns => {
 			if (str === 'Total Revenue') {
 				str = 'Total CPM ($)';
 			}
+			if (str === 'Total Requests') {
+				str = 'Total Pageviews';
+			}
 
 			if (str === 'Report Date') {
 				str = 'Date';
@@ -22,16 +25,19 @@ const formatColumnNames = columns => {
 	},
 	generateYAxis = columns => {
 		let yAxis = [],
-			xPathImpressions = '';
+			xPathImpressionsPageviews = '';
 		for (let i = 0; i < columns.length; i++) {
 			if (columns[i] === 'Xpath Miss' && config.IS_SUPERUSER) {
-				xPathImpressions += columns[i] + ' / ';
+				xPathImpressionsPageviews += columns[i] + ' / ';
+			}
+			if (columns[i] === 'Pageviews' && config.IS_SUPERUSER) {
+				xPathImpressionsPageviews += columns[i] + ' / ';
 			}
 			if (columns[i] === 'Impressions') {
-				xPathImpressions += columns[i];
+				xPathImpressionsPageviews += columns[i];
 				yAxis.push({
 					title: {
-						text: xPathImpressions
+						text: xPathImpressionsPageviews
 					}
 				});
 			}
@@ -64,6 +70,12 @@ const formatColumnNames = columns => {
 				yAxis: 0,
 				data: []
 			},
+			pageviews = {
+				...pointOptions,
+				name: 'Pageviews',
+				yAxis: 0,
+				data: []
+			},
 			cpm = {
 				...pointOptions,
 				name: 'CPM ($)',
@@ -80,11 +92,12 @@ const formatColumnNames = columns => {
 			impressions.data.push(rows[i].total_impressions);
 			cpm.data.push(Number((rows[i].total_revenue * 1000 / rows[i].total_impressions).toFixed(2)));
 			xpathMiss.data.push(rows[i].total_xpath_miss);
+			pageviews.data.push(rows[i].total_requests);
 		}
 		series.push(impressions, cpm);
 
 		if (config.IS_SUPERUSER) {
-			series.push(xpathMiss);
+			series.push(xpathMiss, pageviews);
 		}
 
 		return series;
@@ -94,7 +107,11 @@ const formatColumnNames = columns => {
 			body = [];
 
 		each(cols, col => {
-			if (col === 'Date' || (col === 'Xpath Miss' && !config.IS_SUPERUSER)) {
+			if (
+				col === 'Date' ||
+				(col === 'Xpath Miss' && !config.IS_SUPERUSER) ||
+				(col === 'Pageviews' && !config.IS_SUPERUSER)
+			) {
 				return true;
 			}
 			header.push({
@@ -121,7 +138,8 @@ const formatColumnNames = columns => {
 				Date: moment(row.report_date).format('DD-MM-YYYY'),
 				Impressions: row.total_impressions,
 				'CPM ($)': Number((row.total_revenue * 1000 / row.total_impressions).toFixed(2)),
-				'Xpath Miss': config.IS_SUPERUSER ? row.total_xpath_miss : undefined
+				'Xpath Miss': config.IS_SUPERUSER ? row.total_xpath_miss : undefined,
+				Pageviews: config.IS_SUPERUSER ? row.total_requests : undefined
 			});
 		});
 
