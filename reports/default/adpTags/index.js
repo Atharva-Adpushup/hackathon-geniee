@@ -18,7 +18,14 @@ function checkWhere(where) {
 }
 
 function checkParameters(data) {
-	if (!data || !data.select || !data.select.length || checkWhere(data.where)) {
+	if (
+		!data ||
+		!data.select ||
+		!data.select.length ||
+		checkWhere(data.where) ||
+		((data.where.hasOwnProperty('section') || (data.groupBy && data.groupBy.indexOf('section') != -1)) &&
+			data.select.indexOf('total_requests') != -1) // if level is section then there is no point of pageviews
+	) {
 		return Promise.reject('Invalid query parameters');
 	}
 	return Promise.resolve();
@@ -110,32 +117,28 @@ function getPVS(siteid, type) {
 function generate(data) {
 	return checkParameters(data)
 		.then(() => queryBuilder(data))
-		.then(queryWithParameters => executeQuery(queryWithParameters))
+		.then(queryWithParameters => {
+			return executeQuery(queryWithParameters);
+		})
 		.catch(err => {
 			let message = err.message || err;
 			return Promise.reject(message);
 		});
 }
 
-// function writeFile(name, data) {
-// 	return jsonFile.writeFile(`${name}.json`, data, { spaces: 4, flag: 'a' }, err => {
-// 		if (err) {
-// 			console.log('error');
-// 		}
-// 		console.log('File saved');
-// 		return;
-// 	});
-// }
+/*
+	total_impressions ----> total_ad_requests
+	total_requests ----> total_pageviews
+*/
 
 // let params = {
 // 	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid'],
 // 	where: {
 // 		siteid: 28822,
 // 		pagegroup: ['MIC'],
-// 		variation: ['2e68228f-84da-415e-bfcf-bfcf67c87570'],
-// 		device_type: 2,
-// 		ntwid: 2
-// 	}
+// 		variation: ['2e68228f-84da-415e-bfcf-bfcf67c87570']
+// 	},
+// 	groupBy: ['section']
 // };
 
 // generate(params)
