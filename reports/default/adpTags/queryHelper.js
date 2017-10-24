@@ -457,3 +457,29 @@ var Promise = require('bluebird'),
 	};
 
 module.exports = queryHelper;
+
+/*
+pageviews / impressions
+
+total impressions for adptagreport -- all levels
+
+total_pageviews from apexhourlysitereport -- till variation level
+
+Feedback call
+	one keen
+	one e3 service
+
+
+TO DO:
+Remove Edit Adcode In content section
+And replace it with price floor
+
+Admin
+Pageviews
+Xpath_miss
+
+
+Normal
+Impressions
+
+*/
