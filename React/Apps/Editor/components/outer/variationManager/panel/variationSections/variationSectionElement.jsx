@@ -263,14 +263,18 @@ class variationSectionElement extends Component {
 								</strong>
 							</Col>
 						</Row>
-						<Row>
-							<Col className="u-padding-r10px" xs={4}>
-								Total XPath Misses
-							</Col>
-							<Col className="u-padding-l10px" xs={8}>
-								<strong>{props.reporting.sections[props.section.id].aggregate.total_xpath_miss}</strong>
-							</Col>
-						</Row>
+						{window.isSuperUser ? (
+							<Row>
+								<Col className="u-padding-r10px" xs={4}>
+									Total XPath Misses
+								</Col>
+								<Col className="u-padding-l10px" xs={8}>
+									<strong>
+										{props.reporting.sections[props.section.id].aggregate.total_xpath_miss}
+									</strong>
+								</Col>
+							</Row>
+						) : null}
 						<Row>
 							<Col className="u-padding-r10px" xs={4}>
 								Total CPM

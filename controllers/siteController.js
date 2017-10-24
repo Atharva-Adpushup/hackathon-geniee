@@ -197,7 +197,8 @@ router
 					siteId: data.site.get('siteId'),
 					channels: data.site.get('channels'),
 					environment: config.environment.HOST_ENV,
-					currentSiteId: req.params.siteId
+					currentSiteId: req.params.siteId,
+					isSuperUser: req.session.isSuperUser
 				});
 			})
 			.catch(function() {
