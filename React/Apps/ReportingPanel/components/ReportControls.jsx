@@ -14,7 +14,7 @@ class ReportControls extends Component {
 		this.state = {
 			pageGroup: null,
 			platform: null,
-			variation: null,
+			variation: props.variation ? props.variation : null,
 			startDate: props.startDate,
 			endDate: props.endDate
 		};
