@@ -19,8 +19,8 @@ const apiQueryGenerator = params => {
 			where.device_type = params.platform;
 		}
 
-		if (params.variationIds) {
-			where.variation = params.variationIds;
+		if (params.variation) {
+			where.variation = [params.variation];
 		}
 
 		return JSON.stringify({

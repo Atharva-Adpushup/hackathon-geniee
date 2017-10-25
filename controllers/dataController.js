@@ -162,7 +162,10 @@ router
 			.then(variationsData => {
 				let variations = [];
 				for (v in variationsData.variations) {
-					variations.push(variationsData.variations[v].name);
+					variations.push({
+						name: variationsData.variations[v].name,
+						id: variationsData.variations[v].id
+					});
 				}
 
 				res.send({ error: false, data: variations });

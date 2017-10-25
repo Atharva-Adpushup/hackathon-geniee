@@ -22,6 +22,7 @@ class ReportingPanel extends React.Component {
 			tableConfig: null,
 			pageGroup: null,
 			platform: null,
+			variation: null,
 			variations: [],
 			startDate: moment()
 				.subtract(7, 'days')
@@ -41,11 +42,10 @@ class ReportingPanel extends React.Component {
 			url: `${config.VARIATIONS_ENDPOINT}?siteId=22&pageGroup=${pageGroup}&platform=${platform}`
 		})
 			.then(res => {
-				console.log(res);
+				const variations = this.state.variations.concat(res.data);
+				this.setState({ variations });
 			})
-			.catch(res => {
-				console.log(res);
-			});
+			.catch(res => {});
 	}
 
 	generateReport() {
@@ -54,8 +54,8 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: true
 		});
 
-		const { startDate, endDate, pageGroup, platform } = this.state,
-			params = { startDate, endDate, pageGroup, platform };
+		const { startDate, endDate, pageGroup, platform, variation } = this.state,
+			params = { startDate, endDate, pageGroup, platform, variation };
 
 		let state = {
 			reportLoading: false,
@@ -88,16 +88,15 @@ class ReportingPanel extends React.Component {
 	}
 
 	updateReportParams(params) {
-		const { state } = this;
-
 		this.setState({
 			pageGroup: params.pageGroup,
 			platform: params.platform,
 			startDate: params.startDate,
-			endDate: params.endDate
+			endDate: params.endDate,
+			variation: params.variation
 		});
 
-		if (params.pageGroup && params.platform) {
+		if (params.pageGroup && params.platform && !this.state.variations.length) {
 			this.fetchVariations(params.pageGroup, params.platform);
 		}
 	}
@@ -115,7 +114,8 @@ class ReportingPanel extends React.Component {
 				reportError,
 				chartConfig,
 				tableConfig,
-				platform
+				platform,
+				variations
 			} = this.state,
 			reportPane = reportError ? (
 				<PaneLoader
@@ -152,6 +152,7 @@ class ReportingPanel extends React.Component {
 							disableGenerateButton={disableGenerateButton}
 							generateButtonHandler={this.generateReport}
 							reportParamsUpdateHandler={this.updateReportParams}
+							variations={variations}
 						/>
 					</Col>
 					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : reportPane}</Col>

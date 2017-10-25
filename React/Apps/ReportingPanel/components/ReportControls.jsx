@@ -22,33 +22,68 @@ class ReportControls extends Component {
 		this.platformUpdated = this.platformUpdated.bind(this);
 		this.datesUpdated = this.datesUpdated.bind(this);
 		this.focusUpdated = this.focusUpdated.bind(this);
+		this.variationUpdated = this.variationUpdated.bind(this);
+		this.getPageGroupName = this.getPageGroupName.bind(this);
+		this.getPlatformName = this.getPlatformName.bind(this);
+	}
+
+	getPageGroupName(pageGroup) {
+		return pageGroup !== null ? config.PAGEGROUPS[pageGroup] : null;
+	}
+
+	getPlatformName(platform) {
+		return platform !== null ? config.PLATFORMS[platform] : null;
 	}
 
 	pageGroupUpdated(pageGroup) {
-		const pageGroupName = pageGroup !== null ? config.PAGEGROUPS[pageGroup] : null,
-			{ platform, startDate, endDate } = this.state,
-			platformName = platform !== null ? config.PLATFORMS[platform] : null;
+		const { platform, startDate, endDate, variation } = this.state;
 
 		this.setState({ pageGroup });
-		this.props.reportParamsUpdateHandler({ pageGroup: pageGroupName, platform: platformName, startDate, endDate });
+		this.props.reportParamsUpdateHandler({
+			pageGroup: this.getPageGroupName(pageGroup),
+			platform: this.getPlatformName(platform),
+			startDate,
+			endDate,
+			variation
+		});
 	}
 
 	platformUpdated(platform) {
-		const platformName = platform !== null ? config.PLATFORMS[platform] : null,
-			{ pageGroup, startDate, endDate } = this.state,
-			pageGroupName = pageGroup !== null ? config.PAGEGROUPS[pageGroup] : null;
+		const { pageGroup, startDate, endDate, variation } = this.state;
 
 		this.setState({ platform });
-		this.props.reportParamsUpdateHandler({ platform: platformName, pageGroup: pageGroupName, startDate, endDate });
+		this.props.reportParamsUpdateHandler({
+			platform: this.getPlatformName(platform),
+			pageGroup: this.getPageGroupName(pageGroup),
+			startDate,
+			endDate,
+			variation
+		});
+	}
+
+	variationUpdated(variation) {
+		const { platform, pageGroup, startDate, endDate } = this.state;
+
+		this.setState({ variation });
+		this.props.reportParamsUpdateHandler({
+			variation: variation,
+			platform: this.getPlatformName(platform),
+			pageGroup: this.getPageGroupName(pageGroup),
+			startDate,
+			endDate
+		});
 	}
 
 	datesUpdated({ startDate, endDate }) {
-		const { pageGroup, platform } = this.state,
-			pageGroupName = pageGroup !== null ? config.PAGEGROUPS[pageGroup] : null,
-			platformName = platform !== null ? config.PLATFORMS[platform] : null;
+		const { pageGroup, platform } = this.state;
 
 		this.setState({ startDate, endDate });
-		this.props.reportParamsUpdateHandler({ startDate, endDate, pageGroup: pageGroupName, platform: platformName });
+		this.props.reportParamsUpdateHandler({
+			startDate,
+			endDate,
+			pageGroup: this.getPageGroupName(pageGroup),
+			platform: this.getPlatformName(platform)
+		});
 	}
 
 	focusUpdated(focusedInput) {
@@ -87,14 +122,14 @@ class ReportControls extends Component {
 						</Col>
 						<Col sm={2}>
 							<SelectBox
-								value={state.pageGroup}
+								value={state.variation}
 								label="Select Variation"
-								onChange={this.pageGroupUpdated}
-								disabled={!props.variations}
+								onChange={this.variationUpdated}
+								disabled={!props.variations || !props.variations.length}
 							>
-								{PAGEGROUPS.map((pageGroup, index) => (
-									<option key={index} value={index}>
-										{pageGroup}
+								{props.variations.map((variation, index) => (
+									<option key={index} value={variation.id}>
+										{variation.name}
 									</option>
 								))}
 							</SelectBox>
@@ -134,7 +169,8 @@ ReportControls.propTypes = {
 	endDate: PropTypes.object.isRequired,
 	disableGenerateButton: PropTypes.bool.isRequired,
 	generateButtonHandler: PropTypes.func.isRequired,
-	reportParamsUpdateHandler: PropTypes.func.isRequired
+	reportParamsUpdateHandler: PropTypes.func.isRequired,
+	variations: PropTypes.array.isRequired
 };
 
 export default ReportControls;
