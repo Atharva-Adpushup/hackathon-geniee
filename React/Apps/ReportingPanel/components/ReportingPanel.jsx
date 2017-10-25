@@ -24,9 +24,11 @@ class ReportingPanel extends React.Component {
 			platform: null,
 			variations: [],
 			startDate: moment()
-				.subtract(7, 'days')
+				.subtract(8, 'days')
 				.startOf('day'),
-			endDate: moment().startOf('day')
+			endDate: moment()
+				.startOf('day')
+				.subtract(1, 'day')
 		};
 		this.generateReport = this.generateReport.bind(this);
 		this.updateReportParams = this.updateReportParams.bind(this);
