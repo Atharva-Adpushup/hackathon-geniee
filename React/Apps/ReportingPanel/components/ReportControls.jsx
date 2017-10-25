@@ -25,27 +25,30 @@ class ReportControls extends Component {
 	}
 
 	pageGroupUpdated(pageGroup) {
-		const reportLevel = pageGroup !== null ? 'pageGroup' : 'site',
-			pageGroupName = pageGroup !== null ? config.PAGEGROUPS[pageGroup] : null,
-			{ platform, startDate, endDate } = this.state;
+		const pageGroupName = pageGroup !== null ? config.PAGEGROUPS[pageGroup] : null,
+			{ platform, startDate, endDate } = this.state,
+			platformName = platform !== null ? config.PLATFORMS[platform] : null;
 
 		this.setState({ pageGroup });
-		this.props.reportParamsUpdateHandler({ pageGroup: pageGroupName, platform, startDate, endDate });
+		this.props.reportParamsUpdateHandler({ pageGroup: pageGroupName, platform: platformName, startDate, endDate });
 	}
 
 	platformUpdated(platform) {
-		const platformName = config.PLATFORMS[platform],
-			{ pageGroup, startDate, endDate } = this.state;
+		const platformName = platform !== null ? config.PLATFORMS[platform] : null,
+			{ pageGroup, startDate, endDate } = this.state,
+			pageGroupName = pageGroup !== null ? config.PAGEGROUPS[pageGroup] : null;
 
 		this.setState({ platform });
-		this.props.reportParamsUpdateHandler({ platform: platformName, pageGroup, startDate, endDate });
+		this.props.reportParamsUpdateHandler({ platform: platformName, pageGroup: pageGroupName, startDate, endDate });
 	}
 
 	datesUpdated({ startDate, endDate }) {
-		const { pageGroup, platform } = this.state;
+		const { pageGroup, platform } = this.state,
+			pageGroupName = pageGroup !== null ? config.PAGEGROUPS[pageGroup] : null,
+			platformName = platform !== null ? config.PLATFORMS[platform] : null;
 
 		this.setState({ startDate, endDate });
-		this.props.reportParamsUpdateHandler({ startDate, endDate, pageGroup, platform });
+		this.props.reportParamsUpdateHandler({ startDate, endDate, pageGroup: pageGroupName, platform: platformName });
 	}
 
 	focusUpdated(focusedInput) {

@@ -18,7 +18,6 @@ class ReportingPanel extends React.Component {
 			reportLoading: true,
 			reportError: false,
 			disableGenerateButton: true,
-			reportLevel: 'site',
 			chartConfig: null,
 			tableConfig: null,
 			pageGroup: null,
@@ -34,8 +33,7 @@ class ReportingPanel extends React.Component {
 		this.fetchVariations = this.fetchVariations.bind(this);
 	}
 
-	fetchVariations() {
-		const { pageGroup, platform } = this.state;
+	fetchVariations(pageGroup, platform) {
 		console.log(pageGroup);
 		console.log(platform);
 	}
@@ -46,7 +44,7 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: true
 		});
 
-		const { startDate, endDate, reportLevel, pageGroup } = this.state,
+		const { startDate, endDate, pageGroup } = this.state,
 			params = { startDate, endDate, pageGroup };
 
 		let state = {
@@ -61,7 +59,7 @@ class ReportingPanel extends React.Component {
 		})
 			.then(res => {
 				if (!res.error && res.rows.length) {
-					const data = dataGenerator(res, reportLevel);
+					const data = dataGenerator(res);
 					this.setState({
 						...state,
 						reportError: false,
@@ -82,19 +80,16 @@ class ReportingPanel extends React.Component {
 	updateReportParams(params) {
 		const { state } = this;
 
-		console.log(params);
-
 		this.setState({
 			pageGroup: params.pageGroup,
 			platform: params.platform,
 			startDate: params.startDate,
-			endDate: params.endDate,
-			reportLevel: params.reportLevel
+			endDate: params.endDate
 		});
 
-		// if ((params.pageGroup || state.pageGroup) && (params.platform || state.platform)) {
-		// 	this.fetchVariations();
-		// }
+		if (params.pageGroup && params.platform) {
+			this.fetchVariations(params.pageGroup, params.platform);
+		}
 	}
 
 	componentDidMount() {
