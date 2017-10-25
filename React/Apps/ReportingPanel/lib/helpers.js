@@ -19,8 +19,8 @@ const apiQueryGenerator = params => {
 			where.device_type = params.platform;
 		}
 
-		if (params.variationIds) {
-			where.variation = params.variationIds;
+		if (params.variation) {
+			where.variation = [params.variation];
 		}
 
 		return JSON.stringify({
@@ -63,7 +63,7 @@ const apiQueryGenerator = params => {
 				},
 				plotOptions: {
 					line: {
-						animation: true
+						animation: false
 					}
 				}
 			},
@@ -71,13 +71,15 @@ const apiQueryGenerator = params => {
 			tableData = null;
 
 		if (!data.error) {
-			switch (reportLevel) {
-				case 'site':
-				case 'pageGroup':
-					chartData = parseSiteLevelData(data).chartConfig;
-					tableData = parseSiteLevelData(data).tableConfig;
-					break;
-			}
+			// switch (reportLevel) {
+			// 	case 'site':
+			// 	case 'pageGroup':
+			// 		chartData = parseSiteLevelData(data).chartConfig;
+			// 		tableData = parseSiteLevelData(data).tableConfig;
+			// 		break;
+			// }
+			chartData = parseSiteLevelData(data).chartConfig;
+			tableData = parseSiteLevelData(data).tableConfig;
 		}
 
 		config = { ...config, ...chartData };
