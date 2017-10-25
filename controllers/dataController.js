@@ -157,11 +157,14 @@ router
 	.get('/getVariations', (req, res) => {
 		const { siteId, platform, pageGroup } = req.query;
 
-		console.log(siteId);
-
 		return channelModel
 			.getVariations(siteId, platform, pageGroup)
-			.then(variations => {
+			.then(variationsData => {
+				let variations = [];
+				for (v in variationsData.variations) {
+					variations.push(variationsData.variations[v].name);
+				}
+
 				res.send({ error: false, data: variations });
 			})
 			.catch(err => res.send({ error: true, message: 'Error while fetching result. Please try later.' }));
