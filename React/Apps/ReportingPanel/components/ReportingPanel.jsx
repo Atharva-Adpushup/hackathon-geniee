@@ -36,8 +36,16 @@ class ReportingPanel extends React.Component {
 	}
 
 	fetchVariations(pageGroup, platform) {
-		console.log(pageGroup);
-		console.log(platform);
+		ajax({
+			method: 'GET',
+			url: `${config.VARIATIONS_ENDPOINT}?siteId=${config.SITE_ID}&pageGroup=${pageGroup}&platform=${platform}`
+		})
+			.then(res => {
+				console.log(res);
+			})
+			.catch(res => {
+				console.log(res);
+			});
 	}
 
 	generateReport() {

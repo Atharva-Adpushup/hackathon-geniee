@@ -154,6 +154,18 @@ router
 				res.send({ success: 0 });
 			});
 	})
+	.get('/getVariations', (req, res) => {
+		const { siteId, platform, pageGroup } = req.query;
+
+		console.log(siteId);
+
+		return channelModel
+			.getVariations(siteId, platform, pageGroup)
+			.then(variations => {
+				res.send({ error: false, data: variations });
+			})
+			.catch(err => res.send({ error: true, message: 'Error while fetching result. Please try later.' }));
+	})
 	.get('/getPageGroupVariationRPM', function(req, res) {
 		const reportConfig = extend(true, {}, req.query),
 			email = req.session.user.email,
