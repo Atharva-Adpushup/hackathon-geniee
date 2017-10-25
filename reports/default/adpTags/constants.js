@@ -1,4 +1,5 @@
 /*
+	Comments need rectification. Will do that soon.
 	Section wise reporting query. 
 		The following query will fetch section level reporting data 
 		- report_data, siteid, total_cpm, total_impressions, total_xpath_miss
@@ -308,7 +309,7 @@ const schema = {
 		}
 	},
 	firstQuery: {
-		aggregate: ['total_impressions', 'total_xpath_miss'],
+		aggregate: ['total_requests', 'total_xpath_miss'],
 		nonAggregate: ['report_date', 'siteid', 'device_type'],
 		where: ['device_type'],
 		tables: {
@@ -324,7 +325,7 @@ const schema = {
 		alias: 'a'
 	},
 	secondQuery: {
-		aggregate: ['total_revenue'],
+		aggregate: ['total_revenue', 'total_impressions'],
 		nonAggregate: ['report_date', 'siteid', 'ntwid'],
 		where: ['ntwid'],
 		tables: {

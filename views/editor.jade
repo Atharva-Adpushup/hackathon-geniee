@@ -30,6 +30,7 @@ block append headScripts
         window.ADP_SITE_DOMAIN = "#{domain}";
         window.ADP_SITE_ID = #{siteId};
         window.ADP_ENVIRONMENT = "#{environment}";
+        window.isSuperUser = #{isSuperUser};
        
     if channels.length
         +loadAsset("js", [
