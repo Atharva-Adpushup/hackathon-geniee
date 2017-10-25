@@ -34,7 +34,11 @@ class ReportingPanel extends React.Component {
 		this.fetchVariations = this.fetchVariations.bind(this);
 	}
 
-	fetchVariations() {}
+	fetchVariations() {
+		const { pageGroup, platform } = this.state;
+		console.log(pageGroup);
+		console.log(platform);
+	}
 
 	generateReport() {
 		this.setState({
@@ -78,17 +82,19 @@ class ReportingPanel extends React.Component {
 	updateReportParams(params) {
 		const { state } = this;
 
-		if ((params.pageGroup || state.pageGroup) && (params.platform || state.platform)) {
-			this.fetchVariations();
-		}
+		console.log(params);
 
 		this.setState({
 			pageGroup: params.pageGroup,
-			platform: params.platform ? params.platform : state.platform,
-			startDate: params.startDate ? params.startDate : state.startDate,
-			endDate: params.endDate ? params.endDate : state.endDate,
-			reportLevel: params.reportLevel ? params.reportLevel : state.reportLevel
+			platform: params.platform,
+			startDate: params.startDate,
+			endDate: params.endDate,
+			reportLevel: params.reportLevel
 		});
+
+		// if ((params.pageGroup || state.pageGroup) && (params.platform || state.platform)) {
+		// 	this.fetchVariations();
+		// }
 	}
 
 	componentDidMount() {

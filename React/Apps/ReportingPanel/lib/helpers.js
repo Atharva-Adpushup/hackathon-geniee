@@ -63,7 +63,7 @@ const apiQueryGenerator = params => {
 				},
 				plotOptions: {
 					line: {
-						animation: true
+						animation: false
 					}
 				}
 			},

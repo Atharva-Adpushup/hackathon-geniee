@@ -26,21 +26,26 @@ class ReportControls extends Component {
 
 	pageGroupUpdated(pageGroup) {
 		const reportLevel = pageGroup !== null ? 'pageGroup' : 'site',
-			pageGroupName = pageGroup !== null ? config.PAGEGROUPS[pageGroup] : null;
+			pageGroupName = pageGroup !== null ? config.PAGEGROUPS[pageGroup] : null,
+			{ platform, startDate, endDate } = this.state;
 
 		this.setState({ pageGroup });
-		this.props.reportParamsUpdateHandler({ pageGroup: pageGroupName, reportLevel });
+		this.props.reportParamsUpdateHandler({ pageGroup: pageGroupName, platform, startDate, endDate });
 	}
 
 	platformUpdated(platform) {
-		const platformName = config.PLATFORMS[platform];
+		const platformName = config.PLATFORMS[platform],
+			{ pageGroup, startDate, endDate } = this.state;
+
 		this.setState({ platform });
-		this.props.reportParamsUpdateHandler({ platform: platformName });
+		this.props.reportParamsUpdateHandler({ platform: platformName, pageGroup, startDate, endDate });
 	}
 
 	datesUpdated({ startDate, endDate }) {
+		const { pageGroup, platform } = this.state;
+
 		this.setState({ startDate, endDate });
-		this.props.reportParamsUpdateHandler({ startDate, endDate });
+		this.props.reportParamsUpdateHandler({ startDate, endDate, pageGroup, platform });
 	}
 
 	focusUpdated(focusedInput) {
@@ -82,7 +87,7 @@ class ReportControls extends Component {
 								value={state.pageGroup}
 								label="Select Variation"
 								onChange={this.pageGroupUpdated}
-								disabled
+								disabled={!props.variations}
 							>
 								{PAGEGROUPS.map((pageGroup, index) => (
 									<option key={index} value={index}>
