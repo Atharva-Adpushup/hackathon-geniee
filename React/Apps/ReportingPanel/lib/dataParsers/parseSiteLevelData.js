@@ -109,6 +109,8 @@ const formatColumnNames = columns => {
 		each(cols, col => {
 			if (
 				col === 'Date' ||
+				col === 'Name' ||
+				col === 'Variation Id' ||
 				(col === 'Xpath Miss' && !config.IS_SUPERUSER) ||
 				(col === 'Pageviews' && !config.IS_SUPERUSER)
 			) {
