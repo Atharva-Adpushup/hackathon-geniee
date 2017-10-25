@@ -14,6 +14,7 @@ class ReportControls extends Component {
 		this.state = {
 			pageGroup: null,
 			platform: null,
+			variation: null,
 			startDate: props.startDate,
 			endDate: props.endDate
 		};
@@ -54,7 +55,7 @@ class ReportControls extends Component {
 			<div className="report-controls-wrapper">
 				<div className="container-fluid">
 					<Row>
-						<Col sm={2} smOffset={2}>
+						<Col sm={2}>
 							<SelectBox
 								value={state.pageGroup}
 								label="Select PageGroup"
@@ -72,6 +73,20 @@ class ReportControls extends Component {
 								{PLATFORMS.map((platform, index) => (
 									<option key={index} value={index}>
 										{platform}
+									</option>
+								))}
+							</SelectBox>
+						</Col>
+						<Col sm={2}>
+							<SelectBox
+								value={state.pageGroup}
+								label="Select Variation"
+								onChange={this.pageGroupUpdated}
+								disabled
+							>
+								{PAGEGROUPS.map((pageGroup, index) => (
+									<option key={index} value={index}>
+										{pageGroup}
 									</option>
 								))}
 							</SelectBox>
