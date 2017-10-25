@@ -8,23 +8,28 @@ var prebidSandbox = require('./prebidSandbox'),
 	find = require('lodash.find'),
 	adpRender = require('./adpRender'),
 	// Maps a particular adp slot to a dfp ad unit and a prebid bidder config
-	inventoryMapper = function(size, dfpAdunitToUse) {
+	inventoryMapper = function(size, optionalParam) {
 		var width = size[0],
 			height = size[1],
 			size = width + 'x' + height,
 			dfpAdUnit = null,
-			availableSlots = inventory.dfpAdUnits[size];
+			availableSlots = inventory.dfpAdUnits[size],
+			bidders = null;
+
+		if (optionalParam.headerBidding) {
+			bidders = inventory.hbConfig.bidderAdUnits[size] ? inventory.hbConfig.bidderAdUnits[size].pop() : null;
+		}
 
 		if (availableSlots) {
-			if (dfpAdunitToUse && availableSlots.indexOf(dfpAdunitToUse) !== -1) {
-				dfpAdUnit = availableSlots.splice(availableSlots.indexOf(dfpAdunitToUse), 1);
+			if (optionalParam.dfpAdunitToUse && availableSlots.indexOf(optionalParam.dfpAdunitToUse) !== -1) {
+				dfpAdUnit = availableSlots.splice(availableSlots.indexOf(optionalParam.dfpAdunitToUse), 1);
 			} else {
 				dfpAdUnit = inventory.dfpAdUnits[size].pop();
 			}
 		}
 		return {
 			dfpAdUnit: dfpAdUnit,
-			bidders: inventory.hbConfig.bidderAdUnits[size] ? inventory.hbConfig.bidderAdUnits[size].pop() : null
+			bidders: bidders
 		};
 	},
 	// Adds batch Id to all the adp slots in a batch
@@ -38,7 +43,7 @@ var prebidSandbox = require('./prebidSandbox'),
 		prebidSandbox.createPrebidContainer(adpSlotsBatch);
 	},
 	createSlot = function(containerId, size, placement, optionalParam) {
-		var adUnits = inventoryMapper(size, optionalParam.dfpAdunitCode),
+		var adUnits = inventoryMapper(size, optionalParam),
 			slotId = adUnits.dfpAdUnit,
 			bidders = optionalParam.headerBidding ? adUnits.bidders : [];
 

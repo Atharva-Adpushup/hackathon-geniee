@@ -18,31 +18,35 @@ class ReportingPanel extends React.Component {
 			reportLoading: true,
 			reportError: false,
 			disableGenerateButton: true,
-			reportLevel: 'site',
 			chartConfig: null,
 			tableConfig: null,
 			pageGroup: null,
 			platform: null,
+			variation: null,
 			variations: [],
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
-			endDate: moment().startOf('day'),
-			hideVariationsAlert: true
+			endDate: moment()
+				.startOf('day')
+				.subtract(1, 'day')
 		};
 		this.generateReport = this.generateReport.bind(this);
 		this.updateReportParams = this.updateReportParams.bind(this);
-		this.hideVariationsAlert = this.hideVariationsAlert.bind(this);
 		this.fetchVariations = this.fetchVariations.bind(this);
 	}
 
-	hideVariationsAlert() {
-		this.setState({
-			hideVariationsAlert: true
-		});
+	fetchVariations(pageGroup, platform) {
+		ajax({
+			method: 'GET',
+			url: `${config.VARIATIONS_ENDPOINT}?siteId=22&pageGroup=${pageGroup}&platform=${platform}`
+		})
+			.then(res => {
+				const variations = this.state.variations.concat(res.data);
+				this.setState({ variations });
+			})
+			.catch(res => {});
 	}
-
-	fetchVariations() {}
 
 	generateReport() {
 		this.setState({
@@ -50,8 +54,8 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: true
 		});
 
-		const { startDate, endDate, reportLevel, pageGroup } = this.state,
-			params = { startDate, endDate, pageGroup };
+		const { startDate, endDate, pageGroup, platform, variation } = this.state,
+			params = { startDate, endDate, pageGroup, platform, variation };
 
 		let state = {
 			reportLoading: false,
@@ -65,7 +69,7 @@ class ReportingPanel extends React.Component {
 		})
 			.then(res => {
 				if (!res.error && res.rows.length) {
-					const data = dataGenerator(res, reportLevel);
+					const data = dataGenerator(res);
 					this.setState({
 						...state,
 						reportError: false,
@@ -84,20 +88,23 @@ class ReportingPanel extends React.Component {
 	}
 
 	updateReportParams(params) {
-		const { state } = this;
-
-		if ((params.pageGroup || state.pageGroup) && (params.platform || state.platform)) {
-			this.fetchVariations();
-		}
-
 		this.setState({
 			pageGroup: params.pageGroup,
-			platform: params.platform ? params.platform : state.platform,
-			startDate: params.startDate ? params.startDate : state.startDate,
-			endDate: params.endDate ? params.endDate : state.endDate,
-			reportLevel: params.reportLevel ? params.reportLevel : state.reportLevel,
-			hideVariationsAlert: params.reportLevel && params.reportLevel === 'pageGroup' ? false : true
+			platform: params.platform,
+			startDate: params.startDate,
+			endDate: params.endDate,
+			variation: params.variation
 		});
+
+		if ((params.pageGroup && !params.platform) || (params.platform && !params.pageGroup)) {
+			this.setState({
+				variations: []
+			});
+		}
+
+		if (params.pageGroup && params.platform && !this.state.variations.length) {
+			this.fetchVariations(params.pageGroup, params.platform);
+		}
 	}
 
 	componentDidMount() {
@@ -113,10 +120,10 @@ class ReportingPanel extends React.Component {
 				reportError,
 				chartConfig,
 				tableConfig,
-				hideVariationsAlert,
-				platform
+				platform,
+				variations
 			} = this.state,
-			chartPane = reportError ? (
+			reportPane = reportError ? (
 				<PaneLoader
 					message="Error occurred while fetching report data!"
 					state="error"
@@ -124,18 +131,6 @@ class ReportingPanel extends React.Component {
 				/>
 			) : (
 				<div>
-					{!hideVariationsAlert && !platform ? (
-						<Alert
-							bsStyle="info"
-							className="variation-alert text-center"
-							onDismiss={this.hideVariationsAlert}
-						>
-							Please select a <strong>Platform</strong> in order to check <strong>Variations</strong> data
-							of the PageGroup.
-						</Alert>
-					) : (
-						''
-					)}
 					<ReactHighcharts config={chartConfig} />
 					<div className="report-table">
 						{tableConfig ? (
@@ -163,9 +158,10 @@ class ReportingPanel extends React.Component {
 							disableGenerateButton={disableGenerateButton}
 							generateButtonHandler={this.generateReport}
 							reportParamsUpdateHandler={this.updateReportParams}
+							variations={variations}
 						/>
 					</Col>
-					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : chartPane}</Col>
+					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : reportPane}</Col>
 				</Row>
 			</ActionCard>
 		);

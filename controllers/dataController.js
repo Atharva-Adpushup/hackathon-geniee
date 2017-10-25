@@ -154,6 +154,24 @@ router
 				res.send({ success: 0 });
 			});
 	})
+	.get('/getVariations', (req, res) => {
+		const { siteId, platform, pageGroup } = req.query;
+
+		return channelModel
+			.getVariations(siteId, platform, pageGroup)
+			.then(variationsData => {
+				let variations = [];
+				for (v in variationsData.variations) {
+					variations.push({
+						name: variationsData.variations[v].name,
+						id: variationsData.variations[v].id
+					});
+				}
+
+				res.send({ error: false, data: variations });
+			})
+			.catch(err => res.send({ error: true, message: 'Error while fetching result. Please try later.' }));
+	})
 	.get('/getPageGroupVariationRPM', function(req, res) {
 		const reportConfig = extend(true, {}, req.query),
 			email = req.session.user.email,
