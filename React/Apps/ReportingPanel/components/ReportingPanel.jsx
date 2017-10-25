@@ -24,7 +24,7 @@ class ReportingPanel extends React.Component {
 			platform: null,
 			variations: [],
 			startDate: moment()
-				.subtract(8, 'days')
+				.subtract(7, 'days')
 				.startOf('day'),
 			endDate: moment()
 				.startOf('day')
