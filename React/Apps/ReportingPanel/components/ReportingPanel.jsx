@@ -44,8 +44,8 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: true
 		});
 
-		const { startDate, endDate, pageGroup } = this.state,
-			params = { startDate, endDate, pageGroup };
+		const { startDate, endDate, pageGroup, platform } = this.state,
+			params = { startDate, endDate, pageGroup, platform };
 
 		let state = {
 			reportLoading: false,
