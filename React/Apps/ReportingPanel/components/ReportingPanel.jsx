@@ -27,19 +27,11 @@ class ReportingPanel extends React.Component {
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
-			endDate: moment().startOf('day'),
-			hideVariationsAlert: true
+			endDate: moment().startOf('day')
 		};
 		this.generateReport = this.generateReport.bind(this);
 		this.updateReportParams = this.updateReportParams.bind(this);
-		this.hideVariationsAlert = this.hideVariationsAlert.bind(this);
 		this.fetchVariations = this.fetchVariations.bind(this);
-	}
-
-	hideVariationsAlert() {
-		this.setState({
-			hideVariationsAlert: true
-		});
 	}
 
 	fetchVariations() {}
@@ -95,8 +87,7 @@ class ReportingPanel extends React.Component {
 			platform: params.platform ? params.platform : state.platform,
 			startDate: params.startDate ? params.startDate : state.startDate,
 			endDate: params.endDate ? params.endDate : state.endDate,
-			reportLevel: params.reportLevel ? params.reportLevel : state.reportLevel,
-			hideVariationsAlert: params.reportLevel && params.reportLevel === 'pageGroup' ? false : true
+			reportLevel: params.reportLevel ? params.reportLevel : state.reportLevel
 		});
 	}
 
@@ -113,10 +104,9 @@ class ReportingPanel extends React.Component {
 				reportError,
 				chartConfig,
 				tableConfig,
-				hideVariationsAlert,
 				platform
 			} = this.state,
-			chartPane = reportError ? (
+			reportPane = reportError ? (
 				<PaneLoader
 					message="Error occurred while fetching report data!"
 					state="error"
@@ -124,18 +114,6 @@ class ReportingPanel extends React.Component {
 				/>
 			) : (
 				<div>
-					{!hideVariationsAlert && !platform ? (
-						<Alert
-							bsStyle="info"
-							className="variation-alert text-center"
-							onDismiss={this.hideVariationsAlert}
-						>
-							Please select a <strong>Platform</strong> in order to check <strong>Variations</strong> data
-							of the PageGroup.
-						</Alert>
-					) : (
-						''
-					)}
 					<ReactHighcharts config={chartConfig} />
 					<div className="report-table">
 						{tableConfig ? (
@@ -165,7 +143,7 @@ class ReportingPanel extends React.Component {
 							reportParamsUpdateHandler={this.updateReportParams}
 						/>
 					</Col>
-					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : chartPane}</Col>
+					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : reportPane}</Col>
 				</Row>
 			</ActionCard>
 		);
