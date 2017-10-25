@@ -100,7 +100,8 @@ class ReportingPanel extends React.Component {
 
 		if ((params.pageGroup && !params.platform) || (params.platform && !params.pageGroup)) {
 			this.setState({
-				variations: []
+				variations: [],
+				variation: null
 			});
 		}
 
@@ -123,7 +124,8 @@ class ReportingPanel extends React.Component {
 				chartConfig,
 				tableConfig,
 				platform,
-				variations
+				variations,
+				variation
 			} = this.state,
 			reportPane = reportError ? (
 				<PaneLoader
@@ -161,6 +163,7 @@ class ReportingPanel extends React.Component {
 							generateButtonHandler={this.generateReport}
 							reportParamsUpdateHandler={this.updateReportParams}
 							variations={variations}
+							variation={variation}
 						/>
 					</Col>
 					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : reportPane}</Col>
