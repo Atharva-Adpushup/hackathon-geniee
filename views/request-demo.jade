@@ -73,6 +73,15 @@ block append headScripts
 	
 
 block bodyContent
+	- currentUser = currentUser || {};
+	- calendlyBaseUrl = 'https://calendly.com/adpushup/demo/';
+	- pipeDriveDealId = utils.encodeString(currentUser.crmDealId);
+	- pipeDriveDealTitle = utils.encodeString(currentUser.crmDealTitle);
+	- name = utils.encodeString(`${currentUser.firstName} ${currentUser.lastName}`);
+	- email = utils.encodeString(currentUser.email);
+	- calendlyUrl = `${calendlyBaseUrl}?utm_content=${pipeDriveDealTitle}&utm_term=${pipeDriveDealId}&name=${name}&email=${email}`;
+	- onClickHandler = `Calendly.showPopupWidget('${calendlyUrl}');return false;`;
+
 	.thankyouWrapper
 		include layout/header
 		.container.text-center
@@ -98,7 +107,7 @@ block bodyContent
 						li.active(data-id="TemFBoDWjZw" class="livechat_button") Live chat now
 						//- div(data-id="TemFBoDWjZw" class="livechat_button")
 						//- 	a(href="https://www.livechatinc.com/customer-service/?partner=lc_6965991&amp;utm_source=chat_button") Speak Now
-						li(onclick="Calendly.showPopupWidget('https://calendly.com/adpushup/adpushup-demo');return false;") Schedule Later
+						li(onclick=onClickHandler) Schedule Later
 
 	- user = user || {};
 	- analytics = analytics || {};
