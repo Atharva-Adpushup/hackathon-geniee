@@ -7,6 +7,7 @@ const reorderColumns = cols => {
 		let updatedCols = [];
 		updatedCols.push(reorderArray('Date', cols));
 		updatedCols.push(reorderArray('Pageviews', cols));
+		updatedCols.push(reorderArray('Page CPM ($)', cols));
 		updatedCols.push(reorderArray('Impressions', cols));
 		updatedCols.push(reorderArray('CPM ($)', cols));
 		updatedCols.push(reorderArray('Revenue ($)', cols));
@@ -32,13 +33,14 @@ const reorderColumns = cols => {
 			updatedColumns.push(str);
 		}
 		updatedColumns.push('CPM ($)');
+		updatedColumns.push('Page CPM ($)');
 		remove(updatedColumns, col => col === 'Siteid');
 		return reorderColumns(updatedColumns);
 	},
 	generateYAxis = columns => {
 		let yAxis = [],
 			xPathImpressionsPageviews = '',
-			cpm = '',
+			cpmPageCpm = '',
 			revenue = '';
 
 		for (let i = 0; i < columns.length; i++) {
@@ -53,7 +55,8 @@ const reorderColumns = cols => {
 					}
 					break;
 				case 'CPM ($)':
-					cpm = columns[i];
+				case 'Page CPM ($)':
+					cpmPageCpm += `${columns[i]} / `;
 					break;
 				case 'Revenue ($)':
 					revenue += columns[i];
@@ -69,7 +72,7 @@ const reorderColumns = cols => {
 			},
 			{
 				title: {
-					text: cpm
+					text: cpmPageCpm.substring(0, cpmPageCpm.length - 2)
 				},
 				opposite: true
 			},
@@ -95,6 +98,7 @@ const reorderColumns = cols => {
 
 		let impressions,
 			pageviews,
+			pageCpm,
 			cpm,
 			revenue,
 			xpathMiss,
@@ -137,6 +141,13 @@ const reorderColumns = cols => {
 						visible: true
 					};
 					break;
+				case 'Page CPM ($)':
+					pageCpm = {
+						...defaultOptions,
+						name: col,
+						yAxis: 1
+					};
+					break;
 				case 'Xpath Miss':
 					xpathMiss = {
 						...defaultOptions,
@@ -148,6 +159,7 @@ const reorderColumns = cols => {
 
 		for (let i = 0; i < rows.length; i++) {
 			pageviews.data.push(rows[i].total_requests);
+			pageCpm.data.push(Number((rows[i].total_revenue * 1000 / rows[i].total_requests).toFixed(2)));
 			impressions.data.push(rows[i].total_impressions);
 			cpm.data.push(Number((rows[i].total_revenue * 1000 / rows[i].total_impressions).toFixed(2)));
 			revenue.data.push(Number(rows[i].total_revenue.toFixed(2)));
@@ -155,7 +167,7 @@ const reorderColumns = cols => {
 		}
 
 		if (config.IS_SUPERUSER) {
-			series.push(pageviews, impressions, cpm, revenue, xpathMiss);
+			series.push(pageviews, pageCpm, impressions, cpm, revenue, xpathMiss);
 		} else {
 			series.push(impressions, cpm, revenue);
 		}
@@ -171,7 +183,8 @@ const reorderColumns = cols => {
 				col === 'Name' ||
 				col === 'Variation Id' ||
 				(col === 'Xpath Miss' && !config.IS_SUPERUSER) ||
-				(col === 'Pageviews' && !config.IS_SUPERUSER)
+				(col === 'Pageviews' && !config.IS_SUPERUSER) ||
+				(col === 'Page CPM ($)' && !config.IS_SUPERUSER)
 			) {
 				return true;
 			}
@@ -190,7 +203,8 @@ const reorderColumns = cols => {
 				'CPM ($)': Number((row.total_revenue * 1000 / row.total_impressions).toFixed(2)),
 				'Xpath Miss': config.IS_SUPERUSER ? row.total_xpath_miss : undefined,
 				Pageviews: config.IS_SUPERUSER ? row.total_requests : undefined,
-				'Revenue ($)': Number(row.total_revenue.toFixed(2))
+				'Revenue ($)': Number(row.total_revenue.toFixed(2)),
+				'Page CPM ($)': Number((row.total_revenue * 1000 / row.total_requests).toFixed(2))
 			});
 		});
 
