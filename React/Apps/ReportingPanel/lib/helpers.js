@@ -72,7 +72,7 @@ const apiQueryGenerator = params => {
 
 		if (!data.error) {
 			chartData = parseSiteLevelData(data).chartConfig;
-			//tableData = parseSiteLevelData(data).tableConfig;
+			tableData = parseSiteLevelData(data).tableConfig;
 		}
 
 		config = { ...config, ...chartData };

@@ -166,9 +166,8 @@ const reorderColumns = cols => {
 		let header = [],
 			body = [];
 
-		each(cols, col => {
+		each(formatColumnNames(cols), col => {
 			if (
-				col === 'Date' ||
 				col === 'Name' ||
 				col === 'Variation Id' ||
 				(col === 'Xpath Miss' && !config.IS_SUPERUSER) ||
@@ -182,17 +181,6 @@ const reorderColumns = cols => {
 				sortable: true,
 				filterable: true
 			});
-		});
-
-		each(cols, col => {
-			if (col === 'Date') {
-				header.unshift({
-					title: col,
-					prop: col,
-					sortable: true,
-					filterable: true
-				});
-			}
 		});
 
 		each(rows, row => {
