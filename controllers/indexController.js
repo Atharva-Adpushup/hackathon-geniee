@@ -271,7 +271,7 @@ function setSessionData(user, req, res, type) {
 	});
 }
 
-function thankYouRedirection(page, req, res) {
+function preOnboardingPageRedirection(page, req, res) {
 	var analyticsObj = req.session.analyticsObj ? req.session.analyticsObj : null,
 		primarySiteDetails = req.session.primarySiteDetails,
 		isPrimarySiteDetails = !!primarySiteDetails,
@@ -290,9 +290,20 @@ function thankYouRedirection(page, req, res) {
 			primarySiteDomain,
 			primarySiteStep
 		},
-		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser);
+		isUserSession = !!(req.session && req.session.user),
+		isNotSuperUser = !!(isUserSession && !req.session.isSuperUser),
+		isPipeDriveDealId = !!(isUserSession && req.session.user.crmDealId),
+		isPipeDriveDealTitle = !!(isUserSession && req.session.user.crmDealTitle);
 
-	if (isUserSession) {
+	if (isPipeDriveDealId) {
+		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = req.session.user.crmDealId;
+	}
+
+	if (isPipeDriveDealTitle) {
+		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = req.session.user.crmDealTitle;
+	}
+
+	if (isNotSuperUser) {
 		// Only user sub object is deleted, not the entire session object.
 		// This is done to ensure session object is maintained and consist of
 		// user primary site details that are used on open routes pages
@@ -383,7 +394,7 @@ router
 	})
 	.get('/thank-you', function(req, res) {
 		// this is for users who are less than <2500 USD
-		thankYouRedirection('thank-you', req, res);
+		preOnboardingPageRedirection('thank-you', req, res);
 	})
 	.post('/forgotPassword', function(req, res) {
 		userModel
@@ -451,7 +462,7 @@ router
 	})
 	.get('/thankyou', function(req, res) {
 		// this is for users who are above >10000 USD
-		thankYouRedirection('thankyou', req, res);
+		preOnboardingPageRedirection('thankyou', req, res);
 	})
 	.post('/thankyou', function(req, res) {
 		// Made thankyou POST fail safe

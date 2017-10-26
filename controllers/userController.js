@@ -109,6 +109,54 @@ function dashboardRedirection(req, res, allUserSites, type) {
 	});
 }
 
+function preOnboardingPageRedirection(page, req, res) {
+	var analyticsObj = req.session.analyticsObj ? req.session.analyticsObj : null,
+		primarySiteDetails = req.session.primarySiteDetails,
+		isPrimarySiteDetails = !!primarySiteDetails,
+		primarySiteId = isPrimarySiteDetails ? primarySiteDetails.siteId : null,
+		primarySiteDomain = isPrimarySiteDetails ? primarySiteDetails.domain : null,
+		primarySiteStep = isPrimarySiteDetails ? primarySiteDetails.step : null,
+		firstName = req.session.tempObj && req.session.tempObj.firstName ? req.session.tempObj.firstName : null,
+		email = req.session.tempObj && req.session.tempObj.email ? req.session.tempObj.email : null,
+		stage = req.session.stage ? req.session.stage : null,
+		requestDemo = req.session.user && req.session.user.requestDemo ? req.session.user.requestDemo : true,
+		userObj = {
+			name: firstName,
+			email: email,
+			stage: stage,
+			primarySiteId,
+			primarySiteDomain,
+			primarySiteStep
+		},
+		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser),
+		isPipeDriveDealId = !!(req.session.user && req.session.user.crmDealId),
+		isPipeDriveDealTitle = !!(req.session.user && req.session.user.crmDealTitle);
+
+	if (isPipeDriveDealId) {
+		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = req.session.user.crmDealId;
+	}
+
+	if (isPipeDriveDealTitle) {
+		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = req.session.user.crmDealTitle;
+	}
+
+	if (isUserSession) {
+		// Only user sub object is deleted, not the entire session object.
+		// This is done to ensure session object is maintained and consist of
+		// user primary site details that are used on open routes pages
+		// such as '/tools' and '/thank-you' pages
+		delete req.session.user;
+	}
+
+	return res.render(page, {
+		imageHeaderLogo: true,
+		buttonHeaderLogout: true,
+		user: userObj,
+		analytics: analyticsObj,
+		requestDemo: requestDemo
+	});
+}
+
 router
 	.get('/dashboard', function(req, res) {
 		return userModel
@@ -127,7 +175,7 @@ router
 		return dashboardRedirection(req, res, allUserSites, 'onboarding');
 	})
 	.get('/requestdemo', function(req, res) {
-		return res.render('request-demo', { imageHeaderLogo: true, buttonHeaderLogout: true });
+		return preOnboardingPageRedirection('request-demo', req, res);
 	})
 	.post('/setSiteStep', function(req, res) {
 		siteModel

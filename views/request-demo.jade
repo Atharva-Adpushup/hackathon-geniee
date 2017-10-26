@@ -101,3 +101,28 @@ block bodyContent
 						//- div(data-id="TemFBoDWjZw" class="livechat_button")
 						//- 	a(href="https://www.livechatinc.com/customer-service/?partner=lc_6965991&amp;utm_source=chat_button") Speak Now
 						li(onclick="Calendly.showPopupWidget('https://calendly.com/adpushup/adpushup-demo');return false;") Schedule Later
+
+	- user = user || {};
+	- analytics = analytics || {};
+	script(type="text/javascript").
+		var analyticsObj = !{JSON.stringify(analytics)};
+
+		if(analyticsObj && !jQuery.isEmptyObject(analyticsObj)) {
+			var userInfoObj = !{JSON.stringify(user)},
+				stage = userInfoObj.stage || 'Request Demo';
+			analyticsObj.stage = userInfoObj.stage || 'Request Demo';
+			adpushupAnalyticsEvents.emit('analyticsAlias', {
+				email: userInfoObj.email
+			});
+			adpushupAnalyticsEvents.emit('analyticsIdentify', {
+				email: userInfoObj.email,
+				analytics: analyticsObj
+			});
+			adpushupAnalyticsEvents.emit('analyticsTrack', {
+				eventName: stage,
+				obj: {
+					name: userInfoObj.firstName,
+					email: userInfoObj.email
+				}
+			});
+		}
