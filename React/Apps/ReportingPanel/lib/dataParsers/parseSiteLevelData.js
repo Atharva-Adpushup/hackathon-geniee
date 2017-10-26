@@ -103,7 +103,7 @@ const formatColumnNames = columns => {
 			cpm.data.push(Number((rows[i].total_revenue * 1000 / rows[i].total_impressions).toFixed(2)));
 			xpathMiss.data.push(rows[i].total_xpath_miss);
 			pageviews.data.push(rows[i].total_requests);
-			revenue.data.push(rows[i].total_revenue);
+			revenue.data.push(Number(rows[i].total_revenue.toFixed(2)));
 		}
 		series.push(impressions, cpm, revenue);
 
@@ -152,7 +152,8 @@ const formatColumnNames = columns => {
 				Impressions: row.total_impressions,
 				'CPM ($)': Number((row.total_revenue * 1000 / row.total_impressions).toFixed(2)),
 				'Xpath Miss': config.IS_SUPERUSER ? row.total_xpath_miss : undefined,
-				Pageviews: config.IS_SUPERUSER ? row.total_requests : undefined
+				Pageviews: config.IS_SUPERUSER ? row.total_requests : undefined,
+				'Revenue ($)': Number(row.total_revenue.toFixed(2))
 			});
 		});
 
