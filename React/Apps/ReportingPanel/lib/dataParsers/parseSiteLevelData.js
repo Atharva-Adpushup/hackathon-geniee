@@ -1,61 +1,90 @@
-import { capitalCase } from '../helpers';
+import { capitalCase, reorderArray } from '../helpers';
 import config from '../config';
 import { remove, map, each } from 'lodash';
 import moment from 'moment';
 
-const formatColumnNames = columns => {
+const reorderColumns = cols => {
+		let updatedCols = [];
+		updatedCols.push(reorderArray('Date', cols));
+		updatedCols.push(reorderArray('Pageviews', cols));
+		updatedCols.push(reorderArray('Impressions', cols));
+		updatedCols.push(reorderArray('CPM ($)', cols));
+		updatedCols.push(reorderArray('Revenue ($)', cols));
+		updatedCols.push(reorderArray('Xpath Miss', cols));
+		return updatedCols;
+	},
+	formatColumnNames = columns => {
 		let updatedColumns = [];
 		for (let i = 0; i < columns.length; i++) {
 			let str = capitalCase(columns[i].replace(/_/g, ' '));
-			if (str === 'Total Revenue') {
-				str = 'Total Revenue ($)';
+			str = str.replace(/Total /g, '');
+			switch (str) {
+				case 'Revenue':
+					str = 'Revenue ($)';
+					break;
+				case 'Requests':
+					str = 'Pageviews';
+					break;
+				case 'Report Date':
+					str = 'Date';
+					break;
 			}
-			if (str === 'Total Requests') {
-				str = 'Total Pageviews';
-			}
-			if (str === 'Report Date') {
-				str = 'Date';
-			}
-			updatedColumns.push(str.replace(/Total /g, ''));
+			updatedColumns.push(str);
 		}
-
 		updatedColumns.push('CPM ($)');
-
 		remove(updatedColumns, col => col === 'Siteid');
-		return updatedColumns;
+		return reorderColumns(updatedColumns);
 	},
 	generateYAxis = columns => {
 		let yAxis = [],
-			xPathImpressionsPageviews = '';
+			xPathImpressionsPageviews = '',
+			cpm = '',
+			revenue = '';
+
 		for (let i = 0; i < columns.length; i++) {
-			if (columns[i] === 'Xpath Miss' && config.IS_SUPERUSER) {
-				xPathImpressionsPageviews += columns[i] + ' / ';
-			}
-			if (columns[i] === 'Pageviews' && config.IS_SUPERUSER) {
-				xPathImpressionsPageviews += columns[i] + ' / ';
-			}
-			if (columns[i] === 'Impressions') {
-				xPathImpressionsPageviews += columns[i];
-				yAxis.push({
-					title: {
-						text: xPathImpressionsPageviews
+			switch (columns[i]) {
+				case 'Impressions':
+					xPathImpressionsPageviews += `${columns[i]} / `;
+					break;
+				case 'Xpath Miss':
+				case 'Pageviews':
+					if (config.IS_SUPERUSER) {
+						xPathImpressionsPageviews += `${columns[i]} / `;
 					}
-				});
-			}
-			if (columns[i] === 'CPM ($)' || columns[i] === 'Revenue ($)') {
-				yAxis.push({
-					title: {
-						text: columns[i]
-					},
-					opposite: true
-				});
+					break;
+				case 'CPM ($)':
+					cpm = columns[i];
+					break;
+				case 'Revenue ($)':
+					revenue += columns[i];
+					break;
 			}
 		}
+
+		yAxis.push(
+			{
+				title: {
+					text: xPathImpressionsPageviews.substring(0, xPathImpressionsPageviews.length - 2)
+				}
+			},
+			{
+				title: {
+					text: cpm
+				},
+				opposite: true
+			},
+			{
+				title: {
+					text: revenue
+				},
+				opposite: true
+			}
+		);
 
 		return yAxis;
 	},
 	generateXAxis = rows => map(rows, row => moment(row.report_date).format('DD-MM-YYYY')),
-	generateSeries = rows => {
+	generateSeries = (cols, rows) => {
 		const pointOptions = {
 			lineWidth: 1.5,
 			marker: {
@@ -64,40 +93,59 @@ const formatColumnNames = columns => {
 			}
 		};
 
-		let series = [],
-			impressions = {
+		let impressions,
+			pageviews,
+			cpm,
+			revenue,
+			xpathMiss,
+			series = [];
+
+		each(cols, col => {
+			let defaultOptions = {
 				...pointOptions,
-				name: 'Impressions',
-				yAxis: 0,
-				data: []
-			},
-			pageviews = {
-				...pointOptions,
-				name: 'Pageviews',
-				yAxis: 0,
 				data: [],
-				visible: false
-			},
-			cpm = {
-				...pointOptions,
-				name: 'CPM ($)',
-				yAxis: 1,
-				data: [],
-				visible: false
-			},
-			revenue = {
-				...pointOptions,
-				name: 'Revenue ($)',
-				yAxis: 1,
-				data: []
-			},
-			xpathMiss = {
-				...pointOptions,
-				name: 'Xpath Miss',
 				yAxis: 0,
-				data: [],
 				visible: false
 			};
+
+			switch (col) {
+				case 'Pageviews':
+					pageviews = {
+						...defaultOptions,
+						name: col
+					};
+					break;
+				case 'Impressions':
+					impressions = {
+						...defaultOptions,
+						name: col,
+						visible: true
+					};
+					break;
+				case 'CPM ($)':
+					cpm = {
+						...defaultOptions,
+						name: col,
+						yAxis: 1
+					};
+					break;
+				case 'Revenue ($)':
+					revenue = {
+						...defaultOptions,
+						name: col,
+						yAxis: 2,
+						visible: true
+					};
+					break;
+				case 'Xpath Miss':
+					xpathMiss = {
+						...defaultOptions,
+						name: col
+					};
+					break;
+			}
+		});
+
 		for (let i = 0; i < rows.length; i++) {
 			impressions.data.push(rows[i].total_impressions);
 			cpm.data.push(Number((rows[i].total_revenue * 1000 / rows[i].total_impressions).toFixed(2)));
@@ -165,7 +213,7 @@ const formatColumnNames = columns => {
 		let chartConfig = {
 				yAxis: generateYAxis(columns),
 				xAxis: { categories: generateXAxis(data.rows) },
-				series: generateSeries(data.rows)
+				series: generateSeries(columns, data.rows)
 			},
 			tableConfig = generateTableData(columns, data.rows);
 

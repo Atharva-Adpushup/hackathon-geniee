@@ -72,11 +72,18 @@ const apiQueryGenerator = params => {
 
 		if (!data.error) {
 			chartData = parseSiteLevelData(data).chartConfig;
-			tableData = parseSiteLevelData(data).tableConfig;
+			//tableData = parseSiteLevelData(data).tableConfig;
 		}
 
 		config = { ...config, ...chartData };
 		return { chartData: config, tableData };
+	},
+	reorderArray = (param, arr) => {
+		for (let i = 0; i < arr.length; i++) {
+			if (arr[i] === param) {
+				return arr[i];
+			}
+		}
 	},
 	ajax = params => {
 		const { method, url, data } = params;
@@ -99,4 +106,4 @@ const apiQueryGenerator = params => {
 		});
 	};
 
-export { apiQueryGenerator, dataGenerator, capitalCase, ajax };
+export { apiQueryGenerator, dataGenerator, capitalCase, ajax, reorderArray };
