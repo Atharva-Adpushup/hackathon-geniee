@@ -273,6 +273,7 @@ function setSessionData(user, req, res, type) {
 
 function preOnboardingPageRedirection(page, req, res) {
 	var analyticsObj = req.session.analyticsObj ? req.session.analyticsObj : null,
+		isAnalyticsObj = !!(analyticsObj && _.isObject(analyticsObj)),
 		primarySiteDetails = req.session.primarySiteDetails,
 		isPrimarySiteDetails = !!primarySiteDetails,
 		primarySiteId = isPrimarySiteDetails ? primarySiteDetails.siteId : null,
@@ -292,8 +293,8 @@ function preOnboardingPageRedirection(page, req, res) {
 		},
 		isUserSession = !!(req.session && req.session.user),
 		isNotSuperUser = !!(isUserSession && !req.session.isSuperUser),
-		isPipeDriveDealId = !!(isUserSession && req.session.user.crmDealId),
-		isPipeDriveDealTitle = !!(isUserSession && req.session.user.crmDealTitle);
+		isPipeDriveDealId = !!(isAnalyticsObj && isUserSession && req.session.user.crmDealId),
+		isPipeDriveDealTitle = !!(isAnalyticsObj && isUserSession && req.session.user.crmDealTitle);
 
 	if (isPipeDriveDealId) {
 		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = req.session.user.crmDealId;

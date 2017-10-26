@@ -111,6 +111,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 
 function preOnboardingPageRedirection(page, req, res) {
 	var analyticsObj = req.session.analyticsObj ? req.session.analyticsObj : null,
+		isAnalyticsObj = !!(analyticsObj && _.isObject(analyticsObj)),
 		primarySiteDetails = req.session.primarySiteDetails,
 		isPrimarySiteDetails = !!primarySiteDetails,
 		primarySiteId = isPrimarySiteDetails ? primarySiteDetails.siteId : null,
@@ -129,8 +130,8 @@ function preOnboardingPageRedirection(page, req, res) {
 			primarySiteStep
 		},
 		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser),
-		isPipeDriveDealId = !!(req.session.user && req.session.user.crmDealId),
-		isPipeDriveDealTitle = !!(req.session.user && req.session.user.crmDealTitle);
+		isPipeDriveDealId = !!(isAnalyticsObj && req.session.user && req.session.user.crmDealId),
+		isPipeDriveDealTitle = !!(isAnalyticsObj && req.session.user && req.session.user.crmDealTitle);
 
 	if (isPipeDriveDealId) {
 		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = req.session.user.crmDealId;

@@ -87,15 +87,13 @@ block bodyContent
 				.col-md-7.thankyou-content.text-left
 					h2 Thank you for signing up with Adpushup
 					hr
-					p Hey there, we’re mighty glad that you have shown interest in AdPushup.
-					blockquote(style="margin-top: 20px")
-						p(style="font-style: italic;")
-							| We have seen an extremely great success rate, with more than 77% of our participating websites seeing an average of
-							strong(style="color: #72b800; margin: 0 5px")
-								| 43% uplift
-								i.fa.fa-arrow-up(style="margin: 0 0 0 5px")
-							| in RPM.
-					h3(style="margin: 40px 0 10px; font-weight: bold;") Schedule a live demo with us
+					p
+						| We have seen an extremely great success rate, with more than 77% of our participating websites seeing an average of
+						strong(style="color: #72b800; margin: 0 5px")
+							| 43% uplift
+							i.fa.fa-arrow-up(style="margin: 0 0 0 5px")
+						| in RPM.
+					h3(style="margin: 40px 0 10px; font-weight: bold;") Schedule a call with us to activate your account
 					ul
 						li.active(data-id="TemFBoDWjZw" class="livechat_button") Live chat now
 						//- div(data-id="TemFBoDWjZw" class="livechat_button")
@@ -105,11 +103,12 @@ block bodyContent
 	- user = user || {};
 	- analytics = analytics || {};
 	script(type="text/javascript").
-		var analyticsObj = !{JSON.stringify(analytics)};
+		var analyticsObj = !{JSON.stringify(analytics)},
+			isAnalyticsObj = !!(analyticsObj && !jQuery.isEmptyObject(analyticsObj)),
+			userInfoObj = !{JSON.stringify(user)},
+			stage = userInfoObj.stage || 'Request Demo';
 
-		if(analyticsObj && !jQuery.isEmptyObject(analyticsObj)) {
-			var userInfoObj = !{JSON.stringify(user)},
-				stage = userInfoObj.stage || 'Request Demo';
+		if (isAnalyticsObj) {
 			analyticsObj.stage = userInfoObj.stage || 'Request Demo';
 			adpushupAnalyticsEvents.emit('analyticsAlias', {
 				email: userInfoObj.email
@@ -123,6 +122,22 @@ block bodyContent
 				obj: {
 					name: userInfoObj.firstName,
 					email: userInfoObj.email
+				}
+			});
+		} else {
+			adpushupAnalyticsEvents.emit('analyticsIdentify', {
+				email: window.currentUser.email,
+				analytics: {
+					name: window.currentUser.firstName,
+					email: window.currentUser.email
+				}
+			});
+			adpushupAnalyticsEvents.emit('analyticsTrack', {
+				eventName: stage,
+				obj: {
+					name: window.currentUser.firstName,
+					email: window.currentUser.email,
+					value: true
 				}
 			});
 		}
