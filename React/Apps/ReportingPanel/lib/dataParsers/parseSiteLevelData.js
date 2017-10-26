@@ -3,15 +3,16 @@ import config from '../config';
 import { remove, map, each } from 'lodash';
 import moment from 'moment';
 
-const reorderColumns = cols => {
+const dataLabels = config.dataLabels,
+	reorderColumns = cols => {
 		let updatedCols = [];
-		updatedCols.push(reorderArray('Date', cols));
-		updatedCols.push(reorderArray('Pageviews', cols));
-		updatedCols.push(reorderArray('Page CPM ($)', cols));
-		updatedCols.push(reorderArray('Impressions', cols));
-		updatedCols.push(reorderArray('CPM ($)', cols));
-		updatedCols.push(reorderArray('Revenue ($)', cols));
-		updatedCols.push(reorderArray('Xpath Miss', cols));
+		updatedCols.push(reorderArray(dataLabels.date, cols));
+		updatedCols.push(reorderArray(dataLabels.pageViews, cols));
+		updatedCols.push(reorderArray(dataLabels.pageCpm, cols));
+		updatedCols.push(reorderArray(dataLabels.impressions, cols));
+		updatedCols.push(reorderArray(dataLabels.cpm, cols));
+		updatedCols.push(reorderArray(dataLabels.revenue, cols));
+		updatedCols.push(reorderArray(dataLabels.xpathMiss, cols));
 		return updatedCols;
 	},
 	formatColumnNames = columns => {
@@ -21,20 +22,20 @@ const reorderColumns = cols => {
 			str = str.replace(/Total /g, '');
 			switch (str) {
 				case 'Revenue':
-					str = 'Revenue ($)';
+					str = dataLabels.revenue;
 					break;
 				case 'Requests':
-					str = 'Pageviews';
+					str = dataLabels.pageViews;
 					break;
 				case 'Report Date':
-					str = 'Date';
+					str = dataLabels.date;
 					break;
 			}
 			updatedColumns.push(str);
 		}
-		updatedColumns.push('CPM ($)');
-		updatedColumns.push('Page CPM ($)');
-		remove(updatedColumns, col => col === 'Siteid');
+		updatedColumns.push(dataLabels.cpm);
+		updatedColumns.push(dataLabels.pageCpm);
+		remove(updatedColumns, col => col === dataLabels.siteId);
 		return reorderColumns(updatedColumns);
 	},
 	generateYAxis = columns => {
@@ -45,20 +46,20 @@ const reorderColumns = cols => {
 
 		for (let i = 0; i < columns.length; i++) {
 			switch (columns[i]) {
-				case 'Impressions':
+				case dataLabels.impressions:
 					xPathImpressionsPageviews += `${columns[i]} / `;
 					break;
-				case 'Xpath Miss':
-				case 'Pageviews':
+				case dataLabels.xpathMiss:
+				case dataLabels.pageViews:
 					if (config.IS_SUPERUSER) {
 						xPathImpressionsPageviews += `${columns[i]} / `;
 					}
 					break;
-				case 'CPM ($)':
-				case 'Page CPM ($)':
+				case dataLabels.cpm:
+				case dataLabels.pageCpm:
 					cpmPageCpm += `${columns[i]} / `;
 					break;
-				case 'Revenue ($)':
+				case dataLabels.revenue:
 					revenue += columns[i];
 					break;
 			}
@@ -113,27 +114,27 @@ const reorderColumns = cols => {
 			};
 
 			switch (col) {
-				case 'Pageviews':
+				case dataLabels.pageViews:
 					pageviews = {
 						...defaultOptions,
 						name: col
 					};
 					break;
-				case 'Impressions':
+				case dataLabels.impressions:
 					impressions = {
 						...defaultOptions,
 						name: col,
 						visible: true
 					};
 					break;
-				case 'CPM ($)':
+				case dataLabels.cpm:
 					cpm = {
 						...defaultOptions,
 						name: col,
 						yAxis: 1
 					};
 					break;
-				case 'Revenue ($)':
+				case dataLabels.revenue:
 					revenue = {
 						...defaultOptions,
 						name: col,
@@ -141,14 +142,14 @@ const reorderColumns = cols => {
 						visible: true
 					};
 					break;
-				case 'Page CPM ($)':
+				case dataLabels.pageCpm:
 					pageCpm = {
 						...defaultOptions,
 						name: col,
 						yAxis: 1
 					};
 					break;
-				case 'Xpath Miss':
+				case dataLabels.xpathMiss:
 					xpathMiss = {
 						...defaultOptions,
 						name: col
@@ -180,11 +181,11 @@ const reorderColumns = cols => {
 
 		each(formatColumnNames(cols), col => {
 			if (
-				col === 'Name' ||
-				col === 'Variation Id' ||
-				(col === 'Xpath Miss' && !config.IS_SUPERUSER) ||
-				(col === 'Pageviews' && !config.IS_SUPERUSER) ||
-				(col === 'Page CPM ($)' && !config.IS_SUPERUSER)
+				col === dataLabels.name ||
+				col === dataLabels.variationId ||
+				(col === dataLabels.xpathMiss && !config.IS_SUPERUSER) ||
+				(col === dataLabels.pageViews && !config.IS_SUPERUSER) ||
+				(col === dataLabels.pageCpm && !config.IS_SUPERUSER)
 			) {
 				return true;
 			}
@@ -198,13 +199,13 @@ const reorderColumns = cols => {
 
 		each(rows, row => {
 			body.push({
-				Date: moment(row.report_date).format('DD-MM-YYYY'),
-				Impressions: row.total_impressions,
-				'CPM ($)': Number((row.total_revenue * 1000 / row.total_impressions).toFixed(2)),
-				'Xpath Miss': config.IS_SUPERUSER ? row.total_xpath_miss : undefined,
-				Pageviews: config.IS_SUPERUSER ? row.total_requests : undefined,
-				'Revenue ($)': Number(row.total_revenue.toFixed(2)),
-				'Page CPM ($)': Number((row.total_revenue * 1000 / row.total_requests).toFixed(2))
+				[dataLabels.date]: moment(row.report_date).format('DD-MM-YYYY'),
+				[dataLabels.impressions]: row.total_impressions,
+				[dataLabels.cpm]: Number((row.total_revenue * 1000 / row.total_impressions).toFixed(2)),
+				[dataLabels.xpathMiss]: config.IS_SUPERUSER ? row.total_xpath_miss : undefined,
+				[dataLabels.pageViews]: config.IS_SUPERUSER ? row.total_requests : undefined,
+				[dataLabels.revenue]: Number(row.total_revenue.toFixed(2)),
+				[dataLabels.pageCpm]: Number((row.total_revenue * 1000 / row.total_requests).toFixed(2))
 			});
 		});
 
