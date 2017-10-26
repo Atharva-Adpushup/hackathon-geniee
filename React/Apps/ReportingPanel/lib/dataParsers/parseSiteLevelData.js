@@ -8,17 +8,18 @@ const formatColumnNames = columns => {
 		for (let i = 0; i < columns.length; i++) {
 			let str = capitalCase(columns[i].replace(/_/g, ' '));
 			if (str === 'Total Revenue') {
-				str = 'Total CPM ($)';
+				str = 'Total Revenue ($)';
 			}
 			if (str === 'Total Requests') {
 				str = 'Total Pageviews';
 			}
-
 			if (str === 'Report Date') {
 				str = 'Date';
 			}
 			updatedColumns.push(str.replace(/Total /g, ''));
 		}
+
+		updatedColumns.push('CPM ($)');
 
 		remove(updatedColumns, col => col === 'Siteid');
 		return updatedColumns;
@@ -41,7 +42,7 @@ const formatColumnNames = columns => {
 					}
 				});
 			}
-			if (columns[i] === 'CPM ($)') {
+			if (columns[i] === 'CPM ($)' || columns[i] === 'Revenue ($)') {
 				yAxis.push({
 					title: {
 						text: columns[i]
@@ -84,6 +85,12 @@ const formatColumnNames = columns => {
 				data: [],
 				visible: false
 			},
+			revenue = {
+				...pointOptions,
+				name: 'Revenue ($)',
+				yAxis: 1,
+				data: []
+			},
 			xpathMiss = {
 				...pointOptions,
 				name: 'Xpath Miss',
@@ -96,8 +103,9 @@ const formatColumnNames = columns => {
 			cpm.data.push(Number((rows[i].total_revenue * 1000 / rows[i].total_impressions).toFixed(2)));
 			xpathMiss.data.push(rows[i].total_xpath_miss);
 			pageviews.data.push(rows[i].total_requests);
+			revenue.data.push(rows[i].total_revenue);
 		}
-		series.push(impressions, cpm);
+		series.push(impressions, cpm, revenue);
 
 		if (config.IS_SUPERUSER) {
 			series.push(xpathMiss, pageviews);
