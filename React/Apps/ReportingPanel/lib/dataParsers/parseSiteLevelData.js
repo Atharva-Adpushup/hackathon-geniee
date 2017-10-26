@@ -56,8 +56,12 @@ const dataLabels = config.DATA_LABELS,
 					}
 					break;
 				case dataLabels.cpm:
-				case dataLabels.pageCpm:
 					cpmPageCpm += `${columns[i]} / `;
+					break;
+				case dataLabels.pageCpm:
+					if (config.IS_SUPERUSER) {
+						cpmPageCpm += `${columns[i]} / `;
+					}
 					break;
 				case dataLabels.revenue:
 					revenue += columns[i];
