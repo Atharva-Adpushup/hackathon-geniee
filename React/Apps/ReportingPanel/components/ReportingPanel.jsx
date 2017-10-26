@@ -64,98 +64,29 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: false
 		};
 
-		// ajax({
-		// 	method: 'POST',
-		// 	url: config.REPORT_ENDPOINT,
-		// 	data: apiQueryGenerator(params)
-		// })
-		// 	.then(res => {
-		const res = {
-			error: false,
-			columns: [
-				'total_xpath_miss',
-				'total_requests',
-				'report_date',
-				'siteid',
-				'total_impressions',
-				'total_revenue'
-			],
-			rows: [
-				{
-					total_xpath_miss: 45634,
-					total_requests: 20547,
-					report_date: '2017-10-19T00:00:00.000Z',
-					siteid: 28822,
-					total_impressions: 43858,
-					total_revenue: 158.5481
-				},
-				{
-					total_xpath_miss: 46066,
-					total_requests: 20598,
-					report_date: '2017-10-20T00:00:00.000Z',
-					siteid: 28822,
-					total_impressions: 43894,
-					total_revenue: 140.753
-				},
-				{
-					total_xpath_miss: 38489,
-					total_requests: 16030,
-					report_date: '2017-10-21T00:00:00.000Z',
-					siteid: 28822,
-					total_impressions: 34021,
-					total_revenue: 94.9589
-				},
-				{
-					total_xpath_miss: 36000,
-					total_requests: 14299,
-					report_date: '2017-10-22T00:00:00.000Z',
-					siteid: 28822,
-					total_impressions: 32579,
-					total_revenue: 112.5442
-				},
-				{
-					total_xpath_miss: 16341,
-					total_requests: 21446,
-					report_date: '2017-10-23T00:00:00.000Z',
-					siteid: 28822,
-					total_impressions: 45304,
-					total_revenue: 140.6582
-				},
-				{
-					total_xpath_miss: 1799,
-					total_requests: 22199,
-					report_date: '2017-10-24T00:00:00.000Z',
-					siteid: 28822,
-					total_impressions: 44756,
-					total_revenue: 136.5891
-				},
-				{
-					total_xpath_miss: 1827,
-					total_requests: 22163,
-					report_date: '2017-10-25T00:00:00.000Z',
-					siteid: 28822,
-					total_impressions: 44271,
-					total_revenue: 129.4741
+		ajax({
+			method: 'POST',
+			url: config.REPORT_ENDPOINT,
+			data: apiQueryGenerator(params)
+		})
+			.then(res => {
+				if (!res.error && res.rows.length) {
+					const data = dataGenerator(res);
+					this.setState({
+						...state,
+						reportError: false,
+						chartConfig: data.chartData,
+						tableConfig: data.tableData
+					});
+				} else {
+					this.setState({ ...state, reportError: true });
 				}
-			]
-		};
-		if (!res.error && res.rows.length) {
-			const data = dataGenerator(res);
-			this.setState({
-				...state,
-				reportError: false,
-				chartConfig: data.chartData,
-				tableConfig: data.tableData
+			})
+			.catch(res => {
+				console.log('error');
+				console.log(res);
+				this.setState({ ...state, reportError: true });
 			});
-		} else {
-			this.setState({ ...state, reportError: true });
-		}
-		// })
-		// .catch(res => {
-		// 	console.log('error');
-		// 	console.log(res);
-		// 	this.setState({ ...state, reportError: true });
-		//});
 	}
 
 	updateReportParams(params) {
