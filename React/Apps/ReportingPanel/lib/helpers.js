@@ -71,13 +71,6 @@ const apiQueryGenerator = params => {
 			tableData = null;
 
 		if (!data.error) {
-			// switch (reportLevel) {
-			// 	case 'site':
-			// 	case 'pageGroup':
-			// 		chartData = parseSiteLevelData(data).chartConfig;
-			// 		tableData = parseSiteLevelData(data).tableConfig;
-			// 		break;
-			// }
 			chartData = parseSiteLevelData(data).chartConfig;
 			tableData = parseSiteLevelData(data).tableConfig;
 		}

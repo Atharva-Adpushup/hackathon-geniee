@@ -74,19 +74,22 @@ const formatColumnNames = columns => {
 				...pointOptions,
 				name: 'Pageviews',
 				yAxis: 0,
-				data: []
+				data: [],
+				visible: false
 			},
 			cpm = {
 				...pointOptions,
 				name: 'CPM ($)',
 				yAxis: 1,
-				data: []
+				data: [],
+				visible: false
 			},
 			xpathMiss = {
 				...pointOptions,
 				name: 'Xpath Miss',
 				yAxis: 0,
-				data: []
+				data: [],
+				visible: false
 			};
 		for (let i = 0; i < rows.length; i++) {
 			impressions.data.push(rows[i].total_impressions);

@@ -3,7 +3,7 @@ const config = {
 	PLATFORMS: ['DESKTOP', 'MOBILE', 'TABLET'],
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
-	SITE_ID: window.siteId,
+	SITE_ID: 28822, // window.siteId
 	PAGEGROUPS: window.pageGroups,
 	IS_SUPERUSER: window.isSuperUser
 };
