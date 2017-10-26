@@ -147,16 +147,17 @@ const reorderColumns = cols => {
 		});
 
 		for (let i = 0; i < rows.length; i++) {
+			pageviews.data.push(rows[i].total_requests);
 			impressions.data.push(rows[i].total_impressions);
 			cpm.data.push(Number((rows[i].total_revenue * 1000 / rows[i].total_impressions).toFixed(2)));
-			xpathMiss.data.push(rows[i].total_xpath_miss);
-			pageviews.data.push(rows[i].total_requests);
 			revenue.data.push(Number(rows[i].total_revenue.toFixed(2)));
+			xpathMiss.data.push(rows[i].total_xpath_miss);
 		}
-		series.push(impressions, cpm, revenue);
 
 		if (config.IS_SUPERUSER) {
-			series.push(xpathMiss, pageviews);
+			series.push(pageviews, impressions, cpm, revenue, xpathMiss);
+		} else {
+			series.push(impressions, cpm, revenue);
 		}
 
 		return series;
