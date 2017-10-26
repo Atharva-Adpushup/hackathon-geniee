@@ -6,7 +6,7 @@ const config = {
 	SITE_ID: 28822, // window.siteId
 	PAGEGROUPS: window.pageGroups,
 	IS_SUPERUSER: window.isSuperUser,
-	dataLabels: {
+	DATA_LABELS: {
 		date: 'Date',
 		pageViews: 'Pageviews',
 		pageCpm: 'Page CPM ($)',

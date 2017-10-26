@@ -3,7 +3,7 @@ import config from '../config';
 import { remove, map, each } from 'lodash';
 import moment from 'moment';
 
-const dataLabels = config.dataLabels,
+const dataLabels = config.DATA_LABELS,
 	reorderColumns = cols => {
 		let updatedCols = [];
 		updatedCols.push(reorderArray(dataLabels.date, cols));
