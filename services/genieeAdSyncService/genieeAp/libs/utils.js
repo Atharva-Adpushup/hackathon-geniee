@@ -250,8 +250,6 @@ module.exports = {
 
 			return url;
 		}
-
-		return url.replace('?', '');
 	},
 	queryParams: (function() {
 		var str = window.location.search,
