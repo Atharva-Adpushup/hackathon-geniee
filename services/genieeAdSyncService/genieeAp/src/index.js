@@ -68,9 +68,9 @@ function triggerControl(mode) {
 	}
 }
 
-function startCreation() {
+function startCreation(forced) {
 	// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
-	if (shouldWeNotProceed() || !config.pageGroup) {
+	if (!forced && (shouldWeNotProceed() || !config.pageGroup)) {
 		return false;
 	}
 	var selectedVariation = selectVariation(config);
@@ -87,6 +87,12 @@ function startCreation() {
 function main() {
 	// Hook Pagegroup, find pageGroup and check for blockList
 	hookAndInit(adp, startCreation, browserConfig.platform);
+
+	// AdPushup Debug Force Variation
+	if (utils.queryParams && utils.queryParams.forceVariation) {
+		startCreation(true);
+		return false;
+	}
 
 	if (shouldWeNotProceed()) {
 		return false;

@@ -90,6 +90,10 @@ class ReportControls extends Component {
 		this.setState({ focusedInput });
 	}
 
+	componentWillReceiveProps(nextProps) {
+		this.setState({ ...nextProps });
+	}
+
 	render() {
 		const { state, props } = this,
 			{ PLATFORMS, PAGEGROUPS } = config;
