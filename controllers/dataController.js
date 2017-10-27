@@ -406,12 +406,17 @@ router
 		return userModel
 			.getUserByEmail(req.session.user.email)
 			.then(user => {
-				if (!user || !user.get('data') || !user.get('data').crmDealId) {
+				const isUser = !!user,
+					crmDealId = user.get('crmDealId'),
+					stageId = req.body.status,
+					isCrmDealId = !!crmDealId;
+
+				if (!isUser || !isCrmDealId) {
 					return Promise.reject('No CRM deal id found');
 				}
 				return pipedriveAPI('updateDeal', {
-					deal_id: user.data.crmDealId,
-					stage_id: req.body.status
+					deal_id: crmDealId,
+					stage_id: stageId
 				});
 			})
 			.then(() => res.send({ success: 1 }))
