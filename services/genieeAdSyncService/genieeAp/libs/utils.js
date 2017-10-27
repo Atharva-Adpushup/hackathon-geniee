@@ -247,9 +247,9 @@ module.exports = {
 			} else {
 				url = urlBase;
 			}
-
-			return url;
 		}
+
+		return url;
 	},
 	queryParams: (function() {
 		var str = window.location.search,
