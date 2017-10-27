@@ -242,7 +242,13 @@ module.exports = {
 				}
 			}
 
-			url = urlBase + '?' + parts.join('&');
+			if (Object.keys(this.queryParams).length > 1) {
+				url = urlBase + '?' + parts.join('&');
+			} else {
+				url = urlBase;
+			}
+
+			return url;
 		}
 
 		return url.replace('?', '');
