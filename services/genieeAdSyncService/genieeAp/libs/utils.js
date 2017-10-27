@@ -245,7 +245,7 @@ module.exports = {
 			url = urlBase + '?' + parts.join('&');
 		}
 
-		return url;
+		return url.replace('?', '');
 	},
 	queryParams: (function() {
 		var str = window.location.search,
