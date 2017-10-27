@@ -59,16 +59,38 @@ block append headCss
 		}
 
 block append headScripts
+	- user = user || {};
+	- analytics = analytics || {};
+
 	+loadAsset("js", [
 		'//assets.calendly.com/assets/external/widget.js'
 	])
 	script.
+		var analyticsObj = !{JSON.stringify(analytics)},
+			isAnalyticsObj = !!(analyticsObj && !jQuery.isEmptyObject(analyticsObj)),
+			userInfoObj = !{JSON.stringify(user)},
+			stage = userInfoObj.stage || 'Request Demo',
+			customVariableObj = {}, property;
+
 		window.__lc = window.__lc || {};
 		window.__lc.license = 6965991;
+
+		if (isAnalyticsObj) {
+			window.__lc.params = [];
+
+			for (property in analyticsObj) {
+				if (analyticsObj.hasOwnProperty(property)) {
+					customVariableObj.name = property;
+					customVariableObj.value = analyticsObj[property];
+					window.__lc.params.push(jQuery.extend(true, {}, customVariableObj));
+				}
+			}
+		}
+
 		(function() {
-		var lc = document.createElement('script'); lc.type = 'text/javascript'; lc.async = true;
-		lc.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdn.livechatinc.com/tracking.js';
-		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(lc, s);
+			var lc = document.createElement('script'); lc.type = 'text/javascript'; lc.async = true;
+			lc.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdn.livechatinc.com/tracking.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(lc, s);
 		})();
 	
 
@@ -109,14 +131,8 @@ block bodyContent
 						//- 	a(href="https://www.livechatinc.com/customer-service/?partner=lc_6965991&amp;utm_source=chat_button") Speak Now
 						li(onclick=onClickHandler) Schedule Later
 
-	- user = user || {};
-	- analytics = analytics || {};
 	script(type="text/javascript").
-		var analyticsObj = !{JSON.stringify(analytics)},
-			isAnalyticsObj = !!(analyticsObj && !jQuery.isEmptyObject(analyticsObj)),
-			userInfoObj = !{JSON.stringify(user)},
-			stage = userInfoObj.stage || 'Request Demo';
-
+		// Required variables are define in above inline script
 		if (isAnalyticsObj) {
 			analyticsObj.stage = userInfoObj.stage || 'Request Demo';
 			adpushupAnalyticsEvents.emit('analyticsAlias', {
