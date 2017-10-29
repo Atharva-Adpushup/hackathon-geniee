@@ -6,8 +6,10 @@ import {
 	channelMenuActions,
 	uiActions,
 	status,
-	variationActions
+	variationActions,
+	proxy
 } from '../consts/commonConsts';
+import { getActiveChannelId } from 'selectors/channelSelectors';
 
 const showEditMenu = (sectionId, adId, position, variationId) => ({
 		type: editMenuActions.SHOW_EDIT_MENU,
@@ -30,6 +32,17 @@ const showEditMenu = (sectionId, adId, position, variationId) => ({
 	toggleVariationPanel = () => ({ type: variationActions.TOGGLE_VARIATION_PANEL }),
 	openVariationPanel = () => ({ type: variationActions.OPEN_VARIATION_PANEL }),
 	closeVariationPanel = () => ({ type: variationActions.CLOSE_VARIATION_PANEL }),
+	setMode = editorMode => (dispatch, getState) => {
+		const activeChannelId = getActiveChannelId(getState());
+		if (editorMode == '1') {
+			chrome.runtime.sendMessage(
+				proxy.EXTENSION_ID,
+				{ cmd: uiActions.SET_MODE, data: { mode: editorMode, channelId: activeChannelId } },
+				response => {}
+			);
+		}
+		return dispatch({ type: uiActions.SET_MODE, mode: editorMode });
+	},
 	expandVariationPanel = (panelCssSelector, params) => ({
 		type: variationActions.EXPAND_VARIATION_PANEL,
 		panelCssSelector,
