@@ -35,16 +35,46 @@ function executeQuery(params) {
 	return dbHelper.queryDB(params);
 }
 
-function whereWrapper(data) {
-	data.hasOwnProperty('section') ? (data.section_md5 = data.section) : null;
-	data.hasOwnProperty('variation') ? (data.variation_id = data.variation) : null;
-	data.hasOwnProperty('pagegroup') ? (data.name = data.pagegroup) : null;
+function setDeviceType(value) {
+	// 0=Unknown, 1=Mobile/Tablet, 2=PC, 3=Connected TV, 4=Phone, 5=Tablet, 6=Connected Device, 7=Set Top Box
+	let response = 2;
+	switch (value) {
+		case 'DESKTOP':
+			response = 2;
+			break;
+		case 'MOBILE':
+			response = 4;
+			break;
+		case 'TABLET':
+			response = 5;
+			break;
+		case 'CONNECTED TV':
+			response = 3;
+			break;
+		case 'SET TOP BOX':
+			response = 7;
+			break;
+		case 'UNKNOWN':
+			response = 0;
+			break;
+	}
+	return response;
+}
 
-	delete data.section;
-	delete data.variation;
-	delete data.pagegroup;
-
-	return queryHelper.where(data);
+function setNetworkType(value) {
+	let response = 2;
+	switch (value) {
+		case 'ADSENSE':
+			response = 2;
+			break;
+		case 'ADX':
+			response = 4;
+			break;
+		case 'ADP TAGS':
+			response = 0;
+			break;
+	}
+	return response;
 }
 
 function setCorrectColumnNames(data) {
@@ -65,6 +95,22 @@ function setCorrectColumnNames(data) {
 		});
 	}
 	return columns;
+}
+
+function whereWrapper(data) {
+	data.hasOwnProperty('section') ? (data.section_md5 = data.section) : null;
+	data.hasOwnProperty('variation') ? (data.variation_id = data.variation) : null;
+	data.hasOwnProperty('pagegroup') ? (data.name = data.pagegroup) : null;
+	data.hasOwnProperty('device_type')
+		? ((data.platform = data.device_type), (data.device_type = setDeviceType(data.device_type)))
+		: null;
+	data.hasOwnProperty('ntwid') ? (data.ntwid = setNetworkType(data.ntwid)) : null;
+
+	delete data.section;
+	delete data.variation;
+	delete data.pagegroup;
+
+	return queryHelper.where(data);
 }
 
 function orderByWrapper(data) {
@@ -131,22 +177,23 @@ function generate(data) {
 	total_requests ----> total_pageviews
 */
 
-// let params = {
-// 	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid'],
-// 	where: {
-// 		siteid: 28822,
-// 		pagegroup: ['MIC'],
-// 		variation: ['2e68228f-84da-415e-bfcf-bfcf67c87570']
-// 	},
-// 	groupBy: ['section']
-// };
+let params = {
+	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid', 'device_type', 'ntwid'],
+	where: {
+		siteid: 28822,
+		pagegroup: ['MIC'],
+		variation: ['2e68228f-84da-415e-bfcf-bfcf67c87570'],
+		device_type: 'DESKTOP'
+	},
+	groupBy: ['ntwid']
+};
 
-// generate(params)
-// 	.then(response => {
-// 		debugger;
-// 	})
-// 	.catch(err => {
-// 		debugger;
-// 	});
+generate(params)
+	.then(response => {
+		debugger;
+	})
+	.catch(err => {
+		debugger;
+	});
 
 module.exports = { generate, getPVS };

@@ -62,7 +62,8 @@ var Promise = require('bluebird'),
 			});
 			return response.slice(0, -2);
 		},
-		__getAlias: field => {
+		__getAlias: (field, flag) => {
+			// flag true for common
 			let alias = false;
 			switch (field) {
 				case 'name':
@@ -76,6 +77,15 @@ var Promise = require('bluebird'),
 				case 'section_md5':
 				case 'axsid':
 					alias = schema.common.tables.section.alias;
+					break;
+				case 'device_type':
+					alias = schema.firstQuery.tables.apexSiteReport.alias;
+					break;
+				case 'ntwid':
+					alias = flag ? schema.secondQuery.alias : schema.secondQuery.tables.adpTagReport.alias;
+					break;
+				case 'platform':
+					alias = schema.secondQuery.tables.adpTagReport.alias;
 					break;
 			}
 			return alias;
@@ -325,7 +335,7 @@ var Promise = require('bluebird'),
 
 					// handling where conditions specfic to queries
 					// first query --> device_type
-					// second query -->  ntwid
+					// second query -->  ntwid, platform
 					let disjointFields = _.difference(Object.keys(data), schema.common.fields.where);
 					_.forEach(disjointFields, (value, key) => {
 						let alias = queryHelper.__getAlias(value);
@@ -386,7 +396,7 @@ var Promise = require('bluebird'),
 			return queryHelper
 				.__setLevelFromGroupBy(data)
 				.then(response => {
-					// if (response || queryHelper.__getLevel() == 'site') {
+					let uniqueGroupByFields = _.difference(data, schema.common.groupBy);
 					common.groupBy = common.fields.forUser.length
 						? ` GROUP BY ${queryHelper.__reduceArrayToString(
 								common.fields.forUser,
@@ -401,7 +411,12 @@ var Promise = require('bluebird'),
 								schema.firstQuery.alias
 							)}`)
 						: null;
-					// }
+					uniqueGroupByFields.length
+						? _.forEach(uniqueGroupByFields, (value, key) => {
+								let alias = queryHelper.__getAlias(value, true);
+								common.groupBy += ` , ${alias}.${value}`;
+							})
+						: null;
 					return queryHelper.__groupBy();
 				})
 				.then(response => queryHelper.__completeReaminingSelect())

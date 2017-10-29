@@ -11,56 +11,17 @@ var express = require('express'),
 	liveSitesService = require('../services/liveSites/index'),
 	Promise = require('bluebird'),
 	extend = require('extend'),
+	lodash = require('lodash'),
 	CC = require('../configs/commonConsts'),
 	config = require('../configs/config'),
-	lodash = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
 	pipedriveAPI = require('../misc/vendors/pipedrive'),
 	sqlReporting = require('../reports/default/adpTags/index'),
+	{ queryResultProcessing } = require('../helpers/commonFunctions'),
 	router = express.Router(),
 	couchbase = require('../helpers/couchBaseService'),
 	N1qlQuery = require('couchbase-promises').N1qlQuery;
-
-function createAggregateNonAggregateObjects(dataset, key, container) {
-	let innerObj = {};
-	lodash.forEach(dataset, (nonAggregateDataset, identifier) => {
-		innerObj[identifier] = {
-			aggregate: {
-				total_xpath_miss: 0,
-				total_impressions: 0,
-				total_revenue: 0, // change this to -1
-				total_cpm: 0 // change this to -1
-			},
-			nonAggregate: nonAggregateDataset
-		};
-		nonAggregateDataset.forEach(row => {
-			innerObj[identifier].aggregate.total_xpath_miss += parseInt(row['total_xpath_miss']);
-			innerObj[identifier].aggregate.total_impressions += parseInt(row['total_impressions']);
-			innerObj[identifier].aggregate.total_revenue += parseFloat(row['total_revenue']);
-		});
-		// CPM = Revenue * 1000 / Impressions --> rounding off to 2 decimal places
-		innerObj[identifier].aggregate.total_cpm = Number(
-			innerObj[identifier].aggregate.total_revenue * 1000 / innerObj[identifier].aggregate.total_impressions
-		).toFixed(2);
-	});
-	container[key] = innerObj;
-}
-
-function queryResultProcessing(resultset) {
-	let pageGroupWiseResult = lodash.groupBy(resultset, 'name');
-	let variationWiseResult = lodash.groupBy(resultset, 'variation_id');
-	let sectionWiseResult = lodash.groupBy(resultset, 'section_md5');
-	let reporting = {
-		pagegroups: {},
-		variations: {},
-		sections: {}
-	};
-	createAggregateNonAggregateObjects(pageGroupWiseResult, 'pagegroups', reporting);
-	createAggregateNonAggregateObjects(variationWiseResult, 'variations', reporting);
-	createAggregateNonAggregateObjects(sectionWiseResult, 'sections', reporting);
-	return Promise.resolve(reporting);
-}
 
 function getReportingData(channels, siteId) {
 	if (config && config.hasOwnProperty('reporting') && !config.reporting.activated) {
