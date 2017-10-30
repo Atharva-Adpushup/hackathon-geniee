@@ -26,7 +26,8 @@ const status = {
 	},
 	proxy = {
 		HTTP_PROXY_URL: `${window.ADP_ORIGIN}/loadFromApProxy/`,
-		SIMULATED_PROXY_URL: `${window.ADP_BASEURL}/proxy/loadPage`
+		SIMULATED_PROXY_URL: `${window.ADP_BASEURL}/proxy/loadPage`,
+		EXTENSION_ID: 'nbbbgcccgkkkemfmbjmbelkcgjlpibon' //'jpncecfhenibcencdmcpkeplacnhpcpp'
 	},
 	stores = {
 		SITE_STORE: 'siteStore',
