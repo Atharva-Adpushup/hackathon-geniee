@@ -3,6 +3,7 @@
 import { Field, FieldArray } from 'redux-form';
 import CodeBox from 'shared/codeBox';
 import SelectBox from 'shared/select/select';
+import { networks } from 'consts/commonConsts';
 import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
 import { Row, Col, Button } from 'react-bootstrap';
 
@@ -91,7 +92,7 @@ const renderField = field => {
 		);
 	},
 	renderNetworkOptions = (that, CodeBoxField) => {
-		let networkDropdownItems = ['adsense', 'adx', 'adpTags', 'dfp', 'critieo', 'custom'];
+		let networkDropdownItems = networks;
 		return (
 			<Row>
 				<Col xs={12} className="u-padding-r10px">

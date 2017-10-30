@@ -222,6 +222,10 @@ const status = {
 		UPDATE_AFTER_SAVE_STATUS: 'UPDATE_AFTER_SAVE_STATUS',
 		SET_MODE: 'SET_MODE'
 	},
+	reportingActions = {
+		SET_REPORT: 'SET_REPORT',
+		GET_REPORT: 'GET_REPORT'
+	},
 	components = {
 		INSERT_CONTEXTMENU: 'INSERT_CONTEXTMENU',
 		EDIT_CONTEXTMENU: 'EDIT_CONTEXTMENU',
@@ -318,7 +322,9 @@ const status = {
 	uiModes = {
 		EDITOR_MODE: 1,
 		BROWSE_MODE: 2
-	};
+	},
+	networks = ['adsense', 'adx', 'adpTags', 'dfp', 'custom'],
+	reportingUrl = '/user/reports/generate';
 
 export {
 	status,
@@ -352,5 +358,8 @@ export {
 	uiCollections,
 	floats,
 	partners,
-	uiModes
+	uiModes,
+	networks,
+	reportingActions,
+	reportingUrl
 };
