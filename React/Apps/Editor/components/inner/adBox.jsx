@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import $ from 'jquery';
 import Utils from 'libs/utils';
 import { uiModes } from '../../consts/commonConsts';
+import Tags from '../../../../Components/Tags';
 import _ from 'lodash';
 
 const highLighterClass = '_APD_highlighter',
@@ -63,7 +64,8 @@ const highLighterClass = '_APD_highlighter',
 			width,
 			height,
 			pointerEvents: 'auto',
-			position: 'relative'
+			position: 'relative',
+			padding: '10px 0'
 		});
 
 		const sectionNameStyles = $.extend({}, adBoxSizeStyles, { left: '70px' });
@@ -71,12 +73,7 @@ const highLighterClass = '_APD_highlighter',
 		return (
 			<div style={listStyle}>
 				<div id={`ad-${id}`} className={highLighterClass} onClick={clickHandler} style={adBoxStyles}>
-					<div className="_AP_adSize _ap_reject" style={adBoxSizeStyles}>
-						{adBoxSizeContent}
-					</div>
-					<div className="_AP_adSize _ap_reject" style={sectionNameStyles}>
-						{props.sectionName}
-					</div>
+					<Tags labels={[props.sectionName, adBoxSizeContent]} />
 					{isCustomZoneId ? renderCustomZoneIdLabel(customZoneIdStyles, customZoneIdText) : null}
 				</div>
 			</div>
