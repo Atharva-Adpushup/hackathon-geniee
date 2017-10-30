@@ -471,6 +471,7 @@ class variationSectionElement extends Component {
 						)}
 					</Col>
 				</Row>
+			</li>
 		);
 	}
 }
