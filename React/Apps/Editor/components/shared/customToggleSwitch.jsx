@@ -71,7 +71,7 @@ class customToggleSwitch extends React.Component {
 		return (
 			<div className={options.errorClassName}>
 				<Col className={labelClassNames} xs={options.labelSize}>
-					<b>{this.props.labelText}</b>
+					{options.labelBold ? <b>{this.props.labelText}</b> : this.props.labelText}
 				</Col>
 				<Col className={componentClassNames} xs={options.componentSize}>
 					{this.renderToggleSwitch()}
@@ -112,7 +112,8 @@ class customToggleSwitch extends React.Component {
 			classNamesProps: this.props.className && this.props.className.length > 0 ? this.props.className : '',
 			labelSize: this.props.labelSize,
 			componentSize: this.props.componentSize,
-			customComponentClass: this.props.customComponentClass
+			customComponentClass: this.props.customComponentClass,
+			labelBold: this.props.labelBold
 		};
 
 		if (options.layout === 'vertical') {
@@ -140,7 +141,8 @@ customToggleSwitch.defaultProps = {
 	defaultLayout: false,
 	labelSize: 8,
 	componentSize: 4,
-	customComponentClass: ''
+	customComponentClass: '',
+	labelBold: true
 };
 
 export default customToggleSwitch;
