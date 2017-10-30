@@ -62,16 +62,26 @@ function setDeviceType(value) {
 }
 
 function setNetworkType(value) {
-	let response = 2;
+	/* 1 brealtime, 2 springserve, 3 adsense, 4 dfp, 5 adx */
+	let response = [];
 	switch (value) {
 		case 'ADSENSE':
-			response = 2;
+			response.push(3);
 			break;
 		case 'ADX':
-			response = 4;
+			response.push(5);
+			break;
+		case 'DFP':
+			response.push(4);
 			break;
 		case 'ADP TAGS':
-			response = 0;
+			response.push(1, 2, 4);
+			break;
+		case 'BREALTIME':
+			response.push(1);
+			break;
+		case 'SPRINGSERVE':
+			response.push(2);
 			break;
 	}
 	return response;
@@ -101,9 +111,7 @@ function whereWrapper(data) {
 	data.hasOwnProperty('section') ? (data.section_md5 = data.section) : null;
 	data.hasOwnProperty('variation') ? (data.variation_id = data.variation) : null;
 	data.hasOwnProperty('pagegroup') ? (data.name = data.pagegroup) : null;
-	data.hasOwnProperty('device_type')
-		? ((data.platform = data.device_type), (data.device_type = setDeviceType(data.device_type)))
-		: null;
+	data.hasOwnProperty('device_type') ? (data.device_type = setDeviceType(data.device_type)) : null;
 	data.hasOwnProperty('ntwid') ? (data.ntwid = setNetworkType(data.ntwid)) : null;
 
 	delete data.section;
@@ -177,23 +185,24 @@ function generate(data) {
 	total_requests ----> total_pageviews
 */
 
-let params = {
-	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid', 'device_type', 'ntwid'],
-	where: {
-		siteid: 28822,
-		pagegroup: ['MIC'],
-		variation: ['2e68228f-84da-415e-bfcf-bfcf67c87570'],
-		device_type: 'DESKTOP'
-	},
-	groupBy: ['ntwid']
-};
+// let params = {
+// 	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid', 'device_type', 'ntwid'],
+// 	where: {
+// 		siteid: 28822,
+// 		pagegroup: ['MIC'],
+// 		variation: ['2e68228f-84da-415e-bfcf-bfcf67c87570'],
+// 		device_type: 'DESKTOP',
+// 		ntwid: 'ADP TAGS'
+// 	},
+// 	groupBy: ['ntwid']
+// };
 
-generate(params)
-	.then(response => {
-		debugger;
-	})
-	.catch(err => {
-		debugger;
-	});
+// generate(params)
+// 	.then(response => {
+// 		debugger;
+// 	})
+// 	.catch(err => {
+// 		debugger;
+// 	});
 
 module.exports = { generate, getPVS };

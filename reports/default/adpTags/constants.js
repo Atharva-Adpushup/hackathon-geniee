@@ -9,26 +9,6 @@
 		Revenue from AdpTagReport
 		Impressions, Xpath_miss from ApexSectionReport
 		Siteid, Date from ApexHourlySiteReport  
-*/
-/*
-SELECT   a.total_impressions, a.total_xpath_miss ,  
-a.report_date, a.siteid ,  b.total_cpm,  a.name, a.variation_id , a.section_md5  
-FROM ( SELECT  c.report_date,  c.siteid,  SUM(d.total_impressions) AS total_impressions,  
-SUM(d.total_xpath_miss) AS total_xpath_miss,  d.axsid,  c.axpgid, c.axvid  ,e.name  ,f.variation_id  
-,g.section_md5  FROM ApexHourlySiteReport c , ApexSectionReport d  ,ApexPageGroup e, ApexVariation f, ApexSection g  
-WHERE  c.report_date BETWEEN '2017-09-01' AND '2017-09-01'   AND c.siteid='28822'  
-AND g.section_md5='429e5150-e40b-4afb-b165-93b8bde3cf21'  AND f.variation_id='2e68228f-84da-415e-bfcf-bfcf67c87570'  
-AND e.name='MIC'  AND c.axhsrid=d.axhsrid  GROUP BY  c.report_date, c.siteid,  d.axsid,  c.axpgid, c.axvid  ,e.name  
-,f.variation_id  ,g.section_md5  ) a  INNER JOIN ( SELECT  h.report_date,  h.siteid,  SUM(h.total_cpm) AS total_cpm,  
-h.axpgid, h.axvid , h.axsid  ,e.name  ,f.variation_id  ,g.section_md5  FROM AdpTagReport h  ,ApexPageGroup e, 
-ApexVariation f, ApexSection g  WHERE  h.report_date BETWEEN '2017-09-01' AND '2017-09-01'   AND h.siteid='28822'  
-AND g.section_md5='429e5150-e40b-4afb-b165-93b8bde3cf21'  AND f.variation_id='2e68228f-84da-415e-bfcf-bfcf67c87570'  
-AND e.name='MIC'  GROUP BY  h.report_date, h.siteid ,  h.axpgid, h.axvid , h.axsid  ,e.name  ,f.variation_id  
-,g.section_md5  ) b ON a.report_date=b.report_date AND a.siteid=b.siteid AND a.axpgid=b.axpgid  AND a.axvid=b.axvid  
-AND a.axsid=b.axsid
-
-
-Based on Group By
 
 Select							WHERE						GROUP BY
 
@@ -291,8 +271,8 @@ const schema = {
 		fields: {
 			forUser: ['name', 'variation_id', 'section_md5'],
 			forOn: ['axpgid', 'axvid', 'axsid'],
-			where: ['name', 'variation_id', 'section_md5', 'report_date', 'siteid'],
-			groupBy: ['section', 'variation', 'pagegroup']
+			where: ['name', 'variation_id', 'section_md5', 'report_date', 'siteid', 'device_type'],
+			groupBy: ['section_md5', 'variation_id', 'name']
 		},
 		tables: {
 			pagegroup: {
@@ -312,7 +292,7 @@ const schema = {
 	firstQuery: {
 		aggregate: ['total_requests', 'total_xpath_miss'],
 		nonAggregate: ['report_date', 'siteid', 'device_type'],
-		where: ['device_type'],
+		where: [],
 		tables: {
 			apexSiteReport: {
 				table: 'ApexHourlySiteReport',
@@ -328,7 +308,7 @@ const schema = {
 	secondQuery: {
 		aggregate: ['total_revenue', 'total_impressions'],
 		nonAggregate: ['report_date', 'siteid', 'ntwid', 'platform'],
-		where: ['ntwid', 'platform'],
+		where: ['ntwid'],
 		tables: {
 			adpTagReport: {
 				table: 'AdpTagReport',

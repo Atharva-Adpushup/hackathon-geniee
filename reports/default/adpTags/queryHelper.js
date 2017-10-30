@@ -79,13 +79,14 @@ var Promise = require('bluebird'),
 					alias = schema.common.tables.section.alias;
 					break;
 				case 'device_type':
-					alias = schema.firstQuery.tables.apexSiteReport.alias;
+					alias = false;
+					// alias = schema.firstQuery.tables.apexSiteReport.alias;
 					break;
 				case 'ntwid':
 					alias = flag ? schema.secondQuery.alias : schema.secondQuery.tables.adpTagReport.alias;
 					break;
 				case 'platform':
-					alias = schema.secondQuery.tables.adpTagReport.alias;
+					alias = flag ? schema.secondQuery.alias : schema.secondQuery.tables.adpTagReport.alias;
 					break;
 			}
 			return alias;
@@ -199,7 +200,7 @@ var Promise = require('bluebird'),
 			});
 			return level;
 		},
-		__completeReaminingSelect: () => {
+		__completeRemainingSelect: () => {
 			if (common.level.section || common.level.variation || common.level.pagegroup) {
 				let index = common.fields.forOn.indexOf('axsid');
 				let slicedArray = common.fields.forOn.concat([]);
@@ -254,6 +255,22 @@ var Promise = require('bluebird'),
 		},
 		__setLevelFromGroupBy: data => {
 			return !_.isArray(data) || !data.length ? Promise.resolve(false) : queryHelper.__setLevel(data);
+		},
+		__whereInParamsProcessing: (key, value) => {
+			let lengthOfValue = value.length;
+			let condition = `.${key} IN (`;
+			for (i = 0; i < lengthOfValue; i++) {
+				let name = `@__${key}_${i}__`;
+				condition += `${name},`;
+				common.where.push({
+					name: name.substr(1),
+					type: schema.where[key].type,
+					value: value[i]
+				});
+			}
+			condition = condition.slice(0, -1);
+			condition += ')';
+			return condition;
 		},
 		select: (data, flag) => {
 			let alias =
@@ -332,61 +349,43 @@ var Promise = require('bluebird'),
 					);
 					delete data.from;
 					delete data.to;
-
-					// handling where conditions specfic to queries
-					// first query --> device_type
-					// second query -->  ntwid, platform
-					let disjointFields = _.difference(Object.keys(data), schema.common.fields.where);
-					_.forEach(disjointFields, (value, key) => {
-						let alias = queryHelper.__getAlias(value);
-						schema.firstQuery.where.indexOf(value) !== -1
-							? (firstQuery.where += ` AND ${alias
-									? alias
-									: schema.firstQuery.tables.apexSiteReport.alias}.${value}=@__${value}__ `)
-							: (secondQuery.where += ` AND ${alias
-									? alias
-									: schema.secondQuery.tables.adpTagReport.alias}.${value}=@__${value}__ `);
-						common.where.push(
-							Object.assign(schema.where[value], {
-								value: data[value]
-							})
-						);
-						delete data[value];
-					});
-
 					return queryHelper.__setLevel(data);
 				})
 				.then(() => {
-					_.forEach(data, (value, key) => {
-						let alias = queryHelper.__getAlias(key);
-						let condition = `.${key}=@__${key}__`;
-						if (key == 'variation_id' || key == 'name' || key == 'section') {
-							let lengthOfValue = value.length;
-							condition = `.${key} IN (`;
-							for (i = 0; i < lengthOfValue; i++) {
-								let name = `@__${key}_${i}__`;
-								condition += `${name},`;
-								common.where.push({
-									name: name.substr(1),
-									type: schema.where[key].type,
-									value: value[i]
-								});
-							}
-							condition = condition.slice(0, -1);
-							condition += ')';
-						}
+					function addToFirstWhere(alias, condition) {
 						firstQuery.where += ` AND ${alias
 							? alias
 							: schema.firstQuery.tables.apexSiteReport.alias}${condition} `;
+					}
+
+					function addToSecondWhere(alias, condition) {
 						secondQuery.where += ` AND ${alias
 							? alias
 							: schema.secondQuery.tables.adpTagReport.alias}${condition} `;
-						if (!_.isArray(value)) {
+					}
+
+					_.forEach(data, (value, key) => {
+						let alias = queryHelper.__getAlias(key);
+						let condition = `.${key}=@__${key}__`;
+						if (_.isArray(value)) {
+							condition = queryHelper.__whereInParamsProcessing(key, value);
+						} else {
 							common.where.push(
 								Object.assign(schema.where[key], {
 									value: value
 								})
 							);
+						}
+						if (
+							schema.firstQuery.where.indexOf(key) !== -1 ||
+							schema.secondQuery.where.indexOf(key) !== -1
+						) {
+							schema.firstQuery.where.indexOf(key) !== -1
+								? addToFirstWhere(alias, condition)
+								: addToSecondWhere(alias, condition);
+						} else {
+							addToFirstWhere(alias, condition);
+							addToSecondWhere(alias, condition);
 						}
 					});
 					return true;
@@ -396,7 +395,7 @@ var Promise = require('bluebird'),
 			return queryHelper
 				.__setLevelFromGroupBy(data)
 				.then(response => {
-					let uniqueGroupByFields = _.difference(data, schema.common.groupBy);
+					let uniqueGroupByFields = _.difference(data, schema.common.fields.groupBy);
 					common.groupBy = common.fields.forUser.length
 						? ` GROUP BY ${queryHelper.__reduceArrayToString(
 								common.fields.forUser,
@@ -419,7 +418,7 @@ var Promise = require('bluebird'),
 						: null;
 					return queryHelper.__groupBy();
 				})
-				.then(response => queryHelper.__completeReaminingSelect())
+				.then(response => queryHelper.__completeRemainingSelect())
 				.then(response => queryHelper.__setCommonColumnsCondition());
 		},
 		orderBy: data => {
@@ -472,29 +471,3 @@ var Promise = require('bluebird'),
 	};
 
 module.exports = queryHelper;
-
-/*
-pageviews / impressions
-
-total impressions for adptagreport -- all levels
-
-total_pageviews from apexhourlysitereport -- till variation level
-
-Feedback call
-	one keen
-	one e3 service
-
-
-TO DO:
-Remove Edit Adcode In content section
-And replace it with price floor
-
-Admin
-Pageviews
-Xpath_miss
-
-
-Normal
-Impressions
-
-*/

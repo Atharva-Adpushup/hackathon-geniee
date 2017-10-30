@@ -3,9 +3,6 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Row, Col, Button } from 'react-bootstrap';
 import moment from 'moment';
-import 'react-dates/initialize';
-import { DateRangePicker } from 'react-dates';
-import 'react-dates/lib/css/_datepicker.css';
 import {
 	deleteSection,
 	renameSection,
@@ -20,6 +17,8 @@ import {
 import { updateNetwork, updateAdCode } from 'actions/adActions';
 import { resetErrors } from 'actions/uiActions';
 import { generateReport } from 'actions/reportingActions';
+import Filters from './filters.jsx';
+import PaneLoader from '../../../../../../../Components/PaneLoader.jsx';
 import VariationSectionElement from './variationSectionElement';
 
 class variationSections extends Component {
@@ -30,11 +29,16 @@ class variationSections extends Component {
 				.subtract(7, 'days')
 				.startOf('day'),
 			endDate: moment().startOf('day'),
-			focusedInput: false
+			focusedInput: undefined,
+			loadingReport: false
 		};
 		this.datesUpdated = this.datesUpdated.bind(this);
 		this.focusUpdated = this.focusUpdated.bind(this);
 		this.generateReportWrapper = this.generateReportWrapper.bind(this);
+	}
+
+	componentWillReceiveProps() {
+		this.setState({ loadingReport: false });
 	}
 
 	datesUpdated({ startDate, endDate }) {
@@ -57,6 +61,7 @@ class variationSections extends Component {
 			from: this.state.startDate.format('YYYY-MM-DD'),
 			to: this.state.endDate.format('YYYY-MM-DD')
 		});
+		this.setState({ loadingReport: true });
 	}
 
 	render() {
@@ -85,68 +90,52 @@ class variationSections extends Component {
 					<h1 className="variation-section-heading">Variation Sections</h1>
 				</span>
 				{ui.variationPanel.expanded ? (
-					<Row className="mb-20">
-						<Col xs={5}>
-							{/* <input
-								placeholder="Enter section name"
-								ref="sectionName"
-								type="text"
-								className="inputMinimal"
-								style={{ padding: '14px 10px' }}
-							/> */}
-						</Col>
-						<Col xs={7}>
-							<Col xs={7}>
-								<DateRangePicker
-									onDatesChange={this.datesUpdated}
-									onFocusChange={this.focusUpdated}
-									focusedInput={this.state.focusedInput}
-									startDate={this.state.startDate}
-									endDate={this.state.endDate}
-									showDefaultInputIcon={true}
-									hideKeyboardShortcutsPanel={true}
-									showClearDates={true}
-									displayFormat={'DD-MM-YYYY'}
-									isOutsideRange={() => {}}
-								/>
-							</Col>
-							<Col xs={5} className="mT-10">
-								<Button
-									className="btn-lightBg btn-copy btn-block"
-									onClick={this.generateReportWrapper}
-									type="submit"
-								>
-									Generate
-								</Button>
-							</Col>
-						</Col>
-					</Row>
+					<Filters
+						onDatesChange={this.datesUpdated}
+						onFocusChange={this.focusUpdated}
+						focusedInput={this.state.focusedInput}
+						startDate={this.state.startDate}
+						endDate={this.state.endDate}
+						showDefaultInputIcon
+						hideKeyboardShortcutsPanel
+						showClearDates
+						displayFormat={'DD-MM-YYYY'}
+						generateReport={this.generateReportWrapper}
+					/>
 				) : null}
 				{!sections.length ? <span>No Sections</span> : ''}
 				<ul className="section-list row">
-					{sections.map((section, key) => (
-						<div key={key} className="col-sm-6">
-							<VariationSectionElement
-								section={section}
-								key={key}
-								variation={variation}
-								onDeleteSection={onDeleteSection}
-								onRenameSection={onRenameSection}
-								updateAdCode={updateAdCode}
-								updateNetwork={updateNetwork}
-								onUpdatePartnerData={onUpdatePartnerData}
-								onUpdateXPath={onUpdateXPath}
-								onSectionAllXPaths={onSectionAllXPaths}
-								onValidateXPath={onValidateXPath}
-								onResetErrors={onResetErrors}
-								onSectionXPathValidate={onSectionXPathValidate}
-								onIncontentFloatUpdate={onIncontentFloatUpdate}
-								onScrollSectionIntoView={onScrollSectionIntoView}
-								ui={ui}
-								reporting={reporting}
-							/>
-						</div>
-					))}
+					{this.state.loadingReport ? (
+						<PaneLoader
+							message="Loading Data!"
+							state="load"
+							styles={{ height: '500px', background: '#ebebeb' }}
+						/>
+					) : (
+						sections.map((section, key) => (
+							<div key={key} className="col-sm-6">
+								<VariationSectionElement
+									section={section}
+									key={key}
+									variation={variation}
+									onDeleteSection={onDeleteSection}
+									onRenameSection={onRenameSection}
+									updateAdCode={updateAdCode}
+									updateNetwork={updateNetwork}
+									onUpdatePartnerData={onUpdatePartnerData}
+									onUpdateXPath={onUpdateXPath}
+									onSectionAllXPaths={onSectionAllXPaths}
+									onValidateXPath={onValidateXPath}
+									onResetErrors={onResetErrors}
+									onSectionXPathValidate={onSectionXPathValidate}
+									onIncontentFloatUpdate={onIncontentFloatUpdate}
+									onScrollSectionIntoView={onScrollSectionIntoView}
+									ui={ui}
+									reporting={reporting}
+								/>
+							</div>
+						))
+					)}
 				</ul>
 			</div>
 		);

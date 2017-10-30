@@ -322,7 +322,7 @@ const status = {
 		EDITOR_MODE: 1,
 		BROWSE_MODE: 2
 	},
-	networks = ['adsense', 'adx', 'adpTags', 'dfp', 'critieo', 'custom'],
+	networks = ['adsense', 'adx', 'adpTags', 'dfp', 'custom'],
 	reportingUrl = '/user/reports/generate';
 
 export {
