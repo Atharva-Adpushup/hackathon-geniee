@@ -84,6 +84,7 @@ class variationSectionElement extends Component {
 				id="js-header-bidding-switch"
 				on="Yes"
 				off="No"
+				customComponentClass="u-padding-0px"
 				labelBold={false}
 				onChange={this.onToggleChange}
 				{...field.input}
@@ -400,10 +401,10 @@ class variationSectionElement extends Component {
 														})}
 													</Col>
 												</div>
-												<div>
-													<Col className="u-padding-r10px">
+												<div className="mT-10">
+													<Col>
 														<Button
-															className="btn-lightBg btn-copy btn-block"
+															className="btn-lightBg btn-save btn-block"
 															onClick={this.updateNetworkWrapper}
 															type="submit"
 														>
