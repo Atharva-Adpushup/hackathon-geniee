@@ -56,6 +56,7 @@ const save = (url, data) => $.ajax({ type: 'POST', url, data, dataType: 'json' }
 					computedResult.sectionByIds[sectionName].ads = _.keys(computedResult.sectionByIds[sectionName].ads);
 				});
 
+				computedResult.reporting = rawData.reporting;
 				computedResult = openPageGroupIfPresent(computedResult);
 
 				deferred.resolve(computedResult);

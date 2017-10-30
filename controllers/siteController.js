@@ -49,7 +49,7 @@ var express = require('express'),
 		const hbcfPromise =
 			editMode === 'update'
 				? appBucket.replacePromise(`hbcf::${siteId}`, json)
-				: (hbcfPromise = appBucket.insertPromise(`hbcf::${siteId}`, json));
+				: appBucket.insertPromise(`hbcf::${siteId}`, json);
 
 		return [hbcfPromise, site];
 	};
@@ -197,7 +197,8 @@ router
 					siteId: data.site.get('siteId'),
 					channels: data.site.get('channels'),
 					environment: config.environment.HOST_ENV,
-					currentSiteId: req.params.siteId
+					currentSiteId: req.params.siteId,
+					isSuperUser: req.session.isSuperUser || false
 				});
 			})
 			.catch(function() {

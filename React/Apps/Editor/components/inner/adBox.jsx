@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import $ from 'jquery';
 import Utils from 'libs/utils';
+import { uiModes } from '../../consts/commonConsts';
 import _ from 'lodash';
 
 const highLighterClass = '_APD_highlighter',
@@ -37,7 +38,10 @@ const highLighterClass = '_APD_highlighter',
 			clickHandler = ev => {
 				const $el = $(ev.target),
 					position = Utils.dom.getElementBounds($(ev.target));
-				props.clickHandler(id, position, Utils.ui.getElementSelectorCords($el));
+
+				props.mode == uiModes.EDITOR_MODE // Only dispatch action if EDITOR MODE
+					? props.clickHandler(id, position, Utils.ui.getElementSelectorCords($el))
+					: null;
 			},
 			isPartnerData = !!props.partnerData,
 			isNetworkGeniee = !!(props.ad.network && props.ad.network === 'geniee'),

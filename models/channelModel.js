@@ -79,12 +79,10 @@ function apiModule() {
 					}
 
 					if (!_.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])) {
-						site
-							.get('cmsInfo')
-							.pageGroups.push({
-								sampleUrl: json.sampleUrl,
-								pageGroup: json.pageGroupName.toUpperCase()
-							});
+						site.get('cmsInfo').pageGroups.push({
+							sampleUrl: json.sampleUrl,
+							pageGroup: json.pageGroupName.toUpperCase()
+						});
 					} else {
 						var existingPageGroup = _.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])
 								.pageGroup,

@@ -4,7 +4,7 @@ import {
 	getVariationStructuredSectionsWithAds
 } from '../selectors/variationSelectors';
 import { getActiveChannel } from '../selectors/channelSelectors';
-import { messengerCommands, channelActions, sectionActions } from '../consts/commonConsts';
+import { messengerCommands, channelActions, sectionActions, uiActions } from '../consts/commonConsts';
 import { sendMessage } from '../scripts/messengerHelper';
 
 const getData = state => {
@@ -63,6 +63,8 @@ const getData = state => {
 				});
 			} else if (action.type == sectionActions.SCROLL_TO_VIEW) {
 				sendMessage(nextState.activeChannelId, messengerCommands.SCROLL_TO_VIEW, { adId: action.adId });
+			} else if (action.type == uiActions.SET_MODE) {
+				sendMessage(nextState.activeChannelId, messengerCommands.SET_MODE, { mode: action.mode });
 			}
 		}
 

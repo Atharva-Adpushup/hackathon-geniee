@@ -27,6 +27,10 @@ module.exports = function(grunt) {
 			signupBuild: {
 				src: ['public/assets/js/builds/signup.js'],
 				dest: 'public/assets/js/builds/signup.min.js'
+			},
+			utmParamterCookieBuild: {
+				src: ['public/assets/js/builds/utmParamCookie.js'],
+				dest: 'public/assets/js/builds/utmParamCookie.min.js'
 			}
 		},
 		concat: {
@@ -36,7 +40,7 @@ module.exports = function(grunt) {
 					'public/assets/js/libs/third-party/bootstrap-multiselect.js',
 					'public/assets/js/libs/third-party/notifications.js',
 					'public/assets/js/libs/custom/appEvent.js',
-					'Editor/app/libs/adpushup.js'
+					'public/assets/js/libs/custom/adpushup.js'
 				],
 				dest: 'public/assets/js/libs/custom/base-libs.js'
 			},
@@ -47,6 +51,13 @@ module.exports = function(grunt) {
 					'public/assets/js/libs/custom/signup.js'
 				],
 				dest: 'public/assets/js/builds/signup.js'
+			},
+			utmParamterCookieBuild: {
+				src: [
+					'public/assets/js/libs/third-party/js.cookie.js',
+					'public/assets/js/libs/custom/utm-parameters-cookie.js'
+				],
+				dest: 'public/assets/js/builds/utmParamCookie.js'
 			}
 		},
 		sass: {

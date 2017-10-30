@@ -24,6 +24,7 @@ class variationManager extends React.Component {
 						partnerData={section.partnerData ? section.partnerData : {}}
 						ads={section.ads}
 						operation={section.operation}
+						mode={this.props.mode}
 						onXpathMiss={this.props.onXpathMiss}
 						onAdClick={this.props.onAdClick}
 					/>

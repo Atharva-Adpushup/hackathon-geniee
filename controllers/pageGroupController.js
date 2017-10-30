@@ -8,8 +8,8 @@ var express = require('express'),
 	channelModel = require('../models/channelModel'),
 	router = express.Router({ mergeParams: true });
 
-router.get('/:pageGroupId', function(req, res) {
-	channelModel
+router.get('/:pageGroupId', (req, res) => {
+	return channelModel
 		.getPageGroupById({ id: req.params.pageGroupId, viewName: 'channelById', isExtendedParams: true })
 		.then(function(pageGroup) {
 			return res.render('pageGroup', {

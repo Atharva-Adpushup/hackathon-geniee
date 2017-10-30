@@ -1,0 +1,153 @@
+$primaryColor: #eb575c;
+$borderColor: #ddd;
+$greyBg: #eee;
+$greyBorder: #e6e6e6;
+$fontColor: #555;
+
+html,
+body {
+	overflow-x: hidden;
+}
+
+.report-table {
+	margin: 20px;
+	font-size: 1.2em;
+	border: 1px solid $borderColor;
+
+	.col-md-4 {
+		padding: 15px 25px;
+
+		&:nth-child(2) {
+			text-align: center;
+		}
+	}
+
+	input[id='select-filter-reportTable'] {
+		padding: 16px;
+		font-size: 1em;
+	}
+
+	thead {
+		background-color: $greyBg;
+		border-top: 2px solid $borderColor;
+	}
+}
+
+.report-controls-wrapper {
+	margin: 20px 0;
+
+	button.btn.btn-lightBg {
+		width: 100%;
+		padding: 7px 10px;
+	}
+}
+
+.react-select-box-container .react-select-box {
+	padding: 8px;
+	border-radius: 3px;
+}
+
+.DateRangePicker {
+	display: block;
+
+	.DateRangePickerInput {
+		display: block;
+		border-color: $greyBorder;
+		border-radius: 3px;
+
+		.DateRangePickerInput_calendarIcon,
+		.DateRangePickerInput_clearDates {
+			width: auto;
+			padding: 0 8px;
+
+			&:hover {
+				background: none;
+			}
+		}
+
+		.DateInput {
+			padding: 0;
+			text-align: center;
+			font-size: 1em;
+			width: 90px;
+			font-family: 'Karla', sans-serif;
+			font-size: 1.1em;
+
+			input {
+				cursor: pointer;
+			}
+		}
+	}
+
+	.DayPickerNavigation_button__default {
+		width: 50px;
+	}
+}
+
+.DateRangePicker_picker {
+	top: 45px !important;
+}
+
+.DateInput__openDown_3.DateInput__openDown_3.DateInput__openDown_3:after {
+	top: 36px;
+}
+
+.DateInput__openDown_3.DateInput__openDown_3.DateInput__openDown_3:before {
+	top: 35px;
+}
+
+.DateInput_displayText__focused_3.DateInput_displayText__focused_3.DateInput_displayText__focused_3,
+.DateInput_displayText__focused_2.DateInput_displayText__focused_2 {
+	color: #fff;
+	border-radius: 0;
+	background-color: lighten($primaryColor, 7%);
+	border-color: lighten($primaryColor, 7%);
+}
+
+.CalendarDay__hovered_span.CalendarDay__hovered_span_2 {
+	&,
+	&:hover {
+		background-color: lighten($primaryColor, 7%);
+		color: #fff;
+		border-color: lighten($primaryColor, 7%);
+	}
+}
+
+.CalendarDay__selected_span_2.CalendarDay__selected_span_2,
+.CalendarDay__selected_span_3.CalendarDay__selected_span_3.CalendarDay__selected_span_3,
+.CalendarDay__selected_4.CalendarDay__selected_4.CalendarDay__selected_4.CalendarDay__selected_4 {
+	background-color: lighten($primaryColor, 7%);
+	border-color: lighten($primaryColor, 7%);
+
+	&:hover {
+		background-color: lighten($primaryColor, 10%);
+		border-color: lighten($primaryColor, 10%);
+	}
+}
+
+.CalendarDay__selected_2.CalendarDay__selected_2,
+.CalendarDay__selected_3.CalendarDay__selected_3.CalendarDay__selected_3,
+.CalendarDay__hovered_span.CalendarDay__hovered_span_3.CalendarDay__selected.CalendarDay__selected_4 {
+	&,
+	&:hover {
+		background-color: $primaryColor;
+		border-color: $primaryColor;
+	}
+}
+
+.pane-loader-icon {
+	display: block;
+	color: $primaryColor;
+	font-size: 2.5em;
+	margin-bottom: 20px;
+}
+
+.react-select-box-container .react-select-box-clear {
+	top: 9px;
+}
+
+.variation-alert {
+	width: 70%;
+	margin: 0 auto;
+	font-size: 1.2em;
+}

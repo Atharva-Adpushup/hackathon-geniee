@@ -55,6 +55,7 @@ const showEditMenu = (sectionId, adId, position, variationId) => ({
 	});
 
 export {
+	setMode,
 	showEditMenu,
 	showInsertMenu,
 	hideEditMenu,
