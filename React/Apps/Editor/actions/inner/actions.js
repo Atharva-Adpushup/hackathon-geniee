@@ -5,7 +5,12 @@ import { sendMessage } from 'scripts/inner/messengerHelper';
 
 const highlightElement = $el => {
 		const el = $el.get(0);
-		if (el.tagName === 'HTML' || el.tagName === 'BODY' || $el.hasClass('_ap_reject')) {
+		if (
+			el.tagName === 'HTML' ||
+			el.tagName === 'BODY' ||
+			$el.hasClass('_ap_reject') ||
+			$el.parents().hasClass('_ap_reject')
+		) {
 			return { type: hbBoxActions.HIDE_HB_BOX };
 		}
 		return {
