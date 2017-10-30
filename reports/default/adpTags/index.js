@@ -172,8 +172,8 @@ function generate(data) {
 }
 
 /*
-	total_impressions ----> total_ad_requests
-	total_requests ----> total_pageviews
+total_impressions ----> total_ad_requests
+total_requests ----> total_pageviews
 */
 
 // let params = {

@@ -21,19 +21,26 @@ var express = require('express'),
 	{ languageMapping, languageCodeSupport, defaultLanguageCode } = require('../i18n/language-mapping'),
 	reportsLocalizedObject = require('../i18n/reports/geniee/constants'),
 	{ fileLogger } = require('../helpers/logger/file/index'),
+	{ queryResultProcessing } = require('../helpers/commonFunctions'),
 	// eslint-disable-next-line new-cap
 	router = express.Router({ mergeParams: true }),
 	reports = require('../models/reportsModel');
 
-function queryResultProcessing(queryResult, response, res) {
-	let columnsAndRows =
-		lodash.isArray(queryResult) && queryResult.length
-			? {
-					columns: Object.keys(queryResult.columns),
-					rows: queryResult
-				}
-			: { rows: [], message: 'empty result from query' };
-	return res.send(Object.assign(response, columnsAndRows));
+function resultProcessing(queryResult, response, needAggregated, res) {
+	if (needAggregated) {
+		return queryResultProcessing(queryResult).then(reportingObj => {
+			return res.send({ error: false, data: reportingObj });
+		});
+	} else {
+		let columnsAndRows =
+			lodash.isArray(queryResult) && queryResult.length
+				? {
+						columns: Object.keys(queryResult.columns),
+						rows: queryResult
+					}
+				: { rows: [], message: 'empty result from query' };
+		return res.send(Object.assign(response, columnsAndRows));
+	}
 }
 
 function errorHandling(err, response, res) {
@@ -723,14 +730,15 @@ router
 			);
 		}
 		let params = {
-			select: lodash.union(['report_date', 'siteid'], req.body.select),
-			where: req.body.where,
-			groupBy: req.body.groupBy || false,
-			orderBy: req.body.orderBy || false
-		};
+				select: lodash.union(['report_date', 'siteid'], req.body.select),
+				where: req.body.where,
+				groupBy: req.body.groupBy || false,
+				orderBy: req.body.orderBy || false
+			},
+			needAggregated = req.body.needAggregated || false;
 		return sqlReportingModule
 			.generate(params)
-			.then(queryResult => queryResultProcessing(queryResult, response, res))
+			.then(queryResult => resultProcessing(queryResult, response, needAggregated, res))
 			.catch(err => errorHandling(err, response, res));
 	})
 	.get('/pagegroups', (req, res) => {
@@ -747,7 +755,7 @@ router
 		}
 		return sqlQueryModule
 			.getPVS(siteid, 1)
-			.then(queryResult => queryResultProcessing(queryResult, response, res))
+			.then(queryResult => resultProcessing(queryResult, response, res))
 			.catch(err => errorHandling(err, response, res));
 	})
 	.get('/variations', (req, res) => {
@@ -764,7 +772,7 @@ router
 		}
 		return sqlQueryModule
 			.getPVS(siteid, 2)
-			.then(queryResult => queryResultProcessing(queryResult, response, res))
+			.then(queryResult => resultProcessing(queryResult, response, res))
 			.catch(err => errorHandling(err, response, res));
 	})
 	.get('/sections', (req, res) => {
@@ -781,7 +789,7 @@ router
 		}
 		return sqlQueryModule
 			.getPVS(siteid, 3)
-			.then(queryResult => queryResultProcessing(queryResult, response, res))
+			.then(queryResult => resultProcessing(queryResult, response, res))
 			.catch(err => errorHandling(err, response, res));
 	});
 

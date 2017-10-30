@@ -449,6 +449,26 @@ const randomStore = [],
 				objURL[$1] = window.decodeURIComponent($3.replace(/\+/g, ' '));
 			});
 			return objURL;
+		},
+		ajax: params => {
+			const { method, url, data } = params;
+
+			return new Promise((resolve, resject) => {
+				$.ajax({
+					method,
+					url,
+					headers: { 'Content-Type': 'application/json' },
+					data,
+					contentType: 'json',
+					dataType: 'json',
+					success: res => {
+						return resolve(res);
+					},
+					fail: res => {
+						return reject(res);
+					}
+				});
+			});
 		}
 	};
 
