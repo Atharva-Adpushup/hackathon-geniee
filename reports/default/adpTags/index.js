@@ -62,26 +62,17 @@ function setDeviceType(value) {
 }
 
 function setNetworkType(value) {
-	/* 1 brealtime, 2 springserve, 3 adsense, 4 dfp, 5 adx */
-	let response = [];
+	// 0=Unknown, 1=Mobile/Tablet, 2=PC, 3=Connected TV, 4=Phone, 5=Tablet, 6=Connected Device, 7=Set Top Box
+	let response = 2;
 	switch (value) {
 		case 'ADSENSE':
-			response.push(3);
+			response = 2;
 			break;
 		case 'ADX':
-			response.push(5);
-			break;
-		case 'DFP':
-			response.push(4);
+			response = 4;
 			break;
 		case 'ADP TAGS':
-			response.push(1, 2, 4);
-			break;
-		case 'BREALTIME':
-			response.push(1);
-			break;
-		case 'SPRINGSERVE':
-			response.push(2);
+			response = 0;
 			break;
 	}
 	return response;
@@ -181,20 +172,18 @@ function generate(data) {
 }
 
 /*
-	total_impressions ----> total_ad_requests
-	total_requests ----> total_pageviews
+total_impressions ----> total_ad_requests
+total_requests ----> total_pageviews
 */
 
 // let params = {
-// 	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid', 'device_type', 'ntwid'],
+// 	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid'],
 // 	where: {
 // 		siteid: 28822,
 // 		pagegroup: ['MIC'],
-// 		variation: ['2e68228f-84da-415e-bfcf-bfcf67c87570'],
-// 		device_type: 'DESKTOP',
-// 		ntwid: 'ADP TAGS'
+// 		variation: ['2e68228f-84da-415e-bfcf-bfcf67c87570']
 // 	},
-// 	groupBy: ['ntwid']
+// 	groupBy: ['section']
 // };
 
 // generate(params)
