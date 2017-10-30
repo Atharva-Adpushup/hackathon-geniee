@@ -15,7 +15,7 @@ const emptyScreen = () => <div className="tabContentbg" />,
 			tabPane.props.handleClick(tabPane.key);
 		}
 	},
-	dashboardLink = currentUser.userType === 'partner' ? `/user/site/${currentSiteId}/dashboard` : `/user/dashboard`,
+	dashboardLink = currentUser.userType === 'partner' ? `/user/site/${window.currentSiteId}/dashboard` : `/user/dashboard`,
 	// eslint-disable-next-line react/no-multi-comp
 	Tab = props => (
 		<div className="tabAreaWrap">

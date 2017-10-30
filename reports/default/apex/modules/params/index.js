@@ -1,6 +1,6 @@
 const moment = require('moment'),
 	extend = require('extend'),
-	{ getSqlValidParameterDates } = require('../../vendor/mssql/utils/utils');
+	{ getSqlValidParameterDates } = require('../../../common/mssql/utils/utils');
 
 module.exports = {
 	getParameterConfig: reportConfig => {

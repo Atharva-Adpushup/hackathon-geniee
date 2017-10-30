@@ -82,7 +82,7 @@ const renderDropdownList = that => {
 			</div>
 		);
 	},
-	renderInlineEditPanel = (that, colCompact, adCodeStyles, adCodeEdit, adCodeCheck, rootClassNames) => {
+	renderInlineEditPanel = (that, colCompact, adCodeStyles, adCodeEdit, adCodeCheck, rootClassNames, showTextarea) => {
 		const inlineInputStyles = {
 				width: '100%',
 				padding: '3.5px 10px',
@@ -97,16 +97,29 @@ const renderDropdownList = that => {
 					<div>
 						<Row style={{ margin: 0 }}>
 							<Col className="u-padding-r10px" xs={colCompact} style={{ position: 'relative' }}>
-								<input
-									style={inlineInputStyles}
-									type={inputType}
-									ref="editedText"
-									placeholder={that.props.text}
-									defaultValue={adCodeCheck}
-									onKeyUp={that.props.keyUpHandler ? that.keyUp.bind(that) : () => {}}
-									onFocus={that.props.changeHandler ? that.changeValue.bind(that) : () => {}}
-									onChange={that.props.changeHandler ? that.changeValue.bind(that) : () => {}}
-								/>
+								{showTextarea ? (
+									<textarea
+										style={Object.assign(inlineInputStyles, { height: '50px', resize: 'none' })}
+										type={inputType}
+										ref="editedText"
+										placeholder={that.props.text}
+										defaultValue={adCodeCheck}
+										onKeyUp={that.props.keyUpHandler ? that.keyUp.bind(that) : () => {}}
+										onFocus={that.props.changeHandler ? that.changeValue.bind(that) : () => {}}
+										onChange={that.props.changeHandler ? that.changeValue.bind(that) : () => {}}
+									/>
+								) : (
+									<input
+										style={inlineInputStyles}
+										type={inputType}
+										ref="editedText"
+										placeholder={that.props.text}
+										defaultValue={adCodeCheck}
+										onKeyUp={that.props.keyUpHandler ? that.keyUp.bind(that) : () => {}}
+										onFocus={that.props.changeHandler ? that.changeValue.bind(that) : () => {}}
+										onChange={that.props.changeHandler ? that.changeValue.bind(that) : () => {}}
+									/>
+								)}
 								{that.state.showDropdownList ? that.renderDropdownList() : null}
 								<span className="error-message">
 									{that.state.inputError

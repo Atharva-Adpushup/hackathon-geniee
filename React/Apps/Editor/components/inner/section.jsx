@@ -112,6 +112,7 @@ class Section extends React.Component {
 						ad={ad}
 						sectionName={props.sectionName}
 						partnerData={props.partnerData}
+						mode={props.mode}
 						clickHandler={props.onAdClick.bind(this, props.variationId, props.id)}
 					/>
 				))}

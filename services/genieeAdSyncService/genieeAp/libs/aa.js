@@ -6,7 +6,8 @@ var $ = require('jquery'),
 	height,
 	distanceAddFactor = 0,
 	rootBackgroundColor,
-	placements = {};
+	placements = {},
+	started = false;
 
 if (!window.console || !console.log) {
 	window.console = {};
@@ -434,6 +435,11 @@ $.fn.insertAds = function() {
 
 function placementStart($selector, placementConfig, doneCallback) {
 	var bootstrapPlacements = function() {
+			if (started) {
+				return false;
+			}
+
+			started = true;
 			$(placementConfig).each(function(i, adObj) {
 				var placeFn = function(adObj) {
 					$selector
@@ -474,6 +480,11 @@ function placementStart($selector, placementConfig, doneCallback) {
 				bootstrapPlacements();
 			}
 		};
+
+	$(document).ready(function() {
+		clearInterval(window.intervalId);
+		bootstrapPlacements();
+	});
 
 	window.intervalId = setInterval(imgReadyLoop, 100);
 }

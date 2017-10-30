@@ -7,7 +7,7 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 	__FRAME_PREFIX__ = '__adp_frame__',
 	logger = require('../helpers/logger'),
 	utils = require('../helpers/utils'),
-	hbStatus = require('./hbStatus'),
+	// hbStatus = require('./hbStatus'),
 	createPrebidContainer = function(adpSlotsBatch) {
 		var adUnitCodeForPrebid = [],
 			adpBatchId = adpSlotsBatch[0].batchId;
@@ -58,7 +58,7 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 				logger.log('Running bid auction...');
 
 				var adUnits = utils.getBatchAdUnits(adpSlotsBatch).join(',');
-				hbStatus.hbStart(adUnits);
+				// hbStatus.hbStart(adUnits);
 
 				document.body.appendChild(iframeEl);
 			}
@@ -77,7 +77,7 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 	prebidFinishCallback = function(pbjsParams, adpBatchId, timeout) {
 		var adpSlots = utils.getCurrentAdpSlotBatch(adpTags.adpBatches, adpBatchId),
 			adUnits = utils.getBatchAdUnits(adpSlots).join(',');
-		hbStatus.hbEnd(adUnits);
+		// hbStatus.hbEnd(adUnits);
 
 		adpTags.batchPrebiddingComplete = true;
 		if (Object.keys(adpSlots).length) {

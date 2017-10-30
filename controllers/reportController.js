@@ -11,7 +11,8 @@ var express = require('express'),
 	apexVariationReportService = require('../reports/default/apex/service'),
 	apexParameterModule = require('../reports/default/apex/modules/params/index'),
 	universalReportService = require('../reports/universal/index'),
-	sqlQueryModule = require('../reports/default/apex/vendor/mssql/queryHelpers/fullSiteData'),
+	sqlQueryModule = require('../reports/default/common/mssql/queryHelpers/fullSiteData'),
+	sqlReportingModule = require('../reports/default/adpTags/index'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
 	moment = require('moment'),
@@ -24,6 +25,27 @@ var express = require('express'),
 	router = express.Router({ mergeParams: true }),
 	reports = require('../models/reportsModel');
 
+function queryResultProcessing(queryResult, response, res) {
+	let columnsAndRows =
+		lodash.isArray(queryResult) && queryResult.length
+			? {
+					columns: Object.keys(queryResult.columns),
+					rows: queryResult
+				}
+			: { rows: [], message: 'empty result from query' };
+	return res.send(Object.assign(response, columnsAndRows));
+}
+
+function errorHandling(err, response, res) {
+	console.log(err);
+	return res.send(
+		Object.assign(response, {
+			error: true,
+			message: err.message || 'Error while fetching result. Please try later.'
+		})
+	);
+}
+
 router
 	// .get('/performance', function(req, res) {
 	// 	var siteId = req.params.siteId,
@@ -35,6 +57,18 @@ router
 	// 		pageUrl: url
 	// 	});
 	// })
+	.get('/adpushupReport', (req, res) => {
+		return siteModel
+			.getUniquePageGroups(req.params.siteId)
+			.then(pageGroups =>
+				res.render('adpushupReport', {
+					pageGroups,
+					siteId: req.params.siteId,
+					isSuperUser: req.session.isSuperUser
+				})
+			)
+			.catch(() => res.send('Some error occurred! Please try again later.'));
+	})
 	.get('/performance', function(req, res) {
 		var siteId = req.params.siteId,
 			paramConfig = {
@@ -675,6 +709,80 @@ router
 		return reports.doESSearch(config).then(function(result) {
 			return res.json(result);
 		});
+	})
+	.post('/generate', (req, res) => {
+		let response = {
+			error: false
+		};
+		if (!req.body || !req.body.where || !req.body.where.siteid) {
+			return res.send(
+				Object.assign(response, {
+					error: true,
+					message: 'Error in request parameters'
+				})
+			);
+		}
+		let params = {
+			select: lodash.union(['report_date', 'siteid'], req.body.select),
+			where: req.body.where,
+			groupBy: req.body.groupBy || false,
+			orderBy: req.body.orderBy || false
+		};
+		return sqlReportingModule
+			.generate(params)
+			.then(queryResult => queryResultProcessing(queryResult, response, res))
+			.catch(err => errorHandling(err, response, res));
+	})
+	.get('/pagegroups', (req, res) => {
+		let response = {
+			error: false
+		};
+		if (!req.query.siteid) {
+			return res.send(
+				Object.assign(response, {
+					error: true,
+					message: 'Site id missing'
+				})
+			);
+		}
+		return sqlQueryModule
+			.getPVS(siteid, 1)
+			.then(queryResult => queryResultProcessing(queryResult, response, res))
+			.catch(err => errorHandling(err, response, res));
+	})
+	.get('/variations', (req, res) => {
+		let response = {
+			error: false
+		};
+		if (!req.query.siteid) {
+			return res.send(
+				Object.assign(response, {
+					error: true,
+					message: 'Site id missing'
+				})
+			);
+		}
+		return sqlQueryModule
+			.getPVS(siteid, 2)
+			.then(queryResult => queryResultProcessing(queryResult, response, res))
+			.catch(err => errorHandling(err, response, res));
+	})
+	.get('/sections', (req, res) => {
+		let response = {
+			error: false
+		};
+		if (!req.query.siteid) {
+			return res.send(
+				Object.assign(response, {
+					error: true,
+					message: 'Site id missing'
+				})
+			);
+		}
+		return sqlQueryModule
+			.getPVS(siteid, 3)
+			.then(queryResult => queryResultProcessing(queryResult, response, res))
+			.catch(err => errorHandling(err, response, res));
 	});
 
 module.exports = router;

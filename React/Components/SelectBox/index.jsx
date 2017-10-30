@@ -2,6 +2,8 @@
 
 let React = require('react');
 
+import './styles.scss';
+
 let div = React.createElement.bind(null, 'div');
 let button = React.createElement.bind(null, 'button');
 let a = React.createElement.bind(null, 'a');
@@ -256,7 +258,8 @@ module.exports = React.createClass({
 		}
 	},
 	render() {
-		let className = 'react-select-box-container';
+		let className = 'react-select-box-container',
+			disabledStyles = {};
 		if (this.props.className) {
 			className += ` ${this.props.className}`;
 		}
@@ -266,11 +269,18 @@ module.exports = React.createClass({
 		if (!this.hasValue()) {
 			className += ' react-select-box-empty';
 		}
+		if (this.props.disabled) {
+			disabledStyles = {
+				pointerEvents: 'none',
+				opacity: 0.65
+			};
+		}
 		return div(
 			{
 				onKeyDown: this.handleKeyDown,
 				className,
-				onFocus: this.onFocus
+				onFocus: this.onFocus,
+				style: disabledStyles
 			},
 			button(
 				{

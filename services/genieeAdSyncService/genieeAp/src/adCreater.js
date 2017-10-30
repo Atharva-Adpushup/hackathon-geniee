@@ -98,7 +98,7 @@ var $ = require('jquery'),
 				referrer: config.referrer,
 				tracking: browserConfig.trackerSupported,
 				// Replaced '-' with '_' to avoid ElasticSearch split issue
-				variationId: variation.id.replace(/-/gi, '_') // set the chosenVariation variation in feedback data;
+				variationId: variation.id // set the chosenVariation variation in feedback data;
 			},
 			pushAdToGlobalConfig = function(obj) {
 				var isAdsObject = !!(adp.config && adp.config.ads),

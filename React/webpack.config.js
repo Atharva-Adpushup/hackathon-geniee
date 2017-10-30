@@ -124,5 +124,36 @@ module.exports = [
 				}
 			]
 		}
+	},
+	{
+		entry: {
+			inner: path.join(__dirname, './Apps/ReportingPanel/index.js')
+		},
+		output: {
+			path: path.join(__dirname, buildPath),
+			filename: 'reportingPanel.js',
+			publicPath: '/'
+		},
+		module: {
+			loaders: [
+				{
+					test: /.jsx?$/,
+					loader: 'babel-loader',
+					exclude: /node_modules/,
+					query: {
+						plugins: ['lodash'],
+						presets: ['es2015', 'react', 'stage-2']
+					}
+				},
+				{
+					test: /\.scss$/,
+					loaders: ['style-loader', 'css-loader', 'sass-loader']
+				},
+				{
+					test: /\.css$/,
+					loaders: ['style-loader', 'css-loader']
+				}
+			]
+		}
 	}
 ];
