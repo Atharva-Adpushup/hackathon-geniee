@@ -21,12 +21,15 @@ const PaneLoader = props => {
 			case 'error':
 				stateIcon = <i className="fa fa-exclamation-circle pane-loader-icon" />;
 				break;
+			case 'load':
+				stateIcon = <i className="fa fa-cog fa-spin pane-loader-icon" />;
+				break;
 		}
 	}
 
 	let message = (
 		<div>
-			{stateIcon}
+			{stateIcon}&nbsp;&nbsp;&nbsp;
 			{props.message ? props.message : 'Loading...'}
 		</div>
 	);
