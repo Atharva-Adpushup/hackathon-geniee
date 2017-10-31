@@ -86,15 +86,7 @@ html(lang="en")
         if !excludeAnalytics
             if environment == "production"
                 block analyticsIdentify
-                    // Intercom user secure mode Hash
-                    - intercomHash = utils.getHmacSHA256(currentUser.email, consts.analytics["INTERCOM_ID"]);
                     script(type="text/javascript").
-                        var intercomHash = '#{intercomHash}',
-                            intercomObj = {
-                                Intercom: {
-                                    user_hash: intercomHash
-                                }
-                            };
                         if (Object.keys(window.currentUser).length > 0 && (sites.length > 0)) {
                             sites.map(function (obj, idx) {
                                 siteInfo += obj.siteId + " " + obj.domain + " | ";
@@ -109,15 +101,12 @@ html(lang="en")
                                 name: (window.currentUser.firstName + ((window.currentUser.lastName && window.currentUser.lastName.length > 0) ? ' ' + window.currentUser.lastName : "")),
                                 email: window.currentUser.email,
                                 sites: siteInfo
-                            },
-                            intercom: intercomObj
+                            }
                         }
                         adpushupAnalyticsEvents.emit('analyticsIdentify', data);
                     }
             else
                 script(type="text/javascript" src="/assets/js/libs/custom/adpushup-analytics-mockup.js")
-                script(type="text/javascript").
-                    var intercomObj = null;
 
     body
         block bodyContent
