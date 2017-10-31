@@ -11,16 +11,27 @@ import BeforeAfterJsPanel from './beforeAfterJsPanel';
 
 class VariationPanel extends React.Component {
 	render() {
-		const { variation, channelId, sections, ui, reporting } = this.props;
+		const { variation, channelId, sections, ui, reporting, onUpdateContentSelector } = this.props;
 		return (
 			<div className="variation-settings">
 				<VariationBar panelCssSelector=".variation-settings" expanded={ui.variationPanel.expanded} />
 				<TabPanel tabPosition="left">
+					<div tabTitle="Info">
+						<VariationOptions
+							onUpdateContentSelector={onUpdateContentSelector}
+							channelId={channelId}
+							variation={variation}
+						/>
+					</div>
 					<div tabTitle="Sections">
 						<VariationSections variation={variation} sections={sections} ui={ui} reporting={reporting} />
 					</div>
 					<div tabTitle="Info">
-						<VariationOptions channelId={channelId} variation={variation} />
+						<VariationOptions
+							onUpdateContentSelector={onUpdateContentSelector}
+							channelId={channelId}
+							variation={variation}
+						/>
 					</div>
 					<div tabTitle="Add Incontent Variation">
 						<IncontentAdder

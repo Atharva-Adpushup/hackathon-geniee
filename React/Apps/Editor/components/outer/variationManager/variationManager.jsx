@@ -22,6 +22,7 @@ const variationManager = props => {
 						variation={props.activeVariation}
 						sections={props.activeVariationSections}
 						reporting={props.reporting}
+						onUpdateContentSelector={props.updateContentSelector}
 						updateAdCode={props.updateAdCode}
 						updateNetwork={props.updateNetwork}
 					/>
@@ -58,6 +59,7 @@ variationManager.propTypes = {
 	setActiveVariation: PropTypes.func,
 	openVariationPanel: PropTypes.func,
 	closeVariationPanel: PropTypes.func,
+	updateContentSelector: PropTypes.func,
 	updateAdCode: PropTypes.func,
 	updateNetwork: PropTypes.func,
 	ui: PropTypes.object,
