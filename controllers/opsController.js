@@ -3,7 +3,7 @@ const express = require('express'),
 	_ = require('lodash'),
 	router = express.Router();
 
-router.get('/', (req, res) => {
+router.get(['/', '/liveSitesMapping', 'couchbaseEditor'], (req, res) => {
 	const { session, params } = req;
 
 	if (session.isSuperUser) {
