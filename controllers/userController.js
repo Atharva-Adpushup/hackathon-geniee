@@ -25,6 +25,10 @@ var express = require('express'),
 	// Instantiate mailer
 	mailer = new Mailer(mailConfig, 'text');
 
+function requestDemoRedirection(res) {
+	return res.redirect('/user/requestdemo');
+}
+
 function dashboardRedirection(req, res, allUserSites, type) {
 	function setEmailCookie() {
 		var cookieName = 'email',
@@ -86,7 +90,8 @@ function dashboardRedirection(req, res, allUserSites, type) {
 					validSites: sites,
 					unSavedSite: unSavedSite,
 					hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-					requestDemo: req.session.user.requestDemo
+					requestDemo: req.session.user.requestDemo,
+					imageHeaderLogo: true
 				});
 				break;
 			case 'onboarding':
@@ -95,10 +100,61 @@ function dashboardRedirection(req, res, allUserSites, type) {
 					unSavedSite: unSavedSite,
 					hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
 					requestDemo: req.session.user.requestDemo,
-					analyticsObj: JSON.stringify(req.session.analyticsObj)
+					analyticsObj: JSON.stringify(req.session.analyticsObj),
+					imageHeaderLogo: true,
+					buttonHeaderLogout: true
 				});
 				break;
 		}
+	});
+}
+
+function preOnboardingPageRedirection(page, req, res) {
+	var analyticsObj = req.session.analyticsObj ? req.session.analyticsObj : null,
+		isAnalyticsObj = !!(analyticsObj && _.isObject(analyticsObj)),
+		primarySiteDetails = req.session.primarySiteDetails,
+		isPrimarySiteDetails = !!primarySiteDetails,
+		primarySiteId = isPrimarySiteDetails ? primarySiteDetails.siteId : null,
+		primarySiteDomain = isPrimarySiteDetails ? primarySiteDetails.domain : null,
+		primarySiteStep = isPrimarySiteDetails ? primarySiteDetails.step : null,
+		firstName = req.session.tempObj && req.session.tempObj.firstName ? req.session.tempObj.firstName : null,
+		email = req.session.tempObj && req.session.tempObj.email ? req.session.tempObj.email : null,
+		stage = req.session.stage ? req.session.stage : null,
+		requestDemo = req.session.user && req.session.user.requestDemo ? req.session.user.requestDemo : true,
+		userObj = {
+			name: firstName,
+			email: email,
+			stage: stage,
+			primarySiteId,
+			primarySiteDomain,
+			primarySiteStep
+		},
+		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser),
+		isPipeDriveDealId = !!(isAnalyticsObj && req.session.user && req.session.user.crmDealId),
+		isPipeDriveDealTitle = !!(isAnalyticsObj && req.session.user && req.session.user.crmDealTitle);
+
+	if (isPipeDriveDealId) {
+		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = req.session.user.crmDealId;
+	}
+
+	if (isPipeDriveDealTitle) {
+		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = req.session.user.crmDealTitle;
+	}
+
+	if (isUserSession) {
+		// Only user sub object is deleted, not the entire session object.
+		// This is done to ensure session object is maintained and consist of
+		// user primary site details that are used on open routes pages
+		// such as '/tools' and '/thank-you' pages
+		delete req.session.user;
+	}
+
+	return res.render(page, {
+		imageHeaderLogo: true,
+		buttonHeaderLogout: true,
+		user: userObj,
+		analytics: analyticsObj,
+		requestDemo: requestDemo
 	});
 }
 
@@ -118,6 +174,9 @@ router
 	.get('/onboarding', function(req, res) {
 		var allUserSites = req.session.user.sites;
 		return dashboardRedirection(req, res, allUserSites, 'onboarding');
+	})
+	.get('/requestdemo', function(req, res) {
+		return preOnboardingPageRedirection('request-demo', req, res);
 	})
 	.post('/setSiteStep', function(req, res) {
 		siteModel
@@ -280,7 +339,8 @@ router
 			userModel.setSitePageGroups(email).then(
 				function(user) {
 					req.session.user = user;
-					var allUserSites = user.get('sites');
+					var allUserSites = user.get('sites'),
+						isRequestDemo = !!user.get('requestDemo');
 
 					function sitePromises() {
 						return _.map(allUserSites, function(obj) {
@@ -299,8 +359,13 @@ router
 						var sites = _.difference(validSites, ['inValidSite']);
 						if (Array.isArray(sites) && sites.length > 0) {
 							if (sites.length == 1) {
-								var step = sites[0].step;
-								if (step && step < CC.onboarding.totalSteps) {
+								var step = sites[0].step,
+									isIncompleteOnboardingSteps = !!(step && step < CC.onboarding.totalSteps);
+
+								if (isRequestDemo && isIncompleteOnboardingSteps) {
+									return requestDemoRedirection(res);
+								}
+								if (isIncompleteOnboardingSteps) {
 									return res.redirect('/user/onboarding');
 								}
 								if (!user.get('requestDemo')) {
@@ -312,6 +377,10 @@ router
 								return res.redirect('/user/dashboard');
 							}
 						} else {
+							if (isRequestDemo) {
+								return requestDemoRedirection(res);
+							}
+
 							return res.redirect('/user/onboarding');
 						}
 					});
