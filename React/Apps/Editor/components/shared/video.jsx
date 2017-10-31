@@ -19,8 +19,8 @@ module.exports = React.createClass({
 					siteId: window.ADP_SITE_ID,
 					video: t[t.length - 1],
 					IS_ADMIN: window.ADP_IS_ADMIN
-				},
-				intercomObj
+				}
+				// intercomObj
 			);
 		}
 		this.player.addChild('BigPlayButton');

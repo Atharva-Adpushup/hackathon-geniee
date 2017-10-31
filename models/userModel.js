@@ -41,6 +41,7 @@ var modelAPI = (module.exports = apiModule()),
 			'userType',
 			'websiteRevenue',
 			'crmDealId',
+			'crmDealTitle',
 			'revenueUpperLimit',
 			'preferredModeOfReach',
 			'revenueLowerLimit',
@@ -338,6 +339,7 @@ function apiModule() {
 				.then(response => {
 					if (response && response.success) {
 						user.set('crmDealId', response.data.id);
+						user.set('crmDealTitle', response.data.title);
 						return user;
 					}
 					return Promise.reject('Error while creating new deal in Pipedrive');
@@ -434,6 +436,7 @@ function apiModule() {
 									Config.analytics.hasOwnProperty('pipedriveActivated') &&
 									!Config.analytics.pipedriveActivated
 								) {
+									user.set('crmDealId', false);
 									user.set('crmDealId', false);
 									return Promise.resolve(user);
 								}
