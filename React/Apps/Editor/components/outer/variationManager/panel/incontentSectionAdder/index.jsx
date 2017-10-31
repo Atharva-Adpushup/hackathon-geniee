@@ -2,11 +2,12 @@
 
 import React, { PropTypes } from 'react';
 import { reduxForm } from 'redux-form';
-import validate from './inContentValidations';
 import { connect } from 'react-redux';
-import { createIncontentSection } from 'actions/sectionActions';
-import { commonSupportedSizes, nonPartnerAdSizes } from 'consts/commonConsts.js';
 import _ from 'lodash';
+import validate from './inContentValidations';
+import { createIncontentSection } from 'actions/sectionActions';
+import { getCustomSizes } from 'selectors/siteSelectors';
+import { commonSupportedSizes, nonPartnerAdSizes } from 'consts/commonConsts.js';
 import { renderInContentAdder } from './renderMethods';
 
 const form = reduxForm({
@@ -29,7 +30,7 @@ const form = reduxForm({
 
 		return computedArr;
 	},
-	getSupportedSizes = () => {
+	getSupportedSizes = (customSizes = []) => {
 		const sizes = [];
 		commonSupportedSizes.forEach(size => {
 			size.sizes.forEach(adSize => {
@@ -42,6 +43,9 @@ const form = reduxForm({
 				size.sizes.forEach(adSize => {
 					sizes.push(`${adSize.width} x ${adSize.height}`);
 				});
+			});
+			customSizes.forEach(adSize => {
+				sizes.push(`${adSize.width} x ${adSize.height}`);
 			});
 		}
 
@@ -101,6 +105,7 @@ inContentForm.propTypes = {
 
 const mapStateToProps = (state, ownProps) => ({
 		...ownProps,
+		customSizes: getCustomSizes(state),
 		initialValues: {
 			section: 1,
 			float: 'none',
@@ -118,6 +123,7 @@ const mapStateToProps = (state, ownProps) => ({
 				isCustomZoneId = !!values.customZoneId,
 				sectionPayload = {
 					sectionNo: values.section,
+					name: values.name,
 					minDistanceFromPrevAd: values.minDistanceFromPrevAd,
 					float: values.float,
 					notNear,

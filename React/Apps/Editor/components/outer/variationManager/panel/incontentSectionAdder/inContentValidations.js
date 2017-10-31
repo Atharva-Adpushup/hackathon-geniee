@@ -15,6 +15,10 @@ function validate(formProps) {
 		errors.adCode = 'Please enter Ad Code';
 	}
 
+	if (!formProps.name) {
+		errors.name = 'Please enter Section name';
+	}
+
 	if (formProps.network == 'adpTags' && (isNaN(formProps.priceFloor) || !formProps.priceFloor)) {
 		errors.priceFloor = 'Invalid Price Floor';
 	}

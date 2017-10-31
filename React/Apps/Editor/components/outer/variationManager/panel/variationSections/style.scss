@@ -1,0 +1,79 @@
+$primaryColor: #eb575c;
+$primaryColorDark: #cf474b;
+$greyBorder: #555555;
+$borderColor: #e6e6e6;
+$lightGrey: #ccc;
+
+.DateRangePicker {
+	display: block;
+	.DateRangePickerInput {
+		display: block;
+		border-color: $greyBorder;
+		border-radius: 3px;
+		.DateRangePickerInput_calendarIcon,
+		.DateRangePickerInput_clearDates {
+			width: auto;
+			padding: 0 8px;
+			&:hover {
+				background: none;
+			}
+		}
+		.DateInput {
+			padding: 0;
+			text-align: center;
+			font-size: 1em;
+			width: 90px;
+			font-family: 'Karla', sans-serif;
+			font-size: 1.1em;
+			input {
+				cursor: pointer;
+			}
+		}
+	}
+	.DayPickerNavigation_button__default {
+		width: 50px;
+	}
+}
+.DateRangePicker_picker {
+	top: 45px !important;
+}
+.DateInput__openDown_3.DateInput__openDown_3.DateInput__openDown_3:after {
+	top: 36px;
+}
+.DateInput__openDown_3.DateInput__openDown_3.DateInput__openDown_3:before {
+	top: 35px;
+}
+.DateInput_displayText__focused_3.DateInput_displayText__focused_3.DateInput_displayText__focused_3,
+.DateInput_displayText__focused_2.DateInput_displayText__focused_2 {
+	color: #fff;
+	border-radius: 0;
+	background-color: lighten($primaryColor, 7%);
+	border-color: lighten($primaryColor, 7%);
+}
+.CalendarDay__hovered_span.CalendarDay__hovered_span_2 {
+	&,
+	&:hover {
+		background-color: lighten($primaryColor, 7%);
+		color: #fff;
+		border-color: lighten($primaryColor, 7%);
+	}
+}
+.CalendarDay__selected_span_2.CalendarDay__selected_span_2,
+.CalendarDay__selected_span_3.CalendarDay__selected_span_3.CalendarDay__selected_span_3,
+.CalendarDay__selected_4.CalendarDay__selected_4.CalendarDay__selected_4.CalendarDay__selected_4 {
+	background-color: lighten($primaryColor, 7%);
+	border-color: lighten($primaryColor, 7%);
+	&:hover {
+		background-color: lighten($primaryColor, 10%);
+		border-color: lighten($primaryColor, 10%);
+	}
+}
+.CalendarDay__selected_2.CalendarDay__selected_2,
+.CalendarDay__selected_3.CalendarDay__selected_3.CalendarDay__selected_3,
+.CalendarDay__hovered_span.CalendarDay__hovered_span_3.CalendarDay__selected.CalendarDay__selected_4 {
+	&,
+	&:hover {
+		background-color: $primaryColor;
+		border-color: $primaryColor;
+	}
+}

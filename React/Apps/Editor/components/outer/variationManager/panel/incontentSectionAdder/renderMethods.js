@@ -3,6 +3,7 @@
 import { Field, FieldArray } from 'redux-form';
 import CodeBox from 'shared/codeBox';
 import SelectBox from 'shared/select/select';
+import { networks } from 'consts/commonConsts';
 import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
 import { Row, Col, Button } from 'react-bootstrap';
 
@@ -22,7 +23,7 @@ const renderField = field => {
 								className="inputMinimal"
 							/>
 							{field.meta.touched &&
-								field.meta.error && <div className="error-message">{field.meta.error}</div>}
+							field.meta.error && <div className="error-message">{field.meta.error}</div>}
 						</Col>
 					</Row>
 				</Col>
@@ -91,7 +92,7 @@ const renderField = field => {
 		);
 	},
 	renderNetworkOptions = (that, CodeBoxField) => {
-		let networkDropdownItems = ['adsense', 'adx', 'adpTags', 'dfp', 'critieo', 'custom'];
+		let networkDropdownItems = networks;
 		return (
 			<Row>
 				<Col xs={12} className="u-padding-r10px">
@@ -116,32 +117,30 @@ const renderField = field => {
 						</Col>
 					</Row>
 					<Row>
-						{that.state.network ? (
-							that.state.network == 'adpTags' ? (
-								<div className="clearfix">
-									<div className="mT-10 mB-10 clearfix">
-										<Field
-											placeholder="Please enter price floor"
-											name="priceFloor"
-											component={renderField}
-											type="text"
-											label="Price Floor"
-										/>
-									</div>
-									<div>
-										<Field
-											label="Header Bidding"
-											name="headerBidding"
-											component={renderSwitch}
-											onChange={that.switchChangeHandler.bind(that)}
-										/>
-									</div>
+						{that.state.network ? that.state.network == 'adpTags' ? (
+							<div className="clearfix">
+								<div className="mT-10 mB-10 clearfix">
+									<Field
+										placeholder="Please enter price floor"
+										name="priceFloor"
+										component={renderField}
+										type="text"
+										label="Price Floor"
+									/>
 								</div>
-							) : (
-								<div style={{ margin: '10px 0px' }} className="clearfix">
-									{CodeBoxField}
+								<div>
+									<Field
+										label="Header Bidding"
+										name="headerBidding"
+										component={renderSwitch}
+										onChange={that.switchChangeHandler.bind(that)}
+									/>
 								</div>
-							)
+							</div>
+						) : (
+							<div style={{ margin: '10px 0px' }} className="clearfix">
+								{CodeBoxField}
+							</div>
 						) : null}
 					</Row>
 				</Col>
@@ -235,6 +234,15 @@ const renderField = field => {
 						onBlur={that.setFocusElement.bind(that)}
 					/>
 					<Field
+						placeholder="Please enter section name"
+						name="name"
+						component={renderField}
+						type="text"
+						label="Section Name"
+						onFocus={that.setFocusElement.bind(that)}
+						onBlur={that.setFocusElement.bind(that)}
+					/>
+					<Field
 						placeholder="Please enter minDistanceFromPrevAd"
 						name="minDistanceFromPrevAd"
 						component={renderField}
@@ -249,7 +257,7 @@ const renderField = field => {
 								</Col>
 								<Col xs={7} className="u-padding-r10px">
 									<Field name="adSize" component="select" className="inputMinimal">
-										{getSupportedSizes().map((pos, index) => (
+										{getSupportedSizes(that.props.customSizes).map((pos, index) => (
 											<option key={index} name={pos}>
 												{pos}
 											</option>

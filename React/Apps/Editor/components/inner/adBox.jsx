@@ -66,13 +66,15 @@ const highLighterClass = '_APD_highlighter',
 			position: 'relative'
 		});
 
+		const sectionNameStyles = $.extend({}, adBoxSizeStyles, { left: '70px' });
+
 		return (
 			<div style={listStyle}>
 				<div id={`ad-${id}`} className={highLighterClass} onClick={clickHandler} style={adBoxStyles}>
 					<div className="_AP_adSize _ap_reject" style={adBoxSizeStyles}>
 						{adBoxSizeContent}
 					</div>
-					<div className="_AP_adSize _ap_reject" style={adBoxSizeStyles}>
+					<div className="_AP_adSize _ap_reject" style={sectionNameStyles}>
 						{props.sectionName}
 					</div>
 					{isCustomZoneId ? renderCustomZoneIdLabel(customZoneIdStyles, customZoneIdText) : null}
