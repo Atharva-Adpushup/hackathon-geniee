@@ -144,6 +144,7 @@ class ReportControls extends Component {
 								showDefaultInputIcon={true}
 								hideKeyboardShortcutsPanel={true}
 								showClearDates={true}
+								minimumNights={0}
 								displayFormat={'DD-MM-YYYY'}
 								isOutsideRange={() => {}}
 							/>
