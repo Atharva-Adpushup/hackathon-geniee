@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import OpsPanel from './components/OpsPanel.jsx';
+import App from './components/App';
+// import OpsPanel from './components/OpsPanel.jsx';
 
-ReactDOM.render(<OpsPanel />, document.getElementById('opsPanel'));
+ReactDOM.render(<App />, document.getElementById('opsPanel'));

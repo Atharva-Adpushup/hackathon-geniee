@@ -1,0 +1,10 @@
+.ops-panel-links-container {
+	a li {
+		font-size: 18px;
+		font-weight: bold;
+
+		&:hover {
+			color: $primaryRed;
+		}
+	}
+}
