@@ -5,6 +5,9 @@ block getTitle
 
 block append headScripts
 	script.
+		window.__lc = window.__lc || {};
+		window.__lc.license = 6965991;
+
 		(function() {
 			var lc = document.createElement('script'); lc.type = 'text/javascript'; lc.async = true;
 			lc.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdn.livechatinc.com/tracking.js';
