@@ -16,13 +16,6 @@ class VariationPanel extends React.Component {
 			<div className="variation-settings">
 				<VariationBar panelCssSelector=".variation-settings" expanded={ui.variationPanel.expanded} />
 				<TabPanel tabPosition="left">
-					<div tabTitle="Info">
-						<VariationOptions
-							onUpdateContentSelector={onUpdateContentSelector}
-							channelId={channelId}
-							variation={variation}
-						/>
-					</div>
 					<div tabTitle="Sections">
 						<VariationSections variation={variation} sections={sections} ui={ui} reporting={reporting} />
 					</div>
