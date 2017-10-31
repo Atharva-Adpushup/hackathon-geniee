@@ -9,7 +9,11 @@ module.exports = function(config) {
 		allVariations,
 		chosenVariation,
 		forcedVariation,
-		forcedVariationId;
+		forcedVariationId,
+		channelContentSelector,
+		variationContentSelector,
+		isVariationContentSelector,
+		contentSelector;
 
 	// if no experimnet setup for given platform and pagegroup
 	if (
@@ -30,7 +34,11 @@ module.exports = function(config) {
 		chosenVariation = forcedVariation.obj;
 
 		if (chosenVariation) {
-			config.contentSelector = experiment[config.platform][config.pageGroup].contentSelector;
+			channelContentSelector = experiment[config.platform][config.pageGroup].contentSelector;
+			variationContentSelector = chosenVariation.contentSelector;
+			isVariationContentSelector = !!variationContentSelector;
+			contentSelector = isVariationContentSelector ? variationContentSelector : channelContentSelector;
+			config.contentSelector = contentSelector;
 		}
 
 		return chosenVariation && chosenVariation.ads && chosenVariation.ads.length ? chosenVariation : false;
@@ -46,7 +54,11 @@ module.exports = function(config) {
 		}
 
 		if (chosenVariation) {
-			config.contentSelector = experiment[config.platform][config.pageGroup].contentSelector;
+			channelContentSelector = experiment[config.platform][config.pageGroup].contentSelector;
+			variationContentSelector = chosenVariation.contentSelector;
+			isVariationContentSelector = !!variationContentSelector;
+			contentSelector = isVariationContentSelector ? variationContentSelector : channelContentSelector;
+			config.contentSelector = contentSelector;
 		}
 
 		return chosenVariation && chosenVariation.ads && chosenVariation.ads.length ? chosenVariation : false;
