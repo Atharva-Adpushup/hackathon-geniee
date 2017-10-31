@@ -112,6 +112,10 @@ function createNewUser(params, res) {
 		});
 }
 
+function requestDemoRedirection(res) {
+	return res.redirect('/user/requestdemo');
+}
+
 // Redirects to thank you page if requestDemo = true
 function checkUserDemo() {
 	if (req.session.user.get('requestDemo')) {
@@ -132,6 +136,7 @@ function setSessionData(user, req, res, type) {
 		redirectPath = null,
 		userSites = user.get('sites'),
 		isUserSites = !!(userSites && userSites.length),
+		isRequestDemo = !!user.get('requestDemo'),
 		primarySiteDetails = isUserSites ? _extend(userSites[0], {}) : null;
 
 	return globalModel.getQueue('data::emails').then(function(emailList) {
@@ -150,6 +155,11 @@ function setSessionData(user, req, res, type) {
 
 		if (type == 1 && userPasswordMatch == 1) {
 			// Sign Up
+
+			if (isRequestDemo) {
+				return requestDemoRedirection(res);
+			}
+
 			return res.redirect('/user/onboarding');
 		} else if (type == 2 && userPasswordMatch == 1) {
 			// Login
@@ -190,8 +200,17 @@ function setSessionData(user, req, res, type) {
 					var sites = _.difference(validSites, ['inValidSite']);
 					if (Array.isArray(sites) && sites.length > 0) {
 						if (sites.length == 1) {
-							var step = sites[0].step;
-							if ((step && step < consts.onboarding.totalSteps) || !step) {
+							var step = sites[0].step,
+								isIncompleteOnboardingSteps = !!(
+									(step && step < consts.onboarding.totalSteps) ||
+									!step
+								);
+
+							if (isRequestDemo && isIncompleteOnboardingSteps) {
+								return requestDemoRedirection(res);
+							}
+
+							if (isIncompleteOnboardingSteps) {
 								return res.redirect('/user/onboarding');
 							}
 							if (req.session.isSuperUser) {
@@ -208,12 +227,22 @@ function setSessionData(user, req, res, type) {
 					} else {
 						if (allUserSites.length == 1) {
 							if (req.session.isSuperUser) {
-								if (!allUserSites[0].step || allUserSites[0].step < consts.onboarding.totalSteps) {
+								var isIncompleteOnboardingSteps = !!(
+									!allUserSites[0].step || allUserSites[0].step < consts.onboarding.totalSteps
+								);
+
+								if (isRequestDemo && isIncompleteOnboardingSteps) {
+									return requestDemoRedirection(res);
+								} else if (isIncompleteOnboardingSteps) {
 									return res.redirect('/user/onboarding');
 								} else {
 									return res.redirect('/user/dashboard');
 								}
 							} else {
+								if (isRequestDemo) {
+									return requestDemoRedirection(res);
+								}
+
 								return res.redirect('/user/onboarding');
 							}
 							// if (allUserSites[0].services) {
@@ -242,8 +271,9 @@ function setSessionData(user, req, res, type) {
 	});
 }
 
-function thankYouRedirection(page, req, res) {
+function preOnboardingPageRedirection(page, req, res) {
 	var analyticsObj = req.session.analyticsObj ? req.session.analyticsObj : null,
+		isAnalyticsObj = !!(analyticsObj && _.isObject(analyticsObj)),
 		primarySiteDetails = req.session.primarySiteDetails,
 		isPrimarySiteDetails = !!primarySiteDetails,
 		primarySiteId = isPrimarySiteDetails ? primarySiteDetails.siteId : null,
@@ -261,9 +291,20 @@ function thankYouRedirection(page, req, res) {
 			primarySiteDomain,
 			primarySiteStep
 		},
-		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser);
+		isUserSession = !!(req.session && req.session.user),
+		isNotSuperUser = !!(isUserSession && !req.session.isSuperUser),
+		isPipeDriveDealId = !!(isAnalyticsObj && isUserSession && req.session.user.crmDealId),
+		isPipeDriveDealTitle = !!(isAnalyticsObj && isUserSession && req.session.user.crmDealTitle);
 
-	if (isUserSession) {
+	if (isPipeDriveDealId) {
+		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = req.session.user.crmDealId;
+	}
+
+	if (isPipeDriveDealTitle) {
+		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = req.session.user.crmDealTitle;
+	}
+
+	if (isNotSuperUser) {
 		// Only user sub object is deleted, not the entire session object.
 		// This is done to ensure session object is maintained and consist of
 		// user primary site details that are used on open routes pages
@@ -274,7 +315,9 @@ function thankYouRedirection(page, req, res) {
 	return res.render(page, {
 		user: userObj,
 		analytics: analyticsObj,
-		requestDemo: requestDemo
+		requestDemo: requestDemo,
+		imageHeaderLogo: true,
+		buttonHeaderLogout: true
 	});
 }
 
@@ -352,7 +395,7 @@ router
 	})
 	.get('/thank-you', function(req, res) {
 		// this is for users who are less than <2500 USD
-		thankYouRedirection('thank-you', req, res);
+		preOnboardingPageRedirection('thank-you', req, res);
 	})
 	.post('/forgotPassword', function(req, res) {
 		userModel
@@ -420,7 +463,7 @@ router
 	})
 	.get('/thankyou', function(req, res) {
 		// this is for users who are above >10000 USD
-		thankYouRedirection('thankyou', req, res);
+		preOnboardingPageRedirection('thankyou', req, res);
 	})
 	.post('/thankyou', function(req, res) {
 		// Made thankyou POST fail safe
@@ -456,7 +499,7 @@ router
 			isViewMode = isValidQueryParameter ? 1 : 0,
 			siteId = isSiteIdQueryParameter ? req.query.siteId : '';
 
-		return res.render('tools', { headerBannerLogo: true, isViewMode, siteId });
+		return res.render('tools', { imageHeaderLogo: true, isViewMode, siteId, buttonHeaderLogout: true });
 	})
 	.get('/', function(req, res) {
 		return res.redirect('/login');
