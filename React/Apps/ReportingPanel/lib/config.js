@@ -16,13 +16,15 @@ const config = {
 		xpathMiss: 'Xpath Miss',
 		siteId: 'Siteid',
 		name: 'Name',
-		variationId: 'Variation Id'
+		variationId: 'Variation Id',
+		pageGroup: 'PageGroup'
 	},
 	API_DATA_PARAMS: {
 		impressions: 'total_impressions',
 		pageviews: 'total_requests',
 		revenue: 'total_revenue',
-		xpathMiss: 'total_xpath_miss'
+		xpathMiss: 'total_xpath_miss',
+		pageGroup: 'name'
 	}
 };
 
