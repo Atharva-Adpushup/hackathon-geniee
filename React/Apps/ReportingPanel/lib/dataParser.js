@@ -1,5 +1,5 @@
-import { capitalCase, reorderArray } from '../helpers';
-import config from '../config';
+import { capitalCase, reorderArray } from './helpers';
+import config from './config';
 import { remove, map, each, groupBy } from 'lodash';
 import moment from 'moment';
 
