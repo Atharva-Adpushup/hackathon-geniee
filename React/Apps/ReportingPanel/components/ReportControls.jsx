@@ -16,7 +16,8 @@ class ReportControls extends Component {
 			platform: null,
 			variation: props.variation ? props.variation : null,
 			startDate: props.startDate,
-			endDate: props.endDate
+			endDate: props.endDate,
+			groupBy: null
 		};
 		this.pageGroupUpdated = this.pageGroupUpdated.bind(this);
 		this.platformUpdated = this.platformUpdated.bind(this);
@@ -25,6 +26,7 @@ class ReportControls extends Component {
 		this.variationUpdated = this.variationUpdated.bind(this);
 		this.getPageGroupName = this.getPageGroupName.bind(this);
 		this.getPlatformName = this.getPlatformName.bind(this);
+		this.groupByUpdated = this.groupByUpdated.bind(this);
 	}
 
 	getPageGroupName(pageGroup) {
@@ -36,7 +38,7 @@ class ReportControls extends Component {
 	}
 
 	pageGroupUpdated(pageGroup) {
-		const { platform, startDate, endDate, variation } = this.state;
+		const { platform, startDate, endDate, variation, groupBy } = this.state;
 
 		this.setState({ pageGroup });
 		this.props.reportParamsUpdateHandler({
@@ -44,12 +46,13 @@ class ReportControls extends Component {
 			platform: this.getPlatformName(platform),
 			startDate,
 			endDate,
-			variation
+			variation,
+			groupBy
 		});
 	}
 
 	platformUpdated(platform) {
-		const { pageGroup, startDate, endDate, variation } = this.state;
+		const { pageGroup, startDate, endDate, variation, groupBy } = this.state;
 
 		this.setState({ platform });
 		this.props.reportParamsUpdateHandler({
@@ -57,12 +60,13 @@ class ReportControls extends Component {
 			pageGroup: this.getPageGroupName(pageGroup),
 			startDate,
 			endDate,
-			variation
+			variation,
+			groupBy
 		});
 	}
 
 	variationUpdated(variation) {
-		const { platform, pageGroup, startDate, endDate } = this.state;
+		const { platform, pageGroup, startDate, endDate, groupBy } = this.state;
 
 		this.setState({ variation });
 		this.props.reportParamsUpdateHandler({
@@ -70,17 +74,34 @@ class ReportControls extends Component {
 			platform: this.getPlatformName(platform),
 			pageGroup: this.getPageGroupName(pageGroup),
 			startDate,
-			endDate
+			endDate,
+			groupBy
 		});
 	}
 
 	datesUpdated({ startDate, endDate }) {
-		const { pageGroup, platform } = this.state;
+		const { pageGroup, platform, variation, groupBy } = this.state;
 
 		this.setState({ startDate, endDate });
 		this.props.reportParamsUpdateHandler({
 			startDate,
 			endDate,
+			variation,
+			groupBy,
+			pageGroup: this.getPageGroupName(pageGroup),
+			platform: this.getPlatformName(platform)
+		});
+	}
+
+	groupByUpdated(groupBy) {
+		const { pageGroup, platform, variation, startDate, endDate } = this.state;
+
+		this.setState({ groupBy: groupBy });
+		this.props.reportParamsUpdateHandler({
+			startDate,
+			endDate,
+			variation,
+			groupBy,
 			pageGroup: this.getPageGroupName(pageGroup),
 			platform: this.getPlatformName(platform)
 		});
@@ -150,6 +171,15 @@ class ReportControls extends Component {
 							/>
 						</Col>
 						<Col sm={2}>
+							<SelectBox value={state.groupBy} label="Group By" onChange={this.groupByUpdated}>
+								<option key={0} value="pageGroup">
+									PageGroup
+								</option>
+							</SelectBox>
+						</Col>
+					</Row>
+					<Row className="mT-10">
+						<Col sm={3} smOffset={9}>
 							<button
 								className="btn btn-lightBg btn-default"
 								onClick={props.generateButtonHandler}
