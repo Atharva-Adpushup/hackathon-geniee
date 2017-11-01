@@ -1,6 +1,6 @@
 import config from './config';
 import moment from 'moment';
-import parseSiteLevelData from './dataParsers/parseSiteLevelData';
+import dataParser from './dataParser';
 import $ from 'jquery';
 import { Promise } from 'es6-promise';
 
@@ -71,8 +71,8 @@ const apiQueryGenerator = params => {
 			tableData = null;
 
 		if (!data.error) {
-			chartData = parseSiteLevelData(data, groupBy).chartConfig;
-			tableData = parseSiteLevelData(data, groupBy).tableConfig;
+			chartData = dataParser(data, groupBy).chartConfig;
+			tableData = dataParser(data, groupBy).tableConfig;
 		}
 
 		config = { ...config, ...chartData };
