@@ -24,7 +24,7 @@ class ReportingPanel extends React.Component {
 			platform: null,
 			variation: null,
 			variations: [],
-			groupBy: 'pageGroup',
+			groupBy: null,
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
@@ -191,7 +191,8 @@ class ReportingPanel extends React.Component {
 			platform: params.platform,
 			startDate: params.startDate,
 			endDate: params.endDate,
-			variation: params.variation
+			variation: params.variation,
+			groupBy: params.groupBy
 		});
 
 		if ((params.pageGroup && !params.platform) || (params.platform && !params.pageGroup)) {
