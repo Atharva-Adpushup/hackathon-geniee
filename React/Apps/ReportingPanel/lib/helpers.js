@@ -37,7 +37,7 @@ const apiQueryGenerator = params => {
 			.map(word => word[0].toUpperCase() + word.substr(1))
 			.join(' ');
 	},
-	dataGenerator = (data, reportLevel) => {
+	dataGenerator = (data, groupBy) => {
 		let config = {
 				title: {
 					text: ''
@@ -71,7 +71,7 @@ const apiQueryGenerator = params => {
 			tableData = null;
 
 		if (!data.error) {
-			chartData = parseSiteLevelData(data).chartConfig;
+			chartData = parseSiteLevelData(data, groupBy).chartConfig;
 			tableData = parseSiteLevelData(data).tableConfig;
 		}
 
