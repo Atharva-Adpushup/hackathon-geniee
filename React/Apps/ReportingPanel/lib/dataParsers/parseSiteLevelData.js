@@ -1,6 +1,6 @@
 import { capitalCase, reorderArray } from '../helpers';
 import config from '../config';
-import { remove, map, each } from 'lodash';
+import { remove, map, each, groupBy } from 'lodash';
 import moment from 'moment';
 
 const dataLabels = config.DATA_LABELS,
@@ -99,7 +99,7 @@ const dataLabels = config.DATA_LABELS,
 		row1[API_DATA_PARAMS.xpathMiss] += row2[API_DATA_PARAMS.xpathMiss];
 		return row1;
 	},
-	processGroupBy = (rows, groupBy) => {
+	processChartGroupBy = (rows, groupBy) => {
 		if (!groupBy) {
 			return rows;
 		}
@@ -133,7 +133,7 @@ const dataLabels = config.DATA_LABELS,
 			}
 		};
 
-		rows = processGroupBy(rows, groupBy);
+		rows = processChartGroupBy(rows, groupBy);
 
 		let impressions,
 			pageviews,
@@ -213,7 +213,36 @@ const dataLabels = config.DATA_LABELS,
 
 		return series;
 	},
-	generateTableData = (cols, rows) => {
+	processTableGroupBy = (header, rows, groupByParam) => {
+		if (!groupByParam) {
+			return { header, rows };
+		}
+
+		let updatedRows = [];
+
+		switch (groupByParam) {
+			case 'pageGroup':
+				header.unshift({
+					title: dataLabels.pageGroup,
+					prop: dataLabels.pageGroup,
+					sortable: false,
+					filterable: false
+				});
+
+				let groupedRows = groupBy(rows, config.API_DATA_PARAMS.pageGroup);
+
+				for (let i in groupedRows) {
+					updatedRows.push({
+						pageGroup: i
+					});
+					updatedRows = updatedRows.concat(groupedRows[i]);
+				}
+				break;
+		}
+
+		return { header, rows: updatedRows };
+	},
+	generateTableData = (cols, rows, groupBy) => {
 		let header = [],
 			body = [];
 
@@ -230,20 +259,29 @@ const dataLabels = config.DATA_LABELS,
 			header.push({
 				title: col,
 				prop: col,
-				sortable: true,
+				sortable: false,
 				filterable: true
 			});
 		});
 
+		const groupedData = processTableGroupBy(header, rows, groupBy);
+		header = groupedData.header;
+		rows = groupedData.rows;
+
 		each(rows, row => {
 			body.push({
-				[dataLabels.date]: moment(row.report_date).format('DD-MM-YYYY'),
-				[dataLabels.impressions]: row.total_impressions,
-				[dataLabels.cpm]: Number((row.total_revenue * 1000 / row.total_impressions).toFixed(2)),
+				[dataLabels.pageGroup]: row.pageGroup || undefined,
+				[dataLabels.date]: row.report_date ? moment(row.report_date).format('DD-MM-YYYY') : undefined,
+				[dataLabels.impressions]: row.total_impressions || undefined,
+				[dataLabels.cpm]: row.total_revenue
+					? Number((row.total_revenue * 1000 / row.total_impressions).toFixed(2))
+					: undefined,
 				[dataLabels.xpathMiss]: config.IS_SUPERUSER ? row.total_xpath_miss : undefined,
 				[dataLabels.pageViews]: config.IS_SUPERUSER ? row.total_requests : undefined,
-				[dataLabels.revenue]: Number(row.total_revenue.toFixed(2)),
-				[dataLabels.pageCpm]: Number((row.total_revenue * 1000 / row.total_requests).toFixed(2))
+				[dataLabels.revenue]: row.total_revenue ? Number(row.total_revenue.toFixed(2)) : undefined,
+				[dataLabels.pageCpm]: row.total_revenue
+					? Number((row.total_revenue * 1000 / row.total_requests).toFixed(2))
+					: undefined
 			});
 		});
 
@@ -257,7 +295,7 @@ const dataLabels = config.DATA_LABELS,
 				xAxis: { categories: generateXAxis(data.rows) },
 				series: generateSeries(columns, data.rows, groupBy)
 			},
-			tableConfig = generateTableData(columns, data.rows);
+			tableConfig = generateTableData(columns, data.rows, groupBy);
 
 		return { chartConfig, tableConfig };
 	};
