@@ -91,8 +91,40 @@ const dataLabels = config.DATA_LABELS,
 
 		return yAxis;
 	},
+	mergeParams = (row1, row2) => {
+		const API_DATA_PARAMS = config.API_DATA_PARAMS;
+		row1[API_DATA_PARAMS.impressions] += row2[API_DATA_PARAMS.impressions];
+		row1[API_DATA_PARAMS.pageviews] += row2[API_DATA_PARAMS.pageviews];
+		row1[API_DATA_PARAMS.revenue] += row2[API_DATA_PARAMS.revenue];
+		row1[API_DATA_PARAMS.xpathMiss] += row2[API_DATA_PARAMS.xpathMiss];
+		return row1;
+	},
+	processGroupBy = (rows, groupBy) => {
+		if (!groupBy) {
+			return rows;
+		}
+
+		let updatedRows = [];
+
+		switch (groupBy) {
+			case 'pageGroup':
+				for (let i = 0; i < rows.length; i++) {
+					let row1 = rows[i];
+					for (let j = i + 1; j < rows.length; j++) {
+						if (rows[j].report_date === rows[i].report_date) {
+							let row2 = rows[j];
+							updatedRows.push(mergeParams(row1, row2));
+							break;
+						}
+					}
+				}
+				break;
+		}
+
+		return updatedRows;
+	},
 	generateXAxis = rows => map(rows, row => moment(row.report_date).format('DD-MM-YYYY')),
-	generateSeries = (cols, rows) => {
+	generateSeries = (cols, rows, groupBy) => {
 		const pointOptions = {
 			lineWidth: 1.5,
 			marker: {
@@ -100,6 +132,8 @@ const dataLabels = config.DATA_LABELS,
 				radius: 3.2
 			}
 		};
+
+		rows = processGroupBy(rows, groupBy);
 
 		let impressions,
 			pageviews,
@@ -215,13 +249,13 @@ const dataLabels = config.DATA_LABELS,
 
 		return { header, body };
 	},
-	parseSiteLevelData = data => {
+	parseSiteLevelData = (data, groupBy) => {
 		const columns = formatColumnNames(data.columns);
 
 		let chartConfig = {
 				yAxis: generateYAxis(columns),
 				xAxis: { categories: generateXAxis(data.rows) },
-				series: generateSeries(columns, data.rows)
+				series: generateSeries(columns, data.rows, groupBy)
 			},
 			tableConfig = generateTableData(columns, data.rows);
 

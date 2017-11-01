@@ -17,6 +17,12 @@ const config = {
 		siteId: 'Siteid',
 		name: 'Name',
 		variationId: 'Variation Id'
+	},
+	API_DATA_PARAMS: {
+		impressions: 'total_impressions',
+		pageviews: 'total_requests',
+		revenue: 'total_revenue',
+		xpathMiss: 'total_xpath_miss'
 	}
 };
 

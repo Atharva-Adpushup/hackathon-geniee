@@ -24,6 +24,7 @@ class ReportingPanel extends React.Component {
 			platform: null,
 			variation: null,
 			variations: [],
+			groupBy: 'pageGroup',
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
@@ -56,7 +57,7 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: true
 		});
 
-		const { startDate, endDate, pageGroup, platform, variation } = this.state,
+		const { startDate, endDate, pageGroup, platform, variation, groupBy } = this.state,
 			params = { startDate, endDate, pageGroup, platform, variation };
 
 		let state = {
@@ -64,29 +65,124 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: false
 		};
 
-		ajax({
-			method: 'POST',
-			url: config.REPORT_ENDPOINT,
-			data: apiQueryGenerator(params)
-		})
-			.then(res => {
-				if (!res.error && res.rows.length) {
-					const data = dataGenerator(res);
-					this.setState({
-						...state,
-						reportError: false,
-						chartConfig: data.chartData,
-						tableConfig: data.tableData
-					});
-				} else {
-					this.setState({ ...state, reportError: true });
+		const res = {
+			error: false,
+			columns: [
+				'total_xpath_miss',
+				'total_impressions',
+				'report_date',
+				'siteid',
+				'total_revenue',
+				'name',
+				'total_requests'
+			],
+			rows: [
+				{
+					total_xpath_miss: 49630,
+					total_impressions: 16319,
+					total_requests: 30000,
+					report_date: '2017-10-12T00:00:00.000Z',
+					siteid: 28822,
+					total_revenue: 37.6127,
+					name: 'MIC'
+				},
+				{
+					total_xpath_miss: 59630,
+					total_impressions: 26319,
+					total_requests: 32000,
+					report_date: '2017-10-12T00:00:00.000Z',
+					siteid: 28822,
+					total_revenue: 27.6127,
+					name: 'POST'
+				},
+				{
+					total_xpath_miss: 48659,
+					total_impressions: 15972,
+					total_requests: 10000,
+					report_date: '2017-10-13T00:00:00.000Z',
+					siteid: 28822,
+					total_revenue: 41.7479,
+					name: 'MIC'
+				},
+				{
+					total_xpath_miss: 28659,
+					total_impressions: 25972,
+					total_requests: 210000,
+					report_date: '2017-10-13T00:00:00.000Z',
+					siteid: 28822,
+					total_revenue: 31.7479,
+					name: 'POST'
+				},
+				{
+					total_xpath_miss: 39900,
+					total_impressions: 13102,
+					total_requests: 20000,
+					report_date: '2017-10-14T00:00:00.000Z',
+					siteid: 28822,
+					total_revenue: 22.6022,
+					name: 'MIC'
+				},
+				{
+					total_xpath_miss: 32900,
+					total_impressions: 23102,
+					total_requests: 25000,
+					report_date: '2017-10-14T00:00:00.000Z',
+					siteid: 28822,
+					total_revenue: 32.6022,
+					name: 'POST'
+				},
+				{
+					total_xpath_miss: 36932,
+					total_impressions: 12068,
+					total_requests: 27000,
+					report_date: '2017-10-15T00:00:00.000Z',
+					siteid: 28822,
+					total_revenue: 20.854,
+					name: 'MIC'
+				},
+				{
+					total_xpath_miss: 26932,
+					total_impressions: 32068,
+					total_requests: 29000,
+					report_date: '2017-10-15T00:00:00.000Z',
+					siteid: 28822,
+					total_revenue: 40.854,
+					name: 'POST'
 				}
-			})
-			.catch(res => {
-				console.log('error');
-				console.log(res);
-				this.setState({ ...state, reportError: true });
-			});
+			]
+		};
+
+		const data = dataGenerator(res, groupBy);
+		this.setState({
+			...state,
+			reportError: false,
+			chartConfig: data.chartData,
+			tableConfig: data.tableData
+		});
+
+		// ajax({
+		// 	method: 'POST',
+		// 	url: config.REPORT_ENDPOINT,
+		// 	data: apiQueryGenerator(params)
+		// })
+		// 	.then(res => {
+		// 		if (!res.error && res.rows.length) {
+		// 			const data = dataGenerator(res);
+		// 			this.setState({
+		// 				...state,
+		// 				reportError: false,
+		// 				chartConfig: data.chartData,
+		// 				tableConfig: data.tableData
+		// 			});
+		// 		} else {
+		// 			this.setState({ ...state, reportError: true });
+		// 		}
+		// 	})
+		// 	.catch(res => {
+		// 		console.log('error');
+		// 		console.log(res);
+		// 		this.setState({ ...state, reportError: true });
+		// 	});
 	}
 
 	updateReportParams(params) {
