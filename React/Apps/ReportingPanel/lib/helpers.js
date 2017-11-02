@@ -13,7 +13,11 @@ const apiQueryGenerator = params => {
 			groupBy = [];
 
 		if (params.groupBy) {
-			groupBy.push(params.groupBy.toLowerCase());
+			groupBy.push(params.groupBy);
+		}
+
+		if (params.pageGroup) {
+			where.pagegroup = ['MIC'];
 		}
 
 		if (params.platform) {

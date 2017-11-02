@@ -144,8 +144,8 @@ class ReportingPanel extends React.Component {
 								tableHeader={tableConfig.header}
 								tableBody={tableConfig.body}
 								keyName="reportTable"
-								rowsPerPage={10}
-								rowsPerPageOption={[10, 15, 20, 25]}
+								rowsPerPage={20}
+								rowsPerPageOption={[30, 40, 50, 60]}
 							/>
 						) : (
 							''
