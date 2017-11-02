@@ -198,7 +198,7 @@ router
 					channels: data.site.get('channels'),
 					environment: config.environment.HOST_ENV,
 					currentSiteId: req.params.siteId,
-					isSuperUser: req.session.isSuperUser
+					isSuperUser: req.session.isSuperUser || false
 				});
 			})
 			.catch(function() {
@@ -360,7 +360,8 @@ router
 
 						return res.render('dashboard', {
 							validSites: sites,
-							unSavedSite: unSavedSite
+							unSavedSite: unSavedSite,
+							imageHeaderLogo: true
 						});
 					});
 				}

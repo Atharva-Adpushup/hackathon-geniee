@@ -2,7 +2,6 @@ import React, { PropTypes, Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Row, Col, Button } from 'react-bootstrap';
-import moment from 'moment';
 import {
 	deleteSection,
 	renameSection,
@@ -25,15 +24,12 @@ class variationSections extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			startDate: moment()
-				.subtract(7, 'days')
-				.startOf('day'),
-			endDate: moment().startOf('day'),
+			startDate: false,
+			endDate: false,
 			focusedInput: undefined,
 			loadingReport: false
 		};
 		this.datesUpdated = this.datesUpdated.bind(this);
-		this.focusUpdated = this.focusUpdated.bind(this);
 		this.generateReportWrapper = this.generateReportWrapper.bind(this);
 	}
 
@@ -41,15 +37,13 @@ class variationSections extends Component {
 		this.setState({ loadingReport: false });
 	}
 
-	datesUpdated({ startDate, endDate }) {
-		this.setState({
-			startDate,
-			endDate
-		});
-	}
+	datesUpdated(e) {
+		let target = e.target,
+			type = target.getAttribute('name');
 
-	focusUpdated(focusedInput) {
-		this.setState({ focusedInput });
+		this.setState({
+			[type]: target.value
+		});
 	}
 
 	generateReportWrapper() {
@@ -58,8 +52,8 @@ class variationSections extends Component {
 			return;
 		}
 		this.props.generateReport({
-			from: this.state.startDate.format('YYYY-MM-DD'),
-			to: this.state.endDate.format('YYYY-MM-DD')
+			from: this.state.startDate,
+			to: this.state.endDate
 		});
 		this.setState({ loadingReport: true });
 	}
@@ -90,18 +84,7 @@ class variationSections extends Component {
 					<h1 className="variation-section-heading">Variation Sections</h1>
 				</span>
 				{ui.variationPanel.expanded ? (
-					<Filters
-						onDatesChange={this.datesUpdated}
-						onFocusChange={this.focusUpdated}
-						focusedInput={this.state.focusedInput}
-						startDate={this.state.startDate}
-						endDate={this.state.endDate}
-						showDefaultInputIcon
-						hideKeyboardShortcutsPanel
-						showClearDates
-						displayFormat={'DD-MM-YYYY'}
-						generateReport={this.generateReportWrapper}
-					/>
+					<Filters generateReport={this.generateReportWrapper} datesUpdated={this.datesUpdated} />
 				) : null}
 				{!sections.length ? <span>No Sections</span> : ''}
 				<ul className="section-list row">
