@@ -93,7 +93,7 @@ class insertMenu extends React.Component {
 				customZoneId: customZoneId || ''
 			},
 			adPayload = {
-				isCustomSize: true,
+				isCustomSize: this.state.isCustomSize,
 				adCode,
 				network,
 				height: this.state.adSize.height,
