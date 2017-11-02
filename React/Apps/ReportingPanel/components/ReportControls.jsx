@@ -7,6 +7,8 @@ import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 
+let groupByArray = config.GROUP_BY;
+
 class ReportControls extends Component {
 	constructor(props) {
 		super(props);
@@ -17,7 +19,8 @@ class ReportControls extends Component {
 			variation: props.variation ? props.variation : null,
 			startDate: props.startDate,
 			endDate: props.endDate,
-			groupBy: null
+			groupBy: null,
+			groupByArray
 		};
 		this.pageGroupUpdated = this.pageGroupUpdated.bind(this);
 		this.platformUpdated = this.platformUpdated.bind(this);
@@ -39,6 +42,12 @@ class ReportControls extends Component {
 
 	pageGroupUpdated(pageGroup) {
 		const { platform, startDate, endDate, variation, groupBy } = this.state;
+
+		if (pageGroup !== null) {
+			this.setState({ groupByArray: ['variation'] });
+		} else {
+			this.setState({ groupByArray: [config.GROUP_BY] });
+		}
 
 		this.setState({ pageGroup });
 		this.props.reportParamsUpdateHandler({
@@ -172,9 +181,11 @@ class ReportControls extends Component {
 						</Col>
 						<Col sm={2}>
 							<SelectBox value={state.groupBy} label="Group By" onChange={this.groupByUpdated}>
-								<option key={0} value="pageGroup">
-									PageGroup
-								</option>
+								{state.groupByArray.map((groupBy, index) => (
+									<option key={index} value={groupBy}>
+										{groupBy}
+									</option>
+								))}
 							</SelectBox>
 						</Col>
 					</Row>
