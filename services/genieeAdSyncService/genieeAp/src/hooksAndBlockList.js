@@ -46,17 +46,21 @@ function init(adp, onPageGroupPush, platform) {
 		isExperimentPageGroups = !!(experimentPageGroups && experimentPageGroups.length);
 
 	if (isExperimentPageGroups) {
-		for (var i = 0; i < experimentPageGroups.length; i++) {
-			var key = experimentPageGroups[i],
-				//Remove forceVariation param from url so that it doesn't change pageGrop pattern
-				url = utils.removeUrlParameter(w.location.href, config.forceVariation),
-				patternToMatch = platformExperiments[key].pageGroupPattern;
+		try {
+			for (var i = 0; i < experimentPageGroups.length; i++) {
+				var key = experimentPageGroups[i],
+					//Remove forceVariation param from url so that it doesn't change pageGrop pattern
+					url = utils.removeUrlParameter(w.location.href, config.forceVariation),
+					patternToMatch = platformExperiments[key].pageGroupPattern;
 
-			if (url.match(new RegExp(patternToMatch, 'i'))) {
-				// forceFully set pagegroup in case url pattern matches to current url
-				config.pageGroup = key.toUpperCase();
-				break;
+				if (url.match(new RegExp(patternToMatch, 'i'))) {
+					// forceFully set pagegroup in case url pattern matches to current url
+					config.pageGroup = key.toUpperCase();
+					break;
+				}
 			}
+		} catch (error) {
+			utils.log('Error while detecting pageGroup', error, experimentPageGroups);
 		}
 	}
 
