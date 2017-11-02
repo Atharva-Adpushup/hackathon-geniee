@@ -11,10 +11,6 @@ const apiQueryGenerator = params => {
 			to: moment(params.endDate).format('YYYY-MM-DD')
 		};
 
-		if (params.pageGroup) {
-			where.pagegroup = [params.pageGroup];
-		}
-
 		if (params.platform) {
 			where.device_type = params.platform;
 		}
@@ -26,8 +22,8 @@ const apiQueryGenerator = params => {
 		return JSON.stringify({
 			select: config.SELECT,
 			where,
-			orderBy: ['report_date']
-			//groupBy: ['pagegroup']
+			orderBy: ['report_date'],
+			groupBy: [params.groupBy]
 		});
 	},
 	capitalCase = str => {
