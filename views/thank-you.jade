@@ -185,24 +185,13 @@ block bodyContent
 						a(href=operationToolsPath, target="_blank")
 							li Generate Header code
 
-	div(class="intercom-launcher")
-		if analytics
-			- user = user || {};
-			// Intercom user secure mode Hash
-			- intercomHash = utils.getHmacSHA256(user.email, consts.analytics["INTERCOM_ID"]);
-			if environment == "production"
-				script(type="text/javascript").
-					var intercomHash = '#{intercomHash}',
-						intercomObj = {
-							Intercom: {
-								user_hash: intercomHash
-							}
-						};
-
 	- analytics = analytics || {};
+	if analytics
+		- user = user || {};
+
 	script(type="text/javascript").
-		var analyticsObj = !{JSON.stringify(analytics)},
-			intercomToSegmentObj = intercomObj || null;
+		var analyticsObj = !{JSON.stringify(analytics)};
+
 		if(analyticsObj && !jQuery.isEmptyObject(analyticsObj)) {
 			var userInfoObj = !{JSON.stringify(user)},
 				stage = userInfoObj.stage || 'Pre Onboarding';
@@ -212,15 +201,13 @@ block bodyContent
 			});
 			adpushupAnalyticsEvents.emit('analyticsIdentify', {
 				email: userInfoObj.email, 
-				analytics: analyticsObj, 
-				intercom: intercomToSegmentObj
+				analytics: analyticsObj
 			});
 			adpushupAnalyticsEvents.emit('analyticsTrack', {
 				eventName: stage,
 				obj: {
 					name: userInfoObj.firstName,
 					email: userInfoObj.email
-				},
-				intercom: intercomToSegmentObj
+				}
 			});
 		}

@@ -39,6 +39,7 @@ class variationSectionElement extends Component {
 		this.onSelectChange = this.onSelectChange.bind(this);
 		this.onAdCodeChange = this.onAdCodeChange.bind(this);
 		this.updateNetworkWrapper = this.updateNetworkWrapper.bind(this);
+		this.onToggleChange = this.onToggleChange.bind(this);
 	}
 
 	componentWillMount() {
@@ -68,29 +69,6 @@ class variationSectionElement extends Component {
 		this.props.updateAdCode(this.props.section.ads[0].id, adCode, this.state.network);
 		this.setState({ adCode: adCode });
 	}
-
-	renderSwitch = field => {
-		return (
-			<CustomToggleSwitch
-				labelText={field.label}
-				className="mT-10 mB-10"
-				labelSize={5}
-				componentSize={7}
-				customComponentClass="u-padding-r10px"
-				checked={this.state.headerBidding}
-				name="headerBiddingSwitch"
-				layout="horizontal"
-				size="m"
-				id="js-header-bidding-switch"
-				on="Yes"
-				off="No"
-				customComponentClass="u-padding-0px"
-				labelBold={false}
-				onChange={this.onToggleChange}
-				{...field.input}
-			/>
-		);
-	};
 
 	onSelectChange = network => {
 		this.setState({
@@ -138,6 +116,29 @@ class variationSectionElement extends Component {
 					</Row>
 				</Col>
 			</Row>
+		);
+	};
+
+	renderSwitch = (field, headerBidding, onToggleChange, id) => {
+		return (
+			<CustomToggleSwitch
+				labelText={field.label}
+				className="mT-10 mB-10"
+				labelSize={5}
+				componentSize={7}
+				customComponentClass="u-padding-r10px"
+				checked={headerBidding}
+				name={`headerBiddingSwitch-${id}`}
+				layout="horizontal"
+				size="m"
+				id={`js-header-bidding-switch-${id}`}
+				on="Yes"
+				off="No"
+				customComponentClass="u-padding-0px"
+				labelBold={false}
+				onChange={onToggleChange}
+				{...field.input}
+			/>
 		);
 	};
 
@@ -395,10 +396,15 @@ class variationSectionElement extends Component {
 												</div>
 												<div>
 													<Col>
-														{this.renderSwitch({
-															label: 'Header Bidding',
-															name: 'headerBidding'
-														})}
+														{this.renderSwitch(
+															{
+																label: 'Header Bidding',
+																name: 'headerBidding'
+															},
+															this.state.headerBidding,
+															this.onToggleChange,
+															props.section.id
+														)}
 													</Col>
 												</div>
 												<div className="mT-10">
