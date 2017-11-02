@@ -293,12 +293,12 @@ const dataLabels = commonConsts.DATA_LABELS,
 	dataParser = (data, groupBy) => {
 		const columns = formatColumnNames(data.columns);
 
-		let chartConfig = {
+		let tableConfig = generateTableData(columns, data.rows, groupBy),
+			chartConfig = {
 				yAxis: generateYAxis(columns),
 				xAxis: { categories: generateXAxis(data.rows) },
 				series: generateSeries(columns, data.rows, groupBy)
-			},
-			tableConfig = generateTableData(columns, data.rows, groupBy);
+			};
 
 		return { chartConfig, tableConfig };
 	};

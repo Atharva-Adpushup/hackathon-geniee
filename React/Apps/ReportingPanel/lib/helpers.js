@@ -76,8 +76,9 @@ const apiQueryGenerator = params => {
 			tableData = null;
 
 		if (!data.error) {
-			chartData = dataParser(data, groupBy).chartConfig;
-			tableData = dataParser(data, groupBy).tableConfig;
+			const parsedData = dataParser(data, groupBy);
+			chartData = parsedData.chartConfig;
+			tableData = parsedData.tableConfig;
 		}
 
 		config = { ...config, ...chartData };
