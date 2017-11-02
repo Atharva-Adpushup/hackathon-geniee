@@ -6,10 +6,15 @@ import { Promise } from 'es6-promise';
 
 const apiQueryGenerator = params => {
 		let where = {
-			siteid: config.SITE_ID,
-			from: moment(params.startDate).format('YYYY-MM-DD'),
-			to: moment(params.endDate).format('YYYY-MM-DD')
-		};
+				siteid: config.SITE_ID,
+				from: moment(params.startDate).format('YYYY-MM-DD'),
+				to: moment(params.endDate).format('YYYY-MM-DD')
+			},
+			groupBy = [];
+
+		if (params.groupBy) {
+			groupBy.push(params.groupBy.toLowerCase());
+		}
 
 		if (params.platform) {
 			where.device_type = params.platform;
@@ -23,7 +28,7 @@ const apiQueryGenerator = params => {
 			select: config.SELECT,
 			where,
 			orderBy: ['report_date'],
-			groupBy: [params.groupBy]
+			groupBy
 		});
 	},
 	capitalCase = str => {

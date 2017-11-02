@@ -72,7 +72,7 @@ class ReportingPanel extends React.Component {
 		})
 			.then(res => {
 				if (!res.error && res.rows.length) {
-					const data = dataGenerator(res);
+					const data = dataGenerator(res, groupBy);
 					this.setState({
 						...state,
 						reportError: false,
