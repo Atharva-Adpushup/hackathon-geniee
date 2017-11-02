@@ -10,7 +10,9 @@ const siteMappingActions = {
 		mode: 'Mode',
 		step: 'Status',
 		customSizes: 'Custom Sizes',
-		dateCreated: 'Date Created'
+		dateCreated: 'Date Created',
+		pubId: 'Publisher Id',
+		adsenseEmail: 'Adsense Email'
 	},
 	headers = [
 		{
@@ -32,8 +34,8 @@ const siteMappingActions = {
 			filterable: true
 		},
 		{
-			title: 'Status',
-			prop: 'Status',
+			title: 'Mode',
+			prop: 'Mode',
 			sortable: true,
 			filterable: true
 		},
@@ -50,8 +52,20 @@ const siteMappingActions = {
 			filterable: true
 		},
 		{
-			title: 'Mode',
-			prop: 'Mode',
+			title: 'Status',
+			prop: 'Status',
+			sortable: true,
+			filterable: true
+		},
+		{
+			title: 'Publisher Id',
+			prop: 'Publisher Id',
+			sortable: true,
+			filterable: true
+		},
+		{
+			title: 'Adsense Email',
+			prop: 'Adsense Email',
 			sortable: true,
 			filterable: true
 		}
