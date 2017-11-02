@@ -141,8 +141,8 @@ class ReportingPanel extends React.Component {
 					<div className="report-table">
 						{tableConfig ? (
 							<Datatable
-								tableHeader={tablecommonConsts.header}
-								tableBody={tablecommonConsts.body}
+								tableHeader={tableConfig.header}
+								tableBody={tableConfig.body}
 								keyName="reportTable"
 								rowsPerPage={20}
 								rowsPerPageOption={[30, 40, 50, 60]}

@@ -99,23 +99,26 @@ const dataLabels = commonConsts.DATA_LABELS,
 		row1[API_DATA_PARAMS.xpathMiss] += row2[API_DATA_PARAMS.xpathMiss];
 		return row1;
 	},
-	processChartGroupBy = (rows, groupBy) => {
-		if (!groupBy) {
+	processChartGroupBy = (rows, groupByParam) => {
+		if (!groupByParam) {
 			return rows;
 		}
 
 		let updatedRows = [];
 
-		switch (groupBy) {
+		switch (groupByParam) {
 			case 'pagegroup':
-				for (let i = 0; i < rows.length; i++) {
-					let row1 = rows[i];
-					for (let j = i + 1; j < rows.length; j++) {
-						if (rows[j].report_date === rows[i].report_date) {
-							let row2 = rows[j];
-							updatedRows.push(mergeParams(row1, row2));
-							break;
+				const groupedRows = groupBy(rows, commonConsts.API_DATA_PARAMS.date);
+				for (let i in groupedRows) {
+					const arr = groupedRows[i];
+					for (let j = 0; j < arr.length; j++) {
+						let row1 = arr[j];
+						for (let k = j + 1; k < arr.length; k++) {
+							let row2 = arr[k];
+							row1 = mergeParams(row1, row2);
 						}
+						updatedRows.push(row1);
+						break;
 					}
 				}
 				break;
