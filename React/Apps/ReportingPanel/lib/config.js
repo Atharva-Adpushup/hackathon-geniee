@@ -1,6 +1,7 @@
 const config = {
 	SELECT: ['total_xpath_miss', 'total_impressions', 'total_revenue', 'total_requests'],
 	PLATFORMS: ['DESKTOP', 'MOBILE', 'TABLET'],
+	GROUP_BY: ['pagegroup'],
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
 	SITE_ID: 28822, //window.siteId
