@@ -287,7 +287,7 @@ const dataLabels = config.DATA_LABELS,
 
 		return { header, body };
 	},
-	parseSiteLevelData = (data, groupBy) => {
+	dataParser = (data, groupBy) => {
 		const columns = formatColumnNames(data.columns);
 
 		let chartConfig = {
@@ -300,4 +300,4 @@ const dataLabels = config.DATA_LABELS,
 		return { chartConfig, tableConfig };
 	};
 
-export default parseSiteLevelData;
+export default dataParser;
