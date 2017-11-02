@@ -57,8 +57,7 @@ class SitesMapping extends Component {
 				[labels['siteId']]: site.siteId,
 				[labels['siteDomain']]: site.siteDomain,
 				[labels['ownerEmail']]: site.ownerEmail,
-				[labels['step']]: this.generateStatus(site.step),
-				[labels['dateCreated']]: moment(site.dateCreated).format('DD-MM-YYYY'),
+				[labels['mode']]: site.apConfigs.mode || 'N/A',
 				[labels['channels']]:
 					site.channels && site.channels.length ? (
 						<Badges
@@ -70,7 +69,10 @@ class SitesMapping extends Component {
 					) : (
 						'N/A'
 					),
-				[labels['mode']]: site.apConfigs.mode || 'N/A'
+				[labels['pubId']]: site.pubId || 'N/A',
+				[labels['adsenseEmail']]: site.adsenseEmail || 'N/A',
+				[labels['step']]: this.generateStatus(site.step),
+				[labels['dateCreated']]: moment(site.dateCreated).format('DD-MM-YYYY')
 			};
 		});
 		return tableConfig;

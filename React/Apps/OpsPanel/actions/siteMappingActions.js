@@ -5,7 +5,7 @@ const fetchSites = params => (dispatch, getState) => {
 	console.log('here');
 	return ajax({
 		url: '/ops/getAllSites',
-		method: 'GET'
+		method: 'POST'
 	}).then(response => {
 		if (response.error) {
 			alert('Error occured. Please try again later');
