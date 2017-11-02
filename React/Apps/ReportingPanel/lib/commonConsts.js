@@ -25,7 +25,8 @@ const config = {
 		pageviews: 'total_requests',
 		revenue: 'total_revenue',
 		xpathMiss: 'total_xpath_miss',
-		pageGroup: 'name'
+		pageGroup: 'name',
+		date: 'report_date'
 	}
 };
 

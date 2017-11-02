@@ -5,7 +5,7 @@ import Datatable from 'react-bs-datatable';
 import ActionCard from '../../../Components/ActionCard.jsx';
 import ReportControls from './ReportControls.jsx';
 import '../styles.scss';
-import config from '../lib/config';
+import commonConsts from '../lib/commonConsts';
 import { apiQueryGenerator, dataGenerator, ajax } from '../lib/helpers';
 import moment from 'moment';
 import PaneLoader from '../../../Components/PaneLoader.jsx';
@@ -40,7 +40,7 @@ class ReportingPanel extends React.Component {
 	fetchVariations(pageGroup, platform) {
 		ajax({
 			method: 'GET',
-			url: `${config.VARIATIONS_ENDPOINT}?siteId=${config.SITE_ID}&pageGroup=${pageGroup}&platform=${platform}`
+			url: `${commonConsts.VARIATIONS_ENDPOINT}?siteId=${commonConsts.SITE_ID}&pageGroup=${pageGroup}&platform=${platform}`
 		})
 			.then(res => {
 				const variations = this.state.variations.concat(res.data);
@@ -67,7 +67,7 @@ class ReportingPanel extends React.Component {
 
 		ajax({
 			method: 'POST',
-			url: config.REPORT_ENDPOINT,
+			url: commonConsts.REPORT_ENDPOINT,
 			data: apiQueryGenerator(params)
 		})
 			.then(res => {
@@ -141,8 +141,8 @@ class ReportingPanel extends React.Component {
 					<div className="report-table">
 						{tableConfig ? (
 							<Datatable
-								tableHeader={tableConfig.header}
-								tableBody={tableConfig.body}
+								tableHeader={tablecommonConsts.header}
+								tableBody={tablecommonConsts.body}
 								keyName="reportTable"
 								rowsPerPage={20}
 								rowsPerPageOption={[30, 40, 50, 60]}

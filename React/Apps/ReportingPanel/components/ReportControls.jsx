@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import SelectBox from '../../../Components/SelectBox/index.jsx';
 import { Row, Col } from 'react-bootstrap';
-import config from '../lib/config';
+import commonConsts from '../lib/commonConsts';
 import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 
-let groupByArray = config.GROUP_BY;
+let groupByArray = commonConsts.GROUP_BY;
 
 class ReportControls extends Component {
 	constructor(props) {
@@ -33,11 +33,11 @@ class ReportControls extends Component {
 	}
 
 	getPageGroupName(pageGroup) {
-		return pageGroup !== null ? config.PAGEGROUPS[pageGroup] : null;
+		return pageGroup !== null ? commonConsts.PAGEGROUPS[pageGroup] : null;
 	}
 
 	getPlatformName(platform) {
-		return platform !== null ? config.PLATFORMS[platform] : null;
+		return platform !== null ? commonConsts.PLATFORMS[platform] : null;
 	}
 
 	pageGroupUpdated(pageGroup) {
@@ -46,7 +46,7 @@ class ReportControls extends Component {
 		if (pageGroup !== null) {
 			this.setState({ groupByArray: ['variation'] });
 		} else {
-			this.setState({ groupByArray: [config.GROUP_BY] });
+			this.setState({ groupByArray: [commonConsts.GROUP_BY] });
 		}
 
 		this.setState({ pageGroup });
