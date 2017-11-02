@@ -107,7 +107,7 @@ const dataLabels = config.DATA_LABELS,
 		let updatedRows = [];
 
 		switch (groupBy) {
-			case 'pageGroup':
+			case 'pagegroup':
 				for (let i = 0; i < rows.length; i++) {
 					let row1 = rows[i];
 					for (let j = i + 1; j < rows.length; j++) {
@@ -221,7 +221,7 @@ const dataLabels = config.DATA_LABELS,
 		let updatedRows = [];
 
 		switch (groupByParam) {
-			case 'pageGroup':
+			case 'pagegroup':
 				header.unshift({
 					title: dataLabels.pageGroup,
 					prop: dataLabels.pageGroup,
