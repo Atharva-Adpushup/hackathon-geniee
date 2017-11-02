@@ -1,10 +1,10 @@
-const config = {
+const commonConsts = {
 	SELECT: ['total_xpath_miss', 'total_impressions', 'total_revenue', 'total_requests'],
 	PLATFORMS: ['DESKTOP', 'MOBILE', 'TABLET'],
 	GROUP_BY: ['pagegroup'],
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
-	SITE_ID: 31000, //window.siteId
+	SITE_ID: 28822, //window.siteId
 	PAGEGROUPS: window.pageGroups,
 	IS_SUPERUSER: window.isSuperUser,
 	DATA_LABELS: {
@@ -30,4 +30,4 @@ const config = {
 	}
 };
 
-export default config;
+export default commonConsts;

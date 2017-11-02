@@ -46,7 +46,7 @@ class ReportControls extends Component {
 		if (pageGroup !== null) {
 			this.setState({ groupByArray: ['variation'] });
 		} else {
-			this.setState({ groupByArray: [commonConsts.GROUP_BY] });
+			this.setState({ groupByArray: commonConsts.GROUP_BY });
 		}
 
 		this.setState({ pageGroup });
@@ -122,7 +122,7 @@ class ReportControls extends Component {
 
 	render() {
 		const { state, props } = this,
-			{ PLATFORMS, PAGEGROUPS } = config;
+			{ PLATFORMS, PAGEGROUPS } = commonConsts;
 
 		return (
 			<div className="report-controls-wrapper">
