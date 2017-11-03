@@ -7,15 +7,15 @@ const LinkList = props => {
 		<Row className="ops-panel-links-container">
 			<Col xs={6} xsOffset={3}>
 				<ListGroup componentClass="ul">
-					<Link to="ops/cbDocEditor">
+					{/* <Link to="/ops/cbDocEditor">
 						<ListGroupItem listItem>Couchbase Doc Editor</ListGroupItem>
-					</Link>
-					<Link to="ops/sitesMapping">
+					</Link> */}
+					<Link to="/ops/sitesMapping">
 						<ListGroupItem listItem>Sites Mapping</ListGroupItem>
 					</Link>
-					<Link to="ops/liveSitesMapping">
+					{/* <Link to="/ops/liveSitesMapping">
 						<ListGroupItem listItem>Live Sites Mapping</ListGroupItem>
-					</Link>
+					</Link> */}
 				</ListGroup>
 			</Col>
 		</Row>
