@@ -87,7 +87,9 @@ const _ = require('lodash'),
 	},
 	getVariationPayload = (variation, platform, pageGroup, variationData, finalJson) => {
 		var ads = getSectionsPayload(variation.sections),
-			computedVariationObj;
+			computedVariationObj,
+			contentSelector = variation.contentSelector,
+			isContentSelector = !!contentSelector;
 
 		if (!ads.length) {
 			return true;
@@ -98,6 +100,7 @@ const _ = require('lodash'),
 			name: variation.name,
 			traffic: variation.trafficDistribution,
 			customJs: variation.customJs,
+			contentSelector: isContentSelector ? contentSelector : '',
 			ads: ads,
 			// Data required for auto optimiser model
 			// pageRPM is mapped as sum

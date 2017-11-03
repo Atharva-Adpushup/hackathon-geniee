@@ -51,7 +51,14 @@ module.exports = [
 					loaders: ['style-loader', 'css-loader', 'sass-loader']
 				}
 			]
-		}
+		},
+		plugins: [
+			new webpack.optimize.UglifyJsPlugin({
+				compress: {
+					comparisons: false
+				}
+			})
+		]
 	},
 	{
 		entry: {
@@ -96,7 +103,14 @@ module.exports = [
 					loaders: ['style-loader', 'css-loader', 'sass-loader']
 				}
 			]
-		}
+		},
+		plugins: [
+			new webpack.optimize.UglifyJsPlugin({
+				compress: {
+					comparisons: false
+				}
+			})
+		]
 	},
 	{
 		entry: {
@@ -123,7 +137,14 @@ module.exports = [
 					loaders: ['style-loader', 'css-loader', 'sass-loader']
 				}
 			]
-		}
+		},
+		plugins: [
+			new webpack.optimize.UglifyJsPlugin({
+				compress: {
+					comparisons: false
+				}
+			})
+		]
 	},
 	{
 		entry: {
@@ -154,6 +175,13 @@ module.exports = [
 					loaders: ['style-loader', 'css-loader']
 				}
 			]
-		}
+		},
+		plugins: [
+			new webpack.optimize.UglifyJsPlugin({
+				compress: {
+					comparisons: false
+				}
+			})
+		]
 	}
 ];

@@ -83,14 +83,14 @@ class inContentForm extends React.Component {
 		const props = this.props;
 		return (
 			<div>
-				{props.activeChannel.contentSelector ? (
+				{props.variation.contentSelector ? (
 					renderInContentAdder(this, getSupportedSizes)
 				) : (
 					<div>
 						<h1 className="variation-section-heading">Add Incontent Variation</h1>
 						<p className="error-message" style={{ fontSize: '1em' }}>
-							Please set your <strong>Content Selector</strong> in the channel settings first to create
-							your in-content section.
+							Please set your <strong>Content Selector</strong> in Info settings panel first to create
+							in-content sections.
 						</p>
 					</div>
 				)}

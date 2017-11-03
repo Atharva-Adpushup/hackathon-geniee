@@ -90,6 +90,7 @@ var $ = require('jquery'),
 			finished = false,
 			ads = variation.ads,
 			displayCounter = ads.length,
+			contentSelector = variation.contentSelector,
 			feedbackData = {
 				ads: [],
 				xpathMiss: [],
@@ -217,11 +218,11 @@ var $ = require('jquery'),
 
 			// Process incontent sections
 			// If incontent ads thr but no xpath given for content area
-			if (ads.inContentAds.length && !config.contentSelector) {
+			if (ads.inContentAds.length && !contentSelector) {
 				handleContentSelectorFailure(ads.inContentAds);
 			} else if (ads.inContentAds.length) {
 				nodewatcher
-					.watch(config.contentSelector, config.xpathWaitTimeout)
+					.watch(contentSelector, config.xpathWaitTimeout)
 					.done(function($incontentElm) {
 						placeInContentAds($incontentElm, ads.inContentAds);
 					})

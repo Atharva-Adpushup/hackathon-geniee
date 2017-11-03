@@ -44,6 +44,12 @@ const getLastVariationNumber = function(variations) {
 			}
 		});
 	},
+	updateContentSelector = (variationId, channelId, contentSelector) => ({
+		type: variationActions.UPDATE_CONTENT_SELECTOR,
+		contentSelector,
+		variationId,
+		channelId
+	}),
 	copyVariation = (variationId, channelId) => (dispatch, getState) => {
 		const newVariationId = Utils.getRandomNumber(),
 			ads = [],
@@ -120,5 +126,6 @@ export {
 	editVariationName,
 	editTrafficDistribution,
 	saveBeforeJs,
-	saveAfterJs
+	saveAfterJs,
+	updateContentSelector
 };
