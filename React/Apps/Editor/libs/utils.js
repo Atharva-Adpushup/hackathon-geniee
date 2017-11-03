@@ -424,9 +424,10 @@ const randomStore = [],
 					// Else, left offset will be the context element right
 					left = isArrowMenu ? arrowMenuLeft : contextRight;
 				} else if (contextLeft >= targetWidth) {
-					left = contextLeft - targetWidth;
+					left = contextLeft - targetWidth - 30;
 				} else {
-					left = contextRight - (targetWidth - rightSpace);
+					//some wierd issue creating 30 px wrong calulation so manually substracting
+					left = contextRight - (targetWidth - rightSpace) - 30;
 				}
 
 				if (windowHeight - contextTop >= targetHeight) {
@@ -435,7 +436,8 @@ const randomStore = [],
 					// Else, top offset will be the context element top
 					top = isArrowMenu ? arrowMenuTop : contextTop;
 				} else {
-					top = windowHeight - targetHeight - variationBarHeight;
+					//substraction 20px as agai some calculation bug creating 20px difference in position
+					top = windowHeight - targetHeight - variationBarHeight - 20;
 				}
 
 				return { top, left };
