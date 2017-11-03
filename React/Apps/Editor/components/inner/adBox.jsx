@@ -37,8 +37,11 @@ const highLighterClass = '_APD_highlighter',
 			css = Object.assign({}, props.ad.css),
 			adBoxSizeContent = `${width} X ${height}`,
 			clickHandler = ev => {
-				const $el = $(ev.target),
-					position = Utils.dom.getElementBounds($(ev.target));
+				let $el = $(ev.target);
+				if ($el.parents().hasClass('_ap_reject')) {
+					$el = $el.closest('._ap_reject');
+				}
+				const position = Utils.dom.getElementBounds($el);
 
 				props.mode == uiModes.EDITOR_MODE // Only dispatch action if EDITOR MODE
 					? props.clickHandler(id, position, Utils.ui.getElementSelectorCords($el))
