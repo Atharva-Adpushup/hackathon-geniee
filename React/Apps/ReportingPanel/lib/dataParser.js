@@ -1,9 +1,9 @@
-import { capitalCase, reorderArray } from '../helpers';
-import config from '../config';
-import { remove, map, each } from 'lodash';
+import { capitalCase, reorderArray } from './helpers';
+import commonConsts from './commonConsts';
+import { remove, map, each, groupBy, uniq } from 'lodash';
 import moment from 'moment';
 
-const dataLabels = config.DATA_LABELS,
+const dataLabels = commonConsts.DATA_LABELS,
 	reorderColumns = cols => {
 		let updatedCols = [];
 		updatedCols.push(reorderArray(dataLabels.date, cols));
@@ -51,7 +51,7 @@ const dataLabels = config.DATA_LABELS,
 					break;
 				case dataLabels.xpathMiss:
 				case dataLabels.pageViews:
-					if (config.IS_SUPERUSER) {
+					if (commonConsts.IS_SUPERUSER) {
 						xPathImpressionsPageviews += `${columns[i]} / `;
 					}
 					break;
@@ -59,7 +59,7 @@ const dataLabels = config.DATA_LABELS,
 					cpmPageCpm += `${columns[i]} / `;
 					break;
 				case dataLabels.pageCpm:
-					if (config.IS_SUPERUSER) {
+					if (commonConsts.IS_SUPERUSER) {
 						cpmPageCpm += `${columns[i]} / `;
 					}
 					break;
@@ -91,8 +91,51 @@ const dataLabels = config.DATA_LABELS,
 
 		return yAxis;
 	},
-	generateXAxis = rows => map(rows, row => moment(row.report_date).format('DD-MM-YYYY')),
-	generateSeries = (cols, rows) => {
+	mergeParams = (row1, row2) => {
+		const API_DATA_PARAMS = commonConsts.API_DATA_PARAMS;
+		row1[API_DATA_PARAMS.impressions] += row2[API_DATA_PARAMS.impressions];
+		row1[API_DATA_PARAMS.pageviews] += row2[API_DATA_PARAMS.pageviews];
+		row1[API_DATA_PARAMS.revenue] += row2[API_DATA_PARAMS.revenue];
+		row1[API_DATA_PARAMS.xpathMiss] += row2[API_DATA_PARAMS.xpathMiss];
+		return row1;
+	},
+	processChartGroupBy = (rows, groupByParam) => {
+		if (!groupByParam) {
+			return rows;
+		}
+
+		let updatedRows = [];
+
+		switch (groupByParam) {
+			case 'pagegroup':
+			case 'variation':
+				const groupedRows = groupBy(rows, commonConsts.API_DATA_PARAMS.date);
+				for (let i in groupedRows) {
+					const arr = groupedRows[i];
+					for (let j = 0; j < arr.length; j++) {
+						let row1 = arr[j];
+						for (let k = j + 1; k < arr.length; k++) {
+							let row2 = arr[k];
+							row1 = mergeParams(row1, row2);
+						}
+						updatedRows.push(row1);
+						break;
+					}
+				}
+				break;
+		}
+
+		return updatedRows;
+	},
+	generateXAxis = rows => {
+		return uniq(
+			map(rows, row => {
+				return moment(row.report_date).format('DD-MM-YYYY');
+			}),
+			'report_date'
+		);
+	},
+	generateSeries = (cols, rows, groupBy) => {
 		const pointOptions = {
 			lineWidth: 1.5,
 			marker: {
@@ -100,6 +143,8 @@ const dataLabels = config.DATA_LABELS,
 				radius: 3.2
 			}
 		};
+
+		rows = processChartGroupBy(rows, groupBy);
 
 		let impressions,
 			pageviews,
@@ -171,7 +216,7 @@ const dataLabels = config.DATA_LABELS,
 			xpathMiss.data.push(rows[i].total_xpath_miss);
 		}
 
-		if (config.IS_SUPERUSER) {
+		if (commonConsts.IS_SUPERUSER) {
 			series.push(pageviews, pageCpm, impressions, cpm, revenue, xpathMiss);
 		} else {
 			series.push(impressions, cpm, revenue);
@@ -179,7 +224,53 @@ const dataLabels = config.DATA_LABELS,
 
 		return series;
 	},
-	generateTableData = (cols, rows) => {
+	processTableGroupBy = (header, rows, groupByParam) => {
+		if (!groupByParam) {
+			return { header, rows };
+		}
+
+		let updatedRows = [];
+
+		switch (groupByParam) {
+			case 'pagegroup':
+				header.unshift({
+					title: dataLabels.pageGroup,
+					prop: dataLabels.pageGroup,
+					sortable: false,
+					filterable: false
+				});
+
+				let groupedRows = groupBy(rows, commonConsts.API_DATA_PARAMS.pageGroup);
+
+				for (let i in groupedRows) {
+					updatedRows.push({
+						pageGroup: i
+					});
+					updatedRows = updatedRows.concat(groupedRows[i]);
+				}
+				break;
+			case 'variation':
+				header.unshift({
+					title: dataLabels.variation,
+					prop: dataLabels.variation,
+					sortable: false,
+					filterable: false
+				});
+
+				let groupedRows2 = groupBy(rows, commonConsts.API_DATA_PARAMS.variationId);
+
+				for (let i in groupedRows2) {
+					updatedRows.push({
+						variation: i
+					});
+					updatedRows = updatedRows.concat(groupedRows2[i]);
+				}
+				break;
+		}
+
+		return { header, rows: updatedRows };
+	},
+	generateTableData = (cols, rows, groupBy) => {
 		let header = [],
 			body = [];
 
@@ -187,45 +278,55 @@ const dataLabels = config.DATA_LABELS,
 			if (
 				col === dataLabels.name ||
 				col === dataLabels.variationId ||
-				(col === dataLabels.xpathMiss && !config.IS_SUPERUSER) ||
-				(col === dataLabels.pageViews && !config.IS_SUPERUSER) ||
-				(col === dataLabels.pageCpm && !config.IS_SUPERUSER)
+				(col === dataLabels.xpathMiss && !commonConsts.IS_SUPERUSER) ||
+				(col === dataLabels.pageViews && !commonConsts.IS_SUPERUSER) ||
+				(col === dataLabels.pageCpm && !commonConsts.IS_SUPERUSER)
 			) {
 				return true;
 			}
 			header.push({
 				title: col,
 				prop: col,
-				sortable: true,
+				sortable: false,
 				filterable: true
 			});
 		});
 
+		const groupedData = processTableGroupBy(header, rows, groupBy);
+		header = groupedData.header;
+		rows = groupedData.rows;
+
 		each(rows, row => {
 			body.push({
-				[dataLabels.date]: moment(row.report_date).format('DD-MM-YYYY'),
-				[dataLabels.impressions]: row.total_impressions,
-				[dataLabels.cpm]: Number((row.total_revenue * 1000 / row.total_impressions).toFixed(2)),
-				[dataLabels.xpathMiss]: config.IS_SUPERUSER ? row.total_xpath_miss : undefined,
-				[dataLabels.pageViews]: config.IS_SUPERUSER ? row.total_requests : undefined,
-				[dataLabels.revenue]: Number(row.total_revenue.toFixed(2)),
-				[dataLabels.pageCpm]: Number((row.total_revenue * 1000 / row.total_requests).toFixed(2))
+				[dataLabels.pageGroup]: row.pageGroup || undefined,
+				[dataLabels.variation]: row.variation || undefined,
+				[dataLabels.date]: row.report_date ? moment(row.report_date).format('DD-MM-YYYY') : undefined,
+				[dataLabels.impressions]: row.total_impressions || undefined,
+				[dataLabels.cpm]: row.total_revenue
+					? Number((row.total_revenue * 1000 / row.total_impressions).toFixed(2))
+					: undefined,
+				[dataLabels.xpathMiss]: commonConsts.IS_SUPERUSER ? row.total_xpath_miss : undefined,
+				[dataLabels.pageViews]: commonConsts.IS_SUPERUSER ? row.total_requests : undefined,
+				[dataLabels.revenue]: row.total_revenue ? Number(row.total_revenue.toFixed(2)) : undefined,
+				[dataLabels.pageCpm]: row.total_revenue
+					? Number((row.total_revenue * 1000 / row.total_requests).toFixed(2))
+					: undefined
 			});
 		});
 
 		return { header, body };
 	},
-	parseSiteLevelData = data => {
+	dataParser = (data, groupBy) => {
 		const columns = formatColumnNames(data.columns);
 
-		let chartConfig = {
+		let tableConfig = generateTableData(columns, data.rows, groupBy),
+			chartConfig = {
 				yAxis: generateYAxis(columns),
 				xAxis: { categories: generateXAxis(data.rows) },
-				series: generateSeries(columns, data.rows)
-			},
-			tableConfig = generateTableData(columns, data.rows);
+				series: generateSeries(columns, data.rows, groupBy)
+			};
 
 		return { chartConfig, tableConfig };
 	};
 
-export default parseSiteLevelData;
+export default dataParser;

@@ -1,18 +1,23 @@
-import config from './config';
+import commonConsts from './commonConsts';
 import moment from 'moment';
-import parseSiteLevelData from './dataParsers/parseSiteLevelData';
+import dataParser from './dataParser';
 import $ from 'jquery';
 import { Promise } from 'es6-promise';
 
 const apiQueryGenerator = params => {
 		let where = {
-			siteid: config.SITE_ID,
-			from: moment(params.startDate).format('YYYY-MM-DD'),
-			to: moment(params.endDate).format('YYYY-MM-DD')
-		};
+				siteid: commonConsts.SITE_ID,
+				from: moment(params.startDate).format('YYYY-MM-DD'),
+				to: moment(params.endDate).format('YYYY-MM-DD')
+			},
+			groupBy = [];
+
+		if (params.groupBy) {
+			groupBy.push(params.groupBy);
+		}
 
 		if (params.pageGroup) {
-			where.pagegroup = [params.pageGroup];
+			where.pagegroup = ['CALC'];
 		}
 
 		if (params.platform) {
@@ -24,10 +29,10 @@ const apiQueryGenerator = params => {
 		}
 
 		return JSON.stringify({
-			select: config.SELECT,
+			select: commonConsts.SELECT,
 			where,
-			orderBy: ['report_date']
-			//groupBy: ['pagegroup']
+			orderBy: ['report_date'],
+			groupBy
 		});
 	},
 	capitalCase = str => {
@@ -37,7 +42,7 @@ const apiQueryGenerator = params => {
 			.map(word => word[0].toUpperCase() + word.substr(1))
 			.join(' ');
 	},
-	dataGenerator = (data, reportLevel) => {
+	dataGenerator = (data, groupBy) => {
 		let config = {
 				title: {
 					text: ''
@@ -71,8 +76,9 @@ const apiQueryGenerator = params => {
 			tableData = null;
 
 		if (!data.error) {
-			chartData = parseSiteLevelData(data).chartConfig;
-			tableData = parseSiteLevelData(data).tableConfig;
+			const parsedData = dataParser(data, groupBy);
+			chartData = parsedData.chartConfig;
+			tableData = parsedData.tableConfig;
 		}
 
 		config = { ...config, ...chartData };
