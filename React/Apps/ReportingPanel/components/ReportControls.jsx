@@ -42,11 +42,14 @@ class ReportControls extends Component {
 
 	pageGroupUpdated(pageGroup) {
 		const { platform, startDate, endDate, variation, groupBy } = this.state;
+		let groupByParam = groupBy;
 
-		if (pageGroup !== null) {
-			this.setState({ groupByArray: ['variation'] });
+		if (pageGroup !== null && platform !== null) {
+			groupByParam = null;
+			this.setState({ groupByArray: ['variation'], groupBy: groupByParam });
 		} else {
-			this.setState({ groupByArray: commonConsts.GROUP_BY });
+			groupByParam = null;
+			this.setState({ groupByArray: commonConsts.GROUP_BY, groupBy: groupByParam });
 		}
 
 		this.setState({ pageGroup });
@@ -56,12 +59,21 @@ class ReportControls extends Component {
 			startDate,
 			endDate,
 			variation,
-			groupBy
+			groupBy: groupByParam
 		});
 	}
 
 	platformUpdated(platform) {
 		const { pageGroup, startDate, endDate, variation, groupBy } = this.state;
+		let groupByParam = groupBy;
+
+		if (pageGroup !== null && platform !== null) {
+			groupByParam = null;
+			this.setState({ groupByArray: ['variation'], groupBy: groupByParam });
+		} else {
+			groupByParam = null;
+			this.setState({ groupByArray: commonConsts.GROUP_BY, groupBy: groupByParam });
+		}
 
 		this.setState({ platform });
 		this.props.reportParamsUpdateHandler({
@@ -70,7 +82,7 @@ class ReportControls extends Component {
 			startDate,
 			endDate,
 			variation,
-			groupBy
+			groupBy: groupByParam
 		});
 	}
 

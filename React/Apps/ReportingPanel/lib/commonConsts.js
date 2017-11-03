@@ -4,7 +4,7 @@ const commonConsts = {
 	GROUP_BY: ['pagegroup'],
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
-	SITE_ID: 28822, //window.siteId
+	SITE_ID: 31000, //window.siteId
 	PAGEGROUPS: window.pageGroups,
 	IS_SUPERUSER: window.isSuperUser,
 	DATA_LABELS: {
@@ -18,6 +18,7 @@ const commonConsts = {
 		siteId: 'Siteid',
 		name: 'Name',
 		variationId: 'Variation Id',
+		variation: 'Variation Name',
 		pageGroup: 'PageGroup'
 	},
 	API_DATA_PARAMS: {
@@ -26,7 +27,8 @@ const commonConsts = {
 		revenue: 'total_revenue',
 		xpathMiss: 'total_xpath_miss',
 		pageGroup: 'name',
-		date: 'report_date'
+		date: 'report_date',
+		variationId: 'variation_id'
 	}
 };
 

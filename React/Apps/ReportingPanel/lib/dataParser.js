@@ -108,6 +108,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 		switch (groupByParam) {
 			case 'pagegroup':
+			case 'variation':
 				const groupedRows = groupBy(rows, commonConsts.API_DATA_PARAMS.date);
 				for (let i in groupedRows) {
 					const arr = groupedRows[i];
@@ -126,7 +127,10 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 		return updatedRows;
 	},
-	generateXAxis = rows => map(rows, row => moment(row.report_date).format('DD-MM-YYYY')),
+	generateXAxis = rows =>
+		map(rows, row => {
+			return moment(row.report_date).format('DD-MM-YYYY');
+		}),
 	generateSeries = (cols, rows, groupBy) => {
 		const pointOptions = {
 			lineWidth: 1.5,
@@ -241,6 +245,23 @@ const dataLabels = commonConsts.DATA_LABELS,
 					updatedRows = updatedRows.concat(groupedRows[i]);
 				}
 				break;
+			case 'variation':
+				header.unshift({
+					title: dataLabels.variation,
+					prop: dataLabels.variation,
+					sortable: false,
+					filterable: false
+				});
+
+				let groupedRows2 = groupBy(rows, commonConsts.API_DATA_PARAMS.variationId);
+
+				for (let i in groupedRows2) {
+					updatedRows.push({
+						variation: i
+					});
+					updatedRows = updatedRows.concat(groupedRows2[i]);
+				}
+				break;
 		}
 
 		return { header, rows: updatedRows };
@@ -274,6 +295,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 		each(rows, row => {
 			body.push({
 				[dataLabels.pageGroup]: row.pageGroup || undefined,
+				[dataLabels.variation]: row.variation || undefined,
 				[dataLabels.date]: row.report_date ? moment(row.report_date).format('DD-MM-YYYY') : undefined,
 				[dataLabels.impressions]: row.total_impressions || undefined,
 				[dataLabels.cpm]: row.total_revenue
