@@ -10,7 +10,7 @@ env.hosts = ['localhost']
 path = "./"
 jsPath = path + "services/genieeAdSyncService/genieeAp/"
 reactAppsPath = path + "React/"
-adpTagsPath = path+"/services/adpTags/"
+adpTagsPath = path+"services/adpTags/"
 prebidPath = adpTagsPath+"Prebid.js"
 assetsPath = path + "public/assets/"
 prebidGitPath = "https://github.com/adpushup/Prebid.js"
@@ -21,16 +21,16 @@ def buildAdpTags():
 		lrun("webpack --progress")
 
 def build():
-	if os.path.isdir(prebidPath):
-		buildAdpTags()
-	else:
-		with lcd(adpTagsPath):
-			lrun("git clone "+prebidGitPath)
-		with lcd(prebidPath):
-			lrun("npm install")
-			lrun("node_modules/.bin/gulp build --adapters adapter2.json")
-		buildAdpTags()
-		
+	# if os.path.isdir(prebidPath):
+	# 	buildAdpTags()
+	# else:
+	# 	with lcd(adpTagsPath):
+	# 		lrun("git clone "+prebidGitPath)
+	# 	with lcd(prebidPath):
+	# 		lrun("npm install")
+	# 		lrun("node_modules/.bin/gulp build --adapters adapter2.json")
+	# 	buildAdpTags()
+
 	with lcd(path):
 		lrun('echo "/******************** Building root files ********************/"')
 		lrun('npm install')
@@ -43,6 +43,8 @@ def build():
 		lrun('echo "/******************** Building public assets files ********************/"')
 		lrun('npm install')
 		lrun('webpack --progress')
+
+	buildAdpTags()
 
 	with lcd(jsPath):
 		lrun('echo "/******************** Building Geniee ad sync service files ********************/"')
