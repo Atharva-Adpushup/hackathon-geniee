@@ -17,7 +17,7 @@ const apiQueryGenerator = params => {
 		}
 
 		if (params.pageGroup) {
-			where.pagegroup = ['MIC'];
+			where.pagegroup = ['CALC'];
 		}
 
 		if (params.platform) {
