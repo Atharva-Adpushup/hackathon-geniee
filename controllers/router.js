@@ -7,6 +7,7 @@ var indexController = require('./indexController'),
 	apiController = require('./apiController'),
 	pageGroupController = require('./pageGroupController'),
 	authController = require('./authController'),
+	opsController = require('./opsController'),
 	commonConsts = require('../configs/commonConsts'),
 	_ = require('lodash');
 
@@ -38,6 +39,7 @@ module.exports = function(app) {
 		function isAuthorised() {
 			return _.find(
 				[
+					'/ops',
 					'/user/site',
 					'/genieeApi',
 					'/user/connectGoogle',
@@ -123,6 +125,14 @@ module.exports = function(app) {
 			next();
 		},
 		proxyController
+	);
+
+	app.use(
+		'/ops/',
+		function(req, res, next) {
+			next();
+		},
+		opsController
 	);
 
 	/*****************Login URL's End *******************/

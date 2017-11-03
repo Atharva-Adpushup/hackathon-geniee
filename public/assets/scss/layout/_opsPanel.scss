@@ -1,0 +1,56 @@
+.ops-panel-links-container {
+	a li {
+		font-size: 18px;
+		font-weight: bold;
+
+		&:hover {
+			color: $primaryRed;
+		}
+	}
+}
+
+.section-label {
+	color: #fff;
+	font-weight: 400;
+	padding: 3px 3px 3px 3px;
+	border-radius: 4px;
+	font-size: 0.8em;
+	vertical-align: middle;
+	margin-bottom: 10px;
+	margin-right: 10px;
+	position: relative;
+}
+
+.section-label i {
+	margin: 0 5px;
+}
+
+.channels {
+	background-color: #00a0e3;
+}
+
+.onboarded,
+.live {
+	background-color: #0fbe7c;
+}
+
+.pre-onboarding,
+.draft {
+	background-color: #c22733;
+}
+
+.onboarding {
+	background-color: #00a0e3;
+}
+
+.report-table .thead-th-default {
+	max-width: 250px;
+}
+
+.report-table .tbody-td-default {
+	max-width: 250px;
+}
+
+.pointer {
+	cursor: pointer;
+}
