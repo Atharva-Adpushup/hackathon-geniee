@@ -5,7 +5,7 @@ import Datatable from 'react-bs-datatable';
 import ActionCard from '../../../Components/ActionCard.jsx';
 import ReportControls from './ReportControls.jsx';
 import '../styles.scss';
-import config from '../lib/config';
+import commonConsts from '../lib/commonConsts';
 import { apiQueryGenerator, dataGenerator, ajax } from '../lib/helpers';
 import moment from 'moment';
 import PaneLoader from '../../../Components/PaneLoader.jsx';
@@ -24,6 +24,7 @@ class ReportingPanel extends React.Component {
 			platform: null,
 			variation: null,
 			variations: [],
+			groupBy: null,
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
@@ -39,7 +40,7 @@ class ReportingPanel extends React.Component {
 	fetchVariations(pageGroup, platform) {
 		ajax({
 			method: 'GET',
-			url: `${config.VARIATIONS_ENDPOINT}?siteId=${config.SITE_ID}&pageGroup=${pageGroup}&platform=${platform}`
+			url: `${commonConsts.VARIATIONS_ENDPOINT}?siteId=${commonConsts.SITE_ID}&pageGroup=${pageGroup}&platform=${platform}`
 		})
 			.then(res => {
 				const variations = this.state.variations.concat(res.data);
@@ -56,8 +57,8 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: true
 		});
 
-		const { startDate, endDate, pageGroup, platform, variation } = this.state,
-			params = { startDate, endDate, pageGroup, platform, variation };
+		const { startDate, endDate, pageGroup, platform, variation, groupBy } = this.state,
+			params = { startDate, endDate, pageGroup, platform, variation, groupBy };
 
 		let state = {
 			reportLoading: false,
@@ -66,12 +67,12 @@ class ReportingPanel extends React.Component {
 
 		ajax({
 			method: 'POST',
-			url: config.REPORT_ENDPOINT,
+			url: commonConsts.REPORT_ENDPOINT,
 			data: apiQueryGenerator(params)
 		})
 			.then(res => {
 				if (!res.error && res.rows.length) {
-					const data = dataGenerator(res);
+					const data = dataGenerator(res, groupBy);
 					this.setState({
 						...state,
 						reportError: false,
@@ -95,7 +96,8 @@ class ReportingPanel extends React.Component {
 			platform: params.platform,
 			startDate: params.startDate,
 			endDate: params.endDate,
-			variation: params.variation
+			variation: params.variation,
+			groupBy: params.groupBy
 		});
 
 		if ((params.pageGroup && !params.platform) || (params.platform && !params.pageGroup)) {
@@ -142,8 +144,8 @@ class ReportingPanel extends React.Component {
 								tableHeader={tableConfig.header}
 								tableBody={tableConfig.body}
 								keyName="reportTable"
-								rowsPerPage={10}
-								rowsPerPageOption={[10, 15, 20, 25]}
+								rowsPerPage={20}
+								rowsPerPageOption={[30, 40, 50, 60]}
 							/>
 						) : (
 							''
