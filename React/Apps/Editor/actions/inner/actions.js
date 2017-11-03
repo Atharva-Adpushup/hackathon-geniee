@@ -8,7 +8,7 @@ const highlightElement = $el => {
 		if (
 			el.tagName === 'HTML' ||
 			el.tagName === 'BODY' ||
-			$el.hasClass('_ap_reject') ||
+			//$el.hasClass('_ap_reject') ||
 			$el.parents().hasClass('_ap_reject')
 		) {
 			return { type: hbBoxActions.HIDE_HB_BOX };
