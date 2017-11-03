@@ -186,15 +186,13 @@ total_requests ----> total_pageviews
 */
 
 // let params = {
-// 	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid', 'device_type', 'ntwid'],
+// 	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid', 'device_type'],
 // 	where: {
-// 		siteid: 28822,
-// 		pagegroup: ['MIC'],
-// 		variation: ['2e68228f-84da-415e-bfcf-bfcf67c87570'],
-// 		device_type: 'DESKTOP',
-// 		ntwid: 'ADP TAGS'
+// 		siteid: 31000,
+// 		pagegroup: ['CALC'],
+// 		variation: ['7340049d-1d39-41b5-8e34-b06f1f734b51']
 // 	},
-// 	groupBy: ['ntwid']
+// 	groupBy: ['variation']
 // };
 
 // generate(params)
