@@ -5,29 +5,37 @@ const express = require('express'),
 	config = require('../configs/config'),
 	router = express.Router(),
 	appBucket = couchbaseService(
-		'couchbase://127.0.0.1/apAppBucket',
+		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
 		config.couchBase.DEFAULT_BUCKET,
 		config.couchBase.DEFAULT_BUCKET_PASSWORD
 	);
 
 const fn = {
 	getAllSitesFromCouchbase: () => {
-		let query =
-			"select a.siteId, a.siteDomain, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from apAppBucket a join apAppBucket b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'";
+		let query = `select a.siteId, a.siteDomain, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${config
+			.couchBase.DEFAULT_BUCKET} a join ${config.couchBase
+			.DEFAULT_BUCKET} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
 		return appBucket.queryDB(query);
 	}
 };
 
 router
-	.get(['/', '/liveSitesMapping', '/couchbaseEditor', '/getAllSites'], (req, res) => {
-		const { session, params } = req;
+	.get(
+		['/', '/liveSitesMapping', '/couchbaseEditor', '/getAllSites', '/:siteId/panel', '/sitesMapping'],
+		(req, res) => {
+			const { session, params } = req,
+				dataToSend = {
+					siteId: 1
+				};
 
-		if (session.isSuperUser) {
-			return res.render('opsPanel');
-		} else {
-			return res.render('404');
+			if (session.isSuperUser) {
+				params.hasOwnProperty('siteId') ? (dataToSend.siteId = req.params.siteId) : null;
+				return res.render('opsPanel', dataToSend);
+			} else {
+				return res.render('404');
+			}
 		}
-	})
+	)
 	.post('/getAllSites', (req, res) => {
 		let response = {
 			error: false

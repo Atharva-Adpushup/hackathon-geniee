@@ -11,6 +11,8 @@ const Badges = props => {
 						<span
 							onClick={props.clickHandler ? props.clickHandler : () => {}}
 							data-type={props.type ? props.type : ''}
+							data-extra={props.extra ? props.extra : ''}
+							data-value={value}
 						>
 							{value}
 						</span>
