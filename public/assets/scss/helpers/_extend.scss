@@ -99,6 +99,9 @@ collapsedextended
 {
 	padding: 0 $FMLayoutDimension;
 }
+.pdAll-5 {
+	padding: $FMLayoutDimension/2 !important;
+} 
 .pdAll-10 {
 	padding: $FMLayoutDimension;
 } 
@@ -175,6 +178,9 @@ collapsedextended
 }
 .mT-10 {
 	margin-top:10px;
+}
+.mT-15 {
+	margin-top:15px !important;
 }
 .mT-20 {
 	margin-top: 20px;

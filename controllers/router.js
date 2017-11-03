@@ -178,10 +178,15 @@ module.exports = function(app) {
 			) {
 				if (req.path.indexOf('/login') !== -1) {
 					var sites = req.session.user.sites,
-						step = sites[0].step;
+						step = sites[0].step,
+						isIncompleteOnboardingSteps = !!(!step || step < commonConsts.onboarding.totalSteps),
+						isRequestDemo = !!req.session.user.requestDemo;
+
 					if (sites.length > 1) {
 						return res.redirect('/user/dashboard');
-					} else if (!step || step < commonConsts.onboarding.totalSteps) {
+					} else if (isRequestDemo && isIncompleteOnboardingSteps) {
+						return res.redirect('/user/requestdemo');
+					} else if (isIncompleteOnboardingSteps) {
 						return res.redirect('/user/onboarding');
 					} else {
 						return res.redirect('/user/dashboard');

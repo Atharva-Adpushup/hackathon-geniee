@@ -360,7 +360,8 @@ router
 
 						return res.render('dashboard', {
 							validSites: sites,
-							unSavedSite: unSavedSite
+							unSavedSite: unSavedSite,
+							imageHeaderLogo: true
 						});
 					});
 				}

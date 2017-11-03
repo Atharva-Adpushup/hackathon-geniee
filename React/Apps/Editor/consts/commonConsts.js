@@ -26,7 +26,8 @@ const status = {
 	},
 	proxy = {
 		HTTP_PROXY_URL: `${window.ADP_ORIGIN}/loadFromApProxy/`,
-		SIMULATED_PROXY_URL: `${window.ADP_BASEURL}/proxy/loadPage`
+		SIMULATED_PROXY_URL: `${window.ADP_BASEURL}/proxy/loadPage`,
+		EXTENSION_ID: 'nbbbgcccgkkkemfmbjmbelkcgjlpibon' //'jpncecfhenibcencdmcpkeplacnhpcpp'
 	},
 	stores = {
 		SITE_STORE: 'siteStore',
@@ -177,7 +178,8 @@ const status = {
 		SHRINK_VARIATION_PANEL: 'SHRINK_VARIATION_PANEL',
 		TOGGLE_VARIATION_PANEL: 'TOGGLE_VARIATION_PANEL',
 		OPEN_VARIATION_PANEL: 'OPEN_VARIATION_PANEL',
-		CLOSE_VARIATION_PANEL: 'CLOSE_VARIATION_PANEL'
+		CLOSE_VARIATION_PANEL: 'CLOSE_VARIATION_PANEL',
+		UPDATE_CONTENT_SELECTOR: 'UPDATE_CONTENT_SELECTOR'
 	},
 	sectionActions = {
 		CREATE_SECTION: 'CREATE_SECTION',
