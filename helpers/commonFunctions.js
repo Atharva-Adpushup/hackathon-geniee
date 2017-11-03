@@ -20,10 +20,26 @@ function createAggregateNonAggregateObjects(dataset, key, container) {
 		});
 		// Rounding off
 		innerObj[identifier].aggregate.total_revenue = Number(innerObj[identifier].aggregate.total_revenue).toFixed(3);
+
+		let isInvalidRevenue = !!(
+			innerObj[identifier].aggregate.total_revenue == 0 ||
+			innerObj[identifier].aggregate.total_revenue == NaN ||
+			innerObj[identifier].aggregate.total_revenue == Infinity
+		);
+
+		innerObj[identifier].aggregate.total_revenue = isInvalidRevenue
+			? 0
+			: innerObj[identifier].aggregate.total_revenue;
+
 		// CPM = Revenue * 1000 / Impressions --> rounding off to 2 decimal places
-		innerObj[identifier].aggregate.total_cpm = Number(
-			innerObj[identifier].aggregate.total_revenue * 1000 / innerObj[identifier].aggregate.total_impressions
-		).toFixed(3);
+		innerObj[identifier].aggregate.total_cpm =
+			isInvalidRevenue || innerObj[identifier].aggregate.total_impressions == 0
+				? 0
+				: Number(
+						innerObj[identifier].aggregate.total_revenue *
+							1000 /
+							innerObj[identifier].aggregate.total_impressions
+					).toFixed(3);
 	});
 	container[key] = innerObj;
 }
