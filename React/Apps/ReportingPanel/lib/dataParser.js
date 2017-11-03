@@ -1,6 +1,6 @@
 import { capitalCase, reorderArray } from './helpers';
 import commonConsts from './commonConsts';
-import { remove, map, each, groupBy } from 'lodash';
+import { remove, map, each, groupBy, uniq } from 'lodash';
 import moment from 'moment';
 
 const dataLabels = commonConsts.DATA_LABELS,
@@ -127,10 +127,14 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 		return updatedRows;
 	},
-	generateXAxis = rows =>
-		map(rows, row => {
-			return moment(row.report_date).format('DD-MM-YYYY');
-		}),
+	generateXAxis = rows => {
+		return uniq(
+			map(rows, row => {
+				return moment(row.report_date).format('DD-MM-YYYY');
+			}),
+			'report_date'
+		);
+	},
 	generateSeries = (cols, rows, groupBy) => {
 		const pointOptions = {
 			lineWidth: 1.5,
