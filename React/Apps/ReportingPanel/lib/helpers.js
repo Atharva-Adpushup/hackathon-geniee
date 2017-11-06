@@ -17,7 +17,7 @@ const apiQueryGenerator = params => {
 		}
 
 		if (params.pageGroup) {
-			where.pagegroup = ['CALC'];
+			where.pagegroup = [params.pageGroup];
 		}
 
 		if (params.platform) {
