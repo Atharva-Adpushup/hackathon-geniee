@@ -18,9 +18,10 @@ function validateSiteData(siteModelInstance) {
 			_.keys(siteModelInstance.get('apConfigs')).length
 		),
 		isMode = !!(isApConfigs && _.has(siteModelInstance.get('apConfigs'), 'mode')),
+		isStep = !!(isApConfigs && siteModelInstance.get('step')),
 		dataObject = {};
 
-	if (!isMode) {
+	if (!isMode || !isStep) {
 		throw new AdPushupError('validateSiteData:: Invalid site data');
 	}
 
@@ -116,8 +117,11 @@ function getAllSitesData(modelInstance) {
 			return statusObject;
 		})
 		.catch(error => {
+			const isObjectMessage = _.isObject(error.message),
+				message = isObjectMessage ? JSON.stringify(error.message) : error.message;
+
 			statusObject.status = 0;
-			statusObject.message = `Some error occurred, ${JSON.stringify(error.message)}`;
+			statusObject.message = `Some error occurred, ${message}`;
 			statusObject.data = [];
 			return statusObject;
 		});
