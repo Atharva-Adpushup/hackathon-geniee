@@ -4,7 +4,7 @@ const commonConsts = {
 	GROUP_BY: ['pagegroup'],
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
-	SITE_ID: 31000, //window.siteId
+	SITE_ID: window.siteId,
 	PAGEGROUPS: window.pageGroups,
 	IS_SUPERUSER: window.isSuperUser,
 	DATA_LABELS: {

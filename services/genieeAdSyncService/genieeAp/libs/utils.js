@@ -4,6 +4,9 @@ var browserConfig = require('./browserConfig.js'),
 	Base64 = require('Base64');
 
 module.exports = {
+	log: function() {
+		if (typeof console !== 'undefined' && console.log) console.log.apply(console, arguments);
+	},
 	base64Encode: function(data) {
 		return Base64.btoa(data);
 	},
