@@ -1,6 +1,6 @@
 const N1qlQuery = require('couchbase-promises').N1qlQuery,
-	couchbase = require('../../helpers/couchBaseService'),
-	siteModel = require('../../models/siteModel'),
+	couchbase = require('../../../helpers/couchBaseService'),
+	siteModel = require('../../../models/siteModel'),
 	_ = require('lodash'),
 	Promise = require('bluebird'),
 	query = N1qlQuery.fromString('select siteId from apAppBucket where META().id like "%site::%"'),

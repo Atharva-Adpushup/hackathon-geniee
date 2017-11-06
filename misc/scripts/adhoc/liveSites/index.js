@@ -1,7 +1,7 @@
-const syncGeneratedFileWithCdn = require('../../../services/genieeAdSyncService/service'),
-	utils = require('../../../helpers/utils'),
+const syncGeneratedFileWithCdn = require('../../../../services/genieeAdSyncService/service'),
+	utils = require('../../../../helpers/utils'),
 	moment = require('moment'),
-	{ fileLogger } = require('../../../helpers/logger/file/index'),
+	{ fileLogger } = require('../../../../helpers/logger/file/index'),
 	getAllLiveSites = require('./service');
 
 module.exports = {
