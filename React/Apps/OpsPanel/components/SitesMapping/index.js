@@ -9,6 +9,7 @@ import { labels, headers } from '../../configs/commonConsts';
 import { ajax } from '../../../../common/helpers';
 import ActionCard from '../../../../Components/ActionCard.jsx';
 import Badges from '../../../../common/Badges';
+import SelectBox from '../../../../Components/SelectBox/index.jsx';
 
 class SitesMapping extends Component {
 	constructor(props) {
@@ -16,11 +17,13 @@ class SitesMapping extends Component {
 		this.state = {
 			loaded: false,
 			tableConfig: null,
-			hasSites: this.props.sites.length ? true : false
+			hasSites: this.props.sites.length ? true : false,
+			mode: undefined
 		};
 		this.generateStatus = this.generateStatus.bind(this);
 		this.generateClickableSpan = this.generateClickableSpan.bind(this);
 		this.clickHandler = this.clickHandler.bind(this);
+		this.modeChangeHandler = this.modeChangeHandler.bind(this);
 	}
 
 	componentDidMount() {
@@ -77,6 +80,14 @@ class SitesMapping extends Component {
 		);
 	}
 
+	modeChangeHandler(mode) {
+		let sites = mode == 0 ? this.props.sites : this.props.sites.filter(site => site.apConfigs.mode == mode);
+		this.setState({
+			tableConfig: this.generateTableData(sites),
+			mode: mode
+		});
+	}
+
 	generateTableData(sites) {
 		let tableConfig = {
 			headers: headers,
@@ -117,11 +128,40 @@ class SitesMapping extends Component {
 	}
 
 	render() {
+		let modes = [
+			{
+				name: 'Both',
+				value: 0
+			},
+			{
+				name: 'Live',
+				value: 1
+			},
+			{
+				name: 'Draft',
+				value: 2
+			}
+		];
 		return (
 			<ActionCard title="Sites Mapping">
 				{this.state.loaded ? (
 					this.state.hasSites ? (
 						<div className="report-table">
+							<Row className="pdAll-10">
+								<Col xs={3}>
+									<SelectBox
+										value={this.state.mode}
+										label="Select Mode"
+										onChange={this.modeChangeHandler}
+									>
+										{modes.map((mode, index) => (
+											<option key={index} value={mode.value}>
+												{mode.name}
+											</option>
+										))}
+									</SelectBox>
+								</Col>
+							</Row>
 							<Datatable
 								tableHeader={this.state.tableConfig.headers}
 								tableBody={this.state.tableConfig.data}
