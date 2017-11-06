@@ -341,10 +341,10 @@ const dataLabels = commonConsts.DATA_LABELS,
 		body.push({
 			[dataLabels.date]: <Bold>{dataLabels.total}</Bold>,
 			[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
-			[dataLabels.pageCpm]: <Bold>{totalPageCpm}</Bold>,
+			[dataLabels.pageCpm]: <Bold>{totalPageCpm.toFixed(2)}</Bold>,
 			[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
-			[dataLabels.cpm]: <Bold>{totalCpm}</Bold>,
-			[dataLabels.revenue]: <Bold>{totalRevenue}</Bold>,
+			[dataLabels.cpm]: <Bold>{totalCpm.toFixed(2)}</Bold>,
+			[dataLabels.revenue]: <Bold>{totalRevenue.toFixed(2)}</Bold>,
 			[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>
 		});
 
