@@ -107,7 +107,11 @@ class ReportingPanel extends React.Component {
 			});
 		}
 
-		if (params.pageGroup && params.platform && !this.state.variations.length) {
+		if (params.pageGroup && params.platform && !params.variation) {
+			this.setState({
+				variations: [],
+				variation: null
+			});
 			this.fetchVariations(params.pageGroup, params.platform);
 		}
 	}

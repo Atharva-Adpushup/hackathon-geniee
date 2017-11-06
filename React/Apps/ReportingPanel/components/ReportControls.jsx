@@ -58,7 +58,7 @@ class ReportControls extends Component {
 			platform: this.getPlatformName(platform),
 			startDate,
 			endDate,
-			variation,
+			variation: null,
 			groupBy: groupByParam
 		});
 	}
@@ -81,7 +81,7 @@ class ReportControls extends Component {
 			pageGroup: this.getPageGroupName(pageGroup),
 			startDate,
 			endDate,
-			variation,
+			variation: null,
 			groupBy: groupByParam
 		});
 	}
