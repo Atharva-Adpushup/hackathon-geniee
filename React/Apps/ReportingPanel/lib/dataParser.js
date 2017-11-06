@@ -1,7 +1,9 @@
+import React from 'react';
 import { capitalCase, reorderArray } from './helpers';
 import commonConsts from './commonConsts';
 import { remove, map, each, groupBy, uniq } from 'lodash';
 import moment from 'moment';
+import Bold from '../../../Components/Bold.jsx';
 
 const dataLabels = commonConsts.DATA_LABELS,
 	reorderColumns = cols => {
@@ -296,22 +298,54 @@ const dataLabels = commonConsts.DATA_LABELS,
 		header = groupedData.header;
 		rows = groupedData.rows;
 
+		let totalPageviews = 0,
+			totalPageCpm = 0,
+			totalImpressions = 0,
+			totalCpm = 0,
+			totalRevenue = 0,
+			totalXpathMiss = 0;
+
 		each(rows, row => {
+			const reportDate = row.report_date ? moment(row.report_date).format('DD-MM-YYYY') : undefined,
+				impressions = row.total_impressions || undefined,
+				cpm = row.total_revenue
+					? Number((row.total_revenue * 1000 / row.total_impressions).toFixed(2))
+					: undefined,
+				xpathMiss = commonConsts.IS_SUPERUSER ? row.total_xpath_miss : undefined,
+				pageViews = commonConsts.IS_SUPERUSER ? row.total_requests : undefined,
+				revenue = row.total_revenue ? Number(row.total_revenue.toFixed(2)) : undefined,
+				pageCpm = row.total_revenue
+					? Number((row.total_revenue * 1000 / row.total_requests).toFixed(2))
+					: undefined;
+
 			body.push({
 				[dataLabels.pageGroup]: row.pageGroup || undefined,
 				[dataLabels.variation]: row.variation || undefined,
-				[dataLabels.date]: row.report_date ? moment(row.report_date).format('DD-MM-YYYY') : undefined,
-				[dataLabels.impressions]: row.total_impressions || undefined,
-				[dataLabels.cpm]: row.total_revenue
-					? Number((row.total_revenue * 1000 / row.total_impressions).toFixed(2))
-					: undefined,
-				[dataLabels.xpathMiss]: commonConsts.IS_SUPERUSER ? row.total_xpath_miss : undefined,
-				[dataLabels.pageViews]: commonConsts.IS_SUPERUSER ? row.total_requests : undefined,
-				[dataLabels.revenue]: row.total_revenue ? Number(row.total_revenue.toFixed(2)) : undefined,
-				[dataLabels.pageCpm]: row.total_revenue
-					? Number((row.total_revenue * 1000 / row.total_requests).toFixed(2))
-					: undefined
+				[dataLabels.date]: reportDate,
+				[dataLabels.impressions]: impressions,
+				[dataLabels.cpm]: cpm,
+				[dataLabels.xpathMiss]: xpathMiss,
+				[dataLabels.pageViews]: pageViews,
+				[dataLabels.revenue]: revenue,
+				[dataLabels.pageCpm]: pageCpm
 			});
+
+			totalPageviews += pageViews;
+			totalPageCpm += pageCpm;
+			totalImpressions += impressions;
+			totalCpm += cpm;
+			totalRevenue += revenue;
+			totalXpathMiss += xpathMiss;
+		});
+
+		body.push({
+			[dataLabels.date]: <Bold>{dataLabels.total}</Bold>,
+			[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
+			[dataLabels.pageCpm]: <Bold>{totalPageCpm}</Bold>,
+			[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
+			[dataLabels.cpm]: <Bold>{totalCpm}</Bold>,
+			[dataLabels.revenue]: <Bold>{totalRevenue}</Bold>,
+			[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>
 		});
 
 		return { header, body };
