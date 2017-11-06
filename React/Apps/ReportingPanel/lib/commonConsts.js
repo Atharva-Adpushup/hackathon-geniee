@@ -19,7 +19,8 @@ const commonConsts = {
 		name: 'Name',
 		variationId: 'Variation Id',
 		variation: 'Variation Name',
-		pageGroup: 'PageGroup'
+		pageGroup: 'PageGroup',
+		total: 'Total'
 	},
 	API_DATA_PARAMS: {
 		impressions: 'total_impressions',

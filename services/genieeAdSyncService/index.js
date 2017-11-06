@@ -6,7 +6,7 @@ var adpushup = require('../../helpers/adpushupEvent'),
 	moment = require('moment'),
 	cron = require('node-cron'),
 	{ fileLogger } = require('../../helpers/logger/file/index'),
-	getAutoOptimisedLiveSites = require('../autoOptimisedLiveSites/service');
+	getAutoOptimisedLiveSites = require('../../misc/scripts/adhoc/autoOptimisedLiveSites/service');
 
 function onSiteSaved(site) {
 	// save only after 5 second of siteSaved event as still channels are not saved as siteSaved called first and then channel data is saved.

@@ -14,6 +14,7 @@ var express = require('express'),
 	CC = require('../configs/commonConsts'),
 	config = require('../configs/config'),
 	Mailer = require('../helpers/Mailer'),
+	{ getMetricForSite } = require('../helpers/commonFunctions'),
 	// Create mailer config
 	mailConfig = {
 		MAIL_FROM: config.email.MAIL_FROM,
@@ -28,6 +29,12 @@ var express = require('express'),
 function requestDemoRedirection(res) {
 	return res.redirect('/user/requestdemo');
 }
+
+const getSitesWithMetrics = sites => {
+	_.forEach(sites, site => {
+		console.log(getMetricForSite(site));
+	});
+};
 
 function dashboardRedirection(req, res, allUserSites, type) {
 	function setEmailCookie() {
@@ -82,6 +89,8 @@ function dashboardRedirection(req, res, allUserSites, type) {
 				}
 			}
 		}
+
+		// const sitesWithMetrcs = getSitesWithMetrics(sites);
 
 		switch (type) {
 			case 'dashboard':
