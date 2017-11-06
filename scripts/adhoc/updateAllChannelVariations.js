@@ -1,11 +1,11 @@
 const Promise = require('bluebird'),
 	lodash = require('lodash'),
 	extend = require('extend'),
-	couchBaseService = require('./helpers/couchBaseService'),
+	couchBaseService = require('../../helpers/couchBaseService'),
 	couchbasePromise = require('couchbase-promises'),
 	sitesByNonEmptyChannelsQuery = couchbasePromise.ViewQuery.from('app', 'sitesByNonEmptyChannels'),
 	{ promiseForeach } = require('node-utils'),
-	channelModel = require('./models/channelModel');
+	channelModel = require('../../models/channelModel');
 
 function formatQueryResult(resultData) {
 	return lodash.map(resultData, resultObj => {
