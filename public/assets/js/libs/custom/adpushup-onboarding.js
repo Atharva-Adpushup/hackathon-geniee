@@ -959,6 +959,9 @@ $('document').ready(function() {
 		};
 		ap.onboarding.init();
 
+		// Initialise bootstrap popover
+		$('[data-toggle=popover]').popover();
+
 		// Trigger to update Reach Mode value
 		$('#pwc').on('change', function(e) {
 			var pwcBox = $('#pwc :selected'),
