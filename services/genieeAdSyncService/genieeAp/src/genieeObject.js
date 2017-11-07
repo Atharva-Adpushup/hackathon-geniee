@@ -11,8 +11,12 @@ var utils = require('../libs/utils'),
 			inputZoneECPM = parseFloat(inputZoneECPM);
 
 			var globalConfig = window.adpushup.config,
-				getMatchedAdId = function(adsArray, zoneId) {
-					var adId = null;
+				getMatchedAdData = function(adsArray, zoneId) {
+					var adData = {
+						id: null,
+						size: '',
+						containerId: ''
+					};
 
 					if (!adsArray.length || !zoneId) {
 						return null;
@@ -29,23 +33,28 @@ var utils = require('../libs/utils'),
 							isZoneIdMatch = !!(isNetworkData && adObject.networkData.zoneId === zoneId);
 
 						if (isZoneIdMatch) {
-							adId = adObject.id;
+							adData.id = adObject.id;
+							adData.size = adObject.width + 'x' + adObject.height;
+							adData.containerId = adObject.containerId;
 							return false;
 						}
 					});
 
-					return adId;
+					return adData;
 				},
-				matchedAdId = getMatchedAdId(globalConfig.ads, inputZoneId),
+				matchedAdData = getMatchedAdData(globalConfig.ads, inputZoneId),
 				resultObject;
 
-			if (!matchedAdId) {
+			if (!matchedAdData.id || !matchedAdData.size) {
 				return false;
 			}
 
 			resultObject = {
+				variationId: globalConfig.selectedVariation,
 				eventType: 11,
-				adId: matchedAdId,
+				adId: matchedAdData.id,
+				adSize: matchedAdData.size,
+				containerId: matchedAdData.containerId,
 				revenue: inputZoneECPM,
 				adZoneId: inputZoneId
 			};
