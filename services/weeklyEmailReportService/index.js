@@ -5,9 +5,22 @@ const Promise = require('bluebird'),
 	moment = require('moment'),
 	AdPushupError = require('../../helpers/AdPushupError'),
 	sqlReportingModule = require('../../reports/default/adpTags/index'),
+	couchBaseService = require('../../helpers/couchBaseService'),
+	couchbasePromise = require('couchbase-promises'),
+	usersByNonEmptyChannelsQuery = couchbasePromise.ViewQuery.from('app', 'usersByNonEmptyChannels'),
 	userModel = require('../../models/userModel'),
 	siteModel = require('../../models/siteModel'),
 	channelModel = require('../../models/channelModel');
+
+function formatQueryResult(resultData) {
+	return _.map(resultData, resultObj => extend(true, {}, resultObj.value));
+}
+
+function getAllValidUsers() {
+	const performQuery = couchBaseService.queryViewFromAppBucket(usersByNonEmptyChannelsQuery);
+
+	return Promise.resolve(performQuery).then(formatQueryResult);
+}
 
 function validateSiteData(siteModelInstance) {
 	const isSiteModel = !!siteModelInstance,
@@ -58,7 +71,7 @@ function getSiteData(siteModelInstance) {
 			return dataObject;
 		})
 		.catch(error => {
-			console.log(`getSiteData: Error occurred while fetching site report data: ${error.message}`);
+			console.log(`${dataObject.email} - Error occurred while fetching site report data: ${error.message} \n`);
 			return dataObject;
 		});
 }
@@ -112,8 +125,9 @@ function getAllSitesData(modelInstance) {
 			}
 
 			statusObject.status = 1;
-			statusObject.message = 'Successfully received sites data';
+			statusObject.message = `${statusObject.email} - Successfully received sites data for user ${statusObject.email}`;
 			statusObject.data = sitesData.concat([]);
+			console.log(`${statusObject.message}, data: ${JSON.stringify(statusObject.data)} \n`);
 			return statusObject;
 		})
 		.catch(error => {
@@ -121,32 +135,42 @@ function getAllSitesData(modelInstance) {
 				message = isObjectMessage ? JSON.stringify(error.message) : error.message;
 
 			statusObject.status = 0;
-			statusObject.message = `Some error occurred, ${message}`;
+			statusObject.message = `${statusObject.email} - Some error occurred, ${message}`;
 			statusObject.data = [];
+			console.log(`${statusObject.message}, data: ${JSON.stringify(statusObject.data)} \n`);
 			return statusObject;
 		});
 }
 
-function mainSuccessHandler(sitesData) {
-	var successMessage = `Successfully recieved user sites data: ${JSON.stringify(sitesData)}`;
-
-	console.log(successMessage);
-	return sitesData;
+function mainSuccessHandler() {
+	console.log('Init:: Successfully processed all users site data \n');
 }
 
 function mainErrorHandler(error) {
-	var errorMessage = `getUserAllSites:: Failed to get sites data: Error occurred, ${error.message}`;
-
+	var errorMessage = `Init:: Catch: Failed to process users site data: Error occurred, ${error.message} \n`;
 	console.log(errorMessage);
-	return errorMessage;
 }
 
-function getUserAllSites(email) {
-	return userModel
-		.getUserByEmail(email)
-		.then(getAllSitesData)
+function getAllSites(userObject) {
+	return userModel.getUserByEmail(userObject.email).then(getAllSitesData);
+}
+
+function rootPromiseEachErrorHandler(userObject, err) {
+	console.log(
+		`Init:: Promise ForEach Catch: Unable to get sites for user: ${JSON.stringify(userObject)}, ${err.message} \n`
+	);
+	return true;
+}
+
+function processEachUser(allUsers) {
+	return promiseForeach(allUsers, getAllSites, rootPromiseEachErrorHandler);
+}
+
+function init() {
+	return getAllValidUsers()
+		.then(processEachUser)
 		.then(mainSuccessHandler)
 		.catch(mainErrorHandler);
 }
 
-getUserAllSites('zahin@adpushup.com');
+init();
