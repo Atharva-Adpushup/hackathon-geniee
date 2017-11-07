@@ -107,7 +107,7 @@ function setCorrectColumnNames(data) {
 	return columns;
 }
 
-function whereWrapper(data) {
+function whereWrapper(data, qs) {
 	data.hasOwnProperty('section') ? (data.section_md5 = data.section) : null;
 	data.hasOwnProperty('variation') ? (data.variation_id = data.variation) : null;
 	data.hasOwnProperty('pagegroup') ? (data.name = data.pagegroup) : null;
@@ -118,29 +118,30 @@ function whereWrapper(data) {
 	delete data.variation;
 	delete data.pagegroup;
 
-	return queryHelper.where(data);
+	return qs.where(data);
 }
 
-function orderByWrapper(data) {
-	return queryHelper.orderBy(setCorrectColumnNames(data));
+function orderByWrapper(data, qs) {
+	return qs.orderBy(setCorrectColumnNames(data));
 }
 
-function groupByWrapper(data) {
-	return queryHelper.groupBy(setCorrectColumnNames(data));
+function groupByWrapper(data, qs) {
+	return qs.groupBy(setCorrectColumnNames(data));
 }
 
-function selectWrapper(selectData, groupByData) {
+function selectWrapper(selectData, groupByData, qs) {
 	let flag = _.isArray(groupByData) && groupByData.length && groupByData.indexOf('section') != -1 ? true : false;
-	return queryHelper.select(selectData, flag);
+	return qs.select(selectData, flag);
 }
 
 function queryBuilder(data) {
-	return whereWrapper(data.where)
-		.then(() => selectWrapper(data.select, data.groupBy))
-		.then(() => groupByWrapper(data.groupBy))
-		.then(() => queryHelper.from())
-		.then(() => orderByWrapper(data.orderBy))
-		.then(() => queryHelper.generateCompleteQuery());
+	let qs = queryHelper();
+	return whereWrapper(data.where, qs)
+		.then(() => selectWrapper(data.select, data.groupBy, qs))
+		.then(() => groupByWrapper(data.groupBy, qs))
+		.then(() => qs.from())
+		.then(() => orderByWrapper(data.orderBy, qs))
+		.then(() => qs.generateCompleteQuery());
 }
 
 function getQuery(type) {
@@ -186,14 +187,24 @@ total_requests ----> total_pageviews
 */
 
 // let params = {
-// 	select: ['total_xpath_miss', 'total_revenue', 'total_impressions', 'report_date', 'siteid', 'device_type'],
+// 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid'],
 // 	where: {
-// 		siteid: 31000,
-// 		pagegroup: ['CALC'],
-// 		variation: ['7340049d-1d39-41b5-8e34-b06f1f734b51']
-// 	},
-// 	groupBy: ['variation']
+// 		siteid: 31000
+// 	}
 // };
+
+// Promise.all(
+// 	_.map([1, 2, 3], ele => {
+// 		params.ele = ele;
+// 		return generate(params);
+// 	})
+// )
+// 	.then(response => {
+// 		debugger;
+// 	})
+// 	.catch(err => {
+// 		debugger;
+// 	});
 
 // generate(params)
 // 	.then(response => {
