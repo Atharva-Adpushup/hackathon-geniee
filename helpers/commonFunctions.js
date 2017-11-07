@@ -2,6 +2,7 @@ const Promise = require('bluebird'),
 	_ = require('lodash'),
 	request = require('request-promise'),
 	moment = require('moment'),
+	config = require('../configs/config'),
 	createAggregateNonAggregateObjects = (dataset, key, container) => {
 		let innerObj = {};
 		_.forEach(dataset, (nonAggregateDataset, identifier) => {
@@ -60,28 +61,68 @@ const Promise = require('bluebird'),
 		createAggregateNonAggregateObjects(sectionWiseResult, 'sections', reporting);
 		return Promise.resolve(reporting);
 	},
-	getMetricForSite = site => {
-		site.siteId = 31000;
+	aggregateWeekData = data => {
+		let totalImpressions = 0,
+			totalRevenue = 0,
+			totalPageviews = 0;
+
+		_.forEach(data.rows, row => {
+			totalImpressions += row.total_impressions;
+			totalRevenue += row.total_revenue;
+			totalPageviews += row.total_requests;
+		});
+
+		return {
+			totalImpressions,
+			totalRevenue,
+			totalPageviews,
+			totalCpm: Number((totalRevenue * 1000 / totalImpressions).toFixed(2)),
+			totalPageCpm: Number((totalRevenue * 1000 / totalPageviews).toFixed(2))
+		};
+	},
+	getSiteReport = site => {
+		const { environment } = config,
+			baseUrl =
+				environment.HOST_ENV === 'development'
+					? `${environment.HOST_URL}:${environment.HOST_PORT}`
+					: environment.HOST_URL;
+
+		// return request({
+		// 	method: 'POST',
+		// 	url: `${baseUrl}/user/reports/generate`,
+		// 	body: {
+		// 		select: ['total_requests', 'total_impressions', 'total_revenue'],
+		// 		where: {
+		// 			siteid: 31000,
+		// 			from: moment()
+		// 				.subtract(7, 'days')
+		// 				.startOf('day'),
+		// 			to: moment()
+		// 				.startOf('day')
+		// 				.subtract(1, 'day')
+		// 		}
+		// 	},
+		// 	json: true
+		// })
 		return request({
-			method: 'POST',
-			uri: `/user/reports/generate`,
-			body: {
-				siteid: site.siteId,
-				from: moment()
-					.subtract(7, 'days')
-					.startOf('day'),
-				to: moment()
-					.startOf('day')
-					.subtract(1, 'day')
-			},
+			method: 'GET',
+			url: 'https://jsonplaceholder.typicode.com/posts/1',
 			json: true
 		})
 			.then(data => {
-				console.log(data);
+				data = {
+					error: false,
+					rows: [
+						{
+							total_impressions: 12131,
+							total_requests: 333,
+							total_revenue: 12
+						}
+					]
+				};
+				return aggregateWeekData(data);
 			})
-			.catch(err => {
-				console.log(err);
-			});
+			.catch(err => err);
 	};
 
-module.exports = { queryResultProcessing, getMetricForSite };
+module.exports = { queryResultProcessing, getSiteReport };

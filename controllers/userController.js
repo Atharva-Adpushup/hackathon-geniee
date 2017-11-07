@@ -14,7 +14,8 @@ var express = require('express'),
 	CC = require('../configs/commonConsts'),
 	config = require('../configs/config'),
 	Mailer = require('../helpers/Mailer'),
-	{ getMetricForSite } = require('../helpers/commonFunctions'),
+	promiseForEach = require('../helpers/promiseForeach'),
+	{ getSiteReport } = require('../helpers/commonFunctions'),
 	// Create mailer config
 	mailConfig = {
 		MAIL_FROM: config.email.MAIL_FROM,
@@ -29,12 +30,6 @@ var express = require('express'),
 function requestDemoRedirection(res) {
 	return res.redirect('/user/requestdemo');
 }
-
-const getSitesWithMetrics = sites => {
-	_.forEach(sites, site => {
-		console.log(getMetricForSite(site));
-	});
-};
 
 function dashboardRedirection(req, res, allUserSites, type) {
 	function setEmailCookie() {
@@ -81,6 +76,20 @@ function dashboardRedirection(req, res, allUserSites, type) {
 
 		setEmailCookie(req, res);
 
+		// promiseForEach(sites, getSiteReport, (reportData, err) => {
+		// 	if (err) {
+		// 		return false;
+		// 	}
+		// 	console.log(reportData);
+		// 	return true;
+		// })
+		// 	.then(data => {
+		// 		console.log(data);
+		// 	})
+		// 	.catch(err => {
+		// 		console.log(err);
+		// 	});
+
 		if (type == 'onboarding') {
 			if (sites.length >= CC.onboarding.initialStep) {
 				var hasStep = 'step' in sites[0] ? true : false;
@@ -89,8 +98,6 @@ function dashboardRedirection(req, res, allUserSites, type) {
 				}
 			}
 		}
-
-		// const sitesWithMetrcs = getSitesWithMetrics(sites);
 
 		switch (type) {
 			case 'dashboard':
