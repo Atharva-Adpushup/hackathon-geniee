@@ -29,7 +29,7 @@ module.exports = function(app) {
 
 	app.use(function(req, res, next) {
 		function isOpenRoute() {
-			return _.find(['/tools'], function(route) {
+			return _.find(['/tools', '/user/reports/generate'], function(route) {
 				return req.url.indexOf(route) !== -1;
 			})
 				? true

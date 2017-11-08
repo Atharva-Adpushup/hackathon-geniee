@@ -2,6 +2,10 @@ module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: 'http://console.adpushup.com',
 	PROXY_ORIGIN: 'http://proxy.app.adpushup.com',
+	REPORT_API: {
+		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue'],
+		DATE_FORMAT: 'YYYY-MM-DD'
+	},
 	PROXY_DOCUMENT_DOMAIN: 'app.adpushup.com',
 	apConfigDefaults: {
 		heartBeatMinInterval: 3000,
