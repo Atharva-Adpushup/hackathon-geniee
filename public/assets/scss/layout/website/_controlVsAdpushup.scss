@@ -1,3 +1,8 @@
+html,
+body {
+	overflow-x: hidden;
+}
+
 #reports_control {
 	.navbar-default {
 		border: 0;
@@ -152,6 +157,10 @@
 .weekly-report-wrapper {
 	position: relative;
 
+	.metrics-wrapper {
+		padding: 0 0 20px;
+	}
+
 	.report-legend {
 		margin-top: 30px;
 		padding: 15px;
@@ -188,6 +197,17 @@
 	}
 
 	.metric-count {
-		font-size: 3em;
+		font-size: 2.2em;
 	}
+
+	.su-metrics {
+		margin-top: 30px;
+		border-top: 1px solid $borderColor;
+		padding-top: 20px;
+		margin: 0;
+	}
+}
+
+.btn-dd-menu {
+	left: -125px;
 }
