@@ -14,7 +14,7 @@ var express = require('express'),
 	CC = require('../configs/commonConsts'),
 	config = require('../configs/config'),
 	Mailer = require('../helpers/Mailer'),
-	{ getMetricForSite } = require('../helpers/commonFunctions'),
+	{ getWeeklyComparisionReport } = require('../helpers/commonFunctions'),
 	// Create mailer config
 	mailConfig = {
 		MAIL_FROM: config.email.MAIL_FROM,
@@ -29,12 +29,6 @@ var express = require('express'),
 function requestDemoRedirection(res) {
 	return res.redirect('/user/requestdemo');
 }
-
-const getSitesWithMetrics = sites => {
-	_.forEach(sites, site => {
-		console.log(getMetricForSite(site));
-	});
-};
 
 function dashboardRedirection(req, res, allUserSites, type) {
 	function setEmailCookie() {
@@ -81,40 +75,59 @@ function dashboardRedirection(req, res, allUserSites, type) {
 
 		setEmailCookie(req, res);
 
-		if (type == 'onboarding') {
-			if (sites.length >= CC.onboarding.initialStep) {
-				var hasStep = 'step' in sites[0] ? true : false;
-				if (hasStep && sites[0].step == CC.onboarding.totalSteps) {
-					return res.redirect('/user/dashboard');
+		const siteReportPromises = _.map(sites, site => getWeeklyComparisionReport(site));
+
+		return Promise.all(siteReportPromises)
+			.then(siteReports => {
+				sites = _.map(sites, site => {
+					const reportData = _.find(siteReports, { siteId: site.siteId });
+					return {
+						channels: site.channels,
+						domain: site.domain,
+						siteId: site.siteId,
+						step: site.step,
+						reportData
+					};
+				});
+
+				if (type == 'onboarding') {
+					if (sites.length >= CC.onboarding.initialStep) {
+						var hasStep = 'step' in sites[0] ? true : false;
+						if (hasStep && sites[0].step == CC.onboarding.totalSteps) {
+							return res.redirect('/user/dashboard');
+						}
+					}
 				}
-			}
-		}
 
-		// const sitesWithMetrcs = getSitesWithMetrics(sites);
-
-		switch (type) {
-			case 'dashboard':
-			case 'default':
-				return res.render('dashboard', {
-					validSites: sites,
-					unSavedSite: unSavedSite,
-					hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-					requestDemo: req.session.user.requestDemo,
-					imageHeaderLogo: true
-				});
-				break;
-			case 'onboarding':
-				return res.render('onboarding', {
-					validSites: sites,
-					unSavedSite: unSavedSite,
-					hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-					requestDemo: req.session.user.requestDemo,
-					analyticsObj: JSON.stringify(req.session.analyticsObj),
-					imageHeaderLogo: true,
-					buttonHeaderLogout: true
-				});
-				break;
-		}
+				switch (type) {
+					case 'dashboard':
+					case 'default':
+						return res.render('dashboard', {
+							validSites: sites,
+							unSavedSite: unSavedSite,
+							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+							requestDemo: req.session.user.requestDemo,
+							imageHeaderLogo: true,
+							isSuperUser: req.session.isSuperUser
+						});
+						break;
+					case 'onboarding':
+						return res.render('onboarding', {
+							validSites: sites,
+							unSavedSite: unSavedSite,
+							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+							requestDemo: req.session.user.requestDemo,
+							analyticsObj: JSON.stringify(req.session.analyticsObj),
+							imageHeaderLogo: true,
+							buttonHeaderLogout: true,
+							isSuperUser: req.session.isSuperUser
+						});
+						break;
+				}
+			})
+			.catch(err => {
+				res.send('Some error occurred! Please try again later.');
+			});
 	});
 }
 
