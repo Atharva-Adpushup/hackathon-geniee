@@ -162,7 +162,7 @@ body {
 	}
 
 	.report-legend {
-		margin-top: 30px;
+		margin-top: 25px;
 		padding: 15px;
 		background-color: $whiteColor;
 		border-top: 1px solid $borderColor;
@@ -188,7 +188,7 @@ body {
 
 	.report-mertic {
 		font-weight: 400;
-		font-size: 1.35em;
+		font-size: 1.2em;
 		text-transform: uppercase;
 
 		.fa {
@@ -197,13 +197,13 @@ body {
 	}
 
 	.metric-count {
-		font-size: 2.2em;
+		font-size: 1.8em;
 	}
 
 	.su-metrics {
 		margin-top: 30px;
 		border-top: 1px solid $borderColor;
-		padding-top: 20px;
+		padding: 20px 15px 0;
 		margin: 0;
 	}
 }
