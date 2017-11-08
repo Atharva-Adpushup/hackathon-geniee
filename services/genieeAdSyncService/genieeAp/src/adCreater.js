@@ -101,10 +101,11 @@ var $ = require('jquery'),
 				// Replaced '-' with '_' to avoid ElasticSearch split issue
 				variationId: variation.id // set the chosenVariation variation in feedback data;
 			},
-			pushAdToGlobalConfig = function(obj) {
+			pushAdToGlobalConfig = function(obj, containerId) {
 				var isAdsObject = !!(adp.config && adp.config.ads),
 					adObject = $.extend(true, {}, obj);
 
+				adObject.containerId = containerId || '';
 				!isAdsObject ? (adp.config.ads = []) : null;
 				adp.config.ads.push(adObject);
 			},
@@ -161,10 +162,13 @@ var $ = require('jquery'),
 				$.each(structuredAds, function(index, ad) {
 					getAdContainer(ad, config.xpathWaitTimeout)
 						.done(function(data) {
+							var isContainerElement = !!(data.container && data.container.length),
+								containerId = isContainerElement ? data.container.get(0).id : '';
+
 							// if all well then ad id of ad in feedback to tell system that impression was given
 							feedbackData.ads.push(ad.id);
 							// Add 'ad' object to global config ads array
-							pushAdToGlobalConfig(ad);
+							pushAdToGlobalConfig(ad, containerId);
 							next(ad, data);
 						})
 						.fail(function(data) {
@@ -176,16 +180,25 @@ var $ = require('jquery'),
 			placeInContentAds = function($incontentElm, inContentAds) {
 				incontentAnalyser($incontentElm, inContentAds, function(sectionsWithTargetElm) {
 					$(inContentAds).each(function(index, ad) {
-						var sectionObj = sectionsWithTargetElm[ad.section];
+						var sectionObj = sectionsWithTargetElm[ad.section],
+							$containerElement,
+							isContainerElement,
+							containerId;
 
 						if (sectionObj && sectionObj.elem) {
 							if (!!sectionObj.isSecondaryCss) {
 								ad.css = $.extend(true, {}, ad.secondaryCss);
 							}
+
 							feedbackData.ads.push(ad.id);
+
+							$containerElement = getContainer(ad, sectionObj.elem);
+							isContainerElement = !!($containerElement && $containerElement.length);
+							containerId = isContainerElement ? $containerElement.get(0).id : '';
+
 							// Add 'ad' object to global config ads array
-							pushAdToGlobalConfig(ad);
-							next(ad, { success: true, container: getContainer(ad, sectionObj.elem) });
+							pushAdToGlobalConfig(ad, containerId);
+							next(ad, { success: true, container: $containerElement });
 						} else {
 							feedbackData.xpathMiss.push(ad.id);
 							next(ad, { success: false, container: null });
