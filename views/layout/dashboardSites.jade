@@ -1,125 +1,137 @@
-for site in validSites
-    <!--.2.and.mb-30(class="{{ loop.length % loop.last ? 'col-xs-12' : 'col-xs-6' }}")-->
-    .mb-30
-        .controlAdpushupWrap
-            if site.channels.length
-                h3.title.m-All-0.clearfix
-                    a.pull-left(id="site-report-" + site.siteId, target='_blank', title='Showing last 7 days ControlVsAdPushup reports.', href='/user/site/#{site.siteId}/reports/ControlVsAdpushupCtr').
-                        #{utils.domanize(site.domain)} - #{site.siteId}
-                    .pull-right.site-actions
-                        a.btn.btn-lightBg.btn-default(id="editor-redirect-link", target='_blank', href='/user/site/#{site.siteId}/editor') 
-                            i.fa.fa-code
-                            |  Take to Editor
-                        a.btn.btn-lightBg.btn-default(id="site-custom-reports-" + site.siteId, href='/user/site/#{site.siteId}/reports/adpushupReport')
-                                i.fa.fa-area-chart
-                                |  AdPushup Report
-                        a.btn.btn-lightBg.btn-default(id="pagegroups-link", href='/user/site/#{site.siteId}/pagegroups')  
-                            i.fa.fa-th-list
-                            |  PageGroups
-                        a.btn.btn-lightBg.btn-default(id="settings-link", href='/user/site/#{site.siteId}/settings') 
-                            i.fa.fa-cog
-                            |  Settings
-                        if isSuperUser
-                            a.btn.btn-lightBg.btn-default(id="opspanel-link", href='/user/site/#{site.siteId}/opsPanel') 
-                                i.fa.fa-wrench 
-                                |  Ops Panel
-                            form(action='/user/deleteSite', method='post', style='display: inline', onsubmit="return (confirm('Are you sure you want to delete this site? This step cannot be reversed !') && trackDelete(#{site.siteId}))")
-                                input(type='hidden', name='siteId', value='#{site.siteId}')
-                                input(type='hidden', name='siteDomain', value='#{site.domain}')
-                                button.btn.btn-lightBg.btn-default(id="site-delete-btn", type='submit') Delete Site
+.row
+    for site in validSites
+        <!--.2.and.mb-30(class="{{ loop.length % loop.last ? 'col-xs-12' : 'col-xs-6' }}")-->
+        .col-sm-6
+            .mb-30
+                .controlAdpushupWrap
+                    if site.channels.length
+                        h3.title.m-All-0.clearfix
+                            a.pull-left(id="site-report-" + site.siteId, target='_blank').
+                                #{utils.domanize(site.domain)} - #{site.siteId}
+                            .pull-right.site-actions
+                                a.btn.btn-lightBg.btn-default(id="editor-redirect-link", target='_blank', href='/user/site/#{site.siteId}/editor') 
+                                    i.fa.fa-code
+                                a.btn.btn-lightBg.btn-default(id="site-custom-reports-" + site.siteId, href='/user/site/#{site.siteId}/reports/adpushupReport')
+                                        i.fa.fa-area-chart
+                                .dropdown.btn-dropdown
+                                    button.btn.btn-lightBg#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='true')
+                                        span.caret
+                                    |   
+                                    ul.dropdown-menu.btn-dd-menu(aria-labelledby='dropdownMenu1')
+                                        li
+                                            a(href='/user/site/#{site.siteId}/pagegroups') 
+                                                i.fa.fa-th-list
+                                                |  PageGroups  
+                                        li
+                                            a(href='/user/site/#{site.siteId}/settings') 
+                                                i.fa.fa-cog
+                                                |  Settings   
+                                        if isSuperUser 
+                                            li
+                                                a(href='/user/site/#{site.siteId}/opsPanel') 
+                                                    i.fa.fa-wrench 
+                                                    |  Ops Panel
+                                            li
+                                                a 
+                                                    form(action='/user/deleteSite', method='post', style='display: inline', onsubmit="return (confirm('Are you sure you want to delete this site? This step cannot be reversed !') && trackDelete(#{site.siteId}))")
+                                                        input(type='hidden', name='siteId', value='#{site.siteId}')
+                                                        input(type='hidden', name='siteDomain', value='#{site.domain}')
+                                                        button.btn.btn-lightBg.btn-default(id="site-delete-btn", type='submit') Delete Site
 
-                - siteDomain = (site.domain) ? site.domain : "";
-                .weekly-report.weekly-report-wrapper
-                    if site.reportData
-                        - lastWeek = site.reportData.lastWeekReport
-                        - thisWeek = site.reportData.thisWeekReport
+                        - siteDomain = (site.domain) ? site.domain : "";
+                        .weekly-report.weekly-report-wrapper
+                            if site.reportData
+                                - lastWeek = site.reportData.lastWeekReport
+                                - thisWeek = site.reportData.thisWeekReport
 
-                        .row.text-center
-                            .col-sm-2.col-sm-offset-1
-                                .metric-count
-                                    span.lightBlue!= lastWeek.reportData.totalImpressions
-                                    span  / 
-                                    span.darkBlue!= thisWeek.reportData.totalImpressions
-                                .report-mertic Impressions
-                                    if thisWeek.reportData.totalImpressions > lastWeek.reportData.totalImpressions
-                                        i.fa.fa-arrow-up.green
-                                    else if thisWeek.reportData.totalImpressions < lastWeek.reportData.totalImpressions
-                                        i.fa.fa-arrow-down.red
-                            .col-sm-2
-                                .metric-count
-                                    span.lightBlue!= lastWeek.reportData.totalCpm
-                                    span  / 
-                                    span.darkBlue!= thisWeek.reportData.totalCpm
-                                .report-mertic CPM ($)
-                                    if thisWeek.reportData.totalCpm > lastWeek.reportData.totalCpm
-                                        i.fa.fa-arrow-up.green
-                                    else if thisWeek.reportData.totalCpm < lastWeek.reportData.totalCpm
-                                        i.fa.fa-arrow-down.red
-                            .col-sm-2
-                                .metric-count
-                                    span.lightBlue!= lastWeek.reportData.totalPageviews
-                                    span  / 
-                                    span.darkBlue!= thisWeek.reportData.totalPageviews
-                                .report-mertic Pageviews
-                                    if thisWeek.reportData.totalPageviews > lastWeek.reportData.totalPageviews
-                                        i.fa.fa-arrow-up.green
-                                    else if thisWeek.reportData.totalPageviews < lastWeek.reportData.totalPageviews
-                                        i.fa.fa-arrow-down.red
-                            .col-sm-2
-                                .metric-count
-                                    span.lightBlue!= lastWeek.reportData.totalPageCpm
-                                    span  / 
-                                    span.darkBlue!= thisWeek.reportData.totalPageCpm
-                                .report-mertic Page CPM ($)
-                                    if thisWeek.reportData.totalPageCpm > lastWeek.reportData.totalPageCpm
-                                        i.fa.fa-arrow-up.green
-                                    else if thisWeek.reportData.totalPageCpm < lastWeek.reportData.totalPageCpm
-                                        i.fa.fa-arrow-down.red
-                            .col-sm-2
-                                .metric-count
-                                    span.lightBlue!= lastWeek.reportData.totalRevenue
-                                    span  / 
-                                    span.darkBlue!= thisWeek.reportData.totalRevenue
-                                .report-mertic Revenue ($)
-                                    if thisWeek.reportData.totalRevenue > lastWeek.reportData.totalRevenue
-                                        i.fa.fa-arrow-up.green
-                                    else if thisWeek.reportData.totalRevenue < lastWeek.reportData.totalRevenue
-                                        i.fa.fa-arrow-down.red
-                    
-                        .report-legend
-                            .row.text-center
-                                .col-sm-3.col-sm-offset-3
-                                    .report-label.bglightBlue 
-                                    .report-label-text 
-                                        | Last Week
-                                        .report-date
-                                            | (
-                                            span!= lastWeek.reportFrom
-                                            |  to 
-                                            span!= lastWeek.reportTo
-                                            | )
-                                .col-sm-3
-                                    .report-label.bgdarkBlue 
-                                    .report-label-text This Week
-                                        .report-date
-                                            | (
-                                            span!= thisWeek.reportFrom
-                                            |  to 
-                                            span!= thisWeek.reportTo
-                                            | )
+                                .row.text-center.metrics-wrapper
+                                    .col-sm-4
+                                        .metric-count
+                                            span.lightBlue!= utils.numberFormatter(lastWeek.reportData.totalImpressions)
+                                            span  / 
+                                            span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalImpressions)
+                                        .report-mertic Impressions
+                                            if thisWeek.reportData.totalImpressions > lastWeek.reportData.totalImpressions
+                                                i.fa.fa-arrow-up.green
+                                            else if thisWeek.reportData.totalImpressions < lastWeek.reportData.totalImpressions
+                                                i.fa.fa-arrow-down.red
+                                    .col-sm-4
+                                        .metric-count
+                                            span.lightBlue!= lastWeek.reportData.totalCpm
+                                            span  / 
+                                            span.darkBlue!= thisWeek.reportData.totalCpm
+                                        .report-mertic CPM ($)
+                                            if thisWeek.reportData.totalCpm > lastWeek.reportData.totalCpm
+                                                i.fa.fa-arrow-up.green
+                                            else if thisWeek.reportData.totalCpm < lastWeek.reportData.totalCpm
+                                                i.fa.fa-arrow-down.red
+                                    .col-sm-4
+                                        .metric-count
+                                            span.lightBlue!= utils.numberFormatter(lastWeek.reportData.totalRevenue)
+                                            span  / 
+                                            span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalRevenue)
+                                        .report-mertic Revenue ($)
+                                            if thisWeek.reportData.totalRevenue > lastWeek.reportData.totalRevenue
+                                                i.fa.fa-arrow-up.green
+                                            else if thisWeek.reportData.totalRevenue < lastWeek.reportData.totalRevenue
+                                                i.fa.fa-arrow-down.red
+                                if isSuperUser
+                                    .row.su-metrics
+                                        .col-sm-4
+                                            .metric-count
+                                                span.lightBlue!= utils.numberFormatter(lastWeek.reportData.totalPageviews)
+                                                span  / 
+                                                span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalPageviews)
+                                            .report-mertic Pageviews
+                                                if thisWeek.reportData.totalPageviews > lastWeek.reportData.totalPageviews
+                                                    i.fa.fa-arrow-up.green
+                                                else if thisWeek.reportData.totalPageviews < lastWeek.reportData.totalPageviews
+                                                    i.fa.fa-arrow-down.red
+                                        .col-sm-4
+                                            .metric-count
+                                                span.lightBlue!= lastWeek.reportData.totalPageCpm
+                                                span  / 
+                                                span.darkBlue!= thisWeek.reportData.totalPageCpm
+                                            .report-mertic Page CPM ($)
+                                                if thisWeek.reportData.totalPageCpm > lastWeek.reportData.totalPageCpm
+                                                    i.fa.fa-arrow-up.green
+                                                else if thisWeek.reportData.totalPageCpm < lastWeek.reportData.totalPageCpm
+                                                    i.fa.fa-arrow-down.red
+                            
+                                .report-legend
+                                    .row.text-center
+                                        .col-sm-6
+                                            .report-label.bglightBlue 
+                                            .report-label-text 
+                                                | Last Week
+                                                .report-date
+                                                    | (
+                                                    span!= lastWeek.reportFrom
+                                                    |  to 
+                                                    span!= lastWeek.reportTo
+                                                    | )
+                                        .col-sm-6
+                                            .report-label.bgdarkBlue 
+                                            .report-label-text This Week
+                                                .report-date
+                                                    | (
+                                                    span!= thisWeek.reportFrom
+                                                    |  to 
+                                                    span!= thisWeek.reportTo
+                                                    | )
+                            else
+                                | No report data found for this site.
                     else
-                        | No report data found for this site.
-            else
-                h3.title.m-All-0.clearfix
-                    a.pull-left(id="site-report-" + site.siteId).
-                        #{utils.domanize(site.domain)} - #{site.siteId}
-                    .pull-right
-                        a.btn.btn-lightBg.btn-default(id="site-create-pagegroup-" + site.siteId, href='/user/site/#{site.siteId}/createPagegroup') Create PageGroup
-                section
-                    .site-status
-                        h4
-                            i.fa.fa-exclamation-circle 
-                            | Setup Incomplete
-                        .status-text Page Group not found! Please 
-                            a(href="/user/site/#{site.siteId}/createPagegroup") create
-                            |  one to access the visual editor.
+                        h3.title.m-All-0.clearfix
+                            a.pull-left(id="site-report-" + site.siteId).
+                                #{utils.domanize(site.domain)} - #{site.siteId}
+                            .pull-right
+                                a.btn.btn-lightBg.btn-default(id="site-create-pagegroup-" + site.siteId, href='/user/site/#{site.siteId}/createPagegroup') Create PageGroup
+                        section
+                            .site-status
+                                h4
+                                    i.fa.fa-exclamation-circle 
+                                    | Setup Incomplete
+                                .status-text Page Group not found! Please 
+                                    a(href="/user/site/#{site.siteId}/createPagegroup") create
+                                    |  one to access the visual editor.
