@@ -104,7 +104,7 @@ const Promise = require('bluebird'),
 		return request({
 			method: 'POST',
 			url: `${baseUrl}/user/reports/generate`,
-			body: { select, where: { siteid: siteId, from, to } },
+			body: { select, where: { siteid: 31000, from, to } },
 			followAllRedirects: true,
 			json: true
 		})
@@ -138,13 +138,13 @@ const Promise = require('bluebird'),
 					siteId,
 					lastWeekReport: {
 						reportData: lastWeekReport,
-						reportFrom: lastWeekReportParams.from,
-						reportTo: lastWeekReportParams.to
+						reportFrom: moment(lastWeekReportParams.from).format('DD-MM'),
+						reportTo: moment(lastWeekReportParams.to).format('DD-MM')
 					},
 					thisWeekReport: {
 						reportData: thisWeekReport,
-						reportFrom: thisWeekReportParams.from,
-						reportTo: thisWeekReportParams.to
+						reportFrom: moment(thisWeekReportParams.from).format('DD-MM'),
+						reportTo: moment(thisWeekReportParams.to).format('DD-MM')
 					}
 				};
 			});

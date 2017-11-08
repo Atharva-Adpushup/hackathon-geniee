@@ -170,6 +170,11 @@
 			vertical-align: middle;
 			font-size: 1.2em;
 		}
+
+		.report-date {
+			display: inline-block;
+			color: darken($fontColor, 10%);
+		}
 	}
 
 	.report-mertic {
