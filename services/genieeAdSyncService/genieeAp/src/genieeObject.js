@@ -57,6 +57,12 @@ var utils = require('../libs/utils'),
 					matchedAdData,
 					resultObject;
 
+				utils.log(
+					'KeenIOImpressionRequest: Global ads data: ',
+					globalConfig.ads,
+					', its length: ',
+					globalConfig.ads.length
+				);
 				matchedAdData = getMatchedAdData(globalConfig.ads, inputZoneId);
 
 				if (!matchedAdData.id || !matchedAdData.size) {
@@ -83,7 +89,7 @@ var utils = require('../libs/utils'),
 			}
 
 			//TODO: Implement a proper fix for executing above business logic only after all successful ads have been rendered
-			setTimeout(executeLogic, 5000);
+			setTimeout(executeLogic, 3000);
 		}
 	};
 
