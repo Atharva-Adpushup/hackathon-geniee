@@ -3,16 +3,31 @@ var utils = require('../libs/utils'),
 	genieeObject = {
 		// Get zone id and ecpm values for every successful zone impression
 		registerZoneECPM: function(inputZoneId, inputZoneECPM) {
-			if (!inputZoneId || !inputZoneECPM) {
-				return false;
-			}
-
 			inputZoneId = parseInt(inputZoneId, 10);
 			inputZoneECPM = parseFloat(inputZoneECPM);
 
+			utils.log(
+				'KeenIOImpressionRequest: Value of inputZoneId: ',
+				inputZoneId,
+				', inputZoneECPM: ',
+				inputZoneECPM
+			);
+
+			if (!inputZoneId || isNaN(inputZoneECPM)) {
+				utils.log(
+					'KeenIOImpressionRequest: Invalid zoneId or zone ecpm: Execution will stop for this zoneId: ',
+					inputZoneId
+				);
+				return false;
+			}
+
 			var globalConfig = window.adpushup.config,
-				getMatchedAdId = function(adsArray, zoneId) {
-					var adId = null;
+				getMatchedAdData = function(adsArray, zoneId) {
+					var adData = {
+						id: null,
+						size: '',
+						containerId: ''
+					};
 
 					if (!adsArray.length || !zoneId) {
 						return null;
@@ -29,26 +44,37 @@ var utils = require('../libs/utils'),
 							isZoneIdMatch = !!(isNetworkData && adObject.networkData.zoneId === zoneId);
 
 						if (isZoneIdMatch) {
-							adId = adObject.id;
+							adData.id = adObject.id;
+							adData.size = adObject.width + 'x' + adObject.height;
+							adData.containerId = adObject.containerId;
 							return false;
 						}
 					});
 
-					return adId;
+					return adData;
 				},
-				matchedAdId = getMatchedAdId(globalConfig.ads, inputZoneId),
+				matchedAdData = getMatchedAdData(globalConfig.ads, inputZoneId),
 				resultObject;
 
-			if (!matchedAdId) {
+			if (!matchedAdData.id || !matchedAdData.size) {
+				utils.log('KeenIOImpressionRequest: Matched zone id data: ', matchedAdData);
+				utils.log(
+					'KeenIOImpressionRequest: Zone id does not match with any ad object. Execution will stop for this zoneId: ',
+					inputZoneId
+				);
 				return false;
 			}
 
 			resultObject = {
+				variationId: globalConfig.selectedVariation,
 				eventType: 11,
-				adId: matchedAdId,
+				adId: matchedAdData.id,
+				adSize: matchedAdData.size,
+				containerId: matchedAdData.containerId,
 				revenue: inputZoneECPM,
 				adZoneId: inputZoneId
 			};
+			utils.log('KeenIOImpressionRequest: Matched zone id data: ', resultObject);
 
 			utils.sendFeedback(resultObject);
 		}
