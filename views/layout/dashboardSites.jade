@@ -87,6 +87,15 @@ for site in validSites
                                         i.fa.fa-arrow-up.green
                                     else if thisWeek.totalRevenue < lastWeek.totalRevenue
                                         i.fa.fa-arrow-down.red
+                    
+                        .report-legend
+                            .row.text-center
+                                .col-sm-2.col-sm-offset-4
+                                    .report-label.bglightBlue 
+                                    .report-label-text Last Week
+                                .col-sm-2
+                                    .report-label.bgdarkBlue 
+                                    .report-label-text This Week
                     else
                         | No report data found for this site.
             else
