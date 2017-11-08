@@ -125,6 +125,7 @@ module.exports = {
 		if (data.eventType && (data.eventType === 1 || data.eventType === 3 || data.eventType === 11)) {
 			keenIoFeedbackData = $.extend(true, {}, data);
 			keenIoFeedbackData.ts = +new Date();
+			this.log('KeenIOImpressionRequest: Raw Feedback data: ', keenIoFeedbackData);
 
 			if (keenIoFeedbackData.eventType === 1 && keenIoFeedbackData.ads && keenIoFeedbackData.xpathMiss) {
 				keenIoFeedbackData.impressionCount = keenIoFeedbackData.ads.length;
@@ -142,6 +143,7 @@ module.exports = {
 				keenIoFeedbackData.adSize &&
 				keenIoFeedbackData.hasOwnProperty('revenue')
 			);
+			this.log('KeenIOImpressionRequest: Should impression request be sent? ', isEventTypeGenieeRevenue);
 
 			// Keen IO 'Impression' collection integration
 			if (isEventTypeGenieeRevenue) {
@@ -175,7 +177,9 @@ module.exports = {
 						keenIOImpressionConfig.apiKey +
 						'&data=' +
 						keenIoImpressionFeedbackData;
+					this.log('KeenIOImpressionRequest: keenIoImpressionFeedbackUrl', keenIoImpressionFeedbackUrl);
 					new Image().src = keenIoImpressionFeedbackUrl;
+					this.log('KeenIOImpressionRequest: Successfully sent impression request!');
 				} catch (e) {}
 			}
 
