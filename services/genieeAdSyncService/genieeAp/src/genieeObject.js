@@ -3,12 +3,23 @@ var utils = require('../libs/utils'),
 	genieeObject = {
 		// Get zone id and ecpm values for every successful zone impression
 		registerZoneECPM: function(inputZoneId, inputZoneECPM) {
-			if (!inputZoneId || !inputZoneECPM) {
-				return false;
-			}
-
 			inputZoneId = parseInt(inputZoneId, 10);
 			inputZoneECPM = parseFloat(inputZoneECPM);
+
+			utils.log(
+				'KeenIOImpressionRequest: Value of inputZoneId: ',
+				inputZoneId,
+				', inputZoneECPM: ',
+				inputZoneECPM
+			);
+
+			if (!inputZoneId || isNaN(inputZoneECPM)) {
+				utils.log(
+					'KeenIOImpressionRequest: Invalid zoneId or zone ecpm: Execution will stop for this zoneId: ',
+					inputZoneId
+				);
+				return false;
+			}
 
 			var globalConfig = window.adpushup.config,
 				getMatchedAdData = function(adsArray, zoneId) {
@@ -46,6 +57,11 @@ var utils = require('../libs/utils'),
 				resultObject;
 
 			if (!matchedAdData.id || !matchedAdData.size) {
+				utils.log('KeenIOImpressionRequest: Matched zone id data: ', matchedAdData);
+				utils.log(
+					'KeenIOImpressionRequest: Zone id does not match with any ad object. Execution will stop for this zoneId: ',
+					inputZoneId
+				);
 				return false;
 			}
 
@@ -58,6 +74,7 @@ var utils = require('../libs/utils'),
 				revenue: inputZoneECPM,
 				adZoneId: inputZoneId
 			};
+			utils.log('KeenIOImpressionRequest: Matched zone id data: ', resultObject);
 
 			utils.sendFeedback(resultObject);
 		}
