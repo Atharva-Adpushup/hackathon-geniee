@@ -29,41 +29,66 @@ for site in validSites
                                 button.btn.btn-lightBg.btn-default(id="site-delete-btn", type='submit') Delete Site
 
                 - siteDomain = (site.domain) ? site.domain : "";
-                .graph.dashboardgraph
-                    div(id='controlVsAdpushupChart_#{site.siteId}', style='overflow: hidden;')
-                        //- .loaderwrapper.spinner
-                        //-     img(src="/assets/images/loaderLogo.png")
-                        //- script(type='text/javascript').
-                        //-     adpushup.reports.controlVsAdpushupCtr({
-                        //-         "siteId": #{site.siteId},
-                        //-         "siteDomain": "#{siteDomain}",
-                        //-         "platform": null,
-                        //-         "pageGroup": null,
-                        //-         "step": "1d",
-                        //-         "chartType": "areaChart",
-                        //-         "showX": false,
-                        //-         "showY": false,
-                        //-         "chartContainer": "#controlVsAdpushupChart_"+#{site.siteId},
-                        //-         "notify": false,
-                        //-         "alert": true,
-                        //-         "reportType": "controlVsAdpushupCtr"
-                        //-     });
-                    if isSuperUser
-                        div(id='pageViewsChart_#{site.siteId}')
-                            //- script(type='text/javascript').
-                            //-     adpushup.reports.controlVsAdpushupPageviews({
-                            //-         "siteId": #{site.siteId},
-                            //-         "siteDomain": "#{siteDomain}",
-                            //-         "platform": null,
-                            //-         "pageGroup": null,
-                            //-         "chartType": "pieChart",
-                            //-         "showLabel": false,
-                            //-         "showLegend": false,
-                            //-         "chartContainer": "#" + "pageViewsChart_"+#{site.siteId},
-                            //-         "notify": false,
-                            //-         "alert": true,
-                            //-         "reportType": "controlVsAdpushupPageviews"
-                            //-     });
+                .weekly-report.weekly-report-wrapper
+                    if site.reportData
+                        h1!= JSON.stringify(site.reportData)
+
+                        - lastWeek = site.reportData.lastWeekReport.reportData
+                        - thisWeek = site.reportData.thisWeekReport.reportData
+
+                        .row.text-center
+                            .col-sm-2.col-sm-offset-1
+                                .metric-count
+                                    span.lightBlue!= lastWeek.totalImpressions
+                                    span  / 
+                                    span.darkBlue!= thisWeek.totalImpressions
+                                .report-mertic Impressions
+                                    if thisWeek.totalImpressions > lastWeek.totalImpressions
+                                        i.fa.fa-arrow-up.green
+                                    else if thisWeek.totalImpressions < lastWeek.totalImpressions
+                                        i.fa.fa-arrow-down.red
+                            .col-sm-2
+                                .metric-count
+                                    span.lightBlue!= lastWeek.totalCpm
+                                    span  / 
+                                    span.darkBlue!= thisWeek.totalCpm
+                                .report-mertic CPM ($)
+                                    if thisWeek.totalCpm > lastWeek.totalCpm
+                                        i.fa.fa-arrow-up.green
+                                    else if thisWeek.totalCpm < lastWeek.totalCpm
+                                        i.fa.fa-arrow-down.red
+                            .col-sm-2
+                                .metric-count
+                                    span.lightBlue!= lastWeek.totalPageviews
+                                    span  / 
+                                    span.darkBlue!= thisWeek.totalPageviews
+                                .report-mertic Pageviews
+                                    if thisWeek.totalPageviews > lastWeek.totalPageviews
+                                        i.fa.fa-arrow-up.green
+                                    else if thisWeek.totalPageviews < lastWeek.totalPageviews
+                                        i.fa.fa-arrow-down.red
+                            .col-sm-2
+                                .metric-count
+                                    span.lightBlue!= lastWeek.totalPageCpm
+                                    span  / 
+                                    span.darkBlue!= thisWeek.totalPageCpm
+                                .report-mertic Page CPM ($)
+                                    if thisWeek.totalPageCpm > lastWeek.totalPageCpm
+                                        i.fa.fa-arrow-up.green
+                                    else if thisWeek.totalPageCpm < lastWeek.totalPageCpm
+                                        i.fa.fa-arrow-down.red
+                            .col-sm-2
+                                .metric-count
+                                    span.lightBlue!= lastWeek.totalRevenue
+                                    span  / 
+                                    span.darkBlue!= thisWeek.totalRevenue
+                                .report-mertic Revenue ($)
+                                    if thisWeek.totalRevenue > lastWeek.totalRevenue
+                                        i.fa.fa-arrow-up.green
+                                    else if thisWeek.totalRevenue < lastWeek.totalRevenue
+                                        i.fa.fa-arrow-down.red
+                    else
+                        | No report data found for this site.
             else
                 h3.title.m-All-0.clearfix
                     a.pull-left(id="site-report-" + site.siteId).

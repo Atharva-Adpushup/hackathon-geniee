@@ -365,3 +365,20 @@ maxHeightWidth {
 {
 	overflow: hidden;
 }
+
+.red {
+			color: $primaryColorDark;
+		}
+
+		.green {
+			color: $GreenColor;
+		}
+
+
+		.lightBlue {
+			color: $linkBlue;
+		}
+
+		.darkBlue {
+			color: darken($linkBlue, 12%);
+		}
