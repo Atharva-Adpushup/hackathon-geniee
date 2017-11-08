@@ -379,6 +379,14 @@ maxHeightWidth {
 			color: $linkBlue;
 		}
 
+		.bglightBlue {
+			background-color: $linkBlue;
+		}
+
 		.darkBlue {
 			color: darken($linkBlue, 12%);
+		}
+
+		.bgdarkBlue {
+			background-color: darken($linkBlue, 12%);
 		}

@@ -54,7 +54,6 @@
 	background: $CVABgColor;
 	border: 1px solid $borderColor;
 	position: relative;
-	min-height: 200px;
 	@include shadow;
 	.title {
 		color: $primaryColor;
@@ -101,8 +100,8 @@
 	}
 	.weekly-report-wrapper {
 		border-bottom: 0;
-		min-height: 200px;
-		padding-top: 0;
+		padding-top: 20px;
+		padding-bottom: 0;
 	}
 	.row {
 		position: relative;
@@ -151,6 +150,28 @@
 }
 
 .weekly-report-wrapper {
+	position: relative;
+
+	.report-legend {
+		margin-top: 30px;
+		padding: 15px;
+		background-color: $whiteColor;
+		border-top: 1px solid $borderColor;
+
+		.report-label {
+			width: 12px;
+			height: 12px;
+			display: inline-block;
+			vertical-align: middle;
+		}
+
+		.report-label-text {
+			display: inline-block;
+			vertical-align: middle;
+			font-size: 1.2em;
+		}
+	}
+
 	.report-mertic {
 		font-weight: 400;
 		font-size: 1.35em;
