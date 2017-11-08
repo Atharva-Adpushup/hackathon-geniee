@@ -104,7 +104,7 @@ const Promise = require('bluebird'),
 		return request({
 			method: 'POST',
 			url: `${baseUrl}/user/reports/generate`,
-			body: { select, where: { siteid: 31000, from, to } },
+			body: { select, where: { siteid: siteId, from, to } },
 			followAllRedirects: true,
 			json: true
 		})
