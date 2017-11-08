@@ -1,20 +1,14 @@
-#reports_control 
-{
-	.navbar-default 
-	{
-		border:0;
+#reports_control {
+	.navbar-default {
+		border: 0;
 		background: transparent;
 		min-height: 35px;
-		ul
-		{
-			li 
-			{
+		ul {
+			li {
 				margin-right: 15px;
-				&.datefields 
-				{
+				&.datefields {
 					width: 155px;
-					span.input-group-btn 
-					{
+					span.input-group-btn {
 						button {
 							background: transparent;
 							color: $fontColor;
@@ -26,69 +20,59 @@
 						@include border-radius($BorderRadius);
 					}
 				}
-				&.siteDomain 
-				{
-					.styleSelect 
-					{
+				&.siteDomain {
+					.styleSelect {
 						width: 150px;
 						height: 30px;
 						@include border-radius(3px);
 						overflow: hidden;
 						background: url(../../images/select-arrow.png) no-repeat 130px #fff;
 						border: 1px solid #e6e6e6;
-						select 
-						{
-						  background: transparent;
-						  width: 150px;
-						  padding:0 25px 0 5px;
-						  font-size: 13px;
-						  border: 0;
-						  border-radius: 0;
-						  height: 30px;
-						  -webkit-appearance: none;
-						 } 
+						select {
+							background: transparent;
+							width: 150px;
+							padding: 0 25px 0 5px;
+							font-size: 13px;
+							border: 0;
+							border-radius: 0;
+							height: 30px;
+							-webkit-appearance: none;
+						}
 					}
 				}
-				&:last-child 
-				{
+				&:last-child {
 					margin-right: 0;
 				}
 			}
 		}
 	}
-	input 
-	{
+	input {
 		width: 113px;
 	}
 }
-.controlAdpushupWrap 
-{
+.controlAdpushupWrap {
 	background: $CVABgColor;
-	border:1px solid $borderColor;
+	border: 1px solid $borderColor;
 	position: relative;
 	min-height: 200px;
 	@include shadow;
-	.title 
-	{
+	.title {
 		color: $primaryColor;
 		font-size: $CVATitleSize;
 		padding: 14px 20px;
 		border-bottom: 1px solid $borderColor;
-		.btn-group-option.open 
-		{
-			.btn-lightBg 
-			{
+		.btn-group-option.open {
+			.btn-lightBg {
 				background: $whiteColor;
 				color: $primaryColor;
 				box-shadow: none;
 			}
-		}	
+		}
 	}
-	.ap-buttongroup 
-	{
+	.ap-buttongroup {
 		position: absolute;
 		right: 30px;
-		top:14px;
+		top: 14px;
 		button {
 			background: transparent;
 			border: 1px solid $borderColor !important;
@@ -98,34 +82,31 @@
 			&:hover {
 				color: $primaryColor;
 			}
-			&:active, &.active {
+			&:active,
+			&.active {
 				color: $primaryColor;
 				box-shadow: none;
 			}
 		}
 	}
-	.graph 
-	{
+	.weekly-report {
 		background: $CVAGraphBgColor;
-		padding:10px 0 35px 0;
+		padding: 10px 0 35px 0;
 		border-bottom: 1px solid $borderColor;
 		position: relative;
-		.loaderwrapper 
-		{
-			background-color:rgba(0, 0, 0, 0.08);
+		.loaderwrapper {
+			background-color: rgba(0, 0, 0, 0.08);
 			z-index: 1039;
 		}
 	}
-	.dashboardgraph {
+	.weekly-report-wrapper {
 		border-bottom: 0;
 		min-height: 200px;
-		padding-top:0; 
+		padding-top: 0;
 	}
-	.row
-	{
+	.row {
 		position: relative;
-		.vs 
-		{
+		.vs {
 			position: absolute;
 			background: $primaryColor;
 			color: $whiteColor;
@@ -133,7 +114,7 @@
 			width: 60px;
 			@include border-radius(50%);
 			left: 50%;
-			border:5px solid $whiteColor;
+			border: 5px solid $whiteColor;
 			margin-left: -30px;
 			z-index: 4;
 			text-align: center;
@@ -141,37 +122,46 @@
 			top: 20px;
 			padding-top: 2px;
 		}
-		.ConAdpCol 
-		{
-			padding:20px 30px !important;
-			&.ConAdpColleft 
-			{
+		.ConAdpCol {
+			padding: 20px 30px !important;
+			&.ConAdpColleft {
 				border-right: 1px solid $borderColor;
 			}
-			.heading 
-			{
+			.heading {
 				display: inline-block;
 				width: 100%;
 				text-align: center;
 				border-bottom: 1px solid $borderColor;
 				h4 {
-					
 					margin-bottom: 10px;
 				}
 			}
-			.colContAdpush
-			{
+			.colContAdpush {
 				font-size: $CVAColContHead;
 				text-align: center;
 			}
 		}
 	}
-	&.col-xs-6 
-	{
-		.graph 
-		{
+	&.col-xs-6 {
+		.weekly-report {
 			padding: 0 0 25px 0;
 			position: relative;
 		}
+	}
+}
+
+.weekly-report-wrapper {
+	.report-mertic {
+		font-weight: 400;
+		font-size: 1.35em;
+		text-transform: uppercase;
+
+		.fa {
+			margin-left: 5px;
+		}
+	}
+
+	.metric-count {
+		font-size: 3em;
 	}
 }
