@@ -82,7 +82,8 @@ var utils = require('../libs/utils'),
 				utils.sendFeedback(resultObject);
 			}
 
-			setTimeout(executeLogic, 500);
+			//TODO: Implement a proper fix for executing above business logic only after all successful ads have been rendered
+			setTimeout(executeLogic, 5000);
 		}
 	};
 
