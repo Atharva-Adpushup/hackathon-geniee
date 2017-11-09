@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
+import { networks } from '../../../consts/commonConsts';
 import CodeBox from 'shared/codeBox';
 import SelectBox from 'shared/select/select';
 import AdpTags from './AdpTags';
@@ -29,22 +30,25 @@ class NetworkOptions extends Component {
 	}
 
 	submitHandler(value, isCodeBox = true, isHeaderBiddingActivated) {
-		this.props.adDescriptor
-			? isCodeBox
-				? this.props.onSubmit(value, this.state.network, false)
-				: this.props.onSubmit(value, this.state.network, true, isHeaderBiddingActivated)
-			: isCodeBox
-				? this.props.onSubmit(null, value, null, null, null, null, this.state.network, isHeaderBiddingActivated)
-				: this.props.onSubmit(null, null, null, null, null, value, this.state.network, isHeaderBiddingActivated);
+		return this.props.onSubmit(
+			isCodeBox
+				? {
+						network: this.state.network,
+						networkData: { adCode: value }
+					}
+				: {
+						network: this.state.network,
+						networkData: { priceFloor: value, headerBidding: !!isHeaderBiddingActivated }
+					}
+		);
 	}
 
 	render() {
-		const dropDownItems = ['adsense', 'adx', 'adpTags', 'dfp', 'critieo', 'custom'];
 		let code = this.props.ad && this.props.ad.adCode ? this.props.ad.adCode : '';
 		return (
 			<div className="networkOptionsRow">
 				<SelectBox value={this.state.network} label="Select Network" onChange={this.onChange}>
-					{dropDownItems.map((item, index) => (
+					{networks.map((item, index) => (
 						<option key={index} value={item}>
 							{item.charAt(0).toUpperCase() + item.slice(1).replace(/([A-Z])/g, ' $1')}
 						</option>
@@ -64,19 +68,22 @@ class NetworkOptions extends Component {
 								? this.props.ad.networkData.headerBidding
 								: 1
 						}
-						showButtons={this.props.showButtons || true}
 						submitHandler={this.submitHandler}
 						onCancel={this.props.onCancel}
 					/>
 				) : this.state.network ? (
 					<div className="mT-10">
-						<CodeBox
-							showButtons={this.props.showButtons || true}
-							onSubmit={this.submitHandler}
-							onCancel={this.props.onCancel}
-							code={code}
-							size="small"
-						/>
+						{this.props.inline ? (
+							''
+						) : (
+							<CodeBox
+								showButtons={this.props.showButtons || true}
+								onSubmit={this.submitHandler}
+								onCancel={this.props.onCancel}
+								code={code}
+								size="small"
+							/>
+						)}
 					</div>
 				) : null}
 			</div>
