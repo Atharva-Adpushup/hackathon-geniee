@@ -91,17 +91,21 @@ const siteMappingActions = {
 	],
 	statuses = [
 		{
-			name: 'Pre-onboarding',
+			name: 'All',
 			value: 0
 		},
 		{
-			name: 'Onboarding',
+			name: 'Pre-onboarding',
 			value: 1
 		},
 		{
-			name: 'Onboarded',
+			name: 'Onboarding',
 			value: 2
+		},
+		{
+			name: 'Onboarded',
+			value: 3
 		}
 	];
 
-export { siteMappingActions, labels, headers, modes };
+export { siteMappingActions, labels, headers, modes, statuses };

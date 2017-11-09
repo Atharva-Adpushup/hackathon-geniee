@@ -5,7 +5,7 @@ import moment from 'moment';
 import { Row, Col, Breadcrumb } from 'react-bootstrap';
 import '../../../ReportingPanel/styles.scss';
 import Datatable from 'react-bs-datatable';
-import { labels, headers, modes } from '../../configs/commonConsts';
+import { labels, headers, modes, statuses } from '../../configs/commonConsts';
 import { ajax } from '../../../../common/helpers';
 import ActionCard from '../../../../Components/ActionCard.jsx';
 import Badges from '../../../../common/Badges';
@@ -19,12 +19,14 @@ class SitesMapping extends Component {
 			tableConfig: null,
 			hasSites: this.props.sites.length ? true : false,
 			mode: undefined,
-			status: undefined
+			status: undefined,
+			totalSites: 0
 		};
 		this.generateStatus = this.generateStatus.bind(this);
 		this.generateClickableSpan = this.generateClickableSpan.bind(this);
 		this.clickHandler = this.clickHandler.bind(this);
 		this.modeChangeHandler = this.modeChangeHandler.bind(this);
+		this.statusChangeHandler = this.statusChangeHandler.bind(this);
 	}
 
 	componentDidMount() {
@@ -90,12 +92,24 @@ class SitesMapping extends Component {
 		});
 	}
 
-	statusChangeHandler(mode = 0) {
-		mode = mode == null ? 0 : mode;
-		let sites = mode == 0 ? this.props.sites : this.props.sites.filter(site => site.apConfigs.mode == mode);
+	statusChangeHandler(status = 0) {
+		status = status == null ? 0 : status;
+		let sites;
+		if (status == 0) {
+			sites = this.props.sites;
+		} else if (status == 1) {
+			// Pre onboarding
+			sites = this.props.sites.filter(site => !site.step);
+		} else if (status == 2) {
+			// Onboarding
+			sites = this.props.sites.filter(site => site.step >= 1 && site.step < 3);
+		} else {
+			// Onboarded
+			sites = this.props.sites.filter(site => site.step >= 3);
+		}
 		this.setState({
 			tableConfig: this.generateTableData(sites),
-			mode: mode
+			status: status
 		});
 	}
 
@@ -133,18 +147,18 @@ class SitesMapping extends Component {
 
 	componentWillReceiveProps(nextProps) {
 		let hasSites = nextProps.sites && nextProps.sites.length ? true : false,
-			tableConfig = hasSites ? this.generateTableData(nextProps.sites) : {};
+			tableConfig = hasSites ? this.generateTableData(nextProps.sites) : {},
+			totalSites = hasSites ? nextProps.sites.length : 0;
 
-		this.setState({ loaded: true, hasSites: hasSites, tableConfig: tableConfig });
+		this.setState({ loaded: true, hasSites, tableConfig, totalSites });
 	}
 
 	renderAggregatedData() {
 		return this.state.tableConfig.data ? (
 			<div>
 				<Breadcrumb>
-					<Breadcrumb.Item>Total Sites : {this.state.tableConfig.data.length}</Breadcrumb.Item>
-					<Breadcrumb.Item>Live Sites : 1200</Breadcrumb.Item>
-					<Breadcrumb.Item>Draft Sites : 1000</Breadcrumb.Item>
+					<Breadcrumb.Item>Total Sites : {this.state.totalSites}</Breadcrumb.Item>
+					<Breadcrumb.Item>Current Records : {this.state.tableConfig.data.length}</Breadcrumb.Item>
 				</Breadcrumb>
 			</div>
 		) : (
@@ -154,49 +168,25 @@ class SitesMapping extends Component {
 
 	renderSelect(value, label, changeHandler, array) {
 		return (
-			<SelectBox value={value} label={label} onChange={changeHandler} onClear={changeHandler}>
-				{array.map((ele, index) => (
-					<option key={index} value={ele.value}>
-						{ele.name}
-					</option>
-				))}
-			</SelectBox>
+			<div>
+				<p>{label}</p>
+				<SelectBox value={value} label={label} onChange={changeHandler} onClear={changeHandler}>
+					{array.map((ele, index) => (
+						<option key={index} value={ele.value}>
+							{ele.name}
+						</option>
+					))}
+				</SelectBox>
+			</div>
 		);
 	}
 
 	renderFilters() {
 		return (
 			<div>
-				<Col xs={3}>
-					<p>Filters</p>
-					{this.renderSelect(this.state.mode, 'Select Mode', this.modeChangeHandler, modes)}
-					{/* <SelectBox
-						value={this.state.mode}
-						label="Select Mode"
-						onChange={this.modeChangeHandler}
-						onClear={this.modeChangeHandler}
-					>
-						{modes.map((mode, index) => (
-							<option key={index} value={mode.value}>
-								{mode.name}
-							</option>
-						))}
-					</SelectBox> */}
-				</Col>
+				<Col xs={3}>{this.renderSelect(this.state.mode, 'Select Mode', this.modeChangeHandler, modes)}</Col>
 				<Col xs={3}>
 					{this.renderSelect(this.state.status, 'Select Status', this.statusChangeHandler, statuses)}
-					{/* <SelectBox
-						value={this.state.mode}
-						label="Select Status"
-						onChange={this.statusChangeHandler}
-						onClear={this.statusChangeHandler}
-					>
-						{statuses.map((status, index) => (
-							<option key={index} value={status.value}>
-								{status.name}
-							</option>
-						))}
-					</SelectBox> */}
 				</Col>
 			</div>
 		);
