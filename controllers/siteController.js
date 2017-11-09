@@ -369,6 +369,36 @@ router
 			.catch(function(err) {
 				res.send('Site not found!');
 			});
+	})
+	.post('/:siteId/saveRevenueShare', (req, res) => {
+		let response = {
+			error: true,
+			message: 'Operaiton Failed'
+		};
+		if (!req.body || !req.body.siteId || !req.body.share) {
+			return res.send(response);
+		}
+		return siteModel
+			.getSiteById(req.body.siteId)
+			.then(site => {
+				site.set('revenueShare', {
+					share: parseInt(req.body.share),
+					negate: ['adsense']
+				});
+				return site.save();
+			})
+			.then(() =>
+				res.send(
+					Object.assign(response, {
+						error: false,
+						message: 'Share set'
+					})
+				)
+			)
+			.catch(err => {
+				console.log(err);
+				return res.send(response);
+			});
 	});
 
 module.exports = router;

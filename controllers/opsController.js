@@ -21,7 +21,15 @@ const fn = {
 
 router
 	.get(
-		['/', '/liveSitesMapping', '/couchbaseEditor', '/getAllSites', '/:siteId/panel', '/sitesMapping'],
+		[
+			'/',
+			'/liveSitesMapping',
+			'/couchbaseEditor',
+			'/getAllSites',
+			'/:siteId/panel',
+			'/sitesMapping',
+			'/settings/:siteId'
+		],
 		(req, res) => {
 			const { session, params } = req,
 				dataToSend = {
