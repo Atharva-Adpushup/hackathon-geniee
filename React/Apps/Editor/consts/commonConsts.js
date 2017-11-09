@@ -325,6 +325,7 @@ const status = {
 		BROWSE_MODE: 2
 	},
 	networks = ['adsense', 'adx', 'adpTags', 'dfp', 'custom'],
+	priceFloorKeys = ['FP_SA', 'FP_BA', 'FP_S', 'FP_A'],
 	reportingUrl = '/user/reports/generate';
 
 export {
@@ -362,5 +363,6 @@ export {
 	uiModes,
 	networks,
 	reportingActions,
-	reportingUrl
+	reportingUrl,
+	priceFloorKeys
 };
