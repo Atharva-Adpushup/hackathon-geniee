@@ -80,7 +80,8 @@ class SitesMapping extends Component {
 		);
 	}
 
-	modeChangeHandler(mode) {
+	modeChangeHandler(mode = 0) {
+		mode = mode == null ? 0 : mode;
 		let sites = mode == 0 ? this.props.sites : this.props.sites.filter(site => site.apConfigs.mode == mode);
 		this.setState({
 			tableConfig: this.generateTableData(sites),
@@ -153,6 +154,7 @@ class SitesMapping extends Component {
 										value={this.state.mode}
 										label="Select Mode"
 										onChange={this.modeChangeHandler}
+										onClear={this.modeChangeHandler}
 									>
 										{modes.map((mode, index) => (
 											<option key={index} value={mode.value}>
