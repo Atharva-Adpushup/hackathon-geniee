@@ -36,7 +36,6 @@ const siteMappingActions = {
 		{
 			title: 'Mode',
 			prop: 'Mode',
-			sortable: true,
 			filterable: true
 		},
 		{
@@ -75,6 +74,34 @@ const siteMappingActions = {
 		// 	sortable: true,
 		// 	filterable: true
 		// }
+	],
+	modes = [
+		{
+			name: 'Both',
+			value: 0
+		},
+		{
+			name: 'Live',
+			value: 1
+		},
+		{
+			name: 'Draft',
+			value: 2
+		}
+	],
+	statuses = [
+		{
+			name: 'Pre-onboarding',
+			value: 0
+		},
+		{
+			name: 'Onboarding',
+			value: 1
+		},
+		{
+			name: 'Onboarded',
+			value: 2
+		}
 	];
 
-export { siteMappingActions, labels, headers };
+export { siteMappingActions, labels, headers, modes };

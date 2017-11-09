@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import clipboard from 'clipboard-polyfill';
 import moment from 'moment';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Breadcrumb } from 'react-bootstrap';
 import '../../../ReportingPanel/styles.scss';
 import Datatable from 'react-bs-datatable';
-import { labels, headers } from '../../configs/commonConsts';
+import { labels, headers, modes } from '../../configs/commonConsts';
 import { ajax } from '../../../../common/helpers';
 import ActionCard from '../../../../Components/ActionCard.jsx';
 import Badges from '../../../../common/Badges';
@@ -18,7 +18,8 @@ class SitesMapping extends Component {
 			loaded: false,
 			tableConfig: null,
 			hasSites: this.props.sites.length ? true : false,
-			mode: undefined
+			mode: undefined,
+			status: undefined
 		};
 		this.generateStatus = this.generateStatus.bind(this);
 		this.generateClickableSpan = this.generateClickableSpan.bind(this);
@@ -89,6 +90,15 @@ class SitesMapping extends Component {
 		});
 	}
 
+	statusChangeHandler(mode = 0) {
+		mode = mode == null ? 0 : mode;
+		let sites = mode == 0 ? this.props.sites : this.props.sites.filter(site => site.apConfigs.mode == mode);
+		this.setState({
+			tableConfig: this.generateTableData(sites),
+			mode: mode
+		});
+	}
+
 	generateTableData(sites) {
 		let tableConfig = {
 			headers: headers,
@@ -128,41 +138,79 @@ class SitesMapping extends Component {
 		this.setState({ loaded: true, hasSites: hasSites, tableConfig: tableConfig });
 	}
 
+	renderAggregatedData() {
+		return this.state.tableConfig.data ? (
+			<div>
+				<Breadcrumb>
+					<Breadcrumb.Item>Total Sites : {this.state.tableConfig.data.length}</Breadcrumb.Item>
+					<Breadcrumb.Item>Live Sites : 1200</Breadcrumb.Item>
+					<Breadcrumb.Item>Draft Sites : 1000</Breadcrumb.Item>
+				</Breadcrumb>
+			</div>
+		) : (
+			''
+		);
+	}
+
+	renderSelect(value, label, changeHandler, array) {
+		return (
+			<SelectBox value={value} label={label} onChange={changeHandler} onClear={changeHandler}>
+				{array.map((ele, index) => (
+					<option key={index} value={ele.value}>
+						{ele.name}
+					</option>
+				))}
+			</SelectBox>
+		);
+	}
+
+	renderFilters() {
+		return (
+			<div>
+				<Col xs={3}>
+					<p>Filters</p>
+					{this.renderSelect(this.state.mode, 'Select Mode', this.modeChangeHandler, modes)}
+					{/* <SelectBox
+						value={this.state.mode}
+						label="Select Mode"
+						onChange={this.modeChangeHandler}
+						onClear={this.modeChangeHandler}
+					>
+						{modes.map((mode, index) => (
+							<option key={index} value={mode.value}>
+								{mode.name}
+							</option>
+						))}
+					</SelectBox> */}
+				</Col>
+				<Col xs={3}>
+					{this.renderSelect(this.state.status, 'Select Status', this.statusChangeHandler, statuses)}
+					{/* <SelectBox
+						value={this.state.mode}
+						label="Select Status"
+						onChange={this.statusChangeHandler}
+						onClear={this.statusChangeHandler}
+					>
+						{statuses.map((status, index) => (
+							<option key={index} value={status.value}>
+								{status.name}
+							</option>
+						))}
+					</SelectBox> */}
+				</Col>
+			</div>
+		);
+	}
+
 	render() {
-		let modes = [
-			{
-				name: 'Both',
-				value: 0
-			},
-			{
-				name: 'Live',
-				value: 1
-			},
-			{
-				name: 'Draft',
-				value: 2
-			}
-		];
 		return (
 			<ActionCard title="Sites Mapping">
 				{this.state.loaded ? (
 					this.state.hasSites ? (
 						<div className="report-table">
 							<Row className="pdAll-10">
-								<Col xs={3}>
-									<SelectBox
-										value={this.state.mode}
-										label="Select Mode"
-										onChange={this.modeChangeHandler}
-										onClear={this.modeChangeHandler}
-									>
-										{modes.map((mode, index) => (
-											<option key={index} value={mode.value}>
-												{mode.name}
-											</option>
-										))}
-									</SelectBox>
-								</Col>
+								{this.renderAggregatedData()}
+								{this.renderFilters()}
 							</Row>
 							<Datatable
 								tableHeader={this.state.tableConfig.headers}
