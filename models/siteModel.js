@@ -25,7 +25,8 @@ var model = require('../helpers/model'),
 			'dateModified',
 			'step',
 			'websiteRevenue',
-			'adsensePublisherId'
+			'adsensePublisherId',
+			'revenueShare'
 		];
 		this.clientKeys = [
 			'siteId',
