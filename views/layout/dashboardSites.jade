@@ -11,9 +11,9 @@
                             a.pull-left(id="site-report-" + siteId, target='_blank').
                                 #{utils.domanize(site.domain)} - #{siteId}
                             .pull-right.site-actions
-                                a.btn.btn-lightBg.btn-default(id="editor-redirect-link", target='_blank', href='/user/site/#{siteId}/editor') 
+                                a.btn.btn-lightBg.btn-default(title="Open editor" id="editor-redirect-link", target='_blank', href='/user/site/#{siteId}/editor') 
                                     i.fa.fa-code
-                                a.btn.btn-lightBg.btn-default(target='_blank' id="site-custom-reports-" + siteId, href='/user/site/#{siteId}/reports/adpushupReport')
+                                a.btn.btn-lightBg.btn-default(title="View site report" target='_blank' id="site-custom-reports-" + siteId, href='/user/site/#{siteId}/reports/adpushupReport')
                                         i.fa.fa-area-chart
                                 .dropdown.btn-dropdown
                                     button.btn.btn-lightBg#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='true')
@@ -21,16 +21,16 @@
                                     |   
                                     ul.dropdown-menu.btn-dd-menu(aria-labelledby='dropdownMenu1')
                                         li
-                                            a(href='/user/site/#{siteId}/pagegroups') 
+                                            a(title="View site pagegroups" href='/user/site/#{siteId}/pagegroups') 
                                                 i.fa.fa-th-list
                                                 |  PageGroups  
                                         li
-                                            a(href='/user/site/#{siteId}/settings') 
+                                            a(title="Open site settings" href='/user/site/#{siteId}/settings') 
                                                 i.fa.fa-cog
                                                 |  Settings   
                                         if isSuperUser 
                                             li
-                                                a(href='/user/site/#{siteId}/opsPanel') 
+                                                a(title="Open site ops panel" href='/user/site/#{siteId}/opsPanel') 
                                                     i.fa.fa-wrench 
                                                     |  Ops Panel
                                             li
@@ -53,9 +53,9 @@
                                             span  / 
                                             span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalImpressions)
                                         .report-mertic Impressions
-                                            if thisWeek.reportData.totalImpressions > lastWeek.reportData.totalImpressions
+                                            if Number(thisWeek.reportData.totalImpressions) > Number(lastWeek.reportData.totalImpressions)
                                                 i.fa.fa-arrow-up.green
-                                            else if thisWeek.reportData.totalImpressions < lastWeek.reportData.totalImpressions
+                                            else if Number(thisWeek.reportData.totalImpressions) < Number(lastWeek.reportData.totalImpressions)
                                                 i.fa.fa-arrow-down.red
                                     .col-sm-4
                                         .metric-count
@@ -63,9 +63,9 @@
                                             span  / 
                                             span.darkBlue!= thisWeek.reportData.totalCpm
                                         .report-mertic CPM ($)
-                                            if thisWeek.reportData.totalCpm > lastWeek.reportData.totalCpm
+                                            if Number(thisWeek.reportData.totalCpm) > Number(lastWeek.reportData.totalCpm)
                                                 i.fa.fa-arrow-up.green
-                                            else if thisWeek.reportData.totalCpm < lastWeek.reportData.totalCpm
+                                            else if Number(thisWeek.reportData.totalCpm) < Number(lastWeek.reportData.totalCpm)
                                                 i.fa.fa-arrow-down.red
                                     .col-sm-4
                                         .metric-count
@@ -73,9 +73,9 @@
                                             span  / 
                                             span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalRevenue)
                                         .report-mertic Revenue ($)
-                                            if thisWeek.reportData.totalRevenue > lastWeek.reportData.totalRevenue
+                                            if Number(thisWeek.reportData.totalRevenue) > Number(lastWeek.reportData.totalRevenue)
                                                 i.fa.fa-arrow-up.green
-                                            else if thisWeek.reportData.totalRevenue < lastWeek.reportData.totalRevenue
+                                            else if Number(thisWeek.reportData.totalRevenue) < Number(lastWeek.reportData.totalRevenue)
                                                 i.fa.fa-arrow-down.red
                                 if isSuperUser
                                     .row.su-metrics.text-center
@@ -85,9 +85,9 @@
                                                 span  / 
                                                 span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalPageviews)
                                             .report-mertic Pageviews
-                                                if thisWeek.reportData.totalPageviews > lastWeek.reportData.totalPageviews
+                                                if Number(thisWeek.reportData.totalPageviews) > Number(lastWeek.reportData.totalPageviews)
                                                     i.fa.fa-arrow-up.green
-                                                else if thisWeek.reportData.totalPageviews < lastWeek.reportData.totalPageviews
+                                                else if Number(thisWeek.reportData.totalPageviews) < Number(lastWeek.reportData.totalPageviews)
                                                     i.fa.fa-arrow-down.red
                                         .col-sm-4
                                             .metric-count
@@ -95,9 +95,9 @@
                                                 span  / 
                                                 span.darkBlue!= thisWeek.reportData.totalPageCpm
                                             .report-mertic Page CPM ($)
-                                                if thisWeek.reportData.totalPageCpm > lastWeek.reportData.totalPageCpm
+                                                if Number(thisWeek.reportData.totalPageCpm) > Number(lastWeek.reportData.totalPageCpm)
                                                     i.fa.fa-arrow-up.green
-                                                else if thisWeek.reportData.totalPageCpm < lastWeek.reportData.totalPageCpm
+                                                else if Number(thisWeek.reportData.totalPageCpm) < Number(lastWeek.reportData.totalPageCpm)
                                                     i.fa.fa-arrow-down.red
                             
                                 .report-legend
