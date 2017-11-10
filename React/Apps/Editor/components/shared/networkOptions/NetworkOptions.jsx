@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
+import { networks } from '../../../consts/commonConsts';
 import CodeBox from 'shared/codeBox';
 import SelectBox from 'shared/select/select';
 import AdpTags from './AdpTags';
@@ -39,12 +40,11 @@ class NetworkOptions extends Component {
 	}
 
 	render() {
-		const dropDownItems = ['adsense', 'adx', 'adpTags', 'dfp', 'critieo', 'custom'];
 		let code = this.props.ad && this.props.ad.adCode ? this.props.ad.adCode : '';
 		return (
 			<div className="networkOptionsRow">
 				<SelectBox value={this.state.network} label="Select Network" onChange={this.onChange}>
-					{dropDownItems.map((item, index) => (
+					{networks.map((item, index) => (
 						<option key={index} value={item}>
 							{item.charAt(0).toUpperCase() + item.slice(1).replace(/([A-Z])/g, ' $1')}
 						</option>
