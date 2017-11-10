@@ -4,12 +4,7 @@ const Promise = require('bluebird'),
 	moment = require('moment'),
 	config = require('../configs/config'),
 	commonConsts = require('../configs/commonConsts'),
-	getBaseUrl = () => {
-		const env = config.environment,
-			baseUrl = env.HOST_ENV === 'development' ? `${env.HOST_URL}:${env.HOST_PORT}` : commonConsts.BASE_URL;
-
-		return baseUrl;
-	},
+	sqlReportingModule = require('../reports/default/adpTags/index'),
 	createAggregateNonAggregateObjects = (dataset, key, container) => {
 		let innerObj = {};
 		_.forEach(dataset, (nonAggregateDataset, identifier) => {
@@ -47,10 +42,10 @@ const Promise = require('bluebird'),
 				isInvalidRevenue || innerObj[identifier].aggregate.total_impressions == 0
 					? 0
 					: Number(
-							innerObj[identifier].aggregate.total_revenue *
-								1000 /
-								innerObj[identifier].aggregate.total_impressions
-						).toFixed(3);
+						innerObj[identifier].aggregate.total_revenue *
+						1000 /
+						innerObj[identifier].aggregate.total_impressions
+					).toFixed(3);
 		});
 		container[key] = innerObj;
 	},
@@ -68,12 +63,12 @@ const Promise = require('bluebird'),
 		createAggregateNonAggregateObjects(sectionWiseResult, 'sections', reporting);
 		return Promise.resolve(reporting);
 	},
-	aggregateWeekData = data => {
+	aggregateWeekData = rows => {
 		let totalImpressions = 0,
 			totalRevenue = 0,
 			totalPageviews = 0;
 
-		if (!data.rows.length) {
+		if (!rows.length) {
 			return {
 				totalImpressions,
 				totalRevenue,
@@ -83,7 +78,7 @@ const Promise = require('bluebird'),
 			};
 		}
 
-		_.forEach(data.rows, row => {
+		_.forEach(rows, row => {
 			totalImpressions += row.total_impressions;
 			totalRevenue += row.total_revenue;
 			totalPageviews += row.total_requests;
@@ -98,26 +93,20 @@ const Promise = require('bluebird'),
 		};
 	},
 	getSiteReport = payload => {
-		const baseUrl = getBaseUrl(),
-			{ siteId, select, from, to } = payload;
+		const { siteId, select, from, to } = payload;
 
-		return request({
-			method: 'POST',
-			url: `${baseUrl}/user/reports/generate`,
-			body: { select, where: { siteid: siteId, from, to } },
-			followAllRedirects: true,
-			json: true
-		})
-			.then(data => aggregateWeekData(data))
-			.catch(err => err);
+		return sqlReportingModule
+			.generate({
+				select,
+				where: { siteid: siteId, from, to }
+			});
 	},
 	getDay = dayOffset =>
 		moment()
 			.subtract(dayOffset, 'days')
 			.startOf('day'),
-	getWeeklyComparisionReport = site => {
-		const { siteId } = site,
-			dateFormat = commonConsts.REPORT_DATE_FORMAT,
+	getWeeklyComparisionReport = siteId => {
+		const dateFormat = commonConsts.REPORT_DATE_FORMAT,
 			thisWeekReportParams = {
 				siteId,
 				from: moment(getDay(7)).format(dateFormat),
@@ -132,8 +121,9 @@ const Promise = require('bluebird'),
 			};
 
 		return getSiteReport(lastWeekReportParams)
-			.then(lastWeekReport => [lastWeekReport, getSiteReport(thisWeekReportParams)])
+			.then(lastWeekReport => [aggregateWeekData(lastWeekReport), getSiteReport(thisWeekReportParams)])
 			.spread((lastWeekReport, thisWeekReport) => {
+				thisWeekReport = aggregateWeekData(thisWeekReport);
 				return {
 					siteId,
 					lastWeekReport: {
