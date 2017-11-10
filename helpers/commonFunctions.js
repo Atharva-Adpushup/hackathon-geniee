@@ -102,7 +102,7 @@ const Promise = require('bluebird'),
 		return sqlReportingModule
 			.generate({
 				select,
-				where: { siteid: siteId, from, to }
+				where: { siteid: siteId, from, to, mode: 1 },
 			});
 	},
 	getDay = dayOffset =>

@@ -292,7 +292,7 @@ const schema = {
 	firstQuery: {
 		aggregate: ['total_requests', 'total_xpath_miss'],
 		nonAggregate: ['report_date', 'siteid', 'device_type'],
-		where: [],
+		where: ['mode'],
 		tables: {
 			apexSiteReport: {
 				table: 'ApexHourlySiteReport',
@@ -361,6 +361,11 @@ const schema = {
 		ntwid: {
 			name: '__ntwid__',
 			type: 'INT',
+			value: false
+		},
+		mode: {
+			name: '__mode__',
+			type: 'TINYINT',
 			value: false
 		}
 	}
