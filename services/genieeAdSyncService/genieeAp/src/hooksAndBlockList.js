@@ -52,8 +52,8 @@ function init(adp, onPageGroupPush, platform) {
 					//Remove forceVariation param from url so that it doesn't change pageGrop pattern
 					url = utils.removeUrlParameter(w.location.href, config.forceVariation),
 					patternToMatch = platformExperiments[key].pageGroupPattern;
-
-				if (url.match(new RegExp(patternToMatch, 'i'))) {
+				//do check if any pageGroup pattern provided or not, if not then don't match
+				if (patternToMatch && url.match(new RegExp(patternToMatch, 'i'))) {
 					// forceFully set pagegroup in case url pattern matches to current url
 					config.pageGroup = key.toUpperCase();
 					break;
