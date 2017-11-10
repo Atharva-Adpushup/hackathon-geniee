@@ -75,17 +75,6 @@ function dashboardRedirection(req, res, allUserSites, type) {
 
 		setEmailCookie(req, res);
 
-		sites = _.map(sites, site => {
-			if (site.siteId === 22) {
-				site.siteId = 31000;
-			}
-			if (site.siteId === 23) {
-				site.siteId = 31454;
-			}
-
-			return site;
-		});
-
 		let siteReports = [];
 
 		return Promise.each(sites, site => getWeeklyComparisionReport(site.siteId).then(data => siteReports.push(data)))
