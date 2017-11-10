@@ -66,7 +66,9 @@ const Promise = require('bluebird'),
 	aggregateWeekData = rows => {
 		let totalImpressions = 0,
 			totalRevenue = 0,
-			totalPageviews = 0;
+			totalPageviews = 0,
+			totalCpm = 0,
+			totalPageCpm = 0;
 
 		if (!rows.length) {
 			return {
@@ -82,14 +84,16 @@ const Promise = require('bluebird'),
 			totalImpressions += row.total_impressions;
 			totalRevenue += row.total_revenue;
 			totalPageviews += row.total_requests;
+			totalCpm += (row.total_revenue * 1000 / row.total_impressions);
+			totalPageCpm += (row.total_revenue * 1000 / row.total_requests);
 		});
 
 		return {
 			totalImpressions,
 			totalRevenue: totalRevenue.toFixed(2),
 			totalPageviews,
-			totalCpm: Number((totalRevenue * 1000 / totalImpressions).toFixed(2)),
-			totalPageCpm: Number((totalRevenue * 1000 / totalPageviews).toFixed(2))
+			totalCpm: totalCpm.toFixed(2),
+			totalPageCpm: totalPageCpm.toFixed(2)
 		};
 	},
 	getSiteReport = payload => {
