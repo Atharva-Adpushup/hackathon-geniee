@@ -46,19 +46,19 @@ function dashboardRedirection(req, res, allUserSites, type) {
 	}
 
 	function sitePromises() {
-		return _.map(allUserSites, function(obj) {
+		return _.map(allUserSites, function (obj) {
 			return siteModel
 				.getSiteById(obj.siteId)
-				.then(function() {
+				.then(function () {
 					return obj;
 				})
-				.catch(function() {
+				.catch(function () {
 					return 'inValidSite';
 				});
 		});
 	}
 
-	return Promise.all(sitePromises()).then(function(validSites) {
+	return Promise.all(sitePromises()).then(function (validSites) {
 		var sites = _.difference(validSites, ['inValidSite']),
 			unSavedSite;
 
@@ -75,10 +75,21 @@ function dashboardRedirection(req, res, allUserSites, type) {
 
 		setEmailCookie(req, res);
 
-		const siteReportPromises = _.map(sites, site => getWeeklyComparisionReport(site));
+		sites = _.map(sites, site => {
+			if (site.siteId === 22) {
+				site.siteId = 31000;
+			}
+			if (site.siteId === 23) {
+				site.siteId = 31454;
+			}
 
-		return Promise.all(siteReportPromises)
-			.then(siteReports => {
+			return site;
+		});
+
+		let siteReports = [];
+
+		return Promise.each(sites, site => getWeeklyComparisionReport(site.siteId).then(data => siteReports.push(data)))
+			.then(() => {
 				sites = _.map(sites, site => {
 					const reportData = _.find(siteReports, { siteId: site.siteId });
 					return {
@@ -181,32 +192,32 @@ function preOnboardingPageRedirection(page, req, res) {
 }
 
 router
-	.get('/dashboard', function(req, res) {
+	.get('/dashboard', function (req, res) {
 		return userModel
 			.getAllUserSites(req.session.user.email)
-			.then(function(sites) {
+			.then(function (sites) {
 				var allUserSites = sites;
 				return dashboardRedirection(req, res, allUserSites, 'dashboard');
 			})
-			.catch(function(err) {
+			.catch(function (err) {
 				var allUserSites = req.session.user.sites;
 				return dashboardRedirection(req, res, allUserSites, 'dashboard');
 			});
 	})
-	.get('/onboarding', function(req, res) {
+	.get('/onboarding', function (req, res) {
 		var allUserSites = req.session.user.sites;
 		return dashboardRedirection(req, res, allUserSites, 'onboarding');
 	})
-	.get('/requestdemo', function(req, res) {
+	.get('/requestdemo', function (req, res) {
 		return preOnboardingPageRedirection('request-demo', req, res);
 	})
-	.post('/setSiteStep', function(req, res) {
+	.post('/setSiteStep', function (req, res) {
 		siteModel
 			.setSiteStep(req.body.siteId, req.body.step)
-			.then(function() {
+			.then(function () {
 				return userModel.setSitePageGroups(req.session.user.email);
 			})
-			.then(function(user) {
+			.then(function (user) {
 				req.session.user = user;
 
 				if (req.body.completeOnboarding) {
@@ -216,15 +227,15 @@ router
 				user.save();
 				return res.send({ success: 1 });
 			})
-			.catch(function() {
+			.catch(function () {
 				return res.send({ success: 0 });
 			});
 	})
-	.post('/setSiteServices', function(req, res) {
+	.post('/setSiteServices', function (req, res) {
 		if (req.body && req.body.servicesString) {
 			userModel
 				.getUserByEmail(req.session.user.email)
-				.then(function(user) {
+				.then(function (user) {
 					var userSites = user.get('sites'),
 						userWebsiteRevenue = user.get('revenueUpperLimit');
 					if (req.body.fromDashboard == 'false') {
@@ -248,7 +259,7 @@ router
 					}
 					return res.send({ success: 0 });
 				})
-				.catch(function(err) {
+				.catch(function (err) {
 					console.log(err);
 					return res.send({ success: 0 });
 				});
@@ -256,50 +267,50 @@ router
 			return res.send({ success: 0 });
 		}
 	})
-	.post('/sendCode', function(req, res) {
+	.post('/sendCode', function (req, res) {
 		var json = {
 			email: req.body.developerEmail,
 			code: req.body.headerCode
 		};
 		userModel
 			.sendCodeToDev(json)
-			.then(function() {
+			.then(function () {
 				res.send({ success: 1 });
 			})
-			.catch(function(e) {
+			.catch(function (e) {
 				res.send({ success: 0 });
 			});
 	})
-	.get('/billing', function(req, res) {
+	.get('/billing', function (req, res) {
 		res.render('billing', {
 			user: req.session.user,
 			isSuperUser: true
 		});
 	})
-	.get('/connectGoogle', function(req, res) {
+	.get('/connectGoogle', function (req, res) {
 		return userModel
 			.getUserByEmail(req.session.user.email)
-			.then(function(user) {
+			.then(function (user) {
 				var adSenseData = _.find(user.get('adNetworkSettings'), { networkName: 'ADSENSE' });
 				return res.render('connectGoogle', {
 					adNetworkSettings: !_.isEmpty(user.get('adNetworkSettings'))
 						? {
-								pubId: adSenseData.adsenseAccounts[0].id,
-								email: adSenseData.userInfo.email
-							}
+							pubId: adSenseData.adsenseAccounts[0].id,
+							email: adSenseData.userInfo.email
+						}
 						: false,
 					siteId: req.session.siteId
 				});
 			})
-			.catch(function(err) {
+			.catch(function (err) {
 				res.redirect('/404');
 			});
 	})
-	.get('/addSite', function(req, res) {
+	.get('/addSite', function (req, res) {
 		if (req.session.isSuperUser) {
 			var allUserSites = req.session.user.sites,
 				params = {};
-			_.map(allUserSites, function(site) {
+			_.map(allUserSites, function (site) {
 				if (site.step == 1) {
 					params = {
 						siteDomain: site.domain,
@@ -313,12 +324,12 @@ router
 			res.redirect('/403');
 		}
 	})
-	.post('/addSite', function(req, res) {
+	.post('/addSite', function (req, res) {
 		var site = req.body.site ? utils.getSafeUrl(req.body.site) : req.body.site;
 
 		userModel
 			.addSite(req.session.user.email, site)
-			.spread(function(user, siteId) {
+			.spread(function (user, siteId) {
 				var userSites = user.get('sites');
 				for (var i in userSites) {
 					if (userSites[i].siteId === siteId) {
@@ -331,53 +342,53 @@ router
 				}
 				return res.send({ success: 0 });
 			})
-			.catch(function(err) {
+			.catch(function (err) {
 				return res.send({ success: 0 });
 			});
 	})
-	.get('/logout', function(req, res) {
-		req.session.destroy(function() {
+	.get('/logout', function (req, res) {
+		req.session.destroy(function () {
 			return res.redirect('/');
 		});
 	})
-	.post('/deleteSite', function(req, res) {
+	.post('/deleteSite', function (req, res) {
 		userModel
 			.verifySiteOwner(req.session.user.email, req.body.siteId)
-			.then(function() {
+			.then(function () {
 				return siteModel.deleteSite(req.body.siteId);
 			})
-			.then(function() {
+			.then(function () {
 				return res.redirect('dashboard');
 			})
-			.catch(function(err) {
+			.catch(function (err) {
 				console.log(err);
 				return res.redirect('dashboard');
 			});
 	})
-	.post('/switchTo', function(req, res) {
+	.post('/switchTo', function (req, res) {
 		var email = req.body.email ? utils.sanitiseString(req.body.email) : req.body.email;
 
 		if (req.session.isSuperUser === true) {
 			userModel.setSitePageGroups(email).then(
-				function(user) {
+				function (user) {
 					req.session.user = user;
 					var allUserSites = user.get('sites'),
 						isRequestDemo = !!user.get('requestDemo');
 
 					function sitePromises() {
-						return _.map(allUserSites, function(obj) {
+						return _.map(allUserSites, function (obj) {
 							return siteModel
 								.getSiteById(obj.siteId)
-								.then(function() {
+								.then(function () {
 									return obj;
 								})
-								.catch(function(err) {
+								.catch(function (err) {
 									return 'inValidSite';
 								});
 						});
 					}
 
-					return Promise.all(sitePromises()).then(function(validSites) {
+					return Promise.all(sitePromises()).then(function (validSites) {
 						var sites = _.difference(validSites, ['inValidSite']);
 						if (Array.isArray(sites) && sites.length > 0) {
 							if (sites.length == 1) {
@@ -408,7 +419,7 @@ router
 					});
 					// return res.redirect('/');
 				},
-				function() {
+				function () {
 					return res.redirect('/');
 				}
 			);
@@ -416,11 +427,11 @@ router
 			return res.redirect('/');
 		}
 	})
-	.get('/requestOauth', function(req, res) {
+	.get('/requestOauth', function (req, res) {
 		req.session.state = uuid.v1();
 		return res.redirect(oauthHelper.getRedirectUrl(req.session.state));
 	})
-	.get('/oauth2callback', function(req, res) {
+	.get('/oauth2callback', function (req, res) {
 		if (req.session.state !== req.query.state) {
 			res.status(500);
 			res.send('Fake Request');
@@ -429,16 +440,16 @@ router
 			res.send('Seems you denied request, if done accidently please press back button to retry again.');
 		} else {
 			var getAccessToken = oauthHelper.getAccessTokens(req.query.code),
-				getAdsenseAccounts = getAccessToken.then(function(token) {
+				getAdsenseAccounts = getAccessToken.then(function (token) {
 					return request({
 						strictSSL: false,
 						uri: 'https://www.googleapis.com/adsense/v1.4/accounts?access_token=' + token.access_token,
 						json: true
 					})
-						.then(function(adsenseInfo) {
+						.then(function (adsenseInfo) {
 							return adsenseInfo.items;
 						})
-						.catch(function(err) {
+						.catch(function (err) {
 							if (
 								err.error &&
 								err.error.error &&
@@ -449,7 +460,7 @@ router
 							throw err;
 						});
 				}),
-				getUserInfo = getAccessToken.then(function(token) {
+				getUserInfo = getAccessToken.then(function (token) {
 					return request({
 						strictSSL: false,
 						uri: 'https://www.googleapis.com/oauth2/v2/userinfo?access_token=' + token.access_token,
@@ -458,7 +469,7 @@ router
 				}),
 				getUser = userModel.getUserByEmail(req.session.user.email);
 
-			Promise.join(getUser, getAccessToken, getAdsenseAccounts, getUserInfo, function(
+			Promise.join(getUser, getAccessToken, getAdsenseAccounts, getUserInfo, function (
 				user,
 				token,
 				adsenseAccounts,
@@ -475,7 +486,7 @@ router
 						userInfo: userInfo,
 						adsenseAccounts: adsenseAccounts
 					})
-					.then(function() {
+					.then(function () {
 						req.session.user = user;
 						var pubIds = _.map(adsenseAccounts, 'id'); // grab all the pubIds in case there are multiple and show them to user to choose
 						if (CC.isForceMcm) {
@@ -492,21 +503,21 @@ router
 							});
 						}
 					});
-			}).catch(function(err) {
+			}).catch(function (err) {
 				res.status(500);
 				err.message === 'No adsense account'
 					? res.send(
-							'Sorry but it seems you have no AdSense account linked to your Google account.' +
-								'If this is a recently verified/created account, it might take upto 24 hours to come in effect.' +
-								'Please try again after sometime or contact support.'
-						)
+						'Sorry but it seems you have no AdSense account linked to your Google account.' +
+						'If this is a recently verified/created account, it might take upto 24 hours to come in effect.' +
+						'Please try again after sometime or contact support.'
+					)
 					: res.send(err);
 			});
 		}
 	})
-	.get('/profile', function(req, res) {
+	.get('/profile', function (req, res) {
 		userModel.getUserByEmail(req.session.user.email).then(
-			function(user) {
+			function (user) {
 				var formData = {
 					firstName: user.get('firstName'),
 					lastName: user.get('lastName'),
@@ -517,18 +528,18 @@ router
 					formData: formData
 				});
 			},
-			function() {
+			function () {
 				return res.redirect('/');
 			}
 		);
 	})
-	.post('/profile', function(req, res) {
+	.post('/profile', function (req, res) {
 		req.body.firstName = req.body.firstName ? utils.trimString(req.body.firstName) : req.body.firstName;
 		req.body.lastName = req.body.lastName ? utils.trimString(req.body.lastName) : req.body.lastName;
 
 		userModel
 			.saveProfile(req.body, req.session.user.email)
-			.then(function() {
+			.then(function () {
 				/**
 				 * TODO: Fix user.save() to return updated user object
 				 * and remove below hack
@@ -541,7 +552,7 @@ router
 				req.session.user = user;
 				return res.render('profile', { profileSaved: true, formData: req.body });
 			})
-			.catch(function(e) {
+			.catch(function (e) {
 				if (e instanceof AdPushupError) {
 					res.render('profile', { profileError: e.message, formData: req.body });
 				} else if (e.name && e.name === 'CouchbaseError') {
@@ -549,7 +560,7 @@ router
 				}
 			});
 	})
-	.get('/updateUserStatus', function(req, res) {
+	.get('/updateUserStatus', function (req, res) {
 		if (req.session.isSuperUser) {
 			return res.render('updateUserStatus', {
 				currentStatus: req.session.user.requestDemo,
@@ -560,7 +571,7 @@ router
 			return res.redirect('/user/dashboard');
 		}
 	})
-	.post('/updateUserStatus', function(req, res) {
+	.post('/updateUserStatus', function (req, res) {
 		if (req.session.isSuperUser) {
 			var email = req.session.user.email,
 				websiteRevenue = req.session.user.websiteRevenue,
@@ -591,14 +602,14 @@ router
 
 				return userModel
 					.setUserStatus(
-						{
-							status: status,
-							websiteRevenue: websiteRevenue,
-							revenueUpperLimit: revenueUpperLimit
-						},
-						email.trim()
+					{
+						status: status,
+						websiteRevenue: websiteRevenue,
+						revenueUpperLimit: revenueUpperLimit
+					},
+					email.trim()
 					)
-					.then(function(user) {
+					.then(function (user) {
 						var currentStatus = user.get('requestDemo'),
 							websiteRevenue = user.get('websiteRevenue');
 
@@ -612,7 +623,7 @@ router
 							websiteRevenue: websiteRevenue
 						});
 					})
-					.catch(function(err) {
+					.catch(function (err) {
 						if (err) {
 							return res.render('updateUserStatus', {
 								status: 'failure',
@@ -633,8 +644,8 @@ router
 			return res.redirect('/user/dashboard');
 		}
 	})
-	.get('/credentials', function(req, res) {
-		userModel.getUserByEmail(req.session.user.email).then(function(user) {
+	.get('/credentials', function (req, res) {
+		userModel.getUserByEmail(req.session.user.email).then(function (user) {
 			var credentialsFromModel = user.get('adnetworkCredentials') || [],
 				userAdnetworkCredentials = {
 					taboola: {
@@ -677,10 +688,10 @@ router
 			});
 		});
 	})
-	.post('/credentials', function(req, res) {
+	.post('/credentials', function (req, res) {
 		userModel
 			.getUserByEmail(req.session.user.email)
-			.then(function(user) {
+			.then(function (user) {
 				var userAdnetworkCredentials = user.get('adnetworkCredentials'),
 					taboolaPassword = '',
 					revcontentPassword = '',
@@ -792,14 +803,14 @@ router
 				req.body = credentials;
 				return userModel.saveCredentials(credentials, req.session.user.email);
 			})
-			.then(function() {
+			.then(function () {
 				var user = Array.prototype.slice.call(arguments)[0],
 					dataToSend = req.body;
 				req.session.user = user;
 				dataToSend.commonRandomPassword = 'xxxxxxxxxx';
 				return res.render('credentials', { profileSaved: true, formData: req.body });
 			})
-			.catch(function(e) {
+			.catch(function (e) {
 				var dataToSend = req.body;
 				dataToSend.commonRandomPassword = 'xxxxxxxxxx';
 				if (e instanceof AdPushupError) {
