@@ -101,13 +101,38 @@ var $ = require('jquery'),
 				// Replaced '-' with '_' to avoid ElasticSearch split issue
 				variationId: variation.id // set the chosenVariation variation in feedback data;
 			},
-			pushAdToGlobalConfig = function(obj, containerId) {
-				var isAdsObject = !!(adp.config && adp.config.ads),
-					adObject = $.extend(true, {}, obj);
+			// Push Ad object in Geniee global 'ads' object and invoke feedback request mechanism
+			pushAdToGenieeConfig = function(obj, containerId) {
+				var isGenieeAdsObject = !!(adp.geniee && adp.geniee.ads),
+					isGenieeAd = !!(obj && obj.network && obj.network === 'geniee' && obj.networkData),
+					isZoneId = !!(isGenieeAd && obj.networkData.zoneId),
+					adObject = $.extend(true, {}, obj),
+					zoneId;
 
+				if (!isGenieeAd) {
+					utils.log('PushToGenieeAdsObject: Non Geniee ad found, will not be added to its ads object.');
+					return false;
+				}
+
+				if (!isZoneId) {
+					utils.log(
+						'PushToGenieeAdsObject: Invalid zoneId found for Geniee ad, will not be added to its ads object.'
+					);
+					return false;
+				}
+
+				zoneId = obj.networkData.zoneId;
 				adObject.containerId = containerId || '';
-				!isAdsObject ? (adp.config.ads = []) : null;
-				adp.config.ads.push(adObject);
+				// Below 'success' property means that Geniee ad has been successfully inserted into DOM
+				adObject.success = true;
+
+				// Below 'isImpressionFeedback' property means that Geniee revenue keenIO impression request has not been sent yet
+				// for this ad
+				adObject.isImpressionFeedback = false;
+
+				!isGenieeAdsObject ? (adp.geniee.ads = {}) : null;
+				adp.geniee.ads[zoneId] = adObject;
+				adp.geniee.sendRevenueFeedback ? adp.geniee.sendRevenueFeedback(zoneId) : null;
 			},
 			placeGenieeHeadCode = function(genieeIds) {
 				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIds);
@@ -163,12 +188,16 @@ var $ = require('jquery'),
 					getAdContainer(ad, config.xpathWaitTimeout)
 						.done(function(data) {
 							var isContainerElement = !!(data.container && data.container.length),
-								containerId = isContainerElement ? data.container.get(0).id : '';
+								containerId = isContainerElement ? data.container.get(0).id : '',
+								isGenieeAd = !!(ad && ad.network && ad.network === 'geniee' && ad.networkData);
+
+							if (isGenieeAd) {
+								// Add 'ad' object to global geniee ads object when network is matched
+								pushAdToGenieeConfig(ad, containerId);
+							}
 
 							// if all well then ad id of ad in feedback to tell system that impression was given
 							feedbackData.ads.push(ad.id);
-							// Add 'ad' object to global config ads array
-							pushAdToGlobalConfig(ad, containerId);
 							next(ad, data);
 						})
 						.fail(function(data) {
@@ -183,7 +212,8 @@ var $ = require('jquery'),
 						var sectionObj = sectionsWithTargetElm[ad.section],
 							$containerElement,
 							isContainerElement,
-							containerId;
+							containerId,
+							isGenieeAd = !!(ad && ad.network && ad.network === 'geniee' && ad.networkData);
 
 						if (sectionObj && sectionObj.elem) {
 							if (!!sectionObj.isSecondaryCss) {
@@ -196,8 +226,11 @@ var $ = require('jquery'),
 							isContainerElement = !!($containerElement && $containerElement.length);
 							containerId = isContainerElement ? $containerElement.get(0).id : '';
 
-							// Add 'ad' object to global config ads array
-							pushAdToGlobalConfig(ad, containerId);
+							if (isGenieeAd) {
+								// Add 'ad' object to global geniee ads object when network is matched
+								pushAdToGenieeConfig(ad, containerId);
+							}
+
 							next(ad, { success: true, container: $containerElement });
 						} else {
 							feedbackData.xpathMiss.push(ad.id);
