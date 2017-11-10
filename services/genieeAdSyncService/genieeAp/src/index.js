@@ -35,11 +35,6 @@ $.extend(adp.config, ___abpConfig___, {
 isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
 adp.config.isGeniee = isGenieeSite;
 
-// Empty ads array creation
-// As soon as any ad is placed, its data is pushed into this array
-// This data is later used to send feedback requests to server on every successful impression
-adp.config.ads = [];
-
 function shouldWeNotProceed() {
 	var hasGenieeStarted = !!(
 		config.partner === 'geniee' &&
