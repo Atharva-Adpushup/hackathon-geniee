@@ -102,25 +102,15 @@
                             
                                 .report-legend
                                     .row.text-center
-                                        .col-sm-6
+                                        .col-sm-6.col-sm-offset-3
                                             .report-label.bglightBlue 
                                             .report-label-text 
                                                 | Last Week
-                                                .report-date
-                                                    | (
-                                                    span!= lastWeek.reportFrom
-                                                    |  to 
-                                                    span!= lastWeek.reportTo
-                                                    | )
-                                        .col-sm-6
+                                                strong(style="margin: 0 15px;") VS 
                                             .report-label.bgdarkBlue 
                                             .report-label-text This Week
                                                 .report-date
-                                                    | (
-                                                    span!= thisWeek.reportFrom
-                                                    |  to 
-                                                    span!= thisWeek.reportTo
-                                                    | )
+                                                    
                             else
                                 | No report data found for this site.
                     else
