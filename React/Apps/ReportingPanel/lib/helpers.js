@@ -5,36 +5,38 @@ import $ from 'jquery';
 import { Promise } from 'es6-promise';
 
 const apiQueryGenerator = params => {
-		let where = {
-				siteid: commonConsts.SITE_ID,
-				from: moment(params.startDate).format('YYYY-MM-DD'),
-				to: moment(params.endDate).format('YYYY-MM-DD')
-			},
-			groupBy = [];
-
-		if (params.groupBy) {
-			groupBy.push(params.groupBy);
-		}
-
-		if (params.pageGroup) {
-			where.pagegroup = [params.pageGroup];
-		}
-
-		if (params.platform) {
-			where.device_type = params.platform;
-		}
-
-		if (params.variation) {
-			where.variation = [params.variation];
-		}
-
-		return JSON.stringify({
-			select: commonConsts.SELECT,
-			where,
-			orderBy: ['report_date'],
-			groupBy
-		});
+	let where = {
+		siteid: commonConsts.SITE_ID,
+		from: moment(params.startDate).format('YYYY-MM-DD'),
+		to: moment(params.endDate).format('YYYY-MM-DD')
 	},
+		groupBy = [];
+
+	if (params.groupBy) {
+		groupBy.push(params.groupBy);
+	}
+
+	if (params.pageGroup) {
+		where.pagegroup = [params.pageGroup];
+	}
+
+	if (params.platform) {
+		where.device_type = params.platform;
+	}
+
+	if (params.variation) {
+		where.variation = [params.variation];
+	}
+
+	where.mode = 1;
+
+	return JSON.stringify({
+		select: commonConsts.SELECT,
+		where,
+		orderBy: ['report_date'],
+		groupBy
+	});
+},
 	capitalCase = str => {
 		return str
 			.toLowerCase()
@@ -44,34 +46,34 @@ const apiQueryGenerator = params => {
 	},
 	dataGenerator = (data, groupBy) => {
 		let config = {
-				title: {
-					text: ''
-				},
-				subtitle: {
-					text: ''
-				},
-				lang: {
-					thousandsSep: ','
-				},
-				chart: {
-					spacingTop: 35,
-					style: {
-						fontFamily: 'Karla'
-					}
-				},
-				tooltip: {
-					shared: true
-				},
-				colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e'],
-				credits: {
-					enabled: false
-				},
-				plotOptions: {
-					line: {
-						animation: false
-					}
+			title: {
+				text: ''
+			},
+			subtitle: {
+				text: ''
+			},
+			lang: {
+				thousandsSep: ','
+			},
+			chart: {
+				spacingTop: 35,
+				style: {
+					fontFamily: 'Karla'
 				}
 			},
+			tooltip: {
+				shared: true
+			},
+			colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e'],
+			credits: {
+				enabled: false
+			},
+			plotOptions: {
+				line: {
+					animation: false
+				}
+			}
+		},
 			chartData = null,
 			tableData = null;
 
