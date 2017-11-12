@@ -343,7 +343,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
 			[dataLabels.pageCpm]: <Bold>{totalPageCpm.toFixed(2)}</Bold>,
 			[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
-			[dataLabels.cpm]: <Bold>{totalCpm.toFixed(2)}</Bold>,
+			[dataLabels.cpm]: <Bold>{((totalRevenue / totalImpressions) * 1000).toFixed(2)}</Bold>,
 			[dataLabels.revenue]: <Bold>{totalRevenue.toFixed(2)}</Bold>,
 			[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>
 		});
