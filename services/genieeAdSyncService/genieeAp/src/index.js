@@ -89,7 +89,7 @@ function main() {
 	hookAndInit(adp, startCreation, browserConfig.platform);
 
 	// AdPushup Debug Force Variation
-	if (utils.queryParams && utils.queryParams.forceVariation) {
+	if (utils.queryParams && utils.queryParams.forceVariation && !adp.creationProcessStarted) {
 		startCreation(true);
 		return false;
 	}

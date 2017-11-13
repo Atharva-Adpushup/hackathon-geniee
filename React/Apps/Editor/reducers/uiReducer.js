@@ -31,6 +31,7 @@ const errorsConfig = {},
 
 			case insertMenuActions.HIDE_MENU:
 			case sectionActions.CREATE_SECTION:
+			case variationActions.OPEN_VARIATION_PANEL:
 				return { isVisible: false };
 
 			default:
@@ -54,6 +55,7 @@ const errorsConfig = {},
 			case adActions.UPDATE_CSS:
 			case adActions.UPDATE_NETWORK:
 			case sectionActions.DELETE_SECTION:
+			case variationActions.OPEN_VARIATION_PANEL:
 				return { isVisible: false };
 
 			default:
@@ -68,6 +70,7 @@ const errorsConfig = {},
 			case channelMenuActions.SHOW_CHANNEL_MENU:
 			case newChannelMenuActions.HIDE_NEW_CHANNEL_MENU:
 			case channelActions.OPEN_CHANNEL:
+			case variationActions.OPEN_VARIATION_PANEL:
 				return { isVisible: false };
 
 			default:
@@ -84,6 +87,7 @@ const errorsConfig = {},
 			case channelActions.SAVE_SAMPLE_URL:
 			case channelActions.CLOSE_CHANNEL:
 			case newChannelMenuActions.SHOW_NEW_CHANNEL_MENU:
+			case variationActions.OPEN_VARIATION_PANEL:
 				return { isVisible: false };
 
 			default:
