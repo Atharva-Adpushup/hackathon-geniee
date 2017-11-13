@@ -1,6 +1,6 @@
 import React from 'react';
 import $ from 'jquery';
-import ActionCard from '../../../Components/ActionCard.jsx';
+// import ActionCard from '../../../Components/ActionCard.jsx';
 import { Row, Col } from 'react-bootstrap';
 import HbConfigCreator from './HbConfigCreator/index.jsx';
 import {
@@ -88,39 +88,39 @@ class OpsPanel extends React.Component {
 			{ state } = this;
 
 		return (
-			<ActionCard title="Ops Panel">
-				<div className="settings-pane">
-					<Row>
-						<Col sm={12}>
-							<h4>Header Bidding Config</h4>
-							<Row>
-								<Col sm={12}>
-									<p className="hb-settings-text">
-										This config will save information related to the partner parameters required in
-										the header bidding setup.
-									</p>
-									{state.loading ? <div className="error-message">Loading...</div> : ''}
-									<div className="hb-options-wrapper">
-										<HbConfigCreator
-											updateGlobalHbConfig={this.updateGlobalHbConfig}
-											hbConfig={loadHbConfigToPanel(state.hbConfig)}
-											partners={getActivePartners()}
-											adSizes={getSupportedAdSizes()}
-											saveHbConfigCallback={this.fetchHbConfig}
-										/>
-									</div>
-								</Col>
-								<Col sm={4}>
-									<div className="error-message">{state.updateMessage}</div>
-									<button className="btn btn-lightBg btn-default" onClick={this.saveHbConfig}>
-										Save setup
-									</button>
-								</Col>
-							</Row>
-						</Col>
-					</Row>
-				</div>
-			</ActionCard>
+			// <ActionCard title="Ops Panel">
+			<div className="settings-pane">
+				<Row>
+					<Col sm={12}>
+						{/* <h4>Header Bidding Config</h4> */}
+						<Row>
+							<Col sm={12}>
+								<p className="hb-settings-text">
+									This config will save information related to the partner parameters required in the
+									header bidding setup.
+								</p>
+								{state.loading ? <div className="error-message">Loading...</div> : ''}
+								<div className="hb-options-wrapper">
+									<HbConfigCreator
+										updateGlobalHbConfig={this.updateGlobalHbConfig}
+										hbConfig={loadHbConfigToPanel(state.hbConfig)}
+										partners={getActivePartners()}
+										adSizes={getSupportedAdSizes()}
+										saveHbConfigCallback={this.fetchHbConfig}
+									/>
+								</div>
+							</Col>
+							<Col sm={4}>
+								<div className="error-message">{state.updateMessage}</div>
+								<button className="btn btn-lightBg btn-default" onClick={this.saveHbConfig}>
+									Save setup
+								</button>
+							</Col>
+						</Row>
+					</Col>
+				</Row>
+			</div>
+			// </ActionCard>
 		);
 	}
 }

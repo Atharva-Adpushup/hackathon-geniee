@@ -3,6 +3,7 @@ import _ from 'lodash';
 import clipboard from 'clipboard-polyfill';
 import moment from 'moment';
 import { Row, Col, Breadcrumb } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import '../../../ReportingPanel/styles.scss';
 import Datatable from 'react-bs-datatable';
 import { labels, headers, modes, statuses } from '../../configs/commonConsts';
@@ -119,9 +120,24 @@ class SitesMapping extends Component {
 			data: []
 		};
 		tableConfig.data = _.map(sites, site => {
+			let rs =
+				site.adNetworkSettings && site.adNetworkSettings.revenueShare
+					? site.adNetworkSettings.revenueShare
+					: 10;
 			return {
 				[labels['siteId']]: this.generateClickableSpan('site', site.siteId, this.clickHandler),
-				[labels['siteDomain']]: site.siteDomain,
+				[labels['siteDomain']]: (
+					<Link
+						to={{
+							pathname: `/ops/settings/${site.siteId}`,
+							state: {
+								rs: rs
+							}
+						}}
+					>
+						{site.siteDomain}
+					</Link>
+				),
 				[labels['ownerEmail']]: this.generateClickableSpan('email', site.ownerEmail, this.clickHandler),
 				[labels['mode']]: this.generateMode(site.apConfigs.mode),
 				[labels['channels']]:
