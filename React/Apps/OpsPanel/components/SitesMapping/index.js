@@ -120,9 +120,24 @@ class SitesMapping extends Component {
 			data: []
 		};
 		tableConfig.data = _.map(sites, site => {
+			let rs =
+				site.adNetworkSettings && site.adNetworkSettings.revenueShare
+					? site.adNetworkSettings.revenueShare
+					: 10;
 			return {
 				[labels['siteId']]: this.generateClickableSpan('site', site.siteId, this.clickHandler),
-				[labels['siteDomain']]: <Link to={`/ops/settings/${site.siteId}`}>{site.siteDomain}</Link>,
+				[labels['siteDomain']]: (
+					<Link
+						to={{
+							pathname: `/ops/settings/${site.siteId}`,
+							state: {
+								rs: rs
+							}
+						}}
+					>
+						{site.siteDomain}
+					</Link>
+				),
 				[labels['ownerEmail']]: this.generateClickableSpan('email', site.ownerEmail, this.clickHandler),
 				[labels['mode']]: this.generateMode(site.apConfigs.mode),
 				[labels['channels']]:
