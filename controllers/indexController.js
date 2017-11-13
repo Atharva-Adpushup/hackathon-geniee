@@ -164,7 +164,7 @@ function setSessionData(user, req, res, type) {
 		} else if (type == 2 && userPasswordMatch == 1) {
 			// Login
 			if (parseInt(user.get('revenueLowerLimit')) == 0 || parseInt(user.get('revenueUpperLimit')) < 1000) {
-				if (req.session.isSuperUser) {
+				if (req.session.isSuperUser || !isRequestDemo) {
 					allowEntry = 1;
 				} else {
 					redirectPath = 'thank-you';
