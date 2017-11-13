@@ -93,7 +93,7 @@ const Promise = require('bluebird'),
 			totalRevenue: totalRevenue.toFixed(2),
 			totalPageviews,
 			totalCpm: ((totalRevenue / totalImpressions) * 1000).toFixed(2),
-			totalPageCpm: totalPageCpm.toFixed(2)
+			totalPageCpm: ((totalRevenue / totalPageviews) * 1000).toFixed(2)
 		};
 	},
 	getSiteReport = payload => {
