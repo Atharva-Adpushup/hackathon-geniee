@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
+import moment from 'moment';
 import { Row, Col } from 'react-bootstrap';
 import { ajax } from '../../../../common/helpers';
 
@@ -7,22 +7,50 @@ class General extends Component {
 	constructor(props) {
 		super(props);
 		this.save = this.save.bind(this);
+		this.state = {
+			rs: false
+		};
+		this.fetchRevenueShare = this.fetchRevenueShare.bind(this);
+		this.handleChange = this.handleChange.bind(this);
 	}
-	save() {
-		let inputField = ReactDOM.findDOMNode(this.refs.revenueShare),
-			share = inputField.value;
 
-		share = !share ? 10 : share;
+	componentWillMount() {
+		this.state.rs == false || this.state.rs == undefined ? this.fetchRevenueShare() : null;
+	}
+
+	handleChange(e) {
+		this.setState({ rs: e.target.value });
+	}
+
+	fetchRevenueShare() {
+		return ajax({
+			url: `/user/site/${this.props.siteId}/getRevenueShare`,
+			method: 'GET'
+		}).then(response => {
+			if (response.error) {
+				alert('Error occured. Please try again later');
+				return;
+			}
+			this.setState({ rs: response.rs });
+		});
+	}
+
+	save() {
+		let share = (this.state.rs == false || this.state.rs == undefined) && this.state.rs != 0 ? 10 : this.state.rs;
 		return ajax({
 			url: `/user/site/${this.props.siteId}/saveRevenueShare`,
 			method: 'POST',
 			data: JSON.stringify({ share, siteId: this.props.siteId })
 		}).then(response => {
 			if (response.error) {
-				alert('Error occured. Please try again later');
+				alert('Error occured. Please check Revenue Share value');
 				return;
 			}
-			alert('Revenue Share updated');
+			alert(
+				`Revenue Share updated and revenue share will be effective from ${moment()
+					.subtract(2, 'days')
+					.format('DD-MM-YYYY')}`
+			);
 		});
 	}
 
@@ -31,14 +59,22 @@ class General extends Component {
 			<Row style={{ margin: '0px', padding: '15px' }}>
 				<Col xs={6} style={{ padding: '15px', border: '1px solid #ebebeb' }}>
 					<h4>Revenue Share</h4>
+					<p style={{ marginTop: '10px' }}>
+						Any changes to Revenue Share will be effective from{' '}
+						<strong>
+							{moment()
+								.subtract(2, 'days')
+								.format('DD-MM-YYYY')}
+						</strong>
+					</p>
 					<hr />
 					<Col xs={8} className="u-padding-r5px">
 						<input
 							type="number"
-							name="revenueShare"
-							ref="revenueShare"
+							name="rs"
 							className="input-field"
-							defaultValue={this.props.rs}
+							value={this.state.rs}
+							onChange={this.handleChange}
 						/>
 					</Col>
 					<Col xs={4}>

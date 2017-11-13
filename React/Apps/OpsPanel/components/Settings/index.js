@@ -23,7 +23,16 @@ class Settings extends Component {
 		window.siteId = this.state.site;
 		switch (this.state.activeNav) {
 			case 1:
-				return <General siteId={this.state.site} rs={this.props.location.state.rs} />;
+				return (
+					<General
+						siteId={this.state.site}
+						rs={
+							this.props.location.state && this.props.location.state.rs
+								? this.props.location.state.rs
+								: false
+						}
+					/>
+				);
 				break;
 			case 2:
 				return <OpsPanel />;
