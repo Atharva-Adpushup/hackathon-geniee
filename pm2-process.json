@@ -1,0 +1,17 @@
+{
+	"apps": [
+		{
+			"name": "App",
+			"script": "./app.js",
+			"log_date_format": "YYYY-MM-DD HH:mm Z"
+		},
+		{
+			"name": "CdnSyncConsumer",
+			"script": "./cdnSyncConsumer.js",
+			"instances": 1,
+			"exec_mode": "cluster_mode",
+			"log_date_format": "YYYY-MM-DD HH:mm Z",
+			"cron_restart": "*/30 * * * *"
+		}
+	]
+}

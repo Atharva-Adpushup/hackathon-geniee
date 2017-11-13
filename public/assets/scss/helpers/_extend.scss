@@ -185,6 +185,9 @@ collapsedextended
 .mT-20 {
 	margin-top: 20px;
 }
+.mt-30 {
+	margin-top: 30px;
+}
 .mL-10 {
 	margin-left: 5px;
 }
@@ -203,6 +206,9 @@ collapsedextended
 /*****Layout alignment*****/
 .u-margin-0px {
 	margin: 0 !important;
+}
+.no-margin {
+	margin: 0;
 }
 .u-margin-10px {
 	margin: $FMLayoutDimension !important;
@@ -365,3 +371,28 @@ maxHeightWidth {
 {
 	overflow: hidden;
 }
+
+.red {
+			color: $primaryColorDark;
+		}
+
+		.green {
+			color: $GreenColor;
+		}
+
+
+		.lightBlue {
+			color: $linkBlue;
+		}
+
+		.bglightBlue {
+			background-color: $linkBlue;
+		}
+
+		.darkBlue {
+			color: darken($linkBlue, 25%);
+		}
+
+		.bgdarkBlue {
+			background-color: darken($linkBlue, 25%);
+		}
