@@ -168,14 +168,6 @@ function setSessionData(user, req, res, type) {
 					allowEntry = 1;
 				} else {
 					redirectPath = 'thank-you';
-					// if (parseInt(user.get('revenueUpperLimit')) <= 2500) {
-					// 	redirectPath = 'thank-you';
-					// } else if (parseInt(user.get('revenueUpperLimit')) > 10000) {
-					// 	redirectPath = 'thankyou';
-					// 	if (!req.session.user.requestDemo) {
-					// 		allowEntry = 1;
-					// 	}
-					// }
 				}
 			} else {
 				allowEntry = 1;
@@ -245,20 +237,6 @@ function setSessionData(user, req, res, type) {
 
 								return res.redirect('/user/onboarding');
 							}
-							// if (allUserSites[0].services) {
-							// 	var noOfServices = allUserSites[0].services.split('|');
-							// 	if (noOfServices.length > 1) {
-							// 		return res.redirect('/thankyou');
-							// 	} else {
-							// 		if (allUserSites[0].services == 'header-bidding' || allUserSites[0].services == 'other-networks') {
-							// 			return res.redirect('/thankyou');
-							// 		} else {
-							// 			return res.redirect('/user/onboarding');
-							// 		}
-							// 	}
-							// } else {
-							// 	return res.redirect('/user/onboarding');
-							// }
 						}
 					}
 				});
