@@ -381,10 +381,12 @@ router
 		return siteModel
 			.getSiteById(req.body.siteId)
 			.then(site => {
-				site.set('revenueShare', {
-					share: parseInt(req.body.share),
+				let adNetworkSettings = site.get('adNetworkSettings') || {};
+				adNetworkSettings = {
+					revenueShare: parseInt(req.body.share),
 					negate: ['adsense']
-				});
+				};
+				site.set('adNetworkSettings', adNetworkSettings);
 				return site.save();
 			})
 			.then(() =>
