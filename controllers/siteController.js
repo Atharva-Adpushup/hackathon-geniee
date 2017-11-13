@@ -401,6 +401,30 @@ router
 				console.log(err);
 				return res.send(response);
 			});
+	})
+	.get('/:siteId/getRevenueShare', (req, res) => {
+		let response = {
+			error: true,
+			message: 'Operaiton Failed'
+		};
+		return siteModel
+			.getSiteById(req.params.siteId)
+			.then(site => {
+				if (!site) {
+					return res.send(response);
+				}
+				return res.send(
+					Object.assign(response, {
+						error: false,
+						message: 'Done',
+						rs: site.get('adNetworkSettings').revenueShare ? site.get('adNetworkSettings').revenueShare : 10
+					})
+				);
+			})
+			.catch(err => {
+				console.log(err);
+				return res.send(response);
+			});
 	});
 
 module.exports = router;
