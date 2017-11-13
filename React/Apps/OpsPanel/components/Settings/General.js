@@ -33,7 +33,13 @@ class General extends Component {
 					<h4>Revenue Share</h4>
 					<hr />
 					<Col xs={8} className="u-padding-r5px">
-						<input type="number" name="revenueShare" ref="revenueShare" className="input-field" />
+						<input
+							type="number"
+							name="revenueShare"
+							ref="revenueShare"
+							className="input-field"
+							defaultValue={this.props.rs}
+						/>
 					</Col>
 					<Col xs={4}>
 						<button className="btn btn-save btn-default" style={{ width: '100%' }} onClick={this.save}>
