@@ -48,6 +48,26 @@ class variationSectionElement extends Component {
 			: this.props.onSectionXPathValidate(this.props.section.id, this.props.section.xpath);
 	}
 
+	componentWillReceiveProps(nextProps) {
+		this.props.section.id != nextProps.section.id
+			? this.setState({
+					float: nextProps.section.float,
+					network: nextProps.section.ads[0].network,
+					priceFloor:
+						nextProps.section.ads[0].networkData &&
+						nextProps.section.ads[0].networkData.hasOwnProperty('priceFloor')
+							? nextProps.section.ads[0].networkData.priceFloor
+							: 0,
+					headerBidding:
+						nextProps.section.ads[0].networkData &&
+						nextProps.section.ads[0].networkData.hasOwnProperty('headerBidding')
+							? nextProps.section.ads[0].networkData.headerBidding
+							: true,
+					adCode: nextProps.section.ads[0].adCode || ''
+				})
+			: null;
+	}
+
 	onFloatSelectChange(float) {
 		this.setState({ float });
 
