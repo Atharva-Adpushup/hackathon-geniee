@@ -3,6 +3,7 @@ $borderColor: #ddd;
 $greyBg: #eee;
 $greyBorder: #e6e6e6;
 $fontColor: #555;
+$legendBg:#fafafa;
 
 html,
 body {
@@ -150,4 +151,18 @@ body {
 	width: 70%;
 	margin: 0 auto;
 	font-size: 1.2em;
+}
+
+.chart-legend {
+	margin-top: 20px; 
+	background-color: $legendBg;
+	border: 2px solid $greyBg;
+
+	.legend-item {
+		font-size: 1.2em;
+		padding: 15px;
+		cursor: pointer;
+		color: darken($greyBorder, 15%);
+		margin-bottom: -2px;
+	}
 }
