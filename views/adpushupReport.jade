@@ -11,6 +11,13 @@ block append headScripts
 		window.siteId = !{siteId}
 		window.isSuperUser = !{isSuperUser}
 
+block append headCss
+	style.
+		.loaderwrapper.spinner {
+			top: 0;
+			left: 0;
+		}
+
 block bodyContent
 	include layout/sideBar
 	.pageContainer.page-container
