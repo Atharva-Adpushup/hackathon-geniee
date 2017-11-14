@@ -17,6 +17,7 @@ class ReportingPanel extends React.Component {
 		this.state = {
 			reportLoading: true,
 			reportError: false,
+			emptyData: false,
 			disableGenerateButton: true,
 			chartConfig: null,
 			tableConfig: null,
@@ -57,7 +58,7 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: true
 		});
 
-		const { startDate, endDate, pageGroup, platform, variation, groupBy } = this.state,
+		const { startDate, endDate, pageGroup, platform, variation, groupBy, variations } = this.state,
 			params = { startDate, endDate, pageGroup, platform, variation, groupBy };
 
 		let state = {
@@ -72,13 +73,15 @@ class ReportingPanel extends React.Component {
 		})
 			.then(res => {
 				if (!res.error && res.rows.length) {
-					const data = dataGenerator(res, groupBy);
+					const data = dataGenerator(res, groupBy, variations);
 					this.setState({
 						...state,
 						reportError: false,
 						chartConfig: data.chartData,
 						tableConfig: data.tableData
 					});
+				} else if (!res.error && !res.rows.length) {
+					this.setState({ ...state, reportError: true, emptyData: true });
 				} else {
 					this.setState({ ...state, reportError: true });
 				}
@@ -127,6 +130,7 @@ class ReportingPanel extends React.Component {
 			reportLoading,
 			disableGenerateButton,
 			reportError,
+			emptyData,
 			chartConfig,
 			tableConfig,
 			platform,
@@ -135,7 +139,7 @@ class ReportingPanel extends React.Component {
 			} = this.state,
 			reportPane = reportError ? (
 				<PaneLoader
-					message="Error occurred while fetching report data!"
+					message={!emptyData ? 'Error occurred while fetching report data!' : 'No report data present!'}
 					state="error"
 					styles={{ height: 'auto' }}
 				/>
@@ -160,7 +164,7 @@ class ReportingPanel extends React.Component {
 				);
 
 		return (
-			<ActionCard title="AdPushup Report">
+			<ActionCard title={`AdPushup Report - ${commonConsts.SITE_DOMAIN}`}>
 				<Row>
 					<Col sm={10} smOffset={2}>
 						<ReportControls
