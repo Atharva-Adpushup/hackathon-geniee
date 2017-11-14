@@ -47,7 +47,7 @@ const apiQueryGenerator = params => {
 			.map(word => word[0].toUpperCase() + word.substr(1))
 			.join(' ');
 	},
-	dataGenerator = (data, groupBy) => {
+	dataGenerator = (data, groupBy, variations) => {
 		let config = {
 			title: {
 				text: ''
@@ -91,7 +91,7 @@ const apiQueryGenerator = params => {
 			tableData = null;
 
 		if (!data.error) {
-			const parsedData = dataParser(data, groupBy);
+			const parsedData = dataParser(data, groupBy, variations);
 			chartData = parsedData.chartConfig;
 			tableData = parsedData.tableConfig;
 		}
