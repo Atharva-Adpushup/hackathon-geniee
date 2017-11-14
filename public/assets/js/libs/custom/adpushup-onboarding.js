@@ -334,8 +334,13 @@ $('document').ready(function() {
 							success: function(res) {
 								if (res.success) {
 									if (!newSite.addOtherSite) {
-										var status = onboardingStages.siteAdded;
-										ob.updateCrmDealStatus(status);
+										var status = onboardingStages.siteAdded,
+											domain = newSite.viewObjects.origUnSavedDomain,
+											updateDealParams = {
+												status: status,
+												domain: domain
+											};
+										ob.updateCrmDealStatus(updateDealParams);
 										ob.analyticsEventEmitter({
 											step: 'Added Site'
 										});
@@ -579,9 +584,10 @@ $('document').ready(function() {
 			},
 
 			// Update Crm Deal Status | Pipeline
-			updateCrmDealStatus: function(status) {
+			updateCrmDealStatus: function(params) {
 				$.post('/data/updateCrmDealStatus', {
-					status: status
+					status: params.status,
+					domain: params.domain
 				});
 			},
 
@@ -874,8 +880,13 @@ $('document').ready(function() {
 					function(response) {
 						if (response.success) {
 							if (!newSite.addOtherSite) {
-								var status = onboardingStages.passback;
-								ob.updateCrmDealStatus(status);
+								var status = onboardingStages.passback,
+									domain = newSite.addedSite.domain,
+									updateDealStatusParams = {
+										status: status,
+										domain: domain
+									};
+								ob.updateCrmDealStatus(updateDealStatusParams);
 								ob.analyticsEventEmitter(
 									{
 										stage: 'Post Onboarding',
@@ -938,8 +949,13 @@ $('document').ready(function() {
 					function(response) {
 						if (response.success) {
 							if (!newSite.addOtherSite) {
-								var status = onboardingStages.apCodeAdded;
-								ob.updateCrmDealStatus(status);
+								var status = onboardingStages.apCodeAdded,
+									domain = newSite.addedSite.domain,
+									updateDealStatusParams = {
+										status: status,
+										domain: domain
+									};
+								ob.updateCrmDealStatus(updateDealStatusParams);
 								ob.analyticsEventEmitter({
 									step: 'Added AP Code'
 								});
