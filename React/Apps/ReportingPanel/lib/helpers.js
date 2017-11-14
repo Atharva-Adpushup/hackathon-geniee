@@ -3,6 +3,9 @@ import moment from 'moment';
 import dataParser from './dataParser';
 import $ from 'jquery';
 import { Promise } from 'es6-promise';
+import ChartLegend from '../components/ChartLegend/index.jsx';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 const apiQueryGenerator = params => {
 	let where = {
@@ -59,7 +62,17 @@ const apiQueryGenerator = params => {
 				spacingTop: 35,
 				style: {
 					fontFamily: 'Karla'
+				},
+				events: {
+					load: event => {
+						const chart = event.target,
+							node = document.getElementById('chart-legend');
+						ReactDOM.render(<ChartLegend chart={chart} />, node);
+					}
 				}
+			},
+			legend: {
+				enabled: false
 			},
 			tooltip: {
 				shared: true

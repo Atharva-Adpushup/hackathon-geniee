@@ -123,16 +123,17 @@ class ReportingPanel extends React.Component {
 	render() {
 		const {
 				startDate,
-				endDate,
-				reportLoading,
-				disableGenerateButton,
-				reportError,
-				chartConfig,
-				tableConfig,
-				platform,
-				variations,
-				variation
+			endDate,
+			reportLoading,
+			disableGenerateButton,
+			reportError,
+			chartConfig,
+			tableConfig,
+			platform,
+			variations,
+			variation
 			} = this.state,
+			chart = window.chart,
 			reportPane = reportError ? (
 				<PaneLoader
 					message="Error occurred while fetching report data!"
@@ -140,23 +141,24 @@ class ReportingPanel extends React.Component {
 					styles={{ height: 'auto' }}
 				/>
 			) : (
-				<div>
-					<ReactHighcharts config={chartConfig} />
-					<div className="report-table">
-						{tableConfig ? (
-							<Datatable
-								tableHeader={tableConfig.header}
-								tableBody={tableConfig.body}
-								keyName="reportTable"
-								rowsPerPage={20}
-								rowsPerPageOption={[30, 40, 50, 60]}
-							/>
-						) : (
-							''
-						)}
+					<div>
+						<div id="chart-legend"></div>
+						<ReactHighcharts config={chartConfig} />
+						<div className="report-table">
+							{tableConfig ? (
+								<Datatable
+									tableHeader={tableConfig.header}
+									tableBody={tableConfig.body}
+									keyName="reportTable"
+									rowsPerPage={20}
+									rowsPerPageOption={[30, 40, 50, 60]}
+								/>
+							) : (
+									''
+								)}
+						</div>
 					</div>
-				</div>
-			);
+				);
 
 		return (
 			<ActionCard title="AdPushup Report">
