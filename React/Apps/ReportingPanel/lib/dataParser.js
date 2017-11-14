@@ -1,7 +1,7 @@
 import React from 'react';
 import { capitalCase, reorderArray } from './helpers';
 import commonConsts from './commonConsts';
-import { remove, map, each, groupBy, uniq } from 'lodash';
+import { remove, map, each, groupBy, uniq, find } from 'lodash';
 import moment from 'moment';
 import Bold from '../../../Components/Bold.jsx';
 
@@ -226,7 +226,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 		return series;
 	},
-	processTableGroupBy = (header, rows, groupByParam) => {
+	processTableGroupBy = (header, rows, groupByParam, variations) => {
 		if (!groupByParam) {
 			return { header, rows };
 		}
@@ -262,8 +262,9 @@ const dataLabels = commonConsts.DATA_LABELS,
 				let groupedRows2 = groupBy(rows, commonConsts.API_DATA_PARAMS.variationId);
 
 				for (let i in groupedRows2) {
+					const name = find(variations, { id: i }).name
 					updatedRows.push({
-						variation: i
+						variation: name
 					});
 					updatedRows = updatedRows.concat(groupedRows2[i]);
 				}
@@ -272,7 +273,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 		return { header, rows: updatedRows };
 	},
-	generateTableData = (cols, rows, groupBy) => {
+	generateTableData = (cols, rows, groupBy, variations) => {
 		let header = [],
 			body = [];
 
@@ -294,7 +295,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			});
 		});
 
-		const groupedData = processTableGroupBy(header, rows, groupBy);
+		const groupedData = processTableGroupBy(header, rows, groupBy, variations);
 		header = groupedData.header;
 		rows = groupedData.rows;
 
@@ -350,10 +351,10 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 		return { header, body };
 	},
-	dataParser = (data, groupBy) => {
+	dataParser = (data, groupBy, variations) => {
 		const columns = formatColumnNames(data.columns);
 
-		let tableConfig = generateTableData(columns, data.rows, groupBy),
+		let tableConfig = generateTableData(columns, data.rows, groupBy, variations),
 			chartConfig = {
 				yAxis: generateYAxis(columns),
 				xAxis: { categories: generateXAxis(data.rows) },
