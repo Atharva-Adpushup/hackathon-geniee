@@ -307,12 +307,16 @@ const schema = {
 	},
 	secondQuery: {
 		aggregate: ['total_revenue', 'total_impressions', 'total_gross_revenue'],
-		nonAggregate: ['report_date', 'siteid', 'ntwid', 'platform'],
+		nonAggregate: ['report_date', 'siteid', 'ntwid', 'platform', 'display_name'],
 		where: ['ntwid'],
 		tables: {
 			adpTagReport: {
 				table: 'AdpTagReport',
 				alias: 'h'
+			},
+			network: {
+				table: 'Network',
+				alias: 'i'
 			}
 		},
 		alias: 'b'

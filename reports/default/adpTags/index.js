@@ -101,6 +101,8 @@ function setCorrectColumnNames(data) {
 				case 'pagegroup':
 					columns[key] = 'name';
 					break;
+				case 'ntwid':
+					columns[key] = 'display_name';
 			}
 		});
 	}
@@ -131,6 +133,9 @@ function groupByWrapper(data, qs) {
 
 function selectWrapper(selectData, groupByData, qs) {
 	let flag = _.isArray(groupByData) && groupByData.length && groupByData.indexOf('section') != -1 ? true : false;
+	selectData.indexOf('ntwid') != -1
+		? (selectData.push('display_name'), (selectData = selectData.filter(ele => ele != 'ntwid')))
+		: null;
 	return qs.select(selectData, flag);
 }
 
@@ -186,12 +191,13 @@ total_impressions ----> total_ad_requests
 total_requests ----> total_pageviews
 */
 
-// let params = {
-// 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid'],
-// 	where: {
-// 		siteid: 31000
-// 	}
-// };
+let params = {
+	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid', 'ntwid'],
+	where: {
+		siteid: 31000
+	},
+	groupBy: ['ntwid']
+};
 
 // Promise.all(
 // 	_.map([1, 2, 3], ele => {
@@ -206,12 +212,57 @@ total_requests ----> total_pageviews
 // 		debugger;
 // 	});
 
-// generate(params)
-// 	.then(response => {
-// 		debugger;
-// 	})
-// 	.catch(err => {
-// 		debugger;
-// 	});
+generate(params)
+	.then(response => {
+		debugger;
+	})
+	.catch(err => {
+		debugger;
+	});
 
 module.exports = { generate, getPVS };
+
+/**
+SELECT
+	SUM(a.total_requests) AS total_requests,
+	a.report_date,
+	a.siteid,
+	SUM(b.total_revenue) AS total_revenue,
+	SUM(b.total_impressions) AS total_impressions,
+	b.display_name
+FROM (
+	SELECT
+		SUM(c.total_requests) AS total_requests,
+		c.report_date,
+		c.siteid
+	FROM ApexHourlySiteReport c
+	WHERE
+		c.report_date BETWEEN '2017-11-07' AND '2017-11-13'
+		AND c.siteid = 31000
+	GROUP BY
+		c.report_date,
+		c.siteid
+) a
+INNER JOIN (
+	SELECT
+		SUM(h.total_revenue) AS total_revenue,
+		SUM(h.total_impressions) AS total_impressions,
+		h.report_date,
+		h.siteid,
+		i.display_name
+	FROM AdpTagReport h, Network i
+	WHERE
+		h.report_date BETWEEN '2017-11-07' AND '2017-11-13'
+		AND h.siteid = 31000
+		AND h.ntwid = i.ntwid
+	GROUP BY
+		h.report_date,
+		h.siteid,
+		h.display_name
+) b
+ON a.report_date = b.report_date AND a.siteid = b.siteid
+GROUP BY
+	a.report_date,
+	a.siteid,
+	b.display_name
+*/
