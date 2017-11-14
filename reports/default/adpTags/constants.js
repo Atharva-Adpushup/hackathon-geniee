@@ -306,7 +306,7 @@ const schema = {
 		alias: 'a'
 	},
 	secondQuery: {
-		aggregate: ['total_revenue', 'total_impressions'],
+		aggregate: ['total_revenue', 'total_impressions', 'total_gross_revenue'],
 		nonAggregate: ['report_date', 'siteid', 'ntwid', 'platform'],
 		where: ['ntwid'],
 		tables: {

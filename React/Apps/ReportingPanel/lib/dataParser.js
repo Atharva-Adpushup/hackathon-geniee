@@ -1,7 +1,7 @@
 import React from 'react';
 import { capitalCase, reorderArray } from './helpers';
 import commonConsts from './commonConsts';
-import { remove, map, each, groupBy, uniq } from 'lodash';
+import { remove, map, each, groupBy, uniq, find } from 'lodash';
 import moment from 'moment';
 import Bold from '../../../Components/Bold.jsx';
 
@@ -14,6 +14,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 		updatedCols.push(reorderArray(dataLabels.impressions, cols));
 		updatedCols.push(reorderArray(dataLabels.cpm, cols));
 		updatedCols.push(reorderArray(dataLabels.revenue, cols));
+		updatedCols.push(reorderArray(dataLabels.grossRevenue, cols));
 		updatedCols.push(reorderArray(dataLabels.xpathMiss, cols));
 		return updatedCols;
 	},
@@ -32,6 +33,9 @@ const dataLabels = commonConsts.DATA_LABELS,
 				case 'Report Date':
 					str = dataLabels.date;
 					break;
+				case 'Gross Revenue':
+					str = dataLabels.grossRevenue;
+					break;
 			}
 			updatedColumns.push(str);
 		}
@@ -44,7 +48,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 		let yAxis = [],
 			xPathImpressionsPageviews = '',
 			cpmPageCpm = '',
-			revenue = '';
+			revenueGrossRevenue = '';
 
 		for (let i = 0; i < columns.length; i++) {
 			switch (columns[i]) {
@@ -66,7 +70,12 @@ const dataLabels = commonConsts.DATA_LABELS,
 					}
 					break;
 				case dataLabels.revenue:
-					revenue += columns[i];
+					revenueGrossRevenue += `${columns[i]} / `;
+					break;
+				case dataLabels.grossRevenue:
+					if (commonConsts.IS_SUPERUSER) {
+						revenueGrossRevenue += `${columns[i]} / `;
+					}
 					break;
 			}
 		}
@@ -85,7 +94,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			},
 			{
 				title: {
-					text: revenue
+					text: revenueGrossRevenue.substring(0, revenueGrossRevenue.length - 2)
 				},
 				opposite: true
 			}
@@ -98,6 +107,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 		row1[API_DATA_PARAMS.impressions] += row2[API_DATA_PARAMS.impressions];
 		row1[API_DATA_PARAMS.pageviews] += row2[API_DATA_PARAMS.pageviews];
 		row1[API_DATA_PARAMS.revenue] += row2[API_DATA_PARAMS.revenue];
+		row1[API_DATA_PARAMS.grossRevenue] += row2[API_DATA_PARAMS.grossRevenue];
 		row1[API_DATA_PARAMS.xpathMiss] += row2[API_DATA_PARAMS.xpathMiss];
 		return row1;
 	},
@@ -153,6 +163,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			pageCpm,
 			cpm,
 			revenue,
+			grossRevenue,
 			xpathMiss,
 			series = [];
 
@@ -193,6 +204,13 @@ const dataLabels = commonConsts.DATA_LABELS,
 						yAxis: 2
 					};
 					break;
+				case dataLabels.grossRevenue:
+					grossRevenue = {
+						...defaultOptions,
+						name: col,
+						yAxis: 2
+					};
+					break;
 				case dataLabels.pageCpm:
 					pageCpm = {
 						...defaultOptions,
@@ -215,18 +233,19 @@ const dataLabels = commonConsts.DATA_LABELS,
 			impressions.data.push(rows[i].total_impressions);
 			cpm.data.push(Number((rows[i].total_revenue * 1000 / rows[i].total_impressions).toFixed(2)));
 			revenue.data.push(Number(rows[i].total_revenue.toFixed(2)));
+			grossRevenue.data.push(Number(rows[i].total_gross_revenue.toFixed(2)));
 			xpathMiss.data.push(rows[i].total_xpath_miss);
 		}
 
 		if (commonConsts.IS_SUPERUSER) {
-			series.push(pageviews, pageCpm, impressions, cpm, revenue, xpathMiss);
+			series.push(pageviews, pageCpm, impressions, cpm, revenue, grossRevenue, xpathMiss);
 		} else {
 			series.push(impressions, cpm, revenue);
 		}
 
 		return series;
 	},
-	processTableGroupBy = (header, rows, groupByParam) => {
+	processTableGroupBy = (header, rows, groupByParam, variations) => {
 		if (!groupByParam) {
 			return { header, rows };
 		}
@@ -262,8 +281,9 @@ const dataLabels = commonConsts.DATA_LABELS,
 				let groupedRows2 = groupBy(rows, commonConsts.API_DATA_PARAMS.variationId);
 
 				for (let i in groupedRows2) {
+					const name = find(variations, { id: i }).name
 					updatedRows.push({
-						variation: i
+						variation: name
 					});
 					updatedRows = updatedRows.concat(groupedRows2[i]);
 				}
@@ -272,7 +292,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 		return { header, rows: updatedRows };
 	},
-	generateTableData = (cols, rows, groupBy) => {
+	generateTableData = (cols, rows, groupBy, variations) => {
 		let header = [],
 			body = [];
 
@@ -282,7 +302,8 @@ const dataLabels = commonConsts.DATA_LABELS,
 				col === dataLabels.variationId ||
 				(col === dataLabels.xpathMiss && !commonConsts.IS_SUPERUSER) ||
 				(col === dataLabels.pageViews && !commonConsts.IS_SUPERUSER) ||
-				(col === dataLabels.pageCpm && !commonConsts.IS_SUPERUSER)
+				(col === dataLabels.pageCpm && !commonConsts.IS_SUPERUSER) ||
+				(col === dataLabels.grossRevenue && !commonConsts.IS_SUPERUSER)
 			) {
 				return true;
 			}
@@ -294,7 +315,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			});
 		});
 
-		const groupedData = processTableGroupBy(header, rows, groupBy);
+		const groupedData = processTableGroupBy(header, rows, groupBy, variations);
 		header = groupedData.header;
 		rows = groupedData.rows;
 
@@ -303,6 +324,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			totalImpressions = 0,
 			totalCpm = 0,
 			totalRevenue = 0,
+			totalGrossRevenue = 0,
 			totalXpathMiss = 0;
 
 		each(rows, row => {
@@ -314,6 +336,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 				xpathMiss = commonConsts.IS_SUPERUSER ? row.total_xpath_miss : undefined,
 				pageViews = commonConsts.IS_SUPERUSER ? row.total_requests : undefined,
 				revenue = row.total_revenue ? Number(row.total_revenue.toFixed(2)) : undefined,
+				grossRevenue = row.total_gross_revenue ? Number(row.total_gross_revenue.toFixed(2)) : undefined,
 				pageCpm = row.total_revenue
 					? Number((row.total_revenue * 1000 / row.total_requests).toFixed(2))
 					: undefined;
@@ -327,6 +350,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 				[dataLabels.xpathMiss]: xpathMiss,
 				[dataLabels.pageViews]: pageViews,
 				[dataLabels.revenue]: revenue,
+				[dataLabels.grossRevenue]: grossRevenue,
 				[dataLabels.pageCpm]: pageCpm
 			});
 
@@ -335,6 +359,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			totalImpressions += impressions;
 			totalCpm += cpm;
 			totalRevenue += revenue;
+			totalGrossRevenue += grossRevenue;
 			totalXpathMiss += xpathMiss;
 		});
 
@@ -345,15 +370,16 @@ const dataLabels = commonConsts.DATA_LABELS,
 			[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
 			[dataLabels.cpm]: <Bold>{((totalRevenue / totalImpressions) * 1000).toFixed(2)}</Bold>,
 			[dataLabels.revenue]: <Bold>{totalRevenue.toFixed(2)}</Bold>,
+			[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
 			[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>
 		});
 
 		return { header, body };
 	},
-	dataParser = (data, groupBy) => {
+	dataParser = (data, groupBy, variations) => {
 		const columns = formatColumnNames(data.columns);
 
-		let tableConfig = generateTableData(columns, data.rows, groupBy),
+		let tableConfig = generateTableData(columns, data.rows, groupBy, variations),
 			chartConfig = {
 				yAxis: generateYAxis(columns),
 				xAxis: { categories: generateXAxis(data.rows) },

@@ -47,7 +47,7 @@ const apiQueryGenerator = params => {
 			.map(word => word[0].toUpperCase() + word.substr(1))
 			.join(' ');
 	},
-	dataGenerator = (data, groupBy) => {
+	dataGenerator = (data, groupBy, variations) => {
 		let config = {
 			title: {
 				text: ''
@@ -77,7 +77,7 @@ const apiQueryGenerator = params => {
 			tooltip: {
 				shared: true
 			},
-			colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e'],
+			colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e', '#eb575c'],
 			credits: {
 				enabled: false
 			},
@@ -91,7 +91,7 @@ const apiQueryGenerator = params => {
 			tableData = null;
 
 		if (!data.error) {
-			const parsedData = dataParser(data, groupBy);
+			const parsedData = dataParser(data, groupBy, variations);
 			chartData = parsedData.chartConfig;
 			tableData = parsedData.tableConfig;
 		}
