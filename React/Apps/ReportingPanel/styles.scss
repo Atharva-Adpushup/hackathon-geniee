@@ -158,9 +158,15 @@ body {
 	background-color: $legendBg;
 	border: 2px solid $greyBg;
 
+	.legend-col {
+		width: 14.2222%;
+		float: left;
+		padding: 0 8px;
+	}
+
 	.legend-item {
 		font-size: 1.2em;
-		padding: 15px;
+		padding: 15px 8px;
 		cursor: pointer;
 		color: darken($greyBorder, 15%);
 		margin-bottom: -2px;
