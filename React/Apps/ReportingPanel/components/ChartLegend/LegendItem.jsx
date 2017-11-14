@@ -30,11 +30,9 @@ class LegendItem extends Component {
     render() {
         const { serie } = this.state,
             { toggleSerie } = this.props,
-            fontColor = '#555',
-            colWidth = commonConsts.IS_SUPERUSER ? 2 : 4;
+            fontColor = '#555';
 
         let style = {};
-
         if (serie.visible) {
             style = {
                 borderBottom: `2px solid ${serie.color}`,
@@ -42,13 +40,19 @@ class LegendItem extends Component {
             };
         }
 
-        return (
-            <Col xs={colWidth}>
-                <div className="legend-item" onClick={this.toggleSerie} style={style}>
-                    {serie.name}
-                </div>
-            </Col>
-        );
+        const legendToggle = (<div className="legend-item" onClick={this.toggleSerie} style={style}>
+            {serie.name}
+        </div>), legendItem = commonConsts.IS_SUPERUSER ? (
+            <div className="legend-col">
+                {legendToggle}
+            </div>
+        ) : (
+                <Col xs={4}>
+                    {legendToggle}
+                </Col>
+            );
+
+        return legendItem;
     }
 }
 
