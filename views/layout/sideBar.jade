@@ -21,12 +21,12 @@ nav.pageLeftSidebar.sidebar
                             span.icon-thumbnail#sidebar-dashboard-icon-thumbnail
                                 i.fa.fa-tachometer#sidebar-dashboard-icon
 
-                if isSuperUser
-                    li.sidebar-menu-item
-                        a(id="sidebar-new-website-link", href='/user/addSite', data-toggle='', data-target='')
-                            | Add New Website
-                            span.icon-thumbnail#sidebar-new-website-icon-thumbnail
-                                i.fa.fa-plus#sidebar-new-website-icon
+                li.sidebar-menu-item
+                    a(id="sidebar-new-website-link", href='/user/addSite', data-toggle='', data-target='')
+                        | Add New Website
+                        span.icon-thumbnail#sidebar-new-website-icon-thumbnail
+                            i.fa.fa-plus#sidebar-new-website-icon
+
                 if isSuperUser
                     li.sidebar-menu-item
                         a(id="sidebar-new-website-link", href='/user/updateUserStatus', data-toggle='', data-target='')

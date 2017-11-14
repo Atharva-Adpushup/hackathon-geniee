@@ -267,8 +267,11 @@ function apiModule() {
 			const normalizedDomain = utils.rightTrim(normalizeurl(domain), '/'),
 				getUser = API.getUserByEmail(email),
 				setNewDealForExistingUser = getUser.then(user => {
-					const apiParams = { site: normalizedDomain };
-					return API.createNewDealForExistingUser(apiParams, user);
+					const api = {
+						params: { site: normalizedDomain },
+						options: { isExistingUser: true }
+					};
+					return API.createNewPipeDriveDeal(api.params, user, api.options);
 				}),
 				addSite = setNewDealForExistingUser.then(user => {
 					return user.addSite(normalizedDomain).then(site => {
@@ -385,7 +388,7 @@ function apiModule() {
 				.then(() => user)
 				.catch(err => user);
 		},
-		createNewDealForExistingUser: function(params, user) {
+		createNewPipeDriveDeal: function(params, user, options) {
 			var userEmail = user.get('email'),
 				userFirstName = user.get('firstName'),
 				siteName = utils.domanize(params.site),
@@ -413,12 +416,9 @@ function apiModule() {
 						[consts.analytics.pipedriveCustomFields.utmFirstReferrer]: miscellaneousData.utmFirstReferrer,
 						currency: 'USD'
 					}
-				},
-				apiOptions = {
-					isExistingUser: true
 				};
 
-			return API.pipedriveDealCreation(user, pipedriveParams, apiOptions);
+			return API.pipedriveDealCreation(user, pipedriveParams, options);
 		},
 		createNewUser: function(json) {
 			return FormValidator.validate(json, schema.user.validations)
@@ -459,39 +459,7 @@ function apiModule() {
 								if (json.userType && json.userType === 'partner') {
 									return user;
 								}
-								var userId = user.get('email'),
-									siteName = utils.domanize(json.site),
-									pipedriveParams = {
-										userInfo: {
-											name: user.get('firstName'),
-											email: user.get('email')
-										},
-										dealInfo: {
-											title: `[CO] ${siteName}`,
-											value: user.get('websiteRevenue'),
-											stage_id: 81, // [2017] AP User Onboarding Pipeline | First Stage | Deal Created
-											[consts.analytics.pipedriveCustomFields.websiteName]: siteName,
-											[consts.analytics.pipedriveCustomFields.dailyPageviews]: user.get(
-												'pageviewRange'
-											),
-											[consts.analytics.pipedriveCustomFields.adNetworks]: user
-												.get('adNetworks')
-												.join(' | '),
-											[consts.analytics.pipedriveCustomFields.websiteRevenue]: user.get(
-												'websiteRevenue'
-											),
-											[consts.analytics.pipedriveCustomFields.utmSource]: json.utmSource,
-											[consts.analytics.pipedriveCustomFields.utmMedium]: json.utmMedium,
-											[consts.analytics.pipedriveCustomFields.utmCampaign]: json.utmCampaign,
-											[consts.analytics.pipedriveCustomFields.utmTerm]: json.utmTerm,
-											[consts.analytics.pipedriveCustomFields.utmName]: json.utmName,
-											[consts.analytics.pipedriveCustomFields.utmContent]: json.utmContent,
-											[consts.analytics.pipedriveCustomFields.utmFirstHit]: json.utmFirstHit,
-											[consts.analytics.pipedriveCustomFields.utmFirstReferrer]:
-												json.utmFirstReferrer,
-											currency: 'USD'
-										}
-									};
+
 								if (
 									Config.hasOwnProperty('analytics') &&
 									Config.analytics.hasOwnProperty('pipedriveActivated') &&
@@ -502,7 +470,7 @@ function apiModule() {
 									user.set('crmDealSecondaryTitle', false);
 									return Promise.resolve(user);
 								}
-								return API.pipedriveDealCreation(user, pipedriveParams, {});
+								return API.createNewPipeDriveDeal(json, user, {});
 							})
 							.then(function(user) {
 								return user.addSite(json.site).then(function() {
