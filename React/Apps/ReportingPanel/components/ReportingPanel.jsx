@@ -133,7 +133,6 @@ class ReportingPanel extends React.Component {
 			variations,
 			variation
 			} = this.state,
-			chart = window.chart,
 			reportPane = reportError ? (
 				<PaneLoader
 					message="Error occurred while fetching report data!"
