@@ -77,7 +77,7 @@ const apiQueryGenerator = params => {
 			tooltip: {
 				shared: true
 			},
-			colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e'],
+			colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e', '#eb575c'],
 			credits: {
 				enabled: false
 			},
