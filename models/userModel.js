@@ -42,6 +42,7 @@ var modelAPI = (module.exports = apiModule()),
 			'websiteRevenue',
 			'crmDealId',
 			'crmDealTitle',
+			'crmDealSecondaryTitle',
 			'revenueUpperLimit',
 			'preferredModeOfReach',
 			'revenueLowerLimit',
@@ -262,19 +263,32 @@ function apiModule() {
 			});
 		},
 		addSite: function(email, domain) {
-			var normalizedDomain = utils.rightTrim(normalizeurl(domain), '/'); // normalize and remove slash from the end
-			return API.getUserByEmail(email).then(function(user) {
-				return user.addSite(normalizedDomain).then(function(site) {
-					return user.save().then(function(userObj) {
-						return [userObj, site.siteId];
+			// normalize and remove slash from the end
+			const normalizedDomain = utils.rightTrim(normalizeurl(domain), '/'),
+				getUser = API.getUserByEmail(email),
+				setNewDealForExistingUser = getUser.then(user => {
+					const apiParams = { site: normalizedDomain };
+					return API.createNewDealForExistingUser(apiParams, user);
+				}),
+				addSite = setNewDealForExistingUser.then(user => {
+					return user.addSite(normalizedDomain).then(site => {
+						return [user, site];
 					});
+				});
+
+			return addSite.spread((user, site) => {
+				return user.save().then(function(userObj) {
+					return [userObj, site.siteId];
 				});
 			});
 		},
 		createUserFromJson: function(json) {
 			return Promise.resolve(new User(json));
 		},
-		pipedriveDealCreation: function(user, pipedriveParams) {
+		pipedriveDealCreation: function(user, pipedriveParams, options) {
+			const isOptionsObject = !!options,
+				isExistingUserOption = !!(isOptionsObject && options.isExistingUser);
+
 			process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 			return pipedriveAPI('getUserByTerm', {
 				term: pipedriveParams.userInfo.email,
@@ -283,7 +297,14 @@ function apiModule() {
 			})
 				.then(response => {
 					if (response && response.success) {
-						if (response.data && response.data != null && response.data != 'null' && response.data.length) {
+						const isResponseData = !!(
+							response.data &&
+							response.data != null &&
+							response.data != 'null' &&
+							response.data.length
+						);
+
+						if (isResponseData || isExistingUserOption) {
 							return response.data[0].id;
 						} else {
 							return pipedriveAPI('createPerson', pipedriveParams.userInfo);
@@ -337,7 +358,12 @@ function apiModule() {
 					return pipedriveAPI('updateDeal', paramConfig);
 				})
 				.then(response => {
-					if (response && response.success) {
+					const isResponseSuccess = !!(response && response.success);
+
+					if (isResponseSuccess && isExistingUserOption) {
+						user.set('crmDealSecondaryTitle', response.data.title);
+						return user;
+					} else if (isResponseSuccess) {
 						user.set('crmDealId', response.data.id);
 						user.set('crmDealTitle', response.data.title);
 						return user;
@@ -358,6 +384,41 @@ function apiModule() {
 				})
 				.then(() => user)
 				.catch(err => user);
+		},
+		createNewDealForExistingUser: function(params, user) {
+			var userEmail = user.get('email'),
+				userFirstName = user.get('firstName'),
+				siteName = utils.domanize(params.site),
+				miscellaneousData = user.get('miscellaneous'),
+				pipedriveParams = {
+					userInfo: {
+						name: userFirstName,
+						email: userEmail
+					},
+					dealInfo: {
+						title: `[CO] ${siteName}`,
+						value: user.get('websiteRevenue'),
+						stage_id: 81, // [2017] AP User Onboarding Pipeline | First Stage | Deal Created
+						[consts.analytics.pipedriveCustomFields.websiteName]: siteName,
+						[consts.analytics.pipedriveCustomFields.dailyPageviews]: user.get('pageviewRange'),
+						[consts.analytics.pipedriveCustomFields.adNetworks]: user.get('adNetworks').join(' | '),
+						[consts.analytics.pipedriveCustomFields.websiteRevenue]: user.get('websiteRevenue'),
+						[consts.analytics.pipedriveCustomFields.utmSource]: miscellaneousData.utmSource,
+						[consts.analytics.pipedriveCustomFields.utmMedium]: miscellaneousData.utmMedium,
+						[consts.analytics.pipedriveCustomFields.utmCampaign]: miscellaneousData.utmCampaign,
+						[consts.analytics.pipedriveCustomFields.utmTerm]: miscellaneousData.utmTerm,
+						[consts.analytics.pipedriveCustomFields.utmName]: miscellaneousData.utmName,
+						[consts.analytics.pipedriveCustomFields.utmContent]: miscellaneousData.utmContent,
+						[consts.analytics.pipedriveCustomFields.utmFirstHit]: miscellaneousData.utmFirstHit,
+						[consts.analytics.pipedriveCustomFields.utmFirstReferrer]: miscellaneousData.utmFirstReferrer,
+						currency: 'USD'
+					}
+				},
+				apiOptions = {
+					isExistingUser: true
+				};
+
+			return API.pipedriveDealCreation(user, pipedriveParams, apiOptions);
 		},
 		createNewUser: function(json) {
 			return FormValidator.validate(json, schema.user.validations)
@@ -437,10 +498,11 @@ function apiModule() {
 									!Config.analytics.pipedriveActivated
 								) {
 									user.set('crmDealId', false);
-									user.set('crmDealId', false);
+									user.set('crmDealTitle', false);
+									user.set('crmDealSecondaryTitle', false);
 									return Promise.resolve(user);
 								}
-								return API.pipedriveDealCreation(user, pipedriveParams);
+								return API.pipedriveDealCreation(user, pipedriveParams, {});
 							})
 							.then(function(user) {
 								return user.addSite(json.site).then(function() {
