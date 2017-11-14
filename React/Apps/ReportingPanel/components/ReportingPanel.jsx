@@ -17,6 +17,7 @@ class ReportingPanel extends React.Component {
 		this.state = {
 			reportLoading: true,
 			reportError: false,
+			emptyData: false,
 			disableGenerateButton: true,
 			chartConfig: null,
 			tableConfig: null,
@@ -79,6 +80,8 @@ class ReportingPanel extends React.Component {
 						chartConfig: data.chartData,
 						tableConfig: data.tableData
 					});
+				} else if (!res.error && !res.rows.length) {
+					this.setState({ ...state, reportError: true, emptyData: true });
 				} else {
 					this.setState({ ...state, reportError: true });
 				}
@@ -127,6 +130,7 @@ class ReportingPanel extends React.Component {
 			reportLoading,
 			disableGenerateButton,
 			reportError,
+			emptyData,
 			chartConfig,
 			tableConfig,
 			platform,
@@ -135,7 +139,7 @@ class ReportingPanel extends React.Component {
 			} = this.state,
 			reportPane = reportError ? (
 				<PaneLoader
-					message="Error occurred while fetching report data!"
+					message={!emptyData ? 'Error occurred while fetching report data!' : 'No report data present!'}
 					state="error"
 					styles={{ height: 'auto' }}
 				/>
