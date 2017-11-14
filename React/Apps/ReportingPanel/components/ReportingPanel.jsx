@@ -164,7 +164,7 @@ class ReportingPanel extends React.Component {
 				);
 
 		return (
-			<ActionCard title="AdPushup Report">
+			<ActionCard title={`AdPushup Report - ${commonConsts.SITE_DOMAIN}`}>
 				<Row>
 					<Col sm={10} smOffset={2}>
 						<ReportControls
