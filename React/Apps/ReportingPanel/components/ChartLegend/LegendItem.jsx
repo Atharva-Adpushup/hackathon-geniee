@@ -21,6 +21,12 @@ class LegendItem extends Component {
         this.setState(...serie, { visible: serie.visible });
     }
 
+    componentWillReceiveProps(nextProps) {
+        const { serie } = nextProps;
+
+        this.setState({ serie });
+    }
+
     render() {
         const { serie } = this.state,
             { toggleSerie } = this.props,
