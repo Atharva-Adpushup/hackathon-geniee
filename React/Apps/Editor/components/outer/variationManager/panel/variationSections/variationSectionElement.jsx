@@ -367,8 +367,8 @@ class variationSectionElement extends Component {
 								</Row>
 							</Col>
 						) : null}
-						{props.section.isIncontent ? (
-							<div>
+						<div>
+							{props.section.isIncontent ? (
 								<Row>
 									<Col className="u-padding-r10px" xs={4}>
 										Float
@@ -388,83 +388,7 @@ class variationSectionElement extends Component {
 										</SelectBox>
 									</Col>
 								</Row>
-								<Row style={{ marginTop: 10 }}>
-									<Col className="u-padding-r10px" xs={4}>
-										Network
-									</Col>
-									<Col style={{ padding: 0 }} xs={8}>
-										{this.renderNetworkOptions()}
-									</Col>
-								</Row>
-								<Row style={{ marginTop: 10 }}>
-									{this.state.network ? (
-										this.state.network == 'adpTags' ? (
-											<div>
-												<div className="clearfix" style={{ marginBottom: 10 }}>
-													<Col className="u-padding-r10px" xs={4}>
-														Price Floor
-													</Col>
-													<Col className="u-padding-l10px" xs={8}>
-														<input
-															placeholder="Please enter price floor"
-															ref="priceFloor"
-															type="text"
-															className="inputMinimal"
-															defaultValue={this.state.priceFloor}
-														/>
-													</Col>
-												</div>
-												<div>
-													<Col>
-														{this.renderSwitch(
-															{
-																label: 'Header Bidding',
-																name: 'headerBidding'
-															},
-															this.state.headerBidding,
-															this.onToggleChange,
-															props.section.id
-														)}
-													</Col>
-												</div>
-												<div className="mT-10">
-													<Col>
-														<Button
-															className="btn-lightBg btn-save btn-block"
-															onClick={this.updateNetworkWrapper}
-															type="submit"
-														>
-															Save
-														</Button>
-													</Col>
-												</div>
-											</div>
-										) : (
-											<div>
-												<Row>
-													<Col className="u-padding-r10px" xs={4}>
-														Ad Code
-													</Col>
-													<Col className="u-padding-l10px" xs={8}>
-														<InlineEdit
-															compact
-															validate
-															showTextarea
-															adCode
-															value={this.state.adCode}
-															submitHandler={this.onAdCodeChange}
-															text="Ad Code"
-															errorMessage="Ad Code cannot be blank"
-														/>
-													</Col>
-												</Row>
-											</div>
-										)
-									) : null}
-								</Row>
-							</div>
-						) : (
-							<div>
+							) : (
 								<Row>
 									<Col className="u-padding-r10px" xs={4}>
 										XPath
@@ -493,8 +417,82 @@ class variationSectionElement extends Component {
 										/>
 									</Col>
 								</Row>
-							</div>
-						)}
+							)}
+							<Row style={{ marginTop: 10 }}>
+								<Col className="u-padding-r10px" xs={4}>
+									Network
+								</Col>
+								<Col style={{ padding: 0 }} xs={8}>
+									{this.renderNetworkOptions()}
+								</Col>
+							</Row>
+							<Row style={{ marginTop: 10 }}>
+								{this.state.network ? (
+									this.state.network == 'adpTags' ? (
+										<div>
+											<div className="clearfix" style={{ marginBottom: 10 }}>
+												<Col className="u-padding-r10px" xs={4}>
+													Price Floor
+												</Col>
+												<Col className="u-padding-l10px" xs={8}>
+													<input
+														placeholder="Please enter price floor"
+														ref="priceFloor"
+														type="text"
+														className="inputMinimal"
+														defaultValue={this.state.priceFloor}
+													/>
+												</Col>
+											</div>
+											<div>
+												<Col>
+													{this.renderSwitch(
+														{
+															label: 'Header Bidding',
+															name: 'headerBidding'
+														},
+														this.state.headerBidding,
+														this.onToggleChange,
+														props.section.id
+													)}
+												</Col>
+											</div>
+											<div className="mT-10">
+												<Col>
+													<Button
+														className="btn-lightBg btn-save btn-block"
+														onClick={this.updateNetworkWrapper}
+														type="submit"
+													>
+														Save
+													</Button>
+												</Col>
+											</div>
+										</div>
+									) : (
+										<div>
+											<Row>
+												<Col className="u-padding-r10px" xs={4}>
+													Ad Code
+												</Col>
+												<Col className="u-padding-l10px" xs={8}>
+													<InlineEdit
+														compact
+														validate
+														showTextarea
+														adCode
+														value={this.state.adCode}
+														submitHandler={this.onAdCodeChange}
+														text="Ad Code"
+														errorMessage="Ad Code cannot be blank"
+													/>
+												</Col>
+											</Row>
+										</div>
+									)
+								) : null}
+							</Row>
+						</div>
 					</Col>
 				</Row>
 			</li>
