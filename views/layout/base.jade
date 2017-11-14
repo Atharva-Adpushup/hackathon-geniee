@@ -82,7 +82,17 @@ html(lang="en")
                                     }
                                 }();
                                 window.overrideTrackers();
+
     body
+        // User specific jade variables defined to prevent the
+        // hassle of defining them at 'app locals' level or send them
+        // as parameters to jade files
+        - currentUser = currentUser || {};
+        - currentUserSites = (currentUser && currentUser.sites) ? currentUser.sites : [];
+        - primarySiteDetails = (currentUserSites && currentUserSites.length) ? currentUserSites[0] : {};
+        - isRequestDemo = (currentUser && currentUser.requestDemo) ? currentUser.requestDemo : null;
+        - isUserOnboarded = (primarySiteDetails && primarySiteDetails.domain && primarySiteDetails.siteId && primarySiteDetails.step) ? true : false;
+
         if !excludeAnalytics
             if environment == "production"
                 block analyticsIdentify
@@ -108,6 +118,5 @@ html(lang="en")
             else
                 script(type="text/javascript" src="/assets/js/libs/custom/adpushup-analytics-mockup.js")
 
-    body
         block bodyContent
         div(id="freeow-tr", class="freeow freeow-top-right")

@@ -369,6 +369,62 @@ router
 			.catch(function(err) {
 				res.send('Site not found!');
 			});
+	})
+	.post('/:siteId/saveRevenueShare', (req, res) => {
+		let response = {
+			error: true,
+			message: 'Operaiton Failed'
+		};
+		if (!req.body || !req.body.siteId || !req.body.share) {
+			return res.send(response);
+		}
+		return siteModel
+			.getSiteById(req.body.siteId)
+			.then(site => {
+				let adNetworkSettings = site.get('adNetworkSettings') || {};
+				adNetworkSettings = {
+					revenueShare: parseInt(req.body.share),
+					negate: ['adsense']
+				};
+				site.set('adNetworkSettings', adNetworkSettings);
+				return site.save();
+			})
+			.then(() =>
+				res.send(
+					Object.assign(response, {
+						error: false,
+						message: 'Share set'
+					})
+				)
+			)
+			.catch(err => {
+				console.log(err);
+				return res.send(response);
+			});
+	})
+	.get('/:siteId/getRevenueShare', (req, res) => {
+		let response = {
+			error: true,
+			message: 'Operaiton Failed'
+		};
+		return siteModel
+			.getSiteById(req.params.siteId)
+			.then(site => {
+				if (!site) {
+					return res.send(response);
+				}
+				return res.send(
+					Object.assign(response, {
+						error: false,
+						message: 'Done',
+						rs: site.get('adNetworkSettings').revenueShare ? site.get('adNetworkSettings').revenueShare : 10
+					})
+				);
+			})
+			.catch(err => {
+				console.log(err);
+				return res.send(response);
+			});
 	});
 
 module.exports = router;
