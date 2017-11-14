@@ -182,15 +182,15 @@ const dataLabels = commonConsts.DATA_LABELS,
 					cpm = {
 						...defaultOptions,
 						name: col,
-						yAxis: 1
+						yAxis: 1,
+						visible: true
 					};
 					break;
 				case dataLabels.revenue:
 					revenue = {
 						...defaultOptions,
 						name: col,
-						yAxis: 2,
-						visible: true
+						yAxis: 2
 					};
 					break;
 				case dataLabels.pageCpm:
