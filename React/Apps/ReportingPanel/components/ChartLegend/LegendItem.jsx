@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col } from 'react-bootstrap'
+import commonConsts from '../../lib/commonConsts';
 
 class LegendItem extends Component {
     constructor(props) {
@@ -23,7 +24,8 @@ class LegendItem extends Component {
     render() {
         const { serie } = this.state,
             { toggleSerie } = this.props,
-            fontColor = '#555';
+            fontColor = '#555',
+            colWidth = commonConsts.IS_SUPERUSER ? 2 : 4;
 
         let style = {};
 
@@ -35,7 +37,7 @@ class LegendItem extends Component {
         }
 
         return (
-            <Col xs={2}>
+            <Col xs={colWidth}>
                 <div className="legend-item" onClick={this.toggleSerie} style={style}>
                     {serie.name}
                 </div>
