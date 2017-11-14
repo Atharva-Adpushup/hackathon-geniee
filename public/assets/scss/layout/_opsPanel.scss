@@ -1,3 +1,5 @@
+$grey: #bdc3c7;
+
 .ops-panel-links-container {
 	a li {
 		font-size: 18px;
@@ -54,4 +56,10 @@
 
 .pointer {
 	cursor: pointer;
+}
+
+.input-field {
+	width: 100%;
+	padding: 8px 10px;
+	border: 1px solid $grey;
 }

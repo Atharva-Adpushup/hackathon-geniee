@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import LinkList from './LinkList';
 import OpsPanel from './OpsPanel.jsx';
+import Settings from './Settings/index';
 import SitesMappingContainer from '../containers/sitesMappingContainer';
 class App extends Component {
 	constructor(props) {
@@ -14,6 +15,7 @@ class App extends Component {
 				<Switch>
 					<Route exact path="/ops" component={LinkList} />
 					<Route path="/ops/sitesMapping" component={SitesMappingContainer} />
+					<Route path="/ops/settings/:siteId" component={Settings} />
 					<Route path={`/ops/${window.siteId}/panel`} component={OpsPanel} />
 				</Switch>
 			</BrowserRouter>

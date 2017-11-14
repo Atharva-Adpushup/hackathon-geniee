@@ -2,6 +2,7 @@
     for site in validSites
         <!--.2.and.mb-30(class="{{ loop.length % loop.last ? 'col-xs-12' : 'col-xs-6' }}")-->
         - siteId = site.siteId;
+        - operationToolsPath = 'http://console.adpushup.com/tools?siteId=' + siteId;
 
         .col-sm-6
             .mb-30

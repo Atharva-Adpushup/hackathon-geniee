@@ -3,6 +3,7 @@ import _ from 'lodash';
 import clipboard from 'clipboard-polyfill';
 import moment from 'moment';
 import { Row, Col, Breadcrumb } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import '../../../ReportingPanel/styles.scss';
 import Datatable from 'react-bs-datatable';
 import { labels, headers, modes, statuses } from '../../configs/commonConsts';
@@ -14,13 +15,14 @@ import SelectBox from '../../../../Components/SelectBox/index.jsx';
 class SitesMapping extends Component {
 	constructor(props) {
 		super(props);
+		let loaded = this.props.sites && this.props.sites.length ? true : false;
 		this.state = {
-			loaded: false,
-			tableConfig: null,
-			hasSites: this.props.sites.length ? true : false,
-			mode: undefined,
-			status: undefined,
-			totalSites: 0
+			loaded: loaded,
+			tableConfig: loaded ? this.generateTableData(this.props.sites) : null,
+			hasSites: loaded,
+			mode: false,
+			status: false,
+			totalSites: loaded ? this.props.sites.length : 0
 		};
 		this.generateStatus = this.generateStatus.bind(this);
 		this.generateClickableSpan = this.generateClickableSpan.bind(this);
@@ -31,6 +33,14 @@ class SitesMapping extends Component {
 
 	componentDidMount() {
 		this.state.loaded ? null : this.props.fetchSites();
+	}
+
+	componentWillReceiveProps(nextProps) {
+		let hasSites = nextProps.sites && nextProps.sites.length ? true : false,
+			tableConfig = hasSites ? this.generateTableData(nextProps.sites) : {},
+			totalSites = hasSites ? nextProps.sites.length : 0;
+
+		this.setState({ loaded: true, hasSites, tableConfig, totalSites });
 	}
 
 	generateStatus(step) {
@@ -119,9 +129,24 @@ class SitesMapping extends Component {
 			data: []
 		};
 		tableConfig.data = _.map(sites, site => {
+			let rs =
+				site.adNetworkSettings && site.adNetworkSettings.revenueShare
+					? site.adNetworkSettings.revenueShare
+					: false;
 			return {
 				[labels['siteId']]: this.generateClickableSpan('site', site.siteId, this.clickHandler),
-				[labels['siteDomain']]: site.siteDomain,
+				[labels['siteDomain']]: (
+					<Link
+						to={{
+							pathname: `/ops/settings/${site.siteId}`,
+							state: {
+								rs: rs
+							}
+						}}
+					>
+						{site.siteDomain}
+					</Link>
+				),
 				[labels['ownerEmail']]: this.generateClickableSpan('email', site.ownerEmail, this.clickHandler),
 				[labels['mode']]: this.generateMode(site.apConfigs.mode),
 				[labels['channels']]:
@@ -145,14 +170,6 @@ class SitesMapping extends Component {
 		return tableConfig;
 	}
 
-	componentWillReceiveProps(nextProps) {
-		let hasSites = nextProps.sites && nextProps.sites.length ? true : false,
-			tableConfig = hasSites ? this.generateTableData(nextProps.sites) : {},
-			totalSites = hasSites ? nextProps.sites.length : 0;
-
-		this.setState({ loaded: true, hasSites, tableConfig, totalSites });
-	}
-
 	renderAggregatedData() {
 		return this.state.tableConfig.data ? (
 			<div>
@@ -166,11 +183,17 @@ class SitesMapping extends Component {
 		);
 	}
 
-	renderSelect(value, label, changeHandler, array) {
+	renderSelect(value, label, changeHandler, array, disabled) {
 		return (
 			<div>
 				<p>{label}</p>
-				<SelectBox value={value} label={label} onChange={changeHandler} onClear={changeHandler}>
+				<SelectBox
+					value={value}
+					label={label}
+					onChange={changeHandler}
+					onClear={changeHandler}
+					disabled={disabled}
+				>
 					{array.map((ele, index) => (
 						<option key={index} value={ele.value}>
 							{ele.name}
@@ -184,9 +207,23 @@ class SitesMapping extends Component {
 	renderFilters() {
 		return (
 			<div>
-				<Col xs={3}>{this.renderSelect(this.state.mode, 'Select Mode', this.modeChangeHandler, modes)}</Col>
 				<Col xs={3}>
-					{this.renderSelect(this.state.status, 'Select Status', this.statusChangeHandler, statuses)}
+					{this.renderSelect(
+						this.state.mode,
+						'Select Mode',
+						this.modeChangeHandler,
+						modes,
+						this.state.status
+					)}
+				</Col>
+				<Col xs={3}>
+					{this.renderSelect(
+						this.state.status,
+						'Select Status',
+						this.statusChangeHandler,
+						statuses,
+						this.state.mode
+					)}
 				</Col>
 			</div>
 		);
