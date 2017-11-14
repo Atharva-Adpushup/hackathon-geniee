@@ -5,6 +5,7 @@ const commonConsts = {
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
 	SITE_ID: window.siteId,
+	SITE_DOMAIN: window.siteDomain,
 	PAGEGROUPS: window.pageGroups,
 	IS_SUPERUSER: window.isSuperUser,
 	DATA_LABELS: {
