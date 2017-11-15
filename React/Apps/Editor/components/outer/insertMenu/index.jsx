@@ -70,57 +70,32 @@ class insertMenu extends React.Component {
 		});
 	}
 
-	createSectionAndAd(
-		params
-		// position,
-		// adCode,
-		// firstFold,
-		// asyncTag,
-		// customZoneId,
-		// priceFloor,
-		// networkFromDropdown,
-		// isHeaderBiddingActivated
-	) {
-		console.log(params);
-		// const props = this.props;
-		// let {
-		// 	position,
-		// 	adCode,
-		// 	firstFold,
-		// 	asyncTag,
-		// 	customZoneId,
-		// 	priceFloor,
-		// 	networkFromDropdown,
-		// 	isHeaderBiddingActivated
-		// } = params;
-		// let network = props.partner && props.partner === 'geniee' && !adCode ? 'geniee' : 'custom';
-		// network = networkFromDropdown ? networkFromDropdown : network;
-		// const sectionPayload = {
-		// 		position,
-		// 		firstFold: firstFold || false,
-		// 		asyncTag: asyncTag || false,
-		// 		xpath: this.props.parents[0].xpath,
-		// 		operation: this.state.operation,
-		// 		customZoneId: customZoneId || ''
-		// 	},
-		// 	adPayload = {
-		// 		isCustomSize: this.state.isCustomSize,
-		// 		adCode,
-		// 		network,
-		// 		height: this.state.adSize.height,
-		// 		width: this.state.adSize.width
-		// 	};
-		// customZoneId ? (adPayload.networkData = { zoneId: customZoneId }) : null;
-		// priceFloor && priceFloor.trim()
-		// 	? adPayload.networkData
-		// 		? ((adPayload.networkData.priceFloor = parseFloat(priceFloor)),
-		// 			(adPayload.networkData.headerBidding = !!isHeaderBiddingActivated))
-		// 		: (adPayload.networkData = {
-		// 				priceFloor: parseFloat(priceFloor),
-		// 				headerBidding: !!isHeaderBiddingActivated
-		// 			})
-		// 	: null;
-		// this.props.createSectionAndAd(sectionPayload, adPayload, this.props.variationId);
+	createSectionAndAd(params) {
+		const props = this.props;
+		let { position, adCode, firstFold, asyncTag, customZoneId, network, networkData } = params;
+		// let networkToSet = props.partner && props.partner === 'geniee' && !adCode ? 'geniee' : 'custom';
+		network = network ? network : 'custom';
+		const sectionPayload = {
+				position,
+				firstFold: firstFold || false,
+				asyncTag: asyncTag || false,
+				xpath: this.props.parents[0].xpath,
+				operation: this.state.operation,
+				customZoneId: customZoneId || ''
+			},
+			adPayload = {
+				isCustomSize: this.state.isCustomSize,
+				network,
+				height: this.state.adSize.height,
+				width: this.state.adSize.width,
+				networkData: {}
+			};
+		customZoneId ? (adPayload.networkData = { zoneId: customZoneId }) : null;
+		adPayload.networkData = {
+			...adPayload.networkData,
+			...networkData
+		};
+		this.props.createSectionAndAd(sectionPayload, adPayload, this.props.variationId);
 	}
 
 	enableNonPartnerAdSizes() {
@@ -136,7 +111,7 @@ class insertMenu extends React.Component {
 	}
 
 	networkOptionsSubmit(params) {
-		console.log(params);
+		this.createSectionAndAd(params);
 	}
 
 	render() {
