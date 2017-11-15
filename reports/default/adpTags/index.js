@@ -191,20 +191,15 @@ total_impressions ----> total_ad_requests
 total_requests ----> total_pageviews
 */
 
-let params = {
-	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid', 'ntwid'],
-	where: {
-		siteid: 31000
-	},
-	groupBy: ['ntwid', 'pagegroup']
-};
+// let params = {
+// 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid', 'ntwid'],
+// 	where: {
+// 		siteid: 31000
+// 	},
+// 	groupBy: ['ntwid', 'pagegroup']
+// };
 
-// Promise.all(
-// 	_.map([1, 2, 3], ele => {
-// 		params.ele = ele;
-// 		return generate(params);
-// 	})
-// )
+// generate(params)
 // 	.then(response => {
 // 		debugger;
 // 	})
@@ -212,57 +207,4 @@ let params = {
 // 		debugger;
 // 	});
 
-generate(params)
-	.then(response => {
-		debugger;
-	})
-	.catch(err => {
-		debugger;
-	});
-
 module.exports = { generate, getPVS };
-
-/**
-SELECT
-	SUM(a.total_requests) AS total_requests,
-	a.report_date,
-	a.siteid,
-	SUM(b.total_revenue) AS total_revenue,
-	SUM(b.total_impressions) AS total_impressions,
-	b.display_name
-FROM (
-	SELECT
-		SUM(c.total_requests) AS total_requests,
-		c.report_date,
-		c.siteid
-	FROM ApexHourlySiteReport c
-	WHERE
-		c.report_date BETWEEN '2017-11-07' AND '2017-11-13'
-		AND c.siteid = 31000
-	GROUP BY
-		c.report_date,
-		c.siteid
-) a
-INNER JOIN (
-	SELECT
-		SUM(h.total_revenue) AS total_revenue,
-		SUM(h.total_impressions) AS total_impressions,
-		h.report_date,
-		h.siteid,
-		i.display_name
-	FROM AdpTagReport h, Network i
-	WHERE
-		h.report_date BETWEEN '2017-11-07' AND '2017-11-13'
-		AND h.siteid = 31000
-		AND h.ntwid = i.ntwid
-	GROUP BY
-		h.report_date,
-		h.siteid,
-		h.display_name
-) b
-ON a.report_date = b.report_date AND a.siteid = b.siteid
-GROUP BY
-	a.report_date,
-	a.siteid,
-	b.display_name
-*/
