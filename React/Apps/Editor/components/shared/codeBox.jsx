@@ -101,7 +101,7 @@ class customCodeEditor extends React.Component {
 								</Col>
 								<Col xs={6}>
 									<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>
-										Cancel
+										{this.props.cancelText || 'Cancel'}
 									</Button>
 								</Col>
 							</Row>
@@ -124,7 +124,8 @@ customCodeEditor.propTypes = {
 	showButtons: PropTypes.bool,
 	parentExpanded: PropTypes.bool,
 	onSubmit: PropTypes.func,
-	onCancel: PropTypes.func
+	onCancel: PropTypes.func,
+	cancelText: PropTypes.string
 };
 
 export default customCodeEditor;
