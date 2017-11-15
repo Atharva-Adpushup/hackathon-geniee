@@ -196,7 +196,7 @@ let params = {
 	where: {
 		siteid: 31000
 	},
-	groupBy: ['ntwid']
+	groupBy: ['ntwid', 'pagegroup']
 };
 
 // Promise.all(
