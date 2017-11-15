@@ -333,18 +333,17 @@ $('document').ready(function() {
 							async: false,
 							success: function(res) {
 								if (res.success) {
-									if (!newSite.addOtherSite) {
-										var status = onboardingStages.siteAdded,
-											domain = newSite.viewObjects.origUnSavedDomain,
-											updateDealParams = {
-												status: status,
-												domain: domain
-											};
-										ob.updateCrmDealStatus(updateDealParams);
-										ob.analyticsEventEmitter({
-											step: 'Added Site'
-										});
-									}
+									var status = onboardingStages.siteAdded,
+										domain = newSite.viewObjects.origUnSavedDomain || site,
+										updateDealParams = {
+											status: status,
+											domain: domain
+										};
+									ob.updateCrmDealStatus(updateDealParams);
+									ob.analyticsEventEmitter({
+										step: 'Added Site'
+									});
+
 									$(btn).fadeOut(100);
 									ob.saveSiteModel(site, url, res.siteId, btn);
 									response = true;
@@ -378,13 +377,8 @@ $('document').ready(function() {
 					'success',
 					'slideDown'
 				);
-				if (newSite.addOtherSite) {
-					$(el)
-						.html('Setup Complete ' + ob.templates.checkIcon)
-						.after(ob.templates.dashboardLink);
-				} else {
-					$(el).html('Verified ' + ob.templates.checkIcon);
-				}
+
+				$(el).html('Verified ' + ob.templates.checkIcon);
 				ob.nextStep(3, 2, 1000);
 			},
 
@@ -406,13 +400,17 @@ $('document').ready(function() {
 								},
 								function(response) {
 									if (response.success) {
-										if (!newSite.addOtherSite) {
-											var status = onboardingStages.apCodeAdded;
-											ob.updateCrmDealStatus(status);
-											ob.analyticsEventEmitter({
-												step: 'Added AP Code'
-											});
-										}
+										var status = onboardingStages.apCodeAdded,
+											domain = newSite.addedSite.domain,
+											updateDealStatusParams = {
+												status: status,
+												domain: domain
+											};
+
+										ob.updateCrmDealStatus(updateDealStatusParams);
+										ob.analyticsEventEmitter({
+											step: 'Added AP Code'
+										});
 										ob.detectApSuccess(ob, el);
 									} else {
 										alert('Some error occurred!');
@@ -866,9 +864,9 @@ $('document').ready(function() {
 				var ob = this,
 					completeOnboarding = true;
 
-				if (newSite.addOtherSite) {
-					completeOnboarding = false;
-				}
+				// if (newSite.addOtherSite) {
+				// 	completeOnboarding = false;
+				// }
 
 				$.post(
 					'/user/setSiteStep',
@@ -879,22 +877,22 @@ $('document').ready(function() {
 					},
 					function(response) {
 						if (response.success) {
-							if (!newSite.addOtherSite) {
-								var status = onboardingStages.passback,
-									domain = newSite.addedSite.domain,
-									updateDealStatusParams = {
-										status: status,
-										domain: domain
-									};
-								ob.updateCrmDealStatus(updateDealStatusParams);
-								ob.analyticsEventEmitter(
-									{
-										stage: 'Post Onboarding',
-										step: 'Code Conversion'
-									},
-									1
-								);
-							}
+							var status = onboardingStages.passback,
+								domain = newSite.addedSite.domain,
+								updateDealStatusParams = {
+									status: status,
+									domain: domain
+								};
+
+							ob.updateCrmDealStatus(updateDealStatusParams);
+							ob.analyticsEventEmitter(
+								{
+									stage: 'Post Onboarding',
+									step: 'Code Conversion'
+								},
+								1
+							);
+
 							ob.setupCompleteAlert();
 						} else {
 							ap.apAlert('Some error has occurred!', '#apdetect', 'inverted', 'slideDown');
@@ -948,24 +946,18 @@ $('document').ready(function() {
 					},
 					function(response) {
 						if (response.success) {
-							if (!newSite.addOtherSite) {
-								var status = onboardingStages.apCodeAdded,
-									domain = newSite.addedSite.domain,
-									updateDealStatusParams = {
-										status: status,
-										domain: domain
-									};
-								ob.updateCrmDealStatus(updateDealStatusParams);
-								ob.analyticsEventEmitter({
-									step: 'Added AP Code'
-								});
-							}
+							var status = onboardingStages.apCodeAdded,
+								domain = newSite.addedSite.domain,
+								updateDealStatusParams = {
+									status: status,
+									domain: domain
+								};
+
+							ob.updateCrmDealStatus(updateDealStatusParams);
+							ob.analyticsEventEmitter({
+								step: 'Added AP Code'
+							});
 							ob.nextStep(3, 2, 1000);
-							// if (newSite.addOtherSite) {
-							//     ob.nextStep(6, 3, 1000);
-							// } else {
-							//     ob.nextStep(3, 2, 1000);
-							// }
 						} else {
 							alert('Some error occurred!');
 						}

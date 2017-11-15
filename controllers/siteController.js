@@ -257,12 +257,18 @@ router
 			.then(function(data) {
 				// Reset session on addition of new pagegroup for non-partner
 				var userSites = req.session.user.sites,
+					userEmail = req.session.user.email,
 					site = _.find(userSites, { siteId: parseInt(json.siteId) });
 
-				var index = _.findIndex(userSites, { siteId: parseInt(json.siteId) });
-				req.session.user.sites[index] = site;
+				return userModel
+					.setSitePageGroups(userEmail)
+					.then(user => user.save())
+					.then(() => {
+						var index = _.findIndex(userSites, { siteId: parseInt(json.siteId) });
+						req.session.user.sites[index] = site;
 
-				return res.redirect('/user/dashboard');
+						return res.redirect('/user/dashboard');
+					});
 			})
 			.catch(function(err) {
 				var error = err.message[0].message ? err.message[0].message : 'Some error occurred!';
