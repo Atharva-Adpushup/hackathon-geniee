@@ -37,6 +37,17 @@ body {
 .report-controls-wrapper {
 	margin: 20px 0;
 
+	.control-label {
+		font-size: 1.2em;
+		text-transform: capitalize;
+		font-weight: 700;
+		border-bottom: 1px solid $greyBorder;
+		margin-bottom: 10px;
+		padding-bottom: 5px;
+		display: block;
+		color: lighten($fontColor, 10%);
+	}
+
 	button.btn.btn-lightBg {
 		width: 100%;
 		padding: 7px 10px;
