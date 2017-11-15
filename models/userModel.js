@@ -344,7 +344,9 @@ function apiModule() {
 						};
 
 						return getUser.then(user => {
-							if (!isSiteValidated) {
+							const isAPIActivated = isPipeDriveAPIActivated();
+
+							if (!isSiteValidated || !isAPIActivated) {
 								return user;
 							}
 
