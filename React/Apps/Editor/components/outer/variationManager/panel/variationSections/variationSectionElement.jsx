@@ -21,14 +21,14 @@ class variationSectionElement extends Component {
 			network: this.props.section.ads[0].network,
 			priceFloor:
 				this.props.section.ads[0].networkData &&
-				this.props.section.ads[0].networkData.hasOwnProperty('priceFloor')
+					this.props.section.ads[0].networkData.hasOwnProperty('priceFloor')
 					? this.props.section.ads[0].networkData.priceFloor
 					: 0,
 			headerBidding:
 				this.props.section.ads[0].networkData &&
-				this.props.section.ads[0].networkData.hasOwnProperty('headerBidding')
+					this.props.section.ads[0].networkData.hasOwnProperty('headerBidding')
 					? this.props.section.ads[0].networkData.headerBidding
-					: true,
+					: false,
 			adCode: this.props.section.ads[0].adCode || ''
 		};
 
@@ -51,20 +51,20 @@ class variationSectionElement extends Component {
 	componentWillReceiveProps(nextProps) {
 		this.props.section.id != nextProps.section.id
 			? this.setState({
-					float: nextProps.section.float,
-					network: nextProps.section.ads[0].network,
-					priceFloor:
-						nextProps.section.ads[0].networkData &&
+				float: nextProps.section.float,
+				network: nextProps.section.ads[0].network,
+				priceFloor:
+					nextProps.section.ads[0].networkData &&
 						nextProps.section.ads[0].networkData.hasOwnProperty('priceFloor')
-							? nextProps.section.ads[0].networkData.priceFloor
-							: 0,
-					headerBidding:
-						nextProps.section.ads[0].networkData &&
+						? nextProps.section.ads[0].networkData.priceFloor
+						: 0,
+				headerBidding:
+					nextProps.section.ads[0].networkData &&
 						nextProps.section.ads[0].networkData.hasOwnProperty('headerBidding')
-							? nextProps.section.ads[0].networkData.headerBidding
-							: true,
-					adCode: nextProps.section.ads[0].adCode || ''
-				})
+						? nextProps.section.ads[0].networkData.headerBidding
+						: true,
+				adCode: nextProps.section.ads[0].adCode || ''
+			})
 			: null;
 	}
 
@@ -105,6 +105,7 @@ class variationSectionElement extends Component {
 	updateNetworkWrapper = () => {
 		let priceFloor = ReactDOM.findDOMNode(this.refs.priceFloor).value || 0;
 		this.setState({ priceFloor: priceFloor });
+		alert('Network settings updated!');
 		this.props.updateNetwork(
 			this.props.section.ads[0].id,
 			priceFloor,
@@ -214,11 +215,11 @@ class variationSectionElement extends Component {
 							<span>In-Content</span>
 						</label>
 					) : (
-						<label className="section-label section-structural">
-							<i className="fa fa-object-ungroup" />
-							<span>Structural {props.section.error}</span>
-						</label>
-					)}
+							<label className="section-label section-structural">
+								<i className="fa fa-object-ungroup" />
+								<span>Structural {props.section.error}</span>
+							</label>
+						)}
 					{isCustomZoneId ? (
 						<label className="u-margin-l5px section-label section-incontent">
 							<i className="fa fa-pencil" />
@@ -231,8 +232,8 @@ class variationSectionElement extends Component {
 							<span>Invalid XPath</span>
 						</label>
 					) : (
-						''
-					)}
+							''
+						)}
 					<Col className="u-padding-r10px section-name-ie" xs={12}>
 						<InlineEdit
 							validate
@@ -272,65 +273,65 @@ class variationSectionElement extends Component {
 								</Row>
 							</div>
 						) : (
-							<div>
-								<Row>
-									<Col className="u-padding-r10px" xs={7}>
-										Operation
-									</Col>
-									<Col className="u-padding-l10px" xs={5}>
-										<strong>{props.section.operation}</strong>
-									</Col>
-								</Row>
-							</div>
-						)}
-						{Object.keys(props.reporting).length &&
-						Object.keys(props.reporting.sections).length &&
-						props.reporting.sections[props.section.id] ? (
-							<div>
-								<Row>
-									<Col className="u-padding-r10px" xs={7}>
-										Total Impressions
-									</Col>
-									<Col className="u-padding-l10px" xs={5}>
-										<strong>
-											{props.reporting.sections[props.section.id].aggregate.total_impressions}
-										</strong>
-									</Col>
-								</Row>
-								{window.isSuperUser ? (
+								<div>
 									<Row>
 										<Col className="u-padding-r10px" xs={7}>
-											Total XPath Misses
+											Operation
+									</Col>
+										<Col className="u-padding-l10px" xs={5}>
+											<strong>{props.section.operation}</strong>
 										</Col>
+									</Row>
+								</div>
+							)}
+						{Object.keys(props.reporting).length &&
+							Object.keys(props.reporting.sections).length &&
+							props.reporting.sections[props.section.id] ? (
+								<div>
+									<Row>
+										<Col className="u-padding-r10px" xs={7}>
+											Total Impressions
+									</Col>
 										<Col className="u-padding-l10px" xs={5}>
 											<strong>
-												{props.reporting.sections[props.section.id].aggregate.total_xpath_miss}
+												{props.reporting.sections[props.section.id].aggregate.total_impressions}
 											</strong>
 										</Col>
 									</Row>
-								) : null}
-								<Row>
-									<Col className="u-padding-r10px" xs={7}>
-										Total CPM
+									{window.isSuperUser ? (
+										<Row>
+											<Col className="u-padding-r10px" xs={7}>
+												Total XPath Misses
+										</Col>
+											<Col className="u-padding-l10px" xs={5}>
+												<strong>
+													{props.reporting.sections[props.section.id].aggregate.total_xpath_miss}
+												</strong>
+											</Col>
+										</Row>
+									) : null}
+									<Row>
+										<Col className="u-padding-r10px" xs={7}>
+											Total CPM
 									</Col>
-									<Col className="u-padding-l10px" xs={5}>
-										<strong>
-											{props.reporting.sections[props.section.id].aggregate.total_cpm}
-										</strong>
+										<Col className="u-padding-l10px" xs={5}>
+											<strong>
+												{props.reporting.sections[props.section.id].aggregate.total_cpm}
+											</strong>
+										</Col>
+									</Row>
+									<Row>
+										<Col className="u-padding-r10px" xs={7}>
+											Total Revenue
 									</Col>
-								</Row>
-								<Row>
-									<Col className="u-padding-r10px" xs={7}>
-										Total Revenue
-									</Col>
-									<Col className="u-padding-l10px" xs={5}>
-										<strong>
-											{props.reporting.sections[props.section.id].aggregate.total_revenue}
-										</strong>
-									</Col>
-								</Row>
-							</div>
-						) : null}
+										<Col className="u-padding-l10px" xs={5}>
+											<strong>
+												{props.reporting.sections[props.section.id].aggregate.total_revenue}
+											</strong>
+										</Col>
+									</Row>
+								</div>
+							) : null}
 						{!props.section.isIncontent ? (
 							<Row>
 								<Col className="u-padding-t10px">
@@ -389,35 +390,35 @@ class variationSectionElement extends Component {
 									</Col>
 								</Row>
 							) : (
-								<Row>
-									<Col className="u-padding-r10px" xs={4}>
-										XPath
+									<Row>
+										<Col className="u-padding-r10px" xs={4}>
+											XPath
 									</Col>
-									<Col className="u-padding-l10px" xs={8}>
-										<InlineEdit
-											compact
-											validate
-											cancelEditHandler={props.onResetErrors.bind(null, props.section.id)}
-											customError={props.ui.errors.xpath ? props.ui.errors.xpath.error : false}
-											dropdownList={props.section.allXpaths}
-											value={props.section.xpath}
-											keyUpHandler={props.onValidateXPath.bind(null, props.section.id)}
-											submitHandler={props.onUpdateXPath.bind(null, props.section.id)}
-											editClickHandler={props.onSectionAllXPaths.bind(
-												null,
-												props.section.id,
-												props.section.xpath
-											)}
-											text="XPath"
-											errorMessage={
-												props.ui.errors.xpath && props.ui.errors.xpath.error
-													? props.ui.errors.xpath.message
-													: 'XPath cannot be blank'
-											}
-										/>
-									</Col>
-								</Row>
-							)}
+										<Col className="u-padding-l10px" xs={8}>
+											<InlineEdit
+												compact
+												validate
+												cancelEditHandler={props.onResetErrors.bind(null, props.section.id)}
+												customError={props.ui.errors.xpath ? props.ui.errors.xpath.error : false}
+												dropdownList={props.section.allXpaths}
+												value={props.section.xpath}
+												keyUpHandler={props.onValidateXPath.bind(null, props.section.id)}
+												submitHandler={props.onUpdateXPath.bind(null, props.section.id)}
+												editClickHandler={props.onSectionAllXPaths.bind(
+													null,
+													props.section.id,
+													props.section.xpath
+												)}
+												text="XPath"
+												errorMessage={
+													props.ui.errors.xpath && props.ui.errors.xpath.error
+														? props.ui.errors.xpath.message
+														: 'XPath cannot be blank'
+												}
+											/>
+										</Col>
+									</Row>
+								)}
 							<Row style={{ marginTop: 10 }}>
 								<Col className="u-padding-r10px" xs={4}>
 									Network
@@ -470,26 +471,26 @@ class variationSectionElement extends Component {
 											</div>
 										</div>
 									) : (
-										<div>
-											<Row>
-												<Col className="u-padding-r10px" xs={4}>
-													Ad Code
+											<div>
+												<Row>
+													<Col className="u-padding-r10px" xs={4}>
+														Ad Code
 												</Col>
-												<Col className="u-padding-l10px" xs={8}>
-													<InlineEdit
-														compact
-														validate
-														showTextarea
-														adCode
-														value={this.state.adCode}
-														submitHandler={this.onAdCodeChange}
-														text="Ad Code"
-														errorMessage="Ad Code cannot be blank"
-													/>
-												</Col>
-											</Row>
-										</div>
-									)
+													<Col className="u-padding-l10px" xs={8}>
+														<InlineEdit
+															compact
+															validate
+															showTextarea
+															adCode
+															value={this.state.adCode}
+															submitHandler={this.onAdCodeChange}
+															text="Ad Code"
+															errorMessage="Ad Code cannot be blank"
+														/>
+													</Col>
+												</Row>
+											</div>
+										)
 								) : null}
 							</Row>
 						</div>
