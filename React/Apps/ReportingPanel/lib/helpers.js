@@ -13,7 +13,7 @@ const apiQueryGenerator = params => {
 		from: moment(params.startDate).format('YYYY-MM-DD'),
 		to: moment(params.endDate).format('YYYY-MM-DD')
 	},
-		groupBy = [];
+		groupBy = [commonConsts.NETWORK_ID];
 
 	if (params.groupBy) {
 		groupBy.push(params.groupBy);
@@ -106,6 +106,7 @@ const apiQueryGenerator = params => {
 			}
 		}
 	},
+	isFloat = num => num % 1 === 0 ? false : true,
 	ajax = params => {
 		const { method, url, data } = params;
 
@@ -127,4 +128,4 @@ const apiQueryGenerator = params => {
 		});
 	};
 
-export { apiQueryGenerator, dataGenerator, capitalCase, ajax, reorderArray };
+export { apiQueryGenerator, dataGenerator, capitalCase, ajax, reorderArray, isFloat };
