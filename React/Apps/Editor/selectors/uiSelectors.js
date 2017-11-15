@@ -3,7 +3,7 @@ const getInsertMenuState = state => state.ui.insertMenu,
 	getNewChannelMenuState = state => state.ui.newChannelMenu,
 	getChannelMenuState = state => state.ui.channelMenu,
 	getSiteModesPopoverPosition = state => state.ui.siteModesPopover.position,
-	getAfterSaveLoaderState = state => state.ui.afterSaveLoader.status,
+	getAfterSaveLoaderState = state => state.ui.afterSaveLoader,
 	getSiteModesPopoverVisibility = state => state.ui.siteModesPopover.isVisible;
 
 export {
