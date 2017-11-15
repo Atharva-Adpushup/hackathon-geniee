@@ -363,16 +363,18 @@ const dataLabels = commonConsts.DATA_LABELS,
 			totalXpathMiss += xpathMiss;
 		});
 
-		body.push({
-			[dataLabels.date]: <Bold>{dataLabels.total}</Bold>,
-			[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
-			[dataLabels.pageCpm]: <Bold>{((totalRevenue / totalPageviews) * 1000).toFixed(2)}</Bold>,
-			[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
-			[dataLabels.cpm]: <Bold>{((totalRevenue / totalImpressions) * 1000).toFixed(2)}</Bold>,
-			[dataLabels.revenue]: <Bold>{totalRevenue.toFixed(2)}</Bold>,
-			[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
-			[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>
-		});
+		if (!groupBy) {
+			body.push({
+				[dataLabels.date]: <Bold>{dataLabels.total}</Bold>,
+				[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
+				[dataLabels.pageCpm]: <Bold>{((totalRevenue / totalPageviews) * 1000).toFixed(2)}</Bold>,
+				[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
+				[dataLabels.cpm]: <Bold>{((totalRevenue / totalImpressions) * 1000).toFixed(2)}</Bold>,
+				[dataLabels.revenue]: <Bold>{totalRevenue.toFixed(2)}</Bold>,
+				[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
+				[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>
+			});
+		}
 
 		return { header, body };
 	},
