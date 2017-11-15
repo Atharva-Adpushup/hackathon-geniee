@@ -59,10 +59,10 @@ class NetworkOptions extends Component {
 						}
 						headerBiddingFlag={
 							this.props.ad &&
-							this.props.ad.networkData &&
-							this.props.ad.networkData.hasOwnProperty('headerBidding')
+								this.props.ad.networkData &&
+								this.props.ad.networkData.hasOwnProperty('headerBidding')
 								? this.props.ad.networkData.headerBidding
-								: 1
+								: 0
 						}
 						showButtons={this.props.showButtons || true}
 						submitHandler={this.submitHandler}
