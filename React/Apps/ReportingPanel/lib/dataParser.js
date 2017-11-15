@@ -247,14 +247,16 @@ const dataLabels = commonConsts.DATA_LABELS,
 		let processedData = [];
 		const groupedData = groupBy(rows, commonConsts.API_DATA_PARAMS.date);
 		for (let date in groupedData) {
-			let row = {}, networkwiseImpressions = {}, networkwiseRevenue = {}, networkwiseCpm = {};
+			let row = {
+				total_gross_revenue: 0
+			}, networkwiseImpressions = {}, networkwiseRevenue = {}, networkwiseCpm = {};
 
 			each(groupedData[date], data => {
 				row.report_date = data.report_date;
 				row.siteid = data.siteid;
 				row.total_requests = data.total_requests;
 				row.total_xpath_miss = data.total_xpath_miss;
-				row.total_gross_revenue = data.total_gross_revenue;
+				row.total_gross_revenue += data.total_gross_revenue;
 
 				networkwiseImpressions[data.display_name] = data.total_impressions;
 				networkwiseRevenue[data.display_name] = data.total_revenue.toFixed(2);
@@ -263,7 +265,12 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 			row.total_impressions = React.cloneElement(<NetworkwiseData />, { networkData: networkwiseImpressions });
 			row.total_revenue = React.cloneElement(<NetworkwiseData />, { networkData: networkwiseRevenue });
-			row.cpm = React.cloneElement(<NetworkwiseData />, { networkData: networkwiseCpm });
+			row.cpm = React.cloneElement(<NetworkwiseData />, {
+				networkData: networkwiseCpm, cpmCalc: {
+					revenue: sumNetworkDataProp(row.total_revenue),
+					impressions: sumNetworkDataProp(row.total_impressions)
+				}
+			});
 
 			processedData.push(row);
 		}
@@ -386,27 +393,25 @@ const dataLabels = commonConsts.DATA_LABELS,
 				[dataLabels.pageCpm]: pageCpm
 			});
 
-			// totalPageviews += pageViews;
-			// totalPageCpm += pageCpm;
-			// totalImpressions += impressions;
-			// totalCpm += cpm;
-			// totalRevenue += revenue;
-			// totalGrossRevenue += grossRevenue;
-			// totalXpathMiss += xpathMiss;
+			totalPageviews += pageViews;
+			totalImpressions += sumNetworkDataProp(impressions);
+			totalRevenue += sumNetworkDataProp(revenue);
+			totalGrossRevenue += grossRevenue;
+			totalXpathMiss += xpathMiss;
 		});
 
-		// if (!groupBy) {
-		// 	body.push({
-		// 		[dataLabels.date]: <Bold>{dataLabels.total}</Bold>,
-		// 		[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
-		// 		[dataLabels.pageCpm]: <Bold>{((totalRevenue / totalPageviews) * 1000).toFixed(2)}</Bold>,
-		// 		[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
-		// 		[dataLabels.cpm]: <Bold>{((totalRevenue / totalImpressions) * 1000).toFixed(2)}</Bold>,
-		// 		[dataLabels.revenue]: <Bold>{totalRevenue.toFixed(2)}</Bold>,
-		// 		[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
-		// 		[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>
-		// 	});
-		// }
+		if (!groupBy) {
+			body.push({
+				[dataLabels.date]: <Bold>{dataLabels.total}</Bold>,
+				[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
+				[dataLabels.pageCpm]: <Bold>{((totalRevenue / totalPageviews) * 1000).toFixed(2)}</Bold>,
+				[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
+				[dataLabels.cpm]: <Bold>{((totalRevenue / totalImpressions) * 1000).toFixed(2)}</Bold>,
+				[dataLabels.revenue]: <Bold>{totalRevenue.toFixed(2)}</Bold>,
+				[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
+				[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>
+			});
+		}
 
 		return { header, body };
 	},
