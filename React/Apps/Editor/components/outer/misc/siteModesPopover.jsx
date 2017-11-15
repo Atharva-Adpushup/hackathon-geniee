@@ -93,6 +93,8 @@ class siteModesPopover extends React.Component {
 			setTimeout(() => {
 				if (confirm('Do you wish to pause AdPushup ?')) {
 					this.masterSave(siteModes.DRAFT);
+				} else {
+					this.props.hideMenu();
 				}
 			}, 0);
 
