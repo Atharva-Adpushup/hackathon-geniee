@@ -46,15 +46,22 @@ var Promise = require('bluebird'),
 				};
 				return Promise.resolve();
 			},
-			__reduceArrayToString = (array, alias) => {
-				return (
-					` ${alias}.` +
-					_.reduce(
-						array,
-						(accumulator, value, key) =>
-							value == undefined ? `${accumulator} ` : `${accumulator}, ${alias}.${value} `
-					)
-				);
+			__reduceArrayToString = (array, defaultAlias, fetchAlias) => {
+				// return (
+				// 	` ${alias}.` +
+				// 	_.reduce(array, (accumulator, value, key) => {
+				// 		let alias = fetchAlias ? __getAlias(value) || defaultAlias : defaultAlias;
+
+				// 		return value == undefined ? `${accumulator} ` : `${accumulator}, ${alias}.${value} `;
+				// 	})
+				// );
+				let alias,
+					response = '';
+				_.forEach(array, ele => {
+					alias = fetchAlias ? __getAlias(ele) || defaultAlias : defaultAlias;
+					response += ` ${alias}.${ele}, `;
+				});
+				return `${response.slice(0, -2)} `;
 			},
 			__reduceArrayToStringAggregate = (array, alias) => {
 				let response = ' ';
@@ -96,14 +103,26 @@ var Promise = require('bluebird'),
 				return alias;
 			},
 			__groupBy = () => {
+				// _.forEach(firstQuery.nonAggregate, field => {
+				// 	let alias = __getAlias(field);
+				// 	firstQuery.groupBy += `${alias ? alias : schema.firstQuery.tables.apexSiteReport.alias}.${field}, `;
+				// });
+
+				// _.forEach(secondQuery.nonAggregate, field => {
+				// 	let alias = __getAlias(field);
+				// 	firstQuery.groupBy += `${alias ? alias : schema.secondQuery.tables.adpTagReport.alias}.${field}, `;
+				// });
+
 				firstQuery.groupBy += __reduceArrayToString(
 					firstQuery.nonAggregate,
-					schema.firstQuery.tables.apexSiteReport.alias
+					schema.firstQuery.tables.apexSiteReport.alias,
+					true
 				);
-				secondQuery.groupBy += secondQuery.groupBy.length > 10 ? ' , ' : ' '; // Hack to add ,
+				// secondQuery.groupBy += secondQuery.groupBy.length > 10 ? ' , ' : ' '; // Hack to add ,
 				secondQuery.groupBy += __reduceArrayToString(
 					secondQuery.nonAggregate,
-					schema.secondQuery.tables.adpTagReport.alias
+					schema.secondQuery.tables.adpTagReport.alias,
+					true
 				);
 
 				if (common.level.section || common.level.variation || common.level.pagegroup) {
@@ -278,9 +297,10 @@ var Promise = require('bluebird'),
 							.network.alias}`;
 						secondQuery.where += ` AND ${schema.secondQuery.tables.adpTagReport.alias}.ntwid=${schema
 							.secondQuery.tables.network.alias}.ntwid`;
-						secondQuery.groupBy += ` ${__getAlias(field)}.${field}`;
 
-						secondQuery.nonAggregate = secondQuery.nonAggregate.filter(column => column != field);
+					// 	secondQuery.groupBy += ` ${__getAlias(field)}.${field}`;
+
+					// secondQuery.nonAggregate = secondQuery.nonAggregate.filter(column => column != field);
 				}
 			};
 		return {
