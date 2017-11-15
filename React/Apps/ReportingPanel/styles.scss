@@ -183,3 +183,9 @@ body {
 		margin-bottom: -2px;
 	}
 }
+
+.network-total {
+	padding-bottom: 3px;
+	border-bottom: 1px solid darken($greyBorder, 10%);
+	margin-bottom: 3px;
+}

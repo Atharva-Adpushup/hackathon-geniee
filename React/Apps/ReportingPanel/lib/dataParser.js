@@ -4,6 +4,7 @@ import commonConsts from './commonConsts';
 import { remove, map, each, groupBy, uniq, find } from 'lodash';
 import moment from 'moment';
 import Bold from '../../../Components/Bold.jsx';
+import NetworkwiseData from '../components/NetworkwiseData.jsx';
 
 const dataLabels = commonConsts.DATA_LABELS,
 	reorderColumns = cols => {
@@ -112,15 +113,12 @@ const dataLabels = commonConsts.DATA_LABELS,
 		return row1;
 	},
 	processChartGroupBy = (rows, groupByParam) => {
-		if (!groupByParam) {
-			return rows;
-		}
-
 		let updatedRows = [];
 
 		switch (groupByParam) {
 			case 'pagegroup':
 			case 'variation':
+			default:
 				const groupedRows = groupBy(rows, commonConsts.API_DATA_PARAMS.date);
 				for (let i in groupedRows) {
 					const arr = groupedRows[i];
@@ -245,9 +243,35 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 		return series;
 	},
+	networkWiseProcessing = rows => {
+		let processedData = [];
+		const groupedData = groupBy(rows, commonConsts.API_DATA_PARAMS.date);
+		for (let date in groupedData) {
+			let row = {}, networkwiseImpressions = {}, networkwiseRevenue = {}, networkwiseCpm = {};
+
+			each(groupedData[date], data => {
+				row.report_date = data.report_date;
+				row.siteid = data.siteid;
+				row.total_requests = data.total_requests;
+				row.total_xpath_miss = data.total_xpath_miss;
+				row.total_gross_revenue = data.total_gross_revenue;
+
+				networkwiseImpressions[data.display_name] = data.total_impressions;
+				networkwiseRevenue[data.display_name] = data.total_revenue.toFixed(2);
+				networkwiseCpm[data.display_name] = Number((data.total_revenue * 1000 / data.total_impressions).toFixed(2));
+			});
+
+			row.total_impressions = React.cloneElement(<NetworkwiseData />, { networkData: networkwiseImpressions });
+			row.total_revenue = React.cloneElement(<NetworkwiseData />, { networkData: networkwiseRevenue });
+			row.cpm = React.cloneElement(<NetworkwiseData />, { networkData: networkwiseCpm });
+
+			processedData.push(row);
+		}
+		return processedData;
+	},
 	processTableGroupBy = (header, rows, groupByParam, variations) => {
 		if (!groupByParam) {
-			return { header, rows };
+			return { header, rows: networkWiseProcessing(rows) };
 		}
 
 		let updatedRows = [];
@@ -292,6 +316,16 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 		return { header, rows: updatedRows };
 	},
+	sumNetworkDataProp = component => {
+		const { networkData } = component.props;
+
+		let sum = 0;
+		for (let i in networkData) {
+			sum += Number(networkData[i]);
+		}
+
+		return sum;
+	},
 	generateTableData = (cols, rows, groupBy, variations) => {
 		let header = [],
 			body = [];
@@ -330,15 +364,13 @@ const dataLabels = commonConsts.DATA_LABELS,
 		each(rows, row => {
 			const reportDate = row.report_date ? moment(row.report_date).format('DD-MM-YYYY') : undefined,
 				impressions = row.total_impressions || undefined,
-				cpm = row.total_revenue
-					? Number((row.total_revenue * 1000 / row.total_impressions).toFixed(2))
-					: undefined,
+				cpm = row.cpm || undefined,
 				xpathMiss = commonConsts.IS_SUPERUSER ? row.total_xpath_miss : undefined,
 				pageViews = commonConsts.IS_SUPERUSER ? row.total_requests : undefined,
-				revenue = row.total_revenue ? Number(row.total_revenue.toFixed(2)) : undefined,
+				revenue = row.total_revenue || undefined,
 				grossRevenue = row.total_gross_revenue ? Number(row.total_gross_revenue.toFixed(2)) : undefined,
 				pageCpm = row.total_revenue
-					? Number((row.total_revenue * 1000 / row.total_requests).toFixed(2))
+					? Number((sumNetworkDataProp(row.total_revenue) * 1000 / row.total_requests).toFixed(2))
 					: undefined;
 
 			body.push({
@@ -354,27 +386,27 @@ const dataLabels = commonConsts.DATA_LABELS,
 				[dataLabels.pageCpm]: pageCpm
 			});
 
-			totalPageviews += pageViews;
-			totalPageCpm += pageCpm;
-			totalImpressions += impressions;
-			totalCpm += cpm;
-			totalRevenue += revenue;
-			totalGrossRevenue += grossRevenue;
-			totalXpathMiss += xpathMiss;
+			// totalPageviews += pageViews;
+			// totalPageCpm += pageCpm;
+			// totalImpressions += impressions;
+			// totalCpm += cpm;
+			// totalRevenue += revenue;
+			// totalGrossRevenue += grossRevenue;
+			// totalXpathMiss += xpathMiss;
 		});
 
-		if (!groupBy) {
-			body.push({
-				[dataLabels.date]: <Bold>{dataLabels.total}</Bold>,
-				[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
-				[dataLabels.pageCpm]: <Bold>{((totalRevenue / totalPageviews) * 1000).toFixed(2)}</Bold>,
-				[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
-				[dataLabels.cpm]: <Bold>{((totalRevenue / totalImpressions) * 1000).toFixed(2)}</Bold>,
-				[dataLabels.revenue]: <Bold>{totalRevenue.toFixed(2)}</Bold>,
-				[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
-				[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>
-			});
-		}
+		// if (!groupBy) {
+		// 	body.push({
+		// 		[dataLabels.date]: <Bold>{dataLabels.total}</Bold>,
+		// 		[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
+		// 		[dataLabels.pageCpm]: <Bold>{((totalRevenue / totalPageviews) * 1000).toFixed(2)}</Bold>,
+		// 		[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
+		// 		[dataLabels.cpm]: <Bold>{((totalRevenue / totalImpressions) * 1000).toFixed(2)}</Bold>,
+		// 		[dataLabels.revenue]: <Bold>{totalRevenue.toFixed(2)}</Bold>,
+		// 		[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
+		// 		[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>
+		// 	});
+		// }
 
 		return { header, body };
 	},
