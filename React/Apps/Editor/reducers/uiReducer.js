@@ -122,7 +122,7 @@ const errorsConfig = {},
 	afterSaveLoader = (state = { status: 0 }, action) => {
 		switch (action.type) {
 			case uiActions.UPDATE_AFTER_SAVE_STATUS:
-				return { status: action.status };
+				return { status: action.status, msg: action.msg };
 
 			default:
 				return state;
