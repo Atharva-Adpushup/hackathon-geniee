@@ -48,13 +48,13 @@ class sectionOptions extends React.Component {
 	}
 
 	onSave() {
-		this.props.onCreateAd(
-			this.state.position,
-			this.state.customAdCode,
-			this.state.isAdInFirstFold,
-			this.state.isAdAsync,
-			this.state.customZoneId
-		);
+		this.props.onCreateAd({
+			position: this.state.position,
+			adCode: this.state.customAdCode,
+			firstFold: this.state.isAdInFirstFold,
+			asyncTag: this.state.isAdAsync,
+			customZoneId: this.state.customZoneId
+		});
 	}
 
 	onChange(position) {
