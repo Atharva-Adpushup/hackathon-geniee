@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import { Row, Col, Button } from 'react-bootstrap';
+import CodeBox from 'shared/codeBox';
 import { priceFloorKeys } from '../../../consts/commonConsts';
 import SelectBox from 'shared/select/select.js';
 import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
@@ -9,14 +10,26 @@ class AdpTags extends Component {
 	constructor(props) {
 		super(props);
 		const { priceFloorFromProps, headerBiddingFlag } = props;
-		this.state = { fpKey: 'FP_SA', hbAcivated: headerBiddingFlag, pf: priceFloorFromProps };
+		this.state = {
+			fpKey: 'FP_SA',
+			hbAcivated: headerBiddingFlag,
+			pf: priceFloorFromProps,
+			advanced: false,
+			keyValues: {}
+		};
 		this.save = this.save.bind(this);
 		this.renderButtons = this.renderButtons.bind(this);
+		this.renderNonAdvanced = this.renderNonAdvanced.bind(this);
+		this.toggleAdvance = this.toggleAdvance.bind(this);
 	}
 
 	save() {
 		const { fpKey, hbAcivated, pf } = this.state;
 		this.props.submitHandler(pf, false, hbAcivated);
+	}
+
+	toggleAdvance() {
+		this.setState({ advanced: !this.state.advanced });
 	}
 
 	renderEditMenuButtons(showButtons = true, submitHandler, cancelHandler) {
@@ -58,10 +71,10 @@ class AdpTags extends Component {
 			: this.renderNormalSaveButton(showButtons, submitHandler, cancelHandler);
 	}
 
-	render() {
-		const { showButtons, submitHandler, onCancel, priceFloorFromProps, headerBiddingFlag } = this.props;
+	renderNonAdvanced() {
+		const { showButtons, onCancel } = this.props;
 		return (
-			<div className="mB-10 mT-10">
+			<div>
 				<Row>
 					<Col xs={6}>
 						<strong>Price Floor Key</strong>
@@ -118,8 +131,35 @@ class AdpTags extends Component {
 						/>
 					</Col>
 				</Row>
+				<Row>
+					<Col xs={6} xsPush={6}>
+						<Button className="btn-lightBg btn-edit btn-block" onClick={this.toggleAdvance}>
+							Advanced
+						</Button>
+					</Col>
+				</Row>
 				<div>{this.renderButtons(1, showButtons, this.save, onCancel)}</div>
 			</div>
+		);
+	}
+
+	renderAdvanced() {
+		return (
+			<div>
+				<CodeBox
+					showButtons={true}
+					onSubmit={this.handleAdvance}
+					onCancel={this.toggleAdvance}
+					size="small"
+					cancelText="Back"
+				/>
+			</div>
+		);
+	}
+
+	render() {
+		return (
+			<div className="mB-10 mT-10">{this.state.advanced ? this.renderAdvanced() : this.renderNonAdvanced()}</div>
 		);
 	}
 }
