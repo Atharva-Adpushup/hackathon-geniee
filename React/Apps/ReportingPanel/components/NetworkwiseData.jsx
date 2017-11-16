@@ -1,5 +1,6 @@
 import React from 'react';
 import Bold from '../../../Components/Bold.jsx';
+import CollapsePanel from '../../../Components/CollapsePanel.jsx';
 import { capitalCase, isFloat } from '../lib/helpers';
 import commonConsts from '../lib/commonConsts';
 
@@ -20,13 +21,16 @@ const NetworkwiseData = props => {
         total += (revenue * 1000) / impressions;
     }
 
-    return (<div>
-        <div className="network-total"><Bold>Total</Bold> : {isFloat(total) ? total.toFixed(2) : total}</div>
-        {(
-            networkDataArr.map((data, key) => {
-                return <div key={key}>{data}</div>
-            })
-        )}
+    const title = <div>{isFloat(total) ? total.toFixed(2) : total}</div>;
+
+    return (<div style={{ width: '150px' }}>
+        <CollapsePanel title={title}>
+            {(
+                networkDataArr.map((data, key) => {
+                    return <div key={key}>{data}</div>
+                })
+            )}
+        </CollapsePanel>
     </div>);
 };
 

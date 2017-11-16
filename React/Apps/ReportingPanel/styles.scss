@@ -184,8 +184,19 @@ body {
 	}
 }
 
-.network-total {
-	padding-bottom: 3px;
-	border-bottom: 1px solid darken($greyBorder, 10%);
-	margin-bottom: 3px;
+._collapse-panel {
+	.panel {
+		border: none;
+		margin: 0;
+		border-top: 1px solid darken($greyBorder, 10%);
+		border-radius: 0;
+		margin-top: 3px;
+		box-shadow: none;
+
+		.panel-body {
+			padding: 10px;
+			background-color: $greyBg;
+			border: 1px solid darken($greyBorder, 10%);
+		}
+	}
 }
