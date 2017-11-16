@@ -7,7 +7,7 @@ const Promise = require('bluebird'),
 	sqlReportingModule = require('../../reports/default/adpTags/index'),
 	couchBaseService = require('../../helpers/couchBaseService'),
 	couchbasePromise = require('couchbase-promises'),
-	usersByNonEmptyChannelsQuery = couchbasePromise.ViewQuery.from('app', 'usersByNonEmptyChannels'),
+	usersByNonEmptySitesQuery = couchbasePromise.ViewQuery.from('app', 'usersByNonEmptySites'),
 	userModel = require('../../models/userModel'),
 	siteModel = require('../../models/siteModel'),
 	channelModel = require('../../models/channelModel');
@@ -17,7 +17,7 @@ function formatQueryResult(resultData) {
 }
 
 function getAllValidUsers() {
-	const performQuery = couchBaseService.queryViewFromAppBucket(usersByNonEmptyChannelsQuery);
+	const performQuery = couchBaseService.queryViewFromAppBucket(usersByNonEmptySitesQuery);
 
 	return Promise.resolve(performQuery).then(formatQueryResult);
 }
