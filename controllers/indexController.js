@@ -293,15 +293,25 @@ function preOnboardingPageRedirection(page, req, res) {
 		},
 		isUserSession = !!(req.session && req.session.user),
 		isNotSuperUser = !!(isUserSession && !req.session.isSuperUser),
-		isPipeDriveDealId = !!(isAnalyticsObj && isUserSession && req.session.user.crmDealId),
-		isPipeDriveDealTitle = !!(isAnalyticsObj && isUserSession && req.session.user.crmDealTitle);
+		isPipeDriveDealId = !!(
+			isAnalyticsObj &&
+			primarySiteDetails &&
+			primarySiteDetails.pipeDrive &&
+			primarySiteDetails.pipeDrive.dealId
+		),
+		isPipeDriveDealTitle = !!(
+			isAnalyticsObj &&
+			primarySiteDetails &&
+			primarySiteDetails.pipeDrive &&
+			primarySiteDetails.pipeDrive.dealTitle
+		);
 
 	if (isPipeDriveDealId) {
-		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = req.session.user.crmDealId;
+		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = primarySiteDetails.pipeDrive.dealId;
 	}
 
 	if (isPipeDriveDealTitle) {
-		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = req.session.user.crmDealTitle;
+		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = primarySiteDetails.pipeDrive.dealTitle;
 	}
 
 	if (isNotSuperUser) {
