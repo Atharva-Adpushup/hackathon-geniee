@@ -292,22 +292,18 @@ router
 			});
 	})
 	.get('/addSite', function(req, res) {
-		if (req.session.isSuperUser) {
-			var allUserSites = req.session.user.sites,
-				params = {};
-			_.map(allUserSites, function(site) {
-				if (site.step == 1) {
-					params = {
-						siteDomain: site.domain,
-						siteId: site.siteId,
-						step: site.step
-					};
-				}
-			});
-			res.render('addSite', params);
-		} else {
-			res.redirect('/403');
-		}
+		var allUserSites = req.session.user.sites,
+			params = {};
+		_.map(allUserSites, function(site) {
+			if (site.step == 1) {
+				params = {
+					siteDomain: site.domain,
+					siteId: site.siteId,
+					step: site.step
+				};
+			}
+		});
+		res.render('addSite', params);
 	})
 	.post('/addSite', function(req, res) {
 		var site = req.body.site ? utils.getSafeUrl(req.body.site) : req.body.site;
