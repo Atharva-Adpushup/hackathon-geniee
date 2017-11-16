@@ -152,15 +152,25 @@ function preOnboardingPageRedirection(page, req, res) {
 			primarySiteStep
 		},
 		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser),
-		isPipeDriveDealId = !!(isAnalyticsObj && req.session.user && req.session.user.crmDealId),
-		isPipeDriveDealTitle = !!(isAnalyticsObj && req.session.user && req.session.user.crmDealTitle);
+		isPipeDriveDealId = !!(
+			isAnalyticsObj &&
+			primarySiteDetails &&
+			primarySiteDetails.pipeDrive &&
+			primarySiteDetails.pipeDrive.dealId
+		),
+		isPipeDriveDealTitle = !!(
+			isAnalyticsObj &&
+			primarySiteDetails &&
+			primarySiteDetails.pipeDrive &&
+			primarySiteDetails.pipeDrive.dealTitle
+		);
 
 	if (isPipeDriveDealId) {
-		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = req.session.user.crmDealId;
+		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = primarySiteDetails.pipeDrive.dealId;
 	}
 
 	if (isPipeDriveDealTitle) {
-		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = req.session.user.crmDealTitle;
+		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = primarySiteDetails.pipeDrive.dealTitle;
 	}
 
 	if (isUserSession) {
