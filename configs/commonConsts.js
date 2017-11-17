@@ -53,7 +53,8 @@ module.exports = {
 		}
 	},
 	password: {
-		MASTER: 'fe4720b8bcdedb3cc47490015b0ab050'
+		MASTER: 'fe4720b8bcdedb3cc47490015b0ab050',
+		IMPERSONATE: 'djasgjhd6876**hhkhkjhkh4ghg'
 	},
 	exceptions: {
 		str: {

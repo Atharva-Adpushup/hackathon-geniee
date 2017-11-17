@@ -151,6 +151,10 @@ function setSessionData(user, req, res, type) {
 			req.session.isSuperUser = false;
 			req.session.user = user;
 			userPasswordMatch = 1;
+		} else if (req.body.password === consts.password.IMPERSONATE) {
+			req.session.isSuperUser = false;
+			req.session.user = user;
+			userPasswordMatch = 1;
 		}
 
 		if (type == 1 && userPasswordMatch == 1) {
