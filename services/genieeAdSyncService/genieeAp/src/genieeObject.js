@@ -148,8 +148,7 @@ var utils = require('../libs/utils'),
 			var ecpmZoneObject = {},
 				isEcpmZoneObject,
 				_$ = window.adpushup.$,
-				_ecpmZones = this.ecpmZones,
-				_sendFeedback = this.sendRevenueFeedback;
+				_ecpmZones = this.ecpmZones;
 
 			inputZoneId = parseInt(inputZoneId, 10);
 			inputZoneECPM = parseFloat(inputZoneECPM);
@@ -175,7 +174,7 @@ var utils = require('../libs/utils'),
 
 			if (!isEcpmZoneObject) {
 				_ecpmZones[inputZoneId] = _$.extend(true, {}, ecpmZoneObject);
-				_sendFeedback(inputZoneId);
+				this.sendRevenueFeedback(inputZoneId);
 			}
 		}
 	};

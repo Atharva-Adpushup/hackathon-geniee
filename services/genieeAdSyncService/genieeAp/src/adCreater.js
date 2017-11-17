@@ -130,7 +130,12 @@ var $ = require('jquery'),
 				// for this ad
 				adObject.isImpressionFeedback = false;
 
-				!isGenieeAdsObject ? (adp.geniee.ads = {}) : null;
+				if (!isGenieeAdsObject) {
+					adp.geniee = {
+						ads: {}
+					};
+				}
+
 				adp.geniee.ads[zoneId] = adObject;
 				adp.geniee.sendRevenueFeedback ? adp.geniee.sendRevenueFeedback(zoneId) : null;
 			},
