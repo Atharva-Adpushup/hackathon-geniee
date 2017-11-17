@@ -110,7 +110,8 @@ var utils = require('../libs/utils'),
 				},
 				matchedAdData,
 				matchedEcpmZoneData,
-				resultObject;
+				resultObject,
+				revenueNumber;
 
 			utils.log('KeenIOImpressionRequest: Ads data value: ', _ads);
 			utils.log('KeenIOImpressionRequest: Ecpm zones value: ', _ecpmZones);
@@ -127,14 +128,16 @@ var utils = require('../libs/utils'),
 				return false;
 			}
 
+			revenueNumber = Number((matchedEcpmZoneData.revenue / 1000).toFixed(2));
+
 			resultObject = {
 				variationId: globalConfig.selectedVariation,
 				eventType: 11,
 				adId: matchedAdData.id,
 				adSize: matchedAdData.size,
 				containerId: matchedAdData.containerId,
-				revenue: matchedEcpmZoneData.revenue,
-				adZoneId: matchedEcpmZoneData.zoneId
+				revenue: revenueNumber,
+				adZoneId: matchedEcpmZoneData.id
 			};
 			utils.log('KeenIOImpressionRequest: Matched zone id data: ', resultObject);
 
