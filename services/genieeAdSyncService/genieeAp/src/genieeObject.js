@@ -137,7 +137,7 @@ var utils = require('../libs/utils'),
 				adSize: matchedAdData.size,
 				containerId: matchedAdData.containerId,
 				revenue: revenueNumber,
-				adZoneId: matchedEcpmZoneData.id
+				adZoneId: matchedEcpmZoneData.zoneId
 			};
 			utils.log('KeenIOImpressionRequest: Matched zone id data: ', resultObject);
 
