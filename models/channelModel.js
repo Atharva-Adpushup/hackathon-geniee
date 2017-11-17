@@ -99,6 +99,8 @@ function apiModule() {
 						throw new AdPushupError([{ status: 403, message: 'This pagegroup type already exists' }]);
 					}
 					channels.push(channel);
+					site.set('channels', channels);
+					console.log('siteJSON after createPageGroup before db save: ', JSON.stringify(site.toJSON()));
 
 					channelData = {
 						siteDomain: site.data.siteDomain,
@@ -111,13 +113,19 @@ function apiModule() {
 						genieePageGroupId: json.pageGroupId,
 						variations: {}
 					};
-
-					return API.saveChannel(json.siteId, json.device, json.pageGroupName, channelData).then(function(
-						res
-					) {
-						site.save();
-						return res.data;
-					});
+					return site
+						.save()
+						.then(() => {
+							return siteModel.getSiteById(json.siteId).then(site => {
+								console.log(
+									'siteJSON loaded from db after createPageGroup: ',
+									JSON.stringify(site.toJSON())
+								);
+								return true;
+							});
+						})
+						.then(() => API.saveChannel(json.siteId, json.device, json.pageGroupName, channelData))
+						.then(res => res.data);
 				});
 			});
 		},

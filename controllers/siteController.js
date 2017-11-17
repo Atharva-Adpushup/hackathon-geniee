@@ -252,9 +252,11 @@ router
 	})
 	.post('/:siteId/createPagegroup', function(req, res) {
 		var json = req.body;
+		console.log('Inside CreatePagegroup');
 		return channelModel
 			.createPageGroup(json)
 			.then(function(data) {
+				console.log('PageGroup Creation Done');
 				// Reset session on addition of new pagegroup for non-partner
 				var userSites = req.session.user.sites,
 					userEmail = req.session.user.email,
