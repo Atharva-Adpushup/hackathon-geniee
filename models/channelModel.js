@@ -74,6 +74,8 @@ function apiModule() {
 						channelData,
 						channels = site.get('channels');
 
+					console.log('createPageGroup JSON: ', JSON.stringify(json));
+					console.log('siteJSON before createPageGroup: ', JSON.stringify(site.toJSON()));
 					if (!site.get('cmsInfo')) {
 						site.set('cmsInfo', { cmsName: '', pageGroups: [] });
 					}
