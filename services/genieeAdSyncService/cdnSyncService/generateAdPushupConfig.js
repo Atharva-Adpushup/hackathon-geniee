@@ -58,17 +58,7 @@ const _ = require('lodash'),
 				});
 			}
 			//for geniee provide networkData
-			if (ad.network == 'geniee' && ad.networkData) {
-				json.networkData = {
-					zoneId: ad.networkData.zoneId
-				};
-			} else if (ad.network == 'adpTags') {
-				json.networkData = {
-					dfpAdunit: ad.networkData.dfpAdunit,
-					dfpAdunitCode: ad.networkData.dfpAdunitCode,
-					headerBidding: ad.networkData.headerBidding,
-					priceFloor: ad.networkData.priceFloor
-				};
+			if (ad.network == 'adpTags') {
 				ADPTags.push({
 					key: `${json.width}x${json.height}`,
 					height: json.height,
@@ -76,9 +66,9 @@ const _ = require('lodash'),
 					dfpAdunit: ad.networkData.dfpAdunit,
 					dfpAdunitCode: ad.networkData.dfpAdunitCode
 				});
-			} else {
-				json.adCode = ad.adCode;
 			}
+			//Sending whole network data object in ad.
+			json.networkData = ad.networkData;
 
 			ads.push(json);
 		});
