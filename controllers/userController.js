@@ -77,7 +77,13 @@ function dashboardRedirection(req, res, allUserSites, type) {
 
 		let siteReports = [];
 
-		return Promise.each(sites, site => getWeeklyComparisionReport(site.siteId).then(data => siteReports.push(data)))
+		return Promise.each(sites, site =>
+			getWeeklyComparisionReport(site.siteId)
+				.then(data => siteReports.push(data))
+				.catch(() => {
+					return true;
+				})
+		)
 			.then(() => {
 				sites = _.map(sites, site => {
 					const reportData = _.find(siteReports, { siteId: site.siteId });
