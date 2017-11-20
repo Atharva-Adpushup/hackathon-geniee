@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import { Row, Col, Button } from 'react-bootstrap';
+import _ from 'lodash';
 import CodeBox from 'shared/codeBox';
 import { priceFloorKeys } from '../../../consts/commonConsts';
 import SelectBox from 'shared/select/select.js';
@@ -9,27 +10,55 @@ import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
 class AdpTags extends Component {
 	constructor(props) {
 		super(props);
-		const { priceFloorFromProps, headerBiddingFlag } = props;
+		const { fpKey, priceFloor, headerBidding, code } = props;
 		this.state = {
-			fpKey: 'FP_SA',
-			hbAcivated: headerBiddingFlag,
-			pf: priceFloorFromProps,
+			fpKey: fpKey,
+			hbAcivated: headerBidding,
+			pf: priceFloor,
 			advanced: false,
-			keyValues: {}
+			keyValues: !code
+				? {
+						[fpKey]: priceFloor
+					}
+				: code
 		};
 		this.save = this.save.bind(this);
 		this.renderButtons = this.renderButtons.bind(this);
 		this.renderNonAdvanced = this.renderNonAdvanced.bind(this);
 		this.toggleAdvance = this.toggleAdvance.bind(this);
+		this.advanceSubmit = this.advanceSubmit.bind(this);
+		this.filterKeyValues = this.filterKeyValues.bind(this);
+	}
+
+	filterKeyValues(keyValues) {
+		let response = {};
+		_.forEach(keyValues, (value, key) => {
+			if (priceFloorKeys.indexOf(key) == -1) {
+				response[key] = value;
+			}
+		});
+		return response;
 	}
 
 	save() {
-		const { fpKey, hbAcivated, pf } = this.state;
-		this.props.submitHandler(pf, false, hbAcivated);
+		const { fpKey, hbAcivated, pf, keyValues } = this.state;
+		this.props.submitHandler({
+			headerBidding: !!hbAcivated,
+			keyValues: {
+				...this.filterKeyValues(keyValues),
+				[fpKey]: pf
+			}
+		});
 	}
 
 	toggleAdvance() {
 		this.setState({ advanced: !this.state.advanced });
+	}
+
+	advanceSubmit(keyValues) {
+		keyValues = atob(keyValues);
+		keyValues = typeof keyValues != 'object' ? JSON.parse(keyValues) : keyValues;
+		this.setState({ keyValues: keyValues }, this.save);
 	}
 
 	renderEditMenuButtons(showButtons = true, submitHandler, cancelHandler) {
@@ -73,6 +102,7 @@ class AdpTags extends Component {
 
 	renderNonAdvanced() {
 		const { showButtons, onCancel } = this.props;
+
 		return (
 			<div>
 				<Row>
@@ -144,16 +174,21 @@ class AdpTags extends Component {
 	}
 
 	renderAdvanced() {
+		let code = btoa(
+			JSON.stringify({
+				...this.filterKeyValues(this.state.keyValues),
+				[this.state.fpKey]: this.state.pf
+			})
+		);
 		return (
-			<div>
-				<CodeBox
-					showButtons={true}
-					onSubmit={this.handleAdvance}
-					onCancel={this.toggleAdvance}
-					size="small"
-					cancelText="Back"
-				/>
-			</div>
+			<CodeBox
+				showButtons={true}
+				onSubmit={this.advanceSubmit}
+				onCancel={this.toggleAdvance}
+				size="small"
+				cancelText="Back"
+				code={code}
+			/>
 		);
 	}
 
