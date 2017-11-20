@@ -1,6 +1,12 @@
 const commonConsts = {
-	SELECT: ['total_xpath_miss', 'total_impressions', 'total_revenue', 'total_requests', 'total_gross_revenue'],
+	SELECT: ['total_xpath_miss', 'total_impressions', 'total_revenue', 'total_requests', 'total_gross_revenue', 'ntwid'],
 	PLATFORMS: ['DESKTOP', 'MOBILE', 'TABLET'],
+	NETWORK_ID: 'ntwid',
+	NETWORKS: {
+		adsense: 'adsense',
+		adx: 'adx',
+		dfp: 'dfp'
+	},
 	GROUP_BY: ['pagegroup'],
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,

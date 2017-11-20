@@ -13,7 +13,7 @@ const apiQueryGenerator = params => {
 		from: moment(params.startDate).format('YYYY-MM-DD'),
 		to: moment(params.endDate).format('YYYY-MM-DD')
 	},
-		groupBy = [];
+		groupBy = [commonConsts.NETWORK_ID];
 
 	if (params.groupBy) {
 		groupBy.push(params.groupBy);
@@ -47,7 +47,7 @@ const apiQueryGenerator = params => {
 			.map(word => word[0].toUpperCase() + word.substr(1))
 			.join(' ');
 	},
-	dataGenerator = (data, groupBy, variations) => {
+	dataGenerator = (data, groupBy, variations, customToggleOptions) => {
 		let config = {
 			title: {
 				text: ''
@@ -91,7 +91,7 @@ const apiQueryGenerator = params => {
 			tableData = null;
 
 		if (!data.error) {
-			const parsedData = dataParser(data, groupBy, variations);
+			const parsedData = dataParser(data, groupBy, variations, customToggleOptions);
 			chartData = parsedData.chartConfig;
 			tableData = parsedData.tableConfig;
 		}
@@ -106,6 +106,7 @@ const apiQueryGenerator = params => {
 			}
 		}
 	},
+	isFloat = num => num % 1 === 0 ? false : true,
 	ajax = params => {
 		const { method, url, data } = params;
 
@@ -127,4 +128,4 @@ const apiQueryGenerator = params => {
 		});
 	};
 
-export { apiQueryGenerator, dataGenerator, capitalCase, ajax, reorderArray };
+export { apiQueryGenerator, dataGenerator, capitalCase, ajax, reorderArray, isFloat };
