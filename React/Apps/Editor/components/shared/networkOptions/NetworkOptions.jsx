@@ -5,6 +5,7 @@ import CodeBox from 'shared/codeBox';
 import SelectBox from 'shared/select/select';
 import AdpTags from './AdpTags';
 import Adsense from './Adsense';
+import OtherNetworks from './OtherNetworks';
 import AdX from './AdX';
 
 class NetworkOptions extends Component {
@@ -38,7 +39,6 @@ class NetworkOptions extends Component {
 	}
 
 	networkChangeHandler(value) {
-		console.log(value);
 		this.setState({ network: value });
 	}
 
@@ -55,13 +55,8 @@ class NetworkOptions extends Component {
 				this.props.ad.networkData && this.props.ad.networkData.keyValues
 					? this.props.ad.networkData.keyValues
 					: false;
-		} else if (this.state.network == 'adsense' || this.state.network == 'adx') {
-			code = this.props.ad.networkData && this.props.ad.networkData.adCode ? this.props.ad.networkData : false;
 		} else {
-			code =
-				this.props.ad.networkData && this.props.ad.networkData.adCode
-					? this.props.ad.networkData.adCode
-					: false;
+			code = this.props.ad.networkData && this.props.ad.networkData.adCode ? this.props.ad.networkData : false;
 		}
 		return code;
 	}
@@ -82,8 +77,6 @@ class NetworkOptions extends Component {
 				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('headerBidding')
 					? this.props.ad.networkData.headerBidding
 					: true;
-
-		console.log(code);
 
 		switch (this.state.network) {
 			case 'adpTags':
@@ -107,17 +100,7 @@ class NetworkOptions extends Component {
 			case 'custom':
 			case 'dfp':
 			default:
-				return (
-					<div className="mT-10">
-						<CodeBox
-							showButtons={this.props.showButtons || true}
-							onSubmit={this.adCodeSubmit}
-							onCancel={this.props.onCancel}
-							code={code}
-							size="small"
-						/>
-					</div>
-				);
+				return <OtherNetworks code={code} submitHandler={this.submitHandler} onCancel={this.props.onCancel} />;
 				break;
 		}
 	}

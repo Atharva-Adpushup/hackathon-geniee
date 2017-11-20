@@ -29,8 +29,6 @@ class AdX extends Component {
 	getAdUnitId(value) {
 		let matchedItems = value.match(/([A-Z])\w+/g),
 			adunitId = matchedItems.length ? matchedItems[0] : '';
-
-		console.log(matchedItems, adunitId);
 		return adunitId;
 	}
 
