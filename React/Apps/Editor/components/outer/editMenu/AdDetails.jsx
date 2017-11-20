@@ -8,6 +8,19 @@ class AdDetails extends Component {
 	}
 	render() {
 		const { ad, editCss, editNetwork, userType } = this.props;
+		let pfKeyExists =
+				this.props.ad.networkData &&
+				this.props.ad.networkData.keyValues &&
+				Object.keys(this.props.ad.networkData.keyValues).length,
+			fpKey = pfKeyExists
+				? Object.keys(this.props.ad.networkData.keyValues).filter(key => key.match(/FP/g)) || 'FP_SA'
+				: 'FP_SA',
+			priceFloor = pfKeyExists ? this.props.ad.networkData.keyValues[fpKey] : 0,
+			headerBidding =
+				ad.networkData && ad.networkData.hasOwnProperty('headerBidding')
+					? String(ad.networkData.headerBidding)
+					: 'true';
+
 		return (
 			<div id="ad-details">
 				<div>
@@ -44,18 +57,13 @@ class AdDetails extends Component {
 					{ad.network == 'adpTags' ? (
 						<div>
 							<p>
-								Price Floor :{' '}
-								<strong>
-									{ad.networkData && ad.networkData.priceFloor ? ad.networkData.priceFloor : 0}
-								</strong>
+								PF Key : <strong>{fpKey}</strong>
 							</p>
 							<p>
-								Header Bidding :{' '}
-								<strong>
-									{ad.networkData && ad.networkData.hasOwnProperty('headerBidding')
-										? String(ad.networkData.headerBidding)
-										: 'true'}
-								</strong>
+								Price Floor : <strong>{priceFloor}</strong>
+							</p>
+							<p>
+								Header Bidding : <strong>{headerBidding}</strong>
 							</p>
 						</div>
 					) : userType != 'partner' ? (

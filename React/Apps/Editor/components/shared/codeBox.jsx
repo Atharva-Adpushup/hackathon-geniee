@@ -14,19 +14,23 @@ class customCodeEditor extends React.Component {
 
 		this.updateCode = this.updateCode.bind(this);
 		this.save = this.save.bind(this);
+		this.updateCode = this.updateCode.bind(this);
 	}
 
 	save() {
 		try {
 			!this.props.textEdit ? this.props.onSubmit(btoa(this.state.code)) : this.props.onSubmit(this.state.code);
 		} catch (e) {
+			console.log(e);
 			this.setState({ error: true });
 		}
 	}
 
 	updateCode(code) {
 		try {
-			this.setState({ code, error: false });
+			this.setState({ code, error: false }, () => {
+				return this.props.onChange ? this.props.onChange(code) : null;
+			});
 		} catch (e) {
 			this.setState({ error: true });
 		}
@@ -125,6 +129,7 @@ customCodeEditor.propTypes = {
 	parentExpanded: PropTypes.bool,
 	onSubmit: PropTypes.func,
 	onCancel: PropTypes.func,
+	onChange: PropTypes.func,
 	cancelText: PropTypes.string
 };
 
