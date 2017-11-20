@@ -17,6 +17,10 @@ class CollapsePanel extends Component {
         this.setState({ open: !this.state.open });
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.setState({ ...nextProps });
+    }
+
     render() {
         const { props, state } = this;
 
@@ -29,14 +33,14 @@ class CollapsePanel extends Component {
                                 {props.title}
                             </div>
                             <div className="pull-right">
-                                {
-                                    !state.open ? <i className="fa fa-caret-down"></i> : <i className="fa fa-caret-up"></i>
-                                }
+                                {/* {
+                                    !state.open ? <i className="fa fa-caret-down" title={props.tooltipMessage}></i> : <i className="fa fa-caret-up"></i>
+                                } */}
                             </div>
                         </Row>
                     </div>
                 </div>
-                <Panel collapsible expanded={this.state.open}>
+                <Panel collapsible expanded={state.open}>
                     {props.children}
                 </Panel>
             </div>
@@ -45,11 +49,13 @@ class CollapsePanel extends Component {
 }
 
 CollapsePanel.propTypes = {
-    open: PropTypes.bool
+    open: PropTypes.bool,
+    tooltipMessage: PropTypes.string
 };
 
 CollapsePanel.defaultProps = {
-    open: false
+    open: false,
+    tooltipMessage: 'Click to view details'
 };
 
 export default CollapsePanel;

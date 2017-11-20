@@ -194,9 +194,7 @@ body {
 		box-shadow: none;
 
 		.panel-body {
-			padding: 10px;
-			background-color: $greyBg;
-			border: 1px solid darken($greyBorder, 10%);
+			padding: 10px 0;
 		}
 	}
 }
