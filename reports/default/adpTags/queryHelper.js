@@ -41,19 +41,19 @@ var Promise = require('bluebird'),
 					groupBy: ' GROUP BY ',
 					orderBy: ' ORDER BY ',
 					aggregate: [],
-					nonAggregate: []
+					nonAggregate: [],
+					extra: []
 				};
 				return Promise.resolve();
 			},
-			__reduceArrayToString = (array, alias) => {
-				return (
-					` ${alias}.` +
-					_.reduce(
-						array,
-						(accumulator, value, key) =>
-							value == undefined ? `${accumulator} ` : `${accumulator}, ${alias}.${value} `
-					)
-				);
+			__reduceArrayToString = (array, defaultAlias, fetchAlias) => {
+				let alias,
+					response = '';
+				_.forEach(array, ele => {
+					alias = fetchAlias ? __getAlias(ele) || defaultAlias : defaultAlias;
+					response += ` ${alias}.${ele}, `;
+				});
+				return `${response.slice(0, -2)} `;
 			},
 			__reduceArrayToStringAggregate = (array, alias) => {
 				let response = ' ';
@@ -82,6 +82,9 @@ var Promise = require('bluebird'),
 						alias = false;
 						// alias = schema.firstQuery.tables.apexSiteReport.alias;
 						break;
+					case 'display_name':
+						alias = flag ? schema.secondQuery.alias : schema.secondQuery.tables.network.alias;
+						break;
 					case 'ntwid':
 						alias = flag ? schema.secondQuery.alias : schema.secondQuery.tables.adpTagReport.alias;
 						break;
@@ -94,11 +97,13 @@ var Promise = require('bluebird'),
 			__groupBy = () => {
 				firstQuery.groupBy += __reduceArrayToString(
 					firstQuery.nonAggregate,
-					schema.firstQuery.tables.apexSiteReport.alias
+					schema.firstQuery.tables.apexSiteReport.alias,
+					true
 				);
 				secondQuery.groupBy += __reduceArrayToString(
 					secondQuery.nonAggregate,
-					schema.secondQuery.tables.adpTagReport.alias
+					schema.secondQuery.tables.adpTagReport.alias,
+					true
 				);
 
 				if (common.level.section || common.level.variation || common.level.pagegroup) {
@@ -264,6 +269,16 @@ var Promise = require('bluebird'),
 				condition = condition.slice(0, -1);
 				condition += ')';
 				return condition;
+			},
+			__tableSpecific = field => {
+				// to set specific table conditions in case of joins
+				switch (field) {
+					case 'display_name':
+						secondQuery.from += ` ,${schema.secondQuery.tables.network.table} ${schema.secondQuery.tables
+							.network.alias}`;
+						secondQuery.where += ` AND ${schema.secondQuery.tables.adpTagReport.alias}.ntwid=${schema
+							.secondQuery.tables.network.alias}.ntwid`;
+				}
 			};
 		return {
 			select: (data, flag) => {
@@ -271,23 +286,33 @@ var Promise = require('bluebird'),
 					common.level.section || flag
 						? schema.firstQuery.tables.sectionReport.alias
 						: schema.firstQuery.tables.apexSiteReport.alias;
+
 				_.forEach(data, field => {
+					let currentAliasForNonAggregate = __getAlias(field);
+
+					// First Query
 					if (schema.firstQuery.nonAggregate.indexOf(field) != -1) {
-						firstQuery.select += ` ${schema.firstQuery.tables.apexSiteReport.alias}.${field}, `;
+						firstQuery.select += ` ${currentAliasForNonAggregate
+							? currentAliasForNonAggregate
+							: schema.firstQuery.tables.apexSiteReport.alias}.${field}, `;
 						firstQuery.nonAggregate.push(field);
 					} else if (schema.firstQuery.aggregate.indexOf(field) != -1) {
 						firstQuery.select += ` SUM(${alias}.${field}) AS ${field}, `;
 						firstQuery.aggregate.push(field);
 					}
 
+					// Second Query
 					if (schema.secondQuery.nonAggregate.indexOf(field) != -1) {
-						secondQuery.select += ` ${schema.secondQuery.tables.adpTagReport.alias}.${field}, `;
+						secondQuery.select += ` ${currentAliasForNonAggregate
+							? currentAliasForNonAggregate
+							: schema.secondQuery.tables.adpTagReport.alias}.${field}, `;
 						secondQuery.nonAggregate.push(field);
 					} else if (schema.secondQuery.aggregate.indexOf(field) != -1) {
 						secondQuery.select += ` SUM(${schema.secondQuery.tables.adpTagReport
 							.alias}.${field}) AS ${field}, `;
 						secondQuery.aggregate.push(field);
 					}
+					__tableSpecific(field);
 				});
 				return true;
 			},

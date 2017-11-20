@@ -101,6 +101,8 @@ function setCorrectColumnNames(data) {
 				case 'pagegroup':
 					columns[key] = 'name';
 					break;
+				case 'ntwid':
+					columns[key] = 'display_name';
 			}
 		});
 	}
@@ -131,6 +133,9 @@ function groupByWrapper(data, qs) {
 
 function selectWrapper(selectData, groupByData, qs) {
 	let flag = _.isArray(groupByData) && groupByData.length && groupByData.indexOf('section') != -1 ? true : false;
+	selectData.indexOf('ntwid') != -1
+		? (selectData.push('display_name'), (selectData = selectData.filter(ele => ele != 'ntwid')))
+		: null;
 	return qs.select(selectData, flag);
 }
 
@@ -187,24 +192,12 @@ total_requests ----> total_pageviews
 */
 
 // let params = {
-// 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid'],
+// 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid', 'ntwid'],
 // 	where: {
 // 		siteid: 31000
-// 	}
+// 	},
+// 	groupBy: ['ntwid', 'pagegroup']
 // };
-
-// Promise.all(
-// 	_.map([1, 2, 3], ele => {
-// 		params.ele = ele;
-// 		return generate(params);
-// 	})
-// )
-// 	.then(response => {
-// 		debugger;
-// 	})
-// 	.catch(err => {
-// 		debugger;
-// 	});
 
 // generate(params)
 // 	.then(response => {

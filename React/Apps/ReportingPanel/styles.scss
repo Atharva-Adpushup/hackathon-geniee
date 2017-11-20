@@ -37,6 +37,17 @@ body {
 .report-controls-wrapper {
 	margin: 20px 0;
 
+	.control-label {
+		font-size: 1.2em;
+		text-transform: capitalize;
+		font-weight: 700;
+		border-bottom: 1px solid $greyBorder;
+		margin-bottom: 10px;
+		padding-bottom: 5px;
+		display: block;
+		color: lighten($fontColor, 10%);
+	}
+
 	button.btn.btn-lightBg {
 		width: 100%;
 		padding: 7px 10px;
@@ -170,5 +181,20 @@ body {
 		cursor: pointer;
 		color: darken($greyBorder, 15%);
 		margin-bottom: -2px;
+	}
+}
+
+._collapse-panel {
+	.panel {
+		border: none;
+		margin: 0;
+		border-top: 1px solid darken($greyBorder, 10%);
+		border-radius: 0;
+		margin-top: 3px;
+		box-shadow: none;
+
+		.panel-body {
+			padding: 10px 0;
+		}
 	}
 }
