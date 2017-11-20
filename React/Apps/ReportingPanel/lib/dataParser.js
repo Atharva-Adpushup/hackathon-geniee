@@ -5,6 +5,7 @@ import { remove, map, each, groupBy, uniq, find } from 'lodash';
 import moment from 'moment';
 import Bold from '../../../Components/Bold.jsx';
 import NetworkwiseData from '../components/NetworkwiseData.jsx';
+import CollapsePanel from '../../../Components/CollapsePanel.jsx';
 
 const dataLabels = commonConsts.DATA_LABELS,
 	reorderColumns = cols => {
@@ -243,7 +244,17 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 		return series;
 	},
-	networkWiseProcessing = rows => {
+	sumNetworkDataProp = component => {
+		const { networkData } = component.props;
+
+		let sum = 0;
+		for (let i in networkData) {
+			sum += Number(networkData[i]);
+		}
+
+		return sum;
+	},
+	networkWiseProcessing = (rows, customToggleOptions) => {
 		let processedData = [];
 		const groupedData = groupBy(rows, commonConsts.API_DATA_PARAMS.date);
 		for (let date in groupedData) {
@@ -254,6 +265,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			each(groupedData[date], data => {
 				row.report_date = data.report_date;
 				row.siteid = data.siteid;
+				row.name = data.name;
 				row.total_requests = data.total_requests;
 				row.total_xpath_miss = data.total_xpath_miss;
 				row.total_gross_revenue += data.total_gross_revenue;
@@ -263,22 +275,95 @@ const dataLabels = commonConsts.DATA_LABELS,
 				networkwiseCpm[data.display_name] = Number((data.total_revenue * 1000 / data.total_impressions).toFixed(2));
 			});
 
-			row.total_impressions = React.cloneElement(<NetworkwiseData />, { networkData: networkwiseImpressions });
-			row.total_revenue = React.cloneElement(<NetworkwiseData />, { networkData: networkwiseRevenue });
+			row.total_impressions = React.cloneElement(<NetworkwiseData />, { networkData: networkwiseImpressions, customToggleOptions });
+			row.total_revenue = React.cloneElement(<NetworkwiseData />, { networkData: networkwiseRevenue, customToggleOptions });
 			row.cpm = React.cloneElement(<NetworkwiseData />, {
 				networkData: networkwiseCpm, cpmCalc: {
 					revenue: sumNetworkDataProp(row.total_revenue),
 					impressions: sumNetworkDataProp(row.total_impressions)
-				}
+				}, customToggleOptions
 			});
 
 			processedData.push(row);
 		}
 		return processedData;
 	},
-	processTableGroupBy = (header, rows, groupByParam, variations) => {
+	processRows = (rows, param) => {
+		let totalPageviews = 0,
+			totalPageCpm = 0,
+			totalImpressions = 0,
+			totalCpm = 0,
+			totalRevenue = 0,
+			totalGrossRevenue = 0,
+			totalXpathMiss = 0,
+			body = [],
+			dates = [];
+
+
+		each(rows, row => {
+			dates.push(moment(row.report_date).format('DD-MM'));
+
+			const reportDate = moment(row.report_date).format('DD-MM-YYYY'),
+				impressions = row.total_impressions,
+				cpm = row.cpm,
+				xpathMiss = commonConsts.IS_SUPERUSER ? row.total_xpath_miss : undefined,
+				pageViews = commonConsts.IS_SUPERUSER ? row.total_requests : undefined,
+				revenue = row.total_revenue,
+				grossRevenue = Number(row.total_gross_revenue.toFixed(2)),
+				pageCpm = Number((sumNetworkDataProp(row.total_revenue) * 1000 / row.total_requests).toFixed(2));
+
+			totalPageviews += pageViews;
+			totalImpressions += sumNetworkDataProp(impressions);
+			totalRevenue += sumNetworkDataProp(revenue);
+			totalGrossRevenue += grossRevenue;
+			totalXpathMiss += xpathMiss;
+
+			body.push({
+				[dataLabels.date]: reportDate,
+				[dataLabels.impressions]: impressions,
+				[dataLabels.cpm]: cpm,
+				[dataLabels.xpathMiss]: xpathMiss,
+				[dataLabels.pageViews]: pageViews,
+				[dataLabels.revenue]: revenue,
+				[dataLabels.grossRevenue]: grossRevenue,
+				[dataLabels.pageCpm]: pageCpm
+			});
+		});
+
+		body.push({
+			[dataLabels.pageGroup]: (param && param.name === dataLabels.pageGroup) ? param.value : undefined,
+			[dataLabels.variation]: (param && param.name === dataLabels.variation) ? param.title : undefined,
+			[dataLabels.date]: <Bold>{!param ? dataLabels.total : `${dates[0]} to ${dates[dates.length - 1]}`}</Bold>,
+			[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
+			[dataLabels.cpm]: <Bold>{((totalRevenue / totalImpressions) * 1000).toFixed(2)}</Bold>,
+			[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>,
+			[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
+			[dataLabels.revenue]: <Bold>{totalRevenue.toFixed(2)}</Bold>,
+			[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
+			[dataLabels.pageCpm]: <Bold>{((totalRevenue / totalPageviews) * 1000).toFixed(2)}</Bold>
+		});
+
+		return body;
+	},
+	processRowsWithGroupBy = (rows, groupBy, param) => {
+		rows = processRows(rows, param);
+
+		const nonAggregatedRows = [],
+			aggregatedRows = [];
+		for (let i = 0; i < rows.length - 1; i++) {
+			nonAggregatedRows.push(rows[i]);
+		}
+
+		aggregatedRows.push(rows[rows.length - 1]);
+		nonAggregatedRows.forEach(row => {
+			aggregatedRows.push(row);
+		});
+
+		return aggregatedRows;
+	},
+	processTableGroupBy = (header, rows, groupByParam, variations, customToggleOptions) => {
 		if (!groupByParam) {
-			return { header, rows: networkWiseProcessing(rows) };
+			return { header, rows: processRows(networkWiseProcessing(rows, customToggleOptions)) };
 		}
 
 		let updatedRows = [];
@@ -292,13 +377,19 @@ const dataLabels = commonConsts.DATA_LABELS,
 					filterable: false
 				});
 
-				let groupedRows = groupBy(rows, commonConsts.API_DATA_PARAMS.pageGroup);
+				const groupedRows = groupBy(rows, commonConsts.API_DATA_PARAMS.pageGroup);
 
+				let groupByAggregatedData = [];
 				for (let i in groupedRows) {
-					updatedRows.push({
-						pageGroup: i
-					});
-					updatedRows = updatedRows.concat(groupedRows[i]);
+					const networkWiseData = networkWiseProcessing(groupedRows[i], customToggleOptions),
+						aggregatedData = processRowsWithGroupBy(networkWiseData, groupByParam, {
+							name: dataLabels.pageGroup,
+							value: i
+						});
+
+					aggregatedData.forEach(data => {
+						updatedRows.push(data);
+					})
 				}
 				break;
 			case 'variation':
@@ -309,33 +400,30 @@ const dataLabels = commonConsts.DATA_LABELS,
 					filterable: false
 				});
 
-				let groupedRows2 = groupBy(rows, commonConsts.API_DATA_PARAMS.variationId);
+				let groupedRowsVariation = groupBy(rows, commonConsts.API_DATA_PARAMS.variationId);
 
-				for (let i in groupedRows2) {
-					const name = find(variations, { id: i }).name
-					updatedRows.push({
-						variation: name
-					});
-					updatedRows = updatedRows.concat(groupedRows2[i]);
+				let groupByAggregatedDataVariation = [];
+				for (let i in groupedRowsVariation) {
+					const name = find(variations, { id: i }).name,
+						networkWiseData = networkWiseProcessing(groupedRowsVariation[i], customToggleOptions),
+						aggregatedData = processRowsWithGroupBy(networkWiseData, groupByParam, {
+							name: dataLabels.variation,
+							value: i,
+							title: name
+						}, variations);
+
+					aggregatedData.forEach(data => {
+						updatedRows.push(data);
+					})
 				}
 				break;
 		}
 
 		return { header, rows: updatedRows };
 	},
-	sumNetworkDataProp = component => {
-		const { networkData } = component.props;
-
-		let sum = 0;
-		for (let i in networkData) {
-			sum += Number(networkData[i]);
-		}
-
-		return sum;
-	},
-	generateTableData = (cols, rows, groupBy, variations) => {
+	generateTableData = (cols, rows, groupBy, variations, customToggleOptions) => {
 		let header = [],
-			body = [];
+			body = null;
 
 		each(formatColumnNames(cols), col => {
 			if (
@@ -356,69 +444,18 @@ const dataLabels = commonConsts.DATA_LABELS,
 			});
 		});
 
-		const groupedData = processTableGroupBy(header, rows, groupBy, variations);
+		const groupedData = processTableGroupBy(header, rows, groupBy, variations, customToggleOptions);
 		header = groupedData.header;
 		rows = groupedData.rows;
 
-		let totalPageviews = 0,
-			totalPageCpm = 0,
-			totalImpressions = 0,
-			totalCpm = 0,
-			totalRevenue = 0,
-			totalGrossRevenue = 0,
-			totalXpathMiss = 0;
-
-		each(rows, row => {
-			const reportDate = row.report_date ? moment(row.report_date).format('DD-MM-YYYY') : undefined,
-				impressions = row.total_impressions || undefined,
-				cpm = row.cpm || undefined,
-				xpathMiss = commonConsts.IS_SUPERUSER ? row.total_xpath_miss : undefined,
-				pageViews = commonConsts.IS_SUPERUSER ? row.total_requests : undefined,
-				revenue = row.total_revenue || undefined,
-				grossRevenue = row.total_gross_revenue ? Number(row.total_gross_revenue.toFixed(2)) : undefined,
-				pageCpm = row.total_revenue
-					? Number((sumNetworkDataProp(row.total_revenue) * 1000 / row.total_requests).toFixed(2))
-					: undefined;
-
-			body.push({
-				[dataLabels.pageGroup]: row.pageGroup || undefined,
-				[dataLabels.variation]: row.variation || undefined,
-				[dataLabels.date]: reportDate,
-				[dataLabels.impressions]: impressions,
-				[dataLabels.cpm]: cpm,
-				[dataLabels.xpathMiss]: xpathMiss,
-				[dataLabels.pageViews]: pageViews,
-				[dataLabels.revenue]: revenue,
-				[dataLabels.grossRevenue]: grossRevenue,
-				[dataLabels.pageCpm]: pageCpm
-			});
-
-			totalPageviews += pageViews;
-			totalImpressions += sumNetworkDataProp(impressions);
-			totalRevenue += sumNetworkDataProp(revenue);
-			totalGrossRevenue += grossRevenue;
-			totalXpathMiss += xpathMiss;
-		});
-
-		if (!groupBy) {
-			body.push({
-				[dataLabels.date]: <Bold>{dataLabels.total}</Bold>,
-				[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
-				[dataLabels.pageCpm]: <Bold>{((totalRevenue / totalPageviews) * 1000).toFixed(2)}</Bold>,
-				[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
-				[dataLabels.cpm]: <Bold>{((totalRevenue / totalImpressions) * 1000).toFixed(2)}</Bold>,
-				[dataLabels.revenue]: <Bold>{totalRevenue.toFixed(2)}</Bold>,
-				[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
-				[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>
-			});
-		}
-
-		return { header, body };
+		return {
+			header, body: rows
+		};
 	},
-	dataParser = (data, groupBy, variations) => {
+	dataParser = (data, groupBy, variations, customToggleOptions) => {
 		const columns = formatColumnNames(data.columns);
 
-		let tableConfig = generateTableData(columns, data.rows, groupBy, variations),
+		let tableConfig = generateTableData(columns, data.rows, groupBy, variations, customToggleOptions),
 			chartConfig = {
 				yAxis: generateYAxis(columns),
 				xAxis: { categories: generateXAxis(data.rows) },

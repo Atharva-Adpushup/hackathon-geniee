@@ -26,6 +26,8 @@ class ReportingPanel extends React.Component {
 			variation: null,
 			variations: [],
 			groupBy: null,
+			responseData: null,
+			networkWiseData: false,
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
@@ -36,6 +38,7 @@ class ReportingPanel extends React.Component {
 		this.generateReport = this.generateReport.bind(this);
 		this.updateReportParams = this.updateReportParams.bind(this);
 		this.fetchVariations = this.fetchVariations.bind(this);
+		this.tableToggleCallback = this.tableToggleCallback.bind(this);
 	}
 
 	fetchVariations(pageGroup, platform) {
@@ -73,10 +76,12 @@ class ReportingPanel extends React.Component {
 		})
 			.then(res => {
 				if (!res.error && res.rows.length) {
-					const data = dataGenerator(res, groupBy, variations);
+					const responseData = $.extend(true, {}, res),
+						data = dataGenerator(res, groupBy, variations);
 					this.setState({
 						...state,
 						reportError: false,
+						responseData,
 						chartConfig: data.chartData,
 						tableConfig: data.tableData
 					});
@@ -87,7 +92,6 @@ class ReportingPanel extends React.Component {
 				}
 			})
 			.catch(res => {
-				console.log('error');
 				console.log(res);
 				this.setState({ ...state, reportError: true });
 			});
@@ -123,6 +127,18 @@ class ReportingPanel extends React.Component {
 		this.generateReport();
 	}
 
+	tableToggleCallback(value) {
+		const { responseData, groupBy, variations } = this.state,
+			res = $.extend(true, {}, responseData),
+			data = dataGenerator(res, groupBy, variations, {
+				toggleValue: value
+			});
+
+		this.setState({
+			tableConfig: data.tableData
+		});
+	}
+
 	render() {
 		const {
 				startDate,
@@ -137,6 +153,12 @@ class ReportingPanel extends React.Component {
 			variations,
 			variation
 			} = this.state,
+			customToggle = {
+				toggleText: 'Network wise data',
+				toggleChecked: false,
+				toggleName: 'networkWiseData',
+				toggleCallback: this.tableToggleCallback
+			},
 			reportPane = reportError ? (
 				<PaneLoader
 					message={!emptyData ? 'Error occurred while fetching report data!' : 'No report data present!'}
@@ -153,8 +175,9 @@ class ReportingPanel extends React.Component {
 									tableHeader={tableConfig.header}
 									tableBody={tableConfig.body}
 									keyName="reportTable"
-									rowsPerPage={20}
-									rowsPerPageOption={[30, 40, 50, 60]}
+									rowsPerPage={10}
+									customToggle={customToggle}
+									rowsPerPageOption={[20, 30, 40, 50]}
 								/>
 							) : (
 									''
