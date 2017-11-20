@@ -125,18 +125,22 @@ const Promise = require('bluebird'),
 			};
 
 		return getSiteReport(lastWeekReportParams)
-			.then(lastWeekReport => [aggregateWeekData(lastWeekReport), getSiteReport(thisWeekReportParams)])
+			.then(lastWeekReport => [lastWeekReport, getSiteReport(thisWeekReportParams)])
 			.spread((lastWeekReport, thisWeekReport) => {
-				thisWeekReport = aggregateWeekData(thisWeekReport);
+				const thisWeekAggregatedReport = aggregateWeekData(thisWeekReport),
+					lastWeekAggregatedReport = aggregateWeekData(lastWeekReport);
+
 				return {
 					siteId,
 					lastWeekReport: {
-						reportData: lastWeekReport,
+						reportData: lastWeekAggregatedReport,
+						reportDataNonAggregated: lastWeekReport,
 						reportFrom: moment(lastWeekReportParams.from).format('DD-MM'),
 						reportTo: moment(lastWeekReportParams.to).format('DD-MM')
 					},
 					thisWeekReport: {
-						reportData: thisWeekReport,
+						reportData: thisWeekAggregatedReport,
+						reportDataNonAggregated: thisWeekReport,
 						reportFrom: moment(thisWeekReportParams.from).format('DD-MM'),
 						reportTo: moment(thisWeekReportParams.to).format('DD-MM')
 					}
