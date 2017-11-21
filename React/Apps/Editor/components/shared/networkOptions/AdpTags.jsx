@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import _ from 'lodash';
 import CodeBox from 'shared/codeBox';
 import { priceFloorKeys } from '../../../consts/commonConsts';
@@ -28,6 +28,7 @@ class AdpTags extends Component {
 		this.toggleAdvance = this.toggleAdvance.bind(this);
 		this.advanceSubmit = this.advanceSubmit.bind(this);
 		this.filterKeyValues = this.filterKeyValues.bind(this);
+		this.generateCode = this.generateCode.bind(this);
 	}
 
 	filterKeyValues(keyValues) {
@@ -84,7 +85,7 @@ class AdpTags extends Component {
 
 	renderNormalSaveButton(showButtons = true, submitHandler) {
 		return showButtons ? (
-			<Col xs={8} xsPush={4} style={{ paddingRight: '0px' }}>
+			<Col xs={6} xsPush={6} style={{ paddingRight: '0px' }}>
 				<Button className="btn-lightBg btn-save btn-block" onClick={submitHandler} type="submit">
 					Save
 				</Button>
@@ -100,16 +101,24 @@ class AdpTags extends Component {
 			: this.renderNormalSaveButton(showButtons, submitHandler, cancelHandler);
 	}
 
+	generateCode() {
+		return JSON.stringify({
+			...this.filterKeyValues(this.state.keyValues),
+			[this.state.fpKey]: this.state.pf
+		});
+	}
+
 	renderNonAdvanced() {
-		const { showButtons, onCancel } = this.props;
+		const { showButtons, onCancel, buttonType } = this.props,
+			code = this.generateCode();
 
 		return (
 			<div>
 				<Row>
-					<Col xs={6}>
+					<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
 						<strong>Price Floor Key</strong>
 					</Col>
-					<Col xs={6}>
+					<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
 						<SelectBox
 							value={this.state.fpKey}
 							label="Select Floor Price Key"
@@ -126,11 +135,11 @@ class AdpTags extends Component {
 						</SelectBox>
 					</Col>
 				</Row>
-				<Row>
-					<Col xs={6}>
+				<Row className="mT-10">
+					<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
 						<strong>Price Floor</strong>
 					</Col>
-					<Col xs={6}>
+					<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
 						<input
 							type="number"
 							placeholder="Enter Price Floor"
@@ -143,43 +152,48 @@ class AdpTags extends Component {
 					</Col>
 				</Row>
 				<Row>
-					<Col xs={8} style={{ margin: '0 auto', width: '100%' }}>
+					<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
 						<CustomToggleSwitch
 							labelText="Header Bidding"
 							className="mB-10"
-							defaultLayout
 							checked={this.state.hbAcivated}
-							name="headerBiddingSwitch"
 							onChange={val => {
 								this.setState({ hbAcivated: !!val });
 							}}
 							layout="horizontal"
 							size="m"
-							id="js-header-bidding-switch"
 							on="Yes"
 							off="No"
+							defaultLayout={this.props.fromPanel ? false : true}
+							name={this.props.id ? `headerBiddingSwitch-${this.props.id}` : 'headerBiddingSwitch'}
+							id={
+								this.props.id ? `js-header-bidding-switch-${this.props.id}` : 'js-header-bidding-switch'
+							}
+							customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
 						/>
 					</Col>
 				</Row>
 				<Row>
-					<Col xs={6} xsPush={6}>
-						<Button className="btn-lightBg btn-edit btn-block" onClick={this.toggleAdvance}>
-							Advanced
-						</Button>
+					<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+						<pre>
+							<span style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{code}</span>
+							<OverlayTrigger
+								placement="bottom"
+								overlay={<Tooltip id="edit-advance">Edit Advance</Tooltip>}
+							>
+								<span className="adDetails-icon" onClick={this.toggleAdvance}>
+									<i className="btn-icn-edit" />
+								</span>
+							</OverlayTrigger>
+						</pre>
 					</Col>
 				</Row>
-				<div>{this.renderButtons(1, showButtons, this.save, onCancel)}</div>
+				<div>{this.renderButtons(buttonType, showButtons, this.save, onCancel)}</div>
 			</div>
 		);
 	}
 
 	renderAdvanced() {
-		let code = btoa(
-			JSON.stringify({
-				...this.filterKeyValues(this.state.keyValues),
-				[this.state.fpKey]: this.state.pf
-			})
-		);
 		return (
 			<CodeBox
 				showButtons={true}
@@ -187,7 +201,7 @@ class AdpTags extends Component {
 				onCancel={this.toggleAdvance}
 				size="small"
 				cancelText="Back"
-				code={code}
+				code={btoa(this.generateCode())}
 			/>
 		);
 	}

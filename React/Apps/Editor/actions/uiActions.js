@@ -52,6 +52,10 @@ const showEditMenu = (sectionId, adId, position, variationId) => ({
 		type: variationActions.SHRINK_VARIATION_PANEL,
 		panelCssSelector,
 		params
+	}),
+	showNotification = params => ({
+		type: uiActions.SHOW_NOTIFICATION,
+		params
 	});
 
 export {
@@ -72,5 +76,6 @@ export {
 	shrinkVariationPanel,
 	toggleVariationPanel,
 	openVariationPanel,
-	closeVariationPanel
+	closeVariationPanel,
+	showNotification
 };
