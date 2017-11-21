@@ -1,44 +1,49 @@
 .ReactCodeMirror {
-	border-right: 1px solid $dashboardBgColor
+	border-right: 1px solid $dashboardBgColor;
 }
 
-.containerButtonBar
-{
-	padding-bottom:120px;
-	position: relative;
-  	input[type="number"]{
-	  width: 60px;
+.adDetails-icon {
+	float: right;
+	.btn-icn-edit {
+		color: $dimFontColor;
+		&:hover {
+			color: $primaryColorDark;
+		}
 	}
-	.adsDescriptor
-	{
-		.row
-		{
+}
+
+.containerButtonBar {
+	padding-bottom: 120px;
+	position: relative;
+	input[type='number'] {
+		width: 60px;
+	}
+	.adsDescriptor {
+		.row {
 			margin: 0;
 			padding: 7px 0;
 			font-size: 12px;
-			&:hover
-			{
-				background:$RowHoverBg;
-			}
-		}
-	}
-	.adDetails-icon {
-		float: right;
-		.btn-icn-edit {
-			color: $dimFontColor;
 			&:hover {
-				color: $primaryColorDark;
+				background: $RowHoverBg;
 			}
 		}
 	}
+	// .adDetails-icon {
+	// 	float: right;
+	// 	.btn-icn-edit {
+	// 		color: $dimFontColor;
+	// 		&:hover {
+	// 			color: $primaryColorDark;
+	// 		}
+	// 	}
+	// }
 	.networkOptionsRow {
 		width: 90%;
-		margin: 0px auto; 
-		display: block; 
+		margin: 0px auto;
+		display: block;
 		z-index: 10;
 	}
-  	.butttonsRow
-	{
+	.butttonsRow {
 		padding: $ESPadding 0 !important;
 		background: $ESBg;
 		position: absolute;
@@ -48,47 +53,36 @@
 		border: 1px solid $MBButtonRowBorder;
 		border-radius: 0 0 3px 3px;
 	}
-	&.contextEditMenu 
-	{
-		.row
-		{
+	&.contextEditMenu {
+		.row {
 			margin: 0;
-    	padding: 7px 0;
-    	font-size: 12px;
-    	i
-    	{
-    		color: $primaryColor;
-    		cursor: pointer;
-    	}
+			padding: 7px 0;
+			font-size: 12px;
+			i {
+				color: $primaryColor;
+				cursor: pointer;
+			}
 		}
 	}
-	&.sectionOptions
-	{
+	&.sectionOptions {
 		padding-bottom: 200px;
 	}
 }
 
-.sm-pad
-{
-  .row
-  {
-	margin: 0;
-	padding: 5px 0;
-  }
+.sm-pad {
+	.row {
+		margin: 0;
+		padding: 5px 0;
+	}
 }
 
-.MenuBarComponentWrap.TopRight 
-{
-	.MenuBarContainerWrapper 
-	{
+.MenuBarComponentWrap.TopRight {
+	.MenuBarContainerWrapper {
 		float: right;
-		.MenuBarContainer
-		{
+		.MenuBarContainer {
 			padding: 10px 5px 10px 10px;
-			.containerButtonBar 
-			{
-				.butttonsRow 
-				{
+			.containerButtonBar {
+				.butttonsRow {
 					margin: 0 0 0 -10px;
 				}
 			}
@@ -99,16 +93,13 @@
 	}
 }
 
-.panelBySizeContainer
-{
-	.panel-group
-	{
+.panelBySizeContainer {
+	.panel-group {
 		overflow: hidden;
-		.panelBySize
-		{
+		.panelBySize {
 			max-height: 195px;
-			overflow-y:auto;
-			overflow-x:hidden;
+			overflow-y: auto;
+			overflow-x: hidden;
 		}
 	}
 }
@@ -122,4 +113,3 @@
 		}
 	}
 }
-
