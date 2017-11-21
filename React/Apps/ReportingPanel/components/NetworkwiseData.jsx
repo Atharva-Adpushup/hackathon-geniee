@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Bold from '../../../Components/Bold.jsx';
 import CollapsePanel from '../../../Components/CollapsePanel.jsx';
-import { capitalCase, isFloat } from '../lib/helpers';
+import { capitalCase, isFloat } from '../../../common/helpers';
 import commonConsts from '../lib/commonConsts';
 
 class NetworkwiseData extends Component {
