@@ -11,6 +11,7 @@ module.exports = {
 	xpathWaitTimeout: 5000,
 	contentSelector: null,
 	adpushupPercentage: 100,
+	serveAmpTagsForAdp: true,
 	pageGroupTimeout: 0,
 	mode: 2,
 	domain: '',
