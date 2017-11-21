@@ -1,21 +1,12 @@
-var Tracker = require('../libs/tracker'),
-	nodewatcher = require('../libs/nodeWatcher'),
-	browserConfig = require('../libs/browserConfig'),
-	selectVariation = require('./variationSelector'),
-	createAds = require('./adCreater'),
-	heartBeat = require('../libs/heartBeat'),
-	hookAndInit = require('./hooksAndBlockList'),
-	utils = require('../libs/utils'),
-	w = window,
+var w = window,
 	pageGroupTimer,
 	adp = (w.adpushup = w.adpushup || {}),
-	control = require('./control')(),
-	config = (adp.config = require('../config/config.js')),
 	$ = (adp.$ = require('jquery')),
-	genieeObject = require('./genieeObject'),
-	isGenieeSite;
-
+	config = (adp.config = require('../config/config.js')),
+	Tracker = require('../libs/tracker'),
+	nodewatcher = require('../libs/nodeWatcher');
 // Extend adpushup object
+//Location of blow snippet should not be changed, other wise script will throw error.
 $.extend(adp, {
 	creationProcessStarted: false,
 	err: [],
@@ -24,6 +15,16 @@ $.extend(adp, {
 	nodewatcher: nodewatcher,
 	geniee: genieeObject
 });
+
+var browserConfig = require('../libs/browserConfig'),
+	selectVariation = require('./variationSelector'),
+	createAds = require('./adCreater'),
+	heartBeat = require('../libs/heartBeat'),
+	hookAndInit = require('./hooksAndBlockList'),
+	utils = require('../libs/utils'),
+	control = require('./control')(),
+	genieeObject = require('./genieeObject'),
+	isGenieeSite;
 
 // Extend the settings with generated settings
 // eslint-disable-next-line no-undef
