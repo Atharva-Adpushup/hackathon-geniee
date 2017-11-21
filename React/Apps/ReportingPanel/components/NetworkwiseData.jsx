@@ -3,6 +3,7 @@ import Bold from '../../../Components/Bold.jsx';
 import CollapsePanel from '../../../Components/CollapsePanel.jsx';
 import { capitalCase, isFloat } from '../../../common/helpers';
 import commonConsts from '../lib/commonConsts';
+import { sortBy, each } from 'lodash';
 
 class NetworkwiseData extends Component {
     constructor(props) {
@@ -13,22 +14,43 @@ class NetworkwiseData extends Component {
             cpmCalc: props.cpmCalc,
             customToggleOptions: props.customToggleOptions
         }
+
+        this.sortNetworkData = this.sortNetworkData.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
         this.setState({ ...nextProps });
     }
 
-    render() {
-        const { networkData, cpmCalc, customToggleOptions } = this.state;
+    sortNetworkData(networkData) {
+        let networks = [],
+            sortedNetworks = {};
 
-        let total = 0, networkDataArr = [];
+        for (let i in networkData) {
+            networks.push({
+                networkName: i === commonConsts.NETWORKS.dfp ? commonConsts.NETWORKS.adp : i,
+                networkCount: networkData[i]
+            })
+        }
+
+        networks = sortBy(networks, ['networkName']);
+        each(networks, n => {
+            sortedNetworks[n.networkName] = n.networkCount;
+        });
+
+        return sortedNetworks;
+    }
+
+    render() {
+        const { cpmCalc, customToggleOptions } = this.state;
+
+        let total = 0, networkDataArr = [], networkData = this.sortNetworkData(this.state.networkData);
         for (let i in networkData) {
 
             if (!cpmCalc) {
                 total += Number(networkData[i]);
             }
-            networkDataArr.push(<div><Bold>{i === commonConsts.NETWORKS.dfp ? 'Adp' : capitalCase(i)}</Bold> : {networkData[i]}</div>)
+            networkDataArr.push(<div><Bold>{capitalCase(i)}</Bold> : {networkData[i]}</div>)
         }
 
         if (cpmCalc) {
