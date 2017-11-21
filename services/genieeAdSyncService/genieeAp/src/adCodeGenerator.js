@@ -63,21 +63,21 @@ var utils = require('../libs/utils'),
 		$el.append(adCode.join('\n'));
 		return true;
 	},
-	genrateAdpBodyTag = function() {
+	genrateAdpBodyTag = function(ad) {
 		var adCode;
 		if (!ad.networkData || !ad.networkData.dfpAdunit) {
 			adCode = '';
-		} else if (ad.networkData.serveAmpTagsForAdp) {
+		} else if (config.serveAmpTagsForAdp) {
 			//serve amp tags here
 			adCode = [];
 			adCode.push('<amp-ad width=' + ad.width + ' height=' + ad.height);
 			adCode.push('type="doubleclick"');
-			adCode.push('data-slot="/' + adpTags.config.NETWORK_ID + '/' + ad.networkData.dfpAdunit + '"');
+			adCode.push('data-slot="/103512698/' + ad.networkData.dfpAdunit + '"');
 			adCode.push('data-multi-size-validation="false">');
 			adCode.push('</amp-ad>');
 			if (ad.networkData.isSticky) {
-				adCode.unshift('<amp-sticky-ad layout="nodisplay">');
 				adCode.push('</amp-sticky-ad>');
+				adCode.unshift('<amp-sticky-ad layout="nodisplay">');
 			}
 		} else {
 			adCode = [];
