@@ -36,8 +36,12 @@ class EditOptions extends Component {
 	}
 
 	submitHandler = networkData => {
-		console.log(networkData);
 		this.props.updateNetwork(this.props.section.ads[0].id, networkData);
+		this.props.showNotification({
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Section Updated'
+		});
 	};
 
 	renderContent() {

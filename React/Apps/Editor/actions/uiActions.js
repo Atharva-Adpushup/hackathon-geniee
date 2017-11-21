@@ -55,7 +55,10 @@ const showEditMenu = (sectionId, adId, position, variationId) => ({
 	}),
 	showNotification = params => ({
 		type: uiActions.SHOW_NOTIFICATION,
-		params
+		...params
+	}),
+	hideNotification = () => ({
+		type: uiActions.HIDE_NOTIFICATION
 	});
 
 export {
@@ -77,5 +80,6 @@ export {
 	toggleVariationPanel,
 	openVariationPanel,
 	closeVariationPanel,
-	showNotification
+	showNotification,
+	hideNotification
 };

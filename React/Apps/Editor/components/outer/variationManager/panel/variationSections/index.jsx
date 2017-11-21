@@ -14,7 +14,7 @@ import {
 	scrollSectionIntoView
 } from 'actions/sectionActions.js';
 import { updateNetwork, updateAdCode } from 'actions/adActions';
-import { resetErrors } from 'actions/uiActions';
+import { resetErrors, showNotification } from 'actions/uiActions';
 import { generateReport } from 'actions/reportingActions';
 import Filters from './filters.jsx';
 import PaneLoader from '../../../../../../../Components/PaneLoader.jsx';
@@ -75,7 +75,8 @@ class variationSections extends Component {
 			ui,
 			onResetErrors,
 			onSectionXPathValidate,
-			onScrollSectionIntoView
+			onScrollSectionIntoView,
+			showNotification
 		} = this.props;
 
 		return (
@@ -115,6 +116,7 @@ class variationSections extends Component {
 									onScrollSectionIntoView={onScrollSectionIntoView}
 									ui={ui}
 									reporting={reporting}
+									showNotification={showNotification}
 								/>
 							</div>
 						))
@@ -139,6 +141,7 @@ variationSections.propTypes = {
 	resetErrors: PropTypes.func,
 	updateNetwork: PropTypes.func,
 	generateReport: PropTypes.func,
+	showNotification: PropTypes.func,
 	ui: PropTypes.object,
 	reporting: PropTypes.object
 };
@@ -161,7 +164,8 @@ export default connect(
 				onScrollSectionIntoView: scrollSectionIntoView,
 				updateAdCode: updateAdCode,
 				updateNetwork: updateNetwork,
-				generateReport: generateReport
+				generateReport: generateReport,
+				showNotification: showNotification
 			},
 			dispatch
 		)
