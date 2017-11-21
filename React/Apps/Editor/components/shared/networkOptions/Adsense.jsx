@@ -20,7 +20,7 @@ class Adsense extends Component {
 	checkAdsense(value) {
 		if (value.indexOf('pagead2.googlesyndication.com') == -1) {
 			alert('Only Adsense code allowed');
-			return this.setState({ error: true });
+			return this.setState({ error: true, adCode: '', adunitId: '' });
 		}
 		let adunitId = this.getAdUnitId(value);
 		this.setState({ error: false, adunitId: adunitId, adCode: value });
@@ -54,6 +54,7 @@ class Adsense extends Component {
 				onSubmit={this.submitHandler}
 				showButtons={this.props.showButtons || false}
 				codeBoxSize="small"
+				fromPanel={this.props.fromPanel}
 			/>
 		);
 	}

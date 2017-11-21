@@ -6,10 +6,10 @@ const Form = props => {
 	return (
 		<div className="mT-10">
 			<Row>
-				<Col xs={5}>
+				<Col xs={5} className={props.fromPanel ? 'u-padding-r10px' : ''}>
 					<strong>Adunit Id</strong>
 				</Col>
-				<Col xs={7}>
+				<Col xs={7} className={props.fromPanel ? 'u-padding-l10px' : ''}>
 					<input
 						type="text"
 						placeholder="Enter Adunit Id"

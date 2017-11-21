@@ -88,14 +88,31 @@ class NetworkOptions extends Component {
 						submitHandler={this.submitHandler}
 						onCancel={this.props.onCancel}
 						code={code}
+						buttonType={this.props.buttonType || 1}
+						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
+						id={this.props.id ? this.props.id : false}
 					/>
 				);
 				break;
 			case 'adsense':
-				return <Adsense code={code} submitHandler={this.submitHandler} onCancel={this.props.onCancel} />;
+				return (
+					<Adsense
+						code={code}
+						submitHandler={this.submitHandler}
+						onCancel={this.props.onCancel}
+						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
+					/>
+				);
 				break;
 			case 'adx':
-				return <AdX code={code} submitHandler={this.submitHandler} onCancel={this.props.onCancel} />;
+				return (
+					<AdX
+						code={code}
+						submitHandler={this.submitHandler}
+						onCancel={this.props.onCancel}
+						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
+					/>
+				);
 				break;
 			case 'custom':
 			case 'dfp':
