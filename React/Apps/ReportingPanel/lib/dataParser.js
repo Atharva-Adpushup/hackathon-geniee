@@ -1,5 +1,6 @@
 import React from 'react';
-import { capitalCase, reorderArray } from './helpers';
+import { reorderArray } from './helpers';
+import { capitalCase } from '../../../common/helpers';
 import commonConsts from './commonConsts';
 import { remove, map, each, groupBy, uniq, find } from 'lodash';
 import moment from 'moment';

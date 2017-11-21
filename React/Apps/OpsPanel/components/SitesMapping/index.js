@@ -9,7 +9,7 @@ import Datatable from 'react-bs-datatable';
 import { labels, headers, modes, statuses } from '../../configs/commonConsts';
 import { ajax } from '../../../../common/helpers';
 import ActionCard from '../../../../Components/ActionCard.jsx';
-import Badges from '../../../../common/Badges';
+import Badges from '../../../../Components/Badges.jsx';
 import SelectBox from '../../../../Components/SelectBox/index.jsx';
 
 class SitesMapping extends Component {
@@ -159,8 +159,8 @@ class SitesMapping extends Component {
 							extra={site.siteId}
 						/>
 					) : (
-						'No channels'
-					),
+							'No channels'
+						),
 				[labels['pubId']]: site.pubId || 'Oauth not present',
 				[labels['adsenseEmail']]: site.adsenseEmail || 'Oauth not present',
 				[labels['step']]: this.generateStatus(site.step),
@@ -179,8 +179,8 @@ class SitesMapping extends Component {
 				</Breadcrumb>
 			</div>
 		) : (
-			''
-		);
+				''
+			);
 	}
 
 	renderSelect(value, label, changeHandler, array, disabled) {
@@ -248,11 +248,11 @@ class SitesMapping extends Component {
 							/>
 						</div>
 					) : (
-						'Not sites Available'
-					)
+							'Not sites Available'
+						)
 				) : (
-					'Loading Data...'
-				)}
+						'Loading Data...'
+					)}
 			</ActionCard>
 		);
 	}
