@@ -5,12 +5,13 @@ const commonConsts = {
 	NETWORKS: {
 		adsense: 'adsense',
 		adx: 'adx',
-		dfp: 'dfp'
+		dfp: 'dfp',
+		adp: 'Adp'
 	},
 	GROUP_BY: ['pagegroup'],
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
-	SITE_ID: 31000, //window.siteId,
+	SITE_ID: window.siteId,
 	SITE_DOMAIN: window.siteDomain,
 	PAGEGROUPS: window.pageGroups,
 	IS_SUPERUSER: window.isSuperUser,
