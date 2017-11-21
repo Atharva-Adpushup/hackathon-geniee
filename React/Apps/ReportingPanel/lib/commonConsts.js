@@ -5,7 +5,8 @@ const commonConsts = {
 	NETWORKS: {
 		adsense: 'adsense',
 		adx: 'adx',
-		dfp: 'dfp'
+		dfp: 'dfp',
+		adp: 'Adp'
 	},
 	GROUP_BY: ['pagegroup'],
 	REPORT_ENDPOINT: '/user/reports/generate',
