@@ -357,6 +357,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 		aggregatedRows.push(rows[rows.length - 1]);
 		nonAggregatedRows.forEach(row => {
+			row.nonAggregatedRow = true;
 			aggregatedRows.push(row);
 		});
 

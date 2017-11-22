@@ -152,7 +152,8 @@ class ReportingPanel extends React.Component {
 			tableConfig,
 			platform,
 			variations,
-			variation
+			variation,
+			groupBy
 			} = this.state,
 			customToggle = {
 				toggleText: 'Network wise data',
@@ -179,6 +180,7 @@ class ReportingPanel extends React.Component {
 									rowsPerPage={10}
 									customToggle={customToggle}
 									rowsPerPageOption={[20, 30, 40, 50]}
+									customGroupByNonAggregatedData={groupBy}
 								/>
 							) : (
 									''
