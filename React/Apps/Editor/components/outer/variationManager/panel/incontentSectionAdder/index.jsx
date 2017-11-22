@@ -62,6 +62,10 @@ class inContentForm extends React.Component {
 
 	setNetwork(data) {
 		this.setState({ networkInfo: data }, () => {
+			/**
+			 * Added to window because wasn't able to add network data to redux-form and no way to intercept handleSubmit call
+			 * Added to window object so that can be accessed in the onSubmit handler below
+			 */
 			window.networkInfo = data;
 			this.props.handleSubmit();
 		});
@@ -93,7 +97,8 @@ class inContentForm extends React.Component {
 }
 
 inContentForm.propTypes = {
-	handleSubmit: PropTypes.func.isRequired
+	handleSubmit: PropTypes.func.isRequired,
+	showNotification: PropTypes.func
 };
 
 const mapStateToProps = (state, ownProps) => ({
@@ -148,7 +153,8 @@ const mapStateToProps = (state, ownProps) => ({
 				...networkInfo.networkData
 			};
 			dispatch(createIncontentSection(sectionPayload, adPayload, ownProps.variation.id));
-		}
+		},
+		showNotification: params => dispatch(showNotification(params))
 	});
 
 export default connect(mapStateToProps, mapDispatchToProps)(form(inContentForm));

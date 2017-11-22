@@ -150,7 +150,11 @@ class insertMenu extends React.Component {
 		} else {
 			items.push(
 				<MenuItem key={1} icon="fa-sitemap" contentHeading="Network Options">
-					<NetworkOptions onSubmit={this.networkOptionsSubmit} onCancel={this.toggleExtraOptions} />
+					<NetworkOptions
+						onSubmit={this.networkOptionsSubmit}
+						onCancel={this.toggleExtraOptions}
+						showNotification={this.props.showNotification}
+					/>
 				</MenuItem>
 			);
 		}
@@ -194,7 +198,8 @@ insertMenu.propTypes = {
 	createSectionAndAd: PropTypes.func,
 	hideMenu: PropTypes.func,
 	selectInnerElement: PropTypes.func,
-	highlightInnerElement: PropTypes.func
+	highlightInnerElement: PropTypes.func,
+	showNotification: PropTypes.func
 };
 
 export default insertMenu;

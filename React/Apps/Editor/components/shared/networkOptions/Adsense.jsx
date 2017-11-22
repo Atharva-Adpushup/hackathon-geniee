@@ -18,8 +18,17 @@ class Adsense extends Component {
 	}
 
 	checkAdsense(value) {
-		if (value.indexOf('pagead2.googlesyndication.com') == -1) {
-			alert('Only Adsense code allowed');
+		if (
+			value.indexOf('pagead2.googlesyndication.com') == -1 ||
+			value.indexOf('"adsbygoogle"') == -1 ||
+			value.indexOf('data-ad-slot') == -1 ||
+			value.indexOf('data-ad-client') == -1
+		) {
+			this.props.showNotification({
+				mode: 'error',
+				title: 'Invalid Adcode',
+				message: 'Only Adsense adCode is allowed'
+			});
 			return this.setState({ error: true, adCode: '', adunitId: '' });
 		}
 		let adunitId = this.getAdUnitId(value);
@@ -33,6 +42,14 @@ class Adsense extends Component {
 	}
 
 	submitHandler(value) {
+		if (!value || !value.trim().length || value == '') {
+			this.props.showNotification({
+				mode: 'error',
+				title: 'Invalid AdCode',
+				message: 'AdCode cannot be left blank'
+			});
+			return false;
+		}
 		this.props.submitHandler({
 			adCode: value,
 			adunitId: this.state.adunitId
