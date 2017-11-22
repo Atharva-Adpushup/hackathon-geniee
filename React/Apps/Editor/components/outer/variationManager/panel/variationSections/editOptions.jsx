@@ -4,18 +4,21 @@ import InlineEdit from 'shared/inlineEdit/index.jsx';
 import SelectBox from 'shared/select/select.js';
 import { floats, networks } from 'consts/commonConsts';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
+import AdDetails from '../../../editMenu/AdDetails';
 
 class EditOptions extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			float: this.props.section.float
+			float: this.props.section.float,
+			editNetwork: false
 		};
 
 		this.onFloatSelectChange = this.onFloatSelectChange.bind(this);
 		this.onPartnerDataUpdate = this.onPartnerDataUpdate.bind(this);
 		this.renderContent = this.renderContent.bind(this);
 		this.submitHandler = this.submitHandler.bind(this);
+		this.toggleNetworkEditor = this.toggleNetworkEditor.bind(this);
 	}
 
 	onFloatSelectChange(float) {
@@ -42,20 +45,33 @@ class EditOptions extends Component {
 			title: 'Operation Successful',
 			message: 'Section Updated'
 		});
+		this.toggleNetworkEditor();
 	};
 
+	toggleNetworkEditor() {
+		this.setState({ editNetwork: !this.state.editNetwork });
+	}
+
 	renderContent() {
-		return (
-			<div className="mT-10">
-				<NetworkOptions
-					onSubmit={this.submitHandler}
-					onCancel={this.toggleNetworkEditor}
-					ad={this.props.section.ads[0]}
-					buttonType={2}
-					fromPanel={true}
-					id={this.props.section.id}
-				/>
-			</div>
+		return this.state.editNetwork ? (
+			<NetworkOptions
+				onSubmit={this.submitHandler}
+				onCancel={this.toggleNetworkEditor}
+				ad={this.props.section.ads[0]}
+				buttonType={2}
+				fromPanel={true}
+				id={this.props.section.id}
+			/>
+		) : (
+			<AdDetails
+				userType={currentUser.userType || false}
+				ad={this.props.section.ads[0]}
+				ui={this.props.ui}
+				section={this.props.section}
+				variationId={this.props.variation.id}
+				editNetwork={this.toggleNetworkEditor}
+				fromPanel={true}
+			/>
 		);
 	}
 
@@ -130,7 +146,7 @@ class EditOptions extends Component {
 						</Col>
 					</Row>
 				)}
-				{this.renderContent()}
+				<div className="mT-10">{this.renderContent()}</div>
 			</div>
 		);
 	}

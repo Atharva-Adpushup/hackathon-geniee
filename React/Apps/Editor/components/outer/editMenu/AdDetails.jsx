@@ -5,78 +5,14 @@ import InlineEdit from 'shared/inlineEdit/index.jsx';
 class AdDetails extends Component {
 	constructor(props) {
 		super(props);
+		this.renderXPathAndCSS = this.renderXPathAndCSS.bind(this);
+		this.renderSectionName = this.renderSectionName.bind(this);
+		this.renderNetworkDetails = this.renderNetworkDetails.bind(this);
 	}
-	render() {
-		const { ad, editCss, editNetwork, userType } = this.props;
-		let pfKeyExists =
-				this.props.ad.networkData &&
-				this.props.ad.networkData.keyValues &&
-				Object.keys(this.props.ad.networkData.keyValues).length,
-			fpKey = pfKeyExists
-				? Object.keys(this.props.ad.networkData.keyValues).filter(key => key.match(/FP/g)) || 'FP_SA'
-				: 'FP_SA',
-			priceFloor = pfKeyExists ? this.props.ad.networkData.keyValues[fpKey] : 0,
-			headerBidding =
-				ad.networkData && ad.networkData.hasOwnProperty('headerBidding')
-					? String(ad.networkData.headerBidding)
-					: 'true';
 
+	renderXPathAndCSS() {
 		return (
-			<div id="ad-details">
-				<div>
-					<div className="mB-10">
-						<p style={{ marginBottom: '0px' }}>Section Name</p>
-						<InlineEdit
-							validate
-							value={this.props.section.name}
-							submitHandler={this.props.onRenameSection.bind(
-								null,
-								this.props.section,
-								this.props.variationId
-							)}
-							text="Section Name"
-							errorMessage="Section Name cannot be blank"
-						/>
-					</div>
-					{userType != 'partner' ? (
-						<p>
-							Network :{' '}
-							<strong>
-								{ad.network.charAt(0).toUpperCase() + ad.network.slice(1).replace(/([A-Z])/g, ' $1')}
-							</strong>
-							<OverlayTrigger
-								placement="bottom"
-								overlay={<Tooltip id="edit-network">Edit Network</Tooltip>}
-							>
-								<span className="adDetails-icon" onClick={editNetwork}>
-									<i className="btn-icn-edit" />
-								</span>
-							</OverlayTrigger>
-						</p>
-					) : null}
-					{ad.network == 'adpTags' ? (
-						<div>
-							<p>
-								PF Key : <strong>{fpKey}</strong>
-							</p>
-							<p>
-								Price Floor : <strong>{priceFloor}</strong>
-							</p>
-							<p>
-								Header Bidding : <strong>{headerBidding}</strong>
-							</p>
-						</div>
-					) : userType != 'partner' ? (
-						<div className="mB-10">
-							<span className="mB-10">Ad Code : </span>
-							{ad.adCode != null && ad.adCode != 'null' && ad.adCode != '' ? (
-								<pre style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{atob(ad.adCode)}</pre>
-							) : (
-								<strong> Not added</strong>
-							)}
-						</div>
-					) : null}
-				</div>
+			<div>
 				<div className="mB-10">
 					<pre>
 						<InlineEdit
@@ -105,14 +41,14 @@ class AdDetails extends Component {
 				<div>
 					<pre>
 						<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-css">Edit CSS</Tooltip>}>
-							<span className="adDetails-icon" onClick={editCss}>
+							<span className="adDetails-icon" onClick={this.props.editCss}>
 								<i className="btn-icn-edit" />
 							</span>
 						</OverlayTrigger>
-						{Object.keys(ad.css).map((value, key) => {
+						{Object.keys(this.props.ad.css).map((value, key) => {
 							return (
 								<p key={key} style={{ margin: 0, fontWeight: 'bold' }}>
-									{value} : {ad.css[value]}
+									{value} : {this.props.ad.css[value]}
 								</p>
 							);
 						})}
@@ -121,6 +57,91 @@ class AdDetails extends Component {
 			</div>
 		);
 	}
+
+	renderSectionName() {
+		return (
+			<div className="mB-10">
+				<p style={{ marginBottom: '0px' }}>Section Name</p>
+				<InlineEdit
+					validate
+					value={this.props.section.name}
+					submitHandler={this.props.onRenameSection.bind(null, this.props.section, this.props.variationId)}
+					text="Section Name"
+					errorMessage="Section Name cannot be blank"
+				/>
+			</div>
+		);
+	}
+
+	renderNetworkDetails() {
+		const { ad, editNetwork } = this.props;
+		let pfKeyExists = ad.networkData && ad.networkData.keyValues && Object.keys(ad.networkData.keyValues).length,
+			fpKey = pfKeyExists
+				? Object.keys(ad.networkData.keyValues).filter(key => key.match(/FP/g)) || 'FP_SA'
+				: 'FP_SA',
+			priceFloor = pfKeyExists ? ad.networkData.keyValues[fpKey] : 0,
+			headerBidding =
+				ad.networkData && ad.networkData.hasOwnProperty('headerBidding')
+					? String(ad.networkData.headerBidding)
+					: 'true';
+
+		return (
+			<div>
+				<p>
+					Network :{' '}
+					<strong>
+						{ad.network.charAt(0).toUpperCase() + ad.network.slice(1).replace(/([A-Z])/g, ' $1')}
+					</strong>
+					<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-network">Edit Network</Tooltip>}>
+						<span className="adDetails-icon" onClick={editNetwork}>
+							<i className="btn-icn-edit" />
+						</span>
+					</OverlayTrigger>
+				</p>
+				{ad.network == 'adpTags' ? (
+					<div>
+						<p>
+							PF Key : <strong>{fpKey}</strong>
+						</p>
+						<p>
+							Price Floor : <strong>{priceFloor}</strong>
+						</p>
+						<p>
+							Header Bidding : <strong>{headerBidding}</strong>
+						</p>
+					</div>
+				) : (
+					<div className="mB-10">
+						<span className="mB-10">Ad Code : </span>
+						{ad.networkData && ad.networkData.adCode != null && ad.networkData.adCode.trim().length ? (
+							<pre style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+								{atob(ad.networkData.adCode)}
+							</pre>
+						) : (
+							<strong> Not added</strong>
+						)}
+					</div>
+				)}
+			</div>
+		);
+	}
+
+	render() {
+		const { fromPanel } = this.props;
+		return (
+			<div id="ad-details">
+				<div>
+					{!fromPanel ? this.renderSectionName() : null}
+					{this.renderNetworkDetails()}
+				</div>
+				{!fromPanel ? this.renderXPathAndCSS() : null}
+			</div>
+		);
+	}
 }
+
+AdDetails.defaultProps = {
+	fromPanel: false
+};
 
 export default AdDetails;
