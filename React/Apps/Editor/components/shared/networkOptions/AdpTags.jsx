@@ -86,7 +86,7 @@ class AdpTags extends Component {
 	renderNormalSaveButton(showButtons = true, submitHandler) {
 		return showButtons ? (
 			<Col xs={6} xsPush={6} style={{ paddingRight: '0px' }}>
-				<Button className="btn-lightBg btn-save btn-block" onClick={submitHandler} type="submit">
+				<Button className="btn-lightBg btn-save btn-block" onClick={submitHandler}>
 					Save
 				</Button>
 			</Col>

@@ -1,5 +1,6 @@
 import { sectionActions, defaultSectionCss, leftSectionCss, rightSectionCss, adActions } from 'consts/commonConsts';
 import { getVariationSectionsWithAds } from 'selectors/variationSelectors';
+import { showNotification } from 'actions/uiActions';
 import Utils from 'libs/utils';
 import _ from 'lodash';
 
@@ -74,7 +75,13 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			variationId
 		});
 
-		alert('In-content section has been created!');
+		dispatch(
+			showNotification({
+				mode: 'success',
+				title: 'Operation Successful',
+				message: 'In-content section has been created'
+			})
+		);
 	},
 	deleteSection = (sectionId, variationId, adId) => dispatch => {
 		const isSectionDeletion = confirm('Are you sure you want to delete this section ?');
