@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import validate from './inContentValidations';
 import { createIncontentSection } from 'actions/sectionActions';
+import { showNotification } from 'actions/uiActions';
 import { getCustomSizes } from 'selectors/siteSelectors';
 import { commonSupportedSizes, nonPartnerAdSizes } from 'consts/commonConsts.js';
 import { renderInContentAdder } from './renderMethods';
@@ -116,7 +117,13 @@ const mapStateToProps = (state, ownProps) => ({
 	mapDispatchToProps = (dispatch, ownProps) => ({
 		onSubmit: values => {
 			if (currentUser.userType != 'partner' && !values.network) {
-				alert('Please select a network');
+				dispatch(
+					showNotification({
+						mode: 'error',
+						title: 'Network missing',
+						message: 'Please select a network'
+					})
+				);
 				return false;
 			}
 			const notNear = getNotNearData(values.notNear),
