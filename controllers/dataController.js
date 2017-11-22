@@ -47,6 +47,44 @@ function getReportingData(channels, siteId) {
 		});
 }
 
+function isPipeDriveAPIActivated() {
+	return !!(
+		config.hasOwnProperty('analytics') &&
+		config.analytics.hasOwnProperty('pipedriveActivated') &&
+		config.analytics.pipedriveActivated
+	);
+}
+
+function getSiteLevelPipeDriveData(user, inputData) {
+	let allSites = user.get('sites'),
+		isAllSites = !!(allSites && allSites.length),
+		resultData = {};
+
+	if (!isAllSites) {
+		throw new AdPushupError('getSiteLevelPipeDriveData: User sites are empty');
+	}
+
+	lodash.forEach(allSites, siteObject => {
+		const siteDomain = utils.domanize(siteObject.domain),
+			inputDomain = utils.domanize(inputData.domain),
+			isDomainMatch = !!(siteDomain === inputDomain);
+		let isPipeDriveData;
+
+		if (!isDomainMatch) {
+			return true;
+		}
+
+		isPipeDriveData = siteObject.pipeDrive && siteObject.pipeDrive.dealId && siteObject.pipeDrive.dealTitle;
+		resultData = {
+			dealId: isPipeDriveData ? siteObject.pipeDrive.dealId : null,
+			dealTitle: isPipeDriveData ? siteObject.pipeDrive.dealTitle : null
+		};
+		return false;
+	});
+
+	return Promise.resolve(resultData);
+}
+
 router
 	.get('/getData', function(req, res) {
 		var siteId = req.query.siteId,
@@ -368,16 +406,32 @@ router
 			.getUserByEmail(req.session.user.email)
 			.then(user => {
 				const isUser = !!user,
-					crmDealId = user.get('crmDealId'),
 					stageId = req.body.status,
-					isCrmDealId = !!crmDealId;
+					siteDomain = req.body.domain,
+					isValidParameters = !!(stageId && siteDomain),
+					isAPIActivated = isPipeDriveAPIActivated();
 
-				if (!isUser || !isCrmDealId) {
-					return Promise.reject('No CRM deal id found');
+				if (!isUser) {
+					return Promise.reject('UpdateCrmDealStatus: User does not exist');
+				} else if (!isValidParameters) {
+					return Promise.reject('UpdateCrmDealStatus: Invalid request body parameters');
+				} else if (!isAPIActivated) {
+					return user;
 				}
-				return pipedriveAPI('updateDeal', {
-					deal_id: crmDealId,
-					stage_id: stageId
+
+				return getSiteLevelPipeDriveData(user, { domain: siteDomain }).then(pipeDriveData => {
+					const isValidData = !!(pipeDriveData && pipeDriveData.dealId && pipeDriveData.dealTitle);
+
+					if (!isValidData) {
+						return Promise.reject(
+							`UpdateCrmDealStatus: Invalid PipeDrive deal id for siteDomain: ${siteDomain}`
+						);
+					}
+
+					return pipedriveAPI('updateDeal', {
+						deal_id: pipeDriveData.dealId,
+						stage_id: stageId
+					});
 				});
 			})
 			.then(() => res.send({ success: 1 }))

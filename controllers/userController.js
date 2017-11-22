@@ -77,7 +77,13 @@ function dashboardRedirection(req, res, allUserSites, type) {
 
 		let siteReports = [];
 
-		return Promise.each(sites, site => getWeeklyComparisionReport(site.siteId).then(data => siteReports.push(data)))
+		return Promise.each(sites, site =>
+			getWeeklyComparisionReport(site.siteId)
+				.then(data => siteReports.push(data))
+				.catch(() => {
+					return true;
+				})
+		)
 			.then(() => {
 				sites = _.map(sites, site => {
 					const reportData = _.find(siteReports, { siteId: site.siteId });
@@ -152,15 +158,25 @@ function preOnboardingPageRedirection(page, req, res) {
 			primarySiteStep
 		},
 		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser),
-		isPipeDriveDealId = !!(isAnalyticsObj && req.session.user && req.session.user.crmDealId),
-		isPipeDriveDealTitle = !!(isAnalyticsObj && req.session.user && req.session.user.crmDealTitle);
+		isPipeDriveDealId = !!(
+			isAnalyticsObj &&
+			primarySiteDetails &&
+			primarySiteDetails.pipeDrive &&
+			primarySiteDetails.pipeDrive.dealId
+		),
+		isPipeDriveDealTitle = !!(
+			isAnalyticsObj &&
+			primarySiteDetails &&
+			primarySiteDetails.pipeDrive &&
+			primarySiteDetails.pipeDrive.dealTitle
+		);
 
 	if (isPipeDriveDealId) {
-		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = req.session.user.crmDealId;
+		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = primarySiteDetails.pipeDrive.dealId;
 	}
 
 	if (isPipeDriveDealTitle) {
-		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = req.session.user.crmDealTitle;
+		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = primarySiteDetails.pipeDrive.dealTitle;
 	}
 
 	if (isUserSession) {
@@ -292,22 +308,18 @@ router
 			});
 	})
 	.get('/addSite', function(req, res) {
-		if (req.session.isSuperUser) {
-			var allUserSites = req.session.user.sites,
-				params = {};
-			_.map(allUserSites, function(site) {
-				if (site.step == 1) {
-					params = {
-						siteDomain: site.domain,
-						siteId: site.siteId,
-						step: site.step
-					};
-				}
-			});
-			res.render('addSite', params);
-		} else {
-			res.redirect('/403');
-		}
+		var allUserSites = req.session.user.sites,
+			params = {};
+		_.map(allUserSites, function(site) {
+			if (site.step == 1) {
+				params = {
+					siteDomain: site.domain,
+					siteId: site.siteId,
+					step: site.step
+				};
+			}
+		});
+		res.render('addSite', params);
 	})
 	.post('/addSite', function(req, res) {
 		var site = req.body.site ? utils.getSafeUrl(req.body.site) : req.body.site;
