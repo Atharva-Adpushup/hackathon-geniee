@@ -1,7 +1,7 @@
 // In-content section component
 
 import React, { PropTypes } from 'react';
-import { reduxForm } from 'redux-form';
+import { reduxForm, change, registerField } from 'redux-form';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import validate from './inContentValidations';
@@ -56,23 +56,15 @@ const form = reduxForm({
 class inContentForm extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { addCustomAdCode: false, network: false, headerBidding: true, selectedElement: false };
+		this.state = { networkInfo: false, selectedElement: false };
+		this.setNetwork = this.setNetwork.bind(this);
 	}
 
-	showCustomAdCodeBox() {
-		this.setState({ addCustomAdCode: true });
-	}
-
-	hideCustomAdCodeBox() {
-		this.setState({ addCustomAdCode: false });
-	}
-
-	setNetwork(event) {
-		this.setState({ network: event.target.value });
-	}
-
-	switchChangeHandler(value) {
-		this.setState({ headerBidding: !!value });
+	setNetwork(data) {
+		this.setState({ networkInfo: data }, () => {
+			window.networkInfo = data;
+			this.props.handleSubmit();
+		});
 	}
 
 	setFocusElement(event) {
@@ -116,7 +108,8 @@ const mapStateToProps = (state, ownProps) => ({
 	}),
 	mapDispatchToProps = (dispatch, ownProps) => ({
 		onSubmit: values => {
-			if (currentUser.userType != 'partner' && !values.network) {
+			let networkInfo = window.networkInfo;
+			if (!networkInfo && !networkInfo.network) {
 				dispatch(
 					showNotification({
 						mode: 'error',
@@ -144,20 +137,16 @@ const mapStateToProps = (state, ownProps) => ({
 				adPayload = {
 					adCode: btoa(values.adCode),
 					adSize: values.adSize,
-					network: values.network
+					network: networkInfo.network,
+					networkData: {}
 				};
 
-			if (isCustomZoneId) {
-				adPayload.networkData = {
-					zoneId: values.customZoneId
-				};
-			}
-			if (values.network && values.network == 'adpTags') {
-				adPayload.networkData = {
-					priceFloor: parseInt(values.priceFloor) || 0,
-					headerBidding: values.hasOwnProperty('headerBidding') ? !!values.headerBidding : true
-				};
-			}
+			isCustomZoneId ? (adPayload.networkData.zoneId = values.customZoneId) : null;
+
+			adPayload.networkData = {
+				...adPayload.networkData,
+				...networkInfo.networkData
+			};
 			dispatch(createIncontentSection(sectionPayload, adPayload, ownProps.variation.id));
 		}
 	});
