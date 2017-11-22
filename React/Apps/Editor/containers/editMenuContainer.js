@@ -5,6 +5,7 @@ import { getEditMenuState } from 'selectors/uiSelectors';
 import { getSectionWithAds } from 'selectors/sectionSelectors';
 import { messengerCommands } from 'consts/commonConsts';
 import { updatePartnerData } from 'actions/sectionActions';
+import { showNotification } from 'actions/uiActions';
 
 const mapStateToProps = state => {
 		const json = getEditMenuState(state);
@@ -16,7 +17,8 @@ const mapStateToProps = state => {
 		},
 		updateSettings: (sectionId, adId, partnerData) => {
 			dispatch(updatePartnerData(sectionId, adId, partnerData));
-		}
+		},
+		showNotification: params => dispatch(showNotification(params))
 	});
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditMenu);

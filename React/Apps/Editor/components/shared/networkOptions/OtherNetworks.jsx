@@ -18,7 +18,12 @@ class OtherNetworks extends Component {
 
 	submitHandler(value) {
 		if (!value || !value.trim().length) {
-			return alert('Adcode cannot be empty');
+			this.props.showNotification({
+				mode: 'error',
+				title: 'Invalid AdCode',
+				message: 'AdCode cannot be left blank'
+			});
+			return false;
 		}
 		this.props.submitHandler({
 			adCode: value

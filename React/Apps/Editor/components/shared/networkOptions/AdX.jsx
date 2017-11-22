@@ -18,8 +18,17 @@ class AdX extends Component {
 	}
 
 	checkAdX(value) {
-		if (value.indexOf('pagead2.googlesyndication.com') == -1) {
-			alert('Only AdX code allowed');
+		if (
+			value.indexOf('pagead2.googlesyndication.com') == -1 ||
+			value.indexOf('google_ad_slot') == -1 ||
+			value.indexOf('google_ad_width') == -1 ||
+			value.indexOf('google_ad_height') == -1
+		) {
+			this.props.showNotification({
+				mode: 'error',
+				title: 'Invalid Adcode',
+				message: 'Only AdX adCode is allowed'
+			});
 			return this.setState({ error: true });
 		}
 		let adunitId = this.getAdUnitId(value);
@@ -33,6 +42,14 @@ class AdX extends Component {
 	}
 
 	submitHandler(value) {
+		if (!value || !value.trim().length || value == '') {
+			this.props.showNotification({
+				mode: 'error',
+				title: 'Invalid AdCode',
+				message: 'AdCode cannot be left blank'
+			});
+			return false;
+		}
 		this.props.submitHandler({
 			adCode: value,
 			adunitId: this.state.adunitId

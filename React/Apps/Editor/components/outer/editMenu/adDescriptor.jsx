@@ -82,6 +82,7 @@ class adDescriptor extends React.Component {
 					onCancel={this.toggleNetworkEditor}
 					ad={ad}
 					adDescriptor={true}
+					showNotification={this.props.showNotification}
 				/>
 			);
 		}

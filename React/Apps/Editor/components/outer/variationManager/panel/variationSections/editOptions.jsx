@@ -61,6 +61,7 @@ class EditOptions extends Component {
 				buttonType={2}
 				fromPanel={true}
 				id={this.props.section.id}
+				showNotification={this.props.showNotification}
 			/>
 		) : (
 			<AdDetails

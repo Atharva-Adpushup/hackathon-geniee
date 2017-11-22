@@ -84,6 +84,7 @@ const renderField = field => {
 								onCancel={value => console.log(value)}
 								buttonType={2}
 								fromPanel={true}
+								showNotification={that.props.showNotification}
 							/>
 						</Col>
 					</Row>

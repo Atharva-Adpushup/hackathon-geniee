@@ -13,7 +13,6 @@ class NetworkOptions extends Component {
 		super(props);
 		this.state = { network: this.props.ad && this.props.ad.network ? this.props.ad.network : false };
 		this.submitHandler = this.submitHandler.bind(this);
-		this.adCodeSubmit = this.adCodeSubmit.bind(this);
 		this.renderNetwork = this.renderNetwork.bind(this);
 		this.networkChangeHandler = this.networkChangeHandler.bind(this);
 		this.getCode = this.getCode.bind(this);
@@ -40,12 +39,6 @@ class NetworkOptions extends Component {
 
 	networkChangeHandler(value) {
 		this.setState({ network: value });
-	}
-
-	adCodeSubmit(adCode) {
-		this.submitHandler({
-			adCode: adCode
-		});
 	}
 
 	getCode() {
@@ -91,6 +84,7 @@ class NetworkOptions extends Component {
 						buttonType={this.props.buttonType || 1}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						id={this.props.id ? this.props.id : false}
+						showNotification={this.props.showNotification}
 					/>
 				);
 				break;
@@ -101,6 +95,7 @@ class NetworkOptions extends Component {
 						submitHandler={this.submitHandler}
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
+						showNotification={this.props.showNotification}
 					/>
 				);
 				break;
@@ -111,13 +106,21 @@ class NetworkOptions extends Component {
 						submitHandler={this.submitHandler}
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
+						showNotification={this.props.showNotification}
 					/>
 				);
 				break;
 			case 'custom':
 			case 'dfp':
 			default:
-				return <OtherNetworks code={code} submitHandler={this.submitHandler} onCancel={this.props.onCancel} />;
+				return (
+					<OtherNetworks
+						code={code}
+						submitHandler={this.submitHandler}
+						onCancel={this.props.onCancel}
+						showNotification={this.props.showNotification}
+					/>
+				);
 				break;
 		}
 	}
