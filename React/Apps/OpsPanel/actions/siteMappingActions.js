@@ -2,7 +2,6 @@ import { siteMappingActions } from '../configs/commonConsts';
 import { ajax } from '../../../common/helpers';
 
 const fetchSites = params => (dispatch, getState) => {
-	console.log('here');
 	return ajax({
 		url: '/ops/getAllSites',
 		method: 'POST'

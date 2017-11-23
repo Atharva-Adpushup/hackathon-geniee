@@ -6,7 +6,8 @@ import ActionCard from '../../../Components/ActionCard.jsx';
 import ReportControls from './ReportControls.jsx';
 import '../styles.scss';
 import commonConsts from '../lib/commonConsts';
-import { apiQueryGenerator, dataGenerator, ajax } from '../lib/helpers';
+import { apiQueryGenerator, dataGenerator } from '../lib/helpers';
+import { ajax } from '../../../common/helpers';
 import moment from 'moment';
 import PaneLoader from '../../../Components/PaneLoader.jsx';
 
@@ -17,6 +18,7 @@ class ReportingPanel extends React.Component {
 		this.state = {
 			reportLoading: true,
 			reportError: false,
+			emptyData: false,
 			disableGenerateButton: true,
 			chartConfig: null,
 			tableConfig: null,
@@ -25,6 +27,8 @@ class ReportingPanel extends React.Component {
 			variation: null,
 			variations: [],
 			groupBy: null,
+			responseData: null,
+			networkWiseData: false,
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
@@ -35,6 +39,7 @@ class ReportingPanel extends React.Component {
 		this.generateReport = this.generateReport.bind(this);
 		this.updateReportParams = this.updateReportParams.bind(this);
 		this.fetchVariations = this.fetchVariations.bind(this);
+		this.tableToggleCallback = this.tableToggleCallback.bind(this);
 	}
 
 	fetchVariations(pageGroup, platform) {
@@ -57,7 +62,7 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: true
 		});
 
-		const { startDate, endDate, pageGroup, platform, variation, groupBy } = this.state,
+		const { startDate, endDate, pageGroup, platform, variation, groupBy, variations } = this.state,
 			params = { startDate, endDate, pageGroup, platform, variation, groupBy };
 
 		let state = {
@@ -72,19 +77,22 @@ class ReportingPanel extends React.Component {
 		})
 			.then(res => {
 				if (!res.error && res.rows.length) {
-					const data = dataGenerator(res, groupBy);
+					const responseData = $.extend(true, {}, res),
+						data = dataGenerator(res, groupBy, variations);
 					this.setState({
 						...state,
 						reportError: false,
+						responseData,
 						chartConfig: data.chartData,
 						tableConfig: data.tableData
 					});
+				} else if (!res.error && !res.rows.length) {
+					this.setState({ ...state, reportError: true, emptyData: true });
 				} else {
 					this.setState({ ...state, reportError: true });
 				}
 			})
 			.catch(res => {
-				console.log('error');
 				console.log(res);
 				this.setState({ ...state, reportError: true });
 			});
@@ -107,7 +115,11 @@ class ReportingPanel extends React.Component {
 			});
 		}
 
-		if (params.pageGroup && params.platform && !this.state.variations.length) {
+		if (params.pageGroup && params.platform && !params.variation) {
+			this.setState({
+				variations: [],
+				variation: null
+			});
 			this.fetchVariations(params.pageGroup, params.platform);
 		}
 	}
@@ -116,46 +128,69 @@ class ReportingPanel extends React.Component {
 		this.generateReport();
 	}
 
+	tableToggleCallback(value) {
+		const { responseData, groupBy, variations } = this.state,
+			res = $.extend(true, {}, responseData),
+			data = dataGenerator(res, groupBy, variations, {
+				toggleValue: value
+			});
+
+		this.setState({
+			tableConfig: data.tableData
+		});
+	}
+
 	render() {
 		const {
 				startDate,
-				endDate,
-				reportLoading,
-				disableGenerateButton,
-				reportError,
-				chartConfig,
-				tableConfig,
-				platform,
-				variations,
-				variation
+			endDate,
+			reportLoading,
+			disableGenerateButton,
+			reportError,
+			emptyData,
+			chartConfig,
+			tableConfig,
+			platform,
+			variations,
+			variation,
+			groupBy
 			} = this.state,
+			customToggle = {
+				toggleText: 'Network wise data',
+				toggleChecked: false,
+				toggleName: 'networkWiseData',
+				toggleCallback: this.tableToggleCallback
+			},
 			reportPane = reportError ? (
 				<PaneLoader
-					message="Error occurred while fetching report data!"
+					message={!emptyData ? 'Error occurred while fetching report data!' : 'No report data present!'}
 					state="error"
 					styles={{ height: 'auto' }}
 				/>
 			) : (
-				<div>
-					<ReactHighcharts config={chartConfig} />
-					<div className="report-table">
-						{tableConfig ? (
-							<Datatable
-								tableHeader={tableConfig.header}
-								tableBody={tableConfig.body}
-								keyName="reportTable"
-								rowsPerPage={20}
-								rowsPerPageOption={[30, 40, 50, 60]}
-							/>
-						) : (
-							''
-						)}
+					<div>
+						<div id="chart-legend"></div>
+						<ReactHighcharts config={chartConfig} />
+						<div className="report-table">
+							{tableConfig ? (
+								<Datatable
+									tableHeader={tableConfig.header}
+									tableBody={tableConfig.body}
+									keyName="reportTable"
+									rowsPerPage={10}
+									customToggle={customToggle}
+									rowsPerPageOption={[20, 30, 40, 50]}
+									customGroupByNonAggregatedData={groupBy}
+								/>
+							) : (
+									''
+								)}
+						</div>
 					</div>
-				</div>
-			);
+				);
 
 		return (
-			<ActionCard title="AdPushup Report">
+			<ActionCard title={`AdPushup Report - ${commonConsts.SITE_DOMAIN}`}>
 				<Row>
 					<Col sm={10} smOffset={2}>
 						<ReportControls

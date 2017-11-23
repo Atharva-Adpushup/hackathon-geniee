@@ -5,7 +5,14 @@ var browserConfig = require('./browserConfig.js'),
 
 module.exports = {
 	log: function() {
-		if (typeof console !== 'undefined' && console.log) console.log.apply(console, arguments);
+		var isQueryParams = !!(
+				this.queryParams &&
+				$.isPlainObject(this.queryParams) &&
+				!$.isEmptyObject(this.queryParams)
+			),
+			isapDebugParam = !!(isQueryParams && this.queryParams.apDebug);
+
+		if (typeof console !== 'undefined' && console.log && isapDebugParam) console.log.apply(console, arguments);
 	},
 	base64Encode: function(data) {
 		return Base64.btoa(data);
@@ -97,8 +104,15 @@ module.exports = {
 				projectId: '592298b0be8c3e260bcadfbc',
 				apiKey: '49857281FFEEDDB5784689357D4B429D682B7FE67D6D94631494D1DD1B5E5B24'
 			},
+			keenIOImpressionConfig = {
+				projectId: '5922a50995cfc9addc2480dd',
+				apiKey: '40C0401741E18AFC5F17B722BA6371984333FDD0C36101019C7C107C1E1334B4'
+			},
 			keenIoFeedbackData,
-			keenIoFeedbackUrl;
+			isEventTypeGenieeRevenue,
+			keenIoImpressionFeedbackData,
+			keenIoFeedbackUrl,
+			keenIoImpressionFeedbackUrl;
 
 		data.packetId = adpConfig.packetId;
 		data.siteId = adpConfig.siteId;
@@ -118,6 +132,7 @@ module.exports = {
 		if (data.eventType && (data.eventType === 1 || data.eventType === 3 || data.eventType === 11)) {
 			keenIoFeedbackData = $.extend(true, {}, data);
 			keenIoFeedbackData.ts = +new Date();
+			this.log('KeenIOImpressionRequest: Raw Feedback data: ', keenIoFeedbackData);
 
 			if (keenIoFeedbackData.eventType === 1 && keenIoFeedbackData.ads && keenIoFeedbackData.xpathMiss) {
 				keenIoFeedbackData.impressionCount = keenIoFeedbackData.ads.length;
@@ -126,6 +141,53 @@ module.exports = {
 				if (keenIoFeedbackData.hasOwnProperty('pageGroup')) {
 					keenIoFeedbackData.pageGroup = encodeURIComponent(keenIoFeedbackData.pageGroup);
 				}
+			}
+
+			isEventTypeGenieeRevenue = !!(
+				keenIoFeedbackData.eventType === 11 &&
+				keenIoFeedbackData.variationId &&
+				keenIoFeedbackData.adId &&
+				keenIoFeedbackData.adSize &&
+				keenIoFeedbackData.hasOwnProperty('revenue')
+			);
+			this.log('KeenIOImpressionRequest: Should impression request be sent? ', isEventTypeGenieeRevenue);
+
+			// Keen IO 'Impression' collection integration
+			if (isEventTypeGenieeRevenue) {
+				keenIoImpressionFeedbackData = {
+					success: true,
+					data: {
+						status: null,
+						variationId: keenIoFeedbackData.variationId,
+						placement: keenIoFeedbackData.containerId,
+						containerId: keenIoFeedbackData.containerId,
+						winningRevenue: keenIoFeedbackData.revenue,
+						sectionId: keenIoFeedbackData.adId,
+						winner: 'geniee',
+						bids: [],
+						pageGroup: encodeURIComponent(keenIoFeedbackData.pageGroup),
+						platform: keenIoFeedbackData.platform,
+						siteId: keenIoFeedbackData.siteId,
+						timeout: null,
+						timedOutBidders: [],
+						type: null,
+						size: keenIoFeedbackData.adSize
+					}
+				};
+
+				try {
+					keenIoImpressionFeedbackData = this.base64Encode(JSON.stringify(keenIoImpressionFeedbackData));
+					keenIoImpressionFeedbackUrl =
+						keenIOConfig.baseUrl +
+						keenIOImpressionConfig.projectId +
+						'/events/impression?api_key=' +
+						keenIOImpressionConfig.apiKey +
+						'&data=' +
+						keenIoImpressionFeedbackData;
+					this.log('KeenIOImpressionRequest: keenIoImpressionFeedbackUrl', keenIoImpressionFeedbackUrl);
+					new Image().src = keenIoImpressionFeedbackUrl;
+					this.log('KeenIOImpressionRequest: Successfully sent impression request!');
+				} catch (e) {}
 			}
 
 			try {

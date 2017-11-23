@@ -97,8 +97,8 @@ block append headScripts
 block bodyContent
 	- currentUser = currentUser || {};
 	- calendlyBaseUrl = 'https://calendly.com/adpushup/demo/';
-	- pipeDriveDealId = utils.encodeString(currentUser.crmDealId);
-	- pipeDriveDealTitle = utils.encodeString(currentUser.crmDealTitle);
+	- pipeDriveDealId = utils.encodeString(primarySiteDetails.pipeDrive.dealId);
+	- pipeDriveDealTitle = utils.encodeString(primarySiteDetails.pipeDrive.dealTitle);
 	- name = utils.encodeString(`${currentUser.firstName} ${currentUser.lastName}`);
 	- email = utils.encodeString(currentUser.email);
 	- calendlyUrl = `${calendlyBaseUrl}?utm_content=${pipeDriveDealTitle}&utm_term=${pipeDriveDealId}&name=${name}&email=${email}`;

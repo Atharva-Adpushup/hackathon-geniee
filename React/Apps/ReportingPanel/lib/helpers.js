@@ -3,80 +3,88 @@ import moment from 'moment';
 import dataParser from './dataParser';
 import $ from 'jquery';
 import { Promise } from 'es6-promise';
+import ChartLegend from '../components/ChartLegend/index.jsx';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 const apiQueryGenerator = params => {
-		let where = {
-				siteid: commonConsts.SITE_ID,
-				from: moment(params.startDate).format('YYYY-MM-DD'),
-				to: moment(params.endDate).format('YYYY-MM-DD')
-			},
-			groupBy = [];
-
-		if (params.groupBy) {
-			groupBy.push(params.groupBy);
-		}
-
-		if (params.pageGroup) {
-			where.pagegroup = [params.pageGroup];
-		}
-
-		if (params.platform) {
-			where.device_type = params.platform;
-		}
-
-		if (params.variation) {
-			where.variation = [params.variation];
-		}
-
-		return JSON.stringify({
-			select: commonConsts.SELECT,
-			where,
-			orderBy: ['report_date'],
-			groupBy
-		});
+	let where = {
+		siteid: commonConsts.SITE_ID,
+		from: moment(params.startDate).format('YYYY-MM-DD'),
+		to: moment(params.endDate).format('YYYY-MM-DD')
 	},
-	capitalCase = str => {
-		return str
-			.toLowerCase()
-			.split(' ')
-			.map(word => word[0].toUpperCase() + word.substr(1))
-			.join(' ');
-	},
-	dataGenerator = (data, groupBy) => {
+		groupBy = [commonConsts.NETWORK_ID];
+
+	if (params.groupBy) {
+		groupBy.push(params.groupBy);
+	}
+
+	if (params.pageGroup) {
+		where.pagegroup = [params.pageGroup];
+	}
+
+	if (params.platform) {
+		where.device_type = params.platform;
+	}
+
+	if (params.variation) {
+		where.variation = [params.variation];
+	}
+
+	where.mode = 1;
+
+	return JSON.stringify({
+		select: commonConsts.SELECT,
+		where,
+		orderBy: ['report_date'],
+		groupBy
+	});
+},
+	dataGenerator = (data, groupBy, variations, customToggleOptions) => {
 		let config = {
-				title: {
-					text: ''
+			title: {
+				text: ''
+			},
+			subtitle: {
+				text: ''
+			},
+			lang: {
+				thousandsSep: ','
+			},
+			chart: {
+				spacingTop: 35,
+				style: {
+					fontFamily: 'Karla'
 				},
-				subtitle: {
-					text: ''
-				},
-				lang: {
-					thousandsSep: ','
-				},
-				chart: {
-					spacingTop: 35,
-					style: {
-						fontFamily: 'Karla'
-					}
-				},
-				tooltip: {
-					shared: true
-				},
-				colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e'],
-				credits: {
-					enabled: false
-				},
-				plotOptions: {
-					line: {
-						animation: false
+				events: {
+					load: event => {
+						const chart = event.target,
+							node = document.getElementById('chart-legend');
+						ReactDOM.render(<ChartLegend chart={chart} />, node);
 					}
 				}
 			},
+			legend: {
+				enabled: false
+			},
+			tooltip: {
+				shared: true
+			},
+			colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e', '#eb575c'],
+			credits: {
+				enabled: false
+			},
+			plotOptions: {
+				line: {
+					animation: false
+				}
+			}
+		},
 			chartData = null,
 			tableData = null;
 
 		if (!data.error) {
-			const parsedData = dataParser(data, groupBy);
+			const parsedData = dataParser(data, groupBy, variations, customToggleOptions);
 			chartData = parsedData.chartConfig;
 			tableData = parsedData.tableConfig;
 		}
@@ -90,26 +98,6 @@ const apiQueryGenerator = params => {
 				return arr[i];
 			}
 		}
-	},
-	ajax = params => {
-		const { method, url, data } = params;
-
-		return new Promise((resolve, resject) => {
-			$.ajax({
-				method,
-				url,
-				headers: { 'Content-Type': 'application/json' },
-				data,
-				contentType: 'json',
-				dataType: 'json',
-				success: res => {
-					return resolve(res);
-				},
-				fail: res => {
-					return reject(res);
-				}
-			});
-		});
 	};
 
-export { apiQueryGenerator, dataGenerator, capitalCase, ajax, reorderArray };
+export { apiQueryGenerator, dataGenerator, reorderArray };

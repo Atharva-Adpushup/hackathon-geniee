@@ -16,3 +16,4 @@ ReactDOM.render(
 	</Provider>,
 	document.getElementById('opsPanel')
 );
+document.querySelector('.spinner').style.display = 'none';

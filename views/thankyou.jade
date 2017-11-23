@@ -105,6 +105,11 @@ block append head
 		//- //End Facebook Pixel Code
 
 block bodyContent
+	- primarySiteId = user.primarySiteId || null;
+	- primarySiteDomain = user.primarySiteDomain || null;
+	- primarySiteStep = user.primarySiteStep || null;
+	- operationToolsPath = 'http://console.adpushup.com/tools?siteId=' + primarySiteId;
+
 	style.
 		.thankyouWrapper {
 			width: 100%;
@@ -146,10 +151,9 @@ block bodyContent
 	.thankyouWrapper
 		include layout/header
 		.container.text-center
-			if isSuperUser
-				.row
-					.pull-right.col-lg-2.visible-lg.visible-md.mT-10
-						a.apbtn-danger(id="sidebar-logout-link", href='/user/dashboard') Dashboard
+			.row
+				.pull-right.col-lg-2.visible-lg.visible-md.mT-10
+					a.apbtn-danger(id="sidebar-logout-link", href='/user/dashboard') Dashboard
 			.row
 				.col-md-5.thankyou-img
 					img(src="assets/images/completion_graphic.png")
@@ -170,6 +174,13 @@ block bodyContent
 							li Truth Theory
 						a(href="http://www.adpushup.com/customers/AdPushup_RentLingo_CaseStudy.pdf", target="_blank")
 							li Rent Lingo
+
+					p(style="margin: 20px 0 10px 0px; font-weight: bold;") Operation Tools:
+					ul
+						a(href=operationToolsPath, target="_blank")
+							li Convert Ad Code
+						a(href=operationToolsPath, target="_blank")
+							li Generate Header code
 
 	- analytics = analytics || {};
 	if analytics

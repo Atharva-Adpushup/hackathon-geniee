@@ -262,6 +262,51 @@ INNER JOIN (
 ON a.report_date=b.report_date and a.siteid=b.siteid
 `;
 
+/**
+SELECT
+	SUM(a.total_requests) AS total_requests,
+	a.report_date,
+	a.siteid,
+	SUM(b.total_revenue) AS total_revenue,
+	SUM(b.total_impressions) AS total_impressions,
+	b.display_name
+FROM (
+	SELECT
+		SUM(c.total_requests) AS total_requests,
+		c.report_date,
+		c.siteid
+	FROM ApexHourlySiteReport c
+	WHERE
+		c.report_date BETWEEN '2017-11-07' AND '2017-11-13'
+		AND c.siteid = 31000
+	GROUP BY
+		c.report_date,
+		c.siteid
+) a
+INNER JOIN (
+	SELECT
+		SUM(h.total_revenue) AS total_revenue,
+		SUM(h.total_impressions) AS total_impressions,
+		h.report_date,
+		h.siteid,
+		i.display_name
+	FROM AdpTagReport h, Network i
+	WHERE
+		h.report_date BETWEEN '2017-11-07' AND '2017-11-13'
+		AND h.siteid = 31000
+		AND h.ntwid = i.ntwid
+	GROUP BY
+		h.report_date,
+		h.siteid,
+		h.display_name
+) b
+ON a.report_date = b.report_date AND a.siteid = b.siteid
+GROUP BY
+	a.report_date,
+	a.siteid,
+	b.display_name
+*/
+
 let fetchSectionQuery = `SELECT axsid, sec_key, section_md5 FROM ApexSection where siteid=@__siteid__`;
 let fetchVariationQuery = `SELECT axvid, var_key, variation_id FROM ApexVariation where siteid=@__siteid__`;
 let fetchPagegroupQuery = `SELECT axpgid, pg_key, name FROM ApexPageGroup where siteid=@__siteid__`;
@@ -292,7 +337,7 @@ const schema = {
 	firstQuery: {
 		aggregate: ['total_requests', 'total_xpath_miss'],
 		nonAggregate: ['report_date', 'siteid', 'device_type'],
-		where: [],
+		where: ['mode'],
 		tables: {
 			apexSiteReport: {
 				table: 'ApexHourlySiteReport',
@@ -306,13 +351,17 @@ const schema = {
 		alias: 'a'
 	},
 	secondQuery: {
-		aggregate: ['total_revenue', 'total_impressions'],
-		nonAggregate: ['report_date', 'siteid', 'ntwid', 'platform'],
+		aggregate: ['total_revenue', 'total_impressions', 'total_gross_revenue'],
+		nonAggregate: ['report_date', 'siteid', 'ntwid', 'platform', 'display_name'],
 		where: ['ntwid'],
 		tables: {
 			adpTagReport: {
 				table: 'AdpTagReport',
 				alias: 'h'
+			},
+			network: {
+				table: 'Network',
+				alias: 'i'
 			}
 		},
 		alias: 'b'
@@ -361,6 +410,11 @@ const schema = {
 		ntwid: {
 			name: '__ntwid__',
 			type: 'INT',
+			value: false
+		},
+		mode: {
+			name: '__mode__',
+			type: 'TINYINT',
 			value: false
 		}
 	}

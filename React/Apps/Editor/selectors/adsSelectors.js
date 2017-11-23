@@ -2,6 +2,11 @@ import _ from 'lodash';
 import { createSelector } from 'reselect';
 import { getActiveChannel } from './channelSelectors';
 
-const getAllAds = state => state.adByIds;
+const getAllAds = state => state.adByIds,
+	getEmptyAdCodes = state => {
+		return _.filter(state.adByIds, ad => {
+			return ad.network != 'geniee' && ad.network != 'adpTags' && (!ad.adCode || !ad.adCode.length);
+		});
+	};
 
-export { getAllAds };
+export { getAllAds, getEmptyAdCodes };

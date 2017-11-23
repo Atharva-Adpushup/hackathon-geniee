@@ -3,7 +3,7 @@ import { siteMappingActions } from '../configs/commonConsts';
 const sites = (state = [], action) => {
 	switch (action.type) {
 		case siteMappingActions.SET_SITES_DATA:
-			return [...state, ...action.data];
+			return [...action.data];
 			break;
 
 		default:
