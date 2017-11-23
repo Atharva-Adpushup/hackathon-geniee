@@ -95,6 +95,7 @@ const _ = require('lodash'),
 			name: variation.name,
 			traffic: variation.trafficDistribution,
 			customJs: variation.customJs,
+			adpKeyValues: variation.adpKeyValues,
 			contentSelector: isContentSelector ? contentSelector : '',
 			ads: ads,
 			// Data required for auto optimiser model
