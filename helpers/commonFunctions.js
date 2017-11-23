@@ -84,15 +84,19 @@ const Promise = require('bluebird'),
 			totalImpressions += row.total_impressions;
 			totalRevenue += row.total_revenue;
 			totalPageviews += row.total_requests;
-			totalCpm += (row.total_revenue * 1000 / row.total_impressions);
+
+			const cpm = (row.total_revenue * 1000 / row.total_impressions);
+			totalCpm += isNaN(cpm) ? 0 : cpm;
+
 			totalPageCpm += (row.total_revenue * 1000 / row.total_requests);
 		});
 
+		const totalCpmValue = ((totalRevenue / totalImpressions) * 1000).toFixed(2);
 		return {
 			totalImpressions,
 			totalRevenue: totalRevenue.toFixed(2),
 			totalPageviews,
-			totalCpm: ((totalRevenue / totalImpressions) * 1000).toFixed(2),
+			totalCpm: isNaN(totalCpmValue) ? 0 : totalCpmValue,
 			totalPageCpm: ((totalRevenue / totalPageviews) * 1000).toFixed(2)
 		};
 	},
