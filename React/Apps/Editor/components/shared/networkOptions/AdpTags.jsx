@@ -6,7 +6,6 @@ import CodeBox from 'shared/codeBox';
 import { priceFloorKeys } from '../../../consts/commonConsts';
 import SelectBox from 'shared/select/select.js';
 import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
-
 class AdpTags extends Component {
 	constructor(props) {
 		super(props);
