@@ -63,13 +63,16 @@ var logger = require('../helpers/logger'),
 			Object.assign(targeting, adServerTargeting);
 		}
 
-		if (slot.optionalParam.priceFloor) {
-			var obj = {};
-			obj[config.ADX_FLOOR.key] = getFloorWithGranularity(slot.optionalParam.priceFloor);
-			Object.assign(targeting, obj);
+		if (slot.optionalParam.keyValues && Object.keys(slot.optionalParam.keyValues).length) {
+			Object.assign(targeting, slot.optionalParam.keyValues);
 		}
 
 		Object.keys(targeting).forEach(function(key) {
+			//check if any of keys belong to price floor key then set price using granularity function,
+			// so that it can match with price rules on server
+			if (config.ADX_FLOOR.keys.indexOf(key) !== -1) {
+				targeting[key] = getFloorWithGranularity(targeting[key]);
+			}
 			slot.gSlot.setTargeting(key, String(targeting[key]));
 		});
 	},
@@ -129,6 +132,11 @@ var logger = require('../helpers/logger'),
 
 		//This code must be inside googletag.cmd.push as it depends upon gpt availability
 		googletag.cmd.push(function() {
+			//Global key value settings
+			for (var key in config.PAGE_KEY_VALUES) {
+				googletag.pubads().setTargeting(key, config.PAGE_KEY_VALUES[key]);
+			}
+
 			// Attach gpt slot for each adpSlot in batch
 			adpSlotsWithDFPSlots.forEach(function(slot) {
 				enableGoogServicesForSlot(slot);

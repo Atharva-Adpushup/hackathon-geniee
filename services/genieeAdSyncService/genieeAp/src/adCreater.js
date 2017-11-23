@@ -267,7 +267,7 @@ var $ = require('jquery'),
 			}
 
 			if (ads.adpTagUnits.length) {
-				adCodeGenerator.executeAdpTagsHeadCode(ads.adpTagUnits);
+				adCodeGenerator.executeAdpTagsHeadCode(ads.adpTagUnits, variation.adpKeyValues);
 			}
 
 			// Process and place structural ads
