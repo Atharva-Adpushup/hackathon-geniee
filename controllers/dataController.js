@@ -60,10 +60,12 @@ router
 						computedJSON.siteId = siteId;
 						computedJSON.channels = channels;
 						computedJSON.site = site.toClientJSON();
-						return getReportingData(channels, siteId).then(reporting => {
-							computedJSON.reporting = reporting;
-							return res.json(computedJSON);
-						});
+						computedJSON.reporting = {};
+						return res.json(computedJSON);
+						// return getReportingData(channels, siteId).then(reporting => {
+						// 	computedJSON.reporting = reporting;
+						// 	return res.json(computedJSON);
+						// });
 					});
 				},
 				function() {

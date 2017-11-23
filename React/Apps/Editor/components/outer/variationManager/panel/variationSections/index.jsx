@@ -20,12 +20,23 @@ import Filters from './filters.jsx';
 import PaneLoader from '../../../../../../../Components/PaneLoader.jsx';
 import VariationSectionElement from './variationSectionElement';
 
+const getDate = number => {
+	let days = number, // Days you want to subtract
+		date = new Date(),
+		last = new Date(date.getTime() - days * 24 * 60 * 60 * 1000),
+		day = last.getDate(),
+		month = last.getMonth() + 1,
+		year = last.getFullYear();
+
+	return `${year}-${month.length == 1 ? '0' : ''}${month}-${day.length == 1 ? '0' : ''}${day}`;
+};
+
 class variationSections extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			startDate: false,
-			endDate: false,
+			startDate: getDate(7),
+			endDate: getDate(1),
 			focusedInput: undefined,
 			loadingReport: false
 		};
@@ -85,7 +96,12 @@ class variationSections extends Component {
 					<h1 className="variation-section-heading">Variation Sections</h1>
 				</span>
 				{ui.variationPanel.expanded ? (
-					<Filters generateReport={this.generateReportWrapper} datesUpdated={this.datesUpdated} />
+					<Filters
+						generateReport={this.generateReportWrapper}
+						datesUpdated={this.datesUpdated}
+						startDate={this.state.startDate}
+						endDate={this.state.endDate}
+					/>
 				) : null}
 				{!sections.length ? <span>No Sections</span> : ''}
 				<ul className="section-list row">
