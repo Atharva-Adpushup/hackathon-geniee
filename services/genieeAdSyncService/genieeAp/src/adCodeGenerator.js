@@ -3,8 +3,8 @@ var utils = require('../libs/utils'),
 	config = window.adpushup.config,
 	generateGenieeBodyTag = function(ad) {
 		var adCode;
-		if (ad.adCode) {
-			adCode = utils.base64Decode(ad.adCode);
+		if (ad.networkData.adCode) {
+			adCode = utils.base64Decode(ad.networkData.adCode);
 		} else {
 			adCode = [];
 			adCode.push('<scr' + 'ipt type="text/javascript">');
@@ -95,6 +95,9 @@ var utils = require('../libs/utils'),
 module.exports = {
 	generateAdCode: function(ad) {
 		var adCode;
+		if (!ad.networkData) {
+			return '';
+		}
 		switch (ad.network.toLowerCase()) {
 			case 'geniee':
 				adCode = generateGenieeBodyTag(ad);
@@ -105,8 +108,8 @@ module.exports = {
 				break;
 
 			default:
-				if (ad.adCode) {
-					adCode = utils.base64Decode(ad.adCode);
+				if (ad.networkData.adCode) {
+					adCode = utils.base64Decode(ad.networkData.adCode);
 				} else {
 					return false;
 				}
