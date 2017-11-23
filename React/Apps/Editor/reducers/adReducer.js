@@ -91,20 +91,59 @@ const adsByIds = (state = {}, action) => {
 				}
 			};
 
+		/**
+		 * Set Network
+		 * 
+		 * For ADP TAG
+		 * 		Set adCode to ''
+		 * 		Set Network Data
+		 *			keyValues
+		 *				Set key --> priceFloor
+		 * 			Set headerBiddingFlag
+		 * 
+		 * For Others
+		 * 		Set adCode
+		 * 		Set Network Data
+		 * 			Set adCode
+		 * 
+		 * 			For Adsense
+		 *				Add adUnitId 
+		 */
+
 		case adActions.UPDATE_NETWORK:
 			return {
 				...state,
 				[action.adId]: {
 					...state[action.adId],
 					network: action.network,
-					adCode: '',
-					networkData: {
-						...state[action.adId].networkData,
-						priceFloor: parseFloat(action.priceFloor),
-						headerBidding: !!action.isHeaderBiddingActivated
-					}
+					adCode:
+						action.network == 'adpTags'
+							? ''
+							: action.networkData.adCode ? action.networkData.adCode : state[action.adId].adCode,
+					networkData:
+						action.network == state[action.adId].network
+							? {
+									...state[action.adId].networkData,
+									...action.networkData
+								}
+							: action.networkData
 				}
 			};
+
+		//  case adActions.UPDATE_NETWORK:
+		// 	return {
+		// 		...state,
+		// 		[action.adId]: {
+		// 			...state[action.adId],
+		// 			network: action.network,
+		// 			adCode: '',
+		// 			networkData: {
+		// 				...state[action.adId].networkData,
+		// 				priceFloor: parseFloat(action.priceFloor),
+		// 				headerBidding: !!action.isHeaderBiddingActivated
+		// 			}
+		// 		}
+		// 	};
 
 		case adActions.UPDATE_CSS:
 			return { ...state, [action.adId]: { ...state[action.adId], css: action.css } };

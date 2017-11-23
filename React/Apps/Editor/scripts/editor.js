@@ -36,6 +36,7 @@ const initComponents = store => {
 			})
 			.fail(err => {
 				document.querySelector('.spinner').style.display = 'none';
+				console.log(err);
 				$('#editor').html('Some error while loading editor, please try reloading');
 			});
 	};

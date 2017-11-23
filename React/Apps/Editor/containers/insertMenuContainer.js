@@ -8,6 +8,7 @@ import { getActiveChannelActiveVariationId, getCustomAdCodeFromActiveVariation }
 import { getInsertMenuState } from 'selectors/uiSelectors';
 import { sendMessage } from '../scripts/messengerHelper';
 import { messengerCommands } from '../consts/commonConsts';
+import { showNotification } from 'actions/uiActions';
 
 const mapStateToProps = state => {
 		const json = getInsertMenuState(state);
@@ -32,7 +33,8 @@ const mapStateToProps = state => {
 		},
 		highlightInnerElement: (xpath, channelId) => {
 			sendMessage(channelId, messengerCommands.HIGHLIGHT_ELEMENT, { xpath });
-		}
+		},
+		showNotification: params => dispatch(showNotification(params))
 	});
 
 export default connect(mapStateToProps, mapDispatchToProps)(InsertMenu);
