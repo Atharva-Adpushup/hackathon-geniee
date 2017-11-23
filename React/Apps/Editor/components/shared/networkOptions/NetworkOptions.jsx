@@ -11,7 +11,12 @@ import AdX from './AdX';
 class NetworkOptions extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { network: this.props.ad && this.props.ad.network ? this.props.ad.network : false };
+		this.state = {
+			network:
+				this.props.ad && this.props.ad.network
+					? this.props.ad.network
+					: this.props.ad && currentUser.userType == 'partner' ? 'custom' : false
+		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.renderNetwork = this.renderNetwork.bind(this);
 		this.networkChangeHandler = this.networkChangeHandler.bind(this);
