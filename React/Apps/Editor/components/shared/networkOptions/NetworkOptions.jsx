@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
-import { networks } from '../../../consts/commonConsts';
+import { networks, defaultPriceFloorKey } from '../../../consts/commonConsts';
 import CodeBox from 'shared/codeBox';
 import SelectBox from 'shared/select/select';
 import AdpTags from './AdpTags';
@@ -63,8 +63,9 @@ class NetworkOptions extends Component {
 				this.props.ad.networkData.keyValues &&
 				Object.keys(this.props.ad.networkData.keyValues).length,
 			fpKey = pfKeyExists
-				? Object.keys(this.props.ad.networkData.keyValues).filter(key => key.match(/FP/g))[0] || 'FP_SA'
-				: 'FP_SA',
+				? Object.keys(this.props.ad.networkData.keyValues).filter(key => key.match(/FP/g))[0] ||
+					defaultPriceFloorKey
+				: defaultPriceFloorKey,
 			priceFloor = pfKeyExists ? this.props.ad.networkData.keyValues[fpKey] : 0,
 			headerBidding =
 				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('headerBidding')
