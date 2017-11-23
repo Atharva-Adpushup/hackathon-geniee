@@ -2,29 +2,45 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import clipboard from 'clipboard-polyfill';
 import moment from 'moment';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Breadcrumb } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import '../../../ReportingPanel/styles.scss';
 import Datatable from 'react-bs-datatable';
-import { labels, headers } from '../../configs/commonConsts';
+import { labels, headers, modes, statuses } from '../../configs/commonConsts';
 import { ajax } from '../../../../common/helpers';
 import ActionCard from '../../../../Components/ActionCard.jsx';
-import Badges from '../../../../common/Badges';
+import Badges from '../../../../Components/Badges.jsx';
+import SelectBox from '../../../../Components/SelectBox/index.jsx';
 
 class SitesMapping extends Component {
 	constructor(props) {
 		super(props);
+		let loaded = this.props.sites && this.props.sites.length ? true : false;
 		this.state = {
-			loaded: false,
-			tableConfig: null,
-			hasSites: this.props.sites.length ? true : false
+			loaded: loaded,
+			tableConfig: loaded ? this.generateTableData(this.props.sites) : null,
+			hasSites: loaded,
+			mode: false,
+			status: false,
+			totalSites: loaded ? this.props.sites.length : 0
 		};
 		this.generateStatus = this.generateStatus.bind(this);
 		this.generateClickableSpan = this.generateClickableSpan.bind(this);
 		this.clickHandler = this.clickHandler.bind(this);
+		this.modeChangeHandler = this.modeChangeHandler.bind(this);
+		this.statusChangeHandler = this.statusChangeHandler.bind(this);
 	}
 
 	componentDidMount() {
 		this.state.loaded ? null : this.props.fetchSites();
+	}
+
+	componentWillReceiveProps(nextProps) {
+		let hasSites = nextProps.sites && nextProps.sites.length ? true : false,
+			tableConfig = hasSites ? this.generateTableData(nextProps.sites) : {},
+			totalSites = hasSites ? nextProps.sites.length : 0;
+
+		this.setState({ loaded: true, hasSites, tableConfig, totalSites });
 	}
 
 	generateStatus(step) {
@@ -77,15 +93,60 @@ class SitesMapping extends Component {
 		);
 	}
 
+	modeChangeHandler(mode = 0) {
+		mode = mode == null ? 0 : mode;
+		let sites = mode == 0 ? this.props.sites : this.props.sites.filter(site => site.apConfigs.mode == mode);
+		this.setState({
+			tableConfig: this.generateTableData(sites),
+			mode: mode
+		});
+	}
+
+	statusChangeHandler(status = 0) {
+		status = status == null ? 0 : status;
+		let sites;
+		if (status == 0) {
+			sites = this.props.sites;
+		} else if (status == 1) {
+			// Pre onboarding
+			sites = this.props.sites.filter(site => !site.step);
+		} else if (status == 2) {
+			// Onboarding
+			sites = this.props.sites.filter(site => site.step >= 1 && site.step < 3);
+		} else {
+			// Onboarded
+			sites = this.props.sites.filter(site => site.step >= 3);
+		}
+		this.setState({
+			tableConfig: this.generateTableData(sites),
+			status: status
+		});
+	}
+
 	generateTableData(sites) {
 		let tableConfig = {
 			headers: headers,
 			data: []
 		};
 		tableConfig.data = _.map(sites, site => {
+			let rs =
+				site.adNetworkSettings && site.adNetworkSettings.revenueShare
+					? site.adNetworkSettings.revenueShare
+					: false;
 			return {
 				[labels['siteId']]: this.generateClickableSpan('site', site.siteId, this.clickHandler),
-				[labels['siteDomain']]: site.siteDomain,
+				[labels['siteDomain']]: (
+					<Link
+						to={{
+							pathname: `/ops/settings/${site.siteId}`,
+							state: {
+								rs: rs
+							}
+						}}
+					>
+						{site.siteDomain}
+					</Link>
+				),
 				[labels['ownerEmail']]: this.generateClickableSpan('email', site.ownerEmail, this.clickHandler),
 				[labels['mode']]: this.generateMode(site.apConfigs.mode),
 				[labels['channels']]:
@@ -98,8 +159,8 @@ class SitesMapping extends Component {
 							extra={site.siteId}
 						/>
 					) : (
-						'No channels'
-					),
+							'No channels'
+						),
 				[labels['pubId']]: site.pubId || 'Oauth not present',
 				[labels['adsenseEmail']]: site.adsenseEmail || 'Oauth not present',
 				[labels['step']]: this.generateStatus(site.step),
@@ -109,11 +170,63 @@ class SitesMapping extends Component {
 		return tableConfig;
 	}
 
-	componentWillReceiveProps(nextProps) {
-		let hasSites = nextProps.sites && nextProps.sites.length ? true : false,
-			tableConfig = hasSites ? this.generateTableData(nextProps.sites) : {};
+	renderAggregatedData() {
+		return this.state.tableConfig.data ? (
+			<div>
+				<Breadcrumb>
+					<Breadcrumb.Item>Total Sites : {this.state.totalSites}</Breadcrumb.Item>
+					<Breadcrumb.Item>Current Records : {this.state.tableConfig.data.length}</Breadcrumb.Item>
+				</Breadcrumb>
+			</div>
+		) : (
+				''
+			);
+	}
 
-		this.setState({ loaded: true, hasSites: hasSites, tableConfig: tableConfig });
+	renderSelect(value, label, changeHandler, array, disabled) {
+		return (
+			<div>
+				<p>{label}</p>
+				<SelectBox
+					value={value}
+					label={label}
+					onChange={changeHandler}
+					onClear={changeHandler}
+					disabled={disabled}
+				>
+					{array.map((ele, index) => (
+						<option key={index} value={ele.value}>
+							{ele.name}
+						</option>
+					))}
+				</SelectBox>
+			</div>
+		);
+	}
+
+	renderFilters() {
+		return (
+			<div>
+				<Col xs={3}>
+					{this.renderSelect(
+						this.state.mode,
+						'Select Mode',
+						this.modeChangeHandler,
+						modes,
+						this.state.status
+					)}
+				</Col>
+				<Col xs={3}>
+					{this.renderSelect(
+						this.state.status,
+						'Select Status',
+						this.statusChangeHandler,
+						statuses,
+						this.state.mode
+					)}
+				</Col>
+			</div>
+		);
 	}
 
 	render() {
@@ -122,6 +235,10 @@ class SitesMapping extends Component {
 				{this.state.loaded ? (
 					this.state.hasSites ? (
 						<div className="report-table">
+							<Row className="pdAll-10">
+								{this.renderAggregatedData()}
+								{this.renderFilters()}
+							</Row>
 							<Datatable
 								tableHeader={this.state.tableConfig.headers}
 								tableBody={this.state.tableConfig.data}
@@ -131,11 +248,11 @@ class SitesMapping extends Component {
 							/>
 						</div>
 					) : (
-						'Not sites Available'
-					)
+							'Not sites Available'
+						)
 				) : (
-					'Loading Data...'
-				)}
+						'Loading Data...'
+					)}
 			</ActionCard>
 		);
 	}

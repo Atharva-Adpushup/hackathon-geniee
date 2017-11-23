@@ -58,7 +58,7 @@ class ReportControls extends Component {
 			platform: this.getPlatformName(platform),
 			startDate,
 			endDate,
-			variation,
+			variation: null,
 			groupBy: groupByParam
 		});
 	}
@@ -81,7 +81,7 @@ class ReportControls extends Component {
 			pageGroup: this.getPageGroupName(pageGroup),
 			startDate,
 			endDate,
-			variation,
+			variation: null,
 			groupBy: groupByParam
 		});
 	}
@@ -145,6 +145,7 @@ class ReportControls extends Component {
 				<div className="container-fluid">
 					<Row>
 						<Col sm={2}>
+							<label className="control-label">PageGroup</label>
 							<SelectBox
 								value={state.pageGroup}
 								label="Select PageGroup"
@@ -158,6 +159,7 @@ class ReportControls extends Component {
 							</SelectBox>
 						</Col>
 						<Col sm={2}>
+							<label className="control-label">Platform</label>
 							<SelectBox value={state.platform} label="Select Platform" onChange={this.platformUpdated}>
 								{PLATFORMS.map((platform, index) => (
 									<option key={index} value={index}>
@@ -167,6 +169,7 @@ class ReportControls extends Component {
 							</SelectBox>
 						</Col>
 						<Col sm={2}>
+							<label className="control-label">Variation</label>
 							<SelectBox
 								value={state.variation}
 								label="Select Variation"
@@ -181,6 +184,7 @@ class ReportControls extends Component {
 							</SelectBox>
 						</Col>
 						<Col sm={4}>
+							<label className="control-label">Date Range</label>
 							<DateRangePicker
 								onDatesChange={this.datesUpdated}
 								onFocusChange={this.focusUpdated}
@@ -192,10 +196,11 @@ class ReportControls extends Component {
 								showClearDates={true}
 								minimumNights={0}
 								displayFormat={'DD-MM-YYYY'}
-								isOutsideRange={() => {}}
+								isOutsideRange={() => { }}
 							/>
 						</Col>
 						<Col sm={2}>
+							<label className="control-label">Group By</label>
 							<SelectBox value={state.groupBy} label="Group By" onChange={this.groupByUpdated}>
 								{state.groupByArray.map((groupBy, index) => (
 									<option key={index} value={groupBy}>

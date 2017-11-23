@@ -1,6 +1,7 @@
 import { variationActions } from 'consts/commonConsts';
 import _ from 'lodash';
 import Utils from 'libs/utils';
+import { getDefaultNetworkData } from '../scripts/utils';
 import {
 	getChannelVariations,
 	getChannelVariationsWithAds,
@@ -71,7 +72,7 @@ const getLastVariationNumber = function(variations) {
 					name: `Section-${sectionId}`,
 					ads: _.map(section.ads, ad => {
 						const adId = Utils.getRandomNumber();
-						ads.push({ ...ad, id: adId });
+						ads.push({ ...ad, adCode: '', networkData: getDefaultNetworkData(ad.network), id: adId });
 						return adId;
 					})
 				};

@@ -9,7 +9,15 @@ block append headScripts
 	script.
 		window.pageGroups = !{JSON.stringify(pageGroups)}
 		window.siteId = !{siteId}
+		window.siteDomain = "#{siteDomain}"
 		window.isSuperUser = !{isSuperUser}
+
+block append headCss
+	style.
+		.loaderwrapper.spinner {
+			top: 0;
+			left: 0;
+		}
 
 block bodyContent
 	include layout/sideBar
@@ -17,6 +25,8 @@ block bodyContent
 		include layout/header
 		.pageContentWrapper.page-content
 			.pageContentInner.page-content--inner
+				.loaderwrapper.spinner
+					img(src="/assets/images/loaderLogo.png")
 				#reportingPanel
 
-	script(src="/assets/js/builds/reportingPanel.js?v=1509731837422")
+	script(src="/assets/js/builds/reportingPanel.js?v=1511366342239")

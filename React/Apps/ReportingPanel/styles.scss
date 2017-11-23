@@ -3,6 +3,7 @@ $borderColor: #ddd;
 $greyBg: #eee;
 $greyBorder: #e6e6e6;
 $fontColor: #555;
+$legendBg:#fafafa;
 
 html,
 body {
@@ -35,6 +36,17 @@ body {
 
 .report-controls-wrapper {
 	margin: 20px 0;
+
+	.control-label {
+		font-size: 1.2em;
+		text-transform: capitalize;
+		font-weight: 700;
+		border-bottom: 1px solid $greyBorder;
+		margin-bottom: 10px;
+		padding-bottom: 5px;
+		display: block;
+		color: lighten($fontColor, 10%);
+	}
 
 	button.btn.btn-lightBg {
 		width: 100%;
@@ -150,4 +162,39 @@ body {
 	width: 70%;
 	margin: 0 auto;
 	font-size: 1.2em;
+}
+
+.chart-legend {
+	margin-top: 20px; 
+	background-color: $legendBg;
+	border: 2px solid $greyBg;
+
+	.legend-col {
+		width: 14.2222%;
+		float: left;
+		padding: 0 8px;
+	}
+
+	.legend-item {
+		font-size: 1.2em;
+		padding: 15px 8px;
+		cursor: pointer;
+		color: darken($greyBorder, 15%);
+		margin-bottom: -2px;
+	}
+}
+
+._collapse-panel {
+	.panel {
+		border: none;
+		margin: 0;
+		margin-top: 3px;
+		box-shadow: none;
+		border-radius: 0;
+
+		.panel-body {
+			padding: 5px 0;
+			border-top: 1px solid darken($greyBorder, 10%);
+		}
+	}
 }

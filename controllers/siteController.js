@@ -252,17 +252,25 @@ router
 	})
 	.post('/:siteId/createPagegroup', function(req, res) {
 		var json = req.body;
+		console.log('Inside CreatePagegroup');
 		return channelModel
 			.createPageGroup(json)
 			.then(function(data) {
+				console.log('PageGroup Creation Done');
 				// Reset session on addition of new pagegroup for non-partner
 				var userSites = req.session.user.sites,
+					userEmail = req.session.user.email,
 					site = _.find(userSites, { siteId: parseInt(json.siteId) });
 
-				var index = _.findIndex(userSites, { siteId: parseInt(json.siteId) });
-				req.session.user.sites[index] = site;
+				return userModel
+					.setSitePageGroups(userEmail)
+					.then(user => user.save())
+					.then(() => {
+						var index = _.findIndex(userSites, { siteId: parseInt(json.siteId) });
+						req.session.user.sites[index] = site;
 
-				return res.redirect('/user/dashboard');
+						return res.redirect('/user/dashboard');
+					});
 			})
 			.catch(function(err) {
 				var error = err.message[0].message ? err.message[0].message : 'Some error occurred!';
@@ -368,6 +376,62 @@ router
 			})
 			.catch(function(err) {
 				res.send('Site not found!');
+			});
+	})
+	.post('/:siteId/saveRevenueShare', (req, res) => {
+		let response = {
+			error: true,
+			message: 'Operaiton Failed'
+		};
+		if (!req.body || !req.body.siteId || !req.body.share) {
+			return res.send(response);
+		}
+		return siteModel
+			.getSiteById(req.body.siteId)
+			.then(site => {
+				let adNetworkSettings = site.get('adNetworkSettings') || {};
+				adNetworkSettings = {
+					revenueShare: parseInt(req.body.share),
+					negate: ['adsense']
+				};
+				site.set('adNetworkSettings', adNetworkSettings);
+				return site.save();
+			})
+			.then(() =>
+				res.send(
+					Object.assign(response, {
+						error: false,
+						message: 'Share set'
+					})
+				)
+			)
+			.catch(err => {
+				console.log(err);
+				return res.send(response);
+			});
+	})
+	.get('/:siteId/getRevenueShare', (req, res) => {
+		let response = {
+			error: true,
+			message: 'Operaiton Failed'
+		};
+		return siteModel
+			.getSiteById(req.params.siteId)
+			.then(site => {
+				if (!site) {
+					return res.send(response);
+				}
+				return res.send(
+					Object.assign(response, {
+						error: false,
+						message: 'Done',
+						rs: site.get('adNetworkSettings').revenueShare ? site.get('adNetworkSettings').revenueShare : 10
+					})
+				);
+			})
+			.catch(err => {
+				console.log(err);
+				return res.send(response);
 			});
 	});
 

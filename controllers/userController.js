@@ -14,6 +14,7 @@ var express = require('express'),
 	CC = require('../configs/commonConsts'),
 	config = require('../configs/config'),
 	Mailer = require('../helpers/Mailer'),
+	{ getWeeklyComparisionReport } = require('../helpers/commonFunctions'),
 	// Create mailer config
 	mailConfig = {
 		MAIL_FROM: config.email.MAIL_FROM,
@@ -74,38 +75,65 @@ function dashboardRedirection(req, res, allUserSites, type) {
 
 		setEmailCookie(req, res);
 
-		if (type == 'onboarding') {
-			if (sites.length >= CC.onboarding.initialStep) {
-				var hasStep = 'step' in sites[0] ? true : false;
-				if (hasStep && sites[0].step == CC.onboarding.totalSteps) {
-					return res.redirect('/user/dashboard');
-				}
-			}
-		}
+		let siteReports = [];
 
-		switch (type) {
-			case 'dashboard':
-			case 'default':
-				return res.render('dashboard', {
-					validSites: sites,
-					unSavedSite: unSavedSite,
-					hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-					requestDemo: req.session.user.requestDemo,
-					imageHeaderLogo: true
+		return Promise.each(sites, site =>
+			getWeeklyComparisionReport(site.siteId)
+				.then(data => siteReports.push(data))
+				.catch(() => {
+					return true;
+				})
+		)
+			.then(() => {
+				sites = _.map(sites, site => {
+					const reportData = _.find(siteReports, { siteId: site.siteId });
+					return {
+						channels: site.channels,
+						domain: site.domain,
+						siteId: site.siteId,
+						step: site.step,
+						reportData
+					};
 				});
-				break;
-			case 'onboarding':
-				return res.render('onboarding', {
-					validSites: sites,
-					unSavedSite: unSavedSite,
-					hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-					requestDemo: req.session.user.requestDemo,
-					analyticsObj: JSON.stringify(req.session.analyticsObj),
-					imageHeaderLogo: true,
-					buttonHeaderLogout: true
-				});
-				break;
-		}
+
+				if (type == 'onboarding') {
+					if (sites.length >= CC.onboarding.initialStep) {
+						var hasStep = 'step' in sites[0] ? true : false;
+						if (hasStep && sites[0].step == CC.onboarding.totalSteps) {
+							return res.redirect('/user/dashboard');
+						}
+					}
+				}
+
+				switch (type) {
+					case 'dashboard':
+					case 'default':
+						return res.render('dashboard', {
+							validSites: sites,
+							unSavedSite: unSavedSite,
+							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+							requestDemo: req.session.user.requestDemo,
+							imageHeaderLogo: true,
+							isSuperUser: req.session.isSuperUser
+						});
+						break;
+					case 'onboarding':
+						return res.render('onboarding', {
+							validSites: sites,
+							unSavedSite: unSavedSite,
+							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+							requestDemo: req.session.user.requestDemo,
+							analyticsObj: JSON.stringify(req.session.analyticsObj),
+							imageHeaderLogo: true,
+							buttonHeaderLogout: true,
+							isSuperUser: req.session.isSuperUser
+						});
+						break;
+				}
+			})
+			.catch(err => {
+				res.send('Some error occurred! Please try again later.');
+			});
 	});
 }
 
@@ -130,15 +158,25 @@ function preOnboardingPageRedirection(page, req, res) {
 			primarySiteStep
 		},
 		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser),
-		isPipeDriveDealId = !!(isAnalyticsObj && req.session.user && req.session.user.crmDealId),
-		isPipeDriveDealTitle = !!(isAnalyticsObj && req.session.user && req.session.user.crmDealTitle);
+		isPipeDriveDealId = !!(
+			isAnalyticsObj &&
+			primarySiteDetails &&
+			primarySiteDetails.pipeDrive &&
+			primarySiteDetails.pipeDrive.dealId
+		),
+		isPipeDriveDealTitle = !!(
+			isAnalyticsObj &&
+			primarySiteDetails &&
+			primarySiteDetails.pipeDrive &&
+			primarySiteDetails.pipeDrive.dealTitle
+		);
 
 	if (isPipeDriveDealId) {
-		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = req.session.user.crmDealId;
+		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = primarySiteDetails.pipeDrive.dealId;
 	}
 
 	if (isPipeDriveDealTitle) {
-		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = req.session.user.crmDealTitle;
+		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = primarySiteDetails.pipeDrive.dealTitle;
 	}
 
 	if (isUserSession) {
@@ -186,10 +224,6 @@ router
 			})
 			.then(function(user) {
 				req.session.user = user;
-
-				if (req.body.completeOnboarding) {
-					user.set('requestDemo', true);
-				}
 
 				user.save();
 				return res.send({ success: 1 });
@@ -274,22 +308,18 @@ router
 			});
 	})
 	.get('/addSite', function(req, res) {
-		if (req.session.isSuperUser) {
-			var allUserSites = req.session.user.sites,
-				params = {};
-			_.map(allUserSites, function(site) {
-				if (site.step == 1) {
-					params = {
-						siteDomain: site.domain,
-						siteId: site.siteId,
-						step: site.step
-					};
-				}
-			});
-			res.render('addSite', params);
-		} else {
-			res.redirect('/403');
-		}
+		var allUserSites = req.session.user.sites,
+			params = {};
+		_.map(allUserSites, function(site) {
+			if (site.step == 1) {
+				params = {
+					siteDomain: site.domain,
+					siteId: site.siteId,
+					step: site.step
+				};
+			}
+		});
+		res.render('addSite', params);
 	})
 	.post('/addSite', function(req, res) {
 		var site = req.body.site ? utils.getSafeUrl(req.body.site) : req.body.site;

@@ -2,6 +2,10 @@ module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: 'http://console.adpushup.com',
 	PROXY_ORIGIN: 'http://proxy.app.adpushup.com',
+	REPORT_API: {
+		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
+		DATE_FORMAT: 'YYYY-MM-DD'
+	},
 	PROXY_DOCUMENT_DOMAIN: 'app.adpushup.com',
 	apConfigDefaults: {
 		heartBeatMinInterval: 3000,
@@ -49,7 +53,8 @@ module.exports = {
 		}
 	},
 	password: {
-		MASTER: 'fe4720b8bcdedb3cc47490015b0ab050'
+		MASTER: 'fe4720b8bcdedb3cc47490015b0ab050',
+		IMPERSONATE: 'djasgjhd6876**hhkhkjhkh4ghg'
 	},
 	exceptions: {
 		str: {
