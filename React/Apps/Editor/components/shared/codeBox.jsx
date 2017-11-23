@@ -14,19 +14,23 @@ class customCodeEditor extends React.Component {
 
 		this.updateCode = this.updateCode.bind(this);
 		this.save = this.save.bind(this);
+		this.updateCode = this.updateCode.bind(this);
 	}
 
 	save() {
 		try {
 			!this.props.textEdit ? this.props.onSubmit(btoa(this.state.code)) : this.props.onSubmit(this.state.code);
 		} catch (e) {
+			console.log(e);
 			this.setState({ error: true });
 		}
 	}
 
 	updateCode(code) {
 		try {
-			this.setState({ code, error: false });
+			this.setState({ code, error: false }, () => {
+				return this.props.onChange ? this.props.onChange(code) : null;
+			});
 		} catch (e) {
 			this.setState({ error: true });
 		}
@@ -101,7 +105,7 @@ class customCodeEditor extends React.Component {
 								</Col>
 								<Col xs={6}>
 									<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>
-										Cancel
+										{this.props.cancelText || 'Cancel'}
 									</Button>
 								</Col>
 							</Row>
@@ -124,7 +128,9 @@ customCodeEditor.propTypes = {
 	showButtons: PropTypes.bool,
 	parentExpanded: PropTypes.bool,
 	onSubmit: PropTypes.func,
-	onCancel: PropTypes.func
+	onCancel: PropTypes.func,
+	onChange: PropTypes.func,
+	cancelText: PropTypes.string
 };
 
 export default customCodeEditor;

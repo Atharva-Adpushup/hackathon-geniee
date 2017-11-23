@@ -1,11 +1,12 @@
 // In-content section adder render methods
 
 import { Field, FieldArray } from 'redux-form';
+import { Row, Col, Button } from 'react-bootstrap';
 import CodeBox from 'shared/codeBox';
 import SelectBox from 'shared/select/select';
 import { networks } from 'consts/commonConsts';
 import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
-import { Row, Col, Button } from 'react-bootstrap';
+import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 
 const renderField = field => {
 		return (
@@ -23,7 +24,7 @@ const renderField = field => {
 								className="inputMinimal"
 							/>
 							{field.meta.touched &&
-							field.meta.error && <div className="error-message">{field.meta.error}</div>}
+								field.meta.error && <div className="error-message">{field.meta.error}</div>}
 						</Col>
 					</Row>
 				</Col>
@@ -69,30 +70,7 @@ const renderField = field => {
 			))}
 		</ul>
 	),
-	renderCodeBox = field => {
-		return <CodeBox showButtons={false} isField field={field} />;
-	},
-	renderSwitch = field => {
-		return (
-			<CustomToggleSwitch
-				labelText={field.label}
-				className="mT-10 mB-10"
-				labelSize={5}
-				componentSize={7}
-				customComponentClass="u-padding-r10px"
-				checked={true}
-				name="headerBiddingSwitch"
-				layout="horizontal"
-				size="m"
-				id="js-header-bidding-switch"
-				on="Yes"
-				off="No"
-				{...field.input}
-			/>
-		);
-	},
-	renderNetworkOptions = (that, CodeBoxField) => {
-		let networkDropdownItems = networks;
+	renderNetworkOptions = that => {
 		return (
 			<Row>
 				<Col xs={12} className="u-padding-r10px">
@@ -101,47 +79,14 @@ const renderField = field => {
 							<strong>Select Network</strong>
 						</Col>
 						<Col xs={7} className="u-padding-r10px mb-10">
-							<Field
-								name="network"
-								component="select"
-								className="inputMinimal"
-								onChange={that.setNetwork.bind(that)}
-							>
-								<option value={false}>Select network</option>
-								{networkDropdownItems.map((item, index) => (
-									<option key={index} value={item}>
-										{item.charAt(0).toUpperCase() + item.slice(1).replace(/([A-Z])/g, ' $1')}
-									</option>
-								))}
-							</Field>
+							<NetworkOptions
+								onSubmit={networkObj => that.setNetwork(networkObj)}
+								onCancel={value => console.log(value)}
+								buttonType={2}
+								fromPanel={true}
+								showNotification={that.props.showNotification}
+							/>
 						</Col>
-					</Row>
-					<Row>
-						{that.state.network ? that.state.network == 'adpTags' ? (
-							<div className="clearfix">
-								<div className="mT-10 mB-10 clearfix">
-									<Field
-										placeholder="Please enter price floor"
-										name="priceFloor"
-										component={renderField}
-										type="text"
-										label="Price Floor"
-									/>
-								</div>
-								<div>
-									<Field
-										label="Header Bidding"
-										name="headerBidding"
-										component={renderSwitch}
-										onChange={that.switchChangeHandler.bind(that)}
-									/>
-								</div>
-							</div>
-						) : (
-							<div style={{ margin: '10px 0px' }} className="clearfix">
-								{CodeBoxField}
-							</div>
-						) : null}
 					</Row>
 				</Col>
 			</Row>
@@ -182,46 +127,8 @@ const renderField = field => {
 		);
 	},
 	renderInContentAdder = (that, getSupportedSizes) => {
-		let CodeBoxField;
-
-		if (currentUser.userType !== 'partner') {
-			CodeBoxField = <Field name="adCode" component={renderCodeBox} label="Ad Code" />;
-		} else {
-			if (that.state.addCustomAdCode) {
-				CodeBoxField = (
-					<div>
-						<Field name="adCode" component={renderCodeBox} label="Ad Code" />
-						<Row>
-							<Col xs={2} className="u-padding-r10px col-xs-offset-3">
-								<Button
-									style={{ marginTop: 20, marginBottom: 20 }}
-									onClick={that.hideCustomAdCodeBox.bind(that)}
-									className="btn-lightBg btn-cancel btn-block"
-									type="button"
-								>
-									Cancel
-								</Button>
-							</Col>
-						</Row>
-					</div>
-				);
-			} else {
-				CodeBoxField = (
-					<Col className="u-padding-r10px" style={{ marginTop: 20 }} xs={3}>
-						<Button
-							onClick={that.showCustomAdCodeBox.bind(that)}
-							className="btn-lightBg btn-code btn-block"
-							type="button"
-						>
-							Add Custom Ad Code
-						</Button>
-					</Col>
-				);
-			}
-		}
-
 		return (
-			<form onSubmit={that.props.handleSubmit}>
+			<form>
 				<h1 className="variation-section-heading">Add Incontent Variation</h1>
 				<div style={{ width: '65%', borderRight: '1px solid rgba(85, 85, 85, 0.3)', display: 'inline-block' }}>
 					<Field
@@ -285,7 +192,6 @@ const renderField = field => {
 							</Col>
 						</Row>
 					) : null}
-					{currentUser.userType !== 'partner' ? renderNetworkOptions(that, CodeBoxField) : null}
 					<Row>
 						<FieldArray name="notNear" component={renderNotNear} />
 					</Row>
@@ -298,17 +204,7 @@ const renderField = field => {
 							label="Custom Zone Id"
 						/>
 					) : null}
-					<Row>
-						<Col
-							className="u-padding-r10px"
-							style={{ marginTop: '30px', marginBottom: '30px', clear: 'both' }}
-							xs={2}
-						>
-							<Button className="btn-lightBg btn-save btn-block" type="submit">
-								Save
-							</Button>
-						</Col>
-					</Row>
+					{renderNetworkOptions(that)}
 				</div>
 				<div style={{ width: '35%', padding: '0px 10px', display: 'inline-block', verticalAlign: 'top' }}>
 					{that.state.selectedElement ? renderInfo(that) : null}

@@ -7,9 +7,11 @@ import NewChannelMenu from 'containers/newChannelMenuContainer.js';
 import AfterSaveLoaderContainer from 'containers/afterSaveLoaderContainer.js';
 import SiteModesPopoverContainer from 'containers/siteModesPopoverContainer.js';
 import ChannelMenuContainer from 'containers/channelMenuContainer.js';
+import NotificationContainer from 'containers/notificationContainer';
 
 const OuterEditor = () => (
 	<div>
+		<NotificationContainer />
 		<ChannelManager />
 		<InsertMenu />
 		<VariationManager />
