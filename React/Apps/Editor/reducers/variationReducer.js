@@ -80,6 +80,15 @@ const variation = (state = {}, action) => {
 					}
 				};
 
+			case variationActions.SAVE_KEY_VALUES:
+				return {
+					...state,
+					[action.variation.id]: {
+						...state[action.variation.id],
+						adpKeyValues: action.adpKeyValues
+					}
+				};
+
 			case variationActions.EDIT_VARIATION_NAME:
 				return {
 					...state,

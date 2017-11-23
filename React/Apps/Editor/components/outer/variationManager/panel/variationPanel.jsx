@@ -8,6 +8,7 @@ import VariationOptions from './variationOptions';
 import VariationSections from './variationSections/index';
 import VariationBar from './variationBar';
 import BeforeAfterJsPanel from './beforeAfterJsPanel';
+import KeyValuesPanel from './keyValuesPanel';
 
 class VariationPanel extends React.Component {
 	render() {
@@ -35,6 +36,9 @@ class VariationPanel extends React.Component {
 					</div>
 					<div tabTitle="Before/After JS">
 						<BeforeAfterJsPanel channelId={channelId} variation={variation} ui={ui} />
+					</div>
+					<div tabTitle="ADP Key Values">
+						<KeyValuesPanel channelId={channelId} variation={variation} sections={sections} ui={ui} />
 					</div>
 				</TabPanel>
 			</div>
