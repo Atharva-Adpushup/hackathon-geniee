@@ -86,7 +86,7 @@ module.exports = React.createClass({
 	},
 
 	handleChange(val, cb) {
-		return function(event) {
+		return function (event) {
 			this.clickingOption = false;
 			interceptEvent(event);
 			if (this.isMultiple()) {
@@ -125,7 +125,7 @@ module.exports = React.createClass({
 
 	handleClear(event) {
 		interceptEvent(event);
-		this.handleChange(null, function() {
+		this.handleChange(null, function () {
 			// only called when change="true"
 			this.props.onChange(this.state.pendingValue);
 		})(event);
@@ -138,7 +138,7 @@ module.exports = React.createClass({
 
 	handleOpen(event) {
 		interceptEvent(event);
-		this.setState({ open: true }, function() {
+		this.setState({ open: true }, function () {
 			this.refs.menu.focus();
 		});
 	},
@@ -268,6 +268,9 @@ module.exports = React.createClass({
 		}
 		if (!this.hasValue()) {
 			className += ' react-select-box-empty';
+		}
+		if (this.hasValue()) {
+			className += ' react-select-box-selected'
 		}
 		if (this.props.disabled) {
 			disabledStyles = {
