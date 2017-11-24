@@ -4,6 +4,7 @@ $greyBg: #eee;
 $greyBorder: #e6e6e6;
 $fontColor: #555;
 $legendBg:#fafafa;
+$SBBorderColorActive: #ccc;
 
 html,
 body {
@@ -63,8 +64,9 @@ body {
 	display: block;
 
 	.DateRangePickerInput {
+		background-color: lighten($greyBorder, 5%);
 		display: block;
-		border-color: $greyBorder;
+		border: 2px solid $SBBorderColorActive;
 		border-radius: 3px;
 
 		.DateRangePickerInput_calendarIcon,
@@ -84,6 +86,7 @@ body {
 			width: 90px;
 			font-family: 'Karla', sans-serif;
 			font-size: 1.1em;
+			background-color: lighten($greyBorder, 5%);
 
 			input {
 				cursor: pointer;
