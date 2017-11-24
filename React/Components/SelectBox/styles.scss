@@ -180,3 +180,15 @@ $primaryColor: #eb575c;
 	position: absolute;
 	left: -99999em;
 }
+
+.react-select-box-selected {
+	.react-select-box,
+	.react-select-box:focus {
+		border: 2px solid $SBBorderColorActive;
+	}
+
+	.react-select-box,
+	.react-select-box-clear {
+		background-color: lighten($SBBorderColor, 5%);
+	}
+}
