@@ -207,4 +207,4 @@ total_requests ----> total_pageviews
 // 		debugger;
 // 	});
 
-module.exports = { generate, getPVS };
+module.exports = { generate, getPVS, executeQuery };
