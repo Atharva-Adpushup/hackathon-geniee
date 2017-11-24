@@ -64,9 +64,9 @@ body {
 	display: block;
 
 	.DateRangePickerInput {
-		background-color: lighten($greyBorder, 5%);
+		background-color: lighten($primaryColor, 34%);
 		display: block;
-		border: 2px solid $SBBorderColorActive;
+		border: 2px solid $primaryColor;
 		border-radius: 3px;
 
 		.DateRangePickerInput_calendarIcon,
@@ -86,7 +86,7 @@ body {
 			width: 90px;
 			font-family: 'Karla', sans-serif;
 			font-size: 1.1em;
-			background-color: lighten($greyBorder, 5%);
+			background-color: lighten($primaryColor, 34%);
 
 			input {
 				cursor: pointer;
@@ -200,4 +200,14 @@ body {
 			border-top: 1px solid darken($greyBorder, 10%);
 		}
 	}
+}
+
+.DateRangePickerInput_calendarIcon_svg_1,
+.DateRangePickerInput_arrow_svg_1,
+.DateRangePickerInput_clearDates_svg_1 {
+	fill: darken($primaryColor, 40%);
+}
+
+.DateInput_displayText__hasInput_2.DateInput_displayText__hasInput_2 {
+	color: darken($primaryColor, 40%);
 }
