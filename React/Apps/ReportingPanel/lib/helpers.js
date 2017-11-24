@@ -13,7 +13,7 @@ const apiQueryGenerator = params => {
 		from: moment(params.startDate).format('YYYY-MM-DD'),
 		to: moment(params.endDate).format('YYYY-MM-DD')
 	},
-		groupBy = [commonConsts.DEVICE_TYPE];
+		groupBy = [commonConsts.NETWORK_ID];
 
 	if (params.groupBy) {
 		groupBy.push(params.groupBy);
