@@ -184,11 +184,21 @@ $primaryColor: #eb575c;
 .react-select-box-selected {
 	.react-select-box,
 	.react-select-box:focus {
-		border: 2px solid $SBBorderColorActive;
+		border: 2px solid $primaryColor;
+	}
+
+	.react-select-box {
+		.react-select-box-label {
+			color: darken($primaryColor, 40%);
+		}
 	}
 
 	.react-select-box,
 	.react-select-box-clear {
-		background-color: lighten($SBBorderColor, 5%);
+		background-color: lighten($primaryColor, 34%);
+
+		&:before {
+			color: darken($primaryColor, 40%);
+		}
 	}
 }
