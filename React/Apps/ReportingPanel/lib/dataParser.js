@@ -117,24 +117,18 @@ const dataLabels = commonConsts.DATA_LABELS,
 	processChartGroupBy = (rows, groupByParam) => {
 		let updatedRows = [];
 
-		switch (groupByParam) {
-			case 'pagegroup':
-			case 'variation':
-			default:
-				const groupedRows = groupBy(rows, commonConsts.API_DATA_PARAMS.date);
-				for (let i in groupedRows) {
-					const arr = groupedRows[i];
-					for (let j = 0; j < arr.length; j++) {
-						let row1 = arr[j];
-						for (let k = j + 1; k < arr.length; k++) {
-							let row2 = arr[k];
-							row1 = mergeParams(row1, row2);
-						}
-						updatedRows.push(row1);
-						break;
-					}
+		const groupedRows = groupBy(rows, commonConsts.API_DATA_PARAMS.date);
+		for (let i in groupedRows) {
+			const arr = groupedRows[i];
+			for (let j = 0; j < arr.length; j++) {
+				let row1 = arr[j];
+				for (let k = j + 1; k < arr.length; k++) {
+					let row2 = arr[k];
+					row1 = mergeParams(row1, row2);
 				}
+				updatedRows.push(row1);
 				break;
+			}
 		}
 
 		return updatedRows;
@@ -289,6 +283,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 		}
 		return processedData;
 	},
+	getPlatformName = id => capitalCase(commonConsts.DEVICE_TYPE_MAPPING[id]),
 	processRows = (rows, param) => {
 		let totalPageviews = 0,
 			totalPageCpm = 0,
@@ -334,6 +329,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 		body.push({
 			[dataLabels.pageGroup]: (param && param.name === dataLabels.pageGroup) ? param.value : undefined,
 			[dataLabels.variation]: (param && param.name === dataLabels.variation) ? param.title : undefined,
+			[dataLabels.platform]: (param && param.name === commonConsts.DEVICE_TYPE) ? getPlatformName(param.value) : undefined,
 			[dataLabels.date]: <Bold>{!param ? dataLabels.total : `${dates[0]} to ${dates[dates.length - 1]}`}</Bold>,
 			[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
 			[dataLabels.cpm]: <Bold>{((totalRevenue / totalImpressions) * 1000).toFixed(2)}</Bold>,
@@ -413,6 +409,29 @@ const dataLabels = commonConsts.DATA_LABELS,
 							value: i,
 							title: name
 						}, variations);
+
+					aggregatedData.forEach(data => {
+						updatedRows.push(data);
+					})
+				}
+				break;
+			case commonConsts.DEVICE_TYPE:
+				header.unshift({
+					title: dataLabels.platform,
+					prop: dataLabels.platform,
+					sortable: false,
+					filterable: false
+				});
+
+				let groupedRowsPlatform = groupBy(rows, commonConsts.DEVICE_TYPE);
+
+				let groupByAggregatedDataPlatform = [];
+				for (let i in groupedRowsPlatform) {
+					const networkWiseData = networkWiseProcessing(groupedRowsPlatform[i], customToggleOptions),
+						aggregatedData = processRowsWithGroupBy(networkWiseData, groupByParam, {
+							name: commonConsts.DEVICE_TYPE,
+							value: i
+						});
 
 					aggregatedData.forEach(data => {
 						updatedRows.push(data);
