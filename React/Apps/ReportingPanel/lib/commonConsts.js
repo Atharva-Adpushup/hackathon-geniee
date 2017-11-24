@@ -3,13 +3,18 @@ const commonConsts = {
 	PLATFORMS: ['DESKTOP', 'MOBILE', 'TABLET'],
 	NETWORK_ID: 'ntwid',
 	DEVICE_TYPE: 'device_type',
+	DEVICE_TYPE_MAPPING: {
+		2: 'desktop',
+		4: 'mobile',
+		5: 'tablet'
+	},
 	NETWORKS: {
 		adsense: 'adsense',
 		adx: 'adx',
 		dfp: 'dfp',
 		adp: 'Adp'
 	},
-	GROUP_BY: ['pagegroup'],
+	GROUP_BY: ['device_type', 'pagegroup'],
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
 	SITE_ID: 31000, //window.siteId,
@@ -30,7 +35,8 @@ const commonConsts = {
 		variationId: 'Variation Id',
 		variation: 'Variation Name',
 		pageGroup: 'PageGroup',
-		total: 'Total'
+		total: 'Total',
+		platform: 'Platform'
 	},
 	API_DATA_PARAMS: {
 		impressions: 'total_impressions',
