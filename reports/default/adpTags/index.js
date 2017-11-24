@@ -209,4 +209,4 @@ display_name ---> network
 // 		debugger;
 // 	});
 
-module.exports = { generate, getPVS };
+module.exports = { generate, getPVS, executeQuery };

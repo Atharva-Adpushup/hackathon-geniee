@@ -262,6 +262,17 @@ INNER JOIN (
 ON a.report_date=b.report_date and a.siteid=b.siteid
 `;
 
+const SITE_TOP_URLS = `
+SELECT TOP @__count__ c.url, sum(b.count) AS 'count'
+FROM apexhourlysitereport a, apextopurlreport b, apextopurl c
+WHERE a.axhsrid = b.axhsrid
+	AND b.axtuid = c.axtuid
+	AND report_date BETWEEN @__fromDate__ AND @__toDate__
+	AND a.siteid = @__siteId__
+GROUP BY c.url
+ORDER BY 'count' DESC;
+`;
+
 /**
 SELECT
 	SUM(a.total_requests) AS total_requests,
@@ -421,4 +432,10 @@ const schema = {
 	}
 };
 
-module.exports = { schema, fetchSectionQuery, fetchVariationQuery, fetchPagegroupQuery };
+module.exports = {
+	schema,
+	fetchSectionQuery,
+	fetchVariationQuery,
+	fetchPagegroupQuery,
+	SITE_TOP_URLS
+};
