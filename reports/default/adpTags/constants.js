@@ -316,8 +316,9 @@ const schema = {
 		fields: {
 			forUser: ['name', 'variation_id', 'section_md5'],
 			forOn: ['axpgid', 'axvid', 'axsid'],
+			commonOn: ['report_date', 'siteid', 'device_type'],
 			where: ['name', 'variation_id', 'section_md5', 'report_date', 'siteid', 'device_type'],
-			groupBy: ['section_md5', 'variation_id', 'name']
+			groupBy: ['section_md5', 'variation_id', 'name', 'device_type']
 		},
 		tables: {
 			pagegroup: {
@@ -352,7 +353,7 @@ const schema = {
 	},
 	secondQuery: {
 		aggregate: ['total_revenue', 'total_impressions', 'total_gross_revenue'],
-		nonAggregate: ['report_date', 'siteid', 'ntwid', 'platform', 'display_name'],
+		nonAggregate: ['report_date', 'siteid', 'ntwid', 'platform', 'device_type', 'display_name'],
 		where: ['ntwid'],
 		tables: {
 			adpTagReport: {
