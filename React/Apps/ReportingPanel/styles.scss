@@ -211,3 +211,13 @@ body {
 .DateInput_displayText__hasInput_2.DateInput_displayText__hasInput_2 {
 	color: darken($primaryColor, 40%);
 }
+
+.toggle input[type=checkbox]:checked~label .toggleSwitch {
+	background-color: $primaryColor;
+}
+
+.toggle input[type=checkbox]:checked~label .toggleSwitch:after {
+	color: $primaryColor;
+	box-shadow: 0 2px 2px 0 rgba(235,87,92,.4);
+}
+
