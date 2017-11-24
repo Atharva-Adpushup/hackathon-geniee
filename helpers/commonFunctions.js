@@ -5,6 +5,7 @@ const Promise = require('bluebird'),
 	config = require('../configs/config'),
 	commonConsts = require('../configs/commonConsts'),
 	sqlReportingModule = require('../reports/default/adpTags/index'),
+	siteTopUrlsQuery = require('../reports/default/adpTags/queries/siteTopUrls'),
 	createAggregateNonAggregateObjects = (dataset, key, container) => {
 		let innerObj = {};
 		_.forEach(dataset, (nonAggregateDataset, identifier) => {
@@ -42,10 +43,10 @@ const Promise = require('bluebird'),
 				isInvalidRevenue || innerObj[identifier].aggregate.total_impressions == 0
 					? 0
 					: Number(
-						innerObj[identifier].aggregate.total_revenue *
-						1000 /
-						innerObj[identifier].aggregate.total_impressions
-					).toFixed(3);
+							innerObj[identifier].aggregate.total_revenue *
+								1000 /
+								innerObj[identifier].aggregate.total_impressions
+						).toFixed(3);
 		});
 		container[key] = innerObj;
 	},
@@ -85,36 +86,35 @@ const Promise = require('bluebird'),
 			totalRevenue += row.total_revenue;
 			totalPageviews += row.total_requests;
 
-			const cpm = (row.total_revenue * 1000 / row.total_impressions);
+			const cpm = row.total_revenue * 1000 / row.total_impressions;
 			totalCpm += isNaN(cpm) ? 0 : cpm;
 
-			totalPageCpm += (row.total_revenue * 1000 / row.total_requests);
+			totalPageCpm += row.total_revenue * 1000 / row.total_requests;
 		});
 
-		const totalCpmValue = ((totalRevenue / totalImpressions) * 1000).toFixed(2);
+		const totalCpmValue = (totalRevenue / totalImpressions * 1000).toFixed(2);
 		return {
 			totalImpressions,
 			totalRevenue: totalRevenue.toFixed(2),
 			totalPageviews,
 			totalCpm: isNaN(totalCpmValue) ? 0 : totalCpmValue,
-			totalPageCpm: ((totalRevenue / totalPageviews) * 1000).toFixed(2)
+			totalPageCpm: (totalRevenue / totalPageviews * 1000).toFixed(2)
 		};
 	},
 	getSiteReport = payload => {
 		const { siteId, select, from, to } = payload;
 
-		return sqlReportingModule
-			.generate({
-				select,
-				where: { siteid: siteId, from, to, mode: 1 },
-			});
+		return sqlReportingModule.generate({
+			select,
+			where: { siteid: siteId, from, to, mode: 1 }
+		});
 	},
 	getDay = dayOffset =>
 		moment()
 			.subtract(dayOffset, 'days')
 			.startOf('day'),
 	getWeeklyComparisionReport = siteId => {
-		const dateFormat = commonConsts.REPORT_DATE_FORMAT,
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			thisWeekReportParams = {
 				siteId,
 				from: moment(getDay(7)).format(dateFormat),
@@ -150,6 +150,18 @@ const Promise = require('bluebird'),
 					}
 				};
 			});
+	},
+	getSiteTopUrlsReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				siteId: parameterConfig.siteId,
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				count: parameterConfig.count ? parameterConfig.count : 10,
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return siteTopUrlsQuery.getData(config);
 	};
 
-module.exports = { queryResultProcessing, getWeeklyComparisionReport };
+module.exports = { queryResultProcessing, getWeeklyComparisionReport, getSiteTopUrlsReport };
