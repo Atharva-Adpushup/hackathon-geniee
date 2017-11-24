@@ -108,10 +108,10 @@ const dataLabels = commonConsts.DATA_LABELS,
 	mergeParams = (row1, row2) => {
 		const API_DATA_PARAMS = commonConsts.API_DATA_PARAMS;
 		row1[API_DATA_PARAMS.impressions] += row2[API_DATA_PARAMS.impressions];
-		row1[API_DATA_PARAMS.pageviews] += row2[API_DATA_PARAMS.pageviews];
+		row1[API_DATA_PARAMS.pageviews] = row2[API_DATA_PARAMS.pageviews];
 		row1[API_DATA_PARAMS.revenue] += row2[API_DATA_PARAMS.revenue];
 		row1[API_DATA_PARAMS.grossRevenue] += row2[API_DATA_PARAMS.grossRevenue];
-		row1[API_DATA_PARAMS.xpathMiss] += row2[API_DATA_PARAMS.xpathMiss];
+		row1[API_DATA_PARAMS.xpathMiss] = row2[API_DATA_PARAMS.xpathMiss];
 		return row1;
 	},
 	processChartGroupBy = (rows, groupByParam) => {
