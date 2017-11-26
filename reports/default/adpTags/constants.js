@@ -281,6 +281,15 @@ WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
 GROUP BY report_date, device_type;
 `;
 
+const SITE_PAGEGROUP_WISE_REVENUE_CONTRIBUTION = `
+SELECT a.report_date, b.NAME AS 'name', sum(a.total_gross_revenue) AS 'total_revenue', sum(a.total_revenue) AS 'revenue_after_cut'
+FROM AdpTagReport a, ApexPageGroup b
+WHERE a.axpgid = b.axpgid
+	AND a.report_date BETWEEN @__fromDate__ AND @__toDate__
+	AND a.siteid = @__siteId__
+GROUP BY a.report_date, b.NAME;
+`;
+
 const PLATFORMS_KEYS = {
 	0: 'UNKNOWN',
 	1: 'MOBILE',
@@ -462,5 +471,6 @@ module.exports = {
 	SITE_DEVICE_WISE_REVENUE_CONTRIBUTION,
 	PLATFORMS_KEYS,
 	REGEX_DATE_FORMAT,
-	STRING_DATE_FORMAT
+	STRING_DATE_FORMAT,
+	SITE_PAGEGROUP_WISE_REVENUE_CONTRIBUTION
 };
