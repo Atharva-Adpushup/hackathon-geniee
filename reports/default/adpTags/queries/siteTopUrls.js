@@ -45,9 +45,11 @@ module.exports = {
 		console.log(`Query for site top urls: ${paramConfig.siteId}`);
 
 		return sqlReportModule.executeQuery(databaseConfig).then(resultData => {
-			const isOptionTransform = !!(paramConfig && paramConfig.transform);
+			const isOptionTransform = !!(paramConfig && paramConfig.transform),
+				isResultData = !!(resultData && resultData.length),
+				isTransformableData = isOptionTransform && isResultData;
 
-			if (!isOptionTransform) {
+			if (!isTransformableData) {
 				return resultData;
 			}
 
