@@ -273,6 +273,28 @@ GROUP BY c.url
 ORDER BY 'count' DESC;
 `;
 
+const SITE_DEVICE_WISE_REVENUE_CONTRIBUTION = `
+SELECT report_date, device_type, sum(total_gross_revenue) AS 'total_revenue', sum(total_revenue) AS 'revenue_after_cut'
+FROM adptagreport
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+	AND siteid = @__siteId__
+GROUP BY report_date, device_type;
+`;
+
+const PLATFORMS_KEYS = {
+	0: 'UNKNOWN',
+	1: 'MOBILE',
+	2: 'DESKTOP',
+	3: 'CONNECTED_TV',
+	4: 'MOBILE',
+	5: 'TABLET',
+	6: 'CONNECTED_DEVICE',
+	7: 'SET_TOP_BOX'
+};
+
+const REGEX_DATE_FORMAT = /\d{4}-\d{2}-\d{2}/;
+const STRING_DATE_FORMAT = 'YYYY-MM-DD';
+
 /**
 SELECT
 	SUM(a.total_requests) AS total_requests,
@@ -437,5 +459,9 @@ module.exports = {
 	fetchSectionQuery,
 	fetchVariationQuery,
 	fetchPagegroupQuery,
-	SITE_TOP_URLS
+	SITE_TOP_URLS,
+	SITE_DEVICE_WISE_REVENUE_CONTRIBUTION,
+	PLATFORMS_KEYS,
+	REGEX_DATE_FORMAT,
+	STRING_DATE_FORMAT
 };
