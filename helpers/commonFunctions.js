@@ -6,6 +6,7 @@ const Promise = require('bluebird'),
 	commonConsts = require('../configs/commonConsts'),
 	sqlReportingModule = require('../reports/default/adpTags/index'),
 	siteTopUrlsQuery = require('../reports/default/adpTags/queries/siteTopUrls'),
+	siteDeviceWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/siteDeviceWiseRevenueContribution'),
 	createAggregateNonAggregateObjects = (dataset, key, container) => {
 		let innerObj = {};
 		_.forEach(dataset, (nonAggregateDataset, identifier) => {
@@ -162,6 +163,22 @@ const Promise = require('bluebird'),
 			};
 
 		return siteTopUrlsQuery.getData(config);
+	},
+	getSiteDeviceWiseRevenueContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				siteId: parameterConfig.siteId,
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return siteDeviceWiseRevenueContributionQuery.getData(config);
 	};
 
-module.exports = { queryResultProcessing, getWeeklyComparisionReport, getSiteTopUrlsReport };
+module.exports = {
+	queryResultProcessing,
+	getWeeklyComparisionReport,
+	getSiteTopUrlsReport,
+	getSiteDeviceWiseRevenueContributionReport
+};
