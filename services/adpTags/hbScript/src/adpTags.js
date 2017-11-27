@@ -8,7 +8,7 @@ var prebidSandbox = require('./prebidSandbox'),
 	find = require('lodash.find'),
 	adpRender = require('./adpRender'),
 	// Maps a particular adp slot to a dfp ad unit and a prebid bidder config
-	inventoryMapper = function(size, optionalParam) {
+	inventoryMapper = function (size, optionalParam) {
 		var width = size[0],
 			height = size[1],
 			size = width + 'x' + height,
@@ -20,9 +20,9 @@ var prebidSandbox = require('./prebidSandbox'),
 			bidders = inventory.hbConfig.bidderAdUnits[size] ? inventory.hbConfig.bidderAdUnits[size].pop() : null;
 		}
 
-		if (availableSlots) {
-			if (optionalParam.dfpAdunitToUse && availableSlots.indexOf(optionalParam.dfpAdunitToUse) !== -1) {
-				dfpAdUnit = availableSlots.splice(availableSlots.indexOf(optionalParam.dfpAdunitToUse), 1);
+		if (availableSlots.length) {
+			if (optionalParam.dfpAdunit && availableSlots.indexOf(optionalParam.dfpAdunit) !== -1) {
+				dfpAdUnit = availableSlots.splice(availableSlots.indexOf(optionalParam.dfpAdunit), 1)[0];
 			} else {
 				dfpAdUnit = inventory.dfpAdUnits[size].pop();
 			}
@@ -33,16 +33,16 @@ var prebidSandbox = require('./prebidSandbox'),
 		};
 	},
 	// Adds batch Id to all the adp slots in a batch
-	addBatchIdToAdpSlots = function(adpSlots, batchId) {
-		Object.keys(adpSlots).forEach(function(slot) {
+	addBatchIdToAdpSlots = function (adpSlots, batchId) {
+		Object.keys(adpSlots).forEach(function (slot) {
 			adpSlots[slot].batchId = batchId;
 		});
 	},
 	// Initiate prebidding for an adpSlots batch
-	prebidBatching = function(adpSlotsBatch) {
+	prebidBatching = function (adpSlotsBatch) {
 		prebidSandbox.createPrebidContainer(adpSlotsBatch);
 	},
-	createSlot = function(containerId, size, placement, optionalParam) {
+	createSlot = function (containerId, size, placement, optionalParam) {
 		var adUnits = inventoryMapper(size, optionalParam),
 			slotId = adUnits.dfpAdUnit,
 			bidders = optionalParam.headerBidding ? adUnits.bidders : [];
@@ -67,7 +67,7 @@ var prebidSandbox = require('./prebidSandbox'),
 		};
 		return adpTags.adpSlots[containerId];
 	},
-	processBatchForBidding = function() {
+	processBatchForBidding = function () {
 		var batchId = adpTags.currentBatchId,
 			adpSlots = adpTags.currentBatchAdpSlots;
 
@@ -89,7 +89,7 @@ var prebidSandbox = require('./prebidSandbox'),
 
 		logger.log('Timeout interval ended');
 	},
-	queSlotForBidding = function(slot) {
+	queSlotForBidding = function (slot) {
 		if (!adpTags.slotInterval) {
 			adpTags.currentBatchId = !adpTags.currentBatchId
 				? Math.abs(utils.hashCode(+new Date() + ''))
@@ -111,7 +111,7 @@ var prebidSandbox = require('./prebidSandbox'),
 		currentBatchId: null,
 		batchPrebiddingComplete: false,
 		// Function to define new adp slot
-		defineSlot: function(containerId, size, placement, optionalParam) {
+		defineSlot: function (containerId, size, placement, optionalParam) {
 			var optionalParam = optionalParam || {},
 				slot = createSlot(containerId, size, placement, optionalParam);
 			logger.log('Slot defined for container : ' + containerId);
@@ -148,16 +148,16 @@ var prebidSandbox = require('./prebidSandbox'),
 			queSlotForBidding(this.adpSlots[containerId]);
 			return this.adpSlots[containerId];
 		},
-		processQue: function() {
+		processQue: function () {
 			while (this.que.length) {
 				this.que.shift().call(this);
 			}
 		},
-		extendConfig: function(newConfig) {
+		extendConfig: function (newConfig) {
 			Object.assign(config, newConfig);
 		},
 		// Function to display adp slot for given container id
-		display: function(containerId) {
+		display: function (containerId) {
 			var slot = this.adpSlots[containerId];
 
 			if (slot && !slot.containerPresent) {
