@@ -8,6 +8,7 @@ const Promise = require('bluebird'),
 	siteTopUrlsQuery = require('../reports/default/adpTags/queries/siteTopUrls'),
 	siteDeviceWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/siteDeviceWiseRevenueContribution'),
 	sitePageGroupWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/sitePageGroupWiseRevenueContribution'),
+	siteAdNetworkWiseDataContributionQuery = require('../reports/default/adpTags/queries/siteAdNetworkWiseDataContribution'),
 	createAggregateNonAggregateObjects = (dataset, key, container) => {
 		let innerObj = {};
 		_.forEach(dataset, (nonAggregateDataset, identifier) => {
@@ -186,6 +187,17 @@ const Promise = require('bluebird'),
 			};
 
 		return sitePageGroupWiseRevenueContributionQuery.getData(config);
+	},
+	getSiteAdNetworkWiseDataContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				siteId: parameterConfig.siteId,
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return siteAdNetworkWiseDataContributionQuery.getData(config);
 	};
 
 module.exports = {
@@ -193,5 +205,6 @@ module.exports = {
 	getWeeklyComparisionReport,
 	getSiteTopUrlsReport,
 	getSiteDeviceWiseRevenueContributionReport,
-	getSitePageGroupWiseRevenueContributionReport
+	getSitePageGroupWiseRevenueContributionReport,
+	getSiteAdNetworkWiseDataContributionReport
 };

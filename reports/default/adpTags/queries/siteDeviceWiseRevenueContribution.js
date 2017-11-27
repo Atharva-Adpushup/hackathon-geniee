@@ -45,11 +45,6 @@ function computeContribution(inputData) {
 	aggregatedDataKeys.forEach(dataKeyItem => {
 		const dataValue = inputData.aggregated[dataKeyItem];
 		let revenueContribution = utils.toFloat(dataValue / totalRevenue * 100);
-		const isRevenueContribution = !!(revenueContribution && revenueContribution > 0);
-
-		if (!isRevenueContribution) {
-			return true;
-		}
 
 		inputData.contribution[dataKeyItem] = revenueContribution;
 	});
