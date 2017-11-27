@@ -96,7 +96,7 @@ const getLastVariationNumber = function (variations) {
 				dispatch({ type: variationActions.DELETE_VARIATION, variationId, channelId });
 			}
 		} else {
-			alert('You need at least one variation!');
+			dispatch({ type: uiActions.SHOW_NOTIFICATION, mode: 'error', title: 'Operation failed', message: 'You need at least one variation!' });
 		}
 	},
 	setActiveVariation = variationId => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
@@ -107,7 +107,7 @@ const getLastVariationNumber = function (variations) {
 				return data;
 			});
 		if (_.find(arr, { name: name })) {
-			alert('Cannot create variation with same name!');
+			dispatch({ type: uiActions.SHOW_NOTIFICATION, mode: 'error', title: 'Operation failed', message: 'Cannot create variation with same name!' });
 			return;
 		}
 		dispatch({ type: variationActions.EDIT_VARIATION_NAME, variationId, name });

@@ -5,28 +5,28 @@ import Utils from 'libs/utils';
 import _ from 'lodash';
 
 const createSection = (sectionPayload, adPayload, variationId) => {
-		const adId = Utils.getRandomNumber(),
-			sectionId = Utils.getRandomNumber();
+	const adId = Utils.getRandomNumber(),
+		sectionId = Utils.getRandomNumber();
 
-		return {
-			type: sectionActions.CREATE_SECTION,
-			adPayload: Object.assign(adPayload, {
-				id: adId,
-				css: adPayload.css ? adPayload.css : defaultSectionCss,
-				createTs: Math.floor(Date.now() / 1000)
-			}),
-			sectionPayload: Object.assign(sectionPayload, {
-				name: `Section-${sectionId}`,
-				id: sectionId,
-				ads: [adId],
-				createTs: Math.floor(Date.now() / 1000),
-				allXpaths: []
-			}),
-			sectionId,
-			adId,
-			variationId
-		};
-	},
+	return {
+		type: sectionActions.CREATE_SECTION,
+		adPayload: Object.assign(adPayload, {
+			id: adId,
+			css: adPayload.css ? adPayload.css : defaultSectionCss,
+			createTs: Math.floor(Date.now() / 1000)
+		}),
+		sectionPayload: Object.assign(sectionPayload, {
+			name: `Section-${sectionId}`,
+			id: sectionId,
+			ads: [adId],
+			createTs: Math.floor(Date.now() / 1000),
+			allXpaths: []
+		}),
+		sectionId,
+		adId,
+		variationId
+	};
+},
 	createIncontentSection = (sectionPayload, adPayload, variationId) => (dispatch, getState) => {
 		const variationSections = getVariationSectionsWithAds(getState(), { variationId }).sections,
 			arr = _.map(variationSections, data => {
@@ -34,11 +34,11 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			});
 
 		if (_.find(arr, { sectionNo: sectionPayload.sectionNo })) {
-			alert('Cannot create in content section with same section no.');
+			dispatch({ type: uiActions.SHOW_NOTIFICATION, mode: 'error', title: 'Operation failed', message: 'Cannot create in content section with same section no.' });
 			return;
 		}
 		if (_.find(arr, { sectionNo: sectionPayload.name })) {
-			alert('Cannot create in content section with same section name.');
+			dispatch({ type: uiActions.SHOW_NOTIFICATION, mode: 'error', title: 'Operation failed', message: 'Cannot create in content section with same section name.' });
 			return;
 		}
 
@@ -135,7 +135,7 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 				return data;
 			});
 		if (_.find(arr, { name })) {
-			alert('Cannot create section with same section name!');
+			dispatch({ type: uiActions.SHOW_NOTIFICATION, mode: 'error', title: 'Operation failed', message: 'Cannot create section with same section name' });
 			return;
 		}
 
