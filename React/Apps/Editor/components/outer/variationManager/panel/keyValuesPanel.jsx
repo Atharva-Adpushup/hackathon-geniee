@@ -11,7 +11,7 @@ class KeyValuesPanel extends Component {
 		super(props);
 		this.state = {
 			containsADP: false,
-			adpKeyValues: this.props.variation.adpKeyValues || ''
+			adpKeyValues: this.props.variation.adpKeyValues || isNull
 		};
 		this.checkADP = this.checkADP.bind(this);
 		this.submitHandler = this.submitHandler.bind(this);
@@ -26,11 +26,11 @@ class KeyValuesPanel extends Component {
 	checkADP() {
 		return this.props.sections
 			? this.props.sections.some(section => {
-					let ad = section.ads[0];
-					if (ad.network && ad.network == 'adpTags') {
-						return true;
-					}
-				})
+				let ad = section.ads[0];
+				if (ad.network && ad.network == 'adpTags') {
+					return true;
+				}
+			})
 			: false;
 	}
 
@@ -38,7 +38,7 @@ class KeyValuesPanel extends Component {
 		try {
 			value = JSON.parse(value);
 		} catch (e) {
-			this.showNotification({
+			this.props.showNotification({
 				mode: 'error',
 				title: 'Invalid Value',
 				message: 'Key values must be valid JSON'
@@ -64,15 +64,15 @@ class KeyValuesPanel extends Component {
 							textEdit
 							parentExpanded={this.props.ui.variationPanel.expanded}
 							textEditBtn="Save Key Values"
-							code={this.state.adpKeyValues}
+							code={this.state.adpKeyValues ? JSON.stringify(this.state.adpKeyValues) : '{}'}
 							onSubmit={this.submitHandler}
 						/>
 					</Col>
 				</Row>
 			</div>
 		) : (
-			<div>Variation must contain one ADP section in order to set Key-Values</div>
-		);
+				<div>Variation must contain one ADP section in order to set Key-Values</div>
+			);
 	}
 }
 
