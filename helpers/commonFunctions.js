@@ -109,8 +109,12 @@ const Promise = require('bluebird'),
 	setMetricComparisonData = (inputData, lastWeek, thisWeek) => {
 		const comparisonData = utils.getMetricComparison(lastWeek, thisWeek);
 
-		inputData.lastWeek = Number(lastWeek);
-		inputData.thisWeek = Number(thisWeek);
+		inputData.lastWeek = utils.numberFormatter(lastWeek);
+		inputData.lastWeekOriginal = Number(lastWeek);
+
+		inputData.thisWeek = utils.numberFormatter(thisWeek);
+		inputData.thisWeekOriginal = Number(thisWeek);
+
 		inputData.percentage = Number(comparisonData.percentage);
 		inputData.change = comparisonData.change;
 	},
@@ -118,31 +122,41 @@ const Promise = require('bluebird'),
 		const resultData = {
 			impressions: {
 				lastWeek: 0,
+				lastWeekOriginal: 0,
 				thisWeek: 0,
+				thisWeekOriginal: 0,
 				percentage: 0,
 				change: false
 			},
 			revenue: {
 				lastWeek: 0,
+				lastWeekOriginal: 0,
 				thisWeek: 0,
+				thisWeekOriginal: 0,
 				percentage: 0,
 				change: false
 			},
 			pageViews: {
 				lastWeek: 0,
+				lastWeekOriginal: 0,
 				thisWeek: 0,
+				thisWeekOriginal: 0,
 				percentage: 0,
 				change: false
 			},
 			cpm: {
 				lastWeek: 0,
+				lastWeekOriginal: 0,
 				thisWeek: 0,
+				thisWeekOriginal: 0,
 				percentage: 0,
 				change: false
 			},
 			pageCPM: {
 				lastWeek: 0,
+				lastWeekOriginal: 0,
 				thisWeek: 0,
+				thisWeekOriginal: 0,
 				percentage: 0,
 				change: false
 			}
@@ -312,12 +326,53 @@ const Promise = require('bluebird'),
 			};
 
 		return siteAdNetworkWiseDataContributionQuery.getData(config);
+	},
+	getWeeklyEmailReport = siteId => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			parameterConfig = {
+				siteId,
+				fromDate: moment(getDay(7)).format(dateFormat),
+				toDate: moment(getDay(1)).format(dateFormat),
+				transform: true,
+				count: 10
+			},
+			resultData = {
+				metricComparison: {},
+				topUrls: {},
+				pageGroupRevenueContribution: {},
+				deviceRevenueContribution: {},
+				adNetworkDataContribution: {}
+			};
+
+		return getWeeklyMetricsReport(parameterConfig.siteId).then(metricComparison => {
+			const getTopUrls = getSiteTopUrlsReport(parameterConfig),
+				getPageGroupWiseRevenue = getSitePageGroupWiseRevenueContributionReport(parameterConfig),
+				getDeviceWiseRevenue = getSiteDeviceWiseRevenueContributionReport(parameterConfig),
+				getAdNetworkWiseData = getSiteAdNetworkWiseDataContributionReport(parameterConfig);
+
+			return Promise.join(
+				getTopUrls,
+				getPageGroupWiseRevenue,
+				getDeviceWiseRevenue,
+				getAdNetworkWiseData,
+				(topUrls, pageGroupRevenue, deviceWiseRevenue, adNetworkWiseData) => {
+					resultData.metricComparison = metricComparison;
+					resultData.topUrls = topUrls;
+					resultData.pageGroupRevenueContribution = pageGroupRevenue;
+					resultData.deviceRevenueContribution = deviceWiseRevenue;
+					resultData.adNetworkDataContribution = adNetworkWiseData;
+
+					return resultData;
+				}
+			);
+		});
 	};
 
 module.exports = {
 	queryResultProcessing,
 	getWeeklyComparisionReport,
 	getWeeklyMetricsReport,
+	getWeeklyEmailReport,
 	getSiteTopUrlsReport,
 	getSiteDeviceWiseRevenueContributionReport,
 	getSitePageGroupWiseRevenueContributionReport,
