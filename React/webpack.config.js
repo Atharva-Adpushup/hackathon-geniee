@@ -175,7 +175,7 @@ module.exports = [
 					loaders: ['style-loader', 'css-loader']
 				}
 			]
-		}
+		},
 		plugins: [
 			new webpack.optimize.UglifyJsPlugin({
 				compress: {
