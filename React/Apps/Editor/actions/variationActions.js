@@ -7,22 +7,23 @@ import {
 	getChannelVariationsWithAds,
 	getVariationSectionsWithAds
 } from 'selectors/variationSelectors';
+import { uiActions } from '../consts/commonConsts';
 
-const getLastVariationNumber = function(variations) {
-		const names = variations.map(({ name }) => {
-			var reversed = parseInt(name.split(' ')[1], 10),
-				vName = isNaN(reversed) ? 0 : reversed;
+const getLastVariationNumber = function (variations) {
+	const names = variations.map(({ name }) => {
+		var reversed = parseInt(name.split(' ')[1], 10),
+			vName = isNaN(reversed) ? 0 : reversed;
 
-			return name.indexOf('Variation') === -1 ? 0 : vName;
-		});
-		return names.length
-			? names
-					.sort(function(a, b) {
-						return a > b;
-					})
-					.reverse()[0]
-			: 0;
-	},
+		return name.indexOf('Variation') === -1 ? 0 : vName;
+	});
+	return names.length
+		? names
+			.sort(function (a, b) {
+				return a > b;
+			})
+			.reverse()[0]
+		: 0;
+},
 	addVariation = channelId => (dispatch, getState) => {
 		const variationId = Utils.getRandomNumber(),
 			state = getState(),
@@ -116,8 +117,14 @@ const getLastVariationNumber = function(variations) {
 		variationId,
 		trafficDistribution
 	}),
-	saveBeforeJs = (variation, beforeJs) => ({ type: variationActions.SAVE_BEFORE_JS, variation, beforeJs }),
-	saveAfterJs = (variation, afterJs) => ({ type: variationActions.SAVE_AFTER_JS, variation, afterJs }),
+	saveBeforeJs = (variation, beforeJs) => (dispatch, getState) => {
+		dispatch({ type: variationActions.SAVE_BEFORE_JS, variation, beforeJs });
+		dispatch({ type: uiActions.SHOW_NOTIFICATION, mode: 'success', title: 'Operation Successful', message: 'Before JS has been saved' });
+	},
+	saveAfterJs = (variation, afterJs) => (dispatch, getState) => {
+		dispatch({ type: variationActions.SAVE_AFTER_JS, variation, afterJs });
+		dispatch({ type: uiActions.SHOW_NOTIFICATION, mode: 'success', title: 'Operation Successful', message: 'After JS has been saved' });
+	},
 	saveKeyValues = (variation, adpKeyValues) => ({ type: variationActions.SAVE_KEY_VALUES, variation, adpKeyValues });
 
 export {
