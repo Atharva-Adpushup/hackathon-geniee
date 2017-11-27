@@ -11,7 +11,7 @@ class KeyValuesPanel extends Component {
 		super(props);
 		this.state = {
 			containsADP: false,
-			adpKeyValues: this.props.variation.adpKeyValues || isNull
+			adpKeyValues: this.props.variation.adpKeyValues || null
 		};
 		this.checkADP = this.checkADP.bind(this);
 		this.submitHandler = this.submitHandler.bind(this);
