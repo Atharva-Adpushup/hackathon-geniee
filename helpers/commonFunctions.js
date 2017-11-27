@@ -250,7 +250,7 @@ const Promise = require('bluebird'),
 			lastWeekReportParams = {
 				siteId,
 				from: moment(getDay(14)).format(dateFormat),
-				to: moment(getDay(7)).format(dateFormat),
+				to: moment(getDay(8)).format(dateFormat),
 				select: commonConsts.REPORT_API.SELECT_PARAMS
 			};
 
