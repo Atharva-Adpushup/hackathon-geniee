@@ -4,6 +4,7 @@ const Promise = require('bluebird'),
 	moment = require('moment'),
 	config = require('../configs/config'),
 	commonConsts = require('../configs/commonConsts'),
+	utils = require('./utils'),
 	sqlReportingModule = require('../reports/default/adpTags/index'),
 	siteTopUrlsQuery = require('../reports/default/adpTags/queries/siteTopUrls'),
 	siteDeviceWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/siteDeviceWiseRevenueContribution'),
@@ -66,6 +67,114 @@ const Promise = require('bluebird'),
 		createAggregateNonAggregateObjects(variationWiseResult, 'variations', reporting);
 		createAggregateNonAggregateObjects(sectionWiseResult, 'sections', reporting);
 		return Promise.resolve(reporting);
+	},
+	isSiteLiveFor7Days = inputDate => {
+		return !!(moment().diff(inputDate, 'days') >= 7);
+	},
+	validateMetricsData = inputData => {
+		const isInputData = !!(inputData && inputData.siteId && inputData.lastWeekReport && inputData.thisWeekReport),
+			isLastWeekReport = !!(
+				isInputData &&
+				inputData.lastWeekReport &&
+				Object.keys(inputData.lastWeekReport).length &&
+				inputData.lastWeekReport.reportData &&
+				Object.keys(inputData.lastWeekReport.reportData).length &&
+				inputData.lastWeekReport.reportDataNonAggregated &&
+				inputData.lastWeekReport.reportDataNonAggregated.length &&
+				inputData.lastWeekReport.reportFrom &&
+				inputData.lastWeekReport.reportTo
+			),
+			isThisWeekReport = !!(
+				isInputData &&
+				inputData.thisWeekReport &&
+				Object.keys(inputData.thisWeekReport).length &&
+				inputData.thisWeekReport.reportData &&
+				Object.keys(inputData.thisWeekReport.reportData).length &&
+				inputData.thisWeekReport.reportDataNonAggregated &&
+				inputData.thisWeekReport.reportDataNonAggregated.length &&
+				inputData.thisWeekReport.reportFrom &&
+				inputData.thisWeekReport.reportTo
+			),
+			thisWeekEarliestDate =
+				isThisWeekReport && moment(inputData.thisWeekReport.reportDataNonAggregated[0].report_date),
+			isValidSiteData = isSiteLiveFor7Days(thisWeekEarliestDate),
+			isValidData = isLastWeekReport && isThisWeekReport && isValidSiteData;
+
+		if (!isValidData) {
+			throw new Error('validateMetricsData: Data is invalid');
+		}
+
+		return inputData;
+	},
+	setMetricComparisonData = (inputData, lastWeek, thisWeek) => {
+		const comparisonData = utils.getMetricComparison(lastWeek, thisWeek);
+
+		inputData.lastWeek = Number(lastWeek);
+		inputData.thisWeek = Number(thisWeek);
+		inputData.percentage = Number(comparisonData.percentage);
+		inputData.change = comparisonData.change;
+	},
+	computeMetricComparison = inputData => {
+		const resultData = {
+			impressions: {
+				lastWeek: 0,
+				thisWeek: 0,
+				percentage: 0,
+				change: false
+			},
+			revenue: {
+				lastWeek: 0,
+				thisWeek: 0,
+				percentage: 0,
+				change: false
+			},
+			pageViews: {
+				lastWeek: 0,
+				thisWeek: 0,
+				percentage: 0,
+				change: false
+			},
+			cpm: {
+				lastWeek: 0,
+				thisWeek: 0,
+				percentage: 0,
+				change: false
+			},
+			pageCPM: {
+				lastWeek: 0,
+				thisWeek: 0,
+				percentage: 0,
+				change: false
+			}
+		};
+
+		setMetricComparisonData(
+			resultData.impressions,
+			inputData.lastWeekReport.reportData.totalImpressions,
+			inputData.thisWeekReport.reportData.totalImpressions
+		);
+		setMetricComparisonData(
+			resultData.revenue,
+			inputData.lastWeekReport.reportData.totalRevenue,
+			inputData.thisWeekReport.reportData.totalRevenue
+		);
+		setMetricComparisonData(
+			resultData.pageViews,
+			inputData.lastWeekReport.reportData.totalPageviews,
+			inputData.thisWeekReport.reportData.totalPageviews
+		);
+		setMetricComparisonData(
+			resultData.cpm,
+			inputData.lastWeekReport.reportData.totalCpm,
+			inputData.thisWeekReport.reportData.totalCpm
+		);
+		setMetricComparisonData(
+			resultData.pageCPM,
+			inputData.lastWeekReport.reportData.totalPageCpm,
+			inputData.thisWeekReport.reportData.totalPageCpm
+		);
+
+		return resultData;
 	},
 	aggregateWeekData = rows => {
 		let totalImpressions = 0,
@@ -154,6 +263,11 @@ const Promise = require('bluebird'),
 				};
 			});
 	},
+	getWeeklyMetricsReport = siteId => {
+		return getWeeklyComparisionReport(siteId)
+			.then(validateMetricsData)
+			.then(computeMetricComparison);
+	},
 	getSiteTopUrlsReport = parameterConfig => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
@@ -203,6 +317,7 @@ const Promise = require('bluebird'),
 module.exports = {
 	queryResultProcessing,
 	getWeeklyComparisionReport,
+	getWeeklyMetricsReport,
 	getSiteTopUrlsReport,
 	getSiteDeviceWiseRevenueContributionReport,
 	getSitePageGroupWiseRevenueContributionReport,
