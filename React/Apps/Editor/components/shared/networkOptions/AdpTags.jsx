@@ -17,8 +17,8 @@ class AdpTags extends Component {
 			advanced: false,
 			keyValues: !code
 				? {
-						[fpKey]: priceFloor
-					}
+					[fpKey]: priceFloor
+				}
 				: code
 		};
 		this.save = this.save.bind(this);
@@ -78,8 +78,8 @@ class AdpTags extends Component {
 				</Row>
 			</div>
 		) : (
-			''
-		);
+				''
+			);
 	}
 
 	renderNormalSaveButton(showButtons = true, submitHandler) {
@@ -90,8 +90,8 @@ class AdpTags extends Component {
 				</Button>
 			</Col>
 		) : (
-			''
-		);
+				''
+			);
 	}
 
 	renderButtons(type = 1, showButtons = true, submitHandler, cancelHandler) {
@@ -140,12 +140,12 @@ class AdpTags extends Component {
 					</Col>
 					<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
 						<input
-							type="number"
+							type="text"
 							placeholder="Enter Price Floor"
 							className="inputBasic mB-10"
 							value={this.state.pf}
 							onChange={ev => {
-								this.setState({ pf: parseFloat(ev.target.value) });
+								this.setState({ pf: ev.target.value });
 							}}
 						/>
 					</Col>
