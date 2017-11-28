@@ -117,7 +117,9 @@ const getLastVariationNumber = function(variations) {
 		trafficDistribution
 	}),
 	saveBeforeJs = (variation, beforeJs) => ({ type: variationActions.SAVE_BEFORE_JS, variation, beforeJs }),
-	saveAfterJs = (variation, afterJs) => ({ type: variationActions.SAVE_AFTER_JS, variation, afterJs });
+	saveAfterJs = (variation, afterJs) => ({ type: variationActions.SAVE_AFTER_JS, variation, afterJs }),
+	saveKeyValues = (variation, adpKeyValues) => ({ type: variationActions.SAVE_KEY_VALUES, variation, adpKeyValues });
+
 export {
 	addVariation,
 	copyVariation,
@@ -128,5 +130,6 @@ export {
 	editTrafficDistribution,
 	saveBeforeJs,
 	saveAfterJs,
+	saveKeyValues,
 	updateContentSelector
 };
