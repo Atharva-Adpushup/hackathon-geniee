@@ -1,10 +1,10 @@
 var utils = require('../libs/utils'),
 	$ = require('jquery'),
 	config = window.adpushup.config,
-	generateGenieeBodyTag = function(ad) {
+	generateGenieeBodyTag = function (ad) {
 		var adCode;
-		if (ad.adCode) {
-			adCode = utils.base64Decode(ad.adCode);
+		if (ad.networkData.adCode) {
+			adCode = utils.base64Decode(ad.networkData.adCode);
 		} else {
 			adCode = [];
 			adCode.push('<scr' + 'ipt type="text/javascript">');
@@ -15,20 +15,25 @@ var utils = require('../libs/utils'),
 		}
 		return adCode;
 	},
-	executeNoramlAdpTagsHeadCode = function(adpTagUnits) {
+	executeNoramlAdpTagsHeadCode = function (adpTagUnits, adpKeyValues) {
 		if (!adpTagUnits || !adpTagUnits.length) {
 			return false;
 		}
-		var doIt = function(adpTagUnits) {
-			return function() {
+		var doIt = function (adpTagUnits) {
+			return function () {
 				for (var i = 0; i < adpTagUnits.length; i++) {
 					var ad = adpTagUnits[i];
 					adpTags.defineSlot(ad.networkData.dfpAdunit, [ad.width, ad.height], ad.networkData.dfpAdunit, {
 						dfpAdunit: ad.networkData.dfpAdunit,
 						dfpAdunitCode: ad.networkData.dfpAdunitCode,
 						headerBidding: ad.networkData.headerBidding,
-						priceFloor: ad.networkData.priceFloor
+						keyValues: ad.networkData.keyValues
 					});
+				}
+				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
+				if (adpKeyValues && Object.keys(adpKeyValues).length) {
+					var keyVals = adpTags.config.PAGE_KEY_VALUES;
+					adpTags.extendConfig({ PAGE_KEY_VALUES: Object.assign(keyVals, adpKeyValues) });
 				}
 			};
 		};
@@ -37,7 +42,7 @@ var utils = require('../libs/utils'),
 		window.adpTags.que.push(doIt(adpTagUnits));
 		return true;
 	},
-	executeAmpHeadCode = function() {
+	executeAmpHeadCode = function () {
 		var adCode = [];
 		adCode.push('<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">');
 		adCode.push(
@@ -46,13 +51,13 @@ var utils = require('../libs/utils'),
 		adCode.push('<scr' + 'ipt async src="https://cdn.ampproject.org/v0.js"></scr' + 'ipt>');
 		adCode.push(
 			'<scr' +
-				'ipt async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></scr' +
-				'ipt>'
+			'ipt async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></scr' +
+			'ipt>'
 		);
 		adCode.push(
 			'<scr' +
-				'ipt async custom-element="amp-sticky-ad" src="https://cdn.ampproject.org/v0/amp-sticky-ad-1.0.js"></scr' +
-				'ipt>'
+			'ipt async custom-element="amp-sticky-ad" src="https://cdn.ampproject.org/v0/amp-sticky-ad-1.0.js"></scr' +
+			'ipt>'
 		);
 		$el = null;
 		if ($('head').length) {
@@ -63,7 +68,7 @@ var utils = require('../libs/utils'),
 		$el.append(adCode.join('\n'));
 		return true;
 	},
-	genrateAdpBodyTag = function(ad) {
+	genrateAdpBodyTag = function (ad) {
 		var adCode;
 		if (!ad.networkData || !ad.networkData.dfpAdunit) {
 			adCode = '';
@@ -93,8 +98,11 @@ var utils = require('../libs/utils'),
 	};
 
 module.exports = {
-	generateAdCode: function(ad) {
+	generateAdCode: function (ad) {
 		var adCode;
+		if (!ad.networkData) {
+			return '';
+		}
 		switch (ad.network.toLowerCase()) {
 			case 'geniee':
 				adCode = generateGenieeBodyTag(ad);
@@ -105,15 +113,15 @@ module.exports = {
 				break;
 
 			default:
-				if (ad.adCode) {
-					adCode = utils.base64Decode(ad.adCode);
+				if (ad.networkData.adCode) {
+					adCode = utils.base64Decode(ad.networkData.adCode);
 				} else {
 					return false;
 				}
 		}
 		return typeof adCode === 'string' ? adCode : adCode.join('\n');
 	},
-	generateGenieeHeaderCode: function(genieeAdIds) {
+	generateGenieeHeaderCode: function (genieeAdIds) {
 		if (!genieeAdIds || !genieeAdIds.length) {
 			return false;
 		}
@@ -134,11 +142,11 @@ module.exports = {
 		);
 		return adCode.join('\n');
 	},
-	executeAdpTagsHeadCode: function(adpTagUnits) {
+	executeAdpTagsHeadCode: function (adpTagUnits, adpKeyValues) {
 		if (config.serveAmpTagsForAdp) {
 			executeAmpHeadCode();
 		} else {
-			executeNoramlAdpTagsHeadCode(adpTagUnits);
+			executeNoramlAdpTagsHeadCode(adpTagUnits, adpKeyValues);
 		}
 
 		return true;

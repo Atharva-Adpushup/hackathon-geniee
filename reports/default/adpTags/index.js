@@ -189,14 +189,16 @@ function generate(data) {
 /*
 total_impressions ----> total_ad_requests
 total_requests ----> total_pageviews
+device_type ---> device_type
+display_name ---> network
 */
 
 // let params = {
-// 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid', 'ntwid'],
+// 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid', 'ntwid', 'device_type'],
 // 	where: {
 // 		siteid: 31000
 // 	},
-// 	groupBy: ['ntwid', 'pagegroup']
+// 	groupBy: ['pagegroup']
 // };
 
 // generate(params)

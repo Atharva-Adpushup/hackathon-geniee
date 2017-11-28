@@ -50,6 +50,16 @@ class AdX extends Component {
 			});
 			return false;
 		}
+
+		if (this.state.error) {
+			this.props.showNotification({
+				mode: 'error',
+				title: 'Invalid AdCode',
+				message: 'Invalid AdCode inserted'
+			});
+			return false;
+		}
+
 		this.props.submitHandler({
 			adCode: value,
 			adunitId: this.state.adunitId
