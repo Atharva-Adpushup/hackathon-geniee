@@ -13,10 +13,15 @@ const apiQueryGenerator = params => {
 		from: moment(params.startDate).format('YYYY-MM-DD'),
 		to: moment(params.endDate).format('YYYY-MM-DD')
 	},
+		select = commonConsts.SELECT,
 		groupBy = [commonConsts.NETWORK_ID];
 
 	if (params.groupBy) {
 		groupBy.push(params.groupBy);
+
+		if (params.groupBy === commonConsts.DEVICE_TYPE) {
+			select.push(commonConsts.DEVICE_TYPE);
+		}
 	}
 
 	if (params.pageGroup) {
@@ -34,7 +39,7 @@ const apiQueryGenerator = params => {
 	where.mode = 1;
 
 	return JSON.stringify({
-		select: commonConsts.SELECT,
+		select,
 		where,
 		orderBy: ['report_date'],
 		groupBy

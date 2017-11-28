@@ -5,10 +5,13 @@ const _ = require('lodash'),
 	{ ERROR_MESSAGES } = require('../../../configs/commonConsts'),
 	{ promiseForeach } = require('node-utils'),
 	isAdSynced = ad => {
+		if (!ad.network || !ad.networkData) {
+			return false;
+		}
 		if (
-			(ad.network == 'geniee' && ad.networkData && ad.networkData.zoneId) ||
-			(ad.network == 'adpTags' && ad.networkData && ad.networkData.dfpAdunit) ||
-			(ad.network && ad.adCode && typeof ad.adCode == 'string' && ad.adCode.length)
+			(ad.network == 'geniee' && ad.networkData.zoneId) ||
+			(ad.network == 'adpTags' && ad.networkData.dfpAdunit) ||
+			(typeof ad.networkData.adCode == 'string' && ad.networkData.adCode.length)
 		) {
 			return true;
 		}
@@ -64,7 +67,9 @@ const _ = require('lodash'),
 					height: json.height,
 					width: json.width,
 					dfpAdunit: ad.networkData.dfpAdunit,
-					dfpAdunitCode: ad.networkData.dfpAdunitCode
+					dfpAdunitCode: ad.networkData.dfpAdunitCode,
+					headerBidding: ad.networkData.headerBidding,
+					keyValues: ad.networkData.keyValues
 				});
 			}
 			//Sending whole network data object in ad.
@@ -90,6 +95,7 @@ const _ = require('lodash'),
 			name: variation.name,
 			traffic: variation.trafficDistribution,
 			customJs: variation.customJs,
+			adpKeyValues: variation.adpKeyValues,
 			contentSelector: isContentSelector ? contentSelector : '',
 			ads: ads,
 			// Data required for auto optimiser model

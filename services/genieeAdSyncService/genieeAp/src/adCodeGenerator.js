@@ -3,8 +3,8 @@ var utils = require('../libs/utils'),
 	config = window.adpushup.config,
 	generateGenieeBodyTag = function(ad) {
 		var adCode;
-		if (ad.adCode) {
-			adCode = utils.base64Decode(ad.adCode);
+		if (ad.networkData.adCode) {
+			adCode = utils.base64Decode(ad.networkData.adCode);
 		} else {
 			adCode = [];
 			adCode.push('<scr' + 'ipt type="text/javascript">');
@@ -15,7 +15,7 @@ var utils = require('../libs/utils'),
 		}
 		return adCode;
 	},
-	executeNoramlAdpTagsHeadCode = function(adpTagUnits) {
+	executeNoramlAdpTagsHeadCode = function(adpTagUnits, adpKeyValues) {
 		if (!adpTagUnits || !adpTagUnits.length) {
 			return false;
 		}
@@ -27,8 +27,12 @@ var utils = require('../libs/utils'),
 						dfpAdunit: ad.networkData.dfpAdunit,
 						dfpAdunitCode: ad.networkData.dfpAdunitCode,
 						headerBidding: ad.networkData.headerBidding,
-						priceFloor: ad.networkData.priceFloor
+						keyValues: ad.networkData.keyValues
 					});
+				}
+				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
+				if (adpKeyValues && Object.keys(adpKeyValues).length) {
+					adpTags.extendConfig({ PAGE_KEY_VALUES: adpKeyValues });
 				}
 			};
 		};
@@ -95,6 +99,9 @@ var utils = require('../libs/utils'),
 module.exports = {
 	generateAdCode: function(ad) {
 		var adCode;
+		if (!ad.networkData) {
+			return '';
+		}
 		switch (ad.network.toLowerCase()) {
 			case 'geniee':
 				adCode = generateGenieeBodyTag(ad);
@@ -105,8 +112,8 @@ module.exports = {
 				break;
 
 			default:
-				if (ad.adCode) {
-					adCode = utils.base64Decode(ad.adCode);
+				if (ad.networkData.adCode) {
+					adCode = utils.base64Decode(ad.networkData.adCode);
 				} else {
 					return false;
 				}
@@ -134,11 +141,11 @@ module.exports = {
 		);
 		return adCode.join('\n');
 	},
-	executeAdpTagsHeadCode: function(adpTagUnits) {
+	executeAdpTagsHeadCode: function(adpTagUnits, adpKeyValues) {
 		if (config.serveAmpTagsForAdp) {
 			executeAmpHeadCode();
 		} else {
-			executeNoramlAdpTagsHeadCode(adpTagUnits);
+			executeNoramlAdpTagsHeadCode(adpTagUnits, adpKeyValues);
 		}
 
 		return true;

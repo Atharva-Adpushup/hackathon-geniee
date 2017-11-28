@@ -4,6 +4,7 @@ $greyBg: #eee;
 $greyBorder: #e6e6e6;
 $fontColor: #555;
 $legendBg:#fafafa;
+$SBBorderColorActive: #ccc;
 
 html,
 body {
@@ -63,8 +64,9 @@ body {
 	display: block;
 
 	.DateRangePickerInput {
+		background-color: lighten($primaryColor, 34%);
 		display: block;
-		border-color: $greyBorder;
+		border: 2px solid $primaryColor;
 		border-radius: 3px;
 
 		.DateRangePickerInput_calendarIcon,
@@ -84,6 +86,7 @@ body {
 			width: 90px;
 			font-family: 'Karla', sans-serif;
 			font-size: 1.1em;
+			background-color: lighten($primaryColor, 34%);
 
 			input {
 				cursor: pointer;
@@ -198,3 +201,23 @@ body {
 		}
 	}
 }
+
+.DateRangePickerInput_calendarIcon_svg_1,
+.DateRangePickerInput_arrow_svg_1,
+.DateRangePickerInput_clearDates_svg_1 {
+	fill: darken($primaryColor, 40%);
+}
+
+.DateInput_displayText__hasInput_2.DateInput_displayText__hasInput_2 {
+	color: darken($primaryColor, 40%);
+}
+
+.toggle input[type=checkbox]:checked~label .toggleSwitch {
+	background-color: $primaryColor;
+}
+
+.toggle input[type=checkbox]:checked~label .toggleSwitch:after {
+	color: $primaryColor;
+	box-shadow: 0 2px 2px 0 rgba(235,87,92,.4);
+}
+
