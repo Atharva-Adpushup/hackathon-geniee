@@ -70,7 +70,11 @@ var logger = require('../helpers/logger'),
 		Object.keys(targeting).forEach(function (key) {
 			//check if any of keys belong to price floor key then set price using granularity function,
 			// so that it can match with price rules on server
-			if (config.ADX_FLOOR.priceFloorKeys.indexOf(key) !== -1 && parseInt(targeting[key], 10) !== 0) {
+			if (config.ADX_FLOOR.priceFloorKeys.indexOf(key) !== -1) {
+				if (parseInt(targeting[key], 10) === 0) {
+					return true;
+				}
+
 				targeting[key] = getFloorWithGranularity(targeting[key]);
 			}
 			slot.gSlot.setTargeting(key, String(targeting[key]));
