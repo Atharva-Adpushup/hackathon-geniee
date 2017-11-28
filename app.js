@@ -33,7 +33,7 @@ var express = require('express'),
 // Set Node process environment
 process.env.NODE_ENV = config.environment.HOST_ENV;
 
-if (process.env.NODE_ENV === consts.environment.development) {
+if (process.env.NODE_ENV === consts.environment.production) {
 	require('./services/genieeAdSyncService/index');
 	//require('./services/hbSyncService/index');
 }
@@ -43,7 +43,7 @@ app.use(compression());
 // Locale support
 app.use(locale(languageSupport));
 
-process.on('uncaughtException', function(err) {
+process.on('uncaughtException', function (err) {
 	// handle the error safely
 	console.log(err);
 });
@@ -88,7 +88,7 @@ app.use(
 );
 
 // Write log to couchbase database on woodlot's 'reqErr' event
-woodlotEvents.on('err', function(log) {
+woodlotEvents.on('err', function (log) {
 	if ('name' in log.message && log.message.name === 'GenieeAPI') {
 		var logData = log.message;
 		couchBaseService
@@ -114,9 +114,9 @@ woodlotEvents.on('err', function(log) {
 
 couchBaseService
 	.connectToAppBucket()
-	.then(function() {
+	.then(function () {
 		// set couchbaseStore for session storage
-		couchbaseStore.on('disconnect', function() {
+		couchbaseStore.on('disconnect', function () {
 			console.log('Couchbase store is disconnected now: ', arguments);
 		});
 
@@ -132,7 +132,7 @@ couchBaseService
 		);
 
 		// Setting template local variables for jade
-		app.use(function(req, res, next) {
+		app.use(function (req, res, next) {
 			app.locals.isSuperUser = req.session.isSuperUser ? true : false;
 			app.locals.usersList = req.session.usersList ? req.session.usersList : [];
 			app.locals.environment = config.environment.HOST_ENV;
@@ -160,7 +160,7 @@ couchBaseService
 		// will print stacktrace
 		if (app.get('env') === 'development') {
 			app.locals.pretty = true;
-			app.use(function(err, req, res) {
+			app.use(function (err, req, res) {
 				res.status(err.status || 500);
 				res.json({
 					message: err.message,
@@ -173,7 +173,7 @@ couchBaseService
 
 		// production error handler
 		// no stacktraces leaked to user
-		app.use(function(err, req, res) {
+		app.use(function (err, req, res) {
 			res.status(err.status || 500);
 			res.render('error', {
 				message: err.message,
@@ -184,7 +184,7 @@ couchBaseService
 		server.listen(config.environment.HOST_PORT);
 		console.log('Server listening at port : ' + config.environment.HOST_PORT);
 	})
-	.catch(function(err) {
+	.catch(function (err) {
 		console.log('err: ' + err.toString());
 	});
 

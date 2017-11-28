@@ -104,6 +104,7 @@ var prebidSandbox = require('./prebidSandbox'),
 	// Adp tags main object instance - instantiates adpslots
 	adpTags = {
 		adpSlots: {},
+		config: config,
 		que: [],
 		slotInterval: null,
 		adpBatches: [],
