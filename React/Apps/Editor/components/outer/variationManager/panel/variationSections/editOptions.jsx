@@ -64,16 +64,16 @@ class EditOptions extends Component {
 				showNotification={this.props.showNotification}
 			/>
 		) : (
-			<AdDetails
-				userType={currentUser.userType || false}
-				ad={this.props.section.ads[0]}
-				ui={this.props.ui}
-				section={this.props.section}
-				variationId={this.props.variation.id}
-				editNetwork={this.toggleNetworkEditor}
-				fromPanel={true}
-			/>
-		);
+				<AdDetails
+					userType={currentUser.userType || false}
+					ad={this.props.section.ads[0]}
+					ui={this.props.ui}
+					section={this.props.section}
+					variationId={this.props.variation.id}
+					editNetwork={this.toggleNetworkEditor}
+					fromPanel={true}
+				/>
+			);
 	}
 
 	render() {
@@ -127,26 +127,26 @@ class EditOptions extends Component {
 						</Col>
 					</Row>
 				) : (
-					<Row>
-						<Col className="u-padding-r10px" xs={4}>
-							Float
+						<Row>
+							<Col className="u-padding-r10px" xs={4}>
+								Float
 						</Col>
-						<Col className="u-padding-l10px" xs={8}>
-							<SelectBox
-								value={this.state.float}
-								label="Select Float"
-								onChange={this.onFloatSelectChange}
-								showClear={false}
-							>
-								{floats.map((float, index) => (
-									<option key={index} value={float}>
-										{float}
-									</option>
-								))}
-							</SelectBox>
-						</Col>
-					</Row>
-				)}
+							<Col className="u-padding-l10px" xs={8}>
+								<SelectBox
+									value={this.state.float}
+									label="Select Float"
+									onChange={this.onFloatSelectChange}
+									showClear={false}
+								>
+									{floats.map((float, index) => (
+										<option key={index} value={float}>
+											{float}
+										</option>
+									))}
+								</SelectBox>
+							</Col>
+						</Row>
+					)}
 				<div className="mT-10">{this.renderContent()}</div>
 			</div>
 		);
