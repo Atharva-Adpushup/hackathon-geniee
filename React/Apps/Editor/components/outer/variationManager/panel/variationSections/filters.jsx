@@ -21,6 +21,7 @@ const Filters = props => {
 							type="date"
 							name="startDate"
 							className="pdAll-5 inputMinimal"
+							value={props.startDate}
 							onChange={props.datesUpdated}
 						/>
 					</Col>
@@ -30,6 +31,7 @@ const Filters = props => {
 							type="date"
 							name="endDate"
 							className="pdAll-5 inputMinimal"
+							value={props.endDate}
 							onChange={props.datesUpdated}
 						/>
 					</Col>
