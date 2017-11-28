@@ -16,6 +16,7 @@ const Form = props => {
 						className="inputBasic mB-10"
 						value={props.adunitId}
 						onChange={props.inputChange}
+						readOnly
 					/>
 				</Col>
 			</Row>

@@ -11,7 +11,7 @@ const adsByIds = (state = {}, action) => {
 			// TODO: Make this reducer pure by moving out all below conditional logic in action thunk
 			const createAdObject = {
 					id: payload.id,
-					adCode: payload.adCode,
+					// adCode: payload.adCode,
 					css: payload.css,
 					height: payload.height,
 					width: payload.width,
@@ -42,7 +42,7 @@ const adsByIds = (state = {}, action) => {
 					width: payload.width,
 					height: payload.height,
 					css: payload.css,
-					adCode: payload.adCode ? payload.adCode : undefined,
+					// adCode: payload.adCode ? payload.adCode : undefined,
 					network: payload.network,
 					secondaryCss: payload.secondaryCss
 				},
@@ -93,21 +93,21 @@ const adsByIds = (state = {}, action) => {
 
 		/**
 		 * Set Network
-		 * 
+		 *
 		 * For ADP TAG
 		 * 		Set adCode to ''
 		 * 		Set Network Data
 		 *			keyValues
 		 *				Set key --> priceFloor
 		 * 			Set headerBiddingFlag
-		 * 
+		 *
 		 * For Others
 		 * 		Set adCode
 		 * 		Set Network Data
 		 * 			Set adCode
-		 * 
+		 *
 		 * 			For Adsense
-		 *				Add adUnitId 
+		 *				Add adUnitId
 		 */
 
 		case adActions.UPDATE_NETWORK:
@@ -116,10 +116,10 @@ const adsByIds = (state = {}, action) => {
 				[action.adId]: {
 					...state[action.adId],
 					network: action.network,
-					adCode:
-						action.network == 'adpTags'
-							? ''
-							: action.networkData.adCode ? action.networkData.adCode : state[action.adId].adCode,
+					// adCode:
+					// 	action.network == 'adpTags'
+					// 		? ''
+					// 		: action.networkData.adCode ? action.networkData.adCode : state[action.adId].adCode,
 					networkData:
 						action.network == state[action.adId].network
 							? {
