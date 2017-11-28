@@ -66,7 +66,7 @@ function triggerControl(mode) {
 
 function startCreation(forced) {
 	// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
-	if (!forced && (shouldWeNotProceed() || !config.pageGroup)) {
+	if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
 		return false;
 	}
 	var selectedVariation = selectVariation(config);
@@ -114,7 +114,7 @@ function main() {
 	}
 
 	if (!config.pageGroup) {
-		pageGroupTimer = setTimeout(function() {
+		pageGroupTimer = setTimeout(function () {
 			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {
