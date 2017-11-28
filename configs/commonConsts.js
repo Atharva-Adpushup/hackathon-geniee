@@ -6,6 +6,12 @@ module.exports = {
 		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
 		DATE_FORMAT: 'YYYY-MM-DD'
 	},
+	DEFAULT_AD_NETWORK_SETTINGS: {
+		revenueShare: 10,
+		negate: [
+			"adsense"
+		]
+	},
 	PROXY_DOCUMENT_DOMAIN: 'app.adpushup.com',
 	apConfigDefaults: {
 		heartBeatMinInterval: 3000,

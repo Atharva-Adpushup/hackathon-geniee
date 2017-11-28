@@ -204,7 +204,7 @@ class ReportControls extends Component {
 							<SelectBox value={state.groupBy} label="Group By" onChange={this.groupByUpdated}>
 								{state.groupByArray.map((groupBy, index) => (
 									<option key={index} value={groupBy}>
-										{groupBy}
+										{groupBy === commonConsts.DEVICE_TYPE ? commonConsts.DATA_LABELS.platform : groupBy}
 									</option>
 								))}
 							</SelectBox>
