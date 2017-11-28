@@ -134,7 +134,7 @@ var logger = require('../helpers/logger'),
 		googletag.cmd.push(function () {
 			//Global key value settings
 			for (var key in config.PAGE_KEY_VALUES) {
-				googletag.pubads().setTargeting(key, config.PAGE_KEY_VALUES[key]);
+				googletag.pubads().setTargeting(key, String(config.PAGE_KEY_VALUES[key]));
 			}
 
 			// Attach gpt slot for each adpSlot in batch
