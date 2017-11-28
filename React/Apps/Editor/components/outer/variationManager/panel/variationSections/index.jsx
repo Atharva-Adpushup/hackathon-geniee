@@ -59,7 +59,11 @@ class variationSections extends Component {
 
 	generateReportWrapper() {
 		if (!this.state.startDate || !this.state.endDate) {
-			alert('Dates cannot be left blanked');
+			this.props.showNotification({
+				mode: 'error',
+				title: 'Operation failed',
+				message: 'Dates cannot be left blank'
+			});
 			return;
 		}
 		this.props.generateReport({
@@ -112,31 +116,31 @@ class variationSections extends Component {
 							styles={{ height: '500px', background: '#ebebeb' }}
 						/>
 					) : (
-						sections.map((section, key) => (
-							<div key={key} className="col-sm-6">
-								<VariationSectionElement
-									section={section}
-									key={key}
-									variation={variation}
-									onDeleteSection={onDeleteSection}
-									onRenameSection={onRenameSection}
-									updateAdCode={updateAdCode}
-									updateNetwork={updateNetwork}
-									onUpdatePartnerData={onUpdatePartnerData}
-									onUpdateXPath={onUpdateXPath}
-									onSectionAllXPaths={onSectionAllXPaths}
-									onValidateXPath={onValidateXPath}
-									onResetErrors={onResetErrors}
-									onSectionXPathValidate={onSectionXPathValidate}
-									onIncontentFloatUpdate={onIncontentFloatUpdate}
-									onScrollSectionIntoView={onScrollSectionIntoView}
-									ui={ui}
-									reporting={reporting}
-									showNotification={showNotification}
-								/>
-							</div>
-						))
-					)}
+							sections.map((section, key) => (
+								<div key={key} className="col-sm-6">
+									<VariationSectionElement
+										section={section}
+										key={key}
+										variation={variation}
+										onDeleteSection={onDeleteSection}
+										onRenameSection={onRenameSection}
+										updateAdCode={updateAdCode}
+										updateNetwork={updateNetwork}
+										onUpdatePartnerData={onUpdatePartnerData}
+										onUpdateXPath={onUpdateXPath}
+										onSectionAllXPaths={onSectionAllXPaths}
+										onValidateXPath={onValidateXPath}
+										onResetErrors={onResetErrors}
+										onSectionXPathValidate={onSectionXPathValidate}
+										onIncontentFloatUpdate={onIncontentFloatUpdate}
+										onScrollSectionIntoView={onScrollSectionIntoView}
+										ui={ui}
+										reporting={reporting}
+										showNotification={showNotification}
+									/>
+								</div>
+							))
+						)}
 				</ul>
 			</div>
 		);

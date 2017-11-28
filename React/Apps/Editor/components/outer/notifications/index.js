@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import 'react-notifications/lib/notifications.css';
 import NotificationSystem from 'react-notification-system';
 
 class Notification extends Component {

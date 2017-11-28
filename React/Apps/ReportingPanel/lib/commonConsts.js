@@ -2,13 +2,20 @@ const commonConsts = {
 	SELECT: ['total_xpath_miss', 'total_impressions', 'total_revenue', 'total_requests', 'total_gross_revenue', 'ntwid'],
 	PLATFORMS: ['DESKTOP', 'MOBILE', 'TABLET'],
 	NETWORK_ID: 'ntwid',
+	DEVICE_TYPE: 'device_type',
+	DEVICE_TYPE_MAPPING: {
+		2: 'desktop',
+		4: 'mobile',
+		5: 'tablet'
+	},
 	NETWORKS: {
 		adsense: 'adsense',
 		adx: 'adx',
 		dfp: 'dfp',
 		adp: 'Adp'
 	},
-	GROUP_BY: ['pagegroup'],
+	LEGEND: ['Impressions', 'CPM ($)'],
+	GROUP_BY: ['device_type', 'pagegroup'],
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
 	SITE_ID: window.siteId,
@@ -29,7 +36,8 @@ const commonConsts = {
 		variationId: 'Variation Id',
 		variation: 'Variation Name',
 		pageGroup: 'PageGroup',
-		total: 'Total'
+		total: 'Total',
+		platform: 'Platform'
 	},
 	API_DATA_PARAMS: {
 		impressions: 'total_impressions',
