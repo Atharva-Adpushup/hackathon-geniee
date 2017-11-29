@@ -10,7 +10,12 @@ const Promise = require('bluebird'),
 	usersByNonEmptySitesQuery = couchbasePromise.ViewQuery.from('app', 'usersByNonEmptySites'),
 	userModel = require('../../models/userModel'),
 	siteModel = require('../../models/siteModel'),
-	channelModel = require('../../models/channelModel');
+	channelModel = require('../../models/channelModel'),
+	woodlot = require('woodlot').customLogger,
+	fileLogger = new woodlot({
+		streams: ['./logs/weeklyEmailReport.log'],
+		stdout: true
+	});
 
 function formatQueryResult(resultData) {
 	return _.map(resultData, resultObj => extend(true, {}, resultObj.value));
@@ -78,7 +83,7 @@ function getSiteData(siteModelInstance) {
 			return dataObject;
 		})
 		.catch(error => {
-			console.log(`${dataObject.email} - Error occurred while fetching site report data: ${error.message} \n`);
+			fileLogger.info(`${dataObject.email} - Error occurred while fetching site report data: ${error.message}`);
 			return dataObject;
 		});
 }
@@ -109,8 +114,8 @@ function processSiteItem(sitesDataArray, siteObject) {
 function errorHandler(siteObject, error) {
 	const message = getValidErrorMessage(error);
 
-	console.log(
-		`\ngetAllSitesData:: catch: Error occurred with site object: ${JSON.stringify(siteObject)}, ${message}`
+	fileLogger.info(
+		`getAllSitesData:: catch: Error occurred with site object: ${JSON.stringify(siteObject)}, ${message}`
 	);
 	return true;
 }
@@ -147,7 +152,7 @@ function getAllSitesData(modelInstance) {
 				statusObject.email
 			}`;
 			statusObject.data = sitesData.concat([]);
-			console.log(`${statusObject.message}, data: ${JSON.stringify(statusObject.data)} \n`);
+			fileLogger.info(`${statusObject.message}, data: ${JSON.stringify(statusObject.data)}`);
 			return statusObject;
 		})
 		.catch(error => {
@@ -156,18 +161,18 @@ function getAllSitesData(modelInstance) {
 			statusObject.status = 0;
 			statusObject.message = `${statusObject.email} - Some error occurred, ${message}`;
 			statusObject.data = [];
-			console.log(`${statusObject.message}, data: ${JSON.stringify(statusObject.data)} \n`);
+			fileLogger.info(`${statusObject.message}, data: ${JSON.stringify(statusObject.data)}`);
 			return statusObject;
 		});
 }
 
 function mainSuccessHandler() {
-	console.log('Init:: Successfully processed all users site data \n');
+	fileLogger.info('Init:: Successfully processed all users site data');
 }
 
 function mainErrorHandler(error) {
-	var errorMessage = `Init:: Catch: Failed to process users site data: Error occurred, ${error.message} \n`;
-	console.log(errorMessage);
+	var errorMessage = `Init:: Catch: Failed to process users site data: Error occurred, ${error.message}`;
+	fileLogger.info(errorMessage);
 }
 
 function getAllSites(userObject) {
@@ -175,8 +180,8 @@ function getAllSites(userObject) {
 }
 
 function rootPromiseEachErrorHandler(userObject, err) {
-	console.log(
-		`Init:: Promise ForEach Catch: Unable to get sites for user: ${JSON.stringify(userObject)}, ${err.message} \n`
+	fileLogger.info(
+		`Init:: Promise ForEach Catch: Unable to get sites for user: ${JSON.stringify(userObject)}, ${err.message}`
 	);
 	return true;
 }
