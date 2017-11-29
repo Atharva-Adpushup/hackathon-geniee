@@ -4,14 +4,14 @@ const Promise = require('bluebird'),
 	{ promiseForeach } = require('node-utils'),
 	moment = require('moment'),
 	AdPushupError = require('../../helpers/AdPushupError'),
-	sqlReportingModule = require('../../reports/default/adpTags/index'),
-	{ getWeeklyEmailReport } = require('../../helpers/commonFunctions'),
+	// { getWeeklyEmailReport } = require('../../helpers/commonFunctions'),
+	highChartsModule = require('./modules/highCharts/index'),
+	{ reportData } = require('./dummyData/reportData'),
 	couchBaseService = require('../../helpers/couchBaseService'),
 	couchbasePromise = require('couchbase-promises'),
 	usersByNonEmptySitesQuery = couchbasePromise.ViewQuery.from('app', 'usersByNonEmptySites'),
 	userModel = require('../../models/userModel'),
 	siteModel = require('../../models/siteModel'),
-	channelModel = require('../../models/channelModel'),
 	woodlot = require('woodlot').customLogger,
 	fileLogger = new woodlot({
 		streams: ['./logs/weeklyEmailReport.log'],
@@ -62,26 +62,28 @@ function getSiteData(siteModelInstance) {
 			step: siteModelInstance.get('step'),
 			mode: siteModelInstance.get('apConfigs').mode,
 			dateCreated: moment(siteModelInstance.get('dateCreated'), 'x').format('YYYY-MM-DD'),
-			pageViews: 0,
-			impressions: 0,
-			revenue: 0,
-			ecpm: 0
+			report: {}
 		},
 		reportDataParams = {
 			siteid: dataObject.id
 		};
 
 	//TODO: Remove below dummny statement after testing
-	const dummySites = [25019, 31000, 29752],
-		randomNumber = Math.round(Math.random() * 2),
-		dummySiteId = dummySites[randomNumber];
-	reportDataParams.siteid = dummySiteId;
+	// const dummySites = [25019, 31000, 29752],
+	// 	randomNumber = Math.round(Math.random() * 2),
+	// 	dummySiteId = dummySites[randomNumber];
+	// reportDataParams.siteid = dummySiteId;
 
-	return getWeeklyEmailReport(reportDataParams.siteid)
+	// return getWeeklyEmailReport(reportDataParams.siteid)
+	return Promise.resolve(reportData)
 		.then(reportData => {
 			fileLogger.info(
-				`getWeeklyEmailReport - Successfully fetched report data for siteId ${dataObject.id}: ${reportData}`
+				`getWeeklyEmailReport - Successfully fetched report data for siteId ${dataObject.id}: ${JSON.stringify(
+					reportData
+				)}`
 			);
+
+			dataObject.report = extend(true, {}, reportData);
 			return dataObject;
 		})
 		.catch(error => {
@@ -102,6 +104,7 @@ function processSiteItem(sitesDataArray, siteObject) {
 		.getSiteById(siteObject.siteId)
 		.then(validateSiteData)
 		.then(getSiteData)
+		.then(highChartsModule.generateImageBase64)
 		.then(siteData => {
 			sitesDataArray.push(siteData);
 			return sitesDataArray;
