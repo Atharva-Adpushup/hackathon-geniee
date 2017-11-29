@@ -133,7 +133,9 @@ const Promise = require('bluebird'),
 		return inputData;
 	},
 	setMetricComparisonData = (inputData, lastWeek, thisWeek) => {
-		const comparisonData = utils.getMetricComparison(lastWeek, thisWeek);
+		const comparisonData = utils.getMetricComparison(lastWeek, thisWeek),
+			percentage = Number(comparisonData.percentage),
+			isPercentageGreaterThanOrEqualToOne = !!(percentage >= 1);
 
 		inputData.lastWeek = utils.numberFormatter(lastWeek);
 		inputData.lastWeekOriginal = Number(lastWeek);
@@ -141,7 +143,7 @@ const Promise = require('bluebird'),
 		inputData.thisWeek = utils.numberFormatter(thisWeek);
 		inputData.thisWeekOriginal = Number(thisWeek);
 
-		inputData.percentage = Math.round(comparisonData.percentage);
+		inputData.percentage = isPercentageGreaterThanOrEqualToOne ? Math.round(percentage) : percentage;
 		inputData.change = comparisonData.change;
 	},
 	computeWeekCPMContribution = weekCPMReport => {
