@@ -31,11 +31,18 @@ function validateSiteData(siteModelInstance) {
 			_.keys(siteModelInstance.get('apConfigs')).length
 		),
 		isMode = !!(isApConfigs && _.has(siteModelInstance.get('apConfigs'), 'mode')),
+		isModePublish = !!(isMode && Number(siteModelInstance.get('apConfigs').mode) === 1),
 		isStep = !!(isApConfigs && siteModelInstance.get('step')),
 		dataObject = {};
+	let siteMode;
 
 	if (!isMode || !isStep) {
 		throw new AdPushupError('validateSiteData:: Invalid site data');
+	}
+	siteMode = siteModelInstance.get('apConfigs').mode;
+
+	if (!isModePublish) {
+		throw new AdPushupError(`validateSiteData:: Site is not live. It has mode ${siteMode}.`);
 	}
 
 	return siteModelInstance;
@@ -76,6 +83,13 @@ function getSiteData(siteModelInstance) {
 		});
 }
 
+function getValidErrorMessage(error) {
+	const isMessageCompositeType = _.isObject(error.message) || _.isArray(error.message),
+		message = isMessageCompositeType ? JSON.stringify(error.message) : error.message;
+
+	return message;
+}
+
 function processSiteItem(sitesDataArray, siteObject) {
 	return siteModel
 		.getSiteById(siteObject.siteId)
@@ -86,13 +100,17 @@ function processSiteItem(sitesDataArray, siteObject) {
 			return sitesDataArray;
 		})
 		.catch(error => {
-			throw new AdPushupError(`${error.message}`);
+			const message = getValidErrorMessage(error);
+
+			throw new AdPushupError(`${message}`);
 		});
 }
 
-function errorHandler(siteObject, err) {
+function errorHandler(siteObject, error) {
+	const message = getValidErrorMessage(error);
+
 	console.log(
-		`getAllSitesData:: catch: Error occurred with site object: ${JSON.stringify(siteObject)}, ${err.message}`
+		`\ngetAllSitesData:: catch: Error occurred with site object: ${JSON.stringify(siteObject)}, ${message}`
 	);
 	return true;
 }
@@ -125,14 +143,15 @@ function getAllSitesData(modelInstance) {
 			}
 
 			statusObject.status = 1;
-			statusObject.message = `${statusObject.email} - Successfully received sites data for user ${statusObject.email}`;
+			statusObject.message = `${statusObject.email} - Successfully received sites data for user ${
+				statusObject.email
+			}`;
 			statusObject.data = sitesData.concat([]);
 			console.log(`${statusObject.message}, data: ${JSON.stringify(statusObject.data)} \n`);
 			return statusObject;
 		})
 		.catch(error => {
-			const isObjectMessage = _.isObject(error.message),
-				message = isObjectMessage ? JSON.stringify(error.message) : error.message;
+			const message = getValidErrorMessage(error);
 
 			statusObject.status = 0;
 			statusObject.message = `${statusObject.email} - Some error occurred, ${message}`;
