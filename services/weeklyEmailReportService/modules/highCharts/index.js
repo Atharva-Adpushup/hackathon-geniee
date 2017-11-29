@@ -14,9 +14,9 @@ function addHighChartsObject(inputData) {
 		resultData = extend(true, {}, inputData);
 
 	resultData.report.charts = {
+		cpmLine: extend({}, defaultChartObject),
 		adNetworkCPMLine: extend({}, defaultChartObject),
 		adNetworkRevenuePie: extend({}, defaultChartObject),
-		cpmLine: extend({}, defaultChartObject),
 		deviceRevenuePie: extend({}, defaultChartObject),
 		pageGroupRevenuePie: extend({}, defaultChartObject)
 	};
@@ -72,7 +72,42 @@ function generateCPMLineBase64(inputData) {
 
 	chartConfig.series.push(lastWeekSeries);
 	chartConfig.series.push(thisWeekSeries);
-	chartConfig.xAxis.categories.concat(categories);
+	chartConfig.xAxis.categories = chartConfig.xAxis.categories.concat(categories);
+
+	return generateBase64(imageOptions, chartConfig);
+}
+
+function generateAdNetworkCPMLineBase64(inputData) {
+	const chartConfig = extend(true, {}, LINE_CHART_CONFIG),
+		imageOptions = getChartImageOptions(),
+		categories = [],
+		contributionData = extend(true, {}, inputData.report.adNetworkDataContribution.dayWise);
+
+	_.forOwn(contributionData, (adNetworkDayWiseReport, adNetworkKey) => {
+		const seriesObject = {
+				name: adNetworkKey,
+				data: []
+			},
+			// Below condition is added to avoid 'categories' array stuffed with redundant
+			// day values.
+			isCategoriesValidLength = !!(categories && categories.length + 1 <= 7),
+			isChartConfigCategoriesEmptyLength = !!chartConfig.xAxis.categories.length;
+
+		_.forOwn(adNetworkDayWiseReport, (dayWiseObject, dateKey) => {
+			if (isCategoriesValidLength) {
+				const dayCategory = moment(dateKey).format('ddd');
+				categories.push(dayCategory);
+			}
+
+			seriesObject.data.push(dayWiseObject.cpm);
+		});
+
+		chartConfig.series.push(seriesObject);
+
+		if (isCategoriesValidLength || !isChartConfigCategoriesEmptyLength) {
+			chartConfig.xAxis.categories = chartConfig.xAxis.categories.concat(categories);
+		}
+	});
 
 	return generateBase64(imageOptions, chartConfig);
 }
@@ -80,10 +115,12 @@ function generateCPMLineBase64(inputData) {
 module.exports = {
 	generateImageBase64: inputData => {
 		const reportData = addHighChartsObject(inputData),
-			getCPMLineBase64 = generateCPMLineBase64(reportData);
+			getCPMLineBase64 = generateCPMLineBase64(reportData),
+			getAdNetworkCPMLineBase64 = generateAdNetworkCPMLineBase64(reportData);
 
-		return Promise.join(getCPMLineBase64, cpmLineBase64 => {
+		return Promise.join(getCPMLineBase64, getAdNetworkCPMLineBase64, (cpmLineBase64, adNetworkCPMLineBase64) => {
 			reportData.report.charts.cpmLine.base64 = cpmLineBase64;
+			reportData.report.charts.adNetworkCPMLine.base64 = adNetworkCPMLineBase64;
 
 			return reportData;
 		});
