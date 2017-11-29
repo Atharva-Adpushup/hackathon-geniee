@@ -144,6 +144,33 @@ const Promise = require('bluebird'),
 		inputData.percentage = Math.round(comparisonData.percentage);
 		inputData.change = comparisonData.change;
 	},
+	computeWeekCPMContribution = weekCPMReport => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			resultData = {};
+
+		_.forEach(weekCPMReport, dailyReportObject => {
+			const reportDate = moment(dailyReportObject.report_date).format(dateFormat),
+				revenue = dailyReportObject.total_revenue,
+				impressions = dailyReportObject.total_impressions;
+			let cpm = Number((revenue / impressions * 1000).toFixed(2));
+
+			cpm = isNaN(cpm) ? 0 : cpm;
+			resultData[reportDate] = cpm;
+		});
+
+		return resultData;
+	},
+	setCPMContribution = inputData => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			lastWeekReport = inputData.lastWeekReport.reportDataNonAggregated,
+			thisWeekReport = inputData.thisWeekReport.reportDataNonAggregated,
+			resultData = {
+				lastWeek: computeWeekCPMContribution(lastWeekReport),
+				thisWeek: computeWeekCPMContribution(thisWeekReport)
+			};
+
+		return resultData;
+	},
 	computeMetricComparison = inputData => {
 		const resultData = {
 				impressions: {
@@ -209,21 +236,26 @@ const Promise = require('bluebird'),
 			inputData.lastWeekReport.reportData.totalImpressions,
 			inputData.thisWeekReport.reportData.totalImpressions
 		);
+
 		setMetricComparisonData(
 			resultData.revenue,
 			inputData.lastWeekReport.reportData.totalRevenue,
 			inputData.thisWeekReport.reportData.totalRevenue
 		);
+
 		setMetricComparisonData(
 			resultData.pageViews,
 			inputData.lastWeekReport.reportData.totalPageviews,
 			inputData.thisWeekReport.reportData.totalPageviews
 		);
+
 		setMetricComparisonData(
 			resultData.cpm,
 			inputData.lastWeekReport.reportData.totalCpm,
 			inputData.thisWeekReport.reportData.totalCpm
 		);
+		resultData.cpm.contribution = setCPMContribution(inputData);
+
 		setMetricComparisonData(
 			resultData.pageCPM,
 			inputData.lastWeekReport.reportData.totalPageCpm,
