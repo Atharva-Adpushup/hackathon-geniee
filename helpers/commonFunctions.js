@@ -71,6 +71,32 @@ const Promise = require('bluebird'),
 	isSiteLiveFor7Days = inputDate => {
 		return !!(moment().diff(inputDate, 'days') >= 7);
 	},
+	getDateRepresentation = dateString => {
+		const getCurrentYear = moment().format('YYYY'),
+			reversedDateString = dateString
+				.split('-')
+				.reverse()
+				.join('-'),
+			validDateString = `${getCurrentYear}-${reversedDateString}`,
+			wordDateFormat = moment(validDateString).format(`ddd, MMM DD`),
+			resultData = {
+				format: validDateString,
+				word: wordDateFormat
+			};
+
+		return resultData;
+	},
+	getWeekDatesRepresentation = dateObject => {
+		const startDateObject = getDateRepresentation(dateObject.startDate),
+			endDateObject = getDateRepresentation(dateObject.endDate),
+			resultData = {
+				start: startDateObject,
+				end: endDateObject,
+				representation: `${startDateObject.word} - ${endDateObject.word}`
+			};
+
+		return resultData;
+	},
 	validateMetricsData = inputData => {
 		const isInputData = !!(inputData && inputData.siteId && inputData.lastWeekReport && inputData.thisWeekReport),
 			isLastWeekReport = !!(
@@ -115,52 +141,68 @@ const Promise = require('bluebird'),
 		inputData.thisWeek = utils.numberFormatter(thisWeek);
 		inputData.thisWeekOriginal = Number(thisWeek);
 
-		inputData.percentage = Number(comparisonData.percentage);
+		inputData.percentage = Math.round(comparisonData.percentage);
 		inputData.change = comparisonData.change;
 	},
 	computeMetricComparison = inputData => {
 		const resultData = {
-			impressions: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
+				impressions: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				revenue: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				pageViews: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				cpm: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				pageCPM: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				dates: {
+					lastWeek: {},
+					thisWeek: {}
+				}
 			},
-			revenue: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			pageViews: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			cpm: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			pageCPM: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			}
-		};
+			lastWeekDatesInfo = getWeekDatesRepresentation({
+				startDate: inputData.lastWeekReport.reportFrom,
+				endDate: inputData.lastWeekReport.reportTo
+			}),
+			thisWeekDatesInfo = getWeekDatesRepresentation({
+				startDate: inputData.thisWeekReport.reportFrom,
+				endDate: inputData.thisWeekReport.reportTo
+			});
+
+		// Set dates representation (format and word description) data
+		resultData.dates.lastWeek = lastWeekDatesInfo;
+		resultData.dates.thisWeek = thisWeekDatesInfo;
 
 		setMetricComparisonData(
 			resultData.impressions,
