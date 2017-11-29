@@ -5,6 +5,7 @@ const Promise = require('bluebird'),
 	moment = require('moment'),
 	AdPushupError = require('../../helpers/AdPushupError'),
 	sqlReportingModule = require('../../reports/default/adpTags/index'),
+	{ getWeeklyEmailReport } = require('../../helpers/commonFunctions'),
 	couchBaseService = require('../../helpers/couchBaseService'),
 	couchbasePromise = require('couchbase-promises'),
 	usersByNonEmptySitesQuery = couchbasePromise.ViewQuery.from('app', 'usersByNonEmptySites'),
@@ -67,19 +68,20 @@ function getSiteData(siteModelInstance) {
 			ecpm: 0
 		},
 		reportDataParams = {
-			select: ['total_revenue', 'total_impressions', 'total_requests', 'report_date', 'siteid'],
-			where: {
-				siteid: dataObject.id
-			},
-			needAggregated: true
+			siteid: dataObject.id
 		};
 
 	//TODO: Remove below dummny statement after testing
-	reportDataParams.where.siteid = 31000;
+	const dummySites = [25019, 31000, 29752],
+		randomNumber = Math.round(Math.random() * 2),
+		dummySiteId = dummySites[randomNumber];
+	reportDataParams.siteid = dummySiteId;
 
-	return sqlReportingModule
-		.generate(reportDataParams)
-		.then(queryResult => {
+	return getWeeklyEmailReport(reportDataParams.siteid)
+		.then(reportData => {
+			fileLogger.info(
+				`getWeeklyEmailReport - Successfully fetched report data for siteId ${dataObject.id}: ${reportData}`
+			);
 			return dataObject;
 		})
 		.catch(error => {
