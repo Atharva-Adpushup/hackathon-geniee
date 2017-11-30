@@ -126,6 +126,7 @@ function errorHandler(siteObject, error) {
 function getAllSitesData(modelInstance) {
 	const isUserModel = !!modelInstance,
 		isSitesArray = !!(isUserModel && modelInstance.get('sites') && modelInstance.get('sites').length),
+		emailBlockListArray = ['geniee@adpushup.com'],
 		statusObject = {
 			email: modelInstance.get('email'),
 			status: 0,
@@ -139,7 +140,16 @@ function getAllSitesData(modelInstance) {
 	}
 
 	const sitesArray = modelInstance.get('sites'),
-		sitesDataArray = [];
+		sitesDataArray = [],
+		userEmail = modelInstance.get('email'),
+		isEmailInBlockedList = !!(emailBlockListArray.indexOf(userEmail) > -1);
+
+	if (isEmailInBlockedList) {
+		statusObject.message = `User email ${
+			userEmail
+		} is in blocked list. Module execution for this user will stop now.`;
+		return statusObject;
+	}
 
 	return promiseForeach(sitesArray, processSiteItem.bind(null, sitesDataArray), errorHandler)
 		.then(() => {
