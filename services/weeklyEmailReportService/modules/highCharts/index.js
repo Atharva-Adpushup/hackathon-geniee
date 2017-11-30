@@ -95,7 +95,7 @@ function generateAdNetworkCPMLineBase64(inputData) {
 
 		_.forOwn(adNetworkDayWiseReport, (dayWiseObject, dateKey) => {
 			if (isCategoriesValidLength) {
-				const dayCategory = moment(dateKey).format('ddd');
+				const dayCategory = moment(dateKey).format('MMM DD');
 				categories.push(dayCategory);
 			}
 

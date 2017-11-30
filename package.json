@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "amqplib": "^0.5.1",
+    "base64-img": "^1.0.3",
     "bayesian-bandit": "^0.10.0",
     "bluebird": "^3.3.3",
     "bluebird-retry": "^0.8.0",
