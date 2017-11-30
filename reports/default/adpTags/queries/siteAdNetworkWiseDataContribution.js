@@ -8,12 +8,21 @@ function getSegregatedData(inputData, resultData) {
 	return inputData.reduce((resultCollecton, itemObject) => {
 		const collectionObject = extend(true, {}, itemObject),
 			date = moment(collectionObject.report_date).format(STRING_DATE_FORMAT),
-			adNetwork = collectionObject.display_name.toUpperCase(),
 			revenue = utils.toFloat(collectionObject.total_revenue),
 			impressions = collectionObject.total_impressions,
 			requests = collectionObject.total_requests;
 
-		let isAdNetworkInAggregatedCollection, isAdNetworkInDayWiseCollection;
+		let isAdNetworkInAggregatedCollection,
+			isAdNetworkInDayWiseCollection,
+			adNetwork = collectionObject.display_name.toUpperCase(),
+			isAdNetworkDFP = !!(adNetwork === 'DFP');
+
+		// This change is done to show 'ADP' network name to end users instead of 'DFP'.
+		// NOTE: This change was asked by OPS team and is liable to be removed/modified in future
+		// as per their convenience
+		if (isAdNetworkDFP) {
+			adNetwork = 'ADP';
+		}
 
 		isAdNetworkInAggregatedCollection = !!(
 			resultCollecton.aggregated.hasOwnProperty(adNetwork) && resultCollecton.aggregated[adNetwork]
