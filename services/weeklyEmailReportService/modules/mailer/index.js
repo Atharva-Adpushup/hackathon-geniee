@@ -125,7 +125,7 @@ function getEmailObject(inputData) {
 		from: emailConfig.MAIL_FROM,
 		to: 'zahin@adpushup.com', //inputData.email,
 		cc: '',
-		subject: `Performance Report: ${weekDateRangeString}`,
+		subject: `${inputData.siteName} Performance Report: ${weekDateRangeString}`,
 		attachment: []
 	};
 }
