@@ -3,7 +3,7 @@ const LINE_CHART_CONFIG = {
 		type: 'line'
 	},
 	title: {
-		text: 'Performance Chart'
+		text: ''
 	},
 	xAxis: {
 		categories: []
@@ -31,7 +31,7 @@ const PIE_CHART_CONFIG = {
 		type: 'pie'
 	},
 	title: {
-		text: 'Revenue Contribution chart'
+		text: ''
 	},
 	tooltip: {
 		pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
