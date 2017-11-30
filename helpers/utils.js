@@ -16,7 +16,7 @@ var url = require('url'),
 		},
 		numberFormatter: num => {
 			if (num >= 1000000000) {
-				return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'G';
+				return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
 			}
 			if (num >= 1000000) {
 				return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
@@ -159,6 +159,29 @@ var url = require('url'),
 			});
 
 			return selectedLocale;
+		},
+		getMetricComparison: (lastWeek, thisWeek) => {
+			const resultData = {
+					percentage: 0,
+					change: false
+				},
+				difference = thisWeek - lastWeek,
+				percentage = Number((difference / lastWeek * 100).toFixed(2)),
+				isNoChange = !!(percentage === 0),
+				isPositiveChange = !!(percentage && percentage > 0);
+			let change;
+
+			if (isNoChange) {
+				change = false;
+			} else if (isPositiveChange) {
+				change = 'increased';
+			} else {
+				change = 'decreased';
+			}
+
+			resultData.percentage = Math.abs(percentage);
+			resultData.change = change;
+			return resultData;
 		}
 	};
 
