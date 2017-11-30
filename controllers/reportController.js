@@ -22,6 +22,7 @@ var express = require('express'),
 	reportsLocalizedObject = require('../i18n/reports/geniee/constants'),
 	{ fileLogger } = require('../helpers/logger/file/index'),
 	{ queryResultProcessing } = require('../helpers/commonFunctions'),
+	commonConsts = require('../configs/commonConsts'),
 	// eslint-disable-next-line new-cap
 	router = express.Router({ mergeParams: true }),
 	reports = require('../models/reportsModel');
@@ -71,9 +72,9 @@ router
 			.spread((pageGroups, site) => {
 				return res.render('adpushupReport', {
 					pageGroups,
-					siteId: req.params.siteId,
-					siteDomain: utils.domanize(site.get('siteDomain')),
-					isSuperUser: req.session.isSuperUser
+					siteId: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL ? req.params.siteId : commonConsts.DEMO_REPORT_SITE_ID,
+					siteDomain: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL ? utils.domanize(site.get('siteDomain')) : '',
+					isSuperUser: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL ? req.session.isSuperUser : false
 				})
 			})
 			.catch(err => res.send('Some error occurred! Please try again later.'));
