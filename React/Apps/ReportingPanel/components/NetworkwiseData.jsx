@@ -58,10 +58,11 @@ class NetworkwiseData extends Component {
             total += (revenue * 1000) / impressions;
         }
 
-        const title = <div>{isFloat(total) ? total.toFixed(2) : total}</div>;
+        const totalCount = isFloat(total) ? total.toFixed(2) : total,
+            title = <div>{this.props.cpm ? (totalCount / Object.keys(networkData).length).toFixed(2) : totalCount}</div>;
 
         return (<div style={{ width: '150px' }}>
-            <CollapsePanel title={title} open={customToggleOptions ? customToggleOptions.toggleValue : false}>
+            <CollapsePanel bold={this.props.bold} title={title} open={customToggleOptions ? customToggleOptions.toggleValue : false}>
                 {(
                     networkDataArr.map((data, key) => {
                         return <div key={key}>{data}</div>
