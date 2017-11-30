@@ -59,7 +59,7 @@ function validateSiteData(siteModelInstance) {
 function getSiteData(siteModelInstance) {
 	const dataObject = {
 			domain: siteModelInstance.get('siteDomain'),
-			siteName: utils.domanize(siteModelInstance.get('siteDomain')).toUpperCase(),
+			siteName: utils.domanize(siteModelInstance.get('siteDomain')),
 			id: siteModelInstance.get('siteId'),
 			email: siteModelInstance.get('ownerEmail'),
 			step: siteModelInstance.get('step'),

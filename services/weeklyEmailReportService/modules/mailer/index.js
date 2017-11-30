@@ -36,11 +36,13 @@ function getTemplateConfig(inputData) {
 		seventhUrlObject = topUrlsObject[6],
 		eigthUrlObject = topUrlsObject[7],
 		ninthUrlObject = topUrlsObject[8],
-		tenthUrlObject = topUrlsObject[9];
+		tenthUrlObject = topUrlsObject[9],
+		revenueLastWeekOriginalNumber = Math.round(inputData.report.metricComparison.revenue.lastWeekOriginal),
+		revenueThisWeekOriginalNumber = Math.round(inputData.report.metricComparison.revenue.thisWeekOriginal);
 
 	return {
 		'@__date_range__@': inputData.report.metricComparison.dates.thisWeek.representation,
-		'@__site_name__@': inputData.siteName,
+		'@__site_name__@': inputData.siteName.toUpperCase(),
 		'@__revenue_value__@': Math.round(inputData.report.metricComparison.revenue.thisWeekOriginal),
 		'@__revenue_change_text__@': inputData.report.metricComparison.revenue.change,
 		'@__revenue_change_value__@': inputData.report.metricComparison.revenue.percentage,
@@ -48,8 +50,8 @@ function getTemplateConfig(inputData) {
 		'@__impression_thisWeek_value__@': inputData.report.metricComparison.impressions.thisWeek,
 		'@__cpm_lastWeek_value__@': inputData.report.metricComparison.cpm.lastWeek,
 		'@__cpm_thisWeek_value__@': inputData.report.metricComparison.cpm.thisWeek,
-		'@__revenue_lastWeek_value__@': inputData.report.metricComparison.revenue.lastWeek,
-		'@__revenue_thisWeek_value__@': inputData.report.metricComparison.revenue.thisWeek,
+		'@__revenue_lastWeek_value__@': revenueLastWeekOriginalNumber,
+		'@__revenue_thisWeek_value__@': revenueThisWeekOriginalNumber,
 		'@__topUrl_first_link__@': firstUrlObject.url,
 		'@__topUrl_first_value__@': utils.domanize(firstUrlObject.url),
 		'@__topUrl_first_hits__@': firstUrlObject.count,
@@ -124,8 +126,9 @@ function getEmailObject(inputData) {
 	return {
 		from: emailConfig.MAIL_FROM,
 		to: 'zahin@adpushup.com', //inputData.email,
+		// 'zahin@adpushup.com, dhiraj@adpushup.com, atul@adpushup.com, dikshant.joshi@adpushup.com, abhinav.choudhri@adpushup.com', //inputData.email,
 		cc: '',
-		subject: `${inputData.siteName} Performance Report: ${weekDateRangeString}`,
+		subject: `AdPushup Performance Report: ${inputData.siteName}`,
 		attachment: []
 	};
 }
