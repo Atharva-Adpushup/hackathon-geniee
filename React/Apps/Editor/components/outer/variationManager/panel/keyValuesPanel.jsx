@@ -17,20 +17,27 @@ class KeyValuesPanel extends Component {
 		this.submitHandler = this.submitHandler.bind(this);
 	}
 
-	componentWillMount() {
+	componentWillReceiveProps(nextProps) {
 		this.setState({
-			containsADP: this.checkADP()
+			containsADP: this.checkADP(nextProps.sections),
+			adpKeyValues: nextProps.variation.adpKeyValues || null
 		});
 	}
 
-	checkADP() {
-		return this.props.sections
-			? this.props.sections.some(section => {
-				let ad = section.ads[0];
-				if (ad.network && ad.network == 'adpTags') {
-					return true;
-				}
-			})
+	componentWillMount() {
+		this.setState({
+			containsADP: this.checkADP(this.props.sections)
+		});
+	}
+
+	checkADP(sections) {
+		return sections
+			? sections.some(section => {
+					let ad = section.ads[0];
+					if (ad.network && ad.network == 'adpTags') {
+						return true;
+					}
+				})
 			: false;
 	}
 
@@ -60,6 +67,7 @@ class KeyValuesPanel extends Component {
 				<Row>
 					<Col xs={6}>
 						<CodeBox
+							customId={`${this.props.variation.id}adpKeyValues`}
 							showButtons
 							textEdit
 							parentExpanded={this.props.ui.variationPanel.expanded}
@@ -71,8 +79,8 @@ class KeyValuesPanel extends Component {
 				</Row>
 			</div>
 		) : (
-				<div>Variation must contain one ADP section in order to set Key-Values</div>
-			);
+			<div>Variation must contain one ADP section in order to set Key-Values</div>
+		);
 	}
 }
 
