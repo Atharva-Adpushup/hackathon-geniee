@@ -59,8 +59,8 @@
 		"webpack": "^3.6.0"
 	},
 	"scripts": {
-		"build": "./node_modules/.bin/parallel-webpack --progress",
-		"watch": "./node_modules/.bin/parallel-webpack --watch",
+		"build": "./node_modules/.bin/parallel-webpack --progress --config webpack-prod.js",
+		"watch": "./node_modules/.bin/parallel-webpack --watch --config webpack-dev.js",
 		"start": "node server.js"
 	},
 	"author": "Yomesh Gupta <yomesh.gupta@gmail.com> (http://www.yomeshgupta.com/)",
