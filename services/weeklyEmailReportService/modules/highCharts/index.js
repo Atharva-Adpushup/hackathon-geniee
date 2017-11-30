@@ -146,24 +146,50 @@ function generateDeviceRevenuePieBase64(inputData) {
 	return generateBase64(imageOptions, chartConfig);
 }
 
+function generatePageGroupRevenuePieBase64(inputData) {
+	const chartConfig = extend(true, {}, PIE_CHART_CONFIG),
+		imageOptions = getChartImageOptions(),
+		contributionData = extend(true, {}, inputData.report.pageGroupRevenueContribution.contribution);
+
+	_.forOwn(contributionData, (pageGroupRevenue, pageGroupKey) => {
+		const seriesObject = {
+			name: pageGroupKey,
+			y: pageGroupRevenue
+		};
+
+		chartConfig.series[0].data.push(seriesObject);
+	});
+
+	return generateBase64(imageOptions, chartConfig);
+}
+
 module.exports = {
 	generateImageBase64: inputData => {
 		const reportData = addHighChartsObject(inputData),
 			getCPMLineBase64 = generateCPMLineBase64(reportData),
 			getAdNetworkCPMLineBase64 = generateAdNetworkCPMLineBase64(reportData),
 			getAdNetworkRevenuePieBase64 = generateAdNetworkRevenuePieBase64(reportData),
-			getDeviceRevenuePieBase64 = generateDeviceRevenuePieBase64(reportData);
+			getDeviceRevenuePieBase64 = generateDeviceRevenuePieBase64(reportData),
+			getPageGroupRevenuePieBase64 = generatePageGroupRevenuePieBase64(reportData);
 
 		return Promise.join(
 			getCPMLineBase64,
 			getAdNetworkCPMLineBase64,
 			getAdNetworkRevenuePieBase64,
 			getDeviceRevenuePieBase64,
-			(cpmLineBase64, adNetworkCPMLineBase64, adNetworkRevenuePieBase64, deviceRevenuePieBase64) => {
+			getPageGroupRevenuePieBase64,
+			(
+				cpmLineBase64,
+				adNetworkCPMLineBase64,
+				adNetworkRevenuePieBase64,
+				deviceRevenuePieBase64,
+				pageGroupRevenuePieBase64
+			) => {
 				reportData.report.charts.cpmLine.base64 = cpmLineBase64;
 				reportData.report.charts.adNetworkCPMLine.base64 = adNetworkCPMLineBase64;
 				reportData.report.charts.adNetworkRevenuePie.base64 = adNetworkRevenuePieBase64;
 				reportData.report.charts.deviceRevenuePie.base64 = deviceRevenuePieBase64;
+				reportData.report.charts.pageGroupRevenuePie.base64 = pageGroupRevenuePieBase64;
 
 				return reportData;
 			}
