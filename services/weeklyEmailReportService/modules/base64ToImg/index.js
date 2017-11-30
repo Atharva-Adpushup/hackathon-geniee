@@ -24,6 +24,11 @@ module.exports = {
 				name: 'deviceRevenuePieChart',
 				data: inputData.report.charts.deviceRevenuePie.base64,
 				path: `${__dirname}/`
+			},
+			{
+				name: 'pageGroupRevenuePieChart',
+				data: inputData.report.charts.pageGroupRevenuePie.base64,
+				path: `${__dirname}/`
 			}
 		];
 
@@ -31,7 +36,8 @@ module.exports = {
 			const cpmLineImageInfo = imagesCollection[0],
 				adNetworkCPMLineImageInfo = imagesCollection[1],
 				adNetworkRevenuePieImageInfo = imagesCollection[2],
-				deviceRevenuePieImageInfo = imagesCollection[3];
+				deviceRevenuePieImageInfo = imagesCollection[3],
+				pageGroupRevenuePieImageInfo = imagesCollection[4];
 
 			inputData.report.charts.cpmLine.base64 = '';
 			inputData.report.charts.cpmLine.imageName = cpmLineImageInfo.name;
@@ -52,6 +58,11 @@ module.exports = {
 			inputData.report.charts.deviceRevenuePie.imageName = deviceRevenuePieImageInfo.name;
 			inputData.report.charts.deviceRevenuePie.imagePath = deviceRevenuePieImageInfo.path;
 			inputData.report.charts.deviceRevenuePie.cid = deviceRevenuePieImageInfo.cid;
+
+			inputData.report.charts.pageGroupRevenuePie.base64 = '';
+			inputData.report.charts.pageGroupRevenuePie.imageName = pageGroupRevenuePieImageInfo.name;
+			inputData.report.charts.pageGroupRevenuePie.imagePath = pageGroupRevenuePieImageInfo.path;
+			inputData.report.charts.pageGroupRevenuePie.cid = pageGroupRevenuePieImageInfo.cid;
 
 			return inputData;
 		});
