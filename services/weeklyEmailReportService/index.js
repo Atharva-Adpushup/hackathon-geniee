@@ -4,11 +4,10 @@ const Promise = require('bluebird'),
 	{ promiseForeach } = require('node-utils'),
 	moment = require('moment'),
 	AdPushupError = require('../../helpers/AdPushupError'),
-	// { getWeeklyEmailReport } = require('../../helpers/commonFunctions'),
+	{ getWeeklyEmailReport } = require('../../helpers/commonFunctions'),
 	highChartsModule = require('./modules/highCharts/index'),
 	base64ToImageModule = require('./modules/base64ToImg/index'),
 	mailerModule = require('./modules/mailer/index'),
-	{ reportData } = require('./dummyData/reportData'),
 	utils = require('../../helpers/utils'),
 	couchBaseService = require('../../helpers/couchBaseService'),
 	couchbasePromise = require('couchbase-promises'),
@@ -72,14 +71,7 @@ function getSiteData(siteModelInstance) {
 			siteid: dataObject.id
 		};
 
-	//TODO: Remove below dummny statement after testing
-	// const dummySites = [25019, 31000, 29752],
-	// 	randomNumber = Math.round(Math.random() * 2),
-	// 	dummySiteId = dummySites[randomNumber];
-	// reportDataParams.siteid = dummySiteId;
-
-	// return getWeeklyEmailReport(reportDataParams.siteid)
-	return Promise.resolve(reportData)
+	return getWeeklyEmailReport(reportDataParams.siteid)
 		.then(reportData => {
 			fileLogger.info(
 				`getWeeklyEmailReport - Successfully fetched report data for siteId ${dataObject.id}: ${JSON.stringify(
