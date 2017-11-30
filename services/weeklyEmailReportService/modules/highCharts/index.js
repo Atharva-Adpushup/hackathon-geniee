@@ -129,21 +129,41 @@ function generateAdNetworkRevenuePieBase64(inputData) {
 	return generateBase64(imageOptions, chartConfig);
 }
 
+function generateDeviceRevenuePieBase64(inputData) {
+	const chartConfig = extend(true, {}, PIE_CHART_CONFIG),
+		imageOptions = getChartImageOptions(),
+		contributionData = extend(true, {}, inputData.report.deviceRevenueContribution.contribution);
+
+	_.forOwn(contributionData, (deviceRevenue, deviceKey) => {
+		const seriesObject = {
+			name: deviceKey,
+			y: deviceRevenue
+		};
+
+		chartConfig.series[0].data.push(seriesObject);
+	});
+
+	return generateBase64(imageOptions, chartConfig);
+}
+
 module.exports = {
 	generateImageBase64: inputData => {
 		const reportData = addHighChartsObject(inputData),
 			getCPMLineBase64 = generateCPMLineBase64(reportData),
 			getAdNetworkCPMLineBase64 = generateAdNetworkCPMLineBase64(reportData),
-			getAdNetworkRevenuePieBase64 = generateAdNetworkRevenuePieBase64(reportData);
+			getAdNetworkRevenuePieBase64 = generateAdNetworkRevenuePieBase64(reportData),
+			getDeviceRevenuePieBase64 = generateDeviceRevenuePieBase64(reportData);
 
 		return Promise.join(
 			getCPMLineBase64,
 			getAdNetworkCPMLineBase64,
 			getAdNetworkRevenuePieBase64,
-			(cpmLineBase64, adNetworkCPMLineBase64, adNetworkRevenuePieBase64) => {
+			getDeviceRevenuePieBase64,
+			(cpmLineBase64, adNetworkCPMLineBase64, adNetworkRevenuePieBase64, deviceRevenuePieBase64) => {
 				reportData.report.charts.cpmLine.base64 = cpmLineBase64;
 				reportData.report.charts.adNetworkCPMLine.base64 = adNetworkCPMLineBase64;
 				reportData.report.charts.adNetworkRevenuePie.base64 = adNetworkRevenuePieBase64;
+				reportData.report.charts.deviceRevenuePie.base64 = deviceRevenuePieBase64;
 
 				return reportData;
 			}
