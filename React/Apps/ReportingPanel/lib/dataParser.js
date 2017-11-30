@@ -2,7 +2,7 @@ import React from 'react';
 import { reorderArray } from './helpers';
 import { capitalCase } from '../../../common/helpers';
 import commonConsts from './commonConsts';
-import { remove, map, each, groupBy, uniq, find } from 'lodash';
+import { remove, map, each, groupBy, uniq, find, indexOf } from 'lodash';
 import moment from 'moment';
 import Bold from '../../../Components/Bold.jsx';
 import NetworkwiseData from '../components/NetworkwiseData.jsx';
@@ -141,6 +141,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			'report_date'
 		);
 	},
+	legendItemVisible = legendItem => indexOf(commonConsts.LEGEND, legendItem) !== -1 ? true : false,
 	generateSeries = (cols, rows, groupBy) => {
 		const pointOptions = {
 			lineWidth: 1.5,
@@ -173,14 +174,15 @@ const dataLabels = commonConsts.DATA_LABELS,
 				case dataLabels.pageViews:
 					pageviews = {
 						...defaultOptions,
-						name: col
+						name: col,
+						visible: legendItemVisible(dataLabels.pageViews)
 					};
 					break;
 				case dataLabels.impressions:
 					impressions = {
 						...defaultOptions,
 						name: col,
-						visible: true
+						visible: legendItemVisible(dataLabels.impressions)
 					};
 					break;
 				case dataLabels.cpm:
@@ -188,34 +190,38 @@ const dataLabels = commonConsts.DATA_LABELS,
 						...defaultOptions,
 						name: col,
 						yAxis: 1,
-						visible: true
+						visible: legendItemVisible(dataLabels.cpm)
 					};
 					break;
 				case dataLabels.revenue:
 					revenue = {
 						...defaultOptions,
 						name: col,
-						yAxis: 2
+						yAxis: 2,
+						visible: legendItemVisible(dataLabels.revenue)
 					};
 					break;
 				case dataLabels.grossRevenue:
 					grossRevenue = {
 						...defaultOptions,
 						name: col,
-						yAxis: 2
+						yAxis: 2,
+						visible: legendItemVisible(dataLabels.grossRevenue)
 					};
 					break;
 				case dataLabels.pageCpm:
 					pageCpm = {
 						...defaultOptions,
 						name: col,
-						yAxis: 1
+						yAxis: 1,
+						visible: legendItemVisible(dataLabels.pageCpm)
 					};
 					break;
 				case dataLabels.xpathMiss:
 					xpathMiss = {
 						...defaultOptions,
-						name: col
+						name: col,
+						visible: legendItemVisible(dataLabels.xpathMiss)
 					};
 					break;
 			}
