@@ -6,6 +6,7 @@ const Promise = require('bluebird'),
 	AdPushupError = require('../../helpers/AdPushupError'),
 	// { getWeeklyEmailReport } = require('../../helpers/commonFunctions'),
 	highChartsModule = require('./modules/highCharts/index'),
+	base64ToImageModule = require('./modules/base64ToImg/index'),
 	{ reportData } = require('./dummyData/reportData'),
 	couchBaseService = require('../../helpers/couchBaseService'),
 	couchbasePromise = require('couchbase-promises'),
@@ -105,6 +106,7 @@ function processSiteItem(sitesDataArray, siteObject) {
 		.then(validateSiteData)
 		.then(getSiteData)
 		.then(highChartsModule.generateImageBase64)
+		.then(base64ToImageModule.generateImages)
 		.then(siteData => {
 			sitesDataArray.push(siteData);
 			return sitesDataArray;
