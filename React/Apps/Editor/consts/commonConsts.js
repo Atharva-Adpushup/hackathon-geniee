@@ -330,7 +330,8 @@ const status = {
 	networks = ['adsense', 'adx', 'adpTags', 'dfp', 'custom'],
 	priceFloorKeys = ['FP_S_A', 'FP_B_A', 'FP_S', 'FP_A', 'FP_B'],
 	defaultPriceFloorKey = 'FP_S_A',
-	reportingUrl = '/user/reports/generate';
+	reportingUrl = '/user/reports/generate',
+	jsWrapper = `(function($){ \n\n })(adpushup.$)`;
 
 export {
 	status,
@@ -369,5 +370,6 @@ export {
 	reportingActions,
 	reportingUrl,
 	priceFloorKeys,
-	defaultPriceFloorKey
+	defaultPriceFloorKey,
+	jsWrapper
 };
