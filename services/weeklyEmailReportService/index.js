@@ -7,7 +7,9 @@ const Promise = require('bluebird'),
 	// { getWeeklyEmailReport } = require('../../helpers/commonFunctions'),
 	highChartsModule = require('./modules/highCharts/index'),
 	base64ToImageModule = require('./modules/base64ToImg/index'),
+	mailerModule = require('./modules/mailer/index'),
 	{ reportData } = require('./dummyData/reportData'),
+	utils = require('../../helpers/utils'),
 	couchBaseService = require('../../helpers/couchBaseService'),
 	couchbasePromise = require('couchbase-promises'),
 	usersByNonEmptySitesQuery = couchbasePromise.ViewQuery.from('app', 'usersByNonEmptySites'),
@@ -58,6 +60,7 @@ function validateSiteData(siteModelInstance) {
 function getSiteData(siteModelInstance) {
 	const dataObject = {
 			domain: siteModelInstance.get('siteDomain'),
+			siteName: utils.domanize(siteModelInstance.get('siteDomain')).toUpperCase(),
 			id: siteModelInstance.get('siteId'),
 			email: siteModelInstance.get('ownerEmail'),
 			step: siteModelInstance.get('step'),
@@ -107,6 +110,7 @@ function processSiteItem(sitesDataArray, siteObject) {
 		.then(getSiteData)
 		.then(highChartsModule.generateImageBase64)
 		.then(base64ToImageModule.generateImages)
+		.then(mailerModule.processEmail)
 		.then(siteData => {
 			sitesDataArray.push(siteData);
 			return sitesDataArray;
