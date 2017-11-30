@@ -17,6 +17,12 @@ class customCodeEditor extends React.Component {
 		this.updateCode = this.updateCode.bind(this);
 	}
 
+	componentWillReceiveProps(nextProps) {
+		this.setState({
+			code: nextProps.code
+		});
+	}
+
 	save() {
 		try {
 			!this.props.textEdit ? this.props.onSubmit(btoa(this.state.code)) : this.props.onSubmit(this.state.code);
@@ -50,7 +56,7 @@ class customCodeEditor extends React.Component {
 		if (this.props.isField) {
 			const { label, input, meta } = this.props.field;
 			return (
-				<div>
+				<div key={this.props.customId}>
 					<Col xs={12} className="u-padding-r10px">
 						<Row>
 							<Col xs={5} className="u-padding-r10px">
@@ -75,7 +81,7 @@ class customCodeEditor extends React.Component {
 				let className = 'codeEditor-small ';
 				className += this.props.parentExpanded ? ' codeEditor-large' : ' ';
 				return (
-					<div className={className}>
+					<div className={className} key={this.props.customId}>
 						<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
 						<br />
 						<Button disabled={this.state.code == ''} className="btn-lightBg btn-save" onClick={this.save}>
@@ -89,7 +95,7 @@ class customCodeEditor extends React.Component {
 					className += ' pd-b100';
 				}
 				return (
-					<div className={className}>
+					<div className={className} key={this.props.customId}>
 						{this.state.error && <div>Some Error in CSS, remove comma in last property if there.</div>}
 						<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
 						{this.props.showButtons ? (
@@ -121,6 +127,7 @@ class customCodeEditor extends React.Component {
 
 customCodeEditor.propTypes = {
 	code: PropTypes.string,
+	key: PropTypes.string,
 	isField: PropTypes.bool,
 	textEdit: PropTypes.bool,
 	textEditBtn: PropTypes.string,
