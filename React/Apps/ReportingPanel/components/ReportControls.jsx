@@ -183,6 +183,16 @@ class ReportControls extends Component {
 								))}
 							</SelectBox>
 						</Col>
+						<Col sm={2}>
+							<label className="control-label">Group By</label>
+							<SelectBox value={state.groupBy} label="Group By" onChange={this.groupByUpdated}>
+								{state.groupByArray.map((groupBy, index) => (
+									<option key={index} value={groupBy}>
+										{groupBy === commonConsts.DEVICE_TYPE ? commonConsts.DATA_LABELS.platform : groupBy}
+									</option>
+								))}
+							</SelectBox>
+						</Col>
 						<Col sm={4}>
 							<label className="control-label">Date Range</label>
 							<DateRangePicker
@@ -198,16 +208,6 @@ class ReportControls extends Component {
 								displayFormat={'DD-MM-YYYY'}
 								isOutsideRange={() => { }}
 							/>
-						</Col>
-						<Col sm={2}>
-							<label className="control-label">Group By</label>
-							<SelectBox value={state.groupBy} label="Group By" onChange={this.groupByUpdated}>
-								{state.groupByArray.map((groupBy, index) => (
-									<option key={index} value={groupBy}>
-										{groupBy === commonConsts.DEVICE_TYPE ? commonConsts.DATA_LABELS.platform : groupBy}
-									</option>
-								))}
-							</SelectBox>
 						</Col>
 					</Row>
 					<Row className="mT-10">
