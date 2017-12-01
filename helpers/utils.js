@@ -182,6 +182,12 @@ var url = require('url'),
 			resultData.percentage = Math.abs(percentage);
 			resultData.change = change;
 			return resultData;
+		},
+		// Utility method to match a string in regex array
+		isValueInPatternList: (list, value) => {
+			return list.some(function(pattern) {
+				return pattern.test(value);
+			});
 		}
 	};
 
