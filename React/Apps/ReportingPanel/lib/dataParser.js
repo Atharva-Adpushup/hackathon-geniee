@@ -136,7 +136,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 	generateXAxis = rows => {
 		return uniq(
 			map(rows, row => {
-				return moment(row.report_date).format('DD-MM-YYYY');
+				return moment.utc(row.report_date).format('DD-MM-YYYY');
 			}),
 			'report_date'
 		);
@@ -331,9 +331,9 @@ const dataLabels = commonConsts.DATA_LABELS,
 			networkTotalCpm = [];
 
 		each(rows, row => {
-			dates.push(moment(row.report_date).format('DD-MM'));
+			dates.push(moment.utc(row.report_date).format('DD-MM'));
 
-			const reportDate = moment(row.report_date).format('DD-MM-YYYY'),
+			const reportDate = moment.utc(row.report_date).format('DD-MM-YYYY'),
 				impressions = row.total_impressions,
 				cpm = row.cpm,
 				xpathMiss = commonConsts.IS_SUPERUSER ? row.total_xpath_miss : undefined,
