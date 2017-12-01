@@ -29,6 +29,7 @@ class ReportingPanel extends React.Component {
 			groupBy: null,
 			responseData: null,
 			networkWiseData: false,
+			activeLegendItems: props.activeLegendItems || commonConsts.LEGEND,
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
@@ -62,8 +63,8 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: true
 		});
 
-		const { startDate, endDate, pageGroup, platform, variation, groupBy, variations } = this.state,
-			params = { startDate, endDate, pageGroup, platform, variation, groupBy };
+		const { startDate, endDate, pageGroup, platform, variation, groupBy, variations, activeLegendItems } = this.state,
+			params = { startDate, endDate, pageGroup, platform, variation, groupBy, activeLegendItems };
 
 		let state = {
 			reportLoading: false,
@@ -78,7 +79,7 @@ class ReportingPanel extends React.Component {
 			.then(res => {
 				if (!res.error && res.rows.length) {
 					const responseData = $.extend(true, {}, res),
-						data = dataGenerator(res, groupBy, variations);
+						data = dataGenerator(res, groupBy, variations, null, activeLegendItems);
 					this.setState({
 						...state,
 						reportError: false,
