@@ -12,6 +12,13 @@
 			"exec_mode": "cluster_mode",
 			"log_date_format": "YYYY-MM-DD HH:mm Z",
 			"cron_restart": "*/30 * * * *"
+		},
+		{
+			"name": "weeklyEmailReport",
+			"script": "./services/weeklyEmailReportService/index.js",
+			"instances": 1,
+			"exec_mode": "cluster_mode",
+			"log_date_format": "YYYY-MM-DD HH:mm Z"
 		}
 	]
 }
