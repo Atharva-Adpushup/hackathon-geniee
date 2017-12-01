@@ -44,7 +44,7 @@ const apiQueryGenerator = params => {
 		groupBy
 	});
 },
-	dataGenerator = (data, groupBy, variations, customToggleOptions) => {
+	dataGenerator = (data, groupBy, variations, customToggleOptions, activeLegendItems) => {
 		let config = {
 			title: {
 				text: ''
@@ -64,7 +64,7 @@ const apiQueryGenerator = params => {
 					load: event => {
 						const chart = event.target,
 							node = document.getElementById('chart-legend');
-						ReactDOM.render(<ChartLegend chart={chart} />, node);
+						ReactDOM.render(<ChartLegend chart={chart} activeLegendItems={activeLegendItems} />, node);
 					}
 				}
 			},
