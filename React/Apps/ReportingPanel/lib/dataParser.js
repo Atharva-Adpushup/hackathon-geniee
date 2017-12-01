@@ -1,8 +1,8 @@
 import React from 'react';
 import { reorderArray } from './helpers';
-import { capitalCase } from '../../../common/helpers';
+import { capitalCase, isFloat } from '../../../common/helpers';
 import commonConsts from './commonConsts';
-import { remove, map, each, groupBy, uniq, find } from 'lodash';
+import { remove, map, each, groupBy, uniq, find, indexOf } from 'lodash';
 import moment from 'moment';
 import Bold from '../../../Components/Bold.jsx';
 import NetworkwiseData from '../components/NetworkwiseData.jsx';
@@ -141,6 +141,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			'report_date'
 		);
 	},
+	legendItemVisible = legendItem => indexOf(commonConsts.LEGEND, legendItem) !== -1 ? true : false,
 	generateSeries = (cols, rows, groupBy) => {
 		const pointOptions = {
 			lineWidth: 1.5,
@@ -173,14 +174,15 @@ const dataLabels = commonConsts.DATA_LABELS,
 				case dataLabels.pageViews:
 					pageviews = {
 						...defaultOptions,
-						name: col
+						name: col,
+						visible: legendItemVisible(dataLabels.pageViews)
 					};
 					break;
 				case dataLabels.impressions:
 					impressions = {
 						...defaultOptions,
 						name: col,
-						visible: true
+						visible: legendItemVisible(dataLabels.impressions)
 					};
 					break;
 				case dataLabels.cpm:
@@ -188,34 +190,38 @@ const dataLabels = commonConsts.DATA_LABELS,
 						...defaultOptions,
 						name: col,
 						yAxis: 1,
-						visible: true
+						visible: legendItemVisible(dataLabels.cpm)
 					};
 					break;
 				case dataLabels.revenue:
 					revenue = {
 						...defaultOptions,
 						name: col,
-						yAxis: 2
+						yAxis: 2,
+						visible: legendItemVisible(dataLabels.revenue)
 					};
 					break;
 				case dataLabels.grossRevenue:
 					grossRevenue = {
 						...defaultOptions,
 						name: col,
-						yAxis: 2
+						yAxis: 2,
+						visible: legendItemVisible(dataLabels.grossRevenue)
 					};
 					break;
 				case dataLabels.pageCpm:
 					pageCpm = {
 						...defaultOptions,
 						name: col,
-						yAxis: 1
+						yAxis: 1,
+						visible: legendItemVisible(dataLabels.pageCpm)
 					};
 					break;
 				case dataLabels.xpathMiss:
 					xpathMiss = {
 						...defaultOptions,
-						name: col
+						name: col,
+						visible: legendItemVisible(dataLabels.xpathMiss)
 					};
 					break;
 			}
@@ -284,7 +290,33 @@ const dataLabels = commonConsts.DATA_LABELS,
 		return processedData;
 	},
 	getPlatformName = id => capitalCase(commonConsts.DEVICE_TYPE_MAPPING[id]),
-	processRows = (rows, param) => {
+	networkTotalCalculate = (total, networkTotalItem) => {
+		let adsenseSum = Number(total);
+		adsenseSum += Number(networkTotalItem);
+		return isFloat(adsenseSum) ? adsenseSum.toFixed(2) : adsenseSum;
+	},
+	processNetworkTotal = networkTotalArray => {
+		let total = networkTotalArray[0];
+		for (let i = 1; i < networkTotalArray.length; i++) {
+			const adsense = commonConsts.NETWORKS.adsense,
+				adx = commonConsts.NETWORKS.adx,
+				dfp = commonConsts.NETWORKS.dfp;
+
+			if (adsense in networkTotalArray[i]) {
+				total[adsense] = networkTotalCalculate(total[adsense], networkTotalArray[i][adsense]);
+			}
+
+			if (adx in networkTotalArray[i]) {
+				total[adx] = networkTotalCalculate(total[adx], networkTotalArray[i][adx]);
+			}
+
+			if (dfp in networkTotalArray[i]) {
+				total[dfp] = networkTotalCalculate(total[dfp], networkTotalArray[i][dfp]);
+			}
+		}
+		return total;
+	},
+	processRows = (rows, param, customToggleOptions, groupBy) => {
 		let totalPageviews = 0,
 			totalPageCpm = 0,
 			totalImpressions = 0,
@@ -293,8 +325,10 @@ const dataLabels = commonConsts.DATA_LABELS,
 			totalGrossRevenue = 0,
 			totalXpathMiss = 0,
 			body = [],
-			dates = [];
-
+			dates = [],
+			networkTotalImpressions = [],
+			networkTotalRevenue = [],
+			networkTotalCpm = [];
 
 		each(rows, row => {
 			dates.push(moment(row.report_date).format('DD-MM'));
@@ -314,6 +348,10 @@ const dataLabels = commonConsts.DATA_LABELS,
 			totalGrossRevenue += grossRevenue;
 			totalXpathMiss += xpathMiss;
 
+			networkTotalImpressions.push($.extend(true, {}, impressions.props.networkData));
+			networkTotalRevenue.push($.extend(true, {}, revenue.props.networkData));
+			networkTotalCpm.push($.extend(true, {}, cpm.props.networkData));
+
 			body.push({
 				[dataLabels.date]: reportDate,
 				[dataLabels.impressions]: impressions,
@@ -326,24 +364,29 @@ const dataLabels = commonConsts.DATA_LABELS,
 			});
 		});
 
+		networkTotalCpm = processNetworkTotal(networkTotalCpm);
+		for (let i in networkTotalCpm) {
+			networkTotalCpm[i] = (networkTotalCpm[i] / rows.length).toFixed(2);
+		}
+
 		body.push({
 			[dataLabels.pageGroup]: (param && param.name === dataLabels.pageGroup) ? param.value : undefined,
 			[dataLabels.variation]: (param && param.name === dataLabels.variation) ? param.title : undefined,
 			[dataLabels.platform]: (param && param.name === commonConsts.DEVICE_TYPE) ? getPlatformName(param.value) : undefined,
 			[dataLabels.date]: <Bold>{!param ? dataLabels.total : `${dates[0]} to ${dates[dates.length - 1]}`}</Bold>,
-			[dataLabels.impressions]: <Bold>{totalImpressions}</Bold>,
-			[dataLabels.cpm]: <Bold>{((totalRevenue / totalImpressions) * 1000).toFixed(2)}</Bold>,
+			[dataLabels.impressions]: !groupBy ? <Bold>{totalImpressions}</Bold> : <NetworkwiseData bold networkData={processNetworkTotal(networkTotalImpressions)} customToggleOptions={customToggleOptions} />,
+			[dataLabels.cpm]: <NetworkwiseData bold cpm networkData={networkTotalCpm} customToggleOptions={customToggleOptions} />,
 			[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>,
 			[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
-			[dataLabels.revenue]: <Bold>{totalRevenue.toFixed(2)}</Bold>,
+			[dataLabels.revenue]: !groupBy ? <Bold>{totalRevenue.toFixed(2)}</Bold> : <NetworkwiseData bold networkData={processNetworkTotal(networkTotalRevenue)} customToggleOptions={customToggleOptions} />,
 			[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
 			[dataLabels.pageCpm]: <Bold>{((totalRevenue / totalPageviews) * 1000).toFixed(2)}</Bold>
 		});
 
 		return body;
 	},
-	processRowsWithGroupBy = (rows, groupBy, param) => {
-		rows = processRows(rows, param);
+	processRowsWithGroupBy = (rows, groupBy, param, customToggleOptions) => {
+		rows = processRows(rows, param, customToggleOptions, groupBy);
 
 		const nonAggregatedRows = [],
 			aggregatedRows = [];
@@ -361,7 +404,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 	},
 	processTableGroupBy = (header, rows, groupByParam, variations, customToggleOptions) => {
 		if (!groupByParam) {
-			return { header, rows: processRows(networkWiseProcessing(rows, customToggleOptions)) };
+			return { header, rows: processRows(networkWiseProcessing(rows, customToggleOptions), null, customToggleOptions, groupByParam) };
 		}
 
 		let updatedRows = [];
@@ -383,7 +426,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 						aggregatedData = processRowsWithGroupBy(networkWiseData, groupByParam, {
 							name: dataLabels.pageGroup,
 							value: i
-						});
+						}, customToggleOptions);
 
 					aggregatedData.forEach(data => {
 						updatedRows.push(data);
@@ -408,7 +451,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 							name: dataLabels.variation,
 							value: i,
 							title: name
-						}, variations);
+						}, customToggleOptions);
 
 					aggregatedData.forEach(data => {
 						updatedRows.push(data);
@@ -431,7 +474,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 						aggregatedData = processRowsWithGroupBy(networkWiseData, groupByParam, {
 							name: commonConsts.DEVICE_TYPE,
 							value: i
-						});
+						}, customToggleOptions);
 
 					aggregatedData.forEach(data => {
 						updatedRows.push(data);

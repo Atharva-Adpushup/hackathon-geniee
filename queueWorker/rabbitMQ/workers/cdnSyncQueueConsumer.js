@@ -74,7 +74,8 @@ function errorHandler(error, originalMessage) {
 		logger({
 			source: 'CDN SYNC ERROR LOGS',
 			message: `Error while CDN SYNC and error messgae : ${customErrorMessage}`,
-			debugData: `Site id : ${decodedMessage.siteId}`
+			debugData: `Site id : ${decodedMessage.siteId}`,
+			details: `${JSON.stringify(error)}`
 		});
 		consumer.acknowledge(originalMessage);
 		throw error;
