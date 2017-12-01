@@ -2,7 +2,6 @@ import commonConsts from './commonConsts';
 import moment from 'moment';
 import dataParser from './dataParser';
 import $ from 'jquery';
-import { Promise } from 'es6-promise';
 import ChartLegend from '../components/ChartLegend/index.jsx';
 import React from 'react';
 import ReactDOM from 'react-dom';
