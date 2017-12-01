@@ -331,7 +331,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			networkTotalCpm = [];
 
 		each(rows, row => {
-			dates.push(moment(row.report_date).format('DD-MM'));
+			dates.push(moment.utc(row.report_date).format('DD-MM'));
 
 			const reportDate = moment.utc(row.report_date).format('DD-MM-YYYY'),
 				impressions = row.total_impressions,
