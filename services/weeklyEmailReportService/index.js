@@ -14,6 +14,7 @@ const Promise = require('bluebird'),
 	usersByNonEmptySitesQuery = couchbasePromise.ViewQuery.from('app', 'usersByNonEmptySites'),
 	userModel = require('../../models/userModel'),
 	siteModel = require('../../models/siteModel'),
+	cron = require('node-cron'),
 	woodlot = require('woodlot').customLogger,
 	fileLogger = new woodlot({
 		streams: ['./logs/weeklyEmailReport.log'],
@@ -209,5 +210,16 @@ function init() {
 		.then(mainSuccessHandler)
 		.catch(mainErrorHandler);
 }
+
+cron.schedule(
+	'*/10 * * * *',
+	function() {
+		const infoText = 'WeeklyEmailReport:: Running below task every 4 hours';
+
+		fileLogger.info(infoText);
+		init();
+	},
+	true
+);
 
 init();
