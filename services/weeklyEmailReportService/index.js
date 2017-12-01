@@ -127,7 +127,8 @@ function errorHandler(siteObject, error) {
 function getAllSitesData(modelInstance) {
 	const isUserModel = !!modelInstance,
 		isSitesArray = !!(isUserModel && modelInstance.get('sites') && modelInstance.get('sites').length),
-		emailBlockListArray = ['geniee@adpushup.com'],
+		emailBlockList = ['geniee@adpushup.com', 'demo@adpushup.com'],
+		emailPatternBlockList = [/devtest|mailinator\.com/i],
 		statusObject = {
 			email: modelInstance.get('email'),
 			status: 0,
@@ -143,12 +144,20 @@ function getAllSitesData(modelInstance) {
 	const sitesArray = modelInstance.get('sites'),
 		sitesDataArray = [],
 		userEmail = modelInstance.get('email'),
-		isEmailInBlockedList = !!(emailBlockListArray.indexOf(userEmail) > -1);
+		isEmailInBlockedList = !!(emailBlockList.indexOf(userEmail) > -1),
+		isEmailInPatternBlockedList = utils.isValueInPatternList(emailPatternBlockList, userEmail);
 
 	if (isEmailInBlockedList) {
 		statusObject.message = `User email ${
 			userEmail
 		} is in blocked list. Module execution for this user will stop now.`;
+		return statusObject;
+	}
+
+	if (isEmailInPatternBlockedList) {
+		statusObject.message = `User email ${
+			userEmail
+		} is in pattern blocked list. Module execution for this user will stop now.`;
 		return statusObject;
 	}
 
@@ -212,9 +221,9 @@ function init() {
 }
 
 cron.schedule(
-	'*/10 * * * *',
+	'* */1 * * *',
 	function() {
-		const infoText = 'WeeklyEmailReport:: Running below task every 4 hours';
+		const infoText = 'WeeklyEmailReport:: Running below task every 1 hour';
 
 		fileLogger.info(infoText);
 		init();
@@ -222,4 +231,4 @@ cron.schedule(
 	true
 );
 
-init();
+// init();
