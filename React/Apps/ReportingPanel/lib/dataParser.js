@@ -316,7 +316,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 		}
 		return total;
 	},
-	processRows = (rows, param, customToggleOptions) => {
+	processRows = (rows, param, customToggleOptions, groupBy) => {
 		let totalPageviews = 0,
 			totalPageCpm = 0,
 			totalImpressions = 0,
@@ -348,9 +348,9 @@ const dataLabels = commonConsts.DATA_LABELS,
 			totalGrossRevenue += grossRevenue;
 			totalXpathMiss += xpathMiss;
 
-			networkTotalImpressions.push(impressions.props.networkData);
-			networkTotalRevenue.push(revenue.props.networkData);
-			networkTotalCpm.push(cpm.props.networkData);
+			networkTotalImpressions.push($.extend(true, {}, impressions.props.networkData));
+			networkTotalRevenue.push($.extend(true, {}, revenue.props.networkData));
+			networkTotalCpm.push($.extend(true, {}, cpm.props.networkData));
 
 			body.push({
 				[dataLabels.date]: reportDate,
@@ -374,19 +374,19 @@ const dataLabels = commonConsts.DATA_LABELS,
 			[dataLabels.variation]: (param && param.name === dataLabels.variation) ? param.title : undefined,
 			[dataLabels.platform]: (param && param.name === commonConsts.DEVICE_TYPE) ? getPlatformName(param.value) : undefined,
 			[dataLabels.date]: <Bold>{!param ? dataLabels.total : `${dates[0]} to ${dates[dates.length - 1]}`}</Bold>,
-			[dataLabels.impressions]: <NetworkwiseData bold networkData={processNetworkTotal(networkTotalImpressions)} customToggleOptions={customToggleOptions} />,
+			[dataLabels.impressions]: !groupBy ? <Bold>{totalImpressions}</Bold> : <NetworkwiseData bold networkData={processNetworkTotal(networkTotalImpressions)} customToggleOptions={customToggleOptions} />,
 			[dataLabels.cpm]: <NetworkwiseData bold cpm networkData={networkTotalCpm} customToggleOptions={customToggleOptions} />,
 			[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>,
 			[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
-			[dataLabels.revenue]: <NetworkwiseData bold networkData={processNetworkTotal(networkTotalRevenue)} customToggleOptions={customToggleOptions} />,
+			[dataLabels.revenue]: !groupBy ? <Bold>{totalRevenue.toFixed(2)}</Bold> : <NetworkwiseData bold networkData={processNetworkTotal(networkTotalRevenue)} customToggleOptions={customToggleOptions} />,
 			[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
 			[dataLabels.pageCpm]: <Bold>{((totalRevenue / totalPageviews) * 1000).toFixed(2)}</Bold>
 		});
 
 		return body;
 	},
-	processRowsWithGroupBy = (rows, groupBy, param) => {
-		rows = processRows(rows, param);
+	processRowsWithGroupBy = (rows, groupBy, param, customToggleOptions) => {
+		rows = processRows(rows, param, customToggleOptions, groupBy);
 
 		const nonAggregatedRows = [],
 			aggregatedRows = [];
@@ -404,7 +404,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 	},
 	processTableGroupBy = (header, rows, groupByParam, variations, customToggleOptions) => {
 		if (!groupByParam) {
-			return { header, rows: processRows(networkWiseProcessing(rows, customToggleOptions), null, customToggleOptions) };
+			return { header, rows: processRows(networkWiseProcessing(rows, customToggleOptions), null, customToggleOptions, groupByParam) };
 		}
 
 		let updatedRows = [];
@@ -426,7 +426,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 						aggregatedData = processRowsWithGroupBy(networkWiseData, groupByParam, {
 							name: dataLabels.pageGroup,
 							value: i
-						});
+						}, customToggleOptions);
 
 					aggregatedData.forEach(data => {
 						updatedRows.push(data);
@@ -451,7 +451,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 							name: dataLabels.variation,
 							value: i,
 							title: name
-						}, variations);
+						}, customToggleOptions);
 
 					aggregatedData.forEach(data => {
 						updatedRows.push(data);
@@ -474,7 +474,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 						aggregatedData = processRowsWithGroupBy(networkWiseData, groupByParam, {
 							name: commonConsts.DEVICE_TYPE,
 							value: i
-						});
+						}, customToggleOptions);
 
 					aggregatedData.forEach(data => {
 						updatedRows.push(data);
