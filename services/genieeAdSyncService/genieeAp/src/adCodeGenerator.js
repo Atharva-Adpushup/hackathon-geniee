@@ -99,9 +99,9 @@ var utils = require('../libs/utils'),
 
 module.exports = {
 	generateAdCode: function (ad) {
-		var adCode;
-		if (!ad.networkData) {
-			return '';
+		var adCode = '';
+		if (!ad.networkData && ad.adCode) {
+		    return utils.base64Decode(ad.adCode);
 		}
 		switch (ad.network.toLowerCase()) {
 			case 'geniee':

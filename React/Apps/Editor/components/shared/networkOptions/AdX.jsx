@@ -19,10 +19,9 @@ class AdX extends Component {
 
 	checkAdX(value) {
 		if (
-			value.indexOf('pagead2.googlesyndication.com') == -1 ||
-			value.indexOf('google_ad_slot') == -1 ||
-			value.indexOf('google_ad_width') == -1 ||
-			value.indexOf('google_ad_height') == -1
+			value.indexOf('//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js') == -1 ||
+			value.indexOf('data-ad-client') == -1 ||
+			value.indexOf('data-ad-slot') == -1
 		) {
 			this.props.showNotification({
 				mode: 'error',
