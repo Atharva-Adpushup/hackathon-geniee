@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col } from 'react-bootstrap'
 import commonConsts from '../../lib/commonConsts';
+import { indexOf } from 'lodash';
 
 class LegendItem extends Component {
     constructor(props) {
@@ -17,7 +18,17 @@ class LegendItem extends Component {
     toggleSerie() {
         const serie = this.state.serie;
 
-        serie.visible ? serie.hide() : serie.show();
+        let activeLegendItems = this.props.activeLegendItems;
+        if (serie.visible) {
+            const index = indexOf(activeLegendItems, serie.name);
+            activeLegendItems.splice(index, 1);
+            serie.hide();
+        } else {
+            activeLegendItems.push(serie.name);
+            serie.show();
+        }
+
+        window.activeLegendItemsCallback(activeLegendItems);
         this.setState(...serie, { visible: serie.visible });
     }
 
@@ -57,7 +68,8 @@ class LegendItem extends Component {
 }
 
 LegendItem.propTypes = {
-    serie: PropTypes.object.isRequired
+    serie: PropTypes.object.isRequired,
+    activeLegendItems: PropTypes.array.isRequired
 };
 
 export default LegendItem;
