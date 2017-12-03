@@ -92,8 +92,11 @@ function init(site) {
 		});
 }
 
-init(25019);
+init(25019).then(data => {
+	console.log(data);
+});
 
 /**
  * PAGE RPM -- (Revenue / Pageviews) * 1000
+ * Revenue = RPM * Pageviews / 1000
  */

@@ -1,0 +1,57 @@
+{
+    "1": {
+        "traffic": 3345,
+        "revenue": 3.345,
+        "cpm": 1
+    },
+    "2": {
+        "traffic": 3280,
+        "revenue": 1.64,
+        "cpm": 1
+    },
+    "3": {
+        "traffic": 3375,
+        "revenue": 1.012,
+        "cpm": 1
+    }
+}
+{
+    "1": {
+        "traffic": 3274,
+        "revenue": 3.274,
+        "cpm": 1
+    },
+    "2": {
+        "traffic": 3346,
+        "revenue": 1.338,
+        "cpm": 0.4
+    },
+    "3": {
+        "traffic": 3380,
+        "revenue": 1.69,
+        "cpm": 0.5
+    }
+}
+{
+    "1": {
+        "sum": 3.274,
+        "count": 6620,
+        "cpm": 0.7,
+        "traffic": 6619,
+        "revenue": 6.619
+    },
+    "2": {
+        "sum": 1.338,
+        "count": 6627,
+        "cpm": 0.6,
+        "traffic": 6626,
+        "revenue": 2.9779999999999998
+    },
+    "3": {
+        "sum": 1.69,
+        "count": 6756,
+        "cpm": 0.8,
+        "traffic": 6755,
+        "revenue": 2.702
+    }
+}
