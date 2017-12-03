@@ -163,16 +163,21 @@ var url = require('url'),
 		getMetricComparison: (lastWeek, thisWeek) => {
 			const resultData = {
 					percentage: 0,
-					change: false
+					change: 'remain unchanged'
 				},
-				difference = thisWeek - lastWeek,
-				percentage = Number((difference / lastWeek * 100).toFixed(2)),
-				isNoChange = !!(percentage === 0),
-				isPositiveChange = !!(percentage && percentage > 0);
-			let change;
+				difference = thisWeek - lastWeek;
+
+			let percentage = Number((difference / lastWeek * 100).toFixed(2)),
+				isNoChange,
+				isPositiveChange,
+				change;
+
+			percentage = isNaN(percentage) ? 0 : percentage;
+			isNoChange = !!(percentage === 0);
+			isPositiveChange = !!(percentage && percentage > 0);
 
 			if (isNoChange) {
-				change = false;
+				change = 'remain unchanged';
 			} else if (isPositiveChange) {
 				change = 'increased';
 			} else {
