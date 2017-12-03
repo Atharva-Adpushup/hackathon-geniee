@@ -220,15 +220,15 @@ function init() {
 		.catch(mainErrorHandler);
 }
 
-cron.schedule(
-	'* */1 * * *',
-	function() {
-		const infoText = 'WeeklyEmailReport:: Running below task every 1 hour';
+// cron.schedule(
+// 	'* */1 * * *',
+// 	function() {
+// 		const infoText = 'WeeklyEmailReport:: Running below task every 1 hour';
 
-		fileLogger.info(infoText);
-		init();
-	},
-	true
-);
+// 		fileLogger.info(infoText);
+// 		init();
+// 	},
+// 	true
+// );
 
-// init();
+init();
