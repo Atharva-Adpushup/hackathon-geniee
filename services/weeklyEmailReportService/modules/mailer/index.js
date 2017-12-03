@@ -29,10 +29,6 @@ function sanitiseUrl(url) {
 	return decodeURI(utils.domanize(url));
 }
 
-function isNumberLessThanOne(number) {
-	return !!(Number(number) < 1);
-}
-
 function isMetricDecreaseMoreThan19Percent(inputData, metric) {
 	const percentage = inputData.report.metricComparison[metric].percentage,
 		change = inputData.report.metricComparison[metric].change,
@@ -55,12 +51,8 @@ function getTemplateConfig(inputData) {
 		tenthUrlObject = topUrlsObject[9],
 		revenueLastWeekNumber = inputData.report.metricComparison.revenue.lastWeekOriginal,
 		revenueThisWeekNumber = inputData.report.metricComparison.revenue.thisWeekOriginal,
-		revenueLastWeekOriginalNumber = isNumberLessThanOne(revenueLastWeekNumber)
-			? utils.toFloat(revenueLastWeekNumber)
-			: Math.round(revenueLastWeekNumber),
-		revenueThisWeekOriginalNumber = isNumberLessThanOne(revenueThisWeekNumber)
-			? utils.toFloat(revenueThisWeekNumber)
-			: Math.round(revenueThisWeekNumber),
+		revenueLastWeekOriginalNumber = utils.toFloat(revenueLastWeekNumber),
+		revenueThisWeekOriginalNumber = utils.toFloat(revenueThisWeekNumber),
 		changeImgPathObject = {
 			decreased: 'http://console.adpushup.com/assets/images/down-arrow.png',
 			increased: 'http://console.adpushup.com/assets/images/up-arrow.png'
