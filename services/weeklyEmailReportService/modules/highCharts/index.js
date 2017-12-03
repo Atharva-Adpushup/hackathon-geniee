@@ -60,13 +60,13 @@ function generateCPMLineBase64(inputData) {
 		contributionData = extend(true, {}, inputData.report.metricComparison.cpm.contribution);
 
 	_.forOwn(contributionData.lastWeek, (cpmValue, dateKey) => {
-		const dayCategory = moment(dateKey).format('ddd');
-
-		categories.push(dayCategory);
 		lastWeekSeries.data.push(cpmValue);
 	});
 
 	_.forOwn(contributionData.thisWeek, (cpmValue, dateKey) => {
+		const dayCategory = moment(dateKey).format('ddd');
+
+		categories.push(dayCategory);
 		thisWeekSeries.data.push(cpmValue);
 	});
 
