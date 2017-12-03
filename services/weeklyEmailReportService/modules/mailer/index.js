@@ -33,6 +33,14 @@ function isNumberLessThanOne(number) {
 	return !!(Number(number) < 1);
 }
 
+function isMetricDecreaseMoreThan19Percent(inputData, metric) {
+	const percentage = inputData.report.metricComparison[metric].percentage,
+		change = inputData.report.metricComparison[metric].change,
+		isValid = !!(percentage && Number(percentage) > 19 && change && change === 'decreased');
+
+	return isValid;
+}
+
 function getTemplateConfig(inputData) {
 	const topUrlsObject = inputData.report.topUrls,
 		firstUrlObject = topUrlsObject[0],
@@ -56,7 +64,15 @@ function getTemplateConfig(inputData) {
 		changeImgPathObject = {
 			decreased: 'http://console.adpushup.com/assets/images/down-arrow.png',
 			increased: 'http://console.adpushup.com/assets/images/up-arrow.png'
-		};
+		},
+		cpmPercentage = inputData.report.metricComparison.cpm.percentage,
+		cpmChange = inputData.report.metricComparison.cpm.change,
+		isCPMDecreaseHigh = isMetricDecreaseMoreThan19Percent(inputData, 'cpm'),
+		isRevenueDecreaseHigh = isMetricDecreaseMoreThan19Percent(inputData, 'revenue'),
+		revenueDecreaseExplanation =
+			isCPMDecreaseHigh && isRevenueDecreaseHigh
+				? ` as cpm also ${cpmChange} ${cpmPercentage}% from last week.`
+				: '!';
 
 	return {
 		'@__date_range__@': inputData.report.metricComparison.dates.thisWeek.representation,
@@ -67,12 +83,13 @@ function getTemplateConfig(inputData) {
 		'@__revenue_change_img__@': changeImgPathObject[inputData.report.metricComparison.revenue.change],
 		'@__revenue_lastWeek_value__@': revenueLastWeekOriginalNumber,
 		'@__revenue_thisWeek_value__@': revenueThisWeekOriginalNumber,
+		'@__revenue_change_statement__@': revenueDecreaseExplanation,
 		'@__impression_lastWeek_value__@': inputData.report.metricComparison.impressions.lastWeek,
 		'@__impression_thisWeek_value__@': inputData.report.metricComparison.impressions.thisWeek,
 		'@__impression_change_img__@': changeImgPathObject[inputData.report.metricComparison.impressions.change],
 		'@__cpm_lastWeek_value__@': inputData.report.metricComparison.cpm.lastWeek,
 		'@__cpm_thisWeek_value__@': inputData.report.metricComparison.cpm.thisWeek,
-		'@__cpm_change_img__@': changeImgPathObject[inputData.report.metricComparison.cpm.change],
+		'@__cpm_change_img__@': changeImgPathObject[cpmChange],
 		'@__topUrl_first_link__@': firstUrlObject.url,
 		'@__topUrl_first_value__@': sanitiseUrl(firstUrlObject.url),
 		'@__topUrl_first_hits__@': firstUrlObject.count,
@@ -142,13 +159,13 @@ function sendEmail(options) {
 }
 
 function getEmailObject(inputData) {
-	const weekDateRangeString = inputData.report.metricComparison.dates.thisWeek.representation;
+	const isCPMDecreaseHigh = isMetricDecreaseMoreThan19Percent(inputData, 'cpm');
 
 	return {
 		from: emailConfig.MAIL_FROM,
 		to: 'zahin@adpushup.com', //inputData.email,
 		// 'zahin@adpushup.com, dhiraj@adpushup.com, atul@adpushup.com, dikshant.joshi@adpushup.com, abhinav.choudhri@adpushup.com', //inputData.email,
-		cc: '',
+		cc: isCPMDecreaseHigh ? 'support@adpushup.com' : '',
 		subject: `AdPushup Performance Report: ${inputData.siteName}`,
 		attachment: []
 	};
