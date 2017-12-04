@@ -58,24 +58,17 @@ function getTemplateConfig(inputData) {
 			increased: 'http://console.adpushup.com/assets/images/up-arrow.png'
 		},
 		cpmPercentage = inputData.report.metricComparison.cpm.percentage,
-		cpmChange = inputData.report.metricComparison.cpm.change,
-		isCPMDecreaseHigh = isMetricDecreaseMoreThan19Percent(inputData, 'cpm'),
-		isRevenueDecreaseHigh = isMetricDecreaseMoreThan19Percent(inputData, 'revenue'),
-		revenueDecreaseExplanation =
-			isCPMDecreaseHigh && isRevenueDecreaseHigh
-				? ` as cpm also ${cpmChange} ${cpmPercentage}% from last week.`
-				: '!';
+		cpmChange = inputData.report.metricComparison.cpm.change;
 
 	return {
 		'@__date_range__@': inputData.report.metricComparison.dates.thisWeek.representation,
-		'@__site_name__@': inputData.siteName.toUpperCase(),
+		'@__site_name__@': inputData.siteName.toLowerCase(),
 		'@__revenue_value__@': Math.round(inputData.report.metricComparison.revenue.thisWeekOriginal),
-		'@__revenue_change_text__@': inputData.report.metricComparison.revenue.change,
-		'@__revenue_change_value__@': inputData.report.metricComparison.revenue.percentage,
+		'@__cpm_change_text__@': cpmChange,
+		'@__cpm_change_value__@': cpmPercentage,
 		'@__revenue_change_img__@': changeImgPathObject[inputData.report.metricComparison.revenue.change],
 		'@__revenue_lastWeek_value__@': revenueLastWeekOriginalNumber,
 		'@__revenue_thisWeek_value__@': revenueThisWeekOriginalNumber,
-		'@__revenue_change_statement__@': revenueDecreaseExplanation,
 		'@__impression_lastWeek_value__@': inputData.report.metricComparison.impressions.lastWeek,
 		'@__impression_thisWeek_value__@': inputData.report.metricComparison.impressions.thisWeek,
 		'@__impression_change_img__@': changeImgPathObject[inputData.report.metricComparison.impressions.change],
