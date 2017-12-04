@@ -46,7 +46,6 @@ class NetworkwiseData extends Component {
 
         let total = 0, networkDataArr = [], networkData = this.sortNetworkData(this.state.networkData);
         for (let i in networkData) {
-
             if (!cpmCalc) {
                 total += Number(networkData[i]);
             }
