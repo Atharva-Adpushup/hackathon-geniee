@@ -29,10 +29,6 @@ function sanitiseUrl(url) {
 	return decodeURI(utils.domanize(url));
 }
 
-function isNumberLessThanOne(number) {
-	return !!(Number(number) < 1);
-}
-
 function isMetricDecreaseMoreThan19Percent(inputData, metric) {
 	const percentage = inputData.report.metricComparison[metric].percentage,
 		change = inputData.report.metricComparison[metric].change,
@@ -55,35 +51,24 @@ function getTemplateConfig(inputData) {
 		tenthUrlObject = topUrlsObject[9],
 		revenueLastWeekNumber = inputData.report.metricComparison.revenue.lastWeekOriginal,
 		revenueThisWeekNumber = inputData.report.metricComparison.revenue.thisWeekOriginal,
-		revenueLastWeekOriginalNumber = isNumberLessThanOne(revenueLastWeekNumber)
-			? utils.toFloat(revenueLastWeekNumber)
-			: Math.round(revenueLastWeekNumber),
-		revenueThisWeekOriginalNumber = isNumberLessThanOne(revenueThisWeekNumber)
-			? utils.toFloat(revenueThisWeekNumber)
-			: Math.round(revenueThisWeekNumber),
+		revenueLastWeekOriginalNumber = utils.toFloat(revenueLastWeekNumber),
+		revenueThisWeekOriginalNumber = utils.toFloat(revenueThisWeekNumber),
 		changeImgPathObject = {
 			decreased: 'http://console.adpushup.com/assets/images/down-arrow.png',
 			increased: 'http://console.adpushup.com/assets/images/up-arrow.png'
 		},
 		cpmPercentage = inputData.report.metricComparison.cpm.percentage,
-		cpmChange = inputData.report.metricComparison.cpm.change,
-		isCPMDecreaseHigh = isMetricDecreaseMoreThan19Percent(inputData, 'cpm'),
-		isRevenueDecreaseHigh = isMetricDecreaseMoreThan19Percent(inputData, 'revenue'),
-		revenueDecreaseExplanation =
-			isCPMDecreaseHigh && isRevenueDecreaseHigh
-				? ` as cpm also ${cpmChange} ${cpmPercentage}% from last week.`
-				: '!';
+		cpmChange = inputData.report.metricComparison.cpm.change;
 
 	return {
 		'@__date_range__@': inputData.report.metricComparison.dates.thisWeek.representation,
-		'@__site_name__@': inputData.siteName.toUpperCase(),
+		'@__site_name__@': inputData.siteName.toLowerCase(),
 		'@__revenue_value__@': Math.round(inputData.report.metricComparison.revenue.thisWeekOriginal),
-		'@__revenue_change_text__@': inputData.report.metricComparison.revenue.change,
-		'@__revenue_change_value__@': inputData.report.metricComparison.revenue.percentage,
+		'@__cpm_change_text__@': cpmChange,
+		'@__cpm_change_value__@': cpmPercentage,
 		'@__revenue_change_img__@': changeImgPathObject[inputData.report.metricComparison.revenue.change],
 		'@__revenue_lastWeek_value__@': revenueLastWeekOriginalNumber,
 		'@__revenue_thisWeek_value__@': revenueThisWeekOriginalNumber,
-		'@__revenue_change_statement__@': revenueDecreaseExplanation,
 		'@__impression_lastWeek_value__@': inputData.report.metricComparison.impressions.lastWeek,
 		'@__impression_thisWeek_value__@': inputData.report.metricComparison.impressions.thisWeek,
 		'@__impression_change_img__@': changeImgPathObject[inputData.report.metricComparison.impressions.change],
