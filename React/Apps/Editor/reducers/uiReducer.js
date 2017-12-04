@@ -122,7 +122,7 @@ const errorsConfig = {},
 	afterSaveLoader = (state = { status: 0 }, action) => {
 		switch (action.type) {
 			case uiActions.UPDATE_AFTER_SAVE_STATUS:
-				return { status: action.status };
+				return { status: action.status, msg: action.msg };
 
 			default:
 				return state;
@@ -173,6 +173,30 @@ const errorsConfig = {},
 			default:
 				return state;
 		}
+	},
+	notifications = (state = { isVisible: false }, action) => {
+		switch (action.type) {
+			case uiActions.SHOW_NOTIFICATION:
+				return {
+					...state,
+					isVisible: true,
+					title: action.title,
+					message: action.message,
+					mode: action.mode
+				};
+
+			case uiActions.HIDE_NOTIFICATION:
+				return {
+					...state,
+					isVisible: false,
+					title: '',
+					message: '',
+					mode: ''
+				};
+
+			default:
+				return state;
+		}
 	};
 
 export default combineReducers({
@@ -184,5 +208,6 @@ export default combineReducers({
 	errors,
 	afterSaveLoader,
 	variationPanel,
-	editorViewing
+	editorViewing,
+	notifications
 });

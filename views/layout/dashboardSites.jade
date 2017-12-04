@@ -113,7 +113,11 @@
                                                 .report-date
                                                     
                             else
-                                | No report data found for this site.
+                                section
+                                    .site-status(style="margin-top: -20px; background-color: #fff;")
+                                        h4
+                                            i.fa.fa-exclamation-circle 
+                                            | No report data found for this site
                     else
                         h3.title.m-All-0.clearfix
                             a.pull-left(id="site-report-" + siteId).

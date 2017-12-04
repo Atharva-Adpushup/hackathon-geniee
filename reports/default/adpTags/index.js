@@ -189,15 +189,17 @@ function generate(data) {
 /*
 total_impressions ----> total_ad_requests
 total_requests ----> total_pageviews
+device_type ---> device_type
+display_name ---> network
 */
 
 // let params = {
-// 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid', 'ntwid'],
+// 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid', 'ntwid', 'device_type'],
 // 	where: {
 // 		siteid: 31000,
 // 		mode: 1
 // 	},
-// 	groupBy: ['ntwid', 'pagegroup']
+// 	groupBy: ['pagegroup']
 // };
 
 // generate(params)
@@ -208,4 +210,4 @@ total_requests ----> total_pageviews
 // 		debugger;
 // 	});
 
-module.exports = { generate, getPVS };
+module.exports = { generate, getPVS, executeQuery };

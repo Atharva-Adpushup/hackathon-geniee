@@ -262,6 +262,48 @@ INNER JOIN (
 ON a.report_date=b.report_date and a.siteid=b.siteid
 `;
 
+const SITE_TOP_URLS = `
+SELECT TOP @__count__ c.url, sum(b.count) AS 'count'
+FROM apexhourlysitereport a, apextopurlreport b, apextopurl c
+WHERE a.axhsrid = b.axhsrid
+	AND b.axtuid = c.axtuid
+	AND report_date BETWEEN @__fromDate__ AND @__toDate__
+	AND a.siteid = @__siteId__
+GROUP BY c.url
+ORDER BY 'count' DESC;
+`;
+
+const SITE_DEVICE_WISE_REVENUE_CONTRIBUTION = `
+SELECT report_date, device_type, sum(total_gross_revenue) AS 'total_revenue', sum(total_revenue) AS 'revenue_after_cut'
+FROM adptagreport
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+	AND siteid = @__siteId__
+GROUP BY report_date, device_type;
+`;
+
+const SITE_PAGEGROUP_WISE_REVENUE_CONTRIBUTION = `
+SELECT a.report_date, b.NAME AS 'name', sum(a.total_gross_revenue) AS 'total_revenue', sum(a.total_revenue) AS 'revenue_after_cut'
+FROM AdpTagReport a, ApexPageGroup b
+WHERE a.axpgid = b.axpgid
+	AND a.report_date BETWEEN @__fromDate__ AND @__toDate__
+	AND a.siteid = @__siteId__
+GROUP BY a.report_date, b.NAME;
+`;
+
+const PLATFORMS_KEYS = {
+	0: 'UNKNOWN',
+	1: 'MOBILE',
+	2: 'DESKTOP',
+	3: 'CONNECTED_TV',
+	4: 'MOBILE',
+	5: 'TABLET',
+	6: 'CONNECTED_DEVICE',
+	7: 'SET_TOP_BOX'
+};
+
+const REGEX_DATE_FORMAT = /\d{4}-\d{2}-\d{2}/;
+const STRING_DATE_FORMAT = 'YYYY-MM-DD';
+
 /**
 SELECT
 	SUM(a.total_requests) AS total_requests,
@@ -316,8 +358,9 @@ const schema = {
 		fields: {
 			forUser: ['name', 'variation_id', 'section_md5'],
 			forOn: ['axpgid', 'axvid', 'axsid'],
+			commonOn: ['report_date', 'siteid', 'device_type'],
 			where: ['name', 'variation_id', 'section_md5', 'report_date', 'siteid', 'device_type'],
-			groupBy: ['section_md5', 'variation_id', 'name']
+			groupBy: ['section_md5', 'variation_id', 'name', 'device_type']
 		},
 		tables: {
 			pagegroup: {
@@ -352,7 +395,7 @@ const schema = {
 	},
 	secondQuery: {
 		aggregate: ['total_revenue', 'total_impressions', 'total_gross_revenue'],
-		nonAggregate: ['report_date', 'siteid', 'ntwid', 'platform', 'display_name'],
+		nonAggregate: ['report_date', 'siteid', 'ntwid', 'platform', 'device_type', 'display_name'],
 		where: ['ntwid'],
 		tables: {
 			adpTagReport: {
@@ -420,4 +463,15 @@ const schema = {
 	}
 };
 
-module.exports = { schema, fetchSectionQuery, fetchVariationQuery, fetchPagegroupQuery };
+module.exports = {
+	schema,
+	fetchSectionQuery,
+	fetchVariationQuery,
+	fetchPagegroupQuery,
+	SITE_TOP_URLS,
+	SITE_DEVICE_WISE_REVENUE_CONTRIBUTION,
+	PLATFORMS_KEYS,
+	REGEX_DATE_FORMAT,
+	STRING_DATE_FORMAT,
+	SITE_PAGEGROUP_WISE_REVENUE_CONTRIBUTION
+};
