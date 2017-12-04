@@ -7,6 +7,7 @@ import moment from 'moment';
 import Bold from '../../../Components/Bold.jsx';
 import NetworkwiseData from '../components/NetworkwiseData.jsx';
 import CollapsePanel from '../../../Components/CollapsePanel.jsx';
+import { normalize } from 'path';
 
 const dataLabels = commonConsts.DATA_LABELS,
 	reorderColumns = cols => {
@@ -296,12 +297,32 @@ const dataLabels = commonConsts.DATA_LABELS,
 		return isFloat(adsenseSum) ? adsenseSum.toFixed(2) : adsenseSum;
 	},
 	processNetworkTotal = networkTotalArray => {
-		let total = networkTotalArray[0];
-		for (let i = 1; i < networkTotalArray.length; i++) {
-			const adsense = commonConsts.NETWORKS.adsense,
-				adx = commonConsts.NETWORKS.adx,
-				dfp = commonConsts.NETWORKS.dfp;
+		const adsense = commonConsts.NETWORKS.adsense,
+			adx = commonConsts.NETWORKS.adx,
+			dfp = commonConsts.NETWORKS.dfp,
+			initialData = networkTotalArray[0];
 
+		let normalizedTotal = {};
+		if (adsense in initialData) {
+			normalizedTotal.adsense = initialData.adsense;
+		} else {
+			normalizedTotal.adsense = 0;
+		}
+
+		if (adx in initialData) {
+			normalizedTotal.adx = initialData.adx;
+		} else {
+			normalizedTotal.adx = 0;
+		}
+
+		if (dfp in initialData) {
+			normalizedTotal.dfp = initialData.dfp;
+		} else {
+			normalizedTotal.dfp = 0;
+		}
+
+		let total = normalizedTotal;
+		for (let i = 1; i < networkTotalArray.length; i++) {
 			if (adsense in networkTotalArray[i]) {
 				total[adsense] = networkTotalCalculate(total[adsense], networkTotalArray[i][adsense]);
 			}
@@ -313,6 +334,13 @@ const dataLabels = commonConsts.DATA_LABELS,
 			if (dfp in networkTotalArray[i]) {
 				total[dfp] = networkTotalCalculate(total[dfp], networkTotalArray[i][dfp]);
 			}
+		}
+		return total;
+	},
+	sumNetworkTotal = networkData => {
+		let total = 0;
+		for (let i in networkData) {
+			total += Number(networkData[i]);
 		}
 		return total;
 	},
@@ -369,16 +397,20 @@ const dataLabels = commonConsts.DATA_LABELS,
 			networkTotalCpm[i] = (networkTotalCpm[i] / rows.length).toFixed(2);
 		}
 
+		const cpmCalc = {
+			revenue: sumNetworkTotal(processNetworkTotal(networkTotalRevenue)),
+			impressions: sumNetworkTotal(processNetworkTotal(networkTotalImpressions))
+		};
 		body.push({
 			[dataLabels.pageGroup]: (param && param.name === dataLabels.pageGroup) ? param.value : undefined,
 			[dataLabels.variation]: (param && param.name === dataLabels.variation) ? param.title : undefined,
 			[dataLabels.platform]: (param && param.name === commonConsts.DEVICE_TYPE) ? getPlatformName(param.value) : undefined,
 			[dataLabels.date]: <Bold>{!param ? dataLabels.total : `${dates[0]} to ${dates[dates.length - 1]}`}</Bold>,
-			[dataLabels.impressions]: !groupBy ? <Bold>{totalImpressions}</Bold> : <NetworkwiseData bold networkData={processNetworkTotal(networkTotalImpressions)} customToggleOptions={customToggleOptions} />,
-			[dataLabels.cpm]: <NetworkwiseData bold cpm networkData={networkTotalCpm} customToggleOptions={customToggleOptions} />,
+			[dataLabels.impressions]: <NetworkwiseData bold networkData={processNetworkTotal(networkTotalImpressions)} customToggleOptions={customToggleOptions} />,
+			[dataLabels.cpm]: <NetworkwiseData bold networkData={networkTotalCpm} customToggleOptions={customToggleOptions} cpmCalc={cpmCalc} />,
 			[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>,
 			[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
-			[dataLabels.revenue]: !groupBy ? <Bold>{totalRevenue.toFixed(2)}</Bold> : <NetworkwiseData bold networkData={processNetworkTotal(networkTotalRevenue)} customToggleOptions={customToggleOptions} />,
+			[dataLabels.revenue]: <NetworkwiseData bold networkData={processNetworkTotal(networkTotalRevenue)} customToggleOptions={customToggleOptions} />,
 			[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
 			[dataLabels.pageCpm]: <Bold>{((totalRevenue / totalPageviews) * 1000).toFixed(2)}</Bold>
 		});
