@@ -5,7 +5,14 @@ var browserConfig = require('./browserConfig.js'),
 
 module.exports = {
 	log: function() {
-		if (typeof console !== 'undefined' && console.log) console.log.apply(console, arguments);
+		var isQueryParams = !!(
+				this.queryParams &&
+				$.isPlainObject(this.queryParams) &&
+				!$.isEmptyObject(this.queryParams)
+			),
+			isapDebugParam = !!(isQueryParams && this.queryParams.apDebug);
+
+		if (typeof console !== 'undefined' && console.log && isapDebugParam) console.log.apply(console, arguments);
 	},
 	base64Encode: function(data) {
 		return Base64.btoa(data);

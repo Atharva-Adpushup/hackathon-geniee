@@ -11,7 +11,8 @@ var Promise = require('bluebird'),
 					query: 'SELECT ',
 					fields: {
 						forUser: [],
-						forOn: []
+						forOn: [],
+						commonOn: []
 					},
 					level: {
 						section: false,
@@ -290,6 +291,16 @@ var Promise = require('bluebird'),
 							schema.secondQuery.tables.network.alias
 						}.ntwid`;
 				}
+			},
+			__generateON = () => {
+				let response = ' ';
+				if (common.fields.commonOn.length) {
+					_.forEach(common.fields.commonOn, (value, key) => {
+						response += `${schema.firstQuery.alias}.${value}=${schema.secondQuery.alias}.${value} AND `;
+					});
+					return response.slice(0, -4);
+				}
+				return response;
 			};
 		return {
 			select: (data, flag) => {
@@ -327,6 +338,10 @@ var Promise = require('bluebird'),
 							field
 						}, `;
 						secondQuery.aggregate.push(field);
+					}
+
+					if (schema.common.fields.commonOn.indexOf(field) != -1) {
+						common.fields.commonOn.push(field);
 					}
 					__tableSpecific(field);
 				});
@@ -427,7 +442,11 @@ var Promise = require('bluebird'),
 			groupBy: data => {
 				return __setLevelFromGroupBy(data)
 					.then(response => {
-						let uniqueGroupByFields = _.difference(data, schema.common.fields.groupBy);
+						let uniqueGroupByFields = _.difference(data, schema.common.fields.groupBy),
+							secondQueryUniqueNonAggregate = _.difference(
+								secondQuery.nonAggregate,
+								firstQuery.nonAggregate
+							);
 						common.groupBy = common.fields.forUser.length
 							? ` GROUP BY ${__reduceArrayToString(common.fields.forUser, schema.firstQuery.alias)} `
 							: ' GROUP BY ';
@@ -435,6 +454,12 @@ var Promise = require('bluebird'),
 							? (common.groupBy += ` ${
 									common.fields.forUser.length ? ' , ' : ' '
 								} ${__reduceArrayToString(firstQuery.nonAggregate, schema.firstQuery.alias)}`)
+							: null;
+						secondQueryUniqueNonAggregate.length
+							? _.forEach(secondQueryUniqueNonAggregate, (value, key) => {
+									let alias = __getAlias(value, true);
+									common.groupBy += ` , ${alias}.${value}`;
+								})
 							: null;
 						uniqueGroupByFields.length
 							? _.forEach(uniqueGroupByFields, (value, key) => {
@@ -478,7 +503,7 @@ var Promise = require('bluebird'),
 					common.query += ` ) ${schema.secondQuery.alias} `;
 
 					// ON
-					common.query += 'ON a.report_date=b.report_date AND a.siteid=b.siteid';
+					common.query += `ON ${__generateON()}`;
 
 					common.query += __generateCommonColumnsCondition(schema.firstQuery.alias, schema.secondQuery.alias);
 

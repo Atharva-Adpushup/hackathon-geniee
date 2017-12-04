@@ -36,6 +36,7 @@ class insertMenu extends React.Component {
 		this.state = initialState;
 		this.createSectionAndAd = this.createSectionAndAd.bind(this);
 		this.toggleExtraOptions = this.toggleExtraOptions.bind(this);
+		this.networkOptionsSubmit = this.networkOptionsSubmit.bind(this);
 	}
 
 	componentWillMount() {
@@ -69,21 +70,11 @@ class insertMenu extends React.Component {
 		});
 	}
 
-	createSectionAndAd(
-		position,
-		adCode,
-		firstFold,
-		asyncTag,
-		customZoneId,
-		priceFloor,
-		networkFromDropdown,
-		isHeaderBiddingActivated
-	) {
+	createSectionAndAd(params) {
 		const props = this.props;
-
-		let network = props.partner && props.partner === 'geniee' && !adCode ? 'geniee' : 'custom';
-		network = networkFromDropdown ? networkFromDropdown : network;
-
+		let { position, adCode, firstFold, asyncTag, customZoneId, network, networkData } = params;
+		// let networkToSet = props.partner && props.partner === 'geniee' && !adCode ? 'geniee' : 'custom';
+		network = network ? network : 'custom';
 		const sectionPayload = {
 				position,
 				firstFold: firstFold || false,
@@ -94,23 +85,16 @@ class insertMenu extends React.Component {
 			},
 			adPayload = {
 				isCustomSize: this.state.isCustomSize,
-				adCode,
 				network,
 				height: this.state.adSize.height,
-				width: this.state.adSize.width
+				width: this.state.adSize.width,
+				networkData: {}
 			};
-
 		customZoneId ? (adPayload.networkData = { zoneId: customZoneId }) : null;
-		priceFloor && priceFloor.trim()
-			? adPayload.networkData
-				? ((adPayload.networkData.priceFloor = parseFloat(priceFloor)),
-					(adPayload.networkData.headerBidding = !!isHeaderBiddingActivated))
-				: (adPayload.networkData = {
-						priceFloor: parseFloat(priceFloor),
-						headerBidding: !!isHeaderBiddingActivated
-					})
-			: null;
-
+		adPayload.networkData = {
+			...adPayload.networkData,
+			...networkData
+		};
 		this.props.createSectionAndAd(sectionPayload, adPayload, this.props.variationId);
 	}
 
@@ -124,6 +108,10 @@ class insertMenu extends React.Component {
 				}
 			});
 		});
+	}
+
+	networkOptionsSubmit(params) {
+		this.createSectionAndAd(params);
 	}
 
 	render() {
@@ -162,7 +150,11 @@ class insertMenu extends React.Component {
 		} else {
 			items.push(
 				<MenuItem key={1} icon="fa-sitemap" contentHeading="Network Options">
-					<NetworkOptions onSubmit={this.createSectionAndAd} onCancel={this.toggleExtraOptions} />
+					<NetworkOptions
+						onSubmit={this.networkOptionsSubmit}
+						onCancel={this.toggleExtraOptions}
+						showNotification={this.props.showNotification}
+					/>
 				</MenuItem>
 			);
 		}
@@ -206,7 +198,8 @@ insertMenu.propTypes = {
 	createSectionAndAd: PropTypes.func,
 	hideMenu: PropTypes.func,
 	selectInnerElement: PropTypes.func,
-	highlightInnerElement: PropTypes.func
+	highlightInnerElement: PropTypes.func,
+	showNotification: PropTypes.func
 };
 
 export default insertMenu;

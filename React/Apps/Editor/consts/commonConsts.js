@@ -179,7 +179,8 @@ const status = {
 		TOGGLE_VARIATION_PANEL: 'TOGGLE_VARIATION_PANEL',
 		OPEN_VARIATION_PANEL: 'OPEN_VARIATION_PANEL',
 		CLOSE_VARIATION_PANEL: 'CLOSE_VARIATION_PANEL',
-		UPDATE_CONTENT_SELECTOR: 'UPDATE_CONTENT_SELECTOR'
+		UPDATE_CONTENT_SELECTOR: 'UPDATE_CONTENT_SELECTOR',
+		SAVE_KEY_VALUES: 'SAVE_KEY_VALUES'
 	},
 	sectionActions = {
 		CREATE_SECTION: 'CREATE_SECTION',
@@ -221,7 +222,9 @@ const status = {
 	uiActions = {
 		RESET_ERRORS: 'RESET_ERRORS',
 		UPDATE_AFTER_SAVE_STATUS: 'UPDATE_AFTER_SAVE_STATUS',
-		SET_MODE: 'SET_MODE'
+		SET_MODE: 'SET_MODE',
+		SHOW_NOTIFICATION: 'SHOW_NOTIFICATION',
+		HIDE_NOTIFICATION: 'HIDE_NOTIFICATION'
 	},
 	reportingActions = {
 		SET_REPORT: 'SET_REPORT',
@@ -325,7 +328,10 @@ const status = {
 		BROWSE_MODE: 2
 	},
 	networks = ['adsense', 'adx', 'adpTags', 'dfp', 'custom'],
-	reportingUrl = '/user/reports/generate';
+	priceFloorKeys = ['FP_S_A', 'FP_B_A', 'FP_S', 'FP_A', 'FP_B'],
+	defaultPriceFloorKey = 'FP_S_A',
+	reportingUrl = '/user/reports/generate',
+	jsWrapper = `(function($){ \n\n })(adpushup.$)`;
 
 export {
 	status,
@@ -362,5 +368,8 @@ export {
 	uiModes,
 	networks,
 	reportingActions,
-	reportingUrl
+	reportingUrl,
+	priceFloorKeys,
+	defaultPriceFloorKey,
+	jsWrapper
 };
