@@ -378,7 +378,7 @@ const schema = {
 		}
 	},
 	firstQuery: {
-		aggregate: ['total_requests', 'total_xpath_miss'],
+		aggregate: ['total_requests', 'total_xpath_miss', 'total_impressions'],
 		nonAggregate: ['report_date', 'siteid', 'device_type'],
 		where: ['mode'],
 		tables: {
