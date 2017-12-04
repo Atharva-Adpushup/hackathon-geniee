@@ -196,7 +196,8 @@ display_name ---> network
 // let params = {
 // 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid', 'ntwid', 'device_type'],
 // 	where: {
-// 		siteid: 31000
+// 		siteid: 31000,
+// 		mode: 1
 // 	},
 // 	groupBy: ['pagegroup']
 // };
@@ -209,4 +210,4 @@ display_name ---> network
 // 		debugger;
 // 	});
 
-module.exports = { generate, getPVS };
+module.exports = { generate, getPVS, executeQuery };
