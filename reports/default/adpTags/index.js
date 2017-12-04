@@ -194,7 +194,8 @@ total_requests ----> total_pageviews
 // let params = {
 // 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid', 'ntwid'],
 // 	where: {
-// 		siteid: 31000
+// 		siteid: 31000,
+// 		mode: 1
 // 	},
 // 	groupBy: ['ntwid', 'pagegroup']
 // };
