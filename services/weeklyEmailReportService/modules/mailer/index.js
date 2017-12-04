@@ -148,8 +148,7 @@ function getEmailObject(inputData) {
 
 	return {
 		from: emailConfig.MAIL_FROM,
-		to: 'zahin@adpushup.com', //inputData.email,
-		// 'zahin@adpushup.com, dhiraj@adpushup.com, atul@adpushup.com, dikshant.joshi@adpushup.com, abhinav.choudhri@adpushup.com', //inputData.email,
+		to: `${inputData.email}, support@adpushup.com, zahin@adpushup.com`,
 		cc: isCPMDecreaseHigh ? 'support@adpushup.com' : '',
 		subject: `AdPushup Performance Report: ${inputData.siteName}`,
 		attachment: []
