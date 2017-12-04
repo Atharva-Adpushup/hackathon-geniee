@@ -2,7 +2,7 @@ import React from 'react';
 import { reorderArray } from './helpers';
 import { capitalCase, isFloat } from '../../../common/helpers';
 import commonConsts from './commonConsts';
-import { remove, map, each, groupBy, uniq, find, indexOf } from 'lodash';
+import { remove, map, each, groupBy, uniq, find, indexOf, reduceRight } from 'lodash';
 import moment from 'moment';
 import Bold from '../../../Components/Bold.jsx';
 import NetworkwiseData from '../components/NetworkwiseData.jsx';
@@ -291,56 +291,29 @@ const dataLabels = commonConsts.DATA_LABELS,
 		return processedData;
 	},
 	getPlatformName = id => capitalCase(commonConsts.DEVICE_TYPE_MAPPING[id]),
-	networkTotalCalculate = (total, networkTotalItem) => {
-		let adsenseSum = Number(total);
-		adsenseSum += Number(networkTotalItem);
-		return isFloat(adsenseSum) ? adsenseSum.toFixed(2) : adsenseSum;
-	},
-	processNetworkTotal = networkTotalArray => {
-		const adsense = commonConsts.NETWORKS.adsense,
-			adx = commonConsts.NETWORKS.adx,
-			dfp = commonConsts.NETWORKS.dfp,
-			initialData = networkTotalArray[0];
-
-		let normalizedTotal = {};
-		if (adsense in initialData) {
-			normalizedTotal.adsense = initialData.adsense;
-		} else {
-			normalizedTotal.adsense = 0;
-		}
-
-		if (adx in initialData) {
-			normalizedTotal.adx = initialData.adx;
-		} else {
-			normalizedTotal.adx = 0;
-		}
-
-		if (dfp in initialData) {
-			normalizedTotal.dfp = initialData.dfp;
-		} else {
-			normalizedTotal.dfp = 0;
-		}
-
-		let total = normalizedTotal;
-		for (let i = 1; i < networkTotalArray.length; i++) {
-			if (adsense in networkTotalArray[i]) {
-				total[adsense] = networkTotalCalculate(total[adsense], networkTotalArray[i][adsense]);
-			}
-
-			if (adx in networkTotalArray[i]) {
-				total[adx] = networkTotalCalculate(total[adx], networkTotalArray[i][adx]);
-			}
-
-			if (dfp in networkTotalArray[i]) {
-				total[dfp] = networkTotalCalculate(total[dfp], networkTotalArray[i][dfp]);
-			}
-		}
-		return total;
-	},
 	sumNetworkTotal = networkData => {
 		let total = 0;
 		for (let i in networkData) {
 			total += Number(networkData[i]);
+		}
+		return total;
+	},
+	getNetworksFromData = networkData => Object.keys(reduceRight(networkData, (a, b) => Object.assign(a, b))),
+	processNetworkTotal = networkTotalArray => {
+		const networks = getNetworksFromData(networkTotalArray);
+		let total = {};
+
+		networks.forEach(network => {
+			total[network] = 0;
+		});
+
+		for (let i = 0; i < networkTotalArray.length; i++) {
+			const networkData = networkTotalArray[i];
+			each(networks, network => {
+				if (network in networkData) {
+					total[network] += Number(networkData[network]);
+				}
+			});
 		}
 		return total;
 	},

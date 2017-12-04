@@ -49,7 +49,7 @@ class NetworkwiseData extends Component {
             if (!cpmCalc) {
                 total += Number(networkData[i]);
             }
-            networkDataArr.push(<div><Bold>{capitalCase(i)}</Bold> : {networkData[i]}</div>)
+            networkDataArr.push(<div><Bold>{capitalCase(i)}</Bold> : {isFloat(networkData[i]) ? Number(networkData[i]).toFixed(2) : networkData[i]}</div>)
         }
 
         if (cpmCalc) {
