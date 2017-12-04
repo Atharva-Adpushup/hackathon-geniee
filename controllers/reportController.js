@@ -54,15 +54,6 @@ function errorHandling(err, response, res) {
 	);
 }
 
-const renderAdpReportPanel = (req, res, site, pageGroups) => {
-	return res.render('adpushupReport', {
-		pageGroups,
-		siteId: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL ? req.params.siteId : commonConsts.DEMO_REPORT_SITE_ID,
-		siteDomain: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL ? utils.domanize(site.get('siteDomain')) : '',
-		isSuperUser: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL ? req.session.isSuperUser : false
-	});
-};
-
 router
 	// .get('/performance', function(req, res) {
 	// 	var siteId = req.params.siteId,
@@ -79,13 +70,17 @@ router
 			.getUniquePageGroups(req.params.siteId)
 			.then(pageGroups => [pageGroups, siteModel.getSiteById(req.params.siteId)])
 			.spread((pageGroups, site) => {
-				if (req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL) {
-					return renderAdpReportPanel(req, res, site, pageGroups);
-				} else {
-					return [siteModel.getUniquePageGroups(commonConsts.DEMO_REPORT_SITE_ID), site];
+				if (req.session.user.email === commonConsts.DEMO_ACCOUNT_EMAIL) {
+					pageGroups = commonConsts.DEMO_PAGEGROUPS;
 				}
+
+				return res.render('adpushupReport', {
+					pageGroups,
+					siteId: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL ? req.params.siteId : commonConsts.DEMO_REPORT_SITE_ID,
+					siteDomain: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL ? utils.domanize(site.get('siteDomain')) : '',
+					isSuperUser: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL ? req.session.isSuperUser : false
+				});
 			})
-			.spread((pageGroups, site) => renderAdpReportPanel(req, res, site, pageGroups))
 			.catch(err => res.send('Some error occurred! Please try again later.'));
 	})
 	.get('/performance', function (req, res) {
