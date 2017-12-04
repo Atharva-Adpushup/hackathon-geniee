@@ -337,6 +337,13 @@ const dataLabels = commonConsts.DATA_LABELS,
 		}
 		return total;
 	},
+	sumNetworkTotal = networkData => {
+		let total = 0;
+		for (let i in networkData) {
+			total += Number(networkData[i]);
+		}
+		return total;
+	},
 	processRows = (rows, param, customToggleOptions, groupBy) => {
 		let totalPageviews = 0,
 			totalPageCpm = 0,
@@ -390,13 +397,17 @@ const dataLabels = commonConsts.DATA_LABELS,
 			networkTotalCpm[i] = (networkTotalCpm[i] / rows.length).toFixed(2);
 		}
 
+		const cpmCalc = {
+			revenue: sumNetworkTotal(processNetworkTotal(networkTotalRevenue)),
+			impressions: sumNetworkTotal(processNetworkTotal(networkTotalImpressions))
+		};
 		body.push({
 			[dataLabels.pageGroup]: (param && param.name === dataLabels.pageGroup) ? param.value : undefined,
 			[dataLabels.variation]: (param && param.name === dataLabels.variation) ? param.title : undefined,
 			[dataLabels.platform]: (param && param.name === commonConsts.DEVICE_TYPE) ? getPlatformName(param.value) : undefined,
 			[dataLabels.date]: <Bold>{!param ? dataLabels.total : `${dates[0]} to ${dates[dates.length - 1]}`}</Bold>,
 			[dataLabels.impressions]: <NetworkwiseData bold networkData={processNetworkTotal(networkTotalImpressions)} customToggleOptions={customToggleOptions} />,
-			[dataLabels.cpm]: <NetworkwiseData bold cpm networkData={networkTotalCpm} customToggleOptions={customToggleOptions} />,
+			[dataLabels.cpm]: <NetworkwiseData bold networkData={networkTotalCpm} customToggleOptions={customToggleOptions} cpmCalc={cpmCalc} />,
 			[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>,
 			[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
 			[dataLabels.revenue]: <NetworkwiseData bold networkData={processNetworkTotal(networkTotalRevenue)} customToggleOptions={customToggleOptions} />,
