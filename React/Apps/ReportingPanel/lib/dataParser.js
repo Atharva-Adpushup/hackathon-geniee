@@ -7,7 +7,6 @@ import moment from 'moment';
 import Bold from '../../../Components/Bold.jsx';
 import NetworkwiseData from '../components/NetworkwiseData.jsx';
 import CollapsePanel from '../../../Components/CollapsePanel.jsx';
-import { normalize } from 'path';
 
 const dataLabels = commonConsts.DATA_LABELS,
 	reorderColumns = cols => {
@@ -50,35 +49,35 @@ const dataLabels = commonConsts.DATA_LABELS,
 	},
 	generateYAxis = columns => {
 		let yAxis = [],
-			xPathImpressionsPageviews = '',
-			cpmPageCpm = '',
-			revenueGrossRevenue = '';
+			leftAxis = '',
+			rightAxis1 = '',
+			rightAxis2 = '';
 
 		for (let i = 0; i < columns.length; i++) {
 			switch (columns[i]) {
 				case dataLabels.impressions:
-					xPathImpressionsPageviews += `${columns[i]} / `;
+					leftAxis += `${columns[i]} / `;
 					break;
 				case dataLabels.xpathMiss:
 				case dataLabels.pageViews:
 					if (commonConsts.IS_SUPERUSER) {
-						xPathImpressionsPageviews += `${columns[i]} / `;
+						leftAxis += `${columns[i]} / `;
 					}
 					break;
 				case dataLabels.cpm:
-					cpmPageCpm += `${columns[i]} / `;
+					rightAxis1 += `${columns[i]} / `;
 					break;
 				case dataLabels.pageCpm:
 					if (commonConsts.IS_SUPERUSER) {
-						cpmPageCpm += `${columns[i]} / `;
+						rightAxis1 += `${columns[i]} / `;
 					}
 					break;
 				case dataLabels.revenue:
-					revenueGrossRevenue += `${columns[i]} / `;
+					rightAxis2 += `${columns[i]} / `;
 					break;
 				case dataLabels.grossRevenue:
 					if (commonConsts.IS_SUPERUSER) {
-						revenueGrossRevenue += `${columns[i]} / `;
+						rightAxis2 += `${columns[i]} / `;
 					}
 					break;
 			}
@@ -87,18 +86,18 @@ const dataLabels = commonConsts.DATA_LABELS,
 		yAxis.push(
 			{
 				title: {
-					text: xPathImpressionsPageviews.substring(0, xPathImpressionsPageviews.length - 2)
+					text: leftAxis.substring(0, leftAxis.length - 2)
 				}
 			},
 			{
 				title: {
-					text: cpmPageCpm.substring(0, cpmPageCpm.length - 2)
+					text: rightAxis1.substring(0, rightAxis1.length - 2)
 				},
 				opposite: true
 			},
 			{
 				title: {
-					text: revenueGrossRevenue.substring(0, revenueGrossRevenue.length - 2)
+					text: rightAxis2.substring(0, rightAxis2.length - 2)
 				},
 				opposite: true
 			}
