@@ -399,3 +399,16 @@ maxHeightWidth {
 		.bgdarkBlue {
 			background-color: darken($linkBlue, 25%);
 		}
+
+.btn.btn-lightBg.btn-blue {
+	background-color: darken($linkBlue, 25%);
+	border: 1px solid darken($linkBlue, 25%) !important;
+	color: $whiteColor;
+
+	&:hover,
+	&:active,
+	&:focus {
+		background-color: darken($linkBlue, 25%);
+		color: $whiteColor;
+	}
+}
