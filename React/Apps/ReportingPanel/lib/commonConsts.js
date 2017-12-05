@@ -18,7 +18,7 @@ const commonConsts = {
 	GROUP_BY: ['device_type', 'pagegroup'],
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
-	SITE_ID: window.siteId,
+	SITE_ID: 31000, //window.siteId,
 	SITE_DOMAIN: window.siteDomain,
 	PAGEGROUPS: window.pageGroups,
 	IS_SUPERUSER: window.isSuperUser,
@@ -37,7 +37,8 @@ const commonConsts = {
 		variation: 'Variation Name',
 		pageGroup: 'PageGroup',
 		total: 'Total',
-		platform: 'Platform'
+		platform: 'Platform',
+		adpRequests: 'Adpushup Requests'
 	},
 	API_DATA_PARAMS: {
 		impressions: 'total_impressions',
@@ -47,7 +48,8 @@ const commonConsts = {
 		xpathMiss: 'total_xpath_miss',
 		pageGroup: 'name',
 		date: 'report_date',
-		variationId: 'variation_id'
+		variationId: 'variation_id',
+		adpRequests: 'total_adp_impressions'
 	}
 };
 
