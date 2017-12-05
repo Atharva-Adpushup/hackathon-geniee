@@ -44,18 +44,17 @@ class ReportingPanel extends React.Component {
 	}
 
 	fetchVariations(pageGroup, platform) {
-		// ajax({
-		// 	method: 'GET',
-		// 	url: `${commonConsts.VARIATIONS_ENDPOINT}?siteId=${commonConsts.SITE_ID}&pageGroup=${pageGroup}&platform=${platform}`
-		// })
-		// 	.then(res => {
-		// 		const variations = this.state.variations.concat(res.data);
-		// 		this.setState({ variations });
-		// 	})
-		// 	.catch(res => {
-		// 		this.setState({ variations: [] });
-		// 	});
-		this.setState({ variations: [{ "name": "AdX", "id": "3008d6c4-c9e2-4773-ad44-946a14dded20" }, { "name": "Adp", "id": "200681a0-142e-4940-93f2-c33be470067c" }, { "name": "Adsense", "id": "2f8e771a-ad6b-4721-9c5c-a73b357639d6" }] });
+		ajax({
+			method: 'GET',
+			url: `${commonConsts.VARIATIONS_ENDPOINT}?siteId=${commonConsts.SITE_ID}&pageGroup=${pageGroup}&platform=${platform}`
+		})
+			.then(res => {
+				const variations = this.state.variations.concat(res.data);
+				this.setState({ variations });
+			})
+			.catch(res => {
+				this.setState({ variations: [] });
+			});
 	}
 
 	generateReport() {
