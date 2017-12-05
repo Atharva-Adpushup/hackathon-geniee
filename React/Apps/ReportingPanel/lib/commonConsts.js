@@ -38,7 +38,8 @@ const commonConsts = {
 		pageGroup: 'PageGroup',
 		total: 'Total',
 		platform: 'Platform',
-		adpRequests: 'Adpushup Requests'
+		adpRequests: 'Adpushup Requests',
+		adpCoverage: 'Adpushup Coverage'
 	},
 	API_DATA_PARAMS: {
 		impressions: 'total_impressions',

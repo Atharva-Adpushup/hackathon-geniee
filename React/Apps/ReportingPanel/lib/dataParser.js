@@ -16,6 +16,12 @@ const dataLabels = commonConsts.DATA_LABELS,
 		updatedCols.push(reorderArray(dataLabels.pageCpm, cols));
 		updatedCols.push(reorderArray(dataLabels.adpRequests, cols));
 		updatedCols.push(reorderArray(dataLabels.impressions, cols));
+
+		if (commonConsts.IS_SUPERUSER) {
+			cols.push(dataLabels.adpCoverage);
+			updatedCols.push(reorderArray(dataLabels.adpCoverage, cols));
+		}
+
 		updatedCols.push(reorderArray(dataLabels.cpm, cols));
 		updatedCols.push(reorderArray(dataLabels.revenue, cols));
 		updatedCols.push(reorderArray(dataLabels.grossRevenue, cols));
@@ -378,7 +384,8 @@ const dataLabels = commonConsts.DATA_LABELS,
 				[dataLabels.pageViews]: pageViews,
 				[dataLabels.revenue]: revenue,
 				[dataLabels.grossRevenue]: grossRevenue,
-				[dataLabels.pageCpm]: pageCpm
+				[dataLabels.pageCpm]: pageCpm,
+				[dataLabels.adpCoverage]: `${((sumNetworkDataProp(impressions) / adpRequests) * 100).toFixed(2)}%`
 			});
 		});
 
@@ -400,6 +407,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			[dataLabels.cpm]: <NetworkwiseData bold networkData={networkTotalCpm} customToggleOptions={customToggleOptions} cpmCalc={cpmCalc} />,
 			[dataLabels.xpathMiss]: <Bold>{totalXpathMiss}</Bold>,
 			[dataLabels.adpRequests]: <Bold>{totaladpRequests}</Bold>,
+			[dataLabels.adpCoverage]: <Bold>N/A</Bold>,
 			[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
 			[dataLabels.revenue]: <NetworkwiseData bold networkData={processNetworkTotal(networkTotalRevenue)} customToggleOptions={customToggleOptions} />,
 			[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
