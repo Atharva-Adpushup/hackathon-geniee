@@ -319,7 +319,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 	},
 	getNetworksFromData = networkData => Object.keys(reduceRight(networkData, (a, b) => Object.assign(a, b))),
 	processNetworkTotal = networkTotalArray => {
-		const networks = getNetworksFromData(networkTotalArray);
+		const networks = getNetworksFromData($.extend(true, [], networkTotalArray));
 		let total = {};
 
 		networks.forEach(network => {
@@ -330,7 +330,8 @@ const dataLabels = commonConsts.DATA_LABELS,
 			const networkData = networkTotalArray[i];
 			each(networks, network => {
 				if (network in networkData) {
-					total[network] += Number(networkData[network]);
+					const num = Number(networkData[network]);
+					total[network] += isNaN(num) ? 0 : num;
 				}
 			});
 		}
@@ -349,7 +350,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			dates = [],
 			networkTotalImpressions = [],
 			networkTotalRevenue = [],
-			networkTotalCpm = [];
+			networkTotalCpm = {};
 
 		each(rows, row => {
 			dates.push(moment.utc(row.report_date).format('DD-MM'));
@@ -373,7 +374,6 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 			networkTotalImpressions.push($.extend(true, {}, impressions.props.networkData));
 			networkTotalRevenue.push($.extend(true, {}, revenue.props.networkData));
-			networkTotalCpm.push($.extend(true, {}, cpm.props.networkData));
 
 			const coverage = ((sumNetworkDataProp(impressions) / adpRequests) * 100).toFixed(2);
 
@@ -391,15 +391,17 @@ const dataLabels = commonConsts.DATA_LABELS,
 			});
 		});
 
-		networkTotalCpm = processNetworkTotal(networkTotalCpm);
-		for (let i in networkTotalCpm) {
-			networkTotalCpm[i] = (networkTotalCpm[i] / rows.length).toFixed(2);
+		const processedTotalRevenue = processNetworkTotal(networkTotalRevenue),
+			processedTotalImpressions = processNetworkTotal(networkTotalImpressions),
+			cpmCalc = {
+				revenue: sumNetworkTotal(processedTotalRevenue),
+				impressions: sumNetworkTotal(processedTotalImpressions)
+			};
+
+		for (let i in processedTotalRevenue) {
+			networkTotalCpm[i] = ((processedTotalRevenue[i] * 1000) / processedTotalImpressions[i]).toFixed(2);
 		}
 
-		const cpmCalc = {
-			revenue: sumNetworkTotal(processNetworkTotal(networkTotalRevenue)),
-			impressions: sumNetworkTotal(processNetworkTotal(networkTotalImpressions))
-		};
 		body.push({
 			[dataLabels.pageGroup]: (param && param.name === dataLabels.pageGroup) ? param.value : undefined,
 			[dataLabels.variation]: (param && param.name === dataLabels.variation) ? param.title : undefined,
