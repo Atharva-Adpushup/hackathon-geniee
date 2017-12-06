@@ -97,16 +97,14 @@ function doProcessingAndAck(originalMessage) {
 }
 
 function consumeRabbitMQMessage() {
-	return consumer
-		.getMessage(QUEUE)
-		.then(doProcessingAndAck)
-		.then((timer = 0) => setTimeout(consumeRabbitMQMessage, timer));
+	return consumer.getMessage(QUEUE).then(doProcessingAndAck);
 }
 
 function init() {
 	return consumer
 		.makeConnection()
 		.then(consumeRabbitMQMessage)
+		.then((timer = 0) => setTimeout(init, timer))
 		.catch(error => {
 			let message = error.message || 'CDN SYNC FAILED';
 			console.log(message);
