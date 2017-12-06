@@ -375,6 +375,8 @@ const dataLabels = commonConsts.DATA_LABELS,
 			networkTotalRevenue.push($.extend(true, {}, revenue.props.networkData));
 			networkTotalCpm.push($.extend(true, {}, cpm.props.networkData));
 
+			const coverage = ((sumNetworkDataProp(impressions) / adpRequests) * 100).toFixed(2);
+
 			body.push({
 				[dataLabels.date]: reportDate,
 				[dataLabels.impressions]: impressions,
@@ -385,7 +387,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 				[dataLabels.revenue]: revenue,
 				[dataLabels.grossRevenue]: grossRevenue,
 				[dataLabels.pageCpm]: pageCpm,
-				[dataLabels.adpCoverage]: `${((sumNetworkDataProp(impressions) / adpRequests) * 100).toFixed(2)}%`
+				[dataLabels.adpCoverage]: `${coverage > 100 ? 100 : coverage}%`
 			});
 		});
 
