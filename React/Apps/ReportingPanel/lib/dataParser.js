@@ -319,7 +319,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 	},
 	getNetworksFromData = networkData => Object.keys(reduceRight(networkData, (a, b) => Object.assign(a, b))),
 	processNetworkTotal = networkTotalArray => {
-		const networks = getNetworksFromData(networkTotalArray);
+		const networks = getNetworksFromData($.extend(true, [], networkTotalArray));
 		let total = {};
 
 		networks.forEach(network => {
@@ -330,7 +330,8 @@ const dataLabels = commonConsts.DATA_LABELS,
 			const networkData = networkTotalArray[i];
 			each(networks, network => {
 				if (network in networkData) {
-					total[network] += Number(networkData[network]);
+					const num = Number(networkData[network]);
+					total[network] += isNaN(num) ? 0 : num;
 				}
 			});
 		}
