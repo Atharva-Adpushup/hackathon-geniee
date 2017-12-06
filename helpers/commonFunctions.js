@@ -47,10 +47,10 @@ const Promise = require('bluebird'),
 				isInvalidRevenue || innerObj[identifier].aggregate.total_impressions == 0
 					? 0
 					: Number(
-							innerObj[identifier].aggregate.total_revenue *
-								1000 /
-								innerObj[identifier].aggregate.total_impressions
-						).toFixed(3);
+						innerObj[identifier].aggregate.total_revenue *
+						1000 /
+						innerObj[identifier].aggregate.total_impressions
+					).toFixed(3);
 		});
 		container[key] = innerObj;
 	},
@@ -175,51 +175,51 @@ const Promise = require('bluebird'),
 	},
 	computeMetricComparison = inputData => {
 		const resultData = {
-				impressions: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				revenue: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				pageViews: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				cpm: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				pageCPM: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				dates: {
-					lastWeek: {},
-					thisWeek: {}
-				}
+			impressions: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
 			},
+			revenue: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			pageViews: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			cpm: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			pageCPM: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			dates: {
+				lastWeek: {},
+				thisWeek: {}
+			}
+		},
 			lastWeekDatesInfo = getWeekDatesRepresentation({
 				startDate: inputData.lastWeekReport.reportFrom,
 				endDate: inputData.lastWeekReport.reportTo
@@ -407,8 +407,8 @@ const Promise = require('bluebird'),
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			parameterConfig = {
 				siteId,
-				fromDate: moment(getDay(7)).format(dateFormat),
-				toDate: moment(getDay(1)).format(dateFormat),
+				fromDate: moment(getDay(8)).format(dateFormat),
+				toDate: moment(getDay(2)).format(dateFormat),
 				transform: true,
 				count: 10
 			},
