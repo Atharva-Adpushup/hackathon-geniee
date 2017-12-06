@@ -10,6 +10,7 @@ $SBArrowColor: #555555;
 $fontColor: #555555;
 $SBBorderColorActive: #ccc;
 $primaryColor: #eb575c;
+$linkBlue: #47b6e4;
 
 .react-select-box-container {
 	margin-bottom: 5px;
@@ -184,21 +185,21 @@ $primaryColor: #eb575c;
 .react-select-box-selected {
 	.react-select-box,
 	.react-select-box:focus {
-		border: 2px solid $primaryColor;
+		border: 2px solid $linkBlue;
 	}
 
 	.react-select-box {
 		.react-select-box-label {
-			color: darken($primaryColor, 40%);
+			color: darken($linkBlue, 25%);
 		}
 	}
 
 	.react-select-box,
 	.react-select-box-clear {
-		background-color: lighten($primaryColor, 34%);
+		background-color: lighten($linkBlue, 37%);
 
 		&:before {
-			color: darken($primaryColor, 40%);
+			color: darken($linkBlue, 25%);
 		}
 	}
 }

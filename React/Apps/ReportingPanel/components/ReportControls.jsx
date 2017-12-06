@@ -213,7 +213,7 @@ class ReportControls extends Component {
 					<Row className="mT-10">
 						<Col sm={3} smOffset={9}>
 							<button
-								className="btn btn-lightBg btn-default"
+								className="btn btn-lightBg btn-default btn-blue"
 								onClick={props.generateButtonHandler}
 								disabled={props.disableGenerateButton}
 							>

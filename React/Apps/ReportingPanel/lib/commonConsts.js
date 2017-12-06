@@ -37,7 +37,9 @@ const commonConsts = {
 		variation: 'Variation Name',
 		pageGroup: 'PageGroup',
 		total: 'Total',
-		platform: 'Platform'
+		platform: 'Platform',
+		adpRequests: 'Adpushup Requests',
+		adpCoverage: 'Adpushup Coverage'
 	},
 	API_DATA_PARAMS: {
 		impressions: 'total_impressions',
@@ -47,7 +49,8 @@ const commonConsts = {
 		xpathMiss: 'total_xpath_miss',
 		pageGroup: 'name',
 		date: 'report_date',
-		variationId: 'variation_id'
+		variationId: 'variation_id',
+		adpRequests: 'total_adp_impressions'
 	}
 };
 
