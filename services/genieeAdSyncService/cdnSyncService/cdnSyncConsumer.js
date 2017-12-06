@@ -127,16 +127,14 @@ module.exports = function(site) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			console.log('Uploading.....');
-			return Promise.resolve(fileConfig.uncompressed);
-			// return connectToServer()
-			// 	.then(cwd)
-			// 	.then(function() {
-			// 		return ftp.put(fileConfig.default, 'adpushup.js');
-			// 	})
-			// 	.then(function() {
-			// 		return fileConfig.uncompressed;
-			// 	});
+			return connectToServer()
+				.then(cwd)
+				.then(function() {
+					return ftp.put(fileConfig.default, 'adpushup.js');
+				})
+				.then(function() {
+					return fileConfig.uncompressed;
+				});
 		};
 
 	return getFinalConfig
