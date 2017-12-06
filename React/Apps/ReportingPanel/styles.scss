@@ -5,6 +5,7 @@ $greyBorder: #e6e6e6;
 $fontColor: #555;
 $legendBg:#fafafa;
 $SBBorderColorActive: #ccc;
+$linkBlue: #47b6e4;
 
 html,
 body {
@@ -64,9 +65,9 @@ body {
 	display: block;
 
 	.DateRangePickerInput {
-		background-color: lighten($primaryColor, 34%);
+		background-color: lighten($linkBlue, 37%);
 		display: block;
-		border: 2px solid $primaryColor;
+		border: 2px solid $linkBlue;
 		border-radius: 3px;
 
 		.DateRangePickerInput_calendarIcon,
@@ -86,7 +87,7 @@ body {
 			width: 90px;
 			font-family: 'Karla', sans-serif;
 			font-size: 1.1em;
-			background-color: lighten($primaryColor, 34%);
+			background-color: lighten($linkBlue, 37%);
 
 			input {
 				cursor: pointer;
@@ -115,28 +116,28 @@ body {
 .DateInput_displayText__focused_2.DateInput_displayText__focused_2 {
 	color: #fff;
 	border-radius: 0;
-	background-color: lighten($primaryColor, 7%);
-	border-color: lighten($primaryColor, 7%);
+	background-color: lighten($linkBlue, 7%);
+	border-color: lighten($linkBlue, 7%);
 }
 
 .CalendarDay__hovered_span.CalendarDay__hovered_span_2 {
 	&,
 	&:hover {
-		background-color: lighten($primaryColor, 7%);
+		background-color: lighten($linkBlue, 7%);
 		color: #fff;
-		border-color: lighten($primaryColor, 7%);
+		border-color: lighten($linkBlue, 7%);
 	}
 }
 
 .CalendarDay__selected_span_2.CalendarDay__selected_span_2,
 .CalendarDay__selected_span_3.CalendarDay__selected_span_3.CalendarDay__selected_span_3,
 .CalendarDay__selected_4.CalendarDay__selected_4.CalendarDay__selected_4.CalendarDay__selected_4 {
-	background-color: lighten($primaryColor, 7%);
-	border-color: lighten($primaryColor, 7%);
+	background-color: lighten($linkBlue, 7%);
+	border-color: lighten($linkBlue, 7%);
 
 	&:hover {
-		background-color: lighten($primaryColor, 10%);
-		border-color: lighten($primaryColor, 10%);
+		background-color: lighten($linkBlue, 10%);
+		border-color: lighten($linkBlue, 10%);
 	}
 }
 
@@ -145,8 +146,8 @@ body {
 .CalendarDay__hovered_span.CalendarDay__hovered_span_3.CalendarDay__selected.CalendarDay__selected_4 {
 	&,
 	&:hover {
-		background-color: $primaryColor;
-		border-color: $primaryColor;
+		background-color: $linkBlue;
+		border-color: $linkBlue;
 	}
 }
 
@@ -180,7 +181,7 @@ body {
 
 	.legend-item {
 		font-size: 1.2em;
-		padding: 15px 8px;
+		padding: 15px 0;
 		cursor: pointer;
 		color: darken($greyBorder, 15%);
 		margin-bottom: -2px;
@@ -205,19 +206,19 @@ body {
 .DateRangePickerInput_calendarIcon_svg_1,
 .DateRangePickerInput_arrow_svg_1,
 .DateRangePickerInput_clearDates_svg_1 {
-	fill: darken($primaryColor, 40%);
+	fill: darken($linkBlue, 40%);
 }
 
 .DateInput_displayText__hasInput_2.DateInput_displayText__hasInput_2 {
-	color: darken($primaryColor, 40%);
+	color: darken($linkBlue, 40%);
 }
 
 .toggle input[type=checkbox]:checked~label .toggleSwitch {
-	background-color: $primaryColor;
+	background-color: darken($linkBlue, 25%);
 }
 
 .toggle input[type=checkbox]:checked~label .toggleSwitch:after {
-	color: $primaryColor;
-	box-shadow: 0 2px 2px 0 rgba(235,87,92,.4);
+	color: darken($linkBlue, 25%);
+	box-shadow: 0 2px 2px 0 rgba(71,182,228, .4);
 }
 
