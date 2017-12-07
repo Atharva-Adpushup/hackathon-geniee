@@ -448,6 +448,32 @@ router
 
 		liveSitesService.init();
 		return res.json({ message });
+	})
+	.get('/getLiveSites', (req, res) => {
+		let response = {
+				error: false,
+				data: []
+			},
+			params = {
+				threshold: req.query && req.query.threshold ? req.query.threshold : 0,
+				from:
+					req.query && req.query.from
+						? moment(req.query.from).format('YYYY-MM-DD')
+						: moment()
+								.subtract(7, 'days')
+								.format('YYYY-MM-DD'),
+				to:
+					req.query && req.query.to
+						? moment(req.query.to).format('YYYY-MM-DD')
+						: moment()
+								.subtract(1, 'days')
+								.format('YYYY-MM-DD')
+			};
+		return fetchLiveSites(params)
+			.then(resultFromQuery => {})
+			.catch(err => {
+				return res.send(response);
+			});
 	});
 
 module.exports = router;
