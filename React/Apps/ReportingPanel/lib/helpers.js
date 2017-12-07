@@ -2,7 +2,10 @@ import commonConsts from './commonConsts';
 import moment from 'moment';
 import dataParser from './dataParser';
 import $ from 'jquery';
-import { Promise } from 'es6-promise';
+import ChartLegend from '../components/ChartLegend/index.jsx';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { filter } from 'lodash';
 
 const apiQueryGenerator = params => {
 	let where = {
@@ -10,10 +13,17 @@ const apiQueryGenerator = params => {
 		from: moment(params.startDate).format('YYYY-MM-DD'),
 		to: moment(params.endDate).format('YYYY-MM-DD')
 	},
-		groupBy = [];
+		select = commonConsts.SELECT,
+		groupBy = [commonConsts.NETWORK_ID];
 
 	if (params.groupBy) {
 		groupBy.push(params.groupBy);
+
+		if (params.groupBy === commonConsts.DEVICE_TYPE) {
+			select.push(commonConsts.DEVICE_TYPE);
+		}
+	} else {
+		select = filter(select, val => val !== commonConsts.DEVICE_TYPE);
 	}
 
 	if (params.pageGroup) {
@@ -31,20 +41,13 @@ const apiQueryGenerator = params => {
 	where.mode = 1;
 
 	return JSON.stringify({
-		select: commonConsts.SELECT,
+		select,
 		where,
 		orderBy: ['report_date'],
 		groupBy
 	});
 },
-	capitalCase = str => {
-		return str
-			.toLowerCase()
-			.split(' ')
-			.map(word => word[0].toUpperCase() + word.substr(1))
-			.join(' ');
-	},
-	dataGenerator = (data, groupBy) => {
+	dataGenerator = (data, groupBy, variations, customToggleOptions, activeLegendItems) => {
 		let config = {
 			title: {
 				text: ''
@@ -59,12 +62,22 @@ const apiQueryGenerator = params => {
 				spacingTop: 35,
 				style: {
 					fontFamily: 'Karla'
+				},
+				events: {
+					load: event => {
+						const chart = event.target,
+							node = document.getElementById('chart-legend');
+						ReactDOM.render(<ChartLegend chart={chart} activeLegendItems={activeLegendItems} />, node);
+					}
 				}
+			},
+			legend: {
+				enabled: false
 			},
 			tooltip: {
 				shared: true
 			},
-			colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e'],
+			colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e', '#eb575c', '#ca29f3'],
 			credits: {
 				enabled: false
 			},
@@ -78,7 +91,7 @@ const apiQueryGenerator = params => {
 			tableData = null;
 
 		if (!data.error) {
-			const parsedData = dataParser(data, groupBy);
+			const parsedData = dataParser(data, groupBy, variations, customToggleOptions);
 			chartData = parsedData.chartConfig;
 			tableData = parsedData.tableConfig;
 		}
@@ -92,26 +105,6 @@ const apiQueryGenerator = params => {
 				return arr[i];
 			}
 		}
-	},
-	ajax = params => {
-		const { method, url, data } = params;
-
-		return new Promise((resolve, resject) => {
-			$.ajax({
-				method,
-				url,
-				headers: { 'Content-Type': 'application/json' },
-				data,
-				contentType: 'json',
-				dataType: 'json',
-				success: res => {
-					return resolve(res);
-				},
-				fail: res => {
-					return reject(res);
-				}
-			});
-		});
 	};
 
-export { apiQueryGenerator, dataGenerator, capitalCase, ajax, reorderArray };
+export { apiQueryGenerator, dataGenerator, reorderArray };

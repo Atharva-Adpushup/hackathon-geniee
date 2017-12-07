@@ -51,6 +51,7 @@ class editMenu extends React.Component {
 							onSectionAllXPaths={props.onSectionAllXPaths}
 							onValidateXPath={props.onValidateXPath}
 							onResetErrors={props.onResetErrors}
+							showNotification={props.showNotification}
 						/>
 					</MenuItem>
 				))}
@@ -64,7 +65,8 @@ editMenu.propTypes = {
 	section: PropTypes.object,
 	position: PropTypes.object,
 	hideMenu: PropTypes.func,
-	updateSettings: PropTypes.func
+	updateSettings: PropTypes.func,
+	showNotification: PropTypes.func
 };
 
 export default editMenu;

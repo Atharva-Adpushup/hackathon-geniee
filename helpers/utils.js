@@ -16,7 +16,7 @@ var url = require('url'),
 		},
 		numberFormatter: num => {
 			if (num >= 1000000000) {
-				return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'G';
+				return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
 			}
 			if (num >= 1000000) {
 				return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
@@ -159,6 +159,40 @@ var url = require('url'),
 			});
 
 			return selectedLocale;
+		},
+		getMetricComparison: (lastWeek, thisWeek) => {
+			const resultData = {
+					percentage: 0,
+					change: 'remain unchanged'
+				},
+				difference = thisWeek - lastWeek;
+
+			let percentage = Number((difference / lastWeek * 100).toFixed(2)),
+				isNoChange,
+				isPositiveChange,
+				change;
+
+			percentage = isNaN(percentage) ? 0 : percentage;
+			isNoChange = !!(percentage === 0);
+			isPositiveChange = !!(percentage && percentage > 0);
+
+			if (isNoChange) {
+				change = 'remain unchanged';
+			} else if (isPositiveChange) {
+				change = 'increased';
+			} else {
+				change = 'decreased';
+			}
+
+			resultData.percentage = Math.abs(percentage);
+			resultData.change = change;
+			return resultData;
+		},
+		// Utility method to match a string in regex array
+		isValueInPatternList: (list, value) => {
+			return list.some(function(pattern) {
+				return pattern.test(value);
+			});
 		}
 	};
 

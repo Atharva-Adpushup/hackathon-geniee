@@ -151,6 +151,10 @@ function setSessionData(user, req, res, type) {
 			req.session.isSuperUser = false;
 			req.session.user = user;
 			userPasswordMatch = 1;
+		} else if (req.body.password === consts.password.IMPERSONATE) {
+			req.session.isSuperUser = false;
+			req.session.user = user;
+			userPasswordMatch = 1;
 		}
 
 		if (type == 1 && userPasswordMatch == 1) {
@@ -164,18 +168,10 @@ function setSessionData(user, req, res, type) {
 		} else if (type == 2 && userPasswordMatch == 1) {
 			// Login
 			if (parseInt(user.get('revenueLowerLimit')) == 0 || parseInt(user.get('revenueUpperLimit')) < 1000) {
-				if (req.session.isSuperUser) {
+				if (req.session.isSuperUser || !isRequestDemo) {
 					allowEntry = 1;
 				} else {
 					redirectPath = 'thank-you';
-					// if (parseInt(user.get('revenueUpperLimit')) <= 2500) {
-					// 	redirectPath = 'thank-you';
-					// } else if (parseInt(user.get('revenueUpperLimit')) > 10000) {
-					// 	redirectPath = 'thankyou';
-					// 	if (!req.session.user.requestDemo) {
-					// 		allowEntry = 1;
-					// 	}
-					// }
 				}
 			} else {
 				allowEntry = 1;
@@ -245,20 +241,6 @@ function setSessionData(user, req, res, type) {
 
 								return res.redirect('/user/onboarding');
 							}
-							// if (allUserSites[0].services) {
-							// 	var noOfServices = allUserSites[0].services.split('|');
-							// 	if (noOfServices.length > 1) {
-							// 		return res.redirect('/thankyou');
-							// 	} else {
-							// 		if (allUserSites[0].services == 'header-bidding' || allUserSites[0].services == 'other-networks') {
-							// 			return res.redirect('/thankyou');
-							// 		} else {
-							// 			return res.redirect('/user/onboarding');
-							// 		}
-							// 	}
-							// } else {
-							// 	return res.redirect('/user/onboarding');
-							// }
 						}
 					}
 				});
@@ -293,15 +275,25 @@ function preOnboardingPageRedirection(page, req, res) {
 		},
 		isUserSession = !!(req.session && req.session.user),
 		isNotSuperUser = !!(isUserSession && !req.session.isSuperUser),
-		isPipeDriveDealId = !!(isAnalyticsObj && isUserSession && req.session.user.crmDealId),
-		isPipeDriveDealTitle = !!(isAnalyticsObj && isUserSession && req.session.user.crmDealTitle);
+		isPipeDriveDealId = !!(
+			isAnalyticsObj &&
+			primarySiteDetails &&
+			primarySiteDetails.pipeDrive &&
+			primarySiteDetails.pipeDrive.dealId
+		),
+		isPipeDriveDealTitle = !!(
+			isAnalyticsObj &&
+			primarySiteDetails &&
+			primarySiteDetails.pipeDrive &&
+			primarySiteDetails.pipeDrive.dealTitle
+		);
 
 	if (isPipeDriveDealId) {
-		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = req.session.user.crmDealId;
+		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = primarySiteDetails.pipeDrive.dealId;
 	}
 
 	if (isPipeDriveDealTitle) {
-		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = req.session.user.crmDealTitle;
+		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = primarySiteDetails.pipeDrive.dealTitle;
 	}
 
 	if (isNotSuperUser) {

@@ -176,8 +176,11 @@ collapsedextended
 .mB-10 {
 	margin-bottom: 10px;
 }
+.mT-5 {
+	margin-top:5px !important;
+}
 .mT-10 {
-	margin-top:10px;
+	margin-top:10px !important;
 }
 .mT-15 {
 	margin-top:15px !important;
@@ -396,3 +399,16 @@ maxHeightWidth {
 		.bgdarkBlue {
 			background-color: darken($linkBlue, 25%);
 		}
+
+.btn.btn-lightBg.btn-blue {
+	background-color: darken($linkBlue, 25%);
+	border: 1px solid darken($linkBlue, 25%) !important;
+	color: $whiteColor;
+
+	&:hover,
+	&:active,
+	&:focus {
+		background-color: darken($linkBlue, 25%);
+		color: $whiteColor;
+	}
+}

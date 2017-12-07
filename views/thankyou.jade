@@ -151,10 +151,9 @@ block bodyContent
 	.thankyouWrapper
 		include layout/header
 		.container.text-center
-			if isSuperUser
-				.row
-					.pull-right.col-lg-2.visible-lg.visible-md.mT-10
-						a.apbtn-danger(id="sidebar-logout-link", href='/user/dashboard') Dashboard
+			.row
+				.pull-right.col-lg-2.visible-lg.visible-md.mT-10
+					a.apbtn-danger(id="sidebar-logout-link", href='/user/dashboard') Dashboard
 			.row
 				.col-md-5.thankyou-img
 					img(src="assets/images/completion_graphic.png")

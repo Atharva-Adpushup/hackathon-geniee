@@ -7,22 +7,23 @@ import {
 	getChannelVariationsWithAds,
 	getVariationSectionsWithAds
 } from 'selectors/variationSelectors';
+import { uiActions } from '../consts/commonConsts';
 
-const getLastVariationNumber = function(variations) {
-		const names = variations.map(({ name }) => {
-			var reversed = parseInt(name.split(' ')[1], 10),
-				vName = isNaN(reversed) ? 0 : reversed;
+const getLastVariationNumber = function (variations) {
+	const names = variations.map(({ name }) => {
+		var reversed = parseInt(name.split(' ')[1], 10),
+			vName = isNaN(reversed) ? 0 : reversed;
 
-			return name.indexOf('Variation') === -1 ? 0 : vName;
-		});
-		return names.length
-			? names
-					.sort(function(a, b) {
-						return a > b;
-					})
-					.reverse()[0]
-			: 0;
-	},
+		return name.indexOf('Variation') === -1 ? 0 : vName;
+	});
+	return names.length
+		? names
+			.sort(function (a, b) {
+				return a > b;
+			})
+			.reverse()[0]
+		: 0;
+},
 	addVariation = channelId => (dispatch, getState) => {
 		const variationId = Utils.getRandomNumber(),
 			state = getState(),
@@ -95,7 +96,7 @@ const getLastVariationNumber = function(variations) {
 				dispatch({ type: variationActions.DELETE_VARIATION, variationId, channelId });
 			}
 		} else {
-			alert('You need at least one variation!');
+			dispatch({ type: uiActions.SHOW_NOTIFICATION, mode: 'error', title: 'Operation failed', message: 'You need at least one variation!' });
 		}
 	},
 	setActiveVariation = variationId => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
@@ -106,7 +107,7 @@ const getLastVariationNumber = function(variations) {
 				return data;
 			});
 		if (_.find(arr, { name: name })) {
-			alert('Cannot create variation with same name!');
+			dispatch({ type: uiActions.SHOW_NOTIFICATION, mode: 'error', title: 'Operation failed', message: 'Cannot create variation with same name!' });
 			return;
 		}
 		dispatch({ type: variationActions.EDIT_VARIATION_NAME, variationId, name });
@@ -116,8 +117,16 @@ const getLastVariationNumber = function(variations) {
 		variationId,
 		trafficDistribution
 	}),
-	saveBeforeJs = (variation, beforeJs) => ({ type: variationActions.SAVE_BEFORE_JS, variation, beforeJs }),
-	saveAfterJs = (variation, afterJs) => ({ type: variationActions.SAVE_AFTER_JS, variation, afterJs });
+	saveBeforeJs = (variation, beforeJs) => (dispatch, getState) => {
+		dispatch({ type: variationActions.SAVE_BEFORE_JS, variation, beforeJs });
+		dispatch({ type: uiActions.SHOW_NOTIFICATION, mode: 'success', title: 'Operation Successful', message: 'Before JS has been saved' });
+	},
+	saveAfterJs = (variation, afterJs) => (dispatch, getState) => {
+		dispatch({ type: variationActions.SAVE_AFTER_JS, variation, afterJs });
+		dispatch({ type: uiActions.SHOW_NOTIFICATION, mode: 'success', title: 'Operation Successful', message: 'After JS has been saved' });
+	},
+	saveKeyValues = (variation, adpKeyValues) => ({ type: variationActions.SAVE_KEY_VALUES, variation, adpKeyValues });
+
 export {
 	addVariation,
 	copyVariation,
@@ -128,5 +137,6 @@ export {
 	editTrafficDistribution,
 	saveBeforeJs,
 	saveAfterJs,
+	saveKeyValues,
 	updateContentSelector
 };

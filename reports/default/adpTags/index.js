@@ -101,6 +101,8 @@ function setCorrectColumnNames(data) {
 				case 'pagegroup':
 					columns[key] = 'name';
 					break;
+				case 'ntwid':
+					columns[key] = 'display_name';
 			}
 		});
 	}
@@ -131,6 +133,9 @@ function groupByWrapper(data, qs) {
 
 function selectWrapper(selectData, groupByData, qs) {
 	let flag = _.isArray(groupByData) && groupByData.length && groupByData.indexOf('section') != -1 ? true : false;
+	selectData.indexOf('ntwid') != -1
+		? (selectData.push('display_name'), (selectData = selectData.filter(ele => ele != 'ntwid')))
+		: null;
 	return qs.select(selectData, flag);
 }
 
@@ -184,27 +189,18 @@ function generate(data) {
 /*
 total_impressions ----> total_ad_requests
 total_requests ----> total_pageviews
+device_type ---> device_type
+display_name ---> network
 */
 
 // let params = {
-// 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid'],
+// 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid', 'ntwid', 'device_type'],
 // 	where: {
-// 		siteid: 31000
-// 	}
+// 		siteid: 31000,
+// 		mode: 1
+// 	},
+// 	groupBy: ['pagegroup']
 // };
-
-// Promise.all(
-// 	_.map([1, 2, 3], ele => {
-// 		params.ele = ele;
-// 		return generate(params);
-// 	})
-// )
-// 	.then(response => {
-// 		debugger;
-// 	})
-// 	.catch(err => {
-// 		debugger;
-// 	});
 
 // generate(params)
 // 	.then(response => {
@@ -214,4 +210,4 @@ total_requests ----> total_pageviews
 // 		debugger;
 // 	});
 
-module.exports = { generate, getPVS };
+module.exports = { generate, getPVS, executeQuery };
