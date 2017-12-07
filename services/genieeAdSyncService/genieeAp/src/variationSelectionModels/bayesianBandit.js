@@ -32,7 +32,12 @@ var $ = require('jquery'),
 	},
 	getRandomBasedChoice = function(arms, variations) {
 		var random = utils.getRandomNumberBetween(1, arms.length);
-		return variations[random];
+		/**
+		 * Random number is inclusive so from 1 - 3, it can give 3
+		 * but array starts from 0 so it is 0,1,2
+		 * Hence, random - 1
+		 */
+		return variations[random - 1];
 	},
 	getChosenVariation = function(allVariations) {
 		var payload = preparePayload(allVariations),
