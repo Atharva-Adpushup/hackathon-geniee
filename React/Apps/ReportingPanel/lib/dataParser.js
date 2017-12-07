@@ -346,6 +346,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 			totalRevenue = 0,
 			totalGrossRevenue = 0,
 			totalXpathMiss = 0,
+			totalCoverage = 0,
 			body = [],
 			dates = [],
 			networkTotalImpressions = [],
@@ -359,7 +360,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 				impressions = row.total_impressions,
 				adpRequests = row.total_adp_impressions,
 				cpm = row.cpm,
-				xpathMiss = commonConsts.IS_SUPERUSER ? row.total_xpath_miss : undefined,
+				xpathMiss = commonConsts.IS_SUPERUSER ? Number(((row.total_xpath_miss / (adpRequests + row.total_xpath_miss)) * 100).toFixed(2)) : undefined,
 				pageViews = commonConsts.IS_SUPERUSER ? row.total_requests : undefined,
 				revenue = row.total_revenue,
 				grossRevenue = Number(row.total_gross_revenue.toFixed(2)),
@@ -375,14 +376,15 @@ const dataLabels = commonConsts.DATA_LABELS,
 			networkTotalImpressions.push($.extend(true, {}, impressions.props.networkData));
 			networkTotalRevenue.push($.extend(true, {}, revenue.props.networkData));
 
-			const coverage = ((sumNetworkDataProp(impressions) / adpRequests) * 100).toFixed(2);
+			const coverage = Number(((sumNetworkDataProp(impressions) / adpRequests) * 100).toFixed(2));
+			totalCoverage += coverage;
 
 			body.push({
 				[dataLabels.date]: reportDate,
 				[dataLabels.impressions]: impressions,
 				[dataLabels.adpRequests]: adpRequests,
 				[dataLabels.cpm]: cpm,
-				[dataLabels.xpathMiss]: `${((xpathMiss / (adpRequests + xpathMiss)) * 100).toFixed(2)}%`,
+				[dataLabels.xpathMiss]: `${xpathMiss}%`,
 				[dataLabels.pageViews]: pageViews,
 				[dataLabels.revenue]: revenue,
 				[dataLabels.grossRevenue]: grossRevenue,
@@ -396,7 +398,9 @@ const dataLabels = commonConsts.DATA_LABELS,
 			cpmCalc = {
 				revenue: sumNetworkTotal(processedTotalRevenue),
 				impressions: sumNetworkTotal(processedTotalImpressions)
-			};
+			},
+			avgAdpCoverage = Number((totalCoverage / rows.length).toFixed(2)),
+			avgXPathMiss = (totalXpathMiss / rows.length).toFixed(2);
 
 		for (let i in processedTotalRevenue) {
 			networkTotalCpm[i] = ((processedTotalRevenue[i] * 1000) / processedTotalImpressions[i]).toFixed(2);
@@ -409,9 +413,9 @@ const dataLabels = commonConsts.DATA_LABELS,
 			[dataLabels.date]: <Bold>{!param ? dataLabels.total : `${dates[0]} to ${dates[dates.length - 1]}`}</Bold>,
 			[dataLabels.impressions]: <NetworkwiseData bold networkData={processNetworkTotal(networkTotalImpressions)} customToggleOptions={customToggleOptions} />,
 			[dataLabels.cpm]: <NetworkwiseData bold networkData={networkTotalCpm} customToggleOptions={customToggleOptions} cpmCalc={cpmCalc} />,
-			[dataLabels.xpathMiss]: <Bold>N/A</Bold>,
+			[dataLabels.xpathMiss]: <Bold>{`${avgXPathMiss}%`}</Bold>,
 			[dataLabels.adpRequests]: <Bold>{totaladpRequests}</Bold>,
-			[dataLabels.adpCoverage]: <Bold>N/A</Bold>,
+			[dataLabels.adpCoverage]: <Bold>{`${avgAdpCoverage > 100 ? 100 : avgAdpCoverage}%`}</Bold>,
 			[dataLabels.pageViews]: <Bold>{totalPageviews}</Bold>,
 			[dataLabels.revenue]: <NetworkwiseData bold networkData={processNetworkTotal(networkTotalRevenue)} customToggleOptions={customToggleOptions} />,
 			[dataLabels.grossRevenue]: <Bold>{totalGrossRevenue.toFixed(2)}</Bold>,
