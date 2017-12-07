@@ -7,6 +7,7 @@ import AdpTags from './AdpTags';
 import Adsense from './Adsense';
 import OtherNetworks from './OtherNetworks';
 import AdX from './AdX';
+import SectionOptions from './sectionOptions.jsx';
 
 class NetworkOptions extends Component {
 	constructor(props) {
@@ -15,7 +16,7 @@ class NetworkOptions extends Component {
 			network:
 				this.props.ad && this.props.ad.network
 					? this.props.ad.network
-					: this.props.ad && currentUser.userType == 'partner' ? 'custom' : false
+					: this.props.ad && currentUser.userType == 'partner' ? 'geniee' : false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.renderNetwork = this.renderNetwork.bind(this);
@@ -75,7 +76,27 @@ class NetworkOptions extends Component {
 			headerBidding =
 				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('headerBidding')
 					? this.props.ad.networkData.headerBidding
-					: true;
+					: true,
+			dynamicAllocation =
+				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('dynamicAllocation')
+					? this.props.ad.networkData.dynamicAllocation
+					: true,
+			firstFold =
+				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('firstFold')
+					? this.props.ad.networkData.firstFold
+					: true,
+			position =
+				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('position')
+					? this.props.ad.networkData.position
+					: '',
+			customAdCode =
+				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('adCode')
+					? this.props.ad.networkData.adCode
+					: '',
+			zoneId =
+				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('zoneId')
+					? this.props.ad.networkData.zoneId
+					: '';
 
 		switch (this.state.network) {
 			case 'adpTags':
@@ -112,6 +133,26 @@ class NetworkOptions extends Component {
 						submitHandler={this.submitHandler}
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
+						showNotification={this.props.showNotification}
+					/>
+				);
+				break;
+			case 'geniee':
+				return (
+					<SectionOptions
+						firstFold={firstFold}
+						position={position}
+						customAdCode={customAdCode}
+						zoneId={zoneId}
+						fpKey={fpKey}
+						priceFloor={priceFloor}
+						headerBidding={dynamicAllocation}
+						submitHandler={this.submitHandler}
+						onCancel={this.props.onCancel}
+						code={code}
+						buttonType={this.props.buttonType || 1}
+						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
+						id={this.props.id ? this.props.id : false}
 						showNotification={this.props.showNotification}
 					/>
 				);
