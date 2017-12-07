@@ -2,6 +2,7 @@
     for site in validSites
         <!--.2.and.mb-30(class="{{ loop.length % loop.last ? 'col-xs-12' : 'col-xs-6' }}")-->
         - siteId = site.siteId;
+        - operationToolsPath = 'http://console.adpushup.com/tools?siteId=' + siteId;
 
         .col-sm-6
             .mb-30
@@ -52,31 +53,61 @@
                                             span.lightBlue!= utils.numberFormatter(lastWeek.reportData.totalImpressions)
                                             span  / 
                                             span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalImpressions)
-                                        .report-mertic Impressions
+                                        .report-mertic Impressions 
                                             if Number(thisWeek.reportData.totalImpressions) > Number(lastWeek.reportData.totalImpressions)
-                                                i.fa.fa-arrow-up.green
+
+                                                div
+                                                    | (
+                                                    span!=`${(((Number(thisWeek.reportData.totalImpressions) - Number(lastWeek.reportData.totalImpressions)) / Number(lastWeek.reportData.totalImpressions)) * 100).toFixed(2)}%`
+                                                    i.fa.fa-arrow-up.green
+                                                    | )
                                             else if Number(thisWeek.reportData.totalImpressions) < Number(lastWeek.reportData.totalImpressions)
-                                                i.fa.fa-arrow-down.red
+
+                                                div 
+                                                    | (
+                                                    span!=`${(((Number(lastWeek.reportData.totalImpressions) - Number(thisWeek.reportData.totalImpressions)) / Number(thisWeek.reportData.totalImpressions)) * 100).toFixed(2)}%`
+                                                    i.fa.fa-arrow-down.red
+                                                    | )
                                     .col-sm-4
                                         .metric-count
                                             span.lightBlue!= lastWeek.reportData.totalCpm
                                             span  / 
                                             span.darkBlue!= thisWeek.reportData.totalCpm
-                                        .report-mertic CPM ($)
+                                        .report-mertic CPM ($) 
                                             if Number(thisWeek.reportData.totalCpm) > Number(lastWeek.reportData.totalCpm)
-                                                i.fa.fa-arrow-up.green
+
+                                                div 
+                                                    | (
+                                                    span!=`${(((Number(thisWeek.reportData.totalCpm) - Number(lastWeek.reportData.totalCpm)) / Number(lastWeek.reportData.totalCpm)) * 100).toFixed(2)}%`
+                                                    i.fa.fa-arrow-up.green
+                                                    | )
                                             else if Number(thisWeek.reportData.totalCpm) < Number(lastWeek.reportData.totalCpm)
-                                                i.fa.fa-arrow-down.red
+                                                
+                                                div 
+                                                    | (
+                                                    span!=`${(((Number(lastWeek.reportData.totalCpm) - Number(thisWeek.reportData.totalCpm)) / Number(thisWeek.reportData.totalCpm)) * 100).toFixed(2)}%`
+                                                    i.fa.fa-arrow-down.red
+                                                    | )
                                     .col-sm-4
                                         .metric-count
                                             span.lightBlue!= utils.numberFormatter(lastWeek.reportData.totalRevenue)
                                             span  / 
                                             span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalRevenue)
-                                        .report-mertic Revenue ($)
+                                        .report-mertic Revenue ($) 
                                             if Number(thisWeek.reportData.totalRevenue) > Number(lastWeek.reportData.totalRevenue)
-                                                i.fa.fa-arrow-up.green
+
+                                                div 
+                                                    | (
+                                                    span!=`${(((Number(thisWeek.reportData.totalRevenue) - Number(lastWeek.reportData.totalRevenue)) / Number(lastWeek.reportData.totalRevenue)) * 100).toFixed(2)}%`
+                                                    i.fa.fa-arrow-up.green
+                                                    | )
                                             else if Number(thisWeek.reportData.totalRevenue) < Number(lastWeek.reportData.totalRevenue)
-                                                i.fa.fa-arrow-down.red
+
+                                                div 
+                                                    | (
+                                                    span!=`${(((Number(lastWeek.reportData.totalRevenue) - Number(thisWeek.reportData.totalRevenue)) / Number(thisWeek.reportData.totalRevenue)) * 100).toFixed(2)}%`
+                                                    i.fa.fa-arrow-down.red
+                                                    | )
                                 if isSuperUser
                                     .row.su-metrics.text-center
                                         .col-sm-4
@@ -84,21 +115,40 @@
                                                 span.lightBlue!= utils.numberFormatter(lastWeek.reportData.totalPageviews)
                                                 span  / 
                                                 span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalPageviews)
-                                            .report-mertic Pageviews
+                                            .report-mertic Pageviews 
                                                 if Number(thisWeek.reportData.totalPageviews) > Number(lastWeek.reportData.totalPageviews)
-                                                    i.fa.fa-arrow-up.green
+
+                                                     div 
+                                                        | (
+                                                        span!=`${(((Number(thisWeek.reportData.totalPageviews) - Number(lastWeek.reportData.totalPageviews)) / Number(lastWeek.reportData.totalPageviews)) * 100).toFixed(2)}%`
+                                                        i.fa.fa-arrow-up.green
+                                                        | )
                                                 else if Number(thisWeek.reportData.totalPageviews) < Number(lastWeek.reportData.totalPageviews)
-                                                    i.fa.fa-arrow-down.red
+
+                                                    div 
+                                                        | (
+                                                        span!=`${(((Number(lastWeek.reportData.totalPageviews) - Number(thisWeek.reportData.totalPageviews)) / Number(thisWeek.reportData.totalPageviews)) * 100).toFixed(2)}%`
+                                                        i.fa.fa-arrow-down.red
+                                                        | )
                                         .col-sm-4
                                             .metric-count
                                                 span.lightBlue!= lastWeek.reportData.totalPageCpm
                                                 span  / 
                                                 span.darkBlue!= thisWeek.reportData.totalPageCpm
-                                            .report-mertic Page CPM ($)
+                                            .report-mertic Page CPM ($) 
                                                 if Number(thisWeek.reportData.totalPageCpm) > Number(lastWeek.reportData.totalPageCpm)
-                                                    i.fa.fa-arrow-up.green
+                                                        div 
+                                                            | (
+                                                            span!=`${(((Number(thisWeek.reportData.totalPageCpm) - Number(lastWeek.reportData.totalPageCpm)) / Number(lastWeek.reportData.totalPageCpm)) * 100).toFixed(2)}%`
+                                                            i.fa.fa-arrow-up.green
+                                                            | )
                                                 else if Number(thisWeek.reportData.totalPageCpm) < Number(lastWeek.reportData.totalPageCpm)
-                                                    i.fa.fa-arrow-down.red
+
+                                                    div 
+                                                        | (
+                                                        span!=`${(((Number(lastWeek.reportData.totalPageCpm) - Number(thisWeek.reportData.totalPageCpm)) / Number(thisWeek.reportData.totalPageCpm)) * 100).toFixed(2)}%`
+                                                        i.fa.fa-arrow-down.red
+                                                        | )
                             
                                 .report-legend
                                     .row.text-center
@@ -112,7 +162,11 @@
                                                 .report-date
                                                     
                             else
-                                | No report data found for this site.
+                                section
+                                    .site-status(style="margin-top: -20px; background-color: #fff;")
+                                        h4
+                                            i.fa.fa-exclamation-circle 
+                                            | No report data found for this site
                     else
                         h3.title.m-All-0.clearfix
                             a.pull-left(id="site-report-" + siteId).

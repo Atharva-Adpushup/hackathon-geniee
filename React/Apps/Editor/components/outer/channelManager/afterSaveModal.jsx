@@ -35,12 +35,14 @@ class afterSaveModal extends React.Component {
 		);
 	}
 
-	renderErrorMessage() {
+	renderErrorMessage(
+		msg = `There was some error while saving your changes, please try again by clicking save button again. 
+	If problem persists, please contact support by using chat widget on bottom right of your screen.`
+	) {
 		return (
 			<div>
 				<h4>Save Error</h4>
-				<p>{`There was some error while saving your changes, please try again by clicking save button again. 
-				If problem persists, please contact support by using chat widget on bottom right of your screen.`}</p>
+				<p>{msg}</p>
 			</div>
 		);
 	}
@@ -53,7 +55,7 @@ class afterSaveModal extends React.Component {
 			isStatusReset = props.status === status.RESET,
 			renderConditionalBody = isStatusPending
 				? this.renderWaitMessage()
-				: isStatusSuccess ? this.renderSuccessMessage() : this.renderErrorMessage();
+				: isStatusSuccess ? this.renderSuccessMessage() : this.renderErrorMessage(props.msg);
 
 		return (
 			<Modal

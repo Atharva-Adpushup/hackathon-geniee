@@ -14,18 +14,29 @@ import {
 	scrollSectionIntoView
 } from 'actions/sectionActions.js';
 import { updateNetwork, updateAdCode } from 'actions/adActions';
-import { resetErrors } from 'actions/uiActions';
+import { resetErrors, showNotification } from 'actions/uiActions';
 import { generateReport } from 'actions/reportingActions';
 import Filters from './filters.jsx';
 import PaneLoader from '../../../../../../../Components/PaneLoader.jsx';
 import VariationSectionElement from './variationSectionElement';
 
+const getDate = number => {
+	let days = number, // Days you want to subtract
+		date = new Date(),
+		last = new Date(date.getTime() - days * 24 * 60 * 60 * 1000),
+		day = last.getDate(),
+		month = last.getMonth() + 1,
+		year = last.getFullYear();
+
+	return `${year}-${month.length == 1 ? '0' : ''}${month}-${day.length == 1 ? '0' : ''}${day}`;
+};
+
 class variationSections extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			startDate: false,
-			endDate: false,
+			startDate: getDate(7),
+			endDate: getDate(1),
 			focusedInput: undefined,
 			loadingReport: false
 		};
@@ -48,7 +59,11 @@ class variationSections extends Component {
 
 	generateReportWrapper() {
 		if (!this.state.startDate || !this.state.endDate) {
-			alert('Dates cannot be left blanked');
+			this.props.showNotification({
+				mode: 'error',
+				title: 'Operation failed',
+				message: 'Dates cannot be left blank'
+			});
 			return;
 		}
 		this.props.generateReport({
@@ -75,7 +90,8 @@ class variationSections extends Component {
 			ui,
 			onResetErrors,
 			onSectionXPathValidate,
-			onScrollSectionIntoView
+			onScrollSectionIntoView,
+			showNotification
 		} = this.props;
 
 		return (
@@ -84,7 +100,12 @@ class variationSections extends Component {
 					<h1 className="variation-section-heading">Variation Sections</h1>
 				</span>
 				{ui.variationPanel.expanded ? (
-					<Filters generateReport={this.generateReportWrapper} datesUpdated={this.datesUpdated} />
+					<Filters
+						generateReport={this.generateReportWrapper}
+						datesUpdated={this.datesUpdated}
+						startDate={this.state.startDate}
+						endDate={this.state.endDate}
+					/>
 				) : null}
 				{!sections.length ? <span>No Sections</span> : ''}
 				<ul className="section-list row">
@@ -95,30 +116,31 @@ class variationSections extends Component {
 							styles={{ height: '500px', background: '#ebebeb' }}
 						/>
 					) : (
-						sections.map((section, key) => (
-							<div key={key} className="col-sm-6">
-								<VariationSectionElement
-									section={section}
-									key={key}
-									variation={variation}
-									onDeleteSection={onDeleteSection}
-									onRenameSection={onRenameSection}
-									updateAdCode={updateAdCode}
-									updateNetwork={updateNetwork}
-									onUpdatePartnerData={onUpdatePartnerData}
-									onUpdateXPath={onUpdateXPath}
-									onSectionAllXPaths={onSectionAllXPaths}
-									onValidateXPath={onValidateXPath}
-									onResetErrors={onResetErrors}
-									onSectionXPathValidate={onSectionXPathValidate}
-									onIncontentFloatUpdate={onIncontentFloatUpdate}
-									onScrollSectionIntoView={onScrollSectionIntoView}
-									ui={ui}
-									reporting={reporting}
-								/>
-							</div>
-						))
-					)}
+							sections.map((section, key) => (
+								<div key={key} className="col-sm-6">
+									<VariationSectionElement
+										section={section}
+										key={key}
+										variation={variation}
+										onDeleteSection={onDeleteSection}
+										onRenameSection={onRenameSection}
+										updateAdCode={updateAdCode}
+										updateNetwork={updateNetwork}
+										onUpdatePartnerData={onUpdatePartnerData}
+										onUpdateXPath={onUpdateXPath}
+										onSectionAllXPaths={onSectionAllXPaths}
+										onValidateXPath={onValidateXPath}
+										onResetErrors={onResetErrors}
+										onSectionXPathValidate={onSectionXPathValidate}
+										onIncontentFloatUpdate={onIncontentFloatUpdate}
+										onScrollSectionIntoView={onScrollSectionIntoView}
+										ui={ui}
+										reporting={reporting}
+										showNotification={showNotification}
+									/>
+								</div>
+							))
+						)}
 				</ul>
 			</div>
 		);
@@ -139,6 +161,7 @@ variationSections.propTypes = {
 	resetErrors: PropTypes.func,
 	updateNetwork: PropTypes.func,
 	generateReport: PropTypes.func,
+	showNotification: PropTypes.func,
 	ui: PropTypes.object,
 	reporting: PropTypes.object
 };
@@ -161,7 +184,8 @@ export default connect(
 				onScrollSectionIntoView: scrollSectionIntoView,
 				updateAdCode: updateAdCode,
 				updateNetwork: updateNetwork,
-				generateReport: generateReport
+				generateReport: generateReport,
+				showNotification: showNotification
 			},
 			dispatch
 		)

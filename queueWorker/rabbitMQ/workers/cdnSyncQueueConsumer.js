@@ -74,7 +74,8 @@ function errorHandler(error, originalMessage) {
 		logger({
 			source: 'CDN SYNC ERROR LOGS',
 			message: `Error while CDN SYNC and error messgae : ${customErrorMessage}`,
-			debugData: `Site id : ${decodedMessage.siteId}`
+			debugData: `Site id : ${decodedMessage.siteId}`,
+			details: `${JSON.stringify(error)}`
 		});
 		consumer.acknowledge(originalMessage);
 		throw error;
@@ -96,16 +97,14 @@ function doProcessingAndAck(originalMessage) {
 }
 
 function consumeRabbitMQMessage() {
-	return consumer
-		.getMessage(QUEUE)
-		.then(doProcessingAndAck)
-		.then((timer = 0) => setTimeout(consumeRabbitMQMessage, timer));
+	return consumer.getMessage(QUEUE).then(doProcessingAndAck);
 }
 
 function init() {
 	return consumer
 		.makeConnection()
 		.then(consumeRabbitMQMessage)
+		.then((timer = 0) => setTimeout(init, timer))
 		.catch(error => {
 			let message = error.message || 'CDN SYNC FAILED';
 			console.log(message);

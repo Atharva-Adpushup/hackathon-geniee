@@ -262,6 +262,93 @@ INNER JOIN (
 ON a.report_date=b.report_date and a.siteid=b.siteid
 `;
 
+const SITE_TOP_URLS = `
+SELECT TOP @__count__ c.url, sum(b.count) AS 'count'
+FROM apexhourlysitereport a, apextopurlreport b, apextopurl c
+WHERE a.axhsrid = b.axhsrid
+	AND b.axtuid = c.axtuid
+	AND report_date BETWEEN @__fromDate__ AND @__toDate__
+	AND a.siteid = @__siteId__
+GROUP BY c.url
+ORDER BY 'count' DESC;
+`;
+
+const SITE_DEVICE_WISE_REVENUE_CONTRIBUTION = `
+SELECT report_date, device_type, sum(total_gross_revenue) AS 'total_revenue', sum(total_revenue) AS 'revenue_after_cut'
+FROM adptagreport
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+	AND siteid = @__siteId__
+GROUP BY report_date, device_type;
+`;
+
+const SITE_PAGEGROUP_WISE_REVENUE_CONTRIBUTION = `
+SELECT a.report_date, b.NAME AS 'name', sum(a.total_gross_revenue) AS 'total_revenue', sum(a.total_revenue) AS 'revenue_after_cut'
+FROM AdpTagReport a, ApexPageGroup b
+WHERE a.axpgid = b.axpgid
+	AND a.report_date BETWEEN @__fromDate__ AND @__toDate__
+	AND a.siteid = @__siteId__
+GROUP BY a.report_date, b.NAME;
+`;
+
+const PLATFORMS_KEYS = {
+	0: 'UNKNOWN',
+	1: 'MOBILE',
+	2: 'DESKTOP',
+	3: 'CONNECTED_TV',
+	4: 'MOBILE',
+	5: 'TABLET',
+	6: 'CONNECTED_DEVICE',
+	7: 'SET_TOP_BOX'
+};
+
+const REGEX_DATE_FORMAT = /\d{4}-\d{2}-\d{2}/;
+const STRING_DATE_FORMAT = 'YYYY-MM-DD';
+
+/**
+SELECT
+	SUM(a.total_requests) AS total_requests,
+	a.report_date,
+	a.siteid,
+	SUM(b.total_revenue) AS total_revenue,
+	SUM(b.total_impressions) AS total_impressions,
+	b.display_name
+FROM (
+	SELECT
+		SUM(c.total_requests) AS total_requests,
+		c.report_date,
+		c.siteid
+	FROM ApexHourlySiteReport c
+	WHERE
+		c.report_date BETWEEN '2017-11-07' AND '2017-11-13'
+		AND c.siteid = 31000
+	GROUP BY
+		c.report_date,
+		c.siteid
+) a
+INNER JOIN (
+	SELECT
+		SUM(h.total_revenue) AS total_revenue,
+		SUM(h.total_impressions) AS total_impressions,
+		h.report_date,
+		h.siteid,
+		i.display_name
+	FROM AdpTagReport h, Network i
+	WHERE
+		h.report_date BETWEEN '2017-11-07' AND '2017-11-13'
+		AND h.siteid = 31000
+		AND h.ntwid = i.ntwid
+	GROUP BY
+		h.report_date,
+		h.siteid,
+		h.display_name
+) b
+ON a.report_date = b.report_date AND a.siteid = b.siteid
+GROUP BY
+	a.report_date,
+	a.siteid,
+	b.display_name
+*/
+
 let fetchSectionQuery = `SELECT axsid, sec_key, section_md5 FROM ApexSection where siteid=@__siteid__`;
 let fetchVariationQuery = `SELECT axvid, var_key, variation_id FROM ApexVariation where siteid=@__siteid__`;
 let fetchPagegroupQuery = `SELECT axpgid, pg_key, name FROM ApexPageGroup where siteid=@__siteid__`;
@@ -271,8 +358,9 @@ const schema = {
 		fields: {
 			forUser: ['name', 'variation_id', 'section_md5'],
 			forOn: ['axpgid', 'axvid', 'axsid'],
+			commonOn: ['report_date', 'siteid', 'device_type'],
 			where: ['name', 'variation_id', 'section_md5', 'report_date', 'siteid', 'device_type'],
-			groupBy: ['section_md5', 'variation_id', 'name']
+			groupBy: ['section_md5', 'variation_id', 'name', 'device_type']
 		},
 		tables: {
 			pagegroup: {
@@ -290,7 +378,7 @@ const schema = {
 		}
 	},
 	firstQuery: {
-		aggregate: ['total_requests', 'total_xpath_miss'],
+		aggregate: ['total_requests', 'total_xpath_miss', 'total_impressions'],
 		nonAggregate: ['report_date', 'siteid', 'device_type'],
 		where: ['mode'],
 		tables: {
@@ -306,13 +394,17 @@ const schema = {
 		alias: 'a'
 	},
 	secondQuery: {
-		aggregate: ['total_revenue', 'total_impressions'],
-		nonAggregate: ['report_date', 'siteid', 'ntwid', 'platform'],
+		aggregate: ['total_revenue', 'total_impressions', 'total_gross_revenue'],
+		nonAggregate: ['report_date', 'siteid', 'ntwid', 'platform', 'device_type', 'display_name'],
 		where: ['ntwid'],
 		tables: {
 			adpTagReport: {
 				table: 'AdpTagReport',
 				alias: 'h'
+			},
+			network: {
+				table: 'Network',
+				alias: 'i'
 			}
 		},
 		alias: 'b'
@@ -371,4 +463,15 @@ const schema = {
 	}
 };
 
-module.exports = { schema, fetchSectionQuery, fetchVariationQuery, fetchPagegroupQuery };
+module.exports = {
+	schema,
+	fetchSectionQuery,
+	fetchVariationQuery,
+	fetchPagegroupQuery,
+	SITE_TOP_URLS,
+	SITE_DEVICE_WISE_REVENUE_CONTRIBUTION,
+	PLATFORMS_KEYS,
+	REGEX_DATE_FORMAT,
+	STRING_DATE_FORMAT,
+	SITE_PAGEGROUP_WISE_REVENUE_CONTRIBUTION
+};

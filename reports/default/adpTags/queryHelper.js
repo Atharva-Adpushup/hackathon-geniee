@@ -11,7 +11,8 @@ var Promise = require('bluebird'),
 					query: 'SELECT ',
 					fields: {
 						forUser: [],
-						forOn: []
+						forOn: [],
+						commonOn: []
 					},
 					level: {
 						section: false,
@@ -25,8 +26,9 @@ var Promise = require('bluebird'),
 				};
 				firstQuery = {
 					select: 'SELECT ',
-					from: ` FROM ${schema.firstQuery.tables.apexSiteReport.table} ${schema.firstQuery.tables
-						.apexSiteReport.alias} `,
+					from: ` FROM ${schema.firstQuery.tables.apexSiteReport.table} ${
+						schema.firstQuery.tables.apexSiteReport.alias
+					} `,
 					where: ' WHERE ',
 					groupBy: ' GROUP BY ',
 					orderBy: ' ORDER BY ',
@@ -35,30 +37,33 @@ var Promise = require('bluebird'),
 				};
 				secondQuery = {
 					select: 'SELECT ',
-					from: ` FROM ${schema.secondQuery.tables.adpTagReport.table} ${schema.secondQuery.tables
-						.adpTagReport.alias} `,
+					from: ` FROM ${schema.secondQuery.tables.adpTagReport.table} ${
+						schema.secondQuery.tables.adpTagReport.alias
+					} `,
 					where: ' WHERE ',
 					groupBy: ' GROUP BY ',
 					orderBy: ' ORDER BY ',
 					aggregate: [],
-					nonAggregate: []
+					nonAggregate: [],
+					extra: []
 				};
 				return Promise.resolve();
 			},
-			__reduceArrayToString = (array, alias) => {
-				return (
-					` ${alias}.` +
-					_.reduce(
-						array,
-						(accumulator, value, key) =>
-							value == undefined ? `${accumulator} ` : `${accumulator}, ${alias}.${value} `
-					)
-				);
+			__reduceArrayToString = (array, defaultAlias, fetchAlias) => {
+				let alias,
+					response = '';
+				_.forEach(array, ele => {
+					alias = fetchAlias ? __getAlias(ele) || defaultAlias : defaultAlias;
+					response += ` ${alias}.${ele}, `;
+				});
+				return `${response.slice(0, -2)} `;
 			},
-			__reduceArrayToStringAggregate = (array, alias) => {
+			__reduceArrayToStringAggregate = (array, alias, prefix = false) => {
 				let response = ' ';
 				_.forEach(array, (field, key) => {
-					response += ` SUM(${alias}.${field}) AS ${field}, `;
+					prefix && field == 'total_impressions'
+						? (response += ` SUM(${alias}.${field}) AS 'total_adp_impressions', `)
+						: (response += ` SUM(${alias}.${field}) AS ${field}, `);
 				});
 				return response.slice(0, -2);
 			},
@@ -82,6 +87,9 @@ var Promise = require('bluebird'),
 						alias = false;
 						// alias = schema.firstQuery.tables.apexSiteReport.alias;
 						break;
+					case 'display_name':
+						alias = flag ? schema.secondQuery.alias : schema.secondQuery.tables.network.alias;
+						break;
 					case 'ntwid':
 						alias = flag ? schema.secondQuery.alias : schema.secondQuery.tables.adpTagReport.alias;
 						break;
@@ -94,11 +102,13 @@ var Promise = require('bluebird'),
 			__groupBy = () => {
 				firstQuery.groupBy += __reduceArrayToString(
 					firstQuery.nonAggregate,
-					schema.firstQuery.tables.apexSiteReport.alias
+					schema.firstQuery.tables.apexSiteReport.alias,
+					true
 				);
 				secondQuery.groupBy += __reduceArrayToString(
 					secondQuery.nonAggregate,
-					schema.secondQuery.tables.adpTagReport.alias
+					schema.secondQuery.tables.adpTagReport.alias,
+					true
 				);
 
 				if (common.level.section || common.level.variation || common.level.pagegroup) {
@@ -143,7 +153,11 @@ var Promise = require('bluebird'),
 				let response = ' ';
 
 				firstQuery.aggregate.length
-					? (response += __reduceArrayToStringAggregate(firstQuery.aggregate, schema.firstQuery.alias))
+					? (response += __reduceArrayToStringAggregate(
+							firstQuery.aggregate,
+							schema.firstQuery.alias,
+							'adpushup'
+						))
 					: null;
 				firstQuery.nonAggregate.length
 					? (response += `, ${__reduceArrayToString(firstQuery.nonAggregate, schema.firstQuery.alias)}`)
@@ -229,8 +243,9 @@ var Promise = require('bluebird'),
 			__setCommonColumnsCondition = () => {
 				let level = __getLevel();
 				if (level == 'section') {
-					firstQuery.where += ` AND ${schema.firstQuery.tables.apexSiteReport.alias}.axhsrid=${schema
-						.firstQuery.tables.sectionReport.alias}.axhsrid `;
+					firstQuery.where += ` AND ${schema.firstQuery.tables.apexSiteReport.alias}.axhsrid=${
+						schema.firstQuery.tables.sectionReport.alias
+					}.axhsrid `;
 				}
 				firstQuery.where += __generateCommonColumnsCondition(schema.firstQuery.tables.apexSiteReport.alias);
 				secondQuery.where += __generateCommonColumnsCondition(schema.secondQuery.tables.adpTagReport.alias);
@@ -264,6 +279,28 @@ var Promise = require('bluebird'),
 				condition = condition.slice(0, -1);
 				condition += ')';
 				return condition;
+			},
+			__tableSpecific = field => {
+				// to set specific table conditions in case of joins
+				switch (field) {
+					case 'display_name':
+						secondQuery.from += ` ,${schema.secondQuery.tables.network.table} ${
+							schema.secondQuery.tables.network.alias
+						}`;
+						secondQuery.where += ` AND ${schema.secondQuery.tables.adpTagReport.alias}.ntwid=${
+							schema.secondQuery.tables.network.alias
+						}.ntwid`;
+				}
+			},
+			__generateON = () => {
+				let response = ' ';
+				if (common.fields.commonOn.length) {
+					_.forEach(common.fields.commonOn, (value, key) => {
+						response += `${schema.firstQuery.alias}.${value}=${schema.secondQuery.alias}.${value} AND `;
+					});
+					return response.slice(0, -4);
+				}
+				return response;
 			};
 		return {
 			select: (data, flag) => {
@@ -271,31 +308,51 @@ var Promise = require('bluebird'),
 					common.level.section || flag
 						? schema.firstQuery.tables.sectionReport.alias
 						: schema.firstQuery.tables.apexSiteReport.alias;
+
 				_.forEach(data, field => {
+					let currentAliasForNonAggregate = __getAlias(field);
+
+					// First Query
 					if (schema.firstQuery.nonAggregate.indexOf(field) != -1) {
-						firstQuery.select += ` ${schema.firstQuery.tables.apexSiteReport.alias}.${field}, `;
+						firstQuery.select += ` ${
+							currentAliasForNonAggregate
+								? currentAliasForNonAggregate
+								: schema.firstQuery.tables.apexSiteReport.alias
+						}.${field}, `;
 						firstQuery.nonAggregate.push(field);
 					} else if (schema.firstQuery.aggregate.indexOf(field) != -1) {
 						firstQuery.select += ` SUM(${alias}.${field}) AS ${field}, `;
 						firstQuery.aggregate.push(field);
 					}
 
+					// Second Query
 					if (schema.secondQuery.nonAggregate.indexOf(field) != -1) {
-						secondQuery.select += ` ${schema.secondQuery.tables.adpTagReport.alias}.${field}, `;
+						secondQuery.select += ` ${
+							currentAliasForNonAggregate
+								? currentAliasForNonAggregate
+								: schema.secondQuery.tables.adpTagReport.alias
+						}.${field}, `;
 						secondQuery.nonAggregate.push(field);
 					} else if (schema.secondQuery.aggregate.indexOf(field) != -1) {
-						secondQuery.select += ` SUM(${schema.secondQuery.tables.adpTagReport
-							.alias}.${field}) AS ${field}, `;
+						secondQuery.select += ` SUM(${schema.secondQuery.tables.adpTagReport.alias}.${field}) AS ${
+							field
+						}, `;
 						secondQuery.aggregate.push(field);
 					}
+
+					if (schema.common.fields.commonOn.indexOf(field) != -1) {
+						common.fields.commonOn.push(field);
+					}
+					__tableSpecific(field);
 				});
 				return true;
 			},
 			from: () => {
 				let index = false;
 				if (common.level.section) {
-					firstQuery.from += `, ${schema.firstQuery.tables.sectionReport.table} ${schema.firstQuery.tables
-						.sectionReport.alias} `;
+					firstQuery.from += `, ${schema.firstQuery.tables.sectionReport.table} ${
+						schema.firstQuery.tables.sectionReport.alias
+					} `;
 					index = 3;
 				} else if (common.level.variation) {
 					index = 2;
@@ -344,15 +401,15 @@ var Promise = require('bluebird'),
 					})
 					.then(() => {
 						function addToFirstWhere(alias, condition) {
-							firstQuery.where += ` AND ${alias
-								? alias
-								: schema.firstQuery.tables.apexSiteReport.alias}${condition} `;
+							firstQuery.where += ` AND ${alias ? alias : schema.firstQuery.tables.apexSiteReport.alias}${
+								condition
+							} `;
 						}
 
 						function addToSecondWhere(alias, condition) {
-							secondQuery.where += ` AND ${alias
-								? alias
-								: schema.secondQuery.tables.adpTagReport.alias}${condition} `;
+							secondQuery.where += ` AND ${alias ? alias : schema.secondQuery.tables.adpTagReport.alias}${
+								condition
+							} `;
 						}
 
 						_.forEach(data, (value, key) => {
@@ -385,14 +442,24 @@ var Promise = require('bluebird'),
 			groupBy: data => {
 				return __setLevelFromGroupBy(data)
 					.then(response => {
-						let uniqueGroupByFields = _.difference(data, schema.common.fields.groupBy);
+						let uniqueGroupByFields = _.difference(data, schema.common.fields.groupBy),
+							secondQueryUniqueNonAggregate = _.difference(
+								secondQuery.nonAggregate,
+								firstQuery.nonAggregate
+							);
 						common.groupBy = common.fields.forUser.length
 							? ` GROUP BY ${__reduceArrayToString(common.fields.forUser, schema.firstQuery.alias)} `
 							: ' GROUP BY ';
 						firstQuery.nonAggregate.length
-							? (common.groupBy += ` ${common.fields.forUser.length
-									? ' , '
-									: ' '} ${__reduceArrayToString(firstQuery.nonAggregate, schema.firstQuery.alias)}`)
+							? (common.groupBy += ` ${
+									common.fields.forUser.length ? ' , ' : ' '
+								} ${__reduceArrayToString(firstQuery.nonAggregate, schema.firstQuery.alias)}`)
+							: null;
+						secondQueryUniqueNonAggregate.length
+							? _.forEach(secondQueryUniqueNonAggregate, (value, key) => {
+									let alias = __getAlias(value, true);
+									common.groupBy += ` , ${alias}.${value}`;
+								})
 							: null;
 						uniqueGroupByFields.length
 							? _.forEach(uniqueGroupByFields, (value, key) => {
@@ -436,7 +503,7 @@ var Promise = require('bluebird'),
 					common.query += ` ) ${schema.secondQuery.alias} `;
 
 					// ON
-					common.query += 'ON a.report_date=b.report_date AND a.siteid=b.siteid';
+					common.query += `ON ${__generateON()}`;
 
 					common.query += __generateCommonColumnsCondition(schema.firstQuery.alias, schema.secondQuery.alias);
 

@@ -40,10 +40,8 @@ class adDescriptor extends React.Component {
 		this.setState({ isEditingNetwork: !this.state.isEditingNetwork });
 	}
 
-	submitHandler(value, network, isADP, isHeaderBiddingActivated) {
-		isADP
-			? this.props.updateNetwork(this.props.ad.id, value, network, isHeaderBiddingActivated)
-			: this.props.updateAdCode(this.props.ad.id, value, network);
+	submitHandler(params) {
+		this.props.updateNetwork(this.props.ad.id, params);
 	}
 
 	render() {
@@ -84,6 +82,7 @@ class adDescriptor extends React.Component {
 					onCancel={this.toggleNetworkEditor}
 					ad={ad}
 					adDescriptor={true}
+					showNotification={this.props.showNotification}
 				/>
 			);
 		}

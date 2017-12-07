@@ -145,6 +145,7 @@ class ReportControls extends Component {
 				<div className="container-fluid">
 					<Row>
 						<Col sm={2}>
+							<label className="control-label">PageGroup</label>
 							<SelectBox
 								value={state.pageGroup}
 								label="Select PageGroup"
@@ -158,6 +159,7 @@ class ReportControls extends Component {
 							</SelectBox>
 						</Col>
 						<Col sm={2}>
+							<label className="control-label">Platform</label>
 							<SelectBox value={state.platform} label="Select Platform" onChange={this.platformUpdated}>
 								{PLATFORMS.map((platform, index) => (
 									<option key={index} value={index}>
@@ -167,6 +169,7 @@ class ReportControls extends Component {
 							</SelectBox>
 						</Col>
 						<Col sm={2}>
+							<label className="control-label">Variation</label>
 							<SelectBox
 								value={state.variation}
 								label="Select Variation"
@@ -180,7 +183,18 @@ class ReportControls extends Component {
 								))}
 							</SelectBox>
 						</Col>
+						<Col sm={2}>
+							<label className="control-label">Group By</label>
+							<SelectBox value={state.groupBy} label="Group By" onChange={this.groupByUpdated}>
+								{state.groupByArray.map((groupBy, index) => (
+									<option key={index} value={groupBy}>
+										{groupBy === commonConsts.DEVICE_TYPE ? commonConsts.DATA_LABELS.platform : groupBy}
+									</option>
+								))}
+							</SelectBox>
+						</Col>
 						<Col sm={4}>
+							<label className="control-label">Date Range</label>
 							<DateRangePicker
 								onDatesChange={this.datesUpdated}
 								onFocusChange={this.focusUpdated}
@@ -192,23 +206,14 @@ class ReportControls extends Component {
 								showClearDates={true}
 								minimumNights={0}
 								displayFormat={'DD-MM-YYYY'}
-								isOutsideRange={() => {}}
+								isOutsideRange={() => { }}
 							/>
-						</Col>
-						<Col sm={2}>
-							<SelectBox value={state.groupBy} label="Group By" onChange={this.groupByUpdated}>
-								{state.groupByArray.map((groupBy, index) => (
-									<option key={index} value={groupBy}>
-										{groupBy}
-									</option>
-								))}
-							</SelectBox>
 						</Col>
 					</Row>
 					<Row className="mT-10">
 						<Col sm={3} smOffset={9}>
 							<button
-								className="btn btn-lightBg btn-default"
+								className="btn btn-lightBg btn-default btn-blue"
 								onClick={props.generateButtonHandler}
 								disabled={props.disableGenerateButton}
 							>
