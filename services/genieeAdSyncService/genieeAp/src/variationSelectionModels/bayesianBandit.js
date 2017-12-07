@@ -1,41 +1,51 @@
 var $ = require('jquery'),
-	Bandit = require('bayesian-bandit').Bandit;
+	utils = require('../../libs/utils'),
+	Bandit = require('bayesian-bandit').Bandit,
+	preparePayload = function(allVariations) {
+		var obj = { withData: [], withoutData: [], withDataVariations: [], withoutDataVariations: [] },
+			modelObj = { count: 1, sum: 1 };
 
-module.exports = function() {
-	function getChosenVariation(allVariations) {
-		var isValidModel = false,
-			bandit,
-			banditArm,
-			chosenVariation,
-			armsCollection = [],
-			variationsCollection = {},
-			variationIdCounter = 0;
-
-		// Set model arms and get selected arm if auto optimise is true
 		$.each(allVariations, function(variationId, variationObj) {
-			var modelObj = {
+			modelObj = {
 				count: parseInt(variationObj.count, 10),
-				sum: parseFloat(variationObj.sum)
+				sum: parseInt(variationObj.sum, 10)
 			};
-
-			armsCollection.push(modelObj);
-			variationsCollection[variationIdCounter.toString()] = $.extend(true, {}, variationObj);
-			variationIdCounter++;
+			//Count is pageviews, so if pageviews are 1 the this means we don't have data from reports
+			if (modelObj.count > 1) {
+				obj.withData.push(modelObj);
+				obj.withDataVariations.push(variationObj);
+			} else {
+				obj.withoutData.push(modelObj);
+				obj.withoutDataVariations.push(variationObj);
+			}
 		});
+		return obj;
+	},
+	getBanditBasedChoice = function(arms, variations) {
+		var bandit = new Bandit({ arms: arms }),
+			banditArmIndex = parseInt(bandit.selectArm(), 10);
 
-		bandit = new Bandit({ arms: armsCollection });
-		banditArm = parseInt(bandit.selectArm(), 10);
-		isValidModel = !!(bandit && banditArm > -1);
-
-		if (isValidModel) {
-			chosenVariation = $.extend(true, {}, variationsCollection[banditArm.toString()]);
-			return chosenVariation;
+		if (banditArmIndex > -1) {
+			return variations[banditArmIndex];
+		}
+		return false;
+	},
+	getRandomBasedChoice = function(arms, variations) {
+		var random = utils.getRandomNumberBetween(1, arms.length);
+		return variations[random];
+	},
+	getChosenVariation = function(allVariations) {
+		var payload = preparePayload(allVariations),
+			random = utils.getRandomNumberBetween(1, allVariations.length);
+		if (payload.withoutData.length && random <= payload.withoutData.length) {
+			return getRandomBasedChoice(payload.withoutData, payload.withoutDataVariations);
+		} else if (payload.withData.length) {
+			return getBanditBasedChoice(payload.withData, payload.withDataVariations);
 		}
 
 		return false;
-	}
-
-	return {
-		chooseVariation: getChosenVariation
 	};
+
+module.exports = {
+	chooseVariation: getChosenVariation
 };
