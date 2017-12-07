@@ -137,20 +137,11 @@ class insertMenu extends React.Component {
 					/>
 				</MenuItem>
 			));
-		} else if (props.partner === 'geniee') {
-			items.push(
-				<MenuItem key={1} icon="fa-sitemap" contentHeading="Section Options">
-					<SectionOptions
-						firstFold={props.firstFold}
-						onCreateAd={this.createSectionAndAd.bind(this)}
-						onCancel={this.toggleExtraOptions.bind(this)}
-					/>
-				</MenuItem>
-			);
 		} else {
 			items.push(
 				<MenuItem key={1} icon="fa-sitemap" contentHeading="Network Options">
 					<NetworkOptions
+						firstFold={props.firstFold}
 						onSubmit={this.networkOptionsSubmit}
 						onCancel={this.toggleExtraOptions}
 						showNotification={this.props.showNotification}
