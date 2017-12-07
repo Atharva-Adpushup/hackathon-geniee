@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
 import { Row, Col } from 'react-bootstrap';
-import { ajax } from '../../../common/helpers';
-import ActionCard from '../../../Components/ActionCard.jsx';
+import { ajax } from '../../../../common/helpers';
+import ActionCard from '../../../../Components/ActionCard.jsx';
 
 class LiveSitesMapping extends Component {
 	constructor(props) {
 		super(props);
-		this.fetchLiveSitesWrapper = this.fetchLiveSitesWrapper.bind(this);
+		// this.fetchLiveSitesWrapper = this.fetchLiveSitesWrapper.bind(this);
 	}
-
-	fetchLiveSitesWrapper() {}
 
 	render() {
 		return (
@@ -21,7 +19,7 @@ class LiveSitesMapping extends Component {
 								<Col sm={4}>
 									<button
 										className="btn btn-lightBg btn-default"
-										onClick={this.fetchLiveSitesWrapper}
+										onClick={() => console.log('Clicked')}
 									>
 										Generate Full Mapping
 									</button>
