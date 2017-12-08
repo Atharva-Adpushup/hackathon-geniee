@@ -173,10 +173,12 @@ class NetworkOptions extends Component {
 	}
 
 	render() {
+		let filteredNetworks =
+			currentUser.userType == 'partner' ? networks.filter(network => network != 'adpTags') : networks;
 		return (
 			<div className="networkOptionsRow">
 				<SelectBox value={this.state.network} label="Select Network" onChange={this.networkChangeHandler}>
-					{networks.map((item, index) => (
+					{filteredNetworks.map((item, index) => (
 						<option key={index} value={item}>
 							{item.charAt(0).toUpperCase() + item.slice(1).replace(/([A-Z])/g, ' $1')}
 						</option>

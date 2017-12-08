@@ -135,7 +135,10 @@ class AdDetails extends Component {
 					? String(ad.networkData.firstFold)
 					: 'true',
 			position =
-				ad.networkData && ad.networkData.hasOwnProperty('position') && ad.networkData.position != ''
+				ad.networkData &&
+				ad.networkData.hasOwnProperty('position') &&
+				String(ad.networkData.position) != '' &&
+				ad.networkData.position != null
 					? ad.networkData.position
 					: 'Not set',
 			dynamicAllocation =

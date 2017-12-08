@@ -124,6 +124,7 @@ const mapStateToProps = (state, ownProps) => ({
 				);
 				return false;
 			}
+			console.log(networkInfo);
 			const notNear = getNotNearData(values.notNear),
 				isCustomZoneId = !!values.customZoneId,
 				sectionPayload = {

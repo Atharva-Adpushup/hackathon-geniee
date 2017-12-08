@@ -11,7 +11,8 @@ class KeyValuesPanel extends Component {
 		super(props);
 		this.state = {
 			containsADP: false,
-			adpKeyValues: this.props.variation.adpKeyValues || null
+			adpKeyValues: this.props.variation.adpKeyValues || null,
+			toMatch: currentUser.userType == 'partner' ? 'geniee' : 'adpTags'
 		};
 		this.checkADP = this.checkADP.bind(this);
 		this.submitHandler = this.submitHandler.bind(this);
@@ -34,7 +35,7 @@ class KeyValuesPanel extends Component {
 		return sections
 			? sections.some(section => {
 					let ad = section.ads[0];
-					if (ad.network && ad.network == 'adpTags') {
+					if (ad.network && ad.network == this.state.toMatch) {
 						return true;
 					}
 				})
@@ -79,7 +80,10 @@ class KeyValuesPanel extends Component {
 				</Row>
 			</div>
 		) : (
-			<div>Variation must contain one ADP section in order to set Key-Values</div>
+			<div>
+				Variation must contain one <strong>{this.state.toMatch.toUpperCase()}</strong> section in order to set
+				Key-Values
+			</div>
 		);
 	}
 }
