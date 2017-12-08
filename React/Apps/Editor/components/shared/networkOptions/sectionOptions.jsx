@@ -138,7 +138,7 @@ class sectionOptions extends React.Component {
 				className="containerButtonBar sectionOptions mT-10"
 				style={updateMode ? { paddingBottom: 0, marginRight: 15, marginLeft: 15 } : {}}
 			>
-				<Row>
+				{/* <Row>
 					<Col md={3} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
 						<b>Position</b>
 					</Col>
@@ -151,8 +151,8 @@ class sectionOptions extends React.Component {
 							))}
 						</SelectBox>
 					</Col>
-				</Row>
-				<CustomToggleSwitch
+				</Row> */}
+				{/* <CustomToggleSwitch
 					labelText="First fold"
 					className="u-margin-t15px u-margin-b15px"
 					defaultLayout
@@ -185,7 +185,7 @@ class sectionOptions extends React.Component {
 					name={this.props.id ? `asyncTag-${this.props.id}` : 'asyncTag'}
 					id={this.props.id ? `js-async-tag-switch-${this.props.id}` : 'js-async-tag-switch'}
 					customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
-				/>
+				/> */}
 				{updateMode && !zoneId ? null : this.renderCustomZoneIdInput(zoneId)}
 
 				<AdpTags
