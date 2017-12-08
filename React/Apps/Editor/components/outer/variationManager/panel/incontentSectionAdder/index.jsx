@@ -125,19 +125,19 @@ const mapStateToProps = (state, ownProps) => ({
 				return false;
 			}
 			const notNear = getNotNearData(values.notNear),
-				isCustomZoneId = !!values.customZoneId,
+				// isCustomZoneId = !!values.customZoneId,
 				sectionPayload = {
 					sectionNo: values.section,
 					name: values.name,
 					minDistanceFromPrevAd: values.minDistanceFromPrevAd,
 					float: values.float,
-					notNear,
-					partnerData: {
-						position: 0,
-						firstFold: 0,
-						asyncTag: 1,
-						customZoneId: values.customZoneId ? values.customZoneId : ''
-					}
+					notNear
+					// partnerData: {
+					// 	position: 0,
+					// 	firstFold: 0,
+					// 	asyncTag: 1,
+					// 	customZoneId: values.customZoneId ? values.customZoneId : ''
+					// }
 				},
 				adPayload = {
 					adCode: btoa(values.adCode),
@@ -146,7 +146,7 @@ const mapStateToProps = (state, ownProps) => ({
 					networkData: {}
 				};
 
-			isCustomZoneId ? (adPayload.networkData.zoneId = values.customZoneId) : null;
+			// isCustomZoneId ? (adPayload.networkData.zoneId = values.customZoneId) : null;
 
 			adPayload.networkData = {
 				...adPayload.networkData,
