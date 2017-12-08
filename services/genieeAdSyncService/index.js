@@ -42,16 +42,16 @@ function updateAllAutoOptimisedSites() {
 }
 
 adpushup.on('siteSaved', onSiteSaved);
-// cron.schedule('0 0 */4 * * *', function() {
-// 	const infoText = 'Running below task every 4 hours';
+cron.schedule(
+	'0 0 */6 * * *',
+	function() {
+		const infoText = 'Running Auto Optimise task every 6 hours';
 
-// 	fileLogger.info(infoText);
-// 	console.log(infoText);
-// 	updateAllAutoOptimisedSites();
-// }, true);
-// NOTE: Even with boolean `true` as third argument,
-// cron doesn't immediately start the job.
-// Hence, a manual invokation for this method is done below
-// TODO: Test this issue out and if persists,
-// do a pull request to 'node-cron' npm package to fix this :)
-//updateAllAutoOptimisedSites();
+		fileLogger.info(infoText);
+		console.log(infoText);
+		updateAllAutoOptimisedSites();
+	},
+	true
+);
+
+updateAllAutoOptimisedSites();
