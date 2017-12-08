@@ -103,7 +103,7 @@ class sectionOptions extends React.Component {
 				</Col>
 				<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
 					<input
-						type="text"
+						type="number"
 						placeholder="Enter Geniee Zone Id"
 						className="inputBasic mB-10"
 						value={zoneId}
