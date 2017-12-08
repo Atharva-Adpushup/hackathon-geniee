@@ -171,7 +171,7 @@ class AdDetails extends Component {
 						<div>
 							{this.renderCommonDetails(fpKey, priceFloor, dynamicAllocation, 'Dynamic Allocation')}
 						</div>
-						<div>{this.genieeOptions(position, firstFold, zoneId)}</div>
+						{/* <div>{this.genieeOptions(position, firstFold, zoneId)}</div> */}
 						<div>{this.renderAdCode(adCode)}</div>
 					</div>
 				) : (
