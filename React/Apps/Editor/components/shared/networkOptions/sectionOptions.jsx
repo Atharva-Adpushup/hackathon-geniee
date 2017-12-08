@@ -47,14 +47,14 @@ class sectionOptions extends React.Component {
 			});
 			return;
 		}
-		if (!this.state.position) {
-			this.props.showNotification({
-				mode: 'error',
-				title: 'Incomplete Values',
-				message: 'Please select a position'
-			});
-			return;
-		}
+		// if (!this.state.position) {
+		// 	this.props.showNotification({
+		// 		mode: 'error',
+		// 		title: 'Incomplete Values',
+		// 		message: 'Please select a position'
+		// 	});
+		// 	return;
+		// }
 		let toSend = {
 			...networkData,
 			dynamicAllocation: networkData.headerBidding,
