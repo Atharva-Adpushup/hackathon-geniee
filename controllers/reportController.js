@@ -22,6 +22,7 @@ var express = require('express'),
 	reportsLocalizedObject = require('../i18n/reports/geniee/constants'),
 	{ fileLogger } = require('../helpers/logger/file/index'),
 	{ queryResultProcessing } = require('../helpers/commonFunctions'),
+	commonConsts = require('../configs/commonConsts'),
 	// eslint-disable-next-line new-cap
 	router = express.Router({ mergeParams: true }),
 	reports = require('../models/reportsModel');
@@ -65,16 +66,22 @@ router
 	// 	});
 	// })
 	.get('/adpushupReport', (req, res) => {
-		return siteModel
-			.getUniquePageGroups(req.params.siteId)
-			.then(pageGroups => [pageGroups, siteModel.getSiteById(req.params.siteId)])
+		const siteId = req.params.siteId;
+
+		return userModel.verifySiteOwner(req.session.user.email, siteId)
+			.then(() => siteModel.getUniquePageGroups(siteId))
+			.then(pageGroups => [pageGroups, siteModel.getSiteById(siteId)])
 			.spread((pageGroups, site) => {
+				if (req.session.user.email === commonConsts.DEMO_ACCOUNT_EMAIL) {
+					pageGroups = commonConsts.DEMO_PAGEGROUPS;
+				}
+
 				return res.render('adpushupReport', {
 					pageGroups,
-					siteId: req.params.siteId,
-					siteDomain: utils.domanize(site.get('siteDomain')),
-					isSuperUser: req.session.isSuperUser
-				})
+					siteId: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL ? siteId : commonConsts.DEMO_REPORT_SITE_ID,
+					siteDomain: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL ? utils.domanize(site.get('siteDomain')) : '',
+					isSuperUser: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL ? req.session.isSuperUser : false
+				});
 			})
 			.catch(err => res.send('Some error occurred! Please try again later.'));
 	})

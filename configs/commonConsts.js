@@ -2,6 +2,9 @@ module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: 'http://console.adpushup.com',
 	PROXY_ORIGIN: 'http://proxy.app.adpushup.com',
+	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
+	DEMO_REPORT_SITE_ID: 28822,
+	DEMO_PAGEGROUPS: ['MIC', 'WEBCAM'],
 	REPORT_API: {
 		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
 		DATE_FORMAT: 'YYYY-MM-DD'

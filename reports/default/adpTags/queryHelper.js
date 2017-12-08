@@ -58,10 +58,12 @@ var Promise = require('bluebird'),
 				});
 				return `${response.slice(0, -2)} `;
 			},
-			__reduceArrayToStringAggregate = (array, alias) => {
+			__reduceArrayToStringAggregate = (array, alias, prefix = false) => {
 				let response = ' ';
 				_.forEach(array, (field, key) => {
-					response += ` SUM(${alias}.${field}) AS ${field}, `;
+					prefix && field == 'total_impressions'
+						? (response += ` SUM(${alias}.${field}) AS 'total_adp_impressions', `)
+						: (response += ` SUM(${alias}.${field}) AS ${field}, `);
 				});
 				return response.slice(0, -2);
 			},
@@ -151,7 +153,11 @@ var Promise = require('bluebird'),
 				let response = ' ';
 
 				firstQuery.aggregate.length
-					? (response += __reduceArrayToStringAggregate(firstQuery.aggregate, schema.firstQuery.alias))
+					? (response += __reduceArrayToStringAggregate(
+							firstQuery.aggregate,
+							schema.firstQuery.alias,
+							'adpushup'
+						))
 					: null;
 				firstQuery.nonAggregate.length
 					? (response += `, ${__reduceArrayToString(firstQuery.nonAggregate, schema.firstQuery.alias)}`)

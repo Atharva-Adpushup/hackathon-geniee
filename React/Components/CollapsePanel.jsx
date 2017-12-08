@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Panel, Row } from 'react-bootstrap';
+import Bold from './Bold.jsx';
 
 class CollapsePanel extends Component {
     constructor(props) {
@@ -30,7 +31,9 @@ class CollapsePanel extends Component {
                     <div className="container-fluid">
                         <Row>
                             <div className="pull-left">
-                                {props.title}
+                                {
+                                    props.bold ? <Bold>{props.title}</Bold> : props.title
+                                }
                             </div>
                             <div className="pull-right">
                                 {/* {
@@ -50,12 +53,14 @@ class CollapsePanel extends Component {
 
 CollapsePanel.propTypes = {
     open: PropTypes.bool,
-    tooltipMessage: PropTypes.string
+    tooltipMessage: PropTypes.string,
+    bold: PropTypes.bool
 };
 
 CollapsePanel.defaultProps = {
     open: false,
-    tooltipMessage: 'Click to view details'
+    tooltipMessage: 'Click to view details',
+    bold: false
 };
 
 export default CollapsePanel;
