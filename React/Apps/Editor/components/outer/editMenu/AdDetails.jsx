@@ -8,6 +8,9 @@ class AdDetails extends Component {
 		this.renderXPathAndCSS = this.renderXPathAndCSS.bind(this);
 		this.renderSectionName = this.renderSectionName.bind(this);
 		this.renderNetworkDetails = this.renderNetworkDetails.bind(this);
+		this.renderAdCode = this.renderAdCode.bind(this);
+		this.renderCommonDetails = this.renderCommonDetails.bind(this);
+		this.genieeOptions = this.genieeOptions.bind(this);
 	}
 
 	renderXPathAndCSS() {
@@ -73,6 +76,49 @@ class AdDetails extends Component {
 		);
 	}
 
+	renderCommonDetails(fpKey, priceFloor, headerBidding, title) {
+		return (
+			<div>
+				<p>
+					PF Key : <strong>{fpKey}</strong>
+				</p>
+				<p>
+					Price Floor : <strong>{priceFloor}</strong>
+				</p>
+				<p>
+					{title}: <strong>{headerBidding}</strong>
+				</p>
+			</div>
+		);
+	}
+
+	genieeOptions(position, firstFold, zoneId) {
+		return (
+			<div>
+				<p>
+					Position : <strong>{position}</strong>
+				</p>
+				<p>
+					First fold : <strong>{firstFold}</strong>
+				</p>
+				<p>
+					Geniee Zone Id : <strong>{zoneId}</strong>
+				</p>
+			</div>
+		);
+	}
+
+	renderAdCode(adCode) {
+		<div className="mB-10">
+			<span className="mB-10">Ad Code : </span>
+			{adCode ? (
+				<pre style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{adCode}</pre>
+			) : (
+				<strong> Not added</strong>
+			)}
+		</div>;
+	}
+
 	renderNetworkDetails() {
 		const { ad, editNetwork } = this.props;
 		let pfKeyExists = ad.networkData && ad.networkData.keyValues && Object.keys(ad.networkData.keyValues).length,
@@ -83,7 +129,27 @@ class AdDetails extends Component {
 			headerBidding =
 				ad.networkData && ad.networkData.hasOwnProperty('headerBidding')
 					? String(ad.networkData.headerBidding)
-					: 'true';
+					: 'true',
+			firstFold =
+				ad.networkData && ad.networkData.hasOwnProperty('firstFold')
+					? String(ad.networkData.firstFold)
+					: 'true',
+			position =
+				ad.networkData &&
+				ad.networkData.hasOwnProperty('position') &&
+				String(ad.networkData.position) != '' &&
+				ad.networkData.position != null
+					? ad.networkData.position
+					: 'Not set',
+			dynamicAllocation =
+				ad.networkData && ad.networkData.hasOwnProperty('dynamicAllocation')
+					? String(ad.networkData.dynamicAllocation)
+					: 'true',
+			adCode =
+				ad.networkData && ad.networkData.adCode != null && ad.networkData.adCode.trim().length
+					? atob(ad.networkData.adCode)
+					: false,
+			zoneId = ad.networkData && ad.networkData.hasOwnProperty('zoneId') ? ad.networkData.zoneId : 'Not Set';
 
 		return (
 			<div>
@@ -99,28 +165,17 @@ class AdDetails extends Component {
 					</OverlayTrigger>
 				</p>
 				{ad.network == 'adpTags' ? (
+					this.renderCommonDetails(fpKey, priceFloor, headerBidding, 'Header Bidding')
+				) : ad.network == 'geniee' ? (
 					<div>
-						<p>
-							PF Key : <strong>{fpKey}</strong>
-						</p>
-						<p>
-							Price Floor : <strong>{priceFloor}</strong>
-						</p>
-						<p>
-							Header Bidding : <strong>{headerBidding}</strong>
-						</p>
+						<div>
+							{this.renderCommonDetails(fpKey, priceFloor, dynamicAllocation, 'Dynamic Allocation')}
+						</div>
+						{/* <div>{this.genieeOptions(position, firstFold, zoneId)}</div> */}
+						<div>{this.renderAdCode(adCode)}</div>
 					</div>
 				) : (
-					<div className="mB-10">
-						<span className="mB-10">Ad Code : </span>
-						{ad.networkData && ad.networkData.adCode != null && ad.networkData.adCode.trim().length ? (
-							<pre style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-								{atob(ad.networkData.adCode)}
-							</pre>
-						) : (
-							<strong> Not added</strong>
-						)}
-					</div>
+					this.renderAdCode(adCode)
 				)}
 			</div>
 		);

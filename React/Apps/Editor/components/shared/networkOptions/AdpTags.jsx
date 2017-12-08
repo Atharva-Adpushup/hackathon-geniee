@@ -17,8 +17,8 @@ class AdpTags extends Component {
 			advanced: false,
 			keyValues: !code
 				? {
-					[fpKey]: priceFloor
-				}
+						[fpKey]: priceFloor
+					}
 				: code
 		};
 		this.save = this.save.bind(this);
@@ -78,8 +78,8 @@ class AdpTags extends Component {
 				</Row>
 			</div>
 		) : (
-				''
-			);
+			''
+		);
 	}
 
 	renderNormalSaveButton(showButtons = true, submitHandler) {
@@ -90,8 +90,8 @@ class AdpTags extends Component {
 				</Button>
 			</Col>
 		) : (
-				''
-			);
+			''
+		);
 	}
 
 	renderButtons(type = 1, showButtons = true, submitHandler, cancelHandler) {
@@ -153,7 +153,7 @@ class AdpTags extends Component {
 				<Row>
 					<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
 						<CustomToggleSwitch
-							labelText="Header Bidding"
+							labelText={this.props.geniee ? 'Dynamic Allocation' : 'Header Bidding'}
 							className="mB-10"
 							checked={this.state.hbAcivated}
 							onChange={val => {

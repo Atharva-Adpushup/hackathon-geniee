@@ -9,28 +9,28 @@ import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 
 const renderField = field => {
-	return (
-		<div>
-			<Col xs={12} className="u-padding-r10px">
-				<Row>
-					<Col xs={5} className="u-padding-r10px">
-						<strong>{field.label}</strong>
-					</Col>
-					<Col xs={7} className="u-padding-r10px">
-						<input
-							type={field.type}
-							placeholder={field.placeholder}
-							{...field.input}
-							className="inputMinimal"
-						/>
-						{field.meta.touched &&
-							field.meta.error && <div className="error-message">{field.meta.error}</div>}
-					</Col>
-				</Row>
-			</Col>
-		</div>
-	);
-},
+		return (
+			<div>
+				<Col xs={12} className="u-padding-r10px">
+					<Row>
+						<Col xs={5} className="u-padding-r10px">
+							<strong>{field.label}</strong>
+						</Col>
+						<Col xs={7} className="u-padding-r10px">
+							<input
+								type={field.type}
+								placeholder={field.placeholder}
+								{...field.input}
+								className="inputMinimal"
+							/>
+							{field.meta.touched &&
+								field.meta.error && <div className="error-message">{field.meta.error}</div>}
+						</Col>
+					</Row>
+				</Col>
+			</div>
+		);
+	},
 	renderNotNear = ({ fields, meta: { touched, error } }) => (
 		<ul>
 			<li className="mb-30">
@@ -81,7 +81,7 @@ const renderField = field => {
 						<Col xs={7} className="u-padding-r10px mb-10 incontent-network-code-box">
 							<NetworkOptions
 								onSubmit={networkObj => that.setNetwork(networkObj)}
-								onCancel={() => { }}
+								onCancel={() => {}}
 								buttonType={2}
 								fromPanel={true}
 								showNotification={that.props.showNotification}
@@ -195,7 +195,7 @@ const renderField = field => {
 					<Row>
 						<FieldArray name="notNear" component={renderNotNear} />
 					</Row>
-					{currentUser.userType == 'partner' ? (
+					{/* {currentUser.userType == 'partner' ? (
 						<Field
 							placeholder="Custom Zone Id"
 							name="customZoneId"
@@ -203,7 +203,7 @@ const renderField = field => {
 							type="number"
 							label="Custom Zone Id"
 						/>
-					) : null}
+					) : null} */}
 					{renderNetworkOptions(that)}
 				</div>
 				<div style={{ width: '35%', padding: '0px 10px', display: 'inline-block', verticalAlign: 'top' }}>
