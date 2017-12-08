@@ -3,7 +3,6 @@ import { Row, Col, Button } from 'react-bootstrap';
 import CssEditor from 'shared/cssEditor/cssEditor.jsx';
 import CodeBox from 'shared/codeBox.jsx';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
-import SectionOptions from '../insertMenu/sectionOptions.jsx';
 import AdDetails from './AdDetails';
 
 const initialState = {
@@ -88,17 +87,6 @@ class adDescriptor extends React.Component {
 		}
 		return (
 			<div className="containerButtonBar">
-				<Row>
-					{currentUser.userType === 'partner' ? (
-						<SectionOptions
-							updateMode
-							sectionId={section.sectionId}
-							ad={ad}
-							partnerData={section.partnerData}
-							updateSettings={updateSettings}
-						/>
-					) : null}
-				</Row>
 				<Row style={{ margin: '10px 0' }}>
 					<AdDetails
 						userType={currentUser.userType || false}

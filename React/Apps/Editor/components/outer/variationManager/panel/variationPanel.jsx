@@ -37,7 +37,7 @@ class VariationPanel extends React.Component {
 					<div tabTitle="Before/After JS">
 						<BeforeAfterJsPanel channelId={channelId} variation={variation} ui={ui} />
 					</div>
-					<div tabTitle="ADP Key Values">
+					<div tabTitle={currentUser.userType == 'partner' ? 'Geniee Key Values' : 'ADP Key Values'}>
 						<KeyValuesPanel channelId={channelId} variation={variation} sections={sections} ui={ui} />
 					</div>
 				</TabPanel>
