@@ -55,10 +55,11 @@ function processData(response) {
 
 			innerObj[variationId].pageRevenue = isInvalidRevenue ? 0 : innerObj[variationId].pageRevenue;
 		});
-		output.variations = {
-			...output.variations,
-			...innerObj
-		};
+		output.variations = Object.assign(output.variations, innerObj);
+		// output.variations = {
+		// 	...output.variations,
+		// 	...innerObj
+		// };
 	});
 	return Promise.resolve({
 		status: true,
