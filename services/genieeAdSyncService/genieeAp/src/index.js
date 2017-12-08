@@ -17,7 +17,7 @@ $.extend(adp, {
 });
 
 var browserConfig = require('../libs/browserConfig'),
-	selectVariation = require('./variationSelector'),
+	selectVariation = require('./variationSelectionModels/index'),
 	createAds = require('./adCreater'),
 	heartBeat = require('../libs/heartBeat'),
 	hookAndInit = require('./hooksAndBlockList'),
@@ -114,7 +114,7 @@ function main() {
 	}
 
 	if (!config.pageGroup) {
-		pageGroupTimer = setTimeout(function () {
+		pageGroupTimer = setTimeout(function() {
 			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {
