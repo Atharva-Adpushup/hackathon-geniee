@@ -1,9 +1,9 @@
-var utils = require('../libs/utils'),
+var utils = require('../../libs/utils'),
 	$ = require('jquery'),
 	bayesianBanditModel = require('./bayesianBandit')(),
 	randomSelectionModel = require('./randomSelection')();
 
-module.exports = function(config) {
+module.exports = function (config) {
 	var experiment = config.experiment,
 		isAutoOptimise = !!config.autoOptimise,
 		allVariations,
