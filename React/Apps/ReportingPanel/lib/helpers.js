@@ -2,10 +2,10 @@ import commonConsts from './commonConsts';
 import moment from 'moment';
 import dataParser from './dataParser';
 import $ from 'jquery';
-import { Promise } from 'es6-promise';
 import ChartLegend from '../components/ChartLegend/index.jsx';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { filter } from 'lodash';
 
 const apiQueryGenerator = params => {
 	let where = {
@@ -22,6 +22,8 @@ const apiQueryGenerator = params => {
 		if (params.groupBy === commonConsts.DEVICE_TYPE) {
 			select.push(commonConsts.DEVICE_TYPE);
 		}
+	} else {
+		select = filter(select, val => val !== commonConsts.DEVICE_TYPE);
 	}
 
 	if (params.pageGroup) {
@@ -45,7 +47,7 @@ const apiQueryGenerator = params => {
 		groupBy
 	});
 },
-	dataGenerator = (data, groupBy, variations, customToggleOptions) => {
+	dataGenerator = (data, groupBy, variations, customToggleOptions, activeLegendItems) => {
 		let config = {
 			title: {
 				text: ''
@@ -65,7 +67,7 @@ const apiQueryGenerator = params => {
 					load: event => {
 						const chart = event.target,
 							node = document.getElementById('chart-legend');
-						ReactDOM.render(<ChartLegend chart={chart} />, node);
+						ReactDOM.render(<ChartLegend chart={chart} activeLegendItems={activeLegendItems} />, node);
 					}
 				}
 			},
@@ -75,7 +77,7 @@ const apiQueryGenerator = params => {
 			tooltip: {
 				shared: true
 			},
-			colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e', '#eb575c'],
+			colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e', '#eb575c', '#ca29f3'],
 			credits: {
 				enabled: false
 			},

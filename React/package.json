@@ -6,7 +6,6 @@
 	"dependencies": {
 		"clipboard-polyfill": "^2.3.0",
 		"clipboard.js": "^1.0.1",
-		"es6-promise": "^4.1.1",
 		"jquery": "^3.2.1",
 		"lodash": "^4.17.4",
 		"normalizr": "2.2.1",
@@ -59,8 +58,8 @@
 		"webpack": "^3.6.0"
 	},
 	"scripts": {
-		"build": "./node_modules/.bin/parallel-webpack --progress",
-		"watch": "./node_modules/.bin/parallel-webpack --watch",
+		"build": "./node_modules/.bin/parallel-webpack --progress --config webpack-prod.js",
+		"watch": "./node_modules/.bin/parallel-webpack --watch --config webpack-dev.js",
 		"start": "node server.js"
 	},
 	"author": "Yomesh Gupta <yomesh.gupta@gmail.com> (http://www.yomeshgupta.com/)",
