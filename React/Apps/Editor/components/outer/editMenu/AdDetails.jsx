@@ -92,14 +92,17 @@ class AdDetails extends Component {
 		);
 	}
 
-	genieeOptions(position, firstFold) {
+	genieeOptions(position, firstFold, zoneId) {
 		return (
 			<div>
 				<p>
 					Position : <strong>{position}</strong>
 				</p>
 				<p>
-					firstFold : <strong>{firstFold}</strong>
+					First fold : <strong>{firstFold}</strong>
+				</p>
+				<p>
+					Geniee Zone Id : <strong>{zoneId}</strong>
 				</p>
 			</div>
 		);
@@ -132,8 +135,8 @@ class AdDetails extends Component {
 					? String(ad.networkData.firstFold)
 					: 'true',
 			position =
-				ad.networkData && ad.networkData.hasOwnProperty('position')
-					? String(ad.networkData.position)
+				ad.networkData && ad.networkData.hasOwnProperty('position') && ad.networkData.position != ''
+					? ad.networkData.position
 					: 'Not set',
 			dynamicAllocation =
 				ad.networkData && ad.networkData.hasOwnProperty('dynamicAllocation')
@@ -142,7 +145,8 @@ class AdDetails extends Component {
 			adCode =
 				ad.networkData && ad.networkData.adCode != null && ad.networkData.adCode.trim().length
 					? atob(ad.networkData.adCode)
-					: false;
+					: false,
+			zoneId = ad.networkData && ad.networkData.hasOwnProperty('zoneId') ? ad.networkData.zoneId : 'Not Set';
 
 		return (
 			<div>
@@ -157,13 +161,19 @@ class AdDetails extends Component {
 						</span>
 					</OverlayTrigger>
 				</p>
-				{ad.network == 'adpTags'
-					? this.renderCommonDetails(fpKey, priceFloor, headerBidding, 'Header Bidding')
-					: ad.network == 'geniee'
-						? (this.renderCommonDetails(fpKey, priceFloor, dynamicAllocation, 'Dynamic Allocation'),
-							this.genieeOptions(position, firstFold),
-							this.renderAdCode(adCode))
-						: this.renderAdCode(adCode)}
+				{ad.network == 'adpTags' ? (
+					this.renderCommonDetails(fpKey, priceFloor, headerBidding, 'Header Bidding')
+				) : ad.network == 'geniee' ? (
+					<div>
+						<div>
+							{this.renderCommonDetails(fpKey, priceFloor, dynamicAllocation, 'Dynamic Allocation')}
+						</div>
+						<div>{this.genieeOptions(position, firstFold, zoneId)}</div>
+						<div>{this.renderAdCode(adCode)}</div>
+					</div>
+				) : (
+					this.renderAdCode(adCode)
+				)}
 			</div>
 		);
 	}

@@ -32,24 +32,6 @@ class sectionOptions extends React.Component {
 			customAdCode: props.customAdCode,
 			zoneId: props.zoneId
 		};
-
-		// if (!this.props.updateMode) {
-		// 	this.state = {
-		// 		position: undefined,
-		// 		isAdInFirstFold: props.firstFold || false,
-		// 		isAdAsync: true,
-		// 		manageCustomCode: false,
-		// 		customAdCode: '',
-		// 		zoneId: props.zoneId || ''
-		// 	};
-		// } else {
-		// 	this.state = {
-		// 		position: this.props.partnerData.position,
-		// 		isAdInFirstFold: this.props.partnerData.firstFold,
-		// 		isAdAsync: this.props.partnerData.asyncTag,
-		// 		zoneId: this.props.partnerData.zoneId
-		// 	};
-		// }
 	}
 
 	onCustomZoneIdSubmit(zoneId) {
@@ -107,16 +89,22 @@ class sectionOptions extends React.Component {
 
 	renderCustomZoneIdInput(zoneId) {
 		return (
-			<InlineEdit
-				rootClassNames="u-margin-b15px"
-				type="number"
-				validate
-				font={400}
-				value={zoneId}
-				submitHandler={this.onCustomZoneIdSubmit}
-				text="Custom Zone Id"
-				errorMessage="Custom zone id cannot be blank"
-			/>
+			<Row className="mT-10">
+				<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
+					<strong>Geniee Zone Id</strong>
+				</Col>
+				<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
+					<input
+						type="text"
+						placeholder="Enter Geniee Zone Id"
+						className="inputBasic mB-10"
+						value={zoneId}
+						onChange={ev => {
+							this.setState({ zoneId: ev.target.value });
+						}}
+					/>
+				</Col>
+			</Row>
 		);
 	}
 
@@ -143,10 +131,10 @@ class sectionOptions extends React.Component {
 				style={updateMode ? { paddingBottom: 0, marginRight: 15, marginLeft: 15 } : {}}
 			>
 				<Row>
-					<Col md={3}>
+					<Col md={3} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
 						<b>Position</b>
 					</Col>
-					<Col md={9}>
+					<Col md={9} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
 						<SelectBox value={this.state.position} label="Select Position" onChange={this.onChange}>
 							{positions.map((pos, index) => (
 								<option key={index} value={index}>
@@ -168,6 +156,10 @@ class sectionOptions extends React.Component {
 					id="js-ad-in-first-fold"
 					on="Yes"
 					off="No"
+					defaultLayout={this.props.fromPanel ? false : true}
+					name={this.props.id ? `firstFold-${this.props.id}` : 'firstFold'}
+					id={this.props.id ? `js-first-fold-switch-${this.props.id}` : 'js-first-fold-switch'}
+					customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
 				/>
 				<CustomToggleSwitch
 					labelText="Async tag"
@@ -181,6 +173,10 @@ class sectionOptions extends React.Component {
 					id="js-ad-is-async"
 					on="Yes"
 					off="No"
+					defaultLayout={this.props.fromPanel ? false : true}
+					name={this.props.id ? `asyncTag-${this.props.id}` : 'asyncTag'}
+					id={this.props.id ? `js-async-tag-switch-${this.props.id}` : 'js-async-tag-switch'}
+					customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
 				/>
 				{updateMode && !zoneId ? null : this.renderCustomZoneIdInput(zoneId)}
 
@@ -197,49 +193,6 @@ class sectionOptions extends React.Component {
 					showNotification={this.props.showNotification}
 					geniee={true}
 				/>
-
-				{/* {updateMode ? (
-					<Button
-						style={{ marginBottom: 20 }}
-						disabled={!isAdCreateBtnDisabled}
-						className="btn-lightBg btn-save btn-block"
-						onClick={updateSettings.bind(null, sectionId, ad.id, {
-							position,
-							firstFold,
-							asyncTag,
-							zoneId
-						})}
-					>
-						Update Settings
-					</Button>
-				) : (
-					<div>
-						<LabelWithButton
-							name="customAdCode"
-							className="u-margin-t15px u-margin-b15px"
-							onButtonClick={this.toggleCustomAdCode}
-							labelText="Custom Ad code"
-							layout="horizontal"
-							buttonText={customAdCodeText}
-						/>
-						<Row className="butttonsRow">
-							<Col xs={5}>
-								<Button className="btn-lightBg btn-cancel btn-block" onClick={this.props.onCancel}>
-									Back
-								</Button>
-							</Col>
-							<Col xs={7}>
-								<Button
-									disabled={!isAdCreateBtnDisabled}
-									className="btn-lightBg btn-save btn-block"
-									onClick={this.onSave}
-								>
-									Create Ad
-								</Button>
-							</Col>
-						</Row>
-					</div>
-				)} */}
 			</div>
 		);
 	}

@@ -69,10 +69,12 @@ module.exports = function(app) {
 		}
 
 		if (req.session && req.session.partner === 'geniee' && !isAuthorised()) {
-			req.session.destroy(function() {
-				return res.redirect('/403');
-			});
-			return;
+			if (req.url.indexOf('.map') == -1) {
+				req.session.destroy(function() {
+					return res.redirect('/403');
+				});
+				return;
+			}
 		}
 		next();
 	});
