@@ -65,9 +65,62 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// Interactive ads main module
+
+var commconConsts = __webpack_require__(3),
+    emitter = __webpack_require__(1);
+
+window.addEventListener(commconConsts.EVENTS.PAGE_LOAD, function (event) {
+    emitter.publish(commconConsts.EVENTS.PAGE_LOAD, event);
+});
+
+emitter.subscribe(commconConsts.EVENTS.PAGE_LOAD, function (data) {
+    console.log(data);
+});
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports) {
 
+// Pub-Sub module
 
+var emitter = {
+    events: {},
+    publish: function (event, data) {
+        if (this.events.hasOwnProperty(event)) {
+            this.events[event].forEach(function (listener) {
+                listener(data);
+            });
+        }
+    },
+    subscribe: function (event, listener) {
+        if (!this.events.hasOwnProperty(event)) {
+            this.events[event] = [];
+        }
+
+        this.events[event].push(listener);
+    }
+};
+
+module.exports = emitter;
+
+/***/ }),
+/* 2 */,
+/* 3 */
+/***/ (function(module, exports) {
+
+// Common constants
+
+var commonConsts = {
+    EVENTS: {
+        PAGE_LOAD: 'load',
+        DOM_LOAD: 'DOMContentLoaded'
+    }
+};
+
+module.exports = commonConsts;
 
 /***/ })
 /******/ ]);
