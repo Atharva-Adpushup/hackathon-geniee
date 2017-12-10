@@ -16,7 +16,7 @@ var emitter = {
 		this.events[event].push(listener);
 		return {
 			unsubscribe: function () {
-				this.events[event].splice(this.events[event].indexOf(listener), 1); §11
+				this.events[event].splice(this.events[event].indexOf(listener), 1);
 			}
 		};
 	}
