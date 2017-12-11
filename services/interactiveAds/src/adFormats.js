@@ -1,7 +1,7 @@
 // Ad formats module
 
 var commonConsts = require('./commonConsts'),
-	utils = require('./utils'),
+	utils = require('./helpers/utils'),
 	checkAdFormat = function(format, size, adCode) {
 		if (!adCode) {
 			console.warn('No ad code provided in ' + format.NAME + ' format. Ad could not be created.');
@@ -26,11 +26,11 @@ var commonConsts = require('./commonConsts'),
 						height: formatSize[1]
 					}),
 					attrs = {
-						className: commonConsts.DEFAULT_FORMAT_CLASSNAME
+						class: commonConsts.DEFAULT_FORMAT_CLASSNAME
 					},
-					stickyFooter = utils.createDOMNode('div', styles, attrs, adCode);
+					stickyFooter = utils.createDOMNode(styles, attrs, adCode);
 
-				document.body.appendChild(stickyFooter);
+				$('body').append(stickyFooter);
 			}
 		}
 	};
