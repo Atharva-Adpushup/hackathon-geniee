@@ -54,4 +54,4 @@ def build():
 	with lcd(reactAppsPath):
 		lrun('echo "/******************** Building React Apps files ********************/"')
 		lrun('npm install')
-		lrun('webpack --progress')
+		lrun('npm run build')
