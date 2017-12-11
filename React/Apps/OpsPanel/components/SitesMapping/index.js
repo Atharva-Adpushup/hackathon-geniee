@@ -4,14 +4,15 @@ import clipboard from 'clipboard-polyfill';
 import moment from 'moment';
 import { Row, Col, Breadcrumb } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import '../../../ReportingPanel/styles.scss';
 import Datatable from 'react-bs-datatable';
-import { labels, headers, modes, statuses } from '../../configs/commonConsts';
+import '../../../ReportingPanel/styles.scss';
+import { siteMapping } from '../../configs/commonConsts';
 import { ajax } from '../../../../common/helpers';
 import ActionCard from '../../../../Components/ActionCard.jsx';
 import Badges from '../../../../Components/Badges.jsx';
 import SelectBox from '../../../../Components/SelectBox/index.jsx';
 
+const { labels, headers, modes, statuses } = siteMapping;
 class SitesMapping extends Component {
 	constructor(props) {
 		super(props);
@@ -20,8 +21,8 @@ class SitesMapping extends Component {
 			loaded: loaded,
 			tableConfig: loaded ? this.generateTableData(this.props.sites) : null,
 			hasSites: loaded,
-			mode: false,
-			status: false,
+			mode: null,
+			status: null,
 			totalSites: loaded ? this.props.sites.length : 0
 		};
 		this.generateStatus = this.generateStatus.bind(this);
@@ -159,8 +160,8 @@ class SitesMapping extends Component {
 							extra={site.siteId}
 						/>
 					) : (
-							'No channels'
-						),
+						'No channels'
+					),
 				[labels['pubId']]: site.pubId || 'Oauth not present',
 				[labels['adsenseEmail']]: site.adsenseEmail || 'Oauth not present',
 				[labels['step']]: this.generateStatus(site.step),
@@ -179,8 +180,8 @@ class SitesMapping extends Component {
 				</Breadcrumb>
 			</div>
 		) : (
-				''
-			);
+			''
+		);
 	}
 
 	renderSelect(value, label, changeHandler, array, disabled) {
@@ -248,11 +249,11 @@ class SitesMapping extends Component {
 							/>
 						</div>
 					) : (
-							'Not sites Available'
-						)
+						'Not sites Available'
+					)
 				) : (
-						'Loading Data...'
-					)}
+					'Loading Data...'
+				)}
 			</ActionCard>
 		);
 	}

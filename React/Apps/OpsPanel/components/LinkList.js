@@ -13,9 +13,9 @@ const LinkList = props => {
 					<Link to="/ops/sitesMapping">
 						<ListGroupItem listItem>Sites Mapping</ListGroupItem>
 					</Link>
-					{/* <Link to="/ops/liveSitesMapping">
+					<Link to="/ops/liveSitesMapping">
 						<ListGroupItem listItem>Live Sites Mapping</ListGroupItem>
-					</Link> */}
+					</Link>
 				</ListGroup>
 			</Col>
 		</Row>

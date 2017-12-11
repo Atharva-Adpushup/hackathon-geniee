@@ -1,7 +1,7 @@
 const Promise = require('bluebird'),
 	_ = require('lodash'),
 	dbHelper = require('../common/mssql/dbhelper'),
-	{ fetchSectionQuery, fetchVariationQuery, fetchPagegroupQuery } = require('./constants'),
+	{ fetchSectionQuery, fetchVariationQuery, fetchPagegroupQuery, liveSitesQuery } = require('./constants'),
 	queryHelper = require('./queryHelper');
 
 function checkWhere(where) {
@@ -186,6 +186,29 @@ function generate(data) {
 		});
 }
 
+function fetchLiveSites(params) {
+	return executeQuery({
+		query: liveSitesQuery,
+		inputParameters: [
+			{
+				name: '__from__',
+				type: 'DATE',
+				value: params.from
+			},
+			{
+				name: '__to__',
+				type: 'DATE',
+				value: params.to
+			},
+			{
+				name: '__threshold__',
+				type: 'INT',
+				value: params.threshold
+			}
+		]
+	});
+}
+
 /*
 total_impressions ----> total_ad_requests
 total_requests ----> total_pageviews
@@ -210,4 +233,4 @@ display_name ---> network
 // 		debugger;
 // 	});
 
-module.exports = { generate, getPVS, executeQuery };
+module.exports = { generate, getPVS, executeQuery, fetchLiveSites };
