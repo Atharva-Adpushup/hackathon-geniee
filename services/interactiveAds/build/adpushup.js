@@ -69,46 +69,24 @@
 
 // Interactive ads main module
 
-var commconConsts = __webpack_require__(3),
-    emitter = __webpack_require__(1);
+var commconConsts = __webpack_require__(1),
+	emitter = __webpack_require__(2);
 
-window.addEventListener(commconConsts.EVENTS.PAGE_LOAD, function (event) {
-    emitter.publish(commconConsts.EVENTS.PAGE_LOAD, event);
+window.addEventListener(commconConsts.EVENTS.PAGE_LOAD, function(event) {
+	//emitter.publish(commconConsts.EVENTS.PAGE_LOAD, event);
 });
 
-emitter.subscribe(commconConsts.EVENTS.PAGE_LOAD, function (data) {
-    console.log(data);
+var e = emitter.subscribe(commconConsts.EVENTS.PAGE_LOAD, function(data) {
+	console.log(data);
 });
+
+e.unsubscribe();
+
+console.log(emitter);
+
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
-
-// Pub-Sub module
-
-var emitter = {
-    events: {},
-    publish: function (event, data) {
-        if (this.events.hasOwnProperty(event)) {
-            this.events[event].forEach(function (listener) {
-                listener(data);
-            });
-        }
-    },
-    subscribe: function (event, listener) {
-        if (!this.events.hasOwnProperty(event)) {
-            this.events[event] = [];
-        }
-
-        this.events[event].push(listener);
-    }
-};
-
-module.exports = emitter;
-
-/***/ }),
-/* 2 */,
-/* 3 */
 /***/ (function(module, exports) {
 
 // Common constants
@@ -121,6 +99,38 @@ var commonConsts = {
 };
 
 module.exports = commonConsts;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+// Pub-Sub module
+
+var emitter = {
+	events: {},
+	publish: function(event, data) {
+		if (this.events.hasOwnProperty(event)) {
+			this.events[event].forEach(function(listener) {
+				listener(data);
+			});
+		}
+	},
+	subscribe: function(event, listener) {
+		if (!this.events.hasOwnProperty(event)) {
+			this.events[event] = [];
+		}
+		this.events[event].push(listener);
+
+		return {
+			unsubscribe: function() {
+				this.events[event].splice(this.events[event].indexOf(listener), 1);
+			}.bind(this)
+		};
+	}
+};
+
+module.exports = emitter;
+
 
 /***/ })
 /******/ ]);
