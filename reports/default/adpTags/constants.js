@@ -463,6 +463,17 @@ const schema = {
 	}
 };
 
+const ANAMOLY_PAGE_VIEW_IMPRESSION_XPATH_MISS = `
+EXEC GetPVIXAnomaly @__weekStartDate__,@__weekEndDate__,@__yesterdayDate__,@__codeRemovedThreshold__,@__pageViewThreshold__,@__pageViewMinThreshold__,@__impressionThreshold__,@__impressionMinThreshold__,@__xpathMissThreshold__,@__xpathMissMinThreshold__`;
+
+
+const ANAMOLY_CPM = `
+EXEC GetCpmAnomaly @__weekStartDate__,@__weekEndDate__,@__yesterdayDate__,@__pageViewMinThreshold__,@__cpmThreshold__,@__cpmMinThreshold__`;
+
+
+const ANAMOLY_DETERMINED_MODE = `
+EXEC GetDMAnomaly  @__weekStartDate__,@__weekEndDate__,@__yesterdayDate__,@__pageViewMinThreshold__,@__determinedModeThreshold__,@__determinedModeMinThreshold__`;
+
 module.exports = {
 	schema,
 	fetchSectionQuery,
@@ -473,5 +484,8 @@ module.exports = {
 	PLATFORMS_KEYS,
 	REGEX_DATE_FORMAT,
 	STRING_DATE_FORMAT,
-	SITE_PAGEGROUP_WISE_REVENUE_CONTRIBUTION
+	SITE_PAGEGROUP_WISE_REVENUE_CONTRIBUTION,
+	ANAMOLY_PAGE_VIEW_IMPRESSION_XPATH_MISS,
+	ANAMOLY_CPM,
+	ANAMOLY_DETERMINED_MODE
 };
