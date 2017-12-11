@@ -11,7 +11,7 @@ events.onPageLoad(function(data) {
 
 var pageLoadEvent = emitter.subscribe(commconConsts.EVENTS.PAGE_LOAD, function(data) {
 	//console.log(data);
-	adFormats.sitckyFooter([728, 90], 'adcode');
+	adFormats.createSitckyFooter([728, 90], '728x90');
 });
 
 //pageLoadEvent.unsubscribe();

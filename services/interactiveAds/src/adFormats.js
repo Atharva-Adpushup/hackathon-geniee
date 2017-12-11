@@ -1,30 +1,37 @@
 // Ad formats module
 
 var commonConsts = require('./commonConsts'),
+	utils = require('./utils'),
+	checkAdFormat = function(format, size, adCode) {
+		if (!adCode) {
+			console.warn('No ad code provided in ' + format.NAME + ' format. Ad could not be created.');
+			return false;
+		}
+
+		if (!size || size.length !== 2) {
+			console.warn('Size format is incorrect in ' + format.NAME + ' format, applying default size.');
+			size = format.SIZE;
+		}
+
+		return size;
+	},
 	adFormats = {
-		sitckyFooter: function(size, adCode) {
-			// Size is an array of format - [width, height]
+		createSitckyFooter: function(size, adCode) {
+			var format = commonConsts.FORMATS.STICKY_FOOTER,
+				formatSize = checkAdFormat(format, size, adCode);
 
-			if (!adCode) {
-				console.warn('No ad code provided in Sticky Footer format.');
-				return;
+			if (formatSize) {
+				var styles = Object.assign(commonConsts.FORMATS.STICKY_FOOTER.STYLES, {
+						width: formatSize[0],
+						height: formatSize[1]
+					}),
+					attrs = {
+						className: commonConsts.DEFAULT_FORMAT_CLASSNAME
+					},
+					stickyFooter = utils.createDOMNode('div', styles, attrs, adCode);
+
+				document.body.appendChild(stickyFooter);
 			}
-
-			if (!size || size.length !== 2) {
-				console.warn('Size format is incorrect in Sticky Footer format, applying default size.');
-				size = commonConsts.SIZES.STICKY_FOOTER;
-			}
-
-			var div = document.createElement('div');
-			div.style.width = size[0];
-			div.style.height = size[1];
-			div.style.position = 'fixed';
-			div.style.bottom = 0;
-			div.style.margin = '0 auto';
-			div.innerHTML = adCode;
-			div.className = 'adp_ad';
-
-			document.body.appendChild(div);
 		}
 	};
 
