@@ -91,3 +91,16 @@ $primaryColor: #eb575c;
 		overflow-y: scroll;
 	}
 }
+
+.inputMinimal {
+	width: 100%;
+	padding: 6px 10px;
+	border-radius: 3px;
+	border: 2px solid rgb(204, 204, 204);
+}
+
+.live-sites-filters {
+	.DateRangePicker.DateRangePicker_1 {
+		width: 100% !important;
+	}
+}

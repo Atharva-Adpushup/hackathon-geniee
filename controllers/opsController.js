@@ -3,6 +3,7 @@ const express = require('express'),
 	_ = require('lodash'),
 	{ couchbaseService } = require('node-utils'),
 	config = require('../configs/config'),
+	{ fetchLiveSites } = require('../reports/default/adpTags/index'),
 	router = express.Router(),
 	appBucket = couchbaseService(
 		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
@@ -12,9 +13,9 @@ const express = require('express'),
 
 const fn = {
 	getAllSitesFromCouchbase: () => {
-		let query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${config
-			.couchBase.DEFAULT_BUCKET} a join ${config.couchBase
-			.DEFAULT_BUCKET} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
+		let query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${
+			config.couchBase.DEFAULT_BUCKET
+		} a join ${config.couchBase.DEFAULT_BUCKET} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
 		return appBucket.queryDB(query);
 	}
 };
@@ -44,6 +45,35 @@ router
 			}
 		}
 	)
+	.post('/getLiveSites', (req, res) => {
+		let response = {
+				error: false,
+				data: []
+			},
+			params = {
+				threshold: req.body && req.body.threshold ? req.body.threshold : 0,
+				from:
+					req.body && req.body.from
+						? moment(req.body.from).format('YYYY-MM-DD')
+						: moment()
+								.subtract(7, 'days')
+								.format('YYYY-MM-DD'),
+				to:
+					req.body && req.body.to
+						? moment(req.body.to).format('YYYY-MM-DD')
+						: moment()
+								.subtract(1, 'days')
+								.format('YYYY-MM-DD')
+			};
+		return fetchLiveSites(params)
+			.then(resultFromQuery => {
+				resultFromQuery && resultFromQuery.length ? (response.data = resultFromQuery) : null;
+				return res.send(response);
+			})
+			.catch(err => {
+				return res.send(Object.assign(response, { error: true }));
+			});
+	})
 	.post('/getAllSites', (req, res) => {
 		let response = {
 			error: false
