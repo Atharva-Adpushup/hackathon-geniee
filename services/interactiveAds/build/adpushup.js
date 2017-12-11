@@ -60,33 +60,11 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// Interactive ads main module
-
-var commconConsts = __webpack_require__(1),
-	emitter = __webpack_require__(2);
-
-window.addEventListener(commconConsts.EVENTS.PAGE_LOAD, function(event) {
-	//emitter.publish(commconConsts.EVENTS.PAGE_LOAD, event);
-});
-
-var e = emitter.subscribe(commconConsts.EVENTS.PAGE_LOAD, function(data) {
-	console.log(data);
-});
-
-e.unsubscribe();
-
-console.log(emitter);
-
-
-/***/ }),
-/* 1 */
 /***/ (function(module, exports) {
 
 // Common constants
@@ -96,12 +74,38 @@ var commonConsts = {
 		PAGE_LOAD: 'load',
 		DOM_LOAD: 'DOMContentLoaded'
 	},
-	SIZES: {
-		STICKY_FOOTER: [729, 90]
+	FORMATS: {
+		STICKY_FOOTER: {
+			SIZE: [728, 90],
+			NAME: 'Sticky Footer'
+		}
 	}
 };
 
 module.exports = commonConsts;
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// Interactive ads main module
+
+var commconConsts = __webpack_require__(0),
+	emitter = __webpack_require__(2),
+	events = __webpack_require__(3),
+	adFormats = __webpack_require__(4);
+
+events.onPageLoad(function(data) {
+	emitter.publish(commconConsts.EVENTS.PAGE_LOAD, data);
+});
+
+var pageLoadEvent = emitter.subscribe(commconConsts.EVENTS.PAGE_LOAD, function(data) {
+	//console.log(data);
+	adFormats.sitckyFooter([728, 90], 'adcode');
+});
+
+//pageLoadEvent.unsubscribe();
 
 
 /***/ }),
@@ -134,6 +138,61 @@ var emitter = {
 };
 
 module.exports = emitter;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// Events module
+
+var commonConsts = __webpack_require__(0),
+	events = {
+		onPageLoad: function(callback) {
+			window.addEventListener(commonConsts.EVENTS.PAGE_LOAD, function(event) {
+				return callback(event);
+			});
+		}
+	};
+
+module.exports = events;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// Ad formats module
+
+var commonConsts = __webpack_require__(0),
+	adFormats = {
+		sitckyFooter: function(size, adCode) {
+			// Size is an array of format - [width, height]
+
+			if (!adCode) {
+				console.warn('No ad code provided in Sticky Footer format.');
+				return;
+			}
+
+			if (!size || size.length !== 2) {
+				console.warn('Size format is incorrect in Sticky Footer format, applying default size.');
+				size = commonConsts.SIZES.STICKY_FOOTER;
+			}
+
+			var div = document.createElement('div');
+			div.style.width = size[0];
+			div.style.height = size[1];
+			div.style.position = 'fixed';
+			div.style.bottom = 0;
+			div.style.margin = '0 auto';
+			div.innerHTML = adCode;
+			div.className = 'adp_ad';
+
+			document.body.appendChild(div);
+		}
+	};
+
+module.exports = adFormats;
 
 
 /***/ })
