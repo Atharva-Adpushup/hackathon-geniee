@@ -7,7 +7,7 @@ const mailContentLogger = new woodlot({
 });
 
 function sendMail(dataObject) {
-	const { header, content, emailId } = dataObject,
+	const { header, content, emailId, cc } = dataObject,
 		isDataExists = !!(header && content && emailId);
 
 	if (!isDataExists) {
@@ -19,14 +19,14 @@ function sendMail(dataObject) {
 	}
 
 	const mailConfig = {
-			MAIL_FROM: config.MAIL_FROM,
-			MAIL_FROM_NAME: config.MAIL_FROM_NAME,
-			SMTP_SERVER: config.SMTP_SERVER,
-			SMTP_USERNAME: config.SMTP_USERNAME,
-			SMTP_PASSWORD: config.SMTP_PASSWORD
-		},
+		MAIL_FROM: config.MAIL_FROM,
+		MAIL_FROM_NAME: config.MAIL_FROM_NAME,
+		SMTP_SERVER: config.SMTP_SERVER,
+		SMTP_USERNAME: config.SMTP_USERNAME,
+		SMTP_PASSWORD: config.SMTP_PASSWORD
+	},
 		mailer = new Mailer(mailConfig, 'html'),
-		mailDataConfig = { to: emailId, subject: header, html: content };
+		mailDataConfig = { to: emailId, subject: header, html: content, cc: (cc ? cc : "") };
 
 	return mailer.send(mailDataConfig).then(() => {
 		return {
