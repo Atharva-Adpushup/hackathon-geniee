@@ -10,7 +10,7 @@ const fetchLiveSites = params => (dispatch, getState) => {
 		if (response.error) {
 			alert('Error occured. Please try again later');
 		}
-		return dispatch({ type: liveSitesMappingActions.SET_SITES_DATA, data: response.sites });
+		return dispatch({ type: liveSitesMappingActions.SET_LIVE_SITES_DATA, data: response.data });
 	});
 };
 

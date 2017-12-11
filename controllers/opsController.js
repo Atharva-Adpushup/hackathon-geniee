@@ -67,10 +67,11 @@ router
 			};
 		return fetchLiveSites(params)
 			.then(resultFromQuery => {
-				debugger;
+				resultFromQuery && resultFromQuery.length ? (response.data = resultFromQuery) : null;
+				return res.send(response);
 			})
 			.catch(err => {
-				return res.send(response);
+				return res.send(Object.assign(response, { error: true }));
 			});
 	})
 	.post('/getAllSites', (req, res) => {
