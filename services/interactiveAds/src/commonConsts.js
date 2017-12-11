@@ -3,9 +3,9 @@
 var commonConsts = {
 	EVENTS: {
 		PAGE_LOAD: 'load',
-		DOM_LOAD: 'DOMContentLoaded'
+		DOM_LOAD: 'DOMContentLoaded',
+		SCROLL: 'scroll'
 	},
-	DEFAULT_NODE_TYPE: 'div',
 	DEFAULT_FORMAT_CLASSNAME: 'adp_ad_format',
 	FORMATS: {
 		STICKY_FOOTER: {

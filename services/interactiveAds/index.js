@@ -1,13 +1,13 @@
 // Interactive ads main module
 
+require('./src/events');
+require('./src/helpers/polyfills');
+
+window.$ = require('jquery');
+
 var commconConsts = require('./src/commonConsts'),
 	emitter = require('./src/emitter'),
-	events = require('./src/events'),
 	adFormats = require('./src/adFormats');
-
-events.onPageLoad(function(data) {
-	emitter.publish(commconConsts.EVENTS.PAGE_LOAD, data);
-});
 
 var pageLoadEvent = emitter.subscribe(commconConsts.EVENTS.PAGE_LOAD, function(data) {
 	//console.log(data);
