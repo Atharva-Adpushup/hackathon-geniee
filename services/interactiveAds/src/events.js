@@ -1,12 +1,16 @@
 // Events module
 
 var commonConsts = require('./commonConsts'),
-	events = {
-		onPageLoad: function(callback) {
-			window.addEventListener(commonConsts.EVENTS.PAGE_LOAD, function(event) {
-				return callback(event);
-			});
-		}
-	};
+	emitter = require('./emitter');
 
-module.exports = events;
+window.addEventListener(commonConsts.EVENTS.PAGE_LOAD, function(data) {
+	emitter.publish(commonConsts.EVENTS.PAGE_LOAD, data);
+});
+
+window.addEventListener(commonConsts.EVENTS.DOM_LOAD, function(data) {
+	emitter.publish(commonConsts.EVENTS.DOM_LOAD, data);
+});
+
+window.addEventListener(commonConsts.EVENTS.SCROLL, function(data) {
+	emitter.publish(commonConsts.EVENTS.SCROLL, data);
+});
