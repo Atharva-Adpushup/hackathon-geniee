@@ -4,7 +4,7 @@ import LinkList from './LinkList';
 import OpsPanel from './OpsPanel.jsx';
 import Settings from './Settings/index';
 import SitesMappingContainer from '../containers/sitesMappingContainer';
-import LiveSitesMappingContainer from '../containers/LiveSitesMappingContainer';
+import LiveSitesMappingContainer from '../containers/liveSitesMappingContainer';
 
 class App extends Component {
 	constructor(props) {
