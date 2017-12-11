@@ -2,6 +2,10 @@ const siteMappingActions = {
 		FETCH_SITES: 'FETCH_SITES',
 		SET_SITES_DATA: 'SET_SITES_DATA'
 	},
+	liveSitesMappingActions = {
+		FETCH_LIVE_SITES: 'FETCH_LIVE_SITES',
+		SET_LIVE_SITES_DATA: 'SET_LIVE_SITES_DATA'
+	},
 	labels = {
 		siteId: 'Site Id',
 		siteDomain: 'Site Domain',
@@ -108,4 +112,4 @@ const siteMappingActions = {
 		}
 	];
 
-export { siteMappingActions, labels, headers, modes, statuses };
+export { siteMappingActions, liveSitesMappingActions, labels, headers, modes, statuses };

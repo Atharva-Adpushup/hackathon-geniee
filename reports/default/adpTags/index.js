@@ -189,23 +189,23 @@ function generate(data) {
 function fetchLiveSites(params) {
 	return executeQuery({
 		query: liveSitesQuery,
-		inputParameters: {
-			from: {
+		inputParameters: [
+			{
 				name: '__from__',
 				type: 'DATE',
 				value: params.from
 			},
-			to: {
+			{
 				name: '__to__',
 				type: 'DATE',
 				value: params.to
 			},
-			threshold: {
-				name: '__threshold',
+			{
+				name: '__threshold__',
 				type: 'INT',
 				value: params.threshold
 			}
-		}
+		]
 	});
 }
 

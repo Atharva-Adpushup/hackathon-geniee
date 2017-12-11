@@ -1,12 +1,12 @@
 import { connect } from 'react-redux';
-import { fetchSites } from '../actions/siteMappingActions';
+import { fetchLiveSites } from '../actions/liveSitesMappingActions';
 import LiveSitesMapping from '../components/LiveSitesMapping/index';
 
 const mapStateToProps = (state, ownProps) => ({
-		sites: state.sites
+		sites: state.livesites
 	}),
 	mapDispatchToProps = dispatch => ({
-		fetchSites: () => dispatch(fetchSites())
+		fetchLiveSites: params => dispatch(fetchLiveSites(params))
 	});
 
 export default connect(mapStateToProps, mapDispatchToProps)(LiveSitesMapping);

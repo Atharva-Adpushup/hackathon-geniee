@@ -6,7 +6,28 @@ import ActionCard from '../../../../Components/ActionCard.jsx';
 class LiveSitesMapping extends Component {
 	constructor(props) {
 		super(props);
-		// this.fetchLiveSitesWrapper = this.fetchLiveSitesWrapper.bind(this);
+		let loaded = this.props.livesites && this.props.livesites.length ? true : false;
+		this.state = {
+			loaded: loaded,
+			threshold: 0,
+			tableConfig: loaded ? this.generateTableData(this.props.sites) : null,
+			hasSites: loaded,
+			totalSites: loaded ? this.props.sites.length : 0,
+			sites: null
+		};
+		// this.generateStatus = this.generateStatus.bind(this);
+		// this.generateClickableSpan = this.generateClickableSpan.bind(this);
+		// this.clickHandler = this.clickHandler.bind(this);
+		// this.modeChangeHandler = this.modeChangeHandler.bind(this);
+		// this.statusChangeHandler = this.statusChangeHandler.bind(this);
+	}
+
+	componentDidMount() {
+		this.state.loaded
+			? null
+			: this.props.fetchLiveSites({
+					threshold: this.state.threshold
+				});
 	}
 
 	render() {
