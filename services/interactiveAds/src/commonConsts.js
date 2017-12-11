@@ -5,8 +5,11 @@ var commonConsts = {
 		PAGE_LOAD: 'load',
 		DOM_LOAD: 'DOMContentLoaded'
 	},
-	SIZES: {
-		STICKY_FOOTER: [729, 90]
+	FORMATS: {
+		STICKY_FOOTER: {
+			SIZE: [728, 90],
+			NAME: 'Sticky Footer'
+		}
 	}
 };
 
