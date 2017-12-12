@@ -4,6 +4,7 @@ const express = require('express'),
 	{ couchbaseService } = require('node-utils'),
 	config = require('../configs/config'),
 	{ fetchLiveSites } = require('../reports/default/adpTags/index'),
+	{ getGlobalNetworkWiseDataContributionReport } = require('../helpers/commonFunctions'),
 	router = express.Router(),
 	appBucket = couchbaseService(
 		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
@@ -45,6 +46,36 @@ router
 			}
 		}
 	)
+	.post('/getGlobalMetricCharts', (req, res) => {
+		let response = {
+				error: false,
+				data: []
+			},
+			params = {
+				transform: true,
+				fromDate:
+					req.body && req.body.from
+						? moment(req.body.from).format('YYYY-MM-DD')
+						: moment()
+								.subtract(7, 'days')
+								.format('YYYY-MM-DD'),
+				toDate:
+					req.body && req.body.to
+						? moment(req.body.to).format('YYYY-MM-DD')
+						: moment()
+								.subtract(1, 'days')
+								.format('YYYY-MM-DD')
+			};
+
+		return getGlobalNetworkWiseDataContributionReport(params)
+			.then(responseData => {
+				response.data = responseData;
+				return res.send(response);
+			})
+			.catch(err => {
+				return res.send(Object.assign(response, { error: true }));
+			});
+	})
 	.post('/getLiveSites', (req, res) => {
 		let response = {
 				error: false,
