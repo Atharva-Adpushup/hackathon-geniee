@@ -240,6 +240,7 @@ function raiseSupportTickets(anomalyList) {
 
 	let emailId = `support@adpushup.com`;
 	let cc = '';
+	let from = 'services.daemon@adpushup.com';
 
 	const headerTemplate = `AdPushup Anomaly Report:@__siteId__:@__siteName__:Count:-@__anomalyCount__`;
 
@@ -302,7 +303,7 @@ function raiseSupportTickets(anomalyList) {
 			header += ':' + headerReason;
 		}
 
-		sendMail({ header, content, emailId, cc });
+		sendMail({ header, content, emailId, cc, from });
 		sentMailCount++;
 	});
 
