@@ -6,6 +6,10 @@ const siteMappingActions = {
 		FETCH_LIVE_SITES: 'FETCH_LIVE_SITES',
 		SET_LIVE_SITES_DATA: 'SET_LIVE_SITES_DATA'
 	},
+	globalMetricChartsActions = {
+		FETCH_GLOBAL_METRIC_DATA: 'FETCH_GLOBAL_METRIC_DATA',
+		SET_GLOBAL_METRIC_DATA: 'SET_GLOBAL_METRIC_DATA'
+	},
 	siteMapping = {
 		labels: {
 			siteId: 'Site Id',
@@ -168,4 +172,4 @@ const siteMappingActions = {
 		]
 	};
 
-export { siteMappingActions, liveSitesMappingActions, siteMapping, liveSites };
+export { siteMappingActions, liveSitesMappingActions, globalMetricChartsActions, siteMapping, liveSites };
