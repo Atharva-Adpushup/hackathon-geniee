@@ -1,17 +1,17 @@
 import { globalMetricChartsActions } from '../configs/commonConsts';
 import { ajax } from '../../../common/helpers';
 
-const fetchGlobalMetricCharts = params => (dispatch, getState) => {
+const fetchNetworkWiseData = params => (dispatch, getState) => {
 	return ajax({
-		url: '/ops/getGlobalMetricCharts',
+		url: '/ops/getGlobalNetworkWiseData',
 		method: 'POST',
 		data: JSON.stringify(params)
 	}).then(response => {
 		if (response.error) {
 			alert('Error occured. Please try again later');
 		}
-		return dispatch({ type: globalMetricChartsActions.SET_GLOBAL_METRIC_DATA, data: response.data });
+		return dispatch({ type: globalMetricChartsActions.SET_NETWORK_WISE_DATA, data: response.data });
 	});
 };
 
-export { fetchGlobalMetricCharts };
+export { fetchNetworkWiseData };

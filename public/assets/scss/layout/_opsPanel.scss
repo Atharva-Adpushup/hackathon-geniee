@@ -76,4 +76,8 @@ $grey-light: #f3f6f8;
 			font-weight: bold;
 		}
 	}
+
+	> .panel-body {
+		height: 350px;
+	}
 }
