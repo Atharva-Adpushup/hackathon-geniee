@@ -11,6 +11,18 @@ module.exports = env => {
 			path: path.join(buildPath),
 			filename: '[name].js'
 		},
-		plugins: env && env.ENVIRONMENT === 'production' ? [new webpack.optimize.UglifyJsPlugin()] : []
+		module: {
+			loaders: [
+				{
+					test: /.jsx?$/,
+					loader: 'babel-loader',
+					exclude: /node_modules/,
+					query: {
+						presets: ['es2015']
+					}
+				}
+			]
+		},
+		plugins: [new webpack.optimize.UglifyJsPlugin()]
 	};
 };
