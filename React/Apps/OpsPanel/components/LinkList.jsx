@@ -3,13 +3,9 @@ import { Link } from 'react-router-dom';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
 import ActionCard from '../../../Components/ActionCard.jsx';
 
-const title = (
-    <h3>Useful links</h3>
-);
-
 const LinkList = props => {
 	return (
-        <ActionCard title={title}>
+        <ActionCard title='Useful links'>
 			<ListGroup className="ops-panel-links-container" componentClass="ul">
 				{/* <Link to="/ops/cbDocEditor">
 							<ListGroupItem listItem>Couchbase Doc Editor</ListGroupItem>
