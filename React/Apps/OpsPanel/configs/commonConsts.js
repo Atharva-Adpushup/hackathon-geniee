@@ -170,6 +170,81 @@ const siteMappingActions = {
 				filterable: true
 			}
 		]
+	},
+	LINE_CHART_CONFIG = {
+		colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e', '#eb575c', '#ca29f3'],
+		credits: {
+			enabled: false
+		},
+		chart: {
+			type: 'line'
+		},
+		title: {
+			text: ''
+		},
+		xAxis: {
+			categories: []
+		},
+		yAxis: {
+			title: {
+				text: ''
+			}
+		},
+		plotOptions: {
+			line: {
+				dataLabels: {
+					enabled: true
+				},
+				enableMouseTracking: true
+			}
+		},
+		series: []
+	},
+	PIE_CHART_CONFIG = {
+		colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e', '#eb575c', '#ca29f3'],
+		credits: {
+			enabled: false
+		},
+		chart: {
+			plotBackgroundColor: null,
+			plotBorderWidth: null,
+			plotShadow: false,
+			type: 'pie'
+		},
+		title: {
+			text: ''
+		},
+		tooltip: {
+			pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+		},
+		plotOptions: {
+			pie: {
+				allowPointSelect: false,
+				cursor: 'pointer',
+				dataLabels: {
+					enabled: true,
+					format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+					style: {
+						color: '#555555'
+					}
+				}
+			}
+		},
+		series: [
+			{
+				name: 'Variables',
+				colorByPoint: true,
+				data: []
+			}
+		]
 	};
 
-export { siteMappingActions, liveSitesMappingActions, globalMetricChartsActions, siteMapping, liveSites };
+export {
+	siteMappingActions,
+	liveSitesMappingActions,
+	globalMetricChartsActions,
+	siteMapping,
+	liveSites,
+	LINE_CHART_CONFIG,
+	PIE_CHART_CONFIG
+};
