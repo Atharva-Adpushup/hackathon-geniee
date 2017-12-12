@@ -5,11 +5,13 @@ const webpack = require('webpack'),
 module.exports = env => {
 	return {
 		entry: {
-			adpushup: path.join(__dirname, 'index.js')
+			adpushup: path.join(__dirname, 'script.js')
 		},
 		output: {
-			path: path.join(buildPath),
-			filename: '[name].js'
+			path: buildPath,
+			filename: '[name].js',
+			chunkFilename: '[name].js',
+			publicPath: path.join(__dirname, 'build/')
 		},
 		plugins: env && env.ENVIRONMENT === 'production' ? [new webpack.optimize.UglifyJsPlugin()] : []
 	};
