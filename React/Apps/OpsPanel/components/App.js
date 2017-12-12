@@ -15,7 +15,7 @@ class App extends Component {
 		return (
 			<BrowserRouter>
 				<Switch>
-					<Route path="/ops" component={GlobalMetricChartsContainer} />
+					<Route exact path="/ops" component={GlobalMetricChartsContainer} />
 					<Route path="/ops/sitesMapping" component={SitesMappingContainer} />
 					<Route path="/ops/liveSitesMapping" component={LiveSitesMappingContainer} />
 					<Route path="/ops/settings/:siteId" component={Settings} />

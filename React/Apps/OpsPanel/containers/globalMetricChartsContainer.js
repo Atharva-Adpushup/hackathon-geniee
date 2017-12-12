@@ -1,12 +1,12 @@
 import { connect } from 'react-redux';
-import { fetchGlobalMetricCharts } from '../actions/globalMetricChartsActions';
+import { fetchNetworkWiseData } from '../actions/globalMetricChartsActions';
 import ModuleWrapper from '../components/ModuleWrapper.jsx';
 
 const mapStateToProps = (state, ownProps) => ({
-		charts: state.charts
+		charts: state.globalMetricCharts
 	}),
 	mapDispatchToProps = dispatch => ({
-		fetchGlobalMetricCharts: params => dispatch(fetchGlobalMetricCharts(params))
+		fetchNetworkWiseData: params => dispatch(fetchNetworkWiseData(params))
 	});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ModuleWrapper);
