@@ -13,6 +13,18 @@ module.exports = env => {
 			chunkFilename: '[name].js',
 			publicPath: path.join(__dirname, 'build/')
 		},
-		plugins: env && env.ENVIRONMENT === 'production' ? [new webpack.optimize.UglifyJsPlugin()] : []
+		module: {
+			loaders: [
+				{
+					test: /.jsx?$/,
+					loader: 'babel-loader',
+					exclude: /node_modules/,
+					query: {
+						presets: ['es2015']
+					}
+				}
+			]
+		},
+		plugins: [new webpack.optimize.UglifyJsPlugin()]
 	};
 };
