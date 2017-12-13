@@ -289,6 +289,30 @@ module.exports = {
 
 		return isInCollection;
 	},
+	dockifyAd: function(xPath) {
+		if (!xPath || !$(xPath).length) {
+			return false;
+		}
+
+		var $el = $(xPath),
+			elTopOffset = $el.offset().top;
+
+		$(window).on('scroll', function() {
+			if ($(window).scrollTop() > elTopOffset) {
+				$el.css({
+					position: 'fixed',
+					top: '0px',
+					zIndex: 10000
+				});
+			} else {
+				$el.css({
+					position: '',
+					top: '',
+					zIndex: ''
+				});
+			}
+		});
+	},
 	removeUrlParameter: function(url, parameter) {
 		// Snippet from https://stackoverflow.com/a/4893927
 		var urlParts = url.split('?');
