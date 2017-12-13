@@ -4,6 +4,7 @@ var $ = require('jquery'),
 	browserConfig = require('../libs/browserConfig'),
 	incontentAnalyser = require('../libs/aa'),
 	adCodeGenerator = require('./adCodeGenerator'),
+	commonConsts = require('../config/commonConsts'),
 	segregateAds = function(ads) {
 		var a,
 			ad,
@@ -154,6 +155,11 @@ var $ = require('jquery'),
 					$.ajaxSettings.cache = true;
 					container.append(adCodeGenerator.generateAdCode(ad));
 					$.ajaxSettings.cache = false;
+
+					if (ad.type === commonConsts.AD_TYPES.DOCKED) {
+						utils.dockifyAd('#' + ad.id);
+					}
+
 					tracker.add(
 						container,
 						function(id) {
