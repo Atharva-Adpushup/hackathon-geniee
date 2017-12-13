@@ -1,13 +1,17 @@
 import { h, Component } from 'preact';
 import Abstract from './Abstract';
+import commonConsts from '../commonConsts';
 
 class StickyFooter extends Abstract {
 	constructor(props) {
 		super(props);
-		this.name = 'Sticky Footer';
 	}
 	render() {
-		return <div>{`I am a ${this.name} Ad with ${this.width}X${this.height}`}</div>;
+		const style = {
+			width: this.props.width || this.width,
+			height: this.props.height || this.height
+		};
+		return <div style={style}>{this.props.adCode}</div>;
 	}
 }
 
