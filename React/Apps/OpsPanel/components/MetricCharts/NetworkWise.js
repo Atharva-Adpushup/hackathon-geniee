@@ -115,7 +115,7 @@ class NetworkWise extends Component {
 	renderSelectBox() {
 		return (
 			<SelectBox
-				value=""
+				value={this.state.selectedMetric}
 				label="Select metric"
 				onChange={this.handleSelectBoxChange}
 				onClear={this.handleSelectBoxChange}

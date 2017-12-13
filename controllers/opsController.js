@@ -46,7 +46,7 @@ router
 			}
 		}
 	)
-	.post('/getGlobalMetricCharts', (req, res) => {
+	.post('/getGlobalNetworkWiseData', (req, res) => {
 		let response = {
 				error: false,
 				data: []
