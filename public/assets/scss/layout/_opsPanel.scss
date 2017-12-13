@@ -1,4 +1,9 @@
 $grey: #bdc3c7;
+$grey-light: #f3f6f8;
+
+.u-full-height {
+	height: 100%;
+}
 
 .ops-panel-links-container {
 	a li {
@@ -62,4 +67,22 @@ $grey: #bdc3c7;
 	width: 100%;
 	padding: 8px 10px;
 	border: 1px solid $grey;
+}
+
+.metricsChart.panel {
+	> .panel-heading {
+		background: $grey-light;
+		border-radius: 0;
+		height: 45px;
+		padding: 0;
+		text-transform: uppercase;
+
+		> h4 {
+			font-weight: bold;
+		}
+	}
+
+	> .panel-body {
+		min-height: 250px;
+	}
 }
