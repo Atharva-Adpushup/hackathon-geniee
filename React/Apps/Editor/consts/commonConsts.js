@@ -331,7 +331,24 @@ const status = {
 	priceFloorKeys = ['FP_S_A', 'FP_B_A', 'FP_S', 'FP_A', 'FP_B'],
 	defaultPriceFloorKey = 'FP_S_A',
 	reportingUrl = '/user/reports/generate',
-	jsWrapper = `(function($){ \n\n })(adpushup.$)`;
+	jsWrapper = `(function($){ \n\n })(adpushup.$)`,
+	interactiveAds = {
+		events: ['load', 'scroll', 'onMills', 'DOMContentLoaded'],
+		sizes: {
+			DESKTOP: {
+				sticky: {
+					bottom: ['300X50', '300X100', '320X100'],
+					left: ['160X600', '336X280', '300X250']
+				}
+			},
+			MOBILE: {
+				sticky: {
+					bottom: ['300X50', '300X100', '320X100']
+				}
+			}
+		},
+		types: ['stickyBottom', 'stickyleft']
+	};
 
 export {
 	status,
@@ -371,5 +388,6 @@ export {
 	reportingUrl,
 	priceFloorKeys,
 	defaultPriceFloorKey,
-	jsWrapper
+	jsWrapper,
+	interactiveAds
 };
