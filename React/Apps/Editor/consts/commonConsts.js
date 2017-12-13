@@ -347,7 +347,7 @@ const status = {
 				}
 			}
 		},
-		types: ['stickyBottom', 'stickyleft']
+		types: ['stickyBottom', 'stickyLeft']
 	};
 
 export {
