@@ -127,6 +127,9 @@ class NetworkWise extends Component {
 				<option key="1" value="revenue">
 					REVENUE
 				</option>
+				<option key="2" value="impressions">
+					IMPRESSIONS
+				</option>
 			</SelectBox>
 		);
 	}
