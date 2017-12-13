@@ -1,26 +1,33 @@
 const { GLOBAL_NETWORK_WISE_PERFORMANCE, STRING_DATE_FORMAT } = require('../constants'),
 	sqlReportModule = require('../index'),
+	Promise = require('bluebird'),
 	moment = require('moment'),
 	extend = require('extend'),
 	utils = require('../../../../helpers/utils');
 
 function getSegregatedData(inputData, resultData) {
+	const isExchangeRate = !!resultData.exchangeRate;
+
 	return inputData.reduce((resultCollecton, itemObject) => {
 		const collectionObject = extend(true, {}, itemObject),
-			date = moment(collectionObject.report_date).format(STRING_DATE_FORMAT),
-			revenue = utils.toFloat(collectionObject.revenue),
-			impressions = collectionObject.impressions;
-
-		let isAdNetworkInAggregatedCollection,
+			date = moment(collectionObject.report_date).format(STRING_DATE_FORMAT);
+		let revenue = utils.toFloat(collectionObject.revenue),
+			impressions = collectionObject.impressions,
+			isAdNetworkInAggregatedCollection,
 			isAdNetworkInDayWiseCollection,
 			adNetwork = collectionObject.name.toUpperCase(),
-			isAdNetworkDFP = !!(adNetwork === 'DFP');
+			isAdNetworkDFP = !!(adNetwork === 'DFP'),
+			isAdNetworkGeniee = !!(adNetwork === 'GENIEE');
 
 		// This change is done to show 'ADP' network name to end users instead of 'DFP'.
 		// NOTE: This change was asked by OPS team and is liable to be removed/modified in future
 		// as per their convenience
 		if (isAdNetworkDFP) {
 			adNetwork = 'ADP';
+		}
+
+		if (isAdNetworkGeniee && isExchangeRate) {
+			revenue = utils.toFloat(revenue * resultData.exchangeRate);
 		}
 
 		isAdNetworkInAggregatedCollection = !!(
@@ -61,10 +68,11 @@ function getSegregatedData(inputData, resultData) {
 	}, resultData);
 }
 
-function transformResultData(inputData) {
+function transformResultData(inputData, exchangeRateData) {
 	const resultData = {
 			aggregated: {},
-			dayWise: {}
+			dayWise: {},
+			exchangeRate: exchangeRateData.rate
 		},
 		segregatedData = getSegregatedData(inputData, resultData);
 
@@ -89,12 +97,19 @@ module.exports = {
 			databaseConfig = {
 				inputParameters: inputParameterCollection.concat([]),
 				query: dbQuery
-			};
+			},
+			currencyExchangeConfig = {
+				base: 'JPY',
+				symbols: 'USD'
+			},
+			getReportData = sqlReportModule.executeQuery(databaseConfig),
+			getJPYToUSDExchangeRate = utils.getCurrencyExchangeRate(currencyExchangeConfig);
+
 		console.log(
 			`Query for global network wise contribution between: ${paramConfig.fromDate} and ${paramConfig.toDate}`
 		);
 
-		return sqlReportModule.executeQuery(databaseConfig).then(resultData => {
+		return Promise.join(getReportData, getJPYToUSDExchangeRate, (resultData, exchangeRateData) => {
 			const isOptionTransform = !!(paramConfig && paramConfig.transform),
 				isResultData = !!(resultData && resultData.length),
 				isTransformableData = isOptionTransform && isResultData;
@@ -103,7 +118,7 @@ module.exports = {
 				return resultData;
 			}
 
-			return transformResultData(resultData);
+			return transformResultData(resultData, exchangeRateData);
 		});
 	}
 };

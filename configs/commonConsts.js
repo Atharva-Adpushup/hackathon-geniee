@@ -174,5 +174,16 @@ module.exports = {
 		initialStep: 1,
 		totalSteps: 3
 	},
-	CDN_SYNC_MAX_ATTEMPTS: 10
+	CDN_SYNC_MAX_ATTEMPTS: 10,
+	CURRENCY_EXCHANGE: {
+		API_URL: 'https://api.fixer.io/latest',
+		PARAMETERS: {
+			BASE: 'base',
+			SYMBOLS: 'symbols'
+		},
+		CODES: {
+			JPY: 'JPY',
+			USD: 'USD'
+		}
+	}
 };
