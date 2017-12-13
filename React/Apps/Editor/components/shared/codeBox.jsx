@@ -87,9 +87,15 @@ class customCodeEditor extends React.Component {
 					<div className={className} key={this.props.customId}>
 						<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
 						<br />
-						<Button disabled={disabled} className="btn-lightBg btn-save" onClick={this.save}>
-							{this.props.textEditBtn ? this.props.textEditBtn : 'Save'}
-						</Button>
+						{this.props.showButtons ? (
+							<Button
+								disabled={this.state.code == ''}
+								className="btn-lightBg btn-save"
+								onClick={this.save}
+							>
+								{this.props.textEditBtn ? this.props.textEditBtn : 'Save'}
+							</Button>
+						) : null}
 					</div>
 				);
 			} else {
