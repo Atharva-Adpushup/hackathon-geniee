@@ -1,20 +1,21 @@
 import React, { Component } from 'react';
-import { Panel } from 'react-bootstrap';
+import { Panel, Row, Col } from 'react-bootstrap';
 import moment from 'moment';
 import _ from 'lodash';
 import extend from 'extend';
 import ReactHighCharts from 'react-highcharts';
 import PaneLoader from '../../../../Components/PaneLoader.jsx';
 import { LINE_CHART_CONFIG } from '../../configs/commonConsts';
-
-const FooterTitle = <h4>Network Wise Performance Chart</h4>;
+import SelectBox from '../../../../Components/SelectBox/index.jsx';
 
 function generateHighChartConfig(inputData, metricName) {
 	const chartConfig = extend(true, {}, LINE_CHART_CONFIG),
 		categories = [],
 		contributionData = extend(true, {}, inputData.dayWise);
+	const capitalisedMetric = metricName.toUpperCase();
 
-	chartConfig.yAxis.title.text = `${metricName.toUpperCase()} ($)`;
+	chartConfig.yAxis.title.text = `${capitalisedMetric} ($)`;
+	chartConfig.title.text = `${capitalisedMetric} Performance`;
 
 	_.forOwn(contributionData, (adNetworkDayWiseReport, adNetworkKey) => {
 		const seriesObject = {
@@ -59,6 +60,7 @@ class NetworkWise extends Component {
 		this.state = {
 			isDataLoaded,
 			data: isDataLoaded ? this.props.data : null,
+			selectedMetric: 'cpm',
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
@@ -67,6 +69,9 @@ class NetworkWise extends Component {
 				.subtract(1, 'day')
 		};
 		this.renderHighCharts = this.renderHighCharts.bind(this);
+		this.generateHeaderTitle = this.generateHeaderTitle.bind(this);
+		this.handleSelectBoxChange = this.handleSelectBoxChange.bind(this);
+		this.renderSelectBox = this.renderSelectBox.bind(this);
 	}
 
 	componentDidMount() {
@@ -94,17 +99,57 @@ class NetworkWise extends Component {
 
 	renderHighCharts() {
 		let inputData = this.state.data,
-			metricName = 'cpm',
+			metricName = this.state.selectedMetric,
 			config = generateHighChartConfig(inputData, metricName);
 
 		return <ReactHighCharts config={config} />;
 	}
 
+	handleSelectBoxChange(metric = 'cpm') {
+		metric = metric ? metric : 'cpm';
+		this.setState({
+			selectedMetric: metric
+		});
+	}
+
+	renderSelectBox() {
+		return (
+			<SelectBox
+				value=""
+				label="Select metric"
+				onChange={this.handleSelectBoxChange}
+				onClear={this.handleSelectBoxChange}
+				disabled={false}
+			>
+				<option key="0" value="cpm">
+					CPM
+				</option>
+				<option key="1" value="revenue">
+					REVENUE
+				</option>
+			</SelectBox>
+		);
+	}
+
+	generateHeaderTitle() {
+		return (
+			<Row className="u-block u-margin-0px">
+				<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={8}>
+					<h4>Network Wise Chart</h4>
+				</Col>
+				<Col className="u-full-height aligner aligner--hCenter aligner--vBottom" xs={4}>
+					{this.renderSelectBox()}
+				</Col>
+			</Row>
+		);
+	}
+
 	render() {
-		const props = this.props;
+		const props = this.props,
+			headerTitle = this.generateHeaderTitle();
 
 		return (
-			<Panel className="mb-20 metricsChart" header={FooterTitle}>
+			<Panel className="mb-20 metricsChart" header={headerTitle}>
 				{this.state.isDataLoaded ? this.renderHighCharts() : <PaneLoader />}
 			</Panel>
 		);
