@@ -49,6 +49,15 @@ WHERE a.axpgid = b.axpgid
 GROUP BY a.report_date, b.NAME;
 `;
 
+const GLOBAL_NETWORK_WISE_PERFORMANCE = `
+SELECT report_date, a.ntwid, name, sum(total_impressions) impressions, sum(total_revenue) revenue
+FROM adptagreport a, network b
+WHERE a.ntwid = b.ntwid
+	AND a.report_date BETWEEN @__fromDate__ AND @__toDate__
+GROUP BY a.report_Date, a.ntwid, name
+ORDER BY a.report_date, a.ntwid, name;
+`;
+
 const PLATFORMS_KEYS = {
 	0: 'UNKNOWN',
 	1: 'MOBILE',
@@ -226,10 +235,8 @@ const schema = {
 const ANAMOLY_PAGE_VIEW_IMPRESSION_XPATH_MISS = `
 EXEC GetPVIXAnomaly @__weekStartDate__,@__weekEndDate__,@__yesterdayDate__,@__codeRemovedThreshold__,@__pageViewThreshold__,@__pageViewMinThreshold__,@__impressionThreshold__,@__impressionMinThreshold__,@__xpathMissThreshold__,@__xpathMissMinThreshold__`;
 
-
 const ANAMOLY_CPM = `
 EXEC GetCpmAnomaly @__weekStartDate__,@__weekEndDate__,@__yesterdayDate__,@__pageViewMinThreshold__,@__cpmThreshold__,@__cpmMinThreshold__`;
-
 
 const ANAMOLY_DETERMINED_MODE = `
 EXEC GetDMAnomaly  @__weekStartDate__,@__weekEndDate__,@__yesterdayDate__,@__pageViewMinThreshold__,@__determinedModeThreshold__,@__determinedModeMinThreshold__`;
@@ -248,5 +255,6 @@ module.exports = {
 	liveSitesQuery,
 	ANAMOLY_PAGE_VIEW_IMPRESSION_XPATH_MISS,
 	ANAMOLY_CPM,
-	ANAMOLY_DETERMINED_MODE
+	ANAMOLY_DETERMINED_MODE,
+	GLOBAL_NETWORK_WISE_PERFORMANCE
 };
