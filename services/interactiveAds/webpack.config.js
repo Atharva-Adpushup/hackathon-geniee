@@ -1,6 +1,6 @@
 const webpack = require('webpack'),
 	path = require('path'),
-	buildPath = path.join(__dirname, './build');
+	buildPath = path.join(__dirname, './build/');
 
 module.exports = env => {
 	return {
@@ -11,20 +11,17 @@ module.exports = env => {
 			path: buildPath,
 			filename: '[name].js',
 			chunkFilename: '[name].js',
-			publicPath: path.join(__dirname, 'build/')
+			publicPath: './build/'
 		},
 		module: {
 			loaders: [
 				{
 					test: /.jsx?$/,
 					loader: 'babel-loader',
-					exclude: /node_modules/,
-					query: {
-						presets: ['es2015']
-					}
+					exclude: /node_modules/
 				}
 			]
 		},
-		plugins: [new webpack.optimize.UglifyJsPlugin()]
+		plugins: env && env.ENVIRONMENT === 'production' ? [new webpack.optimize.UglifyJsPlugin()] : []
 	};
 };
