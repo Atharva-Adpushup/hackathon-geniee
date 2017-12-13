@@ -7,6 +7,9 @@ import ReactHighCharts from 'react-highcharts';
 import PaneLoader from '../../../../Components/PaneLoader.jsx';
 import { LINE_CHART_CONFIG } from '../../configs/commonConsts';
 import SelectBox from '../../../../Components/SelectBox/index.jsx';
+import { DateRangePicker } from 'react-dates';
+import 'react-dates/lib/css/_datepicker.css';
+import '../../../ReportingPanel/styles.scss';
 
 function generateHighChartConfig(inputData, metricName) {
 	const chartConfig = extend(true, {}, LINE_CHART_CONFIG),
@@ -72,6 +75,10 @@ class NetworkWise extends Component {
 		this.generateHeaderTitle = this.generateHeaderTitle.bind(this);
 		this.handleSelectBoxChange = this.handleSelectBoxChange.bind(this);
 		this.renderSelectBox = this.renderSelectBox.bind(this);
+		this.renderDateRangePickerUI = this.renderDateRangePickerUI.bind(this);
+		this.datesUpdated = this.datesUpdated.bind(this);
+		this.focusUpdated = this.focusUpdated.bind(this);
+		this.fetchReportData = this.fetchReportData.bind(this);
 	}
 
 	componentDidMount() {
@@ -127,20 +134,78 @@ class NetworkWise extends Component {
 				<option key="1" value="revenue">
 					REVENUE
 				</option>
+				<option key="2" value="impressions">
+					IMPRESSIONS
+				</option>
 			</SelectBox>
 		);
 	}
 
+	datesUpdated({ startDate, endDate }) {
+		this.setState({ startDate, endDate });
+	}
+
+	focusUpdated(focusedInput) {
+		this.setState({ focusedInput });
+	}
+
+	renderDateRangePickerUI() {
+		return (
+			<Col className="u-full-height aligner aligner--hBottom aligner--vCenter" xs={9}>
+				<DateRangePicker
+					onDatesChange={this.datesUpdated}
+					onFocusChange={this.focusUpdated}
+					focusedInput={this.state.focusedInput}
+					startDate={this.state.startDate}
+					endDate={this.state.endDate}
+					showDefaultInputIcon={true}
+					hideKeyboardShortcutsPanel={true}
+					showClearDates={true}
+					minimumNights={0}
+					displayFormat={'DD-MM-YYYY'}
+					isOutsideRange={() => {}}
+				/>
+				<button
+					className="btn btn-lightBg btn-default btn-blue u-margin-l10px"
+					onClick={eve => this.fetchReportData()}
+				>
+					Generate
+				</button>
+				<button
+					className="btn btn-lightBg btn-default u-margin-l10px"
+					onClick={this.fetchReportData.bind(null, true)}
+				>
+					Reset
+				</button>
+			</Col>
+		);
+	}
+
+	fetchReportData(reset = false) {
+		this.setState({ isDataLoaded: false });
+		this.props.fetchData({
+			transform: true,
+			fromDate: this.state.startDate,
+			toDate: this.state.endDate
+		});
+	}
+
 	generateHeaderTitle() {
 		return (
-			<Row className="u-block u-margin-0px">
-				<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={8}>
-					<h4>Network Wise Chart</h4>
-				</Col>
-				<Col className="u-full-height aligner aligner--hCenter aligner--vBottom" xs={4}>
-					{this.renderSelectBox()}
-				</Col>
-			</Row>
+			<div className="u-full-height aligner aligner--column">
+				<Row className="u-margin-0px aligner-item">
+					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={8}>
+						<h4>Network Wise Chart</h4>
+					</Col>
+					<Col className="u-full-height aligner aligner--hCenter aligner--vBottom" xs={4}>
+						{this.renderSelectBox()}
+					</Col>
+				</Row>
+				<Row className="u-margin-0px aligner-item">
+					<Col className="u-full-height aligner aligner--hCenter aligner--vCenter" xs={3} />
+					{this.renderDateRangePickerUI()}
+				</Row>
+			</div>
 		);
 	}
 
