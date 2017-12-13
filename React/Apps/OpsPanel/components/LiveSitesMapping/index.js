@@ -145,7 +145,7 @@ class LiveSitesMapping extends Component {
 						className="inputMinimal"
 					/>
 				</Col>
-				<Col sm={3}>
+				<Col sm={4}>
 					<label className="control-label" style={{ display: 'block' }}>
 						Date Range
 					</label>
@@ -163,7 +163,7 @@ class LiveSitesMapping extends Component {
 						isOutsideRange={() => {}}
 					/>
 				</Col>
-				<Col sm={6}>
+				<Col sm={5}>
 					<label style={{ display: 'block' }}>&nbsp;</label>
 					<button
 						className="btn btn-lightBg btn-default btn-blue"
