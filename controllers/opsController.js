@@ -54,14 +54,14 @@ router
 			params = {
 				transform: true,
 				fromDate:
-					req.body && req.body.from
-						? moment(req.body.from).format('YYYY-MM-DD')
+					req.body && req.body.fromDate
+						? moment(req.body.fromDate).format('YYYY-MM-DD')
 						: moment()
 								.subtract(7, 'days')
 								.format('YYYY-MM-DD'),
 				toDate:
-					req.body && req.body.to
-						? moment(req.body.to).format('YYYY-MM-DD')
+					req.body && req.body.toDate
+						? moment(req.body.toDate).format('YYYY-MM-DD')
 						: moment()
 								.subtract(1, 'days')
 								.format('YYYY-MM-DD')
