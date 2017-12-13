@@ -42,7 +42,13 @@ class VariationPanel extends React.Component {
 						<KeyValuesPanel channelId={channelId} variation={variation} sections={sections} ui={ui} />
 					</div>
 					<div tabTitle="Interactive Ads">
-						<InteractiveAds channelId={channelId} variation={variation} sections={sections} ui={ui} />
+						<InteractiveAds
+							channelId={channelId}
+							variation={variation}
+							sections={sections}
+							ui={ui}
+							platform={this.props.activeChannel.platform}
+						/>
 					</div>
 				</TabPanel>
 			</div>
