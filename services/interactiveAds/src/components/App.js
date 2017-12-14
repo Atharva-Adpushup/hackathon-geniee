@@ -10,7 +10,7 @@ const App = props => {
 				break;
 		}
 	};
-	return <div>{getComponent()}</div>;
+	return getComponent();
 };
 
 export default App;
