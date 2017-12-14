@@ -11,7 +11,8 @@ class EditOptions extends Component {
 		super(props);
 		this.state = {
 			float: this.props.section.float,
-			editNetwork: false
+			editNetwork: false,
+			editInteractiveAd: false
 		};
 
 		this.onFloatSelectChange = this.onFloatSelectChange.bind(this);
@@ -19,6 +20,7 @@ class EditOptions extends Component {
 		this.renderContent = this.renderContent.bind(this);
 		this.submitHandler = this.submitHandler.bind(this);
 		this.toggleNetworkEditor = this.toggleNetworkEditor.bind(this);
+		this.toggleEditInteractiveAd = this.toggleEditInteractiveAd.bind(this);
 	}
 
 	onFloatSelectChange(float) {
@@ -52,28 +54,79 @@ class EditOptions extends Component {
 		this.setState({ editNetwork: !this.state.editNetwork });
 	}
 
+	toggleEditInteractiveAd() {
+		this.setState({ editInteractiveAdData: !this.state.editInteractiveAdData });
+	}
+
 	renderContent() {
-		return this.state.editNetwork ? (
-			<NetworkOptions
-				onSubmit={this.submitHandler}
-				onCancel={this.toggleNetworkEditor}
+		let response = [];
+		if (this.state.editNetwork || this.state.editInteractiveAd) {
+			this.state.editNetwork
+				? response.push(
+						<NetworkOptions
+							onSubmit={this.submitHandler}
+							onCancel={this.toggleNetworkEditor}
+							ad={this.props.section.ads[0]}
+							buttonType={2}
+							fromPanel={true}
+							id={this.props.section.id}
+							showNotification={this.props.showNotification}
+						/>
+					)
+				: null;
+			this.state.editInteractiveAd
+				? response.push(
+						<AdDetails
+							userType={currentUser.userType || false}
+							ad={this.props.section.ads[0]}
+							ui={this.props.ui}
+							section={this.props.section}
+							variationId={this.props.variation.id}
+							editNetwork={this.toggleNetworkEditor}
+							editInteractiveAd={this.toggleEditInteractiveAd}
+							fromPanel={true}
+							showEventData={this.props.section.type == 3 ? true : false}
+						/>
+					)
+				: null;
+		}
+		return (
+			<AdDetails
+				userType={currentUser.userType || false}
 				ad={this.props.section.ads[0]}
-				buttonType={2}
+				ui={this.props.ui}
+				section={this.props.section}
+				variationId={this.props.variation.id}
+				editNetwork={this.toggleNetworkEditor}
+				editInteractiveAd={this.toggleEditInteractiveAd}
 				fromPanel={true}
-				id={this.props.section.id}
-				showNotification={this.props.showNotification}
+				showEventData={this.props.section.type == 3 ? true : false}
 			/>
-		) : (
-				<AdDetails
-					userType={currentUser.userType || false}
-					ad={this.props.section.ads[0]}
-					ui={this.props.ui}
-					section={this.props.section}
-					variationId={this.props.variation.id}
-					editNetwork={this.toggleNetworkEditor}
-					fromPanel={true}
-				/>
-			);
+		);
+
+		// return this.state.editNetwork ? (
+		// 	<NetworkOptions
+		// 		onSubmit={this.submitHandler}
+		// 		onCancel={this.toggleNetworkEditor}
+		// 		ad={this.props.section.ads[0]}
+		// 		buttonType={2}
+		// 		fromPanel={true}
+		// 		id={this.props.section.id}
+		// 		showNotification={this.props.showNotification}
+		// 	/>
+		// ) : (
+		// 	<AdDetails
+		// 		userType={currentUser.userType || false}
+		// 		ad={this.props.section.ads[0]}
+		// 		ui={this.props.ui}
+		// 		section={this.props.section}
+		// 		variationId={this.props.variation.id}
+		// 		editNetwork={this.toggleNetworkEditor}
+		// 		editInteractiveAd={this.toggleEditInteractiveAd}
+		// 		fromPanel={true}
+		// 		showEventData={this.props.section.type == 3 ? true : false}
+		// 	/>
+		// );
 	}
 
 	render() {
@@ -127,26 +180,26 @@ class EditOptions extends Component {
 						</Col>
 					</Row>
 				) : (
-						<Row>
-							<Col className="u-padding-r10px" xs={4}>
-								Float
+					<Row>
+						<Col className="u-padding-r10px" xs={4}>
+							Float
 						</Col>
-							<Col className="u-padding-l10px" xs={8}>
-								<SelectBox
-									value={this.state.float}
-									label="Select Float"
-									onChange={this.onFloatSelectChange}
-									showClear={false}
-								>
-									{floats.map((float, index) => (
-										<option key={index} value={float}>
-											{float}
-										</option>
-									))}
-								</SelectBox>
-							</Col>
-						</Row>
-					)}
+						<Col className="u-padding-l10px" xs={8}>
+							<SelectBox
+								value={this.state.float}
+								label="Select Float"
+								onChange={this.onFloatSelectChange}
+								showClear={false}
+							>
+								{floats.map((float, index) => (
+									<option key={index} value={float}>
+										{float}
+									</option>
+								))}
+							</SelectBox>
+						</Col>
+					</Row>
+				)}
 				<div className="mT-10">{this.renderContent()}</div>
 			</div>
 		);

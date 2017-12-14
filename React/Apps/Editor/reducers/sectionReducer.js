@@ -16,6 +16,8 @@ const sectionByIds = (state = {}, action) => {
 					name: payload.name,
 					allXpaths: payload.allXpaths,
 					ads: payload.ads,
+					formatData: payload.formatData,
+					type: payload.type,
 					partnerData: {
 						position: payload.position,
 						firstFold: payload.firstFold,
