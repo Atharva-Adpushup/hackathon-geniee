@@ -11,7 +11,8 @@ import {
 	validateSectionXPath,
 	updateIncontentFloat,
 	updatePartnerData,
-	scrollSectionIntoView
+	scrollSectionIntoView,
+	updateType
 } from 'actions/sectionActions.js';
 import { updateNetwork, updateAdCode } from 'actions/adActions';
 import { resetErrors, showNotification } from 'actions/uiActions';
@@ -91,6 +92,7 @@ class variationSections extends Component {
 			onResetErrors,
 			onSectionXPathValidate,
 			onScrollSectionIntoView,
+			onSetSectionType,
 			showNotification
 		} = this.props;
 
@@ -116,31 +118,32 @@ class variationSections extends Component {
 							styles={{ height: '500px', background: '#ebebeb' }}
 						/>
 					) : (
-							sections.map((section, key) => (
-								<div key={key} className="col-sm-6">
-									<VariationSectionElement
-										section={section}
-										key={key}
-										variation={variation}
-										onDeleteSection={onDeleteSection}
-										onRenameSection={onRenameSection}
-										updateAdCode={updateAdCode}
-										updateNetwork={updateNetwork}
-										onUpdatePartnerData={onUpdatePartnerData}
-										onUpdateXPath={onUpdateXPath}
-										onSectionAllXPaths={onSectionAllXPaths}
-										onValidateXPath={onValidateXPath}
-										onResetErrors={onResetErrors}
-										onSectionXPathValidate={onSectionXPathValidate}
-										onIncontentFloatUpdate={onIncontentFloatUpdate}
-										onScrollSectionIntoView={onScrollSectionIntoView}
-										ui={ui}
-										reporting={reporting}
-										showNotification={showNotification}
-									/>
-								</div>
-							))
-						)}
+						sections.map((section, key) => (
+							<div key={key} className="col-sm-6">
+								<VariationSectionElement
+									section={section}
+									key={key}
+									variation={variation}
+									onDeleteSection={onDeleteSection}
+									onRenameSection={onRenameSection}
+									updateAdCode={updateAdCode}
+									updateNetwork={updateNetwork}
+									onUpdatePartnerData={onUpdatePartnerData}
+									onUpdateXPath={onUpdateXPath}
+									onSectionAllXPaths={onSectionAllXPaths}
+									onValidateXPath={onValidateXPath}
+									onResetErrors={onResetErrors}
+									onSectionXPathValidate={onSectionXPathValidate}
+									onIncontentFloatUpdate={onIncontentFloatUpdate}
+									onScrollSectionIntoView={onScrollSectionIntoView}
+									ui={ui}
+									reporting={reporting}
+									showNotification={showNotification}
+									onSetSectionType={onSetSectionType}
+								/>
+							</div>
+						))
+					)}
 				</ul>
 			</div>
 		);
@@ -158,6 +161,7 @@ variationSections.propTypes = {
 	onSectionAllXPaths: PropTypes.func,
 	onValidateXPath: PropTypes.func,
 	onSectionXPathValidate: PropTypes.func,
+	onSetSectionType: PropTypes.func,
 	resetErrors: PropTypes.func,
 	updateNetwork: PropTypes.func,
 	generateReport: PropTypes.func,
@@ -185,7 +189,8 @@ export default connect(
 				updateAdCode: updateAdCode,
 				updateNetwork: updateNetwork,
 				generateReport: generateReport,
-				showNotification: showNotification
+				showNotification: showNotification,
+				onSetSectionType: updateType
 			},
 			dispatch
 		)
