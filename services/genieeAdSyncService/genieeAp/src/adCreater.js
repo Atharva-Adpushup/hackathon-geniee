@@ -156,7 +156,7 @@ var $ = require('jquery'),
 					container.append(adCodeGenerator.generateAdCode(ad));
 					$.ajaxSettings.cache = false;
 
-					if (ad.type === commonConsts.AD_TYPES.DOCKED) {
+					if (ad.type && Number(ad.type) === commonConsts.AD_TYPES.DOCKED) {
 						utils.dockifyAd('#' + ad.id);
 					}
 

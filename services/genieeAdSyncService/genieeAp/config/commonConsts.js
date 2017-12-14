@@ -1,5 +1,5 @@
 module.exports = {
 	AD_TYPES: {
-		DOCKED: 'docked'
+		DOCKED: 4
 	}
 };
