@@ -8,6 +8,7 @@ class AdDetails extends Component {
 		this.renderXPathAndCSS = this.renderXPathAndCSS.bind(this);
 		this.renderSectionName = this.renderSectionName.bind(this);
 		this.renderNetworkDetails = this.renderNetworkDetails.bind(this);
+		this.renderEventData = this.renderEventData.bind(this);
 	}
 
 	renderXPathAndCSS() {
@@ -126,8 +127,39 @@ class AdDetails extends Component {
 		);
 	}
 
+	renderEventData() {
+		const { section, ad } = this.props;
+		return (
+			<div>
+				<p>
+					Event : <strong>{section.formatData.event.toUpperCase()}</strong>
+					<OverlayTrigger
+						placement="bottom"
+						overlay={<Tooltip id="edit-interactive-ad-data">Edit Interactive Ad Data</Tooltip>}
+					>
+						<span className="adDetails-icon" onClick={this.props.editInteractiveAd}>
+							<i className="btn-icn-edit" />
+						</span>
+					</OverlayTrigger>
+				</p>
+				{section.formatData.eventData && Object.keys(section.formatData.eventData).length ? (
+					<p>
+						Value : <strong>{section.formatData.eventData.value}</strong>
+					</p>
+				) : null}
+				<p>
+					Format :{' '}
+					<strong>
+						{section.formatData.type}
+						{section.formatData.placement}
+					</strong>
+				</p>
+			</div>
+		);
+	}
+
 	render() {
-		const { fromPanel } = this.props;
+		const { fromPanel, showEventData } = this.props;
 		return (
 			<div id="ad-details">
 				<div>
@@ -135,6 +167,7 @@ class AdDetails extends Component {
 					{this.renderNetworkDetails()}
 				</div>
 				{!fromPanel ? this.renderXPathAndCSS() : null}
+				{showEventData ? this.renderEventData() : null}
 			</div>
 		);
 	}
