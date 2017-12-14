@@ -1,0 +1,8 @@
+module.exports = {
+	AD_TYPES: {
+		STRUCTURAL: 1,
+		IN_CONTENT: 2,
+		INTERACTIVE_AD: 3,
+		DOCKED_STRUCTURAL: 4
+	}
+};

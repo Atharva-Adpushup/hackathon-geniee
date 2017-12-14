@@ -55,6 +55,7 @@ class adDescriptor extends React.Component {
 				onValidateXPath,
 				onResetErrors,
 				onRenameSection,
+				onSetSectionType,
 				ui,
 				variationId
 			} = this.props,
@@ -101,6 +102,7 @@ class adDescriptor extends React.Component {
 						onValidateXPath={onValidateXPath}
 						onResetErrors={onResetErrors}
 						onRenameSection={onRenameSection}
+						onSetSectionType={onSetSectionType}
 					/>
 				</Row>
 				<Row className="butttonsRow">
