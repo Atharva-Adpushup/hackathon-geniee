@@ -3,8 +3,6 @@
 function init(w, d) {
 	// Disabling floor price optimizer service for now
 	// require('./adpOptimizer').init(w);
-
-	require('../helpers/polyfills');
 	w.adpPrebid = require('../../Prebid.js/build/dist/prebid');
 	w.adpPrebid();
 
