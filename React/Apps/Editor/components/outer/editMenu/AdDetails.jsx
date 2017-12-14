@@ -11,11 +11,7 @@ class AdDetails extends Component {
 		this.renderXPathAndCSS = this.renderXPathAndCSS.bind(this);
 		this.renderSectionName = this.renderSectionName.bind(this);
 		this.renderNetworkDetails = this.renderNetworkDetails.bind(this);
-		this.renderAdCode = this.renderAdCode.bind(this);
-		this.renderCommonDetails = this.renderCommonDetails.bind(this);
-		this.genieeOptions = this.genieeOptions.bind(this);
-		this.renderDockedButton = this.renderDockedButton.bind(this);
-		this.editDockSettings = this.editDockSettings.bind(this);
+		this.renderEventData = this.renderEventData.bind(this);
 	}
 
 	renderXPathAndCSS() {
@@ -186,40 +182,47 @@ class AdDetails extends Component {
 		);
 	}
 
-	editDockSettings() {
-		this.setState({ editDock: !this.state.editDock }, () => {
-			this.props.toggleDeleteButton ? this.props.toggleDeleteButton() : null;
-		});
-	}
-
-	renderDockedButton() {
+	renderEventData() {
+		const { section, ad } = this.props;
 		return (
-			<Col xs={8} xsPush={4} style={{ paddingRight: '0px' }}>
-				<Button className="btn-lightBg btn-edit btn-block" onClick={this.editDockSettings}>
-					Ad Docked Settings
-				</Button>
-			</Col>
+			<div>
+				<p>
+					Event : <strong>{section.formatData.event.toUpperCase()}</strong>
+					<OverlayTrigger
+						placement="bottom"
+						overlay={<Tooltip id="edit-interactive-ad-data">Edit Interactive Ad Data</Tooltip>}
+					>
+						<span className="adDetails-icon" onClick={this.props.editInteractiveAd}>
+							<i className="btn-icn-edit" />
+						</span>
+					</OverlayTrigger>
+				</p>
+				{section.formatData.eventData && Object.keys(section.formatData.eventData).length ? (
+					<p>
+						Value : <strong>{section.formatData.eventData.value}</strong>
+					</p>
+				) : null}
+				<p>
+					Format :{' '}
+					<strong>
+						{section.formatData.type}
+						{section.formatData.placement}
+					</strong>
+				</p>
+			</div>
 		);
 	}
 
 	render() {
-		const { fromPanel } = this.props;
+		const { fromPanel, showEventData } = this.props;
 		return (
 			<div id="ad-details">
-				{this.state.editDock ? (
-					<DockedSettings {...this.props} onCancel={this.editDockSettings} />
-				) : (
-					<div>
-						<div>
-							{!fromPanel ? this.renderSectionName() : null}
-							{this.renderNetworkDetails()}
-						</div>
-						{!fromPanel ? this.renderXPathAndCSS() : null}
-						{!this.props.section.isIncontent && this.props.section.type != 3
-							? this.renderDockedButton()
-							: null}
-					</div>
-				)}
+				<div>
+					{!fromPanel ? this.renderSectionName() : null}
+					{this.renderNetworkDetails()}
+				</div>
+				{!fromPanel ? this.renderXPathAndCSS() : null}
+				{showEventData ? this.renderEventData() : null}
 			</div>
 		);
 	}

@@ -7,6 +7,7 @@ import SelectBox from 'shared/select/select';
 import { showNotification } from 'actions/uiActions';
 import { saveKeyValues } from 'actions/variationActions.js';
 import { interactiveAds } from '../../../../../consts/commonConsts';
+import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 
 class AdPushupAds extends Component {
 	constructor(props) {
@@ -21,8 +22,7 @@ class AdPushupAds extends Component {
 			format: false,
 			size: false,
 			css: {},
-			containsADP: true,
-			adpKeyValues: this.props.variation.adpKeyValues || null
+			containsADP: true
 		};
 		// this.checkADP = this.checkADP.bind(this);
 		this.submitHandler = this.submitHandler.bind(this);
@@ -35,6 +35,7 @@ class AdPushupAds extends Component {
 		this.renderFormatOptions = this.renderFormatOptions.bind(this);
 		this.renderInput = this.renderInput.bind(this);
 		this.renderNetwork = this.renderNetwork.bind(this);
+		this.renderButtons = this.renderButtons.bind(this);
 	}
 
 	// componentWillReceiveProps(nextProps) {
@@ -167,7 +168,7 @@ class AdPushupAds extends Component {
 							showButtons={false}
 							textEdit
 							parentExpanded={this.props.ui.variationPanel.expanded}
-							code={this.state.css ? JSON.stringify(this.state.css) : '{}'}
+							code={this.state.css ? JSON.stringify(this.state.css) : ''}
 							onChange={this.cssChangeHandler}
 						/>
 					</Col>
@@ -187,25 +188,93 @@ class AdPushupAds extends Component {
 	// 		: false;
 	// }
 
-	renderNetwork() {}
+	renderNetwork() {
+		return (
+			<Row className="mT-15">
+				<Col xs={5}>
+					<strong>Select Network</strong>
+				</Col>
+				<Col xs={7}>
+					<NetworkOptions
+						onSubmit={this.submitHandler}
+						onCancel={() => {}}
+						buttonType={2}
+						fromPanel={true}
+						showNotification={this.props.showNotification}
+					/>
+				</Col>
+			</Row>
+		);
+	}
 
-	submitHandler(value) {
+	submitHandler(networkInfo) {
+		let css,
+			error = false;
 		try {
-			value = JSON.parse(value);
+			css = typeof this.state.css == 'string' && this.state.css.trim().length ? JSON.parse(this.state.css) : {};
 		} catch (e) {
+			error = true;
+		}
+		if (
+			error ||
+			!this.state.event ||
+			!this.state.format ||
+			!this.state.size ||
+			!this.state.eventData.value.trim().length ||
+			(this.props.showNetworkOptions && (!networkInfo.network || !networkInfo.networkData))
+		) {
 			this.props.showNotification({
 				mode: 'error',
-				title: 'Invalid Value',
-				message: 'Key values must be valid JSON'
+				title: 'Invalid Values',
+				message: 'Please check entered details'
 			});
 			return false;
 		}
-		this.props.saveKeyValues(this.props.variation, value);
-		this.props.showNotification({
-			mode: 'success',
-			title: 'Operation Successful',
-			message: 'Key Values Updated'
-		});
+		const sectionPayload = {
+				formatData: {
+					event: this.state.event,
+					eventData: this.state.eventData,
+					type: this.state.type,
+					placement: this.state.placement
+				},
+				type: 3
+			},
+			sizes = this.state.size.split('X'),
+			adPayload = {
+				width: sizes[0],
+				height: sizes[1]
+			};
+
+		this.props.showNetworkOptions && networkInfo
+			? ((adPayload.networkData = networkInfo.networkData), (adPayload.network = networkInfo.network))
+			: null;
+
+		this.setState(
+			{
+				event: false,
+				eventData: {
+					value: ''
+				},
+				type: false,
+				placement: false,
+				format: false,
+				size: false,
+				css: {}
+			},
+			() => this.props.submitHandler(sectionPayload, adPayload)
+		);
+	}
+
+	renderButtons() {
+		return (
+			<Row className="mT-15">
+				<Col xs={6} xsPush={6} style={{ paddingRight: '0px' }}>
+					<Button className="btn-lightBg btn-save btn-block" onClick={this.submitHandler}>
+						Save
+					</Button>
+				</Col>
+			</Row>
+		);
 	}
 
 	render() {
@@ -235,7 +304,8 @@ class AdPushupAds extends Component {
 					{this.state.event ? this.renderEventOptions() : null}
 					{this.state.event ? this.renderFormatSelect() : null}
 					{this.state.event && this.state.format ? this.renderFormatOptions() : null}
-					{this.renderNetwork()}
+					{this.props.showNetworkOptions ? this.renderNetwork() : null}
+					{this.props.showButtons ? this.renderButtons() : null}
 				</Col>
 				<div style={{ clear: 'both' }}>&nbsp;</div>
 			</div>

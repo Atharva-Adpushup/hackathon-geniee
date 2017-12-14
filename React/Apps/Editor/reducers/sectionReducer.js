@@ -15,13 +15,15 @@ const sectionByIds = (state = {}, action) => {
 					operation: payload.operation,
 					name: payload.name,
 					allXpaths: payload.allXpaths,
-					ads: payload.ads
-					// partnerData: {
-					// 	position: payload.position,
-					// 	firstFold: payload.firstFold,
-					// 	asyncTag: payload.asyncTag,
-					// 	customZoneId: payload.customZoneId
-					// }
+					ads: payload.ads,
+					formatData: payload.formatData,
+					type: payload.type,
+					partnerData: {
+						position: payload.position,
+						firstFold: payload.firstFold,
+						asyncTag: payload.asyncTag,
+						customZoneId: payload.customZoneId
+					}
 				}
 			};
 
