@@ -1,16 +1,21 @@
 import React, { Component } from 'react';
-import { Row, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Row, Col, OverlayTrigger, Tooltip, PageHeader } from 'react-bootstrap';
 import InlineEdit from 'shared/inlineEdit/index.jsx';
+import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
 
 class AdDetails extends Component {
 	constructor(props) {
 		super(props);
+		this.state = {
+			docked: this.props.section && this.props.section.type == 4 ? true : false
+		};
 		this.renderXPathAndCSS = this.renderXPathAndCSS.bind(this);
 		this.renderSectionName = this.renderSectionName.bind(this);
 		this.renderNetworkDetails = this.renderNetworkDetails.bind(this);
 		this.renderAdCode = this.renderAdCode.bind(this);
 		this.renderCommonDetails = this.renderCommonDetails.bind(this);
 		this.genieeOptions = this.genieeOptions.bind(this);
+		this.renderDockedSelect = this.renderDockedSelect.bind(this);
 	}
 
 	renderXPathAndCSS() {
@@ -181,6 +186,39 @@ class AdDetails extends Component {
 		);
 	}
 
+	renderDockedSelect() {
+		return (
+			<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+				<CustomToggleSwitch
+					labelText="Make Docked"
+					className="mB-10"
+					checked={this.state.docked}
+					onChange={val => {
+						this.setState({ docked: !!val }, () => {
+							this.props.onSetSectionType(this.props.section.id, val ? 4 : 1);
+						});
+					}}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout={this.props.fromPanel ? false : true}
+					name={
+						this.props.section && this.props.section.id
+							? `dockedSwitch-${this.props.section.id}`
+							: 'dockedSwitch'
+					}
+					id={
+						this.props.section && this.props.section.id
+							? `js-docked-switch-${this.props.section.id}`
+							: 'js-docked-switch'
+					}
+					customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+				/>
+			</Col>
+		);
+	}
+
 	render() {
 		const { fromPanel } = this.props;
 		return (
@@ -190,6 +228,7 @@ class AdDetails extends Component {
 					{this.renderNetworkDetails()}
 				</div>
 				{!fromPanel ? this.renderXPathAndCSS() : null}
+				{!this.props.section.isIncontent && this.props.section.type != 3 ? this.renderDockedSelect() : null}
 			</div>
 		);
 	}
