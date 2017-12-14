@@ -5,7 +5,10 @@ const express = require('express'),
 	config = require('../configs/config'),
 	utils = require('../helpers/utils'),
 	{ fetchLiveSites } = require('../reports/default/adpTags/index'),
-	{ getGlobalNetworkWiseDataContributionReport } = require('../helpers/commonFunctions'),
+	{
+		getGlobalNetworkWiseDataContributionReport,
+		getGlobalMetricsDataContributionReport
+	} = require('../helpers/commonFunctions'),
 	router = express.Router(),
 	appBucket = couchbaseService(
 		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
@@ -74,6 +77,42 @@ router
 			});
 
 		return getGlobalNetworkWiseDataContributionReport(params)
+			.then(responseData => {
+				response.data = responseData;
+				response.data.dateFormat = dateFormatCollection;
+				return res.send(response);
+			})
+			.catch(err => {
+				return res.send(Object.assign(response, { error: true }));
+			});
+	})
+	.post('/getGlobalMetricsData', (req, res) => {
+		let response = {
+				error: false,
+				data: []
+			},
+			params = {
+				transform: true,
+				fromDate:
+					req.body && req.body.fromDate
+						? moment(req.body.fromDate).format('YYYY-MM-DD')
+						: moment()
+								.subtract(7, 'days')
+								.format('YYYY-MM-DD'),
+				toDate:
+					req.body && req.body.toDate
+						? moment(req.body.toDate).format('YYYY-MM-DD')
+						: moment()
+								.subtract(1, 'days')
+								.format('YYYY-MM-DD')
+			},
+			dateFormatCollection = utils.getDateFormatCollection({
+				fromDate: params.fromDate,
+				toDate: params.toDate,
+				format: 'MMM DD'
+			});
+
+		return getGlobalMetricsDataContributionReport(params)
 			.then(responseData => {
 				response.data = responseData;
 				response.data.dateFormat = dateFormatCollection;

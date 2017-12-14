@@ -188,7 +188,7 @@ class NetworkWise extends Component {
 					<Col className="u-full-height aligner aligner--hCenter aligner--vBottom" xs={4} />
 				</Row>
 				<Row className="u-margin-0px aligner-item">
-					<Col className="u-full-height aligner aligner--hStart aligner--vBottom" xs={4}>
+					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={4}>
 						{this.renderSelectBox()}
 					</Col>
 					{this.renderDateRangePickerUI()}
