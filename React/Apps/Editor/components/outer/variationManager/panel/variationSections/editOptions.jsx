@@ -5,6 +5,7 @@ import SelectBox from 'shared/select/select.js';
 import { floats, networks } from 'consts/commonConsts';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 import AdDetails from '../../../editMenu/AdDetails';
+import AdPushupAds from '../interactiveAds/adpushupAds';
 
 class EditOptions extends Component {
 	constructor(props) {
@@ -12,7 +13,7 @@ class EditOptions extends Component {
 		this.state = {
 			float: this.props.section.float,
 			editNetwork: false,
-			editInteractiveAd: false
+			editInteractiveAdData: false
 		};
 
 		this.onFloatSelectChange = this.onFloatSelectChange.bind(this);
@@ -50,6 +51,10 @@ class EditOptions extends Component {
 		this.toggleNetworkEditor();
 	};
 
+	adpushupSubmitHandler = data => {
+		console.log(data);
+	};
+
 	toggleNetworkEditor() {
 		this.setState({ editNetwork: !this.state.editNetwork });
 	}
@@ -59,36 +64,33 @@ class EditOptions extends Component {
 	}
 
 	renderContent() {
-		let response = [];
-		if (this.state.editNetwork || this.state.editInteractiveAd) {
-			this.state.editNetwork
-				? response.push(
-						<NetworkOptions
-							onSubmit={this.submitHandler}
-							onCancel={this.toggleNetworkEditor}
-							ad={this.props.section.ads[0]}
-							buttonType={2}
-							fromPanel={true}
-							id={this.props.section.id}
-							showNotification={this.props.showNotification}
-						/>
-					)
-				: null;
-			this.state.editInteractiveAd
-				? response.push(
-						<AdDetails
-							userType={currentUser.userType || false}
-							ad={this.props.section.ads[0]}
-							ui={this.props.ui}
-							section={this.props.section}
-							variationId={this.props.variation.id}
-							editNetwork={this.toggleNetworkEditor}
-							editInteractiveAd={this.toggleEditInteractiveAd}
-							fromPanel={true}
-							showEventData={this.props.section.type == 3 ? true : false}
-						/>
-					)
-				: null;
+		if (this.state.editNetwork) {
+			return (
+				<NetworkOptions
+					onSubmit={this.submitHandler}
+					onCancel={this.toggleNetworkEditor}
+					ad={this.props.section.ads[0]}
+					buttonType={2}
+					fromPanel={true}
+					id={this.props.section.id}
+					showNotification={this.props.showNotification}
+				/>
+			);
+		}
+		if (this.state.editInteractiveAdData) {
+			return (
+				<AdPushupAds
+					userType={currentUser.userType || false}
+					ad={this.props.section.ads[0]}
+					ui={this.props.ui}
+					section={this.props.section}
+					variationId={this.props.variation.id}
+					submitHandler={this.adpushupSubmitHandler}
+					onCancel={this.toggleEditInteractiveAd}
+					showNetworkOptions={false}
+					fromEditSection={true}
+				/>
+			);
 		}
 		return (
 			<AdDetails
@@ -103,30 +105,6 @@ class EditOptions extends Component {
 				showEventData={this.props.section.type == 3 ? true : false}
 			/>
 		);
-
-		// return this.state.editNetwork ? (
-		// 	<NetworkOptions
-		// 		onSubmit={this.submitHandler}
-		// 		onCancel={this.toggleNetworkEditor}
-		// 		ad={this.props.section.ads[0]}
-		// 		buttonType={2}
-		// 		fromPanel={true}
-		// 		id={this.props.section.id}
-		// 		showNotification={this.props.showNotification}
-		// 	/>
-		// ) : (
-		// 	<AdDetails
-		// 		userType={currentUser.userType || false}
-		// 		ad={this.props.section.ads[0]}
-		// 		ui={this.props.ui}
-		// 		section={this.props.section}
-		// 		variationId={this.props.variation.id}
-		// 		editNetwork={this.toggleNetworkEditor}
-		// 		editInteractiveAd={this.toggleEditInteractiveAd}
-		// 		fromPanel={true}
-		// 		showEventData={this.props.section.type == 3 ? true : false}
-		// 	/>
-		// );
 	}
 
 	render() {
