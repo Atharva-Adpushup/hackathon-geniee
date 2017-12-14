@@ -12,9 +12,9 @@ class DockedSettings extends Component {
 				this.props.section && this.props.section.formatData && this.props.section.formatData.css
 					? this.props.section.formatData.css
 					: '',
-			bottomXpath:
-				this.props.section && this.props.section.formatData && this.props.section.formatData.bottomXpath
-					? this.props.section.formatData.bottomXpath
+			bottomXPath:
+				this.props.section && this.props.section.formatData && this.props.section.formatData.bottomXPath
+					? this.props.section.formatData.bottomXPath
 					: ''
 		};
 		this.renderDockContent = this.renderDockContent.bind(this);
@@ -39,7 +39,7 @@ class DockedSettings extends Component {
 			() => {
 				this.props.onFormatDataUpdate(this.props.section.id, {
 					css: code,
-					bottomXpath: this.state.bottomXpath
+					bottomXPath: this.state.bottomXPath
 				});
 				this.props.onCancel();
 			}
@@ -55,17 +55,17 @@ class DockedSettings extends Component {
 			<div>
 				<Row className="mT-15">
 					<Col xs={5} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
-						<strong>Bottom Xpath</strong>
+						<strong>Bottom XPath</strong>
 					</Col>
 					<Col xs={7} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
 						<input
 							className="inputMinimal"
 							type="text"
 							style={{ width: '100%' }}
-							name="bottomXpath"
-							value={this.state.bottomXpath}
+							name="bottomXPath"
+							value={this.state.bottomXPath}
 							onChange={ev => {
-								this.setState({ bottomXpath: ev.target.value });
+								this.setState({ bottomXPath: ev.target.value });
 							}}
 						/>
 					</Col>
