@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import { Row, Col, OverlayTrigger, Tooltip, PageHeader } from 'react-bootstrap';
+import { Row, Col, OverlayTrigger, Tooltip, Button, PageHeader } from 'react-bootstrap';
 import InlineEdit from 'shared/inlineEdit/index.jsx';
-import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
-
+import DockedSettings from './dockedSettings.jsx';
 class AdDetails extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			docked: this.props.section && this.props.section.type == 4 ? true : false
+			editDock: false
 		};
 		this.renderXPathAndCSS = this.renderXPathAndCSS.bind(this);
 		this.renderSectionName = this.renderSectionName.bind(this);
@@ -15,7 +14,8 @@ class AdDetails extends Component {
 		this.renderAdCode = this.renderAdCode.bind(this);
 		this.renderCommonDetails = this.renderCommonDetails.bind(this);
 		this.genieeOptions = this.genieeOptions.bind(this);
-		this.renderDockedSelect = this.renderDockedSelect.bind(this);
+		this.renderDockedButton = this.renderDockedButton.bind(this);
+		this.editDockSettings = this.editDockSettings.bind(this);
 	}
 
 	renderXPathAndCSS() {
@@ -186,35 +186,18 @@ class AdDetails extends Component {
 		);
 	}
 
-	renderDockedSelect() {
+	editDockSettings() {
+		this.setState({ editDock: !this.state.editDock }, () => {
+			this.props.toggleDeleteButton ? this.props.toggleDeleteButton() : null;
+		});
+	}
+
+	renderDockedButton() {
 		return (
-			<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
-				<CustomToggleSwitch
-					labelText="Make Docked"
-					className="mB-10"
-					checked={this.state.docked}
-					onChange={val => {
-						this.setState({ docked: !!val }, () => {
-							this.props.onSetSectionType(this.props.section.id, val ? 4 : 1);
-						});
-					}}
-					layout="horizontal"
-					size="m"
-					on="Yes"
-					off="No"
-					defaultLayout={this.props.fromPanel ? false : true}
-					name={
-						this.props.section && this.props.section.id
-							? `dockedSwitch-${this.props.section.id}`
-							: 'dockedSwitch'
-					}
-					id={
-						this.props.section && this.props.section.id
-							? `js-docked-switch-${this.props.section.id}`
-							: 'js-docked-switch'
-					}
-					customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
-				/>
+			<Col xs={8} xsPush={4} style={{ paddingRight: '0px' }}>
+				<Button className="btn-lightBg btn-edit btn-block" onClick={this.editDockSettings}>
+					Ad Docked Settings
+				</Button>
 			</Col>
 		);
 	}
@@ -223,12 +206,20 @@ class AdDetails extends Component {
 		const { fromPanel } = this.props;
 		return (
 			<div id="ad-details">
-				<div>
-					{!fromPanel ? this.renderSectionName() : null}
-					{this.renderNetworkDetails()}
-				</div>
-				{!fromPanel ? this.renderXPathAndCSS() : null}
-				{!this.props.section.isIncontent && this.props.section.type != 3 ? this.renderDockedSelect() : null}
+				{this.state.editDock ? (
+					<DockedSettings {...this.props} onCancel={this.editDockSettings} />
+				) : (
+					<div>
+						<div>
+							{!fromPanel ? this.renderSectionName() : null}
+							{this.renderNetworkDetails()}
+						</div>
+						{!fromPanel ? this.renderXPathAndCSS() : null}
+						{!this.props.section.isIncontent && this.props.section.type != 3
+							? this.renderDockedButton()
+							: null}
+					</div>
+				)}
 			</div>
 		);
 	}
