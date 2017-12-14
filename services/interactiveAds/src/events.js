@@ -1,16 +1,18 @@
 // Events module
 
-var commonConsts = require('./commonConsts'),
-	emitter = require('./emitter');
+import commonConsts from './commonConsts';
+import emitter from './emitter';
 
-window.addEventListener(commonConsts.EVENTS.PAGE_LOAD, function(data) {
-	emitter.publish(commonConsts.EVENTS.PAGE_LOAD, data);
-});
+((w, ap) => {
+	$(document).ready(function() {
+		emitter.publish(commonConsts.EVENTS.DOM_LOAD, w);
+	});
 
-window.addEventListener(commonConsts.EVENTS.DOM_LOAD, function(data) {
-	emitter.publish(commonConsts.EVENTS.DOM_LOAD, data);
-});
+	$(w).scroll(data => {
+		emitter.publish(commonConsts.EVENTS.SCROLL, data);
+	});
 
-window.addEventListener(commonConsts.EVENTS.SCROLL, function(data) {
-	emitter.publish(commonConsts.EVENTS.SCROLL, data);
-});
+	// w.addEventListener(commonConsts.EVENTS.PAGE_LOAD, function(data) {
+	// 	emitter.publish(commonConsts.EVENTS.PAGE_LOAD, data);
+	// });
+})(window, {});
