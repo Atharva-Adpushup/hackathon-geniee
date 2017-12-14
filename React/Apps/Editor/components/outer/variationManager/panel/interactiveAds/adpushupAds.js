@@ -15,13 +15,17 @@ class AdPushupAds extends Component {
 		this.state = {
 			event: false,
 			eventData: {
-				value: ''
+				value:
+					this.props.section && this.props.section.formatData
+						? this.props.section.formatData.eventData.value
+						: ''
 			},
-			type: false,
-			placement: false,
+			type: this.props.section && this.props.section.formatData ? this.props.section.formatData.type : false,
+			placement:
+				this.props.section && this.props.section.formatData ? this.props.section.formatData.placement : false,
 			format: false,
-			size: false,
-			css: {},
+			size: this.props.ad ? `${this.props.ad.width}X${this.props.ad.height}` : false,
+			css: this.props.ad ? this.props.ad.css : {},
 			containsADP: true
 		};
 		// this.checkADP = this.checkADP.bind(this);
@@ -73,13 +77,13 @@ class AdPushupAds extends Component {
 		this.setState({ css });
 	}
 
-	renderInput(label, name, type, value) {
+	renderInput(label, name, type, value, leftWidth, rightWidth) {
 		return (
 			<Row className="mT-15">
-				<Col xs={5}>
+				<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
 					<strong>{label}</strong>
 				</Col>
-				<Col xs={7}>
+				<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 					<input
 						className="inputMinimal"
 						type={type}
@@ -95,10 +99,17 @@ class AdPushupAds extends Component {
 		);
 	}
 
-	renderEventOptions() {
+	renderEventOptions(leftWidth, rightWidth) {
 		switch (this.state.event) {
 			case 'onMills':
-				return this.renderInput('Enter trigger time', 'onMillsTime', 'number', this.state.eventData.value);
+				return this.renderInput(
+					'Enter trigger time',
+					'onMillsTime',
+					'number',
+					this.state.eventData.value,
+					leftWidth,
+					rightWidth
+				);
 				break;
 
 			case 'scroll':
@@ -106,7 +117,9 @@ class AdPushupAds extends Component {
 					'Enter scroll percentage',
 					'scrollPrecentage',
 					'number',
-					this.state.eventData.value
+					this.state.eventData.value,
+					leftWidth,
+					rightWidth
 				);
 				break;
 
@@ -118,15 +131,15 @@ class AdPushupAds extends Component {
 		}
 	}
 
-	renderFormatSelect() {
+	renderFormatSelect(leftWidth, rightWidth) {
 		let limit = this.props.platform == 'DESKTOP' ? 2 : 1,
 			types = interactiveAds.types.slice(0, limit);
 		return (
 			<Row className="mT-15">
-				<Col xs={5}>
+				<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
 					<strong>Select Format : </strong>
 				</Col>
-				<Col xs={7}>
+				<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 					<SelectBox value={this.state.format} label="Select Format" onChange={this.formatChangeHandler}>
 						{types.map((item, index) => (
 							<option key={index} value={item}>
@@ -139,14 +152,14 @@ class AdPushupAds extends Component {
 		);
 	}
 
-	renderFormatOptions() {
+	renderFormatOptions(leftWidth, rightWidth) {
 		return (
 			<div>
 				<Row className="mT-15">
-					<Col xs={5}>
+					<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
 						<strong>Select Size : </strong>
 					</Col>
-					<Col xs={7}>
+					<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 						<SelectBox value={this.state.size} label="Select Size" onChange={this.sizeChangeHandler}>
 							{interactiveAds.sizes[this.props.platform][this.state.type][this.state.placement].map(
 								(item, index) => (
@@ -159,10 +172,10 @@ class AdPushupAds extends Component {
 					</Col>
 				</Row>
 				<Row className="mT-15">
-					<Col xs={5}>
+					<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
 						<strong>Custom CSS : </strong>
 					</Col>
-					<Col xs={7}>
+					<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 						<CodeBox
 							customId={`${this.props.variation.id}interactiveAds`}
 							showButtons={false}
@@ -188,13 +201,13 @@ class AdPushupAds extends Component {
 	// 		: false;
 	// }
 
-	renderNetwork() {
+	renderNetwork(leftWidth, rightWidth) {
 		return (
 			<Row className="mT-15">
-				<Col xs={5}>
+				<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
 					<strong>Select Network</strong>
 				</Col>
-				<Col xs={7}>
+				<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 					<NetworkOptions
 						onSubmit={this.submitHandler}
 						onCancel={() => {}}
@@ -278,14 +291,19 @@ class AdPushupAds extends Component {
 	}
 
 	render() {
+		let parentStyle = { padding: this.props.fromEditSection ? '0px 0px' : '20px 0px' },
+			colStyle = { padding: this.props.fromEditSection ? '0px 0px' : '' },
+			overAllWidth = this.props.fromEditSection ? 12 : 7,
+			leftWidth = this.props.fromEditSection ? 6 : 5,
+			rightWidth = this.props.fromEditSection ? 6 : 7;
 		return this.state.containsADP ? (
-			<div style={{ padding: '20px 0px' }}>
-				<Col xs={7}>
+			<div style={parentStyle}>
+				<Col xs={overAllWidth} style={colStyle}>
 					<Row>
-						<Col xs={5}>
+						<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
 							<strong>Select Event : </strong>
 						</Col>
-						<Col xs={7}>
+						<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 							<div className="interactiveAdsRow">
 								<SelectBox
 									value={this.state.event}
@@ -301,10 +319,10 @@ class AdPushupAds extends Component {
 							</div>
 						</Col>
 					</Row>
-					{this.state.event ? this.renderEventOptions() : null}
-					{this.state.event ? this.renderFormatSelect() : null}
-					{this.state.event && this.state.format ? this.renderFormatOptions() : null}
-					{this.props.showNetworkOptions ? this.renderNetwork() : null}
+					{this.state.event ? this.renderEventOptions(leftWidth, rightWidth) : null}
+					{this.state.event ? this.renderFormatSelect(leftWidth, rightWidth) : null}
+					{this.state.event && this.state.format ? this.renderFormatOptions(leftWidth, rightWidth) : null}
+					{this.props.showNetworkOptions ? this.renderNetwork(leftWidth, rightWidth) : null}
 					{this.props.showButtons ? this.renderButtons() : null}
 				</Col>
 				<div style={{ clear: 'both' }}>&nbsp;</div>
