@@ -3,6 +3,7 @@ const express = require('express'),
 	_ = require('lodash'),
 	{ couchbaseService } = require('node-utils'),
 	config = require('../configs/config'),
+	utils = require('../helpers/utils'),
 	{ fetchLiveSites } = require('../reports/default/adpTags/index'),
 	{ getGlobalNetworkWiseDataContributionReport } = require('../helpers/commonFunctions'),
 	router = express.Router(),
@@ -65,11 +66,17 @@ router
 						: moment()
 								.subtract(1, 'days')
 								.format('YYYY-MM-DD')
-			};
+			},
+			dateFormatCollection = utils.getDateFormatCollection({
+				fromDate: params.fromDate,
+				toDate: params.toDate,
+				format: 'MMM DD'
+			});
 
 		return getGlobalNetworkWiseDataContributionReport(params)
 			.then(responseData => {
 				response.data = responseData;
+				response.data.dateFormat = dateFormatCollection;
 				return res.send(response);
 			})
 			.catch(err => {
