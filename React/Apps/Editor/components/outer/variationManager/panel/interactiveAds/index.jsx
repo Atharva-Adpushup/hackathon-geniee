@@ -3,8 +3,8 @@ import { Row, Col } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Nav, NavItem } from 'react-bootstrap';
+import { createSection } from 'actions/sectionActions';
 import { showNotification } from 'actions/uiActions';
-import { saveKeyValues } from 'actions/variationActions.js';
 import { interactiveAds } from '../../../../../consts/commonConsts';
 import AdPushupAds from './adpushupAds';
 class InteractiveAds extends Component {
@@ -15,16 +15,28 @@ class InteractiveAds extends Component {
 		};
 		this.handleNavSelect = this.handleNavSelect.bind(this);
 		this.renderContent = this.renderContent.bind(this);
+		this.adpushupSubmitHandler = this.adpushupSubmitHandler.bind(this);
 	}
 
 	handleNavSelect(value) {
 		this.setState({ activeNav: value });
 	}
 
+	adpushupSubmitHandler(sectionPayload, adPayload) {
+		this.props.createSectionAndAd(sectionPayload, adPayload, this.props.variation.id);
+		this.props.showNotification({
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'AdPushup Interactive Ad Created'
+		});
+	}
+
 	renderContent() {
 		switch (this.state.activeNav) {
 			case 1:
-				return <AdPushupAds {...this.props} />;
+				return (
+					<AdPushupAds {...this.props} submitHandler={this.adpushupSubmitHandler} showNetworkOptions={true} />
+				);
 				break;
 			case 2:
 				return <div>Empty for now</div>;
@@ -50,7 +62,7 @@ export default connect(
 		bindActionCreators(
 			{
 				showNotification: showNotification,
-				saveKeyValues: saveKeyValues
+				createSectionAndAd: createSection
 			},
 			dispatch
 		)

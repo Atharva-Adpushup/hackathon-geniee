@@ -11,7 +11,8 @@ class EditOptions extends Component {
 		super(props);
 		this.state = {
 			float: this.props.section.float,
-			editNetwork: false
+			editNetwork: false,
+			editInteractiveAd: false
 		};
 
 		this.onFloatSelectChange = this.onFloatSelectChange.bind(this);
@@ -19,6 +20,7 @@ class EditOptions extends Component {
 		this.renderContent = this.renderContent.bind(this);
 		this.submitHandler = this.submitHandler.bind(this);
 		this.toggleNetworkEditor = this.toggleNetworkEditor.bind(this);
+		this.toggleEditInteractiveAd = this.toggleEditInteractiveAd.bind(this);
 	}
 
 	onFloatSelectChange(float) {
@@ -52,18 +54,43 @@ class EditOptions extends Component {
 		this.setState({ editNetwork: !this.state.editNetwork });
 	}
 
+	toggleEditInteractiveAd() {
+		this.setState({ editInteractiveAdData: !this.state.editInteractiveAdData });
+	}
+
 	renderContent() {
-		return this.state.editNetwork ? (
-			<NetworkOptions
-				onSubmit={this.submitHandler}
-				onCancel={this.toggleNetworkEditor}
-				ad={this.props.section.ads[0]}
-				buttonType={2}
-				fromPanel={true}
-				id={this.props.section.id}
-				showNotification={this.props.showNotification}
-			/>
-		) : (
+		let response = [];
+		if (this.state.editNetwork || this.state.editInteractiveAd) {
+			this.state.editNetwork
+				? response.push(
+						<NetworkOptions
+							onSubmit={this.submitHandler}
+							onCancel={this.toggleNetworkEditor}
+							ad={this.props.section.ads[0]}
+							buttonType={2}
+							fromPanel={true}
+							id={this.props.section.id}
+							showNotification={this.props.showNotification}
+						/>
+					)
+				: null;
+			this.state.editInteractiveAd
+				? response.push(
+						<AdDetails
+							userType={currentUser.userType || false}
+							ad={this.props.section.ads[0]}
+							ui={this.props.ui}
+							section={this.props.section}
+							variationId={this.props.variation.id}
+							editNetwork={this.toggleNetworkEditor}
+							editInteractiveAd={this.toggleEditInteractiveAd}
+							fromPanel={true}
+							showEventData={this.props.section.type == 3 ? true : false}
+						/>
+					)
+				: null;
+		}
+		return (
 			<AdDetails
 				userType={currentUser.userType || false}
 				ad={this.props.section.ads[0]}
@@ -71,10 +98,35 @@ class EditOptions extends Component {
 				section={this.props.section}
 				variationId={this.props.variation.id}
 				editNetwork={this.toggleNetworkEditor}
-				onSetSectionType={this.props.onSetSectionType}
+				editInteractiveAd={this.toggleEditInteractiveAd}
 				fromPanel={true}
+				showEventData={this.props.section.type == 3 ? true : false}
 			/>
 		);
+
+		// return this.state.editNetwork ? (
+		// 	<NetworkOptions
+		// 		onSubmit={this.submitHandler}
+		// 		onCancel={this.toggleNetworkEditor}
+		// 		ad={this.props.section.ads[0]}
+		// 		buttonType={2}
+		// 		fromPanel={true}
+		// 		id={this.props.section.id}
+		// 		showNotification={this.props.showNotification}
+		// 	/>
+		// ) : (
+		// 	<AdDetails
+		// 		userType={currentUser.userType || false}
+		// 		ad={this.props.section.ads[0]}
+		// 		ui={this.props.ui}
+		// 		section={this.props.section}
+		// 		variationId={this.props.variation.id}
+		// 		editNetwork={this.toggleNetworkEditor}
+		// 		editInteractiveAd={this.toggleEditInteractiveAd}
+		// 		fromPanel={true}
+		// 		showEventData={this.props.section.type == 3 ? true : false}
+		// 	/>
+		// );
 	}
 
 	render() {
