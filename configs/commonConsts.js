@@ -59,7 +59,8 @@ module.exports = {
 			utmContent: '78fd0246cbe306230b5a27350f1ae60014531143',
 			utmFirstHit: '2f15f7c3386d3c1b8f431385f19b64f4b5a99fea',
 			utmFirstReferrer: 'c3daf387ef687bffc465193a6b1ac525960a1d05'
-		}
+		},
+		emailBlockList: ['demo@adpushup.com']
 	},
 	password: {
 		MASTER: 'fe4720b8bcdedb3cc47490015b0ab050',
