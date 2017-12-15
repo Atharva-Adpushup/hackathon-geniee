@@ -4,6 +4,7 @@
 var url = require('url'),
 	request = require('request-promise'),
 	commonConsts = require('../configs/commonConsts'),
+	moment = require('moment'),
 	// logger = require('./logger'),
 	CryptoJS = require('crypto-js'),
 	Promise = require('bluebird'),
@@ -218,6 +219,27 @@ var url = require('url'),
 				.catch(error => {
 					return response;
 				});
+		},
+		getDateFormatCollection: parameterConfig => {
+			const { fromDate, toDate, format } = parameterConfig,
+				fromDateMoment = moment(fromDate),
+				toDateMoment = moment(toDate),
+				daysDifferenceCount = Math.abs(toDateMoment.diff(fromDateMoment, 'days')),
+				differenceLength = daysDifferenceCount + 1,
+				resultData = {
+					collection: [],
+					differenceCount: daysDifferenceCount
+				};
+
+			for (let dayDifference = 0; dayDifference < differenceLength; dayDifference++) {
+				let dateFormat = moment(fromDate)
+					.add(dayDifference, 'days')
+					.format(format);
+
+				resultData.collection.push(dateFormat);
+			}
+
+			return resultData;
 		}
 	};
 

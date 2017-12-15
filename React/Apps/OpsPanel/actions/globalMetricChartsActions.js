@@ -14,4 +14,17 @@ const fetchNetworkWiseData = params => (dispatch, getState) => {
 	});
 };
 
-export { fetchNetworkWiseData };
+const fetchMetricsData = params => (dispatch, getState) => {
+	return ajax({
+		url: '/ops/getGlobalMetricsData',
+		method: 'POST',
+		data: JSON.stringify(params)
+	}).then(response => {
+		if (response.error) {
+			alert('Error occured. Please try again later');
+		}
+		return dispatch({ type: globalMetricChartsActions.SET_METRICS_DATA, data: response.data });
+	});
+};
+
+export { fetchNetworkWiseData, fetchMetricsData };
