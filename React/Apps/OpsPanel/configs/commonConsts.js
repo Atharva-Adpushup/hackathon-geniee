@@ -10,7 +10,9 @@ const siteMappingActions = {
 		FETCH_NETWORK_WISE_DATA: 'FETCH_NETWORK_WISE_DATA',
 		SET_NETWORK_WISE_DATA: 'SET_NETWORK_WISE_DATA',
 		FETCH_METRICS_DATA: 'FETCH_METRICS_DATA',
-		SET_METRICS_DATA: 'SET_METRICS_DATA'
+		SET_METRICS_DATA: 'SET_METRICS_DATA',
+		FETCH_MODE_WISE_TRAFFIC_DATA: 'FETCH_MODE_WISE_TRAFFIC_DATA',
+		SET_MODE_WISE_TRAFFIC_DATA: 'SET_MODE_WISE_TRAFFIC_DATA'
 	},
 	siteMapping = {
 		labels: {
@@ -221,7 +223,7 @@ const siteMappingActions = {
 		},
 		plotOptions: {
 			pie: {
-				allowPointSelect: false,
+				allowPointSelect: true,
 				cursor: 'pointer',
 				dataLabels: {
 					enabled: true,
@@ -234,7 +236,7 @@ const siteMappingActions = {
 		},
 		series: [
 			{
-				name: 'Variables',
+				name: 'Metrics',
 				colorByPoint: true,
 				data: []
 			}

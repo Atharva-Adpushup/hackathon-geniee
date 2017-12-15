@@ -1,7 +1,8 @@
 import { globalMetricChartsActions } from '../configs/commonConsts';
 const defaultState = {
 		networkWise: {},
-		metrics: {}
+		metrics: {},
+		modeWiseTraffic: {}
 	},
 	globalMetricCharts = (state = defaultState, action) => {
 		switch (action.type) {
@@ -10,6 +11,9 @@ const defaultState = {
 				break;
 			case globalMetricChartsActions.SET_METRICS_DATA:
 				return { ...state, metrics: { ...action.data } };
+				break;
+			case globalMetricChartsActions.SET_MODE_WISE_TRAFFIC_DATA:
+				return { ...state, modeWiseTraffic: { ...action.data } };
 				break;
 
 			default:
