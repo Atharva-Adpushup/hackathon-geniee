@@ -75,6 +75,14 @@ GROUP BY report_Date
 ORDER BY report_date
 `;
 
+const GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE = `
+SELECT report_date, mode, sum(total_requests) as total_page_views
+FROM ApexHourlySiteReport a
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+GROUP BY report_date, mode
+ORDER BY report_date, mode, sum(total_requests) DESC
+`;
+
 const PLATFORMS_KEYS = {
 	0: 'UNKNOWN',
 	1: 'MOBILE',
@@ -274,5 +282,6 @@ module.exports = {
 	ANAMOLY_CPM,
 	ANAMOLY_DETERMINED_MODE,
 	GLOBAL_NETWORK_WISE_PERFORMANCE,
-	GLOBAL_METRICS_PERFORMANCE
+	GLOBAL_METRICS_PERFORMANCE,
+	GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE
 };

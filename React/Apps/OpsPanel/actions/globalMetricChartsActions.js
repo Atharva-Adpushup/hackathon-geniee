@@ -27,4 +27,17 @@ const fetchMetricsData = params => (dispatch, getState) => {
 	});
 };
 
-export { fetchNetworkWiseData, fetchMetricsData };
+const fetchModeWiseTrafficData = params => (dispatch, getState) => {
+	return ajax({
+		url: '/ops/getGlobalModeWiseData',
+		method: 'POST',
+		data: JSON.stringify(params)
+	}).then(response => {
+		if (response.error) {
+			alert('Error occured. Please try again later');
+		}
+		return dispatch({ type: globalMetricChartsActions.SET_MODE_WISE_TRAFFIC_DATA, data: response.data });
+	});
+};
+
+export { fetchNetworkWiseData, fetchMetricsData, fetchModeWiseTrafficData };
