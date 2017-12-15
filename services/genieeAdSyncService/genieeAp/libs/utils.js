@@ -1,6 +1,7 @@
 var browserConfig = require('./browserConfig.js'),
 	// eslint-disable-next-line no-undef
 	$ = require('jquery'),
+	dockify = require('./dockify'),
 	Base64 = require('Base64');
 
 module.exports = {
@@ -290,30 +291,6 @@ module.exports = {
 
 		return isInCollection;
 	},
-	dockifyAd: function(xPath) {
-		if (!xPath || !$(xPath).length) {
-			return false;
-		}
-		var $el = $(xPath);
-
-		$(window).on('scroll', function() {
-			var elTopOffset = $el.offset().top;
-
-			if ($(window).scrollTop() > elTopOffset) {
-				$el.css({
-					position: 'fixed',
-					top: '0px',
-					zIndex: 10000
-				});
-			} else {
-				$el.css({
-					position: '',
-					top: '',
-					zIndex: ''
-				});
-			}
-		});
-	},
 	removeUrlParameter: function(url, parameter) {
 		// Snippet from https://stackoverflow.com/a/4893927
 		var urlParts = url.split('?');
@@ -357,33 +334,6 @@ module.exports = {
 		});
 
 		return objURL;
-	})()
+	})(),
+	dockify: dockify
 };
-
-(function() {
-	if (!Function.prototype.bind) {
-		// eslint-disable-next-line no-extend-native
-		Function.prototype.bind = function(oThis) {
-			if (typeof this !== 'function') {
-				// closest thing possible to the ECMAScript 5
-				// internal IsCallable function
-				throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
-			}
-
-			var aArgs = Array.prototype.slice.call(arguments, 1),
-				fToBind = this,
-				Noop = function() {},
-				fBound = function() {
-					return fToBind.apply(
-						this instanceof Noop ? this : oThis,
-						aArgs.concat(Array.prototype.slice.call(arguments))
-					);
-				};
-
-			Noop.prototype = this.prototype;
-			fBound.prototype = new Noop();
-
-			return fBound;
-		};
-	}
-})();
