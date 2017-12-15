@@ -13,37 +13,25 @@ import '../../../ReportingPanel/styles.scss';
 
 function generateHighChartConfig(inputData, metricName) {
 	const chartConfig = extend(true, {}, LINE_CHART_CONFIG),
-		categories = [],
+		categories = inputData.dateFormat.collection.concat([]),
 		contributionData = extend(true, {}, inputData.dayWise);
 	const capitalisedMetric = metricName.toUpperCase();
 
 	chartConfig.yAxis.title.text = `${capitalisedMetric} ($)`;
 	chartConfig.title.text = `${capitalisedMetric} Performance`;
+	chartConfig.xAxis.categories = chartConfig.xAxis.categories.concat(categories);
 
 	_.forOwn(contributionData, (adNetworkDayWiseReport, adNetworkKey) => {
 		const seriesObject = {
-				name: adNetworkKey,
-				data: []
-			},
-			// Below condition is added to avoid 'categories' array stuffed with redundant
-			// day values.
-			isCategoriesValidLength = !!(categories && categories.length + 1 <= 7),
-			isChartConfigCategoriesEmptyLength = !!chartConfig.xAxis.categories.length;
+			name: adNetworkKey,
+			data: []
+		};
 
 		_.forOwn(adNetworkDayWiseReport, (dayWiseObject, dateKey) => {
-			if (isCategoriesValidLength) {
-				const dayCategory = moment(dateKey).format('MMM DD');
-				categories.push(dayCategory);
-			}
-
 			seriesObject.data.push(dayWiseObject[metricName]);
 		});
 
 		chartConfig.series.push(seriesObject);
-
-		if (isCategoriesValidLength || !isChartConfigCategoriesEmptyLength) {
-			chartConfig.xAxis.categories = chartConfig.xAxis.categories.concat(categories);
-		}
 	});
 
 	return chartConfig;
@@ -151,7 +139,7 @@ class NetworkWise extends Component {
 
 	renderDateRangePickerUI() {
 		return (
-			<Col className="u-full-height aligner aligner--hBottom aligner--vCenter" xs={9}>
+			<Col className="u-full-height aligner aligner--hBottom aligner--vCenter" xs={8}>
 				<DateRangePicker
 					onDatesChange={this.datesUpdated}
 					onFocusChange={this.focusUpdated}
@@ -197,12 +185,12 @@ class NetworkWise extends Component {
 					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={8}>
 						<h4>Network Wise Chart</h4>
 					</Col>
-					<Col className="u-full-height aligner aligner--hCenter aligner--vBottom" xs={4}>
-						{this.renderSelectBox()}
-					</Col>
+					<Col className="u-full-height aligner aligner--hCenter aligner--vBottom" xs={4} />
 				</Row>
 				<Row className="u-margin-0px aligner-item">
-					<Col className="u-full-height aligner aligner--hCenter aligner--vCenter" xs={3} />
+					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={4}>
+						{this.renderSelectBox()}
+					</Col>
 					{this.renderDateRangePickerUI()}
 				</Row>
 			</div>
