@@ -294,11 +294,11 @@ module.exports = {
 		if (!xPath || !$(xPath).length) {
 			return false;
 		}
-
-		var $el = $(xPath),
-			elTopOffset = $el.offset().top;
+		var $el = $(xPath);
 
 		$(window).on('scroll', function() {
+			var elTopOffset = $el.offset().top;
+
 			if ($(window).scrollTop() > elTopOffset) {
 				$el.css({
 					position: 'fixed',
