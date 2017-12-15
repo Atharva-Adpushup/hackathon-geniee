@@ -179,6 +179,19 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			value
 		};
 	},
+	updateFormatData = (sectionId, formatData) => (dispatch, getState) => {
+		dispatch({
+			type: uiActions.SHOW_NOTIFICATION,
+			mode: 'success',
+			title: 'Operation Successfull',
+			message: 'Format Data updated'
+		});
+		return dispatch({
+			type: sectionActions.UPDATE_FORMAT_DATA,
+			sectionId,
+			formatData
+		});
+	},
 	updateIncontentFloat = (sectionId, adId, float) => {
 		let floatCss = '';
 
@@ -221,5 +234,6 @@ export {
 	validateSectionXPath,
 	updateIncontentFloat,
 	scrollSectionIntoView,
-	updateType
+	updateType,
+	updateFormatData
 };

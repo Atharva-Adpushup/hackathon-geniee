@@ -82,7 +82,20 @@ const sectionByIds = (state = {}, action) => {
 		case sectionActions.UPDATE_TYPE:
 			return {
 				...state,
-				[action.sectionId]: { ...state[action.sectionId], type: action.value }
+				[action.sectionId]: {
+					...state[action.sectionId],
+					type: action.value,
+					formatData:
+						action.type != state[action.sectionId].type
+							? {}
+							: !state[action.sectionId].formatData ? {} : state[action.sectionId].formatData
+				}
+			};
+
+		case sectionActions.UPDATE_FORMAT_DATA:
+			return {
+				...state,
+				[action.sectionId]: { ...state[action.sectionId], formatData: action.formatData }
 			};
 
 		case sectionActions.UPDATE_INCONTENT_FLOAT:

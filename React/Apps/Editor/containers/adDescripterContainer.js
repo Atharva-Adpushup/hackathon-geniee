@@ -2,6 +2,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AdsDescriptor from 'editMenu/adDescriptor.jsx';
 import { updateCss, updateAdCode, updateNetwork } from '../actions/adActions';
+import { showNotification } from '../actions/uiActions';
 import { resetErrors } from 'actions/uiActions';
 import {
 	deleteSection,
@@ -9,7 +10,8 @@ import {
 	sectionAllXPaths,
 	validateXPath,
 	renameSection,
-	updateType
+	updateType,
+	updateFormatData
 } from 'actions/sectionActions.js';
 
 export default connect(
@@ -26,7 +28,9 @@ export default connect(
 				onValidateXPath: validateXPath,
 				onResetErrors: resetErrors,
 				onRenameSection: renameSection,
-				onSetSectionType: updateType
+				onSetSectionType: updateType,
+				onFormatDataUpdate: updateFormatData,
+				showNotification: showNotification
 			},
 			dispatch
 		)
