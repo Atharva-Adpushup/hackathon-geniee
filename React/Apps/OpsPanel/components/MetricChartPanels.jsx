@@ -8,8 +8,8 @@ const MetricChartPanels = props => {
 	return (
         <ActionCard title='Global Site Vitals'>
             <div className="pd-20">
+                <Metrics fetchData={props.fetchMetricsData} data={props.charts.metrics} />
                 <NetworkWise fetchData={props.fetchNetworkWiseData} data={props.charts.networkWise} />
-                <Metrics />
             </div>
         </ActionCard>
 	);
