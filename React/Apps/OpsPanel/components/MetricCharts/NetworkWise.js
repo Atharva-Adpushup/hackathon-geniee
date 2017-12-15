@@ -139,7 +139,7 @@ class NetworkWise extends Component {
 
 	renderDateRangePickerUI() {
 		return (
-			<Col className="u-full-height aligner aligner--hBottom aligner--vCenter" xs={8}>
+			<Col className="u-full-height aligner aligner--hBottom aligner--vCenter" xs={9}>
 				<DateRangePicker
 					onDatesChange={this.datesUpdated}
 					onFocusChange={this.focusUpdated}
@@ -188,7 +188,7 @@ class NetworkWise extends Component {
 					<Col className="u-full-height aligner aligner--hCenter aligner--vBottom" xs={4} />
 				</Row>
 				<Row className="u-margin-0px aligner-item">
-					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={4}>
+					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={3}>
 						{this.renderSelectBox()}
 					</Col>
 					{this.renderDateRangePickerUI()}
