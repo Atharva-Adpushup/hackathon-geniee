@@ -158,7 +158,7 @@ var $ = require('jquery'),
 
 					if (ad.type && Number(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL) {
 						// Type 4 is DOCKED
-						utils.dockifyAd('#' + ad.id, 1000);
+						utils.dockify.dockifyAd('#' + ad.id, ad.formatData);
 					}
 
 					tracker.add(
