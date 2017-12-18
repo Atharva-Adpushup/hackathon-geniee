@@ -79,6 +79,7 @@ class variationSections extends Component {
 			variation,
 			sections,
 			reporting,
+			platform,
 			onDeleteSection,
 			onRenameSection,
 			onUpdatePartnerData,
@@ -139,7 +140,7 @@ class variationSections extends Component {
 									ui={ui}
 									reporting={reporting}
 									showNotification={showNotification}
-									onSetSectionType={onSetSectionType}
+									platform={platform}
 								/>
 							</div>
 						))
