@@ -53,6 +53,7 @@ class EditOptions extends Component {
 
 	adpushupSubmitHandler = data => {
 		console.log(data);
+		this.toggleEditInteractiveAd();
 	};
 
 	toggleNetworkEditor() {
@@ -88,6 +89,7 @@ class EditOptions extends Component {
 					submitHandler={this.adpushupSubmitHandler}
 					onCancel={this.toggleEditInteractiveAd}
 					showNetworkOptions={false}
+					showButtons={true}
 					fromEditSection={true}
 					platform={this.props.platform}
 				/>
