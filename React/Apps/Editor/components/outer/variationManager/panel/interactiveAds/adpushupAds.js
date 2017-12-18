@@ -12,18 +12,18 @@ import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 class AdPushupAds extends Component {
 	constructor(props) {
 		super(props);
+		let isFormatDataPresent = this.props.section && this.props.section.formatData,
+			formatData = isFormatDataPresent ? this.props.section.formatData : false;
 		this.state = {
-			event: false,
+			event: isFormatDataPresent ? formatData.event : false,
 			eventData: {
-				value:
-					this.props.section && this.props.section.formatData
-						? this.props.section.formatData.eventData.value
-						: ''
+				value: isFormatDataPresent ? formatData.eventData.value : ''
 			},
-			type: this.props.section && this.props.section.formatData ? this.props.section.formatData.type : false,
-			placement:
-				this.props.section && this.props.section.formatData ? this.props.section.formatData.placement : false,
-			format: false,
+			type: isFormatDataPresent ? formatData.type : false,
+			placement: isFormatDataPresent ? formatData.placement : false,
+			format: isFormatDataPresent
+				? `${formatData.type}${formatData.placement.charAt(0).toUpperCase() + formatData.placement.slice(1)}`
+				: false,
 			size: this.props.ad ? `${this.props.ad.width}X${this.props.ad.height}` : false,
 			css: this.props.ad ? this.props.ad.css : {},
 			containsADP: true
@@ -103,7 +103,7 @@ class AdPushupAds extends Component {
 		switch (this.state.event) {
 			case 'onMills':
 				return this.renderInput(
-					'Enter trigger time',
+					'Trigger time',
 					'onMillsTime',
 					'number',
 					this.state.eventData.value,
@@ -114,7 +114,7 @@ class AdPushupAds extends Component {
 
 			case 'scroll':
 				return this.renderInput(
-					'Enter scroll percentage',
+					'Scroll percentage',
 					'scrollPrecentage',
 					'number',
 					this.state.eventData.value,
@@ -137,7 +137,7 @@ class AdPushupAds extends Component {
 		return (
 			<Row className="mT-15">
 				<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
-					<strong>Select Format : </strong>
+					<strong>Format </strong>
 				</Col>
 				<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 					<SelectBox value={this.state.format} label="Select Format" onChange={this.formatChangeHandler}>
@@ -157,7 +157,7 @@ class AdPushupAds extends Component {
 			<div>
 				<Row className="mT-15">
 					<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
-						<strong>Select Size : </strong>
+						<strong>Size </strong>
 					</Col>
 					<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 						<SelectBox value={this.state.size} label="Select Size" onChange={this.sizeChangeHandler}>
@@ -173,7 +173,7 @@ class AdPushupAds extends Component {
 				</Row>
 				<Row className="mT-15">
 					<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
-						<strong>Custom CSS : </strong>
+						<strong>CSS </strong>
 					</Col>
 					<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 						<CodeBox
@@ -205,7 +205,7 @@ class AdPushupAds extends Component {
 		return (
 			<Row className="mT-15">
 				<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
-					<strong>Select Network</strong>
+					<strong>Network</strong>
 				</Col>
 				<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 					<NetworkOptions
@@ -294,22 +294,18 @@ class AdPushupAds extends Component {
 		let parentStyle = { padding: this.props.fromEditSection ? '0px 0px' : '20px 0px' },
 			colStyle = { padding: this.props.fromEditSection ? '0px 0px' : '' },
 			overAllWidth = this.props.fromEditSection ? 12 : 7,
-			leftWidth = this.props.fromEditSection ? 6 : 5,
-			rightWidth = this.props.fromEditSection ? 6 : 7;
+			leftWidth = this.props.fromEditSection ? 4 : 5,
+			rightWidth = this.props.fromEditSection ? 8 : 7;
 		return this.state.containsADP ? (
 			<div style={parentStyle}>
 				<Col xs={overAllWidth} style={colStyle}>
 					<Row>
 						<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
-							<strong>Select Event : </strong>
+							<strong>Event</strong>
 						</Col>
 						<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 							<div className="interactiveAdsRow">
-								<SelectBox
-									value={this.state.event}
-									label="Select Event"
-									onChange={this.eventChangeHandler}
-								>
+								<SelectBox value={this.state.event} label="Event" onChange={this.eventChangeHandler}>
 									{interactiveAds.events.map((item, index) => (
 										<option key={index} value={item}>
 											{item.toUpperCase()}
