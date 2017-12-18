@@ -75,6 +75,27 @@ GROUP BY report_Date
 ORDER BY report_date
 `;
 
+const GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE = `
+SELECT report_date, mode, sum(total_requests) as total_page_views
+FROM ApexHourlySiteReport a
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+GROUP BY report_date, mode
+ORDER BY report_date, mode, sum(total_requests) DESC
+`;
+
+const GLOBAL_TOP_10_COUNTRIES_PERFORMANCE = `
+SELECT report_date, a.cid, country, total_page_views
+FROM (
+SELECT report_date, a.cid, NAME country, sum(total_requests) AS total_page_views
+,ROW_NUMBER() OVER (PARTITION BY report_date ORDER BY sum(total_requests) DESC) AS rn
+FROM ApexHourlySiteReport a, country b
+WHERE a.cid = b.cid AND report_date BETWEEN @__fromDate__ AND @__toDate__
+GROUP BY report_date, a.cid, NAME
+) a
+WHERE rn <= @__count__
+ORDER BY report_date
+`;
+
 const PLATFORMS_KEYS = {
 	0: 'UNKNOWN',
 	1: 'MOBILE',
@@ -274,5 +295,7 @@ module.exports = {
 	ANAMOLY_CPM,
 	ANAMOLY_DETERMINED_MODE,
 	GLOBAL_NETWORK_WISE_PERFORMANCE,
-	GLOBAL_METRICS_PERFORMANCE
+	GLOBAL_METRICS_PERFORMANCE,
+	GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE,
+	GLOBAL_TOP_10_COUNTRIES_PERFORMANCE
 };
