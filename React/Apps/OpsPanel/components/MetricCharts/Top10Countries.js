@@ -5,53 +5,48 @@ import _ from 'lodash';
 import extend from 'extend';
 import ReactHighCharts from 'react-highcharts';
 import PaneLoader from '../../../../Components/PaneLoader.jsx';
-import { LINE_CHART_CONFIG } from '../../configs/commonConsts';
+import { PIE_CHART_CONFIG } from '../../configs/commonConsts';
 import SelectBox from '../../../../Components/SelectBox/index.jsx';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 import '../../../ReportingPanel/styles.scss';
 
-function generateHighChartConfig(inputData, metricName) {
-	const chartConfig = extend(true, {}, LINE_CHART_CONFIG),
-		categories = inputData.dateFormat.collection.concat([]),
-		contributionData = extend(true, {}, inputData.dayWise);
-	const capitalisedMetric = metricName.toUpperCase();
+function generateHighChartConfig(inputData) {
+	const chartConfig = extend(true, {}, PIE_CHART_CONFIG),
+		contributionData = inputData.contribution.concat([]),
+		seriesData = contributionData.map(modeContributionObject => {
+			const key = Object.keys(modeContributionObject)[0],
+				value = modeContributionObject[key],
+				pageViews = _.find(inputData.aggregated, { country: key }).pageViews;
 
-	chartConfig.yAxis.title.text = `${capitalisedMetric} ($)`;
-	chartConfig.title.text = `${capitalisedMetric} Performance`;
-	chartConfig.xAxis.categories = chartConfig.xAxis.categories.concat(categories);
-
-	_.forOwn(contributionData, (adNetworkDayWiseReport, adNetworkKey) => {
-		const seriesObject = {
-			name: adNetworkKey,
-			data: []
-		};
-
-		_.forOwn(adNetworkDayWiseReport, (dayWiseObject, dateKey) => {
-			seriesObject.data.push(dayWiseObject[metricName]);
+			return {
+				name: key,
+				y: value,
+				pageViews
+			};
 		});
 
-		chartConfig.series.push(seriesObject);
-	});
-
+	chartConfig.series[0].data = seriesData.concat([]);
+	chartConfig.tooltip.pointFormat = '{series.name}: <b>{point.percentage:.1f}%</b><br>PV: {point.pageViews}';
 	return chartConfig;
 }
 
-class NetworkWise extends Component {
+class Top10Countries extends Component {
 	constructor(props) {
 		super(props);
 		let isDataLoaded =
 			this.props.data &&
 			Object.keys(this.props.data).length &&
 			this.props.data.aggregated &&
-			this.props.data.dayWise
+			this.props.data.dayWise &&
+			this.props.data.contribution
 				? true
 				: false;
 
 		this.state = {
 			isDataLoaded,
 			data: isDataLoaded ? this.props.data : null,
-			selectedMetric: 'cpm',
+			count: this.props.count || 11,
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
@@ -61,8 +56,6 @@ class NetworkWise extends Component {
 		};
 		this.renderHighCharts = this.renderHighCharts.bind(this);
 		this.generateHeaderTitle = this.generateHeaderTitle.bind(this);
-		this.handleSelectBoxChange = this.handleSelectBoxChange.bind(this);
-		this.renderSelectBox = this.renderSelectBox.bind(this);
 		this.renderDateRangePickerUI = this.renderDateRangePickerUI.bind(this);
 		this.datesUpdated = this.datesUpdated.bind(this);
 		this.focusUpdated = this.focusUpdated.bind(this);
@@ -75,7 +68,8 @@ class NetworkWise extends Component {
 			: this.props.fetchData({
 					transform: true,
 					fromDate: this.state.startDate,
-					toDate: this.state.endDate
+					toDate: this.state.endDate,
+					count: this.state.count
 				});
 	}
 
@@ -84,7 +78,8 @@ class NetworkWise extends Component {
 				nextProps.data &&
 				Object.keys(nextProps.data).length &&
 				nextProps.data.aggregated &&
-				nextProps.data.dayWise
+				nextProps.data.dayWise &&
+				nextProps.data.contribution
 					? true
 					: false,
 			data = isDataLoaded ? Object.assign(nextProps.data) : null;
@@ -94,39 +89,9 @@ class NetworkWise extends Component {
 
 	renderHighCharts() {
 		let inputData = this.state.data,
-			metricName = this.state.selectedMetric,
-			config = generateHighChartConfig(inputData, metricName);
+			config = generateHighChartConfig(inputData);
 
 		return <ReactHighCharts config={config} />;
-	}
-
-	handleSelectBoxChange(metric = 'cpm') {
-		metric = metric ? metric : 'cpm';
-		this.setState({
-			selectedMetric: metric
-		});
-	}
-
-	renderSelectBox() {
-		return (
-			<SelectBox
-				value={this.state.selectedMetric}
-				label="Select metric"
-				onChange={this.handleSelectBoxChange}
-				onClear={this.handleSelectBoxChange}
-				disabled={false}
-			>
-				<option key="0" value="cpm">
-					CPM
-				</option>
-				<option key="1" value="revenue">
-					REVENUE
-				</option>
-				<option key="2" value="impressions">
-					IMPRESSIONS
-				</option>
-			</SelectBox>
-		);
 	}
 
 	datesUpdated({ startDate, endDate }) {
@@ -183,13 +148,20 @@ class NetworkWise extends Component {
 			<div className="u-full-height aligner aligner--column">
 				<Row className="u-margin-0px aligner-item">
 					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={8}>
-						<h4>Network Wise Chart</h4>
+						<h4>Mode Wise Traffic Chart</h4>
 					</Col>
 					<Col className="u-full-height aligner aligner--hCenter aligner--vBottom" xs={4} />
 				</Row>
 				<Row className="u-margin-0px aligner-item">
 					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={3}>
-						{this.renderSelectBox()}
+						{/* <input
+							type="number"
+							name="countriesCount"
+							placeholder="Enter country count"
+							value={this.state.count}
+							onChange={ev => this.setState({ count: ev.target.value })}
+							className="inputMinimal"
+						/> */}
 					</Col>
 					{this.renderDateRangePickerUI()}
 				</Row>
@@ -209,4 +181,4 @@ class NetworkWise extends Component {
 	}
 }
 
-export default NetworkWise;
+export default Top10Countries;

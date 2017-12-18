@@ -7,7 +7,9 @@ const express = require('express'),
 	{ fetchLiveSites } = require('../reports/default/adpTags/index'),
 	{
 		getGlobalNetworkWiseDataContributionReport,
-		getGlobalMetricsDataContributionReport
+		getGlobalMetricsDataContributionReport,
+		getGlobalModeWiseTrafficContributionReport,
+		getGlobalTop10CountriesContributionQuery
 	} = require('../helpers/commonFunctions'),
 	router = express.Router(),
 	appBucket = couchbaseService(
@@ -113,6 +115,80 @@ router
 			});
 
 		return getGlobalMetricsDataContributionReport(params)
+			.then(responseData => {
+				response.data = responseData;
+				response.data.dateFormat = dateFormatCollection;
+				return res.send(response);
+			})
+			.catch(err => {
+				return res.send(Object.assign(response, { error: true }));
+			});
+	})
+	.post('/getGlobalModeWiseData', (req, res) => {
+		let response = {
+				error: false,
+				data: []
+			},
+			params = {
+				transform: true,
+				fromDate:
+					req.body && req.body.fromDate
+						? moment(req.body.fromDate).format('YYYY-MM-DD')
+						: moment()
+								.subtract(7, 'days')
+								.format('YYYY-MM-DD'),
+				toDate:
+					req.body && req.body.toDate
+						? moment(req.body.toDate).format('YYYY-MM-DD')
+						: moment()
+								.subtract(1, 'days')
+								.format('YYYY-MM-DD')
+			},
+			dateFormatCollection = utils.getDateFormatCollection({
+				fromDate: params.fromDate,
+				toDate: params.toDate,
+				format: 'MMM DD'
+			});
+
+		return getGlobalModeWiseTrafficContributionReport(params)
+			.then(responseData => {
+				response.data = responseData;
+				response.data.dateFormat = dateFormatCollection;
+				return res.send(response);
+			})
+			.catch(err => {
+				return res.send(Object.assign(response, { error: true }));
+			});
+	})
+	.post('/getGlobalTop10Countries', (req, res) => {
+		let response = {
+				error: false,
+				data: []
+			},
+			bodyParameters = req.body,
+			params = {
+				transform: true,
+				count: bodyParameters.count ? bodyParameters.count : 11,
+				fromDate:
+					bodyParameters && bodyParameters.fromDate
+						? moment(bodyParameters.fromDate).format('YYYY-MM-DD')
+						: moment()
+								.subtract(7, 'days')
+								.format('YYYY-MM-DD'),
+				toDate:
+					bodyParameters && bodyParameters.toDate
+						? moment(bodyParameters.toDate).format('YYYY-MM-DD')
+						: moment()
+								.subtract(1, 'days')
+								.format('YYYY-MM-DD')
+			},
+			dateFormatCollection = utils.getDateFormatCollection({
+				fromDate: params.fromDate,
+				toDate: params.toDate,
+				format: 'MMM DD'
+			});
+
+		return getGlobalTop10CountriesContributionQuery(params)
 			.then(responseData => {
 				response.data = responseData;
 				response.data.dateFormat = dateFormatCollection;
