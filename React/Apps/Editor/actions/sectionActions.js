@@ -4,7 +4,8 @@ import {
 	leftSectionCss,
 	rightSectionCss,
 	adActions,
-	uiActions
+	uiActions,
+	editMenuActions
 } from 'consts/commonConsts';
 import { getVariationSectionsWithAds } from 'selectors/variationSelectors';
 import Utils from 'libs/utils';
@@ -185,6 +186,9 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			mode: 'success',
 			title: 'Operation Successfull',
 			message: 'Format Data updated'
+		});
+		dispatch({
+			type: editMenuActions.HIDE_EDIT_MENU
 		});
 		return dispatch({
 			type: sectionActions.UPDATE_FORMAT_DATA,
