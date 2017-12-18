@@ -38,6 +38,7 @@ const _ = require('lodash'),
 				network: ad.network,
 				//Format type of ad like, 1 for structural, 2 for incontent
 				type: section.type,
+				formatData: section.formatData,
 				css: ad.css,
 				height: parseInt(ad.height, 10),
 				width: parseInt(ad.width, 10)
