@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import CodeBox from 'shared/codeBox';
@@ -26,7 +26,7 @@ class AdPushupAds extends Component {
 				: false,
 			size: this.props.ad ? `${this.props.ad.width}X${this.props.ad.height}` : false,
 			css: this.props.ad ? this.props.ad.css : {},
-			containsADP: true
+			containsInteractiveAd: true
 		};
 		// this.checkADP = this.checkADP.bind(this);
 		this.submitHandler = this.submitHandler.bind(this);
@@ -281,9 +281,14 @@ class AdPushupAds extends Component {
 	renderButtons() {
 		return (
 			<Row className="mT-15">
-				<Col xs={6} xsPush={6} style={{ paddingRight: '0px' }}>
+				<Col xs={6} className="u-padding-r10px">
 					<Button className="btn-lightBg btn-save btn-block" onClick={this.submitHandler}>
 						Save
+					</Button>
+				</Col>
+				<Col xs={6} className="u-padding-l10px">
+					<Button className="btn-lightBg btn-save btn-block" onClick={this.props.onCancel}>
+						Cancel
 					</Button>
 				</Col>
 			</Row>
@@ -296,7 +301,7 @@ class AdPushupAds extends Component {
 			overAllWidth = this.props.fromEditSection ? 12 : 7,
 			leftWidth = this.props.fromEditSection ? 4 : 5,
 			rightWidth = this.props.fromEditSection ? 8 : 7;
-		return this.state.containsADP ? (
+		return this.state.containsInteractiveAd ? (
 			<div style={parentStyle}>
 				<Col xs={overAllWidth} style={colStyle}>
 					<Row>
@@ -324,7 +329,7 @@ class AdPushupAds extends Component {
 				<div style={{ clear: 'both' }}>&nbsp;</div>
 			</div>
 		) : (
-			<div>Variation must contain one ADP section in order to set Key-Values</div>
+			<div>Interactive Ads</div>
 		);
 	}
 }
