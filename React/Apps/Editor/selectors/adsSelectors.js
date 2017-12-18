@@ -5,7 +5,11 @@ import { getActiveChannel } from './channelSelectors';
 const getAllAds = state => state.adByIds,
 	getEmptyAdCodes = state => {
 		return _.filter(state.adByIds, ad => {
-			return ad.network != 'geniee' && ad.network != 'adpTags' && (!ad.adCode || !ad.adCode.length);
+			return (
+				ad.network != 'geniee' &&
+				ad.network != 'adpTags' &&
+				(!ad.networkData.adCode || !ad.networkData.adCode.length)
+			);
 		});
 	};
 
