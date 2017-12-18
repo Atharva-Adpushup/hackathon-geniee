@@ -78,6 +78,7 @@ class variationSections extends Component {
 			variation,
 			sections,
 			reporting,
+			platform,
 			onDeleteSection,
 			onRenameSection,
 			onUpdatePartnerData,
@@ -116,31 +117,32 @@ class variationSections extends Component {
 							styles={{ height: '500px', background: '#ebebeb' }}
 						/>
 					) : (
-							sections.map((section, key) => (
-								<div key={key} className="col-sm-6">
-									<VariationSectionElement
-										section={section}
-										key={key}
-										variation={variation}
-										onDeleteSection={onDeleteSection}
-										onRenameSection={onRenameSection}
-										updateAdCode={updateAdCode}
-										updateNetwork={updateNetwork}
-										onUpdatePartnerData={onUpdatePartnerData}
-										onUpdateXPath={onUpdateXPath}
-										onSectionAllXPaths={onSectionAllXPaths}
-										onValidateXPath={onValidateXPath}
-										onResetErrors={onResetErrors}
-										onSectionXPathValidate={onSectionXPathValidate}
-										onIncontentFloatUpdate={onIncontentFloatUpdate}
-										onScrollSectionIntoView={onScrollSectionIntoView}
-										ui={ui}
-										reporting={reporting}
-										showNotification={showNotification}
-									/>
-								</div>
-							))
-						)}
+						sections.map((section, key) => (
+							<div key={key} className="col-sm-6">
+								<VariationSectionElement
+									section={section}
+									key={key}
+									variation={variation}
+									onDeleteSection={onDeleteSection}
+									onRenameSection={onRenameSection}
+									updateAdCode={updateAdCode}
+									updateNetwork={updateNetwork}
+									onUpdatePartnerData={onUpdatePartnerData}
+									onUpdateXPath={onUpdateXPath}
+									onSectionAllXPaths={onSectionAllXPaths}
+									onValidateXPath={onValidateXPath}
+									onResetErrors={onResetErrors}
+									onSectionXPathValidate={onSectionXPathValidate}
+									onIncontentFloatUpdate={onIncontentFloatUpdate}
+									onScrollSectionIntoView={onScrollSectionIntoView}
+									ui={ui}
+									reporting={reporting}
+									showNotification={showNotification}
+									platform={platform}
+								/>
+							</div>
+						))
+					)}
 				</ul>
 			</div>
 		);

@@ -84,11 +84,12 @@ class EditOptions extends Component {
 					ad={this.props.section.ads[0]}
 					ui={this.props.ui}
 					section={this.props.section}
-					variationId={this.props.variation.id}
+					variation={this.props.variation}
 					submitHandler={this.adpushupSubmitHandler}
 					onCancel={this.toggleEditInteractiveAd}
 					showNetworkOptions={false}
 					fromEditSection={true}
+					platform={this.props.platform}
 				/>
 			);
 		}
