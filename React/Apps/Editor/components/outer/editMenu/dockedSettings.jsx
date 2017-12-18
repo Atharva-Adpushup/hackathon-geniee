@@ -40,7 +40,7 @@ class DockedSettings extends Component {
 			},
 			() => {
 				this.props.onFormatDataUpdate(this.props.section.id, {
-					css: code,
+					css: code.trim().length ? code : {},
 					bottomXPath: this.state.bottomXPath
 				});
 				this.props.onCancel();
