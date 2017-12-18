@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Utils from '../libs/utils';
 import {
 	getActiveChannelActiveVariationId,
 	getVariationStructuredSectionsWithAds,
@@ -41,12 +42,18 @@ const getData = state => {
 		const nextState = getData(store.getState());
 		const isActionUpdateContentSelector = !!(action.type === variationActions.UPDATE_CONTENT_SELECTOR),
 			isValidActionData = !!(action.hasOwnProperty('contentSelector') && action.channelId && action.variationId),
-			isValidActionUpdateContentSelector = !!(isActionUpdateContentSelector && isValidActionData);
+			isValidActionUpdateContentSelector = !!(isActionUpdateContentSelector && isValidActionData),
+			difference = Utils.deepDiffMapper.test(nextState.layout, prevState.layout),
+			isChanged = difference.isChanged,
+			changes = isChanged ? _.map(difference.changes.ADDED, 'info.key') : [],
+			isTypedChanged = changes.length && changes.indexOf('type') != -1 ? true : false;
 
 		if (nextState) {
 			if (
 				action.type !== sectionActions.UPDATE_PARTNER_DATA &&
-				(action.type === channelActions.OPEN_CHANNEL_SUCCESS || !_.isEqual(prevState.layout, nextState.layout))
+				(action.type === channelActions.OPEN_CHANNEL_SUCCESS ||
+					(!_.isEqual(prevState.layout, nextState.layout) && !isTypedChanged)) &&
+				!isTypedChanged
 			) {
 				sendMessage(nextState.activeChannelId, messengerCommands.UPDATE_LAYOUT, nextState.layout);
 			} else if (isValidActionUpdateContentSelector) {
