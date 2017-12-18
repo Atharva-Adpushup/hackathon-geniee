@@ -148,7 +148,7 @@ class Top10Countries extends Component {
 			<div className="u-full-height aligner aligner--column">
 				<Row className="u-margin-0px aligner-item">
 					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={8}>
-						<h4>Mode Wise Traffic Chart</h4>
+						<h4>Top 10 Countries Traffic Chart</h4>
 					</Col>
 					<Col className="u-full-height aligner aligner--hCenter aligner--vBottom" xs={4} />
 				</Row>
