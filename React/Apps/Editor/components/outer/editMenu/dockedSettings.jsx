@@ -22,15 +22,17 @@ class DockedSettings extends Component {
 	}
 
 	submitHandler(code) {
-		try {
-			code = JSON.parse(atob(code));
-		} catch (e) {
-			this.props.showNotification({
-				mode: 'error',
-				title: 'Operation failed',
-				message: 'Invalid CSS'
-			});
-			return;
+		if (code.trim().length) {
+			try {
+				code = JSON.parse(atob(code));
+			} catch (e) {
+				this.props.showNotification({
+					mode: 'error',
+					title: 'Operation failed',
+					message: 'Invalid CSS'
+				});
+				return;
+			}
 		}
 		this.setState(
 			{
