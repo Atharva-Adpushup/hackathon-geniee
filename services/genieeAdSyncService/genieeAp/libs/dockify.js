@@ -15,7 +15,7 @@ var $ = require('jquery'),
 	getDockedOffset = function(formatData) {
 		return formatData && formatData.bottomXPath ? $(formatData.bottomXPath).offset().top : null;
 	},
-	dockifyAd = function(xPath, formatData) {
+	dockifyAd = function(xPath, formatData, utils) {
 		if (!xPath || !$(xPath).length) {
 			return false;
 		}
@@ -25,32 +25,38 @@ var $ = require('jquery'),
 			dockedCSS = getDockedCSS(formatData, elComputedStyles),
 			offset = getDockedOffset(formatData),
 			elTopOffset = $el.offset().top,
-			windowHeight = $(window).height();
+			windowHeight = $(window).height(),
+			dockifyTrigger = function() {
+				var windowScrollTop = $(window).scrollTop(),
+					scrollLimitReachedWithoutOffset = windowScrollTop > elTopOffset && !offset,
+					scrollLimitReachedWithOffset = windowScrollTop > elTopOffset && offset && windowScrollTop < offset;
 
-		$(window).on('scroll', function() {
-			var windowScrollTop = $(window).scrollTop(),
-				scrollLimitReachedWithoutOffset = windowScrollTop > elTopOffset && !offset,
-				scrollLimitReachedWithOffset = windowScrollTop > elTopOffset && offset && windowScrollTop < offset;
+				if (scrollLimitReachedWithoutOffset || scrollLimitReachedWithOffset) {
+					$el.css(dockedCSS);
+				} else {
+					$el.css({
+						position: '',
+						top: '',
+						zIndex: ''
+					});
+				}
 
-			if (scrollLimitReachedWithoutOffset || scrollLimitReachedWithOffset) {
-				$el.css(dockedCSS);
-			} else {
-				$el.css({
-					position: '',
-					top: '',
-					zIndex: ''
-				});
-			}
+				if (offset && windowScrollTop + windowHeight > offset) {
+					var resetTop = offset - (windowScrollTop + windowHeight);
+					$el.css({
+						position: 'fixed',
+						top: resetTop, // This goes in negative as the offset is crossed
+						zIndex: ''
+					});
+				}
+			};
 
-			if (offset && windowScrollTop + windowHeight > offset) {
-				var resetTop = offset - (windowScrollTop + windowHeight);
-				$el.css({
-					position: 'fixed',
-					top: resetTop, // This goes in negative as the offset is crossed
-					zIndex: ''
-				});
-			}
-		});
+		$(window).on(
+			'scroll',
+			utils.throttle(function() {
+				dockifyTrigger();
+			}, 10)
+		);
 	};
 
 module.exports = {
