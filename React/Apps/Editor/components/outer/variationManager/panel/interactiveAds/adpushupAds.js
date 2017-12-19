@@ -28,7 +28,6 @@ class AdPushupAds extends Component {
 			css: this.props.ad ? this.props.ad.css : {},
 			containsInteractiveAd: true
 		};
-		// this.checkADP = this.checkADP.bind(this);
 		this.submitHandler = this.submitHandler.bind(this);
 		this.eventChangeHandler = this.eventChangeHandler.bind(this);
 		this.formatChangeHandler = this.formatChangeHandler.bind(this);
@@ -41,19 +40,6 @@ class AdPushupAds extends Component {
 		this.renderNetwork = this.renderNetwork.bind(this);
 		this.renderButtons = this.renderButtons.bind(this);
 	}
-
-	// componentWillReceiveProps(nextProps) {
-	// 	this.setState({
-	// 		containsADP: this.checkADP(nextProps.sections),
-	// 		adpKeyValues: nextProps.variation.adpKeyValues || null
-	// 	});
-	// }
-
-	// componentWillMount() {
-	// 	this.setState({
-	// 		containsADP: this.checkADP(this.props.sections)
-	// 	});
-	// }
 
 	eventChangeHandler(event) {
 		this.setState({ event });
@@ -153,6 +139,7 @@ class AdPushupAds extends Component {
 	}
 
 	renderFormatOptions(leftWidth, rightWidth) {
+		console.log(this.state.css);
 		return (
 			<div>
 				<Row className="mT-15">
@@ -181,7 +168,13 @@ class AdPushupAds extends Component {
 							showButtons={false}
 							textEdit
 							parentExpanded={this.props.ui.variationPanel.expanded}
-							code={this.state.css ? JSON.stringify(this.state.css) : ''}
+							code={
+								this.state.css
+									? typeof this.state.css == 'object'
+										? JSON.stringify(this.state.css)
+										: JSON.parse(this.state.css)
+									: {}
+							}
 							onChange={this.cssChangeHandler}
 						/>
 					</Col>
@@ -189,17 +182,6 @@ class AdPushupAds extends Component {
 			</div>
 		);
 	}
-
-	// checkADP(sections) {
-	// 	return sections
-	// 		? sections.some(section => {
-	// 				let ad = section.ads[0];
-	// 				if (ad.network && ad.network == 'adpTags') {
-	// 					return true;
-	// 				}
-	// 			})
-	// 		: false;
-	// }
 
 	renderNetwork(leftWidth, rightWidth) {
 		return (
@@ -221,15 +203,11 @@ class AdPushupAds extends Component {
 	}
 
 	submitHandler(networkInfo) {
-		let css,
-			error = false;
-		try {
-			css = typeof this.state.css == 'string' && this.state.css.trim().length ? JSON.parse(this.state.css) : {};
-		} catch (e) {
-			error = true;
-		}
+		let css =
+			typeof this.state.css == 'string' && this.state.css.length
+				? JSON.parse(this.state.css)
+				: Object.keys(this.state.css).length ? this.state.css : {};
 		if (
-			error ||
 			!this.state.event ||
 			!this.state.format ||
 			!this.state.size ||
@@ -302,7 +280,7 @@ class AdPushupAds extends Component {
 			overAllWidth = this.props.fromEditSection ? 12 : 7,
 			leftWidth = this.props.fromEditSection ? 4 : 5,
 			rightWidth = this.props.fromEditSection ? 8 : 7;
-		return this.state.containsInteractiveAd ? (
+		return (
 			<div style={parentStyle}>
 				<Col xs={overAllWidth} style={colStyle}>
 					<Row>
@@ -329,8 +307,6 @@ class AdPushupAds extends Component {
 				</Col>
 				<div style={{ clear: 'both' }}>&nbsp;</div>
 			</div>
-		) : (
-			<div>Interactive Ads</div>
 		);
 	}
 }

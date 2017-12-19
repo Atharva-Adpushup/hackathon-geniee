@@ -11,9 +11,10 @@ import {
 	validateSectionXPath,
 	updateIncontentFloat,
 	updatePartnerData,
-	scrollSectionIntoView
+	scrollSectionIntoView,
+	updateSection
 } from 'actions/sectionActions.js';
-import { updateNetwork, updateAdCode } from 'actions/adActions';
+import { updateNetwork, updateAdCode, updateAd } from 'actions/adActions';
 import { resetErrors, showNotification } from 'actions/uiActions';
 import { generateReport } from 'actions/reportingActions';
 import Filters from './filters.jsx';
@@ -92,6 +93,8 @@ class variationSections extends Component {
 			onResetErrors,
 			onSectionXPathValidate,
 			onScrollSectionIntoView,
+			updateAd,
+			updateSection,
 			showNotification
 		} = this.props;
 
@@ -135,6 +138,8 @@ class variationSections extends Component {
 									onSectionXPathValidate={onSectionXPathValidate}
 									onIncontentFloatUpdate={onIncontentFloatUpdate}
 									onScrollSectionIntoView={onScrollSectionIntoView}
+									updateSection={updateSection}
+									updateAd={updateAd}
 									ui={ui}
 									reporting={reporting}
 									showNotification={showNotification}
@@ -164,6 +169,8 @@ variationSections.propTypes = {
 	updateNetwork: PropTypes.func,
 	generateReport: PropTypes.func,
 	showNotification: PropTypes.func,
+	updateAd: PropTypes.func,
+	updateSection: PropTypes.func,
 	ui: PropTypes.object,
 	reporting: PropTypes.object
 };
@@ -187,7 +194,9 @@ export default connect(
 				updateAdCode: updateAdCode,
 				updateNetwork: updateNetwork,
 				generateReport: generateReport,
-				showNotification: showNotification
+				showNotification: showNotification,
+				updateSection: updateSection,
+				updateAd: updateAd
 			},
 			dispatch
 		)

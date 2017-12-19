@@ -81,6 +81,12 @@ const sectionByIds = (state = {}, action) => {
 				[action.sectionId]: { ...state[action.sectionId], xpath: action.xpath, allXpaths: [], error: false }
 			};
 
+		case sectionActions.UPDATE_SECTION:
+			return {
+				...state,
+				[action.sectionId]: { ...state[action.sectionId], ...action.params }
+			};
+
 		case sectionActions.UPDATE_INCONTENT_FLOAT:
 			return { ...state, [action.sectionId]: { ...state[action.sectionId], float: action.float } };
 
