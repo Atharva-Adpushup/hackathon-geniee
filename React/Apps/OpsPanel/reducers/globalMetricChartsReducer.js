@@ -3,7 +3,8 @@ const defaultState = {
 		networkWise: {},
 		metrics: {},
 		modeWiseTraffic: {},
-		top10Countries: {}
+		top10Countries: {},
+		top10Sites: {}
 	},
 	globalMetricCharts = (state = defaultState, action) => {
 		switch (action.type) {
@@ -18,6 +19,9 @@ const defaultState = {
 				break;
 			case globalMetricChartsActions.SET_TOP_10_COUNTRIES_DATA:
 				return { ...state, top10Countries: { ...action.data } };
+				break;
+			case globalMetricChartsActions.SET_TOP_10_SITES_DATA:
+				return { ...state, top10Sites: { ...action.data } };
 				break;
 
 			default:
