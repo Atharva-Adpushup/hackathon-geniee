@@ -22,9 +22,9 @@ class DockedSettings extends Component {
 	}
 
 	submitHandler(code) {
-		if (code.trim().length) {
+		if (code.length) {
 			try {
-				code = JSON.parse(atob(code));
+				code = JSON.parse(`${code}`);
 			} catch (e) {
 				this.props.showNotification({
 					mode: 'error',
@@ -40,7 +40,7 @@ class DockedSettings extends Component {
 			},
 			() => {
 				this.props.onFormatDataUpdate(this.props.section.id, {
-					css: code.trim().length ? code : {},
+					css: typeof code == 'string' ? {} : code,
 					bottomXPath: this.state.bottomXPath
 				});
 				this.props.onCancel();
@@ -77,7 +77,8 @@ class DockedSettings extends Component {
 						<CodeBox
 							customId={`${this.props.section.id}interactiveAds`}
 							showButtons={true}
-							code={this.state.css ? btoa(JSON.stringify(this.state.css)) : ''}
+							textEdit
+							code={this.state.css ? JSON.stringify(this.state.css) : ''}
 							onSubmit={this.submitHandler}
 							onCancel={this.props.onCancel}
 							showNotification={this.props.showNotification}
