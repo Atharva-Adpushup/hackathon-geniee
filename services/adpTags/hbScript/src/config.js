@@ -89,6 +89,7 @@ module.exports = {
 		'pbjs.addAdUnits(__AD_UNIT_CODE__);' +
 		"pbjs.aliasBidder('appnexus', 'springserve');" + // SpringServe specific bidder aliasing
 		"pbjs.aliasBidder('appnexus', 'brealtime');" + // bRealTime specific bidder aliasing
+		"pbjs.aliasBidder('appnexus', 'brainjuicemedia');" + // brainjuicemedia specific bidder aliasing
 		"pbjs.onEvent('bidTimeout', function(timedOutBidders) {" +
 		'parent.__prebidTimeoutCallback(ADP_BATCH_ID, timedOutBidders, PREBID_TIMEOUT);' +
 		'});' +
