@@ -53,4 +53,23 @@ const fetchTop10CountriesData = params => (dispatch, getState) => {
 	});
 };
 
-export { fetchNetworkWiseData, fetchMetricsData, fetchModeWiseTrafficData, fetchTop10CountriesData };
+const fetchTop10SitesData = params => (dispatch, getState) => {
+	return ajax({
+		url: '/ops/getGlobalTop10Sites',
+		method: 'POST',
+		data: JSON.stringify(params)
+	}).then(response => {
+		if (response.error) {
+			alert('Error occured. Please try again later');
+		}
+		return dispatch({ type: globalMetricChartsActions.SET_TOP_10_SITES_DATA, data: response.data });
+	});
+};
+
+export {
+	fetchNetworkWiseData,
+	fetchMetricsData,
+	fetchModeWiseTrafficData,
+	fetchTop10CountriesData,
+	fetchTop10SitesData
+};
