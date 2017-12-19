@@ -51,7 +51,7 @@ class EditOptions extends Component {
 		this.toggleNetworkEditor();
 	};
 
-	adpushupSubmitHandler = data => {
+	adpushupSubmitHandler = (sectionPayload, adPayload) => {
 		console.log(data);
 		this.toggleEditInteractiveAd();
 	};
