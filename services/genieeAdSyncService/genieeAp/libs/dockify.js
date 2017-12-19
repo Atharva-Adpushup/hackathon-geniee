@@ -1,9 +1,16 @@
 var $ = require('jquery'),
 	commonConsts = require('../config/commonConsts'),
-	getDockedCSS = function(formatData) {
+	getDockedCSS = function(formatData, elComputedStyles) {
+		var computedStyles = {
+			bottom: elComputedStyles.bottom,
+			right: elComputedStyles.right,
+			left: elComputedStyles.left,
+			margin: elComputedStyles.margin
+		};
+
 		return formatData && formatData.css
-			? $.extend({}, true, commonConsts.DOCKED_CSS, formatData.css)
-			: $.extend({}, true, commonConsts.DOCKED_CSS, {});
+			? $.extend({}, true, commonConsts.DOCKED_CSS, computedStyles, formatData.css)
+			: $.extend({}, true, commonConsts.DOCKED_CSS, computedStyles);
 	},
 	getDockedOffset = function(formatData) {
 		return formatData && formatData.bottomXPath ? $(formatData.bottomXPath).offset().top : null;
@@ -13,9 +20,10 @@ var $ = require('jquery'),
 			return false;
 		}
 
-		var dockedCSS = getDockedCSS(formatData),
+		var $el = $(xPath),
+			elComputedStyles = window.getComputedStyle($el[0]),
+			dockedCSS = getDockedCSS(formatData, elComputedStyles),
 			offset = getDockedOffset(formatData),
-			$el = $(xPath),
 			elTopOffset = $el.offset().top,
 			windowHeight = $(window).height();
 
