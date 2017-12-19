@@ -22,15 +22,17 @@ class DockedSettings extends Component {
 	}
 
 	submitHandler(code) {
-		try {
-			code = JSON.parse(atob(code));
-		} catch (e) {
-			this.props.showNotification({
-				mode: 'error',
-				title: 'Operation failed',
-				message: 'Invalid CSS'
-			});
-			return;
+		if (code.length) {
+			try {
+				code = JSON.parse(`${code}`);
+			} catch (e) {
+				this.props.showNotification({
+					mode: 'error',
+					title: 'Operation failed',
+					message: 'Invalid CSS'
+				});
+				return;
+			}
 		}
 		this.setState(
 			{
@@ -38,7 +40,7 @@ class DockedSettings extends Component {
 			},
 			() => {
 				this.props.onFormatDataUpdate(this.props.section.id, {
-					css: code,
+					css: typeof code == 'string' ? {} : code,
 					bottomXPath: this.state.bottomXPath
 				});
 				this.props.onCancel();
@@ -75,7 +77,9 @@ class DockedSettings extends Component {
 						<CodeBox
 							customId={`${this.props.section.id}interactiveAds`}
 							showButtons={true}
-							code={this.state.css ? btoa(JSON.stringify(this.state.css)) : ''}
+							enableSave={true}
+							textEdit
+							code={this.state.css ? JSON.stringify(this.state.css) : ''}
 							onSubmit={this.submitHandler}
 							onCancel={this.props.onCancel}
 							showNotification={this.props.showNotification}
