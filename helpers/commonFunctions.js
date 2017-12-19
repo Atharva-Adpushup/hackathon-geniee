@@ -14,6 +14,7 @@ const Promise = require('bluebird'),
 	globalMetricsDataContributionQuery = require('../reports/default/adpTags/queries/globalMetricsDataContribution'),
 	globalModeWiseTrafficContributionQuery = require('../reports/default/adpTags/queries/globalModeWiseTrafficContribution'),
 	globalTop10CountriesContributionQuery = require('../reports/default/adpTags/queries/globalTop10CountriesContribution'),
+	globalTop10SitesContributionQuery = require('../reports/default/adpTags/queries/globalTop10SitesContribution'),
 	createAggregateNonAggregateObjects = (dataset, key, container) => {
 		let innerObj = {};
 		_.forEach(dataset, (nonAggregateDataset, identifier) => {
@@ -448,6 +449,16 @@ const Promise = require('bluebird'),
 
 		return globalTop10CountriesContributionQuery.getData(config);
 	},
+	getGlobalTop10SitesContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return globalTop10SitesContributionQuery.getData(config);
+	},
 	getWeeklyEmailReport = siteId => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			parameterConfig = {
@@ -501,5 +512,6 @@ module.exports = {
 	getGlobalNetworkWiseDataContributionReport,
 	getGlobalMetricsDataContributionReport,
 	getGlobalModeWiseTrafficContributionReport,
-	getGlobalTop10CountriesContributionQuery
+	getGlobalTop10CountriesContributionQuery,
+	getGlobalTop10SitesContributionReport
 };
