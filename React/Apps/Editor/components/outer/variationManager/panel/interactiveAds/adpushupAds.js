@@ -118,7 +118,7 @@ class AdPushupAds extends Component {
 	}
 
 	renderFormatSelect(leftWidth, rightWidth) {
-		let limit = this.props.platform == 'DESKTOP' ? 2 : 1,
+		let limit = this.props.platform == 'DESKTOP' ? interactiveAds.types.length : 1,
 			types = interactiveAds.types.slice(0, limit);
 		return (
 			<Row className="mT-15">
