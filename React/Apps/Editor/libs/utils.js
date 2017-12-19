@@ -195,14 +195,14 @@ const randomStore = [],
 					return this.VALUE_UNCHANGED;
 				}
 				if (Utils.isDef(value1)) {
-					this.CHANGES.ADDED.push({ name: value1 });
+					this.CHANGES.ADDED.push({ name: value1, info: { key: name, value: value1 } });
 					return this.VALUE_CREATED;
 				}
 				if (Utils.isDef(value2)) {
-					this.CHANGES.DELETED.push({ name: value2 });
+					this.CHANGES.DELETED.push({ name: value2, info: { key: name, value: value2 } });
 					return this.VALUE_DELETED;
 				}
-				this.CHANGES.EDITED.push({ name: value2 });
+				this.CHANGES.EDITED.push({ name: value2, info: { key: name, value: value2 } });
 				return this.VALUE_UPDATED;
 			}
 		},
