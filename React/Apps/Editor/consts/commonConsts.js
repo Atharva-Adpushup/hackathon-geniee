@@ -340,7 +340,8 @@ const status = {
 			DESKTOP: {
 				sticky: {
 					bottom: ['300X50', '300X100', '320X100'],
-					left: ['160X600', '336X280', '300X250']
+					left: ['160X600', '336X280', '300X250'],
+					right: ['160X600', '336X280', '300X250']
 				}
 			},
 			MOBILE: {
@@ -349,7 +350,7 @@ const status = {
 				}
 			}
 		},
-		types: ['stickyBottom', 'stickyLeft']
+		types: ['stickyBottom', 'stickyLeft', 'stickyRight']
 	};
 
 export {

@@ -22,6 +22,7 @@ class EditOptions extends Component {
 		this.submitHandler = this.submitHandler.bind(this);
 		this.toggleNetworkEditor = this.toggleNetworkEditor.bind(this);
 		this.toggleEditInteractiveAd = this.toggleEditInteractiveAd.bind(this);
+		this.adpushupSubmitHandler = this.adpushupSubmitHandler.bind(this);
 	}
 
 	onFloatSelectChange(float) {
@@ -52,7 +53,9 @@ class EditOptions extends Component {
 	};
 
 	adpushupSubmitHandler = (sectionPayload, adPayload) => {
-		console.log(data);
+		console.log(sectionPayload, adPayload);
+		this.props.updateSection(this.props.section.id, sectionPayload);
+		this.props.updateAd(this.props.section.ads[0].id, adPayload);
 		this.toggleEditInteractiveAd();
 	};
 
