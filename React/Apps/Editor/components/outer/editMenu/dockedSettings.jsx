@@ -77,6 +77,7 @@ class DockedSettings extends Component {
 						<CodeBox
 							customId={`${this.props.section.id}interactiveAds`}
 							showButtons={true}
+							enableSave={true}
 							textEdit
 							code={this.state.css ? JSON.stringify(this.state.css) : ''}
 							onSubmit={this.submitHandler}
