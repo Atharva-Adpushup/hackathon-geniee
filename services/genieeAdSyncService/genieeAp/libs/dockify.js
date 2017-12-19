@@ -1,26 +1,39 @@
 var $ = require('jquery'),
-	dockedCss = {
-		position: 'fixed',
-		top: '0px',
-		'z-index': 10000
+	commonConsts = require('../config/commonConsts'),
+	getDockedCSS = function(formatData, elComputedStyles) {
+		var computedStyles = {
+			bottom: elComputedStyles.bottom,
+			right: elComputedStyles.right,
+			left: elComputedStyles.left,
+			margin: elComputedStyles.margin
+		};
+
+		return formatData && formatData.css
+			? $.extend({}, true, commonConsts.DOCKED_CSS, computedStyles, formatData.css)
+			: $.extend({}, true, commonConsts.DOCKED_CSS, computedStyles);
+	},
+	getDockedOffset = function(formatData) {
+		return formatData && formatData.bottomXPath ? $(formatData.bottomXPath).offset().top : null;
 	},
 	dockifyAd = function(xPath, formatData) {
-		var css = $.extend({}, true, dockedCss, formatData.css ? formatData.css : {}),
-			offset = $(formatData.bottomXPath).offset().top;
-
 		if (!xPath || !$(xPath).length) {
 			return false;
 		}
 
 		var $el = $(xPath),
-			elTopOffset = $el.offset().top;
+			elComputedStyles = window.getComputedStyle($el[0]),
+			dockedCSS = getDockedCSS(formatData, elComputedStyles),
+			offset = getDockedOffset(formatData),
+			elTopOffset = $el.offset().top,
+			windowHeight = $(window).height();
 
 		$(window).on('scroll', function() {
 			var windowScrollTop = $(window).scrollTop(),
-				windowHeight = $(window).height();
+				scrollLimitReachedWithoutOffset = windowScrollTop > elTopOffset && !offset,
+				scrollLimitReachedWithOffset = windowScrollTop > elTopOffset && offset && windowScrollTop < offset;
 
-			if ($(window).scrollTop() > elTopOffset && $(window).scrollTop() < offset) {
-				$el.css(css);
+			if (scrollLimitReachedWithoutOffset || scrollLimitReachedWithOffset) {
+				$el.css(dockedCSS);
 			} else {
 				$el.css({
 					position: '',

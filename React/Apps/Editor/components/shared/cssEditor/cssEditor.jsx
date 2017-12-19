@@ -1,13 +1,18 @@
 import React, { PropTypes } from 'react';
 import MarginEditor from './marginEditor.jsx';
+import { intersection } from 'lodash';
 import CustomCssEditor from './customCssEditor.jsx';
 
 class cssEditor extends React.Component {
 	static defaultCssProps = ['margin-left', 'margin-right', 'margin-top', 'margin-bottom', 'clear'];
 
 	static isCustomCss(css) {
-		const keys = Object.keys(css);
-		return JSON.stringify(cssEditor.defaultCssProps) != JSON.stringify(keys);
+		const keys = Object.keys(css),
+			intersectedKeys = intersection(cssEditor.defaultCssProps, keys);
+		return intersectedKeys &&
+			(intersectedKeys.length != cssEditor.defaultCssProps.length || intersectedKeys.length != keys.length)
+			? true
+			: false;
 	}
 
 	constructor(props) {
