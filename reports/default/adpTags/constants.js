@@ -96,6 +96,24 @@ WHERE rn <= @__count__
 ORDER BY report_date
 `;
 
+const TOP_10_SITES_PERFORMANCE = `
+SELECT a.report_date, a.siteid, total_page_views, impressions, revenue, a.url, a.name
+FROM (
+	SELECT d.report_date, d.siteid, sum(d.total_requests) AS total_page_views, c.url, c.name
+	FROM ApexHourlySiteReport d, Site c
+	WHERE c.siteid = d.siteid AND d.report_date BETWEEN @__fromDate__ AND @__toDate__ AND d.siteid >= 25000
+	GROUP BY d.report_date, d.siteid, c.url, c.name
+) a
+LEFT JOIN (
+	SELECT report_date, siteid, sum(total_impressions) impressions, sum(total_revenue) revenue
+	FROM adptagreport
+	WHERE report_date BETWEEN @__fromDate__ AND @__toDate__ AND siteid >= 25000
+	GROUP BY report_Date, siteid
+) b ON a.report_date = b.report_date
+AND a.siteid = b.siteid
+ORDER BY report_date, siteid
+`;
+
 const PLATFORMS_KEYS = {
 	0: 'UNKNOWN',
 	1: 'MOBILE',
@@ -297,5 +315,6 @@ module.exports = {
 	GLOBAL_NETWORK_WISE_PERFORMANCE,
 	GLOBAL_METRICS_PERFORMANCE,
 	GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE,
-	GLOBAL_TOP_10_COUNTRIES_PERFORMANCE
+	GLOBAL_TOP_10_COUNTRIES_PERFORMANCE,
+	TOP_10_SITES_PERFORMANCE
 };
