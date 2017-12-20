@@ -4,7 +4,8 @@ const defaultState = {
 		metrics: {},
 		modeWiseTraffic: {},
 		top10Countries: {},
-		top10Sites: {}
+		top10Sites: {},
+		lostAndFoundLiveSites: {}
 	},
 	globalMetricCharts = (state = defaultState, action) => {
 		switch (action.type) {
@@ -22,6 +23,9 @@ const defaultState = {
 				break;
 			case globalMetricChartsActions.SET_TOP_10_SITES_DATA:
 				return { ...state, top10Sites: { ...action.data } };
+				break;
+			case globalMetricChartsActions.SET_LOST_AND_FOUND_LIVE_SITES_DATA:
+				return { ...state, lostAndFoundLiveSites: { ...action.data } };
 				break;
 
 			default:
