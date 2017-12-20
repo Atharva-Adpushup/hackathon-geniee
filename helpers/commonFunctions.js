@@ -15,6 +15,7 @@ const Promise = require('bluebird'),
 	globalModeWiseTrafficContributionQuery = require('../reports/default/adpTags/queries/globalModeWiseTrafficContribution'),
 	globalTop10CountriesContributionQuery = require('../reports/default/adpTags/queries/globalTop10CountriesContribution'),
 	globalTop10SitesContributionQuery = require('../reports/default/adpTags/queries/globalTop10SitesContribution'),
+	globalLostAndFoundLiveSitesQuery = require('../reports/default/adpTags/queries/lostAndFoundLiveSites'),
 	createAggregateNonAggregateObjects = (dataset, key, container) => {
 		let innerObj = {};
 		_.forEach(dataset, (nonAggregateDataset, identifier) => {
@@ -459,6 +460,7 @@ const Promise = require('bluebird'),
 
 		return globalTop10SitesContributionQuery.getData(config);
 	},
+	getGlobalLostAndFoundLiveSitesReport = parameterConfig => globalLostAndFoundLiveSitesQuery.getData(parameterConfig),
 	getWeeklyEmailReport = siteId => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			parameterConfig = {
@@ -513,5 +515,6 @@ module.exports = {
 	getGlobalMetricsDataContributionReport,
 	getGlobalModeWiseTrafficContributionReport,
 	getGlobalTop10CountriesContributionQuery,
-	getGlobalTop10SitesContributionReport
+	getGlobalTop10SitesContributionReport,
+	getGlobalLostAndFoundLiveSitesReport
 };

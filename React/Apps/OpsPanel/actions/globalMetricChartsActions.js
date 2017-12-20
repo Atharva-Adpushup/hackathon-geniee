@@ -66,10 +66,24 @@ const fetchTop10SitesData = params => (dispatch, getState) => {
 	});
 };
 
+const fetchLostAndFoundLiveSitesData = params => (dispatch, getState) => {
+	return ajax({
+		url: '/ops/getGlobalLostAndFoundLiveSites',
+		method: 'POST',
+		data: JSON.stringify(params)
+	}).then(response => {
+		if (response.error) {
+			alert('Error occured. Please try again later');
+		}
+		return dispatch({ type: globalMetricChartsActions.SET_LOST_AND_FOUND_LIVE_SITES_DATA, data: response.data });
+	});
+};
+
 export {
 	fetchNetworkWiseData,
 	fetchMetricsData,
 	fetchModeWiseTrafficData,
 	fetchTop10CountriesData,
-	fetchTop10SitesData
+	fetchTop10SitesData,
+	fetchLostAndFoundLiveSitesData
 };
