@@ -33,6 +33,7 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 			.replace('__AD_UNIT_CODE__', JSON.stringify(adUnitCodeForPrebid))
 			.replace('__ADP_BATCH_ID__', adpBatchId)
 			.replace('__PB_TIMEOUT__', config.PREBID_TIMEOUT)
+			.replace('__C1X_PIXEL_ID__', config.C1X.pixelId)
 			.replace('__PAGE_URL__', window.location.href);
 
 		var iframeEl = document.createElement('iframe');

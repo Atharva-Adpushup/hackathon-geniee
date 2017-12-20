@@ -54,7 +54,7 @@ const config = {
 			name: 'c1x',
 			isHb: true,
 			global: {
-				placementCode: { validations: { required: true }, alias: 'Placement Code', isEditable: true }
+				placementCode: { validations: { required: false }, alias: 'Placement Code', isEditable: true }
 			}
 		}
 	},
