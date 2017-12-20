@@ -487,7 +487,7 @@ function apiModule() {
 			var userEmail = user.get('email'),
 				userFirstName = user.get('firstName'),
 				siteName = utils.domanize(params.site),
-				miscellaneousData = user.get('miscellaneous'),
+				miscellaneousData = user.get('miscellaneous') || {},
 				pipedriveParams = {
 					userInfo: {
 						name: userFirstName,
