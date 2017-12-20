@@ -135,34 +135,36 @@ class EditOptions extends Component {
 					</Row>
 				) : null}
 				{!this.props.section.isIncontent ? (
-					<Row>
-						<Col className="u-padding-r10px" xs={4}>
-							XPath
-						</Col>
-						<Col className="u-padding-l10px" xs={8}>
-							<InlineEdit
-								compact
-								validate
-								cancelEditHandler={this.props.onResetErrors.bind(null, this.props.section.id)}
-								customError={this.props.ui.errors.xpath ? this.props.ui.errors.xpath.error : false}
-								dropdownList={this.props.section.allXpaths}
-								value={this.props.section.xpath}
-								keyUpHandler={this.props.onValidateXPath.bind(null, this.props.section.id)}
-								submitHandler={this.props.onUpdateXPath.bind(null, this.props.section.id)}
-								editClickHandler={this.props.onSectionAllXPaths.bind(
-									null,
-									this.props.section.id,
-									this.props.section.xpath
-								)}
-								text="XPath"
-								errorMessage={
-									this.props.ui.errors.xpath && this.props.ui.errors.xpath.error
-										? this.props.ui.errors.xpath.message
-										: 'XPath cannot be blank'
-								}
-							/>
-						</Col>
-					</Row>
+					this.props.section.type != 3 ? (
+						<Row>
+							<Col className="u-padding-r10px" xs={4}>
+								XPath
+							</Col>
+							<Col className="u-padding-l10px" xs={8}>
+								<InlineEdit
+									compact
+									validate
+									cancelEditHandler={this.props.onResetErrors.bind(null, this.props.section.id)}
+									customError={this.props.ui.errors.xpath ? this.props.ui.errors.xpath.error : false}
+									dropdownList={this.props.section.allXpaths}
+									value={this.props.section.xpath}
+									keyUpHandler={this.props.onValidateXPath.bind(null, this.props.section.id)}
+									submitHandler={this.props.onUpdateXPath.bind(null, this.props.section.id)}
+									editClickHandler={this.props.onSectionAllXPaths.bind(
+										null,
+										this.props.section.id,
+										this.props.section.xpath
+									)}
+									text="XPath"
+									errorMessage={
+										this.props.ui.errors.xpath && this.props.ui.errors.xpath.error
+											? this.props.ui.errors.xpath.message
+											: 'XPath cannot be blank'
+									}
+								/>
+							</Col>
+						</Row>
+					) : null
 				) : (
 					<Row>
 						<Col className="u-padding-r10px" xs={4}>
