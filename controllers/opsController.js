@@ -10,7 +10,8 @@ const express = require('express'),
 		getGlobalMetricsDataContributionReport,
 		getGlobalModeWiseTrafficContributionReport,
 		getGlobalTop10CountriesContributionQuery,
-		getGlobalTop10SitesContributionReport
+		getGlobalTop10SitesContributionReport,
+		getGlobalLostAndFoundLiveSitesReport
 	} = require('../helpers/commonFunctions'),
 	router = express.Router(),
 	appBucket = couchbaseService(
@@ -230,6 +231,45 @@ router
 			.then(responseData => {
 				response.data = responseData;
 				response.data.dateFormat = dateFormatCollection;
+				return res.send(response);
+			})
+			.catch(err => {
+				return res.send(Object.assign(response, { error: true }));
+			});
+	})
+	.post('/getGlobalLostAndFoundLiveSites', (req, res) => {
+		let response = {
+				error: false,
+				data: []
+			},
+			bodyParameters = req.body,
+			isBodyParameters = !!bodyParameters,
+			isThisWeekParameters =
+				isBodyParameters &&
+				bodyParameters.thisWeek &&
+				bodyParameters.thisWeek.from &&
+				bodyParameters.thisWeek.to,
+			isLastWeekParameters =
+				isBodyParameters &&
+				bodyParameters.lastWeek &&
+				bodyParameters.lastWeek.from &&
+				bodyParameters.lastWeek.to,
+			params = {
+				transform: true,
+				threshold: (isBodyParameters && bodyParameters.threshold) || 1000,
+				thisWeek: {
+					from: isThisWeekParameters && bodyParameters.thisWeek.from,
+					to: isThisWeekParameters && bodyParameters.thisWeek.to
+				},
+				lastWeek: {
+					from: isLastWeekParameters && bodyParameters.lastWeek.from,
+					to: isLastWeekParameters && bodyParameters.lastWeek.to
+				}
+			};
+
+		return getGlobalLostAndFoundLiveSitesReport(params)
+			.then(responseData => {
+				response.data = responseData;
 				return res.send(response);
 			})
 			.catch(err => {

@@ -4,7 +4,8 @@ import {
 	fetchMetricsData,
 	fetchModeWiseTrafficData,
 	fetchTop10CountriesData,
-	fetchTop10SitesData
+	fetchTop10SitesData,
+	fetchLostAndFoundLiveSitesData
 } from '../actions/globalMetricChartsActions';
 import ModuleWrapper from '../components/ModuleWrapper.jsx';
 
@@ -16,7 +17,8 @@ const mapStateToProps = (state, ownProps) => ({
 		fetchMetricsData: params => dispatch(fetchMetricsData(params)),
 		fetchModeWiseTrafficData: params => dispatch(fetchModeWiseTrafficData(params)),
 		fetchTop10CountriesData: params => dispatch(fetchTop10CountriesData(params)),
-		fetchTop10SitesData: params => dispatch(fetchTop10SitesData(params))
+		fetchTop10SitesData: params => dispatch(fetchTop10SitesData(params)),
+		fetchLostAndFoundLiveSitesData: params => dispatch(fetchLostAndFoundLiveSitesData(params))
 	});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ModuleWrapper);
