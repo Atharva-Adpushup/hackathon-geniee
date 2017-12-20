@@ -129,7 +129,7 @@ class variationSectionElement extends Component {
 									</Col>
 								</Row>
 							</div>
-						) : (
+						) : props.section.type != 3 ? (
 							<div>
 								<Row>
 									<Col className="u-padding-r10px" xs={7}>
@@ -140,7 +140,7 @@ class variationSectionElement extends Component {
 									</Col>
 								</Row>
 							</div>
-						)}
+						) : null}
 						{Object.keys(props.reporting).length &&
 						Object.keys(props.reporting.sections).length &&
 						props.reporting.sections[props.section.id] ? (
