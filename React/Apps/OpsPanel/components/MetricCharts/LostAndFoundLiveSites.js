@@ -82,6 +82,7 @@ class LostAndFoundLiveSites extends Component {
 
 		this.fetchReportData = this.fetchReportData.bind(this);
 		this.getComputedParameterConfig = this.getComputedParameterConfig.bind(this);
+		this.getDefaultParameterConfig = this.getDefaultParameterConfig.bind(this);
 	}
 
 	generateTableData(inputData) {
@@ -161,6 +162,31 @@ class LostAndFoundLiveSites extends Component {
 			lastWeek: {
 				from: this.state.lastWeekFromDate,
 				to: this.state.lastWeekToDate
+			}
+		};
+
+		return parameterConfig;
+	}
+
+	getDefaultParameterConfig() {
+		const parameterConfig = {
+			transform: true,
+			threshold: 1000,
+			thisWeek: {
+				from: moment()
+					.subtract(7, 'days')
+					.format('YYYY-MM-DD'),
+				to: moment()
+					.subtract(1, 'days')
+					.format('YYYY-MM-DD')
+			},
+			lastWeek: {
+				from: moment()
+					.subtract(14, 'days')
+					.format('YYYY-MM-DD'),
+				to: moment()
+					.subtract(8, 'days')
+					.format('YYYY-MM-DD')
 			}
 		};
 
@@ -251,11 +277,22 @@ class LostAndFoundLiveSites extends Component {
 		);
 	}
 
-	fetchReportData(reset = false) {
-		const parameterConfig = this.getComputedParameterConfig();
+	fetchReportData(isReset = false) {
+		const parameterConfig = isReset ? this.getDefaultParameterConfig() : this.getComputedParameterConfig();
+		let stateObject = {
+			isDataLoaded: false
+		};
 
-		this.setState({ isDataLoaded: false });
-		this.props.fetchData(parameterConfig);
+		if (isReset) {
+			stateObject.lastWeekFromDate = moment(parameterConfig.lastWeek.from);
+			stateObject.lastWeekToDate = moment(parameterConfig.lastWeek.to);
+			stateObject.thisWeekFromDate = moment(parameterConfig.thisWeek.from);
+			stateObject.thisWeekToDate = moment(parameterConfig.thisWeek.to);
+		}
+
+		this.setState(stateObject, () => {
+			this.props.fetchData(parameterConfig);
+		});
 	}
 
 	generateHeaderTitle() {
