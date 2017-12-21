@@ -87,12 +87,8 @@ class Top10Sites extends Component {
 			isDataLoaded,
 			data: isDataLoaded ? this.props.data : null,
 			selectedMetric: 'pageViews',
-			startDate: moment()
-				.subtract(7, 'days')
-				.startOf('day'),
-			endDate: moment()
-				.startOf('day')
-				.subtract(1, 'day')
+			startDate: moment().subtract(7, 'days'),
+			endDate: moment().subtract(1, 'days')
 		};
 		this.renderMetricTable = this.renderMetricTable.bind(this);
 		this.generateHeaderTitle = this.generateHeaderTitle.bind(this);
