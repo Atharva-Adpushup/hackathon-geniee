@@ -42,6 +42,14 @@ function getSegregatedData(inputData, resultData) {
 				);
 			}
 
+			// Calculate CPM for aggregated data
+			const aggregatedImpressions = resultCollecton.aggregated[siteId].impressions,
+				aggregatedRevenue = resultCollecton.aggregated[siteId].revenue;
+			let aggregatedCpm = utils.toFloat(aggregatedRevenue / aggregatedImpressions * 1000);
+			aggregatedCpm = isNaN(aggregatedCpm) ? 0 : aggregatedCpm;
+
+			resultCollecton.aggregated[siteId].cpm = aggregatedCpm;
+
 			return resultCollecton;
 		}, resultData),
 		aggregatedKeyPairsCollection = _.reduce(
@@ -77,12 +85,19 @@ function getSegregatedData(inputData, resultData) {
 		),
 		filteredRevenueCollection = isRevenueCollectionGreaterThanTen
 			? getFirstTenElements(revenueSortedAggregatedCollection)
-			: revenueSortedAggregatedCollection;
+			: revenueSortedAggregatedCollection,
+		// CPM filtered collection
+		cpmSortedAggregatedCollection = _.orderBy(aggregatedKeyPairsCollection, ['cpm'], ['desc']),
+		isCPMCollectionGreaterThanTen = !!(cpmSortedAggregatedCollection && cpmSortedAggregatedCollection.length > 10),
+		filteredCPMCollection = isCPMCollectionGreaterThanTen
+			? getFirstTenElements(cpmSortedAggregatedCollection)
+			: cpmSortedAggregatedCollection;
 
 	segregatedData.aggregated = {
 		pageViews: filteredPageViewsCollection.concat([]),
 		impressions: filteredImpressionsCollection.concat([]),
-		revenue: filteredRevenueCollection.concat([])
+		revenue: filteredRevenueCollection.concat([]),
+		cpm: filteredCPMCollection.concat([])
 	};
 	return segregatedData;
 }
