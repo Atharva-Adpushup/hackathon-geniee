@@ -22,7 +22,7 @@ class OpsPanel extends React.Component {
 			editMode: 'create',
 			loading: true,
 			updateMessage: null,
-			hbConfig: null,
+			hbConfig: {},
 			additionalOptions: {}
 		};
 		this.fetchHbConfig = this.fetchHbConfig.bind(this);
@@ -37,7 +37,12 @@ class OpsPanel extends React.Component {
 			url: `/user/site/${window.siteId}/opsPanel/hbConfig`
 		})
 			.done(res => {
-				this.setState({ editMode: 'update', hbConfig: res.data.hbConfig.bidderAdUnits, loading: false });
+				this.setState({
+					editMode: 'update',
+					hbConfig: res.data.hbConfig.bidderAdUnits,
+					additionalOptions: res.data.hbConfig.additionalOptions,
+					loading: false
+				});
 			})
 			.fail(res => {
 				this.setState({ editMode: 'create', loading: false });
@@ -118,7 +123,10 @@ class OpsPanel extends React.Component {
 								</div>
 							</Col>
 							<Col sm={12}>
-								<AdditionalOptions additionalOptionsCallback={this.additionalOptionsUpdated} />
+								<AdditionalOptions
+									additionalOptions={state.additionalOptions}
+									additionalOptionsCallback={this.additionalOptionsUpdated}
+								/>
 							</Col>
 							<Col sm={4}>
 								<div className="error-message">{state.updateMessage}</div>

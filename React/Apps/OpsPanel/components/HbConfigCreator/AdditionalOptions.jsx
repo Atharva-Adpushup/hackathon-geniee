@@ -32,6 +32,9 @@ class AdditionalOptions extends Component {
 	}
 
 	render() {
+		const { props } = this,
+			c1xSiteId = props.additionalOptions[keys.c1xSiteId] ? props.additionalOptions[keys.c1xSiteId] : '';
+
 		return (
 			<div className="hb-additional-options mT-20 mb-20">
 				<h4>Additional Options</h4>
@@ -43,6 +46,7 @@ class AdditionalOptions extends Component {
 						<input
 							type="text"
 							placeholder="Enter C1X Site Id"
+							value={c1xSiteId}
 							data-key={keys.c1xSiteId}
 							onChange={this.addAdditionalOption}
 						/>
@@ -54,6 +58,7 @@ class AdditionalOptions extends Component {
 }
 
 AdditionalOptions.proptypes = {
+	additionalOptions: PropTypes.object.isRequired,
 	additionalOptionsCallback: PropTypes.func.isRequired
 };
 
