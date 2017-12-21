@@ -38,13 +38,14 @@ var express = require('express'),
 				}
 			});
 	},
-	updateHbConfig = (hbConfig, siteId, site, editMode, appBucket) => {
-		const json = {
-			hbConfig: { bidderAdUnits: hbConfig },
-			siteId: siteId,
-			siteDomain: site.get('siteDomain'),
-			email: site.get('ownerEmail')
-		};
+	updateHbConfig = (siteId, site, payload, appBucket) => {
+		const { hbConfig, editMode, additionalOptions } = payload,
+			json = {
+				hbConfig: { bidderAdUnits: hbConfig, additionalOptions },
+				siteId: siteId,
+				siteDomain: site.get('siteDomain'),
+				email: site.get('ownerEmail')
+			};
 
 		const hbcfPromise =
 			editMode === 'update'
@@ -111,11 +112,10 @@ router
 	.post('/:siteId/opsPanel/hbConfig', (req, res) => {
 		const { siteId } = req.params,
 			sitePromise = siteModel.getSiteById(req.params.siteId),
-			appBucketPromise = couchbase.connectToAppBucket(),
-			{ hbConfig, editMode } = JSON.parse(req.body.data);
+			appBucketPromise = couchbase.connectToAppBucket();
 
 		return Promise.all([sitePromise, appBucketPromise])
-			.spread((site, appBucket) => updateHbConfig(hbConfig, siteId, site, editMode, appBucket))
+			.spread((site, appBucket) => updateHbConfig(siteId, site, JSON.parse(req.body.data), appBucket))
 			.spread((data, site) => {
 				adpushupEvent.emit('siteSaved', site);
 				return res.status(200).send({ success: 1, data: null, message: `Header bidding config updated` });
@@ -356,12 +356,12 @@ router
 
 						sites = Array.isArray(sites) && sites.length > 0 ? sites : [];
 						/**
-                         * unSavedSite, Current user site object entered during signup
-                         *
-                         * - Value is Truthy (all user site/sites) only if user has
-                         * no saved any site through Visual Editor
-                         * - Value is Falsy if user has atleast one saved site
-                        */
+						 * unSavedSite, Current user site object entered during signup
+						 *
+						 * - Value is Truthy (all user site/sites) only if user has
+						 * no saved any site through Visual Editor
+						 * - Value is Falsy if user has atleast one saved site
+						 */
 						unSavedSite = sites.length === 0 ? allUserSites : null;
 						req.session.unSavedSite = unSavedSite;
 						setEmailCookie(req, res);

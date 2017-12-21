@@ -88,8 +88,8 @@ module.exports = {
 		"pbjs.setPriceGranularity('dense');" +
 		"pbjs.setBidderSequence('random');" +
 		'pbjs.addAdUnits(__AD_UNIT_CODE__);' +
-		' pbjs.bidderSettings = {' +
-		"c1x': {" +
+		'pbjs.bidderSettings = {' +
+		'c1x: {' +
 		'pixelId: __C1X_PIXEL_ID__,' +
 		'siteId: 9999' +
 		'};' +
