@@ -6,16 +6,15 @@ import extend from 'extend';
 import ReactHighCharts from 'react-highcharts';
 import PaneLoader from '../../../../Components/PaneLoader.jsx';
 import { LINE_CHART_CONFIG } from '../../configs/commonConsts';
-import SelectBox from '../../../../Components/SelectBox/index.jsx';
+// import SelectBox from '../../../../Components/SelectBox/index.jsx';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 import '../../../ReportingPanel/styles.scss';
 
-function generateHighChartConfig(inputData, metricName) {
+function generateHighChartConfig(inputData) {
 	const chartConfig = extend(true, {}, LINE_CHART_CONFIG),
 		categories = inputData.dateFormat.collection.concat([]),
 		contributionData = extend(true, {}, inputData.dayWise);
-	const capitalisedMetric = metricName.toUpperCase();
 	const seriesObject = {
 		revenue: {
 			name: 'Revenue',
@@ -35,16 +34,21 @@ function generateHighChartConfig(inputData, metricName) {
 		}
 	};
 
-	chartConfig.yAxis.title.text = `${capitalisedMetric} ($)`;
-	chartConfig.title.text = `${capitalisedMetric} Performance`;
+	chartConfig.yAxis.title.text = `VALUE ($)`;
+	chartConfig.title.text = `Metrics Performance`;
 	chartConfig.xAxis.categories = chartConfig.xAxis.categories.concat(categories);
 
 	_.forOwn(contributionData, (dayWiseObject, dateKey) => {
-		seriesObject[metricName].data.push(dayWiseObject[metricName]);
+		seriesObject.revenue.data.push(dayWiseObject.revenue);
+		seriesObject.impressions.data.push(dayWiseObject.impressions);
+		seriesObject.pageViews.data.push(dayWiseObject.pageViews);
+		seriesObject.cpm.data.push(dayWiseObject.cpm);
 	});
 
-	const metricSeries = extend(true, {}, seriesObject[metricName]);
-	chartConfig.series.push(metricSeries);
+	chartConfig.series.push(extend(true, {}, seriesObject.revenue));
+	chartConfig.series.push(extend(true, {}, seriesObject.impressions));
+	chartConfig.series.push(extend(true, {}, seriesObject.pageViews));
+	chartConfig.series.push(extend(true, {}, seriesObject.cpm));
 
 	return chartConfig;
 }
@@ -69,8 +73,8 @@ class Metrics extends Component {
 		};
 		this.renderHighCharts = this.renderHighCharts.bind(this);
 		this.generateHeaderTitle = this.generateHeaderTitle.bind(this);
-		this.handleSelectBoxChange = this.handleSelectBoxChange.bind(this);
-		this.renderSelectBox = this.renderSelectBox.bind(this);
+		// this.handleSelectBoxChange = this.handleSelectBoxChange.bind(this);
+		// this.renderSelectBox = this.renderSelectBox.bind(this);
 		this.renderDateRangePickerUI = this.renderDateRangePickerUI.bind(this);
 		this.datesUpdated = this.datesUpdated.bind(this);
 		this.focusUpdated = this.focusUpdated.bind(this);
@@ -110,37 +114,37 @@ class Metrics extends Component {
 		return <ReactHighCharts config={config} />;
 	}
 
-	handleSelectBoxChange(metric = 'revenue') {
-		metric = metric ? metric : 'revenue';
-		this.setState({
-			selectedMetric: metric
-		});
-	}
+	// handleSelectBoxChange(metric = 'revenue') {
+	// 	metric = metric ? metric : 'revenue';
+	// 	this.setState({
+	// 		selectedMetric: metric
+	// 	});
+	// }
 
-	renderSelectBox() {
-		return (
-			<SelectBox
-				value={this.state.selectedMetric}
-				label="Select metric"
-				onChange={this.handleSelectBoxChange}
-				onClear={this.handleSelectBoxChange}
-				disabled={false}
-			>
-				<option key="0" value="cpm">
-					CPM
-				</option>
-				<option key="1" value="revenue">
-					REVENUE
-				</option>
-				<option key="2" value="impressions">
-					IMPRESSIONS
-				</option>
-				<option key="3" value="pageViews">
-					PAGEVIEWS
-				</option>
-			</SelectBox>
-		);
-	}
+	// renderSelectBox() {
+	// 	return (
+	// 		<SelectBox
+	// 			value={this.state.selectedMetric}
+	// 			label="Select metric"
+	// 			onChange={this.handleSelectBoxChange}
+	// 			onClear={this.handleSelectBoxChange}
+	// 			disabled={false}
+	// 		>
+	// 			<option key="0" value="cpm">
+	// 				CPM
+	// 			</option>
+	// 			<option key="1" value="revenue">
+	// 				REVENUE
+	// 			</option>
+	// 			<option key="2" value="impressions">
+	// 				IMPRESSIONS
+	// 			</option>
+	// 			<option key="3" value="pageViews">
+	// 				PAGEVIEWS
+	// 			</option>
+	// 		</SelectBox>
+	// 	);
+	// }
 
 	datesUpdated({ startDate, endDate }) {
 		this.setState({ startDate, endDate });
@@ -229,7 +233,7 @@ class Metrics extends Component {
 				</Row>
 				<Row className="u-margin-0px aligner-item">
 					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={3}>
-						{this.renderSelectBox()}
+						{/* {this.renderSelectBox()} */}
 					</Col>
 					{this.renderDateRangePickerUI()}
 				</Row>
