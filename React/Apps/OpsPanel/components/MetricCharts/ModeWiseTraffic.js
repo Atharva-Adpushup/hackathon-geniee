@@ -45,12 +45,8 @@ class ModeWiseTraffic extends Component {
 		this.state = {
 			isDataLoaded,
 			data: isDataLoaded ? this.props.data : null,
-			startDate: moment()
-				.subtract(7, 'days')
-				.startOf('day'),
-			endDate: moment()
-				.startOf('day')
-				.subtract(1, 'day')
+			startDate: moment().subtract(7, 'days'),
+			endDate: moment().subtract(1, 'days')
 		};
 		this.renderHighCharts = this.renderHighCharts.bind(this);
 		this.generateHeaderTitle = this.generateHeaderTitle.bind(this);
