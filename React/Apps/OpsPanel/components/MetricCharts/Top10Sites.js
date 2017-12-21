@@ -98,6 +98,8 @@ class Top10Sites extends Component {
 		this.datesUpdated = this.datesUpdated.bind(this);
 		this.focusUpdated = this.focusUpdated.bind(this);
 		this.fetchReportData = this.fetchReportData.bind(this);
+		this.getComputedParameterConfig = this.getComputedParameterConfig.bind(this);
+		this.getDefaultParameterConfig = this.getDefaultParameterConfig.bind(this);
 	}
 
 	componentDidMount() {
@@ -196,12 +198,39 @@ class Top10Sites extends Component {
 		);
 	}
 
-	fetchReportData(reset = false) {
-		this.setState({ isDataLoaded: false });
-		this.props.fetchData({
+	getComputedParameterConfig() {
+		const parameterConfig = {
 			transform: true,
 			fromDate: this.state.startDate,
 			toDate: this.state.endDate
+		};
+
+		return parameterConfig;
+	}
+
+	getDefaultParameterConfig() {
+		const parameterConfig = {
+			transform: true,
+			fromDate: moment().subtract(7, 'days'),
+			toDate: moment().subtract(1, 'day')
+		};
+
+		return parameterConfig;
+	}
+
+	fetchReportData(isReset = false) {
+		const parameterConfig = isReset ? this.getDefaultParameterConfig() : this.getComputedParameterConfig();
+		let stateObject = {
+			isDataLoaded: false
+		};
+
+		if (isReset) {
+			stateObject.startDate = parameterConfig.fromDate;
+			stateObject.endDate = parameterConfig.toDate;
+		}
+
+		this.setState(stateObject, () => {
+			this.props.fetchData(parameterConfig);
 		});
 	}
 
