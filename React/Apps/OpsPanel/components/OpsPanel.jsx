@@ -3,6 +3,7 @@ import $ from 'jquery';
 // import ActionCard from '../../../Components/ActionCard.jsx';
 import { Row, Col } from 'react-bootstrap';
 import HbConfigCreator from './HbConfigCreator/index.jsx';
+import AdditionalOptions from './HbConfigCreator/AdditionalOptions.jsx';
 import {
 	getSupportedAdSizes,
 	getActivePartners,
@@ -21,10 +22,12 @@ class OpsPanel extends React.Component {
 			editMode: 'create',
 			loading: true,
 			updateMessage: null,
-			hbConfig: null
+			hbConfig: {},
+			additionalOptions: {}
 		};
 		this.fetchHbConfig = this.fetchHbConfig.bind(this);
 		this.saveHbConfig = this.saveHbConfig.bind(this);
+		this.additionalOptionsUpdated = this.additionalOptionsUpdated.bind(this);
 		this.updateGlobalHbConfig = this.updateGlobalHbConfig.bind(this);
 	}
 
@@ -34,7 +37,12 @@ class OpsPanel extends React.Component {
 			url: `/user/site/${window.siteId}/opsPanel/hbConfig`
 		})
 			.done(res => {
-				this.setState({ editMode: 'update', hbConfig: res.data.hbConfig.bidderAdUnits, loading: false });
+				this.setState({
+					editMode: 'update',
+					hbConfig: res.data.hbConfig.bidderAdUnits,
+					additionalOptions: res.data.hbConfig.additionalOptions,
+					loading: false
+				});
 			})
 			.fail(res => {
 				this.setState({ editMode: 'create', loading: false });
@@ -56,10 +64,14 @@ class OpsPanel extends React.Component {
 		}
 	}
 
+	additionalOptionsUpdated(additionalOptions) {
+		this.setState({ additionalOptions });
+	}
+
 	saveHbConfig() {
 		const { state } = this,
 			hbConfig = temp ? temp : removeOptionsIndex(state.hbConfig),
-			payload = { editMode: state.editMode, hbConfig };
+			payload = { editMode: state.editMode, hbConfig, additionalOptions: state.additionalOptions };
 
 		this.setState({ updateMessage: 'Saving...' });
 
@@ -109,6 +121,12 @@ class OpsPanel extends React.Component {
 										saveHbConfigCallback={this.fetchHbConfig}
 									/>
 								</div>
+							</Col>
+							<Col sm={12}>
+								<AdditionalOptions
+									additionalOptions={state.additionalOptions}
+									additionalOptionsCallback={this.additionalOptionsUpdated}
+								/>
 							</Col>
 							<Col sm={4}>
 								<div className="error-message">{state.updateMessage}</div>

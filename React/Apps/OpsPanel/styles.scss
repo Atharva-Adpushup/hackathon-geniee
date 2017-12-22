@@ -16,6 +16,13 @@ $primaryColor: #eb575c;
 	font-size: 1.2em;
 }
 
+.hb-additional-options {
+	input {
+		font-size: 1.1em;
+		border: 1px solid $SBBorderColor;
+	}
+}
+
 .hb-config-creator {
 	padding: 20px;
 	border: 1px solid $SBBorderColor;

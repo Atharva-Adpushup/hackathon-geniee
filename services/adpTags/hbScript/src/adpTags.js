@@ -16,7 +16,11 @@ var prebidSandbox = require('./prebidSandbox'),
 			availableSlots = inventory.dfpAdUnits[size],
 			bidders = null;
 
-		if (optionalParam.headerBidding && inventory.hbConfig && Array.isArray(inventory.hbConfig.bidderAdUnits)) {
+		if (
+			optionalParam.headerBidding &&
+			inventory.hbConfig &&
+			Array.isArray(inventory.hbConfig.bidderAdUnits[size])
+		) {
 			bidders = inventory.hbConfig.bidderAdUnits[size] ? inventory.hbConfig.bidderAdUnits[size].pop() : null;
 		}
 
