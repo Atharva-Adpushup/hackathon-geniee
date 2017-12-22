@@ -1,4 +1,4 @@
-const { TOP_10_SITES_PERFORMANCE, STRING_DATE_FORMAT } = require('../constants'),
+const { TOP_10_SITES_PERFORMANCE, STRING_DATE_FORMAT, PLATFORMS_KEYS } = require('../constants'),
 	sqlReportModule = require('../index'),
 	Promise = require('bluebird'),
 	moment = require('moment'),
@@ -19,11 +19,20 @@ function getSegregatedData(inputData, resultData) {
 				date = moment(collectionObject.report_date).format(STRING_DATE_FORMAT),
 				siteId = collectionObject.siteid,
 				siteUrl = collectionObject.url,
-				siteName = collectionObject.name;
+				device = PLATFORMS_KEYS[collectionObject.device_type],
+				siteName = collectionObject.name,
+				networkId = collectionObject.ntwid,
+				isGenieeNetworkId = !!(networkId && Number(networkId) == 6);
 			let pageViews = collectionObject.total_page_views || 0,
 				impressions = collectionObject.impressions || 0,
 				revenue = collectionObject.revenue || 0,
-				isSiteIdInAggregatedCollection = !!resultCollecton.aggregated.hasOwnProperty(siteId);
+				isSiteIdInAggregatedCollection = !!resultCollecton.aggregated.hasOwnProperty(siteId),
+				isDeviceInSiteAggregatedCollection;
+
+			// NOTE: Explicitly stop logic execution if site has 'Geniee' network
+			if (isGenieeNetworkId) {
+				return resultCollecton;
+			}
 
 			if (!isSiteIdInAggregatedCollection) {
 				resultCollecton.aggregated[siteId] = {
@@ -41,14 +50,36 @@ function getSegregatedData(inputData, resultData) {
 					(resultCollecton.aggregated[siteId].revenue + revenue).toFixed(2)
 				);
 			}
-
 			// Calculate CPM for aggregated data
 			const aggregatedImpressions = resultCollecton.aggregated[siteId].impressions,
 				aggregatedRevenue = resultCollecton.aggregated[siteId].revenue;
 			let aggregatedCpm = utils.toFloat(aggregatedRevenue / aggregatedImpressions * 1000);
 			aggregatedCpm = isNaN(aggregatedCpm) ? 0 : aggregatedCpm;
-
 			resultCollecton.aggregated[siteId].cpm = aggregatedCpm;
+
+			/***** PLATFORM METRICS IMPLEMENTATION *****/
+			isDeviceInSiteAggregatedCollection = !!(
+				resultCollecton.aggregated[siteId].hasOwnProperty(device) && resultCollecton.aggregated[siteId][device]
+			);
+			if (!isDeviceInSiteAggregatedCollection) {
+				resultCollecton.aggregated[siteId][device] = {
+					pageViews,
+					impressions,
+					revenue
+				};
+			} else {
+				resultCollecton.aggregated[siteId][device].pageViews += pageViews;
+				resultCollecton.aggregated[siteId][device].impressions += impressions;
+				resultCollecton.aggregated[siteId][device].revenue = Number(
+					(resultCollecton.aggregated[siteId][device].revenue + revenue).toFixed(2)
+				);
+			}
+			// Calculate CPM for aggregated data
+			const platformImpressions = resultCollecton.aggregated[siteId][device].impressions,
+				platformRevenue = resultCollecton.aggregated[siteId][device].revenue;
+			let platformCPM = utils.toFloat(platformRevenue / platformImpressions * 1000);
+			platformCPM = isNaN(platformCPM) ? 0 : platformCPM;
+			resultCollecton.aggregated[siteId][device].cpm = platformCPM;
 
 			return resultCollecton;
 		}, resultData),
