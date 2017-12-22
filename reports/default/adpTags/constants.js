@@ -59,20 +59,20 @@ ORDER BY a.report_date, a.ntwid, name;
 `;
 
 const GLOBAL_METRICS_PERFORMANCE = `
-SELECT a.report_date, total_page_views, impressions, revenue
+SELECT a.report_date, a.device_type, total_page_views, impressions, revenue
 FROM (
-SELECT report_date, sum(total_requests) AS total_page_views
+SELECT report_date, device_type, sum(total_requests) AS total_page_views
 FROM ApexHourlySiteReport
 WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
-GROUP BY report_date
+GROUP BY report_date, device_type
 ) a
 LEFT JOIN (
-SELECT report_date, sum(total_impressions) impressions, sum(total_revenue) revenue
+SELECT report_date, device_type, sum(total_impressions) impressions, sum(total_revenue) revenue
 FROM adptagreport
 WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
-GROUP BY report_Date
-) b ON a.report_date = b.report_date
-ORDER BY report_date
+GROUP BY report_Date, device_type
+) b ON a.report_date = b.report_date AND a.device_type = b.device_type
+ORDER BY report_date, device_type
 `;
 
 const GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE = `
