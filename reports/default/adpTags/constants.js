@@ -76,11 +76,12 @@ ORDER BY report_date, device_type
 `;
 
 const GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE = `
-SELECT report_date, mode, sum(total_requests) as total_page_views
-FROM ApexHourlySiteReport a
+SELECT a.siteid, b.name as siteName, a.report_date, a.mode, sum(a.total_requests) as total_page_views
+FROM ApexHourlySiteReport a,  Site b
 WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
-GROUP BY report_date, mode
-ORDER BY report_date, mode, sum(total_requests) DESC
+AND a.siteid = b.siteid AND a.siteid > 25000
+GROUP BY a.report_date, a.mode, a.siteid, b.name
+ORDER BY a.report_date, a.mode, sum(total_requests) DESC
 `;
 
 const GLOBAL_TOP_10_COUNTRIES_PERFORMANCE = `
