@@ -23,6 +23,11 @@ function generateTableData(inputData, metricName) {
 			REVENUE: 'REVENUE',
 			CPM: 'CPM'
 		},
+		platformName = {
+			DESKTOP: 'DESKTOP',
+			MOBILE: 'MOBILE',
+			TABLET: 'TABLET'
+		},
 		isMetricPageViews = !!(capitalisedMetric === metricsName.PAGEVIEWS),
 		isMetricImpressions = !!(capitalisedMetric === metricsName.IMPRESSIONS),
 		isMetricRevenue = !!(capitalisedMetric === metricsName.REVENUE),
@@ -47,19 +52,77 @@ function generateTableData(inputData, metricName) {
 					<th style={metricsHeadingComputedStyles.pageViews}>
 						<h5>PAGE VIEWS</h5>
 					</th>
+					<th style={metricsHeadingComputedStyles.pageViews}>
+						<h5>PV-DESKTOP</h5>
+					</th>
+					<th style={metricsHeadingComputedStyles.pageViews}>
+						<h5>PV-MOBILE</h5>
+					</th>
+					<th style={metricsHeadingComputedStyles.pageViews}>
+						<h5>PV-TABLET</h5>
+					</th>
 					<th style={metricsHeadingComputedStyles.impressions}>
 						<h5>IMPRESSIONS</h5>
+					</th>
+					<th style={metricsHeadingComputedStyles.impressions}>
+						<h5>IMPR-DESKTOP</h5>
+					</th>
+					<th style={metricsHeadingComputedStyles.impressions}>
+						<h5>IMPR-MOBILE</h5>
+					</th>
+					<th style={metricsHeadingComputedStyles.impressions}>
+						<h5>IMPR-TABLET</h5>
 					</th>
 					<th style={metricsHeadingComputedStyles.revenue}>
 						<h5>REVENUE</h5>
 					</th>
+					<th style={metricsHeadingComputedStyles.revenue}>
+						<h5>REV-DESKTOP</h5>
+					</th>
+					<th style={metricsHeadingComputedStyles.revenue}>
+						<h5>REV-MOBILE</h5>
+					</th>
+					<th style={metricsHeadingComputedStyles.revenue}>
+						<h5>REV-TABLET</h5>
+					</th>
 					<th style={metricsHeadingComputedStyles.cpm}>
 						<h5>CPM</h5>
+					</th>
+					<th style={metricsHeadingComputedStyles.cpm}>
+						<h5>CPM-DESKTOP</h5>
+					</th>
+					<th style={metricsHeadingComputedStyles.cpm}>
+						<h5>CPM-MOBILE</h5>
+					</th>
+					<th style={metricsHeadingComputedStyles.cpm}>
+						<h5>CPM-TABLET</h5>
 					</th>
 				</tr>
 			</thead>
 			<tbody>
 				{metricInputData.map((metricObject, key) => {
+					const isPlatformDesktop = !!metricObject[platformName.DESKTOP],
+						isPlatformMobile = !!metricObject[platformName.MOBILE],
+						isPlatformTablet = !!metricObject[platformName.TABLET],
+						desktopMetrics = {
+							pageViews: isPlatformDesktop ? metricObject[platformName.DESKTOP].pageViews : 0,
+							impressions: isPlatformDesktop ? metricObject[platformName.DESKTOP].impressions : 0,
+							revenue: isPlatformDesktop ? metricObject[platformName.DESKTOP].revenue : 0,
+							cpm: isPlatformDesktop ? metricObject[platformName.DESKTOP].cpm : 0
+						},
+						mobileMetrics = {
+							pageViews: isPlatformMobile ? metricObject[platformName.MOBILE].pageViews : 0,
+							impressions: isPlatformMobile ? metricObject[platformName.MOBILE].impressions : 0,
+							revenue: isPlatformMobile ? metricObject[platformName.MOBILE].revenue : 0,
+							cpm: isPlatformMobile ? metricObject[platformName.MOBILE].cpm : 0
+						},
+						tabletMetrics = {
+							pageViews: isPlatformTablet ? metricObject[platformName.TABLET].pageViews : 0,
+							impressions: isPlatformTablet ? metricObject[platformName.TABLET].impressions : 0,
+							revenue: isPlatformTablet ? metricObject[platformName.TABLET].revenue : 0,
+							cpm: isPlatformTablet ? metricObject[platformName.TABLET].cpm : 0
+						};
+
 					return (
 						<tr key={`table-row-${key}`}>
 							<td>
@@ -72,10 +135,26 @@ function generateTableData(inputData, metricName) {
 									{metricObject.siteName}
 								</a>
 							</td>
+
 							<td>{metricObject.pageViews}</td>
+							<td>{desktopMetrics.pageViews}</td>
+							<td>{mobileMetrics.pageViews}</td>
+							<td>{tabletMetrics.pageViews}</td>
+
 							<td>{metricObject.impressions}</td>
+							<td>{desktopMetrics.impressions}</td>
+							<td>{mobileMetrics.impressions}</td>
+							<td>{tabletMetrics.impressions}</td>
+
 							<td>{metricObject.revenue}</td>
+							<td>{desktopMetrics.revenue}</td>
+							<td>{mobileMetrics.revenue}</td>
+							<td>{tabletMetrics.revenue}</td>
+
 							<td>{metricObject.cpm}</td>
+							<td>{desktopMetrics.cpm}</td>
+							<td>{mobileMetrics.cpm}</td>
+							<td>{tabletMetrics.cpm}</td>
 						</tr>
 					);
 				})}
