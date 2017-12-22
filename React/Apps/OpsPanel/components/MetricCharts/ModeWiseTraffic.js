@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Panel, Row, Col } from 'react-bootstrap';
+import { Panel, Row, Col, Table } from 'react-bootstrap';
 import moment from 'moment';
 import _ from 'lodash';
 import extend from 'extend';
@@ -10,6 +10,61 @@ import SelectBox from '../../../../Components/SelectBox/index.jsx';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 import '../../../ReportingPanel/styles.scss';
+
+function generateTableData(inputData, modeName) {
+	const modeInputData = inputData[modeName];
+	let dataCollection = [];
+
+	_.forOwn(modeInputData, (siteDataObject, siteId) => {
+		const siteName = siteDataObject.name,
+			pageViews = siteDataObject.pageViews,
+			collectionItem = {
+				siteId,
+				siteName,
+				pageViews
+			};
+
+		dataCollection.push(extend(true, {}, collectionItem));
+	});
+
+	return (
+		<Table striped bordered hover responsive className="u-margin-t10px">
+			<thead>
+				<tr>
+					<th>
+						<h5>SITE ID</h5>
+					</th>
+					<th>
+						<h5>SITE NAME</h5>
+					</th>
+					<th>
+						<h5>PAGE VIEWS</h5>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				{dataCollection.map((siteObject, key) => {
+					return (
+						<tr key={`table-row-${key}`}>
+							<td>
+								<a target="_blank" href="/ops/sitesMapping">
+									{siteObject.siteId}
+								</a>
+							</td>
+							<td>
+								<a target="_blank" href={`http://${siteObject.siteName}`}>
+									{siteObject.siteName}
+								</a>
+							</td>
+
+							<td>{siteObject.pageViews}</td>
+						</tr>
+					);
+				})}
+			</tbody>
+		</Table>
+	);
+}
 
 function generateHighChartConfig(inputData) {
 	const chartConfig = extend(true, {}, PIE_CHART_CONFIG),
@@ -45,6 +100,7 @@ class ModeWiseTraffic extends Component {
 		this.state = {
 			isDataLoaded,
 			data: isDataLoaded ? this.props.data : null,
+			selectedMode: '1',
 			startDate: moment().subtract(7, 'days'),
 			endDate: moment().subtract(1, 'days')
 		};
@@ -56,6 +112,9 @@ class ModeWiseTraffic extends Component {
 		this.fetchReportData = this.fetchReportData.bind(this);
 		this.getComputedParameterConfig = this.getComputedParameterConfig.bind(this);
 		this.getDefaultParameterConfig = this.getDefaultParameterConfig.bind(this);
+		this.handleSelectBoxChange = this.handleSelectBoxChange.bind(this);
+		this.renderSelectBox = this.renderSelectBox.bind(this);
+		this.renderModeTable = this.renderModeTable.bind(this);
 	}
 
 	componentDidMount() {
@@ -165,6 +224,43 @@ class ModeWiseTraffic extends Component {
 		});
 	}
 
+	handleSelectBoxChange(mode = '1') {
+		mode = mode || '1';
+
+		this.setState({
+			selectedMode: mode
+		});
+	}
+
+	renderSelectBox() {
+		const isModeData = !!this.state.data && this.state.data.sitewise,
+			siteWiseData = isModeData ? Object.keys(this.state.data.sitewise) : [];
+
+		return (
+			<SelectBox
+				value={this.state.selectedMode}
+				label="Select Mode"
+				onChange={this.handleSelectBoxChange}
+				onClear={this.handleSelectBoxChange}
+				disabled={false}
+			>
+				{siteWiseData.map((modeName, idx) => (
+					<option key={idx} value={modeName}>
+						{modeName}
+					</option>
+				))}
+			</SelectBox>
+		);
+	}
+
+	renderModeTable() {
+		let inputData = this.state.data.sitewise,
+			modeName = this.state.selectedMode,
+			generatedTable = generateTableData(inputData, modeName);
+
+		return generatedTable;
+	}
+
 	generateHeaderTitle() {
 		return (
 			<div className="u-full-height aligner aligner--column">
@@ -175,7 +271,9 @@ class ModeWiseTraffic extends Component {
 					<Col className="u-full-height aligner aligner--hCenter aligner--vBottom" xs={4} />
 				</Row>
 				<Row className="u-margin-0px aligner-item">
-					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={3} />
+					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={3}>
+						{this.renderSelectBox()}
+					</Col>
 					{this.renderDateRangePickerUI()}
 				</Row>
 			</div>
@@ -187,8 +285,9 @@ class ModeWiseTraffic extends Component {
 			headerTitle = this.generateHeaderTitle();
 
 		return (
-			<Panel className="mb-20 metricsChart" header={headerTitle}>
+			<Panel className="mb-20 metricsChart metricsChart--modeWiseTraffic" header={headerTitle}>
 				{this.state.isDataLoaded ? this.renderHighCharts() : <PaneLoader />}
+				{this.state.isDataLoaded ? this.renderModeTable() : null}
 			</Panel>
 		);
 	}

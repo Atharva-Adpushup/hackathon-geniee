@@ -8,11 +8,17 @@ const { GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE, STRING_DATE_FORMAT } = require('..
 function getSegregatedData(inputData, resultData) {
 	return inputData.reduce((resultCollecton, itemObject) => {
 		const collectionObject = extend(true, {}, itemObject),
+			siteId = collectionObject.siteid,
+			siteName = collectionObject.siteName,
 			date = moment(collectionObject.report_date).format(STRING_DATE_FORMAT);
 		let pageViews = collectionObject.total_page_views,
 			mode = Number(collectionObject.mode),
 			isModeInAggregatedCollection = !!resultCollecton.aggregated.hasOwnProperty(mode),
-			isDateInDayWiseCollection;
+			isDateInDayWiseCollection,
+			isModeInSiteWiseCollection = !!(
+				resultCollecton.sitewise.hasOwnProperty(mode) && resultCollecton.sitewise[mode]
+			),
+			isSiteInSiteWiseCollection;
 
 		if (!isModeInAggregatedCollection) {
 			resultCollecton.aggregated[mode] = pageViews;
@@ -24,8 +30,23 @@ function getSegregatedData(inputData, resultData) {
 		if (!isDateInDayWiseCollection) {
 			resultCollecton.dayWise[date] = {};
 		}
-
 		resultCollecton.dayWise[date][mode] = pageViews;
+
+		if (!isModeInSiteWiseCollection) {
+			resultCollecton.sitewise[mode] = {};
+		}
+
+		isSiteInSiteWiseCollection = !!(
+			resultCollecton.sitewise[mode].hasOwnProperty(siteId) && resultCollecton.sitewise[mode][siteId]
+		);
+		if (!isSiteInSiteWiseCollection) {
+			resultCollecton.sitewise[mode][siteId] = {
+				name: siteName,
+				pageViews
+			};
+		} else {
+			resultCollecton.sitewise[mode][siteId].pageViews += pageViews;
+		}
 
 		return resultCollecton;
 	}, resultData);
@@ -64,7 +85,8 @@ function transformResultData(inputData) {
 	const resultData = {
 			aggregated: {},
 			dayWise: {},
-			contribution: []
+			contribution: [],
+			sitewise: {}
 		},
 		segregatedData = getSegregatedData(inputData, resultData),
 		finalResultData = computeContribution(segregatedData);
