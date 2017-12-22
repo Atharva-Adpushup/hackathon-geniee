@@ -97,21 +97,20 @@ ORDER BY report_date
 `;
 
 const TOP_10_SITES_PERFORMANCE = `
-SELECT a.report_date, a.siteid, total_page_views, impressions, revenue, a.url, a.name
+SELECT a.report_date, a.siteid, a.device_type, total_page_views, impressions, revenue, a.url, a.name, b.ntwid
 FROM (
-	SELECT d.report_date, d.siteid, sum(d.total_requests) AS total_page_views, c.url, c.name
-	FROM ApexHourlySiteReport d, Site c
-	WHERE c.siteid = d.siteid AND d.report_date BETWEEN @__fromDate__ AND @__toDate__ AND d.siteid >= 25000
-	GROUP BY d.report_date, d.siteid, c.url, c.name
+SELECT d.report_date, d.device_type, d.siteid, sum(d.total_requests) AS total_page_views, c.url, c.name
+FROM ApexHourlySiteReport d, Site c
+WHERE c.siteid = d.siteid AND d.report_date BETWEEN @__fromDate__ AND @__toDate__ AND d.siteid >= 25000
+GROUP BY d.report_date, d.siteid, c.url, c.name, d.device_type
 ) a
 LEFT JOIN (
-	SELECT report_date, siteid, sum(total_impressions) impressions, sum(total_revenue) revenue
-	FROM adptagreport
-	WHERE report_date BETWEEN @__fromDate__ AND @__toDate__ AND siteid >= 25000
-	GROUP BY report_Date, siteid
-) b ON a.report_date = b.report_date
-AND a.siteid = b.siteid
-ORDER BY report_date, siteid
+SELECT report_date, siteid, sum(total_impressions) impressions, sum(total_revenue) revenue, device_type, ntwid
+FROM adptagreport
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__ AND siteid >= 25000
+GROUP BY report_Date, siteid, device_type, ntwid
+) b ON a.report_date = b.report_date AND a.siteid = b.siteid AND a.device_type = b.device_type
+ORDER BY report_date, siteid, device_type
 `;
 
 const PLATFORMS_KEYS = {
