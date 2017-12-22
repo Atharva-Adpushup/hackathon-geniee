@@ -32,7 +32,7 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 		var c1xSiteId =
 				config.INVENTORY.hbConfig && config.INVENTORY.hbConfig.additionalOptions
 					? config.INVENTORY.hbConfig.additionalOptions.c1xSiteId
-					: '',
+					: null,
 			prebidHtml = adRenderingTemplate
 				.replace('__AD_UNIT_CODE__', JSON.stringify(adUnitCodeForPrebid))
 				.replace('__ADP_BATCH_ID__', adpBatchId)
