@@ -92,6 +92,7 @@ module.exports = {
 		'c1x: {' +
 		'pixelId: __C1X_PIXEL_ID__,' +
 		'siteId: __C1X_SITE_ID__' +
+		'}' +
 		'};' +
 		"pbjs.aliasBidder('appnexus', 'springserve');" + // SpringServe specific bidder aliasing
 		"pbjs.aliasBidder('appnexus', 'brealtime');" + // bRealTime specific bidder aliasing
