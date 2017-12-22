@@ -33,6 +33,9 @@ module.exports = {
 		cpm: 0.01,
 		key: 'FP_S_A' // FP_B, FP_A, FP_S, FP_B_A, FP_S_A (key available, FP - floor price, B-Branded, S-Semi transparent, A-Anonymous)
 	},
+	C1X: {
+		pixelId: 1236239
+	},
 	DEFAULT_WINNER: 'adx',
 	FEEDBACK_URL: 'http://apdc1-webapp-creativeqa.azurewebsites.net/feedback2',
 	POSTBID_PASSBACKS: {
@@ -53,8 +56,6 @@ module.exports = {
 		'var pbjs = pbjs || {};' +
 		'pbjs.que = pbjs.que || [];' +
 		'var PREBID_TIMEOUT = __PB_TIMEOUT__;' +
-		//"var SLOT_ID = __PB_SLOT_ID__;" +
-		//"var CONTAINER_ID = __PB_CONTAINER_ID__;" +
 		"var PAGE_URL = '__PAGE_URL__';" +
 		'var ADP_BATCH_ID = __ADP_BATCH_ID__;' +
 		"var prebidScript = document.createElement('script');" +
@@ -87,6 +88,12 @@ module.exports = {
 		"pbjs.setPriceGranularity('dense');" +
 		"pbjs.setBidderSequence('random');" +
 		'pbjs.addAdUnits(__AD_UNIT_CODE__);' +
+		'pbjs.bidderSettings = {' +
+		'c1x: {' +
+		'pixelId: __C1X_PIXEL_ID__,' +
+		'siteId: __C1X_SITE_ID__' +
+		'}' +
+		'};' +
 		"pbjs.aliasBidder('appnexus', 'springserve');" + // SpringServe specific bidder aliasing
 		"pbjs.aliasBidder('appnexus', 'brealtime');" + // bRealTime specific bidder aliasing
 		"pbjs.aliasBidder('appnexus', 'brainjuicemedia');" + // brainjuicemedia specific bidder aliasing
