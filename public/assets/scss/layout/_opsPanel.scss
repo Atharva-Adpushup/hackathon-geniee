@@ -86,4 +86,11 @@ $grey-light: #f3f6f8;
 	> .panel-body {
 		min-height: 250px;
 	}
+
+	&.metricsChart--modeWiseTraffic {
+		.table-responsive {
+			min-height: auto;
+			max-height: 300px;
+		}
+	}
 }
