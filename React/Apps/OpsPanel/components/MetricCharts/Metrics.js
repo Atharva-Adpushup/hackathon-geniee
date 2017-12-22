@@ -137,7 +137,7 @@ class Metrics extends Component {
 		return (
 			<SelectBox
 				value={this.state.selectedPlatform}
-				label="Select metric"
+				label="Select Platform"
 				onChange={this.handleSelectBoxChange}
 				onClear={this.handleSelectBoxChange}
 				disabled={false}
