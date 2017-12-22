@@ -6,36 +6,44 @@ import extend from 'extend';
 import ReactHighCharts from 'react-highcharts';
 import PaneLoader from '../../../../Components/PaneLoader.jsx';
 import { LINE_CHART_CONFIG } from '../../configs/commonConsts';
-// import SelectBox from '../../../../Components/SelectBox/index.jsx';
+import SelectBox from '../../../../Components/SelectBox/index.jsx';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 import '../../../ReportingPanel/styles.scss';
 
-function generateHighChartConfig(inputData) {
+function generateHighChartConfig(inputData, platformName) {
 	const chartConfig = extend(true, {}, LINE_CHART_CONFIG),
 		categories = inputData.dateFormat.collection.concat([]),
+		seriesObject = {
+			revenue: {
+				name: 'Revenue',
+				data: []
+			},
+			impressions: {
+				name: 'Impressions',
+				data: []
+			},
+			pageViews: {
+				name: 'PageViews',
+				data: []
+			},
+			cpm: {
+				name: 'CPM',
+				data: []
+			}
+		};
+	let isPlatform = !!platformName,
+		contributionData;
+
+	if (!isPlatform) {
 		contributionData = extend(true, {}, inputData.dayWise);
-	const seriesObject = {
-		revenue: {
-			name: 'Revenue',
-			data: []
-		},
-		impressions: {
-			name: 'Impressions',
-			data: []
-		},
-		pageViews: {
-			name: 'PageViews',
-			data: []
-		},
-		cpm: {
-			name: 'CPM',
-			data: []
-		}
-	};
+	} else {
+		platformName = platformName.toUpperCase();
+		contributionData = extend(true, {}, inputData.platform[platformName].dayWise);
+	}
 
 	chartConfig.yAxis.title.text = `VALUE ($)`;
-	chartConfig.title.text = `Metrics Performance`;
+	chartConfig.title.text = isPlatform ? `${platformName} Metrics Performance` : `Metrics Performance`;
 	chartConfig.xAxis.categories = chartConfig.xAxis.categories.concat(categories);
 
 	_.forOwn(contributionData, (dayWiseObject, dateKey) => {
@@ -67,14 +75,14 @@ class Metrics extends Component {
 		this.state = {
 			isDataLoaded,
 			data: isDataLoaded ? this.props.data : null,
-			selectedMetric: 'revenue',
+			selectedPlatform: '',
 			startDate: moment().subtract(7, 'days'),
 			endDate: moment().subtract(1, 'day')
 		};
 		this.renderHighCharts = this.renderHighCharts.bind(this);
 		this.generateHeaderTitle = this.generateHeaderTitle.bind(this);
-		// this.handleSelectBoxChange = this.handleSelectBoxChange.bind(this);
-		// this.renderSelectBox = this.renderSelectBox.bind(this);
+		this.handleSelectBoxChange = this.handleSelectBoxChange.bind(this);
+		this.renderSelectBox = this.renderSelectBox.bind(this);
 		this.renderDateRangePickerUI = this.renderDateRangePickerUI.bind(this);
 		this.datesUpdated = this.datesUpdated.bind(this);
 		this.focusUpdated = this.focusUpdated.bind(this);
@@ -108,43 +116,40 @@ class Metrics extends Component {
 
 	renderHighCharts() {
 		let inputData = this.state.data,
-			metricName = this.state.selectedMetric,
-			config = generateHighChartConfig(inputData, metricName);
+			platformName = this.state.selectedPlatform,
+			config = generateHighChartConfig(inputData, platformName);
 
 		return <ReactHighCharts config={config} />;
 	}
 
-	// handleSelectBoxChange(metric = 'revenue') {
-	// 	metric = metric ? metric : 'revenue';
-	// 	this.setState({
-	// 		selectedMetric: metric
-	// 	});
-	// }
+	handleSelectBoxChange(platform = '') {
+		platform = platform || '';
 
-	// renderSelectBox() {
-	// 	return (
-	// 		<SelectBox
-	// 			value={this.state.selectedMetric}
-	// 			label="Select metric"
-	// 			onChange={this.handleSelectBoxChange}
-	// 			onClear={this.handleSelectBoxChange}
-	// 			disabled={false}
-	// 		>
-	// 			<option key="0" value="cpm">
-	// 				CPM
-	// 			</option>
-	// 			<option key="1" value="revenue">
-	// 				REVENUE
-	// 			</option>
-	// 			<option key="2" value="impressions">
-	// 				IMPRESSIONS
-	// 			</option>
-	// 			<option key="3" value="pageViews">
-	// 				PAGEVIEWS
-	// 			</option>
-	// 		</SelectBox>
-	// 	);
-	// }
+		this.setState({
+			selectedPlatform: platform
+		});
+	}
+
+	renderSelectBox() {
+		const isPlatformData = !!this.state.data && this.state.data.platform,
+			platformData = isPlatformData ? Object.keys(this.state.data.platform) : [];
+
+		return (
+			<SelectBox
+				value={this.state.selectedPlatform}
+				label="Select metric"
+				onChange={this.handleSelectBoxChange}
+				onClear={this.handleSelectBoxChange}
+				disabled={false}
+			>
+				{platformData.map((platformName, idx) => (
+					<option key={idx} value={platformName}>
+						{platformName}
+					</option>
+				))}
+			</SelectBox>
+		);
+	}
 
 	datesUpdated({ startDate, endDate }) {
 		this.setState({ startDate, endDate });
@@ -233,7 +238,7 @@ class Metrics extends Component {
 				</Row>
 				<Row className="u-margin-0px aligner-item">
 					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={3}>
-						{/* {this.renderSelectBox()} */}
+						{this.renderSelectBox()}
 					</Col>
 					{this.renderDateRangePickerUI()}
 				</Row>
