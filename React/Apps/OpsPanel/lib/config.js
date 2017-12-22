@@ -49,6 +49,13 @@ const config = {
 			global: {
 				placementId: { validations: { required: true }, alias: 'Placement Id', isEditable: true }
 			}
+		},
+		c1x: {
+			name: 'c1x',
+			isHb: true,
+			global: {
+				placementCode: { validations: { required: false }, alias: 'Placement Code', isEditable: true }
+			}
 		}
 	},
 	supportedAdSizes: [
