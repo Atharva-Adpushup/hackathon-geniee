@@ -400,7 +400,7 @@ function apiModule() {
 							response.data.length
 						);
 
-						if (isResponseData || isExistingUserOption) {
+						if (isResponseData) {
 							return response.data[0].id;
 						} else {
 							return pipedriveAPI('createPerson', pipedriveParams.userInfo);
