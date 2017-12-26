@@ -172,12 +172,18 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			xpath
 		};
 	},
-	updateSection = (sectionId, params) => {
-		return {
+	updateSection = (sectionId, params) => (dispatch, getState) => {
+		dispatch({
+			type: uiActions.SHOW_NOTIFICATION,
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Section updated'
+		});
+		return dispatch({
 			type: sectionActions.UPDATE_SECTION,
 			sectionId,
 			params
-		};
+		});
 	},
 	updateIncontentFloat = (sectionId, adId, float) => {
 		let floatCss = '';

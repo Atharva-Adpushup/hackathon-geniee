@@ -139,7 +139,6 @@ class AdPushupAds extends Component {
 	}
 
 	renderFormatOptions(leftWidth, rightWidth) {
-		console.log(this.state.css);
 		return (
 			<div>
 				<Row className="mT-15">
@@ -211,7 +210,8 @@ class AdPushupAds extends Component {
 			!this.state.event ||
 			!this.state.format ||
 			!this.state.size ||
-			!this.state.eventData.value.trim().length ||
+			((this.state.event == 'scroll' || this.state.event == 'onMills') &&
+				!this.state.eventData.value.trim().length) ||
 			(this.props.showNetworkOptions && (!networkInfo.network || !networkInfo.networkData))
 		) {
 			this.props.showNotification({
@@ -266,7 +266,7 @@ class AdPushupAds extends Component {
 					</Button>
 				</Col>
 				<Col xs={6} className="u-padding-l10px">
-					<Button className="btn-lightBg btn-save btn-block" onClick={this.props.onCancel}>
+					<Button className="btn-lightBg btn-cancel btn-block" onClick={this.props.onCancel}>
 						Cancel
 					</Button>
 				</Col>
