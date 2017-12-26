@@ -165,6 +165,7 @@ variationSections.propTypes = {
 	onSectionAllXPaths: PropTypes.func,
 	onValidateXPath: PropTypes.func,
 	onSectionXPathValidate: PropTypes.func,
+	onSetSectionType: PropTypes.func,
 	resetErrors: PropTypes.func,
 	updateNetwork: PropTypes.func,
 	generateReport: PropTypes.func,

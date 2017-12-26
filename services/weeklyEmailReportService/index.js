@@ -221,7 +221,7 @@ function init() {
 }
 
 cron.schedule(
-	'0 15 * * Mon',
+	'0 15 * * Tue',
 	function() {
 		const infoText = 'WeeklyEmailReport:: Running task at every Monday 8:30pm IST';
 

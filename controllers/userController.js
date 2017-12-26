@@ -64,12 +64,12 @@ function dashboardRedirection(req, res, allUserSites, type) {
 
 		sites = Array.isArray(sites) && sites.length > 0 ? sites : [];
 		/**
-         * unSavedSite, Current user site object entered during signup
-         *
-         * - Value is Truthy (all user site/sites) only if user has
-         * no saved any site through Visual Editor
-         * - Value is Falsy if user has atleast one saved site
-        */
+		 * unSavedSite, Current user site object entered during signup
+		 *
+		 * - Value is Truthy (all user site/sites) only if user has
+		 * no saved any site through Visual Editor
+		 * - Value is Falsy if user has atleast one saved site
+		 */
 		unSavedSite = sites.length === 0 ? allUserSites : null;
 		req.session.unSavedSite = unSavedSite;
 
@@ -340,6 +340,7 @@ router
 				return res.send({ success: 0 });
 			})
 			.catch(function(err) {
+				console.log('Error while Adding site', err);
 				return res.send({ success: 0 });
 			});
 	})

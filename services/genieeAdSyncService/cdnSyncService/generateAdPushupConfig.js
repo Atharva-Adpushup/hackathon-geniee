@@ -36,6 +36,9 @@ const _ = require('lodash'),
 			json = {
 				id: sectionId,
 				network: ad.network,
+				//Format type of ad like, 1 for structural, 2 for incontent
+				type: section.type,
+				formatData: section.formatData,
 				css: ad.css,
 				height: parseInt(ad.height, 10),
 				width: parseInt(ad.width, 10)
@@ -99,11 +102,12 @@ const _ = require('lodash'),
 			contentSelector: isContentSelector ? contentSelector : '',
 			ads: ads,
 			// Data required for auto optimiser model
-			// pageRPM is mapped as sum
-			sum: variationData && parseFloat(variationData.pageRPM) > -1 ? variationData.pageRPM : 1,
+			// Page revenue is mapped as sum
+			sum:
+				variationData && parseFloat(variationData.pageRevenue) > -1 ? Math.floor(variationData.pageRevenue) : 1,
 			// Data required for auto optimiser model
 			// Page view is mapped as count
-			count: variationData && parseInt(variationData.pageViews, 10) > -1 ? variationData.pageViews : 1
+			count: variationData && parseInt(variationData.pageViews, 10) > -1 ? Math.floor(variationData.pageViews) : 1
 		};
 
 		return computedVariationObj;
@@ -134,7 +138,8 @@ const _ = require('lodash'),
 		finalJson[platform][pageGroup] = {
 			variations: [],
 			contentSelector: channel.contentSelector,
-			pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup)
+			pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup),
+			hasVariationsWithNoData: false
 		};
 
 		_.each(channel.variations, (variation, id) => {
@@ -142,6 +147,10 @@ const _ = require('lodash'),
 			let variationPayload = getVariationPayload(variation, platform, pageGroup, variationData, finalJson);
 			if (typeof variationPayload == 'object' && Object.keys(variationPayload).length) {
 				finalJson[platform][pageGroup].variations.push(variationPayload);
+				finalJson[platform][pageGroup].hasVariationsWithNoData =
+					finalJson[platform][pageGroup].hasVariationsWithNoData == false
+						? variationData == null ? true : false
+						: finalJson[platform][pageGroup].hasVariationsWithNoData;
 			}
 		});
 		if (!Object.keys(finalJson[platform][pageGroup].variations).length) {

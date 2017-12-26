@@ -329,7 +329,7 @@ const status = {
 		EDITOR_MODE: 1,
 		BROWSE_MODE: 2
 	},
-	networks = ['adsense', 'adx', 'adpTags', 'dfp', 'custom'],
+	networks = ['adsense', 'adx', 'adpTags', 'dfp', 'custom', 'geniee'],
 	priceFloorKeys = ['FP_S_A', 'FP_B_A', 'FP_S', 'FP_A', 'FP_B'],
 	defaultPriceFloorKey = 'FP_S_A',
 	reportingUrl = '/user/reports/generate',
@@ -339,14 +339,14 @@ const status = {
 		sizes: {
 			DESKTOP: {
 				sticky: {
-					bottom: ['300X50', '300X100', '320X100'],
-					left: ['160X600', '336X280', '300X250'],
-					right: ['160X600', '336X280', '300X250']
+					bottom: ['300X50', '300X100', '320X100', '728x90'],
+					left: ['160X600', '336X280', '300X250', '300x600', '300x50', '120x600'],
+					right: ['160X600', '336X280', '300X250', '300x600', '300x50', '120x600']
 				}
 			},
 			MOBILE: {
 				sticky: {
-					bottom: ['300X50', '300X100', '320X100']
+					bottom: ['160X600', '336X280', '300X250', '300x600', '300x50', '120x600']
 				}
 			}
 		},

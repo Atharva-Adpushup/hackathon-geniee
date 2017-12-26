@@ -55,6 +55,13 @@ function isPipeDriveAPIActivated() {
 	);
 }
 
+function isEmailInAnalyticsBlockList(email) {
+	const blockList = CC.analytics.emailBlockList,
+		isEmailInBLockList = blockList.indexOf(email) > -1;
+
+	return isEmailInBLockList;
+}
+
 function getSiteLevelPipeDriveData(user, inputData) {
 	let allSites = user.get('sites'),
 		isAllSites = !!(allSites && allSites.length),
@@ -404,20 +411,23 @@ router
 			});
 	})
 	.post('/updateCrmDealStatus', function(req, res) {
+		const email = req.session.user.email;
+
 		return userModel
-			.getUserByEmail(req.session.user.email)
+			.getUserByEmail(email)
 			.then(user => {
 				const isUser = !!user,
 					stageId = req.body.status,
 					siteDomain = req.body.domain,
 					isValidParameters = !!(stageId && siteDomain),
-					isAPIActivated = isPipeDriveAPIActivated();
+					isAPIActivated = isPipeDriveAPIActivated(),
+					isEmailInBLockList = isEmailInAnalyticsBlockList(email);
 
 				if (!isUser) {
 					return Promise.reject('UpdateCrmDealStatus: User does not exist');
 				} else if (!isValidParameters) {
 					return Promise.reject('UpdateCrmDealStatus: Invalid request body parameters');
-				} else if (!isAPIActivated) {
+				} else if (!isAPIActivated || isEmailInBLockList) {
 					return user;
 				}
 
