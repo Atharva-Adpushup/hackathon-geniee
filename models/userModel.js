@@ -237,6 +237,13 @@ function isPipeDriveAPIActivated() {
 	);
 }
 
+function isEmailInAnalyticsBlockList(email) {
+	const blockList = consts.analytics.emailBlockList,
+		isEmailInBLockList = blockList.indexOf(email) > -1;
+
+	return isEmailInBLockList;
+}
+
 function setSiteLevelPipeDriveData(user, inputData) {
 	let allSites = user.get('sites'),
 		isAllSites = !!(allSites && allSites.length);
@@ -344,24 +351,23 @@ function apiModule() {
 						};
 
 						return getUser.then(user => {
-							const isAPIActivated = isPipeDriveAPIActivated();
+							const isAPIActivated = isPipeDriveAPIActivated(),
+								isEmailInBLockList = isEmailInAnalyticsBlockList(email);
 
-							if (!isSiteValidated || !isAPIActivated) {
+							if (!isSiteValidated || !isAPIActivated || isEmailInBLockList) {
 								return user;
 							}
 
-							return API.createNewPipeDriveDeal(
-								api.params,
-								user,
-								api.options
-							).spread((user, pipeDriveData) => {
-								const pipedriveParams = {
-									dealTitle: pipeDriveData.dealTitle || false,
-									dealId: pipeDriveData.dealId || false,
-									domain
-								};
-								return setSiteLevelPipeDriveData(user, pipedriveParams);
-							});
+							return API.createNewPipeDriveDeal(api.params, user, api.options).spread(
+								(user, pipeDriveData) => {
+									const pipedriveParams = {
+										dealTitle: pipeDriveData.dealTitle || false,
+										dealId: pipeDriveData.dealId || false,
+										domain
+									};
+									return setSiteLevelPipeDriveData(user, pipedriveParams);
+								}
+							);
 						});
 					});
 
@@ -394,7 +400,7 @@ function apiModule() {
 							response.data.length
 						);
 
-						if (isResponseData || isExistingUserOption) {
+						if (isResponseData) {
 							return response.data[0].id;
 						} else {
 							return pipedriveAPI('createPerson', pipedriveParams.userInfo);
@@ -481,7 +487,7 @@ function apiModule() {
 			var userEmail = user.get('email'),
 				userFirstName = user.get('firstName'),
 				siteName = utils.domanize(params.site),
-				miscellaneousData = user.get('miscellaneous'),
+				miscellaneousData = user.get('miscellaneous') || {},
 				pipedriveParams = {
 					userInfo: {
 						name: userFirstName,
@@ -546,9 +552,10 @@ function apiModule() {
 							})
 							.then(function(user) {
 								const isUserTypePartner = !!(json.userType && json.userType === 'partner'),
-									isAPIActivated = isPipeDriveAPIActivated();
+									isAPIActivated = isPipeDriveAPIActivated(),
+									isEmailInBLockList = isEmailInAnalyticsBlockList(json.email);
 
-								if (isUserTypePartner || !isAPIActivated) {
+								if (isUserTypePartner || !isAPIActivated || isEmailInBLockList) {
 									return [user, {}];
 								}
 

@@ -119,7 +119,7 @@ block bodyContent
                                             .col-sm-5
                                                 .input-name Auto Optimise
                                             .col-sm-7
-                                                input(type="checkbox" id="autoOptimise" name="autoOptimise" value="" checked=false)
+                                                input(type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "false") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "false"))
                                         .row
                                             .col-sm-12#autoOptimiseErr.error-message
                                         .row

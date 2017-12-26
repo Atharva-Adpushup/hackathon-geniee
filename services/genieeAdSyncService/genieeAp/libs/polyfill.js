@@ -1,5 +1,6 @@
 if (!Object.keys) {
 	Object.keys = (function() {
+		'use strict';
 		var hasOwnProperty = Object.prototype.hasOwnProperty,
 			hasDontEnumBug = !{ toString: null }.propertyIsEnumerable('toString'),
 			dontEnums = [
@@ -14,18 +15,25 @@ if (!Object.keys) {
 			dontEnumsLength = dontEnums.length;
 
 		return function(obj) {
-			if ((typeof obj !== 'object' && typeof obj !== 'function') || obj === null)
+			if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
 				throw new TypeError('Object.keys called on non-object');
+			}
 
-			var result = [];
+			var result = [],
+				prop,
+				i;
 
-			for (var prop in obj) {
-				if (hasOwnProperty.call(obj, prop)) result.push(prop);
+			for (prop in obj) {
+				if (hasOwnProperty.call(obj, prop)) {
+					result.push(prop);
+				}
 			}
 
 			if (hasDontEnumBug) {
-				for (var i = 0; i < dontEnumsLength; i++) {
-					if (hasOwnProperty.call(obj, dontEnums[i])) result.push(dontEnums[i]);
+				for (i = 0; i < dontEnumsLength; i++) {
+					if (hasOwnProperty.call(obj, dontEnums[i])) {
+						result.push(dontEnums[i]);
+					}
 				}
 			}
 			return result;
@@ -81,6 +89,7 @@ if (!window.btoa) {
 		return output;
 	};
 }
+
 if (!Array.isArray) {
 	Array.isArray = function(arg) {
 		return Object.prototype.toString.call(arg) === '[object Array]';
@@ -95,3 +104,31 @@ if (window.NodeList && !NodeList.prototype.forEach) {
 		}
 	};
 }
+
+(function() {
+	if (!Function.prototype.bind) {
+		// eslint-disable-next-line no-extend-native
+		Function.prototype.bind = function(oThis) {
+			if (typeof this !== 'function') {
+				// closest thing possible to the ECMAScript 5
+				// internal IsCallable function
+				throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+			}
+
+			var aArgs = Array.prototype.slice.call(arguments, 1),
+				fToBind = this,
+				Noop = function() {},
+				fBound = function() {
+					return fToBind.apply(
+						this instanceof Noop ? this : oThis,
+						aArgs.concat(Array.prototype.slice.call(arguments))
+					);
+				};
+
+			Noop.prototype = this.prototype;
+			fBound.prototype = new Noop();
+
+			return fBound;
+		};
+	}
+})();

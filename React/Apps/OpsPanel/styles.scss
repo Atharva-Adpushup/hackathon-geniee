@@ -16,6 +16,13 @@ $primaryColor: #eb575c;
 	font-size: 1.2em;
 }
 
+.hb-additional-options {
+	input {
+		font-size: 1.1em;
+		border: 1px solid $SBBorderColor;
+	}
+}
+
 .hb-config-creator {
 	padding: 20px;
 	border: 1px solid $SBBorderColor;
@@ -89,5 +96,18 @@ $primaryColor: #eb575c;
 	.partner-creator {
 		height: 200px;
 		overflow-y: scroll;
+	}
+}
+
+.inputMinimal {
+	width: 100%;
+	padding: 6px 10px;
+	border-radius: 3px;
+	border: 2px solid rgb(204, 204, 204);
+}
+
+.live-sites-filters {
+	.DateRangePicker.DateRangePicker_1 {
+		width: 100% !important;
 	}
 }

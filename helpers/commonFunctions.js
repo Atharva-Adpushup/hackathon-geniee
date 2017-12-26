@@ -10,6 +10,12 @@ const Promise = require('bluebird'),
 	siteDeviceWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/siteDeviceWiseRevenueContribution'),
 	sitePageGroupWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/sitePageGroupWiseRevenueContribution'),
 	siteAdNetworkWiseDataContributionQuery = require('../reports/default/adpTags/queries/siteAdNetworkWiseDataContribution'),
+	globalNetworkWiseDataContributionQuery = require('../reports/default/adpTags/queries/globalNetworkWiseDataContribution'),
+	globalMetricsDataContributionQuery = require('../reports/default/adpTags/queries/globalMetricsDataContribution'),
+	globalModeWiseTrafficContributionQuery = require('../reports/default/adpTags/queries/globalModeWiseTrafficContribution'),
+	globalTop10CountriesContributionQuery = require('../reports/default/adpTags/queries/globalTop10CountriesContribution'),
+	globalTop10SitesContributionQuery = require('../reports/default/adpTags/queries/globalTop10SitesContribution'),
+	globalLostAndFoundLiveSitesQuery = require('../reports/default/adpTags/queries/lostAndFoundLiveSites'),
 	createAggregateNonAggregateObjects = (dataset, key, container) => {
 		let innerObj = {};
 		_.forEach(dataset, (nonAggregateDataset, identifier) => {
@@ -47,10 +53,10 @@ const Promise = require('bluebird'),
 				isInvalidRevenue || innerObj[identifier].aggregate.total_impressions == 0
 					? 0
 					: Number(
-						innerObj[identifier].aggregate.total_revenue *
-						1000 /
-						innerObj[identifier].aggregate.total_impressions
-					).toFixed(3);
+							innerObj[identifier].aggregate.total_revenue *
+								1000 /
+								innerObj[identifier].aggregate.total_impressions
+						).toFixed(3);
 		});
 		container[key] = innerObj;
 	},
@@ -175,51 +181,51 @@ const Promise = require('bluebird'),
 	},
 	computeMetricComparison = inputData => {
 		const resultData = {
-			impressions: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
+				impressions: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				revenue: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				pageViews: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				cpm: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				pageCPM: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				dates: {
+					lastWeek: {},
+					thisWeek: {}
+				}
 			},
-			revenue: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			pageViews: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			cpm: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			pageCPM: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			dates: {
-				lastWeek: {},
-				thisWeek: {}
-			}
-		},
 			lastWeekDatesInfo = getWeekDatesRepresentation({
 				startDate: inputData.lastWeekReport.reportFrom,
 				endDate: inputData.lastWeekReport.reportTo
@@ -319,14 +325,14 @@ const Promise = require('bluebird'),
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			thisWeekReportParams = {
 				siteId,
-				from: moment(getDay(7)).format(dateFormat),
-				to: moment(getDay(1)).format(dateFormat),
+				from: moment(getDay(8)).format(dateFormat),
+				to: moment(getDay(2)).format(dateFormat),
 				select: commonConsts.REPORT_API.SELECT_PARAMS
 			},
 			lastWeekReportParams = {
 				siteId,
-				from: moment(getDay(14)).format(dateFormat),
-				to: moment(getDay(8)).format(dateFormat),
+				from: moment(getDay(15)).format(dateFormat),
+				to: moment(getDay(9)).format(dateFormat),
 				select: commonConsts.REPORT_API.SELECT_PARAMS
 			};
 
@@ -403,6 +409,58 @@ const Promise = require('bluebird'),
 
 		return siteAdNetworkWiseDataContributionQuery.getData(config);
 	},
+	getGlobalNetworkWiseDataContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return globalNetworkWiseDataContributionQuery.getData(config);
+	},
+	getGlobalMetricsDataContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return globalMetricsDataContributionQuery.getData(config);
+	},
+	getGlobalModeWiseTrafficContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return globalModeWiseTrafficContributionQuery.getData(config);
+	},
+	getGlobalTop10CountriesContributionQuery = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false,
+				count: parameterConfig.count
+			};
+
+		return globalTop10CountriesContributionQuery.getData(config);
+	},
+	getGlobalTop10SitesContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return globalTop10SitesContributionQuery.getData(config);
+	},
+	getGlobalLostAndFoundLiveSitesReport = parameterConfig => globalLostAndFoundLiveSitesQuery.getData(parameterConfig),
 	getWeeklyEmailReport = siteId => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			parameterConfig = {
@@ -452,5 +510,11 @@ module.exports = {
 	getSiteTopUrlsReport,
 	getSiteDeviceWiseRevenueContributionReport,
 	getSitePageGroupWiseRevenueContributionReport,
-	getSiteAdNetworkWiseDataContributionReport
+	getSiteAdNetworkWiseDataContributionReport,
+	getGlobalNetworkWiseDataContributionReport,
+	getGlobalMetricsDataContributionReport,
+	getGlobalModeWiseTrafficContributionReport,
+	getGlobalTop10CountriesContributionQuery,
+	getGlobalTop10SitesContributionReport,
+	getGlobalLostAndFoundLiveSitesReport
 };

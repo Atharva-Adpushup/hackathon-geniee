@@ -1,7 +1,6 @@
-var utils = require('../libs/utils'),
-	$ = require('jquery'),
-	bayesianBanditModel = require('./variationSelectionModels/bayesianBandit')(),
-	randomSelectionModel = require('./variationSelectionModels/randomSelection')();
+var utils = require('../../libs/utils'),
+	bayesianBanditModel = require('./bayesianBandit'),
+	randomSelectionModel = require('./randomSelection')();
 
 module.exports = function(config) {
 	var experiment = config.experiment,
@@ -13,6 +12,7 @@ module.exports = function(config) {
 		channelContentSelector,
 		variationContentSelector,
 		isVariationContentSelector,
+		hasVariationsWithNoData,
 		contentSelector;
 
 	// if no experimnet setup for given platform and pagegroup
@@ -48,7 +48,8 @@ module.exports = function(config) {
 
 	try {
 		if (isAutoOptimise) {
-			chosenVariation = bayesianBanditModel.chooseVariation(allVariations);
+			hasVariationsWithNoData = experiment[config.platform][config.pageGroup].hasVariationsWithNoData;
+			chosenVariation = bayesianBanditModel.chooseVariation(allVariations, hasVariationsWithNoData);
 		} else {
 			chosenVariation = randomSelectionModel.chooseVariation(allVariations);
 		}

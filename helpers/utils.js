@@ -2,6 +2,9 @@
  * Created by Dhiraj on 3/4/2016.
  */
 var url = require('url'),
+	request = require('request-promise'),
+	commonConsts = require('../configs/commonConsts'),
+	moment = require('moment'),
 	// logger = require('./logger'),
 	CryptoJS = require('crypto-js'),
 	Promise = require('bluebird'),
@@ -193,6 +196,50 @@ var url = require('url'),
 			return list.some(function(pattern) {
 				return pattern.test(value);
 			});
+		},
+		getCurrencyExchangeRate: parameterConfig => {
+			const config = {
+					uri: commonConsts.CURRENCY_EXCHANGE.API_URL,
+					qs: {
+						[commonConsts.CURRENCY_EXCHANGE.PARAMETERS.BASE]: parameterConfig.base,
+						[commonConsts.CURRENCY_EXCHANGE.PARAMETERS.SYMBOLS]: parameterConfig.symbols
+					},
+					json: true
+				},
+				response = {
+					rate: null,
+					error: false
+				};
+
+			return request(config)
+				.then(responseData => {
+					response.rate = responseData.rates[parameterConfig.symbols];
+					return response;
+				})
+				.catch(error => {
+					return response;
+				});
+		},
+		getDateFormatCollection: parameterConfig => {
+			const { fromDate, toDate, format } = parameterConfig,
+				fromDateMoment = moment(fromDate),
+				toDateMoment = moment(toDate),
+				daysDifferenceCount = Math.abs(toDateMoment.diff(fromDateMoment, 'days')),
+				differenceLength = daysDifferenceCount + 1,
+				resultData = {
+					collection: [],
+					differenceCount: daysDifferenceCount
+				};
+
+			for (let dayDifference = 0; dayDifference < differenceLength; dayDifference++) {
+				let dateFormat = moment(fromDate)
+					.add(dayDifference, 'days')
+					.format(format);
+
+				resultData.collection.push(dateFormat);
+			}
+
+			return resultData;
 		}
 	};
 

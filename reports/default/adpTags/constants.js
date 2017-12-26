@@ -20,247 +20,6 @@ total_impressions				section						section
 								device						device
 
 */
-const section_level_query = `
-SELECT
-	a.report_date,
-	a.siteid,
-	a.total_impressions,
-	a.total_xpath_miss,
-	a.name,
-	a.variation_id,
-	a.section_md5,
-	b.total_cpm
-FROM (
-	SELECT 
-		c.report_date,
-		c.siteid,
-		c.axvid,
-		c.axpgid,
-		d.axsid,
-		e.name,
-		f.variation_id,
-		g.section_md5,
-		SUM(d.total_impressions) AS total_impressions,
-		SUM(d.total_xpath_miss) AS total_xpath_miss
-	FROM
-		ApexHourlySiteReport c, ApexSectionReport d, ApexPagegroup e, ApexVariation f, ApexSection g
-	WHERE
-		e.name=@__name__
-		f.variation_id=@__variation_id
-		g.section_md5=@__section_md5__
-		c.siteid=@__siteid__
-		c.report_date BETWEEN @__from__ AND @__to__
-		c.axhsrid=d.axhsrid
-	GROUP BY
-		c.report_date,
-		c.siteid,
-		c.axvid,
-		c.axpgid,
-		d.axsid,
-		e.name,
-		f.variation_id,
-		g.section_md5
-) a
-INNER JOIN (
-	SELECT
-		h.report_date,
-		h.siteid,
-		h.axvid,
-		h.axpgid,
-		h.axsid,
-		SUM(h.total_cpm) AS h.total_cpm
-	FROM
-		AdpTagReport h, ApexPagegroup e, ApexVariation f, ApexSection g
-	WHERE
-		e.name=@__name__
-		f.variation_id=@__variation_id
-		g.section_md5=@__section_md5__
-		h.siteid=@__siteid__
-		h.report_date BETWEEN @__from__ AND @__to__
-	GROUP BY
-		h.report_date,
-		h.siteid,
-		h.axsid,
-		h.axvid,
-		h.axpgid,
-		e.name,
-		f.variation_id,
-		g.section_md5
-) b
-ON a.report_date=b.report_date and a.siteid=b.siteid and a.axpgid=b.axpgid and a.axvid=b.axvid and a.axsid=b.axsid
-GROUP BY
-	a.section_md5,
-	a.variation_id,
-	a.name
-`;
-
-/*
-Variation wise reporting query. 
-	The following query will fetch variation level reporting data 
-	- report_data, siteid, total_cpm, total_impressions, total_xpath_miss
-	(More fields can be fetched but schema needs to append accordingly)
-	
-	It joins three tables : ApexHourlySiteReport, AdpTagReport
-	Revenue from AdpTagReport
-	Impressions, Xpath_miss, Siteid, Date from ApexHourlySiteReport  
-*/
-const variation_level_query = `
-SELECT
-	a.report_date,
-	a.siteid,
-	a.total_impressions,
-	a.total_xpath_miss,
-	a.axpgid,
-	a.axvid,
-	b.total_cpm
-FROM (
-	SELECT 
-		c.report_date,
-		c.siteid,
-		c.axvid,
-		c.axpgid,
-		SUM(c.total_impressions) AS total_impressions,
-		SUM(c.total_xpath_miss) AS total_xpath_miss
-	FROM
-		ApexHourlySiteReport c
-	WHERE
-		c.axvid=@__axvid__
-		c.axpgid=@__axpgid__
-		c.siteid=@__siteid__
-		c.report_date BETWEEN @__from__ AND @__to__
-	GROUP BY
-		c.report_date,
-		c.siteid,
-		c.axvid,
-		c.axpgid,
-) a
-INNER JOIN (
-	SELECT
-		report_date,
-		siteid,
-		axvid,
-		axpgid,
-		SUM(total_cpm) AS total_cpm
-	FROM
-		AdpTagReport
-	WHERE
-		axvid=@__axvid__
-		axpgid=@__axpgid__
-		siteid=@__siteid__
-		report_date BETWEEN @__from__ AND @__to__
-	GROUP BY
-		report_date,
-		siteid,
-		axvid,
-		axpgid
-) b
-ON a.report_date=b.report_date and a.siteid=b.siteid and a.axpgid=b.axpgid and a.axvid=b.axvid
-`;
-
-/*
-Pagegroup wise reporting query. 
-	The following query will fetch pagegroup level reporting data 
-	- report_data, siteid, total_cpm, total_impressions, total_xpath_miss
-	(More fields can be fetched but schema needs to append accordingly)
-	
-	It joins three tables : ApexHourlySiteReport, AdpTagReport
-	Revenue from AdpTagReport
-	Impressions, Xpath_miss, Siteid, Date from ApexHourlySiteReport  
-*/
-const pagegroup_level_query = `
-SELECT
-	a.report_date,
-	a.siteid,
-	a.total_impressions,
-	a.total_xpath_miss,
-	a.axpgid,
-	b.total_cpm
-FROM (
-	SELECT 
-		c.report_date,
-		c.siteid,
-		c.axpgid,
-		SUM(c.total_impressions) AS total_impressions,
-		SUM(c.total_xpath_miss) AS total_xpath_miss
-	FROM
-		ApexHourlySiteReport c
-	WHERE
-		c.axpgid=@__axpgid__
-		c.siteid=@__siteid__
-		c.report_date BETWEEN @__from__ AND @__to__
-	GROUP BY
-		c.report_date,
-		c.siteid,
-		c.axpgid,
-) a
-INNER JOIN (
-	SELECT
-		report_date,
-		siteid,
-		axpgid,
-		SUM(total_cpm) AS total_cpm
-	FROM
-		AdpTagReport
-	WHERE
-		axpgid=@__axpgid__
-		siteid=@__siteid__
-		report_date BETWEEN @__from__ AND @__to__
-	GROUP BY
-		report_date,
-		axpgid,
-		siteid
-) b
-ON a.report_date=b.report_date and a.siteid=b.siteid and a.axpgid=b.axpgid
-`;
-
-/*
-Site wise reporting query. 
-	The following query will fetch site level reporting data 
-	- report_data, siteid, total_cpm, total_impressions, total_xpath_miss
-	(More fields can be fetched but schema needs to append accordingly)
-	
-	It joins three tables : ApexHourlySiteReport, AdpTagReport
-	Revenue from AdpTagReport
-	Impressions, Xpath_miss, Siteid, Date from ApexHourlySiteReport  
-*/
-const site_level_query = `
-SELECT
-	a.report_date,
-	a.siteid,
-	a.total_impressions,
-	a.total_xpath_miss,
-	b.total_cpm
-FROM (
-	SELECT 
-		c.report_date,
-		c.siteid,
-		SUM(c.total_impressions) AS total_impressions,
-		SUM(c.total_xpath_miss) AS total_xpath_miss
-	FROM
-		ApexHourlySiteReport c
-	WHERE
-		c.siteid=@__siteid__
-		c.report_date BETWEEN @__from__ AND @__to__
-	GROUP BY
-		c.report_date,
-		c.siteid,
-) a
-INNER JOIN (
-	SELECT
-		report_date,
-		siteid,
-		SUM(total_cpm) AS total_cpm
-	FROM
-		AdpTagReport
-	WHERE
-		siteid=@__siteid__
-		report_date BETWEEN @__from__ AND @__to__
-	GROUP BY
-		report_date,
-		siteid
-) b
-ON a.report_date=b.report_date and a.siteid=b.siteid
-`;
 
 const SITE_TOP_URLS = `
 SELECT TOP @__count__ c.url, sum(b.count) AS 'count'
@@ -288,6 +47,71 @@ WHERE a.axpgid = b.axpgid
 	AND a.report_date BETWEEN @__fromDate__ AND @__toDate__
 	AND a.siteid = @__siteId__
 GROUP BY a.report_date, b.NAME;
+`;
+
+const GLOBAL_NETWORK_WISE_PERFORMANCE = `
+SELECT report_date, a.ntwid, name, sum(total_impressions) impressions, sum(total_revenue) revenue
+FROM adptagreport a, network b
+WHERE a.ntwid = b.ntwid
+	AND a.report_date BETWEEN @__fromDate__ AND @__toDate__
+GROUP BY a.report_Date, a.ntwid, name
+ORDER BY a.report_date, a.ntwid, name;
+`;
+
+const GLOBAL_METRICS_PERFORMANCE = `
+SELECT a.report_date, a.device_type, total_page_views, impressions, revenue
+FROM (
+SELECT report_date, device_type, sum(total_requests) AS total_page_views
+FROM ApexHourlySiteReport
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+GROUP BY report_date, device_type
+) a
+LEFT JOIN (
+SELECT report_date, device_type, sum(total_impressions) impressions, sum(total_revenue) revenue
+FROM adptagreport
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+GROUP BY report_Date, device_type
+) b ON a.report_date = b.report_date AND a.device_type = b.device_type
+ORDER BY report_date, device_type
+`;
+
+const GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE = `
+SELECT a.siteid, b.name as siteName, a.report_date, a.mode, sum(a.total_requests) as total_page_views
+FROM ApexHourlySiteReport a,  Site b
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+AND a.siteid = b.siteid AND a.siteid > 25000
+GROUP BY a.report_date, a.mode, a.siteid, b.name
+ORDER BY a.report_date, a.mode, sum(total_requests) DESC
+`;
+
+const GLOBAL_TOP_10_COUNTRIES_PERFORMANCE = `
+SELECT report_date, a.cid, country, total_page_views
+FROM (
+SELECT report_date, a.cid, NAME country, sum(total_requests) AS total_page_views
+,ROW_NUMBER() OVER (PARTITION BY report_date ORDER BY sum(total_requests) DESC) AS rn
+FROM ApexHourlySiteReport a, country b
+WHERE a.cid = b.cid AND report_date BETWEEN @__fromDate__ AND @__toDate__
+GROUP BY report_date, a.cid, NAME
+) a
+WHERE rn <= @__count__
+ORDER BY report_date
+`;
+
+const TOP_10_SITES_PERFORMANCE = `
+SELECT a.report_date, a.siteid, a.device_type, total_page_views, impressions, revenue, a.url, a.name, b.ntwid
+FROM (
+SELECT d.report_date, d.device_type, d.siteid, sum(d.total_requests) AS total_page_views, c.url, c.name
+FROM ApexHourlySiteReport d, Site c
+WHERE c.siteid = d.siteid AND d.report_date BETWEEN @__fromDate__ AND @__toDate__ AND d.siteid >= 25000
+GROUP BY d.report_date, d.siteid, c.url, c.name, d.device_type
+) a
+LEFT JOIN (
+SELECT report_date, siteid, sum(total_impressions) impressions, sum(total_revenue) revenue, device_type, ntwid
+FROM adptagreport
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__ AND siteid >= 25000
+GROUP BY report_Date, siteid, device_type, ntwid
+) b ON a.report_date = b.report_date AND a.siteid = b.siteid AND a.device_type = b.device_type
+ORDER BY report_date, siteid, device_type
 `;
 
 const PLATFORMS_KEYS = {
@@ -349,9 +173,10 @@ GROUP BY
 	b.display_name
 */
 
-let fetchSectionQuery = `SELECT axsid, sec_key, section_md5 FROM ApexSection where siteid=@__siteid__`;
-let fetchVariationQuery = `SELECT axvid, var_key, variation_id FROM ApexVariation where siteid=@__siteid__`;
-let fetchPagegroupQuery = `SELECT axpgid, pg_key, name FROM ApexPageGroup where siteid=@__siteid__`;
+const fetchSectionQuery = `SELECT axsid, sec_key, section_md5 FROM ApexSection where siteid=@__siteid__`,
+	fetchVariationQuery = `SELECT axvid, var_key, variation_id FROM ApexVariation where siteid=@__siteid__`,
+	fetchPagegroupQuery = `SELECT axpgid, pg_key, name FROM ApexPageGroup where siteid=@__siteid__`,
+	liveSitesQuery = `EXEC GetActiveSites @__from__,@__to__,@__threshold__`;
 
 const schema = {
 	common: {
@@ -463,6 +288,15 @@ const schema = {
 	}
 };
 
+const ANAMOLY_PAGE_VIEW_IMPRESSION_XPATH_MISS = `
+EXEC GetPVIXAnomaly @__weekStartDate__,@__weekEndDate__,@__yesterdayDate__,@__codeRemovedThreshold__,@__pageViewThreshold__,@__pageViewMinThreshold__,@__impressionThreshold__,@__impressionMinThreshold__,@__xpathMissThreshold__,@__xpathMissMinThreshold__`;
+
+const ANAMOLY_CPM = `
+EXEC GetCpmAnomaly @__weekStartDate__,@__weekEndDate__,@__yesterdayDate__,@__pageViewMinThreshold__,@__cpmThreshold__,@__cpmMinThreshold__`;
+
+const ANAMOLY_DETERMINED_MODE = `
+EXEC GetDMAnomaly  @__weekStartDate__,@__weekEndDate__,@__yesterdayDate__,@__pageViewMinThreshold__,@__determinedModeThreshold__,@__determinedModeMinThreshold__`;
+
 module.exports = {
 	schema,
 	fetchSectionQuery,
@@ -473,5 +307,14 @@ module.exports = {
 	PLATFORMS_KEYS,
 	REGEX_DATE_FORMAT,
 	STRING_DATE_FORMAT,
-	SITE_PAGEGROUP_WISE_REVENUE_CONTRIBUTION
+	SITE_PAGEGROUP_WISE_REVENUE_CONTRIBUTION,
+	liveSitesQuery,
+	ANAMOLY_PAGE_VIEW_IMPRESSION_XPATH_MISS,
+	ANAMOLY_CPM,
+	ANAMOLY_DETERMINED_MODE,
+	GLOBAL_NETWORK_WISE_PERFORMANCE,
+	GLOBAL_METRICS_PERFORMANCE,
+	GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE,
+	GLOBAL_TOP_10_COUNTRIES_PERFORMANCE,
+	TOP_10_SITES_PERFORMANCE
 };

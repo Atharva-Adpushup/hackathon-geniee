@@ -3,13 +3,13 @@ import { Row, Col, Button } from 'react-bootstrap';
 import CssEditor from 'shared/cssEditor/cssEditor.jsx';
 import CodeBox from 'shared/codeBox.jsx';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
-import SectionOptions from '../insertMenu/sectionOptions.jsx';
 import AdDetails from './AdDetails';
 
 const initialState = {
 	isEditingCss: false,
 	isEditingCode: false,
-	isEditingNetwork: false
+	isEditingNetwork: false,
+	showButton: true
 };
 
 class adDescriptor extends React.Component {
@@ -19,6 +19,7 @@ class adDescriptor extends React.Component {
 		this.toggleCssEditor = this.toggleCssEditor.bind(this);
 		this.toggleCodeEditor = this.toggleCodeEditor.bind(this);
 		this.toggleNetworkEditor = this.toggleNetworkEditor.bind(this);
+		this.toggleDeleteButton = this.toggleDeleteButton.bind(this);
 		this.submitHandler = this.submitHandler.bind(this);
 	}
 
@@ -40,6 +41,10 @@ class adDescriptor extends React.Component {
 		this.setState({ isEditingNetwork: !this.state.isEditingNetwork });
 	}
 
+	toggleDeleteButton() {
+		this.setState({ showButton: !this.state.showButton });
+	}
+
 	submitHandler(params) {
 		this.props.updateNetwork(this.props.ad.id, params);
 	}
@@ -51,11 +56,14 @@ class adDescriptor extends React.Component {
 				updateAdCode,
 				section,
 				updateSettings,
+				showNotification,
 				onUpdateXPath,
 				onSectionAllXPaths,
 				onValidateXPath,
 				onResetErrors,
 				onRenameSection,
+				onSetSectionType,
+				onFormatDataUpdate,
 				ui,
 				variationId
 			} = this.props,
@@ -88,17 +96,6 @@ class adDescriptor extends React.Component {
 		}
 		return (
 			<div className="containerButtonBar">
-				<Row>
-					{currentUser.userType === 'partner' ? (
-						<SectionOptions
-							updateMode
-							sectionId={section.sectionId}
-							ad={ad}
-							partnerData={section.partnerData}
-							updateSettings={updateSettings}
-						/>
-					) : null}
-				</Row>
 				<Row style={{ margin: '10px 0' }}>
 					<AdDetails
 						userType={currentUser.userType || false}
@@ -113,19 +110,25 @@ class adDescriptor extends React.Component {
 						onValidateXPath={onValidateXPath}
 						onResetErrors={onResetErrors}
 						onRenameSection={onRenameSection}
+						onSetSectionType={onSetSectionType}
+						onFormatDataUpdate={onFormatDataUpdate}
+						toggleDeleteButton={this.toggleDeleteButton}
+						showNotification={showNotification}
 					/>
 				</Row>
-				<Row className="butttonsRow">
-					<Col xs={number} className="mT-10">
-						<Button
-							className="btn-lightBg btn-cancel"
-							onClick={this.deleteSectionWithAd.bind(this)}
-							style={{ width: '100%' }}
-						>
-							Delete Ad
-						</Button>
-					</Col>
-				</Row>
+				{this.state.showButton ? (
+					<Row className="butttonsRow">
+						<Col xs={number} className="mT-10">
+							<Button
+								className="btn-lightBg btn-cancel"
+								onClick={this.deleteSectionWithAd.bind(this)}
+								style={{ width: '100%' }}
+							>
+								Delete Ad
+							</Button>
+						</Col>
+					</Row>
+				) : null}
 			</div>
 		);
 	}

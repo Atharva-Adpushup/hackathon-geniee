@@ -293,7 +293,9 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 				networkwiseImpressions[data.display_name] = data.total_impressions;
 				networkwiseRevenue[data.display_name] = data.total_revenue.toFixed(2);
-				networkwiseCpm[data.display_name] = Number((data.total_revenue * 1000 / data.total_impressions).toFixed(2));
+
+				const networkCpm = Number((data.total_revenue * 1000 / data.total_impressions).toFixed(2));
+				networkwiseCpm[data.display_name] = isNaN(networkCpm) ? 0 : networkCpm;
 			});
 
 			row.total_impressions = React.cloneElement(<NetworkwiseData />, { networkData: networkwiseImpressions, customToggleOptions });
