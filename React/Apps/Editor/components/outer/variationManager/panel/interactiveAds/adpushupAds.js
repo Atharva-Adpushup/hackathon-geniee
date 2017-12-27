@@ -230,7 +230,7 @@ class AdPushupAds extends Component {
 				},
 				type: 3
 			},
-			sizes = this.state.size.split('X'),
+			sizes = this.state.size.split('x'),
 			adPayload = {
 				width: sizes[0],
 				height: sizes[1],
