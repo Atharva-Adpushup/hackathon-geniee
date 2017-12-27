@@ -20,10 +20,14 @@ module.exports = [
 				interactiveAds: path.resolve(__dirname, '../../interactiveAds/')
 			}
 		},
-		eslint: {
-			configFile: '.eslintrc.js',
-			failOnWarning: false,
-			failOnError: false
+		module: {
+			loaders: [
+				{
+					test: /.jsx?$/,
+					loader: 'babel-loader',
+					exclude: /node_modules/
+				}
+			]
 		},
 		plugins: []
 	},
@@ -43,10 +47,14 @@ module.exports = [
 				interactiveAds: path.resolve(__dirname, '../../interactiveAds/')
 			}
 		},
-		eslint: {
-			configFile: '.eslintrc.js',
-			failOnWarning: false,
-			failOnError: false
+		module: {
+			loaders: [
+				{
+					test: /.jsx?$/,
+					loader: 'babel-loader',
+					exclude: /node_modules/
+				}
+			]
 		},
 		plugins: [
 			new webpack.optimize.UglifyJsPlugin({
