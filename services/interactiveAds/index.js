@@ -2,10 +2,10 @@
 
 console.log('script loaded');
 
-// import './src/events';
-// import './src/helpers/polyfills';
-// import commconConsts from './src/commonConsts';
-// import emitter from './src/emitter';
+import './src/events';
+import './src/helpers/polyfills';
+import commconConsts from './src/commonConsts';
+import emitter from './src/emitter';
 // import renderer from './src/renderer';
 
 const processInteractiveAds = function(interactiveAds) {
