@@ -342,6 +342,28 @@ module.exports = {
 
 		return url;
 	},
+	getInteractiveAds: function(config) {
+		if (config && config.platform && config.pageGroup && config.selectedVariation) {
+			var ads = null,
+				variations = config.experiment[config.platform][config.pageGroup].variations,
+				selectedVariation = config.selectedVariation,
+				interactiveAds = [];
+			variations.forEach(function(variation) {
+				if (variation.id === selectedVariation) {
+					ads = variation.ads;
+				}
+			});
+			if (ads.length) {
+				ads.forEach(function(ad) {
+					if (ad && ad.formatData && ad.formatData.event) {
+						interactiveAds.push(ad);
+					}
+				});
+			}
+			return interactiveAds.length ? interactiveAds : null;
+		}
+		return null;
+	},
 	queryParams: (function() {
 		var str = window.location.search,
 			objURL = {};
