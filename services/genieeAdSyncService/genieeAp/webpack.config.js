@@ -12,7 +12,13 @@ module.exports = [
 		output: {
 			path: path.join(__dirname, buildPath),
 			filename: '[name].js',
-			publicPath: '/'
+			chunkFilename: '[name].js',
+			publicPath: path.join(__dirname, '../../../public/assets/js/builds/')
+		},
+		resolve: {
+			alias: {
+				interactiveAds: path.resolve(__dirname, '../../interactiveAds/')
+			}
 		},
 		eslint: {
 			configFile: '.eslintrc.js',
@@ -29,7 +35,13 @@ module.exports = [
 		output: {
 			path: path.join(__dirname, buildPath),
 			filename: '[name].min.js',
-			publicPath: '/'
+			chunkFilename: '[name].min.js',
+			publicPath: path.join(__dirname, '../../../public/assets/js/builds/')
+		},
+		resolve: {
+			alias: {
+				interactiveAds: path.resolve(__dirname, '../../interactiveAds/')
+			}
 		},
 		eslint: {
 			configFile: '.eslintrc.js',
