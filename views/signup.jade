@@ -4,6 +4,7 @@ block getTitle
 	- var titleVar = "Sign Up"
 
 block append headScripts
+	- customLCScriptPath = '/assets/js/libs/custom/livechat-country-whitelist.js';
 	script.
 		window.__lc = window.__lc || {};
 		window.__lc.license = 6965991;
@@ -13,6 +14,8 @@ block append headScripts
 			lc.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdn.livechatinc.com/tracking.js';
 			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(lc, s);
 		})();
+
+	script(type='text/javascript', src=customLCScriptPath)
 
 
 block bodyContent
