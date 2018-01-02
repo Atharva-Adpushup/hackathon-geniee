@@ -13,7 +13,7 @@ module.exports = [
 			path: path.join(__dirname, buildPath),
 			filename: '[name].js',
 			chunkFilename: '[name].js',
-			publicPath: path.join(__dirname, '../../../public/assets/js/builds/')
+			publicPath: 'http://localhost:8080/assets/js/builds/'
 		},
 		resolve: {
 			alias: {

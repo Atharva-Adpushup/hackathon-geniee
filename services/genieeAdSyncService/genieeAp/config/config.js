@@ -13,6 +13,8 @@ module.exports = {
 	adpushupPercentage: 100,
 	serveAmpTagsForAdp: false,
 	pageGroupTimeout: 0,
+	pageGroup: 'POST',
+	selectedVariation: '02e0baa7-c078-41dd-9752-09bf6e77aa92',
 	mode: 2,
 	domain: '',
 	forceVariation: 'forceVariation',

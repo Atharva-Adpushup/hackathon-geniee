@@ -1,6 +1,6 @@
 // Pub-Sub module
 
-var emitter = {
+const emitter = {
 	events: {},
 	publish: function(event, data) {
 		if (this.events.hasOwnProperty(event)) {
@@ -23,4 +23,4 @@ var emitter = {
 	}
 };
 
-module.exports = emitter;
+export default emitter;

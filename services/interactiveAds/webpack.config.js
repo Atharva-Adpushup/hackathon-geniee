@@ -5,7 +5,7 @@ const webpack = require('webpack'),
 module.exports = env => {
 	return {
 		entry: {
-			adpushup: path.join(__dirname, 'script.js')
+			adpInteractiveAds: path.join(__dirname, 'script.js')
 		},
 		output: {
 			path: buildPath,
