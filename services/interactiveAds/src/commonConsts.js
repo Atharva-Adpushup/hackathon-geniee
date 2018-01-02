@@ -1,22 +1,29 @@
 // Common constants
 
-var commonConsts = {
+const commonConsts = {
 	EVENTS: {
-		PAGE_LOAD: 'load',
 		DOM_LOAD: 'DOMContentLoaded',
 		SCROLL: 'scroll'
 	},
-	DEFAULT_FORMAT_CLASSNAME: 'adp_ad_format',
+	DEFAULT_CLASSNAME: 'adp_interactive_ad',
 	FORMATS: {
-		STICKY_FOOTER: {
-			SIZE: [728, 90],
-			NAME: 'Sticky Footer',
-			STYLES: {
-				position: 'fixed',
-				bottom: 0
+		STICKY: {
+			NAME: 'sticky',
+			BASE_STYLES: {
+				position: 'fixed'
+			},
+			PLACEMENT_CSS: {
+				BOTTOM: {
+					bottom: 0,
+					marginLeft: 'auto',
+					marginRight: 'auto',
+					left: 0,
+					right: 0,
+					background: 'red'
+				}
 			}
 		}
 	}
 };
 
-module.exports = commonConsts;
+export default commonConsts;

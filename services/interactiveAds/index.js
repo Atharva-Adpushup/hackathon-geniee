@@ -1,27 +1,25 @@
-// Interactive ads main module
-
-console.log('script loaded');
+// Adp Interactive ads main module
 
 import './src/events';
-import './src/helpers/polyfills';
-import commconConsts from './src/commonConsts';
+import commonConsts from './src/commonConsts';
 import emitter from './src/emitter';
-// import renderer from './src/renderer';
+import renderer from './src/renderer/index';
 
-const processInteractiveAds = function(interactiveAds) {
+const processInteractiveAds = interactiveAds => {
 	console.log(interactiveAds);
-	// formats.forEach(format => {
-	// 	switch (format.event) {
-	// 		case commconConsts.EVENTS.DOM_LOAD:
-	// 			console.log(`subscribed to ${format.event} event`);
+	interactiveAds.forEach(interactiveAd => {
+		if (interactiveAd.formatData && interactiveAd.formatData.event) {
+			const eventName = interactiveAd.formatData.event;
 
-	// 			console.log(emitter);
-	// 			const pageLoadEvent = emitter.subscribe(commconConsts.EVENTS.DOM_LOAD, data => {
-	// 				console.log(data);
-	// 				//renderer(config);
-	// 			});
-	// 	}
-	// });
+			switch (eventName) {
+				case commonConsts.EVENTS.DOM_LOAD:
+					const pageLoadEvent = emitter.subscribe(commonConsts.EVENTS.DOM_LOAD, eventData => {
+						renderer(interactiveAd, eventData);
+					});
+					break;
+			}
+		}
+	});
 };
 
 module.exports = processInteractiveAds;
