@@ -162,12 +162,21 @@ function liveChatModule() {
 		s.parentNode.insertBefore(lc, s);
 	}
 
-	function init(isLoadWhiteListScript) {
-		var W = window;
+	function init(options) {
+		var W = window,
+			isOptions = !!(options && typeof options === 'object'),
+			isLoadAPIScript = !!(isOptions && options.isLoadAPIScript),
+			isLoadWhiteListScript = !!(isOptions && options.isLoadWhiteListScript);
 
-		setGLobalData(W);
-		setLicense(W);
-		loadAPIScript();
+		if (!isOptions) {
+			throw new Error('LiveChatModule:: Please enter valid API options');
+		}
+
+		if (isLoadAPIScript) {
+			setGLobalData(W);
+			setLicense(W);
+			loadAPIScript();
+		}
 
 		if (isLoadWhiteListScript) {
 			initAPIInterval(W);

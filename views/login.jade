@@ -3,6 +3,16 @@ extends layout/base
 block getTitle
 	- var titleVar = "Login"
 
+block append headScripts
+	- customLCScriptPath = '/assets/js/libs/custom/livechat-country-whitelist.js';
+	script(type='text/javascript', src=customLCScriptPath)
+	script.
+		var lcOptions = {
+			isLoadAPIScript: false,
+			isLoadWhiteListScript: true
+		};
+		liveChatModule().init(lcOptions)
+
 block bodyContent
 	main(class="aligner aligner--vCenter aligner--hCenter wrapper wrapper--page")
 		div(class="LoginWrap form-container js-form-container", data-ui-component="user-login", id="login")
