@@ -8,8 +8,8 @@ block append headScripts
 	script(type='text/javascript', src=customLCScriptPath)
 	script.
 		var lcOptions = {
-			isLoadAPIScript: false,
-			isLoadWhiteListScript: true
+			isLoadAPIScript: true,
+			isWhiteList: true
 		};
 		liveChatModule().init(lcOptions)
 

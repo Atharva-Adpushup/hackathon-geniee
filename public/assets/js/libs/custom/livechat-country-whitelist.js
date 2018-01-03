@@ -166,7 +166,7 @@ function liveChatModule() {
 		var W = window,
 			isOptions = !!(options && typeof options === 'object'),
 			isLoadAPIScript = !!(isOptions && options.isLoadAPIScript),
-			isLoadWhiteListScript = !!(isOptions && options.isLoadWhiteListScript);
+			isWhiteList = !!(isOptions && options.isWhiteList);
 
 		if (!isOptions) {
 			throw new Error('LiveChatModule:: Please enter valid API options');
@@ -178,7 +178,7 @@ function liveChatModule() {
 			loadAPIScript();
 		}
 
-		if (isLoadWhiteListScript) {
+		if (isWhiteList) {
 			initAPIInterval(W);
 		}
 	}
