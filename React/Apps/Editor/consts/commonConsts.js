@@ -196,15 +196,15 @@ const status = {
 		VALIDATE_XPATH_SECTION: 'VALIDATE_XPATH_SECTION',
 		UPDATE_INCONTENT_FLOAT: 'UPDATE_INCONTENT_FLOAT',
 		SCROLL_TO_VIEW: 'SCROLL_TO_VIEW',
-		UPDATE_TYPE: 'UPDATE_TYPE',
-		UPDATE_FORMAT_DATA: 'UPDATE_FORMAT_DATA'
+		UPDATE_SECTION: 'UPDATE_SECTION'
 	},
 	adActions = {
 		CREATE_AD: 'CREATE_AD',
 		DELETE_AD: 'DELETE_AD',
 		UPDATE_ADCODE: 'UPDATE_ADCODE',
 		UPDATE_CSS: 'UPDATE_CSS',
-		UPDATE_NETWORK: 'UPDATE_NETWORK'
+		UPDATE_NETWORK: 'UPDATE_NETWORK',
+		UPDATE_AD: 'UPDATE_AD'
 	},
 	hbBoxActions = {
 		HIDE_HB_BOX: 'HIDE_HB_BOX',
@@ -333,7 +333,25 @@ const status = {
 	priceFloorKeys = ['FP_S_A', 'FP_B_A', 'FP_S', 'FP_A', 'FP_B'],
 	defaultPriceFloorKey = 'FP_S_A',
 	reportingUrl = '/user/reports/generate',
-	jsWrapper = `(function($){ \n\n })(adpushup.$)`;
+	jsWrapper = `(function($){ \n\n })(adpushup.$)`,
+	interactiveAds = {
+		events: ['load', 'scroll', 'onMills', 'DOMContentLoaded'],
+		sizes: {
+			DESKTOP: {
+				sticky: {
+					bottom: ['300x50', '300x100', '320x100', '728x90'],
+					left: ['160x600', '336x280', '300x250', '300x600', '300x50', '120x600'],
+					right: ['160x600', '336x280', '300x250', '300x600', '300x50', '120x600']
+				}
+			},
+			MOBILE: {
+				sticky: {
+					bottom: ['160x600', '336x280', '300x250', '300x600', '300x50', '120x600']
+				}
+			}
+		},
+		types: ['stickyBottom', 'stickyLeft', 'stickyRight']
+	};
 
 export {
 	status,
@@ -373,5 +391,6 @@ export {
 	reportingUrl,
 	priceFloorKeys,
 	defaultPriceFloorKey,
-	jsWrapper
+	jsWrapper,
+	interactiveAds
 };
