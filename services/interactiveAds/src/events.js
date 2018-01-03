@@ -5,7 +5,6 @@ import emitter from './emitter';
 
 ((w, ap) => {
 	ap.$(document).ready(() => {
-		console.log('dom loaded in emitter');
 		emitter.publish(commonConsts.EVENTS.DOM_LOAD, {});
 	});
 
