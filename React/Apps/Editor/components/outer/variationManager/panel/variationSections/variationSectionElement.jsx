@@ -15,7 +15,7 @@ class variationSectionElement extends Component {
 	}
 
 	componentWillMount() {
-		this.props.section.isIncontent
+		this.props.section.isIncontent || this.props.section.type == 3
 			? null
 			: this.props.onSectionXPathValidate(this.props.section.id, this.props.section.xpath);
 	}
@@ -72,11 +72,11 @@ class variationSectionElement extends Component {
 							<span>In-Content</span>
 						</label>
 					) : (
-							<label className="section-label section-structural">
-								<i className="fa fa-object-ungroup" />
-								<span>Structural {props.section.error}</span>
-							</label>
-						)}
+						<label className="section-label section-structural">
+							<i className="fa fa-object-ungroup" />
+							<span>Structural {props.section.error}</span>
+						</label>
+					)}
 					{isCustomZoneId ? (
 						<label className="u-margin-l5px section-label section-incontent">
 							<i className="fa fa-pencil" />
@@ -89,8 +89,8 @@ class variationSectionElement extends Component {
 							<span>Invalid XPath</span>
 						</label>
 					) : (
-							''
-						)}
+						''
+					)}
 					<Col className="u-padding-r10px section-name-ie" xs={12}>
 						<InlineEdit
 							validate
@@ -129,66 +129,66 @@ class variationSectionElement extends Component {
 									</Col>
 								</Row>
 							</div>
-						) : (
-								<div>
-									<Row>
-										<Col className="u-padding-r10px" xs={7}>
-											Operation
+						) : props.section.type != 3 ? (
+							<div>
+								<Row>
+									<Col className="u-padding-r10px" xs={7}>
+										Operation
 									</Col>
-										<Col className="u-padding-l10px" xs={5}>
-											<strong>{props.section.operation}</strong>
-										</Col>
-									</Row>
-								</div>
-							)}
+									<Col className="u-padding-l10px" xs={5}>
+										<strong>{props.section.operation}</strong>
+									</Col>
+								</Row>
+							</div>
+						) : null}
 						{Object.keys(props.reporting).length &&
-							Object.keys(props.reporting.sections).length &&
-							props.reporting.sections[props.section.id] ? (
-								<div>
+						Object.keys(props.reporting.sections).length &&
+						props.reporting.sections[props.section.id] ? (
+							<div>
+								<Row>
+									<Col className="u-padding-r10px" xs={7}>
+										Total Impressions
+									</Col>
+									<Col className="u-padding-l10px" xs={5}>
+										<strong>
+											{props.reporting.sections[props.section.id].aggregate.total_impressions}
+										</strong>
+									</Col>
+								</Row>
+								{window.isSuperUser ? (
 									<Row>
 										<Col className="u-padding-r10px" xs={7}>
-											Total Impressions
-									</Col>
+											Total XPath Misses
+										</Col>
 										<Col className="u-padding-l10px" xs={5}>
 											<strong>
-												{props.reporting.sections[props.section.id].aggregate.total_impressions}
+												{props.reporting.sections[props.section.id].aggregate.total_xpath_miss}
 											</strong>
 										</Col>
 									</Row>
-									{window.isSuperUser ? (
-										<Row>
-											<Col className="u-padding-r10px" xs={7}>
-												Total XPath Misses
-										</Col>
-											<Col className="u-padding-l10px" xs={5}>
-												<strong>
-													{props.reporting.sections[props.section.id].aggregate.total_xpath_miss}
-												</strong>
-											</Col>
-										</Row>
-									) : null}
-									<Row>
-										<Col className="u-padding-r10px" xs={7}>
-											Total CPM
+								) : null}
+								<Row>
+									<Col className="u-padding-r10px" xs={7}>
+										Total CPM
 									</Col>
-										<Col className="u-padding-l10px" xs={5}>
-											<strong>
-												{props.reporting.sections[props.section.id].aggregate.total_cpm}
-											</strong>
-										</Col>
-									</Row>
-									<Row>
-										<Col className="u-padding-r10px" xs={7}>
-											Total Revenue
+									<Col className="u-padding-l10px" xs={5}>
+										<strong>
+											{props.reporting.sections[props.section.id].aggregate.total_cpm}
+										</strong>
 									</Col>
-										<Col className="u-padding-l10px" xs={5}>
-											<strong>
-												{props.reporting.sections[props.section.id].aggregate.total_revenue}
-											</strong>
-										</Col>
-									</Row>
-								</div>
-							) : null}
+								</Row>
+								<Row>
+									<Col className="u-padding-r10px" xs={7}>
+										Total Revenue
+									</Col>
+									<Col className="u-padding-l10px" xs={5}>
+										<strong>
+											{props.reporting.sections[props.section.id].aggregate.total_revenue}
+										</strong>
+									</Col>
+								</Row>
+							</div>
+						) : null}
 						{!props.section.isIncontent ? (
 							<Row>
 								<Col className="u-padding-t10px">

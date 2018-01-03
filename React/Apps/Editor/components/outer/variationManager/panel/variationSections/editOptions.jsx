@@ -5,13 +5,15 @@ import SelectBox from 'shared/select/select.js';
 import { floats, networks } from 'consts/commonConsts';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 import AdDetails from '../../../editMenu/AdDetails';
+import AdPushupAds from '../interactiveAds/adpushupAds';
 
 class EditOptions extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			float: this.props.section.float,
-			editNetwork: false
+			editNetwork: false,
+			editInteractiveAdData: false
 		};
 
 		this.onFloatSelectChange = this.onFloatSelectChange.bind(this);
@@ -19,6 +21,8 @@ class EditOptions extends Component {
 		this.renderContent = this.renderContent.bind(this);
 		this.submitHandler = this.submitHandler.bind(this);
 		this.toggleNetworkEditor = this.toggleNetworkEditor.bind(this);
+		this.toggleEditInteractiveAd = this.toggleEditInteractiveAd.bind(this);
+		this.adpushupSubmitHandler = this.adpushupSubmitHandler.bind(this);
 	}
 
 	onFloatSelectChange(float) {
@@ -48,22 +52,53 @@ class EditOptions extends Component {
 		this.toggleNetworkEditor();
 	};
 
+	adpushupSubmitHandler = (sectionPayload, adPayload) => {
+		console.log(sectionPayload, adPayload);
+		this.props.updateSection(this.props.section.id, sectionPayload);
+		this.props.updateAd(this.props.section.ads[0].id, adPayload);
+		this.toggleEditInteractiveAd();
+	};
+
 	toggleNetworkEditor() {
 		this.setState({ editNetwork: !this.state.editNetwork });
 	}
 
+	toggleEditInteractiveAd() {
+		this.setState({ editInteractiveAdData: !this.state.editInteractiveAdData });
+	}
+
 	renderContent() {
-		return this.state.editNetwork ? (
-			<NetworkOptions
-				onSubmit={this.submitHandler}
-				onCancel={this.toggleNetworkEditor}
-				ad={this.props.section.ads[0]}
-				buttonType={2}
-				fromPanel={true}
-				id={this.props.section.id}
-				showNotification={this.props.showNotification}
-			/>
-		) : (
+		if (this.state.editNetwork) {
+			return (
+				<NetworkOptions
+					onSubmit={this.submitHandler}
+					onCancel={this.toggleNetworkEditor}
+					ad={this.props.section.ads[0]}
+					buttonType={2}
+					fromPanel={true}
+					id={this.props.section.id}
+					showNotification={this.props.showNotification}
+				/>
+			);
+		}
+		if (this.state.editInteractiveAdData) {
+			return (
+				<AdPushupAds
+					userType={currentUser.userType || false}
+					ad={this.props.section.ads[0]}
+					ui={this.props.ui}
+					section={this.props.section}
+					variation={this.props.variation}
+					submitHandler={this.adpushupSubmitHandler}
+					onCancel={this.toggleEditInteractiveAd}
+					showNetworkOptions={false}
+					showButtons={true}
+					fromEditSection={true}
+					platform={this.props.platform}
+				/>
+			);
+		}
+		return (
 			<AdDetails
 				userType={currentUser.userType || false}
 				ad={this.props.section.ads[0]}
@@ -71,8 +106,9 @@ class EditOptions extends Component {
 				section={this.props.section}
 				variationId={this.props.variation.id}
 				editNetwork={this.toggleNetworkEditor}
-				onSetSectionType={this.props.onSetSectionType}
+				editInteractiveAd={this.toggleEditInteractiveAd}
 				fromPanel={true}
+				showEventData={this.props.section.type == 3 ? true : false}
 			/>
 		);
 	}
@@ -99,34 +135,36 @@ class EditOptions extends Component {
 					</Row>
 				) : null}
 				{!this.props.section.isIncontent ? (
-					<Row>
-						<Col className="u-padding-r10px" xs={4}>
-							XPath
-						</Col>
-						<Col className="u-padding-l10px" xs={8}>
-							<InlineEdit
-								compact
-								validate
-								cancelEditHandler={this.props.onResetErrors.bind(null, this.props.section.id)}
-								customError={this.props.ui.errors.xpath ? this.props.ui.errors.xpath.error : false}
-								dropdownList={this.props.section.allXpaths}
-								value={this.props.section.xpath}
-								keyUpHandler={this.props.onValidateXPath.bind(null, this.props.section.id)}
-								submitHandler={this.props.onUpdateXPath.bind(null, this.props.section.id)}
-								editClickHandler={this.props.onSectionAllXPaths.bind(
-									null,
-									this.props.section.id,
-									this.props.section.xpath
-								)}
-								text="XPath"
-								errorMessage={
-									this.props.ui.errors.xpath && this.props.ui.errors.xpath.error
-										? this.props.ui.errors.xpath.message
-										: 'XPath cannot be blank'
-								}
-							/>
-						</Col>
-					</Row>
+					this.props.section.type != 3 ? (
+						<Row>
+							<Col className="u-padding-r10px" xs={4}>
+								XPath
+							</Col>
+							<Col className="u-padding-l10px" xs={8}>
+								<InlineEdit
+									compact
+									validate
+									cancelEditHandler={this.props.onResetErrors.bind(null, this.props.section.id)}
+									customError={this.props.ui.errors.xpath ? this.props.ui.errors.xpath.error : false}
+									dropdownList={this.props.section.allXpaths}
+									value={this.props.section.xpath}
+									keyUpHandler={this.props.onValidateXPath.bind(null, this.props.section.id)}
+									submitHandler={this.props.onUpdateXPath.bind(null, this.props.section.id)}
+									editClickHandler={this.props.onSectionAllXPaths.bind(
+										null,
+										this.props.section.id,
+										this.props.section.xpath
+									)}
+									text="XPath"
+									errorMessage={
+										this.props.ui.errors.xpath && this.props.ui.errors.xpath.error
+											? this.props.ui.errors.xpath.message
+											: 'XPath cannot be blank'
+									}
+								/>
+							</Col>
+						</Row>
+					) : null
 				) : (
 					<Row>
 						<Col className="u-padding-r10px" xs={4}>

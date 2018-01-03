@@ -9,6 +9,7 @@ import VariationSections from './variationSections/index';
 import VariationBar from './variationBar';
 import BeforeAfterJsPanel from './beforeAfterJsPanel';
 import KeyValuesPanel from './keyValuesPanel';
+import InteractiveAds from './interactiveAds/index';
 
 class VariationPanel extends React.Component {
 	render() {
@@ -18,7 +19,13 @@ class VariationPanel extends React.Component {
 				<VariationBar panelCssSelector=".variation-settings" expanded={ui.variationPanel.expanded} />
 				<TabPanel tabPosition="left">
 					<div tabTitle="Sections">
-						<VariationSections variation={variation} sections={sections} ui={ui} reporting={reporting} />
+						<VariationSections
+							variation={variation}
+							sections={sections}
+							ui={ui}
+							reporting={reporting}
+							platform={this.props.activeChannel.platform}
+						/>
 					</div>
 					<div tabTitle="Info">
 						<VariationOptions
@@ -39,6 +46,15 @@ class VariationPanel extends React.Component {
 					</div>
 					<div tabTitle={currentUser.userType == 'partner' ? 'Geniee Key Values' : 'ADP Key Values'}>
 						<KeyValuesPanel channelId={channelId} variation={variation} sections={sections} ui={ui} />
+					</div>
+					<div tabTitle="Interactive Ads">
+						<InteractiveAds
+							channelId={channelId}
+							variation={variation}
+							sections={sections}
+							ui={ui}
+							platform={this.props.activeChannel.platform}
+						/>
 					</div>
 				</TabPanel>
 			</div>
