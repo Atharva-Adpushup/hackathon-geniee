@@ -1,38 +1,32 @@
 // Sticky ad component
 
-import { h, Component } from 'preact';
-import AdCode from './AdCode';
 import commonConsts from '../../commonConsts';
-import { generateAdCode } from '../../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
 
-class Sticky extends Component {
-	constructor(props) {
-		super(props);
-		this.getPlacementCSS = this.getPlacementCSS.bind(this);
-	}
-
-	getPlacementCSS(formatData) {
+const $ = window.adpushup.$ || window.$,
+	getPlacementCSS = formatData => {
 		const placementCSS = commonConsts.FORMATS.STICKY.PLACEMENT_CSS;
 
 		switch (formatData.placement) {
 			case 'bottom':
 				return placementCSS.BOTTOM;
+			case 'left':
+				return placementCSS.LEFT;
+			case 'right':
+				return placementCSS.RIGHT;
 		}
-	}
-
-	render() {
-		const interactiveAd = this.props,
-			formatData = interactiveAd.formatData,
-			style = {
+	},
+	Sticky = interactiveAd => {
+		const { formatData } = interactiveAd,
+			css = {
 				width: interactiveAd.width,
 				height: interactiveAd.height,
 				...commonConsts.FORMATS.STICKY.BASE_STYLES,
-				...this.getPlacementCSS(formatData)
+				...getPlacementCSS(formatData)
 			},
-			adCode = generateAdCode(interactiveAd);
+			Sticky = $('<div />');
 
-		return <AdCode style={style} adCode={adCode} />;
-	}
-}
+		Sticky.css(css);
+		return Sticky;
+	};
 
 export default Sticky;

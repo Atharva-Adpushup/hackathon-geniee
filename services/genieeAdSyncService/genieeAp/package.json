@@ -20,6 +20,7 @@
 		"eslint-config-airbnb-es5": "^1.0.9",
 		"extend": "^3.0.0",
 		"wait-until": "0.0.2",
-		"webpack": "^3.10.0"
+		"webpack": "^3.10.0",
+		"webpack-bundle-analyzer": "^2.9.1"
 	}
 }

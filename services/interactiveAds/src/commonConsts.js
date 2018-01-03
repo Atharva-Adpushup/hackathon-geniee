@@ -18,8 +18,15 @@ const commonConsts = {
 					marginLeft: 'auto',
 					marginRight: 'auto',
 					left: 0,
+					right: 0
+				},
+				LEFT: {
+					left: 0,
+					bottom: 0
+				},
+				RIGHT: {
 					right: 0,
-					background: 'red'
+					bottom: 0
 				}
 			}
 		}

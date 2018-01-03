@@ -94,7 +94,6 @@ var utils = require('../libs/utils'),
 			adCode.push('</scr' + 'ipt>');
 			adCode.push('</div>');
 		}
-		console.log(adCode);
 		return adCode;
 	};
 
