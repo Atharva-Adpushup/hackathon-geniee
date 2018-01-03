@@ -4,8 +4,7 @@ import {
 	leftSectionCss,
 	rightSectionCss,
 	adActions,
-	uiActions,
-	editMenuActions
+	uiActions
 } from 'consts/commonConsts';
 import { getVariationSectionsWithAds } from 'selectors/variationSelectors';
 import Utils from 'libs/utils';
@@ -173,27 +172,17 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			xpath
 		};
 	},
-	updateType = (sectionId, value) => {
-		return {
-			type: sectionActions.UPDATE_TYPE,
-			sectionId,
-			value
-		};
-	},
-	updateFormatData = (sectionId, formatData) => (dispatch, getState) => {
+	updateSection = (sectionId, params) => (dispatch, getState) => {
 		dispatch({
 			type: uiActions.SHOW_NOTIFICATION,
 			mode: 'success',
-			title: 'Operation Successfull',
-			message: 'Format Data updated'
-		});
-		dispatch({
-			type: editMenuActions.HIDE_EDIT_MENU
+			title: 'Operation Successful',
+			message: 'Section updated'
 		});
 		return dispatch({
-			type: sectionActions.UPDATE_FORMAT_DATA,
+			type: sectionActions.UPDATE_SECTION,
 			sectionId,
-			formatData
+			params
 		});
 	},
 	updateIncontentFloat = (sectionId, adId, float) => {
@@ -238,6 +227,5 @@ export {
 	validateSectionXPath,
 	updateIncontentFloat,
 	scrollSectionIntoView,
-	updateType,
-	updateFormatData
+	updateSection
 };
