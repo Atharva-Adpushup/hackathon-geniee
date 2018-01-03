@@ -32,18 +32,6 @@ $.extend(adp.config, ___abpConfig___, {
 	platform: browserConfig.platform
 });
 
-// Load interactive ads script if interactive ads are present in adpushup config
-var interactiveAds = utils.getInteractiveAds(adp.config);
-if (interactiveAds) {
-	require.ensure(
-		['interactiveAds/index.js'],
-		function(require) {
-			require('interactiveAds/index')(interactiveAds);
-		},
-		'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
-	);
-}
-
 //Geniee ad network specific site check
 isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
 adp.config.isGeniee = isGenieeSite;
@@ -86,6 +74,19 @@ function startCreation(forced) {
 		adp.creationProcessStarted = true;
 		clearTimeout(pageGroupTimer);
 		config.selectedVariation = selectedVariation.id;
+
+		// Load interactive ads script if interactive ads are present in adpushup config
+		var interactiveAds = utils.getInteractiveAds(adp.config);
+		if (interactiveAds) {
+			require.ensure(
+				['interactiveAds/index.js'],
+				function(require) {
+					require('interactiveAds/index')(interactiveAds);
+				},
+				'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
+			);
+		}
+
 		createAds(adp, selectedVariation);
 	} else {
 		triggerControl(3);
