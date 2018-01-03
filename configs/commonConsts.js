@@ -4,16 +4,14 @@ module.exports = {
 	PROXY_ORIGIN: 'http://proxy.app.adpushup.com',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	DEMO_REPORT_SITE_ID: 31764,
-	DEMO_PAGEGROUPS: ['MIC', 'WEBCAM'],
+	DEMO_PAGEGROUPS: ['HOME', 'IMAGE', 'POST', 'PHPBB3', 'NEW', 'CATEGORY'],
 	REPORT_API: {
 		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
 		DATE_FORMAT: 'YYYY-MM-DD'
 	},
 	DEFAULT_AD_NETWORK_SETTINGS: {
 		revenueShare: 10,
-		negate: [
-			"adsense"
-		]
+		negate: ['adsense']
 	},
 	PROXY_DOCUMENT_DOMAIN: 'app.adpushup.com',
 	apConfigDefaults: {
