@@ -1,7 +1,7 @@
 const path = require('path'),
 	webpack = require('webpack'),
-	buildPath = '../../../public/assets/js/builds/';
-//const HtmlWebpackPlugin = require('html-webpack-plugin');
+	buildPath = '../../../public/assets/js/builds/',
+	BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = [
 	{
@@ -29,7 +29,9 @@ module.exports = [
 				}
 			]
 		},
-		plugins: []
+		plugins: [
+			//new BundleAnalyzerPlugin()
+		]
 	},
 	{
 		//devtool: 'cheap-module-source-map',
