@@ -13,7 +13,8 @@ var $ = require('jquery'),
 			: $.extend({}, true, commonConsts.DOCKED_CSS, computedStyles);
 	},
 	getDockedOffset = function(formatData) {
-		return formatData && formatData.bottomXPath ? $(formatData.bottomXPath).offset().top : null;
+		var bottomOffset = formatData && formatData.bottomOffset ? Number(formatData.bottomOffset) : 0;
+		return formatData && formatData.bottomXPath ? $(formatData.bottomXPath).offset().top - bottomOffset : null;
 	},
 	dockifyAd = function(xPath, formatData, utils) {
 		if (!xPath || !$(xPath).length) {
