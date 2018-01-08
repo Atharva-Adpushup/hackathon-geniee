@@ -4,7 +4,8 @@ import {
 	leftSectionCss,
 	rightSectionCss,
 	adActions,
-	uiActions
+	uiActions,
+	editMenuActions
 } from 'consts/commonConsts';
 import { getVariationSectionsWithAds } from 'selectors/variationSelectors';
 import Utils from 'libs/utils';
