@@ -5,7 +5,7 @@ import BrowserWiseTraffic from './MetricCharts/BrowserWiseTraffic';
 const SiteMetricChartPanels = props => {
 	return (
             <div className="pd-20">
-                <BrowserWiseTraffic data={{}} />
+                <BrowserWiseTraffic />
             </div>
 	);
 };
