@@ -3,6 +3,7 @@ import { Nav, NavItem } from 'react-bootstrap';
 import ActionCard from '../../../../Components/ActionCard.jsx';
 import OpsPanel from '../OpsPanel.jsx';
 import General from './General';
+import SiteMetricChartPanels from '../SiteMetricChartPanels.jsx';
 
 class Settings extends Component {
 	constructor(props) {
@@ -36,6 +37,8 @@ class Settings extends Component {
 				break;
 			case 2:
 				return <OpsPanel />;
+			case 3:
+				return <SiteMetricChartPanels />;
 		}
 	}
 
@@ -45,6 +48,7 @@ class Settings extends Component {
 				<Nav bsStyle="tabs" activeKey={this.state.activeNav} onSelect={this.handleNavSelect}>
 					<NavItem eventKey={1}>General</NavItem>
 					<NavItem eventKey={2}>HB Config</NavItem>
+					<NavItem eventKey={3}>Vitals</NavItem>
 				</Nav>
 				{this.renderContent()}
 			</ActionCard>
