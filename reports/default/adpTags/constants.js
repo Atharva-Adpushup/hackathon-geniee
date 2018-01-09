@@ -107,6 +107,19 @@ WHERE rn <= @__count__
 ORDER BY report_date
 `;
 
+const SITE_COUNTRIES_PERFORMANCE = `
+SELECT report_date, a.cid, country, total_page_views
+FROM (
+SELECT report_date, a.cid, NAME country, sum(total_requests) AS total_page_views
+,ROW_NUMBER() OVER (PARTITION BY report_date ORDER BY sum(total_requests) DESC) AS rn
+FROM ApexHourlySiteReport a, country b
+WHERE a.siteid = @__siteId__ AND a.cid = b.cid AND report_date BETWEEN @__fromDate__ AND @__toDate__
+GROUP BY report_date, a.cid, NAME
+) a
+WHERE rn <= @__count__
+ORDER BY report_date
+`;
+
 const TOP_10_SITES_PERFORMANCE = `
 SELECT a.report_date, a.siteid, a.device_type, total_page_views, impressions, revenue, a.url, a.name, b.ntwid
 FROM (
@@ -337,6 +350,7 @@ module.exports = {
 	GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE,
 	SITE_MODE_WISE_TRAFFIC_PERFORMANCE,
 	GLOBAL_TOP_10_COUNTRIES_PERFORMANCE,
+	SITE_COUNTRIES_PERFORMANCE,
 	TOP_10_SITES_PERFORMANCE,
 	SITE_BROWSER_LEVEL_PERFORMANCE
 };

@@ -11,6 +11,7 @@ const Promise = require('bluebird'),
 	sitePageGroupWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/sitePageGroupWiseRevenueContribution'),
 	siteAdNetworkWiseDataContributionQuery = require('../reports/default/adpTags/queries/siteAdNetworkWiseDataContribution'),
 	siteBrowserWiseTrafficContributionQuery = require('../reports/default/adpTags/queries/siteBrowserWiseTrafficContribution'),
+	siteTop20CountriesContributionQuery = require('../reports/default/adpTags/queries/siteTop20CountriesContribution'),
 	siteModeWiseTrafficContributionQuery = require('../reports/default/adpTags/queries/siteModeWiseTrafficContribution'),
 	globalNetworkWiseDataContributionQuery = require('../reports/default/adpTags/queries/globalNetworkWiseDataContribution'),
 	globalMetricsDataContributionQuery = require('../reports/default/adpTags/queries/globalMetricsDataContribution'),
@@ -474,6 +475,18 @@ const Promise = require('bluebird'),
 
 		return globalTop10CountriesContributionQuery.getData(config);
 	},
+	getSiteTop20CountriesContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				siteId: parameterConfig.siteId,
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false,
+				count: parameterConfig.count
+			};
+
+		return siteTop20CountriesContributionQuery.getData(config);
+	},
 	getGlobalTop10SitesContributionReport = parameterConfig => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
@@ -537,6 +550,7 @@ module.exports = {
 	getSitePageGroupWiseRevenueContributionReport,
 	getSiteAdNetworkWiseDataContributionReport,
 	getSiteBrowserWiseTrafficContributionReport,
+	getSiteTop20CountriesContributionReport,
 	getGlobalNetworkWiseDataContributionReport,
 	getGlobalMetricsDataContributionReport,
 	getGlobalModeWiseTrafficContributionReport,
