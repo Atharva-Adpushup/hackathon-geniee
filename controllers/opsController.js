@@ -13,7 +13,8 @@ const express = require('express'),
 		getGlobalTop10CountriesContributionQuery,
 		getGlobalTop10SitesContributionReport,
 		getGlobalLostAndFoundLiveSitesReport,
-		getSiteBrowserWiseTrafficContributionReport
+		getSiteBrowserWiseTrafficContributionReport,
+		getSiteTop20CountriesContributionReport
 	} = require('../helpers/commonFunctions'),
 	router = express.Router(),
 	appBucket = couchbaseService(
@@ -231,6 +232,45 @@ router
 			});
 
 		return getSiteBrowserWiseTrafficContributionReport(params)
+			.then(responseData => {
+				response.data = responseData;
+				response.data.dateFormat = dateFormatCollection;
+				return res.send(response);
+			})
+			.catch(err => {
+				return res.send(Object.assign(response, { error: true }));
+			});
+	})
+	.post('/getSiteTop20CountriesData', (req, res) => {
+		let response = {
+				error: false,
+				data: []
+			},
+			bodyParameters = req.body,
+			params = {
+				transform: true,
+				count: bodyParameters.count ? bodyParameters.count : 11,
+				fromDate:
+					bodyParameters && bodyParameters.fromDate
+						? moment(bodyParameters.fromDate).format('YYYY-MM-DD')
+						: moment()
+								.subtract(7, 'days')
+								.format('YYYY-MM-DD'),
+				toDate:
+					bodyParameters && bodyParameters.toDate
+						? moment(bodyParameters.toDate).format('YYYY-MM-DD')
+						: moment()
+								.subtract(1, 'days')
+								.format('YYYY-MM-DD'),
+				siteId: bodyParameters.siteId
+			},
+			dateFormatCollection = utils.getDateFormatCollection({
+				fromDate: params.fromDate,
+				toDate: params.toDate,
+				format: 'MMM DD'
+			});
+
+		return getSiteTop20CountriesContributionReport(params)
 			.then(responseData => {
 				response.data = responseData;
 				response.data.dateFormat = dateFormatCollection;

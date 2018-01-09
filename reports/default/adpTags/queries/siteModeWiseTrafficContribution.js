@@ -120,9 +120,7 @@ module.exports = {
 			},
 			getReportData = sqlReportModule.executeQuery(databaseConfig);
 
-		console.log(
-			`Query for global mode wise contribution between: ${paramConfig.fromDate} and ${paramConfig.toDate}`
-		);
+		console.log(`Query for site mode wise contribution between: ${paramConfig.fromDate} and ${paramConfig.toDate}`);
 
 		return Promise.join(getReportData, resultData => {
 			const isOptionTransform = !!(paramConfig && paramConfig.transform),
