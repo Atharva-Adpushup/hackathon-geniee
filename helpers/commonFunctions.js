@@ -11,6 +11,7 @@ const Promise = require('bluebird'),
 	sitePageGroupWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/sitePageGroupWiseRevenueContribution'),
 	siteAdNetworkWiseDataContributionQuery = require('../reports/default/adpTags/queries/siteAdNetworkWiseDataContribution'),
 	siteBrowserWiseTrafficContributionQuery = require('../reports/default/adpTags/queries/siteBrowserWiseTrafficContribution'),
+	siteModeWiseTrafficContributionQuery = require('../reports/default/adpTags/queries/siteModeWiseTrafficContribution'),
 	globalNetworkWiseDataContributionQuery = require('../reports/default/adpTags/queries/globalNetworkWiseDataContribution'),
 	globalMetricsDataContributionQuery = require('../reports/default/adpTags/queries/globalMetricsDataContribution'),
 	globalModeWiseTrafficContributionQuery = require('../reports/default/adpTags/queries/globalModeWiseTrafficContribution'),
@@ -421,6 +422,17 @@ const Promise = require('bluebird'),
 
 		return siteBrowserWiseTrafficContributionQuery.getData(config);
 	},
+	getSiteModeWiseTrafficContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				siteId: parameterConfig.siteId,
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return siteModeWiseTrafficContributionQuery.getData(config);
+	},
 	getGlobalNetworkWiseDataContributionReport = parameterConfig => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
@@ -520,6 +532,7 @@ module.exports = {
 	getWeeklyMetricsReport,
 	getWeeklyEmailReport,
 	getSiteTopUrlsReport,
+	getSiteModeWiseTrafficContributionReport,
 	getSiteDeviceWiseRevenueContributionReport,
 	getSitePageGroupWiseRevenueContributionReport,
 	getSiteAdNetworkWiseDataContributionReport,
