@@ -12,20 +12,21 @@ import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 import '../../../ReportingPanel/styles.scss';
 
-function generateTableData(inputData, modeName) {
-	const modeInputData = inputData[modeName];
+function generateTableData(inputData) {
 	let dataCollection = [];
 
-	_.forOwn(modeInputData, (siteDataObject, siteId) => {
-		const siteName = siteDataObject.name,
-			pageViews = siteDataObject.pageViews,
-			collectionItem = {
-				siteId,
-				siteName,
-				pageViews
-			};
+	_.forOwn(inputData, sitesObject => {
+		_.forOwn(sitesObject, (siteDataObject, siteId) => {
+			const browserName = siteDataObject.name,
+				pageViews = siteDataObject.pageViews,
+				collectionItem = {
+					siteId,
+					browserName,
+					pageViews
+				};
 
-		dataCollection.push(extend(true, {}, collectionItem));
+			dataCollection.push(extend(true, {}, collectionItem));
+		});
 	});
 
 	return (
@@ -36,7 +37,7 @@ function generateTableData(inputData, modeName) {
 						<h5>SITE ID</h5>
 					</th>
 					<th>
-						<h5>SITE NAME</h5>
+						<h5>BROWSER NAME</h5>
 					</th>
 					<th>
 						<h5>PAGE VIEWS</h5>
@@ -53,8 +54,8 @@ function generateTableData(inputData, modeName) {
 								</a>
 							</td>
 							<td>
-								<a target="_blank" href={`http://${siteObject.siteName}`}>
-									{siteObject.siteName}
+								<a target="_blank" href={`http://${siteObject.browserName}`}>
+									{siteObject.browserName}
 								</a>
 							</td>
 
@@ -103,7 +104,8 @@ class BrowserWiseTraffic extends Component {
 			data: isDataLoaded ? this.props.data : null,
 			selectedBrowser: 'CHROME',
 			startDate: moment().subtract(7, 'days'),
-			endDate: moment().subtract(1, 'days')
+			endDate: moment().subtract(1, 'days'),
+			siteId: window.siteId
 		};
 		this.renderHighCharts = this.renderHighCharts.bind(this);
 		this.generateHeaderTitle = this.generateHeaderTitle.bind(this);
@@ -115,7 +117,7 @@ class BrowserWiseTraffic extends Component {
 		this.getDefaultParameterConfig = this.getDefaultParameterConfig.bind(this);
 		this.handleSelectBoxChange = this.handleSelectBoxChange.bind(this);
 		this.renderSelectBox = this.renderSelectBox.bind(this);
-		this.renderModeTable = this.renderModeTable.bind(this);
+		this.renderListTable = this.renderListTable.bind(this);
 	}
 
 	componentDidMount() {
@@ -226,7 +228,7 @@ class BrowserWiseTraffic extends Component {
 
 			apiParameters.fromDate = moment(apiParameters.fromDate).format('YYYY-MM-DD');
 			apiParameters.toDate = moment(apiParameters.toDate).format('YYYY-MM-DD');
-			apiParameters.siteId = window.siteId;
+			apiParameters.siteId = _ref.state.siteId;
 
 			$.post(`/ops/getSiteBrowserWiseTraffic`, apiParameters, response => {
 				_ref.setState({
@@ -266,10 +268,9 @@ class BrowserWiseTraffic extends Component {
 		);
 	}
 
-	renderModeTable() {
+	renderListTable() {
 		let inputData = this.state.data.browserWise,
-			modeName = this.state.selectedBrowser,
-			generatedTable = generateTableData(inputData, modeName);
+			generatedTable = generateTableData(inputData);
 
 		return generatedTable;
 	}
@@ -285,7 +286,7 @@ class BrowserWiseTraffic extends Component {
 				</Row>
 				<Row className="u-margin-0px aligner-item">
 					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={3}>
-						{this.renderSelectBox()}
+						{/* {this.renderSelectBox()} */}
 					</Col>
 					{this.renderDateRangePickerUI()}
 				</Row>
@@ -298,9 +299,9 @@ class BrowserWiseTraffic extends Component {
 			headerTitle = this.generateHeaderTitle();
 
 		return (
-			<Panel className="mb-20 metricsChart metricsChart--modeWiseTraffic" header={headerTitle}>
+			<Panel className="mb-20 metricsChart" header={headerTitle}>
 				{this.state.isDataLoaded ? this.renderHighCharts() : <PaneLoader />}
-				{this.state.isDataLoaded ? this.renderModeTable() : null}
+				{this.state.isDataLoaded ? this.renderListTable() : null}
 			</Panel>
 		);
 	}
