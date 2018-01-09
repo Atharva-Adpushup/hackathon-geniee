@@ -8,10 +8,10 @@ import SiteMetrics from './MetricCharts/SiteMetrics';
 const SiteMetricChartPanels = props => {
 	return (
             <div className="pd-20">
-                <SiteBrowserWiseTraffic />
-                <SiteModeWiseTraffic />
-                <SiteTop20Countries />
                 <SiteMetrics />
+                <SiteModeWiseTraffic />
+                <SiteBrowserWiseTraffic />
+                <SiteTop20Countries />
             </div>
 	);
 };
