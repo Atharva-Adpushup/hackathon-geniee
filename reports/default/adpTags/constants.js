@@ -75,6 +75,25 @@ GROUP BY report_Date, device_type
 ORDER BY report_date, device_type
 `;
 
+const SITE_METRICS_PERFORMANCE = `
+SELECT a.report_date, a.device_type, total_page_views, impressions, revenue
+FROM (
+SELECT report_date, device_type, sum(total_requests) AS total_page_views
+FROM ApexHourlySiteReport
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+AND siteid = @__siteId__
+GROUP BY report_date, device_type
+) a
+LEFT JOIN (
+SELECT report_date, device_type, sum(total_impressions) impressions, sum(total_revenue) revenue
+FROM adptagreport
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+AND siteid = @__siteId__
+GROUP BY report_Date, device_type
+) b ON a.report_date = b.report_date AND a.device_type = b.device_type
+ORDER BY report_date, device_type
+`;
+
 const GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE = `
 SELECT a.siteid, b.name as siteName, a.report_date, a.mode, sum(a.total_requests) as total_page_views
 FROM ApexHourlySiteReport a,  Site b
@@ -352,5 +371,6 @@ module.exports = {
 	GLOBAL_TOP_10_COUNTRIES_PERFORMANCE,
 	SITE_COUNTRIES_PERFORMANCE,
 	TOP_10_SITES_PERFORMANCE,
-	SITE_BROWSER_LEVEL_PERFORMANCE
+	SITE_BROWSER_LEVEL_PERFORMANCE,
+	SITE_METRICS_PERFORMANCE
 };
