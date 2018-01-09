@@ -84,6 +84,16 @@ GROUP BY a.report_date, a.mode, a.siteid, b.name
 ORDER BY a.report_date, a.mode, sum(total_requests) DESC
 `;
 
+const SITE_MODE_WISE_TRAFFIC_PERFORMANCE = `
+SELECT a.siteid, b.name as siteName, a.report_date, a.mode, sum(a.total_requests) as total_page_views
+FROM ApexHourlySiteReport a,  Site b
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+AND a.siteid = @__siteId__
+AND a.siteid = b.siteid AND a.siteid > 25000
+GROUP BY a.report_date, a.mode, a.siteid, b.name
+ORDER BY a.report_date, a.mode, sum(total_requests) DESC
+`;
+
 const GLOBAL_TOP_10_COUNTRIES_PERFORMANCE = `
 SELECT report_date, a.cid, country, total_page_views
 FROM (
@@ -325,6 +335,7 @@ module.exports = {
 	GLOBAL_NETWORK_WISE_PERFORMANCE,
 	GLOBAL_METRICS_PERFORMANCE,
 	GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE,
+	SITE_MODE_WISE_TRAFFIC_PERFORMANCE,
 	GLOBAL_TOP_10_COUNTRIES_PERFORMANCE,
 	TOP_10_SITES_PERFORMANCE,
 	SITE_BROWSER_LEVEL_PERFORMANCE
