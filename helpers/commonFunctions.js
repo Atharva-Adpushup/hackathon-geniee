@@ -10,6 +10,7 @@ const Promise = require('bluebird'),
 	siteDeviceWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/siteDeviceWiseRevenueContribution'),
 	sitePageGroupWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/sitePageGroupWiseRevenueContribution'),
 	siteAdNetworkWiseDataContributionQuery = require('../reports/default/adpTags/queries/siteAdNetworkWiseDataContribution'),
+	siteNetworkWiseDataContributionQuery = require('../reports/default/adpTags/queries/siteNetworkWiseDataContribution'),
 	siteBrowserWiseTrafficContributionQuery = require('../reports/default/adpTags/queries/siteBrowserWiseTrafficContribution'),
 	siteTop20CountriesContributionQuery = require('../reports/default/adpTags/queries/siteTop20CountriesContribution'),
 	siteModeWiseTrafficContributionQuery = require('../reports/default/adpTags/queries/siteModeWiseTrafficContribution'),
@@ -413,6 +414,17 @@ const Promise = require('bluebird'),
 
 		return siteAdNetworkWiseDataContributionQuery.getData(config);
 	},
+	getSiteNetworkWiseDataContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				siteId: parameterConfig.siteId,
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return siteNetworkWiseDataContributionQuery.getData(config);
+	},
 	getSiteBrowserWiseTrafficContributionReport = parameterConfig => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
@@ -564,6 +576,7 @@ module.exports = {
 	getSiteBrowserWiseTrafficContributionReport,
 	getSiteTop20CountriesContributionReport,
 	getSiteMetricsDataContributionReport,
+	getSiteNetworkWiseDataContributionReport,
 	getGlobalNetworkWiseDataContributionReport,
 	getGlobalMetricsDataContributionReport,
 	getGlobalModeWiseTrafficContributionReport,

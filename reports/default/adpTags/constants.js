@@ -58,6 +58,16 @@ GROUP BY a.report_Date, a.ntwid, name
 ORDER BY a.report_date, a.ntwid, name;
 `;
 
+const SITE_NETWORK_WISE_PERFORMANCE = `
+SELECT report_date, a.ntwid, name, sum(total_impressions) impressions, sum(total_revenue) revenue
+FROM adptagreport a, network b
+WHERE a.siteid = @__siteId__
+AND a.ntwid = b.ntwid
+AND a.report_date BETWEEN @__fromDate__ AND @__toDate__
+GROUP BY a.report_Date, a.ntwid, name
+ORDER BY a.report_date, a.ntwid, name
+`;
+
 const GLOBAL_METRICS_PERFORMANCE = `
 SELECT a.report_date, a.device_type, total_page_views, impressions, revenue
 FROM (
@@ -372,5 +382,6 @@ module.exports = {
 	SITE_COUNTRIES_PERFORMANCE,
 	TOP_10_SITES_PERFORMANCE,
 	SITE_BROWSER_LEVEL_PERFORMANCE,
-	SITE_METRICS_PERFORMANCE
+	SITE_METRICS_PERFORMANCE,
+	SITE_NETWORK_WISE_PERFORMANCE
 };
