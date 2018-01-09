@@ -114,6 +114,16 @@ GROUP BY report_Date, siteid, device_type, ntwid
 ORDER BY report_date, siteid, device_type
 `;
 
+const SITE_BROWSER_LEVEL_PERFORMANCE = `
+SELECT a.siteid, b.count as hits, a.report_date, c.name
+FROM ApexHourlySiteReport a, ApexWebBrowserReport b, ApexWebBrowser c
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+AND a.siteid = @__siteId__
+AND b.axwbid = c.axwbid
+AND a.axhsrid = b.axhsrid AND a.siteid > 25000
+GROUP BY a.report_date, b.count, a.siteid, c.name
+`;
+
 const PLATFORMS_KEYS = {
 	0: 'UNKNOWN',
 	1: 'MOBILE',
@@ -316,5 +326,6 @@ module.exports = {
 	GLOBAL_METRICS_PERFORMANCE,
 	GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE,
 	GLOBAL_TOP_10_COUNTRIES_PERFORMANCE,
-	TOP_10_SITES_PERFORMANCE
+	TOP_10_SITES_PERFORMANCE,
+	SITE_BROWSER_LEVEL_PERFORMANCE
 };
