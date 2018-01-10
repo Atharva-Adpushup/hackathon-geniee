@@ -58,6 +58,16 @@ GROUP BY a.report_Date, a.ntwid, name
 ORDER BY a.report_date, a.ntwid, name;
 `;
 
+const SITE_NETWORK_WISE_PERFORMANCE = `
+SELECT report_date, a.ntwid, name, sum(total_impressions) impressions, sum(total_revenue) revenue
+FROM adptagreport a, network b
+WHERE a.siteid = @__siteId__
+AND a.ntwid = b.ntwid
+AND a.report_date BETWEEN @__fromDate__ AND @__toDate__
+GROUP BY a.report_Date, a.ntwid, name
+ORDER BY a.report_date, a.ntwid, name
+`;
+
 const GLOBAL_METRICS_PERFORMANCE = `
 SELECT a.report_date, a.device_type, total_page_views, impressions, revenue
 FROM (
@@ -75,10 +85,39 @@ GROUP BY report_Date, device_type
 ORDER BY report_date, device_type
 `;
 
+const SITE_METRICS_PERFORMANCE = `
+SELECT a.report_date, a.device_type, total_page_views, impressions, revenue
+FROM (
+SELECT report_date, device_type, sum(total_requests) AS total_page_views
+FROM ApexHourlySiteReport
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+AND siteid = @__siteId__
+GROUP BY report_date, device_type
+) a
+LEFT JOIN (
+SELECT report_date, device_type, sum(total_impressions) impressions, sum(total_revenue) revenue
+FROM adptagreport
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+AND siteid = @__siteId__
+GROUP BY report_Date, device_type
+) b ON a.report_date = b.report_date AND a.device_type = b.device_type
+ORDER BY report_date, device_type
+`;
+
 const GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE = `
 SELECT a.siteid, b.name as siteName, a.report_date, a.mode, sum(a.total_requests) as total_page_views
 FROM ApexHourlySiteReport a,  Site b
 WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+AND a.siteid = b.siteid AND a.siteid > 25000
+GROUP BY a.report_date, a.mode, a.siteid, b.name
+ORDER BY a.report_date, a.mode, sum(total_requests) DESC
+`;
+
+const SITE_MODE_WISE_TRAFFIC_PERFORMANCE = `
+SELECT a.siteid, b.name as siteName, a.report_date, a.mode, sum(a.total_requests) as total_page_views
+FROM ApexHourlySiteReport a,  Site b
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+AND a.siteid = @__siteId__
 AND a.siteid = b.siteid AND a.siteid > 25000
 GROUP BY a.report_date, a.mode, a.siteid, b.name
 ORDER BY a.report_date, a.mode, sum(total_requests) DESC
@@ -91,6 +130,19 @@ SELECT report_date, a.cid, NAME country, sum(total_requests) AS total_page_views
 ,ROW_NUMBER() OVER (PARTITION BY report_date ORDER BY sum(total_requests) DESC) AS rn
 FROM ApexHourlySiteReport a, country b
 WHERE a.cid = b.cid AND report_date BETWEEN @__fromDate__ AND @__toDate__
+GROUP BY report_date, a.cid, NAME
+) a
+WHERE rn <= @__count__
+ORDER BY report_date
+`;
+
+const SITE_COUNTRIES_PERFORMANCE = `
+SELECT report_date, a.cid, country, total_page_views
+FROM (
+SELECT report_date, a.cid, NAME country, sum(total_requests) AS total_page_views
+,ROW_NUMBER() OVER (PARTITION BY report_date ORDER BY sum(total_requests) DESC) AS rn
+FROM ApexHourlySiteReport a, country b
+WHERE a.siteid = @__siteId__ AND a.cid = b.cid AND report_date BETWEEN @__fromDate__ AND @__toDate__
 GROUP BY report_date, a.cid, NAME
 ) a
 WHERE rn <= @__count__
@@ -112,6 +164,16 @@ WHERE report_date BETWEEN @__fromDate__ AND @__toDate__ AND siteid >= 25000
 GROUP BY report_Date, siteid, device_type, ntwid
 ) b ON a.report_date = b.report_date AND a.siteid = b.siteid AND a.device_type = b.device_type
 ORDER BY report_date, siteid, device_type
+`;
+
+const SITE_BROWSER_LEVEL_PERFORMANCE = `
+SELECT a.siteid, b.count as hits, a.report_date, c.name
+FROM ApexHourlySiteReport a, ApexWebBrowserReport b, ApexWebBrowser c
+WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+AND a.siteid = @__siteId__
+AND b.axwbid = c.axwbid
+AND a.axhsrid = b.axhsrid AND a.siteid > 25000
+GROUP BY a.report_date, b.count, a.siteid, c.name
 `;
 
 const PLATFORMS_KEYS = {
@@ -315,6 +377,11 @@ module.exports = {
 	GLOBAL_NETWORK_WISE_PERFORMANCE,
 	GLOBAL_METRICS_PERFORMANCE,
 	GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE,
+	SITE_MODE_WISE_TRAFFIC_PERFORMANCE,
 	GLOBAL_TOP_10_COUNTRIES_PERFORMANCE,
-	TOP_10_SITES_PERFORMANCE
+	SITE_COUNTRIES_PERFORMANCE,
+	TOP_10_SITES_PERFORMANCE,
+	SITE_BROWSER_LEVEL_PERFORMANCE,
+	SITE_METRICS_PERFORMANCE,
+	SITE_NETWORK_WISE_PERFORMANCE
 };
