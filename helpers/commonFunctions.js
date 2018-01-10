@@ -10,6 +10,11 @@ const Promise = require('bluebird'),
 	siteDeviceWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/siteDeviceWiseRevenueContribution'),
 	sitePageGroupWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/sitePageGroupWiseRevenueContribution'),
 	siteAdNetworkWiseDataContributionQuery = require('../reports/default/adpTags/queries/siteAdNetworkWiseDataContribution'),
+	siteNetworkWiseDataContributionQuery = require('../reports/default/adpTags/queries/siteNetworkWiseDataContribution'),
+	siteBrowserWiseTrafficContributionQuery = require('../reports/default/adpTags/queries/siteBrowserWiseTrafficContribution'),
+	siteTop20CountriesContributionQuery = require('../reports/default/adpTags/queries/siteTop20CountriesContribution'),
+	siteModeWiseTrafficContributionQuery = require('../reports/default/adpTags/queries/siteModeWiseTrafficContribution'),
+	siteMetricsDataContributionQuery = require('../reports/default/adpTags/queries/siteMetricsDataContribution'),
 	globalNetworkWiseDataContributionQuery = require('../reports/default/adpTags/queries/globalNetworkWiseDataContribution'),
 	globalMetricsDataContributionQuery = require('../reports/default/adpTags/queries/globalMetricsDataContribution'),
 	globalModeWiseTrafficContributionQuery = require('../reports/default/adpTags/queries/globalModeWiseTrafficContribution'),
@@ -409,6 +414,39 @@ const Promise = require('bluebird'),
 
 		return siteAdNetworkWiseDataContributionQuery.getData(config);
 	},
+	getSiteNetworkWiseDataContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				siteId: parameterConfig.siteId,
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return siteNetworkWiseDataContributionQuery.getData(config);
+	},
+	getSiteBrowserWiseTrafficContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				siteId: parameterConfig.siteId,
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return siteBrowserWiseTrafficContributionQuery.getData(config);
+	},
+	getSiteModeWiseTrafficContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				siteId: parameterConfig.siteId,
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return siteModeWiseTrafficContributionQuery.getData(config);
+	},
 	getGlobalNetworkWiseDataContributionReport = parameterConfig => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
@@ -428,6 +466,17 @@ const Promise = require('bluebird'),
 			};
 
 		return globalMetricsDataContributionQuery.getData(config);
+	},
+	getSiteMetricsDataContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				siteId: parameterConfig.siteId,
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return siteMetricsDataContributionQuery.getData(config);
 	},
 	getGlobalModeWiseTrafficContributionReport = parameterConfig => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
@@ -449,6 +498,18 @@ const Promise = require('bluebird'),
 			};
 
 		return globalTop10CountriesContributionQuery.getData(config);
+	},
+	getSiteTop20CountriesContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				siteId: parameterConfig.siteId,
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				transform: parameterConfig.transform ? parameterConfig.transform : false,
+				count: parameterConfig.count
+			};
+
+		return siteTop20CountriesContributionQuery.getData(config);
 	},
 	getGlobalTop10SitesContributionReport = parameterConfig => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
@@ -508,9 +569,14 @@ module.exports = {
 	getWeeklyMetricsReport,
 	getWeeklyEmailReport,
 	getSiteTopUrlsReport,
+	getSiteModeWiseTrafficContributionReport,
 	getSiteDeviceWiseRevenueContributionReport,
 	getSitePageGroupWiseRevenueContributionReport,
 	getSiteAdNetworkWiseDataContributionReport,
+	getSiteBrowserWiseTrafficContributionReport,
+	getSiteTop20CountriesContributionReport,
+	getSiteMetricsDataContributionReport,
+	getSiteNetworkWiseDataContributionReport,
 	getGlobalNetworkWiseDataContributionReport,
 	getGlobalMetricsDataContributionReport,
 	getGlobalModeWiseTrafficContributionReport,

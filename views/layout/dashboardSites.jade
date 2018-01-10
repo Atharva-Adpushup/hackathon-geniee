@@ -31,9 +31,9 @@
                                                 |  Settings   
                                         if isSuperUser 
                                             li
-                                                a(title="Open site ops panel" href='/ops/settings/#{siteId}') 
+                                                a(title="Open site info panel" href='/ops/settings/#{siteId}') 
                                                     i.fa.fa-wrench 
-                                                    |  Ops Panel
+                                                    |  Info Panel
                                             li
                                                 a 
                                                     form(action='/user/deleteSite', method='post', style='display: inline', onsubmit="return (confirm('Are you sure you want to delete this site? This step cannot be reversed !') && trackDelete(#{siteId}))")
