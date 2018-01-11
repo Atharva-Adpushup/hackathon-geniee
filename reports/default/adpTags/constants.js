@@ -176,6 +176,18 @@ AND a.axhsrid = b.axhsrid AND a.siteid > 25000
 GROUP BY a.report_date, b.count, a.siteid, c.name
 `;
 
+const SITE_XPATH_MISS_PAGEGROUP_PERFORMANCE = `
+SELECT page_group, url, total_xpath_miss
+FROM (
+SELECT page_group, url, sum(total_xpath_miss) total_xpath_miss, ROW_NUMBER() OVER (PARTITION BY page_group ORDER BY sum(total_xpath_miss) DESC) AS rn
+FROM ApexSiteReport a
+WHERE log_date BETWEEN @__fromDate__ AND @__toDate__ AND siteid = @__siteId__
+GROUP BY page_group, url
+HAVING sum(total_xpath_miss) > 0) a
+WHERE rn <= @__count__
+ORDER BY page_group
+`;
+
 const PLATFORMS_KEYS = {
 	0: 'UNKNOWN',
 	1: 'MOBILE',
@@ -383,5 +395,6 @@ module.exports = {
 	TOP_10_SITES_PERFORMANCE,
 	SITE_BROWSER_LEVEL_PERFORMANCE,
 	SITE_METRICS_PERFORMANCE,
-	SITE_NETWORK_WISE_PERFORMANCE
+	SITE_NETWORK_WISE_PERFORMANCE,
+	SITE_XPATH_MISS_PAGEGROUP_PERFORMANCE
 };
