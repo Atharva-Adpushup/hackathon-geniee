@@ -1,9 +1,12 @@
 const sql = require('mssql');
 const config = require('../../../../../../configs/config'),
-	dbConfig = config.sql,
-	database = config.sqlDatabases['warehouse'];
+	dbConfig = Object.assign({}, config.sql, { database: config.sqlDatabases['warehouse'] });
 
-dbConfig.database = database;
-const dbConnection = sql.connect(dbConfig);
+let pool = null;
 
-module.exports = dbConnection;
+function getConnection() {
+	pool = new sql.ConnectionPool(dbConfig);
+	return pool.connect();
+}
+
+module.exports = getConnection;

@@ -7,6 +7,7 @@ const Promise = require('bluebird'),
 	utils = require('./utils'),
 	sqlReportingModule = require('../reports/default/adpTags/index'),
 	siteTopUrlsQuery = require('../reports/default/adpTags/queries/siteTopUrls'),
+	siteXpathMissPageGroupContributionQuery = require('../reports/default/adpTags/queries/siteXpathMissPageGroupContribution'),
 	siteDeviceWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/siteDeviceWiseRevenueContribution'),
 	sitePageGroupWiseRevenueContributionQuery = require('../reports/default/adpTags/queries/sitePageGroupWiseRevenueContribution'),
 	siteAdNetworkWiseDataContributionQuery = require('../reports/default/adpTags/queries/siteAdNetworkWiseDataContribution'),
@@ -381,6 +382,18 @@ const Promise = require('bluebird'),
 
 		return siteTopUrlsQuery.getData(config);
 	},
+	getSiteXpathMissPageGroupContributionReport = parameterConfig => {
+		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
+			config = {
+				siteId: parameterConfig.siteId,
+				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				count: parameterConfig.count ? parameterConfig.count : 20,
+				transform: parameterConfig.transform ? parameterConfig.transform : false
+			};
+
+		return siteXpathMissPageGroupContributionQuery.getData(config);
+	},
 	getSiteDeviceWiseRevenueContributionReport = parameterConfig => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
@@ -569,6 +582,7 @@ module.exports = {
 	getWeeklyMetricsReport,
 	getWeeklyEmailReport,
 	getSiteTopUrlsReport,
+	getSiteXpathMissPageGroupContributionReport,
 	getSiteModeWiseTrafficContributionReport,
 	getSiteDeviceWiseRevenueContributionReport,
 	getSitePageGroupWiseRevenueContributionReport,
