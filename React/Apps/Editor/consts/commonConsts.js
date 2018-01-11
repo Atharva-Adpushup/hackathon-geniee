@@ -196,6 +196,8 @@ const status = {
 		VALIDATE_XPATH_SECTION: 'VALIDATE_XPATH_SECTION',
 		UPDATE_INCONTENT_FLOAT: 'UPDATE_INCONTENT_FLOAT',
 		SCROLL_TO_VIEW: 'SCROLL_TO_VIEW',
+		UPDATE_TYPE: 'UPDATE_TYPE',
+		UPDATE_FORMAT_DATA: 'UPDATE_FORMAT_DATA',
 		UPDATE_SECTION: 'UPDATE_SECTION'
 	},
 	adActions = {
@@ -335,7 +337,7 @@ const status = {
 	reportingUrl = '/user/reports/generate',
 	jsWrapper = `(function($){ \n\n })(adpushup.$)`,
 	interactiveAds = {
-		events: ['DOMContentLoaded'], //load', 'scroll', 'onMills',
+		events: ['DOMContentLoaded', 'scroll'], //load', 'scroll', 'onMills',
 		sizes: {
 			DESKTOP: {
 				sticky: {
@@ -346,7 +348,7 @@ const status = {
 			},
 			MOBILE: {
 				sticky: {
-					bottom: ['160x600', '336x280', '300x250', '300x600', '300x50', '120x600']
+					bottom: ['336x280', '300x250', '300x50', '320x100', '300x100']
 				}
 			}
 		},

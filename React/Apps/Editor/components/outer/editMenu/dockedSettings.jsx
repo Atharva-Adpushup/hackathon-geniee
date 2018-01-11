@@ -15,6 +15,10 @@ class DockedSettings extends Component {
 			bottomXPath:
 				this.props.section && this.props.section.formatData && this.props.section.formatData.bottomXPath
 					? this.props.section.formatData.bottomXPath
+					: '',
+			bottomOffset:
+				this.props.section && this.props.section.formatData && this.props.section.formatData.bottomOffset
+					? this.props.section.formatData.bottomOffset
 					: ''
 		};
 		this.renderDockContent = this.renderDockContent.bind(this);
@@ -41,7 +45,8 @@ class DockedSettings extends Component {
 			() => {
 				this.props.onFormatDataUpdate(this.props.section.id, {
 					css: typeof code == 'string' ? {} : code,
-					bottomXPath: this.state.bottomXPath
+					bottomXPath: this.state.bottomXPath,
+					bottomOffset: this.state.bottomOffset
 				});
 				this.props.onCancel();
 			}
@@ -68,6 +73,23 @@ class DockedSettings extends Component {
 							value={this.state.bottomXPath}
 							onChange={ev => {
 								this.setState({ bottomXPath: ev.target.value });
+							}}
+						/>
+					</Col>
+				</Row>
+				<Row className="mT-15">
+					<Col xs={5} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
+						<strong>Bottom Offset</strong>
+					</Col>
+					<Col xs={7} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
+						<input
+							className="inputMinimal"
+							type="text"
+							style={{ width: '100%' }}
+							name="bottomOffset"
+							value={this.state.bottomOffset}
+							onChange={ev => {
+								this.setState({ bottomOffset: ev.target.value });
 							}}
 						/>
 					</Col>
