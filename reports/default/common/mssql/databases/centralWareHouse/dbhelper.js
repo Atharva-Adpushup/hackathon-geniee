@@ -30,7 +30,7 @@ function validateResultData(result) {
 
 module.exports = {
 	queryDB: dbConfig => {
-		return dbConnection
+		return dbConnection()
 			.then(pool => pool.request())
 			.then(addInputParameters.bind(null, dbConfig.inputParameters))
 			.then(pool => {
