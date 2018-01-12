@@ -236,7 +236,7 @@ class AdDetails extends Component {
 	
 	
 	render() {
-		const { fromPanel } = this.props;
+		const { fromPanel, showEventData } = this.props;
 		return (
 			<div id="ad-details">
 				{this.state.editDock ? (
