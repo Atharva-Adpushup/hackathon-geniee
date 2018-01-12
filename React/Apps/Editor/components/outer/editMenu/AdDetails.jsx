@@ -11,11 +11,12 @@ class AdDetails extends Component {
 		this.renderXPathAndCSS = this.renderXPathAndCSS.bind(this);
 		this.renderSectionName = this.renderSectionName.bind(this);
 		this.renderNetworkDetails = this.renderNetworkDetails.bind(this);
-		this.renderAdCode = this.renderAdCode.bind(this);
-		this.renderCommonDetails = this.renderCommonDetails.bind(this);
+		this.renderEventData = this.renderEventData.bind(this);
 		this.genieeOptions = this.genieeOptions.bind(this);
 		this.renderDockedButton = this.renderDockedButton.bind(this);
 		this.editDockSettings = this.editDockSettings.bind(this);
+		this.renderAdCode = this.renderAdCode.bind(this);
+		this.renderCommonDetails = this.renderCommonDetails.bind(this);
 	}
 
 	renderXPathAndCSS() {
@@ -202,6 +203,38 @@ class AdDetails extends Component {
 		);
 	}
 
+	renderEventData() {
+		const { section, ad } = this.props;
+		return (
+			<div>
+				<p>
+					Event : <strong>{section.formatData.event.toUpperCase()}</strong>
+					<OverlayTrigger
+						placement="bottom"
+						overlay={<Tooltip id="edit-interactive-ad-data">Edit Interactive Ad Data</Tooltip>}
+					>
+						<span className="adDetails-icon" onClick={this.props.editInteractiveAd}>
+							<i className="btn-icn-edit" />
+						</span>
+					</OverlayTrigger>
+				</p>
+				{section.formatData.eventData && Object.keys(section.formatData.eventData).length ? (
+					<p>
+						Value : <strong>{section.formatData.eventData.value}</strong>
+					</p>
+				) : null}
+				<p>
+					Format :{' '}
+					<strong>
+						{section.formatData.type}
+						{section.formatData.placement}
+					</strong>
+				</p>
+			</div>
+		);
+	}	
+	
+	
 	render() {
 		const { fromPanel } = this.props;
 		return (
@@ -215,6 +248,7 @@ class AdDetails extends Component {
 							{this.renderNetworkDetails()}
 						</div>
 						{!fromPanel ? this.renderXPathAndCSS() : null}
+						{showEventData ? this.renderEventData() : null}
 						{!this.props.section.isIncontent && this.props.section.type != 3
 							? this.renderDockedButton()
 							: null}
