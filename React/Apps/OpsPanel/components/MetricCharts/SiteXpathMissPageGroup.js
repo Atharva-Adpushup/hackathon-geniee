@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Panel, Row, Col, Table } from 'react-bootstrap';
+import { Panel, Row, Col, Table, Jumbotron, Alert } from 'react-bootstrap';
 import moment from 'moment';
 import _ from 'lodash';
 import extend from 'extend';
@@ -48,7 +48,7 @@ function generateTableData(inputData, pageGroupName) {
 						<tr key={`table-row-${key}`}>
 							<td>{xpathMissObject.pageGroupName}</td>
 							<td>
-								<a target="_blank" href={`http://${xpathMissObject.url}`}>
+								<a target="_blank" href={`${xpathMissObject.url}`}>
 									{xpathMissObject.url}
 								</a>
 							</td>
@@ -100,7 +100,8 @@ class SiteXpathMissPageGroup extends Component {
 			selectedPageGroup: '',
 			startDate: moment().subtract(7, 'days'),
 			endDate: moment().subtract(1, 'days'),
-			siteId: window.siteId
+			siteId: window.siteId,
+			showComponentUI: false
 		};
 		this.renderHighCharts = this.renderHighCharts.bind(this);
 		this.generateHeaderTitle = this.generateHeaderTitle.bind(this);
@@ -113,18 +114,11 @@ class SiteXpathMissPageGroup extends Component {
 		this.handleSelectBoxChange = this.handleSelectBoxChange.bind(this);
 		this.renderSelectBox = this.renderSelectBox.bind(this);
 		this.renderListTable = this.renderListTable.bind(this);
+		this.renderAlertUI = this.renderAlertUI.bind(this);
+		this.handleAlertButtonClick = this.handleAlertButtonClick.bind(this);
 	}
 
-	componentDidMount() {
-		this.state.isDataLoaded
-			? null
-			: this.fetchReportData({
-					transform: true,
-					fromDate: this.state.startDate,
-					toDate: this.state.endDate,
-					count: this.state.count
-				});
-	}
+	componentDidMount() {}
 
 	componentWillReceiveProps(nextProps) {
 		let isDataLoaded =
@@ -153,6 +147,42 @@ class SiteXpathMissPageGroup extends Component {
 
 	focusUpdated(focusedInput) {
 		this.setState({ focusedInput });
+	}
+
+	handleAlertButtonClick() {
+		this.fetchReportData({
+			transform: true,
+			fromDate: this.state.startDate,
+			toDate: this.state.endDate,
+			count: this.state.count
+		});
+	}
+
+	renderAlertUI() {
+		const headingStyles = {
+			fontSize: '24px'
+		};
+		return (
+			<Jumbotron className="u-padding-10px">
+				<h3 style={headingStyles} className="u-margin-b15px u-margin-t10px">
+					XPathMiss PageGroup Metrics Chart
+				</h3>
+				<Alert bsStyle="warning" className="mB-10">
+					<h3 style={headingStyles} className="u-margin-b15px">
+						<strong>💪 With Great Power Comes Great Responsibility! 💪</strong>
+					</h3>
+					<p>
+						As this chart is performance intensive, please use it when you really want to. 🙏 Avoid entering
+						dates for more than a couple weeks.
+					</p>
+				</Alert>
+				<p>
+					<button className="btn btn-lightBg btn-default btn-blue" onClick={this.handleAlertButtonClick}>
+						Get Chart Data
+					</button>
+				</p>
+			</Jumbotron>
+		);
 	}
 
 	renderDateRangePickerUI() {
@@ -209,6 +239,8 @@ class SiteXpathMissPageGroup extends Component {
 
 	fetchReportData(isReset = false) {
 		const parameterConfig = isReset ? this.getDefaultParameterConfig() : this.getComputedParameterConfig();
+		const isShowComponentUI = this.state.showComponentUI;
+
 		let stateObject = {
 			isDataLoaded: false
 		};
@@ -217,6 +249,10 @@ class SiteXpathMissPageGroup extends Component {
 		if (isReset) {
 			stateObject.startDate = parameterConfig.fromDate;
 			stateObject.endDate = parameterConfig.toDate;
+		}
+
+		if (!isShowComponentUI) {
+			stateObject.showComponentUI = true;
 		}
 
 		this.setState(stateObject, () => {
@@ -290,6 +326,12 @@ class SiteXpathMissPageGroup extends Component {
 	}
 
 	render() {
+		const isShowComponentUI = this.state.showComponentUI;
+
+		if (!isShowComponentUI) {
+			return this.renderAlertUI();
+		}
+
 		const props = this.props,
 			headerTitle = this.generateHeaderTitle();
 
