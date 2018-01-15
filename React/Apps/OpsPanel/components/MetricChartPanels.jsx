@@ -10,7 +10,7 @@ import LostAndFoundLiveSites from './MetricCharts/LostAndFoundLiveSites';
 
 const MetricChartPanels = props => {
 	return (
-        <ActionCard title='Global Site Vitals'>
+        <ActionCard title='Global Vitals'>
             <div className="pd-20">
                 <Metrics fetchData={props.fetchMetricsData} data={props.charts.metrics} />
                 <Top10Sites fetchData={props.fetchTop10SitesData} data={props.charts.top10Sites} />
