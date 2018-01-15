@@ -12,23 +12,32 @@ import 'react-dates/lib/css/_datepicker.css';
 import '../../../ReportingPanel/styles.scss';
 
 function generateHighChartConfig(inputData, platformName) {
+	// Line Chart Multiple Axis Implementation
 	const chartConfig = extend(true, {}, LINE_CHART_CONFIG),
 		categories = inputData.dateFormat.collection.concat([]),
 		seriesObject = {
 			revenue: {
 				name: 'Revenue',
+				type: 'line',
+				yAxis: 2,
 				data: []
 			},
 			impressions: {
 				name: 'Impressions',
+				type: 'line',
+				yAxis: 1,
 				data: []
 			},
 			pageViews: {
 				name: 'PageViews',
+				type: 'line',
+				yAxis: 0,
 				data: []
 			},
 			cpm: {
 				name: 'CPM',
+				type: 'line',
+				yAxis: 3,
 				data: []
 			}
 		};
@@ -42,9 +51,43 @@ function generateHighChartConfig(inputData, platformName) {
 		contributionData = extend(true, {}, inputData.platform[platformName].dayWise);
 	}
 
-	chartConfig.yAxis.title.text = `VALUE ($)`;
 	chartConfig.title.text = isPlatform ? `${platformName} Metrics Performance` : `Metrics Performance`;
-	chartConfig.xAxis.categories = chartConfig.xAxis.categories.concat(categories);
+	chartConfig.yAxis = [
+		{
+			title: {
+				text: 'PageViews'
+			}
+		},
+		{
+			title: {
+				text: 'Impressions'
+			}
+		},
+		{
+			title: {
+				text: 'Revenue'
+			},
+			labels: {
+				format: '${value}'
+			},
+			opposite: true
+		},
+		{
+			title: {
+				text: 'CPM'
+			},
+			opposite: true
+		}
+	];
+	chartConfig.xAxis = [
+		{
+			categories: chartConfig.xAxis.categories.concat(categories),
+			crosshair: true
+		}
+	];
+	chartConfig.tooltip = {
+		shared: true
+	};
 
 	_.forOwn(contributionData, (dayWiseObject, dateKey) => {
 		seriesObject.revenue.data.push(dayWiseObject.revenue);
@@ -53,9 +96,9 @@ function generateHighChartConfig(inputData, platformName) {
 		seriesObject.cpm.data.push(dayWiseObject.cpm);
 	});
 
-	chartConfig.series.push(extend(true, {}, seriesObject.revenue));
-	chartConfig.series.push(extend(true, {}, seriesObject.impressions));
 	chartConfig.series.push(extend(true, {}, seriesObject.pageViews));
+	chartConfig.series.push(extend(true, {}, seriesObject.impressions));
+	chartConfig.series.push(extend(true, {}, seriesObject.revenue));
 	chartConfig.series.push(extend(true, {}, seriesObject.cpm));
 
 	return chartConfig;
