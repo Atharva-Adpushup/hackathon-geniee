@@ -202,14 +202,14 @@ module.exports = {
 		const inputParameterCollection = [
 				//---------------------NOTE---------------------//
 				// Please ensure that below mentioned 'type' property value
-				// is a case sensitive sql (sql is 'mssql' module) data type such as 'VarChar', 'SmallInt', 'Date' etc.
+				// is a case sensitive sql (sql is 'mssql' module) data type such as 'VarChar', 'Int', 'Date' etc.
 				// These values are supported because dbHelper module identifies every 'type' property value
 				// as sql data type key and gets its corresponding value as mentioned in following code example:
 				// ```return sqlInstance.input(paramObject.name, sql[paramObject.type], paramObject.value);```
 				// Please refer to https://www.npmjs.com/package/mssql#data-types for complete reference of supported data types
 				{
 					name: '__mode__',
-					type: 'SmallInt',
+					type: 'Int',
 					value: paramConfig.mode
 				},
 				{
