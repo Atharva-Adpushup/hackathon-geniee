@@ -32,6 +32,18 @@ GROUP BY c.url
 ORDER BY 'count' DESC;
 `;
 
+const SITE_MODE_WISE_TOP_URLS = `
+SELECT TOP @__count__ c.url, sum(b.count) AS 'count'
+FROM apexhourlysitereport a, apextopurlreport b, apextopurl c
+WHERE a.axhsrid = b.axhsrid
+	AND b.axtuid = c.axtuid
+	AND a.mode = @__mode__
+	AND report_date BETWEEN @__fromDate__ AND @__toDate__
+	AND a.siteid = @__siteId__
+GROUP BY c.url
+ORDER BY 'count' DESC;
+`;
+
 const SITE_DEVICE_WISE_REVENUE_CONTRIBUTION = `
 SELECT report_date, device_type, sum(total_gross_revenue) AS 'total_revenue', sum(total_revenue) AS 'revenue_after_cut'
 FROM adptagreport
@@ -377,6 +389,7 @@ module.exports = {
 	fetchVariationQuery,
 	fetchPagegroupQuery,
 	SITE_TOP_URLS,
+	SITE_MODE_WISE_TOP_URLS,
 	SITE_DEVICE_WISE_REVENUE_CONTRIBUTION,
 	PLATFORMS_KEYS,
 	REGEX_DATE_FORMAT,
