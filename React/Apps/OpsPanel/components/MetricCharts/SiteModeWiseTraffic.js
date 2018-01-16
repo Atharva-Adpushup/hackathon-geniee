@@ -11,6 +11,42 @@ import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 import '../../../ReportingPanel/styles.scss';
 
+function generateTopUrlsTable(inputData) {
+	return (
+		<Table striped bordered hover responsive className="u-margin-t10px">
+			<thead>
+				<tr>
+					<th>
+						<h5>URL</h5>
+					</th>
+					<th>
+						<h5>COUNT</h5>
+					</th>
+					<th>
+						<h5>COUNT FORMAT</h5>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				{inputData.map((topUrlsObject, key) => {
+					return (
+						<tr key={`table-row-${key}`}>
+							<td>
+								<a target="_blank" href={`${topUrlsObject.url}`}>
+									{topUrlsObject.url}
+								</a>
+							</td>
+							<td>{topUrlsObject.count}</td>
+
+							<td>{topUrlsObject.countDesc}</td>
+						</tr>
+					);
+				})}
+			</tbody>
+		</Table>
+	);
+}
+
 function generateTableData(inputData, modeName) {
 	const modeInputData = inputData[modeName];
 	let dataCollection = [];
@@ -100,7 +136,9 @@ class SiteModeWiseTraffic extends Component {
 		this.state = {
 			isDataLoaded,
 			data: isDataLoaded ? this.props.data : null,
+			topUrlsData: null,
 			selectedMode: '1',
+			urlCount: 20,
 			startDate: moment().subtract(7, 'days'),
 			endDate: moment().subtract(1, 'days'),
 			siteId: window.siteId
@@ -111,11 +149,13 @@ class SiteModeWiseTraffic extends Component {
 		this.datesUpdated = this.datesUpdated.bind(this);
 		this.focusUpdated = this.focusUpdated.bind(this);
 		this.fetchReportData = this.fetchReportData.bind(this);
+		this.fetchModeWiseTopUrlsData = this.fetchModeWiseTopUrlsData.bind(this);
 		this.getComputedParameterConfig = this.getComputedParameterConfig.bind(this);
 		this.getDefaultParameterConfig = this.getDefaultParameterConfig.bind(this);
 		this.handleSelectBoxChange = this.handleSelectBoxChange.bind(this);
 		this.renderSelectBox = this.renderSelectBox.bind(this);
 		this.renderModeTable = this.renderModeTable.bind(this);
+		this.renderTopUrlsCountTable = this.renderTopUrlsCountTable.bind(this);
 	}
 
 	componentDidMount() {
@@ -159,7 +199,7 @@ class SiteModeWiseTraffic extends Component {
 
 	renderDateRangePickerUI() {
 		return (
-			<Col className="u-full-height aligner aligner--hBottom aligner--vCenter" xs={9}>
+			<Col className="u-full-height aligner aligner--hBottom aligner--vStart" xs={7}>
 				<DateRangePicker
 					onDatesChange={this.datesUpdated}
 					onFocusChange={this.focusUpdated}
@@ -219,6 +259,7 @@ class SiteModeWiseTraffic extends Component {
 		if (isReset) {
 			stateObject.startDate = parameterConfig.fromDate;
 			stateObject.endDate = parameterConfig.toDate;
+			stateObject.topUrlsData = null;
 		}
 
 		this.setState(stateObject, () => {
@@ -237,11 +278,29 @@ class SiteModeWiseTraffic extends Component {
 		});
 	}
 
+	fetchModeWiseTopUrlsData() {
+		const parameterConfig = this.getComputedParameterConfig(),
+			_ref = this;
+
+		parameterConfig.fromDate = moment(parameterConfig.fromDate).format('YYYY-MM-DD');
+		parameterConfig.toDate = moment(parameterConfig.toDate).format('YYYY-MM-DD');
+		parameterConfig.siteId = _ref.state.siteId;
+		parameterConfig.count = _ref.state.urlCount;
+		parameterConfig.mode = Number(_ref.state.selectedMode);
+
+		$.post(`/ops/getSiteModeWiseTopUrlsData`, parameterConfig, response => {
+			_ref.setState({
+				topUrlsData: response.data
+			});
+		});
+	}
+
 	handleSelectBoxChange(mode = '1') {
 		mode = mode || '1';
 
 		this.setState({
-			selectedMode: mode
+			selectedMode: mode,
+			topUrlsData: null
 		});
 	}
 
@@ -274,6 +333,13 @@ class SiteModeWiseTraffic extends Component {
 		return generatedTable;
 	}
 
+	renderTopUrlsCountTable() {
+		let inputData = this.state.topUrlsData,
+			generatedTable = generateTopUrlsTable(inputData);
+
+		return generatedTable;
+	}
+
 	generateHeaderTitle() {
 		return (
 			<div className="u-full-height aligner aligner--column">
@@ -281,11 +347,17 @@ class SiteModeWiseTraffic extends Component {
 					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={8}>
 						<h4>Mode Wise Traffic Chart</h4>
 					</Col>
-					<Col className="u-full-height aligner aligner--hCenter aligner--vBottom" xs={4} />
+					<Col className="u-full-height aligner aligner--hCenter aligner--vCenter" xs={4} />
 				</Row>
 				<Row className="u-margin-0px aligner-item">
-					<Col className="u-full-height aligner aligner--hStart aligner--vCenter" xs={3}>
+					<Col className="u-full-height aligner aligner--hStart aligner--vStart" xs={5}>
 						{this.renderSelectBox()}
+						<button
+							className="btn btn-lightBg btn-default btn-blue u-margin-l10px"
+							onClick={eve => this.fetchModeWiseTopUrlsData()}
+						>
+							Get Top Urls
+						</button>
 					</Col>
 					{this.renderDateRangePickerUI()}
 				</Row>
@@ -298,9 +370,10 @@ class SiteModeWiseTraffic extends Component {
 			headerTitle = this.generateHeaderTitle();
 
 		return (
-			<Panel className="mb-20 metricsChart metricsChart--modeWiseTraffic" header={headerTitle}>
+			<Panel className="mb-20 metricsChart" header={headerTitle}>
 				{this.state.isDataLoaded ? this.renderHighCharts() : <PaneLoader />}
 				{this.state.isDataLoaded ? this.renderModeTable() : null}
+				{this.state.topUrlsData ? this.renderTopUrlsCountTable() : null}
 			</Panel>
 		);
 	}
