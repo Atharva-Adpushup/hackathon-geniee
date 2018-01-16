@@ -17,7 +17,8 @@ const express = require('express'),
 		getSiteXpathMissPageGroupContributionReport,
 		getSiteTop20CountriesContributionReport,
 		getSiteMetricsDataContributionReport,
-		getSiteNetworkWiseDataContributionReport
+		getSiteNetworkWiseDataContributionReport,
+		getSiteModeWiseTopUrlsReport
 	} = require('../helpers/commonFunctions'),
 	router = express.Router(),
 	appBucket = couchbaseService(
@@ -162,6 +163,46 @@ router
 			.then(responseData => {
 				response.data = responseData;
 				response.data.dateFormat = dateFormatCollection;
+				return res.send(response);
+			})
+			.catch(err => {
+				return res.send(Object.assign(response, { error: true }));
+			});
+	})
+	.post('/getSiteModeWiseTopUrlsData', (req, res) => {
+		let response = {
+				error: false,
+				data: []
+			},
+			bodyParameters = req.body,
+			params = {
+				transform: true,
+				fromDate:
+					bodyParameters && bodyParameters.fromDate
+						? moment(bodyParameters.fromDate).format('YYYY-MM-DD')
+						: moment()
+								.subtract(7, 'days')
+								.format('YYYY-MM-DD'),
+				toDate:
+					bodyParameters && bodyParameters.toDate
+						? moment(bodyParameters.toDate).format('YYYY-MM-DD')
+						: moment()
+								.subtract(1, 'days')
+								.format('YYYY-MM-DD'),
+				siteId: bodyParameters.siteId,
+				mode: bodyParameters.mode || 1,
+				count: bodyParameters.count || 20
+			},
+			dateFormatCollection = utils.getDateFormatCollection({
+				fromDate: params.fromDate,
+				toDate: params.toDate,
+				format: 'MMM DD'
+			});
+
+		return getSiteModeWiseTopUrlsReport(params)
+			.then(responseData => {
+				response.data = responseData;
+				response.dateFormat = dateFormatCollection;
 				return res.send(response);
 			})
 			.catch(err => {
