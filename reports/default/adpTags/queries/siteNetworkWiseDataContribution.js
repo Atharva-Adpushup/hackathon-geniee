@@ -94,7 +94,7 @@ module.exports = {
 				},
 				{
 					name: '__siteId__',
-					type: 'SmallInt',
+					type: 'Int',
 					value: paramConfig.siteId
 				}
 			],

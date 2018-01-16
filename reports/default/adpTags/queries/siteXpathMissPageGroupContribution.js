@@ -94,12 +94,12 @@ module.exports = {
 				},
 				{
 					name: '__siteId__',
-					type: 'SmallInt',
+					type: 'Int',
 					value: paramConfig.siteId
 				},
 				{
 					name: '__count__',
-					type: 'SmallInt',
+					type: 'Int',
 					value: paramConfig.count
 				}
 			],
