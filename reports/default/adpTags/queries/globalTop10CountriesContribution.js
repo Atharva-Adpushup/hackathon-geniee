@@ -125,7 +125,7 @@ module.exports = {
 				},
 				{
 					name: '__count__',
-					type: 'SmallInt',
+					type: 'Int',
 					value: paramConfig.count ? paramConfig.count : 11
 				}
 			],
