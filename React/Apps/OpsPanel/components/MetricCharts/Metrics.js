@@ -20,25 +20,29 @@ function generateHighChartConfig(inputData, platformName) {
 				name: 'Revenue',
 				type: 'line',
 				yAxis: 2,
-				data: []
+				data: [],
+				visible: true
 			},
 			impressions: {
 				name: 'Impressions',
 				type: 'line',
 				yAxis: 1,
-				data: []
+				data: [],
+				visible: true
 			},
 			pageViews: {
 				name: 'PageViews',
 				type: 'line',
 				yAxis: 0,
-				data: []
+				data: [],
+				visible: false
 			},
 			cpm: {
 				name: 'CPM',
 				type: 'line',
 				yAxis: 3,
-				data: []
+				data: [],
+				visible: false
 			}
 		};
 	let isPlatform = !!platformName,
