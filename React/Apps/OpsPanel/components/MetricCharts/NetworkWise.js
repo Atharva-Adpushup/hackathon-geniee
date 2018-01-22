@@ -20,6 +20,9 @@ function generateHighChartConfig(inputData, metricName) {
 	chartConfig.yAxis.title.text = `${capitalisedMetric} ($)`;
 	chartConfig.title.text = `${capitalisedMetric} Performance`;
 	chartConfig.xAxis.categories = chartConfig.xAxis.categories.concat(categories);
+	chartConfig.tooltip = {
+		shared: true
+	};
 
 	_.forOwn(contributionData, (adNetworkDayWiseReport, adNetworkKey) => {
 		const seriesObject = {
@@ -93,9 +96,11 @@ class NetworkWise extends Component {
 	renderHighCharts() {
 		let inputData = this.state.data,
 			metricName = this.state.selectedMetric,
-			config = generateHighChartConfig(inputData, metricName);
+			config = generateHighChartConfig(inputData, metricName),
+			// Manually avoiding HighCharts reflow option if Data Range Picker is interacted
+			isFocusedInputState = this.state.hasOwnProperty('focusedInput');
 
-		return <ReactHighCharts config={config} />;
+		return <ReactHighCharts config={config} neverReflow={isFocusedInputState} />;
 	}
 
 	handleSelectBoxChange(metric = 'cpm') {
@@ -132,7 +137,13 @@ class NetworkWise extends Component {
 	}
 
 	focusUpdated(focusedInput) {
-		this.setState({ focusedInput });
+		const _ref = this;
+
+		this.setState({ focusedInput }, () => {
+			if (!_ref.state.focusedInput) {
+				delete _ref.state.focusedInput;
+			}
+		});
 	}
 
 	renderDateRangePickerUI() {
