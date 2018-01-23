@@ -42,7 +42,7 @@ module.exports = [
 			path: path.join(__dirname, buildPath),
 			filename: '[name].min.js',
 			chunkFilename: '[name].min.js',
-			publicPath: 'http://cdn.adpushup.com/'
+			publicPath: '//cdn.adpushup.com/'
 		},
 		resolve: {
 			alias: {
