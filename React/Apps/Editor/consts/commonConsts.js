@@ -25,7 +25,8 @@ const status = {
 		}
 	},
 	proxy = {
-		HTTP_PROXY_URL: `${window.ADP_ORIGIN}/loadFromApProxy/`,
+		HTTP_PROXY_URL: `https://proxy.app.adpushup.com/loadFromApProxy/`,
+		// HTTP_PROXY_URL: `${window.ADP_ORIGIN}/loadFromApProxy/`,
 		SIMULATED_PROXY_URL: `${window.ADP_BASEURL}/proxy/loadPage`,
 		EXTENSION_ID: 'nbbbgcccgkkkemfmbjmbelkcgjlpibon' //'jpncecfhenibcencdmcpkeplacnhpcpp'
 	},

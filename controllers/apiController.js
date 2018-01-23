@@ -1,6 +1,7 @@
 // AdPushup REST API controller
 
 var express = require('express'),
+	_ = require('lodash'),
 	router = express.Router(),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
@@ -8,7 +9,7 @@ var express = require('express'),
 	schema = require('../helpers/schema'),
 	CC = require('../configs/commonConsts'),
 	FormValidator = require('../helpers/FormValidator'),
-	_ = require('lodash'),
+	genieeDFPInfoService = require('../services/genieeDFPInfoService/index'),
 	woodlotCustomLogger = require('woodlot').customLogger;
 
 // Initialise woodlot module for geniee api custom logging
@@ -20,6 +21,29 @@ var woodlot = new woodlotCustomLogger({
 router
 	.get('/site/create', function(req, res) {
 		res.render('geniee/api/createSite');
+	})
+	.get('/site/:siteId/dfpZoneInfo', (req, res) => {
+		let siteId = req.params.siteId || false;
+		if (!siteId) {
+			return res.send({
+				error: true,
+				message: 'Site Id Missing'
+			});
+		}
+		return genieeDFPInfoService(siteId)
+			.then(response =>
+				res.send({
+					error: false,
+					result: response
+				})
+			)
+			.catch(err => {
+				console.log(err);
+				return res.send({
+					error: true,
+					message: 'Operation Failed'
+				});
+			});
 	})
 	.post('/site/create', function(req, res) {
 		var json = req.body,
@@ -111,16 +135,14 @@ router
 			})
 			.then(function(site) {
 				// Send relevant site data as API output
-				return res
-					.status(200)
-					.send({
-						success: true,
-						data: {
-							siteId: site.data.siteId,
-							siteName: site.data.siteName,
-							siteDomain: site.data.siteDomain
-						}
-					});
+				return res.status(200).send({
+					success: true,
+					data: {
+						siteId: site.data.siteId,
+						siteName: site.data.siteName,
+						siteDomain: site.data.siteDomain
+					}
+				});
 			})
 			.catch(function(err) {
 				woodlot.err({
