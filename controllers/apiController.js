@@ -27,7 +27,9 @@ router
 		if (!siteId) {
 			return res.send({
 				error: true,
-				message: 'Site Id Missing'
+				result: {
+					message: 'Site Id Missing'
+				}
 			});
 		}
 		return genieeDFPInfoService(siteId)
