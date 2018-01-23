@@ -13,7 +13,7 @@ module.exports = [
 			path: path.join(__dirname, buildPath),
 			filename: '[name].js',
 			chunkFilename: '[name].js',
-			publicPath: 'http://cdn.adpushup.com/'
+			publicPath: '//cdn.adpushup.com/'
 		},
 		resolve: {
 			alias: {
