@@ -3,25 +3,25 @@ import { immutableArrayDelete, immutablePush } from 'libs/immutableHelpers';
 import _ from 'lodash';
 
 const variation = (state = {}, action) => {
-	switch (action.type) {
-		case variationActions.ADD_VARIATION:
-			const config = action.payload;
-			return {
-				id: config.id,
-				name: config.name,
-				trafficDistribution: config.trafficDistribution,
-				createTs: config.createTs,
-				customJs: config.customJs,
-				status: config.status,
-				sections: config.sections,
-				expanded: false,
-				contentSelector: config.contentSelector || ''
-			};
+		switch (action.type) {
+			case variationActions.ADD_VARIATION:
+				const config = action.payload;
+				return {
+					id: config.id,
+					name: config.name,
+					trafficDistribution: config.trafficDistribution,
+					createTs: config.createTs,
+					customJs: config.customJs,
+					status: config.status,
+					sections: config.sections,
+					expanded: false,
+					contentSelector: config.contentSelector || ''
+				};
 
-		default:
-			return state;
-	}
-},
+			default:
+				return state;
+		}
+	},
 	variationByIds = (state = {}, action) => {
 		switch (action.type) {
 			case variationActions.ADD_VARIATION:
@@ -82,6 +82,15 @@ const variation = (state = {}, action) => {
 					[action.variation.id]: {
 						...state[action.variation.id],
 						adpKeyValues: action.adpKeyValues
+					}
+				};
+
+			case variationActions.SAVE_PERSONALIZATION_INFO:
+				return {
+					...state,
+					[action.variation.id]: {
+						...state[action.variation.id],
+						personalization: action.personalization
 					}
 				};
 
