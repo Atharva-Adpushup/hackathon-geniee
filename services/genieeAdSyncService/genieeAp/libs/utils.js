@@ -2,7 +2,9 @@ var browserConfig = require('./browserConfig.js'),
 	// eslint-disable-next-line no-undef
 	$ = require('jquery'),
 	dockify = require('./dockify'),
+	//promise polyfill
 	Base64 = require('Base64');
+require('promise-polyfill/src/polyfill');
 
 module.exports = {
 	log: function() {
