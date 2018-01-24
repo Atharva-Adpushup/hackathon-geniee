@@ -24,6 +24,22 @@ module.exports = {
 		//Using this not polyfills because native and polyfills of decode don't provide unicode support
 		return Base64.atob(data);
 	},
+	getCountry: function() {
+		return new Promise(function(resolve, reject) {
+			$.get('http://e3.adpushup.com/IpLocationPublicWebService/GetLocationInfo', function(response) {
+				if (response && response.data && response.data.country) {
+					resolve(response.data.country);
+					return;
+				} else {
+					resolve(null);
+					return;
+				}
+			}).fail(function(err) {
+				utils.log('Error in Geoapi', err);
+				resolve(null);
+			});
+		});
+	},
 	// All feedback packets are generated from this function except event 2, 3 and 4.
 	sendFeedback: function(options) {
 		var adp = window.adpushup;
