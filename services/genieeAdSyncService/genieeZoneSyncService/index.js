@@ -11,16 +11,14 @@ var config = require('../../../configs/config'),
 
 module.exports = {
 	checkGenieeUnsyncedZones: function(variationId, variationName, section, ad) {
-		// isSectionPartnerData = !!(section && section.partnerData),
-		// isCustomZoneIdData = !!(isSectionPartnerData && section.partnerData.customZoneId),
-		// isValidUnsyncedZone = !!(ad.network === 'geniee' && !ad.networkData && !ad.adCode && !isCustomZoneIdData),
-		// partnerData = {
-		// 	zonePosition: isSectionPartnerData ? section.partnerData.position : 0,
-		// 	firstView: isSectionPartnerData ? Number(section.partnerData.firstFold) : 1,
-		// 	useFriendlyIFrameFlag: isSectionPartnerData ? Number(section.partnerData.asyncTag) : 1
-		// };
 		var isValidUnsyncedZone = !!(ad.network === 'geniee' && ad.networkData && !ad.networkData.zoneId),
-			isDynamicAllocationTrue = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.dynamicAllocation);
+			isDynamicAllocationTrue = !!(
+				ad.network === 'geniee' &&
+				ad.networkData &&
+				ad.networkData.dynamicAllocation &&
+				!ad.networkData.dfpAdunit &&
+				!ad.networkData.dfpAdunitCode
+			);
 
 		if (isValidUnsyncedZone || isDynamicAllocationTrue) {
 			return {
