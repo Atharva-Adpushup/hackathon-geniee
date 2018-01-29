@@ -16,7 +16,9 @@ const Promise = require('bluebird'),
 									if (ad.network == 'geniee' && ad.networkData && ad.networkData.dynamicAllocation) {
 										output[ad.networkData.zoneId] = {
 											dfpAdunit: ad.networkData.dfpAdunit || 'Not Present',
-											dfpAdunitCode: ad.networkData.dfpAdunitCode || 'Not Present'
+											dfpAdunitCode: ad.networkData.dfpAdunitCode || 'Not Present',
+											variationId: variation.id,
+											genieePageGroupId: channel.genieePageGroupId
 										};
 									}
 								});
