@@ -5,10 +5,13 @@ const _ = require('lodash'),
 	{ ERROR_MESSAGES } = require('../../../configs/commonConsts'),
 	{ promiseForeach } = require('node-utils'),
 	isAdSynced = ad => {
+		if (!ad.network || !ad.networkData) {
+			return false;
+		}
 		if (
-			(ad.network == 'geniee' && ad.networkData && ad.networkData.zoneId) ||
-			(ad.network == 'adpTags' && ad.networkData && ad.networkData.dfpAdunit) ||
-			(ad.network && ad.adCode && typeof ad.adCode == 'string' && ad.adCode.length)
+			(ad.network == 'geniee' && ad.networkData.zoneId) ||
+			(ad.network == 'adpTags' && ad.networkData.dfpAdunit) ||
+			(typeof ad.networkData.adCode == 'string' && ad.networkData.adCode.length)
 		) {
 			return true;
 		}
@@ -33,6 +36,9 @@ const _ = require('lodash'),
 			json = {
 				id: sectionId,
 				network: ad.network,
+				//Format type of ad like, 1 for structural, 2 for incontent
+				type: section.type,
+				formatData: section.formatData,
 				css: ad.css,
 				height: parseInt(ad.height, 10),
 				width: parseInt(ad.width, 10)
@@ -58,27 +64,19 @@ const _ = require('lodash'),
 				});
 			}
 			//for geniee provide networkData
-			if (ad.network == 'geniee' && ad.networkData) {
-				json.networkData = {
-					zoneId: ad.networkData.zoneId
-				};
-			} else if (ad.network == 'adpTags') {
-				json.networkData = {
-					dfpAdunit: ad.networkData.dfpAdunit,
-					dfpAdunitCode: ad.networkData.dfpAdunitCode,
-					headerBidding: ad.networkData.headerBidding,
-					priceFloor: ad.networkData.priceFloor
-				};
+			if (ad.network == 'adpTags') {
 				ADPTags.push({
 					key: `${json.width}x${json.height}`,
 					height: json.height,
 					width: json.width,
 					dfpAdunit: ad.networkData.dfpAdunit,
-					dfpAdunitCode: ad.networkData.dfpAdunitCode
+					dfpAdunitCode: ad.networkData.dfpAdunitCode,
+					headerBidding: ad.networkData.headerBidding,
+					keyValues: ad.networkData.keyValues
 				});
-			} else {
-				json.adCode = ad.adCode;
 			}
+			//Sending whole network data object in ad.
+			json.networkData = ad.networkData;
 
 			ads.push(json);
 		});
@@ -87,7 +85,9 @@ const _ = require('lodash'),
 	},
 	getVariationPayload = (variation, platform, pageGroup, variationData, finalJson) => {
 		var ads = getSectionsPayload(variation.sections),
-			computedVariationObj;
+			computedVariationObj,
+			contentSelector = variation.contentSelector,
+			isContentSelector = !!contentSelector;
 
 		if (!ads.length) {
 			return true;
@@ -98,13 +98,16 @@ const _ = require('lodash'),
 			name: variation.name,
 			traffic: variation.trafficDistribution,
 			customJs: variation.customJs,
+			adpKeyValues: variation.adpKeyValues,
+			contentSelector: isContentSelector ? contentSelector : '',
 			ads: ads,
 			// Data required for auto optimiser model
-			// pageRPM is mapped as sum
-			sum: variationData && parseFloat(variationData.pageRPM) > -1 ? variationData.pageRPM : 1,
+			// Page revenue is mapped as sum
+			sum:
+				variationData && parseFloat(variationData.pageRevenue) > -1 ? Math.floor(variationData.pageRevenue) : 1,
 			// Data required for auto optimiser model
 			// Page view is mapped as count
-			count: variationData && parseInt(variationData.pageViews, 10) > -1 ? variationData.pageViews : 1
+			count: variationData && parseInt(variationData.pageViews, 10) > -1 ? Math.floor(variationData.pageViews) : 1
 		};
 
 		return computedVariationObj;
@@ -135,7 +138,8 @@ const _ = require('lodash'),
 		finalJson[platform][pageGroup] = {
 			variations: [],
 			contentSelector: channel.contentSelector,
-			pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup)
+			pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup),
+			hasVariationsWithNoData: false
 		};
 
 		_.each(channel.variations, (variation, id) => {
@@ -143,6 +147,10 @@ const _ = require('lodash'),
 			let variationPayload = getVariationPayload(variation, platform, pageGroup, variationData, finalJson);
 			if (typeof variationPayload == 'object' && Object.keys(variationPayload).length) {
 				finalJson[platform][pageGroup].variations.push(variationPayload);
+				finalJson[platform][pageGroup].hasVariationsWithNoData =
+					finalJson[platform][pageGroup].hasVariationsWithNoData == false
+						? variationData == null ? true : false
+						: finalJson[platform][pageGroup].hasVariationsWithNoData;
 			}
 		});
 		if (!Object.keys(finalJson[platform][pageGroup].variations).length) {

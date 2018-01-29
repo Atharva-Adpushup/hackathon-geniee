@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PartnerOptionsCreator from './PartnerOptionsCreator.jsx';
-import SelectBox from '../../../../Components/SelectBox.jsx';
+import SelectBox from '../../../../Components/SelectBox/index.jsx';
 import { cloneElement } from '../../lib/helpers';
 import { findIndex, filter } from 'lodash';
 

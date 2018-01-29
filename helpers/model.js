@@ -131,24 +131,24 @@ var consts = require('../configs/commonConsts'),
 		};
 
 		/**
-	 * OBJECTIVE: Merge any object that follows a particular schema (see /Applications/MAMP/htdocs/GenieeAdPushup/models/subClasses/site/apConfig.js for schema)
-	 * PURPOSE: An implementation was required to merge any object that follow a schema configuration
-	 * IMPLEMENTATION: Following is the algorithm procedure:
-	 * 1) - Union object keys of existing and new data
-	 * 2) - Set final computed object base as a deep extend of existing data
-	 * 3) - Iterate over union keys and get existing and new object based on iterator key
-	 * 4) - Evaluate existing and new data types and existence in variables
-	 * 5) - Perform 2 checks and set computed object based on them:
-	 * 	    1) If current union key is in 'override' array,
-	 * 		set new data as final computed value differentiated by data types
-	 *      2) If current union key is in 'merge' array,
-	 * 		set merged data as final computed value differentiated by data types
-	 * 6) - Return computed merged nested object
-	 * @param {existingData} server side data (saved in database)
-	 * @param {newData} client side json (product's client side, background service etc.)
-	 * @param {schema} a JSON structure that defines model
-	 * @returns {object} merged nested object
-	 */
+		 * OBJECTIVE: Merge any object that follows a particular schema (see /Applications/MAMP/htdocs/GenieeAdPushup/models/subClasses/site/apConfig.js for schema)
+		 * PURPOSE: An implementation was required to merge any object that follow a schema configuration
+		 * IMPLEMENTATION: Following is the algorithm procedure:
+		 * 1) - Union object keys of existing and new data
+		 * 2) - Set final computed object base as a deep extend of existing data
+		 * 3) - Iterate over union keys and get existing and new object based on iterator key
+		 * 4) - Evaluate existing and new data types and existence in variables
+		 * 5) - Perform 2 checks and set computed object based on them:
+		 * 	    1) If current union key is in 'override' array,
+		 * 		set new data as final computed value differentiated by data types
+		 *      2) If current union key is in 'merge' array,
+		 * 		set merged data as final computed value differentiated by data types
+		 * 6) - Return computed merged nested object
+		 * @param {existingData} server side data (saved in database)
+		 * @param {newData} client side json (product's client side, background service etc.)
+		 * @param {schema} a JSON structure that defines model
+		 * @returns {object} merged nested object
+		 */
 		this.mergeObjectViaClassMap = function(existingData = {}, newData = {}, schema) {
 			var unionKeys = _.union(Object.keys(existingData), Object.keys(newData)),
 				computedData = extend(true, {}, existingData),

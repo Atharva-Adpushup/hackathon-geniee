@@ -4,6 +4,7 @@ var $ = require('jquery'),
 	browserConfig = require('../libs/browserConfig'),
 	incontentAnalyser = require('../libs/aa'),
 	adCodeGenerator = require('./adCodeGenerator'),
+	commonConsts = require('../config/commonConsts'),
 	segregateAds = function(ads) {
 		var a,
 			ad,
@@ -14,7 +15,10 @@ var $ = require('jquery'),
 		for (a = 0; a < ads.length; a++) {
 			ad = ads[a];
 			ad.isIncontent ? inContentAds.push(ad) : structuredAds.push(ad);
-			ad.network === 'geniee' && !ad.adCode && ad.networkData && genieeIds.push(ad.networkData.zoneId);
+			ad.network === 'geniee' &&
+				ad.networkData &&
+				!ad.networkData.adCode &&
+				genieeIds.push(ad.networkData.zoneId);
 			ad.network === 'adpTags' && ad.networkData && adpTagUnits.push(ad);
 		}
 
@@ -36,7 +40,7 @@ var $ = require('jquery'),
 			.css(
 				$.extend(
 					{
-						display: ad.network === 'geniee' && !ad.adCode ? 'none' : 'block',
+						display: ad.network === 'geniee' && !ad.networkData.adCode ? 'none' : 'block',
 						clear: ad.isIncontent ? null : 'both',
 						width: ad.width + 'px',
 						height: ad.height + 'px'
@@ -45,7 +49,10 @@ var $ = require('jquery'),
 				)
 			)
 			.attr({
-				id: ad.network === 'geniee' && !ad.adCode ? '_ap_apexGeniee_ad_' + ad.networkData.zoneId : ad.id,
+				id:
+					ad.network === 'geniee' && !ad.networkData.adCode
+						? '_ap_apexGeniee_ad_' + ad.networkData.zoneId
+						: ad.id,
 				'data-section': ad.id,
 				class: '_ap_apex_ad',
 				'data-xpath': ad.xpath ? ad.xpath : '',
@@ -90,6 +97,7 @@ var $ = require('jquery'),
 			finished = false,
 			ads = variation.ads,
 			displayCounter = ads.length,
+			contentSelector = variation.contentSelector,
 			feedbackData = {
 				ads: [],
 				xpathMiss: [],
@@ -98,14 +106,45 @@ var $ = require('jquery'),
 				referrer: config.referrer,
 				tracking: browserConfig.trackerSupported,
 				// Replaced '-' with '_' to avoid ElasticSearch split issue
-				variationId: variation.id.replace(/-/gi, '_') // set the chosenVariation variation in feedback data;
+				variationId: variation.id // set the chosenVariation variation in feedback data;
 			},
-			pushAdToGlobalConfig = function(obj) {
-				var isAdsObject = !!(adp.config && adp.config.ads),
-					adObject = $.extend(true, {}, obj);
+			// Push Ad object in Geniee global 'ads' object and invoke feedback request mechanism
+			pushAdToGenieeConfig = function(obj, containerId) {
+				var isGenieeAdsObject = !!(adp.geniee && adp.geniee.ads),
+					isGenieeAd = !!(obj && obj.network && obj.network === 'geniee' && obj.networkData),
+					isZoneId = !!(isGenieeAd && obj.networkData.zoneId),
+					adObject = $.extend(true, {}, obj),
+					zoneId;
 
-				!isAdsObject ? (adp.config.ads = []) : null;
-				adp.config.ads.push(adObject);
+				if (!isGenieeAd) {
+					utils.log('PushToGenieeAdsObject: Non Geniee ad found, will not be added to its ads object.');
+					return false;
+				}
+
+				if (!isZoneId) {
+					utils.log(
+						'PushToGenieeAdsObject: Invalid zoneId found for Geniee ad, will not be added to its ads object.'
+					);
+					return false;
+				}
+
+				zoneId = obj.networkData.zoneId;
+				adObject.containerId = containerId || '';
+				// Below 'success' property means that Geniee ad has been successfully inserted into DOM
+				adObject.success = true;
+
+				// Below 'isImpressionFeedback' property means that Geniee revenue keenIO impression request has not been sent yet
+				// for this ad
+				adObject.isImpressionFeedback = false;
+
+				if (!isGenieeAdsObject) {
+					adp.geniee = {
+						ads: {}
+					};
+				}
+
+				adp.geniee.ads[zoneId] = adObject;
+				adp.geniee.sendRevenueFeedback ? adp.geniee.sendRevenueFeedback(zoneId) : null;
 			},
 			placeGenieeHeadCode = function(genieeIds) {
 				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIds);
@@ -116,6 +155,12 @@ var $ = require('jquery'),
 					$.ajaxSettings.cache = true;
 					container.append(adCodeGenerator.generateAdCode(ad));
 					$.ajaxSettings.cache = false;
+
+					if (ad.type && Number(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL) {
+						// Type 4 is DOCKED
+						utils.dockify.dockifyAd('#' + ad.id, ad.formatData, utils);
+					}
+
 					tracker.add(
 						container,
 						function(id) {
@@ -160,10 +205,17 @@ var $ = require('jquery'),
 				$.each(structuredAds, function(index, ad) {
 					getAdContainer(ad, config.xpathWaitTimeout)
 						.done(function(data) {
+							var isContainerElement = !!(data.container && data.container.length),
+								containerId = isContainerElement ? data.container.get(0).id : '',
+								isGenieeAd = !!(ad && ad.network && ad.network === 'geniee' && ad.networkData);
+
+							if (isGenieeAd) {
+								// Add 'ad' object to global geniee ads object when network is matched
+								pushAdToGenieeConfig(ad, containerId);
+							}
+
 							// if all well then ad id of ad in feedback to tell system that impression was given
 							feedbackData.ads.push(ad.id);
-							// Add 'ad' object to global config ads array
-							pushAdToGlobalConfig(ad);
 							next(ad, data);
 						})
 						.fail(function(data) {
@@ -175,16 +227,29 @@ var $ = require('jquery'),
 			placeInContentAds = function($incontentElm, inContentAds) {
 				incontentAnalyser($incontentElm, inContentAds, function(sectionsWithTargetElm) {
 					$(inContentAds).each(function(index, ad) {
-						var sectionObj = sectionsWithTargetElm[ad.section];
+						var sectionObj = sectionsWithTargetElm[ad.section],
+							$containerElement,
+							isContainerElement,
+							containerId,
+							isGenieeAd = !!(ad && ad.network && ad.network === 'geniee' && ad.networkData);
 
 						if (sectionObj && sectionObj.elem) {
 							if (!!sectionObj.isSecondaryCss) {
 								ad.css = $.extend(true, {}, ad.secondaryCss);
 							}
+
 							feedbackData.ads.push(ad.id);
-							// Add 'ad' object to global config ads array
-							pushAdToGlobalConfig(ad);
-							next(ad, { success: true, container: getContainer(ad, sectionObj.elem) });
+
+							$containerElement = getContainer(ad, sectionObj.elem);
+							isContainerElement = !!($containerElement && $containerElement.length);
+							containerId = isContainerElement ? $containerElement.get(0).id : '';
+
+							if (isGenieeAd) {
+								// Add 'ad' object to global geniee ads object when network is matched
+								pushAdToGenieeConfig(ad, containerId);
+							}
+
+							next(ad, { success: true, container: $containerElement });
 						} else {
 							feedbackData.xpathMiss.push(ad.id);
 							next(ad, { success: false, container: null });
@@ -209,7 +274,7 @@ var $ = require('jquery'),
 			}
 
 			if (ads.adpTagUnits.length) {
-				adCodeGenerator.executeAdpTagsCode(ads.adpTagUnits);
+				adCodeGenerator.executeAdpTagsHeadCode(ads.adpTagUnits, variation.adpKeyValues);
 			}
 
 			// Process and place structural ads
@@ -217,11 +282,11 @@ var $ = require('jquery'),
 
 			// Process incontent sections
 			// If incontent ads thr but no xpath given for content area
-			if (ads.inContentAds.length && !config.contentSelector) {
+			if (ads.inContentAds.length && !contentSelector) {
 				handleContentSelectorFailure(ads.inContentAds);
 			} else if (ads.inContentAds.length) {
 				nodewatcher
-					.watch(config.contentSelector, config.xpathWaitTimeout)
+					.watch(contentSelector, config.xpathWaitTimeout)
 					.done(function($incontentElm) {
 						placeInContentAds($incontentElm, ads.inContentAds);
 					})

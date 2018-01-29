@@ -26,7 +26,8 @@ const status = {
 	},
 	proxy = {
 		HTTP_PROXY_URL: `${window.ADP_ORIGIN}/loadFromApProxy/`,
-		SIMULATED_PROXY_URL: `${window.ADP_BASEURL}/proxy/loadPage`
+		SIMULATED_PROXY_URL: `${window.ADP_BASEURL}/proxy/loadPage`,
+		EXTENSION_ID: 'nbbbgcccgkkkemfmbjmbelkcgjlpibon' //'jpncecfhenibcencdmcpkeplacnhpcpp'
 	},
 	stores = {
 		SITE_STORE: 'siteStore',
@@ -84,7 +85,8 @@ const status = {
 		XPATH_VALIDATED: 'XPATH_VALIDATED',
 		VALIDATE_XPATH_SECTION: 'VALIDATE_XPATH_SECTION',
 		XPATH_SECTION_VALIDATED: 'XPATH_SECTION_VALIDATED',
-		SCROLL_TO_VIEW: 'SCROLL_TO_VIEW'
+		SCROLL_TO_VIEW: 'SCROLL_TO_VIEW',
+		SET_MODE: 'SET_MODE'
 	},
 	siteModes = {
 		DRAFT: 2,
@@ -176,7 +178,9 @@ const status = {
 		SHRINK_VARIATION_PANEL: 'SHRINK_VARIATION_PANEL',
 		TOGGLE_VARIATION_PANEL: 'TOGGLE_VARIATION_PANEL',
 		OPEN_VARIATION_PANEL: 'OPEN_VARIATION_PANEL',
-		CLOSE_VARIATION_PANEL: 'CLOSE_VARIATION_PANEL'
+		CLOSE_VARIATION_PANEL: 'CLOSE_VARIATION_PANEL',
+		UPDATE_CONTENT_SELECTOR: 'UPDATE_CONTENT_SELECTOR',
+		SAVE_KEY_VALUES: 'SAVE_KEY_VALUES'
 	},
 	sectionActions = {
 		CREATE_SECTION: 'CREATE_SECTION',
@@ -191,14 +195,18 @@ const status = {
 		VALIDATE_XPATH: 'VALIDATE_XPATH',
 		VALIDATE_XPATH_SECTION: 'VALIDATE_XPATH_SECTION',
 		UPDATE_INCONTENT_FLOAT: 'UPDATE_INCONTENT_FLOAT',
-		SCROLL_TO_VIEW: 'SCROLL_TO_VIEW'
+		SCROLL_TO_VIEW: 'SCROLL_TO_VIEW',
+		UPDATE_TYPE: 'UPDATE_TYPE',
+		UPDATE_FORMAT_DATA: 'UPDATE_FORMAT_DATA',
+		UPDATE_SECTION: 'UPDATE_SECTION'
 	},
 	adActions = {
 		CREATE_AD: 'CREATE_AD',
 		DELETE_AD: 'DELETE_AD',
 		UPDATE_ADCODE: 'UPDATE_ADCODE',
 		UPDATE_CSS: 'UPDATE_CSS',
-		UPDATE_NETWORK: 'UPDATE_NETWORK'
+		UPDATE_NETWORK: 'UPDATE_NETWORK',
+		UPDATE_AD: 'UPDATE_AD'
 	},
 	hbBoxActions = {
 		HIDE_HB_BOX: 'HIDE_HB_BOX',
@@ -212,11 +220,19 @@ const status = {
 	innerActions = {
 		HIDE_ELEMENT_SELECTOR: 'HIDE_ELEMENT_SELECTOR',
 		SET_ELEMENT_SELECTOR_CORDS: 'SET_ELEMENT_SELECTOR_CORDS',
-		UPDATE_CONTENT_OVERLAY: 'UPDATE_CONTENT_OVERLAY'
+		UPDATE_CONTENT_OVERLAY: 'UPDATE_CONTENT_OVERLAY',
+		SET_MODE: 'SET_MODE'
 	},
 	uiActions = {
 		RESET_ERRORS: 'RESET_ERRORS',
-		UPDATE_AFTER_SAVE_STATUS: 'UPDATE_AFTER_SAVE_STATUS'
+		UPDATE_AFTER_SAVE_STATUS: 'UPDATE_AFTER_SAVE_STATUS',
+		SET_MODE: 'SET_MODE',
+		SHOW_NOTIFICATION: 'SHOW_NOTIFICATION',
+		HIDE_NOTIFICATION: 'HIDE_NOTIFICATION'
+	},
+	reportingActions = {
+		SET_REPORT: 'SET_REPORT',
+		GET_REPORT: 'GET_REPORT'
 	},
 	components = {
 		INSERT_CONTEXTMENU: 'INSERT_CONTEXTMENU',
@@ -310,6 +326,33 @@ const status = {
 		'margin-right': '0px',
 		'margin-top': '0px',
 		'margin-bottom': '5px'
+	},
+	uiModes = {
+		EDITOR_MODE: 1,
+		BROWSE_MODE: 2
+	},
+	networks = ['adsense', 'adx', 'adpTags', 'dfp', 'custom', 'geniee'],
+	priceFloorKeys = ['FP_S_A', 'FP_B_A', 'FP_S', 'FP_A', 'FP_B'],
+	defaultPriceFloorKey = 'FP_S_A',
+	reportingUrl = '/user/reports/generate',
+	jsWrapper = `(function($){ \n\n })(adpushup.$)`,
+	interactiveAds = {
+		events: ['DOMContentLoaded', 'scroll'], //load', 'scroll', 'onMills',
+		sizes: {
+			DESKTOP: {
+				sticky: {
+					bottom: ['300x50', '300x100', '320x100', '728x90'],
+					left: ['160x600', '336x280', '300x250', '300x600', '300x50', '120x600'],
+					right: ['160x600', '336x280', '300x250', '300x600', '300x50', '120x600']
+				}
+			},
+			MOBILE: {
+				sticky: {
+					bottom: ['336x280', '300x250', '300x50', '320x100', '300x100']
+				}
+			}
+		},
+		types: ['stickyBottom', 'stickyLeft', 'stickyRight']
 	};
 
 export {
@@ -343,5 +386,13 @@ export {
 	ui,
 	uiCollections,
 	floats,
-	partners
+	partners,
+	uiModes,
+	networks,
+	reportingActions,
+	reportingUrl,
+	priceFloorKeys,
+	defaultPriceFloorKey,
+	jsWrapper,
+	interactiveAds
 };

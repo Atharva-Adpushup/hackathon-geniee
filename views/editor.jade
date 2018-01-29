@@ -30,6 +30,7 @@ block append headScripts
         window.ADP_SITE_DOMAIN = "#{domain}";
         window.ADP_SITE_ID = #{siteId};
         window.ADP_ENVIRONMENT = "#{environment}";
+        window.isSuperUser = #{isSuperUser};
        
     if channels.length
         +loadAsset("js", [
@@ -39,7 +40,7 @@ block append headScripts
             //'/assets/js/builds/shim.js',
             // '/assets/js/libs/third-party/underscore.js',
             //'/assets/js/lodash.js',
-            '/assets/js/builds/outer.js'
+            '/assets/js/builds/outer.js?v=1512052159832'
         ])
 
     link(rel="chrome-webstore-item", href="https://chrome.google.com/webstore/detail/lbfaiagkagpgeefmnpefcibmpeccpjpi")

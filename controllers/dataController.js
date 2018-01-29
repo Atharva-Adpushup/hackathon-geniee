@@ -5,21 +5,92 @@ var express = require('express'),
 	adsenseReportModel = require('../models/adsenseModel'),
 	apexVariationRpmService = require('../reports/default/apex/pageGroupVariationRPM/service'),
 	apexParameterModule = require('../reports/default/apex/modules/params/index'),
-	sqlQueryModule = require('../reports/default/apex/vendor/mssql/queryHelpers/fullSiteData'),
+	sqlQueryModule = require('../reports/default/common/mssql/queryHelpers/fullSiteData'),
 	apexSingleChannelVariationModule = require('../reports/default/apex/modules/mssql/singleChannelVariationData'),
-	singleChannelVariationQueryHelper = require('../reports/default/apex/vendor/mssql/queryHelpers/singleChannelVariationData'),
-	liveSitesService = require('../services/liveSites/index'),
+	singleChannelVariationQueryHelper = require('../reports/default/common/mssql/queryHelpers/singleChannelVariationData'),
+	liveSitesService = require('../misc/scripts/adhoc/liveSites/index'),
 	Promise = require('bluebird'),
 	extend = require('extend'),
+	lodash = require('lodash'),
 	CC = require('../configs/commonConsts'),
 	config = require('../configs/config'),
-	lodash = require('lodash'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
 	pipedriveAPI = require('../misc/vendors/pipedrive'),
+	sqlReporting = require('../reports/default/adpTags/index'),
+	{ queryResultProcessing } = require('../helpers/commonFunctions'),
 	router = express.Router(),
 	couchbase = require('../helpers/couchBaseService'),
 	N1qlQuery = require('couchbase-promises').N1qlQuery;
+
+function getReportingData(channels, siteId) {
+	if (config && config.hasOwnProperty('reporting') && !config.reporting.activated) {
+		return Promise.resolve({});
+	}
+	let channelNames = lodash.map(channels, 'pageGroup');
+	let variationNames = lodash.flatten(lodash.map(channels, channel => Object.keys(channel.variations)));
+	let reportingParams = {
+		select: ['total_xpath_miss', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
+		where: {
+			siteid: siteId,
+			pagegroup: channelNames,
+			variation: variationNames
+		},
+		groupBy: ['section']
+	};
+	return sqlReporting
+		.generate(reportingParams)
+		.then(queryResultProcessing)
+		.catch(err => {
+			console.log(err);
+			return {};
+		});
+}
+
+function isPipeDriveAPIActivated() {
+	return !!(
+		config.hasOwnProperty('analytics') &&
+		config.analytics.hasOwnProperty('pipedriveActivated') &&
+		config.analytics.pipedriveActivated
+	);
+}
+
+function isEmailInAnalyticsBlockList(email) {
+	const blockList = CC.analytics.emailBlockList,
+		isEmailInBLockList = blockList.indexOf(email) > -1;
+
+	return isEmailInBLockList;
+}
+
+function getSiteLevelPipeDriveData(user, inputData) {
+	let allSites = user.get('sites'),
+		isAllSites = !!(allSites && allSites.length),
+		resultData = {};
+
+	if (!isAllSites) {
+		throw new AdPushupError('getSiteLevelPipeDriveData: User sites are empty');
+	}
+
+	lodash.forEach(allSites, siteObject => {
+		const siteDomain = utils.domanize(siteObject.domain),
+			inputDomain = utils.domanize(inputData.domain),
+			isDomainMatch = !!(siteDomain === inputDomain);
+		let isPipeDriveData;
+
+		if (!isDomainMatch) {
+			return true;
+		}
+
+		isPipeDriveData = siteObject.pipeDrive && siteObject.pipeDrive.dealId && siteObject.pipeDrive.dealTitle;
+		resultData = {
+			dealId: isPipeDriveData ? siteObject.pipeDrive.dealId : null,
+			dealTitle: isPipeDriveData ? siteObject.pipeDrive.dealTitle : null
+		};
+		return false;
+	});
+
+	return Promise.resolve(resultData);
+}
 
 router
 	.get('/getData', function(req, res) {
@@ -34,12 +105,18 @@ router
 						computedJSON.siteId = siteId;
 						computedJSON.channels = channels;
 						computedJSON.site = site.toClientJSON();
+						computedJSON.reporting = {};
 						return res.json(computedJSON);
+						// return getReportingData(channels, siteId).then(reporting => {
+						// 	computedJSON.reporting = reporting;
+						// 	return res.json(computedJSON);
+						// });
 					});
 				},
 				function() {
 					computedJSON.channels = [];
 					computedJSON.site = {};
+					computedJSON.reporting = {};
 					return res.json(computedJSON);
 				}
 			)
@@ -84,6 +161,24 @@ router
 			.catch(function(err) {
 				res.send({ success: 0 });
 			});
+	})
+	.get('/getVariations', (req, res) => {
+		const { siteId, platform, pageGroup } = req.query;
+
+		return channelModel
+			.getVariations(siteId, platform, pageGroup)
+			.then(variationsData => {
+				let variations = [];
+				for (v in variationsData.variations) {
+					variations.push({
+						name: variationsData.variations[v].name,
+						id: variationsData.variations[v].id
+					});
+				}
+
+				res.send({ error: false, data: variations });
+			})
+			.catch(err => res.send({ error: true, message: 'Error while fetching result. Please try later.' }));
 	})
 	.get('/getPageGroupVariationRPM', function(req, res) {
 		const reportConfig = extend(true, {}, req.query),
@@ -316,15 +411,39 @@ router
 			});
 	})
 	.post('/updateCrmDealStatus', function(req, res) {
+		const email = req.session.user.email;
+
 		return userModel
-			.getUserByEmail(req.session.user.email)
+			.getUserByEmail(email)
 			.then(user => {
-				if (!user || !user.get('data') || !user.get('data').crmDealId) {
-					return Promise.reject('No CRM deal id found');
+				const isUser = !!user,
+					stageId = req.body.status,
+					siteDomain = req.body.domain,
+					isValidParameters = !!(stageId && siteDomain),
+					isAPIActivated = isPipeDriveAPIActivated(),
+					isEmailInBLockList = isEmailInAnalyticsBlockList(email);
+
+				if (!isUser) {
+					return Promise.reject('UpdateCrmDealStatus: User does not exist');
+				} else if (!isValidParameters) {
+					return Promise.reject('UpdateCrmDealStatus: Invalid request body parameters');
+				} else if (!isAPIActivated || isEmailInBLockList) {
+					return user;
 				}
-				return pipedriveAPI('updateDeal', {
-					deal_id: user.data.crmDealId,
-					stage_id: req.body.status
+
+				return getSiteLevelPipeDriveData(user, { domain: siteDomain }).then(pipeDriveData => {
+					const isValidData = !!(pipeDriveData && pipeDriveData.dealId && pipeDriveData.dealTitle);
+
+					if (!isValidData) {
+						return Promise.reject(
+							`UpdateCrmDealStatus: Invalid PipeDrive deal id for siteDomain: ${siteDomain}`
+						);
+					}
+
+					return pipedriveAPI('updateDeal', {
+						deal_id: pipeDriveData.dealId,
+						stage_id: stageId
+					});
 				});
 			})
 			.then(() => res.send({ success: 1 }))

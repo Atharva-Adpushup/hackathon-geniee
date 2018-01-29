@@ -1,8 +1,9 @@
 module.exports = {
-	PREBID_TIMEOUT: 700,
+	PREBID_TIMEOUT: 1000,
 	NETWORK_ID: 103512698,
 	SITE_ID: __SITE_ID__,
 	INVENTORY: __INVENTORY__,
+	PAGE_KEY_VALUES: { da: 'adx' },
 	SLOT_INTERVAL: 50,
 	MEDIATION_API_URL: '//s2s.adpushup.com/MediationWebService/',
 	HB_STATUS: {
@@ -27,9 +28,13 @@ module.exports = {
 		bidderName: 'adxbackfill'
 	},
 	ADX_FLOOR: {
+		priceFloorKeys: ['FP_S_A', 'FP_S', 'FP_B', 'FP_B_A', 'FP_A'],
 		//Use this key to override floor
 		cpm: 0.01,
 		key: 'FP_S_A' // FP_B, FP_A, FP_S, FP_B_A, FP_S_A (key available, FP - floor price, B-Branded, S-Semi transparent, A-Anonymous)
+	},
+	C1X: {
+		pixelId: 1236239
 	},
 	DEFAULT_WINNER: 'adx',
 	FEEDBACK_URL: 'http://apdc1-webapp-creativeqa.azurewebsites.net/feedback2',
@@ -51,8 +56,6 @@ module.exports = {
 		'var pbjs = pbjs || {};' +
 		'pbjs.que = pbjs.que || [];' +
 		'var PREBID_TIMEOUT = __PB_TIMEOUT__;' +
-		//"var SLOT_ID = __PB_SLOT_ID__;" +
-		//"var CONTAINER_ID = __PB_CONTAINER_ID__;" +
 		"var PAGE_URL = '__PAGE_URL__';" +
 		'var ADP_BATCH_ID = __ADP_BATCH_ID__;' +
 		"var prebidScript = document.createElement('script');" +
@@ -85,8 +88,15 @@ module.exports = {
 		"pbjs.setPriceGranularity('dense');" +
 		"pbjs.setBidderSequence('random');" +
 		'pbjs.addAdUnits(__AD_UNIT_CODE__);' +
+		'pbjs.bidderSettings = {' +
+		'c1x: {' +
+		'pixelId: __C1X_PIXEL_ID__,' +
+		'siteId: __C1X_SITE_ID__' +
+		'}' +
+		'};' +
 		"pbjs.aliasBidder('appnexus', 'springserve');" + // SpringServe specific bidder aliasing
 		"pbjs.aliasBidder('appnexus', 'brealtime');" + // bRealTime specific bidder aliasing
+		"pbjs.aliasBidder('appnexus', 'brainjuicemedia');" + // brainjuicemedia specific bidder aliasing
 		"pbjs.onEvent('bidTimeout', function(timedOutBidders) {" +
 		'parent.__prebidTimeoutCallback(ADP_BATCH_ID, timedOutBidders, PREBID_TIMEOUT);' +
 		'});' +

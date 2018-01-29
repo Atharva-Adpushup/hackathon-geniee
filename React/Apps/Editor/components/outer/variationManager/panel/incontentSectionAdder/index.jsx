@@ -1,12 +1,14 @@
 // In-content section component
 
 import React, { PropTypes } from 'react';
-import { reduxForm } from 'redux-form';
-import validate from './inContentValidations';
+import { reduxForm, change, registerField } from 'redux-form';
 import { connect } from 'react-redux';
-import { createIncontentSection } from 'actions/sectionActions';
-import { commonSupportedSizes, nonPartnerAdSizes } from 'consts/commonConsts.js';
 import _ from 'lodash';
+import validate from './inContentValidations';
+import { createIncontentSection } from 'actions/sectionActions';
+import { showNotification } from 'actions/uiActions';
+import { getCustomSizes } from 'selectors/siteSelectors';
+import { commonSupportedSizes, nonPartnerAdSizes } from 'consts/commonConsts.js';
 import { renderInContentAdder } from './renderMethods';
 
 const form = reduxForm({
@@ -29,7 +31,7 @@ const form = reduxForm({
 
 		return computedArr;
 	},
-	getSupportedSizes = () => {
+	getSupportedSizes = (customSizes = []) => {
 		const sizes = [];
 		commonSupportedSizes.forEach(size => {
 			size.sizes.forEach(adSize => {
@@ -43,6 +45,9 @@ const form = reduxForm({
 					sizes.push(`${adSize.width} x ${adSize.height}`);
 				});
 			});
+			customSizes.forEach(adSize => {
+				sizes.push(`${adSize.width} x ${adSize.height}`);
+			});
 		}
 
 		return _.uniq(sizes);
@@ -51,23 +56,19 @@ const form = reduxForm({
 class inContentForm extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { addCustomAdCode: false, network: false, headerBidding: true, selectedElement: false };
+		this.state = { networkInfo: false, selectedElement: false };
+		this.setNetwork = this.setNetwork.bind(this);
 	}
 
-	showCustomAdCodeBox() {
-		this.setState({ addCustomAdCode: true });
-	}
-
-	hideCustomAdCodeBox() {
-		this.setState({ addCustomAdCode: false });
-	}
-
-	setNetwork(event) {
-		this.setState({ network: event.target.value });
-	}
-
-	switchChangeHandler(value) {
-		this.setState({ headerBidding: !!value });
+	setNetwork(data) {
+		this.setState({ networkInfo: data }, () => {
+			/**
+			 * Added to window because wasn't able to add network data to redux-form and no way to intercept handleSubmit call
+			 * Added to window object so that can be accessed in the onSubmit handler below
+			 */
+			window.networkInfo = data;
+			this.props.handleSubmit();
+		});
 	}
 
 	setFocusElement(event) {
@@ -79,14 +80,14 @@ class inContentForm extends React.Component {
 		const props = this.props;
 		return (
 			<div>
-				{props.activeChannel.contentSelector ? (
+				{props.variation.contentSelector ? (
 					renderInContentAdder(this, getSupportedSizes)
 				) : (
 					<div>
 						<h1 className="variation-section-heading">Add Incontent Variation</h1>
 						<p className="error-message" style={{ fontSize: '1em' }}>
-							Please set your <strong>Content Selector</strong> in the channel settings first to create
-							your in-content section.
+							Please set your <strong>Content Selector</strong> in Info settings panel first to create
+							in-content sections.
 						</p>
 					</div>
 				)}
@@ -96,11 +97,13 @@ class inContentForm extends React.Component {
 }
 
 inContentForm.propTypes = {
-	handleSubmit: PropTypes.func.isRequired
+	handleSubmit: PropTypes.func.isRequired,
+	showNotification: PropTypes.func
 };
 
 const mapStateToProps = (state, ownProps) => ({
 		...ownProps,
+		customSizes: getCustomSizes(state),
 		initialValues: {
 			section: 1,
 			float: 'none',
@@ -110,43 +113,48 @@ const mapStateToProps = (state, ownProps) => ({
 	}),
 	mapDispatchToProps = (dispatch, ownProps) => ({
 		onSubmit: values => {
-			if (currentUser.userType != 'partner' && !values.network) {
-				alert('Please select a network');
+			let networkInfo = window.networkInfo;
+			if (!networkInfo && !networkInfo.network) {
+				dispatch(
+					showNotification({
+						mode: 'error',
+						title: 'Network missing',
+						message: 'Please select a network'
+					})
+				);
 				return false;
 			}
 			const notNear = getNotNearData(values.notNear),
-				isCustomZoneId = !!values.customZoneId,
+				// isCustomZoneId = !!values.customZoneId,
 				sectionPayload = {
 					sectionNo: values.section,
+					name: values.name,
 					minDistanceFromPrevAd: values.minDistanceFromPrevAd,
 					float: values.float,
-					notNear,
-					partnerData: {
-						position: 0,
-						firstFold: 0,
-						asyncTag: 1,
-						customZoneId: values.customZoneId ? values.customZoneId : ''
-					}
+					notNear
+					// partnerData: {
+					// 	position: 0,
+					// 	firstFold: 0,
+					// 	asyncTag: 1,
+					// 	customZoneId: values.customZoneId ? values.customZoneId : ''
+					// }
 				},
 				adPayload = {
 					adCode: btoa(values.adCode),
 					adSize: values.adSize,
-					network: values.network
+					network: networkInfo.network,
+					networkData: {}
 				};
 
-			if (isCustomZoneId) {
-				adPayload.networkData = {
-					zoneId: values.customZoneId
-				};
-			}
-			if (values.network && values.network == 'adpTags') {
-				adPayload.networkData = {
-					priceFloor: parseInt(values.priceFloor) || 0,
-					headerBidding: values.hasOwnProperty('headerBidding') ? !!values.headerBidding : true
-				};
-			}
+			// isCustomZoneId ? (adPayload.networkData.zoneId = values.customZoneId) : null;
+
+			adPayload.networkData = {
+				...adPayload.networkData,
+				...networkInfo.networkData
+			};
 			dispatch(createIncontentSection(sectionPayload, adPayload, ownProps.variation.id));
-		}
+		},
+		showNotification: params => dispatch(showNotification(params))
 	});
 
 export default connect(mapStateToProps, mapDispatchToProps)(form(inContentForm));

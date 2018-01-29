@@ -18,24 +18,33 @@ class CustomSizeForm extends React.Component {
 	}
 
 	policiesPassed() {
-		if (this.state.width <= 0 || this.state.height <= 0) {
+		const height = this.state.height,
+			width = this.state.width,
+			isWidth = !!(width),
+			isHeight = !!(height),
+			isDimensions = !!(isWidth && isHeight),
+			isDimensionsLessThanZero = !!(isDimensions && (height <= 0 || width <= 0));
+
+		if (!isDimensions || isDimensionsLessThanZero) {
 			return false;
 		}
-		/*Only one dimension can be greater than 300 pixels
-		 The minimum width is 120 pixels
-		 The minimum height is 50 pixels
-		 Neither height nor width can exceed 1200 pixels.*/
-		if (
-			this.state.width >= 120 &&
-			this.state.width <= 1200 &&
-			(this.state.height >= 50 && this.state.height <= 1200)
-		) {
-			if (this.state.height > 300 && this.state.width > 300) {
-				return false;
-			}
-			return true;
-		}
-		return false;
+		// Below code is commented as not required right now
+		// /*Only one dimension can be greater than 300 pixels
+		//  The minimum width is 120 pixels
+		//  The minimum height is 50 pixels
+		//  Neither height nor width can exceed 1200 pixels.*/
+		// if (
+		// 	this.state.width >= 120 &&
+		// 	this.state.width <= 1200 &&
+		// 	(this.state.height >= 50 && this.state.height <= 1200)
+		// ) {
+		// 	if (this.state.height > 300 && this.state.width > 300) {
+		// 		return false;
+		// 	}
+		// 	return true;
+		// }
+
+		return true;
 	}
 
 	toggleForm() {

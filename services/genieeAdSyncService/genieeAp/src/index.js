@@ -1,21 +1,12 @@
-var Tracker = require('../libs/tracker'),
-	nodewatcher = require('../libs/nodeWatcher'),
-	browserConfig = require('../libs/browserConfig'),
-	selectVariation = require('./variationSelector'),
-	createAds = require('./adCreater'),
-	heartBeat = require('../libs/heartBeat'),
-	hookAndInit = require('./hooksAndBlockList'),
-	utils = require('../libs/utils'),
-	w = window,
+var w = window,
 	pageGroupTimer,
 	adp = (w.adpushup = w.adpushup || {}),
-	control = require('./control')(),
-	config = (adp.config = require('../config/config.js')),
 	$ = (adp.$ = require('jquery')),
-	genieeObject = require('./genieeObject'),
-	isGenieeSite;
-
+	config = (adp.config = require('../config/config.js')),
+	Tracker = require('../libs/tracker'),
+	nodewatcher = require('../libs/nodeWatcher');
 // Extend adpushup object
+//Location of blow snippet should not be changed, other wise script will throw error.
 $.extend(adp, {
 	creationProcessStarted: false,
 	err: [],
@@ -24,6 +15,16 @@ $.extend(adp, {
 	nodewatcher: nodewatcher,
 	geniee: genieeObject
 });
+
+var browserConfig = require('../libs/browserConfig'),
+	selectVariation = require('./variationSelectionModels/index'),
+	createAds = require('./adCreater'),
+	heartBeat = require('../libs/heartBeat'),
+	hookAndInit = require('./hooksAndBlockList'),
+	utils = require('../libs/utils'),
+	control = require('./control')(),
+	genieeObject = require('./genieeObject'),
+	isGenieeSite;
 
 // Extend the settings with generated settings
 // eslint-disable-next-line no-undef
@@ -34,11 +35,6 @@ $.extend(adp.config, ___abpConfig___, {
 //Geniee ad network specific site check
 isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
 adp.config.isGeniee = isGenieeSite;
-
-// Empty ads array creation
-// As soon as any ad is placed, its data is pushed into this array
-// This data is later used to send feedback requests to server on every successful impression
-adp.config.ads = [];
 
 function shouldWeNotProceed() {
 	var hasGenieeStarted = !!(
@@ -68,9 +64,9 @@ function triggerControl(mode) {
 	}
 }
 
-function startCreation() {
+function startCreation(forced) {
 	// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
-	if (shouldWeNotProceed() || !config.pageGroup) {
+	if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
 		return false;
 	}
 	var selectedVariation = selectVariation(config);
@@ -78,6 +74,19 @@ function startCreation() {
 		adp.creationProcessStarted = true;
 		clearTimeout(pageGroupTimer);
 		config.selectedVariation = selectedVariation.id;
+
+		// Load interactive ads script if interactive ads are present in adpushup config
+		var interactiveAds = utils.getInteractiveAds(adp.config);
+		if (interactiveAds) {
+			require.ensure(
+				['interactiveAds/index.js'],
+				function(require) {
+					require('interactiveAds/index')(interactiveAds);
+				},
+				'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
+			);
+		}
+
 		createAds(adp, selectedVariation);
 	} else {
 		triggerControl(3);
@@ -87,6 +96,12 @@ function startCreation() {
 function main() {
 	// Hook Pagegroup, find pageGroup and check for blockList
 	hookAndInit(adp, startCreation, browserConfig.platform);
+
+	// AdPushup Debug Force Variation
+	if (utils.queryParams && utils.queryParams.forceVariation && !adp.creationProcessStarted) {
+		startCreation(true);
+		return false;
+	}
 
 	if (shouldWeNotProceed()) {
 		return false;

@@ -60,11 +60,11 @@ module.exports = React.createClass({
 				$('#miscMenuIntroNext').on(
 					'click',
 					function() {
-						if ($('#intercom-launcher').length) {
-							this.props.intro.goToStep(15);
-						} else {
-							this.props.intro.exit();
-						}
+						// if ($('#intercom-launcher').length) {
+						// 	this.props.intro.goToStep(15);
+						// } else {
+						// 	this.props.intro.exit();
+						// }
 						this.getFlux().actions.hideMenu();
 					}.bind(this)
 				);

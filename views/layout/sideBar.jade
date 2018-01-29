@@ -8,33 +8,46 @@ nav.pageLeftSidebar.sidebar
     .sidebarMenu.sidebar-menu
         ul.menuItems
             if !partner
-                li.mt-30.sidebar-menu-item
-                    a(id="sidebar-dashboard-link", href='/user/dashboard')
-                        | Dashboard
-                        span.icon-thumbnail#sidebar-dashboard-icon-thumbnail
-                            i.fa.fa-tachometer#sidebar-dashboard-icon
-                if isSuperUser
-                    li.sidebar-menu-item
-                        a(id="sidebar-new-website-link", href='/user/addSite', data-toggle='', data-target='')
-                            | Add New Website
-                            span.icon-thumbnail#sidebar-new-website-icon-thumbnail
-                                i.fa.fa-plus#sidebar-new-website-icon
+                if !isUserOnboarded
+                    li.mt-30.sidebar-menu-item
+                        a(id="sidebar-onboarding-link", href='/user/onboarding')
+                            | Onboarding
+                            span.icon-thumbnail#sidebar-onboarding-icon-thumbnail
+                                i.fa.fa-user-plus#sidebar-onboarding-icon
+                else
+                    li.mt-30.sidebar-menu-item
+                        a(id="sidebar-dashboard-link", href='/user/dashboard')
+                            | Dashboard
+                            span.icon-thumbnail#sidebar-dashboard-icon-thumbnail
+                                i.fa.fa-tachometer#sidebar-dashboard-icon
+
+                li.sidebar-menu-item
+                    a(id="sidebar-new-website-link", href='/user/addSite', data-toggle='', data-target='')
+                        | Add New Website
+                        span.icon-thumbnail#sidebar-new-website-icon-thumbnail
+                            i.fa.fa-plus#sidebar-new-website-icon
+
                 if isSuperUser
                     li.sidebar-menu-item
                         a(id="sidebar-new-website-link", href='/user/updateUserStatus', data-toggle='', data-target='')
                             | User Controls
                             span.icon-thumbnail#sidebar-user-controls-icon-thumbnail
                                 i.fa.fa-sliders#sidebar-user-controls
+                    li.sidebar-menu-item
+                        a(id="sidebar-new-website-link", href='/ops', data-toggle='', data-target='')
+                            | Ops Panel
+                            span.icon-thumbnail#sidebar-user-controls-icon-thumbnail
+                                i.fa.fa-wrench#sidebar-user-controls
                 //- li.sidebar-menu-item
                 //-     a(id="sidebar-billing-link", href='/user/billing')
                 //-         | Billing
                 //-         span.icon-thumbnail#sidebar-billing-icon-thumbnail
                 //-             i.fa.fa-dollar#sidebar-billing-icon
-                li.sidebar-menu-item
-                    a(id="sidebar-reports-link", href='/user/reports/apexReport')
-                        | Reports
-                        span.icon-thumbnail#sidebar-reports-icon-thumbnail
-                            i.fa.fa-bar-chart#sidebar-reports-icon
+                //- li.sidebar-menu-item
+                //-     a(id="sidebar-reports-link", href='/user/reports/apexReport')
+                //-         | Reports
+                //-         span.icon-thumbnail#sidebar-reports-icon-thumbnail
+                //-             i.fa.fa-bar-chart#sidebar-reports-icon
                 li.sidebar-menu-item
                     a(id="sidebar-adsense-link", href='/user/connectGoogle')
                         | Connect Google
@@ -56,11 +69,11 @@ nav.pageLeftSidebar.sidebar
                         | Dashboard
                         span.icon-thumbnail#sidebar-dashboard-icon-thumbnail
                             i.fa.fa-tachometer#sidebar-dashboard-icon
-                li.sidebar-menu-item
-                    a(id="sidebar-reports-link", href='/user/site/#{siteId}/reports/performance')
-                        | Reports
-                        span.icon-thumbnail#sidebar-reports-icon-thumbnail
-                            i.fa.fa-bar-chart#sidebar-reports-icon
+                //- li.sidebar-menu-item
+                //-     a(id="sidebar-reports-link", href='/user/site/#{siteId}/reports/performance')
+                //-         | Reports
+                //-         span.icon-thumbnail#sidebar-reports-icon-thumbnail
+                //-             i.fa.fa-bar-chart#sidebar-reports-icon
                 li.sidebar-menu-item
                     a(id="sidebar-adsense-link", href='/user/connectGoogle')
                         | Connect Google

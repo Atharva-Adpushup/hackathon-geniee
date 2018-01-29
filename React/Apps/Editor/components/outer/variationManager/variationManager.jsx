@@ -21,6 +21,10 @@ const variationManager = props => {
 						channelId={props.activeChannelId}
 						variation={props.activeVariation}
 						sections={props.activeVariationSections}
+						reporting={props.reporting}
+						onUpdateContentSelector={props.updateContentSelector}
+						updateAdCode={props.updateAdCode}
+						updateNetwork={props.updateNetwork}
 					/>
 				</div>
 			)}
@@ -55,7 +59,11 @@ variationManager.propTypes = {
 	setActiveVariation: PropTypes.func,
 	openVariationPanel: PropTypes.func,
 	closeVariationPanel: PropTypes.func,
-	ui: PropTypes.object
+	updateContentSelector: PropTypes.func,
+	updateAdCode: PropTypes.func,
+	updateNetwork: PropTypes.func,
+	ui: PropTypes.object,
+	reporting: PropTypes.object
 };
 
 export default variationManager;

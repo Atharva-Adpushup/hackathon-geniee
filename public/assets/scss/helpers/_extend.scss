@@ -99,12 +99,18 @@ collapsedextended
 {
 	padding: 0 $FMLayoutDimension;
 }
+.pdAll-5 {
+	padding: $FMLayoutDimension/2 !important;
+} 
 .pdAll-10 {
 	padding: $FMLayoutDimension;
 } 
 .ptpb-15 {
 	padding-top: 15px;
 	padding-bottom: 15px;
+}
+.u-padding-lr15px {
+	padding: 0 $FMLayoutDimension + $FMLayoutDimension/2 !important;
 }
 .pd-20 {
 	padding: $FMLayoutDimension*2;
@@ -170,11 +176,20 @@ collapsedextended
 .mB-10 {
 	margin-bottom: 10px;
 }
+.mT-5 {
+	margin-top:5px !important;
+}
 .mT-10 {
-	margin-top:10px;
+	margin-top:10px !important;
+}
+.mT-15 {
+	margin-top:15px !important;
 }
 .mT-20 {
 	margin-top: 20px;
+}
+.mt-30 {
+	margin-top: 30px;
 }
 .mL-10 {
 	margin-left: 5px;
@@ -183,7 +198,7 @@ collapsedextended
 	margin: 15px 0;
 }
 .mb-20 {
-  margin-bottom: 20px;
+  margin-bottom: 20px !important;
 }
 .mt-30 {
   margin-top: 30px;
@@ -194,6 +209,9 @@ collapsedextended
 /*****Layout alignment*****/
 .u-margin-0px {
 	margin: 0 !important;
+}
+.no-margin {
+	margin: 0;
 }
 .u-margin-10px {
 	margin: $FMLayoutDimension !important;
@@ -288,6 +306,9 @@ collapsedextended
 .u-border-none {
 	border: 0 !important;
 }
+.float-none {
+	float: none !important;
+}
 
 /*****Text specific classes*****/
 .text-uppercase
@@ -352,4 +373,42 @@ maxHeightWidth {
 .overFlowTxt
 {
 	overflow: hidden;
+}
+
+.red {
+			color: $primaryColorDark;
+		}
+
+		.green {
+			color: $GreenColor;
+		}
+
+
+		.lightBlue {
+			color: $linkBlue;
+		}
+
+		.bglightBlue {
+			background-color: $linkBlue;
+		}
+
+		.darkBlue {
+			color: darken($linkBlue, 25%);
+		}
+
+		.bgdarkBlue {
+			background-color: darken($linkBlue, 25%);
+		}
+
+.btn.btn-lightBg.btn-blue {
+	background-color: darken($linkBlue, 25%);
+	border: 1px solid darken($linkBlue, 25%) !important;
+	color: $whiteColor;
+
+	&:hover,
+	&:active,
+	&:focus {
+		background-color: darken($linkBlue, 25%);
+		color: $whiteColor;
+	}
 }

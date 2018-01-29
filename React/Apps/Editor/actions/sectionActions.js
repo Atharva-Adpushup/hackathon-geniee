@@ -1,4 +1,12 @@
-import { sectionActions, defaultSectionCss, leftSectionCss, rightSectionCss, adActions } from 'consts/commonConsts';
+import {
+	sectionActions,
+	defaultSectionCss,
+	leftSectionCss,
+	rightSectionCss,
+	adActions,
+	uiActions,
+	editMenuActions
+} from 'consts/commonConsts';
 import { getVariationSectionsWithAds } from 'selectors/variationSelectors';
 import Utils from 'libs/utils';
 import _ from 'lodash';
@@ -33,7 +41,21 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			});
 
 		if (_.find(arr, { sectionNo: sectionPayload.sectionNo })) {
-			alert('Cannot create in content section with same section no.');
+			dispatch({
+				type: uiActions.SHOW_NOTIFICATION,
+				mode: 'error',
+				title: 'Operation failed',
+				message: 'Cannot create in content section with same section no.'
+			});
+			return;
+		}
+		if (_.find(arr, { sectionNo: sectionPayload.name })) {
+			dispatch({
+				type: uiActions.SHOW_NOTIFICATION,
+				mode: 'error',
+				title: 'Operation failed',
+				message: 'Cannot create in content section with same section name.'
+			});
 			return;
 		}
 
@@ -61,7 +83,6 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			}),
 			sectionPayload: Object.assign(sectionPayload, {
 				id: sectionId,
-				name: `Section-${sectionId}`,
 				ads: [adId],
 				createTs: Math.floor(Date.now() / 1000),
 				allXpaths: []
@@ -71,7 +92,12 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			variationId
 		});
 
-		alert('In-content section has been created!');
+		dispatch({
+			type: uiActions.SHOW_NOTIFICATION,
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'In-content section has been created'
+		});
 	},
 	deleteSection = (sectionId, variationId, adId) => dispatch => {
 		const isSectionDeletion = confirm('Are you sure you want to delete this section ?');
@@ -125,7 +151,12 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 				return data;
 			});
 		if (_.find(arr, { name })) {
-			alert('Cannot create section with same section name!');
+			dispatch({
+				type: uiActions.SHOW_NOTIFICATION,
+				mode: 'error',
+				title: 'Operation failed',
+				message: 'Cannot create section with same section name'
+			});
 			return;
 		}
 
@@ -141,6 +172,42 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			sectionId,
 			xpath
 		};
+	},
+	updateType = (sectionId, value) => {
+		return {
+			type: sectionActions.UPDATE_TYPE,
+			sectionId,
+			value
+		};
+	},
+	updateFormatData = (sectionId, formatData) => (dispatch, getState) => {
+		dispatch({
+			type: uiActions.SHOW_NOTIFICATION,
+			mode: 'success',
+			title: 'Operation Successfull',
+			message: 'Format Data updated'
+		});
+		dispatch({
+			type: editMenuActions.HIDE_EDIT_MENU
+		});
+		return dispatch({
+			type: sectionActions.UPDATE_FORMAT_DATA,
+			sectionId,
+			formatData
+		});
+	},
+	updateSection = (sectionId, params) => (dispatch, getState) => {
+		dispatch({
+			type: uiActions.SHOW_NOTIFICATION,
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Section updated'
+		});
+		return dispatch({
+			type: sectionActions.UPDATE_SECTION,
+			sectionId,
+			params
+		});
 	},
 	updateIncontentFloat = (sectionId, adId, float) => {
 		let floatCss = '';
@@ -183,5 +250,8 @@ export {
 	validateXPath,
 	validateSectionXPath,
 	updateIncontentFloat,
-	scrollSectionIntoView
+	scrollSectionIntoView,
+	updateSection,
+	updateType,
+	updateFormatData
 };

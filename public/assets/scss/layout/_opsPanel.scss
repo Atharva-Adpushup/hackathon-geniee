@@ -1,0 +1,96 @@
+$grey: #bdc3c7;
+$grey-light: #f3f6f8;
+
+.u-full-height {
+	height: 100%;
+}
+
+.ops-panel-links-container {
+	a li {
+		font-size: 18px;
+		font-weight: bold;
+
+		&:hover {
+			color: $primaryRed;
+		}
+	}
+}
+
+.section-label {
+	color: #fff;
+	font-weight: 400;
+	padding: 3px 3px 3px 3px;
+	border-radius: 4px;
+	font-size: 0.8em;
+	vertical-align: middle;
+	margin-bottom: 10px;
+	margin-right: 10px;
+	position: relative;
+}
+
+.section-label i {
+	margin: 0 5px;
+}
+
+.channels {
+	background-color: #00a0e3;
+}
+
+.onboarded,
+.live {
+	background-color: #0fbe7c;
+}
+
+.pre-onboarding,
+.draft {
+	background-color: #c22733;
+}
+
+.onboarding {
+	background-color: #00a0e3;
+}
+
+.report-table .thead-th-default {
+	max-width: 250px;
+}
+
+.report-table .tbody-td-default {
+	max-width: 250px;
+	word-wrap: break-word;
+}
+
+.pointer {
+	cursor: pointer;
+}
+
+.input-field {
+	width: 100%;
+	padding: 8px 10px;
+	border: 1px solid $grey;
+}
+
+.metricsChart.panel {
+	> .panel-heading {
+		background: $grey-light;
+		border: 0;
+		border-radius: 0;
+		height: 100px;
+		padding: 0;
+		text-transform: uppercase;
+
+		> h4 {
+			font-weight: bold;
+		}
+	}
+
+	> .panel-body {
+		min-height: 250px;
+	}
+
+	&.metricsChart--modeWiseTraffic {
+		.table-responsive {
+			min-height: auto;
+			max-height: 300px;
+		}
+	}
+}

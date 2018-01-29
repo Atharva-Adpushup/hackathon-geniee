@@ -256,15 +256,15 @@ div.detectap-alert.text-center#apdetect
             img.wd-90(src="/assets/images/ob_code_coversion.png")
         div.col-md-7(class="ob-content")
             h3(class="ob-heading")
-                | Setup Passback 
-                i#step6-check.fa &nbsp;
+                | Add JS wrapper to your ad code
+                i(class="u-margin-l10px fa fa-info-circle js-adcode-info", data-toggle="popover", data-trigger="hover", data-animation="true", data-title="Convert Ad Code", data-content="In Adcode Conversion, we wrap your ad code in our JS script so that we can measure the performance of your original ads with our new created setup. The adcode to be converted has to be from <script> to </script> tag. After the conversion, replace your original tag with this new tag. Your ads will appear and the revenue will be intact!", data-placement="bottom", style="font-size: 22px; color: #337ab7;")
             p
                 | Use the widget below to convert all of your current ad codes into AdPushup ad codes.
                 br
-                | Copy paste your existing ad codes one by one into the box then click on convert
+                | Copy paste your existing ad codes one by one into the box then click on convert.
                 div.snippet-wrapper.code-convert-wrapper
                     span.clipboard-copy Copied !
-                    textarea.snippet#code-conversion-box(placeholder="Enter Passback/Control Ad code here")
+                    textarea.snippet#code-conversion-box(placeholder="Enter your ad code here")
 
             //-    |  To enable Adpushup to serve ads using your Adsense account, replace your Adsense ad code with
             //-    |  Adpushup's ad code. For every Adsense banner running on the website, replace Google Adsense ad code with
@@ -276,46 +276,19 @@ div.detectap-alert.text-center#apdetect
                     | Finish
             #dsBLink
 
-    //- if enviroment == "development"
-    //- div(class="intercom-launcher")
 script(type="text/javascript").
-    var analyticsObj = '!{analyticsObj}',
-        intercomToSegmentObj = intercomObj || null;
-    if(analyticsObj) {
-        var jadeAnalyticsObj = JSON.parse(analyticsObj);
-        jadeAnalyticsObj.stage = 'Pre Onboarding';
-       adpushupAnalyticsEvents.emit('analyticsAlias', {
+    adpushupAnalyticsEvents.emit('analyticsIdentify', {
+        email: window.currentUser.email, 
+        analytics: {
+            name: window.currentUser.firstName,
             email: window.currentUser.email
-        });
-        adpushupAnalyticsEvents.emit('analyticsIdentify', {
+        }
+    });
+    adpushupAnalyticsEvents.emit('analyticsTrack', {
+        eventName: 'Pre Onboarding',
+        obj: {
+            name: window.currentUser.firstName,
             email: window.currentUser.email,
-            analytics: jadeAnalyticsObj,
-            intercom: intercomToSegmentObj
-        });
-        adpushupAnalyticsEvents.emit('analyticsTrack', {
-            eventName: 'Pre Onboarding',
-            obj: {
-                name: window.currentUser.firstName,
-                email: window.currentUser.email,
-                value: true
-            },
-            intercom: intercomToSegmentObj
-        });
-    } else {
-        adpushupAnalyticsEvents.emit('analyticsIdentify', {
-            email: window.currentUser.email, 
-            analytics: {
-                name: window.currentUser.firstName,
-                email: window.currentUser.email
-            }, 
-            intercom: intercomToSegmentObj
-        });
-        //- adpushupAnalyticsEvents.emit('analyticsTrack', {
-        //-         eventName: 'App-signup-first-stage', 
-        //-         obj: {
-        //-             name: window.currentUser.firstName,
-        //-             email: window.currentUser.email
-        //-         }, 
-        //-         intercom: intercom
-        //- });            
-    }
+            value: true
+        }
+    });

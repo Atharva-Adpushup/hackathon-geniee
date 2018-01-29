@@ -82,19 +82,21 @@ html(lang="en")
                                     }
                                 }();
                                 window.overrideTrackers();
+
     body
+        // User specific jade variables defined to prevent the
+        // hassle of defining them at 'app locals' level or send them
+        // as parameters to jade files
+        - currentUser = currentUser || {};
+        - currentUserSites = (currentUser && currentUser.sites) ? currentUser.sites : [];
+        - primarySiteDetails = (currentUserSites && currentUserSites.length) ? currentUserSites[0] : {};
+        - isRequestDemo = (currentUser && currentUser.requestDemo) ? currentUser.requestDemo : null;
+        - isUserOnboarded = (primarySiteDetails && primarySiteDetails.domain && primarySiteDetails.siteId && primarySiteDetails.step) ? true : false;
+
         if !excludeAnalytics
             if environment == "production"
                 block analyticsIdentify
-                    // Intercom user secure mode Hash
-                    - intercomHash = utils.getHmacSHA256(currentUser.email, consts.analytics["INTERCOM_ID"]);
                     script(type="text/javascript").
-                        var intercomHash = '#{intercomHash}',
-                            intercomObj = {
-                                Intercom: {
-                                    user_hash: intercomHash
-                                }
-                            };
                         if (Object.keys(window.currentUser).length > 0 && (sites.length > 0)) {
                             sites.map(function (obj, idx) {
                                 siteInfo += obj.siteId + " " + obj.domain + " | ";
@@ -109,16 +111,12 @@ html(lang="en")
                                 name: (window.currentUser.firstName + ((window.currentUser.lastName && window.currentUser.lastName.length > 0) ? ' ' + window.currentUser.lastName : "")),
                                 email: window.currentUser.email,
                                 sites: siteInfo
-                            },
-                            intercom: intercomObj
+                            }
                         }
                         adpushupAnalyticsEvents.emit('analyticsIdentify', data);
                     }
             else
                 script(type="text/javascript" src="/assets/js/libs/custom/adpushup-analytics-mockup.js")
-                script(type="text/javascript").
-                    var intercomObj = null;
 
-    body
         block bodyContent
         div(id="freeow-tr", class="freeow freeow-top-right")

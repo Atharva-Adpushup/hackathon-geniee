@@ -14,6 +14,7 @@ var express = require('express'),
 	CC = require('../configs/commonConsts'),
 	config = require('../configs/config'),
 	Mailer = require('../helpers/Mailer'),
+	{ getWeeklyComparisionReport } = require('../helpers/commonFunctions'),
 	// Create mailer config
 	mailConfig = {
 		MAIL_FROM: config.email.MAIL_FROM,
@@ -24,6 +25,10 @@ var express = require('express'),
 	},
 	// Instantiate mailer
 	mailer = new Mailer(mailConfig, 'text');
+
+function requestDemoRedirection(res) {
+	return res.redirect('/user/requestdemo');
+}
 
 function dashboardRedirection(req, res, allUserSites, type) {
 	function setEmailCookie() {
@@ -59,46 +64,135 @@ function dashboardRedirection(req, res, allUserSites, type) {
 
 		sites = Array.isArray(sites) && sites.length > 0 ? sites : [];
 		/**
-         * unSavedSite, Current user site object entered during signup
-         *
-         * - Value is Truthy (all user site/sites) only if user has
-         * no saved any site through Visual Editor
-         * - Value is Falsy if user has atleast one saved site
-        */
+		 * unSavedSite, Current user site object entered during signup
+		 *
+		 * - Value is Truthy (all user site/sites) only if user has
+		 * no saved any site through Visual Editor
+		 * - Value is Falsy if user has atleast one saved site
+		 */
 		unSavedSite = sites.length === 0 ? allUserSites : null;
 		req.session.unSavedSite = unSavedSite;
 
 		setEmailCookie(req, res);
 
-		if (type == 'onboarding') {
-			if (sites.length >= CC.onboarding.initialStep) {
-				var hasStep = 'step' in sites[0] ? true : false;
-				if (hasStep && sites[0].step == CC.onboarding.totalSteps) {
-					return res.redirect('/user/dashboard');
-				}
-			}
-		}
+		let siteReports = [];
 
-		switch (type) {
-			case 'dashboard':
-			case 'default':
-				return res.render('dashboard', {
-					validSites: sites,
-					unSavedSite: unSavedSite,
-					hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-					requestDemo: req.session.user.requestDemo
+		return Promise.each(sites, site =>
+			getWeeklyComparisionReport(site.siteId)
+				.then(data => siteReports.push(data))
+				.catch(() => {
+					return true;
+				})
+		)
+			.then(() => {
+				sites = _.map(sites, site => {
+					const reportData = _.find(siteReports, { siteId: site.siteId });
+					return {
+						channels: site.channels,
+						domain: site.domain,
+						siteId: site.siteId,
+						step: site.step,
+						reportData
+					};
 				});
-				break;
-			case 'onboarding':
-				return res.render('onboarding', {
-					validSites: sites,
-					unSavedSite: unSavedSite,
-					hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-					requestDemo: req.session.user.requestDemo,
-					analyticsObj: JSON.stringify(req.session.analyticsObj)
-				});
-				break;
-		}
+
+				if (type == 'onboarding') {
+					if (sites.length >= CC.onboarding.initialStep) {
+						var hasStep = 'step' in sites[0] ? true : false;
+						if (hasStep && sites[0].step == CC.onboarding.totalSteps) {
+							return res.redirect('/user/dashboard');
+						}
+					}
+				}
+
+				switch (type) {
+					case 'dashboard':
+					case 'default':
+						return res.render('dashboard', {
+							validSites: sites,
+							unSavedSite: unSavedSite,
+							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+							requestDemo: req.session.user.requestDemo,
+							imageHeaderLogo: true,
+							isSuperUser: req.session.isSuperUser
+						});
+						break;
+					case 'onboarding':
+						return res.render('onboarding', {
+							validSites: sites,
+							unSavedSite: unSavedSite,
+							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+							requestDemo: req.session.user.requestDemo,
+							analyticsObj: JSON.stringify(req.session.analyticsObj),
+							imageHeaderLogo: true,
+							buttonHeaderLogout: true,
+							isSuperUser: req.session.isSuperUser
+						});
+						break;
+				}
+			})
+			.catch(err => {
+				res.send('Some error occurred! Please try again later.');
+			});
+	});
+}
+
+function preOnboardingPageRedirection(page, req, res) {
+	var analyticsObj = req.session.analyticsObj ? req.session.analyticsObj : null,
+		isAnalyticsObj = !!(analyticsObj && _.isObject(analyticsObj)),
+		primarySiteDetails = req.session.primarySiteDetails,
+		isPrimarySiteDetails = !!primarySiteDetails,
+		primarySiteId = isPrimarySiteDetails ? primarySiteDetails.siteId : null,
+		primarySiteDomain = isPrimarySiteDetails ? primarySiteDetails.domain : null,
+		primarySiteStep = isPrimarySiteDetails ? primarySiteDetails.step : null,
+		firstName = req.session.tempObj && req.session.tempObj.firstName ? req.session.tempObj.firstName : null,
+		email = req.session.tempObj && req.session.tempObj.email ? req.session.tempObj.email : null,
+		stage = req.session.stage ? req.session.stage : null,
+		requestDemo = req.session.user && req.session.user.requestDemo ? req.session.user.requestDemo : true,
+		userObj = {
+			name: firstName,
+			email: email,
+			stage: stage,
+			primarySiteId,
+			primarySiteDomain,
+			primarySiteStep
+		},
+		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser),
+		isPipeDriveDealId = !!(
+			isAnalyticsObj &&
+			primarySiteDetails &&
+			primarySiteDetails.pipeDrive &&
+			primarySiteDetails.pipeDrive.dealId
+		),
+		isPipeDriveDealTitle = !!(
+			isAnalyticsObj &&
+			primarySiteDetails &&
+			primarySiteDetails.pipeDrive &&
+			primarySiteDetails.pipeDrive.dealTitle
+		);
+
+	if (isPipeDriveDealId) {
+		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = primarySiteDetails.pipeDrive.dealId;
+	}
+
+	if (isPipeDriveDealTitle) {
+		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = primarySiteDetails.pipeDrive.dealTitle;
+	}
+
+	if (isUserSession) {
+		// Only user sub object is deleted, not the entire session object.
+		// This is done to ensure session object is maintained and consist of
+		// user primary site details that are used on open routes pages
+		// such as '/tools' and '/thank-you' pages
+		delete req.session.user;
+	}
+
+	return res.render(page, {
+		imageHeaderLogo: true,
+		buttonHeaderLogout: true,
+		user: userObj,
+		analytics: analyticsObj,
+		requestDemo: requestDemo
 	});
 }
 
@@ -119,6 +213,9 @@ router
 		var allUserSites = req.session.user.sites;
 		return dashboardRedirection(req, res, allUserSites, 'onboarding');
 	})
+	.get('/requestdemo', function(req, res) {
+		return preOnboardingPageRedirection('request-demo', req, res);
+	})
 	.post('/setSiteStep', function(req, res) {
 		siteModel
 			.setSiteStep(req.body.siteId, req.body.step)
@@ -127,10 +224,6 @@ router
 			})
 			.then(function(user) {
 				req.session.user = user;
-
-				if (req.body.completeOnboarding) {
-					user.set('requestDemo', true);
-				}
 
 				user.save();
 				return res.send({ success: 1 });
@@ -215,22 +308,18 @@ router
 			});
 	})
 	.get('/addSite', function(req, res) {
-		if (req.session.isSuperUser) {
-			var allUserSites = req.session.user.sites,
-				params = {};
-			_.map(allUserSites, function(site) {
-				if (site.step == 1) {
-					params = {
-						siteDomain: site.domain,
-						siteId: site.siteId,
-						step: site.step
-					};
-				}
-			});
-			res.render('addSite', params);
-		} else {
-			res.redirect('/403');
-		}
+		var allUserSites = req.session.user.sites,
+			params = {};
+		_.map(allUserSites, function(site) {
+			if (site.step == 1) {
+				params = {
+					siteDomain: site.domain,
+					siteId: site.siteId,
+					step: site.step
+				};
+			}
+		});
+		res.render('addSite', params);
 	})
 	.post('/addSite', function(req, res) {
 		var site = req.body.site ? utils.getSafeUrl(req.body.site) : req.body.site;
@@ -251,6 +340,7 @@ router
 				return res.send({ success: 0 });
 			})
 			.catch(function(err) {
+				console.log('Error while Adding site', err);
 				return res.send({ success: 0 });
 			});
 	})
@@ -280,7 +370,8 @@ router
 			userModel.setSitePageGroups(email).then(
 				function(user) {
 					req.session.user = user;
-					var allUserSites = user.get('sites');
+					var allUserSites = user.get('sites'),
+						isRequestDemo = !!user.get('requestDemo');
 
 					function sitePromises() {
 						return _.map(allUserSites, function(obj) {
@@ -299,8 +390,13 @@ router
 						var sites = _.difference(validSites, ['inValidSite']);
 						if (Array.isArray(sites) && sites.length > 0) {
 							if (sites.length == 1) {
-								var step = sites[0].step;
-								if (step && step < CC.onboarding.totalSteps) {
+								var step = sites[0].step,
+									isIncompleteOnboardingSteps = !!(step && step < CC.onboarding.totalSteps);
+
+								if (isRequestDemo && isIncompleteOnboardingSteps) {
+									return requestDemoRedirection(res);
+								}
+								if (isIncompleteOnboardingSteps) {
 									return res.redirect('/user/onboarding');
 								}
 								if (!user.get('requestDemo')) {
@@ -312,6 +408,10 @@ router
 								return res.redirect('/user/dashboard');
 							}
 						} else {
+							if (isRequestDemo) {
+								return requestDemoRedirection(res);
+							}
+
 							return res.redirect('/user/onboarding');
 						}
 					});

@@ -4,7 +4,7 @@
 %input-base {
 	padding: 8px;
 	font-size: 1.15em;
-	transition: all .2s ease-in-out;
+	transition: all 0.2s ease-in-out;
 
 	&:focus {
 		border-color: $primaryColor;
@@ -34,7 +34,7 @@ textarea {
 	text-align: center;
 
 	&:disabled {
-		opacity: .65;
+		opacity: 0.65;
 	}
 }
 
@@ -91,7 +91,7 @@ textarea {
 }
 
 .apbtn-small {
-	font-size: .95em;
+	font-size: 0.95em;
 	padding: 7px;
 }
 
@@ -107,7 +107,7 @@ textarea {
 		width: 20px;
 		color: $primaryColor;
 		padding-top: 4.2px;
-    	border-radius: 20px;
+		border-radius: 20px;
 	}
 }
 
@@ -125,12 +125,12 @@ textarea {
 
 .apalert-error {
 	@extend %alert;
-	background-color: rgba($primaryRed, .94);
+	background-color: rgba($primaryRed, 0.94);
 }
 
 .apalert-success {
 	@extend %alert;
-	background-color: rgba(darken($successGreen, 5%), .94);
+	background-color: rgba(darken($successGreen, 5%), 0.94);
 
 	a {
 		color: $whiteColor;
@@ -138,19 +138,19 @@ textarea {
 
 		&:hover {
 			color: $codeBg;
-			text-decoration: underline;	
+			text-decoration: underline;
 		}
 	}
 }
 
 .apalert-inverted {
 	@extend %alert;
-	background-color: rgba(0,0,0,.86);
+	background-color: rgba(0, 0, 0, 0.86);
 
 	.close {
 		color: $iconColor;
 		opacity: 1;
-		text-shadow: 1px 1px 1px rgba(0,0,0,.25);
+		text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
 	}
 }
 
@@ -158,13 +158,13 @@ textarea {
 
 %alert-mini {
 	position: fixed;
-    z-index: 2000;
-    box-shadow: 1px 2px 4px rgba(0,0,0,.25);
-    font-size: 1.2em;
-    width: 400px;
-    background: $darkGreyColor;
-    border: none;
-    color: $whiteColor;
+	z-index: 2000;
+	box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.25);
+	font-size: 1.2em;
+	width: 400px;
+	background: $darkGreyColor;
+	border: none;
+	color: $whiteColor;
 
 	a {
 		color: $whiteColor;
@@ -175,54 +175,53 @@ textarea {
 .alert-mini-right {
 	@extend %alert-mini;
 	right: 10px;
-    top: 70px;
+	top: 70px;
 }
 
 /* Alert card */
 
 %alert-card {
-  width: 500px;
-  font-size: 2em;
-  margin: 50px auto;
-  @extend %shadow;
-  border-radius: 4px;
-  padding: 30px;
+	width: 500px;
+	font-size: 2em;
+	margin: 50px auto;
+	@extend %shadow;
+	border-radius: 4px;
+	padding: 30px;
 
-  i {
-    display: block;
-    font-size: 2.5em;
-    margin-bottom: 30px;
-  }
+	i {
+		display: block;
+		font-size: 2.5em;
+		margin-bottom: 30px;
+	}
 
-  p {
-  	margin: 8px 0 30px;
-  	font-size: 0.7em;
-  }
+	p {
+		margin: 8px 0 30px;
+		font-size: 0.7em;
+	}
 
-  .apbtn-main {
-    font-size: 0.6em;
-  }
+	.apbtn-main {
+		font-size: 0.6em;
+	}
 }
 
 .alert-card-default {
-	 @extend %alert-card;
-	  color: $fontColor;
-	  background-color: $whiteColor;
-	  
-	  i {
-	    color: darken($whiteColor, 22%);
-	  }
+	@extend %alert-card;
+	color: $fontColor;
+	background-color: $whiteColor;
+
+	i {
+		color: darken($whiteColor, 22%);
+	}
 }
 
-
 .alert-card-error {
-  @extend %alert-card;
-  color: #fff;
-  background-color: $primaryRed;
-  
-  i {
-    color: darken($primaryRed, 12%);
-  }
+	@extend %alert-card;
+	color: #fff;
+	background-color: $primaryRed;
+
+	i {
+		color: darken($primaryRed, 12%);
+	}
 }
 
 /* Select box */
@@ -233,7 +232,7 @@ textarea {
 	border: 1px solid $lightGrey;
 	border-right: 0;
 	margin-right: -1px;
-    padding-right: 5px;
+	padding-right: 5px;
 	position: relative;
 
 	.fa-angle-down {
@@ -258,61 +257,61 @@ textarea {
 
 /* Radio button */
 .radio-label {
-    display: block;
-    position: relative;
-    padding-left: 30px;
-    margin-bottom: 15px;
-    cursor: pointer;
-    font-size: 18px;
+	display: block;
+	position: relative;
+	padding-left: 30px;
+	margin-bottom: 15px;
+	cursor: pointer;
+	font-size: 18px;
 }
 
 .radio-label input {
-    position: absolute;
-    z-index: -1;
-    opacity: 0;
+	position: absolute;
+	z-index: -1;
+	opacity: 0;
 }
 
 .radio-label input:checked ~ .radio-indicator {
-    background: $primaryColor;
+	background: $primaryColor;
 }
 
 .radio-label .radio-indicator {
-    border-radius: 4px;
+	border-radius: 4px;
 }
 
 .radio-indicator {
-    position: absolute;
-    top: 2px;
-    left: 0;
-    height: 20px;
-    width: 20px;
-    background: $dashboardBgColor;
+	position: absolute;
+	top: 2px;
+	left: 0;
+	height: 20px;
+	width: 20px;
+	background: $dashboardBgColor;
 	@extend %shadow;
 }
 
 .radio-label input:checked ~ .radio-indicator:after {
-    display: block;
+	display: block;
 }
 
 .radio-label .radio-indicator:after {
-    left: 4px;
-    top: 2px;
-	font-size: .8em;
+	left: 4px;
+	top: 2px;
+	font-size: 0.8em;
 	content: '\2714';
 	color: $whiteColor;
 }
 
 .radio-indicator:after {
-    position: absolute;
-    display: none;
+	position: absolute;
+	display: none;
 }
 
 /* Badge */
 
 %badge {
-    display: inline-block;
-    color: $whiteColor;
-    text-transform: uppercase;
+	display: inline-block;
+	color: $whiteColor;
+	text-transform: uppercase;
 	border-radius: 20px;
 	text-align: center;
 	padding: 1px 0;
@@ -353,49 +352,49 @@ textarea {
 /* Anchors */
 
 .link-primary {
-    text-decoration: underline;
-    color: $primaryColor;
+	text-decoration: underline;
+	color: $primaryColor;
 
-    &:hover {
-    	color: $primaryColorDark;
-    }
+	&:hover {
+		color: $primaryColorDark;
+	}
 }
 
 /* Overlay */
 
 .overlay-primary {
-  position: fixed;
-  z-index: 2000;
-  height: 100%;
-  width: 100%;
-  background-color: rgba(0,0,0,.65);
+	position: fixed;
+	z-index: 2000;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(0, 0, 0, 0.65);
 
-  .overlay-inner {
-	background-color: $whiteColor;
-	width: 60%;
-	position: absolute;
-	left: 20%;
-	top: 15%;
+	.overlay-inner {
+		background-color: $whiteColor;
+		width: 60%;
+		position: absolute;
+		left: 20%;
+		top: 15%;
 
-	.overlay-heading {
-		h2 {
-			font-weight: 400;
-			color: $whiteColor;
-			background: $primaryColor;
+		.overlay-heading {
+			h2 {
+				font-weight: 400;
+				color: $whiteColor;
+				background: $primaryColor;
+				padding: 20px;
+			}
+		}
+
+		.overlay-content {
 			padding: 20px;
+
+			p {
+				font-weight: 300;
+				color: $fontColor;
+				font-size: 1.25em;
+			}
 		}
 	}
-
-	.overlay-content {
-		padding: 20px;
-
-		p {
-			font-weight: 300;
-			color: $fontColor;
-			font-size: 1.25em;
-		}	
-	}
-  }
 }
 
 /* Select box */
@@ -418,12 +417,12 @@ textarea {
 	color: $whiteColor;
 	border-left: 2px solid $primaryColorDark;
 	display: inline-block;
-    padding: 2px 8px;
-    background-color: #eb575c;
-    color: #fff;
-    border-left: 6px solid #cf474b;
-    font-size: 1.2em;
-    border-radius: 2px;
+	padding: 2px 8px;
+	background-color: #eb575c;
+	color: #fff;
+	border-left: 6px solid #cf474b;
+	font-size: 1.2em;
+	border-radius: 2px;
 	text-transform: capitalize;
 }
 
@@ -435,6 +434,28 @@ textarea {
 			margin: 0;
 			border: none;
 			padding: 0;
+		}
+	}
+}
+
+/* Button dropdown */
+.btn-dropdown {
+	display: inline-block;
+
+	.dropdown-toggle.btn-default {
+		background-color: $whiteColor !important;
+		padding: 5px 12px;
+	}
+
+	ul {
+		li {
+			a {
+				color: $primaryColor;
+				padding: 6px;
+				text-align: center;
+				background: #f9f9f9;
+				border-bottom: 1px solid $borderColor;
+			}
 		}
 	}
 }

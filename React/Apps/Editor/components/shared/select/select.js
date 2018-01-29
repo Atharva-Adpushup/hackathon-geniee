@@ -123,10 +123,13 @@ module.exports = React.createClass({
 
 	handleClear(event) {
 		interceptEvent(event);
-		this.handleChange(null, function() {
-			// only called when change="true"
-			this.props.onChange(this.state.pendingValue);
-		})(event);
+		var confirm = window.confirm('Are you sure you would like to do this action?');
+		if (confirm) {
+			this.handleChange(null, function() {
+				// only called when change="true"
+				this.props.onChange(this.state.pendingValue);
+			})(event);
+		}
 	},
 
 	toggleOpenClose(event) {

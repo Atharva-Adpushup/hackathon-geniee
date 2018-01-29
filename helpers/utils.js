@@ -2,6 +2,9 @@
  * Created by Dhiraj on 3/4/2016.
  */
 var url = require('url'),
+	request = require('request-promise'),
+	commonConsts = require('../configs/commonConsts'),
+	moment = require('moment'),
 	// logger = require('./logger'),
 	CryptoJS = require('crypto-js'),
 	Promise = require('bluebird'),
@@ -13,6 +16,18 @@ var url = require('url'),
 				object = { pageGroups: [name] };
 
 			return this.btoa(this.encodeString(JSON.stringify(object)));
+		},
+		numberFormatter: num => {
+			if (num >= 1000000000) {
+				return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+			}
+			if (num >= 1000000) {
+				return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+			}
+			if (num >= 1000) {
+				return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+			}
+			return num;
 		},
 		encodeString: function(string) {
 			return encodeURIComponent(string);
@@ -147,6 +162,84 @@ var url = require('url'),
 			});
 
 			return selectedLocale;
+		},
+		getMetricComparison: (lastWeek, thisWeek) => {
+			const resultData = {
+					percentage: 0,
+					change: 'remain unchanged'
+				},
+				difference = thisWeek - lastWeek;
+
+			let percentage = Number((difference / lastWeek * 100).toFixed(2)),
+				isNoChange,
+				isPositiveChange,
+				change;
+
+			percentage = isNaN(percentage) ? 0 : percentage;
+			isNoChange = !!(percentage === 0);
+			isPositiveChange = !!(percentage && percentage > 0);
+
+			if (isNoChange) {
+				change = 'remain unchanged';
+			} else if (isPositiveChange) {
+				change = 'increased';
+			} else {
+				change = 'decreased';
+			}
+
+			resultData.percentage = Math.abs(percentage);
+			resultData.change = change;
+			return resultData;
+		},
+		// Utility method to match a string in regex array
+		isValueInPatternList: (list, value) => {
+			return list.some(function(pattern) {
+				return pattern.test(value);
+			});
+		},
+		getCurrencyExchangeRate: parameterConfig => {
+			const config = {
+					uri: commonConsts.CURRENCY_EXCHANGE.API_URL,
+					qs: {
+						[commonConsts.CURRENCY_EXCHANGE.PARAMETERS.BASE]: parameterConfig.base,
+						[commonConsts.CURRENCY_EXCHANGE.PARAMETERS.SYMBOLS]: parameterConfig.symbols
+					},
+					json: true
+				},
+				response = {
+					rate: null,
+					error: false
+				};
+
+			return request(config)
+				.then(responseData => {
+					response.rate = responseData.rates[parameterConfig.symbols];
+					return response;
+				})
+				.catch(error => {
+					return response;
+				});
+		},
+		getDateFormatCollection: parameterConfig => {
+			const { fromDate, toDate, format } = parameterConfig,
+				fromDateMoment = moment(fromDate),
+				toDateMoment = moment(toDate),
+				daysDifferenceCount = Math.abs(toDateMoment.diff(fromDateMoment, 'days')),
+				differenceLength = daysDifferenceCount + 1,
+				resultData = {
+					collection: [],
+					differenceCount: daysDifferenceCount
+				};
+
+			for (let dayDifference = 0; dayDifference < differenceLength; dayDifference++) {
+				let dateFormat = moment(fromDate)
+					.add(dayDifference, 'days')
+					.format(format);
+
+				resultData.collection.push(dateFormat);
+			}
+
+			return resultData;
 		}
 	};
 

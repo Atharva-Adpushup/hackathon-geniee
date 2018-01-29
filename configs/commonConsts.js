@@ -2,6 +2,17 @@ module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: 'http://console.adpushup.com',
 	PROXY_ORIGIN: 'http://proxy.app.adpushup.com',
+	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
+	DEMO_REPORT_SITE_ID: 31764,
+	DEMO_PAGEGROUPS: ['HOME', 'IMAGE', 'POST', 'PHPBB3', 'NEW', 'CATEGORY'],
+	REPORT_API: {
+		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
+		DATE_FORMAT: 'YYYY-MM-DD'
+	},
+	DEFAULT_AD_NETWORK_SETTINGS: {
+		revenueShare: 10,
+		negate: ['adsense']
+	},
 	PROXY_DOCUMENT_DOMAIN: 'app.adpushup.com',
 	apConfigDefaults: {
 		heartBeatMinInterval: 3000,
@@ -46,10 +57,12 @@ module.exports = {
 			utmContent: '78fd0246cbe306230b5a27350f1ae60014531143',
 			utmFirstHit: '2f15f7c3386d3c1b8f431385f19b64f4b5a99fea',
 			utmFirstReferrer: 'c3daf387ef687bffc465193a6b1ac525960a1d05'
-		}
+		},
+		emailBlockList: ['demo@adpushup.com']
 	},
 	password: {
-		MASTER: 'fe4720b8bcdedb3cc47490015b0ab050'
+		MASTER: 'fe4720b8bcdedb3cc47490015b0ab050',
+		IMPERSONATE: 'djasgjhd6876**hhkhkjhkh4ghg'
 	},
 	exceptions: {
 		str: {
@@ -160,5 +173,16 @@ module.exports = {
 		initialStep: 1,
 		totalSteps: 3
 	},
-	CDN_SYNC_MAX_ATTEMPTS: 10
+	CDN_SYNC_MAX_ATTEMPTS: 10,
+	CURRENCY_EXCHANGE: {
+		API_URL: 'https://api.fixer.io/latest',
+		PARAMETERS: {
+			BASE: 'base',
+			SYMBOLS: 'symbols'
+		},
+		CODES: {
+			JPY: 'JPY',
+			USD: 'USD'
+		}
+	}
 };

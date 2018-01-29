@@ -1,7 +1,7 @@
 const path = require('path'),
 	webpack = require('webpack'),
-	buildPath = '../../../public/assets/js/builds/';
-//const HtmlWebpackPlugin = require('html-webpack-plugin');
+	buildPath = '../../../public/assets/js/builds/',
+	BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = [
 	{
@@ -12,14 +12,26 @@ module.exports = [
 		output: {
 			path: path.join(__dirname, buildPath),
 			filename: '[name].js',
-			publicPath: '/'
+			chunkFilename: '[name].js',
+			publicPath: 'http://cdn.adpushup.com/'
 		},
-		eslint: {
-			configFile: '.eslintrc.js',
-			failOnWarning: false,
-			failOnError: false
+		resolve: {
+			alias: {
+				interactiveAds: path.resolve(__dirname, '../../interactiveAds/')
+			}
 		},
-		plugins: []
+		module: {
+			loaders: [
+				{
+					test: /.jsx?$/,
+					loader: 'babel-loader',
+					exclude: /node_modules/
+				}
+			]
+		},
+		plugins: [
+			//new BundleAnalyzerPlugin()
+		]
 	},
 	{
 		//devtool: 'cheap-module-source-map',
@@ -29,12 +41,22 @@ module.exports = [
 		output: {
 			path: path.join(__dirname, buildPath),
 			filename: '[name].min.js',
-			publicPath: '/'
+			chunkFilename: '[name].min.js',
+			publicPath: 'http://cdn.adpushup.com/'
 		},
-		eslint: {
-			configFile: '.eslintrc.js',
-			failOnWarning: false,
-			failOnError: false
+		resolve: {
+			alias: {
+				interactiveAds: path.resolve(__dirname, '../../interactiveAds/')
+			}
+		},
+		module: {
+			loaders: [
+				{
+					test: /.jsx?$/,
+					loader: 'babel-loader',
+					exclude: /node_modules/
+				}
+			]
 		},
 		plugins: [
 			new webpack.optimize.UglifyJsPlugin({

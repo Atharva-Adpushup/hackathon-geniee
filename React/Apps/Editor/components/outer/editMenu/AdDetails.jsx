@@ -1,74 +1,27 @@
 import React, { Component } from 'react';
-import { Row, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Row, Col, OverlayTrigger, Tooltip, Button, PageHeader } from 'react-bootstrap';
 import InlineEdit from 'shared/inlineEdit/index.jsx';
-
+import DockedSettings from './dockedSettings.jsx';
 class AdDetails extends Component {
 	constructor(props) {
 		super(props);
+		this.state = {
+			editDock: false
+		};
+		this.renderXPathAndCSS = this.renderXPathAndCSS.bind(this);
+		this.renderSectionName = this.renderSectionName.bind(this);
+		this.renderNetworkDetails = this.renderNetworkDetails.bind(this);
+		this.renderEventData = this.renderEventData.bind(this);
+		this.genieeOptions = this.genieeOptions.bind(this);
+		this.renderDockedButton = this.renderDockedButton.bind(this);
+		this.editDockSettings = this.editDockSettings.bind(this);
+		this.renderAdCode = this.renderAdCode.bind(this);
+		this.renderCommonDetails = this.renderCommonDetails.bind(this);
 	}
-	render() {
-		const { ad, editCss, editNetwork, userType } = this.props;
+
+	renderXPathAndCSS() {
 		return (
-			<div id="ad-details">
-				<div>
-					<div className="mB-10">
-						<p style={{ marginBottom: '0px' }}>Section Name</p>
-						<InlineEdit
-							validate
-							value={this.props.section.name}
-							submitHandler={this.props.onRenameSection.bind(
-								null,
-								this.props.section,
-								this.props.variationId
-							)}
-							text="Section Name"
-							errorMessage="Section Name cannot be blank"
-						/>
-					</div>
-					{userType != 'partner' ? (
-						<p>
-							Network :{' '}
-							<strong>
-								{ad.network.charAt(0).toUpperCase() + ad.network.slice(1).replace(/([A-Z])/g, ' $1')}
-							</strong>
-							<OverlayTrigger
-								placement="bottom"
-								overlay={<Tooltip id="edit-network">Edit Network</Tooltip>}
-							>
-								<span className="adDetails-icon" onClick={editNetwork}>
-									<i className="btn-icn-edit" />
-								</span>
-							</OverlayTrigger>
-						</p>
-					) : null}
-					{ad.network == 'adpTags' ? (
-						<div>
-							<p>
-								Price Floor :{' '}
-								<strong>
-									{ad.networkData && ad.networkData.priceFloor ? ad.networkData.priceFloor : 0}
-								</strong>
-							</p>
-							<p>
-								Header Bidding :{' '}
-								<strong>
-									{ad.networkData && ad.networkData.hasOwnProperty('headerBidding')
-										? String(ad.networkData.headerBidding)
-										: 'true'}
-								</strong>
-							</p>
-						</div>
-					) : userType != 'partner' ? (
-						<div className="mB-10">
-							<span className="mB-10">Ad Code : </span>
-							{ad.adCode != null && ad.adCode != 'null' && ad.adCode != '' ? (
-								<pre style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{atob(ad.adCode)}</pre>
-							) : (
-								<strong> Not added</strong>
-							)}
-						</div>
-					) : null}
-				</div>
+			<div>
 				<div className="mB-10">
 					<pre>
 						<InlineEdit
@@ -97,14 +50,14 @@ class AdDetails extends Component {
 				<div>
 					<pre>
 						<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-css">Edit CSS</Tooltip>}>
-							<span className="adDetails-icon" onClick={editCss}>
+							<span className="adDetails-icon" onClick={this.props.editCss}>
 								<i className="btn-icn-edit" />
 							</span>
 						</OverlayTrigger>
-						{Object.keys(ad.css).map((value, key) => {
+						{Object.keys(this.props.ad.css).map((value, key) => {
 							return (
 								<p key={key} style={{ margin: 0, fontWeight: 'bold' }}>
-									{value} : {ad.css[value]}
+									{value} : {this.props.ad.css[value]}
 								</p>
 							);
 						})}
@@ -113,6 +66,201 @@ class AdDetails extends Component {
 			</div>
 		);
 	}
+
+	renderSectionName() {
+		return (
+			<div className="mB-10">
+				<p style={{ marginBottom: '0px' }}>Section Name</p>
+				<InlineEdit
+					validate
+					value={this.props.section.name}
+					submitHandler={this.props.onRenameSection.bind(null, this.props.section, this.props.variationId)}
+					text="Section Name"
+					errorMessage="Section Name cannot be blank"
+				/>
+			</div>
+		);
+	}
+
+	renderCommonDetails(fpKey, priceFloor, headerBidding, title) {
+		return (
+			<div>
+				<p>
+					PF Key : <strong>{fpKey}</strong>
+				</p>
+				<p>
+					Price Floor : <strong>{priceFloor}</strong>
+				</p>
+				<p>
+					{title}: <strong>{headerBidding}</strong>
+				</p>
+			</div>
+		);
+	}
+
+	genieeOptions(position, firstFold, zoneId) {
+		return (
+			<div>
+				<p>
+					Position : <strong>{position}</strong>
+				</p>
+				<p>
+					First fold : <strong>{firstFold}</strong>
+				</p>
+				<p>
+					Geniee Zone Id : <strong>{zoneId}</strong>
+				</p>
+			</div>
+		);
+	}
+
+	renderAdCode(adCode) {
+		<div className="mB-10">
+			<span className="mB-10">Ad Code : </span>
+			{adCode ? (
+				<pre style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{adCode}</pre>
+			) : (
+				<strong> Not added</strong>
+			)}
+		</div>;
+	}
+
+	renderNetworkDetails() {
+		const { ad, editNetwork } = this.props;
+		let pfKeyExists = ad.networkData && ad.networkData.keyValues && Object.keys(ad.networkData.keyValues).length,
+			fpKey = pfKeyExists
+				? Object.keys(ad.networkData.keyValues).filter(key => key.match(/FP/g)) || 'FP_SA'
+				: 'FP_SA',
+			priceFloor = pfKeyExists ? ad.networkData.keyValues[fpKey] : 0,
+			headerBidding =
+				ad.networkData && ad.networkData.hasOwnProperty('headerBidding')
+					? String(ad.networkData.headerBidding)
+					: 'true',
+			firstFold =
+				ad.networkData && ad.networkData.hasOwnProperty('firstFold')
+					? String(ad.networkData.firstFold)
+					: 'true',
+			position =
+				ad.networkData &&
+				ad.networkData.hasOwnProperty('position') &&
+				String(ad.networkData.position) != '' &&
+				ad.networkData.position != null
+					? ad.networkData.position
+					: 'Not set',
+			dynamicAllocation =
+				ad.networkData && ad.networkData.hasOwnProperty('dynamicAllocation')
+					? String(ad.networkData.dynamicAllocation)
+					: 'true',
+			adCode =
+				ad.networkData && ad.networkData.adCode != null && ad.networkData.adCode.trim().length
+					? atob(ad.networkData.adCode)
+					: false,
+			zoneId = ad.networkData && ad.networkData.hasOwnProperty('zoneId') ? ad.networkData.zoneId : 'Not Set';
+
+		return (
+			<div>
+				<p>
+					Network :{' '}
+					<strong>
+						{ad.network.charAt(0).toUpperCase() + ad.network.slice(1).replace(/([A-Z])/g, ' $1')}
+					</strong>
+					<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-network">Edit Network</Tooltip>}>
+						<span className="adDetails-icon" onClick={editNetwork}>
+							<i className="btn-icn-edit" />
+						</span>
+					</OverlayTrigger>
+				</p>
+				{ad.network == 'adpTags' ? (
+					this.renderCommonDetails(fpKey, priceFloor, headerBidding, 'Header Bidding')
+				) : ad.network == 'geniee' ? (
+					<div>
+						<div>
+							{this.renderCommonDetails(fpKey, priceFloor, dynamicAllocation, 'Dynamic Allocation')}
+						</div>
+						{/* <div>{this.genieeOptions(position, firstFold, zoneId)}</div> */}
+						<div>{this.renderAdCode(adCode)}</div>
+					</div>
+				) : (
+					this.renderAdCode(adCode)
+				)}
+			</div>
+		);
+	}
+
+	editDockSettings() {
+		this.setState({ editDock: !this.state.editDock }, () => {
+			this.props.toggleDeleteButton ? this.props.toggleDeleteButton() : null;
+		});
+	}
+
+	renderDockedButton() {
+		return (
+			<Col xs={8} xsPush={4} style={{ paddingRight: '0px' }}>
+				<Button className="btn-lightBg btn-edit btn-block" onClick={this.editDockSettings}>
+					Ad Docked Settings
+				</Button>
+			</Col>
+		);
+	}
+
+	renderEventData() {
+		const { section, ad } = this.props;
+		return (
+			<div>
+				<p>
+					Event : <strong>{section.formatData.event.toUpperCase()}</strong>
+					<OverlayTrigger
+						placement="bottom"
+						overlay={<Tooltip id="edit-interactive-ad-data">Edit Interactive Ad Data</Tooltip>}
+					>
+						<span className="adDetails-icon" onClick={this.props.editInteractiveAd}>
+							<i className="btn-icn-edit" />
+						</span>
+					</OverlayTrigger>
+				</p>
+				{section.formatData.eventData && Object.keys(section.formatData.eventData).length ? (
+					<p>
+						Value : <strong>{section.formatData.eventData.value}</strong>
+					</p>
+				) : null}
+				<p>
+					Format :{' '}
+					<strong>
+						{section.formatData.type}
+						{section.formatData.placement}
+					</strong>
+				</p>
+			</div>
+		);
+	}	
+	
+	
+	render() {
+		const { fromPanel, showEventData } = this.props;
+		return (
+			<div id="ad-details">
+				{this.state.editDock ? (
+					<DockedSettings {...this.props} onCancel={this.editDockSettings} />
+				) : (
+					<div>
+						<div>
+							{!fromPanel ? this.renderSectionName() : null}
+							{this.renderNetworkDetails()}
+						</div>
+						{!fromPanel ? this.renderXPathAndCSS() : null}
+						{showEventData ? this.renderEventData() : null}
+						{!this.props.section.isIncontent && this.props.section.type != 3
+							? this.renderDockedButton()
+							: null}
+					</div>
+				)}
+			</div>
+		);
+	}
 }
+
+AdDetails.defaultProps = {
+	fromPanel: false
+};
 
 export default AdDetails;

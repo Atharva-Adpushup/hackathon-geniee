@@ -40,7 +40,7 @@ module.exports = function(grunt) {
 					'public/assets/js/libs/third-party/bootstrap-multiselect.js',
 					'public/assets/js/libs/third-party/notifications.js',
 					'public/assets/js/libs/custom/appEvent.js',
-					'Editor/app/libs/adpushup.js'
+					'public/assets/js/libs/custom/adpushup.js'
 				],
 				dest: 'public/assets/js/libs/custom/base-libs.js'
 			},

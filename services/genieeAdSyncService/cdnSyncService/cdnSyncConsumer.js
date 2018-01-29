@@ -4,7 +4,8 @@ var path = require('path'),
 	_ = require('lodash'),
 	moment = require('moment'),
 	PromiseFtp = require('promise-ftp'),
-	universalReportService = require('../../../reports/universal/index'),
+	// universalReportService = require('../../../reports/universal/index'),
+	{ getReportData } = require('../../../reports/universal/index'),
 	mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
 	fs = Promise.promisifyAll(require('fs')),
 	AdPushupError = require('../../../helpers/AdPushupError'),
@@ -71,8 +72,7 @@ module.exports = function(site) {
 			}));
 		},
 		getComputedConfig = () => {
-			return universalReportService
-				.getReportData(site)
+			return getReportData(site)
 				.then(reportData => {
 					if (reportData.status && reportData.data) {
 						return generateAdPushupConfig(site, reportData.data);

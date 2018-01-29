@@ -29,11 +29,17 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 			return prebidFinishCallback({}, adpBatchId);
 		}
 
-		var prebidHtml = adRenderingTemplate
-			.replace('__AD_UNIT_CODE__', JSON.stringify(adUnitCodeForPrebid))
-			.replace('__ADP_BATCH_ID__', adpBatchId)
-			.replace('__PB_TIMEOUT__', config.PREBID_TIMEOUT)
-			.replace('__PAGE_URL__', window.location.href);
+		var c1xSiteId =
+				config.INVENTORY.hbConfig && config.INVENTORY.hbConfig.additionalOptions
+					? config.INVENTORY.hbConfig.additionalOptions.c1xSiteId
+					: null,
+			prebidHtml = adRenderingTemplate
+				.replace('__AD_UNIT_CODE__', JSON.stringify(adUnitCodeForPrebid))
+				.replace('__ADP_BATCH_ID__', adpBatchId)
+				.replace('__PB_TIMEOUT__', config.PREBID_TIMEOUT)
+				.replace('__C1X_PIXEL_ID__', config.C1X.pixelId)
+				.replace('__C1X_SITE_ID__', c1xSiteId)
+				.replace('__PAGE_URL__', window.location.href);
 
 		var iframeEl = document.createElement('iframe');
 		iframeEl.style.display = 'none';

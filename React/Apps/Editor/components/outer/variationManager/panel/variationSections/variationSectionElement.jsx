@@ -1,49 +1,23 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import InlineEdit from 'shared/inlineEdit/index.jsx';
-import SelectBox from 'shared/select/select.js';
-import LabelWithButton from 'components/shared/labelWithButton.jsx';
-import { floats } from 'consts/commonConsts';
+import EditOptions from './editOptions.jsx';
 import $ from 'jquery';
 
 const errorBorder = {
 	border: '1px solid #eb575c',
 	boxShadow: 'inset 0px 0px 1px 1px #eb575c'
 };
-
 class variationSectionElement extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			float: this.props.section.float
-		};
-
-		this.onFloatSelectChange = this.onFloatSelectChange.bind(this);
-		this.onPartnerDataUpdate = this.onPartnerDataUpdate.bind(this);
-		// this.scrollSectionInToView = this.scrollSectionInToView.bind(this);
 	}
 
 	componentWillMount() {
-		this.props.section.isIncontent
+		this.props.section.isIncontent || this.props.section.type == 3
 			? null
 			: this.props.onSectionXPathValidate(this.props.section.id, this.props.section.xpath);
-	}
-
-	onFloatSelectChange(float) {
-		this.setState({ float });
-
-		const sectionId = this.props.section.id,
-			adId = this.props.section.ads[0].id;
-		this.props.onIncontentFloatUpdate(sectionId, adId, float);
-	}
-
-	onPartnerDataUpdate(customZoneId) {
-		const sectionId = this.props.section.id,
-			adId = this.props.section.ads[0].id,
-			partnerData = $.extend(true, {}, this.props.section.partnerData);
-
-		partnerData.customZoneId = customZoneId;
-		this.props.onUpdatePartnerData(sectionId, adId, partnerData);
 	}
 
 	render() {
@@ -126,137 +100,112 @@ class variationSectionElement extends Component {
 							errorMessage="Section Name cannot be blank"
 						/>
 					</Col>
-					<Col className="u-padding-r10px" xs={12}>
+				</Row>
+				<Row>
+					{/* Read only Fields starts from here */}
+					<Col xs={6}>
 						<Row>
-							<Col className="u-padding-r10px" xs={4}>
-								Size
-							</Col>
-							<Col xs={8}>
-								<strong>
-									{props.section.ads[0].width} x {props.section.ads[0].height}
-								</strong>
+							<Col className="u-padding-r10px" xs={12}>
+								<Row>
+									<Col className="u-padding-r10px" xs={7}>
+										Size
+									</Col>
+									<Col xs={5}>
+										<strong>
+											{props.section.ads[0].width} x {props.section.ads[0].height}
+										</strong>
+									</Col>
+								</Row>
 							</Col>
 						</Row>
-					</Col>
-					{isCustomZoneId ? (
-						<Col>
+						{props.section.isIncontent ? (
+							<div>
+								<Row>
+									<Col className="u-padding-r10px" xs={7}>
+										Section No.
+									</Col>
+									<Col className="u-padding-l10px" xs={5}>
+										<strong>{props.section.sectionNo}</strong>
+									</Col>
+								</Row>
+							</div>
+						) : props.section.type != 3 ? (
+							<div>
+								<Row>
+									<Col className="u-padding-r10px" xs={7}>
+										Operation
+									</Col>
+									<Col className="u-padding-l10px" xs={5}>
+										<strong>{props.section.operation}</strong>
+									</Col>
+								</Row>
+							</div>
+						) : null}
+						{Object.keys(props.reporting).length &&
+						Object.keys(props.reporting.sections).length &&
+						props.reporting.sections[props.section.id] ? (
+							<div>
+								<Row>
+									<Col className="u-padding-r10px" xs={7}>
+										Total Impressions
+									</Col>
+									<Col className="u-padding-l10px" xs={5}>
+										<strong>
+											{props.reporting.sections[props.section.id].aggregate.total_impressions}
+										</strong>
+									</Col>
+								</Row>
+								{window.isSuperUser ? (
+									<Row>
+										<Col className="u-padding-r10px" xs={7}>
+											Total XPath Misses
+										</Col>
+										<Col className="u-padding-l10px" xs={5}>
+											<strong>
+												{props.reporting.sections[props.section.id].aggregate.total_xpath_miss}
+											</strong>
+										</Col>
+									</Row>
+								) : null}
+								<Row>
+									<Col className="u-padding-r10px" xs={7}>
+										Total CPM
+									</Col>
+									<Col className="u-padding-l10px" xs={5}>
+										<strong>
+											{props.reporting.sections[props.section.id].aggregate.total_cpm}
+										</strong>
+									</Col>
+								</Row>
+								<Row>
+									<Col className="u-padding-r10px" xs={7}>
+										Total Revenue
+									</Col>
+									<Col className="u-padding-l10px" xs={5}>
+										<strong>
+											{props.reporting.sections[props.section.id].aggregate.total_revenue}
+										</strong>
+									</Col>
+								</Row>
+							</div>
+						) : null}
+						{!props.section.isIncontent ? (
 							<Row>
-								<Col className="u-padding-r10px" xs={4}>
-									Zone Id
-								</Col>
-								<Col className="u-padding-l10px" xs={8}>
-									<InlineEdit
-										type="number"
-										compact
-										validate
-										value={customZoneId}
-										submitHandler={this.onPartnerDataUpdate}
-										text="Custom Zone Id"
-										errorMessage="Custom zone id cannot be blank"
-									/>
+								<Col className="u-padding-t10px">
+									<label
+										className="section-label section-select-ad"
+										onClick={props.onScrollSectionIntoView.bind(null, props.section.ads[0].id)}
+									>
+										<i className="fa fa-eye" aria-hidden="true" />
+										<span>Select Ad</span>
+									</label>
 								</Col>
 							</Row>
-						</Col>
-					) : null}
-				</Row>
-				{props.section.isIncontent ? (
-					<div>
-						<Row>
-							<Col className="u-padding-r10px" xs={4}>
-								Ad Code
-							</Col>
-							<Col className="u-padding-l10px" xs={8}>
-								<InlineEdit
-									compact
-									validate
-									adCode
-									value={props.section.ads[0].adCode}
-									submitHandler={props.onUpdateAdCode.bind(null, props.section.ads[0].id)}
-									text="Ad Code"
-									errorMessage="Ad Code cannot be blank"
-								/>
-							</Col>
-						</Row>
-						<Row>
-							<Col className="u-padding-r10px" xs={4}>
-								Section No.
-							</Col>
-							<Col className="u-padding-l10px" xs={8}>
-								<strong>{props.section.sectionNo}</strong>
-							</Col>
-						</Row>
-						<Row style={{ marginTop: 5 }}>
-							<Col className="u-padding-r10px" xs={4}>
-								Float
-							</Col>
-							<Col className="u-padding-l10px" xs={8}>
-								<SelectBox
-									value={this.state.float}
-									label="Select Float"
-									onChange={this.onFloatSelectChange}
-									showClear={false}
-								>
-									{floats.map((float, index) => (
-										<option key={index} value={float}>
-											{float}
-										</option>
-									))}
-								</SelectBox>
-							</Col>
-						</Row>
-					</div>
-				) : (
-					<div>
-						<Row>
-							<Col className="u-padding-r10px" xs={4}>
-								Operation
-							</Col>
-							<Col className="u-padding-l10px" xs={8}>
-								<strong>{props.section.operation}</strong>
-							</Col>
-						</Row>
-						<Row>
-							<Col className="u-padding-r10px" xs={4}>
-								XPath
-							</Col>
-							<Col className="u-padding-l10px" xs={8}>
-								<InlineEdit
-									compact
-									validate
-									cancelEditHandler={props.onResetErrors.bind(null, props.section.id)}
-									customError={props.ui.errors.xpath ? props.ui.errors.xpath.error : false}
-									dropdownList={props.section.allXpaths}
-									value={props.section.xpath}
-									keyUpHandler={props.onValidateXPath.bind(null, props.section.id)}
-									submitHandler={props.onUpdateXPath.bind(null, props.section.id)}
-									editClickHandler={props.onSectionAllXPaths.bind(
-										null,
-										props.section.id,
-										props.section.xpath
-									)}
-									text="XPath"
-									errorMessage={
-										props.ui.errors.xpath && props.ui.errors.xpath.error
-											? props.ui.errors.xpath.message
-											: 'XPath cannot be blank'
-									}
-								/>
-								{/*
-                                <span className="error-message">{props.section.error ? 'XPath invalid' : ''}</span>
-                            */}
-							</Col>
-						</Row>
-					</div>
-				)}
-				<Row>
-					<Col className="u-padding-t10px">
-						<label
-							className="section-label section-select-ad"
-							onClick={props.onScrollSectionIntoView.bind(null, props.section.ads[0].id)}
-						>
-							<i className="fa fa-eye" aria-hidden="true" />
-							<span>Select Ad</span>
-						</label>
+						) : null}
+					</Col>
+					{/* Editable Fields starts from here */}
+					<Col xs={6}>
+						<EditOptions {...this.props} customZoneId={customZoneId} isCustomZoneId={isCustomZoneId} />
 					</Col>
 				</Row>
 			</li>

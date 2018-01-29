@@ -10,13 +10,16 @@ const createAd = payload => ({
 	}),
 	deleteAd = (adId, sectionId) => ({ type: adActions.DELETE_AD, adId, sectionId }),
 	updateCss = (adId, css) => ({ type: adActions.UPDATE_CSS, adId, css }),
-	updateNetwork = (adId, priceFloor, network, isHeaderBiddingActivated) => ({
+	updateNetwork = (adId, params) => ({
 		type: adActions.UPDATE_NETWORK,
 		adId,
-		priceFloor,
-		network,
-		isHeaderBiddingActivated
+		...params
+	}),
+	updateAd = (adId, params) => ({
+		type: adActions.UPDATE_AD,
+		adId,
+		params
 	}),
 	updateAdCode = (adId, adCode, network) => ({ type: adActions.UPDATE_ADCODE, adId, adCode, network });
 
-export { createAd, deleteAd, updateCss, updateAdCode, updateNetwork };
+export { createAd, deleteAd, updateCss, updateAdCode, updateNetwork, updateAd };

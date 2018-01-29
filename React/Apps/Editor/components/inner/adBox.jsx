@@ -1,6 +1,8 @@
 import React, { PropTypes } from 'react';
 import $ from 'jquery';
 import Utils from 'libs/utils';
+import { uiModes } from '../../consts/commonConsts';
+import Tags from '../../../../Components/Tags';
 import _ from 'lodash';
 
 const highLighterClass = '_APD_highlighter',
@@ -35,9 +37,15 @@ const highLighterClass = '_APD_highlighter',
 			css = Object.assign({}, props.ad.css),
 			adBoxSizeContent = `${width} X ${height}`,
 			clickHandler = ev => {
-				const $el = $(ev.target),
-					position = Utils.dom.getElementBounds($(ev.target));
-				props.clickHandler(id, position, Utils.ui.getElementSelectorCords($el));
+				let $el = $(ev.target);
+				if ($el.parents().hasClass('_ap_reject')) {
+					$el = $el.closest('._ap_reject');
+				}
+				const position = Utils.dom.getElementBounds($el);
+
+				props.mode == uiModes.EDITOR_MODE // Only dispatch action if EDITOR MODE
+					? props.clickHandler(id, position, Utils.ui.getElementSelectorCords($el))
+					: null;
 			},
 			isPartnerData = !!props.partnerData,
 			isNetworkGeniee = !!(props.ad.network && props.ad.network === 'geniee'),
@@ -59,18 +67,16 @@ const highLighterClass = '_APD_highlighter',
 			width,
 			height,
 			pointerEvents: 'auto',
-			position: 'relative'
+			position: 'relative',
+			padding: '10px 0'
 		});
+
+		const sectionNameStyles = $.extend({}, adBoxSizeStyles, { left: '70px' });
 
 		return (
 			<div style={listStyle}>
 				<div id={`ad-${id}`} className={highLighterClass} onClick={clickHandler} style={adBoxStyles}>
-					<div className="_AP_adSize _ap_reject" style={adBoxSizeStyles}>
-						{adBoxSizeContent}
-					</div>
-					<div className="_AP_adSize _ap_reject" style={adBoxSizeStyles}>
-						{props.sectionName}
-					</div>
+					<Tags labels={[props.sectionName, adBoxSizeContent]} />
 					{isCustomZoneId ? renderCustomZoneIdLabel(customZoneIdStyles, customZoneIdText) : null}
 				</div>
 			</div>

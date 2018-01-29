@@ -3,24 +3,25 @@ import { immutableArrayDelete, immutablePush } from 'libs/immutableHelpers';
 import _ from 'lodash';
 
 const variation = (state = {}, action) => {
-		switch (action.type) {
-			case variationActions.ADD_VARIATION:
-				const config = action.payload;
-				return {
-					id: config.id,
-					name: config.name,
-					trafficDistribution: config.trafficDistribution,
-					createTs: config.createTs,
-					customJs: config.customJs,
-					status: config.status,
-					sections: config.sections,
-					expanded: false
-				};
+	switch (action.type) {
+		case variationActions.ADD_VARIATION:
+			const config = action.payload;
+			return {
+				id: config.id,
+				name: config.name,
+				trafficDistribution: config.trafficDistribution,
+				createTs: config.createTs,
+				customJs: config.customJs,
+				status: config.status,
+				sections: config.sections,
+				expanded: false,
+				contentSelector: config.contentSelector || ''
+			};
 
-			default:
-				return state;
-		}
-	},
+		default:
+			return state;
+	}
+},
 	variationByIds = (state = {}, action) => {
 		switch (action.type) {
 			case variationActions.ADD_VARIATION:
@@ -52,8 +53,6 @@ const variation = (state = {}, action) => {
 				return state;
 
 			case variationActions.SAVE_BEFORE_JS:
-				alert('Before JS has been saved!');
-
 				return {
 					...state,
 					[action.variation.id]: {
@@ -66,8 +65,6 @@ const variation = (state = {}, action) => {
 				};
 
 			case variationActions.SAVE_AFTER_JS:
-				alert('After JS has been saved!');
-
 				return {
 					...state,
 					[action.variation.id]: {
@@ -76,6 +73,15 @@ const variation = (state = {}, action) => {
 							beforeAp: action.variation.customJs.beforeAp,
 							afterAp: btoa(action.afterJs)
 						}
+					}
+				};
+
+			case variationActions.SAVE_KEY_VALUES:
+				return {
+					...state,
+					[action.variation.id]: {
+						...state[action.variation.id],
+						adpKeyValues: action.adpKeyValues
 					}
 				};
 
@@ -94,6 +100,15 @@ const variation = (state = {}, action) => {
 					[action.variationId]: {
 						...state[action.variationId],
 						trafficDistribution: parseInt(action.trafficDistribution, 10)
+					}
+				};
+
+			case variationActions.UPDATE_CONTENT_SELECTOR:
+				return {
+					...state,
+					[action.variationId]: {
+						...state[action.variationId],
+						contentSelector: action.contentSelector
 					}
 				};
 

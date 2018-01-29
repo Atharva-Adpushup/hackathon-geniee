@@ -36,8 +36,21 @@ const initComponents = store => {
 			})
 			.fail(err => {
 				document.querySelector('.spinner').style.display = 'none';
+				console.log(err);
 				$('#editor').html('Some error while loading editor, please try reloading');
 			});
 	};
+
+//Logic to support extension to get TOP url of page. When in development this can be localhost and some port, while in production this will be adpushup something.
+window.addEventListener('message', e => {
+	try {
+		const json = JSON.parse(e.data);
+		if (json.cmd == 'location') {
+			e.source.postMessage(JSON.stringify({ cmd: 'locationUpdate', data: window.location.href }), '*');
+		}
+	} catch (e) {
+		return;
+	}
+});
 
 export default initEditor;

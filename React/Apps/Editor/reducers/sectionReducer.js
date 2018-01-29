@@ -16,6 +16,8 @@ const sectionByIds = (state = {}, action) => {
 					name: payload.name,
 					allXpaths: payload.allXpaths,
 					ads: payload.ads,
+					formatData: payload.formatData,
+					type: payload.type,
 					partnerData: {
 						position: payload.position,
 						firstFold: payload.firstFold,
@@ -37,8 +39,8 @@ const sectionByIds = (state = {}, action) => {
 					float: payload.float,
 					sectionNo: payload.sectionNo,
 					minDistanceFromPrevAd: payload.minDistanceFromPrevAd,
-					notNear: payload.notNear,
-					partnerData: payload.partnerData
+					notNear: payload.notNear
+					// partnerData: payload.partnerData
 				}
 			};
 
@@ -77,6 +79,31 @@ const sectionByIds = (state = {}, action) => {
 			return {
 				...state,
 				[action.sectionId]: { ...state[action.sectionId], xpath: action.xpath, allXpaths: [], error: false }
+			};
+
+		case sectionActions.UPDATE_TYPE:
+			return {
+				...state,
+				[action.sectionId]: {
+					...state[action.sectionId],
+					type: action.value,
+					formatData:
+						action.type != state[action.sectionId].type
+							? {}
+							: !state[action.sectionId].formatData ? {} : state[action.sectionId].formatData
+				}
+			};
+
+		case sectionActions.UPDATE_FORMAT_DATA:
+			return {
+				...state,
+				[action.sectionId]: { ...state[action.sectionId], formatData: action.formatData }
+			};
+
+		case sectionActions.UPDATE_SECTION:
+			return {
+				...state,
+				[action.sectionId]: { ...state[action.sectionId], ...action.params }
 			};
 
 		case sectionActions.UPDATE_INCONTENT_FLOAT:

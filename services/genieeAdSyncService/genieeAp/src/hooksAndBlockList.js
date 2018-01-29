@@ -1,4 +1,5 @@
-var $ = require('jquery');
+var $ = require('jquery'),
+	utils = require('../libs/utils');
 
 function init(adp, onPageGroupPush, platform) {
 	// store configure object in temp variable.
@@ -45,15 +46,21 @@ function init(adp, onPageGroupPush, platform) {
 		isExperimentPageGroups = !!(experimentPageGroups && experimentPageGroups.length);
 
 	if (isExperimentPageGroups) {
-		for (var i = 0; i < experimentPageGroups.length; i++) {
-			var key = experimentPageGroups[i],
-				patternToMatch = platformExperiments[key].pageGroupPattern;
-
-			if (w.location.href.match(new RegExp(patternToMatch, 'i'))) {
-				// forceFully set pagegroup in case url pattern matches to current url
-				config.pageGroup = key.toUpperCase();
-				break;
+		try {
+			for (var i = 0; i < experimentPageGroups.length; i++) {
+				var key = experimentPageGroups[i],
+					//Remove forceVariation param from url so that it doesn't change pageGrop pattern
+					url = utils.removeUrlParameter(w.location.href, config.forceVariation),
+					patternToMatch = platformExperiments[key].pageGroupPattern;
+				//do check if any pageGroup pattern provided or not, if not then don't match
+				if (patternToMatch && url.match(new RegExp(patternToMatch, 'i'))) {
+					// forceFully set pagegroup in case url pattern matches to current url
+					config.pageGroup = key.toUpperCase();
+					break;
+				}
 			}
+		} catch (error) {
+			utils.log('Error while detecting pageGroup', error, experimentPageGroups);
 		}
 	}
 

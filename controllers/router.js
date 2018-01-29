@@ -7,6 +7,7 @@ var indexController = require('./indexController'),
 	apiController = require('./apiController'),
 	pageGroupController = require('./pageGroupController'),
 	authController = require('./authController'),
+	opsController = require('./opsController'),
 	commonConsts = require('../configs/commonConsts'),
 	_ = require('lodash');
 
@@ -28,7 +29,7 @@ module.exports = function(app) {
 
 	app.use(function(req, res, next) {
 		function isOpenRoute() {
-			return _.find(['/tools'], function(route) {
+			return _.find(['/tools', '/user/reports/generate'], function(route) {
 				return req.url.indexOf(route) !== -1;
 			})
 				? true
@@ -38,6 +39,7 @@ module.exports = function(app) {
 		function isAuthorised() {
 			return _.find(
 				[
+					'/ops',
 					'/user/site',
 					'/genieeApi',
 					'/user/connectGoogle',
@@ -67,10 +69,12 @@ module.exports = function(app) {
 		}
 
 		if (req.session && req.session.partner === 'geniee' && !isAuthorised()) {
-			req.session.destroy(function() {
-				return res.redirect('/403');
-			});
-			return;
+			if (req.url.indexOf('.map') == -1) {
+				req.session.destroy(function() {
+					return res.redirect('/403');
+				});
+				return;
+			}
 		}
 		next();
 	});
@@ -125,6 +129,14 @@ module.exports = function(app) {
 		proxyController
 	);
 
+	app.use(
+		'/ops/',
+		function(req, res, next) {
+			next();
+		},
+		opsController
+	);
+
 	/*****************Login URL's End *******************/
 
 	app.use(
@@ -168,10 +180,15 @@ module.exports = function(app) {
 			) {
 				if (req.path.indexOf('/login') !== -1) {
 					var sites = req.session.user.sites,
-						step = sites[0].step;
+						step = sites[0].step,
+						isIncompleteOnboardingSteps = !!(!step || step < commonConsts.onboarding.totalSteps),
+						isRequestDemo = !!req.session.user.requestDemo;
+
 					if (sites.length > 1) {
 						return res.redirect('/user/dashboard');
-					} else if (!step || step < commonConsts.onboarding.totalSteps) {
+					} else if (isRequestDemo && isIncompleteOnboardingSteps) {
+						return res.redirect('/user/requestdemo');
+					} else if (isIncompleteOnboardingSteps) {
 						return res.redirect('/user/onboarding');
 					} else {
 						return res.redirect('/user/dashboard');

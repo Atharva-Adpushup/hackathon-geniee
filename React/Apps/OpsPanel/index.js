@@ -1,5 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import OpsPanel from './components/OpsPanel.jsx';
+import { Provider } from 'react-redux';
+import App from './components/App';
+import configureStore from './store/index.js';
 
-ReactDOM.render(<OpsPanel />, document.getElementById('opsPanel'));
+const initialData = {},
+	store = configureStore(initialData);
+
+ReactDOM.render(
+	<Provider store={store}>
+		<App />
+	</Provider>,
+	document.getElementById('opsPanel')
+);
+document.querySelector('.spinner').style.display = 'none';

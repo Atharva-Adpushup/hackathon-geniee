@@ -11,7 +11,8 @@ import {
 	channelActions,
 	channelMenuActions,
 	messengerCommands,
-	uiActions
+	uiActions,
+	uiModes
 } from '../consts/commonConsts';
 
 const errorsConfig = {},
@@ -30,6 +31,7 @@ const errorsConfig = {},
 
 			case insertMenuActions.HIDE_MENU:
 			case sectionActions.CREATE_SECTION:
+			case variationActions.OPEN_VARIATION_PANEL:
 				return { isVisible: false };
 
 			default:
@@ -53,6 +55,7 @@ const errorsConfig = {},
 			case adActions.UPDATE_CSS:
 			case adActions.UPDATE_NETWORK:
 			case sectionActions.DELETE_SECTION:
+			case variationActions.OPEN_VARIATION_PANEL:
 				return { isVisible: false };
 
 			default:
@@ -67,6 +70,7 @@ const errorsConfig = {},
 			case channelMenuActions.SHOW_CHANNEL_MENU:
 			case newChannelMenuActions.HIDE_NEW_CHANNEL_MENU:
 			case channelActions.OPEN_CHANNEL:
+			case variationActions.OPEN_VARIATION_PANEL:
 				return { isVisible: false };
 
 			default:
@@ -83,6 +87,7 @@ const errorsConfig = {},
 			case channelActions.SAVE_SAMPLE_URL:
 			case channelActions.CLOSE_CHANNEL:
 			case newChannelMenuActions.SHOW_NEW_CHANNEL_MENU:
+			case variationActions.OPEN_VARIATION_PANEL:
 				return { isVisible: false };
 
 			default:
@@ -117,7 +122,7 @@ const errorsConfig = {},
 	afterSaveLoader = (state = { status: 0 }, action) => {
 		switch (action.type) {
 			case uiActions.UPDATE_AFTER_SAVE_STATUS:
-				return { status: action.status };
+				return { status: action.status, msg: action.msg };
 
 			default:
 				return state;
@@ -134,6 +139,14 @@ const errorsConfig = {},
 			case uiActions.UPDATE_AFTER_SAVE_STATUS:
 				return { isVisible: false, position: { left: 0, top: 0 } };
 
+			default:
+				return state;
+		}
+	},
+	editorViewing = (state = { mode: uiModes.EDITOR_MODE }, { type, mode }) => {
+		switch (type) {
+			case uiActions.SET_MODE:
+				return { ...state, mode: mode };
 			default:
 				return state;
 		}
@@ -160,6 +173,30 @@ const errorsConfig = {},
 			default:
 				return state;
 		}
+	},
+	notifications = (state = { isVisible: false }, action) => {
+		switch (action.type) {
+			case uiActions.SHOW_NOTIFICATION:
+				return {
+					...state,
+					isVisible: true,
+					title: action.title,
+					message: action.message,
+					mode: action.mode
+				};
+
+			case uiActions.HIDE_NOTIFICATION:
+				return {
+					...state,
+					isVisible: false,
+					title: '',
+					message: '',
+					mode: ''
+				};
+
+			default:
+				return state;
+		}
 	};
 
 export default combineReducers({
@@ -170,5 +207,7 @@ export default combineReducers({
 	channelMenu,
 	errors,
 	afterSaveLoader,
-	variationPanel
+	variationPanel,
+	editorViewing,
+	notifications
 });

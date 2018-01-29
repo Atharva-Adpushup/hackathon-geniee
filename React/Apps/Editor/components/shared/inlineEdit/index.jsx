@@ -37,10 +37,8 @@ class InlineEdit extends React.Component {
 	}
 
 	triggerEdit() {
-		console.log('here');
 		// this.props.editClickHandler ? this.props.editClickHandler() : null;
 		this.setState({ editMode: true });
-		console.log(this.state);
 		this.props.dropdownList && this.props.dropdownList.length ? this.showDropdown() : null;
 	}
 
@@ -100,16 +98,25 @@ class InlineEdit extends React.Component {
 				verticalAlign: 'super'
 			},
 			adCodeCheck = this.props.adCode ? (!this.props.value ? '' : atob(this.props.value)) : this.props.value,
-			rootClassNames = this.props.rootClassNames || '';
+			rootClassNames = this.props.rootClassNames || '',
+			showTextarea = this.props.showTextarea ? true : false;
 
-		return renderInlineEditPanel(this, colCompact, adCodeStyles, adCodeEdit, adCodeCheck, rootClassNames);
+		return renderInlineEditPanel(
+			this,
+			colCompact,
+			adCodeStyles,
+			adCodeEdit,
+			adCodeCheck,
+			rootClassNames,
+			showTextarea
+		);
 	}
 }
 
 InlineEdit.propTypes = {
 	text: PropTypes.string.isRequired,
 	submitHandler: PropTypes.func.isRequired,
-	errorMessage: PropTypes.string.isRequired,
+	errorMessage: PropTypes.string,
 	validate: PropTypes.bool,
 	value: PropTypes.string.isRequired,
 	compact: PropTypes.bool,
@@ -123,7 +130,8 @@ InlineEdit.propTypes = {
 	customError: PropTypes.bool,
 	cancelEditHandler: PropTypes.func,
 	rootClassNames: PropTypes.string,
-	type: PropTypes.string
+	type: PropTypes.string,
+	showTextarea: PropTypes.bool
 };
 
 InlineEdit.defaultProps = {

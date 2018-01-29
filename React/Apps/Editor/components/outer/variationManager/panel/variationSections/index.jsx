@@ -1,6 +1,7 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes, Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Row, Col, Button } from 'react-bootstrap';
 import {
 	deleteSection,
 	renameSection,
@@ -10,73 +11,169 @@ import {
 	validateSectionXPath,
 	updateIncontentFloat,
 	updatePartnerData,
-	scrollSectionIntoView
+	scrollSectionIntoView,
+	updateSection
 } from 'actions/sectionActions.js';
-import { updateAdCode } from 'actions/adActions';
-import { resetErrors } from 'actions/uiActions';
+import { updateNetwork, updateAdCode, updateAd } from 'actions/adActions';
+import { resetErrors, showNotification } from 'actions/uiActions';
+import { generateReport } from 'actions/reportingActions';
+import Filters from './filters.jsx';
+import PaneLoader from '../../../../../../../Components/PaneLoader.jsx';
 import VariationSectionElement from './variationSectionElement';
 
-const variationSections = props => {
-	const {
-		variation,
-		sections,
-		onDeleteSection,
-		onRenameSection,
-		onUpdateAdCode,
-		onUpdatePartnerData,
-		onUpdateXPath,
-		onSectionAllXPaths,
-		onValidateXPath,
-		onIncontentFloatUpdate,
-		ui,
-		onResetErrors,
-		onSectionXPathValidate,
-		onScrollSectionIntoView
-	} = props;
-	return (
-		<div>
-			<h1 className="variation-section-heading">Variation Sections</h1>
-			{!sections.length ? <span>No Sections</span> : ''}
-			<ul className="section-list row">
-				{sections.map((section, key) => (
-					<div key={key} className="col-sm-4">
-						<VariationSectionElement
-							section={section}
-							key={key}
-							variation={variation}
-							onDeleteSection={onDeleteSection}
-							onRenameSection={onRenameSection}
-							onUpdateAdCode={onUpdateAdCode}
-							onUpdatePartnerData={onUpdatePartnerData}
-							onUpdateXPath={onUpdateXPath}
-							onSectionAllXPaths={onSectionAllXPaths}
-							onValidateXPath={onValidateXPath}
-							onResetErrors={onResetErrors}
-							onSectionXPathValidate={onSectionXPathValidate}
-							onIncontentFloatUpdate={onIncontentFloatUpdate}
-							onScrollSectionIntoView={onScrollSectionIntoView}
-							ui={ui}
-						/>
-					</div>
-				))}
-			</ul>
-		</div>
-	);
+const getDate = number => {
+	let days = number, // Days you want to subtract
+		date = new Date(),
+		last = new Date(date.getTime() - days * 24 * 60 * 60 * 1000),
+		day = last.getDate(),
+		month = last.getMonth() + 1,
+		year = last.getFullYear();
+
+	return `${year}-${month.length == 1 ? '0' : ''}${month}-${day.length == 1 ? '0' : ''}${day}`;
 };
+
+class variationSections extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			startDate: getDate(7),
+			endDate: getDate(1),
+			focusedInput: undefined,
+			loadingReport: false
+		};
+		this.datesUpdated = this.datesUpdated.bind(this);
+		this.generateReportWrapper = this.generateReportWrapper.bind(this);
+	}
+
+	componentWillReceiveProps() {
+		this.setState({ loadingReport: false });
+	}
+
+	datesUpdated(e) {
+		let target = e.target,
+			type = target.getAttribute('name');
+
+		this.setState({
+			[type]: target.value
+		});
+	}
+
+	generateReportWrapper() {
+		if (!this.state.startDate || !this.state.endDate) {
+			this.props.showNotification({
+				mode: 'error',
+				title: 'Operation failed',
+				message: 'Dates cannot be left blank'
+			});
+			return;
+		}
+		this.props.generateReport({
+			from: this.state.startDate,
+			to: this.state.endDate
+		});
+		this.setState({ loadingReport: true });
+	}
+
+	render() {
+		const {
+			variation,
+			sections,
+			reporting,
+			platform,
+			onDeleteSection,
+			onRenameSection,
+			onUpdatePartnerData,
+			onUpdateXPath,
+			onSectionAllXPaths,
+			onValidateXPath,
+			onIncontentFloatUpdate,
+			updateAdCode,
+			updateNetwork,
+			ui,
+			onResetErrors,
+			onSectionXPathValidate,
+			onScrollSectionIntoView,
+			updateAd,
+			updateSection,
+			showNotification
+		} = this.props;
+
+		return (
+			<div>
+				<span>
+					<h1 className="variation-section-heading">Variation Sections</h1>
+				</span>
+				{ui.variationPanel.expanded ? (
+					<Filters
+						generateReport={this.generateReportWrapper}
+						datesUpdated={this.datesUpdated}
+						startDate={this.state.startDate}
+						endDate={this.state.endDate}
+					/>
+				) : null}
+				{!sections.length ? <span>No Sections</span> : ''}
+				<ul className="section-list row">
+					{this.state.loadingReport ? (
+						<PaneLoader
+							message="Loading Data!"
+							state="load"
+							styles={{ height: '500px', background: '#ebebeb' }}
+						/>
+					) : (
+						sections.map((section, key) => (
+							<div key={key} className="col-sm-6">
+								<VariationSectionElement
+									section={section}
+									key={key}
+									variation={variation}
+									onDeleteSection={onDeleteSection}
+									onRenameSection={onRenameSection}
+									updateAdCode={updateAdCode}
+									updateNetwork={updateNetwork}
+									onUpdatePartnerData={onUpdatePartnerData}
+									onUpdateXPath={onUpdateXPath}
+									onSectionAllXPaths={onSectionAllXPaths}
+									onValidateXPath={onValidateXPath}
+									onResetErrors={onResetErrors}
+									onSectionXPathValidate={onSectionXPathValidate}
+									onIncontentFloatUpdate={onIncontentFloatUpdate}
+									onScrollSectionIntoView={onScrollSectionIntoView}
+									updateSection={updateSection}
+									updateAd={updateAd}
+									ui={ui}
+									reporting={reporting}
+									showNotification={showNotification}
+									platform={platform}
+								/>
+							</div>
+						))
+					)}
+				</ul>
+			</div>
+		);
+	}
+}
 
 variationSections.propTypes = {
 	variation: PropTypes.object.isRequired,
 	sections: PropTypes.array.isRequired,
 	onDeleteSection: PropTypes.func.isRequired,
 	onRenameSection: PropTypes.func.isRequired,
-	onUpdateAdCode: PropTypes.func.isRequired,
+	updateAdCode: PropTypes.func.isRequired,
 	onUpdatePartnerData: PropTypes.func.isRequired,
 	onUpdateXPath: PropTypes.func,
 	onSectionAllXPaths: PropTypes.func,
 	onValidateXPath: PropTypes.func,
 	onSectionXPathValidate: PropTypes.func,
+	onSetSectionType: PropTypes.func,
+	resetErrors: PropTypes.func,
+	updateNetwork: PropTypes.func,
+	generateReport: PropTypes.func,
+	showNotification: PropTypes.func,
+	updateAd: PropTypes.func,
+	updateSection: PropTypes.func,
 	ui: PropTypes.object,
-	resetErrors: PropTypes.func
+	reporting: PropTypes.object
 };
 
 export default connect(
@@ -94,7 +191,13 @@ export default connect(
 				onResetErrors: resetErrors,
 				onSectionXPathValidate: validateSectionXPath,
 				onIncontentFloatUpdate: updateIncontentFloat,
-				onScrollSectionIntoView: scrollSectionIntoView
+				onScrollSectionIntoView: scrollSectionIntoView,
+				updateAdCode: updateAdCode,
+				updateNetwork: updateNetwork,
+				generateReport: generateReport,
+				showNotification: showNotification,
+				updateSection: updateSection,
+				updateAd: updateAd
 			},
 			dispatch
 		)
