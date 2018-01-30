@@ -1,57 +1,112 @@
 var utils = require('../../libs/utils'),
+	$ = require('jquery'),
+	getPersonalizedVariations = require('./personalization'),
 	bayesianBanditModel = require('./bayesianBandit'),
 	randomSelectionModel = require('./randomSelection')();
 
-module.exports = function(config) {
-	var experiment = config.experiment,
-		isAutoOptimise = !!config.autoOptimise,
+function setModuleConfig(config) {
+	var moduleConfig = {
+		isForced: false,
+		isValidated: false,
+		data: $.extend(true, {}, config),
+		chosenVariation: null
+	};
+
+	return Promise.resolve(moduleConfig);
+}
+
+function validateConfigData(moduleConfig) {
+	var isConfig = moduleConfig && moduleConfig.data,
+		experiment = isConfig && moduleConfig.data.experiment,
+		isNotValid =
+			!experiment ||
+			!experiment[moduleConfig.data.platform] ||
+			!experiment[moduleConfig.data.platform][moduleConfig.data.pageGroup] ||
+			!experiment[moduleConfig.data.platform][moduleConfig.data.pageGroup].variations;
+
+	if (isNotValid) {
+		throw new Error('ValidateConfigData: Config data is not valid');
+	}
+
+	moduleConfig.isValidated = true;
+	return moduleConfig;
+}
+
+function checkForcedVariation(moduleConfig) {
+	var config = moduleConfig.isValidated && moduleConfig.data,
+		experiment = config && config.experiment,
 		allVariations,
 		chosenVariation,
 		forcedVariation,
 		forcedVariationId,
 		channelContentSelector,
 		variationContentSelector,
+		isForcedVariation,
+		isForcedVariationId,
 		isVariationContentSelector,
-		hasVariationsWithNoData,
 		contentSelector;
-
-	// if no experimnet setup for given platform and pagegroup
-	if (
-		!experiment ||
-		!experiment[config.platform] ||
-		!experiment[config.platform][config.pageGroup] ||
-		!experiment[config.platform][config.pageGroup].variations
-	) {
-		return false;
-	}
 
 	allVariations = experiment[config.platform][config.pageGroup].variations;
 	forcedVariationId = utils.queryParams[config.forceVariation];
 	forcedVariation = forcedVariationId ? utils.getObjectByName(allVariations, forcedVariationId) : false;
+	isForcedVariation = !!(forcedVariationId && forcedVariation);
+	isForcedVariationId = !!(forcedVariationId && allVariations[forcedVariationId]);
 
-	// Force a variation using 'forceVariation' query param implementation
-	if (forcedVariationId && forcedVariation) {
-		chosenVariation = forcedVariation.obj;
-
-		if (chosenVariation) {
-			channelContentSelector = experiment[config.platform][config.pageGroup].contentSelector;
-			variationContentSelector = chosenVariation.contentSelector;
-			isVariationContentSelector = !!variationContentSelector;
-			contentSelector = isVariationContentSelector ? variationContentSelector : channelContentSelector;
-			config.contentSelector = contentSelector;
-		}
-
-		return chosenVariation && chosenVariation.ads && chosenVariation.ads.length ? chosenVariation : false;
-	} else if (forcedVariationId && !allVariations[forcedVariationId]) {
-		alert("Variation you are trying to force doesn't exist, system will now choose variation automatically");
+	if (!isForcedVariation) {
+		moduleConfig.isForced = false;
+		moduleConfig.chosenVariation = null;
+		return moduleConfig;
 	}
 
-	try {
+	if (!isForcedVariationId) {
+		alert("Variation you are trying to force doesn't exist, system will now choose variation automatically");
+		moduleConfig.isForced = true;
+		moduleConfig.chosenVariation = null;
+		return moduleConfig;
+	}
+
+	chosenVariation = forcedVariation.obj;
+	if (chosenVariation) {
+		channelContentSelector = experiment[config.platform][config.pageGroup].contentSelector;
+		variationContentSelector = chosenVariation.contentSelector;
+		isVariationContentSelector = !!variationContentSelector;
+		contentSelector = isVariationContentSelector ? variationContentSelector : channelContentSelector;
+		config.contentSelector = contentSelector;
+	}
+
+	moduleConfig.isForced = true;
+	moduleConfig.chosenVariation =
+		chosenVariation && chosenVariation.ads && chosenVariation.ads.length ? chosenVariation : null;
+	return moduleConfig;
+}
+
+function computeChosenVariation(moduleConfig) {
+	var chosenVariation = null,
+		isForcedVariation = !!(moduleConfig && moduleConfig.data && moduleConfig.data.contentSelector,
+		moduleConfig.isValidated && moduleConfig.isForced && moduleConfig.chosenVariation);
+
+	if (isForcedVariation) {
+		chosenVariation = $.extend(true, {}, moduleConfig.chosenVariation);
+		window.adpushup.config = $.extend(true, {}, moduleConfig.data);
+		return chosenVariation;
+	}
+
+	var config = moduleConfig.isValidated && moduleConfig.data,
+		experiment = config && config.experiment,
+		isAutoOptimise = !!config.autoOptimise,
+		allVariations = experiment[config.platform][config.pageGroup].variations,
+		channelContentSelector,
+		variationContentSelector,
+		isVariationContentSelector,
+		hasVariationsWithNoData,
+		contentSelector;
+
+	return getPersonalizedVariations(allVariations).then(function(filteredVariations) {
 		if (isAutoOptimise) {
 			hasVariationsWithNoData = experiment[config.platform][config.pageGroup].hasVariationsWithNoData;
-			chosenVariation = bayesianBanditModel.chooseVariation(allVariations, hasVariationsWithNoData);
+			chosenVariation = bayesianBanditModel.chooseVariation(filteredVariations, hasVariationsWithNoData);
 		} else {
-			chosenVariation = randomSelectionModel.chooseVariation(allVariations);
+			chosenVariation = randomSelectionModel.chooseVariation(filteredVariations);
 		}
 
 		if (chosenVariation) {
@@ -62,8 +117,18 @@ module.exports = function(config) {
 			config.contentSelector = contentSelector;
 		}
 
+		window.adpushup.config = $.extend(true, {}, config);
 		return chosenVariation && chosenVariation.ads && chosenVariation.ads.length ? chosenVariation : false;
-	} catch (e) {
-		return false;
-	}
+	});
+}
+
+module.exports = function(config) {
+	return setModuleConfig(config)
+		.then(validateConfigData)
+		.then(checkForcedVariation)
+		.then(computeChosenVariation)
+		.catch(function(err) {
+			console.log('Failed to choose variation. Error: ', err);
+			return false;
+		});
 };
