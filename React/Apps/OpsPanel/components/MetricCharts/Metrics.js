@@ -20,25 +20,29 @@ function generateHighChartConfig(inputData, platformName) {
 				name: 'Revenue',
 				type: 'line',
 				yAxis: 2,
-				data: []
+				data: [],
+				visible: true
 			},
 			impressions: {
 				name: 'Impressions',
 				type: 'line',
 				yAxis: 1,
-				data: []
+				data: [],
+				visible: true
 			},
 			pageViews: {
 				name: 'PageViews',
 				type: 'line',
 				yAxis: 0,
-				data: []
+				data: [],
+				visible: false
 			},
 			cpm: {
 				name: 'CPM',
 				type: 'line',
 				yAxis: 3,
-				data: []
+				data: [],
+				visible: false
 			}
 		};
 	let isPlatform = !!platformName,
@@ -132,6 +136,11 @@ class Metrics extends Component {
 		this.fetchReportData = this.fetchReportData.bind(this);
 		this.getComputedParameterConfig = this.getComputedParameterConfig.bind(this);
 		this.getDefaultParameterConfig = this.getDefaultParameterConfig.bind(this);
+		this.isDataValid = this.isDataValid.bind(this);
+	}
+
+	isDataValid(object) {
+		return !!(object.data && Object.keys(object.data).length && object.data.aggregated && object.data.dayWise);
 	}
 
 	componentDidMount() {
@@ -145,24 +154,23 @@ class Metrics extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		let isDataLoaded =
-				nextProps.data &&
-				Object.keys(nextProps.data).length &&
-				nextProps.data.aggregated &&
-				nextProps.data.dayWise
-					? true
-					: false,
+		let currentState = this.state,
+			isDataLoaded = this.isDataValid(nextProps) && !this.isDataValid(currentState) && !currentState.isDataLoaded,
 			data = isDataLoaded ? Object.assign(nextProps.data) : null;
 
-		this.setState({ isDataLoaded, data });
+		if (isDataLoaded && data) {
+			this.setState({ isDataLoaded, data });
+		}
 	}
 
 	renderHighCharts() {
 		let inputData = this.state.data,
 			platformName = this.state.selectedPlatform,
-			config = generateHighChartConfig(inputData, platformName);
+			config = generateHighChartConfig(inputData, platformName),
+			// Manually avoiding HighCharts reflow option if Data Range Picker is interacted
+			isFocusedInputState = this.state.hasOwnProperty('focusedInput');
 
-		return <ReactHighCharts config={config} />;
+		return <ReactHighCharts config={config} neverReflow={isFocusedInputState} />;
 	}
 
 	handleSelectBoxChange(platform = '') {
@@ -199,7 +207,13 @@ class Metrics extends Component {
 	}
 
 	focusUpdated(focusedInput) {
-		this.setState({ focusedInput });
+		const _ref = this;
+
+		this.setState({ focusedInput }, () => {
+			if (!_ref.state.focusedInput) {
+				delete _ref.state.focusedInput;
+			}
+		});
 	}
 
 	renderDateRangePickerUI() {
@@ -257,7 +271,8 @@ class Metrics extends Component {
 	fetchReportData(isReset = false) {
 		const parameterConfig = isReset ? this.getDefaultParameterConfig() : this.getComputedParameterConfig();
 		let stateObject = {
-			isDataLoaded: false
+			isDataLoaded: false,
+			data: null
 		};
 
 		if (isReset) {

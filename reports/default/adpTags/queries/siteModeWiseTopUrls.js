@@ -1,5 +1,5 @@
 const { SITE_MODE_WISE_TOP_URLS } = require('../constants'),
-	sqlReportModule = require('../index'),
+	sqlReportModule = require('../../common/mssql/databases/centralWareHouse/dbhelper'),
 	extend = require('extend'),
 	utils = require('../../../../helpers/utils');
 
@@ -49,7 +49,7 @@ module.exports = {
 			};
 		console.log(`Query for site mode wise top urls: ${paramConfig.siteId}`);
 
-		return sqlReportModule.executeQuery(databaseConfig).then(resultData => {
+		return sqlReportModule.queryDB(databaseConfig).then(resultData => {
 			const isOptionTransform = !!(paramConfig && paramConfig.transform),
 				isResultData = !!(resultData && resultData.length),
 				isTransformableData = isOptionTransform && isResultData;
