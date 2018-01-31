@@ -15,8 +15,8 @@ const Promise = require('bluebird'),
 								_.forEach(ads, ad => {
 									if (ad.network == 'geniee' && ad.networkData && ad.networkData.dynamicAllocation) {
 										output[ad.networkData.zoneId] = {
-											dfpAdunit: ad.networkData.dfpAdunit || 'Not Present',
-											dfpAdunitCode: ad.networkData.dfpAdunitCode || 'Not Present',
+											dfpAdunit: ad.networkData.dfpAdunit || '',
+											dfpAdunitCode: ad.networkData.dfpAdunitCode || '',
 											variationId: variation.id,
 											genieePageGroupId: channel.genieePageGroupId
 										};
