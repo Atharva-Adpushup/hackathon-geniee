@@ -80,14 +80,18 @@ function startCreation(forced) {
 			return resolve(false);
 		}
 
-		return selectVariation(config).then(function(selectedVariation) {
+		return selectVariation(config).then(function(variationData) {
+			var selectedVariation = variationData.selectedVariation,
+				moduleConfig = variationData.config;
+
+			config = adp.config = moduleConfig;
 			if (selectedVariation) {
 				adp.creationProcessStarted = true;
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
 
 				// Load interactive ads script if interactive ads are present in adpushup config
-				var interactiveAds = utils.getInteractiveAds(adp.config);
+				var interactiveAds = utils.getInteractiveAds(config);
 				if (interactiveAds) {
 					require.ensure(
 						['interactiveAds/index.js'],

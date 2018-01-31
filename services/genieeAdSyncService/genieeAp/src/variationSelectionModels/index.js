@@ -38,34 +38,34 @@ function checkForcedVariation(moduleConfig) {
 		allVariations,
 		chosenVariation,
 		forcedVariation,
-		forcedVariationId,
+		forcedVariationName,
 		channelContentSelector,
 		variationContentSelector,
 		isForcedVariation,
-		isForcedVariationId,
 		isVariationContentSelector,
-		contentSelector;
+		contentSelector,
+		variationObject;
 
 	allVariations = experiment[config.platform][config.pageGroup].variations;
-	forcedVariationId = utils.queryParams[config.forceVariation];
-	forcedVariation = forcedVariationId ? utils.getObjectByName(allVariations, forcedVariationId) : false;
-	isForcedVariation = !!(forcedVariationId && forcedVariation);
-	isForcedVariationId = !!(forcedVariationId && allVariations[forcedVariationId]);
+	forcedVariationName = utils.queryParams[config.forceVariation];
+	variationObject = utils.getObjectByName(allVariations, forcedVariationName);
+	forcedVariation = forcedVariationName && variationObject && variationObject.hasOwnProperty('index') && variationObject.name && forcedVariationName === variationObject.name ? variationObject.obj : false;
+	isForcedVariation = !!(forcedVariationName && forcedVariation);
 
-	if (!isForcedVariation) {
+	if (!forcedVariationName) {
 		moduleConfig.isForced = false;
 		moduleConfig.chosenVariation = null;
 		return moduleConfig;
 	}
 
-	if (!isForcedVariationId) {
+	if (!isForcedVariation) {
 		alert("Variation you are trying to force doesn't exist, system will now choose variation automatically");
 		moduleConfig.isForced = true;
 		moduleConfig.chosenVariation = null;
 		return moduleConfig;
 	}
 
-	chosenVariation = forcedVariation.obj;
+	chosenVariation = forcedVariation;
 	if (chosenVariation) {
 		channelContentSelector = experiment[config.platform][config.pageGroup].contentSelector;
 		variationContentSelector = chosenVariation.contentSelector;
@@ -87,8 +87,7 @@ function computeChosenVariation(moduleConfig) {
 
 	if (isForcedVariation) {
 		chosenVariation = $.extend(true, {}, moduleConfig.chosenVariation);
-		window.adpushup.config = $.extend(true, {}, moduleConfig.data);
-		return chosenVariation;
+		return { selectedVariation: chosenVariation, config: $.extend(true, {}, moduleConfig.data)};
 	}
 
 	var config = moduleConfig.isValidated && moduleConfig.data,
@@ -117,8 +116,8 @@ function computeChosenVariation(moduleConfig) {
 			config.contentSelector = contentSelector;
 		}
 
-		window.adpushup.config = $.extend(true, {}, config);
-		return chosenVariation && chosenVariation.ads && chosenVariation.ads.length ? chosenVariation : false;
+		var extendedConfig = $.extend(true, {}, config);
+		return chosenVariation && chosenVariation.ads && chosenVariation.ads.length ? { selectedVariation: chosenVariation, config: extendedConfig} : { chooseVariation: null, config: extendedConfig};
 	});
 }
 
