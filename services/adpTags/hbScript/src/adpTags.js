@@ -116,12 +116,17 @@ var prebidSandbox = require('./prebidSandbox'),
 		currentBatchId: null,
 		batchPrebiddingComplete: false,
 		// Function to define new adp slot
+		shouldRun: function(optionalParam) {
+			if (optionalParam && optionalParam.network == 'geniee') {
+				return false;
+			}
+		},
 		defineSlot: function(containerId, size, placement, optionalParam) {
 			var optionalParam = optionalParam || {},
 				slot = createSlot(containerId, size, placement, optionalParam);
 			logger.log('Slot defined for container : ' + containerId);
 
-			if (utils.isSupportedBrowser()) {
+			if (utils.isSupportedBrowser() && adpTags.shouldRun(optionalParam)) {
 				if (!optionalParam.headerBidding) {
 					slot.type = 9;
 					logger.log('Type 9: HB disabled by editor.');
@@ -160,6 +165,9 @@ var prebidSandbox = require('./prebidSandbox'),
 		},
 		extendConfig: function(newConfig) {
 			Object.assign(config, newConfig);
+		},
+		extendTargeting: function(newTargeting) {
+			Object.assign(config.TARGETING, newTargeting);
 		},
 		// Function to display adp slot for given container id
 		display: function(containerId) {

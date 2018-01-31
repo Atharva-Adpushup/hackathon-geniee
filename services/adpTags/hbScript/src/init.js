@@ -9,6 +9,7 @@ function init(w, d) {
 	var logger = require('../helpers/logger'),
 		gpt = require('./gpt'),
 		config = require('./config'),
+		geniee = require('./geniee'),
 		feedback = require('./feedback'),
 		hbStatus = require('./hbStatus');
 

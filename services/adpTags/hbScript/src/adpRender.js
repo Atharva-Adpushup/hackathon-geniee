@@ -5,7 +5,7 @@ var logger = require('../helpers/logger'),
 	config = require('./config'),
 	feedback = require('./feedback'),
 	// hbStatus = require('./hbStatus'),
-	getFloorWithGranularity = function (floor) {
+	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(1));
 		if (val > 20) {
 			return 20;
@@ -15,16 +15,16 @@ var logger = require('../helpers/logger'),
 		console.log('Sent floor : ' + val);
 		return val;
 	},
-	renderGPT = function (slot) {
+	renderGPT = function(slot) {
 		if (!slot.containerPresent || !slot.biddingComplete || slot.hasRendered) {
 			return false;
 		}
 		slot.hasRendered = true;
-		googletag.cmd.push(function () {
+		googletag.cmd.push(function() {
 			googletag.display(slot.containerId);
 		});
 	},
-	renderPostbid = function (slot) {
+	renderPostbid = function(slot) {
 		logger.log('Rendering postbid');
 
 		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId),
@@ -38,7 +38,7 @@ var logger = require('../helpers/logger'),
 			logger.log('Bid present from postbid');
 
 			pbjs.renderAd(iframeDoc, params.hb_adid);
-			adIframe.contentWindow.onload = function () {
+			adIframe.contentWindow.onload = function() {
 				slot.hasRendered = true;
 				feedback(slot);
 			};
@@ -48,11 +48,28 @@ var logger = require('../helpers/logger'),
 			feedback(slot);
 		}
 	},
-	setGPTargeting = function (slot) {
+	setPageLevelTargeting = function(targeting, slot) {
+		if (slot.optionalParam.keyValues && Object.keys(slot.optionalParam.keyValues).length) {
+			return Object.assign(targeting, slot.optionalParam.keyValues);
+		}
+		return targeting;
+	},
+	setGPTargeting = function(slot) {
+		if (slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE) {
+			var genieeSlots = Object.keys(config.TARGETING);
+			if (genieeSlots.indexOf(slot.slotId) !== -1) {
+				var currentTargetingObject = config.TARGETING[slot.slotId],
+					currentTargetingObject = setPageLevelTargeting(currentTargetingObject, slot);
+				Object.keys(currentTargetingObject).forEach(function(value, key) {
+					slot.gSlot.setTargeting(key, String(value));
+				});
+			}
+			return;
+		}
 		var targeting = {
-			hb_siteId: config.SITE_ID,
-			hb_ran: 0
-		},
+				hb_siteId: config.SITE_ID,
+				hb_ran: 0
+			},
 			adServerTargeting = pbjs.getAdserverTargeting()[slot.containerId];
 
 		if (utils.isSupportedBrowser() && slot.bidders.length) {
@@ -63,11 +80,9 @@ var logger = require('../helpers/logger'),
 			Object.assign(targeting, adServerTargeting);
 		}
 
-		if (slot.optionalParam.keyValues && Object.keys(slot.optionalParam.keyValues).length) {
-			Object.assign(targeting, slot.optionalParam.keyValues);
-		}
+		targeting = setPageLevelTargeting(targeting, slot);
 
-		Object.keys(targeting).forEach(function (key) {
+		Object.keys(targeting).forEach(function(key) {
 			//check if any of keys belong to price floor key then set price using granularity function,
 			// so that it can match with price rules on server
 			if (config.ADX_FLOOR.priceFloorKeys.indexOf(key) !== -1) {
@@ -80,16 +95,20 @@ var logger = require('../helpers/logger'),
 			slot.gSlot.setTargeting(key, String(targeting[key]));
 		});
 	},
-	enableGoogServicesForSlot = function (slot) {
+	enableGoogServicesForSlot = function(slot) {
+		var networkId =
+			slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE
+				? config.GENIEE_NETWORK_ID
+				: config.NETWORK_ID;
 		slot.gSlot = googletag.defineSlot(
-			'/' + config.NETWORK_ID + '/' + slot.optionalParam.dfpAdunitCode,
+			'/' + networkId + '/' + slot.optionalParam.dfpAdunitCode,
 			slot.size,
 			slot.containerId
 		);
 		setGPTargeting(slot);
 		slot.gSlot.addService(googletag.pubads());
 	},
-	nonDFPSlotRenderSwitch = function (slot) {
+	nonDFPSlotRenderSwitch = function(slot) {
 		var type = slot.type;
 
 		switch (type) {
@@ -106,10 +125,10 @@ var logger = require('../helpers/logger'),
 				break;
 		}
 	},
-	ifAdsenseWinner = function (containerId) {
+	ifAdsenseWinner = function(containerId) {
 		return pbjs.getHighestCpmBids(containerId)[0].bidder === config.ADSENSE.bidderName ? true : false;
 	},
-	renderAdsenseBackfill = function (slot) {
+	renderAdsenseBackfill = function(slot) {
 		var bid = pbjs.getHighestCpmBids(slot.containerId)[0],
 			adData = JSON.stringify({
 				containerId: slot.containerId,
@@ -119,13 +138,13 @@ var logger = require('../helpers/logger'),
 
 		bid.ad = config.ADSENSE_FALLBACK_ADCODE.replace('__AD_CODE__', adData);
 	},
-	afterBiddingProcessor = function (slots) {
+	afterBiddingProcessor = function(slots) {
 		if (!Array.isArray(slots) || !slots.length) {
 			return false;
 		}
 		var adpSlotsWithDFPSlots = [];
 
-		slots.forEach(function (slot) {
+		slots.forEach(function(slot) {
 			slot.biddingComplete = true;
 			slot.slotId ? adpSlotsWithDFPSlots.push(slot) : nonDFPSlotRenderSwitch(slot);
 		});
@@ -135,14 +154,14 @@ var logger = require('../helpers/logger'),
 		}
 
 		//This code must be inside googletag.cmd.push as it depends upon gpt availability
-		googletag.cmd.push(function () {
+		googletag.cmd.push(function() {
 			//Global key value settings
 			for (var key in config.PAGE_KEY_VALUES) {
 				googletag.pubads().setTargeting(key, String(config.PAGE_KEY_VALUES[key]));
 			}
 
 			// Attach gpt slot for each adpSlot in batch
-			adpSlotsWithDFPSlots.forEach(function (slot) {
+			adpSlotsWithDFPSlots.forEach(function(slot) {
 				enableGoogServicesForSlot(slot);
 			});
 			//when defineslot is done for whole batch enable gpt SRA
@@ -153,7 +172,7 @@ var logger = require('../helpers/logger'),
 			// hbStatus.hbRender(adUnits);
 
 			//In last try rendering all slots.
-			adpSlotsWithDFPSlots.forEach(function (slot) {
+			adpSlotsWithDFPSlots.forEach(function(slot) {
 				// if (ifAdsenseWinner(slot.containerId)) {
 				//     renderAdsenseBackfill(slot);
 				// }
