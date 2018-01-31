@@ -64,7 +64,7 @@ const _ = require('lodash'),
 				});
 			}
 			//for geniee provide networkData
-			if (ad.network == 'adpTags') {
+			if (ad.network == 'adpTags' || (ad.network == 'geniee' && ad.networkData.dynamicAllocation)) {
 				ADPTags.push({
 					key: `${json.width}x${json.height}`,
 					height: json.height,
