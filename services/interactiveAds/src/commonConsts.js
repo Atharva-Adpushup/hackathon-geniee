@@ -29,6 +29,9 @@ const commonConsts = {
 					bottom: 0
 				}
 			}
+		},
+		VIDEO: {
+			NAME: 'video'
 		}
 	}
 };
