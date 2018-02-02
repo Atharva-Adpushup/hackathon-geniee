@@ -74,32 +74,42 @@ function triggerControl(mode) {
 }
 
 function startCreation(forced) {
-	// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
-	if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
-		return false;
-	}
-	var selectedVariation = selectVariation(config);
-	if (selectedVariation) {
-		adp.creationProcessStarted = true;
-		clearTimeout(pageGroupTimer);
-		config.selectedVariation = selectedVariation.id;
-
-		// Load interactive ads script if interactive ads are present in adpushup config
-		var interactiveAds = utils.getInteractiveAds(adp.config);
-		if (interactiveAds) {
-			require.ensure(
-				['interactiveAds/index.js'],
-				function (require) {
-					require('interactiveAds/index')(interactiveAds);
-				},
-				'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
-			);
+	return new Promise(function(resolve) {
+		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
+		if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
+			return resolve(false);
 		}
 
-		createAds(adp, selectedVariation);
-	} else {
-		triggerControl(3);
-	}
+		return selectVariation(config).then(function(variationData) {
+			var selectedVariation = variationData.selectedVariation,
+				moduleConfig = variationData.config;
+
+			config = adp.config = moduleConfig;
+			if (selectedVariation) {
+				adp.creationProcessStarted = true;
+				clearTimeout(pageGroupTimer);
+				config.selectedVariation = selectedVariation.id;
+
+				// Load interactive ads script if interactive ads are present in adpushup config
+				var interactiveAds = utils.getInteractiveAds(config);
+				if (interactiveAds) {
+					require.ensure(
+						['interactiveAds/index.js'],
+						function(require) {
+							require('interactiveAds/index')(interactiveAds);
+						},
+						'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
+					);
+				}
+
+				createAds(adp, selectedVariation);
+			} else {
+				triggerControl(3);
+			}
+
+			return resolve(true);
+		});
+	});
 }
 
 function main() {
@@ -136,7 +146,7 @@ function main() {
 	}
 
 	if (!config.pageGroup) {
-		pageGroupTimer = setTimeout(function () {
+		pageGroupTimer = setTimeout(function() {
 			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {
