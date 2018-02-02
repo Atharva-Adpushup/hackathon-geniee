@@ -1,5 +1,7 @@
 const Promise = require('bluebird'),
 	_ = require('lodash'),
+	config = require('../../configs/config'),
+	AdPushupError = require('../../helpers/AdPushupError'),
 	siteModel = require('../../models/siteModel'),
 	channelProcessing = channels => {
 		let output = {};
@@ -18,7 +20,8 @@ const Promise = require('bluebird'),
 											dfpAdunit: ad.networkData.dfpAdunit || '',
 											dfpAdunitCode: ad.networkData.dfpAdunitCode || '',
 											variationId: variation.id,
-											genieePageGroupId: channel.genieePageGroupId
+											genieePageGroupId: channel.genieePageGroupId,
+											dfpNetworkCode: config.dfpNetworkCodes.GENIEE
 										};
 									}
 								});

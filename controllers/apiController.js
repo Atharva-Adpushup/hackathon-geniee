@@ -41,9 +41,10 @@ router
 			)
 			.catch(err => {
 				console.log(err);
+				let message = err.name == 'AdPushupError' ? err.message[0].message : 'Operation Failed';
 				return res.send({
 					error: true,
-					message: 'Operation Failed'
+					message: message
 				});
 			});
 	})

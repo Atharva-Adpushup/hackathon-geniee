@@ -57,11 +57,39 @@ var logger = require('../helpers/logger'),
 	setGPTargeting = function(slot) {
 		if (slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE) {
 			var genieeSlots = Object.keys(config.TARGETING);
-			if (genieeSlots.indexOf(slot.slotId) !== -1) {
-				var currentTargetingObject = config.TARGETING[slot.slotId],
+			networkCodes = {};
+			dfpAdunitCodes = [];
+			genieeSlots.forEach(function(slot) {
+				/*
+					From Geniee
+					{
+						'/123/234': {},
+						'/567/789': {},
+						'/123/567': {}
+					}
+					networkCodes
+					{
+						234: 123,
+						789: 567,
+						567: 123
+					}
+					dfpAdunitCodes: [234, 789, 567]
+				*/
+				var slotInfo = slot.split('/');
+				networkCodes[slotInfo[2]] = slotInfo[1];
+				dfpAdunitCodes.push(slotInfo[2]);
+			});
+			if (dfpAdunitCodes.indexOf(slot.optionalParam.dfpAdunitCode) !== -1) {
+				var currentTargetingObject =
+						config.TARGETING[
+							'/' +
+								networkCodes[slot.optionalParam.dfpAdunitCode] +
+								'/' +
+								slot.optionalParam.dfpAdunitCode
+						],
 					currentTargetingObject = setPageLevelTargeting(currentTargetingObject, slot);
-				Object.keys(currentTargetingObject).forEach(function(value, key) {
-					slot.gSlot.setTargeting(key, String(value));
+				Object.keys(currentTargetingObject).forEach(function(dfpKey, index) {
+					slot.gSlot.setTargeting(dfpKey, String(currentTargetingObject[dfpKey]));
 				});
 			}
 			return;
