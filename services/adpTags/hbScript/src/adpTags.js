@@ -126,7 +126,8 @@ var prebidSandbox = require('./prebidSandbox'),
 				slot = createSlot(containerId, size, placement, optionalParam);
 			logger.log('Slot defined for container : ' + containerId);
 
-			if (utils.isSupportedBrowser() && adpTags.shouldRun(optionalParam)) {
+			if (utils.isSupportedBrowser()) {
+				// && adpTags.shouldRun(optionalParam)) {
 				if (!optionalParam.headerBidding) {
 					slot.type = 9;
 					logger.log('Type 9: HB disabled by editor.');
