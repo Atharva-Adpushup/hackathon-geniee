@@ -10,13 +10,25 @@ import SelectBox from 'shared/select/select.js';
 
 class Personalization extends Component {
 	constructor(props) {
+		let isPersonalizationPresent = !!(
+			props.variation.personalization && Object.keys(props.variation.personalization).length
+		);
 		super(props);
 		this.state = {
-			countries: '',
-			type: false
+			countries: isPersonalizationPresent ? props.variation.personalization.geo.values.join(',') : '',
+			type: isPersonalizationPresent ? props.variation.personalization.geo.type : false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.checkCountries = this.checkCountries.bind(this);
+	}
+	componentWillReceiveProps(nextProps) {
+		let isPersonalizationPresent = !!(
+			nextProps.variation.personalization && Object.keys(nextProps.variation.personalization).length
+		);
+		this.setState({
+			countries: isPersonalizationPresent ? nextProps.variation.personalization.geo.values.join(',') : '',
+			type: isPersonalizationPresent ? nextProps.variation.personalization.geo.type : false
+		});
 	}
 	checkCountries(countries) {
 		return _.some(countries, country => (country.trim().length == 0 || country.trim().length >= 3 ? true : false));
