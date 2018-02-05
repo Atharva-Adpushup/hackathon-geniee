@@ -21,7 +21,7 @@ var utils = require('../../libs/utils'),
 		});
 		return finalVariations;
 	},
-	getPersonalizedVariations = function(variations) {
+	getPersonalizedVariations = function(variations, isAutoOptimise) {
 		/*personalization: {
         geo: {
             type: "not" //in
@@ -33,9 +33,26 @@ var utils = require('../../libs/utils'),
 				remainingVariations = [];
 
 			$.each(variations, function(variationId, variationObj) {
-				if (variationObj && variationObj.personalization && variationObj.personalization.geo) {
+				//NOTE: Though this check should have been added in variationSelection module,
+				//it is added here to avoid one more variation loop execution time and because
+				//all variations will always go through personalisation module before they are chosen
+				//using 'randomSelection' or 'autoOptimise' models
+				var isValidRandomSelectionVariation = !!(!isAutoOptimise && variationObj.traffic),
+					isValidAutoOptimiseVariation = !!(
+						isAutoOptimise &&
+						variationObj.hasOwnProperty('sum') &&
+						variationObj.hasOwnProperty('count')
+					),
+					isValidVariation = isValidRandomSelectionVariation || isValidAutoOptimiseVariation;
+
+				if (
+					variationObj &&
+					variationObj.personalization &&
+					variationObj.personalization.geo &&
+					isValidVariation
+				) {
 					variationsWhereCountryNeeded.push(variationObj);
-				} else {
+				} else if (isValidVariation) {
 					remainingVariations.push(variationObj);
 				}
 			});

@@ -49,7 +49,14 @@ function checkForcedVariation(moduleConfig) {
 	allVariations = experiment[config.platform][config.pageGroup].variations;
 	forcedVariationName = utils.queryParams[config.forceVariation];
 	variationObject = utils.getObjectByName(allVariations, forcedVariationName);
-	forcedVariation = forcedVariationName && variationObject && variationObject.hasOwnProperty('index') && variationObject.name && forcedVariationName === variationObject.name ? variationObject.obj : false;
+	forcedVariation =
+		forcedVariationName &&
+		variationObject &&
+		variationObject.hasOwnProperty('index') &&
+		variationObject.name &&
+		forcedVariationName === variationObject.name
+			? variationObject.obj
+			: false;
 	isForcedVariation = !!(forcedVariationName && forcedVariation);
 
 	if (!forcedVariationName) {
@@ -87,7 +94,7 @@ function computeChosenVariation(moduleConfig) {
 
 	if (isForcedVariation) {
 		chosenVariation = $.extend(true, {}, moduleConfig.chosenVariation);
-		return { selectedVariation: chosenVariation, config: $.extend(true, {}, moduleConfig.data)};
+		return { selectedVariation: chosenVariation, config: $.extend(true, {}, moduleConfig.data) };
 	}
 
 	var config = moduleConfig.isValidated && moduleConfig.data,
@@ -100,7 +107,7 @@ function computeChosenVariation(moduleConfig) {
 		hasVariationsWithNoData,
 		contentSelector;
 
-	return getPersonalizedVariations(allVariations).then(function(filteredVariations) {
+	return getPersonalizedVariations(allVariations, isAutoOptimise).then(function(filteredVariations) {
 		if (isAutoOptimise) {
 			hasVariationsWithNoData = experiment[config.platform][config.pageGroup].hasVariationsWithNoData;
 			chosenVariation = bayesianBanditModel.chooseVariation(filteredVariations, hasVariationsWithNoData);
@@ -117,7 +124,9 @@ function computeChosenVariation(moduleConfig) {
 		}
 
 		var extendedConfig = $.extend(true, {}, config);
-		return chosenVariation && chosenVariation.ads && chosenVariation.ads.length ? { selectedVariation: chosenVariation, config: extendedConfig} : { chooseVariation: null, config: extendedConfig};
+		return chosenVariation && chosenVariation.ads && chosenVariation.ads.length
+			? { selectedVariation: chosenVariation, config: extendedConfig }
+			: { chooseVariation: null, config: extendedConfig };
 	});
 }
 
