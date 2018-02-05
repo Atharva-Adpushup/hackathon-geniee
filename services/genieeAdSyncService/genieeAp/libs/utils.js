@@ -351,7 +351,7 @@ module.exports = {
 				}
 			}
 
-			if (Object.keys(this.queryParams).length > 1) {
+			if (Object.keys(this.queryParams).length >= 1) {
 				url = urlBase + '?' + parts.join('&');
 			} else {
 				url = urlBase;
