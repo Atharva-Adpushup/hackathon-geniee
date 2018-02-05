@@ -101,6 +101,7 @@ const _ = require('lodash'),
 			adpKeyValues: variation.adpKeyValues,
 			contentSelector: isContentSelector ? contentSelector : '',
 			ads: ads,
+			personalization: variation.personalization,
 			// Data required for auto optimiser model
 			// Page revenue is mapped as sum
 			sum:

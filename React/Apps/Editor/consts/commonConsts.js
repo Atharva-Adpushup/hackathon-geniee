@@ -180,7 +180,8 @@ const status = {
 		OPEN_VARIATION_PANEL: 'OPEN_VARIATION_PANEL',
 		CLOSE_VARIATION_PANEL: 'CLOSE_VARIATION_PANEL',
 		UPDATE_CONTENT_SELECTOR: 'UPDATE_CONTENT_SELECTOR',
-		SAVE_KEY_VALUES: 'SAVE_KEY_VALUES'
+		SAVE_KEY_VALUES: 'SAVE_KEY_VALUES',
+		SAVE_PERSONALIZATION_INFO: 'SAVE_PERSONALIZATION_INFO'
 	},
 	sectionActions = {
 		CREATE_SECTION: 'CREATE_SECTION',
@@ -353,7 +354,8 @@ const status = {
 			}
 		},
 		types: ['stickyBottom', 'stickyLeft', 'stickyRight']
-	};
+	},
+	personalizationTypes = ['not', 'in'];
 
 export {
 	status,
@@ -394,5 +396,6 @@ export {
 	priceFloorKeys,
 	defaultPriceFloorKey,
 	jsWrapper,
-	interactiveAds
+	interactiveAds,
+	personalizationTypes
 };
