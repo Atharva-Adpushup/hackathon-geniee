@@ -56,8 +56,7 @@ const channelMenu = ({
 				sumMismatchErrorMessage={trafficDistributionConfig.sumMismatchErrorMessage}
 				collection={allTrafficDistributions}
 				uiMinimal
-				required
-				maxValue={100}
+				maxValue={1000}
 				onSave={a => saveTrafficDistributions(a)}
 			/>
 		</MenuItem>

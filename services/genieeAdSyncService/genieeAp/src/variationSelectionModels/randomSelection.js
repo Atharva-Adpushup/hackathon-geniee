@@ -6,6 +6,10 @@ module.exports = function() {
 			chosenVariation,
 			tempNumber = 0;
 
+		allVariations = allVariations.sort(function(a, b) {
+			return a.traffic - b.traffic;
+		});
+
 		$.each(allVariations, function(variationId, variationObj) {
 			tempNumber = parseInt(variationObj.traffic, 10) + tempNumber;
 
