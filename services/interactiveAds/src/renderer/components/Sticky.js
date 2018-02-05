@@ -15,7 +15,7 @@ const $ = window.adpushup.$ || window.$,
 				return placementCSS.RIGHT;
 		}
 	},
-	Sticky = interactiveAd => {
+	Sticky = (parentNode, interactiveAd, adCode) => {
 		const { formatData } = interactiveAd,
 			css = {
 				width: interactiveAd.width,
@@ -23,10 +23,10 @@ const $ = window.adpushup.$ || window.$,
 				...commonConsts.FORMATS.STICKY.BASE_STYLES,
 				...getPlacementCSS(formatData)
 			},
-			Sticky = $('<div />');
+			sticky = $('<div />');
 
-		Sticky.css(css);
-		return Sticky;
+		sticky.css(css);
+		return parentNode.append(sticky.append(adCode));
 	};
 
 export default Sticky;

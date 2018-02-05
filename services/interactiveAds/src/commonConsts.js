@@ -6,6 +6,7 @@ const commonConsts = {
 		SCROLL: 'scroll'
 	},
 	DEFAULT_CLASSNAME: 'adp_interactive_ad',
+	IMA_MODULES_CDN: '//cdn.adpushup.com/videojs-ima/',
 	FORMATS: {
 		STICKY: {
 			NAME: 'sticky',
@@ -31,7 +32,12 @@ const commonConsts = {
 			}
 		},
 		VIDEO: {
-			NAME: 'video'
+			NAME: 'video',
+			AD_MODULES: {
+				CSS: ['video-js.min.css', 'video-js-ads.min.css', 'video-js-ima.min.css'],
+				JS: ['video-js-ads.min.js', 'video-js-ima.min.js'],
+				IMA_SDK: '//imasdk.googleapis.com/js/sdkloader/ima3.js' 
+			}
 		}
 	}
 };

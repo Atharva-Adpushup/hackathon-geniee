@@ -7,45 +7,29 @@ import { generateAdCode } from '../../../genieeAdSyncService/genieeAp/src/adCode
 
 const $ = window.adpushup.$ || window.$,
 	createParentNode = (appendTo, interactiveAd) => {
-		const node = $('<div/>'),
+		const parentNode = $('<div/>'),
 			{ id } = interactiveAd;
 
-		node.attr({ class: commonConsts.DEFAULT_CLASSNAME, id });
-		$(appendTo).append(node);
+		parentNode.attr({ class: commonConsts.DEFAULT_CLASSNAME });
+		$(appendTo).append(parentNode);
 
-		return node;
-	},
-	renderFormat = (format, interactiveAd, adCode) => {
-		let ad = null;
-
-		switch(format) {
-			case commonConsts.FORMATS.STICKY.NAME:
-				const sticky = Sticky(interactiveAd),
-					node = createParentNode('body', interactiveAd);
-
-				ad = sticky.append(adCode);
-			break;
-			case commonConsts.FORMATS.VIDEO.NAME:
-				const video = Video(interactiveAd),
-					{ xpath } = interactiveAd.formatData,
-					node = createParentNode(xpath, interactiveAd);
-
-				ad = video.append(adCode);				
-				break;
-		}
-
-		return node.append(ad);
+		return parentNode;
 	},
 	renderer = (interactiveAd, eventData) => {
 		if (interactiveAd && interactiveAd.formatData) {
 			const type = interactiveAd.formatData.type,
 				adCode = generateAdCode(interactiveAd);
 
+			let parentNode = null;
+
 			switch (type) {
 				case commonConsts.FORMATS.STICKY.NAME:
-					return renderFormat(commonConsts.FORMATS.STICKY.NAME, interactiveAd, adCode);
+					parentNode = createParentNode('body', interactiveAd);
+					return Sticky(parentNode, interactiveAd, adCode);
 				case commonConsts.FORMATS.VIDEO.NAME:
-					return renderFormat(commonConsts.FORMATS.VIDEO.NAME, interactiveAd, adCode)
+					const { value } = interactiveAd.formatData.eventData; // Value is the xpath
+					parentNode = createParentNode(value, interactiveAd);
+					return Video(parentNode, interactiveAd, adCode);
 			}
 		}
 	};

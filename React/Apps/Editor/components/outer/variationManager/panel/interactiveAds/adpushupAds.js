@@ -109,8 +109,17 @@ class AdPushupAds extends Component {
 				);
 				break;
 
-			case 'load':
 			case 'DOMContentLoaded':
+				return this.renderInput(
+					'Xpath (optional)',
+					'xpath',
+					'string',
+					this.state.eventData.value,
+					leftWidth,
+					rightWidth
+				);
+				break;
+
 			default:
 				return <Row>&nbsp;</Row>;
 				break;
