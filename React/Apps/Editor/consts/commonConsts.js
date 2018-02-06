@@ -346,7 +346,7 @@ const status = {
 					right: ['160x600', '336x280', '300x250', '300x600', '300x50', '120x600']
 				},
 				video: {
-					custom: ['300x250']
+					custom: ['336x280']
 				}
 			},
 			MOBILE: {
