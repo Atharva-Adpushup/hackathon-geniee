@@ -176,57 +176,57 @@ module.exports = {
 			);
 			this.log('KeenIOImpressionRequest: Should impression request be sent? ', isEventTypeGenieeRevenue);
 
-		// TODO: Below KeenIO code is disabled temporarily, uncomment it and integration should work fine
-		// Keen IO 'Impression' collection integration
-		// 	if (isEventTypeGenieeRevenue) {
-		// 		keenIoImpressionFeedbackData = {
-		// 			success: true,
-		// 			data: {
-		// 				status: null,
-		// 				variationId: keenIoFeedbackData.variationId,
-		// 				placement: keenIoFeedbackData.containerId,
-		// 				containerId: keenIoFeedbackData.containerId,
-		// 				winningRevenue: keenIoFeedbackData.revenue,
-		// 				sectionId: keenIoFeedbackData.adId,
-		// 				winner: 'geniee',
-		// 				bids: [],
-		// 				pageGroup: encodeURIComponent(keenIoFeedbackData.pageGroup),
-		// 				platform: keenIoFeedbackData.platform,
-		// 				siteId: keenIoFeedbackData.siteId,
-		// 				timeout: null,
-		// 				timedOutBidders: [],
-		// 				type: null,
-		// 				size: keenIoFeedbackData.adSize
-		// 			}
-		// 		};
+			// TODO: Below KeenIO code is disabled temporarily, uncomment it and integration should work fine
+			// Keen IO 'Impression' collection integration
+			// if (isEventTypeGenieeRevenue) {
+			// 	keenIoImpressionFeedbackData = {
+			// 		success: true,
+			// 		data: {
+			// 			status: null,
+			// 			variationId: keenIoFeedbackData.variationId,
+			// 			placement: keenIoFeedbackData.containerId,
+			// 			containerId: keenIoFeedbackData.containerId,
+			// 			winningRevenue: keenIoFeedbackData.revenue,
+			// 			sectionId: keenIoFeedbackData.adId,
+			// 			winner: 'geniee',
+			// 			bids: [],
+			// 			pageGroup: encodeURIComponent(keenIoFeedbackData.pageGroup),
+			// 			platform: keenIoFeedbackData.platform,
+			// 			siteId: keenIoFeedbackData.siteId,
+			// 			timeout: null,
+			// 			timedOutBidders: [],
+			// 			type: null,
+			// 			size: keenIoFeedbackData.adSize
+			// 		}
+			// 	};
 
-		// 		try {
-		// 			keenIoImpressionFeedbackData = this.base64Encode(JSON.stringify(keenIoImpressionFeedbackData));
-		// 			keenIoImpressionFeedbackUrl =
-		// 				keenIOConfig.baseUrl +
-		// 				keenIOImpressionConfig.projectId +
-		// 				'/events/impression?api_key=' +
-		// 				keenIOImpressionConfig.apiKey +
-		// 				'&data=' +
-		// 				keenIoImpressionFeedbackData;
-		// 			this.log('KeenIOImpressionRequest: keenIoImpressionFeedbackUrl', keenIoImpressionFeedbackUrl);
-		// 			new Image().src = keenIoImpressionFeedbackUrl;
-		// 			this.log('KeenIOImpressionRequest: Successfully sent impression request!');
-		// 		} catch (e) {}
-		// 	}
+			// 	try {
+			// 		keenIoImpressionFeedbackData = this.base64Encode(JSON.stringify(keenIoImpressionFeedbackData));
+			// 		keenIoImpressionFeedbackUrl =
+			// 			keenIOConfig.baseUrl +
+			// 			keenIOImpressionConfig.projectId +
+			// 			'/events/impression?api_key=' +
+			// 			keenIOImpressionConfig.apiKey +
+			// 			'&data=' +
+			// 			keenIoImpressionFeedbackData;
+			// 		this.log('KeenIOImpressionRequest: keenIoImpressionFeedbackUrl', keenIoImpressionFeedbackUrl);
+			// 		new Image().src = keenIoImpressionFeedbackUrl;
+			// 		this.log('KeenIOImpressionRequest: Successfully sent impression request!');
+			// 	} catch (e) {}
+			// }
 
-		// 	try {
-		// 		keenIoFeedbackData = this.base64Encode(JSON.stringify(keenIoFeedbackData));
-		// 		keenIoFeedbackUrl =
-		// 			keenIOConfig.baseUrl +
-		// 			keenIOConfig.projectId +
-		// 			'/events/pageviews?api_key=' +
-		// 			keenIOConfig.apiKey +
-		// 			'&data=' +
-		// 			keenIoFeedbackData;
-		// 		new Image().src = keenIoFeedbackUrl;
-		// 	} catch (e) {}
-		// }
+			// try {
+			// 	keenIoFeedbackData = this.base64Encode(JSON.stringify(keenIoFeedbackData));
+			// 	keenIoFeedbackUrl =
+			// 		keenIOConfig.baseUrl +
+			// 		keenIOConfig.projectId +
+			// 		'/events/pageviews?api_key=' +
+			// 		keenIOConfig.apiKey +
+			// 		'&data=' +
+			// 		keenIoFeedbackData;
+			// 	new Image().src = keenIoFeedbackUrl;
+			// } catch (e) {}
+		}
 
 		options = options || {};
 
