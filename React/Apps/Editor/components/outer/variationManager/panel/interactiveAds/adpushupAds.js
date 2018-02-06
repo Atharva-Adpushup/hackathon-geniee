@@ -110,6 +110,7 @@ class AdPushupAds extends Component {
 				break;
 
 			case 'DOMContentLoaded':
+			case 'scriptLoaded':
 				return this.renderInput(
 					'Xpath (optional)',
 					'xpath',
