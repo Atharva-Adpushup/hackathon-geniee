@@ -179,6 +179,17 @@ var utils = require('../libs/utils'),
 				_ecpmZones[inputZoneId] = _$.extend(true, {}, ecpmZoneObject);
 				this.sendRevenueFeedback(inputZoneId);
 			}
+		},
+		// Tell geniee whether AdPushup will run 'adpushup' or 'control' mode
+		// 'selectedMode' parameter will contain variationId (uuid value) or 'CONTROL' string as values
+		sendSelectedModeFeedback: function(selectedMode) {
+			var isGnsModOneTag = !!(window.gnsmod && window.gnsmod.useOneTag);
+
+			if (!isGnsModOneTag) {
+				return false;
+			}
+
+			window.gnsmod.adpVariation(selectedMode);
 		}
 	};
 

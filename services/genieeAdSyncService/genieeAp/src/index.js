@@ -49,12 +49,21 @@ function shouldWeNotProceed() {
 }
 
 function triggerControl(mode) {
+	var isGenieeModeSelected;
+
 	if (shouldWeNotProceed()) {
 		return false;
 	}
 	config.mode = mode;
 	if (config.partner === 'geniee' && !config.isAdPushupControlWithPartnerSSP) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
+			isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
+
+			//Geniee method call for control mode
+			if (isGenieeModeSelected) {
+				adp.geniee.sendSelectedModeFeedback('CONTROL');
+			}
+
 			w.gnsmod.triggerAds();
 			utils.sendFeedback({
 				eventType: 3,
@@ -82,13 +91,19 @@ function startCreation(forced) {
 
 		return selectVariation(config).then(function(variationData) {
 			var selectedVariation = variationData.selectedVariation,
-				moduleConfig = variationData.config;
+				moduleConfig = variationData.config,
+				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
 
 			config = adp.config = moduleConfig;
 			if (selectedVariation) {
 				adp.creationProcessStarted = true;
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
+
+				//Geniee method call for chosen variation id
+				if (isGenieeModeSelected) {
+					adp.geniee.sendSelectedModeFeedback(selectedVariation.id);
+				}
 
 				// Load interactive ads script if interactive ads are present in adpushup config
 				var interactiveAds = utils.getInteractiveAds(config);
