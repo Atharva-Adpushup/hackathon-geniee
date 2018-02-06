@@ -5,15 +5,22 @@ import Component from './Component';
 import '../../videojs/css/videojs-ads-ima.css';
 import $ from '../../$';
 import config from '../../config';
+import videojs from 'video.js';
+import 'videojs-contrib-ads';
+import 'videojs-ima';
 
 class Video extends Component {
     constructor(parentNode, interactiveAd, adCode) {
         super(parentNode, interactiveAd, adCode);
 
         this.initImaSdk = this.initImaSdk.bind(this);
+        this.createPlayer = this.createPlayer.bind(this);
+
         if(!config.imaSdkLoaded) {
             this.initImaSdk();
-        }   
+        }
+
+        this.createPlayer();
     }
 
     initImaSdk() {
@@ -22,6 +29,10 @@ class Video extends Component {
         $('head').append(script);
 
         config.imaSdkLoaded = true;
+    }
+
+    createPlayer() {
+        console.log(videojs);
     }
 }
 

@@ -16,6 +16,8 @@
 		"babel-preset-stage-2": "^6.24.1"
 	},
 	"dependencies": {
-		"video.js": "^5.20.4"
+		"video.js": "^5.20.4",
+		"videojs-contrib-ads": "^5.1.6",
+		"videojs-ima": "^1.0.4"
 	}
 }
