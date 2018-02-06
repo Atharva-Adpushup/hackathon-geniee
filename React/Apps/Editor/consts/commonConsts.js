@@ -337,7 +337,7 @@ const status = {
 	reportingUrl = '/user/reports/generate',
 	jsWrapper = `(function($){ \n\n })(adpushup.$)`,
 	interactiveAds = {
-		events: ['DOMContentLoaded'], //load', 'scroll', 'onMills',
+		events: ['DOMContentLoaded', 'scriptLoaded'], //load', 'scroll', 'onMills',
 		sizes: {
 			DESKTOP: {
 				sticky: {

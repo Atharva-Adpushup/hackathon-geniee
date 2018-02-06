@@ -14,8 +14,11 @@ const processInteractiveAds = interactiveAds => {
 			switch (eventName) {
 				case commonConsts.EVENTS.DOM_LOAD:
 					const pageLoadEvent = emitter.subscribe(commonConsts.EVENTS.DOM_LOAD, eventData => {
-						renderer(interactiveAd, eventData);
+						renderer(interactiveAd);
 					});
+					break;
+				case commonConsts.EVENTS.SCRIPT_LOAD:
+					renderer(interactiveAd);
 					break;
 			}
 		}

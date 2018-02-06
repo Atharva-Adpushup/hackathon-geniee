@@ -15,7 +15,7 @@ const $ = window.adpushup.$ || window.$,
 
 		return parentNode;
 	},
-	renderer = (interactiveAd, eventData) => {
+	renderer = interactiveAd => {
 		if (interactiveAd && interactiveAd.formatData) {
 			const type = interactiveAd.formatData.type,
 				adCode = generateAdCode(interactiveAd);
