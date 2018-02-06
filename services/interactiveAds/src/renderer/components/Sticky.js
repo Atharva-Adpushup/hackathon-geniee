@@ -1,9 +1,18 @@
 // Sticky ad component
 
 import commonConsts from '../../commonConsts';
+const $ = window.adpushup.$ || window.$;
 
-const $ = window.adpushup.$ || window.$,
-	getPlacementCSS = formatData => {
+class Sticky {
+	constructor(parentNode, interactiveAd, adCode) {
+		this.parentNode = parentNode;
+		this.interactiveAd = interactiveAd;
+		this.adCode = adCode;
+
+		this.getPlacementCSS = this.getPlacementCSS.bind(this);
+	}
+
+	getPlacementCSS(formatData) {
 		const placementCSS = commonConsts.FORMATS.STICKY.PLACEMENT_CSS;
 
 		switch (formatData.placement) {
@@ -14,19 +23,21 @@ const $ = window.adpushup.$ || window.$,
 			case 'right':
 				return placementCSS.RIGHT;
 		}
-	},
-	Sticky = (parentNode, interactiveAd, adCode) => {
-		const { formatData } = interactiveAd,
+	}
+
+	render() {
+		const { formatData, width, height } = this.interactiveAd,
 			css = {
-				width: interactiveAd.width,
-				height: interactiveAd.height,
+				width,
+				height,
 				...commonConsts.FORMATS.STICKY.BASE_STYLES,
-				...getPlacementCSS(formatData)
+				...this.getPlacementCSS(formatData)
 			},
 			sticky = $('<div />');
 
 		sticky.css(css);
-		return parentNode.append(sticky.append(adCode));
-	};
+		return this.parentNode.append(sticky.append(this.adCode));
+	}
+}	
 
 export default Sticky;

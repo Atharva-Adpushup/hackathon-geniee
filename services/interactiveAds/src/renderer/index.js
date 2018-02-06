@@ -25,11 +25,13 @@ const $ = window.adpushup.$ || window.$,
 			switch (type) {
 				case commonConsts.FORMATS.STICKY.NAME:
 					parentNode = createParentNode('body', interactiveAd);
-					return Sticky(parentNode, interactiveAd, adCode);
+					const sticky = new Sticky(parentNode, interactiveAd, adCode);
+					return sticky.render();
+					
 				case commonConsts.FORMATS.VIDEO.NAME:
 					const { value } = interactiveAd.formatData.eventData; // Value is the xpath
 					parentNode = createParentNode(value, interactiveAd);
-					return Video(parentNode, interactiveAd, adCode);
+					//return Video(parentNode, interactiveAd, adCode);
 			}
 		}
 	};
