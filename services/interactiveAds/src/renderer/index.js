@@ -3,10 +3,11 @@
 import commonConsts from '../commonConsts';
 import Sticky from './components/Sticky';
 import Video from './components/Video';
+import $ from '../$';
+import config from '../config';
 import { generateAdCode } from '../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
 
-const $ = window.adpushup.$ || window.$,
-	createParentNode = (appendTo, interactiveAd) => {
+const createParentNode = (appendTo, interactiveAd) => {
 		const parentNode = $('<div/>'),
 			{ id } = interactiveAd;
 
@@ -15,6 +16,13 @@ const $ = window.adpushup.$ || window.$,
 
 		return parentNode;
 	},
+	initImaSdk = () => {
+        const script = $('<script/>');
+        script.attr({ src: commonConsts.FORMATS.VIDEO.IMA_SDK });
+        $('head').append(script);
+
+        config.imaSdkLoaded = true;
+    },
 	renderer = interactiveAd => {
 		if (interactiveAd && interactiveAd.formatData) {
 			const type = interactiveAd.formatData.type,
@@ -29,10 +37,14 @@ const $ = window.adpushup.$ || window.$,
 					return sticky.render();
 					
 				case commonConsts.FORMATS.VIDEO.NAME:
+					if(!config.imaSdkLoaded) {
+						initImaSdk();
+					}
+
 					const { value } = interactiveAd.formatData.eventData; // Value is the xpath
 					parentNode = createParentNode(value, interactiveAd);
 					const video = new Video(parentNode, interactiveAd, adCode);
-					return video.render();
+					//return video.render();
 					//return Video(parentNode, interactiveAd, adCode);
 			}
 		}
