@@ -31,6 +31,8 @@ const $ = window.adpushup.$ || window.$,
 				case commonConsts.FORMATS.VIDEO.NAME:
 					const { value } = interactiveAd.formatData.eventData; // Value is the xpath
 					parentNode = createParentNode(value, interactiveAd);
+					const video = new Video(parentNode, interactiveAd, adCode);
+					return video.render();
 					//return Video(parentNode, interactiveAd, adCode);
 			}
 		}

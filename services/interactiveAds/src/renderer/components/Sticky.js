@@ -5,11 +5,7 @@ import Component from './Component';
 
 class Sticky extends Component {
 	constructor(parentNode, interactiveAd, adCode) {
-		super();
-
-		this.parentNode = parentNode;
-		this.interactiveAd = interactiveAd;
-		this.adCode = adCode;
+		super(parentNode, interactiveAd, adCode);
 
 		this.getPlacementCSS = this.getPlacementCSS.bind(this);
 	}

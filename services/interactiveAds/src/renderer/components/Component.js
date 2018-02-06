@@ -1,10 +1,18 @@
 // Top-level component
 
 import commonConsts from '../../commonConsts';
-const $ = window.adpushup.$ || window.$;
+import $ from '../../$';
 
 class Component {
+    constructor(parentNode, interactiveAd, adCode) {
+		this.parentNode = parentNode;
+		this.interactiveAd = interactiveAd;
+		this.adCode = adCode;
+    }
+    
     render() {
+        window.adpInteractive.ads.push(this.interactiveAd);
+
         const { formatData, width, height } = this.interactiveAd;
         let css = { width, height }, format = $('<div />');
 

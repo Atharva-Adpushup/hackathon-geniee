@@ -5,8 +5,7 @@ const commonConsts = {
 		DOM_LOAD: 'DOMContentLoaded',
 		SCRIPT_LOAD: 'scriptLoaded'
 	},
-	DEFAULT_CLASSNAME: 'adp_interactive_ad',
-	IMA_MODULES_CDN: '//cdn.adpushup.com/videojs-ima/',
+	DEFAULT_CLASSNAME: 'adp_interactive_ad', 
 	FORMATS: {
 		STICKY: {
 			NAME: 'sticky',
@@ -33,11 +32,12 @@ const commonConsts = {
 		},
 		VIDEO: {
 			NAME: 'video',
-			AD_MODULES: {
-				CSS: ['video-js.min.css', 'video-js-ads.min.css', 'video-js-ima.min.css'],
-				JS: ['video-js-ads.min.js', 'video-js-ima.min.js'],
-				IMA_SDK: '//imasdk.googleapis.com/js/sdkloader/ima3.js' 
-			}
+			IMA_SDK: 'http://imasdk.googleapis.com/js/sdkloader/ima3.js'
+			// AD_MODULES: {
+			// 	CSS: ['video-js.min.css', 'video-js-ads.min.css', 'video-js-ima.min.css'],
+			// 	JS: ['video-js-ads.min.js', 'video-js-ima.min.js'],
+			// 	IMA_SDK: '//imasdk.googleapis.com/js/sdkloader/ima3.js' 
+			// }
 		}
 	}
 };
