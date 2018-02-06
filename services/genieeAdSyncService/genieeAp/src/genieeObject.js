@@ -190,6 +190,18 @@ var utils = require('../libs/utils'),
 			}
 
 			window.gnsmod.adpVariation(selectedMode);
+		},
+		// Boolean flag to check whether body tags feedback has been called or not
+		hasBodyTagsRendered: false,
+		// Tell geniee that all slots will be rendered
+		sendBeforeBodyTagsFeedback: function() {
+			var isGnsModBeforeBodyTags = !!(window.gnsmod && window.gnsmod.notifyBeforeBodyTags);
+
+			if (!isGnsModBeforeBodyTags || this.hasBodyTagsRendered) {
+				return false;
+			}
+
+			window.gnsmod.notifyBeforeBodyTags();
 		}
 	};
 

@@ -109,12 +109,20 @@ var utils = require('../libs/utils'),
 
 module.exports = {
 	generateAdCode: function(ad) {
-		var adCode = '';
+		var adCode = '',
+			genieeRef = window.adpushup && window.adpushup.geniee,
+			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback;
 		if (!ad.networkData && ad.adCode) {
 			return utils.base64Decode(ad.adCode);
 		}
 		switch (ad.network.toLowerCase()) {
 			case 'geniee':
+				if (isSendBeforeBodyTags) {
+					genieeRef.sendBeforeBodyTagsFeedback();
+					if (!genieeRef.hasBodyTagsRendered) {
+						genieeRef.hasBodyTagsRendered = true;
+					}
+				}
 				adCode = generateGenieeBodyTag(ad);
 				break;
 
