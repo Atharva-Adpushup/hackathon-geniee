@@ -22,7 +22,7 @@ var logger = require('../helpers/logger'),
 		return bidData;
 	},
 	feedback = function(slot) {
-		if (!slot.type || slot.feedbackSent) {
+		if (!slot.type || slot.feedbackSent || slot.feedback.winner === config.DEFAULT_WINNER) {
 			return;
 		}
 		slot.feedbackSent = true;
