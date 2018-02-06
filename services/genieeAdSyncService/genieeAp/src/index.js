@@ -5,7 +5,16 @@ var w = window,
 	utils = require('../libs/utils'),
 	config = (adp.config = require('../config/config.js')),
 	Tracker = require('../libs/tracker'),
-	nodewatcher = require('../libs/nodeWatcher');
+	nodewatcher = require('../libs/nodeWatcher'),
+	browserConfig = require('../libs/browserConfig'),
+	selectVariation = require('./variationSelectionModels/index'),
+	createAds = require('./adCreater'),
+	heartBeat = require('../libs/heartBeat'),
+	hookAndInit = require('./hooksAndBlockList'),
+	control = require('./control')(),
+	genieeObject = require('./genieeObject'),
+	isGenieeSite;
+
 // Extend adpushup object
 //Location of blow snippet should not be changed, other wise script will throw error.
 $.extend(adp, {
@@ -17,15 +26,6 @@ $.extend(adp, {
 	nodewatcher: nodewatcher,
 	geniee: genieeObject
 });
-
-var browserConfig = require('../libs/browserConfig'),
-	selectVariation = require('./variationSelectionModels/index'),
-	createAds = require('./adCreater'),
-	heartBeat = require('../libs/heartBeat'),
-	hookAndInit = require('./hooksAndBlockList'),
-	control = require('./control')(),
-	genieeObject = require('./genieeObject'),
-	isGenieeSite;
 
 // Extend the settings with generated settings
 // eslint-disable-next-line no-undef
