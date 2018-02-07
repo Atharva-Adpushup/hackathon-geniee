@@ -23,6 +23,7 @@ var $ = require('jquery'),
 			ad.isIncontent ? inContentAds.push(ad) : structuredAds.push(ad);
 			ad.network === 'geniee' &&
 				ad.networkData &&
+				!ad.networkData.dynamicAllocation &&
 				!ad.networkData.adCode &&
 				genieeIds.push(ad.networkData.zoneId);
 			shouldPushToADP(ad) ? adpTagUnits.push(ad) : null;
