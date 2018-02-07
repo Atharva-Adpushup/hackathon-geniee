@@ -1,7 +1,7 @@
 // Sticky ad component
 
-import commonConsts from '../../commonConsts';
-import Component from './Component';
+import commonConsts from '../../../commonConsts';
+import Component from '../Component';
 
 class Sticky extends Component {
 	constructor(parentNode, interactiveAd, adCode) {
@@ -22,6 +22,6 @@ class Sticky extends Component {
 				return placementCSS.RIGHT;
 		}
 	}
-}	
+}
 
 export default Sticky;

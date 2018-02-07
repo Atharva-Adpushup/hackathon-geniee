@@ -1,8 +1,8 @@
 // Interactive ads renderer
 
 import commonConsts from '../commonConsts';
-import Sticky from './components/Sticky';
-import Video from './components/Video';
+import Sticky from './components/Sticky/index';
+import Video from './components/Video/index';
 import $ from '../$';
 import config from '../config';
 import { generateAdCode } from '../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';

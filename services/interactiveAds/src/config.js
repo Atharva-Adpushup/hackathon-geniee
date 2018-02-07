@@ -1,7 +1,7 @@
 // Adp Interactive config
 
 const config = {
-    ads: []
+	ads: []
 };
 
 export default config;
