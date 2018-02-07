@@ -1,8 +1,7 @@
 // Adp Interactive config
 
 const config = {
-    ads: [],
-    imaSdkLoaded: false
+    ads: []
 };
 
 export default config;

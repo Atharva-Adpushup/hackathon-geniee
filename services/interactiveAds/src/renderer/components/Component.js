@@ -24,6 +24,10 @@ class Component {
                     ...this.getPlacementCSS(formatData)
                 });
                 return this.parentNode.append(format.append(this.adCode));
+                
+            case commonConsts.FORMATS.VIDEO.NAME:
+                return this.createPlayer();
+                break;
         }
     }
 }

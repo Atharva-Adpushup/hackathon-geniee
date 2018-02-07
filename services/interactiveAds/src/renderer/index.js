@@ -16,13 +16,6 @@ const createParentNode = (appendTo, interactiveAd) => {
 
 		return parentNode;
 	},
-	initImaSdk = () => {
-        const script = $('<script/>');
-        script.attr({ src: commonConsts.FORMATS.VIDEO.IMA_SDK });
-        $('head').append(script);
-
-        config.imaSdkLoaded = true;
-    },
 	renderer = interactiveAd => {
 		if (interactiveAd && interactiveAd.formatData) {
 			const type = interactiveAd.formatData.type,
@@ -37,15 +30,10 @@ const createParentNode = (appendTo, interactiveAd) => {
 					return sticky.render();
 					
 				case commonConsts.FORMATS.VIDEO.NAME:
-					if(!config.imaSdkLoaded) {
-						initImaSdk();
-					}
-
 					const { value } = interactiveAd.formatData.eventData; // Value is the xpath
 					parentNode = createParentNode(value, interactiveAd);
 					const video = new Video(parentNode, interactiveAd, adCode);
-					//return video.render();
-					//return Video(parentNode, interactiveAd, adCode);
+					return video.render();
 			}
 		}
 	};
