@@ -49,7 +49,12 @@ function shouldWeNotProceed() {
 }
 
 function triggerControl(mode) {
-	var isGenieeModeSelected;
+	var isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
+
+	//Geniee method call for control mode
+	if (isGenieeModeSelected) {
+		adp.geniee.sendSelectedModeFeedback('CONTROL');
+	}
 
 	if (shouldWeNotProceed()) {
 		return false;
@@ -57,13 +62,6 @@ function triggerControl(mode) {
 	config.mode = mode;
 	if (config.partner === 'geniee' && !config.isAdPushupControlWithPartnerSSP) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
-			isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
-
-			//Geniee method call for control mode
-			if (isGenieeModeSelected) {
-				adp.geniee.sendSelectedModeFeedback('CONTROL');
-			}
-
 			w.gnsmod.triggerAds();
 			utils.sendFeedback({
 				eventType: 3,
