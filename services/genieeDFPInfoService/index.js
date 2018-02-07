@@ -4,7 +4,10 @@ const Promise = require('bluebird'),
 	AdPushupError = require('../../helpers/AdPushupError'),
 	siteModel = require('../../models/siteModel'),
 	channelProcessing = channels => {
-		let output = {};
+		let output = {
+			dfpNetworkCode: config.dfpNetworkCodes.GENIEE,
+			zones: {}
+		};
 		_.forEach(channels, channel => {
 			let variations = channel.variations;
 			if (variations && Object.keys(variations).length) {
@@ -16,12 +19,15 @@ const Promise = require('bluebird'),
 							if (ads && Object.keys(ads).length) {
 								_.forEach(ads, ad => {
 									if (ad.network == 'geniee' && ad.networkData && ad.networkData.dynamicAllocation) {
-										output[ad.networkData.zoneId] = {
+										output.zones[ad.networkData.zoneId] = output.zones[ad.networkData.zoneId] || {};
+										output.zones[ad.networkData.zoneId].sections =
+											output.zones[ad.networkData.zoneId].sections || {};
+
+										output.zones[ad.networkData.zoneId].sections[section.id] = {
 											dfpAdunit: ad.networkData.dfpAdunit || '',
 											dfpAdunitCode: ad.networkData.dfpAdunitCode || '',
 											variationId: variation.id,
-											genieePageGroupId: channel.genieePageGroupId,
-											dfpNetworkCode: config.dfpNetworkCodes.GENIEE
+											genieePageGroupId: channel.genieePageGroupId
 										};
 									}
 								});

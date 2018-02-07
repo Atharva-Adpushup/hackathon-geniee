@@ -8,6 +8,7 @@ var express = require('express'),
 	channelModel = require('../models/channelModel'),
 	schema = require('../helpers/schema'),
 	CC = require('../configs/commonConsts'),
+	logger = require('../helpers/globalBucketLogger'),
 	FormValidator = require('../helpers/FormValidator'),
 	genieeDFPInfoService = require('../services/genieeDFPInfoService/index'),
 	woodlotCustomLogger = require('woodlot').customLogger;
@@ -40,7 +41,12 @@ router
 				})
 			)
 			.catch(err => {
-				console.log(err);
+				logger({
+					source: 'Geniee DFP Zone Info API',
+					message: 'API Failed',
+					details: `Failed for site ${req.params.siteId}`,
+					debugData: JSON.stringify(err)
+				});
 				let message = err.name == 'AdPushupError' ? err.message[0].message : 'Operation Failed';
 				return res.send({
 					error: true,
