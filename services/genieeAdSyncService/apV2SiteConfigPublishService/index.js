@@ -21,13 +21,17 @@ function publishToQueueWrapper(siteConfigItems, site) {
 		return response;
 	}
 	function processing() {
-		let genieeUnsynced = !!(siteConfigItems.geniee && siteConfigItems.geniee && siteConfigItems.geniee.length),
-			adpUnsynced = !!(siteConfigItems.adp && siteConfigItems.adp.ads && siteConfigItems.adp.ads.length);
+		let genieeUnsynced = !!(siteConfigItems.geniee && siteConfigItems.geniee.length),
+			adpUnsynced = !!(siteConfigItems.adp && siteConfigItems.adp.ads && siteConfigItems.adp.ads.length),
+			genieeDFPUnsynced = !!(siteConfigItems.genieeDFP && siteConfigItems.genieeDFP.length);
 
 		genieeUnsynced ? _.forEach(siteConfigItems.geniee, item => jobs.push(genieePublishWrapper(item))) : null;
+		genieeDFPUnsynced
+			? _.forEach(siteConfigItems.genieeDFP, item => jobs.push(adpTagPublisherWrapper(siteConfigItems.genieeDFP)))
+			: null;
 		adpUnsynced ? jobs.push(adpTagPublisherWrapper(siteConfigItems.adp)) : null;
 
-		if (!(genieeUnsynced || adpUnsynced) || !jobs.length) {
+		if (!(genieeUnsynced || adpUnsynced || genieeDFPUnsynced) || !jobs.length) {
 			return Promise.resolve(response);
 		}
 		return Promise.all(jobs).then(() => {
