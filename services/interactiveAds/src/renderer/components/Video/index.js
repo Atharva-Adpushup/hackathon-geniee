@@ -54,14 +54,20 @@ class Video extends Component {
 						const options = {
 							id,
 							debug: true,
-							adTagUrl: VIDEO.DEFAULT_AD_TAG_URL
+							adWillPlayMuted: true,
+							adTagUrl: VIDEO.DEFAULT_AD_TAG_URL.replace('__DESCRIPTION_URL__', window.location.origin)
 						};
 
 						this.ima(options);
 
-						this.on(VIDEO.EVENTS.ERROR, function() {
+						this.on(VIDEO.EVENTS.AD_ERROR, function() {
 							this.dispose();
 							VideoInstance.appendPassbackAd();
+						});
+
+						// Hacky way to mute the ad as "adWillPlayMuted" option is not working
+						this.on(VIDEO.EVENTS.AD_STARTED, function() {
+							this.ima.getAdsManager().setVolume(0);
 						});
 					}
 				);
