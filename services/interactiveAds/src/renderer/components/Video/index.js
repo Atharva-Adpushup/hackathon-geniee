@@ -45,8 +45,7 @@ class Video extends Component {
 						const options = {
 							id,
 							debug: true,
-							adTagUrl:
-								networkData && networkData.adCode ? atob(networkData.adCode) : VIDEO.DEFAULT_AD_TAG_URL
+							adTagUrl: VIDEO.DEFAULT_AD_TAG_URL
 						};
 
 						this.ima(options);
