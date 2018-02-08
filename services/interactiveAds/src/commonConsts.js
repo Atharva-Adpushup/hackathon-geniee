@@ -32,6 +32,9 @@ const commonConsts = {
 		},
 		VIDEO: {
 			NAME: 'video',
+			EVENTS: {
+				ERROR: 'adserror'
+			},
 			RECOMMENDATION: {
 				API_URL: '//e3.adpushup.com/VideoRecommendWebService/video/recommend?keywords=',
 				MAPPING: {
