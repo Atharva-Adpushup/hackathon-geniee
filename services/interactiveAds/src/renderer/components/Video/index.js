@@ -18,10 +18,19 @@ class Video extends Component {
 		this.createPlayer = this.createPlayer.bind(this);
 	}
 
+	appendPassbackAd() {
+		const { networkData, id, width, height } = this.interactiveAd,
+			passbackAd = $('<div/>');
+
+		passbackAd.attr({ id }).css({ width, height });
+		this.parentNode.append(passbackAd.append(atob(networkData.adCode)));
+	}
+
 	createPlayer() {
 		const { id, width, height, networkData } = this.interactiveAd,
 			player = $('<video/>'),
-			{ VIDEO } = commonConsts.FORMATS;
+			{ VIDEO } = commonConsts.FORMATS,
+			VideoInstance = this;
 
 		player.attr({ id });
 		this.parentNode.append(player);
@@ -49,6 +58,11 @@ class Video extends Component {
 						};
 
 						this.ima(options);
+
+						this.on(VIDEO.EVENTS.ERROR, function() {
+							this.dispose();
+							VideoInstance.appendPassbackAd();
+						});
 					}
 				);
 			})
