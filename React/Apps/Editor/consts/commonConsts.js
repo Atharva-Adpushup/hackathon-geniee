@@ -338,22 +338,28 @@ const status = {
 	reportingUrl = '/user/reports/generate',
 	jsWrapper = `(function($){ \n\n })(adpushup.$)`,
 	interactiveAds = {
-		events: ['DOMContentLoaded', 'scroll'], //load', 'scroll', 'onMills',
+		events: ['DOMContentLoaded', 'scriptLoaded'], //load', 'scroll', 'onMills',
 		sizes: {
 			DESKTOP: {
 				sticky: {
 					bottom: ['300x50', '300x100', '320x100', '728x90'],
 					left: ['160x600', '336x280', '300x250', '300x600', '300x50', '120x600'],
 					right: ['160x600', '336x280', '300x250', '300x600', '300x50', '120x600']
+				},
+				video: {
+					custom: ['336x280']
 				}
 			},
 			MOBILE: {
 				sticky: {
 					bottom: ['336x280', '300x250', '300x50', '320x100', '300x100']
+				},
+				video: {
+					custom: ['300x100', '300x50']
 				}
 			}
 		},
-		types: ['stickyBottom', 'stickyLeft', 'stickyRight']
+		types: ['stickyBottom', 'stickyLeft', 'stickyRight', 'videoCustom']
 	},
 	personalizationTypes = ['not', 'in'];
 

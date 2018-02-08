@@ -13,7 +13,7 @@ module.exports = [
 			path: path.join(__dirname, buildPath),
 			filename: '[name].js',
 			chunkFilename: '[name].js',
-			publicPath: 'http://cdn.adpushup.com/'
+			publicPath: '//cdn.adpushup.com/'
 		},
 		resolve: {
 			alias: {
@@ -26,6 +26,14 @@ module.exports = [
 					test: /.jsx?$/,
 					loader: 'babel-loader',
 					exclude: /node_modules/
+				},
+				{
+					test: /.css?$/,
+					loader: ['style-loader', 'css-loader']
+				},
+				{
+					test: /\.(eot|svg|ttf|woff|woff2)$/,
+					loader: 'url-loader'
 				}
 			]
 		},
@@ -42,7 +50,7 @@ module.exports = [
 			path: path.join(__dirname, buildPath),
 			filename: '[name].min.js',
 			chunkFilename: '[name].min.js',
-			publicPath: 'http://cdn.adpushup.com/'
+			publicPath: '//cdn.adpushup.com/'
 		},
 		resolve: {
 			alias: {
@@ -55,6 +63,14 @@ module.exports = [
 					test: /.jsx?$/,
 					loader: 'babel-loader',
 					exclude: /node_modules/
+				},
+				{
+					test: /.css?$/,
+					loader: ['style-loader', 'css-loader']
+				},
+				{
+					test: /\.(eot|svg|ttf|woff|woff2)$/,
+					loader: 'url-loader'
 				}
 			]
 		},
