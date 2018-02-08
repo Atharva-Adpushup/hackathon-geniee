@@ -13,7 +13,7 @@ module.exports = [
 			path: path.join(__dirname, buildPath),
 			filename: '[name].js',
 			chunkFilename: '[name].js',
-			publicPath: '//cdn.adpushup.com/'
+			publicPath: 'http://localhost:8080/assets/js/builds/'
 		},
 		resolve: {
 			alias: {
@@ -31,9 +31,9 @@ module.exports = [
 					test: /.css?$/,
 					loader: ['style-loader', 'css-loader']
 				},
-				{ 
-					test: /\.(eot|svg|ttf|woff|woff2)$/, 
-					loader: 'url-loader' 
+				{
+					test: /\.(eot|svg|ttf|woff|woff2)$/,
+					loader: 'url-loader'
 				}
 			]
 		},
@@ -50,7 +50,7 @@ module.exports = [
 			path: path.join(__dirname, buildPath),
 			filename: '[name].min.js',
 			chunkFilename: '[name].min.js',
-			publicPath: '//cdn.adpushup.com/'
+			publicPath: 'http://localhost:8080/assets/js/builds/'
 		},
 		resolve: {
 			alias: {
@@ -68,9 +68,9 @@ module.exports = [
 					test: /.css?$/,
 					loader: ['style-loader', 'css-loader']
 				},
-				{ 
-					test: /\.(eot|svg|ttf|woff|woff2)$/, 
-					loader: 'url-loader' 
+				{
+					test: /\.(eot|svg|ttf|woff|woff2)$/,
+					loader: 'url-loader'
 				}
 			]
 		},

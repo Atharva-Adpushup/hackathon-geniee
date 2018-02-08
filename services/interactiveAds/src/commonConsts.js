@@ -33,8 +33,7 @@ const commonConsts = {
 		VIDEO: {
 			NAME: 'video',
 			RECOMMENDATION: {
-				API_URL:
-					'//apdc1-staging-1.eastus2.cloudapp.azure.com:8080/VideoRecommendWebService/video/recommend?keywords=',
+				API_URL: '//e3.adpushup.com/VideoRecommendWebService/video/recommend?keywords=',
 				MAPPING: {
 					1: ['bitcoin', 'news', 'crypto', 'ether', 'buy', 'sell'],
 					2: ['blockchain', 'bitcoin', 'crypto', 'ripple'],
