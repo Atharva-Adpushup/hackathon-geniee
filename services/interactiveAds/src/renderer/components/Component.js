@@ -11,9 +11,9 @@ class Component {
 	}
 
 	render() {
-		window.adpInteractive.ads.push(this.interactiveAd);
+		const { formatData, width, height, id } = this.interactiveAd;
+		window.adpInteractive.ads[id] = this.interactiveAd;
 
-		const { formatData, width, height } = this.interactiveAd;
 		let css = { width, height },
 			format = $('<div />');
 

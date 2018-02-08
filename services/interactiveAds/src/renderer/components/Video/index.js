@@ -5,6 +5,7 @@ import './videojs-ima/js/ima-sdk';
 import commonConsts from '../../../commonConsts';
 import Component from '../Component';
 import $ from '../../../$';
+import config from '../../../config';
 import recommendation from './recommendation';
 import videojs from 'video.js';
 import 'videojs-contrib-ads';
@@ -25,30 +26,35 @@ class Video extends Component {
 		player.attr({ id });
 		this.parentNode.append(player);
 
-		return recommendation().then(videoData => {
-			const { url } = videoData;
+		return recommendation()
+			.then(videoData => {
+				const { url } = videoData;
 
-			return videojs(
-				id,
-				{
-					...VIDEO.DEFAULT_PLAYER_CONFIG,
-					width,
-					height
-				},
-				function() {
-					this.addClass(VIDEO.DEFAULT_CLASS);
-					this.src(url);
+				return videojs(
+					id,
+					{
+						...VIDEO.DEFAULT_PLAYER_CONFIG,
+						width,
+						height
+					},
+					function() {
+						this.addClass(VIDEO.DEFAULT_CLASS);
+						this.src(url);
+						config.ads[id].videoData = videoData;
 
-					const options = {
-						id,
-						debug: true,
-						adTagUrl: VIDEO.DEFAULT_AD_TAG_URL
-					};
+						const options = {
+							id,
+							debug: true,
+							adTagUrl: VIDEO.DEFAULT_AD_TAG_URL
+						};
 
-					this.ima(options);
-				}
-			);
-		});
+						this.ima(options);
+					}
+				);
+			})
+			.catch(err => {
+				throw new Error('Error in video recommendation');
+			});
 	}
 }
 
