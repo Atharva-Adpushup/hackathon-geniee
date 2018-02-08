@@ -19,7 +19,7 @@ class Video extends Component {
 	}
 
 	createPlayer() {
-		const { id, width, height } = this.interactiveAd,
+		const { id, width, height, networkData } = this.interactiveAd,
 			player = $('<video/>'),
 			{ VIDEO } = commonConsts.FORMATS;
 
@@ -45,7 +45,8 @@ class Video extends Component {
 						const options = {
 							id,
 							debug: true,
-							adTagUrl: VIDEO.DEFAULT_AD_TAG_URL
+							adTagUrl:
+								networkData && networkData.adCode ? atob(networkData.adCode) : VIDEO.DEFAULT_AD_TAG_URL
 						};
 
 						this.ima(options);
