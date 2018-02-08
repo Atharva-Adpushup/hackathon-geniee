@@ -1,14 +1,16 @@
 // AdPushup REST API controller
 
 var express = require('express'),
+	_ = require('lodash'),
 	router = express.Router(),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
 	schema = require('../helpers/schema'),
 	CC = require('../configs/commonConsts'),
+	logger = require('../helpers/globalBucketLogger'),
 	FormValidator = require('../helpers/FormValidator'),
-	_ = require('lodash'),
+	genieeDFPInfoService = require('../services/genieeDFPInfoService/index'),
 	woodlotCustomLogger = require('woodlot').customLogger;
 
 // Initialise woodlot module for geniee api custom logging
@@ -20,6 +22,37 @@ var woodlot = new woodlotCustomLogger({
 router
 	.get('/site/create', function(req, res) {
 		res.render('geniee/api/createSite');
+	})
+	.get('/site/:siteId/dfpZoneInfo', (req, res) => {
+		let siteId = req.params.siteId || false;
+		if (!siteId) {
+			return res.send({
+				error: true,
+				result: {
+					message: 'Site Id Missing'
+				}
+			});
+		}
+		return genieeDFPInfoService(siteId)
+			.then(response =>
+				res.send({
+					error: false,
+					result: response
+				})
+			)
+			.catch(err => {
+				logger({
+					source: 'Geniee DFP Zone Info API',
+					message: 'API Failed',
+					details: `Failed for site ${req.params.siteId}`,
+					debugData: JSON.stringify(err)
+				});
+				let message = err.name == 'AdPushupError' ? err.message[0].message : 'Operation Failed';
+				return res.send({
+					error: true,
+					message: message
+				});
+			});
 	})
 	.post('/site/create', function(req, res) {
 		var json = req.body,
@@ -111,16 +144,14 @@ router
 			})
 			.then(function(site) {
 				// Send relevant site data as API output
-				return res
-					.status(200)
-					.send({
-						success: true,
-						data: {
-							siteId: site.data.siteId,
-							siteName: site.data.siteName,
-							siteDomain: site.data.siteDomain
-						}
-					});
+				return res.status(200).send({
+					success: true,
+					data: {
+						siteId: site.data.siteId,
+						siteName: site.data.siteName,
+						siteDomain: site.data.siteDomain
+					}
+				});
 			})
 			.catch(function(err) {
 				woodlot.err({

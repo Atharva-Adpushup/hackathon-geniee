@@ -10,24 +10,36 @@ var config = require('../../../configs/config'),
 	retry = require('bluebird-retry');
 
 module.exports = {
-	checkGenieeUnsyncedZones: function(section, ad) {
-		var isSectionPartnerData = !!(section && section.partnerData),
-			isCustomZoneIdData = !!(isSectionPartnerData && section.partnerData.customZoneId),
-			isValidUnsyncedZone = !!(ad.network === 'geniee' && !ad.networkData && !ad.adCode && !isCustomZoneIdData),
-			partnerData = {
-				zonePosition: isSectionPartnerData ? section.partnerData.position : 0,
-				firstView: isSectionPartnerData ? Number(section.partnerData.firstFold) : 1,
-				useFriendlyIFrameFlag: isSectionPartnerData ? Number(section.partnerData.asyncTag) : 1
-			};
-		if (isValidUnsyncedZone) {
+	checkGenieeUnsyncedZones: function(variationId, variationName, section, ad) {
+		var isValidUnsyncedZone = !!(ad.network === 'geniee' && ad.networkData && !ad.networkData.zoneId),
+			isDynamicAllocationTrue = !!(
+				ad.network === 'geniee' &&
+				ad.networkData &&
+				ad.networkData.dynamicAllocation &&
+				!ad.networkData.dfpAdunit &&
+				!ad.networkData.dfpAdunitCode
+			);
+
+		if (isValidUnsyncedZone || isDynamicAllocationTrue) {
 			return {
-				zoneName: ad.id,
-				sizeWidth: parseInt(ad.width, 10),
-				sizeHeight: parseInt(ad.height, 10),
-				zoneType: 1,
-				zonePosition: partnerData.zonePosition,
-				firstView: partnerData.firstView,
-				useFriendlyIFrameFlag: partnerData.useFriendlyIFrameFlag
+				forGenieeDFPCreation: isDynamicAllocationTrue,
+				forZoneSyncing: isValidUnsyncedZone,
+				zone: {
+					isGeniee: true,
+					adId: ad.id,
+					zoneName: ad.id,
+					sectionId: section.id,
+					variationId: variationId,
+					variationName: variationName,
+					sizeWidth: parseInt(ad.width, 10),
+					sizeHeight: parseInt(ad.height, 10),
+					zoneType: 1,
+					zonePosition: ad.position ? position : 0,
+					firstView: ad.firstFold ? Number(ad.firstFold) : 1,
+					useFriendlyIFrameFlag: ad.asyncTag ? Number(ad.asyncTag) : 1,
+					dynamicAllocation: ad.networkData.dynamicAllocation ? ad.networkData.dynamicAllocation : 0,
+					zoneId: ad.networkData && ad.networkData.zoneId ? ad.networkData.zoneId : false
+				}
 			};
 		}
 		return false;
@@ -46,20 +58,29 @@ module.exports = {
 		}
 		return false;
 	},
-	getVariationUnsyncedZones: function(variationId, channelKey, variationSections) {
+	getVariationUnsyncedZones: function(variationId, variationName, channelKey, variationSections) {
 		// Sample json for geniee zone
 		// {"zoneName":"test zone api0","sizeWidth":300,"sizeHeight":250,"zoneType":1,"zonePosition":0,"firstView":1,"useFriendlyIFrameFlag":0}
 		var unsyncedZones = {
 				genieeUnsyncedZones: [],
-				adpTagsUnsyncedZones: []
+				adpTagsUnsyncedZones: [],
+				genieeDFPCreationZones: []
 			},
 			self = this;
 		_.each(variationSections, function(section, sectionId) {
 			_.each(section.ads, function(ad) {
 				switch (ad.network) {
 					case 'geniee':
-						var unsyncedZone = self.checkGenieeUnsyncedZones(section, ad);
-						unsyncedZone ? unsyncedZones.genieeUnsyncedZones.push(unsyncedZone) : null;
+						var unsyncedZone = self.checkGenieeUnsyncedZones(variationId, variationName, section, ad);
+						if (unsyncedZone) {
+							unsyncedZone.forZoneSyncing
+								? unsyncedZones.genieeUnsyncedZones.push(unsyncedZone.zone)
+								: null;
+							unsyncedZone.forGenieeDFPCreation
+								? unsyncedZones.genieeDFPCreationZones.push(unsyncedZone.zone)
+								: null;
+						}
+						// unsyncedZone ? unsyncedZones.genieeUnsyncedZones.push(unsyncedZone) : null;
 						break;
 					case 'adpTags':
 						var unsyncedZone = self.checkAdpTagsUnsyncedZones(section, ad);
@@ -86,7 +107,7 @@ module.exports = {
 					// channelUnsyncedZones = self.getVariationUnsyncedZones(id, variation.sections);
 					channelUnsyncedZones = _.concat(
 						channelUnsyncedZones,
-						self.getVariationUnsyncedZones(id, channelKey, variation.sections)
+						self.getVariationUnsyncedZones(id, variation.name, channelKey, variation.sections)
 					);
 				});
 				finalZones.push({ channel: channel, unsyncedZones: channelUnsyncedZones });

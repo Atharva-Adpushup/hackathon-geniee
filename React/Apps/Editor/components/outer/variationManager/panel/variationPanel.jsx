@@ -8,6 +8,7 @@ import VariationOptions from './variationOptions';
 import VariationSections from './variationSections/index';
 import VariationBar from './variationBar';
 import BeforeAfterJsPanel from './beforeAfterJsPanel';
+import Personalization from './personalization';
 import KeyValuesPanel from './keyValuesPanel';
 import InteractiveAds from './interactiveAds/index';
 
@@ -55,6 +56,9 @@ class VariationPanel extends React.Component {
 							ui={ui}
 							platform={this.props.activeChannel.platform}
 						/>
+					</div>
+					<div tabTitle="Personalization">
+						<Personalization channelId={channelId} variation={variation} />
 					</div>
 				</TabPanel>
 			</div>

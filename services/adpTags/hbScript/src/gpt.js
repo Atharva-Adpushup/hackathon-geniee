@@ -27,7 +27,12 @@ var config = require('./config'),
 					}
 				});
 
-				if (slot && slot.feedback.winner !== config.ADSENSE.bidderName) {
+				if (
+					slot &&
+					slot.feedback.winner !== config.ADSENSE.bidderName &&
+					slot.optionalParam &&
+					slot.optionalParam.network !== config.PARTNERS.GENIEE
+				) {
 					// hbStatus.hbDfpRender(slot.containerId);
 
 					logger.log('DFP ad slot rendered');

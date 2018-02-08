@@ -132,3 +132,5 @@ if (window.NodeList && !NodeList.prototype.forEach) {
 		};
 	}
 })();
+
+// Promise polyfill - required via npm

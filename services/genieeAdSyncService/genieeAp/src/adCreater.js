@@ -5,6 +5,12 @@ var $ = require('jquery'),
 	incontentAnalyser = require('../libs/aa'),
 	adCodeGenerator = require('./adCodeGenerator'),
 	commonConsts = require('../config/commonConsts'),
+	shouldPushToADP = function(ad) {
+		return (
+			(ad.network === 'adpTags' && ad.networkData) ||
+			(ad.network === 'geniee' && ad.networkData && ad.networkData.dynamicAllocation)
+		);
+	},
 	segregateAds = function(ads) {
 		var a,
 			ad,
@@ -17,9 +23,10 @@ var $ = require('jquery'),
 			ad.isIncontent ? inContentAds.push(ad) : structuredAds.push(ad);
 			ad.network === 'geniee' &&
 				ad.networkData &&
+				!ad.networkData.dynamicAllocation &&
 				!ad.networkData.adCode &&
 				genieeIds.push(ad.networkData.zoneId);
-			ad.network === 'adpTags' && ad.networkData && adpTagUnits.push(ad);
+			shouldPushToADP(ad) ? adpTagUnits.push(ad) : null;
 		}
 
 		inContentAds.sort(function(next, prev) {

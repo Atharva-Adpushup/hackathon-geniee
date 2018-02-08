@@ -1,9 +1,14 @@
 module.exports = {
 	PREBID_TIMEOUT: 1000,
 	NETWORK_ID: 103512698,
+	GENIEE_NETWORK_ID: 11586562,
 	SITE_ID: __SITE_ID__,
 	INVENTORY: __INVENTORY__,
 	PAGE_KEY_VALUES: { da: 'adx' },
+	TARGETING: {},
+	PARTNERS: {
+		GENIEE: 'geniee'
+	},
 	SLOT_INTERVAL: 50,
 	MEDIATION_API_URL: '//s2s.adpushup.com/MediationWebService/',
 	HB_STATUS: {
