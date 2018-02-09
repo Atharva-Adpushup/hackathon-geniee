@@ -167,6 +167,9 @@ var logger = require('../helpers/logger'),
 		bid.ad = config.ADSENSE_FALLBACK_ADCODE.replace('__AD_CODE__', adData);
 	},
 	afterBiddingProcessor = function(slots) {
+		var genieeRef = window.adpushup && window.adpushup.geniee,
+			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback;
+
 		if (!Array.isArray(slots) || !slots.length) {
 			return false;
 		}
@@ -183,9 +186,6 @@ var logger = require('../helpers/logger'),
 
 		//This code must be inside googletag.cmd.push as it depends upon gpt availability
 		googletag.cmd.push(function() {
-			var genieeRef = window.adpushup && window.adpushup.geniee,
-				isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback;
-
 			//Global key value settings
 			for (var key in config.PAGE_KEY_VALUES) {
 				googletag.pubads().setTargeting(key, String(config.PAGE_KEY_VALUES[key]));
@@ -199,13 +199,6 @@ var logger = require('../helpers/logger'),
 			googletag.pubads().enableSingleRequest();
 			googletag.enableServices();
 
-			if (isSendBeforeBodyTags) {
-				genieeRef.sendBeforeBodyTagsFeedback();
-				if (!genieeRef.hasBodyTagsRendered) {
-					genieeRef.hasBodyTagsRendered = true;
-				}
-			}
-
 			var adUnits = utils.getBatchAdUnits(adpSlotsWithDFPSlots).join(',');
 			// hbStatus.hbRender(adUnits);
 
@@ -217,6 +210,14 @@ var logger = require('../helpers/logger'),
 				renderGPT(slot);
 			});
 		});
+
+		//Check for geniee 'notifyBeforeBodyTags' function
+		if (isSendBeforeBodyTags) {
+			genieeRef.sendBeforeBodyTagsFeedback();
+			if (!genieeRef.hasBodyTagsRendered) {
+				genieeRef.hasBodyTagsRendered = true;
+			}
+		}
 	};
 
 module.exports = {
