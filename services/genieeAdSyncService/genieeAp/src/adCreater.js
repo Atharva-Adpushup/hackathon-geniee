@@ -43,28 +43,27 @@ var $ = require('jquery'),
 		if (!el) {
 			el = $(ad.xpath);
 		}
-		var container = $('<div/>')
-			.css(
-				$.extend(
-					{
-						display: ad.network === 'geniee' && !ad.networkData.adCode ? 'none' : 'block',
-						clear: ad.isIncontent ? null : 'both',
-						width: ad.width + 'px',
-						height: ad.height + 'px'
-					},
-					ad.css
+		var isGenieePartner = !!(ad.network === 'geniee' && !ad.networkData.adCode),
+			isGenieeWithoutDFP = !!(isGenieePartner && !ad.networkData.dynamicAllocation),
+			container = $('<div/>')
+				.css(
+					$.extend(
+						{
+							display: isGenieeWithoutDFP ? 'none' : 'block',
+							clear: ad.isIncontent ? null : 'both',
+							width: ad.width + 'px',
+							height: ad.height + 'px'
+						},
+						ad.css
+					)
 				)
-			)
-			.attr({
-				id:
-					ad.network === 'geniee' && !ad.networkData.adCode
-						? '_ap_apexGeniee_ad_' + ad.networkData.zoneId
-						: ad.id,
-				'data-section': ad.id,
-				class: '_ap_apex_ad',
-				'data-xpath': ad.xpath ? ad.xpath : '',
-				'data-section-id': ad.section ? ad.section : ''
-			});
+				.attr({
+					id: isGenieePartner ? '_ap_apexGeniee_ad_' + ad.networkData.zoneId : ad.id,
+					'data-section': ad.id,
+					class: '_ap_apex_ad',
+					'data-xpath': ad.xpath ? ad.xpath : '',
+					'data-section-id': ad.section ? ad.section : ''
+				});
 
 		switch (ad.operation) {
 			case 'Append':

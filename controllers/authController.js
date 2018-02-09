@@ -21,6 +21,7 @@ router.get('/geniee/', function(req, res) {
 				req.session.user = data.user;
 				req.session.siteId = data.site.siteId;
 				req.session.partner = 'geniee';
+				req.session.isSuperUser = false;
 				return res.redirect('/user/site/' + data.site.siteId + '/dashboard');
 			})
 			.catch(function(err) {

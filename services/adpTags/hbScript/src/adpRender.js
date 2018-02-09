@@ -183,6 +183,9 @@ var logger = require('../helpers/logger'),
 
 		//This code must be inside googletag.cmd.push as it depends upon gpt availability
 		googletag.cmd.push(function() {
+			var genieeRef = window.adpushup && window.adpushup.geniee,
+				isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback;
+
 			//Global key value settings
 			for (var key in config.PAGE_KEY_VALUES) {
 				googletag.pubads().setTargeting(key, String(config.PAGE_KEY_VALUES[key]));
@@ -195,6 +198,13 @@ var logger = require('../helpers/logger'),
 			//when defineslot is done for whole batch enable gpt SRA
 			googletag.pubads().enableSingleRequest();
 			googletag.enableServices();
+
+			if (isSendBeforeBodyTags) {
+				genieeRef.sendBeforeBodyTagsFeedback();
+				if (!genieeRef.hasBodyTagsRendered) {
+					genieeRef.hasBodyTagsRendered = true;
+				}
+			}
 
 			var adUnits = utils.getBatchAdUnits(adpSlotsWithDFPSlots).join(',');
 			// hbStatus.hbRender(adUnits);
