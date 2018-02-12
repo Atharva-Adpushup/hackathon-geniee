@@ -4,7 +4,8 @@ var utils = require('../libs/utils'),
 	generateGenieeBodyTag = function(ad) {
 		var adCode,
 			genieeRef = window.adpushup && window.adpushup.geniee,
-			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback;
+			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback,
+			isGlobalADPTags = !!config.isADPTags;
 
 		if (ad.networkData.adCode) {
 			adCode = utils.base64Decode(ad.networkData.adCode);
@@ -20,7 +21,8 @@ var utils = require('../libs/utils'),
 		} else {
 			//Check for geniee 'notifyBeforeBodyTags' function
 			//This is done for Geniee-without-DFP tags integration
-			if (isSendBeforeBodyTags) {
+			//'isGlobalADPTags' checks whether any ADP tag is globally present or not
+			if (!isGlobalADPTags && isSendBeforeBodyTags) {
 				genieeRef.sendBeforeBodyTagsFeedback();
 				if (!genieeRef.hasBodyTagsRendered) {
 					genieeRef.hasBodyTagsRendered = true;
