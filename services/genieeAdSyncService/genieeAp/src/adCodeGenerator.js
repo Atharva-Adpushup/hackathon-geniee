@@ -2,7 +2,10 @@ var utils = require('../libs/utils'),
 	$ = require('jquery'),
 	config = window.adpushup.config,
 	generateGenieeBodyTag = function(ad) {
-		var adCode;
+		var adCode,
+			genieeRef = window.adpushup && window.adpushup.geniee,
+			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback;
+
 		if (ad.networkData.adCode) {
 			adCode = utils.base64Decode(ad.networkData.adCode);
 		} else if (ad.network && ad.network == 'geniee' && ad.networkData && ad.networkData.dynamicAllocation) {
@@ -15,6 +18,15 @@ var utils = require('../libs/utils'),
 			adCode.push('</scr' + 'ipt>');
 			adCode.push('</div>');
 		} else {
+			//Check for geniee 'notifyBeforeBodyTags' function
+			//This is done for Geniee-without-DFP tags integration
+			if (isSendBeforeBodyTags) {
+				genieeRef.sendBeforeBodyTagsFeedback();
+				if (!genieeRef.hasBodyTagsRendered) {
+					genieeRef.hasBodyTagsRendered = true;
+				}
+			}
+
 			adCode = [];
 			adCode.push('<scr' + 'ipt type="text/javascript">');
 			adCode.push('gnsmod.cmd.push(function() {');
