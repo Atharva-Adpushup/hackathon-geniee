@@ -189,9 +189,7 @@ var utils = require('../libs/utils'),
 				return false;
 			}
 
-			window.googletag.cmd.push(function() {
-				window.gnsmod.adpVariation(selectedMode);
-			});
+			window.gnsmod.adpVariation(selectedMode);
 		},
 		// Boolean flag to check whether body tags feedback has been called or not
 		hasBodyTagsRendered: false,
