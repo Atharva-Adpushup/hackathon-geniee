@@ -5,7 +5,7 @@ var utils = require('../libs/utils'),
 		var adCode,
 			genieeRef = window.adpushup && window.adpushup.geniee,
 			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback,
-			isGlobalADPTags = !!config.isADPTags;
+			isGlobalADPTags = !!window.adpushup.config.isADPTags;
 
 		if (ad.networkData.adCode) {
 			adCode = utils.base64Decode(ad.networkData.adCode);
