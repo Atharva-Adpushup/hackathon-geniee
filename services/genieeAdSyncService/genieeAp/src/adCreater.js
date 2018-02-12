@@ -26,7 +26,7 @@ var $ = require('jquery'),
 				!ad.networkData.dynamicAllocation &&
 				!ad.networkData.adCode &&
 				genieeIds.push(ad.networkData.zoneId);
-			shouldPushToADP(ad) ? adpTagUnits.push(ad) : null;
+			shouldPushToADP(ad) ? (adpTagUnits.push(ad), (window.adpushup.config.isGenieeDFP = true)) : null;
 		}
 
 		inContentAds.sort(function(next, prev) {
