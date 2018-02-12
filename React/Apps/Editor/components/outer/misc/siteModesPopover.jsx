@@ -9,12 +9,22 @@ import Accordion from 'react-bootstrap/lib/Accordion';
 class siteModesPopover extends React.Component {
 	constructor(props) {
 		super(props);
-		const isPublishMode = props.mode && props.mode === siteModes.PUBLISH;
+		const isPublishMode = props.mode && props.mode === siteModes.PUBLISH,
+			isPartnerGeniee = this.checkPartnerGeniee(props);
+
 		this.checkApStatus(props);
 		this.state = {
-			apStatus: status.PENDING,
-			controlStatus: isPublishMode ? status.TRUE : status.FALSE
+			apStatus: isPartnerGeniee ? status.SUCCESS : status.PENDING,
+			controlStatus: (isPublishMode || isPartnerGeniee) ? status.TRUE : status.FALSE
 		};
+	}
+
+	checkPartnerGeniee(props) {
+		const _props = props || this.props,
+			isPartner = !!(_props && _props.partner),
+			isPartnerGeniee = !!(isPartner && _props.partner === 'geniee');
+
+		return isPartnerGeniee;
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -34,9 +44,12 @@ class siteModesPopover extends React.Component {
 	}
 
 	checkApStatus(props) {
-		if (!props.isVisible || !props.mode === siteModes.DRAFT) {
+		const isPartnerGeniee = this.checkPartnerGeniee();
+
+		if (!props.isVisible || !props.mode === siteModes.DRAFT || isPartnerGeniee) {
 			return false;
 		}
+
 		this.setState({ apStatus: status.PENDING });
 		isApInstalled(props.url || window.ADP_SITE_DOMAIN, window.ADP_SITE_ID)
 			.then(apStatus => {
@@ -71,6 +84,63 @@ class siteModesPopover extends React.Component {
 		});
 	}
 
+	renderAdPushupSnippetPanel() {
+		return (
+			<Panel
+				header="AdPushup snippet"
+				className={
+					this.state.apStatus == status.PENDING
+						? 'pending'
+						: this.state.apStatus == status.SUCCESS ? 'completed' : 'notcompleted'
+				}
+				eventKey={2}
+			>
+				<div>
+					We can't optimize your site if AdPushup snippet isn't installed! :){' '}
+					<a
+						className="btn btn-sm btn-lightBg publishHelperhelp"
+						onClick={this.showGuider.bind(null, components.ADPUSHUP_INSTALLATION_GUIDER)}
+					>
+						Read more
+					</a>
+				</div>
+			</Panel>
+		);
+	}
+
+	renderControlTagsConversionPanel() {
+		return (
+			<Panel
+				header="Control Ad Setup"
+				className={this.state.controlStatus ? 'completed' : 'notcompleted'}
+				eventKey={4}
+			>
+				<div>
+					We strongly recommend setting up Control Ads on your site. They can help you track
+					AdPushup performance, act as fallback in case of failure and much more. Please take
+					a moment out to understand them.
+					<a
+						className="btn btn-sm btn-lightBg publishHelperhelp"
+						onClick={this.showGuider.bind(null, components.CONTROL_CONVERSION_GUIDER)}
+					>
+						Read more
+					</a>
+					<br />
+				</div>
+				<input
+					type="checkbox"
+					className="maincheckbox"
+					id="ctrlconverted"
+					checked={this.state.controlStatus}
+					onChange={this.handleControlStatusOnChange.bind(this)}
+				/>
+				<label htmlFor="ctrlconverted">
+					Yes, I understand what control ads are, and have set them up.
+				</label>
+			</Panel>
+		);
+	}
+
 	render() {
 		const positionOffsets = this.getPositionOffsets(),
 			style = {
@@ -82,6 +152,7 @@ class siteModesPopover extends React.Component {
 				boxShadow: '0 1px 10px 0 rgba(0, 0, 0, 0.3)',
 				width: '300px'
 			},
+			isPartnerGeniee = this.checkPartnerGeniee(),
 			isNotPendingStatus = this.state.apStatus !== status.PENDING,
 			allDone = this.props.url && this.state.apStatus === status.SUCCESS && this.state.controlStatus;
 
@@ -131,53 +202,8 @@ class siteModesPopover extends React.Component {
 									</a>
 								</div>
 							</Panel>
-							<Panel
-								header="AdPushup snippet"
-								className={
-									this.state.apStatus == status.PENDING
-										? 'pending'
-										: this.state.apStatus == status.SUCCESS ? 'completed' : 'notcompleted'
-								}
-								eventKey={2}
-							>
-								<div>
-									We can't optimize your site if AdPushup snippet isn't installed! :){' '}
-									<a
-										className="btn btn-sm btn-lightBg publishHelperhelp"
-										onClick={this.showGuider.bind(null, components.ADPUSHUP_INSTALLATION_GUIDER)}
-									>
-										Read more
-									</a>
-								</div>
-							</Panel>
-							<Panel
-								header="Control Ad Setup"
-								className={this.state.controlStatus ? 'completed' : 'notcompleted'}
-								eventKey={4}
-							>
-								<div>
-									We strongly recommend setting up Control Ads on your site. They can help you track
-									AdPushup performance, act as fallback in case of failure and much more. Please take
-									a moment out to understand them.
-									<a
-										className="btn btn-sm btn-lightBg publishHelperhelp"
-										onClick={this.showGuider.bind(null, components.CONTROL_CONVERSION_GUIDER)}
-									>
-										Read more
-									</a>
-									<br />
-								</div>
-								<input
-									type="checkbox"
-									className="maincheckbox"
-									id="ctrlconverted"
-									checked={this.state.controlStatus}
-									onChange={this.handleControlStatusOnChange.bind(this)}
-								/>
-								<label htmlFor="ctrlconverted">
-									Yes, I understand what control ads are, and have set them up.
-								</label>
-							</Panel>
+							{isPartnerGeniee ? null : this.renderAdPushupSnippetPanel()}
+							{isPartnerGeniee ? null : this.renderControlTagsConversionPanel()}
 						</Accordion>
 					</div>
 				</div>
