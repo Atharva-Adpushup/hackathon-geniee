@@ -26,7 +26,8 @@ var $ = require('jquery'),
 				!ad.networkData.dynamicAllocation &&
 				!ad.networkData.adCode &&
 				genieeIds.push(ad.networkData.zoneId);
-			shouldPushToADP(ad) ? adpTagUnits.push(ad) : null;
+			// 'isADPTags' will be true if atleast one ADP tag is present
+			shouldPushToADP(ad) ? (adpTagUnits.push(ad), (window.adpushup.config.isADPTags = true)) : null;
 		}
 
 		inContentAds.sort(function(next, prev) {
