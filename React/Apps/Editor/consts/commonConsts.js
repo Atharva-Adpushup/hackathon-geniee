@@ -355,11 +355,15 @@ const status = {
 					bottom: ['336x280', '300x250', '300x50', '320x100', '300x100']
 				},
 				video: {
-					custom: ['300x100', '300x50']
+					custom: ['336x280']
 				}
 			}
 		},
-		types: ['stickyBottom', 'stickyLeft', 'stickyRight', 'videoCustom']
+		types: {
+			DESKTOP: ['stickyBottom', 'stickyLeft', 'stickyRight', 'videoCustom'],
+			MOBILE: ['stickyBottom', 'videoCustom'],
+			TABLET: ['stickyBottom', 'stickyLeft', 'stickyRight', 'videoCustom']
+		}
 	},
 	personalizationTypes = ['not', 'in'];
 
