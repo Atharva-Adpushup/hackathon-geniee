@@ -25,9 +25,9 @@ const getDate = number => {
 	let days = number, // Days you want to subtract
 		date = new Date(),
 		last = new Date(date.getTime() - days * 24 * 60 * 60 * 1000),
-		day = last.getDate(),
-		month = last.getMonth() + 1,
-		year = last.getFullYear();
+		day = String(last.getDate()),
+		month = String(last.getMonth() + 1),
+		year = String(last.getFullYear());
 
 	return `${year}-${month.length == 1 ? '0' : ''}${month}-${day.length == 1 ? '0' : ''}${day}`;
 };

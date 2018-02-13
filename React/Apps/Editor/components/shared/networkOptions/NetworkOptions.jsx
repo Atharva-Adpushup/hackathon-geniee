@@ -36,6 +36,14 @@ class NetworkOptions extends Component {
 		}
 	}
 
+	componentWillReceiveProps(nextProps) {
+		if (nextProps.reset) {
+			this.setState({
+				network: false
+			});
+		}
+	}
+
 	submitHandler(networkData) {
 		return this.props.onSubmit({
 			network: this.state.network,
