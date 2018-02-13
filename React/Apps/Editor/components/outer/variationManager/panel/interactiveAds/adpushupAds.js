@@ -50,11 +50,17 @@ class AdPushupAds extends Component {
 	}
 
 	formatChangeHandler(format) {
-		let typeAndPlacement = format.split(/^([^A-Z]+)/);
-		typeAndPlacement.shift();
+		let type = false,
+			placement = false;
+		if (format) {
+			let typeAndPlacement = format.split(/^([^A-Z]+)/);
+			typeAndPlacement.shift();
+			type = typeAndPlacement[0].toLowerCase();
+			placement = typeAndPlacement[1].toLowerCase();
+		}
 		this.setState({
-			type: typeAndPlacement[0].toLowerCase(),
-			placement: typeAndPlacement[1].toLowerCase(),
+			type: type,
+			placement: placement,
 			format: format
 		});
 	}
@@ -128,8 +134,8 @@ class AdPushupAds extends Component {
 	}
 
 	renderFormatSelect(leftWidth, rightWidth) {
-		let limit = this.props.platform == 'DESKTOP' ? interactiveAds.types.length : 1,
-			types = interactiveAds.types.slice(0, limit);
+		// let limit = this.props.platform == 'DESKTOP' ? interactiveAds.types.length : 1,
+		let types = interactiveAds.types[this.props.platform.toUpperCase()];
 		return (
 			<Row className="mT-15">
 				<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
