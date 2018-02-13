@@ -2,7 +2,9 @@ var browserConfig = require('./browserConfig.js'),
 	// eslint-disable-next-line no-undef
 	$ = require('jquery'),
 	dockify = require('./dockify'),
+	//promise polyfill
 	Base64 = require('Base64');
+require('promise-polyfill/src/polyfill');
 
 module.exports = {
 	log: function() {
@@ -21,6 +23,22 @@ module.exports = {
 	base64Decode: function(data) {
 		//Using this not polyfills because native and polyfills of decode don't provide unicode support
 		return Base64.atob(data);
+	},
+	getCountry: function() {
+		return new Promise(function(resolve, reject) {
+			$.get('http://e3.adpushup.com/IpLocationPublicWebService/GetLocationInfo', function(response) {
+				if (response && response.data && response.data.country) {
+					resolve(response.data.country);
+					return;
+				} else {
+					resolve(null);
+					return;
+				}
+			}).fail(function(err) {
+				utils.log('Error in Geoapi', err);
+				resolve(null);
+			});
+		});
 	},
 	// All feedback packets are generated from this function except event 2, 3 and 4.
 	sendFeedback: function(options) {
@@ -191,7 +209,8 @@ module.exports = {
 						'&data=' +
 						keenIoImpressionFeedbackData;
 					this.log('KeenIOImpressionRequest: keenIoImpressionFeedbackUrl', keenIoImpressionFeedbackUrl);
-					new Image().src = keenIoImpressionFeedbackUrl;
+					// TODO: Below KeenIO code is disabled temporarily, uncomment it and integration should work fine
+					// new Image().src = keenIoImpressionFeedbackUrl;
 					this.log('KeenIOImpressionRequest: Successfully sent impression request!');
 				} catch (e) {}
 			}
@@ -205,7 +224,8 @@ module.exports = {
 					keenIOConfig.apiKey +
 					'&data=' +
 					keenIoFeedbackData;
-				new Image().src = keenIoFeedbackUrl;
+				// TODO: Below KeenIO code is disabled temporarily, uncomment it and integration should work fine
+				// new Image().src = keenIoFeedbackUrl;
 			} catch (e) {}
 		}
 
@@ -333,11 +353,15 @@ module.exports = {
 				}
 			}
 
-			if (Object.keys(this.queryParams).length > 1) {
+			if (Object.keys(this.queryParams).length >= 1) {
 				url = urlBase + '?' + parts.join('&');
 			} else {
 				url = urlBase;
 			}
+		}
+
+		if (url.charAt(url.length - 1) === '?') {
+			return url.substr(0, url.length - 1);
 		}
 
 		return url;

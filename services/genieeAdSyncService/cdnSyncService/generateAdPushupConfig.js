@@ -64,7 +64,7 @@ const _ = require('lodash'),
 				});
 			}
 			//for geniee provide networkData
-			if (ad.network == 'adpTags') {
+			if (ad.network == 'adpTags' || (ad.network == 'geniee' && ad.networkData.dynamicAllocation)) {
 				ADPTags.push({
 					key: `${json.width}x${json.height}`,
 					height: json.height,
@@ -101,6 +101,7 @@ const _ = require('lodash'),
 			adpKeyValues: variation.adpKeyValues,
 			contentSelector: isContentSelector ? contentSelector : '',
 			ads: ads,
+			personalization: variation.personalization,
 			// Data required for auto optimiser model
 			// Page revenue is mapped as sum
 			sum:

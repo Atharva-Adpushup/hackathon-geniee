@@ -107,6 +107,7 @@ class sectionOptions extends React.Component {
 						placeholder="Enter Geniee Zone Id"
 						className="inputBasic mB-10"
 						value={zoneId}
+						style={{ width: '100%' }}
 						onChange={ev => {
 							this.setState({ zoneId: ev.target.value });
 						}}

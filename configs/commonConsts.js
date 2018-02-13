@@ -184,5 +184,6 @@ module.exports = {
 			JPY: 'JPY',
 			USD: 'USD'
 		}
-	}
+	},
+	dummy: 'test'
 };

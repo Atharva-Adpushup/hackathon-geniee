@@ -5,6 +5,12 @@ var $ = require('jquery'),
 	incontentAnalyser = require('../libs/aa'),
 	adCodeGenerator = require('./adCodeGenerator'),
 	commonConsts = require('../config/commonConsts'),
+	shouldPushToADP = function(ad) {
+		return (
+			(ad.network === 'adpTags' && ad.networkData) ||
+			(ad.network === 'geniee' && ad.networkData && ad.networkData.dynamicAllocation)
+		);
+	},
 	segregateAds = function(ads) {
 		var a,
 			ad,
@@ -17,9 +23,11 @@ var $ = require('jquery'),
 			ad.isIncontent ? inContentAds.push(ad) : structuredAds.push(ad);
 			ad.network === 'geniee' &&
 				ad.networkData &&
+				!ad.networkData.dynamicAllocation &&
 				!ad.networkData.adCode &&
 				genieeIds.push(ad.networkData.zoneId);
-			ad.network === 'adpTags' && ad.networkData && adpTagUnits.push(ad);
+			// 'isADPTags' will be true if atleast one ADP tag is present
+			shouldPushToADP(ad) ? (adpTagUnits.push(ad), (window.adpushup.config.isADPTags = true)) : null;
 		}
 
 		inContentAds.sort(function(next, prev) {
@@ -36,28 +44,27 @@ var $ = require('jquery'),
 		if (!el) {
 			el = $(ad.xpath);
 		}
-		var container = $('<div/>')
-			.css(
-				$.extend(
-					{
-						display: ad.network === 'geniee' && !ad.networkData.adCode ? 'none' : 'block',
-						clear: ad.isIncontent ? null : 'both',
-						width: ad.width + 'px',
-						height: ad.height + 'px'
-					},
-					ad.css
+		var isGenieePartner = !!(ad.network === 'geniee' && !ad.networkData.adCode),
+			isGenieeWithoutDFP = !!(isGenieePartner && !ad.networkData.dynamicAllocation),
+			container = $('<div/>')
+				.css(
+					$.extend(
+						{
+							display: isGenieeWithoutDFP ? 'none' : 'block',
+							clear: ad.isIncontent ? null : 'both',
+							width: ad.width + 'px',
+							height: ad.height + 'px'
+						},
+						ad.css
+					)
 				)
-			)
-			.attr({
-				id:
-					ad.network === 'geniee' && !ad.networkData.adCode
-						? '_ap_apexGeniee_ad_' + ad.networkData.zoneId
-						: ad.id,
-				'data-section': ad.id,
-				class: '_ap_apex_ad',
-				'data-xpath': ad.xpath ? ad.xpath : '',
-				'data-section-id': ad.section ? ad.section : ''
-			});
+				.attr({
+					id: isGenieePartner ? '_ap_apexGeniee_ad_' + ad.networkData.zoneId : ad.id,
+					'data-section': ad.id,
+					class: '_ap_apex_ad',
+					'data-xpath': ad.xpath ? ad.xpath : '',
+					'data-section-id': ad.section ? ad.section : ''
+				});
 
 		switch (ad.operation) {
 			case 'Append':

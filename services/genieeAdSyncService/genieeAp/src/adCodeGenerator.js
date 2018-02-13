@@ -2,10 +2,33 @@ var utils = require('../libs/utils'),
 	$ = require('jquery'),
 	config = window.adpushup.config,
 	generateGenieeBodyTag = function(ad) {
-		var adCode;
+		var adCode,
+			genieeRef = window.adpushup && window.adpushup.geniee,
+			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback,
+			isGlobalADPTags = !!window.adpushup.config.isADPTags;
+
 		if (ad.networkData.adCode) {
 			adCode = utils.base64Decode(ad.networkData.adCode);
+		} else if (ad.network && ad.network == 'geniee' && ad.networkData && ad.networkData.dynamicAllocation) {
+			adCode = [];
+			adCode.push('<div id="' + ad.networkData.dfpAdunit + '">');
+			adCode.push('<scr' + 'ipt type="text/javascript">');
+			adCode.push('window.adpTags.que.push(function(){');
+			adCode.push('window.adpTags.display("' + ad.networkData.dfpAdunit + '");');
+			adCode.push('});');
+			adCode.push('</scr' + 'ipt>');
+			adCode.push('</div>');
 		} else {
+			//Check for geniee 'notifyBeforeBodyTags' function
+			//This is done for Geniee-without-DFP tags integration
+			//'isGlobalADPTags' checks whether any ADP tag is globally present or not
+			if (!isGlobalADPTags && isSendBeforeBodyTags) {
+				genieeRef.sendBeforeBodyTagsFeedback();
+				if (!genieeRef.hasBodyTagsRendered) {
+					genieeRef.hasBodyTagsRendered = true;
+				}
+			}
+
 			adCode = [];
 			adCode.push('<scr' + 'ipt type="text/javascript">');
 			adCode.push('gnsmod.cmd.push(function() {');
@@ -27,7 +50,8 @@ var utils = require('../libs/utils'),
 						dfpAdunit: ad.networkData.dfpAdunit,
 						dfpAdunitCode: ad.networkData.dfpAdunitCode,
 						headerBidding: ad.networkData.headerBidding,
-						keyValues: ad.networkData.keyValues
+						keyValues: ad.networkData.keyValues,
+						network: ad.network
 					});
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
