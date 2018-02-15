@@ -26,7 +26,8 @@ class AdPushupAds extends Component {
 				: false,
 			size: this.props.ad ? `${this.props.ad.width}X${this.props.ad.height}` : false,
 			css: this.props.ad ? this.props.ad.css : {},
-			containsInteractiveAd: true
+			containsInteractiveAd: true,
+			reset: false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.eventChangeHandler = this.eventChangeHandler.bind(this);
@@ -50,11 +51,17 @@ class AdPushupAds extends Component {
 	}
 
 	formatChangeHandler(format) {
-		let typeAndPlacement = format.split(/^([^A-Z]+)/);
-		typeAndPlacement.shift();
+		let type = false,
+			placement = false;
+		if (format) {
+			let typeAndPlacement = format.split(/^([^A-Z]+)/);
+			typeAndPlacement.shift();
+			type = typeAndPlacement[0].toLowerCase();
+			placement = typeAndPlacement[1].toLowerCase();
+		}
 		this.setState({
-			type: typeAndPlacement[0].toLowerCase(),
-			placement: typeAndPlacement[1].toLowerCase(),
+			type: type,
+			placement: placement,
 			format: format
 		});
 	}
@@ -128,8 +135,8 @@ class AdPushupAds extends Component {
 	}
 
 	renderFormatSelect(leftWidth, rightWidth) {
-		let limit = this.props.platform == 'DESKTOP' ? interactiveAds.types.length : 1,
-			types = interactiveAds.types.slice(0, limit);
+		// let limit = this.props.platform == 'DESKTOP' ? interactiveAds.types.length : 1,
+		let types = interactiveAds.types[this.props.platform.toUpperCase()];
 		return (
 			<Row className="mT-15">
 				<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
@@ -205,6 +212,7 @@ class AdPushupAds extends Component {
 						buttonType={2}
 						fromPanel={true}
 						showNotification={this.props.showNotification}
+						reset={this.state.reset}
 					/>
 				</Col>
 			</Row>
@@ -222,7 +230,8 @@ class AdPushupAds extends Component {
 			!this.state.size ||
 			((this.state.event == 'scroll' || this.state.event == 'onMills') &&
 				!this.state.eventData.value.trim().length) ||
-			(this.props.showNetworkOptions && (!networkInfo.network || !networkInfo.networkData))
+			(this.props.showNetworkOptions && (!networkInfo.network || !networkInfo.networkData)) ||
+			(this.state.format == 'videoCustom' && !this.state.eventData.value.trim().length)
 		) {
 			this.props.showNotification({
 				mode: 'error',
@@ -261,7 +270,8 @@ class AdPushupAds extends Component {
 				placement: false,
 				format: false,
 				size: false,
-				css: {}
+				css: {},
+				reset: true
 			},
 			() => this.props.submitHandler(sectionPayload, adPayload)
 		);
