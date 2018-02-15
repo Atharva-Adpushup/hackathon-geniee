@@ -83,7 +83,8 @@ const commonConsts = {
 				controls: true,
 				muted: true,
 				autoplay: true,
-				preload: 'none'
+				preload: 'none',
+				playsinline: true
 			},
 			DEFAULT_CLASS: 'video-js',
 			DEFAULT_AD_TAG_URL:
