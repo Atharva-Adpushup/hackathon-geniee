@@ -16,62 +16,67 @@ class Video extends Component {
 		super(parentNode, interactiveAd, adCode);
 
 		this.createPlayer = this.createPlayer.bind(this);
+		this.initIma = this.initIma.bind(this);
 	}
 
-	appendPassbackAd() {
-		const { networkData, id, width, height } = this.interactiveAd,
+	appendPassbackAd(adCode) {
+		const { id, width, height } = this.interactiveAd,
 			passbackAd = $('<div/>');
 
 		passbackAd.attr({ id }).css({ width, height });
-		this.parentNode.append(passbackAd.append(atob(networkData.adCode)));
+		return this.parentNode.append(passbackAd.append(adCode));
 	}
 
-	createPlayer() {
+	initIma(videoData) {
 		const { id, width, height, networkData } = this.interactiveAd,
-			player = $('<video/>'),
+			{ url } = videoData,
 			{ VIDEO } = commonConsts.FORMATS,
-			VideoInstance = this;
+			VideoInstance = this,
+			player = $('<video/>'),
+			adCode = atob(networkData.adCode);
 
 		player.attr({ id });
 		this.parentNode.append(player);
 
-		return recommendation()
-			.then(videoData => {
-				const { url } = videoData;
+		return videojs(
+			id,
+			{
+				...VIDEO.DEFAULT_PLAYER_CONFIG,
+				width,
+				height
+			},
+			function() {
+				this.addClass(VIDEO.DEFAULT_CLASS);
+				this.src(url);
+				config.ads[id].videoData = videoData;
 
-				return videojs(
+				const options = {
 					id,
-					{
-						...VIDEO.DEFAULT_PLAYER_CONFIG,
-						width,
-						height
-					},
-					function() {
-						this.addClass(VIDEO.DEFAULT_CLASS);
-						this.src(url);
-						config.ads[id].videoData = videoData;
+					debug: true,
+					adWillPlayMuted: true,
+					adTagUrl: VIDEO.DEFAULT_AD_TAG_URL.replace('__DESCRIPTION_URL__', window.location.origin)
+				};
 
-						const options = {
-							id,
-							debug: true,
-							adWillPlayMuted: true,
-							adTagUrl: VIDEO.DEFAULT_AD_TAG_URL.replace('__DESCRIPTION_URL__', window.location.origin)
-						};
+				this.ima(options);
 
-						this.ima(options);
-
-						this.on(VIDEO.EVENTS.AD_ERROR, function() {
-							this.dispose();
-							VideoInstance.appendPassbackAd();
-						});
-
-						// Hacky way to mute the ad as "adWillPlayMuted" option is not working
-						this.on(VIDEO.EVENTS.AD_STARTED, function() {
-							this.ima.getAdsManager().setVolume(0);
-						});
+				this.on(VIDEO.EVENTS.AD_ERROR, function() {
+					if (adCode) {
+						this.dispose();
+						VideoInstance.appendPassbackAd(adCode);
 					}
-				);
-			})
+				});
+
+				// Hacky way to mute the ad as "adWillPlayMuted" option is not working
+				this.on(VIDEO.EVENTS.AD_STARTED, function() {
+					this.ima.getAdsManager().setVolume(0);
+				});
+			}
+		);
+	}
+
+	createPlayer() {
+		return recommendation()
+			.then(videoData => this.initIma(videoData))
 			.catch(err => {
 				throw new Error('Error in video recommendation');
 			});
