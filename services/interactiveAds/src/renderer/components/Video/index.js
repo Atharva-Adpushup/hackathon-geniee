@@ -48,27 +48,36 @@ class Video extends Component {
 			function() {
 				this.addClass(VIDEO.DEFAULT_CLASS);
 				this.src(url);
+
 				config.ads[id].videoData = videoData;
 
-				const options = {
-					id,
-					debug: true,
-					adWillPlayMuted: true,
-					adTagUrl: VIDEO.DEFAULT_AD_TAG_URL.replace('__DESCRIPTION_URL__', window.location.origin)
-				};
+				const adTagUrl = VIDEO.DEFAULT_AD_TAG_URL.replace('__DESCRIPTION_URL__', window.location.origin),
+					options = {
+						id,
+						debug: true,
+						adWillPlayMuted: true,
+						adTagUrl
+					};
 
+				config.ads[id].videoData.adTagUrl = adTagUrl;
 				this.ima(options);
 
 				this.on(VIDEO.EVENTS.AD_ERROR, function() {
 					if (adCode) {
 						this.dispose();
 						VideoInstance.appendPassbackAd(adCode);
+						config.ads[id].videoData.passBackSuccess = true;
+					} else {
+						config.ads[id].videoData.passBackSuccess = false;
 					}
+					config.ads[id].videoData.adSuccess = false;
 				});
 
 				// Hacky way to mute the ad as "adWillPlayMuted" option is not working
 				this.on(VIDEO.EVENTS.AD_STARTED, function() {
 					this.ima.getAdsManager().setVolume(0);
+					config.ads[id].videoData.passBackSuccess = false;
+					config.ads[id].videoData.adSuccess = true;
 				});
 			}
 		);
