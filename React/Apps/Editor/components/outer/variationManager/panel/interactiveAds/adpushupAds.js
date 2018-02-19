@@ -27,7 +27,8 @@ class AdPushupAds extends Component {
 			size: this.props.ad ? `${this.props.ad.width}X${this.props.ad.height}` : false,
 			css: this.props.ad ? this.props.ad.css : {},
 			containsInteractiveAd: true,
-			reset: false
+			reset: false,
+			showButtons: false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.eventChangeHandler = this.eventChangeHandler.bind(this);
@@ -62,7 +63,8 @@ class AdPushupAds extends Component {
 		this.setState({
 			type: type,
 			placement: placement,
-			format: format
+			format: format,
+			showButtons: format == 'videoCustom' ? true : false
 		});
 	}
 
@@ -230,7 +232,9 @@ class AdPushupAds extends Component {
 			!this.state.size ||
 			((this.state.event == 'scroll' || this.state.event == 'onMills') &&
 				!this.state.eventData.value.trim().length) ||
-			(this.props.showNetworkOptions && (!networkInfo.network || !networkInfo.networkData)) ||
+			(this.props.showNetworkOptions &&
+				(!networkInfo.network || !networkInfo.networkData) &&
+				!this.state.showButtons) ||
 			(this.state.format == 'videoCustom' && !this.state.eventData.value.trim().length)
 		) {
 			this.props.showNotification({
@@ -260,6 +264,13 @@ class AdPushupAds extends Component {
 			? ((adPayload.networkData = networkInfo.networkData), (adPayload.network = networkInfo.network))
 			: null;
 
+		if (this.state.format == 'videoCustom') {
+			adPayload.network = 'custom';
+			adPayload.networkData = {
+				adCode: ''
+			};
+		}
+
 		this.setState(
 			{
 				event: false,
@@ -271,21 +282,22 @@ class AdPushupAds extends Component {
 				format: false,
 				size: false,
 				css: {},
-				reset: true
+				reset: true,
+				showButtons: false
 			},
 			() => this.props.submitHandler(sectionPayload, adPayload)
 		);
 	}
 
-	renderButtons() {
+	renderButtons(leftWidth, rightWidth) {
 		return (
 			<Row className="mT-15">
-				<Col xs={6} className="u-padding-r10px">
+				<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
 					<Button className="btn-lightBg btn-save btn-block" onClick={this.submitHandler}>
 						Save
 					</Button>
 				</Col>
-				<Col xs={6} className="u-padding-l10px">
+				<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 					<Button className="btn-lightBg btn-cancel btn-block" onClick={this.props.onCancel}>
 						Cancel
 					</Button>
@@ -322,8 +334,12 @@ class AdPushupAds extends Component {
 					{this.state.event ? this.renderEventOptions(leftWidth, rightWidth) : null}
 					{this.state.event ? this.renderFormatSelect(leftWidth, rightWidth) : null}
 					{this.state.event && this.state.format ? this.renderFormatOptions(leftWidth, rightWidth) : null}
-					{this.props.showNetworkOptions ? this.renderNetwork(leftWidth, rightWidth) : null}
-					{this.props.showButtons ? this.renderButtons() : null}
+					{this.props.showNetworkOptions && !this.state.showButtons
+						? this.renderNetwork(leftWidth, rightWidth)
+						: null}
+					{this.props.showButtons || this.state.showButtons
+						? this.renderButtons(leftWidth, rightWidth)
+						: null}
 				</Col>
 				<div style={{ clear: 'both' }}>&nbsp;</div>
 			</div>

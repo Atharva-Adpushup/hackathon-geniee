@@ -232,22 +232,25 @@ class AdDetails extends Component {
 				</p>
 			</div>
 		);
-	}	
-	
-	
+	}
+
 	render() {
-		const { fromPanel, showEventData } = this.props;
+		const { fromPanel, showEventData, ad } = this.props;
 		return (
 			<div id="ad-details">
 				{this.state.editDock ? (
 					<DockedSettings {...this.props} onCancel={this.editDockSettings} />
 				) : (
 					<div>
-						<div>
-							{!fromPanel ? this.renderSectionName() : null}
-							{this.renderNetworkDetails()}
-						</div>
-						{!fromPanel ? this.renderXPathAndCSS() : null}
+						{ad.network ? (
+							<div>
+								<div>
+									{!fromPanel ? this.renderSectionName() : null}
+									{this.renderNetworkDetails()}
+								</div>
+								{!fromPanel ? this.renderXPathAndCSS() : null}
+							</div>
+						) : null}
 						{showEventData ? this.renderEventData() : null}
 						{!this.props.section.isIncontent && this.props.section.type != 3
 							? this.renderDockedButton()
