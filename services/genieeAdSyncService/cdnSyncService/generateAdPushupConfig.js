@@ -11,9 +11,10 @@ const _ = require('lodash'),
 		if (
 			(ad.network == 'geniee' && ad.networkData.zoneId) ||
 			(ad.network == 'adpTags' && ad.networkData.dfpAdunit) ||
-			(typeof ad.networkData.adCode == 'string' && ad.networkData.adCode.length)
+			(typeof ad.networkData.adCode == 'string' && ad.networkData.adCode.length) ||
+			(ad.network == 'custom' && ad.networkData.forceByPass)
 		) {
-			return ad.network == 'custom' && ad.networkData.forceByPass ? false : true;
+			return true;
 		}
 		return false;
 	},
