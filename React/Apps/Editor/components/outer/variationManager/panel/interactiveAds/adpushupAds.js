@@ -267,7 +267,8 @@ class AdPushupAds extends Component {
 		if (this.state.format == 'videoCustom') {
 			adPayload.network = 'custom';
 			adPayload.networkData = {
-				adCode: ''
+				adCode: '',
+				forceByPass: true
 			};
 		}
 

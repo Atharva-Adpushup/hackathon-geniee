@@ -13,7 +13,7 @@ const _ = require('lodash'),
 			(ad.network == 'adpTags' && ad.networkData.dfpAdunit) ||
 			(typeof ad.networkData.adCode == 'string' && ad.networkData.adCode.length)
 		) {
-			return true;
+			return ad.network == 'custom' && ad.networkData.forceByPass ? false : true;
 		}
 		return false;
 	},
