@@ -26,7 +26,9 @@ class AdPushupAds extends Component {
 				: false,
 			size: this.props.ad ? `${this.props.ad.width}X${this.props.ad.height}` : false,
 			css: this.props.ad ? this.props.ad.css : {},
-			containsInteractiveAd: true
+			containsInteractiveAd: true,
+			reset: false,
+			showButtons: false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.eventChangeHandler = this.eventChangeHandler.bind(this);
@@ -50,12 +52,19 @@ class AdPushupAds extends Component {
 	}
 
 	formatChangeHandler(format) {
-		let typeAndPlacement = format.split(/^([^A-Z]+)/);
-		typeAndPlacement.shift();
+		let type = false,
+			placement = false;
+		if (format) {
+			let typeAndPlacement = format.split(/^([^A-Z]+)/);
+			typeAndPlacement.shift();
+			type = typeAndPlacement[0].toLowerCase();
+			placement = typeAndPlacement[1].toLowerCase();
+		}
 		this.setState({
-			type: typeAndPlacement[0].toLowerCase(),
-			placement: typeAndPlacement[1].toLowerCase(),
-			format: format
+			type: type,
+			placement: placement,
+			format: format,
+			showButtons: format == 'videoCustom' ? true : false
 		});
 	}
 
@@ -128,8 +137,8 @@ class AdPushupAds extends Component {
 	}
 
 	renderFormatSelect(leftWidth, rightWidth) {
-		let limit = this.props.platform == 'DESKTOP' ? interactiveAds.types.length : 1,
-			types = interactiveAds.types.slice(0, limit);
+		// let limit = this.props.platform == 'DESKTOP' ? interactiveAds.types.length : 1,
+		let types = interactiveAds.types[this.props.platform.toUpperCase()];
 		return (
 			<Row className="mT-15">
 				<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
@@ -205,6 +214,7 @@ class AdPushupAds extends Component {
 						buttonType={2}
 						fromPanel={true}
 						showNotification={this.props.showNotification}
+						reset={this.state.reset}
 					/>
 				</Col>
 			</Row>
@@ -222,7 +232,10 @@ class AdPushupAds extends Component {
 			!this.state.size ||
 			((this.state.event == 'scroll' || this.state.event == 'onMills') &&
 				!this.state.eventData.value.trim().length) ||
-			(this.props.showNetworkOptions && (!networkInfo.network || !networkInfo.networkData))
+			(this.props.showNetworkOptions &&
+				(!networkInfo.network || !networkInfo.networkData) &&
+				!this.state.showButtons) ||
+			(this.state.format == 'videoCustom' && !this.state.eventData.value.trim().length)
 		) {
 			this.props.showNotification({
 				mode: 'error',
@@ -251,6 +264,13 @@ class AdPushupAds extends Component {
 			? ((adPayload.networkData = networkInfo.networkData), (adPayload.network = networkInfo.network))
 			: null;
 
+		if (this.state.format == 'videoCustom') {
+			adPayload.network = 'custom';
+			adPayload.networkData = {
+				adCode: ''
+			};
+		}
+
 		this.setState(
 			{
 				event: false,
@@ -261,21 +281,23 @@ class AdPushupAds extends Component {
 				placement: false,
 				format: false,
 				size: false,
-				css: {}
+				css: {},
+				reset: true,
+				showButtons: false
 			},
 			() => this.props.submitHandler(sectionPayload, adPayload)
 		);
 	}
 
-	renderButtons() {
+	renderButtons(leftWidth, rightWidth) {
 		return (
 			<Row className="mT-15">
-				<Col xs={6} className="u-padding-r10px">
+				<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
 					<Button className="btn-lightBg btn-save btn-block" onClick={this.submitHandler}>
 						Save
 					</Button>
 				</Col>
-				<Col xs={6} className="u-padding-l10px">
+				<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 					<Button className="btn-lightBg btn-cancel btn-block" onClick={this.props.onCancel}>
 						Cancel
 					</Button>
@@ -312,8 +334,12 @@ class AdPushupAds extends Component {
 					{this.state.event ? this.renderEventOptions(leftWidth, rightWidth) : null}
 					{this.state.event ? this.renderFormatSelect(leftWidth, rightWidth) : null}
 					{this.state.event && this.state.format ? this.renderFormatOptions(leftWidth, rightWidth) : null}
-					{this.props.showNetworkOptions ? this.renderNetwork(leftWidth, rightWidth) : null}
-					{this.props.showButtons ? this.renderButtons() : null}
+					{this.props.showNetworkOptions && !this.state.showButtons
+						? this.renderNetwork(leftWidth, rightWidth)
+						: null}
+					{this.props.showButtons || this.state.showButtons
+						? this.renderButtons(leftWidth, rightWidth)
+						: null}
 				</Col>
 				<div style={{ clear: 'both' }}>&nbsp;</div>
 			</div>
