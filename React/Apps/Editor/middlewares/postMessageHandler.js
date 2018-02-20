@@ -51,9 +51,10 @@ const getData = state => {
 		if (nextState) {
 			if (
 				action.type !== sectionActions.UPDATE_PARTNER_DATA &&
-				(action.type === channelActions.OPEN_CHANNEL_SUCCESS ||
-					(!_.isEqual(prevState.layout, nextState.layout) && !isTypedChanged)) &&
-				!isTypedChanged
+				(action.type === channelActions.OPEN_CHANNEL_SUCCESS || !_.isEqual(prevState.layout, nextState.layout))
+				// action.type === channelActions.OPEN_CHANNEL_SUCCESS &&
+				// 	(!_.isEqual(prevState.layout, nextState.layout) && !isTypedChanged)) &&
+				// !isTypedChanged
 			) {
 				sendMessage(nextState.activeChannelId, messengerCommands.UPDATE_LAYOUT, nextState.layout);
 			} else if (isValidActionUpdateContentSelector) {
