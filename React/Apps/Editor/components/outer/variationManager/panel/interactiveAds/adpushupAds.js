@@ -270,6 +270,8 @@ class AdPushupAds extends Component {
 				adCode: '',
 				forceByPass: true
 			};
+			sectionPayload.xpath = this.state.eventData.value.trim();
+			sectionPayload.operation = 'Append';
 		}
 
 		this.setState(
