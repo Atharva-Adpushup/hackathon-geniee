@@ -18,7 +18,7 @@ const Promise = require('bluebird'),
 							let ads = section.ads;
 							if (ads && Object.keys(ads).length) {
 								_.forEach(ads, ad => {
-									if (ad.network == 'geniee' && ad.networkData && ad.networkData.dynamicAllocation) {
+									if (ad.network == 'geniee' && ad.networkData) {
 										output.zones[ad.networkData.zoneId] = output.zones[ad.networkData.zoneId] || {};
 										output.zones[ad.networkData.zoneId].sections =
 											output.zones[ad.networkData.zoneId].sections || {};
