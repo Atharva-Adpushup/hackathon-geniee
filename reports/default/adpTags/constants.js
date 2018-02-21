@@ -33,16 +33,13 @@ ORDER BY 'count' DESC;
 `;
 
 const SITE_MODE_WISE_TOP_URLS = `
-SELECT url, total_impressions as count
-FROM (
-SELECT url, sum(total_impressions) total_impressions, ROW_NUMBER() OVER (ORDER BY sum(total_impressions) DESC) AS rn
+SELECT top 20 url, count(*) count
 FROM ApexSiteReport a
 WHERE log_date BETWEEN @__fromDate__ AND @__toDate__
 AND siteid = @__siteId__
 AND mode = @__mode__
 GROUP BY url
-HAVING sum(total_impressions) > 0) a
-WHERE rn <= @__count__
+ORDER BY COUNT desc
 `;
 
 const SITE_DEVICE_WISE_REVENUE_CONTRIBUTION = `
