@@ -52,6 +52,14 @@ var $ = require('jquery'),
 				}
 			};
 
+		var dockedAdOffsetInterval = setInterval(function() {
+			elTopOffset = $el.offset().top;
+		}, 500);
+
+		$(window).on('load', function() {
+			clearInterval(dockedAdOffsetInterval);
+		});
+
 		$(window).on(
 			'scroll',
 			utils.throttle(function() {
