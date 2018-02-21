@@ -26,7 +26,7 @@ module.exports = {
 	},
 	getCountry: function() {
 		return new Promise(function(resolve, reject) {
-			$.get('http://e3.adpushup.com/IpLocationPublicWebService/GetLocationInfo', function(response) {
+			$.get('//e3.adpushup.com/IpLocationPublicWebService/GetLocationInfo', function(response) {
 				if (response && response.data && response.data.country) {
 					resolve(response.data.country);
 					return;
