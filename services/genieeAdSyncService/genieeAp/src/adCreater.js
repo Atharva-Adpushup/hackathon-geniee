@@ -20,7 +20,7 @@ var $ = require('jquery'),
 			genieeIds = [];
 		for (a = 0; a < ads.length; a++) {
 			ad = ads[a];
-			ad.isIncontent ? inContentAds.push(ad) : structuredAds.push(ad);
+			ad.isIncontent ? inContentAds.push(ad) : null;
 			ad.network === 'geniee' &&
 				ad.networkData &&
 				!ad.networkData.dynamicAllocation &&
@@ -28,6 +28,11 @@ var $ = require('jquery'),
 				genieeIds.push(ad.networkData.zoneId);
 			// 'isADPTags' will be true if atleast one ADP tag is present
 			shouldPushToADP(ad) ? (adpTagUnits.push(ad), (window.adpushup.config.isADPTags = true)) : null;
+
+			// Push ads to structural ad array only if ad is not interactive or not incontent
+			if (!ad.formatData && !ad.isIncontent && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD) {
+				structuredAds.push(ad);
+			}
 		}
 
 		inContentAds.sort(function(next, prev) {
