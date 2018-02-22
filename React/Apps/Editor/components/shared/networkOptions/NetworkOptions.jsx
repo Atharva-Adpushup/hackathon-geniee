@@ -84,7 +84,7 @@ class NetworkOptions extends Component {
 			headerBidding =
 				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('headerBidding')
 					? this.props.ad.networkData.headerBidding
-					: true,
+					: false,
 			dynamicAllocation =
 				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('dynamicAllocation')
 					? this.props.ad.networkData.dynamicAllocation
