@@ -14,7 +14,7 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 		parentNode.attr({ class: commonConsts.DEFAULT_CLASSNAME });
 
 		// Set CSS on parent node - required in case of video interactive ad format
-		if (Object.keys(css).length) {
+		if (css && Object.keys(css).length) {
 			parentNode.css(css);
 		}
 
