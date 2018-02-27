@@ -127,7 +127,14 @@ function errorHandler(siteObject, error) {
 function getAllSitesData(modelInstance) {
 	const isUserModel = !!modelInstance,
 		isSitesArray = !!(isUserModel && modelInstance.get('sites') && modelInstance.get('sites').length),
-		emailBlockList = ['geniee@adpushup.com', 'demo@adpushup.com'],
+		emailBlockList = [
+			'geniee@adpushup.com',
+			'demo@adpushup.com',
+			'amit.sharma3@nw18.com',
+			'kavi.madan@nw18.com',
+			'kavi.madan@network18online.com',
+			'dinesh.joshi@jagrannewmedia.com'
+		],
 		emailPatternBlockList = [/devtest|mailinator\.com/i],
 		statusObject = {
 			email: modelInstance.get('email'),
@@ -148,16 +155,12 @@ function getAllSitesData(modelInstance) {
 		isEmailInPatternBlockedList = utils.isValueInPatternList(emailPatternBlockList, userEmail);
 
 	if (isEmailInBlockedList) {
-		statusObject.message = `User email ${
-			userEmail
-		} is in blocked list. Module execution for this user will stop now.`;
+		statusObject.message = `User email ${userEmail} is in blocked list. Module execution for this user will stop now.`;
 		return statusObject;
 	}
 
 	if (isEmailInPatternBlockedList) {
-		statusObject.message = `User email ${
-			userEmail
-		} is in pattern blocked list. Module execution for this user will stop now.`;
+		statusObject.message = `User email ${userEmail} is in pattern blocked list. Module execution for this user will stop now.`;
 		return statusObject;
 	}
 
