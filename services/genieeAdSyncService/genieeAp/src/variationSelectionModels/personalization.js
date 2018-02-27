@@ -71,7 +71,7 @@ var utils = require('../../libs/utils'),
 						}
 					})
 					.catch(function(err) {
-						return resolve(variations);
+						return resolve(remainingVariations);
 					});
 			}
 		});
