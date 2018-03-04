@@ -51,7 +51,10 @@ function init(adp, onPageGroupPush, platform) {
 				var key = experimentPageGroups[i],
 					//Remove forceVariation param from url so that it doesn't change pageGrop pattern
 					url = utils.removeUrlParameter(w.location.href, config.forceVariation),
-					patternToMatch = platformExperiments[key].pageGroupPattern;
+					// Type casting url pattern to ensure special characters are escaped and variable
+					// value is a valid string
+					patternToMatch = String(platformExperiments[key].pageGroupPattern);
+
 				//do check if any pageGroup pattern provided or not, if not then don't match
 				if (patternToMatch && url.match(new RegExp(patternToMatch, 'i'))) {
 					// forceFully set pagegroup in case url pattern matches to current url
