@@ -30,7 +30,10 @@ var $ = require('jquery'),
 			shouldPushToADP(ad) ? (adpTagUnits.push(ad), (window.adpushup.config.isADPTags = true)) : null;
 
 			// Push ads to structural ad array only if ad is not interactive or not incontent
-			if (!ad.formatData && !ad.isIncontent && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD) {
+			if (
+				(!ad.formatData && !ad.isIncontent && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD) ||
+				ad.type == commonConsts.AD_TYPES.DOCKED_STRUCTURAL
+			) {
 				structuredAds.push(ad);
 			}
 		}
