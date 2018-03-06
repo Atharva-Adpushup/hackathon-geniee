@@ -2,6 +2,7 @@
 
 import commonConsts from './commonConsts';
 import emitter from './emitter';
+import $ from './$';
 
 ((w, ap) => {
 	ap.$(document).ready(() => {
