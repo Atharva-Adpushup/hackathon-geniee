@@ -15,16 +15,16 @@ class Component {
 		window.adpInteractive.ads[id] = this.interactiveAd;
 
 		let css = { width, height },
-			format = $('<div />');
+			$format = $('<div />');
 
 		switch (formatData.type) {
 			case commonConsts.FORMATS.STICKY.NAME:
-				format.css({
+				$format.css({
 					...css,
 					...commonConsts.FORMATS.STICKY.BASE_STYLES,
 					...this.getPlacementCSS(formatData)
 				});
-				return this.parentNode.append(format.append(this.adCode));
+				return this.parentNode.append($format.append(this.adCode));
 
 			case commonConsts.FORMATS.VIDEO.NAME:
 				return this.createPlayer();
