@@ -8,19 +8,19 @@ import config from '../config';
 import { generateAdCode } from '../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
 
 const createParentNode = (appendTo, interactiveAd, css) => {
-		const parentNode = $('<div/>'),
+		const $parentNode = $('<div/>'),
 			{ id } = interactiveAd;
 
-		parentNode.attr({ class: commonConsts.DEFAULT_CLASSNAME });
+		$parentNode.attr({ class: commonConsts.DEFAULT_CLASSNAME });
 
 		// Set CSS on parent node - required in case of video interactive ad format
 		if (Object.keys(css).length) {
-			parentNode.css(css);
+			$parentNode.css(css);
 		}
 
-		$(appendTo).append(parentNode);
+		$(appendTo).append($parentNode);
 
-		return parentNode;
+		return $parentNode;
 	},
 	renderer = interactiveAd => {
 		if (interactiveAd && interactiveAd.formatData) {

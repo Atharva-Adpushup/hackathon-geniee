@@ -21,10 +21,10 @@ class Video extends Component {
 
 	appendPassbackAd(adCode) {
 		const { id, width, height } = this.interactiveAd,
-			passbackAd = $('<div/>');
+			$passbackAd = $('<div/>');
 
-		passbackAd.attr({ id }).css({ width, height });
-		return this.parentNode.append(passbackAd.append(adCode));
+		$passbackAd.attr({ id }).css({ width, height });
+		return this.parentNode.append($passbackAd.append(adCode));
 	}
 
 	initIma(videoData) {
@@ -32,11 +32,11 @@ class Video extends Component {
 			{ url } = videoData,
 			{ VIDEO } = commonConsts.FORMATS,
 			VideoInstance = this,
-			player = $('<video/>'),
+			$player = $('<video/>'),
 			adCode = atob(networkData.adCode);
 
-		player.attr({ id });
-		this.parentNode.append(player);
+		$player.attr({ id });
+		this.parentNode.append($player);
 
 		return videojs(
 			id,
