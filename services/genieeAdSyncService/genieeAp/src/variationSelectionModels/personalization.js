@@ -20,7 +20,8 @@ var utils = require('../../libs/utils'),
 		var finalVariations = [],
 			country = country.toUpperCase(),
 			type,
-			values;
+			values,
+			personalisationMatch = false;
 
 		$.each(variations, function (variations, variationObj) {
 			type = variationObj.personalization.geo.type;
@@ -31,12 +32,14 @@ var utils = require('../../libs/utils'),
 			}
 			if (type == 'in' && values.indexOf(country) !== -1) {
 				finalVariations.push(variationObj);
+				personalisationMatch = true;
 			} else if (type == 'not' && values.indexOf(country) == -1) {
+				personalisationMatch = true;
 				finalVariations.push(variationObj);
 			}
 
 			// Destroy specified publisher DFP ad slots if present
-			if (variationObj.personalization.geo.dfpAdSlotsToDestroy && variationObj.personalization.geo.dfpAdSlotsToDestroy.length) {
+			if (personalisationMatch && variationObj.personalization.geo.dfpAdSlotsToDestroy && variationObj.personalization.geo.dfpAdSlotsToDestroy.length) {
 				destroyPublisherDfpAdSlots(variationObj.personalization.geo.dfpAdSlotsToDestroy);
 			}
 		});
