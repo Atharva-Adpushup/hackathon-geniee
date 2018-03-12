@@ -125,7 +125,7 @@ class Personalization extends Component {
 					</Row>
 					<Row>
 						<Col xs={5} className="u-padding-r10px">
-							<strong>DFP Slots</strong>
+							<strong>Publisher DFP Slots to destroy (Please use with caution!)</strong>
 						</Col>
 						<Col xs={7} className="u-padding-l10px">
 							<input
