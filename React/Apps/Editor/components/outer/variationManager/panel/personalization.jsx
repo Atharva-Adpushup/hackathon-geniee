@@ -16,10 +16,15 @@ class Personalization extends Component {
 		super(props);
 		this.state = {
 			countries: isPersonalizationPresent ? props.variation.personalization.geo.values.join(',') : '',
+			dfpSlots:
+				isPersonalizationPresent && props.variation.personalization.geo.dfpAdSlotsToDestroy
+					? props.variation.personalization.geo.dfpAdSlotsToDestroy.join(',')
+					: '',
 			type: isPersonalizationPresent ? props.variation.personalization.geo.type : false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.checkCountries = this.checkCountries.bind(this);
+		this.reset = this.reset.bind(this);
 	}
 	componentWillReceiveProps(nextProps) {
 		let isPersonalizationPresent = !!(
@@ -27,7 +32,11 @@ class Personalization extends Component {
 		);
 		this.setState({
 			countries: isPersonalizationPresent ? nextProps.variation.personalization.geo.values.join(',') : '',
-			type: isPersonalizationPresent ? nextProps.variation.personalization.geo.type : false
+			type: isPersonalizationPresent ? nextProps.variation.personalization.geo.type : false,
+			dfpSlots:
+				isPersonalizationPresent && nextProps.variation.personalization.geo.dfpAdSlotsToDestroy
+					? nextProps.variation.personalization.geo.dfpAdSlotsToDestroy.join(',')
+					: ''
 		});
 	}
 	checkCountries(countries) {
@@ -54,10 +63,25 @@ class Personalization extends Component {
 		this.props.savePersonalizationInfo(this.props.variation, {
 			geo: {
 				type: this.state.type,
-				values: _.map(countries, country => country.toUpperCase())
+				values: _.map(countries, country => country.toUpperCase()),
+				dfpAdSlotsToDestroy: this.state.dfpSlots.trim().split(',') || []
 			}
 		});
 	}
+
+	reset() {
+		this.setState(
+			{
+				dfpSlots: '',
+				countries: '',
+				type: false
+			},
+			() => {
+				this.props.savePersonalizationInfo(this.props.variation, {});
+			}
+		);
+	}
+
 	render() {
 		return (
 			<div>
@@ -100,10 +124,31 @@ class Personalization extends Component {
 						</Col>
 					</Row>
 					<Row>
+						<Col xs={5} className="u-padding-r10px">
+							<strong>Publisher DFP Slots to destroy (Please use with caution!)</strong>
+						</Col>
+						<Col xs={7} className="u-padding-l10px">
+							<input
+								type="text"
+								value={this.state.dfpSlots}
+								placeholder="Enter DFP Slots (comma separated)"
+								className="inputBasic mB-10"
+								onChange={ev => {
+									this.setState({ dfpSlots: ev.target.value });
+								}}
+							/>
+						</Col>
+					</Row>
+					<Row>
 						<Col xs={7} xsPush={5}>
 							<Col xs={3} style={{ padding: '0px' }}>
 								<Button className="btn-lightBg btn-save btn-block" onClick={this.submitHandler}>
 									Save
+								</Button>
+							</Col>
+							<Col xs={3} style={{ padding: '0px', marginLeft: '10px' }}>
+								<Button className="btn-lightBg btn-block" onClick={this.reset}>
+									Reset
 								</Button>
 							</Col>
 						</Col>
