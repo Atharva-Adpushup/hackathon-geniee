@@ -52,7 +52,8 @@ var $ = require('jquery'),
 			structuredAds: structuredAds,
 			inContentAds: inContentAds,
 			genieeIds: genieeIds,
-			adpTagUnits: adpTagUnits
+			adpTagUnits: adpTagUnits,
+			externalTriggerAds: externalTriggerAds
 		};
 	},
 	getContainer = function(ad, el) {
