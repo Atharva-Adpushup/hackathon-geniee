@@ -3,7 +3,8 @@ module.exports = {
 		STRUCTURAL: 1,
 		IN_CONTENT: 2,
 		INTERACTIVE_AD: 3,
-		DOCKED_STRUCTURAL: 4
+		DOCKED_STRUCTURAL: 4,
+		EXTERNAL_TRIGGER_AD: 5
 	},
 	DOCKED_CSS: {
 		position: 'fixed',

@@ -365,7 +365,14 @@ const status = {
 			TABLET: ['stickyBottom', 'stickyLeft', 'stickyRight', 'videoCustom']
 		}
 	},
-	personalizationTypes = ['not', 'in'];
+	personalizationTypes = ['not', 'in'],
+	typeOfAds = {
+		STRUCTURAL: 1,
+		IN_CONTENT: 2,
+		INTERACTIVE_AD: 3,
+		DOCKED_STRUCTURAL: 4,
+		EXTERNAL_TRIGGER_AD: 5
+	};
 
 export {
 	status,
@@ -407,5 +414,6 @@ export {
 	defaultPriceFloorKey,
 	jsWrapper,
 	interactiveAds,
-	personalizationTypes
+	personalizationTypes,
+	typeOfAds
 };

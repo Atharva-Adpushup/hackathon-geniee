@@ -17,9 +17,16 @@ var $ = require('jquery'),
 			structuredAds = [],
 			inContentAds = [],
 			adpTagUnits = [],
+			externalTriggerAds = [],
 			genieeIds = [];
 		for (a = 0; a < ads.length; a++) {
 			ad = ads[a];
+
+			if (ad.type === commonConsts.AD_TYPES.EXTERNAL_TRIGGER_AD) {
+				externalTriggerAds.push(ad);
+				continue;
+			}
+
 			ad.isIncontent ? inContentAds.push(ad) : null;
 			ad.network === 'geniee' &&
 				ad.networkData &&
