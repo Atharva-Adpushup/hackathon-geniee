@@ -86,6 +86,15 @@ const commonConsts = {
 				preload: 'none',
 				playsinline: true
 			},
+			DEFAULT_TITLE_CSS: {
+				backgroundColor: '#1F232C',
+				color: '#fff',
+				fontSize: 12,
+				textOverflow: 'ellipsis',
+				overflow: 'hidden',
+				whiteSpace: 'nowrap',
+				padding: '10px',
+			},
 			DEFAULT_CLASS: 'video-js',
 			DEFAULT_AD_TAG_URL:
 				'https://ima3vpaid.appspot.com/?adTagUrl=https%3A%2F%2Fgoogleads.g.doubleclick.net%2Fpagead%2Fads%3Fclient%3Dca-video-pub-8933329999391104%26ad_type%3Dvideo%26description_url%3D__DESCRIPTION_URL__%26max_ad_duration%3D30000%26videoad_start_delay%3D0&type=js'

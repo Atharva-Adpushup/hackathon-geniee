@@ -32,20 +32,17 @@ class Video extends Component {
 			{ url } = videoData,
 			{ VIDEO } = commonConsts.FORMATS,
 			VideoInstance = this,
+			$title = $('<div/>'),
 			$player = $('<video/>'),
 			adCode = atob(networkData.adCode);
 
+		$title.text(videoData.title).css({ ...VIDEO.DEFAULT_TITLE_CSS, width });
 		$player.attr({ id });
+		this.parentNode.append($title);
 		this.parentNode.append($player);
 
-		return videojs(
-			id,
-			{
-				...VIDEO.DEFAULT_PLAYER_CONFIG,
-				width,
-				height
-			},
-			function() {
+		return videojs(id, { ...VIDEO.DEFAULT_PLAYER_CONFIG, width, height },
+			function () {
 				this.addClass(VIDEO.DEFAULT_CLASS);
 				this.src(url);
 
@@ -62,7 +59,7 @@ class Video extends Component {
 				config.ads[id].videoData.adTagUrl = adTagUrl;
 				this.ima(options);
 
-				this.on(VIDEO.EVENTS.AD_ERROR, function() {
+				this.on(VIDEO.EVENTS.AD_ERROR, function () {
 					if (adCode) {
 						this.dispose();
 						VideoInstance.appendPassbackAd(adCode);
@@ -74,7 +71,7 @@ class Video extends Component {
 				});
 
 				// Hacky way to mute the ad as "adWillPlayMuted" option is not working
-				this.on(VIDEO.EVENTS.AD_STARTED, function() {
+				this.on(VIDEO.EVENTS.AD_STARTED, function () {
 					this.ima.getAdsManager().setVolume(0);
 					config.ads[id].videoData.passBackSuccess = false;
 					config.ads[id].videoData.adSuccess = true;
