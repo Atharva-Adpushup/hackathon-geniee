@@ -117,7 +117,7 @@ function startCreation(forced) {
 
 				createAds(adp, selectedVariation);
 			} else {
-				triggerControl(3);
+				triggerControl(15);
 			}
 
 			return resolve(true);
