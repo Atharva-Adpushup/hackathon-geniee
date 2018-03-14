@@ -70,6 +70,10 @@ class Video extends Component {
 					config.ads[id].videoData.adSuccess = false;
 				});
 
+				try {
+					this.ima.getAdsManager().setVolume(0);
+				} catch (e) { }
+
 				// Hacky way to mute the ad as "adWillPlayMuted" option is not working
 				this.on(VIDEO.EVENTS.AD_STARTED, function () {
 					this.ima.getAdsManager().setVolume(0);
