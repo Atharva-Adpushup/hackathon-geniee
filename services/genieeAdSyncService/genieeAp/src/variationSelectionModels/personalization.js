@@ -1,18 +1,18 @@
 var utils = require('../../libs/utils'),
 	$ = require('jquery'),
 	destroyPublisherDfpAdSlots = function (dfpAdSlotsToDestroy) {
-		var allDfpAdSlots = googletag.pubads().aa, // Reference to all DFP ad slots on page
-			slotsToDestroy = [];
-
-		dfpAdSlotsToDestroy.forEach(function (dfpAdSlotName) {
-			Object.keys(allDfpAdSlots).forEach(function (dfpAdSlot) {
-				if (dfpAdSlot.includes(dfpAdSlotName)) {
-					slotsToDestroy.push(allDfpAdSlots[dfpAdSlot])
-				}
-			});
-		});
-
 		googletag.cmd.push(function () {
+			var allDfpAdSlots = googletag.pubads().aa, // Reference to all DFP ad slots on page
+				slotsToDestroy = [];
+
+			dfpAdSlotsToDestroy.forEach(function (dfpAdSlotName) {
+				Object.keys(allDfpAdSlots).forEach(function (dfpAdSlot) {
+					if (dfpAdSlot.includes(dfpAdSlotName)) {
+						slotsToDestroy.push(allDfpAdSlots[dfpAdSlot])
+					}
+				});
+			});
+
 			googletag.destroySlots(slotsToDestroy);
 		});
 	},
