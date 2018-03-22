@@ -4,7 +4,7 @@ const config = require('../../../configs/config'),
 	Promise = require('bluebird'),
 	readFile = Promise.promisify(fs.readFile),
 	PromiseFtp = require('promise-ftp'),
-	adpInteractiveScriptName = 'adpInteractiveAdstest',
+	adpInteractiveScriptName = 'adpInteractiveAds',
 	adpInteractiveTplPath = path.join(
 		__dirname,
 		'..',
