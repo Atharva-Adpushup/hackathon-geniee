@@ -13,10 +13,11 @@ var w = window,
 	hookAndInit = require('./hooksAndBlockList'),
 	control = require('./control')(),
 	genieeObject = require('./genieeObject'),
+	triggerAd = require('./trigger'),
 	isGenieeSite;
 
 // Extend adpushup object
-//Location of blow snippet should not be changed, other wise script will throw error.
+// Location of below snippet should not be changed, other wise script will throw error.
 $.extend(adp, {
 	creationProcessStarted: false,
 	err: [],
@@ -24,7 +25,8 @@ $.extend(adp, {
 	control: control,
 	tracker: new Tracker(),
 	nodewatcher: nodewatcher,
-	geniee: genieeObject
+	geniee: genieeObject,
+	triggerAd: triggerAd
 });
 
 // Extend the settings with generated settings
@@ -125,7 +127,37 @@ function startCreation(forced) {
 	});
 }
 
+function processQue() {
+	while (w.adpushup.que.length) {
+		w.adpushup.que.shift().call();
+	}
+}
+
+function initAdpQue() {
+	if (w.adpushup && Array.isArray(w.adpushup.que) && w.adpushup.que.length) {
+		adp.que = w.adpushup.que;
+	} else {
+		adp.que = [];
+	}
+
+	processQue();
+	adp.que.push = function(queFunc) {
+		[].push.call(w.adpushup.que, queFunc);
+		processQue();
+	};
+}
+
 function main() {
+	// Initialise adp que
+	initAdpQue();
+
+	// Set manual ads flag in adp config
+	if (Array.isArray(adp.manualAds) && adp.manualAds.length) {
+		adp.config.hasManualAds = true;
+	} else {
+		adp.config.hasManualAds = false;
+	}
+
 	// Hook Pagegroup, find pageGroup and check for blockList
 	hookAndInit(adp, startCreation, browserConfig.platform);
 
@@ -139,7 +171,7 @@ function main() {
 		return false;
 	}
 
-	// AdPushup Debug Force COntrol
+	// AdPushup Debug Force Control
 	if (utils.queryParams && utils.queryParams.forceControl) {
 		triggerControl(5);
 		return false;
