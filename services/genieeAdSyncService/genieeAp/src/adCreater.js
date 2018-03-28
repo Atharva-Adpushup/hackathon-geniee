@@ -113,6 +113,28 @@ var $ = require('jquery'),
 			});
 		return defer.promise();
 	},
+	placeAd = function(container, ad) {
+		try {
+			$.ajaxSettings.cache = true;
+			container.append(adCodeGenerator.generateAdCode(ad));
+			$.ajaxSettings.cache = false;
+
+			if (ad.type && Number(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL) {
+				// Type 4 is DOCKED
+				utils.dockify.dockifyAd('#' + ad.id, ad.formatData, utils);
+			}
+
+			window.adpushup.tracker.add(
+				container,
+				function(id) {
+					utils.sendBeacon(config.feedbackUrl, { eventType: 2, click: true, id: id });
+				}.bind(null, ad.id)
+			);
+		} catch (e) {
+			window.adpushup.err.push({ msg: 'Error in placing ad.', ad: ad, error: e });
+		}
+		return true;
+	},
 	createAds = function(adp, variation) {
 		var config = adp.config,
 			tracker = adp.tracker,
@@ -172,28 +194,6 @@ var $ = require('jquery'),
 			placeGenieeHeadCode = function(genieeIds) {
 				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIds);
 				genieeHeadCode && $('head').append(genieeHeadCode);
-			},
-			placeAd = function(container, ad) {
-				try {
-					$.ajaxSettings.cache = true;
-					container.append(adCodeGenerator.generateAdCode(ad));
-					$.ajaxSettings.cache = false;
-
-					if (ad.type && Number(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL) {
-						// Type 4 is DOCKED
-						utils.dockify.dockifyAd('#' + ad.id, ad.formatData, utils);
-					}
-
-					tracker.add(
-						container,
-						function(id) {
-							utils.sendBeacon(config.feedbackUrl, { eventType: 2, click: true, id: id });
-						}.bind(null, ad.id)
-					);
-				} catch (e) {
-					err.push({ msg: 'Error in placing ad.', ad: ad, error: e });
-				}
-				return true;
 			},
 			next = function(adObj, data) {
 				if (displayCounter) {
@@ -320,4 +320,7 @@ var $ = require('jquery'),
 		})();
 	};
 
-module.exports = createAds;
+module.exports = {
+	createAds: createAds,
+	placeAd: placeAd
+};

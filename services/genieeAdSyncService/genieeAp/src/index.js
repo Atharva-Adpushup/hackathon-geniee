@@ -8,7 +8,7 @@ var w = window,
 	nodewatcher = require('../libs/nodeWatcher'),
 	browserConfig = require('../libs/browserConfig'),
 	selectVariation = require('./variationSelectionModels/index'),
-	createAds = require('./adCreater'),
+	createAds = require('./adCreater').createAds,
 	heartBeat = require('../libs/heartBeat'),
 	hookAndInit = require('./hooksAndBlockList'),
 	control = require('./control')(),
@@ -156,6 +156,13 @@ function main() {
 		adp.config.hasManualAds = true;
 	} else {
 		adp.config.hasManualAds = false;
+	}
+
+	// Set mode in adp config in case of pure manual ads implementation
+	if (adp.config.hasManualAds && !adp.config.experiment) {
+		adp.config.mode = 16;
+		adp.creationProcessStarted = true;
+		return false;
 	}
 
 	// Hook Pagegroup, find pageGroup and check for blockList

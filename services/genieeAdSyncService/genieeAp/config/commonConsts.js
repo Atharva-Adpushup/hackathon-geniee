@@ -10,5 +10,8 @@ module.exports = {
 		position: 'fixed',
 		top: '0px',
 		'z-index': 10000
+	},
+	MANUAL_ADS: {
+		VARIATION: 'manual'
 	}
 };
