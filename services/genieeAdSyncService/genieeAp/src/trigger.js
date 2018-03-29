@@ -14,8 +14,7 @@ var adp = window.adpushup,
 				$.extend(
 					{
 						width: ad.width,
-						height: ad.height,
-						background: 'red'
+						height: ad.height
 					},
 					ad.css
 				)
