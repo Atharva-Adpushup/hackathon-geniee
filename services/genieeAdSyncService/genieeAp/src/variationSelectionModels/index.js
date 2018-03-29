@@ -89,8 +89,13 @@ function checkForcedVariation(moduleConfig) {
 
 function computeChosenVariation(moduleConfig) {
 	var chosenVariation = null,
-		isForcedVariation = !!(moduleConfig && moduleConfig.data && moduleConfig.data.contentSelector,
-		moduleConfig.isValidated && moduleConfig.isForced && moduleConfig.chosenVariation);
+		isForcedVariation = !!(
+			moduleConfig &&
+			moduleConfig.data &&
+			moduleConfig.isValidated &&
+			moduleConfig.isForced &&
+			moduleConfig.chosenVariation
+		);
 
 	if (isForcedVariation) {
 		chosenVariation = $.extend(true, {}, moduleConfig.chosenVariation);

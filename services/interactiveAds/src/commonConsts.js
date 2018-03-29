@@ -10,7 +10,8 @@ const commonConsts = {
 		STICKY: {
 			NAME: 'sticky',
 			BASE_STYLES: {
-				position: 'fixed'
+				position: 'fixed',
+				zIndex: 1000
 			},
 			PLACEMENT_CSS: {
 				BOTTOM: {
@@ -85,6 +86,15 @@ const commonConsts = {
 				autoplay: true,
 				preload: 'none',
 				playsinline: true
+			},
+			DEFAULT_TITLE_CSS: {
+				backgroundColor: '#1F232C',
+				color: '#fff',
+				fontSize: 12,
+				textOverflow: 'ellipsis',
+				overflow: 'hidden',
+				whiteSpace: 'nowrap',
+				padding: '10px',
 			},
 			DEFAULT_CLASS: 'video-js',
 			DEFAULT_AD_TAG_URL:

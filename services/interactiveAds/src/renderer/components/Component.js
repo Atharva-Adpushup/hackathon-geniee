@@ -3,11 +3,20 @@
 import commonConsts from '../../commonConsts';
 import $ from '../../$';
 
+const adp = window.adpushup;
+
 class Component {
 	constructor(parentNode, interactiveAd, adCode) {
 		this.parentNode = parentNode;
 		this.interactiveAd = interactiveAd;
 		this.adCode = adCode;
+		this.sendFeedback = this.sendFeedback.bind(this);
+	}
+
+	sendFeedback(options) {
+		if (adp && adp.utils && adp.utils.sendFeedback) {
+			adp.utils.sendFeedback(options);
+		}
 	}
 
 	render() {
@@ -15,7 +24,16 @@ class Component {
 		window.adpInteractive.ads[id] = this.interactiveAd;
 
 		let css = { width, height },
-			$format = $('<div />');
+			$format = $('<div />'),
+			feedbackOptions = {
+				ads: [id],
+				xpathMiss: [],
+				eventType: 1,
+				mode: 1,
+				referrer: adp.config.referrer,
+				tracking: false,
+				variationId: adp.config.selectedVariation
+			};
 
 		switch (formatData.type) {
 			case commonConsts.FORMATS.STICKY.NAME:
@@ -24,12 +42,15 @@ class Component {
 					...commonConsts.FORMATS.STICKY.BASE_STYLES,
 					...this.getPlacementCSS(formatData)
 				});
-				return this.parentNode.append($format.append(this.adCode));
+				this.parentNode.append($format.append(this.adCode));
+				break;
 
 			case commonConsts.FORMATS.VIDEO.NAME:
-				return this.createPlayer();
+				this.createPlayer();
 				break;
 		}
+
+		return this.sendFeedback(feedbackOptions);
 	}
 }
 

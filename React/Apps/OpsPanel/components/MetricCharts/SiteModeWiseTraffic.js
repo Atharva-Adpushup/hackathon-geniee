@@ -137,6 +137,8 @@ class SiteModeWiseTraffic extends Component {
 			isDataLoaded,
 			data: isDataLoaded ? this.props.data : null,
 			topUrlsData: null,
+			isTopUrlsButtonLoading: false,
+			isMainButtonLoading: false,
 			selectedMode: '1',
 			urlCount: 20,
 			startDate: moment().subtract(7, 'days'),
@@ -165,7 +167,7 @@ class SiteModeWiseTraffic extends Component {
 					transform: true,
 					fromDate: this.state.startDate,
 					toDate: this.state.endDate
-				});
+			  });
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -198,6 +200,8 @@ class SiteModeWiseTraffic extends Component {
 	}
 
 	renderDateRangePickerUI() {
+		const isMainButtonLoading = this.state.isMainButtonLoading;
+
 		return (
 			<Col className="u-full-height aligner aligner--hBottom aligner--vStart" xs={7}>
 				<DateRangePicker
@@ -214,10 +218,11 @@ class SiteModeWiseTraffic extends Component {
 					isOutsideRange={() => {}}
 				/>
 				<button
+					disabled={isMainButtonLoading}
 					className="btn btn-lightBg btn-default btn-blue u-margin-l10px"
-					onClick={eve => this.fetchReportData()}
+					onClick={!isMainButtonLoading ? eve => this.fetchReportData() : null}
 				>
-					Generate
+					{isMainButtonLoading ? 'Loading Data...' : 'Generate'}
 				</button>
 				<button
 					className="btn btn-lightBg btn-default u-margin-l10px"
@@ -252,7 +257,8 @@ class SiteModeWiseTraffic extends Component {
 	fetchReportData(isReset = false) {
 		const parameterConfig = isReset ? this.getDefaultParameterConfig() : this.getComputedParameterConfig();
 		let stateObject = {
-			isDataLoaded: false
+			isDataLoaded: false,
+			isMainButtonLoading: true
 		};
 		let _ref = this;
 
@@ -272,7 +278,8 @@ class SiteModeWiseTraffic extends Component {
 			$.post(`/ops/getSiteModeWiseData`, apiParameters, response => {
 				_ref.setState({
 					data: response.data,
-					isDataLoaded: true
+					isDataLoaded: true,
+					isMainButtonLoading: false
 				});
 			});
 		});
@@ -288,11 +295,19 @@ class SiteModeWiseTraffic extends Component {
 		parameterConfig.count = _ref.state.urlCount;
 		parameterConfig.mode = Number(_ref.state.selectedMode);
 
-		$.post(`/ops/getSiteModeWiseTopUrlsData`, parameterConfig, response => {
-			_ref.setState({
-				topUrlsData: response.data
-			});
-		});
+		_ref.setState(
+			{
+				isTopUrlsButtonLoading: true
+			},
+			() => {
+				$.post(`/ops/getSiteModeWiseTopUrlsData`, parameterConfig, response => {
+					_ref.setState({
+						topUrlsData: response.data,
+						isTopUrlsButtonLoading: false
+					});
+				});
+			}
+		);
 	}
 
 	handleSelectBoxChange(mode = '1') {
@@ -341,6 +356,8 @@ class SiteModeWiseTraffic extends Component {
 	}
 
 	generateHeaderTitle() {
+		const isTopUrlsButtonLoading = this.state.isTopUrlsButtonLoading;
+
 		return (
 			<div className="u-full-height aligner aligner--column">
 				<Row className="u-margin-0px aligner-item">
@@ -353,10 +370,11 @@ class SiteModeWiseTraffic extends Component {
 					<Col className="u-full-height aligner aligner--hStart aligner--vStart" xs={5}>
 						{this.renderSelectBox()}
 						<button
+							disabled={isTopUrlsButtonLoading}
 							className="btn btn-lightBg btn-default btn-blue u-margin-l10px"
-							onClick={eve => this.fetchModeWiseTopUrlsData()}
+							onClick={!isTopUrlsButtonLoading ? eve => this.fetchModeWiseTopUrlsData() : null}
 						>
-							Get Top Urls
+							{isTopUrlsButtonLoading ? 'Loading Top Urls...' : 'Get Top Urls'}
 						</button>
 					</Col>
 					{this.renderDateRangePickerUI()}

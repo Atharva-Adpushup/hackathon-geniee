@@ -298,7 +298,7 @@ router
 						? {
 								pubId: adSenseData.adsenseAccounts[0].id,
 								email: adSenseData.userInfo.email
-							}
+						  }
 						: false,
 					siteId: req.session.siteId
 				});
@@ -508,7 +508,7 @@ router
 							'Sorry but it seems you have no AdSense account linked to your Google account.' +
 								'If this is a recently verified/created account, it might take upto 24 hours to come in effect.' +
 								'Please try again after sometime or contact support.'
-						)
+					  )
 					: res.send(err);
 			});
 		}
@@ -816,6 +816,31 @@ router
 				} else if (e.name && e.name === 'CouchbaseError') {
 					res.render('credentials', { userNotFound: true, formData: dataToSend });
 				}
+			});
+	})
+	.post('/updatePublisherId', function(req, res) {
+		return userModel
+			.getUserByEmail(req.session.user.email)
+			.then(user => {
+				let adNetworkSettings = user.get('adNetworkSettings') || [];
+				adNetworkSettings[0] = adNetworkSettings[0] || {};
+				adNetworkSettings[0].pubId = req.body.pubId;
+				user.set('adNetworkSettings', adNetworkSettings);
+				return user.save();
+			})
+			.then(() => {
+				req.session.user.adNetworkSettings = req.session.user.adNetworkSettings || [];
+				req.session.user.adNetworkSettings[0] = req.session.user.adNetworkSettings[0] || {};
+				req.session.user.adNetworkSettings[0].pubId = req.body.pubId;
+				return res.send({
+					error: false
+				});
+			})
+			.catch(err => {
+				console.log(err.message);
+				return res.send({
+					error: true
+				});
 			});
 	});
 
