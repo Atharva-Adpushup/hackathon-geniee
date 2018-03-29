@@ -114,6 +114,8 @@ var $ = require('jquery'),
 		return defer.promise();
 	},
 	placeAd = function(container, ad) {
+		var adp = window.adpushup;
+
 		try {
 			$.ajaxSettings.cache = true;
 			container.append(adCodeGenerator.generateAdCode(ad));
@@ -124,20 +126,19 @@ var $ = require('jquery'),
 				utils.dockify.dockifyAd('#' + ad.id, ad.formatData, utils);
 			}
 
-			window.adpushup.tracker.add(
+			adp.tracker.add(
 				container,
 				function(id) {
-					utils.sendBeacon(config.feedbackUrl, { eventType: 2, click: true, id: id });
-				}.bind(null, ad.id)
+					utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: id });
+				}.bind(adp, ad.id)
 			);
 		} catch (e) {
-			window.adpushup.err.push({ msg: 'Error in placing ad.', ad: ad, error: e });
+			adp.err.push({ msg: 'Error in placing ad.', ad: ad, error: e });
 		}
 		return true;
 	},
 	createAds = function(adp, variation) {
 		var config = adp.config,
-			tracker = adp.tracker,
 			err = adp.err,
 			finished = false,
 			ads = variation.ads,
