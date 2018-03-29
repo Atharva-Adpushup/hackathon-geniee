@@ -12,7 +12,8 @@ class AdCodeGenerator extends Component {
 			type: null,
 			size: null,
 			loading: false,
-			codeGenerated: false
+			codeGenerated: false,
+			adId: null
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
 		this.selectType = this.selectType.bind(this);
@@ -25,6 +26,15 @@ class AdCodeGenerator extends Component {
 		this.renderMainContent = this.renderMainContent.bind(this);
 		this.renderLoadingScreen = this.renderLoadingScreen.bind(this);
 		this.renderGeneratedAdcode = this.renderGeneratedAdcode.bind(this);
+	}
+
+	componentWillReceiveProps(nextProps) {
+		this.setState({
+			loading: nextProps.currentAd ? false : true,
+			codeGenerated: nextProps.currentAd ? true : false,
+			error: nextProps.createAdError,
+			adId: nextProps.currentAd
+		});
 	}
 
 	selectPlatform(platform) {
@@ -51,23 +61,35 @@ class AdCodeGenerator extends Component {
 	}
 
 	saveHandler() {
-		let that = this;
+		let sizesArray = this.state.size.split('x'),
+			width = sizesArray[0],
+			height = sizesArray[1],
+			typeAndPlacement = this.state.type.split(/^([^A-Z]+)/);
+
+		typeAndPlacement.shift();
+
 		this.setState(
 			{
 				progress: 100,
-				loading: true,
-				codeGenerated: true
+				loading: true
 			},
-			() => {
-				setTimeout(() => {
-					that.setState(
-						{
-							loading: false
+			() =>
+				this.props.createAd({
+					siteId: this.props.match.params.siteId,
+					ad: {
+						width,
+						height,
+						formatData: {
+							event: null,
+							eventData: { value: null },
+							platform: this.state.platform, // DESKTOP, MOBILE
+							type: typeAndPlacement[0].toLowerCase(), // DISPLAY, VIDEO, STICKY
+							placement: typeAndPlacement[1] ? typeAndPlacement[1].toLowerCase() : null // BOTTOM, LEFT, RIGHT, NULL
 						},
-						5000
-					);
-				});
-			}
+						type: typeAndPlacement[0].toLowerCase() == 'display' ? 2 : 3, // STRUCTURAL, INTERACTIVE
+						css: {}
+					}
+				})
 		);
 	}
 
@@ -141,12 +163,12 @@ class AdCodeGenerator extends Component {
 
 	renderGeneratedAdcode() {
 		let adCode = `
-<div id="f55b61a2-466c-41d0-9a1c-2fedfa3d8307" data-size="${this.state.size}">
+<div id="${this.state.adId}" data-size="${this.state.size}">
 	<script>
 		window.adpushup = window.adpushup || {};
 		window.adpushup.que = window.adpushup.que || [];
 		window.adpushup.que.push(funtion() {
-			window.adpushup.externalTrigger('f55b61a2-466c-41d0-9a1c-2fedfa3d8307');
+			window.adpushup.externalTrigger('${this.state.adId}');
 		})
 	</script>
 </div>
