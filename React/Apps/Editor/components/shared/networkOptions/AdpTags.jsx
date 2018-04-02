@@ -1,11 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import _ from 'lodash';
-import CodeBox from 'shared/codeBox';
+// import _ from 'lodash';
+import CodeBox from '../codeBox';
 import { priceFloorKeys } from '../../../consts/commonConsts';
-import SelectBox from 'shared/select/select.js';
-import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
+import SelectBox from '../select/select.js';
+import CustomToggleSwitch from '../customToggleSwitch.jsx';
 class AdpTags extends Component {
 	constructor(props) {
 		super(props);
@@ -18,7 +18,7 @@ class AdpTags extends Component {
 			keyValues: !code
 				? {
 						[fpKey]: priceFloor
-					}
+				  }
 				: code
 		};
 		this.save = this.save.bind(this);
@@ -32,11 +32,16 @@ class AdpTags extends Component {
 
 	filterKeyValues(keyValues) {
 		let response = {};
-		_.forEach(keyValues, (value, key) => {
+		Object.keys(keyValues).forEach((value, key) => {
 			if (priceFloorKeys.indexOf(key) == -1) {
 				response[key] = value;
 			}
 		});
+		// _.forEach(keyValues, (value, key) => {
+		// 	if (priceFloorKeys.indexOf(key) == -1) {
+		// 		response[key] = value;
+		// 	}
+		// });
 		return response;
 	}
 

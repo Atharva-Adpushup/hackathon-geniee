@@ -18,7 +18,11 @@ const fn = {
 	createNewDocAndDoProcessing: payload => {
 		return appBucket
 			.createDoc(`${docKeys.tagManager}${payload.siteId}`, tagManagerInitialDoc, {})
-			.then(() => fn.processing(tagManagerInitialDoc, payload));
+			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
+			.then(docWithCas => {
+				payload.siteDomain = docWithCas.value.siteDomain;
+				return fn.processing(tagManagerInitialDoc, payload);
+			});
 	},
 	processing: (data, payload) => {
 		let cas = data.cas || false,
@@ -26,7 +30,8 @@ const fn = {
 			id = uuid.v4();
 
 		value.ads.push({ ...payload.ad, id: id });
-		value.dateCreated = value.dateCreated || +new Date();
+		// value.dateCreated = value.dateCreated || +new Date();
+		value.siteDomain = value.siteDomain || payload.siteDomain;
 		value.siteId = value.siteId || payload.siteId;
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
 
@@ -75,7 +80,8 @@ router
 		}
 
 		return res.render('tagManager', {
-			siteId: params.siteId
+			siteId: params.siteId,
+			isSuperUser: !!req.session.isSuperUser
 		});
 	})
 	.post('/createAd', (req, res) => {

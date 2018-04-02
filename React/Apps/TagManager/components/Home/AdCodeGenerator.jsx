@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Row, Col, ProgressBar } from 'react-bootstrap';
 import CustomList from './CustomList.jsx';
-import { PLATFORMS, TYPES, SIZES } from '../../configs/commonConsts';
-
+import { PLATFORMS, TYPES, SIZES, displayAdMessage, interactiveAdMessage } from '../../configs/commonConsts';
+import { CustomMessage } from '../shared/index.jsx';
 class AdCodeGenerator extends Component {
 	constructor(props) {
 		super(props);
@@ -86,7 +86,11 @@ class AdCodeGenerator extends Component {
 							type: typeAndPlacement[0].toLowerCase(), // DISPLAY, VIDEO, STICKY
 							placement: typeAndPlacement[1] ? typeAndPlacement[1].toLowerCase() : null // BOTTOM, LEFT, RIGHT, NULL
 						},
-						type: typeAndPlacement[0].toLowerCase() == 'display' ? 2 : 3, // STRUCTURAL, INTERACTIVE
+						type:
+							typeAndPlacement[0].toLowerCase() == 'display' ||
+							typeAndPlacement[0].toLowerCase() == 'video'
+								? 5
+								: 3, // STRUCTURAL, INTERACTIVE
 						css: {}
 					}
 				})
@@ -162,20 +166,27 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderGeneratedAdcode() {
-		let adCode = `
-<div id="${this.state.adId}" data-size="${this.state.size}">
+		const adCode = `
+<div id="${this.state.adId}">
 	<script>
-		window.adpushup = window.adpushup || {};
-		window.adpushup.que = window.adpushup.que || [];
-		window.adpushup.que.push(funtion() {
-			window.adpushup.externalTrigger('${this.state.adId}');
+		var adpushup = adpushup || {};
+		adpushup.que = adpushup.que || [];
+		adpushup.que.push(funtion() {
+			adpushup.triggerAd('${this.state.adId}');
 		})
 	</script>
 </div>
-		`;
+		`,
+			typeAndPlacement = this.state.type.split(/^([^A-Z]+)/);
+
+		typeAndPlacement.shift();
+
+		const isDisplay = typeAndPlacement[0] == 'display' ? true : false,
+			message = isDisplay ? displayAdMessage : interactiveAdMessage;
 		return (
 			<Col xs={12}>
-				<pre>{adCode.trim()}</pre>
+				{isDisplay ? <pre>{adCode.trim()}</pre> : null}
+				<CustomMessage header="Information" type="info" message={message} />
 				{this.renderButton('Generate More', this.resetHandler)}
 			</Col>
 		);
