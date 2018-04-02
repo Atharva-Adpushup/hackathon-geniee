@@ -146,6 +146,8 @@ const PLATFORMS = [
 	},
 	globalActions = {
 		SET_CURRENT_AD: 'SET_CURRENT_AD'
-	};
+	},
+	displayAdMessage = 'You need to copy and paste the above adcode on your site where you wish to show the ad',
+	interactiveAdMessage = 'Ad has been created. AdPushup will automatically insert ad on your site on the runtime.';
 
-export { PLATFORMS, TYPES, SIZES, adActions, uiActions, globalActions };
+export { PLATFORMS, TYPES, SIZES, adActions, uiActions, globalActions, displayAdMessage, interactiveAdMessage };

@@ -11,7 +11,8 @@ module.exports = function(grunt) {
 				files: {
 					'public/assets/css/builds/editor.min.css': ['public/assets/css/libs/editor.css'],
 					'public/assets/css/builds/website.min.css': ['public/assets/css/libs/website.css'],
-					'public/assets/css/builds/onboarding.min.css': ['public/assets/css/libs/onboarding.css']
+					'public/assets/css/builds/onboarding.min.css': ['public/assets/css/libs/onboarding.css'],
+					'public/assets/css/builds/tagManager.min.css': ['public/assets/css/libs/tagManager.css']
 				}
 			}
 		},
@@ -64,7 +65,8 @@ module.exports = function(grunt) {
 			dist: {
 				files: {
 					'public/assets/css/libs/editor.style.css': 'public/assets/scss/editor.style.scss',
-					'public/assets/css/libs/website.style.css': 'public/assets/scss/website.style.scss'
+					'public/assets/css/libs/website.style.css': 'public/assets/scss/website.style.scss',
+					'public/assets/css/libs/tagManager.style.css': 'public/assets/scss/tagManager.style.scss'
 				}
 			}
 		}

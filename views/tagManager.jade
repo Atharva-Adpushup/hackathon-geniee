@@ -9,8 +9,14 @@ block append headScripts
 	- siteId = siteId ? siteId : false
 	script.
 		window.siteId = !{siteId}
+		window.isSuperUser = !{isSuperUser}
 
 block append headCss
+	if environment == "production"
+		link(href="/assets/css/builds/tagManager.min.css", rel="stylesheet", type="text/css")
+	else
+		link(href="/assets/css/libs/tagManager.css", rel="stylesheet", type="text/css")
+
 
 block bodyContent
 	include layout/sideBar

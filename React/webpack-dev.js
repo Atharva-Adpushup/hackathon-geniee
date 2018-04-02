@@ -138,6 +138,15 @@ module.exports = [
 			filename: 'tagManager.js',
 			publicPath: '/'
 		},
+		resolve: {
+			alias: {
+				react: path.resolve('./node_modules/react'),
+				React: path.resolve('./node_modules/react')
+			},
+			// root: path.resolve('./Editor'),
+			modules: ['./Apps/Editor', './Apps/Editor/components/shared', 'node_modules'],
+			extensions: ['.js', '.jsx', '.css']
+		},
 		module: {
 			loaders: [
 				{

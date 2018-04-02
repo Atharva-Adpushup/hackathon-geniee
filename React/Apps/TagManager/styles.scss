@@ -1,3 +1,14 @@
+// Variables
+$RowHoverBg: rgba(85, 85, 85, 0.05);
+$MBButtonRowBorder: #dfdfe0;
+$primaryColor: #eb575c; //Main Adpushup Red Color
+$primaryColorDark: #cf474b; //Red Dark Color
+$primaryColorLight: #fb9fa2;
+
+/*Extra Space ($ES)*/
+$ESBg: #f6f7f8;
+$ESPadding: 20px;
+
 .options-wrapper {
 	margin: 0 !important;
 	padding: 30px 10px;
@@ -61,7 +72,7 @@
 }
 
 .section-list .section-list-item {
-	min-height: 250px;
+	min-height: 420px;
 
 	& {
 		padding: 20px 0px;
@@ -101,5 +112,107 @@
 	}
 	.ad-details {
 		font-size: 14px !important;
+		pre {
+			tab-size: 4;
+			white-space: pre-wrap;
+		}
+	}
+}
+
+.bg-transparent {
+	background: transparent !important;
+}
+
+.custom-message {
+	padding: 10px;
+	margin: 0px 0px 10px 0px;
+	box-shadow: 0 0 0 1px rgba(34, 36, 38, 0.22) inset, 0 0 0 0 transparent;
+	background: #f8f8f9;
+	border-radius: 0.28571429rem;
+
+	&.info-text {
+		color: #000000;
+	}
+	&.error-text {
+		color: #c3272b;
+	}
+	&.success-text {
+		color: #006442;
+	}
+	h3 {
+		font-weight: bold;
+	}
+	hr {
+		color: #000000;
+		margin: 10px 0px;
+	}
+	p {
+		margin: 0px;
+		font-size: 14px;
+	}
+}
+
+// Network Options Styling
+.CodeMirror {
+	transition: all 1s;
+}
+
+.codeEditor-small {
+	.CodeMirror {
+		height: 110px;
+	}
+}
+
+.codeEditor-large {
+	.CodeMirror {
+		height: 300px;
+	}
+}
+
+.containerButtonBar {
+	padding-bottom: 120px;
+	position: relative;
+	input[type='number'] {
+		width: 60px;
+	}
+	.adsDescriptor {
+		.row {
+			margin: 0;
+			padding: 7px 0;
+			font-size: 12px;
+			&:hover {
+				background: $RowHoverBg;
+			}
+		}
+	}
+	.networkOptionsRow {
+		width: 90%;
+		margin: 0px auto;
+		display: block;
+		z-index: 10;
+	}
+	.butttonsRow {
+		padding: $ESPadding 0 !important;
+		background: $ESBg;
+		position: absolute;
+		bottom: 0;
+		z-index: 3;
+		width: 100%;
+		border: 1px solid $MBButtonRowBorder;
+		border-radius: 0 0 3px 3px;
+	}
+	&.contextEditMenu {
+		.row {
+			margin: 0;
+			padding: 7px 0;
+			font-size: 12px;
+			i {
+				color: $primaryColor;
+				cursor: pointer;
+			}
+		}
+	}
+	&.sectionOptions {
+		padding-bottom: 200px;
 	}
 }

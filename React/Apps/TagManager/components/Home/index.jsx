@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Nav, NavItem } from 'react-bootstrap';
 import ActionCard from '../../../../Components/ActionCard.jsx';
 import AdCodeGenerator from './AdCodeGenerator.jsx';
-import AdList from './AdList.jsx';
+import AdList from './AdList/index.jsx';
 class Home extends Component {
 	constructor(props) {
 		super(props);
@@ -24,8 +24,6 @@ class Home extends Component {
 				return <AdCodeGenerator {...this.props} />;
 			case 2:
 				return <AdList {...this.props} />;
-			// case 3:
-			// 	return <SiteMetricChartPanels />;
 		}
 	}
 
