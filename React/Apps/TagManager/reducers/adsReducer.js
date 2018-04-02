@@ -5,6 +5,14 @@ const ads = (state = [], action) => {
 		case adActions.UPDATE_ADS_LIST:
 			return state.concat(action.data);
 
+		case adActions.UPDATE_AD:
+			return state.map(ad => {
+				if (action.data.id == ad.id) {
+					return { ...ad, ...action.data.updateThis };
+				}
+				return ad;
+			});
+
 		default:
 			return state;
 	}

@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { createAd, fetchAds } from '../actions/adActions';
+import { createAd, fetchAds, updateAd } from '../actions/adActions';
 import Home from '../components/Home/index.jsx';
 
 const mapStateToProps = (state, ownProps) => ({
@@ -11,7 +11,8 @@ const mapStateToProps = (state, ownProps) => ({
 	}),
 	mapDispatchToProps = dispatch => ({
 		createAd: payload => dispatch(createAd(payload)),
-		fetchAds: payload => dispatch(fetchAds(payload))
+		fetchAds: payload => dispatch(fetchAds(payload)),
+		updateAd: (adId, payload) => dispatch(updateAd(adId, payload))
 	});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
