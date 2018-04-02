@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import AdElement from './AdElement.jsx';
+import { CustomButton } from '../../shared/index.jsx';
 
 class AdList extends Component {
 	constructor(props) {
@@ -27,10 +28,14 @@ class AdList extends Component {
 
 		return (
 			<ul className="section-list row" style={{ margin: '20px 0px' }}>
+				<div>
+					<CustomButton label="Master Save" handler={() => {}} />
+					<div style={{ clear: 'both' }}>&nbsp;</div>
+				</div>
 				{ads.map((ad, key) => (
 					<div key={key} className="col-sm-6">
 						<li className="section-list-item" key={ad.id} style={customStyle}>
-							<AdElement ad={ad} />
+							<AdElement ad={ad} updateAd={this.props.updateAd} />
 						</li>
 					</div>
 				))}

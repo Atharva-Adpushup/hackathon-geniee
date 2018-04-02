@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Row, Col, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { makeFirstLetterCapitalize } from '../../../lib/helpers';
+import { CustomButton } from '../../shared/index.jsx';
 import AdNetworkDetails from './AdNetworkDetails.jsx';
 
 class AdElement extends Component {
@@ -9,7 +10,6 @@ class AdElement extends Component {
 		this.state = {
 			showNetworkDetails: false
 		};
-		this.renderButton = this.renderButton.bind(this);
 		this.toggleNetworkDetails = this.toggleNetworkDetails.bind(this);
 	}
 
@@ -19,20 +19,8 @@ class AdElement extends Component {
 		});
 	}
 
-	renderButton(label, handler) {
-		return (
-			<div
-				className="btn btn-lightBg btn-default"
-				style={{ display: 'inline', float: 'right', margin: '10px 15px 0px 0px' }}
-				onClick={handler}
-			>
-				{label}
-			</div>
-		);
-	}
-
 	render() {
-		const { ad } = this.props;
+		const { ad, updateAd } = this.props;
 
 		return (
 			<div key={`adELement-${ad.id}`}>
@@ -51,7 +39,7 @@ class AdElement extends Component {
 				</Col>
 				<Col xs={9} className="ad-details">
 					{this.state.showNetworkDetails ? (
-						<AdNetworkDetails ad={ad} onCancel={this.toggleNetworkDetails} />
+						<AdNetworkDetails ad={ad} onCancel={this.toggleNetworkDetails} onSubmit={updateAd} />
 					) : (
 						<div key={'adDetails' + ad.id}>
 							<p>
@@ -86,10 +74,10 @@ class AdElement extends Component {
 	</script>
 </div>`}
 							</pre>
-							{window.isSuperUser
-								? this.renderButton('Show Network Details', this.toggleNetworkDetails)
-								: null}
-							{this.renderButton('Copy Adcode', () => {})}
+							{window.isSuperUser ? (
+								<CustomButton label="Show Network Details" handler={this.toggleNetworkDetails} />
+							) : null}
+							<CustomButton label="Copy Adcode" handler={() => {}} />
 						</div>
 					)}
 				</Col>

@@ -42,6 +42,15 @@ const createAd = params => (dispatch, getState) => {
 				dispatch({ type: adActions.DELETE_AD, adId: params.adId });
 			}
 		});
+	},
+	updateAd = (adId, data) => (dispatch, getState) => {
+		return dispatch({
+			type: adActions.UPDATE_AD,
+			data: {
+				id: adId,
+				updateThis: data
+			}
+		});
 	};
 
-export { createAd, fetchAds, deleteAd };
+export { createAd, fetchAds, deleteAd, updateAd };

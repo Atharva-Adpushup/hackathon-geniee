@@ -32,16 +32,11 @@ class AdpTags extends Component {
 
 	filterKeyValues(keyValues) {
 		let response = {};
-		Object.keys(keyValues).forEach((value, key) => {
+		Object.keys(keyValues).forEach((key, value) => {
 			if (priceFloorKeys.indexOf(key) == -1) {
 				response[key] = value;
 			}
 		});
-		// _.forEach(keyValues, (value, key) => {
-		// 	if (priceFloorKeys.indexOf(key) == -1) {
-		// 		response[key] = value;
-		// 	}
-		// });
 		return response;
 	}
 
