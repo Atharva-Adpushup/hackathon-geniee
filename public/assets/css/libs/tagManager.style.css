@@ -24,6 +24,58 @@
 /*Help of Each Menu (HEM)*/
 /*Network Manager (NM)*/
 /*Section Manager ($SM)*/
+* {
+  margin: 0;
+  padding: 0; }
+
+body {
+  background: #ebf1f2;
+  color: #555555;
+  font-family: "Karla", sans-serif;
+  font-size: 12px; }
+
+a, a:hover, a:focus {
+  text-decoration: none;
+  outline: none;
+  color: #555555; }
+
+button, input, select, button:focus, input:focus, select:focus {
+  outline: none; }
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-family: "Karla", sans-serif; }
+
+li, ul {
+  list-style: none;
+  margin: 0;
+  padding: 0; }
+
+.btn:hover, .btn:focus, .btn:active {
+  box-shadow: none;
+  outline: none; }
+
+.form-control, .form-control:focus {
+  box-shadow: none; }
+
+.modal.in .modal-dialog {
+  z-index: 9999; }
+
+/* ADDS A BROWSER PREFIX TO THE PROPERTY */
+/* ADD SAME BORDER TO MULTIPLE SIDES */
+/* BORDER RADIUS */
+/* BOX SHADOW */
+/* TEXT SHADOW */
+/* OPACITY */
+/* KEYFRAMES */
+/* ANIMATION */
+/* TRANSFORM */
+/* TRANSITION */
+/* BACKGROUND GRADIENT */
+/* BACKGROUND HORIZONTAL */
+/* BACKGROUND RADIAL */
+/*User Select */
+/* Flex */
 .react-select-box-container {
   position: relative;
   width: 100%;
@@ -174,3 +226,207 @@
 .react-select-box-native {
   position: absolute;
   left: -99999em; }
+
+.inputBasic {
+  padding: 5px 8px;
+  display: inline-block;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  background-color: #fff;
+  border: 1px solid #e6e6e6; }
+
+.inputMinimal {
+  width: 100%;
+  padding: 3.5px 10px;
+  border-radius: 3px;
+  border: 1px solid #cccccc; }
+
+select.inputMinimal {
+  padding: 3.5px 5px; }
+
+.toggle *, .toggle *:before, .toggle *:after {
+  box-sizing: border-box; }
+
+.toggle {
+  position: relative;
+  /*****Disabled class rules*****/ }
+  .toggle input[type="checkbox"] {
+    filter: alpha(opacity=0);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    -webkit-opacity: 0;
+    -khtml-opacity: 0;
+    -moz-opacity: 0;
+    -ms-opacity: 0;
+    -o-opacity: 0;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0; }
+  .toggle label {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    -webkit-align-items: flex-end;
+    -khtml-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    -webkit-justify-content: flex-end;
+    -khtml-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    -webkit-display: flex;
+    -khtml-display: flex;
+    -moz-display: flex;
+    -ms-display: flex;
+    -o-display: flex;
+    display: flex;
+    position: relative;
+    margin: 0; }
+    .toggle label .toggleSwitch {
+      position: relative;
+      -webkit-transition: background-color 0.3s cubic-bezier(0, 1, 0.5, 1);
+      -moz-transition: background-color 0.3s cubic-bezier(0, 1, 0.5, 1);
+      -ms-transition: background-color 0.3s cubic-bezier(0, 1, 0.5, 1);
+      -o-transition: background-color 0.3s cubic-bezier(0, 1, 0.5, 1);
+      transition: background-color 0.3s cubic-bezier(0, 1, 0.5, 1);
+      background: #919191;
+      height: 24px;
+      -webkit-flex: 0 0 100px;
+      -khtml-flex: 0 0 100px;
+      -moz-flex: 0 0 100px;
+      -ms-flex: 0 0 100px;
+      -o-flex: 0 0 100px;
+      flex: 0 0 100px;
+      -webkit-border-radius: 2px;
+      -khtml-border-radius: 2px;
+      -moz-border-radius: 2px;
+      -ms-border-radius: 2px;
+      -o-border-radius: 2px;
+      border-radius: 2px; }
+      .toggle label .toggleSwitch::before {
+        content: attr(data-on);
+        position: absolute;
+        top: 0;
+        text-transform: capitalize;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.8);
+        left: 50px;
+        font-size: 11px;
+        line-height: 24px;
+        width: 50px;
+        padding: 0 8px;
+        font-weight: normal; }
+      .toggle label .toggleSwitch::after {
+        content: attr(data-off);
+        position: absolute;
+        z-index: 0;
+        text-transform: capitalize;
+        text-align: center;
+        background: #fff;
+        -o-transform: translate3d(0, 0, 0);
+        -moz-transform: translate3d(0, 0, 0);
+        -ms-transform: translate3d(0, 0, 0);
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+        -webkit-transition: -webkit-transform 0.3s cubic-bezier(0, 1, 0.5, 1);
+        -moz-transition: -moz-transform 0.3s cubic-bezier(0, 1, 0.5, 1);
+        -ms-transition: -ms-transform 0.3s cubic-bezier(0, 1, 0.5, 1);
+        -o-transition: -o-transform 0.3s cubic-bezier(0, 1, 0.5, 1);
+        transition: transform 0.3s cubic-bezier(0, 1, 0.5, 1);
+        color: #777;
+        top: 1px;
+        left: 1px;
+        border-radius: 1px;
+        width: 49px;
+        line-height: 22px;
+        font-size: 11px; }
+      .toggle label .toggleSwitch:hover::after {
+        -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.4);
+        -khtml-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.4);
+        -moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.4);
+        -ms-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.4);
+        -o-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.4);
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.4); }
+    .toggle label:before {
+      display: none; }
+  .toggle.toggleSizeSmall {
+    height: 20px; }
+    .toggle.toggleSizeSmall label .toggleSwitch {
+      height: 20px;
+      -webkit-flex: 0 0 60px;
+      -khtml-flex: 0 0 60px;
+      -moz-flex: 0 0 60px;
+      -ms-flex: 0 0 60px;
+      -o-flex: 0 0 60px;
+      flex: 0 0 60px; }
+      .toggle.toggleSizeSmall label .toggleSwitch:before {
+        left: 30px;
+        font-size: 10px;
+        line-height: 20px;
+        width: 30px;
+        padding: 0 3px;
+        font-weight: normal; }
+      .toggle.toggleSizeSmall label .toggleSwitch:after {
+        top: 1px;
+        left: 1px;
+        -webkit-border-radius: 1px;
+        -khtml-border-radius: 1px;
+        -moz-border-radius: 1px;
+        -ms-border-radius: 1px;
+        -o-border-radius: 1px;
+        border-radius: 1px;
+        width: 29px;
+        line-height: 18px;
+        font-size: 10px; }
+    .toggle.toggleSizeSmall input[type="checkbox"]:checked ~ label .toggleSwitch:after {
+      -moz-transform: translate3d(29px, 0, 0);
+      -ms-transform: translate3d(29px, 0, 0);
+      -o-transform: translate3d(29px, 0, 0);
+      -webkit-transform: translate3d(29px, 0, 0);
+      transform: translate3d(29px, 0, 0); }
+  .toggle input[type="checkbox"]:focus ~ label .toggleSwitch,
+  .toggle input[type="checkbox"]:hover ~ label .toggleSwitch {
+    background-color: #777; }
+    .toggle input[type="checkbox"]:focus ~ label .toggleSwitch::after,
+    .toggle input[type="checkbox"]:hover ~ label .toggleSwitch::after {
+      color: #5e5e5e;
+      -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.4);
+      -khtml-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.4);
+      -moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.4);
+      -ms-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.4);
+      -o-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.4);
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.4); }
+  .toggle input[type="checkbox"]:checked ~ label .toggleSwitch {
+    background-color: #14A314; }
+    .toggle input[type="checkbox"]:checked ~ label .toggleSwitch:before {
+      content: attr(data-off);
+      left: 0; }
+    .toggle input[type="checkbox"]:checked ~ label .toggleSwitch:after {
+      -webkit-box-shadow: 0 2px 2px 0 rgba(20, 163, 20, 0.4);
+      -khtml-box-shadow: 0 2px 2px 0 rgba(20, 163, 20, 0.4);
+      -moz-box-shadow: 0 2px 2px 0 rgba(20, 163, 20, 0.4);
+      -ms-box-shadow: 0 2px 2px 0 rgba(20, 163, 20, 0.4);
+      -o-box-shadow: 0 2px 2px 0 rgba(20, 163, 20, 0.4);
+      box-shadow: 0 2px 2px 0 rgba(20, 163, 20, 0.4);
+      content: attr(data-on);
+      color: #14A314;
+      -o-transform: translate3d(49px, 0, 0);
+      -ms-transform: translate3d(49px, 0, 0);
+      -moz-transform: translate3d(49px, 0, 0);
+      -webkit-transform: translate3d(49px, 0, 0);
+      transform: translate3d(49px, 0, 0); }
+  .toggle.toggle--disabled input[type="checkbox"]:checked ~ label .toggleSwitch {
+    background-color: #098409;
+    opacity: 0.7; }
+    .toggle.toggle--disabled input[type="checkbox"]:checked ~ label .toggleSwitch:after {
+      background: #eee;
+      box-shadow: none !important;
+      color: #777; }

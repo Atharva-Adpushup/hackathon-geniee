@@ -6,15 +6,15 @@ class AdNetworkDetails extends Component {
 		super(props);
 	}
 	render() {
-		const { ad } = this.props;
+		const { ad, onSubmit, onCancel } = this.props;
 
 		return (
 			<NetworkOptions
 				onSubmit={() => {}}
-				onCancel={() => {}}
+				onCancel={onCancel}
 				ad={ad}
 				buttonType={2}
-				fromPanel={true}
+				fromPanel={false}
 				id={ad.id}
 				showNotification={() => {}}
 			/>

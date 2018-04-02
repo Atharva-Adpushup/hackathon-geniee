@@ -22,12 +22,14 @@ class AdList extends Component {
 	}
 
 	render() {
-		const { ads } = this.state;
+		const { ads } = this.state,
+			customStyle = window.isSuperUser ? { minHeight: '520px' } : { minHeight: '420px' };
+
 		return (
 			<ul className="section-list row" style={{ margin: '20px 0px' }}>
 				{ads.map((ad, key) => (
 					<div key={key} className="col-sm-6">
-						<li className="section-list-item" key={ad.id}>
+						<li className="section-list-item" key={ad.id} style={customStyle}>
 							<AdElement ad={ad} />
 						</li>
 					</div>
