@@ -87,13 +87,20 @@ class AdpTags extends Component {
 		);
 	}
 
-	renderNormalSaveButton(showButtons = true, submitHandler) {
+	renderNormalSaveButton(showButtons = true, submitHandler, cancelHandler) {
 		return showButtons ? (
-			<Col xs={6} xsPush={6} style={{ paddingRight: '0px' }}>
-				<Button className="btn-lightBg btn-save btn-block" onClick={submitHandler}>
-					Save
-				</Button>
-			</Col>
+			<div>
+				<Col xs={6} style={{ paddingRight: '0px' }}>
+					<Button className="btn-lightBg btn-save btn-block" onClick={submitHandler}>
+						Save
+					</Button>
+				</Col>
+				<Col xs={6} style={{ paddingRight: '0px' }}>
+					<Button className="btn-lightBg btn-cancel btn-block" onClick={cancelHandler}>
+						Cancel
+					</Button>
+				</Col>
+			</div>
 		) : (
 			''
 		);

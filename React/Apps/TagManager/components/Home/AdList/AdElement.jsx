@@ -33,6 +33,7 @@ class AdElement extends Component {
 
 	render() {
 		const { ad } = this.props;
+
 		return (
 			<div key={`adELement-${ad.id}`}>
 				<OverlayTrigger placement="bottom" overlay={<Tooltip id="delete-ad-tooltip">Delete Ad</Tooltip>}>
@@ -50,7 +51,7 @@ class AdElement extends Component {
 				</Col>
 				<Col xs={9} className="ad-details">
 					{this.state.showNetworkDetails ? (
-						<AdNetworkDetails ad={ad} />
+						<AdNetworkDetails ad={ad} onCancel={this.toggleNetworkDetails} />
 					) : (
 						<div key={'adDetails' + ad.id}>
 							<p>

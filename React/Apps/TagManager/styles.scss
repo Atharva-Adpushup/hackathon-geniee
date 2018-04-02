@@ -175,15 +175,8 @@ $ESPadding: 20px;
 	input[type='number'] {
 		width: 60px;
 	}
-	.adsDescriptor {
-		.row {
-			margin: 0;
-			padding: 7px 0;
-			font-size: 12px;
-			&:hover {
-				background: $RowHoverBg;
-			}
-		}
+	.row {
+		margin: 0px !important;
 	}
 	.networkOptionsRow {
 		width: 90%;
@@ -200,17 +193,6 @@ $ESPadding: 20px;
 		width: 100%;
 		border: 1px solid $MBButtonRowBorder;
 		border-radius: 0 0 3px 3px;
-	}
-	&.contextEditMenu {
-		.row {
-			margin: 0;
-			padding: 7px 0;
-			font-size: 12px;
-			i {
-				color: $primaryColor;
-				cursor: pointer;
-			}
-		}
 	}
 	&.sectionOptions {
 		padding-bottom: 200px;
