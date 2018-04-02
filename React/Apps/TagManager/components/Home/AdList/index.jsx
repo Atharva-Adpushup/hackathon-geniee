@@ -27,11 +27,17 @@ class AdList extends Component {
 			customStyle = window.isSuperUser ? { minHeight: '520px' } : { minHeight: '420px' };
 
 		return (
+			// set up empty ads list graphic
 			<ul className="section-list row" style={{ margin: '20px 0px' }}>
-				<div>
-					<CustomButton label="Master Save" handler={() => {}} />
-					<div style={{ clear: 'both' }}>&nbsp;</div>
-				</div>
+				{window.isSuperUser ? (
+					<div>
+						<CustomButton
+							label="Master Save"
+							handler={this.props.masterSave.bind(null, this.props.match.params.siteId)}
+						/>
+						<div style={{ clear: 'both' }}>&nbsp;</div>
+					</div>
+				) : null}
 				{ads.map((ad, key) => (
 					<div key={key} className="col-sm-6">
 						<li className="section-list-item" key={ad.id} style={customStyle}>
