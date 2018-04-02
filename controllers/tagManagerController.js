@@ -44,6 +44,10 @@ const fn = {
 	dbWrapper: (cas, value, adId, siteId) => {
 		const key = `${docKeys.tagManager}${siteId}`;
 		return !cas ? fn.getAndUpdate(key, value, adId) : fn.directDBUpdate(key, value, cas, adId);
+	},
+	errorHander: (err, res) => {
+		console.log(err.message);
+		return sendErrorResponse({ message: 'Opertion Failed' }, res);
 	}
 };
 
@@ -67,16 +71,13 @@ router
 					res
 				)
 			)
-			.catch(err => {
-				console.log(err.message);
-				return sendErrorResponse({ message: 'Opertion Failed' }, res);
-			});
+			.catch(err => fn.errorHander(err, res));
 	})
 	.get(['/', '/:siteId'], (req, res) => {
 		const { session, params } = req;
 
 		if (!params.siteId) {
-			return res.send('404');
+			return res.render('404');
 		}
 
 		return res.render('tagManager', {
@@ -112,10 +113,36 @@ router
 					res
 				)
 			)
-			.catch(err => {
-				console.log(err.message);
-				return sendErrorResponse({ message: 'Opertion Failed' }, res);
-			});
+			.catch(err => fn.errorHander(err, res));
+	})
+	.post('/masterSave', (req, res) => {
+		if (!req.body || !req.body.siteId || !req.body.ads) {
+			return sendErrorResponse(
+				{
+					message: 'Incomplete Parameters.'
+				},
+				res
+			);
+		}
+		return appBucket
+			.getDoc(`${docKeys.tagManager}${req.body.siteId}`)
+			.then(docWithCas => {
+				let doc = docWithCas.value;
+				if (doc.ownerEmail != req.session.user.email) {
+					return Promise.reject();
+				}
+				doc.ads = req.body.ads;
+				return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
+			})
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'Master Saved'
+					},
+					res
+				)
+			)
+			.catch(err => fn.errorHander(err, res));
 	});
 
 module.exports = router;
