@@ -31,8 +31,14 @@ const fn = {
 			value = data.value || data,
 			id = uuid.v4();
 
-		value.ads.push({ ...payload.ad, id: id });
-		// value.dateCreated = value.dateCreated || +new Date();
+		value.ads.push({
+			...payload.ad,
+			id: id,
+			formatData: {
+				...payload.ad.formatData,
+				eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
+			}
+		});
 		value.siteDomain = value.siteDomain || payload.siteDomain;
 		value.siteId = value.siteId || payload.siteId;
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;

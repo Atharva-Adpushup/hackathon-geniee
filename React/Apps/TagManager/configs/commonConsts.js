@@ -137,6 +137,7 @@ const PLATFORMS = [
 	adActions = {
 		CREATE_AD: 'CREATE_AD',
 		UPDATE_ADS_LIST: 'UPDATE_ADS_LIST',
+		REPLACE_ADS_LIST: 'REPLACE_ADS_LIST',
 		DELETE_AD: 'DELETE_AD',
 		UPDATE_AD: 'UPDATE_AD'
 	},
@@ -149,6 +150,27 @@ const PLATFORMS = [
 		SET_CURRENT_AD: 'SET_CURRENT_AD'
 	},
 	displayAdMessage = 'You need to copy and paste the above adcode on your site where you wish to show the ad',
-	interactiveAdMessage = 'Ad has been created. AdPushup will automatically insert ad on your site on the runtime.';
+	interactiveAdMessage = 'Ad has been created. AdPushup will automatically insert ad on your site on the runtime.',
+	adCode = `<div id="__AD_ID__">
+	<script>
+		var adpushup = adpushup || {};
+		adpushup.que = adpushup.que || [];
+		adpushup.que.push(funtion() {
+			adpushup.triggerAd("__AD_ID__");
+		})
+	</script>
+</div>`,
+	adCodeVideo = `<div id="#adp_video___AD_ID__"></div>`;
 
-export { PLATFORMS, TYPES, SIZES, adActions, uiActions, globalActions, displayAdMessage, interactiveAdMessage };
+export {
+	PLATFORMS,
+	TYPES,
+	SIZES,
+	adActions,
+	uiActions,
+	globalActions,
+	displayAdMessage,
+	interactiveAdMessage,
+	adCode,
+	adCodeVideo
+};

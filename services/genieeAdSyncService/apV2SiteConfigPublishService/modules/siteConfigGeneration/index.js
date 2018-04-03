@@ -78,7 +78,7 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 	 * 2. Fetch Ads
 	 * 3. Filter Unsynced Ads
 	 * 4. Set Dummy values to some variables to compliment current working flow
-	 * 5. Concat ads from Tag manager to current adpTagsUnsyncedZones
+	 * 5. Concat ads from Tag manager to current adp.ads
 	 */
 	return appBucket
 		.getDoc(`${docKeys.tagManager}${site.get('siteId')}`)
