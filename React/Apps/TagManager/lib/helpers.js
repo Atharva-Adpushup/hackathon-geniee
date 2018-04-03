@@ -6,7 +6,7 @@ function makeFirstLetterCapitalize(word) {
 
 function copyToClipBoard(content) {
 	clipboard.writeText(content);
-	alert('Copied Successful');
+	alert('Successfully Copied');
 }
 
 export { makeFirstLetterCapitalize, copyToClipBoard };
