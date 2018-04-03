@@ -79,6 +79,7 @@ class AdCodeGenerator extends Component {
 					ad: {
 						width,
 						height,
+						isManual: true,
 						formatData: {
 							event: null,
 							eventData: { value: null },
@@ -90,7 +91,7 @@ class AdCodeGenerator extends Component {
 							typeAndPlacement[0].toLowerCase() == 'display' ||
 							typeAndPlacement[0].toLowerCase() == 'video'
 								? 5
-								: 3, // STRUCTURAL, INTERACTIVE
+								: 3, // 5: INTERACTIVE, 3: STRUCTURAL
 						css: {}
 					}
 				})
