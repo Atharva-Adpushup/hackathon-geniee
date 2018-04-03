@@ -7,6 +7,8 @@ const express = require('express'),
 	utils = require('../helpers/utils'),
 	{ sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions'),
 	{ docKeys, tagManagerInitialDoc } = require('../configs/commonConsts'),
+	adpushup = require('../helpers/adpushupEvent'),
+	siteModel = require('../models/siteModel'),
 	router = express.Router(),
 	appBucket = couchbaseService(
 		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
@@ -134,14 +136,16 @@ router
 				doc.ads = req.body.ads;
 				return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
 			})
-			.then(() =>
-				sendSuccessResponse(
+			.then(() => siteModel.getSiteById(req.body.siteId))
+			.then(site => {
+				adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
+				return sendSuccessResponse(
 					{
 						message: 'Master Saved'
 					},
 					res
-				)
-			)
+				);
+			})
 			.catch(err => fn.errorHander(err, res));
 	});
 
