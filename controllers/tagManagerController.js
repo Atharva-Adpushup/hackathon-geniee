@@ -6,7 +6,7 @@ const express = require('express'),
 	config = require('../configs/config'),
 	utils = require('../helpers/utils'),
 	{ sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions'),
-	{ docKeys, tagManagerInitialDoc } = require('../configs/commonConsts'),
+	{ docKeys, tagManagerInitialDoc, videoNetworkInfo } = require('../configs/commonConsts'),
 	adpushup = require('../helpers/adpushupEvent'),
 	siteModel = require('../models/siteModel'),
 	router = express.Router(),
@@ -29,7 +29,8 @@ const fn = {
 	processing: (data, payload) => {
 		let cas = data.cas || false,
 			value = data.value || data,
-			id = uuid.v4();
+			id = uuid.v4(),
+			networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {};
 
 		value.ads.push({
 			...payload.ad,
@@ -37,7 +38,8 @@ const fn = {
 			formatData: {
 				...payload.ad.formatData,
 				eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
-			}
+			},
+			...networkInfo
 		});
 		value.siteDomain = value.siteDomain || payload.siteDomain;
 		value.siteId = value.siteId || payload.siteId;

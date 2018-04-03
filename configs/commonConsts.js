@@ -194,5 +194,12 @@ module.exports = {
 		ownerEmail: null,
 		createdat: null,
 		ads: []
+	},
+	videoNetworkInfo: {
+		network: 'custom',
+		networkData: {
+			adCode: '',
+			forceByPass: true
+		}
 	}
 };
