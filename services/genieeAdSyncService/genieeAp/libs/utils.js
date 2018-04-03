@@ -367,26 +367,29 @@ module.exports = {
 		return url;
 	},
 	getInteractiveAds: function(config) {
-		if (config && config.platform && config.pageGroup && config.selectedVariation) {
-			var ads = null,
-				variations = config.experiment[config.platform][config.pageGroup].variations,
-				selectedVariation = config.selectedVariation,
-				interactiveAds = [];
+		var ads = null;
+
+		if (config && config.experiment && config.platform && config.pageGroup && config.selectedVariation) {
+			var variations = config.experiment[config.platform][config.pageGroup].variations,
+				selectedVariation = config.selectedVariation;
 			variations.forEach(function(variation) {
 				if (variation.id === selectedVariation) {
 					ads = variation.ads;
 				}
 			});
-			if (ads.length) {
-				ads.forEach(function(ad) {
-					if (ad && ad.formatData && ad.formatData.event) {
-						interactiveAds.push(ad);
-					}
-				});
-			}
+		}
+
+		if (config.hasManualAds && window.adpushup.manualAds.length) {
+			ads = window.adpushup.manualAds;
+		}
+
+		if (ads.length) {
+			var interactiveAds = ads.filter(function(ad) {
+				return ad && ad.formatData && ad.formatData.event;
+			});
+
 			return interactiveAds.length ? interactiveAds : null;
 		}
-		return null;
 	},
 	queryParams: (function() {
 		var str = window.location.search,

@@ -82,6 +82,16 @@ function triggerControl(mode) {
 	}
 }
 
+function initInteractiveAds(interactiveAds) {
+	require.ensure(
+		['interactiveAds/index.js'],
+		function(require) {
+			require('interactiveAds/index')(interactiveAds);
+		},
+		'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
+	);
+}
+
 function startCreation(forced) {
 	return new Promise(function(resolve) {
 		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
@@ -108,18 +118,12 @@ function startCreation(forced) {
 				// Load interactive ads script if interactive ads are present in adpushup config
 				var interactiveAds = utils.getInteractiveAds(config);
 				if (interactiveAds) {
-					require.ensure(
-						['interactiveAds/index.js'],
-						function(require) {
-							require('interactiveAds/index')(interactiveAds);
-						},
-						'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
-					);
+					initInteractiveAds(interactiveAds);
 				}
 
 				createAds(adp, selectedVariation);
 			} else {
-				triggerControl(15);
+				triggerControl(3);
 			}
 
 			return resolve(true);
@@ -162,7 +166,17 @@ function main() {
 	if (adp.config.hasManualAds && !adp.config.experiment) {
 		adp.config.mode = 16;
 		adp.creationProcessStarted = true;
+
+		var interactiveAds = utils.getInteractiveAds(adp.config);
+		if (interactiveAds) {
+			initInteractiveAds(interactiveAds);
+		}
+
 		return false;
+	}
+
+	if (adp.config.hasManualAds && adp.config.experiment) {
+		adp.config.mode = 17;
 	}
 
 	// Hook Pagegroup, find pageGroup and check for blockList
