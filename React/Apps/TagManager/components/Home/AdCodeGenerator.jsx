@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { Row, Col, ProgressBar } from 'react-bootstrap';
 import CustomList from './CustomList.jsx';
 import { PLATFORMS, TYPES, SIZES, displayAdMessage, interactiveAdMessage } from '../../configs/commonConsts';
-import { CustomMessage } from '../shared/index.jsx';
+import { copyToClipBoard } from '../../lib/helpers';
+import { CustomMessage, CustomButton } from '../shared/index.jsx';
+import { adCode, adCodeVideo } from '../../configs/commonConsts';
 class AdCodeGenerator extends Component {
 	constructor(props) {
 		super(props);
@@ -81,7 +83,7 @@ class AdCodeGenerator extends Component {
 						height,
 						isManual: true,
 						formatData: {
-							event: null,
+							event: typeAndPlacement[0] == 'video' ? 'scriptLoaded' : null,
 							eventData: { value: null },
 							platform: this.state.platform, // DESKTOP, MOBILE
 							type: typeAndPlacement[0].toLowerCase(), // DISPLAY, VIDEO, STICKY
@@ -167,28 +169,24 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderGeneratedAdcode() {
-		const adCode = `
-<div id="${this.state.adId}">
-	<script>
-		var adpushup = adpushup || {};
-		adpushup.que = adpushup.que || [];
-		adpushup.que.push(funtion() {
-			adpushup.triggerAd('${this.state.adId}');
-		})
-	</script>
-</div>
-		`,
-			typeAndPlacement = this.state.type.split(/^([^A-Z]+)/);
+		let typeAndPlacement = this.state.type.split(/^([^A-Z]+)/);
 
 		typeAndPlacement.shift();
 
-		const isDisplay = typeAndPlacement[0] == 'display' ? true : false,
-			message = isDisplay ? displayAdMessage : interactiveAdMessage;
+		const showAdCode = typeAndPlacement[0] == 'display' || typeAndPlacement[0] == 'video' ? true : false,
+			code = showAdCode ? (typeAndPlacement[0] == 'display' ? adCode : adCodeVideo) : null,
+			message = showAdCode ? displayAdMessage : interactiveAdMessage;
 		return (
 			<Col xs={12}>
-				{isDisplay ? <pre>{adCode.trim()}</pre> : null}
+				{showAdCode ? <pre>{code.replace(/__AD_ID__/g, this.state.adId).trim()}</pre> : null}
 				<CustomMessage header="Information" type="info" message={message} />
-				{this.renderButton('Generate More', this.resetHandler)}
+				<CustomButton label="Generate More" handler={this.resetHandler} />
+				{showAdCode ? (
+					<CustomButton
+						label="Copy Adcode"
+						handler={copyToClipBoard.bind(null, code.replace(/__AD_ID__/g, this.state.adId))}
+					/>
+				) : null}
 			</Col>
 		);
 	}

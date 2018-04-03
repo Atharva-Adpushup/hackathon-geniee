@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Row, Col, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
-import { makeFirstLetterCapitalize } from '../../../lib/helpers';
+import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../lib/helpers';
+import { adCode, adCodeVideo } from '../../../configs/commonConsts';
 import { CustomButton } from '../../shared/index.jsx';
 import AdNetworkDetails from './AdNetworkDetails.jsx';
 
@@ -20,16 +21,19 @@ class AdElement extends Component {
 	}
 
 	render() {
-		const { ad, updateAd } = this.props;
+		const { ad, updateAd } = this.props,
+			showAdCode = ad.formatData.type == 'display' || ad.formatData.type == 'video' ? true : false;
+
+		let code = showAdCode ? (ad.formatData.type == 'display' ? adCode : adCodeVideo) : null;
+		code = code ? code.replace(/__AD_ID__/g, ad.id) : null;
 
 		return (
 			<div key={`adELement-${ad.id}`}>
-				<OverlayTrigger placement="bottom" overlay={<Tooltip id="delete-ad-tooltip">Delete Ad</Tooltip>}>
+				{/* <OverlayTrigger placement="bottom" overlay={<Tooltip id="delete-ad-tooltip">Delete Ad</Tooltip>}>
 					<Button className="btn-close" type="submit">
-						{/* onClick={deleteAd.bind(null, props.ad.id)} */}
 						x
 					</Button>
-				</OverlayTrigger>
+				</OverlayTrigger> */}
 				<Col xs={3} className="ad-image">
 					<img
 						src={`/assets/images/tagManager/types/${ad.formatData.platform}/${ad.formatData.type}${
@@ -63,21 +67,13 @@ class AdElement extends Component {
 									{ad.width}x{ad.height}
 								</strong>
 							</p>
-							<pre>
-								{`<div id="${ad.id}">
-	<script>
-		var adpushup = adpushup || {};
-		adpushup.que = adpushup.que || [];
-		adpushup.que.push(funtion() {
-		adpushup.triggerAd('${ad.id}');
-		})
-	</script>
-</div>`}
-							</pre>
+							{showAdCode ? <pre>{code}</pre> : null}
 							{window.isSuperUser ? (
 								<CustomButton label="Show Network Details" handler={this.toggleNetworkDetails} />
 							) : null}
-							<CustomButton label="Copy Adcode" handler={() => {}} />
+							{showAdCode ? (
+								<CustomButton label="Copy Adcode" handler={copyToClipBoard.bind(null, code)} />
+							) : null}
 						</div>
 					)}
 				</Col>

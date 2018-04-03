@@ -37,6 +37,14 @@ const fn = {
 				{props.label}
 			</div>
 		);
+	},
+	EmptyState = props => {
+		return (
+			<div className="empty-state">
+				<img src="/assets/images/empty.png" />
+				{props.message ? <h2>{props.message}</h2> : ''}
+			</div>
+		);
 	};
 
-export { CustomMessage, CustomButton };
+export { CustomMessage, CustomButton, EmptyState };

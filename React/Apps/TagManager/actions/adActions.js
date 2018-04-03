@@ -26,7 +26,7 @@ const createAd = params => (dispatch, getState) => {
 				dispatch({ type: uiActions.SET_FETCH_ADS_ERROR, value: true });
 			} else {
 				dispatch({ type: uiActions.SET_FETCH_ADS_ERROR, value: false });
-				dispatch({ type: adActions.UPDATE_ADS_LIST, data: response.data.ads });
+				dispatch({ type: adActions.REPLACE_ADS_LIST, data: response.data.ads });
 			}
 		});
 	},
