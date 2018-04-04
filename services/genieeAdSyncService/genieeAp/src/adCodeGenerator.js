@@ -162,7 +162,7 @@ module.exports = {
 		adCode.push('});');
 		adCode.push('</scr' + 'ipt>');
 		adCode.push(
-			' <scr' + 'ipt async type="text/javascript"\n src="http://js.gsspcln.jp/l/gnsmod.min.js"> \n</scr' + 'ipt>'
+			' <scr' + 'ipt async type="text/javascript"\n src="//js.gsspcln.jp/l/gnsmod.min.js"> \n</scr' + 'ipt>'
 		);
 		return adCode.join('\n');
 	},
