@@ -84,12 +84,14 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 		.getDoc(`${docKeys.tagManager}${site.get('siteId')}`)
 		.then(docWithCas => {
 			const ads = docWithCas.value.ads,
-				unSyncedAds = _.map(ads, ad => {
-					return genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad);
-				});
+				unSyncedAds = _.compact(
+					_.map(ads, ad => {
+						return genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad);
+					})
+				);
 			currentDataForSyncing.adp.ads = unSyncedAds.length
 				? _.concat(currentDataForSyncing.adp.ads, unSyncedAds)
-				: null;
+				: [];
 			return currentDataForSyncing;
 		})
 		.catch(err => {

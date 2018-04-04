@@ -157,7 +157,7 @@ const PLATFORMS = [
 		adpushup.que = adpushup.que || [];
 		adpushup.que.push(funtion() {
 			adpushup.triggerAd("__AD_ID__");
-		})
+		});
 	</script>
 </div>`,
 	adCodeVideo = `<div id="#adp_video___AD_ID__"></div>`;
