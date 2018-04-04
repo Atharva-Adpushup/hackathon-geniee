@@ -27,6 +27,13 @@ const fn = {
 			});
 	},
 	processing: (data, payload) => {
+		if (
+			(value.ownerEmail && req.session.user.email != value.ownerEmail) ||
+			(payload.ownerEmail && req.session.user.email != payload.ownerEmail)
+		) {
+			return Promise.reject();
+		}
+
 		let cas = data.cas || false,
 			value = data.value || data,
 			id = uuid.v4(),
@@ -90,10 +97,20 @@ router
 			return res.render('404');
 		}
 
-		return res.render('tagManager', {
-			siteId: params.siteId,
-			isSuperUser: !!req.session.isSuperUser
-		});
+		return siteModel
+			.getSiteById(params.siteId)
+			.then(site => {
+				return site.get('ownerEmail') != session.user.email
+					? res.render('404')
+					: res.render('tagManager', {
+							siteId: params.siteId,
+							isSuperUser: !!session.isSuperUser
+					  });
+			})
+			.catch(err => {
+				console.log(err.message);
+				return res.render('404');
+			});
 	})
 	.post('/createAd', (req, res) => {
 		if (!req.body || !req.body.siteId || !req.body.ad) {
