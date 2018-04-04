@@ -12,13 +12,7 @@ var path = require('path'),
 	CC = require('../../../configs/commonConsts'),
 	generateADPTagsConfig = require('./generateADPTagsConfig'),
 	generateAdPushupConfig = require('./generateAdPushupConfig'),
-	{ couchbaseService } = require('node-utils'),
-	config = require('../../../configs/config'),
-	appBucket = couchbaseService(
-		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
-		config.couchBase.DEFAULT_BUCKET,
-		config.couchBase.DEFAULT_BUCKET_PASSWORD
-	);
+	config = require('../../../configs/config');
 
 module.exports = function(site) {
 	ftp = new PromiseFtp();
@@ -52,19 +46,16 @@ module.exports = function(site) {
 			'geniee',
 			site.get('siteId').toString()
 		),
-		getManualAds = function() {
-			const siteId = site.get('siteId');
-			return appBucket.getDoc(`tgmr::${siteId}`).then(docWithCas => docWithCas.value.ads);
-		},
 		setAllConfigs = function(combinedConfig) {
 			var apConfigs = site.get('apConfigs'),
 				isAdPartner = !!site.get('partner');
-			let { experiment, adpTagsConfig } = combinedConfig;
+			let { experiment, adpTagsConfig, manualAds } = combinedConfig;
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
 			// Default 'draft' mode is selected if config mode is not present
 			apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
+			apConfigs.manualAds = manualAds || [];
 			apConfigs.experiment = experiment;
 			delete apConfigs.pageGroupPattern;
 			return { apConfigs, adpTagsConfig };
@@ -72,13 +63,14 @@ module.exports = function(site) {
 		getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
 		getAdpTagsJsFile = fs.readFileAsync(adpTagsTplPath, 'utf8'),
 		getUncompressedJsFile = fs.readFileAsync(uncompressedJsTplPath, 'utf8'),
-		generateCombinedJson = (experiment, adpTags) => {
+		generateCombinedJson = (experiment, adpTags, manualAds) => {
 			if (!(Array.isArray(adpTags) && adpTags.length)) {
 				return { experiment, adpTagsConfig: false };
 			}
 			return generateADPTagsConfig(adpTags, site.get('siteId')).then(adpTagsConfig => ({
 				adpTagsConfig,
-				experiment
+				experiment,
+				manualAds
 			}));
 		},
 		getComputedConfig = () => {
@@ -92,31 +84,28 @@ module.exports = function(site) {
 				.spread(generateCombinedJson)
 				.then(setAllConfigs);
 		},
-		getFinalConfig = Promise.join(
-			getComputedConfig(),
-			getJsFile,
-			getUncompressedJsFile,
-			getAdpTagsJsFile,
-			getManualAds(),
-			function(finalConfig, jsFile, uncompressedJsFile, adpTagsFile, manualAds) {
-				let { apConfigs, adpTagsConfig } = finalConfig;
-				apConfigs.manualAds = manualAds;
-				jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(apConfigs));
-				jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
+		getFinalConfig = Promise.join(getComputedConfig(), getJsFile, getUncompressedJsFile, getAdpTagsJsFile, function(
+			finalConfig,
+			jsFile,
+			uncompressedJsFile,
+			adpTagsFile
+		) {
+			let { apConfigs, adpTagsConfig } = finalConfig;
+			jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(apConfigs));
+			jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
 
-				uncompressedJsFile = _.replace(uncompressedJsFile, '___abpConfig___', JSON.stringify(apConfigs));
-				uncompressedJsFile = _.replace(uncompressedJsFile, /_xxxxx_/g, site.get('siteId'));
+			uncompressedJsFile = _.replace(uncompressedJsFile, '___abpConfig___', JSON.stringify(apConfigs));
+			uncompressedJsFile = _.replace(uncompressedJsFile, /_xxxxx_/g, site.get('siteId'));
 
-				if (adpTagsConfig) {
-					adpTagsFile = _.replace(adpTagsFile, '__INVENTORY__', JSON.stringify(adpTagsConfig));
-					adpTagsFile = _.replace(adpTagsFile, '__SITE_ID__', site.get('siteId'));
-					jsFile = `${jsFile};${adpTagsFile}`;
-					uncompressedJsFile = `${uncompressedJsFile};${adpTagsFile}`;
-				}
-
-				return { default: jsFile, uncompressed: uncompressedJsFile };
+			if (adpTagsConfig) {
+				adpTagsFile = _.replace(adpTagsFile, '__INVENTORY__', JSON.stringify(adpTagsConfig));
+				adpTagsFile = _.replace(adpTagsFile, '__SITE_ID__', site.get('siteId'));
+				jsFile = `${jsFile};${adpTagsFile}`;
+				uncompressedJsFile = `${uncompressedJsFile};${adpTagsFile}`;
 			}
-		),
+
+			return { default: jsFile, uncompressed: uncompressedJsFile };
+		}),
 		writeTempFile = function(jsFile) {
 			return mkdirpAsync(tempDestPath).then(function() {
 				return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);
