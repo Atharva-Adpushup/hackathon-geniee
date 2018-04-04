@@ -92,7 +92,6 @@ function computeChosenVariation(moduleConfig) {
 		isForcedVariation = !!(
 			moduleConfig &&
 			moduleConfig.data &&
-			moduleConfig.data.contentSelector &&
 			moduleConfig.isValidated &&
 			moduleConfig.isForced &&
 			moduleConfig.chosenVariation

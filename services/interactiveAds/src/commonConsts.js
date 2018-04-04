@@ -10,7 +10,8 @@ const commonConsts = {
 		STICKY: {
 			NAME: 'sticky',
 			BASE_STYLES: {
-				position: 'fixed'
+				position: 'fixed',
+				zIndex: 1000
 			},
 			PLACEMENT_CSS: {
 				BOTTOM: {
@@ -94,6 +95,7 @@ const commonConsts = {
 				overflow: 'hidden',
 				whiteSpace: 'nowrap',
 				padding: '10px',
+				boxSizing: 'border-box'
 			},
 			DEFAULT_CLASS: 'video-js',
 			DEFAULT_AD_TAG_URL:
