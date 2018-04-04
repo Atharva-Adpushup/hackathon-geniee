@@ -12,7 +12,13 @@ var path = require('path'),
 	CC = require('../../../configs/commonConsts'),
 	generateADPTagsConfig = require('./generateADPTagsConfig'),
 	generateAdPushupConfig = require('./generateAdPushupConfig'),
-	config = require('../../../configs/config');
+	{ couchbaseService } = require('node-utils'),
+	config = require('../../../configs/config'),
+	appBucket = couchbaseService(
+		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
+		config.couchBase.DEFAULT_BUCKET,
+		config.couchBase.DEFAULT_BUCKET_PASSWORD
+	);
 
 module.exports = function(site) {
 	ftp = new PromiseFtp();
@@ -46,6 +52,10 @@ module.exports = function(site) {
 			'geniee',
 			site.get('siteId').toString()
 		),
+		getManualAds = function() {
+			const siteId = site.get('siteId');
+			return appBucket.getDoc(`tgmr::${siteId}`).then(docWithCas => docWithCas.value.ads);
+		},
 		setAllConfigs = function(combinedConfig) {
 			var apConfigs = site.get('apConfigs'),
 				isAdPartner = !!site.get('partner');
@@ -82,28 +92,31 @@ module.exports = function(site) {
 				.spread(generateCombinedJson)
 				.then(setAllConfigs);
 		},
-		getFinalConfig = Promise.join(getComputedConfig(), getJsFile, getUncompressedJsFile, getAdpTagsJsFile, function(
-			finalConfig,
-			jsFile,
-			uncompressedJsFile,
-			adpTagsFile
-		) {
-			let { apConfigs, adpTagsConfig } = finalConfig;
-			jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(apConfigs));
-			jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
+		getFinalConfig = Promise.join(
+			getComputedConfig(),
+			getJsFile,
+			getUncompressedJsFile,
+			getAdpTagsJsFile,
+			getManualAds(),
+			function(finalConfig, jsFile, uncompressedJsFile, adpTagsFile, manualAds) {
+				let { apConfigs, adpTagsConfig } = finalConfig;
+				apConfigs.manualAds = manualAds;
+				jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(apConfigs));
+				jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
 
-			uncompressedJsFile = _.replace(uncompressedJsFile, '___abpConfig___', JSON.stringify(apConfigs));
-			uncompressedJsFile = _.replace(uncompressedJsFile, /_xxxxx_/g, site.get('siteId'));
+				uncompressedJsFile = _.replace(uncompressedJsFile, '___abpConfig___', JSON.stringify(apConfigs));
+				uncompressedJsFile = _.replace(uncompressedJsFile, /_xxxxx_/g, site.get('siteId'));
 
-			if (adpTagsConfig) {
-				adpTagsFile = _.replace(adpTagsFile, '__INVENTORY__', JSON.stringify(adpTagsConfig));
-				adpTagsFile = _.replace(adpTagsFile, '__SITE_ID__', site.get('siteId'));
-				jsFile = `${jsFile};${adpTagsFile}`;
-				uncompressedJsFile = `${uncompressedJsFile};${adpTagsFile}`;
+				if (adpTagsConfig) {
+					adpTagsFile = _.replace(adpTagsFile, '__INVENTORY__', JSON.stringify(adpTagsConfig));
+					adpTagsFile = _.replace(adpTagsFile, '__SITE_ID__', site.get('siteId'));
+					jsFile = `${jsFile};${adpTagsFile}`;
+					uncompressedJsFile = `${uncompressedJsFile};${adpTagsFile}`;
+				}
+
+				return { default: jsFile, uncompressed: uncompressedJsFile };
 			}
-
-			return { default: jsFile, uncompressed: uncompressedJsFile };
-		}),
+		),
 		writeTempFile = function(jsFile) {
 			return mkdirpAsync(tempDestPath).then(function() {
 				return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);

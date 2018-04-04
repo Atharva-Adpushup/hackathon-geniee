@@ -155,7 +155,7 @@ const PLATFORMS = [
 	<script>
 		var adpushup = adpushup || {};
 		adpushup.que = adpushup.que || [];
-		adpushup.que.push(funtion() {
+		adpushup.que.push(function() {
 			adpushup.triggerAd("__AD_ID__");
 		});
 	</script>

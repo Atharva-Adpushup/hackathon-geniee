@@ -379,8 +379,8 @@ module.exports = {
 			});
 		}
 
-		if (config.hasManualAds && window.adpushup.manualAds.length) {
-			ads = window.adpushup.manualAds;
+		if (config.hasManualAds && window.adpushup.config.manualAds.length) {
+			ads = window.adpushup.config.manualAds;
 		}
 
 		if (ads.length) {
