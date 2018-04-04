@@ -1,58 +1,90 @@
 /*****Generic extendable classes*****/
 /*Tabs a tag*/
-aTagShape
-{
+aTagShape {
 	display: block;
-  content: " ";
-  position: absolute;
-  top: 0;
-  height: 100%;
-  width: 25px;  
-  background-color:$MTBgColorli;
-  @include transition(all, 250ms, ease);
+	content: ' ';
+	position: absolute;
+	top: 0;
+	height: 100%;
+	width: 25px;
+	background-color: $MTBgColorli;
+	@include transition(all, 250ms, ease);
 }
 MainTabsIcon {
 	width: $MTIconWidth;
-  height: $MTIconHeight;
-  text-align: center;
-  @include border-radius(50%);
+	height: $MTIconHeight;
+	text-align: center;
+	@include border-radius(50%);
 }
 
 /* closeMDBg Stands for Close Modal with Light Background */
 closeMDLg {
-	text-shadow:none;
+	text-shadow: none;
 	@include border-radius(50%);
-	color:$closeColor;		
+	color: $closeColor;
 	@include opacity(1);
-	width:20px;
-	height:20px;
-	margin-top:0px;
-	line-height:20px;	
+	width: 20px;
+	height: 20px;
+	margin-top: 0px;
+	line-height: 20px;
 }
 closeMLBghover {
 	background: $closeHoverBGColor;
-	@include box-shadow(0, 1px, 2px, 0px, rgba(0,0,0,.2),true);
-	color:$closeHoverColor;
+	@include box-shadow(0, 1px, 2px, 0px, rgba(0, 0, 0, 0.2), true);
+	color: $closeHoverColor;
 }
 /* closeMDBg Stands for Close Modal with Dark Background */
 closeMDDg {
-	text-shadow:none;
-	color:$whiteColor;		
+	text-shadow: none;
+	color: $whiteColor;
 	@include opacity(0.7);
-	margin-top:0px;
+	margin-top: 0px;
 }
 closeMDDghover {
-	color:$whiteColor;
+	color: $whiteColor;
 	@include opacity(1);
 }
 modalHeader {
-	color:$whiteColor;
+	color: $whiteColor;
 	background: $primaryColor;
 	@include border-radius-separate($MBorderRadius, $MBorderRadius, 0, 0);
-	padding:$MHeadPadTB $MHeadPadLR;
+	padding: $MHeadPadTB $MHeadPadLR;
 	border-bottom: 1px solid $borderColor;
 }
 
+/* Custom Message */
+.custom-message {
+	padding: 10px;
+	margin: 0px 0px 10px 0px;
+	box-shadow: 0 0 0 1px rgba(34, 36, 38, 0.22) inset, 0 0 0 0 transparent;
+	background: #f8f8f9;
+	border-radius: 0.28571429rem;
+
+	&.info-text {
+		color: #000000;
+	}
+	&.error-text {
+		color: #c3272b;
+	}
+	&.success-text {
+		color: #006442;
+	}
+	&.dashboard-text {
+		font-size: 18px;
+		margin-bottom: 20px;
+	}
+	h3 {
+		font-weight: bold;
+	}
+	hr {
+		color: #000000;
+		margin: 10px 0px;
+	}
+	p {
+		margin: 0px;
+		font-size: 14px;
+	}
+}
 
 /*Insert Menu */
 menubar {
@@ -61,14 +93,13 @@ menubar {
 }
 
 /*SectionManager*/
-collapsedextended 
-{
-	 font-family: "FontAwesome";
-	 display: inline-block;
-	 float: left;
-	 margin-right: 5px;
-	 opacity: 1;
-   font-size: 12px;
+collapsedextended {
+	font-family: 'FontAwesome';
+	display: inline-block;
+	float: left;
+	margin-right: 5px;
+	opacity: 1;
+	font-size: 12px;
 }
 
 /*****Generic style utilities*****/
@@ -91,20 +122,18 @@ collapsedextended
 .pdL-6 {
 	padding-left: 6px;
 }
-.pd-8
-{
+.pd-8 {
 	padding: 0 8px;
 }
-.pd-10 
-{
+.pd-10 {
 	padding: 0 $FMLayoutDimension;
 }
 .pdAll-5 {
 	padding: $FMLayoutDimension/2 !important;
-} 
+}
 .pdAll-10 {
 	padding: $FMLayoutDimension;
-} 
+}
 .ptpb-15 {
 	padding-top: 15px;
 	padding-bottom: 15px;
@@ -113,14 +142,14 @@ collapsedextended
 	padding: 0 $FMLayoutDimension + $FMLayoutDimension/2 !important;
 }
 .pd-20 {
-	padding: $FMLayoutDimension*2;
+	padding: $FMLayoutDimension * 2;
 }
 .ptpd-1020 {
 	padding-top: $FMLayoutDimension !important;
-	padding-bottom: $FMLayoutDimension*2 !important;
+	padding-bottom: $FMLayoutDimension * 2 !important;
 }
 .pd-b100 {
-	padding-bottom: 7*$FMLayoutDimension !important;
+	padding-bottom: 7 * $FMLayoutDimension !important;
 }
 .u-padding-l5px {
 	padding: 0 0 0 $FMLayoutDimension/2 !important;
@@ -159,13 +188,12 @@ collapsedextended
 	padding: 20px !important;
 }
 
-
 /***Margin***/
 .mB-0 {
 	margin-bottom: 0 !important;
 }
 .m-All-0 {
-  margin: 0;
+	margin: 0;
 }
 .mB-5 {
 	margin-bottom: 5px;
@@ -177,13 +205,13 @@ collapsedextended
 	margin-bottom: 10px;
 }
 .mT-5 {
-	margin-top:5px !important;
+	margin-top: 5px !important;
 }
 .mT-10 {
-	margin-top:10px !important;
+	margin-top: 10px !important;
 }
 .mT-15 {
-	margin-top:15px !important;
+	margin-top: 15px !important;
 }
 .mT-20 {
 	margin-top: 20px;
@@ -198,13 +226,13 @@ collapsedextended
 	margin: 15px 0;
 }
 .mb-20 {
-  margin-bottom: 20px !important;
+	margin-bottom: 20px !important;
 }
 .mt-30 {
-  margin-top: 30px;
+	margin-top: 30px;
 }
 .mb-30 {
-  margin-bottom: 30px;
+	margin-bottom: 30px;
 }
 /*****Layout alignment*****/
 .u-margin-0px {
@@ -217,7 +245,7 @@ collapsedextended
 	margin: $FMLayoutDimension !important;
 }
 .u-margin-20px {
-	margin: $FMLayoutDimension*2 !important;
+	margin: $FMLayoutDimension * 2 !important;
 }
 .u-margin-t10px {
 	margin-top: $FMLayoutDimension !important;
@@ -226,13 +254,13 @@ collapsedextended
 	margin-top: $FMLayoutDimension !important;
 }
 .u-margin-t15px {
-	margin-top: $FMLayoutDimension + $FMLayoutDimension/2  !important;	
+	margin-top: $FMLayoutDimension + $FMLayoutDimension/2 !important;
 }
 .u-margin-t5px {
 	margin: $FMLayoutDimension/2 0 0 !important;
 }
 .u-margin-b15px {
-	margin-bottom: $FMLayoutDimension + $FMLayoutDimension/2  !important;	
+	margin-bottom: $FMLayoutDimension + $FMLayoutDimension/2 !important;
 }
 .u-margin-l5px {
 	margin-left: $FMLayoutDimension/2 !important;
@@ -266,13 +294,13 @@ collapsedextended
 .u-block,
 .u-block--half {
 	width: 100%;
-	display: block
+	display: block;
 }
 .u-block {
-	height: 100%
+	height: 100%;
 }
 .u-block--half {
-	height: 50%
+	height: 50%;
 }
 
 .ap-hide {
@@ -285,7 +313,6 @@ collapsedextended
 	@include shadow;
 	position: relative;
 }
-
 
 /*****UI alignment classes*****/
 .u-separator--colon {
@@ -311,23 +338,18 @@ collapsedextended
 }
 
 /*****Text specific classes*****/
-.text-uppercase
-{
+.text-uppercase {
 	text-transform: uppercase !important;
 }
-.text-bold
-{
+.text-bold {
 	font-weight: bold !important;
 }
-.text-success
-{
+.text-success {
 	color: $GreenColor !important;
 }
-.text-error
-{
+.text-error {
 	color: $primaryColorDark !important;
 }
-
 
 /***Text style utils***/
 .boldTxt {
@@ -337,68 +359,64 @@ collapsedextended
 	word-wrap: break-word;
 }
 
-
 /*****Generic extendable classes*****/
 iconStyle {
-	font:normal normal normal 14px/1 FontAwesome;
-	transform:translate(0, 0);
-	-webkit-font-smoothing:antialiased;
+	font: normal normal normal 14px/1 FontAwesome;
+	transform: translate(0, 0);
+	-webkit-font-smoothing: antialiased;
 	display: inline-block;
 	margin-right: 5px;
 }
 
 LoginInputFields {
-  @include border-radius(0);
-  color:$LPFormColor;
-  height:$LPFormInputHeight;
+	@include border-radius(0);
+	color: $LPFormColor;
+	height: $LPFormInputHeight;
 }
 dropdownMenuOpen {
-  opacity: 1;
-  visibility: visible;
-  transition: visibility 0s, opacity 0.3s;
+	opacity: 1;
+	visibility: visible;
+	transition: visibility 0s, opacity 0.3s;
 }
 ReportsInputPadding {
 	padding: 5px 7px;
 }
 btn {
-	padding:3px 12px;
+	padding: 3px 12px;
 }
 maxHeightWidth {
-	width:100%;
-	height:100%;
-	position:relative;
+	width: 100%;
+	height: 100%;
+	position: relative;
 }
 
-
-.overFlowTxt
-{
+.overFlowTxt {
 	overflow: hidden;
 }
 
 .red {
-			color: $primaryColorDark;
-		}
+	color: $primaryColorDark;
+}
 
-		.green {
-			color: $GreenColor;
-		}
+.green {
+	color: $GreenColor;
+}
 
+.lightBlue {
+	color: $linkBlue;
+}
 
-		.lightBlue {
-			color: $linkBlue;
-		}
+.bglightBlue {
+	background-color: $linkBlue;
+}
 
-		.bglightBlue {
-			background-color: $linkBlue;
-		}
+.darkBlue {
+	color: darken($linkBlue, 25%);
+}
 
-		.darkBlue {
-			color: darken($linkBlue, 25%);
-		}
-
-		.bgdarkBlue {
-			background-color: darken($linkBlue, 25%);
-		}
+.bgdarkBlue {
+	background-color: darken($linkBlue, 25%);
+}
 
 .btn.btn-lightBg.btn-blue {
 	background-color: darken($linkBlue, 25%);

@@ -36,12 +36,12 @@ const PLATFORMS = [
 				name: 'Sticky Bottom',
 				image: '/assets/images/tagManager/types/desktop/sticky-bottom.png',
 				key: 'stickyBottom'
-			},
-			{
-				name: 'Video',
-				image: '/assets/images/tagManager/types/desktop/video.png',
-				key: 'video'
 			}
+			// {
+			// 	name: 'Video',
+			// 	image: '/assets/images/tagManager/types/desktop/video.png',
+			// 	key: 'video'
+			// }
 		],
 		MOBILE: [
 			{
@@ -63,12 +63,12 @@ const PLATFORMS = [
 				name: 'Sticky Bottom',
 				image: '/assets/images/tagManager/types/mobile/sticky-bottom.png',
 				key: 'stickyBottom'
-			},
-			{
-				name: 'Video',
-				image: '/assets/images/tagManager/types/mobile/video.png',
-				key: 'video'
 			}
+			// {
+			// 	name: 'Video',
+			// 	image: '/assets/images/tagManager/types/mobile/video.png',
+			// 	key: 'video'
+			// }
 		]
 		// TABLET: [
 		// 	{

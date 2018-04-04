@@ -38,7 +38,11 @@ block bodyContent
                     .notification-wrapper
                     // Control v/s Adpushp Starts here
                     #widgetsArea.row
-                        
+                        if !currentUser.billingInfoComplete
+                            .custom-message.error-text.dashboard-text
+                                h3 Important
+                                hr
+                                | To start seeing ads, please complete billing information.
+                                | To complete click 
+                                a(href="/user/billing") here.
                         include layout/dashboardSites
-
-                      
