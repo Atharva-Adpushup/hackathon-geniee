@@ -27,17 +27,17 @@ const fn = {
 			});
 	},
 	processing: (data, payload) => {
+		let cas = data.cas || false,
+			value = data.value || data,
+			id = uuid.v4(),
+			networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {};
+
 		if (
 			(value.ownerEmail && req.session.user.email != value.ownerEmail) ||
 			(payload.ownerEmail && req.session.user.email != payload.ownerEmail)
 		) {
 			return Promise.reject();
 		}
-
-		let cas = data.cas || false,
-			value = data.value || data,
-			id = uuid.v4(),
-			networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {};
 
 		value.ads.push({
 			...payload.ad,
@@ -63,7 +63,7 @@ const fn = {
 		return !cas ? fn.getAndUpdate(key, value, adId) : fn.directDBUpdate(key, value, cas, adId);
 	},
 	errorHander: (err, res) => {
-		console.log(err.message);
+		console.log(err);
 		return sendErrorResponse({ message: 'Opertion Failed' }, res);
 	}
 };
