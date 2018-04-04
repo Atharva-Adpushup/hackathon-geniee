@@ -32,13 +32,6 @@ const fn = {
 			id = uuid.v4(),
 			networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {};
 
-		if (
-			(value.ownerEmail && req.session.user.email != value.ownerEmail) ||
-			(payload.ownerEmail && req.session.user.email != payload.ownerEmail)
-		) {
-			return Promise.reject();
-		}
-
 		value.ads.push({
 			...payload.ad,
 			id: id,
