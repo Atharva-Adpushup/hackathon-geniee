@@ -13,5 +13,8 @@ module.exports = {
 	},
 	MANUAL_ADS: {
 		VARIATION: 'manual'
+	},
+	NETWORKS: {
+		ADPTAGS: 'adpTags'
 	}
 };

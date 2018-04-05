@@ -156,14 +156,14 @@ function main() {
 	initAdpQue();
 
 	// Set manual ads flag in adp config
-	if (Array.isArray(adp.manualAds) && adp.manualAds.length) {
+	if (Array.isArray(adp.config.manualAds) && adp.config.manualAds.length) {
 		adp.config.hasManualAds = true;
 	} else {
 		adp.config.hasManualAds = false;
 	}
 
 	// Set mode in adp config in case of pure manual ads implementation
-	if (adp.config.hasManualAds && !adp.config.experiment) {
+	if (adp.config.hasManualAds && !Object.keys(adp.config.experiment).length) {
 		adp.config.mode = 16;
 		adp.creationProcessStarted = true;
 
@@ -175,7 +175,7 @@ function main() {
 		return false;
 	}
 
-	if (adp.config.hasManualAds && adp.config.experiment) {
+	if (adp.config.hasManualAds && Object.keys(adp.config.experiment).length) {
 		adp.config.mode = 17;
 	}
 

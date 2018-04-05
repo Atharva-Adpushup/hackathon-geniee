@@ -49,12 +49,13 @@ module.exports = function(site) {
 		setAllConfigs = function(combinedConfig) {
 			var apConfigs = site.get('apConfigs'),
 				isAdPartner = !!site.get('partner');
-			let { experiment, adpTagsConfig } = combinedConfig;
+			let { experiment, adpTagsConfig, manualAds } = combinedConfig;
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
 			// Default 'draft' mode is selected if config mode is not present
 			apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
+			apConfigs.manualAds = manualAds || [];
 			apConfigs.experiment = experiment;
 			delete apConfigs.pageGroupPattern;
 			return { apConfigs, adpTagsConfig };
@@ -62,13 +63,14 @@ module.exports = function(site) {
 		getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
 		getAdpTagsJsFile = fs.readFileAsync(adpTagsTplPath, 'utf8'),
 		getUncompressedJsFile = fs.readFileAsync(uncompressedJsTplPath, 'utf8'),
-		generateCombinedJson = (experiment, adpTags) => {
+		generateCombinedJson = (experiment, adpTags, manualAds) => {
 			if (!(Array.isArray(adpTags) && adpTags.length)) {
 				return { experiment, adpTagsConfig: false };
 			}
 			return generateADPTagsConfig(adpTags, site.get('siteId')).then(adpTagsConfig => ({
 				adpTagsConfig,
-				experiment
+				experiment,
+				manualAds
 			}));
 		},
 		getComputedConfig = () => {

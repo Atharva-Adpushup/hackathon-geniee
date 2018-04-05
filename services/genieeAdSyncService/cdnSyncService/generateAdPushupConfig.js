@@ -3,7 +3,13 @@ let ADPTags = [],
 const _ = require('lodash'),
 	AdPushupError = require('../../../helpers/AdPushupError'),
 	{ ERROR_MESSAGES } = require('../../../configs/commonConsts'),
-	{ promiseForeach } = require('node-utils'),
+	config = require('../../../configs/config'),
+	{ promiseForeach, couchbaseService } = require('node-utils'),
+	appBucket = couchbaseService(
+		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
+		config.couchBase.DEFAULT_BUCKET,
+		config.couchBase.DEFAULT_BUCKET_PASSWORD
+	),
 	isAdSynced = ad => {
 		if (!ad.network || !ad.networkData) {
 			return false;
@@ -17,6 +23,19 @@ const _ = require('lodash'),
 			return true;
 		}
 		return false;
+	},
+	pushToAdpTags = function(ad, json) {
+		if (ad.network == 'adpTags' || (ad.network == 'geniee' && ad.networkData.dynamicAllocation)) {
+			ADPTags.push({
+				key: `${json.width}x${json.height}`,
+				height: json.height,
+				width: json.width,
+				dfpAdunit: ad.networkData.dfpAdunit,
+				dfpAdunitCode: ad.networkData.dfpAdunitCode,
+				headerBidding: ad.networkData.headerBidding,
+				keyValues: ad.networkData.keyValues
+			});
+		}
 	},
 	getSectionsPayload = function(variationSections) {
 		var ads = [],
@@ -65,17 +84,8 @@ const _ = require('lodash'),
 				});
 			}
 			//for geniee provide networkData
-			if (ad.network == 'adpTags' || (ad.network == 'geniee' && ad.networkData.dynamicAllocation)) {
-				ADPTags.push({
-					key: `${json.width}x${json.height}`,
-					height: json.height,
-					width: json.width,
-					dfpAdunit: ad.networkData.dfpAdunit,
-					dfpAdunitCode: ad.networkData.dfpAdunitCode,
-					headerBidding: ad.networkData.headerBidding,
-					keyValues: ad.networkData.keyValues
-				});
-			}
+			pushToAdpTags(ad, json);
+
 			//Sending whole network data object in ad.
 			json.networkData = ad.networkData;
 
@@ -164,6 +174,10 @@ const _ = require('lodash'),
 		}
 		return finalJson;
 	},
+	getManualAds = site => {
+		const siteId = site.get('siteId');
+		return appBucket.getDoc(`tgmr::${siteId}`).then(docWithCas => docWithCas.value.ads);
+	},
 	generatePayload = (site, pageGroupData) => {
 		//Empty finaJson and dfpAunits
 		finalJson = {};
@@ -179,7 +193,18 @@ const _ = require('lodash'),
 					err => false
 				)
 			)
-			.then(() => [finalJson, ADPTags]);
+			.then(() => {
+				if (site.get('isManual')) {
+					return getManualAds(site);
+				}
+				return Promise.resolve();
+			})
+			.then(manualAds => {
+				_.map(manualAds, ad => {
+					pushToAdpTags(ad, ad);
+				});
+				return [finalJson, ADPTags, manualAds];
+			});
 	};
 
 module.exports = generatePayload;
