@@ -57,7 +57,9 @@ var modelAPI = (module.exports = apiModule()),
 		this.defaults = {
 			sites: [],
 			adNetworkSettings: [],
-			requestDemo: true
+			// requestDemo: true
+			// Commented for Tag Manager
+			requestDemo: false
 		};
 		this.ignore = ['password', 'oldPassword', 'confirmPassword', 'site'];
 
