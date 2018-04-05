@@ -168,15 +168,17 @@ function setSessionData(user, req, res, type) {
 			return res.redirect('/user/onboarding');
 		} else if (type == 2 && userPasswordMatch == 1) {
 			// Login
-			if (parseInt(user.get('revenueLowerLimit')) == 0 || parseInt(user.get('revenueUpperLimit')) < 1000) {
-				if (req.session.isSuperUser || !isRequestDemo) {
-					allowEntry = 1;
-				} else {
-					redirectPath = 'thank-you';
-				}
-			} else {
-				allowEntry = 1;
-			}
+			// Commented for Tag Manager
+			// if (parseInt(user.get('revenueLowerLimit')) == 0 || parseInt(user.get('revenueUpperLimit')) < 1000) {
+			// 	if (req.session.isSuperUser || !isRequestDemo) {
+			// 		allowEntry = 1;
+			// 	} else {
+			// 		redirectPath = 'thank-you';
+			// 	}
+			// } else {
+			// 	allowEntry = 1;
+			// }
+			allowEntry = 1;
 			if (allowEntry) {
 				var allUserSites = user.get('sites');
 
@@ -203,9 +205,9 @@ function setSessionData(user, req, res, type) {
 									!step
 								);
 
-							if (isRequestDemo && isIncompleteOnboardingSteps) {
-								return requestDemoRedirection(res);
-							}
+							// if (isRequestDemo && isIncompleteOnboardingSteps) {
+							// 	return requestDemoRedirection(res);
+							// }
 
 							if (isIncompleteOnboardingSteps) {
 								return res.redirect('/user/onboarding');
@@ -236,9 +238,10 @@ function setSessionData(user, req, res, type) {
 									return res.redirect('/user/dashboard');
 								}
 							} else {
-								if (isRequestDemo) {
-									return requestDemoRedirection(res);
-								}
+								// Commented for TagManager
+								// if (isRequestDemo) {
+								// 	return requestDemoRedirection(res);
+								// }
 
 								return res.redirect('/user/onboarding');
 							}
@@ -297,13 +300,14 @@ function preOnboardingPageRedirection(page, req, res) {
 		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = primarySiteDetails.pipeDrive.dealTitle;
 	}
 
-	if (isNotSuperUser) {
-		// Only user sub object is deleted, not the entire session object.
-		// This is done to ensure session object is maintained and consist of
-		// user primary site details that are used on open routes pages
-		// such as '/tools' and '/thank-you' pages
-		delete req.session.user;
-	}
+	// Commmented for Tag Manager
+	// if (isNotSuperUser) {
+	// Only user sub object is deleted, not the entire session object.
+	// This is done to ensure session object is maintained and consist of
+	// user primary site details that are used on open routes pages
+	// such as '/tools' and '/thank-you' pages
+	// 	delete req.session.user;
+	// }
 
 	return res.render(page, {
 		user: userObj,

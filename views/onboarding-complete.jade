@@ -168,5 +168,6 @@ block bodyContent
 			});
 		}
 		setTimeout(function() {
-			window.location.href = window.location.protocol + window.location.host + '/user/dashboard';
-		}, 5000);
+			var url = 'http://' + window.location.host + '/user/dashboard';
+			window.location.replace(url);
+		}, 3000);

@@ -91,7 +91,7 @@ $('document').ready(function() {
 			templates: {
 				checkIcon: '<i class="fa fa-check"></i>',
 				otherPlatformVerification:
-					'<div class="snippet-wrapper"> <span class="clipboard-copy"> Copied ! </span> <textarea class="snippet" id="header-code" readonly placeholder="AdPushup init code comes here.."></textarea> <div class="snippet-btn-wrapper"> <div><button data-toggle="modal" data-target="#sendToDevModal" id="sendToDev" class="snippet-btn apbtn-main-line apbtn-small" style="width: 170px;"> Email Code <i class="fa fa-envelope-o"></i> </button> <button id="clipboardCopy" class="snippet-btn apbtn-main-line apbtn-small" style="width: 170px;"> Copy to clipboard <i class="fa fa-clipboard"></i> </button> </div></div></div><div class="error-message detectap-error"> <span> Please make sure that the header code is present on the the specified URL </span><div id="detectapError"></div></div><div class="row"><button id="apCheck" class="apbtn-main btn-vr btn-wpdt ap-code-verify"> Verify </button> </div>',
+					'<div class="snippet-wrapper"> <span class="clipboard-copy"> Copied ! </span> <textarea class="snippet" id="header-code" readonly placeholder="AdPushup init code comes here.."></textarea> <div class="snippet-btn-wrapper"> <div><button data-toggle="modal" data-target="#sendToDevModal" id="sendToDev" class="snippet-btn apbtn-main-line apbtn-small" style="width: 170px;"> Email Code <i class="fa fa-envelope-o"></i> </button> <button id="clipboardCopy" class="snippet-btn apbtn-main-line apbtn-small" style="width: 170px;"> Copy to clipboard <i class="fa fa-clipboard"></i> </button> </div></div></div><div class="error-message detectap-error"> <span> Please make sure that the header code is present on the the specified URL </span><div id="detectapError"></div></div><div class="row" style="margin-top: 15px !important;"><button id="apCheck" class="apbtn-main btn-vr btn-wpdt ap-code-verify" style="width: 40%; margin: 0px !important; margin-left: 15px !important;"> Verify </button></div>',
 				addOtherSite:
 					'<form id="addSiteAltForm"> <div class="row add-site-alt-form"> <div class="col-sm-8 col-sm-offset-2"> <input name="site" class="input-box" type="url" placeholder="Enter Website URL" required> </div><div class="col-sm-6 col-sm-offset-3"> <button type="submit" class="apbtn-main mT-10"> Add Site </button> </div></div></form>',
 				dashboardLink:
@@ -140,12 +140,14 @@ $('document').ready(function() {
 
 			// Smooth scrolling method
 			scrollTo: function(step, offset, duration) {
-				$('html, body').animate(
-					{
-						scrollTop: $('#step' + step).offset().top - offset
-					},
-					duration
-				);
+				if (step <= 2) {
+					$('html, body').animate(
+						{
+							scrollTop: $('#step' + step).offset().top - offset
+						},
+						duration
+					);
+				}
 			},
 
 			// Init code generation
@@ -380,7 +382,8 @@ $('document').ready(function() {
 				);
 
 				$(el).html('Verified ' + ob.templates.checkIcon);
-				ob.nextStep(3, 2, 1000);
+				$('#step2').removeClass('active-step');
+				// ob.nextStep(3, 2, 1000);
 			},
 
 			// AdPushup detection on site

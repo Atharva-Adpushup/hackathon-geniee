@@ -204,8 +204,10 @@ div.detectap-alert.text-center#apdetect
                 if isSuperUser
                     span#skip-ap-verification &nbsp;Skip Step
             #platformVerificationContent
-            .row.code-conversion-btns(style="padding-top: 5px;")
-                button(id="code-conversion-finish", class="apbtn-main apbtn-icon") Finish
+
+    .row.code-conversion-btns(style="padding: 0px; margin: 0px;")
+        button(id="code-conversion-finish", class="apbtn-main apbtn-icon", style="float: right; max-width: 220px; margin: 0px !important;") Finish
+        div(style="clear: both;") &nbsp;
 
 
     //- Grant adsense oauth access
