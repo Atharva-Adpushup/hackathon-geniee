@@ -163,7 +163,7 @@ function main() {
 	}
 
 	// Set mode in adp config in case of pure manual ads implementation
-	if (adp.config.hasManualAds && !adp.config.experiment) {
+	if (adp.config.hasManualAds && !Object.keys(adp.config.experiment).length) {
 		adp.config.mode = 16;
 		adp.creationProcessStarted = true;
 
@@ -175,7 +175,7 @@ function main() {
 		return false;
 	}
 
-	if (adp.config.hasManualAds && adp.config.experiment) {
+	if (adp.config.hasManualAds && Object.keys(adp.config.experiment).length) {
 		adp.config.mode = 17;
 	}
 
