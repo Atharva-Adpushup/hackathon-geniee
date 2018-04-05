@@ -179,13 +179,14 @@ function preOnboardingPageRedirection(page, req, res) {
 		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = primarySiteDetails.pipeDrive.dealTitle;
 	}
 
-	if (isUserSession) {
-		// Only user sub object is deleted, not the entire session object.
-		// This is done to ensure session object is maintained and consist of
-		// user primary site details that are used on open routes pages
-		// such as '/tools' and '/thank-you' pages
-		delete req.session.user;
-	}
+	// Commented for Tag Manager
+	// if (isUserSession) {
+	// // Only user sub object is deleted, not the entire session object.
+	// // This is done to ensure session object is maintained and consist of
+	// // user primary site details that are used on open routes pages
+	// // such as '/tools' and '/thank-you' pages
+	// 	delete req.session.user;
+	// }
 
 	return res.render(page, {
 		imageHeaderLogo: true,
@@ -212,6 +213,9 @@ router
 	.get('/onboarding', function(req, res) {
 		var allUserSites = req.session.user.sites;
 		return dashboardRedirection(req, res, allUserSites, 'onboarding');
+	})
+	.get('/onboarding-complete', function(req, res) {
+		return preOnboardingPageRedirection('onboarding-complete', req, res);
 	})
 	.get('/requestdemo', function(req, res) {
 		return preOnboardingPageRedirection('request-demo', req, res);

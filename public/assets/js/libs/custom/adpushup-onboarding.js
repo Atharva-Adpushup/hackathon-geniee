@@ -132,7 +132,8 @@ $('document').ready(function() {
 				if (newSite.addOtherSite) {
 					ob.anotherSiteModalOpen();
 				} else {
-					var url = 'http://' + window.location.host + '/thankyou';
+					var url = 'http://' + window.location.host + '/user/onboarding-complete';
+					// var url = 'http://' + window.location.host + '/thankyou';
 					window.location.replace(url);
 				}
 			},
@@ -172,7 +173,7 @@ $('document').ready(function() {
 								.replace('https://', '')
 								.replace('www.', ''),
 							'/'
-						)
+					  )
 					: '';
 			},
 

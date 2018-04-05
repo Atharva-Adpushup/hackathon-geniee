@@ -1,0 +1,172 @@
+extends layout/base
+
+block getTitle
+	- var titleVar = "Onboarding Complete"
+
+block append headCss
+	//- +loadAsset("css", [
+	//- 	'//assets.calendly.com/assets/external/widget.css',
+	//- ])
+	style.
+		.thankyouWrapper {
+			width: 100%;
+			height: 100%;
+		}
+		.thankyouWrapper .container {
+			padding: 60px 0;
+			margin-top: 60px;
+		}
+		.thankyouWrapper .container .row {
+			padding: 15px;
+			background: #ffffff;
+			box-shadow: 0 0.5px 0 0 #ffffff inset, 0 1px 2px 0 #B3B3B3;
+		}
+		.thankyou-img img {
+			width: 90%;
+		}
+		.thankyou-content {
+			padding: 20px 0px;
+		}
+		.thankyou-content {
+			font-size: 16px;
+		}
+		.thankyou-content ul {
+			padding: 20px 0px;
+			margin-top: 30px;
+		}
+		.thankyou-content ul li {
+			cursor: pointer;
+			display: inline;
+			padding: 10px;
+			border: 2px solid #cf474b;
+			color: #cf474b;
+			margin-right: 10px;
+			font-weight: bold;
+			zoom: 2;
+		}
+		.thankyou-content ul li.active {
+			background: #cf474b;
+			color: #fff;
+			cursor: pointer;
+			margin-right: 15px;
+		}
+		.thankyou-content ul li.active a {
+			color: #fff;
+		}
+		.thankyou-content ul li:hover {
+			background: #cf474b;
+			color: #fff;
+		}
+
+block append headScripts
+	- user = user || {};
+	- analytics = analytics || {};
+
+	//- +loadAsset("js", [
+	//- 	'//assets.calendly.com/assets/external/widget.js'
+	//- ])
+	script.
+		var analyticsObj = !{JSON.stringify(analytics)},
+			isAnalyticsObj = !!(analyticsObj && !jQuery.isEmptyObject(analyticsObj)),
+			userInfoObj = !{JSON.stringify(user)},
+			stage = userInfoObj.stage || 'Request Demo',
+			customVariableObj = {}, property;
+
+		window.__lc = window.__lc || {};
+		window.__lc.license = 6965991;
+
+		if (isAnalyticsObj) {
+			window.__lc.params = [];
+
+			for (property in analyticsObj) {
+				if (analyticsObj.hasOwnProperty(property)) {
+					customVariableObj.name = property;
+					customVariableObj.value = analyticsObj[property];
+					window.__lc.params.push(jQuery.extend(true, {}, customVariableObj));
+				}
+			}
+		}
+
+		//- (function() {
+		//- 	var lc = document.createElement('script'); lc.type = 'text/javascript'; lc.async = true;
+		//- 	lc.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdn.livechatinc.com/tracking.js';
+		//- 	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(lc, s);
+		//- })();
+	
+
+block bodyContent
+	- currentUser = currentUser || {};
+	//- - calendlyBaseUrl = 'https://calendly.com/adpushup/demo/';
+	- pipeDriveDealId = utils.encodeString(primarySiteDetails.pipeDrive.dealId);
+	- pipeDriveDealTitle = utils.encodeString(primarySiteDetails.pipeDrive.dealTitle);
+	- name = utils.encodeString(`${currentUser.firstName} ${currentUser.lastName}`);
+	- email = utils.encodeString(currentUser.email);
+	//- - calendlyUrl = `${calendlyBaseUrl}?utm_content=${pipeDriveDealTitle}&utm_term=${pipeDriveDealId}&name=${name}&email=${email}`;
+	//- - onClickHandler = `Calendly.showPopupWidget('${calendlyUrl}');return false;`;
+
+	.thankyouWrapper
+		include layout/header
+		.container.text-center
+			if isSuperUser
+				.row
+					.pull-right.col-lg-6.visible-lg.visible-md.mT-10.text-right
+						a.apbtn-danger.u-margin-r5px(style="width: 30%", href='/user/updateUserStatus') User Controls
+						a.apbtn-danger(style="width: 30%", href='/user/dashboard') Dashboard
+			.row
+				.col-md-5.thankyou-img
+					img(src="/assets/images/completion_graphic.png")
+				.col-md-7.thankyou-content.text-left
+					h2 Thank you for signing up with Adpushup
+					hr
+					p Kindly wait while we prepare your dashboard. We will be redirecting you soon.
+					//- p
+					//- 	| We have seen an extremely great success rate, with more than 77% of our participating websites seeing an average of
+					//- 	strong(style="color: #72b800; margin: 0 5px")
+					//- 		| 43% uplift
+					//- 		i.fa.fa-arrow-up(style="margin: 0 0 0 5px")
+					//- 	| in RPM.
+					//- h3(style="margin: 40px 0 10px; font-weight: bold;") Schedule a call with us to activate your account
+					//- ul
+					//- 	li.active(data-id="TemFBoDWjZw" class="livechat_button") Live chat now
+					//- 	//- div(data-id="TemFBoDWjZw" class="livechat_button")
+					//- 	//- 	a(href="https://www.livechatinc.com/customer-service/?partner=lc_6965991&amp;utm_source=chat_button") Speak Now
+					//- 	li(onclick=onClickHandler) Schedule Later
+
+	script(type="text/javascript").
+		// Required variables are define in above inline script
+		if (isAnalyticsObj) {
+			analyticsObj.stage = userInfoObj.stage || 'Onboarded';
+			adpushupAnalyticsEvents.emit('analyticsAlias', {
+				email: userInfoObj.email
+			});
+			adpushupAnalyticsEvents.emit('analyticsIdentify', {
+				email: userInfoObj.email,
+				analytics: analyticsObj
+			});
+			adpushupAnalyticsEvents.emit('analyticsTrack', {
+				eventName: stage,
+				obj: {
+					name: userInfoObj.firstName,
+					email: userInfoObj.email
+				}
+			});
+		} else {
+			adpushupAnalyticsEvents.emit('analyticsIdentify', {
+				email: window.currentUser.email,
+				analytics: {
+					name: window.currentUser.firstName,
+					email: window.currentUser.email
+				}
+			});
+			adpushupAnalyticsEvents.emit('analyticsTrack', {
+				eventName: stage,
+				obj: {
+					name: window.currentUser.firstName,
+					email: window.currentUser.email,
+					value: true
+				}
+			});
+		}
+		setTimeout(function() {
+			window.location.href = window.location.protocol + window.location.host + '/user/dashboard';
+		}, 5000);

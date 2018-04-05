@@ -160,9 +160,10 @@ function setSessionData(user, req, res, type) {
 		if (type == 1 && userPasswordMatch == 1) {
 			// Sign Up
 
-			if (isRequestDemo) {
-				return requestDemoRedirection(res);
-			}
+			// Commented for Tag Manager
+			// if (isRequestDemo) {
+			// 	return requestDemoRedirection(res);
+			// }
 
 			return res.redirect('/user/onboarding');
 		} else if (type == 2 && userPasswordMatch == 1) {
@@ -332,16 +333,19 @@ router
 							};
 							req.session.primarySiteDetails = primarySiteDetails;
 
-							if (parseInt(user.data.revenueUpperLimit) <= consts.onboarding.revenueLowerBound) {
-								// thank-you --> Page for below threshold users
-								req.session.stage = 'Pre Onboarding';
-								return res.redirect('/thank-you');
-							} else {
-								/*
-										Users with revenue > 1,000
-									*/
-								return setSessionData(user, req, res, 1);
-							}
+							return setSessionData(user, req, res, 1);
+
+							// Commented for Tag Manager
+							// if (parseInt(user.data.revenueUpperLimit) <= consts.onboarding.revenueLowerBound) {
+							// 	// thank-you --> Page for below threshold users
+							// 	req.session.stage = 'Pre Onboarding';
+							// 	return res.redirect('/thank-you');
+							// } else {
+							// 	/* Users with revenue > 1,000 */
+							// 	return setSessionData(user, req, res, 1);
+							// }
+
+							// This was commented before Tag Manager
 							// else if (parseInt(user.data.revenueUpperLimit) > 10000) {
 							// 	// thank-you --> Page for above threshold users
 							// 	req.session.stage = 'Pre Onboarding';
