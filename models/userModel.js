@@ -48,7 +48,9 @@ var modelAPI = (module.exports = apiModule()),
 			'revenueLowerLimit',
 			'revenueAverage',
 			'adnetworkCredentials',
-			'miscellaneous'
+			'miscellaneous',
+			'billingInfoComplete',
+			'paymentInfoComplete'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
