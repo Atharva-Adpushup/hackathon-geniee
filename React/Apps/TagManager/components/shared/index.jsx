@@ -45,6 +45,19 @@ const fn = {
 				{props.message ? <h2>{props.message}</h2> : ''}
 			</div>
 		);
+	},
+	CustomInput = props => {
+		return (
+			<input
+				className={`inputMinimal ${props.classNames ? props.classNames : ' '}`}
+				type={props.type}
+				style={{ width: '100%' }}
+				name={props.name}
+				value={props.value ? props.value : ''}
+				placeholder={props.placeholder ? props.placeholder : 'Enter value here'}
+				onChange={props.handler}
+			/>
+		);
 	};
 
-export { CustomMessage, CustomButton, EmptyState };
+export { CustomMessage, CustomButton, CustomInput, EmptyState };

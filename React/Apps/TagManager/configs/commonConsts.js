@@ -134,6 +134,7 @@ const PLATFORMS = [
 			VIDEO: ['336x280']
 		}
 	},
+	interactiveAdEvents = ['DOMContentLoaded', 'scriptLoaded'], //load', 'scroll', 'onMills',
 	adActions = {
 		CREATE_AD: 'CREATE_AD',
 		UPDATE_ADS_LIST: 'UPDATE_ADS_LIST',
@@ -172,5 +173,6 @@ export {
 	displayAdMessage,
 	interactiveAdMessage,
 	adCode,
-	adCodeVideo
+	adCodeVideo,
+	interactiveAdEvents
 };

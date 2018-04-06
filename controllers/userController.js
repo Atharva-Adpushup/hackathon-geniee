@@ -289,7 +289,13 @@ router
 	.get('/billing', function(req, res) {
 		res.render('billing', {
 			user: req.session.user,
-			isSuperUser: true
+			isSuperUser: !!req.session.isSuperUser
+		});
+	})
+	.get('/payment', function(req, res) {
+		res.render('payment', {
+			user: req.session.user,
+			isSuperUser: !!req.session.isSuperUser
 		});
 	})
 	.get('/connectGoogle', function(req, res) {
