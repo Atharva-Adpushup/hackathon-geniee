@@ -287,13 +287,19 @@ router
 			});
 	})
 	.get('/billing', function(req, res) {
-		res.render('billing', {
+		if (req.session.user.billingInfoComplete) {
+			return res.redirect('/user/dashboard');
+		}
+		return res.render('billing', {
 			user: req.session.user,
 			isSuperUser: !!req.session.isSuperUser
 		});
 	})
 	.get('/payment', function(req, res) {
-		res.render('payment', {
+		if (req.session.user.paymentInfoComplete) {
+			return res.redirect('/user/dashboard');
+		}
+		return res.render('payment', {
 			user: req.session.user,
 			isSuperUser: !!req.session.isSuperUser
 		});

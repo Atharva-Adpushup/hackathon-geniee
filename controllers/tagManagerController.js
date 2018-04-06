@@ -136,10 +136,10 @@ router
 			.catch(err => fn.errorHander(err, res));
 	})
 	.post('/masterSave', (req, res) => {
-		if (!req.body || !req.body.siteId || !req.body.ads) {
+		if (!req.body || !req.body.siteId || !req.body.ads || !req.session.user.isSuperUser) {
 			return sendErrorResponse(
 				{
-					message: 'Incomplete Parameters.'
+					message: 'Invalid Parameters.'
 				},
 				res
 			);
