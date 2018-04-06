@@ -136,7 +136,7 @@ router
 			.catch(err => fn.errorHander(err, res));
 	})
 	.post('/masterSave', (req, res) => {
-		if (!req.body || !req.body.siteId || !req.body.ads || !req.session.user.isSuperUser) {
+		if (!req.body || !req.body.siteId || !req.body.ads || !req.session.isSuperUser) {
 			return sendErrorResponse(
 				{
 					message: 'Invalid Parameters.'
