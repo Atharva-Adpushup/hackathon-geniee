@@ -4,6 +4,12 @@ import NetworkOptions from '../../../../Editor/components/shared/networkOptions/
 class AdNetworkDetails extends Component {
 	constructor(props) {
 		super(props);
+		this.submitHanlder = this.submitHanlder.bind(this);
+	}
+
+	submitHanlder(networkInfo) {
+		this.props.onSubmit(this.props.ad.id, networkInfo);
+		this.props.onCancel();
 	}
 
 	render() {
@@ -11,7 +17,7 @@ class AdNetworkDetails extends Component {
 
 		return (
 			<NetworkOptions
-				onSubmit={onSubmit.bind(null, ad.id)}
+				onSubmit={this.submitHanlder}
 				onCancel={onCancel}
 				ad={ad}
 				buttonType={2}
