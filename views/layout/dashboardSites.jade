@@ -172,8 +172,9 @@
                             a.pull-left(id="site-report-" + siteId).
                                 #{utils.domanize(site.domain)} - #{siteId}
                             .pull-right
-                                a.btn.btn-lightBg.btn-default.u-margin-r10px(id=("operation-tools-"+ siteId) , href=operationToolsPath, target="_blank") Convert Ad Code
-                                a.btn.btn-lightBg.btn-default(id="site-create-pagegroup-" + siteId, href='/user/site/#{siteId}/createPagegroup') Create PageGroup
+                                //- a.btn.btn-lightBg.btn-default.u-margin-r10px(id=("operation-tools-"+ siteId) , href=operationToolsPath, target="_blank") Convert Ad Code
+                                //- a.btn.btn-lightBg.btn-default(id="site-create-pagegroup-" + siteId, href='/user/site/#{siteId}/createPagegroup') Create PageGroup
+                                a.btn.btn-lightBg.btn-default(id="site-tag-manager-" + siteId, href='/tagmanager/#{siteId}') Tags Manager
                         section
                             .site-status
                                 h4
