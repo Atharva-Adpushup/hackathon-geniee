@@ -241,6 +241,14 @@ function isPipeDriveAPIActivated() {
 	);
 }
 
+function isManualTagsActivated() {
+	return !!(
+		Config.hasOwnProperty('analytics') &&
+		Config.analytics.hasOwnProperty('manualTagsActivated') &&
+		Config.analytics.manualTagsActivated
+	);
+}
+
 function isEmailInAnalyticsBlockList(email) {
 	const blockList = consts.analytics.emailBlockList,
 		isEmailInBLockList = blockList.indexOf(email) > -1;
@@ -557,7 +565,13 @@ function apiModule() {
 							.then(function(user) {
 								const isUserTypePartner = !!(json.userType && json.userType === 'partner'),
 									isAPIActivated = isPipeDriveAPIActivated(),
+									isManualTagsActivated = isManualTagsActivated(),
 									isEmailInBLockList = isEmailInAnalyticsBlockList(json.email);
+
+								if (isManualTagsActivated) {
+									// Make call to Zapier
+									// makeCallToZapier();
+								}
 
 								if (isUserTypePartner || !isAPIActivated || isEmailInBLockList) {
 									return [user, {}];

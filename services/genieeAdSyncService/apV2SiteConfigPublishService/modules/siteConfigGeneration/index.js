@@ -117,3 +117,14 @@ function getGeneratedPromises(siteModelItem) {
 module.exports = {
 	generate: getGeneratedPromises
 };
+
+/**
+ * Tag Manager
+ * 1. Sign up --> Tag Manager Dashboard
+ * 2. Tag Manager Dashboard --> Change text to "Create your ad"
+ * 3. Segment Integrate
+ * 4. Payment Options to Sidebar
+ * 5. Call to Zapier when sign up
+ * 6. Live chat close
+ * 7. Segment on -- Mixpanel
+ */

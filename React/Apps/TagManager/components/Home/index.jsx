@@ -29,7 +29,7 @@ class Home extends Component {
 
 	render() {
 		return (
-			<ActionCard title="Tag Manager">
+			<ActionCard title="Create Ad Unit">
 				<Nav bsStyle="tabs" activeKey={this.state.activeNav} onSelect={this.handleNavSelect}>
 					<NavItem eventKey={1}>Ad code Generator</NavItem>
 					<NavItem eventKey={2}>List Ads</NavItem>
