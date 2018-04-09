@@ -82,16 +82,6 @@ function triggerControl(mode) {
 	}
 }
 
-function initInteractiveAds(interactiveAds) {
-	require.ensure(
-		['interactiveAds/index.js'],
-		function(require) {
-			require('interactiveAds/index')(interactiveAds);
-		},
-		'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
-	);
-}
-
 function startCreation(forced) {
 	return new Promise(function(resolve) {
 		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
@@ -118,7 +108,13 @@ function startCreation(forced) {
 				// Load interactive ads script if interactive ads are present in adpushup config
 				var interactiveAds = utils.getInteractiveAds(config);
 				if (interactiveAds) {
-					initInteractiveAds(interactiveAds);
+					require.ensure(
+						['interactiveAds/index.js'],
+						function(require) {
+							require('interactiveAds/index')(interactiveAds);
+						},
+						'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
+					);
 				}
 
 				createAds(adp, selectedVariation);
@@ -169,7 +165,13 @@ function main() {
 
 		var interactiveAds = utils.getInteractiveAds(adp.config);
 		if (interactiveAds) {
-			initInteractiveAds(interactiveAds);
+			require.ensure(
+				['interactiveAds/index.js'],
+				function(require) {
+					require('interactiveAds/index')(interactiveAds);
+				},
+				'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
+			);
 		}
 
 		return false;
