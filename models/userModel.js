@@ -21,6 +21,7 @@ var modelAPI = (module.exports = apiModule()),
 	request = require('request-promise'),
 	pipedriveAPI = require('../misc/vendors/pipedrive'),
 	mailService = require('../services/mailService/index'),
+	{ mailService } = require('node-utils'),
 	User = model.extend(function() {
 		this.keys = [
 			'firstName',
@@ -282,6 +283,39 @@ function setSiteLevelPipeDriveData(user, inputData) {
 
 	user.set('sites', allSites);
 	return Promise.resolve(user);
+}
+
+function sendUserSignupMail(user) {
+	const Mailer = new mailService({
+			MAIL_FROM: 'services.daemon@adpushup.com',
+			MAIL_FROM_NAME: 'AdPushup Mailer',
+			SMTP_SERVER: config.email.SMTP_SERVER,
+			SMTP_USERNAME: config.email.SMTP_USERNAME,
+			SMTP_PASSWORD: config.email.SMTP_PASSWORD
+		}),
+		template = user => {
+			return `
+				<h3>Email:</h3>
+				<h4>${user.get('email')}</h4>
+				<hr/>
+				<h3>Revenue:</h3>
+				<h4>${user.get('websiteRevenue')}</h4>
+				<hr/>
+				<h3>Name:</h3>
+				<h4>${user.get('firstName')} ${user.get('lastName')}</h4>
+				<hr/>
+				<h3>Site:</h3>
+				<h4>${user.get('sites')[0].domain}</h4>
+				<hr/>
+			`;
+		};
+
+	Mailer.send({
+		to: config.email.MAIL_FROM,
+		subject: 'New User Signup - Tag Manager',
+		body: template(user),
+		type: 'html'
+	});
 }
 
 function apiModule() {
@@ -569,8 +603,7 @@ function apiModule() {
 									isEmailInBLockList = isEmailInAnalyticsBlockList(json.email);
 
 								if (isManualTagsActivated) {
-									// Make call to Zapier
-									// makeCallToZapier();
+									sendUserSignupMail(user);
 								}
 
 								if (isUserTypePartner || !isAPIActivated || isEmailInBLockList) {
