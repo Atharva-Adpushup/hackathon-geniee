@@ -161,7 +161,27 @@ const PLATFORMS = [
 		});
 	</script>
 </div>`,
-	adCodeVideo = `<div id="#adp_video___AD_ID__"></div>`;
+	adCodeVideo = `<div id="#adp_video___AD_ID__"></div>`,
+	adsTxtData = `springserve.com, 1, RESELLER, a24eb641fc82e93d
+tremorhub.com, cdgfn, RESELLER, 1a4e959a1b50034a
+google.com, pub-6512936480753445, RESELLER, f08c47fec0942fa0
+spotx.tv, 111271, RESELLER 
+spotxchange.com, 111271, RESELLER
+appnexus.com, 926, RESELLER
+appnexus.com, 1538, RESELLER 
+advertising.com, 9008, RESELLER
+freewheel.tv, 208505, RESELLER
+freewheel.tv, 327377, RESELLER
+btrll.com, 6836428, RESELLER
+contextweb.com, 560580, RESELLER
+pubmatic.com, 156108, RESELLER, 5d62403b186f2ace
+pubmatic.com, 156410, RESELLER, 5d62403b186f2ace
+contextweb.com, 561503, RESELLER, 89ff185a4c4e857c
+appnexus.com, 3911, RESELLER, f5ab79cb980f11d1
+vi.ai, 176220180530289, DIRECT
+spotx.tv, 74964, RESELLER, 7842df1d2fe2db34
+c1exchange.com, 14924, RESELLER
+google.com, pub-8933329999391104, RESELLER, f08c47fec0942fa0`;
 
 export {
 	PLATFORMS,
@@ -174,5 +194,6 @@ export {
 	interactiveAdMessage,
 	adCode,
 	adCodeVideo,
-	interactiveAdEvents
+	interactiveAdEvents,
+	adsTxtData
 };
