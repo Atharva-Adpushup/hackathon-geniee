@@ -168,6 +168,6 @@ block bodyContent
 			});
 		}
 		setTimeout(function() {
-			var url = 'http://' + window.location.host + '/user/dashboard';
+			var url = 'http://' + window.location.host + '/tagManager/' + #{user.primarySiteId};
 			window.location.replace(url);
 		}, 3000);

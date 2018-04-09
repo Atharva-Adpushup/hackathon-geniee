@@ -8,7 +8,12 @@ const masterSave = siteId => (dispatch, getState) => {
 		method: 'POST',
 		data: JSON.stringify(data)
 	}).then(response => {
-		console.log(response);
+		if (response.error) {
+			alert('Some error occurred');
+			return;
+		}
+		alert('Save successful');
+		// console.log(response);
 		// if (response.error) {
 		// 	dispatch({ type: uiActions.SET_CREATE_AD_ERROR, value: true });
 		// } else {

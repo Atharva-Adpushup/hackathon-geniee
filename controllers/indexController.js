@@ -378,18 +378,21 @@ router
 	.get('/403', function(req, res) {
 		res.render('403');
 	})
-	.post('/completeBilling', function(req, res) {
-		debugger;
-		// req.body.email = utils.sanitiseString(req.body.email);
+	.post('/completeInfo', function(req, res) {
+		const email = req.body && req.body.email ? req.body.email : false,
+			key = req.body && req.body.key ? req.body.key : false;
 
-		// return userModel
-		// 	.setSitePageGroups(req.body.email)
-		// 	.then(function(user) {
-		// 		return setSessionData(user, req, res, 2);
-		// 	})
-		// 	.catch(function() {
-		// 		res.render('login', { error: "Email / Password combination doesn't exist." });
-		// 	});
+		if (email && key) {
+			return userModel
+				.getUserByEmail(email)
+				.then(user => {
+					user.set(key, true);
+					return user.save();
+				})
+				.then(() => res.sendStatus(200))
+				.catch(err => res.sendStatus(400));
+		}
+		return res.sendStatus(400);
 	})
 	.post('/login', function(req, res) {
 		req.body.email = utils.sanitiseString(req.body.email);
