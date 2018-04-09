@@ -1,12 +1,17 @@
 import React from 'react';
 import { adsTxtData } from '../../configs/commonConsts';
-import { CustomButton } from '../shared/index.jsx';
+import { CustomButton, CustomMessage } from '../shared/index.jsx';
 import { copyToClipBoard } from '../../lib/helpers.js';
 
 const AdsTxtConfig = props => {
 	return (
 		<div style={{ padding: '20px' }}>
 			<pre>{adsTxtData}</pre>
+			<CustomMessage
+				header="Important"
+				message="If you have implemented Ads.txt then please copy and paste the above content to your Ads.txt file."
+				type="info"
+			/>
 			<CustomButton label="Copy Data" handler={copyToClipBoard.bind(null, adsTxtData)} />
 			<div style={{ clear: 'both' }}>&nbsp;</div>
 		</div>
