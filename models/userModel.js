@@ -599,11 +599,11 @@ function apiModule() {
 							.then(function(user) {
 								const isUserTypePartner = !!(json.userType && json.userType === 'partner'),
 									isAPIActivated = isPipeDriveAPIActivated(),
-									isManualTagsActivated = isManualTagsActivated(),
+									isManualTagActivated = isManualTagsActivated(),
 									isEmailInBLockList = isEmailInAnalyticsBlockList(json.email);
 
-								if (isManualTagsActivated) {
-									sendUserSignupMail(user);
+								if (isManualTagActivated) {
+									sendUserSignupMail(user).then(console.log);
 								}
 
 								if (isUserTypePartner || !isAPIActivated || isEmailInBLockList) {
