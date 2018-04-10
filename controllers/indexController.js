@@ -387,6 +387,7 @@ router
 				.getUserByEmail(email)
 				.then(user => {
 					user.set(key, true);
+					req.session.user[key] = true;
 					return user.save();
 				})
 				.then(() => res.sendStatus(200))
