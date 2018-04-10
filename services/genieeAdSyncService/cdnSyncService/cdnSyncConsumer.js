@@ -53,6 +53,7 @@ module.exports = function(site) {
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
+			apConfigs.siteDomain = site.get('siteDomain');
 			// Default 'draft' mode is selected if config mode is not present
 			apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
 			apConfigs.manualAds = manualAds || [];
