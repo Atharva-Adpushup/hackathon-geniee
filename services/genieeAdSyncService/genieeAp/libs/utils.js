@@ -293,6 +293,39 @@ module.exports = {
 		}
 		return data;
 	},
+	rightTrim: function(string, s) {
+		return string ? string.replace(new RegExp(s + '*$'), '') : '';
+	},
+	domanize: function(domain) {
+		return domain
+			? this.rightTrim(
+					domain
+						.replace('http://', '')
+						.replace('https://', '')
+						.replace('www.', ''),
+					'/'
+			  )
+			: '';
+	},
+	rightTrim: function(string, s) {
+		return string ? string.replace(new RegExp(s + '*$'), '') : '';
+	},
+	domanize: function(domain) {
+		return domain
+			? this.rightTrim(
+					domain
+						.replace('http://', '')
+						.replace('https://', '')
+						.replace('www.', ''),
+					'/'
+			  )
+			: '';
+	},
+	isUrlMatching: function() {
+		var config = window.adpushup.config,
+			url = this.domanize(config.siteDomain);
+		return window.location.href.indexOf(url) !== -1 ? true : false;
+	},
 	getObjectByName: function(collection, name) {
 		var isInCollection = false,
 			objectConfig = { index: -1, name: name };

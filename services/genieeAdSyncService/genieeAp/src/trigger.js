@@ -27,7 +27,7 @@ var adp = window.adpushup,
 		}
 	},
 	trigger = function(adId) {
-		if (adp && Array.isArray(adp.config.manualAds) && adp.config.manualAds.length) {
+		if (adp && Array.isArray(adp.config.manualAds) && adp.config.manualAds.length && adp.utils.isUrlMatching()) {
 			var manualAds = adp.config.manualAds,
 				ad = manualAds.filter(function(ad) {
 					return ad.id == adId;
