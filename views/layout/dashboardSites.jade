@@ -7,7 +7,7 @@
         .col-sm-6
             .mb-30
                 .controlAdpushupWrap
-                    if site.channels.length
+                    if !site.isManual || site.channels.length
                         h3.title.m-All-0.clearfix
                             a.pull-left(id="site-report-" + siteId, target='_blank').
                                 #{utils.domanize(site.domain)} - #{siteId}

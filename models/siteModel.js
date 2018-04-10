@@ -59,8 +59,7 @@ var model = require('../helpers/model'),
 				cmsName: '',
 				pageGroups: []
 			},
-			adNetworkSettings: commonConsts.DEFAULT_AD_NETWORK_SETTINGS,
-			isManual: true
+			adNetworkSettings: commonConsts.DEFAULT_AD_NETWORK_SETTINGS
 		};
 		this.ignore = [];
 		this.classMap = { apConfigs: apConfigSchema };
@@ -472,6 +471,7 @@ function apiModule() {
 						return site;
 					},
 					function() {
+						siteData = Object.assign(siteData, { isManual: true });
 						return API.createSiteFromJson(siteData);
 					}
 				)

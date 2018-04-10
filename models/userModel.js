@@ -84,7 +84,7 @@ var modelAPI = (module.exports = apiModule()),
 			return Promise.resolve(_.find(this.get('sites'), { siteId: siteId }));
 		};
 
-		this.addSite = function(domain) {
+		this.addSite = function(domain, isManual) {
 			var me = this,
 				normalizedDomain = normalizeurl(domain);
 
@@ -93,8 +93,8 @@ var modelAPI = (module.exports = apiModule()),
 					return site;
 				}
 				return globalModel.incrSiteIdInApAppBucket().then(function(siteId) {
-					me.get('sites').push({ siteId: siteId, domain: normalizedDomain });
-					return { siteId: siteId, domain: normalizedDomain };
+					me.get('sites').push({ siteId: siteId, domain: normalizedDomain, isManual: isManual });
+					return { siteId: siteId, domain: normalizedDomain, isManual: isManual };
 				});
 			});
 		};
@@ -285,13 +285,13 @@ function setSiteLevelPipeDriveData(user, inputData) {
 	return Promise.resolve(user);
 }
 
-function sendUserSignupMail(user) {
+function sendUserSignupMail(json) {
 	const Mailer = new mailService({
 			MAIL_FROM: 'services.daemon@adpushup.com',
 			MAIL_FROM_NAME: 'AdPushup Mailer',
-			SMTP_SERVER: config.email.SMTP_SERVER,
-			SMTP_USERNAME: config.email.SMTP_USERNAME,
-			SMTP_PASSWORD: config.email.SMTP_PASSWORD
+			SMTP_SERVER: Config.email.SMTP_SERVER,
+			SMTP_USERNAME: Config.email.SMTP_USERNAME,
+			SMTP_PASSWORD: Config.email.SMTP_PASSWORD
 		}),
 		template = json => {
 			return `
@@ -299,7 +299,7 @@ function sendUserSignupMail(user) {
 				<h4>${json.email}</h4>
 				<hr/>
 				<h3>Revenue:</h3>
-				<h4>${json.websiteRevenue}</h4>
+				<h4>${json.websiteRevenue || 'N/A'}</h4>
 				<hr/>
 				<h3>Name:</h3>
 				<h4>${json.firstName} ${json.lastName}</h4>
@@ -310,8 +310,8 @@ function sendUserSignupMail(user) {
 			`;
 		};
 
-	Mailer.send({
-		to: config.email.MAIL_FROM,
+	return Mailer.send({
+		to: Config.email.MAIL_FROM,
 		subject: 'New User Signup - Tag Manager',
 		body: template(json),
 		type: 'html'
@@ -603,7 +603,7 @@ function apiModule() {
 									isEmailInBLockList = isEmailInAnalyticsBlockList(json.email);
 
 								if (isManualTagActivated) {
-									sendUserSignupMail(user).then(console.log);
+									sendUserSignupMail(json).then(console.log);
 								}
 
 								if (isUserTypePartner || !isAPIActivated || isEmailInBLockList) {
@@ -618,7 +618,8 @@ function apiModule() {
 										dealId: pipedriveData.dealId || false,
 										domain: json.site
 									},
-									addUserSite = user.addSite(json.site),
+									isManualTagActivated = isManualTagsActivated() || false,
+									addUserSite = user.addSite(json.site, isManualTagActivated),
 									setPipeDriveData = addUserSite.then(addedSiteData => {
 										return setSiteLevelPipeDriveData(user, pipedriveParams);
 									});

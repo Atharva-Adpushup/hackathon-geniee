@@ -49,8 +49,8 @@ function dashboardRedirection(req, res, allUserSites, type) {
 		return _.map(allUserSites, function(obj) {
 			return siteModel
 				.getSiteById(obj.siteId)
-				.then(function() {
-					return obj;
+				.then(function(site) {
+					return Object.assign(obj, { isManual: site.get('isManual') || false });
 				})
 				.catch(function() {
 					return 'inValidSite';
@@ -70,6 +70,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 		 * no saved any site through Visual Editor
 		 * - Value is Falsy if user has atleast one saved site
 		 */
+
 		unSavedSite = sites.length === 0 ? allUserSites : null;
 		req.session.unSavedSite = unSavedSite;
 
@@ -92,6 +93,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 						domain: site.domain,
 						siteId: site.siteId,
 						step: site.step,
+						isManual: site.isManual,
 						reportData
 					};
 				});

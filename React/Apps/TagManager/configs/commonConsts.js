@@ -181,7 +181,8 @@ appnexus.com, 3911, RESELLER, f5ab79cb980f11d1
 vi.ai, 176220180530289, DIRECT
 spotx.tv, 74964, RESELLER, 7842df1d2fe2db34
 c1exchange.com, 14924, RESELLER
-google.com, pub-8933329999391104, RESELLER, f08c47fec0942fa0`;
+google.com, pub-8933329999391104, RESELLER, f08c47fec0942fa0`,
+	initCode = `<script data-cfasync="false" type="text/javascript">(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/__SITE_ID__/adpushup.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);</script>`;
 
 export {
 	PLATFORMS,
@@ -195,5 +196,6 @@ export {
 	adCode,
 	adCodeVideo,
 	interactiveAdEvents,
-	adsTxtData
+	adsTxtData,
+	initCode
 };
