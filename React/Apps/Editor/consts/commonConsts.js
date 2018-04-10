@@ -269,7 +269,12 @@ const status = {
 	commonSupportedSizes = [
 		{
 			layoutType: 'SQUARE',
-			sizes: [{ width: 300, height: 250 }, { width: 250, height: 250 }, { width: 200, height: 200 }]
+			sizes: [
+				{ width: 300, height: 250 },
+				{ width: 250, height: 250 },
+				{ width: 200, height: 200 },
+				{ width: 336, height: 280 }
+			]
 		},
 		{
 			layoutType: 'HORIZONTAL',
@@ -285,15 +290,12 @@ const status = {
 				{ width: 320, height: 50 },
 				{ width: 300, height: 250 },
 				{ width: 250, height: 250 },
-				{ width: 200, height: 200 }
+				{ width: 200, height: 200 },
+				{ width: 320, height: 100 }
 			]
 		}
 	],
 	nonPartnerAdSizes = [
-		{
-			layoutType: 'SQUARE',
-			sizes: [{ width: 336, height: 280 }]
-		},
 		{
 			layoutType: 'HORIZONTAL',
 			sizes: [{ width: 900, height: 90 }, { width: 970, height: 250 }]
@@ -301,10 +303,6 @@ const status = {
 		{
 			layoutType: 'VERTICAL',
 			sizes: [{ width: 300, height: 1050 }]
-		},
-		{
-			layoutType: 'MOBILE',
-			sizes: [{ width: 320, height: 100 }]
 		}
 	],
 	defaultSectionCss = {
@@ -365,7 +363,14 @@ const status = {
 			TABLET: ['stickyBottom', 'stickyLeft', 'stickyRight', 'videoCustom']
 		}
 	},
-	personalizationTypes = ['not', 'in'];
+	personalizationTypes = ['not', 'in'],
+	typeOfAds = {
+		STRUCTURAL: 1,
+		IN_CONTENT: 2,
+		INTERACTIVE_AD: 3,
+		DOCKED_STRUCTURAL: 4,
+		EXTERNAL_TRIGGER_AD: 5
+	};
 
 export {
 	status,
@@ -407,5 +412,6 @@ export {
 	defaultPriceFloorKey,
 	jsWrapper,
 	interactiveAds,
-	personalizationTypes
+	personalizationTypes,
+	typeOfAds
 };

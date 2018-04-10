@@ -63,7 +63,7 @@ const Promise = require('bluebird'),
 							innerObj[identifier].aggregate.total_revenue *
 								1000 /
 								innerObj[identifier].aggregate.total_impressions
-						).toFixed(3);
+					  ).toFixed(3);
 		});
 		container[key] = innerObj;
 	},
@@ -588,6 +588,18 @@ const Promise = require('bluebird'),
 				}
 			);
 		});
+	},
+	sendSuccessResponse = (response, res) => {
+		res.send({
+			error: false,
+			data: response
+		});
+	},
+	sendErrorResponse = (response, res) => {
+		res.send({
+			error: true,
+			data: response
+		});
 	};
 
 module.exports = {
@@ -611,5 +623,7 @@ module.exports = {
 	getGlobalModeWiseTrafficContributionReport,
 	getGlobalTop10CountriesContributionQuery,
 	getGlobalTop10SitesContributionReport,
-	getGlobalLostAndFoundLiveSitesReport
+	getGlobalLostAndFoundLiveSitesReport,
+	sendSuccessResponse,
+	sendErrorResponse
 };
