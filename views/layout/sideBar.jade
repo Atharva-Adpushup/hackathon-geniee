@@ -31,6 +31,11 @@ nav.pageLeftSidebar.sidebar
                         | Billing Profile
                         span.icon-thumbnail#sidebar-billing-icon-thumbnail
                             i.fa.fa-dollar#sidebar-billing-icon
+                li.sidebar-menu-item
+                    a(id="sidebar-payment-link", href='/user/payment')
+                        | Payment Details
+                        span.icon-thumbnail#sidebar-payment-icon-thumbnail
+                            i.fa.fa-money#sidebar-payment-icon
                 if isSuperUser
                     li.sidebar-menu-item
                         a(id="sidebar-new-website-link", href='/user/updateUserStatus', data-toggle='', data-target='')
