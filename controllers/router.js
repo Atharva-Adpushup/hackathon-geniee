@@ -8,6 +8,7 @@ var indexController = require('./indexController'),
 	pageGroupController = require('./pageGroupController'),
 	authController = require('./authController'),
 	opsController = require('./opsController'),
+	tagManagerController = require('./tagManagerController'),
 	commonConsts = require('../configs/commonConsts'),
 	_ = require('lodash');
 
@@ -40,6 +41,7 @@ module.exports = function(app) {
 			return _.find(
 				[
 					'/ops',
+					'/tagManager',
 					'/user/site',
 					'/genieeApi',
 					'/user/connectGoogle',
@@ -135,6 +137,14 @@ module.exports = function(app) {
 			next();
 		},
 		opsController
+	);
+
+	app.use(
+		'/tagManager/',
+		function(req, res, next) {
+			next();
+		},
+		tagManagerController
 	);
 
 	/*****************Login URL's End *******************/

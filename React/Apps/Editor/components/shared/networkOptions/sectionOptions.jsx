@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
-import SelectBox from 'shared/select/select.js';
-import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
-import LabelWithButton from 'components/shared/labelWithButton.jsx';
-import CodeBox from 'shared/codeBox';
+import SelectBox from '../select/select.js';
+import CustomToggleSwitch from '../customToggleSwitch.jsx';
+import LabelWithButton from '../labelWithButton.jsx';
+import CodeBox from '../codeBox';
 import requiredIf from 'react-required-if';
-import InlineEdit from 'shared/inlineEdit/index.jsx';
+import InlineEdit from '../inlineEdit/index.jsx';
 import AdpTags from './AdpTags.jsx';
 
 const positions = ['Unknown', 'Header', 'Under the article/column', 'Sidebar', 'Footer'];

@@ -185,5 +185,21 @@ module.exports = {
 			USD: 'USD'
 		}
 	},
-	dummy: 'test'
+	dummy: 'test',
+	docKeys: {
+		tagManager: 'tgmr::'
+	},
+	tagManagerInitialDoc: {
+		siteId: null,
+		ownerEmail: null,
+		createdat: null,
+		ads: []
+	},
+	videoNetworkInfo: {
+		network: 'custom',
+		networkData: {
+			adCode: '',
+			forceByPass: true
+		}
+	}
 };

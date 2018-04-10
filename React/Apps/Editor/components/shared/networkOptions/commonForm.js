@@ -1,5 +1,5 @@
 import React from 'react';
-import CodeBox from 'shared/codeBox';
+import CodeBox from '../codeBox';
 import { Row, Col, Button } from 'react-bootstrap';
 
 const Form = props => {

@@ -205,6 +205,11 @@ div.detectap-alert.text-center#apdetect
                     span#skip-ap-verification &nbsp;Skip Step
             #platformVerificationContent
 
+    .row.code-conversion-btns(style="padding: 0px; margin: 0px;")
+        button(id="code-conversion-finish", class="apbtn-main apbtn-icon", style="float: right; max-width: 220px; margin: 0px !important;") Finish
+        div(style="clear: both;") &nbsp;
+
+
     //- Grant adsense oauth access
     //- .onboarding-step#step4
     //-     span(class="counter-icon")
@@ -249,32 +254,32 @@ div.detectap-alert.text-center#apdetect
 
 
     //- Passback
-    .onboarding-step#step3
-        span(class="counter-icon")
-            | 3
-        div.col-md-5
-            img.wd-90(src="/assets/images/ob_code_coversion.png")
-        div.col-md-7(class="ob-content")
-            h3(class="ob-heading")
-                | Add JS wrapper to your ad code
-                i(class="u-margin-l10px fa fa-info-circle js-adcode-info", data-toggle="popover", data-trigger="hover", data-animation="true", data-title="Convert Ad Code", data-content="In Adcode Conversion, we wrap your ad code in our JS script so that we can measure the performance of your original ads with our new created setup. The adcode to be converted has to be from <script> to </script> tag. After the conversion, replace your original tag with this new tag. Your ads will appear and the revenue will be intact!", data-placement="bottom", style="font-size: 22px; color: #337ab7;")
-            p
-                | Use the widget below to convert all of your current ad codes into AdPushup ad codes.
-                br
-                | Copy paste your existing ad codes one by one into the box then click on convert.
-                div.snippet-wrapper.code-convert-wrapper
-                    span.clipboard-copy Copied !
-                    textarea.snippet#code-conversion-box(placeholder="Enter your ad code here")
+    //- .onboarding-step#step3
+    //-     span(class="counter-icon")
+    //-         | 3
+    //-     div.col-md-5
+    //-         img.wd-90(src="/assets/images/ob_code_coversion.png")
+    //-     div.col-md-7(class="ob-content")
+    //-         h3(class="ob-heading")
+    //-             | Add JS wrapper to your ad code
+    //-             i(class="u-margin-l10px fa fa-info-circle js-adcode-info", data-toggle="popover", data-trigger="hover", data-animation="true", data-title="Convert Ad Code", data-content="In Adcode Conversion, we wrap your ad code in our JS script so that we can measure the performance of your original ads with our new created setup. The adcode to be converted has to be from <script> to </script> tag. After the conversion, replace your original tag with this new tag. Your ads will appear and the revenue will be intact!", data-placement="bottom", style="font-size: 22px; color: #337ab7;")
+    //-         p
+    //-             | Use the widget below to convert all of your current ad codes into AdPushup ad codes.
+    //-             br
+    //-             | Copy paste your existing ad codes one by one into the box then click on convert.
+    //-             div.snippet-wrapper.code-convert-wrapper
+    //-                 span.clipboard-copy Copied !
+    //-                 textarea.snippet#code-conversion-box(placeholder="Enter your ad code here")
 
-            //-    |  To enable Adpushup to serve ads using your Adsense account, replace your Adsense ad code with
-            //-    |  Adpushup's ad code. For every Adsense banner running on the website, replace Google Adsense ad code with
-            //-    |  newly generated Adpushup ad code.
-            .row.code-conversion-btns(style="padding-top: 5px;")
-                button(id="code-conversion-button", class="apbtn-main apbtn-icon")
-                    | Convert
-                button(id="code-conversion-finish", class="apbtn-main apbtn-icon")
-                    | Finish
-            #dsBLink
+    //-         //-    |  To enable Adpushup to serve ads using your Adsense account, replace your Adsense ad code with
+    //-         //-    |  Adpushup's ad code. For every Adsense banner running on the website, replace Google Adsense ad code with
+    //-         //-    |  newly generated Adpushup ad code.
+    //-         .row.code-conversion-btns(style="padding-top: 5px;")
+    //-             button(id="code-conversion-button", class="apbtn-main apbtn-icon")
+    //-                 | Convert
+    //-             button(id="code-conversion-finish", class="apbtn-main apbtn-icon")
+    //-                 | Finish
+    //-         #dsBLink
 
 script(type="text/javascript").
     adpushupAnalyticsEvents.emit('analyticsIdentify', {

@@ -8,15 +8,16 @@ var w = window,
 	nodewatcher = require('../libs/nodeWatcher'),
 	browserConfig = require('../libs/browserConfig'),
 	selectVariation = require('./variationSelectionModels/index'),
-	createAds = require('./adCreater'),
+	createAds = require('./adCreater').createAds,
 	heartBeat = require('../libs/heartBeat'),
 	hookAndInit = require('./hooksAndBlockList'),
 	control = require('./control')(),
 	genieeObject = require('./genieeObject'),
+	triggerAd = require('./trigger'),
 	isGenieeSite;
 
 // Extend adpushup object
-//Location of blow snippet should not be changed, other wise script will throw error.
+// Location of below snippet should not be changed, other wise script will throw error.
 $.extend(adp, {
 	creationProcessStarted: false,
 	err: [],
@@ -24,7 +25,8 @@ $.extend(adp, {
 	control: control,
 	tracker: new Tracker(),
 	nodewatcher: nodewatcher,
-	geniee: genieeObject
+	geniee: genieeObject,
+	triggerAd: triggerAd
 });
 
 // Extend the settings with generated settings
@@ -117,7 +119,7 @@ function startCreation(forced) {
 
 				createAds(adp, selectedVariation);
 			} else {
-				triggerControl(15);
+				triggerControl(3);
 			}
 
 			return resolve(true);
@@ -125,7 +127,60 @@ function startCreation(forced) {
 	});
 }
 
+function processQue() {
+	while (w.adpushup.que.length) {
+		w.adpushup.que.shift().call();
+	}
+}
+
+function initAdpQue() {
+	if (w.adpushup && Array.isArray(w.adpushup.que) && w.adpushup.que.length) {
+		adp.que = w.adpushup.que;
+	} else {
+		adp.que = [];
+	}
+
+	processQue();
+	adp.que.push = function(queFunc) {
+		[].push.call(w.adpushup.que, queFunc);
+		processQue();
+	};
+}
+
 function main() {
+	// Initialise adp que
+	initAdpQue();
+
+	// Set manual ads flag in adp config
+	if (Array.isArray(adp.config.manualAds) && adp.config.manualAds.length) {
+		adp.config.hasManualAds = true;
+	} else {
+		adp.config.hasManualAds = false;
+	}
+
+	// Set mode in adp config in case of pure manual ads implementation
+	if (adp.config.hasManualAds && !Object.keys(adp.config.experiment).length) {
+		adp.config.mode = 16;
+		adp.creationProcessStarted = true;
+
+		var interactiveAds = utils.getInteractiveAds(adp.config);
+		if (interactiveAds) {
+			require.ensure(
+				['interactiveAds/index.js'],
+				function(require) {
+					require('interactiveAds/index')(interactiveAds);
+				},
+				'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
+			);
+		}
+
+		return false;
+	}
+
+	if (adp.config.hasManualAds && Object.keys(adp.config.experiment).length) {
+		adp.config.mode = 17;
+	}
+
 	// Hook Pagegroup, find pageGroup and check for blockList
 	hookAndInit(adp, startCreation, browserConfig.platform);
 
@@ -139,7 +194,7 @@ function main() {
 		return false;
 	}
 
-	// AdPushup Debug Force COntrol
+	// AdPushup Debug Force Control
 	if (utils.queryParams && utils.queryParams.forceControl) {
 		triggerControl(5);
 		return false;
