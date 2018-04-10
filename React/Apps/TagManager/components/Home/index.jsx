@@ -40,7 +40,7 @@ class Home extends Component {
 					<NavItem eventKey={1}>Ad code Generator</NavItem>
 					<NavItem eventKey={2}>List Ads</NavItem>
 					<NavItem eventKey={3}>Ads.txt Config</NavItem>
-					<NavItem eventKey={4}>View Init code</NavItem>
+					<NavItem eventKey={4}>View AdPushup Header Code</NavItem>
 				</Nav>
 				{this.renderContent()}
 			</ActionCard>
