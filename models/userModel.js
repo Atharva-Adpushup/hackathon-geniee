@@ -293,19 +293,19 @@ function sendUserSignupMail(user) {
 			SMTP_USERNAME: config.email.SMTP_USERNAME,
 			SMTP_PASSWORD: config.email.SMTP_PASSWORD
 		}),
-		template = user => {
+		template = json => {
 			return `
 				<h3>Email:</h3>
-				<h4>${user.get('email')}</h4>
+				<h4>${json.email}</h4>
 				<hr/>
 				<h3>Revenue:</h3>
-				<h4>${user.get('websiteRevenue')}</h4>
+				<h4>${json.websiteRevenue}</h4>
 				<hr/>
 				<h3>Name:</h3>
-				<h4>${user.get('firstName')} ${user.get('lastName')}</h4>
+				<h4>${json.firstName} ${json.lastName}</h4>
 				<hr/>
 				<h3>Site:</h3>
-				<h4>${user.get('sites')[0].domain}</h4>
+				<h4>${json.site}</h4>
 				<hr/>
 			`;
 		};
@@ -313,7 +313,7 @@ function sendUserSignupMail(user) {
 	Mailer.send({
 		to: config.email.MAIL_FROM,
 		subject: 'New User Signup - Tag Manager',
-		body: template(user),
+		body: template(json),
 		type: 'html'
 	});
 }

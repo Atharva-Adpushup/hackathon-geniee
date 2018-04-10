@@ -86,7 +86,7 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 			const ads = docWithCas.value.ads,
 				unSyncedAds = _.compact(
 					_.map(ads, ad => {
-						return ad.network && ad.network == 'adp'
+						return ad.network && ad.network == 'adpTags'
 							? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)
 							: false;
 					})
