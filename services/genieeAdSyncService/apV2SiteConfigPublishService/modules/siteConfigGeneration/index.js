@@ -93,7 +93,7 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 				);
 			currentDataForSyncing.adp.ads = unSyncedAds.length
 				? _.concat(currentDataForSyncing.adp.ads, unSyncedAds)
-				: [];
+				: currentDataForSyncing.adp.ads;
 			return currentDataForSyncing;
 		})
 		.catch(err => {

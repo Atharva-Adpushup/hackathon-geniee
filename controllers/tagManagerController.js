@@ -151,7 +151,26 @@ router
 				if (doc.ownerEmail != req.session.user.email) {
 					return Promise.reject();
 				}
-				doc.ads = req.body.ads;
+				if (!doc.ads.length) {
+					doc.ads = req.body.ads;
+				} else {
+					let newAds = [];
+					_.forEach(doc.ads, adFromDoc => {
+						_.forEach(req.body.ads, adFromClient => {
+							if (adFromDoc.id == adFromClient.id) {
+								newAds.push({
+									...adFromDoc,
+									...adFromClient,
+									networkData: {
+										...adFromDoc.networkData,
+										...adFromClient.networkData
+									}
+								});
+							}
+						});
+					});
+					doc.ads = newAds;
+				}
 				return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
 			})
 			.then(() => siteModel.getSiteById(req.body.siteId))
