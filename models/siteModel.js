@@ -9,7 +9,7 @@ var model = require('../helpers/model'),
 	Promise = require('bluebird'),
 	commonConsts = require('../configs/commonConsts'),
 	_ = require('lodash'),
-	Site = model.extend(function () {
+	Site = model.extend(function() {
 		this.keys = [
 			'siteId',
 			'customSizes',
@@ -26,7 +26,8 @@ var model = require('../helpers/model'),
 			'step',
 			'websiteRevenue',
 			'adsensePublisherId',
-			'adNetworkSettings'
+			'adNetworkSettings',
+			'isManual'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -38,7 +39,8 @@ var model = require('../helpers/model'),
 			'apConfigs',
 			'partner',
 			'genieeMediaId',
-			'adsensePublisherId'
+			'adsensePublisherId',
+			'isManual'
 		];
 		this.validations = {
 			required: []
@@ -62,7 +64,7 @@ var model = require('../helpers/model'),
 		this.ignore = [];
 		this.classMap = { apConfigs: apConfigSchema };
 
-		this.constructor = function (data, cas) {
+		this.constructor = function(data, cas) {
 			if (!data.siteId) {
 				throw new Error('Site model need siteId');
 			}
@@ -72,21 +74,21 @@ var model = require('../helpers/model'),
 			this.key = 'site::' + this.data.siteId;
 		};
 
-		this.isApex = function () {
+		this.isApex = function() {
 			return !!this.get('apex'); // forceful convert to bool
 		};
 
-		this.getNetwork = function (networkName) {
+		this.getNetwork = function(networkName) {
 			return Promise.resolve(_.find(this.get('adNetworks'), { name: networkName }));
 		};
 
-		this.deleteChannel = function (platform, pageGroup) {
+		this.deleteChannel = function(platform, pageGroup) {
 			return new Promise(
-				function (resolve) {
+				function(resolve) {
 					// Reset site channels and page group pattern
-					var channels = _.filter(this.get('channels'), function (chnl) {
-						return chnl !== platform + ':' + pageGroup;
-					}),
+					var channels = _.filter(this.get('channels'), function(chnl) {
+							return chnl !== platform + ':' + pageGroup;
+						}),
 						apConfigs = this.get('apConfigs'),
 						isPageGroupPattern = !!(
 							apConfigs &&
@@ -94,11 +96,11 @@ var model = require('../helpers/model'),
 							_.isArray(apConfigs.pageGroupPattern)
 						),
 						pageGroupPatterns = isPageGroupPattern
-							? _.filter(apConfigs.pageGroupPattern, function (patternObj) {
-								var patternKey = Object.keys(patternObj)[0];
+							? _.filter(apConfigs.pageGroupPattern, function(patternObj) {
+									var patternKey = Object.keys(patternObj)[0];
 
-								return patternKey !== pageGroup;
-							})
+									return patternKey !== pageGroup;
+							  })
 							: false,
 						computedApConfig;
 
@@ -115,29 +117,29 @@ var model = require('../helpers/model'),
 			);
 		};
 
-		this.getAllChannels = function () {
+		this.getAllChannels = function() {
 			var allChannels = _.map(
 				this.get('channels'),
-				function (channel) {
+				function(channel) {
 					var channelArr = channel.split(':'); // channel[0] is platform and channel[1] is pagegroup
 					return channelModel.getChannel(this.get('siteId'), channelArr[0], channelArr[1]);
 				}.bind(this)
 			);
-			return Promise.all(allChannels).then(function (data) {
-				return _.map(data, function (channel) {
+			return Promise.all(allChannels).then(function(data) {
+				return _.map(data, function(channel) {
 					return channel.toClientJSON();
 				});
 			});
 		};
 
-		this.getVariationConfig = function () {
+		this.getVariationConfig = function() {
 			var computedConfig = {};
 
-			return Promise.resolve(this.getAllChannels()).then(function (channelsArr) {
+			return Promise.resolve(this.getAllChannels()).then(function(channelsArr) {
 				if (Array.isArray(channelsArr) && channelsArr.length) {
-					_.forEach(channelsArr, function (channelObj, channelKey) {
+					_.forEach(channelsArr, function(channelObj, channelKey) {
 						if (channelObj.hasOwnProperty('variations') && channelObj.variations) {
-							_.forOwn(channelObj.variations, function (variationObj, variationKey) {
+							_.forOwn(channelObj.variations, function(variationObj, variationKey) {
 								computedConfig[variationObj.id] = {
 									id: variationObj.id,
 									name: variationObj.name,
@@ -152,42 +154,42 @@ var model = require('../helpers/model'),
 			});
 		};
 
-		this.areAdsSynced = function () {
-			return _.find(this.get('ads'), function (ad) {
+		this.areAdsSynced = function() {
+			return _.find(this.get('ads'), function(ad) {
 				if (ad.get('syncStatus') === true) {
 					return true;
 				}
 			});
 		};
 
-		this.hasUnsyncedAds = function () {
-			return _.find(this.get('ads'), function (ad) {
+		this.hasUnsyncedAds = function() {
+			return _.find(this.get('ads'), function(ad) {
 				if (ad.get('syncStatus') === false) {
 					return true;
 				}
 			});
 		};
 
-		this.getUnsyncedAd = function () {
-			return _.find(this.get('ads'), function (ad) {
+		this.getUnsyncedAd = function() {
+			return _.find(this.get('ads'), function(ad) {
 				return !ad.get('syncStatus'); // when ad is unsynced
 			});
 		};
 
-		this.getUnsyncedAds = function (networkName) {
-			return _.filter(this.get('ads'), function (ad) {
+		this.getUnsyncedAds = function(networkName) {
+			return _.filter(this.get('ads'), function(ad) {
 				return !ad.get('syncStatus') && ad.get('network') === networkName; // when ad is unsynced
 			});
 		};
 
-		this.getAdByVariationName = function (variationName) {
-			return _.find(this.get('ads'), function (ad) {
+		this.getAdByVariationName = function(variationName) {
+			return _.find(this.get('ads'), function(ad) {
 				return variationName === ad.get('variationName');
 			});
 		};
 
 		this.syncAdsenseAdslot = Promise.method(
-			function (variationName, adslot) {
+			function(variationName, adslot) {
 				var ad = this.getAdByVariationName(variationName);
 				if (!ad) {
 					throw new AdPushupError('No ad with variationName: ' + variationName);
@@ -199,10 +201,10 @@ var model = require('../helpers/model'),
 		);
 
 		this.syncAdsenseAds = Promise.method(
-			function (ads) {
+			function(ads) {
 				var ad = null,
 					self = this;
-				_.each(ads, function (adJson) {
+				_.each(ads, function(adJson) {
 					if (!adJson.adslot) {
 						return true;
 					}
@@ -220,7 +222,7 @@ var model = require('../helpers/model'),
 
 function apiModule() {
 	var API = {
-		createSite: function (data) {
+		createSite: function(data) {
 			var json = {
 				siteName: data.siteName,
 				siteDomain: data.siteDomain,
@@ -245,21 +247,21 @@ function apiModule() {
 				json.apConfigs.isAdPushupControlWithPartnerSSP = false;
 			}
 
-			return globalModel.incrSiteIdInApAppBucket().then(function (siteId) {
+			return globalModel.incrSiteIdInApAppBucket().then(function(siteId) {
 				json.siteId = siteId;
 				return API.saveSiteData(siteId, 'POST', json);
 			});
 		},
-		getSiteById: function (siteId, requestMethod) {
+		getSiteById: function(siteId, requestMethod) {
 			return couchbase
 				.connectToAppBucket()
-				.then(function (appBucket) {
+				.then(function(appBucket) {
 					return appBucket.getAsync('site::' + siteId, {});
 				})
-				.then(function (json) {
+				.then(function(json) {
 					return new Site(json.value, json.cas);
 				})
-				.catch(function (err) {
+				.catch(function(err) {
 					if (err.code === 13) {
 						throw new AdPushupError([{ status: 404, message: 'Site does not exist' }]);
 					}
@@ -267,9 +269,9 @@ function apiModule() {
 					return false;
 				});
 		},
-		updateSite: function (json) {
+		updateSite: function(json) {
 			return API.getSiteById(json.siteId)
-				.then(function (site) {
+				.then(function(site) {
 					// var isAdSensePublisherId = !!(json.publisherId && site.get('adsensePublisherId'));
 
 					if (json.publisherId) {
@@ -281,7 +283,7 @@ function apiModule() {
 
 					return site.save();
 				})
-				.catch(function (err) {
+				.catch(function(err) {
 					if (err.message[0].status === 404) {
 						throw new AdPushupError([{ status: 404, message: 'Site does not exist' }]);
 					}
@@ -289,27 +291,27 @@ function apiModule() {
 					throw new AdPushupError([{ status: 500, message: 'Some error occurred' }]);
 				});
 		},
-		createSiteFromJson: function (json) {
+		createSiteFromJson: function(json) {
 			return Promise.resolve(new Site(json));
 		},
-		deleteSite: function (siteId) {
+		deleteSite: function(siteId) {
 			/**
 			 * delete all original Channel documents and creates archive documents with key _chnl
 			 * @param {object} site site model {}
 			 * @returns {array} deleted channels array
 			 */
 			function getDeleteChannelsPromises(site) {
-				return _(site.get('channels')).map(function (channel) {
+				return _(site.get('channels')).map(function(channel) {
 					var channelArr = channel.split(':'),
 						platform = channelArr[0],
 						pageGroup = channelArr[1];
 
 					return channelModel
 						.deleteChannel(siteId, platform, pageGroup)
-						.then(function () {
+						.then(function() {
 							return platform + ':' + pageGroup;
 						})
-						.catch(function () {
+						.catch(function() {
 							throw new AdPushupError('getDeleteChannelsPromises: Channel is not deleted');
 						});
 				});
@@ -322,15 +324,15 @@ function apiModule() {
 			 */
 			function deleteAllChannels(site) {
 				return Promise.all(getDeleteChannelsPromises(site))
-					.then(function (channelArr) {
+					.then(function(channelArr) {
 						return channelArr;
 					})
-					.catch(function () {
+					.catch(function() {
 						throw new AdPushupError('deleteAllChannels: Channels are not deleted');
 					});
 			}
 
-			return Promise.all([API.getSiteById(siteId), couchbase.connectToAppBucket()]).spread(function (
+			return Promise.all([API.getSiteById(siteId), couchbase.connectToAppBucket()]).spread(function(
 				site,
 				appBucket
 			) {
@@ -338,7 +340,7 @@ function apiModule() {
 					Promise.resolve(deleteAllChannels(site))
 						// .then(function(deleteChannelsArr) {
 						// deletedChannelsArr argument can be used if required
-						.then(function () {
+						.then(function() {
 							return Promise.all([
 								appBucket.upsertAsync('_' + site.key, site.toJSON(), {}),
 								appBucket.removeAsync(site.key, {})
@@ -347,7 +349,7 @@ function apiModule() {
 				);
 			});
 		},
-		saveSiteSettings: function (json) {
+		saveSiteSettings: function(json) {
 			const setPagegroupPattern = patterns => {
 				Object.keys(patterns).forEach(pattern => {
 					patterns[pattern].forEach(p => {
@@ -386,51 +388,51 @@ function apiModule() {
 				return site.save();
 			});
 		},
-		getSetupStep: function (siteId) {
+		getSetupStep: function(siteId) {
 			return API.getSiteById(siteId)
-				.then(function (site) {
+				.then(function(site) {
 					var step = site.get('step');
 					return step;
 				})
-				.catch(function (err) {
+				.catch(function(err) {
 					throw new AdPushupError('Cannot get setup step');
 				});
 		},
-		getCmsData: function (siteId) {
+		getCmsData: function(siteId) {
 			return API.getSiteById(siteId)
-				.then(function (site) {
+				.then(function(site) {
 					var cms = site.get('cmsInfo');
 					return cms;
 				})
-				.catch(function (err) {
+				.catch(function(err) {
 					throw new AdPushupError('Cannot get cms data');
 				});
 		},
-		setSiteStep: function (siteId, step) {
+		setSiteStep: function(siteId, step) {
 			return API.getSiteById(siteId)
-				.then(function (site) {
+				.then(function(site) {
 					site.set('step', parseInt(step));
 					return site.save();
 				})
-				.catch(function (err) {
+				.catch(function(err) {
 					throw new AdPushupError('Cannot get setup step');
 				});
 		},
-		getSitePageGroups: function (siteId) {
-			return API.getSiteById(parseInt(siteId)).then(function (site) {
-				var pageGroupPromises = _.map(site.get('channels'), function (channel) {
+		getSitePageGroups: function(siteId) {
+			return API.getSiteById(parseInt(siteId)).then(function(site) {
+				var pageGroupPromises = _.map(site.get('channels'), function(channel) {
 					var pageGroup = channel.split(':');
-					return channelModel.getChannel(siteId, pageGroup[0], pageGroup[1]).then(function (channel) {
+					return channelModel.getChannel(siteId, pageGroup[0], pageGroup[1]).then(function(channel) {
 						return channel.data;
 					});
 				});
 
-				return Promise.all(pageGroupPromises).then(function (pageGroups) {
+				return Promise.all(pageGroupPromises).then(function(pageGroups) {
 					return pageGroups;
 				});
 			});
 		},
-		getUniquePageGroups: function (siteId) {
+		getUniquePageGroups: function(siteId) {
 			function getVariationFreeApexPageGroup(pageGroup) {
 				var arr = pageGroup.split('_');
 				arr.splice(2, 1);
@@ -439,7 +441,7 @@ function apiModule() {
 
 			function getApexPageGroups(pageGroups) {
 				var computedPageGroups = _.uniq(
-					_.map(pageGroups, function (pageGroup) {
+					_.map(pageGroups, function(pageGroup) {
 						return getVariationFreeApexPageGroup(pageGroup);
 					})
 				).sort();
@@ -447,9 +449,9 @@ function apiModule() {
 				return computedPageGroups;
 			}
 
-			return API.getSiteById(siteId).then(function (site) {
+			return API.getSiteById(siteId).then(function(site) {
 				var pageGroups = _.uniq(
-					_.map(site.get('channels'), function (val) {
+					_.map(site.get('channels'), function(val) {
 						return val.split(':')[1];
 					})
 				).sort();
@@ -461,18 +463,19 @@ function apiModule() {
 				return Promise.resolve(pageGroups);
 			});
 		},
-		saveSiteData: function (siteId, requestMethod, siteData) {
+		saveSiteData: function(siteId, requestMethod, siteData) {
 			return API.getSiteById(siteId, requestMethod)
 				.then(
-				function (site) {
-					site.setAll(siteData);
-					return site;
-				},
-				function () {
-					return API.createSiteFromJson(siteData);
-				}
+					function(site) {
+						site.setAll(siteData);
+						return site;
+					},
+					function() {
+						siteData = Object.assign(siteData, { isManual: true });
+						return API.createSiteFromJson(siteData);
+					}
 				)
-				.then(function (site) {
+				.then(function(site) {
 					return site.save();
 				});
 		}

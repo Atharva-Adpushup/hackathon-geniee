@@ -21,6 +21,7 @@ var modelAPI = (module.exports = apiModule()),
 	request = require('request-promise'),
 	pipedriveAPI = require('../misc/vendors/pipedrive'),
 	mailService = require('../services/mailService/index'),
+	{ mailService } = require('node-utils'),
 	User = model.extend(function() {
 		this.keys = [
 			'firstName',
@@ -48,7 +49,9 @@ var modelAPI = (module.exports = apiModule()),
 			'revenueLowerLimit',
 			'revenueAverage',
 			'adnetworkCredentials',
-			'miscellaneous'
+			'miscellaneous',
+			'billingInfoComplete',
+			'paymentInfoComplete'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
@@ -57,7 +60,9 @@ var modelAPI = (module.exports = apiModule()),
 		this.defaults = {
 			sites: [],
 			adNetworkSettings: [],
-			requestDemo: true
+			// requestDemo: true
+			// Commented for Tag Manager
+			requestDemo: false
 		};
 		this.ignore = ['password', 'oldPassword', 'confirmPassword', 'site'];
 
@@ -79,7 +84,7 @@ var modelAPI = (module.exports = apiModule()),
 			return Promise.resolve(_.find(this.get('sites'), { siteId: siteId }));
 		};
 
-		this.addSite = function(domain) {
+		this.addSite = function(domain, isManual) {
 			var me = this,
 				normalizedDomain = normalizeurl(domain);
 
@@ -88,8 +93,8 @@ var modelAPI = (module.exports = apiModule()),
 					return site;
 				}
 				return globalModel.incrSiteIdInApAppBucket().then(function(siteId) {
-					me.get('sites').push({ siteId: siteId, domain: normalizedDomain });
-					return { siteId: siteId, domain: normalizedDomain };
+					me.get('sites').push({ siteId: siteId, domain: normalizedDomain, isManual: isManual });
+					return { siteId: siteId, domain: normalizedDomain, isManual: isManual };
 				});
 			});
 		};
@@ -237,6 +242,14 @@ function isPipeDriveAPIActivated() {
 	);
 }
 
+function isManualTagsActivated() {
+	return !!(
+		Config.hasOwnProperty('analytics') &&
+		Config.analytics.hasOwnProperty('manualTagsActivated') &&
+		Config.analytics.manualTagsActivated
+	);
+}
+
 function isEmailInAnalyticsBlockList(email) {
 	const blockList = consts.analytics.emailBlockList,
 		isEmailInBLockList = blockList.indexOf(email) > -1;
@@ -270,6 +283,39 @@ function setSiteLevelPipeDriveData(user, inputData) {
 
 	user.set('sites', allSites);
 	return Promise.resolve(user);
+}
+
+function sendUserSignupMail(json) {
+	const Mailer = new mailService({
+			MAIL_FROM: 'services.daemon@adpushup.com',
+			MAIL_FROM_NAME: 'AdPushup Mailer',
+			SMTP_SERVER: Config.email.SMTP_SERVER,
+			SMTP_USERNAME: Config.email.SMTP_USERNAME,
+			SMTP_PASSWORD: Config.email.SMTP_PASSWORD
+		}),
+		template = json => {
+			return `
+				<h3>Email:</h3>
+				<h4>${json.email}</h4>
+				<hr/>
+				<h3>Revenue:</h3>
+				<h4>${json.websiteRevenue || 'N/A'}</h4>
+				<hr/>
+				<h3>Name:</h3>
+				<h4>${json.firstName} ${json.lastName}</h4>
+				<hr/>
+				<h3>Site:</h3>
+				<h4>${json.site}</h4>
+				<hr/>
+			`;
+		};
+
+	return Mailer.send({
+		to: Config.email.MAIL_FROM,
+		subject: 'New User Signup - Tag Manager',
+		body: template(json),
+		type: 'html'
+	});
 }
 
 function apiModule() {
@@ -553,7 +599,12 @@ function apiModule() {
 							.then(function(user) {
 								const isUserTypePartner = !!(json.userType && json.userType === 'partner'),
 									isAPIActivated = isPipeDriveAPIActivated(),
+									isManualTagActivated = isManualTagsActivated(),
 									isEmailInBLockList = isEmailInAnalyticsBlockList(json.email);
+
+								if (isManualTagActivated) {
+									sendUserSignupMail(json).then(console.log);
+								}
 
 								if (isUserTypePartner || !isAPIActivated || isEmailInBLockList) {
 									return [user, {}];
@@ -567,7 +618,8 @@ function apiModule() {
 										dealId: pipedriveData.dealId || false,
 										domain: json.site
 									},
-									addUserSite = user.addSite(json.site),
+									isManualTagActivated = isManualTagsActivated() || false,
+									addUserSite = user.addSite(json.site, isManualTagActivated),
 									setPipeDriveData = addUserSite.then(addedSiteData => {
 										return setSiteLevelPipeDriveData(user, pipedriveParams);
 									});

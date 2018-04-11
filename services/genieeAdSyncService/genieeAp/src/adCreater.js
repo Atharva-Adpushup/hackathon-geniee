@@ -17,9 +17,16 @@ var $ = require('jquery'),
 			structuredAds = [],
 			inContentAds = [],
 			adpTagUnits = [],
+			externalTriggerAds = [],
 			genieeIds = [];
 		for (a = 0; a < ads.length; a++) {
 			ad = ads[a];
+
+			if (ad.type === commonConsts.AD_TYPES.EXTERNAL_TRIGGER_AD) {
+				externalTriggerAds.push(ad);
+				continue;
+			}
+
 			ad.isIncontent ? inContentAds.push(ad) : null;
 			ad.network === 'geniee' &&
 				ad.networkData &&
@@ -46,7 +53,8 @@ var $ = require('jquery'),
 			structuredAds: structuredAds,
 			inContentAds: inContentAds,
 			genieeIds: genieeIds,
-			adpTagUnits: adpTagUnits
+			adpTagUnits: adpTagUnits,
+			externalTriggerAds: externalTriggerAds
 		};
 	},
 	getContainer = function(ad, el) {
@@ -106,9 +114,32 @@ var $ = require('jquery'),
 			});
 		return defer.promise();
 	},
+	placeAd = function(container, ad) {
+		var adp = window.adpushup;
+
+		try {
+			$.ajaxSettings.cache = true;
+			container.append(adCodeGenerator.generateAdCode(ad));
+			$.ajaxSettings.cache = false;
+
+			if (ad.type && Number(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL) {
+				// Type 4 is DOCKED
+				utils.dockify.dockifyAd('#' + ad.id, ad.formatData, utils);
+			}
+
+			adp.tracker.add(
+				container,
+				function(id) {
+					utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: id });
+				}.bind(adp, ad.id)
+			);
+		} catch (e) {
+			adp.err.push({ msg: 'Error in placing ad.', ad: ad, error: e });
+		}
+		return true;
+	},
 	createAds = function(adp, variation) {
 		var config = adp.config,
-			tracker = adp.tracker,
 			err = adp.err,
 			finished = false,
 			ads = variation.ads,
@@ -165,28 +196,6 @@ var $ = require('jquery'),
 			placeGenieeHeadCode = function(genieeIds) {
 				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIds);
 				genieeHeadCode && $('head').append(genieeHeadCode);
-			},
-			placeAd = function(container, ad) {
-				try {
-					$.ajaxSettings.cache = true;
-					container.append(adCodeGenerator.generateAdCode(ad));
-					$.ajaxSettings.cache = false;
-
-					if (ad.type && Number(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL) {
-						// Type 4 is DOCKED
-						utils.dockify.dockifyAd('#' + ad.id, ad.formatData, utils);
-					}
-
-					tracker.add(
-						container,
-						function(id) {
-							utils.sendBeacon(config.feedbackUrl, { eventType: 2, click: true, id: id });
-						}.bind(null, ad.id)
-					);
-				} catch (e) {
-					err.push({ msg: 'Error in placing ad.', ad: ad, error: e });
-				}
-				return true;
 			},
 			next = function(adObj, data) {
 				if (displayCounter) {
@@ -313,4 +322,7 @@ var $ = require('jquery'),
 		})();
 	};
 
-module.exports = createAds;
+module.exports = {
+	createAds: createAds,
+	placeAd: placeAd
+};

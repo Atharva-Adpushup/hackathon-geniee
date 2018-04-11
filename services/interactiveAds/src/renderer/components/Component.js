@@ -29,7 +29,7 @@ class Component {
 				ads: [id],
 				xpathMiss: [],
 				eventType: 1,
-				mode: 1,
+				mode: window.adpushup.config.mode,
 				referrer: adp.config.referrer,
 				tracking: false,
 				variationId: adp.config.selectedVariation

@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { networks, defaultPriceFloorKey } from '../../../consts/commonConsts';
-import CodeBox from 'shared/codeBox';
-import SelectBox from 'shared/select/select';
+import CodeBox from '../codeBox';
+import SelectBox from '../select/select';
 import AdpTags from './AdpTags';
 import Adsense from './Adsense';
 import OtherNetworks from './OtherNetworks';
@@ -78,7 +78,7 @@ class NetworkOptions extends Component {
 				Object.keys(this.props.ad.networkData.keyValues).length,
 			fpKey = pfKeyExists
 				? Object.keys(this.props.ad.networkData.keyValues).filter(key => key.match(/FP/g))[0] ||
-					defaultPriceFloorKey
+				  defaultPriceFloorKey
 				: defaultPriceFloorKey,
 			priceFloor = pfKeyExists ? this.props.ad.networkData.keyValues[fpKey] : 0,
 			headerBidding =

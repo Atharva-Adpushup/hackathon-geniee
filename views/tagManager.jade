@@ -1,0 +1,31 @@
+//- Tag Manager interface
+
+extends layout/base
+
+block getTitle
+	- var titleVar = "Tag Manager"	
+
+block append headScripts
+	- siteId = siteId ? siteId : false
+	script.
+		window.siteId = !{siteId}
+		window.isSuperUser = !{isSuperUser}
+
+block append headCss
+	if environment == "production"
+		link(href="/assets/css/builds/tagManager.min.css", rel="stylesheet", type="text/css")
+	else
+		link(href="/assets/css/libs/tagManager.css", rel="stylesheet", type="text/css")
+
+
+block bodyContent
+	include layout/sideBar
+	.pageContainer.page-container
+		include layout/header
+		.pageContentWrapper.page-content
+			.pageContentInner.page-content--inner
+				.loaderwrapper.spinner
+					img(src="/assets/images/loaderLogo.png")
+				#tagManagerPanel
+
+	script(src="/assets/js/builds/tagManager.js")

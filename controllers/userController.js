@@ -49,8 +49,8 @@ function dashboardRedirection(req, res, allUserSites, type) {
 		return _.map(allUserSites, function(obj) {
 			return siteModel
 				.getSiteById(obj.siteId)
-				.then(function() {
-					return obj;
+				.then(function(site) {
+					return Object.assign(obj, { isManual: site.get('isManual') || false });
 				})
 				.catch(function() {
 					return 'inValidSite';
@@ -70,6 +70,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 		 * no saved any site through Visual Editor
 		 * - Value is Falsy if user has atleast one saved site
 		 */
+
 		unSavedSite = sites.length === 0 ? allUserSites : null;
 		req.session.unSavedSite = unSavedSite;
 
@@ -92,6 +93,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 						domain: site.domain,
 						siteId: site.siteId,
 						step: site.step,
+						isManual: site.isManual,
 						reportData
 					};
 				});
@@ -179,13 +181,14 @@ function preOnboardingPageRedirection(page, req, res) {
 		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = primarySiteDetails.pipeDrive.dealTitle;
 	}
 
-	if (isUserSession) {
-		// Only user sub object is deleted, not the entire session object.
-		// This is done to ensure session object is maintained and consist of
-		// user primary site details that are used on open routes pages
-		// such as '/tools' and '/thank-you' pages
-		delete req.session.user;
-	}
+	// Commented for Tag Manager
+	// if (isUserSession) {
+	// // Only user sub object is deleted, not the entire session object.
+	// // This is done to ensure session object is maintained and consist of
+	// // user primary site details that are used on open routes pages
+	// // such as '/tools' and '/thank-you' pages
+	// 	delete req.session.user;
+	// }
 
 	return res.render(page, {
 		imageHeaderLogo: true,
@@ -212,6 +215,9 @@ router
 	.get('/onboarding', function(req, res) {
 		var allUserSites = req.session.user.sites;
 		return dashboardRedirection(req, res, allUserSites, 'onboarding');
+	})
+	.get('/onboarding-complete', function(req, res) {
+		return preOnboardingPageRedirection('onboarding-complete', req, res);
 	})
 	.get('/requestdemo', function(req, res) {
 		return preOnboardingPageRedirection('request-demo', req, res);
@@ -283,9 +289,21 @@ router
 			});
 	})
 	.get('/billing', function(req, res) {
-		res.render('billing', {
+		if (req.session.user.billingInfoComplete) {
+			return res.redirect('/user/dashboard');
+		}
+		return res.render('billing', {
 			user: req.session.user,
-			isSuperUser: true
+			isSuperUser: !!req.session.isSuperUser
+		});
+	})
+	.get('/payment', function(req, res) {
+		if (req.session.user.paymentInfoComplete) {
+			return res.redirect('/user/dashboard');
+		}
+		return res.render('payment', {
+			user: req.session.user,
+			isSuperUser: !!req.session.isSuperUser
 		});
 	})
 	.get('/connectGoogle', function(req, res) {
@@ -399,18 +417,19 @@ router
 								if (isIncompleteOnboardingSteps) {
 									return res.redirect('/user/onboarding');
 								}
-								if (!user.get('requestDemo')) {
-									return res.redirect('/user/dashboard');
-								} else {
-									return res.redirect('/thankyou');
-								}
+								return res.redirect('/user/dashboard');
+								// if (!user.get('requestDemo')) {
+								// 	return res.redirect('/user/dashboard');
+								// } else {
+								// 	return res.redirect('/thankyou');
+								// }
 							} else {
 								return res.redirect('/user/dashboard');
 							}
 						} else {
-							if (isRequestDemo) {
-								return requestDemoRedirection(res);
-							}
+							// if (isRequestDemo) {
+							// 	return requestDemoRedirection(res);
+							// }
 
 							return res.redirect('/user/onboarding');
 						}

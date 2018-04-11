@@ -1,22 +1,38 @@
 extends layout/base
 
 block getTitle
-    - var titleVar = "Billing - AdPushup"
+	- var titleVar = "Billing - AdPushup"
+
+block append headScripts
+	script(src="https://embed.typeform.com/embed.js")
 
 block bodyContent
-    include layout/sideBar
+	include layout/sideBar
 
-    .pageContainer
-        include layout/header
-        // Page Content Starts Here
-        .pageContentWrapper
-            .pageContentInner
-                // Control v/s Adpushup Starts here
-                .controlAdpushupWrap.col-sm-12.mb-30.pd-20
-                    h3 We'll be coming out with paid plans soon.
-                    br
-                    h4
-                        | Don't worry, we'll give a heads-up in time.
-                        br
-                        br
-                        | AdPushup is on the house till then! :)
+	.pageContainer
+		include layout/header
+		// Page Content Starts Here
+		.pageContentWrapper
+			.pageContentInner
+				// Control v/s Adpushup Starts here
+				.controlAdpushupWrap.col-sm-12.mb-30.pd-20
+					div(id="typeform-adpushup", style="height: 600px;")
+
+	script.
+		var cb = function() {
+			$.ajax({
+				method: 'POST',
+				url: '/completeInfo',
+				headers: { 'Content-Type': 'application/json' },
+				data: JSON.stringify({email: currentUser.email, key: 'billingInfoComplete'}),
+				contentType: 'json',
+				dataType: 'json',
+				success: function() {
+					console.log("Billing Complete");
+				},
+				fail: function() {
+					console.log("Billing Failed");
+				}
+			});
+		};
+		typeformEmbed.makeWidget(document.getElementById('typeform-adpushup'), 'https://adpushup1.typeform.com/to/abujYx', {onSubmit: cb})

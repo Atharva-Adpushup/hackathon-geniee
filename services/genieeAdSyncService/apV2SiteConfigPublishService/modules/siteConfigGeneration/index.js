@@ -1,6 +1,14 @@
-var _ = require('lodash'),
+const _ = require('lodash'),
 	Promise = require('bluebird'),
-	genieeZoneSyncService = require('../../../genieeZoneSyncService/index');
+	genieeZoneSyncService = require('../../../genieeZoneSyncService/index'),
+	config = require('../../../../../configs/config'),
+	{ docKeys } = require('../../../../../configs/commonConsts'),
+	{ couchbaseService } = require('node-utils'),
+	appBucket = couchbaseService(
+		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
+		config.couchBase.DEFAULT_BUCKET,
+		config.couchBase.DEFAULT_BUCKET_PASSWORD
+	);
 
 function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 	let unsyncedGenieeZones = [],
@@ -26,11 +34,11 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 					pageGroupId: isPageGroupId ? channelWithZones.channel.genieePageGroupId : '',
 					channelKey: isChannel
 						? 'chnl::' +
-							siteModelItem.get('siteId') +
-							':' +
-							channelWithZones.channel.platform +
-							':' +
-							channelWithZones.channel.pageGroup
+						  siteModelItem.get('siteId') +
+						  ':' +
+						  channelWithZones.channel.platform +
+						  ':' +
+						  channelWithZones.channel.pageGroup
 						: ''
 				});
 			}
@@ -41,11 +49,11 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 					pageGroupId: isPageGroupId ? channelWithZones.channel.genieePageGroupId : '',
 					channelKey: isChannel
 						? 'chnl::' +
-							siteModelItem.get('siteId') +
-							':' +
-							channelWithZones.channel.platform +
-							':' +
-							channelWithZones.channel.pageGroup
+						  siteModelItem.get('siteId') +
+						  ':' +
+						  channelWithZones.channel.platform +
+						  ':' +
+						  channelWithZones.channel.pageGroup
 						: ''
 				});
 			}
@@ -63,12 +71,62 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 	});
 }
 
+function tagManagerAdsSyncing(currentDataForSyncing, site) {
+	/**
+	 * FLOW:
+	 * 1. Read Tag Manager Doc
+	 * 2. Fetch Ads
+	 * 3. Filter Unsynced Ads
+	 * 4. Set Dummy values to some variables to compliment current working flow
+	 * 5. Concat ads from Tag manager to current adp.ads
+	 */
+	return appBucket
+		.getDoc(`${docKeys.tagManager}${site.get('siteId')}`)
+		.then(docWithCas => {
+			const ads = docWithCas.value.ads,
+				unSyncedAds = _.compact(
+					_.map(ads, ad => {
+						return ad.network && ad.network == 'adpTags'
+							? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)
+							: false;
+					})
+				);
+			currentDataForSyncing.adp.ads = unSyncedAds.length
+				? _.concat(currentDataForSyncing.adp.ads, unSyncedAds)
+				: currentDataForSyncing.adp.ads;
+			return currentDataForSyncing;
+		})
+		.catch(err => {
+			return err.name && err.name == 'CouchbaseError' && err.code == 13
+				? currentDataForSyncing
+				: Promise.reject(err);
+		});
+}
+
+/**
+ * TODO:
+ * 1. Ads Syncing from Manaul Doc for ADP
+ * 2. Ads Syncing from Manaul Doc for Geniee
+ */
+
 function getGeneratedPromises(siteModelItem) {
 	return genieeZoneSyncService
 		.getAllUnsyncedZones(siteModelItem)
-		.then(channelAndZones => generateSiteChannelJSON(channelAndZones, siteModelItem));
+		.then(channelAndZones => generateSiteChannelJSON(channelAndZones, siteModelItem))
+		.then(currentDataForSyncing => tagManagerAdsSyncing(currentDataForSyncing, siteModelItem));
 }
 
 module.exports = {
 	generate: getGeneratedPromises
 };
+
+/**
+ * Tag Manager
+ * 1. Sign up --> Tag Manager Dashboard
+ * 2. Tag Manager Dashboard --> Change text to "Create your ad"
+ * 3. Segment Integrate
+ * 4. Payment Options to Sidebar
+ * 5. Call to Zapier when sign up
+ * 6. Live chat close
+ * 7. Segment on -- Mixpanel
+ */
