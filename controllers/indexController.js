@@ -215,11 +215,12 @@ function setSessionData(user, req, res, type) {
 							if (req.session.isSuperUser) {
 								return res.redirect('/user/dashboard');
 							}
-							if (!user.get('requestDemo')) {
-								return res.redirect('/user/dashboard');
-							} else {
-								return res.redirect('/thankyou');
-							}
+							return res.redirect('/user/dashboard');
+							// if (!user.get('requestDemo')) {
+							// 	return res.redirect('/user/dashboard');
+							// } else {
+							// 	return res.redirect('/thankyou');
+							// }
 						} else {
 							return res.redirect('/user/dashboard');
 						}
