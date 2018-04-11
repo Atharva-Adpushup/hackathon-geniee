@@ -19,13 +19,21 @@ const Promise = require('bluebird'),
 							if (ads && Object.keys(ads).length) {
 								_.forEach(ads, ad => {
 									if (ad.network == 'geniee' && ad.networkData) {
+										const isAdDynamicAllocation = !!(
+												ad.networkData &&
+												ad.networkData.hasOwnProperty('dynamicAllocation') &&
+												ad.networkData.dynamicAllocation
+											),
+											isDFPAdUnit = !!(isAdDynamicAllocation && ad.networkData.dfpAdunit),
+											isDFPAdUnitCode = !!(isAdDynamicAllocation && ad.networkData.dfpAdunitCode);
+
 										output.zones[ad.networkData.zoneId] = output.zones[ad.networkData.zoneId] || {};
 										output.zones[ad.networkData.zoneId].sections =
 											output.zones[ad.networkData.zoneId].sections || {};
 
 										output.zones[ad.networkData.zoneId].sections[section.id] = {
-											dfpAdunit: ad.networkData.dfpAdunit || '',
-											dfpAdunitCode: ad.networkData.dfpAdunitCode || '',
+											dfpAdunit: isDFPAdUnit ? ad.networkData.dfpAdunit : '',
+											dfpAdunitCode: isDFPAdUnitCode ? ad.networkData.dfpAdunitCode : '',
 											variationId: variation.id,
 											genieePageGroupId: channel.genieePageGroupId
 										};
@@ -51,7 +59,7 @@ const Promise = require('bluebird'),
 						? response
 						: {
 								message: 'No Zones found'
-							}
+						  }
 			);
 	};
 
