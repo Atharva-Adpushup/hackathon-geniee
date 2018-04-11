@@ -192,7 +192,6 @@ module.exports = {
 	tagManagerInitialDoc: {
 		siteId: null,
 		ownerEmail: null,
-		createdat: null,
 		ads: []
 	},
 	videoNetworkInfo: {
