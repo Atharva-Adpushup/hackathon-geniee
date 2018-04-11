@@ -417,18 +417,19 @@ router
 								if (isIncompleteOnboardingSteps) {
 									return res.redirect('/user/onboarding');
 								}
-								if (!user.get('requestDemo')) {
-									return res.redirect('/user/dashboard');
-								} else {
-									return res.redirect('/thankyou');
-								}
+								return res.redirect('/user/dashboard');
+								// if (!user.get('requestDemo')) {
+								// 	return res.redirect('/user/dashboard');
+								// } else {
+								// 	return res.redirect('/thankyou');
+								// }
 							} else {
 								return res.redirect('/user/dashboard');
 							}
 						} else {
-							if (isRequestDemo) {
-								return requestDemoRedirection(res);
-							}
+							// if (isRequestDemo) {
+							// 	return requestDemoRedirection(res);
+							// }
 
 							return res.redirect('/user/onboarding');
 						}
