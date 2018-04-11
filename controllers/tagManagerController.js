@@ -18,12 +18,13 @@ const express = require('express'),
 
 const fn = {
 	createNewDocAndDoProcessing: payload => {
+		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
 		return appBucket
-			.createDoc(`${docKeys.tagManager}${payload.siteId}`, tagManagerInitialDoc, {})
+			.createDoc(`${docKeys.tagManager}${payload.siteId}`, tagManagerDefault, {})
 			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
 			.then(docWithCas => {
 				payload.siteDomain = docWithCas.value.siteDomain;
-				return fn.processing(tagManagerInitialDoc, payload);
+				return fn.processing(tagManagerDefault, payload);
 			});
 	},
 	processing: (data, payload) => {
