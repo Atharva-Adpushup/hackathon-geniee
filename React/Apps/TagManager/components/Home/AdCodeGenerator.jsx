@@ -180,7 +180,7 @@ class AdCodeGenerator extends Component {
 			<Col xs={12}>
 				{showAdCode ? <pre>{code.replace(/__AD_ID__/g, this.state.adId).trim()}</pre> : null}
 				<CustomMessage header="Information" type="info" message={message} />
-				<CustomButton label="Generate More" handler={this.resetHandler} />
+				<CustomButton label="Create More Ads" handler={this.resetHandler} />
 				{showAdCode ? (
 					<CustomButton
 						label="Copy Adcode"
