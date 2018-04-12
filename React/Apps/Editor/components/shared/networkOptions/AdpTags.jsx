@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
-import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Row, Col, Button, OverlayTrigger, Tooltip, Alert } from 'react-bootstrap';
 // import _ from 'lodash';
 import CodeBox from '../codeBox';
 import { priceFloorKeys } from '../../../consts/commonConsts';
@@ -24,6 +24,7 @@ class AdpTags extends Component {
 		this.save = this.save.bind(this);
 		this.renderButtons = this.renderButtons.bind(this);
 		this.renderNonAdvanced = this.renderNonAdvanced.bind(this);
+		this.renderGenieeNote = this.renderGenieeNote.bind(this);
 		this.toggleAdvance = this.toggleAdvance.bind(this);
 		this.advanceSubmit = this.advanceSubmit.bind(this);
 		this.filterKeyValues = this.filterKeyValues.bind(this);
@@ -114,12 +115,26 @@ class AdpTags extends Component {
 		});
 	}
 
+	renderGenieeNote() {
+		return (
+				<Row>
+					<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+						<Alert bsStyle="warning">
+							<strong>NOTE:</strong> <i><b>Geniee Zone Id</b> and <b>Dynamic Allocation</b> fields are non-editable.</i>
+						</Alert>
+					</Col>
+				</Row>
+		)
+	}
+
 	renderNonAdvanced() {
-		const { showButtons, onCancel, buttonType } = this.props,
-			code = this.generateCode();
+		const { showButtons, onCancel, buttonType, isInsertMode } = this.props,
+			code = this.generateCode(),
+			isGenieeEditableMode = !!(this.props.geniee && !isInsertMode);
 
 		return (
 			<div>
+				{isGenieeEditableMode ? this.renderGenieeNote() : null}
 				<Row>
 					<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
 						<strong>Price Floor Key</strong>
@@ -163,6 +178,7 @@ class AdpTags extends Component {
 							labelText={this.props.geniee ? 'Dynamic Allocation' : 'Header Bidding'}
 							className="mB-10"
 							checked={this.state.hbAcivated}
+							disabled={isGenieeEditableMode}
 							onChange={val => {
 								this.setState({ hbAcivated: !!val });
 							}}
