@@ -1,5 +1,7 @@
 include ../mixins/mixins
 
+- billingError = Object.keys(currentUser).length && currentUser.userType !== "partner" && (!currentUser.billingInfoComplete || !currentUser.paymentInfoComplete)
+
 doctype html
 html(lang="en")
     block getTitle
@@ -13,6 +15,17 @@ html(lang="en")
                         link(href="/assets/css/builds/website.min.css", rel="stylesheet", type="text/css")
                     else
                         link(href="/assets/css/libs/website.css", rel="stylesheet", type="text/css")
+
+                    if billingError
+                        style.
+                            .sidebar,
+                            .headerTopBar {
+                                top: 55px;
+                            }
+
+                            .pageContainer .pageContentWrapper .pageContentInner {
+                                padding-top: 135px;
+                            }
 
                 link(id="favicon", rel="shortcut icon", href="/assets/images/favicon.ico", sizes="48x48", type="image/png")
                 title #{titleVar + " - AdPushup"}
@@ -92,6 +105,17 @@ html(lang="en")
         - primarySiteDetails = (currentUserSites && currentUserSites.length) ? currentUserSites[0] : {};
         - isRequestDemo = (currentUser && currentUser.requestDemo) ? currentUser.requestDemo : null;
         - isUserOnboarded = (primarySiteDetails && primarySiteDetails.domain && primarySiteDetails.siteId && primarySiteDetails.step) ? true : false;
+
+        if billingError
+            .custom-message.error-text.dashboard-text.billing-error
+                if !currentUser.billingInfoComplete
+                    | To start seeing ads, please complete billing information.
+                    | To complete click 
+                    a(href="/user/billing") here.
+                if !currentUser.paymentInfoComplete
+                    | Please complete payment information.
+                    | To complete click 
+                    a(href="/user/payment") here.
 
         if !excludeAnalytics
             if environment == "production"
