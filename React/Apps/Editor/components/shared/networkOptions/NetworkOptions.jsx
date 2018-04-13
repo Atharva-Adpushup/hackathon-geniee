@@ -162,6 +162,7 @@ class NetworkOptions extends Component {
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						id={this.props.id ? this.props.id : false}
 						showNotification={this.props.showNotification}
+						isInsertMode={this.props.isInsertMode || false}
 					/>
 				);
 				break;

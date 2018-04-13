@@ -66,6 +66,10 @@
 	}
 	&.sectionOptions {
 		padding-bottom: 200px;
+
+		.inputBasic:disabled {
+			background: #f5f5f5;
+		}
 	}
 }
 

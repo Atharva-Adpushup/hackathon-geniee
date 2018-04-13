@@ -85,6 +85,7 @@ const renderField = field => {
 								buttonType={2}
 								fromPanel={true}
 								showNotification={that.props.showNotification}
+								isInsertMode={true}
 							/>
 						</Col>
 					</Row>

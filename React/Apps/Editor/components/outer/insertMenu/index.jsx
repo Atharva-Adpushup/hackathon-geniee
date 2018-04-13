@@ -145,6 +145,7 @@ class insertMenu extends React.Component {
 						onSubmit={this.networkOptionsSubmit}
 						onCancel={this.toggleExtraOptions}
 						showNotification={this.props.showNotification}
+						isInsertMode={true}
 					/>
 				</MenuItem>
 			);
