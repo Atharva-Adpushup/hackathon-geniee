@@ -52,17 +52,4 @@ block bodyContent
                     .notification-wrapper
                     // Control v/s Adpushp Starts here
                     #widgetsArea.row
-                        if !currentUser.billingInfoComplete || !currentUser.paymentInfoComplete
-                            .custom-message.error-text.dashboard-text
-                                h3 Important
-                                hr
-                                if !currentUser.billingInfoComplete
-                                    | To start seeing ads, please complete billing information.
-                                    | To complete click 
-                                    a(href="/user/billing") here.
-                                br
-                                if !currentUser.paymentInfoComplete
-                                    | Please complete payment information.
-                                    | To complete click 
-                                    a(href="/user/payment") here.
                         include layout/dashboardSites
