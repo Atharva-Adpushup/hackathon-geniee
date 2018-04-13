@@ -24,7 +24,16 @@ block append headScripts
 
         script.
             $(document).on('click', '*[data-id*="switch-"]', function() {
-                console.log($(this).attr('data-site-id'));
+                var siteId = $(this).attr('data-site-id');
+                $.post('/user/site/'+siteId+'/updateManualMode', function(res) {
+                    setTimeout(function() {
+                        if(res.success) {
+                            alert('Manual mode setting updated');
+                        } else {
+                            alert('Some error occurred!');
+                        }
+                    }, 500);
+                });
             });
 
 block bodyContent
