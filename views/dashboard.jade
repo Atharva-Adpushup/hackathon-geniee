@@ -22,6 +22,11 @@ block append headScripts
             '/assets/css//third-party/dataTables.css'
         ])    
 
+        script.
+            $(document).on('click', '*[data-id*="switch-"]', function() {
+                console.log($(this).attr('data-site-id'));
+            });
+
 block bodyContent
     //- if isSuperUser || !requestDemo
     include layout/sideBar
