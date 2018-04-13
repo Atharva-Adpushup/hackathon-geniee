@@ -22,6 +22,20 @@ block append headScripts
             '/assets/css//third-party/dataTables.css'
         ])    
 
+        script.
+            $(document).on('click', '*[data-id*="switch-"]', function() {
+                var siteId = $(this).attr('data-site-id');
+                $.post('/user/site/'+siteId+'/updateManualMode', function(res) {
+                    setTimeout(function() {
+                        if(res.success) {
+                            alert('Manual mode setting updated');
+                        } else {
+                            alert('Some error occurred!');
+                        }
+                    }, 500);
+                });
+            });
+
 block bodyContent
     //- if isSuperUser || !requestDemo
     include layout/sideBar

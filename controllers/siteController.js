@@ -109,6 +109,23 @@ router
 				}
 			});
 	})
+	.post('/:siteId/updateManualMode', (req, res) => {
+		const { siteId } = req.params;
+
+		return siteModel
+			.getSiteById(siteId)
+			.then(site => {
+				site.set('isManual', !site.get('isManual'));
+				return site.save();
+			})
+			.then(data => res.status(200).send({ success: 1, data: null, message: 'Manual mode updated!' }))
+			.catch(err => {
+				console.log(err);
+				res
+					.status(500)
+					.send({ success: 0, data: null, message: 'Some error occurred! Please try again later' });
+			});
+	})
 	.post('/:siteId/opsPanel/hbConfig', (req, res) => {
 		const { siteId } = req.params,
 			sitePromise = siteModel.getSiteById(req.params.siteId),
