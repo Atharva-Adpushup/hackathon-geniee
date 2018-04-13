@@ -150,7 +150,7 @@ router
 			.then(docWithCas => {
 				let doc = docWithCas.value;
 				if (doc.ownerEmail != req.session.user.email) {
-					return Promise.reject();
+					return Promise.reject('Owner verfication fail');
 				}
 				if (!doc.ads.length) {
 					doc.ads = req.body.ads;
