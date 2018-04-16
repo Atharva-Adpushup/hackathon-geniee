@@ -30,7 +30,7 @@
 								.replace('https://', '')
 								.replace('www.', ''),
 							'/'
-						)
+					  )
 					: '';
 			}
 		},
@@ -281,6 +281,7 @@
 				return showUiErrors(this, $form, errorsObj);
 			},
 			submitHandler: function(form) {
+				$('#signup-submit').prop('disabled', true);
 				form.submit();
 				return false;
 			},
