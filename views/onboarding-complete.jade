@@ -72,20 +72,20 @@ block append headScripts
 			stage = userInfoObj.stage || 'Request Demo',
 			customVariableObj = {}, property;
 
-		window.__lc = window.__lc || {};
-		window.__lc.license = 6965991;
+		//- window.__lc = window.__lc || {};
+		//- window.__lc.license = 6965991;
 
-		if (isAnalyticsObj) {
-			window.__lc.params = [];
+		//- if (isAnalyticsObj) {
+		//- 	window.__lc.params = [];
 
-			for (property in analyticsObj) {
-				if (analyticsObj.hasOwnProperty(property)) {
-					customVariableObj.name = property;
-					customVariableObj.value = analyticsObj[property];
-					window.__lc.params.push(jQuery.extend(true, {}, customVariableObj));
-				}
-			}
-		}
+		//- 	for (property in analyticsObj) {
+		//- 		if (analyticsObj.hasOwnProperty(property)) {
+		//- 			customVariableObj.name = property;
+		//- 			customVariableObj.value = analyticsObj[property];
+		//- 			window.__lc.params.push(jQuery.extend(true, {}, customVariableObj));
+		//- 		}
+		//- 	}
+		//- }
 
 		//- (function() {
 		//- 	var lc = document.createElement('script'); lc.type = 'text/javascript'; lc.async = true;
