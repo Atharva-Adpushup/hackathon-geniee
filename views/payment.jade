@@ -20,19 +20,12 @@ block bodyContent
 
 	script.
 		var cb = function() {
-			$.ajax({
-				method: 'POST',
-				url: '/completeInfo',
-				headers: { 'Content-Type': 'application/json' },
-				data: JSON.stringify({email: currentUser.email, key: 'paymentInfoComplete'}),
-				contentType: 'json',
-				dataType: 'json',
-				success: function() {
-					console.log("Billing Complete");
-				},
-				fail: function() {
-					console.log("Billing Failed");
-				}
+			$.post('/completeInfo', {
+				email: currentUser.email, 
+				key: 'paymentInfoComplete'
+			}, function(res) {
+				var url = 'http://' + window.location.host + '/user/dashboard';
+				window.location.replace(url);
 			});
 		};
 		typeformEmbed.makeWidget(document.getElementById('typeform-adpushup'), 'https://adpushup1.typeform.com/to/QGSJeq', {onSubmit: cb})
