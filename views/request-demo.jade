@@ -62,9 +62,9 @@ block append headScripts
 	- user = user || {};
 	- analytics = analytics || {};
 
-	+loadAsset("js", [
-		'//assets.calendly.com/assets/external/widget.js'
-	])
+	//- +loadAsset("js", [
+	//- 	'//assets.calendly.com/assets/external/widget.js'
+	//- ])
 	script.
 		var analyticsObj = !{JSON.stringify(analytics)},
 			isAnalyticsObj = !!(analyticsObj && !jQuery.isEmptyObject(analyticsObj)),
@@ -87,11 +87,11 @@ block append headScripts
 			}
 		}
 
-		(function() {
-			var lc = document.createElement('script'); lc.type = 'text/javascript'; lc.async = true;
-			lc.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdn.livechatinc.com/tracking.js';
-			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(lc, s);
-		})();
+		//- (function() {
+		//- 	var lc = document.createElement('script'); lc.type = 'text/javascript'; lc.async = true;
+		//- 	lc.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdn.livechatinc.com/tracking.js';
+		//- 	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(lc, s);
+		//- })();
 	
 
 block bodyContent
