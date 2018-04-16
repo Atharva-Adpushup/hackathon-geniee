@@ -107,7 +107,7 @@ html(lang="en")
         - isRequestDemo = (currentUser && currentUser.requestDemo) ? currentUser.requestDemo : null;
         - isUserOnboarded = (primarySiteDetails && primarySiteDetails.domain && primarySiteDetails.siteId && primarySiteDetails.step) ? true : false;
 
-        if billingError
+        if billingError && !isSuperUser
             .custom-message.error-text.dashboard-text.billing-error
                 if !currentUser.billingInfoComplete
                     | To start seeing ads, please complete billing information.
