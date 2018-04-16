@@ -128,7 +128,8 @@ function dashboardRedirection(req, res, allUserSites, type) {
 							analyticsObj: JSON.stringify(req.session.analyticsObj),
 							imageHeaderLogo: true,
 							buttonHeaderLogout: true,
-							isSuperUser: req.session.isSuperUser
+							isSuperUser: req.session.isSuperUser,
+							isOnboarding: true
 						});
 						break;
 				}
