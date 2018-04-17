@@ -8,6 +8,6 @@ module.exports = function(site) {
 		siteId: site.get('siteId')
 	};
 	return queueWorker.publish(paramConfig).then(function() {
-		return 'Published into Sync Cdn Queue';
+		return 'Published into Sync Cdn Queue ' + site.get('siteId');
 	});
 };
