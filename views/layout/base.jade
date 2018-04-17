@@ -17,7 +17,7 @@ html(lang="en")
                     else
                         link(href="/assets/css/libs/website.css", rel="stylesheet", type="text/css")
 
-                    if billingError
+                    if billingError && !isSuperUser
                         style.
                             .sidebar,
                             .headerTopBar {
