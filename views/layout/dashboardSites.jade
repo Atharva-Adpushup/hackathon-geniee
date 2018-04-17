@@ -174,7 +174,13 @@
                             .pull-right
                                 //- a.btn.btn-lightBg.btn-default.u-margin-r10px(id=("operation-tools-"+ siteId) , href=operationToolsPath, target="_blank") Convert Ad Code
                                 //- a.btn.btn-lightBg.btn-default(id="site-create-pagegroup-" + siteId, href='/user/site/#{siteId}/createPagegroup') Create PageGroup
-                                a.btn.btn-lightBg.btn-default(id="site-tag-manager-" + siteId, href='/tagmanager/#{siteId}') Tags Manager
+                                a.btn.btn-lightBg.btn-default(id="site-tag-manager-" + siteId, href='/tagmanager/#{siteId}') 
+                                    i.fa.fa-code   
+                                    |  Tags Manager
+                                if isSuperUser
+                                    a.btn.btn-lightBg.btn-default(title="Open site info panel" href='/ops/settings/#{siteId}' style="margin-left: 5px;") 
+                                        i.fa.fa-wrench 
+                                        |  Info Panel
                         section
                             .site-status
                                 //- h4
