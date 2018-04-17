@@ -32,7 +32,7 @@ class Component {
 				mode: window.adpushup.config.mode,
 				referrer: adp.config.referrer,
 				tracking: false,
-				variationId: adp.config.selectedVariation
+				variationId: !adp.config.hasManualAds ? adp.config.selectedVariation : commonConsts.MANUAL_ADS.VARIATION
 			};
 
 		switch (formatData.type) {
