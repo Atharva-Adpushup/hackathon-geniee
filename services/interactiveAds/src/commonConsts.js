@@ -1,6 +1,9 @@
 // Common constants
 
 const commonConsts = {
+	MANUAL_ADS: {
+		VARIATION: 'manual'
+	},
 	EVENTS: {
 		DOM_LOAD: 'DOMContentLoaded',
 		SCRIPT_LOAD: 'scriptLoaded'
