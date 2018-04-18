@@ -12,10 +12,11 @@ function Publisher(config) {
 
 		return new Promise((resolve, reject) => {
 			if (me.connection && me.channel) {
+				console.log('Publishing now.. exchange : ' + me.config.exchange.name + ' queue : ' + queueName);
 				me.channel.publish(me.config.exchange.name, queueName, msg, options);
 				return resolve('done');
 			} else {
-				console.log('Job publised to offline queue');
+				console.log('Job published to offline queue');
 				me.offlineQueue.push({ queueName, msg, options });
 				return reject(
 					'issue with rabbitmq connection or channel, messages queued up to be delivered on reconnection'
@@ -89,6 +90,9 @@ function Publisher(config) {
 							me.channel = null;
 							me.connectRabbit(me.config.url);
 							return;
+						});
+						ch.on('return', function(msg) {
+							console.warn('Returned message!');
 						});
 						return me.registerExchange(ch);
 					})
