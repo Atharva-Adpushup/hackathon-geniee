@@ -1,5 +1,6 @@
 const queueInstance = require('amqplib');
 const Promise = require('bluebird');
+const moment = require('moment');
 
 function Publisher(config) {
 	this.config = config;
@@ -35,31 +36,46 @@ function Publisher(config) {
 			return Promise.resolve(me.connection);
 		}
 
-		return queueInstance.connect(me.config.url).then(function(conn) {
-			conn.on('close', function() {
-				me.connection = null;
-				me.channel = null;
-				me.connectRabbit(me.config.url);
-			});
-			conn.on('error', function() {
-				me.connection = null;
-				me.channel = null;
-				me.connectRabbit(me.config.url);
-			});
-			me.connection = conn;
-
-			return me
-				.registerChannel(conn)
-				.then(function(ch) {
-					me.channel = ch;
-					return me.registerExchange(ch);
-				})
-				.then(me.registerQueues.bind(me))
-				.then(function() {
-					me.manageOfflineQueue();
-					return me.channel;
+		return queueInstance
+			.connect(me.config.url)
+			.then(function(conn) {
+				conn.on('close', function() {
+					console.log(
+						`Publisher close event caught | Current Time : ${moment().format(
+							'dddd, MMMM Do YYYY, h:mm:ss a'
+						)}`
+					);
+					me.connection = null;
+					me.channel = null;
+					me.connectRabbit(me.config.url);
 				});
-		});
+				conn.on('error', function() {
+					console.log(
+						`Publisher error event caught | Current Time : ${moment().format(
+							'dddd, MMMM Do YYYY, h:mm:ss a'
+						)}`
+					);
+					me.connection = null;
+					me.channel = null;
+					me.connectRabbit(me.config.url);
+				});
+				me.connection = conn;
+
+				return me
+					.registerChannel(conn)
+					.then(function(ch) {
+						me.channel = ch;
+						return me.registerExchange(ch);
+					})
+					.then(me.registerQueues.bind(me))
+					.then(function() {
+						me.manageOfflineQueue();
+						return me.channel;
+					});
+			})
+			.catch(function(err) {
+				console.log(err);
+			});
 	};
 }
 
