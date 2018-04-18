@@ -9,6 +9,7 @@ function Publisher(config) {
 	this.offlineQueue = [];
 	this.publishMsg = function(queueName, msg, options) {
 		const me = this;
+		options = Object.assign({}, options, { mandatory: true });
 
 		return new Promise((resolve, reject) => {
 			if (me.connection && me.channel) {
