@@ -15,6 +15,7 @@ function Publisher(config) {
 				me.channel.publish(me.config.exchange.name, queueName, msg, options);
 				return resolve('done');
 			} else {
+				console.log('Job publised to offline queue');
 				me.offlineQueue.push({ queueName, msg, options });
 				return reject(
 					'issue with rabbitmq connection or channel, messages queued up to be delivered on reconnection'
