@@ -26,7 +26,7 @@ function Consumer(config) {
 		}
 
 		return queueInstance
-			.connect(self.config.url)
+			.connect(self.config.url, { hearbeat: 60 })
 			.then(conn => {
 				conn.on('close', () => {
 					console.log(
