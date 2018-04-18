@@ -41,6 +41,11 @@ function Publisher(config) {
 				me.channel = null;
 				me.connectRabbit(me.config.url);
 			});
+			conn.on('error', function() {
+				me.connection = null;
+				me.channel = null;
+				me.connectRabbit(me.config.url);
+			});
 			me.connection = conn;
 
 			return me

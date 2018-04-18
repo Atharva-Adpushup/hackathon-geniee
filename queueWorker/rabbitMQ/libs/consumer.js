@@ -32,6 +32,11 @@ function Consumer(config) {
 					self.channel = null;
 					self.connectRabbit(self.config.url);
 				});
+				conn.on('error', () => {
+					self.connection = null;
+					self.channel = null;
+					self.connectRabbit(self.config.url);
+				});
 				self.connection = conn;
 
 				return self
