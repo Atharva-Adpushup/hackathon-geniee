@@ -9,6 +9,7 @@ function Publisher(config) {
 	this.offlineQueue = [];
 	this.publishMsg = function(queueName, msg, options) {
 		const me = this;
+		options = Object.assign({}, options, { mandatory: true });
 
 		return new Promise((resolve, reject) => {
 			if (me.connection && me.channel) {
@@ -39,7 +40,7 @@ function Publisher(config) {
 		}
 
 		return queueInstance
-			.connect(me.config.url, { hearbeat: 60 })
+			.connect(me.config.url, { hearbeat: 20 })
 			.then(function(conn) {
 				conn.on('close', function() {
 					console.log(
