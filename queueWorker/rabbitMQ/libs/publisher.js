@@ -37,7 +37,7 @@ function Publisher(config) {
 		}
 
 		return queueInstance
-			.connect(me.config.url)
+			.connect(me.config.url, { hearbeat: 60 })
 			.then(function(conn) {
 				conn.on('close', function() {
 					console.log(
