@@ -15,6 +15,7 @@ function Publisher(config) {
 				me.channel.publish(me.config.exchange.name, queueName, msg, options);
 				return resolve('done');
 			} else {
+				console.log('Job publised to offline queue');
 				me.offlineQueue.push({ queueName, msg, options });
 				return reject(
 					'issue with rabbitmq connection or channel, messages queued up to be delivered on reconnection'
@@ -41,23 +42,25 @@ function Publisher(config) {
 			.then(function(conn) {
 				conn.on('close', function() {
 					console.log(
-						`Publisher close event caught | Current Time : ${moment().format(
+						`Publisher connection close event caught | Current Time : ${moment().format(
 							'dddd, MMMM Do YYYY, h:mm:ss a'
 						)}`
 					);
 					me.connection = null;
 					me.channel = null;
 					me.connectRabbit(me.config.url);
+					return;
 				});
 				conn.on('error', function() {
 					console.log(
-						`Publisher error event caught | Current Time : ${moment().format(
+						`Publisher connection error event caught | Current Time : ${moment().format(
 							'dddd, MMMM Do YYYY, h:mm:ss a'
 						)}`
 					);
 					me.connection = null;
 					me.channel = null;
 					me.connectRabbit(me.config.url);
+					return;
 				});
 				me.connection = conn;
 
@@ -65,6 +68,28 @@ function Publisher(config) {
 					.registerChannel(conn)
 					.then(function(ch) {
 						me.channel = ch;
+						ch.on('close', () => {
+							console.log(
+								`Publisher channel close event caught | Current Time : ${moment().format(
+									'dddd, MMMM Do YYYY, h:mm:ss a'
+								)}`
+							);
+							me.connection = null;
+							me.channel = null;
+							me.connectRabbit(me.config.url);
+							return;
+						});
+						ch.on('error', () => {
+							console.log(
+								`Publisher channel error event caught | Current Time : ${moment().format(
+									'dddd, MMMM Do YYYY, h:mm:ss a'
+								)}`
+							);
+							me.connection = null;
+							me.channel = null;
+							me.connectRabbit(me.config.url);
+							return;
+						});
 						return me.registerExchange(ch);
 					})
 					.then(me.registerQueues.bind(me))
