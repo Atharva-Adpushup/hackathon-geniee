@@ -23,7 +23,7 @@ const fn = {
 			<div className={`custom-message ${classNames}`}>
 				<h3 className="cm-header">{header}</h3>
 				<hr />
-				<p className="cm-body">{message}</p>
+				<p className="cm-body" dangerouslySetInnerHTML={{ __html: message }} />
 			</div>
 		);
 	},

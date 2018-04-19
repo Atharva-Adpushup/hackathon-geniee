@@ -3,6 +3,7 @@ const express = require('express'),
 	_ = require('lodash'),
 	uuid = require('uuid'),
 	{ couchbaseService } = require('node-utils'),
+	request = require('request-promise'),
 	config = require('../configs/config'),
 	utils = require('../helpers/utils'),
 	{ sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions'),
@@ -17,6 +18,20 @@ const express = require('express'),
 	);
 
 const fn = {
+	sendDataToZapier: data => {
+		let options = {
+			method: 'GET',
+			uri: 'https://hooks.zapier.com/hooks/catch/547126/frue51/?',
+			json: true
+		};
+		_.forEach(data, (value, key) => {
+			options.uri += `${key}=${value}&`;
+		});
+		options.uri = options.uri.slice(0, -1);
+		return request(options)
+			.then(() => console.log('Ad Creation. Called made to Zapier'))
+			.catch(err => console.log('Ad creation call to Zapier failed'));
+	},
 	createNewDocAndDoProcessing: payload => {
 		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
 		return appBucket
@@ -31,20 +46,31 @@ const fn = {
 		let cas = data.cas || false,
 			value = data.value || data,
 			id = uuid.v4(),
-			networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {};
+			networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {},
+			ad = {
+				...payload.ad,
+				id: id,
+				isActive: true,
+				createdOn: +new Date(),
+				formatData: {
+					...payload.ad.formatData,
+					eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
+				},
+				...networkInfo
+			};
 
-		value.ads.push({
-			...payload.ad,
-			id: id,
-			formatData: {
-				...payload.ad.formatData,
-				eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
-			},
-			...networkInfo
-		});
+		value.ads.push(ad);
 		value.siteDomain = value.siteDomain || payload.siteDomain;
 		value.siteId = value.siteId || payload.siteId;
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
+
+		fn.sendDataToZapier({
+			email: value.ownerEmail,
+			website: value.siteDomain,
+			platform: ad.formatData.platform,
+			size: `${ad.width}x${ad.height}`,
+			sticky: ad.formatData.type && ad.formatData.type == 'sticky' ? 'yes' : 'no'
+		});
 
 		return Promise.resolve([cas, value, id, payload.siteId]);
 	},

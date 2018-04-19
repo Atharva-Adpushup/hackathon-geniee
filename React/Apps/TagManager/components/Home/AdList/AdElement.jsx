@@ -11,11 +11,13 @@ class AdElement extends Component {
 		super(props);
 		this.state = {
 			showNetworkDetails: false,
-			showEventDetails: false
+			showEventDetails: false,
+			isActive: props.ad.isActive || true
 		};
 		this.toggleNetworkDetails = this.toggleNetworkDetails.bind(this);
 		this.toggleEventDetails = this.toggleEventDetails.bind(this);
 		this.renderAdDetails = this.renderAdDetails.bind(this);
+		this.disableAd = this.disableAd.bind(this);
 	}
 
 	toggleNetworkDetails() {
@@ -28,6 +30,22 @@ class AdElement extends Component {
 		this.setState({
 			showEventDetails: !this.state.showEventDetails
 		});
+	}
+
+	disableAd(ad) {
+		if (confirm('Are you sure you want to archive this ad?')) {
+			this.setState(
+				{
+					isActive: !this.state.isActive
+				},
+				() => {
+					this.props.updateAd(ad.id, {
+						isActive: this.state.isActive,
+						archivedOn: +new Date()
+					});
+				}
+			);
+		}
 	}
 
 	renderAdDetails() {
@@ -83,11 +101,11 @@ class AdElement extends Component {
 
 		return (
 			<div key={`adELement-${ad.id}`}>
-				{/* <OverlayTrigger placement="bottom" overlay={<Tooltip id="delete-ad-tooltip">Delete Ad</Tooltip>}>
-					<Button className="btn-close" type="submit">
+				<OverlayTrigger placement="bottom" overlay={<Tooltip id="delete-ad-tooltip">Archive Ad</Tooltip>}>
+					<Button className="btn-close" onClick={this.disableAd.bind(null, ad)}>
 						x
 					</Button>
-				</OverlayTrigger> */}
+				</OverlayTrigger>
 				<Col xs={3} className="ad-image">
 					<img
 						src={`/assets/images/tagManager/types/${ad.formatData.platform}/${ad.formatData.type}${
