@@ -40,13 +40,15 @@ class AdList extends Component {
 							<div style={{ clear: 'both' }}>&nbsp;</div>
 						</div>
 					) : null}
-					{ads.map((ad, key) => (
-						<div key={key} className="col-sm-6">
-							<li className="section-list-item" key={ad.id} style={customStyle}>
-								<AdElement ad={ad} updateAd={this.props.updateAd} />
-							</li>
-						</div>
-					))}
+					{ads.map((ad, key) => {
+						return !ad.hasOwnProperty('isActive') || ad.isActive ? (
+							<div key={key} className="col-sm-6">
+								<li className="section-list-item" key={ad.id} style={customStyle}>
+									<AdElement ad={ad} updateAd={this.props.updateAd} />
+								</li>
+							</div>
+						) : null;
+					})}
 				</ul>
 			)
 		);
