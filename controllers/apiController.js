@@ -61,6 +61,7 @@ router
 		// Set partner to geniee
 		if (req.isGenieeSite) {
 			json.partner = 'geniee';
+			json.isManual = false;
 		}
 		var partnerEmail = json.partner + '@adpushup.com',
 			siteId;

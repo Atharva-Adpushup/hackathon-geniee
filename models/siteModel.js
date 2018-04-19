@@ -233,6 +233,7 @@ function apiModule() {
 			if (data.partner) {
 				json.partner = data.partner;
 				json.ownerEmail = data.ownerEmail;
+				json.isManual = data.isManual;
 			}
 
 			if (data.adsensePublisherId) {
@@ -471,7 +472,9 @@ function apiModule() {
 						return site;
 					},
 					function() {
-						siteData = Object.assign(siteData, { isManual: true });
+						siteData = Object.assign(siteData, {
+							isManual: siteData.partner && siteData.partner == 'geniee' ? false : true
+						});
 						return API.createSiteFromJson(siteData);
 					}
 				)
