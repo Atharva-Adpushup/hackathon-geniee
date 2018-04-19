@@ -161,7 +161,9 @@ const _ = require('lodash'),
 				finalJson[platform][pageGroup].variations.push(variationPayload);
 				finalJson[platform][pageGroup].hasVariationsWithNoData =
 					finalJson[platform][pageGroup].hasVariationsWithNoData == false
-						? variationData == null ? true : false
+						? variationData == null
+							? true
+							: false
 						: finalJson[platform][pageGroup].hasVariationsWithNoData;
 			}
 		});
@@ -176,7 +178,13 @@ const _ = require('lodash'),
 	},
 	getManualAds = site => {
 		const siteId = site.get('siteId');
-		return appBucket.getDoc(`tgmr::${siteId}`).then(docWithCas => docWithCas.value.ads);
+		return appBucket
+			.getDoc(`tgmr::${siteId}`)
+			.then(docWithCas => {
+				const ads = docWithCas.value.ads.filter(ad => !ad.hasOwnProperty('isActive') || ad.isActive);
+				return ads;
+			})
+			.catch(err => Promise.reject(new Error(`Error fetching tgmr doc for ${siteId}`)));
 	},
 	generatePayload = (site, pageGroupData) => {
 		//Empty finaJson and dfpAunits

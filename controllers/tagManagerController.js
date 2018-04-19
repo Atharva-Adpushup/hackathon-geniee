@@ -36,6 +36,8 @@ const fn = {
 		value.ads.push({
 			...payload.ad,
 			id: id,
+			isActive: true,
+			createdOn: +new Date(),
 			formatData: {
 				...payload.ad.formatData,
 				eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
