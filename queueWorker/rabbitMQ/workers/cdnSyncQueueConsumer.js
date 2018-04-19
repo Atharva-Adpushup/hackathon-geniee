@@ -52,7 +52,10 @@ function validateMessageData(originalMessage) {
 }
 
 function syncCDNWrapper(decodedMessage) {
-	return siteModel.getSiteById(decodedMessage.siteId).then(site => syncCDNService(site));
+	return siteModel
+		.getSiteById(decodedMessage.siteId)
+		.then(site => syncCDNService(site))
+		.then(() => decodedMessage.siteId);
 }
 
 function errorHandler(error, originalMessage) {
@@ -88,8 +91,12 @@ function errorHandler(error, originalMessage) {
 function doProcessingAndAck(originalMessage) {
 	return validateMessageData(originalMessage)
 		.then(syncCDNWrapper)
-		.then(() => {
+		.then((siteId = 'N/A') => {
 			counter = 0;
+			logger({
+				source: 'CDN SYNC CONSUMPTION LOGS',
+				message: `Job consumed for site id : ${siteId}`
+			});
 			consumer.acknowledge(originalMessage);
 			return 0;
 		})
