@@ -33,7 +33,7 @@ var adp = window.adpushup,
 					return ad.id == adId;
 				})[0];
 
-			if (ad && ad.id) {
+			if (ad && ad.id && adp.config.platform.toUpperCase() === ad.formatData.platform.toUpperCase()) {
 				var feedbackData = {
 					ads: [ad.id],
 					xpathMiss: [],
