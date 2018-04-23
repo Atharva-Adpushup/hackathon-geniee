@@ -9,6 +9,7 @@ module.exports = {
 	PARTNERS: {
 		GENIEE: 'geniee'
 	},
+	GPT_REFRESH_INTERVAL: 30,
 	SLOT_INTERVAL: 50,
 	MEDIATION_API_URL: '//s2s.adpushup.com/MediationWebService/',
 	HB_STATUS: {
