@@ -122,6 +122,7 @@ class NetworkOptions extends Component {
 						submitHandler={this.submitHandler}
 						onCancel={this.props.onCancel}
 						code={code}
+						refreshSlot={refreshSlot}
 						buttonType={this.props.buttonType || 1}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						id={this.props.id ? this.props.id : false}

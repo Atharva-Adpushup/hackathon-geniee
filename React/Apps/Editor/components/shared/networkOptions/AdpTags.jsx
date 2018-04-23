@@ -200,26 +200,30 @@ class AdpTags extends Component {
 						/>
 					</Col>
 				</Row>
-				<Row>
-					<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
-						<CustomToggleSwitch
-							labelText="Refresh Slot"
-							className="mB-10"
-							checked={this.state.refreshSlot}
-							onChange={val => {
-								this.setState({ refreshSlot: !!val });
-							}}
-							layout="horizontal"
-							size="m"
-							on="Yes"
-							off="No"
-							defaultLayout={this.props.fromPanel ? false : true}
-							name={this.props.id ? `refreshSlotSwitch-${this.props.id}` : 'refreshSlotSwitch'}
-							id={this.props.id ? `js-refresh-slot-switch-${this.props.id}` : 'js-refresh-slot-switch'}
-							customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
-						/>
-					</Col>
-				</Row>
+				{!this.props.geniee ? (
+					<Row>
+						<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+							<CustomToggleSwitch
+								labelText="Refresh Slot"
+								className="mB-10"
+								checked={this.state.refreshSlot}
+								onChange={val => {
+									this.setState({ refreshSlot: !!val });
+								}}
+								layout="horizontal"
+								size="m"
+								on="Yes"
+								off="No"
+								defaultLayout={this.props.fromPanel ? false : true}
+								name={this.props.id ? `refreshSlotSwitch-${this.props.id}` : 'refreshSlotSwitch'}
+								id={
+									this.props.id ? `js-refresh-slot-switch-${this.props.id}` : 'js-refresh-slot-switch'
+								}
+								customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+							/>
+						</Col>
+					</Row>
+				) : null}
 				<Row>
 					<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
 						<pre>
