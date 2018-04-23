@@ -197,6 +197,7 @@ class sectionOptions extends React.Component {
 					fpKey={this.props.fpKey}
 					priceFloor={this.props.priceFloor}
 					headerBidding={this.props.headerBidding}
+					refreshSlot={this.props.refreshSlot}
 					submitHandler={this.submitHandler}
 					onCancel={this.props.onCancel}
 					code={this.props.code}

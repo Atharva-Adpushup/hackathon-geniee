@@ -16,7 +16,9 @@ class NetworkOptions extends Component {
 			network:
 				this.props.ad && this.props.ad.network
 					? this.props.ad.network
-					: this.props.ad && currentUser.userType == 'partner' ? 'geniee' : false
+					: this.props.ad && currentUser.userType == 'partner'
+						? 'geniee'
+						: false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.renderNetwork = this.renderNetwork.bind(this);
@@ -81,6 +83,10 @@ class NetworkOptions extends Component {
 				  defaultPriceFloorKey
 				: defaultPriceFloorKey,
 			priceFloor = pfKeyExists ? this.props.ad.networkData.keyValues[fpKey] : 0,
+			refreshSlot =
+				adExists && this.props.ad.networkData && this.props.ad.networkData.refreshSlot
+					? this.props.ad.networkData.refreshSlot
+					: false,
 			headerBidding =
 				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('headerBidding')
 					? this.props.ad.networkData.headerBidding
@@ -154,6 +160,7 @@ class NetworkOptions extends Component {
 						zoneId={zoneId}
 						fpKey={fpKey}
 						priceFloor={priceFloor}
+						refreshSlot={refreshSlot}
 						headerBidding={dynamicAllocation}
 						submitHandler={this.submitHandler}
 						onCancel={this.props.onCancel}
