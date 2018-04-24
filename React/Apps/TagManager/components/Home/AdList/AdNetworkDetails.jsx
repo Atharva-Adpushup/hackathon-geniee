@@ -8,7 +8,15 @@ class AdNetworkDetails extends Component {
 	}
 
 	submitHanlder(networkInfo) {
-		this.props.onSubmit(this.props.ad.id, networkInfo);
+		const { ad } = this.props;
+
+		this.props.onSubmit(ad.id, {
+			network: networkInfo.network,
+			networkData:
+				ad.network == networkInfo.network
+					? { ...ad.networkData, ...networkInfo.networkData }
+					: networkInfo.networkData
+		});
 		this.props.onCancel();
 	}
 
