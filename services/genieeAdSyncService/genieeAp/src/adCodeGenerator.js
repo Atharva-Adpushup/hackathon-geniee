@@ -46,13 +46,19 @@ var utils = require('../libs/utils'),
 			return function() {
 				for (var i = 0; i < adpTagUnits.length; i++) {
 					var ad = adpTagUnits[i];
-					adpTags.defineSlot(ad.networkData.dfpAdunit, [Number(ad.width), Number(ad.height)], ad.networkData.dfpAdunit, {
-						dfpAdunit: ad.networkData.dfpAdunit,
-						dfpAdunitCode: ad.networkData.dfpAdunitCode,
-						headerBidding: ad.networkData.headerBidding,
-						keyValues: ad.networkData.keyValues,
-						network: ad.network
-					});
+					adpTags.defineSlot(
+						ad.networkData.dfpAdunit,
+						[Number(ad.width), Number(ad.height)],
+						ad.networkData.dfpAdunit,
+						{
+							dfpAdunit: ad.networkData.dfpAdunit,
+							dfpAdunitCode: ad.networkData.dfpAdunitCode,
+							headerBidding: ad.networkData.headerBidding,
+							keyValues: ad.networkData.keyValues,
+							network: ad.network,
+							refreshSlot: ad.networkData.refreshSlot
+						}
+					);
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
 				if (adpKeyValues && Object.keys(adpKeyValues).length) {

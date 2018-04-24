@@ -31,8 +31,10 @@ var adp = window.adpushup,
 			var manualAds = adp.config.manualAds,
 				ad = manualAds.filter(function(ad) {
 					return ad.id == adId;
-				})[0],
-				feedbackData = {
+				})[0];
+
+			if (ad && ad.id && adp.config.platform.toUpperCase() === ad.formatData.platform.toUpperCase()) {
+				var feedbackData = {
 					ads: [ad.id],
 					xpathMiss: [],
 					eventType: 1,
@@ -42,20 +44,21 @@ var adp = window.adpushup,
 					variationId: commonConsts.MANUAL_ADS.VARIATION
 				};
 
-			return getContainer(ad)
-				.done(function(container) {
-					// Once container has been found, execute adp head code if ad network is "adpTags"
-					if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
-						executeAdpTagsHeadCode([ad], {}); // This function expects an array of adpTags and optional adpKeyValues
-					}
-					// Send feedback call
-					utils.sendFeedback(feedbackData);
-					// Place the ad in the container
-					return placeAd(container, ad);
-				})
-				.fail(function(err) {
-					throw new Error(err);
-				});
+				return getContainer(ad)
+					.done(function(container) {
+						// Once container has been found, execute adp head code if ad network is "adpTags"
+						if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
+							executeAdpTagsHeadCode([ad], {}); // This function expects an array of adpTags and optional adpKeyValues
+						}
+						// Send feedback call
+						utils.sendFeedback(feedbackData);
+						// Place the ad in the container
+						return placeAd(container, ad);
+					})
+					.fail(function(err) {
+						throw new Error(err);
+					});
+			}
 		}
 	};
 

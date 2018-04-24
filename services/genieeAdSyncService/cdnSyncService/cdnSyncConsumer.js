@@ -66,7 +66,7 @@ module.exports = function(site) {
 		getUncompressedJsFile = fs.readFileAsync(uncompressedJsTplPath, 'utf8'),
 		generateCombinedJson = (experiment, adpTags, manualAds) => {
 			if (!(Array.isArray(adpTags) && adpTags.length)) {
-				return { experiment, adpTagsConfig: false };
+				return { experiment, adpTagsConfig: false, manualAds };
 			}
 			return generateADPTagsConfig(adpTags, site.get('siteId')).then(adpTagsConfig => ({
 				adpTagsConfig,

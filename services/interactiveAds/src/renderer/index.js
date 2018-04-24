@@ -22,25 +22,41 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 
 		return $parentNode;
 	},
+	renderAd = interactiveAd => {
+		const type = interactiveAd.formatData.type,
+			adCode = generateAdCode(interactiveAd);
+
+		let parentNode = null;
+
+		switch (type) {
+			case commonConsts.FORMATS.STICKY.NAME:
+				parentNode = createParentNode('body', interactiveAd);
+				const sticky = new Sticky(parentNode, interactiveAd, adCode);
+				return sticky.render();
+
+			case commonConsts.FORMATS.VIDEO.NAME:
+				const { value } = interactiveAd.formatData.eventData, // Value is the xpath
+					{ css } = interactiveAd;
+				parentNode = createParentNode(value, interactiveAd, css);
+				const video = new Video(parentNode, interactiveAd, adCode);
+				return video.render();
+		}
+	},
 	renderer = interactiveAd => {
 		if (interactiveAd && interactiveAd.formatData) {
-			const type = interactiveAd.formatData.type,
-				adCode = generateAdCode(interactiveAd);
+			const adp = window.adpushup;
 
-			let parentNode = null;
-
-			switch (type) {
-				case commonConsts.FORMATS.STICKY.NAME:
-					parentNode = createParentNode('body', interactiveAd);
-					const sticky = new Sticky(parentNode, interactiveAd, adCode);
-					return sticky.render();
-
-				case commonConsts.FORMATS.VIDEO.NAME:
-					const { value } = interactiveAd.formatData.eventData, // Value is the xpath
-						{ css } = interactiveAd;
-					parentNode = createParentNode(value, interactiveAd, css);
-					const video = new Video(parentNode, interactiveAd, adCode);
-					return video.render();
+			if (adp.config.mode === 16) {
+				if (
+					adp.utils.isUrlMatching() &&
+					adp.config.platform.toUpperCase() === interactiveAd.formatData.platform.toUpperCase()
+				) {
+					renderAd(interactiveAd);
+				} else {
+					return false;
+				}
+			} else {
+				renderAd(interactiveAd);
 			}
 		}
 	};
