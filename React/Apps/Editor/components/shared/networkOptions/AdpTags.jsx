@@ -9,10 +9,11 @@ import CustomToggleSwitch from '../customToggleSwitch.jsx';
 class AdpTags extends Component {
 	constructor(props) {
 		super(props);
-		const { fpKey, priceFloor, headerBidding, code } = props;
+		const { fpKey, priceFloor, headerBidding, code, refreshSlot } = props;
 		this.state = {
 			fpKey: fpKey,
 			hbAcivated: headerBidding,
+			refreshSlot,
 			pf: priceFloor,
 			advanced: false,
 			keyValues: !code
@@ -42,13 +43,14 @@ class AdpTags extends Component {
 	}
 
 	save() {
-		const { fpKey, hbAcivated, pf, keyValues } = this.state;
+		const { fpKey, hbAcivated, pf, keyValues, refreshSlot } = this.state;
 		this.props.submitHandler({
 			headerBidding: !!hbAcivated,
 			keyValues: {
 				...this.filterKeyValues(keyValues),
 				[fpKey]: pf
-			}
+			},
+			refreshSlot
 		});
 	}
 
@@ -117,14 +119,17 @@ class AdpTags extends Component {
 
 	renderGenieeNote() {
 		return (
-				<Row>
-					<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
-						<Alert bsStyle="warning">
-							<strong>NOTE:</strong> <i><b>Geniee Zone Id</b> and <b>Dynamic Allocation</b> fields are non-editable.</i>
-						</Alert>
-					</Col>
-				</Row>
-		)
+			<Row>
+				<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+					<Alert bsStyle="warning">
+						<strong>NOTE:</strong>{' '}
+						<i>
+							<b>Geniee Zone Id</b> and <b>Dynamic Allocation</b> fields are non-editable.
+						</i>
+					</Alert>
+				</Col>
+			</Row>
+		);
 	}
 
 	renderNonAdvanced() {
@@ -195,6 +200,30 @@ class AdpTags extends Component {
 						/>
 					</Col>
 				</Row>
+				{!this.props.geniee ? (
+					<Row>
+						<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+							<CustomToggleSwitch
+								labelText="Refresh Slot"
+								className="mB-10"
+								checked={this.state.refreshSlot}
+								onChange={val => {
+									this.setState({ refreshSlot: !!val });
+								}}
+								layout="horizontal"
+								size="m"
+								on="Yes"
+								off="No"
+								defaultLayout={this.props.fromPanel ? false : true}
+								name={this.props.id ? `refreshSlotSwitch-${this.props.id}` : 'refreshSlotSwitch'}
+								id={
+									this.props.id ? `js-refresh-slot-switch-${this.props.id}` : 'js-refresh-slot-switch'
+								}
+								customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+							/>
+						</Col>
+					</Row>
+				) : null}
 				<Row>
 					<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
 						<pre>

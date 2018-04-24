@@ -130,6 +130,17 @@ $('document').ready(function() {
 			setupCompleteAlert: function() {
 				var ob = this;
 				if (newSite.addOtherSite) {
+					$.get(
+						'https://hooks.zapier.com/hooks/catch/547126/fzjb43/?emailID=' +
+							currentUser.email +
+							'&existingWebsite=' +
+							currentUser.sites[0].domain +
+							'&newWebsite=' +
+							window.newSiteAdded,
+						function() {
+							console.log('Z call over');
+						}
+					);
 					ob.anotherSiteModalOpen();
 				} else {
 					var url = 'http://' + window.location.host + '/user/onboarding-complete';
@@ -910,6 +921,7 @@ $('document').ready(function() {
 					errorBox = $('#addOtherSiteModal .error-message-box'),
 					response = ob.addSite(site, url, null, true);
 				if (response) {
+					window.newSiteAdded = site;
 					$('#addOtherSiteModal').modal('hide');
 					$('#apdetect').fadeOut();
 					ob.nextStep(3, 2, 1000);
@@ -1056,6 +1068,7 @@ $('document').ready(function() {
 			var userUnsavedSite = newSite.viewObjects.domanizedUrl,
 				userUnsavedSiteId = newSite.viewObjects.unSavedSiteId,
 				url = newSite.viewObjects.origUnSavedDomain;
+			window.newSiteAdded = url;
 			ap.onboarding.addSite(url, userUnsavedSite, $(this), true);
 			$('#another-site-box').fadeOut('200');
 		});
@@ -1072,6 +1085,7 @@ $('document').ready(function() {
 			e.preventDefault();
 			var newSiteByUser = $('#another-site-input').val(),
 				btn = $('#another-site-box');
+			window.newSiteAdded = newSiteByUser;
 			ap.onboarding.addAnotherSite(newSiteByUser, btn);
 		});
 
