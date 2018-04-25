@@ -42,6 +42,13 @@ class Component {
 					: commonConsts.MANUAL_ADS.VARIATION
 			};
 
+		adp.tracker.add(
+			$format,
+			function(adId) {
+				adp.utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: adId });
+			}.bind(adp, id)
+		);
+
 		switch (formatData.type) {
 			case commonConsts.FORMATS.STICKY.NAME:
 				$format.css({
