@@ -15,6 +15,10 @@ var logger = require('../helpers/logger'),
 		console.log('Sent floor : ' + val);
 		return val;
 	},
+	// Please use this refresh functionality within the "googletag.cmd.push" wrapper
+	refreshGPTSlot = function(gSlot) {
+		googletag.pubads().refresh([gSlot]);
+	},
 	renderGPT = function(slot) {
 		if (!slot.containerPresent || !slot.biddingComplete || slot.hasRendered) {
 			return false;
@@ -24,7 +28,7 @@ var logger = require('../helpers/logger'),
 		if (slot.optionalParam.refreshSlot) {
 			googletag.cmd.push(function() {
 				setInterval(function() {
-					googletag.pubads().refresh([slot.gSlot]);
+					refreshGPTSlot(slot.gSlot);
 				}, config.GPT_REFRESH_INTERVAL);
 			});
 		}
@@ -36,7 +40,7 @@ var logger = require('../helpers/logger'),
 				If multiple DFP implementations exist on the page, then explicitly refresh ADP ad slot, to fetch the ad. This makes sure that the ad is fetched in all cases, even if disableInitialLoad() is used by the publisher for his own DFP implementation.
 			*/
 			if (utils.hasMultipleDfpAccounts()) {
-				googletag.pubads().refresh([slot.gSlot]);
+				refreshGPTSlot(slot.gSlot);
 			}
 		});
 	},

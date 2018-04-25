@@ -4,6 +4,9 @@ const commonConsts = {
 	MANUAL_ADS: {
 		VARIATION: 'manual'
 	},
+	NETWORKS: {
+		ADPTAGS: 'adpTags'
+	},
 	EVENTS: {
 		DOM_LOAD: 'DOMContentLoaded',
 		SCRIPT_LOAD: 'scriptLoaded'
