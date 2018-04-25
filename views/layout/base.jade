@@ -1,7 +1,7 @@
 include ../mixins/mixins
 
 - isOnboarding = !!(isOnboarding || false)
-- billingError = Object.keys(currentUser).length && currentUser.userType !== "partner" && (!currentUser.billingInfoComplete || !currentUser.paymentInfoComplete) && !isOnboarding
+- billingError = Object.keys(currentUser).length && currentUser.userType !== "partner" && (!currentUser.billingInfoComplete || !currentUser.paymentInfoComplete) && !isOnboarding && currentUser.dateCreated > 1522540800000
 
 doctype html
 html(lang="en")
