@@ -52,6 +52,7 @@ module.exports = {
 					sizeWidth: parseInt(ad.width, 10),
 					sizeHeight: parseInt(ad.height, 10),
 					sectionId: section.id,
+					type: section.formatData && section.formatData.type ? section.formatData.type : false,
 					isManual: ad.isManual || false
 				};
 			}
