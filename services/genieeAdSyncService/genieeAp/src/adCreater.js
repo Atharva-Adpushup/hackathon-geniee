@@ -138,11 +138,16 @@ var $ = require('jquery'),
 		}
 		return true;
 	},
+	filterNonInteractiveAds = function(ads) {
+		return ads.filter(function(ad) {
+			return !ad.type || (ad.type && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD);
+		});
+	},
 	createAds = function(adp, variation) {
 		var config = adp.config,
 			err = adp.err,
 			finished = false,
-			ads = variation.ads,
+			ads = filterNonInteractiveAds(variation.ads),
 			displayCounter = ads.length,
 			contentSelector = variation.contentSelector,
 			feedbackData = {
