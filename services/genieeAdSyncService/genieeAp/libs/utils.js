@@ -400,7 +400,7 @@ module.exports = {
 		return url;
 	},
 	getInteractiveAds: function(config) {
-		var ads = null;
+		var ads = [];
 
 		if (config && config.experiment && config.platform && config.pageGroup && config.selectedVariation) {
 			var variations = config.experiment[config.platform][config.pageGroup].variations,
@@ -412,7 +412,7 @@ module.exports = {
 			});
 		}
 
-		if (config.hasManualAds && window.adpushup.config.manualAds.length) {
+		if (config.manualModeActive && window.adpushup.config.manualAds.length) {
 			ads = window.adpushup.config.manualAds;
 		}
 
