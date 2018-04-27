@@ -442,12 +442,29 @@ function placementStart($selector, placementConfig, doneCallback) {
 			started = true;
 			$(placementConfig).each(function(i, adObj) {
 				var placeFn = function(adObj) {
+					var isNotNear = !!(adObj.notNear && adObj.notNear.length);
+
 					$selector
 						.createAds(adObj.width, adObj.height, adObj.css.float)
 						.selectBetween((adObj.section - 1) * 500, adObj.section * 600)
-						.ignoreXpaths(adObj.ignoreXpaths, 100)
-						.notNear(adObj.notNear ? adObj.notNear[0] : [], adObj.notNear ? adObj.notNear[1] : 200)
-						.setPlacementForSection(adObj, adObj.minDistanceFromPrevAd);
+						.ignoreXpaths(adObj.ignoreXpaths, 100);
+
+					/** NotNear incontent ads feature implementation
+					 * Example data:
+					 * "notNear": [{".p-article_heading > h2:eq(2)": "1200"}]
+					 **/
+
+					if (isNotNear) {
+						adObj.notNear.forEach(function(collectionItem) {
+							var itemKeyArr = Object.keys(collectionItem),
+								itemKey = itemKeyArr[0],
+								itemValue = Number(collectionItem[itemKey]) || 200;
+
+							$selector.notNear(itemKeyArr, itemValue);
+						});
+					}
+
+					$selector.setPlacementForSection(adObj, adObj.minDistanceFromPrevAd);
 				};
 				placeFn(adObj);
 
