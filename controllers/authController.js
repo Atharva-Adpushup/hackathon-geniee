@@ -51,7 +51,7 @@ router.get('/geniee/', function(req, res) {
 	}
 });
 
-router.get('/vendor/', function(req, res) {
+router.get('/genieeUser/', function(req, res) {
 	function getUserToken() {
 		const userToken = req.query && req.query.token,
 			isValid = !!userToken;
