@@ -87,6 +87,24 @@ module.exports = {
 				str: {
 					zonesEmpty: 'Report data should not be empty'
 				}
+			},
+			authenticate: {
+				vendorAccount: {
+					publicKey: `-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA28xRQrbZv/mFiF8H08+O
+5WhY5asoGx5FdqnCvCO30bz6Yin5KfwaHjPO3t2Cp7EkLNQbBXInhCsmWxDH9OMR
+VrytxBCIFDYng/N6T386UXdatFSxFEJee69eg0PLlxKdbOJ7ejdojKxuSC0fswkX
+NDwefrx8pQt7aEDABAsRym4ry4nBLmK6vv6lczHugILALcW3TRlKChwCsBe2JDi8
+VpdnRnnk3g0DfOsWrMY9noYQtqRSkud9XvvDEJpZztYlDwFfhor57PIhjA8MaRoU
+o3nS63uAMI77WXMXUGmTYzjRPCj5LxQdI1VAnIsSU5kCsOxJ2Mwc4Xcy6bK8hgVW
+VSbPtNr+kJipbkgVbDV2WHjm0ENFABp5h4cwEYZ9+BNhSbheAdmyHU5Gs41lFtXV
+VSFOhO5a7r0EA2SkuWpD2ueTUV6U5IoPV3SdOewWKfO7VD8/lCwqLLYPKWSiZDzV
+z87FhuQS9wIsH3AhxexmFvMXNBxHHVmmN1HFjsh/B3aKF4s+rNtFoClb41suOwR3
+PvssN9Ikz1YePUtQzEWyHseXCMheuCRn9j8TXnF7t5Ginlc8Qt0Sd72lknUTKmSO
+3Mxateyxidg0pd0T5SW7sHIMn0zOWgH3383CgAMbPyFZ+rG6fbZe2kFHFETJD76J
+TXTaByllcS7crkb/VT07HzMCAwEAAQ==
+-----END PUBLIC KEY-----`
+				}
 			}
 		}
 	},
