@@ -2,6 +2,7 @@
 
 import commonConsts from '../../commonConsts';
 import $ from '../../$';
+import { executeAdpTagsHeadCode } from '../../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
 
 const adp = window.adpushup;
 
@@ -23,6 +24,10 @@ class Component {
 		const { formatData, width, height, id } = this.interactiveAd;
 		window.adpInteractive.ads[id] = this.interactiveAd;
 
+		if (this.interactiveAd.network === commonConsts.NETWORKS.ADPTAGS) {
+			executeAdpTagsHeadCode([this.interactiveAd], {}); // This function expects an array of adpTags and optional adpKeyValues
+		}
+
 		let css = { width, height },
 			$format = $('<div />'),
 			feedbackOptions = {
@@ -32,8 +37,17 @@ class Component {
 				mode: window.adpushup.config.mode,
 				referrer: adp.config.referrer,
 				tracking: false,
-				variationId: !adp.config.hasManualAds ? adp.config.selectedVariation : commonConsts.MANUAL_ADS.VARIATION
+				variationId: !adp.config.manualModeActive
+					? adp.config.selectedVariation
+					: commonConsts.MANUAL_ADS.VARIATION
 			};
+
+		adp.tracker.add(
+			$format,
+			function(adId) {
+				adp.utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: adId });
+			}.bind(adp, id)
+		);
 
 		switch (formatData.type) {
 			case commonConsts.FORMATS.STICKY.NAME:

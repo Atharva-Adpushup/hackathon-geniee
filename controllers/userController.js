@@ -845,6 +845,7 @@ router
 				let adNetworkSettings = user.get('adNetworkSettings') || [];
 				adNetworkSettings[0] = adNetworkSettings[0] || {};
 				adNetworkSettings[0].pubId = req.body.pubId;
+				adNetworkSettings[0].networkName = adNetworkSettings[0].networkName || 'ADSENSE';
 				user.set('adNetworkSettings', adNetworkSettings);
 				return user.save();
 			})
@@ -852,6 +853,8 @@ router
 				req.session.user.adNetworkSettings = req.session.user.adNetworkSettings || [];
 				req.session.user.adNetworkSettings[0] = req.session.user.adNetworkSettings[0] || {};
 				req.session.user.adNetworkSettings[0].pubId = req.body.pubId;
+				req.session.user.adNetworkSettings[0].networkName =
+					req.session.user.adNetworkSettings[0].networkName || 'ADSENSE';
 				return res.send({
 					error: false
 				});
