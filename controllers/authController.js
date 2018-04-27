@@ -51,7 +51,7 @@ router.get('/geniee/', function(req, res) {
 	}
 });
 
-router.get('/vendor/', function(req, res) {
+router.get('/genieeUser/', function(req, res) {
 	function getUserToken() {
 		const userToken = req.query && req.query.token,
 			isValid = !!userToken;
@@ -85,7 +85,7 @@ router.get('/vendor/', function(req, res) {
 		const getToken = getUserToken(),
 			getUserByEmail = userModel.getUserByEmail(partners.geniee.email);
 
-		return Promise.join(getToken, getUserByEmail, (userToken, userModel) => {
+		return Promise.join(getToken, getUserByEmail, (userToken, modelInstance) => {
 			let { adpushupSiteId } = userToken;
 
 			return siteModel
@@ -108,8 +108,9 @@ router.get('/vendor/', function(req, res) {
 				var error = err.message[0];
 				return res.send(`Authentication Failed: ${error.message}`);
 			} else {
-				var error = err.message;
-				return res.send(`Authentication Failed: ${error.message}`);
+				var error = err.toString();
+				console.log(error);
+				return res.send(`Authentication Failed: ${error}`);
 			}
 		});
 	}
