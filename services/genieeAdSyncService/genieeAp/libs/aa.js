@@ -375,6 +375,8 @@ $.fn.notNear = function(xPathArr, minGap) {
 $.fn.setPlacementForSection = function(adObj, minDistance) {
 	var section = adObj.section;
 
+	minDistance = Number(minDistance);
+
 	if ($.isEmptyObject(placements) && selectedElems.length) {
 		placements[section] = {
 			elem: selectedElems[0],
