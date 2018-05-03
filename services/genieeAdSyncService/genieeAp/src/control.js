@@ -41,7 +41,9 @@ function Control() {
 
 			if (
 				decodedAdCode.indexOf('data-ad-format="link"') !== -1 ||
-				decodedAdCode.indexOf('data-ad-format="auto"') !== -1
+				decodedAdCode.indexOf('data-ad-format="auto"') !== -1 ||
+				decodedAdCode.indexOf('data-ad-format="autorelaxed"') !== -1 ||
+				decodedAdCode.indexOf('data-ad-format="fluid"')
 			) {
 				isBlock = true;
 			}
