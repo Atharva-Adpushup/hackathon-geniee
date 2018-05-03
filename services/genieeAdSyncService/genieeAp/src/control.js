@@ -34,19 +34,22 @@ function Control() {
 	}
 
 	function getControlCSS(adCode) {
-		var isLinkAd = false;
+		var isBlock = false;
 
 		try {
 			var decodedAdCode = atob(adCode);
 
-			if (decodedAdCode.indexOf('data-ad-format="link"') !== -1) {
-				isLinkAd = true;
+			if (
+				decodedAdCode.indexOf('data-ad-format="link"') !== -1 ||
+				decodedAdCode.indexOf('data-ad-format="auto"') !== -1
+			) {
+				isBlock = true;
 			}
 		} catch (e) {
 			console.log(e);
 		}
 
-		return isLinkAd ? { display: 'block' } : { display: 'inline-block' };
+		return isBlock ? { display: 'block' } : { display: 'inline-block' };
 	}
 
 	function activateAd(adObj) {
