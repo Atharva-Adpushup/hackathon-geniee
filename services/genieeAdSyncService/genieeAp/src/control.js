@@ -33,15 +33,29 @@ function Control() {
 		}
 	}
 
+	function getControlCSS(adCode) {
+		var isLinkAd = false;
+
+		try {
+			var decodedAdCode = atob(adCode);
+
+			if (decodedAdCode.indexOf('data-ad-format="link"') !== -1) {
+				isLinkAd = true;
+			}
+		} catch (e) {
+			console.log(e);
+		}
+
+		return isLinkAd ? { display: 'block' } : { display: 'inline-block' };
+	}
+
 	function activateAd(adObj) {
 		if (adObj.active) {
 			return true;
 		}
 
 		var container = $('<div/>')
-			.css({
-				display: 'inline-block'
-			})
+			.css(getControlCSS(adObj.ac))
 			.attr({ id: adObj.id, class: '_ap_control_ad' });
 
 		$(adObj.el).html(container);
