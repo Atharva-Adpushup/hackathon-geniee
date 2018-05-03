@@ -40,7 +40,7 @@ function Control() {
 
 		var container = $('<div/>')
 			.css({
-				display: 'inline-block'
+				display: 'block'
 			})
 			.attr({ id: adObj.id, class: '_ap_control_ad' });
 
