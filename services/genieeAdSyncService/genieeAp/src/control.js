@@ -33,15 +33,34 @@ function Control() {
 		}
 	}
 
+	function getControlCSS(adCode) {
+		var isBlock = false;
+
+		try {
+			var decodedAdCode = atob(adCode);
+
+			if (
+				decodedAdCode.indexOf('data-ad-format="link"') !== -1 ||
+				decodedAdCode.indexOf('data-ad-format="auto"') !== -1 ||
+				decodedAdCode.indexOf('data-ad-format="autorelaxed"') !== -1 ||
+				decodedAdCode.indexOf('data-ad-format="fluid"')
+			) {
+				isBlock = true;
+			}
+		} catch (e) {
+			console.log(e);
+		}
+
+		return isBlock ? { display: 'block' } : { display: 'inline-block' };
+	}
+
 	function activateAd(adObj) {
 		if (adObj.active) {
 			return true;
 		}
 
 		var container = $('<div/>')
-			.css({
-				display: 'block'
-			})
+			.css(getControlCSS(adObj.ac))
 			.attr({ id: adObj.id, class: '_ap_control_ad' });
 
 		$(adObj.el).html(container);
