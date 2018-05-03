@@ -101,27 +101,25 @@ router.get('/genieeUser/', function(req, res) {
 					return res.redirect('/user/site/' + data.site.siteId + '/dashboard');
 				});
 		}).catch(function(err) {
-			if (err.name === 'AdPushupError') {
-				if (err.code === 13) {
-					return res.send('Authentication Failed: User does not exist!');
-				}
-				var error = err.message[0];
-				return res.send(`Authentication Failed: ${error.message}`);
-			} else {
-				var error = err.toString();
-				console.log(error);
-				return res.send(`Authentication Failed: ${error}`);
-			}
+			return res.redirect('/403');
 		});
 	}
 
 	if (req.session.user) {
 		req.session.destroy(function() {
 			req.sessionStore.generate(req);
-			doIt();
+			try {
+				doIt();
+			} catch (e) {
+				return res.redirect('/403');
+			}
 		});
 	} else {
-		doIt();
+		try {
+			doIt();
+		} catch (e) {
+			return res.redirect('/403');
+		}
 	}
 });
 
