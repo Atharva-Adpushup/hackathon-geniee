@@ -17,15 +17,15 @@ html(lang="en")
                     else
                         link(href="/assets/css/libs/website.css", rel="stylesheet", type="text/css")
 
-                    if billingError && !isSuperUser
-                        style.
-                            .sidebar,
-                            .headerTopBar {
-                                top: 80px;
-                            }
+                    //- if billingError && !isSuperUser
+                    //-     style.
+                    //-         .sidebar,
+                    //-         .headerTopBar {
+                    //-             top: 80px;
+                    //-         }
 
-                            .pageContainer .pageContentWrapper .pageContentInner {
-                                padding-top: 160px;
+                    //-         .pageContainer .pageContentWrapper .pageContentInner {
+                    //-             padding-top: 160px;
                             }
 
                 link(id="favicon", rel="shortcut icon", href="/assets/images/favicon.ico", sizes="48x48", type="image/png")
@@ -107,18 +107,18 @@ html(lang="en")
         - isRequestDemo = (currentUser && currentUser.requestDemo) ? currentUser.requestDemo : null;
         - isUserOnboarded = (primarySiteDetails && primarySiteDetails.domain && primarySiteDetails.siteId && primarySiteDetails.step) ? true : false;
 
-        if billingError && !isSuperUser
-            .custom-message.error-text.dashboard-text.billing-error
-                if !currentUser.billingInfoComplete || !currentUser.paymentInfoComplete
-                    i(class="fa fa-warning" style="margin-right: 10px;") 
-                    | To start seeing ads, please complete - 
-                if !currentUser.billingInfoComplete
-                    | Billing profile 
-                    a(href="/user/billing") here. 
-                if !currentUser.paymentInfoComplete
-                    | Payment details 
-                    a(href="/user/payment") here. 
-                    | If you're using ads.txt, kindly paste the ads.txt configuration from the site's tags manager panel to your website.
+        //- if billingError && !isSuperUser
+        //-     .custom-message.error-text.dashboard-text.billing-error
+        //-         if !currentUser.billingInfoComplete || !currentUser.paymentInfoComplete
+        //-             i(class="fa fa-warning" style="margin-right: 10px;") 
+        //-             | To start seeing ads, please complete - 
+        //-         if !currentUser.billingInfoComplete
+        //-             | Billing profile 
+        //-             a(href="/user/billing") here. 
+        //-         if !currentUser.paymentInfoComplete
+        //-             | Payment details 
+        //-             a(href="/user/payment") here. 
+        //-             | If you're using ads.txt, kindly paste the ads.txt configuration from the site's tags manager panel to your website.
 
         if !excludeAnalytics
             if environment == "production"

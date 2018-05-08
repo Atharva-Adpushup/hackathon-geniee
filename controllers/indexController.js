@@ -159,26 +159,16 @@ function setSessionData(user, req, res, type) {
 
 		if (type == 1 && userPasswordMatch == 1) {
 			// Sign Up
-
-			// Commented for Tag Manager
-			// if (isRequestDemo) {
-			// 	return requestDemoRedirection(res);
-			// }
-
-			return res.redirect('/user/onboarding');
+			if (isRequestDemo) {
+				return requestDemoRedirection(res);
+			}
 		} else if (type == 2 && userPasswordMatch == 1) {
 			// Login
-			// Commented for Tag Manager
-			// if (parseInt(user.get('revenueLowerLimit')) == 0 || parseInt(user.get('revenueUpperLimit')) < 1000) {
-			// 	if (req.session.isSuperUser || !isRequestDemo) {
-			// 		allowEntry = 1;
-			// 	} else {
-			// 		redirectPath = 'thank-you';
-			// 	}
-			// } else {
-			// 	allowEntry = 1;
-			// }
-			allowEntry = 1;
+			if (req.session.isSuperUser || !isRequestDemo) {
+				allowEntry = 1;
+			} else {
+				redirectPath = 'thank-you';
+			}
 			if (allowEntry) {
 				var allUserSites = user.get('sites');
 
@@ -239,11 +229,9 @@ function setSessionData(user, req, res, type) {
 									return res.redirect('/user/dashboard');
 								}
 							} else {
-								// Commented for TagManager
-								// if (isRequestDemo) {
-								// 	return requestDemoRedirection(res);
-								// }
-
+								if (isRequestDemo) {
+									return requestDemoRedirection(res);
+								}
 								return res.redirect('/user/onboarding');
 							}
 						}
