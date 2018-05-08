@@ -11,6 +11,7 @@ import {
 	validateSectionXPath,
 	updateIncontentFloat,
 	updatePartnerData,
+	updateInContentMinDistanceFromPrevAd,
 	scrollSectionIntoView,
 	updateSection
 } from 'actions/sectionActions.js';
@@ -84,6 +85,7 @@ class variationSections extends Component {
 			onRenameSection,
 			onUpdatePartnerData,
 			onUpdateXPath,
+			onUpdateInContentMinDistanceFromPrevAd,
 			onSectionAllXPaths,
 			onValidateXPath,
 			onIncontentFloatUpdate,
@@ -132,6 +134,7 @@ class variationSections extends Component {
 									updateNetwork={updateNetwork}
 									onUpdatePartnerData={onUpdatePartnerData}
 									onUpdateXPath={onUpdateXPath}
+									onUpdateInContentMinDistanceFromPrevAd={onUpdateInContentMinDistanceFromPrevAd}
 									onSectionAllXPaths={onSectionAllXPaths}
 									onValidateXPath={onValidateXPath}
 									onResetErrors={onResetErrors}
@@ -162,6 +165,7 @@ variationSections.propTypes = {
 	updateAdCode: PropTypes.func.isRequired,
 	onUpdatePartnerData: PropTypes.func.isRequired,
 	onUpdateXPath: PropTypes.func,
+	onUpdateInContentMinDistanceFromPrevAd: PropTypes.func,
 	onSectionAllXPaths: PropTypes.func,
 	onValidateXPath: PropTypes.func,
 	onSectionXPathValidate: PropTypes.func,
@@ -186,6 +190,7 @@ export default connect(
 				onUpdateAdCode: updateAdCode,
 				onUpdatePartnerData: updatePartnerData,
 				onUpdateXPath: updateXPath,
+				onUpdateInContentMinDistanceFromPrevAd: updateInContentMinDistanceFromPrevAd,
 				onSectionAllXPaths: sectionAllXPaths,
 				onValidateXPath: validateXPath,
 				onResetErrors: resetErrors,
