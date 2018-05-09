@@ -473,7 +473,7 @@ function apiModule() {
 					},
 					function() {
 						siteData = Object.assign(siteData, {
-							isManual: siteData.partner && siteData.partner == 'geniee' ? false : true
+							isManual: false
 						});
 						return API.createSiteFromJson(siteData);
 					}

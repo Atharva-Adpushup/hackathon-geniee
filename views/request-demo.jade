@@ -62,9 +62,9 @@ block append headScripts
 	- user = user || {};
 	- analytics = analytics || {};
 
-	//- +loadAsset("js", [
-	//- 	'//assets.calendly.com/assets/external/widget.js'
-	//- ])
+	+loadAsset("js", [
+		'//assets.calendly.com/assets/external/widget.js'
+	])
 	script.
 		var analyticsObj = !{JSON.stringify(analytics)},
 			isAnalyticsObj = !!(analyticsObj && !jQuery.isEmptyObject(analyticsObj)),
@@ -126,7 +126,7 @@ block bodyContent
 						| in RPM.
 					h3(style="margin: 40px 0 10px; font-weight: bold;") Schedule a call with us to activate your account
 					ul
-						li.active(data-id="TemFBoDWjZw" class="livechat_button") Live chat now
+						//- li.active(data-id="TemFBoDWjZw" class="livechat_button") Live chat now
 						//- div(data-id="TemFBoDWjZw" class="livechat_button")
 						//- 	a(href="https://www.livechatinc.com/customer-service/?partner=lc_6965991&amp;utm_source=chat_button") Speak Now
 						li(onclick=onClickHandler) Schedule Later
