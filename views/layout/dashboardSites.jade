@@ -7,7 +7,7 @@
         .col-sm-6
             .mb-30
                 .controlAdpushupWrap
-                    if !site.channels.length
+                    if site.channels.length
                         h3.title.m-All-0.clearfix
                             a.pull-left(id="site-report-" + siteId, target='_blank').
                                 #{utils.domanize(site.domain)} - #{siteId}
@@ -182,9 +182,9 @@
                                 .status-text Page Group not found! Please 
                                     a(href="/user/site/#{siteId}/createPagegroup") create
                                     |  one to access the visual editor.
-                    if isSuperUser  
-                        .mode-setting
-                            span.label Manual Mode
-                            .toggle-switch
-                                input(type="checkbox" id="switch-#{siteId}" checked=site.isManual ? true : undefined)
-                                label(for="switch-#{siteId}" data-id="switch-#{siteId}" data-site-id="#{siteId}")
+                    //- if isSuperUser  
+                    //-     .mode-setting
+                    //-         span.label Manual Mode
+                    //-         .toggle-switch
+                    //-             input(type="checkbox" id="switch-#{siteId}" checked=site.isManual ? true : undefined)
+                    //-             label(for="switch-#{siteId}" data-id="switch-#{siteId}" data-site-id="#{siteId}")
