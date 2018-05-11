@@ -10,8 +10,8 @@ function init(w, d) {
 		gpt = require('./gpt'),
 		config = require('./config'),
 		geniee = require('./geniee'),
-		feedback = require('./feedback'),
-		hbStatus = require('./hbStatus');
+		feedback = require('./feedback');
+	// hbStatus = require('./hbStatus');
 
 	// Initialise GPT and set listeners
 	gpt.init(w, d);
