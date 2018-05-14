@@ -62,6 +62,15 @@ function errorHandler(error, originalMessage) {
 	let customErrorMessage;
 	customErrorMessage = error.message;
 
+	if (!customErrorMessage) {
+		customErrorMessage = error && error[0] ? error[0].message : 'Unsynced ads in setup';
+		if (typeof customErrorMessage == 'object') {
+			customErrorMessage = `Unsynced ads in setup | SectionId - ${customErrorMessage.sectionId} | adId - ${
+				customErrorMessage.ad.id
+			} | Network - ${customErrorMessage.ad.network}`;
+		}
+	}
+
 	const isEmptyConsumerMessage = !!(customErrorMessage === CONSTANTS.ERROR_MESSAGES.RABBITMQ.CONSUMER.EMPTY_MESSAGE),
 		isInvalidConsumerMessage = !!(customErrorMessage === CONSTANTS.ERROR_MESSAGES.MESSAGE.INVALID_DATA);
 
@@ -73,7 +82,7 @@ function errorHandler(error, originalMessage) {
 		counter = 0;
 		let decodedMessage = originalMessage.content.toString('utf-8');
 		decodedMessage = JSON.parse(decodedMessage);
-		customErrorMessage = customErrorMessage == undefined ? 'Unsynced ad units must be present' : customErrorMessage;
+		// customErrorMessage = customErrorMessage == undefined ? 'Unsynced ad units must be present' : customErrorMessage;
 		logger({
 			source: 'CDN SYNC ERROR LOGS',
 			message: `Error while CDN SYNC and error messgae : ${customErrorMessage}`,
