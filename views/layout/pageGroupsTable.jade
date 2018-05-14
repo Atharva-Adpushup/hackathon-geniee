@@ -51,8 +51,8 @@ if !partner
                                             input(type="hidden", name="pageGroupId", value="#{pagegroup.id}")
                                             button.delete-pagegroup(title="Delete")
                                                 i.fa.fa-trash
-                                    if pagegroup.platform=='DESKTOP'
-                                        a(href="/user/site/#{siteId}/pagegroup/ampSettings/"+pagegroup.pageGroup+"-"+pagegroup.platform title="Go to AMP Settings")
-                                            i.glyphicon.glyphicon-flash
+                                    //- if pagegroup.platform=='DESKTOP'
+                                    //-     a(href="/user/site/#{siteId}/pagegroup/ampSettings/"+pagegroup.pageGroup+"-"+pagegroup.platform title="Go to AMP Settings")
+                                    //-         i.glyphicon.glyphicon-flash
             else
                 h5 No PageGroup Found!
