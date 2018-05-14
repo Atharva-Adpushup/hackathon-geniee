@@ -114,6 +114,9 @@ class EditOptions extends Component {
 	}
 
 	render() {
+		const isInContentSection = !!(this.props.section.isIncontent),
+			isInContentMinDistanceFromPrevAd = !!(isInContentSection && this.props.section.minDistanceFromPrevAd && Number(this.props.section.minDistanceFromPrevAd) > -1);
+
 		return (
 			<div>
 				{this.props.isCustomZoneId ? (
@@ -166,25 +169,48 @@ class EditOptions extends Component {
 						</Row>
 					) : null
 				) : (
-					<Row>
-						<Col className="u-padding-r10px" xs={4}>
-							Float
-						</Col>
-						<Col className="u-padding-l10px" xs={8}>
-							<SelectBox
-								value={this.state.float}
-								label="Select Float"
-								onChange={this.onFloatSelectChange}
-								showClear={false}
-							>
-								{floats.map((float, index) => (
-									<option key={index} value={float}>
-										{float}
-									</option>
-								))}
-							</SelectBox>
-						</Col>
-					</Row>
+					<div>
+						<Row>
+							<Col className="u-padding-0px mB-5" xs={12}>
+								Min distance from previous ad
+							</Col>
+						</Row>
+						<Row>
+							<Col className="u-padding-0px mB-5" xs={12}>
+								<InlineEdit
+									validate
+									cancelEditHandler={this.props.onResetErrors.bind(null, this.props.section.id)}
+									value={this.props.section.minDistanceFromPrevAd.toString()}
+									submitHandler={this.props.onUpdateInContentMinDistanceFromPrevAd.bind(null, this.props.section.id)}
+									editClickHandler={this.props.onUpdateInContentMinDistanceFromPrevAd.bind(
+										null,
+										this.props.section.id
+									)}
+									text="minDistanceFromPrevAd"
+									errorMessage={'minDistanceFromPrevAd cannot be blank'}
+								/>
+							</Col>
+						</Row>
+						<Row>
+							<Col className="u-padding-r10px" xs={4}>
+								Float
+							</Col>
+							<Col className="u-padding-l10px" xs={8}>
+								<SelectBox
+									value={this.state.float}
+									label="Select Float"
+									onChange={this.onFloatSelectChange}
+									showClear={false}
+								>
+									{floats.map((float, index) => (
+										<option key={index} value={float}>
+											{float}
+										</option>
+									))}
+								</SelectBox>
+							</Col>
+						</Row>
+					</div>
 				)}
 				<div className="mT-10">{this.renderContent()}</div>
 			</div>

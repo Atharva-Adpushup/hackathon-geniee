@@ -278,7 +278,7 @@ class AdDetails extends Component {
 					{!this.props.section.isIncontent && this.props.section.type != typeOfAds.INTERACTIVE_AD ? (
 						<div>
 							{this.renderButton('Docked Settings', this.toggleHandler.bind(null, 'editDock'))}
-							{this.renderButton('Trigger Settings', this.toggleHandler.bind(null, 'editTrigger'))}
+							{/* {this.renderButton('Trigger Settings', this.toggleHandler.bind(null, 'editTrigger'))} */}
 						</div>
 					) : null}
 				</div>
