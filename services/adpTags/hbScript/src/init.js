@@ -25,6 +25,7 @@ function init(w, d) {
 	} else {
 		adpQue = [];
 	}
+	gpt.refreshIntervalSwitch(w);
 
 	var existingAdpTags = Object.assign({}, w.adpTags),
 		adpTagsModule = require('./adpTags');
