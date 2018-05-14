@@ -65,7 +65,9 @@ function errorHandler(error, originalMessage) {
 	if (!customErrorMessage) {
 		customErrorMessage = error && error[0] ? error[0].message : 'Unsynced ads in setup';
 		if (typeof customErrorMessage == 'object') {
-			customErrorMessage = `Unsynced ads in setup - ${customErrorMessage.ad.id}`;
+			customErrorMessage = `Unsynced ads in setup | SectionId - ${customErrorMessage.sectionId} | adId - ${
+				customErrorMessage.ad.id
+			} | Network - ${customErrorMessage.ad.network}`;
 		}
 	}
 

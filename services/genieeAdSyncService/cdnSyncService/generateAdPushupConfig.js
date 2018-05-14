@@ -50,7 +50,11 @@ const _ = require('lodash'),
 
 			//In case if even one ad inside variation is unsynced then we don't generate JS as unsynced ads will have no impression and hence loss of revenue'
 			if (!isAdSynced(ad)) {
-				throw new AdPushupError({ message: ERROR_MESSAGES.MESSAGE.UNSYNCED_SETUP, ad: ad });
+				throw new AdPushupError({
+					message: ERROR_MESSAGES.MESSAGE.UNSYNCED_SETUP,
+					ad: ad,
+					sectionId: sectionId
+				});
 			}
 
 			json = {
