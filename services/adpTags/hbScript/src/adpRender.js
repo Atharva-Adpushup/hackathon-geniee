@@ -26,6 +26,8 @@ var logger = require('../helpers/logger'),
 		slot.hasRendered = true;
 
 		if (slot.optionalParam.refreshSlot) {
+			window.focus();
+
 			googletag.cmd.push(function() {
 				setInterval(function() {
 					refreshGPTSlot(slot.gSlot);
