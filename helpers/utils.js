@@ -73,7 +73,7 @@ var url = require('url'),
 							.replace('https://', '')
 							.replace('www.', ''),
 						'/'
-					)
+				  )
 				: '';
 		},
 		rightTrim: function(string, s) {

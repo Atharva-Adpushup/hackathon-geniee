@@ -47,6 +47,7 @@
     "morgan": "~1.6.1",
     "mssql": "^4.0.4",
     "node-cron": "^1.1.2",
+    "node-sass": "4.9.0",
     "node-utils": "git://github.com/adpushup/NodeUtils.git",
     "node-uuid": "^1.4.7",
     "nodemon": "^1.9.1",
@@ -80,5 +81,4 @@
     "grunt-sass": "^1.1.0",
     "grunt-string-replace": "*"
   }
-
 }
