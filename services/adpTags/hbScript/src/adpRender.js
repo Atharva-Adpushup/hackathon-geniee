@@ -25,11 +25,18 @@ var logger = require('../helpers/logger'),
 		}
 		slot.hasRendered = true;
 
+		var gptRefreshInterval = null;
 		if (slot.optionalParam.refreshSlot) {
+			window.focus();
+
 			googletag.cmd.push(function() {
-				setInterval(function() {
+				gptRefreshInterval = setInterval(function() {
 					refreshGPTSlot(slot.gSlot);
 				}, config.GPT_REFRESH_INTERVAL);
+				window.adpTags.gptRefreshIntervals.push({
+					gSlot: slot.gSlot,
+					id: gptRefreshInterval
+				});
 			});
 		}
 
