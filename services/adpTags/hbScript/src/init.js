@@ -10,8 +10,8 @@ function init(w, d) {
 		gpt = require('./gpt'),
 		config = require('./config'),
 		geniee = require('./geniee'),
-		feedback = require('./feedback'),
-		hbStatus = require('./hbStatus');
+		feedback = require('./feedback');
+	// hbStatus = require('./hbStatus');
 
 	// Initialise GPT and set listeners
 	gpt.init(w, d);
@@ -25,6 +25,7 @@ function init(w, d) {
 	} else {
 		adpQue = [];
 	}
+	gpt.refreshIntervalSwitch(w);
 
 	var existingAdpTags = Object.assign({}, w.adpTags),
 		adpTagsModule = require('./adpTags');
