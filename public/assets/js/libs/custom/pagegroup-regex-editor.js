@@ -65,11 +65,3 @@ $(document).ready(function() {
 		});
 	})(window, document);
 });
-
-/*
-http://www.rentdigs.com/pet-friendly/states.aspx?Ad=G_RDC_HFR_SLE
-http://www.rentdigs.com/pet-friendly/pet-rentals.aspx?StateCD=CA
-http://www.rentdigs.com/pet-friendly/states.aspx
-
-http://www.rentdigs.com/newyork/states.aspx
-*/
