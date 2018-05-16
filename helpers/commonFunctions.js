@@ -391,6 +391,7 @@ const Promise = require('bluebird'),
 				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
 				count: parameterConfig.count || 20,
 				mode: parameterConfig.mode || 1,
+				platformCode: parameterConfig.platformCode || '',
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 

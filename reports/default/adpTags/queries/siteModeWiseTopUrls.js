@@ -38,11 +38,16 @@ module.exports = {
 					value: paramConfig.toDate
 				}
 			],
-			//Manually inserting '@__count__' value in sql query
-			// as sql engine fails to convert count value.
+			isPlatformCode = !!paramConfig.platformCode,
+			deviceTypeWhereClause = isPlatformCode ? `AND device_type IN (${paramConfig.platformCode})` : '',
+			//Manually inserting '@__count__' & '@__deviceTypeClause__' values in sql query
+			// as sql engine fails to convert count value & deviceType where clause is optional.
 			// NOTE: Always insert query values through input of prepared statement but
 			// manually insert probelmatic/typical values
-			dbQuery = `${SITE_MODE_WISE_TOP_URLS.replace('@__count__', paramConfig.count)}`,
+			dbQuery = `${SITE_MODE_WISE_TOP_URLS.replace('@__count__', paramConfig.count).replace(
+				'@__deviceTypeClause__',
+				deviceTypeWhereClause
+			)}`,
 			databaseConfig = {
 				inputParameters: inputParameterCollection.concat([]),
 				query: dbQuery

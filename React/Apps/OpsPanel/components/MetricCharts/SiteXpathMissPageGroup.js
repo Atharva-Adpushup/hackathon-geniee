@@ -262,12 +262,18 @@ class SiteXpathMissPageGroup extends Component {
 			apiParameters.toDate = moment(apiParameters.toDate).format('YYYY-MM-DD');
 			apiParameters.siteId = _ref.state.siteId;
 
-			$.post(`/ops/getSiteXpathMissPageGroupData`, apiParameters, response => {
-				_ref.setState({
-					data: response.data,
-					isDataLoaded: true
+			$.post(`/ops/getSiteXpathMissPageGroupData`, apiParameters)
+				.done(function(response) {
+					_ref.setState({
+						data: response.data,
+						isDataLoaded: true
+					});
+				})
+				.fail(function() {
+					window.alert(
+						'Failed to load XPathMiss PageGroup Metrics Chart data. Please try again after some time.'
+					);
 				});
-			});
 		});
 	}
 

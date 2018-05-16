@@ -191,7 +191,8 @@ router
 								.format('YYYY-MM-DD'),
 				siteId: bodyParameters.siteId,
 				mode: bodyParameters.mode || 1,
-				count: bodyParameters.count || 20
+				count: bodyParameters.count || 20,
+				platformCode: bodyParameters.platformCode || ''
 			},
 			dateFormatCollection = utils.getDateFormatCollection({
 				fromDate: params.fromDate,
