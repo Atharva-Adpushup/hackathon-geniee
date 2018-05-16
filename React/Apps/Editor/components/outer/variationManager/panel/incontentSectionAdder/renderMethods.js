@@ -97,20 +97,23 @@ const renderField = field => {
 		return (
 			<div>
 				<p>
-					Each <strong>Section no</strong> maps to a bracket of 200 pixels in reference to the content
-					selector i.e.
+					Each <strong>Section no</strong> maps to a minimum bracket of 600 pixels in reference to the content
+					selector. The bracket increases by 100 pixels for successive section numbers. i.e.
 				</p>
 				<ul>
 					<li>
-						Section No 1 : <strong>(0 - 200) pixels</strong>
+						Section No 1 : <strong>(0 - 600) pixels</strong>
 					</li>
 					<li>
-						Section No 2 : <strong>(200 - 400) pixels</strong>
+						Section No 2 : <strong>(500 - 1200) pixels</strong>
 					</li>
 					<li>
-						Section No 3 : <strong>(400 - 600) pixels</strong>
+						Section No 3 : <strong>(1000 - 1800) pixels</strong>
 					</li>
-					<li>...so on</li>
+					<li>
+						Section No 4 : <strong>(1500 - 2400) pixels</strong>
+					</li>
+					<li>...and so on</li>
 				</ul>
 			</div>
 		);
