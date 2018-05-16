@@ -36,6 +36,7 @@ const SITE_MODE_WISE_TOP_URLS = `
 SELECT top 20 url, count(*) count
 FROM ApexSiteReport a
 WHERE log_date BETWEEN @__fromDate__ AND @__toDate__
+@__deviceTypeClause__
 AND siteid = @__siteId__
 AND mode = @__mode__
 GROUP BY url

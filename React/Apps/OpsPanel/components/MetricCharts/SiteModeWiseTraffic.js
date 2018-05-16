@@ -140,6 +140,7 @@ class SiteModeWiseTraffic extends Component {
 			isTopUrlsButtonLoading: false,
 			isMainButtonLoading: false,
 			selectedMode: '1',
+			selectedPlatformCode: '',
 			urlCount: 20,
 			startDate: moment().subtract(7, 'days'),
 			endDate: moment().subtract(1, 'days'),
@@ -155,7 +156,9 @@ class SiteModeWiseTraffic extends Component {
 		this.getComputedParameterConfig = this.getComputedParameterConfig.bind(this);
 		this.getDefaultParameterConfig = this.getDefaultParameterConfig.bind(this);
 		this.handleSelectBoxChange = this.handleSelectBoxChange.bind(this);
-		this.renderSelectBox = this.renderSelectBox.bind(this);
+		this.handlePlatformSelectBoxChange = this.handlePlatformSelectBoxChange.bind(this);
+		this.renderModeSelectBox = this.renderModeSelectBox.bind(this);
+		this.renderPlatformSelectBox = this.renderPlatformSelectBox.bind(this);
 		this.renderModeTable = this.renderModeTable.bind(this);
 		this.renderTopUrlsCountTable = this.renderTopUrlsCountTable.bind(this);
 	}
@@ -294,6 +297,7 @@ class SiteModeWiseTraffic extends Component {
 		parameterConfig.siteId = _ref.state.siteId;
 		parameterConfig.count = _ref.state.urlCount;
 		parameterConfig.mode = Number(_ref.state.selectedMode);
+		parameterConfig.platformCode = _ref.state.selectedPlatformCode || '';
 
 		_ref.setState(
 			{
@@ -319,7 +323,16 @@ class SiteModeWiseTraffic extends Component {
 		});
 	}
 
-	renderSelectBox() {
+	handlePlatformSelectBoxChange(platformCode = '') {
+		platformCode = platformCode || '';
+
+		this.setState({
+			selectedPlatformCode: platformCode,
+			topUrlsData: null
+		});
+	}
+
+	renderModeSelectBox() {
 		const isModeData = !!this.state.data && this.state.data.sitewise,
 			siteWiseData = isModeData ? Object.keys(this.state.data.sitewise) : [];
 
@@ -336,6 +349,22 @@ class SiteModeWiseTraffic extends Component {
 						{modeName}
 					</option>
 				))}
+			</SelectBox>
+		);
+	}
+
+	renderPlatformSelectBox() {
+		return (
+			<SelectBox
+				className="u-margin-l10px"
+				value={this.state.selectedPlatformCode}
+				label="Select Platform"
+				onChange={this.handlePlatformSelectBoxChange}
+				onClear={this.handlePlatformSelectBoxChange}
+			>
+				<option value="2">DESKTOP</option>
+				<option value="1,4">MOBILE</option>
+				<option value="5">TABLET</option>
 			</SelectBox>
 		);
 	}
@@ -368,7 +397,8 @@ class SiteModeWiseTraffic extends Component {
 				</Row>
 				<Row className="u-margin-0px aligner-item">
 					<Col className="u-full-height aligner aligner--hStart aligner--vStart" xs={5}>
-						{this.renderSelectBox()}
+						{this.renderModeSelectBox()}
+						{this.renderPlatformSelectBox()}
 						<button
 							disabled={isTopUrlsButtonLoading}
 							className="btn btn-lightBg btn-default btn-blue u-margin-l10px"
