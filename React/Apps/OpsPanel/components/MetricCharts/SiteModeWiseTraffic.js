@@ -278,13 +278,21 @@ class SiteModeWiseTraffic extends Component {
 			apiParameters.toDate = moment(apiParameters.toDate).format('YYYY-MM-DD');
 			apiParameters.siteId = _ref.state.siteId;
 
-			$.post(`/ops/getSiteModeWiseData`, apiParameters, response => {
-				_ref.setState({
-					data: response.data,
-					isDataLoaded: true,
-					isMainButtonLoading: false
+			$.post(`/ops/getSiteModeWiseData`, apiParameters)
+				.done(function(response) {
+					_ref.setState({
+						data: response.data,
+						isDataLoaded: true,
+						isMainButtonLoading: false
+					});
+				})
+				.fail(function() {
+					window.alert('Failed to load Mode Wise Traffic Chart data. Please try again after some time.');
+
+					_ref.setState({
+						isMainButtonLoading: false
+					});
 				});
-			});
 		});
 	}
 
@@ -304,12 +312,20 @@ class SiteModeWiseTraffic extends Component {
 				isTopUrlsButtonLoading: true
 			},
 			() => {
-				$.post(`/ops/getSiteModeWiseTopUrlsData`, parameterConfig, response => {
-					_ref.setState({
-						topUrlsData: response.data,
-						isTopUrlsButtonLoading: false
+				$.post(`/ops/getSiteModeWiseTopUrlsData`, parameterConfig)
+					.done(function(response) {
+						_ref.setState({
+							topUrlsData: response.data,
+							isTopUrlsButtonLoading: false
+						});
+					})
+					.fail(function() {
+						window.alert('Failed to load Mode Wise Top urls. Please try again after some time.');
+
+						_ref.setState({
+							isTopUrlsButtonLoading: false
+						});
 					});
-				});
 			}
 		);
 	}
