@@ -30,7 +30,8 @@ var model = require('../helpers/model'),
 			'activeVariation',
 			'dateCreated',
 			'dateModified',
-			'genieePageGroupId'
+			'genieePageGroupId',
+			'ampSettings'
 		];
 		this.clientKeys = [
 			'id',
@@ -43,7 +44,8 @@ var model = require('../helpers/model'),
 			'contentSelector',
 			'contentSelectorMissing',
 			'activeVariation',
-			'genieePageGroupId'
+			'genieePageGroupId',
+			'ampSettings'
 		];
 		this.validations = {
 			required: []
