@@ -88,9 +88,10 @@ block bodyContent
                                         hr
                                         .row
                                             .col-md-4
-                                                a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexVerifier", target="_blank") Regex Verification Tool
-                                            //- .col-md-4
-                                            //-     a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexGenerator", target="_blank") Regex Generation Tool
+                                                a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexVerifier", target="_blank", style="width: 100%") Regex Verification Tool
+                                            if isSuperUser
+                                                .col-md-4
+                                                    a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexGenerator", target="_blank", style="width: 100%") Regex Generation Tool
                                     .col-sm-6
                                         .row
                                             .col-sm-12

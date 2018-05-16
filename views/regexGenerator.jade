@@ -1,121 +1,107 @@
 extends  layout/base
 
 block getTitle
-    - var titleVar = "Settings | RegEx Generator"
+	- var titleVar = "Settings | RegEx Generator"
 
 block append headScripts
-    +loadAsset("js", [
-        '/assets/js/libs/custom/pagegroup-regex-editor.js',
-    ])
+	+loadAsset("js", [
+		'/assets/js/libs/custom/pagegroup-regex-editor.js',
+	])
+	script.
+		$(document).ready(function() {
+			window.siteId = !{siteId};
+		});
 
 block append headCss
-    style.
-        .mg-b-10 {
-            margin-bottom: 10px !important;
-        }
-        .mg-t-10 {
-            margin-top: 10px !important;
-        }
-        .instructions-box {
-            padding: 10px;
-            border: 1px solid #000;
-        }
-        .instructions-box h5 {
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .instructions-box ul li {
-            font-size: 14px;
-        }
-        pre code {
-            text-align: left;
-        }
-        pre code p {
-            margin: 0 !important;
-            padding 0;
-            display: inline;
-            float: left;
-        }
+	style.
+		.mg-b-10 {
+			margin-bottom: 10px !important;
+		}
+		.mg-t-10 {
+			margin-top: 10px !important;
+		}
+		.instructions-box {
+			padding: 10px;
+			border: 1px solid #000;
+		}
+		.instructions-box h5 {
+			font-size: 16px;
+			font-weight: bold;
+		}
+		.instructions-box ul li {
+			font-size: 14px;
+		}
+		pre code {
+			text-align: left;
+		}
+		pre code p {
+			margin: 0 !important;
+			padding 0;
+			display: inline;
+			float: left;
+		}
+		.regex-generator-form h3, .additional-info h3  {
+			font-size: 20px !important;
+			margin: 15px 0px;
+			padding: 10px 0px;
+			border-bottom: 1px solid #ebebeb;
+		}
+		#output-box {
+			display: none;
+			clear: both;
+			margin: 20px 0px;
+		}
+		.additional-info {
+			padding: 10px 0px;
+		}
+		.matched-urls {
+			color: #4BB543;
+		}
+		.not-matched-urls {
+			color: #eb575c;
+		}
 
 block bodyContent
-    include layout/sideBar
-    .pageContainer.page-container
-        include layout/header
-        // Page Content Starts Here
-        .pageContentWrapper.page-content
-            .pageContentInner.page-content--inner
-                .notification-wrapper
+	include layout/sideBar
+	.pageContainer.page-container
+		include layout/header
+		// Page Content Starts Here
+		.pageContentWrapper.page-content
+			.pageContentInner.page-content--inner
+				.notification-wrapper
 
-                #widgetsArea.row
-                    .mb-30.col-md-8(style="margin: 0 auto; float: none;")
-                        .controlAdpushupWrap
-                            h3.title.m-All-0.clearfix 
-                                a RegEx Generator Helper Tool
-                            .settings-pane
-                                    .row
-                                        .col-sm-12
-                                            .instructions-box.mg-b-10
-                                                h5.mg-b-10 General Instructions
-                                                ul
-                                                    li Urls must contain www or relevant subdomain
-                                                    li Domain name is compulsory as of now
-                                                    li All urls must be of same pagegroup
-                                            form(method="post", action="regexGenerator")
-                                                input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", value=userInputs[0])
-                                                input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", value=userInputs[1])
-                                                input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", value=userInputs[2])
-                                                input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", value=userInputs[3])
-                                                hr
-                                                #output-box
-                                                    if ok
-                                                        - completeObj = regexResult.completeObj
-                                                        - completeRegex = regexResult.completeRegex
-                                                        - completeRegexAlt = regexResult.completeRegexAlt
-                                                        pre.mg-b-10
-                                                            code Exact Match Regex :
-                                                                #complete-regex !{completeRegex}
-                                                        pre.mg-b-10
-                                                            code Alternative Regex :
-                                                                #complete-regex-alt !{completeRegexAlt}
-                                                        pre.mg-b-10#individual-components
-                                                            code Individual Components (Exact Match):
-                                                                each value, key in completeObj
-                                                                    if typeof value === 'object'
-                                                                        for innerValue, innerKey in value
-                                                                            - innerPrintThis = innerKey + ' --> <strong>' + innerValue + '</strong>';
-                                                                            p!= innerPrintThis
-                                                                    else
-                                                                        - printThis = key + ' --> <strong>' + value + '</strong>';
-                                                                        p!= printThis
-                                                    else if (ok != undefined && !ok)
-                                                        pre.mg-b-10
-                                                            code !{msg}
-                                                    .row.settings-btn-pane
-                                                        if ok
-                                                            .col-sm-3#edit-btn-box
-                                                                input.form-control.btn-primary#edit-regex(type="button", value="Edit Expression")
-                                                        .col-sm-3
-                                                            input.form-control.btn-primary(type="submit", value="Generate Expression")
-                                            if ok
-                                                #edit-box.mg-b-10.hidden
-                                                    each value, key in completeObj
-                                                        if typeof value === 'object'
-                                                            for innerValue, innerKey in value
-                                                                .mg-b-10
-                                                                    .col-md-6
-                                                                        .input-name!= innerKey
-                                                                    .col-md-6
-                                                                        input.form-control(type="text", value='#{innerValue}', data-id="path-value")
-                                                                    div(style="clear:both;")
-                                                                    
-                                                        else
-                                                            .mg-b-10
-                                                                .col-md-6
-                                                                    .input-name!= key
-                                                                .col-md-6
-                                                                    input.form-control(type="text", value='#{value}', data-id="#{key}")
-                                                                div(style="clear:both;")
-                                                    .col-sm-3
-                                                        input.form-control.btn-primary#save-regex(type="button", value="Save")
+				#widgetsArea.row
+					.mb-30.col-md-8(style="margin: 0 auto; float: none;")
+						.controlAdpushupWrap
+							h3.title.m-All-0.clearfix 
+								a Regex Generator Helper Tool
+							.settings-pane
+									.row
+										.col-sm-12
+											.instructions-box.mg-b-10
+												h5.mg-b-10 General Instructions
+												ul
+													li Urls must contain www or relevant subdomain as in enter complete url
+													li All urls must be of same pagegroup
+													li This tool is to assist you and it will not cover all usecases. Human intervention still might be required at times.
+											form.regex-generator-form(method="post", action="regexGenerator")
+												h3 Urls you want to match
+												input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", class="to-match")
+												input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", class="to-match")
+												input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", class="to-match")
+												input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", class="to-match")
+												hr
+												h3 Urls you do not want to match (Optional)
+												input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", class="to-not-match")
+												input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", class="to-not-match")
+												input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", class="to-not-match")
+												input.form-control.pg-url.mg-b-10(type="text", placeholder="Enter url", name="url", class="to-not-match")
+												hr
+												.col-sm-3(style="padding: 0px;")
+													input.form-control.btn-primary(type="submit", value="Generate Expression")
+												div(style="clear:both;")
 
-                div(style="clear:both;")
+											#output-box
+												pre
+
+				div(style="clear:both;")

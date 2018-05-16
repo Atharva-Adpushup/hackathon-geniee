@@ -5,7 +5,7 @@ var express = require('express'),
 	_ = require('lodash'),
 	urlModule = require('url'),
 	AdPushupError = require('../helpers/AdPushupError'),
-	reGenerator = require('../misc/tools/regexGenerator'),
+	regexGenerator = require('../misc/tools/regexGenerator/index'),
 	utils = require('../helpers/utils'),
 	channelModel = require('../models/channelModel'),
 	config = require('../configs/config'),
@@ -68,7 +68,8 @@ router
 					apConfigs: site.get('apConfigs'),
 					blocklist: site.get('apConfigs').blocklist,
 					siteId: req.params.siteId,
-					siteDomain: site.get('siteDomain')
+					siteDomain: site.get('siteDomain'),
+					isSuperUser: req.session.isSuperUser
 				});
 			})
 			.catch(err => {
@@ -162,27 +163,38 @@ router
 	})
 	.get('/:siteId/settings/regexGenerator', function(req, res) {
 		return res.render('regexGenerator', {
-			ok: undefined,
-			userInputs: []
+			siteId: req.params.siteId
+			// ok: undefined,
+			// userInputs: []
 		});
 	})
 	.post('/:siteId/settings/regexGenerator', function(req, res) {
-		var userInputs = req.body.url.filter(Boolean);
-		if (!userInputs.length) {
-			return res.render('regexGenerator', {
-				ok: undefined,
-				userInputs: []
-			});
-		} else {
-			var response = reGenerator.init(userInputs);
-			// console.log(response);
-			return res.render('regexGenerator', {
-				ok: response.ok,
-				msg: response.errorMessage,
-				regexResult: response.regex,
-				userInputs: userInputs
+		if (!req.body && !req.body.toMatch && !req.body.toMatch.length) {
+			return res.send({
+				error: true,
+				message: 'Incomplete Params'
 			});
 		}
+		return regexGenerator({
+			toMatch: req.body.toMatch,
+			toNotMatch: req.body.toNotMatch
+		}).then(response => {
+			if (!response.error) {
+				let urls = _.concat(req.body.toMatch, req.body.toNotMatch),
+					matchedUrls = [],
+					notMatchedUrls = [],
+					re = new RegExp(response.regex, 'i');
+				_.forEach(urls, url => {
+					re.test(url) ? matchedUrls.push(url) : notMatchedUrls.push(url);
+				});
+				response = {
+					...response,
+					matchedUrls,
+					notMatchedUrls
+				};
+			}
+			return res.send(response);
+		});
 	})
 	.post('/:siteId/saveSiteSettings', function(req, res) {
 		var json = { settings: req.body, siteId: req.params.siteId };
