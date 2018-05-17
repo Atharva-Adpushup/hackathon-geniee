@@ -87,10 +87,18 @@ $grey-light: #f3f6f8;
 		min-height: 250px;
 	}
 
+	.react-select-box-container {
+		max-width: 300px;
+	}
+
 	&.metricsChart--modeWiseTraffic {
 		.table-responsive {
 			min-height: auto;
 			max-height: 300px;
+		}
+
+		.react-select-box-container {
+			max-width: 200px;
 		}
 	}
 }

@@ -113,14 +113,23 @@ module.exports = {
 					value: paramConfig.siteId
 				}
 			],
-			dbQuery = `${SITE_MODE_WISE_TRAFFIC_PERFORMANCE}`,
+			isPlatformCode = !!paramConfig.platformCode,
+			deviceTypeWhereClause = isPlatformCode ? `AND a.device_type IN (${paramConfig.platformCode})` : '',
+			//Manually inserting '@__deviceTypeClause__' values in sql query
+			// as deviceType where clause is optional.
+			// NOTE: Always insert query values through input of prepared statement but manually insert probelmatic/typical values
+			dbQuery = `${SITE_MODE_WISE_TRAFFIC_PERFORMANCE.replace('@__deviceTypeClause__', deviceTypeWhereClause)}`,
 			databaseConfig = {
 				inputParameters: inputParameterCollection.concat([]),
 				query: dbQuery
 			},
 			getReportData = sqlReportModule.executeQuery(databaseConfig);
 
-		console.log(`Query for site mode wise contribution between: ${paramConfig.fromDate} and ${paramConfig.toDate}`);
+		console.log(
+			`Query for site ${paramConfig.siteId} mode wise contribution between: ${paramConfig.fromDate} and ${
+				paramConfig.toDate
+			}`
+		);
 
 		return Promise.join(getReportData, resultData => {
 			const isOptionTransform = !!(paramConfig && paramConfig.transform),

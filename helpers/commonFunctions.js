@@ -470,6 +470,7 @@ const Promise = require('bluebird'),
 				siteId: parameterConfig.siteId,
 				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
 				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				platformCode: parameterConfig.platformCode || '',
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 
