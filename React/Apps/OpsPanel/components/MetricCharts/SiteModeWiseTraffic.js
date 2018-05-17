@@ -206,7 +206,8 @@ class SiteModeWiseTraffic extends Component {
 		const isMainButtonLoading = this.state.isMainButtonLoading;
 
 		return (
-			<Col className="u-full-height aligner aligner--hBottom aligner--vStart" xs={7}>
+			<Col className="u-full-height aligner aligner--hBottom aligner--vStart" xs={8}>
+				{this.renderPlatformSelectBox()}
 				<DateRangePicker
 					onDatesChange={this.datesUpdated}
 					onFocusChange={this.focusUpdated}
@@ -269,6 +270,7 @@ class SiteModeWiseTraffic extends Component {
 			stateObject.startDate = parameterConfig.fromDate;
 			stateObject.endDate = parameterConfig.toDate;
 			stateObject.topUrlsData = null;
+			stateObject.selectedPlatformCode = '';
 		}
 
 		this.setState(stateObject, () => {
@@ -277,6 +279,7 @@ class SiteModeWiseTraffic extends Component {
 			apiParameters.fromDate = moment(apiParameters.fromDate).format('YYYY-MM-DD');
 			apiParameters.toDate = moment(apiParameters.toDate).format('YYYY-MM-DD');
 			apiParameters.siteId = _ref.state.siteId;
+			apiParameters.platformCode = _ref.state.selectedPlatformCode || '';
 
 			$.post(`/ops/getSiteModeWiseData`, apiParameters)
 				.done(function(response) {
@@ -372,7 +375,7 @@ class SiteModeWiseTraffic extends Component {
 	renderPlatformSelectBox() {
 		return (
 			<SelectBox
-				className="u-margin-l10px"
+				className="u-margin-r10px"
 				value={this.state.selectedPlatformCode}
 				label="Select Platform"
 				onChange={this.handlePlatformSelectBoxChange}
@@ -412,9 +415,8 @@ class SiteModeWiseTraffic extends Component {
 					<Col className="u-full-height aligner aligner--hCenter aligner--vCenter" xs={4} />
 				</Row>
 				<Row className="u-margin-0px aligner-item">
-					<Col className="u-full-height aligner aligner--hStart aligner--vStart" xs={5}>
+					<Col className="u-full-height aligner aligner--hStart aligner--vStart" xs={4}>
 						{this.renderModeSelectBox()}
-						{this.renderPlatformSelectBox()}
 						<button
 							disabled={isTopUrlsButtonLoading}
 							className="btn btn-lightBg btn-default btn-blue u-margin-l10px"
@@ -434,7 +436,7 @@ class SiteModeWiseTraffic extends Component {
 			headerTitle = this.generateHeaderTitle();
 
 		return (
-			<Panel className="mb-20 metricsChart" header={headerTitle}>
+			<Panel className="mb-20 metricsChart metricsChart--modeWiseTraffic" header={headerTitle}>
 				{this.state.isDataLoaded ? this.renderHighCharts() : <PaneLoader />}
 				{this.state.isDataLoaded ? this.renderModeTable() : null}
 				{this.state.topUrlsData ? this.renderTopUrlsCountTable() : null}

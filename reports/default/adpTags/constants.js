@@ -128,6 +128,7 @@ const SITE_MODE_WISE_TRAFFIC_PERFORMANCE = `
 SELECT a.siteid, b.name as siteName, a.report_date, a.mode, sum(a.total_requests) as total_page_views
 FROM ApexHourlySiteReport a,  Site b
 WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
+@__deviceTypeClause__
 AND a.siteid = @__siteId__
 AND a.siteid = b.siteid AND a.siteid > 25000
 GROUP BY a.report_date, a.mode, a.siteid, b.name
@@ -199,6 +200,12 @@ WHERE rn <= @__count__
 ORDER BY page_group
 `;
 
+/**
+ * Below standard has been originally created by Open RTB specification and our backend sql reporting uses it.
+ *
+ * Always use '4' key for choosing MOBILE platform in case of sql (apex) reports
+ * NOTE: You can also use IN clause (for example, 'WHERE device_type IN (1,4)') if you wish to add both mobile keys
+ * **/
 const PLATFORMS_KEYS = {
 	0: 'UNKNOWN',
 	1: 'MOBILE',
