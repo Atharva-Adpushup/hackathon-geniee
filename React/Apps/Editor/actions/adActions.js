@@ -10,6 +10,7 @@ const createAd = payload => ({
 	}),
 	deleteAd = (adId, sectionId) => ({ type: adActions.DELETE_AD, adId, sectionId }),
 	updateCss = (adId, css) => ({ type: adActions.UPDATE_CSS, adId, css }),
+	updateCustomCss = (adId, customCSS) => ({ type: adActions.UPDATE_CUSTOM_CSS, adId, customCSS }),
 	updateNetwork = (adId, params) => ({
 		type: adActions.UPDATE_NETWORK,
 		adId,
@@ -22,4 +23,4 @@ const createAd = payload => ({
 	}),
 	updateAdCode = (adId, adCode, network) => ({ type: adActions.UPDATE_ADCODE, adId, adCode, network });
 
-export { createAd, deleteAd, updateCss, updateAdCode, updateNetwork, updateAd };
+export { createAd, deleteAd, updateCss, updateCustomCss, updateAdCode, updateNetwork, updateAd };

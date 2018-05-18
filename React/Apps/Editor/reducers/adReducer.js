@@ -42,6 +42,7 @@ const adsByIds = (state = {}, action) => {
 					width: payload.width,
 					height: payload.height,
 					css: payload.css,
+					customCSS: payload.customCSS,
 					// adCode: payload.adCode ? payload.adCode : undefined,
 					network: payload.network,
 					secondaryCss: payload.secondaryCss
@@ -125,13 +126,16 @@ const adsByIds = (state = {}, action) => {
 							? {
 									...state[action.adId].networkData,
 									...action.networkData
-								}
+							  }
 							: action.networkData
 				}
 			};
 
 		case adActions.UPDATE_CSS:
 			return { ...state, [action.adId]: { ...state[action.adId], css: action.css } };
+
+		case adActions.UPDATE_CUSTOM_CSS:
+			return { ...state, [action.adId]: { ...state[action.adId], customCSS: action.customCSS } };
 
 		case adActions.UPDATE_AD:
 			return { ...state, [action.adId]: { ...state[action.adId], ...action.params } };
