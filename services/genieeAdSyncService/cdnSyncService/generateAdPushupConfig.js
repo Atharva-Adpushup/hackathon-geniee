@@ -78,6 +78,9 @@ const _ = require('lodash'),
 				if (ad.secondaryCss) {
 					json.secondaryCss = ad.secondaryCss;
 				}
+				if (ad.customCSS) {
+					json.customCSS = ad.customCSS;
+				}
 				if (section.notNear) {
 					json.notNear = section.notNear;
 				}
