@@ -108,7 +108,8 @@ const mapStateToProps = (state, ownProps) => ({
 			section: 1,
 			float: 'none',
 			minDistanceFromPrevAd: 200,
-			adSize: getSupportedSizes()[0]
+			adSize: getSupportedSizes()[0],
+			customCSS: '{"margin-top": "0px", "margin-right": "0px", "margin-bottom": "0px", "margin-left": "0px"}'
 		}
 	}),
 	mapDispatchToProps = (dispatch, ownProps) => ({
@@ -125,19 +126,13 @@ const mapStateToProps = (state, ownProps) => ({
 				return false;
 			}
 			const notNear = getNotNearData(values.notNear),
-				// isCustomZoneId = !!values.customZoneId,
+				isCustomCSS = !!(values.customCSS),
 				sectionPayload = {
 					sectionNo: values.section,
 					name: values.name,
 					minDistanceFromPrevAd: values.minDistanceFromPrevAd,
 					float: values.float,
 					notNear
-					// partnerData: {
-					// 	position: 0,
-					// 	firstFold: 0,
-					// 	asyncTag: 1,
-					// 	customZoneId: values.customZoneId ? values.customZoneId : ''
-					// }
 				},
 				adPayload = {
 					adCode: btoa(values.adCode),
@@ -145,8 +140,8 @@ const mapStateToProps = (state, ownProps) => ({
 					network: networkInfo.network,
 					networkData: {}
 				};
-
-			// isCustomZoneId ? (adPayload.networkData.zoneId = values.customZoneId) : null;
+			
+			isCustomCSS ? (adPayload.customCSS = JSON.parse(values.customCSS)) : null;
 
 			adPayload.networkData = {
 				...adPayload.networkData,
