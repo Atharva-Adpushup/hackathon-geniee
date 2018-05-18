@@ -47,9 +47,12 @@ class customCssEditor extends React.Component {
 			mode: 'javascript',
 			theme: 'solarized',
 			lineNumbers: true
-		};
+		},
+		isCompact = !!(this.props.compact),
+		compactStyles = isCompact ? {paddingBottom: '70px'} : {};
+
 		return (
-			<div className="containerButtonBar">
+			<div style={compactStyles} className="containerButtonBar">
 				{this.state.error && <div>Some Error in CSS, remove comma in last property if there.</div>}
 				<Codemirror value={this.state.css} onChange={this.updateCode} options={options} />
 
