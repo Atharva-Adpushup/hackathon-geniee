@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import InlineEdit from 'shared/inlineEdit/index.jsx';
 import SelectBox from 'shared/select/select.js';
-import CodeBox from 'shared/codeBox';
+import CssEditor from 'shared/cssEditor/cssEditor.jsx';
 import { floats, networks } from 'consts/commonConsts';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 import AdDetails from '../../../editMenu/AdDetails';
@@ -70,9 +70,11 @@ class EditOptions extends Component {
 	}
 
 	customCSSEditorSubmit(adId, customCSS) {
-		customCSS = atob(customCSS);
-		customCSS = typeof customCSS != 'object' ? JSON.parse(customCSS) : customCSS;
-
+		this.props.showNotification({
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Ad custom CSS saved successfully'
+		});
 		this.props.onUpdateCustomCss(adId, customCSS);
 	}
 
@@ -137,7 +139,6 @@ class EditOptions extends Component {
 			};
 
 		let inContentAdCustomCSS = (isInContentCustomCSS ? (sectionProps.ads[0].customCSS) : defaultCustomCSS);
-		inContentAdCustomCSS = btoa(JSON.stringify(inContentAdCustomCSS));
 
 		return (
 			<div>
@@ -214,18 +215,13 @@ class EditOptions extends Component {
 							</Col>
 						</Row>
 						<Row>
-							<Col className="u-padding-0px mB-5" xs={12}>
+							<Col className="u-padding-0px mB-5 mT-5" xs={12}>
 								Custom CSS
 							</Col>
 						</Row>
 						<Row>
-							<Col className="u-padding-0px mB-5" xs={12}>
-								<CodeBox
-									showButtons={true}
-									onSubmit={this.customCSSEditorSubmit.bind(null, adProps.id)}
-									size="small"
-									code={inContentAdCustomCSS}
-								/>
+							<Col className="u-padding-0px mB-10" xs={12}>
+								<CssEditor compact css={inContentAdCustomCSS} onSave={this.customCSSEditorSubmit.bind(null, adProps.id)} onCancel={() => {}} />
 							</Col>
 						</Row>
 
