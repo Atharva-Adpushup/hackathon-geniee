@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import InlineEdit from 'shared/inlineEdit/index.jsx';
 import SelectBox from 'shared/select/select.js';
+import CodeBox from 'shared/codeBox';
 import { floats, networks } from 'consts/commonConsts';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 import AdDetails from '../../../editMenu/AdDetails';
@@ -23,6 +24,7 @@ class EditOptions extends Component {
 		this.toggleNetworkEditor = this.toggleNetworkEditor.bind(this);
 		this.toggleEditInteractiveAd = this.toggleEditInteractiveAd.bind(this);
 		this.adpushupSubmitHandler = this.adpushupSubmitHandler.bind(this);
+		this.customCSSEditorSubmit = this.customCSSEditorSubmit.bind(this);
 	}
 
 	onFloatSelectChange(float) {
@@ -65,6 +67,13 @@ class EditOptions extends Component {
 
 	toggleEditInteractiveAd() {
 		this.setState({ editInteractiveAdData: !this.state.editInteractiveAdData });
+	}
+
+	customCSSEditorSubmit(adId, customCSS) {
+		customCSS = atob(customCSS);
+		customCSS = typeof customCSS != 'object' ? JSON.parse(customCSS) : customCSS;
+
+		this.props.onUpdateCustomCss(adId, customCSS);
 	}
 
 	renderContent() {
@@ -114,8 +123,21 @@ class EditOptions extends Component {
 	}
 
 	render() {
-		const isInContentSection = !!(this.props.section.isIncontent),
-			isInContentMinDistanceFromPrevAd = !!(isInContentSection && this.props.section.minDistanceFromPrevAd && Number(this.props.section.minDistanceFromPrevAd) > -1);
+		const sectionProps = this.props.section,
+			isInContentSection = !!(sectionProps.isIncontent),
+			isInContentMinDistanceFromPrevAd = !!(isInContentSection && sectionProps.minDistanceFromPrevAd && Number(sectionProps.minDistanceFromPrevAd) > -1),
+			isInContentAds = !!(isInContentSection && sectionProps.ads && sectionProps.ads.length),
+			adProps = isInContentAds && sectionProps.ads[0],
+			isInContentCustomCSS = !!(isInContentAds && sectionProps.ads[0] && sectionProps.ads[0].customCSS),
+			defaultCustomCSS = {
+				"margin-top":"0px",
+				"margin-right":"0px",
+				"margin-bottom":"0px",
+				"margin-left":"0px"
+			};
+
+		let inContentAdCustomCSS = (isInContentCustomCSS ? (sectionProps.ads[0].customCSS) : defaultCustomCSS);
+		inContentAdCustomCSS = btoa(JSON.stringify(inContentAdCustomCSS));
 
 		return (
 			<div>
@@ -137,8 +159,8 @@ class EditOptions extends Component {
 						</Col>
 					</Row>
 				) : null}
-				{!this.props.section.isIncontent ? (
-					this.props.section.type != 3 ? (
+				{!sectionProps.isIncontent ? (
+					sectionProps.type != 3 ? (
 						<Row>
 							<Col className="u-padding-r10px" xs={4}>
 								XPath
@@ -147,16 +169,16 @@ class EditOptions extends Component {
 								<InlineEdit
 									compact
 									validate
-									cancelEditHandler={this.props.onResetErrors.bind(null, this.props.section.id)}
+									cancelEditHandler={this.props.onResetErrors.bind(null, sectionProps.id)}
 									customError={this.props.ui.errors.xpath ? this.props.ui.errors.xpath.error : false}
-									dropdownList={this.props.section.allXpaths}
-									value={this.props.section.xpath}
-									keyUpHandler={this.props.onValidateXPath.bind(null, this.props.section.id)}
-									submitHandler={this.props.onUpdateXPath.bind(null, this.props.section.id)}
+									dropdownList={sectionProps.allXpaths}
+									value={sectionProps.xpath}
+									keyUpHandler={this.props.onValidateXPath.bind(null, sectionProps.id)}
+									submitHandler={this.props.onUpdateXPath.bind(null, sectionProps.id)}
 									editClickHandler={this.props.onSectionAllXPaths.bind(
 										null,
-										this.props.section.id,
-										this.props.section.xpath
+										sectionProps.id,
+										sectionProps.xpath
 									)}
 									text="XPath"
 									errorMessage={
@@ -179,18 +201,34 @@ class EditOptions extends Component {
 							<Col className="u-padding-0px mB-5" xs={12}>
 								<InlineEdit
 									validate
-									cancelEditHandler={this.props.onResetErrors.bind(null, this.props.section.id)}
-									value={this.props.section.minDistanceFromPrevAd.toString()}
-									submitHandler={this.props.onUpdateInContentMinDistanceFromPrevAd.bind(null, this.props.section.id)}
+									cancelEditHandler={this.props.onResetErrors.bind(null, sectionProps.id)}
+									value={sectionProps.minDistanceFromPrevAd.toString()}
+									submitHandler={this.props.onUpdateInContentMinDistanceFromPrevAd.bind(null, sectionProps.id)}
 									editClickHandler={this.props.onUpdateInContentMinDistanceFromPrevAd.bind(
 										null,
-										this.props.section.id
+										sectionProps.id
 									)}
 									text="minDistanceFromPrevAd"
 									errorMessage={'minDistanceFromPrevAd cannot be blank'}
 								/>
 							</Col>
 						</Row>
+						<Row>
+							<Col className="u-padding-0px mB-5" xs={12}>
+								Custom CSS
+							</Col>
+						</Row>
+						<Row>
+							<Col className="u-padding-0px mB-5" xs={12}>
+								<CodeBox
+									showButtons={true}
+									onSubmit={this.customCSSEditorSubmit.bind(null, adProps.id)}
+									size="small"
+									code={inContentAdCustomCSS}
+								/>
+							</Col>
+						</Row>
+
 						<Row>
 							<Col className="u-padding-r10px" xs={4}>
 								Float

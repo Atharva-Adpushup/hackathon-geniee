@@ -5,7 +5,6 @@ import { Row, Col, Button } from 'react-bootstrap';
 import CodeBox from 'shared/codeBox';
 import SelectBox from 'shared/select/select';
 import { networks } from 'consts/commonConsts';
-import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 
 const renderField = field => {
@@ -21,6 +20,29 @@ const renderField = field => {
 								type={field.type}
 								placeholder={field.placeholder}
 								{...field.input}
+								className="inputMinimal"
+							/>
+							{field.meta.touched &&
+								field.meta.error && <div className="error-message">{field.meta.error}</div>}
+						</Col>
+					</Row>
+				</Col>
+			</div>
+		);
+	},
+	renderTextAreaField = field => {
+		return (
+			<div>
+				<Col xs={12} className="u-padding-r10px">
+					<Row>
+						<Col xs={5} className="u-padding-r10px">
+							<strong>{field.label}</strong>
+						</Col>
+						<Col xs={7} className="u-padding-r10px">
+							<textarea
+								placeholder={field.placeholder}
+								{...field.input}
+								rows="6"
 								className="inputMinimal"
 							/>
 							{field.meta.touched &&
@@ -199,15 +221,14 @@ const renderField = field => {
 					<Row>
 						<FieldArray name="notNear" component={renderNotNear} />
 					</Row>
-					{/* {currentUser.userType == 'partner' ? (
+					<Row>
 						<Field
-							placeholder="Custom Zone Id"
-							name="customZoneId"
-							component={renderField}
-							type="number"
-							label="Custom Zone Id"
+							name="customCSS"
+							placeholder="Please enter customCSS"
+							label="customCSS"
+							component={renderTextAreaField}
 						/>
-					) : null} */}
+					</Row>
 					{renderNetworkOptions(that)}
 				</div>
 				<div style={{ width: '35%', padding: '0px 10px', display: 'inline-block', verticalAlign: 'top' }}>

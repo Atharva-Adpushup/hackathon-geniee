@@ -268,6 +268,10 @@ var $ = require('jquery'),
 								ad.css = $.extend(true, {}, ad.secondaryCss);
 							}
 
+							if (ad.customCSS) {
+								ad.css = $.extend(true, {}, ad.css, ad.customCSS);
+							}
+
 							feedbackData.ads.push(ad.id);
 
 							$containerElement = getContainer(ad, sectionObj.elem);
