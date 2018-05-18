@@ -44,7 +44,7 @@ class cssEditor extends React.Component {
 						onCancel={props.onCancel}
 					/>
 				) : (
-					<CustomCssEditor css={props.css} onSubmit={this.handleSubmit} onCancel={props.onCancel} />
+					<CustomCssEditor compact={props.compact} css={props.css} onSubmit={this.handleSubmit} onCancel={props.onCancel} />
 				)}
 			</div>
 		);
