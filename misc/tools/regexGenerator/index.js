@@ -38,7 +38,7 @@ function getProtocols(protocol, urlParts) {
 
 function getDomains(domain, urlParts) {
 	if (!domain) {
-		return Promise.reject(sendError(1, 'Domain missing in one of the input urls'));
+		return Promise.reject(sendError(1, 'Protocol/Domain missing in one of the input urls'));
 	} else if (!urlParts.domains.length) {
 		urlParts.domains.push(domain);
 	} else if (urlParts.domains.indexOf(domain) == -1) {
@@ -146,10 +146,10 @@ function processUrls(input) {
 				err = err ? JSON.parse(err) : false;
 				message = err && err.type == 1 ? err.message : 'Something went wrong!';
 			}
-			return {
+			return Promise.reject({
 				error: true,
 				message: message
-			};
+			});
 		});
 }
 
@@ -159,12 +159,16 @@ function init(input) {
 			toMatch,
 			toNotMatch
 		};
-		return processUrls(dataToSend).then(response => {
-			return {
-				error: false,
-				regex: response
-			};
-		});
+		return processUrls(dataToSend)
+			.then(response => {
+				return {
+					error: false,
+					regex: response
+				};
+			})
+			.catch(err => {
+				return { ...err };
+			});
 	});
 }
 
