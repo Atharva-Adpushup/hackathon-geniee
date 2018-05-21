@@ -146,10 +146,10 @@ function processUrls(input) {
 				err = err ? JSON.parse(err) : false;
 				message = err && err.type == 1 ? err.message : 'Something went wrong!';
 			}
-			return Promise.reject({
+			return {
 				error: true,
 				message: message
-			});
+			};
 		});
 }
 
