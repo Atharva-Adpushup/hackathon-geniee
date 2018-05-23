@@ -199,7 +199,7 @@ router
 	})
 	.post('/:siteId/saveSiteSettings', function(req, res) {
 		var json = { settings: req.body, siteId: req.params.siteId },
-			{ gdprCompliance } = req.body;
+			{ gdprCompliance, cookieControlConfig } = req.body;
 		gdprCompliance = gdprCompliance === 'false' ? false : true;
 
 		json.settings.pageGroupPattern = JSON.stringify(
@@ -208,7 +208,9 @@ router
 			})
 		);
 		return siteModel
-			.saveSiteData(req.params.siteId, null, { gdpr: { compliance: gdprCompliance } })
+			.saveSiteData(req.params.siteId, null, {
+				gdpr: { compliance: gdprCompliance, cookieControlConfig: JSON.parse(cookieControlConfig) }
+			})
 			.then(() => siteModel.saveSiteSettings(json))
 			.then(function(data) {
 				res.send({ success: 1 });

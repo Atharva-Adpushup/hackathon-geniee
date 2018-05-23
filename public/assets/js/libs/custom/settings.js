@@ -104,7 +104,10 @@ $(document).ready(function() {
 					var autoOpt = this.parseFormData(formValues, 'other').autoOptimise ? true : false,
 						pageGroupPattern = JSON.stringify(parsedPageGroups),
 						otherSettings = JSON.stringify(this.parseFormData(formValues, 'other')),
-						gdprCompliance = this.parseFormData(formValues, 'other').gdprCompliance ? true : false;
+						gdprCompliance = this.parseFormData(formValues, 'other').gdprCompliance ? true : false,
+						cookieControlConfig = this.parseFormData(formValues, 'other').cookieControlConfig
+							? this.parseFormData(formValues, 'other').cookieControlConfig
+							: {};
 
 					$error.html('');
 					$.post(
@@ -114,6 +117,7 @@ $(document).ready(function() {
 							otherSettings: otherSettings,
 							autoOptimise: autoOpt,
 							gdprCompliance: gdprCompliance,
+							cookieControlConfig: cookieControlConfig,
 							blocklist: JSON.stringify(w.blocklist)
 						},
 						function(res) {
