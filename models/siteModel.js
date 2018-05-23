@@ -27,7 +27,8 @@ var model = require('../helpers/model'),
 			'websiteRevenue',
 			'adsensePublisherId',
 			'adNetworkSettings',
-			'isManual'
+			'isManual',
+			'gdpr'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -40,12 +41,14 @@ var model = require('../helpers/model'),
 			'partner',
 			'genieeMediaId',
 			'adsensePublisherId',
-			'isManual'
+			'isManual',
+			'gdpr'
 		];
 		this.validations = {
 			required: []
 		};
 		this.defaults = {
+			gdpr: { compliance: false, cookieControlConfig: {} },
 			apConfigs: {
 				// 'isAdPushupControlWithPartnerSSP', checks whether AdPushup control will be triggered
 				// on any SSP partner website
