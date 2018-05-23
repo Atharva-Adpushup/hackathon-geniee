@@ -227,7 +227,15 @@ router
 					channels: data.site.get('channels'),
 					environment: config.environment.HOST_ENV,
 					currentSiteId: req.params.siteId,
-					isSuperUser: req.session.isSuperUser || false
+					isSuperUser: req.session.isSuperUser || false,
+					config: {
+						af: true, // use_adpushup
+						usn: true, // ui_select_network
+						ubajf: false, // ui_before_after_js_flag
+						upkv: true, // ui_page_key_value
+						uadkv: false, // ui_adunit_key_value
+						uud: false // ui_use_dfp
+					}
 				});
 			})
 			.catch(function() {
