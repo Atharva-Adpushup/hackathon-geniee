@@ -9,6 +9,8 @@ module.exports = {
 		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
 		DATE_FORMAT: 'YYYY-MM-DD'
 	},
+	COOKIE_CONTROL_SCRIPT_TMPL:
+		'!function(){var o=document.createElement("script");o.src="https://cc.cdn.civiccomputing.com/8.0/cookieControl-8.0.min.js",document.head.appendChild(o);var n=setInterval(function(){window.CookieControl&&(clearInterval(n),CookieControl.load(__COOKIE_CONTROL_CONFIG__))})}();',
 	GDPR: {
 		compliance: false,
 		cookieControlConfig: {
