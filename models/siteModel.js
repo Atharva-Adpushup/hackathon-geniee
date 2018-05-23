@@ -48,7 +48,7 @@ var model = require('../helpers/model'),
 			required: []
 		};
 		this.defaults = {
-			gdpr: { compliance: false, cookieControlConfig: {} },
+			gdpr: commonConsts.GDPR,
 			apConfigs: {
 				// 'isAdPushupControlWithPartnerSSP', checks whether AdPushup control will be triggered
 				// on any SSP partner website

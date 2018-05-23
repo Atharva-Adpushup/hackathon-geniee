@@ -120,7 +120,7 @@ block bodyContent
                                             .col-sm-5
                                                 .input-name Auto Optimise
                                             .col-sm-7
-                                                input(type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "false") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "false"))
+                                                input(style="margin-top: 10px;" type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "false") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "false"))
                                         .row
                                             .col-sm-12#autoOptimiseErr.error-message
                                         .row
@@ -147,7 +147,16 @@ block bodyContent
                                                             button.btn-primary(id="code-conversion-button") Convert
                                                         .col-sm-4(style="float: right;")
                                                             button.btn-primary#clipboard-copy-adcode Copy to clipboard
-                                                
+                                        
+                                        .row
+                                            .col-sm-12
+                                                h4 GDPR Compliance
+                                            .col-sm-12
+                                                .row(style="margin-top: -10px;")
+                                                    .col-sm-2
+                                                        .input-name Enable
+                                                    .col-sm-10
+                                                        input(style="margin-top: 10px;" type="checkbox" id="gdprCompliance" name="gdprCompliance" value=(gdpr.compliance ? (gdpr.compliance ? "true" : "false") : "false") checked=(gdpr.compliance !== false ? (gdpr.compliance ? "true" : "true") : undefined))
 
                                 hr
                                 .row.settings-btn-pane

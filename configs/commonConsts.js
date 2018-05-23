@@ -9,6 +9,7 @@ module.exports = {
 		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
 		DATE_FORMAT: 'YYYY-MM-DD'
 	},
+	GDPR: { compliance: false, cookieControlConfig: {} },
 	DEFAULT_AD_NETWORK_SETTINGS: {
 		revenueShare: 10,
 		negate: ['adsense']
