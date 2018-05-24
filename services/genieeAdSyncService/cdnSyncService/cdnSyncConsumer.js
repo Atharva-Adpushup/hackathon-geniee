@@ -103,13 +103,12 @@ module.exports = function(site) {
 				if (cookieControlConfig) {
 					let cookieScript = CC.COOKIE_CONTROL_SCRIPT_TMPL.replace(
 						'__COOKIE_CONTROL_CONFIG__',
-						cookieControlConfig
+						JSON.stringify(cookieControlConfig)
 					);
-					jsFile = `${jsFile}${cookieControlConfig}`;
+					jsFile = `${cookieScript}${jsFile}`;
+					uncompressedJsFile = `${cookieScript}${uncompressedJsFile}`;
 				}
 			}
-
-			console.log(jsFile);
 
 			uncompressedJsFile = _.replace(uncompressedJsFile, '___abpConfig___', JSON.stringify(apConfigs));
 			uncompressedJsFile = _.replace(uncompressedJsFile, /_xxxxx_/g, site.get('siteId'));
