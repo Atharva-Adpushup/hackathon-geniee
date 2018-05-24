@@ -83,7 +83,7 @@ module.exports = {
 				buttonIconWidth: '64px',
 				buttonIconHeight: '64px',
 				removeIcon: false,
-				removeAbout: false
+				removeAbout: true
 			},
 			excludedCountries: ['all']
 		}
