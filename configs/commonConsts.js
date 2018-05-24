@@ -69,6 +69,7 @@ module.exports = {
 
 			position: 'LEFT',
 			theme: 'DARK',
+			initialState: 'NOTIFY',
 			branding: {
 				fontColor: '#FFF',
 				fontSizeTitle: '1.2em',
