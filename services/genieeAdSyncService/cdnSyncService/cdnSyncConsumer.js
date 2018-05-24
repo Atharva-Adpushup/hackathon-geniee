@@ -92,9 +92,24 @@ module.exports = function(site) {
 			uncompressedJsFile,
 			adpTagsFile
 		) {
-			let { apConfigs, adpTagsConfig } = finalConfig;
+			let { apConfigs, adpTagsConfig } = finalConfig,
+				gdpr = site.get('gdpr');
 			jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(apConfigs));
 			jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
+
+			if (gdpr && gdpr.compliance) {
+				const cookieControlConfig = gdpr.cookieControlConfig;
+
+				if (cookieControlConfig) {
+					let cookieScript = CC.COOKIE_CONTROL_SCRIPT_TMPL.replace(
+						'__COOKIE_CONTROL_CONFIG__',
+						cookieControlConfig
+					);
+					jsFile = `${jsFile}${cookieControlConfig}`;
+				}
+			}
+
+			console.log(jsFile);
 
 			uncompressedJsFile = _.replace(uncompressedJsFile, '___abpConfig___', JSON.stringify(apConfigs));
 			uncompressedJsFile = _.replace(uncompressedJsFile, /_xxxxx_/g, site.get('siteId'));
