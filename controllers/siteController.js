@@ -69,7 +69,9 @@ router
 					blocklist: site.get('apConfigs').blocklist,
 					siteId: req.params.siteId,
 					siteDomain: site.get('siteDomain'),
-					isSuperUser: req.session.isSuperUser
+					isSuperUser: req.session.isSuperUser,
+					isPartner: req.session.user.userType == 'partner' ? true : false,
+					gdpr: site.get('gdpr') ? site.get('gdpr') : commonConsts.GDPR
 				});
 			})
 			.catch(err => {
@@ -197,14 +199,20 @@ router
 		});
 	})
 	.post('/:siteId/saveSiteSettings', function(req, res) {
-		var json = { settings: req.body, siteId: req.params.siteId };
+		var json = { settings: req.body, siteId: req.params.siteId },
+			{ gdprCompliance, cookieControlConfig } = req.body;
+		gdprCompliance = gdprCompliance === 'false' ? false : true;
+
 		json.settings.pageGroupPattern = JSON.stringify(
 			_.groupBy(JSON.parse(json.settings.pageGroupPattern), pattern => {
 				return pattern.platform;
 			})
 		);
 		return siteModel
-			.saveSiteSettings(json)
+			.saveSiteData(req.params.siteId, null, {
+				gdpr: { compliance: gdprCompliance, cookieControlConfig: JSON.parse(cookieControlConfig) }
+			})
+			.then(() => siteModel.saveSiteSettings(json))
 			.then(function(data) {
 				res.send({ success: 1 });
 			})

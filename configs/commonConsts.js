@@ -9,6 +9,85 @@ module.exports = {
 		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
 		DATE_FORMAT: 'YYYY-MM-DD'
 	},
+	COOKIE_CONTROL_SCRIPT_TMPL:
+		'!function(){var o=document.createElement("script");o.src="https://cc.cdn.civiccomputing.com/8.0/cookieControl-8.0.min.js",document.head.appendChild(o);var n=setInterval(function(){window.CookieControl&&(clearInterval(n),CookieControl.load(__COOKIE_CONTROL_CONFIG__))})}();',
+	GDPR: {
+		compliance: false,
+		cookieControlConfig: {
+			apiKey: '065eea801841ec9ad57857fa1f5248a14f27bb3e',
+			product: 'PRO_MULTISITE',
+			optionalCookies: [
+				{
+					name: 'information storage and access',
+					label: 'Information storage and access',
+					description: '',
+					cookies: [],
+					onAccept: function() {},
+					onRevoke: function() {}
+				},
+				{
+					name: 'personalisation',
+					label: 'Personalisation',
+					description: '',
+					cookies: [],
+					onAccept: function() {},
+					onRevoke: function() {}
+				},
+				{
+					name: 'ad selection, delivery, reporting',
+					label: 'Ad selection, delivery, reporting',
+					description: '',
+					cookies: [],
+					onAccept: function() {},
+					onRevoke: function() {}
+				},
+				{
+					name: 'content selection, delivery, reporting',
+					label: 'Content selection, delivery, reporting',
+					description: '',
+					cookies: [],
+					onAccept: function() {},
+					onRevoke: function() {}
+				},
+				{
+					name: 'measurement',
+					label: 'Measurement',
+					description: '',
+					cookies: [],
+					onAccept: function() {},
+					onRevoke: function() {}
+				},
+				{
+					name: 'necessary cookies',
+					label: 'Necessary Cookies',
+					description: '',
+					cookies: [],
+					onAccept: function() {},
+					onRevoke: function() {}
+				}
+			],
+
+			position: 'LEFT',
+			theme: 'DARK',
+			branding: {
+				fontColor: '#FFF',
+				fontSizeTitle: '1.2em',
+				fontSizeIntro: '1em',
+				fontSizeHeaders: '1em',
+				fontSize: '0.8em',
+				backgroundColor: '#313147',
+				toggleText: '#fff',
+				toggleColor: '#2f2f5f',
+				toggleBackground: '#111125',
+				buttonIcon: null,
+				buttonIconWidth: '64px',
+				buttonIconHeight: '64px',
+				removeIcon: false,
+				removeAbout: false
+			},
+			excludedCountries: ['all']
+		}
+	},
 	DEFAULT_AD_NETWORK_SETTINGS: {
 		revenueShare: 10,
 		negate: ['adsense']

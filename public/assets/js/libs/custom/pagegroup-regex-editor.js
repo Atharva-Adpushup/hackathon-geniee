@@ -34,7 +34,10 @@ $(document).ready(function() {
 				success: function(response) {
 					var output = response.error ? response.message : response.regex,
 						outputBox = $('#output-box > pre'),
-						toShow = '<p>' + output + '</p>';
+						toShow = '<p';
+
+					toShow += response.error ? ' class="error-text">' : '>';
+					toShow += output + '</p>';
 
 					if (!response.error) {
 						toShow += '<div class="additional-info matched-urls"><h3>Matched Urls</h3>';
