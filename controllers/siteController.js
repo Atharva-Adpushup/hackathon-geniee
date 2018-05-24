@@ -70,6 +70,7 @@ router
 					siteId: req.params.siteId,
 					siteDomain: site.get('siteDomain'),
 					isSuperUser: req.session.isSuperUser,
+					isPartner: req.session.user.userType == 'partner' ? true : false,
 					gdpr: site.get('gdpr') ? site.get('gdpr') : commonConsts.GDPR
 				});
 			})

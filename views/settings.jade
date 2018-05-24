@@ -148,20 +148,21 @@ block bodyContent
                                                         .col-sm-4(style="float: right;")
                                                             button.btn-primary#clipboard-copy-adcode Copy to clipboard
                                         
-                                        .row
-                                            .col-sm-12
-                                                h4 GDPR Compliance
-                                            .col-sm-12
-                                                .row(style="margin-top: -10px;")
-                                                    .col-sm-2
-                                                        .input-name Enable
-                                                    .col-sm-10
-                                                        input(style="margin-top: 10px;" type="checkbox" id="gdprCompliance" name="gdprCompliance" value=(gdpr.compliance ? (gdpr.compliance ? "true" : "false") : "false") checked=(gdpr.compliance !== false ? (gdpr.compliance ? "true" : "true") : undefined))
-                                                .row
-                                                    .col-sm-4
-                                                        .input-name Cookie Control Config
-                                                    .col-sm-8
-                                                        textarea(name="cookieControlConfig" placeholder="Cookie control config (only JSON)", style="margin-top: 0px; height: 300px;")!=JSON.stringify(gdpr.cookieControlConfig)
+                                        if !isPartner
+                                            .row
+                                                .col-sm-12
+                                                    h4 GDPR Compliance
+                                                .col-sm-12
+                                                    .row(style="margin-top: -10px;")
+                                                        .col-sm-2
+                                                            .input-name Enable
+                                                        .col-sm-10
+                                                            input(style="margin-top: 10px;" type="checkbox" id="gdprCompliance" name="gdprCompliance" value=(gdpr.compliance ? (gdpr.compliance ? "true" : "false") : "false") checked=(gdpr.compliance !== false ? (gdpr.compliance ? "true" : "true") : undefined))
+                                                    .row
+                                                        .col-sm-4
+                                                            .input-name Cookie Control Config
+                                                        .col-sm-8
+                                                            textarea(name="cookieControlConfig" placeholder="Cookie control config (only JSON)", style="margin-top: 0px; height: 300px;")!=JSON.stringify(gdpr.cookieControlConfig)
                                 hr
                                 .row.settings-btn-pane
                                     .col-sm-4
