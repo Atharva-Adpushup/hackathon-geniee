@@ -34,6 +34,24 @@ function init(adp, onPageGroupPush, platform) {
 				}
 			}
 			$.extend(adp.config, obj);
+			$.post(
+				'/ampConfig',
+				{
+					url: w.location.href,
+					channelData: {
+						siteId: adp.config.siteId,
+						platform: platform,
+						pagegroup: adp.config.platform
+					}
+				},
+				function(res) {
+					if (res.success) {
+						console.log('amp config success message', res.success);
+					} else {
+						console.log('amp config error message', res.error);
+					}
+				}
+			);
 		}
 	};
 
