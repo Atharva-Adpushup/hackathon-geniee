@@ -33,7 +33,10 @@ class AdditionalOptions extends Component {
 
 	render() {
 		const { props } = this,
-			c1xSiteId = props.additionalOptions[keys.c1xSiteId] ? props.additionalOptions[keys.c1xSiteId] : '';
+			c1xSiteId =
+				props.additionalOptions && props.additionalOptions[keys.c1xSiteId]
+					? props.additionalOptions[keys.c1xSiteId]
+					: '';
 
 		return (
 			<div className="hb-additional-options mT-20 mb-20">
