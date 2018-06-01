@@ -74,9 +74,10 @@ block bodyContent
                                             .col-sm-5
                                                 .input-name Placement
                                             .col-sm-7
+                                                - var placement = channel.ampSettings && channel.ampSettings.social ? channel.ampSettings.social['placement']:'top'
                                                 select.form-control(name="placementSocial")
-                                                    option(value="top") top
-                                                    option(value="bottom") bottom
+                                                    option(value="top" selected=placement=='top'?true:false) top
+                                                    option(value="bottom" selected=placement=='bottom'?true:false) bottom
                                         .row
                                             .col-sm-12
                                                 .input-name Apps
@@ -103,26 +104,27 @@ block bodyContent
                                             .col-sm-5
                                                 .input-name Site Name
                                             .col-sm-7
-                                                - var siteName = channel.ampSettings?channel.ampSettings['siteName']:''
+                                                - var siteName = channel.ampSettings&&channel.ampSettings['siteName']?channel.ampSettings['siteName']:''
                                                 input.form-control(name="siteName" type="text" placeholder="Site Name" value="#{siteName}")
                                         .row
                                             .col-sm-5
                                                 .input-name Template
                                             .col-sm-7
-                                                - var template = channel.ampSettings?channel.ampSettings['template']:''
+                                                - var template = channel.ampSettings&&channel.ampSettings['template']?channel.ampSettings['template']:''
                                                 input.form-control(name="template" type="text" placeholder="Template" value="#{template}")
                                         .row
                                             .col-sm-5
                                                 .input-name Ad Network
                                             .col-sm-7
-                                                select.form-control(name="placementSocial")
-                                                    option(value="top") Adsense
-                                                    option(value="bottom") AdX
+                                                - var adNetwork = channel.ampSettings&&channel.ampSettings['adNetwork']?channel.ampSettings['adNetwork']:'adsense'
+                                                select.form-control(name="adNetwork")
+                                                    option(value="adsense" selected=adNetwork=='adsense'?true:false) Adsense
+                                                    option(value="adx" selected=adNetwork=='adx'?true:false) AdX
                                         .row
                                             .col-sm-5
                                                 .input-name Pub Id
                                             .col-sm-7
-                                                - var pubId = channel.ampSettings?channel.ampSettings['pubId']:''
+                                                - var pubId = channel.ampSettings&&channel.ampSettings['pubId']?channel.ampSettings['pubId']:''
                                                 input.form-control(name="pubId" type="text" placeholder="Pub Id" value="#{pubId}")
 
                                 hr

@@ -45,10 +45,15 @@ router
 		let siteId = req.params.siteId,
 			platform = req.body.platform,
 			pageGroup = req.body.pageGroup;
-		channelModel.getChannel(siteId, platform, pageGroup).then(function(pageGroup) {
-			pageGroup.set('ampSettings', req.body.ampData);
-			return pageGroup.save();
-		});
+		channelModel
+			.getChannel(siteId, platform, pageGroup)
+			.then(function(pageGroup) {
+				pageGroup.set('ampSettings', req.body.ampData);
+				return pageGroup.save();
+			})
+			.then(pageGroup => {
+				res.json(pageGroup);
+			});
 	});
 
 module.exports = router;

@@ -15,17 +15,19 @@ $(document).ready(function() {
 				};
 
 				for (var i = 0; i < values.length; i++) {
-					if (w.ampSettingsConfig.selectors[values[i].name]) {
-						data.selectors[values[i].name] = values[i].value;
-					} else if (w.ampSettingsConfig.socialApps[values[i].name] && values[i].value == 'on') {
-						data.social.apps.push(values[i].name);
-					} else if (values[i].name == 'includeSocialLinks' && values[i].value == 'on')
-						data.social.include = true;
-					else if (values[i].name == 'placementSocial') data.social.placement = values[i].value;
-					else if (values[i].name == 'customCss') data.customCSS.value = values[i].value;
-					else if (values[i].name == 'toDelete') {
-						data.toDelete = values[i].value ? values[i].value.split(',') : [];
-					} else data[values[i].name] = values[i].value;
+					if (values[i].value) {
+						if (w.ampSettingsConfig.selectors[values[i].name]) {
+							data.selectors[values[i].name] = values[i].value;
+						} else if (w.ampSettingsConfig.socialApps[values[i].name] && values[i].value == 'on') {
+							data.social.apps.push(values[i].name);
+						} else if (values[i].name == 'includeSocialLinks' && values[i].value == 'on')
+							data.social.include = true;
+						else if (values[i].name == 'placementSocial') data.social.placement = values[i].value;
+						else if (values[i].name == 'customCss') data.customCSS.value = values[i].value;
+						else if (values[i].name == 'toDelete') {
+							data.toDelete = values[i].value ? values[i].value.split(',') : [];
+						} else data[values[i].name] = values[i].value;
+					}
 				}
 				return data;
 			}
@@ -51,18 +53,6 @@ $(document).ready(function() {
 					alert('AMP Settings saved!');
 				}
 			});
-			// $.post(
-			// 	'/user/site/' + siteId + '/pagegroup/saveAmpSettings',
-			// 	{
-			// 		ampData: parsedSelectors,
-			// 		...pageGroupPattern
-			// 	},
-			// 	function(res) {
-			// 		if (res.success == 1) adRecover.arAlert('Done!', '#ardetect', 'success', 'slideDown');
-			// 		else adRecover.arAlert('Some error occurred!', '#ardetect', 'error', 'slideDown');
-			// 	}
-			// );
-			//settingsModule.saveSiteSettings(formValues);
 		});
 	})(window, document);
 });
