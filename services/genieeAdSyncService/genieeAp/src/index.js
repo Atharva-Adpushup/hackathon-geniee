@@ -173,6 +173,22 @@ function main() {
 	// Hook Pagegroup, find pageGroup and check for blockList
 	hookAndInit(adp, startCreation, browserConfig.platform);
 
+	utils.requestServer(
+		'/ampConfig', // This is to be changed
+		JSON.stringify({
+			url: window.location.href,
+			channelData: {
+				siteId: adp.config.siteId,
+				platform: adp.config.platform,
+				pagegroup: adp.config.pageGroup || null
+			}
+		}),
+		null,
+		'post',
+		'json',
+		'application/json'
+	);
+
 	// AdPushup Debug Force Variation
 	if (utils.queryParams && utils.queryParams.forceVariation && !adp.creationProcessStarted) {
 		startCreation(true);
