@@ -98,6 +98,16 @@ module.exports = {
 		'c1x: {' +
 		'pixelId: __C1X_PIXEL_ID__,' +
 		'siteId: __C1X_SITE_ID__' +
+		'},' +
+		'openx: {' +
+		'bidCpmAdjustment: function(bidCpm) {' +
+		'return bidCpm - (bidCpm * (5/100));' +
+		'}' +
+		'},' +
+		'districtmDMX: {' +
+		'bidCpmAdjustment: function(bidCpm) {' +
+		'return bidCpm - (bidCpm * (5/100));' +
+		'}' +
 		'}' +
 		'};' +
 		"pbjs.aliasBidder('appnexus', 'springserve');" + // SpringServe specific bidder aliasing
