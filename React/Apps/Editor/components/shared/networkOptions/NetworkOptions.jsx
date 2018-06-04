@@ -73,8 +73,17 @@ class NetworkOptions extends Component {
 
 	filterNetworks() {
 		if (window.isGeniee) {
-			return window.gcfg.usn ? ['geniee'] : networks.filter(network => network != 'adpTags');
+			const isGCFG = !!(window.gcfg),
+				isUSN = !!(isGCFG && window.gcfg.hasOwnProperty('usn'));
+
+			// 'isUSN' refers to Geniee UI Access 'Select Network' flag
+			if (isUSN) {
+				return window.gcfg.usn ? networks.filter(network => network != 'adpTags') : ['geniee'];
+			}
+
+			return networks.filter(network => network != 'adpTags');
 		}
+
 		return networks;
 	}
 

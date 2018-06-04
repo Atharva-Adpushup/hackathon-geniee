@@ -26,12 +26,24 @@ router.get('/genieeUser/', function(req, res) {
 					return reject(err.message);
 				}
 
-				let { adpushupSiteId, mediaId, exp } = decodedToken,
+				let { adpushupSiteId, mediaId, exp, uiAccess } = decodedToken,
 					currentTimeStamp = +new Date(),
 					isValidExpressionTimeStamp = Number(exp) * 1000 > currentTimeStamp;
 
 				if (!isValidExpressionTimeStamp) {
 					return reject('AuthenticationError: Invalid expression timestamp');
+				}
+
+				// Set truthy 'uiAccess' flags if token property is not present in payload
+				if (!uiAccess) {
+					decodedToken.uiAccess = {
+						selectNetwork: 1,
+						beforeAfterJs: 1,
+						pageKeyValue: 1,
+						adunitKeyValue: 1,
+						useDfp: 1,
+						codeConversion: 1
+					};
 				}
 
 				return resolve(decodedToken); // bar
@@ -45,7 +57,7 @@ router.get('/genieeUser/', function(req, res) {
 			getUserByEmail = userModel.getUserByEmail(partners.geniee.email);
 
 		return Promise.join(getToken, getUserByEmail, (userToken, modelInstance) => {
-			let { adpushupSiteId } = userToken;
+			let { adpushupSiteId, uiAccess } = userToken;
 
 			return siteModel
 				.getSiteById(adpushupSiteId)
@@ -57,6 +69,11 @@ router.get('/genieeUser/', function(req, res) {
 					req.session.siteId = data.site.siteId;
 					req.session.partner = 'geniee';
 					req.session.isSuperUser = false;
+
+					if (uiAccess) {
+						req.session.genieeUIAccess = Object.assign({}, uiAccess);
+					}
+
 					return res.redirect('/user/site/' + data.site.siteId + '/dashboard');
 				});
 		}).catch(function(err) {

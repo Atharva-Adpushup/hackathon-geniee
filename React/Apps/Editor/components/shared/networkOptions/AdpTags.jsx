@@ -166,7 +166,9 @@ class AdpTags extends Component {
 	}
 
 	renderAdvancedBlock() {
-		let toShow = window.isGeniee && window.gcfg.uadkv ? true : !window.isGeniee;
+		let toShow = window.isGeniee && window.gcfg.uadkv ? true : !window.isGeniee,
+			code = this.generateCode();
+
 		return toShow ? (
 			<Row>
 				<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
