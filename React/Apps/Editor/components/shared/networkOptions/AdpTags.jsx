@@ -9,10 +9,25 @@ import CustomToggleSwitch from '../customToggleSwitch.jsx';
 class AdpTags extends Component {
 	constructor(props) {
 		super(props);
-		const { fpKey, priceFloor, headerBidding, code, refreshSlot } = props;
+		const { fpKey, priceFloor, headerBidding, code, refreshSlot } = props,
+			// Geniee specific UI access feature 'dynamic allocation' property computation
+			isGenieeUIAccessDA = !!(window.isGeniee && window.gcfg && window.gcfg.hasOwnProperty('uud')),
+			isGenieeUIAccessDAActive = !!(isGenieeUIAccessDA && window.gcfg.uud),
+			isGenieeUIAccessDAInActive = !!(isGenieeUIAccessDA && !window.gcfg.uud);
+
 		this.state = {
+			uiAccess: {
+				da: {
+					exists: isGenieeUIAccessDA,
+					active: isGenieeUIAccessDAActive,
+					inactive: isGenieeUIAccessDAInActive
+				}
+			},			
 			fpKey: fpKey,
-			hbAcivated: headerBidding,
+			// 'isGenieeUIAccessDAInActive' is added below as a condition because 
+			// Dynamic Allocation/Header Bidding property should be false by default 
+			// if Geniee UI access 'DA' (window.gcfg.uud) property is present and set to 0
+			hbAcivated: isGenieeUIAccessDAInActive ? false : headerBidding,
 			refreshSlot,
 			pf: priceFloor,
 			advanced: false,
@@ -137,7 +152,8 @@ class AdpTags extends Component {
 	renderDynamicAllocation() {
 		let { isInsertMode } = this.props,
 			isGenieeEditableMode = !!(this.props.geniee && !isInsertMode),
-			toShow = window.isGeniee && window.gcfg.uud ? true : !window.isGeniee,
+			isGenieeUIAccessDAActive = this.state.uiAccess.da.active,
+			toShow = isGenieeUIAccessDAActive ? true : !window.isGeniee,
 			label = this.props.geniee ? 'Dynamic Allocation' : 'Header Bidding';
 
 		return toShow ? (
