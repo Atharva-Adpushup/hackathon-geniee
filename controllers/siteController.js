@@ -63,8 +63,12 @@ router
 			.then(site => [siteModel.getSitePageGroups(req.params.siteId), site])
 			.spread((sitePageGroups, site) => {
 				const isSession = !!req.session,
+					isPartner = req.session.user.userType == 'partner',
 					isSessionGenieeUIAccess = !!(isSession && req.session.genieeUIAccess),
-					genieeUIAccess = isSessionGenieeUIAccess ? req.session.genieeUIAccess : false;
+					genieeUIAccess = isSessionGenieeUIAccess ? req.session.genieeUIAccess : false,
+					isGenieeUIAccessCodeConversion = !!(
+						genieeUIAccess && genieeUIAccess.hasOwnProperty('codeConversion')
+					);
 
 				return res.render('settings', {
 					pageGroups: sitePageGroups,
@@ -76,8 +80,8 @@ router
 					isSuperUser: req.session.isSuperUser,
 					//UI access code conversion property value
 					// Specific to Geniee network as of now but can be made generic
-					uiaccecc: isSessionGenieeUIAccess ? Number(genieeUIAccess.codeConversion) : 1,
-					isPartner: req.session.user.userType == 'partner' ? true : false,
+					uiaccecc: isGenieeUIAccessCodeConversion ? Number(genieeUIAccess.codeConversion) : 1,
+					isPartner: isPartner ? true : false,
 					gdpr: site.get('gdpr') ? site.get('gdpr') : commonConsts.GDPR
 				});
 			})
@@ -249,11 +253,26 @@ router
 					isSuperUser: req.session.isSuperUser || false,
 					// Geniee UI access config values
 					config: {
-						usn: isSessionGenieeUIAccess ? Number(genieeUIAccess.selectNetwork) : 1,
-						ubajf: isSessionGenieeUIAccess ? Number(genieeUIAccess.beforeAfterJs) : 1,
-						upkv: isSessionGenieeUIAccess ? Number(genieeUIAccess.pageKeyValue) : 1,
-						uadkv: isSessionGenieeUIAccess ? Number(genieeUIAccess.adunitKeyValue) : 1,
-						uud: isSessionGenieeUIAccess ? Number(genieeUIAccess.useDfp) : 1
+						usn:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('selectNetwork')
+								? Number(genieeUIAccess.selectNetwork)
+								: 1,
+						ubajf:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('beforeAfterJs')
+								? Number(genieeUIAccess.beforeAfterJs)
+								: 1,
+						upkv:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('pageKeyValue')
+								? Number(genieeUIAccess.pageKeyValue)
+								: 1,
+						uadkv:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('adunitKeyValue')
+								? Number(genieeUIAccess.adunitKeyValue)
+								: 1,
+						uud:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('useDfp')
+								? Number(genieeUIAccess.useDfp)
+								: 1
 					}
 				});
 			})
