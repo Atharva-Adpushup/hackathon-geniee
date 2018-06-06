@@ -72,6 +72,7 @@ const config = {
 				id: { validations: { required: true }, alias: 'Ad Id', isEditable: true }
 			}
 		}
+		// Set new partners in DFP key values as well
 	},
 	supportedAdSizes: [
 		{
