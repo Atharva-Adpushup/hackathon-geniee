@@ -24,6 +24,7 @@ class NetworkOptions extends Component {
 		this.renderNetwork = this.renderNetwork.bind(this);
 		this.networkChangeHandler = this.networkChangeHandler.bind(this);
 		this.getCode = this.getCode.bind(this);
+		this.filterNetworks = this.filterNetworks.bind(this);
 	}
 
 	componentDidMount() {
@@ -68,6 +69,22 @@ class NetworkOptions extends Component {
 			code = this.props.ad.networkData && this.props.ad.networkData.adCode ? this.props.ad.networkData : false;
 		}
 		return code;
+	}
+
+	filterNetworks() {
+		if (window.isGeniee) {
+			const isGCFG = !!(window.gcfg),
+				isUSN = !!(isGCFG && window.gcfg.hasOwnProperty('usn'));
+
+			// 'isUSN' refers to Geniee UI Access 'Select Network' flag
+			if (isUSN) {
+				return window.gcfg.usn ? networks.filter(network => network != 'adpTags') : ['geniee'];
+			}
+
+			return networks.filter(network => network != 'adpTags');
+		}
+
+		return networks;
 	}
 
 	renderNetwork() {
@@ -190,8 +207,7 @@ class NetworkOptions extends Component {
 	}
 
 	render() {
-		let filteredNetworks =
-			currentUser.userType == 'partner' ? networks.filter(network => network != 'adpTags') : networks;
+		let filteredNetworks = this.filterNetworks();
 		return (
 			<div className="networkOptionsRow">
 				<SelectBox value={this.state.network} label="Select Network" onChange={this.networkChangeHandler}>

@@ -31,6 +31,8 @@ block append headScripts
         window.ADP_SITE_ID = #{siteId};
         window.ADP_ENVIRONMENT = "#{environment}";
         window.isSuperUser = #{isSuperUser};
+        window.isGeniee = window.currentUser.userType && window.currentUser.userType == 'partner' ? true : false;
+        window.gcfg = !{JSON.stringify(config)};
        
     if channels.length
         +loadAsset("js", [

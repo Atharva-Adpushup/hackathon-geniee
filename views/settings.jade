@@ -135,19 +135,21 @@ block bodyContent
                                                 .row
                                                     div#blocklistErr.error-message(style="margin: 5px 15px 20px;")
                                                     ul.blocklist
-                                        .row
-                                            .col-sm-12
-                                                h4 Adcode Conversion
-                                            .col-sm-12
-                                                div.snippet-wrapper.code-convert-wrapper
-                                                    span.clipboard-copy Copied !
-                                                    textarea.snippet#code-conversion-box(placeholder="Enter Passback/Control Ad code here", style="margin-top: 0px;")
-                                                    .row
-                                                        .col-sm-4(style="float: right;")
-                                                            button.btn-primary(id="code-conversion-button") Convert
-                                                        .col-sm-4(style="float: right;")
-                                                            button.btn-primary#clipboard-copy-adcode Copy to clipboard
-                                        
+
+                                        if uiaccecc
+                                            .row
+                                                .col-sm-12
+                                                    h4 Adcode Conversion
+                                                .col-sm-12
+                                                    div.snippet-wrapper.code-convert-wrapper
+                                                        span.clipboard-copy Copied !
+                                                        textarea.snippet#code-conversion-box(placeholder="Enter Passback/Control Ad code here", style="margin-top: 0px;")
+                                                        .row
+                                                            .col-sm-4(style="float: right;")
+                                                                button.btn-primary(id="code-conversion-button") Convert
+                                                            .col-sm-4(style="float: right;")
+                                                                button.btn-primary#clipboard-copy-adcode Copy to clipboard
+
                                         if !isPartner
                                             .row
                                                 .col-sm-12

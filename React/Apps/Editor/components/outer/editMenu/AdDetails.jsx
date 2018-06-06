@@ -89,18 +89,25 @@ class AdDetails extends Component {
 		);
 	}
 
-	renderCommonDetails(fpKey, priceFloor, headerBidding, title) {
+	renderCommonDetails(fpKey, priceFloor, headerBidding, title, showPfDetails = true) {
+		let toShow = window.isGeniee && window.gcfg.uud ? true : !window.isGeniee;
 		return (
 			<div>
-				<p>
-					PF Key : <strong>{fpKey}</strong>
-				</p>
-				<p>
-					Price Floor : <strong>{priceFloor}</strong>
-				</p>
-				<p>
-					{title}: <strong>{headerBidding}</strong>
-				</p>
+				{showPfDetails ? (
+					<div>
+						<p>
+							PF Key : <strong>{fpKey}</strong>
+						</p>
+						<p>
+							Price Floor : <strong>{priceFloor}</strong>
+						</p>
+					</div>
+				) : null}
+				{toShow ? (
+					<p>
+						{title}: <strong>{headerBidding}</strong>
+					</p>
+				) : null}
 			</div>
 		);
 	}
@@ -182,7 +189,13 @@ class AdDetails extends Component {
 				) : ad.network == 'geniee' ? (
 					<div>
 						<div>
-							{this.renderCommonDetails(fpKey, priceFloor, dynamicAllocation, 'Dynamic Allocation')}
+							{this.renderCommonDetails(
+								fpKey,
+								priceFloor,
+								dynamicAllocation,
+								'Dynamic Allocation',
+								false
+							)}
 						</div>
 						{/* <div>{this.genieeOptions(position, firstFold, zoneId)}</div> */}
 						<div>{this.renderAdCode(adCode)}</div>

@@ -9,10 +9,25 @@ import CustomToggleSwitch from '../customToggleSwitch.jsx';
 class AdpTags extends Component {
 	constructor(props) {
 		super(props);
-		const { fpKey, priceFloor, headerBidding, code, refreshSlot } = props;
+		const { fpKey, priceFloor, headerBidding, code, refreshSlot } = props,
+			// Geniee specific UI access feature 'dynamic allocation' property computation
+			isGenieeUIAccessDA = !!(window.isGeniee && window.gcfg && window.gcfg.hasOwnProperty('uud')),
+			isGenieeUIAccessDAActive = !!(isGenieeUIAccessDA && window.gcfg.uud),
+			isGenieeUIAccessDAInActive = !!(isGenieeUIAccessDA && !window.gcfg.uud);
+
 		this.state = {
+			uiAccess: {
+				da: {
+					exists: isGenieeUIAccessDA,
+					active: isGenieeUIAccessDAActive,
+					inactive: isGenieeUIAccessDAInActive
+				}
+			},			
 			fpKey: fpKey,
-			hbAcivated: headerBidding,
+			// 'isGenieeUIAccessDAInActive' is added below as a condition because 
+			// Dynamic Allocation/Header Bidding property should be false by default 
+			// if Geniee UI access 'DA' (window.gcfg.uud) property is present and set to 0
+			hbAcivated: isGenieeUIAccessDAInActive ? false : headerBidding,
 			refreshSlot,
 			pf: priceFloor,
 			advanced: false,
@@ -30,6 +45,8 @@ class AdpTags extends Component {
 		this.advanceSubmit = this.advanceSubmit.bind(this);
 		this.filterKeyValues = this.filterKeyValues.bind(this);
 		this.generateCode = this.generateCode.bind(this);
+		this.renderDynamicAllocation = this.renderDynamicAllocation.bind(this);
+		this.renderAdvancedBlock = this.renderAdvancedBlock.bind(this);
 	}
 
 	filterKeyValues(keyValues) {
@@ -118,18 +135,70 @@ class AdpTags extends Component {
 	}
 
 	renderGenieeNote() {
+		let output = `<strong>NOTE:</strong><i><b>Geniee Zone Id</b> ${
+			window.gcfg.uud ? 'and <b>Dynamic Allocation</b>' : ''
+		} field(s) are non-editable.</i>`;
 		return (
 			<Row>
 				<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
 					<Alert bsStyle="warning">
-						<strong>NOTE:</strong>{' '}
-						<i>
-							<b>Geniee Zone Id</b> and <b>Dynamic Allocation</b> fields are non-editable.
-						</i>
+						<p dangerouslySetInnerHTML={{ __html: output }} />
 					</Alert>
 				</Col>
 			</Row>
 		);
+	}
+
+	renderDynamicAllocation() {
+		let { isInsertMode } = this.props,
+			isGenieeEditableMode = !!(this.props.geniee && !isInsertMode),
+			isGenieeUIAccessDAActive = this.state.uiAccess.da.active,
+			toShow = isGenieeUIAccessDAActive ? true : !window.isGeniee,
+			label = this.props.geniee ? 'Dynamic Allocation' : 'Header Bidding';
+
+		return toShow ? (
+			<Row>
+				<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+					<CustomToggleSwitch
+						labelText={label}
+						className="mB-10"
+						checked={this.state.hbAcivated}
+						disabled={isGenieeEditableMode}
+						onChange={val => {
+							this.setState({ hbAcivated: !!val });
+						}}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout={this.props.fromPanel ? false : true}
+						name={this.props.id ? `headerBiddingSwitch-${this.props.id}` : 'headerBiddingSwitch'}
+						id={this.props.id ? `js-header-bidding-switch-${this.props.id}` : 'js-header-bidding-switch'}
+						customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+					/>
+				</Col>
+			</Row>
+		) : null;
+	}
+
+	renderAdvancedBlock() {
+		let toShow = window.isGeniee && window.gcfg.uadkv ? true : !window.isGeniee,
+			code = this.generateCode();
+
+		return toShow ? (
+			<Row>
+				<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+					<pre>
+						<span style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{code}</span>
+						<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-advance">Edit Advance</Tooltip>}>
+							<span className="adDetails-icon" onClick={this.toggleAdvance}>
+								<i className="btn-icn-edit" />
+							</span>
+						</OverlayTrigger>
+					</pre>
+				</Col>
+			</Row>
+		) : null;
 	}
 
 	renderNonAdvanced() {
@@ -140,66 +209,48 @@ class AdpTags extends Component {
 		return (
 			<div>
 				{isGenieeEditableMode ? this.renderGenieeNote() : null}
-				<Row>
-					<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
-						<strong>Price Floor Key</strong>
-					</Col>
-					<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
-						<SelectBox
-							value={this.state.fpKey}
-							label="Select Floor Price Key"
-							showClear={false}
-							onChange={fpKey => {
-								this.setState({ fpKey });
-							}}
-						>
-							{priceFloorKeys.map((item, index) => (
-								<option key={item} value={item}>
-									{item}
-								</option>
-							))}
-						</SelectBox>
-					</Col>
-				</Row>
-				<Row className="mT-10">
-					<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
-						<strong>Price Floor</strong>
-					</Col>
-					<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
-						<input
-							type="text"
-							placeholder="Enter Price Floor"
-							className="inputBasic mB-10"
-							value={this.state.pf}
-							onChange={ev => {
-								this.setState({ pf: ev.target.value });
-							}}
-						/>
-					</Col>
-				</Row>
-				<Row>
-					<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
-						<CustomToggleSwitch
-							labelText={this.props.geniee ? 'Dynamic Allocation' : 'Header Bidding'}
-							className="mB-10"
-							checked={this.state.hbAcivated}
-							disabled={isGenieeEditableMode}
-							onChange={val => {
-								this.setState({ hbAcivated: !!val });
-							}}
-							layout="horizontal"
-							size="m"
-							on="Yes"
-							off="No"
-							defaultLayout={this.props.fromPanel ? false : true}
-							name={this.props.id ? `headerBiddingSwitch-${this.props.id}` : 'headerBiddingSwitch'}
-							id={
-								this.props.id ? `js-header-bidding-switch-${this.props.id}` : 'js-header-bidding-switch'
-							}
-							customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
-						/>
-					</Col>
-				</Row>
+				{this.props.geniee ? null : (
+					<div>
+						<Row>
+							<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
+								<strong>Price Floor Key</strong>
+							</Col>
+							<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
+								<SelectBox
+									value={this.state.fpKey}
+									label="Select Floor Price Key"
+									showClear={false}
+									onChange={fpKey => {
+										this.setState({ fpKey });
+									}}
+								>
+									{priceFloorKeys.map((item, index) => (
+										<option key={item} value={item}>
+											{item}
+										</option>
+									))}
+								</SelectBox>
+							</Col>
+						</Row>
+						<Row className="mT-10">
+							<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
+								<strong>Price Floor</strong>
+							</Col>
+							<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
+								<input
+									type="text"
+									placeholder="Enter Price Floor"
+									className="inputBasic mB-10"
+									value={this.state.pf}
+									onChange={ev => {
+										this.setState({ pf: ev.target.value });
+									}}
+								/>
+							</Col>
+						</Row>
+					</div>
+				)}
+				{this.renderDynamicAllocation()}
 				{!this.props.geniee ? (
 					<Row>
 						<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
@@ -224,21 +275,7 @@ class AdpTags extends Component {
 						</Col>
 					</Row>
 				) : null}
-				<Row>
-					<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
-						<pre>
-							<span style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{code}</span>
-							<OverlayTrigger
-								placement="bottom"
-								overlay={<Tooltip id="edit-advance">Edit Advance</Tooltip>}
-							>
-								<span className="adDetails-icon" onClick={this.toggleAdvance}>
-									<i className="btn-icn-edit" />
-								</span>
-							</OverlayTrigger>
-						</pre>
-					</Col>
-				</Row>
+				{this.renderAdvancedBlock()}
 				<div>{this.renderButtons(buttonType, showButtons, this.save, onCancel)}</div>
 			</div>
 		);
