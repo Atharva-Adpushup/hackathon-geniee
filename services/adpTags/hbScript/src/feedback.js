@@ -100,7 +100,7 @@ var logger = require('../helpers/logger'),
 					winner: config.ADSENSE.bidderName
 				});
 		}
-		if (feedback.winner && feedback.winner !== config.DEFAULT_WINNER) {
+		if (feedback.data.winner && feedback.data.winner !== config.DEFAULT_WINNER) {
 			utils.sendDataToKeenIO(feedback);
 		}
 		logger.log(
