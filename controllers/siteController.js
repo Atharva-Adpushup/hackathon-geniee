@@ -62,6 +62,14 @@ router
 			.getSiteById(req.params.siteId)
 			.then(site => [siteModel.getSitePageGroups(req.params.siteId), site])
 			.spread((sitePageGroups, site) => {
+				const isSession = !!req.session,
+					isPartner = req.session.user.userType == 'partner',
+					isSessionGenieeUIAccess = !!(isSession && req.session.genieeUIAccess),
+					genieeUIAccess = isSessionGenieeUIAccess ? req.session.genieeUIAccess : false,
+					isGenieeUIAccessCodeConversion = !!(
+						genieeUIAccess && genieeUIAccess.hasOwnProperty('codeConversion')
+					);
+
 				return res.render('settings', {
 					pageGroups: sitePageGroups,
 					patterns: site.get('apConfigs').pageGroupPattern || {},
@@ -70,7 +78,10 @@ router
 					siteId: req.params.siteId,
 					siteDomain: site.get('siteDomain'),
 					isSuperUser: req.session.isSuperUser,
-					isPartner: req.session.user.userType == 'partner' ? true : false,
+					//UI access code conversion property value
+					// Specific to Geniee network as of now but can be made generic
+					uiaccecc: isGenieeUIAccessCodeConversion ? Number(genieeUIAccess.codeConversion) : 1,
+					isPartner: isPartner ? true : false,
 					gdpr: site.get('gdpr') ? site.get('gdpr') : commonConsts.GDPR
 				});
 			})
@@ -228,6 +239,10 @@ router
 		userModel
 			.verifySiteOwner(req.session.user.email, req.params.siteId, { fullSiteData: true })
 			.then(function(data) {
+				const isSession = !!req.session,
+					isSessionGenieeUIAccess = !!(isSession && req.session.genieeUIAccess),
+					genieeUIAccess = isSessionGenieeUIAccess ? req.session.genieeUIAccess : false;
+
 				return res.render('editor', {
 					isChrome: true,
 					domain: data.site.get('siteDomain'),
@@ -235,7 +250,30 @@ router
 					channels: data.site.get('channels'),
 					environment: config.environment.HOST_ENV,
 					currentSiteId: req.params.siteId,
-					isSuperUser: req.session.isSuperUser || false
+					isSuperUser: req.session.isSuperUser || false,
+					// Geniee UI access config values
+					config: {
+						usn:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('selectNetwork')
+								? Number(genieeUIAccess.selectNetwork)
+								: 1,
+						ubajf:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('beforeAfterJs')
+								? Number(genieeUIAccess.beforeAfterJs)
+								: 1,
+						upkv:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('pageKeyValue')
+								? Number(genieeUIAccess.pageKeyValue)
+								: 1,
+						uadkv:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('adunitKeyValue')
+								? Number(genieeUIAccess.adunitKeyValue)
+								: 1,
+						uud:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('useDfp')
+								? Number(genieeUIAccess.useDfp)
+								: 1
+					}
 				});
 			})
 			.catch(function() {
