@@ -100,7 +100,9 @@ var logger = require('../helpers/logger'),
 					winner: config.ADSENSE.bidderName
 				});
 		}
-		utils.sendDataToKeenIO(feedback);
+		if (feedback.winner && feedback.winner !== config.DEFAULT_WINNER) {
+			utils.sendDataToKeenIO(feedback);
+		}
 		logger.log(
 			'Winner for div ' + feedback.data.containerId + ': ' + feedback.data.winner,
 			feedback.data.winningRevenue * 1000
