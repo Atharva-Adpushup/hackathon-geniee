@@ -46,7 +46,10 @@ class VariationPanel extends React.Component {
 	}
 
 	render() {
-		const { variation, channelId, sections, ui, reporting, onUpdateContentSelector } = this.props;
+		const { variation, channelId, sections, ui, reporting, onUpdateContentSelector } = this.props,
+			// Geniee UI access before/after js feature visibility condition
+			isBeforeAfterJSHide = !!(window.isGeniee && window.gcfg && window.gcfg.hasOwnProperty('ubajf') && !window.gcfg.ubajf);
+
 		return (
 			<div className="variation-settings">
 				<VariationBar panelCssSelector=".variation-settings" expanded={ui.variationPanel.expanded} />
@@ -74,11 +77,11 @@ class VariationPanel extends React.Component {
 							variation={variation}
 						/>
 					</div>
-					{window.isGeniee && window.gcfg.ubajf ? (
+					{isBeforeAfterJSHide ? null : (
 						<div tabTitle="Before/After JS">
 							<BeforeAfterJsPanel channelId={channelId} variation={variation} ui={ui} />
 						</div>
-					) : null}
+					)}
 					{this.renderKeyValuesOptions()}
 					<div tabTitle="Interactive Ads">
 						<InteractiveAds
