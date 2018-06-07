@@ -33,25 +33,15 @@ function Control() {
 		}
 	}
 
-	function getControlCSS(adCode) {
-		var isBlock = false;
+	function placeAd(adObj) {
+		if (adObj && adObj.el && adObj.ac) {
+			var adCode = utils
+				.base64Decode(adObj.ac)
+				.replace('class="adsbygoogle"', 'class="adsbygoogle _ap_control_ad"');
 
-		try {
-			var decodedAdCode = atob(adCode);
-
-			if (
-				decodedAdCode.indexOf('data-ad-format="link"') !== -1 ||
-				decodedAdCode.indexOf('data-ad-format="auto"') !== -1 ||
-				decodedAdCode.indexOf('data-ad-format="autorelaxed"') !== -1 ||
-				decodedAdCode.indexOf('data-ad-format="fluid"')
-			) {
-				isBlock = true;
-			}
-		} catch (e) {
-			console.log(e);
+			$(adObj.el).before(adCode);
+			$(adObj.el).remove();
 		}
-
-		return isBlock ? { display: 'block' } : { display: 'inline-block' };
 	}
 
 	function activateAd(adObj) {
@@ -59,15 +49,9 @@ function Control() {
 			return true;
 		}
 
-		var container = $('<div/>')
-			.css(getControlCSS(adObj.ac))
-			.attr({ id: adObj.id, class: '_ap_control_ad' });
-
-		$(adObj.el).html(container);
-
 		try {
 			$.ajaxSettings.cache = true;
-			container.append(utils.base64Decode(adObj.ac));
+			placeAd(adObj);
 			$.ajaxSettings.cache = false;
 			adObj.active = true;
 		} catch (e) {
