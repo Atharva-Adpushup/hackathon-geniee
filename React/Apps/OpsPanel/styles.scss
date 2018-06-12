@@ -111,3 +111,11 @@ $primaryColor: #eb575c;
 		width: 100% !important;
 	}
 }
+
+.hb-config-input {
+	height: 400px;
+	&,
+	&:focus {
+		border-color: #999;
+	}
+}
