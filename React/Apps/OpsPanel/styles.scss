@@ -114,6 +114,8 @@ $primaryColor: #eb575c;
 
 .hb-config-input {
 	height: 400px;
+	overflow-x: hidden;
+	overflow-y: scroll;
 	&,
 	&:focus {
 		border-color: #999;

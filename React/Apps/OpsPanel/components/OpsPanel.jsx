@@ -91,7 +91,7 @@ class OpsPanel extends React.Component {
 				res => {
 					this.setState({ updateMessage: res.message });
 					setTimeout(() => {
-						this.setState({ updateMessage: '', editMode: 'update' });
+						this.setState({ updateMessage: '', editMode: 'update', validated: false });
 					}, 3000);
 				}
 			);
