@@ -104,6 +104,11 @@ module.exports = {
 		'return bidCpm - (bidCpm * (5/100));' +
 		'}' +
 		'},' +
+		'brainjuicemedia: {' +
+		'bidCpmAdjustment: function(bidCpm) {' +
+		'return bidCpm - (bidCpm * (5/100));' +
+		'}' +
+		'},' +
 		'districtmDMX: {' +
 		'bidCpmAdjustment: function(bidCpm) {' +
 		'return bidCpm - (bidCpm * (5/100));' +
