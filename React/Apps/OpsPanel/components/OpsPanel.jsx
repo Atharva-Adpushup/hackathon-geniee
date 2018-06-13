@@ -77,7 +77,7 @@ class OpsPanel extends React.Component {
 
 	saveHbConfig() {
 		const { state } = this,
-			hbConfig = temp ? temp : removeOptionsIndex(state.hbConfig),
+			hbConfig = temp ? temp : state.hbConfig,
 			payload = { editMode: state.editMode, hbConfig, additionalOptions: state.additionalOptions };
 
 		this.setState({ updateMessage: 'Saving...' });
