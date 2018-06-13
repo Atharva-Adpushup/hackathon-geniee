@@ -124,9 +124,11 @@ router
 			.then(data => res.status(200).send({ success: 1, data: null, message: 'Manual mode updated!' }))
 			.catch(err => {
 				console.log(err);
-				res
-					.status(500)
-					.send({ success: 0, data: null, message: 'Some error occurred! Please try again later' });
+				res.status(500).send({
+					success: 0,
+					data: null,
+					message: 'Some error occurred! Please try again later'
+				});
 			});
 	})
 	.post('/:siteId/opsPanel/hbConfig', (req, res) => {
@@ -469,6 +471,22 @@ router
 			.catch(err => {
 				console.log(err);
 				return res.send(response);
+			});
+	})
+	.get('/:siteId/ampSettings', (req, res) => {
+		return res.render('ampSettings');
+	})
+	.get('/:siteId/ampSettingsData', (req, res) => {
+		return channelModel
+			.getAmpSettings(req.params.siteId)
+			.then(function(channels) {
+				return res.send({ siteId: req.params.siteId, channels });
+			})
+			.catch(function(err) {
+				return res.send({
+					error: true,
+					message: 'Some Error Occured'
+				});
 			});
 	});
 

@@ -14,6 +14,7 @@ var model = require('../helpers/model'),
 	utils = require('../helpers/utils'),
 	Promise = require('bluebird'),
 	ViewQuery = require('couchbase-promises').ViewQuery,
+	N1qlQuery = require('couchbase-promises').N1qlQuery,
 	Channel = model.extend(function() {
 		this.keys = [
 			'id',
@@ -314,6 +315,21 @@ function apiModule() {
 						});
 				});
 			});
+		},
+		getAmpSettings: function(siteId) {
+			let query = N1qlQuery.fromString(`select ampSettings, pageGroup
+			from apAppBucket where meta().id like 'chnl::${siteId}:%' and platform ='DESKTOP';`);
+			return couchbase.connectToAppBucket().then(
+				appBucket =>
+					new Promise((resolve, reject) => {
+						appBucket.query(query, {}, (err, result) => {
+							if (err) {
+								return reject(err);
+							}
+							return resolve(result);
+						});
+					})
+			);
 		}
 	};
 
