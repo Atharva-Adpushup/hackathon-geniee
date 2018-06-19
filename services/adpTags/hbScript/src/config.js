@@ -109,15 +109,21 @@ module.exports = {
 		'return bidCpm - (bidCpm * (5/100));' +
 		'}' +
 		'},' +
+		'oftmedia: {' +
+		'bidCpmAdjustment: function(bidCpm) {' +
+		'return bidCpm - (bidCpm * (12/100));' +
+		'}' +
+		'},' +
 		'districtmDMX: {' +
 		'bidCpmAdjustment: function(bidCpm) {' +
 		'return bidCpm - (bidCpm * (5/100));' +
 		'}' +
 		'}' +
 		'};' +
-		"pbjs.aliasBidder('appnexus', 'springserve');" + // SpringServe specific bidder aliasing
-		"pbjs.aliasBidder('appnexus', 'brealtime');" + // bRealTime specific bidder aliasing
-		"pbjs.aliasBidder('appnexus', 'brainjuicemedia');" + // brainjuicemedia specific bidder aliasing
+		"pbjs.aliasBidder('appnexus', 'springserve');" +
+		"pbjs.aliasBidder('appnexus', 'brealtime');" +
+		"pbjs.aliasBidder('appnexus', 'brainjuicemedia');" +
+		"pbjs.aliasBidder('appnexus', 'oftmedia');" +
 		"pbjs.onEvent('bidTimeout', function(timedOutBidders) {" +
 		'parent.__prebidTimeoutCallback(ADP_BATCH_ID, timedOutBidders, PREBID_TIMEOUT);' +
 		'});' +
