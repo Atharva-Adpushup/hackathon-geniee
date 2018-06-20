@@ -215,7 +215,7 @@ router
 		gdprCompliance = gdprCompliance === 'false' ? false : true;
 		// Added default parameter check for below JSON.parse issue at line 224
 		if (!cookieControlConfig) {
-			cookieControlConfig = {};
+			cookieControlConfig = JSON.stringify({});
 		}
 
 		json.settings.pageGroupPattern = JSON.stringify(
