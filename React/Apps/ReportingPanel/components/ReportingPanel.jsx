@@ -38,6 +38,7 @@ class ReportingPanel extends React.Component {
 				.subtract(1, 'day')
 		};
 		this.generateReport = this.generateReport.bind(this);
+		this.downloadReport = this.downloadReport.bind(this);
 		this.updateReportParams = this.updateReportParams.bind(this);
 		this.fetchVariations = this.fetchVariations.bind(this);
 		this.tableToggleCallback = this.tableToggleCallback.bind(this);
@@ -46,7 +47,9 @@ class ReportingPanel extends React.Component {
 	fetchVariations(pageGroup, platform) {
 		ajax({
 			method: 'GET',
-			url: `${commonConsts.VARIATIONS_ENDPOINT}?siteId=${commonConsts.SITE_ID}&pageGroup=${pageGroup}&platform=${platform}`
+			url: `${commonConsts.VARIATIONS_ENDPOINT}?siteId=${
+				commonConsts.SITE_ID
+			}&pageGroup=${pageGroup}&platform=${platform}`
 		})
 			.then(res => {
 				const variations = this.state.variations.concat(res.data);
@@ -63,7 +66,16 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: true
 		});
 
-		const { startDate, endDate, pageGroup, platform, variation, groupBy, variations, activeLegendItems } = this.state,
+		const {
+				startDate,
+				endDate,
+				pageGroup,
+				platform,
+				variation,
+				groupBy,
+				variations,
+				activeLegendItems
+			} = this.state,
 			params = { startDate, endDate, pageGroup, platform, variation, groupBy, activeLegendItems };
 
 		let state = {
@@ -97,6 +109,10 @@ class ReportingPanel extends React.Component {
 				console.log(res);
 				this.setState({ ...state, reportError: true });
 			});
+	}
+
+	downloadReport() {
+		console.log(this.state.tableConfig);
 	}
 
 	updateReportParams(params) {
@@ -144,17 +160,17 @@ class ReportingPanel extends React.Component {
 	render() {
 		const {
 				startDate,
-			endDate,
-			reportLoading,
-			disableGenerateButton,
-			reportError,
-			emptyData,
-			chartConfig,
-			tableConfig,
-			platform,
-			variations,
-			variation,
-			groupBy
+				endDate,
+				reportLoading,
+				disableGenerateButton,
+				reportError,
+				emptyData,
+				chartConfig,
+				tableConfig,
+				platform,
+				variations,
+				variation,
+				groupBy
 			} = this.state,
 			customToggle = {
 				toggleText: 'Network wise data',
@@ -169,26 +185,26 @@ class ReportingPanel extends React.Component {
 					styles={{ height: 'auto' }}
 				/>
 			) : (
-					<div>
-						<div id="chart-legend"></div>
-						<ReactHighcharts config={chartConfig} />
-						<div className="report-table">
-							{tableConfig ? (
-								<Datatable
-									tableHeader={tableConfig.header}
-									tableBody={tableConfig.body}
-									keyName="reportTable"
-									rowsPerPage={10}
-									customToggle={customToggle}
-									rowsPerPageOption={[20, 30, 40, 50]}
-									customGroupByNonAggregatedData={groupBy}
-								/>
-							) : (
-									''
-								)}
-						</div>
+				<div>
+					<div id="chart-legend" />
+					<ReactHighcharts config={chartConfig} />
+					<div className="report-table">
+						{tableConfig ? (
+							<Datatable
+								tableHeader={tableConfig.header}
+								tableBody={tableConfig.body}
+								keyName="reportTable"
+								rowsPerPage={10}
+								customToggle={customToggle}
+								rowsPerPageOption={[20, 30, 40, 50]}
+								customGroupByNonAggregatedData={groupBy}
+							/>
+						) : (
+							''
+						)}
 					</div>
-				);
+				</div>
+			);
 
 		return (
 			<ActionCard title={`AdPushup Report - ${commonConsts.SITE_DOMAIN}`}>
@@ -199,6 +215,7 @@ class ReportingPanel extends React.Component {
 							endDate={endDate}
 							disableGenerateButton={disableGenerateButton}
 							generateButtonHandler={this.generateReport}
+							downloadButtonHandler={this.downloadReport}
 							reportParamsUpdateHandler={this.updateReportParams}
 							variations={variations}
 							variation={variation}
