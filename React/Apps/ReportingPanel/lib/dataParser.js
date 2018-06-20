@@ -391,7 +391,8 @@ const dataLabels = commonConsts.DATA_LABELS,
 			networkTotalImpressions.push($.extend(true, {}, impressions.props.networkData));
 			networkTotalRevenue.push($.extend(true, {}, revenue.props.networkData));
 
-			const coverage = Number(((sumNetworkDataProp(impressions) / adpRequests) * 100).toFixed(2));
+			let coverage = Number(((sumNetworkDataProp(impressions) / adpRequests) * 100).toFixed(2));
+			coverage = isNaN(coverage) || !isFinite(coverage) ? 0 : coverage;
 			totalCoverage += coverage;
 
 			body.push({
