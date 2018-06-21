@@ -6,7 +6,7 @@ import ActionCard from '../../../Components/ActionCard.jsx';
 import ReportControls from './ReportControls.jsx';
 import '../styles.scss';
 import commonConsts from '../lib/commonConsts';
-import { apiQueryGenerator, dataGenerator } from '../lib/helpers';
+import { apiQueryGenerator, dataGenerator, csvDataGenerator } from '../lib/helpers';
 import { ajax } from '../../../common/helpers';
 import moment from 'moment';
 import PaneLoader from '../../../Components/PaneLoader.jsx';
@@ -112,7 +112,7 @@ class ReportingPanel extends React.Component {
 	}
 
 	downloadReport() {
-		console.log(this.state.tableConfig);
+		csvDataGenerator(this.state.tableConfig);
 	}
 
 	updateReportParams(params) {

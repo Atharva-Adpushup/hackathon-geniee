@@ -1,5 +1,12 @@
 const commonConsts = {
-	SELECT: ['total_xpath_miss', 'total_impressions', 'total_revenue', 'total_requests', 'total_gross_revenue', 'ntwid'],
+	SELECT: [
+		'total_xpath_miss',
+		'total_impressions',
+		'total_revenue',
+		'total_requests',
+		'total_gross_revenue',
+		'ntwid'
+	],
 	PLATFORMS: ['DESKTOP', 'MOBILE', 'TABLET'],
 	NETWORK_ID: 'ntwid',
 	DEVICE_TYPE: 'device_type',
@@ -18,7 +25,7 @@ const commonConsts = {
 	GROUP_BY: ['device_type', 'pagegroup'],
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
-	SITE_ID: window.siteId,
+	SITE_ID: 31764,
 	SITE_DOMAIN: window.siteDomain,
 	PAGEGROUPS: window.pageGroups,
 	IS_SUPERUSER: window.isSuperUser,
