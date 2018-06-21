@@ -217,7 +217,7 @@ class ReportControls extends Component {
 							<button
 								className="btn btn-lightBg btn-default btn-blue-line"
 								onClick={props.downloadButtonHandler}
-								disabled={props.disableGenerateButton}
+								disabled={props.disableGenerateButton || props.emptyData}
 							>
 								<i className="fa fa-download mR-5" />
 								Download Report
@@ -247,7 +247,8 @@ ReportControls.propTypes = {
 	generateButtonHandler: PropTypes.func.isRequired,
 	downloadButtonHandler: PropTypes.func.isRequired,
 	reportParamsUpdateHandler: PropTypes.func.isRequired,
-	variations: PropTypes.array.isRequired
+	variations: PropTypes.array.isRequired,
+	emptyData: PropTypes.bool.isRequired
 };
 
 export default ReportControls;

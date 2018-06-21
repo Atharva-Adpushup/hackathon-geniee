@@ -97,7 +97,8 @@ class ReportingPanel extends React.Component {
 						reportError: false,
 						responseData,
 						chartConfig: data.chartData,
-						tableConfig: data.tableData
+						tableConfig: data.tableData,
+						emptyData: false
 					});
 				} else if (!res.error && !res.rows.length) {
 					this.setState({ ...state, reportError: true, emptyData: true });
@@ -112,7 +113,9 @@ class ReportingPanel extends React.Component {
 	}
 
 	downloadReport() {
-		csvDataGenerator(this.state.tableConfig);
+		const { tableConfig, groupBy } = this.state;
+
+		csvDataGenerator(tableConfig, groupBy);
 	}
 
 	updateReportParams(params) {
@@ -213,6 +216,7 @@ class ReportingPanel extends React.Component {
 						<ReportControls
 							startDate={startDate}
 							endDate={endDate}
+							emptyData={emptyData}
 							disableGenerateButton={disableGenerateButton}
 							generateButtonHandler={this.generateReport}
 							downloadButtonHandler={this.downloadReport}

@@ -94,12 +94,12 @@ router
 			})
 			.catch(err => res.send('Some error occurred! Please try again later.'));
 	})
-	.get('/generateAdpushupReport', (req, res) => {
-		const csv = [['id', 'subject1', 'subject2', 'subject3'], ['jack', 85, 90, 68], ['sam', 77, 89, 69]];
+	.get('/downloadAdpushupReport', (req, res) => {
+		const { csvData } = req.body;
 
-		res.setHeader('Content-disposition', 'attachment; filename=testing.csv');
+		res.setHeader('Content-disposition', 'attachment; filename=AdpushupReport.csv');
 		res.set('Content-Type', 'text/csv');
-		return res.status(200).csv([['a', 'b', 'c'], ['d', 'e', 'f']]);
+		return res.status(200).csv(csvData);
 	})
 	.get('/performance', function(req, res) {
 		var siteId = req.params.siteId,

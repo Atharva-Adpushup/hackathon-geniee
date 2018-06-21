@@ -106,26 +106,117 @@ const apiQueryGenerator = params => {
 			}
 		}
 	},
-	csvDataGenerator = tableConfig => {
+	calculateCSVRowCPM = row => {
+		const { cpmCalc } = row[commonConsts.DATA_LABELS.cpm].props,
+			{ impressions, revenue } = cpmCalc,
+			cpm = ((revenue * 1000) / impressions).toFixed(2);
+
+		return cpm;
+	},
+	updateMajorRow = (csvRow, row) => {
+		csvRow.push(
+			row[commonConsts.DATA_LABELS.date].props.children,
+			row[commonConsts.DATA_LABELS.pageViews].props.children,
+			row[commonConsts.DATA_LABELS.pageCpm].props.children,
+			row[commonConsts.DATA_LABELS.adpRequests].props.children,
+			sumNetworkDataProp(row[commonConsts.DATA_LABELS.impressions]),
+			row[commonConsts.DATA_LABELS.adpCoverage].props.children,
+			calculateCSVRowCPM(row),
+			sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2),
+			row[commonConsts.DATA_LABELS.grossRevenue].props.children,
+			row[commonConsts.DATA_LABELS.xpathMiss].props.children
+		);
+	},
+	updateMinorRow = (csvRow, row) => {
+		csvRow.push(
+			row[commonConsts.DATA_LABELS.date],
+			row[commonConsts.DATA_LABELS.pageViews],
+			row[commonConsts.DATA_LABELS.pageCpm],
+			row[commonConsts.DATA_LABELS.adpRequests],
+			sumNetworkDataProp(row[commonConsts.DATA_LABELS.impressions]),
+			row[commonConsts.DATA_LABELS.adpCoverage],
+			calculateCSVRowCPM(row),
+			sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2),
+			row[commonConsts.DATA_LABELS.grossRevenue],
+			row[commonConsts.DATA_LABELS.xpathMiss]
+		);
+	},
+	processCSVGroupBy = (groupBy, row) => {
+		let csvRow = [];
+
+		switch (groupBy) {
+			case commonConsts.DEVICE_TYPE:
+				if (commonConsts.DATA_LABELS.platform in row) {
+					csvRow.push(row[commonConsts.DATA_LABELS.platform]);
+					updateMajorRow(csvRow, row);
+				} else {
+					csvRow.push('');
+					updateMinorRow(csvRow, row);
+				}
+				break;
+			case 'pagegroup':
+				if (commonConsts.DATA_LABELS.pageGroup in row) {
+					csvRow.push(row[commonConsts.DATA_LABELS.pageGroup]);
+					updateMajorRow(csvRow, row);
+				} else {
+					csvRow.push('');
+					updateMinorRow(csvRow, row);
+				}
+				break;
+			case 'variation':
+				if (commonConsts.DATA_LABELS.variation in row) {
+					csvRow.push(row[commonConsts.DATA_LABELS.variation]);
+					updateMajorRow(csvRow, row);
+				} else {
+					csvRow.push('');
+					updateMinorRow(csvRow, row);
+				}
+				break;
+		}
+
+		return csvRow;
+	},
+	csvDataGenerator = (tableConfig, groupBy) => {
 		const { header, body } = tableConfig;
 
-		let csvHeader = [];
+		let csvHeader = [],
+			csvBody = [];
 		for (let i in header) {
 			csvHeader.push(header[i].title);
 		}
 
-		console.log(csvHeader);
-		console.log(body);
-		// body.forEach(row => {
-		// 	console.log([
-		// 		row[commonConsts.DATA_LABELS.date],
-		// 		row[commonConsts.DATA_LABELS.pageViews],
-		// 		row[commonConsts.DATA_LABELS.pageCpm],
-		// 		row[commonConsts.DATA_LABELS.adpRequests],
-		// 		sumNetworkDataProp(row[commonConsts.DATA_LABELS.impressions]),
-		// 		row[commonConsts.DATA_LABELS.adpCoverage]
-		// 	]);
-		// });
+		csvBody.push(csvHeader);
+		for (let i = 0; i <= body.length - 2; i++) {
+			let row = body[i],
+				csvRow = [];
+
+			if (groupBy) {
+				csvRow = processCSVGroupBy(groupBy, row);
+			} else {
+				updateMinorRow(csvRow, row);
+			}
+
+			csvBody.push(csvRow);
+		}
+
+		const totalsRow = body[body.length - 1];
+
+		if (!groupBy) {
+			csvBody.push([
+				totalsRow[commonConsts.DATA_LABELS.date].props.children,
+				totalsRow[commonConsts.DATA_LABELS.pageViews].props.children,
+				totalsRow[commonConsts.DATA_LABELS.pageCpm].props.children,
+				totalsRow[commonConsts.DATA_LABELS.adpRequests].props.children,
+				sumNetworkDataProp(totalsRow[commonConsts.DATA_LABELS.impressions]),
+				totalsRow[commonConsts.DATA_LABELS.adpCoverage].props.children,
+				calculateCSVRowCPM(totalsRow),
+				sumNetworkDataProp(totalsRow[commonConsts.DATA_LABELS.revenue]).toFixed(2),
+				totalsRow[commonConsts.DATA_LABELS.grossRevenue].props.children,
+				totalsRow[commonConsts.DATA_LABELS.xpathMiss].props.children
+			]);
+		}
+
+		console.log(csvBody);
 	};
 
 export { apiQueryGenerator, dataGenerator, reorderArray, csvDataGenerator };
