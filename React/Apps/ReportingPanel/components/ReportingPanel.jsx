@@ -115,7 +115,11 @@ class ReportingPanel extends React.Component {
 	downloadReport() {
 		const { tableConfig, groupBy } = this.state;
 
-		csvDataGenerator(tableConfig, groupBy);
+		ajax({
+			method: 'POST',
+			url: `${commonConsts.REPORT_DOWNLOAD_ENDPOINT}`,
+			data: JSON.stringify({ csvData: csvDataGenerator(tableConfig, groupBy) })
+		});
 	}
 
 	updateReportParams(params) {

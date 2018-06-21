@@ -216,7 +216,7 @@ const apiQueryGenerator = params => {
 			]);
 		}
 
-		console.log(csvBody);
+		return csvBody;
 	};
 
 export { apiQueryGenerator, dataGenerator, reorderArray, csvDataGenerator };

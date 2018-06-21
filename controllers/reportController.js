@@ -94,10 +94,10 @@ router
 			})
 			.catch(err => res.send('Some error occurred! Please try again later.'));
 	})
-	.get('/downloadAdpushupReport', (req, res) => {
+	.post('/downloadAdpushupReport', (req, res) => {
 		const { csvData } = req.body;
 
-		res.setHeader('Content-disposition', 'attachment; filename=AdpushupReport.csv');
+		res.setHeader('Content-disposition', 'attachment; filename=adpushup-report.csv');
 		res.set('Content-Type', 'text/csv');
 		return res.status(200).csv(csvData);
 	})

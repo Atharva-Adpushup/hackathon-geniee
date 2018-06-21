@@ -25,6 +25,7 @@ const commonConsts = {
 	GROUP_BY: ['device_type', 'pagegroup'],
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
+	REPORT_DOWNLOAD_ENDPOINT: '/user/reports/downloadAdpushupReport',
 	SITE_ID: 31764,
 	SITE_DOMAIN: window.siteDomain,
 	PAGEGROUPS: window.pageGroups,
