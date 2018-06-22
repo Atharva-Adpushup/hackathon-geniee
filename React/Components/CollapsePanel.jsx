@@ -21,10 +21,10 @@ class CollapsePanel extends Component {
 	componentWillReceiveProps(nextProps) {
 		this.setState({ ...nextProps });
 	}
-	shouldComponentUpdate(nextprop, nextstate) {
-		console.log(this.props, nextprop, this.state);
-		return this.state.open == nextprop.open ? true : false;
-	}
+	// shouldComponentUpdate(nextprop, nextstate) {
+	// 	console.log(this.props, nextprop, this.state);
+	// 	return this.state.open == nextprop.open ? true : false;
+	// }
 
 	render() {
 		const { props, state } = this;
@@ -60,7 +60,7 @@ CollapsePanel.propTypes = {
 };
 
 CollapsePanel.defaultProps = {
-	open: false,
+	//open: false,
 	tooltipMessage: 'Click to view details',
 	bold: false
 };

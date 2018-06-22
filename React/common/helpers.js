@@ -10,7 +10,7 @@ const capitalCase = str => {
 	isFloat = num => (num % 1 === 0 ? false : true),
 	ajax = params => {
 		const { method, url, data } = params;
-
+		console.log(data);
 		return new Promise((resolve, resject) => {
 			$.ajax({
 				method,
