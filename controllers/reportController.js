@@ -94,12 +94,18 @@ router
 			})
 			.catch(err => res.send('Some error occurred! Please try again later.'));
 	})
-	.post('/downloadAdpushupReport', (req, res) => {
-		const { csvData } = req.body;
+	.get('/downloadAdpushupReport', (req, res) => {
+		//const { data } = req.query;
+		//csvData = JSON.parse(utils.atob(data));
 
-		res.setHeader('Content-disposition', 'attachment; filename=adpushup-report.csv');
+		// res.setHeader('Content-disposition', 'attachment; filename=adpushup-report.csv');
+		// res.set('Content-Type', 'text/csv');
+
+		// return res.status(200).csv(csvData);
+
+		res.setHeader('Content-disposition', 'attachment; filename=testing.csv');
 		res.set('Content-Type', 'text/csv');
-		return res.status(200).csv(csvData);
+		return res.status(200).csv([['a', 'b', 'c'], ['d', 'e', 'f']]);
 	})
 	.get('/performance', function(req, res) {
 		var siteId = req.params.siteId,
