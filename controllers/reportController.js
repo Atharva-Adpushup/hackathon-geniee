@@ -98,12 +98,16 @@ router
 		const { data } = req.query;
 
 		if (data) {
-			csvData = JSON.parse(utils.atob(data));
+			try {
+				csvData = JSON.parse(utils.atob(data));
 
-			res.setHeader('Content-disposition', 'attachment; filename=adpushup-report.csv');
-			res.set('Content-Type', 'text/csv');
+				res.setHeader('Content-disposition', 'attachment; filename=adpushup-report.csv');
+				res.set('Content-Type', 'text/csv');
 
-			return res.status(200).csv(csvData);
+				return res.status(200).csv(csvData);
+			} catch (e) {
+				return res.status(500).send('Some error occurred! Please try again later.');
+			}
 		} else {
 			return res.status(403).send('CSV data to be generated is undefined.');
 		}
