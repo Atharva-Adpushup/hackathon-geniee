@@ -488,6 +488,27 @@ router
 					message: 'Some Error Occured'
 				});
 			});
+	})
+	.get('/:siteId/saveAmpSettings', (req, res) => {
+		let response = {
+			error: true,
+			message: 'Operaiton Failed'
+		};
+		return siteModel
+			.getSiteById(req.params.siteId)
+			.then(site => {
+				if (!site) {
+					return res.send(response);
+				}
+				site.set('ampSettings',req.body)
+				return site.save();
+			})
+			.catch(function(err) {
+				return res.send({
+					error: true,
+					message: 'Some Error Occured'
+				});
+			});
 	});
 
 module.exports = router;

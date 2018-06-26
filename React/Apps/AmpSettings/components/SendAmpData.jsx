@@ -59,7 +59,7 @@ class SendAmpData extends React.Component {
 	render() {
 		return (
 			<form onSubmit={this.send}>
-				<Heading title="Send AMP Data" />
+				<Heading title="Force AMP conversion" />
 				{this.renderInputControl('URL(eg. http://abc.com/xyz)', 'url')}
 				<RowColSpan label="Select PageGroup">
 					<select

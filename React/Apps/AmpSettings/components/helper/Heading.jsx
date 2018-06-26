@@ -4,7 +4,7 @@ const Heading = props => {
 	return (
 		<Row>
 			<Col sm={12}>
-				<h4>{props.title}</h4>
+				<h4 style={{ marginBottom: '10px' }}>{props.title}</h4>
 			</Col>
 		</Row>
 	);

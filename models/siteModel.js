@@ -28,7 +28,8 @@ var model = require('../helpers/model'),
 			'adsensePublisherId',
 			'adNetworkSettings',
 			'isManual',
-			'gdpr'
+			'gdpr',
+			'ampSettings'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -42,7 +43,8 @@ var model = require('../helpers/model'),
 			'genieeMediaId',
 			'adsensePublisherId',
 			'isManual',
-			'gdpr'
+			'gdpr',
+			'ampSettings'
 		];
 		this.validations = {
 			required: []
@@ -90,20 +92,18 @@ var model = require('../helpers/model'),
 				function(resolve) {
 					// Reset site channels and page group pattern
 					var channels = _.filter(this.get('channels'), function(chnl) {
-							return chnl !== platform + ':' + pageGroup;
-						}),
+						return chnl !== platform + ':' + pageGroup;
+					}),
 						apConfigs = this.get('apConfigs'),
-						isPageGroupPattern = !!(
-							apConfigs &&
+						isPageGroupPattern = !!(apConfigs &&
 							apConfigs.pageGroupPattern &&
-							_.isArray(apConfigs.pageGroupPattern)
-						),
+							_.isArray(apConfigs.pageGroupPattern)),
 						pageGroupPatterns = isPageGroupPattern
 							? _.filter(apConfigs.pageGroupPattern, function(patternObj) {
 									var patternKey = Object.keys(patternObj)[0];
 
 									return patternKey !== pageGroup;
-							  })
+								})
 							: false,
 						computedApConfig;
 
@@ -205,8 +205,7 @@ var model = require('../helpers/model'),
 
 		this.syncAdsenseAds = Promise.method(
 			function(ads) {
-				var ad = null,
-					self = this;
+				var ad = null, self = this;
 				_.each(ads, function(adJson) {
 					if (!adJson.adslot) {
 						return true;
@@ -306,9 +305,7 @@ function apiModule() {
 			 */
 			function getDeleteChannelsPromises(site) {
 				return _(site.get('channels')).map(function(channel) {
-					var channelArr = channel.split(':'),
-						platform = channelArr[0],
-						pageGroup = channelArr[1];
+					var channelArr = channel.split(':'), platform = channelArr[0], pageGroup = channelArr[1];
 
 					return channelModel
 						.deleteChannel(siteId, platform, pageGroup)
