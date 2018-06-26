@@ -201,7 +201,7 @@ const apiQueryGenerator = params => {
 
 		const totalsRow = body[body.length - 1];
 
-		if (!groupBy) {
+		if (!groupBy && totalsRow && totalsRow[commonConsts.DATA_LABELS.date].props) {
 			csvBody.push([
 				totalsRow[commonConsts.DATA_LABELS.date].props.children,
 				totalsRow[commonConsts.DATA_LABELS.pageViews].props.children,

@@ -38,7 +38,6 @@ class ReportingPanel extends React.Component {
 				.subtract(1, 'day')
 		};
 		this.generateReport = this.generateReport.bind(this);
-		this.downloadReport = this.downloadReport.bind(this);
 		this.updateReportParams = this.updateReportParams.bind(this);
 		this.fetchVariations = this.fetchVariations.bind(this);
 		this.tableToggleCallback = this.tableToggleCallback.bind(this);
@@ -110,16 +109,6 @@ class ReportingPanel extends React.Component {
 				console.log(res);
 				this.setState({ ...state, reportError: true });
 			});
-	}
-
-	downloadReport() {
-		const { tableConfig, groupBy } = this.state,
-			csvData = btoa(JSON.stringify(csvDataGenerator(tableConfig, groupBy)));
-
-		ajax({
-			method: 'GET',
-			url: `${commonConsts.REPORT_DOWNLOAD_ENDPOINT}`
-		});
 	}
 
 	updateReportParams(params) {
@@ -213,6 +202,11 @@ class ReportingPanel extends React.Component {
 				</div>
 			);
 
+		let csvData = '';
+		if (tableConfig) {
+			csvData = btoa(JSON.stringify(csvDataGenerator(tableConfig, groupBy)));
+		}
+
 		return (
 			<ActionCard title={`AdPushup Report - ${commonConsts.SITE_DOMAIN}`}>
 				<Row>
@@ -223,10 +217,10 @@ class ReportingPanel extends React.Component {
 							emptyData={emptyData}
 							disableGenerateButton={disableGenerateButton}
 							generateButtonHandler={this.generateReport}
-							downloadButtonHandler={this.downloadReport}
 							reportParamsUpdateHandler={this.updateReportParams}
 							variations={variations}
 							variation={variation}
+							csvData={csvData}
 						/>
 					</Col>
 					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : reportPane}</Col>

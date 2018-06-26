@@ -95,17 +95,18 @@ router
 			.catch(err => res.send('Some error occurred! Please try again later.'));
 	})
 	.get('/downloadAdpushupReport', (req, res) => {
-		//const { data } = req.query;
-		//csvData = JSON.parse(utils.atob(data));
+		const { data } = req.query;
 
-		// res.setHeader('Content-disposition', 'attachment; filename=adpushup-report.csv');
-		// res.set('Content-Type', 'text/csv');
+		if (data) {
+			csvData = JSON.parse(utils.atob(data));
 
-		// return res.status(200).csv(csvData);
+			res.setHeader('Content-disposition', 'attachment; filename=adpushup-report.csv');
+			res.set('Content-Type', 'text/csv');
 
-		res.setHeader('Content-disposition', 'attachment; filename=testing.csv');
-		res.set('Content-Type', 'text/csv');
-		return res.status(200).csv([['a', 'b', 'c'], ['d', 'e', 'f']]);
+			return res.status(200).csv(csvData);
+		} else {
+			return res.status(403).send('CSV data to be generated is undefined.');
+		}
 	})
 	.get('/performance', function(req, res) {
 		var siteId = req.params.siteId,

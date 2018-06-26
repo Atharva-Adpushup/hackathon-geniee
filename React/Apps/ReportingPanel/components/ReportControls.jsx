@@ -138,7 +138,8 @@ class ReportControls extends Component {
 
 	render() {
 		const { state, props } = this,
-			{ PLATFORMS, PAGEGROUPS } = commonConsts;
+			{ PLATFORMS, PAGEGROUPS, REPORT_DOWNLOAD_ENDPOINT } = commonConsts,
+			downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${props.csvData}`;
 
 		return (
 			<div className="report-controls-wrapper">
@@ -214,14 +215,18 @@ class ReportControls extends Component {
 					</Row>
 					<Row className="mT-10">
 						<Col sm={3} smOffset={6}>
-							<button
+							<a
+								href={downloadLink}
+								style={{
+									display: 'block',
+									height: 33,
+									paddingTop: 8
+								}}
 								className="btn btn-lightBg btn-default btn-blue-line"
-								onClick={props.downloadButtonHandler}
-								disabled={props.disableGenerateButton || props.emptyData}
 							>
 								<i className="fa fa-download mR-5" />
 								Download Report
-							</button>
+							</a>
 						</Col>
 						<Col sm={3}>
 							<button
@@ -245,10 +250,10 @@ ReportControls.propTypes = {
 	endDate: PropTypes.object.isRequired,
 	disableGenerateButton: PropTypes.bool.isRequired,
 	generateButtonHandler: PropTypes.func.isRequired,
-	downloadButtonHandler: PropTypes.func.isRequired,
 	reportParamsUpdateHandler: PropTypes.func.isRequired,
 	variations: PropTypes.array.isRequired,
-	emptyData: PropTypes.bool.isRequired
+	emptyData: PropTypes.bool.isRequired,
+	csvData: PropTypes.string.isRequired
 };
 
 export default ReportControls;
