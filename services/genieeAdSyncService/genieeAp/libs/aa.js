@@ -373,7 +373,50 @@ $.fn.notNear = function(xPathArr, minGap) {
 };
 
 $.fn.setPlacementForSection = function(adObj, minDistance) {
-	var section = adObj.section;
+	var getValidPlacementData = function(config, placementNumber) {
+			var isValidInputData = !!(placementNumber && config),
+				isValidCurrentPlacement = !!(
+					isValidInputData &&
+					config[placementNumber] &&
+					Object.keys(config[placementNumber]).length &&
+					config[placementNumber].elem &&
+					config[placementNumber].hasOwnProperty('isSecondaryCss')
+				),
+				resultData = null,
+				placementId,
+				isValidPlacement;
+
+			if (!isValidInputData) {
+				return null;
+			}
+
+			if (isValidCurrentPlacement) {
+				return config[placementNumber];
+			}
+
+			placementId = Number(placementNumber);
+
+			while (placementId >= 1) {
+				isValidPlacement = !!(
+					placementId &&
+					config &&
+					config[placementId] &&
+					Object.keys(config[placementId]).length &&
+					config[placementId].elem &&
+					config[placementId].hasOwnProperty('isSecondaryCss')
+				);
+
+				if (isValidPlacement) {
+					resultData = config[placementId];
+					break;
+				}
+
+				placementId--;
+			}
+
+			return resultData;
+		},
+		section = adObj.section;
 
 	minDistance = Number(minDistance);
 
@@ -389,7 +432,9 @@ $.fn.setPlacementForSection = function(adObj, minDistance) {
 			distanceAddFactor = 0;
 		}
 	} else {
-		var lastPlacement = placements[section - 1] ? placements[section - 1].elem : placements[section - 1];
+		var lastPlacement = placements[section - 1]
+			? placements[section - 1].elem
+			: getValidPlacementData(placements, section).elem;
 
 		for (var i = 0; i < selectedElems.length; i++) {
 			var currElem = selectedElems[i];
