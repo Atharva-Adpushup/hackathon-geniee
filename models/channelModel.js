@@ -318,7 +318,7 @@ function apiModule() {
 		},
 		getAmpSettings: function(siteId) {
 			let query = N1qlQuery.fromString(`select ampSettings, pageGroup
-			from apAppBucket where meta().id like 'chnl::${siteId}:%' and platform ='DESKTOP';`);
+			from apAppBucket where meta().id like 'chnl::${siteId}:%' and platform ='MOBILE';`);
 			return couchbase.connectToAppBucket().then(
 				appBucket =>
 					new Promise((resolve, reject) => {

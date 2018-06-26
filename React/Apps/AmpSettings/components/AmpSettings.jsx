@@ -21,9 +21,11 @@ class AmpSettings extends React.Component {
 		this.renderBlockList = this.renderBlockList.bind(this);
 	}
 	fetchAmpSettings() {
+		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
+		console.log(arr, arr.length, arr[arr.length - 2]);
 		ajax({
 			method: 'GET',
-			url: '/user/site/16425/ampSettingsData'
+			url: '/user/site/' + siteId + '/ampSettingsData'
 		})
 			.then(res => {
 				this.setState({
