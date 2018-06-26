@@ -19,10 +19,10 @@ class AmpSettings extends React.Component {
 		this.handleOnChange = this.handleOnChange.bind(this);
 		this.renderInputControl = this.renderInputControl.bind(this);
 		this.renderBlockList = this.renderBlockList.bind(this);
+		this.saveSiteSettings = this.saveSiteSettings.bind(this);
 	}
 	fetchAmpSettings() {
 		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
-		console.log(arr, arr.length, arr[arr.length - 2]);
 		ajax({
 			method: 'GET',
 			url: '/user/site/' + siteId + '/ampSettingsData'
@@ -85,7 +85,6 @@ class AmpSettings extends React.Component {
 		);
 	}
 	renderInputControl(label, name, value) {
-		console.log(label, value);
 		return (
 			<Row>
 				<Col sm={5}>
@@ -105,10 +104,11 @@ class AmpSettings extends React.Component {
 		);
 	}
 	sendAmpData(event) {
+		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
 		event.preventDefault();
 		ajax({
 			method: 'POST',
-			url: '/user/site/16425/pagegroup/saveAmpSettings',
+			url: '/user/site/' + siteId + '/pagegroup/saveAmpSettings',
 			data: JSON.stringify({
 				url: window.location.href,
 				channelData: {
@@ -119,9 +119,11 @@ class AmpSettings extends React.Component {
 			})
 		})
 			.then(res => {
+				alert('Sent Successfully!');
 				console.log(res);
 			})
 			.catch(res => {
+				alert('Some Error Occurred!');
 				console.log(res);
 			});
 	}
@@ -131,19 +133,21 @@ class AmpSettings extends React.Component {
 	saveSiteSettings(event) {
 		event.preventDefault();
 		console.log(this.state);
-
+		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
 		ajax({
 			method: 'POST',
-			url: '/user/site/16425/pagegroup/saveAmpSettings',
+			url: '/user/site/' + siteId + '/saveAmpSettings',
 			data: JSON.stringify({
 				samplingPercent: this.state['samplingPercent'],
 				blockList: this.state['blockList']
 			})
 		})
 			.then(res => {
+				alert('Settings Saved Successfully!');
 				console.log(res);
 			})
 			.catch(res => {
+				alert('Some Error Occurred!');
 				console.log(res);
 			});
 	}

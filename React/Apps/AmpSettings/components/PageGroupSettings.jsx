@@ -18,6 +18,11 @@ class PageGroupSettings extends React.Component {
 			imgConfig = ampSettings.imgConfig || {},
 			customCSS = { value: ampSettings['customCSS'] ? ampSettings['customCSS'].value : '' },
 			{ selectors = {}, toDelete, beforeJs, afterJs, siteName, template, adNetwork, pubId } = ampSettings;
+		beforeJs = beforeJs ? atob(beforeJs) : '';
+		afterJs = afterJs ? atob(afterJs) : '';
+		for (let i = 0; i < ads.length; i++) {
+			ads[i]['adCode'] = ads[i]['adCode'] ? atob(ads[i]['adCode']) : '';
+		}
 		this.state = {
 			selectors,
 			toDelete: toDelete && toDelete.toString(),
@@ -30,7 +35,8 @@ class PageGroupSettings extends React.Component {
 			social,
 			menu,
 			ads,
-			customCSS
+			customCSS,
+			afterJs
 		};
 		this.renderSelectors = this.renderSelectors.bind(this);
 		this.renderSocialApps = this.renderSocialApps.bind(this);
@@ -103,15 +109,22 @@ class PageGroupSettings extends React.Component {
 			</Row>
 		);
 	}
+	parseFormData(ampData) {
+		let finalData = ampData, ads = finalData.ads;
+		finalData['beforeJs'] = finalData['beforeJs'] ? btoa(finalData['beforeJs']) : '';
+		finalData['afterJs'] = finalData['afterJs'] ? btoa(finalData['afterJs']) : '';
+		for (let i = 0; i < ads.length; i++) {
+			ads[i]['adCode'] = ads[i]['adCode'] ? btoa(ads[i]['adCode']) : '';
+		}
+		return finalData;
+	}
 	saveChannelSettings(event) {
 		event.preventDefault();
-		console.log(this.state);
-		let ampData = this.state, pageGroup = this.props.channel.pageGroup;
-		// const data = new FormData(event.target);
-		// console.log(event.target.template);
+		let ampData = this.parseFormData(this.state), pageGroup = this.props.channel.pageGroup;
+		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
 		ajax({
 			method: 'POST',
-			url: '/user/site/16425/pagegroup/saveAmpSettings',
+			url: '/user/site/' + siteId + '/pagegroup/saveAmpSettings',
 			data: JSON.stringify({
 				platform: 'DESKTOP',
 				pageGroup,
@@ -119,9 +132,11 @@ class PageGroupSettings extends React.Component {
 			})
 		})
 			.then(res => {
+				alert('Settings Saved Successfully!');
 				console.log(res);
 			})
 			.catch(res => {
+				alert('Some Error Occurred!');
 				console.log(res);
 			});
 	}
@@ -167,11 +182,9 @@ class PageGroupSettings extends React.Component {
 		const name = target.name;
 		const value = target.type === 'checkbox' ? target.checked : target.value;
 		this.setState({ [name]: value });
-		console.log(name, value);
 	}
 	renderLinks() {
 		const listLinks = this.state.menu['links'].map((linkView, index) => {
-			console.log(index);
 			return (
 				<div key={index}>
 					<input
@@ -223,7 +236,6 @@ class PageGroupSettings extends React.Component {
 
 	renderAds() {
 		const listAds = this.state.ads.map((linkView, index) => {
-			console.log(index);
 			return (
 				<div key={index}>
 					<input
@@ -231,7 +243,6 @@ class PageGroupSettings extends React.Component {
 						onChange={e => {
 							let ads = this.state.ads, ad = ads[index];
 							ad['selector'] = e.target.value;
-							console.log(ads);
 							this.setState({ ads });
 						}}
 						style={{ width: 'auto' }}

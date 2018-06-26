@@ -47,10 +47,9 @@ var express = require('express'),
 				email: site.get('ownerEmail')
 			};
 
-		const hbcfPromise =
-			editMode === 'update'
-				? appBucket.replacePromise(`hbcf::${siteId}`, json)
-				: appBucket.insertPromise(`hbcf::${siteId}`, json);
+		const hbcfPromise = editMode === 'update'
+			? appBucket.replacePromise(`hbcf::${siteId}`, json)
+			: appBucket.insertPromise(`hbcf::${siteId}`, json);
 
 		return [hbcfPromise, site];
 	};
@@ -301,15 +300,12 @@ router
 					userEmail = req.session.user.email,
 					site = _.find(userSites, { siteId: parseInt(json.siteId) });
 
-				return userModel
-					.setSitePageGroups(userEmail)
-					.then(user => user.save())
-					.then(() => {
-						var index = _.findIndex(userSites, { siteId: parseInt(json.siteId) });
-						req.session.user.sites[index] = site;
+				return userModel.setSitePageGroups(userEmail).then(user => user.save()).then(() => {
+					var index = _.findIndex(userSites, { siteId: parseInt(json.siteId) });
+					req.session.user.sites[index] = site;
 
-						return res.redirect('/user/dashboard');
-					});
+					return res.redirect('/user/dashboard');
+				});
 			})
 			.catch(function(err) {
 				var error = err.message[0].message ? err.message[0].message : 'Some error occurred!';
@@ -390,8 +386,7 @@ router
 					}
 
 					return Promise.all(sitePromises()).then(function(validSites) {
-						var sites = _.difference(validSites, ['inValidSite']),
-							unSavedSite;
+						var sites = _.difference(validSites, ['inValidSite']), unSavedSite;
 
 						sites = Array.isArray(sites) && sites.length > 0 ? sites : [];
 						/**
@@ -489,7 +484,7 @@ router
 				});
 			});
 	})
-	.get('/:siteId/saveAmpSettings', (req, res) => {
+	.post('/:siteId/saveAmpSettings', (req, res) => {
 		let response = {
 			error: true,
 			message: 'Operaiton Failed'
@@ -500,7 +495,7 @@ router
 				if (!site) {
 					return res.send(response);
 				}
-				site.set('ampSettings',req.body)
+				site.set('ampSettings', req.body);
 				return site.save();
 			})
 			.catch(function(err) {
