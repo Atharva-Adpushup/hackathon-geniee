@@ -393,7 +393,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 			let coverage = Number(((sumNetworkDataProp(impressions) / adpRequests) * 100).toFixed(2));
 			coverage = isNaN(coverage) || !isFinite(coverage) ? 0 : coverage;
-			totalCoverage += coverage;
+			totalCoverage += coverage > 100 ? 100 : coverage;
 
 			body.push({
 				[dataLabels.date]: reportDate,
@@ -633,4 +633,4 @@ const dataLabels = commonConsts.DATA_LABELS,
 		return { chartConfig, tableConfig };
 	};
 
-export default dataParser;
+export { dataParser, sumNetworkDataProp };
