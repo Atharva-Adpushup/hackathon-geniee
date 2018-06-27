@@ -9,7 +9,7 @@ import CustomToggleSwitch from '../customToggleSwitch.jsx';
 class AdpTags extends Component {
 	constructor(props) {
 		super(props);
-		const { fpKey, priceFloor, headerBidding, code, refreshSlot } = props,
+		const { fpKey, priceFloor, headerBidding, code, refreshSlot, overrideActive } = props,
 			// Geniee specific UI access feature 'dynamic allocation' property computation
 			isGenieeUIAccessDA = !!(window.isGeniee && window.gcfg && window.gcfg.hasOwnProperty('uud')),
 			isGenieeUIAccessDAActive = !!(isGenieeUIAccessDA && window.gcfg.uud),
@@ -22,13 +22,14 @@ class AdpTags extends Component {
 					active: isGenieeUIAccessDAActive,
 					inactive: isGenieeUIAccessDAInActive
 				}
-			},			
+			},
 			fpKey: fpKey,
-			// 'isGenieeUIAccessDAInActive' is added below as a condition because 
-			// Dynamic Allocation/Header Bidding property should be false by default 
+			// 'isGenieeUIAccessDAInActive' is added below as a condition because
+			// Dynamic Allocation/Header Bidding property should be false by default
 			// if Geniee UI access 'DA' (window.gcfg.uud) property is present and set to 0
 			hbAcivated: isGenieeUIAccessDAInActive ? false : headerBidding,
 			refreshSlot,
+			overrideActive,
 			pf: priceFloor,
 			advanced: false,
 			keyValues: !code
@@ -47,6 +48,7 @@ class AdpTags extends Component {
 		this.generateCode = this.generateCode.bind(this);
 		this.renderDynamicAllocation = this.renderDynamicAllocation.bind(this);
 		this.renderAdvancedBlock = this.renderAdvancedBlock.bind(this);
+		this.renderHBOverride = this.renderHBOverride.bind(this);
 	}
 
 	filterKeyValues(keyValues) {
@@ -60,14 +62,15 @@ class AdpTags extends Component {
 	}
 
 	save() {
-		const { fpKey, hbAcivated, pf, keyValues, refreshSlot } = this.state;
+		const { fpKey, hbAcivated, pf, keyValues, refreshSlot, overrideActive } = this.state;
 		this.props.submitHandler({
 			headerBidding: !!hbAcivated,
 			keyValues: {
 				...this.filterKeyValues(keyValues),
 				[fpKey]: pf
 			},
-			refreshSlot
+			refreshSlot,
+			overrideActive
 		});
 	}
 
@@ -149,6 +152,30 @@ class AdpTags extends Component {
 		);
 	}
 
+	renderHBOverride(isGenieeEditableMode) {
+		return (
+			<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+				<CustomToggleSwitch
+					labelText="Overrride size"
+					className="mB-10"
+					checked={this.state.overrideActive}
+					disabled={isGenieeEditableMode}
+					onChange={val => {
+						this.setState({ overrideActive: !!val });
+					}}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout={this.props.fromPanel ? false : true}
+					name={this.props.id ? `overrideSizeSwitch-${this.props.id}` : 'overrideSizeSwitch'}
+					id={this.props.id ? `js-override-size-switch-${this.props.id}` : 'js-override-size-switch'}
+					customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+				/>
+			</Col>
+		);
+	}
+
 	renderDynamicAllocation() {
 		let { isInsertMode } = this.props,
 			isGenieeEditableMode = !!(this.props.geniee && !isInsertMode),
@@ -177,6 +204,7 @@ class AdpTags extends Component {
 						customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
 					/>
 				</Col>
+				{this.state.hbAcivated ? this.renderHBOverride(isGenieeEditableMode) : null}
 			</Row>
 		) : null;
 	}

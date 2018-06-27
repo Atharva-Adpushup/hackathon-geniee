@@ -73,7 +73,7 @@ class NetworkOptions extends Component {
 
 	filterNetworks() {
 		if (window.isGeniee) {
-			const isGCFG = !!(window.gcfg),
+			const isGCFG = !!window.gcfg,
 				isUSN = !!(isGCFG && window.gcfg.hasOwnProperty('usn'));
 
 			// 'isUSN' refers to Geniee UI Access 'Select Network' flag
@@ -103,6 +103,10 @@ class NetworkOptions extends Component {
 			refreshSlot =
 				adExists && this.props.ad.networkData && this.props.ad.networkData.refreshSlot
 					? this.props.ad.networkData.refreshSlot
+					: false,
+			overrideActive =
+				adExists && this.props.ad.networkData && this.props.ad.networkData.overrideActive
+					? this.props.ad.networkData.overrideActive
 					: false,
 			headerBidding =
 				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('headerBidding')
@@ -140,6 +144,7 @@ class NetworkOptions extends Component {
 						onCancel={this.props.onCancel}
 						code={code}
 						refreshSlot={refreshSlot}
+						overrideActive={overrideActive}
 						buttonType={this.props.buttonType || 1}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						id={this.props.id ? this.props.id : false}
