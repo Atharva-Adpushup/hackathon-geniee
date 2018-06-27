@@ -74,7 +74,7 @@ class AdpTags extends Component {
 			},
 			refreshSlot,
 			overrideActive,
-			overrideSizeTo
+			overrideSizeTo: overrideActive ? overrideSizeTo : null
 		});
 	}
 
