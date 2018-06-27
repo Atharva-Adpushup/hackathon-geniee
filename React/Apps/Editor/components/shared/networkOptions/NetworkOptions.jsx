@@ -108,6 +108,10 @@ class NetworkOptions extends Component {
 				adExists && this.props.ad.networkData && this.props.ad.networkData.overrideActive
 					? this.props.ad.networkData.overrideActive
 					: false,
+			overrideSizeTo =
+				adExists && this.props.ad.networkData && this.props.ad.networkData.overrideSizeTo
+					? this.props.ad.networkData.overrideSizeTo
+					: false,
 			headerBidding =
 				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('headerBidding')
 					? this.props.ad.networkData.headerBidding
@@ -145,6 +149,7 @@ class NetworkOptions extends Component {
 						code={code}
 						refreshSlot={refreshSlot}
 						overrideActive={overrideActive}
+						overrideSizeTo={overrideSizeTo}
 						buttonType={this.props.buttonType || 1}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						id={this.props.id ? this.props.id : false}

@@ -6,10 +6,11 @@ import CodeBox from '../codeBox';
 import { priceFloorKeys } from '../../../consts/commonConsts';
 import SelectBox from '../select/select.js';
 import CustomToggleSwitch from '../customToggleSwitch.jsx';
+import { getSupportedAdSizes } from '../../../../OpsPanel/lib/helpers';
 class AdpTags extends Component {
 	constructor(props) {
 		super(props);
-		const { fpKey, priceFloor, headerBidding, code, refreshSlot, overrideActive } = props,
+		const { fpKey, priceFloor, headerBidding, code, refreshSlot, overrideActive, overrideSizeTo } = props,
 			// Geniee specific UI access feature 'dynamic allocation' property computation
 			isGenieeUIAccessDA = !!(window.isGeniee && window.gcfg && window.gcfg.hasOwnProperty('uud')),
 			isGenieeUIAccessDAActive = !!(isGenieeUIAccessDA && window.gcfg.uud),
@@ -30,6 +31,7 @@ class AdpTags extends Component {
 			hbAcivated: isGenieeUIAccessDAInActive ? false : headerBidding,
 			refreshSlot,
 			overrideActive,
+			overrideSizeTo,
 			pf: priceFloor,
 			advanced: false,
 			keyValues: !code
@@ -49,6 +51,7 @@ class AdpTags extends Component {
 		this.renderDynamicAllocation = this.renderDynamicAllocation.bind(this);
 		this.renderAdvancedBlock = this.renderAdvancedBlock.bind(this);
 		this.renderHBOverride = this.renderHBOverride.bind(this);
+		this.renderSizeOverrideSelectBox = this.renderSizeOverrideSelectBox.bind(this);
 	}
 
 	filterKeyValues(keyValues) {
@@ -62,7 +65,7 @@ class AdpTags extends Component {
 	}
 
 	save() {
-		const { fpKey, hbAcivated, pf, keyValues, refreshSlot, overrideActive } = this.state;
+		const { fpKey, hbAcivated, pf, keyValues, refreshSlot, overrideActive, overrideSizeTo } = this.state;
 		this.props.submitHandler({
 			headerBidding: !!hbAcivated,
 			keyValues: {
@@ -70,7 +73,8 @@ class AdpTags extends Component {
 				[fpKey]: pf
 			},
 			refreshSlot,
-			overrideActive
+			overrideActive,
+			overrideSizeTo
 		});
 	}
 
@@ -152,27 +156,56 @@ class AdpTags extends Component {
 		);
 	}
 
+	renderSizeOverrideSelectBox() {
+		return (
+			<Row className="mb-20">
+				<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
+					<strong>Override size to</strong>
+				</Col>
+				<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
+					<SelectBox
+						className="size-override-selectbox"
+						value={this.state.overrideSizeTo}
+						label="Select size"
+						showClear={false}
+						onChange={overrideSizeTo => {
+							this.setState({ overrideSizeTo });
+						}}
+					>
+						{getSupportedAdSizes().map((size, index) => (
+							<option key={index} value={`${size.width}x${size.height}`}>
+								{`${size.width}x${size.height}`}
+							</option>
+						))}
+					</SelectBox>
+				</Col>
+			</Row>
+		);
+	}
+
 	renderHBOverride(isGenieeEditableMode) {
 		return (
-			<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
-				<CustomToggleSwitch
-					labelText="Overrride size"
-					className="mB-10"
-					checked={this.state.overrideActive}
-					disabled={isGenieeEditableMode}
-					onChange={val => {
-						this.setState({ overrideActive: !!val });
-					}}
-					layout="horizontal"
-					size="m"
-					on="Yes"
-					off="No"
-					defaultLayout={this.props.fromPanel ? false : true}
-					name={this.props.id ? `overrideSizeSwitch-${this.props.id}` : 'overrideSizeSwitch'}
-					id={this.props.id ? `js-override-size-switch-${this.props.id}` : 'js-override-size-switch'}
-					customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
-				/>
-			</Col>
+			<Row>
+				<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+					<CustomToggleSwitch
+						labelText="Overrride size"
+						className="mB-10"
+						checked={this.state.overrideActive}
+						disabled={isGenieeEditableMode}
+						onChange={val => {
+							this.setState({ overrideActive: !!val });
+						}}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout={this.props.fromPanel ? false : true}
+						name={this.props.id ? `overrideSizeSwitch-${this.props.id}` : 'overrideSizeSwitch'}
+						id={this.props.id ? `js-override-size-switch-${this.props.id}` : 'js-override-size-switch'}
+						customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+					/>
+				</Col>
+			</Row>
 		);
 	}
 
@@ -204,7 +237,6 @@ class AdpTags extends Component {
 						customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
 					/>
 				</Col>
-				{this.state.hbAcivated ? this.renderHBOverride(isGenieeEditableMode) : null}
 			</Row>
 		) : null;
 	}
@@ -279,6 +311,8 @@ class AdpTags extends Component {
 					</div>
 				)}
 				{this.renderDynamicAllocation()}
+				{this.state.hbAcivated ? this.renderHBOverride(isGenieeEditableMode) : null}
+				{this.state.overrideActive ? this.renderSizeOverrideSelectBox() : null}
 				{!this.props.geniee ? (
 					<Row>
 						<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>

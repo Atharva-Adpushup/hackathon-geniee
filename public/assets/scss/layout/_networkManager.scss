@@ -1,64 +1,49 @@
-.networkmanager
-{
-	h5 
-	{
+.networkmanager {
+	h5 {
 		text-transform: uppercase;
-	  margin: $NPHeadMarginT 0 $NPHeadMarginB 0;
-	  font-weight: bold;
-	  font-size: $NPHeadFont;
-	  color: $NPHeadColor;
+		margin: $NPHeadMarginT 0 $NPHeadMarginB 0;
+		font-weight: bold;
+		font-size: $NPHeadFont;
+		color: $NPHeadColor;
 	}
-	a 
-	{
+	a {
 		@include transition(all, 0.3s, ease-out);
-		&:hover
-		{
+		&:hover {
 			color: $primaryColor;
 		}
 	}
-	.panel 
-	{
+	.panel {
 		box-shadow: none;
-		border:1px solid $borderColor;
+		border: 1px solid $borderColor;
 		@include border-radius($BorderRadius);
 		margin-bottom: 0;
-		.panel-heading
-		{
+		.panel-heading {
 			background: $mainBgColor;
 			font-weight: bold;
-	  	font-size: $NPHeadFont;
-	  	color: $fontColor;
-	  	@include border-radius-separate($BorderRadius, $BorderRadius, 0, 0);
-	  	border-color:$borderColor;
+			font-size: $NPHeadFont;
+			color: $fontColor;
+			@include border-radius-separate($BorderRadius, $BorderRadius, 0, 0);
+			border-color: $borderColor;
 		}
-		.panel-body
-		{
-			
-			.row
-			{
+		.panel-body {
+			.row {
 				padding: $NPRowPad 0;
-				label 
-				{
+				label {
 					font-size: $NPLabelfontSize;
 				}
-				&:first-child 
-				{
+				&:first-child {
 					padding-top: 0;
 				}
-				&:last-child 
-				{
+				&:last-child {
 					padding-bottom: 0;
 				}
-				.maxad 
-				{
+				.maxad {
 					padding: 0 0 0 $FMPaddingLR;
 				}
-				.maincheckbox[type="checkbox"]
-				{
+				.maincheckbox[type='checkbox'] {
 					z-index: 1;
 				}
-				&.butttonsRow
-				{
+				&.butttonsRow {
 					padding: $NSButtonPadding 0;
 					background: $ESBg;
 					position: relative;
@@ -66,11 +51,17 @@
 					border-top: 1px solid $MBButtonRowBorder;
 					border-radius: 0 0 3px 3px;
 				}
-				&.err 
-				{
+				&.err {
 					color: $primaryColor;
 				}
-			}	
+			}
 		}
+	}
+}
+
+.size-override-selectbox {
+	& .react-select-box-off-screen {
+		height: 150px;
+		overflow-y: scroll;
 	}
 }
