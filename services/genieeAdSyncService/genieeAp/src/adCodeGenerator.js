@@ -56,7 +56,9 @@ var utils = require('../libs/utils'),
 							headerBidding: ad.networkData.headerBidding,
 							keyValues: ad.networkData.keyValues,
 							network: ad.network,
-							refreshSlot: ad.networkData.refreshSlot
+							refreshSlot: ad.networkData.refreshSlot,
+							overrideActive: ad.networkData.overrideActive,
+							overrideSizeTo: ad.networkData.overrideSizeTo
 						}
 					);
 				}
