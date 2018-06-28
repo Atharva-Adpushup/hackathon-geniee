@@ -12,12 +12,10 @@ class PageGroupSettings extends React.Component {
 		super(props);
 		let channel = props.channel,
 			ampSettings = channel.ampSettings || {},
-			social = ampSettings.social || {},
-			menu = ampSettings.menu || { links: [] },
+			social = ampSettings.social || { include: false },
+			menu = ampSettings.menu || { links: [], include: false },
 			ads = ampSettings.ads || [],
-			imgConfig = Object.keys(ampSettings.imgConfig).length == 0
-				? { widthLimit: 100, heightLimit: 100 }
-				: ampSettings.imgConfig,
+			imgConfig = ampSettings.imgConfig || { widthLimit: 100, heightLimit: 100 },
 			customCSS = { value: ampSettings['customCSS'] ? ampSettings['customCSS'].value : '' },
 			{ selectors = {}, toDelete, beforeJs, afterJs, siteName, template, adNetwork, pubId } = ampSettings;
 		beforeJs = beforeJs ? atob(beforeJs) : '';
@@ -59,17 +57,19 @@ class PageGroupSettings extends React.Component {
 					<RowColSpan label={commonConsts.selectors[key].alias} key={key}>
 						<input
 							onChange={e => {
-								let selectors = this.state.selectors;
-								selectors[e.target.name] = e.target.value;
-								this.setState({
-									selectors
-								});
+								if (e.target.value) {
+									let selectors = this.state.selectors;
+									selectors[e.target.name] = e.target.value;
+									this.setState({
+										selectors
+									});
+								}
 							}}
 							className="form-control"
 							type={commonConsts.selectors[key].inputType}
 							placeholder={commonConsts.selectors[key].alias}
 							name={key}
-							value={selectorValue}
+							defaultValue={selectorValue}
 						/>
 					</RowColSpan>
 				);
@@ -81,11 +81,13 @@ class PageGroupSettings extends React.Component {
 							name={key}
 							value={selectorValue}
 							onChange={e => {
-								let selectors = this.state.selectors;
-								selectors[e.target.name] = e.target.value.split(',');
-								this.setState({
-									selectors
-								});
+								if (e.target.value) {
+									let selectors = this.state.selectors;
+									selectors[e.target.name] = e.target.value.split(',');
+									this.setState({
+										selectors
+									});
+								}
 							}}
 						/>
 					</RowColSpan>
@@ -133,6 +135,10 @@ class PageGroupSettings extends React.Component {
 		event.preventDefault();
 		let ampData = this.parseFormData(this.state), pageGroup = this.props.channel.pageGroup;
 		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
+		if (!ampData.selectors['articleContent'] || !ampData.siteName || !ampData.template) {
+			alert('Artical Content, SiteName and Template are required');
+			return;
+		}
 		ajax({
 			method: 'POST',
 			url: '/user/site/' + siteId + '/pagegroup/saveAmpSettings',
@@ -192,7 +198,7 @@ class PageGroupSettings extends React.Component {
 		const target = e.target;
 		const name = target.name;
 		const value = target.type === 'checkbox' ? target.checked : target.value;
-		this.setState({ [name]: value });
+		if (value) this.setState({ [name]: value });
 	}
 	renderLinks() {
 		const listLinks = this.state.menu['links'].map((linkView, index) => {
@@ -203,7 +209,7 @@ class PageGroupSettings extends React.Component {
 						onChange={e => {
 							let menu = this.state.menu, links = menu['links'], link = links[index];
 							link['name'] = e.target.value;
-							this.setState({ menu });
+							if (e.target.value) this.setState({ menu });
 						}}
 						style={{ width: 'auto' }}
 						type="text"
@@ -216,7 +222,7 @@ class PageGroupSettings extends React.Component {
 						onChange={e => {
 							let menu = this.state.menu, links = menu['links'], link = links[index];
 							link['link'] = e.target.value;
-							this.setState({ menu });
+							if (e.target.value) this.setState({ menu });
 						}}
 						style={{ width: 'auto' }}
 						type="text"
@@ -251,7 +257,7 @@ class PageGroupSettings extends React.Component {
 						onChange={e => {
 							let ads = this.state.ads, ad = ads[index];
 							ad['selector'] = e.target.value;
-							this.setState({ ads });
+							if (e.target.value) this.setState({ ads });
 						}}
 						style={{ width: 'auto' }}
 						type="text"
@@ -264,7 +270,7 @@ class PageGroupSettings extends React.Component {
 						onChange={e => {
 							let ads = this.state.ads, ad = ads[index];
 							ad['adCode'] = e.target.value;
-							this.setState({ ads });
+							if (e.target.value) this.setState({ ads });
 						}}
 						style={{ width: 'auto' }}
 						type="text"
@@ -304,9 +310,10 @@ class PageGroupSettings extends React.Component {
 							onChange={e => {
 								let imgConfig = this.state.imgConfig;
 								imgConfig['widthLimit'] = parseFloat(e.target.value);
-								this.setState({
-									imgConfig
-								});
+								if (e.target.value)
+									this.setState({
+										imgConfig
+									});
 							}}
 							className="form-control"
 							type="number"
@@ -320,9 +327,10 @@ class PageGroupSettings extends React.Component {
 							onChange={e => {
 								let imgConfig = this.state.imgConfig;
 								imgConfig['heightLimit'] = parseFloat(e.target.value);
-								this.setState({
-									imgConfig
-								});
+								if (e.target.value)
+									this.setState({
+										imgConfig
+									});
 							}}
 							className="form-control"
 							type="number"
@@ -359,7 +367,7 @@ class PageGroupSettings extends React.Component {
 							onChange={e => {
 								let social = this.state.social;
 								social['placement'] = e.target.value;
-								this.setState({ social });
+								if (e.target.value) this.setState({ social });
 							}}
 						>
 							<option value="top">Top</option>
@@ -415,7 +423,7 @@ class PageGroupSettings extends React.Component {
 							onChange={e => {
 								let customCSS = this.state.customCSS;
 								customCSS['value'] = e.target.value;
-								this.setState({ customCSS });
+								if (e.target.value) this.setState({ customCSS });
 							}}
 						/>
 					</RowColSpan>
@@ -426,9 +434,10 @@ class PageGroupSettings extends React.Component {
 							onChange={e => {
 								let toDelete = this.state.toDelete;
 								toDelete = e.target.value.split(',');
-								this.setState({
-									toDelete
-								});
+								if (e.target.value)
+									this.setState({
+										toDelete
+									});
 							}}
 						/>
 					</RowColSpan>
