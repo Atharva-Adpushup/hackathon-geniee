@@ -496,7 +496,11 @@ router
 					return res.send(response);
 				}
 				site.set('ampSettings', req.body);
+				adpushupEvent.emit('siteSaved', site);
 				return site.save();
+			})
+			.then(site => {
+				res.send(site);
 			})
 			.catch(function(err) {
 				return res.send({

@@ -12,7 +12,7 @@ class AmpSettings extends React.Component {
 		super(props);
 		this.state = {
 			channels: [],
-			blockList: [''],
+			blockList: [],
 			samplingPercent: ''
 		};
 		this.fetchAmpSettings = this.fetchAmpSettings.bind(this);
@@ -60,21 +60,17 @@ class AmpSettings extends React.Component {
 						placeholder="URL or RegExp"
 						name="name"
 						value={this.state.blockList[index]}
+					/> <i
+						style={{ width: 'auto', cursor: 'pointer', float: 'right' }}
+						className="fa fa-trash fa-2x col-sm-2"
+						onClick={() => {
+							let blockList = this.state.blockList;
+							blockList.splice(index, 1);
+							this.setState({
+								blockList
+							});
+						}}
 					/>
-					{index != 0
-						? <i
-								style={{ width: 'auto', cursor: 'pointer', float: 'right' }}
-								className="fa fa-trash fa-2x col-sm-2"
-								onClick={() => {
-									console.log(index);
-									let blockList = this.state.blockList;
-									blockList.splice(index, 1);
-									this.setState({
-										blockList
-									});
-								}}
-							/>
-						: ''}
 				</div>
 			);
 		});
@@ -103,36 +99,11 @@ class AmpSettings extends React.Component {
 			</Row>
 		);
 	}
-	sendAmpData(event) {
-		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
-		event.preventDefault();
-		ajax({
-			method: 'POST',
-			url: '/user/site/' + siteId + '/pagegroup/saveAmpSettings',
-			data: JSON.stringify({
-				url: window.location.href,
-				channelData: {
-					siteId: adp.config.siteId,
-					platform: 'MOBILE',
-					pagegroup: adp.config.pageGroup || null
-				}
-			})
-		})
-			.then(res => {
-				alert('Sent Successfully!');
-				console.log(res);
-			})
-			.catch(res => {
-				alert('Some Error Occurred!');
-				console.log(res);
-			});
-	}
 	componentDidMount() {
 		this.fetchAmpSettings();
 	}
 	saveSiteSettings(event) {
 		event.preventDefault();
-		console.log(this.state);
 		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
 		ajax({
 			method: 'POST',

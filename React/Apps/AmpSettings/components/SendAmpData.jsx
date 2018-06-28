@@ -40,13 +40,18 @@ class SendAmpData extends React.Component {
 		console.log(name, value);
 	}
 	send(e) {
-		e.preventDefault();
+		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
+		event.preventDefault();
 		ajax({
 			method: 'POST',
-			url: '/abc',
+			url: 'http://autoamp.io/publishAmpJob',
 			data: JSON.stringify({
-				pageGroup: this.state.pageGroup,
-				url: this.state.url
+				url: this.state.url,
+				channelData: {
+					siteId: siteId,
+					platform: 'MOBILE',
+					pagegroup: this.state.pageGroup || null
+				}
 			})
 		})
 			.then(res => {
@@ -69,8 +74,8 @@ class SendAmpData extends React.Component {
 						onChange={this.handleOnChange}
 					>
 						<option value="">Select Pagegroup</option>
-						{this.props.channels.map(channel => (
-							<option value={channel.pageGroup}>{channel.pageGroup}</option>
+						{this.props.channels.map((channel, index) => (
+							<option value={channel.pageGroup} key={index}>{channel.pageGroup}</option>
 						))}
 					</select>
 				</RowColSpan>

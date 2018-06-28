@@ -24,9 +24,7 @@ router
 			});
 	})
 	.get('/ampSettings/:pageGroupId', (req, res) => {
-		let arr = req.params.pageGroupId.split('-'),
-			platform = arr[1],
-			pageGroup = arr[0];
+		let arr = req.params.pageGroupId.split('-'), platform = arr[1], pageGroup = arr[0];
 
 		return channelModel
 			.getChannel(req.params.siteId, platform, pageGroup)
@@ -42,9 +40,7 @@ router
 			});
 	})
 	.post('/saveAmpSettings', (req, res) => {
-		let siteId = req.params.siteId,
-			platform = req.body.platform,
-			pageGroup = req.body.pageGroup;
+		let siteId = req.params.siteId, platform = req.body.platform, pageGroup = req.body.pageGroup;
 		channelModel
 			.getChannel(siteId, platform, pageGroup)
 			.then(function(pageGroup) {

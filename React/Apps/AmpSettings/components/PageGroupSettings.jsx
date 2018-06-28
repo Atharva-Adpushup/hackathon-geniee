@@ -13,8 +13,8 @@ class PageGroupSettings extends React.Component {
 		let channel = props.channel,
 			ampSettings = channel.ampSettings || {},
 			social = ampSettings.social || {},
-			menu = ampSettings.menu || { links: [{ link: '', name: '' }] },
-			ads = ampSettings.ads || [{ adCode: '', selector: '' }],
+			menu = ampSettings.menu || { links: [] },
+			ads = ampSettings.ads || [],
 			imgConfig = ampSettings.imgConfig || {},
 			customCSS = { value: ampSettings['customCSS'] ? ampSettings['customCSS'].value : '' },
 			{ selectors = {}, toDelete, beforeJs, afterJs, siteName, template, adNetwork, pubId } = ampSettings;
@@ -25,7 +25,7 @@ class PageGroupSettings extends React.Component {
 		}
 		this.state = {
 			selectors,
-			toDelete: toDelete && toDelete.toString(),
+			toDelete: toDelete,
 			imgConfig,
 			beforeJs,
 			siteName,
@@ -54,7 +54,7 @@ class PageGroupSettings extends React.Component {
 			let selectorValue = this.state.selectors[key];
 			if (commonConsts.selectors[key].inputType == 'text')
 				return (
-					<RowColSpan label={commonConsts.selectors[key].alias}>
+					<RowColSpan label={commonConsts.selectors[key].alias} key={key}>
 						<input
 							onChange={e => {
 								let selectors = this.state.selectors;
@@ -73,7 +73,7 @@ class PageGroupSettings extends React.Component {
 				);
 			else
 				return (
-					<RowColSpan label={commonConsts.selectors[key].alias}>
+					<RowColSpan label={commonConsts.selectors[key].alias} key={key}>
 						<textarea
 							placeholder={commonConsts.selectors[key].alias}
 							name={key}
@@ -126,7 +126,7 @@ class PageGroupSettings extends React.Component {
 			method: 'POST',
 			url: '/user/site/' + siteId + '/pagegroup/saveAmpSettings',
 			data: JSON.stringify({
-				platform: 'DESKTOP',
+				platform: 'MOBILE',
 				pageGroup,
 				ampData
 			})
@@ -212,18 +212,15 @@ class PageGroupSettings extends React.Component {
 						placeholder="Link"
 						name="link"
 						value={linkView.link}
+					/> <i
+						style={{ width: 'auto', cursor: 'pointer' }}
+						className="fa fa-trash fa-2x col-sm-2"
+						onClick={() => {
+							let menu = this.state.menu, links = menu['links'];
+							links.splice(index, 1);
+							this.setState({ menu });
+						}}
 					/>
-					{index != 0
-						? <i
-								style={{ width: 'auto', cursor: 'pointer' }}
-								className="fa fa-trash fa-2x col-sm-2"
-								onClick={() => {
-									let menu = this.state.menu, links = menu['links'];
-									links.splice(index, 1);
-									this.setState({ menu });
-								}}
-							/>
-						: ''}
 				</div>
 			);
 		});
@@ -263,18 +260,15 @@ class PageGroupSettings extends React.Component {
 						placeholder="AdCode"
 						name="adCode"
 						value={linkView.adCode}
+					/><i
+						style={{ width: 'auto', cursor: 'pointer' }}
+						className="fa fa-trash fa-2x col-sm-2"
+						onClick={() => {
+							let ads = this.state.ads;
+							ads.splice(index, 1);
+							this.setState({ ads });
+						}}
 					/>
-					{index != 0
-						? <i
-								style={{ width: 'auto', cursor: 'pointer' }}
-								className="fa fa-trash fa-2x col-sm-2"
-								onClick={() => {
-									let ads = this.state.ads;
-									ads.splice(index, 1);
-									this.setState({ ads });
-								}}
-							/>
-						: ''}
 				</div>
 			);
 		});
@@ -388,6 +382,7 @@ class PageGroupSettings extends React.Component {
 							<button
 								style={{ width: 'auto', marginLeft: 10 }}
 								className="btn-success"
+								type="button"
 								onClick={() => {
 									let menu = this.state.menu, links = menu['links'];
 									links.push({ name: '', link: '' });
@@ -407,7 +402,7 @@ class PageGroupSettings extends React.Component {
 							name="customCSS"
 							value={this.state.customCSS['value']}
 							onChange={e => {
-								let social = this.state.customCSS;
+								let customCSS = this.state.customCSS;
 								customCSS['value'] = e.target.value;
 								this.setState({ customCSS });
 							}}
@@ -461,9 +456,10 @@ class PageGroupSettings extends React.Component {
 							<button
 								style={{ width: 'auto', marginLeft: 10 }}
 								className="btn-success"
+								type="button"
 								onClick={() => {
 									let ads = this.state.ads;
-									ads.push({ selector: '', adcode: '' });
+									ads.push({ selector: '', adCode: '' });
 									this.setState({ ads });
 								}}
 							>
