@@ -15,7 +15,9 @@ class PageGroupSettings extends React.Component {
 			social = ampSettings.social || {},
 			menu = ampSettings.menu || { links: [] },
 			ads = ampSettings.ads || [],
-			imgConfig = ampSettings.imgConfig || {},
+			imgConfig = Object.keys(ampSettings.imgConfig).length == 0
+				? { widthLimit: 100, heightLimit: 100 }
+				: ampSettings.imgConfig,
 			customCSS = { value: ampSettings['customCSS'] ? ampSettings['customCSS'].value : '' },
 			{ selectors = {}, toDelete, beforeJs, afterJs, siteName, template, adNetwork, pubId } = ampSettings;
 		beforeJs = beforeJs ? atob(beforeJs) : '';
@@ -110,12 +112,21 @@ class PageGroupSettings extends React.Component {
 		);
 	}
 	parseFormData(ampData) {
-		let finalData = ampData, ads = finalData.ads;
+		let finalData = ampData;
+		let ads = [], links = [];
+		for (let i = 0; i < finalData.menu['links'].length; i++) {
+			if (finalData.menu['links'][i]['name'] && finalData.menu['links'][i]['link'])
+				links.push(finalData.menu['links'][i]);
+		}
 		finalData['beforeJs'] = finalData['beforeJs'] ? btoa(finalData['beforeJs']) : '';
 		finalData['afterJs'] = finalData['afterJs'] ? btoa(finalData['afterJs']) : '';
-		for (let i = 0; i < ads.length; i++) {
-			ads[i]['adCode'] = ads[i]['adCode'] ? btoa(ads[i]['adCode']) : '';
+		for (let i = 0; i < finalData.ads.length; i++) {
+			if (finalData.ads[i]['adCode']) {
+				ads.push({ adCode: btoa(finalData.ads[i]['adCode']), selector: finalData.ads[i]['selector'] });
+			}
 		}
+		finalData.ads = ads;
+		finalData.menu['links'] = links;
 		return finalData;
 	}
 	saveChannelSettings(event) {
@@ -365,9 +376,9 @@ class PageGroupSettings extends React.Component {
 						defaultLayout
 						checked={this.state.menu['include']}
 						onChange={value => {
-							let social = this.state.social;
-							social['include'] = e.target.value;
-							this.setState({ social });
+							let menu = this.state.menu;
+							menu['include'] = value;
+							this.setState({ menu });
 						}}
 						name="includeMenu"
 						layout="horizontal"
