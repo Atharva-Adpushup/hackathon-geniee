@@ -16,9 +16,15 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 			if (!adpSlot.bidders || !adpSlot.bidders.length) {
 				return true;
 			}
+
+			var size = adpSlot.size;
+			if (adpSlot.optionalParam.overrideActive && adpSlot.optionalParam.overrideSizeTo) {
+				size = adpSlot.optionalParam.overrideSizeTo.split('x');
+			}
+
 			adUnitCodeForPrebid.push({
 				code: adpSlot.containerId,
-				sizes: [adpSlot.size],
+				sizes: [size],
 				bids: adpSlot.bidders
 			});
 		});
