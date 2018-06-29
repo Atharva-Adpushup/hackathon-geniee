@@ -52,6 +52,7 @@ class AdpTags extends Component {
 		this.renderAdvancedBlock = this.renderAdvancedBlock.bind(this);
 		this.renderHBOverride = this.renderHBOverride.bind(this);
 		this.renderSizeOverrideSelectBox = this.renderSizeOverrideSelectBox.bind(this);
+		this.renderOverrideSettings = this.renderOverrideSettings.bind(this);
 	}
 
 	filterKeyValues(keyValues) {
@@ -153,6 +154,15 @@ class AdpTags extends Component {
 					</Alert>
 				</Col>
 			</Row>
+		);
+	}
+
+	renderOverrideSettings(isGenieeEditableMode) {
+		return (
+			<div>
+				{this.state.hbAcivated ? this.renderHBOverride(isGenieeEditableMode) : null}
+				{this.state.overrideActive ? this.renderSizeOverrideSelectBox() : null}
+			</div>
 		);
 	}
 
@@ -311,8 +321,7 @@ class AdpTags extends Component {
 					</div>
 				)}
 				{this.renderDynamicAllocation()}
-				{this.state.hbAcivated ? this.renderHBOverride(isGenieeEditableMode) : null}
-				{this.state.overrideActive ? this.renderSizeOverrideSelectBox() : null}
+				{!this.props.geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
 				{!this.props.geniee ? (
 					<Row>
 						<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
