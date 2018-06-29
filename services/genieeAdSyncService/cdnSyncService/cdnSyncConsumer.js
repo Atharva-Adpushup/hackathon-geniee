@@ -18,8 +18,8 @@ module.exports = function(site) {
 	ftp = new PromiseFtp();
 
 	var paramConfig = {
-			siteId: site.get('siteId')
-		},
+		siteId: site.get('siteId')
+	},
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.min.js'),
 		adpTagsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adptags.min.js'),
@@ -47,8 +47,7 @@ module.exports = function(site) {
 			site.get('siteId').toString()
 		),
 		setAllConfigs = function(combinedConfig) {
-			var apConfigs = site.get('apConfigs'),
-				isAdPartner = !!site.get('partner');
+			var apConfigs = site.get('apConfigs'), isAdPartner = !!site.get('partner');
 			let { experiment, adpTagsConfig, manualAds } = combinedConfig;
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
@@ -92,8 +91,8 @@ module.exports = function(site) {
 			uncompressedJsFile,
 			adpTagsFile
 		) {
-			let { apConfigs, adpTagsConfig } = finalConfig,
-				gdpr = site.get('gdpr');
+			let { apConfigs, adpTagsConfig } = finalConfig, gdpr = site.get('gdpr');
+			if (site.get('ampSettings')) apConfigs.ampSettings = site.get('ampSettings');
 			jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(apConfigs));
 			jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
 
@@ -155,12 +154,9 @@ module.exports = function(site) {
 				});
 		};
 
-	return getFinalConfig
-		.then(uploadJS)
-		.then(writeTempFile)
-		.finally(function() {
-			if (ftp.getConnectionStatus() === 'connected') {
-				ftp.end();
-			}
-		});
+	return getFinalConfig.then(uploadJS).then(writeTempFile).finally(function() {
+		if (ftp.getConnectionStatus() === 'connected') {
+			ftp.end();
+		}
+	});
 };

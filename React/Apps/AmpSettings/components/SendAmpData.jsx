@@ -51,7 +51,8 @@ class SendAmpData extends React.Component {
 					siteId: siteId,
 					platform: 'MOBILE',
 					pagegroup: this.state.pageGroup || null
-				}
+				},
+				force: true
 			})
 		})
 			.then(res => {
