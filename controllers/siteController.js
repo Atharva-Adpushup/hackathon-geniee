@@ -47,10 +47,9 @@ var express = require('express'),
 				email: site.get('ownerEmail')
 			};
 
-		const hbcfPromise =
-			editMode === 'update'
-				? appBucket.replacePromise(`hbcf::${siteId}`, json)
-				: appBucket.insertPromise(`hbcf::${siteId}`, json);
+		const hbcfPromise = editMode === 'update'
+			? appBucket.replacePromise(`hbcf::${siteId}`, json)
+			: appBucket.insertPromise(`hbcf::${siteId}`, json);
 
 		return [hbcfPromise, site];
 	};
@@ -66,9 +65,8 @@ router
 					isPartner = req.session.user.userType == 'partner',
 					isSessionGenieeUIAccess = !!(isSession && req.session.genieeUIAccess),
 					genieeUIAccess = isSessionGenieeUIAccess ? req.session.genieeUIAccess : false,
-					isGenieeUIAccessCodeConversion = !!(
-						genieeUIAccess && genieeUIAccess.hasOwnProperty('codeConversion')
-					);
+					isGenieeUIAccessCodeConversion = !!(genieeUIAccess &&
+						genieeUIAccess.hasOwnProperty('codeConversion'));
 
 				return res.render('settings', {
 					pageGroups: sitePageGroups,
@@ -257,26 +255,21 @@ router
 					isSuperUser: req.session.isSuperUser || false,
 					// Geniee UI access config values
 					config: {
-						usn:
-							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('selectNetwork')
-								? Number(genieeUIAccess.selectNetwork)
-								: 1,
-						ubajf:
-							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('beforeAfterJs')
-								? Number(genieeUIAccess.beforeAfterJs)
-								: 1,
-						upkv:
-							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('pageKeyValue')
-								? Number(genieeUIAccess.pageKeyValue)
-								: 1,
-						uadkv:
-							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('adunitKeyValue')
-								? Number(genieeUIAccess.adunitKeyValue)
-								: 1,
-						uud:
-							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('useDfp')
-								? Number(genieeUIAccess.useDfp)
-								: 1
+						usn: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('selectNetwork')
+							? Number(genieeUIAccess.selectNetwork)
+							: 1,
+						ubajf: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('beforeAfterJs')
+							? Number(genieeUIAccess.beforeAfterJs)
+							: 1,
+						upkv: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('pageKeyValue')
+							? Number(genieeUIAccess.pageKeyValue)
+							: 1,
+						uadkv: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('adunitKeyValue')
+							? Number(genieeUIAccess.adunitKeyValue)
+							: 1,
+						uud: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('useDfp')
+							? Number(genieeUIAccess.useDfp)
+							: 1
 					}
 				});
 			})
@@ -341,15 +334,12 @@ router
 					userEmail = req.session.user.email,
 					site = _.find(userSites, { siteId: parseInt(json.siteId) });
 
-				return userModel
-					.setSitePageGroups(userEmail)
-					.then(user => user.save())
-					.then(() => {
-						var index = _.findIndex(userSites, { siteId: parseInt(json.siteId) });
-						req.session.user.sites[index] = site;
+				return userModel.setSitePageGroups(userEmail).then(user => user.save()).then(() => {
+					var index = _.findIndex(userSites, { siteId: parseInt(json.siteId) });
+					req.session.user.sites[index] = site;
 
-						return res.redirect('/user/dashboard');
-					});
+					return res.redirect('/user/dashboard');
+				});
 			})
 			.catch(function(err) {
 				var error = err.message[0].message ? err.message[0].message : 'Some error occurred!';
@@ -430,8 +420,7 @@ router
 					}
 
 					return Promise.all(sitePromises()).then(function(validSites) {
-						var sites = _.difference(validSites, ['inValidSite']),
-							unSavedSite;
+						var sites = _.difference(validSites, ['inValidSite']), unSavedSite;
 
 						sites = Array.isArray(sites) && sites.length > 0 ? sites : [];
 						/**
