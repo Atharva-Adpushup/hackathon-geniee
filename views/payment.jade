@@ -7,6 +7,8 @@ block getTitle
 
 block append headScripts
     script.
+        $('document').ready(function() {
+
             tipaltiHandler = function (data){
                 if(data.caller=="PaymentHistory")
                     var tipaltiIframe  = $('#tipaltiPaymentHistoryIframe');
