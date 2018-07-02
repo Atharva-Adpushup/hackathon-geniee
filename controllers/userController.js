@@ -862,7 +862,7 @@ router
 				var tipaltiConfig = config.tipalti,
 					tipaltiUrl = '',
 					tipaltiBaseUrl = tipaltiConfig.baseUrl,
-					email = 'kavi.madan@nwat.com', //user.get('email'),
+					email = user.get('email'),
 					payeeId = encodeURIComponent(crypto.createHash('md5').update(email).digest('hex').substr(0, 64)),
 					payer = tipaltiConfig.payerName,
 					date = Math.floor(+new Date() / 1000),
@@ -876,14 +876,8 @@ router
 				tipaltiUrl = tipaltiBaseUrl + paramsStr + '&hashkey=' + hash;
 				//tipaltiStatusCheck.checkStatus(req.session.user.email);
 				res.render('payment', {
-					user: user.data,
 					tipaltiUrl: tipaltiUrl,
-					paymentHistoryUrl: paymentHistoryUrl,
-					hasBillingProfile: user.data.paymentDetails.length == 0 ? false : true,
-					userCountry: user.data.paymentDetails.length != 0
-						? user.data.paymentDetails[0].billingProfile.country
-						: '',
-					tipaltiBillingInfo: user.get('tipaltiBillingInfo') || false
+					paymentHistoryUrl: paymentHistoryUrl
 				});
 			})
 			.catch(function(err) {
