@@ -133,7 +133,7 @@ class PageGroupSettings extends React.Component {
 	}
 	saveChannelSettings(event) {
 		event.preventDefault();
-		let ampData = this.parseFormData(this.state), pageGroup = this.props.channel.pageGroup;
+		let ampData = this.parseFormData(Object.assign({}, this.state)), pageGroup = this.props.channel.pageGroup;
 		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
 		if (!ampData.selectors['articleContent'] || !ampData.siteName || !ampData.template) {
 			alert('Artical Content, SiteName and Template are required');
