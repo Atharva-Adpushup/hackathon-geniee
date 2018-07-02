@@ -1,31 +1,69 @@
-extends layout/base
+//- Payments template
 
+extends  layout/base
+    
 block getTitle
-	- var titleVar = "Payment - AdPushup"
+    - var titleVar = "Payments - Billing"
 
 block append headScripts
-	script(src="https://embed.typeform.com/embed.js")
+    script.
+            tipaltiHandler = function (data){
+                if(data.caller=="PaymentHistory")
+                    var tipaltiIframe  = $('#tipaltiPaymentHistoryIframe');
+                else
+                    var tipaltiIframe  = $('#tipaltiPaymentDetailIframe');
+                if (data && data.TipaltiIframeInfo){
+                    if (data.TipaltiIframeInfo.height)
+                        tipaltiIframe.height(data.TipaltiIframeInfo.height);
+                    if (data.TipaltiIframeInfo.width){
+                        tipaltiIframe.width(data.TipaltiIframeInfo.width);
+                        tipaltiIframe.parent().width(data.TipaltiIframeInfo.width)
+                    }
+                    tipaltiIframe.show();
+                    tipaltiIframe.prev('.loaderwrapper').hide();
+                }
+            }
 
+            $(window).on('message', function(evt){
+              tipaltiHandler(evt.originalEvent.data)
+           });
+           
+        });
+
+block append headCss
+    style.
+        .loaderwrapper.spinner {
+            top: 0;
+            left: 0;
+        }
 block bodyContent
-	include layout/sideBar
-
-	.pageContainer
-		include layout/header
-		// Page Content Starts Here
-		.pageContentWrapper
-			.pageContentInner
-				// Control v/s Adpushup Starts here
-				.controlAdpushupWrap.col-sm-12.mb-30.pd-20
-					div(id="typeform-adpushup", style="height: 600px;")
-
-	script.
-		var cb = function() {
-			$.post('/completeInfo', {
-				email: currentUser.email, 
-				key: 'paymentInfoComplete'
-			}, function(res) {
-				var url = 'http://' + window.location.host + '/user/dashboard';
-				window.location.replace(url);
-			});
-		};
-		typeformEmbed.makeWidget(document.getElementById('typeform-adpushup'), 'https://adpushup1.typeform.com/to/QGSJeq', {onSubmit: cb})
+   
+    include layout/sideBar
+    .pageContainer
+        include layout/header
+        .pageContentWrapper.page-content
+            .pageContentInner.page-content--inner
+                #widgetsArea.row
+                    .mb-30
+                        .controlAdpushupWrap
+                            h3.title.m-All-0.clearfix 
+                                a Payment Details
+                            .content-item-container
+                                .row
+                                    if tipaltiUrl
+                                        div(style="padding:20px; min-height:200px;margin: 0px auto;")
+                                            .loaderwrapper.spinner
+                                                img(src="/assets/images/loaderLogo.png")
+                                            iframe(id='tipaltiPaymentDetailIframe' src=tipaltiUrl frameborder="0" style="display:none;width:100%")
+                            
+                    .mb-30
+                        .controlAdpushupWrap
+                            h3.title.m-All-0.clearfix 
+                                a Payment History
+                            .content-item-container
+                                .row
+                                    if tipaltiUrl
+                                        div(style="padding:20px; min-height:200px;margin: 0px auto;")
+                                            .loaderwrapper.spinner
+                                                img(src="/assets/images/loaderLogo.png")
+                                            iframe(id='tipaltiPaymentHistoryIframe' src=paymentHistoryUrl frameborder="0" style="display:none;width:100%")
