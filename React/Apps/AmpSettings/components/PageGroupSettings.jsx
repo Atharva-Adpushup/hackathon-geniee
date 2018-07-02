@@ -301,6 +301,10 @@ class PageGroupSettings extends React.Component {
 		return (
 			<CollapsePanel title={channel.pageGroup} bold={true}>
 				<form onSubmit={this.saveChannelSettings}>
+					<div style={{ float: 'right' }}>
+						<input type="checkbox" style={{ width: 'auto', marginRight: '10px' }} />
+						<span>Include</span>
+					</div>
 					<Heading title="Selectors Settings" />
 					{this.renderSelectors()}
 					<hr />
