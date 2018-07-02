@@ -57,6 +57,8 @@ block bodyContent
                                             .loaderwrapper.spinner
                                                 img(src="/assets/images/loaderLogo.png")
                                             iframe(id='tipaltiPaymentDetailIframe' src=tipaltiUrl frameborder="0" style="display:none;width:100%")
+                                    else
+                                        div(style="text-align:center") Some error occured
                             
                     .mb-30
                         .controlAdpushupWrap
@@ -69,3 +71,5 @@ block bodyContent
                                             .loaderwrapper.spinner
                                                 img(src="/assets/images/loaderLogo.png")
                                             iframe(id='tipaltiPaymentHistoryIframe' src=paymentHistoryUrl frameborder="0" style="display:none;width:100%")
+                                    else
+                                        div(style="text-align:center") Some error occured
