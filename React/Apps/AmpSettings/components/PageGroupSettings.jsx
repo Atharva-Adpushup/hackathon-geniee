@@ -58,13 +58,11 @@ class PageGroupSettings extends React.Component {
 					<RowColSpan label={commonConsts.selectors[key].alias} key={key}>
 						<input
 							onChange={e => {
-								if (e.target.value) {
-									let selectors = this.state.selectors;
-									selectors[e.target.name] = e.target.value;
-									this.setState({
-										selectors
-									});
-								}
+								let selectors = this.state.selectors;
+								selectors[e.target.name] = e.target.value;
+								this.setState({
+									selectors
+								});
 							}}
 							className="form-control"
 							type={commonConsts.selectors[key].inputType}
@@ -82,13 +80,11 @@ class PageGroupSettings extends React.Component {
 							name={key}
 							value={selectorValue}
 							onChange={e => {
-								if (e.target.value) {
-									let selectors = this.state.selectors;
-									selectors[e.target.name] = e.target.value.split(',');
-									this.setState({
-										selectors
-									});
-								}
+								let selectors = this.state.selectors;
+								selectors[e.target.name] = e.target.value.split(',');
+								this.setState({
+									selectors
+								});
 							}}
 						/>
 					</RowColSpan>
@@ -199,7 +195,7 @@ class PageGroupSettings extends React.Component {
 		const target = e.target;
 		const name = target.name;
 		const value = target.type === 'checkbox' ? target.checked : target.value;
-		if (value) this.setState({ [name]: value });
+		this.setState({ [name]: value });
 	}
 	renderLinks() {
 		const listLinks = this.state.menu['links'].map((linkView, index) => {
@@ -210,7 +206,7 @@ class PageGroupSettings extends React.Component {
 						onChange={e => {
 							let menu = this.state.menu, links = menu['links'], link = links[index];
 							link['name'] = e.target.value;
-							if (e.target.value) this.setState({ menu });
+							this.setState({ menu });
 						}}
 						style={{ width: 'auto' }}
 						type="text"
@@ -223,7 +219,7 @@ class PageGroupSettings extends React.Component {
 						onChange={e => {
 							let menu = this.state.menu, links = menu['links'], link = links[index];
 							link['link'] = e.target.value;
-							if (e.target.value) this.setState({ menu });
+							this.setState({ menu });
 						}}
 						style={{ width: 'auto' }}
 						type="text"
@@ -258,7 +254,7 @@ class PageGroupSettings extends React.Component {
 						onChange={e => {
 							let ads = this.state.ads, ad = ads[index];
 							ad['selector'] = e.target.value;
-							if (e.target.value) this.setState({ ads });
+							this.setState({ ads });
 						}}
 						style={{ width: 'auto' }}
 						type="text"
@@ -271,7 +267,7 @@ class PageGroupSettings extends React.Component {
 						onChange={e => {
 							let ads = this.state.ads, ad = ads[index];
 							ad['adCode'] = e.target.value;
-							if (e.target.value) this.setState({ ads });
+							this.setState({ ads });
 						}}
 						style={{ width: 'auto' }}
 						type="text"
@@ -326,10 +322,9 @@ class PageGroupSettings extends React.Component {
 							onChange={e => {
 								let imgConfig = this.state.imgConfig;
 								imgConfig['widthLimit'] = parseFloat(e.target.value);
-								if (e.target.value)
-									this.setState({
-										imgConfig
-									});
+								this.setState({
+									imgConfig
+								});
 							}}
 							className="form-control"
 							type="number"
@@ -343,10 +338,9 @@ class PageGroupSettings extends React.Component {
 							onChange={e => {
 								let imgConfig = this.state.imgConfig;
 								imgConfig['heightLimit'] = parseFloat(e.target.value);
-								if (e.target.value)
-									this.setState({
-										imgConfig
-									});
+								this.setState({
+									imgConfig
+								});
 							}}
 							className="form-control"
 							type="number"
@@ -383,7 +377,7 @@ class PageGroupSettings extends React.Component {
 							onChange={e => {
 								let social = this.state.social;
 								social['placement'] = e.target.value;
-								if (e.target.value) this.setState({ social });
+								this.setState({ social });
 							}}
 						>
 							<option value="top">Top</option>
@@ -419,7 +413,7 @@ class PageGroupSettings extends React.Component {
 							onChange={e => {
 								let menu = this.state.menu;
 								menu['position'] = e.target.value;
-								if (e.target.value) this.setState({ menu });
+								this.setState({ menu });
 							}}
 						>
 							<option value="left">Left</option>
@@ -454,7 +448,7 @@ class PageGroupSettings extends React.Component {
 							onChange={e => {
 								let customCSS = this.state.customCSS;
 								customCSS['value'] = e.target.value;
-								if (e.target.value) this.setState({ customCSS });
+								this.setState({ customCSS });
 							}}
 						/>
 					</RowColSpan>
@@ -465,10 +459,9 @@ class PageGroupSettings extends React.Component {
 							onChange={e => {
 								let toDelete = this.state.toDelete;
 								toDelete = e.target.value.split(',');
-								if (e.target.value)
-									this.setState({
-										toDelete
-									});
+								this.setState({
+									toDelete
+								});
 							}}
 						/>
 					</RowColSpan>
