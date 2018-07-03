@@ -29,7 +29,9 @@ class AmpSettings extends React.Component {
 		})
 			.then(res => {
 				this.setState({
-					channels: res.channels
+					channels: res.channels,
+					blockList: res.ampSettings['blockList'] || [],
+					samplingPercent: res.ampSettings['samplingPercent']
 				});
 			})
 			.catch(res => {
@@ -93,7 +95,7 @@ class AmpSettings extends React.Component {
 						type="text"
 						placeholder={label}
 						name={name}
-						defaultValue={value}
+						value={value}
 					/>
 				</Col>
 			</Row>
@@ -131,7 +133,11 @@ class AmpSettings extends React.Component {
 							<Col sm={6}>
 								<form onSubmit={this.saveSiteSettings}>
 									<Heading title="Site Level Settings" />
-									{this.renderInputControl('Sampling Percentage', 'samplingPercent')}
+									{this.renderInputControl(
+										'Sampling Percentage',
+										'samplingPercent',
+										this.state.samplingPercent
+									)}
 									<hr />
 									<Row>
 										<Col sm={5}>

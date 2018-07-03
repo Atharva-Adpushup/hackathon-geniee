@@ -13,7 +13,7 @@ class PageGroupSettings extends React.Component {
 		let channel = props.channel,
 			ampSettings = channel.ampSettings || {},
 			social = ampSettings.social || { include: false },
-			menu = ampSettings.menu || { links: [], include: false },
+			menu = ampSettings.menu || { links: [], include: false, position: 'right' },
 			ads = ampSettings.ads || [],
 			imgConfig = ampSettings.imgConfig || { widthLimit: 100, heightLimit: 100 },
 			customCSS = { value: ampSettings['customCSS'] ? ampSettings['customCSS'].value : '' },
@@ -411,6 +411,21 @@ class PageGroupSettings extends React.Component {
 						on="On"
 						off="Off"
 					/>
+					<RowColSpan label="Position">
+						<select
+							className="form-control"
+							name="position"
+							value={this.state.menu['position']}
+							onChange={e => {
+								let menu = this.state.menu;
+								menu['position'] = e.target.value;
+								if (e.target.value) this.setState({ menu });
+							}}
+						>
+							<option value="left">Left</option>
+							<option value="right">Right</option>
+						</select>
+					</RowColSpan>
 					<Row>
 						<Col sm={4}>
 							<span>Links</span>

@@ -472,10 +472,13 @@ router
 		return res.render('ampSettings');
 	})
 	.get('/:siteId/ampSettingsData', (req, res) => {
-		return channelModel
-			.getAmpSettings(req.params.siteId)
-			.then(function(channels) {
-				return res.send({ siteId: req.params.siteId, channels });
+		return siteModel
+			.getSiteById(req.params.siteId)
+			.then(site => {
+				let ampSettings = site.get('ampSettings') || {};
+				return channelModel.getAmpSettings(req.params.siteId).then(function(channels) {
+					return res.send({ siteId: req.params.siteId, channels, ampSettings });
+				});
 			})
 			.catch(function(err) {
 				return res.send({
