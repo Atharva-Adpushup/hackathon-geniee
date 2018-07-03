@@ -64,7 +64,7 @@ module.exports = {
 		return (
 			appendMe +
 			'-xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-				r = (((d = Math.floor(d / 16)) + Math.random() * 16) % 16) | 0;
+				r = ((d = Math.floor(d / 16)) + Math.random() * 16) % 16 | 0;
 				return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
 			})
 		);
@@ -101,16 +101,15 @@ module.exports = {
 		script.html = str;
 		(d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(script);
 	},
-	requestServer: function(url, data, timeout, method, dataType, contentType, beforeSendCallback) {
+	requestServer: function(url, data, timeout, method, dataType, contentType) {
 		$.support.cors = true;
 		return $.ajax({
 			url: url,
 			data: data,
 			timeout: timeout,
 			type: method || 'GET',
-			beforeSend: beforeSendCallback,
 			dataType: dataType || 'jsonp',
-			contentType: contentType,
+			contentType: contentType || 'application/json; charset=utf-8',
 			jsonpCallback: 'apCallback',
 			crossDomain: true
 		});
