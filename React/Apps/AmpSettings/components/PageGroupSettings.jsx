@@ -15,9 +15,10 @@ class PageGroupSettings extends React.Component {
 			social = ampSettings.social || {},
 			menu = ampSettings.menu || { links: [] },
 			ads = ampSettings.ads || [],
-			imgConfig = Object.keys(ampSettings.imgConfig).length == 0
-				? { widthLimit: 100, heightLimit: 100 }
-				: ampSettings.imgConfig,
+			imgConfig =
+				!ampSettings.imgConfig || (ampSettings.imgConfig && Object.keys(ampSettings.imgConfig).length) == 0
+					? { widthLimit: 100, heightLimit: 100 }
+					: ampSettings.imgConfig,
 			customCSS = { value: ampSettings['customCSS'] ? ampSettings['customCSS'].value : '' },
 			{ selectors = {}, toDelete, beforeJs, afterJs, siteName, template, adNetwork, pubId } = ampSettings;
 		beforeJs = beforeJs ? atob(beforeJs) : '';
@@ -113,7 +114,8 @@ class PageGroupSettings extends React.Component {
 	}
 	parseFormData(ampData) {
 		let finalData = ampData;
-		let ads = [], links = [];
+		let ads = [],
+			links = [];
 		for (let i = 0; i < finalData.menu['links'].length; i++) {
 			if (finalData.menu['links'][i]['name'] && finalData.menu['links'][i]['link'])
 				links.push(finalData.menu['links'][i]);
@@ -131,8 +133,10 @@ class PageGroupSettings extends React.Component {
 	}
 	saveChannelSettings(event) {
 		event.preventDefault();
-		let ampData = this.parseFormData(this.state), pageGroup = this.props.channel.pageGroup;
-		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
+		let ampData = this.parseFormData(this.state),
+			pageGroup = this.props.channel.pageGroup;
+		let arr = window.location.href.split('/'),
+			siteId = arr[arr.length - 2];
 		ajax({
 			method: 'POST',
 			url: '/user/site/' + siteId + '/pagegroup/saveAmpSettings',
@@ -155,7 +159,8 @@ class PageGroupSettings extends React.Component {
 		const target = e.target;
 		const name = target.name;
 		const value = target.checked;
-		let social = this.state.social, apps = social['apps'];
+		let social = this.state.social,
+			apps = social['apps'];
 		//this.setState({ [name]: value });
 		if (value == true) {
 			apps.push(name);
@@ -201,7 +206,9 @@ class PageGroupSettings extends React.Component {
 					<input
 						className="col-sm-5"
 						onChange={e => {
-							let menu = this.state.menu, links = menu['links'], link = links[index];
+							let menu = this.state.menu,
+								links = menu['links'],
+								link = links[index];
 							link['name'] = e.target.value;
 							this.setState({ menu });
 						}}
@@ -214,7 +221,9 @@ class PageGroupSettings extends React.Component {
 					<input
 						className="col-sm-5"
 						onChange={e => {
-							let menu = this.state.menu, links = menu['links'], link = links[index];
+							let menu = this.state.menu,
+								links = menu['links'],
+								link = links[index];
 							link['link'] = e.target.value;
 							this.setState({ menu });
 						}}
@@ -223,11 +232,13 @@ class PageGroupSettings extends React.Component {
 						placeholder="Link"
 						name="link"
 						value={linkView.link}
-					/> <i
+					/>{' '}
+					<i
 						style={{ width: 'auto', cursor: 'pointer' }}
 						className="fa fa-trash fa-2x col-sm-2"
 						onClick={() => {
-							let menu = this.state.menu, links = menu['links'];
+							let menu = this.state.menu,
+								links = menu['links'];
 							links.splice(index, 1);
 							this.setState({ menu });
 						}}
@@ -235,11 +246,7 @@ class PageGroupSettings extends React.Component {
 				</div>
 			);
 		});
-		return (
-			<Col sm={8}>
-				{listLinks}
-			</Col>
-		);
+		return <Col sm={8}>{listLinks}</Col>;
 	}
 
 	renderAds() {
@@ -249,7 +256,8 @@ class PageGroupSettings extends React.Component {
 					<input
 						className="col-sm-5"
 						onChange={e => {
-							let ads = this.state.ads, ad = ads[index];
+							let ads = this.state.ads,
+								ad = ads[index];
 							ad['selector'] = e.target.value;
 							this.setState({ ads });
 						}}
@@ -262,7 +270,8 @@ class PageGroupSettings extends React.Component {
 					<input
 						className="col-sm-5"
 						onChange={e => {
-							let ads = this.state.ads, ad = ads[index];
+							let ads = this.state.ads,
+								ad = ads[index];
 							ad['adCode'] = e.target.value;
 							this.setState({ ads });
 						}}
@@ -271,7 +280,8 @@ class PageGroupSettings extends React.Component {
 						placeholder="AdCode"
 						name="adCode"
 						value={linkView.adCode}
-					/><i
+					/>
+					<i
 						style={{ width: 'auto', cursor: 'pointer' }}
 						className="fa fa-trash fa-2x col-sm-2"
 						onClick={() => {
@@ -283,15 +293,12 @@ class PageGroupSettings extends React.Component {
 				</div>
 			);
 		});
-		return (
-			<Col sm={8}>
-				{listAds}
-			</Col>
-		);
+		return <Col sm={8}>{listAds}</Col>;
 	}
 
 	render() {
-		const { props } = this, channel = props.channel;
+		const { props } = this,
+			channel = props.channel;
 		return (
 			<CollapsePanel title={channel.pageGroup} bold={true}>
 				<form onSubmit={this.saveChannelSettings}>
@@ -395,7 +402,8 @@ class PageGroupSettings extends React.Component {
 								className="btn-success"
 								type="button"
 								onClick={() => {
-									let menu = this.state.menu, links = menu['links'];
+									let menu = this.state.menu,
+										links = menu['links'];
 									links.push({ name: '', link: '' });
 									this.setState({ menu });
 								}}
@@ -411,6 +419,7 @@ class PageGroupSettings extends React.Component {
 						<textarea
 							placeholder="Enter Custom CSS here"
 							name="customCSS"
+							style={{ resize: 'both', overflow: 'auto' }}
 							value={this.state.customCSS['value']}
 							onChange={e => {
 								let customCSS = this.state.customCSS;
