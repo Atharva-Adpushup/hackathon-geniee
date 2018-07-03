@@ -134,19 +134,14 @@ class PageGroupSettings extends React.Component {
 	}
 	saveChannelSettings(event) {
 		event.preventDefault();
-<<<<<<< HEAD
-		let ampData = this.parseFormData(this.state),
+		let ampData = this.parseFormData(Object.assign({}, this.state)),
 			pageGroup = this.props.channel.pageGroup;
 		let arr = window.location.href.split('/'),
 			siteId = arr[arr.length - 2];
-=======
-		let ampData = this.parseFormData(Object.assign({}, this.state)), pageGroup = this.props.channel.pageGroup;
-		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
 		if (!ampData.selectors['articleContent'] || !ampData.siteName || !ampData.template) {
 			alert('Artical Content, SiteName and Template are required');
 			return;
 		}
->>>>>>> ee8d023dccf56f08e0eba9fb19ade2dbf91785a4
 		ajax({
 			method: 'POST',
 			url: '/user/site/' + siteId + '/pagegroup/saveAmpSettings',
