@@ -10,6 +10,7 @@ var w = window,
 	selectVariation = require('./variationSelectionModels/index'),
 	createAds = require('./adCreater').createAds,
 	heartBeat = require('../libs/heartBeat'),
+	ampInit = require('./ampInit'),
 	hookAndInit = require('./hooksAndBlockList'),
 	control = require('./control')(),
 	genieeObject = require('./genieeObject'),
@@ -82,26 +83,7 @@ function triggerControl(mode) {
 
 function startCreation(forced) {
 	return new Promise(function (resolve) {
-		let randomNum = utils.getRandomNumberBetween(1, 100),
-			samplingPercent = adp.config.ampSettings && adp.config.ampSettings.samplingPercent
-				? parseInt(adp.config.ampSettings.samplingPercent)
-				: 10;
-		randomNum >= samplingPercent &&
-			utils.requestServer(
-				'/ampConfig', // This is to be changed
-				JSON.stringify({
-					url: window.location.href,
-					channelData: {
-						siteId: adp.config.siteId,
-						platform: adp.config.platform,
-						pagegroup: adp.config.pageGroup || null
-					}
-				}),
-				null,
-				'post',
-				'json',
-				'application/json'
-			);
+		ampInit(adp.config);
 		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
 		if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
 			return resolve(false);

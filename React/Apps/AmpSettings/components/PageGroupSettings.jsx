@@ -24,6 +24,7 @@ class PageGroupSettings extends React.Component {
 			ads[i]['adCode'] = ads[i]['adCode'] ? atob(ads[i]['adCode']) : '';
 		}
 		this.state = {
+			isEnabled: false,
 			selectors,
 			toDelete: toDelete,
 			imgConfig,
@@ -301,10 +302,21 @@ class PageGroupSettings extends React.Component {
 		return (
 			<CollapsePanel title={channel.pageGroup} bold={true}>
 				<form onSubmit={this.saveChannelSettings}>
-					<div style={{ float: 'right' }}>
-						<input type="checkbox" style={{ width: 'auto', marginRight: '10px' }} />
-						<span>Include</span>
-					</div>
+					<CustomToggleSwitch
+						labelText="IsEnabled"
+						className="mB-0"
+						defaultLayout
+						checked={this.state.isEnabled}
+						onChange={value => {
+							this.setState({ isEnabled: value });
+						}}
+						name="IsEnabled"
+						layout="horizontal"
+						size="m"
+						id="js-force-sample-url"
+						on="On"
+						off="Off"
+					/>
 					<Heading title="Selectors Settings" />
 					{this.renderSelectors()}
 					<hr />
