@@ -1,16 +1,10 @@
 let utils = require('../libs/utils'),
 	ampInitCalled = false,
-	removeUtmlParams = oldUrl => {
-		let newUrl = '';
-		if (oldUrl.search.indexOf('utm_') != -1) {
-			newUrl = oldUrl.toString().replace(/(\&|\?)utm([_a-z0-9=]+)/g, '');
-		}
-		return newUrl;
-	},
+	removeUtmlParams = oldUrl => oldUrl.toString().replace(/(\&|\?)utm([_a-z0-9=]+)/g, ''),
 	isUrlInBlocklist = config => {
-		let blocklist = config.ampSettings.blocklist, nonUtmUrl = removeUtmlParams(window.location);
-		if (blocklist && blocklist instanceof Array) {
-			for (var x = 0, j = blocklist, k = j[x]; x < j.length; k = j[++x]) {
+		let blockList = config.ampSettings.blockList, nonUtmUrl = removeUtmlParams(window.location);
+		if (blockList && blockList instanceof Array) {
+			for (var x = 0, j = blockList, k = j[x]; x < j.length; k = j[++x]) {
 				if (nonUtmUrl.match(new RegExp(k, 'i'))) {
 					return true;
 				}
