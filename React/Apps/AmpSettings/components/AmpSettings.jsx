@@ -3,10 +3,8 @@ import ActionCard from '../../../Components/ActionCard.jsx';
 import Heading from './helper/Heading.jsx';
 import PageGroupSettings from './PageGroupSettings.jsx';
 import SendAmpData from './SendAmpData.jsx';
-import RowColSpan from './helper/RowColSpan.jsx';
 import { ajax } from '../../../common/helpers';
-//import '../styles.scss';
-import { Grid, Row, Col, Alert, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 class AmpSettings extends React.Component {
 	constructor(props) {
 		super(props);
@@ -29,7 +27,9 @@ class AmpSettings extends React.Component {
 		})
 			.then(res => {
 				this.setState({
-					channels: res.channels
+					channels: res.channels,
+					blockList: res.ampSettings['blockList'] || [],
+					samplingPercent: res.ampSettings['samplingPercent']
 				});
 			})
 			.catch(res => {
@@ -93,7 +93,7 @@ class AmpSettings extends React.Component {
 						type="text"
 						placeholder={label}
 						name={name}
-						defaultValue={value}
+						value={value}
 					/>
 				</Col>
 			</Row>
@@ -131,7 +131,11 @@ class AmpSettings extends React.Component {
 							<Col sm={6}>
 								<form onSubmit={this.saveSiteSettings}>
 									<Heading title="Site Level Settings" />
-									{this.renderInputControl('Sampling Percentage', 'samplingPercent')}
+									{this.renderInputControl(
+										'Sampling Percentage',
+										'samplingPercent',
+										this.state.samplingPercent
+									)}
 									<hr />
 									<Row>
 										<Col sm={5}>

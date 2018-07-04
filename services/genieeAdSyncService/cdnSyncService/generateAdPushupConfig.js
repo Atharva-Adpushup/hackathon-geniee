@@ -1,5 +1,4 @@
-let ADPTags = [],
-	finalJson = {};
+let ADPTags = [], finalJson = {};
 const _ = require('lodash'),
 	AdPushupError = require('../../../helpers/AdPushupError'),
 	{ ERROR_MESSAGES } = require('../../../configs/commonConsts'),
@@ -38,10 +37,7 @@ const _ = require('lodash'),
 		}
 	},
 	getSectionsPayload = function(variationSections) {
-		var ads = [],
-			ad = null,
-			json,
-			unsyncedAds = false;
+		var ads = [], ad = null, json, unsyncedAds = false;
 		_.each(variationSections, function(section, sectionId) {
 			if (!Object.keys(section.ads).length) {
 				return true;
@@ -122,8 +118,9 @@ const _ = require('lodash'),
 			personalization: variation.personalization,
 			// Data required for auto optimiser model
 			// Page revenue is mapped as sum
-			sum:
-				variationData && parseFloat(variationData.pageRevenue) > -1 ? Math.floor(variationData.pageRevenue) : 1,
+			sum: variationData && parseFloat(variationData.pageRevenue) > -1
+				? Math.floor(variationData.pageRevenue)
+				: 1,
 			// Data required for auto optimiser model
 			// Page view is mapped as count
 			count: variationData && parseInt(variationData.pageViews, 10) > -1 ? Math.floor(variationData.pageViews) : 1
@@ -158,7 +155,8 @@ const _ = require('lodash'),
 			variations: [],
 			contentSelector: channel.contentSelector,
 			pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup),
-			hasVariationsWithNoData: false
+			hasVariationsWithNoData: false,
+			ampSettings: channel.ampSettings ? { isEnabled: channel.ampSettings.isEnabled } : { isEnabled: false }
 		};
 
 		_.each(channel.variations, (variation, id) => {
@@ -166,12 +164,10 @@ const _ = require('lodash'),
 			let variationPayload = getVariationPayload(variation, platform, pageGroup, variationData, finalJson);
 			if (typeof variationPayload == 'object' && Object.keys(variationPayload).length) {
 				finalJson[platform][pageGroup].variations.push(variationPayload);
-				finalJson[platform][pageGroup].hasVariationsWithNoData =
-					finalJson[platform][pageGroup].hasVariationsWithNoData == false
-						? variationData == null
-							? true
-							: false
-						: finalJson[platform][pageGroup].hasVariationsWithNoData;
+				finalJson[platform][pageGroup].hasVariationsWithNoData = finalJson[platform][pageGroup]
+					.hasVariationsWithNoData == false
+					? variationData == null ? true : false
+					: finalJson[platform][pageGroup].hasVariationsWithNoData;
 			}
 		});
 		if (!Object.keys(finalJson[platform][pageGroup].variations).length) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Row, Col, Alert } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 class RowColSpan extends React.Component {
 	constructor(props) {
 		super(props);
