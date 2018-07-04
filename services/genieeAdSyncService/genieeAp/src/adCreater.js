@@ -300,7 +300,7 @@ var $ = require('jquery'),
 
 							feedbackData.xpathMiss = [];
 							feedbackData.ads = [ad.id];
-							placeAd(data.container, ad);
+							placeAd($containerElement, ad);
 							utils.sendFeedback(feedbackData);
 						} else {
 							//feedbackData.xpathMiss.push(ad.id);
