@@ -457,7 +457,12 @@ class PageGroupSettings extends React.Component {
 						<textarea name="beforeJs" value={this.state.beforeJs} onChange={this.handleOnChange} />
 					</RowColSpan>
 					<RowColSpan label="After JS">
-						<textarea name="afterJs" value={this.state.afterJs} onChange={this.handleOnChange} />
+						<textarea
+							name="afterJs"
+							value={this.state.afterJs}
+							onChange={this.handleOnChange}
+							style={{ resize: 'both', overflow: 'auto' }}
+						/>
 					</RowColSpan>
 					{this.renderInputControl({
 						label: 'Site Name',
