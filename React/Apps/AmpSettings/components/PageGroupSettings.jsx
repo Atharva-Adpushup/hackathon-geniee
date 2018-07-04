@@ -1,10 +1,9 @@
 import React from 'react';
-import { Grid, Row, Col, Alert } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import Heading from './helper/Heading.jsx';
 import RowColSpan from './helper/RowColSpan.jsx';
 import CollapsePanel from '../../../Components/CollapsePanel.jsx';
 import CustomToggleSwitch from './helper/customToggleSwitch.jsx';
-import Dropdown from './helper/Dropdown.jsx';
 import commonConsts from '../lib/commonConsts';
 import { ajax } from '../../../common/helpers';
 class PageGroupSettings extends React.Component {

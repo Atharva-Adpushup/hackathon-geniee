@@ -164,8 +164,6 @@ block bodyContent
                                                         .col-sm-8
                                                             textarea(name="cookieControlConfig" placeholder="Cookie control config (only JSON)", style="margin-top: 0px; height: 300px;")!=JSON.stringify(gdpr.cookieControlConfig)
                                 hr
-                                .row#ampSettings
-                                hr
                                 .row.settings-btn-pane
                                     .col-sm-4
                                         button.btn-success Save Settings
@@ -174,7 +172,5 @@ block bodyContent
                                 .row
                                     .col-sm-7
                                         .error-message#error
-    
-    script(src="/assets/js/builds/ampSettings.js")    
                             
 

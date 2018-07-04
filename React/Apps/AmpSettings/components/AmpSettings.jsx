@@ -3,10 +3,8 @@ import ActionCard from '../../../Components/ActionCard.jsx';
 import Heading from './helper/Heading.jsx';
 import PageGroupSettings from './PageGroupSettings.jsx';
 import SendAmpData from './SendAmpData.jsx';
-import RowColSpan from './helper/RowColSpan.jsx';
 import { ajax } from '../../../common/helpers';
-//import '../styles.scss';
-import { Grid, Row, Col, Alert, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 class AmpSettings extends React.Component {
 	constructor(props) {
 		super(props);

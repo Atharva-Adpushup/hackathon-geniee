@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Row, Col, Alert } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 const Heading = props => {
 	return (
 		<Row>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Row, Col, Alert, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import Heading from './helper/Heading.jsx';
 import RowColSpan from './helper/RowColSpan.jsx';
 import { ajax } from '../../../common/helpers';
