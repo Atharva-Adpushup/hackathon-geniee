@@ -16,14 +16,24 @@ class PageGroupSettings extends React.Component {
 			ads = ampSettings.ads || [],
 			imgConfig = ampSettings.imgConfig || { widthLimit: 100, heightLimit: 100 },
 			customCSS = { value: ampSettings['customCSS'] ? ampSettings['customCSS'].value : '' },
-			{ selectors = {}, toDelete, beforeJs, afterJs, siteName, template, adNetwork, pubId } = ampSettings;
+			{
+				selectors = {},
+				toDelete,
+				beforeJs,
+				afterJs,
+				siteName,
+				template,
+				adNetwork,
+				pubId,
+				isEnabled
+			} = ampSettings;
 		beforeJs = beforeJs ? atob(beforeJs) : '';
 		afterJs = afterJs ? atob(afterJs) : '';
 		for (let i = 0; i < ads.length; i++) {
 			ads[i]['adCode'] = ads[i]['adCode'] ? atob(ads[i]['adCode']) : '';
 		}
 		this.state = {
-			isEnabled: false,
+			isEnabled: isEnabled || false,
 			selectors,
 			toDelete: toDelete,
 			imgConfig,
