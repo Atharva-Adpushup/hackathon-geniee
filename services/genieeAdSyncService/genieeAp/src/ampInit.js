@@ -24,7 +24,7 @@ var utils = require('../libs/utils'),
 				!experiment[config.platform] ||
 				!experiment[config.platform][config.pageGroup] ||
 				!experiment[config.platform][config.pageGroup].ampSettings ||
-				!experiment[config.platform][config.pageGroup].ampSettings.isEnabled;
+				experiment[config.platform][config.pageGroup].ampSettings.isEnabled;
 		return isEnabled;
 	};
 
