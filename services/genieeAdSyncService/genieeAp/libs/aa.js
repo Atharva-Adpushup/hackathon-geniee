@@ -432,9 +432,14 @@ $.fn.setPlacementForSection = function(adObj, minDistance) {
 			distanceAddFactor = 0;
 		}
 	} else {
-		var lastPlacement = placements[section - 1]
-			? placements[section - 1].elem
-			: getValidPlacementData(placements, section).elem;
+		var validPlacementsData = getValidPlacementData(placements, section),
+			isValidPlacements = !!(
+				validPlacementsData &&
+				Object.keys(validPlacementsData).length &&
+				validPlacementsData.elem
+			),
+			validPlacements = isValidPlacements ? validPlacementsData.elem : null,
+			lastPlacement = placements[section - 1] ? placements[section - 1].elem : validPlacements;
 
 		for (var i = 0; i < selectedElems.length; i++) {
 			var currElem = selectedElems[i];
