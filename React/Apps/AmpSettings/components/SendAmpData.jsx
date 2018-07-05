@@ -42,11 +42,11 @@ class SendAmpData extends React.Component {
 	send(e) {
 		let arr = window.location.href.split('/'),
 			siteId = arr[arr.length - 2];
-		event.preventDefault();
+		e.preventDefault();
 		ajax({
 			method: 'POST',
-			url: 'http://localhost:4000/publishAmpJob',
-			// url: 'http://autoamp.io/publishAmpJob',
+			// url: 'http://localhost:4000/publishAmpJob',
+			url: 'http://autoamp.io/publishAmpJob',
 			data: JSON.stringify({
 				url: this.state.url,
 				channelData: {
