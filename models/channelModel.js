@@ -14,6 +14,7 @@ var model = require('../helpers/model'),
 	utils = require('../helpers/utils'),
 	Promise = require('bluebird'),
 	ViewQuery = require('couchbase-promises').ViewQuery,
+	N1qlQuery = require('couchbase-promises').N1qlQuery,
 	Channel = model.extend(function() {
 		this.keys = [
 			'id',
@@ -89,7 +90,7 @@ function apiModule() {
 						});
 					} else {
 						var existingPageGroup = _.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])
-								.pageGroup,
+							.pageGroup,
 							existingChannel = json.device.toUpperCase() + ':' + existingPageGroup;
 
 						if (_.includes(channels, existingChannel)) {
@@ -134,9 +135,7 @@ function apiModule() {
 			});
 		},
 		getPageGroupById: function(paramsObj) {
-			var query = ViewQuery.from('app', paramsObj.viewName)
-				.stale(1)
-				.range(paramsObj.id, paramsObj.id, true);
+			var query = ViewQuery.from('app', paramsObj.viewName).stale(1).range(paramsObj.id, paramsObj.id, true);
 			return couchbase.connectToAppBucket().then(function(appBucket) {
 				return new Promise(function(resolve, reject) {
 					appBucket.query(query, {}, function(err, result) {
@@ -166,9 +165,7 @@ function apiModule() {
 			});
 		},
 		updatePagegroup: function(json) {
-			var query = ViewQuery.from('app', 'channelById')
-				.stale(1)
-				.range(json.pageGroupId, json.pageGroupId, true);
+			var query = ViewQuery.from('app', 'channelById').stale(1).range(json.pageGroupId, json.pageGroupId, true);
 			return couchbase.connectToAppBucket().then(function(appBucket) {
 				return new Promise(function(resolve, reject) {
 					appBucket.query(query, {}, function(err, result) {
@@ -192,9 +189,7 @@ function apiModule() {
 			});
 		},
 		deletePagegroupById: function(pageGroupId) {
-			var query = ViewQuery.from('app', 'channelById')
-				.stale(1)
-				.range(pageGroupId, pageGroupId, true);
+			var query = ViewQuery.from('app', 'channelById').stale(1).range(pageGroupId, pageGroupId, true);
 			return couchbase.connectToAppBucket().then(function(appBucket) {
 				return new Promise(function(resolve, reject) {
 					appBucket.query(query, {}, function(err, result) {
@@ -314,6 +309,23 @@ function apiModule() {
 						});
 				});
 			});
+		},
+		getAmpSettings: function(siteId) {
+			let query = N1qlQuery.fromString(
+				`select ampSettings, pageGroup
+			from AppBucket where meta().id like 'chnl::${siteId}:%' and platform ='MOBILE';`
+			);
+			return couchbase.connectToAppBucket().then(
+				appBucket =>
+					new Promise((resolve, reject) => {
+						appBucket.query(query, {}, (err, result) => {
+							if (err) {
+								return reject(err);
+							}
+							return resolve(result);
+						});
+					})
+			);
 		}
 	};
 

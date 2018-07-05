@@ -133,9 +133,11 @@ router
 			.then(data => res.status(200).send({ success: 1, data: null, message: 'Manual mode updated!' }))
 			.catch(err => {
 				console.log(err);
-				res
-					.status(500)
-					.send({ success: 0, data: null, message: 'Some error occurred! Please try again later' });
+				res.status(500).send({
+					success: 0,
+					data: null,
+					message: 'Some error occurred! Please try again later'
+				});
 			});
 	})
 	.post('/:siteId/opsPanel/hbConfig', (req, res) => {
@@ -500,6 +502,49 @@ router
 			.catch(err => {
 				console.log(err);
 				return res.send(response);
+			});
+	})
+	.get('/:siteId/ampSettings', (req, res) => {
+		return res.render('ampSettings');
+	})
+	.get('/:siteId/ampSettingsData', (req, res) => {
+		return siteModel
+			.getSiteById(req.params.siteId)
+			.then(site => {
+				let ampSettings = site.get('ampSettings') || {};
+				return channelModel.getAmpSettings(req.params.siteId).then(function(channels) {
+					return res.send({ siteId: req.params.siteId, channels, ampSettings });
+				});
+			})
+			.catch(function(err) {
+				return res.send({
+					error: true,
+					message: 'Some Error Occured'
+				});
+			});
+	})
+	.post('/:siteId/saveAmpSettings', (req, res) => {
+		let response = {
+			error: true,
+			message: 'Operaiton Failed'
+		};
+		return siteModel
+			.getSiteById(req.params.siteId)
+			.then(site => {
+				if (!site) {
+					return res.send(response);
+				}
+				site.set('ampSettings', req.body);
+				return site.save();
+			})
+			.then(site => {
+				res.send(site);
+			})
+			.catch(function(err) {
+				return res.send({
+					error: true,
+					message: 'Some Error Occured'
+				});
 			});
 	});
 
