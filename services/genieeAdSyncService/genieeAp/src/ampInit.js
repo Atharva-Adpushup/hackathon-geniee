@@ -31,11 +31,11 @@ var utils = require('../libs/utils'),
 module.exports = function(config) {
 	var blockedUrlMatched = isUrlInBlocklist(config),
 		isEnabled = isPageGroupAmpEnabled();
-	console.group();
-	console.log('config', config);
-	console.log('blockedUrlMatched', blockedUrlMatched);
-	console.log('isEnabled', isEnabled);
-	console.groupEnd();
+	// console.group();
+	// console.log('config', config);
+	// console.log('blockedUrlMatched', blockedUrlMatched);
+	// console.log('isEnabled', isEnabled);
+	// console.groupEnd();
 	if (!ampInitCalled && !blockedUrlMatched && isEnabled) {
 		var randomNum = utils.getRandomNumberBetween(1, 100),
 			samplingPercent =
