@@ -20,17 +20,17 @@ var utils = require('../libs/utils'),
 		var isConfig = config,
 			experiment = isConfig && config.experiment,
 			isEnabled =
-				!experiment ||
-				!experiment[config.platform] ||
-				!experiment[config.platform][config.pageGroup] ||
-				!experiment[config.platform][config.pageGroup].ampSettings ||
+				experiment &&
+				experiment[config.platform] &&
+				experiment[config.platform][config.pageGroup] &&
+				experiment[config.platform][config.pageGroup].ampSettings &&
 				experiment[config.platform][config.pageGroup].ampSettings.isEnabled;
 		return isEnabled;
 	};
 
 module.exports = function(config) {
 	var blockedUrlMatched = isUrlInBlocklist(config),
-		isEnabled = isPageGroupAmpEnabled();
+		isEnabled = isPageGroupAmpEnabled(config);
 	// console.group();
 	// console.log('config', config);
 	// console.log('blockedUrlMatched', blockedUrlMatched);
