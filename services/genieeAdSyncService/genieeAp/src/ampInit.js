@@ -51,7 +51,9 @@ module.exports = function(config) {
 						siteId: config.siteId,
 						platform: config.platform,
 						pagegroup: config.pageGroup || null
-					}
+					},
+					ampPath: window.adpushup && window.adpushup.ampPath ? window.adpushup.ampPath : false,
+					ampDomain: window.adpushup && window.adpushup.ampDomain ? window.adpushup.ampDomain : false
 				}),
 				null,
 				'post',
