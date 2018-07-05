@@ -3,7 +3,7 @@ import { Row, Col } from 'react-bootstrap';
 import Heading from './helper/Heading.jsx';
 import RowColSpan from './helper/RowColSpan.jsx';
 import CollapsePanel from '../../../Components/CollapsePanel.jsx';
-import CustomToggleSwitch from './helper/customToggleSwitch.jsx';
+import CustomToggleSwitch from './helper/CustomToggleSwitch.jsx';
 import commonConsts from '../lib/commonConsts';
 import { ajax } from '../../../common/helpers';
 class PageGroupSettings extends React.Component {

@@ -1,5 +1,5 @@
 var utils = require('../libs/utils'),
-	{ AMP_PUBLISH_URL } = require('../config/commonConsts'),
+	CONFIG = require('../config/commonConsts'),
 	ampInitCalled = false,
 	removeUtmlParams = function removeUtmlParams(oldUrl) {
 		return oldUrl.toString().replace(/(\&|\?)utm([_a-z0-9=]+)/g, '');
@@ -44,7 +44,7 @@ module.exports = function(config) {
 					: 10;
 		randomNum <= samplingPercent &&
 			utils.requestServer(
-				AMP_PUBLISH_URL, // This is to be changed
+				CONFIG.AMP_PUBLISH_URL, // This is to be changed
 				JSON.stringify({
 					url: window.location.href,
 					channelData: {
