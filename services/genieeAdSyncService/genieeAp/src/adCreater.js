@@ -226,8 +226,12 @@ var $ = require('jquery'),
 			handleContentSelectorFailure = function(inContentAds) {
 				feedbackData.contentSelectorMissing = true;
 				$.each(inContentAds, function(index, ad) {
-					feedbackData.xpathMiss.push(ad.id);
-					next(ad, { success: false });
+					//feedbackData.xpathMiss.push(ad.id);
+					//next(ad, { success: false });
+
+					feedbackData.ads = [];
+					feedbackData.xpathMiss = [ad.id];
+					utils.sendFeedback(feedbackData);
 				});
 			},
 			placeStructuralAds = function(structuredAds) {
@@ -245,12 +249,21 @@ var $ = require('jquery'),
 							}
 
 							// if all well then ad id of ad in feedback to tell system that impression was given
-							feedbackData.ads.push(ad.id);
-							next(ad, data);
+							//feedbackData.ads.push(ad.id);
+							//next(ad, data);
+
+							feedbackData.xpathMiss = [];
+							feedbackData.ads = [ad.id];
+							placeAd(data.container, ad);
+							utils.sendFeedback(feedbackData);
 						})
 						.fail(function(data) {
-							feedbackData.xpathMiss.push(ad.id);
-							next(ad, data);
+							//feedbackData.xpathMiss.push(ad.id);
+							//next(ad, data);
+
+							feedbackData.ads = [];
+							feedbackData.xpathMiss = [ad.id];
+							utils.sendFeedback(feedbackData);
 						});
 				});
 			},
@@ -272,7 +285,7 @@ var $ = require('jquery'),
 								ad.css = $.extend(true, {}, ad.css, ad.customCSS);
 							}
 
-							feedbackData.ads.push(ad.id);
+							//feedbackData.ads.push(ad.id);
 
 							$containerElement = getContainer(ad, sectionObj.elem);
 							isContainerElement = !!($containerElement && $containerElement.length);
@@ -283,10 +296,19 @@ var $ = require('jquery'),
 								pushAdToGenieeConfig(ad, containerId);
 							}
 
-							next(ad, { success: true, container: $containerElement });
+							//next(ad, { success: true, container: $containerElement });
+
+							feedbackData.xpathMiss = [];
+							feedbackData.ads = [ad.id];
+							placeAd($containerElement, ad);
+							utils.sendFeedback(feedbackData);
 						} else {
-							feedbackData.xpathMiss.push(ad.id);
-							next(ad, { success: false, container: null });
+							//feedbackData.xpathMiss.push(ad.id);
+							//next(ad, { success: false, container: null });
+
+							feedbackData.ads = [];
+							feedbackData.xpathMiss = [ad.id];
+							utils.sendFeedback(feedbackData);
 						}
 					});
 				});

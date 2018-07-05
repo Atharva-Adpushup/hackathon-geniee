@@ -111,3 +111,13 @@ $primaryColor: #eb575c;
 		width: 100% !important;
 	}
 }
+
+.hb-config-input {
+	height: 400px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	&,
+	&:focus {
+		border-color: #999;
+	}
+}

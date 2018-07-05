@@ -24,6 +24,7 @@ class NetworkOptions extends Component {
 		this.renderNetwork = this.renderNetwork.bind(this);
 		this.networkChangeHandler = this.networkChangeHandler.bind(this);
 		this.getCode = this.getCode.bind(this);
+		this.filterNetworks = this.filterNetworks.bind(this);
 	}
 
 	componentDidMount() {
@@ -70,6 +71,22 @@ class NetworkOptions extends Component {
 		return code;
 	}
 
+	filterNetworks() {
+		if (window.isGeniee) {
+			const isGCFG = !!window.gcfg,
+				isUSN = !!(isGCFG && window.gcfg.hasOwnProperty('usn'));
+
+			// 'isUSN' refers to Geniee UI Access 'Select Network' flag
+			if (isUSN) {
+				return window.gcfg.usn ? networks.filter(network => network != 'adpTags') : ['geniee'];
+			}
+
+			return networks.filter(network => network != 'adpTags');
+		}
+
+		return networks;
+	}
+
 	renderNetwork() {
 		let adExists = this.props.ad ? true : false,
 			code = adExists && this.props.ad.network ? this.getCode() : false,
@@ -86,6 +103,14 @@ class NetworkOptions extends Component {
 			refreshSlot =
 				adExists && this.props.ad.networkData && this.props.ad.networkData.refreshSlot
 					? this.props.ad.networkData.refreshSlot
+					: false,
+			overrideActive =
+				adExists && this.props.ad.networkData && this.props.ad.networkData.overrideActive
+					? this.props.ad.networkData.overrideActive
+					: false,
+			overrideSizeTo =
+				adExists && this.props.ad.networkData && this.props.ad.networkData.overrideSizeTo
+					? this.props.ad.networkData.overrideSizeTo
 					: false,
 			headerBidding =
 				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('headerBidding')
@@ -123,6 +148,8 @@ class NetworkOptions extends Component {
 						onCancel={this.props.onCancel}
 						code={code}
 						refreshSlot={refreshSlot}
+						overrideActive={overrideActive}
+						overrideSizeTo={overrideSizeTo}
 						buttonType={this.props.buttonType || 1}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						id={this.props.id ? this.props.id : false}
@@ -190,8 +217,7 @@ class NetworkOptions extends Component {
 	}
 
 	render() {
-		let filteredNetworks =
-			currentUser.userType == 'partner' ? networks.filter(network => network != 'adpTags') : networks;
+		let filteredNetworks = this.filterNetworks();
 		return (
 			<div className="networkOptionsRow">
 				<SelectBox value={this.state.network} label="Select Network" onChange={this.networkChangeHandler}>

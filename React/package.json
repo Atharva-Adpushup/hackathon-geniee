@@ -62,6 +62,6 @@
 		"watch": "./node_modules/.bin/parallel-webpack --watch --config webpack-dev.js",
 		"start": "node server.js"
 	},
-	"author": "Yomesh Gupta <yomesh.gupta@gmail.com> (http://www.yomeshgupta.com/)",
+	"author": "AdPushup <support@adpushup.com> (https://www.adpushup.com/)",
 	"license": "MIT"
 }

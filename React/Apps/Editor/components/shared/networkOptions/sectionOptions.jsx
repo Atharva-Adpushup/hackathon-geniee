@@ -198,6 +198,8 @@ class sectionOptions extends React.Component {
 					priceFloor={this.props.priceFloor}
 					headerBidding={this.props.headerBidding}
 					refreshSlot={this.props.refreshSlot}
+					overrideActive={this.props.overrideActive}
+					overrideSizeTo={this.props.overrideSizeTo}
 					submitHandler={this.submitHandler}
 					onCancel={this.props.onCancel}
 					code={this.props.code}

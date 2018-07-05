@@ -36,8 +36,11 @@ const _ = require('lodash'),
 			});
 		}
 	},
-	getSectionsPayload = function(variationSections) {
-		var ads = [], ad = null, json, unsyncedAds = false;
+	getSectionsPayload = function(variationSections, platform, pagegroup) {
+		var ads = [],
+			ad = null,
+			json,
+			unsyncedAds = false;
 		_.each(variationSections, function(section, sectionId) {
 			if (!Object.keys(section.ads).length) {
 				return true;
@@ -49,7 +52,9 @@ const _ = require('lodash'),
 				throw new AdPushupError({
 					message: ERROR_MESSAGES.MESSAGE.UNSYNCED_SETUP,
 					ad: ad,
-					sectionId: sectionId
+					sectionId: sectionId,
+					platform: platform || 'Not Present',
+					pagegroup: pagegroup || 'Not Present'
 				});
 			}
 
@@ -98,7 +103,7 @@ const _ = require('lodash'),
 		return ads;
 	},
 	getVariationPayload = (variation, platform, pageGroup, variationData, finalJson) => {
-		var ads = getSectionsPayload(variation.sections),
+		var ads = getSectionsPayload(variation.sections, platform, pageGroup),
 			computedVariationObj,
 			contentSelector = variation.contentSelector,
 			isContentSelector = !!contentSelector;

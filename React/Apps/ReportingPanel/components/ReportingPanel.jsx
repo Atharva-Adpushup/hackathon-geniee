@@ -6,7 +6,7 @@ import ActionCard from '../../../Components/ActionCard.jsx';
 import ReportControls from './ReportControls.jsx';
 import '../styles.scss';
 import commonConsts from '../lib/commonConsts';
-import { apiQueryGenerator, dataGenerator } from '../lib/helpers';
+import { apiQueryGenerator, dataGenerator, csvDataGenerator } from '../lib/helpers';
 import { ajax } from '../../../common/helpers';
 import moment from 'moment';
 import PaneLoader from '../../../Components/PaneLoader.jsx';
@@ -46,7 +46,9 @@ class ReportingPanel extends React.Component {
 	fetchVariations(pageGroup, platform) {
 		ajax({
 			method: 'GET',
-			url: `${commonConsts.VARIATIONS_ENDPOINT}?siteId=${commonConsts.SITE_ID}&pageGroup=${pageGroup}&platform=${platform}`
+			url: `${commonConsts.VARIATIONS_ENDPOINT}?siteId=${
+				commonConsts.SITE_ID
+			}&pageGroup=${pageGroup}&platform=${platform}`
 		})
 			.then(res => {
 				const variations = this.state.variations.concat(res.data);
@@ -63,7 +65,16 @@ class ReportingPanel extends React.Component {
 			disableGenerateButton: true
 		});
 
-		const { startDate, endDate, pageGroup, platform, variation, groupBy, variations, activeLegendItems } = this.state,
+		const {
+				startDate,
+				endDate,
+				pageGroup,
+				platform,
+				variation,
+				groupBy,
+				variations,
+				activeLegendItems
+			} = this.state,
 			params = { startDate, endDate, pageGroup, platform, variation, groupBy, activeLegendItems };
 
 		let state = {
@@ -85,7 +96,8 @@ class ReportingPanel extends React.Component {
 						reportError: false,
 						responseData,
 						chartConfig: data.chartData,
-						tableConfig: data.tableData
+						tableConfig: data.tableData,
+						emptyData: false
 					});
 				} else if (!res.error && !res.rows.length) {
 					this.setState({ ...state, reportError: true, emptyData: true });
@@ -144,17 +156,17 @@ class ReportingPanel extends React.Component {
 	render() {
 		const {
 				startDate,
-			endDate,
-			reportLoading,
-			disableGenerateButton,
-			reportError,
-			emptyData,
-			chartConfig,
-			tableConfig,
-			platform,
-			variations,
-			variation,
-			groupBy
+				endDate,
+				reportLoading,
+				disableGenerateButton,
+				reportError,
+				emptyData,
+				chartConfig,
+				tableConfig,
+				platform,
+				variations,
+				variation,
+				groupBy
 			} = this.state,
 			customToggle = {
 				toggleText: 'Network wise data',
@@ -169,26 +181,31 @@ class ReportingPanel extends React.Component {
 					styles={{ height: 'auto' }}
 				/>
 			) : (
-					<div>
-						<div id="chart-legend"></div>
-						<ReactHighcharts config={chartConfig} />
-						<div className="report-table">
-							{tableConfig ? (
-								<Datatable
-									tableHeader={tableConfig.header}
-									tableBody={tableConfig.body}
-									keyName="reportTable"
-									rowsPerPage={10}
-									customToggle={customToggle}
-									rowsPerPageOption={[20, 30, 40, 50]}
-									customGroupByNonAggregatedData={groupBy}
-								/>
-							) : (
-									''
-								)}
-						</div>
+				<div>
+					<div id="chart-legend" />
+					<ReactHighcharts config={chartConfig} />
+					<div className="report-table">
+						{tableConfig ? (
+							<Datatable
+								tableHeader={tableConfig.header}
+								tableBody={tableConfig.body}
+								keyName="reportTable"
+								rowsPerPage={10}
+								customToggle={customToggle}
+								rowsPerPageOption={[20, 30, 40, 50]}
+								customGroupByNonAggregatedData={groupBy}
+							/>
+						) : (
+							''
+						)}
 					</div>
-				);
+				</div>
+			);
+
+		let csvData = '';
+		if (tableConfig) {
+			csvData = btoa(JSON.stringify(csvDataGenerator(tableConfig, groupBy)));
+		}
 
 		return (
 			<ActionCard title={`AdPushup Report - ${commonConsts.SITE_DOMAIN}`}>
@@ -197,11 +214,13 @@ class ReportingPanel extends React.Component {
 						<ReportControls
 							startDate={startDate}
 							endDate={endDate}
+							emptyData={emptyData}
 							disableGenerateButton={disableGenerateButton}
 							generateButtonHandler={this.generateReport}
 							reportParamsUpdateHandler={this.updateReportParams}
 							variations={variations}
 							variation={variation}
+							csvData={csvData}
 						/>
 					</Col>
 					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : reportPane}</Col>

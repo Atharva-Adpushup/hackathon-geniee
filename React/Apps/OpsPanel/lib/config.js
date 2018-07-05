@@ -2,7 +2,7 @@ const config = {
 	hbConfig: {
 		pulsepoint: {
 			name: 'pulsepoint',
-			isHb: false,
+			isHb: true,
 			global: {
 				cp: { default: '560684', validations: { required: true }, alias: 'User Id', isEditable: true }
 			},
@@ -31,7 +31,7 @@ const config = {
 		},
 		springserve: {
 			name: 'springserve',
-			isHb: true,
+			isHb: false,
 			global: {
 				placementId: { validations: { required: true }, alias: 'Placement Id', isEditable: true }
 			}
@@ -56,7 +56,23 @@ const config = {
 			global: {
 				placementCode: { validations: { required: false }, alias: 'Placement Code', isEditable: true }
 			}
+		},
+		openx: {
+			name: 'openx',
+			isHb: true,
+			global: {
+				unit: { validations: { required: true }, alias: 'Ad Unit Code', isEditable: true },
+				delDomain: { validations: { required: true }, alias: 'Delivery Domain', isEditable: true }
+			}
+		},
+		districtmDMX: {
+			name: 'districtmDMX',
+			isHb: true,
+			global: {
+				id: { validations: { required: true }, alias: 'Ad Id', isEditable: true }
+			}
 		}
+		// Set new partners in DFP key values as well
 	},
 	supportedAdSizes: [
 		{
