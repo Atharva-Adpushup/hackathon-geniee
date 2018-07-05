@@ -5,7 +5,7 @@ var utils = require('../libs/utils'),
 		return oldUrl.toString().replace(/(\&|\?)utm([_a-z0-9=]+)/g, '');
 	},
 	isUrlInBlocklist = function isUrlInBlocklist(config) {
-		var blockList = config.ampSettings.blockList,
+		var blockList = config.ampSettings && config.ampSettings.blockList,
 			nonUtmUrl = removeUtmlParams(window.location);
 		if (blockList && blockList instanceof Array) {
 			for (var x = 0, j = blockList, k = j[x]; x < j.length; k = j[++x]) {
