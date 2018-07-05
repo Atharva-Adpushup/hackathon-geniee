@@ -206,9 +206,15 @@ var $ = require('jquery'),
 				if (displayCounter) {
 					displayCounter--;
 					if (data.success) {
+						feedbackData.xpathMiss = [];
+						feedbackData.ads = [adObj.id];
 						placeAd(data.container, adObj);
+						utils.sendFeedback(feedbackData);
 					} else {
 						adObj.xpathMiss = true;
+						feedbackData.ads = [];
+						feedbackData.xpathMiss = [adObj.id];
+						utils.sendFeedback(feedbackData);
 					}
 				}
 				if (!displayCounter && !finished) {
@@ -220,18 +226,14 @@ var $ = require('jquery'),
 							err.push({ msg: 'Error in afterAp js.', js: variation.customJs.afterAp, error: e });
 						}
 					}
-					utils.sendFeedback(feedbackData);
+					//utils.sendFeedback(feedbackData);
 				}
 			},
 			handleContentSelectorFailure = function(inContentAds) {
 				feedbackData.contentSelectorMissing = true;
 				$.each(inContentAds, function(index, ad) {
 					//feedbackData.xpathMiss.push(ad.id);
-					//next(ad, { success: false });
-
-					feedbackData.ads = [];
-					feedbackData.xpathMiss = [ad.id];
-					utils.sendFeedback(feedbackData);
+					next(ad, { success: false });
 				});
 			},
 			placeStructuralAds = function(structuredAds) {
@@ -250,20 +252,11 @@ var $ = require('jquery'),
 
 							// if all well then ad id of ad in feedback to tell system that impression was given
 							//feedbackData.ads.push(ad.id);
-							//next(ad, data);
-
-							feedbackData.xpathMiss = [];
-							feedbackData.ads = [ad.id];
-							placeAd(data.container, ad);
-							utils.sendFeedback(feedbackData);
+							next(ad, data);
 						})
 						.fail(function(data) {
 							//feedbackData.xpathMiss.push(ad.id);
-							//next(ad, data);
-
-							feedbackData.ads = [];
-							feedbackData.xpathMiss = [ad.id];
-							utils.sendFeedback(feedbackData);
+							next(ad, data);
 						});
 				});
 			},
@@ -296,19 +289,10 @@ var $ = require('jquery'),
 								pushAdToGenieeConfig(ad, containerId);
 							}
 
-							//next(ad, { success: true, container: $containerElement });
-
-							feedbackData.xpathMiss = [];
-							feedbackData.ads = [ad.id];
-							placeAd($containerElement, ad);
-							utils.sendFeedback(feedbackData);
+							next(ad, { success: true, container: $containerElement });
 						} else {
 							//feedbackData.xpathMiss.push(ad.id);
-							//next(ad, { success: false, container: null });
-
-							feedbackData.ads = [];
-							feedbackData.xpathMiss = [ad.id];
-							utils.sendFeedback(feedbackData);
+							next(ad, { success: false, container: null });
 						}
 					});
 				});
