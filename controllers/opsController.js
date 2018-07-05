@@ -191,7 +191,8 @@ router
 								.format('YYYY-MM-DD'),
 				siteId: bodyParameters.siteId,
 				mode: bodyParameters.mode || 1,
-				count: bodyParameters.count || 20
+				count: bodyParameters.count || 20,
+				platformCode: bodyParameters.platformCode || ''
 			},
 			dateFormatCollection = utils.getDateFormatCollection({
 				fromDate: params.fromDate,
@@ -267,7 +268,8 @@ router
 						: moment()
 								.subtract(1, 'days')
 								.format('YYYY-MM-DD'),
-				siteId: bodyParameters.siteId
+				siteId: bodyParameters.siteId,
+				platformCode: bodyParameters.platformCode || ''
 			},
 			dateFormatCollection = utils.getDateFormatCollection({
 				fromDate: params.fromDate,

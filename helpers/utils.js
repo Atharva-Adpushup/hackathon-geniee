@@ -35,6 +35,9 @@ var url = require('url'),
 		btoa: function(stringifiedData) {
 			return new Buffer(stringifiedData).toString('base64');
 		},
+		atob: function(b64Encoded) {
+			return new Buffer.from(b64Encoded, 'base64').toString();
+		},
 		convertPagegroupLink: function(pageGroupId, pageGroupName, siteId) {
 			return '<a href="/user/site/' + siteId + '/pagegroup/' + pageGroupId + '">' + pageGroupName + '</a>';
 		},
@@ -73,7 +76,7 @@ var url = require('url'),
 							.replace('https://', '')
 							.replace('www.', ''),
 						'/'
-					)
+				  )
 				: '';
 		},
 		rightTrim: function(string, s) {

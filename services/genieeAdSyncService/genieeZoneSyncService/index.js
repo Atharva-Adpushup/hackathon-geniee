@@ -12,13 +12,11 @@ var config = require('../../../configs/config'),
 module.exports = {
 	checkGenieeUnsyncedZones: function(variationId, variationName, section, ad) {
 		var isValidUnsyncedZone = !!(ad.network === 'geniee' && ad.networkData && !ad.networkData.zoneId),
-			isDynamicAllocationTrue = !!(
-				ad.network === 'geniee' &&
+			isDynamicAllocationTrue = !!(ad.network === 'geniee' &&
 				ad.networkData &&
 				ad.networkData.dynamicAllocation &&
 				!ad.networkData.dfpAdunit &&
-				!ad.networkData.dfpAdunitCode
-			);
+				!ad.networkData.dfpAdunitCode);
 
 		if (isValidUnsyncedZone || isDynamicAllocationTrue) {
 			return {
@@ -51,7 +49,9 @@ module.exports = {
 					adId: ad.id,
 					sizeWidth: parseInt(ad.width, 10),
 					sizeHeight: parseInt(ad.height, 10),
-					sectionId: section.id
+					sectionId: section.id,
+					type: section.formatData && section.formatData.type ? section.formatData.type : false,
+					isManual: ad.isManual || false
 				};
 			}
 			return false;
@@ -62,10 +62,10 @@ module.exports = {
 		// Sample json for geniee zone
 		// {"zoneName":"test zone api0","sizeWidth":300,"sizeHeight":250,"zoneType":1,"zonePosition":0,"firstView":1,"useFriendlyIFrameFlag":0}
 		var unsyncedZones = {
-				genieeUnsyncedZones: [],
-				adpTagsUnsyncedZones: [],
-				genieeDFPCreationZones: []
-			},
+			genieeUnsyncedZones: [],
+			adpTagsUnsyncedZones: [],
+			genieeDFPCreationZones: []
+		},
 			self = this;
 		_.each(variationSections, function(section, sectionId) {
 			_.each(section.ads, function(ad) {
@@ -96,15 +96,13 @@ module.exports = {
 		return unsyncedZones;
 	},
 	getAllUnsyncedZones: function(site) {
-		var finalZones = [],
-			channelUnsyncedZones = [],
-			self = this;
+		var finalZones = [], channelUnsyncedZones = [], self = this;
 		return site.getAllChannels().then(function(allChannels) {
 			_.each(allChannels, function(channel) {
 				channelUnsyncedZones = [];
 				_.each(channel.variations, function(variation, id) {
 					let channelKey = `chnl::${site.get('siteId')}:${channel.platform}:${channel.pageGroup}`;
-					// channelUnsyncedZones = self.getVariationUnsyncedZones(id, variation.sections);
+					// channelUnsyncedZones = self.getVariationUnsyncedZones(id, varPiation.sections);
 					channelUnsyncedZones = _.concat(
 						channelUnsyncedZones,
 						self.getVariationUnsyncedZones(id, variation.name, channelKey, variation.sections)

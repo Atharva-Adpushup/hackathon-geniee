@@ -1,5 +1,8 @@
 include ../mixins/mixins
 
+- isOnboarding = !!(isOnboarding || false)
+- billingError = Object.keys(currentUser).length && currentUser.userType !== "partner" && (!currentUser.billingInfoComplete || !currentUser.paymentInfoComplete) && !isOnboarding && currentUser.dateCreated > 1522540800000
+
 doctype html
 html(lang="en")
     block getTitle
@@ -10,9 +13,20 @@ html(lang="en")
                 block headCss
                     link(href='//fonts.googleapis.com/css?family=Karla', rel='stylesheet', type='text/css')
                     if environment == "production"
-                        link(href="/assets/css/builds/website.min.css", rel="stylesheet", type="text/css")
+                        link(href="/assets/css/builds/website.min.css?v=1523632039544", rel="stylesheet", type="text/css")
                     else
                         link(href="/assets/css/libs/website.css", rel="stylesheet", type="text/css")
+
+                    //- if billingError && !isSuperUser
+                    //-     style.
+                    //-         .sidebar,
+                    //-         .headerTopBar {
+                    //-             top: 80px;
+                    //-         }
+
+                    //-         .pageContainer .pageContentWrapper .pageContentInner {
+                    //-             padding-top: 160px;
+                            }
 
                 link(id="favicon", rel="shortcut icon", href="/assets/images/favicon.ico", sizes="48x48", type="image/png")
                 title #{titleVar + " - AdPushup"}
@@ -92,6 +106,19 @@ html(lang="en")
         - primarySiteDetails = (currentUserSites && currentUserSites.length) ? currentUserSites[0] : {};
         - isRequestDemo = (currentUser && currentUser.requestDemo) ? currentUser.requestDemo : null;
         - isUserOnboarded = (primarySiteDetails && primarySiteDetails.domain && primarySiteDetails.siteId && primarySiteDetails.step) ? true : false;
+
+        //- if billingError && !isSuperUser
+        //-     .custom-message.error-text.dashboard-text.billing-error
+        //-         if !currentUser.billingInfoComplete || !currentUser.paymentInfoComplete
+        //-             i(class="fa fa-warning" style="margin-right: 10px;") 
+        //-             | To start seeing ads, please complete - 
+        //-         if !currentUser.billingInfoComplete
+        //-             | Billing profile 
+        //-             a(href="/user/billing") here. 
+        //-         if !currentUser.paymentInfoComplete
+        //-             | Payment details 
+        //-             a(href="/user/payment") here. 
+        //-             | If you're using ads.txt, kindly paste the ads.txt configuration from the site's tags manager panel to your website.
 
         if !excludeAnalytics
             if environment == "production"

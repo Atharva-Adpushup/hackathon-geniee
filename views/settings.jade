@@ -88,9 +88,10 @@ block bodyContent
                                         hr
                                         .row
                                             .col-md-4
-                                                a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexVerifier", target="_blank") Regex Verification Tool
-                                            //- .col-md-4
-                                            //-     a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexGenerator", target="_blank") Regex Generation Tool
+                                                a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexVerifier", target="_blank", style="width: 100%") Regex Verification Tool
+                                            if isSuperUser
+                                                .col-md-4
+                                                    a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexGenerator", target="_blank", style="width: 100%") Regex Generation Tool
                                     .col-sm-6
                                         .row
                                             .col-sm-12
@@ -119,7 +120,7 @@ block bodyContent
                                             .col-sm-5
                                                 .input-name Auto Optimise
                                             .col-sm-7
-                                                input(type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "false") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "false"))
+                                                input(style="margin-top: 10px;" type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "false") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "false"))
                                         .row
                                             .col-sm-12#autoOptimiseErr.error-message
                                         .row
@@ -134,20 +135,36 @@ block bodyContent
                                                 .row
                                                     div#blocklistErr.error-message(style="margin: 5px 15px 20px;")
                                                     ul.blocklist
-                                        .row
-                                            .col-sm-12
-                                                h4 Adcode Conversion
-                                            .col-sm-12
-                                                div.snippet-wrapper.code-convert-wrapper
-                                                    span.clipboard-copy Copied !
-                                                    textarea.snippet#code-conversion-box(placeholder="Enter Passback/Control Ad code here", style="margin-top: 0px;")
-                                                    .row
-                                                        .col-sm-4(style="float: right;")
-                                                            button.btn-primary(id="code-conversion-button") Convert
-                                                        .col-sm-4(style="float: right;")
-                                                            button.btn-primary#clipboard-copy-adcode Copy to clipboard
-                                                
 
+                                        if uiaccecc
+                                            .row
+                                                .col-sm-12
+                                                    h4 Adcode Conversion
+                                                .col-sm-12
+                                                    div.snippet-wrapper.code-convert-wrapper
+                                                        span.clipboard-copy Copied !
+                                                        textarea.snippet#code-conversion-box(placeholder="Enter Passback/Control Ad code here", style="margin-top: 0px;")
+                                                        .row
+                                                            .col-sm-4(style="float: right;")
+                                                                button.btn-primary(id="code-conversion-button") Convert
+                                                            .col-sm-4(style="float: right;")
+                                                                button.btn-primary#clipboard-copy-adcode Copy to clipboard
+
+                                        if !isPartner
+                                            .row
+                                                .col-sm-12
+                                                    h4 GDPR Compliance
+                                                .col-sm-12
+                                                    .row(style="margin-top: -10px;")
+                                                        .col-sm-2
+                                                            .input-name Enable
+                                                        .col-sm-10
+                                                            input(style="margin-top: 10px;" type="checkbox" id="gdprCompliance" name="gdprCompliance" value=(gdpr.compliance ? (gdpr.compliance ? "true" : "false") : "false") checked=(gdpr.compliance !== false ? (gdpr.compliance ? "true" : "true") : undefined))
+                                                    .row
+                                                        .col-sm-4
+                                                            .input-name Cookie Control Config
+                                                        .col-sm-8
+                                                            textarea(name="cookieControlConfig" placeholder="Cookie control config (only JSON)", style="margin-top: 0px; height: 300px;")!=JSON.stringify(gdpr.cookieControlConfig)
                                 hr
                                 .row.settings-btn-pane
                                     .col-sm-4
@@ -157,5 +174,5 @@ block bodyContent
                                 .row
                                     .col-sm-7
                                         .error-message#error
-                                
+                            
 

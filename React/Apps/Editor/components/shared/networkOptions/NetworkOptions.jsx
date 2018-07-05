@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { networks, defaultPriceFloorKey } from '../../../consts/commonConsts';
-import CodeBox from 'shared/codeBox';
-import SelectBox from 'shared/select/select';
+import CodeBox from '../codeBox';
+import SelectBox from '../select/select';
 import AdpTags from './AdpTags';
 import Adsense from './Adsense';
 import OtherNetworks from './OtherNetworks';
@@ -16,12 +16,15 @@ class NetworkOptions extends Component {
 			network:
 				this.props.ad && this.props.ad.network
 					? this.props.ad.network
-					: this.props.ad && currentUser.userType == 'partner' ? 'geniee' : false
+					: this.props.ad && currentUser.userType == 'partner'
+						? 'geniee'
+						: false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.renderNetwork = this.renderNetwork.bind(this);
 		this.networkChangeHandler = this.networkChangeHandler.bind(this);
 		this.getCode = this.getCode.bind(this);
+		this.filterNetworks = this.filterNetworks.bind(this);
 	}
 
 	componentDidMount() {
@@ -68,6 +71,22 @@ class NetworkOptions extends Component {
 		return code;
 	}
 
+	filterNetworks() {
+		if (window.isGeniee) {
+			const isGCFG = !!window.gcfg,
+				isUSN = !!(isGCFG && window.gcfg.hasOwnProperty('usn'));
+
+			// 'isUSN' refers to Geniee UI Access 'Select Network' flag
+			if (isUSN) {
+				return window.gcfg.usn ? networks.filter(network => network != 'adpTags') : ['geniee'];
+			}
+
+			return networks.filter(network => network != 'adpTags');
+		}
+
+		return networks;
+	}
+
 	renderNetwork() {
 		let adExists = this.props.ad ? true : false,
 			code = adExists && this.props.ad.network ? this.getCode() : false,
@@ -78,9 +97,21 @@ class NetworkOptions extends Component {
 				Object.keys(this.props.ad.networkData.keyValues).length,
 			fpKey = pfKeyExists
 				? Object.keys(this.props.ad.networkData.keyValues).filter(key => key.match(/FP/g))[0] ||
-					defaultPriceFloorKey
+				  defaultPriceFloorKey
 				: defaultPriceFloorKey,
 			priceFloor = pfKeyExists ? this.props.ad.networkData.keyValues[fpKey] : 0,
+			refreshSlot =
+				adExists && this.props.ad.networkData && this.props.ad.networkData.refreshSlot
+					? this.props.ad.networkData.refreshSlot
+					: false,
+			overrideActive =
+				adExists && this.props.ad.networkData && this.props.ad.networkData.overrideActive
+					? this.props.ad.networkData.overrideActive
+					: false,
+			overrideSizeTo =
+				adExists && this.props.ad.networkData && this.props.ad.networkData.overrideSizeTo
+					? this.props.ad.networkData.overrideSizeTo
+					: false,
 			headerBidding =
 				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('headerBidding')
 					? this.props.ad.networkData.headerBidding
@@ -116,6 +147,9 @@ class NetworkOptions extends Component {
 						submitHandler={this.submitHandler}
 						onCancel={this.props.onCancel}
 						code={code}
+						refreshSlot={refreshSlot}
+						overrideActive={overrideActive}
+						overrideSizeTo={overrideSizeTo}
 						buttonType={this.props.buttonType || 1}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						id={this.props.id ? this.props.id : false}
@@ -154,6 +188,7 @@ class NetworkOptions extends Component {
 						zoneId={zoneId}
 						fpKey={fpKey}
 						priceFloor={priceFloor}
+						refreshSlot={refreshSlot}
 						headerBidding={dynamicAllocation}
 						submitHandler={this.submitHandler}
 						onCancel={this.props.onCancel}
@@ -162,6 +197,7 @@ class NetworkOptions extends Component {
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						id={this.props.id ? this.props.id : false}
 						showNotification={this.props.showNotification}
+						isInsertMode={this.props.isInsertMode || false}
 					/>
 				);
 				break;
@@ -181,8 +217,7 @@ class NetworkOptions extends Component {
 	}
 
 	render() {
-		let filteredNetworks =
-			currentUser.userType == 'partner' ? networks.filter(network => network != 'adpTags') : networks;
+		let filteredNetworks = this.filterNetworks();
 		return (
 			<div className="networkOptionsRow">
 				<SelectBox value={this.state.network} label="Select Network" onChange={this.networkChangeHandler}>

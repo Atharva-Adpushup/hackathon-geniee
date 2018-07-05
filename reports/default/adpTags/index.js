@@ -217,12 +217,14 @@ display_name ---> network
 */
 
 // let params = {
-// 	select: ['total_revenue', 'total_requests', 'total_impressions', 'report_date', 'siteid', 'ntwid', 'device_type'],
+// 	select: ['total_revenue', 'total_xpath_miss', 'total_impressions', 'report_date', 'siteid'],
 // 	where: {
-// 		siteid: 31000,
-// 		mode: 1
+// 		siteid: 35003,
+// 		pagegroup: ['HOME', 'BLOG'],
+// 		mode: 1,
+// 		section: ['4cd85ecf-64ed-48c9-a921-8d4f26146401']
 // 	},
-// 	groupBy: ['pagegroup']
+// 	groupBy: ['section']
 // };
 
 // generate(params)

@@ -52,12 +52,26 @@ function validateMessageData(originalMessage) {
 }
 
 function syncCDNWrapper(decodedMessage) {
-	return siteModel.getSiteById(decodedMessage.siteId).then(site => syncCDNService(site));
+	return siteModel
+		.getSiteById(decodedMessage.siteId)
+		.then(site => syncCDNService(site))
+		.then(() => decodedMessage.siteId);
 }
 
 function errorHandler(error, originalMessage) {
 	let customErrorMessage;
 	customErrorMessage = error.message;
+
+	if (!customErrorMessage) {
+		customErrorMessage = error && error[0] ? error[0].message : 'Unsynced ads in setup';
+		if (typeof customErrorMessage == 'object') {
+			customErrorMessage = `Unsynced ads in setup | Pagegroup - ${customErrorMessage.pagegroup} | Platform - ${
+				customErrorMessage.platform
+			} | SectionId - ${customErrorMessage.sectionId} | adId - ${customErrorMessage.ad.id} | Network - ${
+				customErrorMessage.ad.network
+			}`;
+		}
+	}
 
 	const isEmptyConsumerMessage = !!(customErrorMessage === CONSTANTS.ERROR_MESSAGES.RABBITMQ.CONSUMER.EMPTY_MESSAGE),
 		isInvalidConsumerMessage = !!(customErrorMessage === CONSTANTS.ERROR_MESSAGES.MESSAGE.INVALID_DATA);
@@ -70,7 +84,7 @@ function errorHandler(error, originalMessage) {
 		counter = 0;
 		let decodedMessage = originalMessage.content.toString('utf-8');
 		decodedMessage = JSON.parse(decodedMessage);
-		customErrorMessage = customErrorMessage == undefined ? 'Unsynced ad units must be present' : customErrorMessage;
+		// customErrorMessage = customErrorMessage == undefined ? 'Unsynced ad units must be present' : customErrorMessage;
 		logger({
 			source: 'CDN SYNC ERROR LOGS',
 			message: `Error while CDN SYNC and error messgae : ${customErrorMessage}`,
@@ -88,8 +102,12 @@ function errorHandler(error, originalMessage) {
 function doProcessingAndAck(originalMessage) {
 	return validateMessageData(originalMessage)
 		.then(syncCDNWrapper)
-		.then(() => {
+		.then((siteId = 'N/A') => {
 			counter = 0;
+			logger({
+				source: 'CDN SYNC CONSUMPTION LOGS',
+				message: `Job consumed for site id : ${siteId}`
+			});
 			consumer.acknowledge(originalMessage);
 			return 0;
 		})

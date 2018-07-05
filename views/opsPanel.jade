@@ -11,6 +11,22 @@ block append headScripts
 		window.siteId = !{siteId}
 
 block append headCss
+	//- Required for code box styling
+	link(rel="stylesheet" href="/assets/css/builds/editor.min.css")
+	style.
+		.nav-tabs {
+			background: #fff;
+		}
+		.nav-tabs>li {
+			border-left: none;
+		}
+		.message-wrapper > div {
+			font-size: 16px;
+			margin-bottom: 15px;
+		}
+		.json-text {
+			height: 200px;
+		}
 
 block bodyContent
 	include layout/sideBar

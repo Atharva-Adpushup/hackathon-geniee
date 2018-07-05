@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
-import SelectBox from 'shared/select/select.js';
-import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
-import LabelWithButton from 'components/shared/labelWithButton.jsx';
-import CodeBox from 'shared/codeBox';
+import SelectBox from '../select/select.js';
+import CustomToggleSwitch from '../customToggleSwitch.jsx';
+import LabelWithButton from '../labelWithButton.jsx';
+import CodeBox from '../codeBox';
 import requiredIf from 'react-required-if';
-import InlineEdit from 'shared/inlineEdit/index.jsx';
+import InlineEdit from '../inlineEdit/index.jsx';
 import AdpTags from './AdpTags.jsx';
 
 const positions = ['Unknown', 'Header', 'Under the article/column', 'Sidebar', 'Footer'];
@@ -95,7 +95,9 @@ class sectionOptions extends React.Component {
 		});
 	}
 
-	renderCustomZoneIdInput(zoneId) {
+	renderCustomZoneIdInput(zoneId, isInsertMode) {
+		const isDisabledMode = !!(zoneId && !isInsertMode);
+
 		return (
 			<Row className="mT-10">
 				<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
@@ -106,6 +108,8 @@ class sectionOptions extends React.Component {
 						type="number"
 						placeholder="Enter Geniee Zone Id"
 						className="inputBasic mB-10"
+						readOnly={isDisabledMode}
+						disabled={isDisabledMode}
 						value={zoneId}
 						style={{ width: '100%' }}
 						onChange={ev => {
@@ -120,7 +124,7 @@ class sectionOptions extends React.Component {
 	render() {
 		const customAdCodeText = this.state.customAdCode ? 'Edit' : 'Add',
 			isAdCreateBtnDisabled = !!(this.state.position !== null && typeof this.state.position !== 'undefined'),
-			{ updateMode, updateSettings, sectionId, ad } = this.props,
+			{ updateMode, updateSettings, sectionId, ad, isInsertMode } = this.props,
 			{ position, isAdInFirstFold: firstFold, isAdAsync: asyncTag, zoneId } = this.state;
 
 		if (this.state.manageCustomCode) {
@@ -187,12 +191,15 @@ class sectionOptions extends React.Component {
 					id={this.props.id ? `js-async-tag-switch-${this.props.id}` : 'js-async-tag-switch'}
 					customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
 				/> */}
-				{updateMode && !zoneId ? null : this.renderCustomZoneIdInput(zoneId)}
+				{updateMode && !zoneId ? null : this.renderCustomZoneIdInput(zoneId, isInsertMode)}
 
 				<AdpTags
 					fpKey={this.props.fpKey}
 					priceFloor={this.props.priceFloor}
 					headerBidding={this.props.headerBidding}
+					refreshSlot={this.props.refreshSlot}
+					overrideActive={this.props.overrideActive}
+					overrideSizeTo={this.props.overrideSizeTo}
 					submitHandler={this.submitHandler}
 					onCancel={this.props.onCancel}
 					code={this.props.code}
@@ -201,6 +208,7 @@ class sectionOptions extends React.Component {
 					id={this.props.id ? this.props.id : false}
 					showNotification={this.props.showNotification}
 					geniee={true}
+					isInsertMode={isInsertMode}
 				/>
 			</div>
 		);

@@ -140,6 +140,7 @@ class SiteModeWiseTraffic extends Component {
 			isTopUrlsButtonLoading: false,
 			isMainButtonLoading: false,
 			selectedMode: '1',
+			selectedPlatformCode: '',
 			urlCount: 20,
 			startDate: moment().subtract(7, 'days'),
 			endDate: moment().subtract(1, 'days'),
@@ -155,7 +156,9 @@ class SiteModeWiseTraffic extends Component {
 		this.getComputedParameterConfig = this.getComputedParameterConfig.bind(this);
 		this.getDefaultParameterConfig = this.getDefaultParameterConfig.bind(this);
 		this.handleSelectBoxChange = this.handleSelectBoxChange.bind(this);
-		this.renderSelectBox = this.renderSelectBox.bind(this);
+		this.handlePlatformSelectBoxChange = this.handlePlatformSelectBoxChange.bind(this);
+		this.renderModeSelectBox = this.renderModeSelectBox.bind(this);
+		this.renderPlatformSelectBox = this.renderPlatformSelectBox.bind(this);
 		this.renderModeTable = this.renderModeTable.bind(this);
 		this.renderTopUrlsCountTable = this.renderTopUrlsCountTable.bind(this);
 	}
@@ -203,7 +206,8 @@ class SiteModeWiseTraffic extends Component {
 		const isMainButtonLoading = this.state.isMainButtonLoading;
 
 		return (
-			<Col className="u-full-height aligner aligner--hBottom aligner--vStart" xs={7}>
+			<Col className="u-full-height aligner aligner--hBottom aligner--vStart" xs={8}>
+				{this.renderPlatformSelectBox()}
 				<DateRangePicker
 					onDatesChange={this.datesUpdated}
 					onFocusChange={this.focusUpdated}
@@ -266,6 +270,7 @@ class SiteModeWiseTraffic extends Component {
 			stateObject.startDate = parameterConfig.fromDate;
 			stateObject.endDate = parameterConfig.toDate;
 			stateObject.topUrlsData = null;
+			stateObject.selectedPlatformCode = '';
 		}
 
 		this.setState(stateObject, () => {
@@ -274,14 +279,23 @@ class SiteModeWiseTraffic extends Component {
 			apiParameters.fromDate = moment(apiParameters.fromDate).format('YYYY-MM-DD');
 			apiParameters.toDate = moment(apiParameters.toDate).format('YYYY-MM-DD');
 			apiParameters.siteId = _ref.state.siteId;
+			apiParameters.platformCode = _ref.state.selectedPlatformCode || '';
 
-			$.post(`/ops/getSiteModeWiseData`, apiParameters, response => {
-				_ref.setState({
-					data: response.data,
-					isDataLoaded: true,
-					isMainButtonLoading: false
+			$.post(`/ops/getSiteModeWiseData`, apiParameters)
+				.done(function(response) {
+					_ref.setState({
+						data: response.data,
+						isDataLoaded: true,
+						isMainButtonLoading: false
+					});
+				})
+				.fail(function() {
+					window.alert('Failed to load Mode Wise Traffic Chart data. Please try again after some time.');
+
+					_ref.setState({
+						isMainButtonLoading: false
+					});
 				});
-			});
 		});
 	}
 
@@ -294,18 +308,27 @@ class SiteModeWiseTraffic extends Component {
 		parameterConfig.siteId = _ref.state.siteId;
 		parameterConfig.count = _ref.state.urlCount;
 		parameterConfig.mode = Number(_ref.state.selectedMode);
+		parameterConfig.platformCode = _ref.state.selectedPlatformCode || '';
 
 		_ref.setState(
 			{
 				isTopUrlsButtonLoading: true
 			},
 			() => {
-				$.post(`/ops/getSiteModeWiseTopUrlsData`, parameterConfig, response => {
-					_ref.setState({
-						topUrlsData: response.data,
-						isTopUrlsButtonLoading: false
+				$.post(`/ops/getSiteModeWiseTopUrlsData`, parameterConfig)
+					.done(function(response) {
+						_ref.setState({
+							topUrlsData: response.data,
+							isTopUrlsButtonLoading: false
+						});
+					})
+					.fail(function() {
+						window.alert('Failed to load Mode Wise Top urls. Please try again after some time.');
+
+						_ref.setState({
+							isTopUrlsButtonLoading: false
+						});
 					});
-				});
 			}
 		);
 	}
@@ -319,7 +342,16 @@ class SiteModeWiseTraffic extends Component {
 		});
 	}
 
-	renderSelectBox() {
+	handlePlatformSelectBoxChange(platformCode = '') {
+		platformCode = platformCode || '';
+
+		this.setState({
+			selectedPlatformCode: platformCode,
+			topUrlsData: null
+		});
+	}
+
+	renderModeSelectBox() {
 		const isModeData = !!this.state.data && this.state.data.sitewise,
 			siteWiseData = isModeData ? Object.keys(this.state.data.sitewise) : [];
 
@@ -336,6 +368,22 @@ class SiteModeWiseTraffic extends Component {
 						{modeName}
 					</option>
 				))}
+			</SelectBox>
+		);
+	}
+
+	renderPlatformSelectBox() {
+		return (
+			<SelectBox
+				className="u-margin-r10px"
+				value={this.state.selectedPlatformCode}
+				label="Select Platform"
+				onChange={this.handlePlatformSelectBoxChange}
+				onClear={this.handlePlatformSelectBoxChange}
+			>
+				<option value="2">DESKTOP</option>
+				<option value="1,4">MOBILE</option>
+				<option value="5">TABLET</option>
 			</SelectBox>
 		);
 	}
@@ -367,8 +415,8 @@ class SiteModeWiseTraffic extends Component {
 					<Col className="u-full-height aligner aligner--hCenter aligner--vCenter" xs={4} />
 				</Row>
 				<Row className="u-margin-0px aligner-item">
-					<Col className="u-full-height aligner aligner--hStart aligner--vStart" xs={5}>
-						{this.renderSelectBox()}
+					<Col className="u-full-height aligner aligner--hStart aligner--vStart" xs={4}>
+						{this.renderModeSelectBox()}
 						<button
 							disabled={isTopUrlsButtonLoading}
 							className="btn btn-lightBg btn-default btn-blue u-margin-l10px"
@@ -388,7 +436,7 @@ class SiteModeWiseTraffic extends Component {
 			headerTitle = this.generateHeaderTitle();
 
 		return (
-			<Panel className="mb-20 metricsChart" header={headerTitle}>
+			<Panel className="mb-20 metricsChart metricsChart--modeWiseTraffic" header={headerTitle}>
 				{this.state.isDataLoaded ? this.renderHighCharts() : <PaneLoader />}
 				{this.state.isDataLoaded ? this.renderModeTable() : null}
 				{this.state.topUrlsData ? this.renderTopUrlsCountTable() : null}

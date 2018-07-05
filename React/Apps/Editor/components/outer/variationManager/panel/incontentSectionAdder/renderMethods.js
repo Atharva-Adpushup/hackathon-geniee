@@ -5,7 +5,6 @@ import { Row, Col, Button } from 'react-bootstrap';
 import CodeBox from 'shared/codeBox';
 import SelectBox from 'shared/select/select';
 import { networks } from 'consts/commonConsts';
-import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 
 const renderField = field => {
@@ -21,6 +20,29 @@ const renderField = field => {
 								type={field.type}
 								placeholder={field.placeholder}
 								{...field.input}
+								className="inputMinimal"
+							/>
+							{field.meta.touched &&
+								field.meta.error && <div className="error-message">{field.meta.error}</div>}
+						</Col>
+					</Row>
+				</Col>
+			</div>
+		);
+	},
+	renderTextAreaField = field => {
+		return (
+			<div>
+				<Col xs={12} className="u-padding-r10px">
+					<Row>
+						<Col xs={5} className="u-padding-r10px">
+							<strong>{field.label}</strong>
+						</Col>
+						<Col xs={7} className="u-padding-r10px">
+							<textarea
+								placeholder={field.placeholder}
+								{...field.input}
+								rows="6"
 								className="inputMinimal"
 							/>
 							{field.meta.touched &&
@@ -85,6 +107,7 @@ const renderField = field => {
 								buttonType={2}
 								fromPanel={true}
 								showNotification={that.props.showNotification}
+								isInsertMode={true}
 							/>
 						</Col>
 					</Row>
@@ -96,20 +119,23 @@ const renderField = field => {
 		return (
 			<div>
 				<p>
-					Each <strong>Section no</strong> maps to a bracket of 200 pixels in reference to the content
-					selector i.e.
+					Each <strong>Section no</strong> maps to a minimum bracket of 600 pixels in reference to the content
+					selector. The bracket increases by 100 pixels for successive section numbers. i.e.
 				</p>
 				<ul>
 					<li>
-						Section No 1 : <strong>(0 - 200) pixels</strong>
+						Section No 1 : <strong>(0 - 600) pixels</strong>
 					</li>
 					<li>
-						Section No 2 : <strong>(200 - 400) pixels</strong>
+						Section No 2 : <strong>(500 - 1200) pixels</strong>
 					</li>
 					<li>
-						Section No 3 : <strong>(400 - 600) pixels</strong>
+						Section No 3 : <strong>(1000 - 1800) pixels</strong>
 					</li>
-					<li>...so on</li>
+					<li>
+						Section No 4 : <strong>(1500 - 2400) pixels</strong>
+					</li>
+					<li>...and so on</li>
 				</ul>
 			</div>
 		);
@@ -195,15 +221,14 @@ const renderField = field => {
 					<Row>
 						<FieldArray name="notNear" component={renderNotNear} />
 					</Row>
-					{/* {currentUser.userType == 'partner' ? (
+					<Row>
 						<Field
-							placeholder="Custom Zone Id"
-							name="customZoneId"
-							component={renderField}
-							type="number"
-							label="Custom Zone Id"
+							name="customCSS"
+							placeholder="Please enter customCSS"
+							label="customCSS"
+							component={renderTextAreaField}
 						/>
-					) : null} */}
+					</Row>
 					{renderNetworkOptions(that)}
 				</div>
 				<div style={{ width: '35%', padding: '0px 10px', display: 'inline-block', verticalAlign: 'top' }}>

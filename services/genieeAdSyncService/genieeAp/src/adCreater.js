@@ -17,9 +17,16 @@ var $ = require('jquery'),
 			structuredAds = [],
 			inContentAds = [],
 			adpTagUnits = [],
+			externalTriggerAds = [],
 			genieeIds = [];
 		for (a = 0; a < ads.length; a++) {
 			ad = ads[a];
+
+			if (ad.type === commonConsts.AD_TYPES.EXTERNAL_TRIGGER_AD) {
+				externalTriggerAds.push(ad);
+				continue;
+			}
+
 			ad.isIncontent ? inContentAds.push(ad) : null;
 			ad.network === 'geniee' &&
 				ad.networkData &&
@@ -31,6 +38,7 @@ var $ = require('jquery'),
 
 			// Push ads to structural ad array only if ad is not interactive or not incontent
 			if (
+				ad.type == commonConsts.AD_TYPES.STRUCTURAL ||
 				(!ad.formatData && !ad.isIncontent && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD) ||
 				ad.type == commonConsts.AD_TYPES.DOCKED_STRUCTURAL
 			) {
@@ -45,7 +53,8 @@ var $ = require('jquery'),
 			structuredAds: structuredAds,
 			inContentAds: inContentAds,
 			genieeIds: genieeIds,
-			adpTagUnits: adpTagUnits
+			adpTagUnits: adpTagUnits,
+			externalTriggerAds: externalTriggerAds
 		};
 	},
 	getContainer = function(ad, el) {
@@ -105,12 +114,40 @@ var $ = require('jquery'),
 			});
 		return defer.promise();
 	},
+	placeAd = function(container, ad) {
+		var adp = window.adpushup;
+
+		try {
+			$.ajaxSettings.cache = true;
+			container.append(adCodeGenerator.generateAdCode(ad));
+			$.ajaxSettings.cache = false;
+
+			if (ad.type && Number(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL) {
+				// Type 4 is DOCKED
+				utils.dockify.dockifyAd('#' + ad.id, ad.formatData, utils);
+			}
+
+			adp.tracker.add(
+				container,
+				function(id) {
+					utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: id });
+				}.bind(adp, ad.id)
+			);
+		} catch (e) {
+			adp.err.push({ msg: 'Error in placing ad.', ad: ad, error: e });
+		}
+		return true;
+	},
+	filterNonInteractiveAds = function(ads) {
+		return ads.filter(function(ad) {
+			return !ad.type || (ad.type && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD);
+		});
+	},
 	createAds = function(adp, variation) {
 		var config = adp.config,
-			tracker = adp.tracker,
 			err = adp.err,
 			finished = false,
-			ads = variation.ads,
+			ads = filterNonInteractiveAds(variation.ads),
 			displayCounter = ads.length,
 			contentSelector = variation.contentSelector,
 			feedbackData = {
@@ -165,28 +202,6 @@ var $ = require('jquery'),
 				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIds);
 				genieeHeadCode && $('head').append(genieeHeadCode);
 			},
-			placeAd = function(container, ad) {
-				try {
-					$.ajaxSettings.cache = true;
-					container.append(adCodeGenerator.generateAdCode(ad));
-					$.ajaxSettings.cache = false;
-
-					if (ad.type && Number(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL) {
-						// Type 4 is DOCKED
-						utils.dockify.dockifyAd('#' + ad.id, ad.formatData, utils);
-					}
-
-					tracker.add(
-						container,
-						function(id) {
-							utils.sendBeacon(config.feedbackUrl, { eventType: 2, click: true, id: id });
-						}.bind(null, ad.id)
-					);
-				} catch (e) {
-					err.push({ msg: 'Error in placing ad.', ad: ad, error: e });
-				}
-				return true;
-			},
 			next = function(adObj, data) {
 				if (displayCounter) {
 					displayCounter--;
@@ -211,8 +226,12 @@ var $ = require('jquery'),
 			handleContentSelectorFailure = function(inContentAds) {
 				feedbackData.contentSelectorMissing = true;
 				$.each(inContentAds, function(index, ad) {
-					feedbackData.xpathMiss.push(ad.id);
-					next(ad, { success: false });
+					//feedbackData.xpathMiss.push(ad.id);
+					//next(ad, { success: false });
+
+					feedbackData.ads = [];
+					feedbackData.xpathMiss = [ad.id];
+					utils.sendFeedback(feedbackData);
 				});
 			},
 			placeStructuralAds = function(structuredAds) {
@@ -230,12 +249,21 @@ var $ = require('jquery'),
 							}
 
 							// if all well then ad id of ad in feedback to tell system that impression was given
-							feedbackData.ads.push(ad.id);
-							next(ad, data);
+							//feedbackData.ads.push(ad.id);
+							//next(ad, data);
+
+							feedbackData.xpathMiss = [];
+							feedbackData.ads = [ad.id];
+							placeAd(data.container, ad);
+							utils.sendFeedback(feedbackData);
 						})
 						.fail(function(data) {
-							feedbackData.xpathMiss.push(ad.id);
-							next(ad, data);
+							//feedbackData.xpathMiss.push(ad.id);
+							//next(ad, data);
+
+							feedbackData.ads = [];
+							feedbackData.xpathMiss = [ad.id];
+							utils.sendFeedback(feedbackData);
 						});
 				});
 			},
@@ -253,7 +281,11 @@ var $ = require('jquery'),
 								ad.css = $.extend(true, {}, ad.secondaryCss);
 							}
 
-							feedbackData.ads.push(ad.id);
+							if (ad.customCSS) {
+								ad.css = $.extend(true, {}, ad.css, ad.customCSS);
+							}
+
+							//feedbackData.ads.push(ad.id);
 
 							$containerElement = getContainer(ad, sectionObj.elem);
 							isContainerElement = !!($containerElement && $containerElement.length);
@@ -264,10 +296,19 @@ var $ = require('jquery'),
 								pushAdToGenieeConfig(ad, containerId);
 							}
 
-							next(ad, { success: true, container: $containerElement });
+							//next(ad, { success: true, container: $containerElement });
+
+							feedbackData.xpathMiss = [];
+							feedbackData.ads = [ad.id];
+							placeAd($containerElement, ad);
+							utils.sendFeedback(feedbackData);
 						} else {
-							feedbackData.xpathMiss.push(ad.id);
-							next(ad, { success: false, container: null });
+							//feedbackData.xpathMiss.push(ad.id);
+							//next(ad, { success: false, container: null });
+
+							feedbackData.ads = [];
+							feedbackData.xpathMiss = [ad.id];
+							utils.sendFeedback(feedbackData);
 						}
 					});
 				});
@@ -312,4 +353,7 @@ var $ = require('jquery'),
 		})();
 	};
 
-module.exports = createAds;
+module.exports = {
+	createAds: createAds,
+	placeAd: placeAd
+};

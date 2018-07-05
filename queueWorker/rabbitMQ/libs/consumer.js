@@ -1,6 +1,7 @@
 var queueInstance = require('amqplib');
 var Promise = require('bluebird');
 var mailService = require('../../../services/mailService/index');
+var moment = require('moment');
 
 function Consumer(config) {
 	this.config = config;
@@ -25,9 +26,24 @@ function Consumer(config) {
 		}
 
 		return queueInstance
-			.connect(self.config.url)
+			.connect(self.config.url, { hearbeat: 20 })
 			.then(conn => {
 				conn.on('close', () => {
+					console.log(
+						`Consumer close event caught | Current Time : ${moment().format(
+							'dddd, MMMM Do YYYY, h:mm:ss a'
+						)}`
+					);
+					self.connection = null;
+					self.channel = null;
+					self.connectRabbit(self.config.url);
+				});
+				conn.on('error', () => {
+					console.log(
+						`Consumer error event caught | Current Time : ${moment().format(
+							'dddd, MMMM Do YYYY, h:mm:ss a'
+						)}`
+					);
 					self.connection = null;
 					self.channel = null;
 					self.connectRabbit(self.config.url);

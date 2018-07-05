@@ -33,22 +33,25 @@ function Control() {
 		}
 	}
 
+	function placeAd(adObj) {
+		if (adObj && adObj.el && adObj.ac) {
+			var adCode = utils
+				.base64Decode(adObj.ac)
+				.replace('class="adsbygoogle"', 'class="adsbygoogle _ap_control_ad"');
+
+			$(adObj.el).before(adCode);
+			$(adObj.el).remove();
+		}
+	}
+
 	function activateAd(adObj) {
 		if (adObj.active) {
 			return true;
 		}
 
-		var container = $('<div/>')
-			.css({
-				display: 'block'
-			})
-			.attr({ id: adObj.id, class: '_ap_control_ad' });
-
-		$(adObj.el).html(container);
-
 		try {
 			$.ajaxSettings.cache = true;
-			container.append(utils.base64Decode(adObj.ac));
+			placeAd(adObj);
 			$.ajaxSettings.cache = false;
 			adObj.active = true;
 		} catch (e) {

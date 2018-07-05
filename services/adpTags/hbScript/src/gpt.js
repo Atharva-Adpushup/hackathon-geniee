@@ -40,9 +40,29 @@ var config = require('./config'),
 				}
 			});
 		});
+	},
+	refreshIntervalSwitch = function(w) {
+		w.adpushup.$(w).on('blur', function() {
+			if (w.adpTags.gptRefreshIntervals.length) {
+				w.adpTags.gptRefreshIntervals.forEach(function(interval) {
+					clearInterval(interval.id);
+				});
+			}
+		});
+		w.adpushup.$(w).on('focus', function() {
+			if (w.adpTags.gptRefreshIntervals.length) {
+				w.adpTags.gptRefreshIntervals.forEach(function(interval) {
+					var gptRefreshInterval = setInterval(function() {
+						googletag.pubads().refresh([interval.gSlot]);
+					}, config.GPT_REFRESH_INTERVAL);
+					interval.id = gptRefreshInterval;
+				});
+			}
+		});
 	};
 
 module.exports = {
 	init: init,
-	setListeners: setListeners
+	setListeners: setListeners,
+	refreshIntervalSwitch: refreshIntervalSwitch
 };

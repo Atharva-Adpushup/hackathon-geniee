@@ -15,6 +15,21 @@ function validate(formProps) {
 		errors.adCode = 'Please enter Ad Code';
 	}
 
+	try {
+		if (formProps.customCSS) {
+			let customCSS = JSON.parse(formProps.customCSS),
+				isValidObject = !!(customCSS && Object.keys(customCSS).length);
+
+			if (isValidObject) {
+				errors.customCSS = '';
+			} else {
+				errors.customCSS = 'Please enter valid Custom CSS';
+			}
+		}
+	} catch (e) {
+		errors.customCSS = 'Please enter valid Custom CSS';
+	}
+
 	if (!formProps.name) {
 		errors.name = 'Please enter Section name';
 	}

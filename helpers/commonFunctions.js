@@ -63,7 +63,7 @@ const Promise = require('bluebird'),
 							innerObj[identifier].aggregate.total_revenue *
 								1000 /
 								innerObj[identifier].aggregate.total_impressions
-						).toFixed(3);
+					  ).toFixed(3);
 		});
 		container[key] = innerObj;
 	},
@@ -391,6 +391,7 @@ const Promise = require('bluebird'),
 				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
 				count: parameterConfig.count || 20,
 				mode: parameterConfig.mode || 1,
+				platformCode: parameterConfig.platformCode || '',
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 
@@ -469,6 +470,7 @@ const Promise = require('bluebird'),
 				siteId: parameterConfig.siteId,
 				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
 				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				platformCode: parameterConfig.platformCode || '',
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 
@@ -588,6 +590,18 @@ const Promise = require('bluebird'),
 				}
 			);
 		});
+	},
+	sendSuccessResponse = (response, res) => {
+		res.send({
+			error: false,
+			data: response
+		});
+	},
+	sendErrorResponse = (response, res) => {
+		res.send({
+			error: true,
+			data: response
+		});
 	};
 
 module.exports = {
@@ -611,5 +625,7 @@ module.exports = {
 	getGlobalModeWiseTrafficContributionReport,
 	getGlobalTop10CountriesContributionQuery,
 	getGlobalTop10SitesContributionReport,
-	getGlobalLostAndFoundLiveSitesReport
+	getGlobalLostAndFoundLiveSitesReport,
+	sendSuccessResponse,
+	sendErrorResponse
 };

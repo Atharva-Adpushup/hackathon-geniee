@@ -5,7 +5,7 @@ var express = require('express'),
 	_ = require('lodash'),
 	urlModule = require('url'),
 	AdPushupError = require('../helpers/AdPushupError'),
-	reGenerator = require('../misc/tools/regexGenerator'),
+	regexGenerator = require('../misc/tools/regexGenerator/index'),
 	utils = require('../helpers/utils'),
 	channelModel = require('../models/channelModel'),
 	config = require('../configs/config'),
@@ -47,10 +47,9 @@ var express = require('express'),
 				email: site.get('ownerEmail')
 			};
 
-		const hbcfPromise =
-			editMode === 'update'
-				? appBucket.replacePromise(`hbcf::${siteId}`, json)
-				: appBucket.insertPromise(`hbcf::${siteId}`, json);
+		const hbcfPromise = editMode === 'update'
+			? appBucket.replacePromise(`hbcf::${siteId}`, json)
+			: appBucket.insertPromise(`hbcf::${siteId}`, json);
 
 		return [hbcfPromise, site];
 	};
@@ -62,13 +61,26 @@ router
 			.getSiteById(req.params.siteId)
 			.then(site => [siteModel.getSitePageGroups(req.params.siteId), site])
 			.spread((sitePageGroups, site) => {
+				const isSession = !!req.session,
+					isPartner = req.session.user.userType == 'partner',
+					isSessionGenieeUIAccess = !!(isSession && req.session.genieeUIAccess),
+					genieeUIAccess = isSessionGenieeUIAccess ? req.session.genieeUIAccess : false,
+					isGenieeUIAccessCodeConversion = !!(genieeUIAccess &&
+						genieeUIAccess.hasOwnProperty('codeConversion'));
+
 				return res.render('settings', {
 					pageGroups: sitePageGroups,
 					patterns: site.get('apConfigs').pageGroupPattern || {},
 					apConfigs: site.get('apConfigs'),
 					blocklist: site.get('apConfigs').blocklist,
 					siteId: req.params.siteId,
-					siteDomain: site.get('siteDomain')
+					siteDomain: site.get('siteDomain'),
+					isSuperUser: req.session.isSuperUser,
+					//UI access code conversion property value
+					// Specific to Geniee network as of now but can be made generic
+					uiaccecc: isGenieeUIAccessCodeConversion ? Number(genieeUIAccess.codeConversion) : 1,
+					isPartner: isPartner ? true : false,
+					gdpr: site.get('gdpr') ? site.get('gdpr') : commonConsts.GDPR
 				});
 			})
 			.catch(err => {
@@ -109,6 +121,25 @@ router
 				}
 			});
 	})
+	.post('/:siteId/updateManualMode', (req, res) => {
+		const { siteId } = req.params;
+
+		return siteModel
+			.getSiteById(siteId)
+			.then(site => {
+				site.set('isManual', !site.get('isManual'));
+				return site.save();
+			})
+			.then(data => res.status(200).send({ success: 1, data: null, message: 'Manual mode updated!' }))
+			.catch(err => {
+				console.log(err);
+				res.status(500).send({
+					success: 0,
+					data: null,
+					message: 'Some error occurred! Please try again later'
+				});
+			});
+	})
 	.post('/:siteId/opsPanel/hbConfig', (req, res) => {
 		const { siteId } = req.params,
 			sitePromise = siteModel.getSiteById(req.params.siteId),
@@ -145,37 +176,58 @@ router
 	})
 	.get('/:siteId/settings/regexGenerator', function(req, res) {
 		return res.render('regexGenerator', {
-			ok: undefined,
-			userInputs: []
+			siteId: req.params.siteId
+			// ok: undefined,
+			// userInputs: []
 		});
 	})
 	.post('/:siteId/settings/regexGenerator', function(req, res) {
-		var userInputs = req.body.url.filter(Boolean);
-		if (!userInputs.length) {
-			return res.render('regexGenerator', {
-				ok: undefined,
-				userInputs: []
-			});
-		} else {
-			var response = reGenerator.init(userInputs);
-			// console.log(response);
-			return res.render('regexGenerator', {
-				ok: response.ok,
-				msg: response.errorMessage,
-				regexResult: response.regex,
-				userInputs: userInputs
+		if (!req.body && !req.body.toMatch && !req.body.toMatch.length) {
+			return res.send({
+				error: true,
+				message: 'Incomplete Params'
 			});
 		}
+		return regexGenerator({
+			toMatch: req.body.toMatch,
+			toNotMatch: req.body.toNotMatch
+		}).then(response => {
+			if (!response.error) {
+				let urls = _.concat(req.body.toMatch, req.body.toNotMatch),
+					matchedUrls = [],
+					notMatchedUrls = [],
+					re = new RegExp(response.regex, 'i');
+				_.forEach(urls, url => {
+					re.test(url) ? matchedUrls.push(url) : notMatchedUrls.push(url);
+				});
+				response = {
+					...response,
+					matchedUrls,
+					notMatchedUrls
+				};
+			}
+			return res.send(response);
+		});
 	})
 	.post('/:siteId/saveSiteSettings', function(req, res) {
-		var json = { settings: req.body, siteId: req.params.siteId };
+		var json = { settings: req.body, siteId: req.params.siteId },
+			{ gdprCompliance, cookieControlConfig } = req.body;
+		gdprCompliance = gdprCompliance === 'false' ? false : true;
+		// Added default parameter check for below JSON.parse issue at line 224
+		if (!cookieControlConfig) {
+			cookieControlConfig = JSON.stringify({});
+		}
+
 		json.settings.pageGroupPattern = JSON.stringify(
 			_.groupBy(JSON.parse(json.settings.pageGroupPattern), pattern => {
 				return pattern.platform;
 			})
 		);
 		return siteModel
-			.saveSiteSettings(json)
+			.saveSiteData(req.params.siteId, null, {
+				gdpr: { compliance: gdprCompliance, cookieControlConfig: JSON.parse(cookieControlConfig) }
+			})
+			.then(() => siteModel.saveSiteSettings(json))
 			.then(function(data) {
 				res.send({ success: 1 });
 			})
@@ -191,6 +243,10 @@ router
 		userModel
 			.verifySiteOwner(req.session.user.email, req.params.siteId, { fullSiteData: true })
 			.then(function(data) {
+				const isSession = !!req.session,
+					isSessionGenieeUIAccess = !!(isSession && req.session.genieeUIAccess),
+					genieeUIAccess = isSessionGenieeUIAccess ? req.session.genieeUIAccess : false;
+
 				return res.render('editor', {
 					isChrome: true,
 					domain: data.site.get('siteDomain'),
@@ -198,7 +254,25 @@ router
 					channels: data.site.get('channels'),
 					environment: config.environment.HOST_ENV,
 					currentSiteId: req.params.siteId,
-					isSuperUser: req.session.isSuperUser || false
+					isSuperUser: req.session.isSuperUser || false,
+					// Geniee UI access config values
+					config: {
+						usn: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('selectNetwork')
+							? Number(genieeUIAccess.selectNetwork)
+							: 1,
+						ubajf: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('beforeAfterJs')
+							? Number(genieeUIAccess.beforeAfterJs)
+							: 1,
+						upkv: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('pageKeyValue')
+							? Number(genieeUIAccess.pageKeyValue)
+							: 1,
+						uadkv: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('adunitKeyValue')
+							? Number(genieeUIAccess.adunitKeyValue)
+							: 1,
+						uud: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('useDfp')
+							? Number(genieeUIAccess.useDfp)
+							: 1
+					}
 				});
 			})
 			.catch(function() {
@@ -262,15 +336,12 @@ router
 					userEmail = req.session.user.email,
 					site = _.find(userSites, { siteId: parseInt(json.siteId) });
 
-				return userModel
-					.setSitePageGroups(userEmail)
-					.then(user => user.save())
-					.then(() => {
-						var index = _.findIndex(userSites, { siteId: parseInt(json.siteId) });
-						req.session.user.sites[index] = site;
+				return userModel.setSitePageGroups(userEmail).then(user => user.save()).then(() => {
+					var index = _.findIndex(userSites, { siteId: parseInt(json.siteId) });
+					req.session.user.sites[index] = site;
 
-						return res.redirect('/user/dashboard');
-					});
+					return res.redirect('/user/dashboard');
+				});
 			})
 			.catch(function(err) {
 				var error = err.message[0].message ? err.message[0].message : 'Some error occurred!';
@@ -351,8 +422,7 @@ router
 					}
 
 					return Promise.all(sitePromises()).then(function(validSites) {
-						var sites = _.difference(validSites, ['inValidSite']),
-							unSavedSite;
+						var sites = _.difference(validSites, ['inValidSite']), unSavedSite;
 
 						sites = Array.isArray(sites) && sites.length > 0 ? sites : [];
 						/**
@@ -432,6 +502,49 @@ router
 			.catch(err => {
 				console.log(err);
 				return res.send(response);
+			});
+	})
+	.get('/:siteId/ampSettings', (req, res) => {
+		return res.render('ampSettings');
+	})
+	.get('/:siteId/ampSettingsData', (req, res) => {
+		return siteModel
+			.getSiteById(req.params.siteId)
+			.then(site => {
+				let ampSettings = site.get('ampSettings') || {};
+				return channelModel.getAmpSettings(req.params.siteId).then(function(channels) {
+					return res.send({ siteId: req.params.siteId, channels, ampSettings });
+				});
+			})
+			.catch(function(err) {
+				return res.send({
+					error: true,
+					message: 'Some Error Occured'
+				});
+			});
+	})
+	.post('/:siteId/saveAmpSettings', (req, res) => {
+		let response = {
+			error: true,
+			message: 'Operaiton Failed'
+		};
+		return siteModel
+			.getSiteById(req.params.siteId)
+			.then(site => {
+				if (!site) {
+					return res.send(response);
+				}
+				site.set('ampSettings', req.body);
+				return site.save();
+			})
+			.then(site => {
+				res.send(site);
+			})
+			.catch(function(err) {
+				return res.send({
+					error: true,
+					message: 'Some Error Occured'
+				});
 			});
 	});
 

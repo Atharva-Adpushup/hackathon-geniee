@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import CodeBox from 'shared/codeBox';
+import CodeBox from '../codeBox';
 import { Row, Col, Button } from 'react-bootstrap';
 class OtherNetworks extends Component {
 	constructor(props) {

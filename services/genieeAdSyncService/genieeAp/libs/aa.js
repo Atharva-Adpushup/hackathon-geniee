@@ -373,7 +373,52 @@ $.fn.notNear = function(xPathArr, minGap) {
 };
 
 $.fn.setPlacementForSection = function(adObj, minDistance) {
-	var section = adObj.section;
+	var getValidPlacementData = function(config, placementNumber) {
+			var isValidInputData = !!(placementNumber && config),
+				isValidCurrentPlacement = !!(
+					isValidInputData &&
+					config[placementNumber] &&
+					Object.keys(config[placementNumber]).length &&
+					config[placementNumber].elem &&
+					config[placementNumber].hasOwnProperty('isSecondaryCss')
+				),
+				resultData = null,
+				placementId,
+				isValidPlacement;
+
+			if (!isValidInputData) {
+				return null;
+			}
+
+			if (isValidCurrentPlacement) {
+				return config[placementNumber];
+			}
+
+			placementId = Number(placementNumber);
+
+			while (placementId >= 1) {
+				isValidPlacement = !!(
+					placementId &&
+					config &&
+					config[placementId] &&
+					Object.keys(config[placementId]).length &&
+					config[placementId].elem &&
+					config[placementId].hasOwnProperty('isSecondaryCss')
+				);
+
+				if (isValidPlacement) {
+					resultData = config[placementId];
+					break;
+				}
+
+				placementId--;
+			}
+
+			return resultData;
+		},
+		section = adObj.section;
+
+	minDistance = Number(minDistance);
 
 	if ($.isEmptyObject(placements) && selectedElems.length) {
 		placements[section] = {
@@ -387,7 +432,9 @@ $.fn.setPlacementForSection = function(adObj, minDistance) {
 			distanceAddFactor = 0;
 		}
 	} else {
-		var lastPlacement = placements[section - 1] ? placements[section - 1].elem : placements[section - 1];
+		var lastPlacement = placements[section - 1]
+			? placements[section - 1].elem
+			: getValidPlacementData(placements, section).elem;
 
 		for (var i = 0; i < selectedElems.length; i++) {
 			var currElem = selectedElems[i];
@@ -442,12 +489,29 @@ function placementStart($selector, placementConfig, doneCallback) {
 			started = true;
 			$(placementConfig).each(function(i, adObj) {
 				var placeFn = function(adObj) {
+					var isNotNear = !!(adObj.notNear && adObj.notNear.length);
+
 					$selector
 						.createAds(adObj.width, adObj.height, adObj.css.float)
 						.selectBetween((adObj.section - 1) * 500, adObj.section * 600)
-						.ignoreXpaths(adObj.ignoreXpaths, 100)
-						.notNear(adObj.notNear ? adObj.notNear[0] : [], adObj.notNear ? adObj.notNear[1] : 200)
-						.setPlacementForSection(adObj, adObj.minDistanceFromPrevAd);
+						.ignoreXpaths(adObj.ignoreXpaths, 100);
+
+					/** NotNear incontent ads feature implementation
+					 * Example data:
+					 * "notNear": [{".p-article_heading > h2:eq(2)": "1200"}]
+					 **/
+
+					if (isNotNear) {
+						adObj.notNear.forEach(function(collectionItem) {
+							var itemKeyArr = Object.keys(collectionItem),
+								itemKey = itemKeyArr[0],
+								itemValue = Number(collectionItem[itemKey]) || 200;
+
+							$selector.notNear(itemKeyArr, itemValue);
+						});
+					}
+
+					$selector.setPlacementForSection(adObj, adObj.minDistanceFromPrevAd);
 				};
 				placeFn(adObj);
 

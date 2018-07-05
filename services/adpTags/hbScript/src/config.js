@@ -9,6 +9,7 @@ module.exports = {
 	PARTNERS: {
 		GENIEE: 'geniee'
 	},
+	GPT_REFRESH_INTERVAL: 30000,
 	SLOT_INTERVAL: 50,
 	MEDIATION_API_URL: '//s2s.adpushup.com/MediationWebService/',
 	HB_STATUS: {
@@ -97,11 +98,32 @@ module.exports = {
 		'c1x: {' +
 		'pixelId: __C1X_PIXEL_ID__,' +
 		'siteId: __C1X_SITE_ID__' +
+		'},' +
+		'openx: {' +
+		'bidCpmAdjustment: function(bidCpm) {' +
+		'return bidCpm - (bidCpm * (5/100));' +
+		'}' +
+		'},' +
+		'brainjuicemedia: {' +
+		'bidCpmAdjustment: function(bidCpm) {' +
+		'return bidCpm - (bidCpm * (5/100));' +
+		'}' +
+		'},' +
+		'oftmedia: {' +
+		'bidCpmAdjustment: function(bidCpm) {' +
+		'return bidCpm - (bidCpm * (12/100));' +
+		'}' +
+		'},' +
+		'districtmDMX: {' +
+		'bidCpmAdjustment: function(bidCpm) {' +
+		'return bidCpm - (bidCpm * (5/100));' +
+		'}' +
 		'}' +
 		'};' +
-		"pbjs.aliasBidder('appnexus', 'springserve');" + // SpringServe specific bidder aliasing
-		"pbjs.aliasBidder('appnexus', 'brealtime');" + // bRealTime specific bidder aliasing
-		"pbjs.aliasBidder('appnexus', 'brainjuicemedia');" + // brainjuicemedia specific bidder aliasing
+		"pbjs.aliasBidder('appnexus', 'springserve');" +
+		"pbjs.aliasBidder('appnexus', 'brealtime');" +
+		"pbjs.aliasBidder('appnexus', 'brainjuicemedia');" +
+		"pbjs.aliasBidder('appnexus', 'oftmedia');" +
 		"pbjs.onEvent('bidTimeout', function(timedOutBidders) {" +
 		'parent.__prebidTimeoutCallback(ADP_BATCH_ID, timedOutBidders, PREBID_TIMEOUT);' +
 		'});' +

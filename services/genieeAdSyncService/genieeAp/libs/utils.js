@@ -64,7 +64,7 @@ module.exports = {
 		return (
 			appendMe +
 			'-xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-				r = (((d = Math.floor(d / 16)) + Math.random() * 16) % 16) | 0;
+				r = ((d = Math.floor(d / 16)) + Math.random() * 16) % 16 | 0;
 				return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
 			})
 		);
@@ -101,15 +101,15 @@ module.exports = {
 		script.html = str;
 		(d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(script);
 	},
-	requestServer: function(url, data, timeout, method, beforeSendCallback) {
+	requestServer: function(url, data, timeout, method, dataType, contentType) {
 		$.support.cors = true;
 		return $.ajax({
 			url: url,
 			data: data,
 			timeout: timeout,
 			type: method || 'GET',
-			beforeSend: beforeSendCallback,
-			dataType: 'jsonp',
+			dataType: dataType || 'jsonp',
+			contentType: contentType || 'application/json; charset=utf-8',
 			jsonpCallback: 'apCallback',
 			crossDomain: true
 		});
@@ -293,6 +293,39 @@ module.exports = {
 		}
 		return data;
 	},
+	rightTrim: function(string, s) {
+		return string ? string.replace(new RegExp(s + '*$'), '') : '';
+	},
+	domanize: function(domain) {
+		return domain
+			? this.rightTrim(
+					domain
+						.replace('http://', '')
+						.replace('https://', '')
+						.replace('www.', ''),
+					'/'
+			  )
+			: '';
+	},
+	rightTrim: function(string, s) {
+		return string ? string.replace(new RegExp(s + '*$'), '') : '';
+	},
+	domanize: function(domain) {
+		return domain
+			? this.rightTrim(
+					domain
+						.replace('http://', '')
+						.replace('https://', '')
+						.replace('www.', ''),
+					'/'
+			  )
+			: '';
+	},
+	isUrlMatching: function() {
+		var config = window.adpushup.config,
+			url = this.domanize(config.siteDomain);
+		return window.location.href.indexOf(url) !== -1 ? true : false;
+	},
 	getObjectByName: function(collection, name) {
 		var isInCollection = false,
 			objectConfig = { index: -1, name: name };
@@ -367,26 +400,29 @@ module.exports = {
 		return url;
 	},
 	getInteractiveAds: function(config) {
-		if (config && config.platform && config.pageGroup && config.selectedVariation) {
-			var ads = null,
-				variations = config.experiment[config.platform][config.pageGroup].variations,
-				selectedVariation = config.selectedVariation,
-				interactiveAds = [];
+		var ads = [];
+
+		if (config && config.experiment && config.platform && config.pageGroup && config.selectedVariation) {
+			var variations = config.experiment[config.platform][config.pageGroup].variations,
+				selectedVariation = config.selectedVariation;
 			variations.forEach(function(variation) {
 				if (variation.id === selectedVariation) {
 					ads = variation.ads;
 				}
 			});
-			if (ads.length) {
-				ads.forEach(function(ad) {
-					if (ad && ad.formatData && ad.formatData.event) {
-						interactiveAds.push(ad);
-					}
-				});
-			}
+		}
+
+		if (config.manualModeActive && window.adpushup.config.manualAds.length) {
+			ads = window.adpushup.config.manualAds;
+		}
+
+		if (ads.length) {
+			var interactiveAds = ads.filter(function(ad) {
+				return ad && ad.formatData && ad.formatData.event;
+			});
+
 			return interactiveAds.length ? interactiveAds : null;
 		}
-		return null;
 	},
 	queryParams: (function() {
 		var str = window.location.search,

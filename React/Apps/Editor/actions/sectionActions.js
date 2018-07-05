@@ -63,6 +63,7 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			sectionId = Utils.getRandomNumber(),
 			float = sectionPayload.float,
 			css = float !== 'none' ? (float === 'left' ? leftSectionCss : rightSectionCss) : defaultSectionCss,
+			customCSS = adPayload.customCSS || '',
 			adData = {},
 			adWidth = parseInt(adPayload.adSize.substr(0, adPayload.adSize.indexOf('x')).trim(), 10),
 			adHeight = parseInt(adPayload.adSize.substr(adPayload.adSize.indexOf('x') + 1).trim(), 10),
@@ -76,6 +77,7 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 				adCode: atob(adPayload.adCode) === 'undefined' ? undefined : adPayload.adCode,
 				id: adId,
 				css,
+				customCSS,
 				createTs: Math.floor(Date.now() / 1000),
 				network: network,
 				secondaryCss: float !== 'none' ? defaultSectionCss : undefined,
@@ -173,6 +175,13 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			xpath
 		};
 	},
+	updateInContentMinDistanceFromPrevAd = (sectionId, minDistanceFromPrevAd) => {
+		return {
+			type: sectionActions.UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD,
+			sectionId,
+			minDistanceFromPrevAd
+		};
+	},
 	updateType = (sectionId, value) => {
 		return {
 			type: sectionActions.UPDATE_TYPE,
@@ -246,6 +255,7 @@ export {
 	createIncontentSection,
 	updatePartnerData,
 	updateXPath,
+	updateInContentMinDistanceFromPrevAd,
 	sectionAllXPaths,
 	validateXPath,
 	validateSectionXPath,

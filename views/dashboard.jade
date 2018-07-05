@@ -22,12 +22,26 @@ block append headScripts
             '/assets/css//third-party/dataTables.css'
         ])    
 
+        script.
+            $(document).on('click', '*[data-id*="switch-"]', function() {
+                var siteId = $(this).attr('data-site-id');
+                $.post('/user/site/'+siteId+'/updateManualMode', function(res) {
+                    setTimeout(function() {
+                        if(res.success) {
+                            alert('Manual mode setting updated');
+                        } else {
+                            alert('Some error occurred!');
+                        }
+                    }, 500);
+                });
+            });
+
 block bodyContent
     //- if isSuperUser || !requestDemo
     include layout/sideBar
 
     if environment === 'production'
-        include layout/extensionDetectionAlert
+        //- include layout/extensionDetectionAlert
 
     .pageContainer.page-container
         include layout/header
@@ -38,7 +52,4 @@ block bodyContent
                     .notification-wrapper
                     // Control v/s Adpushp Starts here
                     #widgetsArea.row
-                        
                         include layout/dashboardSites
-
-                      

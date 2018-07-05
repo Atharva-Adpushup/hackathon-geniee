@@ -47,7 +47,7 @@ if !partner
                                     a(target="_blank" href="/user/site/#{siteId}/editor?updateHash=#{pageGroupHash}" title="Go to Editor")
                                         i.fa.fa-code
                                     if !partner
-                                        form.delPg(style="display: inline-block;")
+                                        form.delPg(style="display: inline-block;margin-right:10px;")
                                             input(type="hidden", name="pageGroupId", value="#{pagegroup.id}")
                                             button.delete-pagegroup(title="Delete")
                                                 i.fa.fa-trash

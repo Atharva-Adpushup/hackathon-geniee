@@ -7,7 +7,7 @@
         .col-sm-6
             .mb-30
                 .controlAdpushupWrap
-                    if site.channels.length
+                    if !site.isManual
                         h3.title.m-All-0.clearfix
                             a.pull-left(id="site-report-" + siteId, target='_blank').
                                 #{utils.domanize(site.domain)} - #{siteId}
@@ -25,6 +25,10 @@
                                             a(title="View site pagegroups" href='/user/site/#{siteId}/pagegroups') 
                                                 i.fa.fa-th-list
                                                 |  PageGroups  
+                                        li
+                                            a(title="Open AMP Settings" href='/user/site/#{siteId}/ampSettings') 
+                                                i.fa.fa-th-list
+                                                |  AMP Settings  
                                         li
                                             a(title="Open site settings" href='/user/site/#{siteId}/settings') 
                                                 i.fa.fa-cog
@@ -172,13 +176,21 @@
                             a.pull-left(id="site-report-" + siteId).
                                 #{utils.domanize(site.domain)} - #{siteId}
                             .pull-right
-                                a.btn.btn-lightBg.btn-default.u-margin-r10px(id=("operation-tools-"+ siteId) , href=operationToolsPath, target="_blank") Convert Ad Code
-                                a.btn.btn-lightBg.btn-default(id="site-create-pagegroup-" + siteId, href='/user/site/#{siteId}/createPagegroup') Create PageGroup
+                                //- a.btn.btn-lightBg.btn-default.u-margin-r10px(id=("operation-tools-"+ siteId) , href=operationToolsPath, target="_blank") Convert Ad Code
+                                //- a.btn.btn-lightBg.btn-default(id="site-create-pagegroup-" + siteId, href='/user/site/#{siteId}/createPagegroup') Create PageGroup
+                                a.btn.btn-lightBg.btn-default(id="site-tag-manager-" + siteId, href='/tagmanager/#{siteId}') Tags Manager
                         section
                             .site-status
-                                h4
-                                    i.fa.fa-exclamation-circle 
-                                    | Setup Incomplete
-                                .status-text Page Group not found! Please 
-                                    a(href="/user/site/#{siteId}/createPagegroup") create
-                                    |  one to access the visual editor.
+                                //- h4
+                                //-     i.fa.fa-exclamation-circle 
+                                //-     | Setup Incomplete
+                                .status-text(style="margin: 0;") Tags report snapshot will come here.
+                                    //- Page Group not found! Please 
+                                    //- a(href="/user/site/#{siteId}/createPagegroup") create
+                                    //- |  one to access the visual editor.
+                    //- if isSuperUser  
+                    //-     .mode-setting
+                    //-         span.label Manual Mode
+                    //-         .toggle-switch
+                    //-             input(type="checkbox" id="switch-#{siteId}" checked=site.isManual ? true : undefined)
+                    //-             label(for="switch-#{siteId}" data-id="switch-#{siteId}" data-site-id="#{siteId}")

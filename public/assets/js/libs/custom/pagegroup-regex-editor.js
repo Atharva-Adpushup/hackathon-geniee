@@ -1,78 +1,70 @@
 // Pagegroup editing client-side module script
 
-$(document).ready(function () {
-    (function (w, d) {
+$(document).ready(function() {
+	(function(w, d) {
+		$('form').on('submit', function(e) {
+			e.preventDefault();
+			var toMatchInputs = $('input.to-match'),
+				toNotMatchInputs = $('input.to-not-match'),
+				toMatch = [],
+				toNotMatch = [];
 
-        // Pagegroup editing module object
-        var editModule = {
-            completeRegex: null,
-            isNotEmpty: function(value) {
-                return value && value.trim().length > 0;
-            },
-            updateUI: function() {
-                var editBox = $('#edit-box'),
-                    outputBox = $('#output-box'),
-                    individualComponentsBox = $('#individual-components'),
-                    completeRegex = $('#complete-regex'),
-                    editBtn = $('#edit-btn-box');
+			$.each(toMatchInputs, function(key, input) {
+				let url = input.value.trim();
+				url.length ? toMatch.push(url) : null;
+			});
+			$.each(toNotMatchInputs, function(key, input) {
+				let url = input.value.trim();
+				url.length ? toNotMatch.push(url) : null;
+			});
+			if (!toMatch.length) {
+				alert('No url found');
+				return;
+			}
+			$.ajax({
+				method: 'POST',
+				url: '/user/site/' + window.siteId + '/settings/regexGenerator',
+				headers: { 'Content-Type': 'application/json' },
+				data: JSON.stringify({
+					toMatch: toMatch,
+					toNotMatch: toNotMatch
+				}),
+				contentType: 'json',
+				dataType: 'json',
+				success: function(response) {
+					var output = response.error ? response.message : response.regex,
+						outputBox = $('#output-box > pre'),
+						toShow = '<p';
 
-                    completeRegex.html(editModule.completeRegex);
-                    editBox.addClass('hidden');
-                    individualComponentsBox.addClass('hidden');
-                    editBtn.addClass('hidden');
-                    outputBox.removeClass('hidden');
-            },
-            generateNewRegex: function(protocol, w, domainName, pathArray, query) {
-                // if(editModule.isNotEmpty(protocol)) {
-                //     editModule.completeRegex = protocol;
-                // }
-                // if(editModule.isNotEmpty(w)) {
-                //     editModule.completeRegex = editModule.completeRegex + w;
-                // }
-                // if(editModule.isNotEmpty(domainName)) {
-                //     editModule.completeRegex = editModule.completeRegex + domainName;
-                // }
-                if(pathArray.length > 0) {
-                    editModule.completeRegex = '\\/';
-                    pathArray.each(function(p) {
-                        var pathValue = $(pathArray[p]).val();
-                        if(editModule.isNotEmpty(pathValue)) {
-                            editModule.completeRegex = editModule.completeRegex + pathValue;
-                        }
-                    });
-                }
-                if(editModule.isNotEmpty(query)) {
-                    editModule.completeRegex = editModule.completeRegex + query;
-                }
-                if(editModule.isNotEmpty(editModule.completeRegex)) {
-                    editModule.completeRegex = editModule.completeRegex + '$';
-                    editModule.updateUI();
-                }
-            }
-        };
+					toShow += response.error ? ' class="error-text">' : '>';
+					toShow += output + '</p>';
 
-        // save trigger
-        $('#save-regex').on('click', function(e) {
-            e.preventDefault();
-            var editBox = $('#edit-box'),
-                pathInputFields = $('input[data-id="path-value"]'),
-                protocolValue = $('input[data-id="protocol"]').val(),
-                wValue = $('input[data-id="w"]').val(),
-                domainValue = $('input[data-id="domain"]').val(),
-                queryValue = $('input[data-id="query"]').val();
-
-            editModule.generateNewRegex(protocolValue, wValue, domainValue, pathInputFields, queryValue);
-        });
-
-        // edit trigger
-        $('#edit-regex').on('click', this, function(e) {
-            e.preventDefault();
-            var outputBox = $('#output-box'),
-                editBox = $('#edit-box');
-
-                outputBox.addClass('hidden');
-                editBox.removeClass('hidden');
-        });
-
-    })(window, document);
+					if (!response.error) {
+						toShow += '<div class="additional-info matched-urls"><h3>Matched Urls</h3>';
+						if (response.matchedUrls) {
+							$.each(response.matchedUrls, function(key, url) {
+								toShow += '<p>' + url + '</p>';
+							});
+						} else {
+							toShow += 'Nothing here!';
+						}
+						toShow += '</div><div class="additional-info not-matched-urls"><h3>Not Matched Urls</h3>';
+						if (response.notMatchedUrls) {
+							$.each(response.notMatchedUrls, function(key, url) {
+								toShow += '<p>' + url + '</p>';
+							});
+						} else {
+							toShow += 'Nothing here!';
+						}
+						toShow += '</div>';
+					}
+					outputBox.html(toShow);
+					$('#output-box').fadeIn();
+				},
+				error: function() {
+					alert('Something went wrong');
+				}
+			});
+		});
+	})(window, document);
 });

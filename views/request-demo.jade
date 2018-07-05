@@ -87,11 +87,11 @@ block append headScripts
 			}
 		}
 
-		(function() {
-			var lc = document.createElement('script'); lc.type = 'text/javascript'; lc.async = true;
-			lc.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdn.livechatinc.com/tracking.js';
-			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(lc, s);
-		})();
+		//- (function() {
+		//- 	var lc = document.createElement('script'); lc.type = 'text/javascript'; lc.async = true;
+		//- 	lc.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdn.livechatinc.com/tracking.js';
+		//- 	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(lc, s);
+		//- })();
 	
 
 block bodyContent
@@ -126,7 +126,7 @@ block bodyContent
 						| in RPM.
 					h3(style="margin: 40px 0 10px; font-weight: bold;") Schedule a call with us to activate your account
 					ul
-						li.active(data-id="TemFBoDWjZw" class="livechat_button") Live chat now
+						//- li.active(data-id="TemFBoDWjZw" class="livechat_button") Live chat now
 						//- div(data-id="TemFBoDWjZw" class="livechat_button")
 						//- 	a(href="https://www.livechatinc.com/customer-service/?partner=lc_6965991&amp;utm_source=chat_button") Speak Now
 						li(onclick=onClickHandler) Schedule Later

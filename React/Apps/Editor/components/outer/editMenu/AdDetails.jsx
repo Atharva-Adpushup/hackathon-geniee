@@ -2,19 +2,26 @@ import React, { Component } from 'react';
 import { Row, Col, OverlayTrigger, Tooltip, Button, PageHeader } from 'react-bootstrap';
 import InlineEdit from 'shared/inlineEdit/index.jsx';
 import DockedSettings from './dockedSettings.jsx';
+import TriggerSettings from './triggerSettings.jsx';
+import { typeOfAds } from '../../../consts/commonConsts';
+
 class AdDetails extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			editDock: false
+			editDock: false,
+			editTrigger: false
 		};
 		this.renderXPathAndCSS = this.renderXPathAndCSS.bind(this);
 		this.renderSectionName = this.renderSectionName.bind(this);
 		this.renderNetworkDetails = this.renderNetworkDetails.bind(this);
 		this.renderEventData = this.renderEventData.bind(this);
 		this.genieeOptions = this.genieeOptions.bind(this);
-		this.renderDockedButton = this.renderDockedButton.bind(this);
-		this.editDockSettings = this.editDockSettings.bind(this);
+		this.toggleHandler = this.toggleHandler.bind(this);
+		this.renderButton = this.renderButton.bind(this);
+		this.renderContent = this.renderContent.bind(this);
+		// this.renderDockedButton = this.renderDockedButton.bind(this);
+		// this.editDockSettings = this.editDockSettings.bind(this);
 		this.renderAdCode = this.renderAdCode.bind(this);
 		this.renderCommonDetails = this.renderCommonDetails.bind(this);
 	}
@@ -82,18 +89,25 @@ class AdDetails extends Component {
 		);
 	}
 
-	renderCommonDetails(fpKey, priceFloor, headerBidding, title) {
+	renderCommonDetails(fpKey, priceFloor, headerBidding, title, showPfDetails = true) {
+		let toShow = window.isGeniee && window.gcfg.uud ? true : !window.isGeniee;
 		return (
 			<div>
-				<p>
-					PF Key : <strong>{fpKey}</strong>
-				</p>
-				<p>
-					Price Floor : <strong>{priceFloor}</strong>
-				</p>
-				<p>
-					{title}: <strong>{headerBidding}</strong>
-				</p>
+				{showPfDetails ? (
+					<div>
+						<p>
+							PF Key : <strong>{fpKey}</strong>
+						</p>
+						<p>
+							Price Floor : <strong>{priceFloor}</strong>
+						</p>
+					</div>
+				) : null}
+				{toShow ? (
+					<p>
+						{title}: <strong>{headerBidding}</strong>
+					</p>
+				) : null}
 			</div>
 		);
 	}
@@ -175,7 +189,13 @@ class AdDetails extends Component {
 				) : ad.network == 'geniee' ? (
 					<div>
 						<div>
-							{this.renderCommonDetails(fpKey, priceFloor, dynamicAllocation, 'Dynamic Allocation')}
+							{this.renderCommonDetails(
+								fpKey,
+								priceFloor,
+								dynamicAllocation,
+								'Dynamic Allocation',
+								false
+							)}
 						</div>
 						{/* <div>{this.genieeOptions(position, firstFold, zoneId)}</div> */}
 						<div>{this.renderAdCode(adCode)}</div>
@@ -187,21 +207,37 @@ class AdDetails extends Component {
 		);
 	}
 
-	editDockSettings() {
-		this.setState({ editDock: !this.state.editDock }, () => {
+	toggleHandler(name) {
+		this.setState({ [name]: !this.state[name] }, () => {
 			this.props.toggleDeleteButton ? this.props.toggleDeleteButton() : null;
 		});
 	}
 
-	renderDockedButton() {
+	renderButton(text, handler) {
 		return (
-			<Col xs={8} xsPush={4} style={{ paddingRight: '0px' }}>
-				<Button className="btn-lightBg btn-edit btn-block" onClick={this.editDockSettings}>
-					Ad Docked Settings
+			<Col xs={6} style={{ padding: '0px' }}>
+				<Button className="btn-lightBg btn-block" onClick={handler}>
+					{text}
 				</Button>
 			</Col>
 		);
 	}
+
+	// editDockSettings() {
+	// 	this.setState({ editDock: !this.state.editDock }, () => {
+	// 		this.props.toggleDeleteButton ? this.props.toggleDeleteButton() : null;
+	// 	});
+	// }
+
+	// renderDockedButton() {
+	// 	return (
+	// 		<Col xs={6} style={{ padding: '0px' }}>
+	// 			<Button className="btn-lightBg btn-block" onClick={this.editDockSettings}>
+	// 				Docked Settings
+	// 			</Button>
+	// 		</Col>
+	// 	);
+	// }
 
 	renderEventData() {
 		const { section, ad } = this.props;
@@ -234,12 +270,42 @@ class AdDetails extends Component {
 		);
 	}
 
+	renderContent() {
+		if (this.state.editDock) {
+			return <DockedSettings {...this.props} onCancel={this.toggleHandler.bind(null, 'editDock')} />;
+		} else if (this.state.editTrigger) {
+			return <TriggerSettings {...this.props} onCancel={this.toggleHandler.bind(null, 'editTrigger')} />;
+		} else {
+			return (
+				<div>
+					{this.props.ad.network ? (
+						<div>
+							<div>
+								{!this.props.fromPanel ? this.renderSectionName() : null}
+								{this.renderNetworkDetails()}
+							</div>
+							{!this.props.fromPanel ? this.renderXPathAndCSS() : null}
+						</div>
+					) : null}
+					{this.props.showEventData ? this.renderEventData() : null}
+					{!this.props.section.isIncontent && this.props.section.type != typeOfAds.INTERACTIVE_AD ? (
+						<div>
+							{this.renderButton('Docked Settings', this.toggleHandler.bind(null, 'editDock'))}
+							{/* {this.renderButton('Trigger Settings', this.toggleHandler.bind(null, 'editTrigger'))} */}
+						</div>
+					) : null}
+				</div>
+			);
+		}
+	}
+
 	render() {
-		const { fromPanel, showEventData, ad } = this.props;
+		// const { fromPanel, showEventData, ad } = this.props;
 		return (
 			<div id="ad-details">
-				{this.state.editDock ? (
-					<DockedSettings {...this.props} onCancel={this.editDockSettings} />
+				{this.renderContent()}
+				{/* {this.state.editDock ? (
+					<DockedSettings {...this.props} onCancel={this.toggleHandler.bind(null, 'editDock')} />
 				) : (
 					<div>
 						{ad.network ? (
@@ -252,11 +318,14 @@ class AdDetails extends Component {
 							</div>
 						) : null}
 						{showEventData ? this.renderEventData() : null}
-						{!this.props.section.isIncontent && this.props.section.type != 3
-							? this.renderDockedButton()
-							: null}
+						{!this.props.section.isIncontent && this.props.section.type != typeOfAds.INTERACTIVE_AD ? (
+							<div>
+								{this.renderButton('Docked Settings', this.toggleHandler.bind(null, 'editDock'))}
+								{this.renderButton('Trigger Settings', this.toggleHandler.bind(null, 'editTrigger'))}
+							</div>
+						) : null}
 					</div>
-				)}
+				)} */}
 			</div>
 		);
 	}

@@ -159,22 +159,15 @@ function setSessionData(user, req, res, type) {
 
 		if (type == 1 && userPasswordMatch == 1) {
 			// Sign Up
-
 			if (isRequestDemo) {
 				return requestDemoRedirection(res);
 			}
-
-			return res.redirect('/user/onboarding');
 		} else if (type == 2 && userPasswordMatch == 1) {
 			// Login
-			if (parseInt(user.get('revenueLowerLimit')) == 0 || parseInt(user.get('revenueUpperLimit')) < 1000) {
-				if (req.session.isSuperUser || !isRequestDemo) {
-					allowEntry = 1;
-				} else {
-					redirectPath = 'thank-you';
-				}
-			} else {
+			if (req.session.isSuperUser || !isRequestDemo) {
 				allowEntry = 1;
+			} else {
+				redirectPath = 'thank-you';
 			}
 			if (allowEntry) {
 				var allUserSites = user.get('sites');
@@ -202,9 +195,9 @@ function setSessionData(user, req, res, type) {
 									!step
 								);
 
-							if (isRequestDemo && isIncompleteOnboardingSteps) {
-								return requestDemoRedirection(res);
-							}
+							// if (isRequestDemo && isIncompleteOnboardingSteps) {
+							// 	return requestDemoRedirection(res);
+							// }
 
 							if (isIncompleteOnboardingSteps) {
 								return res.redirect('/user/onboarding');
@@ -212,11 +205,12 @@ function setSessionData(user, req, res, type) {
 							if (req.session.isSuperUser) {
 								return res.redirect('/user/dashboard');
 							}
-							if (!user.get('requestDemo')) {
-								return res.redirect('/user/dashboard');
-							} else {
-								return res.redirect('/thankyou');
-							}
+							return res.redirect('/user/dashboard');
+							// if (!user.get('requestDemo')) {
+							// 	return res.redirect('/user/dashboard');
+							// } else {
+							// 	return res.redirect('/thankyou');
+							// }
 						} else {
 							return res.redirect('/user/dashboard');
 						}
@@ -238,7 +232,6 @@ function setSessionData(user, req, res, type) {
 								if (isRequestDemo) {
 									return requestDemoRedirection(res);
 								}
-
 								return res.redirect('/user/onboarding');
 							}
 						}
@@ -296,13 +289,14 @@ function preOnboardingPageRedirection(page, req, res) {
 		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = primarySiteDetails.pipeDrive.dealTitle;
 	}
 
-	if (isNotSuperUser) {
-		// Only user sub object is deleted, not the entire session object.
-		// This is done to ensure session object is maintained and consist of
-		// user primary site details that are used on open routes pages
-		// such as '/tools' and '/thank-you' pages
-		delete req.session.user;
-	}
+	// Commmented for Tag Manager
+	// if (isNotSuperUser) {
+	// Only user sub object is deleted, not the entire session object.
+	// This is done to ensure session object is maintained and consist of
+	// user primary site details that are used on open routes pages
+	// such as '/tools' and '/thank-you' pages
+	// 	delete req.session.user;
+	// }
 
 	return res.render(page, {
 		user: userObj,
@@ -332,16 +326,19 @@ router
 							};
 							req.session.primarySiteDetails = primarySiteDetails;
 
-							if (parseInt(user.data.revenueUpperLimit) <= consts.onboarding.revenueLowerBound) {
-								// thank-you --> Page for below threshold users
-								req.session.stage = 'Pre Onboarding';
-								return res.redirect('/thank-you');
-							} else {
-								/*
-										Users with revenue > 1,000
-									*/
-								return setSessionData(user, req, res, 1);
-							}
+							return setSessionData(user, req, res, 1);
+
+							// Commented for Tag Manager
+							// if (parseInt(user.data.revenueUpperLimit) <= consts.onboarding.revenueLowerBound) {
+							// 	// thank-you --> Page for below threshold users
+							// 	req.session.stage = 'Pre Onboarding';
+							// 	return res.redirect('/thank-you');
+							// } else {
+							// 	/* Users with revenue > 1,000 */
+							// 	return setSessionData(user, req, res, 1);
+							// }
+
+							// This was commented before Tag Manager
 							// else if (parseInt(user.data.revenueUpperLimit) > 10000) {
 							// 	// thank-you --> Page for above threshold users
 							// 	req.session.stage = 'Pre Onboarding';
@@ -369,6 +366,23 @@ router
 	})
 	.get('/403', function(req, res) {
 		res.render('403');
+	})
+	.post('/completeInfo', function(req, res) {
+		const email = req.body && req.body.email ? req.body.email : false,
+			key = req.body && req.body.key ? req.body.key : false;
+
+		if (email && key) {
+			return userModel
+				.getUserByEmail(email)
+				.then(user => {
+					user.set(key, true);
+					req.session.user[key] = true;
+					return user.save();
+				})
+				.then(() => res.sendStatus(200))
+				.catch(err => res.sendStatus(400));
+		}
+		return res.sendStatus(400);
 	})
 	.post('/login', function(req, res) {
 		req.body.email = utils.sanitiseString(req.body.email);

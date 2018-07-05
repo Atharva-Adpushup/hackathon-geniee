@@ -11,7 +11,7 @@ var express = require('express'),
 	CouchbaseStore = require('connect-couchbase')(session),
 	config = require('./configs/config'),
 	consts = require('./configs/commonConsts'),
-	{ languageSupport } = require('./i18n/language-mapping'),
+	languageSupport = require('./i18n/language-mapping'),
 	utils = require('./helpers/utils'),
 	couchBaseService = require('./helpers/couchBaseService'),
 	woodlotMiddlewareLogger = require('woodlot').middlewareLogger,
@@ -141,10 +141,9 @@ couchBaseService
 			app.locals.partner = req.session.partner ? req.session.partner : null;
 			// unSavedSite, template local for showing unsaved site
 			// prefilled in 'Add a site' modal's url field
-			app.locals.unSavedSite =
-				Array.isArray(req.session.unSavedSite) && req.session.unSavedSite.length > 0
-					? req.session.unSavedSite
-					: '';
+			app.locals.unSavedSite = Array.isArray(req.session.unSavedSite) && req.session.unSavedSite.length > 0
+				? req.session.unSavedSite
+				: '';
 			next();
 		});
 		app.locals.utils = utils;

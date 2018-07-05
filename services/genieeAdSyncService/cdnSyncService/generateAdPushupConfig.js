@@ -1,9 +1,14 @@
-let ADPTags = [],
-	finalJson = {};
+let ADPTags = [], finalJson = {};
 const _ = require('lodash'),
 	AdPushupError = require('../../../helpers/AdPushupError'),
 	{ ERROR_MESSAGES } = require('../../../configs/commonConsts'),
-	{ promiseForeach } = require('node-utils'),
+	config = require('../../../configs/config'),
+	{ promiseForeach, couchbaseService } = require('node-utils'),
+	appBucket = couchbaseService(
+		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
+		config.couchBase.DEFAULT_BUCKET,
+		config.couchBase.DEFAULT_BUCKET_PASSWORD
+	),
 	isAdSynced = ad => {
 		if (!ad.network || !ad.networkData) {
 			return false;
@@ -18,7 +23,20 @@ const _ = require('lodash'),
 		}
 		return false;
 	},
-	getSectionsPayload = function(variationSections) {
+	pushToAdpTags = function(ad, json) {
+		if (ad.network == 'adpTags' || (ad.network == 'geniee' && ad.networkData.dynamicAllocation)) {
+			ADPTags.push({
+				key: `${json.width}x${json.height}`,
+				height: json.height,
+				width: json.width,
+				dfpAdunit: ad.networkData.dfpAdunit,
+				dfpAdunitCode: ad.networkData.dfpAdunitCode,
+				headerBidding: ad.networkData.headerBidding,
+				keyValues: ad.networkData.keyValues
+			});
+		}
+	},
+	getSectionsPayload = function(variationSections, platform, pagegroup) {
 		var ads = [],
 			ad = null,
 			json,
@@ -31,7 +49,13 @@ const _ = require('lodash'),
 
 			//In case if even one ad inside variation is unsynced then we don't generate JS as unsynced ads will have no impression and hence loss of revenue'
 			if (!isAdSynced(ad)) {
-				throw new AdPushupError(ERROR_MESSAGES.MESSAGE.UNSYNCED_SETUP);
+				throw new AdPushupError({
+					message: ERROR_MESSAGES.MESSAGE.UNSYNCED_SETUP,
+					ad: ad,
+					sectionId: sectionId,
+					platform: platform || 'Not Present',
+					pagegroup: pagegroup || 'Not Present'
+				});
 			}
 
 			json = {
@@ -55,6 +79,9 @@ const _ = require('lodash'),
 				if (ad.secondaryCss) {
 					json.secondaryCss = ad.secondaryCss;
 				}
+				if (ad.customCSS) {
+					json.customCSS = ad.customCSS;
+				}
 				if (section.notNear) {
 					json.notNear = section.notNear;
 				}
@@ -65,17 +92,8 @@ const _ = require('lodash'),
 				});
 			}
 			//for geniee provide networkData
-			if (ad.network == 'adpTags' || (ad.network == 'geniee' && ad.networkData.dynamicAllocation)) {
-				ADPTags.push({
-					key: `${json.width}x${json.height}`,
-					height: json.height,
-					width: json.width,
-					dfpAdunit: ad.networkData.dfpAdunit,
-					dfpAdunitCode: ad.networkData.dfpAdunitCode,
-					headerBidding: ad.networkData.headerBidding,
-					keyValues: ad.networkData.keyValues
-				});
-			}
+			pushToAdpTags(ad, json);
+
 			//Sending whole network data object in ad.
 			json.networkData = ad.networkData;
 
@@ -85,7 +103,7 @@ const _ = require('lodash'),
 		return ads;
 	},
 	getVariationPayload = (variation, platform, pageGroup, variationData, finalJson) => {
-		var ads = getSectionsPayload(variation.sections),
+		var ads = getSectionsPayload(variation.sections, platform, pageGroup),
 			computedVariationObj,
 			contentSelector = variation.contentSelector,
 			isContentSelector = !!contentSelector;
@@ -105,8 +123,9 @@ const _ = require('lodash'),
 			personalization: variation.personalization,
 			// Data required for auto optimiser model
 			// Page revenue is mapped as sum
-			sum:
-				variationData && parseFloat(variationData.pageRevenue) > -1 ? Math.floor(variationData.pageRevenue) : 1,
+			sum: variationData && parseFloat(variationData.pageRevenue) > -1
+				? Math.floor(variationData.pageRevenue)
+				: 1,
 			// Data required for auto optimiser model
 			// Page view is mapped as count
 			count: variationData && parseInt(variationData.pageViews, 10) > -1 ? Math.floor(variationData.pageViews) : 1
@@ -141,7 +160,8 @@ const _ = require('lodash'),
 			variations: [],
 			contentSelector: channel.contentSelector,
 			pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup),
-			hasVariationsWithNoData: false
+			hasVariationsWithNoData: false,
+			ampSettings: channel.ampSettings ? { isEnabled: channel.ampSettings.isEnabled } : { isEnabled: false }
 		};
 
 		_.each(channel.variations, (variation, id) => {
@@ -149,10 +169,10 @@ const _ = require('lodash'),
 			let variationPayload = getVariationPayload(variation, platform, pageGroup, variationData, finalJson);
 			if (typeof variationPayload == 'object' && Object.keys(variationPayload).length) {
 				finalJson[platform][pageGroup].variations.push(variationPayload);
-				finalJson[platform][pageGroup].hasVariationsWithNoData =
-					finalJson[platform][pageGroup].hasVariationsWithNoData == false
-						? variationData == null ? true : false
-						: finalJson[platform][pageGroup].hasVariationsWithNoData;
+				finalJson[platform][pageGroup].hasVariationsWithNoData = finalJson[platform][pageGroup]
+					.hasVariationsWithNoData == false
+					? variationData == null ? true : false
+					: finalJson[platform][pageGroup].hasVariationsWithNoData;
 			}
 		});
 		if (!Object.keys(finalJson[platform][pageGroup].variations).length) {
@@ -163,6 +183,16 @@ const _ = require('lodash'),
 			});
 		}
 		return finalJson;
+	},
+	getManualAds = site => {
+		const siteId = site.get('siteId');
+		return appBucket
+			.getDoc(`tgmr::${siteId}`)
+			.then(docWithCas => {
+				const ads = docWithCas.value.ads.filter(ad => !ad.hasOwnProperty('isActive') || ad.isActive);
+				return ads;
+			})
+			.catch(err => Promise.reject(new Error(`Error fetching tgmr doc for ${siteId}`)));
 	},
 	generatePayload = (site, pageGroupData) => {
 		//Empty finaJson and dfpAunits
@@ -179,7 +209,18 @@ const _ = require('lodash'),
 					err => false
 				)
 			)
-			.then(() => [finalJson, ADPTags]);
+			.then(() => {
+				if (site.get('isManual')) {
+					return getManualAds(site);
+				}
+				return Promise.resolve();
+			})
+			.then(manualAds => {
+				_.map(manualAds, ad => {
+					pushToAdpTags(ad, ad);
+				});
+				return [finalJson, ADPTags, manualAds];
+			});
 	};
 
 module.exports = generatePayload;

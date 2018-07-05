@@ -81,6 +81,12 @@ const sectionByIds = (state = {}, action) => {
 				[action.sectionId]: { ...state[action.sectionId], xpath: action.xpath, allXpaths: [], error: false }
 			};
 
+		case sectionActions.UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD:
+			return {
+				...state,
+				[action.sectionId]: { ...state[action.sectionId], minDistanceFromPrevAd: action.minDistanceFromPrevAd }
+			};
+
 		case sectionActions.UPDATE_TYPE:
 			return {
 				...state,
@@ -90,7 +96,9 @@ const sectionByIds = (state = {}, action) => {
 					formatData:
 						action.type != state[action.sectionId].type
 							? {}
-							: !state[action.sectionId].formatData ? {} : state[action.sectionId].formatData
+							: !state[action.sectionId].formatData
+								? {}
+								: state[action.sectionId].formatData
 				}
 			};
 

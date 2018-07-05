@@ -2,6 +2,7 @@ var express = require('express'),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
 	_ = require('lodash'),
+	crypto = require('crypto'),
 	Promise = require('bluebird'),
 	uuid = require('node-uuid'),
 	request = require('request-promise'),
@@ -49,8 +50,8 @@ function dashboardRedirection(req, res, allUserSites, type) {
 		return _.map(allUserSites, function(obj) {
 			return siteModel
 				.getSiteById(obj.siteId)
-				.then(function() {
-					return obj;
+				.then(function(site) {
+					return Object.assign(obj, { isManual: site.get('isManual') || false });
 				})
 				.catch(function() {
 					return 'inValidSite';
@@ -59,8 +60,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 	}
 
 	return Promise.all(sitePromises()).then(function(validSites) {
-		var sites = _.difference(validSites, ['inValidSite']),
-			unSavedSite;
+		var sites = _.difference(validSites, ['inValidSite']), unSavedSite;
 
 		sites = Array.isArray(sites) && sites.length > 0 ? sites : [];
 		/**
@@ -70,6 +70,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 		 * no saved any site through Visual Editor
 		 * - Value is Falsy if user has atleast one saved site
 		 */
+
 		unSavedSite = sites.length === 0 ? allUserSites : null;
 		req.session.unSavedSite = unSavedSite;
 
@@ -78,11 +79,9 @@ function dashboardRedirection(req, res, allUserSites, type) {
 		let siteReports = [];
 
 		return Promise.each(sites, site =>
-			getWeeklyComparisionReport(site.siteId)
-				.then(data => siteReports.push(data))
-				.catch(() => {
-					return true;
-				})
+			getWeeklyComparisionReport(site.siteId).then(data => siteReports.push(data)).catch(() => {
+				return true;
+			})
 		)
 			.then(() => {
 				sites = _.map(sites, site => {
@@ -92,6 +91,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 						domain: site.domain,
 						siteId: site.siteId,
 						step: site.step,
+						isManual: site.isManual,
 						reportData
 					};
 				});
@@ -111,7 +111,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 						return res.render('dashboard', {
 							validSites: sites,
 							unSavedSite: unSavedSite,
-							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+							hasStep: sites.length ? 'step' in sites[0] ? true : false : false,
 							requestDemo: req.session.user.requestDemo,
 							imageHeaderLogo: true,
 							isSuperUser: req.session.isSuperUser
@@ -121,12 +121,13 @@ function dashboardRedirection(req, res, allUserSites, type) {
 						return res.render('onboarding', {
 							validSites: sites,
 							unSavedSite: unSavedSite,
-							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+							hasStep: sites.length ? 'step' in sites[0] ? true : false : false,
 							requestDemo: req.session.user.requestDemo,
 							analyticsObj: JSON.stringify(req.session.analyticsObj),
 							imageHeaderLogo: true,
 							buttonHeaderLogout: true,
-							isSuperUser: req.session.isSuperUser
+							isSuperUser: req.session.isSuperUser,
+							isOnboarding: true
 						});
 						break;
 				}
@@ -158,18 +159,14 @@ function preOnboardingPageRedirection(page, req, res) {
 			primarySiteStep
 		},
 		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser),
-		isPipeDriveDealId = !!(
-			isAnalyticsObj &&
+		isPipeDriveDealId = !!(isAnalyticsObj &&
 			primarySiteDetails &&
 			primarySiteDetails.pipeDrive &&
-			primarySiteDetails.pipeDrive.dealId
-		),
-		isPipeDriveDealTitle = !!(
-			isAnalyticsObj &&
+			primarySiteDetails.pipeDrive.dealId),
+		isPipeDriveDealTitle = !!(isAnalyticsObj &&
 			primarySiteDetails &&
 			primarySiteDetails.pipeDrive &&
-			primarySiteDetails.pipeDrive.dealTitle
-		);
+			primarySiteDetails.pipeDrive.dealTitle);
 
 	if (isPipeDriveDealId) {
 		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = primarySiteDetails.pipeDrive.dealId;
@@ -179,13 +176,14 @@ function preOnboardingPageRedirection(page, req, res) {
 		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = primarySiteDetails.pipeDrive.dealTitle;
 	}
 
-	if (isUserSession) {
-		// Only user sub object is deleted, not the entire session object.
-		// This is done to ensure session object is maintained and consist of
-		// user primary site details that are used on open routes pages
-		// such as '/tools' and '/thank-you' pages
-		delete req.session.user;
-	}
+	// Commented for Tag Manager
+	// if (isUserSession) {
+	// // Only user sub object is deleted, not the entire session object.
+	// // This is done to ensure session object is maintained and consist of
+	// // user primary site details that are used on open routes pages
+	// // such as '/tools' and '/thank-you' pages
+	// 	delete req.session.user;
+	// }
 
 	return res.render(page, {
 		imageHeaderLogo: true,
@@ -213,6 +211,9 @@ router
 		var allUserSites = req.session.user.sites;
 		return dashboardRedirection(req, res, allUserSites, 'onboarding');
 	})
+	.get('/onboarding-complete', function(req, res) {
+		return preOnboardingPageRedirection('onboarding-complete', req, res);
+	})
 	.get('/requestdemo', function(req, res) {
 		return preOnboardingPageRedirection('request-demo', req, res);
 	})
@@ -237,8 +238,7 @@ router
 			userModel
 				.getUserByEmail(req.session.user.email)
 				.then(function(user) {
-					var userSites = user.get('sites'),
-						userWebsiteRevenue = user.get('revenueUpperLimit');
+					var userSites = user.get('sites'), userWebsiteRevenue = user.get('revenueUpperLimit');
 					if (req.body.fromDashboard == 'false') {
 						user.set('preferredModeOfReach', req.body.modeOfReach);
 						if (
@@ -283,11 +283,23 @@ router
 			});
 	})
 	.get('/billing', function(req, res) {
-		res.render('billing', {
+		if (req.session.user.billingInfoComplete) {
+			return res.redirect('/user/dashboard');
+		}
+		return res.render('billing', {
 			user: req.session.user,
-			isSuperUser: true
+			isSuperUser: !!req.session.isSuperUser
 		});
 	})
+	// .get('/payment', function(req, res) {
+	// 	if (req.session.user.paymentInfoComplete) {
+	// 		return res.redirect('/user/dashboard');
+	// 	}
+	// 	return res.render('payment', {
+	// 		user: req.session.user,
+	// 		isSuperUser: !!req.session.isSuperUser
+	// 	});
+	// })
 	.get('/connectGoogle', function(req, res) {
 		return userModel
 			.getUserByEmail(req.session.user.email)
@@ -298,7 +310,7 @@ router
 						? {
 								pubId: adSenseData.adsenseAccounts[0].id,
 								email: adSenseData.userInfo.email
-						  }
+							}
 						: false,
 					siteId: req.session.siteId
 				});
@@ -308,8 +320,7 @@ router
 			});
 	})
 	.get('/addSite', function(req, res) {
-		var allUserSites = req.session.user.sites,
-			params = {};
+		var allUserSites = req.session.user.sites, params = {};
 		_.map(allUserSites, function(site) {
 			if (site.step == 1) {
 				params = {
@@ -370,8 +381,7 @@ router
 			userModel.setSitePageGroups(email).then(
 				function(user) {
 					req.session.user = user;
-					var allUserSites = user.get('sites'),
-						isRequestDemo = !!user.get('requestDemo');
+					var allUserSites = user.get('sites'), isRequestDemo = !!user.get('requestDemo');
 
 					function sitePromises() {
 						return _.map(allUserSites, function(obj) {
@@ -399,18 +409,19 @@ router
 								if (isIncompleteOnboardingSteps) {
 									return res.redirect('/user/onboarding');
 								}
-								if (!user.get('requestDemo')) {
-									return res.redirect('/user/dashboard');
-								} else {
-									return res.redirect('/thankyou');
-								}
+								return res.redirect('/user/dashboard');
+								// if (!user.get('requestDemo')) {
+								// 	return res.redirect('/user/dashboard');
+								// } else {
+								// 	return res.redirect('/thankyou');
+								// }
 							} else {
 								return res.redirect('/user/dashboard');
 							}
 						} else {
-							if (isRequestDemo) {
-								return requestDemoRedirection(res);
-							}
+							// if (isRequestDemo) {
+							// 	return requestDemoRedirection(res);
+							// }
 
 							return res.redirect('/user/onboarding');
 						}
@@ -508,7 +519,7 @@ router
 							'Sorry but it seems you have no AdSense account linked to your Google account.' +
 								'If this is a recently verified/created account, it might take upto 24 hours to come in effect.' +
 								'Please try again after sometime or contact support.'
-					  )
+						)
 					: res.send(err);
 			});
 		}
@@ -608,8 +619,7 @@ router
 						email.trim()
 					)
 					.then(function(user) {
-						var currentStatus = user.get('requestDemo'),
-							websiteRevenue = user.get('websiteRevenue');
+						var currentStatus = user.get('requestDemo'), websiteRevenue = user.get('websiteRevenue');
 
 						req.session.user = user;
 
@@ -802,8 +812,7 @@ router
 				return userModel.saveCredentials(credentials, req.session.user.email);
 			})
 			.then(function() {
-				var user = Array.prototype.slice.call(arguments)[0],
-					dataToSend = req.body;
+				var user = Array.prototype.slice.call(arguments)[0], dataToSend = req.body;
 				req.session.user = user;
 				dataToSend.commonRandomPassword = 'xxxxxxxxxx';
 				return res.render('credentials', { profileSaved: true, formData: req.body });
@@ -825,6 +834,7 @@ router
 				let adNetworkSettings = user.get('adNetworkSettings') || [];
 				adNetworkSettings[0] = adNetworkSettings[0] || {};
 				adNetworkSettings[0].pubId = req.body.pubId;
+				adNetworkSettings[0].networkName = adNetworkSettings[0].networkName || 'ADSENSE';
 				user.set('adNetworkSettings', adNetworkSettings);
 				return user.save();
 			})
@@ -832,6 +842,8 @@ router
 				req.session.user.adNetworkSettings = req.session.user.adNetworkSettings || [];
 				req.session.user.adNetworkSettings[0] = req.session.user.adNetworkSettings[0] || {};
 				req.session.user.adNetworkSettings[0].pubId = req.body.pubId;
+				req.session.user.adNetworkSettings[0].networkName =
+					req.session.user.adNetworkSettings[0].networkName || 'ADSENSE';
 				return res.send({
 					error: false
 				});
@@ -840,6 +852,37 @@ router
 				console.log(err.message);
 				return res.send({
 					error: true
+				});
+			});
+	})
+	.get('/payment', function(req, res) {
+		userModel
+			.getUserByEmail(req.session.user.email)
+			.then(function(user) {
+				var tipaltiConfig = config.tipalti,
+					tipaltiUrl = '',
+					tipaltiBaseUrl = tipaltiConfig.baseUrl,
+					email = user.get('email'),
+					payeeId = encodeURIComponent(crypto.createHash('md5').update(email).digest('hex').substr(0, 64)),
+					payer = tipaltiConfig.payerName,
+					date = Math.floor(+new Date() / 1000),
+					paramsStr =
+						'idap=' + payeeId + '&payer=' + payer + '&ts=' + date + '&email=' + encodeURIComponent(email),
+					key = tipaltiConfig.key,
+					hash = crypto.createHmac('sha256', key).update(paramsStr.toString('utf-8')).digest('hex'),
+					paymentHistoryUrl = tipaltiConfig.paymentHistoryUrl + paramsStr + '&hashkey=' + hash;
+
+				// date = Math.floor(date / 1000);
+				tipaltiUrl = tipaltiBaseUrl + paramsStr + '&hashkey=' + hash;
+				//tipaltiStatusCheck.checkStatus(req.session.user.email);
+				res.render('payment', {
+					tipaltiUrl: tipaltiUrl,
+					paymentHistoryUrl: paymentHistoryUrl
+				});
+			})
+			.catch(function(err) {
+				res.render('payment', {
+					error: 'Some error occurred!'
 				});
 			});
 	});

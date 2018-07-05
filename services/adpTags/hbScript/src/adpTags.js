@@ -21,7 +21,18 @@ var prebidSandbox = require('./prebidSandbox'),
 			inventory.hbConfig &&
 			Array.isArray(inventory.hbConfig.bidderAdUnits[size])
 		) {
-			bidders = inventory.hbConfig.bidderAdUnits[size] ? inventory.hbConfig.bidderAdUnits[size].pop() : null;
+			var overrideSize = size;
+			if (
+				optionalParam.overrideActive &&
+				optionalParam.overrideSizeTo &&
+				Array.isArray(inventory.hbConfig.bidderAdUnits[optionalParam.overrideSizeTo])
+			) {
+				overrideSize = optionalParam.overrideSizeTo;
+			}
+
+			bidders = inventory.hbConfig.bidderAdUnits[overrideSize]
+				? inventory.hbConfig.bidderAdUnits[overrideSize].pop()
+				: null;
 		}
 
 		if (availableSlots.length) {
@@ -110,6 +121,7 @@ var prebidSandbox = require('./prebidSandbox'),
 		adpSlots: {},
 		config: config,
 		que: [],
+		gptRefreshIntervals: [],
 		slotInterval: null,
 		adpBatches: [],
 		currentBatchAdpSlots: [],

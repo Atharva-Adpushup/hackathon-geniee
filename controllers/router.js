@@ -8,6 +8,7 @@ var indexController = require('./indexController'),
 	pageGroupController = require('./pageGroupController'),
 	authController = require('./authController'),
 	opsController = require('./opsController'),
+	tagManagerController = require('./tagManagerController'),
 	commonConsts = require('../configs/commonConsts'),
 	_ = require('lodash');
 
@@ -28,6 +29,26 @@ module.exports = function(app) {
 	// });
 
 	app.use(function(req, res, next) {
+		function isDifferentGenieeSiteId() {
+			const url = req.url,
+				sessionSiteId = Number(req.session.siteId),
+				sitePath = '/user/site/',
+				siteIdPathRegex = /^\/user\/site\/(\d{1,10})\//,
+				isSitePathInUrl = url.indexOf(sitePath) > -1,
+				regexMatcher = siteIdPathRegex.exec(url),
+				isValidMatch = !!(
+					isSitePathInUrl &&
+					regexMatcher &&
+					regexMatcher.constructor === Array &&
+					regexMatcher.length &&
+					regexMatcher.length === 2
+				),
+				matchedSiteId = isValidMatch ? Number(regexMatcher[1]) : 0,
+				isTrue = !!(matchedSiteId && sessionSiteId !== matchedSiteId);
+
+			return isTrue;
+		}
+
 		function isOpenRoute() {
 			return _.find(['/tools', '/user/reports/generate'], function(route) {
 				return req.url.indexOf(route) !== -1;
@@ -40,6 +61,7 @@ module.exports = function(app) {
 			return _.find(
 				[
 					'/ops',
+					'/tagManager',
 					'/user/site',
 					'/genieeApi',
 					'/user/connectGoogle',
@@ -57,8 +79,19 @@ module.exports = function(app) {
 				: false;
 		}
 
-		const isSessionInvalid = !!(!req.session || !req.session.user),
-			isOpenRouteValid = isOpenRoute();
+		const isSession = !!req.session,
+			isUserInSession = !!(isSession && req.session.user),
+			isSiteIdInSession = !!(isSession && req.session.siteId),
+			isAuthorisedURL = !!(isSession && isAuthorised()),
+			isSessionInvalid = !!(!req.session || !req.session.user),
+			isOpenRouteValid = isOpenRoute(),
+			isDifferentGenieeSite = !!(
+				isSession &&
+				isUserInSession &&
+				isSiteIdInSession &&
+				isAuthorisedURL &&
+				isDifferentGenieeSiteId()
+			);
 
 		if (isOpenRouteValid) {
 			return next();
@@ -75,6 +108,8 @@ module.exports = function(app) {
 				});
 				return;
 			}
+		} else if (isDifferentGenieeSite) {
+			return res.redirect('/403');
 		}
 		next();
 	});
@@ -135,6 +170,14 @@ module.exports = function(app) {
 			next();
 		},
 		opsController
+	);
+
+	app.use(
+		'/tagManager/',
+		function(req, res, next) {
+			next();
+		},
+		tagManagerController
 	);
 
 	/*****************Login URL's End *******************/

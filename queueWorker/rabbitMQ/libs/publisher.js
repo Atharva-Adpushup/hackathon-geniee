@@ -1,5 +1,6 @@
 const queueInstance = require('amqplib');
 const Promise = require('bluebird');
+const moment = require('moment');
 
 function Publisher(config) {
 	this.config = config;
@@ -8,12 +9,15 @@ function Publisher(config) {
 	this.offlineQueue = [];
 	this.publishMsg = function(queueName, msg, options) {
 		const me = this;
+		options = Object.assign({}, options, { mandatory: true });
 
 		return new Promise((resolve, reject) => {
 			if (me.connection && me.channel) {
+				console.log('Publishing now.. exchange : ' + me.config.exchange.name + ' queue : ' + queueName);
 				me.channel.publish(me.config.exchange.name, queueName, msg, options);
 				return resolve('done');
 			} else {
+				console.log('Job published to offline queue');
 				me.offlineQueue.push({ queueName, msg, options });
 				return reject(
 					'issue with rabbitmq connection or channel, messages queued up to be delivered on reconnection'
@@ -35,26 +39,73 @@ function Publisher(config) {
 			return Promise.resolve(me.connection);
 		}
 
-		return queueInstance.connect(me.config.url).then(function(conn) {
-			conn.on('close', function() {
-				me.connection = null;
-				me.channel = null;
-				me.connectRabbit(me.config.url);
-			});
-			me.connection = conn;
-
-			return me
-				.registerChannel(conn)
-				.then(function(ch) {
-					me.channel = ch;
-					return me.registerExchange(ch);
-				})
-				.then(me.registerQueues.bind(me))
-				.then(function() {
-					me.manageOfflineQueue();
-					return me.channel;
+		return queueInstance
+			.connect(me.config.url, { hearbeat: 20 })
+			.then(function(conn) {
+				conn.on('close', function() {
+					console.log(
+						`Publisher connection close event caught | Current Time : ${moment().format(
+							'dddd, MMMM Do YYYY, h:mm:ss a'
+						)}`
+					);
+					me.connection = null;
+					me.channel = null;
+					me.connectRabbit(me.config.url);
+					return;
 				});
-		});
+				conn.on('error', function() {
+					console.log(
+						`Publisher connection error event caught | Current Time : ${moment().format(
+							'dddd, MMMM Do YYYY, h:mm:ss a'
+						)}`
+					);
+					me.connection = null;
+					me.channel = null;
+					me.connectRabbit(me.config.url);
+					return;
+				});
+				me.connection = conn;
+
+				return me
+					.registerChannel(conn)
+					.then(function(ch) {
+						me.channel = ch;
+						ch.on('close', () => {
+							console.log(
+								`Publisher channel close event caught | Current Time : ${moment().format(
+									'dddd, MMMM Do YYYY, h:mm:ss a'
+								)}`
+							);
+							me.connection = null;
+							me.channel = null;
+							me.connectRabbit(me.config.url);
+							return;
+						});
+						ch.on('error', () => {
+							console.log(
+								`Publisher channel error event caught | Current Time : ${moment().format(
+									'dddd, MMMM Do YYYY, h:mm:ss a'
+								)}`
+							);
+							me.connection = null;
+							me.channel = null;
+							me.connectRabbit(me.config.url);
+							return;
+						});
+						ch.on('return', function(msg) {
+							console.warn('Returned message!');
+						});
+						return me.registerExchange(ch);
+					})
+					.then(me.registerQueues.bind(me))
+					.then(function() {
+						me.manageOfflineQueue();
+						return me.channel;
+					});
+			})
+			.catch(function(err) {
+				console.log(err);
+			});
 	};
 }
 

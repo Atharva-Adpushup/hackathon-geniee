@@ -2,6 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 // import ActionCard from '../../../Components/ActionCard.jsx';
 import { Row, Col } from 'react-bootstrap';
+import { DEFAULT_HB_CONFIG } from '../configs/commonConsts';
 import HbConfigCreator from './HbConfigCreator/index.jsx';
 import AdditionalOptions from './HbConfigCreator/AdditionalOptions.jsx';
 import {
@@ -21,14 +22,19 @@ class OpsPanel extends React.Component {
 		this.state = {
 			editMode: 'create',
 			loading: true,
+			errorMessage: null,
 			updateMessage: null,
-			hbConfig: {},
+			hbConfigString: JSON.stringify(DEFAULT_HB_CONFIG),
+			validated: false,
+			hbConfig: DEFAULT_HB_CONFIG,
 			additionalOptions: {}
 		};
 		this.fetchHbConfig = this.fetchHbConfig.bind(this);
 		this.saveHbConfig = this.saveHbConfig.bind(this);
 		this.additionalOptionsUpdated = this.additionalOptionsUpdated.bind(this);
 		this.updateGlobalHbConfig = this.updateGlobalHbConfig.bind(this);
+		this.hbConfigChange = this.hbConfigChange.bind(this);
+		this.vaidateHbConfig = this.vaidateHbConfig.bind(this);
 	}
 
 	componentDidMount() {
@@ -40,6 +46,7 @@ class OpsPanel extends React.Component {
 				this.setState({
 					editMode: 'update',
 					hbConfig: res.data.hbConfig.bidderAdUnits,
+					hbConfigString: JSON.stringify(res.data.hbConfig.bidderAdUnits, null, 4),
 					additionalOptions: res.data.hbConfig.additionalOptions,
 					loading: false
 				});
@@ -70,7 +77,7 @@ class OpsPanel extends React.Component {
 
 	saveHbConfig() {
 		const { state } = this,
-			hbConfig = temp ? temp : removeOptionsIndex(state.hbConfig),
+			hbConfig = temp ? temp : state.hbConfig,
 			payload = { editMode: state.editMode, hbConfig, additionalOptions: state.additionalOptions };
 
 		this.setState({ updateMessage: 'Saving...' });
@@ -84,13 +91,35 @@ class OpsPanel extends React.Component {
 				res => {
 					this.setState({ updateMessage: res.message });
 					setTimeout(() => {
-						this.setState({ updateMessage: '' });
+						this.setState({ updateMessage: '', editMode: 'update', validated: false });
 					}, 3000);
 				}
 			);
 		}
 		console.log(payload.hbConfig);
 		temp = null;
+	}
+
+	hbConfigChange(e) {
+		this.setState({ hbConfigString: e.target.value });
+	}
+
+	vaidateHbConfig() {
+		try {
+			const hbConfig = JSON.parse(this.state.hbConfigString);
+			this.setState({
+				errorMessage: null,
+				hbConfig,
+				validated: true,
+				updateMessage: 'JSON validation successfull!'
+			});
+		} catch (e) {
+			this.setState({
+				errorMessage: 'Error found in entered JSON, please check.',
+				validated: false,
+				updateMessage: ''
+			});
+		}
 	}
 
 	render() {
@@ -113,13 +142,22 @@ class OpsPanel extends React.Component {
 								</p>
 								{state.loading ? <div className="error-message">Loading...</div> : ''}
 								<div className="hb-options-wrapper">
-									<HbConfigCreator
+									{/* <HbConfigCreator
 										updateGlobalHbConfig={this.updateGlobalHbConfig}
 										hbConfig={loadHbConfigToPanel(state.hbConfig)}
 										partners={getActivePartners()}
 										adSizes={getSupportedAdSizes()}
 										saveHbConfigCallback={this.fetchHbConfig}
-									/>
+									/> */}
+									<Row>
+										<Col sm={6}>
+											<textarea
+												className="hb-config-input"
+												onChange={this.hbConfigChange}
+												value={state.hbConfigString}
+											/>
+										</Col>
+									</Row>
 								</div>
 							</Col>
 							<Col sm={12}>
@@ -128,9 +166,23 @@ class OpsPanel extends React.Component {
 									additionalOptionsCallback={this.additionalOptionsUpdated}
 								/>
 							</Col>
+							<Col sm={12}>
+								<div className="message-wrapper">
+									<div className="error-message">{state.errorMessage}</div>
+									<div style={{ color: '#14A314' }}>{state.updateMessage}</div>
+								</div>
+							</Col>
 							<Col sm={4}>
-								<div className="error-message">{state.updateMessage}</div>
-								<button className="btn btn-lightBg btn-default" onClick={this.saveHbConfig}>
+								<button className="btn btn-lightBg btn-default" onClick={this.vaidateHbConfig}>
+									Validate
+								</button>
+							</Col>
+							<Col sm={4}>
+								<button
+									disabled={state.errorMessage || !state.validated}
+									className="btn btn-lightBg btn-default"
+									onClick={this.saveHbConfig}
+								>
 									Save setup
 								</button>
 							</Col>
