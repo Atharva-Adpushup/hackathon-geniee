@@ -24,19 +24,19 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 	},
 	renderAd = interactiveAd => {
 		const type = interactiveAd.formatData.type,
-			adCode = generateAdCode(interactiveAd);
+			adCode = generateAdCode(interactiveAd),
+			{ value } = interactiveAd.formatData.eventData; // Value is the xpath
 
 		let parentNode = null;
 
 		switch (type) {
 			case commonConsts.FORMATS.STICKY.NAME:
-				parentNode = createParentNode('body', interactiveAd);
+				parentNode = createParentNode(value ? value : 'body', interactiveAd);
 				const sticky = new Sticky(parentNode, interactiveAd, adCode);
 				return sticky.render();
 
 			case commonConsts.FORMATS.VIDEO.NAME:
-				const { value } = interactiveAd.formatData.eventData, // Value is the xpath
-					{ css } = interactiveAd;
+				const { css } = interactiveAd;
 				parentNode = createParentNode(value, interactiveAd, css);
 				const video = new Video(parentNode, interactiveAd, adCode);
 				return video.render();

@@ -213,6 +213,10 @@ router
 		var json = { settings: req.body, siteId: req.params.siteId },
 			{ gdprCompliance, cookieControlConfig } = req.body;
 		gdprCompliance = gdprCompliance === 'false' ? false : true;
+		// Added default parameter check for below JSON.parse issue at line 224
+		if (!cookieControlConfig) {
+			cookieControlConfig = JSON.stringify({});
+		}
 
 		json.settings.pageGroupPattern = JSON.stringify(
 			_.groupBy(JSON.parse(json.settings.pageGroupPattern), pattern => {
