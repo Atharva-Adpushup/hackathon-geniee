@@ -3,6 +3,7 @@ import Menu from 'shared/menu/menu.jsx';
 import MenuItem from 'shared/menu/menuItem.jsx';
 import { commonSupportedSizes, nonPartnerAdSizes } from 'consts/commonConsts.js';
 import CodeBox from 'shared/codeBox';
+import MultipleAdSizeSelector from './multipleAdSizeSelector.jsx';
 import AdSizeSelector from './adSizeSelector.jsx';
 import SectionOptions from './sectionOptions.jsx';
 import ParentSelector from './parentSelector.jsx';
@@ -15,7 +16,9 @@ const initialState = {
 		operation: null,
 		activeItem: 0,
 		prevActiveItem: 0,
-		showExtraOptions: false
+		showNetworkOptions: false,
+		showMultipleAdSizesSelector: false,
+		multipleAdSizes: []
 	},
 	getInsertOptionClass = function(option) {
 		switch (option) {
@@ -35,8 +38,10 @@ class insertMenu extends React.Component {
 		super(props);
 		this.state = initialState;
 		this.createSectionAndAd = this.createSectionAndAd.bind(this);
-		this.toggleExtraOptions = this.toggleExtraOptions.bind(this);
+		this.toggleNetworkOptions = this.toggleNetworkOptions.bind(this);
+		this.toggleMultipleAdSizes = this.toggleMultipleAdSizes.bind(this);
 		this.networkOptionsSubmit = this.networkOptionsSubmit.bind(this);
+		this.multipleAdSizesSave = this.multipleAdSizesSave.bind(this);
 	}
 
 	componentWillMount() {
@@ -51,11 +56,25 @@ class insertMenu extends React.Component {
 		this.setState({ activeItem: item, prevActiveItem: this.state.activeItem });
 	}
 
-	toggleExtraOptions() {
+	toggleMultipleAdSizes() {
 		this.setState({
-			showExtraOptions: !this.state.showExtraOptions,
+			showMultipleAdSizesSelector: !this.state.showMultipleAdSizesSelector
+		});
+	}
+
+	toggleNetworkOptions() {
+		this.setState({
+			showNetworkOptions: !this.state.showNetworkOptions,
 			activeItem: this.state.prevActiveItem,
 			prevActiveItem: this.state.activeItem
+		});
+	}
+
+	multipleAdSizesSave(multipleAdSizes) {
+		this.setState({
+			multipleAdSizes,
+			showMultipleAdSizesSelector: false,
+			showNetworkOptions: true
 		});
 	}
 
@@ -64,22 +83,24 @@ class insertMenu extends React.Component {
 			adSize,
 			operation,
 			isCustomSize,
-			showExtraOptions: true,
+			showMultipleAdSizesSelector: true,
 			activeItem: 0,
 			prevActiveItem: this.state.activeItem
 		});
 	}
 
 	createSectionAndAd(params) {
-		const props = this.props;
+		const props = this.props,
+			multipleAdSizes = this.state.multipleAdSizes,
+			isMultipleAdSizes = !!(multipleAdSizes && multipleAdSizes.length);
 		let { position, adCode, firstFold, asyncTag, customZoneId, network, networkData } = params;
-		// let networkToSet = props.partner && props.partner === 'geniee' && !adCode ? 'geniee' : 'custom';
+
 		network = network ? network : 'custom';
 		const sectionPayload = {
 				position,
 				firstFold: firstFold || false,
 				asyncTag: asyncTag || false,
-				xpath: this.props.parents[0].xpath,
+				xpath: props.parents[0].xpath,
 				operation: this.state.operation,
 				customZoneId: customZoneId || ''
 			},
@@ -90,12 +111,16 @@ class insertMenu extends React.Component {
 				width: this.state.adSize.width,
 				networkData: {}
 			};
-		// customZoneId ? (adPayload.networkData = { zoneId: customZoneId }) : null;
+
+		if (isMultipleAdSizes) {
+			adPayload.multipleAdSizes = multipleAdSizes;
+		}
+
 		adPayload.networkData = {
 			...adPayload.networkData,
 			...networkData
 		};
-		this.props.createSectionAndAd(sectionPayload, adPayload, this.props.variationId);
+		props.createSectionAndAd(sectionPayload, adPayload, props.variationId);
 	}
 
 	enableNonPartnerAdSizes() {
@@ -115,13 +140,18 @@ class insertMenu extends React.Component {
 	}
 
 	render() {
-		const props = this.props;
+		const props = this.props,
+			isShowNetworkOptions = !!this.state.showNetworkOptions,
+			isShowMultipleAdSizesSelector = !!this.state.showMultipleAdSizesSelector,
+			isDefaultScreenValid = !!(!isShowMultipleAdSizesSelector && !isShowNetworkOptions),
+			isSecondScreenValid = !!(isShowMultipleAdSizesSelector && !isShowNetworkOptions),
+			isLastScreenValid = !!(!isShowMultipleAdSizesSelector && isShowNetworkOptions);
 		let items = [];
 		if (!props.isVisible) {
 			return null;
 		}
 
-		if (!this.state.showExtraOptions) {
+		if (isDefaultScreenValid) {
 			items = props.insertOptions.map((option, index) => (
 				<MenuItem key={index} icon={getInsertOptionClass(option)} contentHeading={option}>
 					<AdSizeSelector
@@ -137,13 +167,26 @@ class insertMenu extends React.Component {
 					/>
 				</MenuItem>
 			));
-		} else {
+		} else if (isSecondScreenValid) {
+			items.push(
+				<MenuItem key={1} icon="fa-mouse-pointer" contentHeading="Select Multiple Ad Sizes">
+					<MultipleAdSizeSelector
+						partner={props.partner}
+						adSizes={commonSupportedSizes}
+						primaryAdSize={this.state.adSize}
+						insertOption={this.state.option}
+						onSave={this.multipleAdSizesSave}
+						onCancel={this.toggleMultipleAdSizes}
+					/>
+				</MenuItem>
+			);
+		} else if (isLastScreenValid) {
 			items.push(
 				<MenuItem key={1} icon="fa-sitemap" contentHeading="Network Options">
 					<NetworkOptions
 						firstFold={props.firstFold}
 						onSubmit={this.networkOptionsSubmit}
-						onCancel={this.toggleExtraOptions}
+						onCancel={this.toggleNetworkOptions}
 						showNotification={this.props.showNotification}
 						isInsertMode={true}
 					/>
