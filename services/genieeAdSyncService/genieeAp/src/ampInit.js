@@ -17,9 +17,13 @@ var utils = require('../libs/utils'),
 		return false;
 	},
 	isPageGroupAmpEnabled = function isPageGroupAmpEnabled(config) {
-		var isConfig = config,
+		var ampPath = window.adpushup && window.adpushup.ampPath,
+			ampDomain = window.adpushup && window.adpushup.ampDomain,
+			isConfig = config,
 			experiment = isConfig && config.experiment,
 			isEnabled =
+				ampPath &&
+				ampDomain &&
 				experiment &&
 				experiment[config.platform] &&
 				experiment[config.platform][config.pageGroup] &&
@@ -31,11 +35,6 @@ var utils = require('../libs/utils'),
 module.exports = function(config) {
 	var blockedUrlMatched = isUrlInBlocklist(config),
 		isEnabled = isPageGroupAmpEnabled(config);
-	// console.group();
-	// console.log('config', config);
-	// console.log('blockedUrlMatched', blockedUrlMatched);
-	// console.log('isEnabled', isEnabled);
-	// console.groupEnd();
 	if (!ampInitCalled && !blockedUrlMatched && isEnabled) {
 		var randomNum = utils.getRandomNumberBetween(1, 100),
 			samplingPercent =
@@ -60,6 +59,6 @@ module.exports = function(config) {
 				'json',
 				'application/json'
 			);
-		ampInitCalled = true;
 	}
+	ampInitCalled = true;
 };
