@@ -1,4 +1,5 @@
-let ADPTags = [], finalJson = {};
+let ADPTags = [],
+	finalJson = {};
 const _ = require('lodash'),
 	AdPushupError = require('../../../helpers/AdPushupError'),
 	{ ERROR_MESSAGES } = require('../../../configs/commonConsts'),
@@ -24,8 +25,10 @@ const _ = require('lodash'),
 		return false;
 	},
 	pushToAdpTags = function(ad, json) {
+		const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
+
 		if (ad.network == 'adpTags' || (ad.network == 'geniee' && ad.networkData.dynamicAllocation)) {
-			ADPTags.push({
+			let adData = {
 				key: `${json.width}x${json.height}`,
 				height: json.height,
 				width: json.width,
@@ -33,7 +36,13 @@ const _ = require('lodash'),
 				dfpAdunitCode: ad.networkData.dfpAdunitCode,
 				headerBidding: ad.networkData.headerBidding,
 				keyValues: ad.networkData.keyValues
-			});
+			};
+
+			if (isMultipleAdSizes) {
+				adData.multipleAdSizes = ad.multipleAdSizes.map(object => [object.width, object.height]);
+			}
+
+			ADPTags.push(adData);
 		}
 	},
 	getSectionsPayload = function(variationSections, platform, pagegroup) {
@@ -68,6 +77,14 @@ const _ = require('lodash'),
 				height: parseInt(ad.height, 10),
 				width: parseInt(ad.width, 10)
 			};
+
+			// Add 'multipleAdSizes' property if exists
+			const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
+
+			if (isMultipleAdSizes) {
+				json.multipleAdSizes = ad.multipleAdSizes.map(object => [object.width, object.height]);
+			}
+
 			if (section.isIncontent) {
 				_.extend(json, {
 					isIncontent: true,
