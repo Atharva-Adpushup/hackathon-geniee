@@ -121,11 +121,10 @@ class PageGroupSettings extends React.Component {
 		);
 	}
 	parseFormData(ampData) {
-		let finalData = ampData;
+		let finalData = ampData, dataLinks = finalData.menu.links;
 		let ads = [], links = [];
-		for (let i = 0; i < finalData.menu['links'].length; i++) {
-			if (finalData.menu['links'][i]['name'] && finalData.menu['links'][i]['link'])
-				links.push(finalData.menu['links'][i]);
+		for (let i = 0; i < dataLinks.length; i++) {
+			if (dataLinks[i]['name'] && dataLinks[i]['link']) links.push(dataLinks[i]);
 		}
 		finalData['beforeJs'] = finalData['beforeJs'] ? btoa(finalData['beforeJs']) : '';
 		finalData['afterJs'] = finalData['afterJs'] ? btoa(finalData['afterJs']) : '';
@@ -135,7 +134,7 @@ class PageGroupSettings extends React.Component {
 			}
 		}
 		finalData.ads = ads;
-		finalData.menu['links'] = links;
+		finalData.menu.links = links;
 		return finalData;
 	}
 	saveChannelSettings(event) {
@@ -460,7 +459,7 @@ class PageGroupSettings extends React.Component {
 					<RowColSpan label="Delete Selector">
 						<textarea
 							name="toDelete"
-							value={this.state.toDelete}
+							value={this.state.toDelete || ''}
 							style={{ resize: 'auto' }}
 							onChange={e => {
 								let toDelete = this.state.toDelete, value = e.target.value.trim();
@@ -475,14 +474,14 @@ class PageGroupSettings extends React.Component {
 						<textarea
 							name="beforeJs"
 							style={{ resize: 'both', overflow: 'auto' }}
-							value={this.state.beforeJs}
+							value={this.state.beforeJs || ''}
 							onChange={this.handleOnChange}
 						/>
 					</RowColSpan>
 					<RowColSpan label="After JS">
 						<textarea
 							name="afterJs"
-							value={this.state.afterJs}
+							value={this.state.afterJs || ''}
 							onChange={this.handleOnChange}
 							style={{ resize: 'both', overflow: 'auto' }}
 						/>
@@ -490,19 +489,19 @@ class PageGroupSettings extends React.Component {
 					{this.renderInputControl({
 						label: 'Site Name',
 						name: 'siteName',
-						value: this.state.siteName,
+						value: this.state.siteName || '',
 						type: 'text'
 					})}
 					{this.renderInputControl({
 						label: 'Template',
 						name: 'template',
-						value: this.state.template,
+						value: this.state.template || '',
 						type: 'text'
 					})}
 					<RowColSpan label="Ad Network">
 						<select
 							className="form-control"
-							value={this.state.adNetwork}
+							value={this.state.adNetwork || ''}
 							name="adNetwork"
 							onChange={this.handleOnChange}
 						>
