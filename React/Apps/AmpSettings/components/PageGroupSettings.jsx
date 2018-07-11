@@ -16,14 +16,24 @@ class PageGroupSettings extends React.Component {
 			ads = ampSettings.ads || [],
 			imgConfig = ampSettings.imgConfig || { widthLimit: 100, heightLimit: 100 },
 			customCSS = { value: ampSettings['customCSS'] ? ampSettings['customCSS'].value : '' },
-			{ selectors = {}, toDelete, beforeJs, afterJs, siteName, template, adNetwork, pubId } = ampSettings;
+			{
+				selectors = {},
+				toDelete,
+				beforeJs,
+				afterJs,
+				siteName,
+				template,
+				adNetwork,
+				pubId,
+				isEnabled
+			} = ampSettings;
 		beforeJs = beforeJs ? atob(beforeJs) : '';
 		afterJs = afterJs ? atob(afterJs) : '';
 		for (let i = 0; i < ads.length; i++) {
 			ads[i]['adCode'] = ads[i]['adCode'] ? atob(ads[i]['adCode']) : '';
 		}
 		this.state = {
-			isEnabled: false,
+			isEnabled: isEnabled || false,
 			selectors,
 			toDelete: toDelete,
 			imgConfig,
@@ -226,7 +236,8 @@ class PageGroupSettings extends React.Component {
 						placeholder="Link"
 						name="link"
 						value={linkView.link}
-					/> <i
+					/>{' '}
+					<i
 						style={{ width: 'auto', cursor: 'pointer' }}
 						className="fa fa-trash fa-2x col-sm-2"
 						onClick={() => {
@@ -238,11 +249,7 @@ class PageGroupSettings extends React.Component {
 				</div>
 			);
 		});
-		return (
-			<Col sm={8}>
-				{listLinks}
-			</Col>
-		);
+		return <Col sm={8}>{listLinks}</Col>;
 	}
 
 	renderAds() {
@@ -274,7 +281,8 @@ class PageGroupSettings extends React.Component {
 						placeholder="AdCode"
 						name="adCode"
 						value={linkView.adCode}
-					/><i
+					/>
+					<i
 						style={{ width: 'auto', cursor: 'pointer' }}
 						className="fa fa-trash fa-2x col-sm-2"
 						onClick={() => {
@@ -286,11 +294,7 @@ class PageGroupSettings extends React.Component {
 				</div>
 			);
 		});
-		return (
-			<Col sm={8}>
-				{listAds}
-			</Col>
-		);
+		return <Col sm={8}>{listAds}</Col>;
 	}
 
 	render() {
@@ -443,8 +447,8 @@ class PageGroupSettings extends React.Component {
 					<RowColSpan label="Custom CSS">
 						<textarea
 							placeholder="Enter Custom CSS here"
-							style={{ resize: 'auto' }}
 							name="customCSS"
+							style={{ resize: 'both', overflow: 'auto' }}
 							value={this.state.customCSS['value']}
 							onChange={e => {
 								let customCSS = this.state.customCSS;
@@ -456,7 +460,6 @@ class PageGroupSettings extends React.Component {
 					<RowColSpan label="Delete Selector">
 						<textarea
 							name="toDelete"
-							style={{ resize: 'auto' }}
 							value={this.state.toDelete}
 							style={{ resize: 'auto' }}
 							onChange={e => {
@@ -471,7 +474,7 @@ class PageGroupSettings extends React.Component {
 					<RowColSpan label="Before JS">
 						<textarea
 							name="beforeJs"
-							style={{ resize: 'auto' }}
+							style={{ resize: 'both', overflow: 'auto' }}
 							value={this.state.beforeJs}
 							onChange={this.handleOnChange}
 						/>
@@ -479,9 +482,9 @@ class PageGroupSettings extends React.Component {
 					<RowColSpan label="After JS">
 						<textarea
 							name="afterJs"
-							style={{ resize: 'auto' }}
 							value={this.state.afterJs}
 							onChange={this.handleOnChange}
+							style={{ resize: 'both', overflow: 'auto' }}
 						/>
 					</RowColSpan>
 					{this.renderInputControl({

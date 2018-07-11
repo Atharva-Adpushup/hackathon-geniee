@@ -26,11 +26,11 @@ nav.pageLeftSidebar.sidebar
                         | Add New Website
                         span.icon-thumbnail#sidebar-new-website-icon-thumbnail
                             i.fa.fa-plus#sidebar-new-website-icon
-                li.sidebar-menu-item
-                    a(id="sidebar-billing-link", href='/user/billing')
-                        | Billing Profile
-                        span.icon-thumbnail#sidebar-billing-icon-thumbnail
-                            i.fa.fa-file#sidebar-billing-icon
+                //- li.sidebar-menu-item
+                //-     a(id="sidebar-billing-link", href='/user/billing')
+                //-         | Billing Profile
+                //-         span.icon-thumbnail#sidebar-billing-icon-thumbnail
+                //-             i.fa.fa-file#sidebar-billing-icon
                 li.sidebar-menu-item
                     a(id="sidebar-payment-link", href='/user/payment')
                         | Payment Details
@@ -78,11 +78,12 @@ nav.pageLeftSidebar.sidebar
                         | Reports
                         span.icon-thumbnail#sidebar-reports-icon-thumbnail
                             i.fa.fa-bar-chart#sidebar-reports-icon
-                li.sidebar-menu-item
-                    a(id="sidebar-adsense-link", href='/user/connectGoogle')
-                        | Connect Google
-                        span.icon-thumbnail#sidebar-adsense-icon-thumbnail
-                            i.fa.fa-google#sidebar-adsense-icon
+                //- if currentUser.userType != 'partner'
+                //-     li.sidebar-menu-item
+                //-         a(id="sidebar-adsense-link", href='/user/connectGoogle')
+                //-             | Connect Google
+                //-             span.icon-thumbnail#sidebar-adsense-icon-thumbnail
+                //-                 i.fa.fa-google#sidebar-adsense-icon
                 li.sidebar-menu-item
                     a(id="sidebar-settings-link", href='/user/site/#{siteId}/settings')
                         | Settings

@@ -6,6 +6,16 @@ const siteMappingActions = {
 		FETCH_LIVE_SITES: 'FETCH_LIVE_SITES',
 		SET_LIVE_SITES_DATA: 'SET_LIVE_SITES_DATA'
 	},
+	DEFAULT_HB_CONFIG = {
+		'728x90': [],
+		'300x250': [],
+		'300x600': [],
+		'336x280': [],
+		'160x600': [],
+		'970x250': [],
+		'970x90': [],
+		'320x100': []
+	},
 	globalMetricChartsActions = {
 		FETCH_NETWORK_WISE_DATA: 'FETCH_NETWORK_WISE_DATA',
 		SET_NETWORK_WISE_DATA: 'SET_NETWORK_WISE_DATA',
@@ -256,5 +266,6 @@ export {
 	siteMapping,
 	liveSites,
 	LINE_CHART_CONFIG,
-	PIE_CHART_CONFIG
+	PIE_CHART_CONFIG,
+	DEFAULT_HB_CONFIG
 };

@@ -1,8 +1,12 @@
-let utils = require('../libs/utils'),
+var utils = require('../libs/utils'),
+	{ AMP_PUBLISH_URL } = require('../config/commonConsts'),
 	ampInitCalled = false,
-	removeUtmlParams = oldUrl => oldUrl.toString().replace(/(\&|\?)utm([_a-z0-9=]+)/g, ''),
-	isUrlInBlocklist = config => {
-		let blockList = config.ampSettings.blockList, nonUtmUrl = removeUtmlParams(window.location);
+	removeUtmlParams = function removeUtmlParams(oldUrl) {
+		return oldUrl.toString().replace(/(\&|\?)utm([_a-z0-9=]+)/g, '');
+	},
+	isUrlInBlocklist = function isUrlInBlocklist(config) {
+		var blockList = config.ampSettings.blockList,
+			nonUtmUrl = removeUtmlParams(window.location);
 		if (blockList && blockList instanceof Array) {
 			for (var x = 0, j = blockList, k = j[x]; x < j.length; k = j[++x]) {
 				if (nonUtmUrl.match(new RegExp(k, 'i'))) {
@@ -12,7 +16,7 @@ let utils = require('../libs/utils'),
 		}
 		return false;
 	},
-	isPageGroupAmpEnabled = config => {
+	isPageGroupAmpEnabled = function isPageGroupAmpEnabled(config) {
 		var isConfig = config,
 			experiment = isConfig && config.experiment,
 			isEnabled =
@@ -24,28 +28,32 @@ let utils = require('../libs/utils'),
 		return isEnabled;
 	};
 
-module.exports = function (config) {
-	let blockedUrlMatched = isUrlInBlocklist(config), isEnabled = isPageGroupAmpEnabled();
-	console.group();
-	console.log('config', config);
-	console.log('blockedUrlMatched', blockedUrlMatched);
-	console.log('isEnabled', isEnabled);
-	console.groupEnd();
+module.exports = function(config) {
+	var blockedUrlMatched = isUrlInBlocklist(config),
+		isEnabled = isPageGroupAmpEnabled();
+	// console.group();
+	// console.log('config', config);
+	// console.log('blockedUrlMatched', blockedUrlMatched);
+	// console.log('isEnabled', isEnabled);
+	// console.groupEnd();
 	if (!ampInitCalled && !blockedUrlMatched && isEnabled) {
-		let randomNum = utils.getRandomNumberBetween(1, 100),
-			samplingPercent = config.ampSettings && config.ampSettings.samplingPercent
-				? parseInt(config.ampSettings.samplingPercent)
-				: 10;
-		randomNum >= samplingPercent &&
+		var randomNum = utils.getRandomNumberBetween(1, 100),
+			samplingPercent =
+				config.ampSettings && config.ampSettings.samplingPercent
+					? parseInt(config.ampSettings.samplingPercent)
+					: 10;
+		randomNum <= samplingPercent &&
 			utils.requestServer(
-				'http://autoamp.io/publishAmpJob', // This is to be changed
+				AMP_PUBLISH_URL, // This is to be changed
 				JSON.stringify({
 					url: window.location.href,
 					channelData: {
 						siteId: config.siteId,
 						platform: config.platform,
 						pagegroup: config.pageGroup || null
-					}
+					},
+					ampPath: window.adpushup && window.adpushup.ampPath ? window.adpushup.ampPath : false,
+					ampDomain: window.adpushup && window.adpushup.ampDomain ? window.adpushup.ampDomain : false
 				}),
 				null,
 				'post',

@@ -65,9 +65,11 @@ function errorHandler(error, originalMessage) {
 	if (!customErrorMessage) {
 		customErrorMessage = error && error[0] ? error[0].message : 'Unsynced ads in setup';
 		if (typeof customErrorMessage == 'object') {
-			customErrorMessage = `Unsynced ads in setup | SectionId - ${customErrorMessage.sectionId} | adId - ${
-				customErrorMessage.ad.id
-			} | Network - ${customErrorMessage.ad.network}`;
+			customErrorMessage = `Unsynced ads in setup | Pagegroup - ${customErrorMessage.pagegroup} | Platform - ${
+				customErrorMessage.platform
+			} | SectionId - ${customErrorMessage.sectionId} | adId - ${customErrorMessage.ad.id} | Network - ${
+				customErrorMessage.ad.network
+			}`;
 		}
 	}
 
