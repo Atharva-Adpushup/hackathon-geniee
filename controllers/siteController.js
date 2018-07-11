@@ -469,7 +469,8 @@ router
 			});
 	})
 	.get('/:siteId/ampSettings', (req, res) => {
-		return res.render('ampSettings');
+		if (req.session.isSuperUser) return res.render('ampSettings');
+		else return res.render('404');
 	})
 	.get('/:siteId/ampSettingsData', (req, res) => {
 		return siteModel

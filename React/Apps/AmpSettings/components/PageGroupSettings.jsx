@@ -76,11 +76,12 @@ class PageGroupSettings extends React.Component {
 					<RowColSpan label={commonConsts.selectors[key].alias} key={key}>
 						<textarea
 							placeholder={commonConsts.selectors[key].alias}
+							style={{ resize: 'auto' }}
 							name={key}
 							value={selectorValue}
 							onChange={e => {
-								let selectors = this.state.selectors;
-								selectors[e.target.name] = e.target.value.split(',');
+								let selectors = this.state.selectors, value = e.target.value.trim();
+								selectors[e.target.name] = value.split(',');
 								this.setState({
 									selectors
 								});
@@ -442,6 +443,7 @@ class PageGroupSettings extends React.Component {
 					<RowColSpan label="Custom CSS">
 						<textarea
 							placeholder="Enter Custom CSS here"
+							style={{ resize: 'auto' }}
 							name="customCSS"
 							value={this.state.customCSS['value']}
 							onChange={e => {
@@ -454,10 +456,12 @@ class PageGroupSettings extends React.Component {
 					<RowColSpan label="Delete Selector">
 						<textarea
 							name="toDelete"
+							style={{ resize: 'auto' }}
 							value={this.state.toDelete}
+							style={{ resize: 'auto' }}
 							onChange={e => {
-								let toDelete = this.state.toDelete;
-								toDelete = e.target.value.split(',');
+								let toDelete = this.state.toDelete, value = e.target.value.trim();
+								toDelete = value.split(',');
 								this.setState({
 									toDelete
 								});
@@ -465,10 +469,20 @@ class PageGroupSettings extends React.Component {
 						/>
 					</RowColSpan>
 					<RowColSpan label="Before JS">
-						<textarea name="beforeJs" value={this.state.beforeJs} onChange={this.handleOnChange} />
+						<textarea
+							name="beforeJs"
+							style={{ resize: 'auto' }}
+							value={this.state.beforeJs}
+							onChange={this.handleOnChange}
+						/>
 					</RowColSpan>
 					<RowColSpan label="After JS">
-						<textarea name="afterJs" value={this.state.afterJs} onChange={this.handleOnChange} />
+						<textarea
+							name="afterJs"
+							style={{ resize: 'auto' }}
+							value={this.state.afterJs}
+							onChange={this.handleOnChange}
+						/>
 					</RowColSpan>
 					{this.renderInputControl({
 						label: 'Site Name',

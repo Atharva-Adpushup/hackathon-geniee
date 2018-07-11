@@ -1,6 +1,7 @@
 const commonConsts = {
 	selectors: {
 		breadcrumb: { alias: 'Breadcrumb', value: 'breadcrumb', inputType: 'text', dataType: 'string' },
+		footer: { alias: 'Footer', value: 'footer', inputType: 'text', dataType: 'string' },
 		headlineTitle: { alias: 'Headline Title', value: 'headlineTitle', inputType: 'text', dataType: 'string' },
 		headlineSubtitle: {
 			alias: 'Headline Subtitle',
