@@ -47,12 +47,9 @@ var utils = require('../libs/utils'),
 				for (var i = 0; i < adpTagUnits.length; i++) {
 					var ad = adpTagUnits[i],
 						isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
-						defaultAdSizeArray = [Number(ad.width), Number(ad.height)],
-						computedAdSizeArray = isMultipleAdSizes
-							? ad.multipleAdSizes.concat([defaultAdSizeArray])
-							: defaultAdSizeArray;
+						defaultAdSizeArray = [Number(ad.width), Number(ad.height)];
 
-					adpTags.defineSlot(ad.networkData.dfpAdunit, computedAdSizeArray, ad.networkData.dfpAdunit, {
+					adpTags.defineSlot(ad.networkData.dfpAdunit, defaultAdSizeArray, ad.networkData.dfpAdunit, {
 						dfpAdunit: ad.networkData.dfpAdunit,
 						dfpAdunitCode: ad.networkData.dfpAdunitCode,
 						headerBidding: ad.networkData.headerBidding,
@@ -60,7 +57,10 @@ var utils = require('../libs/utils'),
 						network: ad.network,
 						refreshSlot: ad.networkData.refreshSlot,
 						overrideActive: ad.networkData.overrideActive,
-						overrideSizeTo: ad.networkData.overrideSizeTo
+						overrideSizeTo: ad.networkData.overrideSizeTo,
+						multipleAdSizes: isMultipleAdSizes
+							? ad.multipleAdSizes.concat([defaultAdSizeArray])
+							: defaultAdSizeArray
 					});
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
