@@ -126,7 +126,13 @@ const mapStateToProps = (state, ownProps) => ({
 				return false;
 			}
 			const notNear = getNotNearData(values.notNear),
-				isCustomCSS = !!(values.customCSS),
+				isCustomCSS = !!values.customCSS,
+				isNetworkData = !!networkInfo.networkData,
+				isMultipleAdSizes = !!(
+					isNetworkData &&
+					networkInfo.networkData.multipleAdSizes &&
+					networkInfo.networkData.multipleAdSizes.length
+				),
 				sectionPayload = {
 					sectionNo: values.section,
 					name: values.name,
@@ -140,8 +146,10 @@ const mapStateToProps = (state, ownProps) => ({
 					network: networkInfo.network,
 					networkData: {}
 				};
-			
+
 			isCustomCSS ? (adPayload.customCSS = JSON.parse(values.customCSS)) : null;
+			isMultipleAdSizes ? (adPayload.multipleAdSizes = networkInfo.networkData.multipleAdSizes.concat([])) : null;
+			delete networkInfo.networkData.multipleAdSizes;
 
 			adPayload.networkData = {
 				...adPayload.networkData,
@@ -152,4 +160,7 @@ const mapStateToProps = (state, ownProps) => ({
 		showNotification: params => dispatch(showNotification(params))
 	});
 
-export default connect(mapStateToProps, mapDispatchToProps)(form(inContentForm));
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(form(inContentForm));

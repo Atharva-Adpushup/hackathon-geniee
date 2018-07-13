@@ -12,14 +12,17 @@ var config = require('../../../configs/config'),
 module.exports = {
 	checkGenieeUnsyncedZones: function(variationId, variationName, section, ad) {
 		var isValidUnsyncedZone = !!(ad.network === 'geniee' && ad.networkData && !ad.networkData.zoneId),
-			isDynamicAllocationTrue = !!(ad.network === 'geniee' &&
+			isDynamicAllocationTrue = !!(
+				ad.network === 'geniee' &&
 				ad.networkData &&
 				ad.networkData.dynamicAllocation &&
 				!ad.networkData.dfpAdunit &&
-				!ad.networkData.dfpAdunitCode);
+				!ad.networkData.dfpAdunitCode
+			),
+			isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
 
 		if (isValidUnsyncedZone || isDynamicAllocationTrue) {
-			return {
+			const defaultZoneData = {
 				forGenieeDFPCreation: isDynamicAllocationTrue,
 				forZoneSyncing: isValidUnsyncedZone,
 				zone: {
@@ -39,20 +42,33 @@ module.exports = {
 					zoneId: ad.networkData && ad.networkData.zoneId ? ad.networkData.zoneId : false
 				}
 			};
+
+			if (isMultipleAdSizes) {
+				defaultZoneData.zone.multipleAdSizes = ad.multipleAdSizes.concat([]);
+			}
+
+			return defaultZoneData;
 		}
 		return false;
 	},
 	checkAdpTagsUnsyncedZones: function(section, ad) {
 		if (ad.networkData && Object.keys(ad.networkData).length) {
 			if (!ad.networkData.dfpAdunit) {
-				return {
-					adId: ad.id,
-					sizeWidth: parseInt(ad.width, 10),
-					sizeHeight: parseInt(ad.height, 10),
-					sectionId: section.id,
-					type: section.formatData && section.formatData.type ? section.formatData.type : false,
-					isManual: ad.isManual || false
-				};
+				const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
+					defaultAdData = {
+						adId: ad.id,
+						sizeWidth: parseInt(ad.width, 10),
+						sizeHeight: parseInt(ad.height, 10),
+						sectionId: section.id,
+						type: section.formatData && section.formatData.type ? section.formatData.type : false,
+						isManual: ad.isManual || false
+					};
+
+				if (isMultipleAdSizes) {
+					defaultAdData.multipleAdSizes = ad.multipleAdSizes.concat([]);
+				}
+
+				return defaultAdData;
 			}
 			return false;
 		}
@@ -62,10 +78,10 @@ module.exports = {
 		// Sample json for geniee zone
 		// {"zoneName":"test zone api0","sizeWidth":300,"sizeHeight":250,"zoneType":1,"zonePosition":0,"firstView":1,"useFriendlyIFrameFlag":0}
 		var unsyncedZones = {
-			genieeUnsyncedZones: [],
-			adpTagsUnsyncedZones: [],
-			genieeDFPCreationZones: []
-		},
+				genieeUnsyncedZones: [],
+				adpTagsUnsyncedZones: [],
+				genieeDFPCreationZones: []
+			},
 			self = this;
 		_.each(variationSections, function(section, sectionId) {
 			_.each(section.ads, function(ad) {
@@ -96,7 +112,9 @@ module.exports = {
 		return unsyncedZones;
 	},
 	getAllUnsyncedZones: function(site) {
-		var finalZones = [], channelUnsyncedZones = [], self = this;
+		var finalZones = [],
+			channelUnsyncedZones = [],
+			self = this;
 		return site.getAllChannels().then(function(allChannels) {
 			_.each(allChannels, function(channel) {
 				channelUnsyncedZones = [];
