@@ -33,6 +33,32 @@ const commonConsts = {
 		gmail: { alias: 'Gmail', value: 'gmail' },
 		whatsapp: { alias: 'Whatsapp', value: 'whatsapp' },
 		gplus: { alias: 'GPlus', value: 'gplus' }
+	},
+	ads: {
+		type: {
+			adsense: {
+				slotId: { alias: 'slotId', value: 'slotId' },
+				pubId: { alias: 'pubId', value: 'pubId' }
+			},
+			adx: {
+				slotId: { alias: 'slotId', value: 'slotId' }
+			},
+			custom: {
+				adCode: { alias: 'adCode', value: 'adCode' }
+			}
+		},
+		sampleAds: {
+			adsense: `<amp-ad width=dWidth height=dHeight
+						type="adsense"
+						data-ad-client="pubId"
+						data-ad-slot="slotId">
+					</amp-ad>`,
+			adx: `<amp-ad width=dWidth height=dHeight
+					type="doubleclick"
+					data-slot="slotId">
+				</amp-ad>`
+		},
+		operations: ['APPEND', 'PREPEND', 'INSERTAFTER', 'INSERTBEFORE']
 	}
 };
 export default commonConsts;

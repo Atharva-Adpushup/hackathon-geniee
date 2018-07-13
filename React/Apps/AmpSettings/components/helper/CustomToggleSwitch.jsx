@@ -139,8 +139,8 @@ customToggleSwitch.defaultProps = {
 	on: 'Enable',
 	off: 'Disable',
 	defaultLayout: false,
-	labelSize: 8,
-	componentSize: 4,
+	labelSize: 5,
+	componentSize: 7,
 	customComponentClass: '',
 	labelBold: true
 };

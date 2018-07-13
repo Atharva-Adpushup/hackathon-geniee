@@ -514,7 +514,7 @@ router
 			.then(site => {
 				let ampSettings = site.get('ampSettings') || {};
 				return channelModel.getAmpSettings(req.params.siteId).then(function(channels) {
-					return res.send({ siteId: req.params.siteId, channels, ampSettings });
+					return res.send({ siteId: req.params.siteId, channels, ampSettings,siteDomain:site.get('siteDomain') });
 				});
 			})
 			.catch(function(err) {

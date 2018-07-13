@@ -9,7 +9,7 @@ import { ajax } from '../../../common/helpers';
 class PageGroupSettings extends React.Component {
 	constructor(props) {
 		super(props);
-		let channel = props.channel,
+		let { siteId, channel } = props,
 			ampSettings = channel.ampSettings || {},
 			social = ampSettings.social || { include: false },
 			menu = ampSettings.menu || { links: [], include: false, position: 'right' },
@@ -33,6 +33,7 @@ class PageGroupSettings extends React.Component {
 			ads[i]['adCode'] = ads[i]['adCode'] ? atob(ads[i]['adCode']) : '';
 		}
 		this.state = {
+			siteId,
 			isEnabled: isEnabled || false,
 			selectors,
 			toDelete: toDelete,
@@ -57,6 +58,7 @@ class PageGroupSettings extends React.Component {
 		this.handleSocialAppChange = this.handleSocialAppChange.bind(this);
 		this.renderLinks = this.renderLinks.bind(this);
 		this.renderAds = this.renderAds.bind(this);
+		this.renderNetworkInputs = this.renderNetworkInputs.bind(this);
 	}
 
 	renderSelectors() {
@@ -120,6 +122,16 @@ class PageGroupSettings extends React.Component {
 			</Row>
 		);
 	}
+	generateAdCode(adData) {
+		let adNetwork = adData.type, adCode = commonConsts.ads.sampleAds[adNetwork];
+
+		adCode = adCode.replace('dWidth', adData.width);
+		adCode = adCode.replace('dHeight', adData.height);
+		for (let field in adData.data) {
+			adCode = adCode.replace(field, adData.data[field]);
+		}
+		return adCode;
+	}
 	parseFormData(ampData) {
 		let finalData = ampData, dataLinks = finalData.menu.links;
 		let ads = [], links = [];
@@ -129,8 +141,12 @@ class PageGroupSettings extends React.Component {
 		finalData['beforeJs'] = finalData['beforeJs'] ? btoa(finalData['beforeJs']) : '';
 		finalData['afterJs'] = finalData['afterJs'] ? btoa(finalData['afterJs']) : '';
 		for (let i = 0; i < finalData.ads.length; i++) {
-			if (finalData.ads[i]['adCode']) {
-				ads.push({ adCode: btoa(finalData.ads[i]['adCode']), selector: finalData.ads[i]['selector'] });
+			if (finalData.ads[i]['selector'] && finalData.ads[i]['data'] != {} && finalData.ads[i]['type']) {
+				let adCode = finalData.ads[i].type != 'custom'
+					? this.generateAdCode(finalData.ads[i])
+					: finalData.ads[i].data.adCode;
+				finalData.ads[i].adCode = btoa(adCode);
+				ads.push(finalData.ads[i]);
 			}
 		}
 		finalData.ads = ads;
@@ -140,7 +156,7 @@ class PageGroupSettings extends React.Component {
 	saveChannelSettings(event) {
 		event.preventDefault();
 		let ampData = this.parseFormData(Object.assign({}, this.state)), pageGroup = this.props.channel.pageGroup;
-		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
+		let { siteId } = this.state;
 		if (!ampData.selectors['articleContent'] || !ampData.siteName || !ampData.template) {
 			alert('Artical Content, SiteName and Template are required');
 			return;
@@ -250,50 +266,141 @@ class PageGroupSettings extends React.Component {
 		});
 		return <Col sm={8}>{listLinks}</Col>;
 	}
+	renderNetworkInputs(index) {
+		let selectedAd = this.state.ads[index], selectedNetwork = selectedAd.type;
+		console.log(selectedNetwork);
+		return selectedNetwork
+			? Object.keys(commonConsts.ads.type[selectedNetwork]).map((field, filedIndex) => (
+					<RowColSpan label={field} key={filedIndex}>
+						<input
+							type="text"
+							placeholder={field}
+							name={field}
+							className="form-control"
+							value={(selectedAd['data'] && selectedAd['data'][field]) || ''}
+							onChange={e => {
+								let ads = this.state.ads, ad = ads[index], data = ad.data || {};
+								data[field] = e.target.value;
+								this.setState({ ads });
+							}}
+						/>
+					</RowColSpan>
+				))
+			: '';
+	}
 
 	renderAds() {
 		const listAds = this.state.ads.map((linkView, index) => {
 			return (
-				<div key={index}>
-					<input
-						className="col-sm-5"
-						onChange={e => {
-							let ads = this.state.ads, ad = ads[index];
-							ad['selector'] = e.target.value;
-							this.setState({ ads });
+				<div
+					key={index}
+					style={{
+						background: 'aliceblue',
+						padding: 5,
+						margin: 5
+					}}
+				>
+					<div
+						style={{
+							textAlign: 'right',
+							cursor: 'pointer',
+							paddingRight: 0,
+							margin: '-10px 10px 5px'
 						}}
-						style={{ width: 'auto' }}
-						type="text"
-						placeholder="Selector"
-						name="selector"
-						value={linkView.selector}
-					/>
-					<input
-						className="col-sm-5"
-						onChange={e => {
-							let ads = this.state.ads, ad = ads[index];
-							ad['adCode'] = e.target.value;
-							this.setState({ ads });
-						}}
-						style={{ width: 'auto' }}
-						type="text"
-						placeholder="AdCode"
-						name="adCode"
-						value={linkView.adCode}
-					/>
-					<i
-						style={{ width: 'auto', cursor: 'pointer' }}
-						className="fa fa-trash fa-2x col-sm-2"
+						className="fa fa-times-circle fa-2x col-sm-12"
 						onClick={() => {
 							let ads = this.state.ads;
 							ads.splice(index, 1);
 							this.setState({ ads });
 						}}
 					/>
+					<RowColSpan label="Selector">
+						<input
+							onChange={e => {
+								let ads = this.state.ads, ad = ads[index];
+								ad['selector'] = e.target.value;
+								this.setState({ ads });
+							}}
+							type="text"
+							placeholder="Selector"
+							name="selector"
+							className="form-control"
+							value={linkView.selector || ''}
+						/>
+					</RowColSpan>
+					<RowColSpan label="Width">
+						<input
+							onChange={e => {
+								let ads = this.state.ads, ad = ads[index];
+								ad['width'] = e.target.value;
+								this.setState({ ads });
+							}}
+							type="number"
+							placeholder="Width"
+							name="width"
+							className="form-control"
+							value={linkView.width || 100}
+						/>
+					</RowColSpan>
+					<RowColSpan label="Height">
+						<input
+							onChange={e => {
+								let ads = this.state.ads, ad = ads[index];
+								ad['height'] = e.target.value;
+								this.setState({ ads });
+							}}
+							type="number"
+							placeholder="Height"
+							name="height"
+							className="form-control"
+							value={linkView.height || 100}
+						/>
+					</RowColSpan>
+					<RowColSpan label="Operation">
+						<select
+							className="form-control"
+							name="operation"
+							value={linkView.operation || 'INSERTAFTER'}
+							onChange={e => {
+								let ads = this.state.ads, ad = ads[index];
+								ad['operation'] = e.target.value;
+								this.setState({ ads });
+							}}
+						>
+							<option value="">Select Operation</option>
+							{commonConsts.ads.operations.map((operation, index) => (
+								<option value={operation} key={index}>
+									{operation}
+								</option>
+							))}
+						</select>
+
+					</RowColSpan>
+					<RowColSpan label="Type">
+						<select
+							className="form-control"
+							name="type"
+							value={linkView.type || ''}
+							onChange={e => {
+								let ads = this.state.ads, ad = ads[index];
+								ad['type'] = e.target.value;
+								ad['data'] = {};
+								this.setState({ ads });
+							}}
+						>
+							<option value="">Select Type</option>
+							{Object.keys(commonConsts.ads.type).map((type, index) => (
+								<option value={type} key={index}>
+									{type}
+								</option>
+							))}
+						</select>
+					</RowColSpan>
+					{this.renderNetworkInputs(index)}
 				</div>
 			);
 		});
-		return <Col sm={8}>{listAds}</Col>;
+		return listAds;
 	}
 
 	render() {
@@ -509,24 +616,20 @@ class PageGroupSettings extends React.Component {
 							<option value="adx">AdX</option>
 						</select>
 					</RowColSpan>
-					<Row>
-						<Col sm={4}>
-							<span>Ads</span>
-							<button
-								style={{ width: 'auto', marginLeft: 10 }}
-								className="btn-success"
-								type="button"
-								onClick={() => {
-									let ads = this.state.ads;
-									ads.push({ selector: '', adCode: '' });
-									this.setState({ ads });
-								}}
-							>
-								+ Add
-							</button>
-						</Col>
-						{this.renderAds()}
-					</Row>
+					<RowColSpan label="Ads">
+						<button
+							className="btn-success"
+							type="button"
+							onClick={() => {
+								let ads = this.state.ads;
+								ads.push({ width: 100, height: 100 });
+								this.setState({ ads });
+							}}
+						>
+							+ Add
+						</button>
+					</RowColSpan>
+					{this.renderAds()}
 					{this.renderInputControl({ label: 'Pub Id', name: 'pubId', value: this.state.pubId, type: 'text' })}
 					<button className="btn-success">Save</button>
 				</form>
