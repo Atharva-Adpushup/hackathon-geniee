@@ -139,7 +139,9 @@ class NetworkOptions extends Component {
 			isPrimaryAdSize = !!(this.props.primaryAdSize && Object.keys(this.props.primaryAdSize).length),
 			isAdSize = !!(adExists && this.props.ad.width && this.props.ad.height),
 			primaryAdSize =
-				isPrimaryAdSize || (isAdSize && { height: this.props.ad.height, width: this.props.ad.width }) || {};
+				(isPrimaryAdSize && this.props.primaryAdSize) ||
+				(isAdSize && { height: this.props.ad.height, width: this.props.ad.width }) ||
+				{};
 
 		switch (this.state.network) {
 			case 'adpTags':
