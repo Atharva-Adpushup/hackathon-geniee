@@ -157,7 +157,7 @@ var logger = require('../helpers/logger'),
 				: config.NETWORK_ID;
 		slot.gSlot = googletag.defineSlot(
 			'/' + networkId + '/' + slot.optionalParam.dfpAdunitCode,
-			slot.size,
+			slot.optionalParam.multipleAdSizes || slot.size,
 			slot.containerId
 		);
 		setGPTargeting(slot);

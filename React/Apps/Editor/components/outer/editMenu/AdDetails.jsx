@@ -20,8 +20,6 @@ class AdDetails extends Component {
 		this.toggleHandler = this.toggleHandler.bind(this);
 		this.renderButton = this.renderButton.bind(this);
 		this.renderContent = this.renderContent.bind(this);
-		// this.renderDockedButton = this.renderDockedButton.bind(this);
-		// this.editDockSettings = this.editDockSettings.bind(this);
 		this.renderAdCode = this.renderAdCode.bind(this);
 		this.renderCommonDetails = this.renderCommonDetails.bind(this);
 	}
@@ -197,7 +195,6 @@ class AdDetails extends Component {
 								false
 							)}
 						</div>
-						{/* <div>{this.genieeOptions(position, firstFold, zoneId)}</div> */}
 						<div>{this.renderAdCode(adCode)}</div>
 					</div>
 				) : (
@@ -222,22 +219,6 @@ class AdDetails extends Component {
 			</Col>
 		);
 	}
-
-	// editDockSettings() {
-	// 	this.setState({ editDock: !this.state.editDock }, () => {
-	// 		this.props.toggleDeleteButton ? this.props.toggleDeleteButton() : null;
-	// 	});
-	// }
-
-	// renderDockedButton() {
-	// 	return (
-	// 		<Col xs={6} style={{ padding: '0px' }}>
-	// 			<Button className="btn-lightBg btn-block" onClick={this.editDockSettings}>
-	// 				Docked Settings
-	// 			</Button>
-	// 		</Col>
-	// 	);
-	// }
 
 	renderEventData() {
 		const { section, ad } = this.props;
@@ -289,10 +270,7 @@ class AdDetails extends Component {
 					) : null}
 					{this.props.showEventData ? this.renderEventData() : null}
 					{!this.props.section.isIncontent && this.props.section.type != typeOfAds.INTERACTIVE_AD ? (
-						<div>
-							{this.renderButton('Docked Settings', this.toggleHandler.bind(null, 'editDock'))}
-							{/* {this.renderButton('Trigger Settings', this.toggleHandler.bind(null, 'editTrigger'))} */}
-						</div>
+						<div>{this.renderButton('Docked Settings', this.toggleHandler.bind(null, 'editDock'))}</div>
 					) : null}
 				</div>
 			);
@@ -300,34 +278,7 @@ class AdDetails extends Component {
 	}
 
 	render() {
-		// const { fromPanel, showEventData, ad } = this.props;
-		return (
-			<div id="ad-details">
-				{this.renderContent()}
-				{/* {this.state.editDock ? (
-					<DockedSettings {...this.props} onCancel={this.toggleHandler.bind(null, 'editDock')} />
-				) : (
-					<div>
-						{ad.network ? (
-							<div>
-								<div>
-									{!fromPanel ? this.renderSectionName() : null}
-									{this.renderNetworkDetails()}
-								</div>
-								{!fromPanel ? this.renderXPathAndCSS() : null}
-							</div>
-						) : null}
-						{showEventData ? this.renderEventData() : null}
-						{!this.props.section.isIncontent && this.props.section.type != typeOfAds.INTERACTIVE_AD ? (
-							<div>
-								{this.renderButton('Docked Settings', this.toggleHandler.bind(null, 'editDock'))}
-								{this.renderButton('Trigger Settings', this.toggleHandler.bind(null, 'editTrigger'))}
-							</div>
-						) : null}
-					</div>
-				)} */}
-			</div>
-		);
+		return <div id="ad-details">{this.renderContent()}</div>;
 	}
 }
 

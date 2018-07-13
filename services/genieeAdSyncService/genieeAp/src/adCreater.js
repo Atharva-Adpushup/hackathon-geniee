@@ -63,25 +63,29 @@ var $ = require('jquery'),
 		}
 		var isGenieePartner = !!(ad.network === 'geniee' && !ad.networkData.adCode),
 			isGenieeWithoutDFP = !!(isGenieePartner && !ad.networkData.dynamicAllocation),
-			container = $('<div/>')
-				.css(
-					$.extend(
-						{
-							display: isGenieeWithoutDFP ? 'none' : 'block',
-							clear: ad.isIncontent ? null : 'both',
-							width: ad.width + 'px',
-							height: ad.height + 'px'
-						},
-						ad.css
-					)
-				)
-				.attr({
-					id: isGenieePartner ? '_ap_apexGeniee_ad_' + ad.networkData.zoneId : ad.id,
-					'data-section': ad.id,
-					class: '_ap_apex_ad',
-					'data-xpath': ad.xpath ? ad.xpath : '',
-					'data-section-id': ad.section ? ad.section : ''
-				});
+			isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
+			defaultAdProperties = {
+				display: isGenieeWithoutDFP ? 'none' : 'block',
+				clear: ad.isIncontent ? null : 'both'
+			},
+			container;
+
+		if (!isMultipleAdSizes) {
+			defaultAdProperties.width = ad.width + 'px';
+			defaultAdProperties.height = ad.height + 'px';
+		} else {
+			defaultAdProperties['text-align'] = 'center';
+		}
+
+		container = $('<div/>')
+			.css($.extend(defaultAdProperties, ad.css))
+			.attr({
+				id: isGenieePartner ? '_ap_apexGeniee_ad_' + ad.networkData.zoneId : ad.id,
+				'data-section': ad.id,
+				class: '_ap_apex_ad',
+				'data-xpath': ad.xpath ? ad.xpath : '',
+				'data-section-id': ad.section ? ad.section : ''
+			});
 
 		switch (ad.operation) {
 			case 'Append':

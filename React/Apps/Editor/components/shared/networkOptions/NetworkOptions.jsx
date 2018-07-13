@@ -135,7 +135,13 @@ class NetworkOptions extends Component {
 			zoneId =
 				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('zoneId')
 					? this.props.ad.networkData.zoneId
-					: '';
+					: '',
+			isPrimaryAdSize = !!(this.props.primaryAdSize && Object.keys(this.props.primaryAdSize).length),
+			isAdSize = !!(adExists && this.props.ad.width && this.props.ad.height),
+			primaryAdSize =
+				(isPrimaryAdSize && this.props.primaryAdSize) ||
+				(isAdSize && { height: this.props.ad.height, width: this.props.ad.width }) ||
+				{};
 
 		switch (this.state.network) {
 			case 'adpTags':
@@ -198,6 +204,7 @@ class NetworkOptions extends Component {
 						id={this.props.id ? this.props.id : false}
 						showNotification={this.props.showNotification}
 						isInsertMode={this.props.isInsertMode || false}
+						primaryAdSize={primaryAdSize}
 					/>
 				);
 				break;

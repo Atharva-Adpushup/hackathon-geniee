@@ -45,22 +45,23 @@ var utils = require('../libs/utils'),
 		var doIt = function(adpTagUnits) {
 			return function() {
 				for (var i = 0; i < adpTagUnits.length; i++) {
-					var ad = adpTagUnits[i];
-					adpTags.defineSlot(
-						ad.networkData.dfpAdunit,
-						[Number(ad.width), Number(ad.height)],
-						ad.networkData.dfpAdunit,
-						{
-							dfpAdunit: ad.networkData.dfpAdunit,
-							dfpAdunitCode: ad.networkData.dfpAdunitCode,
-							headerBidding: ad.networkData.headerBidding,
-							keyValues: ad.networkData.keyValues,
-							network: ad.network,
-							refreshSlot: ad.networkData.refreshSlot,
-							overrideActive: ad.networkData.overrideActive,
-							overrideSizeTo: ad.networkData.overrideSizeTo
-						}
-					);
+					var ad = adpTagUnits[i],
+						isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
+						defaultAdSizeArray = [Number(ad.width), Number(ad.height)];
+
+					adpTags.defineSlot(ad.networkData.dfpAdunit, defaultAdSizeArray, ad.networkData.dfpAdunit, {
+						dfpAdunit: ad.networkData.dfpAdunit,
+						dfpAdunitCode: ad.networkData.dfpAdunitCode,
+						headerBidding: ad.networkData.headerBidding,
+						keyValues: ad.networkData.keyValues,
+						network: ad.network,
+						refreshSlot: ad.networkData.refreshSlot,
+						overrideActive: ad.networkData.overrideActive,
+						overrideSizeTo: ad.networkData.overrideSizeTo,
+						multipleAdSizes: isMultipleAdSizes
+							? ad.multipleAdSizes.concat([defaultAdSizeArray])
+							: defaultAdSizeArray
+					});
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
 				if (adpKeyValues && Object.keys(adpKeyValues).length) {
