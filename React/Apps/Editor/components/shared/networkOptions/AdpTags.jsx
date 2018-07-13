@@ -160,14 +160,9 @@ class AdpTags extends Component {
 	}
 
 	toggleMultipleAdSizes() {
-		this.setState(
-			{
-				showMultipleAdSizesSelector: !this.state.showMultipleAdSizesSelector
-			},
-			() => {
-				console.log(`showMultipleAdSizesSelector: ${this.state.showMultipleAdSizesSelector}`);
-			}
-		);
+		this.setState({
+			showMultipleAdSizesSelector: !this.state.showMultipleAdSizesSelector
+		});
 	}
 
 	renderGenieeNote() {
@@ -186,15 +181,10 @@ class AdpTags extends Component {
 	}
 
 	multipleAdSizesSave(multipleAdSizes) {
-		this.setState(
-			{
-				multipleAdSizes,
-				showMultipleAdSizesSelector: false
-			},
-			() => {
-				console.log('multipleAdSizes:', this.state.multipleAdSizes);
-			}
-		);
+		this.setState({
+			multipleAdSizes,
+			showMultipleAdSizesSelector: false
+		});
 	}
 
 	renderMultipleAdSizes() {

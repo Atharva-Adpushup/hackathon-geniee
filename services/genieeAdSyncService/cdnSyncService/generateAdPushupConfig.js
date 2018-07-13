@@ -39,7 +39,10 @@ const _ = require('lodash'),
 			};
 
 			if (isMultipleAdSizes) {
-				adData.multipleAdSizes = ad.multipleAdSizes.map(object => [object.width, object.height]);
+				adData.multipleAdSizes = ad.multipleAdSizes.map(object => [
+					Number(object.width),
+					Number(object.height)
+				]);
 			}
 
 			ADPTags.push(adData);
@@ -82,7 +85,7 @@ const _ = require('lodash'),
 			const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
 
 			if (isMultipleAdSizes) {
-				json.multipleAdSizes = ad.multipleAdSizes.map(object => [object.width, object.height]);
+				json.multipleAdSizes = ad.multipleAdSizes.map(object => [Number(object.width), Number(object.height)]);
 			}
 
 			if (section.isIncontent) {
@@ -140,9 +143,8 @@ const _ = require('lodash'),
 			personalization: variation.personalization,
 			// Data required for auto optimiser model
 			// Page revenue is mapped as sum
-			sum: variationData && parseFloat(variationData.pageRevenue) > -1
-				? Math.floor(variationData.pageRevenue)
-				: 1,
+			sum:
+				variationData && parseFloat(variationData.pageRevenue) > -1 ? Math.floor(variationData.pageRevenue) : 1,
 			// Data required for auto optimiser model
 			// Page view is mapped as count
 			count: variationData && parseInt(variationData.pageViews, 10) > -1 ? Math.floor(variationData.pageViews) : 1
@@ -186,10 +188,12 @@ const _ = require('lodash'),
 			let variationPayload = getVariationPayload(variation, platform, pageGroup, variationData, finalJson);
 			if (typeof variationPayload == 'object' && Object.keys(variationPayload).length) {
 				finalJson[platform][pageGroup].variations.push(variationPayload);
-				finalJson[platform][pageGroup].hasVariationsWithNoData = finalJson[platform][pageGroup]
-					.hasVariationsWithNoData == false
-					? variationData == null ? true : false
-					: finalJson[platform][pageGroup].hasVariationsWithNoData;
+				finalJson[platform][pageGroup].hasVariationsWithNoData =
+					finalJson[platform][pageGroup].hasVariationsWithNoData == false
+						? variationData == null
+							? true
+							: false
+						: finalJson[platform][pageGroup].hasVariationsWithNoData;
 			}
 		});
 		if (!Object.keys(finalJson[platform][pageGroup].variations).length) {
