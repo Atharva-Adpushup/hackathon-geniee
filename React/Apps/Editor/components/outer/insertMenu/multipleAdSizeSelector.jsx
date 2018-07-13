@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import _ from 'lodash';
-import { partners } from '../../../consts/commonConsts';
+import { commonSupportedSizes } from 'consts/commonConsts.js';
 import { Accordion, Row, Col, Panel, Button, Well, Label } from 'react-bootstrap';
 
 class MultipleAdSizeSelector extends React.Component {
@@ -8,14 +8,18 @@ class MultipleAdSizeSelector extends React.Component {
 		super(props);
 		this.state = {
 			activeTab: 0,
-			selectedSizes: []
+			selectedSizes: props.sizes || []
 		};
 		this.handleTabClick = this.handleTabClick.bind(this);
 		this.handleCheckBoxClick = this.handleCheckBoxClick.bind(this);
 		this.handleSaveButtonClick = this.handleSaveButtonClick.bind(this);
 	}
 
-	componentWillReceiveProps(nextProps) {}
+	componentWillReceiveProps(nextProps) {
+		if (nextProps.sizes) {
+			this.setState({ selectedSizes: nextProps.sizes });
+		}
+	}
 
 	handleTabClick(key) {
 		this.setState({ activeTab: key });
@@ -77,16 +81,16 @@ class MultipleAdSizeSelector extends React.Component {
 							}
 
 							return (
-								<Col key={`col-${this.props.insertOption}-${innerIndex}`} xs={6} className="Col">
+								<Col key={`col-${innerIndex}`} xs={6} className="Col">
 									<input
-										id={this.props.insertOption + rec.layoutType + innerIndex}
+										id={rec.layoutType + innerIndex}
 										type="radio"
 										checked={computedRadioFieldValue}
 										onClick={this.handleCheckBoxClick.bind(this, adProps)}
 									/>
-									<label htmlFor={this.props.insertOption + rec.layoutType + innerIndex}>{`${
-										adProps.width
-									} X ${adProps.height}`}</label>
+									<label htmlFor={rec.layoutType + innerIndex}>{`${adProps.width} X ${
+										adProps.height
+									}`}</label>
 								</Col>
 							);
 						})
@@ -99,16 +103,22 @@ class MultipleAdSizeSelector extends React.Component {
 	renderAdSizeAccordion() {
 		return (
 			<Accordion className="u-margin-b15px" activeKey={this.state.activeTab} onSelect={this.handleTabClick}>
-				{_.compact(_.map(this.props.adSizes, (rec, index) => this.renderSizePanels(rec, index)))}
+				{_.compact(_.map(commonSupportedSizes, (rec, index) => this.renderSizePanels(rec, index)))}
 			</Accordion>
 		);
 	}
 
 	renderCallToActionButtons(showButtons = true, submitHandler, cancelHandler) {
+		const isSelectedSizes = !!this.state.selectedSizes.length;
+
 		return showButtons ? (
 			<Row className="mT-5 u-margin-b15px">
 				<Col xs={6}>
-					<Button className="btn-lightBg btn-save btn-block" onClick={submitHandler}>
+					<Button
+						disabled={!isSelectedSizes}
+						className="btn-lightBg btn-save btn-block"
+						onClick={submitHandler}
+					>
 						Save
 					</Button>
 				</Col>
@@ -130,9 +140,12 @@ class MultipleAdSizeSelector extends React.Component {
 	}
 
 	renderPrimaryAdSizeBlock() {
-		const adSize = this.getStringifiedAdSize(this.props.primaryAdSize);
+		const adSize =
+			this.props.primaryAdSize &&
+			Object.keys(this.props.primaryAdSize).length &&
+			this.getStringifiedAdSize(this.props.primaryAdSize);
 
-		return (
+		return adSize ? (
 			<Row className="mT-5 u-margin-b15px">
 				<Col xs={6}>
 					<strong>Primary Ad Size</strong>
@@ -141,7 +154,7 @@ class MultipleAdSizeSelector extends React.Component {
 					<span>{adSize}</span>
 				</Col>
 			</Row>
-		);
+		) : null;
 	}
 
 	renderSelectedSizesCountBlock() {
@@ -210,9 +223,8 @@ class MultipleAdSizeSelector extends React.Component {
 MultipleAdSizeSelector.propTypes = {
 	onSave: PropTypes.func.isRequired,
 	onCancel: PropTypes.func.isRequired,
-	primaryAdSize: PropTypes.object.isRequired,
-	adSizes: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-	partner: PropTypes.string
+	primaryAdSize: PropTypes.object,
+	sizes: PropTypes.array
 };
 
 MultipleAdSizeSelector.defaultProps = {};

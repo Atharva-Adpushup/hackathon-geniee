@@ -47,14 +47,6 @@ class sectionOptions extends React.Component {
 			});
 			return;
 		}
-		// if (!this.state.position) {
-		// 	this.props.showNotification({
-		// 		mode: 'error',
-		// 		title: 'Incomplete Values',
-		// 		message: 'Please select a position'
-		// 	});
-		// 	return;
-		// }
 		let toSend = {
 			...networkData,
 			dynamicAllocation: networkData.headerBidding,
@@ -124,7 +116,7 @@ class sectionOptions extends React.Component {
 	render() {
 		const customAdCodeText = this.state.customAdCode ? 'Edit' : 'Add',
 			isAdCreateBtnDisabled = !!(this.state.position !== null && typeof this.state.position !== 'undefined'),
-			{ updateMode, updateSettings, sectionId, ad, isInsertMode } = this.props,
+			{ updateMode, updateSettings, sectionId, ad, isInsertMode, primaryAdSize } = this.props,
 			{ position, isAdInFirstFold: firstFold, isAdAsync: asyncTag, zoneId } = this.state;
 
 		if (this.state.manageCustomCode) {
@@ -143,54 +135,6 @@ class sectionOptions extends React.Component {
 				className="containerButtonBar sectionOptions mT-10"
 				style={updateMode ? { paddingBottom: 0, marginRight: 15, marginLeft: 15 } : {}}
 			>
-				{/* <Row>
-					<Col md={3} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
-						<b>Position</b>
-					</Col>
-					<Col md={9} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
-						<SelectBox value={this.state.position} label="Select Position" onChange={this.onChange}>
-							{positions.map((pos, index) => (
-								<option key={index} value={index}>
-									{pos}
-								</option>
-							))}
-						</SelectBox>
-					</Col>
-				</Row> */}
-				{/* <CustomToggleSwitch
-					labelText="First fold"
-					className="u-margin-t15px u-margin-b15px"
-					defaultLayout
-					checked={this.state.isAdInFirstFold}
-					name="adInFirstFold"
-					onChange={this.onFirstFoldChange}
-					layout="horizontal"
-					size="m"
-					id="js-ad-in-first-fold"
-					on="Yes"
-					off="No"
-					defaultLayout={this.props.fromPanel ? false : true}
-					name={this.props.id ? `firstFold-${this.props.id}` : 'firstFold'}
-					id={this.props.id ? `js-first-fold-switch-${this.props.id}` : 'js-first-fold-switch'}
-					customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
-				/>
-				<CustomToggleSwitch
-					labelText="Async tag"
-					className="u-margin-t15px u-margin-b15px"
-					disabled
-					defaultLayout
-					checked={this.state.isAdAsync}
-					name="adIsAsync"
-					layout="horizontal"
-					size="m"
-					id="js-ad-is-async"
-					on="Yes"
-					off="No"
-					defaultLayout={this.props.fromPanel ? false : true}
-					name={this.props.id ? `asyncTag-${this.props.id}` : 'asyncTag'}
-					id={this.props.id ? `js-async-tag-switch-${this.props.id}` : 'js-async-tag-switch'}
-					customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
-				/> */}
 				{updateMode && !zoneId ? null : this.renderCustomZoneIdInput(zoneId, isInsertMode)}
 
 				<AdpTags
@@ -209,6 +153,7 @@ class sectionOptions extends React.Component {
 					showNotification={this.props.showNotification}
 					geniee={true}
 					isInsertMode={isInsertMode}
+					primaryAdSize={primaryAdSize}
 				/>
 			</div>
 		);

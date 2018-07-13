@@ -7,6 +7,8 @@ import { priceFloorKeys } from '../../../consts/commonConsts';
 import SelectBox from '../select/select.js';
 import CustomToggleSwitch from '../customToggleSwitch.jsx';
 import { getSupportedAdSizes } from '../../../../OpsPanel/lib/helpers';
+import MultipleAdSizeSelector from '../../outer/insertMenu/multipleAdSizeSelector.jsx';
+
 class AdpTags extends Component {
 	constructor(props) {
 		super(props);
@@ -29,6 +31,8 @@ class AdpTags extends Component {
 			// Dynamic Allocation/Header Bidding property should be false by default
 			// if Geniee UI access 'DA' (window.gcfg.uud) property is present and set to 0
 			hbAcivated: isGenieeUIAccessDAInActive ? false : headerBidding,
+			showMultipleAdSizesSelector: false,
+			multipleAdSizes: [],
 			refreshSlot,
 			overrideActive,
 			overrideSizeTo,
@@ -53,6 +57,9 @@ class AdpTags extends Component {
 		this.renderHBOverride = this.renderHBOverride.bind(this);
 		this.renderSizeOverrideSelectBox = this.renderSizeOverrideSelectBox.bind(this);
 		this.renderOverrideSettings = this.renderOverrideSettings.bind(this);
+		this.renderManageMultipleAdSizeBlock = this.renderManageMultipleAdSizeBlock.bind(this);
+		this.toggleMultipleAdSizes = this.toggleMultipleAdSizes.bind(this);
+		this.multipleAdSizesSave = this.multipleAdSizesSave.bind(this);
 	}
 
 	filterKeyValues(keyValues) {
@@ -66,7 +73,16 @@ class AdpTags extends Component {
 	}
 
 	save() {
-		const { fpKey, hbAcivated, pf, keyValues, refreshSlot, overrideActive, overrideSizeTo } = this.state;
+		const {
+			fpKey,
+			hbAcivated,
+			pf,
+			keyValues,
+			refreshSlot,
+			overrideActive,
+			overrideSizeTo,
+			multipleAdSizes
+		} = this.state;
 		this.props.submitHandler({
 			headerBidding: !!hbAcivated,
 			keyValues: {
@@ -75,7 +91,8 @@ class AdpTags extends Component {
 			},
 			refreshSlot,
 			overrideActive,
-			overrideSizeTo: overrideActive ? overrideSizeTo : null
+			overrideSizeTo: overrideActive ? overrideSizeTo : null,
+			multipleAdSizes
 		});
 	}
 
@@ -142,6 +159,17 @@ class AdpTags extends Component {
 		});
 	}
 
+	toggleMultipleAdSizes() {
+		this.setState(
+			{
+				showMultipleAdSizesSelector: !this.state.showMultipleAdSizesSelector
+			},
+			() => {
+				console.log(`showMultipleAdSizesSelector: ${this.state.showMultipleAdSizesSelector}`);
+			}
+		);
+	}
+
 	renderGenieeNote() {
 		let output = `<strong>NOTE:</strong><i><b>Geniee Zone Id</b> ${
 			window.gcfg.uud ? 'and <b>Dynamic Allocation</b>' : ''
@@ -155,6 +183,51 @@ class AdpTags extends Component {
 				</Col>
 			</Row>
 		);
+	}
+
+	multipleAdSizesSave(multipleAdSizes) {
+		this.setState(
+			{
+				multipleAdSizes,
+				showMultipleAdSizesSelector: false
+			},
+			() => {
+				console.log('multipleAdSizes:', this.state.multipleAdSizes);
+			}
+		);
+	}
+
+	renderMultipleAdSizes() {
+		const { primaryAdSize } = this.props;
+
+		return (
+			<MultipleAdSizeSelector
+				sizes={this.state.multipleAdSizes}
+				primaryAdSize={primaryAdSize}
+				onSave={this.multipleAdSizesSave}
+				onCancel={this.toggleMultipleAdSizes}
+			/>
+		);
+	}
+
+	renderManageMultipleAdSizeBlock() {
+		const isDynamicAllocation = !!this.state.hbAcivated,
+			isInsertMode = this.props.isInsertMode,
+			isShowBlock = !!(isDynamicAllocation && isInsertMode),
+			isFromPanel = this.props.fromPanel;
+
+		return isShowBlock ? (
+			<Row className="mT-5 u-margin-b15px">
+				<Col xs={6} className={isFromPanel ? 'u-padding-0px' : ''}>
+					<strong>Multiple Ad Sizes</strong>
+				</Col>
+				<Col xs={6} className={isFromPanel ? 'u-padding-0px text-right' : 'text-right'}>
+					<Button className="btn-lightBg" onClick={this.toggleMultipleAdSizes}>
+						Manage
+					</Button>
+				</Col>
+			</Row>
+		) : null;
 	}
 
 	renderOverrideSettings(isGenieeEditableMode) {
@@ -220,11 +293,11 @@ class AdpTags extends Component {
 	}
 
 	renderDynamicAllocation() {
-		let { isInsertMode } = this.props,
+		let { isInsertMode, geniee } = this.props,
 			isGenieeEditableMode = !!(this.props.geniee && !isInsertMode),
 			isGenieeUIAccessDAActive = this.state.uiAccess.da.active,
 			toShow = isGenieeUIAccessDAActive ? true : !window.isGeniee,
-			label = this.props.geniee ? 'Dynamic Allocation' : 'Header Bidding';
+			label = geniee ? 'Dynamic Allocation' : 'Header Bidding';
 
 		return toShow ? (
 			<Row>
@@ -235,7 +308,16 @@ class AdpTags extends Component {
 						checked={this.state.hbAcivated}
 						disabled={isGenieeEditableMode}
 						onChange={val => {
-							this.setState({ hbAcivated: !!val });
+							const isGeniee = !!geniee,
+								isValue = !!val,
+								isResetMultipleAdSizes = !!(isGeniee && !isValue),
+								stateObject = { hbAcivated: !!val };
+
+							if (isResetMultipleAdSizes) {
+								stateObject.multipleAdSizes = [];
+							}
+
+							this.setState(stateObject);
 						}}
 						layout="horizontal"
 						size="m"
@@ -321,6 +403,7 @@ class AdpTags extends Component {
 					</div>
 				)}
 				{this.renderDynamicAllocation()}
+				{this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null}
 				{!this.props.geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
 				{!this.props.geniee ? (
 					<Row>
@@ -366,9 +449,18 @@ class AdpTags extends Component {
 	}
 
 	render() {
-		return (
-			<div className="mB-10 mT-10">{this.state.advanced ? this.renderAdvanced() : this.renderNonAdvanced()}</div>
-		);
+		const renderBlocks = [],
+			isShowMultipleAdSize = !!(this.props.geniee && this.state.showMultipleAdSizesSelector);
+
+		if (this.state.advanced) {
+			renderBlocks.push(<div key={1}>{this.renderAdvanced()}</div>);
+		} else if (isShowMultipleAdSize) {
+			renderBlocks.push(<div key={1}>{this.renderMultipleAdSizes()}</div>);
+		} else {
+			renderBlocks.push(<div key={1}>{this.renderNonAdvanced()}</div>);
+		}
+
+		return <div className="mB-10 mT-10">{renderBlocks}</div>;
 	}
 }
 

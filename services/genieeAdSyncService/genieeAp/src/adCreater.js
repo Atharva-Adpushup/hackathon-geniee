@@ -73,6 +73,8 @@ var $ = require('jquery'),
 		if (!isMultipleAdSizes) {
 			defaultAdProperties.width = ad.width + 'px';
 			defaultAdProperties.height = ad.height + 'px';
+		} else {
+			defaultAdProperties['text-align'] = 'center';
 		}
 
 		container = $('<div/>')
