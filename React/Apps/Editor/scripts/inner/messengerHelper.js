@@ -9,7 +9,7 @@ import {
 	hideElementSelector,
 	setViewingMode
 } from '../../actions/inner/actions';
-import { getAdpVitals, getAllXPaths, isValidXPath, scrollToView } from './domManager';
+import { getAdpVitals, getAllXPaths, isValidXPath, scrollToView, updateAdSize } from './domManager';
 
 const messenger = new Messenger(),
 	sendMessage = (cmd, data) => {
@@ -51,6 +51,10 @@ const messenger = new Messenger(),
 						isValidXPath: isValidXPath(data.xpath),
 						sectionId: data.sectionId
 					});
+					break;
+
+				case messengerCommands.UPDATE_AD_SIZE:
+					updateAdSize(data);
 					break;
 
 				case messengerCommands.VALIDATE_XPATH_SECTION:

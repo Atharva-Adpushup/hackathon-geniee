@@ -65,7 +65,9 @@ class adDescriptor extends React.Component {
 				onSetSectionType,
 				onFormatDataUpdate,
 				ui,
-				variationId
+				variationId,
+				updateAdSize,
+				channelId
 			} = this.props,
 			adCode = ad.adCode,
 			number = 12;
@@ -114,6 +116,8 @@ class adDescriptor extends React.Component {
 						onFormatDataUpdate={onFormatDataUpdate}
 						toggleDeleteButton={this.toggleDeleteButton}
 						showNotification={showNotification}
+						updateAdSize={updateAdSize}
+						channelId={channelId}
 					/>
 				</Row>
 				{this.state.showButton ? (

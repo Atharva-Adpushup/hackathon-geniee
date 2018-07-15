@@ -62,6 +62,32 @@ const selectorator = new Selectorator(),
 			return false;
 		}
 	},
+	updateAdSize = data => {
+		let adSelector = `#ad-${data.adId}`,
+			$el = $(adSelector),
+			isElement = !!($el && $el.length),
+			isSizeObject = !!(
+				data.sizeObject &&
+				Object.keys(data.sizeObject).length &&
+				data.sizeObject.width &&
+				data.sizeObject.height
+			),
+			isDataValid = !!(isElement && isSizeObject);
+
+		if (!isDataValid) {
+			return false;
+		}
+
+		const width = data.sizeObject.width,
+			height = data.sizeObject.height,
+			sizeString = `${width} X ${height}`;
+
+		$el.css({ width: `${width}px`, height: `${height}px` })
+			.find('> ul.tags > li:nth-child(2) > .tag')
+			.text(sizeString);
+
+		return true;
+	},
 	scrollToView = adId => {
 		let id = `#ad-${adId}`,
 			ele = $(id);
@@ -119,4 +145,4 @@ const selectorator = new Selectorator(),
 			});
 	};
 
-export { initDomEvents, getAdpVitals, getAllXPaths, isValidXPath, scrollToView };
+export { initDomEvents, getAdpVitals, getAllXPaths, isValidXPath, scrollToView, updateAdSize };

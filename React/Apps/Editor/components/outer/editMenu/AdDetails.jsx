@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Row, Col, OverlayTrigger, Tooltip, Button, PageHeader } from 'react-bootstrap';
+import { Row, Col, OverlayTrigger, Tooltip, Button, Well, Label } from 'react-bootstrap';
 import InlineEdit from 'shared/inlineEdit/index.jsx';
+import SelectBox from 'shared/select/select';
 import DockedSettings from './dockedSettings.jsx';
 import TriggerSettings from './triggerSettings.jsx';
 import { typeOfAds } from '../../../consts/commonConsts';
@@ -10,7 +11,8 @@ class AdDetails extends Component {
 		super(props);
 		this.state = {
 			editDock: false,
-			editTrigger: false
+			editTrigger: false,
+			selectedAdSize: ''
 		};
 		this.renderXPathAndCSS = this.renderXPathAndCSS.bind(this);
 		this.renderSectionName = this.renderSectionName.bind(this);
@@ -22,6 +24,7 @@ class AdDetails extends Component {
 		this.renderContent = this.renderContent.bind(this);
 		this.renderAdCode = this.renderAdCode.bind(this);
 		this.renderCommonDetails = this.renderCommonDetails.bind(this);
+		this.handleSelectAdSizeChange = this.handleSelectAdSizeChange.bind(this);
 	}
 
 	renderXPathAndCSS() {
@@ -68,6 +71,96 @@ class AdDetails extends Component {
 						})}
 					</pre>
 				</div>
+			</div>
+		);
+	}
+
+	getStringifiedAdSize(object) {
+		const stringifiedSize = `${object.width} X ${object.height}`;
+
+		return stringifiedSize;
+	}
+
+	getAdSizeObject(string) {
+		const array = string.replace(/ /g, '').split('X'),
+			object = { width: array[0], height: array[1] };
+
+		return object;
+	}
+
+	handleSelectAdSizeChange(value) {
+		const { section, ad, updateAdSize, channelId } = this.props,
+			isValue = !!value,
+			isUpdateAdSize = !!updateAdSize;
+		let computedAdSize = isValue ? this.getAdSizeObject(value) : { width: ad.width, height: ad.height };
+
+		if (!isUpdateAdSize) {
+			return false;
+		}
+
+		this.setState(
+			{
+				selectedAdSize: value
+			},
+			() => {
+				updateAdSize(channelId, ad.id, computedAdSize);
+			}
+		);
+	}
+
+	renderMultipleAdSize() {
+		const { ad } = this.props,
+			isValid = !!(ad && ad.multipleAdSizes && ad.multipleAdSizes.length),
+			isFromPanel = !!this.props.fromPanel;
+
+		if (!isValid) {
+			return null;
+		}
+		const collection = ad.multipleAdSizes,
+			collectionWithDefaultSize = collection.concat({ width: ad.width, height: ad.height }),
+			wellClasses = isFromPanel ? 'u-padding-t5px' : '';
+
+		return (
+			<div>
+				<p className="mB-5">Multiple Ad Sizes</p>
+				<Well className={wellClasses}>
+					<Row>
+						<Col xs={12} className="mB-10">
+							{collection.map((object, index) => {
+								const adSizeString = this.getStringifiedAdSize(object).replace(/ /g, ''),
+									marginStyle = {
+										margin: '.5em .1em',
+										display: 'inline-block'
+									};
+
+								return (
+									<Label style={marginStyle} key={index}>
+										{adSizeString}
+									</Label>
+								);
+							})}
+						</Col>
+						{!isFromPanel ? (
+							<Col xs={12} className="mB-10">
+								<SelectBox
+									value={this.state.selectedAdSize}
+									label="Change ad size"
+									onChange={this.handleSelectAdSizeChange}
+								>
+									{collectionWithDefaultSize.map((object, index) => {
+										const adSizeString = this.getStringifiedAdSize(object);
+
+										return (
+											<option key={index} value={adSizeString.replace(/ /g, '')}>
+												{adSizeString}
+											</option>
+										);
+									})}
+								</SelectBox>
+							</Col>
+						) : null}
+					</Row>
+				</Well>
 			</div>
 		);
 	}
@@ -265,6 +358,7 @@ class AdDetails extends Component {
 								{!this.props.fromPanel ? this.renderSectionName() : null}
 								{this.renderNetworkDetails()}
 							</div>
+							{this.renderMultipleAdSize()}
 							{!this.props.fromPanel ? this.renderXPathAndCSS() : null}
 						</div>
 					) : null}

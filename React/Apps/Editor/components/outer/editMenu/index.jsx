@@ -52,6 +52,8 @@ class editMenu extends React.Component {
 							onValidateXPath={props.onValidateXPath}
 							onResetErrors={props.onResetErrors}
 							showNotification={props.showNotification}
+							updateAdSize={props.updateAdSize}
+							channelId={props.channelId}
 						/>
 					</MenuItem>
 				))}
