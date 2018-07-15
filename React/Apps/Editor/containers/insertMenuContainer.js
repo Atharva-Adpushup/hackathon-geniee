@@ -37,4 +37,7 @@ const mapStateToProps = state => {
 		showNotification: params => dispatch(showNotification(params))
 	});
 
-export default connect(mapStateToProps, mapDispatchToProps)(InsertMenu);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(InsertMenu);
