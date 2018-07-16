@@ -4,7 +4,6 @@ var browserConfig = require('./browserConfig.js'),
 	dockify = require('./dockify'),
 	//promise polyfill
 	Base64 = require('Base64');
-require('promise-polyfill/src/polyfill');
 
 module.exports = {
 	log: function() {
