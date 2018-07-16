@@ -1,3 +1,5 @@
+require('promise-polyfill/src/polyfill');
+
 if (!Object.keys) {
 	Object.keys = (function() {
 		'use strict';
@@ -95,5 +97,3 @@ if (window.NodeList && !NodeList.prototype.forEach) {
 		};
 	}
 })();
-
-// Promise polyfill - required via npm
