@@ -2,7 +2,6 @@ var browserConfig = require('./browserConfig.js'),
 	// eslint-disable-next-line no-undef
 	$ = require('jquery'),
 	dockify = require('./dockify'),
-	//promise polyfill
 	Base64 = require('Base64');
 
 module.exports = {
@@ -291,20 +290,6 @@ module.exports = {
 			}
 		}
 		return data;
-	},
-	rightTrim: function(string, s) {
-		return string ? string.replace(new RegExp(s + '*$'), '') : '';
-	},
-	domanize: function(domain) {
-		return domain
-			? this.rightTrim(
-					domain
-						.replace('http://', '')
-						.replace('https://', '')
-						.replace('www.', ''),
-					'/'
-			  )
-			: '';
 	},
 	rightTrim: function(string, s) {
 		return string ? string.replace(new RegExp(s + '*$'), '') : '';
