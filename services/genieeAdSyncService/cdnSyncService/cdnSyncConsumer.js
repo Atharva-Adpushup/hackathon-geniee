@@ -23,6 +23,7 @@ module.exports = function(site) {
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.min.js'),
 		adpTagsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adptags.min.js'),
+		incontentAnalyserScriptPath = path.join(__dirname, '..', 'genieeAp', 'libs', 'aa.js'),
 		uncompressedJsTplPath = path.join(
 			__dirname,
 			'..',
@@ -64,6 +65,7 @@ module.exports = function(site) {
 		},
 		getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
 		getAdpTagsJsFile = fs.readFileAsync(adpTagsTplPath, 'utf8'),
+		getIncontentAnalyserScript = fs.readFileSync(incontentAnalyserScriptPath, 'utf8'),
 		getUncompressedJsFile = fs.readFileAsync(uncompressedJsTplPath, 'utf8'),
 		generateCombinedJson = (experiment, adpTags, manualAds) => {
 			if (!(Array.isArray(adpTags) && adpTags.length)) {
@@ -86,43 +88,45 @@ module.exports = function(site) {
 				.spread(generateCombinedJson)
 				.then(setAllConfigs);
 		},
-		getFinalConfig = Promise.join(getComputedConfig(), getJsFile, getUncompressedJsFile, getAdpTagsJsFile, function(
-			finalConfig,
-			jsFile,
-			uncompressedJsFile,
-			adpTagsFile
-		) {
-			let { apConfigs, adpTagsConfig } = finalConfig,
-				gdpr = site.get('gdpr');
-			if (site.get('ampSettings')) apConfigs.ampSettings = site.get('ampSettings');
-			jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
-			jsFile = _.replace(jsFile, /__SITE_ID__/g, site.get('siteId'));
+		getFinalConfig = Promise.join(
+			getComputedConfig(),
+			getJsFile,
+			getUncompressedJsFile,
+			getAdpTagsJsFile,
+			getIncontentAnalyserScript,
+			function(finalConfig, jsFile, uncompressedJsFile, adpTagsFile, incontentAnalyserScript) {
+				let { apConfigs, adpTagsConfig } = finalConfig,
+					gdpr = site.get('gdpr');
+				if (site.get('ampSettings')) apConfigs.ampSettings = site.get('ampSettings');
+				jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
+				jsFile = _.replace(jsFile, /__SITE_ID__/g, site.get('siteId'));
 
-			if (gdpr && gdpr.compliance) {
-				const cookieControlConfig = gdpr.cookieControlConfig;
+				if (gdpr && gdpr.compliance) {
+					const cookieControlConfig = gdpr.cookieControlConfig;
 
-				if (cookieControlConfig) {
-					let cookieScript = CC.COOKIE_CONTROL_SCRIPT_TMPL.replace(
-						'__COOKIE_CONTROL_CONFIG__',
-						JSON.stringify(cookieControlConfig)
-					);
-					jsFile = `${cookieScript}${jsFile}`;
-					uncompressedJsFile = `${cookieScript}${uncompressedJsFile}`;
+					if (cookieControlConfig) {
+						let cookieScript = CC.COOKIE_CONTROL_SCRIPT_TMPL.replace(
+							'__COOKIE_CONTROL_CONFIG__',
+							JSON.stringify(cookieControlConfig)
+						);
+						jsFile = `${cookieScript}${jsFile}`;
+						uncompressedJsFile = `${cookieScript}${uncompressedJsFile}`;
+					}
 				}
+
+				uncompressedJsFile = _.replace(uncompressedJsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
+				uncompressedJsFile = _.replace(uncompressedJsFile, /__SITE_ID__/g, site.get('siteId'));
+
+				if (adpTagsConfig) {
+					adpTagsFile = _.replace(adpTagsFile, '__INVENTORY__', JSON.stringify(adpTagsConfig));
+					adpTagsFile = _.replace(adpTagsFile, '__SITE_ID__', site.get('siteId'));
+					jsFile = `${jsFile};${adpTagsFile}`;
+					uncompressedJsFile = `${uncompressedJsFile};${adpTagsFile}`;
+				}
+
+				return { default: jsFile, uncompressed: uncompressedJsFile };
 			}
-
-			uncompressedJsFile = _.replace(uncompressedJsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
-			uncompressedJsFile = _.replace(uncompressedJsFile, /__SITE_ID__/g, site.get('siteId'));
-
-			if (adpTagsConfig) {
-				adpTagsFile = _.replace(adpTagsFile, '__INVENTORY__', JSON.stringify(adpTagsConfig));
-				adpTagsFile = _.replace(adpTagsFile, '__SITE_ID__', site.get('siteId'));
-				jsFile = `${jsFile};${adpTagsFile}`;
-				uncompressedJsFile = `${uncompressedJsFile};${adpTagsFile}`;
-			}
-
-			return { default: jsFile, uncompressed: uncompressedJsFile };
-		}),
+		),
 		writeTempFile = function(jsFile) {
 			return mkdirpAsync(tempDestPath).then(function() {
 				return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);
