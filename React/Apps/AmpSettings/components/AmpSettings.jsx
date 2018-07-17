@@ -29,15 +29,15 @@ class AmpSettings extends React.Component {
 				this.setState({
 					siteId: res.siteId,
 					siteDomain: res.siteDomain,
-					uaId: res.ampSettings['uaId'],
+					uaId: res.ampSettings.uaId,
 					channels: res.channels || [],
-					blockList: res.ampSettings['blockList'] || [],
-					samplingPercent: res.ampSettings['samplingPercent'],
-					includeGA: res.ampSettings['includeGA'] || false
+					blockList: res.ampSettings.blockList || [],
+					samplingPercent: res.ampSettings.samplingPercent,
+					includeGA: res.ampSettings.includeGA || false
 				});
 			})
 			.catch(res => {
-				console.log(res);
+				alert('Some Error Occurred In fetching amp settings!');
 			});
 	}
 	handleOnChange(e) {
@@ -97,7 +97,7 @@ class AmpSettings extends React.Component {
 						type="text"
 						placeholder={label}
 						name={name}
-						value={value}
+						value={value || ''}
 					/>
 				</Col>
 			</Row>
@@ -121,11 +121,9 @@ class AmpSettings extends React.Component {
 		})
 			.then(res => {
 				alert('Settings Saved Successfully!');
-				console.log(res);
 			})
 			.catch(res => {
 				alert('Some Error Occurred!');
-				console.log(res);
 			});
 	}
 	render() {
@@ -165,7 +163,7 @@ class AmpSettings extends React.Component {
 											Include
 											<input
 												type="checkbox"
-												value={this.state.includeGA || false}
+												checked={this.state.includeGA || false}
 												style={{ width: 'auto', marginLeft: 10 }}
 												onChange={e => {
 													this.setState({

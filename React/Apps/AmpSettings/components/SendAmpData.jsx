@@ -83,7 +83,6 @@ class SendAmpData extends React.Component {
 		const name = target.name;
 		const value = target.type === 'checkbox' ? target.checked : target.value;
 		this.setState({ [name]: value });
-		console.log(name, value);
 	}
 	send(e) {
 		let { siteId } = this.state, data, url;
@@ -118,10 +117,10 @@ class SendAmpData extends React.Component {
 			data: JSON.stringify(data)
 		})
 			.then(res => {
-				console.log(res);
+				alert('AMP conversion request sent successfully!');
 			})
 			.catch(res => {
-				console.log(res);
+				alert('Some Error Occurred!');
 			});
 	}
 	render() {
