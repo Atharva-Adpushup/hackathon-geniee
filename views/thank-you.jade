@@ -47,7 +47,6 @@ block bodyContent
 	- primarySiteId = user.primarySiteId || null;
 	- primarySiteDomain = user.primarySiteDomain || null;
 	- primarySiteStep = user.primarySiteStep || null;
-	- operationToolsPath = 'http://console.adpushup.com/tools?siteId=' + primarySiteId;
 
 	.thankyouWrapper
 		include layout/header
@@ -76,13 +75,6 @@ block bodyContent
 							li Truth Theory
 						a(href="http://www.adpushup.com/customers/AdPushup_RentLingo_CaseStudy.pdf", target="_blank")
 							li Rent Lingo
-
-					p(style="margin: 20px 0 10px 0px; font-weight: bold;") Operation Tools:
-					ul
-						a(href=operationToolsPath, target="_blank")
-							li Convert Ad Code
-						a(href=operationToolsPath, target="_blank")
-							li Generate Header code
 
 	- analytics = analytics || {};
 	if analytics
