@@ -11,8 +11,7 @@ class AmpSettings extends React.Component {
 		super(props);
 		this.state = {
 			channels: [],
-			blockList: [],
-			samplingPercent: ''
+			blockList: []
 		};
 		this.fetchAmpSettings = this.fetchAmpSettings.bind(this);
 		this.handleOnChange = this.handleOnChange.bind(this);
@@ -30,9 +29,11 @@ class AmpSettings extends React.Component {
 				this.setState({
 					siteId: res.siteId,
 					siteDomain: res.siteDomain,
-					channels: res.channels,
+					uaId: res.ampSettings['uaId'],
+					channels: res.channels || [],
 					blockList: res.ampSettings['blockList'] || [],
-					samplingPercent: res.ampSettings['samplingPercent']
+					samplingPercent: res.ampSettings['samplingPercent'],
+					includeGA: res.ampSettings['includeGA'] || false
 				});
 			})
 			.catch(res => {
@@ -112,9 +113,10 @@ class AmpSettings extends React.Component {
 			method: 'POST',
 			url: '/user/site/' + siteId + '/saveAmpSettings',
 			data: JSON.stringify({
-				samplingPercent: this.state['samplingPercent'],
-				blockList: this.state['blockList'],
-				uaId: this.state.uaId
+				samplingPercent: this.state.samplingPercent,
+				blockList: this.state.blockList,
+				uaId: this.state.uaId,
+				includeGA: this.state.includeGA || false
 			})
 		})
 			.then(res => {
@@ -172,20 +174,18 @@ class AmpSettings extends React.Component {
 												}}
 											/>
 										</Col>
-										{this.state.includeGA
-											? <Col sm={6}>
-													<input
-														type="text"
-														placeholder="UA Id"
-														value={this.state.uaId || ''}
-														onChange={e => {
-															this.setState({
-																uaId: e.target.value
-															});
-														}}
-													/>
-												</Col>
-											: ''}
+										<Col sm={6}>
+											<input
+												type="text"
+												placeholder="UA Id"
+												value={this.state.uaId || ''}
+												onChange={e => {
+													this.setState({
+														uaId: e.target.value
+													});
+												}}
+											/>
+										</Col>
 									</RowColSpan>
 									<Button className="btn-success" type="submit">
 										Save

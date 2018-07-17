@@ -183,7 +183,7 @@ class PageGroupSettings extends React.Component {
 		const target = e.target;
 		const name = target.name;
 		const value = target.checked;
-		let social = this.state.social, apps = social['apps'];
+		let social = this.state.social, apps = social['apps'] || [];
 		//this.setState({ [name]: value });
 		if (value == true) {
 			apps.push(name);
