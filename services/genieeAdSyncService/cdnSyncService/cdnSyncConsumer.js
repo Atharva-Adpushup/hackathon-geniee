@@ -166,9 +166,9 @@ module.exports = function(site) {
 
 				// Generate final init script based on the services to be added
 				var scripts = generateFinalInitScript(jsFile, uncompressedJsFile)
-					.addService(CC.SERVICES.GDPR, gdpr)
-					.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsFile)
 					.addService(CC.SERVICES.INCONTENT_ANALYSER, incontentAds, incontentAnalyserScript)
+					.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsFile)
+					.addService(CC.SERVICES.GDPR, gdpr)
 					.done();
 
 				return { default: scripts.jsFile, uncompressed: scripts.uncompressedJsFile };

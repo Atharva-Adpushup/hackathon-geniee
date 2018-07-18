@@ -10,9 +10,10 @@ module.exports = {
 		DATE_FORMAT: 'YYYY-MM-DD'
 	},
 	SERVICES: {
-		GDPR: 'GDPR',
+		INCONTENT_ANALYSER: 'INCONTENT_ANALYSER',
 		ADPTAGS: 'ADPTAGS',
-		INCONTENT_ANALYSER: 'INCONTENT_ANALYSER'
+		GDPR: 'GDPR',
+		HEADER_BIDDING: 'HEADER_BIDDING'
 	},
 	COOKIE_CONTROL_SCRIPT_TMPL:
 		'!function(){var o=document.createElement("script");o.src="https://cc.cdn.civiccomputing.com/8.0/cookieControl-8.0.min.js",document.head.appendChild(o);var n=setInterval(function(){window.CookieControl&&(clearInterval(n),CookieControl.load(__COOKIE_CONTROL_CONFIG__))},10)}();',
