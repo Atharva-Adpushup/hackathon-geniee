@@ -12,6 +12,7 @@ var path = require('path'),
 	CC = require('../../../configs/commonConsts'),
 	generateADPTagsConfig = require('./generateADPTagsConfig'),
 	generateAdPushupConfig = require('./generateAdPushupConfig'),
+	siteModel = require('../../../models/siteModel'),
 	config = require('../../../configs/config');
 
 module.exports = function(site) {
@@ -77,6 +78,53 @@ module.exports = function(site) {
 				manualAds
 			}));
 		},
+		generateFinalInitScript = (jsFile, uncompressedJsFile) => {
+			return {
+				addService: (serviceName, serviceConfig = {}, serviceScript = null) => {
+					switch (serviceName) {
+						case CC.SERVICES.GDPR:
+							const gdpr = serviceConfig;
+							if (gdpr && gdpr.compliance) {
+								const cookieControlConfig = gdpr.cookieControlConfig;
+								if (cookieControlConfig) {
+									let cookieScript = CC.COOKIE_CONTROL_SCRIPT_TMPL.replace(
+										'__COOKIE_CONTROL_CONFIG__',
+										JSON.stringify(cookieControlConfig)
+									);
+									jsFile = `${cookieScript}${jsFile}`;
+									uncompressedJsFile = `${cookieScript}${uncompressedJsFile}`;
+								}
+							}
+							return generateFinalInitScript(jsFile, uncompressedJsFile);
+						case CC.SERVICES.ADPTAGS:
+							const adpTagsConfig = serviceConfig,
+								adpTagsFile = serviceScript;
+							if (adpTagsConfig) {
+								adpTagsFile = _.replace(adpTagsFile, '__INVENTORY__', JSON.stringify(adpTagsConfig));
+								adpTagsFile = _.replace(adpTagsFile, '__SITE_ID__', site.get('siteId'));
+								jsFile = `${jsFile};${adpTagsFile}`;
+								uncompressedJsFile = `${uncompressedJsFile};${adpTagsFile}`;
+							}
+							return generateFinalInitScript(jsFile, uncompressedJsFile);
+						case CC.SERVICES.INCONTENT_ANALYSER:
+							const incontentAds = serviceConfig,
+								incontentAdsScript = serviceScript;
+							if (incontentAds.length) {
+								jsFile = _.replace(jsFile, '__IN_CONTENT_ANALYSER_SCRIPT__', incontentAdsScript);
+								uncompressedJsFile = _.replace(
+									uncompressedJsFile,
+									'__IN_CONTENT_ANALYSER_SCRIPT__',
+									incontentAdsScript
+								);
+							}
+							return generateFinalInitScript(jsFile, uncompressedJsFile);
+					}
+				},
+				done: () => {
+					return { jsFile, uncompressedJsFile };
+				}
+			};
+		},
 		getComputedConfig = () => {
 			return getReportData(site)
 				.then(reportData => {
@@ -93,36 +141,23 @@ module.exports = function(site) {
 			getJsFile,
 			getUncompressedJsFile,
 			getAdpTagsJsFile,
+			siteModel.getIncontentAds(site.get('siteId')),
 			getIncontentAnalyserScript,
-			function(finalConfig, jsFile, uncompressedJsFile, adpTagsFile, incontentAnalyserScript) {
+			function(finalConfig, jsFile, uncompressedJsFile, adpTagsFile, incontentAds, incontentAnalyserScript) {
 				let { apConfigs, adpTagsConfig } = finalConfig,
 					gdpr = site.get('gdpr');
 				if (site.get('ampSettings')) apConfigs.ampSettings = site.get('ampSettings');
 				jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
 				jsFile = _.replace(jsFile, /__SITE_ID__/g, site.get('siteId'));
-
-				if (gdpr && gdpr.compliance) {
-					const cookieControlConfig = gdpr.cookieControlConfig;
-
-					if (cookieControlConfig) {
-						let cookieScript = CC.COOKIE_CONTROL_SCRIPT_TMPL.replace(
-							'__COOKIE_CONTROL_CONFIG__',
-							JSON.stringify(cookieControlConfig)
-						);
-						jsFile = `${cookieScript}${jsFile}`;
-						uncompressedJsFile = `${cookieScript}${uncompressedJsFile}`;
-					}
-				}
-
 				uncompressedJsFile = _.replace(uncompressedJsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
 				uncompressedJsFile = _.replace(uncompressedJsFile, /__SITE_ID__/g, site.get('siteId'));
 
-				if (adpTagsConfig) {
-					adpTagsFile = _.replace(adpTagsFile, '__INVENTORY__', JSON.stringify(adpTagsConfig));
-					adpTagsFile = _.replace(adpTagsFile, '__SITE_ID__', site.get('siteId'));
-					jsFile = `${jsFile};${adpTagsFile}`;
-					uncompressedJsFile = `${uncompressedJsFile};${adpTagsFile}`;
-				}
+				// Generate final init script based on the services to be added
+				const { jsFile, uncompressedJsFile } = generateFinalInitScript(jsFile, uncompressedJsFile)
+					.addService(CC.SERVICES.GDPR, gdpr)
+					.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsFile)
+					.addService(CC.SERVICES.INCONTENT_ANALYSER, incontentAds, incontentAnalyserScript)
+					.done();
 
 				return { default: jsFile, uncompressed: uncompressedJsFile };
 			}
