@@ -21,6 +21,7 @@ module.exports = function(site) {
 	var paramConfig = {
 			siteId: site.get('siteId')
 		},
+		noop = 'function() {}',
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.min.js'),
 		adpTagsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adptags.min.js'),
@@ -83,11 +84,11 @@ module.exports = function(site) {
 				addService: (serviceName, serviceConfig = {}, serviceScript = null) => {
 					switch (serviceName) {
 						case CC.SERVICES.GDPR:
-							const gdpr = serviceConfig;
+							var gdpr = serviceConfig;
 							if (gdpr && gdpr.compliance) {
-								const cookieControlConfig = gdpr.cookieControlConfig;
+								var cookieControlConfig = gdpr.cookieControlConfig;
 								if (cookieControlConfig) {
-									let cookieScript = CC.COOKIE_CONTROL_SCRIPT_TMPL.replace(
+									var cookieScript = CC.COOKIE_CONTROL_SCRIPT_TMPL.replace(
 										'__COOKIE_CONTROL_CONFIG__',
 										JSON.stringify(cookieControlConfig)
 									);
@@ -97,7 +98,7 @@ module.exports = function(site) {
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 						case CC.SERVICES.ADPTAGS:
-							const adpTagsConfig = serviceConfig,
+							var adpTagsConfig = serviceConfig,
 								adpTagsFile = serviceScript;
 							if (adpTagsConfig) {
 								adpTagsFile = _.replace(adpTagsFile, '__INVENTORY__', JSON.stringify(adpTagsConfig));
@@ -107,14 +108,25 @@ module.exports = function(site) {
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 						case CC.SERVICES.INCONTENT_ANALYSER:
-							const incontentAds = serviceConfig,
-								incontentAdsScript = serviceScript;
+							var incontentAds = serviceConfig,
+								incontentAdsScript = serviceScript,
+								incontentAdsScript = incontentAdsScript.substring(
+									0,
+									incontentAdsScript.trim().length - 1
+								);
 							if (incontentAds.length) {
 								jsFile = _.replace(jsFile, '__IN_CONTENT_ANALYSER_SCRIPT__', incontentAdsScript);
 								uncompressedJsFile = _.replace(
 									uncompressedJsFile,
 									'__IN_CONTENT_ANALYSER_SCRIPT__',
 									incontentAdsScript
+								);
+							} else {
+								jsFile = _.replace(jsFile, '__IN_CONTENT_ANALYSER_SCRIPT__', noop);
+								uncompressedJsFile = _.replace(
+									uncompressedJsFile,
+									'__IN_CONTENT_ANALYSER_SCRIPT__',
+									noop
 								);
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
@@ -153,13 +165,13 @@ module.exports = function(site) {
 				uncompressedJsFile = _.replace(uncompressedJsFile, /__SITE_ID__/g, site.get('siteId'));
 
 				// Generate final init script based on the services to be added
-				const { jsFile, uncompressedJsFile } = generateFinalInitScript(jsFile, uncompressedJsFile)
+				var scripts = generateFinalInitScript(jsFile, uncompressedJsFile)
 					.addService(CC.SERVICES.GDPR, gdpr)
 					.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsFile)
 					.addService(CC.SERVICES.INCONTENT_ANALYSER, incontentAds, incontentAnalyserScript)
 					.done();
 
-				return { default: jsFile, uncompressed: uncompressedJsFile };
+				return { default: scripts.jsFile, uncompressed: scripts.uncompressedJsFile };
 			}
 		),
 		writeTempFile = function(jsFile) {
