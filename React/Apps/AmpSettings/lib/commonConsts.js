@@ -42,9 +42,6 @@ const commonConsts = {
 			},
 			adx: {
 				slotId: { alias: 'slotId', value: 'slotId' }
-			},
-			custom: {
-				adCode: { alias: 'adCode', value: 'adCode' }
 			}
 		},
 		sampleAds: {

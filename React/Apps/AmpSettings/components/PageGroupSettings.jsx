@@ -122,13 +122,13 @@ class PageGroupSettings extends React.Component {
 			</Row>
 		);
 	}
-	generateAdCode(adData) {
-		let adNetwork = adData.type, adCode = commonConsts.ads.sampleAds[adNetwork];
+	generateAdCode(index) {
+		let ad = this.state.ads[index], adNetwork = ad.type, adCode = commonConsts.ads.sampleAds[adNetwork];
 
-		adCode = adCode.replace('dWidth', adData.width);
-		adCode = adCode.replace('dHeight', adData.height);
-		for (let field in adData.data) {
-			adCode = adCode.replace(field, adData.data[field]);
+		adCode = adCode.replace('dWidth', ad.width);
+		adCode = adCode.replace('dHeight', ad.height);
+		for (let field in ad.data) {
+			adCode = adCode.replace(field, ad.data[field]);
 		}
 		return adCode;
 	}
@@ -141,10 +141,14 @@ class PageGroupSettings extends React.Component {
 		finalData.beforeJs = finalData.beforeJs ? btoa(finalData.beforeJs) : '';
 		finalData.afterJs = finalData.afterJs ? btoa(finalData.afterJs) : '';
 		for (let i = 0; i < dataAds.length; i++) {
-			if (dataAds[i].selector && dataAds[i].data && dataAds[i].type) {
-				let adCode = dataAds[i].type != 'custom' ? this.generateAdCode(dataAds[i]) : dataAds[i].data.adCode;
-				dataAds[i].adCode = btoa(adCode);
-				ads.push(dataAds[i]);
+			if (dataAds[i].selector && dataAds[i].adCode && dataAds[i].type) {
+				let adType = dataAds[i].type;
+				if (!commonConsts.ads.type[adType]) delete dataAds[i].data;
+				if ((commonConsts.ads.type[adType] && dataAds[i].data) || !commonConsts.ads.type[adType]) {
+					let adCode = dataAds[i].adCode;
+					dataAds[i].adCode = btoa(adCode);
+					ads.push(dataAds[i]);
+				}
 			}
 		}
 		finalData.ads = ads;
@@ -264,17 +268,17 @@ class PageGroupSettings extends React.Component {
 	}
 	renderNetworkInputs(index) {
 		let selectedAd = this.state.ads[index], selectedNetwork = selectedAd.type;
-		return selectedNetwork
-			? Object.keys(commonConsts.ads.type[selectedNetwork]).map((field, filedIndex) => (
-					<RowColSpan label={field} key={filedIndex}>
+		return selectedNetwork && commonConsts.ads.type[selectedNetwork]
+			? Object.keys(commonConsts.ads.type[selectedNetwork]).map((field, fieldIndex) => (
+					<RowColSpan label={field} key={fieldIndex}>
 						<input
 							type="text"
 							placeholder={field}
 							name={field}
 							className="form-control"
-							value={(selectedAd.data && selectedAd.data[field]) || ''}
+							value={selectedAd.data[field] || ''}
 							onChange={e => {
-								let ads = this.state.ads, ad = ads[index], data = ad.data || {};
+								let ads = this.state.ads, ad = ads[index], data = ad.data;
 								data[field] = e.target.value;
 								this.setState({ ads });
 							}}
@@ -371,15 +375,34 @@ class PageGroupSettings extends React.Component {
 						</select>
 
 					</RowColSpan>
+					<RowColSpan label="AdCode">
+						<textarea
+							style={{ resize: 'both', overflow: 'auto' }}
+							onChange={e => {
+								let ads = this.state.ads, ad = ads[index];
+								ad.adCode = e.target.value;
+								this.setState({ ads });
+							}}
+							placeholder="AdCode"
+							name="adCode"
+							className="form-control"
+							value={
+								this.state.ads[index].type && this.state.ads[index].type != 'custom'
+									? this.generateAdCode(index)
+									: linkView.adCode
+							}
+							disabled={this.state.ads[index].type && this.state.ads[index].type != 'custom'}
+						/>
+					</RowColSpan>
 					<RowColSpan label="Type">
 						<select
 							className="form-control"
 							name="type"
 							value={linkView.type || ''}
 							onChange={e => {
-								let ads = this.state.ads, ad = ads[index];
+								let ads = this.state.ads, ad = ads[index], adFields = commonConsts.ads.type;
 								ad.type = e.target.value;
-								ad.data = {};
+								if (adFields[ad.type]) ad.data = {};
 								this.setState({ ads });
 							}}
 						>
@@ -389,6 +412,7 @@ class PageGroupSettings extends React.Component {
 									{type}
 								</option>
 							))}
+							<option value="custom">Custom</option>
 						</select>
 					</RowColSpan>
 					{this.renderNetworkInputs(index)}
@@ -530,7 +554,7 @@ class PageGroupSettings extends React.Component {
 							<span>Links</span>
 							<button
 								style={{ width: 'auto', marginLeft: 10 }}
-								className="btn-success"
+								className="btn-primary"
 								type="button"
 								onClick={() => {
 									let menu = this.state.menu, links = menu.links;
@@ -613,11 +637,11 @@ class PageGroupSettings extends React.Component {
 					</RowColSpan>
 					<RowColSpan label="Ads">
 						<button
-							className="btn-success"
+							className="btn-primary"
 							type="button"
 							onClick={() => {
 								let ads = this.state.ads;
-								ads.push({ width: 100, height: 100 });
+								ads.push({ width: 100, height: 100, operations: 'INSERTBEFORE' });
 								this.setState({ ads });
 							}}
 						>

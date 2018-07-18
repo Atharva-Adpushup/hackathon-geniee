@@ -1,5 +1,6 @@
 import React from 'react';
 import ActionCard from '../../../Components/ActionCard.jsx';
+import Loader from '../../../Components/Loader.jsx';
 import Heading from './helper/Heading.jsx';
 import PageGroupSettings from './PageGroupSettings.jsx';
 import SendAmpData from './SendAmpData.jsx';
@@ -11,7 +12,8 @@ class AmpSettings extends React.Component {
 		super(props);
 		this.state = {
 			channels: [],
-			blockList: []
+			blockList: [],
+			isLoading: true
 		};
 		this.fetchAmpSettings = this.fetchAmpSettings.bind(this);
 		this.handleOnChange = this.handleOnChange.bind(this);
@@ -33,7 +35,8 @@ class AmpSettings extends React.Component {
 					channels: res.channels || [],
 					blockList: res.ampSettings.blockList || [],
 					samplingPercent: res.ampSettings.samplingPercent,
-					includeGA: res.ampSettings.includeGA || false
+					includeGA: res.ampSettings.includeGA || false,
+					isLoading: false
 				});
 			})
 			.catch(res => {
@@ -127,93 +130,95 @@ class AmpSettings extends React.Component {
 			});
 	}
 	render() {
-		return (
-			<Row>
-				<ActionCard title="AMP settings">
-					<div className="settings-pane">
-						<Row>
-							<Col sm={6}>
-								<form onSubmit={this.saveSiteSettings}>
-									<Heading title="Site Level Settings" />
-									{this.renderInputControl(
-										'Sampling Percentage',
-										'samplingPercent',
-										this.state.samplingPercent
-									)}
-									<Row>
-										<Col sm={5}>
-											<span>BlockList</span>
-											<button
-												style={{ width: 'auto', marginLeft: 10 }}
-												className="btn-success"
-												type="button"
-												onClick={() => {
-													let blockList = this.state.blockList;
-													blockList.push('');
-													this.setState({ blockList });
-												}}
-											>
-												+ Add
-											</button>
-										</Col>
-										{this.renderBlockList()}
-									</Row>
-									<RowColSpan label="Google Analytics">
-										<Col sm={6}>
-											Include
-											<input
-												type="checkbox"
-												checked={this.state.includeGA || false}
-												style={{ width: 'auto', marginLeft: 10 }}
-												onChange={e => {
-													this.setState({
-														includeGA: e.target.checked
-													});
-												}}
-											/>
-										</Col>
-										<Col sm={6}>
-											<input
-												type="text"
-												placeholder="UA Id"
-												value={this.state.uaId || ''}
-												onChange={e => {
-													this.setState({
-														uaId: e.target.value
-													});
-												}}
-											/>
-										</Col>
-									</RowColSpan>
-									<Button className="btn-success" type="submit">
-										Save
-									</Button>
-								</form>
-								<hr />
+		if (this.state.isLoading) return <Loader />;
+		else
+			return (
+				<Row>
+					<ActionCard title="AMP settings">
+						<div className="settings-pane">
+							<Row>
+								<Col sm={6}>
+									<form onSubmit={this.saveSiteSettings}>
+										<Heading title="Site Level Settings" />
+										{this.renderInputControl(
+											'Sampling Percentage',
+											'samplingPercent',
+											this.state.samplingPercent
+										)}
+										<Row>
+											<Col sm={5}>
+												<span>BlockList</span>
+												<button
+													style={{ width: 'auto', marginLeft: 10 }}
+													className="btn-primary"
+													type="button"
+													onClick={() => {
+														let blockList = this.state.blockList;
+														blockList.push('');
+														this.setState({ blockList });
+													}}
+												>
+													+ Add
+												</button>
+											</Col>
+											{this.renderBlockList()}
+										</Row>
+										<RowColSpan label="Google Analytics">
+											<Col sm={6}>
+												Include
+												<input
+													type="checkbox"
+													checked={this.state.includeGA || false}
+													style={{ width: 'auto', marginLeft: 10 }}
+													onChange={e => {
+														this.setState({
+															includeGA: e.target.checked
+														});
+													}}
+												/>
+											</Col>
+											<Col sm={6}>
+												<input
+													type="text"
+													placeholder="UA Id"
+													value={this.state.uaId || ''}
+													onChange={e => {
+														this.setState({
+															uaId: e.target.value
+														});
+													}}
+												/>
+											</Col>
+										</RowColSpan>
+										<Button className="btn-success" type="submit">
+											Save
+										</Button>
+									</form>
+									<hr />
 
-								<SendAmpData
-									channels={this.state.channels}
-									siteId={this.state.siteId}
-									siteDomain={this.state.siteDomain}
-								/>
-							</Col>
-							<Col sm={6}>
-								<Heading title="Channel Level Settings" />
-								{this.state.channels.map(channel => {
-									return (
-										<PageGroupSettings
-											channel={channel}
-											siteId={this.state.siteId}
-											key={channel.pageGroup}
-										/>
-									);
-								})}
-							</Col>
-						</Row>
-					</div>
-				</ActionCard>
-			</Row>
-		);
+									<SendAmpData
+										channels={this.state.channels}
+										siteId={this.state.siteId}
+										siteDomain={this.state.siteDomain}
+									/>
+								</Col>
+								<Col sm={6}>
+									<Heading title="Channel Level Settings" />
+									{this.state.channels.map(channel => {
+										return (
+											<PageGroupSettings
+												channel={channel}
+												siteId={this.state.siteId}
+												key={channel.pageGroup}
+											/>
+										);
+									})}
+								</Col>
+							</Row>
+						</div>
+					</ActionCard>
+				</Row>
+			);
 	}
 }
 

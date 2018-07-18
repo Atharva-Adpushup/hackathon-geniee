@@ -7,8 +7,6 @@ class SendAmpData extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			pageGroup: '',
-			conversionType: '',
 			siteId: props.siteId,
 			siteDomain: props.siteDomain
 		};
@@ -42,7 +40,7 @@ class SendAmpData extends React.Component {
 				<RowColSpan label="Select PageGroup">
 					<select
 						className="form-control"
-						value={this.state.pageGroup}
+						value={this.state.pageGroup || ''}
 						name="pageGroup"
 						onChange={this.handleOnChange}
 					>
@@ -130,7 +128,7 @@ class SendAmpData extends React.Component {
 				<RowColSpan label="Select conversion level">
 					<select
 						className="form-control"
-						value={this.state.conversionType}
+						value={this.state.conversionType || ''}
 						name="conversionType"
 						onChange={this.handleOnChange}
 					>
