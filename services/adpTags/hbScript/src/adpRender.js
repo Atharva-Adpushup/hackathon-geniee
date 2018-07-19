@@ -82,7 +82,7 @@ var logger = require('../helpers/logger'),
 		return targeting;
 	},
 	getAdserverTargeting = function(slot) {
-		if (slot.optionalParam.headerBidding) {
+		if (slot.optionalParam.headerBidding && slot.bidders.length) {
 			return pbjs.getAdserverTargeting()[slot.containerId];
 		}
 		return null;

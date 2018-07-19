@@ -164,44 +164,6 @@ var $ = require('jquery'),
 				// Replaced '-' with '_' to avoid ElasticSearch split issue
 				variationId: variation.id // set the chosenVariation variation in feedback data;
 			},
-			// Push Ad object in Geniee global 'ads' object and invoke feedback request mechanism
-			pushAdToGenieeConfig = function(obj, containerId) {
-				var isGenieeAdsObject = !!(adp.geniee && adp.geniee.ads),
-					isGenieeAd = !!(obj && obj.network && obj.network === 'geniee' && obj.networkData),
-					isZoneId = !!(isGenieeAd && obj.networkData.zoneId),
-					adObject = $.extend(true, {}, obj),
-					zoneId;
-
-				if (!isGenieeAd) {
-					utils.log('PushToGenieeAdsObject: Non Geniee ad found, will not be added to its ads object.');
-					return false;
-				}
-
-				if (!isZoneId) {
-					utils.log(
-						'PushToGenieeAdsObject: Invalid zoneId found for Geniee ad, will not be added to its ads object.'
-					);
-					return false;
-				}
-
-				zoneId = obj.networkData.zoneId;
-				adObject.containerId = containerId || '';
-				// Below 'success' property means that Geniee ad has been successfully inserted into DOM
-				adObject.success = true;
-
-				// Below 'isImpressionFeedback' property means that Geniee revenue keenIO impression request has not been sent yet
-				// for this ad
-				adObject.isImpressionFeedback = false;
-
-				if (!isGenieeAdsObject) {
-					adp.geniee = {
-						ads: {}
-					};
-				}
-
-				adp.geniee.ads[zoneId] = adObject;
-				adp.geniee.sendRevenueFeedback ? adp.geniee.sendRevenueFeedback(zoneId) : null;
-			},
 			placeGenieeHeadCode = function(genieeIds) {
 				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIds);
 				genieeHeadCode && $('head').append(genieeHeadCode);
@@ -246,13 +208,7 @@ var $ = require('jquery'),
 					getAdContainer(ad, config.xpathWaitTimeout)
 						.done(function(data) {
 							var isContainerElement = !!(data.container && data.container.length),
-								containerId = isContainerElement ? data.container.get(0).id : '',
-								isGenieeAd = !!(ad && ad.network && ad.network === 'geniee' && ad.networkData);
-
-							if (isGenieeAd) {
-								// Add 'ad' object to global geniee ads object when network is matched
-								pushAdToGenieeConfig(ad, containerId);
-							}
+								containerId = isContainerElement ? data.container.get(0).id : '';
 
 							// if all well then ad id of ad in feedback to tell system that impression was given
 							//feedbackData.ads.push(ad.id);
@@ -270,8 +226,7 @@ var $ = require('jquery'),
 						var sectionObj = sectionsWithTargetElm[ad.section],
 							$containerElement,
 							isContainerElement,
-							containerId,
-							isGenieeAd = !!(ad && ad.network && ad.network === 'geniee' && ad.networkData);
+							containerId;
 
 						if (sectionObj && sectionObj.elem) {
 							if (!!sectionObj.isSecondaryCss) {
@@ -287,11 +242,6 @@ var $ = require('jquery'),
 							$containerElement = getContainer(ad, sectionObj.elem);
 							isContainerElement = !!($containerElement && $containerElement.length);
 							containerId = isContainerElement ? $containerElement.get(0).id : '';
-
-							if (isGenieeAd) {
-								// Add 'ad' object to global geniee ads object when network is matched
-								pushAdToGenieeConfig(ad, containerId);
-							}
 
 							next(ad, { success: true, container: $containerElement });
 						} else {

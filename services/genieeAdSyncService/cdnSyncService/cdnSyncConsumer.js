@@ -102,6 +102,7 @@ module.exports = function(site) {
 					switch (serviceName) {
 						case CC.SERVICES.INCONTENT_ANALYSER:
 							serviceScript = serviceScript.substring(0, serviceScript.trim().length - 1);
+
 							if (serviceConfig.length) {
 								jsFile = _.replace(jsFile, '__IN_CONTENT_ANALYSER_SCRIPT__', serviceScript);
 								uncompressedJsFile = _.replace(
@@ -118,6 +119,7 @@ module.exports = function(site) {
 								);
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
+
 						case CC.SERVICES.ADPTAGS:
 							if (serviceConfig) {
 								serviceScript = _.replace(
@@ -130,19 +132,25 @@ module.exports = function(site) {
 								uncompressedJsFile = `${uncompressedJsFile};${serviceScript}`;
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
+
 						case CC.SERVICES.HEADER_BIDDING:
 							serviceScript.substring(62, serviceScript.trim().length - 1);
-							if (serviceConfig && serviceConfig.hbConfig) {
+
+							if (serviceConfig && serviceConfig.hbcf.hbConfig && serviceConfig.hbAds.length) {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', serviceScript);
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', serviceScript);
 							} else {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', noop);
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', noop);
 							}
+							return generateFinalInitScript(jsFile, uncompressedJsFile);
+
 						case CC.SERVICES.GDPR:
 							var gdpr = serviceConfig;
+
 							if (gdpr && gdpr.compliance) {
 								var cookieControlConfig = gdpr.cookieControlConfig;
+
 								if (cookieControlConfig) {
 									var cookieScript = CC.COOKIE_CONTROL_SCRIPT_TMPL.replace(
 										'__COOKIE_CONTROL_CONFIG__',
@@ -153,6 +161,7 @@ module.exports = function(site) {
 								}
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
+
 						default:
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 					}
@@ -177,7 +186,7 @@ module.exports = function(site) {
 			getComputedConfig(),
 			getJsFile,
 			getUncompressedJsFile,
-			siteModel.getIncontentAds(site.get('siteId')),
+			siteModel.getIncontentAndHbAds(site.get('siteId')),
 			getIncontentAnalyserScript,
 			getAdpTagsScript,
 			getHbConfig,
@@ -186,14 +195,15 @@ module.exports = function(site) {
 				finalConfig,
 				jsFile,
 				uncompressedJsFile,
-				incontentAds,
+				incontentAndHbAds,
 				incontentAnalyserScript,
 				adpTagsScript,
-				hbConfig,
+				hbcf,
 				prebidScript
 			) {
 				let { apConfigs, adpTagsConfig } = finalConfig,
-					gdpr = site.get('gdpr');
+					gdpr = site.get('gdpr'),
+					{ incontentAds, hbAds } = incontentAndHbAds;
 				if (site.get('ampSettings')) apConfigs.ampSettings = site.get('ampSettings');
 				jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
 				jsFile = _.replace(jsFile, /__SITE_ID__/g, site.get('siteId'));
@@ -204,7 +214,7 @@ module.exports = function(site) {
 				var scripts = generateFinalInitScript(jsFile, uncompressedJsFile)
 					.addService(CC.SERVICES.INCONTENT_ANALYSER, incontentAds, incontentAnalyserScript)
 					.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsScript)
-					.addService(CC.SERVICES.HEADER_BIDDING, hbConfig, prebidScript)
+					.addService(CC.SERVICES.HEADER_BIDDING, { hbcf, hbAds }, prebidScript)
 					.addService(CC.SERVICES.GDPR, gdpr)
 					.done();
 

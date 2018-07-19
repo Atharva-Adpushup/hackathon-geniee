@@ -425,25 +425,35 @@ function apiModule() {
 					throw new AdPushupError('Cannot get setup step');
 				});
 		},
-		getIncontentAds: function(siteId) {
+		getIncontentAndHbAds: function(siteId) {
 			return API.getSiteChannels(siteId)
 				.then(channelsList => {
 					let sectionPromises = [];
+
 					channelsList.forEach(channel => {
 						const platform = channel.split(':')[0],
 							pageGroup = channel.split(':')[1];
 						sectionPromises.push(channelModel.getChannelSections(siteId, platform, pageGroup));
 					});
+
 					return Promise.all(sectionPromises);
 				})
 				.then(sections => {
-					let allSections = [];
+					let allSections = [],
+						incontentAds = [],
+						hbAds = [];
+
 					sections.forEach(sectionArr => {
 						allSections = allSections.concat(sectionArr);
 					});
-					return _.filter(allSections, section => {
-						return section.isIncontent;
+					incontentAds = _.filter(allSections, section => section.isIncontent);
+					hbAds = _.filter(allSections, section => {
+						let adId = Object.keys(section.ads)[0];
+
+						return section.ads[adId].networkData.headerBidding;
 					});
+
+					return { incontentAds, hbAds };
 				});
 		},
 		getSitePageGroups: function(siteId) {
