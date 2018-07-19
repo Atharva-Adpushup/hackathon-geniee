@@ -13,6 +13,7 @@ var path = require('path'),
 	generateADPTagsConfig = require('./generateADPTagsConfig'),
 	generateAdPushupConfig = require('./generateAdPushupConfig'),
 	siteModel = require('../../../models/siteModel'),
+	couchbase = require('../../../helpers/couchBaseService'),
 	config = require('../../../configs/config');
 
 module.exports = function(site) {
@@ -24,8 +25,6 @@ module.exports = function(site) {
 		noop = 'function() {}',
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.min.js'),
-		adpTagsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adptags.min.js'),
-		incontentAnalyserScriptPath = path.join(__dirname, '..', 'genieeAp', 'libs', 'aa.js'),
 		uncompressedJsTplPath = path.join(
 			__dirname,
 			'..',
@@ -37,6 +36,19 @@ module.exports = function(site) {
 			'builds',
 			'adpushup.js'
 		),
+		incontentAnalyserScriptPath = path.join(__dirname, '..', 'genieeAp', 'libs', 'aa.js'),
+		adpTagsScriptPath = path.join(
+			__dirname,
+			'..',
+			'..',
+			'..',
+			'public',
+			'assets',
+			'js',
+			'builds',
+			'adptags.min.js'
+		),
+		prebidScriptPath = path.join(__dirname, '..', '..', 'adpTags', 'Prebid.js', 'build', 'dist', 'prebid.js'),
 		tempDestPath = path.join(
 			__dirname,
 			'..',
@@ -66,9 +78,14 @@ module.exports = function(site) {
 			return { apConfigs, adpTagsConfig };
 		},
 		getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
-		getAdpTagsJsFile = fs.readFileAsync(adpTagsTplPath, 'utf8'),
-		getIncontentAnalyserScript = fs.readFileSync(incontentAnalyserScriptPath, 'utf8'),
 		getUncompressedJsFile = fs.readFileAsync(uncompressedJsTplPath, 'utf8'),
+		getIncontentAnalyserScript = fs.readFileAsync(incontentAnalyserScriptPath, 'utf8'),
+		getAdpTagsScript = fs.readFileAsync(adpTagsScriptPath, 'utf8'),
+		getPrebidScript = fs.readFileAsync(prebidScriptPath, 'utf8'),
+		getHbConfig = couchbase
+			.connectToAppBucket()
+			.then(appBucket => appBucket.getAsync(`hbcf::${site.get('siteId')}`, {}))
+			.catch(err => Promise.resolve({})),
 		generateCombinedJson = (experiment, adpTags, manualAds) => {
 			if (!(Array.isArray(adpTags) && adpTags.length)) {
 				return { experiment, adpTagsConfig: false, manualAds };
@@ -83,6 +100,45 @@ module.exports = function(site) {
 			return {
 				addService: (serviceName, serviceConfig = {}, serviceScript = null) => {
 					switch (serviceName) {
+						case CC.SERVICES.INCONTENT_ANALYSER:
+							serviceScript = serviceScript.substring(0, serviceScript.trim().length - 1);
+							if (serviceConfig.length) {
+								jsFile = _.replace(jsFile, '__IN_CONTENT_ANALYSER_SCRIPT__', serviceScript);
+								uncompressedJsFile = _.replace(
+									uncompressedJsFile,
+									'__IN_CONTENT_ANALYSER_SCRIPT__',
+									serviceScript
+								);
+							} else {
+								jsFile = _.replace(jsFile, '__IN_CONTENT_ANALYSER_SCRIPT__', noop);
+								uncompressedJsFile = _.replace(
+									uncompressedJsFile,
+									'__IN_CONTENT_ANALYSER_SCRIPT__',
+									noop
+								);
+							}
+							return generateFinalInitScript(jsFile, uncompressedJsFile);
+						case CC.SERVICES.ADPTAGS:
+							if (serviceConfig) {
+								serviceScript = _.replace(
+									serviceScript,
+									'__INVENTORY__',
+									JSON.stringify(serviceConfig)
+								);
+								serviceScript = _.replace(serviceScript, '__SITE_ID__', site.get('siteId'));
+								jsFile = `${jsFile};${serviceScript}`;
+								uncompressedJsFile = `${uncompressedJsFile};${serviceScript}`;
+							}
+							return generateFinalInitScript(jsFile, uncompressedJsFile);
+						case CC.SERVICES.HEADER_BIDDING:
+							serviceScript.substring(62, serviceScript.trim().length - 1);
+							if (serviceConfig && serviceConfig.hbConfig) {
+								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', serviceScript);
+								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', serviceScript);
+							} else {
+								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', noop);
+								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', noop);
+							}
 						case CC.SERVICES.GDPR:
 							var gdpr = serviceConfig;
 							if (gdpr && gdpr.compliance) {
@@ -97,38 +153,7 @@ module.exports = function(site) {
 								}
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
-						case CC.SERVICES.ADPTAGS:
-							var adpTagsConfig = serviceConfig,
-								adpTagsFile = serviceScript;
-							if (adpTagsConfig) {
-								adpTagsFile = _.replace(adpTagsFile, '__INVENTORY__', JSON.stringify(adpTagsConfig));
-								adpTagsFile = _.replace(adpTagsFile, '__SITE_ID__', site.get('siteId'));
-								jsFile = `${jsFile};${adpTagsFile}`;
-								uncompressedJsFile = `${uncompressedJsFile};${adpTagsFile}`;
-							}
-							return generateFinalInitScript(jsFile, uncompressedJsFile);
-						case CC.SERVICES.INCONTENT_ANALYSER:
-							var incontentAds = serviceConfig,
-								incontentAdsScript = serviceScript,
-								incontentAdsScript = incontentAdsScript.substring(
-									0,
-									incontentAdsScript.trim().length - 1
-								);
-							if (incontentAds.length) {
-								jsFile = _.replace(jsFile, '__IN_CONTENT_ANALYSER_SCRIPT__', incontentAdsScript);
-								uncompressedJsFile = _.replace(
-									uncompressedJsFile,
-									'__IN_CONTENT_ANALYSER_SCRIPT__',
-									incontentAdsScript
-								);
-							} else {
-								jsFile = _.replace(jsFile, '__IN_CONTENT_ANALYSER_SCRIPT__', noop);
-								uncompressedJsFile = _.replace(
-									uncompressedJsFile,
-									'__IN_CONTENT_ANALYSER_SCRIPT__',
-									noop
-								);
-							}
+						default:
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 					}
 				},
@@ -152,10 +177,21 @@ module.exports = function(site) {
 			getComputedConfig(),
 			getJsFile,
 			getUncompressedJsFile,
-			getAdpTagsJsFile,
 			siteModel.getIncontentAds(site.get('siteId')),
 			getIncontentAnalyserScript,
-			function(finalConfig, jsFile, uncompressedJsFile, adpTagsFile, incontentAds, incontentAnalyserScript) {
+			getAdpTagsScript,
+			getHbConfig,
+			getPrebidScript,
+			function(
+				finalConfig,
+				jsFile,
+				uncompressedJsFile,
+				incontentAds,
+				incontentAnalyserScript,
+				adpTagsScript,
+				hbConfig,
+				prebidScript
+			) {
 				let { apConfigs, adpTagsConfig } = finalConfig,
 					gdpr = site.get('gdpr');
 				if (site.get('ampSettings')) apConfigs.ampSettings = site.get('ampSettings');
@@ -164,10 +200,11 @@ module.exports = function(site) {
 				uncompressedJsFile = _.replace(uncompressedJsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
 				uncompressedJsFile = _.replace(uncompressedJsFile, /__SITE_ID__/g, site.get('siteId'));
 
-				// Generate final init script based on the services to be added
+				// Generate final init script based on the services that are enabled
 				var scripts = generateFinalInitScript(jsFile, uncompressedJsFile)
 					.addService(CC.SERVICES.INCONTENT_ANALYSER, incontentAds, incontentAnalyserScript)
-					.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsFile)
+					.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsScript)
+					.addService(CC.SERVICES.HEADER_BIDDING, hbConfig, prebidScript)
 					.addService(CC.SERVICES.GDPR, gdpr)
 					.done();
 
