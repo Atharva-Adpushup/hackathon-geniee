@@ -81,6 +81,12 @@ var logger = require('../helpers/logger'),
 		}
 		return targeting;
 	},
+	getAdserverTargeting = function(slot) {
+		if (slot.optionalParam.headerBidding) {
+			return pbjs.getAdserverTargeting()[slot.containerId];
+		}
+		return null;
+	},
 	setGPTargeting = function(slot) {
 		if (slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE) {
 			var genieeSlots = Object.keys(config.TARGETING);
@@ -125,7 +131,7 @@ var logger = require('../helpers/logger'),
 				hb_siteId: config.SITE_ID,
 				hb_ran: 0
 			},
-			adServerTargeting = pbjs.getAdserverTargeting()[slot.containerId];
+			adServerTargeting = getAdserverTargeting(slot);
 
 		if (utils.isSupportedBrowser() && slot.bidders.length) {
 			Object.assign(targeting, { hb_ran: 1 });
