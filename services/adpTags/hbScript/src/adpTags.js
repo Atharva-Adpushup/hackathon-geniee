@@ -153,7 +153,7 @@ var prebidSandbox = require('./prebidSandbox'),
 					}
 				} else {
 					// Type 3 handled from within case 2
-					slot.biddingComplete = true;
+					// slot.biddingComplete = true;
 					if (slot.slotId) {
 						logger.log('Type 4: No prebid bidder config, rendering adx tag');
 						slot.type = 4;
