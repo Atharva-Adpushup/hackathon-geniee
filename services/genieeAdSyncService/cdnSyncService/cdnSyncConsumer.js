@@ -134,7 +134,7 @@ module.exports = function(site) {
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 
 						case CC.SERVICES.HEADER_BIDDING:
-							serviceScript.substring(62, serviceScript.trim().length - 1);
+							serviceScript = serviceScript.substring(62, serviceScript.trim().length - 1);
 
 							if (serviceConfig && serviceConfig.hbcf.value.hbConfig && serviceConfig.hbAds.length) {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', serviceScript);
