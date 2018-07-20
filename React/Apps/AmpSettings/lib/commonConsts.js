@@ -56,6 +56,11 @@ const commonConsts = {
 				</amp-ad>`
 		},
 		operations: ['APPEND', 'PREPEND', 'INSERTAFTER', 'INSERTBEFORE']
+	},
+	analytics: {
+		google_analytics: {
+			ua: { alias: 'UA Id', value: 'ua' }
+		}
 	}
 };
 export default commonConsts;

@@ -5,6 +5,7 @@ import Heading from './helper/Heading.jsx';
 import PageGroupSettings from './PageGroupSettings.jsx';
 import SendAmpData from './SendAmpData.jsx';
 import RowColSpan from './helper/RowColSpan.jsx';
+import commonConsts from '../lib/commonConsts';
 import { ajax } from '../../../common/helpers';
 import { Row, Col, Button } from 'react-bootstrap';
 class AmpSettings extends React.Component {
@@ -13,13 +14,15 @@ class AmpSettings extends React.Component {
 		this.state = {
 			channels: [],
 			blockList: [],
-			isLoading: true
+			isLoading: true,
+			selectedAnalytics: 'google_analytics'
 		};
 		this.fetchAmpSettings = this.fetchAmpSettings.bind(this);
 		this.handleOnChange = this.handleOnChange.bind(this);
 		this.renderInputControl = this.renderInputControl.bind(this);
 		this.renderBlockList = this.renderBlockList.bind(this);
 		this.saveSiteSettings = this.saveSiteSettings.bind(this);
+		this.renderAnalyticsFields = this.renderAnalyticsFields.bind(this);
 	}
 	fetchAmpSettings() {
 		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
@@ -28,18 +31,19 @@ class AmpSettings extends React.Component {
 			url: '/user/site/' + siteId + '/ampSettingsData'
 		})
 			.then(res => {
+				console.log(res);
 				this.setState({
 					siteId: res.siteId,
 					siteDomain: res.siteDomain,
-					uaId: res.ampSettings.uaId,
 					channels: res.channels || [],
 					blockList: res.ampSettings.blockList || [],
 					samplingPercent: res.ampSettings.samplingPercent,
-					includeGA: res.ampSettings.includeGA || false,
-					isLoading: false
+					isLoading: false,
+					analytics: res.ampSettings.analytics || []
 				});
 			})
 			.catch(res => {
+				console.log(res);
 				alert('Some Error Occurred In fetching amp settings!');
 			});
 	}
@@ -118,8 +122,7 @@ class AmpSettings extends React.Component {
 			data: JSON.stringify({
 				samplingPercent: this.state.samplingPercent,
 				blockList: this.state.blockList,
-				uaId: this.state.uaId,
-				includeGA: this.state.includeGA || false
+				analytics: this.state.analytics
 			})
 		})
 			.then(res => {
@@ -128,6 +131,28 @@ class AmpSettings extends React.Component {
 			.catch(res => {
 				alert('Some Error Occurred!');
 			});
+	}
+	renderAnalyticsFields() {
+		let fields = commonConsts.analytics[this.state.selectedAnalytics];
+		if (this.state.selectedAnalytics)
+			return Object.keys(fields).map((field, index) => {
+				let alias = fields[field].alias;
+				return (
+					<input
+						type="text"
+						placeholder={alias}
+						key={index}
+						value={this.state.analytics.length > 0 ? this.state.analytics[0][field] : ''}
+						onChange={e => {
+							let analytics = [{ name: this.state.selectedAnalytics, [field]: e.target.value }];
+							this.setState({
+								analytics
+							});
+						}}
+					/>
+				);
+			});
+		else return '';
 	}
 	render() {
 		if (this.state.isLoading) return <Loader />;
@@ -163,31 +188,31 @@ class AmpSettings extends React.Component {
 											</Col>
 											{this.renderBlockList()}
 										</Row>
-										<RowColSpan label="Google Analytics">
+										<RowColSpan label="Analytics">
 											<Col sm={6}>
-												Include
-												<input
-													type="checkbox"
-													checked={this.state.includeGA || false}
-													style={{ width: 'auto', marginLeft: 10 }}
+												<select
+													className="form-control"
+													name="selectedAnalytics"
+													value={this.state.selectedAnalytics}
 													onChange={e => {
-														this.setState({
-															includeGA: e.target.checked
-														});
+														let selectedAnalytics = this.state.selectedAnalytics;
+														selectedAnalytics = e.target.value;
+														this.setState({ selectedAnalytics });
 													}}
-												/>
+												>
+													<option value="">Select Type</option>
+													{Object.keys(commonConsts.analytics).map((analytic, index) => {
+														//let field = commonConsts.analytics[analytic];
+														return (
+															<option value={analytic} key={index}>
+																{analytic}
+															</option>
+														);
+													})}
+												</select>
 											</Col>
 											<Col sm={6}>
-												<input
-													type="text"
-													placeholder="UA Id"
-													value={this.state.uaId || ''}
-													onChange={e => {
-														this.setState({
-															uaId: e.target.value
-														});
-													}}
-												/>
+												{this.renderAnalyticsFields()}
 											</Col>
 										</RowColSpan>
 										<Button className="btn-success" type="submit">

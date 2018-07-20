@@ -62,11 +62,12 @@ class PageGroupSettings extends React.Component {
 	}
 
 	renderSelectors() {
-		return Object.keys(commonConsts.selectors).map(key => {
+		let selectorConf = commonConsts.selectors;
+		return Object.keys(selectorConf).map(key => {
 			let selectorValue = this.state.selectors[key];
-			if (commonConsts.selectors[key].inputType == 'text')
+			if (selectorConf[key].inputType == 'text')
 				return (
-					<RowColSpan label={commonConsts.selectors[key].alias} key={key}>
+					<RowColSpan label={selectorConf[key].alias} key={key}>
 						<input
 							onChange={e => {
 								let selectors = this.state.selectors;
@@ -76,8 +77,8 @@ class PageGroupSettings extends React.Component {
 								});
 							}}
 							className="form-control"
-							type={commonConsts.selectors[key].inputType}
-							placeholder={commonConsts.selectors[key].alias}
+							type={selectorConf[key].inputType}
+							placeholder={selectorConf[key].alias}
 							name={key}
 							defaultValue={selectorValue}
 						/>
@@ -85,9 +86,9 @@ class PageGroupSettings extends React.Component {
 				);
 			else
 				return (
-					<RowColSpan label={commonConsts.selectors[key].alias} key={key}>
+					<RowColSpan label={selectorConf[key].alias} key={key}>
 						<textarea
-							placeholder={commonConsts.selectors[key].alias}
+							placeholder={selectorConf[key].alias}
 							style={{ resize: 'auto' }}
 							name={key}
 							value={selectorValue}
@@ -142,9 +143,9 @@ class PageGroupSettings extends React.Component {
 		finalData.afterJs = finalData.afterJs ? btoa(finalData.afterJs) : '';
 		for (let i = 0; i < dataAds.length; i++) {
 			if (dataAds[i].selector && dataAds[i].adCode && dataAds[i].type) {
-				let adType = dataAds[i].type;
-				if (!commonConsts.ads.type[adType]) delete dataAds[i].data;
-				if ((commonConsts.ads.type[adType] && dataAds[i].data) || !commonConsts.ads.type[adType]) {
+				let adType = dataAds[i].type, adTypeFieldConf = commonConsts.ads.type[adType];
+				if (!adTypeFieldConf) delete dataAds[i].data;
+				if ((adTypeFieldConf && dataAds[i].data) || !adTypeFieldConf) {
 					let adCode = dataAds[i].adCode;
 					dataAds[i].adCode = btoa(adCode);
 					ads.push(dataAds[i]);
@@ -158,8 +159,8 @@ class PageGroupSettings extends React.Component {
 	saveChannelSettings(event) {
 		event.preventDefault();
 		let ampData = this.parseFormData(Object.assign({}, this.state)), pageGroup = this.props.channel.pageGroup;
-		let { siteId } = this.state;
-		if (!ampData.selectors.articleContent || !ampData.siteName || !ampData.template) {
+		let { siteId } = this.state, selectors = ampData.selectors;
+		if (!selectors.articleContent || !ampData.siteName || !ampData.template) {
 			alert('Artical Content, SiteName and Template are required');
 			return;
 		}
@@ -267,9 +268,11 @@ class PageGroupSettings extends React.Component {
 		return <Col sm={8}>{listLinks}</Col>;
 	}
 	renderNetworkInputs(index) {
-		let selectedAd = this.state.ads[index], selectedNetwork = selectedAd.type;
-		return selectedNetwork && commonConsts.ads.type[selectedNetwork]
-			? Object.keys(commonConsts.ads.type[selectedNetwork]).map((field, fieldIndex) => (
+		let selectedAd = this.state.ads[index],
+			selectedNetwork = selectedAd.type,
+			adsTypeFieldConf = commonConsts.ads.type[selectedNetwork];
+		return selectedNetwork && adsTypeFieldConf
+			? Object.keys(adsTypeFieldConf).map((field, fieldIndex) => (
 					<RowColSpan label={field} key={fieldIndex}>
 						<input
 							type="text"
