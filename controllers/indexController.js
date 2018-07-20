@@ -112,16 +112,8 @@ function createNewUser(params, res) {
 		});
 }
 
-function requestDemoRedirection(res) {
-	return res.redirect('/user/requestdemo');
-}
-
-// Redirects to thank you page if requestDemo = true
-function checkUserDemo() {
-	if (req.session.user.get('requestDemo')) {
-		return res.render('thankyou');
-	}
-	return res.redirect('/user/dashboard');
+function responseRedirection(res, path) {
+	return res.redirect(path);
 }
 
 // Set user session data and redirects to relevant screen based on provided parameters
@@ -135,6 +127,8 @@ function setSessionData(user, req, res, type) {
 		allowEntry = 0,
 		redirectPath = null,
 		userSites = user.get('sites'),
+		websiteRevenue = parseInt(user.get('websiteRevenue'), 10),
+		isWebsiteRevenueLessThanMinimum = !!(websiteRevenue && websiteRevenue < consts.onboarding.revenueLowerBound),
 		isUserSites = !!(userSites && userSites.length),
 		isRequestDemo = !!user.get('requestDemo'),
 		primarySiteDetails = isUserSites ? _extend(userSites[0], {}) : null;
@@ -159,8 +153,10 @@ function setSessionData(user, req, res, type) {
 
 		if (type == 1 && userPasswordMatch == 1) {
 			// Sign Up
-			if (isRequestDemo) {
-				return requestDemoRedirection(res);
+			if (isWebsiteRevenueLessThanMinimum) {
+				return responseRedirection(res, '/thank-you');
+			} else if (isRequestDemo) {
+				return responseRedirection(res, '/user/requestdemo');
 			}
 		} else if (type == 2 && userPasswordMatch == 1) {
 			// Login
@@ -195,24 +191,15 @@ function setSessionData(user, req, res, type) {
 									!step
 								);
 
-							// if (isRequestDemo && isIncompleteOnboardingSteps) {
-							// 	return requestDemoRedirection(res);
-							// }
-
 							if (isIncompleteOnboardingSteps) {
-								return res.redirect('/user/onboarding');
+								return responseRedirection(res, '/user/onboarding');
 							}
 							if (req.session.isSuperUser) {
-								return res.redirect('/user/dashboard');
+								return responseRedirection(res, '/user/dashboard');
 							}
-							return res.redirect('/user/dashboard');
-							// if (!user.get('requestDemo')) {
-							// 	return res.redirect('/user/dashboard');
-							// } else {
-							// 	return res.redirect('/thankyou');
-							// }
+							return responseRedirection(res, '/user/dashboard');
 						} else {
-							return res.redirect('/user/dashboard');
+							return responseRedirection(res, '/user/dashboard');
 						}
 					} else {
 						if (allUserSites.length == 1) {
@@ -222,23 +209,23 @@ function setSessionData(user, req, res, type) {
 								);
 
 								if (isRequestDemo && isIncompleteOnboardingSteps) {
-									return requestDemoRedirection(res);
+									return responseRedirection(res, '/user/requestdemo');
 								} else if (isIncompleteOnboardingSteps) {
-									return res.redirect('/user/onboarding');
+									return responseRedirection(res, '/user/onboarding');
 								} else {
-									return res.redirect('/user/dashboard');
+									return responseRedirection(res, '/user/dashboard');
 								}
 							} else {
 								if (isRequestDemo) {
-									return requestDemoRedirection(res);
+									return responseRedirection(res, '/user/requestdemo');
 								}
-								return res.redirect('/user/onboarding');
+								return responseRedirection(res, '/user/onboarding');
 							}
 						}
 					}
 				});
 			} else {
-				return res.redirect(redirectPath);
+				return responseRedirection(res, redirectPath);
 			}
 		} else {
 			res.render('login', { error: "Email / Password combination doesn't exist." });
