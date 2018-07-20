@@ -136,7 +136,12 @@ module.exports = function(site) {
 						case CC.SERVICES.HEADER_BIDDING:
 							serviceScript = serviceScript.substring(62, serviceScript.trim().length - 1);
 
-							if (serviceConfig && serviceConfig.hbcf.value.hbConfig && serviceConfig.hbAds.length) {
+							if (
+								serviceConfig && 
+								serviceConfig.hbcf.value && 
+								serviceConfig.hbcf.value.hbConfig &&
+								serviceConfig.hbAds.length
+							) {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', serviceScript);
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', serviceScript);
 							} else {
