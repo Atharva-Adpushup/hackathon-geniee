@@ -164,7 +164,7 @@ var prebidSandbox = require('./prebidSandbox'),
 				}
 			} else {
 				logger.log('Browser not supported by AdPushup.');
-				slot.biddingComplete = true;
+				// slot.biddingComplete = true;
 
 				slot.type = slot.slotId ? 6 : 7;
 			}
