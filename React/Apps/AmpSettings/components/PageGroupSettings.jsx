@@ -627,17 +627,6 @@ class PageGroupSettings extends React.Component {
 						value: this.state.template || '',
 						type: 'text'
 					})}
-					<RowColSpan label="Ad Network">
-						<select
-							className="form-control"
-							value={this.state.adNetwork || ''}
-							name="adNetwork"
-							onChange={this.handleOnChange}
-						>
-							<option value="adsense">Adsense</option>
-							<option value="adx">AdX</option>
-						</select>
-					</RowColSpan>
 					<RowColSpan label="Ads">
 						<button
 							className="btn-primary"
@@ -652,7 +641,6 @@ class PageGroupSettings extends React.Component {
 						</button>
 					</RowColSpan>
 					{this.renderAds()}
-					{this.renderInputControl({ label: 'Pub Id', name: 'pubId', value: this.state.pubId, type: 'text' })}
 					<button className="btn-success">Save</button>
 				</form>
 			</CollapsePanel>

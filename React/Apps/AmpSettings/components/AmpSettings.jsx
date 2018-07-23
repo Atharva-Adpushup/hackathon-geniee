@@ -12,10 +12,7 @@ class AmpSettings extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			channels: [],
-			blockList: [],
-			isLoading: true,
-			selectedAnalytics: 'google_analytics'
+			isLoading: true
 		};
 		this.fetchAmpSettings = this.fetchAmpSettings.bind(this);
 		this.handleOnChange = this.handleOnChange.bind(this);
@@ -31,7 +28,12 @@ class AmpSettings extends React.Component {
 			url: '/user/site/' + siteId + '/ampSettingsData'
 		})
 			.then(res => {
-				console.log(res);
+				let analytics = res.ampSettings.analytics, selectedAnalytics = [];
+				if (res.ampSettings.analytics) {
+					for (let i = 0; i < analytics.length; i++) {
+						selectedAnalytics.push(analytics[i].name);
+					}
+				}
 				this.setState({
 					siteId: res.siteId,
 					siteDomain: res.siteDomain,
@@ -39,7 +41,8 @@ class AmpSettings extends React.Component {
 					blockList: res.ampSettings.blockList || [],
 					samplingPercent: res.ampSettings.samplingPercent,
 					isLoading: false,
-					analytics: res.ampSettings.analytics || []
+					analytics: res.ampSettings.analytics || [],
+					selectedAnalytics
 				});
 			})
 			.catch(res => {
@@ -133,26 +136,38 @@ class AmpSettings extends React.Component {
 			});
 	}
 	renderAnalyticsFields() {
-		let fields = commonConsts.analytics[this.state.selectedAnalytics];
-		if (this.state.selectedAnalytics)
-			return Object.keys(fields).map((field, index) => {
-				let alias = fields[field].alias;
-				return (
-					<input
-						type="text"
-						placeholder={alias}
-						key={index}
-						value={this.state.analytics.length > 0 ? this.state.analytics[0][field] : ''}
-						onChange={e => {
-							let analytics = [{ name: this.state.selectedAnalytics, [field]: e.target.value }];
-							this.setState({
-								analytics
-							});
-						}}
-					/>
-				);
-			});
-		else return '';
+		return this.state.selectedAnalytics.map((analytic, index) => (
+			<div
+				key={index}
+				style={{
+					background: 'aliceblue',
+					padding: 5,
+					margin: 5
+				}}
+			>
+				{Object.keys(commonConsts.analytics[analytic]).map((field, index) => {
+					let analyticsFieldsConf = commonConsts.analytics[analytic],
+						alias = analyticsFieldsConf[field].alias;
+					return (
+						<RowColSpan label={alias} key={index}>
+							<input
+								type="text"
+								placeholder={alias}
+								value={this.state.analytics.length > 0 ? this.state.analytics[0][field] : ''}
+								onChange={e => {
+									let analytics = [
+										{ name: this.state.selectedAnalytics[0], [field]: e.target.value }
+									];
+									this.setState({
+										analytics
+									});
+								}}
+							/>
+						</RowColSpan>
+					);
+				})}
+			</div>
+		));
 	}
 	render() {
 		if (this.state.isLoading) return <Loader />;
@@ -189,32 +204,45 @@ class AmpSettings extends React.Component {
 											{this.renderBlockList()}
 										</Row>
 										<RowColSpan label="Analytics">
-											<Col sm={6}>
-												<select
-													className="form-control"
-													name="selectedAnalytics"
-													value={this.state.selectedAnalytics}
-													onChange={e => {
-														let selectedAnalytics = this.state.selectedAnalytics;
-														selectedAnalytics = e.target.value;
-														this.setState({ selectedAnalytics });
-													}}
-												>
-													<option value="">Select Type</option>
-													{Object.keys(commonConsts.analytics).map((analytic, index) => {
-														//let field = commonConsts.analytics[analytic];
-														return (
-															<option value={analytic} key={index}>
-																{analytic}
-															</option>
-														);
-													})}
-												</select>
-											</Col>
-											<Col sm={6}>
-												{this.renderAnalyticsFields()}
-											</Col>
+											{Object.keys(commonConsts.analytics).map((analytic, index) => {
+												let isSelected = this.state.selectedAnalytics.indexOf(analytic) > -1
+													? true
+													: false;
+												return (
+													<Col sm={5} key={index}>
+														<input
+															name={analytic}
+															type="checkbox"
+															style={{ width: 'auto' }}
+															onChange={e => {
+																let { selectedAnalytics, analytics } = this.state;
+																if (
+																	this.state.selectedAnalytics.indexOf(analytic) ==
+																		-1 && e.target.checked
+																) {
+																	selectedAnalytics.push(analytic);
+																} else if (
+																	this.state.selectedAnalytics.indexOf(analytic) >
+																		-1 && !e.target.checked
+																) {
+																	selectedAnalytics.splice(index, 1);
+																}
+																if (selectedAnalytics.length == 0) {
+																	analytics = [];
+																}
+																this.setState({
+																	selectedAnalytics,
+																	analytics
+																});
+															}}
+															checked={isSelected}
+														/>
+														<label> {analytic}</label>
+													</Col>
+												);
+											})}
 										</RowColSpan>
+										{this.renderAnalyticsFields()}
 										<Button className="btn-success" type="submit">
 											Save
 										</Button>

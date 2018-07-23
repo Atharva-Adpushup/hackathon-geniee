@@ -29,6 +29,7 @@ class SendAmpData extends React.Component {
 						placeholder={label}
 						name={name}
 						value={value}
+						required
 					/>
 				</Col>
 			</Row>
@@ -43,6 +44,7 @@ class SendAmpData extends React.Component {
 						value={this.state.pageGroup || ''}
 						name="pageGroup"
 						onChange={this.handleOnChange}
+						required
 					>
 						<option value="">Select Pagegroup</option>
 						{this.props.channels.map((channel, index) => (
@@ -63,6 +65,7 @@ class SendAmpData extends React.Component {
 							value={this.state.pageGroup}
 							name="pageGroup"
 							onChange={this.handleOnChange}
+							required
 						>
 							<option value="">Select Pagegroup</option>
 							{this.props.channels.map((channel, index) => (
@@ -131,6 +134,7 @@ class SendAmpData extends React.Component {
 						value={this.state.conversionType || ''}
 						name="conversionType"
 						onChange={this.handleOnChange}
+						required
 					>
 						<option value="">Select</option>
 						<option value="site">Site</option>
