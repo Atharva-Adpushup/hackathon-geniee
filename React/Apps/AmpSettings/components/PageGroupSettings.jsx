@@ -49,19 +49,9 @@ class PageGroupSettings extends React.Component {
 			customCSS,
 			afterJs
 		};
-		this.renderSelectors = this.renderSelectors.bind(this);
-		this.renderSocialApps = this.renderSocialApps.bind(this);
-		this.handleOnChange = this.handleOnChange.bind(this);
-		this.renderInputControl = this.renderInputControl.bind(this);
-		this.saveChannelSettings = this.saveChannelSettings.bind(this);
-		this.parseFormData = this.parseFormData.bind(this);
-		this.handleSocialAppChange = this.handleSocialAppChange.bind(this);
-		this.renderLinks = this.renderLinks.bind(this);
-		this.renderAds = this.renderAds.bind(this);
-		this.renderNetworkInputs = this.renderNetworkInputs.bind(this);
 	}
 
-	renderSelectors() {
+	renderSelectors = () => {
 		let selectorConf = commonConsts.selectors;
 		return Object.keys(selectorConf).map(key => {
 			let selectorValue = this.state.selectors[key];
@@ -103,8 +93,8 @@ class PageGroupSettings extends React.Component {
 					</RowColSpan>
 				);
 		});
-	}
-	renderInputControl({ label, name, value, type }) {
+	};
+	renderInputControl = ({ label, name, value, type }) => {
 		return (
 			<Row>
 				<Col sm={5}>
@@ -122,8 +112,8 @@ class PageGroupSettings extends React.Component {
 				</Col>
 			</Row>
 		);
-	}
-	generateAdCode(index) {
+	};
+	generateAdCode = index => {
 		let ad = this.state.ads[index], adNetwork = ad.type, adCode = commonConsts.ads.sampleAds[adNetwork];
 
 		adCode = adCode.replace('dWidth', ad.width);
@@ -132,8 +122,8 @@ class PageGroupSettings extends React.Component {
 			adCode = adCode.replace(field, ad.data[field]);
 		}
 		return adCode;
-	}
-	parseFormData(ampData) {
+	};
+	parseFormData = ampData => {
 		let finalData = ampData, dataLinks = finalData.menu.links, dataAds = finalData.ads;
 		let ads = [], links = [];
 		for (let i = 0; i < dataLinks.length; i++) {
@@ -155,8 +145,8 @@ class PageGroupSettings extends React.Component {
 		finalData.ads = ads;
 		finalData.menu.links = links;
 		return finalData;
-	}
-	saveChannelSettings(event) {
+	};
+	saveChannelSettings = event => {
 		event.preventDefault();
 		let ampData = this.parseFormData(Object.assign({}, this.state)), pageGroup = this.props.channel.pageGroup;
 		let { siteId } = this.state, selectors = ampData.selectors;
@@ -179,8 +169,8 @@ class PageGroupSettings extends React.Component {
 			.catch(res => {
 				alert('Some Error Occurred!');
 			});
-	}
-	handleSocialAppChange(e) {
+	};
+	handleSocialAppChange = e => {
 		const target = e.target;
 		const name = target.name;
 		const value = target.checked;
@@ -198,8 +188,8 @@ class PageGroupSettings extends React.Component {
 		this.setState({
 			social
 		});
-	}
-	renderSocialApps() {
+	};
+	renderSocialApps = () => {
 		return Object.keys(commonConsts.socialApps).map(key => {
 			let selectedApp = this.state.social.apps && this.state.social.apps.indexOf(key) > -1 ? true : false;
 			return (
@@ -216,14 +206,14 @@ class PageGroupSettings extends React.Component {
 				</Col>
 			);
 		});
-	}
-	handleOnChange(e) {
+	};
+	handleOnChange = e => {
 		const target = e.target;
 		const name = target.name;
 		const value = target.type === 'checkbox' ? target.checked : target.value;
 		this.setState({ [name]: value });
-	}
-	renderLinks() {
+	};
+	renderLinks = () => {
 		const listLinks = this.state.menu.links.map((linkView, index) => {
 			return (
 				<div key={index}>
@@ -266,8 +256,8 @@ class PageGroupSettings extends React.Component {
 			);
 		});
 		return <Col sm={8}>{listLinks}</Col>;
-	}
-	renderNetworkInputs(index) {
+	};
+	renderNetworkInputs = index => {
 		let selectedAd = this.state.ads[index],
 			selectedNetwork = selectedAd.type,
 			adsTypeFieldConf = commonConsts.ads.type[selectedNetwork];
@@ -289,9 +279,9 @@ class PageGroupSettings extends React.Component {
 					</RowColSpan>
 				))
 			: '';
-	}
+	};
 
-	renderAds() {
+	renderAds = () => {
 		const listAds = this.state.ads.map((linkView, index) => {
 			return (
 				<div
@@ -423,9 +413,9 @@ class PageGroupSettings extends React.Component {
 			);
 		});
 		return listAds;
-	}
+	};
 
-	render() {
+	render = () => {
 		const { props } = this, channel = props.channel;
 		return (
 			<CollapsePanel title={channel.pageGroup} bold={true}>
@@ -645,7 +635,7 @@ class PageGroupSettings extends React.Component {
 				</form>
 			</CollapsePanel>
 		);
-	}
+	};
 }
 
 export default PageGroupSettings;

@@ -14,26 +14,14 @@ class AmpSettings extends React.Component {
 		this.state = {
 			isLoading: true
 		};
-		this.fetchAmpSettings = this.fetchAmpSettings.bind(this);
-		this.handleOnChange = this.handleOnChange.bind(this);
-		this.renderInputControl = this.renderInputControl.bind(this);
-		this.renderBlockList = this.renderBlockList.bind(this);
-		this.saveSiteSettings = this.saveSiteSettings.bind(this);
-		this.renderAnalyticsFields = this.renderAnalyticsFields.bind(this);
 	}
-	fetchAmpSettings() {
+	fetchAmpSettings = () => {
 		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
 		ajax({
 			method: 'GET',
 			url: '/user/site/' + siteId + '/ampSettingsData'
 		})
 			.then(res => {
-				let analytics = res.ampSettings.analytics, selectedAnalytics = [];
-				if (res.ampSettings.analytics) {
-					for (let i = 0; i < analytics.length; i++) {
-						selectedAnalytics.push(analytics[i].name);
-					}
-				}
 				this.setState({
 					siteId: res.siteId,
 					siteDomain: res.siteDomain,
@@ -41,22 +29,20 @@ class AmpSettings extends React.Component {
 					blockList: res.ampSettings.blockList || [],
 					samplingPercent: res.ampSettings.samplingPercent,
 					isLoading: false,
-					analytics: res.ampSettings.analytics || [],
-					selectedAnalytics
+					analytics: res.ampSettings.analytics || []
 				});
 			})
 			.catch(res => {
-				console.log(res);
 				alert('Some Error Occurred In fetching amp settings!');
 			});
-	}
-	handleOnChange(e) {
+	};
+	handleOnChange = e => {
 		const target = e.target;
 		const name = target.name;
 		const value = target.type === 'checkbox' ? target.checked : target.value;
 		this.setState({ [name]: value });
-	}
-	renderBlockList() {
+	};
+	renderBlockList = () => {
 		let linkViews = new Array(this.state.blockList);
 		const listItems = this.state.blockList.map((linkView, index) => {
 			return (
@@ -93,8 +79,8 @@ class AmpSettings extends React.Component {
 				{listItems}
 			</Col>
 		);
-	}
-	renderInputControl(label, name, value) {
+	};
+	renderInputControl = (label, name, value) => {
 		return (
 			<Row>
 				<Col sm={5}>
@@ -112,11 +98,11 @@ class AmpSettings extends React.Component {
 				</Col>
 			</Row>
 		);
-	}
-	componentDidMount() {
+	};
+	componentDidMount = () => {
 		this.fetchAmpSettings();
-	}
-	saveSiteSettings(event) {
+	};
+	saveSiteSettings = event => {
 		event.preventDefault();
 		let { siteId } = this.state;
 		ajax({
@@ -134,9 +120,9 @@ class AmpSettings extends React.Component {
 			.catch(res => {
 				alert('Some Error Occurred!');
 			});
-	}
-	renderAnalyticsFields() {
-		return this.state.selectedAnalytics.map((analytic, index) => (
+	};
+	renderAnalyticsFields = () => {
+		return this.state.analytics.map((analytic, index) => (
 			<div
 				key={index}
 				style={{
@@ -145,19 +131,21 @@ class AmpSettings extends React.Component {
 					margin: 5
 				}}
 			>
-				{Object.keys(commonConsts.analytics[analytic]).map((field, index) => {
-					let analyticsFieldsConf = commonConsts.analytics[analytic],
+				{Object.keys(commonConsts.analytics[analytic.name]).map((field, index) => {
+					let analyticsFieldsConf = commonConsts.analytics[analytic.name],
 						alias = analyticsFieldsConf[field].alias;
 					return (
 						<RowColSpan label={alias} key={index}>
 							<input
 								type="text"
 								placeholder={alias}
-								value={this.state.analytics.length > 0 ? this.state.analytics[0][field] : ''}
+								value={analytic[field] || ''}
+								required
 								onChange={e => {
-									let analytics = [
-										{ name: this.state.selectedAnalytics[0], [field]: e.target.value }
-									];
+									let selectedIndex = this.isAnalyticsSelected(analytic.name),
+										analytics = this.state.analytics,
+										selectedAnalytics = analytics[selectedIndex];
+									selectedAnalytics[field] = e.target.value;
 									this.setState({
 										analytics
 									});
@@ -168,8 +156,17 @@ class AmpSettings extends React.Component {
 				})}
 			</div>
 		));
-	}
-	render() {
+	};
+
+	isAnalyticsSelected = analyticsName => {
+		let { analytics } = this.state;
+		for (let i = 0; i < analytics.length; i++) {
+			if (analyticsName == analytics[i].name) return i;
+		}
+		return -1;
+	};
+
+	render = () => {
 		if (this.state.isLoading) return <Loader />;
 		else
 			return (
@@ -205,9 +202,8 @@ class AmpSettings extends React.Component {
 										</Row>
 										<RowColSpan label="Analytics">
 											{Object.keys(commonConsts.analytics).map((analytic, index) => {
-												let isSelected = this.state.selectedAnalytics.indexOf(analytic) > -1
-													? true
-													: false;
+												let selectedIndex = this.isAnalyticsSelected(analytic),
+													isSelected = selectedIndex == -1 ? false : true;
 												return (
 													<Col sm={5} key={index}>
 														<input
@@ -215,23 +211,13 @@ class AmpSettings extends React.Component {
 															type="checkbox"
 															style={{ width: 'auto' }}
 															onChange={e => {
-																let { selectedAnalytics, analytics } = this.state;
-																if (
-																	this.state.selectedAnalytics.indexOf(analytic) ==
-																		-1 && e.target.checked
-																) {
-																	selectedAnalytics.push(analytic);
-																} else if (
-																	this.state.selectedAnalytics.indexOf(analytic) >
-																		-1 && !e.target.checked
-																) {
-																	selectedAnalytics.splice(index, 1);
-																}
-																if (selectedAnalytics.length == 0) {
-																	analytics = [];
+																let { analytics } = this.state;
+																if (e.target.checked) {
+																	analytics.push({ name: analytic });
+																} else {
+																	analytics.splice(selectedIndex, 1);
 																}
 																this.setState({
-																	selectedAnalytics,
 																	analytics
 																});
 															}}
@@ -272,7 +258,7 @@ class AmpSettings extends React.Component {
 					</ActionCard>
 				</Row>
 			);
-	}
+	};
 }
 
 export default AmpSettings;
