@@ -1,25 +1,21 @@
 import React from 'react';
 import ActionCard from '../../../Components/ActionCard.jsx';
+import Loader from '../../../Components/Loader.jsx';
 import Heading from './helper/Heading.jsx';
 import PageGroupSettings from './PageGroupSettings.jsx';
 import SendAmpData from './SendAmpData.jsx';
 import RowColSpan from './helper/RowColSpan.jsx';
+import commonConsts from '../lib/commonConsts';
 import { ajax } from '../../../common/helpers';
 import { Row, Col, Button } from 'react-bootstrap';
 class AmpSettings extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			channels: [],
-			blockList: []
+			isLoading: true
 		};
-		this.fetchAmpSettings = this.fetchAmpSettings.bind(this);
-		this.handleOnChange = this.handleOnChange.bind(this);
-		this.renderInputControl = this.renderInputControl.bind(this);
-		this.renderBlockList = this.renderBlockList.bind(this);
-		this.saveSiteSettings = this.saveSiteSettings.bind(this);
 	}
-	fetchAmpSettings() {
+	fetchAmpSettings = () => {
 		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
 		ajax({
 			method: 'GET',
@@ -29,24 +25,24 @@ class AmpSettings extends React.Component {
 				this.setState({
 					siteId: res.siteId,
 					siteDomain: res.siteDomain,
-					uaId: res.ampSettings.uaId,
 					channels: res.channels || [],
 					blockList: res.ampSettings.blockList || [],
 					samplingPercent: res.ampSettings.samplingPercent,
-					includeGA: res.ampSettings.includeGA || false
+					isLoading: false,
+					analytics: res.ampSettings.analytics || []
 				});
 			})
 			.catch(res => {
 				alert('Some Error Occurred In fetching amp settings!');
 			});
-	}
-	handleOnChange(e) {
+	};
+	handleOnChange = e => {
 		const target = e.target;
 		const name = target.name;
 		const value = target.type === 'checkbox' ? target.checked : target.value;
 		this.setState({ [name]: value });
-	}
-	renderBlockList() {
+	};
+	renderBlockList = () => {
 		let linkViews = new Array(this.state.blockList);
 		const listItems = this.state.blockList.map((linkView, index) => {
 			return (
@@ -83,8 +79,8 @@ class AmpSettings extends React.Component {
 				{listItems}
 			</Col>
 		);
-	}
-	renderInputControl(label, name, value) {
+	};
+	renderInputControl = (label, name, value) => {
 		return (
 			<Row>
 				<Col sm={5}>
@@ -102,11 +98,11 @@ class AmpSettings extends React.Component {
 				</Col>
 			</Row>
 		);
-	}
-	componentDidMount() {
+	};
+	componentDidMount = () => {
 		this.fetchAmpSettings();
-	}
-	saveSiteSettings(event) {
+	};
+	saveSiteSettings = event => {
 		event.preventDefault();
 		let { siteId } = this.state;
 		ajax({
@@ -115,8 +111,7 @@ class AmpSettings extends React.Component {
 			data: JSON.stringify({
 				samplingPercent: this.state.samplingPercent,
 				blockList: this.state.blockList,
-				uaId: this.state.uaId,
-				includeGA: this.state.includeGA || false
+				analytics: this.state.analytics
 			})
 		})
 			.then(res => {
@@ -125,96 +120,145 @@ class AmpSettings extends React.Component {
 			.catch(res => {
 				alert('Some Error Occurred!');
 			});
-	}
-	render() {
-		return (
-			<Row>
-				<ActionCard title="AMP settings">
-					<div className="settings-pane">
-						<Row>
-							<Col sm={6}>
-								<form onSubmit={this.saveSiteSettings}>
-									<Heading title="Site Level Settings" />
-									{this.renderInputControl(
-										'Sampling Percentage',
-										'samplingPercent',
-										this.state.samplingPercent
-									)}
-									<Row>
-										<Col sm={5}>
-											<span>BlockList</span>
-											<button
-												style={{ width: 'auto', marginLeft: 10 }}
-												className="btn-success"
-												type="button"
-												onClick={() => {
-													let blockList = this.state.blockList;
-													blockList.push('');
-													this.setState({ blockList });
-												}}
-											>
-												+ Add
-											</button>
-										</Col>
-										{this.renderBlockList()}
-									</Row>
-									<RowColSpan label="Google Analytics">
-										<Col sm={6}>
-											Include
-											<input
-												type="checkbox"
-												checked={this.state.includeGA || false}
-												style={{ width: 'auto', marginLeft: 10 }}
-												onChange={e => {
-													this.setState({
-														includeGA: e.target.checked
-													});
-												}}
-											/>
-										</Col>
-										<Col sm={6}>
-											<input
-												type="text"
-												placeholder="UA Id"
-												value={this.state.uaId || ''}
-												onChange={e => {
-													this.setState({
-														uaId: e.target.value
-													});
-												}}
-											/>
-										</Col>
-									</RowColSpan>
-									<Button className="btn-success" type="submit">
-										Save
-									</Button>
-								</form>
-								<hr />
+	};
+	renderAnalyticsFields = () => {
+		return this.state.analytics.map((analytic, index) => (
+			<div
+				key={index}
+				style={{
+					background: 'aliceblue',
+					padding: 5,
+					margin: 5
+				}}
+			>
+				{Object.keys(commonConsts.analytics[analytic.name]).map((field, index) => {
+					let analyticsFieldsConf = commonConsts.analytics[analytic.name],
+						alias = analyticsFieldsConf[field].alias;
+					return (
+						<RowColSpan label={alias} key={index}>
+							<input
+								type="text"
+								placeholder={alias}
+								value={analytic[field] || ''}
+								required
+								onChange={e => {
+									let selectedIndex = this.isAnalyticsSelected(analytic.name),
+										analytics = this.state.analytics,
+										selectedAnalytics = analytics[selectedIndex];
+									selectedAnalytics[field] = e.target.value;
+									this.setState({
+										analytics
+									});
+								}}
+							/>
+						</RowColSpan>
+					);
+				})}
+			</div>
+		));
+	};
 
-								<SendAmpData
-									channels={this.state.channels}
-									siteId={this.state.siteId}
-									siteDomain={this.state.siteDomain}
-								/>
-							</Col>
-							<Col sm={6}>
-								<Heading title="Channel Level Settings" />
-								{this.state.channels.map(channel => {
-									return (
-										<PageGroupSettings
-											channel={channel}
-											siteId={this.state.siteId}
-											key={channel.pageGroup}
-										/>
-									);
-								})}
-							</Col>
-						</Row>
-					</div>
-				</ActionCard>
-			</Row>
-		);
-	}
+	isAnalyticsSelected = analyticsName => {
+		let { analytics } = this.state;
+		for (let i = 0; i < analytics.length; i++) {
+			if (analyticsName == analytics[i].name) return i;
+		}
+		return -1;
+	};
+
+	render = () => {
+		if (this.state.isLoading) return <Loader />;
+		else
+			return (
+				<Row>
+					<ActionCard title="AMP settings">
+						<div className="settings-pane">
+							<Row>
+								<Col sm={6}>
+									<form onSubmit={this.saveSiteSettings}>
+										<Heading title="Site Level Settings" />
+										{this.renderInputControl(
+											'Sampling Percentage',
+											'samplingPercent',
+											this.state.samplingPercent
+										)}
+										<Row>
+											<Col sm={5}>
+												<span>BlockList</span>
+												<button
+													style={{ width: 'auto', marginLeft: 10 }}
+													className="btn-primary"
+													type="button"
+													onClick={() => {
+														let blockList = this.state.blockList;
+														blockList.push('');
+														this.setState({ blockList });
+													}}
+												>
+													+ Add
+												</button>
+											</Col>
+											{this.renderBlockList()}
+										</Row>
+										<RowColSpan label="Analytics">
+											{Object.keys(commonConsts.analytics).map((analytic, index) => {
+												let selectedIndex = this.isAnalyticsSelected(analytic),
+													isSelected = selectedIndex == -1 ? false : true;
+												return (
+													<Col sm={5} key={index}>
+														<input
+															name={analytic}
+															type="checkbox"
+															style={{ width: 'auto' }}
+															onChange={e => {
+																let { analytics } = this.state;
+																if (e.target.checked) {
+																	analytics.push({ name: analytic });
+																} else {
+																	analytics.splice(selectedIndex, 1);
+																}
+																this.setState({
+																	analytics
+																});
+															}}
+															checked={isSelected}
+														/>
+														<label> {analytic}</label>
+													</Col>
+												);
+											})}
+										</RowColSpan>
+										{this.renderAnalyticsFields()}
+										<Button className="btn-success" type="submit">
+											Save
+										</Button>
+									</form>
+									<hr />
+
+									<SendAmpData
+										channels={this.state.channels}
+										siteId={this.state.siteId}
+										siteDomain={this.state.siteDomain}
+									/>
+								</Col>
+								<Col sm={6}>
+									<Heading title="Channel Level Settings" />
+									{this.state.channels.map(channel => {
+										return (
+											<PageGroupSettings
+												channel={channel}
+												siteId={this.state.siteId}
+												key={channel.pageGroup}
+											/>
+										);
+									})}
+								</Col>
+							</Row>
+						</div>
+					</ActionCard>
+				</Row>
+			);
+	};
 }
 
 export default AmpSettings;
