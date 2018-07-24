@@ -7,17 +7,11 @@ class SendAmpData extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			pageGroup: '',
-			conversionType: '',
 			siteId: props.siteId,
 			siteDomain: props.siteDomain
 		};
-		this.handleOnChange = this.handleOnChange.bind(this);
-		this.renderInputControl = this.renderInputControl.bind(this);
-		this.renderOtherFields = this.renderOtherFields.bind(this);
-		this.send = this.send.bind(this);
 	}
-	renderInputControl(label, name, value) {
+	renderInputControl = (label, name, value) => {
 		return (
 			<Row>
 				<Col sm={5}>
@@ -31,20 +25,22 @@ class SendAmpData extends React.Component {
 						placeholder={label}
 						name={name}
 						value={value}
+						required
 					/>
 				</Col>
 			</Row>
 		);
-	}
-	renderOtherFields() {
+	};
+	renderOtherFields = () => {
 		if (this.state.conversionType == 'pagegroup')
 			return (
 				<RowColSpan label="Select PageGroup">
 					<select
 						className="form-control"
-						value={this.state.pageGroup}
+						value={this.state.pageGroup || ''}
 						name="pageGroup"
 						onChange={this.handleOnChange}
+						required
 					>
 						<option value="">Select Pagegroup</option>
 						{this.props.channels.map((channel, index) => (
@@ -65,6 +61,7 @@ class SendAmpData extends React.Component {
 							value={this.state.pageGroup}
 							name="pageGroup"
 							onChange={this.handleOnChange}
+							required
 						>
 							<option value="">Select Pagegroup</option>
 							{this.props.channels.map((channel, index) => (
@@ -77,14 +74,14 @@ class SendAmpData extends React.Component {
 				</div>
 			);
 		else return '';
-	}
-	handleOnChange(e) {
+	};
+	handleOnChange = e => {
 		const target = e.target;
 		const name = target.name;
 		const value = target.type === 'checkbox' ? target.checked : target.value;
 		this.setState({ [name]: value });
-	}
-	send(e) {
+	};
+	send = e => {
 		let { siteId } = this.state, data, url;
 		if (this.state.conversionType == 'site') {
 			data = {
@@ -122,17 +119,18 @@ class SendAmpData extends React.Component {
 			.catch(res => {
 				alert('Some Error Occurred!');
 			});
-	}
-	render() {
+	};
+	render = () => {
 		return (
 			<form onSubmit={this.send}>
 				<Heading title="Force AMP conversion" />
 				<RowColSpan label="Select conversion level">
 					<select
 						className="form-control"
-						value={this.state.conversionType}
+						value={this.state.conversionType || ''}
 						name="conversionType"
 						onChange={this.handleOnChange}
+						required
 					>
 						<option value="">Select</option>
 						<option value="site">Site</option>
@@ -146,7 +144,7 @@ class SendAmpData extends React.Component {
 				</Button>
 			</form>
 		);
-	}
+	};
 }
 
 export default SendAmpData;
