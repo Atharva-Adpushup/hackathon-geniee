@@ -384,7 +384,7 @@ class PageGroupSettings extends React.Component {
 									? this.generateAdCode(index)
 									: linkView.adCode
 							}
-							disabled={this.state.ads[index].type && this.state.ads[index].type != 'custom'}
+							disabled={this.state.ads[index].type != 'custom'}
 						/>
 					</RowColSpan>
 					<RowColSpan label="Type">
