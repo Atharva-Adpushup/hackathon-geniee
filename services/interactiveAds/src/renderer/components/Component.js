@@ -3,6 +3,7 @@
 import commonConsts from '../../commonConsts';
 import $ from '../../$';
 import { executeAdpTagsHeadCode } from '../../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
+import { executeAfterJS } from '../../../../genieeAdSyncService/genieeAp/src/adCreater';
 
 const adp = window.adpushup;
 
@@ -64,6 +65,19 @@ class Component {
 				break;
 		}
 
+		adp.interactiveAds.adsRendered += 1;
+		if (Object.keys(adp.interactiveAds.ads).length === adp.interactiveAds.adsRendered && !adp.afterJSExecuted) {
+			let variations = adp.config.experiment[adp.config.platform][adp.config.pageGroup].variations,
+				variation = null;
+
+			for (let i = 0; i < variations.length; i++) {
+				if (variations[i].id === adp.config.selectedVariation) {
+					variation = variations[i];
+				}
+			}
+
+			executeAfterJS(variation);
+		}
 		return this.sendFeedback(feedbackOptions);
 	}
 }
