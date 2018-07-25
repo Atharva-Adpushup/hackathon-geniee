@@ -191,6 +191,7 @@ var $ = require('jquery'),
 						} catch (e) {
 							err.push({ msg: 'Error in afterAp js.', js: variation.customJs.afterAp, error: e });
 						}
+						window.adpushup.afterJSExecuted = true;
 					}
 					//utils.sendFeedback(feedbackData);
 				}

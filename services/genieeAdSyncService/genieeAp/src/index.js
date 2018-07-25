@@ -21,6 +21,7 @@ var w = window,
 // Location of below snippet should not be changed, other wise script will throw error.
 $.extend(adp, {
 	creationProcessStarted: false,
+	afterJSExecuted: false,
 	err: [],
 	utils: utils,
 	control: control,
