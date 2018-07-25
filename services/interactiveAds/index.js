@@ -1,5 +1,6 @@
 // Adp Interactive ads main module
 
+import $ from './src/$';
 import './src/events';
 import commonConsts from './src/commonConsts';
 import emitter from './src/emitter';
@@ -7,7 +8,7 @@ import renderer from './src/renderer/index';
 import config from './src/config';
 
 const processInteractiveAds = interactiveAds => {
-	window.adpushup.interactiveAds = config;
+	window.adpushup.interactiveAds = $.extend({}, config, { adsCount: interactiveAds.length, adsRendered: 0 });
 
 	interactiveAds.forEach(interactiveAd => {
 		if (interactiveAd.formatData && interactiveAd.formatData.event) {
