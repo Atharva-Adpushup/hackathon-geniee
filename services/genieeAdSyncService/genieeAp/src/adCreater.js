@@ -118,6 +118,14 @@ var $ = require('jquery'),
 			});
 		return defer.promise();
 	},
+	executeAfterJS = function(variation) {
+		try {
+			utils.runScript(utils.base64Decode(variation.customJs.afterAp));
+		} catch (e) {
+			window.adpushup.err.push({ msg: 'Error in afterAp js.', js: variation.customJs.afterAp, error: e });
+		}
+		window.adpushup.afterJSExecuted = true;
+	},
 	placeAd = function(container, ad) {
 		var adp = window.adpushup;
 
@@ -185,13 +193,8 @@ var $ = require('jquery'),
 				}
 				if (!displayCounter && !finished) {
 					finished = true;
-					if (variation.customJs && variation.customJs.afterAp) {
-						try {
-							utils.runScript(utils.base64Decode(variation.customJs.afterAp));
-						} catch (e) {
-							err.push({ msg: 'Error in afterAp js.', js: variation.customJs.afterAp, error: e });
-						}
-						window.adpushup.afterJSExecuted = true;
+					if (variation.customJs && variation.customJs.afterAp && !adp.afterJSExecuted) {
+						executeAfterJS(variation);
 					}
 					//utils.sendFeedback(feedbackData);
 				}
@@ -294,5 +297,6 @@ var $ = require('jquery'),
 
 module.exports = {
 	createAds: createAds,
-	placeAd: placeAd
+	placeAd: placeAd,
+	executeAfterJS: executeAfterJS
 };
