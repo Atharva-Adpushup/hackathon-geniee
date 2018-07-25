@@ -448,9 +448,14 @@ function apiModule() {
 					});
 					incontentAds = _.filter(allSections, section => section.isIncontent);
 					hbAds = _.filter(allSections, section => {
-						let adId = Object.keys(section.ads)[0];
+						let adId = Object.keys(section.ads)[0],
+							networkData = section.ads[adId].networkData;
 
-						return section.ads[adId].networkData.headerBidding;
+						return (
+							networkData.dfpAdunitCode &&
+							networkData.dfpAdunit &&
+							(networkData.headerBidding || networkData.dynamicAllocation)
+						);
 					});
 
 					return { incontentAds, hbAds };
