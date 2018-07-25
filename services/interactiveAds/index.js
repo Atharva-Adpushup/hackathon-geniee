@@ -7,7 +7,7 @@ import renderer from './src/renderer/index';
 import config from './src/config';
 
 const processInteractiveAds = interactiveAds => {
-	window.adpInteractive = config;
+	window.adpushup.interactiveAds = config;
 
 	interactiveAds.forEach(interactiveAd => {
 		if (interactiveAd.formatData && interactiveAd.formatData.event) {

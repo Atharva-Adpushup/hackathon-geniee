@@ -22,7 +22,7 @@ class Component {
 
 	render() {
 		const { formatData, width, height, id } = this.interactiveAd;
-		window.adpInteractive.ads[id] = this.interactiveAd;
+		adp.interactiveAds.ads[id] = this.interactiveAd;
 
 		if (this.interactiveAd.network === commonConsts.NETWORKS.ADPTAGS) {
 			executeAdpTagsHeadCode([this.interactiveAd], {}); // This function expects an array of adpTags and optional adpKeyValues
