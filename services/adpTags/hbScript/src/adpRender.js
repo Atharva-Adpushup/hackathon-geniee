@@ -33,7 +33,7 @@ var logger = require('../helpers/logger'),
 				gptRefreshInterval = setInterval(function() {
 					refreshGPTSlot(slot.gSlot);
 				}, config.GPT_REFRESH_INTERVAL);
-				window.adpTags.gptRefreshIntervals.push({
+				window.adpushup.adpTags.gptRefreshIntervals.push({
 					gSlot: slot.gSlot,
 					id: gptRefreshInterval
 				});
