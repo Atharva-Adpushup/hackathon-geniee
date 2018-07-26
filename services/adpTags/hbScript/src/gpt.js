@@ -3,7 +3,6 @@
 var config = require('./config'),
 	logger = require('../helpers/logger'),
 	feedback = require('./feedback'),
-	// hbStatus = require('./hbStatus'),
 	init = function(w, d) {
 		w.googletag = w.googletag || {};
 		googletag.cmd = googletag.cmd || [];
@@ -36,8 +35,6 @@ var config = require('./config'),
 					slot.optionalParam &&
 					slot.optionalParam.network !== config.PARTNERS.GENIEE
 				) {
-					// hbStatus.hbDfpRender(slot.containerId);
-
 					logger.log('DFP ad slot rendered');
 					return cb(feedback(slot));
 				}

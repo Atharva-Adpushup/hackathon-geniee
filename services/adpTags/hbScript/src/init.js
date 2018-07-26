@@ -1,8 +1,6 @@
 // Header bidding initialisation module
 
 function init(w, d) {
-	// Disabling floor price optimizer service for now
-	// require('./adpOptimizer').init(w);
 	w.adpushup.adpPrebid = __PREBID_SCRIPT__;
 	w.adpushup.adpPrebid();
 
@@ -11,7 +9,6 @@ function init(w, d) {
 		config = require('./config'),
 		geniee = require('./geniee'),
 		feedback = require('./feedback');
-	// hbStatus = require('./hbStatus');
 
 	// Initialise GPT and set listeners
 	gpt.init(w, d);
