@@ -3,8 +3,8 @@
 function init(w, d) {
 	// Disabling floor price optimizer service for now
 	// require('./adpOptimizer').init(w);
-	w.adpPrebid = __PREBID_SCRIPT__;
-	w.adpPrebid();
+	w.adpushup.adpPrebid = __PREBID_SCRIPT__;
+	w.adpushup.adpPrebid();
 
 	var logger = require('../helpers/logger'),
 		gpt = require('./gpt'),
