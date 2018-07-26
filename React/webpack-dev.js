@@ -1,6 +1,4 @@
-const path = require('path'),
-	webpack = require('webpack'),
-	buildPath = '../public/assets/js/builds/';
+const path = require('path'), webpack = require('webpack'), buildPath = '../public/assets/js/builds/';
 
 module.exports = [
 	{
@@ -216,7 +214,7 @@ module.exports = [
 					loader: 'babel-loader',
 					exclude: /node_modules/,
 					query: {
-						plugins: ['lodash'],
+						plugins: ['lodash', 'transform-class-properties'],
 						presets: ['es2015', 'react', 'stage-2']
 					}
 				},

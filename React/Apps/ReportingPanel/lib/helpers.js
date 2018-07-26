@@ -114,32 +114,50 @@ const apiQueryGenerator = params => {
 		return cpm;
 	},
 	updateMajorRow = (csvRow, row) => {
-		csvRow.push(
-			row[commonConsts.DATA_LABELS.date].props.children,
-			row[commonConsts.DATA_LABELS.pageViews].props.children,
-			row[commonConsts.DATA_LABELS.pageCpm].props.children,
-			row[commonConsts.DATA_LABELS.adpRequests].props.children,
-			sumNetworkDataProp(row[commonConsts.DATA_LABELS.impressions]),
-			row[commonConsts.DATA_LABELS.adpCoverage].props.children,
-			calculateCSVRowCPM(row),
-			sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2),
-			row[commonConsts.DATA_LABELS.grossRevenue].props.children,
-			row[commonConsts.DATA_LABELS.xpathMiss].props.children
-		);
+		if (commonConsts.IS_SUPERUSER) {
+			csvRow.push(
+				row[commonConsts.DATA_LABELS.date].props.children,
+				row[commonConsts.DATA_LABELS.pageViews].props.children,
+				row[commonConsts.DATA_LABELS.pageCpm].props.children,
+				row[commonConsts.DATA_LABELS.adpRequests].props.children,
+				sumNetworkDataProp(row[commonConsts.DATA_LABELS.impressions]),
+				row[commonConsts.DATA_LABELS.adpCoverage].props.children,
+				calculateCSVRowCPM(row),
+				sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2),
+				row[commonConsts.DATA_LABELS.grossRevenue].props.children,
+				row[commonConsts.DATA_LABELS.xpathMiss].props.children
+			);
+		} else {
+			csvRow.push(
+				row[commonConsts.DATA_LABELS.date].props.children,
+				sumNetworkDataProp(row[commonConsts.DATA_LABELS.impressions]),
+				calculateCSVRowCPM(row),
+				sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2)
+			);
+		}
 	},
 	updateMinorRow = (csvRow, row) => {
-		csvRow.push(
-			row[commonConsts.DATA_LABELS.date],
-			row[commonConsts.DATA_LABELS.pageViews],
-			row[commonConsts.DATA_LABELS.pageCpm],
-			row[commonConsts.DATA_LABELS.adpRequests],
-			sumNetworkDataProp(row[commonConsts.DATA_LABELS.impressions]),
-			row[commonConsts.DATA_LABELS.adpCoverage],
-			calculateCSVRowCPM(row),
-			sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2),
-			row[commonConsts.DATA_LABELS.grossRevenue],
-			row[commonConsts.DATA_LABELS.xpathMiss]
-		);
+		if (commonConsts.IS_SUPERUSER) {
+			csvRow.push(
+				row[commonConsts.DATA_LABELS.date],
+				row[commonConsts.DATA_LABELS.pageViews],
+				row[commonConsts.DATA_LABELS.pageCpm],
+				row[commonConsts.DATA_LABELS.adpRequests],
+				sumNetworkDataProp(row[commonConsts.DATA_LABELS.impressions]),
+				row[commonConsts.DATA_LABELS.adpCoverage],
+				calculateCSVRowCPM(row),
+				sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2),
+				row[commonConsts.DATA_LABELS.grossRevenue],
+				row[commonConsts.DATA_LABELS.xpathMiss]
+			);
+		} else {
+			csvRow.push(
+				row[commonConsts.DATA_LABELS.date],
+				sumNetworkDataProp(row[commonConsts.DATA_LABELS.impressions]),
+				calculateCSVRowCPM(row),
+				sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2)
+			);
+		}
 	},
 	processCSVGroupBy = (groupBy, row) => {
 		let csvRow = [];
@@ -182,7 +200,21 @@ const apiQueryGenerator = params => {
 		let csvHeader = [],
 			csvBody = [];
 		for (let i in header) {
-			csvHeader.push(header[i].title);
+			if (commonConsts.IS_SUPERUSER) {
+				csvHeader.push(header[i].title);
+			} else {
+				if (
+					header[i].title === commonConsts.DATA_LABELS.date ||
+					header[i].title === commonConsts.DATA_LABELS.cpm ||
+					header[i].title === commonConsts.DATA_LABELS.impressions ||
+					header[i].title === commonConsts.DATA_LABELS.revenue ||
+					header[i].title === commonConsts.DATA_LABELS.platform ||
+					header[i].title === commonConsts.DATA_LABELS.pageGroup ||
+					header[i].title === commonConsts.DATA_LABELS.variation
+				) {
+					csvHeader.push(header[i].title);
+				}
+			}
 		}
 
 		csvBody.push(csvHeader);
@@ -202,18 +234,27 @@ const apiQueryGenerator = params => {
 		const totalsRow = body[body.length - 1];
 
 		if (!groupBy && totalsRow && totalsRow[commonConsts.DATA_LABELS.date].props) {
-			csvBody.push([
-				totalsRow[commonConsts.DATA_LABELS.date].props.children,
-				totalsRow[commonConsts.DATA_LABELS.pageViews].props.children,
-				totalsRow[commonConsts.DATA_LABELS.pageCpm].props.children,
-				totalsRow[commonConsts.DATA_LABELS.adpRequests].props.children,
-				sumNetworkDataProp(totalsRow[commonConsts.DATA_LABELS.impressions]),
-				totalsRow[commonConsts.DATA_LABELS.adpCoverage].props.children,
-				calculateCSVRowCPM(totalsRow),
-				sumNetworkDataProp(totalsRow[commonConsts.DATA_LABELS.revenue]).toFixed(2),
-				totalsRow[commonConsts.DATA_LABELS.grossRevenue].props.children,
-				totalsRow[commonConsts.DATA_LABELS.xpathMiss].props.children
-			]);
+			if (commonConsts.IS_SUPERUSER) {
+				csvBody.push([
+					totalsRow[commonConsts.DATA_LABELS.date].props.children,
+					totalsRow[commonConsts.DATA_LABELS.pageViews].props.children,
+					totalsRow[commonConsts.DATA_LABELS.pageCpm].props.children,
+					totalsRow[commonConsts.DATA_LABELS.adpRequests].props.children,
+					sumNetworkDataProp(totalsRow[commonConsts.DATA_LABELS.impressions]),
+					totalsRow[commonConsts.DATA_LABELS.adpCoverage].props.children,
+					calculateCSVRowCPM(totalsRow),
+					sumNetworkDataProp(totalsRow[commonConsts.DATA_LABELS.revenue]).toFixed(2),
+					totalsRow[commonConsts.DATA_LABELS.grossRevenue].props.children,
+					totalsRow[commonConsts.DATA_LABELS.xpathMiss].props.children
+				]);
+			} else {
+				csvBody.push([
+					totalsRow[commonConsts.DATA_LABELS.date].props.children,
+					sumNetworkDataProp(totalsRow[commonConsts.DATA_LABELS.impressions]),
+					calculateCSVRowCPM(totalsRow),
+					sumNetworkDataProp(totalsRow[commonConsts.DATA_LABELS.revenue]).toFixed(2)
+				]);
+			}
 		}
 
 		return csvBody;
