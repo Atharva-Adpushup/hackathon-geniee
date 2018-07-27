@@ -80,11 +80,16 @@ const selectorator = new Selectorator(),
 
 		const width = data.sizeObject.width,
 			height = data.sizeObject.height,
-			sizeString = `${width} X ${height}`;
+			sizeString = `${width} X ${height}`,
+			sizeObject = { width: `${width}px`, height: `${height}px` };
 
-		$el.css({ width: `${width}px`, height: `${height}px` })
+		$el.css(sizeObject)
 			.find('> ul.tags > li:nth-child(2) > .tag')
-			.text(sizeString);
+			.text(sizeString)
+			.end()
+			.closest('._ap_reject')
+			.parent()
+			.css(sizeObject);
 
 		return true;
 	},
