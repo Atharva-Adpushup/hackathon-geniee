@@ -16,7 +16,11 @@ class MultipleAdSizeSelector extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (nextProps.sizes) {
+		const thisProps = this.props,
+			isProps = !!(thisProps && nextProps),
+			isSameProps = !!(isProps && thisProps.sizes == nextProps.sizes);
+
+		if (nextProps.sizes && !isSameProps) {
 			this.setState({ selectedSizes: nextProps.sizes });
 		}
 	}
