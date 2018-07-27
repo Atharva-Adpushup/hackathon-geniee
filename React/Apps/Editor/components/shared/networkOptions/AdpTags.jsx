@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import { Row, Col, Button, OverlayTrigger, Tooltip, Alert } from 'react-bootstrap';
-// import _ from 'lodash';
 import CodeBox from '../codeBox';
 import { priceFloorKeys } from '../../../consts/commonConsts';
 import SelectBox from '../select/select.js';
