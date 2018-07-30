@@ -83,8 +83,7 @@ class PageGroupSettings extends React.Component {
 							name={key}
 							value={selectorValue}
 							onChange={e => {
-								let selectors = this.state.selectors,
-									value = e.target.value.trim();
+								let selectors = this.state.selectors, value = e.target.value.trim();
 								selectors[e.target.name] = value.split(',');
 								this.setState({
 									selectors
@@ -115,22 +114,19 @@ class PageGroupSettings extends React.Component {
 		);
 	};
 	generateAdCode = ad => {
-		let adNetwork = ad.type,
-			adCode = commonConsts.ads.sampleAds[adNetwork];
-
-		adCode = adCode.replace('dWidth', ad.width);
-		adCode = adCode.replace('dHeight', ad.height);
-		for (let field in ad.data) {
-			adCode = adCode.replace(field, ad.data[field]);
+		let adNetwork = ad.type, adCode = commonConsts.ads.sampleAds[adNetwork] || '';
+		if (adCode) {
+			adCode = adCode.replace('dWidth', ad.width);
+			adCode = adCode.replace('dHeight', ad.height);
+			for (let field in ad.data) {
+				adCode = adCode.replace(field, ad.data[field]);
+			}
 		}
 		return adCode;
 	};
 	parseFormData = ampData => {
-		let finalData = ampData,
-			dataLinks = finalData.menu.links,
-			dataAds = finalData.ads;
-		let ads = [],
-			links = [];
+		let finalData = ampData, dataLinks = finalData.menu.links, dataAds = finalData.ads;
+		let ads = [], links = [];
 		for (let i = 0; i < dataLinks.length; i++) {
 			if (dataLinks[i].name && dataLinks[i].link) links.push(dataLinks[i]);
 		}
@@ -138,8 +134,7 @@ class PageGroupSettings extends React.Component {
 		finalData.afterJs = finalData.afterJs ? btoa(finalData.afterJs) : '';
 		for (let i = 0; i < dataAds.length; i++) {
 			if (dataAds[i].selector && dataAds[i].adCode && dataAds[i].type) {
-				let adType = dataAds[i].type,
-					adTypeFieldConf = commonConsts.ads.type[adType];
+				let adType = dataAds[i].type, adTypeFieldConf = commonConsts.ads.type[adType];
 				if (!adTypeFieldConf) delete dataAds[i].data;
 				if ((adTypeFieldConf && dataAds[i].data) || !adTypeFieldConf) {
 					let adCode = dataAds[i].adCode;
@@ -154,10 +149,9 @@ class PageGroupSettings extends React.Component {
 	};
 	saveChannelSettings = event => {
 		event.preventDefault();
-		let ampData = this.parseFormData(Object.assign({}, this.state)),
+		let ampData = this.parseFormData(JSON.parse(JSON.stringify(this.state))),
 			pageGroup = this.props.channel.pageGroup;
-		let { siteId } = this.state,
-			selectors = ampData.selectors;
+		let { siteId } = this.state, selectors = ampData.selectors;
 		if (!selectors.articleContent || !ampData.siteName || !ampData.template) {
 			alert('Artical Content, SiteName and Template are required');
 			return;
@@ -182,8 +176,7 @@ class PageGroupSettings extends React.Component {
 		const target = e.target;
 		const name = target.name;
 		const value = target.checked;
-		let social = this.state.social,
-			apps = social.apps || [];
+		let social = this.state.social, apps = social.apps || [];
 		//this.setState({ [name]: value });
 		if (value == true) {
 			apps.push(name);
@@ -229,9 +222,7 @@ class PageGroupSettings extends React.Component {
 					<input
 						className="col-sm-5"
 						onChange={e => {
-							let menu = this.state.menu,
-								links = menu.links,
-								link = links[index];
+							let menu = this.state.menu, links = menu.links, link = links[index];
 							link.name = e.target.value;
 							this.setState({ menu });
 						}}
@@ -244,9 +235,7 @@ class PageGroupSettings extends React.Component {
 					<input
 						className="col-sm-5"
 						onChange={e => {
-							let menu = this.state.menu,
-								links = menu.links,
-								link = links[index];
+							let menu = this.state.menu, links = menu.links, link = links[index];
 							link.link = e.target.value;
 							this.setState({ menu });
 						}}
@@ -260,8 +249,7 @@ class PageGroupSettings extends React.Component {
 						style={{ width: 'auto', cursor: 'pointer' }}
 						className="fa fa-trash fa-2x col-sm-2"
 						onClick={() => {
-							let menu = this.state.menu,
-								links = menu.links;
+							let menu = this.state.menu, links = menu.links;
 							links.splice(index, 1);
 							this.setState({ menu });
 						}}
@@ -287,7 +275,7 @@ class PageGroupSettings extends React.Component {
 							onChange={e => {
 								let data = { ...selectedAd.data, [field]: e.target.value };
 								//data[field] = e.target.value;
-								let adCode = this.generateAdCode({...selectedAd, data});
+								let adCode = this.generateAdCode({ ...selectedAd, data });
 								this.setAds(index, {
 									data,
 									adCode
@@ -296,7 +284,7 @@ class PageGroupSettings extends React.Component {
 							}}
 						/>
 					</RowColSpan>
-			  ))
+				))
 			: null;
 	};
 
@@ -306,7 +294,7 @@ class PageGroupSettings extends React.Component {
 		this.setState({ ads });
 	};
 
-	insertNewAd = adIndex => {
+	insertNewAd = () => {
 		let ads = this.state.ads;
 		ads.push({ width: 100, height: 100, operations: 'INSERTBEFORE' });
 		this.setState({ ads });
@@ -315,16 +303,18 @@ class PageGroupSettings extends React.Component {
 	setAds = (index, partialAd) => {
 		let ads = this.state.ads;
 		ads[index] = Object.assign(ads[index], partialAd);
+		let adCode = this.generateAdCode(ads[index]);
+		ads[index].adCode = adCode;
 		this.setState({ ads });
 	};
 
 	renderAds = () => {
 		const deleteAdBtnStyle = {
-				position: 'absolute',
-				right: '-8px',
-				top: '-8px',
-				cursor: 'pointer'
-			},
+			position: 'absolute',
+			right: '-8px',
+			top: '-8px',
+			cursor: 'pointer'
+		},
 			adContainerStyle = {
 				background: '#f9f9f9',
 				padding: '20px 10px 10px',
@@ -366,7 +356,7 @@ class PageGroupSettings extends React.Component {
 									placeholder="Width"
 									name="width"
 									className="form-control"
-									value={ad.width || 100}
+									value={ad.width}
 								/>
 							</RowColSpan>
 							<RowColSpan label="Height">
@@ -378,7 +368,7 @@ class PageGroupSettings extends React.Component {
 									placeholder="Height"
 									name="height"
 									className="form-control"
-									value={ad.height || 100}
+									value={ad.height}
 								/>
 							</RowColSpan>
 							<RowColSpan label="Operation">
@@ -404,9 +394,7 @@ class PageGroupSettings extends React.Component {
 									name="type"
 									value={ad.type || ''}
 									onChange={e => {
-										let partialAd = {},
-											type = e.target.value,
-											adFields = commonConsts.ads.type;
+										let partialAd = {}, type = e.target.value, adFields = commonConsts.ads.type;
 
 										partialAd.type = type;
 										if (ad.type === 'custom') {
@@ -428,7 +416,7 @@ class PageGroupSettings extends React.Component {
 								</select>
 							</RowColSpan>
 							{this.renderNetworkInputs(index)}
-							{ad.type && (
+							{ad.type &&
 								<RowColSpan label="AdCode">
 									<textarea
 										style={{ resize: 'both', overflow: 'auto' }}
@@ -441,8 +429,7 @@ class PageGroupSettings extends React.Component {
 										value={ad.adCode}
 										disabled={ad.type != 'custom'}
 									/>
-								</RowColSpan>
-							)}
+								</RowColSpan>}
 						</div>
 					);
 				})}
@@ -458,8 +445,7 @@ class PageGroupSettings extends React.Component {
 	};
 
 	render = () => {
-		const { props } = this,
-			channel = props.channel;
+		const { props } = this, channel = props.channel;
 		return (
 			<CollapsePanel title={channel.pageGroup} bold={true}>
 				<form onSubmit={this.saveChannelSettings}>
@@ -593,8 +579,7 @@ class PageGroupSettings extends React.Component {
 								className="btn-primary"
 								type="button"
 								onClick={() => {
-									let menu = this.state.menu,
-										links = menu.links;
+									let menu = this.state.menu, links = menu.links;
 									links.push({ name: '', link: '' });
 									this.setState({ menu });
 								}}
@@ -625,8 +610,7 @@ class PageGroupSettings extends React.Component {
 							value={this.state.toDelete || ''}
 							style={{ resize: 'auto' }}
 							onChange={e => {
-								let toDelete = this.state.toDelete,
-									value = e.target.value.trim();
+								let toDelete = this.state.toDelete, value = e.target.value.trim();
 								toDelete = value.split(',');
 								this.setState({
 									toDelete
