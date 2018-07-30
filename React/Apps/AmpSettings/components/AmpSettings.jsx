@@ -6,13 +6,17 @@ import PageGroupSettings from './PageGroupSettings.jsx';
 import SendAmpData from './SendAmpData.jsx';
 import RowColSpan from './helper/RowColSpan.jsx';
 import commonConsts from '../lib/commonConsts';
+import Select from 'react-select';
 import { ajax } from '../../../common/helpers';
+import MenuSettings from './MenuSettings.jsx';
+import FooterSettings from './FooterSettings.jsx';
 import { Row, Col, Button } from 'react-bootstrap';
 class AmpSettings extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			isLoading: true
+			isLoading: true,
+			selectedAnalytics: []
 		};
 	}
 	fetchAmpSettings = () => {
@@ -22,6 +26,12 @@ class AmpSettings extends React.Component {
 			url: '/user/site/' + siteId + '/ampSettingsData'
 		})
 			.then(res => {
+				let selectedAnalytics = [], fetchedAnalyticsData = res.ampSettings.analytics;
+				for (let i = 0; i < fetchedAnalyticsData.length; i++) {
+					let name = fetchedAnalyticsData[i].name, analyticData = fetchedAnalyticsData[i];
+					delete analyticData.name;
+					selectedAnalytics.push({ label: name, value: name, fields: analyticData });
+				}
 				this.setState({
 					siteId: res.siteId,
 					siteDomain: res.siteDomain,
@@ -29,7 +39,9 @@ class AmpSettings extends React.Component {
 					blockList: res.ampSettings.blockList || [],
 					samplingPercent: res.ampSettings.samplingPercent,
 					isLoading: false,
-					analytics: res.ampSettings.analytics || []
+					selectedAnalytics,
+					menu: res.ampSettings.menu || { links: [], include: false, position: 'right' },
+					footer: res.ampSettings.footer || { include: false, label: 'AMP by AdPushUp' }
 				});
 			})
 			.catch(res => {
@@ -46,7 +58,7 @@ class AmpSettings extends React.Component {
 		let linkViews = new Array(this.state.blockList);
 		const listItems = this.state.blockList.map((linkView, index) => {
 			return (
-				<div key={index}>
+				<RowColSpan key={index} label="">
 					<input
 						onChange={e => {
 							let blockList = this.state.blockList;
@@ -55,14 +67,14 @@ class AmpSettings extends React.Component {
 								blockList
 							});
 						}}
-						style={{ width: 'auto' }}
+						style={{ width: '90%', border: '1px solid #e6e6e6' }}
 						type="text"
 						placeholder="URL or RegExp"
 						name="name"
 						value={this.state.blockList[index]}
-					/> <i
-						style={{ width: 'auto', cursor: 'pointer', float: 'right' }}
-						className="fa fa-trash fa-2x col-sm-2"
+					/> <button
+						style={{ width: 'auto', float: 'right' }}
+						className="fa fa-trash fa-2x"
 						onClick={() => {
 							let blockList = this.state.blockList;
 							blockList.splice(index, 1);
@@ -71,14 +83,10 @@ class AmpSettings extends React.Component {
 							});
 						}}
 					/>
-				</div>
+				</RowColSpan>
 			);
 		});
-		return (
-			<Col sm={7}>
-				{listItems}
-			</Col>
-		);
+		return <div>{listItems}</div>;
 	};
 	renderInputControl = (label, name, value) => {
 		return (
@@ -104,14 +112,26 @@ class AmpSettings extends React.Component {
 	};
 	saveSiteSettings = event => {
 		event.preventDefault();
-		let { siteId } = this.state;
+		let finalData = JSON.parse(JSON.stringify(this.state)),
+			{ siteId, menu, selectedAnalytics } = finalData,
+			dataLinks = menu.links,
+			analytics = [];
+		for (let i = dataLinks.length - 1; i >= 0; i--) {
+			if (!dataLinks[i].name || !dataLinks[i].link) dataLinks.splice(i, 1);
+		}
+		for (let i = 0; i < selectedAnalytics.length; i++) {
+			let analytic = { name: selectedAnalytics[i].value, ...selectedAnalytics[i].fields };
+			analytics.push(analytic);
+		}
 		ajax({
 			method: 'POST',
 			url: '/user/site/' + siteId + '/saveAmpSettings',
 			data: JSON.stringify({
-				samplingPercent: this.state.samplingPercent,
-				blockList: this.state.blockList,
-				analytics: this.state.analytics
+				samplingPercent: finalData.samplingPercent,
+				blockList: finalData.blockList,
+				analytics: analytics,
+				menu: finalData.menu,
+				footer: finalData.footer
 			})
 		})
 			.then(res => {
@@ -122,40 +142,44 @@ class AmpSettings extends React.Component {
 			});
 	};
 	renderAnalyticsFields = () => {
-		return this.state.analytics.map((analytic, index) => (
-			<div
-				key={index}
-				style={{
-					background: 'aliceblue',
-					padding: 5,
-					margin: 5
-				}}
-			>
-				{Object.keys(commonConsts.analytics[analytic.name]).map((field, index) => {
-					let analyticsFieldsConf = commonConsts.analytics[analytic.name],
-						alias = analyticsFieldsConf[field].alias;
-					return (
-						<RowColSpan label={alias} key={index}>
-							<input
-								type="text"
-								placeholder={alias}
-								value={analytic[field] || ''}
-								required
-								onChange={e => {
-									let selectedIndex = this.isAnalyticsSelected(analytic.name),
-										analytics = this.state.analytics,
-										selectedAnalytics = analytics[selectedIndex];
-									selectedAnalytics[field] = e.target.value;
-									this.setState({
-										analytics
-									});
-								}}
-							/>
-						</RowColSpan>
-					);
-				})}
-			</div>
-		));
+		const adContainerStyle = {
+			background: '#f9f9f9',
+			padding: '20px 10px 10px',
+			margin: 10,
+			borderRadius: 4,
+			border: '1px solid #e9e9e9',
+			position: 'relative'
+		};
+		return this.state.selectedAnalytics.map((analytic, analyticIndex) => {
+			let fields = commonConsts.analytics[analytic.value];
+			return (
+				<div key={analyticIndex} style={adContainerStyle}>
+					{Object.keys(fields).map((field, fieldIndex) => {
+						let alias = fields[field].alias,
+							value = this.state.selectedAnalytics[analyticIndex].fields[field];
+						return (
+							<RowColSpan label={alias} key={fieldIndex}>
+								<input
+									type="text"
+									className="form-control"
+									placeholder={alias}
+									value={value || ''}
+									required
+									onChange={e => {
+										let { selectedAnalytics } = this.state,
+											selectedAnalytic = selectedAnalytics[analyticIndex];
+										selectedAnalytic.fields[field] = e.target.value;
+										this.setState({
+											selectedAnalytics
+										});
+									}}
+								/>
+							</RowColSpan>
+						);
+					})}
+				</div>
+			);
+		});
 	};
 
 	isAnalyticsSelected = analyticsName => {
@@ -167,6 +191,10 @@ class AmpSettings extends React.Component {
 	};
 
 	render = () => {
+		let analytics = Object.keys(commonConsts.analytics).map(function(key) {
+			return { label: key, value: key, fields: {} };
+		});
+
 		if (this.state.isLoading) return <Loader />;
 		else
 			return (
@@ -182,56 +210,47 @@ class AmpSettings extends React.Component {
 											'samplingPercent',
 											this.state.samplingPercent
 										)}
-										<Row>
-											<Col sm={5}>
-												<span>BlockList</span>
-												<button
-													style={{ width: 'auto', marginLeft: 10 }}
-													className="btn-primary"
-													type="button"
-													onClick={() => {
-														let blockList = this.state.blockList;
-														blockList.push('');
-														this.setState({ blockList });
-													}}
-												>
-													+ Add
-												</button>
-											</Col>
-											{this.renderBlockList()}
-										</Row>
+										<RowColSpan label="BlockList">
+											<button
+												className="btn-primary"
+												type="button"
+												onClick={() => {
+													let blockList = this.state.blockList;
+													blockList.push('');
+													this.setState({ blockList });
+												}}
+											>
+												+ Add
+											</button>
+										</RowColSpan>
+										{this.renderBlockList()}
 										<RowColSpan label="Analytics">
-											{Object.keys(commonConsts.analytics).map((analytic, index) => {
-												let selectedIndex = this.isAnalyticsSelected(analytic),
-													isSelected = selectedIndex == -1 ? false : true;
-												return (
-													<Col sm={5} key={index}>
-														<input
-															name={analytic}
-															type="checkbox"
-															style={{ width: 'auto' }}
-															onChange={e => {
-																let { analytics } = this.state;
-																if (e.target.checked) {
-																	analytics.push({ name: analytic });
-																} else {
-																	analytics.splice(selectedIndex, 1);
-																}
-																this.setState({
-																	analytics
-																});
-															}}
-															checked={isSelected}
-														/>
-														<label> {analytic}</label>
-													</Col>
-												);
-											})}
+											<Select
+												value={this.state.selectedAnalytics}
+												isMulti={true}
+												onChange={selectedAnalytics => {
+													this.setState({
+														selectedAnalytics
+													});
+												}}
+												options={analytics}
+												placeholder="Select Analytics"
+											/>
 										</RowColSpan>
 										{this.renderAnalyticsFields()}
-										<Button className="btn-success" type="submit">
-											Save
-										</Button>
+										<hr />
+										<MenuSettings menu={this.state.menu} />
+										<hr />
+										<FooterSettings footer={this.state.footer} />
+										<hr />
+										<div className="row settings-btn-pane">
+											<div className="col-sm-4">
+												<button className="btn-success">Save Settings</button>
+											</div>
+											<div className="col-sm-2">
+												<button type="button" className="btn-default">Cancel</button>
+											</div>
+										</div>
 									</form>
 									<hr />
 
