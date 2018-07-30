@@ -83,7 +83,8 @@ class PageGroupSettings extends React.Component {
 							name={key}
 							value={selectorValue}
 							onChange={e => {
-								let selectors = this.state.selectors, value = e.target.value.trim();
+								let selectors = this.state.selectors,
+									value = e.target.value.trim();
 								selectors[e.target.name] = value.split(',');
 								this.setState({
 									selectors
@@ -113,8 +114,9 @@ class PageGroupSettings extends React.Component {
 			</Row>
 		);
 	};
-	generateAdCode = index => {
-		let ad = this.state.ads[index], adNetwork = ad.type, adCode = commonConsts.ads.sampleAds[adNetwork];
+	generateAdCode = ad => {
+		let adNetwork = ad.type,
+			adCode = commonConsts.ads.sampleAds[adNetwork];
 
 		adCode = adCode.replace('dWidth', ad.width);
 		adCode = adCode.replace('dHeight', ad.height);
@@ -124,8 +126,11 @@ class PageGroupSettings extends React.Component {
 		return adCode;
 	};
 	parseFormData = ampData => {
-		let finalData = ampData, dataLinks = finalData.menu.links, dataAds = finalData.ads;
-		let ads = [], links = [];
+		let finalData = ampData,
+			dataLinks = finalData.menu.links,
+			dataAds = finalData.ads;
+		let ads = [],
+			links = [];
 		for (let i = 0; i < dataLinks.length; i++) {
 			if (dataLinks[i].name && dataLinks[i].link) links.push(dataLinks[i]);
 		}
@@ -133,7 +138,8 @@ class PageGroupSettings extends React.Component {
 		finalData.afterJs = finalData.afterJs ? btoa(finalData.afterJs) : '';
 		for (let i = 0; i < dataAds.length; i++) {
 			if (dataAds[i].selector && dataAds[i].adCode && dataAds[i].type) {
-				let adType = dataAds[i].type, adTypeFieldConf = commonConsts.ads.type[adType];
+				let adType = dataAds[i].type,
+					adTypeFieldConf = commonConsts.ads.type[adType];
 				if (!adTypeFieldConf) delete dataAds[i].data;
 				if ((adTypeFieldConf && dataAds[i].data) || !adTypeFieldConf) {
 					let adCode = dataAds[i].adCode;
@@ -148,8 +154,10 @@ class PageGroupSettings extends React.Component {
 	};
 	saveChannelSettings = event => {
 		event.preventDefault();
-		let ampData = this.parseFormData(Object.assign({}, this.state)), pageGroup = this.props.channel.pageGroup;
-		let { siteId } = this.state, selectors = ampData.selectors;
+		let ampData = this.parseFormData(Object.assign({}, this.state)),
+			pageGroup = this.props.channel.pageGroup;
+		let { siteId } = this.state,
+			selectors = ampData.selectors;
 		if (!selectors.articleContent || !ampData.siteName || !ampData.template) {
 			alert('Artical Content, SiteName and Template are required');
 			return;
@@ -174,7 +182,8 @@ class PageGroupSettings extends React.Component {
 		const target = e.target;
 		const name = target.name;
 		const value = target.checked;
-		let social = this.state.social, apps = social.apps || [];
+		let social = this.state.social,
+			apps = social.apps || [];
 		//this.setState({ [name]: value });
 		if (value == true) {
 			apps.push(name);
@@ -220,7 +229,9 @@ class PageGroupSettings extends React.Component {
 					<input
 						className="col-sm-5"
 						onChange={e => {
-							let menu = this.state.menu, links = menu.links, link = links[index];
+							let menu = this.state.menu,
+								links = menu.links,
+								link = links[index];
 							link.name = e.target.value;
 							this.setState({ menu });
 						}}
@@ -233,7 +244,9 @@ class PageGroupSettings extends React.Component {
 					<input
 						className="col-sm-5"
 						onChange={e => {
-							let menu = this.state.menu, links = menu.links, link = links[index];
+							let menu = this.state.menu,
+								links = menu.links,
+								link = links[index];
 							link.link = e.target.value;
 							this.setState({ menu });
 						}}
@@ -247,7 +260,8 @@ class PageGroupSettings extends React.Component {
 						style={{ width: 'auto', cursor: 'pointer' }}
 						className="fa fa-trash fa-2x col-sm-2"
 						onClick={() => {
-							let menu = this.state.menu, links = menu.links;
+							let menu = this.state.menu,
+								links = menu.links;
 							links.splice(index, 1);
 							this.setState({ menu });
 						}}
@@ -271,152 +285,181 @@ class PageGroupSettings extends React.Component {
 							className="form-control"
 							value={selectedAd.data[field] || ''}
 							onChange={e => {
-								let ads = this.state.ads, ad = ads[index], data = ad.data;
-								data[field] = e.target.value;
-								this.setState({ ads });
+								let data = { ...selectedAd.data, [field]: e.target.value };
+								//data[field] = e.target.value;
+								let adCode = this.generateAdCode({...selectedAd, data});
+								this.setAds(index, {
+									data,
+									adCode
+								});
+								//this.setState({ ads });
 							}}
 						/>
 					</RowColSpan>
-				))
-			: '';
+			  ))
+			: null;
+	};
+
+	deleteAd = adIndex => {
+		let ads = this.state.ads;
+		ads.splice(adIndex, 1);
+		this.setState({ ads });
+	};
+
+	insertNewAd = adIndex => {
+		let ads = this.state.ads;
+		ads.push({ width: 100, height: 100, operations: 'INSERTBEFORE' });
+		this.setState({ ads });
+	};
+
+	setAds = (index, partialAd) => {
+		let ads = this.state.ads;
+		ads[index] = Object.assign(ads[index], partialAd);
+		this.setState({ ads });
 	};
 
 	renderAds = () => {
-		const listAds = this.state.ads.map((linkView, index) => {
-			return (
-				<div
-					key={index}
-					style={{
-						background: 'aliceblue',
-						padding: 5,
-						margin: 5
-					}}
-				>
-					<div
-						style={{
-							textAlign: 'right',
-							cursor: 'pointer',
-							paddingRight: 0,
-							margin: '-10px 10px 5px'
-						}}
-						className="fa fa-times-circle fa-2x col-sm-12"
-						onClick={() => {
-							let ads = this.state.ads;
-							ads.splice(index, 1);
-							this.setState({ ads });
-						}}
-					/>
-					<RowColSpan label="Selector">
-						<input
-							onChange={e => {
-								let ads = this.state.ads, ad = ads[index];
-								ad.selector = e.target.value;
-								this.setState({ ads });
-							}}
-							type="text"
-							placeholder="Selector"
-							name="selector"
-							className="form-control"
-							value={linkView.selector || ''}
-						/>
-					</RowColSpan>
-					<RowColSpan label="Width">
-						<input
-							onChange={e => {
-								let ads = this.state.ads, ad = ads[index];
-								ad.width = e.target.value;
-								this.setState({ ads });
-							}}
-							type="number"
-							placeholder="Width"
-							name="width"
-							className="form-control"
-							value={linkView.width || 100}
-						/>
-					</RowColSpan>
-					<RowColSpan label="Height">
-						<input
-							onChange={e => {
-								let ads = this.state.ads, ad = ads[index];
-								ad.height = e.target.value;
-								this.setState({ ads });
-							}}
-							type="number"
-							placeholder="Height"
-							name="height"
-							className="form-control"
-							value={linkView.height || 100}
-						/>
-					</RowColSpan>
-					<RowColSpan label="Operation">
-						<select
-							className="form-control"
-							name="operation"
-							value={linkView.operation || 'INSERTAFTER'}
-							onChange={e => {
-								let ads = this.state.ads, ad = ads[index];
-								ad.operation = e.target.value;
-								this.setState({ ads });
-							}}
-						>
-							<option value="">Select Operation</option>
-							{commonConsts.ads.operations.map((operation, index) => (
-								<option value={operation} key={index}>
-									{operation}
-								</option>
-							))}
-						</select>
+		const deleteAdBtnStyle = {
+				position: 'absolute',
+				right: '-8px',
+				top: '-8px',
+				cursor: 'pointer'
+			},
+			adContainerStyle = {
+				background: '#f9f9f9',
+				padding: '20px 10px 10px',
+				margin: 10,
+				borderRadius: 4,
+				border: '1px solid #e9e9e9',
+				position: 'relative'
+			};
+		return (
+			<div>
+				<Heading title="Ad Settings" />
+				{this.state.ads.map((ad, index) => {
+					return (
+						<div key={index} style={adContainerStyle}>
+							<div
+								style={deleteAdBtnStyle}
+								className="fa fa-times-circle fa-2x"
+								onClick={() => this.deleteAd(index)}
+								title="Delete This Ad"
+							/>
+							<RowColSpan label="Selector">
+								<input
+									onChange={e => {
+										this.setAds(index, { selector: e.target.value });
+									}}
+									type="text"
+									placeholder="Selector"
+									name="selector"
+									className="form-control"
+									value={ad.selector || ''}
+								/>
+							</RowColSpan>
+							<RowColSpan label="Width">
+								<input
+									onChange={e => {
+										this.setAds(index, { width: e.target.value });
+									}}
+									type="number"
+									placeholder="Width"
+									name="width"
+									className="form-control"
+									value={ad.width || 100}
+								/>
+							</RowColSpan>
+							<RowColSpan label="Height">
+								<input
+									onChange={e => {
+										this.setAds(index, { height: e.target.value });
+									}}
+									type="number"
+									placeholder="Height"
+									name="height"
+									className="form-control"
+									value={ad.height || 100}
+								/>
+							</RowColSpan>
+							<RowColSpan label="Operation">
+								<select
+									className="form-control"
+									name="operation"
+									value={ad.operation || 'INSERTAFTER'}
+									onChange={e => {
+										this.setAds(index, { operation: e.target.value });
+									}}
+								>
+									<option value="">Select Operation</option>
+									{commonConsts.ads.operations.map((operation, index) => (
+										<option value={operation} key={index}>
+											{operation}
+										</option>
+									))}
+								</select>
+							</RowColSpan>
+							<RowColSpan label="Type">
+								<select
+									className="form-control"
+									name="type"
+									value={ad.type || ''}
+									onChange={e => {
+										let partialAd = {},
+											type = e.target.value,
+											adFields = commonConsts.ads.type;
 
-					</RowColSpan>
-					<RowColSpan label="AdCode">
-						<textarea
-							style={{ resize: 'both', overflow: 'auto' }}
-							onChange={e => {
-								let ads = this.state.ads, ad = ads[index];
-								ad.adCode = e.target.value;
-								this.setState({ ads });
-							}}
-							placeholder="AdCode"
-							name="adCode"
-							className="form-control"
-							value={
-								this.state.ads[index].type && this.state.ads[index].type != 'custom'
-									? this.generateAdCode(index)
-									: linkView.adCode
-							}
-							disabled={this.state.ads[index].type != 'custom'}
-						/>
-					</RowColSpan>
-					<RowColSpan label="Type">
-						<select
-							className="form-control"
-							name="type"
-							value={linkView.type || ''}
-							onChange={e => {
-								let ads = this.state.ads, ad = ads[index], adFields = commonConsts.ads.type;
-								ad.type = e.target.value;
-								if (adFields[ad.type]) ad.data = {};
-								this.setState({ ads });
-							}}
-						>
-							<option value="">Select Type</option>
-							{Object.keys(commonConsts.ads.type).map((type, index) => (
-								<option value={type} key={index}>
-									{type}
-								</option>
-							))}
-							<option value="custom">Custom</option>
-						</select>
-					</RowColSpan>
-					{this.renderNetworkInputs(index)}
-				</div>
-			);
-		});
-		return listAds;
+										partialAd.type = type;
+										if (ad.type === 'custom') {
+											partialAd.adCode = '';
+										}
+										if (adFields[type]) {
+											partialAd.data = {};
+										}
+										this.setAds(index, partialAd);
+									}}
+								>
+									<option value="">Select Type</option>
+									{Object.keys(commonConsts.ads.type).map((type, index) => (
+										<option value={type} key={index}>
+											{type}
+										</option>
+									))}
+									<option value="custom">Custom</option>
+								</select>
+							</RowColSpan>
+							{this.renderNetworkInputs(index)}
+							{ad.type && (
+								<RowColSpan label="AdCode">
+									<textarea
+										style={{ resize: 'both', overflow: 'auto' }}
+										onChange={e => {
+											this.setAds(index, { adCode: e.target.value });
+										}}
+										placeholder="AdCode"
+										name="adCode"
+										className="form-control"
+										value={ad.adCode}
+										disabled={ad.type != 'custom'}
+									/>
+								</RowColSpan>
+							)}
+						</div>
+					);
+				})}
+				<Row>
+					<Col sm={12}>
+						<button className="btn-primary" type="button" onClick={this.insertNewAd}>
+							+ Add New Ad
+						</button>
+					</Col>
+				</Row>
+			</div>
+		);
 	};
 
 	render = () => {
-		const { props } = this, channel = props.channel;
+		const { props } = this,
+			channel = props.channel;
 		return (
 			<CollapsePanel title={channel.pageGroup} bold={true}>
 				<form onSubmit={this.saveChannelSettings}>
@@ -550,7 +593,8 @@ class PageGroupSettings extends React.Component {
 								className="btn-primary"
 								type="button"
 								onClick={() => {
-									let menu = this.state.menu, links = menu.links;
+									let menu = this.state.menu,
+										links = menu.links;
 									links.push({ name: '', link: '' });
 									this.setState({ menu });
 								}}
@@ -581,7 +625,8 @@ class PageGroupSettings extends React.Component {
 							value={this.state.toDelete || ''}
 							style={{ resize: 'auto' }}
 							onChange={e => {
-								let toDelete = this.state.toDelete, value = e.target.value.trim();
+								let toDelete = this.state.toDelete,
+									value = e.target.value.trim();
 								toDelete = value.split(',');
 								this.setState({
 									toDelete
@@ -617,19 +662,6 @@ class PageGroupSettings extends React.Component {
 						value: this.state.template || '',
 						type: 'text'
 					})}
-					<RowColSpan label="Ads">
-						<button
-							className="btn-primary"
-							type="button"
-							onClick={() => {
-								let ads = this.state.ads;
-								ads.push({ width: 100, height: 100, operations: 'INSERTBEFORE' });
-								this.setState({ ads });
-							}}
-						>
-							+ Add
-						</button>
-					</RowColSpan>
 					{this.renderAds()}
 					<button className="btn-success">Save</button>
 				</form>
