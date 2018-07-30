@@ -1,207 +1,176 @@
-.MenuBarComponentWrap 
-{
+.MenuBarComponentWrap {
 	position: relative;
-	&.TopLeft 
-	{
-		.MenuBarWrapper 
-		{
-			left:0;
-			top:0;
+	&.TopLeft {
+		.MenuBarWrapper {
+			left: 0;
+			top: 0;
 		}
 	}
-	&.TopRight 
-	{
-		.MenuBarWrapper 
-		{
-			right:2px;
-			top:0;
+	&.TopRight {
+		.MenuBarWrapper {
+			right: 2px;
+			top: 0;
 		}
-		.MenuBarContainerWrapper 
-		{
+		.MenuBarContainerWrapper {
 			margin-right: $MBCWrapMarginLeft;
 			margin-left: 0;
 			padding-left: 0;
 			padding-right: 6px;
 		}
 	}
-	&.BottomLeft
-	{
-		.MenuBarWrapper 
-		{
-			left:0;
-			bottom:0;
+	&.BottomLeft {
+		.MenuBarWrapper {
+			left: 0;
+			bottom: 0;
 		}
 	}
-	&.BottomRight
-	{
-		.MenuBarWrapper 
-		{
-			right:0;
-			bottom:0;
+	&.BottomRight {
+		.MenuBarWrapper {
+			right: 0;
+			bottom: 0;
 		}
-		.MenuBarContainerWrapper 
-		{
+		.MenuBarContainerWrapper {
 			margin-right: $MBCWrapMarginLeft;
 			margin-left: 0;
 		}
 	}
-	.MenuBarWrapper 
-	{
+	.MenuBarWrapper {
 		width: $MBItemWidth;
 		position: absolute;
 		@include border-radius($MBBorderRadius);
 		z-index: 3;
-		li 
-		{
+		li {
 			position: relative;
-			.MenuBarItem
-			{
+			.MenuBarItem {
 				text-align: center;
 				display: block;
 				background: $MBItemBg;
-			  height: $MBItemHeight;
-			  width: $MBItemWidth;
+				height: $MBItemHeight;
+				width: $MBItemWidth;
 				border-top: 1px solid $MBBorderTopColor;
-				border-bottom: 1px solid  #b3b3b3;
+				border-bottom: 1px solid #b3b3b3;
 				position: relative;
-				i 
-				{
+				i {
 					color: $whiteColor;
 					font-size: 16px;
 					margin-top: 9px;
-					&.apSize 
-					{
+					&.apSize {
 						font-size: 11px;
-						font-family: $fontFamily;		
+						font-family: $fontFamily;
 						color: $whiteColor;
 						margin: 0;
 						height: 32px;
-						line-height: 17px;			
+						line-height: 17px;
 					}
 				}
 				.apcross {
-						height: 32px;
-						width: 40px;
-						top:0;
-						position: absolute;
-						background: url("../../images/icons/cross.png") no-repeat center center;	
-						background-size: 7px 7px;
-					}
-				&.active
-				{
-					background:$primaryColor;
-				}				
+					height: 32px;
+					width: 40px;
+					top: 0;
+					position: absolute;
+					background: url('../../images/icons/cross.png') no-repeat center center;
+					background-size: 7px 7px;
+				}
+				&.active {
+					background: $primaryColor;
+				}
 			}
-			&:first-child
-			{
-				.MenuBarItem
-				{
+			&:first-child {
+				.MenuBarItem {
 					border-top: 1px solid transparent;
 					@include border-radius-separate(3px, 0, 0, 0);
 				}
 			}
-			&:last-child
-			{
-				.MenuBarItem
-				{
+			&:last-child {
+				.MenuBarItem {
 					border-bottom: 1px solid transparent;
 					@include border-radius-separate(0, 0, 3px, 0);
 				}
 			}
 			&:only-child {
-				.MenuBarItem
-				{
+				.MenuBarItem {
 					border-bottom: 1px solid transparent;
 					@include border-radius-separate(3px, 0, 3px, 0);
 				}
 			}
-			.MenuBarItemRibbon
-			{
+			.MenuBarItemRibbon {
 				display: none;
 				@extend menubar;
 				position: absolute;
-				top:0;
+				top: 0;
 				left: $MBItemWidth;
 				min-height: $MBItemHeight;
 				padding: 5px 5px 5px 5px;
 				@include border-radius-separate(0, 3px, 0, 3px);
 			}
-			&:hover
-			{
-				.MenuBarItemRibbon
-				{
+			&:hover {
+				.MenuBarItemRibbon {
 					display: none;
 				}
 			}
-		}	
-		&.arrowLeft:after 
-		{
+		}
+		&.arrowLeft:after {
 			right: 100%;
-			top:10px;
-			content: " ";
+			top: 10px;
+			content: ' ';
 			height: 0;
 			width: 0;
 			position: absolute;
 			pointer-events: none;
 			border-top: $MBArrowSize solid transparent;
-			border-bottom: $MBArrowSize solid transparent; 	
-			border-right:$MBArrowSize solid $primaryColor;
+			border-bottom: $MBArrowSize solid transparent;
+			border-right: $MBArrowSize solid $primaryColor;
 		}
-		&.arrowRight:after 
-		{
+		&.arrowRight:after {
 			left: 100%;
 			top: 10px;
-			content: " ";
+			content: ' ';
 			height: 0;
 			width: 0;
 			position: absolute;
 			pointer-events: none;
 			border-top: $MBArrowSize solid transparent;
-			border-bottom: $MBArrowSize solid transparent; 	
-			border-left:$MBArrowSize solid $primaryColor;
+			border-bottom: $MBArrowSize solid transparent;
+			border-left: $MBArrowSize solid $primaryColor;
 		}
-		&.arrowTop:after 
-		{
+		&.arrowTop:after {
 			bottom: 100%;
-			left:50%;
-			content: " ";
+			left: 50%;
+			content: ' ';
 			height: 0;
 			width: 0;
 			position: absolute;
 			pointer-events: none;
 			border-left: $MBArrowSize solid transparent;
-			border-right: $MBArrowSize solid transparent; 	
-			border-bottom:$MBArrowSize solid $primaryColor;
+			border-right: $MBArrowSize solid transparent;
+			border-bottom: $MBArrowSize solid $primaryColor;
 			margin-left: -$MBArrowSize;
 		}
-		&.arrowBottom:after 
-		{
+		&.arrowBottom:after {
 			top: 100%;
 			left: 50%;
-			content: " ";
+			content: ' ';
 			height: 0;
 			width: 0;
 			position: absolute;
 			pointer-events: none;
 			border-left: $MBArrowSize solid transparent;
-			border-right: $MBArrowSize solid transparent; 	
-			border-top:$MBArrowSize solid $primaryColor;
+			border-right: $MBArrowSize solid transparent;
+			border-top: $MBArrowSize solid $primaryColor;
 			margin-left: -$MBArrowSize;
 		}
 	}
-	.MenuBarContainerWrapper 
-	{
+	.MenuBarContainerWrapper {
 		@extend menubar;
 		min-height: 205px;
 		margin-left: $MBCWrapMarginLeft;
-		padding-left:6px;
+		padding-left: 6px;
 		width: $MBCWrapWidth;
 		float: left;
 		position: relative;
 		@include border-radius($MBBorderRadius);
-		border:1px solid $MBCWrapborderColor;
-		h5.head 
-		{
+		border: 1px solid $MBCWrapborderColor;
+		h5.head {
 			font-size: $MBCHeadSize;
 			font-weight: bold;
 			@include border-radius-separate(0, $MBBorderRadius, 0, 0);
@@ -209,33 +178,40 @@
 			line-height: $MBCHeadHeight;
 			background: $MBCHeadBg;
 			border-bottom: 1px solid $MBCWrapborderColor;
-			a 
-			{
+			a {
 				color: $fontColor;
 			}
 			i {
 				height: $MBCHeadIconHeightWidth;
 				width: $MBCHeadIconHeightWidth;
 				background: $MBCHeadIconBg;
-				border:1px solid $MBCWrapborderColor;
-				@include border-radius(50%); 
+				border: 1px solid $MBCWrapborderColor;
+				@include border-radius(50%);
 				margin-top: 6px;
 				font-size: $MBCHeadIconSize;
 				text-align: center;
 				padding-top: 5px;
 			}
 		}
-		.MenuBarContainer
-		{
-			padding: 10px 10px 10px 5px;
+		.MenuBarContainer {
 			font-size: 13px;
+			min-height: 200px;
+			max-height: 500px;
+			overflow: auto;
+			overflow-x: hidden;
+			padding: 10px 10px 10px 5px;
+			visibility: hidden;
+
+			&:hover,
+			&:focus {
+				visibility: visible;
+			}
 		}
 	}
-	.ContentExtWrap
-	{
+	.ContentExtWrap {
 		@extend menubar;
 		@include border-radius($MBBorderRadius);
-		border:1px solid $MBCWrapborderColor;
+		border: 1px solid $MBCWrapborderColor;
 		float: left;
 		margin-left: -10px;
 		padding: 10px 10px 10px 20px;
