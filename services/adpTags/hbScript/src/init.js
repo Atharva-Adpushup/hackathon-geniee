@@ -38,6 +38,7 @@ function init(w, d) {
 		[].push.call(w.adpushup.adpTags.que, queFunc);
 		w.adpushup.adpTags.processQue();
 	};
+	w.adpTags = w.adpushup.adpTags;
 
 	w.pbjs = w.pbjs || {};
 	w.pbjs.que = w.pbjs.que || [];
