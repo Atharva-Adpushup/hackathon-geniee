@@ -76,7 +76,9 @@ class Component {
 				}
 			}
 
-			executeAfterJS(variation);
+			if (variation.customJs.afterAp) {
+				executeAfterJS(variation);
+			}
 		}
 		return this.sendFeedback(feedbackOptions);
 	}
