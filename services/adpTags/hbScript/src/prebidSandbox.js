@@ -7,7 +7,6 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 	__FRAME_PREFIX__ = '__adp_frame__',
 	logger = require('../helpers/logger'),
 	utils = require('../helpers/utils'),
-	// hbStatus = require('./hbStatus'),
 	createPrebidContainer = function(adpSlotsBatch) {
 		var adUnitCodeForPrebid = [],
 			adpBatchId = adpSlotsBatch[0].batchId;
@@ -70,7 +69,6 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 				logger.log('Running bid auction...');
 
 				var adUnits = utils.getBatchAdUnits(adpSlotsBatch).join(',');
-				// hbStatus.hbStart(adUnits);
 
 				document.body.appendChild(iframeEl);
 			}
@@ -87,11 +85,10 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 	},
 	// Callback function to set pbjs keys on parent - fired when prebid sandboxing completes
 	prebidFinishCallback = function(pbjsParams, adpBatchId, timeout) {
-		var adpSlots = utils.getCurrentAdpSlotBatch(adpTags.adpBatches, adpBatchId),
+		var adpSlots = utils.getCurrentAdpSlotBatch(window.adpushup.adpTags.adpBatches, adpBatchId),
 			adUnits = utils.getBatchAdUnits(adpSlots).join(',');
-		// hbStatus.hbEnd(adUnits);
 
-		adpTags.batchPrebiddingComplete = true;
+		window.adpushup.adpTags.batchPrebiddingComplete = true;
 		if (Object.keys(adpSlots).length) {
 			logger.log('Bidding complete');
 			pbjs.que.push(function() {
@@ -108,7 +105,7 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 		logger.log('Bid request timed out');
 		logger.log(timedOutBidders);
 
-		var adpSlots = utils.getCurrentAdpSlotBatch(adpTags.adpBatches, adpBatchId);
+		var adpSlots = utils.getCurrentAdpSlotBatch(window.adpushup.adpTags.adpBatches, adpBatchId);
 
 		adpSlots.forEach(function(adpSlot) {
 			if (adpSlot.bidders && adpSlot.bidders.length) {

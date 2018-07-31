@@ -4,7 +4,6 @@ var logger = require('../helpers/logger'),
 	utils = require('../helpers/utils'),
 	config = require('./config'),
 	feedback = require('./feedback'),
-	// hbStatus = require('./hbStatus'),
 	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(1));
 		if (val > 20) {
@@ -33,7 +32,7 @@ var logger = require('../helpers/logger'),
 				gptRefreshInterval = setInterval(function() {
 					refreshGPTSlot(slot.gSlot);
 				}, config.GPT_REFRESH_INTERVAL);
-				window.adpTags.gptRefreshIntervals.push({
+				window.adpushup.adpTags.gptRefreshIntervals.push({
 					gSlot: slot.gSlot,
 					id: gptRefreshInterval
 				});
@@ -81,6 +80,12 @@ var logger = require('../helpers/logger'),
 		}
 		return targeting;
 	},
+	getAdserverTargeting = function(slot) {
+		if (slot.optionalParam.headerBidding && slot.bidders.length) {
+			return pbjs.getAdserverTargeting()[slot.containerId];
+		}
+		return null;
+	},
 	setGPTargeting = function(slot) {
 		if (slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE) {
 			var genieeSlots = Object.keys(config.TARGETING);
@@ -125,7 +130,7 @@ var logger = require('../helpers/logger'),
 				hb_siteId: config.SITE_ID,
 				hb_ran: 0
 			},
-			adServerTargeting = pbjs.getAdserverTargeting()[slot.containerId];
+			adServerTargeting = getAdserverTargeting(slot);
 
 		if (utils.isSupportedBrowser() && slot.bidders.length) {
 			Object.assign(targeting, { hb_ran: 1 });
@@ -227,7 +232,6 @@ var logger = require('../helpers/logger'),
 			googletag.enableServices();
 
 			var adUnits = utils.getBatchAdUnits(adpSlotsWithDFPSlots).join(',');
-			// hbStatus.hbRender(adUnits);
 
 			//In last try rendering all slots.
 			adpSlotsWithDFPSlots.forEach(function(slot) {

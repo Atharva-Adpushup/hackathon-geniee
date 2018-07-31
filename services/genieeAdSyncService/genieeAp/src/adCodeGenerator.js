@@ -13,8 +13,8 @@ var utils = require('../libs/utils'),
 			adCode = [];
 			adCode.push('<div id="' + ad.networkData.dfpAdunit + '">');
 			adCode.push('<scr' + 'ipt type="text/javascript">');
-			adCode.push('window.adpTags.que.push(function(){');
-			adCode.push('window.adpTags.display("' + ad.networkData.dfpAdunit + '");');
+			adCode.push('window.adpushup.adpTags.que.push(function(){');
+			adCode.push('window.adpushup.adpTags.display("' + ad.networkData.dfpAdunit + '");');
 			adCode.push('});');
 			adCode.push('</scr' + 'ipt>');
 			adCode.push('</div>');
@@ -49,30 +49,35 @@ var utils = require('../libs/utils'),
 						isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
 						defaultAdSizeArray = [Number(ad.width), Number(ad.height)];
 
-					adpTags.defineSlot(ad.networkData.dfpAdunit, defaultAdSizeArray, ad.networkData.dfpAdunit, {
-						dfpAdunit: ad.networkData.dfpAdunit,
-						dfpAdunitCode: ad.networkData.dfpAdunitCode,
-						headerBidding: ad.networkData.headerBidding,
-						keyValues: ad.networkData.keyValues,
-						network: ad.network,
-						refreshSlot: ad.networkData.refreshSlot,
-						overrideActive: ad.networkData.overrideActive,
-						overrideSizeTo: ad.networkData.overrideSizeTo,
-						multipleAdSizes: isMultipleAdSizes
-							? ad.multipleAdSizes.concat([defaultAdSizeArray])
-							: defaultAdSizeArray
-					});
+					window.adpushup.adpTags.defineSlot(
+						ad.networkData.dfpAdunit,
+						defaultAdSizeArray,
+						ad.networkData.dfpAdunit,
+						{
+							dfpAdunit: ad.networkData.dfpAdunit,
+							dfpAdunitCode: ad.networkData.dfpAdunitCode,
+							headerBidding: ad.networkData.headerBidding,
+							keyValues: ad.networkData.keyValues,
+							network: ad.network,
+							refreshSlot: ad.networkData.refreshSlot,
+							overrideActive: ad.networkData.overrideActive,
+							overrideSizeTo: ad.networkData.overrideSizeTo,
+							multipleAdSizes: isMultipleAdSizes
+								? ad.multipleAdSizes.concat([defaultAdSizeArray])
+								: defaultAdSizeArray
+						}
+					);
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
 				if (adpKeyValues && Object.keys(adpKeyValues).length) {
-					var keyVals = adpTags.config.PAGE_KEY_VALUES;
-					adpTags.extendConfig({ PAGE_KEY_VALUES: Object.assign(keyVals, adpKeyValues) });
+					var keyVals = window.adpushup.adpTags.config.PAGE_KEY_VALUES;
+					window.adpushup.adpTags.extendConfig({ PAGE_KEY_VALUES: Object.assign(keyVals, adpKeyValues) });
 				}
 			};
 		};
-		window.adpTags = window.adpTags || {};
-		window.adpTags.que = window.adpTags.que || [];
-		window.adpTags.que.push(doIt(adpTagUnits));
+		window.adpushup.adpTags = window.adpushup.adpTags || {};
+		window.adpushup.adpTags.que = window.adpushup.adpTags.que || [];
+		window.adpushup.adpTags.que.push(doIt(adpTagUnits));
 		return true;
 	},
 	executeAmpHeadCode = function() {
@@ -121,8 +126,8 @@ var utils = require('../libs/utils'),
 			adCode = [];
 			adCode.push('<div id="' + ad.networkData.dfpAdunit + '">');
 			adCode.push('<scr' + 'ipt type="text/javascript">');
-			adCode.push('window.adpTags.que.push(function(){');
-			adCode.push('window.adpTags.display("' + ad.networkData.dfpAdunit + '");');
+			adCode.push('window.adpushup.adpTags.que.push(function(){');
+			adCode.push('window.adpushup.adpTags.display("' + ad.networkData.dfpAdunit + '");');
 			adCode.push('});');
 			adCode.push('</scr' + 'ipt>');
 			adCode.push('</div>');

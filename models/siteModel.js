@@ -92,18 +92,20 @@ var model = require('../helpers/model'),
 				function(resolve) {
 					// Reset site channels and page group pattern
 					var channels = _.filter(this.get('channels'), function(chnl) {
-						return chnl !== platform + ':' + pageGroup;
-					}),
+							return chnl !== platform + ':' + pageGroup;
+						}),
 						apConfigs = this.get('apConfigs'),
-						isPageGroupPattern = !!(apConfigs &&
+						isPageGroupPattern = !!(
+							apConfigs &&
 							apConfigs.pageGroupPattern &&
-							_.isArray(apConfigs.pageGroupPattern)),
+							_.isArray(apConfigs.pageGroupPattern)
+						),
 						pageGroupPatterns = isPageGroupPattern
 							? _.filter(apConfigs.pageGroupPattern, function(patternObj) {
 									var patternKey = Object.keys(patternObj)[0];
 
 									return patternKey !== pageGroup;
-								})
+							  })
 							: false,
 						computedApConfig;
 
@@ -205,7 +207,8 @@ var model = require('../helpers/model'),
 
 		this.syncAdsenseAds = Promise.method(
 			function(ads) {
-				var ad = null, self = this;
+				var ad = null,
+					self = this;
 				_.each(ads, function(adJson) {
 					if (!adJson.adslot) {
 						return true;
@@ -305,7 +308,9 @@ function apiModule() {
 			 */
 			function getDeleteChannelsPromises(site) {
 				return _(site.get('channels')).map(function(channel) {
-					var channelArr = channel.split(':'), platform = channelArr[0], pageGroup = channelArr[1];
+					var channelArr = channel.split(':'),
+						platform = channelArr[0],
+						pageGroup = channelArr[1];
 
 					return channelModel
 						.deleteChannel(siteId, platform, pageGroup)
@@ -409,6 +414,7 @@ function apiModule() {
 					throw new AdPushupError('Cannot get cms data');
 				});
 		},
+		getSiteChannels: siteId => API.getSiteById(siteId).then(site => site.get('channels')),
 		setSiteStep: function(siteId, step) {
 			return API.getSiteById(siteId)
 				.then(function(site) {
@@ -417,6 +423,42 @@ function apiModule() {
 				})
 				.catch(function(err) {
 					throw new AdPushupError('Cannot get setup step');
+				});
+		},
+		getIncontentAndHbAds: function(siteId) {
+			return API.getSiteChannels(siteId)
+				.then(channelsList => {
+					let sectionPromises = [];
+
+					channelsList.forEach(channel => {
+						const platform = channel.split(':')[0],
+							pageGroup = channel.split(':')[1];
+						sectionPromises.push(channelModel.getChannelSections(siteId, platform, pageGroup));
+					});
+
+					return Promise.all(sectionPromises);
+				})
+				.then(sections => {
+					let allSections = [],
+						incontentAds = [],
+						hbAds = [];
+
+					sections.forEach(sectionArr => {
+						allSections = allSections.concat(sectionArr);
+					});
+					incontentAds = _.filter(allSections, section => section.isIncontent);
+					hbAds = _.filter(allSections, section => {
+						let adId = Object.keys(section.ads)[0],
+							networkData = section.ads[adId].networkData;
+
+						return (
+							networkData.dfpAdunitCode &&
+							networkData.dfpAdunit &&
+							(networkData.headerBidding || networkData.dynamicAllocation)
+						);
+					});
+
+					return { incontentAds, hbAds };
 				});
 		},
 		getSitePageGroups: function(siteId) {
@@ -441,21 +483,25 @@ function apiModule() {
 			}
 
 			function getApexPageGroups(pageGroups) {
-				var computedPageGroups = _.uniq(
-					_.map(pageGroups, function(pageGroup) {
-						return getVariationFreeApexPageGroup(pageGroup);
-					})
-				).sort();
+				var computedPageGroups = _
+					.uniq(
+						_.map(pageGroups, function(pageGroup) {
+							return getVariationFreeApexPageGroup(pageGroup);
+						})
+					)
+					.sort();
 
 				return computedPageGroups;
 			}
 
 			return API.getSiteById(siteId).then(function(site) {
-				var pageGroups = _.uniq(
-					_.map(site.get('channels'), function(val) {
-						return val.split(':')[1];
-					})
-				).sort();
+				var pageGroups = _
+					.uniq(
+						_.map(site.get('channels'), function(val) {
+							return val.split(':')[1];
+						})
+					)
+					.sort();
 
 				if ('isApex' in site && site.isApex()) {
 					pageGroups = getApexPageGroups(pageGroups);

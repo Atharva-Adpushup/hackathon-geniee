@@ -66,7 +66,7 @@ module.exports = {
 		'var ADP_BATCH_ID = __ADP_BATCH_ID__;' +
 		"var prebidScript = document.createElement('script');" +
 		'prebidScript.async = true;' +
-		"prebidScript.text = 'var adpPrebid = ' + parent.adpPrebid.toString() + ';';" +
+		"prebidScript.text = 'var adpPrebid = ' + parent.adpushup.adpPrebid.toString() + ';';" +
 		'head.appendChild(prebidScript);' +
 		'adpPrebid();' +
 		'function serverRenderCode( timeout ){' +

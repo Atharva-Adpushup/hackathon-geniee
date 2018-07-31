@@ -361,9 +361,9 @@ const status = {
 			}
 		},
 		types: {
-			DESKTOP: ['stickyBottom', 'stickyLeft', 'stickyRight', 'videoCustom'],
+			DESKTOP: ['stickyBottom', 'stickyLeft', 'stickyRight'],
 			MOBILE: ['stickyBottom', 'videoCustom'],
-			TABLET: ['stickyBottom', 'stickyLeft', 'stickyRight', 'videoCustom']
+			TABLET: ['stickyBottom', 'stickyLeft', 'stickyRight']
 		}
 	},
 	personalizationTypes = ['not', 'in'],
