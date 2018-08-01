@@ -1,25 +1,29 @@
 import React, { PropTypes } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import {
 	deleteVariation,
 	copyVariation,
 	editVariationName,
-	editTrafficDistribution
+	editTrafficDistribution,
+	disableVariation
 } from 'actions/variationActions.js';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
+import CustomToggleSwitch from '../../../shared/customToggleSwitch.jsx';
 
 const variationOtions = props => {
 	const {
-		onDeleteVariation,
-		onCopyVariation,
-		onEditVariationName,
-		variation,
-		channelId,
-		onEditTrafficDistribution,
-		onUpdateContentSelector
-	} = props;
+			onDeleteVariation,
+			onCopyVariation,
+			onEditVariationName,
+			variation,
+			channelId,
+			onDisableVariation,
+			onEditTrafficDistribution,
+			onUpdateContentSelector
+		} = props,
+		variationId = variation.id;
 
 	function copyVariationConfirmation(fn, variationId, channelId) {
 		let confirm = window.confirm('Are you sure you want to copy this variation?');
@@ -37,7 +41,7 @@ const variationOtions = props => {
 					<InlineEdit
 						validate
 						value={variation.name}
-						submitHandler={onEditVariationName.bind(null, variation.id, channelId)}
+						submitHandler={onEditVariationName.bind(null, variationId, channelId)}
 						text="Variation Name"
 						errorMessage="Variation Name cannot be blank"
 					/>
@@ -59,9 +63,48 @@ const variationOtions = props => {
 					<InlineEdit
 						validate
 						value={variation.contentSelector}
-						submitHandler={onUpdateContentSelector.bind(null, variation.id, channelId)}
+						submitHandler={onUpdateContentSelector.bind(null, variationId, channelId)}
 						text="Content selector"
 						errorMessage="Content selector cannot be blank"
+					/>
+				</Col>
+			</Row>
+			<Row>
+				<Col className="u-padding-r10px" xs={2}>
+					Disable this variation
+					<OverlayTrigger
+						placement="top"
+						overlay={
+							<Tooltip id="disable-variation-info-tooltip">
+								Once variation is disabled, its configuration (section, ads, url pattern, traffic
+								distribution etc.) will not be pushed to production script. You can only create upto 10
+								disabled variations. Traffic distribution value will be set to 0.
+							</Tooltip>
+						}
+					>
+						<span className="variation-settings-icon">
+							<i className="fa fa-info" />
+						</span>
+					</OverlayTrigger>
+				</Col>
+				<Col className="u-padding-l10px" xs={4}>
+					<CustomToggleSwitch
+						labelText=""
+						className="mB-10"
+						checked={!!variation.disable}
+						disabled={false}
+						onChange={val => {
+							val ? onEditTrafficDistribution(variationId, 0) : '';
+							onDisableVariation(variationId, channelId, { isDisable: val });
+						}}
+						layout="nolabel"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout={true}
+						name={'disableVariation'}
+						id={'js-disable-variation-switch'}
+						customComponentClass={'u-padding-0px'}
 					/>
 				</Col>
 			</Row>
@@ -71,7 +114,7 @@ const variationOtions = props => {
 				<Col className="u-padding-r10px" xs={2}>
 					<Button
 						className="btn-lightBg btn-copy btn-block"
-						onClick={copyVariationConfirmation.bind(null, onCopyVariation, variation.id, channelId)}
+						onClick={copyVariationConfirmation.bind(null, onCopyVariation, variationId, channelId)}
 						type="submit"
 					>
 						Copy Variation
@@ -80,7 +123,7 @@ const variationOtions = props => {
 				<Col className="u-padding-l10px" xs={2}>
 					<Button
 						className="btn-lightBg btn-del-line btn-block"
-						onClick={onDeleteVariation.bind(null, variation.id, channelId)}
+						onClick={onDeleteVariation.bind(null, variationId, channelId)}
 						type="submit"
 					>
 						Delete Variation
@@ -109,7 +152,8 @@ export default connect(
 				onCopyVariation: copyVariation,
 				onDeleteVariation: deleteVariation,
 				onEditVariationName: editVariationName,
-				onEditTrafficDistribution: editTrafficDistribution
+				onEditTrafficDistribution: editTrafficDistribution,
+				onDisableVariation: disableVariation
 			},
 			dispatch
 		)

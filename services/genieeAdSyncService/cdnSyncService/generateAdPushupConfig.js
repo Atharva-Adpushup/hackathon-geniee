@@ -123,6 +123,13 @@ const _ = require('lodash'),
 		return ads;
 	},
 	getVariationPayload = (variation, platform, pageGroup, variationData, finalJson) => {
+		const isVariation = !!variation,
+			isDisable = !!(isVariation && variation.disable);
+
+		if (isDisable) {
+			return true;
+		}
+
 		var ads = getSectionsPayload(variation.sections, platform, pageGroup),
 			computedVariationObj,
 			contentSelector = variation.contentSelector,
