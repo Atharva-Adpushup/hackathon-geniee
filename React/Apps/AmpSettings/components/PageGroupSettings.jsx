@@ -296,15 +296,17 @@ class PageGroupSettings extends React.Component {
 
 	insertNewAd = () => {
 		let ads = this.state.ads;
-		ads.push({ width: 100, height: 100, operations: 'INSERTBEFORE' });
+		ads.push({ width: 100, height: 100, operation: 'INSERTBEFORE' });
 		this.setState({ ads });
 	};
 
 	setAds = (index, partialAd) => {
 		let ads = this.state.ads;
 		ads[index] = Object.assign(ads[index], partialAd);
-		let adCode = this.generateAdCode(ads[index]);
-		ads[index].adCode = adCode;
+		if (ads[index] && ads[index].type != 'custom') {
+			let adCode = this.generateAdCode(ads[index]);
+			ads[index].adCode = adCode;
+		}
 		this.setState({ ads });
 	};
 
