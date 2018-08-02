@@ -461,11 +461,11 @@ router
 		return res.json({ message });
 	})
 	.get('/generateApConfig', function(req, res) {
-		let siteId = '35498',
+		let siteId = 35498,
 			country = 'IN';
 
 		return siteModel.getSiteById(siteId).then(site => {
-			return syncCDNService(siteId, {
+			return syncCDNService(site, {
 				externalRequest: true,
 				country: country,
 				siteId: siteId
