@@ -165,6 +165,7 @@ class PageGroupSettings extends React.Component {
 				alert('Some Error Occurred!');
 			});
 	};
+
 	handleSocialAppChange = apps => {
 		let social = this.state.social;
 		social.apps = apps || [];
@@ -205,6 +206,7 @@ class PageGroupSettings extends React.Component {
 		const value = target.type === 'checkbox' ? target.checked : target.value;
 		this.setState({ [name]: value });
 	};
+
 	render = () => {
 		const { props } = this, channel = props.channel;
 		return (
