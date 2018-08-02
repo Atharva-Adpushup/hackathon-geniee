@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import _ from 'lodash';
 import Glass from 'shared/glass';
 import Variation from './variation.jsx';
 import VariationPanel from './panel/variationPanel';
@@ -10,6 +11,14 @@ const variationManager = props => {
 	if (!props.activeChannelId) {
 		return null;
 	}
+
+	const disabledVariations = _.compact(
+			_.map(props.variations, variationObj => {
+				return !!variationObj.disable;
+			})
+		),
+		disabledVariationsCount = disabledVariations.length;
+
 	return (
 		<div>
 			{props.ui.variationPanel.open && (
@@ -25,6 +34,7 @@ const variationManager = props => {
 						onUpdateContentSelector={props.updateContentSelector}
 						updateAdCode={props.updateAdCode}
 						updateNetwork={props.updateNetwork}
+						disabledVariationsCount={disabledVariationsCount}
 					/>
 				</div>
 			)}

@@ -119,6 +119,14 @@ module.exports = {
 			_.each(allChannels, function(channel) {
 				channelUnsyncedZones = [];
 				_.each(channel.variations, function(variation, id) {
+					// Skip variation config data if it is set disabled from Visual Editor
+					const isVariation = !!variation,
+						isDisable = !!(isVariation && variation.disable);
+
+					if (isDisable) {
+						return true;
+					}
+
 					let channelKey = `chnl::${site.get('siteId')}:${channel.platform}:${channel.pageGroup}`;
 					// channelUnsyncedZones = self.getVariationUnsyncedZones(id, varPiation.sections);
 					channelUnsyncedZones = _.concat(
