@@ -5,7 +5,7 @@ var path = require('path'),
 	moment = require('moment'),
 	PromiseFtp = require('promise-ftp'),
 	// universalReportService = require('../../../reports/universal/index'),
-	{ getReportData } = require('../../../reports/universal/index'),
+	{ getReportData, getMediationData } = require('../../../reports/universal/index'),
 	mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
 	fs = Promise.promisifyAll(require('fs')),
 	AdPushupError = require('../../../helpers/AdPushupError'),
@@ -14,12 +14,13 @@ var path = require('path'),
 	generateAdPushupConfig = require('./generateAdPushupConfig'),
 	config = require('../../../configs/config');
 
-module.exports = function(site) {
+module.exports = function(site, externalData = {}) {
 	ftp = new PromiseFtp();
 
 	var paramConfig = {
-		siteId: site.get('siteId')
-	},
+			siteId: site.get('siteId')
+		},
+		isExternalRequest = externalData && Object.keys(externalData).length && externalData.externalRequest,
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.min.js'),
 		adpTagsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adptags.min.js'),
@@ -47,7 +48,8 @@ module.exports = function(site) {
 			site.get('siteId').toString()
 		),
 		setAllConfigs = function(combinedConfig) {
-			var apConfigs = site.get('apConfigs'), isAdPartner = !!site.get('partner');
+			var apConfigs = site.get('apConfigs'),
+				isAdPartner = !!site.get('partner');
 			let { experiment, adpTagsConfig, manualAds } = combinedConfig;
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
@@ -75,15 +77,17 @@ module.exports = function(site) {
 			}));
 		},
 		getComputedConfig = () => {
-			return getReportData(site)
-				.then(reportData => {
-					if (reportData.status && reportData.data) {
-						return generateAdPushupConfig(site, reportData.data);
-					}
-					return generateAdPushupConfig(site);
-				})
-				.spread(generateCombinedJson)
-				.then(setAllConfigs);
+			return isExternalRequest
+				? getMediationData(externalData)
+				: getReportData(site)
+						.then(reportData => {
+							if (reportData.status && reportData.data) {
+								return generateAdPushupConfig(site, reportData.data);
+							}
+							return generateAdPushupConfig(site);
+						})
+						.spread(generateCombinedJson)
+						.then(setAllConfigs);
 		},
 		getFinalConfig = Promise.join(getComputedConfig(), getJsFile, getUncompressedJsFile, getAdpTagsJsFile, function(
 			finalConfig,
@@ -91,7 +95,8 @@ module.exports = function(site) {
 			uncompressedJsFile,
 			adpTagsFile
 		) {
-			let { apConfigs, adpTagsConfig } = finalConfig, gdpr = site.get('gdpr');
+			let { apConfigs, adpTagsConfig } = finalConfig,
+				gdpr = site.get('gdpr');
 			if (site.get('ampSettings')) apConfigs.ampSettings = site.get('ampSettings');
 			jsFile = _.replace(jsFile, '___abpConfig___', JSON.stringify(apConfigs));
 			jsFile = _.replace(jsFile, /_xxxxx_/g, site.get('siteId'));
@@ -150,13 +155,21 @@ module.exports = function(site) {
 					return ftp.put(fileConfig.default, 'adpushup.js');
 				})
 				.then(function() {
-					return fileConfig.uncompressed;
+					return Promise.resolve(fileConfig.uncompressed);
 				});
 		};
 
-	return getFinalConfig.then(uploadJS).then(writeTempFile).finally(function() {
-		if (ftp.getConnectionStatus() === 'connected') {
-			ftp.end();
-		}
-	});
+	return getFinalConfig
+		.then(fileConfig => {
+			if (isExternalRequest) {
+				return fileConfig.default;
+			}
+			return uploadJS(fileConfig);
+		})
+		.then(writeTempFile)
+		.finally(function() {
+			if (ftp.getConnectionStatus() === 'connected') {
+				ftp.end();
+			}
+		});
 };

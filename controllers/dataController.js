@@ -8,6 +8,7 @@ var express = require('express'),
 	sqlQueryModule = require('../reports/default/common/mssql/queryHelpers/fullSiteData'),
 	apexSingleChannelVariationModule = require('../reports/default/apex/modules/mssql/singleChannelVariationData'),
 	singleChannelVariationQueryHelper = require('../reports/default/common/mssql/queryHelpers/singleChannelVariationData'),
+	syncCDNService = require('../services/genieeAdSyncService/cdnSyncService/cdnSyncConsumer'),
 	liveSitesService = require('../misc/scripts/adhoc/liveSites/index'),
 	Promise = require('bluebird'),
 	extend = require('extend'),
@@ -458,6 +459,27 @@ router
 
 		liveSitesService.init();
 		return res.json({ message });
+	})
+	.get('/generateApConfig', function(req, res) {
+		let siteId = '35498',
+			country = 'IN';
+
+		return siteModel.getSiteById(siteId).then(site => {
+			return syncCDNService(siteId, {
+				externalRequest: true,
+				country: country,
+				siteId: siteId
+			}).then(apJs => res.send(apJs));
+		});
 	});
 
 module.exports = router;
+
+/**
+ * // url
+ * // country -- header
+ * // site -- queryString
+ * // GET request
+ * // return JS file minified
+ * // SQL Fetching change
+ */

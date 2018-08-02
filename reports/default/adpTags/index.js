@@ -209,6 +209,24 @@ function fetchLiveSites(params) {
 	});
 }
 
+function fetchMediationData(params) {
+	return executeQuery({
+		query: '',
+		inputParameters: [
+			{
+				name: '__siteid__',
+				type: 'INT',
+				value: params.siteId
+			},
+			{
+				name: '__country__',
+				type: 'NVARCHAR',
+				value: params.country
+			}
+		]
+	});
+}
+
 /*
 total_impressions ----> total_ad_requests
 total_requests ----> total_pageviews
@@ -216,15 +234,20 @@ device_type ---> device_type
 display_name ---> network
 */
 
+// let moment = require('moment');
+
 // let params = {
-// 	select: ['total_revenue', 'total_xpath_miss', 'total_impressions', 'report_date', 'siteid'],
+// 	select: ['total_revenue', 'total_requests', 'report_date', 'siteid'],
 // 	where: {
-// 		siteid: 35003,
-// 		pagegroup: ['HOME', 'BLOG'],
+// 		siteid: 35498,
+// 		pagegroup: ['HOME', 'PAGE', 'POST'],
 // 		mode: 1,
-// 		section: ['4cd85ecf-64ed-48c9-a921-8d4f26146401']
+// 		from: moment()
+// 			.subtract(3, 'days')
+// 			.format('YYYY-MM-DD'),
+// 		to: moment().format('YYYY-MM-DD')
 // 	},
-// 	groupBy: ['section']
+// 	groupBy: ['variation']
 // };
 
 // generate(params)
@@ -235,4 +258,4 @@ display_name ---> network
 // 		debugger;
 // 	});
 
-module.exports = { generate, getPVS, executeQuery, fetchLiveSites };
+module.exports = { generate, getPVS, executeQuery, fetchLiveSites, fetchMediationData };

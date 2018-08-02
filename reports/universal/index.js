@@ -80,4 +80,21 @@ function getReportData(site) {
 		});
 }
 
-module.exports = { getReportData };
+function getMediationData(data) {
+	let params = {
+		siteId: data.siteId,
+		country: data.country
+	};
+	return sqlReportingModule
+		.fetchMediationData(params)
+		.then(processData)
+		.catch(err => {
+			console.log(err);
+			return {
+				status: false,
+				data: {}
+			};
+		});
+}
+
+module.exports = { getReportData, getMediationData };
