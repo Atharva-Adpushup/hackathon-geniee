@@ -86,7 +86,8 @@ const getLastVariationNumber = function(variations) {
 				id: newVariationId,
 				name: newName,
 				createTs: Math.floor(Date.now() / 1000),
-				sections: sectionIds
+				sections: sectionIds,
+				disable: false
 			}
 		});
 	},
