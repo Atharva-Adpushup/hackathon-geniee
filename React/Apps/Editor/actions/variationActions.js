@@ -42,7 +42,8 @@ const getLastVariationNumber = function(variations) {
 				customJs: {
 					beforeAp: null,
 					afterAp: null
-				}
+				},
+				disable: false
 			}
 		});
 	},
@@ -85,7 +86,8 @@ const getLastVariationNumber = function(variations) {
 				id: newVariationId,
 				name: newName,
 				createTs: Math.floor(Date.now() / 1000),
-				sections: sectionIds
+				sections: sectionIds,
+				disable: false
 			}
 		});
 	},
@@ -106,6 +108,36 @@ const getLastVariationNumber = function(variations) {
 	},
 	setActiveVariation = variationId => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
 	updateVariation = (variationId, payload) => ({ type: variationActions.UPDATE_VARIATION, variationId, payload }),
+	disableVariation = (variationId, channelId, payload) => (dispatch, getState) => {
+		const allVariations = getChannelVariations(getState(), { channelId }),
+			disabledVariations = _.compact(
+				_.map(allVariations, variationObj => {
+					return !!variationObj.disable;
+				})
+			),
+			hasDisabledVariationsReachedLimit = !!(
+				disabledVariations &&
+				disabledVariations.length >= 10 &&
+				payload &&
+				payload.isDisable
+			);
+
+		if (hasDisabledVariationsReachedLimit) {
+			dispatch({
+				type: uiActions.SHOW_NOTIFICATION,
+				mode: 'error',
+				title: 'Disabled Variations Limit',
+				message: 'Cannot create more than 10 disabled variations!'
+			});
+			return;
+		}
+
+		dispatch({
+			type: variationActions.DISABLE_VARIATION,
+			variationId,
+			payload
+		});
+	},
 	editVariationName = (variationId, channelId, name) => (dispatch, getState) => {
 		const variations = getChannelVariations(getState(), { channelId }),
 			arr = _.map(variations, data => {
@@ -161,6 +193,7 @@ export {
 	copyVariation,
 	deleteVariation,
 	updateVariation,
+	disableVariation,
 	setActiveVariation,
 	editVariationName,
 	editTrafficDistribution,

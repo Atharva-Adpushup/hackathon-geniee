@@ -1,20 +1,37 @@
 import React, { PropTypes } from 'react';
+import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 
-const Variation = ({ variation, toggleVariationPanel, onClick, active }) => (
-	<div
-		onClick={active ? toggleVariationPanel : onClick.bind(null, variation.id)}
-		className={active ? 'variation-block active-variation' : 'variation-block'}
-	>
-		{variation.name}{' '}
-		{active ? (
-			<span className="variation-settings-icon">
-				<i className="fa fa-caret-up" />
-			</span>
-		) : (
-			''
-		)}
-	</div>
-);
+const Variation = ({ variation, toggleVariationPanel, onClick, active }) => {
+	const isDisabled = !!variation.disable;
+	let rootClassName = 'variation-block',
+		activeClassName = active ? ' active-variation' : '',
+		disabledClassName = isDisabled ? ' disabled-variation' : '';
+
+	rootClassName += `${activeClassName}${disabledClassName}`;
+
+	return (
+		<div onClick={active ? toggleVariationPanel : onClick.bind(null, variation.id)} className={rootClassName}>
+			{variation.name}
+			{variation.disable ? (
+				<OverlayTrigger
+					placement="top"
+					overlay={<Tooltip id="disable-variation-tooltip">This variation is disabled</Tooltip>}
+				>
+					<span className="variation-settings-icon">
+						<i className="fa fa-ban" />
+					</span>
+				</OverlayTrigger>
+			) : null}
+			{active ? (
+				<span className="variation-settings-icon">
+					<i className="fa fa-caret-up" />
+				</span>
+			) : (
+				''
+			)}
+		</div>
+	);
+};
 
 Variation.propTypes = {
 	variation: PropTypes.object.isRequired,
