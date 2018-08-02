@@ -19,11 +19,18 @@ const variationOtions = props => {
 			onEditVariationName,
 			variation,
 			channelId,
+			disabledVariationsCount,
 			onDisableVariation,
 			onEditTrafficDistribution,
 			onUpdateContentSelector
 		} = props,
-		variationId = variation.id;
+		variationId = variation.id,
+		hasDisabledVariationsReachedLimit = !!(
+			disabledVariationsCount &&
+			disabledVariationsCount >= 10 &&
+			!variation.disable
+		),
+		computedToggleSwitchValue = hasDisabledVariationsReachedLimit ? false : !!variation.disable;
 
 	function copyVariationConfirmation(fn, variationId, channelId) {
 		let confirm = window.confirm('Are you sure you want to copy this variation?');
@@ -91,8 +98,8 @@ const variationOtions = props => {
 					<CustomToggleSwitch
 						labelText=""
 						className="mB-10"
-						checked={!!variation.disable}
-						disabled={false}
+						checked={computedToggleSwitchValue}
+						disabled={hasDisabledVariationsReachedLimit}
 						onChange={val => {
 							val ? onEditTrafficDistribution(variationId, 0) : '';
 							onDisableVariation(variationId, channelId, { isDisable: val });
@@ -106,6 +113,12 @@ const variationOtions = props => {
 						id={'js-disable-variation-switch'}
 						customComponentClass={'u-padding-0px'}
 					/>
+					{hasDisabledVariationsReachedLimit ? (
+						<div className="error-message mT-10">
+							Toggle Switch is disabled as 10 disabled variations already exist. Please enable one of them
+							to disable this variation.
+						</div>
+					) : null}
 				</Col>
 			</Row>
 			<br />
@@ -137,11 +150,13 @@ const variationOtions = props => {
 variationOtions.propTypes = {
 	variation: PropTypes.object.isRequired,
 	channelId: PropTypes.string.isRequired,
+	disabledVariationsCount: PropTypes.num,
 	onCopyVariation: PropTypes.func.isRequired,
 	onDeleteVariation: PropTypes.func.isRequired,
 	onEditVariationName: PropTypes.func.isRequired,
 	onEditTrafficDistribution: PropTypes.func.isRequired,
-	onUpdateContentSelector: PropTypes.func.isRequired
+	onUpdateContentSelector: PropTypes.func.isRequired,
+	onDisableVariation: PropTypes.func
 };
 
 export default connect(
