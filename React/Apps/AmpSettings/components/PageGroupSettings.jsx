@@ -113,13 +113,14 @@ class PageGroupSettings extends React.Component {
 			</Row>
 		);
 	};
-	generateAdCode = index => {
-		let ad = this.state.ads[index], adNetwork = ad.type, adCode = commonConsts.ads.sampleAds[adNetwork];
-
-		adCode = adCode.replace('dWidth', ad.width);
-		adCode = adCode.replace('dHeight', ad.height);
-		for (let field in ad.data) {
-			adCode = adCode.replace(field, ad.data[field]);
+	generateAdCode = ad => {
+		let adNetwork = ad.type, adCode = commonConsts.ads.sampleAds[adNetwork] || '';
+		if (adCode) {
+			adCode = adCode.replace('dWidth', ad.width);
+			adCode = adCode.replace('dHeight', ad.height);
+			for (let field in ad.data) {
+				adCode = adCode.replace(field, ad.data[field]);
+			}
 		}
 		return adCode;
 	};
@@ -148,7 +149,8 @@ class PageGroupSettings extends React.Component {
 	};
 	saveChannelSettings = event => {
 		event.preventDefault();
-		let ampData = this.parseFormData(Object.assign({}, this.state)), pageGroup = this.props.channel.pageGroup;
+		let ampData = this.parseFormData(JSON.parse(JSON.stringify(this.state))),
+			pageGroup = this.props.channel.pageGroup;
 		let { siteId } = this.state, selectors = ampData.selectors;
 		if (!selectors.articleContent || !ampData.siteName || !ampData.template) {
 			alert('Artical Content, SiteName and Template are required');
@@ -271,148 +273,175 @@ class PageGroupSettings extends React.Component {
 							className="form-control"
 							value={selectedAd.data[field] || ''}
 							onChange={e => {
-								let ads = this.state.ads, ad = ads[index], data = ad.data;
-								data[field] = e.target.value;
-								this.setState({ ads });
+								let data = { ...selectedAd.data, [field]: e.target.value };
+								//data[field] = e.target.value;
+								let adCode = this.generateAdCode({ ...selectedAd, data });
+								this.setAds(index, {
+									data,
+									adCode
+								});
+								//this.setState({ ads });
 							}}
 						/>
 					</RowColSpan>
 				))
-			: '';
+			: null;
+	};
+
+	deleteAd = adIndex => {
+		let ads = this.state.ads;
+		ads.splice(adIndex, 1);
+		this.setState({ ads });
+	};
+
+	insertNewAd = () => {
+		let ads = this.state.ads;
+		ads.push({ width: 100, height: 100, operations: 'INSERTBEFORE' });
+		this.setState({ ads });
+	};
+
+	setAds = (index, partialAd) => {
+		let ads = this.state.ads;
+		ads[index] = Object.assign(ads[index], partialAd);
+		let adCode = this.generateAdCode(ads[index]);
+		ads[index].adCode = adCode;
+		this.setState({ ads });
 	};
 
 	renderAds = () => {
-		const listAds = this.state.ads.map((linkView, index) => {
-			return (
-				<div
-					key={index}
-					style={{
-						background: 'aliceblue',
-						padding: 5,
-						margin: 5
-					}}
-				>
-					<div
-						style={{
-							textAlign: 'right',
-							cursor: 'pointer',
-							paddingRight: 0,
-							margin: '-10px 10px 5px'
-						}}
-						className="fa fa-times-circle fa-2x col-sm-12"
-						onClick={() => {
-							let ads = this.state.ads;
-							ads.splice(index, 1);
-							this.setState({ ads });
-						}}
-					/>
-					<RowColSpan label="Selector">
-						<input
-							onChange={e => {
-								let ads = this.state.ads, ad = ads[index];
-								ad.selector = e.target.value;
-								this.setState({ ads });
-							}}
-							type="text"
-							placeholder="Selector"
-							name="selector"
-							className="form-control"
-							value={linkView.selector || ''}
-						/>
-					</RowColSpan>
-					<RowColSpan label="Width">
-						<input
-							onChange={e => {
-								let ads = this.state.ads, ad = ads[index];
-								ad.width = e.target.value;
-								this.setState({ ads });
-							}}
-							type="number"
-							placeholder="Width"
-							name="width"
-							className="form-control"
-							value={linkView.width || 100}
-						/>
-					</RowColSpan>
-					<RowColSpan label="Height">
-						<input
-							onChange={e => {
-								let ads = this.state.ads, ad = ads[index];
-								ad.height = e.target.value;
-								this.setState({ ads });
-							}}
-							type="number"
-							placeholder="Height"
-							name="height"
-							className="form-control"
-							value={linkView.height || 100}
-						/>
-					</RowColSpan>
-					<RowColSpan label="Operation">
-						<select
-							className="form-control"
-							name="operation"
-							value={linkView.operation || 'INSERTAFTER'}
-							onChange={e => {
-								let ads = this.state.ads, ad = ads[index];
-								ad.operation = e.target.value;
-								this.setState({ ads });
-							}}
-						>
-							<option value="">Select Operation</option>
-							{commonConsts.ads.operations.map((operation, index) => (
-								<option value={operation} key={index}>
-									{operation}
-								</option>
-							))}
-						</select>
+		const deleteAdBtnStyle = {
+			position: 'absolute',
+			right: '-8px',
+			top: '-8px',
+			cursor: 'pointer'
+		},
+			adContainerStyle = {
+				background: '#f9f9f9',
+				padding: '20px 10px 10px',
+				margin: 10,
+				borderRadius: 4,
+				border: '1px solid #e9e9e9',
+				position: 'relative'
+			};
+		return (
+			<div>
+				<Heading title="Ad Settings" />
+				{this.state.ads.map((ad, index) => {
+					return (
+						<div key={index} style={adContainerStyle}>
+							<div
+								style={deleteAdBtnStyle}
+								className="fa fa-times-circle fa-2x"
+								onClick={() => this.deleteAd(index)}
+								title="Delete This Ad"
+							/>
+							<RowColSpan label="Selector">
+								<input
+									onChange={e => {
+										this.setAds(index, { selector: e.target.value });
+									}}
+									type="text"
+									placeholder="Selector"
+									name="selector"
+									className="form-control"
+									value={ad.selector || ''}
+								/>
+							</RowColSpan>
+							<RowColSpan label="Width">
+								<input
+									onChange={e => {
+										this.setAds(index, { width: e.target.value });
+									}}
+									type="number"
+									placeholder="Width"
+									name="width"
+									className="form-control"
+									value={ad.width}
+								/>
+							</RowColSpan>
+							<RowColSpan label="Height">
+								<input
+									onChange={e => {
+										this.setAds(index, { height: e.target.value });
+									}}
+									type="number"
+									placeholder="Height"
+									name="height"
+									className="form-control"
+									value={ad.height}
+								/>
+							</RowColSpan>
+							<RowColSpan label="Operation">
+								<select
+									className="form-control"
+									name="operation"
+									value={ad.operation || 'INSERTAFTER'}
+									onChange={e => {
+										this.setAds(index, { operation: e.target.value });
+									}}
+								>
+									<option value="">Select Operation</option>
+									{commonConsts.ads.operations.map((operation, index) => (
+										<option value={operation} key={index}>
+											{operation}
+										</option>
+									))}
+								</select>
+							</RowColSpan>
+							<RowColSpan label="Type">
+								<select
+									className="form-control"
+									name="type"
+									value={ad.type || ''}
+									onChange={e => {
+										let partialAd = {}, type = e.target.value, adFields = commonConsts.ads.type;
 
-					</RowColSpan>
-					<RowColSpan label="AdCode">
-						<textarea
-							style={{ resize: 'both', overflow: 'auto' }}
-							onChange={e => {
-								let ads = this.state.ads, ad = ads[index];
-								ad.adCode = e.target.value;
-								this.setState({ ads });
-							}}
-							placeholder="AdCode"
-							name="adCode"
-							className="form-control"
-							value={
-								this.state.ads[index].type && this.state.ads[index].type != 'custom'
-									? this.generateAdCode(index)
-									: linkView.adCode
-							}
-							disabled={this.state.ads[index].type != 'custom'}
-						/>
-					</RowColSpan>
-					<RowColSpan label="Type">
-						<select
-							className="form-control"
-							name="type"
-							value={linkView.type || ''}
-							onChange={e => {
-								let ads = this.state.ads, ad = ads[index], adFields = commonConsts.ads.type;
-								ad.type = e.target.value;
-								if (adFields[ad.type]) ad.data = {};
-								this.setState({ ads });
-							}}
-						>
-							<option value="">Select Type</option>
-							{Object.keys(commonConsts.ads.type).map((type, index) => (
-								<option value={type} key={index}>
-									{type}
-								</option>
-							))}
-							<option value="custom">Custom</option>
-						</select>
-					</RowColSpan>
-					{this.renderNetworkInputs(index)}
-				</div>
-			);
-		});
-		return listAds;
+										partialAd.type = type;
+										if (ad.type === 'custom') {
+											partialAd.adCode = '';
+										}
+										if (adFields[type]) {
+											partialAd.data = {};
+										}
+										this.setAds(index, partialAd);
+									}}
+								>
+									<option value="">Select Type</option>
+									{Object.keys(commonConsts.ads.type).map((type, index) => (
+										<option value={type} key={index}>
+											{type}
+										</option>
+									))}
+									<option value="custom">Custom</option>
+								</select>
+							</RowColSpan>
+							{this.renderNetworkInputs(index)}
+							{ad.type &&
+								<RowColSpan label="AdCode">
+									<textarea
+										style={{ resize: 'both', overflow: 'auto' }}
+										onChange={e => {
+											this.setAds(index, { adCode: e.target.value });
+										}}
+										placeholder="AdCode"
+										name="adCode"
+										className="form-control"
+										value={ad.adCode}
+										disabled={ad.type != 'custom'}
+									/>
+								</RowColSpan>}
+						</div>
+					);
+				})}
+				<Row>
+					<Col sm={12}>
+						<button className="btn-primary" type="button" onClick={this.insertNewAd}>
+							+ Add New Ad
+						</button>
+					</Col>
+				</Row>
+			</div>
+		);
 	};
 
 	render = () => {
@@ -617,19 +646,6 @@ class PageGroupSettings extends React.Component {
 						value: this.state.template || '',
 						type: 'text'
 					})}
-					<RowColSpan label="Ads">
-						<button
-							className="btn-primary"
-							type="button"
-							onClick={() => {
-								let ads = this.state.ads;
-								ads.push({ width: 100, height: 100, operations: 'INSERTBEFORE' });
-								this.setState({ ads });
-							}}
-						>
-							+ Add
-						</button>
-					</RowColSpan>
 					{this.renderAds()}
 					<button className="btn-success">Save</button>
 				</form>
