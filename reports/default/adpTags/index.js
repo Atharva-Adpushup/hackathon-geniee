@@ -1,7 +1,13 @@
 const Promise = require('bluebird'),
 	_ = require('lodash'),
 	dbHelper = require('../common/mssql/dbhelper'),
-	{ fetchSectionQuery, fetchVariationQuery, fetchPagegroupQuery, liveSitesQuery } = require('./constants'),
+	{
+		fetchSectionQuery,
+		fetchVariationQuery,
+		fetchPagegroupQuery,
+		liveSitesQuery,
+		fetchMediationQuery
+	} = require('./constants'),
 	queryHelper = require('./queryHelper');
 
 function checkWhere(where) {
@@ -210,8 +216,18 @@ function fetchLiveSites(params) {
 }
 
 function fetchMediationData(params) {
+	let pagegroupString = '',
+		pagegroupsParams = _.map(params.pagegroups, (value, index) => {
+			pagegroupString += `@__name_${index}__,`;
+			return {
+				name: `__name_${index}__`,
+				type: 'NVARCHAR',
+				value: value
+			};
+		});
+	pagegroupString = pagegroupString.slice(0, -1);
 	return executeQuery({
-		query: '',
+		query: fetchMediationQuery.replace('__pagegroup__', pagegroupString),
 		inputParameters: [
 			{
 				name: '__siteid__',
@@ -219,10 +235,21 @@ function fetchMediationData(params) {
 				value: params.siteId
 			},
 			{
-				name: '__country__',
+				name: '__country_code_alpha2',
 				type: 'NVARCHAR',
 				value: params.country
-			}
+			},
+			{
+				name: '__from__',
+				type: 'DATE',
+				value: params.from
+			},
+			{
+				name: '__to__',
+				type: 'DATE',
+				value: params.to
+			},
+			...pagegroupsParams
 		]
 	});
 }

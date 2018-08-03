@@ -77,17 +77,18 @@ module.exports = function(site, externalData = {}) {
 			}));
 		},
 		getComputedConfig = () => {
-			return isExternalRequest
-				? getMediationData(externalData)
-				: getReportData(site)
-						.then(reportData => {
-							if (reportData.status && reportData.data) {
-								return generateAdPushupConfig(site, reportData.data);
-							}
-							return generateAdPushupConfig(site);
-						})
-						.spread(generateCombinedJson)
-						.then(setAllConfigs);
+			function getData() {
+				return isExternalRequest ? getMediationData(site, externalData) : getReportData(site);
+			}
+			return getData()
+				.then(reportData => {
+					if (reportData.status && reportData.data) {
+						return generateAdPushupConfig(site, reportData.data);
+					}
+					return generateAdPushupConfig(site);
+				})
+				.spread(generateCombinedJson)
+				.then(setAllConfigs);
 		},
 		getFinalConfig = Promise.join(getComputedConfig(), getJsFile, getUncompressedJsFile, getAdpTagsJsFile, function(
 			finalConfig,
@@ -127,9 +128,13 @@ module.exports = function(site, externalData = {}) {
 			return { default: jsFile, uncompressed: uncompressedJsFile };
 		}),
 		writeTempFile = function(jsFile) {
-			return mkdirpAsync(tempDestPath).then(function() {
-				return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);
-			});
+			return mkdirpAsync(tempDestPath)
+				.then(function() {
+					return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);
+				})
+				.then(function() {
+					return jsFile;
+				});
 		},
 		cwd = function() {
 			return ftp.cwd('/' + site.get('siteId')).catch(function() {
@@ -160,16 +165,15 @@ module.exports = function(site, externalData = {}) {
 		};
 
 	return getFinalConfig
-		.then(fileConfig => {
-			if (isExternalRequest) {
-				return fileConfig.default;
-			}
-			return uploadJS(fileConfig);
+		.then(function(fileConfig) {
+			return isExternalRequest ? fileConfig.default : uploadJS(fileConfig);
 		})
 		.then(writeTempFile)
-		.finally(function() {
+		.finally(function(jsFile) {
 			if (ftp.getConnectionStatus() === 'connected') {
 				ftp.end();
+			} else {
+				return jsFile;
 			}
 		});
 };

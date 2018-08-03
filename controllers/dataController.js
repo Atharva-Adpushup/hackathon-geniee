@@ -461,16 +461,22 @@ router
 		return res.json({ message });
 	})
 	.get('/generateApConfig', function(req, res) {
-		let siteId = 35498,
-			country = 'IN';
+		let siteId = 35235,
+			country = 'US';
 
-		return siteModel.getSiteById(siteId).then(site => {
-			return syncCDNService(site, {
-				externalRequest: true,
-				country: country,
-				siteId: siteId
-			}).then(apJs => res.send(apJs));
-		});
+		return siteModel
+			.getSiteById(siteId)
+			.then(site => {
+				return syncCDNService(site, {
+					externalRequest: true,
+					country: country,
+					siteId: siteId
+				});
+			})
+			.then(apJs => res.send(apJs))
+			.catch(err => {
+				debugger;
+			});
 	});
 
 module.exports = router;

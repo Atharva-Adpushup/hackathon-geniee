@@ -80,13 +80,22 @@ function getReportData(site) {
 		});
 }
 
-function getMediationData(data) {
+function getMediationData(site, data) {
 	let params = {
 		siteId: data.siteId,
-		country: data.country
+		country: data.country,
+		from: moment()
+			.subtract(3, 'days')
+			.format('YYYY-MM-DD'),
+		to: moment().format('YYYY-MM-DD')
 	};
-	return sqlReportingModule
-		.fetchMediationData(params)
+	return getPagegroupNames(site.get('cmsInfo'))
+		.then(pagegroups =>
+			sqlReportingModule.fetchMediationData({
+				...params,
+				pagegroups
+			})
+		)
 		.then(processData)
 		.catch(err => {
 			console.log(err);
