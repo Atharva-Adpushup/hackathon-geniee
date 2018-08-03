@@ -17,6 +17,8 @@ function init(w, d) {
 	});
 
 	var adpQue;
+	window.adpTags = window.adpTags || {};
+	window.adpTags.que = window.adpTags.que || [];
 	if (w.adpushup.adpTags) {
 		adpQue = w.adpushup.adpTags.que;
 	} else {
@@ -31,14 +33,14 @@ function init(w, d) {
 	w.adpushup.adpTags = existingAdpTags.adpSlots ? existingAdpTags : adpTagsModule;
 
 	// Merge adpQue with any existing que items if present
-	w.adpushup.adpTags.que = w.adpushup.adpTags.que.concat(adpQue);
+	w.adpushup.adpTags.que = w.adpushup.adpTags.que.concat(adpQue).concat(w.adpTags.que);
+	w.adpTags = w.adpushup.adpTags;
 
 	w.adpushup.adpTags.processQue();
 	w.adpushup.adpTags.que.push = function(queFunc) {
 		[].push.call(w.adpushup.adpTags.que, queFunc);
 		w.adpushup.adpTags.processQue();
 	};
-	w.adpTags = w.adpushup.adpTags;
 
 	w.pbjs = w.pbjs || {};
 	w.pbjs.que = w.pbjs.que || [];
