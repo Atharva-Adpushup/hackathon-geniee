@@ -139,9 +139,15 @@ class SendAmpData extends React.Component {
 					</select>
 				</RowColSpan>
 				{this.renderOtherFields()}
-				<Button className="btn-success" type="submit">
-					Send
-				</Button>
+				<hr />
+				<div className="row settings-btn-pane">
+					<div className="col-sm-4">
+						<button className="btn-success" type="submit">Send</button>
+					</div>
+					<div className="col-sm-2">
+						<button type="button" className="btn-default">Cancel</button>
+					</div>
+				</div>
 			</form>
 		);
 	};
