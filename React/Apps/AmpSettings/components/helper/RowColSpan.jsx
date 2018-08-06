@@ -12,9 +12,9 @@ class RowColSpan extends React.Component {
 		return (
 			<Row>
 				<Col sm={5}>
-					<div>{this.props.label}</div>
+					<div>{props.label}</div>
 				</Col>
-				<Col sm={7}>{this.props.children}</Col>
+				<Col sm={7}>{props.children}</Col>
 			</Row>
 		);
 	}
