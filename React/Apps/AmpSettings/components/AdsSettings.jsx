@@ -51,7 +51,7 @@ class AdsSettings extends React.Component {
 				adCode = adCode.replace(field, ad.data[field]);
 			}
 			return adCode;
-		} else return '';
+		} else return ad.adCode;
 	};
 	deleteAd = adIndex => {
 		let ads = this.state.ads;
