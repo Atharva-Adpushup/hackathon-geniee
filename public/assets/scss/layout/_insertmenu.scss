@@ -1,60 +1,50 @@
-.MenuBarContainer 
-{
-  .MenuBarInner
-  {
-    max-height: 500px;
+.MenuBarContainer {
+	.MenuBarInner {
+		visibility: visible;
 
-    .butttonsRow {
-      left: 3px;
-      width: 109.8%;
-      bottom: -20px;
+		.butttonsRow {
+			left: 3px;
+			width: 109.8%;
+			bottom: -20px;
+		}
+
+		.customButtonsRow {
+			width: 90%;
+			margin-left: 0;
+		}
+
+		.SelectParent {
+			padding: 0 5px;
+
+			.row {
+				border-bottom: 1px solid $IMBorderColor;
+				padding: 4px 0;
+				line-height: 20px;
+
+				&:last-child {
+					border-bottom: 0;
+				}
+
+				&:hover {
+					background: $RowHoverBg;
+				}
+			}
+
+			&.channelLst {
+				.mobile,
+				.tablet {
+					i {
+						font-size: 16px;
+					}
+				}
+			}
+		}
 	}
-	
-	.customButtonsRow {
-		width: 90%;
-		margin-left: 0;
-	}
-
-    .SelectParent
-    {
-      padding: 0 5px;
-
-      .row
-      {
-        border-bottom: 1px solid $IMBorderColor;
-        padding: 4px 0;
-        line-height: 20px;
-
-        &:last-child 
-        {
-          border-bottom:0;
-        }
-
-        &:hover
-        {
-          background: $RowHoverBg;
-        }
-      }
-
-      &.channelLst
-      {
-
-        .mobile, .tablet 
-        {
-
-          i 
-          {
-            font-size: 16px;
-          }
-        }
-      }
-    }
-  }
 }
 
 #channelMenu {
-  .MenuBarInner {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
+	.MenuBarInner {
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
 }
