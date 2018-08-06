@@ -42,14 +42,16 @@ class AdsSettings extends React.Component {
 			: null;
 	};
 	generateAdCode = ad => {
-		let adNetwork = ad.type, adCode = commonConsts.ads.sampleAds[adNetwork];
+		if (ad.type && ad.type != 'custom') {
+			let adNetwork = ad.type, adCode = commonConsts.ads.sampleAds[adNetwork];
 
-		adCode = adCode.replace('dWidth', ad.width);
-		adCode = adCode.replace('dHeight', ad.height);
-		for (let field in ad.data) {
-			adCode = adCode.replace(field, ad.data[field]);
-		}
-		return adCode;
+			adCode = adCode.replace('dWidth', ad.width);
+			adCode = adCode.replace('dHeight', ad.height);
+			for (let field in ad.data) {
+				adCode = adCode.replace(field, ad.data[field]);
+			}
+			return adCode;
+		} else return '';
 	};
 	deleteAd = adIndex => {
 		let ads = this.state.ads;
@@ -178,7 +180,7 @@ class AdsSettings extends React.Component {
 													{type}
 												</option>
 											))}
-											<option value="custom">Custom</option>
+											<option value="custom">custom</option>
 										</select>
 									</RowColSpan>
 									{this.renderNetworkInputs(index)}
