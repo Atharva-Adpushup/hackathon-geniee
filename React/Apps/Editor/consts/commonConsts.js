@@ -364,7 +364,7 @@ const status = {
 		},
 		types: {
 			DESKTOP: ['stickyTop', 'stickyBottom', 'stickyLeft', 'stickyRight'],
-			MOBILE: ['stickyTop', 'stickyBottom', 'videoCustom'],
+			MOBILE: ['stickyTop', 'stickyBottom'],
 			TABLET: ['stickyTop', 'stickyBottom', 'stickyLeft', 'stickyRight']
 		}
 	},
