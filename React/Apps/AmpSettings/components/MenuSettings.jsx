@@ -98,9 +98,11 @@ class MenuSettings extends React.Component {
 						<option value="right">Right</option>
 					</select>
 				</RowColSpan>
-				<RowColSpan label="Links">
+				<RowColSpan label="Links" />
+				{this.renderLinks()}
+				<RowColSpan label="">
 					<button
-						className="btn-primary"
+						className="btn-primary addButton"
 						type="button"
 						onClick={() => {
 							let menu = this.state.menu, links = menu.links;
@@ -111,7 +113,6 @@ class MenuSettings extends React.Component {
 						+ Add
 					</button>
 				</RowColSpan>
-				{this.renderLinks()}
 			</div>
 		);
 	};

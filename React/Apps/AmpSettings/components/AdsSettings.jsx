@@ -4,6 +4,7 @@ import Heading from './helper/Heading.jsx';
 import RowColSpan from './helper/RowColSpan.jsx';
 import commonConsts from '../lib/commonConsts';
 import CustomToggleSwitch from './helper/CustomToggleSwitch.jsx';
+import CollapsePanel from '../../../Components/CollapsePanel.jsx';
 import '../style.scss';
 class AdsSettings extends React.Component {
 	constructor(props) {
@@ -73,135 +74,128 @@ class AdsSettings extends React.Component {
 
 	render = () => {
 		return (
-			<div>
-				<Row>
-					<Col sm={10}>
-						<h4>Ad Settings</h4>
-					</Col>
-					<Col sm={2}>
-						<button className="fa fa-plus" type="button" onClick={this.insertNewAd} />
-					</Col>
-				</Row>
-				{this.state.ads.length > 0
-					? this.state.ads.map((ad, index) => {
-							return (
-								<div key={index} className="adContainerStyle">
-									<div
-										className="fa fa-times-circle fa-2x deleteAdBtnStyle"
-										onClick={() => this.deleteAd(index)}
-										title="Delete This Ad"
-									/>
-									<RowColSpan label="Selector">
-										<input
-											onChange={e => {
-												this.setAds(index, { selector: e.target.value });
-											}}
-											type="text"
-											placeholder="Selector"
-											name="selector"
-											className="form-control"
-											value={ad.selector || ''}
-										/>
-									</RowColSpan>
-									<RowColSpan label="Width">
-										<input
-											onChange={e => {
-												let ads = this.state.ads, adCode;
-												ads[index].width = e.target.value;
-												adCode = this.generateAdCode(ads[index]);
-												this.setAds(index, { width: e.target.value, adCode });
-											}}
-											type="number"
-											placeholder="Width"
-											name="width"
-											className="form-control"
-											value={ad.width}
-										/>
-									</RowColSpan>
-									<RowColSpan label="Height">
-										<input
-											onChange={e => {
-												let ads = this.state.ads, adCode;
-												ads[index].height = e.target.value;
-												adCode = this.generateAdCode(ads[index]);
-												this.setAds(index, { height: e.target.value, adCode });
-											}}
-											type="number"
-											placeholder="Height"
-											name="height"
-											className="form-control"
-											value={ad.height}
-										/>
-									</RowColSpan>
-									<RowColSpan label="Operation">
-										<select
-											className="form-control"
-											name="operation"
-											value={ad.operation || 'INSERTAFTER'}
-											onChange={e => {
-												this.setAds(index, { operation: e.target.value });
-											}}
-										>
-											<option value="">Select Operation</option>
-											{commonConsts.ads.operations.map((operation, index) => (
-												<option value={operation} key={index}>
-													{operation}
-												</option>
-											))}
-										</select>
-									</RowColSpan>
-									<RowColSpan label="Type">
-										<select
-											className="form-control"
-											name="type"
-											value={ad.type || ''}
-											onChange={e => {
-												let partialAd = {},
-													ads = this.state.ads,
-													type = e.target.value,
-													adFields = commonConsts.ads.type;
+			<CollapsePanel title="Ads Settings" className="mediumFontSize" noBorder={true}>
+				{this.state.ads.map((ad, index) => {
+					return (
+						<div key={index} className="adContainerStyle">
+							<div
+								className="fa fa-times-circle fa-2x deleteAdBtnStyle"
+								onClick={() => this.deleteAd(index)}
+								title="Delete This Ad"
+							/>
+							<RowColSpan label="Selector">
+								<input
+									onChange={e => {
+										this.setAds(index, { selector: e.target.value });
+									}}
+									type="text"
+									placeholder="Selector"
+									name="selector"
+									className="form-control"
+									value={ad.selector || ''}
+								/>
+							</RowColSpan>
+							<RowColSpan label="Width">
+								<input
+									onChange={e => {
+										let ads = this.state.ads, adCode;
+										ads[index].width = e.target.value;
+										adCode = this.generateAdCode(ads[index]);
+										this.setAds(index, { width: e.target.value, adCode });
+									}}
+									type="number"
+									placeholder="Width"
+									name="width"
+									className="form-control"
+									value={ad.width}
+								/>
+							</RowColSpan>
+							<RowColSpan label="Height">
+								<input
+									onChange={e => {
+										let ads = this.state.ads, adCode;
+										ads[index].height = e.target.value;
+										adCode = this.generateAdCode(ads[index]);
+										this.setAds(index, { height: e.target.value, adCode });
+									}}
+									type="number"
+									placeholder="Height"
+									name="height"
+									className="form-control"
+									value={ad.height}
+								/>
+							</RowColSpan>
+							<RowColSpan label="Operation">
+								<select
+									className="form-control"
+									name="operation"
+									value={ad.operation || 'INSERTAFTER'}
+									onChange={e => {
+										this.setAds(index, { operation: e.target.value });
+									}}
+								>
+									<option value="">Select Operation</option>
+									{commonConsts.ads.operations.map((operation, index) => (
+										<option value={operation} key={index}>
+											{operation}
+										</option>
+									))}
+								</select>
+							</RowColSpan>
+							<RowColSpan label="Type">
+								<select
+									className="form-control"
+									name="type"
+									value={ad.type || ''}
+									onChange={e => {
+										let partialAd = {},
+											ads = this.state.ads,
+											type = e.target.value,
+											adFields = commonConsts.ads.type;
 
-												partialAd.type = type;
-												ads[index].type = type;
-												if (ad.type === 'custom') {
-													partialAd.adCode = '';
-												} else {
-													partialAd.adCode = this.generateAdCode(ads[index]);
-												}
-												if (adFields[type]) {
-													partialAd.data = {};
-												}
-												this.setAds(index, partialAd);
-											}}
-										>
-											<option value="">Select Type</option>
-											{Object.keys(commonConsts.ads.type).map((type, index) => (
-												<option value={type} key={index}>
-													{type}
-												</option>
-											))}
-											<option value="custom">custom</option>
-										</select>
-									</RowColSpan>
-									{this.renderNetworkInputs(index)}
-									{ad.type &&
-										<RowColSpan label="AdCode">
-											<textarea
-												onChange={e => {
-													this.setAds(index, { adCode: e.target.value });
-												}}
-												placeholder="AdCode"
-												name="adCode"
-												className="form-control"
-												value={ad.adCode}
-												disabled={ad.type != 'custom'}
-											/>
-										</RowColSpan>}
-								</div>
-							);
-						})
-					: <div className="textCenter">No Ad Found</div>}
-			</div>
+										partialAd.type = type;
+										ads[index].type = type;
+										if (ad.type === 'custom') {
+											partialAd.adCode = '';
+										} else {
+											partialAd.adCode = this.generateAdCode(ads[index]);
+										}
+										if (adFields[type]) {
+											partialAd.data = {};
+										}
+										this.setAds(index, partialAd);
+									}}
+								>
+									<option value="">Select Type</option>
+									{Object.keys(commonConsts.ads.type).map((type, index) => (
+										<option value={type} key={index}>
+											{type}
+										</option>
+									))}
+									<option value="custom">custom</option>
+								</select>
+							</RowColSpan>
+							{this.renderNetworkInputs(index)}
+							{ad.type &&
+								<RowColSpan label="AdCode">
+									<textarea
+										onChange={e => {
+											this.setAds(index, { adCode: e.target.value });
+										}}
+										placeholder="AdCode"
+										name="adCode"
+										className="form-control"
+										value={ad.adCode}
+										disabled={ad.type != 'custom'}
+									/>
+								</RowColSpan>}
+						</div>
+					);
+				})}
+				<RowColSpan label="">
+					<button className="btn-primary addButton" type="button" onClick={this.insertNewAd}>+Add</button>
+				</RowColSpan>
+			</CollapsePanel>
 		);
 	};
 }
