@@ -57,7 +57,7 @@ class PageGroupSettings extends React.Component {
 	}
 
 	renderSelectors = () => {
-		let selectorConf = commonConsts.selectors;
+		let selectorConf = commonConsts.pagegroupSelectors;
 		return Object.keys(selectorConf).map(key => {
 			let selectorValue = this.state.selectors[key];
 			if (selectorConf[key].inputType == 'text')
@@ -146,7 +146,7 @@ class PageGroupSettings extends React.Component {
 		let ampData = this.parseFormData(Object.assign({}, this.state)), pageGroup = this.props.channel.pageGroup;
 		let { siteId } = this.state, selectors = ampData.selectors;
 		if (!selectors.articleContent || !ampData.siteName || !ampData.template) {
-			alert('Artical Content, SiteName and Template are required');
+			alert('Article Content, SiteName and Template are required');
 			return;
 		}
 		ajax({
@@ -192,7 +192,7 @@ class PageGroupSettings extends React.Component {
 	render = () => {
 		const { props } = this, channel = props.channel;
 		return (
-			<CollapsePanel title={channel.pageGroup} bold={true}>
+			<CollapsePanel title={channel.pageGroup} className="h4FontSize" noBorder={true}>
 				<form onSubmit={this.saveChannelSettings}>
 					<CustomToggleSwitch
 						labelText="IsEnabled"
@@ -210,123 +210,130 @@ class PageGroupSettings extends React.Component {
 						off="Off"
 					/>
 					<hr />
-					<Heading title="Selectors Settings" />
-					{this.renderSelectors()}
+					<CollapsePanel title="Selector Setting" className="mediumFontSize" noBorder={true}>
+						{this.renderSelectors()}
+					</CollapsePanel>
 					<hr />
-					<Heading title="Image Configuration" />
-					<RowColSpan label="Width Limit">
-						<input
-							onChange={e => {
-								let imgConfig = this.state.imgConfig;
-								imgConfig.widthLimit = parseFloat(e.target.value);
-								this.setState({
-									imgConfig
-								});
-							}}
-							className="form-control"
-							type="number"
-							placeholder="Width Limit"
-							name="widthLimit"
-							value={this.state.imgConfig.widthLimit}
-						/>
-					</RowColSpan>
-					<RowColSpan label="Height Limit">
-						<input
-							onChange={e => {
-								let imgConfig = this.state.imgConfig;
-								imgConfig.heightLimit = parseFloat(e.target.value);
-								this.setState({
-									imgConfig
-								});
-							}}
-							className="form-control"
-							type="number"
-							placeholder="Height Limit"
-							name="heightLimit"
-							value={this.state.imgConfig.heightLimit}
-						/>
-					</RowColSpan>
+					<CollapsePanel title="Image Configuration" className="mediumFontSize" noBorder={true}>
+						<RowColSpan label="Width Limit">
+							<input
+								onChange={e => {
+									let imgConfig = this.state.imgConfig;
+									imgConfig.widthLimit = parseFloat(e.target.value);
+									this.setState({
+										imgConfig
+									});
+								}}
+								className="form-control"
+								type="number"
+								placeholder="Width Limit"
+								name="widthLimit"
+								value={this.state.imgConfig.widthLimit}
+							/>
+						</RowColSpan>
+						<RowColSpan label="Height Limit">
+							<input
+								onChange={e => {
+									let imgConfig = this.state.imgConfig;
+									imgConfig.heightLimit = parseFloat(e.target.value);
+									this.setState({
+										imgConfig
+									});
+								}}
+								className="form-control"
+								type="number"
+								placeholder="Height Limit"
+								name="heightLimit"
+								value={this.state.imgConfig.heightLimit}
+							/>
+						</RowColSpan>
+					</CollapsePanel>
 					<hr />
-					<Heading title="Social Settings" />
-
-					<CustomToggleSwitch
-						labelText="Include"
-						className="mB-0"
-						defaultLayout
-						checked={this.state.social.include}
-						onChange={value => {
-							let social = this.state.social;
-							social.include = value;
-							this.setState({ social });
-						}}
-						name="includeSocial"
-						layout="horizontal"
-						size="m"
-						id="js-force-sample-url"
-						on="On"
-						off="Off"
-					/>
-					<RowColSpan label="Placement">
-						<select
-							className="form-control"
-							name="placement"
-							value={this.state.social.placement}
-							onChange={e => {
+					<CollapsePanel title="Social Settings" className="mediumFontSize" noBorder={true}>
+						<CustomToggleSwitch
+							labelText="Include"
+							className="mB-0"
+							defaultLayout
+							checked={this.state.social.include}
+							onChange={value => {
 								let social = this.state.social;
-								social.placement = e.target.value;
+								social.include = value;
 								this.setState({ social });
 							}}
-						>
-							<option value="top">Top</option>
-							<option value="bottom">Bottom</option>
-						</select>
-					</RowColSpan>
-					<RowColSpan label="Apps">{this.renderSocialApps()}</RowColSpan>
+							name="includeSocial"
+							layout="horizontal"
+							size="m"
+							id="js-force-sample-url"
+							on="On"
+							off="Off"
+						/>
+						<RowColSpan label="Placement">
+							<select
+								className="form-control"
+								name="placement"
+								value={this.state.social.placement}
+								onChange={e => {
+									let social = this.state.social;
+									social.placement = e.target.value;
+									this.setState({ social });
+								}}
+							>
+								<option value="top">Top</option>
+								<option value="bottom">Bottom</option>
+							</select>
+						</RowColSpan>
+						<RowColSpan label="Apps">{this.renderSocialApps()}</RowColSpan>
+					</CollapsePanel>
 					<hr />
-					<Heading title="Other Settings" />
-					<RowColSpan label="Custom CSS">
-						<textarea
-							placeholder="Enter Custom CSS here"
-							name="customCSS"
-							value={this.state.customCSS.value}
-							onChange={e => {
-								let customCSS = this.state.customCSS;
-								customCSS.value = e.target.value;
-								this.setState({ customCSS });
-							}}
-						/>
-					</RowColSpan>
-					<RowColSpan label="Delete Selector">
-						<textarea
-							name="toDelete"
-							value={this.state.toDelete || ''}
-							onChange={e => {
-								let toDelete = this.state.toDelete, value = e.target.value.trim();
-								toDelete = value.split(',');
-								this.setState({
-									toDelete
-								});
-							}}
-						/>
-					</RowColSpan>
-					<RowColSpan label="Before JS">
-						<textarea name="beforeJs" value={this.state.beforeJs || ''} onChange={this.handleOnChange} />
-					</RowColSpan>
-					<RowColSpan label="After JS">
-						<textarea name="afterJs" value={this.state.afterJs || ''} onChange={this.handleOnChange} />
-					</RowColSpan>
-					{this.renderInputControl({
-						label: 'Site Name',
-						name: 'siteName',
-						value: this.state.siteName || '',
-						type: 'text'
-					})}
-					{this.renderInputControl({
-						label: 'Template',
-						name: 'template',
-						value: this.state.template || '',
-						type: 'text'
-					})}
+					<CollapsePanel title="Other Settings" className="mediumFontSize" noBorder={true}>
+						<RowColSpan label="Custom CSS">
+							<textarea
+								placeholder="Enter Custom CSS here"
+								name="customCSS"
+								value={this.state.customCSS.value}
+								onChange={e => {
+									let customCSS = this.state.customCSS;
+									customCSS.value = e.target.value;
+									this.setState({ customCSS });
+								}}
+							/>
+						</RowColSpan>
+						<RowColSpan label="Delete Selector">
+							<textarea
+								name="toDelete"
+								value={this.state.toDelete || ''}
+								onChange={e => {
+									let toDelete = this.state.toDelete, value = e.target.value.trim();
+									toDelete = value.split(',');
+									this.setState({
+										toDelete
+									});
+								}}
+							/>
+						</RowColSpan>
+						<RowColSpan label="Before JS">
+							<textarea
+								name="beforeJs"
+								value={this.state.beforeJs || ''}
+								onChange={this.handleOnChange}
+							/>
+						</RowColSpan>
+						<RowColSpan label="After JS">
+							<textarea name="afterJs" value={this.state.afterJs || ''} onChange={this.handleOnChange} />
+						</RowColSpan>
+						{this.renderInputControl({
+							label: 'Site Name',
+							name: 'siteName',
+							value: this.state.siteName || '',
+							type: 'text'
+						})}
+						{this.renderInputControl({
+							label: 'Template',
+							name: 'template',
+							value: this.state.template || '',
+							type: 'text'
+						})}
+					</CollapsePanel>
 					<hr />
 					<AdsSettings ads={this.state.ads} />
 					<hr />

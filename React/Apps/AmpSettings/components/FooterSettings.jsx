@@ -32,7 +32,7 @@ class FooterSettings extends React.Component {
 					on="On"
 					off="Off"
 				/>
-				<RowColSpan label="Position">
+				<RowColSpan label="Text">
 					<input
 						onChange={e => {
 							let footer = this.state.footer;

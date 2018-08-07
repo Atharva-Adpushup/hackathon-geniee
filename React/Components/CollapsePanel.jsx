@@ -33,19 +33,17 @@ class CollapsePanel extends Component {
 			<div className="_collapse-panel">
 				<div onClick={this.toggleCollapse}>
 					<div className="container-fluid">
-						<Row>
+						<Row className={props.className}>
 							<div className="pull-left">{props.bold ? <Bold>{props.title}</Bold> : props.title}</div>
 							<div className="pull-right">
-								{!state.open ? (
-									<i className="fa fa-caret-down" title={props.tooltipMessage} />
-								) : (
-									<i className="fa fa-caret-up" />
-								)}
+								{!state.open
+									? <i className="fa fa-caret-down" title={props.tooltipMessage} />
+									: <i className="fa fa-caret-up" />}
 							</div>
 						</Row>
 					</div>
 				</div>
-				<Panel collapsible expanded={state.open}>
+				<Panel collapsible expanded={state.open} className={!state.open && props.noBorder ? 'no-border' : ''}>
 					{props.children}
 				</Panel>
 			</div>
