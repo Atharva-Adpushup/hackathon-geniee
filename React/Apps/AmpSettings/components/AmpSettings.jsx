@@ -12,6 +12,8 @@ import MenuSettings from './MenuSettings.jsx';
 import FooterSettings from './FooterSettings.jsx';
 import { Row, Col, Button } from 'react-bootstrap';
 import '../style.scss';
+import CollapsePanel from '../../../Components/CollapsePanel.jsx';
+
 class AmpSettings extends React.Component {
 	constructor(props) {
 		super(props);
@@ -28,26 +30,28 @@ class AmpSettings extends React.Component {
 			url: '/user/site/' + siteId + '/ampSettingsData'
 		})
 			.then(res => {
-				let selectedAnalytics = [], fetchedAnalyticsData = res.ampSettings.analytics;
+				let { siteId, siteDomain, channels, ampSettings = {} } = res;
+				let selectedAnalytics = [], fetchedAnalyticsData = ampSettings.analytics || [];
 				for (let i = 0; i < fetchedAnalyticsData.length; i++) {
 					let name = fetchedAnalyticsData[i].name, analyticData = fetchedAnalyticsData[i];
 					delete analyticData.name;
 					selectedAnalytics.push({ label: name, value: name, fields: analyticData });
 				}
 				this.setState({
-					siteId: res.siteId,
-					siteDomain: res.siteDomain,
-					channels: res.channels || [],
-					blockList: res.ampSettings.blockList || [],
-					samplingPercent: res.ampSettings.samplingPercent,
-					selectors: res.ampSettings.selectors || {},
+					siteId: siteId,
+					siteDomain: siteDomain,
+					channels: channels || [],
+					blockList: ampSettings.blockList || [],
+					samplingPercent: ampSettings.samplingPercent,
+					selectors: ampSettings.selectors || {},
 					isLoading: false,
 					selectedAnalytics,
-					menu: res.ampSettings.menu || { links: [], include: false, position: 'right' },
-					footer: res.ampSettings.footer || { include: false, label: 'AMP by AdPushUp' }
+					menu: ampSettings.menu || { links: [], include: false, position: 'right' },
+					footer: ampSettings.footer || { include: false, label: 'AMP by AdPushUp' }
 				});
 			})
 			.catch(res => {
+				console.log(res);
 				alert('Some Error Occurred In fetching amp settings!');
 			});
 	};
@@ -94,7 +98,7 @@ class AmpSettings extends React.Component {
 	};
 	renderInputControl = (label, name, value) => {
 		return (
-			<RowColSpan label={label}>
+			<RowColSpan label={label} className="mediumFontSize">
 				<input
 					onChange={this.handleOnChange}
 					className="form-control"
@@ -246,7 +250,7 @@ class AmpSettings extends React.Component {
 											'samplingPercent',
 											this.state.samplingPercent
 										)}
-										<RowColSpan label="BlockList">
+										<RowColSpan label="BlockList" className="mediumFontSize">
 											{this.renderBlockList()}
 											<button
 												className="btn-primary addButton"
@@ -261,7 +265,7 @@ class AmpSettings extends React.Component {
 											</button>
 										</RowColSpan>
 
-										<RowColSpan label="Analytics">
+										<RowColSpan label="Analytics" className="mediumFontSize">
 											<Select
 												value={this.state.selectedAnalytics}
 												isMulti={true}
@@ -275,12 +279,15 @@ class AmpSettings extends React.Component {
 											/>
 										</RowColSpan>
 										{this.renderAnalyticsFields()}
-										<hr />
 										<MenuSettings menu={this.state.menu} />
-										<hr />
 										<FooterSettings footer={this.state.footer} />
-										<Heading title="Selectors Settings" />
-										{this.renderSelectors()}
+										<CollapsePanel
+											title="Selectors Settings"
+											className="mediumFontSize"
+											noBorder={true}
+										>
+											{this.renderSelectors()}
+										</CollapsePanel>
 										<hr />
 										<div className="row settings-btn-pane">
 											<div className="col-sm-4">

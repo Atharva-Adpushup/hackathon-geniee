@@ -2,6 +2,7 @@ import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Heading from './helper/Heading.jsx';
 import RowColSpan from './helper/RowColSpan.jsx';
+import CollapsePanel from '../../../Components/CollapsePanel.jsx';
 import CustomToggleSwitch from './helper/CustomToggleSwitch.jsx';
 import '../style.scss';
 class MenuSettings extends React.Component {
@@ -63,9 +64,7 @@ class MenuSettings extends React.Component {
 	};
 	render = () => {
 		return (
-			<div>
-				<Heading title="Menu Settings" />
-
+			<CollapsePanel title="Menu Settings" className="mediumFontSize" noBorder={true}>
 				<CustomToggleSwitch
 					labelText="Include"
 					className="mB-0"
@@ -113,7 +112,7 @@ class MenuSettings extends React.Component {
 						+ Add
 					</button>
 				</RowColSpan>
-			</div>
+			</CollapsePanel>
 		);
 	};
 }

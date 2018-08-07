@@ -3,6 +3,7 @@ import { Row, Col } from 'react-bootstrap';
 import Heading from './helper/Heading.jsx';
 import RowColSpan from './helper/RowColSpan.jsx';
 import CustomToggleSwitch from './helper/CustomToggleSwitch.jsx';
+import CollapsePanel from '../../../Components/CollapsePanel.jsx';
 class FooterSettings extends React.Component {
 	constructor(props) {
 		super(props);
@@ -12,9 +13,7 @@ class FooterSettings extends React.Component {
 	}
 	render = () => {
 		return (
-			<div>
-				<Heading title="Footer Settings" />
-
+			<CollapsePanel title="Footer Settings" className="mediumFontSize" noBorder={true}>
 				<CustomToggleSwitch
 					labelText="Include"
 					className="mB-0"
@@ -46,7 +45,7 @@ class FooterSettings extends React.Component {
 						value={this.state.footer.label || ''}
 					/>
 				</RowColSpan>
-			</div>
+			</CollapsePanel>
 		);
 	};
 }
