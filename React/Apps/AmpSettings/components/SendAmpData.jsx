@@ -124,7 +124,7 @@ class SendAmpData extends React.Component {
 		return (
 			<form onSubmit={this.send}>
 				<Heading title="Force AMP conversion" />
-				<RowColSpan label="Select conversion level">
+				<RowColSpan label="Select conversion level" className="mediumFontSize">
 					<select
 						className="form-control"
 						value={this.state.conversionType || ''}

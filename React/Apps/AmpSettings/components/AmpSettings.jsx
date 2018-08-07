@@ -12,12 +12,15 @@ import MenuSettings from './MenuSettings.jsx';
 import FooterSettings from './FooterSettings.jsx';
 import { Row, Col, Button } from 'react-bootstrap';
 import '../style.scss';
+import CollapsePanel from '../../../Components/CollapsePanel.jsx';
+
 class AmpSettings extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			isLoading: true,
-			selectedAnalytics: []
+			selectedAnalytics: [],
+			selectors: {}
 		};
 	}
 	fetchAmpSettings = () => {
@@ -27,25 +30,28 @@ class AmpSettings extends React.Component {
 			url: '/user/site/' + siteId + '/ampSettingsData'
 		})
 			.then(res => {
-				let selectedAnalytics = [], fetchedAnalyticsData = res.ampSettings.analytics;
+				let { siteId, siteDomain, channels, ampSettings = {} } = res;
+				let selectedAnalytics = [], fetchedAnalyticsData = ampSettings.analytics || [];
 				for (let i = 0; i < fetchedAnalyticsData.length; i++) {
 					let name = fetchedAnalyticsData[i].name, analyticData = fetchedAnalyticsData[i];
 					delete analyticData.name;
 					selectedAnalytics.push({ label: name, value: name, fields: analyticData });
 				}
 				this.setState({
-					siteId: res.siteId,
-					siteDomain: res.siteDomain,
-					channels: res.channels || [],
-					blockList: res.ampSettings.blockList || [],
-					samplingPercent: res.ampSettings.samplingPercent,
+					siteId: siteId,
+					siteDomain: siteDomain,
+					channels: channels || [],
+					blockList: ampSettings.blockList || [],
+					samplingPercent: ampSettings.samplingPercent,
+					selectors: ampSettings.selectors || {},
 					isLoading: false,
 					selectedAnalytics,
-					menu: res.ampSettings.menu || { links: [], include: false, position: 'right' },
-					footer: res.ampSettings.footer || { include: false, label: 'AMP by AdPushUp' }
+					menu: ampSettings.menu || { links: [], include: false, position: 'right' },
+					footer: ampSettings.footer || { include: false, label: 'AMP by AdPushUp' }
 				});
 			})
 			.catch(res => {
+				console.log(res);
 				alert('Some Error Occurred In fetching amp settings!');
 			});
 	};
@@ -59,8 +65,9 @@ class AmpSettings extends React.Component {
 		let linkViews = new Array(this.state.blockList);
 		const listItems = this.state.blockList.map((linkView, index) => {
 			return (
-				<RowColSpan key={index} label="">
+				<div className="marginBottom">
 					<input
+						key={index}
 						onChange={e => {
 							let blockList = this.state.blockList;
 							blockList[index] = e.target.value;
@@ -75,6 +82,7 @@ class AmpSettings extends React.Component {
 						value={this.state.blockList[index]}
 					/> <button
 						className="fa fa-trash fa-2x blockListDelete"
+						type="button"
 						onClick={() => {
 							let blockList = this.state.blockList;
 							blockList.splice(index, 1);
@@ -83,28 +91,23 @@ class AmpSettings extends React.Component {
 							});
 						}}
 					/>
-				</RowColSpan>
+				</div>
 			);
 		});
 		return <div>{listItems}</div>;
 	};
 	renderInputControl = (label, name, value) => {
 		return (
-			<Row>
-				<Col sm={5}>
-					<div>{label}</div>
-				</Col>
-				<Col sm={7}>
-					<input
-						onChange={this.handleOnChange}
-						className="form-control"
-						type="text"
-						placeholder={label}
-						name={name}
-						value={value || ''}
-					/>
-				</Col>
-			</Row>
+			<RowColSpan label={label} className="mediumFontSize">
+				<input
+					onChange={this.handleOnChange}
+					className="form-control"
+					type="text"
+					placeholder={label}
+					name={name}
+					value={value || ''}
+				/>
+			</RowColSpan>
 		);
 	};
 	componentDidMount = () => {
@@ -131,7 +134,8 @@ class AmpSettings extends React.Component {
 				blockList: finalData.blockList,
 				analytics: analytics,
 				menu: finalData.menu,
-				footer: finalData.footer
+				footer: finalData.footer,
+				selectors: finalData.selectors
 			})
 		})
 			.then(res => {
@@ -182,6 +186,50 @@ class AmpSettings extends React.Component {
 		return -1;
 	};
 
+	renderSelectors = () => {
+		let selectorConf = commonConsts.siteSelectors;
+		return Object.keys(selectorConf).map(key => {
+			let selectorValue = this.state.selectors[key];
+			if (selectorConf[key].inputType == 'text')
+				return (
+					<RowColSpan label={selectorConf[key].alias} key={key}>
+						<input
+							onChange={e => {
+								console.log('hi', e.target.value);
+								let selectors = this.state.selectors;
+								selectors[e.target.name] = e.target.value;
+								this.setState({
+									selectors
+								});
+							}}
+							className="form-control"
+							type={selectorConf[key].inputType}
+							placeholder={selectorConf[key].alias}
+							name={key}
+							defaultValue={selectorValue}
+						/>
+					</RowColSpan>
+				);
+			else
+				return (
+					<RowColSpan label={selectorConf[key].alias} key={key}>
+						<textarea
+							placeholder={selectorConf[key].alias}
+							name={key}
+							value={selectorValue}
+							onChange={e => {
+								let selectors = this.state.selectors, value = e.target.value.trim();
+								selectors[e.target.name] = value.split(',');
+								this.setState({
+									selectors
+								});
+							}}
+						/>
+					</RowColSpan>
+				);
+		});
+	};
+
 	render = () => {
 		let analytics = Object.keys(commonConsts.analytics).map(function(key) {
 			return { label: key, value: key, fields: {} };
@@ -202,9 +250,10 @@ class AmpSettings extends React.Component {
 											'samplingPercent',
 											this.state.samplingPercent
 										)}
-										<RowColSpan label="BlockList">
+										<RowColSpan label="BlockList" className="mediumFontSize">
+											{this.renderBlockList()}
 											<button
-												className="btn-primary"
+												className="btn-primary addButton"
 												type="button"
 												onClick={() => {
 													let blockList = this.state.blockList;
@@ -215,8 +264,8 @@ class AmpSettings extends React.Component {
 												+ Add
 											</button>
 										</RowColSpan>
-										{this.renderBlockList()}
-										<RowColSpan label="Analytics">
+
+										<RowColSpan label="Analytics" className="mediumFontSize">
 											<Select
 												value={this.state.selectedAnalytics}
 												isMulti={true}
@@ -230,10 +279,15 @@ class AmpSettings extends React.Component {
 											/>
 										</RowColSpan>
 										{this.renderAnalyticsFields()}
-										<hr />
 										<MenuSettings menu={this.state.menu} />
-										<hr />
 										<FooterSettings footer={this.state.footer} />
+										<CollapsePanel
+											title="Selectors Settings"
+											className="mediumFontSize"
+											noBorder={true}
+										>
+											{this.renderSelectors()}
+										</CollapsePanel>
 										<hr />
 										<div className="row settings-btn-pane">
 											<div className="col-sm-4">
@@ -256,11 +310,14 @@ class AmpSettings extends React.Component {
 									<Heading title="Channel Level Settings" />
 									{this.state.channels.map(channel => {
 										return (
-											<PageGroupSettings
-												channel={channel}
-												siteId={this.state.siteId}
-												key={channel.pageGroup}
-											/>
+											<div>
+												<PageGroupSettings
+													channel={channel}
+													siteId={this.state.siteId}
+													key={channel.pageGroup}
+												/>
+												<hr />
+											</div>
 										);
 									})}
 								</Col>

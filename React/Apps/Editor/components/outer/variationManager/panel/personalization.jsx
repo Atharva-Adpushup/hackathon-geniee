@@ -64,7 +64,7 @@ class Personalization extends Component {
 			geo: {
 				type: this.state.type,
 				values: _.map(countries, country => country.toUpperCase()),
-				dfpAdSlotsToDestroy: this.state.dfpSlots.trim().split(',') || []
+				dfpAdSlotsToDestroy: this.state.dfpSlots && this.state.dfpSlots.length ? this.state.dfpSlots.trim().split(',') : []
 			}
 		});
 	}

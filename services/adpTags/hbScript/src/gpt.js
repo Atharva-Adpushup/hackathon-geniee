@@ -3,7 +3,6 @@
 var config = require('./config'),
 	logger = require('../helpers/logger'),
 	feedback = require('./feedback'),
-	// hbStatus = require('./hbStatus'),
 	init = function(w, d) {
 		w.googletag = w.googletag || {};
 		googletag.cmd = googletag.cmd || [];
@@ -18,12 +17,15 @@ var config = require('./config'),
 		w.googletag.cmd.push(function() {
 			w.googletag.pubads().addEventListener('slotRenderEnded', function(event) {
 				var slot;
-				Object.keys(w.adpTags.adpSlots).forEach(function(adpSlot) {
+				Object.keys(w.adpushup.adpTags.adpSlots).forEach(function(adpSlot) {
 					if (
-						'/' + config.NETWORK_ID + '/' + w.adpTags.adpSlots[adpSlot].optionalParam.dfpAdunitCode ===
+						'/' +
+							config.NETWORK_ID +
+							'/' +
+							w.adpushup.adpTags.adpSlots[adpSlot].optionalParam.dfpAdunitCode ===
 						event.slot.getName()
 					) {
-						slot = w.adpTags.adpSlots[adpSlot];
+						slot = w.adpushup.adpTags.adpSlots[adpSlot];
 					}
 				});
 
@@ -33,8 +35,6 @@ var config = require('./config'),
 					slot.optionalParam &&
 					slot.optionalParam.network !== config.PARTNERS.GENIEE
 				) {
-					// hbStatus.hbDfpRender(slot.containerId);
-
 					logger.log('DFP ad slot rendered');
 					return cb(feedback(slot));
 				}
@@ -43,15 +43,15 @@ var config = require('./config'),
 	},
 	refreshIntervalSwitch = function(w) {
 		w.adpushup.$(w).on('blur', function() {
-			if (w.adpTags.gptRefreshIntervals.length) {
-				w.adpTags.gptRefreshIntervals.forEach(function(interval) {
+			if (w.adpushup.adpTags.gptRefreshIntervals.length) {
+				w.adpushup.adpTags.gptRefreshIntervals.forEach(function(interval) {
 					clearInterval(interval.id);
 				});
 			}
 		});
 		w.adpushup.$(w).on('focus', function() {
-			if (w.adpTags.gptRefreshIntervals.length) {
-				w.adpTags.gptRefreshIntervals.forEach(function(interval) {
+			if (w.adpushup.adpTags.gptRefreshIntervals.length) {
+				w.adpushup.adpTags.gptRefreshIntervals.forEach(function(interval) {
 					var gptRefreshInterval = setInterval(function() {
 						googletag.pubads().refresh([interval.gSlot]);
 					}, config.GPT_REFRESH_INTERVAL);

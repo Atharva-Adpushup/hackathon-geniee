@@ -14,6 +14,8 @@ class Sticky extends Component {
 		const placementCSS = commonConsts.FORMATS.STICKY.PLACEMENT_CSS;
 
 		switch (formatData.placement) {
+			case 'top':
+				return placementCSS.TOP;
 			case 'bottom':
 				return placementCSS.BOTTOM;
 			case 'left':

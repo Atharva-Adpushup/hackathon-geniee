@@ -90,7 +90,7 @@ function apiModule() {
 						});
 					} else {
 						var existingPageGroup = _.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])
-							.pageGroup,
+								.pageGroup,
 							existingChannel = json.device.toUpperCase() + ':' + existingPageGroup;
 
 						if (_.includes(channels, existingChannel)) {
@@ -135,7 +135,9 @@ function apiModule() {
 			});
 		},
 		getPageGroupById: function(paramsObj) {
-			var query = ViewQuery.from('app', paramsObj.viewName).stale(1).range(paramsObj.id, paramsObj.id, true);
+			var query = ViewQuery.from('app', paramsObj.viewName)
+				.stale(1)
+				.range(paramsObj.id, paramsObj.id, true);
 			return couchbase.connectToAppBucket().then(function(appBucket) {
 				return new Promise(function(resolve, reject) {
 					appBucket.query(query, {}, function(err, result) {
@@ -165,7 +167,9 @@ function apiModule() {
 			});
 		},
 		updatePagegroup: function(json) {
-			var query = ViewQuery.from('app', 'channelById').stale(1).range(json.pageGroupId, json.pageGroupId, true);
+			var query = ViewQuery.from('app', 'channelById')
+				.stale(1)
+				.range(json.pageGroupId, json.pageGroupId, true);
 			return couchbase.connectToAppBucket().then(function(appBucket) {
 				return new Promise(function(resolve, reject) {
 					appBucket.query(query, {}, function(err, result) {
@@ -189,7 +193,9 @@ function apiModule() {
 			});
 		},
 		deletePagegroupById: function(pageGroupId) {
-			var query = ViewQuery.from('app', 'channelById').stale(1).range(pageGroupId, pageGroupId, true);
+			var query = ViewQuery.from('app', 'channelById')
+				.stale(1)
+				.range(pageGroupId, pageGroupId, true);
 			return couchbase.connectToAppBucket().then(function(appBucket) {
 				return new Promise(function(resolve, reject) {
 					appBucket.query(query, {}, function(err, result) {
@@ -289,6 +295,19 @@ function apiModule() {
 
 				computedData.count = Object.keys(computedData.variations).length;
 				return Promise.resolve(computedData);
+			});
+		},
+		getChannelSections: (siteId, platform, pageGroup) => {
+			return API.getChannel(siteId, platform, pageGroup).then(function(channel) {
+				let variations = channel.get('variations'),
+					allSections = [];
+				Object.keys(variations).forEach(i => {
+					const sections = variations[i].sections;
+					Object.keys(sections).forEach(j => {
+						allSections.push(sections[j]);
+					});
+				});
+				return allSections;
 			});
 		},
 		deleteChannel: function(siteId, platform, pageGroup) {

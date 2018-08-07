@@ -1,7 +1,6 @@
 const commonConsts = {
-	selectors: {
+	pagegroupSelectors: {
 		breadcrumb: { alias: 'Breadcrumb', value: 'breadcrumb', inputType: 'text', dataType: 'string' },
-		footer: { alias: 'Footer', value: 'footer', inputType: 'text', dataType: 'string' },
 		headlineTitle: { alias: 'Headline Title', value: 'headlineTitle', inputType: 'text', dataType: 'string' },
 		headlineSubtitle: {
 			alias: 'Headline Subtitle',
@@ -25,6 +24,9 @@ const commonConsts = {
 		articleContent: { alias: 'Article Content', value: 'articleContent', inputType: 'textarea', dataType: 'array' },
 		afterContent: { alias: 'After Content', value: 'afterContent', inputType: 'text', dataType: 'string' },
 		logo: { alias: 'Logo', value: 'logo', inputType: 'text', dataType: 'string' }
+	},
+	siteSelectors: {
+		footer: { alias: 'Footer', value: 'footer', inputType: 'text', dataType: 'string' }
 	},
 	socialApps: [
 		{ label: 'facebook', value: 'facebook' },
