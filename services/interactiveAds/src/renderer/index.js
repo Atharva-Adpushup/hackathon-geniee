@@ -2,7 +2,7 @@
 
 import commonConsts from '../commonConsts';
 import Sticky from './components/Sticky/index';
-import Video from './components/Video/index';
+//import Video from './components/Video/index';
 import $ from '../$';
 import config from '../config';
 import { generateAdCode } from '../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
@@ -35,11 +35,11 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 				const sticky = new Sticky(parentNode, interactiveAd, adCode);
 				return sticky.render();
 
-			case commonConsts.FORMATS.VIDEO.NAME:
-				const { css } = interactiveAd;
-				parentNode = createParentNode(value, interactiveAd, css);
-				const video = new Video(parentNode, interactiveAd, adCode);
-				return video.render();
+			// case commonConsts.FORMATS.VIDEO.NAME:
+			// 	const { css } = interactiveAd;
+			// 	parentNode = createParentNode(value, interactiveAd, css);
+			// 	const video = new Video(parentNode, interactiveAd, adCode);
+			// 	return video.render();
 		}
 	},
 	renderer = interactiveAd => {

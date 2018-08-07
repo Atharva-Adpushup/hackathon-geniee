@@ -1,17 +1,14 @@
 // Header bidding initialisation module
 
 function init(w, d) {
-	// Disabling floor price optimizer service for now
-	// require('./adpOptimizer').init(w);
-	w.adpPrebid = require('../../Prebid.js/build/dist/prebid');
-	w.adpPrebid();
+	w.adpushup.adpPrebid = __PREBID_SCRIPT__;
+	w.adpushup.adpPrebid();
 
 	var logger = require('../helpers/logger'),
 		gpt = require('./gpt'),
 		config = require('./config'),
 		geniee = require('./geniee'),
 		feedback = require('./feedback');
-	// hbStatus = require('./hbStatus');
 
 	// Initialise GPT and set listeners
 	gpt.init(w, d);
@@ -20,26 +17,29 @@ function init(w, d) {
 	});
 
 	var adpQue;
-	if (w.adpTags) {
-		adpQue = w.adpTags.que;
+	window.adpTags = window.adpTags || {};
+	window.adpTags.que = window.adpTags.que || [];
+	if (w.adpushup.adpTags) {
+		adpQue = w.adpushup.adpTags.que;
 	} else {
 		adpQue = [];
 	}
 	gpt.refreshIntervalSwitch(w);
 
-	var existingAdpTags = Object.assign({}, w.adpTags),
+	var existingAdpTags = Object.assign({}, w.adpushup.adpTags),
 		adpTagsModule = require('./adpTags');
 
 	// Set adpTags if already present else initialise module
-	w.adpTags = existingAdpTags.adpSlots ? existingAdpTags : adpTagsModule;
+	w.adpushup.adpTags = existingAdpTags.adpSlots ? existingAdpTags : adpTagsModule;
 
 	// Merge adpQue with any existing que items if present
-	w.adpTags.que = w.adpTags.que.concat(adpQue);
+	w.adpushup.adpTags.que = w.adpushup.adpTags.que.concat(adpQue).concat(w.adpTags.que);
+	w.adpTags = w.adpushup.adpTags;
 
-	adpTags.processQue();
-	w.adpTags.que.push = function(queFunc) {
-		[].push.call(w.adpTags.que, queFunc);
-		adpTags.processQue();
+	w.adpushup.adpTags.processQue();
+	w.adpushup.adpTags.que.push = function(queFunc) {
+		[].push.call(w.adpushup.adpTags.que, queFunc);
+		w.adpushup.adpTags.processQue();
 	};
 
 	w.pbjs = w.pbjs || {};
@@ -65,7 +65,7 @@ function init(w, d) {
 	w.pbjs.que.push(function() {
 		w.pbjs.onEvent('bidWon', function(bidData) {
 			logger.log('Bid winner decided from prebid auction');
-			var slot = w.adpTags.adpSlots[bidData.adUnitCode];
+			var slot = w.adpushup.adpTags.adpSlots[bidData.adUnitCode];
 			slot.feedback.winner = bidData.bidder;
 			slot.feedback.winningRevenue = bidData.cpm / 1000;
 

@@ -20,6 +20,13 @@ const commonConsts = {
 				zIndex: 1000
 			},
 			PLACEMENT_CSS: {
+				TOP: {
+					top: 0,
+					marginLeft: 'auto',
+					marginRight: 'auto',
+					left: 0,
+					right: 0
+				},
 				BOTTOM: {
 					bottom: 0,
 					marginLeft: 'auto',
