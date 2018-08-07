@@ -12,7 +12,7 @@ class RowColSpan extends React.Component {
 		return (
 			<Row className="rowMargin">
 				<Col sm={5}>
-					<div>{props.label}</div>
+					<div className={props.className}>{props.label}</div>
 				</Col>
 				<Col sm={7}>{props.children}</Col>
 			</Row>
