@@ -7,14 +7,14 @@ block getTitle
 
 block meta
     meta(content="width=device-width,initial-scale=1" name="viewport")
-    
+
 block headCss
     link(href="http://fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic&subset=latin,latin-ext", rel='stylesheet', type='text/css')
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
     style.
-        .sticky-ad-top {
+        .sticky-ad-bottom {
             position: fixed;
-            top: 0;
+            bottom: 0;
             left: 0;
             right: 0;
             margin-left: auto;
@@ -35,6 +35,9 @@ block headCss
         .jumbotron {
             padding-top: 90px;
         }
+        footer {
+            margin-bottom: 90px;
+        }
         @media screen and (max-width: 767px) {
             .desktop {
                 display: none;
@@ -48,11 +51,14 @@ block headCss
             .jumbotron {
                 padding-top: 50px;
             }
+            footer {
+            margin-bottom: 50px;
+        }
         }
 
 block bodyContent
-    .sticky-ad-top.desktop 728 x 90
-    .sticky-ad-top.mobile 300 x 50
+    .sticky-ad-bottom.desktop 728 x 90
+    .sticky-ad-bottom.mobile 300 x 50
     .jumbotron
                                     .container
                                         h2 Mysite.com

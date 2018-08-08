@@ -8,6 +8,9 @@ block getTitle
 block meta
     meta(content="width=device-width,initial-scale=1" name="viewport")
 
+block append headScripts
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.js")
+
 block headCss
     link(href="http://fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic&subset=latin,latin-ext", rel='stylesheet', type='text/css')
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
@@ -15,10 +18,10 @@ block headCss
         html, body {
             overflow-x: hidden;
         }
-        html, body, .main-wrapper, .container-fluid, .sidebar, .demo-content, .main-wrapper > .col-sm-3, .main-wrapper > .col-sm-9 {
+        html, body, .main-wrapper, .container-fluid, .sidebar, .demo-content, .main-wrapper > .col-sm-2, .main-wrapper > .col-sm-10 {
             height: 100%;
         }
-        .main-wrapper > .col-sm-3, .main-wrapper > .col-sm-9 {
+        .main-wrapper > .col-sm-2, .main-wrapper > .col-sm-10 {
             padding: 0;
         }
         .sidebar {
@@ -45,9 +48,12 @@ block headCss
             border-bottom: 2px solid #8a2424;
         }
         .demo-wraper {
-            height: 100%;
-            padding: 15px 30px;
+            min-height: 100%;
+            padding: 15px;
             background-color: #f3f5f7;
+        }
+        .demo-content {
+            display: none;
         }
         .demo-content > h2 {
             margin: 0 0 15px;
@@ -64,39 +70,49 @@ block headCss
             margin-top: -2px;
             border-bottom-left-radius: 6px;
             border-bottom-right-radius: 6px;
-            height: 75%;
-            padding: 30px;
             overflow-y: scroll;
             overflow-x: hidden;
             background-color: #fff;
         }
         .frame > .content {
-            font-weight: 300;
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            padding-top: 25px;
+            height: 0;
         }
-
-block append headScripts
+        .frame > .content > iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        li.format {
+            cursor: pointer;
+        }
 
 block bodyContent
     .container-fluid
         .row.main-wrapper
-            .col-sm-3
+            .col-sm-2
                 .sidebar
                     ul
                         li.header Formats
                         li  
-                            span.title Sticky
+                            span Sticky
                             ul
-                                li Top
-                                li Bottom
-                                li Left
-                                li Right
+                                li.format(data-type="sticky-top") Top
+                                li.format(data-type="sticky-bottom") Bottom
+                                li.format(data-type="sticky-left") Left
+                                li.format(data-type="sticky-right") Right
                         li 
-                            span.title Docked
+                            span.format Docked
                         li 
-                            span.title Native
+                            span.format Native
                         li 
-                            span.title In-image
-            .col-sm-9
+                            span.format In-image
+            .col-sm-10
                 .demo-wraper
                     .demo-content#sticky-top
                         h2 Sticky Top
@@ -105,6 +121,35 @@ block bodyContent
                         .frame
                             .content
                                 iframe(src="/interactive-ads-demo/sticky-top")
+                    .demo-content#sticky-bottom
+                        h2 Sticky Bottom
+                        p Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi id odit quisquam ratione minima? Aliquid fugiat fugit repellendus est recusandae, mollitia odio voluptatibus qui vel voluptates, quisquam eligendi itaque provident.
+                        img(src="http://localhost:8080/assets/images/browser-topbar.png" class="img-responsive")
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-bottom")
+                    .demo-content#sticky-left
+                        h2 Sticky Left
+                        p Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi id odit quisquam ratione minima? Aliquid fugiat fugit repellendus est recusandae, mollitia odio voluptatibus qui vel voluptates, quisquam eligendi itaque provident.
+                        img(src="http://localhost:8080/assets/images/browser-topbar.png" class="img-responsive")
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-left")
+                    .demo-content#sticky-right
+                        h2 Sticky Right
+                        p Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi id odit quisquam ratione minima? Aliquid fugiat fugit repellendus est recusandae, mollitia odio voluptatibus qui vel voluptates, quisquam eligendi itaque provident.
+                        img(src="http://localhost:8080/assets/images/browser-topbar.png" class="img-responsive")
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-right")
+    script.
+        $(document).ready(function() {
+            $('.format').on('click', function() {
+                var format = $(this).attr('data-type');
+                $('.demo-content').hide();
+                $('#'+format).fadeIn();
+            });
+        });
 
 
 

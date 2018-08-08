@@ -360,6 +360,12 @@ router
 		switch (type) {
 			case 'sticky-top':
 				return res.render('interactiveAdsDemo/stickyTop');
+			case 'sticky-bottom':
+				return res.render('interactiveAdsDemo/stickyBottom');
+			case 'sticky-left':
+				return res.render('interactiveAdsDemo/stickyLeft');
+			case 'sticky-right':
+				return res.render('interactiveAdsDemo/stickyRight');
 			default:
 				return res.render('interactiveAdsDemo');
 		}
