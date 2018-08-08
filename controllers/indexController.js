@@ -357,6 +357,22 @@ router
 	.get('/interactive-ads-demo', (req, res) => {
 		return res.render('interactiveAdsDemo');
 	})
+	.get('/interactive-ads-demo-sticky/:type', (req, res) => {
+		const { type } = req.params;
+
+		switch (type) {
+			case 'top':
+				return res.render('interactiveAdsDemo/stickyTop');
+			case 'bottom':
+				return res.render('interactiveAdsDemo/stickyBottom');
+			case 'left':
+				return res.render('interactiveAdsDemo/stickyLeft');
+			case 'right':
+				return res.render('interactiveAdsDemo/stickyRight');
+			default:
+				return res.send('Some error occurred!');
+		}
+	})
 	.post('/completeInfo', function(req, res) {
 		const email = req.body && req.body.email ? req.body.email : false,
 			key = req.body && req.body.key ? req.body.key : false;
