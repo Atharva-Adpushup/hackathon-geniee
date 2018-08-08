@@ -5,11 +5,110 @@ extends layout/base
 block getTitle
     - var titleVar = 'AdPushup Interactive Ads Demo'
 
+block meta
+    meta(content="width=device-width,initial-scale=1" name="viewport")
+
 block headCss
     link(href="http://fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic&subset=latin,latin-ext", rel='stylesheet', type='text/css')
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
+    style.
+        html, body {
+            overflow-x: hidden;
+        }
+        html, body, .main-wrapper, .container-fluid, .sidebar, .demo-content, .main-wrapper > .col-sm-3, .main-wrapper > .col-sm-9 {
+            height: 100%;
+        }
+        .main-wrapper > .col-sm-3, .main-wrapper > .col-sm-9 {
+            padding: 0;
+        }
+        .sidebar {
+            background-color: #eb575c;
+        }
+        .sidebar ul {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        .sidebar ul ul {
+            margin-left: 10px;
+            list-style: none;
+        }
+        .sidebar ul li {
+            color: #8a2424;
+            padding: 15px 15px 0;
+            font-size: 18px;
+        }
+        .sidebar ul li.header {
+            font-weight: 700;
+            font-size: 2em;
+            padding: 15px;
+            border-bottom: 2px solid #8a2424;
+        }
+        .demo-wraper {
+            height: 100%;
+            padding: 15px 30px;
+            background-color: #f3f5f7;
+        }
+        .demo-content > h2 {
+            margin: 0 0 15px;
+            color: #222;
+        }
+        .demo-content > p {
+            margin-bottom: 15px;
+            color: #444;
+            font-weight: 300;
+            font-size: 16px;
+        }
+        .demo-content > .frame {
+            border: 2px solid #e6e6e6;
+            margin-top: -2px;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            height: 75%;
+            padding: 30px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            background-color: #fff;
+        }
+        .frame > .content {
+            font-weight: 300;
+        }
 
 block append headScripts
 
 block bodyContent
+    .container-fluid
+        .row.main-wrapper
+            .col-sm-3
+                .sidebar
+                    ul
+                        li.header Formats
+                        li  
+                            span.title Sticky
+                            ul
+                                li Top
+                                li Bottom
+                                li Left
+                                li Right
+                        li 
+                            span.title Docked
+                        li 
+                            span.title Native
+                        li 
+                            span.title In-image
+            .col-sm-9
+                .demo-wraper
+                    .demo-content#sticky-top
+                        h2 Sticky Top
+                        p Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi id odit quisquam ratione minima? Aliquid fugiat fugit repellendus est recusandae, mollitia odio voluptatibus qui vel voluptates, quisquam eligendi itaque provident.
+                        img(src="http://localhost:8080/assets/images/browser-topbar.png" class="img-responsive")
+                        .frame
+                            .content
+                                include demos/withSidebar
+
+
+
+                            
+
     
    
