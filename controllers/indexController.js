@@ -354,6 +354,9 @@ router
 	.get('/403', function(req, res) {
 		res.render('403');
 	})
+	.get('/interactive-ads-demo', (req, res) => {
+		return res.render('interactiveAdsDemo');
+	})
 	.post('/completeInfo', function(req, res) {
 		const email = req.body && req.body.email ? req.body.email : false,
 			key = req.body && req.body.key ? req.body.key : false;
