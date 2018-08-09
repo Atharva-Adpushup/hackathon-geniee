@@ -22,6 +22,7 @@ module.exports = function(site, externalData = {}) {
 	var paramConfig = {
 			siteId: site.get('siteId')
 		},
+		noop = 'function() {}',
 		isExternalRequest = externalData && Object.keys(externalData).length && externalData.externalRequest,
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.min.js'),
