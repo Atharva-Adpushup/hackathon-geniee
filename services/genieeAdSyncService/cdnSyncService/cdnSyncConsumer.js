@@ -267,16 +267,18 @@ module.exports = function(site, externalData = {}) {
 				});
 		};
 
-	return getFinalConfig
-		.then(function(fileConfig) {
-			return isExternalRequest ? fileConfig.default : uploadJS(fileConfig);
-		})
-		.then(writeTempFile)
-		.finally(function(jsFile) {
-			if (ftp.getConnectionStatus() === 'connected') {
-				ftp.end();
-			} else {
-				return jsFile;
-			}
-		});
+	return Promise.join(getFinalConfig(), fileConfig => {
+		function processing() {
+			return isExternalRequest ? Promise.resolve(fileConfig.uncompressed) : uploadJS(fileConfig);
+		}
+		return processing()
+			.then(writeTempFile)
+			.finally(function(jsFile) {
+				if (ftp.getConnectionStatus() === 'connected') {
+					ftp.end();
+				} else {
+					return fileConfig.default;
+				}
+			});
+	});
 };
