@@ -261,9 +261,10 @@ module.exports = function(site, externalData = {}) {
 				.then(function() {
 					return Promise.resolve(fileConfig.uncompressed);
 				});
-		};
+		},
+		getFinalConfigWrapper = () => getFinalConfig.then(fileConfig => finalConfig);
 
-	return Promise.join(getFinalConfig(), fileConfig => {
+	return Promise.join(getFinalConfigWrapper(), fileConfig => {
 		function processing() {
 			return isExternalRequest ? Promise.resolve(fileConfig.uncompressed) : uploadJS(fileConfig);
 		}
