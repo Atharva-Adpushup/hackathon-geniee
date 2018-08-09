@@ -12,21 +12,7 @@ block headCss
     link(href="http://fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic&subset=latin,latin-ext", rel='stylesheet', type='text/css')
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
     style.
-        .docked-ad {
-            width: 160px;
-            height: 600px;
-            background: #3ed6f9;
-            color: #333;
-            font-size: 1.8em;
-            font-weight: 300;
-            text-align: center;
-            padding: 25px;
-        }
-        @media screen and (max-width: 767px) {
-            .docked-ad {
-                display: none;
-            }
-        }
+        .docked-ad{width:160px;height:600px;background:#3ed6f9;color:#333;font-size:1.8em;font-weight:300;text-align:center;padding:25px}@media screen and (max-width:767px){.docked-ad{display:none}}
 
 block bodyContent
     .jumbotron
@@ -130,21 +116,7 @@ block bodyContent
                                         p © 2018 Mysite Inc.
 
     script.
-        $(document).ready(function() {
-            var offset = null;
-            $(window).scroll(function(e){ 
-                var elOffset = $('.docked-ad').offset().top;
-                    offset = !offset ? elOffset : offset;
-                
-                if ($(this).scrollTop() > offset){ 
-                    $('.docked-ad').css({'position': 'fixed', 'top': '0px'}); 
-                }
-                if ($(this).scrollTop() < offset)
-                {
-                    $('.docked-ad').css({'position': 'static', 'top': '0px'}); 
-                } 
-            });
-        });
+        $(document).ready(function(){var o=null;$(window).scroll(function(d){var s=$(".docked-ad").offset().top;o=o||s,$(this).scrollTop()>o&&$(".docked-ad").css({position:"fixed",top:"0px"}),$(this).scrollTop()<o&&$(".docked-ad").css({position:"static",top:"0px"})})});
 
 
 
