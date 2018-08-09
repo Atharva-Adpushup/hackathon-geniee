@@ -473,7 +473,12 @@ router
 					siteId: siteId
 				});
 			})
-			.then(apJs => res.send(apJs))
+			.then(apJs => {
+				return res
+					.status(200)
+					.set('Content-Type', 'application/javascript')
+					.send(apJs);
+			})
 			.catch(err => {
 				debugger;
 			});
