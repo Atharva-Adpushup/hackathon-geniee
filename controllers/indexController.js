@@ -366,6 +366,8 @@ router
 				return res.render('interactiveAdsDemo/stickyLeft');
 			case 'sticky-right':
 				return res.render('interactiveAdsDemo/stickyRight');
+			case 'docked':
+				return res.render('interactiveAdsDemo/docked');
 			default:
 				return res.render('interactiveAdsDemo');
 		}

@@ -106,12 +106,7 @@ block bodyContent
                                 li.format(data-type="sticky-bottom") Bottom
                                 li.format(data-type="sticky-left") Left
                                 li.format(data-type="sticky-right") Right
-                        li 
-                            span.format Docked
-                        li 
-                            span.format Native
-                        li 
-                            span.format In-image
+                        li.format(data-type="docked") Docked
             .col-sm-10
                 .demo-wraper
                     .demo-content#sticky-top
@@ -142,6 +137,13 @@ block bodyContent
                         .frame
                             .content
                                 iframe(src="/interactive-ads-demo/sticky-right")
+                    .demo-content#docked
+                        h2 Docked
+                        p Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi id odit quisquam ratione minima? Aliquid fugiat fugit repellendus est recusandae, mollitia odio voluptatibus qui vel voluptates, quisquam eligendi itaque provident.
+                        img(src="http://localhost:8080/assets/images/browser-topbar.png" class="img-responsive")
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/docked")
     script.
         $(document).ready(function() {
             $('.format').on('click', function() {
