@@ -231,9 +231,11 @@ module.exports = function(site, externalData = {}) {
 			}
 		),
 		writeTempFile = function(jsFile) {
-			return mkdirpAsync(tempDestPath).then(function() {
-				return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);
-			});
+			return mkdirpAsync(tempDestPath)
+				.then(function() {
+					return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);
+				})
+				.then(() => jsFile);
 		},
 		cwd = function() {
 			return ftp.cwd('/' + site.get('siteId')).catch(function() {
@@ -262,7 +264,7 @@ module.exports = function(site, externalData = {}) {
 					return Promise.resolve(fileConfig.uncompressed);
 				});
 		},
-		getFinalConfigWrapper = () => getFinalConfig.then(fileConfig => finalConfig);
+		getFinalConfigWrapper = () => getFinalConfig.then(fileConfig => fileConfig);
 
 	return Promise.join(getFinalConfigWrapper(), fileConfig => {
 		function processing() {
