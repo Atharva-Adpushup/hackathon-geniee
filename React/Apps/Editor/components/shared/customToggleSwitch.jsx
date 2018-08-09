@@ -37,8 +37,14 @@ class customToggleSwitch extends React.Component {
 		}
 	}
 
-	renderToggleSwitch() {
-		let rootClassName = this.props.size === 's' ? 'toggle toggleSizeSmall' : 'toggle';
+	renderToggleSwitch(options) {
+		let rootClassName = this.props.size === 's' ? 'toggle toggleSizeSmall' : 'toggle',
+			isNoLabelLayout = !!(options && options.nolabel),
+			leftAlignedStyles = isNoLabelLayout
+				? {
+						justifyContent: 'flex-start'
+				  }
+				: null;
 
 		rootClassName += this.props.disabled ? ' toggle--disabled' : '';
 
@@ -51,7 +57,7 @@ class customToggleSwitch extends React.Component {
 					checked={this.state.value}
 					onChange={this.setValue.bind(this)}
 				/>
-				<label htmlFor={this.props.id}>
+				<label style={leftAlignedStyles} htmlFor={this.props.id}>
 					<div className="toggleSwitch" data-on={this.props.on} data-off={this.props.off} />
 				</label>
 			</div>
@@ -104,34 +110,45 @@ class customToggleSwitch extends React.Component {
 	render() {
 		// We create variables that states how the input should be marked.
 		// Should it be marked as valid? Should it be marked as required?
-		const options = {
-			errorClassName: 'clearfix',
-			layout: this.props.layout.toLowerCase() ? this.props.layout.toLowerCase() : 'horizontal',
-			layoutClassName: 'form-group',
-			defaultLayout: this.props.defaultLayout,
-			classNamesProps: this.props.className && this.props.className.length > 0 ? this.props.className : '',
-			labelSize: this.props.labelSize,
-			componentSize: this.props.componentSize,
-			customComponentClass: this.props.customComponentClass,
-			labelBold: this.props.labelBold
-		};
+		const props = this.props,
+			options = {
+				errorClassName: 'clearfix',
+				// layout property options: 'horizontal', 'vertical', 'nolabel'
+				layout: props.layout.toLowerCase() ? props.layout.toLowerCase() : 'horizontal',
+				layoutClassName: 'form-group',
+				defaultLayout: props.defaultLayout,
+				classNamesProps: props.className && props.className.length > 0 ? props.className : '',
+				labelSize: props.labelSize,
+				componentSize: props.componentSize,
+				customComponentClass: props.customComponentClass,
+				labelBold: props.labelBold
+			},
+			renderBlocks = [],
+			isLayoutProp = !!options.layout,
+			isLabelTextProp = !!props.labelText,
+			isLayoutVertical = !!(isLayoutProp && options.layout === 'vertical'),
+			isLayoutHorizontal = !!(isLayoutProp && options.layout === 'horizontal'),
+			isLayoutNoLabel = !!(isLayoutProp && options.layout === 'nolabel' && !isLabelTextProp);
 
-		if (options.layout === 'vertical') {
-			options.layoutClassName += ' form-group--vertical';
-		} else if (options.layout === 'horizontal') {
-			options.layoutClassName += ' form-group--horizontal';
+		if (isLayoutVertical) {
+			options.layoutClassName += ` form-group--vertical ${options.classNamesProps}`;
+			renderBlocks.push(
+				<Row key={props.name} className={options.layoutClassName}>
+					{this.renderVerticalLayout(options)}
+				</Row>
+			);
+		} else if (isLayoutHorizontal) {
+			options.layoutClassName += ` form-group--horizontal ${options.classNamesProps}`;
+			renderBlocks.push(
+				<Row key={props.name} className={options.layoutClassName}>
+					{this.renderHorizontalLayout(options)}
+				</Row>
+			);
+		} else if (isLayoutNoLabel) {
+			renderBlocks.push(this.renderToggleSwitch({ nolabel: true }));
 		}
 
-		// Concatenate props class names
-		options.layoutClassName += ` ${options.classNamesProps}`;
-
-		return (
-			<Row key={this.props.name} className={options.layoutClassName}>
-				{options.layout === 'vertical'
-					? this.renderVerticalLayout(options)
-					: this.renderHorizontalLayout(options)}
-			</Row>
-		);
+		return <div>{renderBlocks}</div>;
 	}
 }
 

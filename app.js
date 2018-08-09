@@ -19,6 +19,7 @@ var express = require('express'),
 	woodlotEvents = require('woodlot').events,
 	uuid = require('uuid'),
 	locale = require('locale'),
+	helmet = require('helmet'),
 	// couchbase store
 	couchbaseStore = new CouchbaseStore({
 		bucket: config.couchBase.DEFAULT_BUCKET,
@@ -42,7 +43,7 @@ if (process.env.NODE_ENV === consts.environment.production) {
 app.use(compression());
 // Locale support
 app.use(locale(languageSupport));
-
+app.use(helmet());
 process.on('uncaughtException', function(err) {
 	// handle the error safely
 	console.log(err);
@@ -141,9 +142,10 @@ couchBaseService
 			app.locals.partner = req.session.partner ? req.session.partner : null;
 			// unSavedSite, template local for showing unsaved site
 			// prefilled in 'Add a site' modal's url field
-			app.locals.unSavedSite = Array.isArray(req.session.unSavedSite) && req.session.unSavedSite.length > 0
-				? req.session.unSavedSite
-				: '';
+			app.locals.unSavedSite =
+				Array.isArray(req.session.unSavedSite) && req.session.unSavedSite.length > 0
+					? req.session.unSavedSite
+					: '';
 			next();
 		});
 		app.locals.utils = utils;

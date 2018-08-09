@@ -182,7 +182,8 @@ const status = {
 		CLOSE_VARIATION_PANEL: 'CLOSE_VARIATION_PANEL',
 		UPDATE_CONTENT_SELECTOR: 'UPDATE_CONTENT_SELECTOR',
 		SAVE_KEY_VALUES: 'SAVE_KEY_VALUES',
-		SAVE_PERSONALIZATION_INFO: 'SAVE_PERSONALIZATION_INFO'
+		SAVE_PERSONALIZATION_INFO: 'SAVE_PERSONALIZATION_INFO',
+		DISABLE_VARIATION: 'DISABLE_VARIATION'
 	},
 	sectionActions = {
 		CREATE_SECTION: 'CREATE_SECTION',
@@ -343,6 +344,7 @@ const status = {
 		sizes: {
 			DESKTOP: {
 				sticky: {
+					top: ['300x50', '300x100', '320x100', '728x90'],
 					bottom: ['300x50', '300x100', '320x100', '728x90'],
 					left: ['160x600', '336x280', '300x250', '300x600', '300x50', '120x600'],
 					right: ['160x600', '336x280', '300x250', '300x600', '300x50', '120x600']
@@ -353,6 +355,7 @@ const status = {
 			},
 			MOBILE: {
 				sticky: {
+					top: ['336x280', '300x250', '300x50', '320x100', '300x100', '320x50'],
 					bottom: ['336x280', '300x250', '300x50', '320x100', '300x100', '320x50']
 				},
 				video: {
@@ -361,9 +364,9 @@ const status = {
 			}
 		},
 		types: {
-			DESKTOP: ['stickyBottom', 'stickyLeft', 'stickyRight', 'videoCustom'],
-			MOBILE: ['stickyBottom', 'videoCustom'],
-			TABLET: ['stickyBottom', 'stickyLeft', 'stickyRight', 'videoCustom']
+			DESKTOP: ['stickyTop', 'stickyBottom', 'stickyLeft', 'stickyRight'],
+			MOBILE: ['stickyTop', 'stickyBottom'],
+			TABLET: ['stickyTop', 'stickyBottom', 'stickyLeft', 'stickyRight']
 		}
 	},
 	personalizationTypes = ['not', 'in'],

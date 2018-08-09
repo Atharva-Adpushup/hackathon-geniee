@@ -1,7 +1,6 @@
 const commonConsts = {
-	selectors: {
+	pagegroupSelectors: {
 		breadcrumb: { alias: 'Breadcrumb', value: 'breadcrumb', inputType: 'text', dataType: 'string' },
-		footer: { alias: 'Footer', value: 'footer', inputType: 'text', dataType: 'string' },
 		headlineTitle: { alias: 'Headline Title', value: 'headlineTitle', inputType: 'text', dataType: 'string' },
 		headlineSubtitle: {
 			alias: 'Headline Subtitle',
@@ -26,14 +25,17 @@ const commonConsts = {
 		afterContent: { alias: 'After Content', value: 'afterContent', inputType: 'text', dataType: 'string' },
 		logo: { alias: 'Logo', value: 'logo', inputType: 'text', dataType: 'string' }
 	},
-	socialApps: {
-		facebook: { alias: 'Facebook', value: 'facebook' },
-		twitter: { alias: 'Twitter', value: 'twitter' },
-		linkedin: { alias: 'Linkedin', value: 'linkedin' },
-		gmail: { alias: 'Gmail', value: 'gmail' },
-		whatsapp: { alias: 'Whatsapp', value: 'whatsapp' },
-		gplus: { alias: 'GPlus', value: 'gplus' }
+	siteSelectors: {
+		footer: { alias: 'Footer', value: 'footer', inputType: 'text', dataType: 'string' }
 	},
+	socialApps: [
+		{ label: 'facebook', value: 'facebook' },
+		{ label: 'twitter', value: 'twitter' },
+		{ label: 'linkedin', value: 'linkedin' },
+		{ label: 'gmail', value: 'gmail' },
+		{ label: 'whatsapp', value: 'whatsapp' },
+		{ label: 'gplus', value: 'gplus' }
+	],
 	ads: {
 		type: {
 			adsense: {
@@ -59,8 +61,25 @@ const commonConsts = {
 	},
 	analytics: {
 		google_analytics: {
-			ua: { alias: 'UA Id', value: 'ua' }
+			ua: { alias: 'UA Id', name: 'ua' }
 		}
 	}
+	// analytics: [
+	// 	{
+	// 		value: 'google_analytics',
+	// 		label: 'Google Analytics',
+	// 		fields: [{ alias: 'UA Id1', name: 'ua' }]
+	// 	},
+	// 	{
+	// 		value: 'google_analytics1',
+	// 		label: 'Google Analytics',
+	// 		fields: [{ alias: 'UA Id2', name: 'ua' }]
+	// 	},
+	// 	{
+	// 		value: 'google_analytics2',
+	// 		label: 'Google Analytics',
+	// 		fields: [{ alias: 'UA Id3', name: 'ua' }]
+	// 	}
+	// ]
 };
 export default commonConsts;

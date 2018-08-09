@@ -2,9 +2,9 @@ var utils = require('../libs/utils');
 module.exports = {
 	ver: 1.0,
 	// eslint-disable-next-line no-undef
-	siteId: _xxxxx_,
+	siteId: __SITE_ID__,
 	// eslint-disable-next-line no-undef
-	packetId: utils.uniqueId(_xxxxx_),
+	packetId: utils.uniqueId(__SITE_ID__),
 	feedbackUrl: '//e3.adpushup.com/ApexWebService/feedback',
 	heartBeatMinInterval: 30000,
 	heartBeatStartDelay: 2000,

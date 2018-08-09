@@ -46,9 +46,22 @@ class VariationPanel extends React.Component {
 	}
 
 	render() {
-		const { variation, channelId, sections, ui, reporting, onUpdateContentSelector } = this.props,
+		const {
+				variation,
+				channelId,
+				sections,
+				ui,
+				reporting,
+				onUpdateContentSelector,
+				disabledVariationsCount
+			} = this.props,
 			// Geniee UI access before/after js feature visibility condition
-			isBeforeAfterJSHide = !!(window.isGeniee && window.gcfg && window.gcfg.hasOwnProperty('ubajf') && !window.gcfg.ubajf);
+			isBeforeAfterJSHide = !!(
+				window.isGeniee &&
+				window.gcfg &&
+				window.gcfg.hasOwnProperty('ubajf') &&
+				!window.gcfg.ubajf
+			);
 
 		return (
 			<div className="variation-settings">
@@ -68,6 +81,7 @@ class VariationPanel extends React.Component {
 							onUpdateContentSelector={onUpdateContentSelector}
 							channelId={channelId}
 							variation={variation}
+							disabledVariationsCount={disabledVariationsCount}
 						/>
 					</div>
 					<div tabTitle="Add Incontent Variation">
