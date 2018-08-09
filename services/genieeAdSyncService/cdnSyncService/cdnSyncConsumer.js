@@ -231,13 +231,9 @@ module.exports = function(site, externalData = {}) {
 			}
 		),
 		writeTempFile = function(jsFile) {
-			return mkdirpAsync(tempDestPath)
-				.then(function() {
-					return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);
-				})
-				.then(function() {
-					return jsFile;
-				});
+			return mkdirpAsync(tempDestPath).then(function() {
+				return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);
+			});
 		},
 		cwd = function() {
 			return ftp.cwd('/' + site.get('siteId')).catch(function() {
@@ -273,7 +269,7 @@ module.exports = function(site, externalData = {}) {
 		}
 		return processing()
 			.then(writeTempFile)
-			.finally(function(jsFile) {
+			.finally(() => {
 				if (ftp.getConnectionStatus() === 'connected') {
 					ftp.end();
 				} else {
