@@ -462,7 +462,8 @@ router
 	})
 	.get('/generateApConfig', function(req, res) {
 		let siteId = 35235,
-			country = 'US';
+			country = 'US',
+			noCountry = false;
 
 		return siteModel
 			.getSiteById(siteId)
@@ -480,7 +481,8 @@ router
 					.send(apJs);
 			})
 			.catch(err => {
-				debugger;
+				console.log(err);
+				return res.sendStatus(400);
 			});
 	});
 
