@@ -278,6 +278,12 @@ module.exports = function(site, externalData = {}) {
 				} else {
 					return fileConfig.default;
 				}
+			})
+			.catch(err => {
+				if (ftp && ftp.getConnectionStatus() === 'connected') {
+					ftp.end();
+				}
+				return Promise.reject(err);
 			});
 	});
 };
