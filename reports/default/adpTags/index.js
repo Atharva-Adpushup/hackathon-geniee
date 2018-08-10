@@ -6,7 +6,8 @@ const Promise = require('bluebird'),
 		fetchVariationQuery,
 		fetchPagegroupQuery,
 		liveSitesQuery,
-		fetchMediationQuery
+		fetchMediationQuery,
+		fetchMediationQueryNoCountry
 	} = require('./constants'),
 	queryHelper = require('./queryHelper');
 
@@ -224,20 +225,13 @@ function fetchMediationData(params) {
 				type: 'NVARCHAR',
 				value: value
 			};
-		});
-	pagegroupString = pagegroupString.slice(0, -1);
-	return executeQuery({
-		query: fetchMediationQuery.replace('__pagegroup__', pagegroupString),
-		inputParameters: [
+		}),
+		query = params.noCountry ? fetchMediationQueryNoCountry : fetchMediationQuery,
+		inputParameters = [
 			{
 				name: '__siteid__',
 				type: 'INT',
 				value: params.siteId
-			},
-			{
-				name: '__country_code_alpha2',
-				type: 'NVARCHAR',
-				value: params.country
 			},
 			{
 				name: '__from__',
@@ -250,7 +244,23 @@ function fetchMediationData(params) {
 				value: params.to
 			},
 			...pagegroupsParams
-		]
+		];
+
+	inputParameters = params.noCountry
+		? inputParameters
+		: [
+				...inputParameters,
+				{
+					name: '__country_code_alpha2',
+					type: 'NVARCHAR',
+					value: params.country
+				}
+		  ];
+
+	pagegroupString = pagegroupString.slice(0, -1);
+	return executeQuery({
+		query: query.replace('__pagegroup__', pagegroupString),
+		inputParameters: inputParameters
 	});
 }
 

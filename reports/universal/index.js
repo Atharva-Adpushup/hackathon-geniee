@@ -87,7 +87,8 @@ function getMediationData(site, data) {
 		from: moment()
 			.subtract(3, 'days')
 			.format('YYYY-MM-DD'),
-		to: moment().format('YYYY-MM-DD')
+		to: moment().format('YYYY-MM-DD'),
+		noCountry: data.noCountry || false
 	};
 	return getPagegroupNames(site.get('cmsInfo'))
 		.then(pagegroups =>

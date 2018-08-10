@@ -285,6 +285,22 @@ const fetchSectionQuery = `SELECT axsid, sec_key, section_md5 FROM ApexSection w
 			a.siteid, 
 			c.variation_id,
 			b.NAME`,
+	fetchMediationQueryNoCountry = `SELECT Sum(a.total_requests) AS total_requests,a.report_date,a.siteid,Sum(a.total_revenue)
+			AS total_revenue,b.NAME,c.variation_id
+			FROM MediationNetworkReport a,
+			apexpagegroup b, 
+			apexvariation c,
+			country d
+			WHERE a.axpgid = b.axpgid 
+				AND a.axvid = c.axvid 
+				AND a.cid = d.cid
+				AND a.report_date BETWEEN @__from__ AND @__to__ 
+				AND a.siteid = @__siteid__ 
+				AND b.NAME IN (__pagegroup__) 
+			GROUP  BY a.report_date,
+					a.siteid, 
+					c.variation_id,
+					b.NAME`,
 	liveSitesQuery = `EXEC GetActiveSites @__from__,@__to__,@__threshold__`;
 
 const schema = {
@@ -412,6 +428,7 @@ module.exports = {
 	fetchVariationQuery,
 	fetchPagegroupQuery,
 	fetchMediationQuery,
+	fetchMediationQueryNoCountry,
 	SITE_TOP_URLS,
 	SITE_MODE_WISE_TOP_URLS,
 	SITE_DEVICE_WISE_REVENUE_CONTRIBUTION,

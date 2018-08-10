@@ -272,7 +272,7 @@ module.exports = function(site, externalData = {}) {
 		}
 		return processing()
 			.then(writeTempFile)
-			.finally(() => {
+			.then(() => {
 				if (ftp.getConnectionStatus() === 'connected') {
 					ftp.end();
 				} else {
