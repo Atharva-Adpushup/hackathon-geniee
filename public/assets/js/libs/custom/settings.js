@@ -102,6 +102,7 @@ $(document).ready(function() {
 					);
 				} else {
 					var autoOpt = this.parseFormData(formValues, 'other').autoOptimise ? true : false,
+						poweredByBanner = this.parseFormData(formValues, 'other').poweredByBanner ? true : false,
 						pageGroupPattern = JSON.stringify(parsedPageGroups),
 						otherSettings = JSON.stringify(this.parseFormData(formValues, 'other')),
 						gdprCompliance = this.parseFormData(formValues, 'other').gdprCompliance ? true : false,
@@ -116,6 +117,7 @@ $(document).ready(function() {
 							pageGroupPattern: pageGroupPattern,
 							otherSettings: otherSettings,
 							autoOptimise: autoOpt,
+							poweredByBanner: poweredByBanner,
 							gdprCompliance: gdprCompliance,
 							cookieControlConfig: cookieControlConfig,
 							blocklist: JSON.stringify(w.blocklist)

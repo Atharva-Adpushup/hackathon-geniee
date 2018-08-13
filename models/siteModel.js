@@ -385,6 +385,7 @@ function apiModule() {
 						? parseInt(otherSettings.adpushupPercentage, 10)
 						: commonConsts.apConfigDefaults.adpushupPercentage,
 					autoOptimise: json.settings.autoOptimise === 'false' ? false : true,
+					poweredByBanner: json.settings.poweredByBanner === 'false' ? false : true,
 					blocklist: blocklist.length ? blocklist : '',
 					isAdPushupControlWithPartnerSSP: !!site.get('apConfigs').isAdPushupControlWithPartnerSSP
 						? site.get('apConfigs').isAdPushupControlWithPartnerSSP
@@ -483,25 +484,21 @@ function apiModule() {
 			}
 
 			function getApexPageGroups(pageGroups) {
-				var computedPageGroups = _
-					.uniq(
-						_.map(pageGroups, function(pageGroup) {
-							return getVariationFreeApexPageGroup(pageGroup);
-						})
-					)
-					.sort();
+				var computedPageGroups = _.uniq(
+					_.map(pageGroups, function(pageGroup) {
+						return getVariationFreeApexPageGroup(pageGroup);
+					})
+				).sort();
 
 				return computedPageGroups;
 			}
 
 			return API.getSiteById(siteId).then(function(site) {
-				var pageGroups = _
-					.uniq(
-						_.map(site.get('channels'), function(val) {
-							return val.split(':')[1];
-						})
-					)
-					.sort();
+				var pageGroups = _.uniq(
+					_.map(site.get('channels'), function(val) {
+						return val.split(':')[1];
+					})
+				).sort();
 
 				if ('isApex' in site && site.isApex()) {
 					pageGroups = getApexPageGroups(pageGroups);

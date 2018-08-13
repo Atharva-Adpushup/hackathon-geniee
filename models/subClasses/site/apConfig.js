@@ -7,6 +7,7 @@ var ApConfig = {
 		'xpathWaitTimeout',
 		'adpushupPercentage',
 		'autoOptimise',
+		'poweredByBanner',
 		'blocklist',
 		'isAdPushupControlWithPartnerSSP'
 	],
@@ -18,6 +19,7 @@ var ApConfig = {
 		'xpathWaitTimeout',
 		'adpushupPercentage',
 		'autoOptimise',
+		'poweredByBanner',
 		'blocklist',
 		'isAdPushupControlWithPartnerSSP'
 	],
