@@ -368,6 +368,8 @@ router
 				return res.render('interactiveAdsDemo/stickyRight');
 			case 'docked':
 				return res.render('interactiveAdsDemo/docked');
+			case 'native':
+				return res.render('interactiveAdsDemo/native');
 			default:
 				return res.render('interactiveAdsDemo');
 		}

@@ -33,6 +33,7 @@ block bodyContent
                                 li.format(data-type="sticky-left") Left
                                 li.format(data-type="sticky-right") Right
                         li.format(data-type="docked") Docked
+                        li.format(data-type="native") Native
             .col-sm-10
                 .demo-wraper
                     .demo-message
@@ -96,6 +97,18 @@ block bodyContent
                         .frame
                             .content
                                 iframe(src="/interactive-ads-demo/docked")
+                    .demo-content#native
+                        h2 Native
+                        p.features
+                            label Viewability : 
+                            span 100%
+                            label Availability : 
+                            i.fa.fa-desktop
+                            i.fa.fa-mobile
+                        img(src="/assets/images/browser-topbar.png" class="img-responsive")
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/native")
     script.
         $(document).ready(function(){$(".format").on("click",function(){var t=$(this).attr("data-type");$(".demo-content").hide(),$(".demo-message").hide(),$("#"+t).fadeIn()})});
 
