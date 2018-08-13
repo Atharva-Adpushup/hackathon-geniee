@@ -21,6 +21,17 @@ class Component {
 		}
 	}
 
+	createPoweredByBanner(formatData) {
+		const $banner = $('<a />'),
+			{ POWERED_BY_BANNER } = commonConsts,
+			formatDataCSS = formatData.placement === 'top' ? POWERED_BY_BANNER.CSS.TOP : POWERED_BY_BANNER.CSS.BOTTOM;
+
+		return $banner
+			.attr({ href: POWERED_BY_BANNER.REDIRECT_URL, target: '_blank' })
+			.css({ ...POWERED_BY_BANNER.CSS.COMMON, ...formatDataCSS })
+			.text(POWERED_BY_BANNER.TEXT);
+	}
+
 	render() {
 		const { formatData, width, height, id } = this.interactiveAd;
 		adp.interactiveAds.ads[id] = this.interactiveAd;
@@ -31,6 +42,7 @@ class Component {
 
 		let css = { width, height },
 			$format = $('<div />'),
+			$banner = null,
 			feedbackOptions = {
 				ads: [id],
 				xpathMiss: [],
@@ -42,6 +54,11 @@ class Component {
 					? adp.config.selectedVariation
 					: commonConsts.MANUAL_ADS.VARIATION
 			};
+
+		if (adp.config.poweredByBanner) {
+			$banner = this.createPoweredByBanner(formatData);
+			$format.append($banner);
+		}
 
 		adp.tracker.add(
 			$format,

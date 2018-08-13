@@ -12,34 +12,35 @@ const commonConsts = {
 		SCRIPT_LOAD: 'scriptLoaded'
 	},
 	DEFAULT_CLASSNAME: 'adp_interactive_ad',
+	POWERED_BY_BANNER: {
+		TEXT: 'Powered by AdPushup',
+		REDIRECT_URL: 'https://www.adpushup.com/',
+		CSS: {
+			COMMON: {
+				color: '#fff',
+				fontFamily: 'sans-serif',
+				fontSize: 10,
+				background: '#eb575c',
+				display: 'inline-block',
+				padding: '2px 6px',
+				position: 'absolute',
+				textDecoration: 'none',
+				left: 0
+			},
+			BOTTOM: {
+				top: -18
+			},
+			TOP: {
+				bottom: -18
+			}
+		}
+	},
 	FORMATS: {
 		STICKY: {
 			NAME: 'sticky',
 			BASE_STYLES: {
 				position: 'fixed',
 				zIndex: 1000
-			},
-			POWERED_BY_BANNER: {
-				TEXT: 'Powered by AdPushup',
-				REDIRECT_URL: 'https://www.adpushup.com/',
-				CSS: {
-					COMMON: {
-						color: '#fff',
-						fontFamily: 'sans-serif',
-						fontSize: 10,
-						background: '#eb575c',
-						display: 'inline-block',
-						padding: '2px 4px',
-						position: 'absolute',
-						left: 0
-					},
-					TOP: {
-						top: -18
-					},
-					BOTTOM: {
-						bottom: -18
-					}
-				}
 			},
 			PLACEMENT_CSS: {
 				TOP: {
