@@ -468,6 +468,7 @@ router
 			noCountry = country ? false : true;
 
 		console.log(country, countryHeader);
+		console.log(req.headers);
 
 		return siteModel
 			.getSiteById(siteId)
