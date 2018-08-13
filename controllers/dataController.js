@@ -1,4 +1,5 @@
 var express = require('express'),
+	_ = require('lodash'),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
@@ -466,6 +467,8 @@ router
 			country = countryHeader ? countryHeader.replace('country_code=', '').replace(/"/g, '') : false,
 			noCountry = country ? false : true;
 
+		console.log(country, countryHeader);
+
 		return siteModel
 			.getSiteById(siteId)
 			.then(site => {
@@ -477,10 +480,11 @@ router
 				});
 			})
 			.then(apJs => {
-				return res
-					.status(200)
-					.set('Content-Type', 'application/javascript')
-					.send(apJs);
+				res.status(200).set('Content-Type', 'application/javascript');
+				_.forEach(req.headers, (value, key) => {
+					res.set(key, value);
+				});
+				return res.send(apJs);
 			})
 			.catch(err => {
 				console.log(err);
