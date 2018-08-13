@@ -460,10 +460,11 @@ router
 		liveSitesService.init();
 		return res.json({ message });
 	})
-	.get('/generateApConfig', function(req, res) {
-		let siteId = 35235,
-			country = 'US',
-			noCountry = false;
+	.get('/adpushup.js', function(req, res) {
+		let siteId = req.baseUrl.replace('/', ''),
+			countryHeader = req.headers['x-cf-geodata'] || false,
+			country = countryHeader ? countryHeader.replace('country_code=', '').replace(/"/g, '') : false,
+			noCountry = country ? false : true;
 
 		return siteModel
 			.getSiteById(siteId)
@@ -471,7 +472,8 @@ router
 				return syncCDNService(site, {
 					externalRequest: true,
 					country: country,
-					siteId: siteId
+					siteId: siteId,
+					noCountry: noCountry
 				});
 			})
 			.then(apJs => {
