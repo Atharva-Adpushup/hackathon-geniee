@@ -481,7 +481,9 @@ router
 				});
 			})
 			.then(apJs => {
-				res.status(200).set('Content-Type', 'application/javascript');
+				res.status(200)
+					.set('Content-Type', 'application/javascript')
+					.set('Cache-Control', 'max-age=3600');
 				_.forEach(req.headers, (value, key) => {
 					res.set(key, value);
 				});
