@@ -19,6 +19,28 @@ const commonConsts = {
 				position: 'fixed',
 				zIndex: 1000
 			},
+			POWERED_BY_BANNER: {
+				TEXT: 'Powered by AdPushup',
+				REDIRECT_URL: 'https://www.adpushup.com/',
+				CSS: {
+					COMMON: {
+						color: '#fff',
+						fontFamily: 'sans-serif',
+						fontSize: 10,
+						background: '#eb575c',
+						display: 'inline-block',
+						padding: '2px 4px',
+						position: 'absolute',
+						left: 0
+					},
+					TOP: {
+						top: -18
+					},
+					BOTTOM: {
+						bottom: -18
+					}
+				}
+			},
 			PLACEMENT_CSS: {
 				TOP: {
 					top: 0,
