@@ -125,7 +125,7 @@ block bodyContent
                                             .col-sm-5
                                                 .input-name "Powered by" banner
                                             .col-sm-7
-                                                input(style="margin-top: 10px;" type="checkbox" id="poweredByBanner" name="poweredByBanner" value=(apConfigs.poweredByBanner ? (apConfigs.poweredByBanner ? "true" : "false") : "false") checked=(apConfigs.poweredByBanner !== undefined ? (apConfigs.poweredByBanner ? "true" : undefined) : undefined))
+                                                input(style="margin-top: 10px;" type="checkbox" id="poweredByBanner" name="poweredByBanner" value=(apConfigs.poweredByBanner ? (apConfigs.poweredByBanner ? "true" : "false") : "false") checked=(apConfigs.poweredByBanner !== undefined ? (apConfigs.poweredByBanner ? "true" : undefined) : "true"))
                                         .row
                                             .col-sm-12#autoOptimiseErr.error-message
                                         .row
