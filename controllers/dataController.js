@@ -482,11 +482,12 @@ router
 			})
 			.then(apJs => {
 				res.status(200)
+					.set('x-cf-geodata', country)
 					.set('Content-Type', 'application/javascript')
 					.set('Cache-Control', 'max-age=3600');
-				_.forEach(req.headers, (value, key) => {
-					res.set(key, value);
-				});
+				// _.forEach(req.headers, (value, key) => {
+				// 	res.set(key, value);
+				// });
 				return res.send(apJs);
 			})
 			.catch(err => {
