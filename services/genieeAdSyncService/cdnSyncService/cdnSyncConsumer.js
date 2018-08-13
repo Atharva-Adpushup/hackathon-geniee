@@ -24,6 +24,7 @@ module.exports = function(site) {
 		},
 		noop = 'function() {}',
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
+		poweredByBanner = !!(site.get('apConfigs') && site.get('apConfigs').poweredByBanner),
 		jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.min.js'),
 		uncompressedJsTplPath = path.join(
 			__dirname,
@@ -68,6 +69,7 @@ module.exports = function(site) {
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
+			apConfigs.poweredByBanner = poweredByBanner ? true : false;
 			apConfigs.siteDomain = site.get('siteDomain');
 			apConfigs.manualModeActive = site.get('isManual') ? site.get('isManual') : false;
 			// Default 'draft' mode is selected if config mode is not present
@@ -137,8 +139,8 @@ module.exports = function(site) {
 							serviceScript = serviceScript.substring(62, serviceScript.trim().length - 1);
 
 							if (
-								serviceConfig && 
-								serviceConfig.hbcf.value && 
+								serviceConfig &&
+								serviceConfig.hbcf.value &&
 								serviceConfig.hbcf.value.hbConfig &&
 								serviceConfig.hbAds.length
 							) {
