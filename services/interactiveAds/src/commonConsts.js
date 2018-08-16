@@ -68,6 +68,10 @@ const commonConsts = {
 				}
 			}
 		},
+		IN_VIEW: {
+			NAME: 'in-view',
+			WAIT_TIMEOUT: 5000
+		},
 		VIDEO: {
 			NAME: 'video',
 			EVENTS: {
