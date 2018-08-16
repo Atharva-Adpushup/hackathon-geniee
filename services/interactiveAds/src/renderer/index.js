@@ -38,8 +38,8 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 
 			case commonConsts.FORMATS.IN_VIEW.NAME:
 				parentNode = createParentNode(value, interactiveAd);
-				const sticky = new Sticky(parentNode, interactiveAd, adCode);
-				return sticky.render();
+				const inView = new InView(parentNode, interactiveAd, adCode);
+				return inView.render();
 
 			// case commonConsts.FORMATS.VIDEO.NAME:
 			// 	const { css } = interactiveAd;
