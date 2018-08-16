@@ -77,6 +77,10 @@ class Component {
 				this.parentNode.append($format.append(this.adCode));
 				break;
 
+			case commonConsts.FORMATS.IN_VIEW:
+				this.initScrollListener();
+				break;
+
 			case commonConsts.FORMATS.VIDEO.NAME:
 				this.createPlayer();
 				break;
