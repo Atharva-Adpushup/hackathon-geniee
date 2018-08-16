@@ -9,6 +9,7 @@ const commonConsts = {
 	},
 	EVENTS: {
 		DOM_LOAD: 'DOMContentLoaded',
+		SCROLL: 'scroll',
 		SCRIPT_LOAD: 'scriptLoaded'
 	},
 	DEFAULT_CLASSNAME: 'adp_interactive_ad',

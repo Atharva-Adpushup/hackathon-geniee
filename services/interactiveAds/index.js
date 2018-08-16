@@ -16,7 +16,12 @@ const processInteractiveAds = interactiveAds => {
 
 			switch (eventName) {
 				case commonConsts.EVENTS.DOM_LOAD:
-					const domLoadEvent = emitter.subscribe(commonConsts.EVENTS.DOM_LOAD, eventData => {
+					emitter.subscribe(commonConsts.EVENTS.DOM_LOAD, eventData => {
+						return renderer(interactiveAd);
+					});
+					break;
+				case commonConsts.EVENTS.SCROLL:
+					emitter.subscribe(commonConsts.EVENTS.SCROLL, eventData => {
 						return renderer(interactiveAd);
 					});
 					break;
