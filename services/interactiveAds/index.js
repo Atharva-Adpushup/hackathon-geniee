@@ -8,10 +8,12 @@ import renderer from './src/renderer/index';
 import config from './src/config';
 
 const processInteractiveAds = interactiveAds => {
-	window.adpushup.interactiveAds = $.extend({}, config, { adsRendered: 0 });
+	const adp = window.adpushup;
+	adp.interactiveAds = $.extend({}, config, { adsRendered: 0 });
 
 	interactiveAds.forEach(interactiveAd => {
 		if (interactiveAd.formatData && interactiveAd.formatData.event) {
+			adp.interactiveAds.ads[interactiveAd.id] = interactiveAd;
 			const eventName = interactiveAd.formatData.event;
 
 			switch (eventName) {
