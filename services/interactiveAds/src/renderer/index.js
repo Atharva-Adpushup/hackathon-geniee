@@ -2,7 +2,6 @@
 
 import commonConsts from '../commonConsts';
 import Sticky from './components/Sticky/index';
-import InView from './components/InView/index';
 //import Video from './components/Video/index';
 import $ from '../$';
 import config from '../config';
@@ -23,7 +22,7 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 
 		return $parentNode;
 	},
-	renderAd = interactiveAd => {
+	renderAd = (interactiveAd, adInstance) => {
 		const type = interactiveAd.formatData.type,
 			adCode = generateAdCode(interactiveAd),
 			{ value: xPath } = interactiveAd.formatData.eventData; // Value is the xPath
@@ -37,9 +36,7 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 				return sticky.render();
 
 			case commonConsts.FORMATS.IN_VIEW.NAME:
-				parentNode = createParentNode(xPath, interactiveAd);
-				const inView = new InView(parentNode, interactiveAd, adCode);
-				return inView.render();
+				return adInstance.initScrollListener(interactiveAd); // Initialise scroll listener from previously created ad instance
 
 			// case commonConsts.FORMATS.VIDEO.NAME:
 			// 	const { css } = interactiveAd;
@@ -48,7 +45,7 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 			// 	return video.render();
 		}
 	},
-	renderer = interactiveAd => {
+	renderer = (interactiveAd, adInstance = null) => {
 		if (interactiveAd && interactiveAd.formatData) {
 			const adp = window.adpushup;
 
@@ -62,7 +59,7 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 					return false;
 				}
 			} else {
-				renderAd(interactiveAd);
+				renderAd(interactiveAd, adInstance);
 			}
 		}
 	};

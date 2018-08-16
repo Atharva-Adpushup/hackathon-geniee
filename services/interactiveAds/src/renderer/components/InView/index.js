@@ -10,7 +10,11 @@ class InView extends Component {
 		this.initScrollListener = this.initScrollListener.bind(this);
 	}
 
-	initScrollListener() {}
+	initScrollListener(interactiveAd) {
+		console.log(interactiveAd);
+		//parentNode = createParentNode(xPath, interactiveAd);
+		// const inView = new InView(parentNode, interactiveAd, adCode);
+	}
 }
 
 export default InView;
