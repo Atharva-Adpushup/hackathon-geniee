@@ -9,6 +9,12 @@ import { ajax } from '../../../common/helpers';
 import AdsSettings from './AdsSettings.jsx';
 import Select from 'react-select';
 import '../style.scss';
+import Codemirror from 'react-codemirror';
+import 'codemirror/addon/display/autorefresh.js';
+import Menu from '../../Editor/components/shared/menu/menu.jsx';
+import MenuItem from '../../Editor/components/shared/menu/menuItem.jsx';
+import MarginEditor from './helper/marginEditor.jsx';
+import ColorEditor from './helper/colorEditor.jsx';
 class PageGroupSettings extends React.Component {
 	constructor(props) {
 		super(props);
@@ -52,50 +58,202 @@ class PageGroupSettings extends React.Component {
 			social,
 			ads,
 			customCSS,
-			afterJs
+			afterJs,
+			isVisible: false
 		};
 	}
+
+	handleButtonClick = () => {
+		console.log('called');
+		this.setState({ isVisible: !this.state.isVisible });
+	};
+
+	onSelectorGlassClick = key => {
+		let selectors = this.state.selectors;
+		selectors[key].isVisible = false;
+		this.setState({
+			selectors
+		});
+	};
+
+	saveSelectorCss = ({ key, css }) => {
+		let selectors = this.state.selectors, selectorCss = selectors[key].css || '';
+		selectorCss += css;
+		selectors[key].css = selectorCss;
+		this.setState({
+			selectors
+		});
+	};
+	onSelectorArrayGlassClick = (key, index) => {
+		let selectors = this.state.selectors;
+		selectors[key][index].isVisible = false;
+		this.setState({
+			selectors
+		});
+	};
+
+	saveSelectorArrayCss = ({ key, css, index }) => {
+		let selectors = this.state.selectors, selectorCss = css;
+		selectors[key][index].css = selectorCss;
+		this.setState({
+			selectors
+		});
+	};
+
+	renderSelector = key => {
+		let selectorConf = commonConsts.pagegroupSelectors,
+			selectorValue = (this.state.selectors[key] && this.state.selectors[key].value) || '';
+		return (
+			<RowColSpan label={selectorConf[key].alias} key={key}>
+				<input
+					onChange={e => {
+						let selectors = this.state.selectors;
+						selectors[e.target.name] = selectors[e.target.name] || {};
+						selectors[e.target.name].value = e.target.value;
+						this.setState({
+							selectors
+						});
+					}}
+					className="blockListInput"
+					type="text"
+					name={key}
+					defaultValue={selectorValue}
+				/>
+				<button
+					className="fa fa-code blockListDelete"
+					type="button"
+					onClick={() => {
+						let selectors = this.state.selectors;
+						selectors[key] = selectors[key] || {};
+						selectors[key].isVisible = true;
+						this.setState({
+							selectors
+						});
+					}}
+				/>
+				{this.state.selectors[key] && this.state.selectors[key].isVisible
+					? <Menu
+							id="channelMenu"
+							position={{ top: 43 }}
+							arrow="none"
+							onGlassClick={() => this.onSelectorGlassClick(key)}
+						>
+							<MenuItem icon={'fa fa-th'} contentHeading="" key={1}>
+								<MarginEditor
+									css={this.state.selectors[key] && this.state.selectors[key].css}
+									onCancel={() => this.onSelectorGlassClick(key)}
+									handleSubmit={css => this.saveSelectorCss({ key, css })}
+								/>
+							</MenuItem>
+							<MenuItem icon={'fa fa-pencil'} contentHeading="" key={2}>
+								<ColorEditor
+									css={this.state.selectors[key] && this.state.selectors[key].css}
+									onCancel={() => this.onSelectorGlassClick(key)}
+									handleSubmit={css => this.saveSelectorCss({ key, css })}
+								/>
+							</MenuItem>
+
+						</Menu>
+					: ''}
+
+			</RowColSpan>
+		);
+	};
+
+	renderArraySelector = (key, index) => {
+		let selectorConf = commonConsts.pagegroupSelectors,
+			selectorValue = (this.state.selectors[key][index] && this.state.selectors[key][index].value) || '';
+		return (
+			<div key={index}>
+				<input
+					onChange={e => {
+						let selectors = this.state.selectors;
+						selectors[key][index].value = e.target.value;
+						this.setState({
+							selectors
+						});
+					}}
+					className="selectorInput"
+					type="text"
+					name={key}
+					defaultValue={selectorValue}
+				/>
+				<button
+					className="fa fa-code selectorDelete"
+					type="button"
+					onClick={() => {
+						let selectors = this.state.selectors;
+						selectors[key][index].isVisible = true;
+						this.setState({
+							selectors
+						});
+					}}
+				/>
+				<button
+					className="fa fa-trash selectorDelete"
+					type="button"
+					onClick={() => {
+						let selectors = this.state.selectors;
+						selectors[key].splice(index, 1);
+						this.setState({
+							selectors
+						});
+					}}
+				/>
+
+				{this.state.selectors[key] && this.state.selectors[key][index].isVisible
+					? <Menu
+							id="channelMenu"
+							position={{ top: 43 }}
+							arrow="none"
+							onGlassClick={() => this.onSelectorArrayGlassClick(key, index)}
+						>
+							<MenuItem icon={'fa fa-th'} contentHeading="" key={1}>
+								<MarginEditor
+									css={this.state.selectors[key][index] && this.state.selectors[key][index].css}
+									onCancel={() => this.onSelectorArrayGlassClick(key, index)}
+									handleSubmit={css => this.saveSelectorArrayCss({ key, css, index })}
+								/>
+							</MenuItem>
+							<MenuItem icon={'fa fa-pencil'} contentHeading="" key={2}>
+								<ColorEditor
+									css={this.state.selectors[key][index] && this.state.selectors[key][index].css}
+									onCancel={() => this.onSelectorArrayGlassClick(key, index)}
+									handleSubmit={css => this.saveSelectorArrayCss({ key, css, index })}
+								/>
+							</MenuItem>
+
+						</Menu>
+					: ''}
+
+			</div>
+		);
+	};
 
 	renderSelectors = () => {
 		let selectorConf = commonConsts.pagegroupSelectors;
 		return Object.keys(selectorConf).map(key => {
-			let selectorValue = this.state.selectors[key];
-			if (selectorConf[key].inputType == 'text')
+			if (selectorConf[key].inputType == 'text') return this.renderSelector(key);
+			else {
 				return (
 					<RowColSpan label={selectorConf[key].alias} key={key}>
-						<input
-							onChange={e => {
+						{this.state.selectors[key] &&
+							this.state.selectors[key].map((value, index) => this.renderArraySelector(key, index))}
+						<button
+							className="btn-primary addButton"
+							type="button"
+							onClick={() => {
 								let selectors = this.state.selectors;
-								selectors[e.target.name] = e.target.value;
-								this.setState({
-									selectors
-								});
+								selectors[key] = selectors[key] || [];
+								selectors[key].push({});
+								this.setState({ selectors });
 							}}
-							className="form-control"
-							type={selectorConf[key].inputType}
-							placeholder={selectorConf[key].alias}
-							name={key}
-							defaultValue={selectorValue}
-						/>
+						>
+							+ Add
+						</button>
 					</RowColSpan>
 				);
-			else
-				return (
-					<RowColSpan label={selectorConf[key].alias} key={key}>
-						<textarea
-							placeholder={selectorConf[key].alias}
-							name={key}
-							value={selectorValue}
-							onChange={e => {
-								let selectors = this.state.selectors, value = e.target.value.trim();
-								selectors[e.target.name] = value.split(',');
-								this.setState({
-									selectors
-								});
-							}}
-						/>
-					</RowColSpan>
-				);
+			}
 		});
 	};
 	renderInputControl = ({ label, name, value, type }) => {
@@ -191,6 +349,16 @@ class PageGroupSettings extends React.Component {
 	};
 	render = () => {
 		const { props } = this, channel = props.channel;
+		const options = {
+			lineNumbers: true,
+			autoRefresh: true,
+			theme: 'solarized',
+			textAreaClassName: ['form-control'],
+			style: {
+				border: '1px solid #eee',
+				height: 'auto'
+			}
+		};
 		return (
 			<CollapsePanel title={channel.pageGroup} className="h4FontSize" noBorder={true}>
 				<form onSubmit={this.saveChannelSettings}>
@@ -287,15 +455,14 @@ class PageGroupSettings extends React.Component {
 					<hr />
 					<CollapsePanel title="Other Settings" className="mediumFontSize" noBorder={true}>
 						<RowColSpan label="Custom CSS">
-							<textarea
-								placeholder="Enter Custom CSS here"
-								name="customCSS"
+							<Codemirror
 								value={this.state.customCSS.value}
-								onChange={e => {
+								onChange={value => {
 									let customCSS = this.state.customCSS;
-									customCSS.value = e.target.value;
+									customCSS.value = value;
 									this.setState({ customCSS });
 								}}
+								options={options}
 							/>
 						</RowColSpan>
 						<RowColSpan label="Delete Selector">
@@ -312,14 +479,26 @@ class PageGroupSettings extends React.Component {
 							/>
 						</RowColSpan>
 						<RowColSpan label="Before JS">
-							<textarea
-								name="beforeJs"
+							<Codemirror
 								value={this.state.beforeJs || ''}
-								onChange={this.handleOnChange}
+								onChange={beforeJs => {
+									this.setState({
+										beforeJs
+									});
+								}}
+								options={options}
 							/>
 						</RowColSpan>
 						<RowColSpan label="After JS">
-							<textarea name="afterJs" value={this.state.afterJs || ''} onChange={this.handleOnChange} />
+							<Codemirror
+								value={this.state.afterJs || ''}
+								onChange={afterJs => {
+									this.setState({
+										afterJs
+									});
+								}}
+								options={options}
+							/>
 						</RowColSpan>
 						{this.renderInputControl({
 							label: 'Site Name',

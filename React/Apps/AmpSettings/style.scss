@@ -1,9 +1,18 @@
 .blockListInput {
-	width: 90% !important;
+	width: 89% !important;
 	border: 1px solid #e6e6e6;
 }
 
 .blockListDelete {
+	width: auto !important;
+	float: right;
+}
+.selectorInput {
+	width: 80% !important;
+	border: 1px solid #e6e6e6;
+}
+
+.selectorDelete {
 	width: auto !important;
 	float: right;
 }
@@ -60,4 +69,9 @@ textarea {
 
 .no-border {
 	border: none;
+}
+
+#channelMenu .MenuBarInner {
+	overflow-y: inherit !important;
+	overflow-x: inherit !important;
 }

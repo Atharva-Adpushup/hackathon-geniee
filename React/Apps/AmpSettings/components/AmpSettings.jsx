@@ -65,9 +65,8 @@ class AmpSettings extends React.Component {
 		let linkViews = new Array(this.state.blockList);
 		const listItems = this.state.blockList.map((linkView, index) => {
 			return (
-				<div className="marginBottom">
+				<div className="marginBottom" key={index}>
 					<input
-						key={index}
 						onChange={e => {
 							let blockList = this.state.blockList;
 							blockList[index] = e.target.value;
@@ -188,11 +187,11 @@ class AmpSettings extends React.Component {
 
 	renderSelectors = () => {
 		let selectorConf = commonConsts.siteSelectors;
-		return Object.keys(selectorConf).map(key => {
+		return Object.keys(selectorConf).map((key, index) => {
 			let selectorValue = this.state.selectors[key];
 			if (selectorConf[key].inputType == 'text')
 				return (
-					<RowColSpan label={selectorConf[key].alias} key={key}>
+					<RowColSpan label={selectorConf[key].alias} key={index}>
 						<input
 							onChange={e => {
 								console.log('hi', e.target.value);
@@ -310,7 +309,7 @@ class AmpSettings extends React.Component {
 									<Heading title="Channel Level Settings" />
 									{this.state.channels.map(channel => {
 										return (
-											<div>
+											<div key={channel.pageGroup}>
 												<PageGroupSettings
 													channel={channel}
 													siteId={this.state.siteId}

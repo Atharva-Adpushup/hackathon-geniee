@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import $ from 'jquery';
-import Glass from 'shared/glass.jsx';
-import Utils from 'libs/utils.js';
+import Glass from '../glass.jsx';
+import Utils from '../../../libs/utils.js';
 import Content from './content.jsx';
 
 const style = {
@@ -63,8 +63,7 @@ class Menu extends React.Component {
 	}
 
 	fixCss() {
-		const $menu = $(this.refs.main),
-			css = Utils.ui.menuRenderPosition($menu, this.props.position);
+		const $menu = $(this.refs.main), css = Utils.ui.menuRenderPosition($menu, this.props.position);
 		$menu.css(css);
 	}
 
