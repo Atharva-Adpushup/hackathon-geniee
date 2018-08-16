@@ -2,6 +2,7 @@
 
 import commonConsts from '../commonConsts';
 import Sticky from './components/Sticky/index';
+import InView from './components/InView/index';
 //import Video from './components/Video/index';
 import $ from '../$';
 import config from '../config';
@@ -32,6 +33,11 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 		switch (type) {
 			case commonConsts.FORMATS.STICKY.NAME:
 				parentNode = createParentNode(value ? value : 'body', interactiveAd);
+				const sticky = new Sticky(parentNode, interactiveAd, adCode);
+				return sticky.render();
+
+			case commonConsts.FORMATS.IN_VIEW.NAME:
+				parentNode = createParentNode(value, interactiveAd);
 				const sticky = new Sticky(parentNode, interactiveAd, adCode);
 				return sticky.render();
 
