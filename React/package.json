@@ -6,6 +6,7 @@
 	"dependencies": {
 		"clipboard-polyfill": "^2.3.0",
 		"clipboard.js": "^1.0.1",
+		"cssbeautify": "0.3.1",
 		"jquery": "^3.2.1",
 		"lodash": "^4.17.4",
 		"normalizr": "2.2.1",
@@ -47,6 +48,7 @@
 		"babel-preset-react": "^6.24.1",
 		"babel-preset-stage-2": "^6.24.1",
 		"babelify": "^7.3.0",
+		"clean-css": "4.2.1",
 		"css-loader": "^0.28.7",
 		"eslint": "^4.6.1",
 		"eslint-config-airbnb": "^15.1.0",

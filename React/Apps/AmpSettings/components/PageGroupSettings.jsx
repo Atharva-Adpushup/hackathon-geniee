@@ -15,15 +15,26 @@ import Menu from '../../Editor/components/shared/menu/menu.jsx';
 import MenuItem from '../../Editor/components/shared/menu/menuItem.jsx';
 import MarginEditor from './helper/marginEditor.jsx';
 import ColorEditor from './helper/colorEditor.jsx';
+import cssbeautify from 'cssbeautify';
+import CleanCSS from 'clean-css';
 class PageGroupSettings extends React.Component {
 	constructor(props) {
 		super(props);
+		let options = {
+			indent: '  ',
+			openbrace: 'separate-line',
+			autosemicolon: true
+		};
 		let { siteId, channel } = props,
 			ampSettings = channel.ampSettings || {},
 			social = ampSettings.social || { include: false, apps: [] },
 			ads = ampSettings.ads || [],
 			imgConfig = ampSettings.imgConfig || { widthLimit: 100, heightLimit: 100 },
-			customCSS = { value: ampSettings.customCSS ? ampSettings.customCSS.value : '' },
+			customCSS = {
+				value: ampSettings.customCSS && ampSettings.customCSS.value
+					? cssbeautify(ampSettings.customCSS.value, options)
+					: ''
+			},
 			{
 				selectors = {},
 				toDelete,
@@ -64,7 +75,6 @@ class PageGroupSettings extends React.Component {
 	}
 
 	handleButtonClick = () => {
-		console.log('called');
 		this.setState({ isVisible: !this.state.isVisible });
 	};
 
@@ -285,6 +295,10 @@ class PageGroupSettings extends React.Component {
 		finalData.social.apps = activeSocialApps;
 		finalData.beforeJs = finalData.beforeJs ? btoa(finalData.beforeJs) : '';
 		finalData.afterJs = finalData.afterJs ? btoa(finalData.afterJs) : '';
+		if (finalData.customCSS) {
+			let value = new CleanCSS().minify(finalData.customCSS.value).styles;
+			finalData.customCSS = { value };
+		}
 		for (let i = 0; i < dataAds.length; i++) {
 			if (dataAds[i].selector && dataAds[i].adCode && dataAds[i].type) {
 				let adType = dataAds[i].type, adTypeFieldConf = commonConsts.ads.type[adType];
@@ -370,10 +384,10 @@ class PageGroupSettings extends React.Component {
 						onChange={value => {
 							this.setState({ isEnabled: value });
 						}}
-						name="IsEnabled"
+						name="isEnabled"
 						layout="horizontal"
 						size="m"
-						id="js-force-sample-url"
+						id="IsEnabled"
 						on="On"
 						off="Off"
 					/>
@@ -431,7 +445,7 @@ class PageGroupSettings extends React.Component {
 							name="includeSocial"
 							layout="horizontal"
 							size="m"
-							id="js-force-sample-url"
+							id="includeSocial"
 							on="On"
 							off="Off"
 						/>
