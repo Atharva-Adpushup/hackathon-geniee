@@ -78,7 +78,7 @@ class MenuSettings extends React.Component {
 					name="includeMenu"
 					layout="horizontal"
 					size="m"
-					id="js-force-sample-url"
+					id="includeMenu"
 					on="On"
 					off="Off"
 				/>

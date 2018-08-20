@@ -3,7 +3,6 @@ import { Row, Col } from 'react-bootstrap';
 import Heading from './helper/Heading.jsx';
 import RowColSpan from './helper/RowColSpan.jsx';
 import commonConsts from '../lib/commonConsts';
-import CustomToggleSwitch from './helper/CustomToggleSwitch.jsx';
 import CollapsePanel from '../../../Components/CollapsePanel.jsx';
 import '../style.scss';
 class AdsSettings extends React.Component {
