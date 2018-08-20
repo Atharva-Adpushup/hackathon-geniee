@@ -87,9 +87,8 @@ class PageGroupSettings extends React.Component {
 	};
 
 	saveSelectorCss = ({ key, css }) => {
-		let selectors = this.state.selectors, selectorCss = selectors[key].css || '';
-		selectorCss += css;
-		selectors[key].css = selectorCss;
+		let selectors = this.state.selectors;
+		selectors[key].css = css;
 		this.setState({
 			selectors
 		});
@@ -103,8 +102,8 @@ class PageGroupSettings extends React.Component {
 	};
 
 	saveSelectorArrayCss = ({ key, css, index }) => {
-		let selectors = this.state.selectors, selectorCss = css;
-		selectors[key][index].css = selectorCss;
+		let selectors = this.state.selectors;
+		selectors[key][index].css = css;
 		this.setState({
 			selectors
 		});
@@ -130,7 +129,7 @@ class PageGroupSettings extends React.Component {
 					defaultValue={selectorValue}
 				/>
 				<button
-					className="fa fa-code blockListDelete"
+					className="fa fa-code blockListDelete mL-10"
 					type="button"
 					onClick={() => {
 						let selectors = this.state.selectors;
@@ -171,10 +170,9 @@ class PageGroupSettings extends React.Component {
 	};
 
 	renderArraySelector = (key, index) => {
-		let selectorConf = commonConsts.pagegroupSelectors,
-			selectorValue = (this.state.selectors[key][index] && this.state.selectors[key][index].value) || '';
+		let selectorValue = (this.state.selectors[key][index] && this.state.selectors[key][index].value) || '';
 		return (
-			<div key={index}>
+			<div key={index} className="mB-5">
 				<input
 					onChange={e => {
 						let selectors = this.state.selectors;
@@ -189,22 +187,22 @@ class PageGroupSettings extends React.Component {
 					defaultValue={selectorValue}
 				/>
 				<button
-					className="fa fa-code selectorDelete"
+					className="fa fa-trash selectorDelete mL-10"
 					type="button"
 					onClick={() => {
 						let selectors = this.state.selectors;
-						selectors[key][index].isVisible = true;
+						selectors[key].splice(index, 1);
 						this.setState({
 							selectors
 						});
 					}}
 				/>
 				<button
-					className="fa fa-trash selectorDelete"
+					className="fa fa-code selectorDelete mL-10"
 					type="button"
 					onClick={() => {
 						let selectors = this.state.selectors;
-						selectors[key].splice(index, 1);
+						selectors[key][index].isVisible = true;
 						this.setState({
 							selectors
 						});
@@ -286,7 +284,10 @@ class PageGroupSettings extends React.Component {
 		);
 	};
 	parseFormData = ampData => {
-		let finalData = ampData, dataAds = finalData.ads, dataSocial = finalData.social;
+		let finalData = ampData,
+			dataAds = finalData.ads,
+			dataSocial = finalData.social,
+			dataSelectors = finalData.selectors;
 		let ads = [], activeSocialApps = [];
 		if (dataSocial.include) {
 			for (let i = 0; i < dataSocial.apps.length; i++)
@@ -310,6 +311,18 @@ class PageGroupSettings extends React.Component {
 				}
 			}
 		}
+
+		Object.keys(dataSelectors).map(key => {
+			if (Array.isArray(dataSelectors[key])) {
+				let newSelectorList = dataSelectors[key].map(selector => ({
+					css: selector.css,
+					value: selector.value
+				}));
+				dataSelectors[key] = newSelectorList;
+			} else if (typeof dataSelectors[key] == 'object') {
+				delete dataSelectors[key].isVisible;
+			}
+		});
 		finalData.ads = ads;
 		return finalData;
 	};
@@ -381,13 +394,13 @@ class PageGroupSettings extends React.Component {
 						className="mB-0"
 						defaultLayout
 						checked={this.state.isEnabled}
-						onChange={value => {
-							this.setState({ isEnabled: value });
+						onChange={isEnabled => {
+							this.setState({ isEnabled });
 						}}
 						name="isEnabled"
 						layout="horizontal"
 						size="m"
-						id="IsEnabled"
+						id={'isEnabled' + channel.pageGroup}
 						on="On"
 						off="Off"
 					/>
@@ -445,7 +458,7 @@ class PageGroupSettings extends React.Component {
 							name="includeSocial"
 							layout="horizontal"
 							size="m"
-							id="includeSocial"
+							id={'includeSocial' + channel.pageGroup}
 							on="On"
 							off="Off"
 						/>

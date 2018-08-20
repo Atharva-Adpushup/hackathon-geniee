@@ -29,12 +29,10 @@ class MarginEditor extends React.Component {
 		this.setState({ [name]: value });
 	};
 	formatCss = () => {
-		console.log(this.state, Object.entries(this.state));
 		let formatedStr = Object.entries(this.state).reduce((styleString, [propName, propValue]) => {
 			if (propValue) return `${styleString}${propName}:${propValue};`;
 			else return `${styleString}`;
 		}, '');
-		console.log(formatedStr);
 		this.props.handleSubmit(formatedStr);
 	};
 

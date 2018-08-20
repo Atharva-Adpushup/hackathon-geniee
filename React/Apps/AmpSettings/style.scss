@@ -1,20 +1,22 @@
 .blockListInput {
-	width: 89% !important;
+	width: 88% !important;
 	border: 1px solid #e6e6e6;
 }
 
 .blockListDelete {
 	width: auto !important;
-	float: right;
+	line-height: inherit;
+	font-size: 1.2em;
 }
 .selectorInput {
-	width: 80% !important;
+	width: 78% !important;
 	border: 1px solid #e6e6e6;
 }
 
 .selectorDelete {
 	width: auto !important;
-	float: right;
+	line-height: inherit;
+	font-size: 1.2em;
 }
 .adContainerStyle {
 	background: #f9f9f9;

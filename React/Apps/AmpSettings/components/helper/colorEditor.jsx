@@ -28,12 +28,10 @@ class ColorEditor extends React.Component {
 	};
 
 	formatCss = () => {
-		console.log(this.state);
 		let formatedStr = Object.entries(this.state).reduce((styleString, [propName, propValue]) => {
 			if (propValue) return `${styleString}${propName}:${propValue};`;
 			else return `${styleString}`;
 		}, '');
-		console.log(formatedStr);
 		this.props.handleSubmit(formatedStr);
 	};
 	render = () => {

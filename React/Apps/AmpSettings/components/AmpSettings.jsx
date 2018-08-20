@@ -13,7 +13,12 @@ import FooterSettings from './FooterSettings.jsx';
 import { Row, Col, Button } from 'react-bootstrap';
 import '../style.scss';
 import CollapsePanel from '../../../Components/CollapsePanel.jsx';
-
+import Menu from '../../Editor/components/shared/menu/menu.jsx';
+import MenuItem from '../../Editor/components/shared/menu/menuItem.jsx';
+import MarginEditor from './helper/marginEditor.jsx';
+import ColorEditor from './helper/colorEditor.jsx';
+import cssbeautify from 'cssbeautify';
+import CleanCSS from 'clean-css';
 class AmpSettings extends React.Component {
 	constructor(props) {
 		super(props);
@@ -65,7 +70,7 @@ class AmpSettings extends React.Component {
 		let linkViews = new Array(this.state.blockList);
 		const listItems = this.state.blockList.map((linkView, index) => {
 			return (
-				<div className="marginBottom" key={index}>
+				<div className="mB-5" key={index}>
 					<input
 						onChange={e => {
 							let blockList = this.state.blockList;
@@ -80,7 +85,7 @@ class AmpSettings extends React.Component {
 						name="name"
 						value={this.state.blockList[index]}
 					/> <button
-						className="fa fa-trash fa-2x blockListDelete"
+						className="fa fa-trash blockListDelete mL-10"
 						type="button"
 						onClick={() => {
 							let blockList = this.state.blockList;
@@ -115,7 +120,7 @@ class AmpSettings extends React.Component {
 	saveSiteSettings = event => {
 		event.preventDefault();
 		let finalData = JSON.parse(JSON.stringify(this.state)),
-			{ siteId, menu, selectedAnalytics } = finalData,
+			{ siteId, menu, selectedAnalytics, selectors } = finalData,
 			dataLinks = menu.links,
 			analytics = [];
 		for (let i = dataLinks.length - 1; i >= 0; i--) {
@@ -125,6 +130,11 @@ class AmpSettings extends React.Component {
 			let analytic = { name: selectedAnalytics[i].value, ...selectedAnalytics[i].fields };
 			analytics.push(analytic);
 		}
+		Object.keys(selectors).map(key => {
+			if (typeof selectors[key] == 'object') {
+				delete selectors[key].isVisible;
+			}
+		});
 		ajax({
 			method: 'POST',
 			url: '/user/site/' + siteId + '/saveAmpSettings',
@@ -185,47 +195,86 @@ class AmpSettings extends React.Component {
 		return -1;
 	};
 
+	onSelectorGlassClick = key => {
+		let selectors = this.state.selectors;
+		selectors[key].isVisible = false;
+		this.setState({
+			selectors
+		});
+	};
+
+	saveSelectorCss = ({ key, css }) => {
+		let selectors = this.state.selectors;
+		selectors[key].css = css;
+		this.setState({
+			selectors
+		});
+	};
+
+	renderSelector = key => {
+		let selectorConf = commonConsts.siteSelectors,
+			selectorValue = (this.state.selectors[key] && this.state.selectors[key].value) || '';
+		return (
+			<RowColSpan label={selectorConf[key].alias} key={key}>
+				<input
+					onChange={e => {
+						let selectors = this.state.selectors;
+						selectors[e.target.name] = selectors[e.target.name] || {};
+						selectors[e.target.name].value = e.target.value;
+						this.setState({
+							selectors
+						});
+					}}
+					className="blockListInput"
+					type="text"
+					name={key}
+					defaultValue={selectorValue}
+				/>
+				<button
+					className="fa fa-code blockListDelete mL-10"
+					type="button"
+					onClick={() => {
+						let selectors = this.state.selectors;
+						selectors[key] = selectors[key] || {};
+						selectors[key].isVisible = true;
+						this.setState({
+							selectors
+						});
+					}}
+				/>
+				{this.state.selectors[key] && this.state.selectors[key].isVisible
+					? <Menu
+							id="channelMenu"
+							position={{ top: 43 }}
+							arrow="none"
+							onGlassClick={() => this.onSelectorGlassClick(key)}
+						>
+							<MenuItem icon={'fa fa-th'} contentHeading="" key={1}>
+								<MarginEditor
+									css={this.state.selectors[key] && this.state.selectors[key].css}
+									onCancel={() => this.onSelectorGlassClick(key)}
+									handleSubmit={css => this.saveSelectorCss({ key, css })}
+								/>
+							</MenuItem>
+							<MenuItem icon={'fa fa-pencil'} contentHeading="" key={2}>
+								<ColorEditor
+									css={this.state.selectors[key] && this.state.selectors[key].css}
+									onCancel={() => this.onSelectorGlassClick(key)}
+									handleSubmit={css => this.saveSelectorCss({ key, css })}
+								/>
+							</MenuItem>
+
+						</Menu>
+					: ''}
+
+			</RowColSpan>
+		);
+	};
+
 	renderSelectors = () => {
 		let selectorConf = commonConsts.siteSelectors;
-		return Object.keys(selectorConf).map((key, index) => {
-			let selectorValue = this.state.selectors[key];
-			if (selectorConf[key].inputType == 'text')
-				return (
-					<RowColSpan label={selectorConf[key].alias} key={index}>
-						<input
-							onChange={e => {
-								console.log('hi', e.target.value);
-								let selectors = this.state.selectors;
-								selectors[e.target.name] = e.target.value;
-								this.setState({
-									selectors
-								});
-							}}
-							className="form-control"
-							type={selectorConf[key].inputType}
-							placeholder={selectorConf[key].alias}
-							name={key}
-							defaultValue={selectorValue}
-						/>
-					</RowColSpan>
-				);
-			else
-				return (
-					<RowColSpan label={selectorConf[key].alias} key={key}>
-						<textarea
-							placeholder={selectorConf[key].alias}
-							name={key}
-							value={selectorValue}
-							onChange={e => {
-								let selectors = this.state.selectors, value = e.target.value.trim();
-								selectors[e.target.name] = value.split(',');
-								this.setState({
-									selectors
-								});
-							}}
-						/>
-					</RowColSpan>
-				);
+		return Object.keys(selectorConf).map(key => {
+			if (selectorConf[key].inputType == 'text') return this.renderSelector(key);
 		});
 	};
 
