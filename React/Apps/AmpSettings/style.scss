@@ -1,11 +1,22 @@
 .blockListInput {
-	width: 90% !important;
+	width: 88% !important;
 	border: 1px solid #e6e6e6;
 }
 
 .blockListDelete {
 	width: auto !important;
-	float: right;
+	line-height: inherit;
+	font-size: 1.2em;
+}
+.selectorInput {
+	width: 78% !important;
+	border: 1px solid #e6e6e6;
+}
+
+.selectorDelete {
+	width: auto !important;
+	line-height: inherit;
+	font-size: 1.2em;
 }
 .adContainerStyle {
 	background: #f9f9f9;
@@ -60,4 +71,9 @@ textarea {
 
 .no-border {
 	border: none;
+}
+
+#channelMenu .MenuBarInner {
+	overflow-y: inherit !important;
+	overflow-x: inherit !important;
 }
