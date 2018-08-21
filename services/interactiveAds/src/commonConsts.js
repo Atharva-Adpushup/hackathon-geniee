@@ -15,7 +15,7 @@ const commonConsts = {
 	DEFAULT_CLASSNAME: 'adp_interactive_ad',
 	POWERED_BY_BANNER: {
 		TEXT: 'Powered by AdPushup',
-		REDIRECT_URL: 'https://www.adpushup.com/',
+		REDIRECT_URL: 'https://campaign.adpushup.com/get-started/?utm_source=banner&utm_campaign=growth_hack',
 		CSS: {
 			COMMON: {
 				color: '#fff',
