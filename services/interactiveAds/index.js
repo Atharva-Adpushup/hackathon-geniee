@@ -9,6 +9,8 @@ import config from './src/config';
 import InView from './src/renderer/components/InView/index';
 import { generateAdCode } from '../genieeAdSyncService/genieeAp/src/adCodeGenerator';
 
+window.seen = false;
+
 const createInViewAd = interactiveAd => {
 		const parentNode = null,
 			adCode = generateAdCode(interactiveAd),
