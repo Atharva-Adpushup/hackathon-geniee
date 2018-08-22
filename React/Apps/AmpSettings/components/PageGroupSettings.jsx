@@ -80,13 +80,13 @@ class PageGroupSettings extends React.Component {
 			let { slotId } = ad.data, { type } = ad;
 			if (
 				(type == 'adsense' && adsenseUniqueIds.indexOf(slotId) != -1) ||
-				(type == 'adpTag' && adpTagUniqueIds.indexOf(slotId) != -1)
+				(type == 'adpTags' && adpTagUniqueIds.indexOf(slotId) != -1)
 			) {
 				found = true;
 			} else {
 				if (type == 'adsense') {
 					adsenseUniqueIds.push(slotId);
-				} else if (type == 'adpTag') {
+				} else if (type == 'adpTags') {
 					adpTagUniqueIds.push(slotId);
 				}
 			}
