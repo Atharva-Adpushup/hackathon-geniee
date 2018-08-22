@@ -17,8 +17,6 @@ import Menu from '../../Editor/components/shared/menu/menu.jsx';
 import MenuItem from '../../Editor/components/shared/menu/menuItem.jsx';
 import MarginEditor from './helper/marginEditor.jsx';
 import ColorEditor from './helper/colorEditor.jsx';
-import cssbeautify from 'cssbeautify';
-import CleanCSS from 'clean-css';
 class AmpSettings extends React.Component {
 	constructor(props) {
 		super(props);
