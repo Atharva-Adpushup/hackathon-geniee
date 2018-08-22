@@ -74,6 +74,26 @@ class PageGroupSettings extends React.Component {
 		this.setState({ isVisible: !this.state.isVisible });
 	};
 
+	isDuplicateSlotId = ads => {
+		let adsenseUniqueIds = [], adpTagUniqueIds = [], found = false;
+		for (let ad of ads) {
+			let { slotId } = ad.data, { type } = ad;
+			if (
+				(type == 'adsense' && adsenseUniqueIds.indexOf(slotId) != -1) ||
+				(type == 'adpTag' && adpTagUniqueIds.indexOf(slotId) != -1)
+			) {
+				found = true;
+			} else {
+				if (type == 'adsense') {
+					adsenseUniqueIds.push(slotId);
+				} else if (type == 'adpTag') {
+					adpTagUniqueIds.push(slotId);
+				}
+			}
+		}
+		return found;
+	};
+
 	renderInputControl = ({ label, name, value, type }) => {
 		return (
 			<Row>
@@ -142,6 +162,10 @@ class PageGroupSettings extends React.Component {
 		let { siteId } = this.state, selectors = ampData.selectors;
 		if (!selectors.articleContent || !ampData.siteName || !ampData.template) {
 			alert('Article Content, SiteName and Template are required');
+			return;
+		}
+		if (this.isDuplicateSlotId(ampData.ads)) {
+			alert('Slot Ids should be unique!');
 			return;
 		}
 		ajax({
