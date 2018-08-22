@@ -13,6 +13,28 @@ const commonConsts = {
 		SCRIPT_LOAD: 'scriptLoaded'
 	},
 	DEFAULT_CLASSNAME: 'adp_interactive_ad',
+	FORMAT_CSS: {
+		background: '#eaeaea'
+	},
+	CLOSE_BUTTON: {
+		CSS: {
+			COMMON: {
+				color: '#fff',
+				background: '#222',
+				fontFamily: 'sans-serif',
+				fontSize: 9,
+				position: 'absolute',
+				right: 0,
+				border: 'none'
+			},
+			BOTTOM: {
+				top: -15
+			},
+			TOP: {
+				bottom: -15
+			}
+		}
+	},
 	POWERED_BY_BANNER: {
 		TEXT: 'Powered by AdPushup',
 		REDIRECT_URL: 'https://campaign.adpushup.com/get-started/?utm_source=banner&utm_campaign=growth_hack',
@@ -20,8 +42,8 @@ const commonConsts = {
 			COMMON: {
 				color: '#fff',
 				fontFamily: 'sans-serif',
-				fontSize: 10,
-				background: '#eb575c',
+				fontSize: 9,
+				background: '#222',
 				display: 'inline-block',
 				padding: '2px 6px',
 				position: 'absolute',
@@ -29,10 +51,10 @@ const commonConsts = {
 				left: 0
 			},
 			BOTTOM: {
-				top: -18
+				top: -16
 			},
 			TOP: {
-				bottom: -18
+				bottom: -16
 			}
 		}
 	},

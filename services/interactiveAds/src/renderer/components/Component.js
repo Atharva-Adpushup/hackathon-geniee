@@ -13,6 +13,9 @@ class Component {
 		this.interactiveAd = interactiveAd;
 		this.adCode = adCode;
 		this.sendFeedback = this.sendFeedback.bind(this);
+		this.createPoweredByBanner = this.createPoweredByBanner.bind(this);
+		this.createCloseButton = this.createCloseButton.bind(this);
+		this.closeAd = this.closeAd.bind(this);
 	}
 
 	sendFeedback(options) {
@@ -32,6 +35,21 @@ class Component {
 			.text(POWERED_BY_BANNER.TEXT);
 	}
 
+	createCloseButton(formatData) {
+		const $closeButton = $('<button>'),
+			{ CLOSE_BUTTON } = commonConsts,
+			formatDataCSS = formatData.placement === 'top' ? CLOSE_BUTTON.CSS.TOP : CLOSE_BUTTON.CSS.BOTTOM;
+
+		return $closeButton
+			.css({ ...CLOSE_BUTTON.CSS.COMMON, ...formatDataCSS })
+			.text('x')
+			.on('click', this.closeAd);
+	}
+
+	closeAd() {
+		$(this.parentNode).fadeOut(200);
+	}
+
 	render() {
 		const { formatData, width, height, id } = this.interactiveAd;
 
@@ -42,6 +60,7 @@ class Component {
 		let css = { width, height },
 			$format = $('<div />'),
 			$banner = null,
+			$closeButton = this.createCloseButton(formatData),
 			feedbackOptions = {
 				ads: [id],
 				xpathMiss: [],
@@ -58,6 +77,7 @@ class Component {
 			$banner = this.createPoweredByBanner(formatData);
 			$format.append($banner);
 		}
+		$format.append($closeButton);
 
 		adp.tracker.add(
 			$format,
@@ -70,6 +90,7 @@ class Component {
 			case commonConsts.FORMATS.STICKY.NAME:
 				$format.css({
 					...css,
+					...commonConsts.FORMAT_CSS,
 					...commonConsts.FORMATS.STICKY.BASE_STYLES,
 					...this.getPlacementCSS(formatData)
 				});
