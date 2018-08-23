@@ -103,6 +103,15 @@ const variation = (state = {}, action) => {
 					}
 				};
 
+			case variationActions.DISABLE_VARIATION:
+				return {
+					...state,
+					[action.variationId]: {
+						...state[action.variationId],
+						disable: action.payload.isDisable
+					}
+				};
+
 			case variationActions.EDIT_TRAFFIC_DISTRIBUTION:
 				return {
 					...state,

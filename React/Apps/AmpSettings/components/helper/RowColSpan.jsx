@@ -10,11 +10,11 @@ class RowColSpan extends React.Component {
 		const { props } = this;
 
 		return (
-			<Row>
+			<Row className="rowMargin">
 				<Col sm={5}>
-					<div>{this.props.label}</div>
+					<div className={props.className}>{props.label}</div>
 				</Col>
-				<Col sm={7}>{this.props.children}</Col>
+				<Col sm={7}>{props.children}</Col>
 			</Row>
 		);
 	}

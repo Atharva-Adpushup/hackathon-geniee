@@ -215,6 +215,7 @@ class AdPushupAds extends Component {
 						fromPanel={true}
 						showNotification={this.props.showNotification}
 						reset={this.state.reset}
+						isInsertMode={true}
 					/>
 				</Col>
 			</Row>
