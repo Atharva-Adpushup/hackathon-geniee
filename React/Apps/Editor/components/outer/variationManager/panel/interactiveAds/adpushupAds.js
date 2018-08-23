@@ -24,7 +24,7 @@ class AdPushupAds extends Component {
 			format: isFormatDataPresent
 				? `${formatData.type}${formatData.placement.charAt(0).toUpperCase() + formatData.placement.slice(1)}`
 				: false,
-			size: this.props.ad ? `${this.props.ad.width}X${this.props.ad.height}` : false,
+			size: this.props.ad ? `${this.props.ad.width}x${this.props.ad.height}` : false,
 			css: this.props.ad ? this.props.ad.css : {},
 			containsInteractiveAd: true,
 			reset: false,
@@ -226,7 +226,9 @@ class AdPushupAds extends Component {
 		let css =
 			typeof this.state.css == 'string' && this.state.css.length
 				? JSON.parse(this.state.css)
-				: Object.keys(this.state.css).length ? this.state.css : {};
+				: Object.keys(this.state.css).length
+					? this.state.css
+					: {};
 		if (
 			!this.state.event ||
 			!this.state.format ||
