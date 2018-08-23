@@ -51,13 +51,13 @@ class Component {
 	}
 
 	render() {
-		const { formatData, width, height, id } = this.interactiveAd;
+		const { formatData, width, height, id, css: customCSS } = this.interactiveAd;
 
 		if (this.interactiveAd.network === commonConsts.NETWORKS.ADPTAGS) {
 			executeAdpTagsHeadCode([this.interactiveAd], {}); // This function expects an array of adpTags and optional adpKeyValues
 		}
 
-		let css = { width, height },
+		let css = { width, height, ...customCSS },
 			$format = $('<div />'),
 			$banner = null,
 			$closeButton = this.createCloseButton(formatData),

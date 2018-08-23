@@ -63,7 +63,7 @@ const commonConsts = {
 			NAME: 'sticky',
 			BASE_STYLES: {
 				position: 'fixed',
-				zIndex: 1000
+				zIndex: 2000
 			},
 			PLACEMENT_CSS: {
 				TOP: {
