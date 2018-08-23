@@ -516,7 +516,14 @@ router
 			});
 	})
 	.get('/:siteId/ampSettings', (req, res) => {
-		if (req.session.isSuperUser) return res.render('ampSettings');
+		const isSession = !!req.session,
+			isSessionUser = !!(isSession && req.session.user),
+			isGenieePartner = !!(isSession && req.session.partner && req.session.partner === 'geniee'),
+			isDemoUserAccount = !!(isSessionUser && req.session.user.email === commonConsts.DEMO_ACCOUNT_EMAIL),
+			isSuperUser = !!req.session.isSuperUser,
+			isValidUser = isSuperUser || isGenieePartner || isDemoUserAccount;
+
+		if (isValidUser) return res.render('ampSettings');
 		else return res.render('404');
 	})
 	.get('/:siteId/ampSettingsData', (req, res) => {

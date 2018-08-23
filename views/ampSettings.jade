@@ -9,9 +9,9 @@ block append headScripts
             //- window.selectedSiteId = !{siteId};
             //- window.ampSettingsConfig = !{JSON.stringify(config)};
         });
-    //- +loadAsset("js", [
-    //-     '/assets/js/libs/custom/ampSettings.js',
-    //- ])
+    +loadAsset("css", [
+        '/assets/css/builds/editor.min.css'
+    ])
 
 block bodyContent
     include layout/sideBar
