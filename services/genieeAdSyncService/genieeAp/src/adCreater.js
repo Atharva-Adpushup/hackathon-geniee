@@ -32,7 +32,7 @@ var $ = require('jquery'),
 				ad.networkData &&
 				!ad.networkData.dynamicAllocation &&
 				!ad.networkData.adCode &&
-				genieeIds.push(ad.networkData.zoneId);
+				genieeIds.push({ zoneId: ad.networkData.zoneId, zoneContainerId: ad.networkData.zoneContainerId });
 			// 'isADPTags' will be true if atleast one ADP tag is present
 			shouldPushToADP(ad) ? (adpTagUnits.push(ad), (window.adpushup.config.isADPTags = true)) : null;
 
@@ -64,11 +64,16 @@ var $ = require('jquery'),
 		var isGenieePartner = !!(ad.network === 'geniee' && !ad.networkData.adCode),
 			isGenieeWithoutDFP = !!(isGenieePartner && !ad.networkData.dynamicAllocation),
 			isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
+			isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
+			isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
+			computedSSPContainerId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.zoneId,
 			defaultAdProperties = {
 				display: isGenieeWithoutDFP ? 'none' : 'block',
 				clear: ad.isIncontent ? null : 'both'
 			},
 			container;
+
+		computedSSPContainerId = '_ap_apexGeniee_ad_' + computedSSPContainerId;
 
 		if (!isMultipleAdSizes) {
 			defaultAdProperties.width = ad.width + 'px';
@@ -80,7 +85,7 @@ var $ = require('jquery'),
 		container = $('<div/>')
 			.css($.extend(defaultAdProperties, ad.css))
 			.attr({
-				id: isGenieePartner ? '_ap_apexGeniee_ad_' + ad.networkData.zoneId : ad.id,
+				id: isGenieePartner ? computedSSPContainerId : ad.id,
 				'data-section': ad.id,
 				class: '_ap_apex_ad',
 				'data-xpath': ad.xpath ? ad.xpath : '',
@@ -172,8 +177,8 @@ var $ = require('jquery'),
 				// Replaced '-' with '_' to avoid ElasticSearch split issue
 				variationId: variation.id // set the chosenVariation variation in feedback data;
 			},
-			placeGenieeHeadCode = function(genieeIds) {
-				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIds);
+			placeGenieeHeadCode = function(genieeIdCollection) {
+				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIdCollection);
 				genieeHeadCode && $('head').append(genieeHeadCode);
 			},
 			next = function(adObj, data) {
