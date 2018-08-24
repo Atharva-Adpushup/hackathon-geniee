@@ -16,101 +16,22 @@ block headCss
     link(rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css")
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
     style.
-        body,html{overflow-x:hidden}.container-fluid,.demo-content,.main-wrapper,.main-wrapper>.col-sm-10,.main-wrapper>.col-sm-2,.sidebar,body,html{height:100%}.main-wrapper>.col-sm-10,.main-wrapper>.col-sm-2{padding:0}.sidebar{background-color:#eb575c}.sidebar ul{padding:0;margin:0;list-style:none}.sidebar ul ul{margin-left:10px;list-style:none}.sidebar ul li{color:#8a2424;padding:15px 15px 0;font-size:18px}.sidebar ul li.header{font-weight:700;font-size:2em;padding:15px;border-bottom:2px solid #8a2424}.demo-wraper{min-height:100%;padding:15px;background-color:#f3f5f7}.demo-content{display:none}.demo-content>h2{margin:0 0 15px;color:#222}.demo-content>p{margin-bottom:15px;color:#444;font-weight:300;font-size:16px}.demo-content>.frame{border:2px solid #e6e6e6;margin-top:-2px;border-bottom-left-radius:6px;border-bottom-right-radius:6px;overflow-y:scroll;overflow-x:hidden;background-color:#fff}.frame>.content{position:relative;padding-bottom:56.25%;padding-top:25px;height:0}.frame>.content>iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}li.format{cursor:pointer}.features>label{font-weight:300;margin-right:5px}.features>span{margin-right:15px;font-weight:300;color:#eb575c}.features>i{font-size:20px;margin-right:5px;color:#eb575c}.demo-message{font-size:1.5em;margin-top:200px;text-align:center;font-weight:300;}.demo-message>i{color:#eb575c;margin-right:10px;}.fa-chevron-up{display:none}@media screen and (max-width:767px){.container-fluid,.demo-content,.main-wrapper,.main-wrapper>.col-sm-10,.main-wrapper>.col-sm-2,.sidebar,body,html{height:auto}.sidebar{height:200px;padding-bottom:15px;overflow-y:scroll;border-bottom:2px solid #8a2424}body,html{overflow-y:hidden}.fa-chevron-up{display:inline-block}.fa-chevron-left{display:none}.demo-content{margin-top:15px}.col-sm-10,.container-fluid,.demo-wrapper,.main-wrapper,body,html{height:100%!important}}
+        body,html{overflow-x:hidden;background-color:#f3f5f7;}.container-fluid,.demo-content,.main-wrapper,.main-wrapper>.col-sm-12,.main-wrapper>.col-sm-2,.sidebar,body,html{height:100%}.main-wrapper>.col-sm-10,.main-wrapper>.col-sm-2{padding:0}.sidebar{background-color:#eb575c}.sidebar ul{padding:0;margin:0;list-style:none}.sidebar ul ul{margin-left:10px;list-style:none}.sidebar ul li{color:#8a2424;padding:15px 15px 0;font-size:18px}.sidebar ul li.header{font-weight:700;font-size:2em;padding:15px;border-bottom:2px solid #8a2424}.demo-wraper{min-height:100%;padding:15px;background-color:#f3f5f7}.demo-content{display:none}.demo-content>h2{margin:0 0 15px;color:#222}.demo-content>p{margin-bottom:15px;color:#444;font-weight:300;font-size:16px}.demo-content>.frame{border:2px solid #e6e6e6;margin-top:-2px;border-bottom-left-radius:6px;border-bottom-right-radius:6px;overflow-y:scroll;overflow-x:hidden;background-color:#fff}.frame>.content{position:relative;padding-bottom:56.25%;padding-top:25px;height:0}.frame>.content>iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}li.format{cursor:pointer}.features>label{font-weight:300;margin-right:5px}.features>span{margin-right:15px;font-weight:300;color:#eb575c}.features>i{font-size:20px;margin-right:5px;color:#eb575c}.demo-message{font-size:1.5em;margin-top:200px;text-align:center;font-weight:300;}.demo-message>i{color:#eb575c;margin-right:10px;}.fa-chevron-up{display:none}@media screen and (max-width:767px){.container-fluid,.demo-content,.main-wrapper,.main-wrapper>.col-sm-10,.main-wrapper>.col-sm-2,.sidebar,body,html{height:auto}.sidebar{height:200px;padding-bottom:15px;overflow-y:scroll;border-bottom:2px solid #8a2424}body,html{overflow-y:hidden}.fa-chevron-up{display:inline-block}.fa-chevron-left{display:none}.demo-content{margin-top:15px}.col-sm-10,.container-fluid,.demo-wrapper,.main-wrapper,body,html{height:100%!important}}
 
 block bodyContent
     .container-fluid
         .row.main-wrapper
-            .col-sm-2
-                .sidebar
-                    ul
-                        li.header Formats
-                        li  
-                            span Sticky
-                            ul
-                                li.format(data-type="sticky-top") Top
-                                li.format(data-type="sticky-bottom") Bottom
-                                li.format(data-type="sticky-left") Left
-                                li.format(data-type="sticky-right") Right
-                        li.format(data-type="docked") Docked
-                        li.format(data-type="native") Native
-            .col-sm-10
+            .col-sm-12
                 .demo-wraper
-                    .demo-message
-                        i.fa.fa-chevron-left
-                        i.fa.fa-chevron-up
-                        | Please select a format from the menu to view the demo.
-                    .demo-content#sticky-top
-                        h2 Sticky Top
-                        p.features
-                            label Viewability : 
-                            span 100%
-                            label Availability : 
-                            i.fa.fa-desktop
-                            span.fa.fa-mobile
-                        img(src="/assets/images/browser-topbar.png" class="img-responsive")
-                        .frame
-                            .content
-                                iframe(src="/interactive-ads-demo/sticky-top")
-                    .demo-content#sticky-bottom
-                        h2 Sticky Bottom
-                        p.features
-                            label Viewability : 
-                            span 100%
-                            label Availability : 
-                            i.fa.fa-desktop
-                            span.fa.fa-mobile
-                        img(src="/assets/images/browser-topbar.png" class="img-responsive")
-                        .frame
-                            .content
-                                iframe(src="/interactive-ads-demo/sticky-bottom")
-                    .demo-content#sticky-left
-                        h2 Sticky Left
-                        p.features
-                            label Viewability : 
-                            span 100%
-                            label Availability : 
-                            i.fa.fa-desktop
-                        img(src="/assets/images/browser-topbar.png" class="img-responsive")
-                        .frame
-                            .content
-                                iframe(src="/interactive-ads-demo/sticky-left")
-                    .demo-content#sticky-right
-                        h2 Sticky Right
-                        p.features
-                            label Viewability : 
-                            span 100%
-                            label Availability : 
-                            i.fa.fa-desktop
-                        img(src="/assets/images/browser-topbar.png" class="img-responsive")
-                        .frame
-                            .content
-                                iframe(src="/interactive-ads-demo/sticky-right")
-                    .demo-content#docked
-                        h2 Docked
-                        p.features
-                            label Viewability : 
-                            span 100%
-                            label Availability : 
-                            i.fa.fa-desktop
-                        img(src="/assets/images/browser-topbar.png" class="img-responsive")
-                        .frame
-                            .content
-                                iframe(src="/interactive-ads-demo/docked")
-                    .demo-content#native
-                        h2 Native
-                        p.features
-                            label Viewability : 
-                            span 100%
-                            label Availability : 
-                            i.fa.fa-desktop
-                            i.fa.fa-mobile
-                        img(src="/assets/images/browser-topbar.png" class="img-responsive")
-                        .frame
-                            .content
-                                iframe(src="/interactive-ads-demo/native")
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 25px; border-bottom: 2px solid #333;") Formats
+                    .row
+                        .col-sm-4
+                            .format
+
     script.
-        $(document).ready(function(){$(".format").on("click",function(){var t=$(this).attr("data-type");$(".demo-content").hide(),$(".demo-message").hide(),$("#"+t).fadeIn()})});
+        $(document).ready(function(){
+
+        });
 
 
 
