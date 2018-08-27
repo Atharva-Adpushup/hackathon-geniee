@@ -270,7 +270,7 @@ const fetchSectionQuery = `SELECT axsid, sec_key, section_md5 FROM ApexSection w
 	fetchPagegroupQuery = `SELECT axpgid, pg_key, name FROM ApexPageGroup where siteid=@__siteid__`,
 	fetchMediationQuery = `SELECT Sum(a.total_requests) AS total_requests,a.report_date,a.siteid,Sum(a.total_revenue)
 	AS total_revenue,b.NAME,c.variation_id
-	FROM MediationNetworkReport a,
+	FROM AdpTagReport a,
 	apexpagegroup b, 
 	apexvariation c,
 	country d
@@ -287,7 +287,7 @@ const fetchSectionQuery = `SELECT axsid, sec_key, section_md5 FROM ApexSection w
 			b.NAME`,
 	fetchMediationQueryNoCountry = `SELECT Sum(a.total_requests) AS total_requests,a.report_date,a.siteid,Sum(a.total_revenue)
 			AS total_revenue,b.NAME,c.variation_id
-			FROM MediationNetworkReport a,
+			FROM AdpTagReport a,
 			apexpagegroup b, 
 			apexvariation c,
 			country d
