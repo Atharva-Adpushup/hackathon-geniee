@@ -219,12 +219,11 @@ display_name ---> network
 // let params = {
 // 	select: ['total_revenue', 'total_xpath_miss', 'total_impressions', 'report_date', 'siteid'],
 // 	where: {
-// 		siteid: 35003,
-// 		pagegroup: ['HOME', 'BLOG'],
-// 		mode: 1,
-// 		section: ['4cd85ecf-64ed-48c9-a921-8d4f26146401']
+// 		siteid: 36458,
+// 		pagegroup: ['TRACK', 'SEARCH', 'HOME', 'ARTIST'],
+// 		mode: 1
 // 	},
-// 	groupBy: ['section']
+// 	groupBy: ['variation']
 // };
 
 // generate(params)
