@@ -82,4 +82,31 @@ function getReportData(site) {
 		});
 }
 
-module.exports = { getReportData };
+function getMediationData(site, data) {
+	let params = {
+		siteId: data.siteId,
+		country: data.country,
+		from: moment()
+			.subtract(3, 'days')
+			.format('YYYY-MM-DD'),
+		to: moment().format('YYYY-MM-DD'),
+		noCountry: data.noCountry || false
+	};
+	return getPagegroupNames(site.get('cmsInfo'))
+		.then(pagegroups =>
+			sqlReportingModule.fetchMediationData({
+				...params,
+				pagegroups
+			})
+		)
+		.then(processData)
+		.catch(err => {
+			console.log(err);
+			return {
+				status: false,
+				data: {}
+			};
+		});
+}
+
+module.exports = { getReportData, getMediationData };

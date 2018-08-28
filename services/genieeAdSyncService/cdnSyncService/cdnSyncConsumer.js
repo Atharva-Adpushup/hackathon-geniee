@@ -5,7 +5,7 @@ var path = require('path'),
 	moment = require('moment'),
 	PromiseFtp = require('promise-ftp'),
 	// universalReportService = require('../../../reports/universal/index'),
-	{ getReportData } = require('../../../reports/universal/index'),
+	{ getReportData, getMediationData } = require('../../../reports/universal/index'),
 	mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
 	fs = Promise.promisifyAll(require('fs')),
 	AdPushupError = require('../../../helpers/AdPushupError'),
@@ -16,13 +16,14 @@ var path = require('path'),
 	couchbase = require('../../../helpers/couchBaseService'),
 	config = require('../../../configs/config');
 
-module.exports = function(site) {
+module.exports = function(site, externalData = {}) {
 	ftp = new PromiseFtp();
 
 	var paramConfig = {
 			siteId: site.get('siteId')
 		},
 		noop = 'function() {}',
+		isExternalRequest = externalData && Object.keys(externalData).length && externalData.externalRequest,
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.min.js'),
 		uncompressedJsTplPath = path.join(
@@ -137,8 +138,8 @@ module.exports = function(site) {
 							serviceScript = serviceScript.substring(62, serviceScript.trim().length - 1);
 
 							if (
-								serviceConfig && 
-								serviceConfig.hbcf.value && 
+								serviceConfig &&
+								serviceConfig.hbcf.value &&
 								serviceConfig.hbcf.value.hbConfig &&
 								serviceConfig.hbAds.length
 							) {
@@ -177,7 +178,10 @@ module.exports = function(site) {
 			};
 		},
 		getComputedConfig = () => {
-			return getReportData(site)
+			function getData() {
+				return isExternalRequest ? getMediationData(site, externalData) : getReportData(site);
+			}
+			return getData()
 				.then(reportData => {
 					if (reportData.status && reportData.data) {
 						return generateAdPushupConfig(site, reportData.data);
@@ -227,9 +231,11 @@ module.exports = function(site) {
 			}
 		),
 		writeTempFile = function(jsFile) {
-			return mkdirpAsync(tempDestPath).then(function() {
-				return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);
-			});
+			return mkdirpAsync(tempDestPath)
+				.then(function() {
+					return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);
+				})
+				.then(() => jsFile);
 		},
 		cwd = function() {
 			return ftp.cwd('/' + site.get('siteId')).catch(function() {
@@ -255,16 +261,29 @@ module.exports = function(site) {
 					return ftp.put(fileConfig.default, 'adpushup.js');
 				})
 				.then(function() {
-					return fileConfig.uncompressed;
+					return Promise.resolve(fileConfig.uncompressed);
 				});
-		};
+		},
+		getFinalConfigWrapper = () => getFinalConfig.then(fileConfig => fileConfig);
 
-	return getFinalConfig
-		.then(uploadJS)
-		.then(writeTempFile)
-		.finally(function() {
-			if (ftp.getConnectionStatus() === 'connected') {
-				ftp.end();
-			}
-		});
+	return Promise.join(getFinalConfigWrapper(), fileConfig => {
+		function processing() {
+			return isExternalRequest ? Promise.resolve(fileConfig.uncompressed) : uploadJS(fileConfig);
+		}
+		return processing()
+			.then(writeTempFile)
+			.then(() => {
+				if (ftp.getConnectionStatus() === 'connected') {
+					ftp.end();
+				} else {
+					return fileConfig.default;
+				}
+			})
+			.catch(err => {
+				if (ftp && ftp.getConnectionStatus() === 'connected') {
+					ftp.end();
+				}
+				return Promise.reject(err);
+			});
+	});
 };
