@@ -28,7 +28,7 @@ block headCss
             padding: 5px 10px;
         }
         .preview-pane {
-            margin: 0 15px;
+            margin: 0 15px 25px;
             font-size: 1.25em;
             font-weight: 300;
         }
@@ -39,6 +39,21 @@ block headCss
             margin-right: 20px;
             text-decoration: underline;
             cursor: pointer;
+        }
+        .desktop-frame {
+            width: 100%;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+        }
+        .mobile-frame {
+            width: 40%;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            height: 500px;
+        }
+        .mobile-frame > .frame,
+        .mobile-frame > .frame > .content {
+            height: 100%;
         }
 
 block bodyContent
@@ -101,16 +116,112 @@ block bodyContent
                                 img(src="/assets/images/formats/native.png" class="img-responsive")
                                 h3 Native
                 .demo-wraper.demo-pane#sticky-top
-                     h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
                         | Sticky Top
                         button.demo-back
                             i.fa.fa-chevron-left
                             | Back
                     .preview-pane
                         i.fa.fa-desktop
-                        span Desktop preview
+                        span.desktop-preview-btn Desktop preview
                         i.fa.fa-mobile
-                        span Mobile preview
+                        span.mobile-preview-btn Mobile preview
+                    .desktop-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-top")
+                    .mobile-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-top")
+                .demo-wraper.demo-pane#sticky-bottom
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
+                        | Sticky bottom
+                        button.demo-back
+                            i.fa.fa-chevron-left
+                            | Back
+                    .preview-pane
+                        i.fa.fa-desktop
+                        span.desktop-preview-btn Desktop preview
+                        i.fa.fa-mobile
+                        span.mobile-preview-btn Mobile preview
+                    .desktop-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-bottom")
+                    .mobile-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-bottom")
+                .demo-wraper.demo-pane#sticky-left
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
+                        | Sticky left
+                        button.demo-back
+                            i.fa.fa-chevron-left
+                            | Back
+                    .preview-pane
+                        i.fa.fa-desktop
+                        span.desktop-preview-btn Desktop preview
+                        i.fa.fa-mobile
+                        span(style="pointer-events: none; text-decoration: none; opacity: .65;").mobile-preview-btn This format is unavailable for mobile devices
+                    .desktop-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-left")
+                    .mobile-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-left")
+                .demo-wraper.demo-pane#sticky-right
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
+                        | Sticky right
+                        button.demo-back
+                            i.fa.fa-chevron-left
+                            | Back
+                    .preview-pane
+                        i.fa.fa-desktop
+                        span.desktop-preview-btn Desktop preview
+                        i.fa.fa-mobile
+                        span(style="pointer-events: none; text-decoration: none; opacity: .65;").mobile-preview-btn This format is unavailable for mobile devices
+                    .desktop-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-right")
+                .demo-wraper.demo-pane#docked
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
+                        | Docked
+                        button.demo-back
+                            i.fa.fa-chevron-left
+                            | Back
+                    .preview-pane
+                        i.fa.fa-desktop
+                        span.desktop-preview-btn Desktop preview
+                        i.fa.fa-mobile
+                        span(style="pointer-events: none; text-decoration: none; opacity: .65;").mobile-preview-btn This format is unavailable for mobile devices
+                    .desktop-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/docked")
+                .demo-wraper.demo-pane#native
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
+                        | Native
+                        button.demo-back
+                            i.fa.fa-chevron-left
+                            | Back
+                    .preview-pane
+                        i.fa.fa-desktop
+                        span.desktop-preview-btn Desktop preview
+                        i.fa.fa-mobile
+                        span.mobile-preview-btn Mobile preview
+                    .desktop-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/native")
+                    .mobile-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/native")
+                    
 
     script.
         $(document).ready(function(){
@@ -155,13 +266,24 @@ block bodyContent
                 var formatName = $(this).attr('data-format');
                 $('.format').hide();
                 $('#formats-list').hide();
-                $('#'+formatName).fadeIn();
+                $('#'+formatName).show();
+                $('.desktop-frame').show();
+                $('.mobile-frame').hide();
             });
 
             $('.demo-back').on('click', function() {
                 $('.format').show();
                 $('#formats-list').show();
                 $('.demo-pane').hide();
+            });
+
+            $('.desktop-preview-btn').on('click', function() {
+                $('.desktop-frame').show();
+                $('.mobile-frame').hide();
+            });
+            $('.mobile-preview-btn').on('click', function() {
+                $('.mobile-frame').show();
+                $('.desktop-frame').hide();
             });
         });
 
