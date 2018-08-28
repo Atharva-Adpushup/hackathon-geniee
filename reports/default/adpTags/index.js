@@ -1,7 +1,14 @@
 const Promise = require('bluebird'),
 	_ = require('lodash'),
 	dbHelper = require('../common/mssql/dbhelper'),
-	{ fetchSectionQuery, fetchVariationQuery, fetchPagegroupQuery, liveSitesQuery } = require('./constants'),
+	{
+		fetchSectionQuery,
+		fetchVariationQuery,
+		fetchPagegroupQuery,
+		liveSitesQuery,
+		fetchMediationQuery,
+		fetchMediationQueryNoCountry
+	} = require('./constants'),
 	queryHelper = require('./queryHelper');
 
 function checkWhere(where) {
@@ -209,6 +216,54 @@ function fetchLiveSites(params) {
 	});
 }
 
+function fetchMediationData(params) {
+	let pagegroupString = '',
+		pagegroupsParams = _.map(params.pagegroups, (value, index) => {
+			pagegroupString += `@__name_${index}__,`;
+			return {
+				name: `__name_${index}__`,
+				type: 'NVARCHAR',
+				value: value
+			};
+		}),
+		query = params.noCountry ? fetchMediationQueryNoCountry : fetchMediationQuery,
+		inputParameters = [
+			{
+				name: '__siteid__',
+				type: 'INT',
+				value: params.siteId
+			},
+			{
+				name: '__from__',
+				type: 'DATE',
+				value: params.from
+			},
+			{
+				name: '__to__',
+				type: 'DATE',
+				value: params.to
+			},
+			...pagegroupsParams
+		];
+
+	inputParameters = params.noCountry
+		? inputParameters
+		: [
+				...inputParameters,
+				{
+					name: '__country_code_alpha2',
+					type: 'NVARCHAR',
+					value: params.country
+				}
+		  ];
+
+	pagegroupString = pagegroupString.slice(0, -1);
+	return executeQuery({
+		query: query.replace('__pagegroup__', pagegroupString),
+		inputParameters: inputParameters
+	});
+}
+
 /*
 total_impressions ----> total_ad_requests
 total_requests ----> total_pageviews
@@ -216,8 +271,10 @@ device_type ---> device_type
 display_name ---> network
 */
 
+// let moment = require('moment');
+
 // let params = {
-// 	select: ['total_revenue', 'total_xpath_miss', 'total_impressions', 'report_date', 'siteid'],
+// 	select: ['total_revenue', 'total_requests', 'report_date', 'siteid'],
 // 	where: {
 // 		siteid: 36458,
 // 		pagegroup: ['TRACK', 'SEARCH', 'HOME', 'ARTIST'],
@@ -234,4 +291,4 @@ display_name ---> network
 // 		debugger;
 // 	});
 
-module.exports = { generate, getPVS, executeQuery, fetchLiveSites };
+module.exports = { generate, getPVS, executeQuery, fetchLiveSites, fetchMediationData };

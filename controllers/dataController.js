@@ -1,4 +1,5 @@
 var express = require('express'),
+	_ = require('lodash'),
 	userModel = require('../models/userModel'),
 	siteModel = require('../models/siteModel'),
 	channelModel = require('../models/channelModel'),
@@ -8,6 +9,7 @@ var express = require('express'),
 	sqlQueryModule = require('../reports/default/common/mssql/queryHelpers/fullSiteData'),
 	apexSingleChannelVariationModule = require('../reports/default/apex/modules/mssql/singleChannelVariationData'),
 	singleChannelVariationQueryHelper = require('../reports/default/common/mssql/queryHelpers/singleChannelVariationData'),
+	syncCDNService = require('../services/genieeAdSyncService/cdnSyncService/cdnSyncConsumer'),
 	liveSitesService = require('../misc/scripts/adhoc/liveSites/index'),
 	Promise = require('bluebird'),
 	extend = require('extend'),
@@ -458,6 +460,34 @@ router
 
 		liveSitesService.init();
 		return res.json({ message });
+	})
+	.get('/adpushup.js', function(req, res) {
+		let siteId = req.baseUrl.replace('/', ''),
+			countryHeader = req.headers['x-cf-geodata'] || false,
+			country = countryHeader ? countryHeader.replace('country_code=', '').replace(/"/g, '') : false,
+			noCountry = country ? false : true;
+
+		return siteModel
+			.getSiteById(siteId)
+			.then(site => {
+				return syncCDNService(site, {
+					externalRequest: true,
+					country: country,
+					siteId: siteId,
+					noCountry: noCountry
+				});
+			})
+			.then(apJs => {
+				res.status(200)
+					.set('x-cf-geodata', country)
+					.set('Content-Type', 'application/javascript')
+					.set('Cache-Control', 'max-age=3600');
+				return res.send(apJs);
+			})
+			.catch(err => {
+				console.log(err);
+				return res.sendStatus(400);
+			});
 	});
 
 module.exports = router;
