@@ -46,13 +46,33 @@ block headCss
             border: 1px solid #ddd;
         }
         .mobile-frame {
-            width: 40%;
+            width: 35%;
             margin: 0 auto;
             border: 1px solid #ddd;
-            height: 500px;
+            height: 650px;
         }
         .mobile-frame > .frame,
         .mobile-frame > .frame > .content {
+            height: 100%;
+        }
+        .sbdf {
+            height: 650px;
+        }
+        .sbdf > .frame,
+        .sbdf > .frame > .content {
+            height: 100%;
+            padding: 0;
+        }
+        .sidebar {
+            height: 900px;
+        }
+        #sticky-top:-webkit-full-screen,
+        #sticky-bottom:-webkit-full-screen,
+        #sticky-left:-webkit-full-screen,
+        #sticky-right:-webkit-full-screen,
+        #docked:-webkit-full-screen,
+        #native:-webkit-full-screen {
+            width: 100%;
             height: 100%;
         }
 
@@ -122,6 +142,8 @@ block bodyContent
                             i.fa.fa-chevron-left
                             | Back
                     .preview-pane
+                        i.fa.fa-arrows
+                        span.fullscreen-btn(data-format="sticky-top") Fullscreen
                         i.fa.fa-desktop
                         span.desktop-preview-btn Desktop preview
                         i.fa.fa-mobile
@@ -141,11 +163,13 @@ block bodyContent
                             i.fa.fa-chevron-left
                             | Back
                     .preview-pane
+                        i.fa.fa-arrows
+                        span.fullscreen-btn(data-format="sticky-bottom") Fullscreen
                         i.fa.fa-desktop
                         span.desktop-preview-btn Desktop preview
                         i.fa.fa-mobile
                         span.mobile-preview-btn Mobile preview
-                    .desktop-frame
+                    .desktop-frame.sbdf
                         .frame
                             .content
                                 iframe(src="/interactive-ads-demo/sticky-bottom")
@@ -160,6 +184,8 @@ block bodyContent
                             i.fa.fa-chevron-left
                             | Back
                     .preview-pane
+                        i.fa.fa-arrows
+                        span.fullscreen-btn(data-format="sticky-left") Fullscreen
                         i.fa.fa-desktop
                         span.desktop-preview-btn Desktop preview
                         i.fa.fa-mobile
@@ -179,6 +205,8 @@ block bodyContent
                             i.fa.fa-chevron-left
                             | Back
                     .preview-pane
+                        i.fa.fa-arrows
+                        span.fullscreen-btn(data-format="sticky-right") Fullscreen
                         i.fa.fa-desktop
                         span.desktop-preview-btn Desktop preview
                         i.fa.fa-mobile
@@ -194,6 +222,8 @@ block bodyContent
                             i.fa.fa-chevron-left
                             | Back
                     .preview-pane
+                        i.fa.fa-arrows
+                        span.fullscreen-btn(data-format="docked") Fullscreen
                         i.fa.fa-desktop
                         span.desktop-preview-btn Desktop preview
                         i.fa.fa-mobile
@@ -209,6 +239,8 @@ block bodyContent
                             i.fa.fa-chevron-left
                             | Back
                     .preview-pane
+                        i.fa.fa-arrows
+                        span.fullscreen-btn(data-format="native") Fullscreen
                         i.fa.fa-desktop
                         span.desktop-preview-btn Desktop preview
                         i.fa.fa-mobile
@@ -225,7 +257,6 @@ block bodyContent
 
     script.
         $(document).ready(function(){
-            $('.sidebar').css('height', $(document).height());
             $('input').on('change', function() {
                 var activeFilters = [],
                     filterCheckboxes = $('input'),
@@ -284,6 +315,13 @@ block bodyContent
             $('.mobile-preview-btn').on('click', function() {
                 $('.mobile-frame').show();
                 $('.desktop-frame').hide();
+            });
+
+            $('.fullscreen-btn').on('click', function() {
+                var format = $(this).attr('data-format');
+                if(document.getElementById(format).requestFullscreen) {
+                    document.getElementById(format).requestFullscreen();
+                }
             });
         });
 
