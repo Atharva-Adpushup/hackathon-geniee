@@ -43,8 +43,10 @@ function processData(response) {
 				pageViews: 0 // total_requests
 			};
 			singleVariationData.forEach(row => {
-				innerObj[variationId].pageViews += parseInt(row['total_requests']);
-				innerObj[variationId].pageRevenue += parseFloat(row['total_revenue']);
+				let total_revenue = row['total_revenue'] || 0,
+					total_requests = row['total_requests'] || 0;
+				innerObj[variationId].pageViews += parseInt(total_requests);
+				innerObj[variationId].pageRevenue += parseFloat(total_revenue);
 			});
 
 			let isInvalidRevenue = !!(

@@ -157,7 +157,7 @@ var Promise = require('bluebird'),
 							firstQuery.aggregate,
 							schema.firstQuery.alias,
 							'adpushup'
-						))
+					  ))
 					: null;
 				firstQuery.nonAggregate.length
 					? (response += `, ${__reduceArrayToString(firstQuery.nonAggregate, schema.firstQuery.alias)}`)
@@ -166,7 +166,7 @@ var Promise = require('bluebird'),
 					? (response += `, ${__reduceArrayToStringAggregate(
 							secondQuery.aggregate,
 							schema.secondQuery.alias
-						)}`)
+					  )}`)
 					: null;
 				if (secondQuery.nonAggregate) {
 					let disjointFields = _.difference(secondQuery.nonAggregate, firstQuery.nonAggregate);
@@ -334,9 +334,9 @@ var Promise = require('bluebird'),
 						}.${field}, `;
 						secondQuery.nonAggregate.push(field);
 					} else if (schema.secondQuery.aggregate.indexOf(field) != -1) {
-						secondQuery.select += ` SUM(${schema.secondQuery.tables.adpTagReport.alias}.${field}) AS ${
-							field
-						}, `;
+						secondQuery.select += ` SUM(${
+							schema.secondQuery.tables.adpTagReport.alias
+						}.${field}) AS ${field}, `;
 						secondQuery.aggregate.push(field);
 					}
 
@@ -401,15 +401,15 @@ var Promise = require('bluebird'),
 					})
 					.then(() => {
 						function addToFirstWhere(alias, condition) {
-							firstQuery.where += ` AND ${alias ? alias : schema.firstQuery.tables.apexSiteReport.alias}${
-								condition
-							} `;
+							firstQuery.where += ` AND ${
+								alias ? alias : schema.firstQuery.tables.apexSiteReport.alias
+							}${condition} `;
 						}
 
 						function addToSecondWhere(alias, condition) {
-							secondQuery.where += ` AND ${alias ? alias : schema.secondQuery.tables.adpTagReport.alias}${
-								condition
-							} `;
+							secondQuery.where += ` AND ${
+								alias ? alias : schema.secondQuery.tables.adpTagReport.alias
+							}${condition} `;
 						}
 
 						_.forEach(data, (value, key) => {
@@ -453,19 +453,19 @@ var Promise = require('bluebird'),
 						firstQuery.nonAggregate.length
 							? (common.groupBy += ` ${
 									common.fields.forUser.length ? ' , ' : ' '
-								} ${__reduceArrayToString(firstQuery.nonAggregate, schema.firstQuery.alias)}`)
+							  } ${__reduceArrayToString(firstQuery.nonAggregate, schema.firstQuery.alias)}`)
 							: null;
 						secondQueryUniqueNonAggregate.length
 							? _.forEach(secondQueryUniqueNonAggregate, (value, key) => {
 									let alias = __getAlias(value, true);
 									common.groupBy += ` , ${alias}.${value}`;
-								})
+							  })
 							: null;
 						uniqueGroupByFields.length
 							? _.forEach(uniqueGroupByFields, (value, key) => {
 									let alias = __getAlias(value, true);
 									common.groupBy += ` , ${alias}.${value}`;
-								})
+							  })
 							: null;
 						return __groupBy();
 					})
@@ -495,7 +495,7 @@ var Promise = require('bluebird'),
 					common.query += ` ) ${schema.firstQuery.alias} `;
 
 					// Second Query
-					common.query += ' INNER JOIN ( ';
+					common.query += ' FULL OUTER JOIN ( ';
 					common.query += secondQuery.select;
 					common.query += secondQuery.from;
 					common.query += secondQuery.where;
