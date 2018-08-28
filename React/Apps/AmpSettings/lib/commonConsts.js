@@ -42,7 +42,7 @@ const commonConsts = {
 				slotId: { alias: 'slotId', value: 'slotId' },
 				pubId: { alias: 'pubId', value: 'pubId' }
 			},
-			adx: {
+			adpTags: {
 				slotId: { alias: 'slotId', value: 'slotId' }
 			}
 		},
@@ -52,7 +52,7 @@ const commonConsts = {
 						data-ad-client="pubId"
 						data-ad-slot="slotId">
 					</amp-ad>`,
-			adx: `<amp-ad width=dWidth height=dHeight
+			adpTags: `<amp-ad width=dWidth height=dHeight
 					type="doubleclick"
 					data-slot="slotId">
 				</amp-ad>`

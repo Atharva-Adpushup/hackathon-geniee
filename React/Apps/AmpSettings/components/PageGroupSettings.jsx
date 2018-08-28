@@ -1,23 +1,36 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
-import Heading from './helper/Heading.jsx';
 import RowColSpan from './helper/RowColSpan.jsx';
 import CollapsePanel from '../../../Components/CollapsePanel.jsx';
 import CustomToggleSwitch from './helper/CustomToggleSwitch.jsx';
 import commonConsts from '../lib/commonConsts';
 import { ajax } from '../../../common/helpers';
 import AdsSettings from './AdsSettings.jsx';
+import SelectorSettings from './SelectorSettings.jsx';
 import Select from 'react-select';
 import '../style.scss';
+import Codemirror from 'react-codemirror';
+import 'codemirror/addon/display/autorefresh.js';
+import cssbeautify from 'cssbeautify';
+import CleanCSS from 'clean-css';
 class PageGroupSettings extends React.Component {
 	constructor(props) {
 		super(props);
+		let options = {
+			indent: '  ',
+			openbrace: 'separate-line',
+			autosemicolon: true
+		};
 		let { siteId, channel } = props,
 			ampSettings = channel.ampSettings || {},
 			social = ampSettings.social || { include: false, apps: [] },
 			ads = ampSettings.ads || [],
 			imgConfig = ampSettings.imgConfig || { widthLimit: 100, heightLimit: 100 },
-			customCSS = { value: ampSettings.customCSS ? ampSettings.customCSS.value : '' },
+			customCSS = {
+				value: ampSettings.customCSS && ampSettings.customCSS.value
+					? cssbeautify(ampSettings.customCSS.value, options)
+					: ''
+			},
 			{
 				selectors = {},
 				toDelete,
@@ -52,52 +65,35 @@ class PageGroupSettings extends React.Component {
 			social,
 			ads,
 			customCSS,
-			afterJs
+			afterJs,
+			isVisible: false
 		};
 	}
 
-	renderSelectors = () => {
-		let selectorConf = commonConsts.pagegroupSelectors;
-		return Object.keys(selectorConf).map(key => {
-			let selectorValue = this.state.selectors[key];
-			if (selectorConf[key].inputType == 'text')
-				return (
-					<RowColSpan label={selectorConf[key].alias} key={key}>
-						<input
-							onChange={e => {
-								let selectors = this.state.selectors;
-								selectors[e.target.name] = e.target.value;
-								this.setState({
-									selectors
-								});
-							}}
-							className="form-control"
-							type={selectorConf[key].inputType}
-							placeholder={selectorConf[key].alias}
-							name={key}
-							defaultValue={selectorValue}
-						/>
-					</RowColSpan>
-				);
-			else
-				return (
-					<RowColSpan label={selectorConf[key].alias} key={key}>
-						<textarea
-							placeholder={selectorConf[key].alias}
-							name={key}
-							value={selectorValue}
-							onChange={e => {
-								let selectors = this.state.selectors, value = e.target.value.trim();
-								selectors[e.target.name] = value.split(',');
-								this.setState({
-									selectors
-								});
-							}}
-						/>
-					</RowColSpan>
-				);
-		});
+	handleButtonClick = () => {
+		this.setState({ isVisible: !this.state.isVisible });
 	};
+
+	isDuplicateSlotId = ads => {
+		let adsenseUniqueIds = [], adpTagUniqueIds = [], found = false;
+		for (let ad of ads) {
+			let { slotId } = ad.data, { type } = ad;
+			if (
+				(type == 'adsense' && adsenseUniqueIds.indexOf(slotId) != -1) ||
+				(type == 'adpTags' && adpTagUniqueIds.indexOf(slotId) != -1)
+			) {
+				found = true;
+			} else {
+				if (type == 'adsense') {
+					adsenseUniqueIds.push(slotId);
+				} else if (type == 'adpTags') {
+					adpTagUniqueIds.push(slotId);
+				}
+			}
+		}
+		return found;
+	};
+
 	renderInputControl = ({ label, name, value, type }) => {
 		return (
 			<Row>
@@ -117,8 +113,11 @@ class PageGroupSettings extends React.Component {
 			</Row>
 		);
 	};
-	parseFormData = ampData => {
-		let finalData = ampData, dataAds = finalData.ads, dataSocial = finalData.social;
+	parseFormData = () => {
+		let finalData = JSON.parse(JSON.stringify(this.state)),
+			dataAds = finalData.ads,
+			dataSocial = finalData.social,
+			dataSelectors = finalData.selectors;
 		let ads = [], activeSocialApps = [];
 		if (dataSocial.include) {
 			for (let i = 0; i < dataSocial.apps.length; i++)
@@ -127,6 +126,10 @@ class PageGroupSettings extends React.Component {
 		finalData.social.apps = activeSocialApps;
 		finalData.beforeJs = finalData.beforeJs ? btoa(finalData.beforeJs) : '';
 		finalData.afterJs = finalData.afterJs ? btoa(finalData.afterJs) : '';
+		if (finalData.customCSS) {
+			let value = new CleanCSS().minify(finalData.customCSS.value).styles;
+			finalData.customCSS = { value };
+		}
 		for (let i = 0; i < dataAds.length; i++) {
 			if (dataAds[i].selector && dataAds[i].adCode && dataAds[i].type) {
 				let adType = dataAds[i].type, adTypeFieldConf = commonConsts.ads.type[adType];
@@ -138,15 +141,31 @@ class PageGroupSettings extends React.Component {
 				}
 			}
 		}
+
+		Object.keys(dataSelectors).map(key => {
+			if (Array.isArray(dataSelectors[key])) {
+				let newSelectorList = dataSelectors[key].map(selector => ({
+					css: selector.css,
+					value: selector.value
+				}));
+				dataSelectors[key] = newSelectorList;
+			} else if (typeof dataSelectors[key] == 'object') {
+				delete dataSelectors[key].isVisible;
+			}
+		});
 		finalData.ads = ads;
 		return finalData;
 	};
 	saveChannelSettings = event => {
 		event.preventDefault();
-		let ampData = this.parseFormData(Object.assign({}, this.state)), pageGroup = this.props.channel.pageGroup;
+		let ampData = this.parseFormData(), pageGroup = this.props.channel.pageGroup;
 		let { siteId } = this.state, selectors = ampData.selectors;
 		if (!selectors.articleContent || !ampData.siteName || !ampData.template) {
 			alert('Article Content, SiteName and Template are required');
+			return;
+		}
+		if (this.isDuplicateSlotId(ampData.ads)) {
+			alert('Slot Ids should be unique!');
 			return;
 		}
 		ajax({
@@ -191,6 +210,16 @@ class PageGroupSettings extends React.Component {
 	};
 	render = () => {
 		const { props } = this, channel = props.channel;
+		const options = {
+			lineNumbers: true,
+			autoRefresh: true,
+			theme: 'solarized',
+			textAreaClassName: ['form-control'],
+			style: {
+				border: '1px solid #eee',
+				height: 'auto'
+			}
+		};
 		return (
 			<CollapsePanel title={channel.pageGroup} className="h4FontSize" noBorder={true}>
 				<form onSubmit={this.saveChannelSettings}>
@@ -199,20 +228,20 @@ class PageGroupSettings extends React.Component {
 						className="mB-0"
 						defaultLayout
 						checked={this.state.isEnabled}
-						onChange={value => {
-							this.setState({ isEnabled: value });
+						onChange={isEnabled => {
+							this.setState({ isEnabled });
 						}}
-						name="IsEnabled"
+						name="isEnabled"
 						layout="horizontal"
 						size="m"
-						id="js-force-sample-url"
+						id={'isEnabled' + channel.pageGroup}
 						on="On"
 						off="Off"
 					/>
 					<hr />
-					<CollapsePanel title="Selector Setting" className="mediumFontSize" noBorder={true}>
-						{this.renderSelectors()}
-					</CollapsePanel>
+
+					<SelectorSettings selectors={this.state.selectors} />
+
 					<hr />
 					<CollapsePanel title="Image Configuration" className="mediumFontSize" noBorder={true}>
 						<RowColSpan label="Width Limit">
@@ -263,7 +292,7 @@ class PageGroupSettings extends React.Component {
 							name="includeSocial"
 							layout="horizontal"
 							size="m"
-							id="js-force-sample-url"
+							id={'includeSocial' + channel.pageGroup}
 							on="On"
 							off="Off"
 						/>
@@ -287,15 +316,14 @@ class PageGroupSettings extends React.Component {
 					<hr />
 					<CollapsePanel title="Other Settings" className="mediumFontSize" noBorder={true}>
 						<RowColSpan label="Custom CSS">
-							<textarea
-								placeholder="Enter Custom CSS here"
-								name="customCSS"
+							<Codemirror
 								value={this.state.customCSS.value}
-								onChange={e => {
+								onChange={value => {
 									let customCSS = this.state.customCSS;
-									customCSS.value = e.target.value;
+									customCSS.value = value;
 									this.setState({ customCSS });
 								}}
+								options={options}
 							/>
 						</RowColSpan>
 						<RowColSpan label="Delete Selector">
@@ -312,14 +340,26 @@ class PageGroupSettings extends React.Component {
 							/>
 						</RowColSpan>
 						<RowColSpan label="Before JS">
-							<textarea
-								name="beforeJs"
+							<Codemirror
 								value={this.state.beforeJs || ''}
-								onChange={this.handleOnChange}
+								onChange={beforeJs => {
+									this.setState({
+										beforeJs
+									});
+								}}
+								options={options}
 							/>
 						</RowColSpan>
 						<RowColSpan label="After JS">
-							<textarea name="afterJs" value={this.state.afterJs || ''} onChange={this.handleOnChange} />
+							<Codemirror
+								value={this.state.afterJs || ''}
+								onChange={afterJs => {
+									this.setState({
+										afterJs
+									});
+								}}
+								options={options}
+							/>
 						</RowColSpan>
 						{this.renderInputControl({
 							label: 'Site Name',

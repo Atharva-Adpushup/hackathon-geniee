@@ -276,13 +276,9 @@ display_name ---> network
 // let params = {
 // 	select: ['total_revenue', 'total_requests', 'report_date', 'siteid'],
 // 	where: {
-// 		siteid: 35498,
-// 		pagegroup: ['HOME', 'PAGE', 'POST'],
-// 		mode: 1,
-// 		from: moment()
-// 			.subtract(3, 'days')
-// 			.format('YYYY-MM-DD'),
-// 		to: moment().format('YYYY-MM-DD')
+// 		siteid: 36458,
+// 		pagegroup: ['TRACK', 'SEARCH', 'HOME', 'ARTIST'],
+// 		mode: 1
 // 	},
 // 	groupBy: ['variation']
 // };

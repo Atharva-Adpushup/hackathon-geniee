@@ -467,9 +467,6 @@ router
 			country = countryHeader ? countryHeader.replace('country_code=', '').replace(/"/g, '') : false,
 			noCountry = country ? false : true;
 
-		console.log(country, countryHeader);
-		console.log(req.headers);
-
 		return siteModel
 			.getSiteById(siteId)
 			.then(site => {
@@ -485,9 +482,6 @@ router
 					.set('x-cf-geodata', country)
 					.set('Content-Type', 'application/javascript')
 					.set('Cache-Control', 'max-age=3600');
-				// _.forEach(req.headers, (value, key) => {
-				// 	res.set(key, value);
-				// });
 				return res.send(apJs);
 			})
 			.catch(err => {
@@ -497,12 +491,3 @@ router
 	});
 
 module.exports = router;
-
-/**
- * // url
- * // country -- header
- * // site -- queryString
- * // GET request
- * // return JS file minified
- * // SQL Fetching change
- */
