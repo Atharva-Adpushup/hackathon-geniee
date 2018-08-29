@@ -23,14 +23,17 @@ class InView extends Component {
 
 	initScrollListener(interactiveAd) {
 		const xPath = '.box_wrapper:eq(2)';
-		window.timeout = window.timeout || null;
+		interactiveAd.timeout = interactiveAd.timeout || null;
 
-		console.log(window.timeout);
+		console.log(interactiveAd.timeout);
 		if (this.elementInViewport(xPath)) {
-			timeout = setTimeout(() => {
-				if (window.timeout) {
-					if (!window.seen) {
-						window.seen = true;
+			interactiveAd.timeout = setTimeout(() => {
+				if (interactiveAd.timeout) {
+					console.log(interactiveAd.seen);
+					if (!interactiveAd.seen) {
+						interactiveAd.seen = true;
+
+						console.log('append');
 						$(xPath)
 							.append(
 								'<div style="margin: 0 auto; width: 300px; height: 250px; background: red">adcode</div>'
@@ -41,8 +44,8 @@ class InView extends Component {
 				}
 			}, commonConsts.FORMATS.IN_VIEW.WAIT_TIMEOUT);
 		} else {
-			window.timeout = null;
-			clearTimeout(timeout);
+			interactiveAd.timeout = null;
+			clearTimeout(interactiveAd.timeout);
 		}
 
 		//parentNode = createParentNode(xPath, interactiveAd);

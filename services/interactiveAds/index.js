@@ -27,6 +27,10 @@ const createInViewAd = interactiveAd => {
 				adp.interactiveAds.ads[interactiveAd.id] = interactiveAd;
 				const eventName = interactiveAd.formatData.event;
 
+				if (interactiveAd.formatData.type === commonConsts.FORMATS.IN_VIEW.NAME) {
+					interactiveAd.seen = false;
+				}
+
 				switch (eventName) {
 					case commonConsts.EVENTS.DOM_LOAD:
 						emitter.subscribe(commonConsts.EVENTS.DOM_LOAD, eventData => {
