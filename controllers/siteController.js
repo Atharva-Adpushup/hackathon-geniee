@@ -326,6 +326,8 @@ router
 	})
 	.post('/:siteId/createPagegroup', function(req, res) {
 		var json = req.body;
+
+		json = utils.getHtmlEncodedJSON(json);
 		console.log('Inside CreatePagegroup');
 		return channelModel
 			.createPageGroup(json)

@@ -10,6 +10,8 @@ var url = require('url'),
 	Promise = require('bluebird'),
 	randomStore = [],
 	_ = require('lodash'),
+	Entities = require('html-entities').XmlEntities,
+	entities = new Entities(),
 	API = {
 		getPageGroupHash: function(pageGroup, platform) {
 			var name = pageGroup + '_' + platform,
@@ -173,7 +175,7 @@ var url = require('url'),
 				},
 				difference = thisWeek - lastWeek;
 
-			let percentage = Number((difference / lastWeek * 100).toFixed(2)),
+			let percentage = Number(((difference / lastWeek) * 100).toFixed(2)),
 				isNoChange,
 				isPositiveChange,
 				change;
@@ -243,6 +245,33 @@ var url = require('url'),
 			}
 
 			return resultData;
+		},
+		/**
+		 * OBJECTIVE: Get html entities encoded json from input config
+		 * IMPLEMENTATION: Iterate over object properties, encode its values and return updated object
+		 *
+		 * @param {config} Object to iterate upon
+		 * @returns {encodedData} Updated json object
+		 */
+		getHtmlEncodedJSON: config => {
+			const encodedData = {};
+
+			if (!config) {
+				return encodedData;
+			}
+
+			for (let property in config) {
+				let value = config[property],
+					isStringValue = !!(value && typeof value === 'string'),
+					encodedValue;
+
+				if (isStringValue) {
+					encodedValue = entities.encode(value);
+					encodedData[property] = encodedValue;
+				}
+			}
+
+			return encodedData;
 		}
 	};
 
