@@ -98,7 +98,8 @@ class Component {
 				break;
 
 			case commonConsts.FORMATS.IN_VIEW:
-				this.initScrollListener();
+				console.log('test');
+				//this.initScrollListener();
 				break;
 
 			case commonConsts.FORMATS.VIDEO.NAME:

@@ -9,8 +9,6 @@ import config from './src/config';
 import InView from './src/renderer/components/InView/index';
 import { generateAdCode } from '../genieeAdSyncService/genieeAp/src/adCodeGenerator';
 
-window.seen = false;
-
 const createInViewAd = interactiveAd => {
 		const parentNode = null,
 			adCode = generateAdCode(interactiveAd),
@@ -28,15 +26,20 @@ const createInViewAd = interactiveAd => {
 				const eventName = interactiveAd.formatData.event;
 
 				if (interactiveAd.formatData.type === commonConsts.FORMATS.IN_VIEW.NAME) {
-					interactiveAd.seen = false;
+					interactiveAd.xPathViewed = false;
 
-					const xPaths =
-						'.box_wrapper:eq(2),body > div.container.text-center.index_main_txt > div > div > p:nth-child(2)';
-					interactiveAd.formatData.eventData.value = xPaths;
-					interactiveAd.formatData.xPathViewability = {
-						'.box_wrapper:eq(2)': false,
-						'body > div.container.text-center.index_main_txt > div > div > p:nth-child(2)': false
-					};
+					const xPaths = interactiveAd.formatData.eventData.value.split(',');
+
+					if (xPaths.length) {
+						interactiveAd.formatData.xPaths = xPaths;
+
+						let xPathViewability = {};
+						xPaths.forEach(xPath => {
+							xPathViewability[xPath] = false;
+						});
+
+						interactiveAd.formatData.xPathViewability = xPathViewability;
+					}
 				}
 
 				switch (eventName) {

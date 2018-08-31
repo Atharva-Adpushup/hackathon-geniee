@@ -22,18 +22,17 @@ class InView extends Component {
 	}
 
 	initScrollListener(interactiveAd) {
-		const xPathsArr = interactiveAd.formatData.eventData.value.split(',');
+		const { xPaths } = interactiveAd.formatData;
 		interactiveAd.timeout = interactiveAd.timeout || null;
 
-		xPathsArr.forEach(xPath => {
-			console.log(interactiveAd.timeout);
+		xPaths.forEach(xPath => {
 			if (this.elementInViewport(xPath)) {
 				interactiveAd.formatData.xPathViewability[xPath] = true;
+
 				interactiveAd.timeout = setTimeout(() => {
 					if (interactiveAd.timeout) {
-						console.log(interactiveAd.seen);
-						if (!interactiveAd.seen && this.elementInViewport(xPath)) {
-							interactiveAd.seen = true;
+						if (!interactiveAd.xPathViewed && this.elementInViewport(xPath)) {
+							interactiveAd.xPathViewed = true;
 
 							console.log('append');
 							$(xPath).append(
@@ -55,7 +54,6 @@ class InView extends Component {
 		});
 
 		if (!xPathViewable) {
-			console.log('cancel timeout');
 			interactiveAd.timeout = null;
 			clearTimeout(interactiveAd.timeout);
 		}
