@@ -1,20 +1,16 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
-import Heading from './helper/Heading.jsx';
 import RowColSpan from './helper/RowColSpan.jsx';
 import CollapsePanel from '../../../Components/CollapsePanel.jsx';
 import CustomToggleSwitch from './helper/CustomToggleSwitch.jsx';
 import commonConsts from '../lib/commonConsts';
 import { ajax } from '../../../common/helpers';
 import AdsSettings from './AdsSettings.jsx';
+import SelectorSettings from './SelectorSettings.jsx';
 import Select from 'react-select';
 import '../style.scss';
 import Codemirror from 'react-codemirror';
 import 'codemirror/addon/display/autorefresh.js';
-import Menu from '../../Editor/components/shared/menu/menu.jsx';
-import MenuItem from '../../Editor/components/shared/menu/menuItem.jsx';
-import MarginEditor from './helper/marginEditor.jsx';
-import ColorEditor from './helper/colorEditor.jsx';
 import cssbeautify from 'cssbeautify';
 import CleanCSS from 'clean-css';
 class PageGroupSettings extends React.Component {
@@ -78,192 +74,26 @@ class PageGroupSettings extends React.Component {
 		this.setState({ isVisible: !this.state.isVisible });
 	};
 
-	onSelectorGlassClick = key => {
-		let selectors = this.state.selectors;
-		selectors[key].isVisible = false;
-		this.setState({
-			selectors
-		});
-	};
-
-	saveSelectorCss = ({ key, css }) => {
-		let selectors = this.state.selectors;
-		selectors[key].css = css;
-		this.setState({
-			selectors
-		});
-	};
-	onSelectorArrayGlassClick = (key, index) => {
-		let selectors = this.state.selectors;
-		selectors[key][index].isVisible = false;
-		this.setState({
-			selectors
-		});
-	};
-
-	saveSelectorArrayCss = ({ key, css, index }) => {
-		let selectors = this.state.selectors;
-		selectors[key][index].css = css;
-		this.setState({
-			selectors
-		});
-	};
-
-	renderSelector = key => {
-		let selectorConf = commonConsts.pagegroupSelectors,
-			selectorValue = (this.state.selectors[key] && this.state.selectors[key].value) || '';
-		return (
-			<RowColSpan label={selectorConf[key].alias} key={key}>
-				<input
-					onChange={e => {
-						let selectors = this.state.selectors;
-						selectors[e.target.name] = selectors[e.target.name] || {};
-						selectors[e.target.name].value = e.target.value;
-						this.setState({
-							selectors
-						});
-					}}
-					className="blockListInput"
-					type="text"
-					name={key}
-					defaultValue={selectorValue}
-				/>
-				<button
-					className="fa fa-code blockListDelete mL-10"
-					type="button"
-					onClick={() => {
-						let selectors = this.state.selectors;
-						selectors[key] = selectors[key] || {};
-						selectors[key].isVisible = true;
-						this.setState({
-							selectors
-						});
-					}}
-				/>
-				{this.state.selectors[key] && this.state.selectors[key].isVisible
-					? <Menu
-							id="channelMenu"
-							position={{ top: 43 }}
-							arrow="none"
-							onGlassClick={() => this.onSelectorGlassClick(key)}
-						>
-							<MenuItem icon={'fa fa-th'} contentHeading="" key={1}>
-								<MarginEditor
-									css={this.state.selectors[key] && this.state.selectors[key].css}
-									onCancel={() => this.onSelectorGlassClick(key)}
-									handleSubmit={css => this.saveSelectorCss({ key, css })}
-								/>
-							</MenuItem>
-							<MenuItem icon={'fa fa-pencil'} contentHeading="" key={2}>
-								<ColorEditor
-									css={this.state.selectors[key] && this.state.selectors[key].css}
-									onCancel={() => this.onSelectorGlassClick(key)}
-									handleSubmit={css => this.saveSelectorCss({ key, css })}
-								/>
-							</MenuItem>
-
-						</Menu>
-					: ''}
-
-			</RowColSpan>
-		);
-	};
-
-	renderArraySelector = (key, index) => {
-		let selectorValue = (this.state.selectors[key][index] && this.state.selectors[key][index].value) || '';
-		return (
-			<div key={index} className="mB-5">
-				<input
-					onChange={e => {
-						let selectors = this.state.selectors;
-						selectors[key][index].value = e.target.value;
-						this.setState({
-							selectors
-						});
-					}}
-					className="selectorInput"
-					type="text"
-					name={key}
-					defaultValue={selectorValue}
-				/>
-				<button
-					className="fa fa-trash selectorDelete mL-10"
-					type="button"
-					onClick={() => {
-						let selectors = this.state.selectors;
-						selectors[key].splice(index, 1);
-						this.setState({
-							selectors
-						});
-					}}
-				/>
-				<button
-					className="fa fa-code selectorDelete mL-10"
-					type="button"
-					onClick={() => {
-						let selectors = this.state.selectors;
-						selectors[key][index].isVisible = true;
-						this.setState({
-							selectors
-						});
-					}}
-				/>
-
-				{this.state.selectors[key] && this.state.selectors[key][index].isVisible
-					? <Menu
-							id="channelMenu"
-							position={{ top: 43 }}
-							arrow="none"
-							onGlassClick={() => this.onSelectorArrayGlassClick(key, index)}
-						>
-							<MenuItem icon={'fa fa-th'} contentHeading="" key={1}>
-								<MarginEditor
-									css={this.state.selectors[key][index] && this.state.selectors[key][index].css}
-									onCancel={() => this.onSelectorArrayGlassClick(key, index)}
-									handleSubmit={css => this.saveSelectorArrayCss({ key, css, index })}
-								/>
-							</MenuItem>
-							<MenuItem icon={'fa fa-pencil'} contentHeading="" key={2}>
-								<ColorEditor
-									css={this.state.selectors[key][index] && this.state.selectors[key][index].css}
-									onCancel={() => this.onSelectorArrayGlassClick(key, index)}
-									handleSubmit={css => this.saveSelectorArrayCss({ key, css, index })}
-								/>
-							</MenuItem>
-
-						</Menu>
-					: ''}
-
-			</div>
-		);
-	};
-
-	renderSelectors = () => {
-		let selectorConf = commonConsts.pagegroupSelectors;
-		return Object.keys(selectorConf).map(key => {
-			if (selectorConf[key].inputType == 'text') return this.renderSelector(key);
-			else {
-				return (
-					<RowColSpan label={selectorConf[key].alias} key={key}>
-						{this.state.selectors[key] &&
-							this.state.selectors[key].map((value, index) => this.renderArraySelector(key, index))}
-						<button
-							className="btn-primary addButton"
-							type="button"
-							onClick={() => {
-								let selectors = this.state.selectors;
-								selectors[key] = selectors[key] || [];
-								selectors[key].push({});
-								this.setState({ selectors });
-							}}
-						>
-							+ Add
-						</button>
-					</RowColSpan>
-				);
+	isDuplicateSlotId = ads => {
+		let adsenseUniqueIds = [], adpTagUniqueIds = [], found = false;
+		for (let ad of ads) {
+			let { slotId } = ad.data, { type } = ad;
+			if (
+				(type == 'adsense' && adsenseUniqueIds.indexOf(slotId) != -1) ||
+				(type == 'adpTags' && adpTagUniqueIds.indexOf(slotId) != -1)
+			) {
+				found = true;
+			} else {
+				if (type == 'adsense') {
+					adsenseUniqueIds.push(slotId);
+				} else if (type == 'adpTags') {
+					adpTagUniqueIds.push(slotId);
+				}
 			}
-		});
+		}
+		return found;
 	};
+
 	renderInputControl = ({ label, name, value, type }) => {
 		return (
 			<Row>
@@ -283,8 +113,8 @@ class PageGroupSettings extends React.Component {
 			</Row>
 		);
 	};
-	parseFormData = ampData => {
-		let finalData = ampData,
+	parseFormData = () => {
+		let finalData = JSON.parse(JSON.stringify(this.state)),
 			dataAds = finalData.ads,
 			dataSocial = finalData.social,
 			dataSelectors = finalData.selectors;
@@ -328,10 +158,14 @@ class PageGroupSettings extends React.Component {
 	};
 	saveChannelSettings = event => {
 		event.preventDefault();
-		let ampData = this.parseFormData(Object.assign({}, this.state)), pageGroup = this.props.channel.pageGroup;
+		let ampData = this.parseFormData(), pageGroup = this.props.channel.pageGroup;
 		let { siteId } = this.state, selectors = ampData.selectors;
 		if (!selectors.articleContent || !ampData.siteName || !ampData.template) {
 			alert('Article Content, SiteName and Template are required');
+			return;
+		}
+		if (this.isDuplicateSlotId(ampData.ads)) {
+			alert('Slot Ids should be unique!');
 			return;
 		}
 		ajax({
@@ -405,9 +239,9 @@ class PageGroupSettings extends React.Component {
 						off="Off"
 					/>
 					<hr />
-					<CollapsePanel title="Selector Setting" className="mediumFontSize" noBorder={true}>
-						{this.renderSelectors()}
-					</CollapsePanel>
+
+					<SelectorSettings selectors={this.state.selectors} />
+
 					<hr />
 					<CollapsePanel title="Image Configuration" className="mediumFontSize" noBorder={true}>
 						<RowColSpan label="Width Limit">

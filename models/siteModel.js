@@ -4,6 +4,7 @@ var model = require('../helpers/model'),
 	couchbase = require('../helpers/couchBaseService'),
 	globalModel = require('../models/globalModel'),
 	AdPushupError = require('../helpers/AdPushupError'),
+	utils = require('../helpers/utils'),
 	channelModel = require('../models/channelModel'),
 	apConfigSchema = require('./subClasses/site/apConfig'),
 	Promise = require('bluebird'),
@@ -360,14 +361,20 @@ function apiModule() {
 				Object.keys(patterns).forEach(pattern => {
 					patterns[pattern].forEach(p => {
 						delete p.platform;
+						p = utils.getHtmlEncodedJSON(p);
 					});
 				});
 				return patterns;
 			};
 
 			const pageGroupPattern = setPagegroupPattern(JSON.parse(json.settings.pageGroupPattern)),
-				otherSettings = JSON.parse(json.settings.otherSettings),
 				blocklist = JSON.parse(json.settings.blocklist);
+			let otherSettings = JSON.parse(json.settings.otherSettings),
+				encodedOtherSettings = Object.assign({}, otherSettings);
+
+			delete encodedOtherSettings.cookieControlConfig;
+			encodedOtherSettings = utils.getHtmlEncodedJSON(encodedOtherSettings);
+			otherSettings = Object.assign({}, otherSettings, encodedOtherSettings);
 
 			return API.getSiteById(json.siteId).then(site => {
 				var siteConfig = {
@@ -483,25 +490,21 @@ function apiModule() {
 			}
 
 			function getApexPageGroups(pageGroups) {
-				var computedPageGroups = _
-					.uniq(
-						_.map(pageGroups, function(pageGroup) {
-							return getVariationFreeApexPageGroup(pageGroup);
-						})
-					)
-					.sort();
+				var computedPageGroups = _.uniq(
+					_.map(pageGroups, function(pageGroup) {
+						return getVariationFreeApexPageGroup(pageGroup);
+					})
+				).sort();
 
 				return computedPageGroups;
 			}
 
 			return API.getSiteById(siteId).then(function(site) {
-				var pageGroups = _
-					.uniq(
-						_.map(site.get('channels'), function(val) {
-							return val.split(':')[1];
-						})
-					)
-					.sort();
+				var pageGroups = _.uniq(
+					_.map(site.get('channels'), function(val) {
+						return val.split(':')[1];
+					})
+				).sort();
 
 				if ('isApex' in site && site.isApex()) {
 					pageGroups = getApexPageGroups(pageGroups);

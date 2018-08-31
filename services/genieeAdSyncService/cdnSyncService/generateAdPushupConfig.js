@@ -157,10 +157,19 @@ const _ = require('lodash'),
 			// Data required for auto optimiser model
 			// Page revenue is mapped as sum
 			sum:
-				variationData && parseFloat(variationData.pageRevenue) > -1 ? Math.floor(variationData.pageRevenue) : 1,
+				variationData && parseFloat(variationData.pageRevenue) > -1
+					? variationData.pageRevenue < 1
+						? 1
+						: Math.round(variationData.pageRevenue)
+					: 1,
 			// Data required for auto optimiser model
 			// Page view is mapped as count
-			count: variationData && parseInt(variationData.pageViews, 10) > -1 ? Math.floor(variationData.pageViews) : 1
+			count:
+				variationData && parseInt(variationData.pageViews, 10) > -1
+					? variationData.pageViews < 1
+						? 1
+						: Math.round(variationData.pageViews)
+					: 1
 		};
 
 		return computedVariationObj;

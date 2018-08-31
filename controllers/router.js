@@ -50,8 +50,10 @@ module.exports = function(app) {
 		}
 
 		function isOpenRoute() {
-			return _.find(['/tools', '/user/reports/generate'], function(route) {
-				return req.url.indexOf(route) !== -1;
+			return _.find(['/tools', '/user/reports/generate', /\d+\/adpushup.js/], function(route) {
+				let re = new RegExp(route, 'g');
+				return re.test(req.url) || false;
+				// return req.url.indexOf(route) !== -1;
 			})
 				? true
 				: false;
@@ -201,7 +203,7 @@ module.exports = function(app) {
 	);
 
 	app.use(
-		'/data/',
+		['/data/', '/:siteId/'],
 		function(req, res, next) {
 			/* if (!req.session || !req.session.user) {
 		return res.redirect("/login");

@@ -6,20 +6,24 @@ import ColorPicker from './ColorPicker.jsx';
 class ColorEditor extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {};
+		this.state = this.getFormattedCss(props.css);
 	}
 
-	componentWillMount() {
+	componentWillReceiveProps() {
 		let { props } = this, css = props.css;
+		this.setState(this.getFormattedCss(css));
+	}
+
+	getFormattedCss(css) {
+		let formatData = {};
 		if (css) {
 			css = css.split(';');
 			for (let value of css) {
 				let property = value.split(':');
-				this.setState({
-					[property[0]]: property[1]
-				});
+				formatData[property[0]] = property[1];
 			}
 		}
+		return formatData;
 	}
 
 	handleOnChange = e => {

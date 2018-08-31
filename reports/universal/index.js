@@ -43,8 +43,10 @@ function processData(response) {
 				pageViews: 0 // total_requests
 			};
 			singleVariationData.forEach(row => {
-				innerObj[variationId].pageViews += parseInt(row['total_requests']);
-				innerObj[variationId].pageRevenue += parseFloat(row['total_revenue']);
+				let total_revenue = row['total_revenue'] || 0,
+					total_requests = row['total_requests'] || 0;
+				innerObj[variationId].pageViews += parseInt(total_requests);
+				innerObj[variationId].pageRevenue += parseFloat(total_revenue);
 			});
 
 			let isInvalidRevenue = !!(
@@ -80,4 +82,31 @@ function getReportData(site) {
 		});
 }
 
-module.exports = { getReportData };
+function getMediationData(site, data) {
+	let params = {
+		siteId: data.siteId,
+		country: data.country,
+		from: moment()
+			.subtract(3, 'days')
+			.format('YYYY-MM-DD'),
+		to: moment().format('YYYY-MM-DD'),
+		noCountry: data.noCountry || false
+	};
+	return getPagegroupNames(site.get('cmsInfo'))
+		.then(pagegroups =>
+			sqlReportingModule.fetchMediationData({
+				...params,
+				pagegroups
+			})
+		)
+		.then(processData)
+		.catch(err => {
+			console.log(err);
+			return {
+				status: false,
+				data: {}
+			};
+		});
+}
+
+module.exports = { getReportData, getMediationData };
