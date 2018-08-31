@@ -22,28 +22,40 @@ class InView extends Component {
 	}
 
 	initScrollListener(interactiveAd) {
-		const xPath = '.box_wrapper:eq(2)';
+		const xPathsArr = interactiveAd.formatData.eventData.value.split(',');
 		interactiveAd.timeout = interactiveAd.timeout || null;
 
-		console.log(interactiveAd.timeout);
-		if (this.elementInViewport(xPath)) {
-			interactiveAd.timeout = setTimeout(() => {
-				if (interactiveAd.timeout) {
-					console.log(interactiveAd.seen);
-					if (!interactiveAd.seen) {
-						interactiveAd.seen = true;
+		xPathsArr.forEach(xPath => {
+			console.log(interactiveAd.timeout);
+			if (this.elementInViewport(xPath)) {
+				interactiveAd.formatData.xPathViewability[xPath] = true;
+				interactiveAd.timeout = setTimeout(() => {
+					if (interactiveAd.timeout) {
+						console.log(interactiveAd.seen);
+						if (!interactiveAd.seen && this.elementInViewport(xPath)) {
+							interactiveAd.seen = true;
 
-						console.log('append');
-						$(xPath)
-							.append(
+							console.log('append');
+							$(xPath).append(
 								'<div style="margin: 0 auto; width: 300px; height: 250px; background: red">adcode</div>'
-							)
-							.hide()
-							.fadeIn(500);
+							);
+						}
 					}
-				}
-			}, commonConsts.FORMATS.IN_VIEW.WAIT_TIMEOUT);
-		} else {
+				}, commonConsts.FORMATS.IN_VIEW.WAIT_TIMEOUT);
+			} else {
+				interactiveAd.formatData.xPathViewability[xPath] = false;
+			}
+		});
+
+		let xPathViewable = false;
+		Object.keys(interactiveAd.formatData.xPathViewability).forEach(key => {
+			if (interactiveAd.formatData.xPathViewability[key]) {
+				xPathViewable = true;
+			}
+		});
+
+		if (!xPathViewable) {
+			console.log('cancel timeout');
 			interactiveAd.timeout = null;
 			clearTimeout(interactiveAd.timeout);
 		}

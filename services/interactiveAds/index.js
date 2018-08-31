@@ -29,6 +29,14 @@ const createInViewAd = interactiveAd => {
 
 				if (interactiveAd.formatData.type === commonConsts.FORMATS.IN_VIEW.NAME) {
 					interactiveAd.seen = false;
+
+					const xPaths =
+						'.box_wrapper:eq(2),body > div.container.text-center.index_main_txt > div > div > p:nth-child(2)';
+					interactiveAd.formatData.eventData.value = xPaths;
+					interactiveAd.formatData.xPathViewability = {
+						'.box_wrapper:eq(2)': false,
+						'body > div.container.text-center.index_main_txt > div > div > p:nth-child(2)': false
+					};
 				}
 
 				switch (eventName) {
