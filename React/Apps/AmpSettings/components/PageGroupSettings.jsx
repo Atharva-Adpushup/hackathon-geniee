@@ -77,7 +77,7 @@ class PageGroupSettings extends React.Component {
 	isDuplicateSlotId = ads => {
 		let adsenseUniqueIds = [], adpTagUniqueIds = [], found = false;
 		for (let ad of ads) {
-			let { slotId } = ad.data, { type } = ad;
+			let slotId = ad.data ? ad.data.slotId : '', { type } = ad;
 			if (
 				(type == 'adsense' && adsenseUniqueIds.indexOf(slotId) != -1) ||
 				(type == 'adpTags' && adpTagUniqueIds.indexOf(slotId) != -1)
