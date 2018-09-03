@@ -36,7 +36,7 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 				return sticky.render();
 
 			case commonConsts.FORMATS.IN_VIEW.NAME:
-				return adInstance.initScrollListener(interactiveAd); // Initialise scroll listener from previously created ad instance
+				return adInstance.initScrollListener(interactiveAd, adCode); // Initialise scroll listener from previously created ad instance
 
 			// case commonConsts.FORMATS.VIDEO.NAME:
 			// 	const { css } = interactiveAd;
@@ -64,4 +64,4 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 		}
 	};
 
-export default renderer;
+export { renderer, createParentNode };

@@ -97,9 +97,13 @@ class Component {
 				this.parentNode.append($format.append(this.adCode));
 				break;
 
-			case commonConsts.FORMATS.IN_VIEW:
-				console.log('test');
-				//this.initScrollListener();
+			case commonConsts.FORMATS.IN_VIEW.NAME:
+				$format.css({
+					...css,
+					...commonConsts.FORMAT_CSS,
+					...commonConsts.FORMATS.IN_VIEW.BASE_STYLES
+				});
+				this.parentNode.append($format.append(this.adCode));
 				break;
 
 			case commonConsts.FORMATS.VIDEO.NAME:

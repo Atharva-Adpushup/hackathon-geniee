@@ -4,7 +4,7 @@ import $ from './src/$';
 import './src/events';
 import commonConsts from './src/commonConsts';
 import emitter from './src/emitter';
-import renderer from './src/renderer/index';
+import { renderer } from './src/renderer/index';
 import config from './src/config';
 import InView from './src/renderer/components/InView/index';
 import { generateAdCode } from '../genieeAdSyncService/genieeAp/src/adCodeGenerator';

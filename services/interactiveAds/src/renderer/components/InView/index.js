@@ -3,6 +3,7 @@
 import $ from '../../../$';
 import Component from '../Component';
 import commonConsts from '../../../commonConsts';
+import { createParentNode } from '../../index';
 
 class InView extends Component {
 	constructor(parentNode, interactiveAd, adCode) {
@@ -21,7 +22,7 @@ class InView extends Component {
 		return elementBottom > viewportTop && elementTop < viewportBottom;
 	}
 
-	initScrollListener(interactiveAd) {
+	initScrollListener(interactiveAd, adCode) {
 		const { xPaths } = interactiveAd.formatData;
 		interactiveAd.timeout = interactiveAd.timeout || null;
 
@@ -34,10 +35,9 @@ class InView extends Component {
 						if (!interactiveAd.xPathViewed && this.elementInViewport(xPath)) {
 							interactiveAd.xPathViewed = true;
 
-							console.log('append');
-							$(xPath).append(
-								'<div style="margin: 0 auto; width: 300px; height: 250px; background: red">adcode</div>'
-							);
+							const parentNode = createParentNode(xPath, interactiveAd),
+								inView = new InView(parentNode, interactiveAd, adCode);
+							return inView.render();
 						}
 					}
 				}, commonConsts.FORMATS.IN_VIEW.WAIT_TIMEOUT);
@@ -57,9 +57,6 @@ class InView extends Component {
 			interactiveAd.timeout = null;
 			clearTimeout(interactiveAd.timeout);
 		}
-
-		//parentNode = createParentNode(xPath, interactiveAd);
-		// const inView = new InView(parentNode, interactiveAd, adCode);
 	}
 }
 

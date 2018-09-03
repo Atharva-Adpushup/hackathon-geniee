@@ -92,7 +92,11 @@ const commonConsts = {
 		},
 		IN_VIEW: {
 			NAME: 'inview',
-			WAIT_TIMEOUT: 3000
+			WAIT_TIMEOUT: 3000,
+			BASE_STYLES: {
+				position: 'relative',
+				display: 'inline-block'
+			}
 		},
 		VIDEO: {
 			NAME: 'video',
