@@ -19,10 +19,12 @@ const createInViewAd = interactiveAd => {
 	processInteractiveAds = interactiveAds => {
 		const adp = window.adpushup;
 		adp.interactiveAds = $.extend({}, config, { adsRendered: 0 });
+		interactiveAds.forEach(interactiveAd => {
+			adp.interactiveAds.ads[interactiveAd.id] = interactiveAd;
+		});
 
 		interactiveAds.forEach(interactiveAd => {
 			if (interactiveAd.formatData && interactiveAd.formatData.event) {
-				adp.interactiveAds.ads[interactiveAd.id] = interactiveAd;
 				const eventName = interactiveAd.formatData.event;
 
 				if (interactiveAd.formatData.type === commonConsts.FORMATS.IN_VIEW.NAME) {
