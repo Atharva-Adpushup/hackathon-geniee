@@ -103,7 +103,12 @@ class Component {
 					...commonConsts.FORMAT_CSS,
 					...commonConsts.FORMATS.IN_VIEW.BASE_STYLES
 				});
-				this.parentNode.append($format.append(this.adCode));
+				this.parentNode.append(
+					$format
+						.append(this.adCode)
+						.hide()
+						.fadeIn()
+				);
 				break;
 
 			case commonConsts.FORMATS.VIDEO.NAME:
