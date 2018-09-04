@@ -11,6 +11,7 @@ class InView extends Component {
 
 		this.elementInViewport = this.elementInViewport.bind(this);
 		this.initScrollListener = this.initScrollListener.bind(this);
+		this.placeInViewAd = this.placeInViewAd.bind(this);
 	}
 
 	elementInViewport(el) {
@@ -22,7 +23,15 @@ class InView extends Component {
 		return elementBottom > viewportTop && elementTop < viewportBottom;
 	}
 
-	initScrollListener(interactiveAd, adCode) {
+	placeInViewAd(xPath) {
+		const { interactiveAd, adCode } = this,
+			parentNode = createParentNode(xPath, interactiveAd),
+			inView = new InView(parentNode, interactiveAd, adCode);
+
+		return inView.render();
+	}
+
+	initScrollListener(interactiveAd) {
 		const { xPaths } = interactiveAd.formatData;
 		interactiveAd.timeout = interactiveAd.timeout || null;
 
@@ -35,9 +44,7 @@ class InView extends Component {
 						if (!interactiveAd.xPathViewed && this.elementInViewport(xPath)) {
 							interactiveAd.xPathViewed = true;
 
-							const parentNode = createParentNode(xPath, interactiveAd),
-								inView = new InView(parentNode, interactiveAd, adCode);
-							return inView.render();
+							return this.placeInViewAd(xPath);
 						}
 					}
 				}, commonConsts.FORMATS.IN_VIEW.WAIT_TIMEOUT);
