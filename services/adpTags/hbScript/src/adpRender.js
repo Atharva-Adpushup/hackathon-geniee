@@ -160,6 +160,8 @@ var logger = require('../helpers/logger'),
 			slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE
 				? config.GENIEE_NETWORK_ID
 				: config.NETWORK_ID;
+		networkId = slot.dfpNetworkId ? slot.dfpNetworkId : networkId;
+
 		slot.gSlot = googletag.defineSlot(
 			'/' + networkId + '/' + slot.optionalParam.dfpAdunitCode,
 			slot.optionalParam.multipleAdSizes || slot.size,
