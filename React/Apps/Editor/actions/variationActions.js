@@ -107,6 +107,10 @@ const getLastVariationNumber = function(variations) {
 		}
 	},
 	setActiveVariation = variationId => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
+	updateDfpNetworkId = (variationId, dfpNetworkId) => ({
+		type: variationActions.UPDATE_DFP_NETWORK_ID,
+		payload: { variationId, dfpNetworkId }
+	}),
 	updateVariation = (variationId, payload) => ({ type: variationActions.UPDATE_VARIATION, variationId, payload }),
 	disableVariation = (variationId, channelId, payload) => (dispatch, getState) => {
 		const allVariations = getChannelVariations(getState(), { channelId }),
@@ -201,5 +205,6 @@ export {
 	saveAfterJs,
 	saveKeyValues,
 	updateContentSelector,
-	savePersonalizationInfo
+	savePersonalizationInfo,
+	updateDfpNetworkId
 };
