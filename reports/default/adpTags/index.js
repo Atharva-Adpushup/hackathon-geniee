@@ -277,10 +277,11 @@ let params = {
 	select: ['total_revenue', 'total_requests', 'report_date', 'siteid'],
 	where: {
 		siteid: 36458,
+		variation: ['chshdhshdshd'],
 		pagegroup: ['TRACK', 'SEARCH', 'HOME', 'ARTIST'],
 		mode: 1
-	},
-	groupBy: ['variation']
+	}
+	// groupBy: ['section']
 };
 
 generate(params)

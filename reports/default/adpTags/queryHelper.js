@@ -68,6 +68,15 @@ var Promise = require('bluebird'),
 				});
 				return response.slice(0, -2);
 			},
+			__reduceArrayToStringAggregate_custom = (array, alias, prefix = false) => {
+				let response = ' ';
+				_.forEach(array, (field, key) => {
+					prefix && field == 'total_impressions'
+						? (response += ` (${alias}.${field}) AS 'total_adp_impressions', `)
+						: (response += ` (${alias}.${field}) AS ${field}, `);
+				});
+				return response.slice(0, -2);
+			},
 			__getAlias = (field, flag) => {
 				// flag true for common
 				let alias = false;
@@ -154,7 +163,7 @@ var Promise = require('bluebird'),
 				let response = ' ';
 
 				firstQuery.aggregate.length
-					? (response += __reduceArrayToStringAggregate(
+					? (response += __reduceArrayToStringAggregate_custom(
 							firstQuery.aggregate,
 							schema.firstQuery.alias,
 							'adpushup'
@@ -164,7 +173,7 @@ var Promise = require('bluebird'),
 					? (response += `, ${__reduceArrayToString(firstQuery.nonAggregate, schema.firstQuery.alias)}`)
 					: null;
 				secondQuery.aggregate.length
-					? (response += `, ${__reduceArrayToStringAggregate(
+					? (response += `, ${__reduceArrayToStringAggregate_custom(
 							secondQuery.aggregate,
 							schema.secondQuery.alias
 					  )}`)
@@ -504,9 +513,10 @@ var Promise = require('bluebird'),
 					common.query += ' FROM ( ';
 					common.query += firstQuery.select;
 					common.query += firstQuery.from;
-					common.query += common.level.section
-						? firstQuery.where.replace('c.axsid=g.axsid', 'd.axsid=g.axsid')
-						: firstQuery.where;
+					common.query += firstQuery.where;
+					// common.query += common.level.section
+					// 	? firstQuery.where.replace('c.axsid=g.axsid', 'd.axsid=g.axsid')
+					// 	: firstQuery.where;
 					common.query += firstQuery.groupBy;
 					common.query += ` ) ${schema.firstQuery.alias}, `;
 
@@ -524,9 +534,9 @@ var Promise = require('bluebird'),
 					// ON
 					common.query += ` WHERE ${__generateON()}`;
 
-					common.query += __generateCommonColumnsCondition(schema.firstQuery.alias, schema.secondQuery.alias);
+					common.query += __generateCommonColumnsCondition(schema.firstQuery.alias);
 
-					common.query += common.groupBy ? common.groupBy : ' ';
+					// common.query += common.groupBy ? common.groupBy : ' ';
 					common.query += common.orderBy ? common.orderBy : ' ';
 
 					return {
