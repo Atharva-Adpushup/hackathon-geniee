@@ -273,22 +273,22 @@ display_name ---> network
 
 // let moment = require('moment');
 
-// let params = {
-// 	select: ['total_revenue', 'total_requests', 'report_date', 'siteid'],
-// 	where: {
-// 		siteid: 36458,
-// 		pagegroup: ['TRACK', 'SEARCH', 'HOME', 'ARTIST'],
-// 		mode: 1
-// 	},
-// 	groupBy: ['variation']
-// };
+let params = {
+	select: ['total_revenue', 'total_requests', 'report_date', 'siteid'],
+	where: {
+		siteid: 36458,
+		pagegroup: ['TRACK', 'SEARCH', 'HOME', 'ARTIST'],
+		mode: 1
+	},
+	groupBy: ['variation']
+};
 
-// generate(params)
-// 	.then(response => {
-// 		debugger;
-// 	})
-// 	.catch(err => {
-// 		debugger;
-// 	});
+generate(params)
+	.then(response => {
+		debugger;
+	})
+	.catch(err => {
+		debugger;
+	});
 
 module.exports = { generate, getPVS, executeQuery, fetchLiveSites, fetchMediationData };

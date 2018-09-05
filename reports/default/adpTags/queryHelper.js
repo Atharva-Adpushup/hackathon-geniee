@@ -9,6 +9,7 @@ var Promise = require('bluebird'),
 			__resetVariables = () => {
 				common = {
 					query: 'SELECT ',
+					from: '',
 					fields: {
 						forUser: [],
 						forOn: [],
@@ -129,11 +130,11 @@ var Promise = require('bluebird'),
 					)}`;
 
 					// for sending to user
-					_.forEach(common.fields.forUser, (value, key) => {
-						let currentAlias = __getAlias(value);
-						firstQuery.groupBy += ` ,${currentAlias}.${value} `;
-						secondQuery.groupBy += ` ,${currentAlias}.${value} `;
-					});
+					// _.forEach(common.fields.forUser, (value, key) => {
+					// 	let currentAlias = __getAlias(value);
+					// 	firstQuery.groupBy += ` ,${currentAlias}.${value} `;
+					// 	secondQuery.groupBy += ` ,${currentAlias}.${value} `;
+					// });
 				}
 
 				return Promise.resolve();
@@ -176,7 +177,7 @@ var Promise = require('bluebird'),
 				}
 
 				common.fields.forUser.length
-					? (response += `, ${__reduceArrayToString(common.fields.forUser, schema.firstQuery.alias)}`)
+					? (response += `, ${__reduceArrayToString(common.fields.forUser, schema.firstQuery.alias, true)}`)
 					: null;
 				return response;
 			},
@@ -230,11 +231,11 @@ var Promise = require('bluebird'),
 					);
 
 					// for sending to user
-					_.forEach(common.fields.forUser, (value, key) => {
-						let currentAlias = __getAlias(value);
-						firstQuery.select += ` ,${currentAlias}.${value} `;
-						secondQuery.select += ` ,${currentAlias}.${value} `;
-					});
+					// _.forEach(common.fields.forUser, (value, key) => {
+					// 	let currentAlias = __getAlias(value);
+					// 	firstQuery.select += ` ,${currentAlias}.${value} `;
+					// 	secondQuery.select += ` ,${currentAlias}.${value} `;
+					// });
 				} else {
 					firstQuery.select = firstQuery.select.slice(0, -2);
 					secondQuery.select = secondQuery.select.slice(0, -2);
@@ -266,19 +267,19 @@ var Promise = require('bluebird'),
 			},
 			__whereInParamsProcessing = (key, value) => {
 				let lengthOfValue = value.length;
-				let condition = `.${key} IN (`;
+				// let condition = `.${key} IN (`;
 				for (i = 0; i < lengthOfValue; i++) {
 					let name = `@__${key}_${i}__`;
-					condition += `${name},`;
+					// condition += `${name},`;
 					common.where.push({
 						name: name.substr(1),
 						type: schema.where[key].type,
 						value: value[i]
 					});
 				}
-				condition = condition.slice(0, -1);
-				condition += ')';
-				return condition;
+				// condition = condition.slice(0, -1);
+				// condition += ')';
+				// return condition;
 			},
 			__tableSpecific = field => {
 				// to set specific table conditions in case of joins
@@ -296,6 +297,9 @@ var Promise = require('bluebird'),
 				let response = ' ';
 				if (common.fields.commonOn.length) {
 					_.forEach(common.fields.commonOn, (value, key) => {
+						response += `${schema.firstQuery.alias}.${value}=${schema.secondQuery.alias}.${value} AND `;
+					});
+					_.forEach(common.fields.forOn, (value, key) => {
 						response += `${schema.firstQuery.alias}.${value}=${schema.secondQuery.alias}.${value} AND `;
 					});
 					return response.slice(0, -4);
@@ -365,10 +369,11 @@ var Promise = require('bluebird'),
 						keysRequired,
 						(value, key) => `${schema.common.tables[value].table} ${schema.common.tables[value].alias}`
 					).join(', ');
-					firstQuery.from += ` ,${response} `;
-					secondQuery.from += ` ,${response} `;
+					common.from += response;
+					// firstQuery.from += ` ,${response} `;
+					// secondQuery.from += ` ,${response} `;
 				}
-				return Promise.resolve();
+				return true;
 			},
 			where: data => {
 				return __resetVariables()
@@ -423,18 +428,29 @@ var Promise = require('bluebird'),
 										value: value
 									})
 								);
+								if (
+									schema.firstQuery.where.indexOf(key) !== -1 ||
+									schema.secondQuery.where.indexOf(key) !== -1
+								) {
+									schema.firstQuery.where.indexOf(key) !== -1
+										? addToFirstWhere(alias, condition)
+										: addToSecondWhere(alias, condition);
+								} else {
+									addToFirstWhere(alias, condition);
+									addToSecondWhere(alias, condition);
+								}
 							}
-							if (
-								schema.firstQuery.where.indexOf(key) !== -1 ||
-								schema.secondQuery.where.indexOf(key) !== -1
-							) {
-								schema.firstQuery.where.indexOf(key) !== -1
-									? addToFirstWhere(alias, condition)
-									: addToSecondWhere(alias, condition);
-							} else {
-								addToFirstWhere(alias, condition);
-								addToSecondWhere(alias, condition);
-							}
+							// if (
+							// 	schema.firstQuery.where.indexOf(key) !== -1 ||
+							// 	schema.secondQuery.where.indexOf(key) !== -1
+							// ) {
+							// 	schema.firstQuery.where.indexOf(key) !== -1
+							// 		? addToFirstWhere(alias, condition)
+							// 		: addToSecondWhere(alias, condition);
+							// } else {
+							// 	addToFirstWhere(alias, condition);
+							// 	addToSecondWhere(alias, condition);
+							// }
 						});
 						return true;
 					});
@@ -469,8 +485,8 @@ var Promise = require('bluebird'),
 							: null;
 						return __groupBy();
 					})
-					.then(response => __completeRemainingSelect())
-					.then(response => __setCommonColumnsCondition());
+					.then(response => __completeRemainingSelect());
+				// .then(response => __setCommonColumnsCondition());
 			},
 			orderBy: data => {
 				if (!_.isArray(data) || !data.length) {
@@ -492,18 +508,21 @@ var Promise = require('bluebird'),
 						? firstQuery.where.replace('c.axsid=g.axsid', 'd.axsid=g.axsid')
 						: firstQuery.where;
 					common.query += firstQuery.groupBy;
-					common.query += ` ) ${schema.firstQuery.alias} `;
+					common.query += ` ) ${schema.firstQuery.alias}, `;
 
 					// Second Query
-					common.query += ' FULL OUTER JOIN ( ';
+					// common.query += ' FULL OUTER JOIN ( ';
+					common.query += ' ( ';
 					common.query += secondQuery.select;
 					common.query += secondQuery.from;
 					common.query += secondQuery.where;
 					common.query += secondQuery.groupBy;
-					common.query += ` ) ${schema.secondQuery.alias} `;
+					common.query += ` ) ${schema.secondQuery.alias}, `;
+
+					common.query += ` ${common.from} `;
 
 					// ON
-					common.query += `ON ${__generateON()}`;
+					common.query += ` WHERE ${__generateON()}`;
 
 					common.query += __generateCommonColumnsCondition(schema.firstQuery.alias, schema.secondQuery.alias);
 
