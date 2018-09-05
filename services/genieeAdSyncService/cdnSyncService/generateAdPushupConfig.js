@@ -133,7 +133,8 @@ const _ = require('lodash'),
 		var ads = getSectionsPayload(variation.sections, platform, pageGroup),
 			computedVariationObj,
 			contentSelector = variation.contentSelector,
-			isContentSelector = !!contentSelector;
+			isContentSelector = !!contentSelector,
+			dfpNetworkId = variation.dfpNetworkId ? variation.dfpNetworkId : '';
 
 		if (!ads.length) {
 			return true;
@@ -148,6 +149,7 @@ const _ = require('lodash'),
 			contentSelector: isContentSelector ? contentSelector : '',
 			ads: ads,
 			personalization: variation.personalization,
+			dfpNetworkId: dfpNetworkId,
 			// Data required for auto optimiser model
 			// Page revenue is mapped as sum
 			sum:
