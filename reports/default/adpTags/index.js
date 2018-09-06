@@ -289,28 +289,33 @@ display_name ---> network
 // };
 
 // Reporting Panel
-let params = {
-	select: ['total_revenue', 'report_date', 'siteid', 'total_xpath_miss', 'total_impressions'],
-	where: {
-		siteid: 35498,
-		variation: [
-			'10c502fb-2d23-466c-9488-8da4caef9eca',
-			'b58fd72a-d491-420b-afee-4f4794cf4fd2',
-			'466fea02-1d17-4a1a-99d0-d3fc7af2f6fa',
-			'387b55ba-6164-4ecc-b5a6-0bae45d2e534'
-		],
-		pagegroup: ['POST'],
-		mode: 1
-	},
-	groupBy: ['section']
-};
+// let params = {
+// 	select: [
+// 		'total_revenue',
+// 		'total_requests',
+// 		'total_gross_revenue',
+// 		'ntwid',
+// 		'report_date',
+// 		'siteid',
+// 		'total_xpath_miss',
+// 		'total_impressions'
+// 	],
+// 	where: {
+// 		siteid: 35498,
+// 		variation: ['f3df9a0e-d409-4797-bbcd-0b2cff9c4713'],
+// 		pagegroup: ['POST'],
+// 		mode: 1,
+// 		device_type: 'HOME'
+// 	},
+// 	groupBy: ['ntwid', 'variation']
+// };
 
-generate(params)
-	.then(response => {
-		debugger;
-	})
-	.catch(err => {
-		debugger;
-	});
+// generate(params)
+// 	.then(response => {
+// 		debugger;
+// 	})
+// 	.catch(err => {
+// 		debugger;
+// 	});
 
 module.exports = { generate, getPVS, executeQuery, fetchLiveSites, fetchMediationData };

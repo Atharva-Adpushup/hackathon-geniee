@@ -539,9 +539,7 @@ var Promise = require('bluebird'),
 					common.query += firstQuery.select;
 					common.query += firstQuery.from;
 					common.query += firstQuery.where;
-					// common.query += common.level.section
-					// 	? firstQuery.where.replace('c.axsid=g.axsid', 'd.axsid=g.axsid')
-					// 	: firstQuery.where;
+					common.query += common.level.section ? ' AND c.axhsrid = d.axhsrid ' : ' ';
 					common.query += firstQuery.groupBy;
 					common.query += ` ) ${schema.firstQuery.alias}, `;
 
