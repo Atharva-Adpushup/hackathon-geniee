@@ -183,12 +183,12 @@ module.exports = {
 			if (variations.length) {
 				variations.forEach(function(variation) {
 					if (variation.id === selectedVariation) {
-						dfpNetworkId = variation.dfpNetworkId ? variation.dfpNetworkId : null;
+						dfpNetworkId = variation.dfpNetworkId ? Number(variation.dfpNetworkId) : null;
 					}
 				});
 			}
 
-			return Number(dfpNetworkId);
+			return dfpNetworkId;
 		}
 		return null;
 	},
