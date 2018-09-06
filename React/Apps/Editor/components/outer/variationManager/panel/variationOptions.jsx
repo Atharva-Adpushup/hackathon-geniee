@@ -84,11 +84,9 @@ const variationOtions = props => {
 				</Col>
 				<Col className="u-padding-l10px" xs={4}>
 					<InlineEdit
-						validate
 						value={variation.dfpNetworkId || ''}
 						submitHandler={onUpdateDfpNetworkId.bind(null, variationId)}
 						text="DFP Network ID"
-						errorMessage="DFP Network ID cannot be blank"
 					/>
 				</Col>
 			</Row>
