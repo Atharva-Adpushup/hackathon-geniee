@@ -314,6 +314,31 @@ var Promise = require('bluebird'),
 					return response.slice(0, -4);
 				}
 				return response;
+			},
+			__completeWhere = () => {
+				let pagegroup = ' name IN (',
+					variation = ' variation_id IN (',
+					section = ' section_id IN (',
+					foundPagegroup = false,
+					foundVariation = false,
+					foundSection = false,
+					response = '';
+				_.forEach(common.where, ({ name }, key) => {
+					if (name.match(/name/g)) {
+						foundPagegroup = true;
+						pagegroup += `@${name},`;
+					} else if (name.match(/variation/g)) {
+						foundVariation = true;
+						variation += `@${name},`;
+					} else if (name.match(/section/g)) {
+						foundSection = true;
+						section += `@${name},`;
+					}
+				});
+				response = foundPagegroup ? ` AND ${pagegroup.slice(0, -1)}) ` : response;
+				response = foundVariation ? ` ${response} AND ${variation.slice(0, -1)}) ` : response;
+				response = foundSection ? ` ${response} AND ${pagegroup.slice(0, -1)}) ` : response;
+				return response;
 			};
 		return {
 			select: (data, flag) => {
@@ -535,6 +560,7 @@ var Promise = require('bluebird'),
 					common.query += ` WHERE ${__generateON()}`;
 
 					common.query += __generateCommonColumnsCondition(schema.firstQuery.alias);
+					common.query += __completeWhere();
 
 					// common.query += common.groupBy ? common.groupBy : ' ';
 					common.query += common.orderBy ? common.orderBy : ' ';
