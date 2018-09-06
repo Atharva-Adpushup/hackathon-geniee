@@ -188,7 +188,7 @@ module.exports = {
 				});
 			}
 
-			return dfpNetworkId;
+			return Number(dfpNetworkId);
 		}
 		return null;
 	},
