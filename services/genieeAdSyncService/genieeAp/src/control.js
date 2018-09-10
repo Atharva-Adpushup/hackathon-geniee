@@ -2,7 +2,7 @@ var utils = require('../libs/utils'),
 	w = window,
 	$ = require('jquery');
 
-function Control() {
+function Control(controlCodeType) {
 	var ads = [],
 		err = [],
 		i,
@@ -39,7 +39,12 @@ function Control() {
 				.base64Decode(adObj.ac)
 				.replace('class="adsbygoogle"', 'class="adsbygoogle _ap_control_ad"');
 
-			$(adObj.el).before(adCode);
+			if (controlCodeType === 'prebid') {
+				$('head').prepend(adCode);
+			} else {
+				$(adObj.el).before(adCode);
+			}
+
 			$(adObj.el).remove();
 		}
 	}
