@@ -552,7 +552,12 @@ var Promise = require('bluebird'),
 					common.query += secondQuery.groupBy;
 					common.query += ` ) ${schema.secondQuery.alias}, `;
 
-					common.query += ` ${common.from} `;
+					common.query =
+						common.from && common.from.trim().length
+							? ` ${common.query} ${common.from} `
+							: common.query.slice(0, -2);
+
+					common.query += ' ';
 
 					// ON
 					common.query += ` WHERE ${__generateON()}`;
