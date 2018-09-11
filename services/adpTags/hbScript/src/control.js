@@ -39,6 +39,7 @@ var initControl = require('../../../genieeAdSyncService/genieeAp/src/control'),
 							selectedAdSlot.siteId = w.adpushup.config.siteId;
 							selectedAdSlot.timedOutBidders = timedOutBidders || [];
 							selectedAdSlot.bids = getBidDataForFeedback(containerId) || [];
+							selectedAdSlot.type = 9; // Prebid control code
 						}
 
 						console.log(adSlots);
