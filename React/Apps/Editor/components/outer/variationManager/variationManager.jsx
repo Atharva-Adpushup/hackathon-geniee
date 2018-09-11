@@ -29,6 +29,7 @@ const variationManager = props => {
 						activeChannel={props.activeChannel}
 						channelId={props.activeChannelId}
 						variation={props.activeVariation}
+						zonesData={props.zonesData}
 						sections={props.activeVariationSections}
 						reporting={props.reporting}
 						onUpdateContentSelector={props.updateContentSelector}

@@ -13,7 +13,16 @@ import _ from 'lodash';
 
 const createSection = (sectionPayload, adPayload, variationId) => {
 		const adId = Utils.getRandomNumber(),
-			sectionId = Utils.getRandomNumber();
+			sectionId = Utils.getRandomNumber(),
+			isAdPayload = !!adPayload,
+			isAdNetworkData = !!(isAdPayload && adPayload.networkData),
+			isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId),
+			isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
+
+		if (isCreateZoneContainerId) {
+			adPayload.networkData.zoneContainerId = `${adPayload.networkData.zoneId}-${adId}`;
+			delete adPayload.networkData.createZoneContainerId;
+		}
 
 		return {
 			type: sectionActions.CREATE_SECTION,
@@ -68,7 +77,16 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			adData = {},
 			adWidth = parseInt(adPayload.adSize.substr(0, adPayload.adSize.indexOf('x')).trim(), 10),
 			adHeight = parseInt(adPayload.adSize.substr(adPayload.adSize.indexOf('x') + 1).trim(), 10),
-			network = currentUser.userType === 'partner' ? 'geniee' : adPayload.network ? adPayload.network : 'custom';
+			network = currentUser.userType === 'partner' ? 'geniee' : adPayload.network ? adPayload.network : 'custom',
+			isAdPayload = !!adPayload,
+			isAdNetworkData = !!(isAdPayload && adPayload.networkData),
+			isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId),
+			isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
+
+		if (isCreateZoneContainerId) {
+			adPayload.networkData.zoneContainerId = `${adPayload.networkData.zoneId}-${adId}`;
+			delete adPayload.networkData.createZoneContainerId;
+		}
 
 		dispatch({
 			type: sectionActions.CREATE_INCONTENT_SECTION,

@@ -123,6 +123,53 @@ const getAllVariations = state => state.variationByIds,
 
 			return isCustomAdCode;
 		}
+	),
+	getZonesDataFromActiveVariation = createSelector(
+		[getActiveChannelActiveVariationWithAds],
+		(activeVariationWithAds = {}) => {
+			const zonesCollection = [],
+				isActiveVariation = !!(
+					activeVariationWithAds &&
+					_.isObject(activeVariationWithAds) &&
+					_.keys(activeVariationWithAds).length
+				);
+
+			if (isActiveVariation) {
+				_.forEach(activeVariationWithAds.sections, sectionObj => {
+					_.forEach(sectionObj.ads, adObj => {
+						const isGenieeZone = !!(
+								adObj &&
+								adObj.network === 'geniee' &&
+								adObj.networkData &&
+								adObj.networkData.zoneId
+							),
+							zoneObject = {},
+							isNetworkData = !!(adObj && adObj.networkData),
+							isZoneId = !!(isNetworkData && adObj.networkData.zoneId),
+							isDynamicAllocation = !!(isNetworkData && adObj.networkData.dynamicAllocation),
+							isDFPAdunitCode = !!(isNetworkData && adObj.networkData.dfpAdunitCode),
+							isDFPAdunit = !!(isNetworkData && adObj.networkData.dfpAdunit),
+							isMultipleAdSizes = !!(adObj && adObj.multipleAdSizes && adObj.multipleAdSizes.length);
+
+						if (!isGenieeZone) {
+							return true;
+						}
+
+						isZoneId ? (zoneObject.zoneId = adObj.networkData.zoneId) : null;
+						isDynamicAllocation
+							? (zoneObject.dynamicAllocation = adObj.networkData.dynamicAllocation)
+							: null;
+						isDFPAdunitCode ? (zoneObject.dfpAdunitCode = adObj.networkData.dfpAdunitCode) : null;
+						isDFPAdunit ? (zoneObject.dfpAdunit = adObj.networkData.dfpAdunit) : null;
+						isMultipleAdSizes ? (zoneObject.multipleAdSizes = adObj.multipleAdSizes.concat([])) : null;
+
+						zonesCollection.push(zoneObject);
+					});
+				});
+			}
+
+			return zonesCollection;
+		}
 	);
 
 export {
@@ -137,5 +184,6 @@ export {
 	getChannelVariations,
 	getVariationStructuredSectionsWithAds,
 	getActiveChannelActiveVariationWithAds,
-	getCustomAdCodeFromActiveVariation
+	getCustomAdCodeFromActiveVariation,
+	getZonesDataFromActiveVariation
 };

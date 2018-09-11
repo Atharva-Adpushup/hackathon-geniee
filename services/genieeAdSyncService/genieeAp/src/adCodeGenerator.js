@@ -5,16 +5,22 @@ var utils = require('../libs/utils'),
 		var adCode,
 			genieeRef = window.adpushup && window.adpushup.geniee,
 			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback,
-			isGlobalADPTags = !!window.adpushup.config.isADPTags;
+			isGlobalADPTags = !!window.adpushup.config.isADPTags,
+			isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
+			isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
+			computedDFPAdUnitId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit,
+			computedSSPContainerId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.zoneId;
+
+		computedSSPContainerId = '_ap_apexGeniee_ad_' + computedSSPContainerId;
 
 		if (ad.networkData.adCode) {
 			adCode = utils.base64Decode(ad.networkData.adCode);
-		} else if (ad.network && ad.network == 'geniee' && ad.networkData && ad.networkData.dynamicAllocation) {
+		} else if (ad.network && ad.network === 'geniee' && ad.networkData && ad.networkData.dynamicAllocation) {
 			adCode = [];
-			adCode.push('<div id="' + ad.networkData.dfpAdunit + '">');
+			adCode.push('<div id="' + computedDFPAdUnitId + '">');
 			adCode.push('<scr' + 'ipt type="text/javascript">');
 			adCode.push('window.adpushup.adpTags.que.push(function(){');
-			adCode.push('window.adpushup.adpTags.display("' + ad.networkData.dfpAdunit + '");');
+			adCode.push('window.adpushup.adpTags.display("' + computedDFPAdUnitId + '");');
 			adCode.push('});');
 			adCode.push('</scr' + 'ipt>');
 			adCode.push('</div>');
@@ -32,7 +38,7 @@ var utils = require('../libs/utils'),
 			adCode = [];
 			adCode.push('<scr' + 'ipt type="text/javascript">');
 			adCode.push('gnsmod.cmd.push(function() {');
-			adCode.push('gnsmod.displayAds("_ap_apexGeniee_ad_' + ad.networkData.zoneId + '");');
+			adCode.push('gnsmod.displayAds("' + computedSSPContainerId + '");');
 			adCode.push('});');
 			adCode.push('</scr' + 'ipt>');
 		}
@@ -46,27 +52,28 @@ var utils = require('../libs/utils'),
 			return function() {
 				for (var i = 0; i < adpTagUnits.length; i++) {
 					var ad = adpTagUnits[i],
+						//Geniee specific variables
 						isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
-						defaultAdSizeArray = [Number(ad.width), Number(ad.height)];
+						defaultAdSizeArray = [Number(ad.width), Number(ad.height)],
+						isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
+						isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
+						computedDFPAdUnitId = isZoneContainerId
+							? ad.networkData.zoneContainerId
+							: ad.networkData.dfpAdunit;
 
-					window.adpushup.adpTags.defineSlot(
-						ad.networkData.dfpAdunit,
-						defaultAdSizeArray,
-						ad.networkData.dfpAdunit,
-						{
-							dfpAdunit: ad.networkData.dfpAdunit,
-							dfpAdunitCode: ad.networkData.dfpAdunitCode,
-							headerBidding: ad.networkData.headerBidding,
-							keyValues: ad.networkData.keyValues,
-							network: ad.network,
-							refreshSlot: ad.networkData.refreshSlot,
-							overrideActive: ad.networkData.overrideActive,
-							overrideSizeTo: ad.networkData.overrideSizeTo,
-							multipleAdSizes: isMultipleAdSizes
-								? ad.multipleAdSizes.concat([defaultAdSizeArray])
-								: defaultAdSizeArray
-						}
-					);
+					window.adpushup.adpTags.defineSlot(computedDFPAdUnitId, defaultAdSizeArray, computedDFPAdUnitId, {
+						dfpAdunit: computedDFPAdUnitId,
+						dfpAdunitCode: ad.networkData.dfpAdunitCode,
+						headerBidding: ad.networkData.headerBidding,
+						keyValues: ad.networkData.keyValues,
+						network: ad.network,
+						refreshSlot: ad.networkData.refreshSlot,
+						overrideActive: ad.networkData.overrideActive,
+						overrideSizeTo: ad.networkData.overrideSizeTo,
+						multipleAdSizes: isMultipleAdSizes
+							? ad.multipleAdSizes.concat([defaultAdSizeArray])
+							: defaultAdSizeArray
+					});
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
 				if (adpKeyValues && Object.keys(adpKeyValues).length) {
@@ -159,18 +166,28 @@ module.exports = {
 		}
 		return typeof adCode === 'string' ? adCode : adCode.join('\n');
 	},
-	generateGenieeHeaderCode: function(genieeAdIds) {
-		if (!genieeAdIds || !genieeAdIds.length) {
+	generateGenieeHeaderCode: function(genieeIdCollection) {
+		if (!genieeIdCollection || !genieeIdCollection.length) {
 			return false;
 		}
+
 		var adCode = [],
-			i;
+			i,
+			iteratorObject,
+			containerId,
+			zoneId;
+
 		adCode.push('<scr' + 'ipt type="text/javascript">');
 		adCode.push('var gnsmod = gnsmod || {};');
 		adCode.push('gnsmod.cmd = gnsmod.cmd || [];');
 		adCode.push('gnsmod.cmd.push(function() {');
-		for (i = 0; i < genieeAdIds.length; i++) {
-			adCode.push('gnsmod.defineZone("_ap_apexGeniee_ad_' + genieeAdIds[i] + '", ' + genieeAdIds[i] + ');');
+		for (i = 0; i < genieeIdCollection.length; i++) {
+			iteratorObject = genieeIdCollection[i];
+			containerId = iteratorObject.zoneContainerId || iteratorObject.zoneId;
+			containerId = '_ap_apexGeniee_ad_' + containerId;
+			zoneId = iteratorObject.zoneId;
+
+			adCode.push('gnsmod.defineZone("' + containerId + '", ' + zoneId + ');');
 		}
 		adCode.push('gnsmod.fetchAds();');
 		adCode.push('});');
