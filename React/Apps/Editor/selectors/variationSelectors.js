@@ -148,7 +148,8 @@ const getAllVariations = state => state.variationByIds,
 							isZoneId = !!(isNetworkData && adObj.networkData.zoneId),
 							isDynamicAllocation = !!(isNetworkData && adObj.networkData.dynamicAllocation),
 							isDFPAdunitCode = !!(isNetworkData && adObj.networkData.dfpAdunitCode),
-							isDFPAdunit = !!(isNetworkData && adObj.networkData.dfpAdunit);
+							isDFPAdunit = !!(isNetworkData && adObj.networkData.dfpAdunit),
+							isMultipleAdSizes = !!(adObj && adObj.multipleAdSizes && adObj.multipleAdSizes.length);
 
 						if (!isGenieeZone) {
 							return true;
@@ -160,6 +161,7 @@ const getAllVariations = state => state.variationByIds,
 							: null;
 						isDFPAdunitCode ? (zoneObject.dfpAdunitCode = adObj.networkData.dfpAdunitCode) : null;
 						isDFPAdunit ? (zoneObject.dfpAdunit = adObj.networkData.dfpAdunit) : null;
+						isMultipleAdSizes ? (zoneObject.multipleAdSizes = adObj.multipleAdSizes.concat([])) : null;
 
 						zonesCollection.push(zoneObject);
 					});
