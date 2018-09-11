@@ -53,7 +53,8 @@ class VariationPanel extends React.Component {
 				ui,
 				reporting,
 				onUpdateContentSelector,
-				disabledVariationsCount
+				disabledVariationsCount,
+				zonesData
 			} = this.props,
 			// Geniee UI access before/after js feature visibility condition
 			isBeforeAfterJSHide = !!(
@@ -89,6 +90,7 @@ class VariationPanel extends React.Component {
 							activeChannel={this.props.activeChannel}
 							channelId={channelId}
 							variation={variation}
+							zonesData={zonesData}
 						/>
 					</div>
 					{isBeforeAfterJSHide ? null : (

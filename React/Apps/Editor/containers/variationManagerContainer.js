@@ -12,12 +12,14 @@ import { getActiveChannelId, getActiveChannel } from 'selectors/channelSelectors
 import {
 	getActiveChannelVariationsWithAds,
 	getActiveChannelActiveVariation,
-	getVariationSectionsWithAds
+	getVariationSectionsWithAds,
+	getZonesDataFromActiveVariation
 } from 'selectors/variationSelectors';
 
 const mapStateToProps = state => ({
 		variations: getActiveChannelVariationsWithAds(state),
 		activeVariation: getActiveChannelActiveVariation(state),
+		zonesData: getZonesDataFromActiveVariation(state),
 		activeChannelId: getActiveChannelId(state),
 		activeChannel: getActiveChannel(state),
 		activeVariationSections: getActiveChannelActiveVariation(state)
@@ -54,4 +56,7 @@ const mapStateToProps = state => ({
 		}
 	});
 
-export default connect(mapStateToProps, mapDispatchToProps)(VariationManager);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(VariationManager);

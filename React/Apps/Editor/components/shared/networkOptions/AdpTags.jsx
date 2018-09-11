@@ -32,6 +32,7 @@ class AdpTags extends Component {
 			hbAcivated: isGenieeUIAccessDAInActive ? false : headerBidding,
 			showMultipleAdSizesSelector: false,
 			multipleAdSizes: [],
+			dfpAdunitId: '',
 			refreshSlot,
 			overrideActive,
 			overrideSizeTo,
@@ -59,6 +60,8 @@ class AdpTags extends Component {
 		this.renderManageMultipleAdSizeBlock = this.renderManageMultipleAdSizeBlock.bind(this);
 		this.toggleMultipleAdSizes = this.toggleMultipleAdSizes.bind(this);
 		this.multipleAdSizesSave = this.multipleAdSizesSave.bind(this);
+		this.renderDFPAdUnitIdSelectBox = this.renderDFPAdUnitIdSelectBox.bind(this);
+		this.handleDFPAdUnitIdChange = this.handleDFPAdUnitIdChange.bind(this);
 	}
 
 	filterKeyValues(keyValues) {
@@ -80,7 +83,8 @@ class AdpTags extends Component {
 			refreshSlot,
 			overrideActive,
 			overrideSizeTo,
-			multipleAdSizes
+			multipleAdSizes,
+			dfpAdunitId
 		} = this.state;
 		this.props.submitHandler({
 			headerBidding: !!hbAcivated,
@@ -91,7 +95,8 @@ class AdpTags extends Component {
 			refreshSlot,
 			overrideActive,
 			overrideSizeTo: overrideActive ? overrideSizeTo : null,
-			multipleAdSizes
+			multipleAdSizes,
+			dfpAdunitId
 		});
 	}
 
@@ -214,6 +219,38 @@ class AdpTags extends Component {
 					<Button className="btn-lightBg" onClick={this.toggleMultipleAdSizes}>
 						Manage
 					</Button>
+				</Col>
+			</Row>
+		) : null;
+	}
+
+	handleDFPAdUnitIdChange(dfpAdunitId = '') {
+		this.setState({ dfpAdunitId });
+	}
+
+	renderDFPAdUnitIdSelectBox() {
+		const props = this.props,
+			uniqCollection = props.dfpAdUnitUniqArray || [],
+			isDynamicAllocation = !!this.state.hbAcivated,
+			isInsertMode = props.isInsertMode,
+			isShowBlock = !!(isDynamicAllocation && isInsertMode && uniqCollection.length);
+
+		return isShowBlock ? (
+			<Row className="mT-10">
+				<Col xs={12} className={props.fromPanel ? 'u-padding-0px mB-10' : 'mB-10'}>
+					<SelectBox
+						value={this.state.dfpAdunitId}
+						label="Select a DFP AdUnit Id"
+						onChange={this.handleDFPAdUnitIdChange}
+					>
+						{uniqCollection.map((value, index) => {
+							return (
+								<option key={index} title={value} value={value}>
+									{value}
+								</option>
+							);
+						})}
+					</SelectBox>
 				</Col>
 			</Row>
 		) : null;
@@ -392,6 +429,7 @@ class AdpTags extends Component {
 					</div>
 				)}
 				{this.renderDynamicAllocation()}
+				{this.props.geniee ? this.renderDFPAdUnitIdSelectBox() : null}
 				{this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null}
 				{!this.props.geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
 				{!this.props.geniee ? (

@@ -7,6 +7,8 @@ var express = require('express'),
 	utils = require('../helpers/utils'),
 	channelModel = require('../models/channelModel'),
 	router = express.Router({ mergeParams: true }),
+	Promise = require('bluebird'),
+	adpushupEvent = require('../helpers/adpushupEvent'),
 	config = require('../configs/config');
 
 router
@@ -41,11 +43,14 @@ router
 	})
 	.post('/saveAmpSettings', (req, res) => {
 		let siteId = req.params.siteId, platform = req.body.platform, pageGroup = req.body.pageGroup;
-		channelModel
+		return channelModel
 			.getChannel(siteId, platform, pageGroup)
 			.then(function(pageGroup) {
-				pageGroup.set('ampSettings', req.body.ampData);
-				return pageGroup.save();
+				return Promise.all([siteModel.getSiteById(req.params.siteId), pageGroup]).spread((site, pageGroup) => {
+					adpushupEvent.emit('siteSaved', site);
+					pageGroup.set('ampSettings', req.body.ampData);
+					return pageGroup.save();
+				});
 			})
 			.then(pageGroup => {
 				res.json(pageGroup);
