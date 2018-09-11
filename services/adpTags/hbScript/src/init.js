@@ -4,8 +4,7 @@ var control = require('../../../genieeAdSyncService/genieeAp/src/control');
 
 function init(w, d) {
 	if (w.adpushup.config && w.adpushup.config.mode !== 1) {
-		var controlCodeType = 'prebid';
-		return control.trigger(controlCodeType);
+		return control('prebid').trigger();
 	} else {
 		w.adpushup.adpPrebid = __PREBID_SCRIPT__;
 		w.adpushup.adpPrebid();

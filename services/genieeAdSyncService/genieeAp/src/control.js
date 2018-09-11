@@ -12,8 +12,10 @@ function Control(controlCodeType) {
 		isControlActivated = false;
 
 	(function hookAndfetchAllControlAds() {
-		if (typeof w.adpushup.control === 'object' && w.adpushup.control instanceof Array) {
-			for (i = 0, j = w.adpushup.control, k = j[i]; i < j.length; k = j[++i]) {
+		var controlElArray = controlCodeType === 'prebid' ? w.adpTags.control : w.adpushup.control;
+
+		if (typeof controlElArray === 'object' && controlElArray instanceof Array) {
+			for (i = 0, j = controlElArray, k = j[i]; i < j.length; k = j[++i]) {
 				push(k);
 			}
 		}
