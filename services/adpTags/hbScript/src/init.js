@@ -1,10 +1,20 @@
 // Header bidding initialisation module
 
-var control = require('../../../genieeAdSyncService/genieeAp/src/control');
-
 function init(w, d) {
+	var control = require('./control');
+
+	w.pbjs = w.pbjs || {};
+	w.pbjs.que = w.pbjs.que || [];
+
+	w.googletag = w.googletag || {};
+	googletag.cmd = googletag.cmd || [];
+
 	if (w.adpushup.config && w.adpushup.config.mode !== 1) {
-		return control('prebid').trigger();
+		w.adpTags = w.adpTags || {};
+		w.adpTags.control = control.initControl('prebid');
+		control.initControlFeedback(w);
+
+		return w.adpTags.control.trigger();
 	} else {
 		w.adpushup.adpPrebid = __PREBID_SCRIPT__;
 		w.adpushup.adpPrebid();
@@ -13,10 +23,10 @@ function init(w, d) {
 			gpt = require('./gpt'),
 			config = require('./config'),
 			geniee = require('./geniee'),
-			feedback = require('./feedback');
+			feedback = require('./feedback').feedback;
 
 		// Initialise GPT and set listeners
-		gpt.init(w, d);
+		gpt.init(d);
 		gpt.setListeners(w, function(d) {
 			logger.log('Feedback sent'); // Feedback for DFP slot render sent here
 		});
@@ -46,9 +56,6 @@ function init(w, d) {
 			[].push.call(w.adpushup.adpTags.que, queFunc);
 			w.adpushup.adpTags.processQue();
 		};
-
-		w.pbjs = w.pbjs || {};
-		w.pbjs.que = w.pbjs.que || [];
 
 		function messageListener(e) {
 			var data = e.data;

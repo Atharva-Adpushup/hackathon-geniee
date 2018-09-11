@@ -3,7 +3,7 @@
 var logger = require('../helpers/logger'),
 	utils = require('../helpers/utils'),
 	config = require('./config'),
-	feedback = require('./feedback'),
+	feedback = require('./feedback').feedback,
 	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(1));
 		if (val > 20) {

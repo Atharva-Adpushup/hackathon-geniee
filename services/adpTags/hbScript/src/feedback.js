@@ -109,4 +109,7 @@ var logger = require('../helpers/logger'),
 		);
 	};
 
-module.exports = feedback;
+module.exports = {
+	feedback: feedback,
+	getBidDataForFeedback: getBidDataForFeedback
+};
