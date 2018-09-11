@@ -40,6 +40,7 @@ var initControl = require('../../../genieeAdSyncService/genieeAp/src/control'),
 							selectedAdSlot.timedOutBidders = timedOutBidders || [];
 							selectedAdSlot.bids = getBidDataForFeedback(containerId) || [];
 							selectedAdSlot.type = 9; // Prebid control code
+							selectedAdSlot.status = 'Type 9: Prebid contol code rendered!';
 						}
 
 						console.log(adSlots);
