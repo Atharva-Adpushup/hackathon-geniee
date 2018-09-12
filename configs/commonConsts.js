@@ -2,6 +2,7 @@ module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: 'http://console.adpushup.com',
 	PROXY_ORIGIN: 'http://proxy.app.adpushup.com',
+	DFP_WEB_SERVICE_ENDPOINT: 'http://apdc1-staging-1.eastus2.cloudapp.azure.com:8080/DfpWebService/info',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	DEMO_REPORT_SITE_ID: 31764,
 	DEMO_PAGEGROUPS: ['HOME', 'IMAGE', 'POST', 'PHPBB3', 'NEW', 'CATEGORY'],
