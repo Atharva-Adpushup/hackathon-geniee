@@ -225,15 +225,27 @@ class AdpTags extends Component {
 	}
 
 	handleDFPAdUnitIdChange(dfpAdunitId = '') {
-		this.setState({ dfpAdunitId });
+		const stateObject = {dfpAdunitId},
+			props = this.props,
+			isDfpAdUnitObject = !!(props && props.dfpAdUnitObject && Object.keys(props.dfpAdUnitObject).length),
+			isDfpAdUnitId = !!(dfpAdunitId),
+			isAdUnitInObject = !!(isDfpAdUnitId && isDfpAdUnitObject && props.dfpAdUnitObject.hasOwnProperty(dfpAdunitId) && props.dfpAdUnitObject[dfpAdunitId]);
+
+		if (isAdUnitInObject) {
+			stateObject.multipleAdSizes = props.dfpAdUnitObject[dfpAdunitId].multipleAdSizes.concat([]);
+		} else if (!isDfpAdUnitId) {
+			stateObject.multipleAdSizes = [];
+		}
+
+		this.setState(stateObject);
 	}
 
 	renderDFPAdUnitIdSelectBox() {
 		const props = this.props,
-			uniqCollection = props.dfpAdUnitUniqArray || [],
+			isUniqObject = !!(props.dfpAdUnitObject && Object.keys(props.dfpAdUnitObject).length),
 			isDynamicAllocation = !!this.state.hbAcivated,
 			isInsertMode = props.isInsertMode,
-			isShowBlock = !!(isDynamicAllocation && isInsertMode && uniqCollection.length);
+			isShowBlock = !!(isDynamicAllocation && isInsertMode && isUniqObject);
 
 		return isShowBlock ? (
 			<Row className="mT-10">
@@ -243,7 +255,7 @@ class AdpTags extends Component {
 						label="Select a DFP AdUnit Id"
 						onChange={this.handleDFPAdUnitIdChange}
 					>
-						{uniqCollection.map((value, index) => {
+						{Object.keys(props.dfpAdUnitObject).map((value, index) => {
 							return (
 								<option key={index} title={value} value={value}>
 									{value}
