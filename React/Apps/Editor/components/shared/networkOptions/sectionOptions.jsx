@@ -11,6 +11,13 @@ function getUniqArrayItems(item, index, origArray) {
 	return origArray.indexOf(item) == index;
 }
 
+function getUniqItems(accumulator, item) {
+	const isValidItem = accumulator && item && Object.keys(item).length && !accumulator[item.dfpAdunit] && item.zoneId && item.dynamicAllocation && item.dfpAdunit && item.dfpAdunitCode;
+  
+	isValidItem ? (accumulator[item.dfpAdunit] = Object.assign({}, item)) : null;
+	return accumulator;
+  }
+
 class sectionOptions extends React.Component {
 	constructor(props) {
 		super(props);
@@ -38,27 +45,26 @@ class sectionOptions extends React.Component {
 			zoneIdUniqArray: isZonesData
 				? props.zonesData.map(object => Number(object.zoneId)).filter(getUniqArrayItems)
 				: [],
-			dfpAdUnitUniqArray: isZonesData
-				? props.zonesData.map(object => object.dfpAdunit).filter(getUniqArrayItems)
-				: []
+			dfpAdUnitObject: isZonesData
+				? props.zonesData.reduce(getUniqItems, {})
+				: {}
 		};
 		const isValidZoneIdArray = !!(
 				this.state.zoneIdUniqArray &&
 				this.state.zoneIdUniqArray.length &&
 				this.state.zoneIdUniqArray[0]
 			),
-			isValidDFPAdUnitArray = !!(
-				this.state.dfpAdUnitUniqArray &&
-				this.state.dfpAdUnitUniqArray.length &&
-				this.state.dfpAdUnitUniqArray[0]
+			isValidDFPAdUnitObject = !!(
+				this.state.dfpAdUnitObject &&
+				Object.keys(this.state.dfpAdUnitObject).length
 			);
 
 		if (!isValidZoneIdArray) {
 			this.state.zoneIdUniqArray = [];
 		}
 
-		if (!isValidDFPAdUnitArray) {
-			this.state.dfpAdUnitUniqArray = [];
+		if (!isValidDFPAdUnitObject) {
+			this.state.dfpAdUnitObject = {};
 		}
 	}
 
@@ -196,7 +202,7 @@ class sectionOptions extends React.Component {
 				isAdInFirstFold: firstFold,
 				isAdAsync: asyncTag,
 				zoneId,
-				dfpAdUnitUniqArray,
+				dfpAdUnitObject,
 				zoneIdUniqArray
 			} = state,
 			isRenderZoneIdSelectBox = !!(isInsertMode && zoneIdUniqArray && zoneIdUniqArray.length);
@@ -237,7 +243,7 @@ class sectionOptions extends React.Component {
 					geniee={true}
 					isInsertMode={isInsertMode}
 					primaryAdSize={primaryAdSize}
-					dfpAdUnitUniqArray={dfpAdUnitUniqArray}
+					dfpAdUnitObject={dfpAdUnitObject}
 				/>
 			</div>
 		);
