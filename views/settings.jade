@@ -12,6 +12,12 @@ block append headScripts
     +loadAsset("js", [
         '/assets/js/libs/custom/settings.js?v=1496398593971',
     ])
+    style.
+        .select-wrapper {
+            width: 50%;
+            margin: -10px 0 25px;
+            border-right: 1px solid #ccc;
+        }
 
 block bodyContent
     include layout/sideBar
@@ -123,6 +129,18 @@ block bodyContent
                                                 input(style="margin-top: 10px;" type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "false") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "false"))
                                         .row
                                             .col-sm-12#autoOptimiseErr.error-message
+                                        .row
+                                            .col-sm-12
+                                                h4 Thid party DFP
+                                            .col-sm-12
+                                                .row
+                                                    .col-sm-12
+                                                        .select-wrapper
+                                                            select
+                                                                option(value="" selected) Select DFP Network
+                                                                each dfpAccount in dfpAccounts
+                                                                    option(value=dfpAccount.code)!=dfpAccount.code
+
                                         .row
                                             .col-sm-12
                                                 h4 Manage Blocklist
