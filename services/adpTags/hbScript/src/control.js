@@ -9,9 +9,10 @@ var initControl = require('../../../genieeAdSyncService/genieeAp/src/control'),
 			w.pbjs.onEvent('bidWon', function(bidData) {
 				var winData = {
 					winner: bidData.bidder || bidData.bidderCode,
-					winningRevenue: bidData.cpm ? (bidData.cpm / 1000).toFixed(2) : 0,
-					containerId: bidData.adUnitCode || null,
-					size: bidData.size || null
+					winningCpm: bidData.cpm,
+					winningRevenue: bidData.cpm / 1000,
+					containerId: bidData.adUnitCode,
+					size: bidData.size
 				};
 
 				adSlots.push(winData);
@@ -30,20 +31,28 @@ var initControl = require('../../../genieeAdSyncService/genieeAp/src/control'),
 					var containerId = slotData.slot && slotData.slot.o && slotData.slot.o.m ? slotData.slot.o.m : null;
 
 					if (containerId) {
-						var selectedAdSlot = null;
+						var selectedAdSlot = null,
+							siteId = null,
+							platform = null;
 						adSlots.forEach(function(adSlot) {
 							selectedAdSlot = adSlot.containerId === containerId ? adSlot : null;
 						});
 
+						if (w.adpushup && w.adpushup.config) {
+							siteId = w.adpushup.config.siteId;
+							platform = w.adpushup.config.platform;
+						}
+
 						if (selectedAdSlot) {
-							selectedAdSlot.siteId = w.adpushup.config.siteId;
+							selectedAdSlot.siteId = siteId;
+							selectedAdSlot.platform = platform;
 							selectedAdSlot.timedOutBidders = timedOutBidders || [];
 							selectedAdSlot.bids = getBidDataForFeedback(containerId) || [];
 							selectedAdSlot.type = 9; // Prebid control code
 							selectedAdSlot.status = 'Type 9: Prebid contol code rendered!';
 						}
 
-						console.log(adSlots);
+						// feedback(selectedAdSlot);
 					}
 				}
 			});
