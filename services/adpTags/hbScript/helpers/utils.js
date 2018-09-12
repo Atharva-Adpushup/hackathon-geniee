@@ -172,23 +172,9 @@ module.exports = {
 		}
 		return null;
 	},
-	getDfpNetworkId: function() {
-		if (window.adpushup) {
-			var dfpNetworkId = null,
-				selectedVariation = this.getVariationId(),
-				pageGroup = this.getPageGroup(),
-				platform = this.getPlatform(),
-				variations = window.adpushup.config.experiment[platform][pageGroup].variations;
-
-			if (variations.length) {
-				variations.forEach(function(variation) {
-					if (variation.id === selectedVariation) {
-						dfpNetworkId = variation.dfpNetworkId ? Number(variation.dfpNetworkId) : null;
-					}
-				});
-			}
-
-			return dfpNetworkId;
+	getActiveDFPNetwork: function() {
+		if (window.adpushup && window.adpushup.config) {
+			return window.adpushup.config.activeDFPNetwork;
 		}
 		return null;
 	},

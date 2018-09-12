@@ -7,8 +7,7 @@ import {
 	copyVariation,
 	editVariationName,
 	editTrafficDistribution,
-	disableVariation,
-	updateDfpNetworkId
+	disableVariation
 } from 'actions/variationActions.js';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 import CustomToggleSwitch from '../../../shared/customToggleSwitch.jsx';
@@ -23,8 +22,7 @@ const variationOtions = props => {
 			disabledVariationsCount,
 			onDisableVariation,
 			onEditTrafficDistribution,
-			onUpdateContentSelector,
-			onUpdateDfpNetworkId
+			onUpdateContentSelector
 		} = props,
 		variationId = variation.id,
 		hasDisabledVariationsReachedLimit = !!(
@@ -75,18 +73,6 @@ const variationOtions = props => {
 						submitHandler={onUpdateContentSelector.bind(null, variationId, channelId)}
 						text="Content selector"
 						errorMessage="Content selector cannot be blank"
-					/>
-				</Col>
-			</Row>
-			<Row>
-				<Col className="u-padding-r10px" xs={2}>
-					DFP Network ID
-				</Col>
-				<Col className="u-padding-l10px" xs={4}>
-					<InlineEdit
-						value={variation.dfpNetworkId || ''}
-						submitHandler={onUpdateDfpNetworkId.bind(null, variationId)}
-						text="DFP Network ID"
 					/>
 				</Col>
 			</Row>
@@ -170,8 +156,7 @@ variationOtions.propTypes = {
 	onEditVariationName: PropTypes.func.isRequired,
 	onEditTrafficDistribution: PropTypes.func.isRequired,
 	onUpdateContentSelector: PropTypes.func.isRequired,
-	onDisableVariation: PropTypes.func,
-	onUpdateDfpNetworkId: PropTypes.func
+	onDisableVariation: PropTypes.func
 };
 
 export default connect(
@@ -183,8 +168,7 @@ export default connect(
 				onDeleteVariation: deleteVariation,
 				onEditVariationName: editVariationName,
 				onEditTrafficDistribution: editTrafficDistribution,
-				onDisableVariation: disableVariation,
-				onUpdateDfpNetworkId: updateDfpNetworkId
+				onDisableVariation: disableVariation
 			},
 			dispatch
 		)

@@ -112,16 +112,6 @@ const variation = (state = {}, action) => {
 					}
 				};
 
-			case variationActions.UPDATE_DFP_NETWORK_ID:
-				const { variationId, dfpNetworkId } = action.payload;
-				return {
-					...state,
-					[variationId]: {
-						...state[variationId],
-						dfpNetworkId
-					}
-				};
-
 			case variationActions.EDIT_TRAFFIC_DISTRIBUTION:
 				return {
 					...state,
