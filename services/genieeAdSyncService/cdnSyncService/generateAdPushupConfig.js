@@ -25,14 +25,20 @@ const _ = require('lodash'),
 		return false;
 	},
 	pushToAdpTags = function(ad, json) {
-		const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
+		const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
+			isNetwork = !!ad.network,
+			isNetworkData = !!ad.networkData,
+			isDynamicAllocation = !!(isNetworkData && ad.networkData.dynamicAllocation),
+			isZoneContainerId = !!(isNetworkData && ad.networkData.zoneContainerId),
+			isAdpTagsNetwork = !!(isNetwork && ad.network == 'adpTags'),
+			isGenieeNetwork = !!(isNetwork && ad.network == 'geniee');
 
-		if (ad.network == 'adpTags' || (ad.network == 'geniee' && ad.networkData.dynamicAllocation)) {
+		if (isAdpTagsNetwork || (isGenieeNetwork && isDynamicAllocation)) {
 			let adData = {
 				key: `${json.width}x${json.height}`,
 				height: json.height,
 				width: json.width,
-				dfpAdunit: ad.networkData.dfpAdunit,
+				dfpAdunit: isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit,
 				dfpAdunitCode: ad.networkData.dfpAdunitCode,
 				headerBidding: ad.networkData.headerBidding,
 				keyValues: ad.networkData.keyValues

@@ -4,7 +4,11 @@ import { hideMenu } from 'actions/insertMenuActions';
 import { createSection } from 'actions/sectionActions';
 import { getActiveChannelId } from 'selectors/channelSelectors';
 import { getPartner, getCustomSizes } from 'selectors/siteSelectors';
-import { getActiveChannelActiveVariationId, getCustomAdCodeFromActiveVariation } from 'selectors/variationSelectors';
+import {
+	getActiveChannelActiveVariationId,
+	getCustomAdCodeFromActiveVariation,
+	getZonesDataFromActiveVariation
+} from 'selectors/variationSelectors';
 import { getInsertMenuState } from 'selectors/uiSelectors';
 import { sendMessage } from '../scripts/messengerHelper';
 import { messengerCommands } from '../consts/commonConsts';
@@ -18,7 +22,8 @@ const mapStateToProps = state => {
 			partner: getPartner(state),
 			isCustomAdCodeInVariationAds: getCustomAdCodeFromActiveVariation(state),
 			variationId: getActiveChannelActiveVariationId(state),
-			channelId: getActiveChannelId(state)
+			channelId: getActiveChannelId(state),
+			zonesData: getZonesDataFromActiveVariation(state)
 		};
 	},
 	mapDispatchToProps = dispatch => ({

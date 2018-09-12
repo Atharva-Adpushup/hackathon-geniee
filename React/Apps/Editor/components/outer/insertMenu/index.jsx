@@ -154,6 +154,7 @@ class insertMenu extends React.Component {
 						showNotification={this.props.showNotification}
 						isInsertMode={true}
 						primaryAdSize={this.state.adSize}
+						zonesData={props.zonesData}
 					/>
 				</MenuItem>
 			);
