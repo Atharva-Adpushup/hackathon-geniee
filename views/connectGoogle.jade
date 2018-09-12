@@ -15,7 +15,7 @@ block append headScripts
             function oauthHook(event) {
                 var adsense = JSON.parse(event.data);
                 if(adsense.data) {
-                    $('#oauth').html('<span>Google AdSense Connected<span><i class="fa fa-check"></i>').css('pointer-events', 'none');
+                    $('#oauth').html('<span>Google Connected<span><i class="fa fa-check"></i>').css('pointer-events', 'none');
                 }
                 else {
                     alert('Some error occurred! Please try again later.');
@@ -41,15 +41,16 @@ block bodyContent
                                 a Connect Google
                             .row
                                 .col-sm-3
-                                    img.img-responsive(src="/assets/images/onboarding/3.png" alt="Connect Google AdSense")
+                                    img.img-responsive(src="/assets/images/onboarding/3.png" alt="Connect Google")
                                 .col-sm-9.mT-10
                                     p.widget-text.mT-10.top
-                                        | Connecting your Google AdSense account with AdPushup helps us to pull your AdSense reports so that you can conveniently view them in one place.
+                                        | Connecting your Google account with AdPushup helps us to access your inventory and reports for all Google services and manage them conviniently.
                                     .mT-10
                                         if !adNetworkSettings
-                                            button#oauth.btn.btn-lightBg.btn-default.widget-btn Connect Google AdSense
+                                            button#oauth.btn.btn-lightBg.btn-default.widget-btn 
+                                                | Connect Google
                                         else
-                                            button.btn.btn-lightBg.btn-default.widget-btn(style="pointer-events: none;") Google AdSense Connected 
+                                            button.btn.btn-lightBg.btn-default.widget-btn(style="pointer-events: none;") Google Connected 
                                                 i.fa.fa-check
                                     
                                     if adNetworkSettings
