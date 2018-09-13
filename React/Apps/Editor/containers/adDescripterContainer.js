@@ -7,6 +7,7 @@ import { resetErrors } from 'actions/uiActions';
 import {
 	deleteSection,
 	updateXPath,
+	updateOperation,
 	sectionAllXPaths,
 	validateXPath,
 	renameSection,
@@ -24,6 +25,7 @@ export default connect(
 				updateAdCode: updateAdCode,
 				updateNetwork: updateNetwork,
 				onUpdateXPath: updateXPath,
+				onUpdateOperation: updateOperation,
 				onSectionAllXPaths: sectionAllXPaths,
 				onValidateXPath: validateXPath,
 				onResetErrors: resetErrors,
