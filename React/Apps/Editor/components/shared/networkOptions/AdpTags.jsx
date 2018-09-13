@@ -229,7 +229,7 @@ class AdpTags extends Component {
 			props = this.props,
 			isDfpAdUnitObject = !!(props && props.dfpAdUnitObject && Object.keys(props.dfpAdUnitObject).length),
 			isDfpAdUnitId = !!(dfpAdunitId),
-			isAdUnitInObject = !!(isDfpAdUnitId && isDfpAdUnitObject && props.dfpAdUnitObject.hasOwnProperty(dfpAdunitId) && props.dfpAdUnitObject[dfpAdunitId]);
+			isAdUnitInObject = !!(isDfpAdUnitId && isDfpAdUnitObject && props.dfpAdUnitObject.hasOwnProperty(dfpAdunitId) && props.dfpAdUnitObject[dfpAdunitId] && props.dfpAdUnitObject[dfpAdunitId].multipleAdSizes);
 
 		if (isAdUnitInObject) {
 			stateObject.multipleAdSizes = props.dfpAdUnitObject[dfpAdunitId].multipleAdSizes.concat([]);
