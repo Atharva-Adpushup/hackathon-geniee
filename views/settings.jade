@@ -129,17 +129,19 @@ block bodyContent
                                                 input(style="margin-top: 10px;" type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "false") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "false"))
                                         .row
                                             .col-sm-12#autoOptimiseErr.error-message
-                                        .row
-                                            .col-sm-12
-                                                h4 Thid party DFP
-                                            .col-sm-12
-                                                .row
-                                                    .col-sm-12
-                                                        .select-wrapper
-                                                            select(name="activeDFPNetwork")
-                                                                option(value="" selected) Select DFP Network
-                                                                each dfpAccount in dfpAccounts
-                                                                    option(value=dfpAccount.code selected=(apConfigs.activeDFPNetwork === dfpAccount.code ? true : undefined))!=dfpAccount.code
+
+                                        if dfpAccounts && dfpAccounts.length
+                                            .row
+                                                .col-sm-12
+                                                    h4 Thid party DFP
+                                                .col-sm-12
+                                                    .row
+                                                        .col-sm-12
+                                                            .select-wrapper
+                                                                select(name="activeDFPNetwork")
+                                                                    option(value="" selected) Select DFP Network
+                                                                    each dfpAccount in dfpAccounts
+                                                                        option(value=dfpAccount.code selected=(apConfigs.activeDFPNetwork === dfpAccount.code ? true : undefined))!=dfpAccount.code
 
                                         .row
                                             .col-sm-12
