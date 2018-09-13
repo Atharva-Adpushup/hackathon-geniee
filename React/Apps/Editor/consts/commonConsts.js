@@ -202,7 +202,8 @@ const status = {
 		SCROLL_TO_VIEW: 'SCROLL_TO_VIEW',
 		UPDATE_TYPE: 'UPDATE_TYPE',
 		UPDATE_FORMAT_DATA: 'UPDATE_FORMAT_DATA',
-		UPDATE_SECTION: 'UPDATE_SECTION'
+		UPDATE_SECTION: 'UPDATE_SECTION',
+		UPDATE_OPERATION: 'UPDATE_OPERATION'
 	},
 	adActions = {
 		CREATE_AD: 'CREATE_AD',
@@ -212,6 +213,12 @@ const status = {
 		UPDATE_CUSTOM_CSS: 'UPDATE_CUSTOM_CSS',
 		UPDATE_NETWORK: 'UPDATE_NETWORK',
 		UPDATE_AD: 'UPDATE_AD'
+	},
+	adInsertOptions = {
+		INSERT_BEFORE: 'Insert Before',
+		INSERT_AFTER: 'Insert After',
+		PREPEND: 'Prepend',
+		APPEND: 'Append'
 	},
 	hbBoxActions = {
 		HIDE_HB_BOX: 'HIDE_HB_BOX',
@@ -389,6 +396,7 @@ export {
 	channelActions,
 	sectionActions,
 	adActions,
+	adInsertOptions,
 	insertMenuActions,
 	editMenuActions,
 	newChannelMenuActions,
