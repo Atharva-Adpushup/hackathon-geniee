@@ -9,7 +9,6 @@ var initControl = require('../../../genieeAdSyncService/genieeAp/src/control'),
 			w.pbjs.onEvent('bidWon', function(bidData) {
 				var winData = {
 					winner: bidData.bidder || bidData.bidderCode,
-					winningCpm: bidData.cpm,
 					winningRevenue: bidData.cpm / 1000,
 					containerId: bidData.adUnitCode,
 					size: bidData.size
