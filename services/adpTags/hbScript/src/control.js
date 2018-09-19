@@ -2,6 +2,7 @@
 
 var initControl = require('../../../genieeAdSyncService/genieeAp/src/control'),
 	getBidDataForFeedback = require('./feedback').getBidDataForFeedback,
+	utils = require('../helpers/utils'),
 	timedOutBidders = null,
 	adSlots = [],
 	initControlFeedback = function(w) {
@@ -49,9 +50,17 @@ var initControl = require('../../../genieeAdSyncService/genieeAp/src/control'),
 							selectedAdSlot.bids = getBidDataForFeedback(containerId) || [];
 							selectedAdSlot.type = 9; // Prebid control code
 							selectedAdSlot.status = 'Type 9: Prebid contol code rendered!';
+							selectedAdSlot.url = window.location.href;
 						}
 
-						// feedback(selectedAdSlot);
+						var feedback = {
+							success: true,
+							data: selectedAdSlot
+						};
+
+						if (feedback.data) {
+							return utils.sendFeedback(feedback);
+						}
 					}
 				}
 			});

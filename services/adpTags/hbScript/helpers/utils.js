@@ -1,4 +1,4 @@
-var KEEN_IO = require('../src/config').KEEN_IO,
+var config = require('../src/config'),
 	logger = require('./logger'),
 	find = require('lodash.find');
 
@@ -82,23 +82,26 @@ module.exports = {
 		}
 		return null;
 	},
-	sendDataToKeenIO: function(data) {
-		logger.info('keenIO data', data);
-		var encodedData = window.btoa(JSON.stringify(data)),
-			imgEl = document.createElement('img');
-
-		imgEl.src =
-			'https://api.keen.io/3.0/projects/' +
-			KEEN_IO.PROJECT_ID +
-			'/events/' +
-			KEEN_IO.EVENTS.IMPRESSION +
-			'?api_key=' +
-			KEEN_IO.WRITE_KEY +
-			'&data=' +
-			encodedData;
-		imgEl.style.display = 'none';
-		document.body.appendChild(imgEl);
+	sendFeedback: function(feedback) {
+		window.adpushup.$.post(config.FEEDBACK_URL, feedback.data);
 	},
+	// sendDataToKeenIO: function(data) {
+	// 	logger.info('keenIO data', data);
+	// 	var encodedData = window.btoa(JSON.stringify(data)),
+	// 		imgEl = document.createElement('img');
+
+	// 	imgEl.src =
+	// 		'https://api.keen.io/3.0/projects/' +
+	// 		KEEN_IO.PROJECT_ID +
+	// 		'/events/' +
+	// 		KEEN_IO.EVENTS.IMPRESSION +
+	// 		'?api_key=' +
+	// 		KEEN_IO.WRITE_KEY +
+	// 		'&data=' +
+	// 		encodedData;
+	// 	imgEl.style.display = 'none';
+	// 	document.body.appendChild(imgEl);
+	// },
 	getBatchAdUnits: function(adpSlots) {
 		var adUnits = [];
 		adpSlots.forEach(function(adpSlot) {
