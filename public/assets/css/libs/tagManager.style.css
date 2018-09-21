@@ -430,3 +430,164 @@ select.inputMinimal {
       background: #eee;
       box-shadow: none !important;
       color: #777; }
+
+/*Extra Space ($ES)*/
+.options-wrapper {
+  margin: 0 !important;
+  padding: 30px 10px;
+  -webkit-transition: 0.4s;
+  transition: 0.35s; }
+  .options-wrapper h3 {
+    font-size: 18px !important; }
+  .options-wrapper h4 {
+    font-size: 14px !important;
+    color: #5d5d5d;
+    margin-top: 5px;
+    font-style: italic; }
+  .options-wrapper .progress-wrapper {
+    padding: 0px 15px;
+    margin-bottom: 25px; }
+  .options-wrapper ul.options {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
+    flex-wrap: wrap; }
+    .options-wrapper ul.options li.option,
+    .options-wrapper ul.options li.simpleOption {
+      list-style: none;
+      justify-content: start;
+      align-self: center;
+      text-align: center;
+      padding: 20px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer; }
+      .options-wrapper ul.options li.option:hover, .options-wrapper ul.options li.option.active,
+      .options-wrapper ul.options li.simpleOption:hover,
+      .options-wrapper ul.options li.simpleOption.active {
+        border: 2px solid #5d5d5d; }
+    .options-wrapper ul.options li.option {
+      min-width: 200px;
+      max-width: 250px;
+      flex-grow: 1;
+      border: 2px solid transparent; }
+      .options-wrapper ul.options li.option img {
+        width: 50%; }
+    .options-wrapper ul.options li.simpleOption {
+      min-width: 100px;
+      border: 2px solid #ebebeb;
+      margin-right: 10px;
+      margin-bottom: 10px; }
+
+.section-list .section-list-item {
+  min-height: 420px; }
+  .section-list .section-list-item {
+    padding: 20px 0px;
+    border: 1px solid #c0cace;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    position: relative;
+    font-size: 16px !important; }
+  .section-list .section-list-item,
+  .section-list .section-list-item .btn.btn-lightBg {
+    font-size: 0.9em; }
+  .section-list .section-list-item .btn-close {
+    background-color: firebrick;
+    color: #fff;
+    position: absolute;
+    right: -10px;
+    top: -7px;
+    border: none;
+    font-weight: 700;
+    border-radius: 50%;
+    padding: 2px 7.2px; }
+  .section-list .section-list-item .ad-image {
+    text-align: center; }
+    .section-list .section-list-item .ad-image img {
+      width: 80%; }
+    .section-list .section-list-item .ad-image p {
+      font-weight: bold;
+      margin: 10px 0px; }
+  .section-list .section-list-item .ad-details {
+    font-size: 14px !important; }
+    .section-list .section-list-item .ad-details pre {
+      tab-size: 4;
+      white-space: pre-wrap; }
+
+.bg-transparent {
+  background: transparent !important; }
+
+.custom-message {
+  padding: 10px;
+  margin: 0px 0px 10px 0px;
+  box-shadow: 0 0 0 1px rgba(34, 36, 38, 0.22) inset, 0 0 0 0 transparent;
+  background: #f8f8f9;
+  border-radius: 0.28571429rem; }
+  .custom-message.info-text {
+    color: #000000; }
+  .custom-message.error-text {
+    color: #c3272b; }
+  .custom-message.success-text {
+    color: #006442; }
+  .custom-message h3 {
+    font-weight: bold; }
+  .custom-message hr {
+    color: #000000;
+    margin: 10px 0px; }
+  .custom-message p {
+    margin: 0px;
+    font-size: 14px; }
+
+.empty-state {
+  text-align: center;
+  padding: 10px 0px 25px 0px; }
+  .empty-state img {
+    max-width: 25%; }
+  .empty-state h2 {
+    font-size: 22px; }
+
+.CodeMirror {
+  transition: all 1s; }
+
+.codeEditor-small .CodeMirror {
+  height: 110px; }
+
+.codeEditor-large .CodeMirror {
+  height: 300px; }
+
+.containerButtonBar {
+  padding-bottom: 120px;
+  position: relative; }
+  .containerButtonBar input[type='number'] {
+    width: 60px; }
+  .containerButtonBar .row {
+    margin: 0px !important; }
+  .containerButtonBar .networkOptionsRow {
+    width: 90%;
+    margin: 0px auto;
+    display: block;
+    z-index: 10; }
+  .containerButtonBar .butttonsRow {
+    padding: 20px 0 !important;
+    background: #f6f7f8;
+    position: absolute;
+    bottom: 0;
+    z-index: 3;
+    width: 100%;
+    border: 1px solid #dfdfe0;
+    border-radius: 0 0 3px 3px; }
+  .containerButtonBar.sectionOptions {
+    padding-bottom: 200px; }
+
+.list-heading {
+  border-bottom: 1px solid #ebebeb;
+  margin-bottom: 15px; }
+  .list-heading h4 {
+    margin-top: 10px; }
+
+.information {
+  margin: 10px 0px; }
+  .information .description {
+    font-size: 12px;
+    font-weight: lighter;
+    color: grey; }

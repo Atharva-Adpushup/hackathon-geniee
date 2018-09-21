@@ -10,8 +10,8 @@ class AdCodeGenerator extends Component {
 		super(props);
 		this.state = {
 			progress: 0,
-			platform: null,
-			type: null,
+			platform: '',
+			type: '',
 			size: null,
 			loading: false,
 			codeGenerated: false,
@@ -42,8 +42,8 @@ class AdCodeGenerator extends Component {
 	selectPlatform(platform) {
 		this.setState({
 			platform,
-			type: null,
-			progress: 25
+			size: platform == 'responsive' ? 'responsive' : null,
+			progress: platform == 'responsive' ? 75 : 50
 		});
 	}
 
@@ -128,7 +128,7 @@ class AdCodeGenerator extends Component {
 	renderTypeOptions() {
 		return (
 			<CustomList
-				options={TYPES[this.state.platform.toUpperCase()]}
+				options={TYPES}
 				heading="Select Ad Type"
 				subHeading="AdpPushup supports varied ad types"
 				onClick={this.selectType}
@@ -141,16 +141,37 @@ class AdCodeGenerator extends Component {
 
 	renderSizes() {
 		return (
-			<CustomList
-				options={SIZES[this.state.platform.toUpperCase()][this.state.type.toUpperCase()]}
-				heading="Select Ad Size"
-				subHeading="AdpPushup supports varied ad sizes"
-				onClick={this.selectSize}
-				leftSize={3}
-				rightSize={9}
-				toMatch={this.state.size}
-				simpleList={true}
-			/>
+			<div>
+				<CustomList
+					heading="Select Ad Size"
+					subHeading="AdpPushup supports varied ad sizes"
+					leftSize={3}
+					rightSize={9}
+					toMatch={this.state.size}
+					platform={this.state.platform}
+					tabbedList={{
+						list: {
+							responsive: {
+								header: 'Responsive',
+								key: 'responsive',
+								options: false
+							},
+							desktop: {
+								header: 'Desktop',
+								key: 'desktop',
+								options: SIZES[this.state.type.toUpperCase()][this.state.platform.toUpperCase()]
+							},
+							mobile: {
+								header: 'Mobile',
+								key: 'mobile',
+								options: SIZES[this.state.type.toUpperCase()][this.state.platform.toUpperCase()]
+							}
+						}
+					}}
+					selectPlatform={this.selectPlatform}
+					onClick={this.selectSize}
+				/>
+			</div>
 		);
 	}
 
@@ -205,8 +226,8 @@ class AdCodeGenerator extends Component {
 					this.renderGeneratedAdcode()
 				) : (
 					<div>
-						{this.renderPlatformOptions()}
-						{this.state.progress >= 25 ? this.renderTypeOptions() : null}
+						{/* {this.renderPlatformOptions()} */}
+						{this.renderTypeOptions()}
 						{this.state.progress >= 50 ? this.renderSizes() : null}
 						{this.state.progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
 					</div>

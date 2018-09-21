@@ -15,92 +15,36 @@ const PLATFORMS = [
 		// 	key: 'tablet'
 		// }
 	],
-	TYPES = {
-		DESKTOP: [
-			{
-				name: 'Display',
-				image: '/assets/images/tagManager/types/desktop/display.png',
-				key: 'display'
-			},
-			{
-				name: 'Sticky Left',
-				image: '/assets/images/tagManager/types/desktop/sticky-left.png',
-				key: 'stickyLeft'
-			},
-			{
-				name: 'Sticky Right',
-				image: '/assets/images/tagManager/types/desktop/sticky-right.png',
-				key: 'stickyRight'
-			},
-			{
-				name: 'Sticky Bottom',
-				image: '/assets/images/tagManager/types/desktop/sticky-bottom.png',
-				key: 'stickyBottom'
-			}
-			// {
-			// 	name: 'Video',
-			// 	image: '/assets/images/tagManager/types/desktop/video.png',
-			// 	key: 'video'
-			// }
-		],
-		MOBILE: [
-			{
-				name: 'Display',
-				image: '/assets/images/tagManager/types/mobile/display.png',
-				key: 'display'
-			},
-			// {
-			// 	name: 'Sticky Left',
-			// 	image: '/assets/images/tagManager/types/mobile/sticky-left.png',
-			// 	key: 'stickyLeft'
-			// },
-			// {
-			// 	name: 'Sticky Right',
-			// 	image: '/assets/images/tagManager/types/mobile/sticky-right.png',
-			// 	key: 'stickyRight'
-			// },
-			{
-				name: 'Sticky Bottom',
-				image: '/assets/images/tagManager/types/mobile/sticky-bottom.png',
-				key: 'stickyBottom'
-			}
-			// {
-			// 	name: 'Video',
-			// 	image: '/assets/images/tagManager/types/mobile/video.png',
-			// 	key: 'video'
-			// }
-		]
-		// TABLET: [
-		// 	{
-		// 		name: 'Display',
-		// 		image: '/assets/images/tagManager/types/tablet/display.png',
-		// 		key: 'display'
-		// 	},
-		// 	{
-		// 		name: 'Sticky Left',
-		// 		image: '/assets/images/tagManager/types/tablet/sticky-left.png',
-		// 		key: 'stickyLeft'
-		// 	},
-		// 	{
-		// 		name: 'Sticky Right',
-		// 		image: '/assets/images/tagManager/types/tablet/sticky-right.png',
-		// 		key: 'stickyRight'
-		// 	},
-		// 	{
-		// 		name: 'Sticky Bottom',
-		// 		image: '/assets/images/tagManager/types/tablet/sticky-bottom.png',
-		// 		key: 'stickyBottom'
-		// 	},
-		// 	{
-		// 		name: 'Video',
-		// 		image: '/assets/images/tagManager/types/tablet/video.png',
-		// 		key: 'video'
-		// 	}
-		// ]
-	},
+	TYPES = [
+		{
+			name: 'Display (Text / Image)',
+			image: '/assets/images/tagManager/text_display.png',
+			key: 'display',
+			description: 'A simple way to get ads on your page. Select size, generate code and you are good to go'
+		},
+		{
+			name: 'Native',
+			image: '/assets/images/tagManager/native.png',
+			key: 'native',
+			description:
+				'Ads that flow seamlessly inside a list of articles or products on your site, offering a great user experience'
+		},
+		{
+			name: 'Links',
+			image: '/assets/images/tagManager/links.png',
+			key: 'links',
+			description: 'Link units display a list of topics that are relevant to the content of your page'
+		},
+		{
+			name: 'AMP Ad',
+			image: '/assets/images/tagManager/amp.png',
+			key: 'amp',
+			description: 'AMPHTML ads are a faster, lighter and more secure way to advertise on the web'
+		}
+	],
 	SIZES = {
-		DESKTOP: {
-			DISPLAY: [
+		DISPLAY: {
+			DESKTOP: [
 				'336x280',
 				'300x250',
 				'250x250',
@@ -114,15 +58,110 @@ const PLATFORMS = [
 				'970x250',
 				'900x90'
 			],
-			STICKYBOTTOM: ['900x90', '468x60', '728x90'],
-			STICKYLEFT: ['160x600', '336x280', '300x250', '300x600', '120x600'],
-			STICKYRIGHT: ['160x600', '336x280', '300x250', '300x600', '120x600'],
-			VIDEO: ['336x280']
+			MOBILE: [
+				'336x280',
+				'300x250',
+				'250x250',
+				'200x200',
+				'728x90',
+				'468x60',
+				'300x600',
+				'160x600',
+				'120x600',
+				'320x50',
+				'970x250',
+				'900x90'
+			]
 		},
-		MOBILE: {
-			DISPLAY: ['336x280', '300x250', '250x250', '200x200', '320x100', '320x50'],
-			STICKYBOTTOM: ['320x100', '300x100', '320x50'],
-			VIDEO: ['336x280']
+		NATIVE: {
+			DESKTOP: [
+				'336x280',
+				'300x250',
+				'250x250',
+				'200x200',
+				'728x90',
+				'468x60',
+				'300x600',
+				'160x600',
+				'120x600',
+				'320x50',
+				'970x250',
+				'900x90'
+			],
+			MOBILE: [
+				'336x280',
+				'300x250',
+				'250x250',
+				'200x200',
+				'728x90',
+				'468x60',
+				'300x600',
+				'160x600',
+				'120x600',
+				'320x50',
+				'970x250',
+				'900x90'
+			]
+		},
+		LINKS: {
+			DESKTOP: [
+				'336x280',
+				'300x250',
+				'250x250',
+				'200x200',
+				'728x90',
+				'468x60',
+				'300x600',
+				'160x600',
+				'120x600',
+				'320x50',
+				'970x250',
+				'900x90'
+			],
+			MOBILE: [
+				'336x280',
+				'300x250',
+				'250x250',
+				'200x200',
+				'728x90',
+				'468x60',
+				'300x600',
+				'160x600',
+				'120x600',
+				'320x50',
+				'970x250',
+				'900x90'
+			]
+		},
+		AMP: {
+			DESKTOP: [
+				'336x280',
+				'300x250',
+				'250x250',
+				'200x200',
+				'728x90',
+				'468x60',
+				'300x600',
+				'160x600',
+				'120x600',
+				'320x50',
+				'970x250',
+				'900x90'
+			],
+			MOBILE: [
+				'336x280',
+				'300x250',
+				'250x250',
+				'200x200',
+				'728x90',
+				'468x60',
+				'300x600',
+				'160x600',
+				'120x600',
+				'320x50',
+				'970x250',
+				'900x90'
+			]
 		}
 	},
 	interactiveAdEvents = ['DOMContentLoaded', 'scriptLoaded'], //load', 'scroll', 'onMills',
