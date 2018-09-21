@@ -50,6 +50,7 @@ class AdCodeGenerator extends Component {
 	selectType(type) {
 		this.setState({
 			type,
+			platform: '',
 			size: null,
 			progress: 50
 		});

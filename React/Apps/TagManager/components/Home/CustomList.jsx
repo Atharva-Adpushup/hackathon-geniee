@@ -30,9 +30,9 @@ const CustomList = props => {
 		) : null;
 	}
 
-	function renderTabbedList() {
-		return renderTabbedHeaders();
-	}
+	// function renderTabbedList() {
+	// 	return renderTabbedHeaders();
+	// }
 
 	function renderIconList() {
 		return props.options.map((option, key) => (
@@ -64,11 +64,16 @@ const CustomList = props => {
 
 	function renderList() {
 		if (props.simpleList) {
-			return renderSimpleList();
+			return <ul className="options">{renderSimpleList()}</ul>;
 		} else if (props.tabbedList) {
-			return renderTabbedList();
+			return (
+				<div>
+					<ul className="options">{renderTabbedHeaders()}</ul>
+					{renderTabbedOptions()}
+				</div>
+			);
 		} else {
-			return renderIconList();
+			return <ul className="options">{renderIconList()}</ul>;
 		}
 	}
 
@@ -85,8 +90,8 @@ const CustomList = props => {
 						{props.listHeaders.subHeading ? <h4>{props.listHeaders.subHeading}</h4> : null}
 					</div>
 				) : null}
-				<ul className="options">{renderList()}</ul>
-				{props.tabbedList ? renderTabbedOptions() : null}
+				{renderList()}
+				{/* <ul className="options">{renderList()}</ul> */}
 			</Col>
 			<div style={{ clear: 'both' }}>&nbsp;</div>
 		</div>
