@@ -99,14 +99,16 @@ class AdCodeGenerator extends Component {
 	}
 
 	resetHandler() {
-		this.setState({
-			progress: 0,
-			platform: '',
-			type: '',
-			size: null,
-			loading: false,
-			codeGenerated: false
-		});
+		this.setState(
+			{
+				progress: 0,
+				platform: '',
+				type: '',
+				size: null,
+				loading: false
+			},
+			() => this.props.resetCurrentAd()
+		);
 	}
 
 	// renderPlatformOptions() {
