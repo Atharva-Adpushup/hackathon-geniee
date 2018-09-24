@@ -19,6 +19,7 @@ const express = require('express'),
 
 const fn = {
 	sendDataToZapier: data => {
+		return Promise.resolve('Zapier Call Skipped');
 		let options = {
 			method: 'GET',
 			uri: 'https://hooks.zapier.com/hooks/catch/547126/frue51/?',

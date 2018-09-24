@@ -13,30 +13,19 @@ class AdCodeGenerator extends Component {
 			platform: '',
 			type: '',
 			size: null,
-			loading: false,
-			codeGenerated: false,
-			adId: null
+			loading: false
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
 		this.selectType = this.selectType.bind(this);
 		this.selectSize = this.selectSize.bind(this);
 		this.saveHandler = this.saveHandler.bind(this);
 		this.resetHandler = this.resetHandler.bind(this);
-		this.renderPlatformOptions = this.renderPlatformOptions.bind(this);
+		// this.renderPlatformOptions = this.renderPlatformOptions.bind(this);
 		this.renderTypeOptions = this.renderTypeOptions.bind(this);
 		this.renderSizes = this.renderSizes.bind(this);
 		this.renderMainContent = this.renderMainContent.bind(this);
 		this.renderLoadingScreen = this.renderLoadingScreen.bind(this);
 		this.renderGeneratedAdcode = this.renderGeneratedAdcode.bind(this);
-	}
-
-	componentWillReceiveProps(nextProps) {
-		this.setState({
-			loading: nextProps.currentAd ? false : true,
-			codeGenerated: nextProps.currentAd ? true : false,
-			error: nextProps.createAdError,
-			adId: nextProps.currentAd
-		});
 	}
 
 	selectPlatform(platform) {
@@ -79,16 +68,23 @@ class AdCodeGenerator extends Component {
 			},
 			() =>
 				this.props.createAd({
-					siteId: this.props.match.params.siteId,
+					siteId: window.siteId,
 					ad: {
 						width,
 						height,
 						isManual: true,
 						formatData: {
 							platform: this.state.platform, // DESKTOP, MOBILE
-							type: this.state.type // DISPLAY, VIDEO, STICKY
+							type: this.state.type, // DISPLAY, NATIVE, AMP, LINK
+
+							// Setting for backward compatibility
+							event: null,
+							placement: null,
+							eventData: {
+								value: null
+							}
 						},
-						type: 3, // 5: INTERACTIVE, 3: STRUCTURAL
+						type: 3, // STRUCTURAL
 						css: {}
 					}
 				})
@@ -98,27 +94,27 @@ class AdCodeGenerator extends Component {
 	resetHandler() {
 		this.setState({
 			progress: 0,
-			platform: null,
-			type: null,
+			platform: '',
+			type: '',
 			size: null,
 			loading: false,
 			codeGenerated: false
 		});
 	}
 
-	renderPlatformOptions() {
-		return (
-			<CustomList
-				options={PLATFORMS}
-				heading="Select Platform"
-				subHeading="Device for which you want to show ads"
-				onClick={this.selectPlatform}
-				leftSize={3}
-				rightSize={9}
-				toMatch={this.state.platform}
-			/>
-		);
-	}
+	// renderPlatformOptions() {
+	// 	return (
+	// 		<CustomList
+	// 			options={PLATFORMS}
+	// 			heading="Select Platform"
+	// 			subHeading="Device for which you want to show ads"
+	// 			onClick={this.selectPlatform}
+	// 			leftSize={3}
+	// 			rightSize={9}
+	// 			toMatch={this.state.platform}
+	// 		/>
+	// 	);
+	// }
 
 	renderTypeOptions() {
 		return (
@@ -194,13 +190,13 @@ class AdCodeGenerator extends Component {
 			message = showAdCode ? displayAdMessage : interactiveAdMessage;
 		return (
 			<Col xs={12}>
-				{showAdCode ? <pre>{code.replace(/__AD_ID__/g, this.state.adId).trim()}</pre> : null}
+				{showAdCode ? <pre>{code.replace(/__AD_ID__/g, this.props.adId).trim()}</pre> : null}
 				<CustomMessage header="Information" type="info" message={message} />
 				<CustomButton label="Create More Ads" handler={this.resetHandler} />
 				{showAdCode ? (
 					<CustomButton
 						label="Copy Adcode"
-						handler={copyToClipBoard.bind(null, code.replace(/__AD_ID__/g, this.state.adId))}
+						handler={copyToClipBoard.bind(null, code.replace(/__AD_ID__/g, this.props.adId))}
 					/>
 				) : null}
 			</Col>
@@ -217,7 +213,7 @@ class AdCodeGenerator extends Component {
 				<div className="progress-wrapper">
 					<ProgressBar striped active bsStyle="success" now={this.state.progress} />
 				</div>
-				{this.state.codeGenerated ? (
+				{this.props.codeGenerated ? (
 					this.renderGeneratedAdcode()
 				) : (
 					<div>
@@ -234,7 +230,9 @@ class AdCodeGenerator extends Component {
 	render() {
 		return (
 			<Row className="options-wrapper">
-				{this.state.loading ? this.renderLoadingScreen() : this.renderMainContent()}
+				{this.state.loading && !this.props.codeGenerated
+					? this.renderLoadingScreen()
+					: this.renderMainContent()}
 			</Row>
 		);
 	}
