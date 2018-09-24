@@ -10,7 +10,8 @@ const config = require('../../configs/config'),
 	localBucket = couchbaseService(
 		`couchbase://${config.couchBase.HOST}`,
 		'apLocalBucket',
-		config.couchBase.DEFAULT_BUCKET_PASSWORD
+		config.couchBase.DEFAULT_USER_NAME,
+		config.couchBase.DEFAULT_USER_PASSWORD
 	);
 
 const logger = require('../../helpers/globalBucketLogger');

@@ -16,7 +16,7 @@ state.cluster = new couchbase.Cluster('couchbase://' + config.couchBase.HOST, {
 
 // RBAC (Role Based Access Control) Authentication,
 // See https://docs.couchbase.com/server/5.1/security/security-rbac-user-management.html
-state.cluster.authenticate(config.couchBase.DEFAULT_USER_NAME, config.couchBase.DEFAULT_USER_NAME);
+state.cluster.authenticate(config.couchBase.DEFAULT_USER_NAME, config.couchBase.DEFAULT_USER_PASSWORD);
 
 function connect(bucket) {
 	return new Promise(function(resolve, reject) {
