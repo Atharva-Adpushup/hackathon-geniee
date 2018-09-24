@@ -78,16 +78,18 @@ class AdElement extends Component {
 					<p>
 						Size:{' '}
 						<strong>
-							{ad.width}x{ad.height}
+							{this.ad.width == 'responsive'
+								? makeFirstLetterCapitalize(ad.width)
+								: `${ad.width}x${ad.height}`}
 						</strong>
 					</p>
 					{showAdCode ? <pre>{code}</pre> : null}
 					{window.isSuperUser ? (
 						<CustomButton label="Network Details" handler={this.toggleNetworkDetails} />
 					) : null}
-					{window.isSuperUser && ad.formatData.type == 'sticky' ? (
+					{/* {window.isSuperUser && ad.formatData.type == 'sticky' ? (
 						<CustomButton label="Ad Event Details" handler={this.toggleEventDetails} />
-					) : null}
+					) : null} */}
 					{showAdCode ? (
 						<CustomButton label="Copy Adcode" handler={copyToClipBoard.bind(null, code)} />
 					) : null}
@@ -107,11 +109,7 @@ class AdElement extends Component {
 					</Button>
 				</OverlayTrigger>
 				<Col xs={3} className="ad-image">
-					<img
-						src={`/assets/images/tagManager/types/${ad.formatData.platform}/${ad.formatData.type}${
-							ad.formatData.placement ? `-${ad.formatData.placement}` : ''
-						}.png`}
-					/>
+					<img src={`/assets/images/tagManager/types/${ad.formatData.type}.png`} />
 				</Col>
 				<Col xs={9} className="ad-details">
 					{this.renderAdDetails()}

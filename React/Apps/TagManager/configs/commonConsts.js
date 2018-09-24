@@ -18,7 +18,7 @@ const PLATFORMS = [
 	TYPES = [
 		{
 			name: 'Display (Text / Image)',
-			image: '/assets/images/tagManager/text_display.png',
+			image: '/assets/images/tagManager/display.png',
 			key: 'display',
 			description: 'A simple way to get ads on your page. Select size, generate code and you are good to go'
 		},

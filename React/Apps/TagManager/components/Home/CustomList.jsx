@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
 
 const CustomList = props => {
 	function renderTabbedHeaders() {
@@ -29,10 +29,6 @@ const CustomList = props => {
 			</ul>
 		) : null;
 	}
-
-	// function renderTabbedList() {
-	// 	return renderTabbedHeaders();
-	// }
 
 	function renderIconList() {
 		return props.options.map((option, key) => (
@@ -91,7 +87,6 @@ const CustomList = props => {
 					</div>
 				) : null}
 				{renderList()}
-				{/* <ul className="options">{renderList()}</ul> */}
 			</Col>
 			<div style={{ clear: 'both' }}>&nbsp;</div>
 		</div>

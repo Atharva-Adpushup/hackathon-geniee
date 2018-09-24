@@ -64,9 +64,10 @@ class AdCodeGenerator extends Component {
 	}
 
 	saveHandler() {
-		let sizesArray = this.state.size.split('x'),
-			width = sizesArray[0],
-			height = sizesArray[1],
+		let isResponsive = this.state.size == 'responsive',
+			sizesArray = isResponsive ? 'responsive' : this.state.size.split('x'),
+			width = isResponsive ? 'responsive' : sizesArray[0],
+			height = isResponsive ? 'responsive' : sizesArray[1],
 			typeAndPlacement = this.state.type.split(/^([^A-Z]+)/);
 
 		typeAndPlacement.shift();
@@ -84,17 +85,10 @@ class AdCodeGenerator extends Component {
 						height,
 						isManual: true,
 						formatData: {
-							event: typeAndPlacement[0] == 'video' ? 'scriptLoaded' : null,
-							eventData: { value: null },
 							platform: this.state.platform, // DESKTOP, MOBILE
-							type: typeAndPlacement[0].toLowerCase(), // DISPLAY, VIDEO, STICKY
-							placement: typeAndPlacement[1] ? typeAndPlacement[1].toLowerCase() : null // BOTTOM, LEFT, RIGHT, NULL
+							type: this.state.type // DISPLAY, VIDEO, STICKY
 						},
-						type:
-							typeAndPlacement[0].toLowerCase() == 'display' ||
-							typeAndPlacement[0].toLowerCase() == 'video'
-								? 5
-								: 3, // 5: INTERACTIVE, 3: STRUCTURAL
+						type: 3, // 5: INTERACTIVE, 3: STRUCTURAL
 						css: {}
 					}
 				})
