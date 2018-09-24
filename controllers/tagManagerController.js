@@ -15,79 +15,78 @@ const express = require('express'),
 		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
 		config.couchBase.DEFAULT_BUCKET,
 		config.couchBase.DEFAULT_BUCKET_PASSWORD
-	);
-
-const fn = {
-	sendDataToZapier: data => {
-		return Promise.resolve('Zapier Call Skipped');
-		let options = {
-			method: 'GET',
-			uri: 'https://hooks.zapier.com/hooks/catch/547126/frue51/?',
-			json: true
-		};
-		_.forEach(data, (value, key) => {
-			options.uri += `${key}=${value}&`;
-		});
-		options.uri = options.uri.slice(0, -1);
-		return request(options)
-			.then(() => console.log('Ad Creation. Called made to Zapier'))
-			.catch(err => console.log('Ad creation call to Zapier failed'));
-	},
-	createNewDocAndDoProcessing: payload => {
-		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
-		return appBucket
-			.createDoc(`${docKeys.tagManager}${payload.siteId}`, tagManagerDefault, {})
-			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
-			.then(docWithCas => {
-				payload.siteDomain = docWithCas.value.siteDomain;
-				return fn.processing(tagManagerDefault, payload);
-			});
-	},
-	processing: (data, payload) => {
-		let cas = data.cas || false,
-			value = data.value || data,
-			id = uuid.v4(),
-			networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {},
-			ad = {
-				...payload.ad,
-				id: id,
-				isActive: true,
-				createdOn: +new Date(),
-				formatData: {
-					...payload.ad.formatData,
-					eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
-				},
-				...networkInfo
+	),
+	fn = {
+		sendDataToZapier: data => {
+			return Promise.resolve('Zapier Call Skipped');
+			let options = {
+				method: 'GET',
+				uri: 'https://hooks.zapier.com/hooks/catch/547126/frue51/?',
+				json: true
 			};
+			_.forEach(data, (value, key) => {
+				options.uri += `${key}=${value}&`;
+			});
+			options.uri = options.uri.slice(0, -1);
+			return request(options)
+				.then(() => console.log('Ad Creation. Called made to Zapier'))
+				.catch(err => console.log('Ad creation call to Zapier failed'));
+		},
+		createNewDocAndDoProcessing: payload => {
+			let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
+			return appBucket
+				.createDoc(`${docKeys.tagManager}${payload.siteId}`, tagManagerDefault, {})
+				.then(() => appBucket.getDoc(`site::${payload.siteId}`))
+				.then(docWithCas => {
+					payload.siteDomain = docWithCas.value.siteDomain;
+					return fn.processing(tagManagerDefault, payload);
+				});
+		},
+		processing: (data, payload) => {
+			let cas = data.cas || false,
+				value = data.value || data,
+				id = uuid.v4(),
+				networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {},
+				ad = {
+					...payload.ad,
+					id: id,
+					isActive: true,
+					createdOn: +new Date(),
+					formatData: {
+						...payload.ad.formatData,
+						eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
+					},
+					...networkInfo
+				};
 
-		value.ads.push(ad);
-		value.siteDomain = value.siteDomain || payload.siteDomain;
-		value.siteId = value.siteId || payload.siteId;
-		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
+			value.ads.push(ad);
+			value.siteDomain = value.siteDomain || payload.siteDomain;
+			value.siteId = value.siteId || payload.siteId;
+			value.ownerEmail = value.ownerEmail || payload.ownerEmail;
 
-		fn.sendDataToZapier({
-			email: value.ownerEmail,
-			website: value.siteDomain,
-			platform: ad.formatData.platform,
-			size: `${ad.width}x${ad.height}`,
-			sticky: ad.formatData.type && ad.formatData.type == 'sticky' ? 'yes' : 'no'
-		});
+			fn.sendDataToZapier({
+				email: value.ownerEmail,
+				website: value.siteDomain,
+				platform: ad.formatData.platform,
+				size: `${ad.width}x${ad.height}`,
+				sticky: ad.formatData.type && ad.formatData.type == 'sticky' ? 'yes' : 'no'
+			});
 
-		return Promise.resolve([cas, value, id, payload.siteId]);
-	},
-	getAndUpdate: (key, value, adId) => {
-		return appBucket.getDoc(key).then(result => appBucket.updateDoc(key, value, result.cas).then(() => adId));
-	},
-	directDBUpdate: (key, value, cas, adId) => appBucket.updateDoc(key, value, cas).then(() => adId),
-	dbWrapper: (cas, value, adId, siteId) => {
-		const key = `${docKeys.tagManager}${siteId}`;
-		return !cas ? fn.getAndUpdate(key, value, adId) : fn.directDBUpdate(key, value, cas, adId);
-	},
-	errorHander: (err, res) => {
-		console.log(err);
-		return sendErrorResponse({ message: 'Opertion Failed' }, res);
-	}
-};
+			return Promise.resolve([cas, value, id, payload.siteId]);
+		},
+		getAndUpdate: (key, value, adId) => {
+			return appBucket.getDoc(key).then(result => appBucket.updateDoc(key, value, result.cas).then(() => adId));
+		},
+		directDBUpdate: (key, value, cas, adId) => appBucket.updateDoc(key, value, cas).then(() => adId),
+		dbWrapper: (cas, value, adId, siteId) => {
+			const key = `${docKeys.tagManager}${siteId}`;
+			return !cas ? fn.getAndUpdate(key, value, adId) : fn.directDBUpdate(key, value, cas, adId);
+		},
+		errorHander: (err, res) => {
+			console.log(err);
+			return sendErrorResponse({ message: 'Opertion Failed' }, res);
+		}
+	};
 
 router
 	.get('/fetchAds', (req, res) => {
