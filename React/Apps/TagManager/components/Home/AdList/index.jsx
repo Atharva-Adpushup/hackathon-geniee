@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import AdElement from './AdElement.jsx';
 import { CustomButton, EmptyState } from '../../shared/index.jsx';
+import Loader from '../../../../../Components/Loader';
 
 class AdList extends Component {
 	componentDidMount() {
@@ -12,8 +13,11 @@ class AdList extends Component {
 			customStyle = window.isSuperUser ? { minHeight: '520px' } : { minHeight: '420px' };
 
 		if (loading) {
-			// Add Loader
-			return <div>Loading</div>;
+			return (
+				<div style={{ height: '600px' }}>
+					<Loader />
+				</div>
+			);
 		} else if (!ads.length) {
 			return <EmptyState message="Seems kind of empty here" />;
 		}
