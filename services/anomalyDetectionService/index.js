@@ -407,7 +407,7 @@ function numberWithCommas(x) {
 
 function filterApAppBucketSites(dataSets) {
 	let couchBaseService = require('../../helpers/couchBaseService'),
-		couchbasePromise = require('couchbase-promises');
+		couchbasePromise = require('couchbase');
 
 	let query = couchbasePromise.ViewQuery.from('AdpTagReporting', 'SiteUserMapping')
 		.stale(1)
