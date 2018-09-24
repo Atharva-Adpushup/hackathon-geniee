@@ -50,9 +50,9 @@ class AdElement extends Component {
 
 	renderAdDetails() {
 		const { ad, updateAd } = this.props,
-			showAdCode = ad.formatData.type == 'display' || ad.formatData.type == 'video' ? true : false;
+			showAdCode = ad.formatData.type == 'amp' ? false : true;
 
-		let code = showAdCode ? (ad.formatData.type == 'display' ? adCode : adCodeVideo) : null;
+		let code = showAdCode ? adCode : null;
 		code = code ? code.replace(/__AD_ID__/g, ad.id) : null;
 
 		if (this.state.showNetworkDetails) {
@@ -78,7 +78,7 @@ class AdElement extends Component {
 					<p>
 						Size:{' '}
 						<strong>
-							{this.ad.width == 'responsive'
+							{ad.width == 'responsive'
 								? makeFirstLetterCapitalize(ad.width)
 								: `${ad.width}x${ad.height}`}
 						</strong>
@@ -87,9 +87,6 @@ class AdElement extends Component {
 					{window.isSuperUser ? (
 						<CustomButton label="Network Details" handler={this.toggleNetworkDetails} />
 					) : null}
-					{/* {window.isSuperUser && ad.formatData.type == 'sticky' ? (
-						<CustomButton label="Ad Event Details" handler={this.toggleEventDetails} />
-					) : null} */}
 					{showAdCode ? (
 						<CustomButton label="Copy Adcode" handler={copyToClipBoard.bind(null, code)} />
 					) : null}
@@ -109,7 +106,7 @@ class AdElement extends Component {
 					</Button>
 				</OverlayTrigger>
 				<Col xs={3} className="ad-image">
-					<img src={`/assets/images/tagManager/types/${ad.formatData.type}.png`} />
+					<img src={`/assets/images/tagManager/${ad.formatData.type}.png`} />
 				</Col>
 				<Col xs={9} className="ad-details">
 					{this.renderAdDetails()}

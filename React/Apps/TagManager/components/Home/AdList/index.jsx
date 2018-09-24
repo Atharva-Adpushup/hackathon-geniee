@@ -3,15 +3,6 @@ import AdElement from './AdElement.jsx';
 import { CustomButton, EmptyState } from '../../shared/index.jsx';
 
 class AdList extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			loaded: false,
-			hasAds: false,
-			ads: this.props.ads || []
-		};
-	}
-
 	componentDidMount() {
 		this.props.loading ? this.props.fetchAds({ siteId: window.siteId }) : null;
 	}

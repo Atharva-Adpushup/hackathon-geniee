@@ -1,7 +1,14 @@
 import React, { Component } from 'react';
 import { Row, Col, ProgressBar } from 'react-bootstrap';
 import CustomList from './CustomList.jsx';
-import { PLATFORMS, TYPES, SIZES, displayAdMessage, interactiveAdMessage } from '../../configs/commonConsts';
+import {
+	PLATFORMS,
+	TYPES,
+	SIZES,
+	displayAdMessage,
+	interactiveAdMessage,
+	ampMessage
+} from '../../configs/commonConsts';
 import { copyToClipBoard } from '../../lib/helpers';
 import { CustomMessage, CustomButton } from '../shared/index.jsx';
 import { adCode, adCodeVideo } from '../../configs/commonConsts';
@@ -181,13 +188,9 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderGeneratedAdcode() {
-		let typeAndPlacement = this.state.type.split(/^([^A-Z]+)/);
-
-		typeAndPlacement.shift();
-
-		const showAdCode = typeAndPlacement[0] == 'display' || typeAndPlacement[0] == 'video' ? true : false,
-			code = showAdCode ? (typeAndPlacement[0] == 'display' ? adCode : adCodeVideo) : null,
-			message = showAdCode ? displayAdMessage : interactiveAdMessage;
+		const showAdCode = this.state.type == 'amp' ? false : true,
+			code = showAdCode ? adCode : null,
+			message = showAdCode ? displayAdMessage : ampMessage;
 		return (
 			<Col xs={12}>
 				{showAdCode ? <pre>{code.replace(/__AD_ID__/g, this.props.adId).trim()}</pre> : null}

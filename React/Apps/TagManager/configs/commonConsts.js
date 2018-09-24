@@ -182,6 +182,7 @@ const PLATFORMS = [
 	},
 	displayAdMessage =
 		'You need to copy and paste the above adcode on your site where you wish to show the ad. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>',
+	ampMessage = 'AMP ad code will be sent to you via mail',
 	interactiveAdMessage =
 		'Ad has been created. AdPushup will automatically insert ad on your site on the runtime. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>',
 	adCode = `<div id="__AD_ID__">

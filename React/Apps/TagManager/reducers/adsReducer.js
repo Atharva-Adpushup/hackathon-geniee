@@ -3,7 +3,7 @@ import { adActions } from '../configs/commonConsts';
 const ads = (state = { fetched: false, content: [] }, action) => {
 	switch (action.type) {
 		case adActions.UPDATE_ADS_LIST:
-			return { ...state, content: [...state.content, ...action.data] };
+			return { ...state, content: state.content.concat(action.data) };
 
 		case adActions.REPLACE_ADS_LIST:
 			return { fetched: true, content: action.data };
