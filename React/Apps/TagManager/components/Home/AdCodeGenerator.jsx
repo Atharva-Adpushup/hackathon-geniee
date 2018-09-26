@@ -6,8 +6,8 @@ import {
 	TYPES,
 	SIZES,
 	displayAdMessage,
-	interactiveAdMessage,
-	ampMessage
+	ampMessage,
+	interactiveAdMessage
 } from '../../configs/commonConsts';
 import { copyToClipBoard } from '../../lib/helpers';
 import { CustomMessage, CustomButton } from '../shared/index.jsx';
@@ -149,7 +149,11 @@ class AdCodeGenerator extends Component {
 					rightSize={9}
 					toMatch={this.state.size}
 					platform={this.state.platform}
+					type={this.state.type}
 					tabbedList={{
+						allowed: SIZES[this.state.type.toUpperCase()]
+							? SIZES[this.state.type.toUpperCase()]['ALLOWED']
+							: [],
 						list: {
 							responsive: {
 								header: 'Responsive',

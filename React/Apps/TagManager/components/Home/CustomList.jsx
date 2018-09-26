@@ -3,15 +3,22 @@ import { Col } from 'react-bootstrap';
 
 const CustomList = props => {
 	function renderTabbedHeaders() {
-		return Object.keys(props.tabbedList.list).map((item, key) => (
-			<li
-				key={`${key}-${props.tabbedList.list[item].key}`}
-				className={`simpleOption ${props.platform == props.tabbedList.list[item].key ? 'active' : ''}`}
-				onClick={props.selectPlatform.bind(null, props.tabbedList.list[item].key)}
-			>
-				{props.tabbedList.list[item].header}
-			</li>
-		));
+		return Object.keys(props.tabbedList.list)
+			.map((item, key) => {
+				const toMatch = props.tabbedList.list[item].key;
+				return props.tabbedList.allowed.indexOf(props.tabbedList.list[item].key) != -1 ? (
+					<li
+						key={`${key}-${toMatch}`}
+						className={`simpleOption ${props.platform == toMatch ? 'active' : ''}`}
+						onClick={props.selectPlatform.bind(null, toMatch)}
+					>
+						{props.tabbedList.list[item].header}
+					</li>
+				) : (
+					false
+				);
+			})
+			.filter(ele => ele != false);
 	}
 
 	function renderTabbedOptions() {
