@@ -29,6 +29,7 @@ block append headScripts
                     setTimeout(function() {
                         if(res.success) {
                             alert('Manual mode setting updated');
+                            window.location.reload();
                         } else {
                             alert('Some error occurred!');
                         }
