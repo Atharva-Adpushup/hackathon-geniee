@@ -25,7 +25,11 @@ class AdList extends Component {
 			<ul className="section-list row" style={{ margin: '20px 0px' }}>
 				{window.isSuperUser ? (
 					<div>
-						<CustomButton label="Master Save" handler={masterSave.bind(null, window.siteId)} />
+						<CustomButton
+							label="Master Save"
+							handler={masterSave.bind(null, window.siteId)}
+							classNames="mr-10"
+						/>
 						<div style={{ clear: 'both' }}>&nbsp;</div>
 					</div>
 				) : null}

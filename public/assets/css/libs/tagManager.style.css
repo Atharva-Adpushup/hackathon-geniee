@@ -517,6 +517,9 @@ select.inputMinimal {
 .bg-transparent {
   background: transparent !important; }
 
+.mr-10 {
+  margin-right: 10px !important; }
+
 .custom-message {
   padding: 10px;
   margin: 0px 0px 10px 0px;
@@ -537,6 +540,11 @@ select.inputMinimal {
   .custom-message p {
     margin: 0px;
     font-size: 14px; }
+
+.custom-btn {
+  display: inline;
+  float: right;
+  margin: 10px 0px 0px 10px; }
 
 .empty-state {
   text-align: center;

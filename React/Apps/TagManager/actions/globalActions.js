@@ -2,7 +2,7 @@ import { uiActions, globalActions } from '../configs/commonConsts';
 import { ajax } from '../../../common/helpers';
 
 const masterSave = siteId => (dispatch, getState) => {
-		const data = { siteId, ads: getState().ads };
+		const data = { siteId, ads: getState().ads.content };
 		return ajax({
 			url: '/tagManager/masterSave',
 			method: 'POST',
