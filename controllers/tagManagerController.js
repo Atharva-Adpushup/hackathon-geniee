@@ -50,6 +50,7 @@ const express = require('express'),
 				ad = {
 					...payload.ad,
 					id: id,
+					name: `Ad-${id}`,
 					isActive: true,
 					createdOn: +new Date(),
 					formatData: {
