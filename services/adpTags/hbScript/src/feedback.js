@@ -14,7 +14,8 @@ var logger = require('../helpers/logger'),
 				bidData.push({
 					revenue: bids[i].cpm / 1000, // Actual revenue for impression = cpm/1000
 					bidder: bids[i].bidder,
-					adId: bids[i].adId
+					adId: bids[i].adId,
+					responseTime: bids[i].responseTimestamp - bids[i].requestTimestamp
 				});
 			}
 			return bidData;
