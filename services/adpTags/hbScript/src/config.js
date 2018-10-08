@@ -43,7 +43,7 @@ module.exports = {
 		pixelId: 1236239
 	},
 	DEFAULT_WINNER: 'adx',
-	FEEDBACK_URL: 'http://apdc1-webapp-creativeqa.azurewebsites.net/feedback2',
+	FEEDBACK_URL: '//apdc1-staging-1.eastus2.cloudapp.azure.com:8080/ApHbWebService/feedback',
 	POSTBID_PASSBACKS: {
 		'*': 'PGgxPkJPTyBZQUghPC9oMT4='
 	},
@@ -101,7 +101,7 @@ module.exports = {
 		'},' +
 		'openx: {' +
 		'bidCpmAdjustment: function(bidCpm) {' +
-		'return bidCpm - (bidCpm * (5/100));' +
+		'return bidCpm - (bidCpm * (10/100));' +
 		'}' +
 		'},' +
 		'districtm: {' +
@@ -111,7 +111,7 @@ module.exports = {
 		'},' +
 		'brainjuicemedia: {' +
 		'bidCpmAdjustment: function(bidCpm) {' +
-		'return bidCpm - (bidCpm * (5/100));' +
+		'return bidCpm - (bidCpm * (18/100));' +
 		'}' +
 		'},' +
 		'oftmedia: {' +

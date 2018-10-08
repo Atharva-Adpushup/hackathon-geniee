@@ -1,9 +1,9 @@
-var KEEN_IO = require('../src/config').KEEN_IO,
+var config = require('../src/config'),
 	logger = require('./logger'),
 	find = require('lodash.find');
 
 module.exports = {
-	hashCode: function (str) {
+	hashCode: function(str) {
 		var hash = 0;
 		if (str.length === 0) return hash;
 		for (i = 0; i < str.length; i++) {
@@ -13,7 +13,7 @@ module.exports = {
 		}
 		return hash;
 	},
-	createEmptyIframe: function () {
+	createEmptyIframe: function() {
 		var f = document.createElement('iframe');
 
 		f.id = '_adp_frame_' + ((Math.random() * 1000) | 0);
@@ -31,12 +31,12 @@ module.exports = {
 
 		return f;
 	},
-	getCurrentAdpSlotBatch: function (adpBatches, batchId) {
-		return find(adpBatches, function (batch) {
+	getCurrentAdpSlotBatch: function(adpBatches, batchId) {
+		return find(adpBatches, function(batch) {
 			return batch.batchId === batchId;
 		}).adpSlots;
 	},
-	isSupportedBrowser: function () {
+	isSupportedBrowser: function() {
 		var ua = navigator.userAgent;
 
 		// Check for MSIE v7-10 in UA string
@@ -48,7 +48,7 @@ module.exports = {
 		}
 		return true;
 	},
-	getBrowser: function () {
+	getBrowser: function() {
 		if (window.navigator) {
 			var ua = navigator.userAgent,
 				tem,
@@ -72,7 +72,7 @@ module.exports = {
 			return 'unknown';
 		}
 	},
-	getUaString: function () {
+	getUaString: function() {
 		if (window.navigator) {
 			if (window.navigator.userAgent) {
 				return window.navigator.userAgent;
@@ -82,31 +82,34 @@ module.exports = {
 		}
 		return null;
 	},
-	sendDataToKeenIO: function (data) {
-		logger.info('keenIO data', data);
-		var encodedData = window.btoa(JSON.stringify(data)),
-			imgEl = document.createElement('img');
-
-		imgEl.src =
-			'https://api.keen.io/3.0/projects/' +
-			KEEN_IO.PROJECT_ID +
-			'/events/' +
-			KEEN_IO.EVENTS.IMPRESSION +
-			'?api_key=' +
-			KEEN_IO.WRITE_KEY +
-			'&data=' +
-			encodedData;
-		imgEl.style.display = 'none';
-		document.body.appendChild(imgEl);
+	sendFeedback: function(feedback) {
+		window.adpushup.$.post(config.FEEDBACK_URL, feedback.data);
 	},
-	getBatchAdUnits: function (adpSlots) {
+	// sendDataToKeenIO: function(data) {
+	// 	logger.info('keenIO data', data);
+	// 	var encodedData = window.btoa(JSON.stringify(data)),
+	// 		imgEl = document.createElement('img');
+
+	// 	imgEl.src =
+	// 		'https://api.keen.io/3.0/projects/' +
+	// 		KEEN_IO.PROJECT_ID +
+	// 		'/events/' +
+	// 		KEEN_IO.EVENTS.IMPRESSION +
+	// 		'?api_key=' +
+	// 		KEEN_IO.WRITE_KEY +
+	// 		'&data=' +
+	// 		encodedData;
+	// 	imgEl.style.display = 'none';
+	// 	document.body.appendChild(imgEl);
+	// },
+	getBatchAdUnits: function(adpSlots) {
 		var adUnits = [];
-		adpSlots.forEach(function (adpSlot) {
+		adpSlots.forEach(function(adpSlot) {
 			adUnits.push(adpSlot.containerId);
 		});
 		return adUnits;
 	},
-	stringifyJSON: function (json) {
+	stringifyJSON: function(json) {
 		var dataString = '?',
 			keys = Object.keys(json);
 
@@ -122,15 +125,15 @@ module.exports = {
 
 		return dataString;
 	},
-	generateUUID: function (placeholder) {
+	generateUUID: function(placeholder) {
 		return placeholder
 			? (placeholder ^ ((Math.random() * 16) >> (placeholder / 4))).toString(16)
 			: ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, this.generateUUID);
 	},
-	getRandomNumber: function (min, max) {
+	getRandomNumber: function(min, max) {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	},
-	getSectionId: function (el) {
+	getSectionId: function(el) {
 		if (document.getElementById(el)) {
 			var parent = document.getElementById(el).parentNode;
 
@@ -140,7 +143,7 @@ module.exports = {
 		}
 		return null;
 	},
-	getVariationId: function () {
+	getVariationId: function() {
 		try {
 			if (window.adpushup) {
 				var variationId = window.adpushup.config.selectedVariation;
@@ -149,10 +152,10 @@ module.exports = {
 					return variationId;
 				}
 			}
-		} catch (error) { }
+		} catch (error) {}
 		return null;
 	},
-	getPageGroup: function () {
+	getPageGroup: function() {
 		if (window.adpushup) {
 			var pageGroup = window.adpushup.config.pageGroup;
 
@@ -162,7 +165,7 @@ module.exports = {
 		}
 		return null;
 	},
-	getPlatform: function () {
+	getPlatform: function() {
 		if (window.adpushup) {
 			var platform = window.adpushup.config.platform;
 
@@ -172,12 +175,18 @@ module.exports = {
 		}
 		return null;
 	},
-	hasMultipleDfpAccounts: function () {
+	getActiveDFPNetwork: function() {
+		if (window.adpushup && window.adpushup.config) {
+			return window.adpushup.config.activeDFPNetwork;
+		}
+		return null;
+	},
+	hasMultipleDfpAccounts: function() {
 		try {
 			var dfpAdSlots = Object.keys(window.googletag.pubads().aa),
 				dfpNetworkIdMap = {};
 
-			dfpAdSlots.forEach(function (dfpAdSlot) {
+			dfpAdSlots.forEach(function(dfpAdSlot) {
 				var dfpNetworkId = dfpAdSlot.match(/\/(.*?)\//)[1];
 
 				if (!dfpNetworkIdMap.hasOwnProperty(dfpNetworkId)) {

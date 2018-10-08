@@ -2,11 +2,8 @@
 
 var config = require('./config'),
 	logger = require('../helpers/logger'),
-	feedback = require('./feedback'),
-	init = function(w, d) {
-		w.googletag = w.googletag || {};
-		googletag.cmd = googletag.cmd || [];
-
+	feedback = require('./feedback').feedback,
+	init = function(d) {
 		var gptScriptEl = d.createElement('script');
 		gptScriptEl.src = '//www.googletagservices.com/tag/js/gpt.js';
 		gptScriptEl.async = true;

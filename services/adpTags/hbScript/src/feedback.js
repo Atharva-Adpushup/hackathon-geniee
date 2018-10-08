@@ -14,7 +14,8 @@ var logger = require('../helpers/logger'),
 				bidData.push({
 					revenue: bids[i].cpm / 1000, // Actual revenue for impression = cpm/1000
 					bidder: bids[i].bidder,
-					adId: bids[i].adId
+					adId: bids[i].adId,
+					responseTime: bids[i].responseTimestamp - bids[i].requestTimestamp
 				});
 			}
 			return bidData;
@@ -36,6 +37,7 @@ var logger = require('../helpers/logger'),
 					placement: slot.placement,
 					containerId: slot.containerId,
 					type: slot.type,
+					url: window.location.href,
 					bids: getBidDataForFeedback(slot.containerId) || [],
 					winner: slot.feedback.winner || config.DEFAULT_WINNER,
 					winningRevenue: slot.feedback.winningRevenue || 0,
@@ -101,7 +103,7 @@ var logger = require('../helpers/logger'),
 				});
 		}
 		//if (feedback.data.winner && feedback.data.winner !== config.DEFAULT_WINNER) {
-		utils.sendDataToKeenIO(feedback);
+		utils.sendFeedback(feedback);
 		//}
 		logger.log(
 			'Winner for div ' + feedback.data.containerId + ': ' + feedback.data.winner,
@@ -109,4 +111,7 @@ var logger = require('../helpers/logger'),
 		);
 	};
 
-module.exports = feedback;
+module.exports = {
+	feedback: feedback,
+	getBidDataForFeedback: getBidDataForFeedback
+};

@@ -70,6 +70,7 @@ module.exports = function(site, externalData = {}) {
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
 			apConfigs.siteDomain = site.get('siteDomain');
+			apConfigs.activeDFPNetwork = apConfigs.activeDFPNetwork ? apConfigs.activeDFPNetwork : null;
 			apConfigs.manualModeActive = site.get('isManual') ? site.get('isManual') : false;
 			// Default 'draft' mode is selected if config mode is not present
 			apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
