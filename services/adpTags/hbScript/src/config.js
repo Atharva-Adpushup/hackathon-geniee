@@ -101,7 +101,7 @@ module.exports = {
 		'},' +
 		'openx: {' +
 		'bidCpmAdjustment: function(bidCpm) {' +
-		'return bidCpm - (bidCpm * (5/100));' +
+		'return bidCpm - (bidCpm * (10/100));' +
 		'}' +
 		'},' +
 		'brainjuicemedia: {' +
