@@ -3,7 +3,7 @@
 var logger = require('../helpers/logger'),
 	utils = require('../helpers/utils'),
 	config = require('./config'),
-	feedback = require('./feedback'),
+	feedback = require('./feedback').feedback,
 	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(1));
 		if (val > 20) {
@@ -160,6 +160,8 @@ var logger = require('../helpers/logger'),
 			slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE
 				? config.GENIEE_NETWORK_ID
 				: config.NETWORK_ID;
+		networkId = slot.activeDFPNetwork ? slot.activeDFPNetwork : networkId;
+
 		slot.gSlot = googletag.defineSlot(
 			'/' + networkId + '/' + slot.optionalParam.dfpAdunitCode,
 			slot.optionalParam.multipleAdSizes || slot.size,
