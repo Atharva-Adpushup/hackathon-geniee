@@ -4,7 +4,7 @@ import InlineEdit from 'shared/inlineEdit/index.jsx';
 import SelectBox from 'shared/select/select';
 import DockedSettings from './dockedSettings.jsx';
 import TriggerSettings from './triggerSettings.jsx';
-import { typeOfAds } from '../../../consts/commonConsts';
+import { typeOfAds, adInsertOptions } from '../../../consts/commonConsts';
 
 class AdDetails extends Component {
 	constructor(props) {
@@ -12,7 +12,8 @@ class AdDetails extends Component {
 		this.state = {
 			editDock: false,
 			editTrigger: false,
-			selectedAdSize: ''
+			selectedAdSize: '',
+			operation: props.section && props.section.operation || ''
 		};
 		this.renderXPathAndCSS = this.renderXPathAndCSS.bind(this);
 		this.renderSectionName = this.renderSectionName.bind(this);
@@ -25,6 +26,7 @@ class AdDetails extends Component {
 		this.renderAdCode = this.renderAdCode.bind(this);
 		this.renderCommonDetails = this.renderCommonDetails.bind(this);
 		this.handleSelectAdSizeChange = this.handleSelectAdSizeChange.bind(this);
+		this.handleSelectAdOperationChange = this.handleSelectAdOperationChange.bind(this);
 	}
 
 	renderXPathAndCSS() {
@@ -88,6 +90,14 @@ class AdDetails extends Component {
 		return object;
 	}
 
+	handleSelectAdOperationChange(operation) {
+		const {section} = this.props;
+
+		this.setState({operation}, () => {
+			this.props.onUpdateOperation(section.id, operation);
+		});
+	}
+
 	handleSelectAdSizeChange(value) {
 		const { section, ad, updateAdSize, channelId } = this.props,
 			isValue = !!value,
@@ -105,6 +115,48 @@ class AdDetails extends Component {
 			() => {
 				updateAdSize(channelId, ad.id, computedAdSize);
 			}
+		);
+	}
+
+	renderAdOperationBlock() {
+		const { section } = this.props,
+			isValid = !!(section && section.operation),
+			isFromPanel = !!this.props.fromPanel;
+
+		if (!isValid) {
+			return null;
+		}
+
+		const insertOptionKeys = Object.keys(adInsertOptions),
+			wellClasses = 'u-padding-5px';
+
+		return (
+			<div>
+				<p className="mB-5">Change Ad Operation</p>
+				<Well className={wellClasses}>
+					<Row>
+						{
+						<Col xs={12}>
+							<SelectBox
+								value={this.state.operation}
+								label="Change ad operation"
+								onChange={this.handleSelectAdOperationChange}
+							>
+								{insertOptionKeys.map((operationConstant, index) => {
+									const operationValue = adInsertOptions[operationConstant];
+
+									return (
+										<option key={index} value={operationValue}>
+											{operationValue}
+										</option>
+									);
+								})}
+							</SelectBox>
+						</Col>
+						}
+					</Row>
+				</Well>
+			</div>
 		);
 	}
 
@@ -359,6 +411,7 @@ class AdDetails extends Component {
 								{this.renderNetworkDetails()}
 							</div>
 							{this.renderMultipleAdSize()}
+							{this.renderAdOperationBlock()}
 							{!this.props.fromPanel ? this.renderXPathAndCSS() : null}
 						</div>
 					) : null}
