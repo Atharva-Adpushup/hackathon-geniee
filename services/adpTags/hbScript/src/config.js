@@ -104,6 +104,11 @@ module.exports = {
 		'return bidCpm - (bidCpm * (10/100));' +
 		'}' +
 		'},' +
+		'districtm: {' +
+		'bidCpmAdjustment: function(bidCpm) {' +
+		'return bidCpm - (bidCpm * (10/100));' +
+		'}' +
+		'},' +
 		'brainjuicemedia: {' +
 		'bidCpmAdjustment: function(bidCpm) {' +
 		'return bidCpm - (bidCpm * (18/100));' +
@@ -121,6 +126,7 @@ module.exports = {
 		'}' +
 		'};' +
 		"pbjs.aliasBidder('appnexus', 'springserve');" +
+		"pbjs.aliasBidder('appnexus', 'districtm');" +
 		"pbjs.aliasBidder('appnexus', 'brealtime');" +
 		"pbjs.aliasBidder('appnexus', 'brainjuicemedia');" +
 		"pbjs.aliasBidder('appnexus', 'oftmedia');" +

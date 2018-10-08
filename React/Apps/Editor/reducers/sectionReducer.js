@@ -81,6 +81,12 @@ const sectionByIds = (state = {}, action) => {
 				[action.sectionId]: { ...state[action.sectionId], xpath: action.xpath, allXpaths: [], error: false }
 			};
 
+		case sectionActions.UPDATE_OPERATION:
+			return {
+				...state,
+				[action.sectionId]: { ...state[action.sectionId], operation: action.operation }
+			};
+
 		case sectionActions.UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD:
 			return {
 				...state,

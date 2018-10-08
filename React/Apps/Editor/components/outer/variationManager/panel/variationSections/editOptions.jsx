@@ -120,6 +120,7 @@ class EditOptions extends Component {
 				editInteractiveAd={this.toggleEditInteractiveAd}
 				fromPanel={true}
 				showEventData={this.props.section.type == 3 ? true : false}
+				onUpdateOperation={this.props.onUpdateOperation}
 			/>
 		);
 	}

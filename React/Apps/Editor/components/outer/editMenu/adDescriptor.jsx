@@ -58,6 +58,7 @@ class adDescriptor extends React.Component {
 				updateSettings,
 				showNotification,
 				onUpdateXPath,
+				onUpdateOperation,
 				onSectionAllXPaths,
 				onValidateXPath,
 				onResetErrors,
@@ -108,6 +109,7 @@ class adDescriptor extends React.Component {
 						editCss={this.toggleCssEditor}
 						editNetwork={this.toggleNetworkEditor}
 						onUpdateXPath={onUpdateXPath}
+						onUpdateOperation={onUpdateOperation}
 						onSectionAllXPaths={onSectionAllXPaths}
 						onValidateXPath={onValidateXPath}
 						onResetErrors={onResetErrors}

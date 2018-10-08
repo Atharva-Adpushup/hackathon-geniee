@@ -195,6 +195,13 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			xpath
 		};
 	},
+	updateOperation = (sectionId, operation) => {
+		return {
+			type: sectionActions.UPDATE_OPERATION,
+			sectionId,
+			operation
+		};
+	},
 	updateInContentMinDistanceFromPrevAd = (sectionId, minDistanceFromPrevAd) => {
 		return {
 			type: sectionActions.UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD,
@@ -275,6 +282,7 @@ export {
 	createIncontentSection,
 	updatePartnerData,
 	updateXPath,
+	updateOperation,
 	updateInContentMinDistanceFromPrevAd,
 	sectionAllXPaths,
 	validateXPath,

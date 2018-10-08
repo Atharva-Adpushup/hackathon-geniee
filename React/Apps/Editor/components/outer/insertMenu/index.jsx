@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import Menu from 'shared/menu/menu.jsx';
 import MenuItem from 'shared/menu/menuItem.jsx';
-import { commonSupportedSizes, nonPartnerAdSizes } from 'consts/commonConsts.js';
+import { commonSupportedSizes, nonPartnerAdSizes, adInsertOptions } from 'consts/commonConsts.js';
 import AdSizeSelector from './adSizeSelector.jsx';
 import ParentSelector from './parentSelector.jsx';
 import { immutablePush } from 'libs/immutableHelpers';
@@ -17,11 +17,11 @@ const initialState = {
 	},
 	getInsertOptionClass = function(option) {
 		switch (option) {
-			case 'Prepend':
+			case adInsertOptions.PREPEND:
 				return 'ap-prepend';
-			case 'Insert After':
+			case adInsertOptions.INSERT_AFTER:
 				return 'ap-insertafter';
-			case 'Insert Before':
+			case adInsertOptions.INSERT_BEFORE:
 				return 'ap-insertbefore';
 			default:
 				return 'ap-append';

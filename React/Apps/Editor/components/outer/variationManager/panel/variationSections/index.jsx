@@ -6,6 +6,7 @@ import {
 	deleteSection,
 	renameSection,
 	updateXPath,
+	updateOperation,
 	sectionAllXPaths,
 	validateXPath,
 	validateSectionXPath,
@@ -85,6 +86,7 @@ class variationSections extends Component {
 			onRenameSection,
 			onUpdatePartnerData,
 			onUpdateXPath,
+			onUpdateOperation,
 			onUpdateCustomCss,
 			onUpdateInContentMinDistanceFromPrevAd,
 			onSectionAllXPaths,
@@ -135,6 +137,7 @@ class variationSections extends Component {
 									updateNetwork={updateNetwork}
 									onUpdatePartnerData={onUpdatePartnerData}
 									onUpdateXPath={onUpdateXPath}
+									onUpdateOperation={onUpdateOperation}
 									onUpdateCustomCss={onUpdateCustomCss}
 									onUpdateInContentMinDistanceFromPrevAd={onUpdateInContentMinDistanceFromPrevAd}
 									onSectionAllXPaths={onSectionAllXPaths}
@@ -167,6 +170,7 @@ variationSections.propTypes = {
 	updateAdCode: PropTypes.func.isRequired,
 	onUpdatePartnerData: PropTypes.func.isRequired,
 	onUpdateXPath: PropTypes.func,
+	onUpdateOperation: PropTypes.func,
 	onUpdateCustomCss: PropTypes.func,
 	onUpdateInContentMinDistanceFromPrevAd: PropTypes.func,
 	onSectionAllXPaths: PropTypes.func,
@@ -194,6 +198,7 @@ export default connect(
 				onUpdateCustomCss: updateCustomCss,
 				onUpdatePartnerData: updatePartnerData,
 				onUpdateXPath: updateXPath,
+				onUpdateOperation: updateOperation,
 				onUpdateInContentMinDistanceFromPrevAd: updateInContentMinDistanceFromPrevAd,
 				onSectionAllXPaths: sectionAllXPaths,
 				onValidateXPath: validateXPath,
