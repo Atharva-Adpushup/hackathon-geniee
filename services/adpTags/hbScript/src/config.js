@@ -43,7 +43,7 @@ module.exports = {
 		pixelId: 1236239
 	},
 	DEFAULT_WINNER: 'adx',
-	FEEDBACK_URL: '//apdc1-staging-1.eastus2.cloudapp.azure.com:8080/ApHbWebService/feedback',
+	FEEDBACK_URL: '//staging.adpushup.com/ApHbWebService/feedback',
 	POSTBID_PASSBACKS: {
 		'*': 'PGgxPkJPTyBZQUghPC9oMT4='
 	},
