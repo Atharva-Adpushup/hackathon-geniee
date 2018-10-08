@@ -106,7 +106,7 @@ module.exports = {
 		'},' +
 		'brainjuicemedia: {' +
 		'bidCpmAdjustment: function(bidCpm) {' +
-		'return bidCpm - (bidCpm * (5/100));' +
+		'return bidCpm - (bidCpm * (18/100));' +
 		'}' +
 		'},' +
 		'oftmedia: {' +
