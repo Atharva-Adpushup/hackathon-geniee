@@ -317,15 +317,19 @@ module.exports = {
 			return interactiveAds.length ? interactiveAds : null;
 		}
 	},
-	isElementInViewport: function (el, threshold) {
+	isElementInViewport: function(el, threshold) {
 		const elementTop = $(el).offset().top,
 			elementBottom = elementTop + $(el).outerHeight(),
 			viewportTop = $(window).scrollTop(),
 			viewportBottom = viewportTop + $(window).height();
- 		return (
-			Math.abs(elementTop - viewportBottom) <= threshold ||
-			Math.abs(elementBottom - viewportTop) <= threshold ||
+		return (
+			elementTop - viewportBottom <= threshold ||
+			elementBottom - viewportTop <= threshold ||
 			(elementBottom > viewportTop && elementTop < viewportBottom)
+
+			// Math.abs(elementTop - viewportBottom) <= threshold ||
+			// Math.abs(elementBottom - viewportTop) <= threshold ||
+			// (elementBottom > viewportTop && elementTop < viewportBottom)
 		);
 	},
 	queryParams: (function() {

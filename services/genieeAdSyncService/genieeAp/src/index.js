@@ -9,9 +9,9 @@ var w = window,
 	browserConfig = require('../libs/browserConfig'),
 	selectVariation = require('./variationSelectionModels/index'),
 	createAds = require('./adCreater').createAds,
-	renderAd = require('./adCreater').renderAd,
+	// renderAd = require('./adCreater').renderAd,
 	heartBeat = require('../libs/heartBeat'),
-	lazyLoad = require('../libs/lazyload'),
+	lazyload = require('../libs/lazyload'),
 	ampInit = require('./ampInit'),
 	hookAndInit = require('./hooksAndBlockList'),
 	control = require('./control')(),
@@ -31,11 +31,14 @@ $.extend(adp, {
 	nodewatcher: nodewatcher,
 	geniee: genieeObject,
 	triggerAd: triggerAd,
-	lazyLoadAds: []
+	lazyload: {
+		ads: [],
+		cb: null
+	}
 });
 
 // calling lazyloadModule
-lazyLoad(renderAd);
+lazyload();
 
 // Extend the settings with generated settings
 // eslint-disable-next-line no-undef

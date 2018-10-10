@@ -1,10 +1,13 @@
-var $ = require('jquery'), utils = require('./utils');
+var $ = require('jquery'),
+	utils = require('./utils');
 
-function renderAdWrapper(cb) {
-	var ads = window.adpushup.lazyLoadAds || [];
+function renderAdWrapper() {
+	var ads = window.adpushup.lazyload.ads || [],
+		cb = window.adpushup.lazyload.cb;
 	if (ads.length) {
-		ads.forEach(function (element) {
-			if (utils.isElementInViewport(element.data.container)) {
+		ads.forEach(function(element, index) {
+			if (utils.isElementInViewport(element.data.container, 10)) {
+				ads.splice(index, 1);
 				cb(element.ad, element.data);
 			}
 		});
@@ -12,26 +15,13 @@ function renderAdWrapper(cb) {
 	return false;
 }
 
-// (function(w, d) {
-// 	$(d).ready(function() {
-// 		$(w).on(
-// 			'scroll',
-// 			utils.throttle(function() {
-// 				renderAdWrapper();
-// 			}, 200)
-// 		);
-// 	});
-// })(window, document);
-
-function init(cb) {
-	// $(document).ready(function() {
+function init() {
 	$(window).on(
 		'scroll',
-		utils.throttle(function () {
-			renderAdWrapper(cb);
+		utils.throttle(function() {
+			renderAdWrapper();
 		}, 200)
 	);
-	// });
 }
 
 module.exports = init;

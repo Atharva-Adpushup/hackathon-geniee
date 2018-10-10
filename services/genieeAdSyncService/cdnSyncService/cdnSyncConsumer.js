@@ -255,6 +255,7 @@ module.exports = function(site, externalData = {}) {
 			});
 		},
 		uploadJS = function(fileConfig) {
+			return Promise.resolve(fileConfig.uncompressed);
 			return connectToServer()
 				.then(cwd)
 				.then(function() {
