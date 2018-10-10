@@ -5,6 +5,10 @@ var $ = require('jquery'),
 	incontentAnalyser = __IN_CONTENT_ANALYSER_SCRIPT__,
 	adCodeGenerator = require('./adCodeGenerator'),
 	commonConsts = require('../config/commonConsts'),
+	displayCounter = 0,
+	adsVariation,
+	finished = false,
+	isAfterJSExecuted = false,
 	shouldPushToADP = function (ad) {
 		return (
 			(ad.network === 'adpTags' && ad.networkData) ||
@@ -152,12 +156,33 @@ var $ = require('jquery'),
 			return !ad.type || (ad.type && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD);
 		});
 	},
+	next = function (adObj, data) {
+		if (displayCounter) {
+			displayCounter--;
+			if (data.success) {
+				feedbackData.xpathMiss = [];
+				feedbackData.ads = [adObj.id];
+				placeAd(data.container, adObj);
+				utils.sendFeedback(feedbackData);
+			} else {
+				adObj.xpathMiss = true;
+				feedbackData.ads = [];
+				feedbackData.xpathMiss = [adObj.id];
+				utils.sendFeedback(feedbackData);
+			}
+		}
+		if (!displayCounter && !finished) {
+			finished = true;
+			if (adsVariation.customJs && adsVariation.customJs.afterAp && !isAfterJSExecuted) {
+				executeAfterJS(adsVariation);
+			}
+			//utils.sendFeedback(feedbackData);
+		}
+	},
 	createAds = function (adp, variation) {
 		var config = adp.config,
 			err = adp.err,
-			finished = false,
 			ads = filterNonInteractiveAds(variation.ads),
-			displayCounter = ads.length,
 			contentSelector = variation.contentSelector,
 			feedbackData = {
 				ads: [],
@@ -172,29 +197,6 @@ var $ = require('jquery'),
 			placeGenieeHeadCode = function (genieeIdCollection) {
 				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIdCollection);
 				genieeHeadCode && $('head').append(genieeHeadCode);
-			},
-			next = function (adObj, data) {
-				if (displayCounter) {
-					displayCounter--;
-					if (data.success) {
-						feedbackData.xpathMiss = [];
-						feedbackData.ads = [adObj.id];
-						placeAd(data.container, adObj);
-						utils.sendFeedback(feedbackData);
-					} else {
-						adObj.xpathMiss = true;
-						feedbackData.ads = [];
-						feedbackData.xpathMiss = [adObj.id];
-						utils.sendFeedback(feedbackData);
-					}
-				}
-				if (!displayCounter && !finished) {
-					finished = true;
-					if (variation.customJs && variation.customJs.afterAp && !adp.afterJSExecuted) {
-						executeAfterJS(variation);
-					}
-					//utils.sendFeedback(feedbackData);
-				}
 			},
 			handleContentSelectorFailure = function (inContentAds) {
 				feedbackData.contentSelectorMissing = true;
@@ -214,6 +216,7 @@ var $ = require('jquery'),
 
 							// if all well then ad id of ad in feedback to tell system that impression was given
 							//feedbackData.ads.push(ad.id);
+							console.log("ads")
 							if (utils.isElementInViewport(data.container)) next(ad, data);
 							else window.adpushup.lazyLoadAds.push({ ad: ad, data: data });
 						})
@@ -274,6 +277,9 @@ var $ = require('jquery'),
 				adCodeGenerator.executeAdpTagsHeadCode(ads.adpTagUnits, variation.adpKeyValues);
 			}
 
+			displayCounter = ads.length;
+			adsVariation = variation;
+			isAfterJSExecuted = adp.afterJSExecuted;
 			// Process and place structural ads
 			placeStructuralAds(ads.structuredAds);
 
