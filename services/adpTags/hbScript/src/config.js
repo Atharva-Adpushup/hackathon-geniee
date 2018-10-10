@@ -73,17 +73,10 @@ module.exports = {
 		'if( serverRenderCode.isExecuted === undefined ) {' +
 		'serverRenderCode.isExecuted = true;' +
 		'console.log(pbjs.getBidResponses());' +
-		'var pbjsParams = {' +
-		"'_bidsReceived'  : pbjs._bidsReceived," +
-		"'_bidsRequested' : pbjs._bidsRequested," +
-		"'_adUnitCodes'   : pbjs._adUnitCodes," +
-		"'_winningBids'   : pbjs._winningBids," +
-		"'_adsReceived'   : pbjs._adsReceived" +
-		'};' +
 		'if( Number.isInteger(timeout) ) {' +
-		'parent.__prebidFinishCallback(pbjsParams, ADP_BATCH_ID, timeout);' +
+		'parent.__prebidFinishCallback(ADP_BATCH_ID, timeout);' +
 		'} else {' +
-		'parent.__prebidFinishCallback(pbjsParams, ADP_BATCH_ID);' +
+		'parent.__prebidFinishCallback(ADP_BATCH_ID);' +
 		'}' +
 		'}' +
 		'}' +

@@ -1,7 +1,6 @@
 // Header bidding feedback module
 
-var logger = require('../helpers/logger'),
-	config = require('./config'),
+var config = require('./config'),
 	utils = require('../helpers/utils'),
 	getBidDataForFeedback = function(containerId) {
 		var bidData = [],
@@ -105,10 +104,6 @@ var logger = require('../helpers/logger'),
 		//if (feedback.data.winner && feedback.data.winner !== config.DEFAULT_WINNER) {
 		utils.sendFeedback(feedback);
 		//}
-		logger.log(
-			'Winner for div ' + feedback.data.containerId + ': ' + feedback.data.winner,
-			feedback.data.winningRevenue * 1000
-		);
 	};
 
 module.exports = {
