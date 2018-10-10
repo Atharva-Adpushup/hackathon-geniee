@@ -317,6 +317,17 @@ module.exports = {
 			return interactiveAds.length ? interactiveAds : null;
 		}
 	},
+	isElementInViewport: function (el, threshold) {
+		const elementTop = $(el).offset().top,
+			elementBottom = elementTop + $(el).outerHeight(),
+			viewportTop = $(window).scrollTop(),
+			viewportBottom = viewportTop + $(window).height();
+ 		return (
+			Math.abs(elementTop - viewportBottom) <= threshold ||
+			Math.abs(elementBottom - viewportTop) <= threshold ||
+			(elementBottom > viewportTop && elementTop < viewportBottom)
+		);
+	},
 	queryParams: (function() {
 		var str = window.location.search,
 			objURL = {};

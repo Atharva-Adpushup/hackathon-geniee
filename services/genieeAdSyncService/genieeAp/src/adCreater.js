@@ -5,20 +5,14 @@ var $ = require('jquery'),
 	incontentAnalyser = __IN_CONTENT_ANALYSER_SCRIPT__,
 	adCodeGenerator = require('./adCodeGenerator'),
 	commonConsts = require('../config/commonConsts'),
-	shouldPushToADP = function(ad) {
+	shouldPushToADP = function (ad) {
 		return (
 			(ad.network === 'adpTags' && ad.networkData) ||
 			(ad.network === 'geniee' && ad.networkData && ad.networkData.dynamicAllocation)
 		);
 	},
-	segregateAds = function(ads) {
-		var a,
-			ad,
-			structuredAds = [],
-			inContentAds = [],
-			adpTagUnits = [],
-			externalTriggerAds = [],
-			genieeIds = [];
+	segregateAds = function (ads) {
+		var a, ad, structuredAds = [], inContentAds = [], adpTagUnits = [], externalTriggerAds = [], genieeIds = [];
 		for (a = 0; a < ads.length; a++) {
 			ad = ads[a];
 
@@ -46,7 +40,7 @@ var $ = require('jquery'),
 			}
 		}
 
-		inContentAds.sort(function(next, prev) {
+		inContentAds.sort(function (next, prev) {
 			return parseInt(next.section, 10) > parseInt(prev.section, 10);
 		});
 		return {
@@ -57,7 +51,7 @@ var $ = require('jquery'),
 			externalTriggerAds: externalTriggerAds
 		};
 	},
-	getContainer = function(ad, el) {
+	getContainer = function (ad, el) {
 		if (!el) {
 			el = $(ad.xpath);
 		}
@@ -82,15 +76,13 @@ var $ = require('jquery'),
 			defaultAdProperties['text-align'] = 'center';
 		}
 
-		container = $('<div/>')
-			.css($.extend(defaultAdProperties, ad.css))
-			.attr({
-				id: isGenieePartner ? computedSSPContainerId : ad.id,
-				'data-section': ad.id,
-				class: '_ap_apex_ad',
-				'data-xpath': ad.xpath ? ad.xpath : '',
-				'data-section-id': ad.section ? ad.section : ''
-			});
+		container = $('<div/>').css($.extend(defaultAdProperties, ad.css)).attr({
+			id: isGenieePartner ? computedSSPContainerId : ad.id,
+			'data-section': ad.id,
+			class: '_ap_apex_ad',
+			'data-xpath': ad.xpath ? ad.xpath : '',
+			'data-section-id': ad.section ? ad.section : ''
+		});
 
 		switch (ad.operation) {
 			case 'Append':
@@ -107,23 +99,23 @@ var $ = require('jquery'),
 		}
 		return container;
 	},
-	getAdContainer = function(ad, xpathWaitTimeout) {
+	getAdContainer = function (ad, xpathWaitTimeout) {
 		// eslint-disable-next-line new-cap
 		var defer = $.Deferred();
 		nodewatcher
 			.watch(ad.xpath, xpathWaitTimeout)
-			.done(function() {
+			.done(function () {
 				var container = getContainer(ad);
 				container
 					? defer.resolve({ container: container, success: true })
 					: defer.reject({ xpathMiss: true, success: false });
 			})
-			.fail(function() {
+			.fail(function () {
 				defer.reject({ xpathMiss: true, success: false });
 			});
 		return defer.promise();
 	},
-	executeAfterJS = function(variation) {
+	executeAfterJS = function (variation) {
 		try {
 			utils.runScript(utils.base64Decode(variation.customJs.afterAp));
 		} catch (e) {
@@ -131,7 +123,7 @@ var $ = require('jquery'),
 		}
 		window.adpushup.afterJSExecuted = true;
 	},
-	placeAd = function(container, ad) {
+	placeAd = function (container, ad) {
 		var adp = window.adpushup;
 
 		try {
@@ -146,7 +138,7 @@ var $ = require('jquery'),
 
 			adp.tracker.add(
 				container,
-				function(id) {
+				function (id) {
 					utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: id });
 				}.bind(adp, ad.id)
 			);
@@ -155,12 +147,12 @@ var $ = require('jquery'),
 		}
 		return true;
 	},
-	filterNonInteractiveAds = function(ads) {
-		return ads.filter(function(ad) {
+	filterNonInteractiveAds = function (ads) {
+		return ads.filter(function (ad) {
 			return !ad.type || (ad.type && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD);
 		});
 	},
-	createAds = function(adp, variation) {
+	createAds = function (adp, variation) {
 		var config = adp.config,
 			err = adp.err,
 			finished = false,
@@ -177,11 +169,11 @@ var $ = require('jquery'),
 				// Replaced '-' with '_' to avoid ElasticSearch split issue
 				variationId: variation.id // set the chosenVariation variation in feedback data;
 			},
-			placeGenieeHeadCode = function(genieeIdCollection) {
+			placeGenieeHeadCode = function (genieeIdCollection) {
 				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIdCollection);
 				genieeHeadCode && $('head').append(genieeHeadCode);
 			},
-			next = function(adObj, data) {
+			next = function (adObj, data) {
 				if (displayCounter) {
 					displayCounter--;
 					if (data.success) {
@@ -204,34 +196,36 @@ var $ = require('jquery'),
 					//utils.sendFeedback(feedbackData);
 				}
 			},
-			handleContentSelectorFailure = function(inContentAds) {
+			handleContentSelectorFailure = function (inContentAds) {
 				feedbackData.contentSelectorMissing = true;
-				$.each(inContentAds, function(index, ad) {
+				$.each(inContentAds, function (index, ad) {
 					//feedbackData.xpathMiss.push(ad.id);
 					next(ad, { success: false });
 				});
 			},
-			placeStructuralAds = function(structuredAds) {
+			placeStructuralAds = function (structuredAds) {
 				// Process strutural sections
-				$.each(structuredAds, function(index, ad) {
+				window.adpushup.lazyLoadAds = window.adpushup.lazyLoadAds || [];
+				$.each(structuredAds, function (index, ad) {
 					getAdContainer(ad, config.xpathWaitTimeout)
-						.done(function(data) {
+						.done(function (data) {
 							var isContainerElement = !!(data.container && data.container.length),
 								containerId = isContainerElement ? data.container.get(0).id : '';
 
 							// if all well then ad id of ad in feedback to tell system that impression was given
 							//feedbackData.ads.push(ad.id);
-							next(ad, data);
+							if (utils.isElementInViewport(data.container)) next(ad, data);
+							else window.adpushup.lazyLoadAds.push({ ad: ad, data: data });
 						})
-						.fail(function(data) {
+						.fail(function (data) {
 							//feedbackData.xpathMiss.push(ad.id);
 							next(ad, data);
 						});
 				});
 			},
-			placeInContentAds = function($incontentElm, inContentAds) {
-				incontentAnalyser($incontentElm, inContentAds, function(sectionsWithTargetElm) {
-					$(inContentAds).each(function(index, ad) {
+			placeInContentAds = function ($incontentElm, inContentAds) {
+				incontentAnalyser($incontentElm, inContentAds, function (sectionsWithTargetElm) {
+					$(inContentAds).each(function (index, ad) {
 						var sectionObj = sectionsWithTargetElm[ad.section],
 							$containerElement,
 							isContainerElement,
@@ -290,10 +284,10 @@ var $ = require('jquery'),
 			} else if (ads.inContentAds.length) {
 				nodewatcher
 					.watch(contentSelector, config.xpathWaitTimeout)
-					.done(function($incontentElm) {
+					.done(function ($incontentElm) {
 						placeInContentAds($incontentElm, ads.inContentAds);
 					})
-					.fail(function() {
+					.fail(function () {
 						handleContentSelectorFailure(ads.inContentAds);
 					});
 			}
@@ -303,5 +297,6 @@ var $ = require('jquery'),
 module.exports = {
 	createAds: createAds,
 	placeAd: placeAd,
-	executeAfterJS: executeAfterJS
+	executeAfterJS: executeAfterJS,
+	renderAd: next
 };
