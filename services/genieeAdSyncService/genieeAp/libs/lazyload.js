@@ -1,10 +1,9 @@
-var $ = require('jquery'),
-	utils = require('./utils');
+var $ = require('jquery'), utils = require('./utils');
 
 function renderAdWrapper(cb) {
 	var ads = window.adpushup.lazyLoadAds || [];
 	if (ads.length) {
-		ads.forEach(element => {
+		ads.forEach(function (element) {
 			if (utils.isElementInViewport(element.data.container)) {
 				cb(element.ad, element.data);
 			}
@@ -28,7 +27,7 @@ function init(cb) {
 	// $(document).ready(function() {
 	$(window).on(
 		'scroll',
-		utils.throttle(function() {
+		utils.throttle(function () {
 			renderAdWrapper(cb);
 		}, 200)
 	);
