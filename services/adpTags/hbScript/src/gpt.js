@@ -19,7 +19,7 @@ var config = require('./config'),
 							config.NETWORK_ID +
 							'/' +
 							w.adpushup.adpTags.adpSlots[adpSlot].optionalParam.dfpAdunitCode ===
-						event.slot.getName()
+						event.slot.getAdUnitPath()
 					) {
 						slot = w.adpushup.adpTags.adpSlots[adpSlot];
 					}
