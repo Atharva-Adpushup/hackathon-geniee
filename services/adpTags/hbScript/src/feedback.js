@@ -14,7 +14,7 @@ var config = require('./config'),
 					revenue: bids[i].cpm / 1000, // Actual revenue for impression = cpm/1000
 					bidder: bids[i].bidder,
 					adId: bids[i].adId,
-					responseTime: bids[i].responseTimestamp - bids[i].requestTimestamp
+					responseTime: bids[i].timeToRespond
 				});
 			}
 			return bidData;
