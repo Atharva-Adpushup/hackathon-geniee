@@ -210,9 +210,11 @@ var $ = require('jquery'),
 				$.each(structuredAds, function (index, ad) {
 					getAdContainer(ad, config.xpathWaitTimeout)
 						.done(function (data) {
-							isAdContainerInView(data.container).done(function () {
-								next(ad, data);
-							});
+							if (ad.enableLazyLoading == true) {
+								isAdContainerInView(data.container).done(function () {
+									next(ad, data);
+								});
+							} else next(ad, data);
 
 							// var isContainerElement = !!(data.container && data.container.length),
 							// 	containerId = isContainerElement ? data.container.get(0).id : '';
