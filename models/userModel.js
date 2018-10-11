@@ -1,7 +1,7 @@
 var modelAPI = (module.exports = apiModule()),
 	model = require('../helpers/model'),
 	couchbase = require('../helpers/couchBaseService'),
-	query = require('couchbase-promises').ViewQuery.from('app', 'sitesByUser'),
+	query = require('couchbase').ViewQuery.from('app', 'sitesByUser'),
 	networkSettings = require('../models/subClasses/user/networkSettings'),
 	globalModel = require('../models/globalModel'),
 	siteModel = require('../models/siteModel'),

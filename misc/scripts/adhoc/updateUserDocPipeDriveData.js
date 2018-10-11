@@ -6,7 +6,7 @@ const Promise = require('bluebird'),
 	utils = require('../../../helpers/utils'),
 	AdPushupError = require('../../../helpers/AdPushupError'),
 	couchBaseService = require('../../../helpers/couchBaseService'),
-	couchbasePromise = require('couchbase-promises'),
+	couchbasePromise = require('couchbase'),
 	usersByNonEmptySitesQuery = couchbasePromise.ViewQuery.from('app', 'usersByNonEmptySites'),
 	userModel = require('../../../models/userModel');
 

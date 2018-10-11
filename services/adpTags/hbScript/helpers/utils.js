@@ -82,7 +82,7 @@ module.exports = {
 		return null;
 	},
 	sendFeedback: function(feedback) {
-		window.adpushup.$.post(config.FEEDBACK_URL, feedback.data);
+		window.adpushup.$.post(config.FEEDBACK_URL, JSON.stringify(feedback.data));
 	},
 	getBatchAdUnits: function(adpSlots) {
 		var adUnits = [];

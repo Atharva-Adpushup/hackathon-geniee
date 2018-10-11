@@ -7,7 +7,8 @@ const _ = require('lodash'),
 	appBucket = couchbaseService(
 		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
 		config.couchBase.DEFAULT_BUCKET,
-		config.couchBase.DEFAULT_BUCKET_PASSWORD
+		config.couchBase.DEFAULT_USER_NAME,
+		config.couchBase.DEFAULT_USER_PASSWORD
 	);
 
 function generateSiteChannelJSON(channelAndZones, siteModelItem) {
