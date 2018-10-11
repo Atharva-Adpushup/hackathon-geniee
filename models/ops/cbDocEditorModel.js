@@ -1,6 +1,6 @@
 var couchbase = require('../../helpers/couchBaseService'),
 	// eslint-disable-next-line no-unused-vars
-	ViewQuery = require('couchbase-promises').ViewQuery,
+	ViewQuery = require('couchbase').ViewQuery,
 	// eslint-disable-next-line no-unused-vars
 	Promise = require('bluebird'),
 	API;

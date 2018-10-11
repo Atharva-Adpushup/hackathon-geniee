@@ -13,8 +13,9 @@ var model = require('../helpers/model'),
 	extend = require('extend'),
 	utils = require('../helpers/utils'),
 	Promise = require('bluebird'),
-	ViewQuery = require('couchbase-promises').ViewQuery,
-	N1qlQuery = require('couchbase-promises').N1qlQuery,
+	couchbaseModule = require('couchbase'),
+	ViewQuery = couchbaseModule.ViewQuery,
+	N1qlQuery = couchbaseModule.N1qlQuery,
 	Channel = model.extend(function() {
 		this.keys = [
 			'id',
