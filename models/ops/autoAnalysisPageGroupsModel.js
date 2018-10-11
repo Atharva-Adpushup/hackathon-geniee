@@ -1,5 +1,5 @@
 var couchbase = require('../../helpers/couchBaseService'),
-	ViewQuery = require('couchbase-promises').ViewQuery,
+	ViewQuery = require('couchbase').ViewQuery,
 	Promise = require('bluebird'),
 	API = {
 		getAutoAnalysisPageGroupsForSite: function(siteId) {

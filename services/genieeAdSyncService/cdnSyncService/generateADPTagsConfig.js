@@ -6,7 +6,8 @@ const couchBase = require('../../../configs/config').couchBase,
 	dbHelper = couchbaseService(
 		`couchbase://${couchBase.HOST}`,
 		couchBase.DEFAULT_BUCKET,
-		couchBase.DEFAULT_BUCKET_PASSWORD
+		couchBase.DEFAULT_USER_NAME,
+		couchBase.DEFAULT_USER_PASSWORD
 	),
 	generateDfpConfig = adpTags => {
 		let json = {},

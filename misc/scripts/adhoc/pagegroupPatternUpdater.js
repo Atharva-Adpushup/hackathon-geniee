@@ -1,4 +1,4 @@
-const N1qlQuery = require('couchbase-promises').N1qlQuery,
+const N1qlQuery = require('couchbase').N1qlQuery,
 	couchbase = require('../../../helpers/couchBaseService'),
 	siteModel = require('../../../models/siteModel'),
 	_ = require('lodash'),

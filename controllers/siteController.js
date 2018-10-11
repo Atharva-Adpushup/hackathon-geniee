@@ -15,7 +15,7 @@ var express = require('express'),
 	couchbase = require('../helpers/couchBaseService'),
 	countryData = require('country-data'),
 	Promise = require('bluebird'),
-	N1qlQuery = require('couchbase-promises').N1qlQuery,
+	N1qlQuery = require('couchbase').N1qlQuery,
 	router = express.Router({ mergeParams: true }),
 	checkAuth = (req, res, next) => {
 		userModel

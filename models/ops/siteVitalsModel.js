@@ -1,5 +1,5 @@
 var couchbase = require('../../helpers/couchBaseService'),
-	ViewQuery = require('couchbase-promises').ViewQuery,
+	ViewQuery = require('couchbase').ViewQuery,
 	es = require('../../helpers/elasticSearchService'),
 	esqm = require('../../helpers/ElasticsearchQueryMaker'),
 	Promise = require('bluebird'),
