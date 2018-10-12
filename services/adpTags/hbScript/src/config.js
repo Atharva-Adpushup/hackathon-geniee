@@ -84,10 +84,10 @@ module.exports = {
 		'serverRenderCode(PREBID_TIMEOUT);' +
 		'}, PREBID_TIMEOUT);' +
 		'pbjs.que.push(function(){' +
-		'pbjs.setConfig(){' +
-		'bidderSequence: "random"' +
+		'pbjs.setConfig({' +
+		'bidderSequence: "random",' +
 		'priceGranularity: "dense"' +
-		'};' +
+		'});' +
 		'pbjs.addAdUnits(__AD_UNIT_CODE__);' +
 		'pbjs.bidderSettings = {' +
 		'c1x: {' +
