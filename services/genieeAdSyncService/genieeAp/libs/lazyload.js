@@ -13,10 +13,11 @@ module.exports = function (el) {
 $(window).on(
 	'scroll',
 	utils.throttle(function () {
-		lazyLoadAds.forEach(function (lazyLoadAd, index) {
-			if (utils.isElementInViewport(lazyLoadAd.el)) {
-				lazyLoadAd.defer.resolve();
+		for (var i = lazyLoadAds.length - 1; i >= 0; i--) {
+			if (utils.isElementInViewport(lazyLoadAds[i].el)) {
+				lazyLoadAds[i].splice(i, 1);
+				lazyLoadAds[i].defer.resolve();
 			}
-		});
+		}
 	}, 200)
 );
