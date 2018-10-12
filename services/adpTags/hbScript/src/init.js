@@ -16,8 +16,10 @@ function init(w, d) {
 
 		return w.adpTags.control.trigger();
 	} else {
-		w.adpushup.adpPrebid = __PREBID_SCRIPT__;
-		w.adpushup.adpPrebid();
+		// Execute prebid script
+		(function() {
+			__PREBID_SCRIPT__;
+		})();
 
 		var gpt = require('./gpt'),
 			config = require('./config'),
