@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
-import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import CodeBox from 'shared/codeBox';
+import { CustomButton } from 'shared/components.jsx';
 
 class DockedSettings extends Component {
 	constructor(props) {
@@ -142,7 +143,11 @@ class DockedSettings extends Component {
 						}
 						customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
 					/>
-					{this.state.docked ? this.renderDockContent() : null}
+					{this.state.docked ? (
+						this.renderDockContent()
+					) : (
+						<CustomButton label="Back" handler={this.props.onCancel} />
+					)}
 				</Col>
 			</div>
 		);
