@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
-import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import CodeBox from 'shared/codeBox';
+import { Col } from 'react-bootstrap';
+import { CustomButton } from 'shared/components.jsx';
 
 class LazyLoadSettings extends Component {
 	constructor(props) {
@@ -41,6 +41,7 @@ class LazyLoadSettings extends Component {
 						}
 						customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
 					/>
+					<CustomButton label="Back" handler={this.props.onCancel} />
 				</Col>
 			</div>
 		);
