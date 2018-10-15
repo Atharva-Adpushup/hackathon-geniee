@@ -15,8 +15,8 @@ $(window).on(
 	utils.throttle(function () {
 		for (var i = lazyLoadAds.length - 1; i >= 0; i--) {
 			if (utils.isElementInViewport(lazyLoadAds[i].el)) {
-				lazyLoadAds[i].splice(i, 1);
 				lazyLoadAds[i].defer.resolve();
+				lazyLoadAds.splice(i, 1);
 			}
 		}
 	}, 200)

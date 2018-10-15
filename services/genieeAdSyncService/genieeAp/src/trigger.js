@@ -56,12 +56,19 @@ var adp = window.adpushup,
 						if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
 							executeAdpTagsHeadCode([ad], {}); // This function expects an array of adpTags and optional adpKeyValues
 						}
-						isAdContainerInView(container).done(function () {
+						if (ad.enableLazyLoading == true) {
+							isAdContainerInView(container).done(function () {
+								// Send feedback call
+								utils.sendFeedback(feedbackData);
+								// Place the ad in the container
+								return placeAd(container, ad);
+							});
+						} else {
 							// Send feedback call
 							utils.sendFeedback(feedbackData);
 							// Place the ad in the container
 							return placeAd(container, ad);
-						});
+						}
 					})
 					.fail(function (err) {
 						throw new Error(err);
