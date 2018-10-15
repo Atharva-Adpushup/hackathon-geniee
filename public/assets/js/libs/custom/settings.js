@@ -101,7 +101,9 @@ $(document).ready(function() {
 						'Pagegroup pattern cannot be blank. Please provide valid regex patterns for all the pagegroups.'
 					);
 				} else {
-					var autoOpt = this.parseFormData(formValues, 'other').autoOptimise ? true : false,
+					var activeDFPNetwork = this.parseFormData(formValues, 'other').activeDFPNetwork,
+						autoOpt = this.parseFormData(formValues, 'other').autoOptimise ? true : false,
+						activeDFPNetwork = activeDFPNetwork ? activeDFPNetwork : '',
 						pageGroupPattern = JSON.stringify(parsedPageGroups),
 						otherSettings = JSON.stringify(this.parseFormData(formValues, 'other')),
 						gdprCompliance = this.parseFormData(formValues, 'other').gdprCompliance ? true : false,
@@ -116,6 +118,7 @@ $(document).ready(function() {
 							pageGroupPattern: pageGroupPattern,
 							otherSettings: otherSettings,
 							autoOptimise: autoOpt,
+							activeDFPNetwork: activeDFPNetwork,
 							gdprCompliance: gdprCompliance,
 							cookieControlConfig: cookieControlConfig,
 							blocklist: JSON.stringify(w.blocklist)

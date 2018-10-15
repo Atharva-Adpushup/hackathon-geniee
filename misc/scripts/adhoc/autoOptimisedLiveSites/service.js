@@ -3,7 +3,7 @@ var extend = require('extend'),
 	lodash = require('lodash'),
 	siteModel = require('../../../../models/siteModel'),
 	couchBaseService = require('../../../../helpers/couchBaseService'),
-	couchbasePromise = require('couchbase-promises'),
+	couchbasePromise = require('couchbase'),
 	sitesByAutoOptimiseParameterQuery = couchbasePromise.ViewQuery.from('app', 'sitesByAutoOptimiseParameter'),
 	Promise = require('bluebird');
 

@@ -479,6 +479,26 @@ router
 							throw err;
 						});
 				}),
+				getUserDFPInfo = getAccessToken.then(function(token) {
+					const { refresh_token } = token,
+						{ OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET } = config.googleOauth;
+
+					return request({
+						method: 'POST',
+						uri: CC.DFP_WEB_SERVICE_ENDPOINT,
+						body: {
+							clientCode: OAUTH_CLIENT_ID,
+							clientSecret: OAUTH_CLIENT_SECRET,
+							refreshToken: refresh_token
+						},
+						json: true
+					}).then(res => {
+						if (res.code === 0) {
+							return res.data;
+						}
+						return [];
+					});
+				}),
 				getUserInfo = getAccessToken.then(function(token) {
 					return request({
 						strictSSL: false,
@@ -488,22 +508,33 @@ router
 				}),
 				getUser = userModel.getUserByEmail(req.session.user.email);
 
-			Promise.join(getUser, getAccessToken, getAdsenseAccounts, getUserInfo, function(
+			Promise.join(getUser, getAccessToken, getAdsenseAccounts, getUserInfo, getUserDFPInfo, function(
 				user,
 				token,
 				adsenseAccounts,
-				userInfo
+				userInfo,
+				userDFPInfo
 			) {
-				user.addNetworkData({
-					networkName: 'ADSENSE',
-					refreshToken: token.refresh_token,
-					accessToken: token.access_token,
-					expiresIn: token.expires_in,
-					pubId: adsenseAccounts[0].id,
-					adsenseEmail: userInfo.email,
-					userInfo: userInfo,
-					adsenseAccounts: adsenseAccounts
-				}).then(function() {
+				Promise.all([
+					user.addNetworkData({
+						networkName: 'ADSENSE',
+						refreshToken: token.refresh_token,
+						accessToken: token.access_token,
+						expiresIn: token.expires_in,
+						pubId: adsenseAccounts[0].id,
+						adsenseEmail: userInfo.email,
+						userInfo: userInfo,
+						adsenseAccounts: adsenseAccounts
+					}),
+					user.addNetworkData({
+						networkName: 'DFP',
+						refreshToken: token.refresh_token,
+						accessToken: token.access_token,
+						expiresIn: token.expires_in,
+						userInfo: userInfo,
+						dfpAccounts: userDFPInfo
+					})
+				]).then(function() {
 					req.session.user = user;
 					var pubIds = _.map(adsenseAccounts, 'id'); // grab all the pubIds in case there are multiple and show them to user to choose
 					if (CC.isForceMcm) {

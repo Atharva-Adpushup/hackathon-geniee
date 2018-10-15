@@ -43,7 +43,7 @@ module.exports = {
 		pixelId: 1236239
 	},
 	DEFAULT_WINNER: 'adx',
-	FEEDBACK_URL: 'http://apdc1-webapp-creativeqa.azurewebsites.net/feedback2',
+	FEEDBACK_URL: '//staging.adpushup.com/ApHbWebService/feedback',
 	POSTBID_PASSBACKS: {
 		'*': 'PGgxPkJPTyBZQUghPC9oMT4='
 	},
@@ -101,12 +101,17 @@ module.exports = {
 		'},' +
 		'openx: {' +
 		'bidCpmAdjustment: function(bidCpm) {' +
-		'return bidCpm - (bidCpm * (5/100));' +
+		'return bidCpm - (bidCpm * (10/100));' +
+		'}' +
+		'},' +
+		'districtm: {' +
+		'bidCpmAdjustment: function(bidCpm) {' +
+		'return bidCpm - (bidCpm * (10/100));' +
 		'}' +
 		'},' +
 		'brainjuicemedia: {' +
 		'bidCpmAdjustment: function(bidCpm) {' +
-		'return bidCpm - (bidCpm * (5/100));' +
+		'return bidCpm - (bidCpm * (18/100));' +
 		'}' +
 		'},' +
 		'oftmedia: {' +
@@ -121,6 +126,7 @@ module.exports = {
 		'}' +
 		'};' +
 		"pbjs.aliasBidder('appnexus', 'springserve');" +
+		"pbjs.aliasBidder('appnexus', 'districtm');" +
 		"pbjs.aliasBidder('appnexus', 'brealtime');" +
 		"pbjs.aliasBidder('appnexus', 'brainjuicemedia');" +
 		"pbjs.aliasBidder('appnexus', 'oftmedia');" +

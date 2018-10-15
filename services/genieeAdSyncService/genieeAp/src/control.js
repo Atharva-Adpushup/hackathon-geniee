@@ -2,7 +2,7 @@ var utils = require('../libs/utils'),
 	w = window,
 	$ = require('jquery');
 
-function Control() {
+function Control(controlCodeType) {
 	var ads = [],
 		err = [],
 		i,
@@ -12,8 +12,10 @@ function Control() {
 		isControlActivated = false;
 
 	(function hookAndfetchAllControlAds() {
-		if (typeof w.adpushup.control === 'object' && w.adpushup.control instanceof Array) {
-			for (i = 0, j = w.adpushup.control, k = j[i]; i < j.length; k = j[++i]) {
+		var controlElArray = controlCodeType === 'prebid' ? w.adpTags.control : w.adpushup.control;
+
+		if (typeof controlElArray === 'object' && controlElArray instanceof Array) {
+			for (i = 0, j = controlElArray, k = j[i]; i < j.length; k = j[++i]) {
 				push(k);
 			}
 		}
@@ -39,7 +41,12 @@ function Control() {
 				.base64Decode(adObj.ac)
 				.replace('class="adsbygoogle"', 'class="adsbygoogle _ap_control_ad"');
 
-			$(adObj.el).before(adCode);
+			if (controlCodeType === 'prebid') {
+				$('head').prepend(adCode);
+			} else {
+				$(adObj.el).before(adCode);
+			}
+
 			$(adObj.el).remove();
 		}
 	}
