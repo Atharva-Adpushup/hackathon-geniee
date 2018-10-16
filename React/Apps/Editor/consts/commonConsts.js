@@ -21,8 +21,12 @@ const status = {
 	},
 	partners = {
 		geniee: {
-			name: 'geniee'
-		}
+			name: 'geniee',
+			networks: {
+				disabled: ['adpTags', 'medianet']
+			}
+		},
+		list: ['geniee']
 	},
 	proxy = {
 		HTTP_PROXY_URL: `${window.ADP_ORIGIN}/loadFromApProxy/`,
@@ -341,7 +345,7 @@ const status = {
 		EDITOR_MODE: 1,
 		BROWSE_MODE: 2
 	},
-	networks = ['adsense', 'adx', 'adpTags', 'dfp', 'custom', 'geniee'],
+	networks = ['adsense', 'adpTags', 'custom', 'geniee', 'medianet'],
 	priceFloorKeys = ['FP_S_A', 'FP_B_A', 'FP_S', 'FP_A', 'FP_B'],
 	defaultPriceFloorKey = 'FP_S_A',
 	reportingUrl = '/user/reports/generate',
