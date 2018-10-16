@@ -49,8 +49,8 @@ var express = require('express'),
 
 		const hbcfPromise =
 			editMode === 'update'
-				? appBucket.replacePromise(`hbcf::${siteId}`, json)
-				: appBucket.insertPromise(`hbcf::${siteId}`, json);
+				? appBucket.replaceAsync(`hbcf::${siteId}`, json)
+				: appBucket.insertAsync(`hbcf::${siteId}`, json);
 
 		return [hbcfPromise, site];
 	};
