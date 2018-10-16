@@ -34,7 +34,8 @@ var logger = require('../helpers/logger'),
 				}, config.GPT_REFRESH_INTERVAL);
 				window.adpushup.adpTags.gptRefreshIntervals.push({
 					gSlot: slot.gSlot,
-					id: gptRefreshInterval
+					id: gptRefreshInterval,
+					sectionId: slot.sectionId
 				});
 			});
 		}
@@ -53,8 +54,7 @@ var logger = require('../helpers/logger'),
 	renderPostbid = function(slot) {
 		logger.log('Rendering postbid');
 
-		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId),
-			adIframe = utils.createEmptyIframe();
+		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId), adIframe = utils.createEmptyIframe();
 
 		document.getElementById(slot.containerId).appendChild(adIframe);
 
@@ -113,12 +113,9 @@ var logger = require('../helpers/logger'),
 			});
 			if (dfpAdunitCodes.indexOf(slot.optionalParam.dfpAdunitCode) !== -1) {
 				var currentTargetingObject =
-						config.TARGETING[
-							'/' +
-								networkCodes[slot.optionalParam.dfpAdunitCode] +
-								'/' +
-								slot.optionalParam.dfpAdunitCode
-						],
+					config.TARGETING[
+						'/' + networkCodes[slot.optionalParam.dfpAdunitCode] + '/' + slot.optionalParam.dfpAdunitCode
+					],
 					currentTargetingObject = setPageLevelTargeting(currentTargetingObject, slot);
 				Object.keys(currentTargetingObject).forEach(function(dfpKey, index) {
 					slot.gSlot.setTargeting(dfpKey, String(currentTargetingObject[dfpKey]));
@@ -127,9 +124,9 @@ var logger = require('../helpers/logger'),
 			return;
 		}
 		var targeting = {
-				hb_siteId: config.SITE_ID,
-				hb_ran: 0
-			},
+			hb_siteId: config.SITE_ID,
+			hb_ran: 0
+		},
 			adServerTargeting = getAdserverTargeting(slot);
 
 		if (utils.isSupportedBrowser() && slot.bidders.length) {
@@ -156,10 +153,9 @@ var logger = require('../helpers/logger'),
 		});
 	},
 	enableGoogServicesForSlot = function(slot) {
-		var networkId =
-			slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE
-				? config.GENIEE_NETWORK_ID
-				: config.NETWORK_ID;
+		var networkId = slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE
+			? config.GENIEE_NETWORK_ID
+			: config.NETWORK_ID;
 		networkId = slot.activeDFPNetwork ? slot.activeDFPNetwork : networkId;
 
 		slot.gSlot = googletag.defineSlot(

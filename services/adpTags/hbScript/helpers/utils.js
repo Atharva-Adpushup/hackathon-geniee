@@ -1,6 +1,4 @@
-var config = require('../src/config'),
-	logger = require('./logger'),
-	find = require('lodash.find');
+var config = require('../src/config'), logger = require('./logger'), find = require('lodash.find');
 
 module.exports = {
 	hashCode: function(str) {
@@ -41,8 +39,7 @@ module.exports = {
 
 		// Check for MSIE v7-10 in UA string
 		if (ua.indexOf('MSIE') !== -1) {
-			var re = new RegExp('MSIE ([0-9]{1,}[.0-9]{0,})'),
-				ieVersion = Number(re.exec(ua)[1]);
+			var re = new RegExp('MSIE ([0-9]{1,}[.0-9]{0,})'), ieVersion = Number(re.exec(ua)[1]);
 
 			return ieVersion >= 9 ? true : false;
 		}
@@ -59,11 +56,7 @@ module.exports = {
 			}
 			if (M[1] === 'Chrome') {
 				tem = ua.match(/\b(OPR|Edge)\/(\d+)/);
-				if (tem != null)
-					return tem
-						.slice(1)
-						.join(' ')
-						.replace('OPR', 'Opera');
+				if (tem != null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
 			}
 			M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, '-?'];
 			if ((tem = ua.match(/version\/(\d+)/i)) != null) M.splice(1, 1, tem[1]);
@@ -93,8 +86,7 @@ module.exports = {
 		return adUnits;
 	},
 	stringifyJSON: function(json) {
-		var dataString = '?',
-			keys = Object.keys(json);
+		var dataString = '?', keys = Object.keys(json);
 
 		for (var i = 0; i < keys.length; i++) {
 			var key = keys[i];
@@ -166,8 +158,7 @@ module.exports = {
 	},
 	hasMultipleDfpAccounts: function() {
 		try {
-			var dfpAdSlots = Object.keys(window.googletag.pubads().aa),
-				dfpNetworkIdMap = {};
+			var dfpAdSlots = Object.keys(window.googletag.pubads().aa), dfpNetworkIdMap = {};
 
 			dfpAdSlots.forEach(function(dfpAdSlot) {
 				var dfpNetworkId = dfpAdSlot.match(/\/(.*?)\//)[1];
@@ -187,5 +178,31 @@ module.exports = {
 		} catch (e) {
 			return false;
 		}
+	},
+	isElementInViewport: function(el) {
+		const elementTop = $(el).offset().top,
+			elementBottom = elementTop + $(el).outerHeight(),
+			viewportTop = $(window).scrollTop(),
+			viewportBottom = viewportTop + $(window).height();
+		return elementBottom > viewportTop && elementTop < viewportBottom;
+	},
+	throttle: function(fn, threshhold, scope) {
+		var last, deferTimer;
+		return function() {
+			var context = scope || this;
+
+			var now = +new Date(), args = arguments;
+			if (last && now < last + threshhold) {
+				// hold on to it
+				clearTimeout(deferTimer);
+				deferTimer = setTimeout(function() {
+					last = now;
+					fn.apply(context, args);
+				}, threshhold);
+			} else {
+				last = now;
+				fn.apply(context, args);
+			}
+		};
 	}
 };
