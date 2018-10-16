@@ -109,11 +109,6 @@ module.exports = {
 		'bidCpmAdjustment: function(bidCpm) {' +
 		'return bidCpm - (bidCpm * (12/100));' +
 		'}' +
-		'},' +
-		'districtmDMX: {' +
-		'bidCpmAdjustment: function(bidCpm) {' +
-		'return bidCpm - (bidCpm * (5/100));' +
-		'}' +
 		'}' +
 		'};' +
 		'pbjs.aliasBidder("appnexus", "springserve");' +
