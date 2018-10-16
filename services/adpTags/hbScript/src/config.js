@@ -64,11 +64,7 @@ module.exports = {
 		'var PREBID_TIMEOUT = __PB_TIMEOUT__;' +
 		"var PAGE_URL = '__PAGE_URL__';" +
 		'var ADP_BATCH_ID = __ADP_BATCH_ID__;' +
-		"var prebidScript = document.createElement('script');" +
-		'prebidScript.async = true;' +
-		"prebidScript.text = 'var adpPrebid = ' + parent.adpushup.adpPrebid.toString() + ';';" +
-		'head.appendChild(prebidScript);' +
-		'adpPrebid();' +
+		'var pbjs = parent.pbjs;' +
 		'function serverRenderCode( timeout ){' +
 		'if( serverRenderCode.isExecuted === undefined ) {' +
 		'serverRenderCode.isExecuted = true;' +
