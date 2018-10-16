@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
-import { networks, defaultPriceFloorKey } from '../../../consts/commonConsts';
+import { networks, defaultPriceFloorKey, partners } from '../../../consts/commonConsts';
 import CodeBox from '../codeBox';
 import SelectBox from '../select/select';
 import AdpTags from './AdpTags';
@@ -72,19 +72,25 @@ class NetworkOptions extends Component {
 	}
 
 	filterNetworks() {
+		const partnersList = partners.list,
+			activeNetworks = networks.filter(network => !partnersList.includes(network));
+
 		if (window.isGeniee) {
 			const isGCFG = !!window.gcfg,
-				isUSN = !!(isGCFG && window.gcfg.hasOwnProperty('usn'));
+				isUSN = !!(isGCFG && window.gcfg.hasOwnProperty('usn')),
+				disabledNetworks = partners.geniee.networks.disabled,
+				activeGenieeNetworks = networks.filter(network => !disabledNetworks.includes(network));
 
 			// 'isUSN' refers to Geniee UI Access 'Select Network' flag
 			if (isUSN) {
-				return window.gcfg.usn ? networks.filter(network => network != 'adpTags') : ['geniee'];
+				return window.gcfg.usn ? activeGenieeNetworks : ['geniee'];
 			}
 
-			return networks.filter(network => network != 'adpTags');
+			return activeGenieeNetworks;
 		}
 
-		return networks;
+		// Filter all partners networks in default user mode
+		return activeNetworks;
 	}
 
 	renderNetwork() {
