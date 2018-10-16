@@ -80,6 +80,9 @@ class AdCodeGenerator extends Component {
 						width,
 						height,
 						isManual: true,
+						networkData: {
+							isResponsive: !!(width === 'responsive')
+						},
 						formatData: {
 							platform: this.state.platform, // DESKTOP, MOBILE
 							type: this.state.type, // DISPLAY, NATIVE, AMP, LINK

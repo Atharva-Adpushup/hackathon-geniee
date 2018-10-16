@@ -266,7 +266,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	environment: {
 		development: 'development',
-		production: 'production'
+		production: 'development'
 	},
 	onboarding: {
 		steps: ['Add Site', 'Add AP code', 'Setup Passback'],
