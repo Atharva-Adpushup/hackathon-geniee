@@ -22,7 +22,7 @@ var Promise = require('bluebird'),
 				header: 'Alert open for Service: CDN SYN Consumer',
 				content: '<p>Consumer failed multiple times. Please check on priority.</p>'
 			},
-			emailId: 'yomesh.gupta@adpushup.com, zahin@adpushup.com'
+			emailId: 'yomesh.gupta@adpushup.com, zahin@adpushup.com, shubham.grover@adpushup.com'
 		}
 	},
 	QUEUE = CONFIG.RABBITMQ.CDN_SYNC.QUEUE.name,
