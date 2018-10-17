@@ -11,20 +11,30 @@ import { getVariationSectionsWithAds } from 'selectors/variationSelectors';
 import Utils from 'libs/utils';
 import _ from 'lodash';
 
-const createSection = (sectionPayload, adPayload, variationId) => {
+const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 		const adId = Utils.getRandomNumber(),
 			sectionId = Utils.getRandomNumber(),
 			isAdPayload = !!adPayload,
 			isAdNetworkData = !!(isAdPayload && adPayload.networkData),
 			isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId),
-			isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
+			isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId),
+			isDisableSyncing = !!(isAdNetworkData && adPayload.networkData.disableSyncing);
 
 		if (isCreateZoneContainerId) {
 			adPayload.networkData.zoneContainerId = `${adPayload.networkData.zoneId}-${adId}`;
 			delete adPayload.networkData.createZoneContainerId;
 		}
 
-		return {
+		if (isDisableSyncing) {
+			dispatch({
+				type: uiActions.SHOW_NOTIFICATION,
+				mode: 'info',
+				title: 'Ad syncing disabled',
+				message: 'Ad Syncing will be disabled for this ad'
+			});
+		}
+
+		return dispatch({
 			type: sectionActions.CREATE_SECTION,
 			adPayload: Object.assign(adPayload, {
 				id: adId,
@@ -41,7 +51,7 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			sectionId,
 			adId,
 			variationId
-		};
+		});
 	},
 	createIncontentSection = (sectionPayload, adPayload, variationId) => (dispatch, getState) => {
 		const variationSections = getVariationSectionsWithAds(getState(), { variationId }).sections,
