@@ -1,7 +1,6 @@
 // Adp tags rendering module
 
-var logger = require('../helpers/logger'),
-	utils = require('../helpers/utils'),
+var utils = require('../helpers/utils'),
 	config = require('./config'),
 	feedback = require('./feedback').feedback,
 	getFloorWithGranularity = function(floor) {
@@ -51,8 +50,6 @@ var logger = require('../helpers/logger'),
 		});
 	},
 	renderPostbid = function(slot) {
-		logger.log('Rendering postbid');
-
 		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId),
 			adIframe = utils.createEmptyIframe();
 
@@ -61,15 +58,12 @@ var logger = require('../helpers/logger'),
 		var iframeDoc = adIframe.contentWindow.document;
 
 		if (params && params.hb_adid) {
-			logger.log('Bid present from postbid');
-
 			pbjs.renderAd(iframeDoc, params.hb_adid);
 			adIframe.contentWindow.onload = function() {
 				slot.hasRendered = true;
 				feedback(slot);
 			};
 		} else {
-			logger.log('No bid or $0 cpm bid for slot, collapsing div');
 			slot.type = 3;
 			feedback(slot);
 		}
