@@ -53,7 +53,7 @@ module.exports = {
 	},
 	checkAdpTagsUnsyncedZones: function(section, ad) {
 		if (ad.networkData && Object.keys(ad.networkData).length) {
-			if (!ad.networkData.dfpAdunit) {
+			if (!ad.networkData.dfpAdunit && !ad.networkData.disableSyncing) {
 				const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
 					isResponsive = !!(ad.width === 'responsive' && ad.isResponsive),
 					defaultAdData = {
