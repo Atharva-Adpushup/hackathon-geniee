@@ -30,7 +30,7 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 		//In case we don't have any bidders available for any of the adslots,
 		//this may be due to non availablity of inventory or HB not required option used by user
 		if (!adUnitCodeForPrebid.length) {
-			return prebidFinishCallback({}, adpBatchId);
+			return prebidFinishCallback(adpBatchId);
 		}
 
 		var c1xSiteId =
