@@ -42,6 +42,7 @@ class Component {
 					? adp.config.selectedVariation
 					: commonConsts.MANUAL_ADS.VARIATION
 			};
+		$format.attr('data-section', id);
 
 		adp.tracker.add(
 			$format,

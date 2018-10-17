@@ -1,7 +1,6 @@
 // GPT library module
 
 var config = require('./config'),
-	logger = require('../helpers/logger'),
 	feedback = require('./feedback').feedback,
 	init = function(d) {
 		var gptScriptEl = d.createElement('script');
@@ -20,7 +19,7 @@ var config = require('./config'),
 							config.NETWORK_ID +
 							'/' +
 							w.adpushup.adpTags.adpSlots[adpSlot].optionalParam.dfpAdunitCode ===
-						event.slot.getName()
+						event.slot.getAdUnitPath()
 					) {
 						slot = w.adpushup.adpTags.adpSlots[adpSlot];
 					}
@@ -32,7 +31,6 @@ var config = require('./config'),
 					slot.optionalParam &&
 					slot.optionalParam.network !== config.PARTNERS.GENIEE
 				) {
-					logger.log('DFP ad slot rendered');
 					return cb(feedback(slot));
 				}
 			});

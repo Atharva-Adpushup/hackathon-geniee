@@ -136,7 +136,7 @@ module.exports = function(site, externalData = {}) {
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 
 						case CC.SERVICES.HEADER_BIDDING:
-							serviceScript = serviceScript.substring(62, serviceScript.trim().length - 1);
+							serviceScript = serviceScript.substring(50, serviceScript.trim().length - 1);
 
 							if (
 								serviceConfig &&

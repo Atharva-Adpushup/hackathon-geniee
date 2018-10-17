@@ -1,5 +1,4 @@
 var config = require('../src/config'),
-	logger = require('./logger'),
 	find = require('lodash.find');
 
 module.exports = {
