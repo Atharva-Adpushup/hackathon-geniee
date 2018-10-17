@@ -100,11 +100,6 @@ module.exports = {
 		'return bidCpm - (bidCpm * (10/100));' +
 		'}' +
 		'},' +
-		'brainjuicemedia: {' +
-		'bidCpmAdjustment: function(bidCpm) {' +
-		'return bidCpm - (bidCpm * (18/100));' +
-		'}' +
-		'},' +
 		'oftmedia: {' +
 		'bidCpmAdjustment: function(bidCpm) {' +
 		'return bidCpm - (bidCpm * (12/100));' +
@@ -114,7 +109,6 @@ module.exports = {
 		'pbjs.aliasBidder("appnexus", "springserve");' +
 		'pbjs.aliasBidder("appnexus", "districtm");' +
 		'pbjs.aliasBidder("appnexus", "brealtime");' +
-		'pbjs.aliasBidder("appnexus", "brainjuicemedia");' +
 		'pbjs.aliasBidder("appnexus", "oftmedia");' +
 		'pbjs.onEvent("bidTimeout", function(timedOutBidders) {' +
 		'parent.__prebidTimeoutCallback(ADP_BATCH_ID, timedOutBidders, PREBID_TIMEOUT);' +
