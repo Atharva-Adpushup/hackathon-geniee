@@ -147,8 +147,8 @@ module.exports = function(site, externalData = {}) {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', serviceScript);
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', serviceScript);
 							} else {
-								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', noop);
-								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', noop);
+								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', '');
+								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', '');
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 
