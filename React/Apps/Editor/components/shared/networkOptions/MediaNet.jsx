@@ -6,10 +6,10 @@ function checkAdCode(value) {
 		return {
 			...response,
 			error: true,
-			message: 'Only ADX Code allowed'
+			message: 'Only Media.net Code allowed'
 		};
 	}
 	return response;
 }
 
-export default FormWrapper(checkAdCode, 'ADX', /id=\"\d+\"/gi);
+export default FormWrapper(checkAdCode, 'Media.net', /id=\"\d+\"/gi);
