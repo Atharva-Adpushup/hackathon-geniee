@@ -1,83 +1,15 @@
-import React, { Component } from 'react';
-import Form from './commonForm';
+import { FormWrapper } from './commonForm';
 
-class MediaNet extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			error: false,
-			adunitId: this.props.code.adunitId || '',
-			adCode: this.props.code.adCode || ''
+function checkAdCode(value) {
+	const response = { error: false };
+	if (value.indexOf('_mNHandle') == -1 || value.indexOf('_mNDetails.loadTag') == -1) {
+		return {
+			...response,
+			error: true,
+			message: 'Only ADX Code allowed'
 		};
-		this.checkAdsense = this.checkAdsense.bind(this);
-		this.getAdUnitId = this.getAdUnitId.bind(this);
-		this.submitHandler = this.submitHandler.bind(this);
-		this.inputChange = this.inputChange.bind(this);
 	}
-
-	checkAdsense(value) {
-		if (value.indexOf('_mNHandle') == -1 || value.indexOf('_mNDetails.loadTag') == -1) {
-			this.props.showNotification({
-				mode: 'error',
-				title: 'Invalid Adcode',
-				message: 'Only Media.net adCode is allowed'
-			});
-			return this.setState({ error: true, adCode: '', adunitId: '' });
-		}
-		let adunitId = this.getAdUnitId(value);
-		this.setState({ error: false, adunitId: adunitId, adCode: value });
-	}
-
-	getAdUnitId(value) {
-		let matchedItems = value.match(/id=\"\d+\"/gi),
-			adunitId = matchedItems.length ? matchedItems[0].split('=')[1].replace(/\"/g, '') : '';
-		return adunitId;
-	}
-
-	submitHandler(value) {
-		if (!value || !value.trim().length || value == '') {
-			this.props.showNotification({
-				mode: 'error',
-				title: 'Invalid AdCode',
-				message: 'AdCode cannot be left blank'
-			});
-			return false;
-		}
-
-		if (this.state.error) {
-			this.props.showNotification({
-				mode: 'error',
-				title: 'Invalid AdCode',
-				message: 'Invalid AdCode inserted'
-			});
-			return false;
-		}
-
-		this.props.submitHandler({
-			adCode: value,
-			adunitId: this.state.adunitId
-		});
-	}
-
-	inputChange(ev) {
-		this.setState({ adunitId: ev.target.value });
-	}
-
-	render() {
-		return (
-			<Form
-				adunitId={this.state.adunitId}
-				inputChange={this.inputChange}
-				adCode={this.state.adCode}
-				onCodeBoxChange={this.checkAdsense}
-				onCancel={this.props.onCancel}
-				onSubmit={this.submitHandler}
-				showButtons={this.props.showButtons || false}
-				codeBoxSize="small"
-				fromPanel={this.props.fromPanel}
-			/>
-		);
-	}
+	return response;
 }
 
-export default MediaNet;
+export default FormWrapper(checkAdCode, 'ADX', /id=\"\d+\"/gi);
