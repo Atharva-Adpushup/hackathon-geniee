@@ -163,6 +163,18 @@ module.exports = {
 		}
 		return null;
 	},
+	getUniqueValuesArray: function(collection, value) {
+		var uniqueVales = {};
+
+		collection.forEach(function(colData) {
+			var data = colData[value];
+			if (!uniqueVales.hasOwnProperty(data)) {
+				uniqueVales[data] = true;
+			}
+		});
+
+		return Object.keys(uniqueVales);
+	},
 	hasMultipleDfpAccounts: function() {
 		try {
 			var dfpAdSlots = Object.keys(window.googletag.pubads().aa),
