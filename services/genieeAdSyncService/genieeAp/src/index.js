@@ -85,14 +85,14 @@ function triggerControl(mode) {
 }
 
 function startCreation(forced) {
-	return new Promise(function(resolve) {
+	return new Promise(function (resolve) {
 		ampInit(adp.config);
 		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
 		if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
 			return resolve(false);
 		}
 
-		return selectVariation(config).then(function(variationData) {
+		return selectVariation(config).then(function (variationData) {
 			var selectedVariation = variationData.selectedVariation,
 				moduleConfig = variationData.config,
 				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
@@ -113,7 +113,7 @@ function startCreation(forced) {
 				if (interactiveAds) {
 					require.ensure(
 						['interactiveAds/index.js'],
-						function(require) {
+						function (require) {
 							require('interactiveAds/index')(interactiveAds);
 						},
 						'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
@@ -144,7 +144,7 @@ function initAdpQue() {
 	}
 
 	processQue();
-	adp.que.push = function(queFunc) {
+	adp.que.push = function (queFunc) {
 		[].push.call(w.adpushup.que, queFunc);
 		processQue();
 	};
@@ -156,14 +156,14 @@ function main() {
 
 	// Set mode in adp config in case of pure manual ads implementation
 	if (adp.config.manualModeActive) {
-		adp.config.mode = 16;
+		adp.config.mode = 1;
 		adp.creationProcessStarted = true;
 
 		var interactiveAds = utils.getInteractiveAds(adp.config);
 		if (interactiveAds) {
 			require.ensure(
 				['interactiveAds/index.js'],
-				function(require) {
+				function (require) {
 					require('interactiveAds/index')(interactiveAds);
 				},
 				'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
@@ -206,7 +206,7 @@ function main() {
 	}
 
 	if (!config.pageGroup) {
-		pageGroupTimer = setTimeout(function() {
+		pageGroupTimer = setTimeout(function () {
 			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {

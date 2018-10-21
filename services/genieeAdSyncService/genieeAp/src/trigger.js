@@ -6,7 +6,7 @@ var adp = window.adpushup,
 	placeAd = require('./adCreater').placeAd,
 	executeAdpTagsHeadCode = require('./adCodeGenerator').executeAdpTagsHeadCode,
 	browserConfig = require('../libs/browserConfig'),
-	getContainer = function(ad) {
+	getContainer = function (ad) {
 		var defer = $.Deferred();
 
 		try {
@@ -26,31 +26,35 @@ var adp = window.adpushup,
 			return defer.reject('Unable to get adpushup container');
 		}
 	},
-	trigger = function(adId) {
+	trigger = function (adId) {
 		if (adp && Array.isArray(adp.config.manualAds) && adp.config.manualAds.length && adp.utils.isUrlMatching()) {
 			var manualAds = adp.config.manualAds,
-				ad = manualAds.filter(function(ad) {
+				ad = manualAds.filter(function (ad) {
 					return ad.id == adId;
-				})[0];
+				})[0],
+				isAdId = !!(ad && ad.id),
+				isAdElement = !!(isAdId && document.getElementById(ad.id).children.length === 1),
+				isResponsivePlatform = !!(
+					isAdElement && ad.formatData.platform.toUpperCase() === commonConsts.PLATFORMS.RESPONSIVE
+				),
+				isMatchingPlatform = !!(
+					isAdElement && adp.config.platform.toUpperCase() === ad.formatData.platform.toUpperCase()
+				),
+				isValidAd = !!(isResponsivePlatform || isMatchingPlatform);
 
-			if (
-				ad &&
-				ad.id &&
-				adp.config.platform.toUpperCase() === ad.formatData.platform.toUpperCase() &&
-				document.getElementById(ad.id).children.length === 1
-			) {
+			if (isValidAd) {
 				var feedbackData = {
 					ads: [ad.id],
 					xpathMiss: [],
 					eventType: 1,
-					mode: 16,
+					mode: 1,
 					referrer: config.referrer,
 					tracking: browserConfig.trackerSupported,
 					variationId: commonConsts.MANUAL_ADS.VARIATION
 				};
 
 				return getContainer(ad)
-					.done(function(container) {
+					.done(function (container) {
 						// Once container has been found, execute adp head code if ad network is "adpTags"
 						if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
 							executeAdpTagsHeadCode([ad], {}); // This function expects an array of adpTags and optional adpKeyValues
@@ -60,7 +64,7 @@ var adp = window.adpushup,
 						// Place the ad in the container
 						return placeAd(container, ad);
 					})
-					.fail(function(err) {
+					.fail(function (err) {
 						throw new Error(err);
 					});
 			}

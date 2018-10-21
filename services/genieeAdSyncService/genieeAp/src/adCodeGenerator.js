@@ -1,7 +1,7 @@
 var utils = require('../libs/utils'),
 	$ = require('jquery'),
 	config = window.adpushup.config,
-	generateGenieeBodyTag = function(ad) {
+	generateGenieeBodyTag = function (ad) {
 		var adCode,
 			genieeRef = window.adpushup && window.adpushup.geniee,
 			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback,
@@ -44,35 +44,39 @@ var utils = require('../libs/utils'),
 		}
 		return adCode;
 	},
-	executeNoramlAdpTagsHeadCode = function(adpTagUnits, adpKeyValues) {
+	executeNoramlAdpTagsHeadCode = function (adpTagUnits, adpKeyValues) {
 		if (!adpTagUnits || !adpTagUnits.length) {
 			return false;
 		}
-		var doIt = function(adpTagUnits) {
-			return function() {
+		var doIt = function (adpTagUnits) {
+			return function () {
 				for (var i = 0; i < adpTagUnits.length; i++) {
 					var ad = adpTagUnits[i],
+						isNetworkData = !!ad.networkData,
+						networkData = isNetworkData && ad.networkData,
 						//Geniee specific variables
 						isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
-						defaultAdSizeArray = [Number(ad.width), Number(ad.height)],
-						isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
-						isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
-						computedDFPAdUnitId = isZoneContainerId
-							? ad.networkData.zoneContainerId
-							: ad.networkData.dfpAdunit;
+						isResponsive = !!(networkData && networkData.isResponsive),
+						adWidth = isResponsive ? ad.width : Number(ad.width),
+						adHeight = isResponsive ? ad.height : Number(ad.height),
+						defaultAdSizeArray = [adWidth, adHeight],
+						isGenieeNetwork = !!(ad.network === 'geniee' && networkData && networkData.zoneId),
+						isZoneContainerId = !!(isGenieeNetwork && networkData.zoneContainerId),
+						computedDFPAdUnitId = isZoneContainerId ? networkData.zoneContainerId : networkData.dfpAdunit;
 
 					window.adpushup.adpTags.defineSlot(computedDFPAdUnitId, defaultAdSizeArray, computedDFPAdUnitId, {
 						dfpAdunit: computedDFPAdUnitId,
-						dfpAdunitCode: ad.networkData.dfpAdunitCode,
-						headerBidding: ad.networkData.headerBidding,
-						keyValues: ad.networkData.keyValues,
+						dfpAdunitCode: networkData.dfpAdunitCode,
+						headerBidding: networkData.headerBidding,
+						keyValues: networkData.keyValues,
 						network: ad.network,
-						refreshSlot: ad.networkData.refreshSlot,
-						overrideActive: ad.networkData.overrideActive,
-						overrideSizeTo: ad.networkData.overrideSizeTo,
+						refreshSlot: networkData.refreshSlot,
+						overrideActive: networkData.overrideActive,
+						overrideSizeTo: networkData.overrideSizeTo,
 						multipleAdSizes: isMultipleAdSizes
 							? ad.multipleAdSizes.concat([defaultAdSizeArray])
-							: defaultAdSizeArray
+							: defaultAdSizeArray,
+						isResponsive: isResponsive
 					});
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
@@ -87,7 +91,7 @@ var utils = require('../libs/utils'),
 		window.adpushup.adpTags.que.push(doIt(adpTagUnits));
 		return true;
 	},
-	executeAmpHeadCode = function() {
+	executeAmpHeadCode = function () {
 		var adCode = [];
 		adCode.push('<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">');
 		adCode.push(
@@ -96,13 +100,13 @@ var utils = require('../libs/utils'),
 		adCode.push('<scr' + 'ipt async src="https://cdn.ampproject.org/v0.js"></scr' + 'ipt>');
 		adCode.push(
 			'<scr' +
-				'ipt async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></scr' +
-				'ipt>'
+			'ipt async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></scr' +
+			'ipt>'
 		);
 		adCode.push(
 			'<scr' +
-				'ipt async custom-element="amp-sticky-ad" src="https://cdn.ampproject.org/v0/amp-sticky-ad-1.0.js"></scr' +
-				'ipt>'
+			'ipt async custom-element="amp-sticky-ad" src="https://cdn.ampproject.org/v0/amp-sticky-ad-1.0.js"></scr' +
+			'ipt>'
 		);
 		$el = null;
 		if ($('head').length) {
@@ -113,7 +117,7 @@ var utils = require('../libs/utils'),
 		$el.append(adCode.join('\n'));
 		return true;
 	},
-	genrateAdpBodyTag = function(ad) {
+	genrateAdpBodyTag = function (ad) {
 		var adCode;
 		if (!ad.networkData || !ad.networkData.dfpAdunit) {
 			adCode = '';
@@ -143,7 +147,7 @@ var utils = require('../libs/utils'),
 	};
 
 module.exports = {
-	generateAdCode: function(ad) {
+	generateAdCode: function (ad) {
 		var adCode = '';
 		if (!ad.networkData && ad.adCode) {
 			return utils.base64Decode(ad.adCode);
@@ -166,7 +170,7 @@ module.exports = {
 		}
 		return typeof adCode === 'string' ? adCode : adCode.join('\n');
 	},
-	generateGenieeHeaderCode: function(genieeIdCollection) {
+	generateGenieeHeaderCode: function (genieeIdCollection) {
 		if (!genieeIdCollection || !genieeIdCollection.length) {
 			return false;
 		}
@@ -197,7 +201,7 @@ module.exports = {
 		);
 		return adCode.join('\n');
 	},
-	executeAdpTagsHeadCode: function(adpTagUnits, adpKeyValues) {
+	executeAdpTagsHeadCode: function (adpTagUnits, adpKeyValues) {
 		if (config.serveAmpTagsForAdp) {
 			executeAmpHeadCode();
 		} else {

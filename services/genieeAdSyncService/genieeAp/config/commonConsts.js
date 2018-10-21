@@ -17,5 +17,10 @@ module.exports = {
 	NETWORKS: {
 		ADPTAGS: 'adpTags'
 	},
-	AMP_PUBLISH_URL: '//autoamp.io/publishAmpJob'
+	AMP_PUBLISH_URL: '//autoamp.io/publishAmpJob',
+	PLATFORMS: {
+		RESPONSIVE: 'RESPONSIVE',
+		DESKTOP: 'DESKTOP',
+		MOBILE: 'MOBILE'
+	}
 };

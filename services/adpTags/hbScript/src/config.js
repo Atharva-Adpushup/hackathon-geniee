@@ -141,5 +141,24 @@ module.exports = {
 		'</script>' +
 		'</head>' +
 		'<body></body>' +
-		'</html>'
+		'</html>',
+	RESPONSIVE_AD: {
+		SIZE: {
+			PRIMARY: [300, 250],
+			BREAKPOINTS: {
+				MOBILE: {
+					BROWSER_WIDTH: [320, 0],
+					ADS: [[300, 100]]
+				},
+				TABLET: {
+					BROWSER_WIDTH: [768, 0],
+					ADS: [[250, 250]]
+				},
+				DESKTOP: {
+					BROWSER_WIDTH: [992, 0],
+					ADS: [[728, 90]]
+				}
+			}
+		}
+	}
 };
