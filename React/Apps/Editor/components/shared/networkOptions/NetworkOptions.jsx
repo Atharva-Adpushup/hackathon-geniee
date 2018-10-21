@@ -5,6 +5,7 @@ import CodeBox from '../codeBox';
 import SelectBox from '../select/select';
 import AdpTags from './AdpTags';
 import Adsense from './Adsense';
+import MediaNet from './MediaNet';
 import OtherNetworks from './OtherNetworks';
 import AdX from './AdX';
 import SectionOptions from './sectionOptions.jsx';
@@ -208,6 +209,16 @@ class NetworkOptions extends Component {
 					/>
 				);
 				break;
+			case 'medianet':
+				return (
+					<MediaNet
+						code={code}
+						submitHandler={this.submitHandler}
+						onCancel={this.props.onCancel}
+						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
+						showNotification={this.props.showNotification}
+					/>
+				);
 			case 'custom':
 			case 'dfp':
 			default:
