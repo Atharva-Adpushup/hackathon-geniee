@@ -46,7 +46,7 @@ class Component {
 
 		adp.tracker.add(
 			$format,
-			function(adId) {
+			function (adId) {
 				adp.utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: adId });
 			}.bind(adp, id)
 		);
@@ -67,12 +67,20 @@ class Component {
 		}
 
 		adp.interactiveAds.adsRendered += 1;
-		if (Object.keys(adp.interactiveAds.ads).length === adp.interactiveAds.adsRendered && !adp.afterJSExecuted) {
-			let variations = adp.config.experiment[adp.config.platform][adp.config.pageGroup].variations,
+		const apConfig = adp.config,
+			isConfig = !!(apConfig),
+			isExperiment = !!(isConfig && apConfig.experiment),
+			isExperimentPlatform = !!(isExperiment && apConfig.experiment[apConfig.platform]),
+			isExperimentPageGroup = !!(isExperimentPlatform && apConfig.experiment[apConfig.platform][apConfig.pageGroup]),
+			isExperimentVariations = !!(isExperimentPageGroup && apConfig.experiment[apConfig.platform][apConfig.pageGroup].variations),
+			isSelectedVariation = !!(apConfig.selectedVariation);
+
+		if (Object.keys(adp.interactiveAds.ads).length === adp.interactiveAds.adsRendered && !adp.afterJSExecuted && isExperimentVariations && isSelectedVariation) {
+			let variations = apConfig.experiment[apConfig.platform][apConfig.pageGroup].variations,
 				variation = null;
 
 			for (let i = 0; i < variations.length; i++) {
-				if (variations[i].id === adp.config.selectedVariation) {
+				if (variations[i].id === apConfig.selectedVariation) {
 					variation = variations[i];
 				}
 			}
