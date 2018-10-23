@@ -6,6 +6,7 @@ import Edit from '../../shared/Edit.jsx';
 import { CustomButton } from '../../shared/index.jsx';
 import AdNetworkDetails from './AdNetworkDetails.jsx';
 import AdEventDetails from './AdEventDetails.jsx';
+import LazyLoadSettings from './LazyLoadSettings.jsx';
 
 class AdElement extends Component {
 	constructor(props) {
@@ -13,33 +14,46 @@ class AdElement extends Component {
 		this.state = {
 			showNetworkDetails: false,
 			showEventDetails: false,
+			showLazyload: false,
 			editName: false,
 			isActive: props.ad.isActive || true
 		};
-		this.toggleNetworkDetails = this.toggleNetworkDetails.bind(this);
-		this.toggleEventDetails = this.toggleEventDetails.bind(this);
-		this.toggleNameEdit = this.toggleNameEdit.bind(this);
+		// this.toggleNetworkDetails = this.toggleNetworkDetails.bind(this);
+		// this.toggleEventDetails = this.toggleEventDetails.bind(this);
+		// this.toggleNameEdit = this.toggleNameEdit.bind(this);
+		this.toggleHandler = this.toggleHandler.bind(this);
 		this.renderAdDetails = this.renderAdDetails.bind(this);
 		this.disableAd = this.disableAd.bind(this);
 	}
 
-	toggleNetworkDetails() {
-		this.setState({
-			showNetworkDetails: !this.state.showNetworkDetails
-		});
+	toggleHandler(property) {
+		this.setState(
+			{
+				[property]: !this.state[property]
+			},
+			() => {
+				console.log(this.state);
+			}
+		);
 	}
 
-	toggleEventDetails() {
-		this.setState({
-			showEventDetails: !this.state.showEventDetails
-		});
-	}
+	// toggleNetworkDetails() {
+	// 	this.setState({
+	// 		showNetworkDetails: !this.state.showNetworkDetails
+	// 	});
+	// }
 
-	toggleNameEdit() {
-		this.setState({
-			editName: !this.state.editName
-		});
-	}
+	// toggleEventDetails() {
+	// 	this.setState({
+	// 		showEventDetails: !this.state.showEventDetails
+	// 	});
+	// }
+
+	// toggleNameEdit() {
+	// 	this.setState({
+	// 		editName: !this.state.editName
+	// 	});
+	// }
 
 	disableAd(ad) {
 		if (confirm('Are you sure you want to archive this ad?')) {
@@ -64,6 +78,7 @@ class AdElement extends Component {
 	}
 
 	renderAdDetails() {
+		console.log('Rendering', this.state);
 		const { ad, updateAd } = this.props,
 			isAMP = ad.formatData.type == 'amp' ? true : false;
 
@@ -71,9 +86,21 @@ class AdElement extends Component {
 		code = code ? code.replace(/__AD_ID__/g, ad.id) : null;
 
 		if (this.state.showNetworkDetails) {
-			return <AdNetworkDetails ad={ad} onCancel={this.toggleNetworkDetails} onSubmit={updateAd} />;
+			return (
+				<AdNetworkDetails
+					ad={ad}
+					onCancel={this.toggleHandler.bind(null, 'showNetworkDetails')}
+					onSubmit={updateAd}
+				/>
+			);
 		} else if (this.state.showEventDetails) {
-			return <AdEventDetails ad={ad} onCancel={this.toggleEventDetails} onSubmit={updateAd} />;
+			return (
+				<AdEventDetails
+					ad={ad}
+					onCancel={this.toggleHandler.bind(null, 'showEventDetails')}
+					onSubmit={updateAd}
+				/>
+			);
 		} else if (this.state.editName) {
 			return (
 				<Edit
@@ -81,9 +108,18 @@ class AdElement extends Component {
 					name={`name-${ad.id}`}
 					value={ad.name ? ad.name : `Ad-${ad.id}`}
 					onSave={updateAd.bind(null, ad.id)}
-					onCancel={this.toggleNameEdit}
+					onCancel={this.toggleHandler.bind(null, 'editName')}
 					leftSize={3}
 					rightSize={9}
+				/>
+			);
+		} else if (this.state.showLazyload) {
+			return (
+				<LazyLoadSettings
+					checked={ad.enableLazyLoading}
+					id={ad.id}
+					changeHandler={updateAd.bind(null, ad.id)}
+					cancelHandler={this.toggleHandler.bind(null, 'showLazyload')}
 				/>
 			);
 		} else {
@@ -101,7 +137,7 @@ class AdElement extends Component {
 							>
 								<span
 									className="adDetails-icon"
-									onClick={this.toggleNameEdit}
+									onClick={this.toggleHandler.bind(null, 'editName')}
 									style={{ cursor: 'pointer' }}
 								>
 									<i className="btn-icn-edit" />
@@ -129,7 +165,16 @@ class AdElement extends Component {
 					</p>
 					<pre style={{ wordBreak: 'break-word' }}>{code}</pre>{' '}
 					{window.isSuperUser ? (
-						<CustomButton label="Network Details" handler={this.toggleNetworkDetails} />
+						<div>
+							<CustomButton
+								label="Network Details"
+								handler={this.toggleHandler.bind(null, 'showNetworkDetails')}
+							/>
+							<CustomButton
+								label="Lazyload Settings"
+								handler={this.toggleHandler.bind(null, 'showLazyload')}
+							/>
+						</div>
 					) : null}
 					{!isAMP ? <CustomButton label="Copy Adcode" handler={copyToClipBoard.bind(null, code)} /> : null}
 				</div>
