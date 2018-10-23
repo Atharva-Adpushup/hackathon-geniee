@@ -22,11 +22,10 @@ var express = require('express'),
 	helmet = require('helmet'),
 	// couchbase store
 	couchbaseStore = new CouchbaseStore({
-		bucket: config.couchBase.DEFAULT_BUCKET,
-		password: config.couchBase.DEFAULT_BUCKET_PASSWORD,
+		db: couchBaseService.cluster.openBucket(config.couchBase.DEFAULT_BUCKET),
 		host: config.couchBase.HOST + ':8091',
-		connectionTimeout: 5000,
-		operationTimeout: 2000,
+		connectionTimeout: 15000,
+		operationTimeout: 10000,
 		ttl: 86400,
 		prefix: 'sess::'
 	});

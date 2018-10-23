@@ -1,7 +1,6 @@
 // Header bidding feedback module
 
-var logger = require('../helpers/logger'),
-	config = require('./config'),
+var config = require('./config'),
 	utils = require('../helpers/utils'),
 	getBidDataForFeedback = function(containerId) {
 		var bidData = [],
@@ -14,7 +13,8 @@ var logger = require('../helpers/logger'),
 				bidData.push({
 					revenue: bids[i].cpm / 1000, // Actual revenue for impression = cpm/1000
 					bidder: bids[i].bidder,
-					adId: bids[i].adId
+					adId: bids[i].adId,
+					responseTime: bids[i].timeToRespond
 				});
 			}
 			return bidData;
@@ -36,6 +36,7 @@ var logger = require('../helpers/logger'),
 					placement: slot.placement,
 					containerId: slot.containerId,
 					type: slot.type,
+					url: window.location.href,
 					bids: getBidDataForFeedback(slot.containerId) || [],
 					winner: slot.feedback.winner || config.DEFAULT_WINNER,
 					winningRevenue: slot.feedback.winningRevenue || 0,
@@ -101,12 +102,11 @@ var logger = require('../helpers/logger'),
 				});
 		}
 		//if (feedback.data.winner && feedback.data.winner !== config.DEFAULT_WINNER) {
-		utils.sendDataToKeenIO(feedback);
+		utils.sendFeedback(feedback);
 		//}
-		logger.log(
-			'Winner for div ' + feedback.data.containerId + ': ' + feedback.data.winner,
-			feedback.data.winningRevenue * 1000
-		);
 	};
 
-module.exports = feedback;
+module.exports = {
+	feedback: feedback,
+	getBidDataForFeedback: getBidDataForFeedback
+};

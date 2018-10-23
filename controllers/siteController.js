@@ -15,7 +15,7 @@ var express = require('express'),
 	couchbase = require('../helpers/couchBaseService'),
 	countryData = require('country-data'),
 	Promise = require('bluebird'),
-	N1qlQuery = require('couchbase-promises').N1qlQuery,
+	N1qlQuery = require('couchbase').N1qlQuery,
 	router = express.Router({ mergeParams: true }),
 	checkAuth = (req, res, next) => {
 		userModel
@@ -47,9 +47,10 @@ var express = require('express'),
 				email: site.get('ownerEmail')
 			};
 
-		const hbcfPromise = editMode === 'update'
-			? appBucket.replacePromise(`hbcf::${siteId}`, json)
-			: appBucket.insertPromise(`hbcf::${siteId}`, json);
+		const hbcfPromise =
+			editMode === 'update'
+				? appBucket.replaceAsync(`hbcf::${siteId}`, json)
+				: appBucket.insertAsync(`hbcf::${siteId}`, json);
 
 		return [hbcfPromise, site];
 	};
@@ -59,14 +60,29 @@ router
 	.get('/:siteId/settings', (req, res) => {
 		return siteModel
 			.getSiteById(req.params.siteId)
-			.then(site => [siteModel.getSitePageGroups(req.params.siteId), site])
-			.spread((sitePageGroups, site) => {
+			.then(site => [
+				siteModel.getSitePageGroups(req.params.siteId),
+				site,
+				userModel.getUserByEmail(req.session.user.email)
+			])
+			.spread((sitePageGroups, site, user) => {
 				const isSession = !!req.session,
 					isPartner = req.session.user.userType == 'partner',
 					isSessionGenieeUIAccess = !!(isSession && req.session.genieeUIAccess),
 					genieeUIAccess = isSessionGenieeUIAccess ? req.session.genieeUIAccess : false,
-					isGenieeUIAccessCodeConversion = !!(genieeUIAccess &&
-						genieeUIAccess.hasOwnProperty('codeConversion'));
+					isGenieeUIAccessCodeConversion = !!(
+						genieeUIAccess && genieeUIAccess.hasOwnProperty('codeConversion')
+					),
+					adNetworkSettings = user.get('adNetworkSettings');
+
+				let dfpAccounts = null;
+				if (adNetworkSettings.length) {
+					adNetworkSettings.forEach(adNetworkSetting => {
+						if (adNetworkSetting.networkName === 'DFP') {
+							dfpAccounts = adNetworkSetting.dfpAccounts ? adNetworkSetting.dfpAccounts : null;
+						}
+					});
+				}
 
 				return res.render('settings', {
 					pageGroups: sitePageGroups,
@@ -75,6 +91,7 @@ router
 					blocklist: site.get('apConfigs').blocklist,
 					siteId: req.params.siteId,
 					siteDomain: site.get('siteDomain'),
+					dfpAccounts: dfpAccounts,
 					isSuperUser: req.session.isSuperUser,
 					//UI access code conversion property value
 					// Specific to Geniee network as of now but can be made generic
@@ -257,21 +274,26 @@ router
 					isSuperUser: req.session.isSuperUser || false,
 					// Geniee UI access config values
 					config: {
-						usn: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('selectNetwork')
-							? Number(genieeUIAccess.selectNetwork)
-							: 1,
-						ubajf: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('beforeAfterJs')
-							? Number(genieeUIAccess.beforeAfterJs)
-							: 1,
-						upkv: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('pageKeyValue')
-							? Number(genieeUIAccess.pageKeyValue)
-							: 1,
-						uadkv: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('adunitKeyValue')
-							? Number(genieeUIAccess.adunitKeyValue)
-							: 1,
-						uud: isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('useDfp')
-							? Number(genieeUIAccess.useDfp)
-							: 1
+						usn:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('selectNetwork')
+								? Number(genieeUIAccess.selectNetwork)
+								: 1,
+						ubajf:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('beforeAfterJs')
+								? Number(genieeUIAccess.beforeAfterJs)
+								: 1,
+						upkv:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('pageKeyValue')
+								? Number(genieeUIAccess.pageKeyValue)
+								: 1,
+						uadkv:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('adunitKeyValue')
+								? Number(genieeUIAccess.adunitKeyValue)
+								: 1,
+						uud:
+							isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('useDfp')
+								? Number(genieeUIAccess.useDfp)
+								: 1
 					}
 				});
 			})
@@ -338,12 +360,15 @@ router
 					userEmail = req.session.user.email,
 					site = _.find(userSites, { siteId: parseInt(json.siteId) });
 
-				return userModel.setSitePageGroups(userEmail).then(user => user.save()).then(() => {
-					var index = _.findIndex(userSites, { siteId: parseInt(json.siteId) });
-					req.session.user.sites[index] = site;
+				return userModel
+					.setSitePageGroups(userEmail)
+					.then(user => user.save())
+					.then(() => {
+						var index = _.findIndex(userSites, { siteId: parseInt(json.siteId) });
+						req.session.user.sites[index] = site;
 
-					return res.redirect('/user/dashboard');
-				});
+						return res.redirect('/user/dashboard');
+					});
 			})
 			.catch(function(err) {
 				var error = err.message[0].message ? err.message[0].message : 'Some error occurred!';
@@ -424,7 +449,8 @@ router
 					}
 
 					return Promise.all(sitePromises()).then(function(validSites) {
-						var sites = _.difference(validSites, ['inValidSite']), unSavedSite;
+						var sites = _.difference(validSites, ['inValidSite']),
+							unSavedSite;
 
 						sites = Array.isArray(sites) && sites.length > 0 ? sites : [];
 						/**
@@ -523,7 +549,12 @@ router
 			.then(site => {
 				let ampSettings = site.get('ampSettings') || {};
 				return channelModel.getAmpSettings(req.params.siteId).then(function(channels) {
-					return res.send({ siteId: req.params.siteId, channels, ampSettings,siteDomain:site.get('siteDomain') });
+					return res.send({
+						siteId: req.params.siteId,
+						channels,
+						ampSettings,
+						siteDomain: site.get('siteDomain')
+					});
 				});
 			})
 			.catch(function(err) {

@@ -3,13 +3,8 @@
 var config = require('./config'),
 	utils = require('../helpers/utils'),
 	xhr = require('../helpers/xhr'),
-	logger = require('../helpers/logger'),
 	responseHandler = function(err, data) {
-		if (!err) {
-			logger.log(data);
-		} else {
-			logger.log(err);
-		}
+		err ? console.log(err) : console.log(data);
 	},
 	packetId =
 		window.adpushup && window.adpushup.config && window.adpushup.config.packetId

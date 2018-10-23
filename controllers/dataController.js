@@ -23,7 +23,7 @@ var express = require('express'),
 	{ queryResultProcessing } = require('../helpers/commonFunctions'),
 	router = express.Router(),
 	couchbase = require('../helpers/couchBaseService'),
-	N1qlQuery = require('couchbase-promises').N1qlQuery;
+	N1qlQuery = require('couchbase').N1qlQuery;
 
 function getReportingData(channels, siteId) {
 	if (config && config.hasOwnProperty('reporting') && !config.reporting.activated) {

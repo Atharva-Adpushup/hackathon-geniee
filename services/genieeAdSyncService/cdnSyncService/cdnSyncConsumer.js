@@ -70,6 +70,7 @@ module.exports = function(site, externalData = {}) {
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
 			apConfigs.siteDomain = site.get('siteDomain');
+			apConfigs.activeDFPNetwork = apConfigs.activeDFPNetwork ? apConfigs.activeDFPNetwork : null;
 			apConfigs.manualModeActive = site.get('isManual') ? site.get('isManual') : false;
 			// Default 'draft' mode is selected if config mode is not present
 			apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
@@ -135,7 +136,7 @@ module.exports = function(site, externalData = {}) {
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 
 						case CC.SERVICES.HEADER_BIDDING:
-							serviceScript = serviceScript.substring(62, serviceScript.trim().length - 1);
+							serviceScript = serviceScript.substring(50, serviceScript.trim().length - 1);
 
 							if (
 								serviceConfig &&
@@ -146,8 +147,8 @@ module.exports = function(site, externalData = {}) {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', serviceScript);
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', serviceScript);
 							} else {
-								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', noop);
-								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', noop);
+								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', '');
+								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', '');
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 

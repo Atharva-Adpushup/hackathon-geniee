@@ -7,7 +7,8 @@ import _ from 'lodash';
 const masterSaveData = mode => (dispatch, getState) => {
 	const emptyCodes = getEmptyAdCodes(getState()),
 		paramData = getFinalJson(_.cloneDeep(getState()));
-	if (emptyCodes.length && mode == siteModes.PUBLISH) {
+	if (emptyCodes.length) {
+		// if (emptyCodes.length && mode == siteModes.PUBLISH) {
 		/* When a variation/section deleted we just remove variation/selection not the ads from our redux, 
 		hence possible that in some cases empty ads exist in redux but not when final json calculated. 
 		Hence we added a very dirty and unoptimized check to stringify json and find index of empty ad in json.

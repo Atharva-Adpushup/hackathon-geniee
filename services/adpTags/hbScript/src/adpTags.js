@@ -2,7 +2,6 @@
 
 var prebidSandbox = require('./prebidSandbox'),
 	utils = require('../helpers/utils'),
-	logger = require('../helpers/logger'),
 	config = require('./config'),
 	inventory = config.INVENTORY,
 	find = require('lodash.find'),
@@ -67,6 +66,7 @@ var prebidSandbox = require('./prebidSandbox'),
 			optionalParam: optionalParam,
 			bidders: bidders || [],
 			placement: placement,
+			activeDFPNetwork: utils.getActiveDFPNetwork(),
 			size: size,
 			containerId: containerId,
 			timeout: config.PREBID_TIMEOUT,
@@ -101,8 +101,6 @@ var prebidSandbox = require('./prebidSandbox'),
 		adpTags.currentBatchId = null;
 		adpTags.currentBatchAdpSlots = [];
 		adpTags.slotInterval = null;
-
-		logger.log('Timeout interval ended');
 	},
 	queSlotForBidding = function(slot) {
 		if (!adpTags.slotInterval) {
@@ -110,7 +108,6 @@ var prebidSandbox = require('./prebidSandbox'),
 				? Math.abs(utils.hashCode(+new Date() + ''))
 				: adpTags.currentBatchId;
 		} else {
-			logger.log('Timeout interval already defined, resetting it');
 			clearTimeout(adpTags.slotInterval);
 		}
 		adpTags.currentBatchAdpSlots.push(slot);
@@ -136,34 +133,27 @@ var prebidSandbox = require('./prebidSandbox'),
 		defineSlot: function(containerId, size, placement, optionalParam) {
 			var optionalParam = optionalParam || {},
 				slot = createSlot(containerId, size, placement, optionalParam);
-			logger.log('Slot defined for container : ' + containerId);
 
 			if (utils.isSupportedBrowser()) {
 				// && adpTags.shouldRun(optionalParam)) {
 				if (!optionalParam.headerBidding) {
 					slot.type = 9;
-					logger.log('Type 9: HB disabled by editor.');
 				} else if (slot.bidders.length) {
 					if (slot.slotId) {
-						logger.log('Type 1: Attaching gSlot and running prebid sandboxing');
 						slot.type = 1;
 					} else {
-						logger.log('Type 2: Running prebid sandboxing and then postbid as dfp slot is not present');
 						slot.type = 2;
 					}
 				} else {
 					// Type 3 handled from within case 2
 					// slot.biddingComplete = true;
 					if (slot.slotId) {
-						logger.log('Type 4: No prebid bidder config, rendering adx tag');
 						slot.type = 4;
 					} else {
-						logger.log('Type 5: No prebid bidder config or dfp slot, collapsing div');
 						slot.type = 5;
 					}
 				}
 			} else {
-				logger.log('Browser not supported by AdPushup.');
 				// slot.biddingComplete = true;
 
 				slot.type = slot.slotId ? 6 : 7;
@@ -193,7 +183,6 @@ var prebidSandbox = require('./prebidSandbox'),
 
 				slot.pageGroup = utils.getPageGroup();
 				slot.platform = utils.getPlatform();
-				//logger.log('Rendering adp tag for container : ' + containerId);
 				adpRender.renderGPT(slot);
 			}
 		}

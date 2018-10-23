@@ -5,7 +5,6 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 	config = require('./config'),
 	find = require('lodash.find'),
 	__FRAME_PREFIX__ = '__adp_frame__',
-	logger = require('../helpers/logger'),
 	utils = require('../helpers/utils'),
 	createPrebidContainer = function(adpSlotsBatch) {
 		var adUnitCodeForPrebid = [],
@@ -31,7 +30,7 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 		//In case we don't have any bidders available for any of the adslots,
 		//this may be due to non availablity of inventory or HB not required option used by user
 		if (!adUnitCodeForPrebid.length) {
-			return prebidFinishCallback({}, adpBatchId);
+			return prebidFinishCallback(adpBatchId);
 		}
 
 		var c1xSiteId =
@@ -66,10 +65,8 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 		var waitUntil = setInterval(function() {
 			if (document.body) {
 				clearInterval(waitUntil);
-				logger.log('Running bid auction...');
 
 				var adUnits = utils.getBatchAdUnits(adpSlotsBatch).join(',');
-
 				document.body.appendChild(iframeEl);
 			}
 		}, 50);
@@ -78,23 +75,13 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 		var iframe = document.getElementById(__FRAME_PREFIX__ + adpBatchId);
 		document.body.removeChild(iframe);
 	},
-	setPbjsKeys = function(pbjsParams) {
-		Object.keys(pbjsParams).forEach(function(pbjsKey) {
-			pbjs[pbjsKey] = pbjsParams[pbjsKey].concat(pbjs[pbjsKey]);
-		});
-	},
 	// Callback function to set pbjs keys on parent - fired when prebid sandboxing completes
-	prebidFinishCallback = function(pbjsParams, adpBatchId, timeout) {
+	prebidFinishCallback = function(adpBatchId, timeout) {
 		var adpSlots = utils.getCurrentAdpSlotBatch(window.adpushup.adpTags.adpBatches, adpBatchId),
 			adUnits = utils.getBatchAdUnits(adpSlots).join(',');
 
 		window.adpushup.adpTags.batchPrebiddingComplete = true;
 		if (Object.keys(adpSlots).length) {
-			logger.log('Bidding complete');
-			pbjs.que.push(function() {
-				setPbjsKeys(pbjsParams);
-				//removeHBIframe(adpBatchId);
-			});
 			//function sets google targeting and render the slot, also handle if google slot not available
 			adpRender.afterBiddingProcessor(adpSlots);
 		}
@@ -102,14 +89,11 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 	},
 	// Callback function to set timeout feedback of bidders - fired when prebid auction times out
 	prebidTimeoutCallback = function(adpBatchId, timedOutBidders, timeout) {
-		logger.log('Bid request timed out');
-		logger.log(timedOutBidders);
-
 		var adpSlots = utils.getCurrentAdpSlotBatch(window.adpushup.adpTags.adpBatches, adpBatchId);
 
 		adpSlots.forEach(function(adpSlot) {
 			if (adpSlot.bidders && adpSlot.bidders.length) {
-				adpSlot.feedback.timedOutBidders = timedOutBidders;
+				adpSlot.feedback.timedOutBidders = utils.getUniqueValuesArray(timedOutBidders, 'bidder');
 				adpSlot.feedback.timeout = timeout;
 				adpSlot.hasTimedOut = true;
 			}
