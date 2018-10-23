@@ -18,42 +18,16 @@ class AdElement extends Component {
 			editName: false,
 			isActive: props.ad.isActive || true
 		};
-		// this.toggleNetworkDetails = this.toggleNetworkDetails.bind(this);
-		// this.toggleEventDetails = this.toggleEventDetails.bind(this);
-		// this.toggleNameEdit = this.toggleNameEdit.bind(this);
 		this.toggleHandler = this.toggleHandler.bind(this);
 		this.renderAdDetails = this.renderAdDetails.bind(this);
 		this.disableAd = this.disableAd.bind(this);
 	}
 
 	toggleHandler(property) {
-		this.setState(
-			{
-				[property]: !this.state[property]
-			},
-			() => {
-				console.log(this.state);
-			}
-		);
+		this.setState({
+			[property]: !this.state[property]
+		});
 	}
-
-	// toggleNetworkDetails() {
-	// 	this.setState({
-	// 		showNetworkDetails: !this.state.showNetworkDetails
-	// 	});
-	// }
-
-	// toggleEventDetails() {
-	// 	this.setState({
-	// 		showEventDetails: !this.state.showEventDetails
-	// 	});
-	// }
-
-	// toggleNameEdit() {
-	// 	this.setState({
-	// 		editName: !this.state.editName
-	// 	});
-	// }
 
 	disableAd(ad) {
 		if (confirm('Are you sure you want to archive this ad?')) {
@@ -78,7 +52,6 @@ class AdElement extends Component {
 	}
 
 	renderAdDetails() {
-		console.log('Rendering', this.state);
 		const { ad, updateAd } = this.props,
 			isAMP = ad.formatData.type == 'amp' ? true : false;
 
