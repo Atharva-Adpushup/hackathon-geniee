@@ -80,6 +80,16 @@ var utils = require('../helpers/utils'),
 		}
 		return null;
 	},
+	setURLWiseTargeting = function(slot) {
+		var urlParams = window.adpushup.utils.queryParams;
+
+		Object.keys(config.URL_WISE_TARGETING).forEach(function(key) {
+			var keyVal = config.URL_WISE_TARGETING[key],
+				utmParam = urlParams[keyVal];
+
+			slot.gSlot.setTargeting(keyVal.trim(), String(utmParam ? utmParam.trim() : null));
+		});
+	},
 	setGPTargeting = function(slot) {
 		if (slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE) {
 			var genieeSlots = Object.keys(config.TARGETING);
@@ -148,6 +158,10 @@ var utils = require('../helpers/utils'),
 			}
 			slot.gSlot.setTargeting(key, String(targeting[key]));
 		});
+
+		if (config.SITE_ID === 32142) {
+			setURLWiseTargeting(slot);
+		}
 	},
 	enableGoogServicesForSlot = function(slot) {
 		var networkId =
