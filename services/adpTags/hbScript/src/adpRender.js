@@ -87,7 +87,7 @@ var utils = require('../helpers/utils'),
 			var keyVal = config.URL_WISE_TARGETING[key],
 				utmParam = urlParams[keyVal];
 
-			slot.gSlot.setTargeting(keyVal.trim(), String(utmParam ? utmParam.trim() : null));
+			slot.gSlot.setTargeting(keyVal.trim(), String(utmParam ? utmParam.trim().substr(0, 40) : null));
 		});
 	},
 	setGPTargeting = function(slot) {
@@ -159,7 +159,7 @@ var utils = require('../helpers/utils'),
 			slot.gSlot.setTargeting(key, String(targeting[key]));
 		});
 
-		if (config.SITE_ID === 32142) {
+		if (config.SITE_ID === 41) {
 			setURLWiseTargeting(slot);
 		}
 	},
