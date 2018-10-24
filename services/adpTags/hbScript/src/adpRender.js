@@ -159,7 +159,7 @@ var utils = require('../helpers/utils'),
 			slot.gSlot.setTargeting(key, String(targeting[key]));
 		});
 
-		if (config.SITE_ID === 41) {
+		if (config.SITE_ID === 32142) {
 			setURLWiseTargeting(slot);
 		}
 	},
