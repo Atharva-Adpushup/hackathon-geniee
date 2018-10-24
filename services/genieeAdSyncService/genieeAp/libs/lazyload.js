@@ -1,10 +1,11 @@
-var lazyLoadAds = [],
-	utils = require('./utils'),
-	SCROLL_THRESHOLD = 100;
+var utils = require('./utils'),
+	commonConsts = require('../config/commonConsts'),
+	$ = window.adpushup.$ || $,
+	lazyLoadAds = [];
 
 module.exports = function(el) {
 	var defer = $.Deferred();
-	if (utils.isElementInViewport(el, SCROLL_THRESHOLD)) {
+	if (utils.isElementInViewport(el, commonConsts.LAZY_LOAD.SCROLL_THRESHOLD)) {
 		return defer.resolve();
 	}
 	lazyLoadAds.push({ el: el, defer: defer });
@@ -16,7 +17,7 @@ function onScroll() {
 	return utils.throttle(function() {
 		if (lazyLoadAds.length) {
 			for (var i = lazyLoadAds.length - 1; i >= 0; i--) {
-				if (utils.isElementInViewport(lazyLoadAds[i].el, SCROLL_THRESHOLD)) {
+				if (utils.isElementInViewport(lazyLoadAds[i].el, commonConsts.LAZY_LOAD.SCROLL_THRESHOLD)) {
 					lazyLoadAds[i].defer.resolve();
 					lazyLoadAds.splice(i, 1);
 				}
