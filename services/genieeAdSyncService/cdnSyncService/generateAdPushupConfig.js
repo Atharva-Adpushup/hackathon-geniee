@@ -85,7 +85,8 @@ const _ = require('lodash'),
 				formatData: section.formatData,
 				css: ad.css,
 				height: parseInt(ad.height, 10),
-				width: parseInt(ad.width, 10)
+				width: parseInt(ad.width, 10),
+				enableLazyLoading:section.enableLazyLoading
 			};
 
 			// Add 'multipleAdSizes' property if exists

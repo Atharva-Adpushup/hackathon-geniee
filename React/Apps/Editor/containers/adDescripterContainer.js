@@ -12,7 +12,8 @@ import {
 	validateXPath,
 	renameSection,
 	updateType,
-	updateFormatData
+	updateFormatData,
+	toggleLazyLoad
 } from 'actions/sectionActions.js';
 
 export default connect(
@@ -32,7 +33,8 @@ export default connect(
 				onRenameSection: renameSection,
 				onSetSectionType: updateType,
 				onFormatDataUpdate: updateFormatData,
-				showNotification: showNotification
+				showNotification: showNotification,
+				onToggleLazyLoad: toggleLazyLoad
 			},
 			dispatch
 		)

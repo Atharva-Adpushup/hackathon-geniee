@@ -30,8 +30,7 @@ class EditOptions extends Component {
 	onFloatSelectChange(float) {
 		this.setState({ float });
 
-		const sectionId = this.props.section.id,
-			adId = this.props.section.ads[0].id;
+		const sectionId = this.props.section.id, adId = this.props.section.ads[0].id;
 		this.props.onIncontentFloatUpdate(sectionId, adId, float);
 	}
 
@@ -121,132 +120,145 @@ class EditOptions extends Component {
 				fromPanel={true}
 				showEventData={this.props.section.type == 3 ? true : false}
 				onUpdateOperation={this.props.onUpdateOperation}
+				onSetSectionType={this.props.onSetSectionType}
+				onFormatDataUpdate={this.props.onFormatDataUpdate}
+				onToggleLazyLoad={this.props.onToggleLazyLoad}
 			/>
 		);
 	}
 
 	render() {
 		const sectionProps = this.props.section,
-			isInContentSection = !!(sectionProps.isIncontent),
-			isInContentMinDistanceFromPrevAd = !!(isInContentSection && sectionProps.minDistanceFromPrevAd && Number(sectionProps.minDistanceFromPrevAd) > -1),
+			isInContentSection = !!sectionProps.isIncontent,
+			isInContentMinDistanceFromPrevAd = !!(isInContentSection &&
+				sectionProps.minDistanceFromPrevAd &&
+				Number(sectionProps.minDistanceFromPrevAd) > -1),
 			isInContentAds = !!(isInContentSection && sectionProps.ads && sectionProps.ads.length),
 			adProps = isInContentAds && sectionProps.ads[0],
 			isInContentCustomCSS = !!(isInContentAds && sectionProps.ads[0] && sectionProps.ads[0].customCSS),
 			defaultCustomCSS = {
-				"margin-top":"0px",
-				"margin-right":"0px",
-				"margin-bottom":"0px",
-				"margin-left":"0px"
+				'margin-top': '0px',
+				'margin-right': '0px',
+				'margin-bottom': '0px',
+				'margin-left': '0px'
 			};
 
-		let inContentAdCustomCSS = (isInContentCustomCSS ? (sectionProps.ads[0].customCSS) : defaultCustomCSS);
+		let inContentAdCustomCSS = isInContentCustomCSS ? sectionProps.ads[0].customCSS : defaultCustomCSS;
 
 		return (
 			<div>
-				{this.props.isCustomZoneId ? (
-					<Row>
-						<Col className="u-padding-r10px" xs={4}>
-							Zone Id
-						</Col>
-						<Col className="u-padding-l10px" xs={8}>
-							<InlineEdit
-								type="number"
-								compact
-								validate
-								value={this.props.customZoneId}
-								submitHandler={this.onPartnerDataUpdate}
-								text="Custom Zone Id"
-								errorMessage="Custom zone id cannot be blank"
-							/>
-						</Col>
-					</Row>
-				) : null}
-				{!sectionProps.isIncontent ? (
-					sectionProps.type != 3 ? (
-						<Row>
+				{this.props.isCustomZoneId
+					? <Row>
 							<Col className="u-padding-r10px" xs={4}>
-								XPath
+								Zone Id
 							</Col>
 							<Col className="u-padding-l10px" xs={8}>
 								<InlineEdit
+									type="number"
 									compact
 									validate
-									cancelEditHandler={this.props.onResetErrors.bind(null, sectionProps.id)}
-									customError={this.props.ui.errors.xpath ? this.props.ui.errors.xpath.error : false}
-									dropdownList={sectionProps.allXpaths}
-									value={sectionProps.xpath}
-									keyUpHandler={this.props.onValidateXPath.bind(null, sectionProps.id)}
-									submitHandler={this.props.onUpdateXPath.bind(null, sectionProps.id)}
-									editClickHandler={this.props.onSectionAllXPaths.bind(
-										null,
-										sectionProps.id,
-										sectionProps.xpath
-									)}
-									text="XPath"
-									errorMessage={
-										this.props.ui.errors.xpath && this.props.ui.errors.xpath.error
-											? this.props.ui.errors.xpath.message
-											: 'XPath cannot be blank'
-									}
+									value={this.props.customZoneId}
+									submitHandler={this.onPartnerDataUpdate}
+									text="Custom Zone Id"
+									errorMessage="Custom zone id cannot be blank"
 								/>
 							</Col>
 						</Row>
-					) : null
-				) : (
-					<div>
-						<Row>
-							<Col className="u-padding-0px mB-5" xs={12}>
-								Min distance from previous ad
-							</Col>
-						</Row>
-						<Row>
-							<Col className="u-padding-0px mB-5" xs={12}>
-								<InlineEdit
-									validate
-									cancelEditHandler={this.props.onResetErrors.bind(null, sectionProps.id)}
-									value={sectionProps.minDistanceFromPrevAd.toString()}
-									submitHandler={this.props.onUpdateInContentMinDistanceFromPrevAd.bind(null, sectionProps.id)}
-									editClickHandler={this.props.onUpdateInContentMinDistanceFromPrevAd.bind(
-										null,
-										sectionProps.id
-									)}
-									text="minDistanceFromPrevAd"
-									errorMessage={'minDistanceFromPrevAd cannot be blank'}
-								/>
-							</Col>
-						</Row>
-						<Row>
-							<Col className="u-padding-0px mB-5 mT-5" xs={12}>
-								Custom CSS
-							</Col>
-						</Row>
-						<Row>
-							<Col className="u-padding-0px mB-10" xs={12}>
-								<CssEditor compact css={inContentAdCustomCSS} onSave={this.customCSSEditorSubmit.bind(null, adProps.id)} onCancel={() => {}} />
-							</Col>
-						</Row>
+					: null}
+				{!sectionProps.isIncontent
+					? sectionProps.type != 3
+							? <Row>
+									<Col className="u-padding-r10px" xs={4}>
+										XPath
+									</Col>
+									<Col className="u-padding-l10px" xs={8}>
+										<InlineEdit
+											compact
+											validate
+											cancelEditHandler={this.props.onResetErrors.bind(null, sectionProps.id)}
+											customError={
+												this.props.ui.errors.xpath ? this.props.ui.errors.xpath.error : false
+											}
+											dropdownList={sectionProps.allXpaths}
+											value={sectionProps.xpath}
+											keyUpHandler={this.props.onValidateXPath.bind(null, sectionProps.id)}
+											submitHandler={this.props.onUpdateXPath.bind(null, sectionProps.id)}
+											editClickHandler={this.props.onSectionAllXPaths.bind(
+												null,
+												sectionProps.id,
+												sectionProps.xpath
+											)}
+											text="XPath"
+											errorMessage={
+												this.props.ui.errors.xpath && this.props.ui.errors.xpath.error
+													? this.props.ui.errors.xpath.message
+													: 'XPath cannot be blank'
+											}
+										/>
+									</Col>
+								</Row>
+							: null
+					: <div>
+							<Row>
+								<Col className="u-padding-0px mB-5" xs={12}>
+									Min distance from previous ad
+								</Col>
+							</Row>
+							<Row>
+								<Col className="u-padding-0px mB-5" xs={12}>
+									<InlineEdit
+										validate
+										cancelEditHandler={this.props.onResetErrors.bind(null, sectionProps.id)}
+										value={sectionProps.minDistanceFromPrevAd.toString()}
+										submitHandler={this.props.onUpdateInContentMinDistanceFromPrevAd.bind(
+											null,
+											sectionProps.id
+										)}
+										editClickHandler={this.props.onUpdateInContentMinDistanceFromPrevAd.bind(
+											null,
+											sectionProps.id
+										)}
+										text="minDistanceFromPrevAd"
+										errorMessage={'minDistanceFromPrevAd cannot be blank'}
+									/>
+								</Col>
+							</Row>
+							<Row>
+								<Col className="u-padding-0px mB-5 mT-5" xs={12}>
+									Custom CSS
+								</Col>
+							</Row>
+							<Row>
+								<Col className="u-padding-0px mB-10" xs={12}>
+									<CssEditor
+										compact
+										css={inContentAdCustomCSS}
+										onSave={this.customCSSEditorSubmit.bind(null, adProps.id)}
+										onCancel={() => {}}
+									/>
+								</Col>
+							</Row>
 
-						<Row>
-							<Col className="u-padding-r10px" xs={4}>
-								Float
-							</Col>
-							<Col className="u-padding-l10px" xs={8}>
-								<SelectBox
-									value={this.state.float}
-									label="Select Float"
-									onChange={this.onFloatSelectChange}
-									showClear={false}
-								>
-									{floats.map((float, index) => (
-										<option key={index} value={float}>
-											{float}
-										</option>
-									))}
-								</SelectBox>
-							</Col>
-						</Row>
-					</div>
-				)}
+							<Row>
+								<Col className="u-padding-r10px" xs={4}>
+									Float
+								</Col>
+								<Col className="u-padding-l10px" xs={8}>
+									<SelectBox
+										value={this.state.float}
+										label="Select Float"
+										onChange={this.onFloatSelectChange}
+										showClear={false}
+									>
+										{floats.map((float, index) => (
+											<option key={index} value={float}>
+												{float}
+											</option>
+										))}
+									</SelectBox>
+								</Col>
+							</Row>
+						</div>}
 				<div className="mT-10">{this.renderContent()}</div>
 			</div>
 		);
