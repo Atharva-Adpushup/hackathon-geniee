@@ -1,4 +1,5 @@
-var config = require('../src/config'), logger = require('./logger'), find = require('lodash.find');
+var config = require('../src/config'),
+	find = require('lodash.find');
 
 module.exports = {
 	hashCode: function(str) {
@@ -39,7 +40,8 @@ module.exports = {
 
 		// Check for MSIE v7-10 in UA string
 		if (ua.indexOf('MSIE') !== -1) {
-			var re = new RegExp('MSIE ([0-9]{1,}[.0-9]{0,})'), ieVersion = Number(re.exec(ua)[1]);
+			var re = new RegExp('MSIE ([0-9]{1,}[.0-9]{0,})'),
+				ieVersion = Number(re.exec(ua)[1]);
 
 			return ieVersion >= 9 ? true : false;
 		}
@@ -56,7 +58,11 @@ module.exports = {
 			}
 			if (M[1] === 'Chrome') {
 				tem = ua.match(/\b(OPR|Edge)\/(\d+)/);
-				if (tem != null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
+				if (tem != null)
+					return tem
+						.slice(1)
+						.join(' ')
+						.replace('OPR', 'Opera');
 			}
 			M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, '-?'];
 			if ((tem = ua.match(/version\/(\d+)/i)) != null) M.splice(1, 1, tem[1]);
@@ -86,7 +92,8 @@ module.exports = {
 		return adUnits;
 	},
 	stringifyJSON: function(json) {
-		var dataString = '?', keys = Object.keys(json);
+		var dataString = '?',
+			keys = Object.keys(json);
 
 		for (var i = 0; i < keys.length; i++) {
 			var key = keys[i];
@@ -156,9 +163,22 @@ module.exports = {
 		}
 		return null;
 	},
+	getUniqueValuesArray: function(collection, value) {
+		var uniqueVales = {};
+
+		collection.forEach(function(colData) {
+			var data = colData[value];
+			if (!uniqueVales.hasOwnProperty(data)) {
+				uniqueVales[data] = true;
+			}
+		});
+
+		return Object.keys(uniqueVales);
+	},
 	hasMultipleDfpAccounts: function() {
 		try {
-			var dfpAdSlots = Object.keys(window.googletag.pubads().aa), dfpNetworkIdMap = {};
+			var dfpAdSlots = Object.keys(window.googletag.pubads().aa),
+				dfpNetworkIdMap = {};
 
 			dfpAdSlots.forEach(function(dfpAdSlot) {
 				var dfpNetworkId = dfpAdSlot.match(/\/(.*?)\//)[1];
@@ -191,7 +211,8 @@ module.exports = {
 		return function() {
 			var context = scope || this;
 
-			var now = +new Date(), args = arguments;
+			var now = +new Date(),
+				args = arguments;
 			if (last && now < last + threshhold) {
 				// hold on to it
 				clearTimeout(deferTimer);

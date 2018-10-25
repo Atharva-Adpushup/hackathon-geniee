@@ -1,7 +1,6 @@
 // Adp tags rendering module
 
-var logger = require('../helpers/logger'),
-	utils = require('../helpers/utils'),
+var utils = require('../helpers/utils'),
 	config = require('./config'),
 	feedback = require('./feedback').feedback,
 	getFloorWithGranularity = function(floor) {
@@ -52,24 +51,20 @@ var logger = require('../helpers/logger'),
 		});
 	},
 	renderPostbid = function(slot) {
-		logger.log('Rendering postbid');
-
-		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId), adIframe = utils.createEmptyIframe();
+		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId),
+			adIframe = utils.createEmptyIframe();
 
 		document.getElementById(slot.containerId).appendChild(adIframe);
 
 		var iframeDoc = adIframe.contentWindow.document;
 
 		if (params && params.hb_adid) {
-			logger.log('Bid present from postbid');
-
 			pbjs.renderAd(iframeDoc, params.hb_adid);
 			adIframe.contentWindow.onload = function() {
 				slot.hasRendered = true;
 				feedback(slot);
 			};
 		} else {
-			logger.log('No bid or $0 cpm bid for slot, collapsing div');
 			slot.type = 3;
 			feedback(slot);
 		}
@@ -85,6 +80,16 @@ var logger = require('../helpers/logger'),
 			return pbjs.getAdserverTargeting()[slot.containerId];
 		}
 		return null;
+	},
+	setURLWiseTargeting = function(slot) {
+		var urlParams = window.adpushup.utils.queryParams;
+
+		Object.keys(config.URL_WISE_TARGETING).forEach(function(key) {
+			var keyVal = config.URL_WISE_TARGETING[key],
+				utmParam = urlParams[keyVal];
+
+			slot.gSlot.setTargeting(keyVal.trim(), String(utmParam ? utmParam.trim().substr(0, 40) : null));
+		});
 	},
 	setGPTargeting = function(slot) {
 		if (slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE) {
@@ -113,9 +118,12 @@ var logger = require('../helpers/logger'),
 			});
 			if (dfpAdunitCodes.indexOf(slot.optionalParam.dfpAdunitCode) !== -1) {
 				var currentTargetingObject =
-					config.TARGETING[
-						'/' + networkCodes[slot.optionalParam.dfpAdunitCode] + '/' + slot.optionalParam.dfpAdunitCode
-					],
+						config.TARGETING[
+							'/' +
+								networkCodes[slot.optionalParam.dfpAdunitCode] +
+								'/' +
+								slot.optionalParam.dfpAdunitCode
+						],
 					currentTargetingObject = setPageLevelTargeting(currentTargetingObject, slot);
 				Object.keys(currentTargetingObject).forEach(function(dfpKey, index) {
 					slot.gSlot.setTargeting(dfpKey, String(currentTargetingObject[dfpKey]));
@@ -124,9 +132,9 @@ var logger = require('../helpers/logger'),
 			return;
 		}
 		var targeting = {
-			hb_siteId: config.SITE_ID,
-			hb_ran: 0
-		},
+				hb_siteId: config.SITE_ID,
+				hb_ran: 0
+			},
 			adServerTargeting = getAdserverTargeting(slot);
 
 		if (utils.isSupportedBrowser() && slot.bidders.length) {
@@ -151,11 +159,16 @@ var logger = require('../helpers/logger'),
 			}
 			slot.gSlot.setTargeting(key, String(targeting[key]));
 		});
+
+		if (config.SITE_ID === 32142) {
+			setURLWiseTargeting(slot);
+		}
 	},
 	enableGoogServicesForSlot = function(slot) {
-		var networkId = slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE
-			? config.GENIEE_NETWORK_ID
-			: config.NETWORK_ID;
+		var networkId =
+			slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE
+				? config.GENIEE_NETWORK_ID
+				: config.NETWORK_ID;
 		networkId = slot.activeDFPNetwork ? slot.activeDFPNetwork : networkId;
 
 		slot.gSlot = googletag.defineSlot(

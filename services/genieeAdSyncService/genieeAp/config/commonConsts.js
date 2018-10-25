@@ -11,6 +11,9 @@ module.exports = {
 		top: '0px',
 		'z-index': 10000
 	},
+	LAZY_LOAD: {
+		SCROLL_THRESHOLD: 100
+	},
 	MANUAL_ADS: {
 		VARIATION: 'manual'
 	},

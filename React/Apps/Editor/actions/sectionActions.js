@@ -12,37 +12,37 @@ import Utils from 'libs/utils';
 import _ from 'lodash';
 
 const createSection = (sectionPayload, adPayload, variationId) => {
-		const adId = Utils.getRandomNumber(),
-			sectionId = Utils.getRandomNumber(),
-			isAdPayload = !!adPayload,
-			isAdNetworkData = !!(isAdPayload && adPayload.networkData),
-			isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId),
-			isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
+	const adId = Utils.getRandomNumber(),
+		sectionId = Utils.getRandomNumber(),
+		isAdPayload = !!adPayload,
+		isAdNetworkData = !!(isAdPayload && adPayload.networkData),
+		isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId),
+		isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
 
-		if (isCreateZoneContainerId) {
-			adPayload.networkData.zoneContainerId = `${adPayload.networkData.zoneId}-${adId}`;
-			delete adPayload.networkData.createZoneContainerId;
-		}
+	if (isCreateZoneContainerId) {
+		adPayload.networkData.zoneContainerId = `${adPayload.networkData.zoneId}-${adId}`;
+		delete adPayload.networkData.createZoneContainerId;
+	}
 
-		return {
-			type: sectionActions.CREATE_SECTION,
-			adPayload: Object.assign(adPayload, {
-				id: adId,
-				css: adPayload.css ? adPayload.css : defaultSectionCss,
-				createTs: Math.floor(Date.now() / 1000)
-			}),
-			sectionPayload: Object.assign(sectionPayload, {
-				name: `Section-${sectionId}`,
-				id: sectionId,
-				ads: [adId],
-				createTs: Math.floor(Date.now() / 1000),
-				allXpaths: []
-			}),
-			sectionId,
-			adId,
-			variationId
-		};
-	},
+	return {
+		type: sectionActions.CREATE_SECTION,
+		adPayload: Object.assign(adPayload, {
+			id: adId,
+			css: adPayload.css ? adPayload.css : defaultSectionCss,
+			createTs: Math.floor(Date.now() / 1000)
+		}),
+		sectionPayload: Object.assign(sectionPayload, {
+			name: `Section-${sectionId}`,
+			id: sectionId,
+			ads: [adId],
+			createTs: Math.floor(Date.now() / 1000),
+			allXpaths: []
+		}),
+		sectionId,
+		adId,
+		variationId
+	};
+},
 	createIncontentSection = (sectionPayload, adPayload, variationId) => (dispatch, getState) => {
 		const variationSections = getVariationSectionsWithAds(getState(), { variationId }).sections,
 			arr = _.map(variationSections, data => {
@@ -71,7 +71,7 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 		const adId = Utils.getRandomNumber(),
 			sectionId = Utils.getRandomNumber(),
 			float = sectionPayload.float,
-			css = float !== 'none' ? (float === 'left' ? leftSectionCss : rightSectionCss) : defaultSectionCss,
+			css = float !== 'none' ? float === 'left' ? leftSectionCss : rightSectionCss : defaultSectionCss,
 			customCSS = adPayload.customCSS || '',
 			multipleAdSizes = adPayload.multipleAdSizes || null,
 			adData = {},
@@ -273,6 +273,13 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			type: sectionActions.SCROLL_TO_VIEW,
 			adId
 		};
+	},
+	toggleLazyLoad = (sectionId, value) => {
+		return {
+			type: sectionActions.ENABLE_LAZYLOAD,
+			sectionId,
+			value
+		};
 	};
 
 export {
@@ -291,5 +298,6 @@ export {
 	scrollSectionIntoView,
 	updateSection,
 	updateType,
-	updateFormatData
+	updateFormatData,
+	toggleLazyLoad
 };
