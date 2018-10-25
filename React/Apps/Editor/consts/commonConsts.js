@@ -1,28 +1,32 @@
 const status = {
-	text: {
-		SUCCESS: 'SUCCESS',
-		PENDING: 'PENDING',
-		FAILED: 'FAILED',
-		LOADING: 'LOADING',
-		RESET: 'RESET'
+		text: {
+			SUCCESS: 'SUCCESS',
+			PENDING: 'PENDING',
+			FAILED: 'FAILED',
+			LOADING: 'LOADING',
+			RESET: 'RESET'
+		},
+		RESET: 0,
+		PENDING: 1,
+		SUCCESS: 2,
+		FAILED: 3,
+		LOADING: 4,
+		NOT_LOADED: 5,
+		LOADED: 6,
+		ARCHIVED: 7,
+		ACTIVE: 8,
+		PAUSED: 9,
+		FALSE: false,
+		TRUE: true
 	},
-	RESET: 0,
-	PENDING: 1,
-	SUCCESS: 2,
-	FAILED: 3,
-	LOADING: 4,
-	NOT_LOADED: 5,
-	LOADED: 6,
-	ARCHIVED: 7,
-	ACTIVE: 8,
-	PAUSED: 9,
-	FALSE: false,
-	TRUE: true
-},
 	partners = {
 		geniee: {
-			name: 'geniee'
-		}
+			name: 'geniee',
+			networks: {
+				disabled: ['adpTags', 'medianet']
+			}
+		},
+		list: ['geniee']
 	},
 	proxy = {
 		HTTP_PROXY_URL: `${window.ADP_ORIGIN}/loadFromApProxy/`,
@@ -342,7 +346,7 @@ const status = {
 		EDITOR_MODE: 1,
 		BROWSE_MODE: 2
 	},
-	networks = ['adsense', 'adx', 'adpTags', 'dfp', 'custom', 'geniee'],
+	networks = ['adsense', 'adpTags', 'custom', 'geniee', 'medianet'],
 	priceFloorKeys = ['FP_S_A', 'FP_B_A', 'FP_S', 'FP_A', 'FP_B'],
 	defaultPriceFloorKey = 'FP_S_A',
 	reportingUrl = '/user/reports/generate',
