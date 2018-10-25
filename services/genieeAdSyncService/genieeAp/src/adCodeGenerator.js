@@ -113,6 +113,23 @@ var utils = require('../libs/utils'),
 		$el.append(adCode.join('\n'));
 		return true;
 	},
+	executeMediaNetHeadCode = function() {
+		var adCode = [];
+		adCode.push('<scr' + 'ipt type="text/javascript">');
+		adCode.push('window._mNHandle = window._mNHandle || {};');
+		adCode.push('window._mNHandle.queue = window._mNHandle.queue || [];');
+		adCode.push('medianet_versionId = "3121199";');
+		adCode.push('</scr' + 'ipt>');
+		adCode.push('<scr' + 'ipt async  src="//contextual.media.net/dmedianet.js?cid=8CUEJU9TP"></scr' + 'ipt>');
+		var $el = null;
+		if ($('head').length) {
+			$el = $('head');
+		} else {
+			$el = $('body');
+		}
+		$el.append(adCode.join('\n'));
+		return true;
+	},
 	genrateAdpBodyTag = function(ad) {
 		var adCode;
 		if (!ad.networkData || !ad.networkData.dfpAdunit) {
@@ -205,5 +222,8 @@ module.exports = {
 		}
 
 		return true;
+	},
+	generateMediaNetHeadCode: function() {
+		return executeMediaNetHeadCode();
 	}
 };
