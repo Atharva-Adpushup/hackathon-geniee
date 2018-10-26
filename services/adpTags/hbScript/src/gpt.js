@@ -37,26 +37,6 @@ var config = require('./config'),
 			});
 		});
 	},
-	setGptRefreshInterval = function() {
-		if (w.adpushup.adpTags.gptRefreshIntervals.length) {
-			w.adpushup.adpTags.gptRefreshIntervals.forEach(function(interval) {
-				var gptRefreshInterval = setInterval(function() {
-					googletag.pubads().refresh([interval.gSlot]);
-				}, config.GPT_REFRESH_INTERVAL);
-				interval.id = gptRefreshInterval;
-			});
-		}
-	},
-	onScroll = function() {
-		return w.adpushup.utils.throttle(function() {
-			w.adpushup.adpTags.gptRefreshIntervals.forEach(function(interval) {
-				var el = $('#' + interval.sectionId);
-				if (utils.isElementInViewport(el)) {
-					googletag.pubads().refresh([interval.gSlot]);
-				}
-			});
-		}, 200)();
-	},
 	refreshIntervalSwitch = function(w) {
 		w.adpushup.$(w).on('blur', function() {
 			if (w.adpushup.adpTags.gptRefreshIntervals.length) {
@@ -65,10 +45,19 @@ var config = require('./config'),
 				});
 			}
 		});
-		w.adpushup.$(w).on('focus', setGptRefreshInterval);
-		if (w.adpushup.adpTags.gptRefreshIntervals.length) {
-			w.adpushup.$(w).on('scroll', onScroll);
-		}
+		w.adpushup.$(w).on('focus', function() {
+			if (w.adpushup.adpTags.gptRefreshIntervals.length) {
+				w.adpushup.adpTags.gptRefreshIntervals.forEach(function(interval) {
+					var gptRefreshInterval = setInterval(function() {
+						var el = $('#' + interval.sectionId);
+						if (utils.isElementInViewport(el)) {
+							googletag.pubads().refresh([interval.gSlot]);
+						}
+					}, config.GPT_REFRESH_INTERVAL);
+					interval.id = gptRefreshInterval;
+				});
+			}
+		});
 	};
 
 module.exports = {
