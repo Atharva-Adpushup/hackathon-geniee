@@ -215,6 +215,7 @@ module.exports = function(site, externalData = {}) {
 					gdpr = site.get('gdpr'),
 					{ incontentAds, hbAds } = incontentAndHbAds;
 				if (site.get('ampSettings')) apConfigs.ampSettings = site.get('ampSettings');
+				if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
 				jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
 				jsFile = _.replace(jsFile, /__SITE_ID__/g, site.get('siteId'));
 				uncompressedJsFile = _.replace(uncompressedJsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
@@ -256,6 +257,7 @@ module.exports = function(site, externalData = {}) {
 			});
 		},
 		uploadJS = function(fileConfig) {
+			return Promise.resolve(fileConfig.uncompressed);
 			return connectToServer()
 				.then(cwd)
 				.then(function() {
