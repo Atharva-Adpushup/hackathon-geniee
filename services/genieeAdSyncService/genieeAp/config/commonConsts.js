@@ -18,7 +18,9 @@ module.exports = {
 		VARIATION: 'manual'
 	},
 	NETWORKS: {
-		ADPTAGS: 'adpTags'
+		ADPTAGS: 'adpTags',
+		MEDIANET: 'medianet'
 	},
+	ADPUSHUP_MEDIANET_ID: '8CUEJU9TP',
 	AMP_PUBLISH_URL: '//autoamp.io/publishAmpJob'
 };
