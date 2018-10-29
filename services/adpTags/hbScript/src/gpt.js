@@ -2,6 +2,7 @@
 
 var config = require('./config'),
 	feedback = require('./feedback').feedback,
+	utils = require('../helpers/utils'),
 	init = function(d) {
 		var gptScriptEl = d.createElement('script');
 		gptScriptEl.src = '//www.googletagservices.com/tag/js/gpt.js';
@@ -48,7 +49,10 @@ var config = require('./config'),
 			if (w.adpushup.adpTags.gptRefreshIntervals.length) {
 				w.adpushup.adpTags.gptRefreshIntervals.forEach(function(interval) {
 					var gptRefreshInterval = setInterval(function() {
-						googletag.pubads().refresh([interval.gSlot]);
+						var el = $('#' + interval.sectionId);
+						if (utils.isElementInViewport(el)) {
+							googletag.pubads().refresh([interval.gSlot]);
+						}
 					}, config.GPT_REFRESH_INTERVAL);
 					interval.id = gptRefreshInterval;
 				});
