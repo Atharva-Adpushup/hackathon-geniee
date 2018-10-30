@@ -84,14 +84,14 @@ var utils = require('../helpers/utils'),
 		}
 		return null;
 	},
-	setURLWiseTargeting = function(slot) {
+	setURLWiseTargeting = function() {
 		var urlParams = window.adpushup.utils.queryParams;
 
 		Object.keys(config.URL_WISE_TARGETING).forEach(function(key) {
 			var keyVal = config.URL_WISE_TARGETING[key],
 				utmParam = urlParams[keyVal];
 
-			slot.gSlot.setTargeting(keyVal.trim(), String(utmParam ? utmParam.trim().substr(0, 40) : null));
+			googletag.pubads().setTargeting(keyVal.trim(), String(utmParam ? utmParam.trim().substr(0, 40) : null));
 		});
 	},
 	setGPTargeting = function(slot) {
@@ -162,10 +162,6 @@ var utils = require('../helpers/utils'),
 			}
 			slot.gSlot.setTargeting(key, String(targeting[key]));
 		});
-
-		if (config.SITE_ID === 32142) {
-			setURLWiseTargeting(slot);
-		}
 	},
 	enableGoogServicesForSlot = function(slot) {
 		var networkId =
@@ -235,6 +231,10 @@ var utils = require('../helpers/utils'),
 			//Global key value settings
 			for (var key in config.PAGE_KEY_VALUES) {
 				googletag.pubads().setTargeting(key, String(config.PAGE_KEY_VALUES[key]));
+			}
+
+			if (config.SITE_ID === 32142) {
+				setURLWiseTargeting();
 			}
 
 			// Attach gpt slot for each adpSlot in batch
