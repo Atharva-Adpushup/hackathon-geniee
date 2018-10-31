@@ -15,6 +15,7 @@ var w = window,
 	control = require('./control')(),
 	genieeObject = require('./genieeObject'),
 	triggerAd = require('./trigger'),
+	session = require('../libs/session'),
 	isGenieeSite;
 
 // Extend adpushup object
@@ -36,6 +37,9 @@ $.extend(adp, {
 $.extend(adp.config, __AP_CONFIG__, {
 	platform: browserConfig.platform
 });
+
+// Initialise adpushup session
+session.init();
 
 //Geniee ad network specific site check
 isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
