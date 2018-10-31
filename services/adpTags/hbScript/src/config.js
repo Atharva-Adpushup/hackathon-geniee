@@ -9,7 +9,7 @@ module.exports = {
 	PARTNERS: {
 		GENIEE: 'geniee'
 	},
-	URL_WISE_TARGETING: {
+	UTM_WISE_TARGETING: {
 		UTM_SOURCE: 'utm_source',
 		UTM_CAMPAIGN: 'utm_campaign',
 		UTM_MEDIUM: 'utm_medium',
