@@ -9,27 +9,26 @@ function init(w, d) {
 	w.googletag = w.googletag || {};
 	googletag.cmd = googletag.cmd || [];
 
-	if (w.adpushup.config && w.adpushup.config.mode !== 1) {
+	if (w.adpushup.config && w.adpushup.config.mode !== 1 && w.adpushup.config.mode !== 16) {
 		w.adpTags = w.adpTags || {};
 		w.adpTags.control = control.initControl('prebid');
 		control.initControlFeedback(w);
 
 		return w.adpTags.control.trigger();
 	} else {
-		w.adpushup.adpPrebid = __PREBID_SCRIPT__;
-		w.adpushup.adpPrebid();
+		// Execute prebid script
+		(function() {
+			__PREBID_SCRIPT__;
+		})();
 
-		var logger = require('../helpers/logger'),
-			gpt = require('./gpt'),
+		var gpt = require('./gpt'),
 			config = require('./config'),
 			geniee = require('./geniee'),
 			feedback = require('./feedback').feedback;
 
 		// Initialise GPT and set listeners
 		gpt.init(d);
-		gpt.setListeners(w, function(d) {
-			logger.log('Feedback sent'); // Feedback for DFP slot render sent here
-		});
+		gpt.setListeners(w, function(d) {});
 
 		var adpQue;
 		window.adpTags = window.adpTags || {};
@@ -76,7 +75,6 @@ function init(w, d) {
 		// Declaring prebid winner, if anyone
 		w.pbjs.que.push(function() {
 			w.pbjs.onEvent('bidWon', function(bidData) {
-				logger.log('Bid winner decided from prebid auction');
 				var slot = w.adpushup.adpTags.adpSlots[bidData.adUnitCode];
 				slot.feedback.winner = bidData.bidder;
 				slot.feedback.winningRevenue = bidData.cpm / 1000;

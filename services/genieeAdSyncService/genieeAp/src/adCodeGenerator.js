@@ -1,7 +1,12 @@
 var utils = require('../libs/utils'),
 	$ = require('jquery'),
 	config = window.adpushup.config,
+<<<<<<< HEAD
 	generateGenieeBodyTag = function (ad) {
+=======
+	consts = require('../config/commonConsts'),
+	generateGenieeBodyTag = function(ad) {
+>>>>>>> 7da2ff064ef52e7a2ab140b9c1fd29e976d1c054
 		var adCode,
 			genieeRef = window.adpushup && window.adpushup.geniee,
 			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback,
@@ -117,7 +122,25 @@ var utils = require('../libs/utils'),
 		$el.append(adCode.join('\n'));
 		return true;
 	},
-	genrateAdpBodyTag = function (ad) {
+	executeMediaNetHeadCode = function() {
+		var adCode = [];
+		var cid = window.adpushup.config.medianetId || consts.ADPUSHUP_MEDIANET_ID;
+		adCode.push('<scr' + 'ipt type="text/javascript">');
+		adCode.push('window._mNHandle = window._mNHandle || {};');
+		adCode.push('window._mNHandle.queue = window._mNHandle.queue || [];');
+		adCode.push('medianet_versionId = "3121199";');
+		adCode.push('</scr' + 'ipt>');
+		adCode.push('<scr' + 'ipt async  src="//contextual.media.net/dmedianet.js?cid=' + cid + '"></scr' + 'ipt>');
+		var $el = null;
+		if ($('head').length) {
+			$el = $('head');
+		} else {
+			$el = $('body');
+		}
+		$el.append(adCode.join('\n'));
+		return true;
+	},
+	genrateAdpBodyTag = function(ad) {
 		var adCode;
 		if (!ad.networkData || !ad.networkData.dfpAdunit) {
 			adCode = '';
@@ -209,5 +232,8 @@ module.exports = {
 		}
 
 		return true;
+	},
+	generateMediaNetHeadCode: function() {
+		return executeMediaNetHeadCode();
 	}
 };

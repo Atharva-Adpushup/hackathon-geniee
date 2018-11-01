@@ -136,7 +136,7 @@ module.exports = function(site, externalData = {}) {
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 
 						case CC.SERVICES.HEADER_BIDDING:
-							serviceScript = serviceScript.substring(62, serviceScript.trim().length - 1);
+							serviceScript = serviceScript.substring(50, serviceScript.trim().length - 1);
 
 							if (
 								serviceConfig &&
@@ -147,8 +147,8 @@ module.exports = function(site, externalData = {}) {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', serviceScript);
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', serviceScript);
 							} else {
-								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', noop);
-								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', noop);
+								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', '');
+								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', '');
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 
@@ -215,6 +215,7 @@ module.exports = function(site, externalData = {}) {
 					gdpr = site.get('gdpr'),
 					{ incontentAds, hbAds } = incontentAndHbAds;
 				if (site.get('ampSettings')) apConfigs.ampSettings = site.get('ampSettings');
+				if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
 				jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
 				jsFile = _.replace(jsFile, /__SITE_ID__/g, site.get('siteId'));
 				uncompressedJsFile = _.replace(uncompressedJsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));

@@ -1,7 +1,6 @@
 // Adp tags rendering module
 
-var logger = require('../helpers/logger'),
-	utils = require('../helpers/utils'),
+var utils = require('../helpers/utils'),
 	config = require('./config'),
 	responsiveAds = require('./responsiveAds'),
 	feedback = require('./feedback').feedback,
@@ -31,11 +30,15 @@ var logger = require('../helpers/logger'),
 
 			googletag.cmd.push(function() {
 				gptRefreshInterval = setInterval(function() {
-					refreshGPTSlot(slot.gSlot);
+					var el = $('#' + slot.sectionId);
+					if (utils.isElementInViewport(el)) {
+						refreshGPTSlot(slot.gSlot);
+					}
 				}, config.GPT_REFRESH_INTERVAL);
 				window.adpushup.adpTags.gptRefreshIntervals.push({
 					gSlot: slot.gSlot,
-					id: gptRefreshInterval
+					id: gptRefreshInterval,
+					sectionId: slot.sectionId
 				});
 			});
 		}
@@ -52,8 +55,6 @@ var logger = require('../helpers/logger'),
 		});
 	},
 	renderPostbid = function(slot) {
-		logger.log('Rendering postbid');
-
 		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId),
 			adIframe = utils.createEmptyIframe();
 
@@ -62,15 +63,12 @@ var logger = require('../helpers/logger'),
 		var iframeDoc = adIframe.contentWindow.document;
 
 		if (params && params.hb_adid) {
-			logger.log('Bid present from postbid');
-
 			pbjs.renderAd(iframeDoc, params.hb_adid);
 			adIframe.contentWindow.onload = function() {
 				slot.hasRendered = true;
 				feedback(slot);
 			};
 		} else {
-			logger.log('No bid or $0 cpm bid for slot, collapsing div');
 			slot.type = 3;
 			feedback(slot);
 		}
@@ -86,6 +84,16 @@ var logger = require('../helpers/logger'),
 			return pbjs.getAdserverTargeting()[slot.containerId];
 		}
 		return null;
+	},
+	setURLWiseTargeting = function() {
+		var urlParams = window.adpushup.utils.queryParams;
+
+		Object.keys(config.URL_WISE_TARGETING).forEach(function(key) {
+			var keyVal = config.URL_WISE_TARGETING[key],
+				utmParam = urlParams[keyVal];
+
+			googletag.pubads().setTargeting(keyVal.trim(), String(utmParam ? utmParam.trim().substr(0, 40) : null));
+		});
 	},
 	setGPTargeting = function(slot) {
 		if (slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE) {
@@ -229,6 +237,10 @@ var logger = require('../helpers/logger'),
 			//Global key value settings
 			for (var key in config.PAGE_KEY_VALUES) {
 				googletag.pubads().setTargeting(key, String(config.PAGE_KEY_VALUES[key]));
+			}
+
+			if (config.SITE_ID === 32142) {
+				setURLWiseTargeting();
 			}
 
 			// Attach gpt slot for each adpSlot in batch

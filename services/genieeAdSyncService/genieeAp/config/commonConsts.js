@@ -11,16 +11,21 @@ module.exports = {
 		top: '0px',
 		'z-index': 10000
 	},
+	LAZY_LOAD: {
+		SCROLL_THRESHOLD: 100
+	},
 	MANUAL_ADS: {
 		VARIATION: 'manual'
 	},
 	NETWORKS: {
-		ADPTAGS: 'adpTags'
+		ADPTAGS: 'adpTags',
+		MEDIANET: 'medianet'
 	},
 	AMP_PUBLISH_URL: '//autoamp.io/publishAmpJob',
 	PLATFORMS: {
 		RESPONSIVE: 'RESPONSIVE',
 		DESKTOP: 'DESKTOP',
 		MOBILE: 'MOBILE'
-	}
+	},
+	ADPUSHUP_MEDIANET_ID: '8CUEJU9TP'
 };

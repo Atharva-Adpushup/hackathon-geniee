@@ -1,5 +1,4 @@
 var config = require('../src/config'),
-	logger = require('./logger'),
 	find = require('lodash.find');
 
 module.exports = {
@@ -164,6 +163,18 @@ module.exports = {
 		}
 		return null;
 	},
+	getUniqueValuesArray: function(collection, value) {
+		var uniqueVales = {};
+
+		collection.forEach(function(colData) {
+			var data = colData[value];
+			if (!uniqueVales.hasOwnProperty(data)) {
+				uniqueVales[data] = true;
+			}
+		});
+
+		return Object.keys(uniqueVales);
+	},
 	hasMultipleDfpAccounts: function() {
 		try {
 			var dfpAdSlots = Object.keys(window.googletag.pubads().aa),
@@ -187,5 +198,12 @@ module.exports = {
 		} catch (e) {
 			return false;
 		}
+	},
+	isElementInViewport: function(el) {
+		const elementTop = $(el).offset().top,
+			elementBottom = elementTop + $(el).outerHeight(),
+			viewportTop = $(window).scrollTop(),
+			viewportBottom = viewportTop + $(window).height();
+		return elementBottom > viewportTop && elementTop < viewportBottom;
 	}
 };

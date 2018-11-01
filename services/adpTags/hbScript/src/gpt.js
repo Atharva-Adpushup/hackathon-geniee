@@ -1,8 +1,8 @@
 // GPT library module
 
 var config = require('./config'),
-	logger = require('../helpers/logger'),
 	feedback = require('./feedback').feedback,
+	utils = require('../helpers/utils'),
 	init = function(d) {
 		var gptScriptEl = d.createElement('script');
 		gptScriptEl.src = '//www.googletagservices.com/tag/js/gpt.js';
@@ -20,7 +20,7 @@ var config = require('./config'),
 							config.NETWORK_ID +
 							'/' +
 							w.adpushup.adpTags.adpSlots[adpSlot].optionalParam.dfpAdunitCode ===
-						event.slot.getName()
+						event.slot.getAdUnitPath()
 					) {
 						slot = w.adpushup.adpTags.adpSlots[adpSlot];
 					}
@@ -32,7 +32,6 @@ var config = require('./config'),
 					slot.optionalParam &&
 					slot.optionalParam.network !== config.PARTNERS.GENIEE
 				) {
-					logger.log('DFP ad slot rendered');
 					return cb(feedback(slot));
 				}
 			});
@@ -50,7 +49,10 @@ var config = require('./config'),
 			if (w.adpushup.adpTags.gptRefreshIntervals.length) {
 				w.adpushup.adpTags.gptRefreshIntervals.forEach(function(interval) {
 					var gptRefreshInterval = setInterval(function() {
-						googletag.pubads().refresh([interval.gSlot]);
+						var el = $('#' + interval.sectionId);
+						if (utils.isElementInViewport(el)) {
+							googletag.pubads().refresh([interval.gSlot]);
+						}
 					}, config.GPT_REFRESH_INTERVAL);
 					interval.id = gptRefreshInterval;
 				});

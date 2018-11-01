@@ -283,6 +283,13 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 			type: sectionActions.SCROLL_TO_VIEW,
 			adId
 		};
+	},
+	toggleLazyLoad = (sectionId, value) => {
+		return {
+			type: sectionActions.ENABLE_LAZYLOAD,
+			sectionId,
+			value
+		};
 	};
 
 export {
@@ -301,5 +308,6 @@ export {
 	scrollSectionIntoView,
 	updateSection,
 	updateType,
-	updateFormatData
+	updateFormatData,
+	toggleLazyLoad
 };

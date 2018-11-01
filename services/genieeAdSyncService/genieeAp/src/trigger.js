@@ -1,10 +1,13 @@
 var adp = window.adpushup,
 	$ = adp.$,
+	isMedianetHeaderCodePlaced = false,
 	config = require('../config/config'),
 	utils = require('../libs/utils'),
 	commonConsts = require('../config/commonConsts'),
 	placeAd = require('./adCreater').placeAd,
 	executeAdpTagsHeadCode = require('./adCodeGenerator').executeAdpTagsHeadCode,
+	generateMediaNetHeadCode = require('./adCodeGenerator').generateMediaNetHeadCode,
+	isAdContainerInView = require('../libs/lazyload'),
 	browserConfig = require('../libs/browserConfig'),
 	getContainer = function(ad) {
 		var defer = $.Deferred(),
@@ -58,10 +61,23 @@ var adp = window.adpushup,
 						if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
 							executeAdpTagsHeadCode([ad], {}); // This function expects an array of adpTags and optional adpKeyValues
 						}
-						// Send feedback call
-						utils.sendFeedback(feedbackData);
-						// Place the ad in the container
-						return placeAd(container, ad);
+						if (!isMedianetHeaderCodePlaced && ad.network === commonConsts.NETWORKS.MEDIANET) {
+							generateMediaNetHeadCode();
+							isMedianetHeaderCodePlaced = true;
+						}
+						if (ad.enableLazyLoading == true) {
+							isAdContainerInView(container).done(function() {
+								// Send feedback call
+								utils.sendFeedback(feedbackData);
+								// Place the ad in the container
+								return placeAd(container, ad);
+							});
+						} else {
+							// Send feedback call
+							utils.sendFeedback(feedbackData);
+							// Place the ad in the container
+							return placeAd(container, ad);
+						}
 					})
 					.fail(function(err) {
 						throw new Error(err);

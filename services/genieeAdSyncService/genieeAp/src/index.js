@@ -9,6 +9,7 @@ var w = window,
 	browserConfig = require('../libs/browserConfig'),
 	selectVariation = require('./variationSelectionModels/index'),
 	createAds = require('./adCreater').createAds,
+	// renderAd = require('./adCreater').renderAd,
 	heartBeat = require('../libs/heartBeat'),
 	ampInit = require('./ampInit'),
 	hookAndInit = require('./hooksAndBlockList'),
@@ -42,12 +43,10 @@ isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
 adp.config.isGeniee = isGenieeSite;
 
 function shouldWeNotProceed() {
-	var hasGenieeStarted = !!(
-		config.partner === 'geniee' &&
+	var hasGenieeStarted = !!(config.partner === 'geniee' &&
 		w.gnsmod &&
 		w.gnsmod.creationProcessStarted &&
-		!config.isAdPushupControlWithPartnerSSP
-	);
+		!config.isAdPushupControlWithPartnerSSP);
 
 	return config.disable || adp.creationProcessStarted || hasGenieeStarted;
 }
