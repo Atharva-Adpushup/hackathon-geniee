@@ -1,12 +1,8 @@
 var utils = require('../libs/utils'),
 	$ = require('jquery'),
 	config = window.adpushup.config,
-<<<<<<< HEAD
-	generateGenieeBodyTag = function (ad) {
-=======
 	consts = require('../config/commonConsts'),
 	generateGenieeBodyTag = function(ad) {
->>>>>>> 7da2ff064ef52e7a2ab140b9c1fd29e976d1c054
 		var adCode,
 			genieeRef = window.adpushup && window.adpushup.geniee,
 			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback,
@@ -49,12 +45,12 @@ var utils = require('../libs/utils'),
 		}
 		return adCode;
 	},
-	executeNoramlAdpTagsHeadCode = function (adpTagUnits, adpKeyValues) {
+	executeNoramlAdpTagsHeadCode = function(adpTagUnits, adpKeyValues) {
 		if (!adpTagUnits || !adpTagUnits.length) {
 			return false;
 		}
-		var doIt = function (adpTagUnits) {
-			return function () {
+		var doIt = function(adpTagUnits) {
+			return function() {
 				for (var i = 0; i < adpTagUnits.length; i++) {
 					var ad = adpTagUnits[i],
 						isNetworkData = !!ad.networkData,
@@ -96,7 +92,7 @@ var utils = require('../libs/utils'),
 		window.adpushup.adpTags.que.push(doIt(adpTagUnits));
 		return true;
 	},
-	executeAmpHeadCode = function () {
+	executeAmpHeadCode = function() {
 		var adCode = [];
 		adCode.push('<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">');
 		adCode.push(
@@ -105,13 +101,13 @@ var utils = require('../libs/utils'),
 		adCode.push('<scr' + 'ipt async src="https://cdn.ampproject.org/v0.js"></scr' + 'ipt>');
 		adCode.push(
 			'<scr' +
-			'ipt async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></scr' +
-			'ipt>'
+				'ipt async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></scr' +
+				'ipt>'
 		);
 		adCode.push(
 			'<scr' +
-			'ipt async custom-element="amp-sticky-ad" src="https://cdn.ampproject.org/v0/amp-sticky-ad-1.0.js"></scr' +
-			'ipt>'
+				'ipt async custom-element="amp-sticky-ad" src="https://cdn.ampproject.org/v0/amp-sticky-ad-1.0.js"></scr' +
+				'ipt>'
 		);
 		$el = null;
 		if ($('head').length) {
@@ -170,7 +166,7 @@ var utils = require('../libs/utils'),
 	};
 
 module.exports = {
-	generateAdCode: function (ad) {
+	generateAdCode: function(ad) {
 		var adCode = '';
 		if (!ad.networkData && ad.adCode) {
 			return utils.base64Decode(ad.adCode);
@@ -193,7 +189,7 @@ module.exports = {
 		}
 		return typeof adCode === 'string' ? adCode : adCode.join('\n');
 	},
-	generateGenieeHeaderCode: function (genieeIdCollection) {
+	generateGenieeHeaderCode: function(genieeIdCollection) {
 		if (!genieeIdCollection || !genieeIdCollection.length) {
 			return false;
 		}
@@ -224,7 +220,7 @@ module.exports = {
 		);
 		return adCode.join('\n');
 	},
-	executeAdpTagsHeadCode: function (adpTagUnits, adpKeyValues) {
+	executeAdpTagsHeadCode: function(adpTagUnits, adpKeyValues) {
 		if (config.serveAmpTagsForAdp) {
 			executeAmpHeadCode();
 		} else {
