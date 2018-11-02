@@ -9,7 +9,7 @@ var adp = window.adpushup,
 				expiryTime = new Date();
 			expiryTime.setTime(expiryTime.getTime() + expiry * 60 * 1000); // Set expiry time to 30 minutes from current time
 
-			var cookie = cookieName + '=' + cookieValue + '; expires=' + expiryTime.toUTCString();
+			var cookie = cookieName + '=' + cookieValue + '; expires=' + expiryTime.toUTCString() + '; path=/ ';
 			return (document.cookie = cookie);
 		},
 		getCookie: function(cookieName) {
