@@ -29,11 +29,15 @@ var utils = require('../helpers/utils'),
 
 			googletag.cmd.push(function() {
 				gptRefreshInterval = setInterval(function() {
-					refreshGPTSlot(slot.gSlot);
+					var el = $('#' + slot.sectionId);
+					if (utils.isElementInViewport(el)) {
+						refreshGPTSlot(slot.gSlot);
+					}
 				}, config.GPT_REFRESH_INTERVAL);
 				window.adpushup.adpTags.gptRefreshIntervals.push({
 					gSlot: slot.gSlot,
-					id: gptRefreshInterval
+					id: gptRefreshInterval,
+					sectionId: slot.sectionId
 				});
 			});
 		}

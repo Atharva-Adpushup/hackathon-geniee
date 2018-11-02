@@ -198,5 +198,12 @@ module.exports = {
 		} catch (e) {
 			return false;
 		}
+	},
+	isElementInViewport: function(el) {
+		const elementTop = $(el).offset().top,
+			elementBottom = elementTop + $(el).outerHeight(),
+			viewportTop = $(window).scrollTop(),
+			viewportBottom = viewportTop + $(window).height();
+		return elementBottom > viewportTop && elementTop < viewportBottom;
 	}
 };
