@@ -88,7 +88,7 @@ var utils = require('../helpers/utils'),
 		var urlParams = window.adpushup.utils.queryParams;
 
 		if (!Object.keys(urlParams).length) {
-			var utmSessionCookie = window.adpushup.session.getCookie(COOKIE.NAME);
+			var utmSessionCookie = window.adpushup.session.getCookie(config.UTM_SESSION_COOKIE);
 
 			if (utmSessionCookie) {
 				var utmSessionCookieValues = window.adpushup.utils.base64Decode(utmSessionCookie.split('_=')[1]);
