@@ -11,7 +11,16 @@ import MultipleAdSizeSelector from '../../outer/insertMenu/multipleAdSizeSelecto
 class AdpTags extends Component {
 	constructor(props) {
 		super(props);
-		const { fpKey, priceFloor, headerBidding, code, refreshSlot, overrideActive, overrideSizeTo } = props,
+		const {
+				fpKey,
+				priceFloor,
+				headerBidding,
+				code,
+				refreshSlot,
+				overrideActive,
+				overrideSizeTo,
+				disableSyncing
+			} = props,
 			// Geniee specific UI access feature 'dynamic allocation' property computation
 			isGenieeUIAccessDA = !!(window.isGeniee && window.gcfg && window.gcfg.hasOwnProperty('uud')),
 			isGenieeUIAccessDAActive = !!(isGenieeUIAccessDA && window.gcfg.uud),
@@ -34,6 +43,7 @@ class AdpTags extends Component {
 			multipleAdSizes: [],
 			dfpAdunitId: '',
 			refreshSlot,
+			disableSyncing: disableSyncing || false,
 			overrideActive,
 			overrideSizeTo,
 			pf: priceFloor,
@@ -53,6 +63,7 @@ class AdpTags extends Component {
 		this.filterKeyValues = this.filterKeyValues.bind(this);
 		this.generateCode = this.generateCode.bind(this);
 		this.renderDynamicAllocation = this.renderDynamicAllocation.bind(this);
+		this.renderDisableSyncingToggleSwitch = this.renderDisableSyncingToggleSwitch.bind(this);
 		this.renderAdvancedBlock = this.renderAdvancedBlock.bind(this);
 		this.renderHBOverride = this.renderHBOverride.bind(this);
 		this.renderSizeOverrideSelectBox = this.renderSizeOverrideSelectBox.bind(this);
@@ -84,7 +95,8 @@ class AdpTags extends Component {
 			overrideActive,
 			overrideSizeTo,
 			multipleAdSizes,
-			dfpAdunitId
+			dfpAdunitId,
+			disableSyncing
 		} = this.state;
 		this.props.submitHandler({
 			headerBidding: !!hbAcivated,
@@ -96,7 +108,8 @@ class AdpTags extends Component {
 			overrideActive,
 			overrideSizeTo: overrideActive ? overrideSizeTo : null,
 			multipleAdSizes,
-			dfpAdunitId
+			dfpAdunitId,
+			disableSyncing
 		});
 	}
 
@@ -225,11 +238,17 @@ class AdpTags extends Component {
 	}
 
 	handleDFPAdUnitIdChange(dfpAdunitId = '') {
-		const stateObject = {dfpAdunitId},
+		const stateObject = { dfpAdunitId },
 			props = this.props,
 			isDfpAdUnitObject = !!(props && props.dfpAdUnitObject && Object.keys(props.dfpAdUnitObject).length),
-			isDfpAdUnitId = !!(dfpAdunitId),
-			isAdUnitInObject = !!(isDfpAdUnitId && isDfpAdUnitObject && props.dfpAdUnitObject.hasOwnProperty(dfpAdunitId) && props.dfpAdUnitObject[dfpAdunitId] && props.dfpAdUnitObject[dfpAdunitId].multipleAdSizes);
+			isDfpAdUnitId = !!dfpAdunitId,
+			isAdUnitInObject = !!(
+				isDfpAdUnitId &&
+				isDfpAdUnitObject &&
+				props.dfpAdUnitObject.hasOwnProperty(dfpAdunitId) &&
+				props.dfpAdUnitObject[dfpAdunitId] &&
+				props.dfpAdUnitObject[dfpAdunitId].multipleAdSizes
+			);
 
 		if (isAdUnitInObject) {
 			stateObject.multipleAdSizes = props.dfpAdUnitObject[dfpAdunitId].multipleAdSizes.concat([]);
@@ -324,6 +343,33 @@ class AdpTags extends Component {
 						name={this.props.id ? `overrideSizeSwitch-${this.props.id}` : 'overrideSizeSwitch'}
 						id={this.props.id ? `js-override-size-switch-${this.props.id}` : 'js-override-size-switch'}
 						customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+					/>
+				</Col>
+			</Row>
+		);
+	}
+
+	renderDisableSyncingToggleSwitch() {
+		const { fromPanel, id } = this.props;
+
+		return (
+			<Row>
+				<Col xs={12} className={fromPanel ? 'u-padding-0px' : ''}>
+					<CustomToggleSwitch
+						labelText={'Disable Syncing'}
+						className="mB-10"
+						checked={this.state.disableSyncing}
+						onChange={val => {
+							this.setState({ disableSyncing: !!val });
+						}}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout={fromPanel ? false : true}
+						name={id ? `disableSyncingSwitch-${id}` : 'disableSyncingSwitch'}
+						id={id ? `js-disable-sync-switch-${id}` : 'js-disable-sync-switch'}
+						customComponentClass={fromPanel ? 'u-padding-0px' : ''}
 					/>
 				</Col>
 			</Row>
@@ -441,6 +487,7 @@ class AdpTags extends Component {
 					</div>
 				)}
 				{this.renderDynamicAllocation()}
+				{this.props.geniee ? null : this.renderDisableSyncingToggleSwitch()}
 				{this.props.geniee ? this.renderDFPAdUnitIdSelectBox() : null}
 				{this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null}
 				{!this.props.geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}

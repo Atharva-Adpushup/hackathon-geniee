@@ -9,6 +9,7 @@ var w = window,
 	browserConfig = require('../libs/browserConfig'),
 	selectVariation = require('./variationSelectionModels/index'),
 	createAds = require('./adCreater').createAds,
+	// renderAd = require('./adCreater').renderAd,
 	heartBeat = require('../libs/heartBeat'),
 	ampInit = require('./ampInit'),
 	hookAndInit = require('./hooksAndBlockList'),
@@ -47,12 +48,10 @@ isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
 adp.config.isGeniee = isGenieeSite;
 
 function shouldWeNotProceed() {
-	var hasGenieeStarted = !!(
-		config.partner === 'geniee' &&
+	var hasGenieeStarted = !!(config.partner === 'geniee' &&
 		w.gnsmod &&
 		w.gnsmod.creationProcessStarted &&
-		!config.isAdPushupControlWithPartnerSSP
-	);
+		!config.isAdPushupControlWithPartnerSSP);
 
 	return config.disable || adp.creationProcessStarted || hasGenieeStarted;
 }
@@ -90,14 +89,14 @@ function triggerControl(mode) {
 }
 
 function startCreation(forced) {
-	return new Promise(function(resolve) {
+	return new Promise(function (resolve) {
 		ampInit(adp.config);
 		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
 		if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
 			return resolve(false);
 		}
 
-		return selectVariation(config).then(function(variationData) {
+		return selectVariation(config).then(function (variationData) {
 			var selectedVariation = variationData.selectedVariation,
 				moduleConfig = variationData.config,
 				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
@@ -118,7 +117,7 @@ function startCreation(forced) {
 				if (interactiveAds) {
 					require.ensure(
 						['interactiveAds/index.js'],
-						function(require) {
+						function (require) {
 							require('interactiveAds/index')(interactiveAds);
 						},
 						'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
@@ -149,7 +148,7 @@ function initAdpQue() {
 	}
 
 	processQue();
-	adp.que.push = function(queFunc) {
+	adp.que.push = function (queFunc) {
 		[].push.call(w.adpushup.que, queFunc);
 		processQue();
 	};
@@ -168,7 +167,7 @@ function main() {
 		if (interactiveAds) {
 			require.ensure(
 				['interactiveAds/index.js'],
-				function(require) {
+				function (require) {
 					require('interactiveAds/index')(interactiveAds);
 				},
 				'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
@@ -211,7 +210,7 @@ function main() {
 	}
 
 	if (!config.pageGroup) {
-		pageGroupTimer = setTimeout(function() {
+		pageGroupTimer = setTimeout(function () {
 			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {

@@ -1,6 +1,7 @@
 var $ = require('jquery'),
 	nodewatcher = require('../libs/nodeWatcher'),
 	utils = require('../libs/utils'),
+	isAdContainerInView = require('../libs/lazyload'),
 	browserConfig = require('../libs/browserConfig'),
 	incontentAnalyser = __IN_CONTENT_ANALYSER_SCRIPT__,
 	adCodeGenerator = require('./adCodeGenerator'),
@@ -18,6 +19,7 @@ var $ = require('jquery'),
 			inContentAds = [],
 			adpTagUnits = [],
 			externalTriggerAds = [],
+			medianetAds = [],
 			genieeIds = [];
 		for (a = 0; a < ads.length; a++) {
 			ad = ads[a];
@@ -44,6 +46,9 @@ var $ = require('jquery'),
 			) {
 				structuredAds.push(ad);
 			}
+			if (ad.network === 'medianet' && ad.networkData.adCode) {
+				medianetAds.push(ad);
+			}
 		}
 
 		inContentAds.sort(function(next, prev) {
@@ -54,7 +59,8 @@ var $ = require('jquery'),
 			inContentAds: inContentAds,
 			genieeIds: genieeIds,
 			adpTagUnits: adpTagUnits,
-			externalTriggerAds: externalTriggerAds
+			externalTriggerAds: externalTriggerAds,
+			medianetAds: medianetAds
 		};
 	},
 	getContainer = function(ad, el) {
@@ -181,6 +187,13 @@ var $ = require('jquery'),
 				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIdCollection);
 				genieeHeadCode && $('head').append(genieeHeadCode);
 			},
+			handleContentSelectorFailure = function(inContentAds) {
+				feedbackData.contentSelectorMissing = true;
+				$.each(inContentAds, function(index, ad) {
+					//feedbackData.xpathMiss.push(ad.id);
+					next(ad, { success: false });
+				});
+			},
 			next = function(adObj, data) {
 				if (displayCounter) {
 					displayCounter--;
@@ -204,24 +217,28 @@ var $ = require('jquery'),
 					//utils.sendFeedback(feedbackData);
 				}
 			},
-			handleContentSelectorFailure = function(inContentAds) {
-				feedbackData.contentSelectorMissing = true;
-				$.each(inContentAds, function(index, ad) {
-					//feedbackData.xpathMiss.push(ad.id);
-					next(ad, { success: false });
-				});
-			},
 			placeStructuralAds = function(structuredAds) {
 				// Process strutural sections
+				//window.adpushup.lazyload.cb = next;
 				$.each(structuredAds, function(index, ad) {
 					getAdContainer(ad, config.xpathWaitTimeout)
 						.done(function(data) {
-							var isContainerElement = !!(data.container && data.container.length),
-								containerId = isContainerElement ? data.container.get(0).id : '';
+							if (ad.enableLazyLoading == true) {
+								isAdContainerInView(data.container).done(function() {
+									next(ad, data);
+								});
+							} else next(ad, data);
+
+							// var isContainerElement = !!(data.container && data.container.length),
+							// 	containerId = isContainerElement ? data.container.get(0).id : '';
 
 							// if all well then ad id of ad in feedback to tell system that impression was given
 							//feedbackData.ads.push(ad.id);
-							next(ad, data);
+							// if (utils.isElementInViewport(data.container, 10)) {
+							// 	next(ad, data);
+							// } else {
+							// 	window.adpushup.lazyload.ads.push({ ad: ad, data: data });
+							// }
 						})
 						.fail(function(data) {
 							//feedbackData.xpathMiss.push(ad.id);
@@ -280,6 +297,10 @@ var $ = require('jquery'),
 				adCodeGenerator.executeAdpTagsHeadCode(ads.adpTagUnits, variation.adpKeyValues);
 			}
 
+			if (ads.medianetAds.length) {
+				adCodeGenerator.generateMediaNetHeadCode();
+			}
+
 			// Process and place structural ads
 			placeStructuralAds(ads.structuredAds);
 
@@ -304,4 +325,5 @@ module.exports = {
 	createAds: createAds,
 	placeAd: placeAd,
 	executeAfterJS: executeAfterJS
+	// renderAd: next
 };

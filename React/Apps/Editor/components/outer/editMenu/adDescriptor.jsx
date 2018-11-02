@@ -51,25 +51,26 @@ class adDescriptor extends React.Component {
 
 	render() {
 		const {
-				ad,
-				updateCss,
-				updateAdCode,
-				section,
-				updateSettings,
-				showNotification,
-				onUpdateXPath,
-				onUpdateOperation,
-				onSectionAllXPaths,
-				onValidateXPath,
-				onResetErrors,
-				onRenameSection,
-				onSetSectionType,
-				onFormatDataUpdate,
-				ui,
-				variationId,
-				updateAdSize,
-				channelId
-			} = this.props,
+			ad,
+			updateCss,
+			updateAdCode,
+			section,
+			updateSettings,
+			showNotification,
+			onUpdateXPath,
+			onUpdateOperation,
+			onSectionAllXPaths,
+			onValidateXPath,
+			onResetErrors,
+			onRenameSection,
+			onSetSectionType,
+			onFormatDataUpdate,
+			ui,
+			variationId,
+			updateAdSize,
+			channelId,
+			onToggleLazyLoad
+		} = this.props,
 			adCode = ad.adCode,
 			number = 12;
 
@@ -120,21 +121,22 @@ class adDescriptor extends React.Component {
 						showNotification={showNotification}
 						updateAdSize={updateAdSize}
 						channelId={channelId}
+						onToggleLazyLoad={onToggleLazyLoad}
 					/>
 				</Row>
-				{this.state.showButton ? (
-					<Row className="butttonsRow">
-						<Col xs={number} className="mT-10">
-							<Button
-								className="btn-lightBg btn-cancel"
-								onClick={this.deleteSectionWithAd.bind(this)}
-								style={{ width: '100%' }}
-							>
-								Delete Ad
-							</Button>
-						</Col>
-					</Row>
-				) : null}
+				{this.state.showButton
+					? <Row className="butttonsRow">
+							<Col xs={number} className="mT-10">
+								<Button
+									className="btn-lightBg btn-cancel"
+									onClick={this.deleteSectionWithAd.bind(this)}
+									style={{ width: '100%' }}
+								>
+									Delete Ad
+								</Button>
+							</Col>
+						</Row>
+					: null}
 			</div>
 		);
 	}

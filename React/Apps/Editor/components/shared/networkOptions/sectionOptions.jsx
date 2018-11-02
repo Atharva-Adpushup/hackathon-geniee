@@ -12,11 +12,19 @@ function getUniqArrayItems(item, index, origArray) {
 }
 
 function getUniqItems(accumulator, item) {
-	const isValidItem = accumulator && item && Object.keys(item).length && !accumulator[item.dfpAdunit] && item.zoneId && item.dynamicAllocation && item.dfpAdunit && item.dfpAdunitCode;
-  
+	const isValidItem =
+		accumulator &&
+		item &&
+		Object.keys(item).length &&
+		!accumulator[item.dfpAdunit] &&
+		item.zoneId &&
+		item.dynamicAllocation &&
+		item.dfpAdunit &&
+		item.dfpAdunitCode;
+
 	isValidItem ? (accumulator[item.dfpAdunit] = Object.assign({}, item)) : null;
 	return accumulator;
-  }
+}
 
 class sectionOptions extends React.Component {
 	constructor(props) {
@@ -45,19 +53,14 @@ class sectionOptions extends React.Component {
 			zoneIdUniqArray: isZonesData
 				? props.zonesData.map(object => Number(object.zoneId)).filter(getUniqArrayItems)
 				: [],
-			dfpAdUnitObject: isZonesData
-				? props.zonesData.reduce(getUniqItems, {})
-				: {}
+			dfpAdUnitObject: isZonesData ? props.zonesData.reduce(getUniqItems, {}) : {}
 		};
 		const isValidZoneIdArray = !!(
 				this.state.zoneIdUniqArray &&
 				this.state.zoneIdUniqArray.length &&
 				this.state.zoneIdUniqArray[0]
 			),
-			isValidDFPAdUnitObject = !!(
-				this.state.dfpAdUnitObject &&
-				Object.keys(this.state.dfpAdUnitObject).length
-			);
+			isValidDFPAdUnitObject = !!(this.state.dfpAdUnitObject && Object.keys(this.state.dfpAdUnitObject).length);
 
 		if (!isValidZoneIdArray) {
 			this.state.zoneIdUniqArray = [];
