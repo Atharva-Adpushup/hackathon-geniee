@@ -83,6 +83,15 @@ var utils = require('../helpers/utils'),
 	setUTMWiseTargeting = function() {
 		var urlParams = window.adpushup.utils.queryParams;
 
+		if (!Object.keys(urlParams).length) {
+			var utmSessionCookie = window.adpushup.session.getCookie(COOKIE.NAME);
+
+			if (utmSessionCookie) {
+				var utmSessionCookieValues = window.adpushup.utils.base64Decode(utmSessionCookie.split('_=')[1]);
+				urlParams = utmSessionCookieValues ? JSON.parse(utmSessionCookieValues) : {};
+			}
+		}
+
 		Object.keys(config.UTM_WISE_TARGETING).forEach(function(key) {
 			var keyVal = config.UTM_WISE_TARGETING[key],
 				utmParam = urlParams[keyVal];

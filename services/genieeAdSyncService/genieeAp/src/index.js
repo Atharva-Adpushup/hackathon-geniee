@@ -29,7 +29,8 @@ $.extend(adp, {
 	tracker: new Tracker(),
 	nodewatcher: nodewatcher,
 	geniee: genieeObject,
-	triggerAd: triggerAd
+	triggerAd: triggerAd,
+	session: session
 });
 
 // Extend the settings with generated settings

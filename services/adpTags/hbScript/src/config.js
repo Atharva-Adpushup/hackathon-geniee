@@ -9,6 +9,7 @@ module.exports = {
 	PARTNERS: {
 		GENIEE: 'geniee'
 	},
+	UTM_SESSION_COOKIE: '_adp_utm_session_',
 	UTM_WISE_TARGETING: {
 		UTM_SOURCE: 'utm_source',
 		UTM_CAMPAIGN: 'utm_campaign',

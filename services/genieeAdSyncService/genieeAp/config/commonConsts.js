@@ -19,7 +19,7 @@ module.exports = {
 	},
 	AMP_PUBLISH_URL: '//autoamp.io/publishAmpJob',
 	COOKIE: {
-		NAME: 'adp_utm_session',
+		NAME: '_adp_utm_session_',
 		EXPIRY: 30
 	},
 	UTM_WISE_TARGETING: {

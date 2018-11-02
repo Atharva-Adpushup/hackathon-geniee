@@ -26,9 +26,6 @@ var adp = window.adpushup,
 
 			return cookieFound;
 		},
-		// function eraseCookie(name) {
-		// 	document.cookie = name+'=; Max-Age=-99999999;';
-		// }
 		getUTMParams: function() {
 			var queryParams = adp.utils.queryParams,
 				currentQueryParams = {};
@@ -50,10 +47,8 @@ var adp = window.adpushup,
 				expiry = commonConsts.COOKIE.EXPIRY; // 30 minutes
 
 			if (this.getUTMParams()) {
-				if (!this.getCookie(commonConsts.COOKIE.NAME)) {
-					var currentUTMParams = this.getUTMParams();
-					this.setCookie(cookieName, currentUTMParams, expiry);
-				}
+				var currentUTMParams = this.getUTMParams();
+				this.setCookie(cookieName, currentUTMParams, expiry);
 			}
 		}
 	};
