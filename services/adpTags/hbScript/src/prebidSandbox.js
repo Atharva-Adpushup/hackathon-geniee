@@ -1,6 +1,6 @@
 // Prebid sandboxing module
 
-var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
+var prebidAdTemplate = require('./prebidAdTemplate'),
 	adpRender = require('./adpRender'),
 	config = require('./config'),
 	find = require('lodash.find'),
@@ -37,7 +37,7 @@ var adRenderingTemplate = require('./config').PREBID_AD_TEMPLATE,
 				config.INVENTORY.hbConfig && config.INVENTORY.hbConfig.additionalOptions
 					? config.INVENTORY.hbConfig.additionalOptions.c1xSiteId
 					: null,
-			prebidHtml = adRenderingTemplate
+			prebidHtml = prebidAdTemplate
 				.replace('__AD_UNIT_CODE__', JSON.stringify(adUnitCodeForPrebid))
 				.replace('__ADP_BATCH_ID__', adpBatchId)
 				.replace('__PB_TIMEOUT__', config.PREBID_TIMEOUT)
