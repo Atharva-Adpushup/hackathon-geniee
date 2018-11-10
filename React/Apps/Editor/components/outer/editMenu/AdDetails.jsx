@@ -79,8 +79,8 @@ class AdDetails extends Component {
 		);
 	}
 
-	getStringifiedAdSize(object) {
-		const stringifiedSize = `${object.width} X ${object.height}`;
+	getStringifiedAdSize(array) {
+		const stringifiedSize = `${array[0]} X ${array[1]}`;
 
 		return stringifiedSize;
 	}
@@ -171,7 +171,6 @@ class AdDetails extends Component {
 			return null;
 		}
 		const collection = ad.multipleAdSizes,
-			collectionWithDefaultSize = collection.concat({ width: ad.width, height: ad.height }),
 			wellClasses = isFromPanel ? 'u-padding-t5px' : '';
 
 		return (
@@ -180,8 +179,8 @@ class AdDetails extends Component {
 				<Well className={wellClasses}>
 					<Row>
 						<Col xs={12} className="mB-10">
-							{collection.map((object, index) => {
-								const adSizeString = this.getStringifiedAdSize(object).replace(/ /g, ''),
+							{collection.map((array, index) => {
+								const adSizeString = this.getStringifiedAdSize(array).replace(/ /g, ''),
 									marginStyle = {
 										margin: '.5em .1em',
 										display: 'inline-block'
@@ -201,8 +200,8 @@ class AdDetails extends Component {
 									label="Change ad size"
 									onChange={this.handleSelectAdSizeChange}
 								>
-									{collectionWithDefaultSize.map((object, index) => {
-										const adSizeString = this.getStringifiedAdSize(object);
+									{collection.map((array, index) => {
+										const adSizeString = this.getStringifiedAdSize(array);
 
 										return (
 											<option key={index} value={adSizeString.replace(/ /g, '')}>

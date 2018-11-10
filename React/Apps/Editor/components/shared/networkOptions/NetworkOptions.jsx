@@ -160,6 +160,7 @@ class NetworkOptions extends Component {
 						fromPanel={props.fromPanel ? props.fromPanel : false}
 						id={props.id ? props.id : false}
 						showNotification={props.showNotification}
+						primaryAdSize={primaryAdSize}
 					/>
 				);
 				break;

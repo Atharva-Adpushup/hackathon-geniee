@@ -1,8 +1,8 @@
-var config = require('./config'),
+var adSizeConsts = require('../../../../helpers/adSizeMappingConsts'),
 	getMatchedAdSize = function(object) {
-		var adCollection = config.IAB_SIZES.ALL,
-			widthsWithMultipleAdSizes = config.IAB_SIZES.MULTIPLE_AD_SIZES_WIDTHS_MAPPING,
-			adsWithBackwardCompatibleSizesMapping = config.IAB_SIZES.BACKWARD_COMPATIBLE_MAPPING,
+		var adCollection = adSizeConsts.IAB_SIZES.ALL,
+			widthsWithMultipleAdSizes = adSizeConsts.IAB_SIZES.MULTIPLE_AD_SIZES_WIDTHS_MAPPING,
+			adsWithBackwardCompatibleSizesMapping = adSizeConsts.IAB_SIZES.BACKWARD_COMPATIBLE_MAPPING,
 			differenceObject = {},
 			adSizeWidth = object.width,
 			difference,
