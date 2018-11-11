@@ -55,7 +55,7 @@ module.exports = {
 		if (ad.networkData && Object.keys(ad.networkData).length) {
 			if (!ad.networkData.dfpAdunit && !ad.networkData.disableSyncing) {
 				const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
-					isResponsive = !!(ad.width === 'responsive' && ad.isResponsive),
+					isResponsive = !!(ad.width === 'responsive' && ad.networkData.isResponsive),
 					defaultAdData = {
 						adId: ad.id,
 						isResponsive: isResponsive,

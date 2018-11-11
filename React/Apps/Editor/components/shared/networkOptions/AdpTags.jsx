@@ -19,12 +19,19 @@ class AdpTags extends Component {
 				refreshSlot,
 				overrideActive,
 				overrideSizeTo,
-				disableSyncing
+				disableSyncing,
+				primaryAdSize
 			} = props,
 			// Geniee specific UI access feature 'dynamic allocation' property computation
 			isGenieeUIAccessDA = !!(window.isGeniee && window.gcfg && window.gcfg.hasOwnProperty('uud')),
 			isGenieeUIAccessDAActive = !!(isGenieeUIAccessDA && window.gcfg.uud),
-			isGenieeUIAccessDAInActive = !!(isGenieeUIAccessDA && !window.gcfg.uud);
+			isGenieeUIAccessDAInActive = !!(isGenieeUIAccessDA && !window.gcfg.uud),
+			isPrimaryAdSize = !!(primaryAdSize && primaryAdSize.width && primaryAdSize.height),
+			isResponsiveAdSize = !!(
+				isPrimaryAdSize &&
+				primaryAdSize.width === 'responsive' &&
+				primaryAdSize.height === 'responsive'
+			);
 
 		this.state = {
 			uiAccess: {
@@ -45,6 +52,7 @@ class AdpTags extends Component {
 			refreshSlot,
 			disableSyncing: disableSyncing || false,
 			isBackwardCompatibleSizes: true,
+			isResponsive: isResponsiveAdSize,
 			overrideActive,
 			overrideSizeTo,
 			pf: priceFloor,
@@ -100,7 +108,8 @@ class AdpTags extends Component {
 				multipleAdSizes,
 				dfpAdunitId,
 				disableSyncing,
-				isBackwardCompatibleSizes
+				isBackwardCompatibleSizes,
+				isResponsive
 			} = this.state,
 			shouldMultipleAdSizesBeComputed = !!(
 				isBackwardCompatibleSizes &&
@@ -129,7 +138,8 @@ class AdpTags extends Component {
 			// functionality in features (such as InContent sections) that cannot receive primary ad size
 			// value when mounted. Deletion of this property is recommended before saving
 			// other properties in database primarily as ad object network information.
-			isBackwardCompatibleSizes
+			isBackwardCompatibleSizes,
+			isResponsive
 		});
 	}
 
@@ -420,7 +430,9 @@ class AdpTags extends Component {
 	}
 
 	renderIsBackwardCompatibleSizesToggleSwitch() {
-		const { fromPanel, id } = this.props;
+		const { fromPanel, id } = this.props,
+			{ isResponsive } = this.state,
+			isDisabled = !!isResponsive;
 
 		return (
 			<Row>
@@ -430,6 +442,7 @@ class AdpTags extends Component {
 						className="mB-10"
 						checked={this.state.isBackwardCompatibleSizes}
 						onChange={this.handleIsBackCompatibleSizesChange}
+						disabled={isDisabled}
 						layout="horizontal"
 						size="m"
 						on="Yes"
