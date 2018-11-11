@@ -46,10 +46,7 @@ const _ = require('lodash'),
 			};
 
 			if (isMultipleAdSizes) {
-				adData.multipleAdSizes = ad.multipleAdSizes.map(object => [
-					Number(object.width),
-					Number(object.height)
-				]);
+				adData.multipleAdSizes = ad.multipleAdSizes.concat([]);
 			}
 
 			ADPTags.push(adData);
@@ -86,14 +83,14 @@ const _ = require('lodash'),
 				css: ad.css,
 				height: parseInt(ad.height, 10),
 				width: parseInt(ad.width, 10),
-				enableLazyLoading:section.enableLazyLoading
+				enableLazyLoading: section.enableLazyLoading
 			};
 
 			// Add 'multipleAdSizes' property if exists
 			const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
 
 			if (isMultipleAdSizes) {
-				json.multipleAdSizes = ad.multipleAdSizes.map(object => [Number(object.width), Number(object.height)]);
+				json.multipleAdSizes = ad.multipleAdSizes.concat([]);
 			}
 
 			if (section.isIncontent) {

@@ -167,12 +167,19 @@ var utils = require('../helpers/utils'),
 	enableGoogServicesForSlot = function(slot) {
 		var isGenieeNetwork = !!(slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE),
 			networkId = isGenieeNetwork ? config.GENIEE_NETWORK_ID : slot.activeDFPNetwork || config.NETWORK_ID,
-			isResponsive = slot.optionalParam.isResponsive;
+			isResponsive = slot.optionalParam.isResponsive,
+			multipleAdSizes = slot.optionalParam.multipleAdSizes,
+			isMultipleAdSize = !!(multipleAdSizes && multipleAdSizes.length);
 
 		if (isResponsive) {
 			size = responsiveAds.getAdSizes(slot.containerId);
 		} else {
-			size = slot.optionalParam.multipleAdSizes || slot.size;
+			// reverse() is added below as multiple ad size mapping originates from our common
+			// IAB backward ad size mapping for every ad and all ad sizes in this mapping are added in
+			// increasing order of their widths and probably DFP prioritizes ad sizes as per their
+			// added order in `size` argument. If DFP does prioritizes this, then we need to ensure that
+			// selected ad size is the first size present in `size` array.
+			size = isMultipleAdSize ? multipleAdSizes.concat([]).reverse() : slot.size;
 		}
 
 		slot.gSlot = googletag.defineSlot(

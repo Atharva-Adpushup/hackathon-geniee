@@ -74,9 +74,7 @@ var utils = require('../libs/utils'),
 						refreshSlot: networkData.refreshSlot,
 						overrideActive: networkData.overrideActive,
 						overrideSizeTo: networkData.overrideSizeTo,
-						multipleAdSizes: isMultipleAdSizes
-							? ad.multipleAdSizes.concat([defaultAdSizeArray])
-							: defaultAdSizeArray,
+						multipleAdSizes: isMultipleAdSizes ? ad.multipleAdSizes : null,
 						isResponsive: isResponsive
 					});
 				}
