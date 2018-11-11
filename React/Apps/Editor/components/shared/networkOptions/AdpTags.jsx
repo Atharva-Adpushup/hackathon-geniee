@@ -44,8 +44,6 @@ class AdpTags extends Component {
 			dfpAdunitId: '',
 			refreshSlot,
 			disableSyncing: disableSyncing || false,
-			// 'is' is added in front of below state property as this field need not to be saved
-			// in database and thus a boolean naming convention would suit it
 			isBackwardCompatibleSizes: true,
 			overrideActive,
 			overrideSizeTo,
@@ -126,7 +124,12 @@ class AdpTags extends Component {
 			overrideSizeTo: overrideActive ? overrideSizeTo : null,
 			multipleAdSizes: computedMultipleAdSizes,
 			dfpAdunitId,
-			disableSyncing
+			disableSyncing,
+			// NOTE: Below key is exported only because it is required to provide `Backward compatible size mapping`
+			// functionality in features (such as InContent sections) that cannot receive primary ad size
+			// value when mounted. Deletion of this property is recommended before saving
+			// other properties in database primarily as ad object network information.
+			isBackwardCompatibleSizes
 		});
 	}
 
