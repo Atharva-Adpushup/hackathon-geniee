@@ -4,10 +4,10 @@ import Select from 'react-select';
 
 import { sizeConfigOptions as options } from '../configs/commonConsts';
 
-function findSupportedSizes(name, data) {
+function findSizesSupported(name, data) {
   for(let i = 0; i < data.length; i++) {
     if(name === data[i].mediaQuery){
-      return data[i].supportedSizes;
+      return data[i].sizesSupported;
     }
   }
   return [];
@@ -19,7 +19,7 @@ export default class SettingsPanel extends React.Component {
 
     this.state = {
       device: '(min-width: 1200px)',
-      supportedSizes: [],
+      sizesSupported: [],
     }
 
     this.onValChange = this.onValChange.bind(this);
@@ -30,7 +30,7 @@ export default class SettingsPanel extends React.Component {
 
   validationCheckWrapper() {
 
-    const { device, supportedSizes } = this.state;
+    const { device, sizesSupported } = this.state;
     let label;
 
     switch(device) {
@@ -47,7 +47,7 @@ export default class SettingsPanel extends React.Component {
 
     this.props.validationCheck(JSON.stringify({
       mediaQuery: device,
-      supportedSizes: supportedSizes.map(size => size.label.split('x')),
+      sizesSupported: sizesSupported.map(size => size.label.split('x').map(str => +str)),
       labels: [label]
     }), "deviceConfig");
 
@@ -59,7 +59,7 @@ export default class SettingsPanel extends React.Component {
 
     this.setState({
       [e.target.name]: e.target.value,
-      supportedSizes: fetchedData.length > 0 ? findSupportedSizes(e.target.value, fetchedData).map(arr => ({
+      sizesSupported: fetchedData.length > 0 ? findSizesSupported(e.target.value, fetchedData).map(arr => ({
         value: arr.join(" "),
         label: arr.join("x"),
       })) : [],
@@ -67,8 +67,8 @@ export default class SettingsPanel extends React.Component {
 
   }
 
-  onNewSelect(supportedSizes) {
-    this.setState({ supportedSizes });
+  onNewSelect(sizesSupported) {
+    this.setState({ sizesSupported });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -77,7 +77,7 @@ export default class SettingsPanel extends React.Component {
 
     this.setState({
       device: fetchedData.length > 0 ? fetchedData[0].mediaQuery : "(min-width: 1200px)",
-      supportedSizes: fetchedData.length > 0 ? fetchedData[0].supportedSizes.map(arr => ({
+      sizesSupported: fetchedData.length > 0 ? fetchedData[0].sizesSupported.map(arr => ({
         value: arr.join(" "),
         label: arr.join("x"),
       })) : [],
@@ -87,7 +87,7 @@ export default class SettingsPanel extends React.Component {
 
   render() {
 
-    const { device, supportedSizes } = this.state;
+    const { device, sizesSupported } = this.state;
 
     return (
       <div>
@@ -100,11 +100,11 @@ export default class SettingsPanel extends React.Component {
         </Row>
         <Row>
           <Select
-            name="supportedSizes"
+            name="sizesSupported"
             onChange={this.onNewSelect}
             options={options}
             isMulti={true}
-            value={supportedSizes}
+            value={sizesSupported}
           />
         </Row>
         <Row>
