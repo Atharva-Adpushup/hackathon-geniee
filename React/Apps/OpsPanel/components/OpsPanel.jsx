@@ -142,9 +142,9 @@ class OpsPanel extends React.Component {
 		this.validateJSONConfig(config, configName);
 		if(!this.state.errorMessage) {
 			const parsedConfig = JSON.parse(config);
-			const sizeConfig = [...this.state.deviceConfig.sizeConfig.filter(
+			const sizeConfig = [parsedConfig, ...this.state.deviceConfig.sizeConfig.filter(
 				obj => !(obj.mediaQuery === parsedConfig.mediaQuery)
-			), parsedConfig];
+			)];
 			this.setState({deviceConfig: { sizeConfig }});
 			return true;
 		}

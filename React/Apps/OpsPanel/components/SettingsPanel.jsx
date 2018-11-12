@@ -79,7 +79,7 @@ export default class SettingsPanel extends React.Component {
     const { device, supportedSizes } = this.state;
     let label;
 
-    switch(this.state.device) {
+    switch(device) {
       case "(min-width: 1200px)":
         label = "display";
         break;
@@ -91,13 +91,11 @@ export default class SettingsPanel extends React.Component {
         break;
     }
 
-    const config = {
+    this.props.validationCheck(JSON.stringify({
       mediaQuery: device,
       supportedSizes: supportedSizes.map(size => size.label.split('x')),
       labels: [label]
-    }
-
-    this.props.validationCheck(JSON.stringify(config), "deviceConfig");
+    }), "deviceConfig");
 
   }
 
