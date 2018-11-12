@@ -42,8 +42,8 @@ var express = require('express'),
 		const { hbConfig, editMode, additionalOptions, deviceConfig } = payload,
 			json = {
 				hbConfig: { bidderAdUnits: hbConfig, additionalOptions },
-				deviceConfig: deviceConfig,
-				siteId: siteId,
+				deviceConfig,
+				siteId,
 				siteDomain: site.get('siteDomain'),
 				email: site.get('ownerEmail')
 			};
