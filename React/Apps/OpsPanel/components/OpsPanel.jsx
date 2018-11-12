@@ -57,8 +57,8 @@ class OpsPanel extends React.Component {
 					hbConfigString: JSON.stringify(res.data.hbConfig.bidderAdUnits, null, 4),
 					additionalOptions: res.data.hbConfig.additionalOptions,
 					loading: false,
-					deviceConfig: res.data.deviceConfig,
-					deviceConfigString: JSON.stringify(res.data.deviceConfig, null, 4),
+					deviceConfig: res.data.deviceConfig || this.state.deviceConfig,
+					deviceConfigString: JSON.stringify(res.data.deviceConfig || this.state.deviceConfig, null, 4),
 				});
 			})
 			.fail(res => {
@@ -188,7 +188,7 @@ class OpsPanel extends React.Component {
 										</Col>
 										<Col sm={6} >
 											<SettingsPanel
-											 	fetchedData={this.state.deviceConfig.sizeConfig}
+											 	fetchedData={state.deviceConfig.sizeConfig}
 												validationCheck={this.validateJSONConfigWrapper}
 											/>
 										</Col>
