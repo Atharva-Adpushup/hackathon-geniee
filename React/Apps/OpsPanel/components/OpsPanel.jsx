@@ -58,7 +58,7 @@ class OpsPanel extends React.Component {
 					additionalOptions: res.data.hbConfig.additionalOptions,
 					loading: false,
 					deviceConfig: res.data.deviceConfig || this.state.deviceConfig,
-					deviceConfigString: JSON.stringify(res.data.deviceConfig || this.state.deviceConfig, null, 4),
+					deviceConfigString: res.data.deviceConfig ? JSON.stringify(res.data.deviceConfig , null, 4) : this.state.deviceConfigString,
 				});
 			})
 			.fail(res => {
@@ -142,9 +142,11 @@ class OpsPanel extends React.Component {
 		this.validateJSONConfig(config, configName);
 		if(!this.state.errorMessage) {
 			const parsedConfig = JSON.parse(config);
-			const sizeConfig = [parsedConfig, ...this.state.deviceConfig.sizeConfig.filter(
+			const sizeConfig = parsedConfig.sizesSupported.length !== 0 ? [parsedConfig, ...this.state.deviceConfig.sizeConfig.filter(
 				obj => !(obj.mediaQuery === parsedConfig.mediaQuery)
-			)];
+			)] : this.state.deviceConfig.sizeConfig.filter(
+				obj => !(obj.mediaQuery === parsedConfig.mediaQuery)
+			);
 			this.setState({deviceConfig: { sizeConfig }});
 			return true;
 		}
@@ -188,7 +190,7 @@ class OpsPanel extends React.Component {
 										</Col>
 										<Col sm={6} >
 											<SettingsPanel
-											 	fetchedData={state.deviceConfig.sizeConfig}
+											 	fetchedData={this.state.deviceConfig.sizeConfig}
 												validationCheck={this.validateJSONConfigWrapper}
 											/>
 										</Col>
