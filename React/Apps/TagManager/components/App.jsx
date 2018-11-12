@@ -1,22 +1,7 @@
-import React, { Component } from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
-// import Home from './Home/index.jsx';
-import HomeContainer from '../containers/HomeContainer.js';
+import React from 'react';
+// import HomeContainer from '../containers/HomeContainer.js';
+import Home from './Home/index.jsx';
 
-class App extends Component {
-	constructor(props) {
-		super(props);
-	}
-
-	render() {
-		return (
-			<BrowserRouter>
-				<Switch>
-					<Route exact path="/tagManager/:siteId" component={HomeContainer} />
-				</Switch>
-			</BrowserRouter>
-		);
-	}
-}
+const App = props => <Home {...props} />;
 
 export default App;

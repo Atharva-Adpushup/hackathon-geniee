@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import { Nav, NavItem } from 'react-bootstrap';
 import ActionCard from '../../../../Components/ActionCard.jsx';
-import AdCodeGenerator from './AdCodeGenerator.jsx';
-import AdList from './AdList/index.jsx';
+import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';
+import AdListContainer from '../../containers/AdListContainer';
 import AdsTxtConfig from './AdsTxtConfig.jsx';
 import InitCode from './InitCode.jsx';
 class Home extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			activeNav: 1,
-			progress: 0
+			activeNav: 1
 		};
 		this.handleNavSelect = this.handleNavSelect.bind(this);
 		this.renderContent = this.renderContent.bind(this);
@@ -23,9 +22,9 @@ class Home extends Component {
 	renderContent() {
 		switch (this.state.activeNav) {
 			case 1:
-				return <AdCodeGenerator {...this.props} />;
+				return <AdCodeGeneratorContainer {...this.props} />;
 			case 2:
-				return <AdList {...this.props} />;
+				return <AdListContainer {...this.props} />;
 			case 3:
 				return <AdsTxtConfig {...this.props} />;
 			case 4:

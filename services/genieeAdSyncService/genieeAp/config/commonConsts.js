@@ -21,6 +21,11 @@ module.exports = {
 		ADPTAGS: 'adpTags',
 		MEDIANET: 'medianet'
 	},
-	ADPUSHUP_MEDIANET_ID: '8CUEJU9TP',
-	AMP_PUBLISH_URL: '//autoamp.io/publishAmpJob'
+	AMP_PUBLISH_URL: '//autoamp.io/publishAmpJob',
+	PLATFORMS: {
+		RESPONSIVE: 'RESPONSIVE',
+		DESKTOP: 'DESKTOP',
+		MOBILE: 'MOBILE'
+	},
+	ADPUSHUP_MEDIANET_ID: '8CUEJU9TP'
 };
