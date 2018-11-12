@@ -46,7 +46,8 @@ var adp = window.adpushup,
 					ads: [ad.id],
 					xpathMiss: [],
 					eventType: 1,
-					mode: 16,
+					// mode: 16,
+					mode: 1, // Sending Mode 1 in Manual Ads
 					referrer: config.referrer,
 					tracking: browserConfig.trackerSupported,
 					variationId: commonConsts.MANUAL_ADS.VARIATION
