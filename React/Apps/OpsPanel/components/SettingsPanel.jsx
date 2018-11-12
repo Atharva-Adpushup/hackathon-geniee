@@ -157,7 +157,7 @@ export default class SettingsPanel extends React.Component {
         </Row>
         <Row>
           <Col sm={4}>
-         <button className="btn btn-lightBg btn-default" onClick={() => this.validationCheckWrapper()}>
+         <button className="btn btn-lightBg btn-default" onClick={this.validationCheckWrapper}>
           Validate Device config
          </button>
           </Col>
