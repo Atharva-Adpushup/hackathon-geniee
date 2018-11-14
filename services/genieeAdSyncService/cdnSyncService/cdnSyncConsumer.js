@@ -146,6 +146,16 @@ module.exports = function(site, externalData = {}) {
 							) {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', serviceScript);
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', serviceScript);
+
+								let { deviceConfig } = serviceConfig.hbcf.value;
+								if (deviceConfig && deviceConfig.sizeConfig.length) {
+									deviceConfig = ',sizeConfig: ' + JSON.stringify(deviceConfig.sizeConfig);
+								} else {
+									deviceConfig = '';
+								}
+
+								jsFile = _.replace(jsFile, '__SIZE_CONFIG__', deviceConfig);
+								uncompressedJsFile = _.replace(uncompressedJsFile, '__SIZE_CONFIG__', deviceConfig);
 							} else {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', '');
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', '');

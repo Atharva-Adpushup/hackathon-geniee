@@ -28,8 +28,8 @@ var prebidAdTemplate =
 	'pbjs.que.push(function(){' +
 	'pbjs.setConfig({' +
 	'bidderSequence: "random",' +
-	'priceGranularity: "dense",' +
-	'sizeConfig: __SIZE_CONFIG__ ' +
+	'priceGranularity: "dense"' +
+	'__SIZE_CONFIG__' +
 	'});' +
 	'pbjs.addAdUnits(__AD_UNIT_CODE__);' +
 	'pbjs.bidderSettings = {' +
