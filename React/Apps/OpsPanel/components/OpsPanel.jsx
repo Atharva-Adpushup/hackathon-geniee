@@ -30,11 +30,11 @@ class OpsPanel extends React.Component {
 			hbConfig: DEFAULT_HB_CONFIG,
 			additionalOptions: {},
 			deviceConfig: {
-				sizeConfig: [],
+				sizeConfig: []
 			},
 			deviceConfigString: JSON.stringify({
-				sizeConfig: [],
-			}),
+				sizeConfig: []
+			})
 		};
 		this.fetchHbConfig = this.fetchHbConfig.bind(this);
 		this.saveConfigs = this.saveConfigs.bind(this);
@@ -58,7 +58,9 @@ class OpsPanel extends React.Component {
 					additionalOptions: res.data.hbConfig.additionalOptions,
 					loading: false,
 					deviceConfig: res.data.deviceConfig || this.state.deviceConfig,
-					deviceConfigString: res.data.deviceConfig ? JSON.stringify(res.data.deviceConfig , null, 4) : this.state.deviceConfigString,
+					deviceConfigString: res.data.deviceConfig
+						? JSON.stringify(res.data.deviceConfig, null, 4)
+						: this.state.deviceConfigString
 				});
 			})
 			.fail(res => {
@@ -91,7 +93,7 @@ class OpsPanel extends React.Component {
 			deviceConfig = state.deviceConfig,
 			payload = {
 				editMode: state.editMode,
-			 	hbConfig,
+				hbConfig,
 				deviceConfig,
 				additionalOptions: state.additionalOptions
 			};
@@ -140,14 +142,18 @@ class OpsPanel extends React.Component {
 
 	validateJSONConfigWrapper(config, configName) {
 		this.validateJSONConfig(config, configName);
-		if(!this.state.errorMessage) {
+		if (!this.state.errorMessage) {
 			const parsedConfig = JSON.parse(config);
-			const sizeConfig = parsedConfig.sizesSupported.length !== 0 ? [parsedConfig, ...this.state.deviceConfig.sizeConfig.filter(
-				obj => !(obj.mediaQuery === parsedConfig.mediaQuery)
-			)] : this.state.deviceConfig.sizeConfig.filter(
-				obj => !(obj.mediaQuery === parsedConfig.mediaQuery)
-			);
-			this.setState({deviceConfig: { sizeConfig }});
+			const sizeConfig =
+				parsedConfig.sizesSupported.length !== 0
+					? [
+							parsedConfig,
+							...this.state.deviceConfig.sizeConfig.filter(
+								obj => !(obj.mediaQuery === parsedConfig.mediaQuery)
+							)
+					  ]
+					: this.state.deviceConfig.sizeConfig.filter(obj => !(obj.mediaQuery === parsedConfig.mediaQuery));
+			this.setState({ deviceConfig: { sizeConfig } });
 			return true;
 		}
 		return false;
@@ -167,10 +173,6 @@ class OpsPanel extends React.Component {
 						{/* <h4>Header Bidding Config</h4> */}
 						<Row>
 							<Col sm={12}>
-								<p className="hb-settings-text">
-									This config will save information related to the partner parameters required in the
-									header bidding setup.
-								</p>
 								{state.loading ? <div className="error-message">Loading...</div> : ''}
 								<div className="hb-options-wrapper">
 									{/* <HbConfigCreator
@@ -182,15 +184,25 @@ class OpsPanel extends React.Component {
 									/> */}
 									<Row>
 										<Col sm={6}>
+											<p className="hb-settings-text">
+												This config will save information related to the partner parameters
+												required in the header bidding setup.
+											</p>
+											<hr />
 											<textarea
 												className="hb-config-input"
 												onChange={this.hbConfigChange}
 												value={state.hbConfigString}
 											/>
 										</Col>
-										<Col sm={6} >
+										<Col sm={6}>
+											<p className="hb-settings-text">
+												This config will save information related to loading of header bidding
+												ad units based on device type
+											</p>
+											<hr />
 											<SettingsPanel
-											 	fetchedData={this.state.deviceConfig.sizeConfig}
+												fetchedData={this.state.deviceConfig.sizeConfig}
 												validationCheck={this.validateJSONConfigWrapper}
 											/>
 										</Col>
@@ -210,8 +222,11 @@ class OpsPanel extends React.Component {
 								</div>
 							</Col>
 							<Col sm={4}>
-								<button className="btn btn-lightBg btn-default" onClick={() => this.validateJSONConfig(this.state.hbConfigString, "hbConfig")}>
-									Validate
+								<button
+									className="btn btn-lightBg btn-default"
+									onClick={() => this.validateJSONConfig(this.state.hbConfigString, 'hbConfig')}
+								>
+									Validate HB Config
 								</button>
 							</Col>
 							<Col sm={4}>
