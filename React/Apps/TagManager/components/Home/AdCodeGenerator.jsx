@@ -95,7 +95,8 @@ class AdCodeGenerator extends Component {
 							}
 						},
 						type: 3, // STRUCTURAL
-						css: {}
+						css: {},
+						isActive: true
 					}
 				})
 		);

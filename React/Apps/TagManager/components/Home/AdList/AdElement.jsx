@@ -136,6 +136,11 @@ class AdElement extends Component {
 								: `${ad.width}x${ad.height}`}
 						</strong>
 					</p>
+					{window.isSuperUser ? (
+						<p>
+							Status : <strong>{ad.isActive ? 'Active' : 'Archived'}</strong>
+						</p>
+					) : null}
 					<pre style={{ wordBreak: 'break-word' }}>{code}</pre>{' '}
 					{window.isSuperUser ? (
 						<div>

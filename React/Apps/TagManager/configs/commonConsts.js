@@ -163,7 +163,7 @@ const PLATFORMS = [
 	ampMessage = 'AMP adcode will be sent to your registered e-mail address by your account manager',
 	interactiveAdMessage =
 		'Ad has been created. AdPushup will automatically insert ad on your site on the runtime. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>',
-	adCode = `<div id="__AD_ID__">
+	adCode = `<div id="__AD_ID__" class="adp_tag">
 	<script>
 		var adpushup = adpushup || {};
 		adpushup.que = adpushup.que || [];

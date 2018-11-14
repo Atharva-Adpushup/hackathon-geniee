@@ -1,5 +1,14 @@
 // Header bidding initialisation module
 
+function shouldRunControl(config) {
+	/*
+		Prebid control should run if 
+			config is present
+			mode is not 1 and manualmode is disabled
+	*/
+	return !!(config && config.mode !== 1 && !config.manualModeActive);
+}
+
 function init(w, d) {
 	var control = require('./control');
 
@@ -9,7 +18,7 @@ function init(w, d) {
 	w.googletag = w.googletag || {};
 	googletag.cmd = googletag.cmd || [];
 
-	if (w.adpushup.config && w.adpushup.config.mode !== 1 && w.adpushup.config.mode !== 16) {
+	if (shouldRunControl(w.adpushup.config)) {
 		w.adpTags = w.adpTags || {};
 		w.adpTags.control = control.initControl('prebid');
 		control.initControlFeedback(w);
