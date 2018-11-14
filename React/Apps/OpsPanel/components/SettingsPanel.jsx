@@ -3,6 +3,7 @@ import { Row, Col } from 'react-bootstrap';
 import Select from 'react-select';
 
 import { sizeConfigOptions as options } from '../configs/commonConsts';
+import SelectBox from '../../../Components/SelectBox/index.jsx';
 
 function findSizesSupported(name, data) {
   for(let i = 0; i < data.length; i++) {
@@ -53,13 +54,13 @@ export default class SettingsPanel extends React.Component {
 
   }
 
-  onValChange(e) {
+  onValChange(val) {
 
     const { fetchedData } = this.props;
 
     this.setState({
-      [e.target.name]: e.target.value,
-      sizesSupported: fetchedData.length > 0 ? findSizesSupported(e.target.value, fetchedData).map(arr => ({
+      device: val,
+      sizesSupported: fetchedData.length > 0 ? findSizesSupported(val, fetchedData).map(arr => ({
         value: arr.join(" "),
         label: arr.join("x"),
       })) : [],
@@ -92,20 +93,28 @@ export default class SettingsPanel extends React.Component {
     return (
       <div>
         <Row>
-          <select name="device" value={device} onChange={this.onValChange} >
-            <option value={"(min-width: 1200px)"} >PC</option>
-            <option value={"(min-width: 768px) and (max-width: 1199px)"} >Tablet</option>
-            <option value={"(min-width: 0px) and (max-width: 767px)"} >Phone</option>
-          </select>
+          <Col sm={4}>
+            <SelectBox 
+              value={device} 
+              onChange={this.onValChange}
+              label="Choose Device"
+            >
+              <option value={"(min-width: 1200px)"} >PC</option>
+              <option value={"(min-width: 768px) and (max-width: 1199px)"} >Tablet</option>
+              <option value={"(min-width: 0px) and (max-width: 767px)"} >Phone</option>
+            </SelectBox>
+          </Col>
         </Row>
         <Row>
-          <Select
-            name="sizesSupported"
-            onChange={this.onNewSelect}
-            options={options}
-            isMulti={true}
-            value={sizesSupported}
-          />
+          <Col sm={12} >
+            <Select
+              name="sizesSupported"
+              onChange={this.onNewSelect}
+              options={options}
+              isMulti={true}
+              value={sizesSupported}
+            />
+          </Col>
         </Row>
         <Row>
           <Col sm={4}>
