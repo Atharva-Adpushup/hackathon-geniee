@@ -30,6 +30,7 @@ const commonConsts = {
 	SITE_DOMAIN: window.siteDomain,
 	PAGEGROUPS: window.pageGroups,
 	IS_SUPERUSER: window.isSuperUser,
+	IS_MANUAL: window.isManual,
 	DATA_LABELS: {
 		date: 'Date',
 		pageViews: 'Pageviews',

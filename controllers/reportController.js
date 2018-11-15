@@ -80,6 +80,7 @@ router
 
 				return res.render('adpushupReport', {
 					pageGroups,
+					isManual:site.get('isManual'),
 					siteId:
 						req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL
 							? siteId
