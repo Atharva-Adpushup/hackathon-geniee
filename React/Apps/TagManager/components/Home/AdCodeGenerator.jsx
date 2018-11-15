@@ -12,6 +12,8 @@ import {
 import { copyToClipBoard } from '../../lib/helpers';
 import { CustomMessage, CustomButton } from '../shared/index.jsx';
 import { adCode, adCodeVideo } from '../../configs/commonConsts';
+import Loader from '../../../../Components/Loader';
+
 class AdCodeGenerator extends Component {
 	constructor(props) {
 		super(props);
@@ -217,7 +219,7 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderLoadingScreen() {
-		return <div>Loading</div>;
+		return <Loader />;
 	}
 
 	renderMainContent() {
