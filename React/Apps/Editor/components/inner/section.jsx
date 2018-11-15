@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import _ from 'lodash';
 import AdBox from './adBox.jsx';
-import {adInsertOptions} from '../../consts/commonConsts';
+import { adInsertOptions } from '../../consts/commonConsts';
 
 class Section extends React.Component {
 	constructor(props) {
@@ -30,7 +30,11 @@ class Section extends React.Component {
 	componentWillReceiveProps(newProps) {
 		const isDifferentOperation = !!(this.props.operation !== newProps.operation);
 
-		if (this.props.xpath !== newProps.xpath || !_.isEqual(this.props.ads[0].css, newProps.ads[0].css) || isDifferentOperation) {
+		if (
+			this.props.xpath !== newProps.xpath ||
+			!_.isEqual(this.props.ads[0].css, newProps.ads[0].css) ||
+			isDifferentOperation
+		) {
 			this.unMountSection();
 			this.init(newProps);
 		}
@@ -43,8 +47,7 @@ class Section extends React.Component {
 	}
 
 	getMaxDimensions() {
-		const ads = this.props.ads,
-			d = { width: 0, height: 0 };
+		const ads = this.props.ads, d = { width: 0, height: 0 };
 		if (ads.length) {
 			let ad;
 			ad = _.max(
@@ -73,8 +76,7 @@ class Section extends React.Component {
 	}
 
 	injectSection(props) {
-		const { operation, xpath } = props,
-			$el = $('<div />');
+		const { operation, xpath } = props, $el = $('<div />');
 		if (operation === adInsertOptions.INSERT_BEFORE) {
 			$el.insertBefore($(xpath));
 		} else if (operation === adInsertOptions.INSERT_AFTER) {
@@ -109,16 +111,22 @@ class Section extends React.Component {
 		this.$node.css(css);
 		ReactDOM.render(
 			<div className="_ap_reject">
-				{props.ads.map(ad => (
-					<AdBox
-						key={ad.id}
-						ad={ad}
-						sectionName={props.sectionName}
-						partnerData={props.partnerData}
-						mode={props.mode}
-						clickHandler={props.onAdClick.bind(this, props.variationId, props.id)}
-					/>
-				))}
+				{props.ads.map(ad => {
+					if (ad.networkData && ad.networkData.isResponsive) {
+						ad.width = $(this.node).width() || 300;
+						ad.height = 300;
+					}
+					return (
+						<AdBox
+							key={ad.id}
+							ad={ad}
+							sectionName={props.sectionName}
+							partnerData={props.partnerData}
+							mode={props.mode}
+							clickHandler={props.onAdClick.bind(this, props.variationId, props.id)}
+						/>
+					);
+				})}
 			</div>,
 			this.node
 		);
