@@ -138,6 +138,12 @@ class AdElement extends Component {
 					</p>
 					{window.isSuperUser ? (
 						<p>
+							Network :{' '}
+							<strong>{ad.network && ad.networkData ? ad.network.toUpperCase() : 'Not Set'}</strong>
+						</p>
+					) : null}
+					{window.isSuperUser ? (
+						<p>
 							Status : <strong>{ad.isActive ? 'Active' : 'Archived'}</strong>
 						</p>
 					) : null}
@@ -176,6 +182,7 @@ class AdElement extends Component {
 				<Col xs={9} className="ad-details">
 					{this.renderAdDetails()}
 				</Col>
+				<div style={{ clear: 'both' }} />
 			</div>
 		);
 	}
