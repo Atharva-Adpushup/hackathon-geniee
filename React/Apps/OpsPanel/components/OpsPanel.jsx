@@ -97,9 +97,7 @@ class OpsPanel extends React.Component {
 			};
 
 		this.setState({ updateMessage: 'Saving...' });
-
-		console.log(deviceConfig);
-
+		
 		if (state.hbConfig) {
 			$.post(
 				`/user/site/${window.siteId}/opsPanel/hbConfig`,
