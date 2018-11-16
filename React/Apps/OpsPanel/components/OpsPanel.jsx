@@ -140,22 +140,18 @@ class OpsPanel extends React.Component {
 		}
 	}
 
-	validateJSONConfigWrapper(config, configName) {
-		this.validateJSONConfig(config, configName);
+	validateJSONConfigWrapper(configs, configName) {
+		this.validateJSONConfig(configs, configName);
+
 		if (!this.state.errorMessage) {
-			const parsedConfig = JSON.parse(config);
-			const sizeConfig =
-				parsedConfig.sizesSupported.length !== 0
-					? [
-							parsedConfig,
-							...this.state.deviceConfig.sizeConfig.filter(
-								obj => !(obj.mediaQuery === parsedConfig.mediaQuery)
-							)
-					  ]
-					: this.state.deviceConfig.sizeConfig.filter(obj => !(obj.mediaQuery === parsedConfig.mediaQuery));
-			this.setState({ deviceConfig: { sizeConfig } });
+			const parsedConfig = JSON.parse(configs);
+			this.setState({
+				deviceConfig: { sizeConfig: parsedConfig.sizeConfig.filter(data => data.sizesSupported.length > 0) }
+			});
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -173,6 +169,10 @@ class OpsPanel extends React.Component {
 						{/* <h4>Header Bidding Config</h4> */}
 						<Row>
 							<Col sm={12}>
+								<p className="hb-settings-text">
+									This config will save information related to the partner parameters required in the
+									header bidding setup.
+								</p>
 								{state.loading ? <div className="error-message">Loading...</div> : ''}
 								<div className="hb-options-wrapper">
 									{/* <HbConfigCreator
@@ -184,11 +184,6 @@ class OpsPanel extends React.Component {
 									/> */}
 									<Row>
 										<Col sm={6}>
-											<p className="hb-settings-text">
-												This config will save information related to the partner parameters
-												required in the header bidding setup.
-											</p>
-											<hr />
 											<textarea
 												className="hb-config-input"
 												onChange={this.hbConfigChange}
@@ -196,11 +191,6 @@ class OpsPanel extends React.Component {
 											/>
 										</Col>
 										<Col sm={6}>
-											<p className="hb-settings-text">
-												This config will save information related to loading of header bidding
-												ad units based on device type
-											</p>
-											<hr />
 											<SettingsPanel
 												fetchedData={this.state.deviceConfig.sizeConfig}
 												validationCheck={this.validateJSONConfigWrapper}
@@ -226,7 +216,7 @@ class OpsPanel extends React.Component {
 									className="btn btn-lightBg btn-default"
 									onClick={() => this.validateJSONConfig(this.state.hbConfigString, 'hbConfig')}
 								>
-									Validate HB Config
+									Validate
 								</button>
 							</Col>
 							<Col sm={4}>
