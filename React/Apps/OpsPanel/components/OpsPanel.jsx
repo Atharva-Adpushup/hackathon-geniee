@@ -97,7 +97,7 @@ class OpsPanel extends React.Component {
 			};
 
 		this.setState({ updateMessage: 'Saving...' });
-
+		
 		if (state.hbConfig) {
 			$.post(
 				`/user/site/${window.siteId}/opsPanel/hbConfig`,
@@ -138,19 +138,21 @@ class OpsPanel extends React.Component {
 		}
 	}
 
-	validateJSONConfigWrapper(config, configName) {
-		this.validateJSONConfig(config, configName);
+	validateJSONConfigWrapper(configs, configName) {
+
+		this.validateJSONConfig(configs, configName);
+
 		if(!this.state.errorMessage) {
-			const parsedConfig = JSON.parse(config);
-			const sizeConfig = parsedConfig.sizesSupported.length !== 0 ? [parsedConfig, ...this.state.deviceConfig.sizeConfig.filter(
-				obj => !(obj.mediaQuery === parsedConfig.mediaQuery)
-			)] : this.state.deviceConfig.sizeConfig.filter(
-				obj => !(obj.mediaQuery === parsedConfig.mediaQuery)
-			);
-			this.setState({deviceConfig: { sizeConfig }});
+
+			const parsedConfig = JSON.parse(configs);
+			this.setState({ deviceConfig: { sizeConfig: parsedConfig.sizeConfig.filter(data => data.sizesSupported.length > 0)}});
+
 			return true;
+			
 		}
+
 		return false;
+
 	}
 
 	render() {
