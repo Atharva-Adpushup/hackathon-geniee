@@ -102,20 +102,23 @@ class Section extends React.Component {
 		if (!this.node) {
 			return false;
 		}
+		console.log(props.ads);
+		let { networkData } = props.ads[0];
+		if (networkData && networkData.isResponsive) {
+			props.ads[0].width = $(this.node).width() || 300;
+			props.ads[0].height = 200;
+		}
 		const css = Object.assign(
 			{},
 			{ position: 'relative', clear: 'both', pointerEvents: 'none', width: '100%' },
 			{ height: this.getMaxDimensions().clientHeight, width: this.getMaxDimensions().clientWidth },
 			props.ads[0].css
 		);
+		console.log(css, props.ads);
 		this.$node.css(css);
 		ReactDOM.render(
 			<div className="_ap_reject">
 				{props.ads.map(ad => {
-					if (ad.networkData && ad.networkData.isResponsive) {
-						ad.width = $(this.node).width() || 300;
-						ad.height = 300;
-					}
 					return (
 						<AdBox
 							key={ad.id}
