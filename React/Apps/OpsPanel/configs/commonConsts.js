@@ -303,6 +303,11 @@ const siteMappingActions = {
 	    value: "300 1050",
 	    label: "300x1050",
 	  },
+	],
+	devicesList = [
+		"(min-width: 1200px)",
+		"(min-width: 768px) and (max-width: 1199px)",
+		"(min-width: 0px) and (max-width: 767px)"
 	];
 
 export {
@@ -311,6 +316,7 @@ export {
 	globalMetricChartsActions,
 	siteMapping,
 	liveSites,
+	devicesList,
 	sizeConfigOptions,
 	LINE_CHART_CONFIG,
 	PIE_CHART_CONFIG,

@@ -2,7 +2,7 @@ import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Select from 'react-select';
 
-import { sizeConfigOptions as options } from '../configs/commonConsts';
+import { sizeConfigOptions as options, devicesList } from '../configs/commonConsts';
 import SelectBox from '../../../Components/SelectBox/index.jsx';
 
 function findSizesSupported(name, data) {
@@ -14,13 +14,28 @@ function findSizesSupported(name, data) {
   return [];
 }
 
+function findLabel(device) {
+
+  switch(device) {
+    case "(min-width: 1200px)":
+      return "display";
+    case "(min-width: 768px) and (max-width: 1199px)":
+      return "tablet";
+    case "(min-width: 0px) and (max-width: 767px)":
+      return "phone";
+  }
+
+}
+
 export default class SettingsPanel extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       device: '(min-width: 1200px)',
-      sizesSupported: [],
+      '(min-width: 1200px)': [],
+      '(min-width: 768px) and (max-width: 1199px)': [],
+      '(min-width: 0px) and (max-width: 767px)': [],
     }
 
     this.onValChange = this.onValChange.bind(this);
@@ -31,64 +46,52 @@ export default class SettingsPanel extends React.Component {
 
   validationCheckWrapper() {
 
-    const { device, sizesSupported } = this.state;
-    let label;
+    const configs = [];
+    
+    devicesList.forEach(device => {
+      configs.push({ 
+        mediaQuery: device,
+        sizesSupported: this.state[device].map(size => size.label.split('x').map(str => +str)),
+        labels: [findLabel(device)],
+      });
+    });
 
-    switch(device) {
-      case "(min-width: 1200px)":
-        label = "display";
-        break;
-      case "(min-width: 768px) and (max-width: 1199px)":
-        label = "tablet";
-        break;
-      case "(min-width: 0px) and (max-width: 767px)":
-        label = "phone";
-        break;
-    }
-
-    this.props.validationCheck(JSON.stringify({
-      mediaQuery: device,
-      sizesSupported: sizesSupported.map(size => size.label.split('x').map(str => +str)),
-      labels: [label]
-    }), "deviceConfig");
+    this.props.validationCheck(JSON.stringify({sizeConfig: configs}), 'deviceConfig');
 
   }
 
-  onValChange(val) {
+  onValChange(device) {
 
-    const { fetchedData } = this.props;
-
-    this.setState({
-      device: val,
-      sizesSupported: fetchedData.length > 0 ? findSizesSupported(val, fetchedData).map(arr => ({
-        value: arr.join(" "),
-        label: arr.join("x"),
-      })) : [],
-    });
+    this.setState({ device });
 
   }
 
   onNewSelect(sizesSupported) {
-    this.setState({ sizesSupported });
+    this.setState({ [this.state.device]: sizesSupported });
   }
 
   componentWillReceiveProps(nextProps) {
 
     const { fetchedData } = nextProps;
 
+    const newDevice = fetchedData.length > 0 ? fetchedData[0].mediaQuery : "(min-width: 1200px)";
+
     this.setState({
-      device: fetchedData.length > 0 ? fetchedData[0].mediaQuery : "(min-width: 1200px)",
-      sizesSupported: fetchedData.length > 0 ? fetchedData[0].sizesSupported.map(arr => ({
+      device: newDevice
+    });
+
+    fetchedData.forEach(data => this.setState({
+      [data.mediaQuery]: data.sizesSupported.map(arr => ({
         value: arr.join(" "),
         label: arr.join("x"),
-      })) : [],
-    });
+      }))
+    }));
 
   }
 
   render() {
 
-    const { device, sizesSupported } = this.state;
+    const { device } = this.state;
 
     return (
       <div>
@@ -99,7 +102,7 @@ export default class SettingsPanel extends React.Component {
               onChange={this.onValChange}
               label="Choose Device"
             >
-              <option value={"(min-width: 1200px)"} >PC</option>
+              <option value={"(min-width: 1200px)"} >Desktop</option>
               <option value={"(min-width: 768px) and (max-width: 1199px)"} >Tablet</option>
               <option value={"(min-width: 0px) and (max-width: 767px)"} >Phone</option>
             </SelectBox>
@@ -112,7 +115,7 @@ export default class SettingsPanel extends React.Component {
               onChange={this.onNewSelect}
               options={options}
               isMulti={true}
-              value={sizesSupported}
+              value={this.state[device]}
             />
           </Col>
         </Row>
@@ -121,6 +124,11 @@ export default class SettingsPanel extends React.Component {
          <button className="btn btn-lightBg btn-default" onClick={this.validationCheckWrapper}>
           Validate Device config
          </button>
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={4} >
+            <p className="hb-settings-text" >labels: ['{findLabel(device)}']</p>
           </Col>
         </Row>
       </div>
