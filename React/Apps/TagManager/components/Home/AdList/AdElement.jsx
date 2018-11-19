@@ -51,9 +51,17 @@ class AdElement extends Component {
 			: ampMessage;
 	}
 
+	renderInformation(label, value) {
+		return (
+			<p>
+				{label}: <strong>{value}</strong>
+			</p>
+		);
+	}
+
 	renderAdDetails() {
-		const { ad, updateAd } = this.props,
-			isAMP = ad.formatData.type == 'amp' ? true : false;
+		const { ad, updateAd } = this.props;
+		const isAMP = ad.formatData.type == 'amp' ? true : false;
 
 		let code = isAMP ? this.getAMPAdCode(ad) : adCode;
 		code = code ? code.replace(/__AD_ID__/g, ad.id) : null;
@@ -98,9 +106,7 @@ class AdElement extends Component {
 		} else {
 			return (
 				<div key={'adDetails' + ad.id}>
-					<p>
-						Id: <strong>{ad.id}</strong>
-					</p>
+					{this.renderInformation('Id', ad.id)}
 					<p>
 						Name: <strong>{ad.name ? ad.name : `Ad-${ad.id}`}</strong>{' '}
 						{window.isSuperUser ? (
@@ -118,34 +124,25 @@ class AdElement extends Component {
 							</OverlayTrigger>
 						) : null}
 					</p>
-					<p>
-						Platform: <strong>{makeFirstLetterCapitalize(ad.formatData.platform)}</strong>
-					</p>
-					<p>
-						Type:{' '}
-						<strong>
-							{makeFirstLetterCapitalize(ad.formatData.type)}
-							{ad.formatData.placement ? ' ' + makeFirstLetterCapitalize(ad.formatData.placement) : ''}
-						</strong>
-					</p>
-					<p>
-						Size:{' '}
-						<strong>
-							{ad.width == 'responsive'
-								? makeFirstLetterCapitalize(ad.width)
-								: `${ad.width}x${ad.height}`}
-						</strong>
-					</p>
+					{this.renderInformation('Platform', makeFirstLetterCapitalize(ad.formatData.platform))}
+					{this.renderInformation(
+						'Type',
+						`${makeFirstLetterCapitalize(ad.formatData.type)} ${
+							ad.formatData.placement ? makeFirstLetterCapitalize(ad.formatData.placement) : ''
+						}`
+					)}
+					{this.renderInformation(
+						'Size',
+						ad.width === 'responsive' ? makeFirstLetterCapitalize(ad.width) : `${ad.width}x${ad.height}`
+					)}
 					{window.isSuperUser ? (
-						<p>
-							Network :{' '}
-							<strong>{ad.network && ad.networkData ? ad.network.toUpperCase() : 'Not Set'}</strong>
-						</p>
-					) : null}
-					{window.isSuperUser ? (
-						<p>
-							Status : <strong>{ad.isActive ? 'Active' : 'Archived'}</strong>
-						</p>
+						<div>
+							{this.renderInformation(
+								'Network',
+								ad.network && ad.networkData ? ad.network.toUpperCase() : 'Not Set'
+							)}
+							{this.renderInformation('Status', ad.isActive ? 'Active' : 'Archived')}
+						</div>
 					) : null}
 					<pre style={{ wordBreak: 'break-word' }}>{code}</pre>{' '}
 					{window.isSuperUser ? (

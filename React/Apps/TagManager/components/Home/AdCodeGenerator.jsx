@@ -33,7 +33,6 @@ class AdCodeGenerator extends Component {
 		this.renderTypeOptions = this.renderTypeOptions.bind(this);
 		this.renderSizes = this.renderSizes.bind(this);
 		this.renderMainContent = this.renderMainContent.bind(this);
-		this.renderLoadingScreen = this.renderLoadingScreen.bind(this);
 		this.renderGeneratedAdcode = this.renderGeneratedAdcode.bind(this);
 	}
 
@@ -218,10 +217,6 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
-	renderLoadingScreen() {
-		return <Loader />;
-	}
-
 	renderMainContent() {
 		return (
 			<div>
@@ -245,9 +240,7 @@ class AdCodeGenerator extends Component {
 	render() {
 		return (
 			<Row className="options-wrapper">
-				{this.state.loading && !this.props.codeGenerated
-					? this.renderLoadingScreen()
-					: this.renderMainContent()}
+				{this.state.loading && !this.props.codeGenerated ? <Loader /> : this.renderMainContent()}
 			</Row>
 		);
 	}
