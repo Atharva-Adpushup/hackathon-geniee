@@ -41,13 +41,9 @@ module.exports = {
 	sendFeedback: function(options) {
 		var adp = window.adpushup;
 
-		console.log('------ Mocking Feedback Call ------');
-		console.log('Feedback options', options);
-		console.log('------ Feedback Request Sent ------');
-
-		// return this.sendBeacon(adp.config.feedbackUrl, options, {
-		// 	method: 'image'
-		// });
+		return this.sendBeacon(adp.config.feedbackUrl, options, {
+			method: 'image'
+		});
 	},
 	getRandomNumberBetween: function(min, max) {
 		min = Math.ceil(min);
@@ -309,7 +305,7 @@ module.exports = {
 		}
 
 		if (config.manualModeActive && window.adpushup.config.manualAds.length) {
-			ads = window.adpushup.config.manualAds;
+			ads = ads.concat(window.adpushup.config.manualAds);
 		}
 
 		if (ads.length) {
