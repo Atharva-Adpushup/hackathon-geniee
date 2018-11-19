@@ -35,17 +35,9 @@ var adp = window.adpushup,
 					return ad.id == adId;
 				})[0],
 				isAdId = !!(ad && ad.id),
-				isAdElement = !!(isAdId && document.getElementById(ad.id).children.length === 1),
-				isResponsivePlatform = !!(
-					isAdElement && ad.formatData.platform.toUpperCase() === commonConsts.PLATFORMS.RESPONSIVE
-				),
-				// isMatchingPlatform = !!(
-				// 	isAdElement && adp.config.platform.toUpperCase() === ad.formatData.platform.toUpperCase()
-				// ),
-				// isValidAd = !!(isResponsivePlatform || isMatchingPlatform);
-				isValidAd = !!(isResponsivePlatform || ad.formatData.platform);
+				isAdElement = !!(isAdId && document.getElementById(ad.id).children.length === 1);
 
-			if (isValidAd) {
+			if (isAdElement) {
 				var feedbackData = {
 					ads: [ad.id],
 					xpathMiss: [],
