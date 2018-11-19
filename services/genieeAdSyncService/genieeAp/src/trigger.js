@@ -39,10 +39,11 @@ var adp = window.adpushup,
 				isResponsivePlatform = !!(
 					isAdElement && ad.formatData.platform.toUpperCase() === commonConsts.PLATFORMS.RESPONSIVE
 				),
-				isMatchingPlatform = !!(
-					isAdElement && adp.config.platform.toUpperCase() === ad.formatData.platform.toUpperCase()
-				),
-				isValidAd = !!(isResponsivePlatform || isMatchingPlatform);
+				// isMatchingPlatform = !!(
+				// 	isAdElement && adp.config.platform.toUpperCase() === ad.formatData.platform.toUpperCase()
+				// ),
+				// isValidAd = !!(isResponsivePlatform || isMatchingPlatform);
+				isValidAd = !!(isResponsivePlatform || ad.formatData.platform);
 
 			if (isValidAd) {
 				var feedbackData = {
