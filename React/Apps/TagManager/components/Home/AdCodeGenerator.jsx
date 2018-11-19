@@ -96,7 +96,10 @@ class AdCodeGenerator extends Component {
 							}
 						},
 						type: 3, // STRUCTURAL
-						css: {},
+						css: {
+							display: 'block',
+							margin: '10px auto'
+						},
 						isActive: true
 					}
 				})
