@@ -10,20 +10,19 @@ var adp = window.adpushup,
 	isAdContainerInView = require('../libs/lazyload'),
 	browserConfig = require('../libs/browserConfig'),
 	getContainer = function(ad) {
-		var defer = $.Deferred();
+		var defer = $.Deferred(),
+			isResponsive = !!(ad.networkData && ad.networkData.isResponsive),
+			computedStylesObject = isResponsive
+				? {}
+				: {
+						width: ad.width,
+						height: ad.height
+				  };
 
 		try {
 			var $adEl = $('#' + ad.id);
-			$adEl.css(
-				$.extend(
-					{
-						width: ad.width,
-						height: ad.height
-					},
-					ad.css
-				)
-			);
 
+			$adEl.css($.extend(computedStylesObject, ad.css));
 			return defer.resolve($adEl);
 		} catch (e) {
 			return defer.reject('Unable to get adpushup container');
@@ -34,19 +33,23 @@ var adp = window.adpushup,
 			var manualAds = adp.config.manualAds,
 				ad = manualAds.filter(function(ad) {
 					return ad.id == adId;
-				})[0];
+				})[0],
+				isAdId = !!(ad && ad.id),
+				isAdElement = !!(isAdId && document.getElementById(ad.id).children.length === 1),
+				isResponsivePlatform = !!(
+					isAdElement && ad.formatData.platform.toUpperCase() === commonConsts.PLATFORMS.RESPONSIVE
+				),
+				isMatchingPlatform = !!(
+					isAdElement && adp.config.platform.toUpperCase() === ad.formatData.platform.toUpperCase()
+				),
+				isValidAd = !!(isResponsivePlatform || isMatchingPlatform);
 
-			if (
-				ad &&
-				ad.id &&
-				adp.config.platform.toUpperCase() === ad.formatData.platform.toUpperCase() &&
-				document.getElementById(ad.id).children.length === 1
-			) {
+			if (isValidAd) {
 				var feedbackData = {
 					ads: [ad.id],
 					xpathMiss: [],
 					eventType: 1,
-					mode: 16,
+					mode: 1,
 					referrer: config.referrer,
 					tracking: browserConfig.trackerSupported,
 					variationId: commonConsts.MANUAL_ADS.VARIATION

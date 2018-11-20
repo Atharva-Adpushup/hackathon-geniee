@@ -1,56 +1,48 @@
 import React, { Component } from 'react';
 import AdElement from './AdElement.jsx';
 import { CustomButton, EmptyState } from '../../shared/index.jsx';
+import Loader from '../../../../../Components/Loader';
 
 class AdList extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			loaded: false,
-			hasAds: false,
-			ads: this.props.ads || []
-		};
-	}
-
 	componentDidMount() {
-		!this.state.loaded ? this.props.fetchAds({ siteId: this.props.match.params.siteId }) : null;
-	}
-
-	componentWillReceiveProps(nextProps) {
-		const hasAds = nextProps.ads && nextProps.ads.length ? true : false;
-		this.setState({ loaded: true, hasAds, ads: nextProps.ads });
+		this.props.loading ? this.props.fetchAds({ siteId: window.siteId }) : null;
 	}
 
 	render() {
-		const { ads } = this.state,
+		const { loading, ads, masterSave, updateAd } = this.props,
 			customStyle = window.isSuperUser ? { minHeight: '520px' } : { minHeight: '420px' };
 
+		if (loading) {
+			return (
+				<div style={{ height: '600px' }}>
+					<Loader />
+				</div>
+			);
+		} else if (!ads.length) {
+			return <EmptyState message="Seems kind of empty here" />;
+		}
 		return (
-			// set up empty ads list graphic
-			!this.state.loaded || !this.state.hasAds ? (
-				<EmptyState message="Seems kind of empty here" />
-			) : (
-				<ul className="section-list row" style={{ margin: '20px 0px' }}>
-					{window.isSuperUser ? (
-						<div>
-							<CustomButton
-								label="Master Save"
-								handler={this.props.masterSave.bind(null, this.props.match.params.siteId)}
-							/>
-							<div style={{ clear: 'both' }}>&nbsp;</div>
+			<ul className="section-list row" style={{ margin: '20px 0px' }}>
+				{window.isSuperUser ? (
+					<div>
+						<CustomButton
+							label="Master Save"
+							handler={masterSave.bind(null, window.siteId)}
+							classNames="mr-10"
+						/>
+						<div style={{ clear: 'both' }}>&nbsp;</div>
+					</div>
+				) : null}
+				{ads.map((ad, key) => {
+					return !ad.hasOwnProperty('isActive') || ad.isActive ? (
+						<div key={key} className="col-sm-6">
+							<li className="section-list-item" key={ad.id} style={customStyle}>
+								<AdElement ad={ad} updateAd={updateAd} />
+							</li>
 						</div>
-					) : null}
-					{ads.map((ad, key) => {
-						return !ad.hasOwnProperty('isActive') || ad.isActive ? (
-							<div key={key} className="col-sm-6">
-								<li className="section-list-item" key={ad.id} style={customStyle}>
-									<AdElement ad={ad} updateAd={this.props.updateAd} />
-								</li>
-							</div>
-						) : null;
-					})}
-				</ul>
-			)
+					) : null;
+				})}
+			</ul>
 		);
 	}
 }

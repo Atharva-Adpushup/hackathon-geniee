@@ -53,27 +53,29 @@ var utils = require('../libs/utils'),
 			return function() {
 				for (var i = 0; i < adpTagUnits.length; i++) {
 					var ad = adpTagUnits[i],
+						isNetworkData = !!ad.networkData,
+						networkData = isNetworkData && ad.networkData,
 						//Geniee specific variables
 						isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
-						defaultAdSizeArray = [Number(ad.width), Number(ad.height)],
-						isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
-						isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
-						computedDFPAdUnitId = isZoneContainerId
-							? ad.networkData.zoneContainerId
-							: ad.networkData.dfpAdunit;
+						isResponsive = !!(networkData && networkData.isResponsive),
+						adWidth = isResponsive ? ad.width : Number(ad.width),
+						adHeight = isResponsive ? ad.height : Number(ad.height),
+						defaultAdSizeArray = [adWidth, adHeight],
+						isGenieeNetwork = !!(ad.network === 'geniee' && networkData && networkData.zoneId),
+						isZoneContainerId = !!(isGenieeNetwork && networkData.zoneContainerId),
+						computedDFPAdUnitId = isZoneContainerId ? networkData.zoneContainerId : networkData.dfpAdunit;
 
 					window.adpushup.adpTags.defineSlot(computedDFPAdUnitId, defaultAdSizeArray, computedDFPAdUnitId, {
 						dfpAdunit: computedDFPAdUnitId,
-						dfpAdunitCode: ad.networkData.dfpAdunitCode,
-						headerBidding: ad.networkData.headerBidding,
-						keyValues: ad.networkData.keyValues,
+						dfpAdunitCode: networkData.dfpAdunitCode,
+						headerBidding: networkData.headerBidding,
+						keyValues: networkData.keyValues,
 						network: ad.network,
-						refreshSlot: ad.networkData.refreshSlot,
-						overrideActive: ad.networkData.overrideActive,
-						overrideSizeTo: ad.networkData.overrideSizeTo,
-						multipleAdSizes: isMultipleAdSizes
-							? ad.multipleAdSizes.concat([defaultAdSizeArray])
-							: defaultAdSizeArray
+						refreshSlot: networkData.refreshSlot,
+						overrideActive: networkData.overrideActive,
+						overrideSizeTo: networkData.overrideSizeTo,
+						multipleAdSizes: isMultipleAdSizes ? ad.multipleAdSizes : null,
+						isResponsive: isResponsive
 					});
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys

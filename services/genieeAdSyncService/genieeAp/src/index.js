@@ -160,7 +160,7 @@ function main() {
 
 	// Set mode in adp config in case of pure manual ads implementation
 	if (adp.config.manualModeActive) {
-		adp.config.mode = 16;
+		adp.config.mode = 1;
 		adp.creationProcessStarted = true;
 
 		var interactiveAds = utils.getInteractiveAds(adp.config);

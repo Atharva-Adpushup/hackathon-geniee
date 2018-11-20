@@ -20,6 +20,7 @@ const express = require('express'),
 
 const fn = {
 	sendDataToZapier: data => {
+		return Promise.resolve('Zapier Call Skipped');
 		let options = {
 			method: 'GET',
 			uri: 'https://hooks.zapier.com/hooks/catch/547126/frue51/?',
@@ -51,6 +52,41 @@ const fn = {
 			ad = {
 				...payload.ad,
 				id: id,
+				isActive: true,
+				createdOn: +new Date(),
+				formatData: {
+					...payload.ad.formatData,
+					eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
+				},
+				...networkInfo
+			};
+		_.forEach(data, (value, key) => {
+			options.uri += `${key}=${value}&`;
+		});
+		options.uri = options.uri.slice(0, -1);
+		return request(options)
+			.then(() => console.log('Ad Creation. Called made to Zapier'))
+			.catch(err => console.log('Ad creation call to Zapier failed'));
+	},
+	createNewDocAndDoProcessing: payload => {
+		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
+		return appBucket
+			.createDoc(`${docKeys.tagManager}${payload.siteId}`, tagManagerDefault, {})
+			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
+			.then(docWithCas => {
+				payload.siteDomain = docWithCas.value.siteDomain;
+				return fn.processing(tagManagerDefault, payload);
+			});
+	},
+	processing: (data, payload) => {
+		let cas = data.cas || false,
+			value = data.value || data,
+			id = uuid.v4(),
+			networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {},
+			ad = {
+				...payload.ad,
+				id: id,
+				name: `Ad-${id}`,
 				isActive: true,
 				createdOn: +new Date(),
 				formatData: {
