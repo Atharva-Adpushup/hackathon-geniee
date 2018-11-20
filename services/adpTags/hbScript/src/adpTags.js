@@ -124,12 +124,12 @@ var prebidSandbox = require('./prebidSandbox'),
 		currentBatchAdpSlots: [],
 		currentBatchId: null,
 		batchPrebiddingComplete: false,
-		// Function to define new adp slot
 		shouldRun: function(optionalParam) {
 			if (optionalParam && optionalParam.network == 'geniee') {
 				return false;
 			}
 		},
+		// Function to define new adp slot
 		defineSlot: function(containerId, size, placement, optionalParam) {
 			var optionalParam = optionalParam || {},
 				slot = createSlot(containerId, size, placement, optionalParam);
