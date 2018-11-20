@@ -172,7 +172,7 @@ var utils = require('../helpers/utils'),
 			isMultipleAdSize = !!(multipleAdSizes && multipleAdSizes.length);
 
 		if (isResponsive) {
-			size = responsiveAds.getAdSizes(slot.containerId);
+			size = responsiveAds.getAdSizes(slot.containerId).reverse();
 		} else {
 			// reverse() is added below as multiple ad size mapping originates from our common
 			// IAB backward ad size mapping for every ad and all ad sizes in this mapping are added in
