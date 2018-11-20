@@ -13,6 +13,7 @@ import {
 	removeOptionsIndex
 } from '../lib/helpers.js';
 import '../styles.scss';
+import SettingsPanel from './SettingsPanel.jsx';
 
 let temp = null;
 
@@ -27,14 +28,21 @@ class OpsPanel extends React.Component {
 			hbConfigString: JSON.stringify(DEFAULT_HB_CONFIG),
 			validated: false,
 			hbConfig: DEFAULT_HB_CONFIG,
-			additionalOptions: {}
+			additionalOptions: {},
+			deviceConfig: {
+				sizeConfig: [],
+			},
+			deviceConfigString: JSON.stringify({
+				sizeConfig: [],
+			}),
 		};
 		this.fetchHbConfig = this.fetchHbConfig.bind(this);
-		this.saveHbConfig = this.saveHbConfig.bind(this);
+		this.saveConfigs = this.saveConfigs.bind(this);
 		this.additionalOptionsUpdated = this.additionalOptionsUpdated.bind(this);
 		this.updateGlobalHbConfig = this.updateGlobalHbConfig.bind(this);
 		this.hbConfigChange = this.hbConfigChange.bind(this);
-		this.vaidateHbConfig = this.vaidateHbConfig.bind(this);
+		this.validateJSONConfig = this.validateJSONConfig.bind(this);
+		this.validateJSONConfigWrapper = this.validateJSONConfigWrapper.bind(this);
 	}
 
 	componentDidMount() {
@@ -48,7 +56,9 @@ class OpsPanel extends React.Component {
 					hbConfig: res.data.hbConfig.bidderAdUnits,
 					hbConfigString: JSON.stringify(res.data.hbConfig.bidderAdUnits, null, 4),
 					additionalOptions: res.data.hbConfig.additionalOptions,
-					loading: false
+					loading: false,
+					deviceConfig: res.data.deviceConfig || this.state.deviceConfig,
+					deviceConfigString: res.data.deviceConfig ? JSON.stringify(res.data.deviceConfig , null, 4) : this.state.deviceConfigString,
 				});
 			})
 			.fail(res => {
@@ -75,13 +85,19 @@ class OpsPanel extends React.Component {
 		this.setState({ additionalOptions });
 	}
 
-	saveHbConfig() {
+	saveConfigs() {
 		const { state } = this,
 			hbConfig = temp ? temp : state.hbConfig,
-			payload = { editMode: state.editMode, hbConfig, additionalOptions: state.additionalOptions };
+			deviceConfig = state.deviceConfig,
+			payload = {
+				editMode: state.editMode,
+			 	hbConfig,
+				deviceConfig,
+				additionalOptions: state.additionalOptions
+			};
 
 		this.setState({ updateMessage: 'Saving...' });
-
+		
 		if (state.hbConfig) {
 			$.post(
 				`/user/site/${window.siteId}/opsPanel/hbConfig`,
@@ -104,12 +120,12 @@ class OpsPanel extends React.Component {
 		this.setState({ hbConfigString: e.target.value });
 	}
 
-	vaidateHbConfig() {
+	validateJSONConfig(config, configName) {
 		try {
-			const hbConfig = JSON.parse(this.state.hbConfigString);
+			const parsedConfig = JSON.parse(config);
 			this.setState({
 				errorMessage: null,
-				hbConfig,
+				[configName]: parsedConfig,
 				validated: true,
 				updateMessage: 'JSON validation successfull!'
 			});
@@ -120,6 +136,23 @@ class OpsPanel extends React.Component {
 				updateMessage: ''
 			});
 		}
+	}
+
+	validateJSONConfigWrapper(configs, configName) {
+
+		this.validateJSONConfig(configs, configName);
+
+		if(!this.state.errorMessage) {
+
+			const parsedConfig = JSON.parse(configs);
+			this.setState({ deviceConfig: { sizeConfig: parsedConfig.sizeConfig.filter(data => data.sizesSupported.length > 0)}});
+
+			return true;
+			
+		}
+
+		return false;
+
 	}
 
 	render() {
@@ -157,6 +190,12 @@ class OpsPanel extends React.Component {
 												value={state.hbConfigString}
 											/>
 										</Col>
+										<Col sm={6} >
+											<SettingsPanel
+											 	fetchedData={this.state.deviceConfig.sizeConfig}
+												validationCheck={this.validateJSONConfigWrapper}
+											/>
+										</Col>
 									</Row>
 								</div>
 							</Col>
@@ -173,7 +212,7 @@ class OpsPanel extends React.Component {
 								</div>
 							</Col>
 							<Col sm={4}>
-								<button className="btn btn-lightBg btn-default" onClick={this.vaidateHbConfig}>
+								<button className="btn btn-lightBg btn-default" onClick={() => this.validateJSONConfig(this.state.hbConfigString, "hbConfig")}>
 									Validate
 								</button>
 							</Col>
@@ -181,7 +220,7 @@ class OpsPanel extends React.Component {
 								<button
 									disabled={state.errorMessage || !state.validated}
 									className="btn btn-lightBg btn-default"
-									onClick={this.saveHbConfig}
+									onClick={this.saveConfigs}
 								>
 									Save setup
 								</button>

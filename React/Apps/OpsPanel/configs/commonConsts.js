@@ -257,7 +257,58 @@ const siteMappingActions = {
 				data: []
 			}
 		]
-	};
+	},
+	sizeConfigOptions = [
+	  {
+	    value: "300 250",
+	    label: "300x250",
+	  },
+	  {
+	    value: "250 250",
+	    label: "250x250",
+	  },{
+	    value: "200 200",
+	    label: "200x200",
+	  },{
+	    value: "336 280",
+	    label: "336x280",
+	  },{
+	    value: "728 90",
+	    label: "728x90",
+	  },{
+	    value: "468 60",
+	    label: "468x60",
+	  },{
+	    value: "300 600",
+	    label: "300x600",
+	  },{
+	    value: "160 600",
+	    label: "160x600",
+	  },{
+	    value: "120 600",
+	    label: "120x600",
+	  },{
+	    value: "320 50",
+	    label: "320x50",
+	  },{
+	    value: "320 100",
+	    label: "320x100",
+	  },{
+	    value: "900 90",
+	    label: "900x90",
+	  },{
+	    value: "970 250",
+	    label: "970x250",
+	  },{
+	    value: "300 1050",
+	    label: "300x1050",
+	  },
+	],
+	devicesList = [
+		"(min-width: 1200px)",
+		"(min-width: 768px) and (max-width: 1199px)",
+		"(min-width: 0px) and (max-width: 767px)"
+	];
 
 export {
 	siteMappingActions,
@@ -265,6 +316,8 @@ export {
 	globalMetricChartsActions,
 	siteMapping,
 	liveSites,
+	devicesList,
+	sizeConfigOptions,
 	LINE_CHART_CONFIG,
 	PIE_CHART_CONFIG,
 	DEFAULT_HB_CONFIG

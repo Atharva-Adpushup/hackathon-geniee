@@ -39,10 +39,11 @@ var express = require('express'),
 			});
 	},
 	updateHbConfig = (siteId, site, payload, appBucket) => {
-		const { hbConfig, editMode, additionalOptions } = payload,
+		const { hbConfig, editMode, additionalOptions, deviceConfig } = payload,
 			json = {
 				hbConfig: { bidderAdUnits: hbConfig, additionalOptions },
-				siteId: siteId,
+				deviceConfig,
+				siteId,
 				siteDomain: site.get('siteDomain'),
 				email: site.get('ownerEmail')
 			};
