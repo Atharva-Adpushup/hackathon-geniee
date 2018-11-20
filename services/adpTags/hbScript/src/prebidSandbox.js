@@ -15,7 +15,9 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 				return true;
 			}
 
-			var size = adpSlot.size;
+			var size = adpSlot.size,
+				computedSizes = adpSlot.computedSizes,
+				prebidSizes = computedSizes ? computedSizes : [size];
 			if (adpSlot.optionalParam.overrideActive && adpSlot.optionalParam.overrideSizeTo) {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
@@ -24,7 +26,7 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 				code: adpSlot.containerId,
 				mediaTypes: {
 					banner: {
-						sizes: [[size]]
+						sizes: prebidSizes
 					}
 				},
 				bids: adpSlot.bidders
