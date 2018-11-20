@@ -22,7 +22,11 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 
 			adUnitCodeForPrebid.push({
 				code: adpSlot.containerId,
-				sizes: [size],
+				mediaTypes: {
+					banner: {
+						sizes: [[size]]
+					}
+				},
 				bids: adpSlot.bidders
 			});
 		});
