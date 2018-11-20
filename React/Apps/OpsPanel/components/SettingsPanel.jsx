@@ -17,7 +17,7 @@ function findSizesSupported(name, data) {
 function findLabel(device) {
 	switch (device) {
 		case '(min-width: 1200px)':
-			return 'display';
+			return 'desktop';
 		case '(min-width: 768px) and (max-width: 1199px)':
 			return 'tablet';
 		case '(min-width: 0px) and (max-width: 767px)':
@@ -89,7 +89,7 @@ export default class SettingsPanel extends React.Component {
 			<div>
 				<Row>
 					<Col sm={4}>
-						<SelectBox value={device} onChange={this.onValChange} label="Choose Device">
+						<SelectBox value={device} onChange={this.onValChange} label="Select Device">
 							<option value={'(min-width: 1200px)'}>Desktop</option>
 							<option value={'(min-width: 768px) and (max-width: 1199px)'}>Tablet</option>
 							<option value={'(min-width: 0px) and (max-width: 767px)'}>Phone</option>
@@ -100,6 +100,7 @@ export default class SettingsPanel extends React.Component {
 					<Col sm={12}>
 						<Select
 							name="sizesSupported"
+							placeholder="Select supported sizes"
 							onChange={this.onNewSelect}
 							options={options}
 							isMulti={true}
@@ -109,14 +110,20 @@ export default class SettingsPanel extends React.Component {
 				</Row>
 				<Row>
 					<Col sm={4}>
-						<button className="btn btn-lightBg btn-default" onClick={this.validationCheckWrapper}>
+						<button
+							className="btn btn-lightBg btn-default"
+							style={{ marginTop: 5 }}
+							onClick={this.validationCheckWrapper}
+						>
 							Validate Device config
 						</button>
 					</Col>
 				</Row>
 				<Row>
-					<Col sm={4}>
-						<p className="hb-settings-text">labels: ['{findLabel(device)}']</p>
+					<Col sm={6}>
+						<p className="hb-settings-text" style={{ marginTop: 5 }}>
+							<span className="text-well">labelAny: ["{findLabel(device)}"]</span>
+						</p>
 					</Col>
 				</Row>
 			</div>

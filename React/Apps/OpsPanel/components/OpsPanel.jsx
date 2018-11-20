@@ -216,7 +216,7 @@ class OpsPanel extends React.Component {
 									className="btn btn-lightBg btn-default"
 									onClick={() => this.validateJSONConfig(this.state.hbConfigString, 'hbConfig')}
 								>
-									Validate
+									Validate HB Config
 								</button>
 							</Col>
 							<Col sm={4}>
