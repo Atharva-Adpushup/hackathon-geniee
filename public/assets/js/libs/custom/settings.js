@@ -103,7 +103,9 @@ $(document).ready(function() {
 				} else {
 					var activeDFPNetwork = this.parseFormData(formValues, 'other').activeDFPNetwork,
 						autoOpt = this.parseFormData(formValues, 'other').autoOptimise ? true : false,
-						activeDFPNetwork = activeDFPNetwork ? activeDFPNetwork : '',
+						dfpInfo = activeDFPNetwork ? activeDFPNetwork.split('-') : [],
+						activeDFPNetwork = dfpInfo.length ? dfpInfo[0] : '',
+						activeDFPParentId = dfpInfo.length ? dfpInfo[1] : '',
 						pageGroupPattern = JSON.stringify(parsedPageGroups),
 						otherSettings = JSON.stringify(this.parseFormData(formValues, 'other')),
 						gdprCompliance = this.parseFormData(formValues, 'other').gdprCompliance ? true : false,
@@ -119,6 +121,7 @@ $(document).ready(function() {
 							otherSettings: otherSettings,
 							autoOptimise: autoOpt,
 							activeDFPNetwork: activeDFPNetwork,
+							activeDFPParentId: activeDFPParentId,
 							gdprCompliance: gdprCompliance,
 							cookieControlConfig: cookieControlConfig,
 							blocklist: JSON.stringify(w.blocklist)
