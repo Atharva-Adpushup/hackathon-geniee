@@ -393,6 +393,7 @@ function apiModule() {
 						: commonConsts.apConfigDefaults.adpushupPercentage,
 					autoOptimise: json.settings.autoOptimise === 'false' ? false : true,
 					activeDFPNetwork: json.settings.activeDFPNetwork ? json.settings.activeDFPNetwork : '',
+					activeDFPParentId: json.settings.activeDFPParentId ? json.settings.activeDFPParentId : '',
 					blocklist: blocklist.length ? blocklist : '',
 					isAdPushupControlWithPartnerSSP: !!site.get('apConfigs').isAdPushupControlWithPartnerSSP
 						? site.get('apConfigs').isAdPushupControlWithPartnerSSP
