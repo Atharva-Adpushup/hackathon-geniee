@@ -12,6 +12,7 @@ var path = require('path'),
 	CC = require('../../../configs/commonConsts'),
 	generateADPTagsConfig = require('./generateADPTagsConfig'),
 	generateAdPushupConfig = require('./generateAdPushupConfig'),
+	{ getHbAdsApTag } = require('./generateAPTagConfig'),
 	siteModel = require('../../../models/siteModel'),
 	couchbase = require('../../../helpers/couchBaseService'),
 	config = require('../../../configs/config');
@@ -211,6 +212,7 @@ module.exports = function(site, externalData = {}) {
 			getAdpTagsScript,
 			getHbConfig,
 			getPrebidScript,
+			getHbAdsApTag(site.get('siteId'), site.get('isManual')),
 			function(
 				finalConfig,
 				jsFile,
@@ -219,7 +221,8 @@ module.exports = function(site, externalData = {}) {
 				incontentAnalyserScript,
 				adpTagsScript,
 				hbcf,
-				prebidScript
+				prebidScript,
+				hbAdsApTag
 			) {
 				let { apConfigs, adpTagsConfig } = finalConfig,
 					gdpr = site.get('gdpr'),
@@ -235,7 +238,7 @@ module.exports = function(site, externalData = {}) {
 				var scripts = generateFinalInitScript(jsFile, uncompressedJsFile)
 					.addService(CC.SERVICES.INCONTENT_ANALYSER, incontentAds, incontentAnalyserScript)
 					.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsScript)
-					.addService(CC.SERVICES.HEADER_BIDDING, { hbcf, hbAds }, prebidScript)
+					.addService(CC.SERVICES.HEADER_BIDDING, { hbcf, hbAds: hbAds.concat(hbAdsApTag) }, prebidScript)
 					.addService(CC.SERVICES.GDPR, gdpr)
 					.done();
 
