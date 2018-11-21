@@ -59,7 +59,7 @@ html(lang="en")
                             script(type='text/javascript').
                                 var currentUser = !{JSON.stringify(currentUser)};
                                 var sites = (Object.keys(currentUser).length > 0) ? currentUser.sites : [];
-                                var siteInfo = "", segmentAppId = !{JSON.stringify(consts.analytics["SEGMENT_APP_ID"])};
+                                var siteInfo = "", segmentAppId = !{JSON.stringify(consts.analytics["SEGMENT_APP_ID"])}, analytics = {};
 
                                 window.adpushup.user.sites = sites;
                                 //Segment Analytics Starts
