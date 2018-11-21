@@ -169,10 +169,12 @@ var utils = require('../helpers/utils'),
 			networkId = isGenieeNetwork ? config.GENIEE_NETWORK_ID : slot.activeDFPNetwork || config.NETWORK_ID,
 			isResponsive = slot.optionalParam.isResponsive,
 			multipleAdSizes = slot.optionalParam.multipleAdSizes,
-			isMultipleAdSize = !!(multipleAdSizes && multipleAdSizes.length);
+			isMultipleAdSize = !!(multipleAdSizes && multipleAdSizes.length),
+			responsiveAdsData;
 
 		if (isResponsive) {
-			size = responsiveAds.getAdSizes(slot.containerId).reverse();
+			responsiveAdsData = responsiveAds.getAdSizes(slot.containerId);
+			size = responsiveAdsData.collection.concat([]).reverse();
 		} else {
 			// reverse() is added below as multiple ad size mapping originates from our common
 			// IAB backward ad size mapping for every ad and all ad sizes in this mapping are added in
