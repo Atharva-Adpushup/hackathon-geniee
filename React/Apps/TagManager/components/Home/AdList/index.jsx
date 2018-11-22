@@ -34,7 +34,7 @@ class AdList extends Component {
 					</div>
 				) : null}
 				{ads.map((ad, key) => {
-					return !ad.hasOwnProperty('isActive') || ad.isActive ? (
+					return !ad.hasOwnProperty('isActive') || ad.isActive || window.isSuperUser ? (
 						<div key={key} className="col-sm-6">
 							<li className="section-list-item" key={ad.id} style={customStyle}>
 								<AdElement ad={ad} updateAd={updateAd} />

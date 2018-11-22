@@ -35,21 +35,15 @@ var adp = window.adpushup,
 					return ad.id == adId;
 				})[0],
 				isAdId = !!(ad && ad.id),
-				isAdElement = !!(isAdId && document.getElementById(ad.id).children.length === 1),
-				isResponsivePlatform = !!(
-					isAdElement && ad.formatData.platform.toUpperCase() === commonConsts.PLATFORMS.RESPONSIVE
-				),
-				isMatchingPlatform = !!(
-					isAdElement && adp.config.platform.toUpperCase() === ad.formatData.platform.toUpperCase()
-				),
-				isValidAd = !!(isResponsivePlatform || isMatchingPlatform);
+				isAdElement = !!(isAdId && document.getElementById(ad.id).children.length === 1);
 
-			if (isValidAd) {
+			if (isAdElement) {
 				var feedbackData = {
 					ads: [ad.id],
 					xpathMiss: [],
 					eventType: 1,
-					mode: 1,
+					// mode: 16,
+					mode: 1, // Sending Mode 1 in Manual Ads
 					referrer: config.referrer,
 					tracking: browserConfig.trackerSupported,
 					variationId: commonConsts.MANUAL_ADS.VARIATION
