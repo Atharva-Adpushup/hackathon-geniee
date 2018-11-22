@@ -31,17 +31,17 @@ adpushupAnalyticsEvents.on('analyticsTrack', analyticsTrack);
 adpushupAnalyticsEvents.on('analyticsPage', analyticsPage);
 
 function analyticsAlias(data) {
-	analytics.alias(data.email);
+	// analytics.alias(data.email);
 }
 
 function analyticsIdentify(data) {
-	analytics.identify(data.email, data.analytics);
+	// analytics.identify(data.email, data.analytics);
 }
 
 function analyticsTrack(data) {
-	analytics.track(data.eventName, data.obj);
+	// analytics.track(data.eventName, data.obj);
 }
 
 function analyticsPage(data) {
-	analytics.page(data.pageName);
+	// analytics.page(data.pageName);
 }
