@@ -36,6 +36,10 @@ html(lang="en")
                     - excludeBaseLibs = excludeBaseLibs || false;
                     - excludeAnalytics = excludeAnalytics || false;
 
+                    // Google Tag Manager
+                    script.
+                        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-NMS9P3Q');
+
                     if !excludeJquery
                         if environment == "production"
                             script(type='text/javascript', src='//code.jquery.com/jquery-1.11.2.min.js')
@@ -60,44 +64,13 @@ html(lang="en")
                                 var currentUser = !{JSON.stringify(currentUser)};
                                 var sites = (Object.keys(currentUser).length > 0) ? currentUser.sites : [];
                                 var siteInfo = "", segmentAppId = !{JSON.stringify(consts.analytics["SEGMENT_APP_ID"])};
+                                var analytics = {};
 
                                 window.adpushup.user.sites = sites;
-                                //Segment Analytics Starts
-                                !function () {
-                                    var analytics = window.analytics = window.analytics || [];
-                                    if (!analytics.initialize)if (analytics.invoked)window.console && console.error && console.error("Segment snippet included twice."); else {
-                                        analytics.invoked = !0;
-                                        analytics.methods = ["trackSubmit", "trackClick", "trackLink", "trackForm", "pageview", "identify", "group", "track", "ready", "alias", "page", "once", "off", "on"];
-                                        analytics.factory = function (t) {
-                                            return function () {
-                                                var e = Array.prototype.slice.call(arguments);
-                                                e.unshift(t);
-                                                analytics.push(e);
-                                                return analytics
-                                            }
-                                        };
-                                        for (var t = 0; t < analytics.methods.length; t++) {
-                                            var e = analytics.methods[t];
-                                            analytics[e] = analytics.factory(e)
-                                        }
-                                        analytics.load = function (t) {
-                                            var e = document.createElement("script");
-                                            e.type = "text/javascript";
-                                            e.async = false;
-                                            e.src = ("https:" === document.location.protocol ? "https://" : "http://") + "cdn.segment.com/analytics.js/v1/" + t + "/analytics.min.js";
-                                            e.onload = function () {
-                                                window.overrideTrackers();
-                                            };
-                                            var n = document.getElementsByTagName("script")[0];
-                                            n.parentNode.insertBefore(e, n)
-                                        };
-                                        analytics.SNIPPET_VERSION = "3.0.1";
-                                        analytics.load(segmentAppId);
-                                    }
-                                }();
                                 window.overrideTrackers();
 
     body
+
         // User specific jade variables defined to prevent the
         // hassle of defining them at 'app locals' level or send them
         // as parameters to jade files
@@ -146,4 +119,6 @@ html(lang="en")
                 script(type="text/javascript" src="/assets/js/libs/custom/adpushup-analytics-mockup.js")
 
         block bodyContent
+            noscript.
+                iframe(src="https://www.googletagmanager.com/ns.html?id=GTM-NMS9P3Q", height="0", width="0", style="display:none;visibility:hidden")
         div(id="freeow-tr", class="freeow freeow-top-right")
