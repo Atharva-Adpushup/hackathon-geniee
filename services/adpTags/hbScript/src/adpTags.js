@@ -59,7 +59,9 @@ var prebidSandbox = require('./prebidSandbox'),
 	createSlot = function(containerId, size, placement, optionalParam) {
 		var adUnits = inventoryMapper(size, optionalParam),
 			slotId = adUnits.dfpAdUnit,
-			bidders = optionalParam.headerBidding ? adUnits.bidders : [];
+			bidders = optionalParam.headerBidding ? adUnits.bidders : [],
+			isResponsive = optionalParam.isResponsive,
+			multipleAdSizes = optionalParam.multipleAdSizes;
 
 		adpTags.adpSlots[containerId] = {
 			slotId: slotId,
