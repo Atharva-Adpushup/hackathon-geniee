@@ -17,7 +17,7 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 
 			var size = adpSlot.size,
 				computedSizes = adpSlot.computedSizes,
-				prebidSizes = computedSizes ? computedSizes : [size];
+				prebidSizes = computedSizes.length ? computedSizes : [size];
 			if (adpSlot.optionalParam.overrideActive && adpSlot.optionalParam.overrideSizeTo) {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}

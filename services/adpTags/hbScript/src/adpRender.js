@@ -178,9 +178,9 @@ var utils = require('../helpers/utils'),
 	enableGoogServicesForSlot = function(slot) {
 		var isGenieeNetwork = !!(slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE),
 			networkId = isGenieeNetwork ? config.GENIEE_NETWORK_ID : slot.activeDFPNetwork || config.NETWORK_ID,
-			isResponsive = slot.optionalParam.isResponsive,
-			multipleAdSizes = slot.optionalParam.multipleAdSizes,
-			isMultipleAdSize = !!(multipleAdSizes && multipleAdSizes.length),
+			isResponsive = slot.isResponsive,
+			computedSizes = slot.computedSizes,
+			isComputedSizes = !!(computedSizes && computedSizes.length),
 			responsiveAdsData;
 
 		if (isResponsive) {
@@ -192,7 +192,7 @@ var utils = require('../helpers/utils'),
 			// increasing order of their widths and probably DFP prioritizes ad sizes as per their
 			// added order in `size` argument. If DFP does prioritizes this, then we need to ensure that
 			// selected ad size is the first size present in `size` array.
-			size = isMultipleAdSize ? multipleAdSizes.concat([]).reverse() : slot.size;
+			size = isComputedSizes ? computedSizes.concat([]).reverse() : slot.size;
 		}
 
 		slot.gSlot = googletag.defineSlot(
