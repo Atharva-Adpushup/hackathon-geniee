@@ -10,7 +10,7 @@ block append headScripts
             window.blocklist = '!{blocklist}' ? '!{blocklist}'.split(',') : []; 
         });
     +loadAsset("js", [
-        '/assets/js/libs/custom/settings.js?v=1496398593971',
+        '/assets/js/libs/custom/settings.js?v=1496398593978',
     ])
     style.
         .select-wrapper {
@@ -141,7 +141,7 @@ block bodyContent
                                                                 select(name="activeDFPNetwork")
                                                                     option(value="" selected) Select DFP Network
                                                                     each dfpAccount in dfpAccounts
-                                                                        option(value=dfpAccount.code selected=(apConfigs.activeDFPNetwork === dfpAccount.code ? true : undefined))!=dfpAccount.code
+                                                                        option(value=dfpAccount.code + '-' + dfpAccount.dfpParentId, selected=(apConfigs.activeDFPNetwork === dfpAccount.code ? true : undefined))!=dfpAccount.code
 
                                         .row
                                             .col-sm-12
