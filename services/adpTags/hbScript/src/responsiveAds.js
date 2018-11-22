@@ -14,7 +14,8 @@ var adSizeConsts = require('../../../../helpers/adSizeMappingConsts'),
 			matchedAdSize,
 			computedMatchedSizeArray = [],
 			isMatchedWidthInMultipleAdSize,
-			multipleAdSizesCollection;
+			multipleAdSizesCollection,
+			finalComputedData = {};
 
 		if (!isValidInput) {
 			return null;
@@ -69,7 +70,11 @@ var adSizeConsts = require('../../../../helpers/adSizeMappingConsts'),
 			);
 		}
 
-		return computedMatchedSizeArray;
+		finalComputedData.size = matchedAdSize;
+		finalComputedData.collection = computedMatchedSizeArray.concat([]);
+		finalComputedData.elementWidth = inputSizeWidth;
+		finalComputedData.elementHeight = inputSizeHeight;
+		return finalComputedData;
 	},
 	getElComputedStyles = function(element) {
 		var elComputedStyles = window.getComputedStyle(element),
@@ -122,6 +127,28 @@ var adSizeConsts = require('../../../../helpers/adSizeMappingConsts'),
 
 		return finalComputedStyles;
 	},
+	removeBlackListedSizes = function(inputCollection) {
+		var blackListedCollection = adSizeConsts.IAB_SIZES.BLACK_LIST,
+			filteredCollection = [];
+
+		blackListedCollection.forEach(function(item) {
+			filteredCollection = utils.removeElementArrayFromCollection(inputCollection, item);
+		});
+
+		return filteredCollection;
+	},
+	getFilteredData = function(inputData) {
+		var windowWidth = $(window).width(),
+			thirtyPercentOfWindowWidth = Math.round((30 / 100) * windowWidth),
+			primarySizeWidth = inputData.elementWidth,
+			isWidthSimulateContentAreaWidth = !!(primarySizeWidth && primarySizeWidth > thirtyPercentOfWindowWidth);
+
+		if (isWidthSimulateContentAreaWidth) {
+			inputData.collection = removeBlackListedSizes(inputData.collection);
+		}
+
+		return inputData;
+	},
 	getComputedAdSizes = function(elementSelector) {
 		var immediateParentData = getImmediateParentData(elementSelector),
 			recursiveParentData = getRecursiveParentData(elementSelector),
@@ -143,7 +170,8 @@ var adSizeConsts = require('../../../../helpers/adSizeMappingConsts'),
 				isValidRecursiveParentData
 			),
 			computedParentData = {},
-			matchedSizeArray;
+			matchedSizeData,
+			finalComputedData;
 
 		if (isValidImmediateParentData) {
 			computedParentData = $.extend({}, immediateParentData);
@@ -154,8 +182,9 @@ var adSizeConsts = require('../../../../helpers/adSizeMappingConsts'),
 			computedParentData = $.extend({}, recursiveParentData);
 		}
 
-		matchedSizeArray = getMatchedAdSize(computedParentData);
-		return matchedSizeArray;
+		matchedSizeData = getMatchedAdSize(computedParentData);
+		finalComputedData = getFilteredData(matchedSizeData);
+		return finalComputedData;
 	};
 
 module.exports = {
