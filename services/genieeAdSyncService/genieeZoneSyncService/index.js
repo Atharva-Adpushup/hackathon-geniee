@@ -56,6 +56,7 @@ module.exports = {
 			if (!ad.networkData.dfpAdunit && !ad.networkData.disableSyncing) {
 				const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
 					isResponsive = !!(ad.width === 'responsive' && ad.networkData.isResponsive),
+					isNative = !!(ad.formatData && ad.formatData.type === 'native'),
 					defaultAdData = {
 						adId: ad.id,
 						isResponsive: isResponsive,
@@ -63,7 +64,8 @@ module.exports = {
 						sizeHeight: isResponsive ? 'responsive' : parseInt(ad.height, 10),
 						sectionId: section.id,
 						type: section.formatData && section.formatData.type ? section.formatData.type : false,
-						isManual: ad.isManual || false
+						isManual: ad.isManual || false,
+						isNative: isNative
 					};
 
 				if (isMultipleAdSizes) {

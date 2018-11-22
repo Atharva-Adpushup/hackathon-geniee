@@ -432,6 +432,10 @@ select.inputMinimal {
       color: #777; }
 
 /*Extra Space ($ES)*/
+body {
+  min-width: 1280px !important;
+  height: auto; }
+
 .options-wrapper {
   margin: 0 !important;
   padding: 30px 10px;
@@ -599,3 +603,7 @@ select.inputMinimal {
     font-size: 12px;
     font-weight: lighter;
     color: grey; }
+
+@media (max-width: 600px) {
+  .btn-close {
+    background-color: #000000 !important; } }

@@ -9,6 +9,11 @@ $primaryColorLight: #fb9fa2;
 $ESBg: #f6f7f8;
 $ESPadding: 20px;
 
+body {
+	min-width: 1280px !important;
+	height: auto;
+}
+
 .options-wrapper {
 	margin: 0 !important;
 	padding: 30px 10px;
@@ -233,5 +238,11 @@ $ESPadding: 20px;
 		font-size: 12px;
 		font-weight: lighter;
 		color: grey;
+	}
+}
+
+@media (max-width: 600px) {
+	.btn-close {
+		background-color: #000000 !important;
 	}
 }

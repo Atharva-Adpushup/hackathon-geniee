@@ -44,30 +44,6 @@ const fn = {
 				return fn.processing(tagManagerDefault, payload);
 			});
 	},
-	processing: (data, payload) => {
-		let cas = data.cas || false,
-			value = data.value || data,
-			id = uuid.v4(),
-			networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {},
-			ad = {
-				...payload.ad,
-				id: id,
-				isActive: true,
-				createdOn: +new Date(),
-				formatData: {
-					...payload.ad.formatData,
-					eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
-				},
-				...networkInfo
-			};
-		_.forEach(data, (value, key) => {
-			options.uri += `${key}=${value}&`;
-		});
-		options.uri = options.uri.slice(0, -1);
-		return request(options)
-			.then(() => console.log('Ad Creation. Called made to Zapier'))
-			.catch(err => console.log('Ad creation call to Zapier failed'));
-	},
 	createNewDocAndDoProcessing: payload => {
 		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
 		return appBucket
@@ -87,7 +63,7 @@ const fn = {
 				...payload.ad,
 				id: id,
 				name: `Ad-${id}`,
-				isActive: true,
+				// isActive: true,
 				createdOn: +new Date(),
 				formatData: {
 					...payload.ad.formatData,
@@ -145,7 +121,16 @@ router
 					res
 				)
 			)
-			.catch(err => fn.errorHander(err, res));
+			.catch(err => {
+				return err.code && err.code === 13 && err.message.includes('key does not exist')
+					? sendSuccessResponse(
+							{
+								ads: []
+							},
+							res
+					  )
+					: fn.errorHander(err, res);
+			});
 	})
 	.get(['/', '/:siteId'], (req, res) => {
 		const { session, params } = req;

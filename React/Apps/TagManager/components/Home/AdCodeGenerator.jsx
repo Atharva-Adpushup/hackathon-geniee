@@ -12,6 +12,8 @@ import {
 import { copyToClipBoard } from '../../lib/helpers';
 import { CustomMessage, CustomButton } from '../shared/index.jsx';
 import { adCode, adCodeVideo } from '../../configs/commonConsts';
+import Loader from '../../../../Components/Loader';
+
 class AdCodeGenerator extends Component {
 	constructor(props) {
 		super(props);
@@ -31,7 +33,6 @@ class AdCodeGenerator extends Component {
 		this.renderTypeOptions = this.renderTypeOptions.bind(this);
 		this.renderSizes = this.renderSizes.bind(this);
 		this.renderMainContent = this.renderMainContent.bind(this);
-		this.renderLoadingScreen = this.renderLoadingScreen.bind(this);
 		this.renderGeneratedAdcode = this.renderGeneratedAdcode.bind(this);
 	}
 
@@ -98,7 +99,8 @@ class AdCodeGenerator extends Component {
 						css: {
 							display: 'block',
 							margin: '10px auto'
-						}
+						},
+						isActive: true
 					}
 				})
 		);
@@ -218,10 +220,6 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
-	renderLoadingScreen() {
-		return <div>Loading</div>;
-	}
-
 	renderMainContent() {
 		return (
 			<div>
@@ -245,9 +243,7 @@ class AdCodeGenerator extends Component {
 	render() {
 		return (
 			<Row className="options-wrapper">
-				{this.state.loading && !this.props.codeGenerated
-					? this.renderLoadingScreen()
-					: this.renderMainContent()}
+				{this.state.loading && !this.props.codeGenerated ? <Loader /> : this.renderMainContent()}
 			</Row>
 		);
 	}
