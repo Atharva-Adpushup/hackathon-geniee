@@ -2,7 +2,7 @@ var utils = require('../libs/utils'),
 	$ = require('jquery'),
 	config = window.adpushup.config,
 	consts = require('../config/commonConsts'),
-	generateGenieeBodyTag = function(ad) {
+	generateGenieeBodyTag = function (ad) {
 		var adCode,
 			genieeRef = window.adpushup && window.adpushup.geniee,
 			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback,
@@ -45,12 +45,12 @@ var utils = require('../libs/utils'),
 		}
 		return adCode;
 	},
-	executeNoramlAdpTagsHeadCode = function(adpTagUnits, adpKeyValues) {
+	executeNoramlAdpTagsHeadCode = function (adpTagUnits, adpKeyValues) {
 		if (!adpTagUnits || !adpTagUnits.length) {
 			return false;
 		}
-		var doIt = function(adpTagUnits) {
-			return function() {
+		var doIt = function (adpTagUnits) {
+			return function () {
 				for (var i = 0; i < adpTagUnits.length; i++) {
 					var ad = adpTagUnits[i],
 						isNetworkData = !!ad.networkData,
@@ -62,7 +62,7 @@ var utils = require('../libs/utils'),
 						adHeight = isResponsive ? ad.height : Number(ad.height),
 						defaultAdSizeArray = [adWidth, adHeight],
 						isGenieeNetwork = !!(ad.network === 'geniee' && networkData && networkData.zoneId),
-						isZoneContainerId = !!(isGenieeNetwork && networkData.zoneContainerId),
+						isZoneContainerId = !!networkData.zoneContainerId,
 						computedDFPAdUnitId = isZoneContainerId ? networkData.zoneContainerId : networkData.dfpAdunit;
 
 					window.adpushup.adpTags.defineSlot(computedDFPAdUnitId, defaultAdSizeArray, computedDFPAdUnitId, {
@@ -90,7 +90,7 @@ var utils = require('../libs/utils'),
 		window.adpushup.adpTags.que.push(doIt(adpTagUnits));
 		return true;
 	},
-	executeAmpHeadCode = function() {
+	executeAmpHeadCode = function () {
 		var adCode = [];
 		adCode.push('<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">');
 		adCode.push(
@@ -116,7 +116,7 @@ var utils = require('../libs/utils'),
 		$el.append(adCode.join('\n'));
 		return true;
 	},
-	executeMediaNetHeadCode = function() {
+	executeMediaNetHeadCode = function () {
 		var adCode = [];
 		var cid = window.adpushup.config.medianetId || consts.ADPUSHUP_MEDIANET_ID;
 		adCode.push('<scr' + 'ipt type="text/javascript">');
@@ -134,8 +134,10 @@ var utils = require('../libs/utils'),
 		$el.append(adCode.join('\n'));
 		return true;
 	},
-	genrateAdpBodyTag = function(ad) {
-		var adCode;
+	genrateAdpBodyTag = function (ad) {
+		var adCode,
+			isZoneContainerId = !!ad.networkData.zoneContainerId,
+			computedDFPAdUnitId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit;
 		if (!ad.networkData || !ad.networkData.dfpAdunit) {
 			adCode = '';
 		} else if (config.serveAmpTagsForAdp) {
@@ -143,7 +145,7 @@ var utils = require('../libs/utils'),
 			adCode = [];
 			adCode.push('<amp-ad width=' + ad.width + ' height=' + ad.height);
 			adCode.push('type="doubleclick"');
-			adCode.push('data-slot="/103512698/' + ad.networkData.dfpAdunit + '"');
+			adCode.push('data-slot="/103512698/' + computedDFPAdUnitId + '"');
 			adCode.push('data-multi-size-validation="false">');
 			adCode.push('</amp-ad>');
 			if (ad.networkData.isSticky) {
@@ -152,10 +154,10 @@ var utils = require('../libs/utils'),
 			}
 		} else {
 			adCode = [];
-			adCode.push('<div id="' + ad.networkData.dfpAdunit + '">');
+			adCode.push('<div id="' + computedDFPAdUnitId + '">');
 			adCode.push('<scr' + 'ipt type="text/javascript">');
 			adCode.push('window.adpushup.adpTags.que.push(function(){');
-			adCode.push('window.adpushup.adpTags.display("' + ad.networkData.dfpAdunit + '");');
+			adCode.push('window.adpushup.adpTags.display("' + computedDFPAdUnitId + '");');
 			adCode.push('});');
 			adCode.push('</scr' + 'ipt>');
 			adCode.push('</div>');
@@ -164,7 +166,7 @@ var utils = require('../libs/utils'),
 	};
 
 module.exports = {
-	generateAdCode: function(ad) {
+	generateAdCode: function (ad) {
 		var adCode = '';
 		if (!ad.networkData && ad.adCode) {
 			return utils.base64Decode(ad.adCode);
@@ -187,16 +189,12 @@ module.exports = {
 		}
 		return typeof adCode === 'string' ? adCode : adCode.join('\n');
 	},
-	generateGenieeHeaderCode: function(genieeIdCollection) {
+	generateGenieeHeaderCode: function (genieeIdCollection) {
 		if (!genieeIdCollection || !genieeIdCollection.length) {
 			return false;
 		}
 
-		var adCode = [],
-			i,
-			iteratorObject,
-			containerId,
-			zoneId;
+		var adCode = [], i, iteratorObject, containerId, zoneId;
 
 		adCode.push('<scr' + 'ipt type="text/javascript">');
 		adCode.push('var gnsmod = gnsmod || {};');
@@ -218,7 +216,7 @@ module.exports = {
 		);
 		return adCode.join('\n');
 	},
-	executeAdpTagsHeadCode: function(adpTagUnits, adpKeyValues) {
+	executeAdpTagsHeadCode: function (adpTagUnits, adpKeyValues) {
 		if (config.serveAmpTagsForAdp) {
 			executeAmpHeadCode();
 		} else {
@@ -227,7 +225,7 @@ module.exports = {
 
 		return true;
 	},
-	generateMediaNetHeadCode: function() {
+	generateMediaNetHeadCode: function () {
 		return executeMediaNetHeadCode();
 	}
 };

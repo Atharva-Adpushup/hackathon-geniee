@@ -16,9 +16,7 @@ var prebidSandbox = require('./prebidSandbox'),
 			bidders = null;
 
 		if (
-			optionalParam.headerBidding &&
-			inventory.hbConfig &&
-			Array.isArray(inventory.hbConfig.bidderAdUnits[size])
+			optionalParam.headerBidding && inventory.hbConfig && Array.isArray(inventory.hbConfig.bidderAdUnits[size])
 		) {
 			var overrideSize = size;
 			if (
@@ -40,6 +38,8 @@ var prebidSandbox = require('./prebidSandbox'),
 			} else {
 				dfpAdUnit = inventory.dfpAdUnits[size].pop();
 			}
+		} else {
+			dfpAdUnit = optionalParam.dfpAdunit;
 		}
 		return {
 			dfpAdUnit: dfpAdUnit,
@@ -83,8 +83,7 @@ var prebidSandbox = require('./prebidSandbox'),
 		return adpTags.adpSlots[containerId];
 	},
 	processBatchForBidding = function() {
-		var batchId = adpTags.currentBatchId,
-			adpSlots = adpTags.currentBatchAdpSlots;
+		var batchId = adpTags.currentBatchId, adpSlots = adpTags.currentBatchAdpSlots;
 
 		adpTags.adpBatches.push({
 			batchId: batchId,
@@ -131,8 +130,7 @@ var prebidSandbox = require('./prebidSandbox'),
 			}
 		},
 		defineSlot: function(containerId, size, placement, optionalParam) {
-			var optionalParam = optionalParam || {},
-				slot = createSlot(containerId, size, placement, optionalParam);
+			var optionalParam = optionalParam || {}, slot = createSlot(containerId, size, placement, optionalParam);
 
 			if (utils.isSupportedBrowser()) {
 				// && adpTags.shouldRun(optionalParam)) {
