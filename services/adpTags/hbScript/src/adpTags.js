@@ -16,7 +16,9 @@ var prebidSandbox = require('./prebidSandbox'),
 			bidders = null;
 
 		if (
-			optionalParam.headerBidding && inventory.hbConfig && Array.isArray(inventory.hbConfig.bidderAdUnits[size])
+			optionalParam.headerBidding &&
+			inventory.hbConfig &&
+			Array.isArray(inventory.hbConfig.bidderAdUnits[size])
 		) {
 			var overrideSize = size;
 			if (
@@ -34,13 +36,16 @@ var prebidSandbox = require('./prebidSandbox'),
 
 		if (availableSlots.length) {
 			if (optionalParam.dfpAdunit && availableSlots.indexOf(optionalParam.dfpAdunit) !== -1) {
-				dfpAdUnit = availableSlots.splice(availableSlots.indexOf(optionalParam.dfpAdunit), 1)[0];
+				if (optionalParam.isManual) {
+					dfpAdUnit = optionalParam.dfpAdunit;
+				} else {
+					dfpAdUnit = availableSlots.splice(availableSlots.indexOf(optionalParam.dfpAdunit), 1)[0];
+				}
 			} else {
 				dfpAdUnit = inventory.dfpAdUnits[size].pop();
 			}
-		} else {
-			dfpAdUnit = optionalParam.dfpAdunit;
 		}
+
 		return {
 			dfpAdUnit: dfpAdUnit,
 			bidders: bidders
@@ -83,7 +88,8 @@ var prebidSandbox = require('./prebidSandbox'),
 		return adpTags.adpSlots[containerId];
 	},
 	processBatchForBidding = function() {
-		var batchId = adpTags.currentBatchId, adpSlots = adpTags.currentBatchAdpSlots;
+		var batchId = adpTags.currentBatchId,
+			adpSlots = adpTags.currentBatchAdpSlots;
 
 		adpTags.adpBatches.push({
 			batchId: batchId,
@@ -130,7 +136,8 @@ var prebidSandbox = require('./prebidSandbox'),
 			}
 		},
 		defineSlot: function(containerId, size, placement, optionalParam) {
-			var optionalParam = optionalParam || {}, slot = createSlot(containerId, size, placement, optionalParam);
+			var optionalParam = optionalParam || {},
+				slot = createSlot(containerId, size, placement, optionalParam);
 
 			if (utils.isSupportedBrowser()) {
 				// && adpTags.shouldRun(optionalParam)) {
