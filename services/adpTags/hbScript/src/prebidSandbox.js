@@ -12,13 +12,14 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 			adpBatchId = adpSlotsBatch[0].batchId;
 
 		adpSlotsBatch.forEach(function(adpSlot) {
-			if (!adpSlot.bidders || !adpSlot.bidders.length) {
-				return true;
-			}
-
 			var responsiveSizes = [];
 			if (adpSlot.isResponsive) {
 				responsiveSizes = responsiveAds.getAdSizes(adpSlot.containerId).collection;
+				adpSlot.computedSizes = responsiveSizes;
+			}
+			
+			if (!adpSlot.bidders || !adpSlot.bidders.length) {
+				return true;
 			}
 
 			var size = adpSlot.size,
