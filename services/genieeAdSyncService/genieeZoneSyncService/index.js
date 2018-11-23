@@ -53,7 +53,7 @@ module.exports = {
 	},
 	checkAdpTagsUnsyncedZones: function(section, ad) {
 		if (ad.networkData && Object.keys(ad.networkData).length) {
-			if (!ad.networkData.dfpAdunit && !ad.networkData.disableSyncing) {
+			if (!ad.networkData.dfpAdunit) {
 				const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
 					isResponsive = !!(ad.width === 'responsive' && ad.networkData.isResponsive),
 					isNative = !!(ad.formatData && ad.formatData.type === 'native'),
@@ -114,7 +114,7 @@ module.exports = {
 			});
 		});
 		return unsyncedZones;
-	},
+	}, 
 	getAllUnsyncedZones: function(site) {
 		var finalZones = [],
 			channelUnsyncedZones = [],

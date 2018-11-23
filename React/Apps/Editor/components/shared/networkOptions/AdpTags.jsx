@@ -19,7 +19,6 @@ class AdpTags extends Component {
 				refreshSlot,
 				overrideActive,
 				overrideSizeTo,
-				disableSyncing,
 				primaryAdSize
 			} = props,
 			// Geniee specific UI access feature 'dynamic allocation' property computation
@@ -50,7 +49,6 @@ class AdpTags extends Component {
 			multipleAdSizes: [],
 			dfpAdunitId: '',
 			refreshSlot,
-			disableSyncing: disableSyncing || false,
 			isBackwardCompatibleSizes: true,
 			isResponsive: isResponsiveAdSize,
 			overrideActive,
@@ -72,7 +70,6 @@ class AdpTags extends Component {
 		this.filterKeyValues = this.filterKeyValues.bind(this);
 		this.generateCode = this.generateCode.bind(this);
 		this.renderDynamicAllocation = this.renderDynamicAllocation.bind(this);
-		this.renderDisableSyncingToggleSwitch = this.renderDisableSyncingToggleSwitch.bind(this);
 		this.renderIsBackwardCompatibleSizesToggleSwitch = this.renderIsBackwardCompatibleSizesToggleSwitch.bind(this);
 		this.renderAdvancedBlock = this.renderAdvancedBlock.bind(this);
 		this.renderHBOverride = this.renderHBOverride.bind(this);
@@ -107,7 +104,6 @@ class AdpTags extends Component {
 				overrideSizeTo,
 				multipleAdSizes,
 				dfpAdunitId,
-				disableSyncing,
 				isBackwardCompatibleSizes,
 				isResponsive
 			} = this.state,
@@ -133,7 +129,6 @@ class AdpTags extends Component {
 			overrideSizeTo: overrideActive ? overrideSizeTo : null,
 			multipleAdSizes: computedMultipleAdSizes,
 			dfpAdunitId,
-			disableSyncing,
 			// NOTE: Below key is exported only because it is required to provide `Backward compatible size mapping`
 			// functionality in features (such as InContent sections) that cannot receive primary ad size
 			// value when mounted. Deletion of this property is recommended before saving
@@ -379,33 +374,6 @@ class AdpTags extends Component {
 		);
 	}
 
-	renderDisableSyncingToggleSwitch() {
-		const { fromPanel, id } = this.props;
-
-		return (
-			<Row>
-				<Col xs={12} className={fromPanel ? 'u-padding-0px' : ''}>
-					<CustomToggleSwitch
-						labelText={'Disable Syncing'}
-						className="mB-10"
-						checked={this.state.disableSyncing}
-						onChange={val => {
-							this.setState({ disableSyncing: !!val });
-						}}
-						layout="horizontal"
-						size="m"
-						on="Yes"
-						off="No"
-						defaultLayout={fromPanel ? false : true}
-						name={id ? `disableSyncingSwitch-${id}` : 'disableSyncingSwitch'}
-						id={id ? `js-disable-sync-switch-${id}` : 'js-disable-sync-switch'}
-						customComponentClass={fromPanel ? 'u-padding-0px' : ''}
-					/>
-				</Col>
-			</Row>
-		);
-	}
-
 	getMultipleAdSizesOfPrimaryAdSize(isBackCompatibleSizes) {
 		const { primaryAdSize } = this.props,
 			primaryAdSizeString = primaryAdSize ? `${primaryAdSize.width},${primaryAdSize.height}` : '',
@@ -568,7 +536,6 @@ class AdpTags extends Component {
 					</div>
 				)}
 				{this.renderDynamicAllocation()}
-				{this.props.geniee ? null : this.renderDisableSyncingToggleSwitch()}
 				{this.props.geniee ? null : this.renderIsBackwardCompatibleSizesToggleSwitch()}
 				{this.props.geniee ? this.renderDFPAdUnitIdSelectBox() : null}
 				{this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null}

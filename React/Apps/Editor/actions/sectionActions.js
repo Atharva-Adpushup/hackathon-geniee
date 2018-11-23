@@ -17,21 +17,11 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 			isAdPayload = !!adPayload,
 			isAdNetworkData = !!(isAdPayload && adPayload.networkData),
 			isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId),
-			isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId),
-			isDisableSyncing = !!(isAdNetworkData && adPayload.networkData.disableSyncing);
+			isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
 
 		if (isCreateZoneContainerId) {
 			adPayload.networkData.zoneContainerId = `${adPayload.networkData.zoneId}-${adId}`;
 			delete adPayload.networkData.createZoneContainerId;
-		}
-
-		if (isDisableSyncing) {
-			dispatch({
-				type: uiActions.SHOW_NOTIFICATION,
-				mode: 'info',
-				title: 'Ad syncing disabled',
-				message: 'Ad Syncing will be disabled for this ad'
-			});
 		}
 
 		return dispatch({
