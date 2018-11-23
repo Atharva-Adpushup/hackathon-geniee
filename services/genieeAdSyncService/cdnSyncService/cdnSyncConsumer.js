@@ -48,7 +48,7 @@ module.exports = function(site, externalData = {}) {
 			'assets',
 			'js',
 			'builds',
-			'adptags.js'
+			'adptags.min.js'
 		),
 		prebidScriptPath = path.join(__dirname, '..', '..', 'adpTags', 'Prebid.js', 'build', 'dist', 'prebid.js'),
 		tempDestPath = path.join(
