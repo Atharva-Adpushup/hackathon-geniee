@@ -1,5 +1,6 @@
 var adSizeConsts = require('../../../../helpers/adSizeMappingConsts'),
 	utils = require('../helpers/utils'),
+	AdpError = require('../helpers/error'),
 	$ = window.adpushup.$,
 	getMatchedAdSize = function(inputObject) {
 		var adCollection = adSizeConsts.IAB_SIZES.ALL,
@@ -62,6 +63,10 @@ var adSizeConsts = require('../../../../helpers/adSizeMappingConsts'),
 
 		matchedAdSize = Math.min.apply(null, Object.keys(differenceObject));
 		matchedAdSize = differenceObject[matchedAdSize];
+
+		if (!matchedAdSize) {
+			throw new AdpError('No matched ad for width : ' + inputSizeWidth + 'px');
+		}
 		isMatchedWidthInMultipleAdSize = !!widthsWithMultipleAdSizes[matchedAdSize[0]];
 
 		// 'isMatchedWidthInMultipleAdSize' check is added to incorporate backward compatible sizes of all
