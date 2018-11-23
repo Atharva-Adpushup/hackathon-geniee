@@ -7,8 +7,18 @@ var adSizeConsts = require('../../../../helpers/adSizeMappingConsts'),
 			adsWithBackwardCompatibleSizesMapping = adSizeConsts.IAB_SIZES.BACKWARD_COMPATIBLE_MAPPING,
 			differenceObject = {},
 			isValidInput = !!inputObject,
-			areValidInputDimensions = !!(isValidInput && inputObject.width && inputObject.height),
-			isValidInputWidth = !!(isValidInput && inputObject.width && !inputObject.height),
+			areValidInputDimensions = !!(
+				isValidInput &&
+				inputObject.width &&
+				inputObject.height &&
+				// Below '50' height value is minimum height to consider
+				inputObject.height >= 50
+			),
+			isValidInputWidth = !!(
+				isValidInput &&
+				inputObject.width &&
+				(!inputObject.height || inputObject.height < 50)
+			),
 			inputSizeWidth,
 			inputSizeHeight,
 			matchedAdSize,
