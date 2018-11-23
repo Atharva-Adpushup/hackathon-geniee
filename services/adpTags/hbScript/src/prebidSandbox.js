@@ -3,6 +3,7 @@
 var prebidAdTemplate = require('./prebidAdTemplate'),
 	adpRender = require('./adpRender'),
 	config = require('./config'),
+	responsiveAds = require('./responsiveAds'),
 	find = require('lodash.find'),
 	__FRAME_PREFIX__ = '__adp_frame__',
 	utils = require('../helpers/utils'),
@@ -15,8 +16,13 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 				return true;
 			}
 
+			var responsiveSizes = [];
+			if (adpSlot.isResponsive) {
+				responsiveSizes = responsiveAds.getAdSizes(adpSlot.containerId).collection;
+			}
+
 			var size = adpSlot.size,
-				computedSizes = adpSlot.computedSizes,
+				computedSizes = adpSlot.isResponsive ? responsiveSizes : adpSlot.computedSizes,
 				prebidSizes = computedSizes.length ? computedSizes : [size];
 			if (adpSlot.optionalParam.overrideActive && adpSlot.optionalParam.overrideSizeTo) {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
