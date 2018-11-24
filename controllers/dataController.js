@@ -481,7 +481,7 @@ router
 				res.status(200)
 					.set('x-cf-geodata', country)
 					.set('Content-Type', 'application/javascript')
-					.set('Cache-Control', 'max-age=3600');
+					.set('Cache-Control', 'max-age=900');
 				return res.send(apJs);
 			})
 			.catch(err => {
