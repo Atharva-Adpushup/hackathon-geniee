@@ -65,7 +65,10 @@ var adSizeConsts = require('../../../../helpers/adSizeMappingConsts'),
 		matchedAdSize = differenceObject[matchedAdSize];
 
 		if (!matchedAdSize) {
-			throw new AdpError('No matched ad for width : ' + inputSizeWidth + 'px');
+			var errorMessage = 'No matched ad for width : ' + inputSizeWidth + 'px';
+
+			console.error ? console.error(errorMessage) : console.log(errorMessage);
+			matchedAdSize = [];
 		}
 		isMatchedWidthInMultipleAdSize = !!widthsWithMultipleAdSizes[matchedAdSize[0]];
 
