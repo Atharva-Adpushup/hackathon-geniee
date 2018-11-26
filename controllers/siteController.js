@@ -4,6 +4,7 @@ var express = require('express'),
 	siteModel = require('../models/siteModel'),
 	_ = require('lodash'),
 	urlModule = require('url'),
+	{ promiseForeach } = require('node-utils'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	regexGenerator = require('../misc/tools/regexGenerator/index'),
 	utils = require('../helpers/utils'),
@@ -228,6 +229,23 @@ router
 		});
 	})
 	.post('/:siteId/saveSiteSettings', function(req, res) {
+		function channelProcessing(autoOptimise, channel) {
+			const platformAndPagegroup = channel.split(':');
+			return channelModel
+				.getChannel(req.params.siteId, platformAndPagegroup[0], platformAndPagegroup[1])
+				.then(channel => {
+					channel.set('autoOptimise', autoOptimise);
+					return channel.save();
+				});
+		}
+
+		function updateChannelsAutoptimize(channels, autoOptimise) {
+			return promiseForeach(channels, channelProcessing.bind(null, autoOptimise), (err, data) => {
+				console.log(err, data);
+				return false;
+			});
+		}
+
 		var json = { settings: req.body, siteId: req.params.siteId },
 			{ gdprCompliance, cookieControlConfig } = req.body;
 		gdprCompliance = gdprCompliance === 'false' ? false : true;
@@ -246,9 +264,11 @@ router
 				gdpr: { compliance: gdprCompliance, cookieControlConfig: JSON.parse(cookieControlConfig) }
 			})
 			.then(() => siteModel.saveSiteSettings(json))
-			.then(function(data) {
-				res.send({ success: 1 });
-			})
+			.then(() => siteModel.getSiteChannels(req.params.siteId))
+			.then(channels =>
+				updateChannelsAutoptimize(channels, json.settings.autoOptimise === 'false' ? false : true)
+			)
+			.then(() => res.send({ success: 1 }))
 			.catch(function(err) {
 				if (err.name === 'AdPushupError') {
 					res.send({ succes: 0, message: err.message });
