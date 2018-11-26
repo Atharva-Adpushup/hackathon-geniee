@@ -185,7 +185,7 @@ router
 			.catch(err => fn.errorHander(err, res));
 	})
 	.post('/masterSave', (req, res) => {
-		if (!req.body || !req.body.siteId || !req.body.ads || !req.session.isSuperUser) {
+		if (!req.body || !req.body.siteId || !req.body.ads) {
 			return sendErrorResponse(
 				{
 					message: 'Invalid Parameters.'
@@ -224,7 +224,9 @@ router
 			})
 			.then(() => siteModel.getSiteById(req.body.siteId))
 			.then(site => {
-				adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
+				if (req.session.isSuperUser) {
+					adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
+				}
 				return sendSuccessResponse(
 					{
 						message: 'Master Saved'
