@@ -3,8 +3,8 @@ import Menu from 'shared/menu/menu.jsx';
 import MenuItem from 'shared/menu/menuItem.jsx';
 import Info from './info.jsx';
 import CloseChannel from './closeChannel.jsx';
-import NumericCollectionManager from 'components/shared/NumericCollectionManager/index.jsx';
 import { uiCollections } from 'consts/commonConsts';
+import TrafficPanel from './trafficPanel.jsx';
 
 const channelMenu = ({
 	isVisible,
@@ -46,24 +46,18 @@ const channelMenu = ({
 
 	items.push(
 		<MenuItem key={1} icon="fa fa-info" contentHeading="Page Group Info">
-			<Info
-				onContentSelectorChange={changeContentSelector}
-				onSampleUrlChange={saveSampleUrl}
-				channel={channel}
-				onAutoptimizeChange={updateAutoptimize}
-			/>
+			<Info onContentSelectorChange={changeContentSelector} onSampleUrlChange={saveSampleUrl} channel={channel} />
 		</MenuItem>
 	);
 
 	items.push(
 		<MenuItem key={2} icon="fa fa-exchange" contentHeading="Traffic Distribution">
-			<NumericCollectionManager
-				description={trafficDistributionConfig.description}
-				sumMismatchErrorMessage={trafficDistributionConfig.sumMismatchErrorMessage}
-				collection={allTrafficDistributions}
-				uiMinimal
-				maxValue={1000}
-				onSave={a => saveTrafficDistributions(a)}
+			<TrafficPanel
+				trafficDistributionConfig={trafficDistributionConfig}
+				onAutoptimizeChange={updateAutoptimize}
+				allTrafficDistributions={allTrafficDistributions}
+				saveTrafficDistributions={saveTrafficDistributions}
+				channel={channel}
 			/>
 		</MenuItem>
 	);
@@ -75,7 +69,7 @@ const channelMenu = ({
 	);
 
 	return (
-		<Menu id="channelMenu" position={position} arrow="top" activeItem={0} onGlassClick={hideMenu}>
+		<Menu id="channelMenu" position={position} arrow="top" activeItem={1} onGlassClick={hideMenu}>
 			{items}
 		</Menu>
 	);

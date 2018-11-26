@@ -17,15 +17,12 @@ class info extends React.Component {
 			hostNameValid: true,
 			forceSampleUrl: this.props.channel.forceSampleUrl ? this.props.channel.forceSampleUrl : false,
 			sampleUrl: this.props.channel.sampleUrl,
-			isSampleUrlChanged: false,
-			autoptimize: this.props.channel.hasOwnProperty('autoOptimise') ? this.props.channel.autoOptimise : true
+			isSampleUrlChanged: false
 		};
 	}
 
-	toggleStateValues(target, val, cb = false) {
-		this.setState({ [target]: val }, () => {
-			cb && typeof cb === 'function' ? cb(val) : false;
-		});
+	toggleStateValues(target, val) {
+		this.setState({ [target]: val });
 	}
 
 	onChange(sampleUrl) {
@@ -51,7 +48,7 @@ class info extends React.Component {
 	}
 
 	render() {
-		const { channel, onContentSelectorChange, onSampleUrlChange, onAutoptimizeChange } = this.props;
+		const { channel, onContentSelectorChange, onSampleUrlChange } = this.props;
 		return (
 			<div className="rowPadding containerButtonBar">
 				<Row>
@@ -100,25 +97,6 @@ class info extends React.Component {
 							layout="horizontal"
 							size="m"
 							id="js-force-sample-url"
-							on="On"
-							off="Off"
-						/>
-					</Col>
-				</Row>
-				<Row>
-					<Col xs={12}>
-						<CustomToggleSwitch
-							labelText="Auto Optimize"
-							className="mB-0"
-							defaultLayout
-							checked={this.state.autoptimize}
-							name={`autoOptimize-${channel.id}`}
-							onChange={v =>
-								this.toggleStateValues('autoptimize', v, onAutoptimizeChange.bind(null, channel.id))
-							}
-							layout="horizontal"
-							size="m"
-							id={`js-auto-optimize-${channel.id}`}
 							on="On"
 							off="Off"
 						/>
