@@ -43,6 +43,7 @@ var adp = window.adpushup,
 
 			ad.id = newAdId;
 			document.getElementById(adId).setAttribute('id', newAdId);
+			document.getElementById(newAdId).setAttribute('data-section', newAdId);
 			if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
 				if (ad.networkData) ad.networkData.zoneContainerId = 'ADP_' + siteId + '_' + adSize + '_' + newAdId;
 			}
