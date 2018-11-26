@@ -233,6 +233,38 @@ router
 				);
 			})
 			.catch(err => fn.errorHander(err, res));
+	})
+	.post('/modifyAd', (req, res) => {
+		if (!req.body || !req.body.siteId) {
+			return sendErrorResponse(
+				{
+					message: 'Invalid Parameters.'
+				},
+				res
+			);
+		}
+		return appBucket
+			.getDoc(`${docKeys.tagManager}${req.body.siteId}`)
+			.then(docWithCas => {
+				let doc = docWithCas.value;
+				if (doc.ownerEmail != req.session.user.email) {
+					return Promise.reject('Owner verfication fail');
+				}
+				const hasAd = doc.ads && doc.ads[adId] ? true : false;
+				hasAd ? (doc.ads[adId] = { ...doc.ads[adId], ...req.body.data }) : null;
+				return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
+			})
+			.then(() => siteModel.getSiteById(req.body.siteId))
+			.then(site => {
+				adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
+				return sendSuccessResponse(
+					{
+						message: 'Ad updated'
+					},
+					res
+				);
+			})
+			.catch(err => fn.errorHander(err, res));
 	});
 
 module.exports = router;

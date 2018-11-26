@@ -53,6 +53,17 @@ const createAd = params => (dispatch, getState) => {
 				updateThis: data
 			}
 		});
+	},
+	modifyAdOnServer = (adId, data) => (dispatch, getState) => {
+		return ajax({
+			url: '/tagManager/modifyAd',
+			method: 'POST',
+			data: JSON.stringify({ adId, data })
+		}).then(response => {
+			if (response.error) {
+				return alert(response.data.message);
+			}
+		});
 	};
 
-export { createAd, fetchAds, deleteAd, updateAd };
+export { createAd, fetchAds, deleteAd, updateAd, modifyAdOnServer };

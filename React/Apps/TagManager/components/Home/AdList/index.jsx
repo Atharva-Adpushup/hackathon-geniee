@@ -26,7 +26,7 @@ class AdList extends Component {
 				{window.isSuperUser ? (
 					<div>
 						<CustomButton
-							label={window.isSuperUser ? 'Master Save' : 'Save Settings'}
+							label={'Master Save'}
 							handler={masterSave.bind(null, window.siteId, window.isSuperUser)}
 							classNames="mr-10"
 						/>
