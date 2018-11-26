@@ -36,12 +36,14 @@ var prebidSandbox = require('./prebidSandbox'),
 
 		if (availableSlots.length) {
 			if (optionalParam.dfpAdunit && availableSlots.indexOf(optionalParam.dfpAdunit) !== -1) {
-				dfpAdUnit = availableSlots.splice(availableSlots.indexOf(optionalParam.dfpAdunit), 1)[0];
+				if (optionalParam.isManual) {
+					dfpAdUnit = optionalParam.dfpAdunit;
+				} else {
+					dfpAdUnit = availableSlots.splice(availableSlots.indexOf(optionalParam.dfpAdunit), 1)[0];
+				}
 			} else {
 				dfpAdUnit = inventory.dfpAdUnits[size].pop();
 			}
-		} else {
-			dfpAdUnit = optionalParam.dfpAdunit;
 		}
 
 		return {
