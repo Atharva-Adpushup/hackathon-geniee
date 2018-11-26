@@ -109,20 +109,15 @@ class AdElement extends Component {
 					{this.renderInformation('Id', ad.id)}
 					<p>
 						Name: <strong>{ad.name ? ad.name : `Ad-${ad.id}`}</strong>{' '}
-						{window.isSuperUser ? (
-							<OverlayTrigger
-								placement="bottom"
-								overlay={<Tooltip id="ad-name-edit">Edit Ad Name</Tooltip>}
+						<OverlayTrigger placement="bottom" overlay={<Tooltip id="ad-name-edit">Edit Ad Name</Tooltip>}>
+							<span
+								className="adDetails-icon"
+								onClick={this.toggleHandler.bind(null, 'editName')}
+								style={{ cursor: 'pointer' }}
 							>
-								<span
-									className="adDetails-icon"
-									onClick={this.toggleHandler.bind(null, 'editName')}
-									style={{ cursor: 'pointer' }}
-								>
-									<i className="btn-icn-edit" />
-								</span>
-							</OverlayTrigger>
-						) : null}
+								<i className="btn-icn-edit" />
+							</span>
+						</OverlayTrigger>
 					</p>
 					{this.renderInformation('Platform', makeFirstLetterCapitalize(ad.formatData.platform))}
 					{this.renderInformation(
