@@ -9,7 +9,7 @@ class AdList extends Component {
 	}
 
 	render() {
-		const { loading, ads, masterSave, updateAd } = this.props,
+		const { loading, ads, masterSave, updateAd, modifyAdOnServer } = this.props,
 			customStyle = window.isSuperUser ? { minHeight: '520px' } : { minHeight: '420px' };
 
 		if (loading) {
@@ -26,7 +26,7 @@ class AdList extends Component {
 				{window.isSuperUser ? (
 					<div>
 						<CustomButton
-							label={window.isSuperUser ? 'Master Save' : 'Save Settings'}
+							label={'Master Save'}
 							handler={masterSave.bind(null, window.siteId, window.isSuperUser)}
 							classNames="mr-10"
 						/>
@@ -37,7 +37,7 @@ class AdList extends Component {
 					return !ad.hasOwnProperty('isActive') || ad.isActive || window.isSuperUser ? (
 						<div key={key} className="col-sm-6">
 							<li className="section-list-item" key={ad.id} style={customStyle}>
-								<AdElement ad={ad} updateAd={updateAd} />
+								<AdElement ad={ad} updateAd={updateAd} modifyAdOnServer={modifyAdOnServer} />
 							</li>
 						</div>
 					) : null;

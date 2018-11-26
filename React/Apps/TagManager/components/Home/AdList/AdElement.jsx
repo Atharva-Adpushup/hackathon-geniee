@@ -21,6 +21,7 @@ class AdElement extends Component {
 		this.toggleHandler = this.toggleHandler.bind(this);
 		this.renderAdDetails = this.renderAdDetails.bind(this);
 		this.disableAd = this.disableAd.bind(this);
+		this.updateWrapper = this.updateWrapper.bind(this);
 	}
 
 	toggleHandler(property) {
@@ -59,6 +60,12 @@ class AdElement extends Component {
 		);
 	}
 
+	updateWrapper(data) {
+		return window.isSuperUser
+			? this.props.updateAd(this.props.ad.id, data)
+			: this.props.modifyAdOnServer(this.props.ad.id, data);
+	}
+
 	renderAdDetails() {
 		const { ad, updateAd } = this.props;
 		const isAMP = ad.formatData.type == 'amp' ? true : false;
@@ -88,7 +95,7 @@ class AdElement extends Component {
 					label="Ad Name"
 					name={`name-${ad.id}`}
 					value={ad.name ? ad.name : `Ad-${ad.id}`}
-					onSave={updateAd.bind(null, ad.id)}
+					onSave={this.updateWrapper}
 					onCancel={this.toggleHandler.bind(null, 'editName')}
 					leftSize={3}
 					rightSize={9}
