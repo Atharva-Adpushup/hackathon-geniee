@@ -14,6 +14,7 @@ const channelMenu = ({
 	position,
 	hideMenu,
 	saveSampleUrl,
+	updateAutoptimize,
 	channel,
 	partner,
 	closeChannel,
@@ -45,7 +46,12 @@ const channelMenu = ({
 
 	items.push(
 		<MenuItem key={1} icon="fa fa-info" contentHeading="Page Group Info">
-			<Info onContentSelectorChange={changeContentSelector} onSampleUrlChange={saveSampleUrl} channel={channel} />
+			<Info
+				onContentSelectorChange={changeContentSelector}
+				onSampleUrlChange={saveSampleUrl}
+				channel={channel}
+				onAutoptimizeChange={updateAutoptimize}
+			/>
 		</MenuItem>
 	);
 
@@ -80,7 +86,8 @@ channelMenu.propTypes = {
 	partner: PropTypes.string,
 	position: PropTypes.object,
 	channels: PropTypes.array,
-	hideMenu: PropTypes.func
+	hideMenu: PropTypes.func,
+	onAutoptimizeChange: PropTypes.func
 };
 
 channelMenu.defaultProps = {

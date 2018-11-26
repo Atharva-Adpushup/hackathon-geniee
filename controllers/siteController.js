@@ -240,8 +240,8 @@ router
 		}
 
 		function updateChannelsAutoptimize(channels, autoOptimise) {
-			return promiseForeach(channels, channelProcessing.bind(null, autoOptimise), (err, data) => {
-				console.log(err, data);
+			return promiseForeach(channels, channelProcessing.bind(null, autoOptimise), (data, err) => {
+				console.log(`${err.message} | Data: ${data}`);
 				return false;
 			});
 		}
