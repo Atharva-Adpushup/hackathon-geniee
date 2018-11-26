@@ -23,15 +23,16 @@ class AdList extends Component {
 		}
 		return (
 			<ul className="section-list row" style={{ margin: '20px 0px' }}>
-				<div>
-					<CustomButton
-						label={window.isSuperUser ? 'Master Save' : 'Save Settings'}
-						handler={masterSave.bind(null, window.siteId, window.isSuperUser)}
-						classNames="mr-10"
-					/>
-					<div style={{ clear: 'both' }}>&nbsp;</div>
-				</div>
-
+				{window.isSuperUser ? (
+					<div>
+						<CustomButton
+							label={window.isSuperUser ? 'Master Save' : 'Save Settings'}
+							handler={masterSave.bind(null, window.siteId, window.isSuperUser)}
+							classNames="mr-10"
+						/>
+						<div style={{ clear: 'both' }}>&nbsp;</div>
+					</div>
+				) : null}
 				{ads.map((ad, key) => {
 					return !ad.hasOwnProperty('isActive') || ad.isActive || window.isSuperUser ? (
 						<div key={key} className="col-sm-6">
