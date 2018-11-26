@@ -68,9 +68,28 @@ const PLATFORMS = [
 			MOBILE: ['320x50', '300x250', '250x250', '200x200', '320x100', '336x280']
 		},
 		NATIVE: {
-			ALLOWED: ['responsive'],
-			DESKTOP: [],
-			MOBILE: []
+			ALLOWED: ['desktop', 'mobile'],
+			DESKTOP: [
+				'970x250',
+				'970x90',
+				'728x250',
+				'728x90',
+				'468x60',
+				'336x280',
+				'320x50',
+				'300x600',
+				'300x100',
+				'250x250',
+				'240x240',
+				'234x60',
+				'200x200',
+				'180x150',
+				'160x600',
+				'120x600',
+				'120x240',
+				'300x250'
+			],
+			MOBILE: ['320x50', '300x250', '250x250', '200x200', '320x100', '336x280']
 		},
 		LINKS: {
 			ALLOWED: ['responsive', 'desktop', 'mobile'],
