@@ -98,6 +98,22 @@ const fn = {
 	errorHander: (err, res) => {
 		console.log(err);
 		return sendErrorResponse({ message: 'Opertion Failed' }, res);
+	},
+	adUpdateProcessing: (req, res, processing) => {
+		return appBucket
+			.getDoc(`${docKeys.tagManager}${req.body.siteId}`)
+			.then(docWithCas => processing(docWithCas))
+			.then(() => siteModel.getSiteById(req.body.siteId))
+			.then(site => {
+				adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
+				return sendSuccessResponse(
+					{
+						message: 'Operation Successfull'
+					},
+					res
+				);
+			})
+			.catch(err => fn.errorHander(err, res));
 	}
 };
 
@@ -193,49 +209,36 @@ router
 				res
 			);
 		}
-		return appBucket
-			.getDoc(`${docKeys.tagManager}${req.body.siteId}`)
-			.then(docWithCas => {
-				let doc = docWithCas.value;
-				if (doc.ownerEmail != req.session.user.email) {
-					return Promise.reject('Owner verfication fail');
-				}
-				if (!doc.ads.length) {
-					doc.ads = req.body.ads;
-				} else {
-					let newAds = [];
-					_.forEach(doc.ads, adFromDoc => {
-						_.forEach(req.body.ads, adFromClient => {
-							if (adFromDoc.id == adFromClient.id) {
-								newAds.push({
-									...adFromDoc,
-									...adFromClient,
-									networkData: {
-										...adFromDoc.networkData,
-										...adFromClient.networkData
-									}
-								});
-							}
-						});
+		return fn.adUpdateProcessing(req, res, docWithCas => {
+			let doc = docWithCas.value;
+			if (doc.ownerEmail != req.session.user.email) {
+				return Promise.reject('Owner verfication fail');
+			}
+			if (!doc.ads.length) {
+				doc.ads = req.body.ads;
+			} else {
+				let newAds = [];
+				_.forEach(doc.ads, adFromDoc => {
+					_.forEach(req.body.ads, adFromClient => {
+						if (adFromDoc.id == adFromClient.id) {
+							newAds.push({
+								...adFromDoc,
+								...adFromClient,
+								networkData: {
+									...adFromDoc.networkData,
+									...adFromClient.networkData
+								}
+							});
+						}
 					});
-					doc.ads = newAds;
-				}
-				return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
-			})
-			.then(() => siteModel.getSiteById(req.body.siteId))
-			.then(site => {
-				adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
-				return sendSuccessResponse(
-					{
-						message: 'Master Saved'
-					},
-					res
-				);
-			})
-			.catch(err => fn.errorHander(err, res));
+				});
+				doc.ads = newAds;
+			}
+			return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
+		});
 	})
 	.post('/modifyAd', (req, res) => {
-		if (!req.body || !req.body.siteId) {
+		if (!req.body || !req.body.siteId || !req.body.adId) {
 			return sendErrorResponse(
 				{
 					message: 'Invalid Parameters.'
@@ -243,28 +246,19 @@ router
 				res
 			);
 		}
-		return appBucket
-			.getDoc(`${docKeys.tagManager}${req.body.siteId}`)
-			.then(docWithCas => {
-				let doc = docWithCas.value;
-				if (doc.ownerEmail != req.session.user.email) {
-					return Promise.reject('Owner verfication fail');
+		return fn.adUpdateProcessing(req, res, docWithCas => {
+			let doc = docWithCas.value;
+			if (doc.ownerEmail != req.session.user.email) {
+				return Promise.reject('Owner verfication fail');
+			}
+			_.forEach(doc.ads, (ad, index) => {
+				if (ad.id == req.body.adId) {
+					doc.ads[index] = { ...ad, ...req.body.data };
+					return false;
 				}
-				const hasAd = doc.ads && doc.ads[adId] ? true : false;
-				hasAd ? (doc.ads[adId] = { ...doc.ads[adId], ...req.body.data }) : null;
-				return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
-			})
-			.then(() => siteModel.getSiteById(req.body.siteId))
-			.then(site => {
-				adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
-				return sendSuccessResponse(
-					{
-						message: 'Ad updated'
-					},
-					res
-				);
-			})
-			.catch(err => fn.errorHander(err, res));
+			});
+			return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
+		});
 	});
 
 module.exports = router;

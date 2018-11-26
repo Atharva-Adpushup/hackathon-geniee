@@ -61,8 +61,9 @@ class AdElement extends Component {
 	}
 
 	updateWrapper(data) {
-		this.props.updateAd(this.props.ad.id, data);
-		return window.isSuperUser ? null : this.props.modifyAdOnServer(this.props.ad.id, data);
+		return window.isSuperUser
+			? this.props.updateAd(this.props.ad.id, data)
+			: this.props.modifyAdOnServer(this.props.ad.id, data);
 	}
 
 	renderAdDetails() {
