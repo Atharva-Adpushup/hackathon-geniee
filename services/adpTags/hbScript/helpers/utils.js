@@ -177,7 +177,7 @@ module.exports = {
 	},
 	hasMultipleDfpAccounts: function() {
 		try {
-			var dfpAdSlots = Object.keys(window.googletag.pubads().aa),
+			var dfpAdSlots = Object.keys(window.googletag.pubads().pa),
 				dfpNetworkIdMap = {};
 
 			dfpAdSlots.forEach(function(dfpAdSlot) {
