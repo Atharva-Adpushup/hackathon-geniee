@@ -110,6 +110,7 @@ class ModalWrapper extends React.Component {
                 dmxid: districtmDMX ? districtmDMX.params.dmxid : '',
                 memberid: districtmDMX ? districtmDMX.params.memberid : '',
             },
+            error: '',
         });
 
     }

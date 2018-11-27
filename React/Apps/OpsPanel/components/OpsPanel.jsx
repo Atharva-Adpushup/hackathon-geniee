@@ -78,7 +78,7 @@ class OpsPanel extends React.Component {
 						});
 					}
 				});
-				console.log(sizes);
+
 				this.setState({
 					editMode: 'update',
 					hbConfig: { ...DEFAULT_HB_CONFIG , ...res.data.hbConfig.bidderAdUnits },
@@ -201,7 +201,7 @@ class OpsPanel extends React.Component {
 
 	addCollection(newCollection) {
 
-		const { modalId, currentSize } = this.state;
+		const { modalId, currentSize, sizesSelected } = this.state;
 
 		let currentCollection = [
 			...this.state.hbConfig[currentSize]
@@ -213,10 +213,18 @@ class OpsPanel extends React.Component {
 				return;
 			}
 			else {
+
 				currentCollection = [
 					...currentCollection.slice(0, modalId),
 					...currentCollection.slice(modalId + 1)
 				]
+
+				if(currentCollection.length === 0) {
+					this.setState({
+						sizesSelected: sizesSelected.filter(size => size.label !== currentSize),
+					});
+				}
+
 			}
 
 		}
@@ -315,12 +323,12 @@ class OpsPanel extends React.Component {
 											{
 											state.currentSize &&
 											<Row>
-												<Col sm={5} style={{ paddingRight: 0 }}>
+												<Col sm={4} style={{ paddingRight: 0 }}>
 													<button 
 														className="btn btn-lightBg btn-default"
 														onClick={ () => this.openModalAndSetCollection(-1) }
 													>
-														Add Bidder Collections for {state.currentSize}
+														Add SLOTS
 													</button>
 												</Col>
 												<Col sm={7} >
@@ -333,14 +341,17 @@ class OpsPanel extends React.Component {
 											</Row>
 											}
 										</Col>
-									</Row>
-									<Row>
 										<Col sm={6}>
 											<textarea
 												className="hb-config-input"
 												onChange={this.hbConfigChange}
 												value={state.hbConfigString}
 											/>
+										</Col>
+									</Row>
+									<Row>
+										<Col sm={12} >
+											<h4>Size Config Panel</h4>
 										</Col>
 										<Col sm={6} >
 											<SettingsPanel
