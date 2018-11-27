@@ -169,7 +169,6 @@ class OpsPanel extends React.Component {
 				updateMessage: 'JSON validation successfull!'
 			});
 		} catch (e) {
-			console.log(e);
 			this.setState({
 				errorMessage: 'Error found in entered JSON, please check.',
 				validated: false,

@@ -119,7 +119,7 @@ class ModalWrapper extends React.Component {
 
         const partnersNotValidated = [];
 
-        this.state.partnersSelected.map(partner => {
+        const collection = this.state.partnersSelected.map(partner => {
 
             Object.keys(this.state[partner.value]).forEach(param => { 
                 if (this.state[partner.value][param] === '') {
@@ -140,10 +140,7 @@ class ModalWrapper extends React.Component {
 
         this.props.toggle();
 
-        this.props.addCollection(this.state.partnersSelected.map(partner => ({
-            bidder: partner.value,
-            params: this.state[partner.value]
-        })));
+        this.props.addCollection(collection);
 
     }
 
