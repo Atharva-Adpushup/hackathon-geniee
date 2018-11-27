@@ -39,20 +39,20 @@ class channelMenu extends Component {
 			return null;
 		}
 
-		const items = [],
-			closeChannelById = () => {
-				closeChannel(activeChannelId);
-			},
-			saveTrafficDistributions = config => {
-				Object.keys(config).forEach(key => {
-					const value = config[key];
-					editTrafficDistribution(key, value);
-				});
-			},
-			trafficDistributionConfig = {
-				description: uiCollections.trafficDistribution.description,
-				sumMismatchErrorMessage: uiCollections.trafficDistribution.errorMessage.sumMismatch
-			};
+		const items = [];
+		const closeChannelById = () => {
+			closeChannel(activeChannelId);
+		};
+		const saveTrafficDistributions = config => {
+			Object.keys(config).forEach(key => {
+				const value = config[key];
+				editTrafficDistribution(key, value);
+			});
+		};
+		const trafficDistributionConfig = {
+			description: uiCollections.trafficDistribution.description,
+			sumMismatchErrorMessage: uiCollections.trafficDistribution.errorMessage.sumMismatch
+		};
 
 		trafficDistributionConfig.sumMismatchErrorMessage = trafficDistributionConfig.sumMismatchErrorMessage.map(
 			(text, id) => <span key={`td-error-${id}`}>{text}</span>
@@ -94,7 +94,10 @@ class channelMenu extends Component {
 				arrow="top"
 				activeItem={this.state.activeItem}
 				onMenuItemClick={this.updateActiveItem}
-				onGlassClick={hideMenu}
+				onGlassClick={() => {
+					this.updateActiveItem(0);
+					hideMenu();
+				}}
 			>
 				{items}
 			</Menu>
