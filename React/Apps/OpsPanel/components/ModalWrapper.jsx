@@ -62,7 +62,7 @@ class ModalWrapper extends React.Component {
         this.setState({
             [this.state.currentPartner]: {
                 ...this.state[this.state.currentPartner],
-                [e.target.name]: e.target.value,
+                [e.target.name]: e.target.type !== "number" ? e.target.value : +e.target.value,
             },
             error: '',
         });
