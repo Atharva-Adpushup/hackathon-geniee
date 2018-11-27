@@ -9,7 +9,7 @@ const AdsTxtConfig = props => {
 			<pre>{adsTxtData}</pre>
 			<CustomMessage
 				header="Important"
-				message="If you have implemented Ads.txt then please copy and paste the above content to your Ads.txt file."
+				message="If you have implemented Ads.txt then please copy and paste the above content to your Ads.txt file. You should append the above content to your ads.txt. Do not replace your ads.txt completely."
 				type="info"
 			/>
 			<CustomButton label="Copy Data" handler={copyToClipBoard.bind(null, adsTxtData)} />

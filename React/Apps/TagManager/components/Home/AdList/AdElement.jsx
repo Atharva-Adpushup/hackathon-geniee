@@ -7,7 +7,7 @@ import { CustomButton } from '../../shared/index.jsx';
 import AdNetworkDetails from './AdNetworkDetails.jsx';
 import AdEventDetails from './AdEventDetails.jsx';
 import LazyLoadSettings from './LazyLoadSettings.jsx';
-
+import Tags from '../../../../../Components/Tags';
 class AdElement extends Component {
 	constructor(props) {
 		super(props);
@@ -31,7 +31,10 @@ class AdElement extends Component {
 	}
 
 	disableAd(ad) {
-		if (confirm('Are you sure you want to archive this ad?')) {
+		const message = this.state.isActive
+			? 'Are you sure you want to archive this ad?'
+			: 'Are you sure you want to unarchive this ad?';
+		if (confirm(message)) {
 			this.setState(
 				{
 					isActive: !this.state.isActive
@@ -113,6 +116,7 @@ class AdElement extends Component {
 		} else {
 			return (
 				<div key={'adDetails' + ad.id}>
+					{!this.state.isActive ? <Tags labels={['Archived']} labelClasses="custom-label" /> : null}
 					{this.renderInformation('Id', ad.id)}
 					<p>
 						Name: <strong>{ad.name ? ad.name : `Ad-${ad.id}`}</strong>{' '}
@@ -170,7 +174,12 @@ class AdElement extends Component {
 
 		return (
 			<div key={`adELement-${ad.id}`}>
-				<OverlayTrigger placement="bottom" overlay={<Tooltip id="delete-ad-tooltip">Archive Ad</Tooltip>}>
+				<OverlayTrigger
+					placement="bottom"
+					overlay={
+						<Tooltip id="delete-ad-tooltip">{this.state.isActive ? 'Archive Ad' : 'Unarchive Ad'}</Tooltip>
+					}
+				>
 					<Button className="btn-close" onClick={this.disableAd.bind(null, ad)}>
 						x
 					</Button>
