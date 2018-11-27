@@ -27,9 +27,9 @@ class Notification extends Component {
 			Containers: {
 				DefaultStyle: {
 					top: 'auto',
-					bottom: '0',
-					left: 'auto',
-					right: '0'
+					bottom: 'auto',
+					left: '0',
+					right: 'auto'
 				}
 			}
 		};
