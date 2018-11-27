@@ -79,10 +79,12 @@ class OpsPanel extends React.Component {
 					}
 				});
 
+				const hbConfig = { ...DEFAULT_HB_CONFIG , ...res.data.hbConfig.bidderAdUnits };
+
 				this.setState({
 					editMode: 'update',
-					hbConfig: { ...DEFAULT_HB_CONFIG , ...res.data.hbConfig.bidderAdUnits },
-					hbConfigString: JSON.stringify({ ...DEFAULT_HB_CONFIG , ...res.data.hbConfig.bidderAdUnits }, null, 4),
+					hbConfig: hbConfig,
+					hbConfigString: JSON.stringify(hbConfig, null, 4),
 					additionalOptions: res.data.hbConfig.additionalOptions,
 					loading: false,
 					deviceConfig: res.data.deviceConfig || this.state.deviceConfig,
