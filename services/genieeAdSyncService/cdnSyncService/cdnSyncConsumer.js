@@ -15,7 +15,8 @@ var path = require('path'),
 	{ getHbAdsApTag } = require('./generateAPTagConfig'),
 	siteModel = require('../../../models/siteModel'),
 	couchbase = require('../../../helpers/couchBaseService'),
-	config = require('../../../configs/config');
+	config = require('../../../configs/config'),
+	prodEnv = config.environment.HOST_ENV === 'production';
 
 module.exports = function(site, externalData = {}) {
 	ftp = new PromiseFtp();
@@ -48,7 +49,7 @@ module.exports = function(site, externalData = {}) {
 			'assets',
 			'js',
 			'builds',
-			'adptags.min.js'
+			prodEnv ? 'adptags.min.js' : 'adptags.js'
 		),
 		prebidScriptPath = path.join(__dirname, '..', '..', 'adpTags', 'Prebid.js', 'build', 'dist', 'prebid.js'),
 		tempDestPath = path.join(
@@ -270,14 +271,17 @@ module.exports = function(site, externalData = {}) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			return connectToServer()
-				.then(cwd)
-				.then(function() {
-					return ftp.put(fileConfig.default, 'adpushup.js');
-				})
-				.then(function() {
-					return Promise.resolve(fileConfig.uncompressed);
-				});
+			if (prodEnv) {
+				return connectToServer()
+					.then(cwd)
+					.then(function() {
+						return ftp.put(fileConfig.default, 'adpushup.js');
+					})
+					.then(function() {
+						return Promise.resolve(fileConfig.uncompressed);
+					});
+			}
+			return Promise.resolve(fileConfig.uncompressed);
 		},
 		getFinalConfigWrapper = () => getFinalConfig.then(fileConfig => fileConfig);
 
