@@ -2,6 +2,7 @@ const express = require('express'),
 	Promise = require('bluebird'),
 	_ = require('lodash'),
 	uuid = require('uuid'),
+	moment = require('moment'),
 	{ couchbaseService } = require('node-utils'),
 	request = require('request-promise'),
 	config = require('../configs/config'),
@@ -20,7 +21,6 @@ const express = require('express'),
 
 const fn = {
 	sendDataToZapier: data => {
-		return Promise.resolve('Zapier Call Skipped');
 		let options = {
 			method: 'GET',
 			uri: 'https://hooks.zapier.com/hooks/catch/547126/frue51/?',
@@ -63,7 +63,6 @@ const fn = {
 				...payload.ad,
 				id: id,
 				name: `Ad-${id}`,
-				// isActive: true,
 				createdOn: +new Date(),
 				formatData: {
 					...payload.ad.formatData,
@@ -82,7 +81,10 @@ const fn = {
 			website: value.siteDomain,
 			platform: ad.formatData.platform,
 			size: `${ad.width}x${ad.height}`,
-			sticky: ad.formatData.type && ad.formatData.type == 'sticky' ? 'yes' : 'no'
+			adId: ad.id,
+			type: 'info',
+			message: 'New Section Created. Please Check',
+			createdOn: moment(ad.createdOn).format('dddd, MMMM Do YYYY, h:mm:ss a')
 		});
 
 		return Promise.resolve([cas, value, id, payload.siteId]);
