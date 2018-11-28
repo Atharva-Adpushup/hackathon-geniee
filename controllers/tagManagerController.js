@@ -82,7 +82,7 @@ const fn = {
 			platform: ad.formatData.platform,
 			size: `${ad.width}x${ad.height}`,
 			adId: ad.id,
-			type: 'info',
+			type: 'action',
 			message: 'New Section Created. Please Check',
 			createdOn: moment(ad.createdOn).format('dddd, MMMM Do YYYY, h:mm:ss a')
 		});
