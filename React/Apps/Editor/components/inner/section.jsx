@@ -47,7 +47,8 @@ class Section extends React.Component {
 	}
 
 	getMaxDimensions() {
-		const ads = this.props.ads, d = { width: 0, height: 0 };
+		const ads = this.props.ads,
+			d = { width: 0, height: 0 };
 		if (ads.length) {
 			let ad;
 			ad = _.max(
@@ -76,7 +77,8 @@ class Section extends React.Component {
 	}
 
 	injectSection(props) {
-		const { operation, xpath } = props, $el = $('<div />');
+		const { operation, xpath } = props,
+			$el = $('<div />');
 		if (operation === adInsertOptions.INSERT_BEFORE) {
 			$el.insertBefore($(xpath));
 		} else if (operation === adInsertOptions.INSERT_AFTER) {
@@ -102,7 +104,6 @@ class Section extends React.Component {
 		if (!this.node) {
 			return false;
 		}
-		console.log(props.ads);
 		let { networkData } = props.ads[0];
 		if (networkData && networkData.isResponsive) {
 			props.ads[0].width = $(this.node).width() || 300;
@@ -114,7 +115,6 @@ class Section extends React.Component {
 			{ height: this.getMaxDimensions().clientHeight, width: this.getMaxDimensions().clientWidth },
 			props.ads[0].css
 		);
-		console.log(css, props.ads);
 		this.$node.css(css);
 		ReactDOM.render(
 			<div className="_ap_reject">
