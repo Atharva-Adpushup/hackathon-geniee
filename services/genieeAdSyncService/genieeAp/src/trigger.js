@@ -62,6 +62,8 @@ var adp = window.adpushup,
 
 				return getContainer(ad)
 					.done(function (container) {
+						adp.config.renderedTagAds = adp.config.renderedTagAds || [];
+						adp.config.renderedTagAds.push({ newId: newAdId, oldId: adId });
 						// Once container has been found, execute adp head code if ad network is "adpTags"
 						if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
 							executeAdpTagsHeadCode([ad], {}); // This function expects an array of adpTags and optional adpKeyValues
