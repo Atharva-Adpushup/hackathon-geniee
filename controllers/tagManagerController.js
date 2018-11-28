@@ -23,7 +23,7 @@ const fn = {
 	sendDataToZapier: data => {
 		let options = {
 			method: 'GET',
-			uri: 'https://hooks.zapier.com/hooks/catch/547126/frue51/?',
+			uri: 'https://hooks.zapier.com/hooks/catch/547126/cdt7p8/?',
 			json: true
 		};
 		_.forEach(data, (value, key) => {
@@ -31,7 +31,7 @@ const fn = {
 		});
 		options.uri = options.uri.slice(0, -1);
 		return request(options)
-			.then(() => console.log('Ad Creation. Called made to Zapier'))
+			.then(response => console.log('Ad Creation. Called made to Zapier'))
 			.catch(err => console.log('Ad creation call to Zapier failed'));
 	},
 	createNewDocAndDoProcessing: payload => {
