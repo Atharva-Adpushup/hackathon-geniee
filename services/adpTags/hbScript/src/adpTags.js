@@ -36,11 +36,16 @@ var prebidSandbox = require('./prebidSandbox'),
 
 		if (availableSlots.length) {
 			if (optionalParam.dfpAdunit && availableSlots.indexOf(optionalParam.dfpAdunit) !== -1) {
-				dfpAdUnit = availableSlots.splice(availableSlots.indexOf(optionalParam.dfpAdunit), 1)[0];
+				if (optionalParam.isManual) {
+					dfpAdUnit = optionalParam.dfpAdunit;
+				} else {
+					dfpAdUnit = availableSlots.splice(availableSlots.indexOf(optionalParam.dfpAdunit), 1)[0];
+				}
 			} else {
 				dfpAdUnit = inventory.dfpAdUnits[size].pop();
 			}
 		}
+
 		return {
 			dfpAdUnit: dfpAdUnit,
 			bidders: bidders
@@ -59,7 +64,9 @@ var prebidSandbox = require('./prebidSandbox'),
 	createSlot = function(containerId, size, placement, optionalParam) {
 		var adUnits = inventoryMapper(size, optionalParam),
 			slotId = adUnits.dfpAdUnit,
-			bidders = optionalParam.headerBidding ? adUnits.bidders : [];
+			bidders = optionalParam.headerBidding ? adUnits.bidders : [],
+			isResponsive = optionalParam.isResponsive,
+			multipleAdSizes = optionalParam.multipleAdSizes;
 
 		adpTags.adpSlots[containerId] = {
 			slotId: slotId,
@@ -68,6 +75,8 @@ var prebidSandbox = require('./prebidSandbox'),
 			placement: placement,
 			activeDFPNetwork: utils.getActiveDFPNetwork(),
 			size: size,
+			computedSizes: multipleAdSizes ? multipleAdSizes : [],
+			isResponsive: isResponsive,
 			containerId: containerId,
 			timeout: config.PREBID_TIMEOUT,
 			gSlot: null,
@@ -124,12 +133,12 @@ var prebidSandbox = require('./prebidSandbox'),
 		currentBatchAdpSlots: [],
 		currentBatchId: null,
 		batchPrebiddingComplete: false,
-		// Function to define new adp slot
 		shouldRun: function(optionalParam) {
 			if (optionalParam && optionalParam.network == 'geniee') {
 				return false;
 			}
 		},
+		// Function to define new adp slot
 		defineSlot: function(containerId, size, placement, optionalParam) {
 			var optionalParam = optionalParam || {},
 				slot = createSlot(containerId, size, placement, optionalParam);

@@ -42,11 +42,11 @@ class Component {
 					? adp.config.selectedVariation
 					: commonConsts.MANUAL_ADS.VARIATION
 			};
-		$format.attr('data-section', id);
+		$format.attr({ 'data-section': id, class: '_ap_apex_ad' });
 
 		adp.tracker.add(
 			$format,
-			function (adId) {
+			function(adId) {
 				adp.utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: adId });
 			}.bind(adp, id)
 		);
@@ -68,14 +68,23 @@ class Component {
 
 		adp.interactiveAds.adsRendered += 1;
 		const apConfig = adp.config,
-			isConfig = !!(apConfig),
+			isConfig = !!apConfig,
 			isExperiment = !!(isConfig && apConfig.experiment),
 			isExperimentPlatform = !!(isExperiment && apConfig.experiment[apConfig.platform]),
-			isExperimentPageGroup = !!(isExperimentPlatform && apConfig.experiment[apConfig.platform][apConfig.pageGroup]),
-			isExperimentVariations = !!(isExperimentPageGroup && apConfig.experiment[apConfig.platform][apConfig.pageGroup].variations),
-			isSelectedVariation = !!(apConfig.selectedVariation);
+			isExperimentPageGroup = !!(
+				isExperimentPlatform && apConfig.experiment[apConfig.platform][apConfig.pageGroup]
+			),
+			isExperimentVariations = !!(
+				isExperimentPageGroup && apConfig.experiment[apConfig.platform][apConfig.pageGroup].variations
+			),
+			isSelectedVariation = !!apConfig.selectedVariation;
 
-		if (Object.keys(adp.interactiveAds.ads).length === adp.interactiveAds.adsRendered && !adp.afterJSExecuted && isExperimentVariations && isSelectedVariation) {
+		if (
+			Object.keys(adp.interactiveAds.ads).length === adp.interactiveAds.adsRendered &&
+			!adp.afterJSExecuted &&
+			isExperimentVariations &&
+			isSelectedVariation
+		) {
 			let variations = apConfig.experiment[apConfig.platform][apConfig.pageGroup].variations,
 				variation = null;
 

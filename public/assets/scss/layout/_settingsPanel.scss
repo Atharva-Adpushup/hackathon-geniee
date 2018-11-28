@@ -1,53 +1,57 @@
 .settings-pane {
-    padding: 20px;
-    color: $fontColor;
+	padding: 20px;
+	color: $fontColor;
 
-    h4 {
-        margin-bottom: 30px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid $lightGrey;
-    }
+	h4 {
+		margin-bottom: 30px;
+		padding-bottom: 10px;
+		border-bottom: 1px solid $lightGrey;
+	}
 
-    .row {
-        margin: 5px -15px;
-    }
+	.row {
+		margin: 5px -15px;
+	}
 
-    input,
-    button {
-        width: 100%;
-        height: auto;
-        padding: 8px;
-        border-radius: 3px;
-    }
+	input,
+	button {
+		width: 100%;
+		height: auto;
+		padding: 8px;
+		border-radius: 3px;
+	}
 
-    input {
-        font-size: 1.2em;
-    }
+	input {
+		font-size: 1.2em;
+	}
 
-    .input-name {
-        font-size: 1.4em;
-        margin-top: 5px;
-        font-weight: 700;
-    }
+	.input-name {
+		font-size: 1.4em;
+		margin-top: 5px;
+		font-weight: 700;
+	}
 }
 
 .blocklist {
-    margin: 0 15px;
-    font-size: 1.2em;
-    color: $fontColor;
+	margin: 0 15px;
+	font-size: 1.2em;
+	color: $fontColor;
 
-    li {
-        padding: 5px;
-        margin: 5px 0;
-        border-bottom: 1px solid lighten($lightGrey, 12%);
-    }
+	li {
+		padding: 5px;
+		margin: 5px 0;
+		border-bottom: 1px solid lighten($lightGrey, 12%);
+	}
 }
 
 .removeBlocklistItem:hover {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .error-message {
-    font-size: 1.2em;
-    line-height: 20px;
+	font-size: 1.2em;
+	line-height: 20px;
+}
+
+.text-well {
+	margin-top: 5px;
 }

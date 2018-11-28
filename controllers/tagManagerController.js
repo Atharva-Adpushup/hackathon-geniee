@@ -2,6 +2,7 @@ const express = require('express'),
 	Promise = require('bluebird'),
 	_ = require('lodash'),
 	uuid = require('uuid'),
+	moment = require('moment'),
 	{ couchbaseService } = require('node-utils'),
 	request = require('request-promise'),
 	config = require('../configs/config'),
@@ -22,7 +23,7 @@ const fn = {
 	sendDataToZapier: data => {
 		let options = {
 			method: 'GET',
-			uri: 'https://hooks.zapier.com/hooks/catch/547126/frue51/?',
+			uri: 'https://hooks.zapier.com/hooks/catch/547126/cdt7p8/?',
 			json: true
 		};
 		_.forEach(data, (value, key) => {
@@ -30,8 +31,18 @@ const fn = {
 		});
 		options.uri = options.uri.slice(0, -1);
 		return request(options)
-			.then(() => console.log('Ad Creation. Called made to Zapier'))
+			.then(response => console.log('Ad Creation. Called made to Zapier'))
 			.catch(err => console.log('Ad creation call to Zapier failed'));
+	},
+	createNewDocAndDoProcessing: payload => {
+		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
+		return appBucket
+			.createDoc(`${docKeys.tagManager}${payload.siteId}`, tagManagerDefault, {})
+			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
+			.then(docWithCas => {
+				payload.siteDomain = docWithCas.value.siteDomain;
+				return fn.processing(tagManagerDefault, payload);
+			});
 	},
 	createNewDocAndDoProcessing: payload => {
 		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
@@ -51,7 +62,7 @@ const fn = {
 			ad = {
 				...payload.ad,
 				id: id,
-				isActive: true,
+				name: `Ad-${id}`,
 				createdOn: +new Date(),
 				formatData: {
 					...payload.ad.formatData,
@@ -70,7 +81,10 @@ const fn = {
 			website: value.siteDomain,
 			platform: ad.formatData.platform,
 			size: `${ad.width}x${ad.height}`,
-			sticky: ad.formatData.type && ad.formatData.type == 'sticky' ? 'yes' : 'no'
+			adId: ad.id,
+			type: 'action',
+			message: 'New Section Created. Please Check',
+			createdOn: moment(ad.createdOn).format('dddd, MMMM Do YYYY, h:mm:ss a')
 		});
 
 		return Promise.resolve([cas, value, id, payload.siteId]);
@@ -86,6 +100,22 @@ const fn = {
 	errorHander: (err, res) => {
 		console.log(err);
 		return sendErrorResponse({ message: 'Opertion Failed' }, res);
+	},
+	adUpdateProcessing: (req, res, processing) => {
+		return appBucket
+			.getDoc(`${docKeys.tagManager}${req.body.siteId}`)
+			.then(docWithCas => processing(docWithCas))
+			.then(() => siteModel.getSiteById(req.body.siteId))
+			.then(site => {
+				adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
+				return sendSuccessResponse(
+					{
+						message: 'Operation Successfull'
+					},
+					res
+				);
+			})
+			.catch(err => fn.errorHander(err, res));
 	}
 };
 
@@ -109,7 +139,16 @@ router
 					res
 				)
 			)
-			.catch(err => fn.errorHander(err, res));
+			.catch(err => {
+				return err.code && err.code === 13 && err.message.includes('key does not exist')
+					? sendSuccessResponse(
+							{
+								ads: []
+							},
+							res
+					  )
+					: fn.errorHander(err, res);
+			});
 	})
 	.get(['/', '/:siteId'], (req, res) => {
 		const { session, params } = req;
@@ -172,46 +211,56 @@ router
 				res
 			);
 		}
-		return appBucket
-			.getDoc(`${docKeys.tagManager}${req.body.siteId}`)
-			.then(docWithCas => {
-				let doc = docWithCas.value;
-				if (doc.ownerEmail != req.session.user.email) {
-					return Promise.reject('Owner verfication fail');
-				}
-				if (!doc.ads.length) {
-					doc.ads = req.body.ads;
-				} else {
-					let newAds = [];
-					_.forEach(doc.ads, adFromDoc => {
-						_.forEach(req.body.ads, adFromClient => {
-							if (adFromDoc.id == adFromClient.id) {
-								newAds.push({
-									...adFromDoc,
-									...adFromClient,
-									networkData: {
-										...adFromDoc.networkData,
-										...adFromClient.networkData
-									}
-								});
-							}
-						});
+		return fn.adUpdateProcessing(req, res, docWithCas => {
+			let doc = docWithCas.value;
+			if (doc.ownerEmail != req.session.user.email) {
+				return Promise.reject('Owner verfication fail');
+			}
+			if (!doc.ads.length) {
+				doc.ads = req.body.ads;
+			} else {
+				let newAds = [];
+				_.forEach(doc.ads, adFromDoc => {
+					_.forEach(req.body.ads, adFromClient => {
+						if (adFromDoc.id == adFromClient.id) {
+							newAds.push({
+								...adFromDoc,
+								...adFromClient,
+								networkData: {
+									...adFromDoc.networkData,
+									...adFromClient.networkData
+								}
+							});
+						}
 					});
-					doc.ads = newAds;
+				});
+				doc.ads = newAds;
+			}
+			return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
+		});
+	})
+	.post('/modifyAd', (req, res) => {
+		if (!req.body || !req.body.siteId || !req.body.adId) {
+			return sendErrorResponse(
+				{
+					message: 'Invalid Parameters.'
+				},
+				res
+			);
+		}
+		return fn.adUpdateProcessing(req, res, docWithCas => {
+			let doc = docWithCas.value;
+			if (doc.ownerEmail != req.session.user.email) {
+				return Promise.reject('Owner verfication fail');
+			}
+			_.forEach(doc.ads, (ad, index) => {
+				if (ad.id == req.body.adId) {
+					doc.ads[index] = { ...ad, ...req.body.data };
+					return false;
 				}
-				return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
-			})
-			.then(() => siteModel.getSiteById(req.body.siteId))
-			.then(site => {
-				adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
-				return sendSuccessResponse(
-					{
-						message: 'Master Saved'
-					},
-					res
-				);
-			})
-			.catch(err => fn.errorHander(err, res));
+			});
+			return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
+		});
 	});
 
 module.exports = router;
