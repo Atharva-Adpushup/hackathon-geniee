@@ -1,4 +1,6 @@
+import React from 'react';
 import './styles.scss';
+
 const Tags = props => {
 	let { labels } = props;
 	labels = labels || [];

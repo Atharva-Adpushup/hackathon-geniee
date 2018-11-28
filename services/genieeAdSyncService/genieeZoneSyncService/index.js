@@ -55,13 +55,17 @@ module.exports = {
 		if (ad.networkData && Object.keys(ad.networkData).length) {
 			if (!ad.networkData.dfpAdunit) {
 				const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
+					isResponsive = !!(ad.width === 'responsive' && ad.networkData.isResponsive),
+					isNative = !!(ad.formatData && ad.formatData.type === 'native'),
 					defaultAdData = {
 						adId: ad.id,
-						sizeWidth: parseInt(ad.width, 10),
-						sizeHeight: parseInt(ad.height, 10),
+						isResponsive: isResponsive,
+						sizeWidth: isResponsive ? 'responsive' : parseInt(ad.width, 10),
+						sizeHeight: isResponsive ? 'responsive' : parseInt(ad.height, 10),
 						sectionId: section.id,
 						type: section.formatData && section.formatData.type ? section.formatData.type : false,
-						isManual: ad.isManual || false
+						isManual: ad.isManual || false,
+						isNative: isNative
 					};
 
 				if (isMultipleAdSizes) {
@@ -110,7 +114,7 @@ module.exports = {
 			});
 		});
 		return unsyncedZones;
-	},
+	}, 
 	getAllUnsyncedZones: function(site) {
 		var finalZones = [],
 			channelUnsyncedZones = [],

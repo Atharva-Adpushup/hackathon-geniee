@@ -30,11 +30,11 @@ class OpsPanel extends React.Component {
 			hbConfig: DEFAULT_HB_CONFIG,
 			additionalOptions: {},
 			deviceConfig: {
-				sizeConfig: [],
+				sizeConfig: []
 			},
 			deviceConfigString: JSON.stringify({
-				sizeConfig: [],
-			}),
+				sizeConfig: []
+			})
 		};
 		this.fetchHbConfig = this.fetchHbConfig.bind(this);
 		this.saveConfigs = this.saveConfigs.bind(this);
@@ -58,7 +58,9 @@ class OpsPanel extends React.Component {
 					additionalOptions: res.data.hbConfig.additionalOptions,
 					loading: false,
 					deviceConfig: res.data.deviceConfig || this.state.deviceConfig,
-					deviceConfigString: res.data.deviceConfig ? JSON.stringify(res.data.deviceConfig , null, 4) : this.state.deviceConfigString,
+					deviceConfigString: res.data.deviceConfig
+						? JSON.stringify(res.data.deviceConfig, null, 4)
+						: this.state.deviceConfigString
 				});
 			})
 			.fail(res => {
@@ -91,13 +93,13 @@ class OpsPanel extends React.Component {
 			deviceConfig = state.deviceConfig,
 			payload = {
 				editMode: state.editMode,
-			 	hbConfig,
+				hbConfig,
 				deviceConfig,
 				additionalOptions: state.additionalOptions
 			};
 
 		this.setState({ updateMessage: 'Saving...' });
-		
+
 		if (state.hbConfig) {
 			$.post(
 				`/user/site/${window.siteId}/opsPanel/hbConfig`,
@@ -139,20 +141,18 @@ class OpsPanel extends React.Component {
 	}
 
 	validateJSONConfigWrapper(configs, configName) {
-
 		this.validateJSONConfig(configs, configName);
 
-		if(!this.state.errorMessage) {
-
+		if (!this.state.errorMessage) {
 			const parsedConfig = JSON.parse(configs);
-			this.setState({ deviceConfig: { sizeConfig: parsedConfig.sizeConfig.filter(data => data.sizesSupported.length > 0)}});
+			this.setState({
+				deviceConfig: { sizeConfig: parsedConfig.sizeConfig.filter(data => data.sizesSupported.length > 0) }
+			});
 
 			return true;
-			
 		}
 
 		return false;
-
 	}
 
 	render() {
@@ -190,9 +190,9 @@ class OpsPanel extends React.Component {
 												value={state.hbConfigString}
 											/>
 										</Col>
-										<Col sm={6} >
+										<Col sm={6}>
 											<SettingsPanel
-											 	fetchedData={this.state.deviceConfig.sizeConfig}
+												fetchedData={this.state.deviceConfig.sizeConfig}
 												validationCheck={this.validateJSONConfigWrapper}
 											/>
 										</Col>
@@ -212,8 +212,11 @@ class OpsPanel extends React.Component {
 								</div>
 							</Col>
 							<Col sm={4}>
-								<button className="btn btn-lightBg btn-default" onClick={() => this.validateJSONConfig(this.state.hbConfigString, "hbConfig")}>
-									Validate
+								<button
+									className="btn btn-lightBg btn-default"
+									onClick={() => this.validateJSONConfig(this.state.hbConfigString, 'hbConfig')}
+								>
+									Validate HB Config
 								</button>
 							</Col>
 							<Col sm={4}>

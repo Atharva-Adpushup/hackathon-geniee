@@ -5,95 +5,100 @@ var browserConfig = require('./browserConfig.js'),
 	Base64 = require('Base64');
 
 module.exports = {
-	log: function () {
-		var isQueryParams = !!(this.queryParams &&
-			$.isPlainObject(this.queryParams) &&
-			!$.isEmptyObject(this.queryParams)),
+	log: function() {
+		var isQueryParams = !!(
+				this.queryParams &&
+				$.isPlainObject(this.queryParams) &&
+				!$.isEmptyObject(this.queryParams)
+			),
 			isapDebugParam = !!(isQueryParams && this.queryParams.apDebug);
 
 		if (typeof console !== 'undefined' && console.log && isapDebugParam) console.log.apply(console, arguments);
 	},
-	base64Encode: function (data) {
+	base64Encode: function(data) {
 		return Base64.btoa(data);
 	},
-	base64Decode: function (data) {
+	base64Decode: function(data) {
 		//Using this not polyfills because native and polyfills of decode don't provide unicode support
 		return Base64.atob(data);
 	},
-	getCountry: function () {
-		return new Promise(function (resolve, reject) {
-			$.get('//e3.adpushup.com/IpLocationPublicWebService/GetLocationInfo', function (response) {
+	getCountry: function() {
+		return new Promise(function(resolve, reject) {
+			$.get('//e3.adpushup.com/IpLocationPublicWebService/GetLocationInfo', function(response) {
 				if (response && response.data && response.data.country) {
 					resolve(response.data.country);
 					return;
 				}
 				resolve(null);
 				return;
-			}).fail(function (err) {
+			}).fail(function(err) {
 				utils.log('Error in Geoapi', err);
 				resolve(null);
 			});
 		});
 	},
 	// All feedback packets are generated from this function except event 2, 3 and 4.
-	sendFeedback: function (options) {
+	sendFeedback: function(options) {
 		var adp = window.adpushup;
 
 		return this.sendBeacon(adp.config.feedbackUrl, options, {
 			method: 'image'
 		});
 	},
-	getRandomNumberBetween: function (min, max) {
+	getRandomNumberBetween: function(min, max) {
 		min = Math.ceil(min);
 		max = Math.floor(max);
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	},
-	uniqueId: function (appendNum) {
+	uniqueId: function(appendNum) {
 		var d = +new Date(),
 			r,
-			appendMe = !appendNum || (typeof appendNum === 'number' && appendNum < 0)
-				? Number(1).toString(16)
-				: Number(appendNum).toString(16);
+			appendMe =
+				!appendNum || (typeof appendNum === 'number' && appendNum < 0)
+					? Number(1).toString(16)
+					: Number(appendNum).toString(16);
 		appendMe = ('0000000'.substr(0, 8 - appendMe.length) + appendMe).toUpperCase();
 		return (
 			appendMe +
-			'-xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-				r = (((d = Math.floor(d / 16)) + Math.random() * 16) % 16) | 0;
+			'-xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+				r = ((d = Math.floor(d / 16)) + Math.random() * 16) % 16 | 0;
 				return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
 			})
 		);
 	},
-	loadScript: function (src, sC, fC) {
-		var d = document, s = d.createElement('script');
+	loadScript: function(src, sC, fC) {
+		var d = document,
+			s = d.createElement('script');
 		s.src = src;
 		s.type = 'text/javascript';
 		s.async = true;
-		s.onerror = function () {
+		s.onerror = function() {
 			if (typeof fC === 'function') {
 				fC.call();
 			}
 		};
 		if (typeof d.attachEvent === 'object') {
-			s.onreadystatechange = function () {
+			s.onreadystatechange = function() {
 				s.readyState === 'loaded' || s.readyState === 'complete'
 					? (s.onreadystatechange = null && (typeof sC === 'function' ? sC.call() : null))
 					: null;
 			};
 		} else {
-			s.onload = function () {
+			s.onload = function() {
 				typeof sC === 'function' ? sC.call() : null;
 			};
 		}
 		(d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s);
 	},
-	runScript: function (str) {
-		var d = document, script = d.createElement('script');
+	runScript: function(str) {
+		var d = document,
+			script = d.createElement('script');
 		script.type = 'text/javascript';
 		script.text = str;
 		script.html = str;
 		(d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(script);
 	},
-	requestServer: function (url, data, timeout, method, dataType, contentType) {
+	requestServer: function(url, data, timeout, method, dataType, contentType) {
 		$.support.cors = true;
 		return $.ajax({
 			url: url,
@@ -106,12 +111,15 @@ module.exports = {
 			crossDomain: true
 		});
 	},
-	sendBeacon: function (url, data, options) {
+	sendBeacon: function(url, data, options) {
 		if (typeof url !== 'string' || typeof data !== 'object') {
 			return false;
 		}
 
-		var toFeedback, request, evt, adpConfig = window.adpushup.config;
+		var toFeedback,
+			request,
+			evt,
+			adpConfig = window.adpushup.config;
 
 		data.packetId = adpConfig.packetId;
 		data.siteId = adpConfig.siteId;
@@ -164,7 +172,10 @@ module.exports = {
 							0,
 							null
 						);
-						browserConfig.$pingEl.attr('ping', toFeedback).get(0).dispatchEvent(evt);
+						browserConfig.$pingEl
+							.attr('ping', toFeedback)
+							.get(0)
+							.dispatchEvent(evt);
 					} catch (e) {} // eslint-disable-line no-empty
 				} else {
 					new Image().src = toFeedback;
@@ -175,11 +186,12 @@ module.exports = {
 		}
 		return true;
 	},
-	objToUrl: function (obj) {
+	objToUrl: function(obj) {
 		if (typeof obj !== 'object') {
 			return false;
 		}
-		var data = '', i;
+		var data = '',
+			i;
 		for (i in obj) {
 			if (obj.hasOwnProperty(i)) {
 				data += '&' + i + '=' + obj[i];
@@ -187,23 +199,31 @@ module.exports = {
 		}
 		return data;
 	},
-	rightTrim: function (string, s) {
+	rightTrim: function(string, s) {
 		return string ? string.replace(new RegExp(s + '*$'), '') : '';
 	},
-	domanize: function (domain) {
+	domanize: function(domain) {
 		return domain
-			? this.rightTrim(domain.replace('http://', '').replace('https://', '').replace('www.', ''), '/')
+			? this.rightTrim(
+					domain
+						.replace('http://', '')
+						.replace('https://', '')
+						.replace('www.', ''),
+					'/'
+			  )
 			: '';
 	},
-	isUrlMatching: function () {
-		var config = window.adpushup.config, url = this.domanize(config.siteDomain);
+	isUrlMatching: function() {
+		var config = window.adpushup.config,
+			url = this.domanize(config.siteDomain);
 		return window.location.href.indexOf(url) !== -1 ? true : false;
 	},
-	getObjectByName: function (collection, name) {
-		var isInCollection = false, objectConfig = { index: -1, name: name };
+	getObjectByName: function(collection, name) {
+		var isInCollection = false,
+			objectConfig = { index: -1, name: name };
 
 		if (collection && collection.length && name) {
-			$.each(collection, function (idx, obj) {
+			$.each(collection, function(idx, obj) {
 				if (name === obj.name) {
 					isInCollection = true;
 					objectConfig.index = idx;
@@ -216,16 +236,17 @@ module.exports = {
 
 		return isInCollection;
 	},
-	throttle: function (fn, threshhold, scope) {
+	throttle: function(fn, threshhold, scope) {
 		var last, deferTimer;
-		return function () {
+		return function() {
 			var context = scope || this;
 
-			var now = +new Date(), args = arguments;
+			var now = +new Date(),
+				args = arguments;
 			if (last && now < last + threshhold) {
 				// hold on to it
 				clearTimeout(deferTimer);
-				deferTimer = setTimeout(function () {
+				deferTimer = setTimeout(function() {
 					last = now;
 					fn.apply(context, args);
 				}, threshhold);
@@ -235,7 +256,7 @@ module.exports = {
 			}
 		};
 	},
-	removeUrlParameter: function (url, parameter) {
+	removeUrlParameter: function(url, parameter) {
 		// Snippet from https://stackoverflow.com/a/4893927
 		var urlParts = url.split('?');
 
@@ -270,13 +291,13 @@ module.exports = {
 
 		return url;
 	},
-	getInteractiveAds: function (config) {
+	getInteractiveAds: function(config) {
 		var ads = [];
 
 		if (config && config.experiment && config.platform && config.pageGroup && config.selectedVariation) {
 			var variations = config.experiment[config.platform][config.pageGroup].variations,
 				selectedVariation = config.selectedVariation;
-			variations.forEach(function (variation) {
+			variations.forEach(function(variation) {
 				if (variation.id === selectedVariation) {
 					ads = variation.ads;
 				}
@@ -284,18 +305,18 @@ module.exports = {
 		}
 
 		if (config.manualModeActive && window.adpushup.config.manualAds.length) {
-			ads = window.adpushup.config.manualAds;
+			ads = ads.concat(window.adpushup.config.manualAds);
 		}
 
 		if (ads.length) {
-			var interactiveAds = ads.filter(function (ad) {
+			var interactiveAds = ads.filter(function(ad) {
 				return ad && ad.formatData && ad.formatData.event;
 			});
 
 			return interactiveAds.length ? interactiveAds : null;
 		}
 	},
-	isElementInViewport: function (el, threshold) {
+	isElementInViewport: function(el, threshold) {
 		const elementTop = $(el).offset().top,
 			elementBottom = elementTop + $(el).outerHeight(),
 			viewportTop = $(window).scrollTop(),
@@ -306,11 +327,13 @@ module.exports = {
 			(elementBottom > viewportTop && elementTop < viewportBottom)
 		);
 	},
-	queryParams: (function () {
-		var str = window.location.search, objURL = {};
+	queryParams: (function() {
+		var str = window.location.search,
+			objURL = {};
 
-		str.replace(new RegExp('([^?=&]+)(=([^&]*))?', 'g'), function ($0, $1, $2, $3) {
-			var queryStringKey = $1 || '', queryStringValue = $3 || '';
+		str.replace(new RegExp('([^?=&]+)(=([^&]*))?', 'g'), function($0, $1, $2, $3) {
+			var queryStringKey = $1 || '',
+				queryStringValue = $3 || '';
 
 			objURL[queryStringKey] = window.decodeURIComponent(queryStringValue.replace(/\+/g, ' '));
 		});

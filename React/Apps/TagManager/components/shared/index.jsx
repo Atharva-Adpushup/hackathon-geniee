@@ -30,8 +30,7 @@ const fn = {
 	CustomButton = props => {
 		return (
 			<div
-				className="btn btn-lightBg btn-default"
-				style={{ display: 'inline', float: 'right', margin: '10px 15px 0px 0px' }}
+				className={`btn btn-lightBg btn-default custom-btn ${props.classNames ? props.classNames : ' '}`}
 				onClick={props.handler}
 			>
 				{props.label}

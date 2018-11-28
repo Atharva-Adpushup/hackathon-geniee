@@ -178,9 +178,11 @@ router
 					});
 				}
 
-				res.send({ error: false, data: variations });
+				return res.send({ error: false, data: variations });
 			})
-			.catch(err => res.send({ error: true, message: 'Error while fetching result. Please try later.' }));
+			.catch(err => {
+				return res.send({ error: true, message: 'Error while fetching result. Please try later.' });
+			});
 	})
 	.get('/getPageGroupVariationRPM', function(req, res) {
 		const reportConfig = extend(true, {}, req.query),

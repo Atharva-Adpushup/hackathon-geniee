@@ -94,6 +94,7 @@ class insertMenu extends React.Component {
 			adPayload.multipleAdSizes = networkData.multipleAdSizes;
 		}
 		delete networkData.multipleAdSizes;
+		delete networkData.isBackwardCompatibleSizes;
 
 		adPayload.networkData = {
 			...adPayload.networkData,

@@ -15,7 +15,8 @@ var path = require('path'),
 	{ getHbAdsApTag } = require('./generateAPTagConfig'),
 	siteModel = require('../../../models/siteModel'),
 	couchbase = require('../../../helpers/couchBaseService'),
-	config = require('../../../configs/config');
+	config = require('../../../configs/config'),
+	prodEnv = config.environment.HOST_ENV === 'production';
 
 module.exports = function(site, externalData = {}) {
 	ftp = new PromiseFtp();
@@ -48,7 +49,7 @@ module.exports = function(site, externalData = {}) {
 			'assets',
 			'js',
 			'builds',
-			'adptags.min.js'
+			prodEnv ? 'adptags.min.js' : 'adptags.js'
 		),
 		prebidScriptPath = path.join(__dirname, '..', '..', 'adpTags', 'Prebid.js', 'build', 'dist', 'prebid.js'),
 		tempDestPath = path.join(
@@ -147,6 +148,16 @@ module.exports = function(site, externalData = {}) {
 							) {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', serviceScript);
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', serviceScript);
+
+								let { deviceConfig } = serviceConfig.hbcf.value;
+								if (deviceConfig && deviceConfig.sizeConfig.length) {
+									deviceConfig = ',sizeConfig: ' + JSON.stringify(deviceConfig.sizeConfig);
+								} else {
+									deviceConfig = '';
+								}
+
+								jsFile = _.replace(jsFile, '__SIZE_CONFIG__', deviceConfig);
+								uncompressedJsFile = _.replace(uncompressedJsFile, '__SIZE_CONFIG__', deviceConfig);
 							} else {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', '');
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', '');
@@ -260,14 +271,17 @@ module.exports = function(site, externalData = {}) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			return connectToServer()
-				.then(cwd)
-				.then(function() {
-					return ftp.put(fileConfig.default, 'adpushup.js');
-				})
-				.then(function() {
-					return Promise.resolve(fileConfig.uncompressed);
-				});
+			if (prodEnv) {
+				return connectToServer()
+					.then(cwd)
+					.then(function() {
+						return ftp.put(fileConfig.default, 'adpushup.js');
+					})
+					.then(function() {
+						return Promise.resolve(fileConfig.uncompressed);
+					});
+			}
+			return Promise.resolve(fileConfig.uncompressed);
 		},
 		getFinalConfigWrapper = () => getFinalConfig.then(fileConfig => fileConfig);
 
