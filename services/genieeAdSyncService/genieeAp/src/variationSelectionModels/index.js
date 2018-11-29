@@ -104,7 +104,8 @@ function computeChosenVariation(moduleConfig) {
 
 	var config = moduleConfig.isValidated && moduleConfig.data,
 		experiment = config && config.experiment,
-		isAutoOptimise = !!config.autoOptimise,
+		isAutoOptimise = experiment[config.platform][config.pageGroup].autoOptimise,
+		// isAutoOptimise = !!config.autoOptimise,
 		allVariations = experiment[config.platform][config.pageGroup].variations,
 		channelContentSelector,
 		variationContentSelector,

@@ -86,7 +86,7 @@ const _ = require('lodash'),
 				css: ad.css,
 				height: parseInt(ad.height, 10),
 				width: parseInt(ad.width, 10),
-				enableLazyLoading:section.enableLazyLoading
+				enableLazyLoading: section.enableLazyLoading
 			};
 
 			// Add 'multipleAdSizes' property if exists
@@ -204,7 +204,8 @@ const _ = require('lodash'),
 			contentSelector: channel.contentSelector,
 			pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup),
 			hasVariationsWithNoData: false,
-			ampSettings: channel.ampSettings ? { isEnabled: channel.ampSettings.isEnabled } : { isEnabled: false }
+			ampSettings: channel.ampSettings ? { isEnabled: channel.ampSettings.isEnabled } : { isEnabled: false },
+			autoOptimise: channel.hasOwnProperty('autoOptimise') ? channel.autoOptimise : true
 		};
 
 		_.each(channel.variations, (variation, id) => {
