@@ -30,6 +30,7 @@ const fn = {
 			options.uri += `${key}=${value}&`;
 		});
 		options.uri = options.uri.slice(0, -1);
+
 		return request(options)
 			.then(response => console.log('Ad Creation. Called made to Zapier'))
 			.catch(err => console.log('Ad creation call to Zapier failed'));
@@ -76,16 +77,18 @@ const fn = {
 		value.siteId = value.siteId || payload.siteId;
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
 
-		fn.sendDataToZapier({
-			email: value.ownerEmail,
-			website: value.siteDomain,
-			platform: ad.formatData.platform,
-			size: `${ad.width}x${ad.height}`,
-			adId: ad.id,
-			type: 'action',
-			message: 'New Section Created. Please Check',
-			createdOn: moment(ad.createdOn).format('dddd, MMMM Do YYYY, h:mm:ss a')
-		});
+		if (config.environment.HOST_ENV === 'production') {
+			fn.sendDataToZapier({
+				email: value.ownerEmail,
+				website: value.siteDomain,
+				platform: ad.formatData.platform,
+				size: `${ad.width}x${ad.height}`,
+				adId: ad.id,
+				type: 'action',
+				message: 'New Section Created. Please Check',
+				createdOn: moment(ad.createdOn).format('dddd, MMMM Do YYYY, h:mm:ss a')
+			});
+		}
 
 		return Promise.resolve([cas, value, id, payload.siteId]);
 	},
