@@ -16,7 +16,7 @@ class AdElement extends Component {
 			showEventDetails: false,
 			showLazyload: false,
 			editName: false,
-			isActive: props.ad.isActive || true
+			isActive: props.ad.hasOwnProperty('isActive') ? props.ad.isActive : true
 		};
 		this.toggleHandler = this.toggleHandler.bind(this);
 		this.renderAdDetails = this.renderAdDetails.bind(this);
