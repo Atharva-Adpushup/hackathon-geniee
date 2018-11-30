@@ -7,7 +7,7 @@ class TrafficPanel extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			autoOptimise: this.props.channel.hasOwnProperty('autoOptimise') ? this.props.channel.autoOptimise : true
+			autoOptimise: this.props.channel.hasOwnProperty('autoOptimise') ? this.props.channel.autoOptimise : false
 		};
 		this.toggleHandler = this.toggleHandler.bind(this);
 	}

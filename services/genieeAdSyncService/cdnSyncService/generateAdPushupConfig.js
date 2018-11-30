@@ -205,7 +205,7 @@ const _ = require('lodash'),
 			pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup),
 			hasVariationsWithNoData: false,
 			ampSettings: channel.ampSettings ? { isEnabled: channel.ampSettings.isEnabled } : { isEnabled: false },
-			autoOptimise: channel.hasOwnProperty('autoOptimise') ? channel.autoOptimise : true
+			autoOptimise: channel.hasOwnProperty('autoOptimise') ? channel.autoOptimise : false
 		};
 
 		_.each(channel.variations, (variation, id) => {
