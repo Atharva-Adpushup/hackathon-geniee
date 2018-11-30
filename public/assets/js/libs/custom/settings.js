@@ -379,9 +379,18 @@ $(document).ready(function() {
 			autoOptimise = $(this).prop('checked');
 			!autoOptimise
 				? $('#autoOptimiseErr').html(
-						'NOTE: AdPushup might be disabled right now for this site. Kindly set the traffic manually for each variation in all the page groups present for this site. <br/><br/> To update the traffic, go to Editor > Load Page Group > Traffic Distribution.'
+						'NOTE: AdPushup might be disabled right now for this site. Kindly set the traffic manually for each variation in all the page groups present for this site. Kindly, do save settings below. <br/><br/> To update the traffic, go to Editor > Load Page Group > Traffic Distribution.'
 				  )
 				: $('#autoOptimiseErr').html('');
+
+			var autoOptimiseValues = $('td[data-identifier="autoptimise"]'),
+				toAdd = autoOptimise ? 'green' : 'red';
+			autoOptimiseValues.each(function(index, ele) {
+				ele.innerText = autoOptimise ? 'Enabled' : 'Disabled';
+				ele.classList.remove('green');
+				ele.classList.remove('red');
+				ele.classList.add(toAdd);
+			});
 		});
 
 		// Copy to clipboard trigger
