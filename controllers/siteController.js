@@ -60,6 +60,21 @@ var express = require('express'),
 router
 	.get('/:siteId/*', checkAuth)
 	.get('/:siteId/settings', (req, res) => {
+		function channelsDataFetching(site) {
+			return site.getAllChannels().then(channels => {
+				let response = [];
+				if (channels && channels.length) {
+					response = _.map(channels, channel => {
+						return {
+							name: channel.channelName,
+							autoOptimise: channel.hasOwnProperty('autoOptimise') ? channel.autoOptimise : 'N/A'
+						};
+					});
+				}
+				return response;
+			});
+		}
+
 		return siteModel
 			.getSiteById(req.params.siteId)
 			.then(site => [
@@ -86,20 +101,28 @@ router
 					});
 				}
 
-				return res.render('settings', {
-					pageGroups: sitePageGroups,
-					patterns: site.get('apConfigs').pageGroupPattern || {},
-					apConfigs: site.get('apConfigs'),
-					blocklist: site.get('apConfigs').blocklist,
-					siteId: req.params.siteId,
-					siteDomain: site.get('siteDomain'),
-					dfpAccounts: dfpAccounts,
-					isSuperUser: req.session.isSuperUser,
-					//UI access code conversion property value
-					// Specific to Geniee network as of now but can be made generic
-					uiaccecc: isGenieeUIAccessCodeConversion ? Number(genieeUIAccess.codeConversion) : 1,
-					isPartner: isPartner ? true : false,
-					gdpr: site.get('gdpr') ? site.get('gdpr') : commonConsts.GDPR
+				return [
+					site,
+					{
+						pageGroups: sitePageGroups,
+						patterns: site.get('apConfigs').pageGroupPattern || {},
+						apConfigs: site.get('apConfigs'),
+						blocklist: site.get('apConfigs').blocklist,
+						siteId: req.params.siteId,
+						siteDomain: site.get('siteDomain'),
+						dfpAccounts: dfpAccounts,
+						isSuperUser: req.session.isSuperUser,
+						//UI access code conversion property value
+						// Specific to Geniee network as of now but can be made generic
+						uiaccecc: isGenieeUIAccessCodeConversion ? Number(genieeUIAccess.codeConversion) : 1,
+						isPartner: isPartner ? true : false,
+						gdpr: site.get('gdpr') ? site.get('gdpr') : commonConsts.GDPR
+					}
+				];
+			})
+			.spread((site, data) => {
+				return Promise.join(channelsDataFetching(site), channels => {
+					return res.render('settings', { ...data, channels: channels });
 				});
 			})
 			.catch(err => {

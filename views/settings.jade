@@ -128,6 +128,17 @@ block bodyContent
                                             .col-sm-7
                                                 input(style="margin-top: 10px;" type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "false") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "false"))
                                         .row
+                                            .col-sm-12
+                                                h4 Auto Optimise Status
+                                                    table
+                                                        tr
+                                                            th Channel
+                                                            th Auto Optimise
+                                                        each channel in channels
+                                                            tr
+                                                                td !{channel.name}
+                                                                td !{channel.autoOptimise}
+                                        .row
                                             .col-sm-12#autoOptimiseErr.error-message
 
                                         if dfpAccounts && dfpAccounts.length
