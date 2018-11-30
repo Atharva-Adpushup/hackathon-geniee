@@ -484,6 +484,8 @@ router
 					.set('x-cf-geodata', country)
 					.set('Content-Type', 'application/javascript')
 					.set('Cache-Control', 'max-age=3600');
+
+				apJs = apJs.replace('__COUNTRY__', country);
 				return res.send(apJs);
 			})
 			.catch(err => {

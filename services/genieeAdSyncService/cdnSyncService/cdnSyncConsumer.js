@@ -232,8 +232,10 @@ module.exports = function(site, externalData = {}) {
 				if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
 				jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
 				jsFile = _.replace(jsFile, /__SITE_ID__/g, site.get('siteId'));
+				jsFile = _.replace(jsFile, '__COUNTRY__', false);
 				uncompressedJsFile = _.replace(uncompressedJsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
 				uncompressedJsFile = _.replace(uncompressedJsFile, /__SITE_ID__/g, site.get('siteId'));
+				uncompressedJsFile = _.replace(uncompressedJsFile, '__COUNTRY__', false);
 
 				// Generate final init script based on the services that are enabled
 				var scripts = generateFinalInitScript(jsFile, uncompressedJsFile)
