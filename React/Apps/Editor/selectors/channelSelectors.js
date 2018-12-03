@@ -21,7 +21,10 @@ const getAllChannels = state => state.channelData.byIds,
 		channelByIds => _.filter(channelByIds, { isOpen: false })
 	),
 	checkTrafficDistribution = (channels, variations) => {
-		let response = true;
+		let response = {
+			valid: true,
+			culprits: []
+		};
 		_.forEach(channels, channel => {
 			if (channel.hasOwnProperty('autoOptimise') && !channel.autoOptimise) {
 				const variationIds = channel.variations;
@@ -29,8 +32,8 @@ const getAllChannels = state => state.channelData.byIds,
 					return acc + variations[variationId].trafficDistribution;
 				}, 0);
 				if (traffic !== 100) {
-					response = false;
-					return false;
+					response.valid = false;
+					response.culprits.push(channel.channelName);
 				}
 			}
 		});

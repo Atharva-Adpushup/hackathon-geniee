@@ -11,7 +11,7 @@ const masterSaveData = mode => (dispatch, getState) => {
 	const paramData = getFinalJson(_.cloneDeep(getState()));
 	const allChannels = getAllChannels(getState());
 	const allVariations = getAllVariations(getState());
-	const isTrafficDistributionValid = checkTrafficDistribution(allChannels, allVariations);
+	const trafficDistribution = checkTrafficDistribution(allChannels, allVariations);
 
 	if (emptyCodes.length) {
 		// if (emptyCodes.length && mode == siteModes.PUBLISH) {
@@ -29,11 +29,13 @@ const masterSaveData = mode => (dispatch, getState) => {
 		}
 	}
 
-	if (!isTrafficDistributionValid) {
+	if (!trafficDistribution.valid) {
 		return dispatch({
 			type: uiActions.UPDATE_AFTER_SAVE_STATUS,
 			status: status.FAILED,
-			msg: 'Some pagegroup(s) have Autoptimise off but traffic distribution does not add up to 100. Please check.'
+			msg: `Some pagegroup(s) have Autoptimise off but traffic distribution does not add up to 100. Please check. Error in ${trafficDistribution.culprits.join(
+				', '
+			)}`
 		});
 	}
 
