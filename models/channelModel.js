@@ -110,6 +110,12 @@ function apiModule() {
 					site.set('channels', channels);
 					console.log('siteJSON after createPageGroup before db save: ', JSON.stringify(site.toJSON()));
 
+					const siteApConfigs = site.get('apConfigs') || false;
+					const siteAutoOptimise =
+						siteApConfigs && siteApConfigs.hasOwnProperty('autoOptimise')
+							? siteApConfigs.autoOptimise
+							: true;
+
 					channelData = {
 						siteDomain: site.data.siteDomain,
 						siteId: site.data.siteId,
@@ -120,10 +126,7 @@ function apiModule() {
 						channelName: json.pageGroupName.toUpperCase() + '_' + json.device.toUpperCase(),
 						genieePageGroupId: json.pageGroupId,
 						variations: {},
-						autoOptimise:
-							site.data.apConfigs && site.data.hasOwnProperty('autoOptimise')
-								? site.data.autoOptimise
-								: true
+						autoOptimise: siteAutoOptimise
 					};
 					return site
 						.save()
