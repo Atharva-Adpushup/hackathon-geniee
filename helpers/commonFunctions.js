@@ -60,8 +60,7 @@ const Promise = require('bluebird'),
 				isInvalidRevenue || innerObj[identifier].aggregate.total_impressions == 0
 					? 0
 					: Number(
-							innerObj[identifier].aggregate.total_revenue *
-								1000 /
+							(innerObj[identifier].aggregate.total_revenue * 1000) /
 								innerObj[identifier].aggregate.total_impressions
 					  ).toFixed(3);
 		});
@@ -167,7 +166,7 @@ const Promise = require('bluebird'),
 			const reportDate = moment(dailyReportObject.report_date).format(dateFormat),
 				revenue = dailyReportObject.total_revenue,
 				impressions = dailyReportObject.total_impressions;
-			let cpm = Number((revenue / impressions * 1000).toFixed(2));
+			let cpm = Number(((revenue / impressions) * 1000).toFixed(2));
 
 			cpm = isNaN(cpm) ? 0 : cpm;
 			resultData[reportDate] = cpm;
@@ -301,19 +300,19 @@ const Promise = require('bluebird'),
 			totalRevenue += row.total_revenue;
 			totalPageviews += row.total_requests;
 
-			const cpm = row.total_revenue * 1000 / row.total_impressions;
+			const cpm = (row.total_revenue * 1000) / row.total_impressions;
 			totalCpm += isNaN(cpm) ? 0 : cpm;
 
-			totalPageCpm += row.total_revenue * 1000 / row.total_requests;
+			totalPageCpm += (row.total_revenue * 1000) / row.total_requests;
 		});
 
-		const totalCpmValue = (totalRevenue / totalImpressions * 1000).toFixed(2);
+		const totalCpmValue = ((totalRevenue / totalImpressions) * 1000).toFixed(2);
 		return {
 			totalImpressions,
 			totalRevenue: totalRevenue.toFixed(2),
 			totalPageviews,
 			totalCpm: isNaN(totalCpmValue) ? 0 : totalCpmValue,
-			totalPageCpm: (totalRevenue / totalPageviews * 1000).toFixed(2)
+			totalPageCpm: ((totalRevenue / totalPageviews) * 1000).toFixed(2)
 		};
 	},
 	getSiteReport = payload => {
@@ -602,6 +601,66 @@ const Promise = require('bluebird'),
 			error: true,
 			data: response
 		});
+	},
+	addSetupTransaction = (siteId, siteDomain, ads, injectionTechnique) => {
+		const getSetupLogData = ad => {
+				const { isManual, formatData, network, networkData } = ad;
+				let platform = null,
+					pageGroup = null,
+					variationId = null,
+					networkAdUnitId = null,
+					service = null;
+
+				if (isManual) {
+					if (formatData && formatData.platform) {
+						platform = formatData.platform;
+					}
+					variationId = commonConsts.MANUAL_ADS.VARIATION;
+				}
+
+				switch (network) {
+					case commonConsts.NETWORKS.ADPTAGS:
+						networkAdUnitId = networkData.dfpAdunitCode;
+						break;
+					case commonConsts.NETWORKS.ADSENSE:
+					case commonConsts.NETWORKS.ADX:
+					case commonConsts.NETWORKS.MEDIANET:
+						networkAdUnitId = networkData.adunitId;
+						break;
+				}
+
+				if (networkData.headerBidding) {
+					service = commonConsts.SETUP_SERVICES.HEADER_BIDDING;
+				}
+
+				return { platform, pageGroup, variationId, networkAdUnitId, service };
+			},
+			setupLogs = ads.map(ad => {
+				const { id: sectionId, network } = ad,
+					{ platform, pageGroup, variationId, networkAdUnitId, service } = getSetupLogData(ad);
+
+				return {
+					siteId,
+					siteDomain: utils.domanize(siteDomain),
+					siteUrl: siteDomain,
+					platform,
+					pageGroup,
+					variationId,
+					sectionId,
+					network: network,
+					networkAdUnitId,
+					injectionTechnique,
+					service,
+					status: commonConsts.SETUP_STATUS.ACTIVE
+				};
+			});
+
+		return request({
+			method: 'POST',
+			uri: commonConsts.SETUP_TRANSACTION_ENDPOINT,
+			body: { setupLogs },
+			json: true
+		});
 	};
 
 module.exports = {
@@ -627,5 +686,6 @@ module.exports = {
 	getGlobalTop10SitesContributionReport,
 	getGlobalLostAndFoundLiveSitesReport,
 	sendSuccessResponse,
-	sendErrorResponse
+	sendErrorResponse,
+	addSetupTransaction
 };

@@ -7,8 +7,8 @@ const express = require('express'),
 	request = require('request-promise'),
 	config = require('../configs/config'),
 	utils = require('../helpers/utils'),
-	{ sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions'),
-	{ docKeys, tagManagerInitialDoc, videoNetworkInfo } = require('../configs/commonConsts'),
+	{ sendErrorResponse, sendSuccessResponse, addSetupTransaction } = require('../helpers/commonFunctions'),
+	{ docKeys, tagManagerInitialDoc, videoNetworkInfo, INJECTION_TECHNIQUES } = require('../configs/commonConsts'),
 	adpushup = require('../helpers/adpushupEvent'),
 	siteModel = require('../models/siteModel'),
 	router = express.Router(),
@@ -215,7 +215,9 @@ router
 			);
 		}
 		return fn.adUpdateProcessing(req, res, docWithCas => {
-			let doc = docWithCas.value;
+			let doc = docWithCas.value,
+				{ siteId, siteDomain } = req.body;
+
 			if (doc.ownerEmail != req.session.user.email) {
 				return Promise.reject('Owner verfication fail');
 			}
@@ -223,6 +225,7 @@ router
 				doc.ads = req.body.ads;
 			} else {
 				let newAds = [];
+
 				_.forEach(doc.ads, adFromDoc => {
 					_.forEach(req.body.ads, adFromClient => {
 						if (adFromDoc.id == adFromClient.id) {
@@ -239,7 +242,10 @@ router
 				});
 				doc.ads = newAds;
 			}
-			return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
+
+			return appBucket
+				.updateDoc(`${docKeys.tagManager}${siteId}`, doc, docWithCas.cas)
+				.then(() => addSetupTransaction(siteId, siteDomain, doc.ads, INJECTION_TECHNIQUES.TAG));
 		});
 	})
 	.post('/modifyAd', (req, res) => {
