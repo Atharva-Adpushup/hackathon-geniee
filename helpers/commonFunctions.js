@@ -602,12 +602,10 @@ const Promise = require('bluebird'),
 			data: response
 		});
 	},
-	addTransactionLog = (siteId, siteDomain, ads, injectionTechnique) => {
+	createTransactionLog = (siteId, siteDomain, pageGroup = null, variationId = null, ads, injectionTechnique) => {
 		const getTransactionLogData = ad => {
 				const { isManual, formatData, network, networkData } = ad;
 				let platform = null,
-					pageGroup = null,
-					variationId = null,
 					networkAdUnitId = null,
 					service = commonConsts.TRANSACTION_SERVICES.UNKNOWN;
 
@@ -621,18 +619,18 @@ const Promise = require('bluebird'),
 				if (network) {
 					switch (network) {
 						case commonConsts.NETWORKS.ADPTAGS:
-							networkAdUnitId = networkData.dfpAdunitCode;
+							networkAdUnitId = networkData.dfpAdunitCode; // Check for required ad unit code or name
 							break;
 						case commonConsts.NETWORKS.ADSENSE:
 						case commonConsts.NETWORKS.ADX:
 						case commonConsts.NETWORKS.MEDIANET:
-							networkAdUnitId = networkData.adunitId;
+							networkAdUnitId = networkData.adunitId; // Check for media.net network id
 							break;
 					}
 				}
 
 				if (networkData.headerBidding) {
-					service = commonConsts.TRANSACTION_SERVICES.HEADER_BIDDING;
+					service = commonConsts.SETUP_SERVICES.HEADER_BIDDING;
 				}
 
 				return { platform, pageGroup, variationId, networkAdUnitId, service };
@@ -689,5 +687,5 @@ module.exports = {
 	getGlobalLostAndFoundLiveSitesReport,
 	sendSuccessResponse,
 	sendErrorResponse,
-	addTransactionLog
+	createTransactionLog
 };
