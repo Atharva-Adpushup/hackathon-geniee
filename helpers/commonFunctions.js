@@ -602,14 +602,14 @@ const Promise = require('bluebird'),
 			data: response
 		});
 	},
-	addSetupTransaction = (siteId, siteDomain, ads, injectionTechnique) => {
-		const getSetupLogData = ad => {
+	addTransactionLog = (siteId, siteDomain, ads, injectionTechnique) => {
+		const getTransactionLogData = ad => {
 				const { isManual, formatData, network, networkData } = ad;
 				let platform = null,
 					pageGroup = null,
 					variationId = null,
 					networkAdUnitId = null,
-					service = null;
+					service = commonConsts.TRANSACTION_SERVICES.UNKNOWN;
 
 				if (isManual) {
 					if (formatData && formatData.platform) {
@@ -618,26 +618,28 @@ const Promise = require('bluebird'),
 					variationId = commonConsts.MANUAL_ADS.VARIATION;
 				}
 
-				switch (network) {
-					case commonConsts.NETWORKS.ADPTAGS:
-						networkAdUnitId = networkData.dfpAdunitCode;
-						break;
-					case commonConsts.NETWORKS.ADSENSE:
-					case commonConsts.NETWORKS.ADX:
-					case commonConsts.NETWORKS.MEDIANET:
-						networkAdUnitId = networkData.adunitId;
-						break;
+				if (network) {
+					switch (network) {
+						case commonConsts.NETWORKS.ADPTAGS:
+							networkAdUnitId = networkData.dfpAdunitCode;
+							break;
+						case commonConsts.NETWORKS.ADSENSE:
+						case commonConsts.NETWORKS.ADX:
+						case commonConsts.NETWORKS.MEDIANET:
+							networkAdUnitId = networkData.adunitId;
+							break;
+					}
 				}
 
 				if (networkData.headerBidding) {
-					service = commonConsts.SETUP_SERVICES.HEADER_BIDDING;
+					service = commonConsts.TRANSACTION_SERVICES.HEADER_BIDDING;
 				}
 
 				return { platform, pageGroup, variationId, networkAdUnitId, service };
 			},
 			setupLogs = ads.map(ad => {
 				const { id: sectionId, network } = ad,
-					{ platform, pageGroup, variationId, networkAdUnitId, service } = getSetupLogData(ad);
+					{ platform, pageGroup, variationId, networkAdUnitId, service } = getTransactionLogData(ad);
 
 				return {
 					siteId,
@@ -647,7 +649,7 @@ const Promise = require('bluebird'),
 					pageGroup,
 					variationId,
 					sectionId,
-					network: network,
+					network: network || null,
 					networkAdUnitId,
 					injectionTechnique,
 					service,
@@ -657,7 +659,7 @@ const Promise = require('bluebird'),
 
 		return request({
 			method: 'POST',
-			uri: commonConsts.SETUP_TRANSACTION_ENDPOINT,
+			uri: commonConsts.TRANSACTION_LOG_ENDPOINT,
 			body: { setupLogs },
 			json: true
 		});
@@ -687,5 +689,5 @@ module.exports = {
 	getGlobalLostAndFoundLiveSitesReport,
 	sendSuccessResponse,
 	sendErrorResponse,
-	addSetupTransaction
+	addTransactionLog
 };

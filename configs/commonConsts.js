@@ -2,7 +2,7 @@ module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: 'http://console.adpushup.com',
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
-	SETUP_TRANSACTION_ENDPOINT: 'http://staging.adpushup.com/SetupLogWebService/log',
+	TRANSACTION_LOG_ENDPOINT: 'http://staging.adpushup.com/SetupLogWebService/log',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	DEMO_REPORT_SITE_ID: 31764,
@@ -30,7 +30,7 @@ module.exports = {
 		ADX: 'adx',
 		MEDIANET: 'medianet'
 	},
-	SETUP_SERVICES: {
+	TRANSACTION_SERVICES: {
 		UNKNOWN: 0,
 		HEADER_BIDDING: 1,
 		MEDIATION: 2,

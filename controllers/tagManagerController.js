@@ -7,7 +7,7 @@ const express = require('express'),
 	request = require('request-promise'),
 	config = require('../configs/config'),
 	utils = require('../helpers/utils'),
-	{ sendErrorResponse, sendSuccessResponse, addSetupTransaction } = require('../helpers/commonFunctions'),
+	{ sendErrorResponse, sendSuccessResponse, addTransactionLog } = require('../helpers/commonFunctions'),
 	{ docKeys, tagManagerInitialDoc, videoNetworkInfo, INJECTION_TECHNIQUES } = require('../configs/commonConsts'),
 	adpushup = require('../helpers/adpushupEvent'),
 	siteModel = require('../models/siteModel'),
@@ -245,7 +245,7 @@ router
 
 			return appBucket
 				.updateDoc(`${docKeys.tagManager}${siteId}`, doc, docWithCas.cas)
-				.then(() => addSetupTransaction(siteId, siteDomain, doc.ads, INJECTION_TECHNIQUES.TAG));
+				.then(() => addTransactionLog(siteId, siteDomain, doc.ads, INJECTION_TECHNIQUES.TAG));
 		});
 	})
 	.post('/modifyAd', (req, res) => {
