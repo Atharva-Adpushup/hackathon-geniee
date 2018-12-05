@@ -2,8 +2,14 @@ import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Select from 'react-select';
 
-import { sizeConfigOptions as options, devicesList } from '../configs/commonConsts';
+import { sizeConfigOptions as options, devicesList, countryCodes } from '../configs/commonConsts';
 import SelectBox from '../../../Components/SelectBox/index.jsx';
+
+const MEDIA_QUERY = {
+	DESKTOP: devicesList[0],
+	TABLET: devicesList[1],
+	MOBILE: devicesList[2]
+};
 
 function findSizesSupported(name, data) {
 	for (let i = 0; i < data.length; i++) {
@@ -16,11 +22,11 @@ function findSizesSupported(name, data) {
 
 function findLabel(device) {
 	switch (device) {
-		case '(min-width: 1200px)':
+		case MEDIA_QUERY.DESKTOP:
 			return 'desktop';
-		case '(min-width: 768px) and (max-width: 1199px)':
+		case MEDIA_QUERY.TABLET:
 			return 'tablet';
-		case '(min-width: 0px) and (max-width: 767px)':
+		case MEDIA_QUERY.MOBILE:
 			return 'phone';
 	}
 }
@@ -30,10 +36,10 @@ export default class SettingsPanel extends React.Component {
 		super(props);
 
 		this.state = {
-			device: '(min-width: 1200px)',
-			'(min-width: 1200px)': [],
-			'(min-width: 768px) and (max-width: 1199px)': [],
-			'(min-width: 0px) and (max-width: 767px)': []
+			device: MEDIA_QUERY.DESKTOP,
+			[MEDIA_QUERY.DESKTOP]: [],
+			[MEDIA_QUERY.TABLET]: [],
+			[MEDIA_QUERY.MOBILE]: []
 		};
 
 		this.onValChange = this.onValChange.bind(this);
@@ -66,7 +72,7 @@ export default class SettingsPanel extends React.Component {
 	componentWillReceiveProps(nextProps) {
 		const { fetchedData } = nextProps;
 
-		const newDevice = fetchedData.length > 0 ? fetchedData[0].mediaQuery : '(min-width: 1200px)';
+		const newDevice = fetchedData.length > 0 ? fetchedData[0].mediaQuery : MEDIA_QUERY.DESKTOP;
 
 		this.setState({
 			device: newDevice
@@ -90,9 +96,9 @@ export default class SettingsPanel extends React.Component {
 				<Row>
 					<Col sm={4}>
 						<SelectBox value={device} onChange={this.onValChange} label="Select Device">
-							<option value={'(min-width: 1200px)'}>Desktop</option>
-							<option value={'(min-width: 768px) and (max-width: 1199px)'}>Tablet</option>
-							<option value={'(min-width: 0px) and (max-width: 767px)'}>Phone</option>
+							<option value={MEDIA_QUERY.DESKTOP}>Desktop</option>
+							<option value={MEDIA_QUERY.TABLET}>Tablet</option>
+							<option value={MEDIA_QUERY.MOBILE}>Phone</option>
 						</SelectBox>
 					</Col>
 				</Row>
@@ -126,6 +132,9 @@ export default class SettingsPanel extends React.Component {
 						</p>
 					</Col>
 				</Row>
+				<h5 style={{ borderBottom: '1px solid #ccc' }} className="mTB-15 padding-b10px">
+					Select country codes
+				</h5>
 			</div>
 		);
 	}
