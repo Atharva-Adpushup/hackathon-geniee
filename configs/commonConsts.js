@@ -28,7 +28,8 @@ module.exports = {
 		ADPTAGS: 'adpTags',
 		ADSENSE: 'adsense',
 		ADX: 'adx',
-		MEDIANET: 'medianet'
+		MEDIANET: 'medianet',
+		GENIEE: 'geniee'
 	},
 	TRANSACTION_SERVICES: {
 		UNKNOWN: 0,
