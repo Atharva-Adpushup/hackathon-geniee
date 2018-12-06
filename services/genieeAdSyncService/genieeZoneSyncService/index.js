@@ -9,6 +9,8 @@ var config = require('../../../configs/config'),
 	crypto = require('crypto'),
 	retry = require('bluebird-retry');
 
+const { checkForLog } = require('../../../helpers/commonFunctions');
+
 module.exports = {
 	checkGenieeUnsyncedZones: function(variationId, variationName, section, ad) {
 		var isValidUnsyncedZone = !!(ad.network === 'geniee' && ad.networkData && !ad.networkData.zoneId),
@@ -78,17 +80,40 @@ module.exports = {
 		}
 		return false;
 	},
-	getVariationUnsyncedZones: function(variationId, variationName, channelKey, variationSections) {
+	getVariationUnsyncedZones: function(
+		variationId,
+		variationName,
+		channelKey,
+		variationSections,
+		additionalInfo = {}
+	) {
 		// Sample json for geniee zone
 		// {"zoneName":"test zone api0","sizeWidth":300,"sizeHeight":250,"zoneType":1,"zonePosition":0,"firstView":1,"useFriendlyIFrameFlag":0}
 		var unsyncedZones = {
 				genieeUnsyncedZones: [],
 				adpTagsUnsyncedZones: [],
-				genieeDFPCreationZones: []
+				genieeDFPCreationZones: [],
+				logsUnsyncedZones: []
 			},
 			self = this;
 		_.each(variationSections, function(section, sectionId) {
 			_.each(section.ads, function(ad) {
+				if (checkForLog(ad)) {
+					unsyncedZones.logsUnsyncedZones.push({
+						...ad,
+						// network: ad.network,
+						// networkData: ad.networkData,
+						// formatData: ad.formatData,
+						// width: ad.width,
+						// height: ad.height,
+						variationId,
+						variationName,
+						id: sectionId,
+						adId: ad.id,
+						platform: additionalInfo.platform,
+						pageGroup: additionalInfo.pageGroup
+					});
+				}
 				switch (ad.network) {
 					case 'geniee':
 						var unsyncedZone = self.checkGenieeUnsyncedZones(variationId, variationName, section, ad);
@@ -100,7 +125,6 @@ module.exports = {
 								? unsyncedZones.genieeDFPCreationZones.push(unsyncedZone.zone)
 								: null;
 						}
-						// unsyncedZone ? unsyncedZones.genieeUnsyncedZones.push(unsyncedZone) : null;
 						break;
 					case 'adpTags':
 						var unsyncedZone = self.checkAdpTagsUnsyncedZones(section, ad);
@@ -114,7 +138,7 @@ module.exports = {
 			});
 		});
 		return unsyncedZones;
-	}, 
+	},
 	getAllUnsyncedZones: function(site) {
 		var finalZones = [],
 			channelUnsyncedZones = [],
@@ -135,7 +159,10 @@ module.exports = {
 					// channelUnsyncedZones = self.getVariationUnsyncedZones(id, varPiation.sections);
 					channelUnsyncedZones = _.concat(
 						channelUnsyncedZones,
-						self.getVariationUnsyncedZones(id, variation.name, channelKey, variation.sections)
+						self.getVariationUnsyncedZones(id, variation.name, channelKey, variation.sections, {
+							platform: channel.platform,
+							pageGroup: channel.pageGroup
+						})
 					);
 				});
 				finalZones.push({ channel: channel, unsyncedZones: channelUnsyncedZones });

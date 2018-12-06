@@ -1,23 +1,30 @@
-const _ = require('lodash'),
-	Promise = require('bluebird'),
-	genieeZoneSyncService = require('../../../genieeZoneSyncService/index'),
-	config = require('../../../../../configs/config'),
-	{ docKeys } = require('../../../../../configs/commonConsts'),
-	{ couchbaseService } = require('node-utils'),
-	appBucket = couchbaseService(
-		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
-		config.couchBase.DEFAULT_BUCKET,
-		config.couchBase.DEFAULT_USER_NAME,
-		config.couchBase.DEFAULT_USER_PASSWORD
-	);
+const _ = require('lodash');
+const Promise = require('bluebird');
+const genieeZoneSyncService = require('../../../genieeZoneSyncService/index');
+const config = require('../../../../../configs/config');
+const { docKeys } = require('../../../../../configs/commonConsts');
+const { couchbaseService } = require('node-utils');
+const { checkForLog } = require('../../../../../helpers/commonFunctions');
+
+const appBucket = couchbaseService(
+	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
+	config.couchBase.DEFAULT_BUCKET,
+	config.couchBase.DEFAULT_USER_NAME,
+	config.couchBase.DEFAULT_USER_PASSWORD
+);
 
 function generateSiteChannelJSON(channelAndZones, siteModelItem) {
-	let unsyncedGenieeZones = [],
-		unsyncedGenieeDFPCreationZones = [],
-		adpTagsUnsyncedZones = {
-			siteId: siteModelItem.get('siteId'),
-			ads: []
-		};
+	let unsyncedGenieeZones = [];
+	let unsyncedGenieeDFPCreationZones = [];
+	let adpTagsUnsyncedZones = {
+		siteId: siteModelItem.get('siteId'),
+		ads: []
+	};
+	let logsUnsyncedZones = {
+		siteId: siteModelItem.get('siteId'),
+		siteDomain: siteModelItem.get('siteDomain'),
+		ads: []
+	};
 	function doIt(channelWithZones) {
 		if (
 			!(channelWithZones && channelWithZones.unsyncedZones && Object.keys(channelWithZones.unsyncedZones).length)
@@ -71,13 +78,17 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 				}
 				adpTagsUnsyncedZones.ads = _.concat(adpTagsUnsyncedZones.ads, zones.adpTagsUnsyncedZones);
 			}
+			if (zones.logsUnsyncedZones && zones.logsUnsyncedZones.length) {
+				logsUnsyncedZones.ads = _.concat(logsUnsyncedZones.ads, zones.logsUnsyncedZones);
+			}
 		});
 	}
 	return Promise.map(channelAndZones, doIt).then(() => {
 		return {
 			geniee: unsyncedGenieeZones,
 			adp: adpTagsUnsyncedZones,
-			genieeDFP: unsyncedGenieeDFPCreationZones
+			genieeDFP: unsyncedGenieeDFPCreationZones,
+			logs: logsUnsyncedZones
 		};
 	});
 }
@@ -94,17 +105,37 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 	return appBucket
 		.getDoc(`${docKeys.tagManager}${site.get('siteId')}`)
 		.then(docWithCas => {
-			const ads = docWithCas.value.ads,
-				unSyncedAds = _.compact(
-					_.map(ads, ad => {
-						return ad.network && ad.network == 'adpTags'
-							? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)
-							: false;
-					})
-				);
+			let logUnsyncedAds = [];
+
+			const ads = docWithCas.value.ads;
+			const unSyncedAds = _.compact(
+				_.map(ads, ad => {
+					if (checkForLog(ad)) {
+						logUnsyncedAds.push(ad);
+						// logUnsyncedAds.push({
+						// network: ad.network,
+						// networkData: ad.networkData,
+						// formatData: ad.formatData,
+						// id: ad.id,
+						// width: ad.width,
+						// height: ad.height,
+						// isManual: ad.isManual
+						// });
+					}
+					return ad.network && ad.network == 'adpTags'
+						? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)
+						: false;
+				})
+			);
+
 			currentDataForSyncing.adp.ads = unSyncedAds.length
 				? _.concat(currentDataForSyncing.adp.ads, unSyncedAds)
 				: currentDataForSyncing.adp.ads;
+
+			currentDataForSyncing.logs.ads = logUnsyncedAds.length
+				? _.concat(currentDataForSyncing.logs.ads, logUnsyncedAds)
+				: currentDataForSyncing.logs.ads;
+
 			return currentDataForSyncing;
 		})
 		.catch(err => {

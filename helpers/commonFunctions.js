@@ -683,6 +683,16 @@ const Promise = require('bluebird'),
 			body: { setupLogs: getSetupLogs() },
 			json: true
 		});
+	},
+	checkForLog = function(ad) {
+		return !!(
+			ad.network &&
+			ad.network != 'adpTags' &&
+			ad.networkData &&
+			Object.keys(ad.networkData).length &&
+			ad.networkData.hasOwnProperty('logWritten') &&
+			ad.networkData.logWritten === false
+		);
 	};
 
 module.exports = {
@@ -709,5 +719,6 @@ module.exports = {
 	getGlobalLostAndFoundLiveSitesReport,
 	sendSuccessResponse,
 	sendErrorResponse,
-	createTransactionLog
+	createTransactionLog,
+	checkForLog
 };

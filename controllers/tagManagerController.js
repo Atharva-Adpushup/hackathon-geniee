@@ -243,9 +243,8 @@ router
 				doc.ads = newAds;
 			}
 
-			return appBucket
-				.updateDoc(`${docKeys.tagManager}${siteId}`, doc, docWithCas.cas)
-				.then(() => createTransactionLog(siteId, siteDomain, doc.ads, INJECTION_TECHNIQUES.TAG));
+			return appBucket.updateDoc(`${docKeys.tagManager}${siteId}`, doc, docWithCas.cas);
+			// .then(() => createTransactionLog(siteId, siteDomain, doc.ads, INJECTION_TECHNIQUES.TAG));
 		});
 	})
 	.post('/modifyAd', (req, res) => {
