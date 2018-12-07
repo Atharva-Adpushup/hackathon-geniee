@@ -101,11 +101,6 @@ module.exports = {
 				if (checkForLog(ad)) {
 					unsyncedZones.logsUnsyncedZones.push({
 						...ad,
-						// network: ad.network,
-						// networkData: ad.networkData,
-						// formatData: ad.formatData,
-						// width: ad.width,
-						// height: ad.height,
 						variationId,
 						variationName,
 						channelKey,
@@ -131,6 +126,7 @@ module.exports = {
 						var unsyncedZone = self.checkAdpTagsUnsyncedZones(section, ad);
 						if (unsyncedZone) {
 							unsyncedZone.variationId = variationId;
+							unsyncedZone.variationName = variationName;
 							unsyncedZone.channelKey = channelKey;
 							unsyncedZones.adpTagsUnsyncedZones.push(unsyncedZone);
 						}

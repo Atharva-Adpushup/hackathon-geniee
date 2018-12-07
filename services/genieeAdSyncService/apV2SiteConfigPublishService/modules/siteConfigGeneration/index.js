@@ -18,6 +18,7 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 	let unsyncedGenieeDFPCreationZones = [];
 	let adpTagsUnsyncedZones = {
 		siteId: siteModelItem.get('siteId'),
+		siteDomain: siteModelItem.get('siteDomain'),
 		ads: []
 	};
 	let logsUnsyncedZones = {
@@ -112,15 +113,6 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 				_.map(ads, ad => {
 					if (checkForLog(ad)) {
 						logUnsyncedAds.push(ad);
-						// logUnsyncedAds.push({
-						// network: ad.network,
-						// networkData: ad.networkData,
-						// formatData: ad.formatData,
-						// id: ad.id,
-						// width: ad.width,
-						// height: ad.height,
-						// isManual: ad.isManual
-						// });
 					}
 					return ad.network && ad.network == 'adpTags'
 						? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)

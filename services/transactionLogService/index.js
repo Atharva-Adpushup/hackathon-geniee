@@ -96,16 +96,12 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 			return setupLogs;
 		};
 
-	const logs = getSetupLogs();
-
-	return updateDb(siteId, layoutAds, apTagAds);
-
-	// return request({
-	// 	method: 'POST',
-	// 	uri: commonConsts.TRANSACTION_LOG_ENDPOINT,
-	// 	body: { setupLogs: getSetupLogs() },
-	// 	json: true
-	// }).then(() => updateDb(siteDomain, siteId, layoutAds, apTagAds));
+	return request({
+		method: 'POST',
+		uri: commonConsts.TRANSACTION_LOG_ENDPOINT,
+		body: { setupLogs: getSetupLogs() },
+		json: true
+	}).then(() => updateDb(siteId, layoutAds, apTagAds));
 }
 
 module.exports = createTransactionLog;

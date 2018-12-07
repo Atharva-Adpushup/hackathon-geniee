@@ -50,20 +50,7 @@ function validateMessageData(originalMessage) {
 }
 
 function errorHandler(error, originalMessage) {
-	let customErrorMessage;
-	customErrorMessage = error.message;
-
-	// if (!customErrorMessage) {
-	// 	customErrorMessage = error && error[0] ? error[0].message : 'Unsynced ads in setup';
-	// 	if (typeof customErrorMessage == 'object') {
-	// 		customErrorMessage = `Unsynced ads in setup | Pagegroup - ${customErrorMessage.pagegroup} | Platform - ${
-	// 			customErrorMessage.platform
-	// 		} | SectionId - ${customErrorMessage.sectionId} | adId - ${customErrorMessage.ad.id} | Network - ${
-	// 			customErrorMessage.ad.network
-	// 		}`;
-	// 	}
-	// }
-
+	let customErrorMessage = error.message;
 	const isEmptyConsumerMessage = !!(customErrorMessage === CONSTANTS.ERROR_MESSAGES.RABBITMQ.CONSUMER.EMPTY_MESSAGE);
 	const isInvalidConsumerMessage = !!(customErrorMessage === CONSTANTS.ERROR_MESSAGES.MESSAGE.INVALID_DATA);
 
