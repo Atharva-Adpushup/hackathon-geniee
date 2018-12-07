@@ -48,7 +48,7 @@ var utils = require('../helpers/utils'),
 			/* 
 				If multiple DFP implementations exist on the page, then explicitly refresh ADP ad slot, to fetch the ad. This makes sure that the ad is fetched in all cases, even if disableInitialLoad() is used by the publisher for his own DFP implementation.
 			*/
-			if (utils.hasMultipleDfpAccounts()) {
+			if (window.google_DisableInitialLoad) {
 				refreshGPTSlot(slot.gSlot);
 			}
 		});
