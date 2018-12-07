@@ -47,12 +47,24 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 				}
 			}
 
-			if (network && networkData.headerBidding) {
-				service = commonConsts.TRANSACTION_SERVICES.HEADER_BIDDING;
+			if (network && networkData) {
+				if (networkData.headerBidding) {
+					service = commonConsts.TRANSACTION_SERVICES.HEADER_BIDDING;
+				} else if (networkData.dynamicAllocation) {
+					service = commonConsts.TRANSACTION_SERVICES.DYNAMIC_ALLOCATION;
+				}
 				status = commonConsts.SETUP_STATUS.ACTIVE;
 			}
 
-			return { platform, pageGroup, variationId, networkAdUnitId, service, status, injectionTechnique };
+			return {
+				platform,
+				pageGroup,
+				variationId,
+				networkAdUnitId,
+				service,
+				status,
+				injectionTechnique
+			};
 		},
 		getSetupLogs = () => {
 			if (!ads || !ads.length) {
@@ -62,7 +74,8 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 			let setupLogs = [];
 			for (let i = 0; i < ads.length; i++) {
 				const ad = ads[i];
-				const { id: sectionId, network } = ad;
+				const { network } = ad;
+				const sectionId = ad.sectionId ? ad.sectionId : ad.id;
 				const {
 					platform,
 					pageGroup,
@@ -101,7 +114,14 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 		uri: commonConsts.TRANSACTION_LOG_ENDPOINT,
 		body: { setupLogs: getSetupLogs() },
 		json: true
-	}).then(() => updateDb(siteId, layoutAds, apTagAds));
+	})
+		.then(response => {
+			debugger;
+			updateDb(siteId, layoutAds, apTagAds);
+		})
+		.catch(err => {
+			debugger;
+		});
 }
 
 module.exports = createTransactionLog;

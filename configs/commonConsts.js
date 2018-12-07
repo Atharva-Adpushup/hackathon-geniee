@@ -36,7 +36,8 @@ module.exports = {
 		HEADER_BIDDING: 1,
 		MEDIATION: 2,
 		AMP: 3,
-		NEW_FORMATS: 4
+		NEW_FORMATS: 4,
+		DYNAMIC_ALLOCATION: 5
 	},
 	SETUP_STATUS: {
 		ACTIVE: 1,

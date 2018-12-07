@@ -41,7 +41,13 @@ module.exports = {
 					firstView: ad.firstFold ? Number(ad.firstFold) : 1,
 					useFriendlyIFrameFlag: ad.asyncTag ? Number(ad.asyncTag) : 1,
 					dynamicAllocation: ad.networkData.dynamicAllocation ? ad.networkData.dynamicAllocation : 0,
-					zoneId: ad.networkData && ad.networkData.zoneId ? ad.networkData.zoneId : false
+					zoneId: ad.networkData && ad.networkData.zoneId ? ad.networkData.zoneId : false,
+					network: ad.network,
+					networkData: {
+						dynamicAllocation: ad.hasOwnProperty('dynamicAllocation')
+							? ad.networkData.dynamicAllocation
+							: false
+					}
 				}
 			};
 
@@ -67,7 +73,11 @@ module.exports = {
 						sectionId: section.id,
 						type: section.formatData && section.formatData.type ? section.formatData.type : false,
 						isManual: ad.isManual || false,
-						isNative: isNative
+						isNative: isNative,
+						network: ad.network,
+						networkData: {
+							headerBidding: ad.hasOwnProperty('networkData') ? ad.networkData.headerBidding : false
+						}
 					};
 
 				if (isMultipleAdSizes) {
@@ -128,6 +138,8 @@ module.exports = {
 							unsyncedZone.variationId = variationId;
 							unsyncedZone.variationName = variationName;
 							unsyncedZone.channelKey = channelKey;
+							unsyncedZone.pageGroup = additionalInfo.pageGroup;
+							unsyncedZone.platform = additionalInfo.platform;
 							unsyncedZones.adpTagsUnsyncedZones.push(unsyncedZone);
 						}
 						break;

@@ -13,7 +13,7 @@ const dbHelper = couchbaseService(
 function modifyChannelData(channelDoc, ads) {
 	let variations = channelDoc.value.variations;
 	_.each(ads, ad => {
-		const sectionId = ad.id; // id: Refers to Section Id | adId: Refers to adId
+		const sectionId = ad.sectionId ? ad.sectionId : ad.id; // id: Refers to Section Id | adId: Refers to adId
 		if (
 			variations && // if variations exists
 			variations[ad.variationId] && // if particular variation exists
@@ -76,7 +76,7 @@ function updateTagManager(siteId, ads) {
 function updateDb(siteId, layoutAds, apTagAds) {
 	return updateLayout(layoutAds)
 		.then(() => updateTagManager(siteId, apTagAds))
-		.then(() => console.log(`Docs updated for ${siteId}`));
+		.then(() => console.log(`Docs updated for site: ${siteId}`));
 }
 
 module.exports = { updateDb };
