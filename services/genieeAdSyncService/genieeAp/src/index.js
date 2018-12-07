@@ -159,7 +159,6 @@ function initAdpQue() {
 function main() {
 	// Initialise adp que
 	initAdpQue();
-	refreshAdInterval(w);
 	// Set mode in adp config in case of pure manual ads implementation
 	// if (adp.config.manualModeActive) {
 	// 	adp.config.mode = 16;
@@ -201,6 +200,7 @@ function main() {
 	// AdPushup Mode Logic
 	if (parseInt(config.mode, 10) === 2) {
 		triggerControl(2);
+		refreshAdInterval(w);
 		return false;
 	}
 
@@ -220,7 +220,9 @@ function main() {
 		heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
 
 		//Init creation
-		startCreation();
+		startCreation().then(function () {
+			refreshAdInterval(w);
+		});
 	}
 }
 
