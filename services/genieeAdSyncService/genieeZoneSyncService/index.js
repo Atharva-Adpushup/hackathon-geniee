@@ -108,6 +108,7 @@ module.exports = {
 						// height: ad.height,
 						variationId,
 						variationName,
+						channelKey,
 						id: sectionId,
 						adId: ad.id,
 						platform: additionalInfo.platform,

@@ -1,8 +1,11 @@
 const request = require('request-promise');
 const commonConsts = require('../../configs/commonConsts');
 const utils = require('../../helpers/utils');
+const { updateDb } = require('./dbHelper');
 
-function createTransactionLog(siteId, siteDomain, ads) {
+function createTransactionLog({ siteId, siteDomain, ads }) {
+	let layoutAds = [];
+	let apTagAds = [];
 	const getTransactionLogData = ad => {
 			let {
 				isManual,
@@ -59,21 +62,20 @@ function createTransactionLog(siteId, siteDomain, ads) {
 			let setupLogs = [];
 			for (let i = 0; i < ads.length; i++) {
 				const ad = ads[i];
+				const { id: sectionId, network } = ad;
+				const {
+					platform,
+					pageGroup,
+					variationId,
+					networkAdUnitId,
+					service,
+					status,
+					injectionTechnique
+				} = getTransactionLogData(ad);
 
-				// if (ad.network && ad.network === commonConsts.NETWORKS.ADPTAGS) {
-				// 	continue; // In case of adpTags, transaction API call is to be made from queueworker where the dfpAdunit is assigned
-				// }
-
-				const { id: sectionId, network } = ad,
-					{
-						platform,
-						pageGroup,
-						variationId,
-						networkAdUnitId,
-						service,
-						status,
-						injectionTechnique
-					} = getTransactionLogData(ad);
+				injectionTechnique === commonConsts.INJECTION_TECHNIQUES.LAYOUT
+					? layoutAds.push(ad)
+					: apTagAds.push(ad);
 
 				setupLogs.push({
 					siteId,
@@ -94,12 +96,16 @@ function createTransactionLog(siteId, siteDomain, ads) {
 			return setupLogs;
 		};
 
-	return request({
-		method: 'POST',
-		uri: commonConsts.TRANSACTION_LOG_ENDPOINT,
-		body: { setupLogs: getSetupLogs() },
-		json: true
-	});
+	const logs = getSetupLogs();
+
+	return updateDb(siteId, layoutAds, apTagAds);
+
+	// return request({
+	// 	method: 'POST',
+	// 	uri: commonConsts.TRANSACTION_LOG_ENDPOINT,
+	// 	body: { setupLogs: getSetupLogs() },
+	// 	json: true
+	// }).then(() => updateDb(siteDomain, siteId, layoutAds, apTagAds));
 }
 
-module.exports = { createTransactionLog };
+module.exports = createTransactionLog;
