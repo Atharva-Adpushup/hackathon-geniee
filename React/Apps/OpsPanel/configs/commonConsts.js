@@ -408,7 +408,7 @@ const siteMappingActions = {
 			}
 		]
 	},
-	countryCodes = [
+	countryCollection = [
 		{ label: 'Afghanistan', value: 'af' },
 		{ label: 'Albania', value: 'al' },
 		{ label: 'Antarctica', value: 'aq' },
@@ -669,7 +669,7 @@ export {
 	liveSites,
 	devicesList,
 	partnersList,
-	countryCodes,
+	countryCollection,
 	biddersParams,
 	sizeConfigOptions,
 	LINE_CHART_CONFIG,

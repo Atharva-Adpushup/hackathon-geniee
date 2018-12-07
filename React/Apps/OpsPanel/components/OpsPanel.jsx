@@ -34,7 +34,10 @@ class OpsPanel extends React.Component {
 			},
 			deviceConfigString: JSON.stringify({
 				sizeConfig: []
-			})
+			}),
+			countryConfig: {
+				labels: []
+			}
 		};
 		this.fetchHbConfig = this.fetchHbConfig.bind(this);
 		this.saveConfigs = this.saveConfigs.bind(this);
@@ -145,9 +148,22 @@ class OpsPanel extends React.Component {
 
 		if (!this.state.errorMessage) {
 			const parsedConfig = JSON.parse(configs);
-			this.setState({
-				deviceConfig: { sizeConfig: parsedConfig.sizeConfig.filter(data => data.sizesSupported.length > 0) }
-			});
+
+			switch (configName) {
+				case 'deviceConfig':
+					this.setState({
+						deviceConfig: {
+							sizeConfig: parsedConfig.sizeConfig.filter(data => data.sizesSupported.length > 0)
+						}
+					});
+					break;
+
+				case 'countryConfig':
+					this.setState({
+						countryConfig: parsedConfig.concat([])
+					});
+					break;
+			}
 
 			return true;
 		}
