@@ -16,7 +16,7 @@ class OtherNetworks extends Component {
 	}
 
 	onCodeBoxChange(value) {
-		this.setState({ adCode: value });
+		this.setState({ adCode: btoa(value) });
 	}
 
 	submitHandler(value) {

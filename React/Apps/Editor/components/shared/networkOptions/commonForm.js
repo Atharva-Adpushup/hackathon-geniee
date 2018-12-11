@@ -30,7 +30,7 @@ const FormWrapper = (adCodeCheck, name, adUnitRegex) => {
 				});
 				return this.setState({ error: true, adCode: '', adunitId: '' });
 			}
-			this.setState({ error: false, adunitId: this.getAdUnitId(value), adCode: value });
+			this.setState({ error: false, adunitId: this.getAdUnitId(value), adCode: btoa(value) });
 		}
 
 		getAdUnitId(value) {
