@@ -603,14 +603,31 @@ const Promise = require('bluebird'),
 		});
 	},
 	checkForLog = function(ad) {
-		return !!(
-			ad.network &&
-			ad.network != 'adpTags' &&
-			ad.networkData &&
-			Object.keys(ad.networkData).length &&
+		/* 
+			First Condition required if adunit is not adpTags as we need to sync adpTags and then write log
+			Second Condition because once adpTags synced but HB status changes can happen and we need to log that too
+		*/
+		const hasNetwork = !!ad.network;
+		const isADPTags = !!(hasNetwork && ad.network == 'adpTags');
+		// const isGeniee = !!(hasNetwork && ad.network == 'geniee');
+		const hasNetworkData = !!(hasNetwork && ad.networkData && Object.keys(ad.networkData).length);
+		const isLogFalse = !!(
+			hasNetworkData &&
 			ad.networkData.hasOwnProperty('logWritten') &&
 			ad.networkData.logWritten === false
 		);
+		const isADPSynced = !!(isADPTags && hasNetworkData && ad.networkData.dfpAdunit && ad.networkData.dfpAdunitCode);
+		// const isGenieeSynced = !!(
+		// 	isGeniee &&
+		// 	hasNetworkData &&
+		// 	ad.networkData.dynamicAllocation &&
+		// 	ad.networkData.dfpAdunit &&
+		// 	ad.networkData.dfpAdunitCode
+		// );
+		const isNonADPDemandChanged = !!(hasNetwork && !isADPTags && isLogFalse);
+		const isADPChanged = !!(hasNetwork && isADPTags && isLogFalse && isADPSynced);
+
+		return isNonADPDemandChanged || isADPChanged;
 	};
 
 module.exports = {

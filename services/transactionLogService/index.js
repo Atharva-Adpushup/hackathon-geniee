@@ -2,6 +2,7 @@ const request = require('request-promise');
 const commonConsts = require('../../configs/commonConsts');
 const utils = require('../../helpers/utils');
 const { updateDb } = require('./dbHelper');
+const syncCdn = require('../genieeAdSyncService/cdnSyncService/index');
 
 function createTransactionLog({ siteId, siteDomain, ads }) {
 	let layoutAds = [];
@@ -109,18 +110,22 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 			return setupLogs;
 		};
 
+	const logs = getSetupLogs();
+	console.log(logs);
+
 	return request({
 		method: 'POST',
 		uri: commonConsts.TRANSACTION_LOG_ENDPOINT,
-		body: { setupLogs: getSetupLogs() },
+		body: { setupLogs: logs },
 		json: true
 	})
 		.then(response => {
-			debugger;
-			updateDb(siteId, layoutAds, apTagAds);
+			return updateDb(siteId, layoutAds, apTagAds);
 		})
+		.then(() => syncCdn(siteId, true))
 		.catch(err => {
-			debugger;
+			console.log(err);
+			return Promise.reject(err);
 		});
 }
 
