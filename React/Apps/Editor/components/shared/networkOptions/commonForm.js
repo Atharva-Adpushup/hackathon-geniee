@@ -126,7 +126,7 @@ const FormWrapper = (adCodeCheck, name, adUnitRegex) => {
 							off="No"
 							defaultLayout={true}
 							name="Refresh Ad"
-							id="refresh-ad"
+							id={props.id ? `js-refresh-slot-switch-${props.id}` : 'js-refresh-slot-switch'}
 						/>
 					</Col>
 				</Row>

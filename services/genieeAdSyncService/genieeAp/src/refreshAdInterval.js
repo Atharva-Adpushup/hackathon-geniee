@@ -26,6 +26,33 @@ var utils = require('../libs/utils'),
 			return defer.reject('Unable to get adpushup container');
 		}
 	},
+	setAdInterval = function (ads) {
+		for (var i = 0; i < ads.length; i++) {
+			var ad = $.extend({}, ads[i]);
+			getContainer(ad).done(function (container) {
+				var refreshInterval = setInterval(
+					function (container, ad) {
+						if (utils.isElementInViewport(container)) {
+							console.log('refreshed');
+							container.children().remove();
+							placeAd(container, ad);
+						}
+					},
+					commonConsts.AD_REFRESH_INTERVAL,
+					container,
+					ad
+				);
+				intervals.push(refreshInterval);
+			});
+		}
+	},
+	clearAdInterval = function () {
+		if (intervals.length) {
+			for (var i = 0; i < intervals.length; i++) {
+				clearInterval(intervals[i]);
+			}
+		}
+	},
 	refreshIntervalSwitch = function (w) {
 		var ads = [],
 			platform = w.adpushup.config.platform,
@@ -68,32 +95,13 @@ var utils = require('../libs/utils'),
 				}
 			}
 		}
+		setAdInterval(ads);
 		w.adpushup.$(w).on('blur', function () {
 			console.log('blur');
-			if (intervals.length) {
-				for (var i = 0; i < intervals.length; i++) {
-					clearInterval(intervals[i]);
-				}
-			}
+			clearAdInterval();
 		});
 		w.adpushup.$(w).on('focus', function () {
-			for (var i = 0; i < ads.length; i++) {
-				var ad = $.extend({}, ads[i]);
-				getContainer(ad).done(function (container) {
-					var refreshInterval = setInterval(
-						function (container, ad) {
-							if (utils.isElementInViewport(container)) {
-								container.children().remove();
-								placeAd(container, ad);
-							}
-						},
-						10000,
-						container,
-						ad
-					);
-					intervals.push(refreshInterval);
-				});
-			}
+			setAdInterval(ads);
 		});
 	};
 

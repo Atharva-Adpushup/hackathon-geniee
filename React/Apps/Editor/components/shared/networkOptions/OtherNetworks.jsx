@@ -56,7 +56,7 @@ class OtherNetworks extends Component {
 							off="No"
 							defaultLayout={true}
 							name="Refresh Ad"
-							id="refresh-ad"
+							id={this.props.id ? `js-refresh-slot-switch-${this.props.id}` : 'js-refresh-slot-switch'}
 						/>
 					</Col>
 				</Row>
