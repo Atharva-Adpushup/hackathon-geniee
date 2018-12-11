@@ -17,7 +17,6 @@ var config = require('./config'),
 				var adUnitPath = event.slot.getAdUnitPath();
 				var adUnitArray = adUnitPath.split('/');
 				var adUnitDFPAdunitCode = adUnitArray[adUnitArray.length - 1];
-
 				var networkCode = config.NETWORK_ID;
 
 				Object.keys(w.adpushup.adpTags.adpSlots).forEach(function(adpSlot) {
