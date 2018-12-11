@@ -177,11 +177,11 @@ module.exports = {
 	},
 	hasMultipleDfpAccounts: function() {
 		try {
-			var dfpAdSlots = Object.keys(window.googletag.pubads().pa),
+			var dfpAdSlots = window.googletag.pubads().getSlots(),
 				dfpNetworkIdMap = {};
 
 			dfpAdSlots.forEach(function(dfpAdSlot) {
-				var dfpNetworkId = dfpAdSlot.match(/\/(.*?)\//)[1];
+				var dfpNetworkId = dfpAdSlot.getAdUnitPath().match(/\/(.*?)\//)[1];
 
 				if (!dfpNetworkIdMap.hasOwnProperty(dfpNetworkId)) {
 					dfpNetworkIdMap[dfpNetworkId] = 1;

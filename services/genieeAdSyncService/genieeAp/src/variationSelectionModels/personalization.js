@@ -2,13 +2,13 @@ var utils = require('../../libs/utils'),
 	$ = require('jquery'),
 	destroyPublisherDfpAdSlots = function(dfpAdSlotsToDestroy) {
 		googletag.cmd.push(function() {
-			var allDfpAdSlots = googletag.pubads().pa, // Reference to all DFP ad slots on page
+			var allDfpAdSlots = googletag.pubads().getSlots(), // Reference to all DFP ad slots on page
 				slotsToDestroy = [];
 
 			dfpAdSlotsToDestroy.forEach(function(dfpAdSlotName) {
-				Object.keys(allDfpAdSlots).forEach(function(dfpAdSlot) {
+				allDfpAdSlots.forEach(function(dfpAdSlot) {
 					if (dfpAdSlot.includes(dfpAdSlotName)) {
-						slotsToDestroy.push(allDfpAdSlots[dfpAdSlot]);
+						slotsToDestroy.push(dfpAdSlot);
 					}
 				});
 			});
