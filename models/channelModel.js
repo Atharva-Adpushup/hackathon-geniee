@@ -33,7 +33,8 @@ var model = require('../helpers/model'),
 			'dateCreated',
 			'dateModified',
 			'genieePageGroupId',
-			'ampSettings'
+			'ampSettings',
+			'autoOptimise'
 		];
 		this.clientKeys = [
 			'id',
@@ -47,7 +48,8 @@ var model = require('../helpers/model'),
 			'contentSelectorMissing',
 			'activeVariation',
 			'genieePageGroupId',
-			'ampSettings'
+			'ampSettings',
+			'autoOptimise'
 		];
 		this.validations = {
 			required: []
@@ -91,7 +93,7 @@ function apiModule() {
 						});
 					} else {
 						var existingPageGroup = _.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])
-							.pageGroup,
+								.pageGroup,
 							existingChannel = json.device.toUpperCase() + ':' + existingPageGroup;
 
 						if (_.includes(channels, existingChannel)) {
@@ -108,6 +110,12 @@ function apiModule() {
 					site.set('channels', channels);
 					console.log('siteJSON after createPageGroup before db save: ', JSON.stringify(site.toJSON()));
 
+					const siteApConfigs = site.get('apConfigs') || false;
+					const siteAutoOptimise =
+						siteApConfigs && siteApConfigs.hasOwnProperty('autoOptimise')
+							? siteApConfigs.autoOptimise
+							: true;
+
 					channelData = {
 						siteDomain: site.data.siteDomain,
 						siteId: site.data.siteId,
@@ -117,7 +125,8 @@ function apiModule() {
 						id: uuid.v4(),
 						channelName: json.pageGroupName.toUpperCase() + '_' + json.device.toUpperCase(),
 						genieePageGroupId: json.pageGroupId,
-						variations: {}
+						variations: {},
+						autoOptimise: siteAutoOptimise
 					};
 					return site
 						.save()
@@ -136,7 +145,9 @@ function apiModule() {
 			});
 		},
 		getPageGroupById: function(paramsObj) {
-			var query = ViewQuery.from('app', paramsObj.viewName).stale(1).range(paramsObj.id, paramsObj.id, true);
+			var query = ViewQuery.from('app', paramsObj.viewName)
+				.stale(1)
+				.range(paramsObj.id, paramsObj.id, true);
 			return couchbase.connectToAppBucket().then(function(appBucket) {
 				return new Promise(function(resolve, reject) {
 					appBucket.query(query, {}, function(err, result) {
@@ -166,7 +177,9 @@ function apiModule() {
 			});
 		},
 		updatePagegroup: function(json) {
-			var query = ViewQuery.from('app', 'channelById').stale(1).range(json.pageGroupId, json.pageGroupId, true);
+			var query = ViewQuery.from('app', 'channelById')
+				.stale(1)
+				.range(json.pageGroupId, json.pageGroupId, true);
 			return couchbase.connectToAppBucket().then(function(appBucket) {
 				return new Promise(function(resolve, reject) {
 					appBucket.query(query, {}, function(err, result) {
@@ -190,7 +203,9 @@ function apiModule() {
 			});
 		},
 		deletePagegroupById: function(pageGroupId) {
-			var query = ViewQuery.from('app', 'channelById').stale(1).range(pageGroupId, pageGroupId, true);
+			var query = ViewQuery.from('app', 'channelById')
+				.stale(1)
+				.range(pageGroupId, pageGroupId, true);
 			return couchbase.connectToAppBucket().then(function(appBucket) {
 				return new Promise(function(resolve, reject) {
 					appBucket.query(query, {}, function(err, result) {
@@ -294,7 +309,8 @@ function apiModule() {
 		},
 		getChannelSections: (siteId, platform, pageGroup) => {
 			return API.getChannel(siteId, platform, pageGroup).then(function(channel) {
-				let variations = channel.get('variations'), allSections = [];
+				let variations = channel.get('variations'),
+					allSections = [];
 				Object.keys(variations).forEach(i => {
 					const sections = variations[i].sections;
 					Object.keys(sections).forEach(j => {
