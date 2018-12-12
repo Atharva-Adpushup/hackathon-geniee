@@ -63,7 +63,7 @@ function errorHandler(error, originalMessage) {
 		let decodedMessage = originalMessage.content.toString('utf-8');
 		decodedMessage = JSON.parse(decodedMessage);
 		logger({
-			source: 'DB TRANSACTION SYNC ERROR LOGS',
+			source: 'TRANSACTION SYNC ERROR LOGS',
 			message: `Error while DB TRANSACTION SYNC and error messgae : ${customErrorMessage}`,
 			debugData: `Site id : ${decodedMessage.siteId}`,
 			details: `${JSON.stringify(error)}`

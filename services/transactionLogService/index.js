@@ -1,4 +1,5 @@
 const request = require('request-promise');
+const _ = require('lodash');
 const commonConsts = require('../../configs/commonConsts');
 const utils = require('../../helpers/utils');
 const { updateDb } = require('./dbHelper');
@@ -116,7 +117,6 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 		};
 
 	const logs = getSetupLogs();
-	console.log(logs);
 
 	return request({
 		method: 'POST',
@@ -125,7 +125,10 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 		json: true
 	})
 		.then(response => {
-			console.log(response);
+			if (response.code != 1) {
+				const errors = _.map(response.FailedLogs, log => log.error);
+				return Promise.reject(errors.join(', '));
+			}
 			return updateDb(siteId, layoutAds, apTagAds);
 		})
 		.then(() => syncCdn(siteId, true))
