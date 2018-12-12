@@ -604,30 +604,47 @@ const Promise = require('bluebird'),
 	},
 	checkForLog = function(ad) {
 		/* 
-			First Condition required if adunit is not adpTags as we need to sync adpTags and then write log
-			Second Condition because once adpTags synced but HB status changes can happen and we need to log that too
+			Should return true only
+				1. Network is not other than adpTags or geniee
+				2. If Geniee
+					dynamicAllocation should be false.
+					if dynamicAllocation is true then adunit should be synced and other changes made
+				3. If adpTags, then adunit should be synced and other changes made 
+				4. logWritten should be false
 		*/
 		const hasNetwork = !!ad.network;
 		const isADPTags = !!(hasNetwork && ad.network == 'adpTags');
-		// const isGeniee = !!(hasNetwork && ad.network == 'geniee');
+		const isGeniee = !!(hasNetwork && ad.network == 'geniee');
 		const hasNetworkData = !!(hasNetwork && ad.networkData && Object.keys(ad.networkData).length);
-		const isLogFalse = !!(
+		const isLogWrittenFalse = !!(
 			hasNetworkData &&
 			ad.networkData.hasOwnProperty('logWritten') &&
 			ad.networkData.logWritten === false
 		);
 		const isADPSynced = !!(isADPTags && hasNetworkData && ad.networkData.dfpAdunit && ad.networkData.dfpAdunitCode);
-		// const isGenieeSynced = !!(
-		// 	isGeniee &&
-		// 	hasNetworkData &&
-		// 	ad.networkData.dynamicAllocation &&
-		// 	ad.networkData.dfpAdunit &&
-		// 	ad.networkData.dfpAdunitCode
-		// );
-		const isNonADPDemandChanged = !!(hasNetwork && !isADPTags && isLogFalse);
-		const isADPChanged = !!(hasNetwork && isADPTags && isLogFalse && isADPSynced);
+		const genieeNonSyncing = !!(
+			isGeniee &&
+			hasNetworkData &&
+			!ad.networkData.dynamicAllocation &&
+			ad.networkData.zoneId
+		);
+		const isGenieeSynced = !!(
+			isGeniee &&
+			hasNetworkData &&
+			ad.networkData.dynamicAllocation &&
+			ad.networkData.dfpAdunit &&
+			ad.networkData.dfpAdunitCode
+		);
+		const isDemandChanged = !!(
+			hasNetwork &&
+			isADPTags === false &&
+			(isGeniee === false || genieeNonSyncing) &&
+			isLogWrittenFalse
+		);
+		const isADPChanged = !!(hasNetwork && isADPTags && isADPSynced && isLogWrittenFalse);
+		const isGenieeChanged = !!(hasNetwork && isGeniee && isGenieeSynced && isLogWrittenFalse);
 
-		return isNonADPDemandChanged || isADPChanged;
+		return isDemandChanged || isADPChanged || isGenieeChanged;
 	};
 
 module.exports = {

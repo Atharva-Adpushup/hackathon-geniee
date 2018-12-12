@@ -55,6 +55,7 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 				unsyncedGenieeDFPCreationZones.push({
 					zones: zones.genieeDFPCreationZones,
 					siteId: siteModelItem.get('siteId'),
+					siteDomain: siteModelItem.get('siteDomain'),
 					pageGroupId: isPageGroupId ? channelWithZones.channel.genieePageGroupId : '',
 					channelKey: isChannel
 						? 'chnl::' +
