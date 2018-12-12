@@ -1,4 +1,6 @@
+import React from 'react';
 import './styles.scss';
+
 const Tags = props => {
 	let { labels } = props;
 	labels = labels || [];
@@ -7,9 +9,9 @@ const Tags = props => {
 	}
 	return (
 		<ul className="tags">
-			{labels.map(label => {
+			{labels.map((label, key) => {
 				return (
-					<li>
+					<li key={key}>
 						<a href="#" className="tag">
 							{label}
 						</a>

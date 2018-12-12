@@ -29,6 +29,7 @@ var prebidAdTemplate =
 	'pbjs.setConfig({' +
 	'bidderSequence: "random",' +
 	'priceGranularity: "dense"' +
+	'__SIZE_CONFIG__' +
 	'});' +
 	'pbjs.addAdUnits(__AD_UNIT_CODE__);' +
 	'pbjs.bidderSettings = {' +

@@ -53,27 +53,30 @@ var utils = require('../libs/utils'),
 			return function() {
 				for (var i = 0; i < adpTagUnits.length; i++) {
 					var ad = adpTagUnits[i],
+						isNetworkData = !!ad.networkData,
+						networkData = isNetworkData && ad.networkData,
 						//Geniee specific variables
 						isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
-						defaultAdSizeArray = [Number(ad.width), Number(ad.height)],
-						isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
-						isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
-						computedDFPAdUnitId = isZoneContainerId
-							? ad.networkData.zoneContainerId
-							: ad.networkData.dfpAdunit;
+						isResponsive = !!(networkData && networkData.isResponsive),
+						isManual = !!ad.isManual,
+						adWidth = isResponsive ? ad.width : Number(ad.width),
+						adHeight = isResponsive ? ad.height : Number(ad.height),
+						defaultAdSizeArray = [adWidth, adHeight],
+						isZoneContainerId = !!networkData.zoneContainerId,
+						computedDFPAdUnitId = isZoneContainerId ? networkData.zoneContainerId : networkData.dfpAdunit;
 
 					window.adpushup.adpTags.defineSlot(computedDFPAdUnitId, defaultAdSizeArray, computedDFPAdUnitId, {
-						dfpAdunit: computedDFPAdUnitId,
-						dfpAdunitCode: ad.networkData.dfpAdunitCode,
-						headerBidding: ad.networkData.headerBidding,
-						keyValues: ad.networkData.keyValues,
+						dfpAdunit: networkData.dfpAdunit,
+						dfpAdunitCode: networkData.dfpAdunitCode,
+						headerBidding: networkData.headerBidding,
+						keyValues: networkData.keyValues,
 						network: ad.network,
-						refreshSlot: ad.networkData.refreshSlot,
-						overrideActive: ad.networkData.overrideActive,
-						overrideSizeTo: ad.networkData.overrideSizeTo,
-						multipleAdSizes: isMultipleAdSizes
-							? ad.multipleAdSizes.concat([defaultAdSizeArray])
-							: defaultAdSizeArray
+						refreshSlot: networkData.refreshSlot,
+						overrideActive: networkData.overrideActive,
+						overrideSizeTo: networkData.overrideSizeTo,
+						multipleAdSizes: isMultipleAdSizes ? ad.multipleAdSizes : null,
+						isResponsive: isResponsive,
+						isManual: isManual
 					});
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
@@ -133,7 +136,9 @@ var utils = require('../libs/utils'),
 		return true;
 	},
 	genrateAdpBodyTag = function(ad) {
-		var adCode;
+		var adCode,
+			isZoneContainerId = !!ad.networkData.zoneContainerId,
+			computedDFPAdUnitId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit;
 		if (!ad.networkData || !ad.networkData.dfpAdunit) {
 			adCode = '';
 		} else if (config.serveAmpTagsForAdp) {
@@ -141,7 +146,7 @@ var utils = require('../libs/utils'),
 			adCode = [];
 			adCode.push('<amp-ad width=' + ad.width + ' height=' + ad.height);
 			adCode.push('type="doubleclick"');
-			adCode.push('data-slot="/103512698/' + ad.networkData.dfpAdunit + '"');
+			adCode.push('data-slot="/103512698/' + computedDFPAdUnitId + '"');
 			adCode.push('data-multi-size-validation="false">');
 			adCode.push('</amp-ad>');
 			if (ad.networkData.isSticky) {
@@ -150,10 +155,10 @@ var utils = require('../libs/utils'),
 			}
 		} else {
 			adCode = [];
-			adCode.push('<div id="' + ad.networkData.dfpAdunit + '">');
+			adCode.push('<div id="' + computedDFPAdUnitId + '">');
 			adCode.push('<scr' + 'ipt type="text/javascript">');
 			adCode.push('window.adpushup.adpTags.que.push(function(){');
-			adCode.push('window.adpushup.adpTags.display("' + ad.networkData.dfpAdunit + '");');
+			adCode.push('window.adpushup.adpTags.display("' + computedDFPAdUnitId + '");');
 			adCode.push('});');
 			adCode.push('</scr' + 'ipt>');
 			adCode.push('</div>');

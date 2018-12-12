@@ -3,7 +3,7 @@ $borderColor: #ddd;
 $greyBg: #eee;
 $greyBorder: #e6e6e6;
 $fontColor: #555;
-$legendBg:#fafafa;
+$legendBg: #fafafa;
 $SBBorderColorActive: #ccc;
 $linkBlue: #47b6e4;
 
@@ -169,7 +169,7 @@ body {
 }
 
 .chart-legend {
-	margin-top: 20px; 
+	margin-top: 20px;
 	background-color: $legendBg;
 	border: 2px solid $greyBg;
 
@@ -213,12 +213,15 @@ body {
 	color: darken($linkBlue, 40%);
 }
 
-.toggle input[type=checkbox]:checked~label .toggleSwitch {
+.toggle input[type='checkbox']:checked ~ label .toggleSwitch {
 	background-color: darken($linkBlue, 25%);
 }
 
-.toggle input[type=checkbox]:checked~label .toggleSwitch:after {
+.toggle input[type='checkbox']:checked ~ label .toggleSwitch:after {
 	color: darken($linkBlue, 25%);
-	box-shadow: 0 2px 2px 0 rgba(71,182,228, .4);
+	box-shadow: 0 2px 2px 0 rgba(71, 182, 228, 0.4);
 }
 
+.hidden {
+	display: none;
+}

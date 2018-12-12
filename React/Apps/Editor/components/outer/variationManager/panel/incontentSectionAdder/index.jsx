@@ -8,7 +8,7 @@ import validate from './inContentValidations';
 import { createIncontentSection } from 'actions/sectionActions';
 import { showNotification } from 'actions/uiActions';
 import { getCustomSizes } from 'selectors/siteSelectors';
-import { commonSupportedSizes, nonPartnerAdSizes } from 'consts/commonConsts.js';
+import { commonSupportedSizes, nonPartnerAdSizes, iabSizes } from 'consts/commonConsts.js';
 import { renderInContentAdder } from './renderMethods';
 
 const form = reduxForm({
@@ -51,6 +51,16 @@ const form = reduxForm({
 		}
 
 		return _.uniq(sizes);
+	},
+	getMultipleAdSizesOfPrimaryAdSize = (primaryAdSize, isBackCompatibleSizes) => {
+		const primaryAdSizeString = primaryAdSize || '',
+			multipleAdSizes =
+				(primaryAdSizeString &&
+					isBackCompatibleSizes &&
+					iabSizes.BACKWARD_COMPATIBLE_MAPPING[primaryAdSizeString]) ||
+				[];
+
+		return multipleAdSizes;
 	};
 
 class inContentForm extends React.Component {
@@ -126,12 +136,23 @@ const mapStateToProps = (state, ownProps) => ({
 				return false;
 			}
 			const notNear = getNotNearData(values.notNear),
-				isCustomCSS = !!values.customCSS,
-				isNetworkData = !!networkInfo.networkData,
+				isValues = !!values,
+				isCustomCSS = !!(isValues && values.customCSS),
+				isAdpTagsNetwork = !!(networkInfo.network && networkInfo.network === 'adpTags'),
+				isAdSize = !!(isValues && values.adSize),
+				networkData = !!networkInfo.networkData && networkInfo.networkData,
+				shouldMultipleAdSizesBeComputed = !!(
+					networkData &&
+					networkData.isBackwardCompatibleSizes &&
+					networkData.multipleAdSizes &&
+					!networkData.multipleAdSizes.length &&
+					isAdpTagsNetwork &&
+					isAdSize
+				),
 				isMultipleAdSizes = !!(
-					isNetworkData &&
-					networkInfo.networkData.multipleAdSizes &&
-					networkInfo.networkData.multipleAdSizes.length
+					networkData &&
+					networkData.multipleAdSizes &&
+					networkData.multipleAdSizes.length
 				),
 				sectionPayload = {
 					sectionNo: values.section,
@@ -148,12 +169,24 @@ const mapStateToProps = (state, ownProps) => ({
 				};
 
 			isCustomCSS ? (adPayload.customCSS = JSON.parse(values.customCSS)) : null;
-			isMultipleAdSizes ? (adPayload.multipleAdSizes = networkInfo.networkData.multipleAdSizes.concat([])) : null;
-			delete networkInfo.networkData.multipleAdSizes;
+
+			if (shouldMultipleAdSizesBeComputed) {
+				let adSize = values.adSize.replace(' x ', ',');
+
+				adPayload.multipleAdSizes = getMultipleAdSizesOfPrimaryAdSize(
+					adSize,
+					networkData.isBackwardCompatibleSizes
+				);
+			} else if (isMultipleAdSizes) {
+				adPayload.multipleAdSizes = networkData.multipleAdSizes.concat([]);
+			}
+
+			delete networkData.multipleAdSizes;
+			delete networkData.isBackwardCompatibleSizes;
 
 			adPayload.networkData = {
 				...adPayload.networkData,
-				...networkInfo.networkData
+				...networkData
 			};
 			dispatch(createIncontentSection(sectionPayload, adPayload, ownProps.variation.id));
 		},
