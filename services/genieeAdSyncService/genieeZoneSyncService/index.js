@@ -76,7 +76,10 @@ module.exports = {
 						isNative: isNative,
 						network: ad.network,
 						networkData: {
-							headerBidding: ad.hasOwnProperty('networkData') ? ad.networkData.headerBidding : false
+							headerBidding:
+								ad.hasOwnProperty('networkData') && ad.networkData.hasOwnProperty('headerBidding')
+									? ad.networkData.headerBidding
+									: false
 						}
 					};
 
