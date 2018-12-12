@@ -2,11 +2,17 @@ import { uiActions, status, siteModes } from 'consts/commonConsts';
 import { masterSave } from 'libs/dataSyncService';
 import { getFinalJson } from 'selectors/siteSelectors';
 import { getEmptyAdCodes } from 'selectors/adsSelectors';
+import { getAllChannels, checkTrafficDistribution } from 'selectors/channelSelectors';
+import { getAllVariations } from 'selectors/variationSelectors';
 import _ from 'lodash';
 
 const masterSaveData = mode => (dispatch, getState) => {
-	const emptyCodes = getEmptyAdCodes(getState()),
-		paramData = getFinalJson(_.cloneDeep(getState()));
+	const emptyCodes = getEmptyAdCodes(getState());
+	const paramData = getFinalJson(_.cloneDeep(getState()));
+	const allChannels = getAllChannels(getState());
+	const allVariations = getAllVariations(getState());
+	const trafficDistribution = checkTrafficDistribution(allChannels, allVariations);
+
 	if (emptyCodes.length) {
 		// if (emptyCodes.length && mode == siteModes.PUBLISH) {
 		/* When a variation/section deleted we just remove variation/selection not the ads from our redux, 
@@ -21,6 +27,16 @@ const masterSaveData = mode => (dispatch, getState) => {
 				msg: 'Some empty adcodes present in the setup.'
 			});
 		}
+	}
+
+	if (!trafficDistribution.valid) {
+		return dispatch({
+			type: uiActions.UPDATE_AFTER_SAVE_STATUS,
+			status: status.FAILED,
+			msg: `Some pagegroup(s) have Autoptimise off but traffic distribution does not add up to 100. Please check. Error in ${trafficDistribution.culprits.join(
+				', '
+			)}`
+		});
 	}
 
 	dispatch({ type: uiActions.UPDATE_AFTER_SAVE_STATUS, status: status.PENDING });
