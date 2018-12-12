@@ -177,11 +177,11 @@ module.exports = {
 	},
 	hasMultipleDfpAccounts: function() {
 		try {
-			var dfpAdSlots = Object.keys(window.googletag.pubads().aa),
+			var dfpAdSlots = window.googletag.pubads().getSlots(),
 				dfpNetworkIdMap = {};
 
 			dfpAdSlots.forEach(function(dfpAdSlot) {
-				var dfpNetworkId = dfpAdSlot.match(/\/(.*?)\//)[1];
+				var dfpNetworkId = dfpAdSlot.getAdUnitPath().match(/\/(.*?)\//)[1];
 
 				if (!dfpNetworkIdMap.hasOwnProperty(dfpNetworkId)) {
 					dfpNetworkIdMap[dfpNetworkId] = 1;
@@ -205,5 +205,25 @@ module.exports = {
 			viewportTop = $(window).scrollTop(),
 			viewportBottom = viewportTop + $(window).height();
 		return elementBottom > viewportTop && elementTop < viewportBottom;
+	},
+	removeElementArrayFromCollection: function(collection, elArray) {
+		var inputCollection = collection.concat([]),
+			isValidCollection = !!inputCollection.length,
+			isElArray = !!(elArray && elArray.length);
+
+		if (!isValidCollection) {
+			return null;
+		}
+
+		inputCollection.forEach(function(item, idx) {
+			var isElArrayMatch = !!(item && isElArray && item[0] === elArray[0] && item[1] === elArray[1]);
+
+			if (isElArrayMatch) {
+				collection.splice(idx, 1);
+				return false;
+			}
+		});
+
+		return collection;
 	}
 };

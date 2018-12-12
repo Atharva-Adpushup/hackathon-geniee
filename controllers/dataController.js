@@ -178,9 +178,11 @@ router
 					});
 				}
 
-				res.send({ error: false, data: variations });
+				return res.send({ error: false, data: variations });
 			})
-			.catch(err => res.send({ error: true, message: 'Error while fetching result. Please try later.' }));
+			.catch(err => {
+				return res.send({ error: true, message: 'Error while fetching result. Please try later.' });
+			});
 	})
 	.get('/getPageGroupVariationRPM', function(req, res) {
 		const reportConfig = extend(true, {}, req.query),
@@ -481,7 +483,9 @@ router
 				res.status(200)
 					.set('x-cf-geodata', country)
 					.set('Content-Type', 'application/javascript')
-					.set('Cache-Control', 'max-age=3600');
+					.set('Cache-Control', 'max-age=900');
+
+				apJs = apJs.replace('__COUNTRY__', country);
 				return res.send(apJs);
 			})
 			.catch(err => {

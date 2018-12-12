@@ -165,7 +165,7 @@ block bodyContent
                                                                 select(name="activeDFPNetwork")
                                                                     option(value="" selected) Select DFP Network
                                                                     each dfpAccount in dfpAccounts
-                                                                        option(value=dfpAccount.code + '-' + dfpAccount.dfpParentId, selected=(apConfigs.activeDFPNetwork === dfpAccount.code ? true : undefined))!=dfpAccount.code
+                                                                        option(value=dfpAccount.code + '-' + dfpAccount.dfpParentId, selected=(apConfigs.activeDFPNetwork === dfpAccount.code ? true : undefined)) #{dfpAccount.name ? dfpAccount.code + ' - ' + dfpAccount.name : dfpAccount.code + ' - ' + 'N/A' }
 
                                         .row
                                             .col-sm-12

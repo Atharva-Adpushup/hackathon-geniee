@@ -33,5 +33,10 @@ module.exports = {
 		UTM_TERM: 'utm_term',
 		UTM_CONTENT: 'utm_content'
 	},
+	PLATFORMS: {
+		RESPONSIVE: 'RESPONSIVE',
+		DESKTOP: 'DESKTOP',
+		MOBILE: 'MOBILE'
+	},
 	ADPUSHUP_MEDIANET_ID: '8CUEJU9TP'
 };

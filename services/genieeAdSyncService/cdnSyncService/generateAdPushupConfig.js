@@ -46,10 +46,7 @@ const _ = require('lodash'),
 			};
 
 			if (isMultipleAdSizes) {
-				adData.multipleAdSizes = ad.multipleAdSizes.map(object => [
-					Number(object.width),
-					Number(object.height)
-				]);
+				adData.multipleAdSizes = ad.multipleAdSizes.concat([]);
 			}
 
 			ADPTags.push(adData);
@@ -77,6 +74,8 @@ const _ = require('lodash'),
 				});
 			}
 
+			const isResponsive = !!ad.networkData.isResponsive;
+
 			json = {
 				id: sectionId,
 				network: ad.network,
@@ -84,8 +83,8 @@ const _ = require('lodash'),
 				type: section.type,
 				formatData: section.formatData,
 				css: ad.css,
-				height: parseInt(ad.height, 10),
-				width: parseInt(ad.width, 10),
+				height: isResponsive ? ad.height : parseInt(ad.height, 10),
+				width: isResponsive ? ad.width : parseInt(ad.width, 10),
 				enableLazyLoading: section.enableLazyLoading
 			};
 
@@ -93,7 +92,7 @@ const _ = require('lodash'),
 			const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
 
 			if (isMultipleAdSizes) {
-				json.multipleAdSizes = ad.multipleAdSizes.map(object => [Number(object.width), Number(object.height)]);
+				json.multipleAdSizes = ad.multipleAdSizes.concat([]);
 			}
 
 			if (section.isIncontent) {

@@ -7,14 +7,21 @@ const siteMappingActions = {
 		SET_LIVE_SITES_DATA: 'SET_LIVE_SITES_DATA'
 	},
 	DEFAULT_HB_CONFIG = {
-		'728x90': [],
-		'300x250': [],
-		'300x600': [],
-		'336x280': [],
-		'160x600': [],
-		'970x250': [],
-		'970x90': [],
-		'320x100': []
+		"300x250": [],
+		"250x250": [],
+		"200x200": [],
+		"336x280": [],
+		"728x90": [],
+		"468x60": [],
+		"300x600": [],
+		"160x600": [],
+		"120x600": [],
+		"320x50": [],
+		"320x100": [],
+		"900x90": [],
+		"970x250": [],
+		"300x1050": [],
+		"responsivexresponsive": [],
 	},
 	globalMetricChartsActions = {
 		FETCH_NETWORK_WISE_DATA: 'FETCH_NETWORK_WISE_DATA',
@@ -302,13 +309,92 @@ const siteMappingActions = {
 	  },{
 	    value: "300 1050",
 	    label: "300x1050",
-	  },
+	  },{
+		value: "responsive responsive",
+		label: "responsivexresponsive",
+	  }
+	],
+	partnersList = [
+		{
+			value: "districtm",
+			label: "districtm"
+		},
+		{
+			value: "oftmedia",
+			label: "oftmedia"
+		},
+		{
+			value: "pulsepoint",
+			label: "pulsepoint"
+		},
+		{
+			value: "c1x",
+			label: "c1x"
+		},
+		{
+			value: "medianet",
+			label: "medianet"
+		},
+		{
+			value: "districtmDMX",
+			label: "districtmDMX"
+		}
 	],
 	devicesList = [
 		"(min-width: 1200px)",
 		"(min-width: 768px) and (max-width: 1199px)",
 		"(min-width: 0px) and (max-width: 767px)"
-	];
+	],
+	biddersParams = {
+		districtm: [ 
+			{
+				name: 'placementId',
+				type: 'string',
+			}
+		],
+		oftmedia: [
+			{
+				name: 'placementId',
+				type: 'string',
+			}
+		],
+		pulsepoint: [
+			{
+				name: 'cf',
+				type: 'string',
+			},
+			{
+				name: 'cp',
+				type: 'integer',
+			},
+			{
+				name: 'ct',
+				type: 'integer',
+			},
+		],
+		c1x: [
+			{
+				name: 'siteId',
+				type: 'string',
+			},
+		],
+		medianet: [
+			{
+				name: 'cid',
+				type: 'string',
+			}
+		],
+		districtmDMX: [
+			{
+				name: 'dmxid',
+				type: 'integer'
+			},
+			{
+				name: 'memberid',
+				type: 'integer'
+			}
+		]
+	};
 
 export {
 	siteMappingActions,
@@ -317,6 +403,8 @@ export {
 	siteMapping,
 	liveSites,
 	devicesList,
+	partnersList,
+	biddersParams,
 	sizeConfigOptions,
 	LINE_CHART_CONFIG,
 	PIE_CHART_CONFIG,

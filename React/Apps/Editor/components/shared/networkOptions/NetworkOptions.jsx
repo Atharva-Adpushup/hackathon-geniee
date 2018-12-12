@@ -18,8 +18,8 @@ class NetworkOptions extends Component {
 				this.props.ad && this.props.ad.network
 					? this.props.ad.network
 					: this.props.ad && currentUser.userType == 'partner'
-						? 'geniee'
-						: false
+					? 'geniee'
+					: false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.renderNetwork = this.renderNetwork.bind(this);
@@ -51,7 +51,7 @@ class NetworkOptions extends Component {
 	submitHandler(networkData) {
 		return this.props.onSubmit({
 			network: this.state.network,
-			networkData: networkData
+			networkData: { ...networkData, logWritten: false }
 		});
 	}
 
@@ -136,11 +136,7 @@ class NetworkOptions extends Component {
 				(isAdSize && { height: props.ad.height, width: props.ad.width }) ||
 				{},
 			isZonesData = !!(props.zonesData && props.zonesData.length),
-			zonesData = isZonesData ? props.zonesData : [],
-			disableSyncing =
-				isAdNetworkData &&
-				props.ad.networkData.hasOwnProperty('disableSyncing') &&
-				props.ad.networkData.disableSyncing;
+			zonesData = isZonesData ? props.zonesData : [];
 
 		switch (this.state.network) {
 			case 'adpTags':
@@ -155,11 +151,11 @@ class NetworkOptions extends Component {
 						refreshSlot={refreshSlot}
 						overrideActive={overrideActive}
 						overrideSizeTo={overrideSizeTo}
-						disableSyncing={disableSyncing}
 						buttonType={props.buttonType || 1}
 						fromPanel={props.fromPanel ? props.fromPanel : false}
 						id={props.id ? props.id : false}
 						showNotification={props.showNotification}
+						primaryAdSize={primaryAdSize}
 					/>
 				);
 				break;

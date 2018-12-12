@@ -7,8 +7,8 @@
         .col-sm-6
             .mb-30
                 .controlAdpushupWrap
-                    if !site.isManual
-                        h3.title.m-All-0.clearfix
+                    //- if !site.isManual
+                    h3.title.m-All-0.clearfix
                             a.pull-left(id="site-report-" + siteId, target='_blank').
                                 #{utils.domanize(site.domain)} - #{siteId}
                             .pull-right.site-actions
@@ -16,6 +16,8 @@
                                     i.fa.fa-code
                                 a.btn.btn-lightBg.btn-default(title="View site report" target='_blank' id="site-custom-reports-" + siteId, href='/user/site/#{siteId}/reports/adpushupReport')
                                         i.fa.fa-area-chart
+                                if site.isManual
+                                    a.btn.btn-lightBg.btn-default(id="site-tag-manager-" + siteId, href='/tagmanager/#{siteId}') AP Tag
                                 .dropdown.btn-dropdown
                                     button.btn.btn-lightBg#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='true')
                                         span.caret
@@ -172,7 +174,7 @@
                                         h4
                                             i.fa.fa-exclamation-circle 
                                             | No report data found for this site
-                    else
+                    //- else
                         h3.title.m-All-0.clearfix
                             a.pull-left(id="site-report-" + siteId).
                                 #{utils.domanize(site.domain)} - #{siteId}
@@ -189,9 +191,9 @@
                                     //- Page Group not found! Please 
                                     //- a(href="/user/site/#{siteId}/createPagegroup") create
                                     //- |  one to access the visual editor.
-                    //- if isSuperUser  
-                    //-     .mode-setting
-                    //-         span.label Manual Mode
-                    //-         .toggle-switch
-                    //-             input(type="checkbox" id="switch-#{siteId}" checked=site.isManual ? true : undefined)
-                    //-             label(for="switch-#{siteId}" data-id="switch-#{siteId}" data-site-id="#{siteId}")
+                    if isSuperUser  
+                        .mode-setting
+                            span.label Manual Mode
+                            .toggle-switch
+                                input(type="checkbox" id="switch-#{siteId}" checked=site.isManual ? true : undefined)
+                                label(for="switch-#{siteId}" data-id="switch-#{siteId}" data-site-id="#{siteId}")
