@@ -115,9 +115,17 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 					if (checkForLog(ad)) {
 						logUnsyncedAds.push(ad);
 					}
-					return ad.network && ad.network == 'adpTags'
-						? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)
-						: false;
+					let unsyncedZone =
+						ad.network && ad.network == 'adpTags'
+							? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)
+							: false;
+
+					if (unsyncedZone) {
+						if (ad.formatData && ad.formatData.platform) {
+							unsyncedZone.platform = ad.formatData.platform;
+						}
+					}
+					return unsyncedZone;
 				})
 			);
 

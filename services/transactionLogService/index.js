@@ -49,12 +49,17 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 			}
 
 			if (network && networkData) {
-				if (networkData.headerBidding) {
+				if (networkData.hasOwnProperty('headerBidding')) {
 					service = commonConsts.TRANSACTION_SERVICES.HEADER_BIDDING;
-				} else if (networkData.dynamicAllocation) {
+					status = networkData.headerBidding
+						? commonConsts.SETUP_STATUS.ACTIVE
+						: commonConsts.SETUP_STATUS.INACTIVE;
+				} else if (networkData.hasOwnProperty('dynamicAllocation')) {
 					service = commonConsts.TRANSACTION_SERVICES.DYNAMIC_ALLOCATION;
+					status = networkData.dynamicAllocation
+						? commonConsts.SETUP_STATUS.ACTIVE
+						: commonConsts.SETUP_STATUS.INACTIVE;
 				}
-				status = commonConsts.SETUP_STATUS.ACTIVE;
 			}
 
 			return {
@@ -120,6 +125,7 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 		json: true
 	})
 		.then(response => {
+			console.log(response);
 			return updateDb(siteId, layoutAds, apTagAds);
 		})
 		.then(() => syncCdn(siteId, true))
