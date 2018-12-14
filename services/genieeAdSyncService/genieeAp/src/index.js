@@ -16,7 +16,7 @@ var w = window,
 	control = require('./control')(),
 	genieeObject = require('./genieeObject'),
 	triggerAd = require('./trigger'),
-	refreshAdInterval = require('./refreshAdInterval'),
+	refreshAdSlot = require('./refreshAdSlot'),
 	session = require('../libs/session'),
 	isGenieeSite;
 
@@ -43,6 +43,9 @@ $.extend(adp.config, __AP_CONFIG__, {
 
 // Initialise adpushup session
 session.init();
+
+//Initialise refresh slots
+refreshAdSlot.init(w);
 
 //Geniee ad network specific site check
 isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
@@ -200,7 +203,6 @@ function main() {
 	// AdPushup Mode Logic
 	if (parseInt(config.mode, 10) === 2) {
 		triggerControl(2);
-		refreshAdInterval(w);
 		return false;
 	}
 
@@ -220,9 +222,7 @@ function main() {
 		heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
 
 		//Init creation
-		startCreation().then(function () {
-			refreshAdInterval(w);
-		});
+		startCreation();
 	}
 }
 
