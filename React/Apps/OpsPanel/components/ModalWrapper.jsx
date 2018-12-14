@@ -23,7 +23,7 @@ class ModalWrapper extends React.Component {
 		const districtmDMX = findBidder(data, 'districtmDMX');
 		const openx = findBidder(data, 'openx');
 		const conversant = findBidder(data, 'conversant');
-		const thirtyThreeAcross = findBidder(data, 'thirtyThreeAcross');
+		const thirtyThreeAcross = findBidder(data, '33across');
 
 		this.state = {
 			partnersSelected: props.data.map(obj => obj.bidder) || [],
@@ -57,7 +57,7 @@ class ModalWrapper extends React.Component {
 				site_id: conversant ? conversant.params.site_id : '',
 				secure: conversant ? conversant.params.secure : ''
 			},
-			thirtyThreeAcross: {
+			'33across': {
 				siteId: thirtyThreeAcross ? thirtyThreeAcross.params.siteId : '',
 				productId: thirtyThreeAcross ? thirtyThreeAcross.params.productId : ''
 			},
@@ -95,7 +95,7 @@ class ModalWrapper extends React.Component {
 		const districtmDMX = findBidder(data, 'districtmDMX');
 		const openx = findBidder(data, 'openx');
 		const conversant = findBidder(data, 'conversant');
-		const thirtyThreeAcross = findBidder(data, 'thirtyThreeAcross');
+		const thirtyThreeAcross = findBidder(data, '33across');
 
 		this.setState({
 			partnersSelected: nextProps.data.map(obj => ({ value: obj.bidder, label: obj.bidder })) || [],
@@ -129,7 +129,7 @@ class ModalWrapper extends React.Component {
 				site_id: conversant ? conversant.params.site_id : '',
 				secure: conversant ? conversant.params.secure : ''
 			},
-			thirtyThreeAcross: {
+			'33across': {
 				siteId: thirtyThreeAcross ? thirtyThreeAcross.params.siteId : '',
 				productId: thirtyThreeAcross ? thirtyThreeAcross.params.productId : ''
 			},

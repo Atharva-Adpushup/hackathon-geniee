@@ -362,7 +362,7 @@ const siteMappingActions = {
 		},
 		{
 			value: '33across',
-			label: 'thirtyThreeAcross'
+			label: '33across'
 		}
 	],
 	devicesList = [
