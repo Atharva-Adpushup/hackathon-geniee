@@ -67,7 +67,7 @@ router
 					response = _.map(channels, channel => {
 						return {
 							name: channel.channelName,
-							autoOptimise: channel.hasOwnProperty('autoOptimise') ? channel.autoOptimise : 'N/A'
+							autoOptimise: channel.hasOwnProperty('autoOptimise') ? channel.autoOptimise : false
 						};
 					});
 				}
