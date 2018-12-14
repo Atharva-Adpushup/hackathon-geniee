@@ -1,8 +1,9 @@
 import React from 'react';
 import $ from 'jquery';
 // import ActionCard from '../../../Components/ActionCard.jsx';
-import { Row, Col } from 'react-bootstrap';
-import { DEFAULT_HB_CONFIG } from '../configs/commonConsts';
+import { Row, Col, ButtonGroup, ButtonToolbar, Button } from 'react-bootstrap';
+import Select from 'react-select';
+import { DEFAULT_HB_CONFIG, sizeConfigOptions as options } from '../configs/commonConsts';
 import HbConfigCreator from './HbConfigCreator/index.jsx';
 import AdditionalOptions from './HbConfigCreator/AdditionalOptions.jsx';
 import {
@@ -14,6 +15,8 @@ import {
 } from '../lib/helpers.js';
 import '../styles.scss';
 import SettingsPanel from './SettingsPanel.jsx';
+import SelectBox from '../../../Components/SelectBox/index.jsx';
+import ModalWrapper from './ModalWrapper.jsx';
 
 let temp = null;
 
@@ -34,7 +37,12 @@ class OpsPanel extends React.Component {
 			},
 			deviceConfigString: JSON.stringify({
 				sizeConfig: []
-			})
+			}),
+			sizesSelected: [],
+			currentSize: null,
+			isModalOpen: false,
+			collection: [],
+			modalId: -1
 		};
 		this.fetchHbConfig = this.fetchHbConfig.bind(this);
 		this.saveConfigs = this.saveConfigs.bind(this);
@@ -43,6 +51,11 @@ class OpsPanel extends React.Component {
 		this.hbConfigChange = this.hbConfigChange.bind(this);
 		this.validateJSONConfig = this.validateJSONConfig.bind(this);
 		this.validateJSONConfigWrapper = this.validateJSONConfigWrapper.bind(this);
+		this.onNewSelect = this.onNewSelect.bind(this);
+		this.onValChange = this.onValChange.bind(this);
+		this.addCollection = this.addCollection.bind(this);
+		this.toggleModal = this.toggleModal.bind(this);
+		this.openModalAndSetCollection = this.openModalAndSetCollection.bind(this);
 	}
 
 	componentDidMount() {
@@ -51,16 +64,30 @@ class OpsPanel extends React.Component {
 			url: `/user/site/${window.siteId}/opsPanel/hbConfig`
 		})
 			.done(res => {
+				const sizes = [];
+
+				Object.keys(res.data.hbConfig.bidderAdUnits).forEach(key => {
+					if (res.data.hbConfig.bidderAdUnits[key].length > 0) {
+						sizes.push({
+							label: key,
+							value: key.replace('x', ' ')
+						});
+					}
+				});
+
+				const hbConfig = { ...DEFAULT_HB_CONFIG, ...res.data.hbConfig.bidderAdUnits };
+
 				this.setState({
 					editMode: 'update',
-					hbConfig: res.data.hbConfig.bidderAdUnits,
-					hbConfigString: JSON.stringify(res.data.hbConfig.bidderAdUnits, null, 4),
+					hbConfig: hbConfig,
+					hbConfigString: JSON.stringify(hbConfig, null, 4),
 					additionalOptions: res.data.hbConfig.additionalOptions,
 					loading: false,
 					deviceConfig: res.data.deviceConfig || this.state.deviceConfig,
 					deviceConfigString: res.data.deviceConfig
 						? JSON.stringify(res.data.deviceConfig, null, 4)
-						: this.state.deviceConfigString
+						: this.state.deviceConfigString,
+					sizesSelected: sizes
 				});
 			})
 			.fail(res => {
@@ -70,6 +97,14 @@ class OpsPanel extends React.Component {
 
 	fetchHbConfig(hbConfig) {
 		this.setState({ hbConfig: getSizeWiseSetupGroups(hbConfig) });
+	}
+
+	onNewSelect(sizesSelected) {
+		this.setState({ sizesSelected });
+	}
+
+	onValChange(currentSize) {
+		this.setState({ currentSize });
 	}
 
 	updateGlobalHbConfig(hbConfig, setupCreatorToRemove) {
@@ -155,6 +190,58 @@ class OpsPanel extends React.Component {
 		return false;
 	}
 
+	toggleModal() {
+		this.setState({ isModalOpen: !this.state.isModalOpen });
+	}
+
+	addCollection(newCollection) {
+		const { modalId, currentSize, sizesSelected } = this.state;
+
+		let currentCollection = [...this.state.hbConfig[currentSize]];
+
+		if (newCollection.length === 0) {
+			if (modalId === -1) {
+				return;
+			} else {
+				currentCollection = [...currentCollection.slice(0, modalId), ...currentCollection.slice(modalId + 1)];
+
+				if (currentCollection.length === 0) {
+					this.setState({
+						sizesSelected: sizesSelected.filter(size => size.label !== currentSize)
+					});
+				}
+			}
+		} else {
+			if (this.state.modalId === -1) {
+				currentCollection.push(newCollection);
+			} else {
+				currentCollection[modalId] = newCollection;
+			}
+		}
+
+		const hbConfig = {
+			...this.state.hbConfig,
+			[currentSize]: currentCollection
+		};
+
+		this.setState({
+			hbConfig,
+			hbConfigString: JSON.stringify(hbConfig, null, 4)
+		});
+	}
+
+	openModalAndSetCollection(id) {
+		if (id === -1) {
+			this.setState({ collection: [], modalId: -1, isModalOpen: true });
+		} else {
+			this.setState({
+				collection: this.state.hbConfig[this.state.currentSize][id],
+				modalId: id,
+				isModalOpen: true
+			});
+		}
+	}
+
 	render() {
 		const defaultHbConfig = {
 				bidderAdUnits: {}
@@ -184,11 +271,80 @@ class OpsPanel extends React.Component {
 									/> */}
 									<Row>
 										<Col sm={6}>
+											<Row>
+												<Col sm={4} style={{ paddingRight: 0 }}>
+													<div className="input-name">Choose Sizes</div>
+												</Col>
+												<Col sm={8}>
+													<Select
+														name="sizesSelected"
+														onChange={this.onNewSelect}
+														options={options}
+														isMulti={true}
+														value={state.sizesSelected}
+													/>
+												</Col>
+											</Row>
+											{state.sizesSelected.length > 0 && (
+												<Row>
+													<Col sm={4} style={{ paddingRight: 0 }}>
+														<div className="input-name">Select Current Size</div>
+													</Col>
+													<Col sm={8}>
+														<SelectBox
+															value={state.currentSize}
+															onChange={this.onValChange}
+															label="Choose Current Size"
+														>
+															{state.sizesSelected.map(size => (
+																<option key={size.value} value={size.label}>
+																	{size.label}
+																</option>
+															))}
+														</SelectBox>
+													</Col>
+												</Row>
+											)}
+											{state.currentSize && (
+												<Row>
+													<Col sm={4} style={{ paddingRight: 0 }}>
+														<button
+															className="btn btn-lightBg btn-default"
+															onClick={() => this.openModalAndSetCollection(-1)}
+														>
+															Add SLOTS
+														</button>
+													</Col>
+													<Col sm={7}>
+														<ButtonGroup style={{ display: 'inline-flex' }}>
+															{this.state.hbConfig[state.currentSize].map(
+																(_sizeobj, i) => (
+																	<Button
+																		key={i}
+																		onClick={() =>
+																			this.openModalAndSetCollection(i)
+																		}
+																	>
+																		{i + 1}
+																	</Button>
+																)
+															)}
+														</ButtonGroup>
+													</Col>
+												</Row>
+											)}
+										</Col>
+										<Col sm={6}>
 											<textarea
 												className="hb-config-input"
 												onChange={this.hbConfigChange}
 												value={state.hbConfigString}
 											/>
+										</Col>
+									</Row>
+									<Row>
+										<Col sm={12}>
+											<h4>Size Config Panel</h4>
 										</Col>
 										<Col sm={6}>
 											<SettingsPanel
@@ -216,7 +372,7 @@ class OpsPanel extends React.Component {
 									className="btn btn-lightBg btn-default"
 									onClick={() => this.validateJSONConfig(this.state.hbConfigString, 'hbConfig')}
 								>
-									Validate HB Config
+									Validate
 								</button>
 							</Col>
 							<Col sm={4}>
@@ -231,6 +387,13 @@ class OpsPanel extends React.Component {
 						</Row>
 					</Col>
 				</Row>
+				<ModalWrapper
+					addCollection={this.addCollection}
+					isOpen={state.isModalOpen}
+					toggle={this.toggleModal}
+					heading={`Collection for ${state.currentSize}`}
+					data={state.collection}
+				/>
 			</div>
 			// </ActionCard>
 		);
