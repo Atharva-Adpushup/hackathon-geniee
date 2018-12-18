@@ -212,4 +212,4 @@ function main() {
 	}
 }
 
-module.exports = main;
+adp.init = main;
