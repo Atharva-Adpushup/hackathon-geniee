@@ -6,7 +6,10 @@ const masterSave = siteId => (dispatch, getState) => {
 		return ajax({
 			url: '/tagManager/masterSave',
 			method: 'POST',
-			data: JSON.stringify(data)
+			data: JSON.stringify({
+				...data,
+				siteDomain: window.currentUser.sites.filter(site => site.siteId === siteId)[0].domain
+			})
 		}).then(response => {
 			if (response.error) {
 				alert('Some error occurred');

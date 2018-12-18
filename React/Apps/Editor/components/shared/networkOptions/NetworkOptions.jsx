@@ -14,9 +14,12 @@ class NetworkOptions extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			network: this.props.ad && this.props.ad.network
-				? this.props.ad.network
-				: this.props.ad && currentUser.userType == 'partner' ? 'geniee' : false
+			network:
+				this.props.ad && this.props.ad.network
+					? this.props.ad.network
+					: this.props.ad && currentUser.userType == 'partner'
+					? 'geniee'
+					: false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.renderNetwork = this.renderNetwork.bind(this);
@@ -48,7 +51,7 @@ class NetworkOptions extends Component {
 	submitHandler(networkData) {
 		return this.props.onSubmit({
 			network: this.state.network,
-			networkData: networkData
+			networkData: { ...networkData, logWritten: false }
 		});
 	}
 

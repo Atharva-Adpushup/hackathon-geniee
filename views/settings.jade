@@ -10,13 +10,27 @@ block append headScripts
             window.blocklist = '!{blocklist}' ? '!{blocklist}'.split(',') : []; 
         });
     +loadAsset("js", [
-        '/assets/js/libs/custom/settings.js?v=1496398593978',
+        '/assets/js/libs/custom/settings.js?v=1496398593980',
     ])
     style.
         .select-wrapper {
             width: 50%;
             margin: -10px 0 25px;
             border-right: 1px solid #ccc;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
         }
 
 block bodyContent
@@ -128,6 +142,16 @@ block bodyContent
                                             .col-sm-7
                                                 input(style="margin-top: 10px;" type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "false") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "false"))
                                         .row
+                                            .col-sm-12
+                                                table
+                                                    tr
+                                                        th Channel
+                                                        th Auto Optimise
+                                                    each channel in channels
+                                                        tr
+                                                            td !{channel.name}
+                                                            td(data-identifier="autoptimise", class=channel.autoOptimise == false ? 'red' : 'green') !{channel.autoOptimise == false ? 'Disabled' : 'Enabled'}
+                                            .row
                                             .col-sm-12#autoOptimiseErr.error-message
 
                                         if dfpAccounts && dfpAccounts.length
@@ -141,7 +165,7 @@ block bodyContent
                                                                 select(name="activeDFPNetwork")
                                                                     option(value="" selected) Select DFP Network
                                                                     each dfpAccount in dfpAccounts
-                                                                        option(value=dfpAccount.code + '-' + dfpAccount.dfpParentId, selected=(apConfigs.activeDFPNetwork === dfpAccount.code ? true : undefined))!=dfpAccount.code
+                                                                        option(value=dfpAccount.code + '-' + dfpAccount.dfpParentId, selected=(apConfigs.activeDFPNetwork === dfpAccount.code ? true : undefined)) #{dfpAccount.name ? dfpAccount.code + ' - ' + dfpAccount.name : dfpAccount.code + ' - ' + 'N/A' }
 
                                         .row
                                             .col-sm-12

@@ -241,6 +241,12 @@ body {
 	}
 }
 
+.custom-label {
+	background: $primaryColor;
+	font-size: 14px;
+	padding: 5px;
+}
+
 @media (max-width: 600px) {
 	.btn-close {
 		background-color: #000000 !important;

@@ -14,15 +14,21 @@ var config = require('./config'),
 		w.googletag.cmd.push(function() {
 			w.googletag.pubads().addEventListener('slotRenderEnded', function(event) {
 				var slot;
+				var adUnitPath = event.slot.getAdUnitPath();
+				var adUnitArray = adUnitPath.split('/');
+				var adUnitDFPAdunitCode = adUnitArray[adUnitArray.length - 1];
+				var networkCode = config.NETWORK_ID;
+
 				Object.keys(w.adpushup.adpTags.adpSlots).forEach(function(adpSlot) {
-					if (
-						'/' +
-							config.NETWORK_ID +
-							'/' +
-							w.adpushup.adpTags.adpSlots[adpSlot].optionalParam.dfpAdunitCode ===
-						event.slot.getAdUnitPath()
-					) {
-						slot = w.adpushup.adpTags.adpSlots[adpSlot];
+					var currentSlot = w.adpushup.adpTags.adpSlots[adpSlot];
+					var slotMatched = !!(
+						currentSlot.optionalParam.dfpAdunitCode == adUnitDFPAdunitCode && currentSlot.activeDFPNetwork
+					);
+					if (slotMatched) {
+						networkCode = currentSlot.activeDFPNetwork;
+					}
+					if ('/' + networkCode + '/' + currentSlot.optionalParam.dfpAdunitCode === adUnitPath) {
+						slot = currentSlot;
 					}
 				});
 
