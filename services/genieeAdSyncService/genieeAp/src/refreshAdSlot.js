@@ -7,18 +7,17 @@ var utils = require('../libs/utils'),
 	$ = adp.$,
 	ads = [],
 	intervals = [],
-	refreshAd = function (container, ad) {
+	refreshAd = function(container, ad) {
 		if (utils.isElementInViewport(container)) {
-			console.log('refreshed', ad);
 			container.children().remove();
 			container.append(adCodeGenerator.generateAdCode(ad));
 		}
 	},
-	setAdInterval = function (container, ad) {
+	setAdInterval = function(container, ad) {
 		var refreshInterval = setInterval(refreshAd, commonConsts.AD_REFRESH_INTERVAL, container, ad);
 		intervals.push(refreshInterval);
 	},
-	clearAdInterval = function () {
+	clearAdInterval = function() {
 		if (intervals.length) {
 			for (var i = 0; i < intervals.length; i++) {
 				clearInterval(intervals[i]);
@@ -26,20 +25,21 @@ var utils = require('../libs/utils'),
 			intervals.length = 0;
 		}
 	},
-	init = function (w) {
-		w.adpushup.$(w).on('blur', function () {
-			console.log(intervals, 'blur');
+	init = function(w) {
+		w.adpushup.$(w).on('blur', function() {
 			clearAdInterval();
 		});
-		w.adpushup.$(w).on('focus', function () {
+		w.adpushup.$(w).on('focus', function() {
 			for (var i = 0; i < ads.length; i++) {
-				var adContainer = $.extend({}, ads[i]), container = adContainer.container, ad = adContainer.ad;
+				var adContainer = $.extend({}, ads[i]),
+					container = adContainer.container,
+					ad = adContainer.ad;
 				refreshAd(container, ad);
 				setAdInterval(container, ad);
 			}
 		});
 	},
-	refreshSlot = function (container, ad) {
+	refreshSlot = function(container, ad) {
 		setAdInterval(container, ad);
 		ads.push({ container: container, ad: ad });
 	};
