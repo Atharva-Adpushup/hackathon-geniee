@@ -62,10 +62,9 @@ class NetworkOptions extends Component {
 	getCode() {
 		let code;
 		if (this.state.network == 'adpTags') {
-			code =
-				this.props.ad.networkData && this.props.ad.networkData.keyValues
-					? this.props.ad.networkData.keyValues
-					: false;
+			code = this.props.ad.networkData && this.props.ad.networkData.keyValues
+				? this.props.ad.networkData.keyValues
+				: false;
 		} else {
 			code = this.props.ad.networkData && this.props.ad.networkData.adCode ? this.props.ad.networkData : false;
 		}
@@ -105,36 +104,37 @@ class NetworkOptions extends Component {
 				? Object.keys(props.ad.networkData.keyValues).filter(key => key.match(/FP/g))[0] || defaultPriceFloorKey
 				: defaultPriceFloorKey,
 			priceFloor = pfKeyExists ? props.ad.networkData.keyValues[fpKey] : 0,
-			refreshSlot =
-				isAdNetworkData && props.ad.networkData.refreshSlot ? props.ad.networkData.refreshSlot : false,
-			overrideActive =
-				isAdNetworkData && props.ad.networkData.overrideActive ? props.ad.networkData.overrideActive : false,
-			overrideSizeTo =
-				isAdNetworkData && props.ad.networkData.overrideSizeTo ? props.ad.networkData.overrideSizeTo : false,
-			headerBidding =
-				isAdNetworkData && props.ad.networkData.hasOwnProperty('headerBidding')
-					? props.ad.networkData.headerBidding
-					: false,
-			dynamicAllocation =
-				isAdNetworkData && props.ad.networkData.hasOwnProperty('dynamicAllocation')
-					? props.ad.networkData.dynamicAllocation
-					: true,
-			firstFold =
-				isAdNetworkData && props.ad.networkData.hasOwnProperty('firstFold')
-					? props.ad.networkData.firstFold
-					: true,
-			position =
-				isAdNetworkData && props.ad.networkData.hasOwnProperty('position') ? props.ad.networkData.position : '',
-			customAdCode =
-				isAdNetworkData && props.ad.networkData.hasOwnProperty('adCode') ? props.ad.networkData.adCode : '',
-			zoneId =
-				isAdNetworkData && props.ad.networkData.hasOwnProperty('zoneId') ? props.ad.networkData.zoneId : '',
+			refreshSlot = isAdNetworkData && props.ad.networkData.refreshSlot
+				? props.ad.networkData.refreshSlot
+				: false,
+			overrideActive = isAdNetworkData && props.ad.networkData.overrideActive
+				? props.ad.networkData.overrideActive
+				: false,
+			overrideSizeTo = isAdNetworkData && props.ad.networkData.overrideSizeTo
+				? props.ad.networkData.overrideSizeTo
+				: false,
+			headerBidding = isAdNetworkData && props.ad.networkData.hasOwnProperty('headerBidding')
+				? props.ad.networkData.headerBidding
+				: false,
+			dynamicAllocation = isAdNetworkData && props.ad.networkData.hasOwnProperty('dynamicAllocation')
+				? props.ad.networkData.dynamicAllocation
+				: true,
+			firstFold = isAdNetworkData && props.ad.networkData.hasOwnProperty('firstFold')
+				? props.ad.networkData.firstFold
+				: true,
+			position = isAdNetworkData && props.ad.networkData.hasOwnProperty('position')
+				? props.ad.networkData.position
+				: '',
+			customAdCode = isAdNetworkData && props.ad.networkData.hasOwnProperty('adCode')
+				? props.ad.networkData.adCode
+				: '',
+			zoneId = isAdNetworkData && props.ad.networkData.hasOwnProperty('zoneId')
+				? props.ad.networkData.zoneId
+				: '',
 			isPrimaryAdSize = !!(props.primaryAdSize && Object.keys(props.primaryAdSize).length),
 			isAdSize = !!(adExists && props.ad.width && props.ad.height),
-			primaryAdSize =
-				(isPrimaryAdSize && props.primaryAdSize) ||
-				(isAdSize && { height: props.ad.height, width: props.ad.width }) ||
-				{},
+			primaryAdSize = (isPrimaryAdSize && props.primaryAdSize) ||
+			(isAdSize && { height: props.ad.height, width: props.ad.width }) || {},
 			isZonesData = !!(props.zonesData && props.zonesData.length),
 			zonesData = isZonesData ? props.zonesData : [];
 
@@ -164,6 +164,7 @@ class NetworkOptions extends Component {
 					<Adsense
 						code={code}
 						submitHandler={this.submitHandler}
+						id={props.id ? props.id : false}
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						showNotification={this.props.showNotification}
@@ -175,6 +176,7 @@ class NetworkOptions extends Component {
 					<AdX
 						code={code}
 						submitHandler={this.submitHandler}
+						id={props.id ? props.id : false}
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						showNotification={this.props.showNotification}
@@ -210,6 +212,7 @@ class NetworkOptions extends Component {
 					<MediaNet
 						code={code}
 						submitHandler={this.submitHandler}
+						id={props.id ? props.id : false}
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						showNotification={this.props.showNotification}
@@ -222,6 +225,7 @@ class NetworkOptions extends Component {
 					<OtherNetworks
 						code={code}
 						submitHandler={this.submitHandler}
+						id={props.id ? props.id : false}
 						onCancel={this.props.onCancel}
 						showNotification={this.props.showNotification}
 					/>
