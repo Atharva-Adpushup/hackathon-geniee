@@ -320,7 +320,9 @@ module.exports = {
 		const elementTop = $(el).offset().top,
 			elementBottom = elementTop + $(el).outerHeight(),
 			viewportTop = $(window).scrollTop(),
-			viewportBottom = viewportTop + $(window).height();
+			windowHeight =
+				window.innerHeight || Math.min(document.body.clientHeight, document.documentElement.clientHeight),
+			viewportBottom = viewportTop + windowHeight;
 		return (
 			Math.abs(elementTop - viewportBottom) <= threshold ||
 			Math.abs(elementBottom - viewportTop) <= threshold ||
