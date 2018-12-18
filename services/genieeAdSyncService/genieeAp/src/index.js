@@ -19,6 +19,7 @@ var w = window,
 	session = require('../libs/session'),
 	isGenieeSite;
 
+// Resets and initialises the adpushup config object
 function initAdpConfig() {
 	// Extend adpushup object
 	// Location of below snippet should not be changed, other wise script will throw error.
@@ -38,7 +39,8 @@ function initAdpConfig() {
 	// Extend the settings with generated settings
 	// eslint-disable-next-line no-undef
 	$.extend(adp.config, __AP_CONFIG__, {
-		platform: browserConfig.platform
+		platform: browserConfig.platform,
+		packetId: utils.uniqueId(__SITE_ID__)
 	});
 }
 
