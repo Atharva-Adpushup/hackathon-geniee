@@ -5,6 +5,7 @@ var $ = require('jquery'),
 	browserConfig = require('../libs/browserConfig'),
 	incontentAnalyser = __IN_CONTENT_ANALYSER_SCRIPT__,
 	adCodeGenerator = require('./adCodeGenerator'),
+	refreshAdSlot = require('./refreshAdSlot'),
 	commonConsts = require('../config/commonConsts'),
 	shouldPushToADP = function(ad) {
 		return (
@@ -156,6 +157,10 @@ var $ = require('jquery'),
 					utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: id });
 				}.bind(adp, ad.id)
 			);
+
+			if (ad.networkData && ad.networkData.refreshSlot) {
+				refreshAdSlot.refreshSlot(container, ad);
+			}
 		} catch (e) {
 			adp.err.push({ msg: 'Error in placing ad.', ad: ad, error: e });
 		}
