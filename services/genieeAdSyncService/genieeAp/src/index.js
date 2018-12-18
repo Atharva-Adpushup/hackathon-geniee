@@ -19,33 +19,28 @@ var w = window,
 	session = require('../libs/session'),
 	isGenieeSite;
 
-// Extend adpushup object
-// Location of below snippet should not be changed, other wise script will throw error.
-$.extend(adp, {
-	creationProcessStarted: false,
-	afterJSExecuted: false,
-	err: [],
-	utils: utils,
-	control: control,
-	tracker: new Tracker(),
-	nodewatcher: nodewatcher,
-	geniee: genieeObject,
-	triggerAd: triggerAd,
-	session: session
-});
+function initAdpConfig() {
+	// Extend adpushup object
+	// Location of below snippet should not be changed, other wise script will throw error.
+	$.extend(adp, {
+		creationProcessStarted: false,
+		afterJSExecuted: false,
+		err: [],
+		utils: utils,
+		control: control,
+		tracker: new Tracker(),
+		nodewatcher: nodewatcher,
+		geniee: genieeObject,
+		triggerAd: triggerAd,
+		session: session
+	});
 
-// Extend the settings with generated settings
-// eslint-disable-next-line no-undef
-$.extend(adp.config, __AP_CONFIG__, {
-	platform: browserConfig.platform
-});
-
-// Initialise adpushup session
-session.init();
-
-//Geniee ad network specific site check
-isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
-adp.config.isGeniee = isGenieeSite;
+	// Extend the settings with generated settings
+	// eslint-disable-next-line no-undef
+	$.extend(adp.config, __AP_CONFIG__, {
+		platform: browserConfig.platform
+	});
+}
 
 function shouldWeNotProceed() {
 	var hasGenieeStarted = !!(
@@ -157,27 +152,18 @@ function initAdpQue() {
 }
 
 function main() {
+	// Initialise adp config
+	initAdpConfig();
+
+	// Initialise adpushup session
+	session.init();
+
+	//Geniee ad network specific site check
+	isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
+	adp.config.isGeniee = isGenieeSite;
+
 	// Initialise adp que
 	initAdpQue();
-
-	// Set mode in adp config in case of pure manual ads implementation
-	// if (adp.config.manualModeActive) {
-	// 	adp.config.mode = 16;
-	// 	adp.creationProcessStarted = true;
-
-	// 	var interactiveAds = utils.getInteractiveAds(adp.config);
-	// 	if (interactiveAds) {
-	// 		require.ensure(
-	// 			['interactiveAds/index.js'],
-	// 			function (require) {
-	// 				require('interactiveAds/index')(interactiveAds);
-	// 			},
-	// 			'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
-	// 		);
-	// 	}
-
-	// 	return false;
-	// }
 
 	// Hook Pagegroup, find pageGroup and check for blockList
 	hookAndInit(adp, startCreation, browserConfig.platform);
