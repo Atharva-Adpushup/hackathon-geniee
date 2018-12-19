@@ -10,7 +10,7 @@ block append headScripts
             window.blocklist = '!{blocklist}' ? '!{blocklist}'.split(',') : []; 
         });
     +loadAsset("js", [
-        '/assets/js/libs/custom/settings.js?v=1496398593980',
+        '/assets/js/libs/custom/settings.js?v=1496398593983',
     ])
     style.
         .select-wrapper {
@@ -148,9 +148,11 @@ block bodyContent
                                                         th Channel
                                                         th Auto Optimise
                                                     each channel in channels
+                                                        - channelAutoOptimiseClass = channel.autoOptimise == false || channel.autoOptimise == 'N/A'  ? 'red' : 'green'
+                                                        - channelAutoOptimiseStatus = channel.autoOptimise == false ? 'Disabled' : channel.autoOptimise == 'N/A' ? 'N/A' : 'Enabled'
                                                         tr
                                                             td !{channel.name}
-                                                            td(data-identifier="autoptimise", class=channel.autoOptimise == false ? 'red' : 'green') !{channel.autoOptimise == false ? 'Disabled' : 'Enabled'}
+                                                            td(data-identifier="autoptimise", class=channelAutoOptimiseClass) !{channelAutoOptimiseStatus}
                                             .row
                                             .col-sm-12#autoOptimiseErr.error-message
 
