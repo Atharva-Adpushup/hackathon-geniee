@@ -218,4 +218,4 @@ function main() {
 }
 
 adp.init = main;
-// adp.init();
+adp.init();
