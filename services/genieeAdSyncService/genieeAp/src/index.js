@@ -3,6 +3,7 @@ var w = window,
 	adp = (w.adpushup = w.adpushup || {}),
 	$ = (adp.$ = require('jquery')),
 	utils = require('../libs/utils'),
+	defaultConfig = $.extend({}, require('../config/config.js')),
 	config = (adp.config = require('../config/config.js')),
 	Tracker = require('../libs/tracker'),
 	nodewatcher = require('../libs/nodeWatcher'),
@@ -18,8 +19,14 @@ var w = window,
 	session = require('../libs/session'),
 	isGenieeSite;
 
+function resetAdpConfig() {
+	config = adp.config = $.extend({}, defaultConfig);
+}
+
 // Resets and initialises the adpushup config object
 function initAdpConfig() {
+	resetAdpConfig();
+
 	// Extend adpushup object
 	$.extend(adp, {
 		creationProcessStarted: false,
