@@ -9,7 +9,6 @@ var w = window,
 	browserConfig = require('../libs/browserConfig'),
 	selectVariation = require('./variationSelectionModels/index'),
 	createAds = require('./adCreater').createAds,
-	// renderAd = require('./adCreater').renderAd,
 	heartBeat = require('../libs/heartBeat'),
 	ampInit = require('./ampInit'),
 	hookAndInit = require('./hooksAndBlockList'),
@@ -22,7 +21,6 @@ var w = window,
 // Resets and initialises the adpushup config object
 function initAdpConfig() {
 	// Extend adpushup object
-	// Location of below snippet should not be changed, other wise script will throw error.
 	$.extend(adp, {
 		creationProcessStarted: false,
 		afterJSExecuted: false,
@@ -213,3 +211,4 @@ function main() {
 }
 
 adp.init = main;
+// adp.init();
