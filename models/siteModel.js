@@ -4,6 +4,7 @@ var model = require('../helpers/model'),
 	couchbase = require('../helpers/couchBaseService'),
 	globalModel = require('../models/globalModel'),
 	AdPushupError = require('../helpers/AdPushupError'),
+	utils = require('../helpers/utils'),
 	channelModel = require('../models/channelModel'),
 	apConfigSchema = require('./subClasses/site/apConfig'),
 	Promise = require('bluebird'),
@@ -360,14 +361,20 @@ function apiModule() {
 				Object.keys(patterns).forEach(pattern => {
 					patterns[pattern].forEach(p => {
 						delete p.platform;
+						p = utils.getHtmlEncodedJSON(p);
 					});
 				});
 				return patterns;
 			};
 
 			const pageGroupPattern = setPagegroupPattern(JSON.parse(json.settings.pageGroupPattern)),
-				otherSettings = JSON.parse(json.settings.otherSettings),
 				blocklist = JSON.parse(json.settings.blocklist);
+			let otherSettings = JSON.parse(json.settings.otherSettings),
+				encodedOtherSettings = Object.assign({}, otherSettings);
+
+			delete encodedOtherSettings.cookieControlConfig;
+			encodedOtherSettings = utils.getHtmlEncodedJSON(encodedOtherSettings);
+			otherSettings = Object.assign({}, otherSettings, encodedOtherSettings);
 
 			return API.getSiteById(json.siteId).then(site => {
 				var siteConfig = {
@@ -386,6 +393,8 @@ function apiModule() {
 						: commonConsts.apConfigDefaults.adpushupPercentage,
 					autoOptimise: json.settings.autoOptimise === 'false' ? false : true,
 					poweredByBanner: json.settings.poweredByBanner === 'false' ? false : true,
+					activeDFPNetwork: json.settings.activeDFPNetwork ? json.settings.activeDFPNetwork : '',
+					activeDFPParentId: json.settings.activeDFPParentId ? json.settings.activeDFPParentId : '',
 					blocklist: blocklist.length ? blocklist : '',
 					isAdPushupControlWithPartnerSSP: !!site.get('apConfigs').isAdPushupControlWithPartnerSSP
 						? site.get('apConfigs').isAdPushupControlWithPartnerSSP

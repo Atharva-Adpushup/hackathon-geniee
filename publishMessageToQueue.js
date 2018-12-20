@@ -1,6 +1,6 @@
 var siteModel = require('./models/siteModel'),
 	couchbase = require('./helpers/couchBaseService'),
-	CouchbasePromises = require('couchbase-promises'),
+	CouchbasePromises = require('couchbase'),
 	Promise = require('bluebird'),
 	lodash = require('lodash'),
 	N1qlQuery = CouchbasePromises.N1qlQuery,

@@ -13,8 +13,9 @@ var model = require('../helpers/model'),
 	extend = require('extend'),
 	utils = require('../helpers/utils'),
 	Promise = require('bluebird'),
-	ViewQuery = require('couchbase-promises').ViewQuery,
-	N1qlQuery = require('couchbase-promises').N1qlQuery,
+	couchbaseModule = require('couchbase'),
+	ViewQuery = couchbaseModule.ViewQuery,
+	N1qlQuery = couchbaseModule.N1qlQuery,
 	Channel = model.extend(function() {
 		this.keys = [
 			'id',
@@ -32,7 +33,8 @@ var model = require('../helpers/model'),
 			'dateCreated',
 			'dateModified',
 			'genieePageGroupId',
-			'ampSettings'
+			'ampSettings',
+			'autoOptimise'
 		];
 		this.clientKeys = [
 			'id',
@@ -46,7 +48,8 @@ var model = require('../helpers/model'),
 			'contentSelectorMissing',
 			'activeVariation',
 			'genieePageGroupId',
-			'ampSettings'
+			'ampSettings',
+			'autoOptimise'
 		];
 		this.validations = {
 			required: []
@@ -107,6 +110,12 @@ function apiModule() {
 					site.set('channels', channels);
 					console.log('siteJSON after createPageGroup before db save: ', JSON.stringify(site.toJSON()));
 
+					const siteApConfigs = site.get('apConfigs') || false;
+					const siteAutoOptimise =
+						siteApConfigs && siteApConfigs.hasOwnProperty('autoOptimise')
+							? siteApConfigs.autoOptimise
+							: true;
+
 					channelData = {
 						siteDomain: site.data.siteDomain,
 						siteId: site.data.siteId,
@@ -116,7 +125,8 @@ function apiModule() {
 						id: uuid.v4(),
 						channelName: json.pageGroupName.toUpperCase() + '_' + json.device.toUpperCase(),
 						genieePageGroupId: json.pageGroupId,
-						variations: {}
+						variations: {},
+						autoOptimise: siteAutoOptimise
 					};
 					return site
 						.save()

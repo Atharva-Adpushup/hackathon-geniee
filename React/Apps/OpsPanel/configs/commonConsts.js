@@ -7,14 +7,21 @@ const siteMappingActions = {
 		SET_LIVE_SITES_DATA: 'SET_LIVE_SITES_DATA'
 	},
 	DEFAULT_HB_CONFIG = {
-		'728x90': [],
 		'300x250': [],
-		'300x600': [],
+		'250x250': [],
+		'200x200': [],
 		'336x280': [],
+		'728x90': [],
+		'468x60': [],
+		'300x600': [],
 		'160x600': [],
+		'120x600': [],
+		'320x50': [],
+		'320x100': [],
+		'900x90': [],
 		'970x250': [],
-		'970x90': [],
-		'320x100': []
+		'300x1050': [],
+		responsivexresponsive: []
 	},
 	globalMetricChartsActions = {
 		FETCH_NETWORK_WISE_DATA: 'FETCH_NETWORK_WISE_DATA',
@@ -257,6 +264,191 @@ const siteMappingActions = {
 				data: []
 			}
 		]
+	},
+	sizeConfigOptions = [
+		{
+			value: '300 250',
+			label: '300x250'
+		},
+		{
+			value: '250 250',
+			label: '250x250'
+		},
+		{
+			value: '200 200',
+			label: '200x200'
+		},
+		{
+			value: '336 280',
+			label: '336x280'
+		},
+		{
+			value: '728 90',
+			label: '728x90'
+		},
+		{
+			value: '468 60',
+			label: '468x60'
+		},
+		{
+			value: '300 600',
+			label: '300x600'
+		},
+		{
+			value: '160 600',
+			label: '160x600'
+		},
+		{
+			value: '120 600',
+			label: '120x600'
+		},
+		{
+			value: '320 50',
+			label: '320x50'
+		},
+		{
+			value: '320 100',
+			label: '320x100'
+		},
+		{
+			value: '900 90',
+			label: '900x90'
+		},
+		{
+			value: '970 250',
+			label: '970x250'
+		},
+		{
+			value: '300 1050',
+			label: '300x1050'
+		},
+		{
+			value: 'responsive responsive',
+			label: 'responsivexresponsive'
+		}
+	],
+	partnersList = [
+		{
+			value: 'districtm',
+			label: 'districtm'
+		},
+		{
+			value: 'oftmedia',
+			label: 'oftmedia'
+		},
+		{
+			value: 'pulsepoint',
+			label: 'pulsepoint'
+		},
+		{
+			value: 'c1x',
+			label: 'c1x'
+		},
+		{
+			value: 'medianet',
+			label: 'medianet'
+		},
+		{
+			value: 'districtmDMX',
+			label: 'districtmDMX'
+		},
+		{
+			value: 'openx',
+			label: 'openx'
+		},
+		{
+			value: 'conversant',
+			label: 'conversant'
+		},
+		{
+			value: '33across',
+			label: '33across'
+		}
+	],
+	devicesList = [
+		'(min-width: 1200px)',
+		'(min-width: 768px) and (max-width: 1199px)',
+		'(min-width: 0px) and (max-width: 767px)'
+	],
+	biddersParams = {
+		districtm: [
+			{
+				name: 'placementId',
+				type: 'string'
+			}
+		],
+		oftmedia: [
+			{
+				name: 'placementId',
+				type: 'string'
+			}
+		],
+		pulsepoint: [
+			{
+				name: 'cf',
+				type: 'string'
+			},
+			{
+				name: 'cp',
+				type: 'integer'
+			},
+			{
+				name: 'ct',
+				type: 'integer'
+			}
+		],
+		c1x: [
+			{
+				name: 'siteId',
+				type: 'string'
+			}
+		],
+		medianet: [
+			{
+				name: 'cid',
+				type: 'string'
+			}
+		],
+		districtmDMX: [
+			{
+				name: 'dmxid',
+				type: 'integer'
+			},
+			{
+				name: 'memberid',
+				type: 'integer'
+			}
+		],
+		openx: [
+			{
+				name: 'delDomain',
+				type: 'string'
+			},
+			{
+				name: 'unit',
+				type: 'string'
+			}
+		],
+		conversant: [
+			{
+				name: 'site_id',
+				type: 'string'
+			},
+			{
+				name: 'secure',
+				type: 'integer'
+			}
+		],
+		'33across': [
+			{
+				name: 'siteId',
+				type: 'string'
+			},
+			{
+				name: 'productId',
+				type: 'string'
+			}
+		]
 	};
 
 export {
@@ -265,6 +457,10 @@ export {
 	globalMetricChartsActions,
 	siteMapping,
 	liveSites,
+	devicesList,
+	partnersList,
+	biddersParams,
+	sizeConfigOptions,
 	LINE_CHART_CONFIG,
 	PIE_CHART_CONFIG,
 	DEFAULT_HB_CONFIG

@@ -4,6 +4,7 @@ var express = require('express'),
 	siteModel = require('../models/siteModel'),
 	_ = require('lodash'),
 	urlModule = require('url'),
+	{ promiseForeach } = require('node-utils'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	regexGenerator = require('../misc/tools/regexGenerator/index'),
 	utils = require('../helpers/utils'),
@@ -15,7 +16,7 @@ var express = require('express'),
 	couchbase = require('../helpers/couchBaseService'),
 	countryData = require('country-data'),
 	Promise = require('bluebird'),
-	N1qlQuery = require('couchbase-promises').N1qlQuery,
+	N1qlQuery = require('couchbase').N1qlQuery,
 	router = express.Router({ mergeParams: true }),
 	checkAuth = (req, res, next) => {
 		userModel
@@ -39,18 +40,19 @@ var express = require('express'),
 			});
 	},
 	updateHbConfig = (siteId, site, payload, appBucket) => {
-		const { hbConfig, editMode, additionalOptions } = payload,
+		const { hbConfig, editMode, additionalOptions, deviceConfig } = payload,
 			json = {
 				hbConfig: { bidderAdUnits: hbConfig, additionalOptions },
-				siteId: siteId,
+				deviceConfig,
+				siteId,
 				siteDomain: site.get('siteDomain'),
 				email: site.get('ownerEmail')
 			};
 
 		const hbcfPromise =
 			editMode === 'update'
-				? appBucket.replacePromise(`hbcf::${siteId}`, json)
-				: appBucket.insertPromise(`hbcf::${siteId}`, json);
+				? appBucket.replaceAsync(`hbcf::${siteId}`, json)
+				: appBucket.insertAsync(`hbcf::${siteId}`, json);
 
 		return [hbcfPromise, site];
 	};
@@ -58,31 +60,72 @@ var express = require('express'),
 router
 	.get('/:siteId/*', checkAuth)
 	.get('/:siteId/settings', (req, res) => {
+		function channelsDataFetching(site) {
+			return site.getAllChannels().then(channels => {
+				let response = [];
+				if (channels && channels.length) {
+					response = _.map(channels, channel => {
+						return {
+							name: channel.channelName,
+							autoOptimise:
+								channel.hasOwnProperty('autoOptimise') && channel.autoOptimise != undefined
+									? channel.autoOptimise
+									: 'N/A'
+						};
+					});
+				}
+				return response;
+			});
+		}
+
 		return siteModel
 			.getSiteById(req.params.siteId)
-			.then(site => [siteModel.getSitePageGroups(req.params.siteId), site])
-			.spread((sitePageGroups, site) => {
+			.then(site => [
+				siteModel.getSitePageGroups(req.params.siteId),
+				site,
+				userModel.getUserByEmail(req.session.user.email)
+			])
+			.spread((sitePageGroups, site, user) => {
 				const isSession = !!req.session,
 					isPartner = req.session.user.userType == 'partner',
 					isSessionGenieeUIAccess = !!(isSession && req.session.genieeUIAccess),
 					genieeUIAccess = isSessionGenieeUIAccess ? req.session.genieeUIAccess : false,
 					isGenieeUIAccessCodeConversion = !!(
 						genieeUIAccess && genieeUIAccess.hasOwnProperty('codeConversion')
-					);
+					),
+					adNetworkSettings = user.get('adNetworkSettings');
 
-				return res.render('settings', {
-					pageGroups: sitePageGroups,
-					patterns: site.get('apConfigs').pageGroupPattern || {},
-					apConfigs: site.get('apConfigs'),
-					blocklist: site.get('apConfigs').blocklist,
-					siteId: req.params.siteId,
-					siteDomain: site.get('siteDomain'),
-					isSuperUser: req.session.isSuperUser,
-					//UI access code conversion property value
-					// Specific to Geniee network as of now but can be made generic
-					uiaccecc: isGenieeUIAccessCodeConversion ? Number(genieeUIAccess.codeConversion) : 1,
-					isPartner: isPartner ? true : false,
-					gdpr: site.get('gdpr') ? site.get('gdpr') : commonConsts.GDPR
+				let dfpAccounts = null;
+				if (adNetworkSettings.length) {
+					adNetworkSettings.forEach(adNetworkSetting => {
+						if (adNetworkSetting.networkName === 'DFP') {
+							dfpAccounts = adNetworkSetting.dfpAccounts ? adNetworkSetting.dfpAccounts : null;
+						}
+					});
+				}
+
+				return [
+					site,
+					{
+						pageGroups: sitePageGroups,
+						patterns: site.get('apConfigs').pageGroupPattern || {},
+						apConfigs: site.get('apConfigs'),
+						blocklist: site.get('apConfigs').blocklist,
+						siteId: req.params.siteId,
+						siteDomain: site.get('siteDomain'),
+						dfpAccounts: dfpAccounts,
+						isSuperUser: req.session.isSuperUser,
+						//UI access code conversion property value
+						// Specific to Geniee network as of now but can be made generic
+						uiaccecc: isGenieeUIAccessCodeConversion ? Number(genieeUIAccess.codeConversion) : 1,
+						isPartner: isPartner ? true : false,
+						gdpr: site.get('gdpr') ? site.get('gdpr') : commonConsts.GDPR
+					}
+				];
+			})
+			.spread((site, data) => {
+				return Promise.join(channelsDataFetching(site), channels => {
+					return res.render('settings', { ...data, channels: channels });
 				});
 			})
 			.catch(err => {
@@ -212,6 +255,23 @@ router
 		});
 	})
 	.post('/:siteId/saveSiteSettings', function(req, res) {
+		function channelProcessing(autoOptimise, channel) {
+			const platformAndPagegroup = channel.split(':');
+			return channelModel
+				.getChannel(req.params.siteId, platformAndPagegroup[0], platformAndPagegroup[1])
+				.then(channel => {
+					channel.set('autoOptimise', autoOptimise);
+					return channel.save();
+				});
+		}
+
+		function updateChannelsAutoptimize(channels, autoOptimise) {
+			return promiseForeach(channels, channelProcessing.bind(null, autoOptimise), (data, err) => {
+				console.log(`${err.message} | Data: ${data}`);
+				return false;
+			});
+		}
+
 		var json = { settings: req.body, siteId: req.params.siteId },
 			{ gdprCompliance, cookieControlConfig } = req.body;
 		gdprCompliance = gdprCompliance === 'false' ? false : true;
@@ -230,9 +290,13 @@ router
 				gdpr: { compliance: gdprCompliance, cookieControlConfig: JSON.parse(cookieControlConfig) }
 			})
 			.then(() => siteModel.saveSiteSettings(json))
-			.then(function(data) {
-				res.send({ success: 1 });
-			})
+			.then(() => siteModel.getSiteChannels(req.params.siteId))
+			.then(channels =>
+				json.settings.isAutoOptimiseChanged == 'true'
+					? updateChannelsAutoptimize(channels, json.settings.autoOptimise === 'false' ? false : true)
+					: true
+			)
+			.then(() => res.send({ success: 1 }))
 			.catch(function(err) {
 				if (err.name === 'AdPushupError') {
 					res.send({ succes: 0, message: err.message });
@@ -333,6 +397,8 @@ router
 	})
 	.post('/:siteId/createPagegroup', function(req, res) {
 		var json = req.body;
+
+		json = utils.getHtmlEncodedJSON(json);
 		console.log('Inside CreatePagegroup');
 		return channelModel
 			.createPageGroup(json)

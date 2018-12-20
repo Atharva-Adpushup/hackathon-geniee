@@ -8,6 +8,8 @@ var ApConfig = {
 		'adpushupPercentage',
 		'autoOptimise',
 		'poweredByBanner',
+		'activeDFPNetwork',
+		'activeDFPParentId',
 		'blocklist',
 		'isAdPushupControlWithPartnerSSP'
 	],
@@ -20,6 +22,8 @@ var ApConfig = {
 		'adpushupPercentage',
 		'autoOptimise',
 		'poweredByBanner',
+		'activeDFPNetwork',
+		'activeDFPParentId',
 		'blocklist',
 		'isAdPushupControlWithPartnerSSP'
 	],

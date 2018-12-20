@@ -1,9 +1,9 @@
 // Adp tags rendering module
 
-var logger = require('../helpers/logger'),
-	utils = require('../helpers/utils'),
+var utils = require('../helpers/utils'),
 	config = require('./config'),
-	feedback = require('./feedback'),
+	responsiveAds = require('./responsiveAds'),
+	feedback = require('./feedback').feedback,
 	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(1));
 		if (val > 20) {
@@ -30,11 +30,15 @@ var logger = require('../helpers/logger'),
 
 			googletag.cmd.push(function() {
 				gptRefreshInterval = setInterval(function() {
-					refreshGPTSlot(slot.gSlot);
+					var el = $('#' + slot.sectionId);
+					if (utils.isElementInViewport(el)) {
+						refreshGPTSlot(slot.gSlot);
+					}
 				}, config.GPT_REFRESH_INTERVAL);
 				window.adpushup.adpTags.gptRefreshIntervals.push({
 					gSlot: slot.gSlot,
-					id: gptRefreshInterval
+					id: gptRefreshInterval,
+					sectionId: slot.sectionId
 				});
 			});
 		}
@@ -45,14 +49,12 @@ var logger = require('../helpers/logger'),
 			/* 
 				If multiple DFP implementations exist on the page, then explicitly refresh ADP ad slot, to fetch the ad. This makes sure that the ad is fetched in all cases, even if disableInitialLoad() is used by the publisher for his own DFP implementation.
 			*/
-			if (utils.hasMultipleDfpAccounts()) {
+			if (googletag.pubads().isInitialLoadDisabled()) {
 				refreshGPTSlot(slot.gSlot);
 			}
 		});
 	},
 	renderPostbid = function(slot) {
-		logger.log('Rendering postbid');
-
 		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId),
 			adIframe = utils.createEmptyIframe();
 
@@ -61,15 +63,12 @@ var logger = require('../helpers/logger'),
 		var iframeDoc = adIframe.contentWindow.document;
 
 		if (params && params.hb_adid) {
-			logger.log('Bid present from postbid');
-
 			pbjs.renderAd(iframeDoc, params.hb_adid);
 			adIframe.contentWindow.onload = function() {
 				slot.hasRendered = true;
 				feedback(slot);
 			};
 		} else {
-			logger.log('No bid or $0 cpm bid for slot, collapsing div');
 			slot.type = 3;
 			feedback(slot);
 		}
@@ -85,6 +84,27 @@ var logger = require('../helpers/logger'),
 			return pbjs.getAdserverTargeting()[slot.containerId];
 		}
 		return null;
+	},
+	setUTMWiseTargeting = function() {
+		var urlParams = window.adpushup.utils.queryParams;
+
+		if (!Object.keys(urlParams).length) {
+			var utmSessionCookie = window.adpushup.session.getCookie(config.UTM_SESSION_COOKIE);
+
+			if (utmSessionCookie) {
+				var utmSessionCookieValues = window.adpushup.utils.base64Decode(utmSessionCookie.split('_=')[1]);
+				urlParams = utmSessionCookieValues ? JSON.parse(utmSessionCookieValues) : {};
+			}
+		}
+
+		Object.keys(config.UTM_WISE_TARGETING).forEach(function(key) {
+			var keyVal = config.UTM_WISE_TARGETING[key],
+				utmParam = urlParams[keyVal];
+
+			googletag
+				.pubads()
+				.setTargeting(keyVal.trim().toLowerCase(), String(utmParam ? utmParam.trim().substr(0, 40) : null));
+		});
 	},
 	setGPTargeting = function(slot) {
 		if (slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE) {
@@ -156,15 +176,31 @@ var logger = require('../helpers/logger'),
 		});
 	},
 	enableGoogServicesForSlot = function(slot) {
-		var networkId =
-			slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE
-				? config.GENIEE_NETWORK_ID
-				: config.NETWORK_ID;
+		var isGenieeNetwork = !!(slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE),
+			networkId = isGenieeNetwork ? config.GENIEE_NETWORK_ID : slot.activeDFPNetwork || config.NETWORK_ID,
+			isResponsive = slot.isResponsive,
+			computedSizes = slot.computedSizes,
+			isComputedSizes = !!(computedSizes && computedSizes.length),
+			responsiveAdsData;
+
+		if (isResponsive) {
+			responsiveAdsData = responsiveAds.getAdSizes(slot.containerId);
+			size = responsiveAdsData.collection.concat([]).reverse();
+		} else {
+			// reverse() is added below as multiple ad size mapping originates from our common
+			// IAB backward ad size mapping for every ad and all ad sizes in this mapping are added in
+			// increasing order of their widths and probably DFP prioritizes ad sizes as per their
+			// added order in `size` argument. If DFP does prioritizes this, then we need to ensure that
+			// selected ad size is the first size present in `size` array.
+			size = isComputedSizes ? computedSizes.concat([]).reverse() : slot.size;
+		}
+
 		slot.gSlot = googletag.defineSlot(
 			'/' + networkId + '/' + slot.optionalParam.dfpAdunitCode,
-			slot.optionalParam.multipleAdSizes || slot.size,
+			size,
 			slot.containerId
 		);
+
 		setGPTargeting(slot);
 		slot.gSlot.addService(googletag.pubads());
 	},
@@ -221,6 +257,10 @@ var logger = require('../helpers/logger'),
 			//Global key value settings
 			for (var key in config.PAGE_KEY_VALUES) {
 				googletag.pubads().setTargeting(key, String(config.PAGE_KEY_VALUES[key]));
+			}
+
+			if (config.SITE_ID === 32142) {
+				setUTMWiseTargeting();
 			}
 
 			// Attach gpt slot for each adpSlot in batch

@@ -11,11 +11,20 @@ import { getVariationSectionsWithAds } from 'selectors/variationSelectors';
 import Utils from 'libs/utils';
 import _ from 'lodash';
 
-const createSection = (sectionPayload, adPayload, variationId) => {
+const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 		const adId = Utils.getRandomNumber(),
-			sectionId = Utils.getRandomNumber();
+			sectionId = Utils.getRandomNumber(),
+			isAdPayload = !!adPayload,
+			isAdNetworkData = !!(isAdPayload && adPayload.networkData),
+			isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId),
+			isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
 
-		return {
+		if (isCreateZoneContainerId) {
+			adPayload.networkData.zoneContainerId = `${adPayload.networkData.zoneId}-${adId}`;
+			delete adPayload.networkData.createZoneContainerId;
+		}
+
+		return dispatch({
 			type: sectionActions.CREATE_SECTION,
 			adPayload: Object.assign(adPayload, {
 				id: adId,
@@ -32,7 +41,7 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			sectionId,
 			adId,
 			variationId
-		};
+		});
 	},
 	createIncontentSection = (sectionPayload, adPayload, variationId) => (dispatch, getState) => {
 		const variationSections = getVariationSectionsWithAds(getState(), { variationId }).sections,
@@ -68,7 +77,16 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			adData = {},
 			adWidth = parseInt(adPayload.adSize.substr(0, adPayload.adSize.indexOf('x')).trim(), 10),
 			adHeight = parseInt(adPayload.adSize.substr(adPayload.adSize.indexOf('x') + 1).trim(), 10),
-			network = currentUser.userType === 'partner' ? 'geniee' : adPayload.network ? adPayload.network : 'custom';
+			network = currentUser.userType === 'partner' ? 'geniee' : adPayload.network ? adPayload.network : 'custom',
+			isAdPayload = !!adPayload,
+			isAdNetworkData = !!(isAdPayload && adPayload.networkData),
+			isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId),
+			isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
+
+		if (isCreateZoneContainerId) {
+			adPayload.networkData.zoneContainerId = `${adPayload.networkData.zoneId}-${adId}`;
+			delete adPayload.networkData.createZoneContainerId;
+		}
 
 		dispatch({
 			type: sectionActions.CREATE_INCONTENT_SECTION,
@@ -177,6 +195,13 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			xpath
 		};
 	},
+	updateOperation = (sectionId, operation) => {
+		return {
+			type: sectionActions.UPDATE_OPERATION,
+			sectionId,
+			operation
+		};
+	},
 	updateInContentMinDistanceFromPrevAd = (sectionId, minDistanceFromPrevAd) => {
 		return {
 			type: sectionActions.UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD,
@@ -248,6 +273,13 @@ const createSection = (sectionPayload, adPayload, variationId) => {
 			type: sectionActions.SCROLL_TO_VIEW,
 			adId
 		};
+	},
+	toggleLazyLoad = (sectionId, value) => {
+		return {
+			type: sectionActions.ENABLE_LAZYLOAD,
+			sectionId,
+			value
+		};
 	};
 
 export {
@@ -257,6 +289,7 @@ export {
 	createIncontentSection,
 	updatePartnerData,
 	updateXPath,
+	updateOperation,
 	updateInContentMinDistanceFromPrevAd,
 	sectionAllXPaths,
 	validateXPath,
@@ -265,5 +298,6 @@ export {
 	scrollSectionIntoView,
 	updateSection,
 	updateType,
-	updateFormatData
+	updateFormatData,
+	toggleLazyLoad
 };

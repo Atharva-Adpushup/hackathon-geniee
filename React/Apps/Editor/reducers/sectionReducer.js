@@ -81,6 +81,12 @@ const sectionByIds = (state = {}, action) => {
 				[action.sectionId]: { ...state[action.sectionId], xpath: action.xpath, allXpaths: [], error: false }
 			};
 
+		case sectionActions.UPDATE_OPERATION:
+			return {
+				...state,
+				[action.sectionId]: { ...state[action.sectionId], operation: action.operation }
+			};
+
 		case sectionActions.UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD:
 			return {
 				...state,
@@ -93,12 +99,9 @@ const sectionByIds = (state = {}, action) => {
 				[action.sectionId]: {
 					...state[action.sectionId],
 					type: action.value,
-					formatData:
-						action.type != state[action.sectionId].type
-							? {}
-							: !state[action.sectionId].formatData
-								? {}
-								: state[action.sectionId].formatData
+					formatData: action.type != state[action.sectionId].type
+						? {}
+						: !state[action.sectionId].formatData ? {} : state[action.sectionId].formatData
 				}
 			};
 
@@ -132,8 +135,17 @@ const sectionByIds = (state = {}, action) => {
 
 		case variationActions.COPY_VARIATION:
 			const sections = {};
-			_.each(action.sections, section => (sections[section.id] = section));
+			_.each(action.sections, section => sections[section.id] = section);
 			return { ...state, ...sections };
+
+		case sectionActions.ENABLE_LAZYLOAD:
+			return {
+				...state,
+				[action.sectionId]: {
+					...state[action.sectionId],
+					enableLazyLoading: action.value
+				}
+			};
 
 		default:
 			return state;

@@ -1,20 +1,27 @@
 var utils = require('../libs/utils'),
 	$ = require('jquery'),
 	config = window.adpushup.config,
+	consts = require('../config/commonConsts'),
 	generateGenieeBodyTag = function(ad) {
 		var adCode,
 			genieeRef = window.adpushup && window.adpushup.geniee,
 			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback,
-			isGlobalADPTags = !!window.adpushup.config.isADPTags;
+			isGlobalADPTags = !!window.adpushup.config.isADPTags,
+			isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
+			isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
+			computedDFPAdUnitId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit,
+			computedSSPContainerId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.zoneId;
+
+		computedSSPContainerId = '_ap_apexGeniee_ad_' + computedSSPContainerId;
 
 		if (ad.networkData.adCode) {
 			adCode = utils.base64Decode(ad.networkData.adCode);
-		} else if (ad.network && ad.network == 'geniee' && ad.networkData && ad.networkData.dynamicAllocation) {
+		} else if (ad.network && ad.network === 'geniee' && ad.networkData && ad.networkData.dynamicAllocation) {
 			adCode = [];
-			adCode.push('<div id="' + ad.networkData.dfpAdunit + '">');
+			adCode.push('<div id="' + computedDFPAdUnitId + '">');
 			adCode.push('<scr' + 'ipt type="text/javascript">');
 			adCode.push('window.adpushup.adpTags.que.push(function(){');
-			adCode.push('window.adpushup.adpTags.display("' + ad.networkData.dfpAdunit + '");');
+			adCode.push('window.adpushup.adpTags.display("' + computedDFPAdUnitId + '");');
 			adCode.push('});');
 			adCode.push('</scr' + 'ipt>');
 			adCode.push('</div>');
@@ -32,7 +39,7 @@ var utils = require('../libs/utils'),
 			adCode = [];
 			adCode.push('<scr' + 'ipt type="text/javascript">');
 			adCode.push('gnsmod.cmd.push(function() {');
-			adCode.push('gnsmod.displayAds("_ap_apexGeniee_ad_' + ad.networkData.zoneId + '");');
+			adCode.push('gnsmod.displayAds("' + computedSSPContainerId + '");');
 			adCode.push('});');
 			adCode.push('</scr' + 'ipt>');
 		}
@@ -46,27 +53,31 @@ var utils = require('../libs/utils'),
 			return function() {
 				for (var i = 0; i < adpTagUnits.length; i++) {
 					var ad = adpTagUnits[i],
+						isNetworkData = !!ad.networkData,
+						networkData = isNetworkData && ad.networkData,
+						//Geniee specific variables
 						isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
-						defaultAdSizeArray = [Number(ad.width), Number(ad.height)];
+						isResponsive = !!(networkData && networkData.isResponsive),
+						isManual = !!ad.isManual,
+						adWidth = isResponsive ? ad.width : Number(ad.width),
+						adHeight = isResponsive ? ad.height : Number(ad.height),
+						defaultAdSizeArray = [adWidth, adHeight],
+						isZoneContainerId = !!networkData.zoneContainerId,
+						computedDFPAdUnitId = isZoneContainerId ? networkData.zoneContainerId : networkData.dfpAdunit;
 
-					window.adpushup.adpTags.defineSlot(
-						ad.networkData.dfpAdunit,
-						defaultAdSizeArray,
-						ad.networkData.dfpAdunit,
-						{
-							dfpAdunit: ad.networkData.dfpAdunit,
-							dfpAdunitCode: ad.networkData.dfpAdunitCode,
-							headerBidding: ad.networkData.headerBidding,
-							keyValues: ad.networkData.keyValues,
-							network: ad.network,
-							refreshSlot: ad.networkData.refreshSlot,
-							overrideActive: ad.networkData.overrideActive,
-							overrideSizeTo: ad.networkData.overrideSizeTo,
-							multipleAdSizes: isMultipleAdSizes
-								? ad.multipleAdSizes.concat([defaultAdSizeArray])
-								: defaultAdSizeArray
-						}
-					);
+					window.adpushup.adpTags.defineSlot(computedDFPAdUnitId, defaultAdSizeArray, computedDFPAdUnitId, {
+						dfpAdunit: networkData.dfpAdunit,
+						dfpAdunitCode: networkData.dfpAdunitCode,
+						headerBidding: networkData.headerBidding,
+						keyValues: networkData.keyValues,
+						network: ad.network,
+						refreshSlot: networkData.refreshSlot,
+						overrideActive: networkData.overrideActive,
+						overrideSizeTo: networkData.overrideSizeTo,
+						multipleAdSizes: isMultipleAdSizes ? ad.multipleAdSizes : null,
+						isResponsive: isResponsive,
+						isManual: isManual
+					});
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
 				if (adpKeyValues && Object.keys(adpKeyValues).length) {
@@ -106,8 +117,28 @@ var utils = require('../libs/utils'),
 		$el.append(adCode.join('\n'));
 		return true;
 	},
+	executeMediaNetHeadCode = function() {
+		var adCode = [];
+		var cid = window.adpushup.config.medianetId || consts.ADPUSHUP_MEDIANET_ID;
+		adCode.push('<scr' + 'ipt type="text/javascript">');
+		adCode.push('window._mNHandle = window._mNHandle || {};');
+		adCode.push('window._mNHandle.queue = window._mNHandle.queue || [];');
+		adCode.push('medianet_versionId = "3121199";');
+		adCode.push('</scr' + 'ipt>');
+		adCode.push('<scr' + 'ipt async  src="//contextual.media.net/dmedianet.js?cid=' + cid + '"></scr' + 'ipt>');
+		var $el = null;
+		if ($('head').length) {
+			$el = $('head');
+		} else {
+			$el = $('body');
+		}
+		$el.append(adCode.join('\n'));
+		return true;
+	},
 	genrateAdpBodyTag = function(ad) {
-		var adCode;
+		var adCode,
+			isZoneContainerId = !!ad.networkData.zoneContainerId,
+			computedDFPAdUnitId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit;
 		if (!ad.networkData || !ad.networkData.dfpAdunit) {
 			adCode = '';
 		} else if (config.serveAmpTagsForAdp) {
@@ -115,7 +146,7 @@ var utils = require('../libs/utils'),
 			adCode = [];
 			adCode.push('<amp-ad width=' + ad.width + ' height=' + ad.height);
 			adCode.push('type="doubleclick"');
-			adCode.push('data-slot="/103512698/' + ad.networkData.dfpAdunit + '"');
+			adCode.push('data-slot="/103512698/' + computedDFPAdUnitId + '"');
 			adCode.push('data-multi-size-validation="false">');
 			adCode.push('</amp-ad>');
 			if (ad.networkData.isSticky) {
@@ -124,10 +155,10 @@ var utils = require('../libs/utils'),
 			}
 		} else {
 			adCode = [];
-			adCode.push('<div id="' + ad.networkData.dfpAdunit + '">');
+			adCode.push('<div id="' + computedDFPAdUnitId + '">');
 			adCode.push('<scr' + 'ipt type="text/javascript">');
 			adCode.push('window.adpushup.adpTags.que.push(function(){');
-			adCode.push('window.adpushup.adpTags.display("' + ad.networkData.dfpAdunit + '");');
+			adCode.push('window.adpushup.adpTags.display("' + computedDFPAdUnitId + '");');
 			adCode.push('});');
 			adCode.push('</scr' + 'ipt>');
 			adCode.push('</div>');
@@ -159,18 +190,28 @@ module.exports = {
 		}
 		return typeof adCode === 'string' ? adCode : adCode.join('\n');
 	},
-	generateGenieeHeaderCode: function(genieeAdIds) {
-		if (!genieeAdIds || !genieeAdIds.length) {
+	generateGenieeHeaderCode: function(genieeIdCollection) {
+		if (!genieeIdCollection || !genieeIdCollection.length) {
 			return false;
 		}
+
 		var adCode = [],
-			i;
+			i,
+			iteratorObject,
+			containerId,
+			zoneId;
+
 		adCode.push('<scr' + 'ipt type="text/javascript">');
 		adCode.push('var gnsmod = gnsmod || {};');
 		adCode.push('gnsmod.cmd = gnsmod.cmd || [];');
 		adCode.push('gnsmod.cmd.push(function() {');
-		for (i = 0; i < genieeAdIds.length; i++) {
-			adCode.push('gnsmod.defineZone("_ap_apexGeniee_ad_' + genieeAdIds[i] + '", ' + genieeAdIds[i] + ');');
+		for (i = 0; i < genieeIdCollection.length; i++) {
+			iteratorObject = genieeIdCollection[i];
+			containerId = iteratorObject.zoneContainerId || iteratorObject.zoneId;
+			containerId = '_ap_apexGeniee_ad_' + containerId;
+			zoneId = iteratorObject.zoneId;
+
+			adCode.push('gnsmod.defineZone("' + containerId + '", ' + zoneId + ');');
 		}
 		adCode.push('gnsmod.fetchAds();');
 		adCode.push('});');
@@ -188,5 +229,8 @@ module.exports = {
 		}
 
 		return true;
+	},
+	generateMediaNetHeadCode: function() {
+		return executeMediaNetHeadCode();
 	}
 };

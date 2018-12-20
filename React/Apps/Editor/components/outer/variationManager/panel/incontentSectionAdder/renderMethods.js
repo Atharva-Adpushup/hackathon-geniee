@@ -108,6 +108,7 @@ const renderField = field => {
 								fromPanel={true}
 								showNotification={that.props.showNotification}
 								isInsertMode={true}
+								zonesData={that.props.zonesData}
 							/>
 						</Col>
 					</Row>

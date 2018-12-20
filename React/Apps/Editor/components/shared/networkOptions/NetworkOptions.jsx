@@ -1,10 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
-import { networks, defaultPriceFloorKey } from '../../../consts/commonConsts';
+import { networks, defaultPriceFloorKey, partners } from '../../../consts/commonConsts';
 import CodeBox from '../codeBox';
 import SelectBox from '../select/select';
 import AdpTags from './AdpTags';
 import Adsense from './Adsense';
+import MediaNet from './MediaNet';
 import OtherNetworks from './OtherNetworks';
 import AdX from './AdX';
 import SectionOptions from './sectionOptions.jsx';
@@ -17,8 +18,8 @@ class NetworkOptions extends Component {
 				this.props.ad && this.props.ad.network
 					? this.props.ad.network
 					: this.props.ad && currentUser.userType == 'partner'
-						? 'geniee'
-						: false
+					? 'geniee'
+					: false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.renderNetwork = this.renderNetwork.bind(this);
@@ -50,7 +51,7 @@ class NetworkOptions extends Component {
 	submitHandler(networkData) {
 		return this.props.onSubmit({
 			network: this.state.network,
-			networkData: networkData
+			networkData: { ...networkData, logWritten: false }
 		});
 	}
 
@@ -61,10 +62,9 @@ class NetworkOptions extends Component {
 	getCode() {
 		let code;
 		if (this.state.network == 'adpTags') {
-			code =
-				this.props.ad.networkData && this.props.ad.networkData.keyValues
-					? this.props.ad.networkData.keyValues
-					: false;
+			code = this.props.ad.networkData && this.props.ad.networkData.keyValues
+				? this.props.ad.networkData.keyValues
+				: false;
 		} else {
 			code = this.props.ad.networkData && this.props.ad.networkData.adCode ? this.props.ad.networkData : false;
 		}
@@ -72,76 +72,71 @@ class NetworkOptions extends Component {
 	}
 
 	filterNetworks() {
+		const partnersList = partners.list,
+			activeNetworks = networks.filter(network => !partnersList.includes(network));
+
 		if (window.isGeniee) {
 			const isGCFG = !!window.gcfg,
-				isUSN = !!(isGCFG && window.gcfg.hasOwnProperty('usn'));
+				isUSN = !!(isGCFG && window.gcfg.hasOwnProperty('usn')),
+				disabledNetworks = partners.geniee.networks.disabled,
+				activeGenieeNetworks = networks.filter(network => !disabledNetworks.includes(network));
 
 			// 'isUSN' refers to Geniee UI Access 'Select Network' flag
 			if (isUSN) {
-				return window.gcfg.usn ? networks.filter(network => network != 'adpTags') : ['geniee'];
+				return window.gcfg.usn ? activeGenieeNetworks : ['geniee'];
 			}
 
-			return networks.filter(network => network != 'adpTags');
+			return activeGenieeNetworks;
 		}
 
-		return networks;
+		// Filter all partners networks in default user mode
+		return activeNetworks;
 	}
 
 	renderNetwork() {
-		let adExists = this.props.ad ? true : false,
-			code = adExists && this.props.ad.network ? this.getCode() : false,
+		const props = this.props;
+		let adExists = props.ad ? true : false,
+			isAdNetworkData = !!(adExists && props.ad.networkData),
+			code = adExists && props.ad.network ? this.getCode() : false,
 			pfKeyExists =
-				adExists &&
-				this.props.ad.networkData &&
-				this.props.ad.networkData.keyValues &&
-				Object.keys(this.props.ad.networkData.keyValues).length,
+				isAdNetworkData && props.ad.networkData.keyValues && Object.keys(props.ad.networkData.keyValues).length,
 			fpKey = pfKeyExists
-				? Object.keys(this.props.ad.networkData.keyValues).filter(key => key.match(/FP/g))[0] ||
-				  defaultPriceFloorKey
+				? Object.keys(props.ad.networkData.keyValues).filter(key => key.match(/FP/g))[0] || defaultPriceFloorKey
 				: defaultPriceFloorKey,
-			priceFloor = pfKeyExists ? this.props.ad.networkData.keyValues[fpKey] : 0,
-			refreshSlot =
-				adExists && this.props.ad.networkData && this.props.ad.networkData.refreshSlot
-					? this.props.ad.networkData.refreshSlot
-					: false,
-			overrideActive =
-				adExists && this.props.ad.networkData && this.props.ad.networkData.overrideActive
-					? this.props.ad.networkData.overrideActive
-					: false,
-			overrideSizeTo =
-				adExists && this.props.ad.networkData && this.props.ad.networkData.overrideSizeTo
-					? this.props.ad.networkData.overrideSizeTo
-					: false,
-			headerBidding =
-				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('headerBidding')
-					? this.props.ad.networkData.headerBidding
-					: false,
-			dynamicAllocation =
-				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('dynamicAllocation')
-					? this.props.ad.networkData.dynamicAllocation
-					: true,
-			firstFold =
-				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('firstFold')
-					? this.props.ad.networkData.firstFold
-					: true,
-			position =
-				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('position')
-					? this.props.ad.networkData.position
-					: '',
-			customAdCode =
-				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('adCode')
-					? this.props.ad.networkData.adCode
-					: '',
-			zoneId =
-				adExists && this.props.ad.networkData && this.props.ad.networkData.hasOwnProperty('zoneId')
-					? this.props.ad.networkData.zoneId
-					: '',
-			isPrimaryAdSize = !!(this.props.primaryAdSize && Object.keys(this.props.primaryAdSize).length),
-			isAdSize = !!(adExists && this.props.ad.width && this.props.ad.height),
-			primaryAdSize =
-				(isPrimaryAdSize && this.props.primaryAdSize) ||
-				(isAdSize && { height: this.props.ad.height, width: this.props.ad.width }) ||
-				{};
+			priceFloor = pfKeyExists ? props.ad.networkData.keyValues[fpKey] : 0,
+			refreshSlot = isAdNetworkData && props.ad.networkData.refreshSlot
+				? props.ad.networkData.refreshSlot
+				: false,
+			overrideActive = isAdNetworkData && props.ad.networkData.overrideActive
+				? props.ad.networkData.overrideActive
+				: false,
+			overrideSizeTo = isAdNetworkData && props.ad.networkData.overrideSizeTo
+				? props.ad.networkData.overrideSizeTo
+				: false,
+			headerBidding = isAdNetworkData && props.ad.networkData.hasOwnProperty('headerBidding')
+				? props.ad.networkData.headerBidding
+				: false,
+			dynamicAllocation = isAdNetworkData && props.ad.networkData.hasOwnProperty('dynamicAllocation')
+				? props.ad.networkData.dynamicAllocation
+				: true,
+			firstFold = isAdNetworkData && props.ad.networkData.hasOwnProperty('firstFold')
+				? props.ad.networkData.firstFold
+				: true,
+			position = isAdNetworkData && props.ad.networkData.hasOwnProperty('position')
+				? props.ad.networkData.position
+				: '',
+			customAdCode = isAdNetworkData && props.ad.networkData.hasOwnProperty('adCode')
+				? props.ad.networkData.adCode
+				: '',
+			zoneId = isAdNetworkData && props.ad.networkData.hasOwnProperty('zoneId')
+				? props.ad.networkData.zoneId
+				: '',
+			isPrimaryAdSize = !!(props.primaryAdSize && Object.keys(props.primaryAdSize).length),
+			isAdSize = !!(adExists && props.ad.width && props.ad.height),
+			primaryAdSize = (isPrimaryAdSize && props.primaryAdSize) ||
+			(isAdSize && { height: props.ad.height, width: props.ad.width }) || {},
+			isZonesData = !!(props.zonesData && props.zonesData.length),
+			zonesData = isZonesData ? props.zonesData : [];
 
 		switch (this.state.network) {
 			case 'adpTags':
@@ -151,15 +146,16 @@ class NetworkOptions extends Component {
 						priceFloor={priceFloor}
 						headerBidding={headerBidding}
 						submitHandler={this.submitHandler}
-						onCancel={this.props.onCancel}
+						onCancel={props.onCancel}
 						code={code}
 						refreshSlot={refreshSlot}
 						overrideActive={overrideActive}
 						overrideSizeTo={overrideSizeTo}
-						buttonType={this.props.buttonType || 1}
-						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
-						id={this.props.id ? this.props.id : false}
-						showNotification={this.props.showNotification}
+						buttonType={props.buttonType || 1}
+						fromPanel={props.fromPanel ? props.fromPanel : false}
+						id={props.id ? props.id : false}
+						showNotification={props.showNotification}
+						primaryAdSize={primaryAdSize}
 					/>
 				);
 				break;
@@ -168,6 +164,7 @@ class NetworkOptions extends Component {
 					<Adsense
 						code={code}
 						submitHandler={this.submitHandler}
+						id={props.id ? props.id : false}
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						showNotification={this.props.showNotification}
@@ -179,6 +176,7 @@ class NetworkOptions extends Component {
 					<AdX
 						code={code}
 						submitHandler={this.submitHandler}
+						id={props.id ? props.id : false}
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						showNotification={this.props.showNotification}
@@ -205,9 +203,21 @@ class NetworkOptions extends Component {
 						showNotification={this.props.showNotification}
 						isInsertMode={this.props.isInsertMode || false}
 						primaryAdSize={primaryAdSize}
+						zonesData={zonesData}
 					/>
 				);
 				break;
+			case 'medianet':
+				return (
+					<MediaNet
+						code={code}
+						submitHandler={this.submitHandler}
+						id={props.id ? props.id : false}
+						onCancel={this.props.onCancel}
+						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
+						showNotification={this.props.showNotification}
+					/>
+				);
 			case 'custom':
 			case 'dfp':
 			default:
@@ -215,6 +225,7 @@ class NetworkOptions extends Component {
 					<OtherNetworks
 						code={code}
 						submitHandler={this.submitHandler}
+						id={props.id ? props.id : false}
 						onCancel={this.props.onCancel}
 						showNotification={this.props.showNotification}
 					/>

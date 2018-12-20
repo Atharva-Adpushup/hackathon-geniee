@@ -1,14 +1,30 @@
 import React, { PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
-import SelectBox from '../select/select.js';
-import CustomToggleSwitch from '../customToggleSwitch.jsx';
-import LabelWithButton from '../labelWithButton.jsx';
+import SelectBox from '../select/select';
 import CodeBox from '../codeBox';
 import requiredIf from 'react-required-if';
-import InlineEdit from '../inlineEdit/index.jsx';
 import AdpTags from './AdpTags.jsx';
 
 const positions = ['Unknown', 'Header', 'Under the article/column', 'Sidebar', 'Footer'];
+
+function getUniqArrayItems(item, index, origArray) {
+	return origArray.indexOf(item) == index;
+}
+
+function getUniqItems(accumulator, item) {
+	const isValidItem =
+		accumulator &&
+		item &&
+		Object.keys(item).length &&
+		!accumulator[item.dfpAdunit] &&
+		item.zoneId &&
+		item.dynamicAllocation &&
+		item.dfpAdunit &&
+		item.dfpAdunitCode;
+
+	isValidItem ? (accumulator[item.dfpAdunit] = Object.assign({}, item)) : null;
+	return accumulator;
+}
 
 class sectionOptions extends React.Component {
 	constructor(props) {
@@ -19,45 +35,87 @@ class sectionOptions extends React.Component {
 		this.onFirstFoldChange = this.onFirstFoldChange.bind(this);
 		this.toggleCustomAdCode = this.toggleCustomAdCode.bind(this);
 		this.onCustomAdCodeChange = this.onCustomAdCodeChange.bind(this);
-		this.onCustomZoneIdSubmit = this.onCustomZoneIdSubmit.bind(this);
 		this.renderCustomZoneIdInput = this.renderCustomZoneIdInput.bind(this);
+		this.renderZoneIdSelectBox = this.renderZoneIdSelectBox.bind(this);
 		this.submitHandler = this.submitHandler.bind(this);
+		this.handleZoneIdChange = this.handleZoneIdChange.bind(this);
 
 		// Set initial state
+		const isZonesData = !!(props.zonesData && props.zonesData.length);
 		this.state = {
 			position: props.position,
 			isAdInFirstFold: props.firstFold,
 			isAdAsync: true,
 			manageCustomCode: false,
 			customAdCode: props.customAdCode,
-			zoneId: props.zoneId
+			zoneId: props.zoneId,
+			selectedZoneId: '',
+			zoneIdUniqArray: isZonesData
+				? props.zonesData.map(object => Number(object.zoneId)).filter(getUniqArrayItems)
+				: [],
+			dfpAdUnitObject: isZonesData ? props.zonesData.reduce(getUniqItems, {}) : {}
 		};
+		const isValidZoneIdArray = !!(
+				this.state.zoneIdUniqArray &&
+				this.state.zoneIdUniqArray.length &&
+				this.state.zoneIdUniqArray[0]
+			),
+			isValidDFPAdUnitObject = !!(this.state.dfpAdUnitObject && Object.keys(this.state.dfpAdUnitObject).length);
+
+		if (!isValidZoneIdArray) {
+			this.state.zoneIdUniqArray = [];
+		}
+
+		if (!isValidDFPAdUnitObject) {
+			this.state.dfpAdUnitObject = {};
+		}
 	}
 
-	onCustomZoneIdSubmit(zoneId) {
-		this.setState({ zoneId });
+	handleZoneIdChange(selectedZoneId) {
+		const value = selectedZoneId || '';
+		this.setState({ selectedZoneId: value, zoneId: value });
 	}
 
 	submitHandler(networkData) {
-		if (!this.state.zoneId) {
-			this.props.showNotification({
+		const state = this.state,
+			props = this.props;
+
+		if (!state.zoneId) {
+			props.showNotification({
 				mode: 'error',
 				title: 'Incomplete Values',
 				message: 'Custom Zone is a required field'
 			});
 			return;
 		}
+
+		const isZoneIdReused = !!state.selectedZoneId,
+			isDFPAdUnitIdReused = !!(networkData && networkData.dfpAdunitId),
+			shouldCreateZoneContainerId = isZoneIdReused || isDFPAdUnitIdReused;
+		let dfpAdUnitData = isDFPAdUnitIdReused
+				? props.zonesData.filter(object => object.dfpAdunit == networkData.dfpAdunitId)[0]
+				: {},
+			isValidDFPAdUnitData = !!(dfpAdUnitData && Object.keys(dfpAdUnitData).length);
+
+		shouldCreateZoneContainerId ? (networkData.createZoneContainerId = true) : null;
+		isValidDFPAdUnitData ? delete dfpAdUnitData.zoneId : null;
+		delete networkData.dfpAdunitId;
+		networkData = {
+			...networkData,
+			...dfpAdUnitData
+		};
+
 		let toSend = {
 			...networkData,
 			dynamicAllocation: networkData.headerBidding,
-			position: this.state.position,
-			adCode: this.state.customAdCode,
-			firstFold: this.state.isAdInFirstFold,
-			asyncTag: this.state.isAdAsync,
-			zoneId: this.state.zoneId
+			position: state.position,
+			adCode: state.customAdCode,
+			firstFold: state.isAdInFirstFold,
+			asyncTag: state.isAdAsync,
+			zoneId: state.zoneId
 		};
 		delete toSend.headerBidding;
-		this.props.submitHandler(toSend);
+		props.submitHandler(toSend);
 	}
 
 	onChange(position) {
@@ -88,17 +146,17 @@ class sectionOptions extends React.Component {
 	}
 
 	renderCustomZoneIdInput(zoneId, isInsertMode) {
-		const isDisabledMode = !!(zoneId && !isInsertMode);
+		const isDisabledMode = !!((zoneId && !isInsertMode) || this.state.selectedZoneId);
 
 		return (
-			<Row className="mT-10">
+			<Row className="mT-5">
 				<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
-					<strong>Geniee Zone Id</strong>
+					<strong>Enter new Zone Id</strong>
 				</Col>
 				<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
 					<input
 						type="number"
-						placeholder="Enter Geniee Zone Id"
+						placeholder="Enter a value"
 						className="inputBasic mB-10"
 						readOnly={isDisabledMode}
 						disabled={isDisabledMode}
@@ -113,17 +171,50 @@ class sectionOptions extends React.Component {
 		);
 	}
 
-	render() {
-		const customAdCodeText = this.state.customAdCode ? 'Edit' : 'Add',
-			isAdCreateBtnDisabled = !!(this.state.position !== null && typeof this.state.position !== 'undefined'),
-			{ updateMode, updateSettings, sectionId, ad, isInsertMode, primaryAdSize } = this.props,
-			{ position, isAdInFirstFold: firstFold, isAdAsync: asyncTag, zoneId } = this.state;
+	renderZoneIdSelectBox() {
+		const uniqCollection = this.state.zoneIdUniqArray;
 
-		if (this.state.manageCustomCode) {
+		return (
+			<Row className="mT-10">
+				<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px mB-10' : 'mB-10'}>
+					<SelectBox
+						value={this.state.selectedZoneId}
+						label="Select a Zone Id"
+						onChange={this.handleZoneIdChange}
+					>
+						{uniqCollection.map((value, index) => {
+							return (
+								<option key={index} value={value}>
+									{value}
+								</option>
+							);
+						})}
+					</SelectBox>
+				</Col>
+			</Row>
+		);
+	}
+
+	render() {
+		const state = this.state,
+			customAdCodeText = state.customAdCode ? 'Edit' : 'Add',
+			isAdCreateBtnDisabled = !!(state.position !== null && typeof state.position !== 'undefined'),
+			{ updateMode, updateSettings, sectionId, ad, isInsertMode, primaryAdSize } = this.props,
+			{
+				position,
+				isAdInFirstFold: firstFold,
+				isAdAsync: asyncTag,
+				zoneId,
+				dfpAdUnitObject,
+				zoneIdUniqArray
+			} = state,
+			isRenderZoneIdSelectBox = !!(isInsertMode && zoneIdUniqArray && zoneIdUniqArray.length);
+
+		if (state.manageCustomCode) {
 			return (
 				<CodeBox
 					showButtons
-					code={this.state.customAdCode}
+					code={state.customAdCode}
 					onSubmit={this.onCustomAdCodeChange}
 					onCancel={this.toggleCustomAdCode}
 				/>
@@ -135,6 +226,7 @@ class sectionOptions extends React.Component {
 				className="containerButtonBar sectionOptions mT-10"
 				style={updateMode ? { paddingBottom: 0, marginRight: 15, marginLeft: 15 } : {}}
 			>
+				{isRenderZoneIdSelectBox ? this.renderZoneIdSelectBox() : null}
 				{updateMode && !zoneId ? null : this.renderCustomZoneIdInput(zoneId, isInsertMode)}
 
 				<AdpTags
@@ -154,6 +246,7 @@ class sectionOptions extends React.Component {
 					geniee={true}
 					isInsertMode={isInsertMode}
 					primaryAdSize={primaryAdSize}
+					dfpAdUnitObject={dfpAdUnitObject}
 				/>
 			</div>
 		);

@@ -1,7 +1,9 @@
 module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: 'http://console.adpushup.com',
-	PROXY_ORIGIN: 'http://proxy.app.adpushup.com',
+	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
+	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
+	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	DEMO_REPORT_SITE_ID: 31764,
 	DEMO_PAGEGROUPS: ['HOME', 'IMAGE', 'POST', 'PHPBB3', 'NEW', 'CATEGORY'],
@@ -14,6 +16,32 @@ module.exports = {
 		ADPTAGS: 'ADPTAGS',
 		HEADER_BIDDING: 'HEADER_BIDDING',
 		GDPR: 'GDPR'
+	},
+	INJECTION_TECHNIQUES: {
+		LAYOUT: 1,
+		TAG: 2
+	},
+	MANUAL_ADS: {
+		VARIATION: 'manual'
+	},
+	NETWORKS: {
+		ADPTAGS: 'adpTags',
+		ADSENSE: 'adsense',
+		ADX: 'adx',
+		MEDIANET: 'medianet',
+		GENIEE: 'geniee'
+	},
+	TRANSACTION_SERVICES: {
+		UNKNOWN: 0,
+		HEADER_BIDDING: 1,
+		MEDIATION: 2,
+		AMP: 3,
+		NEW_FORMATS: 4,
+		DYNAMIC_ALLOCATION: 5
+	},
+	SETUP_STATUS: {
+		ACTIVE: 1,
+		INACTIVE: 0
 	},
 	COOKIE_CONTROL_SCRIPT_TMPL:
 		'!function(){var o=document.createElement("script");o.src="https://cc.cdn.civiccomputing.com/8.0/cookieControl-8.0.min.js",document.head.appendChild(o);var n=setInterval(function(){window.CookieControl&&(clearInterval(n),CookieControl.load(__COOKIE_CONTROL_CONFIG__))},10)}();',

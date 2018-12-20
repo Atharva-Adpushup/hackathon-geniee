@@ -27,7 +27,8 @@ function createNewUser(params, res) {
 		isExactRevenue = !!exactRevenue,
 		isRevenue = !!revenue,
 		isMinimumRevenueMatch = !!(isRevenue && leastRevenueConstant === revenue),
-		isExactRevenueCondition = !!(isExactRevenue && isMinimumRevenueMatch);
+		isExactRevenueCondition = !!(isExactRevenue && isMinimumRevenueMatch),
+		encodedParams;
 
 	// firstName and lastName fields are added to params json
 	// as user name will be saved in database as
@@ -76,6 +77,9 @@ function createNewUser(params, res) {
 
 	// (typeof params.adNetworks === 'string') ? [params.adNetworks] : params.adNetworks;
 	delete params.name;
+	encodedParams = utils.getHtmlEncodedJSON(params);
+	delete encodedParams.password;
+	params = _.extend({}, params, encodedParams);
 
 	return userModel
 		.createNewUser(params)

@@ -23,7 +23,7 @@ var express = require('express'),
 	{ queryResultProcessing } = require('../helpers/commonFunctions'),
 	router = express.Router(),
 	couchbase = require('../helpers/couchBaseService'),
-	N1qlQuery = require('couchbase-promises').N1qlQuery;
+	N1qlQuery = require('couchbase').N1qlQuery;
 
 function getReportingData(channels, siteId) {
 	if (config && config.hasOwnProperty('reporting') && !config.reporting.activated) {
@@ -178,9 +178,11 @@ router
 					});
 				}
 
-				res.send({ error: false, data: variations });
+				return res.send({ error: false, data: variations });
 			})
-			.catch(err => res.send({ error: true, message: 'Error while fetching result. Please try later.' }));
+			.catch(err => {
+				return res.send({ error: true, message: 'Error while fetching result. Please try later.' });
+			});
 	})
 	.get('/getPageGroupVariationRPM', function(req, res) {
 		const reportConfig = extend(true, {}, req.query),
@@ -481,7 +483,9 @@ router
 				res.status(200)
 					.set('x-cf-geodata', country)
 					.set('Content-Type', 'application/javascript')
-					.set('Cache-Control', 'max-age=3600');
+					.set('Cache-Control', 'max-age=900');
+
+				apJs = apJs.replace('__COUNTRY__', country);
 				return res.send(apJs);
 			})
 			.catch(err => {

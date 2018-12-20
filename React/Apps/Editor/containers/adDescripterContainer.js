@@ -7,11 +7,13 @@ import { resetErrors } from 'actions/uiActions';
 import {
 	deleteSection,
 	updateXPath,
+	updateOperation,
 	sectionAllXPaths,
 	validateXPath,
 	renameSection,
 	updateType,
-	updateFormatData
+	updateFormatData,
+	toggleLazyLoad
 } from 'actions/sectionActions.js';
 
 export default connect(
@@ -24,13 +26,15 @@ export default connect(
 				updateAdCode: updateAdCode,
 				updateNetwork: updateNetwork,
 				onUpdateXPath: updateXPath,
+				onUpdateOperation: updateOperation,
 				onSectionAllXPaths: sectionAllXPaths,
 				onValidateXPath: validateXPath,
 				onResetErrors: resetErrors,
 				onRenameSection: renameSection,
 				onSetSectionType: updateType,
 				onFormatDataUpdate: updateFormatData,
-				showNotification: showNotification
+				showNotification: showNotification,
+				onToggleLazyLoad: toggleLazyLoad
 			},
 			dispatch
 		)

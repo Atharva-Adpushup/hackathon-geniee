@@ -28,6 +28,19 @@ const dataLabels = commonConsts.DATA_LABELS,
 		updatedCols.push(reorderArray(dataLabels.xpathMiss, cols));
 		return updatedCols;
 	},
+	normaliseRows = rows => {
+		let normalisedRows = [];
+
+		rows.forEach(row => {
+			let rowData = {};
+			Object.keys(row).forEach(param => {
+				rowData[param] = row[param] ? row[param] : 0;
+			});
+			normalisedRows.push(rowData);
+		});
+
+		return normalisedRows;
+	},
 	formatColumnNames = columns => {
 		let updatedColumns = [];
 		for (let i = 0; i < columns.length; i++) {
@@ -276,7 +289,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 	},
 	networkWiseProcessing = (rows, customToggleOptions) => {
 		let processedData = [];
-		const groupedData = groupBy(rows, commonConsts.API_DATA_PARAMS.date);
+		const groupedData = groupBy(normaliseRows(rows), commonConsts.API_DATA_PARAMS.date);
 		for (let date in groupedData) {
 			let row = {
 					total_gross_revenue: 0
@@ -623,7 +636,13 @@ const dataLabels = commonConsts.DATA_LABELS,
 	dataParser = (data, groupBy, variations, customToggleOptions) => {
 		const columns = formatColumnNames(data.columns);
 
-		let tableConfig = generateTableData(columns, data.rows, groupBy, variations, customToggleOptions),
+		let tableConfig = generateTableData(
+				columns,
+				normaliseRows(data.rows),
+				groupBy,
+				variations,
+				customToggleOptions
+			),
 			chartConfig = {
 				yAxis: generateYAxis(columns),
 				xAxis: { categories: generateXAxis(data.rows) },

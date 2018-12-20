@@ -34,6 +34,11 @@ const commonConsts = {
 		{ label: 'linkedin', value: 'linkedin' },
 		{ label: 'gmail', value: 'gmail' },
 		{ label: 'whatsapp', value: 'whatsapp' },
+		{ label: 'email', value: 'email' },
+		{ label: 'pinterest', value: 'pinterest' },
+		{ label: 'tumblr', value: 'tumblr' },
+		{ label: 'line', value: 'line' },
+		{ label: 'sms', value: 'sms' },
 		{ label: 'gplus', value: 'gplus' }
 	],
 	ads: {

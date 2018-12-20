@@ -10,7 +10,8 @@ const config = require('../../configs/config'),
 	localBucket = couchbaseService(
 		`couchbase://${config.couchBase.HOST}`,
 		'apLocalBucket',
-		config.couchBase.DEFAULT_BUCKET_PASSWORD
+		config.couchBase.DEFAULT_USER_NAME,
+		config.couchBase.DEFAULT_USER_PASSWORD
 	);
 
 const logger = require('../../helpers/globalBucketLogger');
@@ -406,7 +407,7 @@ function numberWithCommas(x) {
 
 function filterApAppBucketSites(dataSets) {
 	let couchBaseService = require('../../helpers/couchBaseService'),
-		couchbasePromise = require('couchbase-promises');
+		couchbasePromise = require('couchbase');
 
 	let query = couchbasePromise.ViewQuery.from('AdpTagReporting', 'SiteUserMapping')
 		.stale(1)

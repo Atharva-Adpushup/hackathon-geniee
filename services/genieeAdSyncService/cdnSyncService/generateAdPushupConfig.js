@@ -8,7 +8,8 @@ const _ = require('lodash'),
 	appBucket = couchbaseService(
 		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
 		config.couchBase.DEFAULT_BUCKET,
-		config.couchBase.DEFAULT_BUCKET_PASSWORD
+		config.couchBase.DEFAULT_USER_NAME,
+		config.couchBase.DEFAULT_USER_PASSWORD
 	),
 	isAdSynced = ad => {
 		if (!ad.network || !ad.networkData) {
@@ -25,24 +26,27 @@ const _ = require('lodash'),
 		return false;
 	},
 	pushToAdpTags = function(ad, json) {
-		const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
+		const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
+			isNetwork = !!ad.network,
+			isNetworkData = !!ad.networkData,
+			isDynamicAllocation = !!(isNetworkData && ad.networkData.dynamicAllocation),
+			isZoneContainerId = !!(isNetworkData && ad.networkData.zoneContainerId),
+			isAdpTagsNetwork = !!(isNetwork && ad.network == 'adpTags'),
+			isGenieeNetwork = !!(isNetwork && ad.network == 'geniee');
 
-		if (ad.network == 'adpTags' || (ad.network == 'geniee' && ad.networkData.dynamicAllocation)) {
+		if (isAdpTagsNetwork || (isGenieeNetwork && isDynamicAllocation)) {
 			let adData = {
 				key: `${json.width}x${json.height}`,
 				height: json.height,
 				width: json.width,
-				dfpAdunit: ad.networkData.dfpAdunit,
+				dfpAdunit: isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit,
 				dfpAdunitCode: ad.networkData.dfpAdunitCode,
 				headerBidding: ad.networkData.headerBidding,
 				keyValues: ad.networkData.keyValues
 			};
 
 			if (isMultipleAdSizes) {
-				adData.multipleAdSizes = ad.multipleAdSizes.map(object => [
-					Number(object.width),
-					Number(object.height)
-				]);
+				adData.multipleAdSizes = ad.multipleAdSizes.concat([]);
 			}
 
 			ADPTags.push(adData);
@@ -70,6 +74,8 @@ const _ = require('lodash'),
 				});
 			}
 
+			const isResponsive = !!ad.networkData.isResponsive;
+
 			json = {
 				id: sectionId,
 				network: ad.network,
@@ -77,15 +83,16 @@ const _ = require('lodash'),
 				type: section.type,
 				formatData: section.formatData,
 				css: ad.css,
-				height: parseInt(ad.height, 10),
-				width: parseInt(ad.width, 10)
+				height: isResponsive ? ad.height : parseInt(ad.height, 10),
+				width: isResponsive ? ad.width : parseInt(ad.width, 10),
+				enableLazyLoading: section.enableLazyLoading
 			};
 
 			// Add 'multipleAdSizes' property if exists
 			const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
 
 			if (isMultipleAdSizes) {
-				json.multipleAdSizes = ad.multipleAdSizes.map(object => [Number(object.width), Number(object.height)]);
+				json.multipleAdSizes = ad.multipleAdSizes.concat([]);
 			}
 
 			if (section.isIncontent) {
@@ -196,7 +203,8 @@ const _ = require('lodash'),
 			contentSelector: channel.contentSelector,
 			pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup),
 			hasVariationsWithNoData: false,
-			ampSettings: channel.ampSettings ? { isEnabled: channel.ampSettings.isEnabled } : { isEnabled: false }
+			ampSettings: channel.ampSettings ? { isEnabled: channel.ampSettings.isEnabled } : { isEnabled: false },
+			autoOptimise: channel.hasOwnProperty('autoOptimise') ? channel.autoOptimise : false
 		};
 
 		_.each(channel.variations, (variation, id) => {

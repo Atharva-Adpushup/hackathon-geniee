@@ -11,6 +11,7 @@ block append headScripts
 		window.siteId = !{siteId}
 		window.siteDomain = "#{siteDomain}"
 		window.isSuperUser = !{isSuperUser}
+		window.isManual = !{isManual||false}
 
 block append headCss
 	style.
@@ -29,4 +30,4 @@ block bodyContent
 					img(src="/assets/images/loaderLogo.png")
 				#reportingPanel
 
-	script(src="/assets/js/builds/reportingPanel.js?v=1532539725274")
+	script(src="/assets/js/builds/reportingPanel.js?v=1535557986333")

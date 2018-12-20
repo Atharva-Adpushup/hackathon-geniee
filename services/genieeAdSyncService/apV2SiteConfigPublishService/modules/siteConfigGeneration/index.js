@@ -1,22 +1,31 @@
-const _ = require('lodash'),
-	Promise = require('bluebird'),
-	genieeZoneSyncService = require('../../../genieeZoneSyncService/index'),
-	config = require('../../../../../configs/config'),
-	{ docKeys } = require('../../../../../configs/commonConsts'),
-	{ couchbaseService } = require('node-utils'),
-	appBucket = couchbaseService(
-		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
-		config.couchBase.DEFAULT_BUCKET,
-		config.couchBase.DEFAULT_BUCKET_PASSWORD
-	);
+const _ = require('lodash');
+const Promise = require('bluebird');
+const genieeZoneSyncService = require('../../../genieeZoneSyncService/index');
+const config = require('../../../../../configs/config');
+const { docKeys } = require('../../../../../configs/commonConsts');
+const { couchbaseService } = require('node-utils');
+const { checkForLog } = require('../../../../../helpers/commonFunctions');
+
+const appBucket = couchbaseService(
+	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
+	config.couchBase.DEFAULT_BUCKET,
+	config.couchBase.DEFAULT_USER_NAME,
+	config.couchBase.DEFAULT_USER_PASSWORD
+);
 
 function generateSiteChannelJSON(channelAndZones, siteModelItem) {
-	let unsyncedGenieeZones = [],
-		unsyncedGenieeDFPCreationZones = [],
-		adpTagsUnsyncedZones = {
-			siteId: siteModelItem.get('siteId'),
-			ads: []
-		};
+	let unsyncedGenieeZones = [];
+	let unsyncedGenieeDFPCreationZones = [];
+	let adpTagsUnsyncedZones = {
+		siteId: siteModelItem.get('siteId'),
+		siteDomain: siteModelItem.get('siteDomain'),
+		ads: []
+	};
+	let logsUnsyncedZones = {
+		siteId: siteModelItem.get('siteId'),
+		siteDomain: siteModelItem.get('siteDomain'),
+		ads: []
+	};
 	function doIt(channelWithZones) {
 		if (
 			!(channelWithZones && channelWithZones.unsyncedZones && Object.keys(channelWithZones.unsyncedZones).length)
@@ -46,6 +55,7 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 				unsyncedGenieeDFPCreationZones.push({
 					zones: zones.genieeDFPCreationZones,
 					siteId: siteModelItem.get('siteId'),
+					siteDomain: siteModelItem.get('siteDomain'),
 					pageGroupId: isPageGroupId ? channelWithZones.channel.genieePageGroupId : '',
 					channelKey: isChannel
 						? 'chnl::' +
@@ -58,7 +68,20 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 				});
 			}
 			if (Object.keys(zones.adpTagsUnsyncedZones).length) {
+				const apConfigs = siteModelItem.get('apConfigs') || false;
+				const activeDFPNetwork = apConfigs && apConfigs.activeDFPNetwork ? apConfigs.activeDFPNetwork : false;
+				const activeDFPParentId =
+					apConfigs && apConfigs.activeDFPParentId ? apConfigs.activeDFPParentId : false;
+				if (activeDFPNetwork && activeDFPParentId) {
+					adpTagsUnsyncedZones.currentDFP = {
+						activeDFPNetwork,
+						activeDFPParentId
+					};
+				}
 				adpTagsUnsyncedZones.ads = _.concat(adpTagsUnsyncedZones.ads, zones.adpTagsUnsyncedZones);
+			}
+			if (zones.logsUnsyncedZones && zones.logsUnsyncedZones.length) {
+				logsUnsyncedZones.ads = _.concat(logsUnsyncedZones.ads, zones.logsUnsyncedZones);
 			}
 		});
 	}
@@ -66,7 +89,8 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 		return {
 			geniee: unsyncedGenieeZones,
 			adp: adpTagsUnsyncedZones,
-			genieeDFP: unsyncedGenieeDFPCreationZones
+			genieeDFP: unsyncedGenieeDFPCreationZones,
+			logs: logsUnsyncedZones
 		};
 	});
 }
@@ -83,17 +107,36 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 	return appBucket
 		.getDoc(`${docKeys.tagManager}${site.get('siteId')}`)
 		.then(docWithCas => {
-			const ads = docWithCas.value.ads,
-				unSyncedAds = _.compact(
-					_.map(ads, ad => {
-						return ad.network && ad.network == 'adpTags'
+			let logUnsyncedAds = [];
+
+			const ads = docWithCas.value.ads;
+			const unSyncedAds = _.compact(
+				_.map(ads, ad => {
+					if (checkForLog(ad)) {
+						logUnsyncedAds.push(ad);
+					}
+					let unsyncedZone =
+						ad.network && ad.network == 'adpTags'
 							? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)
 							: false;
-					})
-				);
+
+					if (unsyncedZone) {
+						if (ad.formatData && ad.formatData.platform) {
+							unsyncedZone.platform = ad.formatData.platform;
+						}
+					}
+					return unsyncedZone;
+				})
+			);
+
 			currentDataForSyncing.adp.ads = unSyncedAds.length
 				? _.concat(currentDataForSyncing.adp.ads, unSyncedAds)
 				: currentDataForSyncing.adp.ads;
+
+			currentDataForSyncing.logs.ads = logUnsyncedAds.length
+				? _.concat(currentDataForSyncing.logs.ads, logUnsyncedAds)
+				: currentDataForSyncing.logs.ads;
+
 			return currentDataForSyncing;
 		})
 		.catch(err => {
@@ -102,12 +145,6 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 				: Promise.reject(err);
 		});
 }
-
-/**
- * TODO:
- * 1. Ads Syncing from Manaul Doc for ADP
- * 2. Ads Syncing from Manaul Doc for Geniee
- */
 
 function getGeneratedPromises(siteModelItem) {
 	return genieeZoneSyncService
@@ -119,14 +156,3 @@ function getGeneratedPromises(siteModelItem) {
 module.exports = {
 	generate: getGeneratedPromises
 };
-
-/**
- * Tag Manager
- * 1. Sign up --> Tag Manager Dashboard
- * 2. Tag Manager Dashboard --> Change text to "Create your ad"
- * 3. Segment Integrate
- * 4. Payment Options to Sidebar
- * 5. Call to Zapier when sign up
- * 6. Live chat close
- * 7. Segment on -- Mixpanel
- */

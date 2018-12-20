@@ -1,5 +1,5 @@
 module.exports = {
-	PREBID_TIMEOUT: 1000,
+	PREBID_TIMEOUT: 3000,
 	NETWORK_ID: 103512698,
 	GENIEE_NETWORK_ID: 9116787,
 	SITE_ID: __SITE_ID__,
@@ -8,6 +8,14 @@ module.exports = {
 	TARGETING: {},
 	PARTNERS: {
 		GENIEE: 'geniee'
+	},
+	UTM_SESSION_COOKIE: '_adp_utm_session_',
+	UTM_WISE_TARGETING: {
+		UTM_SOURCE: 'utm_source',
+		UTM_CAMPAIGN: 'utm_campaign',
+		UTM_MEDIUM: 'utm_medium',
+		UTM_TERM: 'utm_term',
+		UTM_CONTENT: 'utm_content'
 	},
 	GPT_REFRESH_INTERVAL: 30000,
 	SLOT_INTERVAL: 50,
@@ -43,7 +51,7 @@ module.exports = {
 		pixelId: 1236239
 	},
 	DEFAULT_WINNER: 'adx',
-	FEEDBACK_URL: 'http://apdc1-webapp-creativeqa.azurewebsites.net/feedback2',
+	FEEDBACK_URL: '//e3.adpushup.com/ApHbWebService/feedback',
 	POSTBID_PASSBACKS: {
 		'*': 'PGgxPkJPTyBZQUghPC9oMT4='
 	},
@@ -53,87 +61,5 @@ module.exports = {
 		EVENTS: {
 			IMPRESSION: 'impression'
 		}
-	},
-	PREBID_AD_TEMPLATE:
-		'<html>' +
-		'<head>' +
-		'<script>' +
-		"var head = document.getElementsByTagName('head')[0];" +
-		'var pbjs = pbjs || {};' +
-		'pbjs.que = pbjs.que || [];' +
-		'var PREBID_TIMEOUT = __PB_TIMEOUT__;' +
-		"var PAGE_URL = '__PAGE_URL__';" +
-		'var ADP_BATCH_ID = __ADP_BATCH_ID__;' +
-		"var prebidScript = document.createElement('script');" +
-		'prebidScript.async = true;' +
-		"prebidScript.text = 'var adpPrebid = ' + parent.adpushup.adpPrebid.toString() + ';';" +
-		'head.appendChild(prebidScript);' +
-		'adpPrebid();' +
-		'function serverRenderCode( timeout ){' +
-		'if( serverRenderCode.isExecuted === undefined ) {' +
-		'serverRenderCode.isExecuted = true;' +
-		'console.log(pbjs.getBidResponses());' +
-		'var pbjsParams = {' +
-		"'_bidsReceived'  : pbjs._bidsReceived," +
-		"'_bidsRequested' : pbjs._bidsRequested," +
-		"'_adUnitCodes'   : pbjs._adUnitCodes," +
-		"'_winningBids'   : pbjs._winningBids," +
-		"'_adsReceived'   : pbjs._adsReceived" +
-		'};' +
-		'if( Number.isInteger(timeout) ) {' +
-		'parent.__prebidFinishCallback(pbjsParams, ADP_BATCH_ID, timeout);' +
-		'} else {' +
-		'parent.__prebidFinishCallback(pbjsParams, ADP_BATCH_ID);' +
-		'}' +
-		'}' +
-		'}' +
-		'setTimeout(function(){' +
-		'serverRenderCode(PREBID_TIMEOUT);' +
-		'}, PREBID_TIMEOUT);' +
-		'pbjs.que.push(function(){' +
-		"pbjs.setPriceGranularity('dense');" +
-		"pbjs.setBidderSequence('random');" +
-		'pbjs.addAdUnits(__AD_UNIT_CODE__);' +
-		'pbjs.bidderSettings = {' +
-		'c1x: {' +
-		'pixelId: __C1X_PIXEL_ID__,' +
-		'siteId: __C1X_SITE_ID__' +
-		'},' +
-		'openx: {' +
-		'bidCpmAdjustment: function(bidCpm) {' +
-		'return bidCpm - (bidCpm * (5/100));' +
-		'}' +
-		'},' +
-		'brainjuicemedia: {' +
-		'bidCpmAdjustment: function(bidCpm) {' +
-		'return bidCpm - (bidCpm * (5/100));' +
-		'}' +
-		'},' +
-		'oftmedia: {' +
-		'bidCpmAdjustment: function(bidCpm) {' +
-		'return bidCpm - (bidCpm * (12/100));' +
-		'}' +
-		'},' +
-		'districtmDMX: {' +
-		'bidCpmAdjustment: function(bidCpm) {' +
-		'return bidCpm - (bidCpm * (5/100));' +
-		'}' +
-		'}' +
-		'};' +
-		"pbjs.aliasBidder('appnexus', 'springserve');" +
-		"pbjs.aliasBidder('appnexus', 'brealtime');" +
-		"pbjs.aliasBidder('appnexus', 'brainjuicemedia');" +
-		"pbjs.aliasBidder('appnexus', 'oftmedia');" +
-		"pbjs.onEvent('bidTimeout', function(timedOutBidders) {" +
-		'parent.__prebidTimeoutCallback(ADP_BATCH_ID, timedOutBidders, PREBID_TIMEOUT);' +
-		'});' +
-		'pbjs.requestBids({' +
-		'timeout : PREBID_TIMEOUT,' +
-		'bidsBackHandler: serverRenderCode' +
-		'});' +
-		'})' +
-		'</script>' +
-		'</head>' +
-		'<body></body>' +
-		'</html>'
+	}
 };

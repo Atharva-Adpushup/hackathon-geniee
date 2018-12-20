@@ -3,16 +3,19 @@ import { Row, Col, OverlayTrigger, Tooltip, Button, Well, Label } from 'react-bo
 import InlineEdit from 'shared/inlineEdit/index.jsx';
 import SelectBox from 'shared/select/select';
 import DockedSettings from './dockedSettings.jsx';
+import LazyLoadSettings from './lazyLoadSettings.jsx';
 import TriggerSettings from './triggerSettings.jsx';
-import { typeOfAds } from '../../../consts/commonConsts';
+import { typeOfAds, adInsertOptions } from '../../../consts/commonConsts';
 
 class AdDetails extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			editDock: false,
+			editLazyLoad: false,
 			editTrigger: false,
-			selectedAdSize: ''
+			selectedAdSize: '',
+			operation: (props.section && props.section.operation) || ''
 		};
 		this.renderXPathAndCSS = this.renderXPathAndCSS.bind(this);
 		this.renderSectionName = this.renderSectionName.bind(this);
@@ -25,6 +28,7 @@ class AdDetails extends Component {
 		this.renderAdCode = this.renderAdCode.bind(this);
 		this.renderCommonDetails = this.renderCommonDetails.bind(this);
 		this.handleSelectAdSizeChange = this.handleSelectAdSizeChange.bind(this);
+		this.handleSelectAdOperationChange = this.handleSelectAdOperationChange.bind(this);
 	}
 
 	renderXPathAndCSS() {
@@ -75,8 +79,8 @@ class AdDetails extends Component {
 		);
 	}
 
-	getStringifiedAdSize(object) {
-		const stringifiedSize = `${object.width} X ${object.height}`;
+	getStringifiedAdSize(array) {
+		const stringifiedSize = `${array[0]} X ${array[1]}`;
 
 		return stringifiedSize;
 	}
@@ -86,6 +90,14 @@ class AdDetails extends Component {
 			object = { width: array[0], height: array[1] };
 
 		return object;
+	}
+
+	handleSelectAdOperationChange(operation) {
+		const { section } = this.props;
+
+		this.setState({ operation }, () => {
+			this.props.onUpdateOperation(section.id, operation);
+		});
 	}
 
 	handleSelectAdSizeChange(value) {
@@ -108,6 +120,48 @@ class AdDetails extends Component {
 		);
 	}
 
+	renderAdOperationBlock() {
+		const { section } = this.props,
+			isValid = !!(section && section.operation),
+			isFromPanel = !!this.props.fromPanel;
+
+		if (!isValid) {
+			return null;
+		}
+
+		const insertOptionKeys = Object.keys(adInsertOptions),
+			wellClasses = 'u-padding-5px';
+
+		return (
+			<div>
+				<p className="mB-5">Change Ad Operation</p>
+				<Well className={wellClasses}>
+					<Row>
+						{
+							<Col xs={12}>
+								<SelectBox
+									value={this.state.operation}
+									label="Change ad operation"
+									onChange={this.handleSelectAdOperationChange}
+								>
+									{insertOptionKeys.map((operationConstant, index) => {
+										const operationValue = adInsertOptions[operationConstant];
+
+										return (
+											<option key={index} value={operationValue}>
+												{operationValue}
+											</option>
+										);
+									})}
+								</SelectBox>
+							</Col>
+						}
+					</Row>
+				</Well>
+			</div>
+		);
+	}
+
 	renderMultipleAdSize() {
 		const { ad } = this.props,
 			isValid = !!(ad && ad.multipleAdSizes && ad.multipleAdSizes.length),
@@ -117,7 +171,6 @@ class AdDetails extends Component {
 			return null;
 		}
 		const collection = ad.multipleAdSizes,
-			collectionWithDefaultSize = collection.concat({ width: ad.width, height: ad.height }),
 			wellClasses = isFromPanel ? 'u-padding-t5px' : '';
 
 		return (
@@ -126,8 +179,8 @@ class AdDetails extends Component {
 				<Well className={wellClasses}>
 					<Row>
 						<Col xs={12} className="mB-10">
-							{collection.map((object, index) => {
-								const adSizeString = this.getStringifiedAdSize(object).replace(/ /g, ''),
+							{collection.map((array, index) => {
+								const adSizeString = this.getStringifiedAdSize(array).replace(/ /g, ''),
 									marginStyle = {
 										margin: '.5em .1em',
 										display: 'inline-block'
@@ -147,8 +200,8 @@ class AdDetails extends Component {
 									label="Change ad size"
 									onChange={this.handleSelectAdSizeChange}
 								>
-									{collectionWithDefaultSize.map((object, index) => {
-										const adSizeString = this.getStringifiedAdSize(object);
+									{collection.map((array, index) => {
+										const adSizeString = this.getStringifiedAdSize(array);
 
 										return (
 											<option key={index} value={adSizeString.replace(/ /g, '')}>
@@ -305,8 +358,8 @@ class AdDetails extends Component {
 
 	renderButton(text, handler) {
 		return (
-			<Col xs={6} style={{ padding: '0px' }}>
-				<Button className="btn-lightBg btn-block" onClick={handler}>
+			<Col xs={6}>
+				<Button className="btn-lightBg btn-block" style={{ whiteSpace: 'normal' }} onClick={handler}>
 					{text}
 				</Button>
 			</Col>
@@ -349,6 +402,8 @@ class AdDetails extends Component {
 			return <DockedSettings {...this.props} onCancel={this.toggleHandler.bind(null, 'editDock')} />;
 		} else if (this.state.editTrigger) {
 			return <TriggerSettings {...this.props} onCancel={this.toggleHandler.bind(null, 'editTrigger')} />;
+		} else if (this.state.editLazyLoad) {
+			return <LazyLoadSettings {...this.props} onCancel={this.toggleHandler.bind(null, 'editLazyLoad')} />;
 		} else {
 			return (
 				<div>
@@ -359,13 +414,15 @@ class AdDetails extends Component {
 								{this.renderNetworkDetails()}
 							</div>
 							{this.renderMultipleAdSize()}
+							{this.renderAdOperationBlock()}
 							{!this.props.fromPanel ? this.renderXPathAndCSS() : null}
 						</div>
 					) : null}
 					{this.props.showEventData ? this.renderEventData() : null}
-					{!this.props.section.isIncontent && this.props.section.type != typeOfAds.INTERACTIVE_AD ? (
-						<div>{this.renderButton('Docked Settings', this.toggleHandler.bind(null, 'editDock'))}</div>
-					) : null}
+					{!this.props.section.isIncontent && this.props.section.type != typeOfAds.INTERACTIVE_AD
+						? this.renderButton('Docked Settings', this.toggleHandler.bind(null, 'editDock'))
+						: null}
+					{this.renderButton('Lazyload Settings', this.toggleHandler.bind(null, 'editLazyLoad'))}
 				</div>
 			);
 		}

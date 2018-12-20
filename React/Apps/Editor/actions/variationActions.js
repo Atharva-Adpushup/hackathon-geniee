@@ -154,11 +154,19 @@ const getLastVariationNumber = function(variations) {
 		}
 		dispatch({ type: variationActions.EDIT_VARIATION_NAME, variationId, name });
 	},
-	editTrafficDistribution = (variationId, trafficDistribution) => ({
-		type: variationActions.EDIT_TRAFFIC_DISTRIBUTION,
-		variationId,
-		trafficDistribution
-	}),
+	editTrafficDistribution = (variationId, trafficDistribution) => (dispatch, getState) => {
+		dispatch({
+			type: variationActions.EDIT_TRAFFIC_DISTRIBUTION,
+			variationId,
+			trafficDistribution
+		});
+		dispatch({
+			type: uiActions.SHOW_NOTIFICATION,
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Variation traffic distribution saved'
+		});
+	},
 	saveBeforeJs = (variation, beforeJs) => (dispatch, getState) => {
 		dispatch({ type: variationActions.SAVE_BEFORE_JS, variation, beforeJs });
 		dispatch({

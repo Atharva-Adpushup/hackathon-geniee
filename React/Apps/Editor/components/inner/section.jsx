@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import _ from 'lodash';
 import AdBox from './adBox.jsx';
+import { adInsertOptions } from '../../consts/commonConsts';
 
 class Section extends React.Component {
 	constructor(props) {
@@ -27,7 +28,13 @@ class Section extends React.Component {
 	}
 
 	componentWillReceiveProps(newProps) {
-		if (this.props.xpath !== newProps.xpath || !_.isEqual(this.props.ads[0].css, newProps.ads[0].css)) {
+		const isDifferentOperation = !!(this.props.operation !== newProps.operation);
+
+		if (
+			this.props.xpath !== newProps.xpath ||
+			!_.isEqual(this.props.ads[0].css, newProps.ads[0].css) ||
+			isDifferentOperation
+		) {
 			this.unMountSection();
 			this.init(newProps);
 		}
@@ -72,11 +79,11 @@ class Section extends React.Component {
 	injectSection(props) {
 		const { operation, xpath } = props,
 			$el = $('<div />');
-		if (operation === 'Insert Before') {
+		if (operation === adInsertOptions.INSERT_BEFORE) {
 			$el.insertBefore($(xpath));
-		} else if (operation === 'Insert After') {
+		} else if (operation === adInsertOptions.INSERT_AFTER) {
 			$el.insertAfter($(xpath));
-		} else if (operation === 'Append') {
+		} else if (operation === adInsertOptions.APPEND) {
 			$(xpath).append($el);
 		} else {
 			$(xpath).prepend($el);
@@ -97,6 +104,11 @@ class Section extends React.Component {
 		if (!this.node) {
 			return false;
 		}
+		let { networkData } = props.ads[0];
+		if (networkData && networkData.isResponsive) {
+			props.ads[0].width = $(this.node).width() || 300;
+			props.ads[0].height = 200;
+		}
 		const css = Object.assign(
 			{},
 			{ position: 'relative', clear: 'both', pointerEvents: 'none', width: '100%' },
@@ -106,16 +118,18 @@ class Section extends React.Component {
 		this.$node.css(css);
 		ReactDOM.render(
 			<div className="_ap_reject">
-				{props.ads.map(ad => (
-					<AdBox
-						key={ad.id}
-						ad={ad}
-						sectionName={props.sectionName}
-						partnerData={props.partnerData}
-						mode={props.mode}
-						clickHandler={props.onAdClick.bind(this, props.variationId, props.id)}
-					/>
-				))}
+				{props.ads.map(ad => {
+					return (
+						<AdBox
+							key={ad.id}
+							ad={ad}
+							sectionName={props.sectionName}
+							partnerData={props.partnerData}
+							mode={props.mode}
+							clickHandler={props.onAdClick.bind(this, props.variationId, props.id)}
+						/>
+					);
+				})}
 			</div>,
 			this.node
 		);

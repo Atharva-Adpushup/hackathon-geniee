@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import { Row, Col, Button, OverlayTrigger, Tooltip, Alert } from 'react-bootstrap';
 import CodeBox from '../codeBox';
-import { priceFloorKeys } from '../../../consts/commonConsts';
+import { priceFloorKeys, iabSizes } from '../../../consts/commonConsts';
 import SelectBox from '../select/select.js';
 import CustomToggleSwitch from '../customToggleSwitch.jsx';
 import { getSupportedAdSizes } from '../../../../OpsPanel/lib/helpers';
@@ -11,11 +11,26 @@ import MultipleAdSizeSelector from '../../outer/insertMenu/multipleAdSizeSelecto
 class AdpTags extends Component {
 	constructor(props) {
 		super(props);
-		const { fpKey, priceFloor, headerBidding, code, refreshSlot, overrideActive, overrideSizeTo } = props,
+		const {
+				fpKey,
+				priceFloor,
+				headerBidding,
+				code,
+				refreshSlot,
+				overrideActive,
+				overrideSizeTo,
+				primaryAdSize
+			} = props,
 			// Geniee specific UI access feature 'dynamic allocation' property computation
 			isGenieeUIAccessDA = !!(window.isGeniee && window.gcfg && window.gcfg.hasOwnProperty('uud')),
 			isGenieeUIAccessDAActive = !!(isGenieeUIAccessDA && window.gcfg.uud),
-			isGenieeUIAccessDAInActive = !!(isGenieeUIAccessDA && !window.gcfg.uud);
+			isGenieeUIAccessDAInActive = !!(isGenieeUIAccessDA && !window.gcfg.uud),
+			isPrimaryAdSize = !!(primaryAdSize && primaryAdSize.width && primaryAdSize.height),
+			isResponsiveAdSize = !!(
+				isPrimaryAdSize &&
+				primaryAdSize.width === 'responsive' &&
+				primaryAdSize.height === 'responsive'
+			);
 
 		this.state = {
 			uiAccess: {
@@ -32,7 +47,10 @@ class AdpTags extends Component {
 			hbAcivated: isGenieeUIAccessDAInActive ? false : headerBidding,
 			showMultipleAdSizesSelector: false,
 			multipleAdSizes: [],
+			dfpAdunitId: '',
 			refreshSlot,
+			isBackwardCompatibleSizes: true,
+			isResponsive: isResponsiveAdSize,
 			overrideActive,
 			overrideSizeTo,
 			pf: priceFloor,
@@ -52,6 +70,7 @@ class AdpTags extends Component {
 		this.filterKeyValues = this.filterKeyValues.bind(this);
 		this.generateCode = this.generateCode.bind(this);
 		this.renderDynamicAllocation = this.renderDynamicAllocation.bind(this);
+		this.renderIsBackwardCompatibleSizesToggleSwitch = this.renderIsBackwardCompatibleSizesToggleSwitch.bind(this);
 		this.renderAdvancedBlock = this.renderAdvancedBlock.bind(this);
 		this.renderHBOverride = this.renderHBOverride.bind(this);
 		this.renderSizeOverrideSelectBox = this.renderSizeOverrideSelectBox.bind(this);
@@ -59,6 +78,9 @@ class AdpTags extends Component {
 		this.renderManageMultipleAdSizeBlock = this.renderManageMultipleAdSizeBlock.bind(this);
 		this.toggleMultipleAdSizes = this.toggleMultipleAdSizes.bind(this);
 		this.multipleAdSizesSave = this.multipleAdSizesSave.bind(this);
+		this.renderDFPAdUnitIdSelectBox = this.renderDFPAdUnitIdSelectBox.bind(this);
+		this.handleDFPAdUnitIdChange = this.handleDFPAdUnitIdChange.bind(this);
+		this.handleIsBackCompatibleSizesChange = this.handleIsBackCompatibleSizesChange.bind(this);
 	}
 
 	filterKeyValues(keyValues) {
@@ -73,15 +95,29 @@ class AdpTags extends Component {
 
 	save() {
 		const {
-			fpKey,
-			hbAcivated,
-			pf,
-			keyValues,
-			refreshSlot,
-			overrideActive,
-			overrideSizeTo,
-			multipleAdSizes
-		} = this.state;
+				fpKey,
+				hbAcivated,
+				pf,
+				keyValues,
+				refreshSlot,
+				overrideActive,
+				overrideSizeTo,
+				multipleAdSizes,
+				dfpAdunitId,
+				isBackwardCompatibleSizes,
+				isResponsive
+			} = this.state,
+			shouldMultipleAdSizesBeComputed = !!(
+				isBackwardCompatibleSizes &&
+				multipleAdSizes &&
+				!multipleAdSizes.length
+			);
+		let computedMultipleAdSizes = multipleAdSizes;
+
+		if (shouldMultipleAdSizesBeComputed) {
+			computedMultipleAdSizes = this.getMultipleAdSizesOfPrimaryAdSize(isBackwardCompatibleSizes);
+		}
+
 		this.props.submitHandler({
 			headerBidding: !!hbAcivated,
 			keyValues: {
@@ -91,7 +127,14 @@ class AdpTags extends Component {
 			refreshSlot,
 			overrideActive,
 			overrideSizeTo: overrideActive ? overrideSizeTo : null,
-			multipleAdSizes
+			multipleAdSizes: computedMultipleAdSizes,
+			dfpAdunitId,
+			// NOTE: Below key is exported only because it is required to provide `Backward compatible size mapping`
+			// functionality in features (such as InContent sections) that cannot receive primary ad size
+			// value when mounted. Deletion of this property is recommended before saving
+			// other properties in database primarily as ad object network information.
+			isBackwardCompatibleSizes,
+			isResponsive
 		});
 	}
 
@@ -219,6 +262,56 @@ class AdpTags extends Component {
 		) : null;
 	}
 
+	handleDFPAdUnitIdChange(dfpAdunitId = '') {
+		const stateObject = { dfpAdunitId },
+			props = this.props,
+			isDfpAdUnitObject = !!(props && props.dfpAdUnitObject && Object.keys(props.dfpAdUnitObject).length),
+			isDfpAdUnitId = !!dfpAdunitId,
+			isAdUnitInObject = !!(
+				isDfpAdUnitId &&
+				isDfpAdUnitObject &&
+				props.dfpAdUnitObject.hasOwnProperty(dfpAdunitId) &&
+				props.dfpAdUnitObject[dfpAdunitId] &&
+				props.dfpAdUnitObject[dfpAdunitId].multipleAdSizes
+			);
+
+		if (isAdUnitInObject) {
+			stateObject.multipleAdSizes = props.dfpAdUnitObject[dfpAdunitId].multipleAdSizes.concat([]);
+		} else if (!isDfpAdUnitId) {
+			stateObject.multipleAdSizes = [];
+		}
+
+		this.setState(stateObject);
+	}
+
+	renderDFPAdUnitIdSelectBox() {
+		const props = this.props,
+			isUniqObject = !!(props.dfpAdUnitObject && Object.keys(props.dfpAdUnitObject).length),
+			isDynamicAllocation = !!this.state.hbAcivated,
+			isInsertMode = props.isInsertMode,
+			isShowBlock = !!(isDynamicAllocation && isInsertMode && isUniqObject);
+
+		return isShowBlock ? (
+			<Row className="mT-10">
+				<Col xs={12} className={props.fromPanel ? 'u-padding-0px mB-10' : 'mB-10'}>
+					<SelectBox
+						value={this.state.dfpAdunitId}
+						label="Select a DFP AdUnit Id"
+						onChange={this.handleDFPAdUnitIdChange}
+					>
+						{Object.keys(props.dfpAdUnitObject).map((value, index) => {
+							return (
+								<option key={index} title={value} value={value}>
+									{value}
+								</option>
+							);
+						})}
+					</SelectBox>
+				</Col>
+			</Row>
+		) : null;
+	}
+
 	renderOverrideSettings(isGenieeEditableMode) {
 		return (
 			<div>
@@ -275,6 +368,57 @@ class AdpTags extends Component {
 						name={this.props.id ? `overrideSizeSwitch-${this.props.id}` : 'overrideSizeSwitch'}
 						id={this.props.id ? `js-override-size-switch-${this.props.id}` : 'js-override-size-switch'}
 						customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+					/>
+				</Col>
+			</Row>
+		);
+	}
+
+	getMultipleAdSizesOfPrimaryAdSize(isBackCompatibleSizes) {
+		const { primaryAdSize } = this.props,
+			primaryAdSizeString = primaryAdSize ? `${primaryAdSize.width},${primaryAdSize.height}` : '',
+			multipleAdSizes =
+				(primaryAdSizeString &&
+					isBackCompatibleSizes &&
+					iabSizes.BACKWARD_COMPATIBLE_MAPPING[primaryAdSizeString]) ||
+				[];
+
+		return multipleAdSizes;
+	}
+
+	handleIsBackCompatibleSizesChange(val) {
+		const isValue = !!val,
+			stateObject = {
+				isBackwardCompatibleSizes: isValue
+			},
+			multipleAdSizes = this.getMultipleAdSizesOfPrimaryAdSize(isValue);
+
+		stateObject.multipleAdSizes = multipleAdSizes;
+		this.setState(stateObject);
+	}
+
+	renderIsBackwardCompatibleSizesToggleSwitch() {
+		const { fromPanel, id } = this.props,
+			{ isResponsive } = this.state,
+			isDisabled = !!isResponsive;
+
+		return (
+			<Row>
+				<Col xs={12} className={fromPanel ? 'u-padding-0px' : ''}>
+					<CustomToggleSwitch
+						labelText={'Add downward sizes'}
+						className="mB-10"
+						checked={this.state.isBackwardCompatibleSizes}
+						onChange={this.handleIsBackCompatibleSizesChange}
+						disabled={isDisabled}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout={fromPanel ? false : true}
+						name={id ? `isBackwardCompatibleSizes-${id}` : 'isBackwardCompatibleSizes'}
+						id={id ? `js-is-backward-sizes-switch-${id}` : 'js-is-backward-sizes-switch'}
+						customComponentClass={fromPanel ? 'u-padding-0px' : ''}
 					/>
 				</Col>
 			</Row>
@@ -392,6 +536,8 @@ class AdpTags extends Component {
 					</div>
 				)}
 				{this.renderDynamicAllocation()}
+				{this.props.geniee ? null : this.renderIsBackwardCompatibleSizesToggleSwitch()}
+				{this.props.geniee ? this.renderDFPAdUnitIdSelectBox() : null}
 				{this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null}
 				{!this.props.geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
 				{!this.props.geniee ? (

@@ -7,7 +7,7 @@ const InitCode = props => {
 	return (
 		<div style={{ padding: '20px' }}>
 			<pre style={{ wordWrap: 'break-word', whiteSpace: 'inherit' }}>
-				{initCode.replace('__SITE_ID__', props.match.params.siteId)}
+				{initCode.replace('__SITE_ID__', window.siteId)}
 			</pre>
 			<CustomMessage
 				header="Important"
@@ -16,7 +16,7 @@ const InitCode = props => {
 			/>
 			<CustomButton
 				label="Copy Init Code"
-				handler={copyToClipBoard.bind(null, initCode.replace('__SITE_ID__', props.match.params.siteId))}
+				handler={copyToClipBoard.bind(null, initCode.replace('__SITE_ID__', window.siteId))}
 			/>
 			<div style={{ clear: 'both' }}>&nbsp;</div>
 		</div>

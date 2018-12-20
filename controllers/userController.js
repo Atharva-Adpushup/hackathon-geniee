@@ -60,7 +60,8 @@ function dashboardRedirection(req, res, allUserSites, type) {
 	}
 
 	return Promise.all(sitePromises()).then(function(validSites) {
-		var sites = _.difference(validSites, ['inValidSite']), unSavedSite;
+		var sites = _.difference(validSites, ['inValidSite']),
+			unSavedSite;
 
 		sites = Array.isArray(sites) && sites.length > 0 ? sites : [];
 		/**
@@ -79,9 +80,11 @@ function dashboardRedirection(req, res, allUserSites, type) {
 		let siteReports = [];
 
 		return Promise.each(sites, site =>
-			getWeeklyComparisionReport(site.siteId).then(data => siteReports.push(data)).catch(() => {
-				return true;
-			})
+			getWeeklyComparisionReport(site.siteId)
+				.then(data => siteReports.push(data))
+				.catch(() => {
+					return true;
+				})
 		)
 			.then(() => {
 				sites = _.map(sites, site => {
@@ -111,7 +114,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 						return res.render('dashboard', {
 							validSites: sites,
 							unSavedSite: unSavedSite,
-							hasStep: sites.length ? 'step' in sites[0] ? true : false : false,
+							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
 							requestDemo: req.session.user.requestDemo,
 							imageHeaderLogo: true,
 							isSuperUser: req.session.isSuperUser
@@ -121,7 +124,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 						return res.render('onboarding', {
 							validSites: sites,
 							unSavedSite: unSavedSite,
-							hasStep: sites.length ? 'step' in sites[0] ? true : false : false,
+							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
 							requestDemo: req.session.user.requestDemo,
 							analyticsObj: JSON.stringify(req.session.analyticsObj),
 							imageHeaderLogo: true,
@@ -159,14 +162,18 @@ function preOnboardingPageRedirection(page, req, res) {
 			primarySiteStep
 		},
 		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser),
-		isPipeDriveDealId = !!(isAnalyticsObj &&
+		isPipeDriveDealId = !!(
+			isAnalyticsObj &&
 			primarySiteDetails &&
 			primarySiteDetails.pipeDrive &&
-			primarySiteDetails.pipeDrive.dealId),
-		isPipeDriveDealTitle = !!(isAnalyticsObj &&
+			primarySiteDetails.pipeDrive.dealId
+		),
+		isPipeDriveDealTitle = !!(
+			isAnalyticsObj &&
 			primarySiteDetails &&
 			primarySiteDetails.pipeDrive &&
-			primarySiteDetails.pipeDrive.dealTitle);
+			primarySiteDetails.pipeDrive.dealTitle
+		);
 
 	if (isPipeDriveDealId) {
 		analyticsObj.INFO_PIPEDRIVE_DEAL_ID = primarySiteDetails.pipeDrive.dealId;
@@ -238,7 +245,8 @@ router
 			userModel
 				.getUserByEmail(req.session.user.email)
 				.then(function(user) {
-					var userSites = user.get('sites'), userWebsiteRevenue = user.get('revenueUpperLimit');
+					var userSites = user.get('sites'),
+						userWebsiteRevenue = user.get('revenueUpperLimit');
 					if (req.body.fromDashboard == 'false') {
 						user.set('preferredModeOfReach', req.body.modeOfReach);
 						if (
@@ -310,7 +318,7 @@ router
 						? {
 								pubId: adSenseData.adsenseAccounts[0].id,
 								email: adSenseData.userInfo.email
-							}
+						  }
 						: false,
 					siteId: req.session.siteId
 				});
@@ -320,7 +328,8 @@ router
 			});
 	})
 	.get('/addSite', function(req, res) {
-		var allUserSites = req.session.user.sites, params = {};
+		var allUserSites = req.session.user.sites,
+			params = {};
 		_.map(allUserSites, function(site) {
 			if (site.step == 1) {
 				params = {
@@ -381,7 +390,8 @@ router
 			userModel.setSitePageGroups(email).then(
 				function(user) {
 					req.session.user = user;
-					var allUserSites = user.get('sites'), isRequestDemo = !!user.get('requestDemo');
+					var allUserSites = user.get('sites'),
+						isRequestDemo = !!user.get('requestDemo');
 
 					function sitePromises() {
 						return _.map(allUserSites, function(obj) {
@@ -469,6 +479,26 @@ router
 							throw err;
 						});
 				}),
+				getUserDFPInfo = getAccessToken.then(function(token) {
+					const { refresh_token } = token,
+						{ OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET } = config.googleOauth;
+
+					return request({
+						method: 'POST',
+						uri: CC.DFP_WEB_SERVICE_ENDPOINT,
+						body: {
+							clientCode: OAUTH_CLIENT_ID,
+							clientSecret: OAUTH_CLIENT_SECRET,
+							refreshToken: refresh_token
+						},
+						json: true
+					}).then(res => {
+						if (res.code === 0) {
+							return res.data;
+						}
+						return [];
+					});
+				}),
 				getUserInfo = getAccessToken.then(function(token) {
 					return request({
 						strictSSL: false,
@@ -478,14 +508,15 @@ router
 				}),
 				getUser = userModel.getUserByEmail(req.session.user.email);
 
-			Promise.join(getUser, getAccessToken, getAdsenseAccounts, getUserInfo, function(
+			Promise.join(getUser, getAccessToken, getAdsenseAccounts, getUserInfo, getUserDFPInfo, function(
 				user,
 				token,
 				adsenseAccounts,
-				userInfo
+				userInfo,
+				userDFPInfo
 			) {
-				user
-					.addNetworkData({
+				Promise.all([
+					user.addNetworkData({
 						networkName: 'ADSENSE',
 						refreshToken: token.refresh_token,
 						accessToken: token.access_token,
@@ -494,24 +525,32 @@ router
 						adsenseEmail: userInfo.email,
 						userInfo: userInfo,
 						adsenseAccounts: adsenseAccounts
+					}),
+					user.addNetworkData({
+						networkName: 'DFP',
+						refreshToken: token.refresh_token,
+						accessToken: token.access_token,
+						expiresIn: token.expires_in,
+						userInfo: userInfo,
+						dfpAccounts: userDFPInfo
 					})
-					.then(function() {
-						req.session.user = user;
-						var pubIds = _.map(adsenseAccounts, 'id'); // grab all the pubIds in case there are multiple and show them to user to choose
-						if (CC.isForceMcm) {
-							res.render('mcmConnect', {
-								baseUrl: CC.BASE_URL,
-								adsenseEmail: userInfo.email,
-								pubId: pubIds.length > 1 ? pubIds : pubIds[0],
-								userEmail: user.get('email')
-							});
-						} else {
-							res.render('oauthParams', {
-								adsenseEmail: userInfo.email,
-								pubId: pubIds.length > 1 ? pubIds : pubIds[0]
-							});
-						}
-					});
+				]).then(function() {
+					req.session.user = user;
+					var pubIds = _.map(adsenseAccounts, 'id'); // grab all the pubIds in case there are multiple and show them to user to choose
+					if (CC.isForceMcm) {
+						res.render('mcmConnect', {
+							baseUrl: CC.BASE_URL,
+							adsenseEmail: userInfo.email,
+							pubId: pubIds.length > 1 ? pubIds : pubIds[0],
+							userEmail: user.get('email')
+						});
+					} else {
+						res.render('oauthParams', {
+							adsenseEmail: userInfo.email,
+							pubId: pubIds.length > 1 ? pubIds : pubIds[0]
+						});
+					}
+				});
 			}).catch(function(err) {
 				res.status(500);
 				err.message === 'No adsense account'
@@ -519,7 +558,7 @@ router
 							'Sorry but it seems you have no AdSense account linked to your Google account.' +
 								'If this is a recently verified/created account, it might take upto 24 hours to come in effect.' +
 								'Please try again after sometime or contact support.'
-						)
+					  )
 					: res.send(err);
 			});
 		}
@@ -545,9 +584,13 @@ router
 	.post('/profile', function(req, res) {
 		req.body.firstName = req.body.firstName ? utils.trimString(req.body.firstName) : req.body.firstName;
 		req.body.lastName = req.body.lastName ? utils.trimString(req.body.lastName) : req.body.lastName;
+		let jsonParams = Object.assign({}, req.body),
+			encodedParams = { firstName: req.body.firstName, lastName: req.body.lastName };
 
+		encodedParams = utils.getHtmlEncodedJSON(encodedParams);
+		jsonParams = Object.assign({}, jsonParams, encodedParams);
 		userModel
-			.saveProfile(req.body, req.session.user.email)
+			.saveProfile(jsonParams, req.session.user.email)
 			.then(function() {
 				/**
 				 * TODO: Fix user.save() to return updated user object
@@ -619,7 +662,8 @@ router
 						email.trim()
 					)
 					.then(function(user) {
-						var currentStatus = user.get('requestDemo'), websiteRevenue = user.get('websiteRevenue');
+						var currentStatus = user.get('requestDemo'),
+							websiteRevenue = user.get('websiteRevenue');
 
 						req.session.user = user;
 
@@ -812,7 +856,8 @@ router
 				return userModel.saveCredentials(credentials, req.session.user.email);
 			})
 			.then(function() {
-				var user = Array.prototype.slice.call(arguments)[0], dataToSend = req.body;
+				var user = Array.prototype.slice.call(arguments)[0],
+					dataToSend = req.body;
 				req.session.user = user;
 				dataToSend.commonRandomPassword = 'xxxxxxxxxx';
 				return res.render('credentials', { profileSaved: true, formData: req.body });
@@ -863,13 +908,22 @@ router
 					tipaltiUrl = '',
 					tipaltiBaseUrl = tipaltiConfig.baseUrl,
 					email = user.get('email'),
-					payeeId = encodeURIComponent(crypto.createHash('md5').update(email).digest('hex').substr(0, 64)),
+					payeeId = encodeURIComponent(
+						crypto
+							.createHash('md5')
+							.update(email)
+							.digest('hex')
+							.substr(0, 64)
+					),
 					payer = tipaltiConfig.payerName,
 					date = Math.floor(+new Date() / 1000),
 					paramsStr =
 						'idap=' + payeeId + '&payer=' + payer + '&ts=' + date + '&email=' + encodeURIComponent(email),
 					key = tipaltiConfig.key,
-					hash = crypto.createHmac('sha256', key).update(paramsStr.toString('utf-8')).digest('hex'),
+					hash = crypto
+						.createHmac('sha256', key)
+						.update(paramsStr.toString('utf-8'))
+						.digest('hex'),
 					paymentHistoryUrl = tipaltiConfig.paymentHistoryUrl + paramsStr + '&hashkey=' + hash;
 
 				// date = Math.floor(date / 1000);

@@ -2,7 +2,6 @@
 
 var prebidSandbox = require('./prebidSandbox'),
 	utils = require('../helpers/utils'),
-	logger = require('../helpers/logger'),
 	config = require('./config'),
 	inventory = config.INVENTORY,
 	find = require('lodash.find'),
@@ -37,11 +36,16 @@ var prebidSandbox = require('./prebidSandbox'),
 
 		if (availableSlots.length) {
 			if (optionalParam.dfpAdunit && availableSlots.indexOf(optionalParam.dfpAdunit) !== -1) {
-				dfpAdUnit = availableSlots.splice(availableSlots.indexOf(optionalParam.dfpAdunit), 1)[0];
+				if (optionalParam.isManual) {
+					dfpAdUnit = optionalParam.dfpAdunit;
+				} else {
+					dfpAdUnit = availableSlots.splice(availableSlots.indexOf(optionalParam.dfpAdunit), 1)[0];
+				}
 			} else {
 				dfpAdUnit = inventory.dfpAdUnits[size].pop();
 			}
 		}
+
 		return {
 			dfpAdUnit: dfpAdUnit,
 			bidders: bidders
@@ -60,14 +64,19 @@ var prebidSandbox = require('./prebidSandbox'),
 	createSlot = function(containerId, size, placement, optionalParam) {
 		var adUnits = inventoryMapper(size, optionalParam),
 			slotId = adUnits.dfpAdUnit,
-			bidders = optionalParam.headerBidding ? adUnits.bidders : [];
+			bidders = optionalParam.headerBidding ? adUnits.bidders : [],
+			isResponsive = optionalParam.isResponsive,
+			multipleAdSizes = optionalParam.multipleAdSizes;
 
 		adpTags.adpSlots[containerId] = {
 			slotId: slotId,
 			optionalParam: optionalParam,
 			bidders: bidders || [],
 			placement: placement,
+			activeDFPNetwork: utils.getActiveDFPNetwork(),
 			size: size,
+			computedSizes: multipleAdSizes ? multipleAdSizes : [],
+			isResponsive: isResponsive,
 			containerId: containerId,
 			timeout: config.PREBID_TIMEOUT,
 			gSlot: null,
@@ -101,8 +110,6 @@ var prebidSandbox = require('./prebidSandbox'),
 		adpTags.currentBatchId = null;
 		adpTags.currentBatchAdpSlots = [];
 		adpTags.slotInterval = null;
-
-		logger.log('Timeout interval ended');
 	},
 	queSlotForBidding = function(slot) {
 		if (!adpTags.slotInterval) {
@@ -110,7 +117,6 @@ var prebidSandbox = require('./prebidSandbox'),
 				? Math.abs(utils.hashCode(+new Date() + ''))
 				: adpTags.currentBatchId;
 		} else {
-			logger.log('Timeout interval already defined, resetting it');
 			clearTimeout(adpTags.slotInterval);
 		}
 		adpTags.currentBatchAdpSlots.push(slot);
@@ -127,43 +133,36 @@ var prebidSandbox = require('./prebidSandbox'),
 		currentBatchAdpSlots: [],
 		currentBatchId: null,
 		batchPrebiddingComplete: false,
-		// Function to define new adp slot
 		shouldRun: function(optionalParam) {
 			if (optionalParam && optionalParam.network == 'geniee') {
 				return false;
 			}
 		},
+		// Function to define new adp slot
 		defineSlot: function(containerId, size, placement, optionalParam) {
 			var optionalParam = optionalParam || {},
 				slot = createSlot(containerId, size, placement, optionalParam);
-			logger.log('Slot defined for container : ' + containerId);
 
 			if (utils.isSupportedBrowser()) {
 				// && adpTags.shouldRun(optionalParam)) {
 				if (!optionalParam.headerBidding) {
 					slot.type = 9;
-					logger.log('Type 9: HB disabled by editor.');
 				} else if (slot.bidders.length) {
 					if (slot.slotId) {
-						logger.log('Type 1: Attaching gSlot and running prebid sandboxing');
 						slot.type = 1;
 					} else {
-						logger.log('Type 2: Running prebid sandboxing and then postbid as dfp slot is not present');
 						slot.type = 2;
 					}
 				} else {
 					// Type 3 handled from within case 2
 					// slot.biddingComplete = true;
 					if (slot.slotId) {
-						logger.log('Type 4: No prebid bidder config, rendering adx tag');
 						slot.type = 4;
 					} else {
-						logger.log('Type 5: No prebid bidder config or dfp slot, collapsing div');
 						slot.type = 5;
 					}
 				}
 			} else {
-				logger.log('Browser not supported by AdPushup.');
 				// slot.biddingComplete = true;
 
 				slot.type = slot.slotId ? 6 : 7;
@@ -193,7 +192,6 @@ var prebidSandbox = require('./prebidSandbox'),
 
 				slot.pageGroup = utils.getPageGroup();
 				slot.platform = utils.getPlatform();
-				//logger.log('Rendering adp tag for container : ' + containerId);
 				adpRender.renderGPT(slot);
 			}
 		}

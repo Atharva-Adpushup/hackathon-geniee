@@ -28,10 +28,9 @@ module.exports = {
 				if (response && response.data && response.data.country) {
 					resolve(response.data.country);
 					return;
-				} else {
-					resolve(null);
-					return;
 				}
+				resolve(null);
+				return;
 			}).fail(function(err) {
 				utils.log('Error in Geoapi', err);
 				resolve(null);
@@ -306,7 +305,7 @@ module.exports = {
 		}
 
 		if (config.manualModeActive && window.adpushup.config.manualAds.length) {
-			ads = window.adpushup.config.manualAds;
+			ads = ads.concat(window.adpushup.config.manualAds);
 		}
 
 		if (ads.length) {
@@ -316,6 +315,19 @@ module.exports = {
 
 			return interactiveAds.length ? interactiveAds : null;
 		}
+	},
+	isElementInViewport: function(el, threshold) {
+		const elementTop = $(el).offset().top,
+			elementBottom = elementTop + $(el).outerHeight(),
+			viewportTop = $(window).scrollTop(),
+			windowHeight =
+				window.innerHeight || Math.min(document.body.clientHeight, document.documentElement.clientHeight),
+			viewportBottom = viewportTop + windowHeight;
+		return (
+			Math.abs(elementTop - viewportBottom) <= threshold ||
+			Math.abs(elementBottom - viewportTop) <= threshold ||
+			(elementBottom > viewportTop && elementTop < viewportBottom)
+		);
 	},
 	queryParams: (function() {
 		var str = window.location.search,

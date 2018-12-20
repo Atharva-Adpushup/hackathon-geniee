@@ -21,8 +21,12 @@ const status = {
 	},
 	partners = {
 		geniee: {
-			name: 'geniee'
-		}
+			name: 'geniee',
+			networks: {
+				disabled: ['adpTags', 'medianet']
+			}
+		},
+		list: ['geniee']
 	},
 	proxy = {
 		HTTP_PROXY_URL: `${window.ADP_ORIGIN}/loadFromApProxy/`,
@@ -141,7 +145,8 @@ const status = {
 		EDIT_CONTENT_SELECTOR: 'EDIT_CONTENT_SELECTOR',
 		SAVE_BEFORE_AFTER_JS: 'SAVE_BEFORE_AFTER_JS',
 		CONTENT_SELECTOR_MISSING: 'CONTENT_SELECTOR_MISSING',
-		CONTENT_SELECTOR_WORKED: 'CONTENT_SELECTOR_WORKED'
+		CONTENT_SELECTOR_WORKED: 'CONTENT_SELECTOR_WORKED',
+		UPDATE_AUTOPTIMIZE: 'UPDATE_AUTOPTIMIZE'
 	},
 	insertMenuActions = {
 		HIDE_MENU: 'HIDE_MENU',
@@ -201,8 +206,10 @@ const status = {
 		UPDATE_INCONTENT_FLOAT: 'UPDATE_INCONTENT_FLOAT',
 		SCROLL_TO_VIEW: 'SCROLL_TO_VIEW',
 		UPDATE_TYPE: 'UPDATE_TYPE',
+		ENABLE_LAZYLOAD: 'ENABLE_LAZYLOAD',
 		UPDATE_FORMAT_DATA: 'UPDATE_FORMAT_DATA',
-		UPDATE_SECTION: 'UPDATE_SECTION'
+		UPDATE_SECTION: 'UPDATE_SECTION',
+		UPDATE_OPERATION: 'UPDATE_OPERATION'
 	},
 	adActions = {
 		CREATE_AD: 'CREATE_AD',
@@ -212,6 +219,12 @@ const status = {
 		UPDATE_CUSTOM_CSS: 'UPDATE_CUSTOM_CSS',
 		UPDATE_NETWORK: 'UPDATE_NETWORK',
 		UPDATE_AD: 'UPDATE_AD'
+	},
+	adInsertOptions = {
+		INSERT_BEFORE: 'Insert Before',
+		INSERT_AFTER: 'Insert After',
+		PREPEND: 'Prepend',
+		APPEND: 'Append'
 	},
 	hbBoxActions = {
 		HIDE_HB_BOX: 'HIDE_HB_BOX',
@@ -297,6 +310,10 @@ const status = {
 				{ width: 200, height: 200 },
 				{ width: 320, height: 100 }
 			]
+		},
+		{
+			layoutType: 'RESPONSIVE',
+			sizes: [{ width: 'responsive', height: 'responsive' }]
 		}
 	],
 	nonPartnerAdSizes = [
@@ -334,7 +351,7 @@ const status = {
 		EDITOR_MODE: 1,
 		BROWSE_MODE: 2
 	},
-	networks = ['adsense', 'adx', 'adpTags', 'dfp', 'custom', 'geniee'],
+	networks = ['adsense', 'adpTags', 'custom', 'geniee', 'medianet'],
 	priceFloorKeys = ['FP_S_A', 'FP_B_A', 'FP_S', 'FP_A', 'FP_B'],
 	defaultPriceFloorKey = 'FP_S_A',
 	reportingUrl = '/user/reports/generate',
@@ -367,6 +384,15 @@ const status = {
 				inview: {
 					custom: ['336x280', '300x250', '300x50', '320x100', '300x100', '320x50']
 				}
+			},
+			TABLET: {
+				sticky: {
+					top: ['336x280', '300x250', '300x50', '320x100', '300x100', '320x50', '728x90'],
+					bottom: ['336x280', '300x250', '300x50', '320x100', '300x100', '320x50', '728x90']
+				},
+				video: {
+					custom: ['336x280']
+				}
 			}
 		},
 		types: {
@@ -381,7 +407,94 @@ const status = {
 		IN_CONTENT: 2,
 		INTERACTIVE_AD: 3,
 		DOCKED_STRUCTURAL: 4,
-		EXTERNAL_TRIGGER_AD: 5
+		EXTERNAL_TRIGGER_AD: 5,
+		LAZYLOAD_STRUCTURAL: 6
+	},
+	iabSizes = {
+		ALL: [
+			[120, 600],
+			[160, 600],
+			[200, 200],
+			[240, 400],
+			[250, 250],
+			[300, 50],
+			[300, 100],
+			[300, 250],
+			[300, 600],
+			[320, 50],
+			[320, 100],
+			[320, 480],
+			[336, 280],
+			[468, 60],
+			[480, 320],
+			[720, 300],
+			[728, 90],
+			[728, 250],
+			[728, 280],
+			[900, 90],
+			[970, 90],
+			[970, 250],
+			['responsive', 'responsive']
+		],
+		MULTIPLE_AD_SIZES_WIDTHS_MAPPING: {
+			'300': [[300, 50], [300, 100], [300, 250], [300, 600]],
+			'320': [[320, 50], [320, 100], [320, 480]],
+			'728': [[728, 90], [728, 250], [728, 280]],
+			'970': [[970, 90], [970, 250]]
+		},
+		// The backward compatible size array for every ad size contains itself as well
+		BACKWARD_COMPATIBLE_MAPPING: {
+			// MOBILE sizes
+			'120,600': [[120, 600]],
+			'160,600': [[120, 600], [160, 600]],
+			'200,200': [[200, 200]],
+			'240,400': [[200, 200], [240, 400]],
+			'250,250': [[200, 200], [250, 250]],
+			'300,50': [[300, 50]],
+			'300,100': [[300, 50], [300, 100]],
+			'300,250': [[300, 250]],
+			'300,600': [[160, 600], [300, 250], [300, 600]],
+			'320,50': [[320, 50]],
+			'320,100': [[320, 50], [320, 100]],
+			'320,480': [[300, 250], [320, 50], [320, 100], [320, 480]],
+			'336,280': [[300, 250], [336, 280]],
+			// TABLET sizes
+			'468,60': [[468, 60]],
+			'480,320': [[250, 250], [300, 250], [320, 50], [320, 100], [336, 280], [468, 60], [480, 320]],
+			// DESKTOP sizes
+			'720,300': [[300, 250], [336, 280], [720, 300]],
+			'728,90': [[728, 90]],
+			'728,250': [[300, 250], [728, 90], [728, 250]],
+			'728,280': [[300, 250], [336, 280], [728, 90], [728, 250], [728, 280]],
+			'900,90': [[728, 90], [900, 90]],
+			'970,90': [[728, 90], [900, 90], [970, 90]],
+			'970,250': [[300, 250], [728, 90], [728, 250], [900, 90], [970, 90], [970, 250]],
+			// RESPONSIVE size
+			'responsive,responsive': [
+				[120, 600],
+				[160, 600],
+				[200, 200],
+				[240, 400],
+				[250, 250],
+				[300, 50],
+				[300, 100],
+				[300, 250],
+				[300, 600],
+				[320, 50],
+				[320, 100],
+				[320, 480],
+				[336, 280],
+				[468, 60],
+				[480, 320],
+				[720, 300],
+				[728, 90],
+				[728, 250],
+				[728, 280],
+				[900, 90],
+				[970, 90],
+				[970, 250]
+			]
+		}
 	};
 
 export {
@@ -395,6 +508,7 @@ export {
 	channelActions,
 	sectionActions,
 	adActions,
+	adInsertOptions,
 	insertMenuActions,
 	editMenuActions,
 	newChannelMenuActions,
@@ -425,5 +539,6 @@ export {
 	jsWrapper,
 	interactiveAds,
 	personalizationTypes,
-	typeOfAds
+	typeOfAds,
+	iabSizes
 };

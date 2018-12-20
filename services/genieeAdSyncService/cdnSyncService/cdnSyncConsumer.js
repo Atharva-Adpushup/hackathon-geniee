@@ -12,9 +12,11 @@ var path = require('path'),
 	CC = require('../../../configs/commonConsts'),
 	generateADPTagsConfig = require('./generateADPTagsConfig'),
 	generateAdPushupConfig = require('./generateAdPushupConfig'),
+	{ getHbAdsApTag } = require('./generateAPTagConfig'),
 	siteModel = require('../../../models/siteModel'),
 	couchbase = require('../../../helpers/couchBaseService'),
-	config = require('../../../configs/config');
+	config = require('../../../configs/config'),
+	prodEnv = config.environment.HOST_ENV === 'production';
 
 module.exports = function(site, externalData = {}) {
 	ftp = new PromiseFtp();
@@ -48,7 +50,7 @@ module.exports = function(site, externalData = {}) {
 			'assets',
 			'js',
 			'builds',
-			'adptags.min.js'
+			prodEnv ? 'adptags.min.js' : 'adptags.js'
 		),
 		prebidScriptPath = path.join(__dirname, '..', '..', 'adpTags', 'Prebid.js', 'build', 'dist', 'prebid.js'),
 		tempDestPath = path.join(
@@ -72,6 +74,7 @@ module.exports = function(site, externalData = {}) {
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
 			apConfigs.poweredByBanner = poweredByBanner ? true : false;
 			apConfigs.siteDomain = site.get('siteDomain');
+			apConfigs.activeDFPNetwork = apConfigs.activeDFPNetwork ? apConfigs.activeDFPNetwork : null;
 			apConfigs.manualModeActive = site.get('isManual') ? site.get('isManual') : false;
 			// Default 'draft' mode is selected if config mode is not present
 			apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
@@ -137,7 +140,7 @@ module.exports = function(site, externalData = {}) {
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 
 						case CC.SERVICES.HEADER_BIDDING:
-							serviceScript = serviceScript.substring(62, serviceScript.trim().length - 1);
+							serviceScript = serviceScript.substring(50, serviceScript.trim().length - 1);
 
 							if (
 								serviceConfig &&
@@ -147,9 +150,19 @@ module.exports = function(site, externalData = {}) {
 							) {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', serviceScript);
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', serviceScript);
+
+								let { deviceConfig } = serviceConfig.hbcf.value;
+								if (deviceConfig && deviceConfig.sizeConfig.length) {
+									deviceConfig = ',sizeConfig: ' + JSON.stringify(deviceConfig.sizeConfig);
+								} else {
+									deviceConfig = '';
+								}
+
+								jsFile = _.replace(jsFile, '__SIZE_CONFIG__', deviceConfig);
+								uncompressedJsFile = _.replace(uncompressedJsFile, '__SIZE_CONFIG__', deviceConfig);
 							} else {
-								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', noop);
-								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', noop);
+								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', '');
+								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', '');
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 
@@ -202,6 +215,7 @@ module.exports = function(site, externalData = {}) {
 			getAdpTagsScript,
 			getHbConfig,
 			getPrebidScript,
+			getHbAdsApTag(site.get('siteId'), site.get('isManual')),
 			function(
 				finalConfig,
 				jsFile,
@@ -210,22 +224,26 @@ module.exports = function(site, externalData = {}) {
 				incontentAnalyserScript,
 				adpTagsScript,
 				hbcf,
-				prebidScript
+				prebidScript,
+				hbAdsApTag
 			) {
 				let { apConfigs, adpTagsConfig } = finalConfig,
 					gdpr = site.get('gdpr'),
 					{ incontentAds, hbAds } = incontentAndHbAds;
 				if (site.get('ampSettings')) apConfigs.ampSettings = site.get('ampSettings');
+				if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
 				jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
 				jsFile = _.replace(jsFile, /__SITE_ID__/g, site.get('siteId'));
+				jsFile = _.replace(jsFile, '__COUNTRY__', false);
 				uncompressedJsFile = _.replace(uncompressedJsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
 				uncompressedJsFile = _.replace(uncompressedJsFile, /__SITE_ID__/g, site.get('siteId'));
+				uncompressedJsFile = _.replace(uncompressedJsFile, '__COUNTRY__', false);
 
 				// Generate final init script based on the services that are enabled
 				var scripts = generateFinalInitScript(jsFile, uncompressedJsFile)
 					.addService(CC.SERVICES.INCONTENT_ANALYSER, incontentAds, incontentAnalyserScript)
 					.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsScript)
-					.addService(CC.SERVICES.HEADER_BIDDING, { hbcf, hbAds }, prebidScript)
+					.addService(CC.SERVICES.HEADER_BIDDING, { hbcf, hbAds: hbAds.concat(hbAdsApTag) }, prebidScript)
 					.addService(CC.SERVICES.GDPR, gdpr)
 					.done();
 
@@ -257,14 +275,17 @@ module.exports = function(site, externalData = {}) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			return connectToServer()
-				.then(cwd)
-				.then(function() {
-					return ftp.put(fileConfig.default, 'adpushup.js');
-				})
-				.then(function() {
-					return Promise.resolve(fileConfig.uncompressed);
-				});
+			if (prodEnv) {
+				return connectToServer()
+					.then(cwd)
+					.then(function() {
+						return ftp.put(fileConfig.default, 'adpushup.js');
+					})
+					.then(function() {
+						return Promise.resolve(fileConfig.uncompressed);
+					});
+			}
+			return Promise.resolve(fileConfig.uncompressed);
 		},
 		getFinalConfigWrapper = () => getFinalConfig.then(fileConfig => fileConfig);
 

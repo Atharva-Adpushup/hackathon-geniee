@@ -1,9 +1,11 @@
 var $ = require('jquery'),
 	nodewatcher = require('../libs/nodeWatcher'),
 	utils = require('../libs/utils'),
+	isAdContainerInView = require('../libs/lazyload'),
 	browserConfig = require('../libs/browserConfig'),
 	incontentAnalyser = __IN_CONTENT_ANALYSER_SCRIPT__,
 	adCodeGenerator = require('./adCodeGenerator'),
+	refreshAdSlot = require('./refreshAdSlot'),
 	commonConsts = require('../config/commonConsts'),
 	shouldPushToADP = function(ad) {
 		return (
@@ -18,6 +20,7 @@ var $ = require('jquery'),
 			inContentAds = [],
 			adpTagUnits = [],
 			externalTriggerAds = [],
+			medianetAds = [],
 			genieeIds = [];
 		for (a = 0; a < ads.length; a++) {
 			ad = ads[a];
@@ -32,7 +35,7 @@ var $ = require('jquery'),
 				ad.networkData &&
 				!ad.networkData.dynamicAllocation &&
 				!ad.networkData.adCode &&
-				genieeIds.push(ad.networkData.zoneId);
+				genieeIds.push({ zoneId: ad.networkData.zoneId, zoneContainerId: ad.networkData.zoneContainerId });
 			// 'isADPTags' will be true if atleast one ADP tag is present
 			shouldPushToADP(ad) ? (adpTagUnits.push(ad), (window.adpushup.config.isADPTags = true)) : null;
 
@@ -44,6 +47,9 @@ var $ = require('jquery'),
 			) {
 				structuredAds.push(ad);
 			}
+			if (ad.network === 'medianet' && ad.networkData.adCode) {
+				medianetAds.push(ad);
+			}
 		}
 
 		inContentAds.sort(function(next, prev) {
@@ -54,7 +60,8 @@ var $ = require('jquery'),
 			inContentAds: inContentAds,
 			genieeIds: genieeIds,
 			adpTagUnits: adpTagUnits,
-			externalTriggerAds: externalTriggerAds
+			externalTriggerAds: externalTriggerAds,
+			medianetAds: medianetAds
 		};
 	},
 	getContainer = function(ad, el) {
@@ -64,11 +71,16 @@ var $ = require('jquery'),
 		var isGenieePartner = !!(ad.network === 'geniee' && !ad.networkData.adCode),
 			isGenieeWithoutDFP = !!(isGenieePartner && !ad.networkData.dynamicAllocation),
 			isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
+			isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
+			isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
+			computedSSPContainerId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.zoneId,
 			defaultAdProperties = {
 				display: isGenieeWithoutDFP ? 'none' : 'block',
 				clear: ad.isIncontent ? null : 'both'
 			},
 			container;
+
+		computedSSPContainerId = '_ap_apexGeniee_ad_' + computedSSPContainerId;
 
 		if (!isMultipleAdSizes) {
 			defaultAdProperties.width = ad.width + 'px';
@@ -80,7 +92,7 @@ var $ = require('jquery'),
 		container = $('<div/>')
 			.css($.extend(defaultAdProperties, ad.css))
 			.attr({
-				id: isGenieePartner ? '_ap_apexGeniee_ad_' + ad.networkData.zoneId : ad.id,
+				id: isGenieePartner ? computedSSPContainerId : ad.id,
 				'data-section': ad.id,
 				class: '_ap_apex_ad',
 				'data-xpath': ad.xpath ? ad.xpath : '',
@@ -145,6 +157,10 @@ var $ = require('jquery'),
 					utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: id });
 				}.bind(adp, ad.id)
 			);
+
+			if (ad.networkData && ad.networkData.refreshSlot) {
+				refreshAdSlot.refreshSlot(container, ad);
+			}
 		} catch (e) {
 			adp.err.push({ msg: 'Error in placing ad.', ad: ad, error: e });
 		}
@@ -172,9 +188,16 @@ var $ = require('jquery'),
 				// Replaced '-' with '_' to avoid ElasticSearch split issue
 				variationId: variation.id // set the chosenVariation variation in feedback data;
 			},
-			placeGenieeHeadCode = function(genieeIds) {
-				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIds);
+			placeGenieeHeadCode = function(genieeIdCollection) {
+				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIdCollection);
 				genieeHeadCode && $('head').append(genieeHeadCode);
+			},
+			handleContentSelectorFailure = function(inContentAds) {
+				feedbackData.contentSelectorMissing = true;
+				$.each(inContentAds, function(index, ad) {
+					//feedbackData.xpathMiss.push(ad.id);
+					next(ad, { success: false });
+				});
 			},
 			next = function(adObj, data) {
 				if (displayCounter) {
@@ -199,24 +222,28 @@ var $ = require('jquery'),
 					//utils.sendFeedback(feedbackData);
 				}
 			},
-			handleContentSelectorFailure = function(inContentAds) {
-				feedbackData.contentSelectorMissing = true;
-				$.each(inContentAds, function(index, ad) {
-					//feedbackData.xpathMiss.push(ad.id);
-					next(ad, { success: false });
-				});
-			},
 			placeStructuralAds = function(structuredAds) {
 				// Process strutural sections
+				//window.adpushup.lazyload.cb = next;
 				$.each(structuredAds, function(index, ad) {
 					getAdContainer(ad, config.xpathWaitTimeout)
 						.done(function(data) {
-							var isContainerElement = !!(data.container && data.container.length),
-								containerId = isContainerElement ? data.container.get(0).id : '';
+							if (ad.enableLazyLoading == true) {
+								isAdContainerInView(data.container).done(function() {
+									next(ad, data);
+								});
+							} else next(ad, data);
+
+							// var isContainerElement = !!(data.container && data.container.length),
+							// 	containerId = isContainerElement ? data.container.get(0).id : '';
 
 							// if all well then ad id of ad in feedback to tell system that impression was given
 							//feedbackData.ads.push(ad.id);
-							next(ad, data);
+							// if (utils.isElementInViewport(data.container, 10)) {
+							// 	next(ad, data);
+							// } else {
+							// 	window.adpushup.lazyload.ads.push({ ad: ad, data: data });
+							// }
 						})
 						.fail(function(data) {
 							//feedbackData.xpathMiss.push(ad.id);
@@ -275,6 +302,10 @@ var $ = require('jquery'),
 				adCodeGenerator.executeAdpTagsHeadCode(ads.adpTagUnits, variation.adpKeyValues);
 			}
 
+			if (ads.medianetAds.length) {
+				adCodeGenerator.generateMediaNetHeadCode();
+			}
+
 			// Process and place structural ads
 			placeStructuralAds(ads.structuredAds);
 
@@ -299,4 +330,5 @@ module.exports = {
 	createAds: createAds,
 	placeAd: placeAd,
 	executeAfterJS: executeAfterJS
+	// renderAd: next
 };

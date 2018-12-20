@@ -40,7 +40,10 @@ class PageGroupSettings extends React.Component {
 				template,
 				adNetwork,
 				pubId,
-				isEnabled
+				isEnabled,
+				reconversion,
+				reconversionFrequency,
+				convertLinksToAmpLinks
 			} = ampSettings;
 		beforeJs = beforeJs ? atob(beforeJs) : '';
 		afterJs = afterJs ? atob(afterJs) : '';
@@ -53,8 +56,11 @@ class PageGroupSettings extends React.Component {
 		}
 		this.state = {
 			siteId,
+			reconversionFrequency,
+			convertLinksToAmpLinks: convertLinksToAmpLinks || false,
 			isEnabled: isEnabled || false,
 			selectors,
+			reconversion: reconversion || { unit: 'min', value: '' },
 			toDelete: toDelete,
 			imgConfig,
 			beforeJs,
@@ -77,7 +83,7 @@ class PageGroupSettings extends React.Component {
 	isDuplicateSlotId = ads => {
 		let adsenseUniqueIds = [], adpTagUniqueIds = [], found = false;
 		for (let ad of ads) {
-			let { slotId } = ad.data, { type } = ad;
+			let slotId = ad.data ? ad.data.slotId : '', { type } = ad;
 			if (
 				(type == 'adsense' && adsenseUniqueIds.indexOf(slotId) != -1) ||
 				(type == 'adpTags' && adpTagUniqueIds.indexOf(slotId) != -1)
@@ -117,7 +123,8 @@ class PageGroupSettings extends React.Component {
 		let finalData = JSON.parse(JSON.stringify(this.state)),
 			dataAds = finalData.ads,
 			dataSocial = finalData.social,
-			dataSelectors = finalData.selectors;
+			dataSelectors = finalData.selectors,
+			reconversion = finalData.reconversion;
 		let ads = [], activeSocialApps = [];
 		if (dataSocial.include) {
 			for (let i = 0; i < dataSocial.apps.length; i++)
@@ -153,6 +160,21 @@ class PageGroupSettings extends React.Component {
 				delete dataSelectors[key].isVisible;
 			}
 		});
+		if (reconversion && reconversion.value) {
+			switch (reconversion.unit) {
+				case 'min':
+					finalData.reconversionFrequency = parseInt(reconversion.value) * 60 * 1000;
+					break;
+				case 'hrs':
+					finalData.reconversionFrequency = parseInt(reconversion.value) * 60 * 60 * 1000;
+					break;
+				case 'days':
+					finalData.reconversionFrequency = parseInt(reconversion.value) * 60 * 60 * 24 * 1000;
+					break;
+			}
+		} else {
+			finalData.reconversionFrequency = 0;
+		}
 		finalData.ads = ads;
 		return finalData;
 	};
@@ -238,8 +260,52 @@ class PageGroupSettings extends React.Component {
 						on="On"
 						off="Off"
 					/>
-					<hr />
+					<CustomToggleSwitch
+						labelText="Convert Links To AmpLinks"
+						className="mB-0"
+						defaultLayout
+						checked={this.state.convertLinksToAmpLinks}
+						onChange={convertLinksToAmpLinks => {
+							this.setState({ convertLinksToAmpLinks });
+						}}
+						name="convertLinksToAmpLinks"
+						layout="horizontal"
+						size="m"
+						id={'convertLinksToAmpLinks' + channel.pageGroup}
+						on="On"
+						off="Off"
+					/>
 
+					<RowColSpan label="Reconversion Frequency">
+						<select
+							className="reConversionInput mL-10"
+							name="placement"
+							value={this.state.reconversion.unit}
+							onChange={e => {
+								let reconversion = this.state.reconversion;
+								reconversion.unit = e.target.value;
+								this.setState({
+									reconversion
+								});
+							}}
+						>
+							<option value="min">Minutes</option>
+							<option value="hrs">Hours</option>
+							<option value="days">Days</option>
+						</select>
+						<input
+							className="reConversionInput"
+							type="number"
+							onChange={e => {
+								let reconversion = this.state.reconversion;
+								reconversion.value = parseFloat(e.target.value);
+								this.setState({
+									reconversion
+								});
+							}}
+							value={this.state.reconversion.value}
+						/>
+					</RowColSpan>
 					<SelectorSettings selectors={this.state.selectors} />
 
 					<hr />

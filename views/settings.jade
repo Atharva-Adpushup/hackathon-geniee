@@ -10,8 +10,28 @@ block append headScripts
             window.blocklist = '!{blocklist}' ? '!{blocklist}'.split(',') : []; 
         });
     +loadAsset("js", [
-        '/assets/js/libs/custom/settings.js?v=1496398593971',
+        '/assets/js/libs/custom/settings.js?v=1496398593986',
     ])
+    style.
+        .select-wrapper {
+            width: 50%;
+            margin: -10px 0 25px;
+            border-right: 1px solid #ccc;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+        }
 
 block bodyContent
     include layout/sideBar
@@ -127,7 +147,33 @@ block bodyContent
                                             .col-sm-7
                                                 input(style="margin-top: 10px;" type="checkbox" id="poweredByBanner" name="poweredByBanner" value=(apConfigs.poweredByBanner ? (apConfigs.poweredByBanner ? "true" : "false") : "false") checked=(apConfigs.poweredByBanner !== undefined ? (apConfigs.poweredByBanner ? "true" : undefined) : "true"))
                                         .row
+                                            .col-sm-12
+                                                table
+                                                    tr
+                                                        th Channel
+                                                        th Auto Optimise
+                                                    each channel in channels
+                                                        - channelAutoOptimiseClass = channel.autoOptimise == false || channel.autoOptimise == 'N/A'  ? 'red' : 'green'
+                                                        - channelAutoOptimiseStatus = channel.autoOptimise == false ? 'Disabled' : channel.autoOptimise == 'N/A' ? 'N/A' : 'Enabled'
+                                                        tr
+                                                            td !{channel.name}
+                                                            td(data-identifier="autoptimise", class=channelAutoOptimiseClass) !{channelAutoOptimiseStatus}
+                                            .row
                                             .col-sm-12#autoOptimiseErr.error-message
+
+                                        if dfpAccounts && dfpAccounts.length
+                                            .row
+                                                .col-sm-12
+                                                    h4 Thid party DFP
+                                                .col-sm-12
+                                                    .row
+                                                        .col-sm-12
+                                                            .select-wrapper
+                                                                select(name="activeDFPNetwork")
+                                                                    option(value="" selected) Select DFP Network
+                                                                    each dfpAccount in dfpAccounts
+                                                                        option(value=dfpAccount.code + '-' + dfpAccount.dfpParentId, selected=(apConfigs.activeDFPNetwork === dfpAccount.code ? true : undefined)) #{dfpAccount.name ? dfpAccount.code + ' - ' + dfpAccount.name : dfpAccount.code + ' - ' + 'N/A' }
+
                                         .row
                                             .col-sm-12
                                                 h4 Manage Blocklist

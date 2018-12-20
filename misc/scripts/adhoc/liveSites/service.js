@@ -3,7 +3,7 @@ const extend = require('extend'),
 	lodash = require('lodash'),
 	siteModel = require('../../../../models/siteModel'),
 	couchBaseService = require('../../../../helpers/couchBaseService'),
-	couchbasePromise = require('couchbase-promises'),
+	couchbasePromise = require('couchbase'),
 	liveSitesByNonEmptyChannelsQuery = couchbasePromise.ViewQuery.from('app', 'liveSitesByNonEmptyChannels'),
 	Promise = require('bluebird');
 
