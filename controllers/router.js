@@ -9,8 +9,8 @@ var indexController = require('./indexController'),
 	authController = require('./authController'),
 	opsController = require('./opsController'),
 	tagManagerController = require('./tagManagerController'),
-	commonConsts = require('../configs/commonConsts'),
-	_ = require('lodash');
+	interactiveAdsManagerController = require('./interactiveAdsManagerController');
+(commonConsts = require('../configs/commonConsts')), (_ = require('lodash'));
 
 module.exports = function(app) {
 	// Always invoked middleware added to check for user demo
@@ -180,6 +180,14 @@ module.exports = function(app) {
 			next();
 		},
 		tagManagerController
+	);
+
+	app.use(
+		'/interactive-ads-manager/',
+		function(req, res, next) {
+			next();
+		},
+		interactiveAdsManagerController
 	);
 
 	/*****************Login URL's End *******************/
