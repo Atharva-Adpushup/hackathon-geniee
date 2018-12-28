@@ -17,6 +17,7 @@ var w = window,
 	genieeObject = require('./genieeObject'),
 	triggerAd = require('./trigger'),
 	session = require('../libs/session'),
+	spaHandler = require('./spaHandler'),
 	isGenieeSite;
 
 function resetAdpConfig() {
@@ -216,6 +217,9 @@ function main() {
 		startCreation();
 	}
 }
+
+// Initialise SPA handler
+spaHandler(adp);
 
 adp.init = main;
 adp.init();
