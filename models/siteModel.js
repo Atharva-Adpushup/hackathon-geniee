@@ -395,6 +395,7 @@ function apiModule() {
 					activeDFPNetwork: json.settings.activeDFPNetwork ? json.settings.activeDFPNetwork : '',
 					activeDFPParentId: json.settings.activeDFPParentId ? json.settings.activeDFPParentId : '',
 					blocklist: blocklist.length ? blocklist : '',
+					isSPA: json.settings.isSPA === 'false' ? false : true,
 					isAdPushupControlWithPartnerSSP: !!site.get('apConfigs').isAdPushupControlWithPartnerSSP
 						? site.get('apConfigs').isAdPushupControlWithPartnerSSP
 						: commonConsts.apConfigDefaults.isAdPushupControlWithPartnerSSP

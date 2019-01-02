@@ -103,6 +103,7 @@ $(document).ready(function() {
 				} else {
 					var activeDFPNetwork = this.parseFormData(formValues, 'other').activeDFPNetwork,
 						autoOpt = this.parseFormData(formValues, 'other').autoOptimise ? true : false,
+						isSPA = this.parseFormData(formValues, 'other').isSPA ? true : false,
 						dfpInfo = activeDFPNetwork ? activeDFPNetwork.split('-') : [],
 						activeDFPNetwork = dfpInfo.length ? dfpInfo[0] : '',
 						activeDFPParentId = dfpInfo.length ? dfpInfo[1] : '',
@@ -120,6 +121,7 @@ $(document).ready(function() {
 							pageGroupPattern: pageGroupPattern,
 							otherSettings: otherSettings,
 							autoOptimise: autoOpt,
+							isSPA: isSPA,
 							activeDFPNetwork: activeDFPNetwork,
 							activeDFPParentId: activeDFPParentId,
 							gdprCompliance: gdprCompliance,

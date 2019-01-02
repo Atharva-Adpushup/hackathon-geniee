@@ -142,6 +142,11 @@ block bodyContent
                                             .col-sm-7
                                                 input(style="margin-top: 10px;" type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "false") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "false"))
                                         .row
+                                            .col-sm-5
+                                                .input-name Is SPA
+                                            .col-sm-7
+                                                input(style="margin-top: 10px;" type="checkbox" id="isSPA" name="isSPA" value=(apConfigs.isSPA ? (apConfigs.isSPA ? "true" : "false") : "false") checked=(apConfigs.isSPA !== "undefined" ? (apConfigs.isSPA ? "true" : undefined) : "false"))
+                                        .row
                                             .col-sm-12
                                                 table
                                                     tr
