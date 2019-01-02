@@ -219,7 +219,9 @@ function main() {
 }
 
 // Initialise SPA handler
-spaHandler(adp);
+if (adp.config.isSPA) {
+	spaHandler(adp);
+}
 
 adp.init = main;
 adp.init();
