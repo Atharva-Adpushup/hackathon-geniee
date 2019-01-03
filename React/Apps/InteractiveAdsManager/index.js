@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import App from './components/App.jsx';
-import configureStore from './store/index.js';
+import App from './components/App';
+import configureStore from './store/index';
 
 const initialData = {};
 const store = configureStore(initialData);

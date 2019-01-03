@@ -2,20 +2,20 @@ import React, { PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import Codemirror from 'react-codemirror';
 
-//require('libs/codemirror/codemirror.min');
-//require('libs/codemirror/codemirror.javascript.min');
+// require('libs/codemirror/codemirror.min');
+// require('libs/codemirror/codemirror.javascript.min');
 //	CodeMirrorEditor = require('shared/codeMirrorEditor');
 
 class CodeEditor extends React.Component {
 	constructor(props) {
 		super(props);
-		let code = JSON.stringify(props.code, null, 4);
-		//code = formatCode(code);
+		const code = JSON.stringify(props.code, null, 4);
+		// code = formatCode(code);
 
 		this.state = {
 			code: code || '{\r\n}',
 			error: false,
-			empty: !this.props.code || !Object.keys(this.props.code).length ? true : false
+			empty: !!(!this.props.code || !Object.keys(this.props.code).length)
 		};
 
 		this.updateCode = this.updateCode.bind(this);
@@ -63,27 +63,28 @@ class CodeEditor extends React.Component {
 			<div className="containerButtonBar">
 				{this.state.error && <div className="error-message">{this.props.error}</div>}
 				<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
-
-				<Row className="butttonsRow">
-					<Col xs={6}>
-						<Button
-							disabled={this.state.error || this.state.empty}
-							className="btn-lightBg btn-save"
-							onClick={this.save}
-						>
-							Save
-						</Button>
-					</Col>
-					{this.props.onCancel ? (
+				{this.props.showButtons ? (
+					<Row className="butttonsRow">
 						<Col xs={6}>
-							<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>
-								Cancel
+							<Button
+								disabled={this.state.error || this.state.empty}
+								className="btn-lightBg btn-save"
+								onClick={this.save}
+							>
+								Save
 							</Button>
 						</Col>
-					) : (
-						''
-					)}
-				</Row>
+						{this.props.onCancel ? (
+							<Col xs={6}>
+								<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>
+									Cancel
+								</Button>
+							</Col>
+						) : (
+							''
+						)}
+					</Row>
+				) : null}
 			</div>
 		);
 	}
@@ -98,7 +99,8 @@ CodeEditor.propTypes = {
 
 CodeEditor.defaultProps = {
 	code: '{}',
-	error: 'Some error occurred, please check your code.'
+	error: 'Some error occurred, please check your code.',
+	showButtons: true
 };
 
 export default CodeEditor;

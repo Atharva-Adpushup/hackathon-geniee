@@ -14,6 +14,10 @@ body {
 	height: auto;
 }
 
+.br-0 {
+	border: 0px !important;
+}
+
 .options-wrapper {
 	margin: 0 !important;
 	padding: 30px 10px;
@@ -73,6 +77,10 @@ body {
 			margin-right: 10px;
 			margin-bottom: 10px;
 		}
+	}
+
+	.react-select-box-container .react-select-box {
+		padding: 10px 15px;
 	}
 }
 
@@ -228,9 +236,9 @@ body {
 .list-heading {
 	border-bottom: 1px solid #ebebeb;
 	margin-bottom: 15px;
-	h4 {
-		margin-top: 10px;
-	}
+	// h4 {
+	// 	margin-top: 10px;
+	// }
 }
 .information {
 	margin: 10px 0px;

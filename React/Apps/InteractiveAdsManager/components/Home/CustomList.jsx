@@ -18,7 +18,7 @@ const CustomList = props => {
 					false
 				);
 			})
-			.filter(ele => ele != false);
+			.filter(ele => ele !== false);
 	}
 
 	function renderTabbedOptions() {
@@ -38,7 +38,7 @@ const CustomList = props => {
 	}
 
 	function renderIconList() {
-		return props.options.map((option, key) => (
+		return props.options.map(option => (
 			<li
 				key={option.key}
 				className={`option ${props.toMatch == option.key ? 'active' : ''}`}
@@ -54,15 +54,19 @@ const CustomList = props => {
 	}
 
 	function renderSimpleList() {
-		return props.options.map((option, key) => (
-			<li
-				key={key}
-				className={`simpleOption ${props.toMatch == option ? 'active' : ''}`}
-				onClick={props.onClick.bind(null, option)}
-			>
-				{option}
-			</li>
-		));
+		return props.options.map((option, key) => {
+			let activeClass = '';
+			if (props.multiSelect) {
+				activeClass = props.toMatch.includes(option) ? 'active' : activeClass;
+			} else {
+				activeClass = props.toMatch === option ? 'active' : activeClass;
+			}
+			return (
+				<li key={key} className={`simpleOption ${activeClass}`} onClick={props.onClick.bind(null, option)}>
+					{option.replace(':', ' - ')}
+				</li>
+			);
+		});
 	}
 
 	function renderList() {
@@ -75,9 +79,8 @@ const CustomList = props => {
 					{renderTabbedOptions()}
 				</div>
 			);
-		} else {
-			return <ul className="options">{renderIconList()}</ul>;
 		}
+		return <ul className="options">{renderIconList()}</ul>;
 	}
 
 	return (

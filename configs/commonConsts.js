@@ -315,13 +315,35 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	dummy: 'test',
 	docKeys: {
-		tagManager: 'tgmr::'
+		tagManager: 'tgmr::',
+		interactiveAds: 'fmrt::'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,
 		ownerEmail: null,
 		siteDomain: null,
 		ads: []
+	},
+	interactiveAdsInitialDoc: {
+		siteId: null,
+		ownerEmail: null,
+		siteDomain: null,
+		ads: [],
+		rules: {
+			pagegroups: {},
+			custom: {}
+		}
+	},
+	interactiveAdsRules: {
+		vertical: {
+			noOfAdsAllowed: 1
+		},
+		horizontal: {
+			noOfAdsAllowed: 1
+		},
+		docked: {
+			noOfAdsAllowed: 1
+		}
 	},
 	videoNetworkInfo: {
 		network: 'custom',

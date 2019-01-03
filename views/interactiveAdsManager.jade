@@ -1,5 +1,4 @@
 //- Interactive Ads Manager interface
-
 extends layout/base
 
 block getTitle
@@ -10,6 +9,7 @@ block append headScripts
 	script.
 		window.siteId = !{siteId}
 		window.isSuperUser = !{isSuperUser}
+		window.iam = { siteId: !{siteId}, isSuperUser: !{isSuperUser}, channels: !{JSON.stringify(channels)} }
 
 block append headCss
 	if environment == "production"

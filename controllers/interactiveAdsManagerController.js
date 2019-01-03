@@ -8,7 +8,7 @@ const request = require('request-promise');
 const config = require('../configs/config');
 const utils = require('../helpers/utils');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { docKeys, tagManagerInitialDoc, videoNetworkInfo } = require('../configs/commonConsts');
+const { docKeys, interactiveAdsInitialDoc, videoNetworkInfo } = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
 const siteModel = require('../models/siteModel');
 const router = express.Router();
@@ -38,7 +38,7 @@ const fn = {
 	createNewDocAndDoProcessing: payload => {
 		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
 		return appBucket
-			.createDoc(`${docKeys.tagManager}${payload.siteId}`, tagManagerDefault, {})
+			.createDoc(`${docKeys.interactiveAds}${payload.siteId}`, tagManagerDefault, {})
 			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
 			.then(docWithCas => {
 				payload.siteDomain = docWithCas.value.siteDomain;
@@ -46,9 +46,9 @@ const fn = {
 			});
 	},
 	createNewDocAndDoProcessing: payload => {
-		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
+		const tagManagerDefault = _.cloneDeep(interactiveAdsInitialDoc);
 		return appBucket
-			.createDoc(`${docKeys.tagManager}${payload.siteId}`, tagManagerDefault, {})
+			.createDoc(`${docKeys.interactiveAds}${payload.siteId}`, tagManagerDefault, {})
 			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
 			.then(docWithCas => {
 				payload.siteDomain = docWithCas.value.siteDomain;
@@ -56,39 +56,40 @@ const fn = {
 			});
 	},
 	processing: (data, payload) => {
-		let cas = data.cas || false,
-			value = data.value || data,
-			id = uuid.v4(),
-			networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {},
-			ad = {
-				...payload.ad,
-				id: id,
-				name: `Ad-${id}`,
-				createdOn: +new Date(),
-				formatData: {
-					...payload.ad.formatData,
-					eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
-				},
-				...networkInfo
-			};
+		let value = data.value || data;
+
+		const cas = data.cas || false;
+		const id = uuid.v4();
+		const networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {};
+		const ad = {
+			...payload.ad,
+			id: id,
+			name: `Ad-${id}`,
+			createdOn: +new Date(),
+			formatData: {
+				...payload.ad.formatData,
+				eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
+			},
+			...networkInfo
+		};
 
 		value.ads.push(ad);
 		value.siteDomain = value.siteDomain || payload.siteDomain;
 		value.siteId = value.siteId || payload.siteId;
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
 
-		if (config.environment.HOST_ENV === 'production') {
-			fn.sendDataToZapier({
-				email: value.ownerEmail,
-				website: value.siteDomain,
-				platform: ad.formatData.platform,
-				size: `${ad.width}x${ad.height}`,
-				adId: ad.id,
-				type: 'action',
-				message: 'New Section Created. Please Check',
-				createdOn: moment(ad.createdOn).format('dddd, MMMM Do YYYY, h:mm:ss a')
-			});
-		}
+		// if (config.environment.HOST_ENV === 'production') {
+		// 	fn.sendDataToZapier({
+		// 		email: value.ownerEmail,
+		// 		website: value.siteDomain,
+		// 		platform: ad.formatData.platform,
+		// 		size: `${ad.width}x${ad.height}`,
+		// 		adId: ad.id,
+		// 		type: 'action',
+		// 		message: 'New Section Created. Please Check',
+		// 		createdOn: moment(ad.createdOn).format('dddd, MMMM Do YYYY, h:mm:ss a')
+		// 	});
+		// }
 
 		return Promise.resolve([cas, value, id, payload.siteId]);
 	},
@@ -97,7 +98,7 @@ const fn = {
 	},
 	directDBUpdate: (key, value, cas, adId) => appBucket.updateDoc(key, value, cas).then(() => adId),
 	dbWrapper: (cas, value, adId, siteId) => {
-		const key = `${docKeys.tagManager}${siteId}`;
+		const key = `${docKeys.interactiveAds}${siteId}`;
 		return !cas ? fn.getAndUpdate(key, value, adId) : fn.directDBUpdate(key, value, cas, adId);
 	},
 	errorHander: (err, res) => {
@@ -106,7 +107,7 @@ const fn = {
 	},
 	adUpdateProcessing: (req, res, processing) => {
 		return appBucket
-			.getDoc(`${docKeys.tagManager}${req.body.siteId}`)
+			.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`)
 			.then(docWithCas => processing(docWithCas))
 			.then(() => siteModel.getSiteById(req.body.siteId))
 			.then(site => {
@@ -133,7 +134,7 @@ router
 			);
 		}
 		return appBucket
-			.getDoc(`${docKeys.tagManager}${req.query.siteId}`)
+			.getDoc(`${docKeys.interactiveAds}${req.query.siteId}`)
 			.then(docWithCas =>
 				sendSuccessResponse(
 					{
@@ -160,20 +161,21 @@ router
 			return res.render('404');
 		}
 
-		return siteModel
-			.getSiteById(params.siteId)
-			.then(site => {
-				return site.get('ownerEmail') != session.user.email
-					? res.render('404')
-					: res.render('interactiveAdsManager', {
-							siteId: params.siteId,
-							isSuperUser: !!session.isSuperUser
-					  });
-			})
-			.catch(err => {
-				console.log(err.message);
-				return res.render('404');
+		return Promise.join(siteModel.getSiteById(params.siteId), site => {
+			return new Promise((resolve, reject) =>
+				site.get('ownerEmail') === session.user.email ? resolve() : reject('Owner verification failed')
+			).then(() => {
+				let channels = site.get('channels') || [];
+				return res.render('interactiveAdsManager', {
+					siteId: params.siteId,
+					isSuperUser: !!session.isSuperUser,
+					channels: channels
+				});
 			});
+		}).catch(err => {
+			console.log(err.message);
+			return res.render('404');
+		});
 	})
 	.post('/createAd', (req, res) => {
 		if (!req.body || !req.body.siteId || !req.body.ad) {
@@ -186,7 +188,7 @@ router
 		}
 		let payload = { ad: req.body.ad, siteId: req.body.siteId, ownerEmail: req.session.user.email };
 		return appBucket
-			.getDoc(`${docKeys.tagManager}${req.body.siteId}`)
+			.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`)
 			.then(docWithCas => fn.processing(docWithCas, payload))
 			.catch(err => {
 				return err.name && err.name == 'CouchbaseError' && err.code == 13
@@ -243,7 +245,7 @@ router
 				doc.ads = newAds;
 			}
 
-			return appBucket.updateDoc(`${docKeys.tagManager}${siteId}`, doc, docWithCas.cas);
+			return appBucket.updateDoc(`${docKeys.interactiveAds}${siteId}`, doc, docWithCas.cas);
 		});
 	})
 	.post('/modifyAd', (req, res) => {
@@ -266,7 +268,7 @@ router
 					return false;
 				}
 			});
-			return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
+			return appBucket.updateDoc(`${docKeys.interactiveAds}${req.body.siteId}`, doc, docWithCas.cas);
 		});
 	});
 

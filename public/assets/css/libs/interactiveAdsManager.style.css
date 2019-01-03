@@ -436,6 +436,9 @@ body {
   min-width: 1280px !important;
   height: auto; }
 
+.br-0 {
+  border: 0px !important; }
+
 .options-wrapper {
   margin: 0 !important;
   padding: 30px 10px;
@@ -482,6 +485,8 @@ body {
       border: 2px solid #ebebeb;
       margin-right: 10px;
       margin-bottom: 10px; }
+  .options-wrapper .react-select-box-container .react-select-box {
+    padding: 10px 15px; }
 
 .section-list .section-list-item {
   min-height: 420px; }
@@ -594,8 +599,6 @@ body {
 .list-heading {
   border-bottom: 1px solid #ebebeb;
   margin-bottom: 15px; }
-  .list-heading h4 {
-    margin-top: 10px; }
 
 .information {
   margin: 10px 0px; }

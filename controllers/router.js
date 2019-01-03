@@ -183,7 +183,7 @@ module.exports = function(app) {
 	);
 
 	app.use(
-		'/interactive-ads-manager/',
+		['/interactive-ads-manager/', '/interactiveAdsManager/data/'],
 		function(req, res, next) {
 			next();
 		},

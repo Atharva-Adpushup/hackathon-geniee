@@ -1,17 +1,10 @@
 import React, { Component } from 'react';
 import { Row, Col, ProgressBar } from 'react-bootstrap';
-import CustomList from './CustomList.jsx';
-import {
-	PLATFORMS,
-	TYPES,
-	SIZES,
-	displayAdMessage,
-	ampMessage,
-	interactiveAdMessage
-} from '../../configs/commonConsts';
+import CustomList from './CustomList';
+import { Docked, Default } from './Formats/index';
+import { PLATFORMS, FORMATS, SIZES, displayAdMessage, ampMessage, adCode } from '../../configs/commonConsts';
 import { copyToClipBoard } from '../../lib/helpers';
-import { CustomMessage, CustomButton } from '../shared/index.jsx';
-import { adCode, adCodeVideo } from '../../configs/commonConsts';
+import { CustomMessage, CustomButton } from '../shared/index';
 import Loader from '../../../../Components/Loader';
 
 class AdCodeGenerator extends Component {
@@ -20,90 +13,137 @@ class AdCodeGenerator extends Component {
 		this.state = {
 			progress: 0,
 			platform: '',
-			type: '',
+			format: '',
 			size: null,
-			loading: false
+			loading: false,
+			pagegroups: [],
+			isLayoutSetupPresent: !!(window.iam && window.iam.channels && window.iam.channels.length)
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
-		this.selectType = this.selectType.bind(this);
+		this.selectFormat = this.selectFormat.bind(this);
 		this.selectSize = this.selectSize.bind(this);
+		this.selectPagegroups = this.selectPagegroups.bind(this);
 		this.saveHandler = this.saveHandler.bind(this);
+		this.formatCheck = this.formatCheck.bind(this);
 		this.resetHandler = this.resetHandler.bind(this);
-		// this.renderPlatformOptions = this.renderPlatformOptions.bind(this);
-		this.renderTypeOptions = this.renderTypeOptions.bind(this);
+		this.renderPlatformOptions = this.renderPlatformOptions.bind(this);
+		this.renderPagegroups = this.renderPagegroups.bind(this);
+		this.renderFormats = this.renderFormats.bind(this);
 		this.renderSizes = this.renderSizes.bind(this);
+		this.renderFormatDetails = this.renderFormatDetails.bind(this);
+		this.renderIndividualFormat = this.renderIndividualFormat.bind(this);
 		this.renderMainContent = this.renderMainContent.bind(this);
+		this.renderFormatOrSave = this.renderFormatOrSave.bind(this);
 		this.renderGeneratedAdcode = this.renderGeneratedAdcode.bind(this);
+		this.generateAdData = this.generateAdData.bind(this);
 	}
 
 	selectPlatform(platform) {
 		this.setState({
+			progress: 15,
 			platform,
-			size: platform == 'responsive' ? 'responsive' : null,
-			progress: platform == 'responsive' ? 75 : 50
+			format: '',
+			size: null,
+			pagegroups: []
 		});
 	}
 
-	selectType(type) {
+	selectFormat(format) {
 		this.setState({
-			type,
-			platform: '',
+			format,
 			size: null,
-			progress: 50
+			progress: 30,
+			pagegroups: []
 		});
 	}
 
 	selectSize(size) {
+		let progress = 80;
+		if (this.state.progress > 80) {
+			progress = this.state.progress;
+		} else if (this.state.isLayoutSetupPresent) {
+			progress = 45;
+		} else if (this.formatCheck()) {
+			progress = 60;
+		}
 		this.setState({
 			size,
-			progress: this.state.progress > 75 ? this.state.progress : 75
+			progress,
+			pagegroups: []
 		});
 	}
 
-	saveHandler() {
-		let isResponsive = this.state.size == 'responsive',
-			sizesArray = isResponsive ? 'responsive' : this.state.size.split('x'),
-			width = isResponsive ? 'responsive' : sizesArray[0],
-			height = isResponsive ? 'responsive' : sizesArray[1],
-			typeAndPlacement = this.state.type.split(/^([^A-Z]+)/);
+	selectPagegroups(pagegroup) {
+		const pagegroups = this.state.pagegroups;
+		let progress;
+
+		if (pagegroups.includes(pagegroup)) {
+			pagegroups.splice(pagegroups.indexOf(pagegroup), 1);
+		} else {
+			pagegroups.push(pagegroup);
+		}
+		if (pagegroups.length) {
+			if (this.formatCheck()) {
+				progress = 60;
+			} else {
+				progress = 80;
+			}
+		} else {
+			progress = 45;
+		}
+		return this.setState({ pagegroups, progress });
+	}
+
+	generateAdData() {
+		const sizesArray = this.state.size.split('x');
+		const width = sizesArray[0];
+		const height = sizesArray[1];
+		const typeAndPlacement = this.state.format.split(/^([^A-Z]+)/);
 
 		typeAndPlacement.shift();
 
+		const type = typeAndPlacement[0] ? typeAndPlacement[0].toLowerCase() : null;
+		const placement = typeAndPlacement[1] ? typeAndPlacement[1].toLowerCase() : null;
+
+		return {
+			siteId: window.siteId,
+			ad: {
+				width,
+				height,
+				networkData: {
+					isResponsive: !!(width === 'responsive')
+				},
+				formatData: {
+					platform: this.state.platform,
+					format: this.state.format,
+
+					type,
+					placement,
+
+					event: null,
+					eventData: {
+						value: null
+					}
+				},
+				type: 3,
+				css: {
+					display: 'block',
+					margin: '10px auto',
+					'text-align': 'center'
+				},
+				isActive: true
+			}
+		};
+	}
+
+	saveHandler() {
 		this.setState(
 			{
 				progress: 100,
 				loading: true
 			},
-			() =>
-				this.props.createAd({
-					siteId: window.siteId,
-					ad: {
-						width,
-						height,
-						isManual: true,
-						networkData: {
-							isResponsive: !!(width === 'responsive')
-						},
-						formatData: {
-							platform: this.state.platform, // DESKTOP, MOBILE
-							type: this.state.type, // DISPLAY, NATIVE, AMP, LINK
-
-							// Setting for backward compatibility
-							event: null,
-							placement: null,
-							eventData: {
-								value: null
-							}
-						},
-						type: 3, // STRUCTURAL
-						css: {
-							display: 'block',
-							margin: '10px auto',
-							'text-align': 'center'
-						},
-						isActive: true
-					}
-				})
+			this.generateAdData
+			// () => this.props.createAd(this.generateAdData)
 		);
 	}
 
@@ -120,30 +160,44 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
-	// renderPlatformOptions() {
-	// 	return (
-	// 		<CustomList
-	// 			options={PLATFORMS}
-	// 			heading="Select Platform"
-	// 			subHeading="Device for which you want to show ads"
-	// 			onClick={this.selectPlatform}
-	// 			leftSize={3}
-	// 			rightSize={9}
-	// 			toMatch={this.state.platform}
-	// 		/>
-	// 	);
-	// }
+	formatCheck() {
+		return this.state.format && ['DOCKED', 'STICKYTOP'].includes(this.state.format.toUpperCase());
+	}
 
-	renderTypeOptions() {
+	renderButton = (label, handler) => (
+		<Row style={{ margin: '0px' }}>
+			<CustomButton
+				label={label}
+				handler={handler}
+				style={{ float: 'right', minWidth: '200px', margin: '10px 10px 0px 0px' }}
+			/>
+		</Row>
+	);
+
+	renderPlatformOptions() {
 		return (
 			<CustomList
-				options={TYPES}
-				heading="Select Ad Type"
-				subHeading="AdpPushup supports varied ad types"
-				onClick={this.selectType}
+				options={PLATFORMS}
+				heading="Select Platform"
+				subHeading="Device for which you want to show ads"
+				onClick={this.selectPlatform}
 				leftSize={3}
 				rightSize={9}
-				toMatch={this.state.type}
+				toMatch={this.state.platform}
+			/>
+		);
+	}
+
+	renderFormats() {
+		return (
+			<CustomList
+				options={FORMATS[this.state.platform.toUpperCase()]}
+				heading="Select Ad Format"
+				subHeading="AdpPushup supports varied high value ad formats"
+				onClick={this.selectFormat}
+				leftSize={3}
+				rightSize={9}
+				toMatch={this.state.format}
 			/>
 		);
 	}
@@ -158,67 +212,83 @@ class AdCodeGenerator extends Component {
 					rightSize={9}
 					toMatch={this.state.size}
 					platform={this.state.platform}
-					type={this.state.type}
-					tabbedList={{
-						allowed: SIZES[this.state.type.toUpperCase()]
-							? SIZES[this.state.type.toUpperCase()]['ALLOWED']
-							: [],
-						list: {
-							responsive: {
-								header: 'Responsive',
-								key: 'responsive',
-								options: false
-							},
-							desktop: {
-								header: 'Desktop',
-								key: 'desktop',
-								options: SIZES[this.state.type.toUpperCase()][this.state.platform.toUpperCase()]
-							},
-							mobile: {
-								header: 'Mobile',
-								key: 'mobile',
-								options: SIZES[this.state.type.toUpperCase()][this.state.platform.toUpperCase()]
-							}
-						}
-					}}
-					selectPlatform={this.selectPlatform}
+					format={this.state.format}
+					simpleList
+					options={SIZES[this.state.platform.toUpperCase()][this.state.format.toUpperCase()]}
 					onClick={this.selectSize}
 				/>
 			</div>
 		);
 	}
 
-	renderButton(label, handler) {
+	renderPagegroups() {
 		return (
-			<Row style={{ margin: '0px' }}>
-				<div
-					className="btn btn-lightBg btn-default"
-					style={{ float: 'right', minWidth: '200px', margin: '10px 10px 0px 0px' }}
-					onClick={handler}
-				>
-					{label}
-				</div>
-			</Row>
+			<CustomList
+				multiSelect
+				simpleList
+				heading="Select Pagegroup(s)"
+				subHeading="Please select pagegroup(s) on which you want to run the ad"
+				leftSize={3}
+				rightSize={9}
+				toMatch={this.state.pagegroups}
+				options={window.iam.channels}
+				onClick={this.selectPagegroups}
+			/>
+		);
+	}
+
+	renderIndividualFormat() {
+		const save = {
+			renderFn: this.renderButton,
+			label: 'Create Ad',
+			handler: this.saveHandler
+		};
+		switch (this.state.format) {
+			// case 'stickyTop':
+			// 	return <StickyTop />;
+			case 'inView':
+				return null;
+			case 'docked':
+				return <Docked save={save} />;
+			default:
+				return <Default save={save} />;
+		}
+	}
+
+	renderFormatDetails() {
+		return (
+			<div>
+				<Col md={3} className="list-heading br-0">
+					<h3>Format Settings</h3>
+					<h4>Please fill the necessary details</h4>
+				</Col>
+				<Col md={9}>{this.renderIndividualFormat()}</Col>
+				<div style={{ clear: 'both' }}>&nbsp;</div>
+			</div>
 		);
 	}
 
 	renderGeneratedAdcode() {
-		const showAdCode = this.state.type == 'amp' ? false : true,
-			code = showAdCode ? adCode : null,
-			message = showAdCode ? displayAdMessage : ampMessage;
+		const showAdCode = this.state.type !== 'amp';
+		const message = showAdCode ? displayAdMessage : ampMessage;
+		const code = showAdCode ? adCode.replace(/__AD_ID__/g, this.props.adId).trim() : null;
+
 		return (
 			<Col xs={12}>
-				{showAdCode ? <pre>{code.replace(/__AD_ID__/g, this.props.adId).trim()}</pre> : null}
+				{showAdCode ? <pre>{code}</pre> : null}
 				<CustomMessage header="Information" type="info" message={message} />
 				<CustomButton label="Create More Ads" handler={this.resetHandler} />
-				{showAdCode ? (
-					<CustomButton
-						label="Copy Adcode"
-						handler={copyToClipBoard.bind(null, code.replace(/__AD_ID__/g, this.props.adId))}
-					/>
-				) : null}
+				{showAdCode ? <CustomButton label="Copy Adcode" handler={copyToClipBoard(code)} /> : null}
 			</Col>
 		);
+	}
+
+	renderFormatOrSave() {
+		if (this.state.progress && this.state.progress >= 60) {
+			return this.renderFormatDetails();
+			// return this.formatCheck() ? this.renderFormatDetails() : this.renderButton('Create Ad', this.saveHandler);
+		}
+		return null;
 	}
 
 	renderMainContent() {
@@ -231,10 +301,12 @@ class AdCodeGenerator extends Component {
 					this.renderGeneratedAdcode()
 				) : (
 					<div>
-						{/* {this.renderPlatformOptions()} */}
-						{this.renderTypeOptions()}
-						{this.state.progress >= 50 ? this.renderSizes() : null}
-						{this.state.progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
+						{this.renderPlatformOptions()}
+						{this.state.progress >= 15 ? this.renderFormats() : null}
+						{this.state.progress >= 30 ? this.renderSizes() : null}
+						{this.state.progress >= 45 && this.state.isLayoutSetupPresent ? this.renderPagegroups() : null}
+						{this.renderFormatOrSave()}
+						{/* {this.state.progress >= 80 ? this.renderButton('Generate AdCode', this.saveHandler) : null} */}
 					</div>
 				)}
 			</div>

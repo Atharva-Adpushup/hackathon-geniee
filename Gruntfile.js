@@ -69,8 +69,7 @@ module.exports = function(grunt) {
 				files: {
 					'public/assets/css/libs/editor.style.css': 'public/assets/scss/editor.style.scss',
 					'public/assets/css/libs/website.style.css': 'public/assets/scss/website.style.scss',
-					'public/assets/css/libs/interactiveAdsManager.style.css':
-						'public/assets/scss/interactiveAdsManager.style.scss',
+					'public/assets/css/libs/tagManager.style.css': 'public/assets/scss/tagManager.style.scss',
 					'public/assets/css/libs/interactiveAdsManager.style.css':
 						'public/assets/scss/interactiveAdsManager.style.scss'
 				}

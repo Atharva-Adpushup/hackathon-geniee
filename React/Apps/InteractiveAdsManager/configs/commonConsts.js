@@ -1,148 +1,169 @@
 const PLATFORMS = [
+	{
+		name: 'Desktop',
+		image: '/assets/images/interactiveAdsManager/devices/desktop.png',
+		key: 'desktop'
+	},
+	{
+		name: 'Mobile',
+		image: '/assets/images/interactiveAdsManager/devices/smartphone.png',
+		key: 'mobile'
+	}
+	// {
+	// 	name: 'Tablet',
+	// 	image: '/assets/images/interactiveAdsManager/devices/tablet.png',
+	// 	key: 'tablet'
+	// }
+];
+const FORMATS = {
+	DESKTOP: [
 		{
-			name: 'Desktop',
-			image: '/assets/images/tagManager/devices/desktop.png',
-			key: 'desktop'
+			name: 'Sticky Top',
+			image: '/assets/images/interactiveAdsManager/formats/desktop/sticky-top.gif',
+			disabled: '/assets/images/interactiveAdsManager/formats/desktop/sticky-top-disabled.jpg',
+			key: 'stickyTop'
 		},
 		{
-			name: 'Mobile',
-			image: '/assets/images/tagManager/devices/smartphone.png',
-			key: 'mobile'
+			name: 'Sticky Left',
+			image: '/assets/images/interactiveAdsManager/formats/desktop/sticky-left.gif',
+			disabled: '/assets/images/interactiveAdsManager/formats/desktop/sticky-left-disabled.jpg',
+			key: 'stickyLeft'
+		},
+		{
+			name: 'Sticky Right',
+			image: '/assets/images/interactiveAdsManager/formats/desktop/sticky-right.gif',
+			disabled: '/assets/images/interactiveAdsManager/formats/desktop/sticky-right-disabled.jpg',
+			key: 'stickyRight'
+		},
+		{
+			name: 'Sticky Bottom',
+			image: '/assets/images/interactiveAdsManager/formats/desktop/sticky-bottom.gif',
+			disabled: '/assets/images/interactiveAdsManager/formats/desktop/sticky-bottom-disabled.jpg',
+			key: 'stickyBottom'
+		},
+		{
+			name: 'In View',
+			image: '/assets/images/interactiveAdsManager/formats/desktop/in-view.gif',
+			disabled: '/assets/images/interactiveAdsManager/formats/desktop/in-view-disabled.jpg',
+			key: 'inView'
+		},
+		{
+			name: 'Docked',
+			image: '/assets/images/interactiveAdsManager/formats/desktop/docked.gif',
+			disabled: '/assets/images/interactiveAdsManager/formats/desktop/docked-disabled.jpg',
+			key: 'docked'
 		}
-		// {
-		// 	name: 'Tablet',
-		// 	image: '/assets/images/tagManager/devices/tablet.png',
-		// 	key: 'tablet'
-		// }
 	],
-	TYPES = [
+	MOBILE: [
 		{
-			name: 'Display (Text / Image)',
-			image: '/assets/images/tagManager/display.png',
-			key: 'display',
-			description: 'A simple way to get ads on your page. Select size, generate code and you are good to go'
+			name: 'Sticky Top',
+			image: '/assets/images/interactiveAdsManager/formats/mobile/sticky-top.gif',
+			disabled: '/assets/images/interactiveAdsManager/formats/mobile/sticky-top-disabled.jpg',
+			key: 'stickyTop'
 		},
 		{
-			name: 'Native',
-			image: '/assets/images/tagManager/native.png',
-			key: 'native',
-			description:
-				'Ads that flow seamlessly inside a list of articles or products on your site, offering a great user experience'
+			name: 'Sticky Bottom',
+			image: '/assets/images/interactiveAdsManager/formats/mobile/sticky-bottom.gif',
+			disabled: '/assets/images/interactiveAdsManager/formats/mobile/sticky-bottom-disabled.jpg',
+			key: 'stickyBottom'
 		},
 		{
-			name: 'Links',
-			image: '/assets/images/tagManager/links.png',
-			key: 'links',
-			description: 'Link units display a list of topics that are relevant to the content of your page'
-		},
-		{
-			name: 'AMP Ad',
-			image: '/assets/images/tagManager/amp.png',
-			key: 'amp',
-			description: 'AMPHTML ads are a faster, lighter and more secure way to advertise on the web'
+			name: 'In View',
+			image: '/assets/images/interactiveAdsManager/formats/mobile/in-view.gif',
+			disabled: '/assets/images/interactiveAdsManager/formats/mobile/in-view-disabled.jpg',
+			key: 'inView'
 		}
-	],
-	SIZES = {
-		DISPLAY: {
-			ALLOWED: ['responsive', 'desktop', 'mobile'],
-			DESKTOP: [
-				'970x250',
-				'970x90',
-				'728x250',
-				'728x90',
-				'468x60',
-				'336x280',
-				'320x50',
-				'300x600',
-				'300x100',
-				'250x250',
-				'240x240',
-				'234x60',
-				'200x200',
-				'180x150',
-				'160x600',
-				'120x600',
-				'120x240',
-				'300x250'
-			],
-			MOBILE: ['320x50', '300x250', '250x250', '200x200', '320x100', '336x280']
-		},
-		NATIVE: {
-			ALLOWED: ['desktop', 'mobile'],
-			DESKTOP: [
-				'970x250',
-				'970x90',
-				'728x250',
-				'728x90',
-				'468x60',
-				'336x280',
-				'320x50',
-				'300x600',
-				'300x100',
-				'250x250',
-				'240x240',
-				'234x60',
-				'200x200',
-				'180x150',
-				'160x600',
-				'120x600',
-				'120x240',
-				'300x250'
-			],
-			MOBILE: ['320x50', '300x250', '250x250', '200x200', '320x100', '336x280']
-		},
-		LINKS: {
-			ALLOWED: ['responsive', 'desktop', 'mobile'],
-			DESKTOP: ['336x280', '120x600', '1070x250', '320x100', '336x280', '300x250', '468x60'],
-			MOBILE: ['320x100', '336x280', '300x250', '468x60']
-		},
-		AMP: {
-			ALLOWED: ['mobile'],
-			DESKTOP: [
-				'970x250',
-				'970x90',
-				'728x250',
-				'728x90',
-				'468x60',
-				'336x280',
-				'320x50',
-				'300x600',
-				'300x100',
-				'250x250',
-				'240x240',
-				'234x60',
-				'200x200',
-				'180x150',
-				'160x600',
-				'120x600',
-				'120x240',
-				'300x250'
-			],
-			MOBILE: ['320x50', '300x250', '250x250', '200x200', '320x100', '336x280']
-		}
+	]
+};
+const TYPES = [
+	{
+		name: 'Display (Text / Image)',
+		image: '/assets/images/interactiveAdsManager/display.png',
+		key: 'display',
+		description: 'A simple way to get ads on your page. Select size, generate code and you are good to go'
 	},
-	interactiveAdEvents = ['DOMContentLoaded', 'scriptLoaded'], //load', 'scroll', 'onMills',
-	adActions = {
-		CREATE_AD: 'CREATE_AD',
-		UPDATE_ADS_LIST: 'UPDATE_ADS_LIST',
-		REPLACE_ADS_LIST: 'REPLACE_ADS_LIST',
-		DELETE_AD: 'DELETE_AD',
-		UPDATE_AD: 'UPDATE_AD'
+	{
+		name: 'Native',
+		image: '/assets/images/interactiveAdsManager/native.png',
+		key: 'native',
+		description:
+			'Ads that flow seamlessly inside a list of articles or products on your site, offering a great user experience'
 	},
-	uiActions = {
-		SET_CREATE_AD_ERROR: 'SET_CREATE_AD_ERROR',
-		SET_CREATE_AD_LOADER: 'SET_CREATE_AD_LOADER',
-		SET_FETCH_ADS_ERROR: 'SET_FETCH_ADS_ERROR'
+	{
+		name: 'Links',
+		image: '/assets/images/interactiveAdsManager/links.png',
+		key: 'links',
+		description: 'Link units display a list of topics that are relevant to the content of your page'
 	},
-	globalActions = {
-		SET_CURRENT_AD: 'SET_CURRENT_AD'
+	{
+		name: 'AMP Ad',
+		image: '/assets/images/interactiveAdsManager/amp.png',
+		key: 'amp',
+		description: 'AMPHTML ads are a faster, lighter and more secure way to advertise on the web'
+	}
+];
+const SIZES = {
+	DESKTOP: {
+		DOCKED: [
+			'336x280',
+			'300x250',
+			'250x250',
+			'200x200',
+			'728x90',
+			'468x60',
+			'300x600',
+			'160x600',
+			'120x600',
+			'320x50',
+			'970x250',
+			'900x90'
+		],
+		INVIEW: [
+			'336x280',
+			'300x250',
+			'250x250',
+			'200x200',
+			'728x90',
+			'468x60',
+			'300x600',
+			'160x600',
+			'120x600',
+			'320x50',
+			'970x250',
+			'900x90'
+		],
+		STICKYTOP: ['900x90', '468x60', '728x90'],
+		STICKYBOTTOM: ['900x90', '468x60', '728x90'],
+		STICKYLEFT: ['160x600', '336x280', '300x250', '300x600', '120x600'],
+		STICKYRIGHT: ['160x600', '336x280', '300x250', '300x600', '120x600']
 	},
-	displayAdMessage =
-		'You need to copy and paste the above adcode on your site where you wish to show the ad. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>',
-	ampMessage = 'AMP adcode will be sent to your registered e-mail address by your account manager',
-	interactiveAdMessage =
-		'Ad has been created. AdPushup will automatically insert ad on your site on the runtime. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>',
-	adCode = `<div id="__AD_ID__" class="_ap_apex_ad">
+	MOBILE: {
+		STICKYTOP: ['900x90', '468x60', '728x90'],
+		STICKYBOTTOM: ['320x100', '300x100', '320x50'],
+		INVIEW: ['336x280']
+	}
+};
+const interactiveAdEvents = ['DOMContentLoaded', 'scriptLoaded']; // load', 'scroll', 'onMills',
+const adActions = {
+	CREATE_AD: 'CREATE_AD',
+	UPDATE_ADS_LIST: 'UPDATE_ADS_LIST',
+	REPLACE_ADS_LIST: 'REPLACE_ADS_LIST',
+	DELETE_AD: 'DELETE_AD',
+	UPDATE_AD: 'UPDATE_AD'
+};
+const uiActions = {
+	SET_CREATE_AD_ERROR: 'SET_CREATE_AD_ERROR',
+	SET_CREATE_AD_LOADER: 'SET_CREATE_AD_LOADER',
+	SET_FETCH_ADS_ERROR: 'SET_FETCH_ADS_ERROR'
+};
+const globalActions = {
+	SET_CURRENT_AD: 'SET_CURRENT_AD'
+};
+const displayAdMessage =
+	'You need to copy and paste the above adcode on your site where you wish to show the ad. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>';
+const interactiveAdMessage =
+	'Ad has been created. AdPushup will automatically insert ad on your site on the runtime. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>';
+const adCode = `<div id="__AD_ID__" class="_ap_apex_ad">
 	<script>
 		var adpushup = adpushup || {};
 		adpushup.que = adpushup.que || [];
@@ -150,9 +171,9 @@ const PLATFORMS = [
 			adpushup.triggerAd("__AD_ID__");
 		});
 	</script>
-</div>`,
-	adCodeVideo = `<div id="#adp_video___AD_ID__"></div>`,
-	adsTxtData = `#AdX
+</div>`;
+const adCodeVideo = `<div id="#adp_video___AD_ID__"></div>`;
+const adsTxtData = `#AdX
 google.com,pub-8933329999391104,RESELLER,f08c47fec0942fa0
 #DMX and OpenX
 openx.com, 539848768, RESELLER 
@@ -211,17 +232,28 @@ aolcloud.net, 9993, RESELLER
 openx.com, 539266264, RESELLER, 6a698e2ec38604c6  
 appnexus.com, 1356, RESELLER, f5ab79cb980f11d1  
 emxdgt.com, 326, RESELLER, 1e1d41537f7cad7f  
-google.com, pub-5995202563537249, RESELLER, f08c47fec0942fa0`,
-	initCode = `<script data-cfasync="false" type="text/javascript">(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/__SITE_ID__/adpushup.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);</script>`,
-	COMPONENT_TITLES = {
-		2: 'Create Ad Unit',
-		3: 'Ads List',
-		4: 'Ads Txt Config',
-		1: 'AdPushup Header Code'
-	};
+google.com, pub-5995202563537249, RESELLER, f08c47fec0942fa0`;
+const initCode = `<script data-cfasync="false" type="text/javascript">(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/__SITE_ID__/adpushup.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);</script>`;
+const COMPONENT_TITLES = {
+	2: 'Create Ad Unit',
+	3: 'Ads List',
+	4: 'Ads Txt Config',
+	1: 'AdPushup Header Code'
+};
+const AD_OPERATIONS = ['APPEND', 'PREPEND', 'INSERTAFTER', 'INSERTBEFORE'];
+
+const TYPE_OF_ADS = {
+	STRUCTURAL: 1,
+	IN_CONTENT: 2,
+	INTERACTIVE_AD: 3,
+	DOCKED_STRUCTURAL: 4,
+	EXTERNAL_TRIGGER_AD: 5,
+	LAZYLOAD_STRUCTURAL: 6
+};
 
 export {
 	PLATFORMS,
+	FORMATS,
 	TYPES,
 	SIZES,
 	adActions,
@@ -234,6 +266,7 @@ export {
 	interactiveAdEvents,
 	adsTxtData,
 	initCode,
-	ampMessage,
-	COMPONENT_TITLES
+	COMPONENT_TITLES,
+	AD_OPERATIONS,
+	TYPE_OF_ADS
 };
