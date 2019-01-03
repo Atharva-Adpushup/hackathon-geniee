@@ -246,7 +246,6 @@
 			}
 		});
 
-		console.log('selectedElems value before excludeElems function: ', selectedElems);
 		selectedElems = excludeElems(selectedElems);
 
 		return this;
@@ -509,9 +508,6 @@ Don't float beside large elements that are already floating.
 
 				started = true;
 				$(placementConfig).each(function(i, adObj) {
-					adObj.selectorsTreeLevel = 5;
-					console.log('Ad section number: ', adObj.section);
-
 					var placeFn = function(adObj) {
 						var isNotNear = !!(adObj.notNear && adObj.notNear.length);
 

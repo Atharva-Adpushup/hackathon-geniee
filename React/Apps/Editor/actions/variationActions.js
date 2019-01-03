@@ -53,6 +53,19 @@ const getLastVariationNumber = function(variations) {
 		variationId,
 		channelId
 	}),
+	updateInContentTreeSelectorsLevel = (variationId, selectorsTreeLevel) => dispatch => {
+		dispatch({
+			type: variationActions.UPDATE_INCONTENT_SELECTORS_TREE_LEVEL,
+			variationId,
+			selectorsTreeLevel
+		});
+		dispatch({
+			type: uiActions.SHOW_NOTIFICATION,
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Variation incontent selectors tree level setting saved'
+		});
+	},
 	copyVariation = (variationId, channelId) => (dispatch, getState) => {
 		const newVariationId = Utils.getRandomNumber(),
 			ads = [],
@@ -209,5 +222,6 @@ export {
 	saveAfterJs,
 	saveKeyValues,
 	updateContentSelector,
+	updateInContentTreeSelectorsLevel,
 	savePersonalizationInfo
 };
