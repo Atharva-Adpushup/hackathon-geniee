@@ -329,19 +329,31 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		ownerEmail: null,
 		siteDomain: null,
 		ads: [],
-		rules: {
-			pagegroups: {},
-			custom: {}
+		meta: {
+			pagegroups: [],
+			custom: [],
+			verticalAds: 0,
+			horizontalAds: 0,
+			otherAds: 0
 		}
+	},
+	defaultMeta: {
+		pagegroups: [],
+		custom: [],
+		verticalAds: 0,
+		horizontalAds: 0,
+		otherAds: 0
+	},
+	INTERACTIVE_ADS_TYPES: {
+		VERTICAL: ['stickyLeft', 'stickyRight', 'docked'],
+		HORIZONTAL: ['stickyTop', 'stickyBottom'],
+		OTHER: ['inView']
 	},
 	interactiveAdsRules: {
 		vertical: {
 			noOfAdsAllowed: 1
 		},
 		horizontal: {
-			noOfAdsAllowed: 1
-		},
-		docked: {
 			noOfAdsAllowed: 1
 		}
 	},

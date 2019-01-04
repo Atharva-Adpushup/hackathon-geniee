@@ -7,6 +7,7 @@ const mapStateToProps = (state, ownProps) => ({
 	currentAd: state.global.currentAd,
 	codeGenerated: !!state.global.currentAd,
 	adId: state.global.currentAd,
+	meta: state.global.meta,
 	...ownProps
 });
 

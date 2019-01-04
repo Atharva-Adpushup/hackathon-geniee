@@ -2,13 +2,11 @@ const express = require('express');
 const Promise = require('bluebird');
 const _ = require('lodash');
 const uuid = require('uuid');
-const moment = require('moment');
 const { couchbaseService } = require('node-utils');
 const request = require('request-promise');
 const config = require('../configs/config');
-const utils = require('../helpers/utils');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { docKeys, interactiveAdsInitialDoc, videoNetworkInfo } = require('../configs/commonConsts');
+const { docKeys, interactiveAdsInitialDoc, defaultMeta } = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
 const siteModel = require('../models/siteModel');
 const router = express.Router();
@@ -60,23 +58,33 @@ const fn = {
 
 		const cas = data.cas || false;
 		const id = uuid.v4();
-		const networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {};
 		const ad = {
 			...payload.ad,
 			id: id,
 			name: `Ad-${id}`,
-			createdOn: +new Date(),
-			formatData: {
-				...payload.ad.formatData,
-				eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
-			},
-			...networkInfo
+			createdOn: +new Date()
 		};
 
 		value.ads.push(ad);
 		value.siteDomain = value.siteDomain || payload.siteDomain;
 		value.siteId = value.siteId || payload.siteId;
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
+
+		if (ad.pagegroups.length) {
+			_.forEach(ad.pagegroups, pagegroup => {
+				value.meta.pagegroups.push(`${ad.formatData.platform}-${ad.format}-${pagegroup}`);
+			});
+		} else {
+			value.meta.custom.push(`${ad.formatData.platform}-${ad.format}`);
+		}
+
+		if (INTERACTIVE_ADS_TYPES.VERTICAL.includes(this.state.format)) {
+			value.meta.verticalAds = 1;
+		} else if (INTERACTIVE_ADS_TYPES.HORIZONTAL.includes(this.state.format)) {
+			value.meta.horizontalAds = 1;
+		} else {
+			value.meta.others = 1;
+		}
 
 		// if (config.environment.HOST_ENV === 'production') {
 		// 	fn.sendDataToZapier({
@@ -164,14 +172,23 @@ router
 		return Promise.join(siteModel.getSiteById(params.siteId), site => {
 			return new Promise((resolve, reject) =>
 				site.get('ownerEmail') === session.user.email ? resolve() : reject('Owner verification failed')
-			).then(() => {
-				let channels = site.get('channels') || [];
-				return res.render('interactiveAdsManager', {
-					siteId: params.siteId,
-					isSuperUser: !!session.isSuperUser,
-					channels: channels
+			)
+				.then(() => appBucket.getDoc(`${docKeys.interactiveAds}${params.siteId}`))
+				.then(docWithCas => docWithCas.value.meta)
+				.catch(err => {
+					return err.name && err.name == 'CouchbaseError' && err.code == 13
+						? defaultMeta
+						: Promise.reject(err);
+				})
+				.then(meta => {
+					let channels = site.get('channels') || [];
+					return res.render('interactiveAdsManager', {
+						siteId: params.siteId,
+						isSuperUser: !!session.isSuperUser,
+						channels: channels,
+						meta
+					});
 				});
-			});
 		}).catch(err => {
 			console.log(err.message);
 			return res.render('404');

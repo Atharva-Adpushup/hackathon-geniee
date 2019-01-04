@@ -2,7 +2,15 @@ import React, { Component } from 'react';
 import { Row, Col, ProgressBar } from 'react-bootstrap';
 import CustomList from './CustomList';
 import { Docked, Default } from './Formats/index';
-import { PLATFORMS, FORMATS, SIZES, displayAdMessage, ampMessage, adCode } from '../../configs/commonConsts';
+import {
+	PLATFORMS,
+	FORMATS,
+	SIZES,
+	displayAdMessage,
+	ampMessage,
+	adCode,
+	INTERACTIVE_ADS_TYPES
+} from '../../configs/commonConsts';
 import { copyToClipBoard } from '../../lib/helpers';
 import { CustomMessage, CustomButton } from '../shared/index';
 import Loader from '../../../../Components/Loader';
@@ -94,7 +102,7 @@ class AdCodeGenerator extends Component {
 		return this.setState({ pagegroups, progress });
 	}
 
-	generateAdData() {
+	generateAdData(data) {
 		const sizesArray = this.state.size.split('x');
 		const width = sizesArray[0];
 		const height = sizesArray[1];
@@ -110,40 +118,49 @@ class AdCodeGenerator extends Component {
 			ad: {
 				width,
 				height,
+				pagegroups: this.state.pagegroups ? this.state.pagegroups : [],
+				network: 'adpTags',
 				networkData: {
-					isResponsive: !!(width === 'responsive')
+					isResponsive: false,
+					headerBidding: false,
+					refreshSlot: false,
+					overrideActive: false,
+					overrideSizeTo: null,
+					logWritten: false,
+					isBackwardCompatibleSizes: true,
+					keyValues: {
+						FP_S_A: 0
+					},
+					multipleAdSizes: []
 				},
 				formatData: {
 					platform: this.state.platform,
 					format: this.state.format,
-
 					type,
 					placement,
-
-					event: null,
-					eventData: {
-						value: null
-					}
+					...data.formatData
 				},
-				type: 3,
+				type: data.type,
 				css: {
 					display: 'block',
 					margin: '10px auto',
-					'text-align': 'center'
+					'text-align': 'center',
+					...data.css
 				},
-				isActive: true
+				blocklist: [],
+				isActive: true,
+				isNewFormat: true
 			}
 		};
 	}
 
-	saveHandler() {
+	saveHandler(data) {
 		this.setState(
 			{
 				progress: 100,
 				loading: true
 			},
-			this.generateAdData
-			// () => this.props.createAd(this.generateAdData)
+			() => this.props.createAd(this.generateAdData(data))
 		);
 	}
 
@@ -222,7 +239,41 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderPagegroups() {
-		return (
+		/*
+			platform - desktop
+			format - stickyLeft
+			pagegroup - ??
+				- home or post
+				Conditions:
+					1. stickyLeft should not be already created
+					2. stickyRight or docked should not be already created
+		*/
+
+		const filteredPagegroupsByPlatform = window.iam.channels.filter(channel => {
+			const re = new RegExp(this.state.platform, 'ig');
+			return channel.match(re);
+		});
+		const pagegroupsToShow = new Set();
+
+		let types;
+
+		if (INTERACTIVE_ADS_TYPES.VERTICAL.includes(this.state.format)) {
+			types = INTERACTIVE_ADS_TYPES.VERTICAL;
+		} else if (INTERACTIVE_ADS_TYPES.HORIZONTAL.includes(this.state.format)) {
+			types = INTERACTIVE_ADS_TYPES.HORIZONTAL;
+		} else {
+			types = INTERACTIVE_ADS_TYPES.OTHER;
+		}
+
+		types.forEach(type => {
+			filteredPagegroupsByPlatform.forEach(pg => {
+				if (!this.props.meta.pagegroups.includes(`${this.state.platform}-${type}-${pg}`)) {
+					pagegroupsToShow.add(pg);
+				}
+			});
+		});
+
+		return pagegroupsToShow && pagegroupsToShow.size ? (
 			<CustomList
 				multiSelect
 				simpleList
@@ -231,9 +282,11 @@ class AdCodeGenerator extends Component {
 				leftSize={3}
 				rightSize={9}
 				toMatch={this.state.pagegroups}
-				options={window.iam.channels}
+				options={[...pagegroupsToShow]}
 				onClick={this.selectPagegroups}
 			/>
+		) : (
+			'Seems like you have reached the limt to create ad for this format. Please delete/modify an existing ad'
 		);
 	}
 

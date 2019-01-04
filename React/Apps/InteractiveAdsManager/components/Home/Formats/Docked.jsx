@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
 import SelectBox from '../../../../../Components/SelectBox';
-import { AD_OPERATIONS } from '../../../configs/commonConsts';
+import { AD_OPERATIONS, TYPE_OF_ADS } from '../../../configs/commonConsts';
+import CodeBox from '../../../../../Components/CodeEditor';
 
 class Docked extends Component {
 	constructor(props) {
@@ -24,21 +25,36 @@ class Docked extends Component {
 		});
 	}
 
+	handleCodeChange(css) {
+		this.setState({ css: window.btoa(css) });
+	}
+
 	operationChange(value) {
 		this.setState({ operation: value });
 	}
 
 	saveHandler(e) {
 		e.preventDefault();
-		const { xpath, bottomXpath, bottomOffset, operation } = this.state;
+		const { xpath, bottomXpath, bottomOffset, operation, css } = this.state;
+		let parsedCSS = {};
 		if (!xpath || !operation) {
 			return alert('Xpath and Ad Operation are mandatory fields');
+		} else if (css && css.trim().length) {
+			try {
+				parsedCSS = JSON.parse(window.btoa(css));
+			} catch (err) {
+				return window.alert('Invalid CSS');
+			}
 		}
 		return this.props.save.handler({
 			xpath,
-			bottomOffset,
-			bottomXpath,
-			operation
+			operation,
+			formatData: {
+				bottomOffset,
+				bottomXpath,
+				css: parsedCSS
+			},
+			type: TYPE_OF_ADS.DOCKED_STRUCTURAL
 		});
 	}
 
@@ -90,9 +106,10 @@ class Docked extends Component {
 				</Col>
 				<Col md={12} style={{ paddingLeft: '0px' }}>
 					<label htmlFor="css">Custom CSS</label>
-					<textarea style={{ width: '100%', minHeight: '200px' }} name="css" onChange={this.handleChange}>
+					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={this.state.css} />
+					{/* <textarea style={{ width: '100%', minHeight: '200px' }} name="css" onChange={this.handleChange}>
 						{this.state.css}
-					</textarea>
+					</textarea> */}
 				</Col>
 				<Col md={12} style={{ paddingRight: '0px' }}>
 					{this.props.save.renderFn(this.props.save.label, this.saveHandler)}

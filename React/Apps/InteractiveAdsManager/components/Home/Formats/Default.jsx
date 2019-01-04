@@ -1,4 +1,9 @@
+/* eslint-disable no-alert */
+/* eslint-disable jsx-a11y/label-has-for */
+/* eslint-disable jsx-a11y/href-no-hash */
 import React, { Component } from 'react';
+import CodeBox from '../../../../../Components/CodeEditor';
+import { TYPE_OF_ADS } from '../../../configs/commonConsts';
 
 class Default extends Component {
 	constructor(props) {
@@ -11,28 +16,37 @@ class Default extends Component {
 	}
 
 	saveHandler() {
-		this.props.save.saveHandler({
-			event: 'scriptLoaded',
-			eventData: {
-				value: this.state.css
+		const { css } = this.state;
+		if (css && css.trim().length) {
+			try {
+				const code = JSON.parse(window.btoa(css));
+				if (!code || !Object.keys(code).length) {
+					throw new Error('Invalid CSS');
+				}
+			} catch (e) {
+				return window.alert('Invalid CSS');
 			}
+		}
+		return this.props.save.handler({
+			formatData: {
+				event: 'scriptLoaded',
+				eventData: {
+					value: this.state.css
+				}
+			},
+			type: TYPE_OF_ADS.INTERACTIVE_AD
 		});
-		console.log('Here');
 	}
 
-	handleChange(e) {
-		this.setState({
-			[e.target.name]: e.target.value
-		});
+	handleChange(css) {
+		this.setState({ css: window.btoa(css) });
 	}
 
 	render() {
 		return (
 			<div>
 				<label htmlFor="css">Custom CSS</label>
-				<textarea style={{ width: '100%', minHeight: '200px' }} onChange={this.handleChange}>
-					{this.state.css}
-				</textarea>
+				<CodeBox name="css" showButtons={false} onChange={this.handleChange} code={this.state.css} />
 				{this.props.save.renderFn(this.props.save.label, this.saveHandler)}
 			</div>
 		);

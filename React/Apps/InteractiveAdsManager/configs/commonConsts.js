@@ -157,7 +157,8 @@ const uiActions = {
 	SET_FETCH_ADS_ERROR: 'SET_FETCH_ADS_ERROR'
 };
 const globalActions = {
-	SET_CURRENT_AD: 'SET_CURRENT_AD'
+	SET_CURRENT_AD: 'SET_CURRENT_AD',
+	SET_META: 'SET_META'
 };
 const displayAdMessage =
 	'You need to copy and paste the above adcode on your site where you wish to show the ad. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>';
@@ -241,7 +242,6 @@ const COMPONENT_TITLES = {
 	1: 'AdPushup Header Code'
 };
 const AD_OPERATIONS = ['APPEND', 'PREPEND', 'INSERTAFTER', 'INSERTBEFORE'];
-
 const TYPE_OF_ADS = {
 	STRUCTURAL: 1,
 	IN_CONTENT: 2,
@@ -249,6 +249,11 @@ const TYPE_OF_ADS = {
 	DOCKED_STRUCTURAL: 4,
 	EXTERNAL_TRIGGER_AD: 5,
 	LAZYLOAD_STRUCTURAL: 6
+};
+const INTERACTIVE_ADS_TYPES = {
+	VERTICAL: ['stickyLeft', 'stickyRight', 'docked'],
+	HORIZONTAL: ['stickyTop', 'stickyBottom'],
+	OTHER: ['inView']
 };
 
 export {
@@ -268,5 +273,6 @@ export {
 	initCode,
 	COMPONENT_TITLES,
 	AD_OPERATIONS,
-	TYPE_OF_ADS
+	TYPE_OF_ADS,
+	INTERACTIVE_ADS_TYPES
 };
