@@ -213,15 +213,15 @@ router
 					: Promise.reject(err);
 			})
 			.spread(fn.dbWrapper)
-			.then(id =>
-				sendSuccessResponse(
+			.then(id => {
+				return sendSuccessResponse(
 					{
 						message: 'Ad created',
 						id: id
 					},
 					res
-				)
-			)
+				);
+			})
 			.catch(err => fn.errorHander(err, res));
 	})
 	.post('/masterSave', (req, res) => {

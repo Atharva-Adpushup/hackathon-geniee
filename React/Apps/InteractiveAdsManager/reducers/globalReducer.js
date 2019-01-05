@@ -8,6 +8,14 @@ const global = (state = { currentAd: null, meta: { ...window.iam.meta } }, actio
 		case globalActions.SET_META:
 			return { ...state, meta: { ...state.meta, ...action.meta } };
 
+		case globalActions.UPDATE_META:
+			return {
+				...state,
+				meta: {
+					...state.meta,
+				}
+			}
+
 		default:
 			return state;
 	}

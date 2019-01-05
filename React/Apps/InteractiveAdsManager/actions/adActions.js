@@ -1,7 +1,7 @@
 import { adActions, globalActions } from '../configs/commonConsts';
 import { ajax } from '../../../common/helpers';
 
-const createAd = params => dispatch =>
+const createAd = params => (dispatch, getState) =>
 	ajax({
 		url: '/interactiveAdsManager/data/createAd',
 		method: 'POST',
@@ -12,6 +12,29 @@ const createAd = params => dispatch =>
 		}
 		dispatch({ type: adActions.UPDATE_ADS_LIST, data: { ...params.ad, id: response.data.id } });
 		dispatch({ type: globalActions.SET_CURRENT_AD, currentAd: response.data.id });
+
+		const { ad } = params;
+		let adsKeys = [];
+		let mode;
+
+		if (ad.pagegroups && ad.pagegroups.length) {
+			adsKeys = ad.pagegroups.map(pg => {
+				if (ad.format) return `${ad.formatData.platform}-${ad.format}-${pg}`;
+			});
+			mode = 'pagegroups';
+		} else {
+			adsKeys = `${ad.formatData.platform}-${ad.format}`;
+			mode = 'custom';
+		}
+
+		dispatch({
+			type: globalActions.UPDATE_META,
+			value: {
+				mode,
+				adsKeys,
+				toIncrement:  
+			}
+		})
 	});
 const fetchAds = params => dispatch =>
 	ajax({
