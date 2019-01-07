@@ -8,13 +8,14 @@ const global = (state = { currentAd: null, meta: { ...window.iam.meta } }, actio
 		case globalActions.SET_META:
 			return { ...state, meta: { ...state.meta, ...action.meta } };
 
-		case globalActions.UPDATE_META:
+		case globalActions.UPDATE_AD_TRACKING_LOGS:
 			return {
 				...state,
 				meta: {
 					...state.meta,
+					[action.value.mode]: [...state.meta[action.value.mode], ...action.value.logs]
 				}
-			}
+			};
 
 		default:
 			return state;

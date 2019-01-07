@@ -19,11 +19,12 @@ class Default extends Component {
 		const { css } = this.state;
 		if (css && css.trim().length) {
 			try {
-				const code = JSON.parse(window.btoa(css));
+				const code = JSON.parse(window.atob(css));
 				if (!code || !Object.keys(code).length) {
 					throw new Error('Invalid CSS');
 				}
 			} catch (e) {
+				console.log(e);
 				return window.alert('Invalid CSS');
 			}
 		}

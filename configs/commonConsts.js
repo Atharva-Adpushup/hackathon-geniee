@@ -331,18 +331,12 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		ads: [],
 		meta: {
 			pagegroups: [],
-			custom: [],
-			verticalAds: 0,
-			horizontalAds: 0,
-			otherAds: 0
+			custom: []
 		}
 	},
 	defaultMeta: {
 		pagegroups: [],
-		custom: [],
-		verticalAds: 0,
-		horizontalAds: 0,
-		otherAds: 0
+		custom: []
 	},
 	INTERACTIVE_ADS_TYPES: {
 		VERTICAL: ['stickyLeft', 'stickyRight', 'docked'],

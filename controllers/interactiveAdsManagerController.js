@@ -6,7 +6,7 @@ const { couchbaseService } = require('node-utils');
 const request = require('request-promise');
 const config = require('../configs/config');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { docKeys, interactiveAdsInitialDoc, defaultMeta } = require('../configs/commonConsts');
+const { docKeys, interactiveAdsInitialDoc, defaultMeta, INTERACTIVE_ADS_TYPES } = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
 const siteModel = require('../models/siteModel');
 const router = express.Router();
@@ -72,19 +72,19 @@ const fn = {
 
 		if (ad.pagegroups.length) {
 			_.forEach(ad.pagegroups, pagegroup => {
-				value.meta.pagegroups.push(`${ad.formatData.platform}-${ad.format}-${pagegroup}`);
+				value.meta.pagegroups.push(`${ad.formatData.platform}-${ad.formatData.format}-${pagegroup}`);
 			});
 		} else {
 			value.meta.custom.push(`${ad.formatData.platform}-${ad.format}`);
 		}
 
-		if (INTERACTIVE_ADS_TYPES.VERTICAL.includes(this.state.format)) {
-			value.meta.verticalAds = 1;
-		} else if (INTERACTIVE_ADS_TYPES.HORIZONTAL.includes(this.state.format)) {
-			value.meta.horizontalAds = 1;
-		} else {
-			value.meta.others = 1;
-		}
+		// if (INTERACTIVE_ADS_TYPES.VERTICAL.includes(this.state.format)) {
+		// 	value.meta.verticalAds = 1;
+		// } else if (INTERACTIVE_ADS_TYPES.HORIZONTAL.includes(this.state.format)) {
+		// 	value.meta.horizontalAds = 1;
+		// } else {
+		// 	value.meta.others = 1;
+		// }
 
 		// if (config.environment.HOST_ENV === 'production') {
 		// 	fn.sendDataToZapier({

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Col } from 'react-bootstrap';
+import { CustomMessage } from '../shared/index';
 
 const CustomList = props => {
 	function renderTabbedHeaders() {
@@ -61,6 +62,9 @@ const CustomList = props => {
 			} else {
 				activeClass = props.toMatch === option ? 'active' : activeClass;
 			}
+			if (props.disabled) {
+				activeClass = props.toDisable.includes(option) ? 'disabled' : activeClass;
+			}
 			return (
 				<li key={key} className={`simpleOption ${activeClass}`} onClick={props.onClick.bind(null, option)}>
 					{option.replace(':', ' - ')}
@@ -70,17 +74,21 @@ const CustomList = props => {
 	}
 
 	function renderList() {
+		const toReturn = [];
 		if (props.simpleList) {
-			return <ul className="options">{renderSimpleList()}</ul>;
+			toReturn.push(<ul className="options">{renderSimpleList()}</ul>);
 		} else if (props.tabbedList) {
-			return (
-				<div>
-					<ul className="options">{renderTabbedHeaders()}</ul>
-					{renderTabbedOptions()}
-				</div>
-			);
+			toReturn.push(<ul className="options">{renderTabbedHeaders()}</ul>);
+			toReturn.push(renderTabbedOptions());
+		} else {
+			toReturn.push(<ul className="options">{renderIconList()}</ul>);
 		}
-		return <ul className="options">{renderIconList()}</ul>;
+
+		if (props.disabled && props.toDisable.length === props.options.length) {
+			toReturn.push(<CustomMessage message={props.message} className="error" header="Limit Reached" />);
+		}
+
+		return <div>{toReturn}</div>;
 	}
 
 	return (

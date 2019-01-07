@@ -473,6 +473,11 @@ body {
       .options-wrapper ul.options li.simpleOption:hover,
       .options-wrapper ul.options li.simpleOption.active {
         border: 2px solid #5d5d5d; }
+      .options-wrapper ul.options li.option.disabled,
+      .options-wrapper ul.options li.simpleOption.disabled {
+        cursor: not-allowed !important;
+        pointer-events: none !important;
+        opacity: 0.5; }
     .options-wrapper ul.options li.option {
       min-width: 200px;
       max-width: 250px;

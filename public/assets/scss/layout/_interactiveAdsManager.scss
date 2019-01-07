@@ -60,6 +60,11 @@ body {
 			&.active {
 				border: 2px solid #5d5d5d;
 			}
+			&.disabled {
+				cursor: not-allowed !important;
+				pointer-events: none !important;
+				opacity: 0.5;
+			}
 		}
 		li.option {
 			min-width: 200px;

@@ -15,6 +15,7 @@ class Docked extends Component {
 			operation: null
 		};
 		this.handleChange = this.handleChange.bind(this);
+		this.handleCodeChange = this.handleCodeChange.bind(this);
 		this.operationChange = this.operationChange.bind(this);
 		this.saveHandler = this.saveHandler.bind(this);
 	}
@@ -41,14 +42,16 @@ class Docked extends Component {
 			return alert('Xpath and Ad Operation are mandatory fields');
 		} else if (css && css.trim().length) {
 			try {
-				parsedCSS = JSON.parse(window.btoa(css));
+				parsedCSS = JSON.parse(window.atob(css));
 			} catch (err) {
 				return window.alert('Invalid CSS');
 			}
 		}
 		return this.props.save.handler({
-			xpath,
-			operation,
+			adData: {
+				xpath,
+				operation
+			},
 			formatData: {
 				bottomOffset,
 				bottomXpath,
@@ -76,7 +79,7 @@ class Docked extends Component {
 					<label htmlFor="adOperation">Ad Operation*</label>
 					<SelectBox value={this.state.operation} label="Ad Operation" onChange={this.operationChange}>
 						{AD_OPERATIONS.map((operation, index) => (
-							<option key={index} value={index}>
+							<option key={index} value={operation}>
 								{operation}
 							</option>
 						))}

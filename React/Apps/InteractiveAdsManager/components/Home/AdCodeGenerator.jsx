@@ -149,7 +149,8 @@ class AdCodeGenerator extends Component {
 				},
 				blocklist: [],
 				isActive: true,
-				isNewFormat: true
+				isNewFormat: true,
+				...data.adData
 			}
 		};
 	}
@@ -254,6 +255,7 @@ class AdCodeGenerator extends Component {
 			return channel.match(re);
 		});
 		const pagegroupsToShow = new Set();
+		const disabled = new Set();
 
 		let types;
 
@@ -265,15 +267,22 @@ class AdCodeGenerator extends Component {
 			types = INTERACTIVE_ADS_TYPES.OTHER;
 		}
 
-		types.forEach(type => {
-			filteredPagegroupsByPlatform.forEach(pg => {
-				if (!this.props.meta.pagegroups.includes(`${this.state.platform}-${type}-${pg}`)) {
-					pagegroupsToShow.add(pg);
+		filteredPagegroupsByPlatform.forEach(pg => {
+			let shouldDisable = true;
+			types.forEach(type => {
+				if (this.props.meta.pagegroups.includes(`${this.state.platform}-${type}-${pg}`)) {
+					shouldDisable = false;
+					return false;
 				}
 			});
+			if (!shouldDisable) {
+				// 	pagegroupsToShow.add(pg);
+				// } else {
+				disabled.add(pg);
+			}
 		});
 
-		return pagegroupsToShow && pagegroupsToShow.size ? (
+		return (
 			<CustomList
 				multiSelect
 				simpleList
@@ -282,11 +291,12 @@ class AdCodeGenerator extends Component {
 				leftSize={3}
 				rightSize={9}
 				toMatch={this.state.pagegroups}
-				options={[...pagegroupsToShow]}
+				options={[...filteredPagegroupsByPlatform]}
 				onClick={this.selectPagegroups}
+				disabled={!!disabled.size}
+				toDisable={[...disabled]}
+				message="Seems like you have reached the limt to create ad for this format. Please delete/modify an existing ad"
 			/>
-		) : (
-			'Seems like you have reached the limt to create ad for this format. Please delete/modify an existing ad'
 		);
 	}
 

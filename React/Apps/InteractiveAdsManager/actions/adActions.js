@@ -1,9 +1,9 @@
-import { adActions, globalActions } from '../configs/commonConsts';
+import { adActions, globalActions, API_PATHS } from '../configs/commonConsts';
 import { ajax } from '../../../common/helpers';
 
 const createAd = params => (dispatch, getState) =>
 	ajax({
-		url: '/interactiveAdsManager/data/createAd',
+		url: API_PATHS.CREATE_AD,
 		method: 'POST',
 		data: JSON.stringify(params)
 	}).then(response => {
@@ -17,28 +17,30 @@ const createAd = params => (dispatch, getState) =>
 		let adsKeys = [];
 		let mode;
 
-		if (ad.pagegroups && ad.pagegroups.length) {
-			adsKeys = ad.pagegroups.map(pg => {
-				if (ad.format) return `${ad.formatData.platform}-${ad.format}-${pg}`;
-			});
-			mode = 'pagegroups';
-		} else {
-			adsKeys = `${ad.formatData.platform}-${ad.format}`;
-			mode = 'custom';
-		}
+		console.log(ad);
 
+		try {
+			if (ad.pagegroups && ad.pagegroups.length) {
+				adsKeys = ad.pagegroups.map(pg => `${ad.formatData.platform}-${ad.formatData.format}-${pg}`);
+				mode = 'pagegroups';
+			} else {
+				adsKeys = `${ad.formatData.platform}-${ad.formatData.format}`;
+				mode = 'custom';
+			}
+		} catch (e) {
+			console.log(e);
+		}
 		dispatch({
-			type: globalActions.UPDATE_META,
+			type: globalActions.UPDATE_AD_TRACKING_LOGS,
 			value: {
 				mode,
-				adsKeys,
-				toIncrement:  
+				logs: adsKeys
 			}
-		})
+		});
 	});
 const fetchAds = params => dispatch =>
 	ajax({
-		url: '/tagManager/fetchAds',
+		url: API_PATHS.FETCH_ADS,
 		method: 'GET',
 		data: params
 	}).then(response => {
@@ -49,7 +51,7 @@ const fetchAds = params => dispatch =>
 	});
 const deleteAd = params => dispatch =>
 	ajax({
-		url: '/tagManager/deleteAd',
+		url: API_PATHS.DELETE_AD,
 		method: 'POST',
 		data: JSON.stringify(params)
 	}).then(response => {
@@ -68,7 +70,7 @@ const updateAd = (adId, data) => dispatch =>
 	});
 const modifyAdOnServer = (adId, data) => dispatch =>
 	ajax({
-		url: '/tagManager/modifyAd',
+		url: API_PATHS.MODIFY_AD,
 		method: 'POST',
 		data: JSON.stringify({ siteId: window.siteId, adId, data })
 	}).then(response => {

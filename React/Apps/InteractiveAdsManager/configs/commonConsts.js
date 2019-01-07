@@ -159,7 +159,8 @@ const uiActions = {
 const globalActions = {
 	SET_CURRENT_AD: 'SET_CURRENT_AD',
 	SET_META: 'SET_META',
-	UPDATE_META: 'UPDATE_META'
+	UPDATE_META: 'UPDATE_META',
+	UPDATE_AD_TRACKING_LOGS: 'UPDATE_AD_TRACKING_LOGS'
 };
 const displayAdMessage =
 	'You need to copy and paste the above adcode on your site where you wish to show the ad. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>';
@@ -256,6 +257,12 @@ const INTERACTIVE_ADS_TYPES = {
 	HORIZONTAL: ['stickyTop', 'stickyBottom'],
 	OTHER: ['inView']
 };
+const API_PATHS = {
+	FETCH_ADS: '/interactiveAdsManager/data/fetchAds',
+	CREATE_AD: '/interactiveAdsManager/data/createAd',
+	DELETE_AD: '/interactiveAdsManager/data/deleteAd',
+	MODIFY_AD: '/interactiveAdsManager/data/modifyAd'
+};
 
 export {
 	PLATFORMS,
@@ -275,5 +282,6 @@ export {
 	COMPONENT_TITLES,
 	AD_OPERATIONS,
 	TYPE_OF_ADS,
-	INTERACTIVE_ADS_TYPES
+	INTERACTIVE_ADS_TYPES,
+	API_PATHS
 };
