@@ -151,6 +151,56 @@ const getLastVariationNumber = function(variations) {
 			payload
 		});
 	},
+	tagcontrolVariation = (variationId, channelId, payload) => (dispatch, getState) => {
+		const allVariations = getChannelVariations(getState(), { channelId }),
+			isControl = !!payload.isControl,
+			controlVariations = _.compact(
+				_.map(allVariations, variationObj => {
+					const isSameVariation = !!(variationId === variationObj.id);
+
+					if (isSameVariation) {
+						return false;
+					}
+
+					return !!variationObj.isControl;
+				})
+			),
+			hasControlVariationsReachedLimit = !!(
+				controlVariations &&
+				controlVariations.length &&
+				payload &&
+				isControl
+			),
+			computedMessage = isControl ? 'tagged as' : 'removed the tag',
+			computedConfirmationMessage = `Are you sure you want to ${
+				isControl ? 'tag this variation as Control?' : 'remove Control tag from this variation'
+			}`,
+			notificationMessage = `Successfully ${computedMessage} Control Variation`;
+
+		if (hasControlVariationsReachedLimit) {
+			dispatch({
+				type: uiActions.SHOW_NOTIFICATION,
+				mode: 'error',
+				title: 'Control Variations Limit',
+				message: 'Cannot create more than 1 control variation!'
+			});
+			return;
+		}
+
+		if (confirm(computedConfirmationMessage)) {
+			dispatch({
+				type: variationActions.TAG_CONTROL_VARIATION,
+				variationId,
+				payload
+			});
+			dispatch({
+				type: uiActions.SHOW_NOTIFICATION,
+				mode: 'success',
+				title: 'Operation Successful',
+				message: notificationMessage
+			});
+		}
+	},
 	editVariationName = (variationId, channelId, name) => (dispatch, getState) => {
 		const variations = getChannelVariations(getState(), { channelId }),
 			arr = _.map(variations, data => {
@@ -215,6 +265,7 @@ export {
 	deleteVariation,
 	updateVariation,
 	disableVariation,
+	tagcontrolVariation,
 	setActiveVariation,
 	editVariationName,
 	editTrafficDistribution,

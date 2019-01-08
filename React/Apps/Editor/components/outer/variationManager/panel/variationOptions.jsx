@@ -8,6 +8,7 @@ import {
 	editVariationName,
 	editTrafficDistribution,
 	disableVariation,
+	tagcontrolVariation,
 	updateInContentTreeSelectorsLevel
 } from 'actions/variationActions.js';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
@@ -23,7 +24,9 @@ const variationOtions = props => {
 			variation,
 			channelId,
 			disabledVariationsCount,
+			controlVariationsCount,
 			onDisableVariation,
+			onTagcontrolVariation,
 			onEditTrafficDistribution,
 			onUpdateContentSelector,
 			onUpdateInContentTreeSelectorsLevel
@@ -34,6 +37,10 @@ const variationOtions = props => {
 			disabledVariationsCount >= 10 &&
 			!variation.disable
 		),
+		// 'isDifferentControlVariation' variable checks whether a different control variation exists in same page group
+		isDifferentControlVariation = !!controlVariationsCount,
+		isControlVariation = variation.isControl || false,
+		shouldDeleteButtonBeDisabled = !!isControlVariation,
 		contentSelector = variation.contentSelector,
 		computedToggleSwitchValue = hasDisabledVariationsReachedLimit ? false : !!variation.disable,
 		incontentSelectorsTreeLevelValue = variation.selectorsTreeLevel || '';
@@ -68,6 +75,8 @@ const variationOtions = props => {
 					<strong>{props.variation.sections.length}</strong>
 				</Col>
 			</Row>
+
+			{/*Incontent content selector UI*/}
 			<Row>
 				<Col className="u-padding-r10px" xs={2}>
 					Content Selector
@@ -83,6 +92,7 @@ const variationOtions = props => {
 				</Col>
 			</Row>
 
+			{/*Incontent children tree level UI*/}
 			{contentSelector ? (
 				<Row className="u-margin-b15px">
 					<Col className="u-padding-r10px" xs={2}>
@@ -122,6 +132,49 @@ const variationOtions = props => {
 				</Row>
 			) : null}
 
+			{/*Control Variation Tag UI*/}
+			{!isDifferentControlVariation ? (
+				<Row>
+					<Col className="u-padding-r10px" xs={2}>
+						Set as Control Variation
+						<OverlayTrigger
+							placement="top"
+							overlay={
+								<Tooltip id="control-variation-tag-info-tooltip">
+									Only one variation can be tagged as <b>Control Variation</b> per page group. The
+									existing tagged variation must be deleted in order to control tag a different
+									variation in same page group.
+								</Tooltip>
+							}
+						>
+							<span className="variation-settings-icon">
+								<i className="fa fa-info" />
+							</span>
+						</OverlayTrigger>
+					</Col>
+					<Col className="u-padding-l10px" xs={4}>
+						<CustomToggleSwitch
+							labelText=""
+							className="mB-10"
+							checked={isControlVariation}
+							disabled={false}
+							onChange={val => {
+								onTagcontrolVariation(variationId, channelId, { isControl: val });
+							}}
+							layout="nolabel"
+							size="m"
+							on="Yes"
+							off="No"
+							defaultLayout={true}
+							name={'controlVariationTag'}
+							id={'js-control-variation-tag-switch'}
+							customComponentClass={'u-padding-0px'}
+						/>
+					</Col>
+				</Row>
+			) : null}
+
+			{/*Disable Variation UI*/}
 			<Row>
 				<Col className="u-padding-r10px" xs={2}>
 					Disable this variation
@@ -167,6 +220,7 @@ const variationOtions = props => {
 					) : null}
 				</Col>
 			</Row>
+
 			<br />
 			<br />
 			<Row>
@@ -184,6 +238,7 @@ const variationOtions = props => {
 						className="btn-lightBg btn-del-line btn-block"
 						onClick={onDeleteVariation.bind(null, variationId, channelId)}
 						type="submit"
+						disabled={shouldDeleteButtonBeDisabled}
 					>
 						Delete Variation
 					</Button>
@@ -197,13 +252,15 @@ variationOtions.propTypes = {
 	variation: PropTypes.object.isRequired,
 	channelId: PropTypes.string.isRequired,
 	disabledVariationsCount: PropTypes.num,
+	controlVariationsCount: PropTypes.num,
 	onCopyVariation: PropTypes.func.isRequired,
 	onDeleteVariation: PropTypes.func.isRequired,
 	onEditVariationName: PropTypes.func.isRequired,
 	onEditTrafficDistribution: PropTypes.func.isRequired,
 	onUpdateInContentTreeSelectorsLevel: PropTypes.func.isRequired,
 	onUpdateContentSelector: PropTypes.func.isRequired,
-	onDisableVariation: PropTypes.func
+	onDisableVariation: PropTypes.func,
+	onTagcontrolVariation: PropTypes.func
 };
 
 export default connect(
@@ -216,6 +273,7 @@ export default connect(
 				onEditVariationName: editVariationName,
 				onEditTrafficDistribution: editTrafficDistribution,
 				onDisableVariation: disableVariation,
+				onTagcontrolVariation: tagcontrolVariation,
 				onUpdateInContentTreeSelectorsLevel: updateInContentTreeSelectorsLevel
 			},
 			dispatch
