@@ -1,19 +1,25 @@
 // SPA handler
 
-function spaHandler(adp) {
-	var url = window.location.href;
+var spaHandlerEnabled = false,
+	spaHandler = function(adp) {
+		if (!spaHandlerEnabled) {
+			spaHandlerEnabled = true;
+			var url = window.location.href;
 
-	function reInitAdp() {
-		requestAnimationFrame(function() {
-			if (url !== window.location.href) {
-				url = window.location.href;
-				adp.init();
+			function reInitAdp() {
+				window.requestAnimationFrame(function() {
+					window.setTimeout(function() {
+						if (url !== window.location.href) {
+							url = window.location.href;
+							adp.init();
+						}
+					}, adp.config.spaPageTransitionTimeout);
+				});
 			}
-		});
-	}
 
-	document.body.addEventListener('click', reInitAdp);
-	window.addEventListener('popstate', reInitAdp);
-}
+			document.body.addEventListener('click', reInitAdp, true);
+			window.addEventListener('popstate', reInitAdp);
+		}
+	};
 
 module.exports = spaHandler;
