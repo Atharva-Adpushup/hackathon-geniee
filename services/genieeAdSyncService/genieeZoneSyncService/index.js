@@ -98,7 +98,8 @@ module.exports = {
 		variationName,
 		channelKey,
 		variationSections,
-		additionalInfo = {}
+		additionalInfo = {},
+		isControl
 	) {
 		// Sample json for geniee zone
 		// {"zoneName":"test zone api0","sizeWidth":300,"sizeHeight":250,"zoneType":1,"zonePosition":0,"firstView":1,"useFriendlyIFrameFlag":0}
@@ -120,7 +121,8 @@ module.exports = {
 						id: sectionId,
 						adId: ad.id,
 						platform: additionalInfo.platform,
-						pageGroup: additionalInfo.pageGroup
+						pageGroup: additionalInfo.pageGroup,
+						isControl
 					});
 				}
 				switch (ad.network) {
@@ -168,13 +170,19 @@ module.exports = {
 					}
 
 					let channelKey = `chnl::${site.get('siteId')}:${channel.platform}:${channel.pageGroup}`;
-					// channelUnsyncedZones = self.getVariationUnsyncedZones(id, varPiation.sections);
 					channelUnsyncedZones = _.concat(
 						channelUnsyncedZones,
-						self.getVariationUnsyncedZones(id, variation.name, channelKey, variation.sections, {
-							platform: channel.platform,
-							pageGroup: channel.pageGroup
-						})
+						self.getVariationUnsyncedZones(
+							id,
+							variation.name,
+							channelKey,
+							variation.sections,
+							{
+								platform: channel.platform,
+								pageGroup: channel.pageGroup
+							},
+							variation.isControl
+						)
 					);
 				});
 				finalZones.push({ channel: channel, unsyncedZones: channelUnsyncedZones });

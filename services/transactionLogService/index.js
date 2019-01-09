@@ -16,7 +16,8 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 				networkData,
 				platform = null,
 				pageGroup = null,
-				variationId = null
+				variationId = null,
+				isControl = false
 			} = ad;
 			let injectionTechnique = null;
 			let networkAdUnitId = null;
@@ -61,6 +62,10 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 						? commonConsts.SETUP_STATUS.ACTIVE
 						: commonConsts.SETUP_STATUS.INACTIVE;
 				}
+			}
+
+			if (isControl) {
+				service = commonConsts.TRANSACTION_SERVICES.CONTROL_TAG;
 			}
 
 			return {
