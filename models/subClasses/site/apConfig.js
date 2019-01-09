@@ -11,7 +11,8 @@ var ApConfig = {
 		'activeDFPParentId',
 		'blocklist',
 		'isAdPushupControlWithPartnerSSP',
-		'isSPA'
+		'isSPA',
+		'spaPageTransitionTimeout'
 	],
 	override: [
 		'mode',
@@ -25,7 +26,8 @@ var ApConfig = {
 		'activeDFPParentId',
 		'blocklist',
 		'isAdPushupControlWithPartnerSSP',
-		'isSPA'
+		'isSPA',
+		'spaPageTransitionTimeout'
 	],
 	merge: []
 };

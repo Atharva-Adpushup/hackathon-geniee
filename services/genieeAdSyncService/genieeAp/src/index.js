@@ -163,6 +163,11 @@ function main() {
 	// Initialise adp config
 	initAdpConfig();
 
+	// Initialise SPA handler
+	if (adp.config.isSPA) {
+		spaHandler(adp);
+	}
+
 	// Initialise adpushup session
 	session.init();
 
@@ -216,11 +221,6 @@ function main() {
 		//Init creation
 		startCreation();
 	}
-}
-
-// Initialise SPA handler
-if (adp.config.isSPA) {
-	spaHandler(adp);
 }
 
 adp.init = main;
