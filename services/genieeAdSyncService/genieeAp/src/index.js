@@ -165,7 +165,7 @@ function main() {
 
 	// Initialise SPA handler
 	if (adp.config.isSPA) {
-		spaHandler(adp);
+		spaHandler(w, adp);
 	}
 
 	// Initialise adpushup session

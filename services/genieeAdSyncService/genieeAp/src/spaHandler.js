@@ -1,16 +1,16 @@
 // SPA handler
 
 var spaHandlerEnabled = false,
-	spaHandler = function(adp) {
+	spaHandler = function(w, adp) {
 		if (!spaHandlerEnabled) {
 			spaHandlerEnabled = true;
-			var url = window.location.href;
+			var url = w.location.href;
 
 			function reInitAdp() {
-				window.requestAnimationFrame(function() {
-					window.setTimeout(function() {
-						if (url !== window.location.href) {
-							url = window.location.href;
+				w.requestAnimationFrame(function() {
+					w.setTimeout(function() {
+						if (url !== w.location.href) {
+							url = w.location.href;
 							adp.init();
 						}
 					}, adp.config.spaPageTransitionTimeout);
@@ -18,7 +18,7 @@ var spaHandlerEnabled = false,
 			}
 
 			document.body.addEventListener('click', reInitAdp, true);
-			window.addEventListener('popstate', reInitAdp);
+			w.addEventListener('popstate', reInitAdp);
 		}
 	};
 
