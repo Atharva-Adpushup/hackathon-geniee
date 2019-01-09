@@ -144,12 +144,46 @@ body {
 	}
 }
 
+.ad-td {
+	.adDetails-icon {
+		visibility: hidden;
+	}
+	&:hover {
+		.adDetails-icon {
+			visibility: visible;
+		}
+	}
+	.action-button {
+		border: 1px solid rgb(0, 0, 0);
+		margin-right: 10px;
+		margin-bottom: 10px;
+		display: inline-block;
+		padding: 5px;
+		color: #000;
+
+		&:hover {
+			color: #fff;
+			font-weight: bold;
+			border-color: #c3272b;
+			background: #c3272b;
+		}
+	}
+}
+
 .bg-transparent {
 	background: transparent !important;
 }
 
 .mr-10 {
 	margin-right: 10px !important;
+}
+
+.mr-5 {
+	margin-right: 5px !important;
+}
+
+.ml-5 {
+	margin-left: 5px !important;
 }
 
 .custom-message {

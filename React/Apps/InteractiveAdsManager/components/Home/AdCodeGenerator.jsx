@@ -1,16 +1,8 @@
 import React, { Component } from 'react';
 import { Row, Col, ProgressBar } from 'react-bootstrap';
 import CustomList from './CustomList';
-import { Docked, Default } from './Formats/index';
-import {
-	PLATFORMS,
-	FORMATS,
-	SIZES,
-	displayAdMessage,
-	ampMessage,
-	adCode,
-	INTERACTIVE_ADS_TYPES
-} from '../../configs/commonConsts';
+import { Docked, Default, InView } from './Formats/index';
+import { PLATFORMS, FORMATS, SIZES, displayAdMessage, INTERACTIVE_ADS_TYPES } from '../../configs/commonConsts';
 import { copyToClipBoard } from '../../lib/helpers';
 import { CustomMessage, CustomButton } from '../shared/index';
 import Loader from '../../../../Components/Loader';
@@ -150,6 +142,7 @@ class AdCodeGenerator extends Component {
 				blocklist: [],
 				isActive: true,
 				isNewFormat: true,
+				name: `Ad-${this.state.platform}-${this.state.format}-${this.state.width}x${this.state.height}`,
 				...data.adData
 			}
 		};
@@ -310,7 +303,7 @@ class AdCodeGenerator extends Component {
 			// case 'stickyTop':
 			// 	return <StickyTop />;
 			case 'inView':
-				return null;
+				return <InView save={save} />;
 			case 'docked':
 				return <Docked save={save} />;
 			default:
@@ -332,16 +325,14 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderGeneratedAdcode() {
-		const showAdCode = this.state.type !== 'amp';
-		const message = showAdCode ? displayAdMessage : ampMessage;
-		const code = showAdCode ? adCode.replace(/__AD_ID__/g, this.props.adId).trim() : null;
-
 		return (
 			<Col xs={12}>
-				{showAdCode ? <pre>{code}</pre> : null}
-				<CustomMessage header="Information" type="info" message={message} />
+				<CustomMessage
+					header="Ad Creation Successful. Please ensure the following"
+					type="info"
+					message={displayAdMessage}
+				/>
 				<CustomButton label="Create More Ads" handler={this.resetHandler} />
-				{showAdCode ? <CustomButton label="Copy Adcode" handler={copyToClipBoard(code)} /> : null}
 			</Col>
 		);
 	}

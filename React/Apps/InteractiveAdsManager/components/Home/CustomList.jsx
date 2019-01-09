@@ -7,7 +7,7 @@ const CustomList = props => {
 		return Object.keys(props.tabbedList.list)
 			.map((item, key) => {
 				const toMatch = props.tabbedList.list[item].key;
-				return props.tabbedList.allowed.indexOf(props.tabbedList.list[item].key) != -1 ? (
+				return props.tabbedList.allowed.indexOf(props.tabbedList.list[item].key) !== -1 ? (
 					<li
 						key={`${key}-${toMatch}`}
 						className={`simpleOption ${props.platform == toMatch ? 'active' : ''}`}
@@ -45,7 +45,7 @@ const CustomList = props => {
 				className={`option ${props.toMatch == option.key ? 'active' : ''}`}
 				onClick={props.onClick.bind(null, option.key)}
 			>
-				<img src={option.image} />
+				<img src={option.image} alt={option.key} />
 				<div className="information">
 					<p className="header">{option.name}</p>
 					{option.description ? <p className="description">{option.description}</p> : null}
@@ -76,16 +76,28 @@ const CustomList = props => {
 	function renderList() {
 		const toReturn = [];
 		if (props.simpleList) {
-			toReturn.push(<ul className="options">{renderSimpleList()}</ul>);
+			toReturn.push(
+				<ul className="options" key={1}>
+					{renderSimpleList()}
+				</ul>
+			);
 		} else if (props.tabbedList) {
-			toReturn.push(<ul className="options">{renderTabbedHeaders()}</ul>);
+			toReturn.push(
+				<ul className="options" key={1}>
+					{renderTabbedHeaders()}
+				</ul>
+			);
 			toReturn.push(renderTabbedOptions());
 		} else {
-			toReturn.push(<ul className="options">{renderIconList()}</ul>);
+			toReturn.push(
+				<ul className="options" key={1}>
+					{renderIconList()}
+				</ul>
+			);
 		}
 
 		if (props.disabled && props.toDisable.length === props.options.length) {
-			toReturn.push(<CustomMessage message={props.message} className="error" header="Limit Reached" />);
+			toReturn.push(<CustomMessage message={props.message} className="error" header="Limit Reached" key={2} />);
 		}
 
 		return <div>{toReturn}</div>;

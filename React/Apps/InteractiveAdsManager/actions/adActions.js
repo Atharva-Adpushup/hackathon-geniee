@@ -17,8 +17,6 @@ const createAd = params => (dispatch, getState) =>
 		let adsKeys = [];
 		let mode;
 
-		console.log(ad);
-
 		try {
 			if (ad.pagegroups && ad.pagegroups.length) {
 				adsKeys = ad.pagegroups.map(pg => `${ad.formatData.platform}-${ad.formatData.format}-${pg}`);

@@ -533,11 +533,36 @@ body {
       tab-size: 4;
       white-space: pre-wrap; }
 
+.ad-td .adDetails-icon {
+  visibility: hidden; }
+
+.ad-td:hover .adDetails-icon {
+  visibility: visible; }
+
+.ad-td .action-button {
+  border: 1px solid black;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  display: inline-block;
+  padding: 5px;
+  color: #000; }
+  .ad-td .action-button:hover {
+    color: #fff;
+    font-weight: bold;
+    border-color: #c3272b;
+    background: #c3272b; }
+
 .bg-transparent {
   background: transparent !important; }
 
 .mr-10 {
   margin-right: 10px !important; }
+
+.mr-5 {
+  margin-right: 5px !important; }
+
+.ml-5 {
+  margin-left: 5px !important; }
 
 .custom-message {
   padding: 10px;

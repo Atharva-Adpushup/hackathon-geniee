@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
-import { CustomButton } from './index.jsx';
+import { CustomButton } from './index';
 
 class Edit extends Component {
 	constructor(props) {

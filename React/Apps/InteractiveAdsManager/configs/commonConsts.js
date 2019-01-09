@@ -162,8 +162,12 @@ const globalActions = {
 	UPDATE_META: 'UPDATE_META',
 	UPDATE_AD_TRACKING_LOGS: 'UPDATE_AD_TRACKING_LOGS'
 };
-const displayAdMessage =
-	'You need to copy and paste the above adcode on your site where you wish to show the ad. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>';
+const displayAdMessage = `<ol style="font-size: 15px;">
+	<li style="margin-bottom: 10px;">AdPushup head code needs to be inserted in the global head of your website.</li>
+	<li style="margin-bottom: 10px;">Ads.txt  is mandatory. It needs to be updated incase you already have one. Else please follow the instructions provided here: https://support.google.com/admanager/answer/7441288?hl=en. AdPushup's ads.txt should be appended alongside your existing partners.</li>
+	<li style="margin-bottom: 10px; color: red; font-weight: bold; color: #eb575c">Please wait for 24-48 working hours for our operations team to review and approve the website. You'll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com<li>
+</ol>
+`;
 const interactiveAdMessage =
 	'Ad has been created. AdPushup will automatically insert ad on your site on the runtime. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>';
 const adCode = `<div id="__AD_ID__" class="_ap_apex_ad">
@@ -263,6 +267,23 @@ const API_PATHS = {
 	DELETE_AD: '/interactiveAdsManager/data/deleteAd',
 	MODIFY_AD: '/interactiveAdsManager/data/modifyAd'
 };
+const USER_AD_LIST_HEADERS = ['Id', 'Name', 'Platform', 'Format', 'Size', 'Traffic', 'Status', 'Actions'];
+const OPS_AD_LIST_HEADERS = ['Id', 'Name', 'Platform', 'Format', 'Size', 'Network', 'Traffic', 'Status', 'Actions'];
+const USER_AD_LIST_ACTIONS = [{ displayText: 'Archive', key: 'archive' }];
+const OPS_AD_LIST_ACTIONS = [
+	{ displayText: 'Edit Network Options', key: 'networkEdit' },
+	{ displayText: 'Archive', key: 'archive' }
+];
+const AD_LIST_ACTIONS = {
+	copy: {
+		tooltipText: 'Copy',
+		iconClass: 'btn-icn-copy'
+	},
+	edit: {
+		tooltipText: 'Edit',
+		iconClass: 'btn-icn-edit'
+	}
+};
 
 export {
 	PLATFORMS,
@@ -283,5 +304,10 @@ export {
 	AD_OPERATIONS,
 	TYPE_OF_ADS,
 	INTERACTIVE_ADS_TYPES,
-	API_PATHS
+	API_PATHS,
+	USER_AD_LIST_HEADERS,
+	OPS_AD_LIST_HEADERS,
+	USER_AD_LIST_ACTIONS,
+	OPS_AD_LIST_ACTIONS,
+	AD_LIST_ACTIONS
 };

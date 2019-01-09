@@ -1,9 +1,17 @@
 import React, { Component } from 'react';
-import NetworkOptions from '../../../../Editor/components/shared/networkOptions/NetworkOptions.jsx';
+import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch';
 
 class AdNetworkDetails extends Component {
 	constructor(props) {
 		super(props);
+
+		const hasAd = this.props.ad;
+		const hasNetworkData = hasAd && this.props.ad.network && this.props.ad.networkData;
+
+		this.state = {
+			headerBidding: hasNetworkData ? this.props.ad.networkData.headerBidding : false,
+			refreshSlot: hasNetworkData ? this.props.ad.networkData.refreshSlot : false
+		};
 		this.submitHanlder = this.submitHanlder.bind(this);
 	}
 
@@ -31,17 +39,24 @@ class AdNetworkDetails extends Component {
 	}
 
 	render() {
-		const { ad, onSubmit, onCancel } = this.props;
+		const { ad, onCancel } = this.props;
 
 		return (
-			<NetworkOptions
-				onSubmit={this.submitHanlder}
-				onCancel={onCancel}
-				ad={ad}
-				buttonType={2}
-				fromPanel={false}
-				id={ad.id}
-				showNotification={() => {}}
+			<CustomToggleSwitch
+				labelText="Header Bidding"
+				className="mB-10"
+				checked={this.state.headerBidding}
+				onChange={val => {
+					this.setState({ headerBidding: !!val });
+				}}
+				layout="horizontal"
+				size="m"
+				on="Yes"
+				off="No"
+				defaultLayout={false}
+				name={`headerBidding-${ad.id}`}
+				id={`js-header-bidding-switch-${ad.id}`}
+				customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
 			/>
 		);
 	}

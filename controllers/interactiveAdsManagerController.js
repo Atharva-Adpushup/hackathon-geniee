@@ -61,7 +61,6 @@ const fn = {
 		const ad = {
 			...payload.ad,
 			id: id,
-			name: `Ad-${id}`,
 			createdOn: +new Date()
 		};
 
