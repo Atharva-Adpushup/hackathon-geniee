@@ -7,7 +7,9 @@ import {
 	getChannelVariationsWithAds,
 	getVariationSectionsWithAds
 } from 'selectors/variationSelectors';
+import { getSectionWithAds } from 'selectors/sectionSelectors';
 import { uiActions } from '../consts/commonConsts';
+import { updateLogWritten } from './adActions';
 
 const getLastVariationNumber = function(variations) {
 		const names = variations.map(({ name }) => {
@@ -152,13 +154,16 @@ const getLastVariationNumber = function(variations) {
 		});
 	},
 	tagcontrolVariation = (variationId, channelId, payload) => (dispatch, getState) => {
-		const allVariations = getChannelVariations(getState(), { channelId }),
+		let currentVariationObj = null;
+		const state = getState(),
+			allVariations = getChannelVariations(state, { channelId }),
 			isControl = !!payload.isControl,
 			controlVariations = _.compact(
 				_.map(allVariations, variationObj => {
 					const isSameVariation = !!(variationId === variationObj.id);
 
 					if (isSameVariation) {
+						currentVariationObj = variationObj;
 						return false;
 					}
 
@@ -175,7 +180,8 @@ const getLastVariationNumber = function(variations) {
 			computedConfirmationMessage = `Are you sure you want to ${
 				isControl ? 'tag this variation as Control?' : 'remove Control tag from this variation'
 			}`,
-			notificationMessage = `Successfully ${computedMessage} Control Variation`;
+			notificationMessage = `Successfully ${computedMessage} Control Variation`,
+			isCurrentVariationSections = !!(currentVariationObj.sections && currentVariationObj.sections.length);
 
 		if (hasControlVariationsReachedLimit) {
 			dispatch({
@@ -199,6 +205,17 @@ const getLastVariationNumber = function(variations) {
 				title: 'Operation Successful',
 				message: notificationMessage
 			});
+
+			if (isCurrentVariationSections) {
+				currentVariationObj.sections.forEach(id => {
+					const sectionObj = getSectionWithAds(state, { sectionId: id }),
+						adId = sectionObj.ads[0].id;
+
+					// Negative control value is set for all ads 'logWritten' value
+					// as this property value should be 'false' when control is 'true' as vice-versa.
+					dispatch(updateLogWritten(adId, !isControl));
+				});
+			}
 		}
 	},
 	editVariationName = (variationId, channelId, name) => (dispatch, getState) => {
