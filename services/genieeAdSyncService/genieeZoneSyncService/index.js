@@ -122,7 +122,8 @@ module.exports = {
 						adId: ad.id,
 						platform: additionalInfo.platform,
 						pageGroup: additionalInfo.pageGroup,
-						isControl
+						isControl,
+						sectionName: section.name
 					});
 				}
 				switch (ad.network) {

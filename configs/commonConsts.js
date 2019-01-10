@@ -316,7 +316,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	dummy: 'test',
 	docKeys: {
-		tagManager: 'tgmr::'
+		tagManager: 'tgmr::',
+		user: 'user::'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,
