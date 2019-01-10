@@ -71,6 +71,7 @@ module.exports = {
 						sizeWidth: isResponsive ? 'responsive' : parseInt(ad.width, 10),
 						sizeHeight: isResponsive ? 'responsive' : parseInt(ad.height, 10),
 						sectionId: section.id,
+						sectionName: section.name,
 						type: section.formatData && section.formatData.type ? section.formatData.type : false,
 						isManual: ad.isManual || false,
 						isNative: isNative,
