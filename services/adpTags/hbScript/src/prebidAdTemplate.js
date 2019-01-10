@@ -27,6 +27,7 @@ var prebidAdTemplate =
 	'}, PREBID_TIMEOUT);' +
 	'pbjs.que.push(function(){' +
 	'pbjs.setConfig({' +
+	'publisherDomain: parent.adpushup.config.siteDomain,' +
 	'bidderSequence: "random",' +
 	'priceGranularity: "dense"' +
 	'__SIZE_CONFIG__' +
