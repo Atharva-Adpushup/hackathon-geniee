@@ -14,14 +14,16 @@ const appBucket = couchbaseService(
 );
 
 function generateSiteChannelJSON(channelAndZones, siteModelItem) {
+	const userEmail = siteModelItem.get('ownerEmail');
 	let unsyncedGenieeZones = [];
 	let unsyncedGenieeDFPCreationZones = [];
 	let adpTagsUnsyncedZones = {
 		siteId: siteModelItem.get('siteId'),
 		siteDomain: siteModelItem.get('siteDomain'),
+		publisherEmailAddress: userEmail,
+		publisherName: '',
 		ads: []
 	};
-	const userEmail = siteModelItem.get('ownerEmail');
 	let logsUnsyncedZones = {
 		siteId: siteModelItem.get('siteId'),
 		siteDomain: siteModelItem.get('siteDomain'),
@@ -93,6 +95,8 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 		const userData = docWithCas.value;
 
 		logsUnsyncedZones.publisherName = `${userData.firstName} ${userData.lastName}`;
+		adpTagsUnsyncedZones.publisherName = `${userData.firstName} ${userData.lastName}`;
+
 		return Promise.map(channelAndZones, doIt).then(() => {
 			return {
 				geniee: unsyncedGenieeZones,
