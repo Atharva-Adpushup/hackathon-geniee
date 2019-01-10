@@ -7,10 +7,13 @@ import {
 	copyVariation,
 	editVariationName,
 	editTrafficDistribution,
-	disableVariation
+	disableVariation,
+	updateInContentTreeSelectorsLevel
 } from 'actions/variationActions.js';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 import CustomToggleSwitch from '../../../shared/customToggleSwitch.jsx';
+import SelectBox from '../../../shared/select/select';
+import { incontentSections } from '../../../../consts/commonConsts';
 
 const variationOtions = props => {
 	const {
@@ -22,7 +25,8 @@ const variationOtions = props => {
 			disabledVariationsCount,
 			onDisableVariation,
 			onEditTrafficDistribution,
-			onUpdateContentSelector
+			onUpdateContentSelector,
+			onUpdateInContentTreeSelectorsLevel
 		} = props,
 		variationId = variation.id,
 		hasDisabledVariationsReachedLimit = !!(
@@ -30,7 +34,9 @@ const variationOtions = props => {
 			disabledVariationsCount >= 10 &&
 			!variation.disable
 		),
-		computedToggleSwitchValue = hasDisabledVariationsReachedLimit ? false : !!variation.disable;
+		contentSelector = variation.contentSelector,
+		computedToggleSwitchValue = hasDisabledVariationsReachedLimit ? false : !!variation.disable,
+		incontentSelectorsTreeLevelValue = variation.selectorsTreeLevel || '';
 
 	function copyVariationConfirmation(fn, variationId, channelId) {
 		let confirm = window.confirm('Are you sure you want to copy this variation?');
@@ -76,6 +82,46 @@ const variationOtions = props => {
 					/>
 				</Col>
 			</Row>
+
+			{contentSelector ? (
+				<Row className="u-margin-b15px">
+					<Col className="u-padding-r10px" xs={2}>
+						Children Tree Level
+						<OverlayTrigger
+							placement="top"
+							overlay={
+								<Tooltip id="incontent-children-tree-level-info-tooltip">
+									Select the children (selectors) tree level number upto which Incontent Sections
+									library will choose valid HTML selectors to place sections/ads. This is a variation
+									level setting that will be applicable on all sections.
+								</Tooltip>
+							}
+						>
+							<span className="variation-settings-icon">
+								<i className="fa fa-info" />
+							</span>
+						</OverlayTrigger>
+					</Col>
+					<Col className="u-padding-l10px" xs={2}>
+						<SelectBox
+							value={incontentSelectorsTreeLevelValue}
+							label="Select a value"
+							onChange={selectorsTreeLevel => {
+								selectorsTreeLevel = selectorsTreeLevel || '';
+								console.log(`Incontent selectors tree level value: ${selectorsTreeLevel}`);
+								onUpdateInContentTreeSelectorsLevel(variationId, selectorsTreeLevel);
+							}}
+						>
+							{incontentSections.SELECTORS_TREE_LEVEL.map((item, index) => (
+								<option key={index} value={item}>
+									{item}
+								</option>
+							))}
+						</SelectBox>
+					</Col>
+				</Row>
+			) : null}
+
 			<Row>
 				<Col className="u-padding-r10px" xs={2}>
 					Disable this variation
@@ -155,6 +201,7 @@ variationOtions.propTypes = {
 	onDeleteVariation: PropTypes.func.isRequired,
 	onEditVariationName: PropTypes.func.isRequired,
 	onEditTrafficDistribution: PropTypes.func.isRequired,
+	onUpdateInContentTreeSelectorsLevel: PropTypes.func.isRequired,
 	onUpdateContentSelector: PropTypes.func.isRequired,
 	onDisableVariation: PropTypes.func
 };
@@ -168,7 +215,8 @@ export default connect(
 				onDeleteVariation: deleteVariation,
 				onEditVariationName: editVariationName,
 				onEditTrafficDistribution: editTrafficDistribution,
-				onDisableVariation: disableVariation
+				onDisableVariation: disableVariation,
+				onUpdateInContentTreeSelectorsLevel: updateInContentTreeSelectorsLevel
 			},
 			dispatch
 		)

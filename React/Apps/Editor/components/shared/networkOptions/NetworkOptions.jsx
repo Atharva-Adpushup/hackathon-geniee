@@ -164,6 +164,7 @@ class NetworkOptions extends Component {
 					<Adsense
 						code={code}
 						submitHandler={this.submitHandler}
+						id={props.id ? props.id : false}
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						showNotification={this.props.showNotification}
@@ -175,6 +176,7 @@ class NetworkOptions extends Component {
 					<AdX
 						code={code}
 						submitHandler={this.submitHandler}
+						id={props.id ? props.id : false}
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						showNotification={this.props.showNotification}
@@ -210,6 +212,7 @@ class NetworkOptions extends Component {
 					<MediaNet
 						code={code}
 						submitHandler={this.submitHandler}
+						id={props.id ? props.id : false}
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						showNotification={this.props.showNotification}
@@ -222,6 +225,7 @@ class NetworkOptions extends Component {
 					<OtherNetworks
 						code={code}
 						submitHandler={this.submitHandler}
+						id={props.id ? props.id : false}
 						onCancel={this.props.onCancel}
 						showNotification={this.props.showNotification}
 					/>

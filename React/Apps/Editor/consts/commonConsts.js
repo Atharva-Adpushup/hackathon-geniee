@@ -186,6 +186,7 @@ const status = {
 		OPEN_VARIATION_PANEL: 'OPEN_VARIATION_PANEL',
 		CLOSE_VARIATION_PANEL: 'CLOSE_VARIATION_PANEL',
 		UPDATE_CONTENT_SELECTOR: 'UPDATE_CONTENT_SELECTOR',
+		UPDATE_INCONTENT_SELECTORS_TREE_LEVEL: 'UPDATE_INCONTENT_SELECTORS_TREE_LEVEL',
 		SAVE_KEY_VALUES: 'SAVE_KEY_VALUES',
 		SAVE_PERSONALIZATION_INFO: 'SAVE_PERSONALIZATION_INFO',
 		DISABLE_VARIATION: 'DISABLE_VARIATION'
@@ -489,6 +490,9 @@ const status = {
 				[970, 250]
 			]
 		}
+	},
+	incontentSections = {
+		SELECTORS_TREE_LEVEL: ['any', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 	};
 
 export {
@@ -534,5 +538,6 @@ export {
 	interactiveAds,
 	personalizationTypes,
 	typeOfAds,
-	iabSizes
+	iabSizes,
+	incontentSections
 };

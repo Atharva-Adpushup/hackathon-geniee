@@ -2,6 +2,7 @@
 
 $(document).ready(function() {
 	(function(w, d) {
+		var isAutoOptimiseChanged = false;
 		// Settings module object
 		var settingsModule = {
 			// Settings templates
@@ -128,7 +129,8 @@ $(document).ready(function() {
 							activeDFPParentId: activeDFPParentId,
 							gdprCompliance: gdprCompliance,
 							cookieControlConfig: cookieControlConfig,
-							blocklist: JSON.stringify(w.blocklist)
+							blocklist: JSON.stringify(w.blocklist),
+							isAutoOptimiseChanged: isAutoOptimiseChanged
 						},
 						function(res) {
 							if (res.success) {
@@ -380,6 +382,7 @@ $(document).ready(function() {
 		// Auto optimise check trigger
 		var autoOptimise;
 		$('#autoOptimise').on('change', function() {
+			isAutoOptimiseChanged = true;
 			autoOptimise = $(this).prop('checked');
 			!autoOptimise
 				? $('#autoOptimiseErr').html(

@@ -67,7 +67,10 @@ router
 					response = _.map(channels, channel => {
 						return {
 							name: channel.channelName,
-							autoOptimise: channel.hasOwnProperty('autoOptimise') ? channel.autoOptimise : false
+							autoOptimise:
+								channel.hasOwnProperty('autoOptimise') && channel.autoOptimise != undefined
+									? channel.autoOptimise
+									: 'N/A'
 						};
 					});
 				}
@@ -289,7 +292,9 @@ router
 			.then(() => siteModel.saveSiteSettings(json))
 			.then(() => siteModel.getSiteChannels(req.params.siteId))
 			.then(channels =>
-				updateChannelsAutoptimize(channels, json.settings.autoOptimise === 'false' ? false : true)
+				json.settings.isAutoOptimiseChanged == 'true'
+					? updateChannelsAutoptimize(channels, json.settings.autoOptimise === 'false' ? false : true)
+					: true
 			)
 			.then(() => res.send({ success: 1 }))
 			.catch(function(err) {

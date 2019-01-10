@@ -15,7 +15,8 @@ const variation = (state = {}, action) => {
 					status: config.status,
 					sections: config.sections,
 					expanded: false,
-					contentSelector: config.contentSelector || ''
+					contentSelector: config.contentSelector || '',
+					selectorsTreeLevel: config.selectorsTreeLevel || ''
 				};
 
 			default:
@@ -118,6 +119,15 @@ const variation = (state = {}, action) => {
 					[action.variationId]: {
 						...state[action.variationId],
 						trafficDistribution: parseInt(action.trafficDistribution, 10)
+					}
+				};
+
+			case variationActions.UPDATE_INCONTENT_SELECTORS_TREE_LEVEL:
+				return {
+					...state,
+					[action.variationId]: {
+						...state[action.variationId],
+						selectorsTreeLevel: action.selectorsTreeLevel
 					}
 				};
 

@@ -53,6 +53,19 @@ const getLastVariationNumber = function(variations) {
 		variationId,
 		channelId
 	}),
+	updateInContentTreeSelectorsLevel = (variationId, selectorsTreeLevel) => dispatch => {
+		dispatch({
+			type: variationActions.UPDATE_INCONTENT_SELECTORS_TREE_LEVEL,
+			variationId,
+			selectorsTreeLevel
+		});
+		dispatch({
+			type: uiActions.SHOW_NOTIFICATION,
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Variation incontent selectors tree level setting saved'
+		});
+	},
 	copyVariation = (variationId, channelId) => (dispatch, getState) => {
 		const newVariationId = Utils.getRandomNumber(),
 			ads = [],
@@ -154,11 +167,19 @@ const getLastVariationNumber = function(variations) {
 		}
 		dispatch({ type: variationActions.EDIT_VARIATION_NAME, variationId, name });
 	},
-	editTrafficDistribution = (variationId, trafficDistribution) => ({
-		type: variationActions.EDIT_TRAFFIC_DISTRIBUTION,
-		variationId,
-		trafficDistribution
-	}),
+	editTrafficDistribution = (variationId, trafficDistribution) => (dispatch, getState) => {
+		dispatch({
+			type: variationActions.EDIT_TRAFFIC_DISTRIBUTION,
+			variationId,
+			trafficDistribution
+		});
+		dispatch({
+			type: uiActions.SHOW_NOTIFICATION,
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Variation traffic distribution saved'
+		});
+	},
 	saveBeforeJs = (variation, beforeJs) => (dispatch, getState) => {
 		dispatch({ type: variationActions.SAVE_BEFORE_JS, variation, beforeJs });
 		dispatch({
@@ -201,5 +222,6 @@ export {
 	saveAfterJs,
 	saveKeyValues,
 	updateContentSelector,
+	updateInContentTreeSelectorsLevel,
 	savePersonalizationInfo
 };

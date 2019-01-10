@@ -171,6 +171,9 @@ function main() {
 	// Initialise adpushup session
 	session.init();
 
+	//Initialise refresh slots
+	refreshAdSlot.init(w);
+
 	//Geniee ad network specific site check
 	isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
 	adp.config.isGeniee = isGenieeSite;
