@@ -20,6 +20,7 @@ const express = require('express'),
 	);
 
 const fn = {
+	isSuperUser: false,
 	sendDataToZapier: data => {
 		let options = {
 			method: 'GET',
@@ -34,16 +35,6 @@ const fn = {
 		return request(options)
 			.then(response => console.log('Ad Creation. Called made to Zapier'))
 			.catch(err => console.log('Ad creation call to Zapier failed'));
-	},
-	createNewDocAndDoProcessing: payload => {
-		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
-		return appBucket
-			.createDoc(`${docKeys.tagManager}${payload.siteId}`, tagManagerDefault, {})
-			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
-			.then(docWithCas => {
-				payload.siteDomain = docWithCas.value.siteDomain;
-				return fn.processing(tagManagerDefault, payload);
-			});
 	},
 	createNewDocAndDoProcessing: payload => {
 		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
@@ -77,7 +68,7 @@ const fn = {
 		value.siteId = value.siteId || payload.siteId;
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
 
-		if (config.environment.HOST_ENV === 'production') {
+		if (config.environment.HOST_ENV === 'production' && !fn.isSuperUser) {
 			fn.sendDataToZapier({
 				email: value.ownerEmail,
 				website: value.siteDomain,
@@ -184,6 +175,9 @@ router
 				res
 			);
 		}
+
+		fn.isSuperUser = req.session.isSuperUser;
+
 		let payload = { ad: req.body.ad, siteId: req.body.siteId, ownerEmail: req.session.user.email };
 		return appBucket
 			.getDoc(`${docKeys.tagManager}${req.body.siteId}`)

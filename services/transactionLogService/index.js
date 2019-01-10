@@ -5,7 +5,7 @@ const utils = require('../../helpers/utils');
 const { updateDb } = require('./dbHelper');
 const syncCdn = require('../genieeAdSyncService/cdnSyncService/index');
 
-function createTransactionLog({ siteId, siteDomain, ads }) {
+function createTransactionLog({ siteId, siteDomain, ads, publisherName, publisherEmailAddress }) {
 	let layoutAds = [];
 	let apTagAds = [];
 	const getTransactionLogData = ad => {
@@ -16,7 +16,10 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 				networkData,
 				platform = null,
 				pageGroup = null,
-				variationId = null
+				variationId = null,
+				isControl = false,
+				sectionName = '',
+				variationName = ''
 			} = ad;
 			let injectionTechnique = null;
 			let networkAdUnitId = null;
@@ -63,6 +66,10 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 				}
 			}
 
+			if (isControl) {
+				service = commonConsts.TRANSACTION_SERVICES.CONTROL_TAG;
+			}
+
 			return {
 				platform,
 				pageGroup,
@@ -70,7 +77,11 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 				networkAdUnitId,
 				service,
 				status,
-				injectionTechnique
+				injectionTechnique,
+				publisherName,
+				publisherEmailAddress,
+				sectionName,
+				variationName
 			};
 		},
 		getSetupLogs = () => {
@@ -90,7 +101,11 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 					networkAdUnitId,
 					service,
 					status,
-					injectionTechnique
+					injectionTechnique,
+					publisherName,
+					publisherEmailAddress,
+					sectionName,
+					variationName
 				} = getTransactionLogData(ad);
 
 				injectionTechnique === commonConsts.INJECTION_TECHNIQUES.LAYOUT
@@ -109,7 +124,11 @@ function createTransactionLog({ siteId, siteDomain, ads }) {
 					networkAdUnitId,
 					injectionTechnique,
 					service,
-					status
+					status,
+					publisherName,
+					publisherEmailAddress,
+					sectionName,
+					variationName
 				});
 			}
 

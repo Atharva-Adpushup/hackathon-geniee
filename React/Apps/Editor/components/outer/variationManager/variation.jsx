@@ -12,6 +12,16 @@ const Variation = ({ variation, toggleVariationPanel, onClick, active }) => {
 	return (
 		<div onClick={active ? toggleVariationPanel : onClick.bind(null, variation.id)} className={rootClassName}>
 			{variation.name}
+			{variation.isControl ? (
+				<OverlayTrigger
+					placement="top"
+					overlay={<Tooltip id="control-variation-tooltip">This variation is Control Variation</Tooltip>}
+				>
+					<span className="variation-settings-icon">
+						<i className="text-bold">C</i>
+					</span>
+				</OverlayTrigger>
+			) : null}
 			{variation.disable ? (
 				<OverlayTrigger
 					placement="top"
