@@ -1,22 +1,14 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
-import SelectBox from '../../../../../Components/SelectBox';
-import { AD_OPERATIONS, TYPE_OF_ADS } from '../../../configs/commonConsts';
-import CodeBox from '../../../../../Components/CodeEditor';
+import { TYPE_OF_ADS } from '../../../configs/commonConsts';
 
 class InView extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			xpath: '',
-			bottomXpath: '',
-			bottomOffset: '',
-			css: '',
-			operation: null
+			xpath: ''
 		};
 		this.handleChange = this.handleChange.bind(this);
-		this.handleCodeChange = this.handleCodeChange.bind(this);
-		this.operationChange = this.operationChange.bind(this);
 		this.saveHandler = this.saveHandler.bind(this);
 	}
 
@@ -26,45 +18,27 @@ class InView extends Component {
 		});
 	}
 
-	handleCodeChange(css) {
-		this.setState({ css: window.btoa(css) });
-	}
-
-	operationChange(value) {
-		this.setState({ operation: value });
-	}
-
 	saveHandler(e) {
 		e.preventDefault();
-		const { xpath, bottomXpath, bottomOffset, operation, css } = this.state;
-		let parsedCSS = {};
-		if (!xpath || !operation) {
-			return alert('Xpath and Ad Operation are mandatory fields');
-		} else if (css && css.trim().length) {
-			try {
-				parsedCSS = JSON.parse(window.atob(css));
-			} catch (err) {
-				return window.alert('Invalid CSS');
-			}
+		const { xpath } = this.state;
+		if (!xpath) {
+			return alert('Xpath is mandatory field');
 		}
 		return this.props.save.handler({
-			adData: {
-				xpath,
-				operation
-			},
 			formatData: {
-				bottomOffset,
-				bottomXpath,
-				css: parsedCSS
+				event: 'scroll',
+				eventData: {
+					value: xpath
+				}
 			},
-			type: TYPE_OF_ADS.DOCKED_STRUCTURAL
+			type: TYPE_OF_ADS.INTERACTIVE_AD
 		});
 	}
 
 	render() {
 		return (
 			<form action="#" method="POST">
-				<Col md={6} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
+				<Col md={12} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
 					<label htmlFor="xpath">Enter Xpath*</label>
 					<input
 						className="inputMinimal"
@@ -74,42 +48,6 @@ class InView extends Component {
 						style={{ padding: '10px 15px' }}
 						onChange={this.handleChange}
 					/>
-				</Col>
-				<Col md={6} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
-					<label htmlFor="adOperation">Ad Operation*</label>
-					<SelectBox value={this.state.operation} label="Ad Operation" onChange={this.operationChange}>
-						{AD_OPERATIONS.map((operation, index) => (
-							<option key={index} value={operation}>
-								{operation}
-							</option>
-						))}
-					</SelectBox>
-				</Col>
-				<Col md={6} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
-					<label htmlFor="bottomXpath">Enter Bottom Xpath</label>
-					<input
-						className="inputMinimal"
-						type="input"
-						placeholder="Enter Bottom XPath"
-						name="bottomXpath"
-						style={{ padding: '10px 15px' }}
-						onChange={this.handleChange}
-					/>
-				</Col>
-				<Col md={6} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
-					<label htmlFor="bottomOffset">Enter Bottom Offset</label>
-					<input
-						className="inputMinimal"
-						type="number"
-						placeholder="Enter Bottom Offset"
-						name="bottomOffset"
-						style={{ padding: '10px 15px' }}
-						onChange={this.handleChange}
-					/>
-				</Col>
-				<Col md={12} style={{ paddingLeft: '0px' }}>
-					<label htmlFor="css">Custom CSS</label>
-					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={this.state.css} />
 				</Col>
 				<Col md={12} style={{ paddingRight: '0px' }}>
 					{this.props.save.renderFn(this.props.save.label, this.saveHandler)}

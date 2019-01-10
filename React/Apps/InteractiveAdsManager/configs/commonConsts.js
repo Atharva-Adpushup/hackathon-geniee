@@ -271,7 +271,7 @@ const USER_AD_LIST_HEADERS = ['Id', 'Name', 'Platform', 'Format', 'Size', 'Traff
 const OPS_AD_LIST_HEADERS = ['Id', 'Name', 'Platform', 'Format', 'Size', 'Network', 'Traffic', 'Status', 'Actions'];
 const USER_AD_LIST_ACTIONS = [{ displayText: 'Archive', key: 'archive' }];
 const OPS_AD_LIST_ACTIONS = [
-	{ displayText: 'Edit Network Options', key: 'networkEdit' },
+	{ displayText: 'Network Options', key: 'networkEdit' },
 	{ displayText: 'Archive', key: 'archive' }
 ];
 const AD_LIST_ACTIONS = {
