@@ -164,8 +164,20 @@ body {
 		&:hover {
 			color: #fff;
 			font-weight: bold;
-			border-color: #c3272b;
-			background: #c3272b;
+			border-color: #eb575c;
+			background: #eb575c;
+		}
+	}
+}
+
+#edit-traffic-pagegroups {
+	padding: 0px !important;
+	.options {
+		margin: 0px !important;
+		ul {
+			li.simpleOption {
+				padding: 10px !important;
+			}
 		}
 	}
 }

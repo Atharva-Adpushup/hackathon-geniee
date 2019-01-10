@@ -43,16 +43,6 @@ const fn = {
 				return fn.processing(tagManagerDefault, payload);
 			});
 	},
-	createNewDocAndDoProcessing: payload => {
-		const tagManagerDefault = _.cloneDeep(interactiveAdsInitialDoc);
-		return appBucket
-			.createDoc(`${docKeys.interactiveAds}${payload.siteId}`, tagManagerDefault, {})
-			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
-			.then(docWithCas => {
-				payload.siteDomain = docWithCas.value.siteDomain;
-				return fn.processing(tagManagerDefault, payload);
-			});
-	},
 	processing: (data, payload) => {
 		let value = data.value || data;
 
@@ -76,14 +66,6 @@ const fn = {
 		} else {
 			value.meta.custom.push(`${ad.formatData.platform}-${ad.format}`);
 		}
-
-		// if (INTERACTIVE_ADS_TYPES.VERTICAL.includes(this.state.format)) {
-		// 	value.meta.verticalAds = 1;
-		// } else if (INTERACTIVE_ADS_TYPES.HORIZONTAL.includes(this.state.format)) {
-		// 	value.meta.horizontalAds = 1;
-		// } else {
-		// 	value.meta.others = 1;
-		// }
 
 		// if (config.environment.HOST_ENV === 'production') {
 		// 	fn.sendDataToZapier({

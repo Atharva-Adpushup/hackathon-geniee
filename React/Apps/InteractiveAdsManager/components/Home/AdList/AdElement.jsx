@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import PagegroupTrafficEdit from './PagegroupTrafficEdit';
 import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../lib/helpers';
 import { AD_LIST_ACTIONS, USER_AD_LIST_ACTIONS, OPS_AD_LIST_ACTIONS } from '../../../configs/commonConsts';
 import Edit from '../../shared/Edit';
@@ -12,7 +13,6 @@ class AdElement extends Component {
 		this.state = {
 			isActive: Object.prototype.hasOwnProperty.call(props.ad, 'isActive') ? props.ad.isActive : true
 		};
-		this.toggleHandler = this.toggleHandler.bind(this);
 		this.renderAdDetails = this.renderAdDetails.bind(this);
 		this.disableAd = this.disableAd.bind(this);
 		this.updateWrapper = this.updateWrapper.bind(this);
@@ -78,7 +78,20 @@ class AdElement extends Component {
 
 	editTraffic() {
 		const hasPagegroups = !!(this.props.ad.pagegroups && this.props.ad.pagegroups.length);
-		return hasPagegroups;
+		const { ad, meta, modalToggle } = this.props;
+
+		let body = <p>Custom Traffic Edit would be here</p>;
+		let header = 'Edit Traffic';
+
+		if (hasPagegroups) {
+			header += ' | Pagegroups';
+			body = <PagegroupTrafficEdit ad={ad} meta={meta} onSubmit={() => {}} onCancel={modalToggle} />;
+		}
+		return this.props.modalToggle({
+			header,
+			body,
+			footer: false
+		});
 	}
 
 	updateWrapper(data) {
@@ -175,6 +188,7 @@ class AdElement extends Component {
 		const { ad } = this.props;
 		const toRender = [];
 
+		// Rendering tds. Do not change the order of the code below as it depends upon user mode.
 		toRender.push(this.renderInformation(ad.id, [{ name: 'copy', handler: copyToClipBoard.bind(null, ad.id) }]));
 		toRender.push(
 			this.renderInformation(ad.name, [

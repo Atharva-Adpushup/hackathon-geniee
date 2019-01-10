@@ -3,9 +3,9 @@ import { Row, Col, ProgressBar } from 'react-bootstrap';
 import CustomList from './CustomList';
 import { Docked, Default, InView } from './Formats/index';
 import { PLATFORMS, FORMATS, SIZES, displayAdMessage, INTERACTIVE_ADS_TYPES } from '../../configs/commonConsts';
-import { copyToClipBoard } from '../../lib/helpers';
 import { CustomMessage, CustomButton } from '../shared/index';
 import Loader from '../../../../Components/Loader';
+import { pagegroupFiltering } from '../../lib/helpers';
 
 class AdCodeGenerator extends Component {
 	constructor(props) {
@@ -243,37 +243,43 @@ class AdCodeGenerator extends Component {
 					2. stickyRight or docked should not be already created
 		*/
 
-		const filteredPagegroupsByPlatform = window.iam.channels.filter(channel => {
-			const re = new RegExp(this.state.platform, 'ig');
-			return channel.match(re);
-		});
-		const pagegroupsToShow = new Set();
-		const disabled = new Set();
+		const { filteredPagegroupsByPlatform, disabled } = pagegroupFiltering(
+			window.iam.channels,
+			this.state.platform,
+			this.state.format,
+			this.props.meta,
+			false
+		);
 
-		let types;
+		// const filteredPagegroupsByPlatform = window.iam.channels.filter(channel => {
+		// 	const re = new RegExp(this.state.platform, 'ig');
+		// 	return channel.match(re);
+		// });
+		// const pagegroupsToShow = new Set();
+		// const disabled = new Set();
 
-		if (INTERACTIVE_ADS_TYPES.VERTICAL.includes(this.state.format)) {
-			types = INTERACTIVE_ADS_TYPES.VERTICAL;
-		} else if (INTERACTIVE_ADS_TYPES.HORIZONTAL.includes(this.state.format)) {
-			types = INTERACTIVE_ADS_TYPES.HORIZONTAL;
-		} else {
-			types = INTERACTIVE_ADS_TYPES.OTHER;
-		}
+		// let types;
 
-		filteredPagegroupsByPlatform.forEach(pg => {
-			let shouldDisable = true;
-			types.forEach(type => {
-				if (this.props.meta.pagegroups.includes(`${this.state.platform}-${type}-${pg}`)) {
-					shouldDisable = false;
-					return false;
-				}
-			});
-			if (!shouldDisable) {
-				// 	pagegroupsToShow.add(pg);
-				// } else {
-				disabled.add(pg);
-			}
-		});
+		// if (INTERACTIVE_ADS_TYPES.VERTICAL.includes(this.state.format)) {
+		// 	types = INTERACTIVE_ADS_TYPES.VERTICAL;
+		// } else if (INTERACTIVE_ADS_TYPES.HORIZONTAL.includes(this.state.format)) {
+		// 	types = INTERACTIVE_ADS_TYPES.HORIZONTAL;
+		// } else {
+		// 	types = INTERACTIVE_ADS_TYPES.OTHER;
+		// }
+
+		// filteredPagegroupsByPlatform.forEach(pg => {
+		// 	let shouldDisable = false;
+		// 	types.forEach(type => {
+		// 		if (this.props.meta.pagegroups.includes(`${this.state.platform}-${type}-${pg}`)) {
+		// 			shouldDisable = true;
+		// 			return false;
+		// 		}
+		// 	});
+		// 	if (shouldDisable) {
+		// 		disabled.add(pg);
+		// 	}
+		// });
 
 		return (
 			<CustomList
