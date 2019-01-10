@@ -37,7 +37,8 @@ module.exports = {
 		MEDIATION: 2,
 		AMP: 3,
 		NEW_FORMATS: 4,
-		DYNAMIC_ALLOCATION: 5
+		DYNAMIC_ALLOCATION: 5,
+		CONTROL_TAG: 6
 	},
 	SETUP_STATUS: {
 		ACTIVE: 1,
@@ -315,7 +316,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	dummy: 'test',
 	docKeys: {
-		tagManager: 'tgmr::'
+		tagManager: 'tgmr::',
+		user: 'user::'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,
