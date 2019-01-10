@@ -16,6 +16,7 @@ var w = window,
 	control = require('./control')(),
 	genieeObject = require('./genieeObject'),
 	triggerAd = require('./trigger'),
+	refreshAdSlot = require('./refreshAdSlot'),
 	session = require('../libs/session'),
 	spaHandler = require('./spaHandler'),
 	isGenieeSite;
