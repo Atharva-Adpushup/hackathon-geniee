@@ -4,7 +4,6 @@ module.exports = {
 	// eslint-disable-next-line no-undef
 	siteId: __SITE_ID__,
 	// eslint-disable-next-line no-undef
-	packetId: utils.uniqueId(__SITE_ID__),
 	country: __COUNTRY__,
 	feedbackUrl: '//e3.adpushup.com/ApexWebService/feedback',
 	heartBeatMinInterval: 30000,
