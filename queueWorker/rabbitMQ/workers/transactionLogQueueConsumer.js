@@ -5,6 +5,8 @@ const Consumer = require('../libs/consumer');
 const CustomError = require('./customError');
 const logger = require('../../../helpers/globalBucketLogger');
 const createTransactionLog = require('../../../services/transactionLogService/index');
+const syncCdn = require('../../../services/genieeAdSyncService/cdnSyncService/index');
+
 const queueConfig = {
 	url: CONFIG.RABBITMQ.URL,
 	exchange: CONFIG.RABBITMQ.TRANSACTION_LOG_SYNC.EXCHANGE,
@@ -68,12 +70,15 @@ function errorHandler(error, originalMessage) {
 			debugData: `Site id : ${decodedMessage.siteId}`,
 			details: `${JSON.stringify(error)}`
 		});
-		consumer.acknowledge(originalMessage);
-		throw error;
+
+		return syncCdn(decodedMessage.siteId, true).then(() => {
+			consumer.acknowledge(originalMessage);
+			return Promise.reject(error);
+		});
 	}
 	counter = counter + 1; // increase counter
 	consumer.reject(originalMessage);
-	throw error;
+	return Promise.reject(error);
 }
 
 function doProcessingAndAck(originalMessage) {
