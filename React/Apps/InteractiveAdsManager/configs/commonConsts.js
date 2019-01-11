@@ -160,7 +160,8 @@ const globalActions = {
 	SET_CURRENT_AD: 'SET_CURRENT_AD',
 	SET_META: 'SET_META',
 	UPDATE_META: 'UPDATE_META',
-	UPDATE_AD_TRACKING_LOGS: 'UPDATE_AD_TRACKING_LOGS'
+	UPDATE_AD_TRACKING_LOGS: 'UPDATE_AD_TRACKING_LOGS',
+	SET_AD_TRACKING_LOGS: 'SET_AD_TRACKING_LOGS'
 };
 const displayAdMessage = `<ol style="font-size: 15px;">
 	<li style="margin-bottom: 10px;">AdPushup head code needs to be inserted in the global head of your website.</li>

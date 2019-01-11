@@ -17,6 +17,15 @@ const global = (state = { currentAd: null, meta: { ...window.iam.meta } }, actio
 				}
 			};
 
+		case globalActions.SET_AD_TRACKING_LOGS:
+			return {
+				...state,
+				meta: {
+					...state.meta,
+					[action.value.mode]: action.value.logs
+				}
+			};
+
 		default:
 			return state;
 	}

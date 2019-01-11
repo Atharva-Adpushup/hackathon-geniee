@@ -13,7 +13,7 @@ class PagegroupTrafficEdit extends Component {
 	}
 
 	selectPagegroups(pagegroup) {
-		const { pagegroups } = this.state.pagegroups;
+		const pagegroups = this.state.pagegroups.concat([]);
 		if (pagegroups.includes(pagegroup)) {
 			pagegroups.splice(pagegroups.indexOf(pagegroup), 1);
 		} else {
@@ -38,7 +38,7 @@ class PagegroupTrafficEdit extends Component {
 			ad.formatData.format,
 			this.props.meta,
 			true,
-			ad.pagegroup
+			pagegroups
 		);
 
 		return (

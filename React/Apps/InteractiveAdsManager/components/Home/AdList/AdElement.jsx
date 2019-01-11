@@ -43,17 +43,22 @@ class AdElement extends Component {
 			? 'Are you sure you want to archive this ad?'
 			: 'Are you sure you want to unarchive this ad?';
 		if (confirm(message)) {
-			this.setState(
-				{
-					isActive: !this.state.isActive
-				},
-				() => {
-					this.updateWrapper({
-						isActive: this.state.isActive,
+			this.props
+				.archiveAd({
+					toUpdate: {
+						isActive: !this.state.isActive,
 						archivedOn: +new Date()
-					});
-				}
-			);
+					},
+					isSuperUser: this.isSuperUser
+				})
+				.then(response => {
+					if (response) {
+						this.setState({
+							isActive: !this.state.isActive
+						});
+					}
+					return true;
+				});
 		}
 	}
 

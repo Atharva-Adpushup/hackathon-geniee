@@ -83,5 +83,83 @@ const modifyAdOnServer = (adId, data) => dispatch =>
 			}
 		});
 	});
+const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
+	function processing(toUpdate, updatedLogs) {
+		if (isSuperUser) {
+			return Promise.resolve();
+		}
+		return ajax({
+			url: API_PATHS.MODIFY_AD,
+			method: 'POST',
+			data: JSON.stringify({
+				siteId: window.siteId,
+				adId,
+				data: toUpdate,
+				metaUpdate: {
+					mode: 'pagegroups',
+					logs: updatedLogs
+				}
+			})
+		}).then(response => {
+			if (response.error) {
+				return Promise.reject(response.data.message);
+			}
+			return true;
+		});
+	}
 
-export { createAd, fetchAds, deleteAd, updateAd, modifyAdOnServer };
+	const state = getState();
+	const globalAdLogs = state.global.meta.pagegroups;
+	const { format, platform, pagegroups, isActive, archivedOn } = data;
+	const currentAdLogs = pagegroups.map(pg => `${platform}-${format}-${pg}`);
+	const mode = 'pagegroups';
+
+	let updatedLogs = null;
+
+	if (isActive) {
+		const alreadyExists = globalAdLogs.some(log => currentAdLogs.includes(log));
+		if (alreadyExists) {
+			return new Promise(resolve => {
+				alert(
+					`"${format.toUpperCase()} ad already exists for ${platform} and ${pagegroups
+						.join(',')
+						.toUpperCase()} "`
+				);
+				return resolve(false);
+			});
+		}
+		updatedLogs = [...globalAdLogs, ...currentAdLogs];
+	}
+	if (!isActive && !updatedLogs) {
+		updatedLogs = globalAdLogs.filter(log => !currentAdLogs.includes(log));
+	}
+
+	return processing({ isActive }, updatedLogs)
+		.then(() => {
+			dispatch({
+				type: adActions.UPDATE_AD,
+				data: {
+					id: adId,
+					updateThis: {
+						isActive,
+						archivedOn
+					}
+				}
+			});
+			dispatch({
+				type: globalActions.SET_AD_TRACKING_LOGS,
+				value: {
+					mode,
+					logs: updatedLogs
+				}
+			});
+			return true;
+		})
+		.catch(err => {
+			console.log(err);
+			alert('Operation Failed. Please contact Ops');
+			return false;
+		});
+};
+
+export { createAd, fetchAds, deleteAd, updateAd, modifyAdOnServer, archiveAd };

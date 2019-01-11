@@ -74,7 +74,7 @@ class AdCodeGenerator extends Component {
 	}
 
 	selectPagegroups(pagegroup) {
-		const pagegroups = this.state.pagegroups;
+		const pagegroups = this.state.pagegroups.concat([]);
 		let progress;
 
 		if (pagegroups.includes(pagegroup)) {

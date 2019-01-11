@@ -266,6 +266,10 @@ router
 					return false;
 				}
 			});
+			if (req.body.metaUpdate && Object.keys(req.body.metaUpdate).length) {
+				const { mode, logs } = req.body.metaUpdate;
+				doc.meta[mode] = logs;
+			}
 			return appBucket.updateDoc(`${docKeys.interactiveAds}${req.body.siteId}`, doc, docWithCas.cas);
 		});
 	});
