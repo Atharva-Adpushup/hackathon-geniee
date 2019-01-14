@@ -44,13 +44,17 @@ class AdElement extends Component {
 			: 'Are you sure you want to unarchive this ad?';
 		if (confirm(message)) {
 			this.props
-				.archiveAd({
-					toUpdate: {
+				.archiveAd(
+					this.props.ad.id,
+					{
+						format: this.props.ad.formatData.format,
+						platform: this.props.ad.formatData.platform,
+						pagegroups: this.props.ad.pagegroups,
 						isActive: !this.state.isActive,
 						archivedOn: +new Date()
 					},
-					isSuperUser: this.isSuperUser
-				})
+					this.isSuperUser
+				)
 				.then(response => {
 					if (response) {
 						this.setState({

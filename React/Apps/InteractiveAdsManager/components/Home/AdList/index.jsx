@@ -31,7 +31,7 @@ class AdList extends Component {
 	}
 
 	render() {
-		const { loading, ads, updateAd, modifyAdOnServer, meta } = this.props;
+		const { loading, ads, updateAd, modifyAdOnServer, meta, archiveAd } = this.props;
 		const { show, modalData } = this.state;
 		const HEADERS = window.iam.isSuperUser ? OPS_AD_LIST_HEADERS : USER_AD_LIST_HEADERS;
 		const customStyle = {};
@@ -70,11 +70,12 @@ class AdList extends Component {
 									key={`adElement-${ad.id}`}
 									identifier={ad.id}
 									ad={ad}
+									style={customStyle}
+									meta={meta}
 									updateAd={updateAd}
 									modifyAdOnServer={modifyAdOnServer}
-									style={customStyle}
 									modalToggle={this.modalToggle}
-									meta={meta}
+									archiveAd={archiveAd}
 								/>
 							) : null
 						)}

@@ -121,9 +121,9 @@ const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
 		if (alreadyExists) {
 			return new Promise(resolve => {
 				alert(
-					`"${format.toUpperCase()} ad already exists for ${platform} and ${pagegroups
+					`${format.toUpperCase()} ad already exists for ${platform.toUpperCase()} and ${pagegroups
 						.join(',')
-						.toUpperCase()} "`
+						.toUpperCase()}`
 				);
 				return resolve(false);
 			});
