@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { fetchAds, updateAd, modifyAdOnServer, archiveAd } from '../actions/adActions';
+import { fetchAds, updateAd, modifyAdOnServer, archiveAd, updateTraffic } from '../actions/adActions';
 import { masterSave } from '../actions/globalActions';
 import AdList from '../components/Home/AdList/index';
 
@@ -14,6 +14,7 @@ const mapDispatchToProps = dispatch => ({
 	updateAd: (adId, payload) => dispatch(updateAd(adId, payload)),
 	modifyAdOnServer: (adId, payload) => dispatch(modifyAdOnServer(adId, payload)),
 	archiveAd: (adId, payload, isSuperUser) => dispatch(archiveAd(adId, payload, isSuperUser)),
+	updateTraffic: (adId, payload, isSuperUser) => dispatch(updateTraffic(adId, payload, isSuperUser)),
 	masterSave: siteId => dispatch(masterSave(siteId))
 });
 

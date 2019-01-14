@@ -266,7 +266,8 @@ const API_PATHS = {
 	FETCH_ADS: '/innovativeAdsManager/data/fetchAds',
 	CREATE_AD: '/innovativeAdsManager/data/createAd',
 	DELETE_AD: '/innovativeAdsManager/data/deleteAd',
-	MODIFY_AD: '/innovativeAdsManager/data/modifyAd'
+	MODIFY_AD: '/innovativeAdsManager/data/modifyAd',
+	MASTER_SAVE: '/innovativeAdsManager/data/masterSave'
 };
 const USER_AD_LIST_HEADERS = ['Id', 'Name', 'Platform', 'Format', 'Size', 'Traffic', 'Status', 'Actions'];
 const OPS_AD_LIST_HEADERS = ['Id', 'Name', 'Platform', 'Format', 'Size', 'Network', 'Traffic', 'Status', 'Actions'];

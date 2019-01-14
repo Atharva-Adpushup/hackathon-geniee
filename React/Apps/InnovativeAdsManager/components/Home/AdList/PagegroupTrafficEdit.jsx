@@ -10,6 +10,7 @@ class PagegroupTrafficEdit extends Component {
 			pagegroups: this.props.ad.pagegroups
 		};
 		this.selectPagegroups = this.selectPagegroups.bind(this);
+		this.shouldProceed = this.shouldProceed.bind(this);
 	}
 
 	selectPagegroups(pagegroup) {
@@ -28,8 +29,14 @@ class PagegroupTrafficEdit extends Component {
 		return alert('Atleast one pagegroup is required for ads to run.');
 	}
 
+	shouldProceed(isActive, pagegroupsFromProps) {
+		return !!isActive;
+		// const areCurrentPagegroupsSelected = this.state.pagegroups.some(pg => pagegroupsFromProps.includes(pg));
+		// return !!(isActive || !areCurrentPagegroupsSelected);
+	}
+
 	render() {
-		const { ad, onSubmit, onCancel } = this.props;
+		const { ad, onSubmit, onCancel, isSuperUser } = this.props;
 		const { pagegroups } = this.state;
 
 		const { filteredPagegroupsByPlatform, disabled } = pagegroupFiltering(
@@ -59,8 +66,19 @@ class PagegroupTrafficEdit extends Component {
 				<CustomButton
 					label="Save"
 					handler={() => {
-						onSubmit();
-						return onCancel();
+						if (this.shouldProceed(ad.isActive, ad.pagegroups)) {
+							onSubmit(
+								ad.id,
+								{
+									platform: ad.formatData.platform,
+									format: ad.formatData.format,
+									pagegroups: this.state.pagegroups
+								},
+								isSuperUser
+							);
+							return onCancel();
+						}
+						return alert('Cannot edit archived ads');
 					}}
 				/>
 				<div style={{ clear: 'both' }}>&nbsp;</div>

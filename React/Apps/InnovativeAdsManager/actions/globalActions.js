@@ -1,10 +1,10 @@
-import { globalActions } from '../configs/commonConsts';
+import { globalActions, API_PATHS } from '../configs/commonConsts';
 import { ajax } from '../../../common/helpers';
 
 const masterSave = siteId => (_, getState) => {
-	const data = { siteId, ads: getState().ads.content };
+	const data = { siteId, ads: getState().ads.content, meta: getState().meta };
 	return ajax({
-		url: '/tagManager/masterSave',
+		url: API_PATHS.masterSave,
 		method: 'POST',
 		data: JSON.stringify({
 			...data,

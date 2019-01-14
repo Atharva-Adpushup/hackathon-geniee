@@ -87,14 +87,22 @@ class AdElement extends Component {
 
 	editTraffic() {
 		const hasPagegroups = !!(this.props.ad.pagegroups && this.props.ad.pagegroups.length);
-		const { ad, meta, modalToggle } = this.props;
+		const { ad, meta, modalToggle, updateTraffic } = this.props;
 
 		let body = <p>Custom Traffic Edit would be here</p>;
 		let header = 'Edit Traffic';
 
 		if (hasPagegroups) {
 			header += ' | Pagegroups';
-			body = <PagegroupTrafficEdit ad={ad} meta={meta} onSubmit={() => {}} onCancel={modalToggle} />;
+			body = (
+				<PagegroupTrafficEdit
+					ad={ad}
+					meta={meta}
+					onSubmit={updateTraffic}
+					onCancel={modalToggle}
+					isSuperUser={this.isSuperUser}
+				/>
+			);
 		}
 		return this.props.modalToggle({
 			header,

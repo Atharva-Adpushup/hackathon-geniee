@@ -206,7 +206,7 @@ router
 			.catch(err => fn.errorHander(err, res));
 	})
 	.post('/masterSave', (req, res) => {
-		if (!req.body || !req.body.siteId || !req.body.ads || !req.session.isSuperUser) {
+		if (!req.body || !req.body.siteId || !req.body.ads || !req.session.isSuperUser || !req.body.meta) {
 			return sendErrorResponse(
 				{
 					message: 'Invalid Parameters.'
@@ -243,6 +243,7 @@ router
 				doc.ads = newAds;
 			}
 
+			doc.meta = req.body.meta;
 			return appBucket.updateDoc(`${docKeys.interactiveAds}${siteId}`, doc, docWithCas.cas);
 		});
 	})
