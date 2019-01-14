@@ -1,6 +1,7 @@
-const path = require('path'),
-	webpack = require('webpack'),
-	buildPath = '../public/assets/js/builds/';
+const path = require('path');
+const webpack = require('webpack');
+
+const buildPath = '../public/assets/js/builds/';
 
 module.exports = [
 	{
@@ -267,7 +268,7 @@ module.exports = [
 	},
 	{
 		entry: {
-			inner: path.join(__dirname, './Apps/InteractiveAdsManager/index.js')
+			inner: path.join(__dirname, './Apps/InnovativeAdsManager/index.js')
 		},
 		output: {
 			path: path.join(__dirname, buildPath),

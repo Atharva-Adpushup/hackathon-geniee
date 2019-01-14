@@ -9,7 +9,7 @@ var indexController = require('./indexController'),
 	authController = require('./authController'),
 	opsController = require('./opsController'),
 	tagManagerController = require('./tagManagerController'),
-	interactiveAdsManagerController = require('./interactiveAdsManagerController');
+	innovativeAdsManagerController = require('./innovativeAdsManagerController');
 (commonConsts = require('../configs/commonConsts')), (_ = require('lodash'));
 
 module.exports = function(app) {
@@ -64,6 +64,8 @@ module.exports = function(app) {
 				[
 					'/ops',
 					'/tagManager',
+					'/innovative-ads-manager/',
+					'/innovativeAdsManager/data/',
 					'/user/site',
 					'/genieeApi',
 					'/user/connectGoogle',
@@ -183,11 +185,11 @@ module.exports = function(app) {
 	);
 
 	app.use(
-		['/interactive-ads-manager/', '/interactiveAdsManager/data/'],
+		['/innovative-ads-manager/', '/innovativeAdsManager/data/'],
 		function(req, res, next) {
 			next();
 		},
-		interactiveAdsManagerController
+		innovativeAdsManagerController
 	);
 
 	/*****************Login URL's End *******************/

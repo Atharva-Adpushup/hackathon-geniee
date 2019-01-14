@@ -263,10 +263,10 @@ const INTERACTIVE_ADS_TYPES = {
 	OTHER: ['inView']
 };
 const API_PATHS = {
-	FETCH_ADS: '/interactiveAdsManager/data/fetchAds',
-	CREATE_AD: '/interactiveAdsManager/data/createAd',
-	DELETE_AD: '/interactiveAdsManager/data/deleteAd',
-	MODIFY_AD: '/interactiveAdsManager/data/modifyAd'
+	FETCH_ADS: '/innovativeAdsManager/data/fetchAds',
+	CREATE_AD: '/innovativeAdsManager/data/createAd',
+	DELETE_AD: '/innovativeAdsManager/data/deleteAd',
+	MODIFY_AD: '/innovativeAdsManager/data/modifyAd'
 };
 const USER_AD_LIST_HEADERS = ['Id', 'Name', 'Platform', 'Format', 'Size', 'Traffic', 'Status', 'Actions'];
 const OPS_AD_LIST_HEADERS = ['Id', 'Name', 'Platform', 'Format', 'Size', 'Network', 'Traffic', 'Status', 'Actions'];
