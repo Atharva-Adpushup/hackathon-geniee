@@ -54,6 +54,7 @@ class VariationPanel extends React.Component {
 				reporting,
 				onUpdateContentSelector,
 				disabledVariationsCount,
+				controlVariationsCount,
 				zonesData
 			} = this.props,
 			// Geniee UI access before/after js feature visibility condition
@@ -83,6 +84,7 @@ class VariationPanel extends React.Component {
 							channelId={channelId}
 							variation={variation}
 							disabledVariationsCount={disabledVariationsCount}
+							controlVariationsCount={controlVariationsCount}
 						/>
 					</div>
 					<div tabTitle="Add Incontent Variation">

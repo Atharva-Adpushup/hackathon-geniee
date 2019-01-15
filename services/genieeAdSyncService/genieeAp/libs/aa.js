@@ -191,16 +191,23 @@
 	/**
 	 * Iterate over children and select elements within specific position coordinates.
 	 */
-	$.fn.selectBetween = function(top, bottom) {
-		if ($(this).length > 1) {
+	$.fn.selectBetween = function(top, bottom, selectorsTreeLevel) {
+		var $rootThis = $(this),
+			isValidSelectorsTreeLevel = !!(
+				selectorsTreeLevel &&
+				Number(selectorsTreeLevel) &&
+				!isNaN(selectorsTreeLevel)
+			);
+
+		if ($rootThis.length > 1) {
 			console.error('Ambigious content area selector.');
 			return this;
 		}
 
-		rootBackgroundColor = computeBackgroundColor($(this));
+		rootBackgroundColor = computeBackgroundColor($rootThis);
 
 		selectedElems = []; // reset selected elem. essentially "selectBetween" is bootstrapping function
-		containerWidth = $(this).width();
+		containerWidth = $rootThis.width();
 
 		// if (width > containerWidth) {
 		// 	console.error('Ad Size is larger than container.');
@@ -213,15 +220,22 @@
 		}
 
 		var blockChildren = this.find('*').filter(function() {
+			var $this = $(this),
+				elParentsCount = $this.parentsUntil($rootThis).length + 1,
+				isValidSelectorsTreeLevelFilter = isValidSelectorsTreeLevel
+					? selectorsTreeLevel === elParentsCount || selectorsTreeLevel >= elParentsCount
+					: true;
+
 			return (
-				$(this).css('display') == 'block' &&
-				$(this).height() > 10 &&
-				$(this).width() > 200 &&
-				$(this).height() < 1000
+				$this.css('display') == 'block' &&
+				$this.height() > 10 &&
+				$this.width() > 200 &&
+				$this.height() < 1000 &&
+				isValidSelectorsTreeLevelFilter
 			);
 		});
 
-		var rootPos = $(this).offset();
+		var rootPos = $rootThis.offset();
 
 		$(blockChildren).each(function() {
 			var childPos = $(this).offset();
@@ -499,7 +513,7 @@ Don't float beside large elements that are already floating.
 
 						$selector
 							.createAds(adObj.width, adObj.height, adObj.css.float)
-							.selectBetween((adObj.section - 1) * 500, adObj.section * 600)
+							.selectBetween((adObj.section - 1) * 500, adObj.section * 600, adObj.selectorsTreeLevel)
 							.ignoreXpaths(adObj.ignoreXpaths, 100);
 
 						/** NotNear incontent ads feature implementation
