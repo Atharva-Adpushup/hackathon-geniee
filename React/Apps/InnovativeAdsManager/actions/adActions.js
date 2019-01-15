@@ -25,7 +25,15 @@ const helpers = {
 			return true;
 		});
 	},
-	processing: (adId, isSuperUser, toUpdate, updatedLogs, dispatch, mode = 'pagegroups') =>
+	processing: (
+		adId,
+		isSuperUser,
+		toUpdate,
+		updatedLogs,
+		dispatch,
+		mode = 'pagegroups',
+		logType = globalActions.SET_AD_TRACKING_LOGS
+	) =>
 		helpers
 			.makeAPICall(adId, isSuperUser, toUpdate, updatedLogs)
 			.then(() => {
@@ -37,7 +45,7 @@ const helpers = {
 					}
 				});
 				dispatch({
-					type: globalActions.SET_AD_TRACKING_LOGS,
+					type: logType,
 					value: {
 						mode,
 						logs: updatedLogs
@@ -52,7 +60,7 @@ const helpers = {
 			})
 };
 
-const createAd = params => (dispatch, getState) =>
+const createAd = params => dispatch =>
 	ajax({
 		url: API_PATHS.CREATE_AD,
 		method: 'POST',
@@ -161,68 +169,15 @@ const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
 		updatedLogs = globalAdLogs.filter(log => !currentAdLogs.includes(log));
 	}
 
-	return helpers.processing(adId, isSuperUser, { isActive }, updatedLogs, dispatch, mode);
-
-	// return helpers
-	// 	.processing(adId, isSuperUser, { isActive }, updatedLogs)
-	// 	.then(() => {
-	// 		dispatch({
-	// 			type: adActions.UPDATE_AD,
-	// 			data: {
-	// 				id: adId,
-	// 				updateThis: {
-	// 					isActive,
-	// 					archivedOn
-	// 				}
-	// 			}
-	// 		});
-	// 		dispatch({
-	// 			type: globalActions.SET_AD_TRACKING_LOGS,
-	// 			value: {
-	// 				mode,
-	// 				logs: updatedLogs
-	// 			}
-	// 		});
-	// 		return true;
-	// 	})
-	// 	.catch(err => {
-	// 		console.log(err);
-	// 		alert('Operation Failed. Please contact Ops');
-	// 		return false;
-	// 	});
+	return helpers.processing(adId, isSuperUser, { isActive, archivedOn }, updatedLogs, dispatch, mode);
 };
-const updateTraffic = (adId, { pagegroups, platform, format }, isSuperUser) => dispatch => {
+const updateTraffic = (adId, { pagegroups, platform, format }, isSuperUser) => (dispatch, getState) => {
 	const currentAdLogs = pagegroups.map(pg => `${platform}-${format}-${pg}`);
+	const stateLogs = getState().global.meta.pagegroups;
+	const updatedLogs = new Set(currentAdLogs.concat(stateLogs));
 	const mode = 'pagegroups';
 
-	return helpers.processing(adId, isSuperUser, { pagegroups }, currentAdLogs, dispatch, mode);
-
-	// return helpers
-	// 	.processing(adId, isSuperUser, { pagegroups }, currentAdLogs)
-	// 	.then(() => {
-	// 		dispatch({
-	// 			type: adActions.UPDATE_AD,
-	// 			data: {
-	// 				id: adId,
-	// 				updateThis: {
-	// 					pagegroups
-	// 				}
-	// 			}
-	// 		});
-	// 		dispatch({
-	// 			type: globalActions.SET_AD_TRACKING_LOGS,
-	// 			value: {
-	// 				mode,
-	// 				logs: currentAdLogs
-	// 			}
-	// 		});
-	// 		return true;
-	// 	})
-	// 	.catch(err => {
-	// 		console.log(err);
-	// 		alert('Operation Failed. Please contact Ops');
-	// 		return false;
-	// 	});
+	return helpers.processing(adId, isSuperUser, { pagegroups }, [...updatedLogs], dispatch, mode);
 };
 
 export { createAd, fetchAds, deleteAd, updateAd, modifyAdOnServer, archiveAd, updateTraffic };

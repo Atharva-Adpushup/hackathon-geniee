@@ -98,7 +98,8 @@ class AdElement extends Component {
 				<PagegroupTrafficEdit
 					ad={ad}
 					meta={meta}
-					onSubmit={updateTraffic}
+					updateTraffic={updateTraffic}
+					updateWrapper={this.updateWrapper}
 					onCancel={modalToggle}
 					isSuperUser={this.isSuperUser}
 				/>
