@@ -2,9 +2,9 @@ import { globalActions, API_PATHS } from '../configs/commonConsts';
 import { ajax } from '../../../common/helpers';
 
 const masterSave = siteId => (_, getState) => {
-	const data = { siteId, ads: getState().ads.content, meta: getState().meta };
+	const data = { siteId, ads: getState().ads.content, meta: getState().global.meta };
 	return ajax({
-		url: API_PATHS.masterSave,
+		url: API_PATHS.MASTER_SAVE,
 		method: 'POST',
 		data: JSON.stringify({
 			...data,
@@ -12,7 +12,7 @@ const masterSave = siteId => (_, getState) => {
 		})
 	}).then(response => {
 		if (response.error) {
-			return alert('Some error occurred');
+			return alert(response.data.message || 'Some error occurred');
 		}
 		return alert('Save successful');
 	});

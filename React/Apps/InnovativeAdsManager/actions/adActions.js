@@ -1,5 +1,6 @@
 import { adActions, globalActions, API_PATHS } from '../configs/commonConsts';
 import { ajax } from '../../../common/helpers';
+import { pagegroupFiltering } from '../lib/helpers';
 
 const helpers = {
 	makeAPICall: (adId, isSuperUser, toUpdate, updatedLogs) => {
@@ -161,6 +162,23 @@ const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
 			);
 			return Promise.resolve(false);
 		}
+		const { disabled } = pagegroupFiltering(
+			window.iam.channels,
+			platform,
+			format,
+			state.global.meta,
+			false,
+			pagegroups
+		);
+
+		if (disabled.size) {
+			const currentPagegroupsDisabled = [...disabled].some(ele => pagegroups.includes(ele));
+			if (currentPagegroupsDisabled) {
+				alert('Only one type of horizontal / vertical ad is allowed in a pagegroup');
+				return Promise.resolve(false);
+			}
+		}
+
 		updatedLogs = [...globalAdLogs, ...currentAdLogs];
 	}
 	if (!isActive && !updatedLogs) {
@@ -171,8 +189,16 @@ const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
 };
 const updateTraffic = (adId, { pagegroups, platform, format }, isSuperUser) => (dispatch, getState) => {
 	const currentAdLogs = pagegroups.map(pg => `${platform}-${format}-${pg}`);
-	const stateLogs = getState().global.meta.pagegroups;
-	const updatedLogs = new Set(currentAdLogs.concat(stateLogs));
+	const globalAdLogs = getState().global.meta.pagegroups;
+	const currentAd = getState().ads.content.filter(ad => ad.id === adId)[0];
+	const currentPagegroups = currentAd.pagegroups;
+	const toRemove = currentPagegroups.map(
+		pg => `${currentAd.formatData.platform}-${currentAd.formatData.format}-${pg}`
+	);
+
+	const filteredLogs = globalAdLogs.filter(log => !toRemove.includes(log));
+	const updatedLogs = new Set(currentAdLogs.concat(filteredLogs));
+
 	const mode = 'pagegroups';
 
 	return helpers.processing(adId, isSuperUser, { pagegroups }, [...updatedLogs], dispatch, mode);

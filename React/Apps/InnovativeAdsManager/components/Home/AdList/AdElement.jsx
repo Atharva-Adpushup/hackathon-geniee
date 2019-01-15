@@ -221,17 +221,15 @@ class AdElement extends Component {
 			toRender.push(this.renderInformation(ad.network ? ad.network.toUpperCase() : 'Not Set'));
 		}
 		toRender.push(this.renderInformation(this.renderTrafficMode(), [{ name: 'edit', handler: this.editTraffic }]));
-		if (this.isSuperUser) {
-			toRender.push(
-				this.renderInformation(
-					ad.isActive ? (
-						<span className="boldTxt text-success">Active</span>
-					) : (
-						<span className="boldTxt text-error">Archived</span>
-					)
+		toRender.push(
+			this.renderInformation(
+				ad.isActive ? (
+					<span className="boldTxt text-success">Active</span>
+				) : (
+					<span className="boldTxt text-error">Archived</span>
 				)
-			);
-		}
+			)
+		);
 		toRender.push(this.renderInformation(this.renderUserActions()));
 		return toRender;
 	}

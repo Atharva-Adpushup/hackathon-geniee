@@ -1,9 +1,12 @@
 import $ from 'jquery';
 
-const capitalCase = str => {
-	return str.toLowerCase().split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ');
-},
-	isFloat = num => (num % 1 === 0 ? false : true),
+const capitalCase = str =>
+		str
+			.toLowerCase()
+			.split(' ')
+			.map(word => word[0].toUpperCase() + word.substr(1))
+			.join(' '),
+	isFloat = num => num % 1 !== 0,
 	ajax = params => {
 		const { method, url, data } = params;
 		return new Promise((resolve, resject) => {
@@ -14,12 +17,8 @@ const capitalCase = str => {
 				data,
 				contentType: 'json',
 				dataType: 'json',
-				success: res => {
-					return resolve(res);
-				},
-				fail: res => {
-					return reject(res);
-				}
+				success: res => resolve(res),
+				fail: res => reject(res)
 			});
 		});
 	};
