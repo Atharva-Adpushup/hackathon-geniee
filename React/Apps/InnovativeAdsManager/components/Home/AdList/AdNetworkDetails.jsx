@@ -55,7 +55,8 @@ class AdNetworkDetails extends Component {
 							networkData: {
 								...ad.networkData,
 								headerBidding,
-								refreshSlot
+								refreshSlot,
+								logWritten: false
 							}
 						});
 						return onCancel();
