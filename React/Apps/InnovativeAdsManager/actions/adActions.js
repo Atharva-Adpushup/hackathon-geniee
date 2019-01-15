@@ -154,14 +154,12 @@ const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
 	if (isActive) {
 		const alreadyExists = globalAdLogs.some(log => currentAdLogs.includes(log));
 		if (alreadyExists) {
-			return new Promise(resolve => {
-				alert(
-					`${format.toUpperCase()} ad already exists for ${platform.toUpperCase()} and ${pagegroups
-						.join(',')
-						.toUpperCase()}`
-				);
-				return resolve(false);
-			});
+			alert(
+				`${format.toUpperCase()} ad already exists for ${platform.toUpperCase()} and ${pagegroups
+					.join(',')
+					.toUpperCase()}`
+			);
+			return Promise.resolve(false);
 		}
 		updatedLogs = [...globalAdLogs, ...currentAdLogs];
 	}
