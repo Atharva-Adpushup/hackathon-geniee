@@ -16,6 +16,7 @@ class ReportingPanel extends React.Component {
 		super(props);
 
 		this.state = {
+			updateStatusText: '',
 			reportLoading: true,
 			reportError: false,
 			emptyData: false,
@@ -37,6 +38,7 @@ class ReportingPanel extends React.Component {
 		this.updateReportParams = this.updateReportParams.bind(this);
 		this.fetchVariations = this.fetchVariations.bind(this);
 		this.tableToggleCallback = this.tableToggleCallback.bind(this);
+		this.getReportStatus = this.getReportStatus.bind(this);
 	}
 
 	fetchVariations(pageGroup, platform) {
@@ -51,6 +53,26 @@ class ReportingPanel extends React.Component {
 			.catch(res => {
 				this.setState({ variations: [] });
 			});
+	}
+
+	getReportStatus() {
+		ajax({
+			method: 'GET',
+			url: `${commonConsts.REPORT_STATUS}?fromDate=${this.state.startDate}&toDate=${this.state.endDate}`
+		}).then(res => {
+			if (res.status) {
+				if (res.status == 'Stopped') {
+					let updatedDate = moment.utc(res.lastRunOn).local().format('LLLL');
+					this.setState({
+						updateStatusText: `Note - The reports were last updated on ${updatedDate}.`
+					});
+				} else if (res.status == 'Running') {
+					this.setState({
+						updateStatusText: `Note - The network reporting data is being crunched and you will see updated data shortly.`
+					});
+				}
+			}
+		});
 	}
 
 	generateReport() {
@@ -91,6 +113,7 @@ class ReportingPanel extends React.Component {
 			data: apiQueryGenerator(params)
 		})
 			.then(res => {
+				this.getReportStatus();
 				if (!res.error && res.rows.length) {
 					const responseData = $.extend(true, {}, res),
 						data = dataGenerator(res, groupBy, variations, null, activeLegendItems);
@@ -178,7 +201,8 @@ class ReportingPanel extends React.Component {
 			platform,
 			variations,
 			variation,
-			groupBy
+			groupBy,
+			updateStatusText
 		} = this.state,
 			customToggle = {
 				toggleText: 'Network wise data',
@@ -230,6 +254,9 @@ class ReportingPanel extends React.Component {
 							variation={variation}
 							csvData={csvData}
 						/>
+					</Col>
+					<Col sm={12} className="updateStatusDiv">
+						{updateStatusText}
 					</Col>
 					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : reportPane}</Col>
 				</Row>

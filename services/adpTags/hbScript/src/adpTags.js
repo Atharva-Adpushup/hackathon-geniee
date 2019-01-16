@@ -1,6 +1,7 @@
 // Adp tags library
 
-var prebidSandbox = require('./prebidSandbox'),
+var w = window,
+	prebidSandbox = require('./prebidSandbox'),
 	utils = require('../helpers/utils'),
 	config = require('./config'),
 	inventory = config.INVENTORY,
@@ -8,6 +9,11 @@ var prebidSandbox = require('./prebidSandbox'),
 	adpRender = require('./adpRender'),
 	// Maps a particular adp slot to a dfp ad unit and a prebid bidder config
 	inventoryMapper = function(size, optionalParam) {
+		// Reset inventory as default if site is SPA
+		if (w.adpushup.config.isSPA) {
+			inventory = w.adpushup.$.extend(true, {}, w.adpTags.defaultInventory);
+		}
+
 		var width = size[0],
 			height = size[1],
 			size = width + 'x' + height,
