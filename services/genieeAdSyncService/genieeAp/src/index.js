@@ -21,13 +21,45 @@ var w = window,
 	spaHandler = require('./spaHandler'),
 	isGenieeSite;
 
+// Destroy ADP slots and their associated GPT slots
+function destroyAdpSlots() {
+	var adpSlots = Object.keys(w.adpTags.adpSlots);
+
+	if (adpSlots.length) {
+		var adpGSlots = [];
+		adpSlots.forEach(function(adpSlot) {
+			adpGSlots.push(w.adpTags.adpSlots[adpSlot].gSlot);
+		});
+
+		w.adpTags.adpSlots = {};
+		w.googletag.cmd.push(function() {
+			w.googletag.destroySlots(adpGSlots);
+		});
+	}
+}
+
+// Reset adpTags config and destroy all ADP slots
+function resetAdpTagsConfig() {
+	if (w.adpTags) {
+		w.adpTags.config.INVENTORY = $.extend(true, {}, w.adpTags.defaultInventory);
+		w.adpTags.adpBatches = [];
+		w.adpTags.batchPrebiddingComplete = false;
+		w.adpTags.currentBatchAdpSlots = [];
+		w.adpTags.currentBatchId = null;
+		w.adpTags.gptRefreshIntervals = [];
+		destroyAdpSlots();
+	}
+}
+
+// Reset adpushup config
 function resetAdpConfig() {
-	config = adp.config = $.extend({}, defaultConfig);
+	config = adp.config = $.extend(true, {}, defaultConfig);
 }
 
 // Resets and initialises the adpushup config object
 function initAdpConfig() {
 	resetAdpConfig();
+	resetAdpTagsConfig();
 
 	// Extend adpushup object
 	$.extend(adp, {
