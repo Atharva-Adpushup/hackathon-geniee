@@ -4,6 +4,7 @@ var utils = require('../helpers/utils'),
 	config = require('./config'),
 	responsiveAds = require('./responsiveAds'),
 	feedback = require('./feedback').feedback,
+	$ = window.adpushup.$,
 	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(1));
 		if (val > 20) {
