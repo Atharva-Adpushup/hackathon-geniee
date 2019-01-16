@@ -143,7 +143,12 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 							unsyncedZone.platform = ad.formatData.platform;
 						}
 					}
-					return unsyncedZone;
+
+					return {
+						variationName: 'manual',
+						sectionName: ad.name,
+						...unsyncedZone
+					};
 				})
 			);
 
