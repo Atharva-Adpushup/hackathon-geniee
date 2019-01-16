@@ -58,7 +58,7 @@ class ReportingPanel extends React.Component {
 	getReportStatus() {
 		ajax({
 			method: 'GET',
-			url: `${commonConsts.REPORT_STATUS}?fromDate=${this.state.startDate}&toDate=${this.state.endDate}&report=GETADPTAGREPORTSTATUS`
+			url: `${commonConsts.REPORT_STATUS}?fromDate=${this.state.startDate}&toDate=${this.state.endDate}`
 		}).then(res => {
 			if (res.status) {
 				if (res.status == 'Stopped') {
