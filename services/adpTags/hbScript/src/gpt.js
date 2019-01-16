@@ -3,6 +3,7 @@
 var config = require('./config'),
 	feedback = require('./feedback').feedback,
 	utils = require('../helpers/utils'),
+	$ = window.adpushup.$,
 	init = function(d) {
 		var gptScriptEl = d.createElement('script');
 		gptScriptEl.src = '//www.googletagservices.com/tag/js/gpt.js';
