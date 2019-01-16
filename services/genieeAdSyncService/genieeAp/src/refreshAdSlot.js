@@ -8,7 +8,7 @@ var utils = require('../libs/utils'),
 	ads = [],
 	intervals = [],
 	refreshAd = function(container, ad) {
-		if (utils.isElementInViewport(container)) {
+		if (utils.isElementInViewport(container) && ad.network !== commonConsts.NETWORKS.ADPTAGS) {
 			container.children().remove();
 			container.append(adCodeGenerator.generateAdCode(ad));
 		}
