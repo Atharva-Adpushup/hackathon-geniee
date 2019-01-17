@@ -34,7 +34,19 @@ var utils = require('../helpers/utils'),
 				gptRefreshInterval = setInterval(function() {
 					var el = $('#' + slot.sectionId);
 					if (adp.utils.isElementInViewport(el)) {
+						var feedbackData = {
+							ads: [],
+							xpathMiss: [],
+							eventType: 1,
+							mode: 1,
+							referrer: adp.config.referrer,
+							tracking: false
+						};
 						refreshGPTSlot(slot.gSlot);
+						feedbackData.xpathMiss = [];
+						feedbackData.ads = [slot.sectionId];
+						feedbackData.variationId = adp.config.selectedVariation;
+						adp.utils.sendFeedback(feedbackData);
 					}
 				}, config.GPT_REFRESH_INTERVAL);
 				adp.adpTags.gptRefreshIntervals.push({
@@ -57,8 +69,7 @@ var utils = require('../helpers/utils'),
 		});
 	},
 	renderPostbid = function(slot) {
-		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId),
-			adIframe = utils.createEmptyIframe();
+		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId), adIframe = utils.createEmptyIframe();
 
 		document.getElementById(slot.containerId).appendChild(adIframe);
 
@@ -100,8 +111,7 @@ var utils = require('../helpers/utils'),
 		}
 
 		Object.keys(config.UTM_WISE_TARGETING).forEach(function(key) {
-			var keyVal = config.UTM_WISE_TARGETING[key],
-				utmParam = urlParams[keyVal];
+			var keyVal = config.UTM_WISE_TARGETING[key], utmParam = urlParams[keyVal];
 
 			googletag
 				.pubads()
@@ -135,12 +145,9 @@ var utils = require('../helpers/utils'),
 			});
 			if (dfpAdunitCodes.indexOf(slot.optionalParam.dfpAdunitCode) !== -1) {
 				var currentTargetingObject =
-						config.TARGETING[
-							'/' +
-								networkCodes[slot.optionalParam.dfpAdunitCode] +
-								'/' +
-								slot.optionalParam.dfpAdunitCode
-						],
+					config.TARGETING[
+						'/' + networkCodes[slot.optionalParam.dfpAdunitCode] + '/' + slot.optionalParam.dfpAdunitCode
+					],
 					currentTargetingObject = setPageLevelTargeting(currentTargetingObject, slot);
 				Object.keys(currentTargetingObject).forEach(function(dfpKey, index) {
 					slot.gSlot.setTargeting(dfpKey, String(currentTargetingObject[dfpKey]));
@@ -149,9 +156,9 @@ var utils = require('../helpers/utils'),
 			return;
 		}
 		var targeting = {
-				hb_siteId: config.SITE_ID,
-				hb_ran: 0
-			},
+			hb_siteId: config.SITE_ID,
+			hb_ran: 0
+		},
 			adServerTargeting = getAdserverTargeting(slot);
 
 		if (utils.isSupportedBrowser() && slot.bidders.length) {
@@ -237,8 +244,7 @@ var utils = require('../helpers/utils'),
 		bid.ad = config.ADSENSE_FALLBACK_ADCODE.replace('__AD_CODE__', adData);
 	},
 	afterBiddingProcessor = function(slots) {
-		var genieeRef = adp && adp.geniee,
-			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback;
+		var genieeRef = adp && adp.geniee, isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback;
 
 		if (!Array.isArray(slots) || !slots.length) {
 			return false;
