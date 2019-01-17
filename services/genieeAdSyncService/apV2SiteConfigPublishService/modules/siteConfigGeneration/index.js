@@ -142,13 +142,15 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 						if (ad.formatData && ad.formatData.platform) {
 							unsyncedZone.platform = ad.formatData.platform;
 						}
+
+						return {
+							variationName: 'manual',
+							sectionName: ad.name,
+							...unsyncedZone
+						};
 					}
 
-					return {
-						variationName: 'manual',
-						sectionName: ad.name,
-						...unsyncedZone
-					};
+					return unsyncedZone;
 				})
 			);
 
