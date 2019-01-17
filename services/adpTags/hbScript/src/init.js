@@ -55,6 +55,9 @@ function init(w, d) {
 		// Set adpTags if already present else initialise module
 		w.adpushup.adpTags = existingAdpTags.adpSlots ? existingAdpTags : adpTagsModule;
 
+		// Keep deep copy of inventory in adpTags module
+		w.adpushup.adpTags.defaultInventory = w.adpushup.$.extend(true, {}, config.INVENTORY);
+
 		// Merge adpQue with any existing que items if present
 		w.adpushup.adpTags.que = w.adpushup.adpTags.que.concat(adpQue).concat(w.adpTags.que);
 		w.adpTags = w.adpushup.adpTags;

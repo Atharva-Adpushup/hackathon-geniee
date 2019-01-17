@@ -42,7 +42,7 @@ class Component {
 					? adp.config.selectedVariation
 					: commonConsts.MANUAL_ADS.VARIATION
 			};
-		$format.attr({ 'data-section': id, class: '_ap_apex_ad' });
+		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
 
 		adp.tracker.add(
 			$format,

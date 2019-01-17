@@ -136,6 +136,16 @@ block bodyContent
                                                 .input-name X Path Wait Timeout
                                             .col-sm-7
                                                 input.form-control(value=(apConfigs.xpathWaitTimeout ? apConfigs.xpathWaitTimeout : 5000) name="xpathWaitTimeout" type="number" placeholder="Enter X Path Wait Timeout")
+                                        .row
+                                            .col-sm-5
+                                                .input-name Is SPA
+                                            .col-sm-7
+                                                input(style="margin-top: 10px;" type="checkbox" id="isSPA" name="isSPA" value=(apConfigs.isSPA ? (apConfigs.isSPA ? "true" : "false") : "false") checked=(apConfigs.isSPA !== "undefined" ? (apConfigs.isSPA ? "true" : undefined) : "false"))
+                                        .row
+                                            .col-sm-5
+                                                .input-name SPA page transition timeout
+                                            .col-sm-7
+                                                input.form-control(style="margin-top: 10px;" value=(apConfigs.spaPageTransitionTimeout ? apConfigs.spaPageTransitionTimeout : 0) name="spaPageTransitionTimeout" type="number" placeholder="Enter SPA Page Transition Timeout")
                                          .row
                                             .col-sm-5
                                                 .input-name Auto Optimise
