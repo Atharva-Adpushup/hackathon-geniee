@@ -4,7 +4,8 @@ var utils = require('../helpers/utils'),
 	config = require('./config'),
 	responsiveAds = require('./responsiveAds'),
 	feedback = require('./feedback').feedback,
-	$ = window.adpushup.$,
+	$ = require('./adp').$,
+	adp = require('./adp').adp,
 	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(1));
 		if (val > 20) {
@@ -32,11 +33,11 @@ var utils = require('../helpers/utils'),
 			googletag.cmd.push(function() {
 				gptRefreshInterval = setInterval(function() {
 					var el = $('#' + slot.sectionId);
-					if (utils.isElementInViewport(el)) {
+					if (adp.utils.isElementInViewport(el)) {
 						refreshGPTSlot(slot.gSlot);
 					}
 				}, config.GPT_REFRESH_INTERVAL);
-				window.adpushup.adpTags.gptRefreshIntervals.push({
+				adp.adpTags.gptRefreshIntervals.push({
 					gSlot: slot.gSlot,
 					id: gptRefreshInterval,
 					sectionId: slot.sectionId
@@ -87,13 +88,13 @@ var utils = require('../helpers/utils'),
 		return null;
 	},
 	setUTMWiseTargeting = function() {
-		var urlParams = window.adpushup.utils.queryParams;
+		var urlParams = adp.utils.queryParams;
 
 		if (!Object.keys(urlParams).length) {
-			var utmSessionCookie = window.adpushup.session.getCookie(config.UTM_SESSION_COOKIE);
+			var utmSessionCookie = adp.session.getCookie(config.UTM_SESSION_COOKIE);
 
 			if (utmSessionCookie) {
-				var utmSessionCookieValues = window.adpushup.utils.base64Decode(utmSessionCookie.split('_=')[1]);
+				var utmSessionCookieValues = adp.utils.base64Decode(utmSessionCookie.split('_=')[1]);
 				urlParams = utmSessionCookieValues ? JSON.parse(utmSessionCookieValues) : {};
 			}
 		}
@@ -236,7 +237,7 @@ var utils = require('../helpers/utils'),
 		bid.ad = config.ADSENSE_FALLBACK_ADCODE.replace('__AD_CODE__', adData);
 	},
 	afterBiddingProcessor = function(slots) {
-		var genieeRef = window.adpushup && window.adpushup.geniee,
+		var genieeRef = adp && adp.geniee,
 			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback;
 
 		if (!Array.isArray(slots) || !slots.length) {
