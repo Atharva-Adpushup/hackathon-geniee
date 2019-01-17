@@ -4,7 +4,7 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 	adpRender = require('./adpRender'),
 	config = require('./config'),
 	responsiveAds = require('./responsiveAds'),
-	find = require('lodash.find'),
+	adp = require('./adp').adp,
 	__FRAME_PREFIX__ = '__adp_frame__',
 	utils = require('../helpers/utils'),
 	createPrebidContainer = function(adpSlotsBatch) {
@@ -17,7 +17,7 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 				responsiveSizes = responsiveAds.getAdSizes(adpSlot.containerId).collection;
 				adpSlot.computedSizes = responsiveSizes;
 			}
-			
+
 			if (!adpSlot.bidders || !adpSlot.bidders.length) {
 				return true;
 			}
@@ -90,10 +90,10 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 	},
 	// Callback function to set pbjs keys on parent - fired when prebid sandboxing completes
 	prebidFinishCallback = function(adpBatchId, timeout) {
-		var adpSlots = utils.getCurrentAdpSlotBatch(window.adpushup.adpTags.adpBatches, adpBatchId),
+		var adpSlots = utils.getCurrentAdpSlotBatch(adp.adpTags.adpBatches, adpBatchId),
 			adUnits = utils.getBatchAdUnits(adpSlots).join(',');
 
-		window.adpushup.adpTags.batchPrebiddingComplete = true;
+		adp.adpTags.batchPrebiddingComplete = true;
 		if (Object.keys(adpSlots).length) {
 			//function sets google targeting and render the slot, also handle if google slot not available
 			adpRender.afterBiddingProcessor(adpSlots);
@@ -102,7 +102,7 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 	},
 	// Callback function to set timeout feedback of bidders - fired when prebid auction times out
 	prebidTimeoutCallback = function(adpBatchId, timedOutBidders, timeout) {
-		var adpSlots = utils.getCurrentAdpSlotBatch(window.adpushup.adpTags.adpBatches, adpBatchId);
+		var adpSlots = utils.getCurrentAdpSlotBatch(adp.adpTags.adpBatches, adpBatchId);
 
 		adpSlots.forEach(function(adpSlot) {
 			if (adpSlot.bidders && adpSlot.bidders.length) {
