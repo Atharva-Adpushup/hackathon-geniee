@@ -17,7 +17,20 @@ const variationManager = props => {
 				return !!variationObj.disable;
 			})
 		),
-		disabledVariationsCount = disabledVariations.length;
+		controlVariations = _.compact(
+			_.map(props.variations, variationObj => {
+				const activeVariationId = props.activeVariation.id,
+					isSameVariation = !!(activeVariationId === variationObj.id);
+
+				if (isSameVariation) {
+					return false;
+				}
+
+				return !!variationObj.isControl;
+			})
+		),
+		disabledVariationsCount = disabledVariations.length,
+		controlVariationsCount = controlVariations.length;
 
 	return (
 		<div>
@@ -36,6 +49,7 @@ const variationManager = props => {
 						updateAdCode={props.updateAdCode}
 						updateNetwork={props.updateNetwork}
 						disabledVariationsCount={disabledVariationsCount}
+						controlVariationsCount={controlVariationsCount}
 					/>
 				</div>
 			)}

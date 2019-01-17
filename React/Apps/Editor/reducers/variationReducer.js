@@ -113,6 +113,15 @@ const variation = (state = {}, action) => {
 					}
 				};
 
+			case variationActions.TAG_CONTROL_VARIATION:
+				return {
+					...state,
+					[action.variationId]: {
+						...state[action.variationId],
+						isControl: action.payload.isControl
+					}
+				};
+
 			case variationActions.EDIT_TRAFFIC_DISTRIBUTION:
 				return {
 					...state,

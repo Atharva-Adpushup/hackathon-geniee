@@ -14,16 +14,21 @@ const appBucket = couchbaseService(
 );
 
 function generateSiteChannelJSON(channelAndZones, siteModelItem) {
+	const userEmail = siteModelItem.get('ownerEmail');
 	let unsyncedGenieeZones = [];
 	let unsyncedGenieeDFPCreationZones = [];
 	let adpTagsUnsyncedZones = {
 		siteId: siteModelItem.get('siteId'),
 		siteDomain: siteModelItem.get('siteDomain'),
+		publisherEmailAddress: userEmail,
+		publisherName: '',
 		ads: []
 	};
 	let logsUnsyncedZones = {
 		siteId: siteModelItem.get('siteId'),
 		siteDomain: siteModelItem.get('siteDomain'),
+		publisherEmailAddress: userEmail,
+		publisherName: '',
 		ads: []
 	};
 	function doIt(channelWithZones) {
@@ -85,13 +90,21 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 			}
 		});
 	}
-	return Promise.map(channelAndZones, doIt).then(() => {
-		return {
-			geniee: unsyncedGenieeZones,
-			adp: adpTagsUnsyncedZones,
-			genieeDFP: unsyncedGenieeDFPCreationZones,
-			logs: logsUnsyncedZones
-		};
+
+	return appBucket.getDoc(`${docKeys.user}${userEmail}`).then(docWithCas => {
+		const userData = docWithCas.value;
+
+		logsUnsyncedZones.publisherName = `${userData.firstName} ${userData.lastName}`;
+		adpTagsUnsyncedZones.publisherName = `${userData.firstName} ${userData.lastName}`;
+
+		return Promise.map(channelAndZones, doIt).then(() => {
+			return {
+				geniee: unsyncedGenieeZones,
+				adp: adpTagsUnsyncedZones,
+				genieeDFP: unsyncedGenieeDFPCreationZones,
+				logs: logsUnsyncedZones
+			};
+		});
 	});
 }
 
@@ -113,7 +126,12 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 			const unSyncedAds = _.compact(
 				_.map(ads, ad => {
 					if (checkForLog(ad)) {
-						logUnsyncedAds.push(ad);
+						const computedData = {
+							variationName: 'manual',
+							sectionName: ad.name,
+							...ad
+						};
+						logUnsyncedAds.push(computedData);
 					}
 					let unsyncedZone =
 						ad.network && ad.network == 'adpTags'
@@ -124,7 +142,14 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 						if (ad.formatData && ad.formatData.platform) {
 							unsyncedZone.platform = ad.formatData.platform;
 						}
+
+						return {
+							variationName: 'manual',
+							sectionName: ad.name,
+							...unsyncedZone
+						};
 					}
+
 					return unsyncedZone;
 				})
 			);

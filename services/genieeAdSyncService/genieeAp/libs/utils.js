@@ -317,7 +317,7 @@ module.exports = {
 		}
 	},
 	isElementInViewport: function(el, threshold) {
-		const elementTop = $(el).offset().top,
+		var elementTop = $(el).offset().top,
 			elementBottom = elementTop + $(el).outerHeight(),
 			viewportTop = $(window).scrollTop(),
 			windowHeight =
