@@ -74,6 +74,7 @@ module.exports = {
 						sectionName: section.name,
 						type: section.formatData && section.formatData.type ? section.formatData.type : false,
 						isManual: ad.isManual || false,
+						isInnovativeAd: ad.isInnovativeAd || false,
 						isNative: isNative,
 						network: ad.network,
 						networkData: {
@@ -116,13 +117,17 @@ module.exports = {
 				if (checkForLog(ad)) {
 					unsyncedZones.logsUnsyncedZones.push({
 						...ad,
-						variationId,
-						variationName,
+						variations: [
+							{
+								id: variationId,
+								name: variationName,
+								platform: additionalInfo.platform,
+								pageGroup: additionalInfo.pageGroup
+							}
+						],
 						channelKey,
 						id: sectionId,
 						adId: ad.id,
-						platform: additionalInfo.platform,
-						pageGroup: additionalInfo.pageGroup,
 						isControl,
 						sectionName: section.name
 					});
@@ -142,11 +147,19 @@ module.exports = {
 					case 'adpTags':
 						var unsyncedZone = self.checkAdpTagsUnsyncedZones(section, ad);
 						if (unsyncedZone) {
-							unsyncedZone.variationId = variationId;
-							unsyncedZone.variationName = variationName;
+							unsyncedZone.variations = [
+								{
+									id: variationId,
+									name: variationName,
+									platform: additionalInfo.platform,
+									pageGroup: additionalInfo.pageGroup
+								}
+							];
+							// unsyncedZone.variationId = variationId;
+							// unsyncedZone.variationName = variationName;
+							// unsyncedZone.pageGroup = additionalInfo.pageGroup;
+							// unsyncedZone.platform = additionalInfo.platform;
 							unsyncedZone.channelKey = channelKey;
-							unsyncedZone.pageGroup = additionalInfo.pageGroup;
-							unsyncedZone.platform = additionalInfo.platform;
 							unsyncedZones.adpTagsUnsyncedZones.push(unsyncedZone);
 						}
 						break;

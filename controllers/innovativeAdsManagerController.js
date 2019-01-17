@@ -34,13 +34,13 @@ const fn = {
 			.catch(err => console.log('Ad creation call to Zapier failed'));
 	},
 	createNewDocAndDoProcessing: payload => {
-		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
+		let innovativeAdDefault = _.cloneDeep(interactiveAdsInitialDoc);
 		return appBucket
-			.createDoc(`${docKeys.interactiveAds}${payload.siteId}`, tagManagerDefault, {})
+			.createDoc(`${docKeys.interactiveAds}${payload.siteId}`, innovativeAdDefault, {})
 			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
 			.then(docWithCas => {
 				payload.siteDomain = docWithCas.value.siteDomain;
-				return fn.processing(tagManagerDefault, payload);
+				return fn.processing(innovativeAdDefault, payload);
 			});
 	},
 	processing: (data, payload) => {

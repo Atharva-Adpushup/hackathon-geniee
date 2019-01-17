@@ -22,14 +22,16 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 		siteDomain: siteModelItem.get('siteDomain'),
 		publisherEmailAddress: userEmail,
 		publisherName: '',
-		ads: []
+		ads: [],
+		options: {}
 	};
 	let logsUnsyncedZones = {
 		siteId: siteModelItem.get('siteId'),
 		siteDomain: siteModelItem.get('siteDomain'),
 		publisherEmailAddress: userEmail,
 		publisherName: '',
-		ads: []
+		ads: [],
+		options: {}
 	};
 	function doIt(channelWithZones) {
 		if (
@@ -261,7 +263,7 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 	// 			: Promise.reject(err);
 	// 	});
 	return adGeneration(`${docKeys.tagManager}${site.get('siteId')}`, currentDataForSyncing, () =>
-		Promise.resolve({ variationName: 'manual' })
+		Promise.resolve({ variations: [{ variationName: 'manual', variationId: 'manual' }] })
 	);
 }
 
@@ -294,7 +296,7 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 								? {
 										channel: `${channel.platform}:${channel.pageGroup}`,
 										pageGroup: channel.pageGroup,
-										variationsData: generateVariationsData(channel.variations)
+										variations: generateVariationsData(channel.variations)
 								  }
 								: false;
 						})
@@ -302,7 +304,7 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 				)
 			)
 			.then(variationsData => {
-				return { variationName: variationsData };
+				return { variations: variationsData };
 			})
 			.catch(err => {
 				console.log(err.message);
@@ -320,7 +322,16 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 		`${docKeys.interactiveAds}${site.get('siteId')}`,
 		currentDataForSyncing,
 		generateLogData.bind(null, site)
-	);
+	).then(() => {
+		const options = {
+			multiple: true,
+			keys: ['variations']
+		};
+		currentDataForSyncing.adp.options = options;
+		currentDataForSyncing.logs.options = options;
+
+		return currentDataForSyncing;
+	});
 }
 
 function getGeneratedPromises(siteModelItem) {
