@@ -11,7 +11,9 @@
 		"safe-access": "^0.1.0"
 	},
 	"scripts": {
-		"eslint": "eslint ."
+		"eslint": "eslint .",
+		"build": "webpack --progress",
+		"watch": "webpack --progress -w"
 	},
 	"devDependencies": {
 		"babel-core": "^6.26.0",
