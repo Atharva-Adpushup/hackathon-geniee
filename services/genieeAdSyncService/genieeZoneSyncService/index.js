@@ -119,8 +119,8 @@ module.exports = {
 						...ad,
 						variations: [
 							{
-								id: variationId,
-								name: variationName,
+								variationId: variationId,
+								variationName: variationName,
 								platform: additionalInfo.platform,
 								pageGroup: additionalInfo.pageGroup
 							}
@@ -149,8 +149,8 @@ module.exports = {
 						if (unsyncedZone) {
 							unsyncedZone.variations = [
 								{
-									id: variationId,
-									name: variationName,
+									variationId: variationId,
+									variationName: variationName,
 									platform: additionalInfo.platform,
 									pageGroup: additionalInfo.pageGroup
 								}

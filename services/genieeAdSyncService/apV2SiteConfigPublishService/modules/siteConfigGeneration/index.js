@@ -23,7 +23,9 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 		publisherEmailAddress: userEmail,
 		publisherName: '',
 		ads: [],
-		options: {}
+		options: {
+			multiple: false
+		}
 	};
 	let logsUnsyncedZones = {
 		siteId: siteModelItem.get('siteId'),
@@ -31,7 +33,9 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 		publisherEmailAddress: userEmail,
 		publisherName: '',
 		ads: [],
-		options: {}
+		options: {
+			multiple: false
+		}
 	};
 	function doIt(channelWithZones) {
 		if (
@@ -262,8 +266,12 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 	// 			? currentDataForSyncing
 	// 			: Promise.reject(err);
 	// 	});
-	return adGeneration(`${docKeys.tagManager}${site.get('siteId')}`, currentDataForSyncing, () =>
-		Promise.resolve({ variations: [{ variationName: 'manual', variationId: 'manual' }] })
+	return adGeneration(`${docKeys.tagManager}${site.get('siteId')}`, currentDataForSyncing, ad =>
+		Promise.resolve({
+			variations: [
+				{ variationName: 'manual', variationId: 'manual', pageGroup: null, platform: ad.formatData.platform }
+			]
+		})
 	);
 }
 
@@ -279,8 +287,8 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 								let output = {};
 								_.forEach(variations, variation => {
 									output[variation.id] = {
-										id: variation.id,
-										name: variation.name
+										variationId: variation.id,
+										variationName: variation.name
 									};
 								});
 								return output;
@@ -324,8 +332,7 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 		generateLogData.bind(null, site)
 	).then(() => {
 		const options = {
-			multiple: true,
-			keys: ['variations']
+			multiple: true
 		};
 		currentDataForSyncing.adp.options = options;
 		currentDataForSyncing.logs.options = options;
