@@ -1,5 +1,6 @@
 var config = require('../src/config'),
-	find = require('lodash.find');
+	find = require('lodash.find'),
+	$ = window.adpushup.$;
 
 module.exports = {
 	hashCode: function(str) {
@@ -82,7 +83,7 @@ module.exports = {
 		return null;
 	},
 	sendFeedback: function(feedback) {
-		window.adpushup.$.post(config.FEEDBACK_URL, JSON.stringify(feedback.data));
+		$.post(config.FEEDBACK_URL, JSON.stringify(feedback.data));
 	},
 	getBatchAdUnits: function(adpSlots) {
 		var adUnits = [];
