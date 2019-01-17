@@ -3,7 +3,7 @@ const Promise = require('bluebird');
 const genieeZoneSyncService = require('../../../genieeZoneSyncService/index');
 const config = require('../../../../../configs/config');
 const { docKeys } = require('../../../../../configs/commonConsts');
-const { couchbaseService } = require('node-utils');
+const { couchbaseService, promiseForeach } = require('node-utils');
 const { checkForLog } = require('../../../../../helpers/commonFunctions');
 
 const appBucket = couchbaseService(
@@ -108,54 +108,92 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 	});
 }
 
-function tagManagerAdsSyncing(currentDataForSyncing, site) {
-	/**
-	 * FLOW:
-	 * 1. Read Tag Manager Doc
-	 * 2. Fetch Ads
-	 * 3. Filter Unsynced Ads
-	 * 4. Set Dummy values to some variables to compliment current working flow
-	 * 5. Concat ads from Tag manager to current adp.ads
-	 */
+function unSyncedAdsWrapper(unSyncedAds, logUnsyncedAds, cb, ad) {
+	function processCallback(cb) {
+		return cb ? cb(ad) : Promise.resolve({});
+	}
+
+	return processCallback(cb).then(appSpecficData => {
+		if (checkForLog(ad)) {
+			const computedData = {
+				sectionName: ad.name,
+				...appSpecficData,
+				...ad
+			};
+			logUnsyncedAds.push(computedData);
+		}
+		let unsyncedZone =
+			ad.network && ad.network == 'adpTags' ? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad) : false;
+		if (unsyncedZone) {
+			if (ad.formatData && ad.formatData.platform) {
+				unsyncedZone.platform = ad.formatData.platform;
+			}
+			unSyncedAds.push({
+				sectionName: ad.name,
+				...appSpecficData,
+				...unsyncedZone
+			});
+		}
+		return true;
+	});
+}
+
+function adGeneration(docKey, currentDataForSyncing, cb = false) {
+	let logUnsyncedAds = [];
+	let unSyncedAds = [];
 	return appBucket
-		.getDoc(`${docKeys.tagManager}${site.get('siteId')}`)
+		.getDoc(docKey)
 		.then(docWithCas => {
-			let logUnsyncedAds = [];
-
 			const ads = docWithCas.value.ads;
-			const unSyncedAds = _.compact(
-				_.map(ads, ad => {
-					if (checkForLog(ad)) {
-						const computedData = {
-							variationName: 'manual',
-							sectionName: ad.name,
-							...ad
-						};
-						logUnsyncedAds.push(computedData);
-					}
-					let unsyncedZone =
-						ad.network && ad.network == 'adpTags'
-							? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)
-							: false;
 
-					if (unsyncedZone) {
-						if (ad.formatData && ad.formatData.platform) {
-							unsyncedZone.platform = ad.formatData.platform;
-						}
-					}
+			return promiseForeach(ads, unSyncedAdsWrapper.bind(null, unSyncedAds, logUnsyncedAds, cb), err => {
+				console.log(err);
+				return false;
+			});
+			// const unSyncedAds = _.compact(
+			// 	_.map(ads, ad => {
+			// 		if (checkForLog(ad)) {
+			// 			const appSpecficData = cb ? cb(ad) : {};
+			// 			const computedData = {
+			// 				sectionName: ad.name,
+			// 				...appSpecficData,
+			// 				...ad
+			// 			};
+			// 			logUnsyncedAds.push(computedData);
+			// 		}
+			// 		let unsyncedZone =
+			// 			ad.network && ad.network == 'adpTags'
+			// 				? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)
+			// 				: false;
 
-					return {
-						variationName: 'manual',
-						sectionName: ad.name,
-						...unsyncedZone
-					};
-				})
-			);
+			// 		if (unsyncedZone) {
+			// 			if (ad.formatData && ad.formatData.platform) {
+			// 				unsyncedZone.platform = ad.formatData.platform;
+			// 			}
+			// 		}
 
+			// 		return {
+			// 			sectionName: ad.name,
+			// 			...extra,
+			// 			...unsyncedZone
+			// 		};
+			// 	})
+			// );
+
+			// currentDataForSyncing.adp.ads = unSyncedAds.length
+			// 	? _.concat(currentDataForSyncing.adp.ads, unSyncedAds)
+			// 	: currentDataForSyncing.adp.ads;
+
+			// currentDataForSyncing.logs.ads = logUnsyncedAds.length
+			// 	? _.concat(currentDataForSyncing.logs.ads, logUnsyncedAds)
+			// 	: currentDataForSyncing.logs.ads;
+
+			// return currentDataForSyncing;
+		})
+		.then(() => {
 			currentDataForSyncing.adp.ads = unSyncedAds.length
 				? _.concat(currentDataForSyncing.adp.ads, unSyncedAds)
 				: currentDataForSyncing.adp.ads;
-
 			currentDataForSyncing.logs.ads = logUnsyncedAds.length
 				? _.concat(currentDataForSyncing.logs.ads, logUnsyncedAds)
 				: currentDataForSyncing.logs.ads;
@@ -169,11 +207,128 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 		});
 }
 
+function tagManagerAdsSyncing(currentDataForSyncing, site) {
+	/**
+	 * FLOW:
+	 * 1. Read Tag Manager Doc
+	 * 2. Fetch Ads
+	 * 3. Filter Unsynced Ads
+	 * 4. Set Dummy values to some variables to compliment current working flow
+	 * 5. Concat ads from Tag manager to current adp.ads
+	 */
+	// return appBucket
+	// 	.getDoc(`${docKeys.tagManager}${site.get('siteId')}`)
+	// 	.then(docWithCas => {
+	// 		let logUnsyncedAds = [];
+	// 		const ads = docWithCas.value.ads;
+	// 		const unSyncedAds = _.compact(
+	// 			_.map(ads, ad => {
+	// 				if (checkForLog(ad)) {
+	// 					const computedData = {
+	// 						variationName: 'manual',
+	// 						sectionName: ad.name,
+	// 						...ad
+	// 					};
+	// 					logUnsyncedAds.push(computedData);
+	// 				}
+	// 				let unsyncedZone =
+	// 					ad.network && ad.network == 'adpTags'
+	// 						? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)
+	// 						: false;
+	// 				if (unsyncedZone) {
+	// 					if (ad.formatData && ad.formatData.platform) {
+	// 						unsyncedZone.platform = ad.formatData.platform;
+	// 					}
+	// 				}
+	// 				return {
+	// 					variationName: 'manual',
+	// 					sectionName: ad.name,
+	// 					...unsyncedZone
+	// 				};
+	// 			})
+	// 		);
+	// 		currentDataForSyncing.adp.ads = unSyncedAds.length
+	// 			? _.concat(currentDataForSyncing.adp.ads, unSyncedAds)
+	// 			: currentDataForSyncing.adp.ads;
+	// 		currentDataForSyncing.logs.ads = logUnsyncedAds.length
+	// 			? _.concat(currentDataForSyncing.logs.ads, logUnsyncedAds)
+	// 			: currentDataForSyncing.logs.ads;
+	// 		return currentDataForSyncing;
+	// 	})
+	// 	.catch(err => {
+	// 		return err.name && err.name == 'CouchbaseError' && err.code == 13
+	// 			? currentDataForSyncing
+	// 			: Promise.reject(err);
+	// 	});
+	return adGeneration(`${docKeys.tagManager}${site.get('siteId')}`, currentDataForSyncing, () =>
+		Promise.resolve({ variationName: 'manual' })
+	);
+}
+
+function innovativeAdsSyncing(currentDataForSyncing, site) {
+	function generateLogData(site, ad) {
+		return site
+			.getAllChannels()
+			.then(channels =>
+				_.flatMap(
+					_.compact(
+						_.map(channels, channel => {
+							function generateVariationsData(variations) {
+								let output = {};
+								_.forEach(variations, variation => {
+									output[variation.id] = {
+										id: variation.id,
+										name: variation.name
+									};
+								});
+								return output;
+							}
+
+							const pagegroupAssignedToAd = ad.pagegroups.includes(
+								`${channel.platform}:${channel.pageGroup}`
+							);
+							const variationsExist =
+								pagegroupAssignedToAd && channel.variations && Object.keys(channel.variations).length;
+
+							return variationsExist
+								? {
+										channel: `${channel.platform}:${channel.pageGroup}`,
+										pageGroup: channel.pageGroup,
+										variationsData: generateVariationsData(channel.variations)
+								  }
+								: false;
+						})
+					)
+				)
+			)
+			.then(variationsData => {
+				return { variationName: variationsData };
+			})
+			.catch(err => {
+				console.log(err.message);
+				return Promise.reject(
+					new Error(
+						`Error while fetching variations for ad - ${ad.id} and site - ${site.get(
+							'siteId'
+						)} | Innovative Ads`
+					)
+				);
+			});
+	}
+
+	return adGeneration(
+		`${docKeys.interactiveAds}${site.get('siteId')}`,
+		currentDataForSyncing,
+		generateLogData.bind(null, site)
+	);
+}
+
 function getGeneratedPromises(siteModelItem) {
 	return genieeZoneSyncService
 		.getAllUnsyncedZones(siteModelItem)
 		.then(channelAndZones => generateSiteChannelJSON(channelAndZones, siteModelItem))
-		.then(currentDataForSyncing => tagManagerAdsSyncing(currentDataForSyncing, siteModelItem));
+		.then(currentDataForSyncing => tagManagerAdsSyncing(currentDataForSyncing, siteModelItem))
+		.then(currentDataForSyncing => innovativeAdsSyncing(currentDataForSyncing, siteModelItem));
 }
 
 module.exports = {
