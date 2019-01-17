@@ -22,9 +22,8 @@ var config = require('./config'),
 
 				Object.keys(w.adpushup.adpTags.adpSlots).forEach(function(adpSlot) {
 					var currentSlot = w.adpushup.adpTags.adpSlots[adpSlot];
-					var slotMatched = !!(
-						currentSlot.optionalParam.dfpAdunitCode == adUnitDFPAdunitCode && currentSlot.activeDFPNetwork
-					);
+					var slotMatched = !!(currentSlot.optionalParam.dfpAdunitCode == adUnitDFPAdunitCode &&
+						currentSlot.activeDFPNetwork);
 					if (slotMatched) {
 						networkCode = currentSlot.activeDFPNetwork;
 					}
@@ -45,6 +44,14 @@ var config = require('./config'),
 		});
 	},
 	refreshIntervalSwitch = function(w) {
+		var feedbackData = {
+			ads: [],
+			xpathMiss: [],
+			eventType: 1,
+			mode: 1,
+			referrer: w.adpushup.config.referrer,
+			tracking: false
+		};
 		w.adpushup.$(w).on('blur', function() {
 			if (w.adpushup.adpTags.gptRefreshIntervals.length) {
 				w.adpushup.adpTags.gptRefreshIntervals.forEach(function(interval) {
@@ -59,6 +66,10 @@ var config = require('./config'),
 						var el = $('#' + interval.sectionId);
 						if (utils.isElementInViewport(el)) {
 							googletag.pubads().refresh([interval.gSlot]);
+							feedbackData.xpathMiss = [];
+							feedbackData.ads = [interval.sectionId];
+							feedbackData.variationId = w.adpushup.config.selectedVariation;
+							w.adpushup.utils.sendFeedback(feedbackData);
 						}
 					}, config.GPT_REFRESH_INTERVAL);
 					interval.id = gptRefreshInterval;
