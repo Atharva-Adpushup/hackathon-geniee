@@ -119,25 +119,6 @@ function createTransactionLog({
 				}
 
 				setupLogs = setupLogs.concat(logs);
-
-				// setupLogs.push({
-				// 	siteId,
-				// 	siteDomain: utils.domanize(siteDomain),
-				// 	siteUrl: siteDomain,
-				// 	sectionId,
-				// 	platform,
-				// 	pageGroup,
-				// 	variationId,
-				// 	network: network || null,
-				// 	networkAdUnitId,
-				// 	injectionTechnique,
-				// 	service,
-				// 	status,
-				// 	publisherName,
-				// 	publisherEmailAddress,
-				// 	sectionName,
-				// 	variationName
-				// });
 			}
 
 			return setupLogs;
