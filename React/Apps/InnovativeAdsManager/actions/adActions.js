@@ -146,7 +146,7 @@ const modifyAdOnServer = (adId, data) => dispatch =>
 const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
 	const state = getState();
 	const globalAdLogs = state.global.meta.pagegroups;
-	const { format, platform, pagegroups, isActive, archivedOn } = data;
+	const { format, platform, pagegroups, isActive, archivedOn, networkData } = data;
 	const currentAdLogs = pagegroups.map(pg => `${platform}-${format}-${pg}`);
 	const mode = 'pagegroups';
 
@@ -185,9 +185,9 @@ const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
 		updatedLogs = globalAdLogs.filter(log => !currentAdLogs.includes(log));
 	}
 
-	return helpers.processing(adId, isSuperUser, { isActive, archivedOn }, updatedLogs, dispatch, mode);
+	return helpers.processing(adId, isSuperUser, { isActive, archivedOn, networkData }, updatedLogs, dispatch, mode);
 };
-const updateTraffic = (adId, { pagegroups, platform, format }, isSuperUser) => (dispatch, getState) => {
+const updateTraffic = (adId, { networkData, pagegroups, platform, format }, isSuperUser) => (dispatch, getState) => {
 	const currentAdLogs = pagegroups.map(pg => `${platform}-${format}-${pg}`);
 	const globalAdLogs = getState().global.meta.pagegroups;
 	const currentAd = getState().ads.content.filter(ad => ad.id === adId)[0];
@@ -201,7 +201,7 @@ const updateTraffic = (adId, { pagegroups, platform, format }, isSuperUser) => (
 
 	const mode = 'pagegroups';
 
-	return helpers.processing(adId, isSuperUser, { pagegroups }, [...updatedLogs], dispatch, mode);
+	return helpers.processing(adId, isSuperUser, { pagegroups, networkData }, [...updatedLogs], dispatch, mode);
 };
 
 export { createAd, fetchAds, deleteAd, updateAd, modifyAdOnServer, archiveAd, updateTraffic };

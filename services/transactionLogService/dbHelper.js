@@ -57,7 +57,7 @@ function customDocProcessing(ads, docKey) {
 	if (!ads || !ads.length) {
 		return Promise.resolve();
 	}
-	return dbHelper.getDoc(dockey).then(docWithCas => {
+	return dbHelper.getDoc(docKey).then(docWithCas => {
 		let adsFromDoc = _.cloneDeep(docWithCas.value.ads);
 		_.forEach(adsFromDoc, ad => {
 			_.forEach(ads, currentAd => {
@@ -68,7 +68,7 @@ function customDocProcessing(ads, docKey) {
 			});
 		});
 		docWithCas.value.ads = adsFromDoc;
-		return dbHelper.updateDoc(dockey, docWithCas.value, docWithCas.cas);
+		return dbHelper.updateDoc(docKey, docWithCas.value, docWithCas.cas);
 	});
 }
 

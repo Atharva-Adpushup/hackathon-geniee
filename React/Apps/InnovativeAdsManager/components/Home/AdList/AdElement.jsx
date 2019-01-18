@@ -51,7 +51,11 @@ class AdElement extends Component {
 						platform: this.props.ad.formatData.platform,
 						pagegroups: this.props.ad.pagegroups,
 						isActive: !this.state.isActive,
-						archivedOn: +new Date()
+						archivedOn: +new Date(),
+						networkData: {
+							...this.props.ad.networkData,
+							logWritten: false
+						}
 					},
 					this.isSuperUser
 				)
