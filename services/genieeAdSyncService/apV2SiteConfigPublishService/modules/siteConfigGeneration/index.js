@@ -152,7 +152,7 @@ function adGeneration(docKey, currentDataForSyncing, cb = false) {
 		.then(docWithCas => {
 			const ads = docWithCas.value.ads;
 
-			return promiseForeach(ads, unSyncedAdsWrapper.bind(null, unSyncedAds, logUnsyncedAds, cb), err => {
+			return promiseForeach(ads, unSyncedAdsWrapper.bind(null, unSyncedAds, logUnsyncedAds, cb), (data, err) => {
 				console.log(err);
 				return false;
 			});
@@ -280,20 +280,9 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 		return site
 			.getAllChannels()
 			.then(channels =>
-				_.flatMap(
-					_.compact(
+				_.compact(
+					_.flatMap(
 						_.map(channels, channel => {
-							function generateVariationsData(variations) {
-								let output = {};
-								_.forEach(variations, variation => {
-									output[variation.id] = {
-										variationId: variation.id,
-										variationName: variation.name
-									};
-								});
-								return output;
-							}
-
 							const pagegroupAssignedToAd = ad.pagegroups.includes(
 								`${channel.platform}:${channel.pageGroup}`
 							);
@@ -301,11 +290,18 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 								pagegroupAssignedToAd && channel.variations && Object.keys(channel.variations).length;
 
 							return variationsExist
-								? {
-										channel: `${channel.platform}:${channel.pageGroup}`,
-										pageGroup: channel.pageGroup,
-										variations: generateVariationsData(channel.variations)
-								  }
+								? _.map(channel.variations, variation => {
+										if (!variation.isControl) {
+											return {
+												channel: `${channel.platform}:${channel.pageGroup}`,
+												pageGroup: channel.pageGroup,
+												platform: channel.platform,
+												variationId: variation.id,
+												variationName: variation.name
+											};
+										}
+										return false;
+								  })
 								: false;
 						})
 					)

@@ -29,6 +29,7 @@ function createTransactionLog({
 			let networkAdUnitId = null;
 			let status = commonConsts.SETUP_STATUS.ACTIVE;
 			let service = commonConsts.TRANSACTION_SERVICES.UNKNOWN;
+			let sectionId = ad.sectionId ? ad.sectionId : ad.id;
 
 			// Should Innovative Ad count under Layout??
 			if (isManual) {
@@ -74,31 +75,43 @@ function createTransactionLog({
 			return {
 				injectionTechnique,
 				networkAdUnitId,
+				network,
 				status,
 				service,
-				sectionName
+				sectionName,
+				sectionId,
+				publisherName,
+				publisherEmailAddress,
+				siteId,
+				siteUrl: siteDomain,
+				siteDomain: utils.domanize(siteDomain)
 			};
 		},
 		generateVariationsLogCombo = (constantLogKeys, variations) => {
-			if (options.multiple) {
-				let finalOutput = [];
-				_.forEach(variations, ele => {
-					const channelInfo = {
-						pageGroup: ele.pageGroup,
-						platform: ele.platform
-					};
-					_.forEach(ele.variations, ({ variationId, variationName }) => {
-						finalOutput.push({
-							...constantLogKeys,
-							...channelInfo,
-							variationId,
-							variationName
-						});
-					});
-				});
-				return finalOutput;
-			}
-			return [{ ...constantLogKeys, ...variations[0] }];
+			return _.map(variations, variation => {
+				return {
+					...constantLogKeys,
+					...variation
+				};
+			});
+			// if (options.multiple) {
+			// 	let finalOutput = [];
+			// 	_.forEach(variations, ele => {
+			// 		const channelInfo = {
+			// 			pageGroup: ele.pageGroup,
+			// 			platform: ele.platform
+			// 		};
+			// 		_.forEach(ele.variations, variation => {
+			// 			finalOutput.push({
+			// 				...constantLogKeys,
+			// 				...channelInfo,
+			// 				...variation
+			// 			});
+			// 		});
+			// 	});
+			// 	return finalOutput;
+			// }
+			// return [{ ...constantLogKeys, ...variations[0] }];
 		},
 		getTransactionLogData = ad => {
 			// let pageGroup = null;
@@ -200,10 +213,10 @@ function createTransactionLog({
 					siteId,
 					siteDomain: utils.domanize(siteDomain),
 					siteUrl: siteDomain,
+					sectionId,
 					platform,
 					pageGroup,
 					variationId,
-					sectionId,
 					network: network || null,
 					networkAdUnitId,
 					injectionTechnique,
