@@ -65,12 +65,20 @@ class PagegroupTrafficEdit extends Component {
 								{
 									platform: ad.formatData.platform,
 									format: ad.formatData.format,
-									pagegroups: this.state.pagegroups
+									pagegroups: this.state.pagegroups,
+									networkData: {
+										...ad.networkData,
+										logWritten: false
+									}
 								},
 								isSuperUser
 							);
 						} else {
 							updateWrapper({
+								networkData: {
+									...ad.networkData,
+									logWritten: false
+								},
 								pagegroups: this.state.pagegroups
 							});
 						}

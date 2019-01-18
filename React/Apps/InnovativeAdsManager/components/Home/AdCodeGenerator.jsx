@@ -251,36 +251,6 @@ class AdCodeGenerator extends Component {
 			false
 		);
 
-		// const filteredPagegroupsByPlatform = window.iam.channels.filter(channel => {
-		// 	const re = new RegExp(this.state.platform, 'ig');
-		// 	return channel.match(re);
-		// });
-		// const pagegroupsToShow = new Set();
-		// const disabled = new Set();
-
-		// let types;
-
-		// if (INTERACTIVE_ADS_TYPES.VERTICAL.includes(this.state.format)) {
-		// 	types = INTERACTIVE_ADS_TYPES.VERTICAL;
-		// } else if (INTERACTIVE_ADS_TYPES.HORIZONTAL.includes(this.state.format)) {
-		// 	types = INTERACTIVE_ADS_TYPES.HORIZONTAL;
-		// } else {
-		// 	types = INTERACTIVE_ADS_TYPES.OTHER;
-		// }
-
-		// filteredPagegroupsByPlatform.forEach(pg => {
-		// 	let shouldDisable = false;
-		// 	types.forEach(type => {
-		// 		if (this.props.meta.pagegroups.includes(`${this.state.platform}-${type}-${pg}`)) {
-		// 			shouldDisable = true;
-		// 			return false;
-		// 		}
-		// 	});
-		// 	if (shouldDisable) {
-		// 		disabled.add(pg);
-		// 	}
-		// });
-
 		return (
 			<CustomList
 				multiSelect
