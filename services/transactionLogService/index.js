@@ -94,91 +94,11 @@ function createTransactionLog({
 					...variation
 				};
 			});
-			// if (options.multiple) {
-			// 	let finalOutput = [];
-			// 	_.forEach(variations, ele => {
-			// 		const channelInfo = {
-			// 			pageGroup: ele.pageGroup,
-			// 			platform: ele.platform
-			// 		};
-			// 		_.forEach(ele.variations, variation => {
-			// 			finalOutput.push({
-			// 				...constantLogKeys,
-			// 				...channelInfo,
-			// 				...variation
-			// 			});
-			// 		});
-			// 	});
-			// 	return finalOutput;
-			// }
-			// return [{ ...constantLogKeys, ...variations[0] }];
 		},
 		getTransactionLogData = ad => {
-			// let pageGroup = null;
-			// let variationName = null;
-			// let variationId = null;
-			// let platform = null;
-
 			const constantLogKeys = getConstantKeys(ad);
-			const logs = generateVariationsLogCombo(ad.variations);
-
-			// if (isManual) {
-			// 	if (formatData && formatData.platform) {
-			// 		platform = formatData.platform;
-			// 	}
-			// 	injectionTechnique = commonConsts.INJECTION_TECHNIQUES.TAG;
-			// 	variationId = commonConsts.MANUAL_ADS.VARIATION;
-			// } else {
-			// 	injectionTechnique = commonConsts.INJECTION_TECHNIQUES.LAYOUT;
-			// }
-
-			// if (network) {
-			// 	switch (network) {
-			// 		case commonConsts.NETWORKS.ADPTAGS:
-			// 			networkAdUnitId = networkData.dfpAdunit;
-			// 			break;
-			// 		case commonConsts.NETWORKS.ADSENSE:
-			// 		case commonConsts.NETWORKS.ADX:
-			// 		case commonConsts.NETWORKS.MEDIANET:
-			// 			networkAdUnitId = networkData.adunitId;
-			// 			break;
-			// 		case commonConsts.NETWORKS.GENIEE:
-			// 			networkAdUnitId = String(networkData.zoneId);
-			// 			break;
-			// 	}
-			// }
-
-			// if (network && networkData) {
-			// 	if (networkData.hasOwnProperty('headerBidding')) {
-			// 		service = commonConsts.TRANSACTION_SERVICES.HEADER_BIDDING;
-			// 		status = networkData.headerBidding
-			// 			? commonConsts.SETUP_STATUS.ACTIVE
-			// 			: commonConsts.SETUP_STATUS.INACTIVE;
-			// 	} else if (networkData.hasOwnProperty('dynamicAllocation')) {
-			// 		service = commonConsts.TRANSACTION_SERVICES.DYNAMIC_ALLOCATION;
-			// 		status = networkData.dynamicAllocation
-			// 			? commonConsts.SETUP_STATUS.ACTIVE
-			// 			: commonConsts.SETUP_STATUS.INACTIVE;
-			// 	}
-			// }
-
-			// if (isControl) {
-			// 	service = commonConsts.TRANSACTION_SERVICES.CONTROL_TAG;
-			// }
-
-			return {
-				platform,
-				pageGroup,
-				variationId,
-				networkAdUnitId,
-				service,
-				status,
-				injectionTechnique,
-				publisherName,
-				publisherEmailAddress,
-				sectionName,
-				variationName
-			};
+			const logs = generateVariationsLogCombo(constantLogKeys, ad.variations);
+			return logs;
 		},
 		getSetupLogs = () => {
 			if (!ads || !ads.length) {
@@ -188,45 +108,36 @@ function createTransactionLog({
 			let setupLogs = [];
 			for (let i = 0; i < ads.length; i++) {
 				const ad = ads[i];
-				const { network } = ad;
-				const sectionId = ad.sectionId ? ad.sectionId : ad.id;
 				const logs = getTransactionLogData(ad);
-				// const {
+
+				if (ad.isManual) {
+					apTagAds.push(ad);
+				} else if (ad.isInnovativeAd) {
+					innovativeAds.push(ad);
+				} else {
+					layoutAds.push(ad);
+				}
+
+				setupLogs = setupLogs.concat(logs);
+
+				// setupLogs.push({
+				// 	siteId,
+				// 	siteDomain: utils.domanize(siteDomain),
+				// 	siteUrl: siteDomain,
+				// 	sectionId,
 				// 	platform,
 				// 	pageGroup,
 				// 	variationId,
+				// 	network: network || null,
 				// 	networkAdUnitId,
+				// 	injectionTechnique,
 				// 	service,
 				// 	status,
-				// 	injectionTechnique,
 				// 	publisherName,
 				// 	publisherEmailAddress,
 				// 	sectionName,
 				// 	variationName
-				// } = getTransactionLogData(ad);
-
-				injectionTechnique === commonConsts.INJECTION_TECHNIQUES.LAYOUT
-					? layoutAds.push(ad)
-					: apTagAds.push(ad);
-
-				setupLogs.push({
-					siteId,
-					siteDomain: utils.domanize(siteDomain),
-					siteUrl: siteDomain,
-					sectionId,
-					platform,
-					pageGroup,
-					variationId,
-					network: network || null,
-					networkAdUnitId,
-					injectionTechnique,
-					service,
-					status,
-					publisherName,
-					publisherEmailAddress,
-					sectionName,
-					variationName
-				});
+				// });
 			}
 
 			return setupLogs;
@@ -245,7 +156,7 @@ function createTransactionLog({
 				const errors = _.map(response.FailedLogs, log => log.error);
 				return Promise.reject(errors.join(', '));
 			}
-			return updateDb(siteId, layoutAds, apTagAds);
+			return updateDb(siteId, layoutAds, apTagAds, innovativeAds);
 		})
 		.then(() => syncCdn(siteId, true))
 		.catch(err => {

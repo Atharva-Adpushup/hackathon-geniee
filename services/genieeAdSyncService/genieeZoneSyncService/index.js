@@ -32,8 +32,6 @@ module.exports = {
 					adId: ad.id,
 					zoneName: ad.id,
 					sectionId: section.id,
-					variationId: variationId,
-					variationName: variationName,
 					sizeWidth: parseInt(ad.width, 10),
 					sizeHeight: parseInt(ad.height, 10),
 					zoneType: 1,
@@ -42,6 +40,12 @@ module.exports = {
 					useFriendlyIFrameFlag: ad.asyncTag ? Number(ad.asyncTag) : 1,
 					dynamicAllocation: ad.networkData.dynamicAllocation ? ad.networkData.dynamicAllocation : 0,
 					zoneId: ad.networkData && ad.networkData.zoneId ? ad.networkData.zoneId : false,
+					variations: [
+						{
+							variationId: variationId,
+							variationName: variationName
+						}
+					],
 					network: ad.network,
 					networkData: {
 						dynamicAllocation: ad.hasOwnProperty('dynamicAllocation')
@@ -136,6 +140,11 @@ module.exports = {
 					case 'geniee':
 						var unsyncedZone = self.checkGenieeUnsyncedZones(variationId, variationName, section, ad);
 						if (unsyncedZone) {
+							unsyncedZone.variations[0] = {
+								...unsyncedZone.variations[0],
+								platform: additionalInfo.platform,
+								pageGroup: additionalInfo.pageGroup
+							};
 							unsyncedZone.forZoneSyncing
 								? unsyncedZones.genieeUnsyncedZones.push(unsyncedZone.zone)
 								: null;
