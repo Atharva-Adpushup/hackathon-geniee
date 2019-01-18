@@ -2,8 +2,8 @@
 
 var config = require('./config'),
 	feedback = require('./feedback').feedback,
-	utils = require('../helpers/utils'),
-	$ = window.adpushup.$,
+	$ = require('./adp').$,
+	adp = require('./adp').adp,
 	init = function(d) {
 		var gptScriptEl = d.createElement('script');
 		gptScriptEl.src = '//www.googletagservices.com/tag/js/gpt.js';
@@ -20,8 +20,8 @@ var config = require('./config'),
 				var adUnitDFPAdunitCode = adUnitArray[adUnitArray.length - 1];
 				var networkCode = config.NETWORK_ID;
 
-				Object.keys(w.adpushup.adpTags.adpSlots).forEach(function(adpSlot) {
-					var currentSlot = w.adpushup.adpTags.adpSlots[adpSlot];
+				Object.keys(adp.adpTags.adpSlots).forEach(function(adpSlot) {
+					var currentSlot = adp.adpTags.adpSlots[adpSlot];
 					var slotMatched = !!(
 						currentSlot.optionalParam.dfpAdunitCode == adUnitDFPAdunitCode && currentSlot.activeDFPNetwork
 					);
@@ -45,20 +45,32 @@ var config = require('./config'),
 		});
 	},
 	refreshIntervalSwitch = function(w) {
-		w.adpushup.$(w).on('blur', function() {
-			if (w.adpushup.adpTags.gptRefreshIntervals.length) {
-				w.adpushup.adpTags.gptRefreshIntervals.forEach(function(interval) {
+		var feedbackData = {
+			ads: [],
+			xpathMiss: [],
+			eventType: 1,
+			mode: 1,
+			referrer: adp.config.referrer,
+			tracking: false
+		};
+		$(w).on('blur', function() {
+			if (adp.adpTags.gptRefreshIntervals.length) {
+				adp.adpTags.gptRefreshIntervals.forEach(function(interval) {
 					clearInterval(interval.id);
 				});
 			}
 		});
-		w.adpushup.$(w).on('focus', function() {
-			if (w.adpushup.adpTags.gptRefreshIntervals.length) {
-				w.adpushup.adpTags.gptRefreshIntervals.forEach(function(interval) {
+		$(w).on('focus', function() {
+			if (adp.adpTags.gptRefreshIntervals.length) {
+				adp.adpTags.gptRefreshIntervals.forEach(function(interval) {
 					var gptRefreshInterval = setInterval(function() {
 						var el = $('#' + interval.sectionId);
-						if (utils.isElementInViewport(el)) {
+						if (adp.utils.isElementInViewport(el)) {
 							googletag.pubads().refresh([interval.gSlot]);
+							feedbackData.xpathMiss = [];
+							feedbackData.ads = [interval.sectionId];
+							feedbackData.variationId = adp.config.selectedVariation;
+							adp.utils.sendFeedback(feedbackData);
 						}
 					}, config.GPT_REFRESH_INTERVAL);
 					interval.id = gptRefreshInterval;

@@ -4,7 +4,8 @@ var utils = require('../helpers/utils'),
 	config = require('./config'),
 	responsiveAds = require('./responsiveAds'),
 	feedback = require('./feedback').feedback,
-	$ = window.adpushup.$,
+	$ = require('./adp').$,
+	adp = require('./adp').adp,
 	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(1));
 		if (val > 20) {
@@ -32,11 +33,23 @@ var utils = require('../helpers/utils'),
 			googletag.cmd.push(function() {
 				gptRefreshInterval = setInterval(function() {
 					var el = $('#' + slot.sectionId);
-					if (utils.isElementInViewport(el)) {
+					if (adp.utils.isElementInViewport(el)) {
+						var feedbackData = {
+							ads: [],
+							xpathMiss: [],
+							eventType: 1,
+							mode: 1,
+							referrer: adp.config.referrer,
+							tracking: false
+						};
 						refreshGPTSlot(slot.gSlot);
+						feedbackData.xpathMiss = [];
+						feedbackData.ads = [slot.sectionId];
+						feedbackData.variationId = adp.config.selectedVariation;
+						adp.utils.sendFeedback(feedbackData);
 					}
 				}, config.GPT_REFRESH_INTERVAL);
-				window.adpushup.adpTags.gptRefreshIntervals.push({
+				adp.adpTags.gptRefreshIntervals.push({
 					gSlot: slot.gSlot,
 					id: gptRefreshInterval,
 					sectionId: slot.sectionId
@@ -56,8 +69,7 @@ var utils = require('../helpers/utils'),
 		});
 	},
 	renderPostbid = function(slot) {
-		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId),
-			adIframe = utils.createEmptyIframe();
+		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId), adIframe = utils.createEmptyIframe();
 
 		document.getElementById(slot.containerId).appendChild(adIframe);
 
@@ -87,20 +99,19 @@ var utils = require('../helpers/utils'),
 		return null;
 	},
 	setUTMWiseTargeting = function() {
-		var urlParams = window.adpushup.utils.queryParams;
+		var urlParams = adp.utils.queryParams;
 
 		if (!Object.keys(urlParams).length) {
-			var utmSessionCookie = window.adpushup.session.getCookie(config.UTM_SESSION_COOKIE);
+			var utmSessionCookie = adp.session.getCookie(config.UTM_SESSION_COOKIE);
 
 			if (utmSessionCookie) {
-				var utmSessionCookieValues = window.adpushup.utils.base64Decode(utmSessionCookie.split('_=')[1]);
+				var utmSessionCookieValues = adp.utils.base64Decode(utmSessionCookie.split('_=')[1]);
 				urlParams = utmSessionCookieValues ? JSON.parse(utmSessionCookieValues) : {};
 			}
 		}
 
 		Object.keys(config.UTM_WISE_TARGETING).forEach(function(key) {
-			var keyVal = config.UTM_WISE_TARGETING[key],
-				utmParam = urlParams[keyVal];
+			var keyVal = config.UTM_WISE_TARGETING[key], utmParam = urlParams[keyVal];
 
 			googletag
 				.pubads()
@@ -134,12 +145,9 @@ var utils = require('../helpers/utils'),
 			});
 			if (dfpAdunitCodes.indexOf(slot.optionalParam.dfpAdunitCode) !== -1) {
 				var currentTargetingObject =
-						config.TARGETING[
-							'/' +
-								networkCodes[slot.optionalParam.dfpAdunitCode] +
-								'/' +
-								slot.optionalParam.dfpAdunitCode
-						],
+					config.TARGETING[
+						'/' + networkCodes[slot.optionalParam.dfpAdunitCode] + '/' + slot.optionalParam.dfpAdunitCode
+					],
 					currentTargetingObject = setPageLevelTargeting(currentTargetingObject, slot);
 				Object.keys(currentTargetingObject).forEach(function(dfpKey, index) {
 					slot.gSlot.setTargeting(dfpKey, String(currentTargetingObject[dfpKey]));
@@ -148,9 +156,9 @@ var utils = require('../helpers/utils'),
 			return;
 		}
 		var targeting = {
-				hb_siteId: config.SITE_ID,
-				hb_ran: 0
-			},
+			hb_siteId: config.SITE_ID,
+			hb_ran: 0
+		},
 			adServerTargeting = getAdserverTargeting(slot);
 
 		if (utils.isSupportedBrowser() && slot.bidders.length) {
@@ -236,8 +244,7 @@ var utils = require('../helpers/utils'),
 		bid.ad = config.ADSENSE_FALLBACK_ADCODE.replace('__AD_CODE__', adData);
 	},
 	afterBiddingProcessor = function(slots) {
-		var genieeRef = window.adpushup && window.adpushup.geniee,
-			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback;
+		var genieeRef = adp && adp.geniee, isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback;
 
 		if (!Array.isArray(slots) || !slots.length) {
 			return false;
