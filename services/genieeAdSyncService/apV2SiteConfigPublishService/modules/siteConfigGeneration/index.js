@@ -22,20 +22,14 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 		siteDomain: siteModelItem.get('siteDomain'),
 		publisherEmailAddress: userEmail,
 		publisherName: '',
-		ads: [],
-		options: {
-			multiple: false
-		}
+		ads: []
 	};
 	let logsUnsyncedZones = {
 		siteId: siteModelItem.get('siteId'),
 		siteDomain: siteModelItem.get('siteDomain'),
 		publisherEmailAddress: userEmail,
 		publisherName: '',
-		ads: [],
-		options: {
-			multiple: false
-		}
+		ads: []
 	};
 	function doIt(channelWithZones) {
 		if (
@@ -156,45 +150,6 @@ function adGeneration(docKey, currentDataForSyncing, cb = false) {
 				console.log(err);
 				return false;
 			});
-			// const unSyncedAds = _.compact(
-			// 	_.map(ads, ad => {
-			// 		if (checkForLog(ad)) {
-			// 			const appSpecficData = cb ? cb(ad) : {};
-			// 			const computedData = {
-			// 				sectionName: ad.name,
-			// 				...appSpecficData,
-			// 				...ad
-			// 			};
-			// 			logUnsyncedAds.push(computedData);
-			// 		}
-			// 		let unsyncedZone =
-			// 			ad.network && ad.network == 'adpTags'
-			// 				? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)
-			// 				: false;
-
-			// 		if (unsyncedZone) {
-			// 			if (ad.formatData && ad.formatData.platform) {
-			// 				unsyncedZone.platform = ad.formatData.platform;
-			// 			}
-			// 		}
-
-			// 		return {
-			// 			sectionName: ad.name,
-			// 			...extra,
-			// 			...unsyncedZone
-			// 		};
-			// 	})
-			// );
-
-			// currentDataForSyncing.adp.ads = unSyncedAds.length
-			// 	? _.concat(currentDataForSyncing.adp.ads, unSyncedAds)
-			// 	: currentDataForSyncing.adp.ads;
-
-			// currentDataForSyncing.logs.ads = logUnsyncedAds.length
-			// 	? _.concat(currentDataForSyncing.logs.ads, logUnsyncedAds)
-			// 	: currentDataForSyncing.logs.ads;
-
-			// return currentDataForSyncing;
 		})
 		.then(() => {
 			currentDataForSyncing.adp.ads = unSyncedAds.length
@@ -222,50 +177,6 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 	 * 4. Set Dummy values to some variables to compliment current working flow
 	 * 5. Concat ads from Tag manager to current adp.ads
 	 */
-	// return appBucket
-	// 	.getDoc(`${docKeys.tagManager}${site.get('siteId')}`)
-	// 	.then(docWithCas => {
-	// 		let logUnsyncedAds = [];
-	// 		const ads = docWithCas.value.ads;
-	// 		const unSyncedAds = _.compact(
-	// 			_.map(ads, ad => {
-	// 				if (checkForLog(ad)) {
-	// 					const computedData = {
-	// 						variationName: 'manual',
-	// 						sectionName: ad.name,
-	// 						...ad
-	// 					};
-	// 					logUnsyncedAds.push(computedData);
-	// 				}
-	// 				let unsyncedZone =
-	// 					ad.network && ad.network == 'adpTags'
-	// 						? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)
-	// 						: false;
-	// 				if (unsyncedZone) {
-	// 					if (ad.formatData && ad.formatData.platform) {
-	// 						unsyncedZone.platform = ad.formatData.platform;
-	// 					}
-	// 				}
-	// 				return {
-	// 					variationName: 'manual',
-	// 					sectionName: ad.name,
-	// 					...unsyncedZone
-	// 				};
-	// 			})
-	// 		);
-	// 		currentDataForSyncing.adp.ads = unSyncedAds.length
-	// 			? _.concat(currentDataForSyncing.adp.ads, unSyncedAds)
-	// 			: currentDataForSyncing.adp.ads;
-	// 		currentDataForSyncing.logs.ads = logUnsyncedAds.length
-	// 			? _.concat(currentDataForSyncing.logs.ads, logUnsyncedAds)
-	// 			: currentDataForSyncing.logs.ads;
-	// 		return currentDataForSyncing;
-	// 	})
-	// 	.catch(err => {
-	// 		return err.name && err.name == 'CouchbaseError' && err.code == 13
-	// 			? currentDataForSyncing
-	// 			: Promise.reject(err);
-	// 	});
 	return adGeneration(`${docKeys.tagManager}${site.get('siteId')}`, currentDataForSyncing, ad =>
 		Promise.resolve({
 			variations: [
@@ -276,6 +187,7 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 }
 
 function innovativeAdsSyncing(currentDataForSyncing, site) {
+	let hasInnovativeAds = false;
 	function generateLogData(site, ad) {
 		return site
 			.getAllChannels()
@@ -326,15 +238,7 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 		`${docKeys.interactiveAds}${site.get('siteId')}`,
 		currentDataForSyncing,
 		generateLogData.bind(null, site)
-	).then(() => {
-		const options = {
-			multiple: true
-		};
-		currentDataForSyncing.adp.options = options;
-		currentDataForSyncing.logs.options = options;
-
-		return currentDataForSyncing;
-	});
+	);
 }
 
 function getGeneratedPromises(siteModelItem) {

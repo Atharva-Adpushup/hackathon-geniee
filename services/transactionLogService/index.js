@@ -5,14 +5,7 @@ const utils = require('../../helpers/utils');
 const { updateDb } = require('./dbHelper');
 const syncCdn = require('../genieeAdSyncService/cdnSyncService/index');
 
-function createTransactionLog({
-	siteId,
-	siteDomain,
-	ads,
-	publisherName,
-	publisherEmailAddress,
-	options = { multiple: false, keys: [] }
-}) {
+function createTransactionLog({ siteId, siteDomain, ads, publisherName, publisherEmailAddress }) {
 	let layoutAds = [];
 	let apTagAds = [];
 	let innovativeAds = [];
