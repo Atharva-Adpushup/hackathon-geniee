@@ -27,6 +27,8 @@ function createTransactionLog({ siteId, siteDomain, ads, publisherName, publishe
 			// Should Innovative Ad count under Layout??
 			if (isManual) {
 				injectionTechnique = commonConsts.INJECTION_TECHNIQUES.TAG;
+			} else if (isInnovativeAd) {
+				injectionTechnique = commonConsts.INJECTION_TECHNIQUES.INNOVATIVE_AD;
 			} else {
 				injectionTechnique = commonConsts.INJECTION_TECHNIQUES.LAYOUT;
 			}
@@ -128,7 +130,7 @@ function createTransactionLog({ siteId, siteDomain, ads, publisherName, publishe
 		.then(response => {
 			if (response.code != 1) {
 				const errors = _.map(response.FailedLogs, log => log.error);
-				return Promise.reject(errors.join(', '));
+				return Promise.reject(new Error(errors.join(', ')));
 			}
 			return updateDb(siteId, layoutAds, apTagAds, innovativeAds);
 		})
