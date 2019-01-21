@@ -232,43 +232,64 @@ const _ = require('lodash'),
 		}
 		return finalJson;
 	},
-	getManualAds = site => {
-		const siteId = site.get('siteId');
+	getAds = (docKey, siteId) => {
 		return appBucket
-			.getDoc(`tgmr::${siteId}`)
+			.getDoc(docKey)
 			.then(docWithCas => {
 				const ads = docWithCas.value.ads.filter(ad => !ad.hasOwnProperty('isActive') || ad.isActive);
 				return ads;
 			})
 			.catch(err => Promise.reject(new Error(`Error fetching tgmr doc for ${siteId}`)));
 	},
+	getAdsAndPushToAdp = (identifier, docKey, site) => {
+		if (!site.get(identifier)) {
+			return Promise.resolve([]);
+		}
+
+		return getAds(docKey, site.get('siteId'))
+			.then(ads => {
+				_.forEach(ads, ad => pushToAdpTags(ad, ad));
+				return ads;
+			})
+			.catch(err =>
+				err.code && err.code === 13 && err.message.includes('key does not exist') ? [] : Promise.reject(err)
+			);
+	},
 	generatePayload = (site, pageGroupData) => {
 		//Empty finaJson and dfpAunits
 		finalJson = {};
 		ADPTags = [];
+		let manualAds = [];
 		let pageGroupPattern = site.get('apConfigs').pageGroupPattern;
 
-		return site
-			.getAllChannels()
-			.then(channels =>
-				promiseForeach(
-					channels,
-					channel => getChannelPayload(channel, pageGroupData, pageGroupPattern),
-					err => false
+		return (
+			site
+				.getAllChannels()
+				.then(channels =>
+					promiseForeach(
+						channels,
+						channel => getChannelPayload(channel, pageGroupData, pageGroupPattern),
+						err => false
+					)
 				)
-			)
-			.then(() => {
-				if (site.get('isManual')) {
-					return getManualAds(site);
-				}
-				return Promise.resolve();
-			})
-			.then(manualAds => {
-				_.map(manualAds, ad => {
-					pushToAdpTags(ad, ad);
-				});
-				return [finalJson, ADPTags, manualAds];
-			});
+				// .then(() => getAdsAndPushToAdp('isManual', `tgmr::${site.get('siteId')}`, site))
+				// .then(manualAds => {
+				// 	manualAds = manualAds;
+				// 	return getAdsAndPushToAdp('isInnovative', `fmrt::${site.get('siteId')}`, site);
+				// })
+				// .then(innovativeAds => {
+				// 	return [finalJson, ADPTags, manualAds, innovativeAds];
+				// });
+				.then(() => {
+					return Promise.join(
+						getAdsAndPushToAdp('isManual', `tgmr::${site.get('siteId')}`, site),
+						getAdsAndPushToAdp('isInnovative', `fmrt::${site.get('siteId')}`, site),
+						(manualAds, innovativeAds) => {
+							return [finalJson, ADPTags, manualAds, innovativeAds];
+						}
+					);
+				})
+		);
 	};
 
 module.exports = generatePayload;
