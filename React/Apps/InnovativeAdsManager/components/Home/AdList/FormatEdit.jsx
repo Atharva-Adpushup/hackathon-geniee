@@ -12,8 +12,15 @@ class FormatEdit extends Component {
 	}
 
 	saveHandler(data) {
-		const { ad, onCancel } = this.props;
-		console.log(data);
+		const { ad, onSave, onCancel } = this.props;
+		onSave({
+			formatData: {
+				...ad.formatData,
+				...data.formatData
+			},
+			...data.adData
+		});
+		onCancel();
 	}
 
 	renderButton = (label, handler) => (
@@ -39,11 +46,11 @@ class FormatEdit extends Component {
 			// case 'stickyTop':
 			// 	return <StickyTop />;
 			case 'inView':
-				return <InView save={save} />;
+				return <InView save={save} cancel={cancel} ad={ad} fullWidth />;
 			case 'docked':
 				return <Docked save={save} cancel={cancel} ad={ad} fullWidth />;
 			default:
-				return <Default save={save} />;
+				return <Default save={save} cancel={cancel} ad={ad} fullWidth />;
 		}
 	}
 

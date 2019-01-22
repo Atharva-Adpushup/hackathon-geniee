@@ -6,7 +6,7 @@ class InView extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			xpath: ''
+			xpath: this.props.ad && this.props.ad.formatData ? this.props.ad.formatData.xpath : ''
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this.saveHandler = this.saveHandler.bind(this);
@@ -46,12 +46,12 @@ class InView extends Component {
 						placeholder="Enter XPath"
 						name="xpath"
 						style={{ padding: '10px 15px' }}
+						value={this.state.xpath}
 						onChange={this.handleChange}
 					/>
 				</Col>
-				<Col md={12} style={{ paddingRight: '0px' }}>
-					{this.props.save.renderFn(this.props.save.label, this.saveHandler)}
-				</Col>
+				{this.props.cancel.renderFn(this.props.cancel.label, this.handler)}
+				{this.props.save.renderFn(this.props.save.label, this.saveHandler)}
 			</form>
 		);
 	}
