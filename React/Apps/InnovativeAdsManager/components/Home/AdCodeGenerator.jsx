@@ -176,13 +176,11 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderButton = (label, handler) => (
-		<Row style={{ margin: '0px' }}>
-			<CustomButton
-				label={label}
-				handler={handler}
-				style={{ float: 'right', minWidth: '200px', margin: '10px 10px 0px 0px' }}
-			/>
-		</Row>
+		<CustomButton
+			label={label}
+			handler={handler}
+			style={{ float: 'right', minWidth: '200px', margin: '10px 10px 0px 0px' }}
+		/>
 	);
 
 	renderPlatformOptions() {
