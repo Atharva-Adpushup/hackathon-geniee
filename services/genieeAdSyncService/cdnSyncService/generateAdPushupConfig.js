@@ -1,6 +1,7 @@
 let ADPTags = [],
 	finalJson = {};
-const _ = require('lodash'),
+const Promise = require('bluebird'),
+	_ = require('lodash'),
 	AdPushupError = require('../../../helpers/AdPushupError'),
 	{ ERROR_MESSAGES } = require('../../../configs/commonConsts'),
 	config = require('../../../configs/config'),
