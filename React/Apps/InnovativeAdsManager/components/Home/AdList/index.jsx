@@ -88,6 +88,7 @@ class AdList extends Component {
 					</Modal.Header>
 					<Modal.Body>{modalData.body}</Modal.Body>
 					{modalData.footer ? <Modal.Body>{modalData.footer}</Modal.Body> : null}
+					<div style={{ clear: 'both' }}>&nbsp;</div>
 				</Modal>
 			</div>
 		);

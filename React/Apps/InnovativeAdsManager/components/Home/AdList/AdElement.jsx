@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import PagegroupTrafficEdit from './PagegroupTrafficEdit';
+import FormatEdit from './FormatEdit';
 import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../lib/helpers';
 import { AD_LIST_ACTIONS, USER_AD_LIST_ACTIONS, OPS_AD_LIST_ACTIONS } from '../../../configs/commonConsts';
 import Edit from '../../shared/Edit';
@@ -135,6 +136,14 @@ class AdElement extends Component {
 							onSubmit={this.updateWrapper}
 							onCancel={this.props.modalToggle}
 						/>
+					),
+					footer: false
+				});
+			case 'formatEdit':
+				return this.props.modalToggle({
+					header: 'Edit Format Options',
+					body: (
+						<FormatEdit ad={this.props.ad} onSave={this.updateWrapper} onCancel={this.props.modalToggle} />
 					),
 					footer: false
 				});

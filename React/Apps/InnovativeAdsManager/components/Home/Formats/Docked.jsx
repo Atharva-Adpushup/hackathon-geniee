@@ -62,9 +62,11 @@ class Docked extends Component {
 	}
 
 	render() {
+		const { save, cancel, fullWidth } = this.props;
+		const colSize = fullWidth ? 12 : 6;
 		return (
 			<form action="#" method="POST">
-				<Col md={6} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
+				<Col md={colSize} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
 					<label htmlFor="xpath">Enter Xpath*</label>
 					<input
 						className="inputMinimal"
@@ -75,7 +77,7 @@ class Docked extends Component {
 						onChange={this.handleChange}
 					/>
 				</Col>
-				<Col md={6} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
+				<Col md={colSize} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
 					<label htmlFor="adOperation">Ad Operation*</label>
 					<SelectBox value={this.state.operation} label="Ad Operation" onChange={this.operationChange}>
 						{AD_OPERATIONS.map((operation, index) => (
@@ -85,7 +87,7 @@ class Docked extends Component {
 						))}
 					</SelectBox>
 				</Col>
-				<Col md={6} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
+				<Col md={colSize} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
 					<label htmlFor="bottomXpath">Enter Bottom Xpath</label>
 					<input
 						className="inputMinimal"
@@ -96,7 +98,7 @@ class Docked extends Component {
 						onChange={this.handleChange}
 					/>
 				</Col>
-				<Col md={6} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
+				<Col md={colSize} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
 					<label htmlFor="bottomOffset">Enter Bottom Offset</label>
 					<input
 						className="inputMinimal"
@@ -111,9 +113,8 @@ class Docked extends Component {
 					<label htmlFor="css">Custom CSS</label>
 					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={this.state.css} />
 				</Col>
-				<Col md={12} style={{ paddingRight: '0px' }}>
-					{this.props.save.renderFn(this.props.save.label, this.saveHandler)}
-				</Col>
+				{cancel ? this.props.cancel.renderFn(cancel.label, cancel.handler) : null}
+				{save.renderFn(save.label, this.saveHandler)}
 			</form>
 		);
 	}
