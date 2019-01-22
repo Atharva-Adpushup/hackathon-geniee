@@ -62,7 +62,7 @@ class ReportingPanel extends React.Component {
 		}).then(res => {
 			if (res.status) {
 				if (res.status == 'Stopped') {
-					let updatedDate = moment.utc(res.lastRunOn).local().format('LLLL');
+					let updatedDate = res.lastRunTimePST;
 					this.setState({
 						updateStatusText: `Note - The reports were last updated on ${updatedDate}.`
 					});
