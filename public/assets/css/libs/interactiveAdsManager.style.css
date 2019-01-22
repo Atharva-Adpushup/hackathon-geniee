@@ -492,11 +492,12 @@ body {
       margin-bottom: 10px; }
   .options-wrapper .react-select-box-container .react-select-box {
     padding: 10px 15px; }
-  .options-wrapper .containerButtonBar {
-    padding-bottom: 20px; }
   .options-wrapper label {
     font-size: 14px;
     margin-bottom: 10px; }
+
+.containerButtonBar {
+  padding-bottom: 20px !important; }
 
 .section-list .section-list-item {
   min-height: 420px; }

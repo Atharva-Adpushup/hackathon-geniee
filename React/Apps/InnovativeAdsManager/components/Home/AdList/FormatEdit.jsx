@@ -8,6 +8,7 @@ class FormatEdit extends Component {
 		super(props);
 		this.renderButton = this.renderButton.bind(this);
 		this.renderIndividualFormat = this.renderIndividualFormat.bind(this);
+		this.saveHandler = this.saveHandler.bind(this);
 	}
 
 	saveHandler(data) {
@@ -40,7 +41,7 @@ class FormatEdit extends Component {
 			case 'inView':
 				return <InView save={save} />;
 			case 'docked':
-				return <Docked save={save} cancel={cancel} fullWidth />;
+				return <Docked save={save} cancel={cancel} ad={ad} fullWidth />;
 			default:
 				return <Default save={save} />;
 		}

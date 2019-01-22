@@ -7,12 +7,14 @@ import CodeBox from '../../../../../Components/CodeEditor';
 class Docked extends Component {
 	constructor(props) {
 		super(props);
+		const ad = this.props.ad ? this.props.ad : false;
+		const hasFormatData = ad && ad.formatData ? ad.formatData : false;
 		this.state = {
-			xpath: '',
-			bottomXpath: '',
-			bottomOffset: '',
-			css: '',
-			operation: null
+			xpath: ad ? ad.xpath : '',
+			bottomXpath: hasFormatData ? ad.formatData.bottomXpath : '',
+			bottomOffset: hasFormatData ? ad.formatData.bottomOffset : '',
+			css: ad.css ? window.btoa(JSON.stringify(ad.css)) : '',
+			operation: ad ? ad.operation : null
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this.handleCodeChange = this.handleCodeChange.bind(this);
@@ -63,6 +65,7 @@ class Docked extends Component {
 
 	render() {
 		const { save, cancel, fullWidth } = this.props;
+		const { xpath, bottomOffset, bottomXpath, operation, css } = this.state;
 		const colSize = fullWidth ? 12 : 6;
 		return (
 			<form action="#" method="POST">
@@ -74,12 +77,13 @@ class Docked extends Component {
 						placeholder="Enter XPath"
 						name="xpath"
 						style={{ padding: '10px 15px' }}
+						value={xpath}
 						onChange={this.handleChange}
 					/>
 				</Col>
 				<Col md={colSize} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
 					<label htmlFor="adOperation">Ad Operation*</label>
-					<SelectBox value={this.state.operation} label="Ad Operation" onChange={this.operationChange}>
+					<SelectBox value={operation} label="Ad Operation" onChange={this.operationChange}>
 						{AD_OPERATIONS.map((operation, index) => (
 							<option key={index} value={operation}>
 								{operation}
@@ -95,6 +99,7 @@ class Docked extends Component {
 						placeholder="Enter Bottom XPath"
 						name="bottomXpath"
 						style={{ padding: '10px 15px' }}
+						value={bottomXpath}
 						onChange={this.handleChange}
 					/>
 				</Col>
@@ -106,12 +111,13 @@ class Docked extends Component {
 						placeholder="Enter Bottom Offset"
 						name="bottomOffset"
 						style={{ padding: '10px 15px' }}
+						value={bottomOffset}
 						onChange={this.handleChange}
 					/>
 				</Col>
 				<Col md={12} style={{ paddingLeft: '0px' }}>
 					<label htmlFor="css">Custom CSS</label>
-					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={this.state.css} />
+					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={css} />
 				</Col>
 				{cancel ? this.props.cancel.renderFn(cancel.label, cancel.handler) : null}
 				{save.renderFn(save.label, this.saveHandler)}
