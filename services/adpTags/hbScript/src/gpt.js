@@ -22,9 +22,8 @@ var config = require('./config'),
 
 				Object.keys(adp.adpTags.adpSlots).forEach(function(adpSlot) {
 					var currentSlot = adp.adpTags.adpSlots[adpSlot];
-					var slotMatched = !!(
-						currentSlot.optionalParam.dfpAdunitCode == adUnitDFPAdunitCode && currentSlot.activeDFPNetwork
-					);
+					var slotMatched = !!(currentSlot.optionalParam.dfpAdunitCode == adUnitDFPAdunitCode &&
+						currentSlot.activeDFPNetwork);
 					if (slotMatched) {
 						networkCode = currentSlot.activeDFPNetwork;
 					}
@@ -63,6 +62,7 @@ var config = require('./config'),
 		$(w).on('focus', function() {
 			if (adp.adpTags.gptRefreshIntervals.length) {
 				adp.adpTags.gptRefreshIntervals.forEach(function(interval) {
+					clearInterval(interval.id);
 					var gptRefreshInterval = setInterval(function() {
 						var el = $('#' + interval.sectionId);
 						if (adp.utils.isElementInViewport(el)) {
