@@ -24,33 +24,41 @@ class FormatEdit extends Component {
 	}
 
 	renderButton = (label, handler) => (
-		<CustomButton label={label} handler={handler} style={{ float: 'right', margin: '10px 10px 0px 0px' }} />
+		<CustomButton
+			label={label}
+			handler={handler}
+			style={{ float: 'right', minWidth: '100px', margin: '10px 10px 0px 0px' }}
+		/>
 	);
 
 	renderIndividualFormat() {
 		const { ad, onCancel } = this.props;
-		const save = {
-			renderFn: this.renderButton,
-			label: 'Save',
-			handler: this.saveHandler
-		};
-		const cancel = {
-			renderFn: this.renderButton,
-			label: 'Cancel',
-			handler: e => {
-				e.preventDefault();
-				onCancel();
-			}
+		const commonProps = {
+			save: {
+				label: 'Save',
+				renderFn: this.renderButton,
+				handler: this.saveHandler
+			},
+			cancel: {
+				label: 'Cancel',
+				renderFn: this.renderButton,
+				handler: e => {
+					e.preventDefault();
+					onCancel();
+				}
+			},
+			fullWidth: true,
+			ad
 		};
 		switch (ad.formatData.format) {
 			// case 'stickyTop':
 			// 	return <StickyTop />;
 			case 'inView':
-				return <InView save={save} cancel={cancel} ad={ad} fullWidth />;
+				return <InView {...commonProps} />;
 			case 'docked':
-				return <Docked save={save} cancel={cancel} ad={ad} fullWidth />;
+				return <Docked {...commonProps} />;
 			default:
-				return <Default save={save} cancel={cancel} ad={ad} fullWidth />;
+				return <Default {...commonProps} />;
 		}
 	}
 
