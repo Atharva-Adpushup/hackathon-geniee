@@ -1,0 +1,16 @@
+@import 'header';
+@import 'sidebar';
+
+.container-fluid {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  .sidebar-main-wrap {
+    height: 100%;
+    display: flex;
+    .main-content {
+      width: 100%;
+      background: #eee;
+    }
+  }
+}

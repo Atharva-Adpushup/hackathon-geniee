@@ -1,0 +1,27 @@
+.sidebar {
+  position: relative;
+  transition: width linear 0.5s;
+  background: #ccc;
+  &.sb-show {
+    width: 350px;
+  }
+  &.sb-hide {
+    width: 0;
+  }
+  .sb-nav {
+    padding-left: 0;
+    margin-bottom: 0;
+    li {
+      list-style: none;
+    }
+    &.primary-nav {
+      //
+    }
+    &.secondary-nav {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+  }
+}
