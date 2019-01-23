@@ -308,6 +308,10 @@ module.exports = {
 			ads = ads.concat(window.adpushup.config.manualAds);
 		}
 
+		if (config.innovativeModeActive && window.adpushup.config.innovativeAds.length) {
+			ads = ads.concat(window.adpushup.config.innovativeAds);
+		}
+
 		if (ads.length) {
 			var interactiveAds = ads.filter(function(ad) {
 				return ad && ad.formatData && ad.formatData.event;

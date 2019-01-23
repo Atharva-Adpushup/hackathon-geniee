@@ -263,34 +263,24 @@ const Promise = require('bluebird'),
 		let manualAds = [];
 		let pageGroupPattern = site.get('apConfigs').pageGroupPattern;
 
-		return (
-			site
-				.getAllChannels()
-				.then(channels =>
-					promiseForeach(
-						channels,
-						channel => getChannelPayload(channel, pageGroupData, pageGroupPattern),
-						err => false
-					)
+		return site
+			.getAllChannels()
+			.then(channels =>
+				promiseForeach(
+					channels,
+					channel => getChannelPayload(channel, pageGroupData, pageGroupPattern),
+					err => false
 				)
-				// .then(() => getAdsAndPushToAdp('isManual', `tgmr::${site.get('siteId')}`, site))
-				// .then(manualAds => {
-				// 	manualAds = manualAds;
-				// 	return getAdsAndPushToAdp('isInnovative', `fmrt::${site.get('siteId')}`, site);
-				// })
-				// .then(innovativeAds => {
-				// 	return [finalJson, ADPTags, manualAds, innovativeAds];
-				// });
-				.then(() => {
-					return Promise.join(
-						getAdsAndPushToAdp('isManual', `tgmr::${site.get('siteId')}`, site),
-						getAdsAndPushToAdp('isInnovative', `fmrt::${site.get('siteId')}`, site),
-						(manualAds, innovativeAds) => {
-							return [finalJson, ADPTags, manualAds, innovativeAds];
-						}
-					);
-				})
-		);
+			)
+			.then(() => {
+				return Promise.join(
+					getAdsAndPushToAdp('isManual', `tgmr::${site.get('siteId')}`, site),
+					getAdsAndPushToAdp('isInnovative', `fmrt::${site.get('siteId')}`, site),
+					(manualAds, innovativeAds) => {
+						return [finalJson, ADPTags, manualAds, innovativeAds];
+					}
+				);
+			});
 	};
 
 module.exports = generatePayload;
