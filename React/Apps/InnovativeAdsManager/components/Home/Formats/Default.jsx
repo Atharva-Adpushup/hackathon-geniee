@@ -44,11 +44,13 @@ class Default extends Component {
 	}
 
 	render() {
+		const { save, cancel } = this.props;
 		return (
 			<div>
 				<label htmlFor="css">Custom CSS</label>
 				<CodeBox name="css" showButtons={false} onChange={this.handleChange} code={this.state.css} />
-				{this.props.save.renderFn(this.props.save.label, this.saveHandler)}
+				{cancel ? cancel.renderFn(cancel.label, cancel.handler) : null}
+				{save.renderFn(save.label, this.saveHandler)}
 			</div>
 		);
 	}

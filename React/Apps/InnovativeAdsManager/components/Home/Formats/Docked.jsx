@@ -119,7 +119,7 @@ class Docked extends Component {
 					<label htmlFor="css">Custom CSS</label>
 					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={css} />
 				</Col>
-				{cancel ? this.props.cancel.renderFn(cancel.label, cancel.handler) : null}
+				{cancel ? cancel.renderFn(cancel.label, cancel.handler) : null}
 				{save.renderFn(save.label, this.saveHandler)}
 			</form>
 		);

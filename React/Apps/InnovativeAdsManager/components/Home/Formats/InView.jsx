@@ -36,6 +36,7 @@ class InView extends Component {
 	}
 
 	render() {
+		const { save, cancel } = this.props;
 		return (
 			<form action="#" method="POST">
 				<Col md={12} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
@@ -50,8 +51,8 @@ class InView extends Component {
 						onChange={this.handleChange}
 					/>
 				</Col>
-				{this.props.cancel.renderFn(this.props.cancel.label, this.handler)}
-				{this.props.save.renderFn(this.props.save.label, this.saveHandler)}
+				{cancel.renderFn(cancel.label, cancel.handler)}
+				{save.renderFn(save.label, this.saveHandler)}
 			</form>
 		);
 	}
