@@ -1,0 +1,16 @@
+.ap-page-header {
+  padding: 10px;
+  display: flex;
+  .nav-toggle {
+    font-size: 20px;
+    margin-right: 15px;
+    margin-top: 4px;
+  }
+  .ap-logo {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .dropdown {
+    margin-left: auto;
+  }
+}
