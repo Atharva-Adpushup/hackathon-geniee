@@ -198,23 +198,31 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 							const pagegroupAssignedToAd = ad.pagegroups.includes(
 								`${channel.platform}:${channel.pageGroup}`
 							);
-							const variationsExist =
-								pagegroupAssignedToAd && channel.variations && Object.keys(channel.variations).length;
-
-							return variationsExist
-								? _.map(channel.variations, variation => {
-										if (!variation.isControl) {
-											return {
-												channel: `${channel.platform}:${channel.pageGroup}`,
-												pageGroup: channel.pageGroup,
-												platform: channel.platform,
-												variationId: variation.id || null,
-												variationName: variation.name || null
-											};
-										}
-										return false;
-								  })
-								: false;
+							if (pagegroupAssignedToAd) {
+								const variationsExist = channel.variations && Object.keys(channel.variations).length;
+								const common = {
+									channel: `${channel.platform}:${channel.pageGroup}`,
+									pageGroup: channel.pageGroup,
+									platform: channel.platform
+								};
+								if (variationsExist) {
+									return _.map(channel.variations, variation => {
+										return !variation.isControl
+											? {
+													...common,
+													variationId: variation.id,
+													variationName: variation.name
+											  }
+											: false;
+									});
+								}
+								return {
+									...common,
+									variationId: null,
+									variationName: null
+								};
+							}
+							return false;
 						})
 					)
 				)

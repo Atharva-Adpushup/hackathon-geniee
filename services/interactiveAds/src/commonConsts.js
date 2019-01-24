@@ -17,6 +17,8 @@ const commonConsts = {
 		background: '#eaeaea'
 	},
 	CLOSE_BUTTON: {
+		IMAGE:
+			'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 15 15"><path d="M3.25,3.25l8.5,8.5M11.75,3.25l-8.5,8.5"></path></svg>',
 		CSS: {
 			COMMON: {
 				// position: 'absolute',
@@ -38,7 +40,8 @@ const commonConsts = {
 		}
 	},
 	POWERED_BY_BANNER: {
-		TEXT: 'Powered by AdPushup',
+		TEXT: 'Ads by',
+		IMAGE: 'http://localhost:8080/assets/images/logo-red-200X50.png',
 		REDIRECT_URL: 'https://campaign.adpushup.com/get-started/?utm_source=banner&utm_campaign=growth_hack',
 		CSS: {
 			COMMON: {
@@ -53,19 +56,33 @@ const commonConsts = {
 				float: 'left'
 				// left: 0
 			},
-			BOTTOM: {
-				top: -16
-			},
-			TOP: {
-				bottom: -16
+			LOGO: {
+				'max-width': '50px',
+				'margin-left': '2px',
+				background: '#fff'
 			}
 		}
 	},
 	FRAME: {
 		CSS: {
-			background: 'rgba(0,0,0,0.5)',
-			position: 'absolute',
-			top: '-15px'
+			COMMON: {
+				background: 'rgba(0,0,0,0.5)',
+				position: 'absolute',
+				top: '-19px',
+				'padding-bottom': '2px'
+			},
+			LEFT: {
+				top: -19
+			},
+			RIGHT: {
+				top: -19
+			},
+			BOTTOM: {
+				top: -19
+			},
+			TOP: {
+				bottom: -19
+			}
 		}
 	},
 	FORMATS: {
@@ -91,12 +108,12 @@ const commonConsts = {
 					right: 0
 				},
 				LEFT: {
-					left: 0,
-					bottom: 0
+					left: 0
+					// bottom: 0
 				},
 				RIGHT: {
-					right: 0,
-					bottom: 0
+					right: 0
+					// bottom: 0
 				}
 			}
 		},

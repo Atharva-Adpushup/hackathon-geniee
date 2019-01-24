@@ -1,6 +1,6 @@
 import React from 'react';
 import { Col } from 'react-bootstrap';
-import { CustomMessage } from '../shared/index';
+import { CustomMessage, EmptyState } from '../shared/index';
 
 const CustomList = props => {
 	function renderTabbedHeaders() {
@@ -55,6 +55,18 @@ const CustomList = props => {
 	}
 
 	function renderSimpleList() {
+		if (!props.options || !props.options.length) {
+			return (
+				<li key={1} style={{ width: '100%' }}>
+					<CustomMessage
+						message={"Seems like you haven't created any pagegroup for selected platform"}
+						className="error"
+						header="No Pagegroups Found"
+						key={1}
+					/>
+				</li>
+			);
+		}
 		return props.options.map((option, key) => {
 			let activeClass = '';
 			if (props.multiSelect) {

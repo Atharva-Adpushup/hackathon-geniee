@@ -19,9 +19,10 @@ class Sticky extends Component {
 			case 'bottom':
 				return placementCSS.BOTTOM;
 			case 'left':
-				return placementCSS.LEFT;
 			case 'right':
-				return placementCSS.RIGHT;
+				const { height } = this.interactiveAd;
+				const css = { top: (window.innerHeight - height) / 2 };
+				return { ...placementCSS[formatData.placement.toUpperCase()], ...css };
 		}
 	}
 }

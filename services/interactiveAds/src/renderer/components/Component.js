@@ -25,21 +25,22 @@ class Component {
 	}
 
 	createPoweredByBanner(formatData) {
-		const $banner = $('<a />'),
-			{ POWERED_BY_BANNER } = commonConsts,
-			formatDataCSS = formatData.placement === 'top' ? POWERED_BY_BANNER.CSS.TOP : POWERED_BY_BANNER.CSS.BOTTOM;
+		const { POWERED_BY_BANNER } = commonConsts;
+		const $banner = $('<a />');
+		const $logo = $('<img />');
+
+		$logo.attr({ alt: 'AdPushup', src: POWERED_BY_BANNER.IMAGE }).css({ ...POWERED_BY_BANNER.CSS.LOGO });
 
 		return $banner
 			.attr({ href: POWERED_BY_BANNER.REDIRECT_URL, target: '_blank' })
-			.css({ ...POWERED_BY_BANNER.CSS.COMMON, ...formatDataCSS })
-			.text(POWERED_BY_BANNER.TEXT);
+			.css({ ...POWERED_BY_BANNER.CSS.COMMON })
+			.text(POWERED_BY_BANNER.TEXT)
+			.append($logo);
 	}
 
 	createCloseButton(formatData) {
-		const $closeButton = $(
-			'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 15 15"><path d="M3.25,3.25l8.5,8.5M11.75,3.25l-8.5,8.5"></path></svg>'
-		);
 		const { CLOSE_BUTTON } = commonConsts;
+		const $closeButton = $(CLOSE_BUTTON.IMAGE);
 		const formatDataCSS = formatData.placement === 'top' ? CLOSE_BUTTON.CSS.TOP : CLOSE_BUTTON.CSS.BOTTOM;
 
 		return $closeButton.css({ ...CLOSE_BUTTON.CSS.COMMON, ...formatDataCSS }).on('click', this.closeAd);
@@ -74,7 +75,11 @@ class Component {
 			$frame = $('<div />');
 
 		$format.attr({ 'data-section': id, class: '_ap_apex_ad' });
-		$frame.css({ width, ...commonConsts.FRAME.CSS });
+		$frame.css({
+			width,
+			...commonConsts.FRAME.CSS.COMMON,
+			...commonConsts.FRAME.CSS[formatData.placement.toUpperCase()]
+		});
 
 		if (adp.config.poweredByBanner) {
 			$banner = this.createPoweredByBanner(formatData);
