@@ -65,7 +65,7 @@ class Component {
 				ads: [id],
 				xpathMiss: [],
 				eventType: 1,
-				mode: window.adpushup.config.mode,
+				mode: 1, // Changed it 1 because Innovative Ad is now completely independent of AdPushup Layout Testing
 				referrer: adp.config.referrer,
 				tracking: false,
 				variationId: !adp.config.manualModeActive

@@ -308,17 +308,14 @@ module.exports = {
 			ads = ads.concat(window.adpushup.config.manualAds);
 		}
 
-		if (config.innovativeModeActive && window.adpushup.config.innovativeAds.length) {
-			ads = ads.concat(window.adpushup.config.innovativeAds);
-		}
-
-		if (ads.length) {
-			var interactiveAds = ads.filter(function(ad) {
-				return ad && ad.formatData && ad.formatData.event;
-			});
-
-			return interactiveAds.length ? interactiveAds : null;
-		}
+		return utils.filterInteractiveAds(ads);
+	},
+	filterInteractiveAds: function(ads) {
+		return ads && ads.length
+			? ads.filter(function(ad) {
+					return ad.formatData && ad.formatData.event;
+			  })
+			: [];
 	},
 	isElementInViewport: function(el, threshold) {
 		const elementTop = $(el).offset().top,

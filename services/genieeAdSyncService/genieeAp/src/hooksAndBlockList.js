@@ -43,9 +43,10 @@ function init(adp, onPageGroupPush, platform) {
 		isPlatformExperiment = config.experiment && !!config.experiment[platform],
 		platformExperiments = isPlatformExperiment ? config.experiment[platform] : false,
 		experimentPageGroups = isPlatformExperiment ? Object.keys(platformExperiments) : [],
-		isExperimentPageGroups = !!(experimentPageGroups && experimentPageGroups.length);
+		isExperimentPageGroups = !!(experimentPageGroups && experimentPageGroups.length),
+		hasInnovativeAds = !!(config.innovativeModeActive && config.innovativeAds && config.innovativeAds.length);
 
-	if (isExperimentPageGroups) {
+	if (isExperimentPageGroups || hasInnovativeAds) {
 		try {
 			for (var i = 0; i < experimentPageGroups.length; i++) {
 				var key = experimentPageGroups[i],

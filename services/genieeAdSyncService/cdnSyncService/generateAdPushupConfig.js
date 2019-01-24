@@ -159,6 +159,7 @@ const Promise = require('bluebird'),
 			contentSelector: isContentSelector ? contentSelector : '',
 			ads: ads,
 			personalization: variation.personalization,
+			isControl: !!variation.isControl,
 			// Data required for auto optimiser model
 			// Page revenue is mapped as sum
 			sum:
@@ -224,9 +225,9 @@ const Promise = require('bluebird'),
 						: finalJson[platform][pageGroup].hasVariationsWithNoData;
 			}
 		});
-		if (!Object.keys(finalJson[platform][pageGroup].variations).length) {
-			delete finalJson[platform][pageGroup];
-		} else {
+		if (Object.keys(finalJson[platform][pageGroup].variations).length) {
+			// delete finalJson[platform][pageGroup];
+			// } else {
 			finalJson[platform][pageGroup].variations.sort(function(a, b) {
 				return a.traffic - b.traffic;
 			});

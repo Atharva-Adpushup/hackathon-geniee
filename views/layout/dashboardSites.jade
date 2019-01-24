@@ -196,4 +196,8 @@
                             span.label Manual Mode
                             .toggle-switch
                                 input(type="checkbox" id="switch-#{siteId}" checked=site.isManual ? true : undefined)
-                                label(for="switch-#{siteId}" data-id="switch-#{siteId}" data-site-id="#{siteId}")
+                                label(for="switch-#{siteId}", data-key="isManual" data-id="switch-#{siteId}" data-site-id="#{siteId}")
+                            span.label(style="margin-left: 20px") Innovative Ads
+                            .toggle-switch
+                                input.service-toggle(type="checkbox" id="switch-innovative-#{siteId}" checked=site.isInnovative ? true : undefined)
+                                label(for="switch-innovative-#{siteId}" data-key="isInnovative" data-id="switch-#{siteId}" data-site-id="#{siteId}")

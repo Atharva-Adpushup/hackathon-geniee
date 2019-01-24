@@ -134,14 +134,25 @@ function startCreation(forced) {
 			return resolve(false);
 		}
 
+		var innovativeInteractiveAds = [];
+		var layoutAndManualInteractiveAds = [];
+		var isAdPushupRunning = false;
+		var isControlVariation = false;
+
+		if (config.innovativeModeActive && window.adpushup.config.innovativeAds.length) {
+			innovativeInteractiveAds = utils.filterInteractiveAds(window.adpushup.config.innovativeAds);
+		}
+
 		return selectVariation(config).then(function(variationData) {
 			var selectedVariation = variationData.selectedVariation,
 				moduleConfig = variationData.config,
 				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
 
 			config = adp.config = moduleConfig;
+			isAdPushupRunning = true;
 			if (selectedVariation) {
 				adp.creationProcessStarted = true;
+
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
 
@@ -151,20 +162,31 @@ function startCreation(forced) {
 				}
 
 				// Load interactive ads script if interactive ads are present in adpushup config
-				var interactiveAds = utils.getInteractiveAds(config);
-				if (interactiveAds) {
-					require.ensure(
-						['interactiveAds/index.js'],
-						function(require) {
-							require('interactiveAds/index')(interactiveAds);
-						},
-						'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
-					);
+				layoutAndManualInteractiveAds = utils.getInteractiveAds(config);
+
+				if (selectVariation.isControl) {
+					isControlVariation = true;
 				}
 
 				createAds(adp, selectedVariation);
 			} else {
 				triggerControl(3);
+			}
+
+			if (isAdPushupRunning) {
+				var finalInteractiveAds = !isControlVariation
+					? innovativeInteractiveAds.concat(layoutAndManualInteractiveAds)
+					: layoutAndManualInteractiveAds;
+
+				if (finalInteractiveAds && finalInteractiveAds.length) {
+					require.ensure(
+						['interactiveAds/index.js'],
+						function(require) {
+							require('interactiveAds/index')(finalInteractiveAds);
+						},
+						'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
+					);
+				}
 			}
 
 			return resolve(true);

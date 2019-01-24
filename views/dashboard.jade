@@ -24,11 +24,13 @@ block append headScripts
 
         script.
             $(document).on('click', '*[data-id*="switch-"]', function() {
+                var trigger = $(this);
+                var key = trigger.attr('data-key');
                 var siteId = $(this).attr('data-site-id');
-                $.post('/user/site/'+siteId+'/updateManualMode', function(res) {
+                $.post('/user/site/'+siteId+'/updateServiceMode', {siteId: siteId, key: key}, function(res) {
                     setTimeout(function() {
                         if(res.success) {
-                            alert('Manual mode setting updated');
+                            alert('Setting updated');
                             window.location.reload();
                         } else {
                             alert('Some error occurred!');
