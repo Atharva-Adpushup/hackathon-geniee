@@ -140,7 +140,8 @@ function startCreation(forced) {
 		var isControlVariation = false;
 
 		if (config.innovativeModeActive && window.adpushup.config.innovativeAds.length) {
-			innovativeInteractiveAds = utils.filterInteractiveAds(window.adpushup.config.innovativeAds);
+			var channel = config.platform.toUpperCase() + ':' + config.pageGroup.toUpperCase();
+			innovativeInteractiveAds = utils.filterInteractiveAds(window.adpushup.config.innovativeAds, true, channel);
 		}
 
 		return selectVariation(config).then(function(variationData) {

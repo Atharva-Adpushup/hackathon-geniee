@@ -208,8 +208,8 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 												channel: `${channel.platform}:${channel.pageGroup}`,
 												pageGroup: channel.pageGroup,
 												platform: channel.platform,
-												variationId: variation.id,
-												variationName: variation.name
+												variationId: variation.id || null,
+												variationName: variation.name || null
 											};
 										}
 										return false;

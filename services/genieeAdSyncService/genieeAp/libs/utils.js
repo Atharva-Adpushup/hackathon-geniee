@@ -310,10 +310,11 @@ module.exports = {
 
 		return utils.filterInteractiveAds(ads);
 	},
-	filterInteractiveAds: function(ads) {
+	filterInteractiveAds: function(ads, isInnovative, channel) {
 		return ads && ads.length
 			? ads.filter(function(ad) {
-					return ad.formatData && ad.formatData.event;
+					var channelValid = isInnovative && ad.pagegroups ? ad.pagegroups.indexOf(channel) !== -1 : true;
+					return channelValid && ad.formatData && ad.formatData.event;
 			  })
 			: [];
 	},

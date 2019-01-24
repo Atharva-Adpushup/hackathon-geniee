@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Row, Col, ProgressBar } from 'react-bootstrap';
 import CustomList from './CustomList';
 import { Docked, Default, InView } from './Formats/index';
-import { PLATFORMS, FORMATS, SIZES, displayAdMessage, INTERACTIVE_ADS_TYPES } from '../../configs/commonConsts';
+import { PLATFORMS, FORMATS, SIZES, displayAdMessage } from '../../configs/commonConsts';
 import { CustomMessage, CustomButton } from '../shared/index';
 import Loader from '../../../../Components/Loader';
 import { pagegroupFiltering } from '../../lib/helpers';
@@ -135,7 +135,6 @@ class AdCodeGenerator extends Component {
 				type: data.type,
 				css: {
 					display: 'block',
-					margin: '10px auto',
 					'text-align': 'center',
 					...data.css
 				},

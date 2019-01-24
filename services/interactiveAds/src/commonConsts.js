@@ -19,13 +19,15 @@ const commonConsts = {
 	CLOSE_BUTTON: {
 		CSS: {
 			COMMON: {
-				color: '#fff',
-				background: '#222',
-				fontFamily: 'sans-serif',
-				fontSize: 9,
-				position: 'absolute',
-				right: 0,
-				border: 'none'
+				// position: 'absolute',
+				// top: 0,
+				// right: 0,
+				float: 'right',
+				height: '15px',
+				width: '15px',
+				stroke: '#fff',
+				cursor: 'pointer',
+				'stroke-width': 1.25
 			},
 			BOTTOM: {
 				top: -15
@@ -43,12 +45,13 @@ const commonConsts = {
 				color: '#fff',
 				fontFamily: 'sans-serif',
 				fontSize: 9,
-				background: '#222',
+				// background: '#222',
 				display: 'inline-block',
 				padding: '2px 6px',
-				position: 'absolute',
+				// position: 'absolute',
 				textDecoration: 'none',
-				left: 0
+				float: 'left'
+				// left: 0
 			},
 			BOTTOM: {
 				top: -16
@@ -56,6 +59,13 @@ const commonConsts = {
 			TOP: {
 				bottom: -16
 			}
+		}
+	},
+	FRAME: {
+		CSS: {
+			background: 'rgba(0,0,0,0.5)',
+			position: 'absolute',
+			top: '-15px'
 		}
 	},
 	FORMATS: {

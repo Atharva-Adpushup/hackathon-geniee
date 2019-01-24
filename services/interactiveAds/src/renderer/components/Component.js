@@ -36,14 +36,13 @@ class Component {
 	}
 
 	createCloseButton(formatData) {
-		const $closeButton = $('<button>'),
-			{ CLOSE_BUTTON } = commonConsts,
-			formatDataCSS = formatData.placement === 'top' ? CLOSE_BUTTON.CSS.TOP : CLOSE_BUTTON.CSS.BOTTOM;
+		const $closeButton = $(
+			'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 15 15"><path d="M3.25,3.25l8.5,8.5M11.75,3.25l-8.5,8.5"></path></svg>'
+		);
+		const { CLOSE_BUTTON } = commonConsts;
+		const formatDataCSS = formatData.placement === 'top' ? CLOSE_BUTTON.CSS.TOP : CLOSE_BUTTON.CSS.BOTTOM;
 
-		return $closeButton
-			.css({ ...CLOSE_BUTTON.CSS.COMMON, ...formatDataCSS })
-			.text('x')
-			.on('click', this.closeAd);
+		return $closeButton.css({ ...CLOSE_BUTTON.CSS.COMMON, ...formatDataCSS }).on('click', this.closeAd);
 	}
 
 	closeAd() {
@@ -71,14 +70,18 @@ class Component {
 				variationId: !adp.config.manualModeActive
 					? adp.config.selectedVariation
 					: commonConsts.MANUAL_ADS.VARIATION
-			};
+			},
+			$frame = $('<div />');
+
 		$format.attr({ 'data-section': id, class: '_ap_apex_ad' });
+		$frame.css({ width, ...commonConsts.FRAME.CSS });
 
 		if (adp.config.poweredByBanner) {
 			$banner = this.createPoweredByBanner(formatData);
-			$format.append($banner);
+			$frame.append($banner);
 		}
-		$format.append($closeButton);
+		$frame.append($closeButton);
+		$format.append($frame);
 
 		adp.tracker.add(
 			$format,
