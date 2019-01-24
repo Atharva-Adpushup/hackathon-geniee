@@ -9,8 +9,9 @@
     height: 100%;
     display: flex;
     .main-content {
-      width: 100%;
+      flex-grow: 1;
       background: #eee;
+      padding: 30px;
     }
   }
 }
