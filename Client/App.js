@@ -3,9 +3,9 @@ import Routes from './Routes';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTachometerAlt } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faBars);
+library.add(faBars, faTachometerAlt);
 
 const App = () => (
   <div id="app">
