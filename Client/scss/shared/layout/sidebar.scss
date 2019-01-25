@@ -1,54 +1,79 @@
 .sidebar {
-  position: relative;
-  transition: width linear 0.3s;
-  overflow: hidden;
-  flex-grow: 0;
-  &.sb-show {
-    width: $sidebar-width;
-  }
-  &.sb-hide {
-    width: 0;
-  }
-  .sb-nav {
-    padding-left: 0;
-    margin-bottom: 0;
-    width: $sidebar-width;
-    a, a:focus, a:hover {
-      text-decoration: none;
-      li {
-        list-style: none;
-        padding: 15px;
-        padding-right: 20px;
-        text-transform: uppercase;
-        cursor: pointer;
-        &:hover {
-          position: relative;
-          background: rgba(#000, 0.03);
-          color: $primary-color;
-          &::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: calc(100% - 7px);
-            bottom: 0;
-            right: 0;
-            background: $primary-color;
-          }
-        }
-        .sb-nav-icon {
-          font-size: 1.2em;
-          color: lighten($text-color, 10%);
-        }
-      }
-    }  
-    &.primary-nav {
-      margin-top: 20px;
-    }
-    &.secondary-nav {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 20px;
-    }
-  }
+	position: relative;
+	transition: width linear 0.3s;
+	overflow: hidden;
+	flex-grow: 0;
+	&.sb-show {
+		width: $sidebar-width;
+	}
+	&.sb-hide {
+		width: 0;
+	}
+	.sb-nav {
+		padding-left: 0;
+		margin-bottom: 0;
+		width: $sidebar-width;
+		li {
+			list-style: none;
+			text-transform: uppercase;
+			&:hover {
+				position: relative;
+				background: rgba(#000, 0.03);
+				color: $primary-color;
+				&::after {
+					content: '';
+					position: absolute;
+					top: 0;
+					left: calc(100% - 7px);
+					bottom: 0;
+					right: 0;
+					background: $primary-color;
+				}
+				.sb-nav-icon {
+					color: $primary-color;
+				}
+			}
+			a {
+				display: block;
+				padding: 15px;
+				padding-right: 20px;
+				color: inherit;
+				&:focus,
+				&:hover {
+					text-decoration: none;
+				}
+				.sb-nav-icon {
+					font-size: 1.2em;
+					color: lighten($text-color, 10%);
+				}
+			}
+		}
+
+		&.primary-nav {
+			margin-top: 20px;
+		}
+		&.secondary-nav {
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: 20px;
+		}
+	}
+	.cta-btn-wrap {
+		width: $sidebar-width - 30;
+		margin: 35px 15px;
+		.cta-btn {
+			text-align: center;
+			display: block;
+			background: $primary-color;
+			color: #fff;
+			text-decoration: none;
+			padding: 10px;
+			text-transform: uppercase;
+			border-radius: 3px;
+			&:hover {
+				background: darken($primary-color, 10%);
+			}
+		}
+	}
 }

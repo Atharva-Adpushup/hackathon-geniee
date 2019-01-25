@@ -4,22 +4,30 @@ import Routes from './Routes';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTachometerAlt } from '@fortawesome/free-solid-svg-icons';
+import {
+	faBars,
+	faTachometerAlt,
+	faList,
+	faChartArea,
+	faAlignCenter,
+	faDollarSign,
+	faDesktop
+} from '@fortawesome/free-solid-svg-icons';
 import Shell from './Components/Shell';
 import ErrorBoundary from './Components/ErrorBoundary';
 
-library.add(faBars, faTachometerAlt);
+library.add(faBars, faTachometerAlt, faList, faChartArea, faAlignCenter, faDollarSign, faDesktop);
 
 const App = () => (
-  <div id="app">
-    <Router>
-      <Shell>
-        <ErrorBoundary>
-          <Routes />
-        </ErrorBoundary>
-      </Shell>
-    </Router>
-  </div>
+	<div id="app">
+		<Router>
+			<Shell>
+				<ErrorBoundary>
+					<Routes />
+				</ErrorBoundary>
+			</Shell>
+		</Router>
+	</div>
 );
 
 export default App;
