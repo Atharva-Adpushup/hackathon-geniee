@@ -18,6 +18,8 @@
                                         i.fa.fa-area-chart
                                 if site.isManual
                                     a.btn.btn-lightBg.btn-default(id="site-tag-manager-" + siteId, href='/tagmanager/#{siteId}') AP Tag
+                                if site.isInnovative
+                                    a.btn.btn-lightBg.btn-default(id="site-innovative-ads-manager-" + siteId, href='/innovative-ads-manager/#{siteId}') Innovative Ads
                                 .dropdown.btn-dropdown
                                     button.btn.btn-lightBg#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='true')
                                         span.caret
