@@ -1,6 +1,5 @@
 import React from 'react';
-import Shell from '../../Components/Shell';
 
-const Dashboard = () => <Shell>Dashboard</Shell>;
+const Dashboard = () => <div>Dashboard</div>
 
 export default Dashboard;
