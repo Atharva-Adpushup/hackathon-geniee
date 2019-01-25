@@ -1,5 +1,10 @@
 import React, { Suspense, lazy } from 'react';
-import { Route, Switch } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Switch
+} from 'react-router-dom';
 
 import Loader from './Components/Loader/';
 
@@ -15,6 +20,7 @@ const PaymentSettings = lazy(() => import(/* webpackChunkName: "paymentSettings"
 const Routes = () => (
   <Suspense fallback={<Loader />} >
     <Switch>
+      <Route exact path="/" render={() => <Redirect to="/dashboard" />} />
       <Route exact path="/dashboard" component={Dashboard} />
       <Route exact path="/sites" component={Sites} />
       <Route exact path="/reporting" component={Reporting} />
