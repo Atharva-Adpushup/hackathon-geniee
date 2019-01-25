@@ -49,18 +49,18 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 		if (interactiveAd && interactiveAd.formatData) {
 			const adp = window.adpushup;
 
-			if (adp.config.mode === 16) {
-				if (
-					adp.utils.isUrlMatching() &&
-					adp.config.platform.toUpperCase() === interactiveAd.formatData.platform.toUpperCase()
-				) {
-					renderAd(interactiveAd);
-				} else {
-					return false;
-				}
-			} else {
+			// if (adp.config.mode === 16) {
+			if (
+				adp.utils.isUrlMatching() &&
+				adp.config.platform.toUpperCase() === interactiveAd.formatData.platform.toUpperCase()
+			) {
 				renderAd(interactiveAd, adInstance);
+			} else {
+				return false;
 			}
+			// } else {
+			// 	renderAd(interactiveAd, adInstance);
+			// }
 		}
 	};
 

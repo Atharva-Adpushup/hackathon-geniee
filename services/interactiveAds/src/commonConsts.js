@@ -41,7 +41,7 @@ const commonConsts = {
 	},
 	POWERED_BY_BANNER: {
 		TEXT: 'Ads by',
-		IMAGE: 'http://localhost:8080/assets/images/logo-red-200X50.png',
+		IMAGE: 'http://localhost:8080/assets/images/logo-white-200X50.png',
 		REDIRECT_URL: 'https://campaign.adpushup.com/get-started/?utm_source=banner&utm_campaign=growth_hack',
 		CSS: {
 			COMMON: {
@@ -58,8 +58,8 @@ const commonConsts = {
 			},
 			LOGO: {
 				'max-width': '50px',
-				'margin-left': '2px',
-				background: '#fff'
+				'margin-left': '2px'
+				// background: '#fff'
 			}
 		}
 	},
@@ -68,20 +68,20 @@ const commonConsts = {
 			COMMON: {
 				background: 'rgba(0,0,0,0.5)',
 				position: 'absolute',
-				top: '-19px',
-				'padding-bottom': '2px'
+				'padding-bottom': '2px',
+				'max-height': '20px'
 			},
 			LEFT: {
-				top: -19
+				top: '-19px'
 			},
 			RIGHT: {
-				top: -19
+				top: '-19px'
 			},
 			BOTTOM: {
-				top: -19
+				top: '-19px'
 			},
 			TOP: {
-				bottom: -19
+				top: '-19px'
 			}
 		}
 	},

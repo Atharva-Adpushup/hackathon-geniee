@@ -17,9 +17,10 @@ class Default extends Component {
 
 	saveHandler() {
 		const { css } = this.state;
+		let code = {};
 		if (css && css.trim().length) {
 			try {
-				const code = JSON.parse(window.atob(css));
+				code = JSON.parse(window.atob(css));
 				if (!code || !Object.keys(code).length) {
 					throw new Error('Invalid CSS');
 				}
@@ -32,9 +33,10 @@ class Default extends Component {
 			formatData: {
 				event: 'scriptLoaded',
 				eventData: {
-					value: this.state.css
+					value: ''
 				}
 			},
+			css: code,
 			type: TYPE_OF_ADS.INTERACTIVE_AD
 		});
 	}

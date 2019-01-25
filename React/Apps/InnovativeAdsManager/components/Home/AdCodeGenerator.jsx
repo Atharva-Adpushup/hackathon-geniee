@@ -98,12 +98,22 @@ class AdCodeGenerator extends Component {
 		const sizesArray = this.state.size.split('x');
 		const width = sizesArray[0];
 		const height = sizesArray[1];
-		const typeAndPlacement = this.state.format.split(/^([^A-Z]+)/);
 
-		typeAndPlacement.shift();
+		let typeAndPlacement = [];
+		let type = null;
+		let placement = null;
 
-		const type = typeAndPlacement[0] ? typeAndPlacement[0].toLowerCase() : null;
-		const placement = typeAndPlacement[1] ? typeAndPlacement[1].toLowerCase() : null;
+		if (this.state.format.indexOf('inView') === -1) {
+			typeAndPlacement = this.state.format.split(/^([^A-Z]+)/);
+
+			typeAndPlacement.shift();
+
+			type = typeAndPlacement[0] ? typeAndPlacement[0].toLowerCase() : null;
+			placement = typeAndPlacement[1] ? typeAndPlacement[1].toLowerCase() : null;
+		} else {
+			type = this.state.format;
+			placement = 'top';
+		}
 
 		return {
 			siteId: window.siteId,
@@ -128,8 +138,8 @@ class AdCodeGenerator extends Component {
 				formatData: {
 					platform: this.state.platform,
 					format: this.state.format,
-					type,
-					placement,
+					type: type.toLowerCase(),
+					placement: placement.toLowerCase(),
 					...data.formatData
 				},
 				type: data.type,

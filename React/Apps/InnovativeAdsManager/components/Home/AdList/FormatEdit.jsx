@@ -18,6 +18,7 @@ class FormatEdit extends Component {
 				...ad.formatData,
 				...data.formatData
 			},
+			css: data.css ? data.css : ad.css,
 			...data.adData
 		});
 		onCancel();
