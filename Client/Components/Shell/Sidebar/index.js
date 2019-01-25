@@ -1,95 +1,58 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 
 const Sidebar = ({ show }) => (
-  <aside className={`sidebar ${show ? 'sb-show' : 'sb-hide'}`}>
-    <ul className="sb-nav primary-nav">
-      <Link to="/dashboard" >
-        <li>
-            Dashboard
-            <FontAwesomeIcon
-              icon="tachometer-alt"
-              pull="right"
-              className="sb-nav-icon"
-            />
-        </li>
-      </Link>
-      <Link to="/sites" >
-        <li>
-          My Sites
-          <FontAwesomeIcon
-            icon="tachometer-alt"
-            pull="right"
-            className="sb-nav-icon"
-          />
-        </li>
-      </Link>
-      <Link to="/addSite" >
-        <li>
-          Add New Website
-          <FontAwesomeIcon
-            icon="tachometer-alt"
-            pull="right"
-            className="sb-nav-icon"
-          />
-        </li>
-      </Link>
-      <Link to="/reporting" >
-        <li>
-          Reporting
-          <FontAwesomeIcon
-            icon="tachometer-alt"
-            pull="right"
-            className="sb-nav-icon"
-          />
-        </li>
-      </Link>
-      <Link to="/byodPanel" >
-        <li>
-        BYOD Panel
-        <FontAwesomeIcon
-          icon="tachometer-alt"
-          pull="right"
-          className="sb-nav-icon"
-        />
-        </li>
-      </Link>
-    </ul>
+	<aside className={`sidebar ${show ? 'sb-show' : 'sb-hide'}`}>
+		<ul className="sb-nav primary-nav">
+			<li>
+				<Link to="/dashboard">
+					Dashboard
+					<FontAwesomeIcon icon="tachometer-alt" pull="right" className="sb-nav-icon" />
+				</Link>
+			</li>
+			<li>
+				<Link to="/sites">
+					My Sites
+					<FontAwesomeIcon icon="list" pull="right" className="sb-nav-icon" />
+				</Link>
+			</li>
+			<li>
+				<Link to="/reporting">
+					Reporting
+					<FontAwesomeIcon icon="chart-area" pull="right" className="sb-nav-icon" />
+				</Link>
+			</li>
+			<li>
+				<Link to="/byodPanel">
+					BYOD Panel
+					<FontAwesomeIcon icon="desktop" pull="right" className="sb-nav-icon" />
+				</Link>
+			</li>
+		</ul>
 
-    <ul className="sb-nav secondary-nav">
-      <Link to="/adsTxtManagement" >
-        <li>
-          Ads.txt Management
-          <FontAwesomeIcon
-            icon="tachometer-alt"
-            pull="right"
-            className="sb-nav-icon"
-          />
-        </li>
-      </Link>
-      <Link to="/payment" >
-        <li>
-          Payments
-          <FontAwesomeIcon
-            icon="tachometer-alt"
-            pull="right"
-            className="sb-nav-icon"
-          />
-        </li>
-      </Link>
-      <Link to="/paymentSettings" >
-        <li>
-          Payments Settings
-          <FontAwesomeIcon
-            icon="tachometer-alt"
-            pull="right"
-            className="sb-nav-icon"
-          />
-        </li>
-      </Link>
-    </ul>
-  </aside>
+		<div className="cta-btn-wrap">
+			<Link to="/addSite" className="cta-btn">
+				Add New Website
+			</Link>
+		</div>
+
+		<ul className="sb-nav secondary-nav">
+			<li>
+				<Link to="/adsTxtManagement">
+					Ads.txt Management
+					<FontAwesomeIcon icon="align-center" pull="right" className="sb-nav-icon" />
+				</Link>
+			</li>
+			<li>
+				<Link to="/payment">
+					Payments
+					<FontAwesomeIcon icon="dollar-sign" pull="right" className="sb-nav-icon" />
+				</Link>
+			</li>
+		</ul>
+	</aside>
 );
 
 export default Sidebar;
