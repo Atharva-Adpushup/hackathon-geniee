@@ -6,6 +6,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTachometerAlt } from '@fortawesome/free-solid-svg-icons';
 import Shell from './Components/Shell';
+import ErrorBoundary from './Components/ErrorBoundary';
 
 library.add(faBars, faTachometerAlt);
 
@@ -13,7 +14,9 @@ const App = () => (
   <div id="app">
     <Router>
       <Shell>
-        <Routes />
+        <ErrorBoundary>
+          <Routes />
+        </ErrorBoundary>
       </Shell>
     </Router>
   </div>
