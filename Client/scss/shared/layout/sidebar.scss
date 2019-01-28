@@ -1,18 +1,32 @@
 .sidebar {
 	position: relative;
-	transition: width linear 0.3s;
+	transition: width $sidebar-transition-style $sidebar-transition-duration;
 	overflow: hidden;
 	flex-grow: 0;
 	&.sb-show {
 		width: $sidebar-width;
 	}
 	&.sb-hide {
-		width: 0;
+		width: 60px;
+		.link-text-wrap {
+			width: 0% !important;
+		}
+		.cta-btn-wrap {
+			margin-left: 10px;
+			margin-right: 10px;
+			.cta-btn {
+				.cta-btn-txt-wrap {
+					width: 0% !important;
+				}
+				.cta-btn-icon {
+					opacity: 1;
+				}
+			}
+		}
 	}
 	.sb-nav {
 		padding-left: 0;
 		margin-bottom: 0;
-		width: $sidebar-width;
 		li {
 			list-style: none;
 			text-transform: uppercase;
@@ -24,12 +38,12 @@
 					content: '';
 					position: absolute;
 					top: 0;
-					left: calc(100% - 7px);
+					right: calc(100% - 7px);
 					bottom: 0;
-					right: 0;
+					left: 0;
 					background: $primary-color;
 				}
-				.sb-nav-icon {
+				.sb-nav-icon-wrap {
 					color: $primary-color;
 				}
 			}
@@ -42,7 +56,20 @@
 				&:hover {
 					text-decoration: none;
 				}
-				.sb-nav-icon {
+				.link-text-wrap {
+					position: absolute;
+					width: 100%;
+					overflow: hidden;
+					transition: width $sidebar-transition-style $sidebar-transition-duration;
+					.link-text {
+						display: block;
+						width: $sidebar-width;
+					}
+				}
+				.sb-nav-icon-wrap {
+					float: right;
+					width: 20px;
+					text-align: center;
 					font-size: 1.2em;
 					color: lighten($text-color, 10%);
 				}
@@ -60,7 +87,7 @@
 		}
 	}
 	.cta-btn-wrap {
-		width: $sidebar-width - 30;
+		position: relative;
 		margin: 35px 15px;
 		.cta-btn {
 			text-align: center;
@@ -71,8 +98,26 @@
 			padding: 10px;
 			text-transform: uppercase;
 			border-radius: 3px;
+			height: 34px;
 			&:hover {
 				background: darken($primary-color, 10%);
+			}
+			.cta-btn-txt-wrap {
+				position: absolute;
+				width: 100%;
+				overflow: hidden;
+				top: 0;
+				left: 0;
+				transition: width $sidebar-transition-style $sidebar-transition-duration;
+				.cta-btn-text {
+					width: $sidebar-width - 30px;
+					padding: 7px;
+					display: block;
+				}
+			}
+			.cta-btn-icon {
+				transition: opacity $sidebar-transition-style $sidebar-transition-duration;
+				opacity: 0;
 			}
 		}
 	}
