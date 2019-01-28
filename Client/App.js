@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import Routes from './Routes';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,12 +10,23 @@ import {
 	faChartArea,
 	faAlignCenter,
 	faDollarSign,
-	faDesktop
+	faDesktop,
+	faPlus
 } from '@fortawesome/free-solid-svg-icons';
+import Routes from './Routes';
 import Shell from './Components/Shell';
 import ErrorBoundary from './Components/ErrorBoundary';
 
-library.add(faBars, faTachometerAlt, faList, faChartArea, faAlignCenter, faDollarSign, faDesktop);
+library.add(
+	faBars,
+	faTachometerAlt,
+	faList,
+	faChartArea,
+	faAlignCenter,
+	faDollarSign,
+	faDesktop,
+	faPlus
+);
 
 const App = () => (
 	<div id="app">

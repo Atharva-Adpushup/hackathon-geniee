@@ -7,48 +7,75 @@ const Sidebar = ({ show }) => (
 	<aside className={`sidebar ${show ? 'sb-show' : 'sb-hide'}`}>
 		<ul className="sb-nav primary-nav">
 			<li>
-				<Link to="/dashboard">
-					Dashboard
-					<FontAwesomeIcon icon="tachometer-alt" pull="right" className="sb-nav-icon" />
+				<Link to="/dashboard" className="clearfix">
+					<span className="link-text-wrap">
+						<span className="link-text">Dashboard</span>
+					</span>
+					<span className="sb-nav-icon-wrap">
+						<FontAwesomeIcon icon="tachometer-alt" className="sb-nav-icon" />
+					</span>
 				</Link>
 			</li>
 			<li>
-				<Link to="/sites">
-					My Sites
-					<FontAwesomeIcon icon="list" pull="right" className="sb-nav-icon" />
+				<Link to="/sites" className="clearfix">
+					<span className="link-text-wrap">
+						<span className="link-text">My Sites</span>
+					</span>
+					<span className="sb-nav-icon-wrap">
+						<FontAwesomeIcon icon="list" className="sb-nav-icon" />
+					</span>
 				</Link>
 			</li>
 			<li>
-				<Link to="/reporting">
-					Reporting
-					<FontAwesomeIcon icon="chart-area" pull="right" className="sb-nav-icon" />
+				<Link to="/reporting" className="clearfix">
+					<span className="link-text-wrap">
+						<span className="link-text">Reporting</span>
+					</span>
+					<span className="sb-nav-icon-wrap">
+						<FontAwesomeIcon icon="chart-area" className="sb-nav-icon" />
+					</span>
 				</Link>
 			</li>
 			<li>
-				<Link to="/byodPanel">
-					BYOD Panel
-					<FontAwesomeIcon icon="desktop" pull="right" className="sb-nav-icon" />
+				<Link to="/byodPanel" className="clearfix">
+					<span className="link-text-wrap">
+						<span className="link-text">BYOD Panel</span>
+					</span>
+					<span className="sb-nav-icon-wrap">
+						<FontAwesomeIcon icon="desktop" className="sb-nav-icon" />
+					</span>
 				</Link>
 			</li>
 		</ul>
 
 		<div className="cta-btn-wrap">
 			<Link to="/addSite" className="cta-btn">
-				Add New Website
+				<span className="cta-btn-txt-wrap">
+					<span className="cta-btn-text">Add New Website</span>
+				</span>
+				<FontAwesomeIcon icon="plus" className="cta-btn-icon" />
 			</Link>
 		</div>
 
 		<ul className="sb-nav secondary-nav">
 			<li>
-				<Link to="/adsTxtManagement">
-					Ads.txt Management
-					<FontAwesomeIcon icon="align-center" pull="right" className="sb-nav-icon" />
+				<Link to="/adsTxtManagement" className="clearfix">
+					<span className="link-text-wrap">
+						<span className="link-text">Ads.txt Management</span>
+					</span>
+					<span className="sb-nav-icon-wrap">
+						<FontAwesomeIcon icon="align-center" className="sb-nav-icon" />
+					</span>
 				</Link>
 			</li>
 			<li>
-				<Link to="/payment">
-					Payments
-					<FontAwesomeIcon icon="dollar-sign" pull="right" className="sb-nav-icon" />
+				<Link to="/payment" className="clearfix">
+					<span className="link-text-wrap">
+						<span className="link-text">Payments</span>
+					</span>
+					<span className="sb-nav-icon-wrap">
+						<FontAwesomeIcon icon="dollar-sign" className="sb-nav-icon" />
+					</span>
 				</Link>
 			</li>
 		</ul>
