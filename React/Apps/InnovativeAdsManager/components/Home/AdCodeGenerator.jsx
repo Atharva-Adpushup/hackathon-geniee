@@ -151,7 +151,7 @@ class AdCodeGenerator extends Component {
 				blocklist: [],
 				isActive: true,
 				isInnovativeAd: true,
-				name: `Ad-${this.state.platform}-${this.state.format}-${width}x${height}`,
+				name: `Ad-${this.state.platform}-${this.state.format}-${width}x${height}-${+new Date()}`,
 				...data.adData
 			}
 		};

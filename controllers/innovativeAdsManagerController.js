@@ -250,7 +250,6 @@ router
 
 			doc.meta = req.body.meta;
 			return fn.directDBUpdate(`${docKeys.interactiveAds}${siteId}`, doc, docWithCas.cas);
-			// return appBucket.updateDoc(`${docKeys.interactiveAds}${siteId}`, doc, docWithCas.cas);
 		});
 	})
 	.post('/modifyAd', (req, res) => {
@@ -278,7 +277,6 @@ router
 				doc.meta[mode] = logs;
 			}
 			return fn.directDBUpdate(`${docKeys.interactiveAds}${req.body.siteId}`, doc, docWithCas.cas);
-			// return appBucket.updateDoc(`${docKeys.interactiveAds}${req.body.siteId}`, doc, docWithCas.cas);
 		});
 	});
 
