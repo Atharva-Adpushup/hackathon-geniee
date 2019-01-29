@@ -56,7 +56,7 @@ const helpers = {
 			})
 			.catch(err => {
 				console.log(err);
-				alert('Operation Failed. Please contact Ops');
+				window.alert('Operation Failed. Please contact Ops');
 				return false;
 			})
 };
@@ -68,31 +68,15 @@ const createAd = params => dispatch =>
 		data: JSON.stringify(params)
 	}).then(response => {
 		if (response.error) {
-			return alert('Ad creation failed');
+			return window.alert('Ad creation failed');
 		}
-		dispatch({ type: adActions.UPDATE_ADS_LIST, data: { ...params.ad, id: response.data.id } });
-		dispatch({ type: globalActions.SET_CURRENT_AD, currentAd: response.data.id });
-
-		const { ad } = params;
-		let adsKeys = [];
-		let mode;
-
-		try {
-			if (ad.pagegroups && ad.pagegroups.length) {
-				adsKeys = ad.pagegroups.map(pg => `${ad.formatData.platform}-${ad.formatData.format}-${pg}`);
-				mode = 'pagegroups';
-			} else {
-				adsKeys = `${ad.formatData.platform}-${ad.formatData.format}`;
-				mode = 'custom';
-			}
-		} catch (e) {
-			console.log(e);
-		}
-		dispatch({
+		dispatch({ type: adActions.UPDATE_ADS_LIST, data: response.data.ads });
+		dispatch({ type: globalActions.SET_CURRENT_AD, currentAd: response.data.ads[0].id });
+		return dispatch({
 			type: globalActions.UPDATE_AD_TRACKING_LOGS,
 			value: {
-				mode,
-				logs: adsKeys
+				mode: 'pagegroups',
+				logs: response.data.logs
 			}
 		});
 	});
@@ -103,9 +87,9 @@ const fetchAds = params => dispatch =>
 		data: params
 	}).then(response => {
 		if (response.error) {
-			return alert('Ad fetching failed');
+			return window.alert('Ad fetching failed');
 		}
-		dispatch({ type: adActions.REPLACE_ADS_LIST, data: response.data.ads });
+		return dispatch({ type: adActions.REPLACE_ADS_LIST, data: response.data.ads });
 	});
 const deleteAd = params => dispatch =>
 	ajax({
@@ -114,9 +98,9 @@ const deleteAd = params => dispatch =>
 		data: JSON.stringify(params)
 	}).then(response => {
 		if (response.error) {
-			return alert('Delete Ad failed');
+			return window.alert('Delete Ad failed');
 		}
-		dispatch({ type: adActions.DELETE_AD, adId: params.adId });
+		return dispatch({ type: adActions.DELETE_AD, adId: params.adId });
 	});
 const updateAd = (adId, data) => dispatch =>
 	dispatch({
@@ -133,7 +117,7 @@ const modifyAdOnServer = (adId, data) => dispatch =>
 		data: JSON.stringify({ siteId: window.siteId, adId, data })
 	}).then(response => {
 		if (response.error) {
-			return alert(response.data.message);
+			return window.alert(response.data.message);
 		}
 		return dispatch({
 			type: adActions.UPDATE_AD,
@@ -155,7 +139,7 @@ const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
 	if (isActive) {
 		const alreadyExists = globalAdLogs.some(log => currentAdLogs.includes(log));
 		if (alreadyExists) {
-			alert(
+			window.alert(
 				`${format.toUpperCase()} ad already exists for ${platform.toUpperCase()} and ${pagegroups
 					.join(',')
 					.toUpperCase()}`
@@ -174,7 +158,7 @@ const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
 		if (disabled.size) {
 			const currentPagegroupsDisabled = [...disabled].some(ele => pagegroups.includes(ele));
 			if (currentPagegroupsDisabled) {
-				alert('Only one type of horizontal / vertical ad is allowed in a pagegroup');
+				window.alert('Only one type of horizontal / vertical ad is allowed in a pagegroup');
 				return Promise.resolve(false);
 			}
 		}

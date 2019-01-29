@@ -13,19 +13,20 @@ class PagegroupTrafficEdit extends Component {
 	}
 
 	selectPagegroups(pagegroup) {
-		const pagegroups = this.state.pagegroups.concat([]);
-		if (pagegroups.includes(pagegroup)) {
-			pagegroups.splice(pagegroups.indexOf(pagegroup), 1);
-		} else {
-			pagegroups.push(pagegroup);
-		}
+		// const pagegroups = this.state.pagegroups.concat([]);
+		// if (pagegroups.includes(pagegroup)) {
+		// 	pagegroups.splice(pagegroups.indexOf(pagegroup), 1);
+		// } else {
+		// 	pagegroups.push(pagegroup);
+		// }
 
-		if (pagegroups.length) {
+		// Now only one pagegroup is allowed per ad
+		if (pagegroup) {
 			return this.setState({
-				pagegroups
+				pagegroups: [pagegroup]
 			});
 		}
-		return alert('Atleast one pagegroup is required for ads to run.');
+		return window.alert('Atleast one pagegroup is required for ads to run.');
 	}
 
 	render() {
@@ -44,11 +45,11 @@ class PagegroupTrafficEdit extends Component {
 		return (
 			<div className="options-wrapper" id="edit-traffic-pagegroups">
 				<CustomList
-					multiSelect
+					// multiSelect
 					simpleList
 					leftSize={0}
 					rightSize={12}
-					toMatch={pagegroups}
+					toMatch={pagegroups[0]}
 					options={filteredPagegroupsByPlatform}
 					disabled={!!disabled.size}
 					toDisable={[...disabled]}

@@ -63,9 +63,7 @@ class AdList extends Component {
 					</thead>
 					<tbody>
 						{ads.map(ad =>
-							!Object.prototype.hasOwnProperty.call(ad, 'isActive') ||
-							ad.isActive ||
-							window.iam.isSuperUser ? (
+							ad.isActive || window.iam.isSuperUser ? (
 								<AdElement
 									key={`adElement-${ad.id}`}
 									identifier={ad.id}

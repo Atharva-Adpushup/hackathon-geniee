@@ -12,7 +12,7 @@ const ads = (state = { fetched: false, content: [] }, action) => {
 			return {
 				...state,
 				content: state.content.map(ad => {
-					if (action.data.id == ad.id) {
+					if (action.data.id === ad.id) {
 						return { ...ad, ...action.data.updateThis };
 					}
 					return ad;

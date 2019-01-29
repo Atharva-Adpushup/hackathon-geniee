@@ -44,28 +44,32 @@ const fn = {
 			});
 	},
 	processing: (data, payload) => {
-		let value = data.value || data;
-
 		const cas = data.cas || false;
-		const id = uuid.v4();
-		const ad = {
-			...payload.ad,
-			id: id,
-			createdOn: +new Date()
-		};
+		const { pagegroups, formatData } = payload.ad;
 
-		value.ads.push(ad);
+		let value = data.value || data;
+		let newAds = [];
+		let logs = [];
+
+		if (pagegroups.length) {
+			newAds = _.map(pagegroups, pagegroup => {
+				logs.push(`${formatData.platform}-${formatData.format}-${pagegroup}`);
+				return {
+					...payload.ad,
+					id: uuid.v4(),
+					createdOn: +new Date(),
+					pagegroups: [pagegroup]
+				};
+			});
+		} else {
+			return Promise.reject('No Pagegroups found in the ad');
+		}
+
+		value.ads = value.ads.concat(newAds);
+		value.meta.pagegroups = value.meta.pagegroups.concat(logs);
 		value.siteDomain = value.siteDomain || payload.siteDomain;
 		value.siteId = value.siteId || payload.siteId;
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
-
-		if (ad.pagegroups.length) {
-			_.forEach(ad.pagegroups, pagegroup => {
-				value.meta.pagegroups.push(`${ad.formatData.platform}-${ad.formatData.format}-${pagegroup}`);
-			});
-		} else {
-			value.meta.custom.push(`${ad.formatData.platform}-${ad.format}`);
-		}
 
 		// if (config.environment.HOST_ENV === 'production') {
 		// 	fn.sendDataToZapier({
@@ -80,15 +84,16 @@ const fn = {
 		// 	});
 		// }
 
-		return Promise.resolve([cas, value, id, payload.siteId]);
+		return Promise.resolve([cas, value, { ads: newAds, logs }, payload.siteId]);
 	},
-	getAndUpdate: (key, value, adId) => {
-		return appBucket.getDoc(key).then(result => appBucket.updateDoc(key, value, result.cas).then(() => adId));
-	},
-	directDBUpdate: (key, value, cas, adId) => appBucket.updateDoc(key, value, cas).then(() => adId),
-	dbWrapper: (cas, value, adId, siteId) => {
-		const key = `${docKeys.interactiveAds}${siteId}`;
-		return !cas ? fn.getAndUpdate(key, value, adId) : fn.directDBUpdate(key, value, cas, adId);
+	getAndUpdate: (key, value) => appBucket.getDoc(key).then(result => appBucket.updateDoc(key, value, result.cas)),
+	directDBUpdate: (key, value, cas) => appBucket.updateDoc(key, value, cas),
+	dbWrapper: (cas, value, toReturn, siteId) => {
+		function process() {
+			const key = `${docKeys.interactiveAds}${siteId}`;
+			return !cas ? fn.getAndUpdate(key, value) : fn.directDBUpdate(key, value, cas);
+		}
+		return process().then(() => toReturn);
 	},
 	errorHander: (err, res) => {
 		console.log(err);
@@ -194,11 +199,11 @@ router
 					: Promise.reject(err);
 			})
 			.spread(fn.dbWrapper)
-			.then(id => {
+			.then(data => {
 				return sendSuccessResponse(
 					{
 						message: 'Ad created',
-						id: id
+						...data
 					},
 					res
 				);
@@ -215,8 +220,8 @@ router
 			);
 		}
 		return fn.adUpdateProcessing(req, res, docWithCas => {
-			let doc = docWithCas.value,
-				{ siteId, siteDomain } = req.body;
+			let doc = docWithCas.value;
+			const { siteId } = req.body;
 
 			if (doc.ownerEmail != req.session.user.email) {
 				return Promise.reject('Owner verfication fail');
@@ -244,7 +249,8 @@ router
 			}
 
 			doc.meta = req.body.meta;
-			return appBucket.updateDoc(`${docKeys.interactiveAds}${siteId}`, doc, docWithCas.cas);
+			return fn.directDBUpdate(`${docKeys.interactiveAds}${siteId}`, doc, docWithCas.cas);
+			// return appBucket.updateDoc(`${docKeys.interactiveAds}${siteId}`, doc, docWithCas.cas);
 		});
 	})
 	.post('/modifyAd', (req, res) => {
@@ -271,7 +277,8 @@ router
 				const { mode, logs } = req.body.metaUpdate;
 				doc.meta[mode] = logs;
 			}
-			return appBucket.updateDoc(`${docKeys.interactiveAds}${req.body.siteId}`, doc, docWithCas.cas);
+			return fn.directDBUpdate(`${docKeys.interactiveAds}${req.body.siteId}`, doc, docWithCas.cas);
+			// return appBucket.updateDoc(`${docKeys.interactiveAds}${req.body.siteId}`, doc, docWithCas.cas);
 		});
 	});
 

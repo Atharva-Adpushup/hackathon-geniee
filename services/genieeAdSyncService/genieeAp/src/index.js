@@ -136,7 +136,7 @@ function startCreation(forced) {
 
 		var innovativeInteractiveAds = [];
 		var layoutAndManualInteractiveAds = [];
-		var isAdPushupRunning = false;
+		var layoutRunning = false;
 		var isControlVariation = false;
 
 		if (config.innovativeModeActive && window.adpushup.config.innovativeAds.length) {
@@ -150,9 +150,9 @@ function startCreation(forced) {
 				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
 
 			config = adp.config = moduleConfig;
-			isAdPushupRunning = true;
 			if (selectedVariation) {
 				adp.creationProcessStarted = true;
+				layoutRunning = true;
 
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
@@ -174,20 +174,18 @@ function startCreation(forced) {
 				triggerControl(3);
 			}
 
-			if (isAdPushupRunning) {
-				var finalInteractiveAds = !isControlVariation
-					? innovativeInteractiveAds.concat(layoutAndManualInteractiveAds)
-					: layoutAndManualInteractiveAds;
+			var finalInteractiveAds = !isControlVariation
+				? innovativeInteractiveAds.concat(layoutAndManualInteractiveAds)
+				: layoutAndManualInteractiveAds;
 
-				if (finalInteractiveAds && finalInteractiveAds.length) {
-					require.ensure(
-						['interactiveAds/index.js'],
-						function(require) {
-							require('interactiveAds/index')(finalInteractiveAds);
-						},
-						'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
-					);
-				}
+			if (finalInteractiveAds && finalInteractiveAds.length) {
+				require.ensure(
+					['interactiveAds/index.js'],
+					function(require) {
+						require('interactiveAds/index')(finalInteractiveAds);
+					},
+					'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
+				);
 			}
 
 			return resolve(true);
