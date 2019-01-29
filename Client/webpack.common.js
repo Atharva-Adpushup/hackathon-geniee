@@ -1,11 +1,8 @@
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
-  mode: 'development',
-  devtool: 'source-map',
   entry: path.resolve(__dirname, 'index.js'),
   output: {
     path: path.resolve(__dirname, 'public'),
@@ -53,10 +50,5 @@ module.exports = {
       filename: '[name].css',
       chunkFilename: '[id].css'
     }),
-    //new BundleAnalyzerPlugin(),
   ],
-  devServer: {
-    port: 5000,
-    historyApiFallback: true
-  }
 };
