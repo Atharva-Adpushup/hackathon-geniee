@@ -200,13 +200,16 @@ router
 			})
 			.spread(fn.dbWrapper)
 			.then(data => {
-				return sendSuccessResponse(
-					{
-						message: 'Ad created',
-						...data
-					},
-					res
-				);
+				return Promise.join(siteModel.getSiteById(req.body.site), site => {
+					adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
+					return sendSuccessResponse(
+						{
+							message: 'Ad created',
+							...data
+						},
+						res
+					);
+				});
 			})
 			.catch(err => fn.errorHander(err, res));
 	})
