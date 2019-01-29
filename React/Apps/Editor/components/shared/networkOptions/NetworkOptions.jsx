@@ -133,7 +133,8 @@ class NetworkOptions extends Component {
 			primaryAdSize = (isPrimaryAdSize && props.primaryAdSize) ||
 			(isAdSize && { height: props.ad.height, width: props.ad.width }) || {},
 			isZonesData = !!(props.zonesData && props.zonesData.length),
-			zonesData = isZonesData ? props.zonesData : [];
+			zonesData = isZonesData ? props.zonesData : [],
+			networkConfig = props.networkConfig;
 
 		switch (this.state.network) {
 			case 'adpTags':
@@ -153,7 +154,7 @@ class NetworkOptions extends Component {
 						id={props.id ? props.id : false}
 						showNotification={props.showNotification}
 						primaryAdSize={primaryAdSize}
-						networkConfig={props.networkConfig['adpTags']}
+						networkConfig={networkConfig['adpTags']}
 					/>
 				);
 				break;
@@ -166,7 +167,7 @@ class NetworkOptions extends Component {
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						showNotification={this.props.showNotification}
-						networkConfig={props.networkConfig['adsense']}
+						networkConfig={networkConfig['adsense']}
 					/>
 				);
 				break;
@@ -179,7 +180,7 @@ class NetworkOptions extends Component {
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						showNotification={this.props.showNotification}
-						networkConfig={props.networkConfig['adx']}
+						networkConfig={networkConfig['adx']}
 					/>
 				);
 				break;
@@ -204,7 +205,7 @@ class NetworkOptions extends Component {
 						isInsertMode={this.props.isInsertMode || false}
 						primaryAdSize={primaryAdSize}
 						zonesData={zonesData}
-						networkConfig={props.networkConfig['geniee']}
+						networkConfig={networkConfig['geniee']}
 					/>
 				);
 				break;
@@ -217,7 +218,7 @@ class NetworkOptions extends Component {
 						onCancel={this.props.onCancel}
 						fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 						showNotification={this.props.showNotification}
-						networkConfig={props.networkConfig['medianet']}
+						networkConfig={networkConfig['medianet']}
 					/>
 				);
 			case 'custom':
@@ -230,7 +231,7 @@ class NetworkOptions extends Component {
 						id={props.id ? props.id : false}
 						onCancel={this.props.onCancel}
 						showNotification={this.props.showNotification}
-						networkConfig={this.props.networkConfig['custom']}
+						networkConfig={networkConfig['custom']}
 					/>
 				);
 				break;
