@@ -44,7 +44,6 @@
     "prettier": "^1.16.1",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.1",
-    "uglifyjs-webpack-plugin": "^2.1.1",
     "url-loader": "^1.1.2",
     "webpack": "^4.28.4",
     "webpack-bundle-analyzer": "^3.0.3",
