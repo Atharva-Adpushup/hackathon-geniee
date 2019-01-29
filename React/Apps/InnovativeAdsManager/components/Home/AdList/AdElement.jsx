@@ -43,7 +43,7 @@ class AdElement extends Component {
 		const message = this.state.isActive
 			? 'Are you sure you want to archive this ad?'
 			: 'Are you sure you want to unarchive this ad?';
-		if (confirm(message)) {
+		if (window.confirm(message)) {
 			this.props
 				.archiveAd(
 					this.props.ad.id,

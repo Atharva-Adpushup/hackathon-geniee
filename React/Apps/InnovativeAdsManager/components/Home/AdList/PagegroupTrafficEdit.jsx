@@ -21,12 +21,11 @@ class PagegroupTrafficEdit extends Component {
 		// }
 
 		// Now only one pagegroup is allowed per ad
-		if (pagegroup) {
-			return this.setState({
-				pagegroups: [pagegroup]
-			});
-		}
-		return window.alert('Atleast one pagegroup is required for ads to run.');
+		return pagegroup
+			? this.setState({
+					pagegroups: [pagegroup]
+			  })
+			: window.alert('Atleast one pagegroup is required for ads to run.');
 	}
 
 	render() {
@@ -60,30 +59,33 @@ class PagegroupTrafficEdit extends Component {
 				<CustomButton
 					label="Save"
 					handler={() => {
-						if (ad.isActive) {
-							updateTraffic(
-								ad.id,
-								{
-									platform: ad.formatData.platform,
-									format: ad.formatData.format,
-									pagegroups: this.state.pagegroups,
+						if (this.state.pagegroups.length) {
+							if (ad.isActive) {
+								updateTraffic(
+									ad.id,
+									{
+										platform: ad.formatData.platform,
+										format: ad.formatData.format,
+										pagegroups: this.state.pagegroups,
+										networkData: {
+											...ad.networkData,
+											logWritten: false
+										}
+									},
+									isSuperUser
+								);
+							} else {
+								updateWrapper({
 									networkData: {
 										...ad.networkData,
 										logWritten: false
-									}
-								},
-								isSuperUser
-							);
-						} else {
-							updateWrapper({
-								networkData: {
-									...ad.networkData,
-									logWritten: false
-								},
-								pagegroups: this.state.pagegroups
-							});
+									},
+									pagegroups: this.state.pagegroups
+								});
+							}
+							return onCancel();
 						}
-						return onCancel();
+						return window.alert('Please select at least one pagegroup');
 					}}
 				/>
 				<div style={{ clear: 'both' }}>&nbsp;</div>
