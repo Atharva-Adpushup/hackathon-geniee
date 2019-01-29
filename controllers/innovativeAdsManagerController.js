@@ -99,20 +99,23 @@ const fn = {
 		console.log(err);
 		return sendErrorResponse({ message: 'Opertion Failed' }, res);
 	},
+	emitEventAndSendResponse: (siteId, res, data = {}) => {
+		return siteModel.getSiteById(siteId).then(site => {
+			adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
+			return sendSuccessResponse(
+				{
+					message: 'Operation Successfull',
+					...data
+				},
+				res
+			);
+		});
+	},
 	adUpdateProcessing: (req, res, processing) => {
 		return appBucket
 			.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`)
 			.then(docWithCas => processing(docWithCas))
-			.then(() => siteModel.getSiteById(req.body.siteId))
-			.then(site => {
-				adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
-				return sendSuccessResponse(
-					{
-						message: 'Operation Successfull'
-					},
-					res
-				);
-			})
+			.then(() => fn.emitEventAndSendResponse(siteId, res))
 			.catch(err => fn.errorHander(err, res));
 	}
 };
@@ -199,18 +202,7 @@ router
 					: Promise.reject(err);
 			})
 			.spread(fn.dbWrapper)
-			.then(data => {
-				return Promise.join(siteModel.getSiteById(req.body.site), site => {
-					adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
-					return sendSuccessResponse(
-						{
-							message: 'Ad created',
-							...data
-						},
-						res
-					);
-				});
-			})
+			.then(data => fn.emitEventAndSendResponse(req.body.siteId, res, data))
 			.catch(err => fn.errorHander(err, res));
 	})
 	.post('/masterSave', (req, res) => {
