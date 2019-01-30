@@ -1,6 +1,7 @@
 import React from 'react';
 import { Col } from 'react-bootstrap';
-import { CustomMessage, EmptyState } from '../shared/index';
+import { CustomMessage } from '../shared/index';
+import { NOOP } from '../../configs/commonConsts';
 
 const CustomList = props => {
 	function renderTabbedHeaders() {
@@ -69,16 +70,21 @@ const CustomList = props => {
 		}
 		return props.options.map((option, key) => {
 			let activeClass = '';
+			const disabled = props.toDisable && props.toDisable.includes(option);
 			if (props.multiSelect) {
 				activeClass = props.toMatch.includes(option) ? 'active' : activeClass;
 			} else {
 				activeClass = props.toMatch === option ? 'active' : activeClass;
 			}
 			if (props.disabled) {
-				activeClass = props.toDisable.includes(option) ? 'disabled' : activeClass;
+				activeClass = disabled ? 'disabled' : activeClass;
 			}
 			return (
-				<li key={key} className={`simpleOption ${activeClass}`} onClick={props.onClick.bind(null, option)}>
+				<li
+					key={key}
+					className={`simpleOption ${activeClass}`}
+					onClick={disabled ? NOOP : props.onClick.bind(null, option)}
+				>
 					{option.replace(':', ' - ')}
 				</li>
 			);

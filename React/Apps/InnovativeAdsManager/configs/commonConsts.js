@@ -264,6 +264,7 @@ const AD_LIST_ACTIONS = {
 		iconClass: 'btn-icn-edit'
 	}
 };
+const NOOP = () => {};
 
 export {
 	PLATFORMS,
@@ -289,5 +290,6 @@ export {
 	OPS_AD_LIST_HEADERS,
 	USER_AD_LIST_ACTIONS,
 	OPS_AD_LIST_ACTIONS,
-	AD_LIST_ACTIONS
+	AD_LIST_ACTIONS,
+	NOOP
 };
