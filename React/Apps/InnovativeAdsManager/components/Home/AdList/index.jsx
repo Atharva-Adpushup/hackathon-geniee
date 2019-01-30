@@ -59,9 +59,13 @@ class AdList extends Component {
 	filterAds = (filters, ads) =>
 		ads
 			.map(ad => {
+				const keys = Object.keys(filters);
 				let condition = true;
-				Object.keys(filters).forEach(key => {
-					const filter = filters[key];
+				let i = 0;
+				const length = keys.length;
+				for (i = 0; i < length; i += 1) {
+					const filter = filters[keys[i]];
+					if (condition === false) break;
 					if (filter.value !== null) {
 						switch (filter.type) {
 							case 'array':
@@ -74,7 +78,7 @@ class AdList extends Component {
 								break;
 						}
 					}
-				});
+				}
 				return condition ? ad : false;
 			})
 			.filter(ele => ele !== false);
