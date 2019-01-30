@@ -107,6 +107,7 @@ $(document).ready(function() {
 						activeDFPCurrencyCode = parsedFormValues.activeDFPCurrencyCode,
 						autoOpt = parsedFormValues.autoOptimise ? true : false,
 						isSPA = parsedFormValues.isSPA ? true : false,
+						isThirdPartyAdx = parsedFormValues.isThirdPartyAdx ? true : false,
 						spaPageTransitionTimeout = parsedFormValues.spaPageTransitionTimeout,
 						dfpInfo = activeDFPNetwork ? activeDFPNetwork.split('-') : [],
 						activeDFPNetwork = dfpInfo.length ? dfpInfo[0] : '',
@@ -126,6 +127,7 @@ $(document).ready(function() {
 							otherSettings: otherSettings,
 							autoOptimise: autoOpt,
 							isSPA: isSPA,
+							isThirdPartyAdx: isThirdPartyAdx,
 							spaPageTransitionTimeout: spaPageTransitionTimeout,
 							activeDFPNetwork: activeDFPNetwork,
 							activeDFPParentId: activeDFPParentId,
@@ -409,18 +411,25 @@ $(document).ready(function() {
 				currencyCode = $checkedOption.attr('data-currencyCode'),
 				$currencyTable = $('.js-currency-table'),
 				$currencyTd = $('#currencyValue'),
-				$activeDFPCurrencyCodeHiddenInput = $('#activeDFPCurrencyCode');
+				$activeDFPCurrencyCodeHiddenInput = $('#activeDFPCurrencyCode'),
+				$thirdPartyAdxWrapper = $('.js-thirdpartyadx-wrapper'),
+				$thirdPartyAdxInput = $('#isThirdPartyAdx');
 
 			if (!currencyCode) {
 				$currencyTable.addClass('u-hide');
 				$currencyTd.text('');
 				$activeDFPCurrencyCodeHiddenInput.val('');
+
+				$thirdPartyAdxWrapper.addClass('u-hide');
+				$thirdPartyAdxInput.prop('checked', false);
 				return;
 			}
 
 			$currencyTd.text(currencyCode);
 			$activeDFPCurrencyCodeHiddenInput.val(currencyCode);
 			$currencyTable.removeClass('u-hide');
+
+			$thirdPartyAdxWrapper.removeClass('u-hide');
 		});
 
 		// Copy to clipboard trigger

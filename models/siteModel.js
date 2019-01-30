@@ -398,6 +398,7 @@ function apiModule() {
 					activeDFPCurrencyCode: settings.activeDFPCurrencyCode || '',
 					blocklist: blocklist.length ? blocklist : '',
 					isSPA: settings.isSPA === 'false' ? false : true,
+					isThirdPartyAdx: settings.isThirdPartyAdx === 'false' ? false : true,
 					spaPageTransitionTimeout: parseInt(settings.spaPageTransitionTimeout, 10),
 					isAdPushupControlWithPartnerSSP: !!site.get('apConfigs').isAdPushupControlWithPartnerSSP
 						? site.get('apConfigs').isAdPushupControlWithPartnerSSP

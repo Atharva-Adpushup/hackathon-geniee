@@ -15,6 +15,7 @@ var ApConfig = {
 		'blocklist',
 		'isAdPushupControlWithPartnerSSP',
 		'isSPA',
+		'isThirdPartyAdx',
 		'spaPageTransitionTimeout'
 	],
 	override: [
@@ -33,6 +34,7 @@ var ApConfig = {
 		'blocklist',
 		'isAdPushupControlWithPartnerSSP',
 		'isSPA',
+		'isThirdPartyAdx',
 		'spaPageTransitionTimeout'
 	],
 	merge: []
