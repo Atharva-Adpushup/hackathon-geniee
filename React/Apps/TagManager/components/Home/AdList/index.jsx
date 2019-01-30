@@ -9,7 +9,7 @@ class AdList extends Component {
 	}
 
 	render() {
-		const { loading, ads, masterSave, updateAd, modifyAdOnServer } = this.props,
+		const { loading, ads, masterSave, updateAd, modifyAdOnServer, networkConfig } = this.props,
 			customStyle = window.isSuperUser ? { minHeight: '520px' } : { minHeight: '420px' };
 
 		if (loading) {
@@ -23,24 +23,29 @@ class AdList extends Component {
 		}
 		return (
 			<ul className="section-list row" style={{ margin: '20px 0px' }}>
-				{window.isSuperUser ? (
-					<div>
-						<CustomButton
-							label={'Master Save'}
-							handler={masterSave.bind(null, window.siteId, window.isSuperUser)}
-							classNames="mr-10"
-						/>
-						<div style={{ clear: 'both' }}>&nbsp;</div>
-					</div>
-				) : null}
-				{ads.map((ad, key) => {
-					return !ad.hasOwnProperty('isActive') || ad.isActive || window.isSuperUser ? (
-						<div key={key} className="col-sm-6">
-							<li className="section-list-item" key={ad.id} style={customStyle}>
-								<AdElement ad={ad} updateAd={updateAd} modifyAdOnServer={modifyAdOnServer} />
-							</li>
+				{window.isSuperUser
+					? <div>
+							<CustomButton
+								label={'Master Save'}
+								handler={masterSave.bind(null, window.siteId, window.isSuperUser)}
+								classNames="mr-10"
+							/>
+							<div style={{ clear: 'both' }}>&nbsp;</div>
 						</div>
-					) : null;
+					: null}
+				{ads.map((ad, key) => {
+					return !ad.hasOwnProperty('isActive') || ad.isActive || window.isSuperUser
+						? <div key={key} className="col-sm-6">
+								<li className="section-list-item" key={ad.id} style={customStyle}>
+									<AdElement
+										ad={ad}
+										updateAd={updateAd}
+										modifyAdOnServer={modifyAdOnServer}
+										networkConfig={networkConfig}
+									/>
+								</li>
+							</div>
+						: null;
 				})}
 			</ul>
 		);

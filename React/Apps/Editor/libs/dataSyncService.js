@@ -16,7 +16,6 @@ const save = (url, data) => $.ajax({ type: 'POST', url, data, dataType: 'json' }
 				const parsedData = typeof rawData === 'string' ? JSON.parse(rawData) : rawData,
 					result = normalize(parsedData.channels, arrayOf(channelSchema));
 				let computedResult = $.extend(true, {}, result.entities);
-
 				computedResult.siteData = {
 					mode: parsedData.site.hasOwnProperty('apConfigs')
 						? parseInt(parsedData.site.apConfigs.mode, 10)
@@ -57,21 +56,20 @@ const save = (url, data) => $.ajax({ type: 'POST', url, data, dataType: 'json' }
 				});
 
 				computedResult.reporting = rawData.reporting;
+				computedResult.networkConfig = parsedData.networkConfig;
 				computedResult = openPageGroupIfPresent(computedResult);
 
 				deferred.resolve(computedResult);
 				return deferred.promise();
 			};
 
-		return getData('/data/getData', { siteId })
-			.then(rawData => processData(rawData))
-			.fail((jqXHR, textStatus) => {
-				const initialData = { channels: [] };
+		return getData('/data/getData', { siteId }).then(rawData => processData(rawData)).fail((jqXHR, textStatus) => {
+			const initialData = { channels: [] };
 
-				console.log('Error while loading data: ', textStatus);
-				console.log('Initial data will be loaded');
-				return processData(initialData);
-			});
+			console.log('Error while loading data: ', textStatus);
+			console.log('Initial data will be loaded');
+			return processData(initialData);
+		});
 	},
 	masterSave = data =>
 		save('/data/saveData', {
