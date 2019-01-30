@@ -9,6 +9,7 @@ import {
 } from 'actions/variationActions';
 import { openVariationPanel, closeVariationPanel } from 'actions/uiActions';
 import { getActiveChannelId, getActiveChannel } from 'selectors/channelSelectors';
+import { getNetworkConfig } from 'selectors/networkConfigSelector';
 import {
 	getActiveChannelVariationsWithAds,
 	getActiveChannelActiveVariation,
@@ -17,17 +18,18 @@ import {
 } from 'selectors/variationSelectors';
 
 const mapStateToProps = state => ({
-		variations: getActiveChannelVariationsWithAds(state),
-		activeVariation: getActiveChannelActiveVariation(state),
-		zonesData: getZonesDataFromActiveVariation(state),
-		activeChannelId: getActiveChannelId(state),
-		activeChannel: getActiveChannel(state),
-		activeVariationSections: getActiveChannelActiveVariation(state)
-			? getVariationSectionsWithAds(state, { variationId: getActiveChannelActiveVariation(state).id }).sections
-			: null,
-		ui: state.ui,
-		reporting: state.reporting
-	}),
+	variations: getActiveChannelVariationsWithAds(state),
+	activeVariation: getActiveChannelActiveVariation(state),
+	zonesData: getZonesDataFromActiveVariation(state),
+	activeChannelId: getActiveChannelId(state),
+	activeChannel: getActiveChannel(state),
+	activeVariationSections: getActiveChannelActiveVariation(state)
+		? getVariationSectionsWithAds(state, { variationId: getActiveChannelActiveVariation(state).id }).sections
+		: null,
+	ui: state.ui,
+	reporting: state.reporting,
+	networkConfig: getNetworkConfig(state)
+}),
 	noop = () => ({ type: 'test' }),
 	mapDispatchToProps = dispatch => ({
 		deleteVariation: variationId => {
@@ -56,7 +58,4 @@ const mapStateToProps = state => ({
 		}
 	});
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(VariationManager);
+export default connect(mapStateToProps, mapDispatchToProps)(VariationManager);

@@ -88,6 +88,7 @@ class EditOptions extends Component {
 					fromPanel={true}
 					id={this.props.section.id}
 					showNotification={this.props.showNotification}
+					networkConfig={this.props.networkConfig}
 				/>
 			);
 		}
