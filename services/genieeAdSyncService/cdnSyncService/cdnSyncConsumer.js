@@ -259,7 +259,8 @@ module.exports = function(site, externalData = {}) {
 					isActiveDFPCurrencyCode = !!(
 						apConfigs.activeDFPCurrencyCode &&
 						apConfigs.activeDFPCurrencyCode.length &&
-						apConfigs.activeDFPCurrencyCode.length === 3
+						apConfigs.activeDFPCurrencyCode.length === 3 &&
+						apConfigs.activeDFPCurrencyCode !== CC.CURRENCY_EXCHANGE.CODES.USD
 					),
 					isPrebidGranularityMultiplier = !!(
 						apConfigs.prebidGranularityMultiplier && Number(apConfigs.prebidGranularityMultiplier)
