@@ -1,23 +1,42 @@
 import React, { Component } from 'react';
-import { Table, Modal } from 'react-bootstrap';
+import { Table, Modal, Col } from 'react-bootstrap';
 import AdElement from './AdElement';
 import { CustomButton, EmptyState } from '../../shared/index';
 import Loader from '../../../../../Components/Loader';
+import SelectBox from '../../../../../Components/SelectBox/index';
 import { USER_AD_LIST_HEADERS, OPS_AD_LIST_HEADERS } from '../../../configs/commonConsts';
 
 class AdList extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { show: false, modalData: { header: null, body: null, footer: null } };
+		this.state = {
+			show: false,
+			modalData: { header: null, body: null, footer: null },
+			filters: {
+				pagegroups: {
+					value: null,
+					key: 'pagegroups',
+					type: 'array'
+				},
+				isActive: {
+					value: null,
+					key: 'isActive',
+					type: 'boolean'
+				}
+			}
+		};
 		this.saveWrapper = this.saveWrapper.bind(this);
 		this.modalToggle = this.modalToggle.bind(this);
+		this.selectChangeHandler = this.selectChangeHandler.bind(this);
+		this.renderFilters = this.renderFilters.bind(this);
 	}
+
 	componentDidMount() {
-		if (this.props.loading) this.props.fetchAds({ siteId: window.siteId });
+		if (this.props.loading) this.props.fetchAds({ siteId: window.iam.siteId });
 	}
 
 	saveWrapper() {
-		return this.props.masterSave(window.siteId, window.isSuperUser);
+		return this.props.masterSave(window.iam.siteId, window.iam.isSuperUser);
 	}
 
 	modalToggle(data = {}) {
@@ -30,10 +49,96 @@ class AdList extends Component {
 		});
 	}
 
+	selectChangeHandler(key, value) {
+		this.setState(state => ({
+			...state,
+			filters: { ...state.filters, [key]: { ...state.filters[key], value } }
+		}));
+	}
+
+	filterAds = (filters, ads) =>
+		ads
+			.map(ad => {
+				let condition = true;
+				Object.keys(filters).forEach(key => {
+					const filter = filters[key];
+					if (filter.value !== null) {
+						switch (filter.type) {
+							case 'array':
+								condition = condition && ad[filter.key].includes(filter.value);
+								break;
+							case 'boolean':
+								condition = condition && ad[filter.key] === filter.value;
+								break;
+							default:
+								break;
+						}
+					}
+				});
+				return condition ? ad : false;
+			})
+			.filter(ele => ele !== false);
+
+	renderSelect = (value, label, changeHandler, array, disabled = false) => (
+		<div>
+			<p>{label}</p>
+			<SelectBox value={value} label={label} onChange={changeHandler} onClear={changeHandler} disabled={disabled}>
+				{array.map((ele, index) => (
+					<option key={`${label}-${index}`} value={ele.value}>
+						{ele.name}
+					</option>
+				))}
+			</SelectBox>
+		</div>
+	);
+
+	renderFilters() {
+		const pagegroups = window.iam.channels.map(channel => ({
+			name: channel,
+			value: channel
+		}));
+		return (
+			<div>
+				<Col xs={4}>
+					{this.renderSelect(
+						this.state.filters.pagegroups.value,
+						'Select Pagegroup',
+						value => this.selectChangeHandler('pagegroups', value),
+						pagegroups,
+						this.state.isActive
+					)}
+				</Col>
+				<Col xs={4}>
+					{this.renderSelect(
+						this.state.filters.isActive.value,
+						'Select Status',
+						value => this.selectChangeHandler('isActive', value),
+						[
+							{
+								name: 'Active',
+								value: true
+							},
+							{
+								name: 'Archived',
+								value: false
+							}
+						],
+						this.state.pagegroups
+					)}
+				</Col>
+				<Col xs={4}>
+					<CustomButton label={'Master Save'} handler={this.saveWrapper} />
+				</Col>
+				<div style={{ clear: 'both' }}>&nbsp;</div>
+			</div>
+		);
+	}
+
 	render() {
 		const { loading, ads, updateAd, modifyAdOnServer, meta, archiveAd, updateTraffic } = this.props;
-		const { show, modalData } = this.state;
+		const { show, modalData, filters } = this.state;
 		const HEADERS = window.iam.isSuperUser ? OPS_AD_LIST_HEADERS : USER_AD_LIST_HEADERS;
+		const adsToRender = this.filterAds(filters, ads);
 		const customStyle = {};
 
 		if (loading) {
@@ -42,17 +147,17 @@ class AdList extends Component {
 					<Loader />
 				</div>
 			);
-		} else if (!ads.length) {
-			return <EmptyState message="Seems kind of empty here" />;
+		} else if (!adsToRender.length) {
+			return (
+				<div>
+					{window.isSuperUser ? this.renderFilters() : null}
+					<EmptyState message="Seems kind of empty here" />
+				</div>
+			);
 		}
 		return (
 			<div style={{ padding: '10px 10px', fontSize: '15px' }}>
-				{window.isSuperUser ? (
-					<div>
-						<CustomButton label={'Master Save'} handler={this.saveWrapper} />
-						<div style={{ clear: 'both' }}>&nbsp;</div>
-					</div>
-				) : null}
+				{window.isSuperUser ? this.renderFilters() : null}
 				<Table striped bordered hover>
 					<thead>
 						<tr>
@@ -62,7 +167,7 @@ class AdList extends Component {
 						</tr>
 					</thead>
 					<tbody>
-						{ads.map(ad =>
+						{adsToRender.map(ad =>
 							ad.isActive || window.iam.isSuperUser ? (
 								<AdElement
 									key={`adElement-${ad.id}`}
