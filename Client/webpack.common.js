@@ -1,14 +1,28 @@
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 
 module.exports = {
   entry: path.resolve(__dirname, 'index.js'),
   output: {
     path: path.resolve(__dirname, 'public'),
-    filename: 'index.js',
-    chunkFilename: '[name].bundle.js',
+    filename: 'shell.[contenthash].js',
+    chunkFilename: '[name].[contenthash].js',
     publicPath: '/'
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        default: false,
+        vendors: false,
+        vendor: {
+          name: 'vendor',
+          chunks: 'all',
+          test: /node_modules/
+        }
+      }
+    },
   },
   module: {
     rules: [
@@ -25,7 +39,7 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader']
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
       },
       {
         test: /\.(png|jpg|gif)$/i,
@@ -46,9 +60,10 @@ module.exports = {
       // favicon: './public/favicon.ico',
       filename: 'index.html'
     }),
+    new OptimizeCSSAssetsPlugin({}),
     new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFilename: '[id].css'
+      filename: '[name].[contenthash].css',
+      chunkFilename: '[id].[contenthash].css'
     }),
   ],
 };
