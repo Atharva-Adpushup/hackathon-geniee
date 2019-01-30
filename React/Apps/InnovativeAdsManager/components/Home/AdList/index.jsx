@@ -56,32 +56,34 @@ class AdList extends Component {
 		}));
 	}
 
-	filterAds = (filters, ads) =>
-		ads
-			.map(ad => {
-				const keys = Object.keys(filters);
-				let condition = true;
-				let i = 0;
-				const length = keys.length;
-				for (i = 0; i < length; i += 1) {
-					const filter = filters[keys[i]];
-					if (condition === false) break;
-					if (filter.value !== null) {
-						switch (filter.type) {
-							case 'array':
-								condition = condition && ad[filter.key].includes(filter.value);
-								break;
-							case 'boolean':
-								condition = condition && ad[filter.key] === filter.value;
-								break;
-							default:
-								break;
-						}
+	filterAds = (filters, ads) => {
+		const finalAds = [];
+		ads.forEach(ad => {
+			const keys = Object.keys(filters);
+			const length = keys.length;
+			let condition = true;
+			let i = 0;
+
+			for (i = 0; i < length; i += 1) {
+				const filter = filters[keys[i]];
+				if (condition === false) break;
+				if (filter.value !== null) {
+					switch (filter.type) {
+						case 'array':
+							condition = condition && ad[filter.key].includes(filter.value);
+							break;
+						case 'boolean':
+							condition = condition && ad[filter.key] === filter.value;
+							break;
+						default:
+							break;
 					}
 				}
-				return condition ? ad : false;
-			})
-			.filter(ele => ele !== false);
+			}
+			if (condition) finalAds.push(ad);
+		});
+		return finalAds;
+	};
 
 	renderSelect = (value, label, changeHandler, array, disabled = false) => (
 		<div>
