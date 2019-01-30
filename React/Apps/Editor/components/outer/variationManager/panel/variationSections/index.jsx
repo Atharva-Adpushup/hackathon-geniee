@@ -105,7 +105,8 @@ class variationSections extends Component {
 			showNotification,
 			updateType,
 			updateFormatData,
-			toggleLazyLoad
+			toggleLazyLoad,
+			networkConfig
 		} = this.props;
 
 		return (
@@ -159,6 +160,7 @@ class variationSections extends Component {
 										onSetSectionType={updateType}
 										onFormatDataUpdate={updateFormatData}
 										onToggleLazyLoad={toggleLazyLoad}
+										networkConfig={networkConfig}
 									/>
 								</div>
 							))}

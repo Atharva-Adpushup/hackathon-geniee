@@ -13,10 +13,10 @@ const variationManager = props => {
 	}
 
 	const disabledVariations = _.compact(
-			_.map(props.variations, variationObj => {
-				return !!variationObj.disable;
-			})
-		),
+		_.map(props.variations, variationObj => {
+			return !!variationObj.disable;
+		})
+	),
 		controlVariations = _.compact(
 			_.map(props.variations, variationObj => {
 				const activeVariationId = props.activeVariation.id,
@@ -34,7 +34,7 @@ const variationManager = props => {
 
 	return (
 		<div>
-			{props.ui.variationPanel.open && (
+			{props.ui.variationPanel.open &&
 				<div>
 					<Glass clickHandler={props.closeVariationPanel} shim />{' '}
 					<VariationPanel
@@ -50,9 +50,9 @@ const variationManager = props => {
 						updateNetwork={props.updateNetwork}
 						disabledVariationsCount={disabledVariationsCount}
 						controlVariationsCount={controlVariationsCount}
+						networkConfig={props.networkConfig}
 					/>
-				</div>
-			)}
+				</div>}
 
 			<div id="variationManager" className="variation-bar">
 				{props.variations.map(variation => (

@@ -69,7 +69,8 @@ class adDescriptor extends React.Component {
 			variationId,
 			updateAdSize,
 			channelId,
-			onToggleLazyLoad
+			onToggleLazyLoad,
+			networkConfig
 		} = this.props,
 			adCode = ad.adCode,
 			number = 12;
@@ -95,6 +96,7 @@ class adDescriptor extends React.Component {
 					ad={ad}
 					adDescriptor={true}
 					showNotification={this.props.showNotification}
+					networkConfig={networkConfig}
 				/>
 			);
 		}
