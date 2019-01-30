@@ -134,7 +134,7 @@ class NetworkOptions extends Component {
 			(isAdSize && { height: props.ad.height, width: props.ad.width }) || {},
 			isZonesData = !!(props.zonesData && props.zonesData.length),
 			zonesData = isZonesData ? props.zonesData : [],
-			networkConfig = props.networkConfig;
+			networkConfig = props.networkConfig || {};
 
 		switch (this.state.network) {
 			case 'adpTags':
