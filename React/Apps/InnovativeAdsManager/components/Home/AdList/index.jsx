@@ -86,7 +86,7 @@ class AdList extends Component {
 	};
 
 	renderSelect = (value, label, changeHandler, array, disabled = false) => (
-		<div>
+		<div className="mTB-15">
 			<p>{label}</p>
 			<SelectBox value={value} label={label} onChange={changeHandler} onClear={changeHandler} disabled={disabled}>
 				{array.map((ele, index) => (
@@ -99,10 +99,6 @@ class AdList extends Component {
 	);
 
 	renderFilters() {
-		const pagegroups = window.iam.channels.map(channel => ({
-			name: channel,
-			value: channel
-		}));
 		return (
 			<div>
 				<Col xs={4}>
@@ -110,7 +106,10 @@ class AdList extends Component {
 						this.state.filters.pagegroups.value,
 						'Select Pagegroup',
 						value => this.selectChangeHandler('pagegroups', value),
-						pagegroups,
+						window.iam.channels.map(channel => ({
+							name: channel,
+							value: channel
+						})),
 						this.state.isActive
 					)}
 				</Col>
