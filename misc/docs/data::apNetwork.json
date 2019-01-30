@@ -1,0 +1,91 @@
+{
+	"adsense": {
+		"name": "adsense",
+		"isActive": true,
+		"isPartner": false,
+		"enableRefreshSlot": false,
+		"enableLazyLoad": true,
+		"isHb": false,
+		"props": {
+			"adunitId": {
+				"name": "Adunit Id",
+				"isEditable": true
+			},
+			"adCode": {
+				"name": "AdCode",
+				"isEditable": true
+			}
+		}
+	},
+	"adpTags": {
+		"name": "adpTags",
+		"isActive": true,
+		"isPartner": false,
+		"enableRefreshSlot": true,
+		"enableLazyLoad": true,
+		"isHb": true,
+		"props": {
+			"priceFloorKey": {
+				"name": "Price Floor Key",
+				"isEditable": true
+			},
+			"priceFloor": {
+				"name": "Price Floor",
+				"isEditable": true
+			},
+			"addDownwardSizes": {
+				"name": "Add Downward Sizes",
+				"isEditable": true
+			},
+			"keyValues": {
+				"name": "Key Values",
+				"isEditable": true
+			},
+			"isResponsive": {
+				"name": "isResponsive",
+				"isEditable": true
+			}
+		}
+	},
+	"custom": {
+		"name": "custom",
+		"isActive": true,
+		"isPartner": false,
+		"enableRefreshSlot": true,
+		"enableLazyLoad": true,
+		"isHb": false,
+		"props": {
+			"adCode": {
+				"name": "AdCode",
+				"isEditable": true
+			}
+		}
+	},
+	"geniee": {
+		"name": "geniee",
+		"isActive": true,
+		"isPartner": true,
+		"enableRefreshSlot": false,
+		"enableLazyLoad": false,
+		"isHb": false,
+		"props": {}
+	},
+	"medianet": {
+		"name": "medianet",
+		"isActive": true,
+		"isPartner": false,
+		"enableRefreshSlot": false,
+		"enableLazyLoad": true,
+		"isHb": false,
+		"props": {
+			"adunitId": {
+				"name": "Adunit Id",
+				"isEditable": true
+			},
+			"adCode": {
+				"name": "AdCode",
+				"isEditable": true
+			}
+		}
+	}
+}

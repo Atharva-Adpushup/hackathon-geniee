@@ -43,23 +43,29 @@ class OtherNetworks extends Component {
 	render() {
 		return (
 			<div>
-				<Row>
-					<Col xs={12}>
-						<CustomToggleSwitch
-							labelText="Refresh Ad"
-							className="mB-10 mT-10"
-							checked={this.state.refreshSlot}
-							onChange={this.toggleRefreshSlot}
-							layout="horizontal"
-							size="m"
-							on="Yes"
-							off="No"
-							defaultLayout={true}
-							name="Refresh Ad"
-							id={this.props.id ? `js-refresh-slot-switch-${this.props.id}` : 'js-refresh-slot-switch'}
-						/>
-					</Col>
-				</Row>
+				{this.props.networkConfig && this.props.networkConfig.enableRefreshSlot
+					? <Row>
+							<Col xs={12}>
+								<CustomToggleSwitch
+									labelText="Refresh Ad"
+									className="mB-10 mT-10"
+									checked={this.state.refreshSlot}
+									onChange={this.toggleRefreshSlot}
+									layout="horizontal"
+									size="m"
+									on="Yes"
+									off="No"
+									defaultLayout={true}
+									name="Refresh Ad"
+									id={
+										this.props.id
+											? `js-refresh-slot-switch-${this.props.id}`
+											: 'js-refresh-slot-switch'
+									}
+								/>
+							</Col>
+						</Row>
+					: null}
 				<div className="mT-10">
 					<CodeBox
 						showButtons={this.props.showButtons || true}

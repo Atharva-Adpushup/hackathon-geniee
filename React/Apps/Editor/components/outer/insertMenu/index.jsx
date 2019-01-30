@@ -8,13 +8,13 @@ import { immutablePush } from 'libs/immutableHelpers';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 
 const initialState = {
-		adSize: null,
-		isCustomSize: false,
-		operation: null,
-		activeItem: 0,
-		prevActiveItem: 0,
-		showNetworkOptions: false
-	},
+	adSize: null,
+	isCustomSize: false,
+	operation: null,
+	activeItem: 0,
+	prevActiveItem: 0,
+	showNetworkOptions: false
+},
 	getInsertOptionClass = function(option) {
 		switch (option) {
 			case adInsertOptions.PREPEND:
@@ -75,13 +75,13 @@ class insertMenu extends React.Component {
 
 		network = network ? network : 'custom';
 		const sectionPayload = {
-				position,
-				firstFold: firstFold || false,
-				asyncTag: asyncTag || false,
-				xpath: props.parents[0].xpath,
-				operation: this.state.operation,
-				customZoneId: customZoneId || ''
-			},
+			position,
+			firstFold: firstFold || false,
+			asyncTag: asyncTag || false,
+			xpath: props.parents[0].xpath,
+			operation: this.state.operation,
+			customZoneId: customZoneId || ''
+		},
 			adPayload = {
 				isCustomSize: this.state.isCustomSize,
 				network,
@@ -156,6 +156,7 @@ class insertMenu extends React.Component {
 						isInsertMode={true}
 						primaryAdSize={this.state.adSize}
 						zonesData={props.zonesData}
+						networkConfig={props.networkConfig}
 					/>
 				</MenuItem>
 			);

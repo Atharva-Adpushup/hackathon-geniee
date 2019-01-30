@@ -11,10 +11,9 @@ class AdNetworkDetails extends Component {
 		const { ad } = this.props,
 			dataObject = {
 				network: networkInfo.network,
-				networkData:
-					ad.network == networkInfo.network
-						? { ...ad.networkData, ...networkInfo.networkData }
-						: networkInfo.networkData
+				networkData: ad.network == networkInfo.network
+					? { ...ad.networkData, ...networkInfo.networkData }
+					: networkInfo.networkData
 			},
 			networkData = dataObject.networkData,
 			isMultipleAdSizes = !!(networkData && networkData.multipleAdSizes && networkData.multipleAdSizes.length);
@@ -31,7 +30,7 @@ class AdNetworkDetails extends Component {
 	}
 
 	render() {
-		const { ad, onSubmit, onCancel } = this.props;
+		const { ad, onSubmit, onCancel, networkConfig } = this.props;
 
 		return (
 			<NetworkOptions
@@ -42,6 +41,7 @@ class AdNetworkDetails extends Component {
 				fromPanel={false}
 				id={ad.id}
 				showNotification={() => {}}
+				networkConfig={networkConfig}
 			/>
 		);
 	}
