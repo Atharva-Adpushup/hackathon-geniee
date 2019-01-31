@@ -38,6 +38,9 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 			case commonConsts.FORMATS.IN_VIEW.NAME:
 				return adInstance.initScrollListener(interactiveAd, adCode); // Initialise scroll listener from previously created ad instance
 
+			case commonConsts.FORMATS.DOCKED.NAME:
+				return false;
+
 			// case commonConsts.FORMATS.VIDEO.NAME:
 			// 	const { css } = interactiveAd;
 			// 	parentNode = createParentNode(xPath, interactiveAd, css);

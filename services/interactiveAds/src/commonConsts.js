@@ -125,6 +125,9 @@ const commonConsts = {
 				display: 'inline-block'
 			}
 		},
+		DOCKED: {
+			NAME: 'docked'
+		},
 		VIDEO: {
 			NAME: 'video',
 			EVENTS: {

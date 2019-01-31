@@ -10,11 +10,11 @@ class Docked extends Component {
 		const ad = this.props.ad ? this.props.ad : false;
 		const hasFormatData = ad && ad.formatData ? ad.formatData : false;
 		this.state = {
-			xpath: ad ? ad.xpath : '',
+			xpath: hasFormatData ? ad.formatData.xpath : '',
 			bottomXpath: hasFormatData ? ad.formatData.bottomXpath : '',
 			bottomOffset: hasFormatData ? ad.formatData.bottomOffset : '',
 			css: ad.css ? window.btoa(JSON.stringify(ad.css)) : '',
-			operation: ad ? ad.operation : null
+			operation: hasFormatData ? ad.formatData.operation : null
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this.handleCodeChange = this.handleCodeChange.bind(this);
@@ -51,8 +51,6 @@ class Docked extends Component {
 		}
 		return this.props.save.handler({
 			adData: {
-				xpath,
-				operation,
 				event: EVENTS.SCRIPT_LOADED,
 				eventData: {
 					value: ''
@@ -61,9 +59,11 @@ class Docked extends Component {
 			formatData: {
 				bottomOffset,
 				bottomXpath,
-				css: parsedCSS
+				css: parsedCSS,
+				xpath,
+				operation
 			},
-			type: TYPE_OF_ADS.DOCKED_STRUCTURAL
+			type: TYPE_OF_ADS.INTERACTIVE_AD
 		});
 	}
 
