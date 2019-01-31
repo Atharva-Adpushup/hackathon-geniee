@@ -41,6 +41,7 @@ const commonConsts = {
 		}
 	},
 	POWERED_BY_BANNER: {
+		HEIGHT: 20,
 		TEXT: 'Ads by',
 		IMAGE: 'http://localhost:8080/assets/images/logo-white-200X50.png',
 		REDIRECT_URL: 'https://campaign.adpushup.com/get-started/?utm_source=banner&utm_campaign=growth_hack',
@@ -68,10 +69,12 @@ const commonConsts = {
 		CSS: {
 			COMMON: {
 				background: 'rgba(0,0,0,0.5)',
-				position: 'absolute',
+				// position: 'absolute',
 				'padding-bottom': '2px',
-				'max-height': '20px',
-				top: '-19px'
+				'max-height': '20px'
+				// display: 'table',
+				// clear: 'both'
+				// top: '-19px'
 			},
 			LEFT: {
 				top: '-19px'

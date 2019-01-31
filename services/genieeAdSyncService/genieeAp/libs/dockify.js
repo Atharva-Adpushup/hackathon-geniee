@@ -36,7 +36,7 @@ var $ = require('jquery'),
 					$el.css(dockedCSS);
 				} else {
 					$el.css({
-						position: '',
+						position: 'relative',
 						top: '',
 						zIndex: ''
 					});

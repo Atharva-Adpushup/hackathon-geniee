@@ -52,12 +52,13 @@ class Component {
 
 	render() {
 		const { formatData, width, height, id, css: customCSS } = this.interactiveAd;
+		const { POWERED_BY_BANNER } = commonConsts;
 
 		if (this.interactiveAd.network === commonConsts.NETWORKS.ADPTAGS) {
 			executeAdpTagsHeadCode([this.interactiveAd], {}); // This function expects an array of adpTags and optional adpKeyValues
 		}
 
-		let css = { width, height, ...customCSS },
+		let css = { width, height: parseInt(height) + POWERED_BY_BANNER.HEIGHT, ...customCSS },
 			$format = $('<div />'),
 			$banner = null,
 			$closeButton = this.createCloseButton(formatData),
@@ -74,7 +75,7 @@ class Component {
 			},
 			$frame = $('<div />');
 
-		$format.attr({ 'data-section': id, class: '_ap_apex_ad' });
+		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
 		$frame.css({
 			width,
 			...commonConsts.FRAME.CSS.COMMON,
@@ -86,6 +87,7 @@ class Component {
 			$frame.append($banner);
 		}
 		$frame.append($closeButton);
+		$frame.append('<div style="clear:both">&nbsp;</div>');
 		$format.append($frame);
 
 		adp.tracker.add(

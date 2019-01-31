@@ -54,7 +54,7 @@ class Docked extends Component {
 			formatData: {
 				bottomOffset,
 				bottomXpath,
-				css: { ...parsedCSS, position: 'relative', margin: '0 auto' },
+				css: { ...parsedCSS, position: 'relative' },
 				xpath,
 				operation,
 				event: EVENTS.SCRIPT_LOADED,
