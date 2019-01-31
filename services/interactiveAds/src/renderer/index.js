@@ -7,7 +7,7 @@ import $ from '../$';
 import config from '../config';
 import { generateAdCode } from '../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
 
-const createParentNode = (appendTo, interactiveAd, css) => {
+const createParentNode = (appendTo, interactiveAd, css = {}, operation = 'append') => {
 		const $parentNode = $('<div/>'),
 			{ id } = interactiveAd;
 
@@ -18,7 +18,20 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 			$parentNode.css(css);
 		}
 
-		$(appendTo).append($parentNode);
+		switch (operation.toLowerCase()) {
+			case 'prepend':
+				$(appendTo).prepend($parentNode);
+				break;
+			case 'insertbefore':
+				$(appendTo).before($parentNode);
+				break;
+			case 'insertafter':
+				$(appendTo).after($parentNode);
+				break;
+			case 'append':
+			default:
+				$(appendTo).append($parentNode);
+		}
 
 		return $parentNode;
 	},
@@ -39,7 +52,10 @@ const createParentNode = (appendTo, interactiveAd, css) => {
 				return adInstance.initScrollListener(interactiveAd, adCode); // Initialise scroll listener from previously created ad instance
 
 			case commonConsts.FORMATS.DOCKED.NAME:
-				return false;
+				const { xPath: adXpath, operation } = interactiveAd.formatData;
+				parentNode = createParentNode(adXpath, interactiveAd, {}, operation);
+				const docked = new Docked(parentNode, interactiveAd, adCode);
+				return docked.render();
 
 			// case commonConsts.FORMATS.VIDEO.NAME:
 			// 	const { css } = interactiveAd;
