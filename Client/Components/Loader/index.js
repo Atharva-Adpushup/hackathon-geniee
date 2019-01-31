@@ -1,5 +1,5 @@
 import React from 'react';
-import LoaderLogo from '../../public//assets/images/loaderLogo.png';
+import LoaderLogo from '../../public/assets/images/loaderLogo.png';
 
 const Loader = props => {
 	return (

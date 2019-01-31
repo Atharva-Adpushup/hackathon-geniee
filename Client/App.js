@@ -13,6 +13,8 @@ import {
 	faDesktop,
 	faPlus
 } from '@fortawesome/free-solid-svg-icons';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import Routes from './Routes';
 import Shell from './Components/Shell';
 import ErrorBoundary from './Components/ErrorBoundary';
