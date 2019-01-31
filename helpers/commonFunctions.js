@@ -645,6 +645,29 @@ const Promise = require('bluebird'),
 		const isGenieeChanged = !!(hasNetwork && isGeniee && isGenieeSynced && isLogWrittenFalse);
 
 		return isDemandChanged || isADPChanged || isGenieeChanged;
+	},
+	isValidThirdPartyDFPAndCurrency = function(config) {
+		const isActiveDFPNetwork = !!(config.activeDFPNetwork && config.activeDFPNetwork.length),
+			isActiveDFPCurrencyCode = !!(
+				config.activeDFPCurrencyCode &&
+				config.activeDFPCurrencyCode.length &&
+				config.activeDFPCurrencyCode.length === 3 &&
+				config.activeDFPCurrencyCode !== commonConsts.CURRENCY_EXCHANGE.CODES.USD
+			),
+			isPrebidGranularityMultiplier = !!(
+				config.prebidGranularityMultiplier && Number(config.prebidGranularityMultiplier)
+			),
+			isActiveDFPCurrencyExchangeRate = !!(
+				config.activeDFPCurrencyExchangeRate && Number(config.activeDFPCurrencyExchangeRate)
+			),
+			isValidResult = !!(
+				isActiveDFPNetwork &&
+				isActiveDFPCurrencyCode &&
+				isPrebidGranularityMultiplier &&
+				isActiveDFPCurrencyExchangeRate
+			);
+
+		return isValidResult;
 	};
 
 module.exports = {
@@ -671,5 +694,6 @@ module.exports = {
 	getGlobalLostAndFoundLiveSitesReport,
 	sendSuccessResponse,
 	sendErrorResponse,
-	checkForLog
+	checkForLog,
+	isValidThirdPartyDFPAndCurrency
 };

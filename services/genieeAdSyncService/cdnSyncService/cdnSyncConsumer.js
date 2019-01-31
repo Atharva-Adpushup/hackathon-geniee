@@ -9,6 +9,7 @@ var path = require('path'),
 	mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
 	fs = Promise.promisifyAll(require('fs')),
 	AdPushupError = require('../../../helpers/AdPushupError'),
+	{ isValidThirdPartyDFPAndCurrency } = require('../../../helpers/commonFunctions'),
 	CC = require('../../../configs/commonConsts'),
 	generateADPTagsConfig = require('./generateADPTagsConfig'),
 	generateAdPushupConfig = require('./generateAdPushupConfig'),
@@ -255,25 +256,7 @@ module.exports = function(site, externalData = {}) {
 				let { apConfigs, adpTagsConfig } = finalConfig,
 					gdpr = site.get('gdpr'),
 					{ incontentAds, hbAds } = incontentAndHbAds,
-					isActiveDFPNetwork = !!(apConfigs.activeDFPNetwork && apConfigs.activeDFPNetwork.length),
-					isActiveDFPCurrencyCode = !!(
-						apConfigs.activeDFPCurrencyCode &&
-						apConfigs.activeDFPCurrencyCode.length &&
-						apConfigs.activeDFPCurrencyCode.length === 3 &&
-						apConfigs.activeDFPCurrencyCode !== CC.CURRENCY_EXCHANGE.CODES.USD
-					),
-					isPrebidGranularityMultiplier = !!(
-						apConfigs.prebidGranularityMultiplier && Number(apConfigs.prebidGranularityMultiplier)
-					),
-					isActiveDFPCurrencyExchangeRate = !!(
-						apConfigs.activeDFPCurrencyExchangeRate && Number(apConfigs.activeDFPCurrencyExchangeRate)
-					),
-					isValidCurrencyConfig = !!(
-						isActiveDFPNetwork &&
-						isActiveDFPCurrencyCode &&
-						isPrebidGranularityMultiplier &&
-						isActiveDFPCurrencyExchangeRate
-					),
+					isValidCurrencyConfig = isValidThirdPartyDFPAndCurrency(apConfigs),
 					computedPrebidCurrencyConfig = {};
 
 				if (isValidCurrencyConfig) {

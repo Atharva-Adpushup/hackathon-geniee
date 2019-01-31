@@ -61,5 +61,10 @@ module.exports = {
 		EVENTS: {
 			IMPRESSION: 'impression'
 		}
+	},
+	CURRENCY_CODES: {
+		USD: 'USD',
+		INR: 'INR',
+		EUR: 'EUR'
 	}
 };
