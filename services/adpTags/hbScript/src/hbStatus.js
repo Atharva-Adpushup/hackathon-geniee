@@ -3,17 +3,12 @@
 var config = require('./config'),
 	utils = require('../helpers/utils'),
 	xhr = require('../helpers/xhr'),
+	adp = require('./adp').adp,
 	responseHandler = function(err, data) {
 		err ? console.log(err) : console.log(data);
 	},
-	packetId =
-		window.adpushup && window.adpushup.config && window.adpushup.config.packetId
-			? window.adpushup.config.packetId
-			: utils.generateUUID(),
-	platform =
-		window.adpushup && window.adpushup.config && window.adpushup.config.platform
-			? window.adpushup.config.platform
-			: utils.generateUUID(),
+	packetId = adp && adp.config && adp.config.packetId ? adp.config.packetId : utils.generateUUID(),
+	platform = adp && adp.config && adp.config.platform ? adp.config.platform : utils.generateUUID(),
 	hbStart = function(adUnits) {
 		xhr(
 			'POST',

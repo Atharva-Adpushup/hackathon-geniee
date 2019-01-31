@@ -1,7 +1,7 @@
 var adSizeConsts = require('../../../../helpers/adSizeMappingConsts'),
 	utils = require('../helpers/utils'),
 	AdpError = require('../helpers/error'),
-	$ = window.adpushup.$,
+	$ = require('./adp').$,
 	getMatchedAdSize = function(inputObject) {
 		var adCollection = adSizeConsts.IAB_SIZES.ALL,
 			widthsWithMultipleAdSizes = adSizeConsts.IAB_SIZES.MULTIPLE_AD_SIZES_WIDTHS_MAPPING,

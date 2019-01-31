@@ -7,17 +7,29 @@ var utils = require('../libs/utils'),
 	$ = adp.$,
 	ads = [],
 	intervals = [],
-	refreshAd = function(container, ad) {
-		if (utils.isElementInViewport(container)) {
+	refreshAd = function (container, ad) {
+		var feedbackData = {
+			ads: [],
+			xpathMiss: [],
+			eventType: 1,
+			mode: 1,
+			referrer: adp.config.referrer,
+			tracking: false
+		};
+		if (utils.isElementInViewport(container) && ad.network !== commonConsts.NETWORKS.ADPTAGS) {
 			container.children().remove();
 			container.append(adCodeGenerator.generateAdCode(ad));
+			feedbackData.xpathMiss = [];
+			feedbackData.ads = [ad.id];
+			feedbackData.variationId = adp.config.selectedVariation;
+			utils.sendFeedback(feedbackData);
 		}
 	},
-	setAdInterval = function(container, ad) {
+	setAdInterval = function (container, ad) {
 		var refreshInterval = setInterval(refreshAd, commonConsts.AD_REFRESH_INTERVAL, container, ad);
 		intervals.push(refreshInterval);
 	},
-	clearAdInterval = function() {
+	clearAdInterval = function () {
 		if (intervals.length) {
 			for (var i = 0; i < intervals.length; i++) {
 				clearInterval(intervals[i]);
@@ -25,21 +37,19 @@ var utils = require('../libs/utils'),
 			intervals.length = 0;
 		}
 	},
-	init = function(w) {
-		w.adpushup.$(w).on('blur', function() {
+	init = function (w) {
+		w.adpushup.$(w).on('blur', function () {
 			clearAdInterval();
 		});
-		w.adpushup.$(w).on('focus', function() {
+		w.adpushup.$(w).on('focus', function () {
 			for (var i = 0; i < ads.length; i++) {
-				var adContainer = $.extend({}, ads[i]),
-					container = adContainer.container,
-					ad = adContainer.ad;
+				var adContainer = $.extend({}, ads[i]), container = adContainer.container, ad = adContainer.ad;
 				refreshAd(container, ad);
 				setAdInterval(container, ad);
 			}
 		});
 	},
-	refreshSlot = function(container, ad) {
+	refreshSlot = function (container, ad) {
 		setAdInterval(container, ad);
 		ads.push({ container: container, ad: ad });
 	};

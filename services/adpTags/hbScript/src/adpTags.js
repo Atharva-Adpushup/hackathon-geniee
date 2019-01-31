@@ -5,13 +5,14 @@ var w = window,
 	utils = require('../helpers/utils'),
 	config = require('./config'),
 	inventory = config.INVENTORY,
-	find = require('lodash.find'),
+	$ = require('./adp').$,
+	adp = require('./adp').adp,
 	adpRender = require('./adpRender'),
 	// Maps a particular adp slot to a dfp ad unit and a prebid bidder config
 	inventoryMapper = function(size, optionalParam) {
 		// Reset inventory as default if site is SPA
-		if (w.adpushup.config.isSPA) {
-			inventory = w.adpushup.$.extend(true, {}, w.adpTags.defaultInventory);
+		if (adp.config.isSPA) {
+			inventory = $.extend(true, {}, w.adpTags.defaultInventory);
 		}
 
 		var width = size[0],
