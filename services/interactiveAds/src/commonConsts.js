@@ -29,7 +29,8 @@ const commonConsts = {
 				width: '15px',
 				stroke: '#fff',
 				cursor: 'pointer',
-				'stroke-width': 1.25
+				'stroke-width': 1.25,
+				top: -15
 			},
 			BOTTOM: {
 				top: -15
@@ -69,7 +70,8 @@ const commonConsts = {
 				background: 'rgba(0,0,0,0.5)',
 				position: 'absolute',
 				'padding-bottom': '2px',
-				'max-height': '20px'
+				'max-height': '20px',
+				top: '-19px'
 			},
 			LEFT: {
 				top: '-19px'

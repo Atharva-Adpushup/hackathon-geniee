@@ -109,7 +109,7 @@ class AdCodeGenerator extends Component {
 			typeAndPlacement.shift();
 
 			type = typeAndPlacement[0] ? typeAndPlacement[0].toLowerCase() : null;
-			placement = typeAndPlacement[1] ? typeAndPlacement[1].toLowerCase() : null;
+			placement = typeAndPlacement[1] ? typeAndPlacement[1].toLowerCase() : 'default';
 		} else {
 			type = this.state.format;
 			placement = 'top';

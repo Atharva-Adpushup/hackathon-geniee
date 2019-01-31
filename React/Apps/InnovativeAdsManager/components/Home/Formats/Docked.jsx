@@ -50,18 +50,17 @@ class Docked extends Component {
 			}
 		}
 		return this.props.save.handler({
-			adData: {
+			adData: {},
+			formatData: {
+				bottomOffset,
+				bottomXpath,
+				css: { ...parsedCSS, position: 'relative', margin: '0 auto' },
+				xpath,
+				operation,
 				event: EVENTS.SCRIPT_LOADED,
 				eventData: {
 					value: ''
 				}
-			},
-			formatData: {
-				bottomOffset,
-				bottomXpath,
-				css: parsedCSS,
-				xpath,
-				operation
 			},
 			type: TYPE_OF_ADS.INTERACTIVE_AD
 		});

@@ -120,6 +120,15 @@ class Component {
 				);
 				break;
 
+			case commonConsts.FORMATS.DOCKED.NAME:
+				$format.css({
+					...css,
+					...commonConsts.FORMAT_CSS
+				});
+				this.parentNode.append($format.append(this.adCode));
+				window.adpushup.utils.dockify.dockifyAd(`#${id}`, formatData, window.adpushup.utils);
+				break;
+
 			case commonConsts.FORMATS.VIDEO.NAME:
 				this.createPlayer();
 				break;

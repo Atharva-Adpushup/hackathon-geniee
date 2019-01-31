@@ -2,6 +2,7 @@
 
 import commonConsts from '../commonConsts';
 import Sticky from './components/Sticky/index';
+import Docked from './components/Docked/index';
 //import Video from './components/Video/index';
 import $ from '../$';
 import config from '../config';
@@ -52,7 +53,7 @@ const createParentNode = (appendTo, interactiveAd, css = {}, operation = 'append
 				return adInstance.initScrollListener(interactiveAd, adCode); // Initialise scroll listener from previously created ad instance
 
 			case commonConsts.FORMATS.DOCKED.NAME:
-				const { xPath: adXpath, operation } = interactiveAd.formatData;
+				const { xpath: adXpath, operation } = interactiveAd.formatData;
 				parentNode = createParentNode(adXpath, interactiveAd, {}, operation);
 				const docked = new Docked(parentNode, interactiveAd, adCode);
 				return docked.render();
