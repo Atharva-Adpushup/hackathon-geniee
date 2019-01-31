@@ -1,3 +1,7 @@
+const EVENTS = {
+	SCRIPT_LOADED: 'scriptLoaded',
+	SCROLL: 'scroll'
+};
 const PLATFORMS = [
 	{
 		name: 'Desktop',
@@ -267,6 +271,7 @@ const AD_LIST_ACTIONS = {
 const NOOP = () => {};
 
 export {
+	EVENTS,
 	PLATFORMS,
 	FORMATS,
 	TYPES,

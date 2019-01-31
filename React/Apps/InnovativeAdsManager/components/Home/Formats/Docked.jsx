@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
 import SelectBox from '../../../../../Components/SelectBox';
-import { AD_OPERATIONS, TYPE_OF_ADS } from '../../../configs/commonConsts';
+import { AD_OPERATIONS, TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
 import CodeBox from '../../../../../Components/CodeEditor';
 
 class Docked extends Component {
@@ -52,7 +52,11 @@ class Docked extends Component {
 		return this.props.save.handler({
 			adData: {
 				xpath,
-				operation
+				operation,
+				event: EVENTS.SCRIPT_LOADED,
+				eventData: {
+					value: ''
+				}
 			},
 			formatData: {
 				bottomOffset,

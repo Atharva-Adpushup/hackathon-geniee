@@ -3,7 +3,7 @@
 /* eslint-disable jsx-a11y/href-no-hash */
 import React, { Component } from 'react';
 import CodeBox from '../../../../../Components/CodeEditor';
-import { TYPE_OF_ADS } from '../../../configs/commonConsts';
+import { TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
 
 class Default extends Component {
 	constructor(props) {
@@ -31,7 +31,7 @@ class Default extends Component {
 		}
 		return this.props.save.handler({
 			formatData: {
-				event: 'scriptLoaded',
+				event: EVENTS.SCRIPT_LOADED,
 				eventData: {
 					value: ''
 				}

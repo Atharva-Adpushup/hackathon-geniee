@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
 import CodeBox from '../../../../../Components/CodeEditor';
-import { TYPE_OF_ADS } from '../../../configs/commonConsts';
+import { TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
 
 class InView extends Component {
 	constructor(props) {
@@ -41,7 +41,7 @@ class InView extends Component {
 		}
 		return this.props.save.handler({
 			formatData: {
-				event: 'scroll',
+				event: EVENTS.SCROLL,
 				eventData: {
 					value: xpath
 				}
