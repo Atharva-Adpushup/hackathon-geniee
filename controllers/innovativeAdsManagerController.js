@@ -115,7 +115,7 @@ const fn = {
 		return appBucket
 			.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`)
 			.then(docWithCas => processing(docWithCas))
-			.then(() => fn.emitEventAndSendResponse(siteId, res))
+			.then(() => fn.emitEventAndSendResponse(req.body.siteId, res))
 			.catch(err => fn.errorHander(err, res));
 	}
 };

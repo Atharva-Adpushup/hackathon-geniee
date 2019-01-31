@@ -138,8 +138,8 @@ class AdCodeGenerator extends Component {
 				formatData: {
 					platform: this.state.platform,
 					format: this.state.format,
-					type: type.toLowerCase(),
-					placement: placement.toLowerCase(),
+					type,
+					placement,
 					...data.formatData
 				},
 				type: data.type,
