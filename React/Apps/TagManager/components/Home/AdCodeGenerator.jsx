@@ -99,7 +99,8 @@ class AdCodeGenerator extends Component {
 						css: {
 							display: 'block',
 							margin: '10px auto',
-							'text-align': 'center'
+							'text-align': 'center',
+							'clear': 'both'
 						},
 						isActive: true
 					}
