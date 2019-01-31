@@ -308,7 +308,7 @@ module.exports = {
 			ads = ads.concat(window.adpushup.config.manualAds);
 		}
 
-		return utils.filterInteractiveAds(ads);
+		return this.filterInteractiveAds(ads);
 	},
 	filterInteractiveAds: function(ads, isInnovative, channel) {
 		return ads && ads.length
