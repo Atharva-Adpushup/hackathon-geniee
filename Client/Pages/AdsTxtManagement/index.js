@@ -1,5 +1,5 @@
 import React from 'react';
 
-const AdsTxtManagement = () => <div>AdsTxtManagement</div>
+const AdsTxtManagement = () => <div>AdsTxtManagement</div>;
 
 export default AdsTxtManagement;

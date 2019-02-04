@@ -1,12 +1,14 @@
-const express = require('express');
+/* eslint-disable block-scoped-var */
+/* eslint-disable global-require */
+/* eslint-disable vars-on-top */
+/* eslint-disable no-var */
 const path = require('path');
-console.log('NodeEnv: ', process.env.NODE_ENV);
 
 if (process.env.NODE_ENV !== 'production') {
 	var swaggerUi = require('swagger-ui-express');
 	var swaggerDocument = require('../configs/swagger.json');
 
-	var webpack = require('webpack');
+	const webpack = require('webpack');
 	var webpackConfig = require('../webpack.dev');
 	var compiler = webpack(webpackConfig);
 	var webpackDevMiddleware = require('webpack-dev-middleware');
@@ -15,7 +17,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const userController = require('./userController');
 
-module.exports = function(app) {
+module.exports = function router(app) {
 	if (process.env.NODE_ENV !== 'production') {
 		// webpack hmr
 		app.use(
@@ -37,11 +39,12 @@ module.exports = function(app) {
 	// React Catch All Route
 	app.use((req, res) => {
 		if (process.env.NODE_ENV === 'production') {
+			// eslint-disable-next-line no-undef
 			const filePath = path.resolve(__basedir, 'clientDist', 'index.html');
 			res.sendFile(filePath);
 		} else {
 			const filename = path.resolve(compiler.outputPath, 'index.html');
-			compiler.outputFileSystem.readFile(filename, function(err, result) {
+			compiler.outputFileSystem.readFile(filename, (err, result) => {
 				res.set('content-type', 'text/html');
 				res.send(result);
 				res.end();

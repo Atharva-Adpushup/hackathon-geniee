@@ -1,8 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-
+import { hot } from 'react-hot-loader/root';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faBars,
 	faTachometerAlt,
@@ -13,12 +12,11 @@ import {
 	faDesktop,
 	faPlus
 } from '@fortawesome/free-solid-svg-icons';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 
-import { hot } from 'react-hot-loader/root';
+import ErrorBoundary from './Components/ErrorBoundary';
 import Routes from './Routes';
 import Shell from './Components/Shell';
-import ErrorBoundary from './Components/ErrorBoundary';
 
 library.add(
 	faBars,
