@@ -25,7 +25,7 @@ function pagegroupFiltering(channels, platform, format, meta, listMode = false, 
 	let types;
 
 	/*
-		Finding to which group, ad belongs to
+		Finding to which group, ad belongs to and assigning that group to types
 		['stickyLeft', 'stickyRight', 'docked']
 		['stickyTop', 'stickyBottom']
 		['inView']
