@@ -21,8 +21,7 @@ class Sticky extends Component {
 		switch (formatData.placement) {
 			case 'top':
 				const { topOffset = 0 } = this.interactiveAd.formatData;
-				let temp = { ...placementCSS.TOP, top: `${topOffset}px` };
-				return temp;
+				return { ...placementCSS.TOP, top: `${topOffset}px` };
 			case 'bottom':
 				return placementCSS.BOTTOM;
 			case 'left':
