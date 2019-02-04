@@ -102,18 +102,21 @@ $(document).ready(function() {
 						'Pagegroup pattern cannot be blank. Please provide valid regex patterns for all the pagegroups.'
 					);
 				} else {
-					var activeDFPNetwork = this.parseFormData(formValues, 'other').activeDFPNetwork,
-						autoOpt = this.parseFormData(formValues, 'other').autoOptimise ? true : false,
-						isSPA = this.parseFormData(formValues, 'other').isSPA ? true : false,
-						spaPageTransitionTimeout = this.parseFormData(formValues, 'other').spaPageTransitionTimeout,
+					var parsedFormValues = this.parseFormData(formValues, 'other'),
+						activeDFPNetwork = parsedFormValues.activeDFPNetwork,
+						activeDFPCurrencyCode = parsedFormValues.activeDFPCurrencyCode,
+						autoOpt = parsedFormValues.autoOptimise ? true : false,
+						isSPA = parsedFormValues.isSPA ? true : false,
+						isThirdPartyAdx = parsedFormValues.isThirdPartyAdx ? true : false,
+						spaPageTransitionTimeout = parsedFormValues.spaPageTransitionTimeout,
 						dfpInfo = activeDFPNetwork ? activeDFPNetwork.split('-') : [],
 						activeDFPNetwork = dfpInfo.length ? dfpInfo[0] : '',
 						activeDFPParentId = dfpInfo.length ? dfpInfo[1] : '',
 						pageGroupPattern = JSON.stringify(parsedPageGroups),
-						otherSettings = JSON.stringify(this.parseFormData(formValues, 'other')),
-						gdprCompliance = this.parseFormData(formValues, 'other').gdprCompliance ? true : false,
-						cookieControlConfig = this.parseFormData(formValues, 'other').cookieControlConfig
-							? this.parseFormData(formValues, 'other').cookieControlConfig
+						otherSettings = JSON.stringify(parsedFormValues),
+						gdprCompliance = parsedFormValues.gdprCompliance ? true : false,
+						cookieControlConfig = parsedFormValues.cookieControlConfig
+							? parsedFormValues.cookieControlConfig
 							: {};
 
 					$error.html('');
@@ -124,9 +127,11 @@ $(document).ready(function() {
 							otherSettings: otherSettings,
 							autoOptimise: autoOpt,
 							isSPA: isSPA,
+							isThirdPartyAdx: isThirdPartyAdx,
 							spaPageTransitionTimeout: spaPageTransitionTimeout,
 							activeDFPNetwork: activeDFPNetwork,
 							activeDFPParentId: activeDFPParentId,
+							activeDFPCurrencyCode: activeDFPCurrencyCode,
 							gdprCompliance: gdprCompliance,
 							cookieControlConfig: cookieControlConfig,
 							blocklist: JSON.stringify(w.blocklist),
@@ -398,6 +403,33 @@ $(document).ready(function() {
 				ele.classList.remove('red');
 				ele.classList.add(toAdd);
 			});
+		});
+
+		// Active DFP Network change handler
+		$('#activeDFPNetwork').on('change', function(e) {
+			var $checkedOption = $('option:selected', this),
+				currencyCode = $checkedOption.attr('data-currencyCode'),
+				$currencyTable = $('.js-currency-table'),
+				$currencyTd = $('#currencyValue'),
+				$activeDFPCurrencyCodeHiddenInput = $('#activeDFPCurrencyCode'),
+				$thirdPartyAdxWrapper = $('.js-thirdpartyadx-wrapper'),
+				$thirdPartyAdxInput = $('#isThirdPartyAdx');
+
+			if (!currencyCode) {
+				$currencyTable.addClass('u-hide');
+				$currencyTd.text('');
+				$activeDFPCurrencyCodeHiddenInput.val('');
+
+				$thirdPartyAdxWrapper.addClass('u-hide');
+				$thirdPartyAdxInput.prop('checked', false);
+				return;
+			}
+
+			$currencyTd.text(currencyCode);
+			$activeDFPCurrencyCodeHiddenInput.val(currencyCode);
+			$currencyTable.removeClass('u-hide');
+
+			$thirdPartyAdxWrapper.removeClass('u-hide');
 		});
 
 		// Copy to clipboard trigger

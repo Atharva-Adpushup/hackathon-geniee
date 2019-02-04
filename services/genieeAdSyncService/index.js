@@ -19,15 +19,18 @@ function onSiteSaved(site) {
 	}, 3000);
 }
 
-function updateAllAutoOptimisedSites() {
-	var getSites = getAutoOptimisedLiveSites.init(),
-		uploadSites = getSites.then(function(sitesArr) {
+function updateGeneratedScriptsForLiveSites() {
+	var getAutoOptimisedSites = getAutoOptimisedLiveSites.init(),
+		getValidLiveSites = Promise.join(getAutoOptimisedSites, function(autoOptimisedSites) {
+			return [...autoOptimisedSites];
+		}),
+		uploadValidLiveSites = getValidLiveSites.then(function(sitesArr) {
 			return utils.syncArrayPromise(sitesArr, syncGeneratedFileWithCdn.init);
 		});
 
-	return Promise.join(getSites, uploadSites, function(sitesArr, uploadedSites) {
+	return Promise.join(uploadValidLiveSites, function(uploadedLiveSites) {
 		const dateTime = moment().format('LLL'),
-			successInfo = `All autoOptimise Sites were synced at ${dateTime}`;
+			successInfo = `All valid live sites were synced at ${dateTime}`;
 
 		fileLogger.info(successInfo);
 		console.log(successInfo);
@@ -43,15 +46,15 @@ function updateAllAutoOptimisedSites() {
 
 adpushup.on('siteSaved', onSiteSaved);
 cron.schedule(
-	'0 0 */6 * * *',
+	'0 0 */4 * * *',
 	function() {
-		const infoText = 'Running Auto Optimise task every 6 hours';
+		const infoText = 'Running generated scripts for live sites task every 4 hours';
 
 		fileLogger.info(infoText);
 		console.log(infoText);
-		updateAllAutoOptimisedSites();
+		updateGeneratedScriptsForLiveSites();
 	},
 	true
 );
 
-updateAllAutoOptimisedSites();
+updateGeneratedScriptsForLiveSites();
