@@ -33,7 +33,7 @@ var express = require('express'),
 // Set Node process environment
 process.env.NODE_ENV = config.environment.HOST_ENV;
 
-if (process.env.NODE_ENV === consts.environment.production || true) {
+if (process.env.NODE_ENV === consts.environment.production) {
 	require('./services/genieeAdSyncService/index');
 	//require('./services/hbSyncService/index');
 }

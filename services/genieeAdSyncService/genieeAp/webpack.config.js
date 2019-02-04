@@ -13,7 +13,8 @@ module.exports = [
 			path: path.join(__dirname, buildPath),
 			filename: '[name].js',
 			chunkFilename: '[name].js',
-			publicPath: 'http://localhost:8080/assets/js/builds/'
+			publicPath: '//cdn.adpushup.com/'
+			// publicPath: 'http://localhost:8080/assets/js/builds/'
 		},
 		resolve: {
 			alias: {
@@ -50,7 +51,8 @@ module.exports = [
 			path: path.join(__dirname, buildPath),
 			filename: '[name].min.js',
 			chunkFilename: '[name].min.js',
-			publicPath: 'http://localhost:8080/assets/js/builds/'
+			publicPath: '//cdn.adpushup.com/'
+			// publicPath: 'http://localhost:8080/assets/js/builds/'
 		},
 		resolve: {
 			alias: {

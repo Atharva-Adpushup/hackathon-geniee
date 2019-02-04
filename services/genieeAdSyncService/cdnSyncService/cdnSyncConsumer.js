@@ -282,7 +282,7 @@ module.exports = function(site, externalData = {}) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			if (prodEnv || false) {
+			if (prodEnv) {
 				return connectToServer()
 					.then(cwd)
 					.then(function() {
