@@ -70,10 +70,12 @@ function successHandler(resultData) {
 	const isValidResult = !!(resultData && resultData.length);
 
 	if (isValidResult) {
+		const allSiteIds = _.map(resultData, modelInstance => modelInstance.get('siteId'));
+
 		console.log(
-			'Successfully updated currency exchange value for sites: ',
-			resultData,
-			', liveSitesByValidThirdPartyDFPAndCurrency'
+			`Successfully updated currency exchange value for sites: ${allSiteIds.join(
+				', '
+			)} liveSitesByValidThirdPartyDFPAndCurrency`
 		);
 	} else {
 		console.log(
