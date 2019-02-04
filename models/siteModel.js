@@ -396,7 +396,6 @@ function apiModule() {
 					activeDFPNetwork: settings.activeDFPNetwork ? settings.activeDFPNetwork : '',
 					activeDFPParentId: settings.activeDFPParentId ? settings.activeDFPParentId : '',
 					activeDFPCurrencyCode: settings.activeDFPCurrencyCode || '',
-					activeDFPCurrencyExchangeRate: settings.activeDFPCurrencyExchangeRate || '',
 					blocklist: blocklist.length ? blocklist : '',
 					isSPA: settings.isSPA === 'false' ? false : true,
 					isThirdPartyAdx: settings.isThirdPartyAdx === 'false' ? false : true,
@@ -405,6 +404,7 @@ function apiModule() {
 						? site.get('apConfigs').isAdPushupControlWithPartnerSSP
 						: commonConsts.apConfigDefaults.isAdPushupControlWithPartnerSSP
 				};
+
 				site.set('apConfigs', siteConfig);
 				return site.save();
 			});

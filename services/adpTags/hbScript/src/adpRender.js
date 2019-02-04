@@ -7,9 +7,9 @@ var utils = require('../helpers/utils'),
 	$ = require('./adp').$,
 	adp = require('./adp').adp,
 	getFloorWithGranularity = function(floor) {
-		var val = parseFloat(Math.abs(floor).toFixed(1));
+		var val = parseFloat(Math.abs(floor).toFixed(2));
 		if (val > 20) {
-			return 20;
+			return 20.00;
 		} else if (val == 0) {
 			val = 0.01;
 		}
@@ -69,7 +69,8 @@ var utils = require('../helpers/utils'),
 		});
 	},
 	renderPostbid = function(slot) {
-		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId), adIframe = utils.createEmptyIframe();
+		var params = pbjs.getAdserverTargetingForAdUnitCode(slot.containerId),
+			adIframe = utils.createEmptyIframe();
 
 		document.getElementById(slot.containerId).appendChild(adIframe);
 
@@ -111,7 +112,8 @@ var utils = require('../helpers/utils'),
 		}
 
 		Object.keys(config.UTM_WISE_TARGETING).forEach(function(key) {
-			var keyVal = config.UTM_WISE_TARGETING[key], utmParam = urlParams[keyVal];
+			var keyVal = config.UTM_WISE_TARGETING[key],
+				utmParam = urlParams[keyVal];
 
 			googletag
 				.pubads()
@@ -145,9 +147,12 @@ var utils = require('../helpers/utils'),
 			});
 			if (dfpAdunitCodes.indexOf(slot.optionalParam.dfpAdunitCode) !== -1) {
 				var currentTargetingObject =
-					config.TARGETING[
-						'/' + networkCodes[slot.optionalParam.dfpAdunitCode] + '/' + slot.optionalParam.dfpAdunitCode
-					],
+						config.TARGETING[
+							'/' +
+								networkCodes[slot.optionalParam.dfpAdunitCode] +
+								'/' +
+								slot.optionalParam.dfpAdunitCode
+						],
 					currentTargetingObject = setPageLevelTargeting(currentTargetingObject, slot);
 				Object.keys(currentTargetingObject).forEach(function(dfpKey, index) {
 					slot.gSlot.setTargeting(dfpKey, String(currentTargetingObject[dfpKey]));
@@ -156,9 +161,9 @@ var utils = require('../helpers/utils'),
 			return;
 		}
 		var targeting = {
-			hb_siteId: config.SITE_ID,
-			hb_ran: 0
-		},
+				hb_siteId: config.SITE_ID,
+				hb_ran: 0
+			},
 			adServerTargeting = getAdserverTargeting(slot);
 
 		if (utils.isSupportedBrowser() && slot.bidders.length) {
@@ -244,7 +249,8 @@ var utils = require('../helpers/utils'),
 		bid.ad = config.ADSENSE_FALLBACK_ADCODE.replace('__AD_CODE__', adData);
 	},
 	afterBiddingProcessor = function(slots) {
-		var genieeRef = adp && adp.geniee, isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback;
+		var genieeRef = adp && adp.geniee,
+			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback;
 
 		if (!Array.isArray(slots) || !slots.length) {
 			return false;
