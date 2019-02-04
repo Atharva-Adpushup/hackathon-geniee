@@ -15,6 +15,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import { hot } from 'react-hot-loader/root';
 import Routes from './Routes';
 import Shell from './Components/Shell';
 import ErrorBoundary from './Components/ErrorBoundary';
@@ -42,4 +43,4 @@ const App = () => (
 	</div>
 );
 
-export default App;
+export default hot(App);
