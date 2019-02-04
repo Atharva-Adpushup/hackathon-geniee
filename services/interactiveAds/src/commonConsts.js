@@ -78,7 +78,7 @@ const commonConsts = {
 			BOTTOM: {},
 			TOP: {
 				width: '170px',
-				'border-radius': '5px',
+				'border-radius': '5px 5px 0px 0px',
 				padding: '2px'
 			}
 		}
