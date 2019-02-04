@@ -69,24 +69,17 @@ const commonConsts = {
 		CSS: {
 			COMMON: {
 				background: 'rgba(0,0,0,0.5)',
-				// position: 'absolute',
 				'padding-bottom': '2px',
-				'max-height': '20px'
-				// display: 'table',
-				// clear: 'both'
-				// top: '-19px'
+				'max-height': '20px',
+				margin: '0px auto'
 			},
-			LEFT: {
-				top: '-19px'
-			},
-			RIGHT: {
-				top: '-19px'
-			},
-			BOTTOM: {
-				top: '-19px'
-			},
+			LEFT: {},
+			RIGHT: {},
+			BOTTOM: {},
 			TOP: {
-				top: '-19px'
+				width: '170px',
+				'border-radius': '5px',
+				padding: '2px'
 			}
 		}
 	},
@@ -103,7 +96,10 @@ const commonConsts = {
 					marginLeft: 'auto',
 					marginRight: 'auto',
 					left: 0,
-					right: 0
+					right: 0,
+					padding: '10px 0px',
+					width: '100%',
+					'box-sizing': 'content-box'
 				},
 				BOTTOM: {
 					bottom: 0,

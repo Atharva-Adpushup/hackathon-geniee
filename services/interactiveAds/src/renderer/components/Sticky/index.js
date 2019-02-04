@@ -10,12 +10,19 @@ class Sticky extends Component {
 		this.getPlacementCSS = this.getPlacementCSS.bind(this);
 	}
 
+	pushContent(formatData) {
+		const { contentOffset = 110, contentXpath = '' } = formatData;
+		contentOffset && contentXpath ? $(contentXpath).css('margin-top', `${contentOffset}px`) : null;
+	}
+
 	getPlacementCSS(formatData) {
 		const placementCSS = commonConsts.FORMATS.STICKY.PLACEMENT_CSS;
 
 		switch (formatData.placement) {
 			case 'top':
-				return placementCSS.TOP;
+				const { topOffset = 0 } = this.interactiveAd.formatData;
+				let temp = { ...placementCSS.TOP, top: `${topOffset}px` };
+				return temp;
 			case 'bottom':
 				return placementCSS.BOTTOM;
 			case 'left':

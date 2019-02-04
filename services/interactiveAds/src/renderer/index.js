@@ -37,9 +37,9 @@ const createParentNode = (appendTo, interactiveAd, css = {}, operation = 'append
 		return $parentNode;
 	},
 	renderAd = (interactiveAd, adInstance) => {
-		const type = interactiveAd.formatData.type,
-			adCode = generateAdCode(interactiveAd),
-			{ value: xPath } = interactiveAd.formatData.eventData; // Value is the xPath
+		const type = interactiveAd.formatData.type;
+		const adCode = generateAdCode(interactiveAd);
+		const { value: xPath } = interactiveAd.formatData.eventData; // Value is the xPath
 
 		let parentNode = null;
 

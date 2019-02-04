@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
-import { TYPE_OF_ADS } from '../../../configs/commonConsts';
+import { TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
 import CodeBox from '../../../../../Components/CodeEditor';
 
 class Docked extends Component {
@@ -11,6 +11,7 @@ class Docked extends Component {
 		this.state = {
 			topOffset: hasFormatData ? ad.formatData.topOffset : 0,
 			contentOffset: hasFormatData ? ad.formatData.contentOffset : 0,
+			contentXpath: hasFormatData ? ad.formatData.contentXpath : '',
 			css: ad && ad.css ? window.btoa(JSON.stringify(ad.css)) : ''
 		};
 		this.handleChange = this.handleChange.bind(this);
@@ -30,7 +31,7 @@ class Docked extends Component {
 
 	saveHandler(e) {
 		e.preventDefault();
-		const { topOffset, contentOffset, css } = this.state;
+		const { topOffset, contentOffset, contentXpath, css } = this.state;
 		let parsedCSS = {};
 		if (!topOffset) {
 			return alert('Top Offset is mandatory fields');
@@ -44,7 +45,14 @@ class Docked extends Component {
 		return this.props.save.handler({
 			formatData: {
 				contentOffset,
-				topOffset
+				topOffset,
+				contentXpath: contentXpath.trim(),
+				formatData: {
+					event: EVENTS.SCRIPT_LOADED,
+					eventData: {
+						value: ''
+					}
+				}
 			},
 			css: parsedCSS,
 			type: TYPE_OF_ADS.INTERACTIVE_AD
@@ -67,11 +75,12 @@ class Docked extends Component {
 	);
 
 	render() {
-		const { topOffset, contentOffset } = this.state;
+		const { topOffset, contentOffset, contentXpath } = this.state;
 		return (
 			<form action="#" method="POST">
 				{this.renderInput('topOffset', topOffset, 'number', 'Enter Top Offset', this.handleChange)}
 				{this.renderInput('contentOffset', contentOffset, 'number', 'Enter Content Offset', this.handleChange)}
+				{this.renderInput('contentXpath', contentXpath, 'text', 'Enter Content Xpath', this.handleChange, 12)}
 				<Col md={12} style={{ paddingLeft: '0px' }}>
 					<label htmlFor="css">Custom CSS</label>
 					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={this.state.css} />

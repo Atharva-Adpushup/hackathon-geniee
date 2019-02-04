@@ -105,6 +105,7 @@ class Component {
 					...commonConsts.FORMATS.STICKY.BASE_STYLES,
 					...this.getPlacementCSS(formatData)
 				});
+				formatData.placement.toLowerCase() === 'top' ? this.pushContent(formatData) : null;
 				this.parentNode.append($format.append(this.adCode));
 				break;
 
