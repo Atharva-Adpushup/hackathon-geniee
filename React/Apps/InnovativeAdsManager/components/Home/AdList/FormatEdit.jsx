@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Row } from 'react-bootstrap';
 import { CustomButton } from '../../shared/index';
-import { InView, Docked, Default } from '../Formats/index';
+import { InView, Docked, Default, StickyTop } from '../Formats/index';
 
 class FormatEdit extends Component {
 	constructor(props) {
@@ -52,8 +51,8 @@ class FormatEdit extends Component {
 			ad
 		};
 		switch (ad.formatData.format) {
-			// case 'stickyTop':
-			// 	return <StickyTop />;
+			case 'stickyTop':
+				return <StickyTop {...commonProps} />;
 			case 'inView':
 				return <InView {...commonProps} />;
 			case 'docked':

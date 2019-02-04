@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Row, Col, ProgressBar } from 'react-bootstrap';
 import CustomList from './CustomList';
-import { Docked, Default, InView } from './Formats/index';
+import { Docked, Default, InView, StickyTop } from './Formats/index';
 import { PLATFORMS, FORMATS, SIZES, displayAdMessage } from '../../configs/commonConsts';
 import { CustomMessage, CustomButton } from '../shared/index';
 import Loader from '../../../../Components/Loader';
@@ -283,8 +283,8 @@ class AdCodeGenerator extends Component {
 			handler: this.saveHandler
 		};
 		switch (this.state.format) {
-			// case 'stickyTop':
-			// 	return <StickyTop />;
+			case 'stickyTop':
+				return <StickyTop save={save} />;
 			case 'inView':
 				return <InView save={save} />;
 			case 'docked':

@@ -1,22 +1,20 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
-import SelectBox from '../../../../../Components/SelectBox';
-import { AD_OPERATIONS, TYPE_OF_ADS } from '../../../configs/commonConsts';
+import { TYPE_OF_ADS } from '../../../configs/commonConsts';
 import CodeBox from '../../../../../Components/CodeEditor';
 
 class Docked extends Component {
 	constructor(props) {
 		super(props);
+		const ad = this.props.ad ? this.props.ad : false;
+		const hasFormatData = ad && ad.formatData ? ad.formatData : false;
 		this.state = {
-			xpath: '',
-			bottomXpath: '',
-			bottomOffset: '',
-			css: '',
-			operation: null
+			topOffset: hasFormatData ? ad.formatData.topOffset : 0,
+			contentOffset: hasFormatData ? ad.formatData.contentOffset : 0,
+			css: ad && ad.css ? window.btoa(JSON.stringify(ad.css)) : ''
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this.handleCodeChange = this.handleCodeChange.bind(this);
-		this.operationChange = this.operationChange.bind(this);
 		this.saveHandler = this.saveHandler.bind(this);
 	}
 
@@ -30,16 +28,12 @@ class Docked extends Component {
 		this.setState({ css: window.btoa(css) });
 	}
 
-	operationChange(value) {
-		this.setState({ operation: value });
-	}
-
 	saveHandler(e) {
 		e.preventDefault();
-		const { xpath, bottomXpath, bottomOffset, operation, css } = this.state;
+		const { topOffset, contentOffset, css } = this.state;
 		let parsedCSS = {};
-		if (!xpath || !operation) {
-			return alert('Xpath and Ad Operation are mandatory fields');
+		if (!topOffset) {
+			return alert('Top Offset is mandatory fields');
 		} else if (css && css.trim().length) {
 			try {
 				parsedCSS = JSON.parse(window.atob(css));
@@ -48,65 +42,36 @@ class Docked extends Component {
 			}
 		}
 		return this.props.save.handler({
-			adData: {
-				xpath,
-				operation
-			},
 			formatData: {
-				bottomOffset,
-				bottomXpath,
-				css: parsedCSS
+				contentOffset,
+				topOffset
 			},
-			type: TYPE_OF_ADS.DOCKED_STRUCTURAL
+			css: parsedCSS,
+			type: TYPE_OF_ADS.INTERACTIVE_AD
 		});
 	}
 
+	renderInput = (name, value, type, label, handler, size = 6) => (
+		<Col md={size} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
+			<label htmlFor={name}>{label}</label>
+			<input
+				className="inputMinimal"
+				type={type}
+				placeholder={label}
+				name={name}
+				value={value}
+				style={{ padding: '10px 15px' }}
+				onChange={handler}
+			/>
+		</Col>
+	);
+
 	render() {
+		const { topOffset, contentOffset } = this.state;
 		return (
 			<form action="#" method="POST">
-				<Col md={6} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
-					<label htmlFor="xpath">Enter Xpath*</label>
-					<input
-						className="inputMinimal"
-						type="input"
-						placeholder="Enter XPath"
-						name="xpath"
-						style={{ padding: '10px 15px' }}
-						onChange={this.handleChange}
-					/>
-				</Col>
-				<Col md={6} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
-					<label htmlFor="adOperation">Ad Operation*</label>
-					<SelectBox value={this.state.operation} label="Ad Operation" onChange={this.operationChange}>
-						{AD_OPERATIONS.map((operation, index) => (
-							<option key={index} value={operation}>
-								{operation}
-							</option>
-						))}
-					</SelectBox>
-				</Col>
-				<Col md={6} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
-					<label htmlFor="bottomXpath">Enter Bottom Xpath</label>
-					<input
-						className="inputMinimal"
-						type="input"
-						placeholder="Enter Bottom XPath"
-						name="bottomXpath"
-						style={{ padding: '10px 15px' }}
-						onChange={this.handleChange}
-					/>
-				</Col>
-				<Col md={6} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
-					<label htmlFor="bottomOffset">Enter Bottom Offset</label>
-					<input
-						className="inputMinimal"
-						type="number"
-						placeholder="Enter Bottom Offset"
-						name="bottomOffset"
-						style={{ padding: '10px 15px' }}
-						onChange={this.handleChange}
-					/>
-				</Col>
+				{this.renderInput('topOffset', topOffset, 'number', 'Enter Top Offset', this.handleChange)}
+				{this.renderInput('contentOffset', contentOffset, 'number', 'Enter Content Offset', this.handleChange)}
 				<Col md={12} style={{ paddingLeft: '0px' }}>
 					<label htmlFor="css">Custom CSS</label>
 					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={this.state.css} />

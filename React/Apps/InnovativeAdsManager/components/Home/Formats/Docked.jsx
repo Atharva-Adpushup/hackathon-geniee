@@ -13,7 +13,7 @@ class Docked extends Component {
 			xpath: hasFormatData ? ad.formatData.xpath : '',
 			bottomXpath: hasFormatData ? ad.formatData.bottomXpath : '',
 			bottomOffset: hasFormatData ? ad.formatData.bottomOffset : '',
-			css: ad.css ? window.btoa(JSON.stringify(ad.css)) : '',
+			css: ad && ad.css ? window.btoa(JSON.stringify(ad.css)) : '',
 			operation: hasFormatData ? ad.formatData.operation : null
 		};
 		this.handleChange = this.handleChange.bind(this);
