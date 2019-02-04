@@ -11,7 +11,9 @@ function shouldRunControl(config) {
 
 function init(w, d) {
 	var control = require('./control'),
-		adp = require('./adp').adp;
+		adp = require('./adp').adp,
+		apConfig = adp.config,
+		utils = require('../helpers/utils');
 
 	w.pbjs = w.pbjs || {};
 	w.pbjs.que = w.pbjs.que || [];
@@ -19,7 +21,7 @@ function init(w, d) {
 	w.googletag = w.googletag || {};
 	googletag.cmd = googletag.cmd || [];
 
-	if (shouldRunControl(adp.config)) {
+	if (shouldRunControl(apConfig)) {
 		w.adpTags = w.adpTags || {};
 		w.adpTags.control = control.initControl('prebid');
 		control.initControlFeedback(w);
@@ -88,16 +90,11 @@ function init(w, d) {
 		// Declaring prebid winner, if anyone
 		w.pbjs.que.push(function() {
 			w.pbjs.onEvent('bidWon', function(bidData) {
-				var slot = adp.adpTags.adpSlots[bidData.adUnitCode];
+				var slot = adp.adpTags.adpSlots[bidData.adUnitCode],
+					computedCPMValue = utils.isValidThirdPartyDFPAndCurrencyConfig(apConfig) ? 'originalCpm' : 'cpm';
+
 				slot.feedback.winner = bidData.bidder;
-				slot.feedback.winningRevenue = bidData.cpm / 1000;
-
-				// if(slot.feedback.winner === config.ADSENSE.bidderName) {
-				//     hbStatus.hbDfpRender(slot.containerId);
-
-				//     slot.type = 8;
-				//     feedback(slot);
-				// }
+				slot.feedback.winningRevenue = bidData[computedCPMValue] / 1000;
 			});
 		});
 	}

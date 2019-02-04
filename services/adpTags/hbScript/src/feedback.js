@@ -5,13 +5,14 @@ var config = require('./config'),
 	getBidDataForFeedback = function(containerId) {
 		var bidData = [],
 			// Not using getBidResponses() because context of all slot containers is not getting saved in it, instead using getBidResponsesForAdUnitCode(':adUnitCode')
-			slotBids = pbjs.getBidResponsesForAdUnitCode(containerId);
+			slotBids = pbjs.getBidResponsesForAdUnitCode(containerId),
+			computedCPMValue = utils.isValidThirdPartyDFPAndCurrencyConfig() ? 'originalCpm' : 'cpm';
 
 		if (slotBids) {
 			var bids = slotBids.bids;
 			for (var i in bids) {
 				bidData.push({
-					revenue: bids[i].cpm / 1000, // Actual revenue for impression = cpm/1000
+					revenue: bids[i][computedCPMValue] / 1000, // Actual revenue for impression = cpm/1000
 					bidder: bids[i].bidder,
 					adId: bids[i].adId,
 					responseTime: bids[i].timeToRespond
