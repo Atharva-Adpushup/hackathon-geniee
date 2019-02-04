@@ -1,10 +1,15 @@
 import React, { Component } from 'react';
-import { Table, Modal, Col } from 'react-bootstrap';
+import { Table, Modal, Col, Row } from 'react-bootstrap';
 import AdElement from './AdElement';
 import { CustomButton, EmptyState } from '../../shared/index';
 import Loader from '../../../../../Components/Loader';
 import SelectBox from '../../../../../Components/SelectBox/index';
-import { USER_AD_LIST_HEADERS, OPS_AD_LIST_HEADERS } from '../../../configs/commonConsts';
+import {
+	USER_AD_LIST_HEADERS,
+	OPS_AD_LIST_HEADERS,
+	STATUS_FILTER_OPTIONS,
+	FORMAT_FILTER_OPTIONS
+} from '../../../configs/commonConsts';
 
 class AdList extends Component {
 	constructor(props) {
@@ -22,6 +27,12 @@ class AdList extends Component {
 					value: null,
 					key: 'isActive',
 					type: 'boolean'
+				},
+				format: {
+					value: null,
+					key: 'format',
+					type: 'string',
+					inFormatData: true
 				}
 			}
 		};
@@ -68,14 +79,15 @@ class AdList extends Component {
 				const filter = filters[keys[i]];
 				if (condition === false) break;
 				if (filter.value !== null) {
+					const container = filter.inFormatData ? ad.formatData : ad;
 					switch (filter.type) {
 						case 'array':
-							condition = condition && ad[filter.key].includes(filter.value);
-							break;
-						case 'boolean':
-							condition = condition && ad[filter.key] === filter.value;
+							condition = condition && container[filter.key].includes(filter.value);
 							break;
 						default:
+						case 'string':
+						case 'boolean':
+							condition = condition && container[filter.key] === filter.value;
 							break;
 					}
 				}
@@ -101,40 +113,39 @@ class AdList extends Component {
 	renderFilters() {
 		return (
 			<div>
-				<Col xs={4}>
-					{this.renderSelect(
-						this.state.filters.pagegroups.value,
-						'Select Pagegroup',
-						value => this.selectChangeHandler('pagegroups', value),
-						window.iam.channels.map(channel => ({
-							name: channel,
-							value: channel
-						})),
-						this.state.isActive
-					)}
-				</Col>
-				<Col xs={4}>
-					{this.renderSelect(
-						this.state.filters.isActive.value,
-						'Select Status',
-						value => this.selectChangeHandler('isActive', value),
-						[
-							{
-								name: 'Active',
-								value: true
-							},
-							{
-								name: 'Archived',
-								value: false
-							}
-						],
-						this.state.pagegroups
-					)}
-				</Col>
-				<Col xs={4}>
+				<Row style={{ marginRight: '0px' }}>
 					<CustomButton label={'Master Save'} handler={this.saveWrapper} />
-				</Col>
-				<div style={{ clear: 'both' }}>&nbsp;</div>
+				</Row>
+				<div>
+					<Col xs={4}>
+						{this.renderSelect(
+							this.state.filters.pagegroups.value,
+							'Select Pagegroup',
+							value => this.selectChangeHandler('pagegroups', value),
+							window.iam.channels.map(channel => ({
+								name: channel,
+								value: channel
+							}))
+						)}
+					</Col>
+					<Col xs={4}>
+						{this.renderSelect(
+							this.state.filters.isActive.value,
+							'Select Status',
+							value => this.selectChangeHandler('isActive', value),
+							STATUS_FILTER_OPTIONS
+						)}
+					</Col>
+					<Col xs={4}>
+						{this.renderSelect(
+							this.state.filters.format.value,
+							'Select Format',
+							value => this.selectChangeHandler('format', value),
+							FORMAT_FILTER_OPTIONS
+						)}
+					</Col>
+					<div style={{ clear: 'both' }}>&nbsp;</div>
+				</div>
 			</div>
 		);
 	}

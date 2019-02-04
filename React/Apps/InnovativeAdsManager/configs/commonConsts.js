@@ -269,6 +269,42 @@ const AD_LIST_ACTIONS = {
 	}
 };
 const NOOP = () => {};
+const STATUS_FILTER_OPTIONS = [
+	{
+		name: 'Active',
+		value: true
+	},
+	{
+		name: 'Archived',
+		value: false
+	}
+];
+const FORMAT_FILTER_OPTIONS = [
+	{
+		name: 'Sticky Top',
+		value: 'stickyTop'
+	},
+	{
+		name: 'Sticky Bottom',
+		value: 'stickyBottom'
+	},
+	{
+		name: 'Sticky Left',
+		value: 'stickyLeft'
+	},
+	{
+		name: 'Sticky Right',
+		value: 'stickyRight'
+	},
+	{
+		name: 'Docked',
+		value: 'docked'
+	},
+	{
+		name: 'In View',
+		value: 'inView'
+	}
+];
 
 export {
 	EVENTS,
@@ -296,5 +332,7 @@ export {
 	USER_AD_LIST_ACTIONS,
 	OPS_AD_LIST_ACTIONS,
 	AD_LIST_ACTIONS,
-	NOOP
+	NOOP,
+	STATUS_FILTER_OPTIONS,
+	FORMAT_FILTER_OPTIONS
 };
