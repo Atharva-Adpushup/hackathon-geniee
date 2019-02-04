@@ -396,6 +396,7 @@ function apiModule() {
 					activeDFPNetwork: settings.activeDFPNetwork ? settings.activeDFPNetwork : '',
 					activeDFPParentId: settings.activeDFPParentId ? settings.activeDFPParentId : '',
 					activeDFPCurrencyCode: settings.activeDFPCurrencyCode || '',
+					activeDFPCurrencyExchangeRate: settings.activeDFPCurrencyExchangeRate || '',
 					blocklist: blocklist.length ? blocklist : '',
 					isSPA: settings.isSPA === 'false' ? false : true,
 					isThirdPartyAdx: settings.isThirdPartyAdx === 'false' ? false : true,

@@ -56,7 +56,7 @@ function liveSitesByNonEmptyChannels(doc, meta) {
 }
 
 /**
- * NAME:        sitesByNonEmptyChannels
+ * NAME:        liveSitesByValidThirdPartyDFPAndCurrency
  * DESCRIPTION: View to get all sites (Filtered by non-empty channels)
  * LOCATION:    _design/dev_app/_view/sitesByNonEmptyChannels
  */
@@ -74,5 +74,44 @@ function sitesByNonEmptyChannels(doc, meta) {
 		computedData.channels = doc.channels;
 
 		emit(doc.siteId, computedData);
+	}
+}
+
+/**
+ * NAME:        liveSitesByValidThirdPartyDFPAndCurrency
+ * DESCRIPTION: View to get all valid third party DFP currency live sites (Filtered by non-empty channels)
+ * LOCATION:    _design/dev_app/_view/liveSitesByValidThirdPartyDFPAndCurrency
+ */
+function liveSitesByValidThirdPartyDFPAndCurrency(doc, meta) {
+	var computedObj,
+		apConfig = doc.apConfigs,
+		isAutoOptimise = !!(apConfig && apConfig.autoOptimise),
+		isModePublish = !!(apConfig && apConfig.mode == 1),
+		isActiveDFPNetwork = !!(apConfig && apConfig.activeDFPNetwork && apConfig.activeDFPNetwork.length),
+		isActiveDFPCurrencyCode = !!(
+			apConfig &&
+			apConfig.activeDFPCurrencyCode &&
+			apConfig.activeDFPCurrencyCode.length &&
+			apConfig.activeDFPCurrencyCode.length === 3 &&
+			apConfig.activeDFPCurrencyCode !== 'US'
+		),
+		isPrebidGranularityMultiplier = !!(
+			apConfig &&
+			apConfig.prebidGranularityMultiplier &&
+			Number(apConfig.prebidGranularityMultiplier)
+		),
+		isValidSite = !!(
+			meta.id.indexOf('site::') === 0 &&
+			isAutoOptimise &&
+			isModePublish &&
+			isActiveDFPNetwork &&
+			isActiveDFPCurrencyCode &&
+			isPrebidGranularityMultiplier
+		);
+
+	if (isValidSite) {
+		computedObj = { domain: doc.siteDomain, siteId: doc.siteId, currencyCode: apConfig.activeDFPCurrencyCode };
+
+		emit(doc.siteId, computedObj);
 	}
 }
