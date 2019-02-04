@@ -4,8 +4,8 @@ import { withInfo } from '@storybook/addon-info';
 //addDecorator(withInfo);
 
 function loadStories() {
-    require('../stories/loader.js');
-    require('../stories/sidebar.js');
+	require('../stories/loader.js');
+	require('../stories/sidebar.js');
 }
 
 configure(loadStories, module);

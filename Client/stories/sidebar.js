@@ -14,7 +14,6 @@ import {
 	faDesktop,
 	faPlus
 } from '@fortawesome/free-solid-svg-icons';
-import { withInfo } from '@storybook/addon-info';
 
 import Sidebar from '../Components/Shell/Sidebar';
 import '../scss/index.scss';
@@ -29,18 +28,18 @@ library.add(
 	faDesktop,
 	faPlus
 );
- 
+
 const stories = storiesOf('Sidebar', module);
 
 stories.addDecorator(withKnobs);
 
 stories.add('default', () => (
-        <Router>
-            <Grid fluid={true}>
-                <Row className="sidebar-main-wrap">
-                    <Sidebar show={boolean('show', true)} />
-                    <main className="main-content"></main>
-                </Row>
-            </Grid>
-        </Router>
-    ))
+	<Router>
+		<Grid fluid>
+			<Row className="sidebar-main-wrap">
+				<Sidebar show={boolean('show', true)} />
+				<main className="main-content" />
+			</Row>
+		</Grid>
+	</Router>
+));

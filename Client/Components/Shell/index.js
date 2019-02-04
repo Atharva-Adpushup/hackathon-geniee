@@ -20,7 +20,7 @@ class Shell extends React.Component {
 		const { children } = this.props;
 
 		return (
-			<Grid fluid={true}>
+			<Grid fluid>
 				<Row>
 					<Col>
 						<Header sidebarToggle={this.sidebarToggle} />
