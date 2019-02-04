@@ -113,7 +113,7 @@ class AdList extends Component {
 	renderFilters() {
 		return (
 			<div>
-				<Row style={{ marginRight: '0px' }}>
+				<Row style={{ marginRight: '10px' }}>
 					<CustomButton label={'Master Save'} handler={this.saveWrapper} />
 				</Row>
 				<div>
