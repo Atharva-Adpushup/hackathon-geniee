@@ -1,6 +1,5 @@
-// Sticky ad component
+// Docked ad component
 
-import commonConsts from '../../../commonConsts';
 import Component from '../Component';
 
 class Docked extends Component {
