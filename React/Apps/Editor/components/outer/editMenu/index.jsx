@@ -54,6 +54,7 @@ class editMenu extends React.Component {
 							showNotification={props.showNotification}
 							updateAdSize={props.updateAdSize}
 							channelId={props.channelId}
+							networkConfig={props.networkConfig}
 						/>
 					</MenuItem>
 				))}

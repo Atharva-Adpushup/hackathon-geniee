@@ -90,6 +90,7 @@ const FormWrapper = (adCodeCheck, name, adUnitRegex) => {
 					fromPanel={this.props.fromPanel}
 					label="Adunit Id"
 					placeholder="Enter Adunit Id"
+					networkConfig={this.props.networkConfig}
 				/>
 			);
 		}
@@ -113,23 +114,25 @@ const FormWrapper = (adCodeCheck, name, adUnitRegex) => {
 						/>
 					</Col>
 				</Row>
-				<Row>
-					<Col xs={12}>
-						<CustomToggleSwitch
-							labelText="Refresh Ad"
-							className="mB-10"
-							checked={props.refreshSlot}
-							onChange={props.toggleRefreshSlot}
-							layout="horizontal"
-							size="m"
-							on="Yes"
-							off="No"
-							defaultLayout={true}
-							name="Refresh Ad"
-							id={props.id ? `js-refresh-slot-switch-${props.id}` : 'js-refresh-slot-switch'}
-						/>
-					</Col>
-				</Row>
+				{props.networkConfig && props.networkConfig.enableRefreshSlot
+					? <Row>
+							<Col xs={12}>
+								<CustomToggleSwitch
+									labelText="Refresh Ad"
+									className="mB-10"
+									checked={props.refreshSlot}
+									onChange={props.toggleRefreshSlot}
+									layout="horizontal"
+									size="m"
+									on="Yes"
+									off="No"
+									defaultLayout={true}
+									name="Refresh Ad"
+									id={props.id ? `js-refresh-slot-switch-${props.id}` : 'js-refresh-slot-switch'}
+								/>
+							</Col>
+						</Row>
+					: null}
 				<div>
 					<CodeBox
 						showButtons={props.showButtons || true}

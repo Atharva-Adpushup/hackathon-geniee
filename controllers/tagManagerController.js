@@ -12,6 +12,7 @@ const express = require('express'),
 	adpushup = require('../helpers/adpushupEvent'),
 	siteModel = require('../models/siteModel'),
 	router = express.Router(),
+	couchbase = require('../helpers/couchBaseService'),
 	appBucket = couchbaseService(
 		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
 		config.couchBase.DEFAULT_BUCKET,
@@ -140,8 +141,25 @@ router
 								ads: []
 							},
 							res
-					  )
+						)
 					: fn.errorHander(err, res);
+			});
+	})
+	.get('/networkConfig', (req, res) => {
+		return couchbase
+			.connectToAppBucket()
+			.then(function(appBucket) {
+				return appBucket.getAsync('data::apNetwork');
+			})
+			.then(function(json) {
+				return res.json(json.value);
+			})
+			.catch(function(err) {
+				if (err.code === 13) {
+					throw new AdPushupError([{ status: 404, message: 'Doc does not exist' }]);
+				}
+
+				return res.json(err);
 			});
 	})
 	.get(['/', '/:siteId'], (req, res) => {
@@ -159,7 +177,7 @@ router
 					: res.render('tagManager', {
 							siteId: params.siteId,
 							isSuperUser: !!session.isSuperUser
-					  });
+						});
 			})
 			.catch(err => {
 				console.log(err.message);
@@ -209,8 +227,7 @@ router
 			);
 		}
 		return fn.adUpdateProcessing(req, res, docWithCas => {
-			let doc = docWithCas.value,
-				{ siteId, siteDomain } = req.body;
+			let doc = docWithCas.value, { siteId, siteDomain } = req.body;
 
 			if (doc.ownerEmail != req.session.user.email) {
 				return Promise.reject('Owner verfication fail');

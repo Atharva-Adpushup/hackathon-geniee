@@ -12,25 +12,23 @@ class AdpTags extends Component {
 	constructor(props) {
 		super(props);
 		const {
-				fpKey,
-				priceFloor,
-				headerBidding,
-				code,
-				refreshSlot,
-				overrideActive,
-				overrideSizeTo,
-				primaryAdSize
-			} = props,
+			fpKey,
+			priceFloor,
+			headerBidding,
+			code,
+			refreshSlot,
+			overrideActive,
+			overrideSizeTo,
+			primaryAdSize
+		} = props,
 			// Geniee specific UI access feature 'dynamic allocation' property computation
 			isGenieeUIAccessDA = !!(window.isGeniee && window.gcfg && window.gcfg.hasOwnProperty('uud')),
 			isGenieeUIAccessDAActive = !!(isGenieeUIAccessDA && window.gcfg.uud),
 			isGenieeUIAccessDAInActive = !!(isGenieeUIAccessDA && !window.gcfg.uud),
 			isPrimaryAdSize = !!(primaryAdSize && primaryAdSize.width && primaryAdSize.height),
-			isResponsiveAdSize = !!(
-				isPrimaryAdSize &&
+			isResponsiveAdSize = !!(isPrimaryAdSize &&
 				primaryAdSize.width === 'responsive' &&
-				primaryAdSize.height === 'responsive'
-			);
+				primaryAdSize.height === 'responsive');
 
 		this.state = {
 			uiAccess: {
@@ -58,7 +56,7 @@ class AdpTags extends Component {
 			keyValues: !code
 				? {
 						[fpKey]: priceFloor
-				  }
+					}
 				: code
 		};
 		this.save = this.save.bind(this);
@@ -95,23 +93,21 @@ class AdpTags extends Component {
 
 	save() {
 		const {
-				fpKey,
-				hbAcivated,
-				pf,
-				keyValues,
-				refreshSlot,
-				overrideActive,
-				overrideSizeTo,
-				multipleAdSizes,
-				dfpAdunitId,
-				isBackwardCompatibleSizes,
-				isResponsive
-			} = this.state,
-			shouldMultipleAdSizesBeComputed = !!(
-				isBackwardCompatibleSizes &&
+			fpKey,
+			hbAcivated,
+			pf,
+			keyValues,
+			refreshSlot,
+			overrideActive,
+			overrideSizeTo,
+			multipleAdSizes,
+			dfpAdunitId,
+			isBackwardCompatibleSizes,
+			isResponsive
+		} = this.state,
+			shouldMultipleAdSizesBeComputed = !!(isBackwardCompatibleSizes &&
 				multipleAdSizes &&
-				!multipleAdSizes.length
-			);
+				!multipleAdSizes.length);
 		let computedMultipleAdSizes = multipleAdSizes;
 
 		if (shouldMultipleAdSizesBeComputed) {
@@ -149,43 +145,39 @@ class AdpTags extends Component {
 	}
 
 	renderEditMenuButtons(showButtons = true, submitHandler, cancelHandler) {
-		return showButtons ? (
-			<div className="containerButtonBar">
-				<Row className="butttonsRow mT-10">
-					<Col xs={6}>
-						<Button className="btn-lightBg btn-save" onClick={submitHandler}>
-							Save
-						</Button>
-					</Col>
-					<Col xs={6}>
-						<Button className="btn-lightBg btn-cancel" onClick={cancelHandler}>
-							Cancel
-						</Button>
-					</Col>
-				</Row>
-			</div>
-		) : (
-			''
-		);
+		return showButtons
+			? <div className="containerButtonBar">
+					<Row className="butttonsRow mT-10">
+						<Col xs={6}>
+							<Button className="btn-lightBg btn-save" onClick={submitHandler}>
+								Save
+							</Button>
+						</Col>
+						<Col xs={6}>
+							<Button className="btn-lightBg btn-cancel" onClick={cancelHandler}>
+								Cancel
+							</Button>
+						</Col>
+					</Row>
+				</div>
+			: '';
 	}
 
 	renderNormalSaveButton(showButtons = true, submitHandler, cancelHandler) {
-		return showButtons ? (
-			<div>
-				<Col xs={6} style={{ paddingRight: '0px' }}>
-					<Button className="btn-lightBg btn-save btn-block" onClick={submitHandler}>
-						Save
-					</Button>
-				</Col>
-				<Col xs={6} style={{ paddingRight: '0px' }}>
-					<Button className="btn-lightBg btn-cancel btn-block" onClick={cancelHandler}>
-						Cancel
-					</Button>
-				</Col>
-			</div>
-		) : (
-			''
-		);
+		return showButtons
+			? <div>
+					<Col xs={6} style={{ paddingRight: '0px' }}>
+						<Button className="btn-lightBg btn-save btn-block" onClick={submitHandler}>
+							Save
+						</Button>
+					</Col>
+					<Col xs={6} style={{ paddingRight: '0px' }}>
+						<Button className="btn-lightBg btn-cancel btn-block" onClick={cancelHandler}>
+							Cancel
+						</Button>
+					</Col>
+				</div>
+			: '';
 	}
 
 	renderButtons(type = 1, showButtons = true, submitHandler, cancelHandler) {
@@ -208,9 +200,7 @@ class AdpTags extends Component {
 	}
 
 	renderGenieeNote() {
-		let output = `<strong>NOTE:</strong><i><b>Geniee Zone Id</b> ${
-			window.gcfg.uud ? 'and <b>Dynamic Allocation</b>' : ''
-		} field(s) are non-editable.</i>`;
+		let output = `<strong>NOTE:</strong><i><b>Geniee Zone Id</b> ${window.gcfg.uud ? 'and <b>Dynamic Allocation</b>' : ''} field(s) are non-editable.</i>`;
 		return (
 			<Row>
 				<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
@@ -248,18 +238,18 @@ class AdpTags extends Component {
 			isShowBlock = !!(isDynamicAllocation && isInsertMode),
 			isFromPanel = this.props.fromPanel;
 
-		return isShowBlock ? (
-			<Row className="mT-5 u-margin-b15px">
-				<Col xs={6} className={isFromPanel ? 'u-padding-0px' : ''}>
-					<strong>Multiple Ad Sizes</strong>
-				</Col>
-				<Col xs={6} className={isFromPanel ? 'u-padding-0px text-right' : 'text-right'}>
-					<Button className="btn-lightBg" onClick={this.toggleMultipleAdSizes}>
-						Manage
-					</Button>
-				</Col>
-			</Row>
-		) : null;
+		return isShowBlock
+			? <Row className="mT-5 u-margin-b15px">
+					<Col xs={6} className={isFromPanel ? 'u-padding-0px' : ''}>
+						<strong>Multiple Ad Sizes</strong>
+					</Col>
+					<Col xs={6} className={isFromPanel ? 'u-padding-0px text-right' : 'text-right'}>
+						<Button className="btn-lightBg" onClick={this.toggleMultipleAdSizes}>
+							Manage
+						</Button>
+					</Col>
+				</Row>
+			: null;
 	}
 
 	handleDFPAdUnitIdChange(dfpAdunitId = '') {
@@ -267,13 +257,11 @@ class AdpTags extends Component {
 			props = this.props,
 			isDfpAdUnitObject = !!(props && props.dfpAdUnitObject && Object.keys(props.dfpAdUnitObject).length),
 			isDfpAdUnitId = !!dfpAdunitId,
-			isAdUnitInObject = !!(
-				isDfpAdUnitId &&
+			isAdUnitInObject = !!(isDfpAdUnitId &&
 				isDfpAdUnitObject &&
 				props.dfpAdUnitObject.hasOwnProperty(dfpAdunitId) &&
 				props.dfpAdUnitObject[dfpAdunitId] &&
-				props.dfpAdUnitObject[dfpAdunitId].multipleAdSizes
-			);
+				props.dfpAdUnitObject[dfpAdunitId].multipleAdSizes);
 
 		if (isAdUnitInObject) {
 			stateObject.multipleAdSizes = props.dfpAdUnitObject[dfpAdunitId].multipleAdSizes.concat([]);
@@ -291,25 +279,25 @@ class AdpTags extends Component {
 			isInsertMode = props.isInsertMode,
 			isShowBlock = !!(isDynamicAllocation && isInsertMode && isUniqObject);
 
-		return isShowBlock ? (
-			<Row className="mT-10">
-				<Col xs={12} className={props.fromPanel ? 'u-padding-0px mB-10' : 'mB-10'}>
-					<SelectBox
-						value={this.state.dfpAdunitId}
-						label="Select a DFP AdUnit Id"
-						onChange={this.handleDFPAdUnitIdChange}
-					>
-						{Object.keys(props.dfpAdUnitObject).map((value, index) => {
-							return (
-								<option key={index} title={value} value={value}>
-									{value}
-								</option>
-							);
-						})}
-					</SelectBox>
-				</Col>
-			</Row>
-		) : null;
+		return isShowBlock
+			? <Row className="mT-10">
+					<Col xs={12} className={props.fromPanel ? 'u-padding-0px mB-10' : 'mB-10'}>
+						<SelectBox
+							value={this.state.dfpAdunitId}
+							label="Select a DFP AdUnit Id"
+							onChange={this.handleDFPAdUnitIdChange}
+						>
+							{Object.keys(props.dfpAdUnitObject).map((value, index) => {
+								return (
+									<option key={index} title={value} value={value}>
+										{value}
+									</option>
+								);
+							})}
+						</SelectBox>
+					</Col>
+				</Row>
+			: null;
 	}
 
 	renderOverrideSettings(isGenieeEditableMode) {
@@ -377,11 +365,9 @@ class AdpTags extends Component {
 	getMultipleAdSizesOfPrimaryAdSize(isBackCompatibleSizes) {
 		const { primaryAdSize } = this.props,
 			primaryAdSizeString = primaryAdSize ? `${primaryAdSize.width},${primaryAdSize.height}` : '',
-			multipleAdSizes =
-				(primaryAdSizeString &&
-					isBackCompatibleSizes &&
-					iabSizes.BACKWARD_COMPATIBLE_MAPPING[primaryAdSizeString]) ||
-				[];
+			multipleAdSizes = (primaryAdSizeString &&
+				isBackCompatibleSizes &&
+				iabSizes.BACKWARD_COMPATIBLE_MAPPING[primaryAdSizeString]) || [];
 
 		return multipleAdSizes;
 	}
@@ -398,9 +384,7 @@ class AdpTags extends Component {
 	}
 
 	renderIsBackwardCompatibleSizesToggleSwitch() {
-		const { fromPanel, id } = this.props,
-			{ isResponsive } = this.state,
-			isDisabled = !!isResponsive;
+		const { fromPanel, id } = this.props, { isResponsive } = this.state, isDisabled = !!isResponsive;
 
 		return (
 			<Row>
@@ -432,58 +416,60 @@ class AdpTags extends Component {
 			toShow = isGenieeUIAccessDAActive ? true : !window.isGeniee,
 			label = geniee ? 'Dynamic Allocation' : 'Header Bidding';
 
-		return toShow ? (
-			<Row>
-				<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
-					<CustomToggleSwitch
-						labelText={label}
-						className="mB-10"
-						checked={this.state.hbAcivated}
-						disabled={isGenieeEditableMode}
-						onChange={val => {
-							const isGeniee = !!geniee,
-								isValue = !!val,
-								isResetMultipleAdSizes = !!(isGeniee && !isValue),
-								stateObject = { hbAcivated: !!val };
+		return toShow
+			? <Row>
+					<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+						<CustomToggleSwitch
+							labelText={label}
+							className="mB-10"
+							checked={this.state.hbAcivated}
+							disabled={isGenieeEditableMode}
+							onChange={val => {
+								const isGeniee = !!geniee,
+									isValue = !!val,
+									isResetMultipleAdSizes = !!(isGeniee && !isValue),
+									stateObject = { hbAcivated: !!val };
 
-							if (isResetMultipleAdSizes) {
-								stateObject.multipleAdSizes = [];
-							}
+								if (isResetMultipleAdSizes) {
+									stateObject.multipleAdSizes = [];
+								}
 
-							this.setState(stateObject);
-						}}
-						layout="horizontal"
-						size="m"
-						on="Yes"
-						off="No"
-						defaultLayout={this.props.fromPanel ? false : true}
-						name={this.props.id ? `headerBiddingSwitch-${this.props.id}` : 'headerBiddingSwitch'}
-						id={this.props.id ? `js-header-bidding-switch-${this.props.id}` : 'js-header-bidding-switch'}
-						customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
-					/>
-				</Col>
-			</Row>
-		) : null;
+								this.setState(stateObject);
+							}}
+							layout="horizontal"
+							size="m"
+							on="Yes"
+							off="No"
+							defaultLayout={this.props.fromPanel ? false : true}
+							name={this.props.id ? `headerBiddingSwitch-${this.props.id}` : 'headerBiddingSwitch'}
+							id={this.props.id ? `js-header-bidding-switch-${this.props.id}` : 'js-header-bidding-switch'}
+							customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+						/>
+					</Col>
+				</Row>
+			: null;
 	}
 
 	renderAdvancedBlock() {
-		let toShow = window.isGeniee && window.gcfg.uadkv ? true : !window.isGeniee,
-			code = this.generateCode();
+		let toShow = window.isGeniee && window.gcfg.uadkv ? true : !window.isGeniee, code = this.generateCode();
 
-		return toShow ? (
-			<Row>
-				<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
-					<pre>
-						<span style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{code}</span>
-						<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-advance">Edit Advance</Tooltip>}>
-							<span className="adDetails-icon" onClick={this.toggleAdvance}>
-								<i className="btn-icn-edit" />
-							</span>
-						</OverlayTrigger>
-					</pre>
-				</Col>
-			</Row>
-		) : null;
+		return toShow
+			? <Row>
+					<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+						<pre>
+							<span style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{code}</span>
+							<OverlayTrigger
+								placement="bottom"
+								overlay={<Tooltip id="edit-advance">Edit Advance</Tooltip>}
+							>
+								<span className="adDetails-icon" onClick={this.toggleAdvance}>
+									<i className="btn-icn-edit" />
+								</span>
+							</OverlayTrigger>
+						</pre>
+					</Col>
+				</Row>
+			: null;
 	}
 
 	renderNonAdvanced() {
@@ -494,76 +480,78 @@ class AdpTags extends Component {
 		return (
 			<div>
 				{isGenieeEditableMode ? this.renderGenieeNote() : null}
-				{this.props.geniee ? null : (
-					<div>
-						<Row>
-							<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
-								<strong>Price Floor Key</strong>
-							</Col>
-							<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
-								<SelectBox
-									value={this.state.fpKey}
-									label="Select Floor Price Key"
-									showClear={false}
-									onChange={fpKey => {
-										this.setState({ fpKey });
-									}}
-								>
-									{priceFloorKeys.map((item, index) => (
-										<option key={item} value={item}>
-											{item}
-										</option>
-									))}
-								</SelectBox>
-							</Col>
-						</Row>
-						<Row className="mT-10">
-							<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
-								<strong>Price Floor</strong>
-							</Col>
-							<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
-								<input
-									type="text"
-									placeholder="Enter Price Floor"
-									className="inputBasic mB-10"
-									value={this.state.pf}
-									onChange={ev => {
-										this.setState({ pf: ev.target.value });
-									}}
-								/>
-							</Col>
-						</Row>
-					</div>
-				)}
+				{this.props.geniee
+					? null
+					: <div>
+							<Row>
+								<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
+									<strong>Price Floor Key</strong>
+								</Col>
+								<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
+									<SelectBox
+										value={this.state.fpKey}
+										label="Select Floor Price Key"
+										showClear={false}
+										onChange={fpKey => {
+											this.setState({ fpKey });
+										}}
+									>
+										{priceFloorKeys.map((item, index) => (
+											<option key={item} value={item}>
+												{item}
+											</option>
+										))}
+									</SelectBox>
+								</Col>
+							</Row>
+							<Row className="mT-10">
+								<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
+									<strong>Price Floor</strong>
+								</Col>
+								<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
+									<input
+										type="text"
+										placeholder="Enter Price Floor"
+										className="inputBasic mB-10"
+										value={this.state.pf}
+										onChange={ev => {
+											this.setState({ pf: ev.target.value });
+										}}
+									/>
+								</Col>
+							</Row>
+						</div>}
 				{this.renderDynamicAllocation()}
 				{this.props.geniee ? null : this.renderIsBackwardCompatibleSizesToggleSwitch()}
 				{this.props.geniee ? this.renderDFPAdUnitIdSelectBox() : null}
 				{this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null}
 				{!this.props.geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
-				{!this.props.geniee ? (
-					<Row>
-						<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
-							<CustomToggleSwitch
-								labelText="Refresh Slot"
-								className="mB-10"
-								checked={this.state.refreshSlot}
-								onChange={val => {
-									this.setState({ refreshSlot: !!val });
-								}}
-								layout="horizontal"
-								size="m"
-								on="Yes"
-								off="No"
-								defaultLayout={this.props.fromPanel ? false : true}
-								name={this.props.id ? `refreshSlotSwitch-${this.props.id}` : 'refreshSlotSwitch'}
-								id={
-									this.props.id ? `js-refresh-slot-switch-${this.props.id}` : 'js-refresh-slot-switch'
-								}
-								customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
-							/>
-						</Col>
-					</Row>
-				) : null}
+				{!this.props.geniee && this.props.networkConfig && this.props.networkConfig.enableRefreshSlot
+					? <Row>
+							<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+								<CustomToggleSwitch
+									labelText="Refresh Slot"
+									className="mB-10"
+									checked={this.state.refreshSlot}
+									onChange={val => {
+										this.setState({ refreshSlot: !!val });
+									}}
+									layout="horizontal"
+									size="m"
+									on="Yes"
+									off="No"
+									defaultLayout={this.props.fromPanel ? false : true}
+									name={this.props.id ? `refreshSlotSwitch-${this.props.id}` : 'refreshSlotSwitch'}
+									id={
+										this.props.id
+											? `js-refresh-slot-switch-${this.props.id}`
+											: 'js-refresh-slot-switch'
+									}
+									customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+								/>
+							</Col>
+						</Row>
+					: null}
 				{this.renderAdvancedBlock()}
 				<div>{this.renderButtons(buttonType, showButtons, this.save, onCancel)}</div>
 			</div>
@@ -584,8 +572,7 @@ class AdpTags extends Component {
 	}
 
 	render() {
-		const renderBlocks = [],
-			isShowMultipleAdSize = !!(this.props.geniee && this.state.showMultipleAdSizesSelector);
+		const renderBlocks = [], isShowMultipleAdSize = !!(this.props.geniee && this.state.showMultipleAdSizesSelector);
 
 		if (this.state.advanced) {
 			renderBlocks.push(<div key={1}>{this.renderAdvanced()}</div>);

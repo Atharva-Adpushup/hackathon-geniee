@@ -10,22 +10,24 @@ import {
 	getZonesDataFromActiveVariation
 } from 'selectors/variationSelectors';
 import { getInsertMenuState } from 'selectors/uiSelectors';
+import { getNetworkConfig } from 'selectors/networkConfigSelector';
 import { sendMessage } from '../scripts/messengerHelper';
 import { messengerCommands } from '../consts/commonConsts';
 import { showNotification } from 'actions/uiActions';
 
 const mapStateToProps = state => {
-		const json = getInsertMenuState(state);
-		return {
-			...json,
-			customSizes: getCustomSizes(state),
-			partner: getPartner(state),
-			isCustomAdCodeInVariationAds: getCustomAdCodeFromActiveVariation(state),
-			variationId: getActiveChannelActiveVariationId(state),
-			channelId: getActiveChannelId(state),
-			zonesData: getZonesDataFromActiveVariation(state)
-		};
-	},
+	const json = getInsertMenuState(state);
+	return {
+		...json,
+		customSizes: getCustomSizes(state),
+		partner: getPartner(state),
+		isCustomAdCodeInVariationAds: getCustomAdCodeFromActiveVariation(state),
+		variationId: getActiveChannelActiveVariationId(state),
+		channelId: getActiveChannelId(state),
+		zonesData: getZonesDataFromActiveVariation(state),
+		networkConfig: getNetworkConfig(state)
+	};
+},
 	mapDispatchToProps = dispatch => ({
 		hideMenu: () => {
 			dispatch(hideMenu());
@@ -42,7 +44,4 @@ const mapStateToProps = state => {
 		showNotification: params => dispatch(showNotification(params))
 	});
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(InsertMenu);
+export default connect(mapStateToProps, mapDispatchToProps)(InsertMenu);

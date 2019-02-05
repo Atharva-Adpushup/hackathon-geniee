@@ -7,6 +7,7 @@ import sectionByIds from './sectionReducer';
 import ui from './uiReducer';
 import siteData from './siteReducer';
 import reporting from './reportingReducer';
+import networkConfig from './networkConfigReducer';
 
 export default combineReducers({
 	adByIds,
@@ -16,5 +17,6 @@ export default combineReducers({
 	siteData,
 	ui,
 	reporting,
+	networkConfig,
 	form: formReducer // key Name should be form only
 });

@@ -42,15 +42,15 @@ class AdElement extends Component {
 					isActive: !this.state.isActive
 				},
 				() =>
-					window.isSuperUser
+					(window.isSuperUser
 						? updateAd(ad.id, {
 								isActive: this.state.isActive,
 								archivedOn: +new Date()
-						  })
+							})
 						: modifyAdOnServer(ad.id, {
 								isActive: this.state.isActive,
 								archivedOn: +new Date()
-						  })
+							}))
 			);
 		}
 	}
@@ -76,7 +76,7 @@ class AdElement extends Component {
 	}
 
 	renderAdDetails() {
-		const { ad, updateAd } = this.props;
+		const { ad, updateAd, networkConfig } = this.props;
 		const isAMP = ad.formatData.type == 'amp';
 
 		let code = isAMP ? this.getAMPAdCode(ad) : adCode;
@@ -88,6 +88,7 @@ class AdElement extends Component {
 					ad={ad}
 					onCancel={this.toggleHandler.bind(null, 'showNetworkDetails')}
 					onSubmit={updateAd}
+					networkConfig={networkConfig}
 				/>
 			);
 		} else if (this.state.showEventDetails) {
@@ -122,9 +123,9 @@ class AdElement extends Component {
 		}
 		return (
 			<div key={`adDetails${ad.id}`}>
-				{window.isSuperUser && !this.state.isActive ? (
-					<Tags labels={['Archived']} labelClasses="custom-label" />
-				) : null}
+				{window.isSuperUser && !this.state.isActive
+					? <Tags labels={['Archived']} labelClasses="custom-label" />
+					: null}
 				{this.renderInformation('Id', ad.id)}
 				<p>
 					Name: <strong>{ad.name ? ad.name : `Ad-${ad.id}`}</strong>{' '}
@@ -141,36 +142,34 @@ class AdElement extends Component {
 				{this.renderInformation('Platform', makeFirstLetterCapitalize(ad.formatData.platform))}
 				{this.renderInformation(
 					'Type',
-					`${makeFirstLetterCapitalize(ad.formatData.type)} ${
-						ad.formatData.placement ? makeFirstLetterCapitalize(ad.formatData.placement) : ''
-					}`
+					`${makeFirstLetterCapitalize(ad.formatData.type)} ${ad.formatData.placement ? makeFirstLetterCapitalize(ad.formatData.placement) : ''}`
 				)}
 				{this.renderInformation(
 					'Size',
 					ad.width === 'responsive' ? makeFirstLetterCapitalize(ad.width) : `${ad.width}x${ad.height}`
 				)}
-				{window.isSuperUser ? (
-					<div>
-						{this.renderInformation(
-							'Network',
-							ad.network && ad.networkData ? ad.network.toUpperCase() : 'Not Set'
-						)}
-						{this.renderInformation('Status', ad.isActive ? 'Active' : 'Archived')}
-					</div>
-				) : null}
+				{window.isSuperUser
+					? <div>
+							{this.renderInformation(
+								'Network',
+								ad.network && ad.networkData ? ad.network.toUpperCase() : 'Not Set'
+							)}
+							{this.renderInformation('Status', ad.isActive ? 'Active' : 'Archived')}
+						</div>
+					: null}
 				<pre style={{ wordBreak: 'break-word' }}>{code}</pre>{' '}
-				{window.isSuperUser ? (
-					<div>
-						<CustomButton
-							label="Network Details"
-							handler={this.toggleHandler.bind(null, 'showNetworkDetails')}
-						/>
-						<CustomButton
-							label="Lazyload Settings"
-							handler={this.toggleHandler.bind(null, 'showLazyload')}
-						/>
-					</div>
-				) : null}
+				{window.isSuperUser
+					? <div>
+							<CustomButton
+								label="Network Details"
+								handler={this.toggleHandler.bind(null, 'showNetworkDetails')}
+							/>
+							<CustomButton
+								label="Lazyload Settings"
+								handler={this.toggleHandler.bind(null, 'showLazyload')}
+							/>
+						</div>
+					: null}
 				{!isAMP ? <CustomButton label="Copy Adcode" handler={copyToClipBoard.bind(null, code)} /> : null}
 			</div>
 		);

@@ -9,6 +9,7 @@ var path = require('path'),
 	mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
 	fs = Promise.promisifyAll(require('fs')),
 	AdPushupError = require('../../../helpers/AdPushupError'),
+	{ isValidThirdPartyDFPAndCurrency } = require('../../../helpers/commonFunctions'),
 	CC = require('../../../configs/commonConsts'),
 	generateADPTagsConfig = require('./generateADPTagsConfig'),
 	generateAdPushupConfig = require('./generateAdPushupConfig'),
@@ -143,13 +144,22 @@ module.exports = function(site, externalData = {}) {
 
 						case CC.SERVICES.HEADER_BIDDING:
 							serviceScript = serviceScript.substring(50, serviceScript.trim().length - 1);
+							const isValidHBConfig = !!(
+									serviceConfig &&
+									serviceConfig.hbcf.value &&
+									serviceConfig.hbcf.value.hbConfig &&
+									serviceConfig.hbAds.length
+								),
+								isValidCurrencyConfig = !!(
+									isValidHBConfig &&
+									serviceConfig.currency &&
+									Object.keys(serviceConfig.currency).length &&
+									serviceConfig.currency.adServerCurrency &&
+									serviceConfig.currency.granularityMultiplier &&
+									serviceConfig.currency.rates
+								);
 
-							if (
-								serviceConfig &&
-								serviceConfig.hbcf.value &&
-								serviceConfig.hbcf.value.hbConfig &&
-								serviceConfig.hbAds.length
-							) {
+							if (isValidHBConfig) {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', serviceScript);
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', serviceScript);
 
@@ -160,8 +170,22 @@ module.exports = function(site, externalData = {}) {
 									deviceConfig = '';
 								}
 
+								let prebidCurrencyConfig = serviceConfig.currency;
+								if (isValidCurrencyConfig) {
+									prebidCurrencyConfig = ',currency: ' + JSON.stringify(prebidCurrencyConfig);
+								} else {
+									prebidCurrencyConfig = '';
+								}
+
 								jsFile = _.replace(jsFile, '__SIZE_CONFIG__', deviceConfig);
+								jsFile = _.replace(jsFile, '__PREBID_CURRENCY_CONFIG__', prebidCurrencyConfig);
+
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__SIZE_CONFIG__', deviceConfig);
+								uncompressedJsFile = _.replace(
+									uncompressedJsFile,
+									'__PREBID_CURRENCY_CONFIG__',
+									prebidCurrencyConfig
+								);
 							} else {
 								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', '');
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', '');
@@ -231,9 +255,25 @@ module.exports = function(site, externalData = {}) {
 			) {
 				let { apConfigs, adpTagsConfig } = finalConfig,
 					gdpr = site.get('gdpr'),
-					{ incontentAds, hbAds } = incontentAndHbAds;
+					{ incontentAds, hbAds } = incontentAndHbAds,
+					isValidCurrencyConfig = isValidThirdPartyDFPAndCurrency(apConfigs),
+					computedPrebidCurrencyConfig = {};
+
+				if (isValidCurrencyConfig) {
+					computedPrebidCurrencyConfig = {
+						adServerCurrency: apConfigs.activeDFPCurrencyCode,
+						granularityMultiplier: Number(apConfigs.prebidGranularityMultiplier),
+						rates: {
+							USD: {
+								[apConfigs.activeDFPCurrencyCode]: Number(apConfigs.activeDFPCurrencyExchangeRate)
+							}
+						}
+					};
+				}
+
 				if (site.get('ampSettings')) apConfigs.ampSettings = site.get('ampSettings');
 				if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
+
 				jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
 				jsFile = _.replace(jsFile, /__SITE_ID__/g, site.get('siteId'));
 				jsFile = _.replace(jsFile, '__COUNTRY__', false);
@@ -245,7 +285,11 @@ module.exports = function(site, externalData = {}) {
 				var scripts = generateFinalInitScript(jsFile, uncompressedJsFile)
 					.addService(CC.SERVICES.INCONTENT_ANALYSER, incontentAds, incontentAnalyserScript)
 					.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsScript)
-					.addService(CC.SERVICES.HEADER_BIDDING, { hbcf, hbAds: hbAds.concat(hbAdsApTag) }, prebidScript)
+					.addService(
+						CC.SERVICES.HEADER_BIDDING,
+						{ hbcf, hbAds: hbAds.concat(hbAdsApTag), currency: computedPrebidCurrencyConfig },
+						prebidScript
+					)
 					.addService(CC.SERVICES.GDPR, gdpr)
 					.done();
 

@@ -1,7 +1,8 @@
 var config = require('../src/config'),
 	find = require('lodash.find'),
 	$ = require('../src/adp').$,
-	adp = require('../src/adp').adp;
+	adp = require('../src/adp').adp,
+	apConfig = adp.config;
 
 module.exports = {
 	hashCode: function(str) {
@@ -130,7 +131,7 @@ module.exports = {
 	getVariationId: function() {
 		try {
 			if (adp) {
-				var variationId = adp.config.selectedVariation;
+				var variationId = apConfig.selectedVariation;
 
 				if (variationId) {
 					return variationId;
@@ -141,7 +142,7 @@ module.exports = {
 	},
 	getPageGroup: function() {
 		if (adp) {
-			var pageGroup = adp.config.pageGroup;
+			var pageGroup = apConfig.pageGroup;
 
 			if (pageGroup) {
 				return pageGroup;
@@ -151,7 +152,7 @@ module.exports = {
 	},
 	getPlatform: function() {
 		if (adp) {
-			var platform = adp.config.platform;
+			var platform = apConfig.platform;
 
 			if (platform) {
 				return platform;
@@ -160,8 +161,8 @@ module.exports = {
 		return null;
 	},
 	getActiveDFPNetwork: function() {
-		if (adp && adp.config) {
-			return adp.config.activeDFPNetwork;
+		if (adp && apConfig) {
+			return apConfig.activeDFPNetwork;
 		}
 		return null;
 	},
@@ -220,5 +221,29 @@ module.exports = {
 		});
 
 		return collection;
+	},
+	isValidThirdPartyDFPAndCurrencyConfig: function(inputObject) {
+		var inputObject = inputObject || apConfig,
+			isActiveDFPNetwork = !!(inputObject.activeDFPNetwork && inputObject.activeDFPNetwork.length),
+			isActiveDFPCurrencyCode = !!(
+				inputObject.activeDFPCurrencyCode &&
+				inputObject.activeDFPCurrencyCode.length &&
+				inputObject.activeDFPCurrencyCode.length === 3 &&
+				inputObject.activeDFPCurrencyCode !== config.CURRENCY_CODES.USD
+			),
+			isPrebidGranularityMultiplier = !!(
+				inputObject.prebidGranularityMultiplier && Number(inputObject.prebidGranularityMultiplier)
+			),
+			isActiveDFPCurrencyExchangeRate = !!(
+				inputObject.activeDFPCurrencyExchangeRate && Number(inputObject.activeDFPCurrencyExchangeRate)
+			),
+			isValidResult = !!(
+				isActiveDFPNetwork &&
+				isActiveDFPCurrencyCode &&
+				isPrebidGranularityMultiplier &&
+				isActiveDFPCurrencyExchangeRate
+			);
+
+		return isValidResult;
 	}
 };
