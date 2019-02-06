@@ -3,6 +3,7 @@
 /* eslint-disable vars-on-top */
 /* eslint-disable no-var */
 const path = require('path');
+const apiRouter = require('./apiRouter');
 
 if (process.env.NODE_ENV !== 'production') {
 	var swaggerUi = require('swagger-ui-express');
@@ -14,8 +15,6 @@ if (process.env.NODE_ENV !== 'production') {
 	var webpackDevMiddleware = require('webpack-dev-middleware');
 	var webpackHotMiddleware = require('webpack-hot-middleware');
 }
-
-const userController = require('./userController');
 
 module.exports = function router(app) {
 	if (process.env.NODE_ENV !== 'production') {
@@ -33,8 +32,8 @@ module.exports = function router(app) {
 		app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 	}
 
-	// API Conrollers
-	app.use('/api/user', userController);
+	// API Router
+	app.use('/api', apiRouter);
 
 	// React Catch All Route
 	app.use((req, res) => {

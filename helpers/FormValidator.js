@@ -40,6 +40,10 @@ module.exports = {
 									}
 									break;
 								}
+							case 'isEmail':
+								if (!validator.isEmail(json[key], rule.value))
+									errors.push({ message: rule.message, status: rule.status });
+								break;
 						}
 					}
 				});
