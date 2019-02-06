@@ -20,14 +20,14 @@ const Routes = () => (
 	<Suspense fallback={<Loader />}>
 		<Switch>
 			<Route exact path="/" render={() => <Redirect to="/dashboard" />} />
-			<Route exact path="/dashboard" component={Dashboard} />
-			<Route exact path="/sites" component={Sites} />
-			<Route exact path="/reporting" component={Reporting} />
-			<Route exact path="/byodPanel" component={ByodPanel} />
-			<Route exact path="/adsTxtManagement" component={AdsTxtManagement} />
-			<Route exact path="/addSite" component={AddNewSite} />
-			<Route exact path="/payment" component={Payment} />
-			<Route exact path="/paymentSettings" component={PaymentSettings} />
+			<Route exact path="/dashboard" render={() => <Dashboard />} />
+			<Route exact path="/sites" render={() => <Sites />} />
+			<Route exact path="/reporting" render={() => <Reporting />} />
+			<Route exact path="/byodPanel" render={() => <ByodPanel />} />
+			<Route exact path="/adsTxtManagement" render={() => <AdsTxtManagement />} />
+			<Route exact path="/addSite" render={() => <AddNewSite />} />
+			<Route exact path="/payment" render={() => <Payment />} />
+			<Route exact path="/paymentSettings" render={() => <PaymentSettings />} />
 		</Switch>
 	</Suspense>
 );
