@@ -16,7 +16,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import Sidebar from '../Components/Shell/Sidebar';
-import '../scss/index.scss';
 
 library.add(
 	faBars,
