@@ -15,6 +15,7 @@ const Payment = lazy(() => import(/* webpackChunkName: "payment" */ './Pages/Pay
 const PaymentSettings = lazy(() =>
 	import(/* webpackChunkName: "paymentSettings" */ './Pages/PaymentSettings')
 );
+// const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/index'));
 
 const Routes = () => (
 	<Suspense fallback={<Loader />}>
@@ -28,6 +29,7 @@ const Routes = () => (
 			<Route exact path="/addSite" render={() => <AddNewSite />} />
 			<Route exact path="/payment" render={() => <Payment />} />
 			<Route exact path="/paymentSettings" render={() => <PaymentSettings />} />
+			{/* <Route exact path="/:siteId/ap-tag" render={() => <ApTag />} /> */}
 		</Switch>
 	</Suspense>
 );
