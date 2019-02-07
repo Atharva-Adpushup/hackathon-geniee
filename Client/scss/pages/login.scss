@@ -1,0 +1,75 @@
+@import '../shared/authShell/index';
+
+.LoginForm {
+	padding: 0 35px;
+	margin: 25px 0;
+	.input-group-addon {
+		@extend LoginInputFields;
+		border: 0;
+		padding: 0 13px;
+		font-size: $LPFormIconSize;
+	}
+	.form-control {
+		@extend LoginInputFields;
+		border: 2px solid $LPFormBorderColor;
+		font-size: $LPFormInputSize;
+		box-shadow: none;
+		&:focus {
+			border-color: $LPFormBorderFocusColor;
+			box-shadow: none;
+		}
+	}
+	.forgetPassword {
+		text-decoration: underline;
+		font-weight: bold;
+		color: $primaryColor;
+		padding-top: $LPForgetPassPadTop;
+		display: block;
+		font-size: $LPForgetPassFontSize;
+	}
+	.btn-lightBg {
+		padding: $LPFormButtonPaddingTB $LPFormButtonPaddingLR;
+		margin-top: $LPFormButtonMarginTop;
+		font-size: 14px;
+	}
+	.form-groupnew {
+		font-size: 14px;
+		.labelheadmain {
+			color: $fontColor;
+			font-size: $LPFormInputSize;
+			font-weight: normal;
+			padding: 7px 10px 0 0;
+		}
+		.radio,
+		.checkbox {
+			padding-left: 10px;
+			color: $LPFormColor;
+		}
+		&.borTop {
+			border-top: 1px dashed $LPFormBorderColor;
+		}
+	}
+	select {
+		border-radius: 0 !important;
+	}
+}
+.LoginFooter {
+	padding: $LPFooterPadding;
+	background: $MBCHeadBg;
+	font-size: $LPFormInputSize;
+	margin: 0;
+	a {
+		margin-left: $LPFooterTextMarginL;
+		padding: $LPFooterTextPadTB $LPFooterTextPadLR;
+	}
+	[class*='col-'] {
+		button,
+		a {
+			width: 100%;
+		}
+	}
+	.label--text-faded {
+		margin-top: $FMLayoutDimension * 2;
+		font-size: 0.7em;
+	}
+}

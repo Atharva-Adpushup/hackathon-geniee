@@ -1,7 +1,15 @@
 import React, { Suspense, lazy } from 'react';
-import { Route, Redirect, Switch } from 'react-router-dom';
+import { Router, Route, Redirect, Switch } from 'react-router-dom';
 
+import history from './helpers/history';
+import PublicOnlyRoute from './Components/PublicOnlyRoute';
+import PrivateRoute from './Components/PrivateRoute';
+import authService from './services/authService';
 import Loader from './Components/Loader';
+import Shell from './Components/Shell';
+
+import Login from './Pages/Login';
+import Signup from './Pages/Signup';
 
 const Dashboard = lazy(() => import(/* webpackChunkName: "dashboard" */ './Pages/Dashboard'));
 const Sites = lazy(() => import(/* webpackChunkName: "sites" */ './Pages/Sites'));
@@ -16,20 +24,35 @@ const PaymentSettings = lazy(() =>
 	import(/* webpackChunkName: "paymentSettings" */ './Pages/PaymentSettings')
 );
 
-const Routes = () => (
-	<Suspense fallback={<Loader />}>
-		<Switch>
-			<Route exact path="/" render={() => <Redirect to="/dashboard" />} />
-			<Route exact path="/dashboard" render={() => <Dashboard />} />
-			<Route exact path="/sites" render={() => <Sites />} />
-			<Route exact path="/reporting" render={() => <Reporting />} />
-			<Route exact path="/byodPanel" render={() => <ByodPanel />} />
-			<Route exact path="/adsTxtManagement" render={() => <AdsTxtManagement />} />
-			<Route exact path="/addSite" render={() => <AddNewSite />} />
-			<Route exact path="/payment" render={() => <Payment />} />
-			<Route exact path="/paymentSettings" render={() => <PaymentSettings />} />
-		</Switch>
-	</Suspense>
+const UserRoutes = () => (
+	<Router history={history}>
+		<Suspense fallback={<Loader />}>
+			<Switch>
+				{/* Public Routes */}
+				<Route
+					exact
+					path="/"
+					render={() =>
+						authService.isLoggedin() ? <Redirect to="/dashboard" /> : <Redirect to="/login" />
+					}
+				/>
+				<PublicOnlyRoute exact path="/login" component={Login} />
+				<PublicOnlyRoute exact path="/signup" component={Signup} />
+
+				{/* Private Routes */}
+				<Shell>
+					<PrivateRoute exact path="/dashboard" component={Dashboard} />
+					<PrivateRoute exact path="/sites" component={Sites} />
+					<PrivateRoute exact path="/reporting" component={Reporting} />
+					<PrivateRoute exact path="/byodPanel" component={ByodPanel} />
+					<PrivateRoute exact path="/adsTxtManagement" component={AdsTxtManagement} />
+					<PrivateRoute exact path="/addSite" component={AddNewSite} />
+					<PrivateRoute exact path="/payment" component={Payment} />
+					<PrivateRoute exact path="/paymentSettings" component={PaymentSettings} />
+				</Shell>
+			</Switch>
+		</Suspense>
+	</Router>
 );
 
-export default Routes;
+export default UserRoutes;

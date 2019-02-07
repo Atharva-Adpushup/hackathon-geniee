@@ -1,6 +1,11 @@
 @import 'shared/colors';
 @import 'shared/variables';
+@import 'helpers/mixins';
 @import 'shared/base';
 @import 'shared/mixin';
-@import 'shared/layout/index';
 @import 'shared/loader/index';
+
+@import 'shared/shell/index';
+
+// Auth Pages
+@import './pages/login';
