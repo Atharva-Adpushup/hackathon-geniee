@@ -8,6 +8,27 @@ var utils = require('../libs/utils'),
 	ads = [],
 	intervals = [],
 	refreshAd = function (container, ad) {
+		if (utils.checkElementInViewPercent(container)) {
+			if (ad.network === commonConsts.NETWORKS.ADPTAGS && !ad.networkData.headerBidding) {
+				var slot = getAdpSlot(ad);
+				refreshGPTSlot(slot.gSlot);
+				sendFeedback(ad);
+			} else if (ad.network !== commonConsts.NETWORKS.ADPTAGS) {
+				container.children().remove();
+				container.append(adCodeGenerator.generateAdCode(ad));
+				sendFeedback(ad);
+			}
+		}
+	},
+	getAdpSlot = function (ad) {
+		var adSize = ad.width + 'X' + ad.height,
+			siteId = 37902, //adp.config.siteId,
+			slotId = 'ADP_' + siteId + '_' + adSize + '_' + ad.id,
+			adpSlots = adp.adpTags.adpSlots,
+			slot = adpSlots[slotId];
+		return slot;
+	},
+	sendFeedback = function (ad) {
 		var feedbackData = {
 			ads: [],
 			xpathMiss: [],
@@ -16,14 +37,13 @@ var utils = require('../libs/utils'),
 			referrer: adp.config.referrer,
 			tracking: false
 		};
-		if (utils.isElementInViewport(container) && ad.network !== commonConsts.NETWORKS.ADPTAGS) {
-			container.children().remove();
-			container.append(adCodeGenerator.generateAdCode(ad));
-			feedbackData.xpathMiss = [];
-			feedbackData.ads = [ad.id];
-			feedbackData.variationId = adp.config.selectedVariation;
-			utils.sendFeedback(feedbackData);
-		}
+		feedbackData.xpathMiss = [];
+		feedbackData.ads = [ad.id];
+		feedbackData.variationId = adp.config.selectedVariation;
+		utils.sendFeedback(feedbackData);
+	},
+	refreshGPTSlot = function (gSlot) {
+		googletag.pubads().refresh([gSlot]);
 	},
 	setAdInterval = function (container, ad) {
 		var refreshInterval = setInterval(refreshAd, commonConsts.AD_REFRESH_INTERVAL, container, ad);
@@ -43,7 +63,9 @@ var utils = require('../libs/utils'),
 		});
 		w.adpushup.$(w).on('focus', function () {
 			for (var i = 0; i < ads.length; i++) {
-				var adContainer = $.extend({}, ads[i]), container = adContainer.container, ad = adContainer.ad;
+				var adContainer = $.extend({}, ads[i]),
+					container = adContainer.container,
+					ad = adContainer.ad;
 				refreshAd(container, ad);
 				setAdInterval(container, ad);
 			}
