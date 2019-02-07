@@ -20,7 +20,7 @@
       content: '';
       @include border-radius(50%);
       border: $LOSpinBeforeBorderWid solid $whiteColor;
-      border-top-color: $primary-color;
+      border-top-color: $primaryColor;
       @include animation(spinner .7s linear infinite);
       z-index:5;
     }

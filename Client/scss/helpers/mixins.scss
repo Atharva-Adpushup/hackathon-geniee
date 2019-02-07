@@ -1,0 +1,272 @@
+/* ADDS A BROWSER PREFIX TO THE PROPERTY */
+@mixin css3-prefix($property, $value) {
+	-webkit-#{$property}: #{$value};
+	-khtml-#{$property}: #{$value};
+	-moz-#{$property}: #{$value};
+	-ms-#{$property}: #{$value};
+	-o-#{$property}: #{$value};
+	#{$property}: #{$value};
+}
+
+/* ADD SAME BORDER TO MULTIPLE SIDES */
+@mixin bordersStyle($style, $sides...) {
+	@if length($sides) == 0 {
+		border: $style;
+	} @else {
+		@each $side in $sides {
+			border-#{$side}: $style;
+		}
+	}
+}
+
+/* BORDER RADIUS */
+@mixin border-radius($radius) {
+	@include css3-prefix('border-radius', $radius);
+}
+
+@mixin border-radius-separate(
+	$topLeftRadius,
+	$topRightRadius,
+	$bottomLeftRadius,
+	$bottomRightRadius
+) {
+	-webkit-border-top-left-radius: $topLeftRadius;
+	-webkit-border-top-right-radius: $topRightRadius;
+	-webkit-border-bottom-right-radius: $bottomRightRadius;
+	-webkit-border-bottom-left-radius: $bottomLeftRadius;
+
+	-moz-border-radius-topleft: $topLeftRadius;
+	-moz-border-radius-topright: $topRightRadius;
+	-moz-border-radius-bottomright: $bottomRightRadius;
+	-moz-border-radius-bottomleft: $bottomLeftRadius;
+
+	border-top-left-radius: $topLeftRadius;
+	border-top-right-radius: $topRightRadius;
+	border-bottom-right-radius: $bottomRightRadius;
+	border-bottom-left-radius: $bottomLeftRadius;
+}
+
+/* BOX SHADOW */
+@mixin box-shadow($top, $left, $blur, $spread, $color, $inset: false) {
+	@if $inset {
+		@include css3-prefix('box-shadow', inset $top $left $blur $spread $color);
+	} @else {
+		@include css3-prefix('box-shadow', $top $left $blur $spread $color);
+	}
+}
+
+@mixin box-shadow1(
+	$top,
+	$left,
+	$blur,
+	$spread,
+	$color,
+	$top1,
+	$left1,
+	$blur1,
+	$spread1,
+	$color1,
+	$inset: false
+) {
+	@if $inset {
+		-webkit-box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1 inset;
+		-moz-box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1 inset;
+		-ms-box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1 inset;
+		-o-box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1 inset;
+		box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1 inset;
+	} @else {
+		-webkit-box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1;
+		-moz-box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1;
+		-ms-box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1;
+		-o-box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1;
+		box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1;
+	}
+}
+
+@mixin box-shadow2(
+	$top,
+	$left,
+	$blur,
+	$spread,
+	$color,
+	$top1,
+	$left1,
+	$blur1,
+	$spread1,
+	$color1,
+	$inset: false
+) {
+	@if $inset {
+		-webkit-box-shadow: $top $left $blur $spread $color inset, $top1 $left1 $blur1 $spread1 $color1;
+		-moz-box-shadow: $top $left $blur $spread $color inset, $top1 $left1 $blur1 $spread1 $color1;
+		-ms-box-shadow: $top $left $blur $spread $color inset, $top1 $left1 $blur1 $spread1 $color1;
+		-o-box-shadow: $top $left $blur $spread $color inset, $top1 $left1 $blur1 $spread1 $color1;
+		box-shadow: $top $left $blur $spread $color inset, $top1 $left1 $blur1 $spread1 $color1;
+	} @else {
+		-webkit-box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1;
+		-moz-box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1;
+		-ms-box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1;
+		-o-box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1;
+		box-shadow: $top $left $blur $spread $color, $top1 $left1 $blur1 $spread1 $color1;
+	}
+}
+
+/* TEXT SHADOW */
+@mixin text-shadow($x, $y, $blur, $color) {
+	text-shadow: $x $y $blur $color;
+}
+
+/* OPACITY */
+@mixin opacity($opacity) {
+	$opacityMultiplied: ($opacity * 100);
+
+	filter: alpha(opacity=$opacityMultiplied);
+	-ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=' + $opacityMultiplied + ')';
+	@include css3-prefix('opacity', $opacity);
+}
+/* KEYFRAMES */
+@mixin keyframes($animation-name) {
+	@-webkit-keyframes #{$animation-name} {
+		@content;
+	}
+	@-moz-keyframes #{$animation-name} {
+		@content;
+	}
+	@-ms-keyframes #{$animation-name} {
+		@content;
+	}
+	@-o-keyframes #{$animation-name} {
+		@content;
+	}
+	@keyframes #{$animation-name} {
+		@content;
+	}
+}
+
+/* ANIMATION */
+@mixin animation($str) {
+	@include css3-prefix('animation', $str);
+}
+@mixin animation-name($name) {
+	@include css3-prefix('animation-name', $name);
+}
+@mixin animation-duration($duration) {
+	@include css3-prefix('animation-duration', $duration);
+}
+@mixin animation-timing-function($x1, $y1, $x2, $y2) {
+	@include css3-prefix('animation-timing-function', cubic-bezier($x1, $y1, $x2, $y2));
+}
+
+/* TRANSFORM */
+@mixin transform($transform) {
+	@include css3-prefix('transform', $transform);
+}
+
+/* TRANSITION */
+@mixin transition($transition-property, $transition-time, $method) {
+	-webkit-transition: $transition-property $transition-time $method;
+	-moz-transition: $transition-property $transition-time $method;
+	-ms-transition: $transition-property $transition-time $method;
+	-o-transition: $transition-property $transition-time $method;
+	transition: $transition-property $transition-time $method;
+}
+
+/* BACKGROUND GRADIENT */
+@mixin background-gradient($startColor: #3c3c3c, $endColor: #999999) {
+	background-color: $startColor;
+	background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		from($startColor),
+		to($endColor)
+	);
+	background-image: -webkit-linear-gradient(top, $startColor, $endColor);
+	background-image: -moz-linear-gradient(top, $startColor, $endColor);
+	background-image: -ms-linear-gradient(top, $startColor, $endColor);
+	background-image: -o-linear-gradient(top, $startColor, $endColor);
+	background-image: linear-gradient(top, $startColor, $endColor);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#{$startColor}', endColorStr='#{$endColor}');
+}
+
+/* BACKGROUND HORIZONTAL */
+@mixin background-horizontal($startColor: #3c3c3c, $endColor: #999999) {
+	background-color: $startColor;
+	background-image: -webkit-gradient(linear, left top, right top, from($startColor), to($endColor));
+	background-image: -webkit-linear-gradient(left, $startColor, $endColor);
+	background-image: -moz-linear-gradient(left, $startColor, $endColor);
+	background-image: -ms-linear-gradient(left, $startColor, $endColor);
+	background-image: -o-linear-gradient(left, $startColor, $endColor);
+	background-image: linear-gradient(left, $startColor, $endColor);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#{$startColor}', endColorStr='#{$endColor}', gradientType='1');
+}
+
+/* BACKGROUND RADIAL */
+@mixin background-radial($startColor: #ffffff, $startPos: 0%, $endColor: #000000, $endPos: 100%) {
+	background: -moz-radial-gradient(center, ellipse cover, $startColor $startPos, $endColor $endPos);
+	background: -webkit-gradient(
+		radial,
+		center center,
+		0px,
+		center center,
+		100%,
+		color-stop($startPos, $startColor),
+		color-stop($endPos, $endColor)
+	);
+	background: -webkit-radial-gradient(
+		center,
+		ellipse cover,
+		$startColor $startPos,
+		$endColor $endPos
+	);
+	background: -o-radial-gradient(center, ellipse cover, $startColor $startPos, $endColor $endPos);
+	background: -ms-radial-gradient(center, ellipse cover, $startColor $startPos, $endColor $endPos);
+	background: radial-gradient(ellipse at center, $startColor $startPos, $endColor $endPos);
+}
+
+/*User Select */
+@mixin no-select($userSelect) {
+	@include css3-prefix('user-select', $userSelect);
+}
+
+/* Flex */
+@mixin flex($f1, $f2, $f3) {
+	@include css3-prefix('flex', $f1 $f2 $f3);
+}
+
+// @include translate(0, 0);
+@mixin translate($x, $y) {
+	-webkit-transform: translate($x, $y);
+	-moz-transform: translate($x, $y);
+	-ms-transform: translate($x, $y);
+	-o-transform: translate($x, $y);
+	transform: translate($x, $y);
+}
+
+// @include translate3d(0, 0, 0);
+@mixin translate3d($x, $y, $z) {
+	-webkit-transform: translate3d($x, $y, $z);
+	-moz-transform: translate3d($x, $y, $z);
+	-ms-transform: translate3d($x, $y, $z);
+	-o-transform: translate3d($x, $y, $z);
+	transform: translate3d($x, $y, $z);
+}
+
+//@include perspective(1000);
+@mixin perspective($value: 1000) {
+	@include css3-prefix('perspective', $value);
+}
+
+@mixin box-sizing($box-model) {
+	@include css3-prefix('box-sizing', $box-model);
+}
+
+@mixin shadow {
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), -1px 0 0 rgba(0, 0, 0, 0.03),
+		1px 0 0 rgba(0, 0, 0, 0.03), 0 1px 0 rgba(0, 0, 0, 0.12);
+}
+
+@mixin block-ui {
+	background: $CVABgColor;
+	border: 1px solid $borderColor;
+}
