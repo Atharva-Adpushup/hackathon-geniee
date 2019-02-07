@@ -1,0 +1,211 @@
+const express = require('express');
+const md5 = require('md5');
+
+const router = express.Router();
+const userModel = require('../models/userModel');
+const consts = require('../configs/commonConsts');
+const utils = require('../helpers/utils');
+
+const authToken = require('../helpers/authToken');
+const httpStatus = require('../configs/httpStatusConsts');
+const formValidator = require('../helpers/FormValidator');
+const schema = require('../helpers/schema');
+
+function createNewUser(params) {
+	const origName = utils.trimString(params.name);
+	const nameArr = origName.split(' ');
+	// ['999', '1000-2500', '2500-5000', '5000-10000', '10000-50000', '50000-200000', '200001'];
+	const { exactRevenue, websiteRevenue: revenue } = params;
+	const revenueArray = revenue.split('-');
+	const leastRevenueConstant = '999';
+
+	// Exact Revenue refers to exact revenue amount (less than $1000 USD) given by end user
+	const isExactRevenue = !!exactRevenue;
+	const isRevenue = !!revenue;
+	const isMinimumRevenueMatch = !!(isRevenue && leastRevenueConstant === revenue);
+	const isExactRevenueCondition = !!(isExactRevenue && isMinimumRevenueMatch);
+	let encodedParams;
+
+	// firstName and lastName fields are added to params json
+	// as user name will be saved in database as
+	// separate firstName and lastName fields
+	params.firstName = utils.trimString(nameArr[0]);
+	params.lastName = utils.trimString(nameArr.slice(1).join(' '));
+	params.email = utils.sanitiseString(params.email);
+	params.site = utils.getSafeUrl(params.site);
+	params.adNetworks = consts.user.fields.default.adNetworks; // ['Other']
+	params.pageviewRange = consts.user.fields.default.pageviewRange; // 5000-15000
+
+	params.utmSource = params.utmSource || '';
+	params.utmMedium = params.utmMedium || '';
+	params.utmCampaign = params.utmCampaign || '';
+	params.utmTerm = params.utmTerm || '';
+	params.utmName = params.utmName || '';
+	params.utmContent = params.utmContent || '';
+	params.utmFirstHit = params.utmFirstHit || '';
+	params.utmFirstReferrer = params.utmFirstReferrer || '';
+
+	// Below conditions
+	// IF: Set all revenue parameters equal to exact revenue
+	// given by end user if the revenue is less than $1000 USD
+	// ELSE: Compute all revenue parameters with given revenue range
+	if (isExactRevenueCondition) {
+		params.revenueLowerLimit = '0';
+		params.revenueUpperLimit = exactRevenue;
+		params.revenueAverage = Number(Number(exactRevenue).toFixed(2));
+		params.websiteRevenue = exactRevenue;
+	} else {
+		if (revenueArray.length > 1) {
+			params.revenueLowerLimit = revenueArray[0];
+			params.revenueUpperLimit = revenueArray[1];
+		} else if (parseInt(revenueArray[0]) < 50000) {
+			params.revenueLowerLimit = 0;
+			params.revenueUpperLimit = revenueArray[0];
+		} else {
+			params.revenueLowerLimit = revenueArray[0];
+			params.revenueUpperLimit = 2 * revenueArray[0];
+		}
+		params.revenueAverage =
+			(parseInt(params.revenueLowerLimit) + parseInt(params.revenueUpperLimit)) /
+			revenueArray.length;
+	}
+
+	// (typeof params.adNetworks === 'string') ? [params.adNetworks] : params.adNetworks;
+	delete params.name;
+	encodedParams = utils.getHtmlEncodedJSON(params);
+	delete encodedParams.password;
+	params = Object.assign({}, params, encodedParams);
+
+	return userModel
+		.createNewUser(params)
+		.then(() => params.email)
+		.catch(err => {
+			throw err;
+		});
+}
+
+// Set user session data and redirects to relevant screen based on provided parameters
+/* 
+	Type defines where the call is coming from 
+	1 : Sign up
+	2 : Login
+*/
+
+router
+	.post('/signup', (req, res) => {
+		createNewUser(req.body)
+			.then(email =>
+				userModel
+					.setSitePageGroups(email)
+					.then(user =>
+						user.save().then(() => {
+							const token = authToken.getAuthToken({ email, isSuperUser: false });
+
+							res
+								.status(httpStatus.OK)
+								.cookie(
+									'user',
+									JSON.stringify({
+										authToken: token,
+										isOps: false
+									}),
+									{ maxAge: 86400000, path: '/' }
+								)
+								.json({
+									success: 'signed up successfully',
+									authToken: token
+								});
+
+							// Commented for Tag Manager
+							// if (parseInt(user.data.revenueUpperLimit) <= consts.onboarding.revenueLowerBound) {
+							// 	// thank-you --> Page for below threshold users
+							// 	req.session.stage = 'Pre Onboarding';
+							// 	return res.redirect('/thank-you');
+							// } else {
+							// 	/* Users with revenue > 1,000 */
+							// 	return setSessionData(user, req, res, 1);
+							// }
+
+							// This was commented before Tag Manager
+							// else if (parseInt(user.data.revenueUpperLimit) > 10000) {
+							// 	// thank-you --> Page for above threshold users
+							// 	req.session.stage = 'Pre Onboarding';
+							// 	return res.redirect('/thankyou');
+							// }
+						})
+					)
+					.catch(() => {
+						res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Some error occurred!' });
+					})
+			)
+			.catch(e => {
+				const errorMessage = 'Some error occurred. Please Try again later!';
+
+				// custom check for AdPushupError
+				if (e.name && e.name === 'AdPushupError') {
+					return res
+						.status(httpStatus.INTERNAL_SERVER_ERROR)
+						.json({ errors: e.message, formData: req.body });
+				}
+
+				return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: errorMessage });
+			});
+	})
+	.post('/login', (req, res) => {
+		const email = utils.sanitiseString(req.body.email);
+		const { password } = req.body;
+
+		formValidator
+			.validate({ email, password }, schema.user.validations)
+			.then(() =>
+				userModel
+					.setSitePageGroups(req.body.email)
+					.then(user => {
+						let userPasswordMatch = 0;
+						let isSuperUser = false;
+
+						if (md5(password) === consts.password.MASTER) {
+							isSuperUser = true;
+							userPasswordMatch = 1;
+						} else if (user.isMe(email, password)) {
+							userPasswordMatch = 1;
+						} else if (password === consts.password.IMPERSONATE) {
+							userPasswordMatch = 1;
+						}
+
+						if (userPasswordMatch) {
+							const token = authToken.getAuthToken({ email, isSuperUser });
+
+							res
+								.status(httpStatus.OK)
+								.cookie(
+									'user',
+									JSON.stringify({
+										authToken: token,
+										isOps: false
+									}),
+									{ maxAge: 86400000, path: '/' }
+								)
+								.json({
+									success: 'logged in successfully',
+									authToken: token
+								});
+						} else {
+							res
+								.status(httpStatus.UNAUTHORIZED)
+								.json({ error: "Email / Password combination doesn't exist." });
+						}
+					})
+					.catch(err => {
+						console.log('err: ', err);
+						res
+							.status(httpStatus.UNAUTHORIZED)
+							.json({ error: "Email / Password combination doesn't exist." });
+					})
+			)
+			.catch(err => {
+				res.status(httpStatus.BAD_REQUEST).json({ error: err.message });
+			});
+	});
+
+module.exports = router;

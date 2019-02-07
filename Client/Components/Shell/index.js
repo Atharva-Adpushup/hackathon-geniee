@@ -4,12 +4,7 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 
 class Shell extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			isSidebarOpen: true
-		};
-	}
+	state = { isSidebarOpen: true };
 
 	sidebarToggle = () => {
 		this.setState(state => ({ isSidebarOpen: !state.isSidebarOpen }));

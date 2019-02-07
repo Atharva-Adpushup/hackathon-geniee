@@ -24,41 +24,50 @@
 			}
 		}
 	}
+
+	%list-active-state {
+		position: relative;
+		background: rgba(#000, 0.03);
+		color: $primary-color;
+		&::after {
+			content: '';
+			position: absolute;
+			top: 0;
+			right: calc(100% - 7px);
+			bottom: 0;
+			left: 0;
+			background: $primary-color;
+		}
+		.sb-nav-icon-wrap {
+			color: $primary-color;
+		}
+	}
+
 	.sb-nav {
 		padding-left: 0;
 		margin-bottom: 0;
-		li {
-			list-style: none;
-			text-transform: uppercase;
+
+		a {
+			display: block;
+			color: inherit;
+			&:focus,
 			&:hover {
-				position: relative;
-				background: rgba(#000, 0.03);
-				color: $primary-color;
-				&::after {
-					content: '';
-					position: absolute;
-					top: 0;
-					right: calc(100% - 7px);
-					bottom: 0;
-					left: 0;
-					background: $primary-color;
-				}
-				.sb-nav-icon-wrap {
-					color: $primary-color;
-				}
+				text-decoration: none;
 			}
-			a {
-				display: block;
+
+			li {
+				list-style: disc;
 				padding: 15px;
 				padding-right: 20px;
-				color: inherit;
-				&:focus,
+				text-transform: uppercase;
+
 				&:hover {
-					text-decoration: none;
+					@extend %list-active-state;
 				}
+
 				.link-text-wrap {
 					position: absolute;
-					width: 100%;
+					width: calc(100% - 30px);
 					overflow: hidden;
 					transition: width $sidebar-transition-style $sidebar-transition-duration;
 					.link-text {
@@ -73,6 +82,10 @@
 					font-size: 1.2em;
 					color: lighten($text-color, 10%);
 				}
+			}
+
+			&.active li {
+				@extend %list-active-state;
 			}
 		}
 
