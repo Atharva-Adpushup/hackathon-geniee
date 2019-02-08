@@ -1,5 +1,7 @@
 import clipboard from 'clipboard-polyfill';
+
 const deferred = $.Deferred();
+
 function makeFirstLetterCapitalize(word) {
 	return word.charAt(0).toUpperCase() + word.slice(1).replace(/([A-Z])/g, ' $1');
 }
@@ -13,7 +15,7 @@ function getData(url, data) {
 }
 function getInitData() {
 	return getData('/tagManager/networkConfig').then(networkConfig => {
-		deferred.resolve({ global: { networkConfig: networkConfig } });
+		deferred.resolve({ global: { networkConfig } });
 		return deferred.promise();
 	});
 }

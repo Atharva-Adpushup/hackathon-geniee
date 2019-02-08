@@ -1,29 +1,30 @@
-const express = require('express'),
-	Promise = require('bluebird'),
-	_ = require('lodash'),
-	uuid = require('uuid'),
-	moment = require('moment'),
-	{ couchbaseService } = require('node-utils'),
-	request = require('request-promise'),
-	config = require('../configs/config'),
-	utils = require('../helpers/utils'),
-	{ sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions'),
-	{ docKeys, tagManagerInitialDoc, videoNetworkInfo } = require('../configs/commonConsts'),
-	adpushup = require('../helpers/adpushupEvent'),
-	siteModel = require('../models/siteModel'),
-	router = express.Router(),
-	couchbase = require('../helpers/couchBaseService'),
-	appBucket = couchbaseService(
-		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
-		config.couchBase.DEFAULT_BUCKET,
-		config.couchBase.DEFAULT_USER_NAME,
-		config.couchBase.DEFAULT_USER_PASSWORD
-	);
+const express = require('express');
+const Promise = require('bluebird');
+const _ = require('lodash');
+const uuid = require('uuid');
+const moment = require('moment');
+const { couchbaseService } = require('node-utils');
+const request = require('request-promise');
+const config = require('../configs/config');
+const utils = require('../helpers/utils');
+const HTTP_STATUS = require('../configs/httpStatusConsts');
+const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
+const { docKeys, tagManagerInitialDoc, videoNetworkInfo } = require('../configs/commonConsts');
+const adpushup = require('../helpers/adpushupEvent');
+const siteModel = require('../models/siteModel');
+
+const appBucket = couchbaseService(
+	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
+	config.couchBase.DEFAULT_BUCKET,
+	config.couchBase.DEFAULT_USER_NAME,
+	config.couchBase.DEFAULT_USER_PASSWORD
+);
+const router = express.Router();
 
 const fn = {
 	isSuperUser: false,
 	sendDataToZapier: data => {
-		let options = {
+		const options = {
 			method: 'GET',
 			uri: 'https://hooks.zapier.com/hooks/catch/547126/cdt7p8/?',
 			json: true
@@ -34,11 +35,11 @@ const fn = {
 		options.uri = options.uri.slice(0, -1);
 
 		return request(options)
-			.then(response => console.log('Ad Creation. Called made to Zapier'))
-			.catch(err => console.log('Ad creation call to Zapier failed'));
+			.then(() => console.log('Ad Creation. Called made to Zapier'))
+			.catch(err => console.log(`Ad creation call to Zapier failed, err message : ${err.message}`));
 	},
 	createNewDocAndDoProcessing: payload => {
-		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
+		const tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
 		return appBucket
 			.createDoc(`${docKeys.apTag}${payload.siteId}`, tagManagerDefault, {})
 			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
@@ -48,21 +49,21 @@ const fn = {
 			});
 	},
 	processing: (data, payload) => {
-		let cas = data.cas || false,
-			value = data.value || data,
-			id = uuid.v4(),
-			networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {},
-			ad = {
-				...payload.ad,
-				id: id,
-				name: `Ad-${id}`,
-				createdOn: +new Date(),
-				formatData: {
-					...payload.ad.formatData,
-					eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
-				},
-				...networkInfo
-			};
+		const cas = data.cas || false;
+		const value = data.value || data;
+		const id = uuid.v4();
+		const networkInfo = payload.ad.formatData.type === 'video' ? videoNetworkInfo : {};
+		const ad = {
+			...payload.ad,
+			id,
+			name: `Ad-${id}`,
+			createdOn: +new Date(),
+			formatData: {
+				...payload.ad.formatData,
+				eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
+			},
+			...networkInfo
+		};
 
 		value.ads.push(ad);
 		value.siteDomain = value.siteDomain || payload.siteDomain;
@@ -84,20 +85,21 @@ const fn = {
 
 		return Promise.resolve([cas, value, id, payload.siteId]);
 	},
-	getAndUpdate: (key, value, adId) => {
-		return appBucket.getDoc(key).then(result => appBucket.updateDoc(key, value, result.cas).then(() => adId));
-	},
+	getAndUpdate: (key, value, adId) =>
+		appBucket
+			.getDoc(key)
+			.then(result => appBucket.updateDoc(key, value, result.cas).then(() => adId)),
 	directDBUpdate: (key, value, cas, adId) => appBucket.updateDoc(key, value, cas).then(() => adId),
 	dbWrapper: (cas, value, adId, siteId) => {
 		const key = `${docKeys.apTag}${siteId}`;
 		return !cas ? fn.getAndUpdate(key, value, adId) : fn.directDBUpdate(key, value, cas, adId);
 	},
-	errorHander: (err, res) => {
+	errorHander: (err, res, code = HTTP_STATUS.BAD_REQUEST) => {
 		console.log(err);
-		return sendErrorResponse({ message: 'Opertion Failed' }, res);
+		return sendErrorResponse({ message: 'Opertion Failed' }, res, code);
 	},
-	adUpdateProcessing: (req, res, processing) => {
-		return appBucket
+	adUpdateProcessing: (req, res, processing) =>
+		appBucket
 			.getDoc(`${docKeys.apTag}${req.body.siteId}`)
 			.then(docWithCas => processing(docWithCas))
 			.then(() => siteModel.getSiteById(req.body.siteId))
@@ -110,8 +112,7 @@ const fn = {
 					res
 				);
 			})
-			.catch(err => fn.errorHander(err, res));
-	}
+			.catch(err => fn.errorHander(err, res))
 };
 
 router
@@ -134,34 +135,28 @@ router
 					res
 				)
 			)
-			.catch(err => {
-				return err.code && err.code === 13 && err.message.includes('key does not exist')
+			.catch(err =>
+				err.code && err.code === 13 && err.message.includes('key does not exist')
 					? sendSuccessResponse(
 							{
 								ads: []
 							},
 							res
-						)
-					: fn.errorHander(err, res);
-			});
+					  )
+					: fn.errorHander(err, res)
+			);
 	})
-	.get('/networkConfig', (req, res) => {
-		return couchbase
-			.connectToAppBucket()
-			.then(function(appBucket) {
-				return appBucket.getAsync('data::apNetwork');
-			})
-			.then(function(json) {
-				return res.json(json.value);
-			})
-			.catch(function(err) {
+	.get('/networkConfig', (req, res) =>
+		appBucket
+			.getDoc('data::apNetwork')
+			.then(json => res.json(json.value))
+			.catch(err => {
 				if (err.code === 13) {
 					throw new AdPushupError([{ status: 404, message: 'Doc does not exist' }]);
 				}
-
 				return res.json(err);
-			});
-	})
+			})
+	)
 	.get(['/', '/:siteId'], (req, res) => {
 		const { session, params } = req;
 
@@ -171,14 +166,14 @@ router
 
 		return siteModel
 			.getSiteById(params.siteId)
-			.then(site => {
-				return site.get('ownerEmail') != session.user.email
+			.then(site =>
+				site.get('ownerEmail') !== session.user.email
 					? res.render('404')
 					: res.render('tagManager', {
 							siteId: params.siteId,
 							isSuperUser: !!session.isSuperUser
-						});
-			})
+					  })
+			)
 			.catch(err => {
 				console.log(err.message);
 				return res.render('404');
@@ -196,21 +191,25 @@ router
 
 		fn.isSuperUser = req.session.isSuperUser;
 
-		let payload = { ad: req.body.ad, siteId: req.body.siteId, ownerEmail: req.session.user.email };
+		const payload = {
+			ad: req.body.ad,
+			siteId: req.body.siteId,
+			ownerEmail: req.session.user.email
+		};
 		return appBucket
 			.getDoc(`${docKeys.apTag}${req.body.siteId}`)
 			.then(docWithCas => fn.processing(docWithCas, payload))
-			.catch(err => {
-				return err.name && err.name == 'CouchbaseError' && err.code == 13
+			.catch(err =>
+				err.name && err.name === 'CouchbaseError' && err.code === 13
 					? fn.createNewDocAndDoProcessing(payload)
-					: Promise.reject(err);
-			})
+					: Promise.reject(err)
+			)
 			.spread(fn.dbWrapper)
 			.then(id =>
 				sendSuccessResponse(
 					{
 						message: 'Ad created',
-						id: id
+						id
 					},
 					res
 				)
@@ -227,7 +226,9 @@ router
 			);
 		}
 		return fn.adUpdateProcessing(req, res, docWithCas => {
-			let doc = docWithCas.value, { siteId, siteDomain } = req.body;
+			const doc = docWithCas.value;
+
+			const { siteId, siteDomain } = req.body;
 
 			if (doc.ownerEmail != req.session.user.email) {
 				return Promise.reject('Owner verfication fail');
@@ -235,7 +236,7 @@ router
 			if (!doc.ads.length) {
 				doc.ads = req.body.ads;
 			} else {
-				let newAds = [];
+				const newAds = [];
 
 				_.forEach(doc.ads, adFromDoc => {
 					_.forEach(req.body.ads, adFromClient => {
@@ -267,12 +268,12 @@ router
 			);
 		}
 		return fn.adUpdateProcessing(req, res, docWithCas => {
-			let doc = docWithCas.value;
-			if (doc.ownerEmail != req.session.user.email) {
-				return Promise.reject('Owner verfication fail');
+			const doc = docWithCas.value;
+			if (doc.ownerEmail !== req.session.user.email) {
+				return Promise.reject(new Error('Owner verfication fail'));
 			}
 			_.forEach(doc.ads, (ad, index) => {
-				if (ad.id == req.body.adId) {
+				if (ad.id === req.body.adId) {
 					doc.ads[index] = { ...ad, ...req.body.data };
 					return false;
 				}

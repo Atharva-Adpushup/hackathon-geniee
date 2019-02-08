@@ -23,7 +23,7 @@ const Payment = lazy(() => import(/* webpackChunkName: "payment" */ './Pages/Pay
 const PaymentSettings = lazy(() =>
 	import(/* webpackChunkName: "paymentSettings" */ './Pages/PaymentSettings')
 );
-// const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/index'));
+const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/index'));
 
 const Routes = () => (
 	<Router history={history}>
@@ -50,6 +50,7 @@ const Routes = () => (
 					<PrivateRoute exact path="/addSite" component={AddNewSite} />
 					<PrivateRoute exact path="/payment" component={Payment} />
 					<PrivateRoute exact path="/paymentSettings" component={PaymentSettings} />
+					<PrivateRoute exact path="/:siteId/ap-tag" component={ApTag} />
 				</Shell>
 			</Switch>
 		</Suspense>

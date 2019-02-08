@@ -1,17 +1,9 @@
 import React, { Component } from 'react';
 import { Row, Col, ProgressBar } from 'react-bootstrap';
-import CustomList from './CustomList.jsx';
-import {
-	PLATFORMS,
-	TYPES,
-	SIZES,
-	displayAdMessage,
-	ampMessage,
-	interactiveAdMessage
-} from '../../configs/commonConsts';
+import CustomList from './CustomList';
+import { TYPES, SIZES, DISPLAY_AD_MESSAGE, AMP_MESSAGE, ADCODE } from '../../configs/commonConsts';
 import { copyToClipBoard } from '../../lib/helpers';
-import { CustomMessage, CustomButton } from '../shared/index.jsx';
-import { adCode, adCodeVideo } from '../../configs/commonConsts';
+import { CustomMessage, CustomButton } from '../shared/index';
 import Loader from '../../../../Components/Loader';
 
 class AdCodeGenerator extends Component {
@@ -39,8 +31,8 @@ class AdCodeGenerator extends Component {
 	selectPlatform(platform) {
 		this.setState({
 			platform,
-			size: platform == 'responsive' ? 'responsive' : null,
-			progress: platform == 'responsive' ? 75 : 50
+			size: platform === 'responsive' ? 'responsive' : null,
+			progress: platform === 'responsive' ? 75 : 50
 		});
 	}
 
@@ -54,19 +46,21 @@ class AdCodeGenerator extends Component {
 	}
 
 	selectSize(size) {
+		const { progress } = this.state;
 		this.setState({
 			size,
-			progress: this.state.progress > 75 ? this.state.progress : 75
+			progress: progress > 75 ? progress : 75
 		});
 	}
 
 	saveHandler() {
-		let isResponsive = this.state.size == 'responsive',
-			sizesArray = isResponsive ? 'responsive' : this.state.size.split('x'),
-			width = isResponsive ? 'responsive' : sizesArray[0],
-			height = isResponsive ? 'responsive' : sizesArray[1],
-			typeAndPlacement = this.state.type.split(/^([^A-Z]+)/);
-
+		const { createAd } = this.props;
+		const { type, platform, size } = this.state;
+		const isResponsive = size === 'responsive';
+		const sizesArray = isResponsive ? 'responsive' : size.split('x');
+		const width = isResponsive ? 'responsive' : sizesArray[0];
+		const height = isResponsive ? 'responsive' : sizesArray[1];
+		const typeAndPlacement = type.split(/^([^A-Z]+)/);
 		typeAndPlacement.shift();
 
 		this.setState(
@@ -75,7 +69,7 @@ class AdCodeGenerator extends Component {
 				loading: true
 			},
 			() =>
-				this.props.createAd({
+				createAd({
 					siteId: window.siteId,
 					ad: {
 						width,
@@ -85,15 +79,8 @@ class AdCodeGenerator extends Component {
 							isResponsive: !!(width === 'responsive')
 						},
 						formatData: {
-							platform: this.state.platform, // DESKTOP, MOBILE
-							type: this.state.type, // DISPLAY, NATIVE, AMP, LINK
-
-							// Setting for backward compatibility
-							event: null,
-							placement: null,
-							eventData: {
-								value: null
-							}
+							platform, // DESKTOP, MOBILE
+							type // DISPLAY, NATIVE, AMP, LINK
 						},
 						type: 3, // STRUCTURAL
 						css: {
@@ -108,6 +95,7 @@ class AdCodeGenerator extends Component {
 	}
 
 	resetHandler() {
+		const { resetCurrentAd } = this.props;
 		this.setState(
 			{
 				progress: 0,
@@ -116,25 +104,12 @@ class AdCodeGenerator extends Component {
 				size: null,
 				loading: false
 			},
-			() => this.props.resetCurrentAd()
+			() => resetCurrentAd()
 		);
 	}
 
-	// renderPlatformOptions() {
-	// 	return (
-	// 		<CustomList
-	// 			options={PLATFORMS}
-	// 			heading="Select Platform"
-	// 			subHeading="Device for which you want to show ads"
-	// 			onClick={this.selectPlatform}
-	// 			leftSize={3}
-	// 			rightSize={9}
-	// 			toMatch={this.state.platform}
-	// 		/>
-	// 	);
-	// }
-
 	renderTypeOptions() {
+		const { type } = this.state;
 		return (
 			<CustomList
 				options={TYPES}
@@ -143,12 +118,13 @@ class AdCodeGenerator extends Component {
 				onClick={this.selectType}
 				leftSize={3}
 				rightSize={9}
-				toMatch={this.state.type}
+				toMatch={type}
 			/>
 		);
 	}
 
 	renderSizes() {
+		const { size, platform, type } = this.state;
 		return (
 			<div>
 				<CustomList
@@ -156,13 +132,11 @@ class AdCodeGenerator extends Component {
 					subHeading="AdpPushup supports varied ad sizes"
 					leftSize={3}
 					rightSize={9}
-					toMatch={this.state.size}
-					platform={this.state.platform}
-					type={this.state.type}
+					toMatch={size}
+					platform={platform}
+					type={type}
 					tabbedList={{
-						allowed: SIZES[this.state.type.toUpperCase()]
-							? SIZES[this.state.type.toUpperCase()]['ALLOWED']
-							: [],
+						allowed: SIZES[type.toUpperCase()] ? SIZES[type.toUpperCase()].ALLOWED : [],
 						list: {
 							responsive: {
 								header: 'Responsive',
@@ -172,12 +146,12 @@ class AdCodeGenerator extends Component {
 							desktop: {
 								header: 'Desktop',
 								key: 'desktop',
-								options: SIZES[this.state.type.toUpperCase()][this.state.platform.toUpperCase()]
+								options: SIZES[type.toUpperCase()][platform.toUpperCase()]
 							},
 							mobile: {
 								header: 'Mobile',
 								key: 'mobile',
-								options: SIZES[this.state.type.toUpperCase()][this.state.platform.toUpperCase()]
+								options: SIZES[type.toUpperCase()][platform.toUpperCase()]
 							}
 						}
 					}}
@@ -188,33 +162,33 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
-	renderButton(label, handler) {
-		return (
-			<Row style={{ margin: '0px' }}>
-				<div
-					className="btn btn-lightBg btn-default"
-					style={{ float: 'right', minWidth: '200px', margin: '10px 10px 0px 0px' }}
-					onClick={handler}
-				>
-					{label}
-				</div>
-			</Row>
-		);
-	}
+	renderButton = (label, handler) => (
+		<Row style={{ margin: '0px' }}>
+			<div
+				className="btn btn-lightBg btn-default"
+				style={{ float: 'right', minWidth: '200px', margin: '10px 10px 0px 0px' }}
+				onClick={handler}
+			>
+				{label}
+			</div>
+		</Row>
+	);
 
 	renderGeneratedAdcode() {
-		const showAdCode = this.state.type == 'amp' ? false : true,
-			code = showAdCode ? adCode : null,
-			message = showAdCode ? displayAdMessage : ampMessage;
+		const { type } = this.state;
+		const { adId } = this.props;
+		const isDisplayAd = type !== 'amp';
+		const code = isDisplayAd ? ADCODE : null;
+		const message = isDisplayAd ? DISPLAY_AD_MESSAGE : AMP_MESSAGE;
 		return (
 			<Col xs={12}>
-				{showAdCode ? <pre>{code.replace(/__AD_ID__/g, this.props.adId).trim()}</pre> : null}
+				{isDisplayAd ? <pre>{code.replace(/__AD_ID__/g, adId).trim()}</pre> : null}
 				<CustomMessage header="Information" type="info" message={message} />
 				<CustomButton label="Create More Ads" handler={this.resetHandler} />
-				{showAdCode ? (
+				{isDisplayAd ? (
 					<CustomButton
 						label="Copy Adcode"
-						handler={copyToClipBoard.bind(null, code.replace(/__AD_ID__/g, this.props.adId))}
+						handler={() => copyToClipBoard(code.replace(/__AD_ID__/g, adId))}
 					/>
 				) : null}
 			</Col>
@@ -222,19 +196,20 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderMainContent() {
+		const { progress } = this.state;
+		const { codeGenerated } = this.props;
 		return (
 			<div>
 				<div className="progress-wrapper">
-					<ProgressBar striped active bsStyle="success" now={this.state.progress} />
+					<ProgressBar striped active bsStyle="success" now={progress} />
 				</div>
-				{this.props.codeGenerated ? (
+				{codeGenerated ? (
 					this.renderGeneratedAdcode()
 				) : (
 					<div>
-						{/* {this.renderPlatformOptions()} */}
 						{this.renderTypeOptions()}
-						{this.state.progress >= 50 ? this.renderSizes() : null}
-						{this.state.progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
+						{progress >= 50 ? this.renderSizes() : null}
+						{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
 					</div>
 				)}
 			</div>
@@ -242,9 +217,11 @@ class AdCodeGenerator extends Component {
 	}
 
 	render() {
+		const { loading } = this.state;
+		const { codeGenerated } = this.props;
 		return (
 			<Row className="options-wrapper">
-				{this.state.loading && !this.props.codeGenerated ? <Loader /> : this.renderMainContent()}
+				{loading && !codeGenerated ? <Loader /> : this.renderMainContent()}
 			</Row>
 		);
 	}

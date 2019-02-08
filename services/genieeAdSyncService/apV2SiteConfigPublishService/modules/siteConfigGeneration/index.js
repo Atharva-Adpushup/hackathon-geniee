@@ -118,7 +118,7 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 	 * 5. Concat ads from Tag manager to current adp.ads
 	 */
 	return appBucket
-		.getDoc(`${docKeys.tagManager}${site.get('siteId')}`)
+		.getDoc(`${docKeys.apTag}${site.get('siteId')}`)
 		.then(docWithCas => {
 			let logUnsyncedAds = [];
 

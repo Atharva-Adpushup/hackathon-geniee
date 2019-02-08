@@ -1,11 +1,12 @@
 //Sidebar
-$sidebar-width: 250px;
-$sidebar-transition-style: linear;
-$sidebar-transition-duration: 0.3s;
+$width: '$width';
+$sidebarWidth: 250px;
+$sidebarTransitionStyle: linear;
+$sidebarTransitionDuration: 0.3s;
 
 .sidebar {
 	position: relative;
-	transition: width $sidebarTransitionStyle $sidebarTransitionDuration;
+	transition: $width $sidebarTransitionStyle $sidebarTransitionDuration;
 	overflow: hidden;
 	flex-grow: 0;
 	&.sb-show {
