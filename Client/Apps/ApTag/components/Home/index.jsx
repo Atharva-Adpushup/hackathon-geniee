@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Nav, NavItem } from 'react-bootstrap';
-import ActionCard from '../../../../Components/ActionCard.jsx';
+import ActionCard from '../../../../Components/ActionCard/index';
 import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';
 import AdListContainer from '../../containers/AdListContainer';
-import AdsTxtConfig from './AdsTxtConfig.jsx';
-import InitCode from './InitCode.jsx';
+import AdsTxtConfig from './AdsTxtConfig';
+import InitCode from './InitCode';
 import { COMPONENT_TITLES } from '../../configs/commonConsts';
 
 class Home extends Component {
@@ -24,7 +24,9 @@ class Home extends Component {
 	}
 
 	renderContent() {
-		switch (this.state.activeNav) {
+		const { activeNav } = this.state;
+		switch (activeNav) {
+			default:
 			case 1:
 				return <InitCode {...this.props} />;
 			case 2:
@@ -37,9 +39,10 @@ class Home extends Component {
 	}
 
 	render() {
+		const { title, activeNav } = this.state;
 		return (
-			<ActionCard title={this.state.title}>
-				<Nav bsStyle="tabs" activeKey={this.state.activeNav} onSelect={this.handleNavSelect}>
+			<ActionCard title={title}>
+				<Nav bsStyle="tabs" activeKey={activeNav} onSelect={this.handleNavSelect}>
 					<NavItem eventKey={1}>AdPushup Header Code</NavItem>
 					<NavItem eventKey={2}>Ad code Generator</NavItem>
 					<NavItem eventKey={3}>Ads List</NavItem>
