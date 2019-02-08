@@ -1,6 +1,12 @@
+//Sidebar
+$width: '$width';
+$sidebarWidth: 250px;
+$sidebarTransitionStyle: linear;
+$sidebarTransitionDuration: 0.3s;
+
 .sidebar {
 	position: relative;
-	transition: width $sidebarTransitionStyle $sidebarTransitionDuration;
+	transition: $width $sidebarTransitionStyle $sidebarTransitionDuration;
 	overflow: hidden;
 	flex-grow: 0;
 	flex-shrink: 0;

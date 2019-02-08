@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { Nav, NavItem } from 'react-bootstrap';
 import ActionCard from '../../../../Components/ActionCard/index';
 import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';
-import AdListContainer from '../../containers/AdListContainer';
-import AdsTxtConfig from './AdsTxtConfig';
+// import AdListContainer from '../../containers/AdListContainer';
+// import AdsTxtConfig from './AdsTxtConfig';
 import InitCode from './InitCode';
 import { COMPONENT_TITLES } from '../../configs/commonConsts';
 
@@ -31,10 +31,10 @@ class Home extends Component {
 				return <InitCode {...this.props} />;
 			case 2:
 				return <AdCodeGeneratorContainer {...this.props} />;
-			case 3:
-				return <AdListContainer {...this.props} />;
-			case 4:
-				return <AdsTxtConfig {...this.props} />;
+			// case 3:
+			// 	return <AdListContainer {...this.props} />;
+			// case 4:
+			// 	return <AdsTxtConfig {...this.props} />;
 		}
 	}
 

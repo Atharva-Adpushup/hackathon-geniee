@@ -5,6 +5,7 @@ const Promise = require('bluebird'),
 	config = require('../configs/config'),
 	commonConsts = require('../configs/commonConsts'),
 	utils = require('./utils'),
+	httpStatus = require('../configs/httpStatusConsts'),
 	sqlReportingModule = require('../reports/default/adpTags/index'),
 	siteTopUrlsQuery = require('../reports/default/adpTags/queries/siteTopUrls'),
 	siteModeWiseTopUrlsQuery = require('../reports/default/adpTags/queries/siteModeWiseTopUrls'),
@@ -590,14 +591,14 @@ const Promise = require('bluebird'),
 			);
 		});
 	},
-	sendSuccessResponse = (response, res) => {
-		res.send({
+	sendSuccessResponse = (response, res, code = httpStatus.OK) => {
+		return res.status(code).send({
 			error: false,
 			data: response
 		});
 	},
-	sendErrorResponse = (response, res) => {
-		res.send({
+	sendErrorResponse = (response, res, code = httpStatus.BAD_REQUEST) => {
+		return res.status(code).send({
 			error: true,
 			data: response
 		});
