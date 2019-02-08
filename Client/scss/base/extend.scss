@@ -1,0 +1,14 @@
+/*****Generic extendable classes*****/
+iconStyle {
+	font: normal normal normal 14px/1 FontAwesome;
+	transform: translate(0, 0);
+	-webkit-font-smoothing: antialiased;
+	display: inline-block;
+	margin-right: 5px;
+}
+
+LoginInputFields {
+	@include border-radius(0);
+	color: $LPFormColor;
+	height: $LPFormInputHeight;
+}
