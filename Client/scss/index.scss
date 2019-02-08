@@ -4,8 +4,4 @@
 @import 'shared/base';
 @import 'shared/mixin';
 @import 'shared/loader/index';
-
-@import 'shared/shell/index';
-
-// Auth Pages
-@import './pages/login';
+@import 'shared/actionCard.scss';
