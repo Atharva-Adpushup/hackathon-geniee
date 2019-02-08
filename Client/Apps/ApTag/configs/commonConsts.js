@@ -192,10 +192,10 @@ emxdgt.com, 326, RESELLER, 1e1d41537f7cad7f
 google.com, pub-5995202563537249, RESELLER, f08c47fec0942fa0`;
 const INIT_CODE = `<script data-cfasync="false" type="text/javascript">(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/__SITE_ID__/adpushup.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);</script>`;
 const COMPONENT_TITLES = {
-	2: 'Create Ad Unit',
-	3: 'Ads List',
-	4: 'Ads Txt Config',
-	1: 'AdPushup Header Code'
+	1: 'Create Ad Unit',
+	2: 'Ads List'
+	// 4: 'Ads Txt Config',
+	// 1: 'AdPushup Header Code'
 };
 
 export {
