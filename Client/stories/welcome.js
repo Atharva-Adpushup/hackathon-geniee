@@ -3,43 +3,6 @@ import { storiesOf } from '@storybook/react';
 import { linkTo } from '@storybook/addon-links';
 
 import '../scss/index.scss';
+import Welcome from './Components/Welcome/index';
 
-storiesOf('Welcome', module).add('to AdPushup Storybook', () => (
-	<div className="container-fluid">
-		<h1>Welcome to AdPushup-Storybook</h1>
-		<p>An interactive UI development environment for new SPA.</p>
-
-		<div className="panel panel-primary u-margin-t4">
-			<div className="panel-heading">Table Of Contents</div>
-
-			<ul className="list-group">
-				<li className="list-group-item">
-					<div className="panel panel-info">
-						<div className="panel-heading">UI Style Guide</div>
-						<ul className="list-group">
-							<li className="list-group-item">Front-end naming convention</li>
-							<li className="list-group-item">Color Theme</li>
-							<li className="list-group-item">Typography</li>
-							<li className="list-group-item">Iconography</li>
-							<li className="list-group-item">
-								Utility classNames (Layout specific like Flexbox, Padding, Margin, Block level)
-							</li>
-						</ul>
-					</div>
-				</li>
-
-				<li className="list-group-item">
-					<div className="panel panel-info">
-						<div className="panel-heading">UI Components (React)</div>
-						<ul className="list-group">
-							<li className="list-group-item">Loader</li>
-							<li className="list-group-item">Sidebar</li>
-						</ul>
-					</div>
-				</li>
-
-				{/* <li className="list-group-item">Dapibus ac facilisis in</li> */}
-			</ul>
-		</div>
-	</div>
-));
+storiesOf('Welcome', module).add('to AdPushup Storybook', () => <Welcome />);

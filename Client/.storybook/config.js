@@ -5,6 +5,7 @@ import { withInfo } from '@storybook/addon-info';
 
 function loadStories() {
 	require('../stories/welcome');
+	require('../stories/styleGuide');
 	require('../stories/loader.js');
 	require('../stories/sidebar.js');
 }

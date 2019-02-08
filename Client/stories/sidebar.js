@@ -28,7 +28,7 @@ library.add(
 	faPlus
 );
 
-const stories = storiesOf('Sidebar', module);
+const stories = storiesOf('UI.Sidebar', module);
 
 stories.addDecorator(withKnobs);
 
