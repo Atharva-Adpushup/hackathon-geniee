@@ -1,0 +1,76 @@
+@import './variables';
+@import './extend';
+
+.aligner {
+	display: flex;
+	&.aligner--vCenter {
+		align-items: center;
+	}
+	&.aligner--hCenter {
+		justify-content: center;
+	}
+}
+
+.wrapper {
+	&.wrapper--page {
+		background: url('/assets/images/banner-bg.jpg') top left/cover;
+		height: 100%;
+		width: 100%;
+	}
+}
+
+.LoginWrap {
+	background: $LPBg;
+	@include border-radius($LPBorderRadius);
+	@include box-shadow(0, 0, 10px, 0, rgba(0, 0, 0, 0.22), false);
+	overflow: hidden;
+	width: 700px;
+
+	.LoginHead {
+		background: $primaryColor;
+		@include border-radius-separate($LPBorderRadius, $LPBorderRadius, 0, 0);
+		text-align: center;
+
+		> .LoginHead-logo {
+			background: url('/assets/images/logo-full.png') center center/35% no-repeat;
+			display: block;
+			padding: $FMLayoutDimension * 4;
+		}
+
+		h3 {
+			padding: $LPHeadPadding;
+			color: $whiteColor;
+			text-transform: uppercase;
+		}
+	}
+}
+
+.error-message {
+	display: block;
+	margin-top: $FMLayoutDimension;
+	text-align: left;
+	font-size: $LPErrorMessageFontSize;
+	line-height: 14px;
+	color: $LPErrorMessageColor;
+	&.top {
+		padding-left: $LPErrorMessageTopPadLeft;
+		margin: 0 0 $LPErrorMessageMargin 0;
+	}
+}
+.success-message {
+	display: block;
+	margin-top: $LPErrorMessageMargin;
+	text-align: left;
+	font-size: $LPErrorMessageFontSize;
+	line-height: 14px;
+	padding: 0 0 0 $LPErrorMessagePadLeft;
+	color: $LPSuccessMessageColor;
+	&.top {
+		padding-left: $LPErrorMessageTopPadLeft;
+		margin: 0 0 $LPErrorMessageMargin 0;
+	}
+	a {
+		color: $LPSuccessMessageColor;
+		text-decoration: underline;
+	}
+}

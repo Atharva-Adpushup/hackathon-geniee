@@ -1,10 +1,15 @@
+//Sidebar
+$sidebar-width: 250px;
+$sidebar-transition-style: linear;
+$sidebar-transition-duration: 0.3s;
+
 .sidebar {
 	position: relative;
-	transition: width $sidebar-transition-style $sidebar-transition-duration;
+	transition: width $sidebarTransitionStyle $sidebarTransitionDuration;
 	overflow: hidden;
 	flex-grow: 0;
 	&.sb-show {
-		width: $sidebar-width;
+		width: $sidebarWidth;
 	}
 	&.sb-hide {
 		width: 60px;
@@ -28,7 +33,7 @@
 	%list-active-state {
 		position: relative;
 		background: rgba(#000, 0.03);
-		color: $primary-color;
+		color: $primaryColor;
 		&::after {
 			content: '';
 			position: absolute;
@@ -36,10 +41,10 @@
 			right: calc(100% - 7px);
 			bottom: 0;
 			left: 0;
-			background: $primary-color;
+			background: $primaryColor;
 		}
 		.sb-nav-icon-wrap {
-			color: $primary-color;
+			color: $primaryColor;
 		}
 	}
 
@@ -69,10 +74,10 @@
 					position: absolute;
 					width: calc(100% - 30px);
 					overflow: hidden;
-					transition: width $sidebar-transition-style $sidebar-transition-duration;
+					transition: width $sidebarTransitionStyle $sidebarTransitionDuration;
 					.link-text {
 						display: block;
-						width: $sidebar-width;
+						width: $sidebarWidth;
 					}
 				}
 				.sb-nav-icon-wrap {
@@ -80,7 +85,7 @@
 					width: 20px;
 					text-align: center;
 					font-size: 1.2em;
-					color: lighten($text-color, 10%);
+					color: lighten($textColor, 10%);
 				}
 			}
 
@@ -105,7 +110,7 @@
 		.cta-btn {
 			text-align: center;
 			display: block;
-			background: $primary-color;
+			background: $primaryColor;
 			color: #fff;
 			text-decoration: none;
 			padding: 10px;
@@ -113,7 +118,7 @@
 			border-radius: 3px;
 			height: 34px;
 			&:hover {
-				background: darken($primary-color, 10%);
+				background: darken($primaryColor, 10%);
 			}
 			.cta-btn-txt-wrap {
 				position: absolute;
@@ -121,15 +126,15 @@
 				overflow: hidden;
 				top: 0;
 				left: 0;
-				transition: width $sidebar-transition-style $sidebar-transition-duration;
+				transition: width $sidebarTransitionStyle $sidebarTransitionDuration;
 				.cta-btn-text {
-					width: $sidebar-width - 30px;
+					width: $sidebarWidth - 30px;
 					padding: 7px;
 					display: block;
 				}
 			}
 			.cta-btn-icon {
-				transition: opacity $sidebar-transition-style $sidebar-transition-duration;
+				transition: opacity $sidebarTransitionStyle $sidebarTransitionDuration;
 				opacity: 0;
 			}
 		}

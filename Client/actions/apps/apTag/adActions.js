@@ -9,9 +9,7 @@ const createAd = params => (dispatch, getState) =>
 	}).then(response => {
 		if (response.error) {
 			return alert('Ad creation failed');
-			// dispatch({ type: uiActions.SET_CREATE_AD_ERROR, value: true });
 		}
-		// dispatch({ type: uiActions.SET_CREATE_AD_ERROR, value: false });
 		dispatch({ type: adActions.UPDATE_ADS_LIST, data: { ...params.ad, id: response.data.id } });
 		dispatch({ type: globalActions.SET_CURRENT_AD, currentAd: response.data.id });
 	});

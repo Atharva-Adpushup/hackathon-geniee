@@ -1,7 +1,13 @@
 @import 'shared/colors';
 @import 'shared/variables';
+@import 'helpers/mixins';
 @import 'shared/base';
 @import 'shared/mixin';
 @import 'shared/layout/index';
+@import 'shared/actionCard';
 @import 'shared/loader/index';
-@import 'shared/actionCard.scss';
+
+@import 'shared/shell/index';
+
+// Auth Pages
+@import './pages/login';
