@@ -8,29 +8,31 @@ class AdNetworkDetails extends Component {
 	}
 
 	submitHanlder(networkInfo) {
-		const { ad } = this.props,
-			dataObject = {
-				network: networkInfo.network,
-				networkData: ad.network == networkInfo.network
+		const { ad, onSubmit, onCancel } = this.props;
+		const dataObject = {
+			network: networkInfo.network,
+			networkData:
+				ad.network === networkInfo.network
 					? { ...ad.networkData, ...networkInfo.networkData }
 					: networkInfo.networkData
-			},
-			networkData = dataObject.networkData,
-			isMultipleAdSizes = !!(networkData && networkData.multipleAdSizes && networkData.multipleAdSizes.length);
-
+		};
+		const { networkData } = dataObject;
+		const isMultipleAdSizes = !!(
+			networkData &&
+			networkData.multipleAdSizes &&
+			networkData.multipleAdSizes.length
+		);
 		if (isMultipleAdSizes) {
 			dataObject.multipleAdSizes = networkData.multipleAdSizes.concat([]);
 		}
-
 		delete networkData.multipleAdSizes;
 		delete networkData.isBackwardCompatibleSizes;
-
-		this.props.onSubmit(ad.id, dataObject);
-		this.props.onCancel();
+		onSubmit(ad.id, dataObject);
+		onCancel();
 	}
 
 	render() {
-		const { ad, onSubmit, onCancel, networkConfig } = this.props;
+		const { ad, networkConfig, onCancel } = this.props;
 
 		return (
 			<NetworkOptions
