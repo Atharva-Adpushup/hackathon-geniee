@@ -3,12 +3,15 @@ import { createAd } from '../../../actions/apps/apTag/adActions';
 import { resetCurrentAd } from '../../../actions/apps/apTag/globalActions';
 import AdCodeGenerator from '../components/Home/AdCodeGenerator';
 
-const mapStateToProps = (state, ownProps) => ({
-	currentAd: state.global.currentAd,
-	codeGenerated: !!state.global.currentAd,
-	adId: state.global.currentAd,
-	...ownProps
-});
+const mapStateToProps = (state, ownProps) => {
+	const { apTag } = state.apps;
+	return {
+		currentAd: apTag.global.currentAd,
+		codeGenerated: !!apTag.global.currentAd,
+		adId: apTag.global.currentAd,
+		...ownProps
+	};
+};
 
 const mapDispatchToProps = dispatch => ({
 	createAd: payload => dispatch(createAd(payload)),
