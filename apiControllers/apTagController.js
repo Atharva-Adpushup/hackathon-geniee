@@ -230,8 +230,8 @@ router
 
 			const { siteId, siteDomain } = req.body;
 
-			if (doc.ownerEmail != req.session.user.email) {
-				return Promise.reject('Owner verfication fail');
+			if (doc.ownerEmail !== req.session.user.email) {
+				return Promise.reject(new Error('Owner verfication fail'));
 			}
 			if (!doc.ads.length) {
 				doc.ads = req.body.ads;
@@ -240,7 +240,7 @@ router
 
 				_.forEach(doc.ads, adFromDoc => {
 					_.forEach(req.body.ads, adFromClient => {
-						if (adFromDoc.id == adFromClient.id) {
+						if (adFromDoc.id === adFromClient.id) {
 							newAds.push({
 								...adFromDoc,
 								...adFromClient,
