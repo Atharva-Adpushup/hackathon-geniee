@@ -1,15 +1,14 @@
-import React, { Component, PropTypes } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
-import { networks, defaultPriceFloorKey, partners } from '../../../consts/commonConsts';
+import React, { Component } from 'react';
+import { Object } from 'es6-shim';
+import { NETWORKS, DEFAULT_PRICE_FLOOR_KEY, PARTNERS } from '../../../../configs/commonConsts';
 import CodeBox from '../codeBox';
-import SelectBox from '../select/select';
+import SelectBox from '../../../../../../Components/Selectbox/index';
 import AdpTags from './AdpTags';
 import Adsense from './Adsense';
 import MediaNet from './MediaNet';
 import OtherNetworks from './OtherNetworks';
 import AdX from './AdX';
 import SectionOptions from './sectionOptions';
-import { Object } from 'es6-shim';
 
 class NetworkOptions extends Component {
 	constructor(props) {
@@ -59,15 +58,15 @@ class NetworkOptions extends Component {
 	}
 
 	filterNetworks = () => {
-		const partnersList = partners.list;
+		const partnersList = PARTNERS.list;
 
-		const activeNetworks = networks.filter(network => !partnersList.includes(network));
+		const activeNetworks = NETWORKS.filter(network => !partnersList.includes(network));
 
 		if (window.isGeniee) {
 			const isGCFG = !!window.gcfg;
 			const isUSN = !!(isGCFG && Object.prototype.hasOwnProperty.call(window.gcfg, 'usn'));
-			const disabledNetworks = partners.geniee.networks.disabled;
-			const activeGenieeNetworks = networks.filter(network => !disabledNetworks.includes(network));
+			const disabledNetworks = PARTNERS.geniee.networks.disabled;
+			const activeGenieeNetworks = NETWORKS.filter(network => !disabledNetworks.includes(network));
 
 			// 'isUSN' refers to Geniee UI Access 'Select Network' flag
 			if (isUSN) {
@@ -103,8 +102,8 @@ class NetworkOptions extends Component {
 		const code = adExists && ad.network ? this.getCode() : false;
 		const pfKeyExists = isAdNetworkData && ad.networkData.keyValues && Object.keys(ad.networkData.keyValues).length;
 		const fpKey = pfKeyExists
-				? Object.keys(ad.networkData.keyValues).filter(key => key.match(/FP/g))[0] || defaultPriceFloorKey
-				: defaultPriceFloorKey;
+				? Object.keys(ad.networkData.keyValues).filter(key => key.match(/FP/g))[0] || DEFAULT_PRICE_FLOOR_KEY
+				: DEFAULT_PRICE_FLOOR_KEY;
 		const priceFloor = pfKeyExists ? ad.networkData.keyValues[fpKey] : 0;
 		const refreshSlot = isAdNetworkData && ad.networkData.refreshSlot
 				? ad.networkData.refreshSlot

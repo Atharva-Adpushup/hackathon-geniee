@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import NetworkOptions from '../../../../Editor/components/shared/networkOptions/NetworkOptions.jsx';
+import NetworkOptions from './NetworkOptions/index';
 
 class AdNetworkDetails extends Component {
 	constructor(props) {
