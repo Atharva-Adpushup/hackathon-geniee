@@ -50,7 +50,7 @@ const UserRoutes = () => (
 					<PrivateRoute exact path="/addSite" component={AddNewSite} />
 					<PrivateRoute exact path="/payment" component={Payment} />
 					<PrivateRoute exact path="/paymentSettings" component={PaymentSettings} />
-					<PrivateRoute exact path="/:siteId/ap-tag" component={ApTag} />
+					<PrivateRoute exact path="/ap-tag/:siteId" component={ApTag} />
 				</Shell>
 			</Switch>
 		</Suspense>
