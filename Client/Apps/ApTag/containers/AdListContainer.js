@@ -1,19 +1,26 @@
 import { connect } from 'react-redux';
-import { fetchAds, updateAd, modifyAdOnServer } from '../actions/adActions';
-import { masterSave } from '../actions/globalActions';
-import AdList from '../components/Home/AdList/index.jsx';
+import { fetchAds, updateAd, modifyAdOnServer } from '../../../actions/apps/apTag/adActions';
+import { masterSave } from '../../../actions/apps/apTag/globalActions';
+import AdList from '../components/Home/AdList/index';
 
-const mapStateToProps = (state, ownProps) => ({
-	loading: !state.ads.fetched,
-	ads: state.ads.content,
-	networkConfig: state.global.networkConfig,
-	...ownProps
-}),
-	mapDispatchToProps = dispatch => ({
-		fetchAds: payload => dispatch(fetchAds(payload)),
-		updateAd: (adId, payload) => dispatch(updateAd(adId, payload)),
-		modifyAdOnServer: (adId, payload) => dispatch(modifyAdOnServer(adId, payload)),
-		masterSave: siteId => dispatch(masterSave(siteId))
-	});
+const mapStateToProps = (state, ownProps) => {
+	const { apTag } = state.apps;
+	return {
+		loading: !apTag.ads.fetched,
+		ads: apTag.ads.content,
+		networkConfig: apTag.global.networkConfig,
+		...ownProps
+	};
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(AdList);
+const mapDispatchToProps = dispatch => ({
+	fetchAds: payload => dispatch(fetchAds(payload)),
+	updateAd: (adId, payload) => dispatch(updateAd(adId, payload)),
+	modifyAdOnServer: (adId, payload) => dispatch(modifyAdOnServer(adId, payload)),
+	masterSave: siteId => dispatch(masterSave(siteId))
+});
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(AdList);
