@@ -9,6 +9,7 @@ $sidebarTransitionDuration: 0.3s;
 	transition: $width $sidebarTransitionStyle $sidebarTransitionDuration;
 	overflow: hidden;
 	flex-grow: 0;
+	flex-shrink: 0;
 	&.sb-show {
 		width: $sidebarWidth;
 	}
