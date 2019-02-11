@@ -1,0 +1,12 @@
+.u-hide {
+	display: $none !important;
+}
+
+.u-cursor-pointer {
+	cursor: $cursorPointer !important;
+}
+
+.u-box-shadow-none {
+	-webkit-box-shadow: $none !important;
+	box-shadow: $none !important;
+}

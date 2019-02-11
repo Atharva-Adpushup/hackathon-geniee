@@ -1,0 +1,15 @@
+.u-text-uppercase {
+	text-transform: $textUppercase !important;
+}
+
+.u-text-bold {
+	font-weight: $textBold !important;
+}
+
+.u-text-underline {
+	text-decoration: $textUnderline !important;
+}
+
+.u-text-underline-none {
+	text-decoration: $none !important;
+}

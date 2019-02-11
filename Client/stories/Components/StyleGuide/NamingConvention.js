@@ -66,6 +66,12 @@ const NamingConvention = () => (
 					(For example, .button.is-hovered, .form-control.is-focused, .link.is-visited,
 					.link.is-active)
 				</pre>
+
+				<pre>
+					/***** JS HOOKS *****/ .js-ComponentSpecificClassName (For example, .js-slideout-menu,
+					.js-filter-selected-wrapper, .js-slideout-panel, .js-reports-wrapper, .js-filter-btn) -
+					Prefixed with js- for JS hooks
+				</pre>
 			</div>
 		</div>
 
@@ -75,9 +81,28 @@ const NamingConvention = () => (
 			</div>
 			<div className="panel-body">
 				<pre>
-					/***** JS HOOKS *****/ .js-ComponentSpecificClassName (For example, .js-slideout-menu,
-					.js-filter-selected-wrapper, .js-slideout-panel, .js-reports-wrapper, .js-filter-btn) -
-					Prefixed with js- for JS hooks
+					/***** padding *****/ .u-padding-(alignment/Dimension) (For example, .u-padding-t0,
+					.u-padding-5)
+				</pre>
+				<pre>
+					/***** margin *****/ .u-margin-(alignment/Dimension) (For example, .u-margin-t0,
+					.u-margin-5)
+				</pre>
+				<pre>
+					/***** text *****/ .u-text-(value) (For example, .u-text-uppercase, .u-text-underline)
+				</pre>
+				<pre>
+					/***** interaction *****/ .u-(property)/-(value) (For example, .u-cursor-pointer,
+					.u-box-shadow-none)
+				</pre>
+				<pre>
+					/***** boxModel *****/ .u-(property)/-(value) (For example, .u-width-full, .u-block,
+					.u-height-half)
+				</pre>
+				<pre>
+					/***** flexbox *****/ .u-aligner/--(modifier)/.aligner-item--/(modifier) (For example,
+					.aligner, .aligner--row, .aligner--wrap-reverse, .aligner--hSpaceBetween,
+					.aligner.aligner-item--growHalf)
 				</pre>
 			</div>
 		</div>
