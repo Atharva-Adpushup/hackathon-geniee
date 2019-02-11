@@ -116,10 +116,14 @@ router
 						computedJSON.channels = channels;
 						computedJSON.site = site.toClientJSON();
 						computedJSON.reporting = {};
-						return getNetworkConfigData().then(networkConfig => {
-							computedJSON.networkConfig = networkConfig;
-							return res.json(computedJSON);
-						});
+						return getNetworkConfigData()
+							.then(networkConfig => {
+								computedJSON.networkConfig = networkConfig;
+								return res.json(computedJSON);
+							})
+							.catch(() => {
+								return res.json(computedJSON);
+							});
 					});
 				},
 				function() {
