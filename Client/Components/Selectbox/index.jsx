@@ -67,7 +67,8 @@ class SelectBox extends Component {
 SelectBox.propTypes = {
 	id: PropTypes.string.isRequired,
 	onSelect: PropTypes.func.isRequired,
-	options: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.object])).isRequired,
+	options: PropTypes.arrayOf(PropTypes.shape({ name: PropTypes.string, value: PropTypes.string }))
+		.isRequired,
 	dropdownClassName: PropTypes.string,
 	wrapperClassName: PropTypes.string,
 	title: PropTypes.string,

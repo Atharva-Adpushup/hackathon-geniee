@@ -19,19 +19,19 @@
 	}
 }
 
-.LoginWrap {
+.AuthWrap {
 	background: $LPBg;
 	@include border-radius($LPBorderRadius);
 	@include box-shadow(0, 0, 10px, 0, rgba(0, 0, 0, 0.22), false);
 	overflow: hidden;
 	width: 700px;
 
-	.LoginHead {
+	.AuthHead {
 		background: $primaryColor;
 		@include border-radius-separate($LPBorderRadius, $LPBorderRadius, 0, 0);
 		text-align: center;
 
-		> .LoginHead-logo {
+		> .AuthHead-logo {
 			background: url('/assets/images/logo-full.png') center center/35% no-repeat;
 			display: block;
 			padding: $FMLayoutDimension * 4;
@@ -41,6 +41,23 @@
 			padding: $LPHeadPadding;
 			color: $whiteColor;
 			text-transform: uppercase;
+		}
+	}
+
+	.AuthFooter {
+		padding: $LPFooterPadding;
+		background: $MBCHeadBg;
+		font-size: $LPFormInputSize;
+		margin: 0;
+		a {
+			margin-left: $LPFooterTextMarginL;
+			padding: $LPFooterTextPadTB $LPFooterTextPadLR;
+		}
+		[class*='col-'] {
+			button,
+			a {
+				width: 100%;
+			}
 		}
 	}
 }
