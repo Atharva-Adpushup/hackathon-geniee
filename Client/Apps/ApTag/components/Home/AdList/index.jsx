@@ -11,7 +11,7 @@ class AdList extends Component {
 
 	render() {
 		const { loading, ads = [], masterSave, updateAd, modifyAdOnServer, networkConfig } = this.props;
-		const customStyle = window.isSuperUser ? { minHeight: '520px' } : { minHeight: '420px' };
+		const customStyle = window.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
 
 		if (loading) {
 			return (

@@ -71,8 +71,7 @@ body {
 }
 
 .section-list .section-list-item {
-	min-height: 420px;
-
+	min-height: 440px;
 	& {
 		padding: 20px 0px;
 		border: 1px solid lighten(#b2bec3, 5%);
@@ -240,4 +239,17 @@ body {
 	background: $primaryColor;
 	font-size: 14px;
 	padding: 5px;
+}
+.pd-b100 {
+	padding-bottom: 70px !important;
+}
+.mT-10 {
+	margin-top: 10px !important;
+}
+.mB-10 {
+	margin-bottom: 10px !important;
+}
+.networkOptionsRow .adpTag-wrapper .row {
+	margin-left: -15px !important;
+	margin-right: -15px !important;
 }

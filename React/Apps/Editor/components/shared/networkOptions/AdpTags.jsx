@@ -477,7 +477,7 @@ class AdpTags extends Component {
 			isGenieeEditableMode = !!(this.props.geniee && !isInsertMode);
 
 		return (
-			<div>
+			<div className="adpTag-wrapper">
 				{isGenieeEditableMode ? this.renderGenieeNote() : null}
 				{this.props.geniee
 					? null
