@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import { Col, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../lib/helpers';
 import { ADCODE, AMP_MESSAGE } from '../../../configs/commonConsts';
-import Edit from '../../shared/Edit';
 import { CustomButton } from '../../shared/index';
 import AdNetworkDetails from './AdNetworkDetails';
-import AdEventDetails from './AdEventDetails';
 import LazyLoadSettings from './LazyLoadSettings';
+import EditBox from '../../../../../Components/EditBox/index';
 import Tags from '../../../../../Components/Tags/index';
 
 class AdElement extends Component {
@@ -14,7 +13,6 @@ class AdElement extends Component {
 		super(props);
 		this.state = {
 			showNetworkDetails: false,
-			showEventDetails: false,
 			showLazyload: false,
 			editName: false,
 			isActive: Object.prototype.hasOwnProperty.call(props.ad, 'isActive')
@@ -68,7 +66,7 @@ class AdElement extends Component {
 
 	renderAdDetails() {
 		const { ad, updateAd, networkConfig } = this.props;
-		const { showEventDetails, showLazyload, showNetworkDetails, editName, isActive } = this.state;
+		const { showLazyload, showNetworkDetails, editName, isActive } = this.state;
 		const isAMP = ad.formatData.type === 'amp';
 
 		let code = isAMP ? this.getAMPAdCode(ad) : ADCODE;
@@ -83,36 +81,27 @@ class AdElement extends Component {
 					networkConfig={networkConfig}
 				/>
 			);
-		}
-		if (showEventDetails) {
-			// return (
-			// 	<AdEventDetails
-			// 		ad={ad}
-			// 		onCancel={() => this.toggleHandler('showEventDetails')}
-			// 		onSubmit={updateAd}
-			// 	/>
-			// );
 		} else if (editName) {
-			// return (
-			// 	<Edit
-			// 		label="Ad Name"
-			// 		name={`name-${ad.id}`}
-			// 		value={ad.name ? ad.name : `Ad-${ad.id}`}
-			// 		onSave={this.updateWrapper}
-			// 		onCancel={() => this.toggleHandler('editName')}
-			// 		leftSize={3}
-			// 		rightSize={9}
-			// 	/>
-			// );
+			return (
+				<EditBox
+					label="Ad Name"
+					name={`name-${ad.id}`}
+					value={ad.name ? ad.name : `Ad-${ad.id}`}
+					onSave={this.updateWrapper}
+					onCancel={() => this.toggleHandler('editName')}
+					leftSize={3}
+					rightSize={9}
+				/>
+			);
 		} else if (showLazyload) {
-			// return (
-			// 	<LazyLoadSettings
-			// 		checked={ad.enableLazyLoading}
-			// 		id={ad.id}
-			// 		changeHandler={payload => updateAd(ad.id, payload)}
-			// 		cancelHandler={() => this.toggleHandler('showLazyLoad')}
-			// 	/>
-			// );
+			return (
+				<LazyLoadSettings
+					checked={ad.enableLazyLoading}
+					id={ad.id}
+					changeHandler={payload => updateAd(ad.id, payload)}
+					cancelHandler={() => this.toggleHandler('showLazyLoad')}
+				/>
+			);
 		}
 		return (
 			<div key={`adDetails${ad.id}`}>

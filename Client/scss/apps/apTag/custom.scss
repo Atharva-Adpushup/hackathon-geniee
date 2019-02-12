@@ -127,35 +127,6 @@ body {
 	margin-right: 10px !important;
 }
 
-.custom-message {
-	padding: 10px;
-	margin: 0px 0px 10px 0px;
-	box-shadow: 0 0 0 1px rgba(34, 36, 38, 0.22) inset, 0 0 0 0 transparent;
-	background: #f8f8f9;
-	border-radius: 0.28571429rem;
-
-	&.info-text {
-		color: #000000;
-	}
-	&.error-text {
-		color: #c3272b;
-	}
-	&.success-text {
-		color: #006442;
-	}
-	h3 {
-		font-weight: bold;
-	}
-	hr {
-		color: #000000;
-		margin: 10px 0px;
-	}
-	p {
-		margin: 0px;
-		font-size: 14px;
-	}
-}
-
 .custom-btn {
 	display: inline;
 	float: right;

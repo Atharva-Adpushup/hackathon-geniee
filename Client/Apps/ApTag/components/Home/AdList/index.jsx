@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import AdElement from './AdElement';
-import { CustomButton, EmptyState } from '../../shared/index';
+import { CustomButton } from '../../shared/index';
+import Empty from '../../../../../Components/Empty/index';
 import Loader from '../../../../../Components/Loader';
 
 class AdList extends Component {
@@ -21,7 +22,7 @@ class AdList extends Component {
 			);
 		}
 		if (!ads.length) {
-			return <EmptyState message="Seems kind of empty here" />;
+			return <Empty message="Seems kind of empty here" />;
 		}
 		return (
 			<ul className="section-list row">

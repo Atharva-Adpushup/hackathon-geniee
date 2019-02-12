@@ -5,7 +5,7 @@ import history from '../../helpers/history';
 import AuthShell from '../../Components/AuthShell';
 import AuthFormWrap from '../../Components/AuthFormWrap';
 import FormInput from '../../Components/FormInput';
-import ApButton from '../../Components/ApButton';
+import CustomButton from '../../Components/CustomButton';
 import formValidator from '../../helpers/formValidator';
 import validationSchema from '../../helpers/validationSchema';
 import { signupAction } from '../../actions/userActions';
@@ -205,15 +205,15 @@ class Signup extends Component {
 									)}
 								</div>
 
-								<div className="col-md-6 u-padding-0">
-									<ApButton
+								<div className="col-md-6 pd-0">
+									<CustomButton
 										variant="primary"
 										type="submit"
 										id="signup-submit"
 										className="u-margin-0px btn btn-lightBg btn-red pull-right"
 									>
 										Create an account
-									</ApButton>
+									</CustomButton>
 								</div>
 							</div>
 						</div>
