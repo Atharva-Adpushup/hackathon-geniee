@@ -65,6 +65,11 @@ body {
 	}
 }
 
+.section-list {
+	margin: 20px 0px !important;
+	padding: 0px 10px;
+}
+
 .section-list .section-list-item {
 	min-height: 420px;
 
@@ -75,6 +80,7 @@ body {
 		margin-bottom: 20px;
 		position: relative;
 		font-size: 16px !important;
+		list-style: none;
 	}
 
 	&,

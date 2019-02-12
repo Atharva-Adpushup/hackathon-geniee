@@ -1,9 +1,10 @@
 @import '../../base/variables.scss';
 @import '../../base/colors.scss';
 @import '../../base/mixins.scss';
-// @import 'base/reset';
-// @import 'base/inputBox';
-// @import 'base/toggle';
+@import '../../shared/inputBox.scss';
+@import '../../shared/toggle.scss';
 @import '../../shared/selectbox.scss';
 @import '../../shared/tags.scss';
-@import './custom';
+@import '../../shared/codemirror.min.css';
+@import '../../shared/solarized.min.css';
+@import './custom.scss';

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Row, Col, Button, OverlayTrigger, Tooltip, Alert } from 'react-bootstrap';
-import CodeBox from '../codeBox';
 import { PRICE_FLOOR_KEYS, IAB_SIZES } from '../../../../configs/commonConsts';
-import SelectBox from '../select/select.js';
+import SelectBox from '../../../../../../Components/Selectbox/index';
 import CustomToggleSwitch from '../customToggleSwitch.jsx';
+import CodeBox from '../codeBox';
 import { getSupportedAdSizes } from '../../../../OpsPanel/lib/helpers';
 import MultipleAdSizeSelector from '../../outer/insertMenu/multipleAdSizeSelector.jsx';
 

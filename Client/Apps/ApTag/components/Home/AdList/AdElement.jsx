@@ -4,7 +4,7 @@ import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../lib/helpers
 import { ADCODE, AMP_MESSAGE } from '../../../configs/commonConsts';
 // import Edit from '../../shared/Edit';
 import { CustomButton } from '../../shared/index';
-// import AdNetworkDetails from './AdNetworkDetails';
+import AdNetworkDetails from './AdNetworkDetails';
 // import AdEventDetails from './AdEventDetails';
 // import LazyLoadSettings from './LazyLoadSettings';
 import Tags from '../../../../../Components/Tags/index';
@@ -75,15 +75,16 @@ class AdElement extends Component {
 		code = code ? code.replace(/__AD_ID__/g, ad.id) : null;
 
 		if (showNetworkDetails) {
-			// return (
-			// 	<AdNetworkDetails
-			// 		ad={ad}
-			// 		onCancel={() => this.toggleHandler('showNetworkDetails')}
-			// 		onSubmit={updateAd}
-			// 		networkConfig={networkConfig}
-			// 	/>
-			// );
-		} else if (showEventDetails) {
+			return (
+				<AdNetworkDetails
+					ad={ad}
+					onCancel={() => this.toggleHandler('showNetworkDetails')}
+					onSubmit={updateAd}
+					networkConfig={networkConfig}
+				/>
+			);
+		}
+		if (showEventDetails) {
 			// return (
 			// 	<AdEventDetails
 			// 		ad={ad}
@@ -157,7 +158,7 @@ class AdElement extends Component {
 					</div>
 				) : null}
 				<pre style={{ wordBreak: 'break-word' }}>{code}</pre>{' '}
-				{window.isSuperUser ? (
+				{window.isSuperUser || true ? (
 					<div>
 						<CustomButton
 							label="Network Details"

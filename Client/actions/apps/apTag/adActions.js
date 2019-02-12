@@ -15,12 +15,13 @@ const createAd = params => dispatch =>
 
 const fetchAds = params => dispatch =>
 	axiosInstance
-		.post('/apTag/fetchAds', params)
+		.get('/apTag/fetchAds', { params })
 		.then(response => {
+			const { data } = response.data;
 			if (response.error) {
 				return alert('Ad fetching failed');
 			}
-			dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: response.data.ads });
+			dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: data.ads });
 		})
 		.catch(err => console.log(err));
 

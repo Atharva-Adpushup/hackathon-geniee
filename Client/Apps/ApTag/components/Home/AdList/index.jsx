@@ -5,12 +5,12 @@ import Loader from '../../../../../Components/Loader';
 
 class AdList extends Component {
 	componentDidMount() {
-		const { loading, fetchAds } = this.props;
-		if (loading) fetchAds({ siteId: window.siteId });
+		const { loading, fetchAds, location } = this.props;
+		if (loading) fetchAds({ siteId: 1 });
 	}
 
 	render() {
-		const { loading, ads, masterSave, updateAd, modifyAdOnServer, networkConfig } = this.props;
+		const { loading, ads = [], masterSave, updateAd, modifyAdOnServer, networkConfig } = this.props;
 		const customStyle = window.isSuperUser ? { minHeight: '520px' } : { minHeight: '420px' };
 
 		if (loading) {
@@ -24,7 +24,7 @@ class AdList extends Component {
 			return <EmptyState message="Seems kind of empty here" />;
 		}
 		return (
-			<ul className="section-list row" style={{ margin: '20px 0px' }}>
+			<ul className="section-list row">
 				{window.isSuperUser ? (
 					<div>
 						<CustomButton

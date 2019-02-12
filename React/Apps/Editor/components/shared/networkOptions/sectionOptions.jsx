@@ -1,8 +1,9 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Row, Col, Button } from 'react-bootstrap';
-import SelectBox from '../select/select';
-import CodeBox from '../codeBox';
 import requiredIf from 'react-required-if';
+import SelectBox from '../select/index.js';
+import CodeBox from '../codeBox';
 import AdpTags from './AdpTags.jsx';
 
 const positions = ['Unknown', 'Header', 'Under the article/column', 'Sidebar', 'Footer'];
@@ -56,11 +57,14 @@ class sectionOptions extends React.Component {
 			dfpAdUnitObject: isZonesData ? props.zonesData.reduce(getUniqItems, {}) : {}
 		};
 		const isValidZoneIdArray = !!(
-				this.state.zoneIdUniqArray &&
-				this.state.zoneIdUniqArray.length &&
-				this.state.zoneIdUniqArray[0]
-			),
-			isValidDFPAdUnitObject = !!(this.state.dfpAdUnitObject && Object.keys(this.state.dfpAdUnitObject).length);
+			this.state.zoneIdUniqArray &&
+			this.state.zoneIdUniqArray.length &&
+			this.state.zoneIdUniqArray[0]
+		);
+
+		const isValidDFPAdUnitObject = !!(
+			this.state.dfpAdUnitObject && Object.keys(this.state.dfpAdUnitObject).length
+		);
 
 		if (!isValidZoneIdArray) {
 			this.state.zoneIdUniqArray = [];
@@ -77,8 +81,9 @@ class sectionOptions extends React.Component {
 	}
 
 	submitHandler(networkData) {
-		const state = this.state,
-			props = this.props;
+		const state = this.state;
+
+		const props = this.props;
 
 		if (!state.zoneId) {
 			props.showNotification({
@@ -89,13 +94,16 @@ class sectionOptions extends React.Component {
 			return;
 		}
 
-		const isZoneIdReused = !!state.selectedZoneId,
-			isDFPAdUnitIdReused = !!(networkData && networkData.dfpAdunitId),
-			shouldCreateZoneContainerId = isZoneIdReused || isDFPAdUnitIdReused;
-		let dfpAdUnitData = isDFPAdUnitIdReused
-				? props.zonesData.filter(object => object.dfpAdunit == networkData.dfpAdunitId)[0]
-				: {},
-			isValidDFPAdUnitData = !!(dfpAdUnitData && Object.keys(dfpAdUnitData).length);
+		const isZoneIdReused = !!state.selectedZoneId;
+
+		const isDFPAdUnitIdReused = !!(networkData && networkData.dfpAdunitId);
+
+		const shouldCreateZoneContainerId = isZoneIdReused || isDFPAdUnitIdReused;
+		const dfpAdUnitData = isDFPAdUnitIdReused
+			? props.zonesData.filter(object => object.dfpAdunit == networkData.dfpAdunitId)[0]
+			: {};
+
+		const isValidDFPAdUnitData = !!(dfpAdUnitData && Object.keys(dfpAdUnitData).length);
 
 		shouldCreateZoneContainerId ? (networkData.createZoneContainerId = true) : null;
 		isValidDFPAdUnitData ? delete dfpAdUnitData.zoneId : null;
@@ -105,7 +113,7 @@ class sectionOptions extends React.Component {
 			...dfpAdUnitData
 		};
 
-		let toSend = {
+		const toSend = {
 			...networkData,
 			dynamicAllocation: networkData.headerBidding,
 			position: state.position,
@@ -178,37 +186,44 @@ class sectionOptions extends React.Component {
 			<Row className="mT-10">
 				<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px mB-10' : 'mB-10'}>
 					<SelectBox
-						value={this.state.selectedZoneId}
-						label="Select a Zone Id"
-						onChange={this.handleZoneIdChange}
-					>
-						{uniqCollection.map((value, index) => {
-							return (
-								<option key={index} value={value}>
-									{value}
-								</option>
-							);
-						})}
-					</SelectBox>
+						id="zone-id-selection"
+						title="Select a Zone Id"
+						onSelect={this.handleZoneIdChange}
+						selected={this.state.selectedZoneId}
+						options={uniqCollection.map((value, index) => {
+							return {
+								name: value,
+								value: value
+							}
+						}
+						)}
+					/>
 				</Col>
 			</Row>
 		);
 	}
 
 	render() {
-		const state = this.state,
-			customAdCodeText = state.customAdCode ? 'Edit' : 'Add',
-			isAdCreateBtnDisabled = !!(state.position !== null && typeof state.position !== 'undefined'),
-			{ updateMode, updateSettings, sectionId, ad, isInsertMode, primaryAdSize } = this.props,
-			{
-				position,
-				isAdInFirstFold: firstFold,
-				isAdAsync: asyncTag,
-				zoneId,
-				dfpAdUnitObject,
-				zoneIdUniqArray
-			} = state,
-			isRenderZoneIdSelectBox = !!(isInsertMode && zoneIdUniqArray && zoneIdUniqArray.length);
+		const state = this.state;
+
+		const customAdCodeText = state.customAdCode ? 'Edit' : 'Add';
+
+		const isAdCreateBtnDisabled = !!(
+			state.position !== null && typeof state.position !== 'undefined'
+		);
+
+		const { updateMode, updateSettings, sectionId, ad, isInsertMode, primaryAdSize } = this.props;
+
+		const {
+			position,
+			isAdInFirstFold: firstFold,
+			isAdAsync: asyncTag,
+			zoneId,
+			dfpAdUnitObject,
+			zoneIdUniqArray
+		} = state;
+
+		const isRenderZoneIdSelectBox = !!(isInsertMode && zoneIdUniqArray && zoneIdUniqArray.length);
 
 		if (state.manageCustomCode) {
 			return (
@@ -243,7 +258,7 @@ class sectionOptions extends React.Component {
 					fromPanel={this.props.fromPanel ? this.props.fromPanel : false}
 					id={this.props.id ? this.props.id : false}
 					showNotification={this.props.showNotification}
-					geniee={true}
+					geniee
 					isInsertMode={isInsertMode}
 					primaryAdSize={primaryAdSize}
 					dfpAdUnitObject={dfpAdUnitObject}
