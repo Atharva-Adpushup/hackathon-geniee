@@ -57,6 +57,36 @@ var utils = require('../libs/utils'),
 			intervals.length = 0;
 		}
 	},
+	getContainer = function (ad) {
+		var defer = $.Deferred(),
+			isResponsive = !!(ad.networkData && ad.networkData.isResponsive),
+			computedStylesObject = isResponsive
+				? {}
+				: {
+					width: ad.width,
+					height: ad.height
+				  };
+
+		try {
+			var $adEl = $('#' + ad.id);
+
+			$adEl.css($.extend(computedStylesObject, ad.css));
+			return defer.resolve($adEl);
+		} catch (e) {
+			return defer.reject('Unable to get adpushup container');
+		}
+	},
+	setAdTimeOut = function () {},
+	getAllInViewAds = function (ads) {
+		for (var i = 0; i < ads.length; i++) {
+			return getContainer(ad).done(function (container) {
+				if (utils.checkElementInViewPercent(container)) {
+					var currentTime = new Date().getTime();
+					container.setAttribute('data-refresh-time', currentTime);
+				}
+			});
+		}
+	},
 	init = function (w) {
 		w.adpushup.$(w).on('blur', function () {
 			clearAdInterval();
