@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { Col, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../lib/helpers';
 import { ADCODE, AMP_MESSAGE } from '../../../configs/commonConsts';
-// import Edit from '../../shared/Edit';
+import Edit from '../../shared/Edit';
 import { CustomButton } from '../../shared/index';
 import AdNetworkDetails from './AdNetworkDetails';
-// import AdEventDetails from './AdEventDetails';
-// import LazyLoadSettings from './LazyLoadSettings';
+import AdEventDetails from './AdEventDetails';
+import LazyLoadSettings from './LazyLoadSettings';
 import Tags from '../../../../../Components/Tags/index';
 
 class AdElement extends Component {
