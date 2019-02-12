@@ -1,7 +1,8 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { commonSupportedSizes } from 'consts/commonConsts.js';
 import { Accordion, Row, Col, Panel, Button, Well, Label } from 'react-bootstrap';
+import { commonSupportedSizes } from '../../../consts/commonConsts';
 
 class MultipleAdSizeSelector extends React.Component {
 	constructor(props) {
@@ -16,9 +17,11 @@ class MultipleAdSizeSelector extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		const thisProps = this.props,
-			isProps = !!(thisProps && nextProps),
-			isSameProps = !!(isProps && thisProps.sizes == nextProps.sizes);
+		const thisProps = this.props;
+
+		const isProps = !!(thisProps && nextProps);
+
+		const isSameProps = !!(isProps && thisProps.sizes == nextProps.sizes);
 
 		if (nextProps.sizes && !isSameProps) {
 			this.setState({ selectedSizes: nextProps.sizes });
@@ -48,8 +51,9 @@ class MultipleAdSizeSelector extends React.Component {
 	}
 
 	toggleAdSizeData(adSize) {
-		const collection = this.state.selectedSizes,
-			isAdSizeInCollection = _.find(collection, adSize);
+		const collection = this.state.selectedSizes;
+
+		const isAdSizeInCollection = _.find(collection, adSize);
 
 		if (!isAdSizeInCollection) {
 			return this.pushAdSize(adSize);
@@ -76,9 +80,11 @@ class MultipleAdSizeSelector extends React.Component {
 				<Row>
 					{_.compact(
 						_.map(rec.sizes, (adProps, innerIndex) => {
-							const isAdPropsInCollection = _.find(adSizeCollection, adProps),
-								computedRadioFieldValue = isAdPropsInCollection ? 'checked' : false,
-								isAdPropsEqualToPrimaryAdSize = _.isEqual(this.props.primaryAdSize, adProps);
+							const isAdPropsInCollection = _.find(adSizeCollection, adProps);
+
+							const computedRadioFieldValue = isAdPropsInCollection ? 'checked' : false;
+
+							const isAdPropsEqualToPrimaryAdSize = _.isEqual(this.props.primaryAdSize, adProps);
 
 							if (isAdPropsEqualToPrimaryAdSize) {
 								return false;
@@ -106,7 +112,11 @@ class MultipleAdSizeSelector extends React.Component {
 
 	renderAdSizeAccordion() {
 		return (
-			<Accordion className="u-margin-b15px" activeKey={this.state.activeTab} onSelect={this.handleTabClick}>
+			<Accordion
+				className="u-margin-b15px"
+				activeKey={this.state.activeTab}
+				onSelect={this.handleTabClick}
+			>
 				{_.compact(_.map(commonSupportedSizes, (rec, index) => this.renderSizePanels(rec, index)))}
 			</Accordion>
 		);
@@ -192,11 +202,12 @@ class MultipleAdSizeSelector extends React.Component {
 		return (
 			<Well>
 				{_.map(collection, (object, index) => {
-					const adSizeString = this.getStringifiedAdSize(object).replace(/ /g, ''),
-						marginStyle = {
-							margin: '.5em .1em',
-							display: 'inline-block'
-						};
+					const adSizeString = this.getStringifiedAdSize(object).replace(/ /g, '');
+
+					const marginStyle = {
+						margin: '.5em .1em',
+						display: 'inline-block'
+					};
 
 					return (
 						<Label style={marginStyle} key={index}>

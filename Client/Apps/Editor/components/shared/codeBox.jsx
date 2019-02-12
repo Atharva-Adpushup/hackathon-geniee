@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import Codemirror from 'react-codemirror';
 
@@ -24,7 +24,9 @@ class customCodeEditor extends React.Component {
 
 	save() {
 		try {
-			!this.props.textEdit ? this.props.onSubmit(btoa(this.state.code)) : this.props.onSubmit(this.state.code);
+			!this.props.textEdit
+				? this.props.onSubmit(btoa(this.state.code))
+				: this.props.onSubmit(this.state.code);
 		} catch (e) {
 			console.log(e);
 			this.setState({ error: true });
@@ -33,7 +35,9 @@ class customCodeEditor extends React.Component {
 
 	updateCode(code) {
 		try {
-			this.setState({ code, error: false }, () => (this.props.onChange ? this.props.onChange(code) : null));
+			this.setState({ code, error: false }, () =>
+				this.props.onChange ? this.props.onChange(code) : null
+			);
 		} catch (e) {
 			this.setState({ error: true });
 		}
@@ -75,8 +79,9 @@ class customCodeEditor extends React.Component {
 		}
 		// Check if code box is meant to be a regular text editor
 		if (this.props.textEdit) {
-			let className = 'codeEditor-small ',
-				disabled = this.props.enableSave ? false : this.props.code == '';
+			let className = 'codeEditor-small ';
+
+			const disabled = this.props.enableSave ? false : this.props.code == '';
 
 			className += this.props.parentExpanded ? ' codeEditor-large' : ' ';
 
@@ -85,7 +90,11 @@ class customCodeEditor extends React.Component {
 					<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
 					<br />
 					{this.props.showButtons ? (
-						<Button disabled={this.state.code == ''} className="btn-lightBg btn-save" onClick={this.save}>
+						<Button
+							disabled={this.state.code == ''}
+							className="btn-lightBg btn-save"
+							onClick={this.save}
+						>
 							{this.props.textEditBtn ? this.props.textEditBtn : 'Save'}
 						</Button>
 					) : null}
@@ -103,7 +112,11 @@ class customCodeEditor extends React.Component {
 				{this.props.showButtons ? (
 					<Row className="butttonsRow">
 						<Col xs={6}>
-							<Button disabled={this.state.error} className="btn-lightBg btn-save" onClick={this.save}>
+							<Button
+								disabled={this.state.error}
+								className="btn-lightBg btn-save"
+								onClick={this.save}
+							>
 								Save
 							</Button>
 						</Col>
@@ -119,25 +132,26 @@ class customCodeEditor extends React.Component {
 			</div>
 		);
 	}
+
 	static defaultProps = {
 		enableSave: false
 	};
 }
 
-customCodeEditor.propTypes = {
-	code: PropTypes.string,
-	key: PropTypes.string,
-	isField: PropTypes.bool,
-	textEdit: PropTypes.bool,
-	enableSave: PropTypes.bool,
-	textEditBtn: PropTypes.string,
-	size: PropTypes.string,
-	showButtons: PropTypes.bool,
-	parentExpanded: PropTypes.bool,
-	onSubmit: PropTypes.func,
-	onCancel: PropTypes.func,
-	onChange: PropTypes.func,
-	cancelText: PropTypes.string
-};
+// customCodeEditor.propTypes = {
+// 	code: PropTypes.string,
+// 	key: PropTypes.string,
+// 	isField: PropTypes.bool,
+// 	textEdit: PropTypes.bool,
+// 	enableSave: PropTypes.bool,
+// 	textEditBtn: PropTypes.string,
+// 	size: PropTypes.string,
+// 	showButtons: PropTypes.bool,
+// 	parentExpanded: PropTypes.bool,
+// 	onSubmit: PropTypes.func,
+// 	onCancel: PropTypes.func,
+// 	onChange: PropTypes.func,
+// 	cancelText: PropTypes.string
+// };
 
 export default customCodeEditor;
