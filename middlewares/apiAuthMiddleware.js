@@ -36,17 +36,11 @@ module.exports = (req, res, next) => {
 	}
 
 	const isSession = !!req.session;
-
 	const isUserInSession = !!(isSession && req.session.user);
-
 	const isSiteIdInSession = !!(isSession && req.session.siteId);
-
 	const isAuthorisedURL = !!(isSession && isAuthorised());
-
 	const isSessionInvalid = !!(!req.session || !req.session.user);
-
 	const isOpenRouteValid = isOpenRoute();
-
 	const isDifferentGenieeSite = !!(
 		isSession &&
 		isUserInSession &&

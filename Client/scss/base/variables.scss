@@ -8,15 +8,17 @@ $sidebarWidth: 250px;
 $sidebarTransitionStyle: linear;
 $sidebarTransitionDuration: 0.3s;
 
-//Loader ($LO)
-$LOSpinBeforeHeiWidth: 100px;
-$LOSpinBeforeBorderWid: 5px;
-
 //LoaderBar ($LB)
 $LBHeight: 3px;
 $LBSpinnerPosition: 15px;
 $LBSpinnerHeightWidth: 20px;
 
+/*Extra Space ($ES)*/
+$ESBg: #f6f7f8;
+$ESPadding: 20px;
+
+/*ToolBar (MB) ToolBar Container ($MBC)*/
+$MBButtonRowBorder: #dfdfe0;
 $LPFormButtonSize: 12px;
 $LPFormInputHeight: 50px;
 
