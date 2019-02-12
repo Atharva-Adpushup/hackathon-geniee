@@ -16,13 +16,19 @@ class Signup extends Component {
 		site: { value: '', error: '' },
 		email: { value: '', error: '' },
 		password: { value: '', error: '' },
-		websiteRevenue: '200001'
+		websiteRevenue: '200001',
+		termsPolicy: { accepted: false, error: '' }
 	};
 
 	onChange = e => {
 		const { name, value } = e.target;
 
 		this.setState(state => ({ [name]: { ...state[name], value } }));
+	};
+
+	onCheckboxToggle = e => {
+		const { name, checked } = e.target;
+		this.setState(state => ({ [name]: { ...state[name], accepted: checked } }));
 	};
 
 	onInputBlur = e => {
@@ -49,11 +55,17 @@ class Signup extends Component {
 			email: { value: email },
 			password: { value: password },
 			site: { value: site },
-			websiteRevenue
+			websiteRevenue,
+			termsPolicy
 		} = this.state;
 
 		formValidator
 			.validate({ name, email, password, site }, validationSchema.user.validations)
+			.then(() =>
+				!termsPolicy.accepted
+					? Promise.reject({ termsPolicy: 'Please agree to our Terms of Service & Privacy Policy' })
+					: null
+			)
 			.then(() => {
 				const { signupAction: signup } = this.props;
 
@@ -62,15 +74,25 @@ class Signup extends Component {
 					.catch(err => console.dir(err.response));
 			})
 			.catch(err => {
+				const error = { ...err };
+
+				if (!err.termsPolicy && !termsPolicy.accepted) {
+					error.termsPolicy = 'Please agree to our Terms of Service & Privacy Policy';
+				}
+
 				this.setState(state => {
-					const errorKeys = Object.keys(err);
+					const errorKeys = Object.keys(error);
 					const newState = {};
 					for (let i = 0; i < errorKeys.length; i += 1) {
 						newState[errorKeys[i]] = {
 							...state[errorKeys[i]],
-							error: err[errorKeys[i]]
+							error: error[errorKeys[i]]
 						};
 					}
+
+					if (state.termsPolicy.accepted && state.termsPolicy.error)
+						newState.termsPolicy = { error: '' };
+
 					return newState;
 				});
 			});
@@ -82,13 +104,14 @@ class Signup extends Component {
 			site: { error: siteError },
 			email: { error: emailError },
 			password: { error: passwordError },
-			websiteRevenue
+			websiteRevenue,
+			termsPolicy
 		} = this.state;
 
 		return (
 			<AuthShell>
 				<AuthFormWrap formType="signup" onSubmit={this.onSubmit}>
-					<Fragment>
+					<div className="AuthForm SignupForm u-padding-h4 u-padding-v3">
 						<Row>
 							<Col md={6}>
 								<FormInput
@@ -152,12 +175,17 @@ class Signup extends Component {
 							</Col>
 						</Row>
 
-						<div className="form-group">
-							<div className="col-md-12 pd-0">
-								<div className="col-md-6 u-padding-r15px">
+						<div className="form-group clearfix">
+							<div className="col-md-12 u-padding-0">
+								<div className="col-md-6 u-padding-0">
 									<div className="input-group input-group--minimal">
-										<span className="input-group-addon">
-											<input type="checkbox" id="signup-termsPolicy" name="termsPolicy" />
+										<span className="input-group-addon signup-termsPolicy-wrap">
+											<input
+												type="checkbox"
+												id="signup-termsPolicy"
+												name="termsPolicy"
+												onChange={this.onCheckboxToggle}
+											/>
 										</span>
 										<div className="input-group-text">
 											I agree to{' '}
@@ -170,11 +198,14 @@ class Signup extends Component {
 											</a>
 										</div>
 									</div>
-
-									<div className="error-message js-error-message js-termsPolicy-error" />
+									{termsPolicy.error && (
+										<div className="error-message js-error-message js-termsPolicy-error">
+											{termsPolicy.error}
+										</div>
+									)}
 								</div>
 
-								<div className="col-md-6 pd-0">
+								<div className="col-md-6 u-padding-0">
 									<ApButton
 										variant="primary"
 										type="submit"
@@ -186,7 +217,7 @@ class Signup extends Component {
 								</div>
 							</div>
 						</div>
-					</Fragment>
+					</div>
 				</AuthFormWrap>
 			</AuthShell>
 		);

@@ -78,7 +78,7 @@ class Login extends Component {
 		return (
 			<AuthShell>
 				<AuthFormWrap formType="login" onSubmit={this.onSubmit}>
-					<Fragment>
+					<div className="AuthForm LoginForm u-padding-h4 u-padding-v3">
 						<FormInput
 							type="email"
 							name="email"
@@ -90,12 +90,7 @@ class Login extends Component {
 						<FormInput type="password" name="password" onChange={this.onChange} icon="key" />
 						{passwordError}
 						<div className="form-group">
-							<ApButton
-								variant="primary"
-								type="submit"
-								id="login-submit"
-								className="btn-lightBg btn-red pull-right"
-							>
+							<ApButton variant="primary" type="submit" id="login-submit" className="pull-right">
 								Login
 							</ApButton>
 							<Link
@@ -106,7 +101,7 @@ class Login extends Component {
 								Forgot Password?
 							</Link>
 						</div>
-					</Fragment>
+					</div>
 				</AuthFormWrap>
 			</AuthShell>
 		);

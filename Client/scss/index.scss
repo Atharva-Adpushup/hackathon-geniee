@@ -4,3 +4,9 @@
 @import 'shared/actionCard';
 @import 'base/index';
 @import 'shared/loader/index';
+
+@import 'shared/shell/index';
+
+// Auth Pages
+@import './pages/login';
+@import './pages/signup';
