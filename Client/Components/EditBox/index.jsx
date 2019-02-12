@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col } from 'react-bootstrap';
-import { CustomButton } from './index.jsx';
+import CustomButton from '../CustomButton/index';
 
 class EditBox extends Component {
 	constructor(props) {
@@ -46,16 +46,21 @@ class EditBox extends Component {
 						placeholder={placeholder}
 						onChange={this.changeHandler}
 					/>
-					<CustomButton label="Cancel" handler={onCancel} />
 					<CustomButton
-						label="Save"
-						handler={() => {
+						variant="primary"
+						className="u-margin-r3 u-margin-t3"
+						onClick={() => {
 							onSave({
 								name: value
 							});
 							return onCancel();
 						}}
-					/>
+					>
+						Save
+					</CustomButton>
+					<CustomButton variant="secondary" className="u-margin-t3" onClick={onCancel}>
+						Cancel
+					</CustomButton>
 				</Col>
 				<div style={{ clear: 'both' }}>&nbsp;</div>
 			</div>
@@ -64,8 +69,8 @@ class EditBox extends Component {
 }
 
 EditBox.propTypes = {
-	leftSize: PropTypes.string,
-	rightSize: PropTypes.string,
+	leftSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+	rightSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 	label: PropTypes.string,
 	classNames: PropTypes.string,
 	type: PropTypes.string,
@@ -84,4 +89,4 @@ EditBox.defaultProps = {
 	placeholder: 'Enter value here'
 };
 
-module.exports = EditBox;
+export default EditBox;

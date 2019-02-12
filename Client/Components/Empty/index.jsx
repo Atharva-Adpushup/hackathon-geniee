@@ -12,7 +12,6 @@ const Empty = props => {
 };
 
 Empty.propTypes = { message: PropTypes.string };
-
 Empty.defaultProps = { message: null };
 
 export default Empty;

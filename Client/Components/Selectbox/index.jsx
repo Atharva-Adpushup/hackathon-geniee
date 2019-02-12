@@ -2,9 +2,24 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
+const findSelected = props => {
+	const { selected = null, title, options } = props;
+	let name = title;
+	if (selected) {
+		for (let i = 0; i < options.length; i += 1) {
+			const option = options[i];
+			if (option.value === selected) {
+				name = option.name;
+				break;
+			}
+		}
+	}
+	return { selected, name };
+};
+
 class SelectBox extends Component {
 	state = {
-		selected: this.props.selected || null
+		...findSelected(this.props)
 	};
 
 	selectWrapper = (key, e) => {

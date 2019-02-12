@@ -1,7 +1,7 @@
-import React from 'React';
+import React from 'react';
 import { Row, Col } from 'react-bootstrap';
-import { CustomButton } from '../../shared/index.jsx';
-import CustomToggleSwitch from '../../../../Editor/components/shared/customToggleSwitch.jsx';
+import { CustomButton } from '../../shared/index';
+import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 
 const LazyLoadSettings = props => {
 	const { checked, id, changeHandler, cancelHandler } = props;
@@ -17,13 +17,13 @@ const LazyLoadSettings = props => {
 					size="m"
 					on="Yes"
 					off="No"
-					defaultLayout={true}
+					defaultLayout
 					name={`lazyLoadSwitch-${id}`}
 					id={`js-lazy-load-switch-${id}`}
 				/>
 			</Col>
 			<Col xs={6} xsPush={6}>
-				<CustomButton label="Back" handler={cancelHandler.bind(null, 'showLazyload')} />
+				<CustomButton label="Back" handler={() => cancelHandler('showLazyload')} />
 			</Col>
 		</Row>
 	);

@@ -2,9 +2,9 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
-const ApButton = ({ children, ...props }) => <Button {...props}>{children}</Button>;
+const CustomButton = ({ children, ...props }) => <Button {...props}>{children}</Button>;
 
-ApButton.propTypes = {
+CustomButton.propTypes = {
 	variant: PropTypes.oneOf([
 		'primary',
 		'secondary',
@@ -20,9 +20,9 @@ ApButton.propTypes = {
 	children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired
 };
 
-ApButton.defaultProps = {
+CustomButton.defaultProps = {
 	variant: 'light',
 	type: 'button'
 };
 
-export default ApButton;
+export default CustomButton;
