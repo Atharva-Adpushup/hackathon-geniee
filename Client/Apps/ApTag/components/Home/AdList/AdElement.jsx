@@ -32,7 +32,7 @@ class AdElement extends Component {
 			: AMP_MESSAGE;
 
 	disableAd() {
-		const { ad, updateAd, modifyAdOnServer, user } = this.props;
+		const { ad, updateAd, modifyAdOnServer, user, match } = this.props;
 		const { isActive } = this.state;
 		const message = isActive
 			? 'Are you sure you want to archive this ad?'
@@ -45,7 +45,7 @@ class AdElement extends Component {
 				() =>
 					user.isSuperUser
 						? updateAd(ad.id, { isActive, archivedOn: +new Date() })
-						: modifyAdOnServer(ad.id, { isActive, archivedOn: +new Date() })
+						: modifyAdOnServer(match.params.siteId, ad.id, { isActive, archivedOn: +new Date() })
 			);
 		}
 	}
@@ -55,8 +55,8 @@ class AdElement extends Component {
 	}
 
 	updateWrapper(data) {
-		const { updateAd, modifyAdOnServer, user, ad } = this.props;
-		return user.isSuperUser ? updateAd(ad.id, data) : modifyAdOnServer(ad.id, data);
+		const { updateAd, modifyAdOnServer, user, ad, match } = this.props;
+		return user.isSuperUser ? updateAd(ad.id, data) : modifyAdOnServer(match.params.siteId, ad.id, data);
 	}
 
 	renderInformation = (label, value) => (

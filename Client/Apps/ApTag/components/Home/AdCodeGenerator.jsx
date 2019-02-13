@@ -54,7 +54,7 @@ class AdCodeGenerator extends Component {
 	}
 
 	saveHandler() {
-		const { createAd } = this.props;
+		const { createAd, match } = this.props;
 		const { type, platform, size } = this.state;
 		const isResponsive = size === 'responsive';
 		const sizesArray = isResponsive ? 'responsive' : size.split('x');
@@ -70,7 +70,7 @@ class AdCodeGenerator extends Component {
 			},
 			() =>
 				createAd({
-					siteId: window.siteId,
+					siteId: match.params.siteId,
 					ad: {
 						width,
 						height,
@@ -194,7 +194,7 @@ class AdCodeGenerator extends Component {
 				{isDisplayAd ? (
 					<CustomButton
 						variant="secondary"
-						className="u-margin-t3 pull-right"
+						className="u-margin-t3 u-margin-r3 pull-right"
 						onClick={() => copyToClipBoard(code.replace(/__AD_ID__/g, adId))}
 					>
 						Copy Adcode

@@ -189,12 +189,12 @@ router
 			);
 		}
 
-		fn.isSuperUser = req.session.isSuperUser;
+		fn.isSuperUser = req.user.isSuperUser;
 
 		const payload = {
 			ad: req.body.ad,
 			siteId: req.body.siteId,
-			ownerEmail: req.session.user.email
+			ownerEmail: req.user.email
 		};
 		return appBucket
 			.getDoc(`${docKeys.apTag}${req.body.siteId}`)
@@ -217,7 +217,7 @@ router
 			.catch(err => fn.errorHander(err, res));
 	})
 	.post('/masterSave', (req, res) => {
-		if (!req.body || !req.body.siteId || !req.body.ads || !req.session.isSuperUser) {
+		if (!req.body || !req.body.siteId || !req.body.ads || !req.user.isSuperUser) {
 			return sendErrorResponse(
 				{
 					message: 'Invalid Parameters.'
@@ -228,9 +228,9 @@ router
 		return fn.adUpdateProcessing(req, res, docWithCas => {
 			const doc = docWithCas.value;
 
-			const { siteId, siteDomain } = req.body;
+			const { siteId } = req.body;
 
-			if (doc.ownerEmail !== req.session.user.email) {
+			if (doc.ownerEmail !== req.user.email) {
 				return Promise.reject(new Error('Owner verfication fail'));
 			}
 			if (!doc.ads.length) {
@@ -269,7 +269,7 @@ router
 		}
 		return fn.adUpdateProcessing(req, res, docWithCas => {
 			const doc = docWithCas.value;
-			if (doc.ownerEmail !== req.session.user.email) {
+			if (doc.ownerEmail !== req.user.email) {
 				return Promise.reject(new Error('Owner verfication fail'));
 			}
 			_.forEach(doc.ads, (ad, index) => {
