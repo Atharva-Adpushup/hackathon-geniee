@@ -1,4 +1,5 @@
-$fontFamily: Karla, sans-serif;
+$fontFamily: 'Karla', sans-serif;
+$codeFont: monospace;
 
 $FMLayoutDimension: 10px;
 $whiteColor: #fff;
@@ -43,49 +44,53 @@ $LBSpinnerHeightWidth: 20px;
 $LPFormButtonSize: 12px;
 $LPFormInputHeight: 50px;
 
-$none: none;
-$normal: normal;
-$nowrap: nowrap;
-$wrap: wrap;
-$wrapReverse: wrap-reverse;
-$start: start;
-$center: center;
-$end: end;
-$justify: justify;
-$distribute: distribute;
-$stretch: stretch;
-$baseline: baseline;
-$auto: auto;
+$arrowDownIconSize: 12px;
+$BorderRadius: 3px;
+$fontSize: 12px;
 
-$textBold: bold;
-$textBolder: bolder;
-$textUnderline: underline;
-$textUppercase: uppercase;
-$textLowercase: lowercase;
+$none: 'none';
+$normal: 'normal';
+$nowrap: 'nowrap';
+$wrap: 'wrap';
+$wrapReverse: 'wrap-reverse';
+$start: 'start';
+$center: 'center';
+$end: 'end';
+$justify: 'justify';
+$distribute: 'distribute';
+$stretch: 'stretch';
+$baseline: 'baseline';
+$auto: 'auto';
 
-$cursorPointer: pointer;
+$textBold: 'bold';
+$textBolder: 'bolder';
+$textUnderline: 'underline';
+$textUppercase: 'uppercase';
+$textLowercase: 'lowercase';
 
-$displayBlock: block;
-$displayFlex: flex;
-$displayInlineFlex: inline-flex;
+$cursorPointer: 'pointer';
 
-$layoutHorizontal: horizontal;
-$layoutVertical: vertical;
-$layoutRow: row;
-$layoutColumn: column;
+$displayBlock: 'block';
+$displayFlex: 'flex';
+$displayInlineFlex: 'inline-flex';
 
-$flexStart: flex-start;
-$flexEnd: flex-end;
+$layoutHorizontal: 'horizontal';
+$layoutVertical: 'vertical';
+$layoutRow: 'row';
+$layoutColumn: 'column';
 
-$contentSpaceBetween: space-between;
-$contentSpaceAround: space-around;
-$contentSpaceEvenly: space-evenly;
+$flexStart: 'flex-start';
+$flexEnd: 'flex-end';
 
-$directionReverse: reverse;
-$directionRowReverse: row-reverse;
-$directionColumnReverse: column-reverse;
+$contentSpaceBetween: 'space-between';
+$contentSpaceAround: 'space-around';
+$contentSpaceEvenly: 'space-evenly';
 
-$fullPercentage: 100%;
+$directionReverse: 'reverse';
+$directionRowReverse: 'row-reverse';
+$directionColumnReverse: 'column-reverse';
+
+$fullPercentage: '100%';
 $halfPercentage: ($fullPercentage / 2);
 
 $numberZero: 0;
