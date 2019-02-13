@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import ApButton from '../ApButton';
+import CustomButton from '../CustomButton';
 
 const AuthFormWrap = ({ formType, onSubmit, children }) => (
 	<div className="AuthWrap">
@@ -57,9 +57,9 @@ const AuthFormWrap = ({ formType, onSubmit, children }) => (
 			{formType === 'forgotPassword' && (
 				<div className="AuthFooter ForgotPswFooter row">
 					<div className="col-xs-6">
-						<ApButton type="submit" id="forgotPassword-submit" variant="secondary">
+						<CustomButton type="submit" id="forgotPassword-submit" variant="secondary">
 							Reset Password
-						</ApButton>
+						</CustomButton>
 					</div>
 					<div className="col-xs-6">
 						<Link to="/login" id="forgotPassword-auth-redirect-link" className="btn btn--secondary">

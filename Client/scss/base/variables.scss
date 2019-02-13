@@ -1,8 +1,6 @@
-// Colors
-$primaryColor: #eb575c; //Main Adpushup Red Color
-$primaryColorDark: #cf474b; //Red Dark Color
-$primaryColorLight: #fb9fa2;
-$mainBgColor: #f6f7f8;
+$fontFamily: Karla, sans-serif;
+
+$FMLayoutDimension: 10px;
 $whiteColor: #fff;
 $blackColor: #000;
 $warningColor: #f0ad4e;
@@ -45,49 +43,49 @@ $LBSpinnerHeightWidth: 20px;
 $LPFormButtonSize: 12px;
 $LPFormInputHeight: 50px;
 
-$none: 'none';
-$normal: 'normal';
-$nowrap: 'nowrap';
-$wrap: 'wrap';
-$wrapReverse: 'wrap-reverse';
-$start: 'start';
-$center: 'center';
-$end: 'end';
-$justify: 'justify';
-$distribute: 'distribute';
-$stretch: 'stretch';
-$baseline: 'baseline';
-$auto: 'auto';
+$none: none;
+$normal: normal;
+$nowrap: nowrap;
+$wrap: wrap;
+$wrapReverse: wrap-reverse;
+$start: start;
+$center: center;
+$end: end;
+$justify: justify;
+$distribute: distribute;
+$stretch: stretch;
+$baseline: baseline;
+$auto: auto;
 
-$textBold: 'bold';
-$textBolder: 'bolder';
-$textUnderline: 'underline';
-$textUppercase: 'uppercase';
-$textLowercase: 'lowercase';
+$textBold: bold;
+$textBolder: bolder;
+$textUnderline: underline;
+$textUppercase: uppercase;
+$textLowercase: lowercase;
 
-$cursorPointer: 'pointer';
+$cursorPointer: pointer;
 
-$displayBlock: 'block';
-$displayFlex: 'flex';
-$displayInlineFlex: 'inline-flex';
+$displayBlock: block;
+$displayFlex: flex;
+$displayInlineFlex: inline-flex;
 
-$layoutHorizontal: 'horizontal';
-$layoutVertical: 'vertical';
-$layoutRow: 'row';
-$layoutColumn: 'column';
+$layoutHorizontal: horizontal;
+$layoutVertical: vertical;
+$layoutRow: row;
+$layoutColumn: column;
 
-$flexStart: 'flex-start';
-$flexEnd: 'flex-end';
+$flexStart: flex-start;
+$flexEnd: flex-end;
 
-$contentSpaceBetween: 'space-between';
-$contentSpaceAround: 'space-around';
-$contentSpaceEvenly: 'space-evenly';
+$contentSpaceBetween: space-between;
+$contentSpaceAround: space-around;
+$contentSpaceEvenly: space-evenly;
 
-$directionReverse: 'reverse';
-$directionRowReverse: 'row-reverse';
-$directionColumnReverse: 'column-reverse';
+$directionReverse: reverse;
+$directionRowReverse: row-reverse;
+$directionColumnReverse: column-reverse;
 
-$fullPercentage: '100%';
+$fullPercentage: 100%;
 $halfPercentage: ($fullPercentage / 2);
 
 $numberZero: 0;

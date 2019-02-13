@@ -4,12 +4,12 @@ import PropTypes from 'prop-types';
 const getClassnames = type => {
 	switch (type) {
 		case 'error':
-			return 'error-text';
+			return 'u-text-error';
 		case 'success':
-			return 'success-text';
+			return 'u-text-success';
 		default:
 		case 'info':
-			return 'info-text';
+			return 'u-text-info';
 	}
 };
 

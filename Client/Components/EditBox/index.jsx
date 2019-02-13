@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col } from 'react-bootstrap';
 import CustomButton from '../CustomButton/index';
+import InputBox from '../InputBox/index';
 
 class EditBox extends Component {
 	constructor(props) {
@@ -32,23 +33,24 @@ class EditBox extends Component {
 		} = this.props;
 		const { value } = this.state;
 		return (
-			<div>
+			<div className={classNames}>
 				<Col md={leftSize}>
-					<h4>{label}</h4>
+					<p className="u-text-bold">{label}</p>
 				</Col>
 				<Col md={rightSize}>
-					<input
-						className={`inputMinimal ${classNames}`}
+					<InputBox
 						type={type}
-						style={{ width: '100%' }}
 						name={name}
 						value={value}
 						placeholder={placeholder}
 						onChange={this.changeHandler}
 					/>
+					<CustomButton variant="secondary" className="u-margin-t4 pull-right" onClick={onCancel}>
+						Cancel
+					</CustomButton>
 					<CustomButton
 						variant="primary"
-						className="u-margin-r3 u-margin-t3"
+						className="u-margin-r3 u-margin-t4 pull-right"
 						onClick={() => {
 							onSave({
 								name: value
@@ -57,9 +59,6 @@ class EditBox extends Component {
 						}}
 					>
 						Save
-					</CustomButton>
-					<CustomButton variant="secondary" className="u-margin-t3" onClick={onCancel}>
-						Cancel
 					</CustomButton>
 				</Col>
 				<div style={{ clear: 'both' }}>&nbsp;</div>
