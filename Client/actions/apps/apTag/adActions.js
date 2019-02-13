@@ -4,10 +4,11 @@ import { errorHandler } from '../../../helpers/commonFunctions';
 
 const createAd = params => dispatch =>
 	axiosInstance
-		.post('/apTag/createAd', { params })
+		.post('/apTag/createAd', params)
 		.then(response => {
-			dispatch({ type: AD_ACTIONS.UPDATE_ADS_LIST, data: { ...params.ad, id: response.data.id } });
-			dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, currentAd: response.data.id });
+			const { data } = response.data;
+			dispatch({ type: AD_ACTIONS.UPDATE_ADS_LIST, data: { ...params.ad, id: data.id } });
+			dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, currentAd: data.id });
 		})
 		.catch(err => errorHandler(err, 'Ad Creation Failed. Please contact AdPushup Operations Team'));
 
@@ -35,9 +36,9 @@ const updateAd = (adId, data) => dispatch =>
 		}
 	});
 
-const modifyAdOnServer = (adId, data) => dispatch =>
+const modifyAdOnServer = (siteId, adId, data) => dispatch =>
 	axiosInstance
-		.post('/apTag/modifyAd', { siteId: window.siteId, adId, data })
+		.post('/apTag/modifyAd', { siteId, adId, data })
 		.then(() =>
 			dispatch({
 				type: AD_ACTIONS.UPDATE_AD,
