@@ -1,12 +1,16 @@
 import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { map } from 'lodash';
+import clipboard from 'clipboard-polyfill';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-function LinkWithTooltip({ id, children, tooltip }) {
+import { colorAndBoxShadowData, styleElementData } from './constants';
+
+function LinkWithTooltip({ id, children, tooltip, placement }) {
 	return (
 		<OverlayTrigger
 			overlay={<Tooltip id={id}>{tooltip}</Tooltip>}
-			placement="top"
+			placement={placement}
 			delayShow={300}
 			delayHide={150}
 		>
@@ -15,267 +19,79 @@ function LinkWithTooltip({ id, children, tooltip }) {
 	);
 }
 
-const dataCollectionFormat = [
-	// About primary colors
-	[
-		{
-			tooltip: 'Pro Tip: Use it as company brand color throught the product',
-			componentClassName: 'color-swatch--primary',
-			componentText: 'Primary',
-			componentCode: '#eb575c'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as hover transition state to primary color',
-			componentClassName: 'color-swatch--primary-dark-1',
-			componentText: 'Primary-Dark-1',
-			componentCode: '#e62930'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as primary color for icons, labels etc.',
-			componentClassName: 'color-swatch--primary-dark-2',
-			componentText: 'Primary-Dark-2',
-			componentCode: '#d9434e'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as dark variation of primary color',
-			componentClassName: 'color-swatch--primary-dark-3',
-			componentText: 'Primary-Dark-3',
-			componentCode: '#cf474b'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as light variation of primary color',
-			componentClassName: 'color-swatch--primary-light',
-			componentText: 'Primary-Light-1',
-			componentCode: '#fb9fa2'
-		}
-	],
-	// About background colors
-	[
-		{
-			tooltip: 'Pro Tip: Use it as app/component back/foreground color',
-			componentClassName: 'color-swatch--background-1',
-			componentText: 'Background-1',
-			componentCode: '#f6f7f8'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as app/component back/foreground color',
-			componentClassName: 'color-swatch--background-2',
-			componentText: 'Background-2',
-			componentCode: '#fff'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as app/component back/foreground color',
-			componentClassName: 'color-swatch--background-3',
-			componentText: 'Background-3',
-			componentCode: '#ebf1f2'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as app/component back/foreground color',
-			componentClassName: 'color-swatch--background-4',
-			componentText: 'Background-4',
-			componentCode: '#f3f5f7'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as app/component back/foreground color',
-			componentClassName: 'color-swatch--background-5',
-			componentText: 'Background-5',
-			componentCode: '#f9f9f9'
-		}
-	],
-	// About font colors
-	[
-		{
-			tooltip: 'Pro Tip: Use it as app/component font color',
-			componentClassName: 'color-swatch--font-1',
-			componentText: 'Font-1',
-			componentCode: '#555'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as app/component font color',
-			componentClassName: 'color-swatch--font-2',
-			componentText: 'Font-2',
-			componentCode: '#000'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as app/component font color',
-			componentClassName: 'color-swatch--font-3',
-			componentText: 'Font-3',
-			componentCode: '#b2b2b2'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as UI component font color',
-			componentClassName: 'color-swatch--font-4',
-			componentText: 'Font-4',
-			componentCode: '#89949b'
-		}
-	],
-	// About alert message colors
-	[
-		{
-			tooltip: 'Pro Tip: Use it as alert error message fore/background color',
-			componentClassName: 'color-swatch--alert-error',
-			componentText: 'Alert-Error-Message',
-			componentCode: '#e34849'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as alert warning message fore/background color',
-			componentClassName: 'color-swatch--alert-warning',
-			componentText: 'Alert-Warning-Message',
-			componentCode: '#f0ad4e'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as alert success message fore/background color',
-			componentClassName: 'color-swatch--alert-success',
-			componentText: 'Alert-Success-Message',
-			componentCode: '#3bb85d'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as alert success message fore/background color',
-			componentClassName: 'color-swatch--alert-success-2',
-			componentText: 'Alert-Success-Message-2',
-			componentCode: '#04a506'
-		}
-	],
-	// About border, icon and link colors
-	[
-		{
-			tooltip: 'Pro Tip: Use it as border color',
-			componentClassName: 'color-swatch--border-1',
-			componentText: 'Border-1',
-			componentCode: '#e6e6e6'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as UI component border color',
-			componentClassName: 'color-swatch--border-2',
-			componentText: 'Border-2',
-			componentCode: '#ddd'
-		},
-		{
-			tooltip: "Pro Tip: Use it as UI component's focus state border color",
-			componentClassName: 'color-swatch--border-focus',
-			componentText: 'Border-Focus',
-			componentCode: '#ccc'
-		}
-	],
-	// About button, icon, link, dropdown and datepicker colors
-	[
-		{
-			tooltip: 'Pro Tip: Use it as button primary background/border/text color',
-			componentClassName: 'color-swatch--button-primary',
-			componentText: 'Button-Primary',
-			componentCode: '#167096'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as icon color',
-			componentClassName: 'color-swatch--icon',
-			componentText: 'Icon',
-			componentCode: '#787878'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as UI (link/dropdown/datepicker) border color',
-			componentClassName: 'color-swatch--ui-border-or-font',
-			componentText: 'UI-Border/Color',
-			componentCode: '#47b6e4'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as UI (dropdown/datepicker) background color',
-			componentClassName: 'color-swatch--ui-background',
-			componentText: 'UI-Background',
-			componentCode: '#ecf7fc'
-		}
-	],
-	// About unused but listed colors
-	[
-		{
-			tooltip: "Pro Tip: Use it however you want. It ain't used in product ;)",
-			componentClassName: 'color-swatch--grey-light',
-			componentText: 'Light-Grey',
-			componentCode: '#ccc'
-		},
-		{
-			tooltip: "Pro Tip: Use it however you want. It ain't used in product ;)",
-			componentClassName: 'color-swatch--green',
-			componentText: 'Green',
-			componentCode: '#14a314'
-		}
-	],
-	// About box-shadow colors and values
-	[
-		{
-			tooltip: 'Pro Tip: Use it as button hover box-shadow value',
-			componentClassName: 'color-swatch--background-2 color-swatch--boxShadow-1',
-			componentText: 'Box-Shadow-1',
-			componentCode: '0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19)'
-		},
-		{
-			tooltip: 'Pro Tip: Use it as component default box-shadow value',
-			componentClassName: 'color-swatch--background-2 color-swatch--boxShadow-2',
-			componentText: 'Box-Shadow-2',
-			componentCode: '0 0 10px #f9f9f9, 0 0 5px #f9f9f9;'
-		}
-	]
-];
+function clipBoardButtonClickHandler(e) {
+	const elem = e.target;
+	const isIconElement = !!(
+		elem &&
+		elem.tagName !== 'BUTTON' &&
+		(elem.parentNode.tagName === 'BUTTON' || elem.parentNode.parentNode.tagName === 'BUTTON')
+	);
+	const isPathElement = !!(isIconElement && elem.parentNode.parentNode.tagName === 'BUTTON');
+	const isSVGElement = !!(isIconElement && elem.parentNode.tagName === 'BUTTON');
+	let toCopy;
+
+	if (isPathElement) {
+		toCopy = elem.parentNode.parentNode.getAttribute('data-clipboard');
+	} else if (isSVGElement) {
+		toCopy = elem.parentNode.getAttribute('data-clipboard');
+	} else {
+		toCopy = elem.getAttribute('data-clipboard');
+	}
+
+	console.log(elem.tagName);
+
+	clipboard.writeText(toCopy);
+	window.alert('Text Copied: ' + toCopy);
+}
 
 const renderDataUI = collection => {
-	return map(collection, (rowCollection, rootCollectionKey) => {
-		return (
-			<div className="row">
-				{map(rowCollection, (itemObject, rowItemKey) => {
-					return (
-						<div className="col-sm-4 col-md-2 col-lg-2">
-							<LinkWithTooltip id={`tooltip-${rowItemKey}`} tooltip={itemObject.tooltip}>
-								<div className="thumbnail u-border-none">
-									<div className={`color-swatch ${itemObject.componentClassName}`} />
-									<div className="caption text-center">
-										<h4>{itemObject.componentText}</h4>
-										<h5>
-											<code>{itemObject.componentCode}</code>
-										</h5>
-									</div>
+	return map(collection, (rowCollection, rootCollectionKey) => (
+		<div className="row">
+			{map(rowCollection, (itemObject, rowItemKey) => {
+				return (
+					<div className="col-sm-4 col-md-2 col-lg-2">
+						<LinkWithTooltip
+							id={`tooltip-${rowItemKey}`}
+							placement="top"
+							tooltip={itemObject.tooltip}
+						>
+							<div className="thumbnail u-border-none">
+								<div className={`color-swatch ${itemObject.componentClassName}`}>
+									<LinkWithTooltip
+										id={`tooltip-code-${rowItemKey}`}
+										placement="bottom"
+										tooltip="Copy to clipboard"
+									>
+										<button
+											type="button"
+											className="button button--line"
+											data-clipboard={itemObject.componentCode}
+											onClick={clipBoardButtonClickHandler}
+										>
+											<FontAwesomeIcon icon="code" className="" />
+										</button>
+									</LinkWithTooltip>
 								</div>
-							</LinkWithTooltip>
-						</div>
-					);
-				})}
-			</div>
-		);
-	});
+								<div className="caption text-center">
+									<h4>{itemObject.componentText}</h4>
+									<h5>
+										<code>{itemObject.componentCode}</code>
+									</h5>
+								</div>
+							</div>
+						</LinkWithTooltip>
+					</div>
+				);
+			})}
+		</div>
+	));
 };
 
 const Theme = () => (
 	<div className="container-fluid">
 		<style
 			dangerouslySetInnerHTML={{
-				__html: `.color-swatch { background: #fff; min-height: 100px; border-radius: 5px;}
-					.color-swatch.color-swatch--grey-light { background: #ccc; }
-					.color-swatch.color-swatch--green { background: #14a314; }
-					.color-swatch.color-swatch--primary { background: #eb575c; }
-					.color-swatch.color-swatch--primary-dark-1 { background: #e62930; }
-					.color-swatch.color-swatch--primary-dark-2 { background: #d9434e; }
-					.color-swatch.color-swatch--primary-dark-3 { background: #cf474b; }
-					.color-swatch.color-swatch--primary-light { background: #fb9fa2; }
-					.color-swatch.color-swatch--background-1 { background: #f6f7f8; }
-					.color-swatch.color-swatch--background-2 { background: #fff; }
-					.color-swatch.color-swatch--background-3 { background: #ebf1f2; }
-					.color-swatch.color-swatch--background-4 { background: #f3f5f7; }
-					.color-swatch.color-swatch--background-5 { background: #f9f9f9; }
-					.color-swatch.color-swatch--font-1 { background: #555; }
-					.color-swatch.color-swatch--font-2 { background: #000; }
-					.color-swatch.color-swatch--font-3 { background: #b2b2b2; }
-					.color-swatch.color-swatch--font-4 { background: #89949b; }
-					.color-swatch.color-swatch--alert-error { background: #e34849; }
-					.color-swatch.color-swatch--alert-warning { background: #f0ad4e; }
-					.color-swatch.color-swatch--alert-success { background: #3bb85d; }
-					.color-swatch.color-swatch--alert-success-2 { background: #04a506; }
-					.color-swatch.color-swatch--border-1 { background: #e6e6e6; }
-					.color-swatch.color-swatch--border-2 { background: #ddd; }
-					.color-swatch.color-swatch--border-focus { background: #ccc; }
-					.color-swatch.color-swatch--icon { background: #787878; }
-					.color-swatch.color-swatch--ui-border-or-font { background: #47b6e4; }
-					.color-swatch.color-swatch--ui-background { background: #ecf7fc; }
-					.color-swatch.color-swatch--boxShadow-1 { box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19); }
-					.color-swatch.color-swatch--boxShadow-2 { box-shadow: 0 0 10px #f9f9f9, 0 0 5px #f9f9f9; }
-					.color-swatch.color-swatch--button-primary { background: #167096; }`
+				__html: styleElementData
 			}}
 		/>
 		<h1 className="u-margin-b4">Theme</h1>
@@ -283,28 +99,28 @@ const Theme = () => (
 
 		<div className="panel panel-info u-margin-t4 u-margin-b4">
 			<div className="panel-heading">
-				<h3>Color & Box-Shadow</h3>
+				<h3 className="u-margin-0">Color & Box-Shadow</h3>
 			</div>
-			<div className="panel-body">{renderDataUI(dataCollectionFormat)}</div>
+			<div className="panel-body">{renderDataUI(colorAndBoxShadowData)}</div>
 		</div>
 
 		<div className="panel panel-info u-margin-t4 u-margin-b4">
 			<div className="panel-heading">
-				<h3>Font Size</h3>
-			</div>
-			<div className="panel-body" />
-		</div>
-
-		<div className="panel panel-info u-margin-t4 u-margin-b4">
-			<div className="panel-heading">
-				<h3>Spacing</h3>
+				<h3 className="u-margin-0">Font Size</h3>
 			</div>
 			<div className="panel-body" />
 		</div>
 
 		<div className="panel panel-info u-margin-t4 u-margin-b4">
 			<div className="panel-heading">
-				<h3>zIndex</h3>
+				<h3 className="u-margin-0">Spacing</h3>
+			</div>
+			<div className="panel-body" />
+		</div>
+
+		<div className="panel panel-info u-margin-t4 u-margin-b4">
+			<div className="panel-heading">
+				<h3 className="u-margin-0">zIndex</h3>
 			</div>
 			<div className="panel-body" />
 		</div>
