@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../lib/helpers';
 import { ADCODE, AMP_MESSAGE } from '../../../configs/commonConsts';
-import { CustomButton } from '../../shared/index';
+// import { CustomButton } from '../../shared/index';
+import CustomButton from '../../../../../Components/CustomButton/index';
 import AdNetworkDetails from './AdNetworkDetails';
 import LazyLoadSettings from './LazyLoadSettings';
 import EditBox from '../../../../../Components/EditBox/index';
@@ -98,8 +100,8 @@ class AdElement extends Component {
 				<LazyLoadSettings
 					checked={ad.enableLazyLoading}
 					id={ad.id}
-					changeHandler={payload => updateAd(ad.id, payload)}
-					cancelHandler={() => this.toggleHandler('showLazyLoad')}
+					onChange={payload => updateAd(ad.id, payload)}
+					onCancel={() => this.toggleHandler('showLazyload')}
 				/>
 			);
 		}
@@ -116,11 +118,11 @@ class AdElement extends Component {
 						overlay={<Tooltip id="ad-name-edit">Edit Ad Name</Tooltip>}
 					>
 						<span
-							className="adDetails-icon"
+							className="adDetails-icon u-text-red"
 							onClick={() => this.toggleHandler('editName')}
 							style={{ cursor: 'pointer' }}
 						>
-							<i className="btn-icn-edit" />
+							<FontAwesomeIcon icon="edit" />
 						</span>
 					</OverlayTrigger>
 				</p>
@@ -149,17 +151,21 @@ class AdElement extends Component {
 				<pre style={{ wordBreak: 'break-word' }}>{code}</pre>{' '}
 				{window.isSuperUser || true ? (
 					<div>
-						<CustomButton
-							label="Network Details"
-							handler={() => this.toggleHandler('showNetworkDetails')}
-						/>
-						<CustomButton
-							label="Lazyload Settings"
-							handler={() => this.toggleHandler('showLazyload')}
-						/>
+						<CustomButton variant="secondary" className="u-margin-l3 u-margin-t3 pull-right" onClick={() => this.toggleHandler('showNetworkDetails')}>
+							Network Details
+						</CustomButton>
+						<CustomButton variant="secondary" className="u-margin-l3 u-margin-t3 pull-right" onClick={() => this.toggleHandler('showLazyload')}>
+							Lazyload Settings
+						</CustomButton>
+						{
+							!isAMP ? (
+								<CustomButton variant="secondary" className="u-margin-t3 pull-right" onClick={() => copyToClipBoard(code)}>
+									Copy AdCode
+								</CustomButton>
+							) : null
+						}
 					</div>
 				) : null}
-				{!isAMP ? <CustomButton label="Copy Adcode" handler={() => copyToClipBoard(code)} /> : null}
 			</div>
 		);
 	}

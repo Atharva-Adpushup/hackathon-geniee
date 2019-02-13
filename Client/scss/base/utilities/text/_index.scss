@@ -13,3 +13,16 @@
 .u-text-underline-none {
 	text-decoration: $none !important;
 }
+
+.u-text-info {
+	color: $blackColor !important;
+}
+
+.u-text-red,
+.u-text-error {
+	color: $errorText !important;
+}
+
+.u-text-success {
+	color: $successText !important;
+}
