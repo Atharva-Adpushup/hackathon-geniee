@@ -1,22 +1,30 @@
 import React, { Component } from 'react';
 import AdElement from './AdElement';
-import { CustomButton } from '../../shared/index';
+import CustomButton from '../../../../../Components/CustomButton/index';
 import Empty from '../../../../../Components/Empty/index';
 import Loader from '../../../../../Components/Loader';
 
 class AdList extends Component {
 	componentDidMount() {
-		const { loading, fetchAds, location } = this.props;
-		if (loading) fetchAds({ siteId: 1 });
+		const { loading, fetchAds, match } = this.props;
+		if (loading) fetchAds({ siteId: match.params.siteId });
 	}
 
 	render() {
-		const { loading, ads = [], masterSave, updateAd, modifyAdOnServer, networkConfig } = this.props;
-		const customStyle = window.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
+		const {
+			loading,
+			ads = [],
+			masterSave,
+			updateAd,
+			modifyAdOnServer,
+			user,
+			networkConfig
+		} = this.props;
+		const customStyle = user.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
 
 		if (loading) {
 			return (
-				<div style={{ height: '600px' }}>
+				<div style={{ height: '100%', minHeight: '600px' }}>
 					<Loader />
 				</div>
 			);
@@ -26,24 +34,27 @@ class AdList extends Component {
 		}
 		return (
 			<ul className="section-list row">
-				{window.isSuperUser ? (
+				{user.isSuperUser ? (
 					<div>
 						<CustomButton
-							label="Master Save"
-							handler={() => masterSave(window.siteId, window.isSuperUser)}
-							classNames="mr-10"
-						/>
+							variant="primary"
+							className="u-margin-t3 u-margin-r2 pull-right"
+							onClick={() => masterSave(window.siteId, user.isSuperUser)}
+						>
+							Master Save
+						</CustomButton>
 						<div style={{ clear: 'both' }}>&nbsp;</div>
 					</div>
 				) : null}
 				{ads.map((ad, key) =>
 					!Object.prototype.hasOwnProperty.call(ad, 'isActive') ||
 					ad.isActive ||
-					window.isSuperUser ? (
+					user.isSuperUser ? (
 						<div key={key} className="col-sm-6">
 							<li className="section-list-item" key={ad.id} style={customStyle}>
 								<AdElement
 									ad={ad}
+									user={user}
 									updateAd={updateAd}
 									modifyAdOnServer={modifyAdOnServer}
 									networkConfig={networkConfig}

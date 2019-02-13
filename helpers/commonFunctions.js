@@ -5,6 +5,7 @@ const Promise = require('bluebird'),
 	config = require('../configs/config'),
 	commonConsts = require('../configs/commonConsts'),
 	utils = require('./utils'),
+	couchbase = require('./couchBaseService'),
 	httpStatus = require('../configs/httpStatusConsts'),
 	sqlReportingModule = require('../reports/default/adpTags/index'),
 	siteTopUrlsQuery = require('../reports/default/adpTags/queries/siteTopUrls'),
@@ -669,6 +670,12 @@ const Promise = require('bluebird'),
 			);
 
 		return isValidResult;
+	},
+	getNetworkConfig = () => {
+		return couchbase
+			.connectToAppBucket()
+			.then(appBucket => appBucket.getAsync(commonConsts.docKeys.networkConfig))
+			.then(json => json.value);
 	};
 
 module.exports = {
@@ -696,5 +703,6 @@ module.exports = {
 	sendSuccessResponse,
 	sendErrorResponse,
 	checkForLog,
-	isValidThirdPartyDFPAndCurrency
+	isValidThirdPartyDFPAndCurrency,
+	getNetworkConfig
 };
