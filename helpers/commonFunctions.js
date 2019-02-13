@@ -592,13 +592,13 @@ const Promise = require('bluebird'),
 		});
 	},
 	sendSuccessResponse = (response, res, code = httpStatus.OK) => {
-		return res.status(code).send({
+		return res.status(code).json({
 			error: false,
 			data: response
 		});
 	},
 	sendErrorResponse = (response, res, code = httpStatus.BAD_REQUEST) => {
-		return res.status(code).send({
+		return res.status(code).json({
 			error: true,
 			data: response
 		});
