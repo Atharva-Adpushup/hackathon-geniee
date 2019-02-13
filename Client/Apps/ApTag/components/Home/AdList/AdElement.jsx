@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../lib/helpers';
 import { ADCODE, AMP_MESSAGE } from '../../../configs/commonConsts';
-// import { CustomButton } from '../../shared/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import AdNetworkDetails from './AdNetworkDetails';
 import LazyLoadSettings from './LazyLoadSettings';
@@ -33,7 +32,7 @@ class AdElement extends Component {
 			: AMP_MESSAGE;
 
 	disableAd() {
-		const { ad, updateAd, modifyAdOnServer } = this.props;
+		const { ad, updateAd, modifyAdOnServer, user } = this.props;
 		const { isActive } = this.state;
 		const message = isActive
 			? 'Are you sure you want to archive this ad?'
@@ -44,7 +43,7 @@ class AdElement extends Component {
 					isActive: !isActive
 				},
 				() =>
-					window.isSuperUser
+					user.isSuperUser
 						? updateAd(ad.id, { isActive, archivedOn: +new Date() })
 						: modifyAdOnServer(ad.id, { isActive, archivedOn: +new Date() })
 			);
@@ -56,8 +55,8 @@ class AdElement extends Component {
 	}
 
 	updateWrapper(data) {
-		const { updateAd, modifyAdOnServer, ad } = this.props;
-		return window.isSuperUser ? updateAd(ad.id, data) : modifyAdOnServer(ad.id, data);
+		const { updateAd, modifyAdOnServer, user, ad } = this.props;
+		return user.isSuperUser ? updateAd(ad.id, data) : modifyAdOnServer(ad.id, data);
 	}
 
 	renderInformation = (label, value) => (
@@ -67,7 +66,7 @@ class AdElement extends Component {
 	);
 
 	renderAdDetails() {
-		const { ad, updateAd, networkConfig } = this.props;
+		const { ad, updateAd, networkConfig, user } = this.props;
 		const { showLazyload, showNetworkDetails, editName, isActive } = this.state;
 		const isAMP = ad.formatData.type === 'amp';
 
@@ -107,7 +106,7 @@ class AdElement extends Component {
 		}
 		return (
 			<div key={`adDetails${ad.id}`}>
-				{window.isSuperUser && !isActive ? (
+				{user.isSuperUser && !isActive ? (
 					<Tags labels={['Archived']} labelClasses="custom-label" />
 				) : null}
 				{this.renderInformation('Id', ad.id)}
@@ -139,7 +138,7 @@ class AdElement extends Component {
 						? makeFirstLetterCapitalize(ad.width)
 						: `${ad.width}x${ad.height}`
 				)}
-				{window.isSuperUser ? (
+				{user.isSuperUser ? (
 					<div>
 						{this.renderInformation(
 							'Network',
@@ -149,7 +148,7 @@ class AdElement extends Component {
 					</div>
 				) : null}
 				<pre style={{ wordBreak: 'break-word' }}>{code}</pre>{' '}
-				{window.isSuperUser || true ? (
+				{user.isSuperUser ? (
 					<div>
 						<CustomButton variant="secondary" className="u-margin-l3 u-margin-t3 pull-right" onClick={() => this.toggleHandler('showNetworkDetails')}>
 							Network Details

@@ -5,10 +5,12 @@ import AdList from '../components/Home/AdList/index';
 
 const mapStateToProps = (state, ownProps) => {
 	const { apTag } = state.apps;
+	const { user, networkConfig } = state.global;
 	return {
 		loading: !apTag.ads.fetched,
 		ads: apTag.ads.content,
-		networkConfig: apTag.global.networkConfig,
+		user: user.data,
+		networkConfig: networkConfig.data,
 		...ownProps
 	};
 };

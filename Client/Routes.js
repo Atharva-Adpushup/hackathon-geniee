@@ -6,7 +6,7 @@ import PublicOnlyRoute from './Components/PublicOnlyRoute';
 import PrivateRoute from './Components/PrivateRoute';
 import authService from './services/authService';
 import Loader from './Components/Loader';
-import Shell from './Components/Shell';
+import ShellContainer from './Containers/ShellContainer';
 
 import Login from './Pages/Login';
 import Signup from './Pages/Signup';
@@ -41,7 +41,7 @@ const UserRoutes = () => (
 				<PublicOnlyRoute exact path="/signup" component={Signup} />
 
 				{/* Private Routes */}
-				<Shell>
+				<ShellContainer>
 					<PrivateRoute exact path="/dashboard" component={Dashboard} />
 					<PrivateRoute exact path="/sites" component={Sites} />
 					<PrivateRoute exact path="/reporting" component={Reporting} />
@@ -51,7 +51,7 @@ const UserRoutes = () => (
 					<PrivateRoute exact path="/payment" component={Payment} />
 					<PrivateRoute exact path="/paymentSettings" component={PaymentSettings} />
 					<PrivateRoute exact path="/ap-tag/:siteId" component={ApTag} />
-				</Shell>
+				</ShellContainer>
 			</Switch>
 		</Suspense>
 	</Router>

@@ -343,7 +343,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	docKeys: {
 		apTag: 'tgmr::',
-		user: 'user::'
+		user: 'user::',
+		networkConfig: 'data::apNetwork'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,
