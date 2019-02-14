@@ -13,13 +13,11 @@ import SectionOptions from './sectionOptions.jsx';
 class NetworkOptions extends Component {
 	constructor(props) {
 		super(props);
+		const user = this.props.user || window.currentUser;
 		this.state = {
-			network:
-				this.props.ad && this.props.ad.network
-					? this.props.ad.network
-					: this.props.ad && currentUser.userType == 'partner'
-					? 'geniee'
-					: false
+			network: this.props.ad && this.props.ad.network
+				? this.props.ad.network
+				: this.props.ad && user.userType == 'partner' ? 'geniee' : false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.renderNetwork = this.renderNetwork.bind(this);
