@@ -1,39 +1,31 @@
 import { AD_ACTIONS, GLOBAL_ACTIONS } from '../../../constants/apTag';
 import axiosInstance from '../../../helpers/axiosInstance';
+import { errorHandler } from '../../../helpers/commonFunctions';
 
 const createAd = params => dispatch =>
 	axiosInstance
 		.post('/apTag/createAd', params)
 		.then(response => {
-			if (response.error) {
-				return alert('Ad creation failed');
-			}
-			dispatch({ type: AD_ACTIONS.UPDATE_ADS_LIST, data: { ...params.ad, id: response.data.id } });
-			dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, currentAd: response.data.id });
+			const { data } = response.data;
+			dispatch({ type: AD_ACTIONS.UPDATE_ADS_LIST, data: { ...params.ad, id: data.id } });
+			dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, currentAd: data.id });
 		})
-		.catch(err => console.log(err));
+		.catch(err => errorHandler(err, 'Ad Creation Failed. Please contact AdPushup Operations Team'));
 
 const fetchAds = params => dispatch =>
 	axiosInstance
-		.post('/apTag/fetchAds', params)
+		.get('/apTag/fetchAds', { params })
 		.then(response => {
-			if (response.error) {
-				return alert('Ad fetching failed');
-			}
-			dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: response.data.ads });
+			const { data } = response.data;
+			dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: data.ads });
 		})
-		.catch(err => console.log(err));
+		.catch(err => errorHandler(err, 'Ad Fetching Failed'));
 
 const deleteAd = params => dispatch =>
 	axiosInstance
-		.post('/apTag/deleteAd', params)
-		.then(response => {
-			if (response.error) {
-				return alert('Delete Ad failed');
-			}
-			dispatch({ type: AD_ACTIONS.DELETE_AD, adId: params.adId });
-		})
-		.catch(err => console.log(err));
+		.post('/apTag/deleteAd', { params })
+		.then(() => dispatch({ type: AD_ACTIONS.DELETE_AD, adId: params.adId }))
+		.catch(err => errorHandler(err, 'Ad Deletion Failed'));
 
 const updateAd = (adId, data) => dispatch =>
 	dispatch({
@@ -44,21 +36,18 @@ const updateAd = (adId, data) => dispatch =>
 		}
 	});
 
-const modifyAdOnServer = (adId, data) => dispatch =>
+const modifyAdOnServer = (siteId, adId, data) => dispatch =>
 	axiosInstance
-		.post('/apTag/modifyAd', { siteId: window.siteId, adId, data })
-		.then(response => {
-			if (response.error) {
-				return alert(response.data.message);
-			}
-			return dispatch({
+		.post('/apTag/modifyAd', { siteId, adId, data })
+		.then(() =>
+			dispatch({
 				type: AD_ACTIONS.UPDATE_AD,
 				data: {
 					id: adId,
 					updateThis: data
 				}
-			});
-		})
-		.catch(err => console.log(err));
+			})
+		)
+		.catch(err => errorHandler(err));
 
 export { createAd, fetchAds, deleteAd, updateAd, modifyAdOnServer };

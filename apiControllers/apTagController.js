@@ -6,10 +6,10 @@ const moment = require('moment');
 const { couchbaseService } = require('node-utils');
 const request = require('request-promise');
 const config = require('../configs/config');
-const utils = require('../helpers/utils');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
+const AdPushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { docKeys, tagManagerInitialDoc, videoNetworkInfo } = require('../configs/commonConsts');
+const { docKeys, tagManagerInitialDoc } = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
 const siteModel = require('../models/siteModel');
 
@@ -23,6 +23,15 @@ const router = express.Router();
 
 const fn = {
 	isSuperUser: false,
+	verifyOwner: (siteId, userEmail) =>
+		siteModel.getSiteById(siteId).then(site => {
+			if (site.get('ownerEmail') !== userEmail) {
+				return Promise.reject(
+					new Error({ message: 'Unauthorized Request', code: HTTP_STATUS.PERMISSION_DENIED })
+				);
+			}
+			return true;
+		}),
 	sendDataToZapier: data => {
 		const options = {
 			method: 'GET',
@@ -52,17 +61,15 @@ const fn = {
 		const cas = data.cas || false;
 		const value = data.value || data;
 		const id = uuid.v4();
-		const networkInfo = payload.ad.formatData.type === 'video' ? videoNetworkInfo : {};
 		const ad = {
 			...payload.ad,
 			id,
 			name: `Ad-${id}`,
 			createdOn: +new Date(),
 			formatData: {
-				...payload.ad.formatData,
-				eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
+				...payload.ad.formatData
 			},
-			...networkInfo
+			networkInfo: {}
 		};
 
 		value.ads.push(ad);
@@ -95,8 +102,9 @@ const fn = {
 		return !cas ? fn.getAndUpdate(key, value, adId) : fn.directDBUpdate(key, value, cas, adId);
 	},
 	errorHander: (err, res, code = HTTP_STATUS.BAD_REQUEST) => {
-		console.log(err);
-		return sendErrorResponse({ message: 'Opertion Failed' }, res, code);
+		const customMessage = err.message || err;
+		const errorCode = customMessage.code || code;
+		return sendErrorResponse({ message: 'Opertion Failed' }, res, errorCode);
 	},
 	adUpdateProcessing: (req, res, processing) =>
 		appBucket
@@ -125,8 +133,9 @@ router
 				res
 			);
 		}
-		return appBucket
-			.getDoc(`${docKeys.apTag}${req.query.siteId}`)
+		return fn
+			.verifyOwner(req.query.siteId, req.user.email)
+			.then(() => appBucket.getDoc(`${docKeys.apTag}${req.query.siteId}`))
 			.then(docWithCas =>
 				sendSuccessResponse(
 					{
@@ -146,39 +155,6 @@ router
 					: fn.errorHander(err, res)
 			);
 	})
-	.get('/networkConfig', (req, res) =>
-		appBucket
-			.getDoc('data::apNetwork')
-			.then(json => res.json(json.value))
-			.catch(err => {
-				if (err.code === 13) {
-					throw new AdPushupError([{ status: 404, message: 'Doc does not exist' }]);
-				}
-				return res.json(err);
-			})
-	)
-	.get(['/', '/:siteId'], (req, res) => {
-		const { session, params } = req;
-
-		if (!params.siteId) {
-			return res.render('404');
-		}
-
-		return siteModel
-			.getSiteById(params.siteId)
-			.then(site =>
-				site.get('ownerEmail') !== session.user.email
-					? res.render('404')
-					: res.render('tagManager', {
-							siteId: params.siteId,
-							isSuperUser: !!session.isSuperUser
-					  })
-			)
-			.catch(err => {
-				console.log(err.message);
-				return res.render('404');
-			});
-	})
 	.post('/createAd', (req, res) => {
 		if (!req.body || !req.body.siteId || !req.body.ad) {
 			return sendErrorResponse(
@@ -189,15 +165,16 @@ router
 			);
 		}
 
-		fn.isSuperUser = req.session.isSuperUser;
+		fn.isSuperUser = req.user.isSuperUser;
 
 		const payload = {
 			ad: req.body.ad,
 			siteId: req.body.siteId,
-			ownerEmail: req.session.user.email
+			ownerEmail: req.user.email
 		};
-		return appBucket
-			.getDoc(`${docKeys.apTag}${req.body.siteId}`)
+		return fn
+			.verifyOwner(req.body.siteId, req.user.email)
+			.then(() => appBucket.getDoc(`${docKeys.apTag}${req.body.siteId}`))
 			.then(docWithCas => fn.processing(docWithCas, payload))
 			.catch(err =>
 				err.name && err.name === 'CouchbaseError' && err.code === 13
@@ -217,7 +194,7 @@ router
 			.catch(err => fn.errorHander(err, res));
 	})
 	.post('/masterSave', (req, res) => {
-		if (!req.body || !req.body.siteId || !req.body.ads || !req.session.isSuperUser) {
+		if (!req.body || !req.body.siteId || !req.body.ads || !req.user.isSuperUser) {
 			return sendErrorResponse(
 				{
 					message: 'Invalid Parameters.'
@@ -228,10 +205,13 @@ router
 		return fn.adUpdateProcessing(req, res, docWithCas => {
 			const doc = docWithCas.value;
 
-			const { siteId, siteDomain } = req.body;
+			const { siteId } = req.body;
 
-			if (doc.ownerEmail !== req.session.user.email) {
-				return Promise.reject(new Error('Owner verfication fail'));
+			if (doc.ownerEmail !== req.user.email) {
+				throw new AdPushupError({
+					message: 'Unauthorized Request',
+					code: HTTP_STATUS.PERMISSION_DENIED
+				});
 			}
 			if (!doc.ads.length) {
 				doc.ads = req.body.ads;
@@ -254,8 +234,7 @@ router
 				});
 				doc.ads = newAds;
 			}
-
-			return appBucket.updateDoc(`${docKeys.apTag}${siteId}`, doc, docWithCas.cas);
+			return fn.directDBUpdate(`${docKeys.apTag}${siteId}`, doc, docWithCas.cas);
 		});
 	})
 	.post('/modifyAd', (req, res) => {
@@ -269,8 +248,11 @@ router
 		}
 		return fn.adUpdateProcessing(req, res, docWithCas => {
 			const doc = docWithCas.value;
-			if (doc.ownerEmail !== req.session.user.email) {
-				return Promise.reject(new Error('Owner verfication fail'));
+			if (doc.ownerEmail !== req.user.email) {
+				throw new AdPushupError({
+					message: 'Unauthorized Request',
+					code: HTTP_STATUS.PERMISSION_DENIED
+				});
 			}
 			_.forEach(doc.ads, (ad, index) => {
 				if (ad.id === req.body.adId) {
@@ -278,7 +260,7 @@ router
 					return false;
 				}
 			});
-			return appBucket.updateDoc(`${docKeys.apTag}${req.body.siteId}`, doc, docWithCas.cas);
+			return fn.directDBUpdate(`${docKeys.apTag}${req.body.siteId}`, doc, docWithCas.cas);
 		});
 	});
 

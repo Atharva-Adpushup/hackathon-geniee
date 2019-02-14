@@ -53,6 +53,27 @@ var modelAPI = (module.exports = apiModule()),
 			'billingInfoComplete',
 			'paymentInfoComplete'
 		];
+		this.clientKeys = [
+			'firstName',
+			'lastName',
+			'email',
+			'sites',
+			'adNetworkSettings',
+			'createdAt',
+			'requestDemo',
+			'requestDemoData',
+			'adNetworks',
+			'pageviewRange',
+			'userType',
+			'websiteRevenue',
+			'revenueUpperLimit',
+			'preferredModeOfReach',
+			'revenueLowerLimit',
+			'revenueAverage',
+			'adnetworkCredentials',
+			'billingInfoComplete',
+			'paymentInfoComplete'
+		];
 		this.validations = schema.user.validations;
 		this.classMap = {
 			adNetworkSettings: networkSettings
@@ -232,6 +253,17 @@ var modelAPI = (module.exports = apiModule()),
 					return ad ? { ad: ad, site: activeSite } : false;
 				});
 		};
+
+		this.cleanData = () => {
+			const { data } = this;
+			const filteredData = {};
+			_.forEach(data, (value, key) => {
+				if (this.clientKeys.includes(key)) {
+					filteredData[key] = value;
+				}
+			});
+			return filteredData;
+		}
 	});
 
 function isPipeDriveAPIActivated() {

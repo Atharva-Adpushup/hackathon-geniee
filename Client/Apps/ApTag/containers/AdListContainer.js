@@ -5,10 +5,12 @@ import AdList from '../components/Home/AdList/index';
 
 const mapStateToProps = (state, ownProps) => {
 	const { apTag } = state.apps;
+	const { user, networkConfig } = state.global;
 	return {
 		loading: !apTag.ads.fetched,
 		ads: apTag.ads.content,
-		networkConfig: apTag.global.networkConfig,
+		user: user.data,
+		networkConfig: networkConfig.data,
 		...ownProps
 	};
 };
@@ -16,7 +18,7 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = dispatch => ({
 	fetchAds: payload => dispatch(fetchAds(payload)),
 	updateAd: (adId, payload) => dispatch(updateAd(adId, payload)),
-	modifyAdOnServer: (adId, payload) => dispatch(modifyAdOnServer(adId, payload)),
+	modifyAdOnServer: (siteId, adId, payload) => dispatch(modifyAdOnServer(siteId, adId, payload)),
 	masterSave: siteId => dispatch(masterSave(siteId))
 });
 

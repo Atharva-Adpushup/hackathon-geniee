@@ -65,9 +65,13 @@ body {
 	}
 }
 
-.section-list .section-list-item {
-	min-height: 420px;
+.section-list {
+	margin: 20px 0px !important;
+	padding: 0px 10px;
+}
 
+.section-list .section-list-item {
+	min-height: 440px;
 	& {
 		padding: 20px 0px;
 		border: 1px solid lighten(#b2bec3, 5%);
@@ -75,6 +79,7 @@ body {
 		margin-bottom: 20px;
 		position: relative;
 		font-size: 16px !important;
+		list-style: none;
 	}
 
 	&,
@@ -119,35 +124,6 @@ body {
 
 .mr-10 {
 	margin-right: 10px !important;
-}
-
-.custom-message {
-	padding: 10px;
-	margin: 0px 0px 10px 0px;
-	box-shadow: 0 0 0 1px rgba(34, 36, 38, 0.22) inset, 0 0 0 0 transparent;
-	background: #f8f8f9;
-	border-radius: 0.28571429rem;
-
-	&.info-text {
-		color: #000000;
-	}
-	&.error-text {
-		color: #c3272b;
-	}
-	&.success-text {
-		color: #006442;
-	}
-	h3 {
-		font-weight: bold;
-	}
-	hr {
-		color: #000000;
-		margin: 10px 0px;
-	}
-	p {
-		margin: 0px;
-		font-size: 14px;
-	}
 }
 
 .custom-btn {
@@ -234,4 +210,20 @@ body {
 	background: $primaryColor;
 	font-size: 14px;
 	padding: 5px;
+}
+.pd-b100 {
+	padding-bottom: 70px !important;
+}
+.mT-10 {
+	margin-top: 10px !important;
+}
+.mB-10 {
+	margin-bottom: 10px !important;
+}
+.networkOptionsRow .adpTag-wrapper .row {
+	margin-left: -15px !important;
+	margin-right: -15px !important;
+}
+.lazyload-wrapper .toggle-container {
+	padding: 0px !important;
 }

@@ -1,9 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-import ReactDOM from 'react-dom';
 import { Row, Col, Button, OverlayTrigger, Tooltip, Alert } from 'react-bootstrap';
 import CodeBox from '../codeBox';
 import { priceFloorKeys, iabSizes } from '../../../consts/commonConsts';
-import SelectBox from '../select/select.js';
+import SelectBox from '../select/index';
 import CustomToggleSwitch from '../customToggleSwitch.jsx';
 import { getSupportedAdSizes } from '../../../../OpsPanel/lib/helpers';
 import MultipleAdSizeSelector from '../../outer/insertMenu/multipleAdSizeSelector.jsx';
@@ -478,7 +477,7 @@ class AdpTags extends Component {
 			isGenieeEditableMode = !!(this.props.geniee && !isInsertMode);
 
 		return (
-			<div>
+			<div className="adpTag-wrapper">
 				{isGenieeEditableMode ? this.renderGenieeNote() : null}
 				{this.props.geniee
 					? null
@@ -489,19 +488,20 @@ class AdpTags extends Component {
 								</Col>
 								<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
 									<SelectBox
-										value={this.state.fpKey}
-										label="Select Floor Price Key"
-										showClear={false}
-										onChange={fpKey => {
+										id="price-floor-key-selection"
+										title="Select Floor Price Key"
+										onSelect={fpKey => {
 											this.setState({ fpKey });
 										}}
-									>
-										{priceFloorKeys.map((item, index) => (
-											<option key={item} value={item}>
-												{item}
-											</option>
-										))}
-									</SelectBox>
+										selected={this.state.fpKey}
+										options={priceFloorKeys.map((item, index) => {
+											return {
+												name: item,
+												value: item
+											}
+										}
+										)}
+									/>
 								</Col>
 							</Row>
 							<Row className="mT-10">
