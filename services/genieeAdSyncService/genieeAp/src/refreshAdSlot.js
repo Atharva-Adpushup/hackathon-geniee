@@ -4,25 +4,34 @@ var utils = require('../libs/utils'),
 	commonConsts = require('../config/commonConsts'),
 	adCodeGenerator = require('./adCodeGenerator'),
 	adp = window.adpushup,
+	_ = require('lodash'),
 	$ = adp.$,
 	ads = [],
-	intervals = [],
+	inViewAds = [],
+	setRefreshTimeOut = function (container, ad, refreshInterval) {
+		var refreshInterval = refreshInterval !== undefined ? refreshInterval : commonConsts.AD_REFRESH_INTERVAL;
+		setTimeout(refreshAd, refreshInterval, container, ad);
+	},
 	refreshAd = function (container, ad) {
 		if (utils.checkElementInViewPercent(container)) {
+			var currentTime = new Date().getTime();
+			container.attr('data-refresh-time', currentTime);
 			if (ad.network === commonConsts.NETWORKS.ADPTAGS && !ad.networkData.headerBidding) {
 				var slot = getAdpSlot(ad);
 				refreshGPTSlot(slot.gSlot);
 				sendFeedback(ad);
+				setRefreshTimeOut(container, ad);
 			} else if (ad.network !== commonConsts.NETWORKS.ADPTAGS) {
 				container.children().remove();
 				container.append(adCodeGenerator.generateAdCode(ad));
 				sendFeedback(ad);
+				setRefreshTimeOut(container, ad);
 			}
 		}
 	},
 	getAdpSlot = function (ad) {
 		var adSize = ad.width + 'X' + ad.height,
-			siteId = 37902, //adp.config.siteId,
+			siteId = adp.config.siteId,
 			slotId = 'ADP_' + siteId + '_' + adSize + '_' + ad.id,
 			adpSlots = adp.adpTags.adpSlots,
 			slot = adpSlots[slotId];
@@ -46,63 +55,56 @@ var utils = require('../libs/utils'),
 		googletag.pubads().refresh([gSlot]);
 	},
 	setAdInterval = function (container, ad) {
-		var refreshInterval = setInterval(refreshAd, commonConsts.AD_REFRESH_INTERVAL, container, ad);
-		intervals.push(refreshInterval);
-	},
-	clearAdInterval = function () {
-		if (intervals.length) {
-			for (var i = 0; i < intervals.length; i++) {
-				clearInterval(intervals[i]);
-			}
-			intervals.length = 0;
+		if (utils.checkElementInViewPercent(container)) {
+			var currentTime = new Date().getTime();
+			inViewAds.push(ad);
+			container.attr('data-refresh-time', currentTime);
+			setTimeout(refreshAd, commonConsts.AD_REFRESH_INTERVAL, container, ad);
 		}
 	},
-	getContainer = function (ad) {
-		var defer = $.Deferred(),
-			isResponsive = !!(ad.networkData && ad.networkData.isResponsive),
-			computedStylesObject = isResponsive
-				? {}
-				: {
-					width: ad.width,
-					height: ad.height
-				  };
-
-		try {
-			var $adEl = $('#' + ad.id);
-
-			$adEl.css($.extend(computedStylesObject, ad.css));
-			return defer.resolve($adEl);
-		} catch (e) {
-			return defer.reject('Unable to get adpushup container');
-		}
-	},
-	setAdTimeOut = function () {},
-	getAllInViewAds = function (ads) {
+	getAllInViewAds = function () {
+		inViewAds = [];
 		for (var i = 0; i < ads.length; i++) {
-			return getContainer(ad).done(function (container) {
-				if (utils.checkElementInViewPercent(container)) {
-					var currentTime = new Date().getTime();
-					container.setAttribute('data-refresh-time', currentTime);
-				}
-			});
+			if (utils.checkElementInViewPercent(ads[i].container)) inViewAds.push(ads[i]);
 		}
 	},
-	init = function (w) {
-		w.adpushup.$(w).on('blur', function () {
-			clearAdInterval();
-		});
-		w.adpushup.$(w).on('focus', function () {
-			for (var i = 0; i < ads.length; i++) {
-				var adContainer = $.extend({}, ads[i]),
-					container = adContainer.container,
-					ad = adContainer.ad;
-				refreshAd(container, ad);
-				setAdInterval(container, ad);
+	onScroll = function () {
+		console.log('scrolled', ads);
+		getAllInViewAds();
+
+		for (var i = 0; i < inViewAds.length; i++) {
+			var inViewAd = inViewAds[i],
+				container = inViewAd.container,
+				ad = inViewAd.ad,
+				adRenderTime = container.attr('data-render-time'),
+				lastRefreshTime = container.attr('data-refresh-time'),
+				currentTime = new Date().getTime(),
+				timeDifferenceInSec,
+				refreshInterval;
+			if (lastRefreshTime) {
+				// if Ad has been rendered before
+				timeDifferenceInSec = currentTime - lastRefreshTime;
+				if (timeDifferenceInSec > commonConsts.AD_REFRESH_INTERVAL) {
+					// if last refresh turn has been missed
+					refreshInterval = 0;
+				}
+				// else immediatly refresh it;
+			} else {
+				// If ad is rendering for the first time.
+				timeDifferenceInSec = currentTime - adRenderTime;
+				if (timeDifferenceInSec > commonConsts.AD_REFRESH_INTERVAL) {
+					// wait for 2 sec to count the impression of ad renedered first time.
+					refreshInterval = 2000;
+				} else refreshInterval = commonConsts.AD_REFRESH_INTERVAL; // lazyloading case (if ad has just rendered, refreesh it after 30sec.)
 			}
-		});
+			setRefreshTimeOut(container, ad, refreshInterval);
+		}
+	},
+	init = function () {
+		$(window).on('scroll', _.throttle(onScroll, 1000));
 	},
 	refreshSlot = function (container, ad) {
-		setAdInterval(container, ad);
+		setRefreshTimeOut(container, ad);
 		ads.push({ container: container, ad: ad });
 	};
 
