@@ -1,6 +1,6 @@
 module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
-	BASE_URL: 'http://console.adpushup.com',
+	BASE_URL: 'http://localhost:8080',
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://staging.adpushup.com/InternalOpsWebService/stats',
@@ -325,7 +325,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	dummy: 'test',
 	docKeys: {
 		apTag: 'tgmr::',
-		user: 'user::'
+		user: 'user::',
+		networkConfig: 'data::apNetwork'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,

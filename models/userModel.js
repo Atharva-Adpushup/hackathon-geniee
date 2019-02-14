@@ -21,7 +21,7 @@ var modelAPI = (module.exports = apiModule()),
 	request = require('request-promise'),
 	pipedriveAPI = require('../misc/vendors/pipedrive'),
 	mailService = require('../services/mailService/index'),
-	{ mailService } = require('node-utils'),
+	{ mailService: nodeUtilsMailService } = require('node-utils'),
 	User = model.extend(function() {
 		this.keys = [
 			'firstName',
@@ -50,6 +50,27 @@ var modelAPI = (module.exports = apiModule()),
 			'revenueAverage',
 			'adnetworkCredentials',
 			'miscellaneous',
+			'billingInfoComplete',
+			'paymentInfoComplete'
+		];
+		this.clientKeys = [
+			'firstName',
+			'lastName',
+			'email',
+			'sites',
+			'adNetworkSettings',
+			'createdAt',
+			'requestDemo',
+			'requestDemoData',
+			'adNetworks',
+			'pageviewRange',
+			'userType',
+			'websiteRevenue',
+			'revenueUpperLimit',
+			'preferredModeOfReach',
+			'revenueLowerLimit',
+			'revenueAverage',
+			'adnetworkCredentials',
 			'billingInfoComplete',
 			'paymentInfoComplete'
 		];
@@ -232,6 +253,17 @@ var modelAPI = (module.exports = apiModule()),
 					return ad ? { ad: ad, site: activeSite } : false;
 				});
 		};
+
+		this.cleanData = () => {
+			const { data } = this;
+			const filteredData = {};
+			_.forEach(data, (value, key) => {
+				if (this.clientKeys.includes(key)) {
+					filteredData[key] = value;
+				}
+			});
+			return filteredData;
+		}
 	});
 
 function isPipeDriveAPIActivated() {
@@ -286,7 +318,7 @@ function setSiteLevelPipeDriveData(user, inputData) {
 }
 
 function sendUserSignupMail(json) {
-	const Mailer = new mailService({
+	const Mailer = new nodeUtilsMailService({
 			MAIL_FROM: 'services.daemon@adpushup.com',
 			MAIL_FROM_NAME: 'AdPushup Mailer',
 			SMTP_SERVER: Config.email.SMTP_SERVER,
@@ -566,7 +598,7 @@ function apiModule() {
 				.then(API.getUserByEmail.bind(null, json.email))
 				.then(function(user) {
 					if (user) {
-						var error = { email: ['User with email ' + json.email + ' already exists'] };
+						const error = [{ email: `User with email ${json.email} already exists` }];
 						throw new AdPushupError(error);
 					}
 				})

@@ -39,7 +39,7 @@ class SelectBox extends Component {
 		const { options, id, title, wrapperClassName, dropdownClassName, type } = this.props;
 		const buttonTitle = name || title;
 		return (
-			<div className={`custom-select-box-wrapper ${wrapperClassName}"`}>
+			<div className={`custom-select-box-wrapper ${wrapperClassName}`}>
 				<DropdownButton
 					title={buttonTitle}
 					bsStyle={type}

@@ -6,7 +6,7 @@
 @import 'shared/loader/index';
 
 @import 'shared/shell/index';
-
+@import 'shared/spinner';
 // Auth Pages
-@import './pages/login';
-@import './pages/signup';
+@import 'pages/login';
+@import 'pages/signup';

@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { networks, defaultPriceFloorKey, partners } from '../../../consts/commonConsts';
 import CodeBox from '../codeBox';
-import SelectBox from '../select/select';
+import SelectBox from '../select/index';
 import AdpTags from './AdpTags';
 import Adsense from './Adsense';
 import MediaNet from './MediaNet';
@@ -13,10 +13,11 @@ import SectionOptions from './sectionOptions.jsx';
 class NetworkOptions extends Component {
 	constructor(props) {
 		super(props);
+		const user = this.props.user || window.currentUser;
 		this.state = {
 			network: this.props.ad && this.props.ad.network
 				? this.props.ad.network
-				: this.props.ad && currentUser.userType == 'partner' ? 'geniee' : false
+				: this.props.ad && user.userType == 'partner' ? 'geniee' : false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.renderNetwork = this.renderNetwork.bind(this);
@@ -242,13 +243,19 @@ class NetworkOptions extends Component {
 		let filteredNetworks = this.filterNetworks();
 		return (
 			<div className="networkOptionsRow">
-				<SelectBox value={this.state.network} label="Select Network" onChange={this.networkChangeHandler}>
-					{filteredNetworks.map((item, index) => (
-						<option key={index} value={item}>
-							{item.charAt(0).toUpperCase() + item.slice(1).replace(/([A-Z])/g, ' $1')}
-						</option>
-					))}
-				</SelectBox>
+				<SelectBox
+					id="network-selection"
+					title="Select Network"
+					onSelect={this.networkChangeHandler}
+					options={filteredNetworks.map((item, index) => {
+							return {
+								name: item.charAt(0).toUpperCase() + item.slice(1).replace(/([A-Z])/g, ' $1'),
+								value: item
+							}
+						}
+					)}
+					selected={this.state.network}
+				/>
 				<div>{this.state.network ? this.renderNetwork() : null}</div>
 			</div>
 		);

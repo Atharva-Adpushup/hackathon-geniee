@@ -1,0 +1,20 @@
+$SBBorderColor: #e6e6e6;
+$SBBorderColorActive: #ccc;
+$SBPaddingTB: 5px;
+$SBPaddingLR: 8px;
+
+.input--basic {
+	padding: $SBPaddingTB $SBPaddingLR;
+	display: inline-block;
+	width: 100%;
+	text-align: left;
+	background-color: $whiteColor;
+	border: 1px solid $SBBorderColor;
+}
+
+.input--minimal {
+	width: 100%;
+	padding: 3.5px 10px;
+	border-radius: 3px;
+	border: 1px solid rgb(204, 204, 204);
+}

@@ -5,10 +5,12 @@ module.exports = {
 				{ name: 'name', message: 'Please fill out name', value: '' },
 				{ name: 'firstName', message: 'Please fill out first name', value: '' },
 				{ name: 'email', message: 'Please fill out email id', value: '' },
+				{ name: 'key', message: 'Key not found', value: '' },
 				{ name: 'oldPassword', message: 'Please fill out old password', value: '' },
 				{ name: 'password', message: 'Please fill out password', value: '' },
 				{ name: 'confirmPassword', message: 'Please fill out confirm password', value: '' },
 				{ name: 'site', message: 'Please fill out site url', value: '' },
+				{ name: 'websiteRevenue', message: 'Please select your website revenue range', value: '' },
 				{ name: 'pageviewRange', message: 'Please select a page view range', value: '' }
 			],
 			isLength: [
