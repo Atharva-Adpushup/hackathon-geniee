@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../lib/helpers';
 import { ADCODE, AMP_MESSAGE } from '../../../configs/commonConsts';
-// import Edit from '../../shared/Edit';
-import { CustomButton } from '../../shared/index';
-// import AdNetworkDetails from './AdNetworkDetails';
-// import AdEventDetails from './AdEventDetails';
-// import LazyLoadSettings from './LazyLoadSettings';
+import CustomButton from '../../../../../Components/CustomButton/index';
+import AdNetworkDetails from './AdNetworkDetails';
+import LazyLoadSettings from './LazyLoadSettings';
+import EditBox from '../../../../../Components/EditBox/index';
 import Tags from '../../../../../Components/Tags/index';
 
 class AdElement extends Component {
@@ -14,7 +14,6 @@ class AdElement extends Component {
 		super(props);
 		this.state = {
 			showNetworkDetails: false,
-			showEventDetails: false,
 			showLazyload: false,
 			editName: false,
 			isActive: Object.prototype.hasOwnProperty.call(props.ad, 'isActive')
@@ -33,7 +32,7 @@ class AdElement extends Component {
 			: AMP_MESSAGE;
 
 	disableAd() {
-		const { ad, updateAd, modifyAdOnServer } = this.props;
+		const { ad, updateAd, modifyAdOnServer, user, match } = this.props;
 		const { isActive } = this.state;
 		const message = isActive
 			? 'Are you sure you want to archive this ad?'
@@ -44,9 +43,9 @@ class AdElement extends Component {
 					isActive: !isActive
 				},
 				() =>
-					window.isSuperUser
+					user.isSuperUser
 						? updateAd(ad.id, { isActive, archivedOn: +new Date() })
-						: modifyAdOnServer(ad.id, { isActive, archivedOn: +new Date() })
+						: modifyAdOnServer(match.params.siteId, ad.id, { isActive, archivedOn: +new Date() })
 			);
 		}
 	}
@@ -56,8 +55,8 @@ class AdElement extends Component {
 	}
 
 	updateWrapper(data) {
-		const { updateAd, modifyAdOnServer, ad } = this.props;
-		return window.isSuperUser ? updateAd(ad.id, data) : modifyAdOnServer(ad.id, data);
+		const { updateAd, modifyAdOnServer, user, ad, match } = this.props;
+		return user.isSuperUser ? updateAd(ad.id, data) : modifyAdOnServer(match.params.siteId, ad.id, data);
 	}
 
 	renderInformation = (label, value) => (
@@ -67,55 +66,48 @@ class AdElement extends Component {
 	);
 
 	renderAdDetails() {
-		const { ad, updateAd, networkConfig } = this.props;
-		const { showEventDetails, showLazyload, showNetworkDetails, editName, isActive } = this.state;
+		const { ad, updateAd, networkConfig, user } = this.props;
+		const { showLazyload, showNetworkDetails, editName, isActive } = this.state;
 		const isAMP = ad.formatData.type === 'amp';
 
 		let code = isAMP ? this.getAMPAdCode(ad) : ADCODE;
 		code = code ? code.replace(/__AD_ID__/g, ad.id) : null;
 
 		if (showNetworkDetails) {
-			// return (
-			// 	<AdNetworkDetails
-			// 		ad={ad}
-			// 		onCancel={() => this.toggleHandler('showNetworkDetails')}
-			// 		onSubmit={updateAd}
-			// 		networkConfig={networkConfig}
-			// 	/>
-			// );
-		} else if (showEventDetails) {
-			// return (
-			// 	<AdEventDetails
-			// 		ad={ad}
-			// 		onCancel={() => this.toggleHandler('showEventDetails')}
-			// 		onSubmit={updateAd}
-			// 	/>
-			// );
+			return (
+				<AdNetworkDetails
+					ad={ad}
+					onCancel={() => this.toggleHandler('showNetworkDetails')}
+					onSubmit={updateAd}
+					networkConfig={networkConfig}
+					user={user}
+				/>
+			);
 		} else if (editName) {
-			// return (
-			// 	<Edit
-			// 		label="Ad Name"
-			// 		name={`name-${ad.id}`}
-			// 		value={ad.name ? ad.name : `Ad-${ad.id}`}
-			// 		onSave={this.updateWrapper}
-			// 		onCancel={() => this.toggleHandler('editName')}
-			// 		leftSize={3}
-			// 		rightSize={9}
-			// 	/>
-			// );
+			return (
+				<EditBox
+					label="Ad Name"
+					name={`name-${ad.id}`}
+					value={ad.name ? ad.name : `Ad-${ad.id}`}
+					onSave={this.updateWrapper}
+					onCancel={() => this.toggleHandler('editName')}
+					leftSize={3}
+					rightSize={9}
+				/>
+			);
 		} else if (showLazyload) {
-			// return (
-			// 	<LazyLoadSettings
-			// 		checked={ad.enableLazyLoading}
-			// 		id={ad.id}
-			// 		changeHandler={payload => updateAd(ad.id, payload)}
-			// 		cancelHandler={() => this.toggleHandler('showLazyLoad')}
-			// 	/>
-			// );
+			return (
+				<LazyLoadSettings
+					checked={ad.enableLazyLoading}
+					id={ad.id}
+					onChange={payload => updateAd(ad.id, payload)}
+					onCancel={() => this.toggleHandler('showLazyload')}
+				/>
+			);
 		}
 		return (
 			<div key={`adDetails${ad.id}`}>
-				{window.isSuperUser && !isActive ? (
+				{user.isSuperUser && !isActive ? (
 					<Tags labels={['Archived']} labelClasses="custom-label" />
 				) : null}
 				{this.renderInformation('Id', ad.id)}
@@ -126,11 +118,11 @@ class AdElement extends Component {
 						overlay={<Tooltip id="ad-name-edit">Edit Ad Name</Tooltip>}
 					>
 						<span
-							className="adDetails-icon"
+							className="adDetails-icon u-text-red"
 							onClick={() => this.toggleHandler('editName')}
 							style={{ cursor: 'pointer' }}
 						>
-							<i className="btn-icn-edit" />
+							<FontAwesomeIcon icon="edit" />
 						</span>
 					</OverlayTrigger>
 				</p>
@@ -147,7 +139,7 @@ class AdElement extends Component {
 						? makeFirstLetterCapitalize(ad.width)
 						: `${ad.width}x${ad.height}`
 				)}
-				{window.isSuperUser ? (
+				{user.isSuperUser ? (
 					<div>
 						{this.renderInformation(
 							'Network',
@@ -157,19 +149,23 @@ class AdElement extends Component {
 					</div>
 				) : null}
 				<pre style={{ wordBreak: 'break-word' }}>{code}</pre>{' '}
-				{window.isSuperUser ? (
+				{user.isSuperUser ? (
 					<div>
-						<CustomButton
-							label="Network Details"
-							handler={() => this.toggleHandler('showNetworkDetails')}
-						/>
-						<CustomButton
-							label="Lazyload Settings"
-							handler={() => this.toggleHandler('showLazyload')}
-						/>
+						<CustomButton variant="secondary" className="u-margin-l3 u-margin-t3 pull-right" onClick={() => this.toggleHandler('showNetworkDetails')}>
+							Network Details
+						</CustomButton>
+						<CustomButton variant="secondary" className="u-margin-l3 u-margin-t3 pull-right" onClick={() => this.toggleHandler('showLazyload')}>
+							Lazyload Settings
+						</CustomButton>
+						{
+							!isAMP ? (
+								<CustomButton variant="secondary" className="u-margin-t3 pull-right" onClick={() => copyToClipBoard(code)}>
+									Copy AdCode
+								</CustomButton>
+							) : null
+						}
 					</div>
 				) : null}
-				{!isAMP ? <CustomButton label="Copy Adcode" handler={() => copyToClipBoard(code)} /> : null}
 			</div>
 		);
 	}

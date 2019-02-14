@@ -1,7 +1,7 @@
+const Promise = require('bluebird');
 const express = require('express');
 const md5 = require('md5');
 
-const router = express.Router();
 const userModel = require('../models/userModel');
 const consts = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
@@ -11,6 +11,9 @@ const httpStatus = require('../configs/httpStatusConsts');
 const formValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const AdPushupError = require('../helpers/AdPushupError');
+const { getNetworkConfig } = require('../helpers/commonFunctions');
+
+const router = express.Router();
 
 function createNewUser(params) {
 	const origName = utils.trimString(params.name);
@@ -93,6 +96,25 @@ function createNewUser(params) {
 */
 
 router
+	.get('/globalData', (req, res) => {
+		const { email, isSuperUser } = req.user;
+		return Promise.join(
+			userModel.getUserByEmail(email),
+			getNetworkConfig(),
+			(user, networkConfig) => {
+				const userData = user.cleanData();
+				return res.status(httpStatus.OK).json({
+					user: { ...userData, isSuperUser },
+					networkConfig
+				});
+			}
+		).catch(err => {
+			console.log(err);
+			return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+				message: err.message
+			});
+		});
+	})
 	.post('/signup', (req, res) => {
 		createNewUser(req.body)
 			.then(email =>

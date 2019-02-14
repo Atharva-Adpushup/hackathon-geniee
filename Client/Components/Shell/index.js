@@ -6,6 +6,11 @@ import Sidebar from './Sidebar';
 class Shell extends React.Component {
 	state = { isSidebarOpen: true };
 
+	componentDidMount() {
+		const { fetched, fetchGlobalData } = this.props;
+		if (!fetched) fetchGlobalData();
+	}
+
 	sidebarToggle = () => {
 		this.setState(state => ({ isSidebarOpen: !state.isSidebarOpen }));
 	};

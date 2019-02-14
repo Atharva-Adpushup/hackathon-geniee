@@ -13,7 +13,8 @@ import {
 	faEnvelope,
 	faKey,
 	faUser,
-	faLink
+	faLink,
+	faEdit
 } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import ErrorBoundary from './Components/ErrorBoundary';
@@ -31,7 +32,8 @@ library.add(
 	faEnvelope,
 	faKey,
 	faUser,
-	faLink
+	faLink,
+	faEdit
 );
 
 const App = () => (

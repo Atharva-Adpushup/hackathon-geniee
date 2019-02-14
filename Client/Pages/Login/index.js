@@ -5,7 +5,7 @@ import history from '../../helpers/history';
 import AuthShell from '../../Components/AuthShell';
 import AuthFormWrap from '../../Components/AuthFormWrap';
 import FormInput from '../../Components/FormInput';
-import ApButton from '../../Components/ApButton';
+import CustomButton from '../../Components/CustomButton';
 import { loginAction } from '../../actions/userActions';
 import formValidator from '../../helpers/formValidator';
 import validationSchema from '../../helpers/validationSchema';
@@ -136,7 +136,7 @@ class Login extends Component {
 							/>
 							{passwordError && <div className="error-message">{passwordError}</div>}
 							<div className="form-group">
-								<ApButton
+								<CustomButton
 									variant="primary"
 									showSpinner={isLoggingIn}
 									type="submit"
@@ -144,7 +144,7 @@ class Login extends Component {
 									className="pull-right"
 								>
 									Login
-								</ApButton>
+								</CustomButton>
 								<Link
 									to="/forgot-password"
 									id="login-forgotPassword-redirect-link"

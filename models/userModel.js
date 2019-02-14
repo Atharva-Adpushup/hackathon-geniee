@@ -1,4 +1,91 @@
-const modelAPI = (module.exports = apiModule());
+var modelAPI = (module.exports = apiModule()),
+	model = require('../helpers/model'),
+	couchbase = require('../helpers/couchBaseService'),
+	query = require('couchbase').ViewQuery.from('app', 'sitesByUser'),
+	networkSettings = require('../models/subClasses/user/networkSettings'),
+	globalModel = require('../models/globalModel'),
+	siteModel = require('../models/siteModel'),
+	consts = require('../configs/commonConsts'),
+	utils = require('../helpers/utils'),
+	schema = require('../helpers/schema'),
+	_ = require('lodash'),
+	md5 = require('md5'),
+	extend = require('extend'),
+	normalizeurl = require('normalizeurl'),
+	FormValidator = require('../helpers/FormValidator'),
+	AdPushupError = require('../helpers/AdPushupError'),
+	Config = require('../configs/config'),
+	Mailer = require('../helpers/Mailer'),
+	jadeParser = require('simple-jade-parser'),
+	Promise = require('bluebird'),
+	request = require('request-promise'),
+	pipedriveAPI = require('../misc/vendors/pipedrive'),
+	mailService = require('../services/mailService/index'),
+	{ mailService } = require('node-utils'),
+	User = model.extend(function() {
+		this.keys = [
+			'firstName',
+			'lastName',
+			'email',
+			'salt',
+			'passwordMd5',
+			'sites',
+			'adNetworkSettings',
+			'createdAt',
+			'passwordResetKey',
+			'passwordResetKeyCreatedAt',
+			'requestDemo',
+			'requestDemoData',
+			'adNetworks',
+			'pageviewRange',
+			'managedBy',
+			'userType',
+			'websiteRevenue',
+			// 'crmDealId',
+			// 'crmDealTitle',
+			// 'crmDealSecondaryTitle',
+			'revenueUpperLimit',
+			'preferredModeOfReach',
+			'revenueLowerLimit',
+			'revenueAverage',
+			'adnetworkCredentials',
+			'miscellaneous',
+			'billingInfoComplete',
+			'paymentInfoComplete'
+		];
+		this.clientKeys = [
+			'firstName',
+			'lastName',
+			'email',
+			'sites',
+			'adNetworkSettings',
+			'createdAt',
+			'requestDemo',
+			'requestDemoData',
+			'adNetworks',
+			'pageviewRange',
+			'userType',
+			'websiteRevenue',
+			'revenueUpperLimit',
+			'preferredModeOfReach',
+			'revenueLowerLimit',
+			'revenueAverage',
+			'adnetworkCredentials',
+			'billingInfoComplete',
+			'paymentInfoComplete'
+		];
+		this.validations = schema.user.validations;
+		this.classMap = {
+			adNetworkSettings: networkSettings
+		};
+		this.defaults = {
+			sites: [],
+			adNetworkSettings: [],
+			// requestDemo: true
+			// Commented for Tag Manager
+			requestDemo: true
+		};
+		this.ignore = ['password', 'oldPassword', 'confirmPassword', 'site'];
 
 const model = require('../helpers/model');
 
@@ -249,10 +336,19 @@ const User = model.extend(function() {
 						return false;
 					}
 				});
-				return ad ? { ad, site: activeSite } : false;
+		};
+
+		this.cleanData = () => {
+			const { data } = this;
+			const filteredData = {};
+			_.forEach(data, (value, key) => {
+				if (this.clientKeys.includes(key)) {
+					filteredData[key] = value;
+				}
 			});
-	};
-});
+			return filteredData;
+		}
+	});
 
 function isPipeDriveAPIActivated() {
 	return !!(

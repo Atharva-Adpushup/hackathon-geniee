@@ -6,7 +6,7 @@ import PublicOnlyRoute from './Components/PublicOnlyRoute';
 import PrivateRoute from './Components/PrivateRoute';
 import authService from './services/authService';
 import Loader from './Components/Loader';
-import Shell from './Components/Shell';
+import ShellContainer from './Containers/ShellContainer';
 
 import Login from './Pages/Login';
 import Signup from './Pages/Signup';
@@ -26,6 +26,7 @@ const PaymentSettings = lazy(() =>
 	import(/* webpackChunkName: "paymentSettings" */ './Pages/PaymentSettings')
 );
 const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/index'));
+const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/ErrorPage/index'));
 
 const Routes = () => (
 	<Router history={history}>
@@ -39,13 +40,15 @@ const Routes = () => (
 						authService.isLoggedin() ? <Redirect to="/dashboard" /> : <Redirect to="/login" />
 					}
 				/>
+
 				<PublicOnlyRoute exact path="/login" component={Login} />
 				<PublicOnlyRoute exact path="/signup" component={Signup} />
 				<PublicOnlyRoute exact path="/forgot-password" component={ForgotPassword} />
 				<PublicOnlyRoute exact path="/reset-password" component={ResetPassword} />
 
 				{/* Private Routes */}
-				<Shell>
+				<ShellContainer>
+					<Route exact path="/error" render={() => <ErrorPage />} />
 					<PrivateRoute exact path="/dashboard" component={Dashboard} />
 					<PrivateRoute exact path="/sites" component={Sites} />
 					<PrivateRoute exact path="/reporting" component={Reporting} />
@@ -54,8 +57,8 @@ const Routes = () => (
 					<PrivateRoute exact path="/addSite" component={AddNewSite} />
 					<PrivateRoute exact path="/payment" component={Payment} />
 					<PrivateRoute exact path="/paymentSettings" component={PaymentSettings} />
-					<PrivateRoute exact path="/:siteId/ap-tag" component={ApTag} />
-				</Shell>
+					<PrivateRoute exact path="/ap-tag/:siteId" component={ApTag} />
+				</ShellContainer>
 			</Switch>
 		</Suspense>
 	</Router>

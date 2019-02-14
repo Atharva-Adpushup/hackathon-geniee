@@ -3,7 +3,8 @@ import { Row, Col, ProgressBar } from 'react-bootstrap';
 import CustomList from './CustomList';
 import { TYPES, SIZES, DISPLAY_AD_MESSAGE, AMP_MESSAGE, ADCODE } from '../../configs/commonConsts';
 import { copyToClipBoard } from '../../lib/helpers';
-import { CustomMessage, CustomButton } from '../shared/index';
+import CustomMessage from '../../../../Components/CustomMessage/index';
+import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader';
 
 class AdCodeGenerator extends Component {
@@ -21,7 +22,6 @@ class AdCodeGenerator extends Component {
 		this.selectSize = this.selectSize.bind(this);
 		this.saveHandler = this.saveHandler.bind(this);
 		this.resetHandler = this.resetHandler.bind(this);
-		// this.renderPlatformOptions = this.renderPlatformOptions.bind(this);
 		this.renderTypeOptions = this.renderTypeOptions.bind(this);
 		this.renderSizes = this.renderSizes.bind(this);
 		this.renderMainContent = this.renderMainContent.bind(this);
@@ -54,7 +54,7 @@ class AdCodeGenerator extends Component {
 	}
 
 	saveHandler() {
-		const { createAd } = this.props;
+		const { createAd, match } = this.props;
 		const { type, platform, size } = this.state;
 		const isResponsive = size === 'responsive';
 		const sizesArray = isResponsive ? 'responsive' : size.split('x');
@@ -70,7 +70,7 @@ class AdCodeGenerator extends Component {
 			},
 			() =>
 				createAd({
-					siteId: window.siteId,
+					siteId: match.params.siteId,
 					ad: {
 						width,
 						height,
@@ -164,13 +164,13 @@ class AdCodeGenerator extends Component {
 
 	renderButton = (label, handler) => (
 		<Row style={{ margin: '0px' }}>
-			<div
-				className="btn btn-lightBg btn-default"
-				style={{ float: 'right', minWidth: '200px', margin: '10px 10px 0px 0px' }}
+			<CustomButton
+				variant="primary"
+				className="u-margin-t2 u-margin-r3 pull-right"
 				onClick={handler}
 			>
 				{label}
-			</div>
+			</CustomButton>
 		</Row>
 	);
 
@@ -184,12 +184,21 @@ class AdCodeGenerator extends Component {
 			<Col xs={12}>
 				{isDisplayAd ? <pre>{code.replace(/__AD_ID__/g, adId).trim()}</pre> : null}
 				<CustomMessage header="Information" type="info" message={message} />
-				<CustomButton label="Create More Ads" handler={this.resetHandler} />
+				<CustomButton
+					variant="primary"
+					className="u-margin-t3 pull-right"
+					onClick={() => this.resetHandler()}
+				>
+					Create More Ads
+				</CustomButton>
 				{isDisplayAd ? (
 					<CustomButton
-						label="Copy Adcode"
-						handler={() => copyToClipBoard(code.replace(/__AD_ID__/g, adId))}
-					/>
+						variant="secondary"
+						className="u-margin-t3 u-margin-r3 pull-right"
+						onClick={() => copyToClipBoard(code.replace(/__AD_ID__/g, adId))}
+					>
+						Copy Adcode
+					</CustomButton>
 				) : null}
 			</Col>
 		);
