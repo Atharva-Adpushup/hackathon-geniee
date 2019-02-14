@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import AuthShell from '../../Components/AuthShell';
 import AuthFormWrap from '../../Components/AuthFormWrap';
 import FormInput from '../../Components/FormInput';
-import ApButton from '../../Components/ApButton';
+import CustomButton from '../../Components/CustomButton';
 import { forgotPasswordAction } from '../../actions/userActions';
 import formValidator from '../../helpers/formValidator';
 import validationSchema from '../../helpers/validationSchema';
@@ -125,14 +125,14 @@ class ForgotPassword extends Component {
 
 						<div className="AuthFooter ForgotPswFooter row">
 							<div className="col-xs-6">
-								<ApButton
+								<CustomButton
 									type="submit"
 									showSpinner={isSendingMail}
 									id="forgotPassword-submit"
 									variant="secondary"
 								>
 									Reset Password
-								</ApButton>
+								</CustomButton>
 							</div>
 							<div className="col-xs-6">
 								<Link
