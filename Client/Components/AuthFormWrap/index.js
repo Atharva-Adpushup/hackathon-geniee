@@ -1,7 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
-import CustomButton from '../CustomButton';
 
 const AuthFormWrap = ({ formType, onSubmit, children }) => (
 	<div className="AuthWrap">
@@ -12,6 +10,7 @@ const AuthFormWrap = ({ formType, onSubmit, children }) => (
 				{formType === 'login' && 'Sign in'}
 				{formType === 'signup' && 'Sign up'}
 				{formType === 'forgotPassword' && 'Forgot Password'}
+				{formType === 'resetPassword' && 'Reset Password'}
 			</h3>
 		</div>
 		{/* Header Ends Here */}
@@ -19,61 +18,13 @@ const AuthFormWrap = ({ formType, onSubmit, children }) => (
 		{/* <!-- Form Starts Here--> */}
 		<form className="u-margin-b0" onSubmit={onSubmit}>
 			{children}
-
-			{/* <!-- Form Ends Here--> */}
-
-			{/* <!-- Footer Section Starts Here--> */}
-			{formType === 'login' && (
-				<div className="AuthFooter LoginFooter row">
-					<div className="pull-right">
-						Don&apos;t have an account?
-						<Link to="/signup" id="auth-signup-redirect-link" className="btn btn--secondary">
-							Sign up
-						</Link>
-					</div>
-				</div>
-			)}
-
-			{formType === 'signup' && (
-				<div className="AuthFooter SignupFooter row text-center">
-					<div className="u-margin-b4">
-						Already have an account?
-						<Link to="/login" id="signup-auth-redirect-btn" className="btn btn--secondary">
-							Login!
-						</Link>
-					</div>
-					<span className="u-padding-0 label label--text-faded">
-						Have any questions? Please email our Sales Team -{' '}
-						<a
-							href="mailto:sales@adpushup.com"
-							className="u-padding-0 u-margin-0 link link--primary"
-						>
-							sales@adpushup.com
-						</a>
-					</span>
-				</div>
-			)}
-
-			{formType === 'forgotPassword' && (
-				<div className="AuthFooter ForgotPswFooter row">
-					<div className="col-xs-6">
-						<CustomButton type="submit" id="forgotPassword-submit" variant="secondary">
-							Reset Password
-						</CustomButton>
-					</div>
-					<div className="col-xs-6">
-						<Link to="/login" id="forgotPassword-auth-redirect-link" className="btn btn--secondary">
-							Or, Go Back
-						</Link>
-					</div>
-				</div>
-			)}
 		</form>
+		{/* <!-- Form Ends Here--> */}
 	</div>
 );
 
 AuthFormWrap.propTypes = {
-	formType: PropTypes.oneOf(['login', 'signup', 'forgotPassword']).isRequired,
+	formType: PropTypes.oneOf(['login', 'signup', 'forgotPassword', 'resetPassword']).isRequired,
 	children: PropTypes.element.isRequired
 };
 
