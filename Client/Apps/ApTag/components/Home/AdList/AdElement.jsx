@@ -80,6 +80,7 @@ class AdElement extends Component {
 					onCancel={() => this.toggleHandler('showNetworkDetails')}
 					onSubmit={updateAd}
 					networkConfig={networkConfig}
+					user={user}
 				/>
 			);
 		} else if (editName) {

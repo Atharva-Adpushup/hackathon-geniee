@@ -24,6 +24,7 @@ const PaymentSettings = lazy(() =>
 	import(/* webpackChunkName: "paymentSettings" */ './Pages/PaymentSettings')
 );
 const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/index'));
+const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/ErrorPage/index'));
 
 const Routes = () => (
 	<Router history={history}>
@@ -37,11 +38,13 @@ const Routes = () => (
 						authService.isLoggedin() ? <Redirect to="/dashboard" /> : <Redirect to="/login" />
 					}
 				/>
+
 				<PublicOnlyRoute exact path="/login" component={Login} />
 				<PublicOnlyRoute exact path="/signup" component={Signup} />
 
 				{/* Private Routes */}
 				<ShellContainer>
+					<Route exact path="/error" render={() => <ErrorPage />} />
 					<PrivateRoute exact path="/dashboard" component={Dashboard} />
 					<PrivateRoute exact path="/sites" component={Sites} />
 					<PrivateRoute exact path="/reporting" component={Reporting} />

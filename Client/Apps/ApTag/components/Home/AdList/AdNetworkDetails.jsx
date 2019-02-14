@@ -32,12 +32,13 @@ class AdNetworkDetails extends Component {
 	}
 
 	render() {
-		const { ad, networkConfig, onCancel } = this.props;
+		const { ad, networkConfig, onCancel, user } = this.props;
 
 		return (
 			<NetworkOptions
 				onSubmit={this.submitHanlder}
 				onCancel={onCancel}
+				user={user}
 				ad={ad}
 				buttonType={2}
 				fromPanel={false}
