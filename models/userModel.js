@@ -227,7 +227,7 @@ const User = model.extend(function() {
 			});
 	};
 
-	this.getUnsyncedAd = function() {
+	this.getUnsyncedAd = function () {
 		return this.getAllSites()
 			.then(sites => {
 				let validSites;
@@ -250,6 +250,16 @@ const User = model.extend(function() {
 					}
 				});
 				return ad ? { ad, site: activeSite } : false;
+			});
+	};
+
+		this.cleanData = () => {
+			const { data } = this;
+			const filteredData = {};
+			_.forEach(data, (value, key) => {
+				if (this.clientKeys.includes(key)) {
+					filteredData[key] = value;
+				}
 			});
 	};
 });
