@@ -13,13 +13,11 @@ const Welcome = () => (
 					<div className="panel panel-info">
 						<div className="panel-heading">UI Style Guide</div>
 						<ul className="list-group">
-							<li className="list-group-item">Front-end naming convention</li>
-							<li className="list-group-item">Color Theme</li>
-							<li className="list-group-item">Typography</li>
-							<li className="list-group-item">Iconography</li>
 							<li className="list-group-item">
-								Utility classNames (Layout specific like Flexbox, Padding, Margin, Block level)
+								Front-end naming convention & Utility classNames (Layout specific like Flexbox,
+								Padding, Margin, Block level)
 							</li>
+							<li className="list-group-item">Color, Type & zIndex Theme</li>
 						</ul>
 					</div>
 				</li>

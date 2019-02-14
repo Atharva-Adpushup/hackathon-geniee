@@ -4,7 +4,7 @@ import { map } from 'lodash';
 import clipboard from 'clipboard-polyfill';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { colorAndBoxShadowData, styleElementData } from './constants';
+import { colorAndBoxShadowData, fontSizeData, zIndexData, styleElementData } from './constants';
 
 function LinkWithTooltip({ id, children, tooltip, placement }) {
 	return (
@@ -45,18 +45,31 @@ function clipBoardButtonClickHandler(e) {
 }
 
 const renderDataUI = collection => {
-	return map(collection, (rowCollection, rootCollectionKey) => (
+	return map(collection, rowCollection => (
 		<div className="row">
 			{map(rowCollection, (itemObject, rowItemKey) => {
+				const isItemObject = !!itemObject;
+				const isInlineElement = !!(isItemObject && itemObject.componentInlineText);
+				const isColumnClassName = !!(isItemObject && itemObject.componentColumnClassName);
+				const computedColumnClassName = isColumnClassName
+					? itemObject.componentColumnClassName
+					: 'col-sm-4 col-md-2 col-lg-2';
+
 				return (
-					<div className="col-sm-4 col-md-2 col-lg-2">
+					<div className={computedColumnClassName}>
 						<LinkWithTooltip
 							id={`tooltip-${rowItemKey}`}
 							placement="top"
 							tooltip={itemObject.tooltip}
 						>
 							<div className="thumbnail u-border-none">
-								<div className={`color-swatch ${itemObject.componentClassName}`}>
+								<div className={`color-swatch ${itemObject.componentThumnailClassName}`}>
+									{isInlineElement ? (
+										<strong style={itemObject.componentInlineStyle}>
+											{itemObject.componentInlineText}
+										</strong>
+									) : null}
+
 									<LinkWithTooltip
 										id={`tooltip-code-${rowItemKey}`}
 										placement="bottom"
@@ -97,32 +110,28 @@ const Theme = () => (
 		<h1 className="u-margin-b4">Theme</h1>
 		<p>Visual Representation of our theme settings.</p>
 
-		<div className="panel panel-info u-margin-t4 u-margin-b4">
+		<div className="panel panel-default u-margin-t4 u-margin-b4">
 			<div className="panel-heading">
 				<h3 className="u-margin-0">Color & Box-Shadow</h3>
 			</div>
 			<div className="panel-body">{renderDataUI(colorAndBoxShadowData)}</div>
 		</div>
 
-		<div className="panel panel-info u-margin-t4 u-margin-b4">
+		<div className="panel panel-default u-margin-t4 u-margin-b4">
 			<div className="panel-heading">
 				<h3 className="u-margin-0">Font Size</h3>
+				<em className="panel-heading-description u-margin-t2">
+					All font sizes are based on rem. 1rem equals 16px.
+				</em>
 			</div>
-			<div className="panel-body" />
+			<div className="panel-body">{renderDataUI(fontSizeData)}</div>
 		</div>
 
-		<div className="panel panel-info u-margin-t4 u-margin-b4">
-			<div className="panel-heading">
-				<h3 className="u-margin-0">Spacing</h3>
-			</div>
-			<div className="panel-body" />
-		</div>
-
-		<div className="panel panel-info u-margin-t4 u-margin-b4">
+		<div className="panel panel-default u-margin-t4 u-margin-b4">
 			<div className="panel-heading">
 				<h3 className="u-margin-0">zIndex</h3>
 			</div>
-			<div className="panel-body" />
+			<div className="panel-body">{renderDataUI(zIndexData)}</div>
 		</div>
 	</div>
 );
