@@ -20,7 +20,8 @@ class Signup extends Component {
 		password: { value: '', error: '' },
 		websiteRevenue: { value: '', error: '' },
 		termsPolicy: { accepted: false, error: '' },
-		error: ''
+		error: '',
+		isSigningUp: false
 	};
 
 	websiteRevenueOptions = [
@@ -85,7 +86,7 @@ class Signup extends Component {
 			validationSchema.user.validations
 		);
 
-		let validationErrors = {
+		const validationErrors = {
 			...validationResult.errors,
 			...(!termsPolicy.accepted
 				? { termsPolicy: 'Please agree to our Terms of Service & Privacy Policy' }
@@ -93,24 +94,41 @@ class Signup extends Component {
 		};
 
 		if (validationResult.isValid && termsPolicy.accepted) {
+			this.setState({ isSigningUp: true });
+
 			const { signupAction: signup } = this.props;
 
 			signup({ name, email, password, site, websiteRevenue })
 				.then(resp => history.push('/dashboard'))
-				.catch(response => {
+				.catch(({ response }) => {
+					const newState = { isSigningUp: false };
+
 					if (response.status === 400) {
-						validationErrors = { ...validationErrors, ...response.data.errors };
+						const errors = response.data.errors.reduce((accumulator, currValue) => ({
+							...accumulator,
+							...currValue
+						}));
+						const errorKeys = Object.keys(errors);
+
+						for (let i = 0; i < errorKeys.length; i += 1) {
+							newState[errorKeys[i]] = {
+								...this.state[errorKeys[i]],
+								error: errors[errorKeys[i]]
+							};
+						}
 					}
 
 					if (response.status === 500) {
-						this.setState({ error: response.data.error });
+						newState.error = response.data.error;
 					}
+
+					this.setState(newState);
 				});
 		}
 
 		const errorKeys = Object.keys(validationErrors);
 
-		if (errorKeys.length)
+		if (errorKeys.length) {
 			this.setState(state => {
 				const newState = {};
 
@@ -123,6 +141,7 @@ class Signup extends Component {
 
 				return newState;
 			});
+		}
 	};
 
 	render() {
@@ -133,7 +152,8 @@ class Signup extends Component {
 			password: { error: passwordError },
 			websiteRevenue: { error: websiteRevenueError },
 			termsPolicy: { error: termsPolicyError },
-			error
+			error,
+			isSigningUp
 		} = this.state;
 
 		return (
@@ -238,6 +258,7 @@ class Signup extends Component {
 									<div className="col-md-6 u-padding-0">
 										<ApButton
 											variant="primary"
+											showSpinner={isSigningUp}
 											type="submit"
 											id="signup-submit"
 											className="u-margin-0px btn btn-lightBg btn-red pull-right"
