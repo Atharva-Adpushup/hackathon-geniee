@@ -107,19 +107,20 @@ class AdPushupAds extends Component {
 				);
 				break;
 
-			case 'scroll':
-				return this.renderInput(
-					'Scroll percentage',
-					'scrollPrecentage',
-					'number',
-					this.state.eventData.value,
-					leftWidth,
-					rightWidth
-				);
-				break;
+			// case 'scroll':
+			// 	return this.renderInput(
+			// 		'Scroll percentage',
+			// 		'scrollPrecentage',
+			// 		'number',
+			// 		this.state.eventData.value,
+			// 		leftWidth,
+			// 		rightWidth
+			// 	);
+			// 	break;
 
 			case 'DOMContentLoaded':
 			case 'scriptLoaded':
+			case 'scroll':
 				return this.renderInput(
 					'Xpath (optional)',
 					'xpath',
@@ -233,8 +234,6 @@ class AdPushupAds extends Component {
 			!this.state.event ||
 			!this.state.format ||
 			!this.state.size ||
-			((this.state.event == 'scroll' || this.state.event == 'onMills') &&
-				!this.state.eventData.value.trim().length) ||
 			(this.props.showNetworkOptions &&
 				(!networkInfo.network || !networkInfo.networkData) &&
 				!this.state.showButtons) ||

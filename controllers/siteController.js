@@ -166,16 +166,24 @@ router
 				}
 			});
 	})
-	.post('/:siteId/updateManualMode', (req, res) => {
-		const { siteId } = req.params;
+	.post('/:siteId/updateServiceMode', (req, res) => {
+		const { key, siteId } = req.body;
+
+		if (!req.body || !key || !siteId) {
+			res.status(500).send({
+				success: 0,
+				data: null,
+				message: 'Incomplete Params'
+			});
+		}
 
 		return siteModel
 			.getSiteById(siteId)
 			.then(site => {
-				site.set('isManual', !site.get('isManual'));
+				site.set(key, !site.get(key));
 				return site.save();
 			})
-			.then(data => res.status(200).send({ success: 1, data: null, message: 'Manual mode updated!' }))
+			.then(data => res.status(200).send({ success: 1, data: null, message: 'Settings updated!' }))
 			.catch(err => {
 				console.log(err);
 				res.status(500).send({

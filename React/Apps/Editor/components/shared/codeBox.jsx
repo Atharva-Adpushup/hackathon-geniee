@@ -13,7 +13,6 @@ class customCodeEditor extends React.Component {
 		};
 		this.updateCode = this.updateCode.bind(this);
 		this.save = this.save.bind(this);
-		this.updateCode = this.updateCode.bind(this);
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -80,32 +79,52 @@ class customCodeEditor extends React.Component {
 		}
 		// Check if code box is meant to be a regular text editor
 		if (this.props.textEdit) {
+<<<<<<< HEAD
 			let className = 'codeEditor-small ';
 
 			const disabled = this.props.enableSave ? false : this.props.code == '';
 
 			className += this.props.parentExpanded ? ' codeEditor-large' : ' ';
 
+=======
+			let className = 'codeEditor-small ',
+				disabled = this.props.enableSave ? false : this.props.code == '';
+
+			className += this.props.parentExpanded ? ' codeEditor-large' : ' ';
+
+>>>>>>> interactive-ad-formats
 			return (
 				<div className={className} key={this.props.customId}>
 					<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
 					<br />
 					{this.props.showButtons ? (
+<<<<<<< HEAD
 						<Button
 							disabled={this.state.code == ''}
 							className="btn-lightBg btn-save"
 							onClick={this.save}
 						>
+=======
+						<Button disabled={this.state.code == ''} className="btn-lightBg btn-save" onClick={this.save}>
+>>>>>>> interactive-ad-formats
 							{this.props.textEditBtn ? this.props.textEditBtn : 'Save'}
 						</Button>
 					) : null}
 				</div>
 			);
+<<<<<<< HEAD
 		}
 		let className = this.props.showButtons ? 'containerButtonBar' : '';
 		if (this.props.size == 'small') {
 			className += ' pd-b100';
 		}
+=======
+		}
+		let className = this.props.showButtons ? 'containerButtonBar' : '';
+		if (this.props.size == 'small') {
+			className += ' pd-b100';
+		}
+>>>>>>> interactive-ad-formats
 		return (
 			<div className={className} key={this.props.customId}>
 				{this.state.error && <div>Some Error in Code, remove comma in last property if there.</div>}
@@ -113,11 +132,15 @@ class customCodeEditor extends React.Component {
 				{this.props.showButtons ? (
 					<Row className="butttonsRow">
 						<Col xs={6}>
+<<<<<<< HEAD
 							<Button
 								disabled={this.state.error}
 								className="btn-lightBg btn-save"
 								onClick={this.save}
 							>
+=======
+							<Button disabled={this.state.error} className="btn-lightBg btn-save" onClick={this.save}>
+>>>>>>> interactive-ad-formats
 								Save
 							</Button>
 						</Col>

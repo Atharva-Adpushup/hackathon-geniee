@@ -7,6 +7,7 @@ var ApConfig = {
 		'xpathWaitTimeout',
 		'adpushupPercentage',
 		'autoOptimise',
+		'poweredByBanner',
 		'activeDFPNetwork',
 		'activeDFPParentId',
 		'activeDFPCurrencyCode',
@@ -17,6 +18,8 @@ var ApConfig = {
 		'isSPA',
 		'isThirdPartyAdx',
 		'spaPageTransitionTimeout'
+		'isManual',
+		'isInnovative'
 	],
 	override: [
 		'mode',
@@ -26,6 +29,7 @@ var ApConfig = {
 		'xpathWaitTimeout',
 		'adpushupPercentage',
 		'autoOptimise',
+		'poweredByBanner',
 		'activeDFPNetwork',
 		'activeDFPParentId',
 		'activeDFPCurrencyCode',
@@ -36,6 +40,8 @@ var ApConfig = {
 		'isSPA',
 		'isThirdPartyAdx',
 		'spaPageTransitionTimeout'
+		'isManual',
+		'isInnovative'
 	],
 	merge: []
 };
