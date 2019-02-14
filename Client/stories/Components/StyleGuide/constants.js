@@ -344,6 +344,94 @@ const zIndexData = [
 	]
 ];
 
+const iconData = [
+	[
+		{
+			tooltip: 'Pro Tip: Use it as copy to clipboard icon',
+			componentThumnailClassName:
+				'color-swatch--background-2 color-swatch--boxShadow-1 aligner aligner--vCenter aligner--hCenter',
+			componentText: 'icon-Copy',
+			componentCode: 'copy',
+			componentFontAwesomeIcon: true,
+			componentInlineStyle: { fontSize: `2rem` }
+		},
+		{
+			tooltip: 'Pro Tip: Use it as responsive hamburger menu icon',
+			componentThumnailClassName:
+				'color-swatch--background-2 color-swatch--boxShadow-1 aligner aligner--vCenter aligner--hCenter',
+			componentText: 'icon-Bars',
+			componentCode: 'bars',
+			componentFontAwesomeIcon: true,
+			componentInlineStyle: { fontSize: `2rem` }
+		},
+		{
+			tooltip: 'Pro Tip: Use it as dashboard/metrics icon',
+			componentThumnailClassName:
+				'color-swatch--background-2 color-swatch--boxShadow-1 aligner aligner--vCenter aligner--hCenter',
+			componentText: 'icon-Tachometer-Alt',
+			componentCode: 'tachometer-alt',
+			componentFontAwesomeIcon: true,
+			componentInlineStyle: { fontSize: `2rem` }
+		},
+		{
+			tooltip: 'Pro Tip: Use it as listing data icon',
+			componentThumnailClassName:
+				'color-swatch--background-2 color-swatch--boxShadow-1 aligner aligner--vCenter aligner--hCenter',
+			componentText: 'icon-list',
+			componentCode: 'list',
+			componentFontAwesomeIcon: true,
+			componentInlineStyle: { fontSize: `2rem` }
+		},
+		{
+			tooltip: 'Pro Tip: Use it as reports icon',
+			componentThumnailClassName:
+				'color-swatch--background-2 color-swatch--boxShadow-1 aligner aligner--vCenter aligner--hCenter',
+			componentText: 'icon-chart-area',
+			componentCode: 'chart-area',
+			componentFontAwesomeIcon: true,
+			componentInlineStyle: { fontSize: `2rem` }
+		},
+		{
+			tooltip: 'Pro Tip: Use it as desktop icon',
+			componentThumnailClassName:
+				'color-swatch--background-2 color-swatch--boxShadow-1 aligner aligner--vCenter aligner--hCenter',
+			componentText: 'icon-desktop',
+			componentCode: 'desktop',
+			componentFontAwesomeIcon: true,
+			componentInlineStyle: { fontSize: `2rem` }
+		}
+	],
+	[
+		{
+			tooltip: 'Pro Tip: Use it as add data icon',
+			componentThumnailClassName:
+				'color-swatch--background-2 color-swatch--boxShadow-1 aligner aligner--vCenter aligner--hCenter',
+			componentText: 'icon-plus',
+			componentCode: 'plus',
+			componentFontAwesomeIcon: true,
+			componentInlineStyle: { fontSize: `2rem` }
+		},
+		{
+			tooltip: 'Pro Tip: Use it as center alignment icon',
+			componentThumnailClassName:
+				'color-swatch--background-2 color-swatch--boxShadow-1 aligner aligner--vCenter aligner--hCenter',
+			componentText: 'icon-align-center',
+			componentCode: 'align-center',
+			componentFontAwesomeIcon: true,
+			componentInlineStyle: { fontSize: `2rem` }
+		},
+		{
+			tooltip: 'Pro Tip: Use it as money/USD currency/dollar icon',
+			componentThumnailClassName:
+				'color-swatch--background-2 color-swatch--boxShadow-1 aligner aligner--vCenter aligner--hCenter',
+			componentText: 'icon-dollar-sign',
+			componentCode: 'dollar-sign',
+			componentFontAwesomeIcon: true,
+			componentInlineStyle: { fontSize: `2rem` }
+		}
+	]
+];
+
 const styleElementData = `.color-swatch { background: #fff; border-radius: 5px; min-height: 100px; position: relative;}
 .color-swatch.color-swatch--grey-light { background: #ccc; }
 .color-swatch.color-swatch--green { background: #14a314; }
@@ -374,8 +462,8 @@ const styleElementData = `.color-swatch { background: #fff; border-radius: 5px; 
 .color-swatch.color-swatch--boxShadow-1 { box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19); }
 .color-swatch.color-swatch--boxShadow-2 { box-shadow: 0 0 10px #f9f9f9, 0 0 5px #f9f9f9; }
 .color-swatch.color-swatch--button-primary { background: #167096; }
-.button.button--line {border: 0.2rem solid #47b6e4;outline: 0 none;background: #fff;border-radius: 0.5rem;position: absolute;right: 0.5rem;top: 0.5rem;color: #47b6e4;padding: 0.1rem 0.5rem;}
+.button.button--line {border: 0.1rem solid #47b6e4;outline: 0 none;background: #fff;border-radius: 0.25rem;position: absolute;right: 0.5rem;top: 0.5rem;color: #47b6e4;padding: 0.1rem 0.5rem;}
 .panel-heading-description {color: #89949b; display: inline-block;}
 `;
 
-module.exports = { colorAndBoxShadowData, fontSizeData, zIndexData, styleElementData };
+module.exports = { colorAndBoxShadowData, fontSizeData, zIndexData, iconData, styleElementData };

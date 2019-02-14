@@ -4,7 +4,13 @@ import { map } from 'lodash';
 import clipboard from 'clipboard-polyfill';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { colorAndBoxShadowData, fontSizeData, zIndexData, styleElementData } from './constants';
+import {
+	colorAndBoxShadowData,
+	fontSizeData,
+	zIndexData,
+	iconData,
+	styleElementData
+} from './constants';
 
 function LinkWithTooltip({ id, children, tooltip, placement }) {
 	return (
@@ -70,6 +76,13 @@ const renderDataUI = collection => {
 										</strong>
 									) : null}
 
+									{itemObject.componentFontAwesomeIcon ? (
+										<FontAwesomeIcon
+											icon={itemObject.componentCode}
+											style={itemObject.componentInlineStyle}
+										/>
+									) : null}
+
 									<LinkWithTooltip
 										id={`tooltip-code-${rowItemKey}`}
 										placement="bottom"
@@ -81,7 +94,7 @@ const renderDataUI = collection => {
 											data-clipboard={itemObject.componentCode}
 											onClick={clipBoardButtonClickHandler}
 										>
-											<FontAwesomeIcon icon="code" className="" />
+											<FontAwesomeIcon icon="copy" className="" />
 										</button>
 									</LinkWithTooltip>
 								</div>
@@ -132,6 +145,13 @@ const Theme = () => (
 				<h3 className="u-margin-0">zIndex</h3>
 			</div>
 			<div className="panel-body">{renderDataUI(zIndexData)}</div>
+		</div>
+
+		<div className="panel panel-default u-margin-t4 u-margin-b4">
+			<div className="panel-heading">
+				<h3 className="u-margin-0">Icons</h3>
+			</div>
+			<div className="panel-body">{renderDataUI(iconData)}</div>
 		</div>
 	</div>
 );
