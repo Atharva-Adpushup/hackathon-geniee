@@ -25,14 +25,17 @@ module.exports = {
 							case 'isEmail':
 								if (!validator.isEmail(json[key], rule.value)) errors[key] = rule.message;
 								break;
+							case 'isLength':
+								!validator.isLength(json[key], rule.value) ? (errors[key] = rule.message) : '';
+								break;
 						}
 					}
 				});
 			});
 		});
 
-		if (Object.keys(errors).length) return Promise.reject(errors);
+		if (Object.keys(errors).length) return { isValid: false, errors };
 
-		return Promise.resolve();
+		return { isValid: true };
 	}
 };

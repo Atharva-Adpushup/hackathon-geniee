@@ -1,7 +1,7 @@
 const authToken = require('../helpers/authToken');
 const userModel = require('../models/userModel');
 
-const openRoutes = ['/login', '/signup'];
+const openRoutes = ['/login', '/signup', '/forgotPassword', '/resetPassword'];
 const closedRoutes = ['/user'];
 
 module.exports = (req, res, next) => {

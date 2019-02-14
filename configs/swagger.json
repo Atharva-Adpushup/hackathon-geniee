@@ -65,12 +65,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "object",
-									"properties": {
-										"success": {
-											"type": "string"
-										}
-									}
+									"$ref": "#/components/schemas/SuccessResponse"
 								}
 							}
 						}
@@ -80,12 +75,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "object",
-									"properties": {
-										"error": {
-											"type": "string"
-										}
-									}
+									"$ref": "#/components/schemas/ErrorResponse"
 								}
 							}
 						}
@@ -95,12 +85,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "object",
-									"properties": {
-										"error": {
-											"type": "string"
-										}
-									}
+									"$ref": "#/components/schemas/FieldValidationErrorResponse"
 								}
 							}
 						}
@@ -166,12 +151,142 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "object",
-									"properties": {
-										"success": {
-											"type": "string"
-										}
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "input validation errors",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FieldValidationErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/forgotPassword": {
+			"post": {
+				"summary": "forgot password",
+				"tags": ["indexController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"email": {
+										"type": "string",
+										"format": "email"
 									}
+								},
+								"required": ["email"]
+							}
+						}
+					}
+				},
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "email sent",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "input validation error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FieldValidationErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "user not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resetPassword": {
+			"post": {
+				"summary": "reset password",
+				"tags": ["indexController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"email": {
+										"type": "string",
+										"format": "email"
+									},
+									"key": "string",
+									"password": {
+										"type": "string",
+										"format": "password"
+									}
+								},
+								"required": ["email", "key", "password"]
+							}
+						}
+					}
+				},
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "email sent",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "input validation error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FieldValidationErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "user not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
 								}
 							}
 						}
@@ -181,6 +296,34 @@
 		}
 	},
 	"components": {
+		"schemas": {
+			"ErrorResponse": {
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string"
+					}
+				}
+			},
+			"FieldValidationErrorResponse": {
+				"type": "object",
+				"properties": {
+					"errors": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					}
+				}
+			},
+			"SuccessResponse": {
+				"properties": {
+					"success": {
+						"type": "string"
+					}
+				}
+			}
+		},
 		"securitySchemes": {
 			"cookieAuth": {
 				"type": "apiKey",

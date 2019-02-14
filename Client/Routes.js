@@ -10,6 +10,8 @@ import Shell from './Components/Shell';
 
 import Login from './Pages/Login';
 import Signup from './Pages/Signup';
+import ForgotPassword from './Pages/ForgotPassword';
+import ResetPassword from './Pages/ResetPassword';
 
 const Dashboard = lazy(() => import(/* webpackChunkName: "dashboard" */ './Pages/Dashboard'));
 const Sites = lazy(() => import(/* webpackChunkName: "sites" */ './Pages/Sites'));
@@ -39,6 +41,8 @@ const Routes = () => (
 				/>
 				<PublicOnlyRoute exact path="/login" component={Login} />
 				<PublicOnlyRoute exact path="/signup" component={Signup} />
+				<PublicOnlyRoute exact path="/forgot-password" component={ForgotPassword} />
+				<PublicOnlyRoute exact path="/reset-password" component={ResetPassword} />
 
 				{/* Private Routes */}
 				<Shell>
