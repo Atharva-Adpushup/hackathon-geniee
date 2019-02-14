@@ -13,6 +13,7 @@ const schema = require('../helpers/schema');
 const { getNetworkConfig } = require('../helpers/commonFunctions');
 
 const router = express.Router();
+const AdPushupError = require('../helpers/AdPushupError');
 
 function createNewUser(params) {
 	const origName = utils.trimString(params.name);
@@ -88,8 +89,8 @@ function createNewUser(params) {
 }
 
 // Set user session data and redirects to relevant screen based on provided parameters
-/* 
-	Type defines where the call is coming from 
+/*
+	Type defines where the call is coming from
 	1 : Sign up
 	2 : Login
 */
@@ -165,12 +166,10 @@ router
 
 				// custom check for AdPushupError
 				if (e.name && e.name === 'AdPushupError') {
-					return res
-						.status(httpStatus.INTERNAL_SERVER_ERROR)
-						.json({ errors: e.message, formData: req.body });
+					return res.status(httpStatus.BAD_REQUEST).json({ errors: e.message });
 				}
 
-				return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: errorMessage });
+				return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
 			});
 	})
 	.post('/login', (req, res) => {
@@ -227,6 +226,41 @@ router
 			)
 			.catch(err => {
 				res.status(httpStatus.BAD_REQUEST).json({ error: err.message });
+			});
+	})
+	.post('/forgotPassword', (req, res) => {
+		userModel
+			.forgotPassword(req.body)
+			.then(() => {
+				res
+					.status(httpStatus.OK)
+					.json({ success: 'Verification Email has been sent successfully!' });
+			})
+			.catch(e => {
+				if (e instanceof AdPushupError) {
+					if (typeof e.message === 'object' && e.message.email) {
+						res.status(httpStatus.BAD_REQUEST).json({ errors: e.message });
+					}
+				} else if (e.name && e.name === 'CouchbaseError') {
+					res.status(httpStatus.NOT_FOUND).json({ error: 'User Not Found!' });
+				}
+			});
+	})
+	.post('/resetPassword', (req, res) => {
+		// email, key, password
+		userModel
+			.postResetPassword(req.body)
+			.then(() =>
+				res.status(httpStatus.OK).json({ success: 'Your password has been reset successfully!' })
+			)
+			.catch(e => {
+				if (e instanceof AdPushupError) {
+					res
+						.status(httpStatus.BAD_REQUEST)
+						.json(e.message.keyNotFound ? { error: 'Key not found!' } : { errors: e.message });
+				} else if (e.name && e.name === 'CouchbaseError') {
+					res.status(httpStatus.NOT_FOUND).json({ error: 'User not found!' });
+				}
 			});
 	});
 

@@ -11,6 +11,7 @@ module.exports = {
 				{ name: 'oldPassword', message: 'Please fill out old password', value: '' },
 				{ name: 'password', message: 'Please fill out password', value: '' },
 				{ name: 'confirmPassword', message: 'Please fill out confirm password', value: '' },
+				{ name: 'key', message: 'Key not found', value: '' },
 				{ name: 'site', message: 'Please fill out site url', value: '' },
 				{ name: 'pageviewRange', message: 'Please select a page view range', value: '' }
 			],

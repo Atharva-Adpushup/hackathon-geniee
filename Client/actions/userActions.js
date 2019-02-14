@@ -13,3 +13,6 @@ export const logoutAction = () => dispatch =>
 			// TODO: handle logout failure
 			console.log('unable to logout');
 		});
+export const forgotPasswordAction = email => dispatch => userService.forgotPassword(email);
+export const resetPasswordAction = (email, key, password) => dispatch =>
+	userService.resetPassword(email, key, password);

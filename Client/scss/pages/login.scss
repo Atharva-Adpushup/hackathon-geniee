@@ -1,22 +1,6 @@
 @import '../shared/authShell/index';
 
 .LoginForm {
-	.input-group-addon {
-		@extend LoginInputFields;
-		border: 0;
-		padding: 0 13px;
-		font-size: $LPFormIconSize;
-	}
-	.form-control {
-		@extend LoginInputFields;
-		border: 2px solid $LPFormBorderColor;
-		font-size: $LPFormInputSize;
-		box-shadow: none;
-		&:focus {
-			border-color: $LPFormBorderFocusColor;
-			box-shadow: none;
-		}
-	}
 	.forgetPassword {
 		text-decoration: underline;
 		font-weight: bold;
