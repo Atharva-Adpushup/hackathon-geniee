@@ -1,8 +1,6 @@
 @import '../shared/authShell/index';
 
 .LoginForm {
-	padding: 0 35px;
-	margin: 25px 0;
 	.input-group-addon {
 		@extend LoginInputFields;
 		border: 0;
@@ -54,22 +52,4 @@
 	}
 }
 .LoginFooter {
-	padding: $LPFooterPadding;
-	background: $MBCHeadBg;
-	font-size: $LPFormInputSize;
-	margin: 0;
-	a {
-		margin-left: $LPFooterTextMarginL;
-		padding: $LPFooterTextPadTB $LPFooterTextPadLR;
-	}
-	[class*='col-'] {
-		button,
-		a {
-			width: 100%;
-		}
-	}
-	.label--text-faded {
-		margin-top: $FMLayoutDimension * 2;
-		font-size: 0.7em;
-	}
 }

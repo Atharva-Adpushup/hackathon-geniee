@@ -1,17 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import ApButton from '../ApButton';
 
 const AuthFormWrap = ({ formType, onSubmit, children }) => (
-	<div
-		data-ui-component="user-login"
-		id="login"
-		className="LoginWrap form-container js-form-container"
-	>
+	<div className="AuthWrap">
 		{/* Header Starts Here */}
-		<div className="LoginHead">
-			<div className="LoginHead-logo" />
-			<h3 id="login-heading" className="form-container-heading">
+		<div className="AuthHead">
+			<div className="AuthHead-logo" />
+			<h3 id="auth-heading" className="form-container-heading">
 				{formType === 'login' && 'Sign in'}
 				{formType === 'signup' && 'Sign up'}
 				{formType === 'forgotPassword' && 'Forgot Password'}
@@ -20,17 +17,17 @@ const AuthFormWrap = ({ formType, onSubmit, children }) => (
 		{/* Header Ends Here */}
 
 		{/* <!-- Form Starts Here--> */}
-		<form className="form-horizontal" onSubmit={onSubmit}>
-			<div className="LoginForm">{children}</div>
+		<form className="u-margin-b0" onSubmit={onSubmit}>
+			{children}
 
 			{/* <!-- Form Ends Here--> */}
 
 			{/* <!-- Footer Section Starts Here--> */}
 			{formType === 'login' && (
-				<div className="LoginFooter row">
+				<div className="AuthFooter LoginFooter row">
 					<div className="pull-right">
 						Don&apos;t have an account?
-						<Link to="/signup" id="login-signup-redirect-link" className="btn btn-lightBg">
+						<Link to="/signup" id="auth-signup-redirect-link" className="btn btn--secondary">
 							Sign up
 						</Link>
 					</div>
@@ -38,18 +35,18 @@ const AuthFormWrap = ({ formType, onSubmit, children }) => (
 			)}
 
 			{formType === 'signup' && (
-				<div className="LoginFooter row text-center">
-					<div>
+				<div className="AuthFooter SignupFooter row text-center">
+					<div className="u-margin-b4">
 						Already have an account?
-						<Link to="/login" id="signup-login-redirect-btn" className="btn btn-lightBg">
+						<Link to="/login" id="signup-auth-redirect-btn" className="btn btn--secondary">
 							Login!
 						</Link>
 					</div>
-					<span className="u-padding-0px label label--text-faded">
+					<span className="u-padding-0 label label--text-faded">
 						Have any questions? Please email our Sales Team -{' '}
 						<a
 							href="mailto:sales@adpushup.com"
-							className="u-padding-0px u-margin-0px link link--primary"
+							className="u-padding-0 u-margin-0 link link--primary"
 						>
 							sales@adpushup.com
 						</a>
@@ -58,22 +55,14 @@ const AuthFormWrap = ({ formType, onSubmit, children }) => (
 			)}
 
 			{formType === 'forgotPassword' && (
-				<div className="LoginFooter row">
+				<div className="AuthFooter ForgotPswFooter row">
 					<div className="col-xs-6">
-						<button
-							type="submit"
-							id="forgotPassword-submit"
-							className="btn btn-lg btn-default btn-lightBg"
-						>
+						<ApButton type="submit" id="forgotPassword-submit" variant="secondary">
 							Reset Password
-						</button>
+						</ApButton>
 					</div>
 					<div className="col-xs-6">
-						<Link
-							to="/login"
-							id="forgotPassword-login-redirect-link"
-							className="btn btn-lg btn-default btn-lightBg"
-						>
+						<Link to="/login" id="forgotPassword-auth-redirect-link" className="btn btn--secondary">
 							Or, Go Back
 						</Link>
 					</div>
