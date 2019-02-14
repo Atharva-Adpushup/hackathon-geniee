@@ -314,7 +314,7 @@ const User = model.extend(function() {
 			});
 	};
 
-	this.getUnsyncedAd = function() {
+	this.getUnsyncedAd = function () {
 		return this.getAllSites()
 			.then(sites => {
 				let validSites;
@@ -336,7 +336,9 @@ const User = model.extend(function() {
 						return false;
 					}
 				});
-		};
+				return ad ? { ad, site: activeSite } : false;
+			});
+	};
 
 		this.cleanData = () => {
 			const { data } = this;
