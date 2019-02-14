@@ -14,7 +14,8 @@ class Login extends Component {
 	state = {
 		email: { value: '', error: '' },
 		password: { value: '', error: '' },
-		error: ''
+		error: '',
+		isLoggingIn: false
 	};
 
 	onChange = e => {
@@ -55,21 +56,38 @@ class Login extends Component {
 			validationSchema.user.validations
 		);
 
-		let validationErrors = { ...validationResult.errors };
+		const validationErrors = { ...validationResult.errors };
 
 		if (validationResult.isValid) {
+			this.setState({ isLoggingIn: true });
+
 			const { loginAction: login } = this.props;
 
 			login(email, password)
 				.then(resp => history.push('/dashboard'))
 				.catch(({ response }) => {
+					let newState = { isLoggingIn: false };
+
 					if (response.status === 401) {
-						return this.setState({ error: response.data.error });
+						newState = { ...newState, error: response.data.error };
 					}
 
 					if (response.status === 400) {
-						validationErrors = { ...validationErrors, ...response.data.errors };
+						const errors = response.data.errors.reduce((accumulator, currValue) => ({
+							...accumulator,
+							...currValue
+						}));
+						const errorKeys = Object.keys(errors);
+
+						for (let i = 0; i < errorKeys.length; i += 1) {
+							newState[errorKeys[i]] = {
+								...this.state[errorKeys[i]],
+								error: errors[errorKeys[i]]
+							};
+						}
 					}
+
+					this.setState(newState);
 				});
 		}
 
@@ -92,7 +110,8 @@ class Login extends Component {
 		const {
 			email: { error: emailError },
 			password: { error: passwordError },
-			error
+			error,
+			isLoggingIn
 		} = this.state;
 		return (
 			<AuthShell>
@@ -117,7 +136,13 @@ class Login extends Component {
 							/>
 							{passwordError && <div className="error-message">{passwordError}</div>}
 							<div className="form-group">
-								<ApButton variant="primary" type="submit" id="login-submit" className="pull-right">
+								<ApButton
+									variant="primary"
+									showSpinner={isLoggingIn}
+									type="submit"
+									id="login-submit"
+									className="pull-right"
+								>
 									Login
 								</ApButton>
 								<Link

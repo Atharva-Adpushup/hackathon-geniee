@@ -1,9 +1,11 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import Spinner from '../Spinner';
 
-const ApButton = ({ children, variant, className, ...props }) => (
+const ApButton = ({ children, variant, showSpinner, className, ...props }) => (
 	<Button className={`btn--${variant}${className ? ` ${className}` : ''}`} {...props}>
+		{showSpinner && <Spinner size={11} color={variant === 'primary' ? '#fff' : 'primary'} />}{' '}
 		{children}
 	</Button>
 );

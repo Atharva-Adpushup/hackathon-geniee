@@ -13,7 +13,8 @@ class ForgotPassword extends Component {
 	state = {
 		email: { value: '', error: '' },
 		success: '',
-		error: ''
+		error: '',
+		isSendingMail: false
 	};
 
 	onChange = e => {
@@ -49,24 +50,36 @@ class ForgotPassword extends Component {
 
 		const validationResult = formValidator.validate({ email }, validationSchema.user.validations);
 
-		let validationErrors = { ...validationResult.errors };
+		const validationErrors = { ...validationResult.errors };
 
 		if (validationResult.isValid) {
+			this.setState({ isSendingMail: true });
+
 			const { forgotPasswordAction: forgotPassword } = this.props;
 
 			forgotPassword(email)
-				.then(resp => this.setState({ success: resp.data.success }))
+				.then(resp => this.setState({ success: resp.data.success, isSendingMail: false }))
 				.catch(({ response }) => {
+					const newState = { isSendingMail: false };
+
 					if (response.status === 400) {
-						validationErrors = {
-							...validationErrors,
-							...response.data.reduce((accumulator, currValue) => ({
-								...accumulator,
-								...currValue
-							}))
-						};
+						const errors = response.data.errors.reduce((accumulator, currValue) => ({
+							...accumulator,
+							...currValue
+						}));
+						const errorKeys = Object.keys(errors);
+
+						for (let i = 0; i < errorKeys.length; i += 1) {
+							newState[errorKeys[i]] = {
+								...this.state[errorKeys[i]],
+								error: errors[errorKeys[i]]
+							};
+						}
 					}
-					if (response.status === 404) return this.setState({ error: response.data.error });
+
+					if (response.status === 404) newState.error = response.data.error;
+
+					this.setState(newState);
 				});
 		}
 
@@ -89,7 +102,8 @@ class ForgotPassword extends Component {
 		const {
 			email: { error: emailError },
 			success,
-			error
+			error,
+			isSendingMail
 		} = this.state;
 		return (
 			<AuthShell>
@@ -111,7 +125,12 @@ class ForgotPassword extends Component {
 
 						<div className="AuthFooter ForgotPswFooter row">
 							<div className="col-xs-6">
-								<ApButton type="submit" id="forgotPassword-submit" variant="secondary">
+								<ApButton
+									type="submit"
+									showSpinner={isSendingMail}
+									id="forgotPassword-submit"
+									variant="secondary"
+								>
 									Reset Password
 								</ApButton>
 							</div>

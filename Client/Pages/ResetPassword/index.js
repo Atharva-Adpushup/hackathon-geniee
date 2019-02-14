@@ -17,7 +17,8 @@ class ResetPassword extends Component {
 		password: { value: '', error: '' },
 		confirmPassword: { value: '', error: '' },
 		success: '',
-		error: ''
+		error: '',
+		isResettingPassword: false
 	};
 
 	static getDerivedStateFromProps({ location }) {
@@ -102,7 +103,7 @@ class ResetPassword extends Component {
 			{ password },
 			validationSchema.user.validations
 		);
-		let validationErrors = {
+		const validationErrors = {
 			...validationResult.errors,
 			...(password !== confirmPassword
 				? { confirmPassword: 'Password and Confirm password should match.' }
@@ -110,6 +111,8 @@ class ResetPassword extends Component {
 		};
 
 		if (!Object.keys(validationErrors).length) {
+			this.setState({ isResettingPassword: true });
+
 			const { resetPasswordAction: resetPassword } = this.props;
 
 			resetPassword(email, key, password)
@@ -125,20 +128,25 @@ class ResetPassword extends Component {
 					);
 				})
 				.catch(({ response }) => {
+					const newState = { isResettingPassword: false };
+
 					if (response.status === 400) {
-						console.dir(response);
-						if (response.data.error) {
-							return this.setState({ error: response.data.error });
+						const errors = response.data.errors.reduce((accumulator, currValue) => ({
+							...accumulator,
+							...currValue
+						}));
+						const errorKeys = Object.keys(errors);
+
+						for (let i = 0; i < errorKeys.length; i += 1) {
+							newState[errorKeys[i]] = {
+								...this.state[errorKeys[i]],
+								error: errors[errorKeys[i]]
+							};
 						}
-						validationErrors = {
-							...validationErrors,
-							...response.data.errors.reduce((accumulator, currValue) => ({
-								...accumulator,
-								...currValue
-							}))
-						};
 					}
-					if (response.status === 404) return this.setState({ error: response.data.error });
+					if (response.status === 404) newState.error = response.data.error;
+
+					this.setState(newState);
 				});
 		}
 
@@ -162,7 +170,8 @@ class ResetPassword extends Component {
 			password: { error: passwordError },
 			confirmPassword: { error: confirmPasswordError },
 			success,
-			error
+			error,
+			isResettingPassword
 		} = this.state;
 		return (
 			<AuthShell>
@@ -195,7 +204,12 @@ class ResetPassword extends Component {
 
 						<div className="AuthFooter ForgotPswFooter row">
 							<div className="col-xs-6">
-								<ApButton type="submit" id="forgotPassword-submit" variant="secondary">
+								<ApButton
+									type="submit"
+									showSpinner={isResettingPassword}
+									id="forgotPassword-submit"
+									variant="secondary"
+								>
 									Reset Password
 								</ApButton>
 							</div>
