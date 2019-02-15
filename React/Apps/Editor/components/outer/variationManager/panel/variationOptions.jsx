@@ -37,7 +37,7 @@ const variationOtions = props => {
 			disabledVariationsCount >= 10 &&
 			!variation.disable
 		),
-		// 'isDifferentControlVariation' variable checks whether a different control variation exists in same page group
+		// 'isDifferentControlVariation' variable checks whether a different baseline/control variation exists in same page group
 		isDifferentControlVariation = !!controlVariationsCount,
 		isControlVariation = variation.isControl || false,
 		shouldDeleteButtonBeDisabled = !!isControlVariation,
@@ -136,13 +136,13 @@ const variationOtions = props => {
 			{!isDifferentControlVariation ? (
 				<Row>
 					<Col className="u-padding-r10px" xs={2}>
-						Set as Control Variation
+						Set as Baseline Variation
 						<OverlayTrigger
 							placement="top"
 							overlay={
 								<Tooltip id="control-variation-tag-info-tooltip">
-									Only one variation can be tagged as <b>Control Variation</b> per page group. The
-									existing tagged variation must be deleted in order to control tag a different
+									Only one variation can be tagged as <b>Baseline Variation</b> per page group. The
+									existing tagged variation must be deleted in order to baseline tag a different
 									variation in same page group.
 								</Tooltip>
 							}

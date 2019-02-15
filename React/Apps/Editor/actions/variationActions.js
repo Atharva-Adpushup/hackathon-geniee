@@ -76,6 +76,9 @@ const getLastVariationNumber = function(variations) {
 			sectionIds = [],
 			newName = `Variation ${getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1}`;
 
+		// Delete 'isControl' property from copied data as only one variation can be tagged as 'control/baseline'
+		delete copyFromVariation.isControl;
+
 		dispatch({
 			type: variationActions.COPY_VARIATION,
 			variationId: newVariationId,
@@ -178,17 +181,17 @@ const getLastVariationNumber = function(variations) {
 			),
 			computedMessage = isControl ? 'tagged as' : 'removed the tag',
 			computedConfirmationMessage = `Are you sure you want to ${
-				isControl ? 'tag this variation as Control?' : 'remove Control tag from this variation'
+				isControl ? 'tag this variation as Baseline?' : 'remove Baseline tag from this variation'
 			}`,
-			notificationMessage = `Successfully ${computedMessage} Control Variation`,
+			notificationMessage = `Successfully ${computedMessage} Baseline Variation`,
 			isCurrentVariationSections = !!(currentVariationObj.sections && currentVariationObj.sections.length);
 
 		if (hasControlVariationsReachedLimit) {
 			dispatch({
 				type: uiActions.SHOW_NOTIFICATION,
 				mode: 'error',
-				title: 'Control Variations Limit',
-				message: 'Cannot create more than 1 control variation!'
+				title: 'Baseline Variations Limit',
+				message: 'Cannot create more than 1 baseline variation!'
 			});
 			return;
 		}
