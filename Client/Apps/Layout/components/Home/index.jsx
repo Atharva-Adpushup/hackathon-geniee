@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { Nav, NavItem } from 'react-bootstrap';
 import ActionCard from '../../../../Components/ActionCard/index';
-import SplitScreen from '../../../../Components/Layout/SplitScreen';
-import FieldGroup from '../../../../Components/Layout/FieldGroup';
-import CustomButton from '../../../../Components/CustomButton/index';
+import ControlTagConversion from './ControlTagConversion';
 import { COMPONENT_TITLES } from '../../constants/index';
 
 class Home extends Component {
@@ -22,57 +20,12 @@ class Home extends Component {
 		this.setState({ activeNav: value, title: COMPONENT_TITLES[value] });
 	}
 
-	renderControlConversionLeftPanel() {
-		const buttonToggle = [
-			{
-				value: 1,
-				text: 'AdSense'
-			},
-			{
-				value: 2,
-				text: 'Medianet'
-			},
-			{
-				value: 3,
-				text: 'Other'
-			}
-		];
-
-		return (
-			<div className="clearfix">
-				<FieldGroup
-					id="toggle-button-group"
-					label="Select control ad type"
-					type="toggle-button-group"
-					buttonToggle={buttonToggle}
-				/>
-
-				<FieldGroup
-					id="input-text-siteId"
-					label="Enter site id"
-					type="text"
-					placeholder="For example 25019, 31000"
-					className="u-width-half"
-				/>
-
-				<CustomButton variant="primary" className="" onClick={() => {}}>
-					Convert
-				</CustomButton>
-			</div>
-		);
-	}
-
 	renderContent() {
 		const { activeNav } = this.state;
 		switch (activeNav) {
 			default:
 			case 1:
-				return (
-					<SplitScreen
-						leftChildren={this.renderControlConversionLeftPanel()}
-						rightChildren={<h4 className="u-margin-t3 u-margin-b4 pull-right">Output</h4>}
-					/>
-				);
+				return <ControlTagConversion />;
 			case 2:
 				return <div>Ad Layout component</div>;
 		}
