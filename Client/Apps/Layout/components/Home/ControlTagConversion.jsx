@@ -103,6 +103,20 @@ class ControlTagConversion extends Component {
 		} = this.state;
 		// Check for ad network toggle UI selection ('All ad networks' or 'Medianet')
 		const isAllAdNetworksSelection = !!(Number(adControlType) === 1);
+		const isMedianetNetworkSelection = !!(Number(adControlType) === 2);
+
+		const isValidAllNetworksData = !!(siteId && inputCode);
+		const isValidMedianetNetworkData = !!(adId && adWidth && adHeight && crId && versionId && cId);
+
+		if (isAllAdNetworksSelection && !isValidAllNetworksData) {
+			window.alert('Please fill All networks related UI fields');
+			return false;
+		}
+
+		if (isMedianetNetworkSelection && !isValidMedianetNetworkData) {
+			window.alert('Please fill Medianet network related UI fields');
+			return false;
+		}
 
 		const template = CONTROL_CONVERSION_NETWORKS[adControlType].template;
 		const parameterCollection = isAllAdNetworksSelection
@@ -128,6 +142,10 @@ class ControlTagConversion extends Component {
 		switch (buttonType) {
 			case 'convertButton':
 				const convertedAdCode = this.getConvertedAdCode();
+
+				if (!convertedAdCode) {
+					return false;
+				}
 
 				this.setState({ convertedCode: convertedAdCode });
 				break;
