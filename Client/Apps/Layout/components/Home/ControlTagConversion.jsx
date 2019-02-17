@@ -48,67 +48,47 @@ class ControlTagConversion extends Component {
 
 		if (isValue) {
 			const value = isInputParamInElementTypeArray ? inputParam : inputParam.target.value;
+			const medianet = { ...this.state.medianet };
 
 			switch (elementType) {
 				case 'siteId':
-					console.log(`siteid value: ${value}`);
 					this.setState({ siteId: value });
 					break;
 
 				case 'inputCode':
-					console.log(`inputCode value: ${value}`);
 					this.setState({ inputCode: value });
 					break;
 
 				case 'adNetworkToggle':
-					console.log(`control ad: ${value}`);
 					this.setState({ adControlType: Number(value) });
 					break;
 
 				case 'adId':
-					console.log(`medianet adId: ${value}`);
-					var medianet = { ...this.state.medianet };
-
 					medianet.adId = value;
 					this.setState({ medianet });
 					break;
 
 				case 'adWidth':
-					console.log(`medianet adWidth: ${value}`);
-					var medianet = { ...this.state.medianet };
-
 					medianet.adWidth = Number(value);
 					this.setState({ medianet });
 					break;
 
 				case 'adHeight':
-					console.log(`medianet adHeight: ${value}`);
-					var medianet = { ...this.state.medianet };
-
 					medianet.adHeight = Number(value);
 					this.setState({ medianet });
 					break;
 
 				case 'crId':
-					console.log(`medianet crId: ${value}`);
-					var medianet = { ...this.state.medianet };
-
 					medianet.crId = Number(value);
 					this.setState({ medianet });
 					break;
 
 				case 'versionId':
-					console.log(`medianet versionId: ${value}`);
-					var medianet = { ...this.state.medianet };
-
 					medianet.versionId = Number(value);
 					this.setState({ medianet });
 					break;
 
 				case 'cId':
-					console.log(`medianet cId: ${value}`);
-					var medianet = { ...this.state.medianet };
-
 					medianet.cId = Number(value);
 					this.setState({ medianet });
 					break;
@@ -148,7 +128,7 @@ class ControlTagConversion extends Component {
 		switch (buttonType) {
 			case 'convertButton':
 				const convertedAdCode = this.getConvertedAdCode();
-				console.log(convertedAdCode);
+
 				this.setState({ convertedCode: convertedAdCode });
 				break;
 
@@ -306,7 +286,7 @@ class ControlTagConversion extends Component {
 		const { convertedCode } = this.state;
 		return (
 			<div className="clearfix">
-				<h4 className="u-margin-t3 u-margin-b4">Output</h4>
+				<h4 className="u-margin-t3 u-margin-b4">Converted Code Output</h4>
 
 				{convertedCode ? (
 					<Row>
