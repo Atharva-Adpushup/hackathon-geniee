@@ -1,5 +1,6 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 class SplitScreen extends React.Component {
 	state = {};
@@ -25,5 +26,19 @@ class SplitScreen extends React.Component {
 		);
 	}
 }
+
+SplitScreen.propTypes = {
+	leftChildren: PropTypes.element.isRequired,
+	rightChildren: PropTypes.element.isRequired
+};
+
+SplitScreen.defaultProps = {
+	leftChildren: function() {
+		return <div>Left panel data</div>;
+	},
+	rightChildren: function() {
+		return <div>Right panel data</div>;
+	}
+};
 
 export default SplitScreen;
