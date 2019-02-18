@@ -1,20 +1,38 @@
 import React from 'react';
 import { Col } from 'react-bootstrap';
-import { CustomMessage } from '../shared/index';
+import CustomMessage from '../../../../Components/CustomMessage/index';
 import { NOOP } from '../../configs/commonConsts';
 
 const CustomList = props => {
+	const {
+		tabbedList,
+		selectPlatform,
+		platform,
+		onClick,
+		toMatch,
+		toDisable,
+		multiSelect,
+		simpleList,
+		disabled,
+		options,
+		message,
+		leftSize,
+		rightSize,
+		subHeading,
+		listHeaders,
+		heading
+	} = props;
 	function renderTabbedHeaders() {
-		return Object.keys(props.tabbedList.list)
+		return Object.keys(tabbedList.list)
 			.map((item, key) => {
-				const toMatch = props.tabbedList.list[item].key;
-				return props.tabbedList.allowed.indexOf(props.tabbedList.list[item].key) !== -1 ? (
+				const toMatch = tabbedList.list[item].key;
+				return tabbedList.allowed.indexOf(tabbedList.list[item].key) !== -1 ? (
 					<li
 						key={`${key}-${toMatch}`}
-						className={`simpleOption ${props.platform == toMatch ? 'active' : ''}`}
-						onClick={props.selectPlatform.bind(null, toMatch)}
+						className={`simpleOption ${platform == toMatch ? 'active' : ''}`}
+						onClick={() => selectPlatform(toMatch)}
 					>
-						{props.tabbedList.list[item].header}
+						{tabbedList.list[item].header}
 					</li>
 				) : (
 					false
@@ -24,13 +42,13 @@ const CustomList = props => {
 	}
 
 	function renderTabbedOptions() {
-		return props.platform && props.tabbedList.list[props.platform].options ? (
+		return platform && tabbedList.list[platform].options ? (
 			<ul className="options">
-				{props.tabbedList.list[props.platform].options.map((option, key) => (
+				{tabbedList.list[platform].options.map((option, key) => (
 					<li
 						key={`${key}-${option}`}
-						className={`simpleOption ${props.toMatch == option ? 'active' : ''}`}
-						onClick={props.onClick.bind(null, option)}
+						className={`simpleOption ${toMatch == option ? 'active' : ''}`}
+						onClick={() => onClick(option)}
 					>
 						{option}
 					</li>
@@ -40,11 +58,11 @@ const CustomList = props => {
 	}
 
 	function renderIconList() {
-		return props.options.map(option => (
+		return options.map(option => (
 			<li
 				key={option.key}
-				className={`option ${props.toMatch == option.key ? 'active' : ''}`}
-				onClick={props.onClick.bind(null, option.key)}
+				className={`option ${toMatch == option.key ? 'active' : ''}`}
+				onClick={onClick.bind(null, option.key)}
 			>
 				<img src={option.image} alt={option.key} />
 				<div className="information">
@@ -56,7 +74,7 @@ const CustomList = props => {
 	}
 
 	function renderSimpleList() {
-		if (!props.options || !props.options.length) {
+		if (!options || !options.length) {
 			return (
 				<li key={1} style={{ width: '100%' }}>
 					<CustomMessage
@@ -68,22 +86,22 @@ const CustomList = props => {
 				</li>
 			);
 		}
-		return props.options.map((option, key) => {
+		return options.map((option, key) => {
 			let activeClass = '';
-			const disabled = props.toDisable && props.toDisable.includes(option);
-			if (props.multiSelect) {
-				activeClass = props.toMatch.includes(option) ? 'active' : activeClass;
+			const isDisabled = toDisable && toDisable.includes(option);
+			if (multiSelect) {
+				activeClass = toMatch.includes(option) ? 'active' : activeClass;
 			} else {
-				activeClass = props.toMatch === option ? 'active' : activeClass;
+				activeClass = toMatch === option ? 'active' : activeClass;
 			}
-			if (props.disabled) {
-				activeClass = disabled ? 'disabled' : activeClass;
+			if (disabled) {
+				activeClass = isDisabled ? 'disabled' : activeClass;
 			}
 			return (
 				<li
 					key={key}
 					className={`simpleOption ${activeClass}`}
-					onClick={disabled ? NOOP : props.onClick.bind(null, option)}
+					onClick={disabled ? NOOP : () => onClick(option)}
 				>
 					{option.replace(':', ' - ')}
 				</li>
@@ -93,13 +111,13 @@ const CustomList = props => {
 
 	function renderList() {
 		const toReturn = [];
-		if (props.simpleList) {
+		if (simpleList) {
 			toReturn.push(
 				<ul className="options" key={1}>
 					{renderSimpleList()}
 				</ul>
 			);
-		} else if (props.tabbedList) {
+		} else if (tabbedList) {
 			toReturn.push(
 				<ul className="options" key={1}>
 					{renderTabbedHeaders()}
@@ -114,8 +132,10 @@ const CustomList = props => {
 			);
 		}
 
-		if (props.disabled && props.toDisable.length === props.options.length) {
-			toReturn.push(<CustomMessage message={props.message} className="error" header="Limit Reached" key={2} />);
+		if (disabled && toDisable.length === options.length) {
+			toReturn.push(
+				<CustomMessage message={message} className="error" header="Limit Reached" key={2} />
+			);
 		}
 
 		return <div>{toReturn}</div>;
@@ -123,15 +143,15 @@ const CustomList = props => {
 
 	return (
 		<div>
-			<Col md={props.leftSize}>
-				<h3>{props.heading}</h3>
-				<h4>{props.subHeading}</h4>
+			<Col md={leftSize}>
+				<h3>{heading}</h3>
+				<h4>{subHeading}</h4>
 			</Col>
-			<Col md={props.rightSize}>
-				{props.listHeaders ? (
+			<Col md={rightSize}>
+				{listHeaders ? (
 					<div className="list-heading">
-						<h3>{props.listHeaders.heading}</h3>
-						{props.listHeaders.subHeading ? <h4>{props.listHeaders.subHeading}</h4> : null}
+						<h3>{listHeaders.heading}</h3>
+						{listHeaders.subHeading ? <h4>{listHeaders.subHeading}</h4> : null}
 					</div>
 				) : null}
 				{renderList()}
