@@ -3,12 +3,18 @@ import { Row, Col, Button } from 'react-bootstrap';
 import Codemirror from 'react-codemirror';
 
 class customCodeEditor extends React.Component {
+	static defaultProps = {
+		enableSave: false,
+		code: '',
+		textEdit: false,
+		onChange: () => {}
+	};
+
 	constructor(props) {
 		super(props);
-
-		const code = this.props.code ? this.props.code : '';
+		const { code, textEdit } = this.props;
 		this.state = {
-			code: this.props.textEdit ? code : atob(code),
+			code: textEdit ? code : window.atob(code),
 			error: false
 		};
 		this.updateCode = this.updateCode.bind(this);
@@ -17,16 +23,16 @@ class customCodeEditor extends React.Component {
 
 	componentWillReceiveProps(nextProps) {
 		this.setState({
-			code: nextProps.textEdit ? nextProps.code : atob(nextProps.code),
+			code: nextProps.textEdit ? nextProps.code : window.atob(nextProps.code),
 			error: false
 		});
 	}
 
 	save() {
+		const { onSubmit } = this.props;
+		const { code, textEdit } = this.state;
 		try {
-			!this.props.textEdit
-				? this.props.onSubmit(btoa(this.state.code))
-				: this.props.onSubmit(this.state.code);
+			!textEdit ? onSubmit(window.btoa(code)) : onSubmit(code);
 		} catch (e) {
 			console.log(e);
 			this.setState({ error: true });
@@ -34,10 +40,9 @@ class customCodeEditor extends React.Component {
 	}
 
 	updateCode(code) {
+		const { onChange } = this.props;
 		try {
-			this.setState({ code, error: false }, () =>
-				this.props.onChange ? this.props.onChange(code) : null
-			);
+			this.setState({ code, error: false }, () => (onChange ? onChange(code) : null));
 		} catch (e) {
 			this.setState({ error: true });
 		}
@@ -52,24 +57,33 @@ class customCodeEditor extends React.Component {
 			theme: 'solarized',
 			lineNumbers: true
 		};
+		const {
+			isField,
+			field,
+			customId,
+			textEdit,
+			enableSave,
+			parentExpanded,
+			showButtons,
+			textEditBtn,
+			size,
+			onCancel,
+			cancelText
+		} = this.props;
+		const { code, error } = this.state;
 
 		// Check if code box is a redux form component
-		if (this.props.isField) {
-			const { label, input, meta } = this.props.field;
+		if (isField) {
+			const { label, input, meta } = field;
 			return (
-				<div key={this.props.customId}>
+				<div key={customId}>
 					<Col xs={12} className="u-padding-r10px">
 						<Row>
 							<Col xs={5} className="u-padding-r10px">
 								<strong>{label}</strong>
 							</Col>
 							<Col xs={7} className="u-padding-r10px">
-								<Codemirror
-									value={this.state.code}
-									onChange={this.updateCode}
-									options={options}
-									{...input}
-								/>
+								<Codemirror value={code} onChange={this.updateCode} options={options} {...input} />
 								{meta.touched && meta.error && <div className="error-message">{meta.error}</div>}
 							</Col>
 						</Row>
@@ -78,49 +92,41 @@ class customCodeEditor extends React.Component {
 			);
 		}
 		// Check if code box is meant to be a regular text editor
-		if (this.props.textEdit) {
+		if (textEdit) {
 			let className = 'codeEditor-small ';
-			const disabled = this.props.enableSave ? false : this.props.code == '';
-			className += this.props.parentExpanded ? ' codeEditor-large' : ' ';
+			const disabled = enableSave ? false : code === '';
+			className += parentExpanded ? ' codeEditor-large' : ' ';
 
 			return (
-				<div className={className} key={this.props.customId}>
-					<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
+				<div className={className} key={customId}>
+					<Codemirror value={code} onChange={this.updateCode} options={options} />
 					<br />
-					{this.props.showButtons ? (
-						<Button
-							disabled={this.state.code == ''}
-							className="btn-lightBg btn-save"
-							onClick={this.save}
-						>
-							{this.props.textEditBtn ? this.props.textEditBtn : 'Save'}
+					{showButtons ? (
+						<Button disabled={code === ''} className="btn-lightBg btn-save" onClick={this.save}>
+							{textEditBtn || 'Save'}
 						</Button>
 					) : null}
 				</div>
 			);
 		}
-		let className = this.props.showButtons ? 'containerButtonBar' : '';
-		if (this.props.size == 'small') {
+		let className = showButtons ? 'containerButtonBar' : '';
+		if (size == 'small') {
 			className += ' pd-b100';
 		}
 		return (
-			<div className={className} key={this.props.customId}>
-				{this.state.error && <div>Some Error in Code, remove comma in last property if there.</div>}
-				<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
-				{this.props.showButtons ? (
+			<div className={className} key={customId}>
+				{error && <div>Some Error in Code, remove comma in last property if there.</div>}
+				<Codemirror value={code} onChange={this.updateCode} options={options} />
+				{showButtons ? (
 					<Row className="butttonsRow">
 						<Col xs={6}>
-							<Button
-								disabled={this.state.error}
-								className="btn-lightBg btn-save"
-								onClick={this.save}
-							>
+							<Button disabled={error} className="btn-lightBg btn-save" onClick={this.save}>
 								Save
 							</Button>
 						</Col>
 						<Col xs={6}>
-							<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>
-								{this.props.cancelText || 'Cancel'}
+							<Button className="btn-lightBg btn-cancel" onClick={onCancel}>
+								{cancelText || 'Cancel'}
 							</Button>
 						</Col>
 					</Row>
@@ -130,10 +136,6 @@ class customCodeEditor extends React.Component {
 			</div>
 		);
 	}
-
-	static defaultProps = {
-		enableSave: false
-	};
 }
 
 // customCodeEditor.propTypes = {
