@@ -316,7 +316,9 @@ class AdCodeGenerator extends Component {
 					<h3>Format Settings</h3>
 					<h4>Please fill the necessary details</h4>
 				</Col>
-				<Col md={9}>{this.renderIndividualFormat()}</Col>
+				<Col md={9} className="u-padding-h3">
+					{this.renderIndividualFormat()}
+				</Col>
 				<div style={{ clear: 'both' }}>&nbsp;</div>
 			</div>
 		);
