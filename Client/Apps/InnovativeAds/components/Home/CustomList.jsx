@@ -25,12 +25,12 @@ const CustomList = props => {
 	function renderTabbedHeaders() {
 		return Object.keys(tabbedList.list)
 			.map((item, key) => {
-				const toMatch = tabbedList.list[item].key;
+				const match = tabbedList.list[item].key;
 				return tabbedList.allowed.indexOf(tabbedList.list[item].key) !== -1 ? (
 					<li
-						key={`${key}-${toMatch}`}
-						className={`simpleOption ${platform == toMatch ? 'active' : ''}`}
-						onClick={() => selectPlatform(toMatch)}
+						key={`${key}-${match}`}
+						className={`simpleOption ${platform === match ? 'active' : ''}`}
+						onClick={() => selectPlatform(match)}
 					>
 						{tabbedList.list[item].header}
 					</li>
@@ -47,7 +47,7 @@ const CustomList = props => {
 				{tabbedList.list[platform].options.map((option, key) => (
 					<li
 						key={`${key}-${option}`}
-						className={`simpleOption ${toMatch == option ? 'active' : ''}`}
+						className={`simpleOption ${toMatch === option ? 'active' : ''}`}
 						onClick={() => onClick(option)}
 					>
 						{option}

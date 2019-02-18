@@ -14,16 +14,17 @@ const UI_ACTIONS = {
 const GLOBAL_ACTIONS = {
 	SET_CURRENT_AD: `${PREFIX}_SET_CURRENT_AD`,
 	SET_META: `${PREFIX}_SET_META`,
+	REPLACE_META: `${PREFIX}_REPLACE_META`,
 	UPDATE_META: `${PREFIX}_UPDATE_META`,
 	UPDATE_AD_TRACKING_LOGS: `${PREFIX}_UPDATE_AD_TRACKING_LOGS`,
 	SET_AD_TRACKING_LOGS: `${PREFIX}_SET_AD_TRACKING_LOGS`
 };
 const API_PATHS = {
-	FETCH_ADS: '/innovativeAdsManager/data/fetchAds',
-	CREATE_AD: '/innovativeAdsManager/data/createAd',
-	DELETE_AD: '/innovativeAdsManager/data/deleteAd',
-	MODIFY_AD: '/innovativeAdsManager/data/modifyAd',
-	MASTER_SAVE: '/innovativeAdsManager/data/masterSave'
+	FETCH_ADS: '/innovativeAds/fetchAds',
+	CREATE_AD: '/innovativeAds/createAd',
+	DELETE_AD: '/innovativeAds/deleteAd',
+	MODIFY_AD: '/innovativeAds/modifyAd',
+	MASTER_SAVE: '/innovativeAds/masterSave'
 };
 
 export { AD_ACTIONS, UI_ACTIONS, GLOBAL_ACTIONS, API_PATHS };
