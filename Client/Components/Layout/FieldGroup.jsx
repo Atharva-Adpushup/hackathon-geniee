@@ -45,8 +45,8 @@ FieldGroup.propTypes = {
 	buttonToggle: PropTypes.array
 };
 FieldGroup.defaultProps = {
-	type: 'text',
 	help: '',
+	type: 'text',
 	buttonToggle: []
 };
 export default FieldGroup;

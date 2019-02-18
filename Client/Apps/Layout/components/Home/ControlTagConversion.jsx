@@ -340,6 +340,7 @@ class ControlTagConversion extends Component {
 	render() {
 		return (
 			<SplitScreen
+				rootClassName="u-padding-h4 u-padding-v5"
 				leftChildren={this.renderControlConversionLeftPanel()}
 				rightChildren={this.renderControlConversionRightPanel()}
 			/>

@@ -4,11 +4,6 @@ import { storiesOf } from '@storybook/react';
 import FieldGroup from '../Components/Layout/FieldGroup';
 
 storiesOf('UI.FieldGroup', module)
-	.add('default', () => (
-		<div>
-			<FieldGroup />
-		</div>
-	))
 	.add('input-text', () => (
 		<div>
 			<FieldGroup
