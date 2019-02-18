@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable jsx-a11y/href-no-hash */
 import React, { Component } from 'react';
-import CodeBox from '../../../../../Components/CodeEditor';
+import CodeBox from '../../../../../Components/CodeBox/index';
 import { TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
 
 class Default extends Component {
@@ -16,6 +16,7 @@ class Default extends Component {
 	}
 
 	saveHandler() {
+		const { save } = this.props;
 		const { css } = this.state;
 		let code = {};
 		if (css && css.trim().length) {
@@ -29,7 +30,7 @@ class Default extends Component {
 				return window.alert('Invalid CSS');
 			}
 		}
-		return this.props.save.handler({
+		return save.handler({
 			formatData: {
 				event: EVENTS.SCRIPT_LOADED,
 				eventData: {
@@ -47,10 +48,11 @@ class Default extends Component {
 
 	render() {
 		const { save, cancel } = this.props;
+		const { css } = this.state;
 		return (
 			<div>
 				<label htmlFor="css">Custom CSS</label>
-				<CodeBox name="css" showButtons={false} onChange={this.handleChange} code={this.state.css} />
+				<CodeBox name="css" showButtons={false} onChange={this.handleChange} code={css} />
 				{cancel ? cancel.renderFn(cancel.label, cancel.handler) : null}
 				{save.renderFn(save.label, this.saveHandler)}
 			</div>

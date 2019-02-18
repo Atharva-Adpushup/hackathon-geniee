@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
-import CodeBox from '../../../../../Components/CodeEditor';
+import CodeBox from '../../../../../Components/CodeBox/index';
 import { TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
+import CustomInput from '../../shared/index';
 
 class InView extends Component {
 	constructor(props) {
@@ -29,17 +30,19 @@ class InView extends Component {
 	saveHandler(e) {
 		e.preventDefault();
 		const { xpath, css } = this.state;
+		const { save } = this.props;
 		let parsedCSS = {};
 		if (!xpath) {
-			return alert('Xpath is mandatory field');
-		} else if (css && css.trim().length) {
+			return window.alert('Xpath is mandatory field');
+		}
+		if (css && css.trim().length) {
 			try {
 				parsedCSS = JSON.parse(window.atob(css));
 			} catch (err) {
 				return window.alert('Invalid CSS');
 			}
 		}
-		return this.props.save.handler({
+		return save.handler({
 			formatData: {
 				event: EVENTS.SCROLL,
 				eventData: {
@@ -56,18 +59,15 @@ class InView extends Component {
 		const { xpath, css } = this.state;
 		return (
 			<form action="#" method="POST">
-				<Col md={12} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
-					<label htmlFor="xpath">Enter Xpath*</label>
-					<input
-						className="inputMinimal"
-						type="input"
-						placeholder="Enter XPath"
-						name="xpath"
-						style={{ padding: '10px 15px' }}
-						value={xpath}
-						onChange={this.handleChange}
-					/>
-				</Col>
+				<CustomInput
+					name="xpath"
+					value={xpath}
+					type="text"
+					label="Enter Xpath"
+					handler={this.handleChange}
+					size={12}
+					id="xpath-input"
+				/>
 				<Col md={12} style={{ paddingLeft: '0px' }}>
 					<label htmlFor="css">Custom CSS</label>
 					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={css} />

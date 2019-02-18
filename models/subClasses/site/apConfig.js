@@ -1,4 +1,4 @@
-var ApConfig = {
+const ApConfig = {
 	keys: [
 		'mode',
 		'pageGroupPattern',
@@ -17,7 +17,7 @@ var ApConfig = {
 		'isAdPushupControlWithPartnerSSP',
 		'isSPA',
 		'isThirdPartyAdx',
-		'spaPageTransitionTimeout'
+		'spaPageTransitionTimeout',
 		'isManual',
 		'isInnovative'
 	],
@@ -39,7 +39,7 @@ var ApConfig = {
 		'isAdPushupControlWithPartnerSSP',
 		'isSPA',
 		'isThirdPartyAdx',
-		'spaPageTransitionTimeout'
+		'spaPageTransitionTimeout',
 		'isManual',
 		'isInnovative'
 	],

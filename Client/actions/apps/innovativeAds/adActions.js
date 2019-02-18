@@ -1,7 +1,7 @@
 import { AD_ACTIONS, GLOBAL_ACTIONS, API_PATHS } from '../../../constants/innovativeAds';
 import axiosInstance from '../../../helpers/axiosInstance';
 import { errorHandler } from '../../../helpers/commonFunctions';
-import { pagegroupFiltering } from '../../../Apps/InnovativeAds/libs/helpers';
+import { pagegroupFiltering } from '../../../Apps/InnovativeAds/lib/helpers';
 
 const helpers = {
 	makeAPICall: (adId, isSuperUser, toUpdate, updatedLogs) => {
