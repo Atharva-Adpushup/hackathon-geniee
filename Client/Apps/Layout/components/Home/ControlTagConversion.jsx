@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import { Row, Col } from 'react-bootstrap';
 import SplitScreen from '../../../../Components/Layout/SplitScreen';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../Components/CustomButton/index';
 import { CONTROL_CONVERSION_NETWORKS } from '../../constants/index';
 import { getRandomString, getEncodedData, getCompiledTemplate } from '../../lib/helpers';
 import { copyToClipBoard } from '../../../ApTag/lib/helpers';
-import { Row, Col } from 'react-bootstrap';
+
 class ControlTagConversion extends Component {
 	constructor(props) {
 		super(props);
@@ -33,67 +34,6 @@ class ControlTagConversion extends Component {
 		const defaultState = this.getDefaultState();
 
 		this.setState(defaultState);
-	}
-
-	handleInputChangeHandler(elementType, inputParam) {
-		const elementTypeArray = ['siteId', 'inputCode', 'adNetworkToggle'],
-			isInputParam = !!inputParam,
-			isElement = !!(isInputParam && inputParam.target),
-			isInputParamInElementTypeArray = !!(
-				isInputParam &&
-				!isElement &&
-				elementTypeArray.includes(elementType)
-			),
-			isValue = !!((isElement && inputParam.target.value) || isInputParamInElementTypeArray);
-
-		if (isValue) {
-			const value = isInputParamInElementTypeArray ? inputParam : inputParam.target.value;
-			const medianet = { ...this.state.medianet };
-
-			switch (elementType) {
-				case 'siteId':
-					this.setState({ siteId: value });
-					break;
-
-				case 'inputCode':
-					this.setState({ inputCode: value });
-					break;
-
-				case 'adNetworkToggle':
-					this.setState({ adControlType: Number(value) });
-					break;
-
-				case 'adId':
-					medianet.adId = value;
-					this.setState({ medianet });
-					break;
-
-				case 'adWidth':
-					medianet.adWidth = Number(value);
-					this.setState({ medianet });
-					break;
-
-				case 'adHeight':
-					medianet.adHeight = Number(value);
-					this.setState({ medianet });
-					break;
-
-				case 'crId':
-					medianet.crId = Number(value);
-					this.setState({ medianet });
-					break;
-
-				case 'versionId':
-					medianet.versionId = Number(value);
-					this.setState({ medianet });
-					break;
-
-				case 'cId':
-					medianet.cId = Number(value);
-					this.setState({ medianet });
-					break;
-			}
-		}
 	}
 
 	getConvertedAdCode() {
@@ -138,10 +78,76 @@ class ControlTagConversion extends Component {
 		return compiledTemplate;
 	}
 
+	handleInputChangeHandler(elementType, inputParam) {
+		const elementTypeArray = ['siteId', 'inputCode', 'adNetworkToggle'];
+		const isInputParam = !!inputParam;
+		const isElement = !!(isInputParam && inputParam.target);
+		const isInputParamInElementTypeArray = !!(
+			isInputParam &&
+			!isElement &&
+			elementTypeArray.includes(elementType)
+		);
+		const isValue = !!((isElement && inputParam.target.value) || isInputParamInElementTypeArray);
+
+		if (isValue) {
+			const value = isInputParamInElementTypeArray ? inputParam : inputParam.target.value;
+			const { medianet } = this.state;
+
+			switch (elementType) {
+				case 'siteId':
+					this.setState({ siteId: value });
+					break;
+
+				case 'inputCode':
+					this.setState({ inputCode: value });
+					break;
+
+				case 'adNetworkToggle':
+					this.setState({ adControlType: Number(value) });
+					break;
+
+				case 'adId':
+					medianet.adId = value;
+					this.setState({ medianet });
+					break;
+
+				case 'adWidth':
+					medianet.adWidth = Number(value);
+					this.setState({ medianet });
+					break;
+
+				case 'adHeight':
+					medianet.adHeight = Number(value);
+					this.setState({ medianet });
+					break;
+
+				case 'crId':
+					medianet.crId = Number(value);
+					this.setState({ medianet });
+					break;
+
+				case 'versionId':
+					medianet.versionId = Number(value);
+					this.setState({ medianet });
+					break;
+
+				case 'cId':
+					medianet.cId = Number(value);
+					this.setState({ medianet });
+					break;
+
+				default:
+					break;
+			}
+		}
+	}
+
 	handleButtonClickHandler(buttonType) {
+		let convertedAdCode;
+
 		switch (buttonType) {
 			case 'convertButton':
-				const convertedAdCode = this.getConvertedAdCode();
+				convertedAdCode = this.getConvertedAdCode();
 
 				if (!convertedAdCode) {
 					return false;
@@ -153,7 +159,12 @@ class ControlTagConversion extends Component {
 			case 'resetButton':
 				this.setDefaultState();
 				break;
+
+			default:
+				break;
 		}
+
+		return false;
 	}
 
 	renderMedianetNetworkUI() {
@@ -267,8 +278,8 @@ class ControlTagConversion extends Component {
 				text: [CONTROL_CONVERSION_NETWORKS[2].name]
 			}
 		];
-		const { adControlType } = this.state,
-			isAllAdNetworksSelection = !!(Number(adControlType) === 1);
+		const { adControlType } = this.state;
+		const isAllAdNetworksSelection = !!(Number(adControlType) === 1);
 
 		return (
 			<div className="clearfix">
