@@ -29,10 +29,16 @@ class Home extends Component {
 
 	renderContent() {
 		const { activeNav } = this.state;
+		const {
+			match: {
+				params: { siteId }
+			}
+		} = this.props;
+
 		switch (activeNav) {
 			default:
 			case 1:
-				return <ControlTagConversion />;
+				return <ControlTagConversion siteId={siteId} />;
 			case 2:
 				return <div>Ad Layout component</div>;
 		}
@@ -55,12 +61,12 @@ class Home extends Component {
 					</NavItem>
 				</Nav>
 				{this.renderContent()}
-				<h5 className="u-padding-h4 u-margin-t3 u-margin-b4 u-text-bold">
+				<h4 className="u-padding-h4 u-margin-t3 u-margin-b4 u-text-bold">
 					To visit Visual Editor, please click here
 					<a target="_blank" rel="noopener noreferrer" href="//localhost:8080/ap-layout/editor">
 						<FontAwesomeIcon icon="external-link-alt" className="u-margin-l2" />
 					</a>
-				</h5>
+				</h4>
 			</ActionCard>
 		);
 	}
