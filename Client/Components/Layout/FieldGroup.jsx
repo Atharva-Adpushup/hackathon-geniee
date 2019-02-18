@@ -49,12 +49,9 @@ FieldGroup.propTypes = {
 };
 
 FieldGroup.defaultProps = {
-	id: 'Simple-field-group-1',
-	label: 'Simple field group',
-	onChange: () => {
-		console.log('Fieldgroup component changed');
-	},
-	type: 'text'
+	help: '',
+	type: 'text',
+	buttonToggle: []
 };
 
 export default FieldGroup;

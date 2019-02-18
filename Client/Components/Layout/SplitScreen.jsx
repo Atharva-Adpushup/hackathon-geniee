@@ -6,10 +6,11 @@ class SplitScreen extends React.Component {
 	state = {};
 
 	render() {
-		const { leftChildren, rightChildren } = this.props;
+		const { rootClassName, leftChildren, rightChildren } = this.props;
+		const computedRootClassName = `layout-splitScreen ${rootClassName}`;
 
 		return (
-			<Row className="layout-splitScreen u-padding-h4 u-padding-v5">
+			<Row className={computedRootClassName}>
 				<Col
 					xs={12}
 					sm={12}
@@ -29,7 +30,12 @@ class SplitScreen extends React.Component {
 
 SplitScreen.propTypes = {
 	leftChildren: PropTypes.element.isRequired,
-	rightChildren: PropTypes.element.isRequired
+	rightChildren: PropTypes.element.isRequired,
+	rootClassName: PropTypes.string
+};
+
+SplitScreen.defaultProps = {
+	rootClassName: ''
 };
 
 export default SplitScreen;
