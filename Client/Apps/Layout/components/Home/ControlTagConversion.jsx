@@ -285,7 +285,7 @@ class ControlTagConversion extends Component {
 			<div className="clearfix">
 				<FieldGroup
 					id="toggle-button-group"
-					label="Select control ad type"
+					label="Select ad network type"
 					type="toggle-button-group"
 					buttonToggle={buttonToggle}
 					onChange={this.handleInputChangeHandler.bind(this, 'adNetworkToggle')}
@@ -315,7 +315,7 @@ class ControlTagConversion extends Component {
 		const { convertedCode } = this.state;
 		return (
 			<div className="clearfix">
-				<h4 className="u-margin-t3 u-margin-b4">Converted Code Output</h4>
+				<h4 className="u-margin-t3 u-margin-b4">Transformed Code Output</h4>
 
 				{convertedCode ? (
 					<Row>

@@ -10,8 +10,8 @@ const getCompiledTemplate = (template, parameterCollection) => {
 	let finalTemplate = '';
 
 	parameterCollection.forEach(itemObject => {
-		const isFinalTemplate = !!finalTemplate,
-			computedTemplate = isFinalTemplate ? finalTemplate : template;
+		const isFinalTemplate = !!finalTemplate;
+		const computedTemplate = isFinalTemplate ? finalTemplate : template;
 
 		finalTemplate = computedTemplate.replace(itemObject.replacee, itemObject.replacer);
 	});
