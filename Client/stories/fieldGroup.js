@@ -4,6 +4,9 @@ import { storiesOf } from '@storybook/react';
 import FieldGroup from '../Components/Layout/FieldGroup';
 
 storiesOf('UI.FieldGroup', module)
+	.add('text-only', () => (
+		<FieldGroup id="input-number-siteId" label="Enter site id" value="25000" isTextOnly />
+	))
 	.add('input-text', () => (
 		<div>
 			<FieldGroup

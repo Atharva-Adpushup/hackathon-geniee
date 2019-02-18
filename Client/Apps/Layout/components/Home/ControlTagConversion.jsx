@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Row, Col } from 'react-bootstrap';
 import SplitScreen from '../../../../Components/Layout/SplitScreen';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
@@ -14,9 +15,10 @@ class ControlTagConversion extends Component {
 	}
 
 	getDefaultState() {
+		const { siteId } = this.props;
 		return {
 			adControlType: 1,
-			siteId: '',
+			siteId,
 			inputCode: '',
 			convertedCode: '',
 			medianet: {
@@ -94,10 +96,6 @@ class ControlTagConversion extends Component {
 			const { medianet } = this.state;
 
 			switch (elementType) {
-				case 'siteId':
-					this.setState({ siteId: value });
-					break;
-
 				case 'inputCode':
 					this.setState({ inputCode: value });
 					break;
@@ -242,21 +240,22 @@ class ControlTagConversion extends Component {
 
 		return (
 			<div className="clearfix">
-				<FieldGroup
-					id="input-number-siteId"
-					label="Enter site id"
-					type="number"
-					placeholder="For example 25019, 31000"
-					className=""
-					onChange={this.handleInputChangeHandler.bind(this, 'siteId')}
-					value={siteId}
-				/>
+				<FieldGroup id="input-number-siteId" label="AdPushup Site ID" value={siteId} isTextOnly />
 
 				<FieldGroup
 					id="textarea-input-code"
 					label="Enter code"
-					placeholder="For example (function() { console.log('Example code'); }());"
-					rows="10"
+					placeholder={`For example, AdSense ad code: 
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+	style="display:block"
+	data-ad-client="ca-pub-XXXXXXXXXXXX"
+	data-ad-slot="XXXXXXXX"
+	data-full-width-responsive="true"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script> `}
+					rows="12"
 					cols="10"
 					className=""
 					componentClass="textarea"
@@ -347,5 +346,9 @@ class ControlTagConversion extends Component {
 		);
 	}
 }
+
+ControlTagConversion.propTypes = {
+	siteId: PropTypes.string.isRequired
+};
 
 export default ControlTagConversion;
