@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import { createAd } from '../actions/adActions';
-import { resetCurrentAd } from '../actions/globalActions';
+import { createAd } from '../../../actions/apps/innovativeAds/adActions';
+import { resetCurrentAd } from '../../../actions/apps/innovativeAds/globalActions';
 import AdCodeGenerator from '../components/Home/AdCodeGenerator';
 
 const mapStateToProps = (state, ownProps) => ({

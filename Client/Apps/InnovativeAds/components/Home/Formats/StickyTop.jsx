@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
 import { TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
-import CodeBox from '../../../../../Components/CodeEditor';
+import CodeBox from '../../../../../Components/CodeBox/index';
+import CustomInput from '../../shared/index';
 
 class Docked extends Component {
 	constructor(props) {
 		super(props);
-		const ad = this.props.ad ? this.props.ad : false;
+		const { ad } = this.props;
 		const hasFormatData = ad && ad.formatData ? ad.formatData : false;
 		this.state = {
 			topOffset: hasFormatData ? ad.formatData.topOffset : 0,
@@ -31,18 +32,20 @@ class Docked extends Component {
 
 	saveHandler(e) {
 		e.preventDefault();
+		const { save } = this.props;
 		const { topOffset, contentOffset, contentXpath, css } = this.state;
 		let parsedCSS = {};
 		if (!topOffset) {
-			return alert('Top Offset is mandatory fields');
-		} else if (css && css.trim().length) {
+			return window.alert('Top Offset is mandatory fields');
+		}
+		if (css && css.trim().length) {
 			try {
 				parsedCSS = JSON.parse(window.atob(css));
 			} catch (err) {
 				return window.alert('Invalid CSS');
 			}
 		}
-		return this.props.save.handler({
+		return save.handler({
 			formatData: {
 				contentOffset,
 				topOffset,
@@ -59,38 +62,52 @@ class Docked extends Component {
 		});
 	}
 
-	renderInput = (name, value, type, label, handler, size = 6) => (
-		<Col md={size} style={{ paddingLeft: '0px', marginBottom: '20px' }}>
-			<label htmlFor={name}>{label}</label>
-			<input
-				className="inputMinimal"
-				type={type}
-				placeholder={label}
-				name={name}
-				value={value}
-				style={{ padding: '10px 15px' }}
-				onChange={handler}
-			/>
-		</Col>
-	);
-
 	render() {
-		const { topOffset, contentOffset, contentXpath } = this.state;
+		const { save } = this.props;
+		const { topOffset, contentOffset, contentXpath, css } = this.state;
 		return (
 			<form action="#" method="POST">
-				{this.renderInput('topOffset', topOffset, 'number', 'Enter Top Offset', this.handleChange)}
-				{this.renderInput('contentOffset', contentOffset, 'number', 'Enter Content Offset', this.handleChange)}
-				{this.renderInput('contentXpath', contentXpath, 'text', 'Enter Content Xpath', this.handleChange, 12)}
+				<CustomInput
+					name="topOffset"
+					value={topOffset}
+					type="number"
+					label="Enter Top Offset"
+					handler={this.handleChange}
+					size={6}
+					id="top-offset-input"
+				/>
+				<CustomInput
+					name="contentOffset"
+					value={contentOffset}
+					type="number"
+					label="Enter Content Offset"
+					handler={this.handleChange}
+					size={6}
+					id="content-offset-input"
+				/>
+				<CustomInput
+					name="contentXpath"
+					value={contentXpath}
+					type="text"
+					label="Enter Content Xpath"
+					handler={this.handleChange}
+					size={12}
+					id="top-content-xpath"
+				/>
 				<Col md={12} style={{ paddingLeft: '0px' }}>
 					<label htmlFor="css">Custom CSS</label>
-					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={this.state.css} />
+					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={css} />
 				</Col>
 				<Col md={12} style={{ paddingRight: '0px' }}>
-					{this.props.save.renderFn(this.props.save.label, this.saveHandler)}
+					{save.renderFn(save.label, this.saveHandler)}
 				</Col>
 			</form>
 		);
 	}
 }
+
+Docked.defaultProps = {
+	ad: false
+};
 
 export default Docked;

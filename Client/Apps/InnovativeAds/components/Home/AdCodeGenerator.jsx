@@ -3,11 +3,10 @@ import { Row, Col, ProgressBar } from 'react-bootstrap';
 import CustomList from './CustomList';
 import { Docked, Default, InView, StickyTop } from './Formats/index';
 import { PLATFORMS, FORMATS, SIZES, displayAdMessage } from '../../configs/commonConsts';
-// import { CustomMessage, CustomButton } from '../shared/index';
 import CustomMessage from '../../../../Components/CustomMessage/index';
 import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader';
-import { pagegroupFiltering } from '../../libs/helpers';
+import { pagegroupFiltering } from '../../lib/helpers';
 
 class AdCodeGenerator extends Component {
 	constructor(props) {
@@ -195,7 +194,7 @@ class AdCodeGenerator extends Component {
 	renderButton = (label, handler) => (
 		<CustomButton
 			variant="primary"
-			className="u-margin-t2 u-margin-r3 pull-right"
+			className="u-margin-t4 u-margin-r3 pull-right"
 			onClick={handler}
 		>
 			{label}

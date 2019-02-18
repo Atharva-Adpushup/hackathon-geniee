@@ -24,7 +24,6 @@ const FieldGroup = ({ id, label, help, type, buttonToggle, onChange, ...props })
 			</ToggleButtonGroup>
 		</ButtonToolbar>
 	) : null;
-
 	return (
 		<FormGroup controlId={id} className="u-margin-b4">
 			<ControlLabel className="u-margin-b3">{label}</ControlLabel>
@@ -33,12 +32,10 @@ const FieldGroup = ({ id, label, help, type, buttonToggle, onChange, ...props })
 			) : (
 				<FormControl type={type} onChange={onChange} {...props} />
 			)}
-
 			{help && <HelpBlock>{help}</HelpBlock>}
 		</FormGroup>
 	);
 };
-
 FieldGroup.propTypes = {
 	id: PropTypes.string.isRequired,
 	label: PropTypes.string.isRequired,
@@ -47,14 +44,9 @@ FieldGroup.propTypes = {
 	type: PropTypes.string,
 	buttonToggle: PropTypes.array
 };
-
 FieldGroup.defaultProps = {
-	id: 'Simple-field-group-1',
-	label: 'Simple field group',
-	onChange: () => {
-		console.log('Fieldgroup component changed');
-	},
-	type: 'text'
+	type: 'text',
+	help: '',
+	buttonToggle: []
 };
-
 export default FieldGroup;

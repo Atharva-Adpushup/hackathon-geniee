@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Nav, NavItem } from 'react-bootstrap';
 import ActionCard from '../../../../Components/ActionCard';
 import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';
-import AdListContainer from '../../containers/AdListContainer';
+// import AdListContainer from '../../containers/AdListContainer';
 import { COMPONENT_TITLES } from '../../configs/commonConsts';
 
 class Home extends Component {
@@ -27,8 +27,8 @@ class Home extends Component {
 			default:
 			case 2:
 				return <AdCodeGeneratorContainer {...this.props} />;
-			case 3:
-				return <AdListContainer {...this.props} />;
+			// case 3:
+			// 	return <AdListContainer {...this.props} />;
 		}
 	}
 
