@@ -73,6 +73,7 @@ var w = window,
 			slotId = adUnits.dfpAdUnit,
 			bidders = optionalParam.headerBidding ? adUnits.bidders : [],
 			isResponsive = optionalParam.isResponsive,
+			sectionName = optionalParam.sectionName,
 			multipleAdSizes = optionalParam.multipleAdSizes;
 
 		adpTags.adpSlots[containerId] = {
@@ -82,6 +83,7 @@ var w = window,
 			placement: placement,
 			activeDFPNetwork: utils.getActiveDFPNetwork(),
 			size: size,
+			sectionName: sectionName,
 			computedSizes: multipleAdSizes ? multipleAdSizes : [],
 			isResponsive: isResponsive,
 			containerId: containerId,

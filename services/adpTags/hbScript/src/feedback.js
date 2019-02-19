@@ -46,6 +46,7 @@ var config = require('./config'),
 					status: null,
 					sectionId: slot.sectionId,
 					variationId: slot.variationId,
+					sectionName: slot.sectionName,
 					pageGroup: slot.pageGroup,
 					platform: slot.platform
 				}

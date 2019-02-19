@@ -78,6 +78,7 @@ const _ = require('lodash'),
 
 			json = {
 				id: sectionId,
+				sectionName: section.name,
 				network: ad.network,
 				//Format type of ad like, 1 for structural, 2 for incontent
 				type: section.type,
