@@ -153,7 +153,7 @@ class AdList extends Component {
 					</CustomButton>
 				</Row>
 				<div>
-					<Col xs={4}>
+					<Col xs={4} className="u-padding-l0">
 						{this.renderSelect(
 							filters.pagegroups.value,
 							'Select Pagegroup',
@@ -172,7 +172,7 @@ class AdList extends Component {
 							STATUS_FILTER_OPTIONS
 						)}
 					</Col>
-					<Col xs={4}>
+					<Col xs={4} className="u-padding-r0">
 						{this.renderSelect(
 							filters.format.value,
 							'Select Format',
