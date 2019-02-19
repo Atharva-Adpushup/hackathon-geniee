@@ -37,8 +37,8 @@ class Home extends Component {
 		return (
 			<ActionCard title={title}>
 				<Nav bsStyle="tabs" activeKey={activeNav} onSelect={this.handleNavSelect}>
-					<NavItem eventKey={1}>Ad code Generator</NavItem>
-					<NavItem eventKey={2}>Ads List</NavItem>
+					<NavItem eventKey={1}>AdCode Generation</NavItem>
+					<NavItem eventKey={2}>Manage Ads</NavItem>
 				</Nav>
 				{this.renderContent()}
 			</ActionCard>
