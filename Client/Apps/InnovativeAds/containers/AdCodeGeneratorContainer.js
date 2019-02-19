@@ -10,6 +10,7 @@ const mapStateToProps = (state, ownProps) => {
 		codeGenerated: !!innovativeAds.global.currentAd,
 		adId: innovativeAds.global.currentAd,
 		meta: innovativeAds.global.meta,
+		channels: innovativeAds.global.channels,
 		...ownProps
 	};
 };

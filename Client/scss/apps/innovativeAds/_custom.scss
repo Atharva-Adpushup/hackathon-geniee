@@ -148,6 +148,7 @@ body {
 .ad-td {
 	.adDetails-icon {
 		visibility: hidden;
+		cursor: pointer;
 	}
 	&:hover {
 		.adDetails-icon {
@@ -175,6 +176,7 @@ body {
 	padding: 0px !important;
 	.options {
 		margin: 0px !important;
+		padding: 0px !important;
 		ul {
 			li.simpleOption {
 				padding: 10px !important;

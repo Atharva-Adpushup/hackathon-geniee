@@ -2,6 +2,7 @@
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable jsx-a11y/href-no-hash */
 import React, { Component } from 'react';
+import { Col } from 'react-bootstrap';
 import CodeBox from '../../../../../Components/CodeBox/index';
 import { TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
 
@@ -51,8 +52,10 @@ class Default extends Component {
 		const { css } = this.state;
 		return (
 			<div>
-				<label htmlFor="css">Custom CSS</label>
-				<CodeBox name="css" showButtons={false} onChange={this.handleChange} code={css} />
+				<Col md={12} className="u-padding-l0">
+					<label htmlFor="css">Custom CSS</label>
+					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={css} />
+				</Col>
 				{cancel ? cancel.renderFn(cancel.label, cancel.handler) : null}
 				{save.renderFn(save.label, this.saveHandler)}
 			</div>

@@ -44,8 +44,8 @@ class AdList extends Component {
 	}
 
 	componentDidMount() {
-		const { loading, fetchAds } = this.props;
-		if (loading) fetchAds({ siteId: window.iam.siteId });
+		const { loading, fetchAds, match } = this.props;
+		if (loading) fetchAds({ siteId: match.params.siteId });
 	}
 
 	filterAds = (filters, ads) => {
@@ -66,8 +66,11 @@ class AdList extends Component {
 							break;
 						default:
 						case 'string':
-						case 'boolean':
 							condition = condition && container[filter.key] === filter.value;
+							break;
+						case 'boolean':
+							const toMatch = filter.value === "false" ? false : true;
+							condition = condition && container[filter.key] === toMatch;
 							break;
 					}
 				}
@@ -77,6 +80,28 @@ class AdList extends Component {
 		return finalAds;
 	};
 
+	resetFilters = () => {
+		this.setState({
+			filters: {
+				pagegroups: {
+					value: null,
+					key: 'pagegroups',
+					type: 'array'
+				},
+				isActive: {
+					value: null,
+					key: 'isActive',
+					type: 'boolean'
+				},
+				format: {
+					value: null,
+					key: 'format',
+					type: 'string',
+					inFormatData: true
+				}
+			}
+		});
+	};
 
 	modalToggle(data = {}) {
 		const { show, modalData } = this.state;
@@ -101,31 +126,30 @@ class AdList extends Component {
 		return masterSave(match.params.siteId, user.isSuperUser);
 	}
 
-
-	renderSelect = (value, label, changeHandler, array, disabled = false) => (
-		<div className="mTB-15">
+	renderSelect = (value, label, changeHandler, array) => (
+		<div className="u-margin-v4">
 			<p>{label}</p>
-			<SelectBox value={value} label={label} onChange={changeHandler} onClear={changeHandler} disabled={disabled}>
-				{array.map((ele, index) => (
-					<option key={`${label}-${index}`} value={ele.value}>
-						{ele.name}
-					</option>
-				))}
-			</SelectBox>
+			<SelectBox
+				selected={value}
+				onSelect={changeHandler}
+				title={label}
+				id={label.toUpperCase()}
+				options={array}
+			/>
 		</div>
 	);
 
 	renderFilters() {
 		const { filters } = this.state;
+		const { channels } = this.props;
 		return (
 			<React.Fragment>
-				<Row style={{ marginRight: '10px' }}>
-					<CustomButton
-						variant="primary"
-						// className="u-margin-t3 pull-right"
-						onClick={this.saveWrapper}
-					>
+				<Row>
+					<CustomButton variant="primary" className="pull-right" onClick={this.saveWrapper}>
 						Master Save
+					</CustomButton>
+					<CustomButton variant="secondary" className="u-margin-r3 pull-right" onClick={this.resetFilters}>
+						Reset Filters
 					</CustomButton>
 				</Row>
 				<div>
@@ -134,7 +158,7 @@ class AdList extends Component {
 							filters.pagegroups.value,
 							'Select Pagegroup',
 							value => this.selectChangeHandler('pagegroups', value),
-							window.iam.channels.map(channel => ({
+							channels.map(channel => ({
 								name: channel,
 								value: channel
 							}))
@@ -171,10 +195,11 @@ class AdList extends Component {
 			meta,
 			archiveAd,
 			updateTraffic,
-			user
+			user,
+			channels
 		} = this.props;
 		const { show, modalData, filters } = this.state;
-		const HEADERS = window.iam.isSuperUser ? OPS_AD_LIST_HEADERS : USER_AD_LIST_HEADERS;
+		const HEADERS = user.isSuperUser ? OPS_AD_LIST_HEADERS : USER_AD_LIST_HEADERS;
 		const adsToRender = this.filterAds(filters, ads);
 		const customStyle = {};
 
@@ -186,14 +211,14 @@ class AdList extends Component {
 			);
 		} else if (!adsToRender.length) {
 			return (
-				<div>
+				<div className="u-padding-4">
 					{user.isSuperUser ? this.renderFilters() : null}
 					<Empty message="Seems kind of empty here" />
 				</div>
 			);
 		}
 		return (
-			<div className="u-padding-4" style={{ fontSize: '15px' }}>
+			<div className="u-padding-4">
 				{user.isSuperUser ? this.renderFilters() : null}
 				<Table striped bordered hover>
 					<thead>
@@ -212,6 +237,8 @@ class AdList extends Component {
 									ad={ad}
 									style={customStyle}
 									meta={meta}
+									channels={channels}
+									user={user}
 									updateAd={updateAd}
 									modifyAdOnServer={modifyAdOnServer}
 									modalToggle={this.modalToggle}

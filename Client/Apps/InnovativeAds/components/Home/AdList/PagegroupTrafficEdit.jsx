@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import CustomList from '../CustomList';
-import { pagegroupFiltering } from '../../../libs/helpers';
+import { pagegroupFiltering } from '../../../lib/helpers';
 
 class PagegroupTrafficEdit extends Component {
 	constructor(props) {
@@ -30,14 +30,14 @@ class PagegroupTrafficEdit extends Component {
 	}
 
 	render() {
-		const { ad, updateTraffic, updateWrapper, onCancel, isSuperUser, meta } = this.props;
+		const { ad, updateTraffic, updateWrapper, onCancel, isSuperUser, meta, channels } = this.props;
 		const { pagegroups } = this.state;
 
 		const { filteredPagegroupsByPlatform, disabled } = pagegroupFiltering(
-			window.iam.channels,
+			channels,
 			ad.formatData.platform,
 			ad.formatData.format,
-			meta,
+			meta.content,
 			true,
 			ad.pagegroups
 		);
@@ -55,9 +55,9 @@ class PagegroupTrafficEdit extends Component {
 					message="Seems like you have reached the limt to create ad for this format. Please delete/modify an existing ad"
 					onClick={this.selectPagegroups}
 				/>
-				<CustomButton handler={onCancel}>Cancel</CustomButton>
 				<CustomButton
-					handler={() => {
+					className="u-margin-l3 u-margin-r3"
+					onClick={() => {
 						if (pagegroups.length) {
 							if (ad.isActive) {
 								updateTraffic(
@@ -89,7 +89,7 @@ class PagegroupTrafficEdit extends Component {
 				>
 					Save
 				</CustomButton>
-				<div style={{ clear: 'both' }}>&nbsp;</div>
+				<CustomButton onClick={() => onCancel()}>Cancel</CustomButton>
 			</div>
 		);
 	}

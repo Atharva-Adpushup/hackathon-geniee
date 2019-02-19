@@ -101,7 +101,7 @@ const CustomList = props => {
 				<li
 					key={key}
 					className={`simpleOption ${activeClass}`}
-					onClick={disabled ? NOOP : () => onClick(option)}
+					onClick={isDisabled ? NOOP : () => onClick(option)}
 				>
 					{option.replace(':', ' - ')}
 				</li>

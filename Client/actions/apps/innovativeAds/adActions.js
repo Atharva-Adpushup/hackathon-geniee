@@ -72,12 +72,13 @@ const createAd = params => dispatch =>
 		});
 	});
 const fetchAds = params => dispatch =>
-	axiosInstance.get(API_PATHS.FETCH_ADS, params).then(response => {
-		if (response.error) {
-			return window.alert('Ad fetching failed');
-		}
-		return dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: response.data.ads });
-	});
+	axiosInstance
+		.get(API_PATHS.FETCH_ADS, { params })
+		.then(response => {
+			const { data } = response.data;
+			return dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: data.ads });
+		})
+		.catch(err => errorHandler(err, 'Ad Fetching Failed'));
 const deleteAd = params => dispatch =>
 	axiosInstance.post(API_PATHS.DELETE_AD, params).then(response => {
 		if (response.error) {

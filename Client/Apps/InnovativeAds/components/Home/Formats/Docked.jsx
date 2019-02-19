@@ -115,7 +115,7 @@ class Docked extends Component {
 					size={colSize}
 					id="bottom-offset-input"
 				/>
-				<Col md={12} style={{ paddingLeft: '0px' }}>
+				<Col md={12} className="u-padding-l0">
 					<label htmlFor="css">Custom CSS</label>
 					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={css} />
 				</Col>

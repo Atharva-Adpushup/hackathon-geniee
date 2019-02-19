@@ -14,7 +14,7 @@ router.use(apiAuthMiddleware);
 // API Controllers
 router.use('/user', userController);
 router.use('/apTag', apTagController);
-router.use('/innovativeAd/', innovativeAdsController);
+router.use('/innovativeAds', innovativeAdsController);
 router.use('/', indexController);
 
 module.exports = router;

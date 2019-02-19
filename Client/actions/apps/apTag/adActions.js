@@ -8,7 +8,7 @@ const createAd = params => dispatch =>
 		.then(response => {
 			const { data } = response.data;
 			dispatch({ type: AD_ACTIONS.UPDATE_ADS_LIST, data: { ...params.ad, id: data.id } });
-			dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, currentAd: data.id });
+			return dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, currentAd: data.id });
 		})
 		.catch(err => errorHandler(err, 'Ad Creation Failed. Please contact AdPushup Operations Team'));
 
@@ -17,7 +17,7 @@ const fetchAds = params => dispatch =>
 		.get('/apTag/fetchAds', { params })
 		.then(response => {
 			const { data } = response.data;
-			dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: data.ads });
+			return dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: data.ads });
 		})
 		.catch(err => errorHandler(err, 'Ad Fetching Failed'));
 
