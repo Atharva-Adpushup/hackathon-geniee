@@ -109,8 +109,8 @@ const modifyAdOnServer = (adId, data) => dispatch =>
 		});
 	});
 const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
-	const state = getState();
-	const globalAdLogs = state.global.meta.pagegroups;
+	const { innovativeAds } = getState().apps;
+	const globalAdLogs = innovativeAds.global.meta.content.pagegroups;
 	const { format, platform, pagegroups, isActive, archivedOn, networkData } = data;
 	const currentAdLogs = pagegroups.map(pg => `${platform}-${format}-${pg}`);
 	const mode = 'pagegroups';
@@ -128,10 +128,10 @@ const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
 			return Promise.resolve(false);
 		}
 		const { disabled } = pagegroupFiltering(
-			window.iam.channels,
+			innovativeAds.global.channels,
 			platform,
 			format,
-			state.global.meta,
+			innovativeAds.global.meta.content,
 			false,
 			pagegroups
 		);

@@ -48,9 +48,9 @@ class AdNetworkDetails extends Component {
 					name={`refreshSlot-${ad.id}`}
 					id={`js-refresh-slot-switch-${ad.id}`}
 				/>
-				<CustomButton label="Cancel" handler={onCancel} />
 				<CustomButton
-					handler={() => {
+					className="u-margin-r3"
+					onClick={() => {
 						onSubmit({
 							networkData: {
 								...ad.networkData,
@@ -64,7 +64,9 @@ class AdNetworkDetails extends Component {
 				>
 					Save
 				</CustomButton>
-				<div style={{ clear: 'both' }}>&nbsp;</div>
+				<CustomButton variant="secondary" onClick={onCancel}>
+					Cancel
+				</CustomButton>
 			</div>
 		);
 	}

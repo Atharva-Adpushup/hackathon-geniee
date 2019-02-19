@@ -3,10 +3,11 @@ import axiosInstance from '../../../helpers/axiosInstance';
 import { errorHandler } from '../../../helpers/commonFunctions';
 
 const masterSave = siteId => (_, getState) => {
+	const { innovativeAds } = getState().apps;
 	const data = {
 		siteId,
-		ads: getState().apps.innovativeAds.ads.content,
-		meta: getState().apps.innovativeAds.global.meta.content
+		ads: innovativeAds.ads.content,
+		meta: innovativeAds.global.meta.content
 	};
 	return axiosInstance
 		.post('/innovativeAds/masterSave', data)
