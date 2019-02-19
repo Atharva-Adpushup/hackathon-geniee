@@ -57,20 +57,21 @@ const helpers = {
 };
 
 const createAd = params => dispatch =>
-	axiosInstance.post(API_PATHS.CREATE_AD, params).then(response => {
-		if (response.error) {
-			return window.alert('Ad creation failed');
-		}
-		dispatch({ type: AD_ACTIONS.UPDATE_ADS_LIST, data: response.data.ads });
-		dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, currentAd: response.data.ads[0].id });
-		return dispatch({
-			type: GLOBAL_ACTIONS.UPDATE_AD_TRACKING_LOGS,
-			value: {
-				mode: 'pagegroups',
-				logs: response.data.logs
-			}
-		});
-	});
+	axiosInstance
+		.post(API_PATHS.CREATE_AD, params)
+		.then(response => {
+			const { data } = response.data;
+			dispatch({ type: AD_ACTIONS.UPDATE_ADS_LIST, data: data.ads });
+			dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, currentAd: data.ads[0].id });
+			return dispatch({
+				type: GLOBAL_ACTIONS.UPDATE_AD_TRACKING_LOGS,
+				value: {
+					mode: 'pagegroups',
+					logs: data.logs
+				}
+			});
+		})
+		.catch(err => errorHandler(err, 'Ad creation failed'));
 const fetchAds = params => dispatch =>
 	axiosInstance
 		.get(API_PATHS.FETCH_ADS, { params })
@@ -162,9 +163,10 @@ const updateTraffic = (adId, { networkData, pagegroups, platform, format }, isSu
 	dispatch,
 	getState
 ) => {
+	const { innovativeAds } = getState().apps;
 	const currentAdLogs = pagegroups.map(pg => `${platform}-${format}-${pg}`);
-	const globalAdLogs = getState().global.meta.pagegroups;
-	const currentAd = getState().ads.content.filter(ad => ad.id === adId)[0];
+	const globalAdLogs = innovativeAds.global.meta.content.pagegroups;
+	const currentAd = innovativeAds.ads.content.filter(ad => ad.id === adId)[0];
 	const currentPagegroups = currentAd.pagegroups;
 	const toRemove = currentPagegroups.map(
 		pg => `${currentAd.formatData.platform}-${currentAd.formatData.format}-${pg}`

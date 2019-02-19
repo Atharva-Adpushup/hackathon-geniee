@@ -125,8 +125,8 @@ const SIZES = {
 const interactiveAdEvents = ['DOMContentLoaded', 'scriptLoaded']; // load', 'scroll', 'onMills',
 const displayAdMessage = `<ol style="font-size: 15px;">
 	<li style="margin-bottom: 10px;">AdPushup head code needs to be inserted in the global head of your website.</li>
-	<li style="margin-bottom: 10px;">Ads.txt  is mandatory. It needs to be updated incase you already have one. Else please follow the instructions provided here: https://support.google.com/admanager/answer/7441288?hl=en. AdPushup's ads.txt should be appended alongside your existing partners.</li>
-	<li style="margin-bottom: 10px; color: red; font-weight: bold; color: #eb575c">Please wait for 24-48 working hours for our operations team to review and approve the website. You'll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com<li>
+	<li style="margin-bottom: 10px;">Ads.txt  is mandatory. It needs to be updated incase you already have one. Else please follow the instructions provided here: <a href="https://support.google.com/admanager/answer/7441288?hl=en">https://support.google.com/admanager/answer/7441288?hl=en</a>. AdPushup's ads.txt should be appended alongside your existing partners.</li>
+	<li style="margin-bottom: 10px; color: red; font-weight: bold; color: #eb575c">Please wait for 24-48 working hours for our operations team to review and approve the website. You'll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</li>
 </ol>
 `;
 const interactiveAdMessage =

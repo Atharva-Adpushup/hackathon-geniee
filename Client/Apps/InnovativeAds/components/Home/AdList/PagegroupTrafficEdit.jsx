@@ -89,7 +89,9 @@ class PagegroupTrafficEdit extends Component {
 				>
 					Save
 				</CustomButton>
-				<CustomButton onClick={() => onCancel()}>Cancel</CustomButton>
+				<CustomButton variant="secondary" onClick={() => onCancel()}>
+					Cancel
+				</CustomButton>
 			</div>
 		);
 	}

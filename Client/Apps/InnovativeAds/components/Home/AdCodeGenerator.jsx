@@ -98,6 +98,7 @@ class AdCodeGenerator extends Component {
 	}
 
 	generateAdData(data) {
+		const { match } = this.props;
 		const { size, format, pagegroups, platform } = this.state;
 		const sizesArray = size.split('x');
 		const width = sizesArray[0];
@@ -120,7 +121,7 @@ class AdCodeGenerator extends Component {
 		}
 
 		return {
-			siteId: window.siteId,
+			siteId: match.params.siteId,
 			ad: {
 				width,
 				height,
@@ -347,7 +348,7 @@ class AdCodeGenerator extends Component {
 		const { codeGenerated } = this.props;
 		const { progress, isLayoutSetupPresent } = this.state;
 		return (
-			<div>
+			<React.Fragment>
 				<div className="progress-wrapper">
 					<ProgressBar striped active bsStyle="success" now={progress} />
 				</div>
@@ -362,12 +363,12 @@ class AdCodeGenerator extends Component {
 						{progress >= 60 ? this.renderFormatDetails() : null}
 					</div>
 				)}
-			</div>
+			</React.Fragment>
 		);
 	}
 
 	renderLoader = () => (
-		<div style={{ position: 'relative', 'min-height': '200px' }}>
+		<div style={{ position: 'relative', minHeight: '200px' }}>
 			<Loader />
 		</div>
 	);
