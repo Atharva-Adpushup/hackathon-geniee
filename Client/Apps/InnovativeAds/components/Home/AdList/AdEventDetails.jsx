@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import SelectBox from '../../../../../Components/Selectbox/index';
 import { interactiveAdEvents } from '../../../configs/commonConsts';
 import CodeBox from '../../../../../Components/CodeBox/index';
-// import { CustomInput, CustomButton } from '../../shared/index.jsx';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import CustomInput from '../../../../../Components/InputBox/index';
 
@@ -51,14 +50,17 @@ class EventDetails extends Component {
 		const { ad, onCancel } = this.props;
 		const { event, value, css } = this.state;
 		return (
-			<div>
-				<SelectBox value={event} label="Event" onChange={ev => this.setState({ event: ev })}>
-					{interactiveAdEvents.map((item, index) => (
-						<option key={index} value={item}>
-							{item.toUpperCase()}
-						</option>
-					))}
-				</SelectBox>
+			<React.Fragment>
+				<SelectBox
+					selected={event}
+					onSelect={ev => this.setState({ event: ev })}
+					title="Select Event"
+					id="event-selection-selectbox"
+					options={interactiveAdEvents.map((item, index) => ({
+						name: item.toUpperCase(),
+						value: item
+					}))}
+				/>
 				<CustomInput
 					name={`${ad.id}-input-box`}
 					value={value}
@@ -74,9 +76,13 @@ class EventDetails extends Component {
 					code={typeof css === 'object' ? window.btoa(JSON.stringify(css)) : window.btoa(css)}
 					onChange={this.cssChangeHandler}
 				/>
-				<CustomButton label="Cancel" handler={onCancel} />
-				<CustomButton label="Save" handler={this.submitHandler} />
-			</div>
+				<CustomButton variant="primary" onClick={this.submitHandler}>
+					Save
+				</CustomButton>
+				<CustomButton variant="secondary" onClick={onCancel}>
+					Cancel
+				</CustomButton>
+			</React.Fragment>
 		);
 	}
 }

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import PagegroupTrafficEdit from './PagegroupTrafficEdit';
 import FormatEdit from './FormatEdit';
 import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../lib/helpers';
@@ -8,9 +10,10 @@ import {
 	USER_AD_LIST_ACTIONS,
 	OPS_AD_LIST_ACTIONS
 } from '../../../configs/commonConsts';
-import Edit from '../../shared/Edit';
+import Edit from '../../../../../Components/EditBox/index';
 import AdNetworkDetails from './AdNetworkDetails';
 import Tags from '../../../../../Components/Tags';
+import CustomButton from '../../../../../Components/CustomButton/index';
 
 class AdElement extends Component {
 	constructor(props) {
@@ -97,7 +100,7 @@ class AdElement extends Component {
 	}
 
 	editTraffic() {
-		const { ad, meta, modalToggle, updateTraffic } = this.props;
+		const { ad, meta, modalToggle, updateTraffic, user, channels } = this.props;
 		const hasPagegroups = !!(ad.pagegroups && ad.pagegroups.length);
 
 		let body = <p>Custom Traffic Edit would be here</p>;
@@ -109,6 +112,8 @@ class AdElement extends Component {
 				<PagegroupTrafficEdit
 					ad={ad}
 					meta={meta}
+					user={user}
+					channels={channels}
 					updateTraffic={updateTraffic}
 					updateWrapper={this.updateWrapper}
 					onCancel={modalToggle}
@@ -173,22 +178,20 @@ class AdElement extends Component {
 					overlay={<Tooltip id={`ad-${ad.id}-${action.tooltipText}`}>{action.tooltipText}</Tooltip>}
 					key={`ad-${ad.id}-${action.tooltipText}`}
 				>
-					<span className="adDetails-icon" style={{ cursor: 'pointer' }} onClick={element.handler}>
-						<i className={`${action.iconClass} ad-action-icon mr-5 ${index === 0 ? 'ml-5' : ''}`} />
-					</span>
+					<FontAwesomeIcon
+						icon={action.iconClass}
+						className={`u-text-red adDetails-icon u-margin-r2 ${index === 0 ? 'u-margin-l2' : ''}`}
+						onClick={element.handler}
+					/>
 				</OverlayTrigger>
 			);
 		});
 	}
 
-	renderInformation(value, actions = []) {
+	renderInformation(value, actions = [], maxWidth = '80px') {
 		const { ad } = this.props;
 		return (
-			<td
-				key={`${ad.id}-infoKey-${this.getIdentifier()}`}
-				className="ad-td"
-				style={{ maxWidth: '100px' }}
-			>
+			<td key={`${ad.id}-infoKey-${this.getIdentifier()}`} className="ad-td" style={{ maxWidth }}>
 				{value}
 				{actions.length ? this.renderActions(actions) : null}
 			</td>
@@ -200,17 +203,14 @@ class AdElement extends Component {
 		const { ad } = this.props;
 
 		return actions.map((action, index) => (
-			<a
+			<CustomButton
 				key={`adAction-${ad.id}-${index}`}
-				href="#"
-				className="action-button"
-				onClick={e => {
-					e.preventDefault();
-					this.userActionsHandler(action.key);
-				}}
+				variant="secondary"
+				className="u-margin-b3"
+				onClick={() => this.userActionsHandler(action.key)}
 			>
 				{action.displayText}
-			</a>
+			</CustomButton>
 		));
 	}
 
@@ -242,19 +242,18 @@ class AdElement extends Component {
 		toRender.push(
 			this.renderInformation(
 				ad.isActive ? (
-					<span className="boldTxt text-success">Active</span>
+					<span className="u-text-bold u-text-success">Active</span>
 				) : (
-					<span className="boldTxt text-error">Archived</span>
+					<span className="u-text-bold u-text-error">Archived</span>
 				)
 			)
 		);
-		toRender.push(this.renderInformation(this.renderUserActions()));
+		toRender.push(this.renderInformation(this.renderUserActions(), [], '100px'));
 		return toRender;
 	}
 
 	render() {
 		const { identifier } = this.props;
-
 		return <tr key={identifier}>{this.renderAdDetails()}</tr>;
 	}
 }

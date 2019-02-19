@@ -352,7 +352,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		siteDomain: null,
 		ads: []
 	},
-	interactiveAdsInitialDoc: {
+	INNOVATIVE_ADS_INITIAL_DOC: {
 		siteId: null,
 		ownerEmail: null,
 		siteDomain: null,
@@ -362,7 +362,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			custom: []
 		}
 	},
-	defaultMeta: {
+	DEFAULT_META: {
 		pagegroups: [],
 		custom: []
 	},

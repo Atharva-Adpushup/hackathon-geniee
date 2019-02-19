@@ -3,7 +3,7 @@ import { fetchMeta } from '../../../actions/apps/innovativeAds/globalActions';
 import Home from '../components/Home/index';
 
 const mapStateToProps = (state, ownProps) => ({
-	meta: state.apps.innvotiveAds.global.meta,
+	meta: state.apps.innovativeAds.global.meta,
 	...ownProps
 });
 

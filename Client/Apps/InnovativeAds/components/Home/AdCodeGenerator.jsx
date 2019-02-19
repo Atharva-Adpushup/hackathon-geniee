@@ -11,6 +11,7 @@ import { pagegroupFiltering } from '../../lib/helpers';
 class AdCodeGenerator extends Component {
 	constructor(props) {
 		super(props);
+		const { channels } = props;
 		this.state = {
 			progress: 0,
 			platform: '',
@@ -18,7 +19,7 @@ class AdCodeGenerator extends Component {
 			size: null,
 			loading: false,
 			pagegroups: [],
-			isLayoutSetupPresent: !!(window.iam && window.iam.channels && window.iam.channels.length)
+			isLayoutSetupPresent: !!(channels && channels.length)
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
 		this.selectFormat = this.selectFormat.bind(this);
@@ -34,7 +35,6 @@ class AdCodeGenerator extends Component {
 		this.renderFormatDetails = this.renderFormatDetails.bind(this);
 		this.renderIndividualFormat = this.renderIndividualFormat.bind(this);
 		this.renderMainContent = this.renderMainContent.bind(this);
-		this.renderFormatOrSave = this.renderFormatOrSave.bind(this);
 		this.renderGeneratedAdcode = this.renderGeneratedAdcode.bind(this);
 		this.generateAdData = this.generateAdData.bind(this);
 	}
@@ -253,7 +253,7 @@ class AdCodeGenerator extends Component {
 
 	renderPagegroups() {
 		const { platform, format, pagegroups } = this.state;
-		const { meta } = this.props;
+		const { meta, channels } = this.props;
 		/*
 			platform - desktop
 			format - stickyLeft
@@ -265,10 +265,10 @@ class AdCodeGenerator extends Component {
 		*/
 
 		const { filteredPagegroupsByPlatform, disabled } = pagegroupFiltering(
-			window.iam.channels,
+			channels,
 			platform,
 			format,
-			meta,
+			meta.content,
 			false
 		);
 
@@ -311,16 +311,16 @@ class AdCodeGenerator extends Component {
 
 	renderFormatDetails() {
 		return (
-			<div>
+			<React.Fragment>
 				<Col md={3} className="list-heading br-0">
 					<h3>Format Settings</h3>
 					<h4>Please fill the necessary details</h4>
 				</Col>
-				<Col md={9} className="u-padding-h3">
+				<Col md={9} className="u-padding-l5 u-padding-r3">
 					{this.renderIndividualFormat()}
 				</Col>
 				<div style={{ clear: 'both' }}>&nbsp;</div>
-			</div>
+			</React.Fragment>
 		);
 	}
 
@@ -343,14 +343,6 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
-	renderFormatOrSave() {
-		const { progress } = this.state;
-		if (progress && progress >= 60) {
-			return this.renderFormatDetails();
-		}
-		return null;
-	}
-
 	renderMainContent() {
 		const { codeGenerated } = this.props;
 		const { progress, isLayoutSetupPresent } = this.state;
@@ -367,7 +359,7 @@ class AdCodeGenerator extends Component {
 						{progress >= 15 ? this.renderFormats() : null}
 						{progress >= 30 ? this.renderSizes() : null}
 						{progress >= 45 && isLayoutSetupPresent ? this.renderPagegroups() : null}
-						{this.renderFormatOrSave()}
+						{progress >= 60 ? this.renderFormatDetails() : null}
 					</div>
 				)}
 			</div>

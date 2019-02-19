@@ -94,11 +94,11 @@ class Docked extends Component {
 					size={12}
 					id="top-content-xpath"
 				/>
-				<Col md={12} style={{ paddingLeft: '0px' }}>
+				<Col md={12} className="u-padding-l0">
 					<label htmlFor="css">Custom CSS</label>
 					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={css} />
 				</Col>
-				<Col md={12} style={{ paddingRight: '0px' }}>
+				<Col md={12} className="u-padding-r0">
 					{save.renderFn(save.label, this.saveHandler)}
 				</Col>
 			</form>

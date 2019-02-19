@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { CustomButton } from '../../shared/index';
+import CustomButton from '../../../../../Components/CustomButton/index';
 import { InView, Docked, Default, StickyTop } from '../Formats/index';
 
 class FormatEdit extends Component {
@@ -24,11 +24,9 @@ class FormatEdit extends Component {
 	}
 
 	renderButton = (label, handler) => (
-		<CustomButton
-			label={label}
-			handler={handler}
-			style={{ float: 'right', minWidth: '100px', margin: '10px 10px 0px 0px' }}
-		/>
+		<CustomButton variant="primary" className="u-margin-t3 u-margin-r3" onClick={handler}>
+			{label}
+		</CustomButton>
 	);
 
 	renderIndividualFormat() {

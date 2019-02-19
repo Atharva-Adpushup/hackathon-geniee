@@ -185,11 +185,11 @@ const OPS_AD_LIST_ACTIONS = [
 const AD_LIST_ACTIONS = {
 	copy: {
 		tooltipText: 'Copy',
-		iconClass: 'btn-icn-copy'
+		iconClass: 'copy'
 	},
 	edit: {
 		tooltipText: 'Edit',
-		iconClass: 'btn-icn-edit'
+		iconClass: 'edit'
 	}
 };
 const NOOP = () => {};

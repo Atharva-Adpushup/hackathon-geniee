@@ -25,13 +25,19 @@ const ads = (state = { fetched: false, content: [] }, action) => {
 	}
 };
 
-const global = (state = { currentAd: null, meta: { fetched: false, data: {} } }, action) => {
+const global = (
+	state = { currentAd: null, meta: { fetched: false, content: {} }, channels: [] },
+	action
+) => {
 	switch (action.type) {
 		case GLOBAL_ACTIONS.SET_CURRENT_AD:
 			return { ...state, currentAd: action.currentAd };
 
 		case GLOBAL_ACTIONS.REPLACE_META:
-			return { ...state, meta: { fetched: true, data: action.data } };
+			return { ...state, meta: { fetched: true, content: action.data } };
+
+		case GLOBAL_ACTIONS.SET_CHANNELS:
+			return { ...state, channels: [...state.channels, ...action.data] };
 
 		case GLOBAL_ACTIONS.SET_META:
 			return { ...state, meta: { ...state.meta, ...action.meta } };
@@ -41,7 +47,10 @@ const global = (state = { currentAd: null, meta: { fetched: false, data: {} } },
 				...state,
 				meta: {
 					...state.meta,
-					[action.value.mode]: [...state.meta[action.value.mode], ...action.value.logs]
+					content: {
+						...state.meta.content,
+						[action.value.mode]: [...state.meta[action.value.mode], ...action.value.logs]
+					}
 				}
 			};
 
@@ -50,7 +59,10 @@ const global = (state = { currentAd: null, meta: { fetched: false, data: {} } },
 				...state,
 				meta: {
 					...state.meta,
-					[action.value.mode]: action.value.logs
+					content: {
+						...state.meta.content,
+						[action.value.mode]: action.value.logs
+					}
 				}
 			};
 

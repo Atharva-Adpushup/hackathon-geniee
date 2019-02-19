@@ -2,21 +2,24 @@ const express = require('express');
 const Promise = require('bluebird');
 const _ = require('lodash');
 const uuid = require('uuid');
-const { couchbaseService } = require('node-utils');
+// const { couchbaseService } = require('node-utils');
 const request = require('request-promise');
-const config = require('../configs/config');
+// const config = require('../configs/config');
+const HTTP_STATUS = require('../configs/httpStatusConsts');
+const AdPushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { docKeys, interactiveAdsInitialDoc, defaultMeta } = require('../configs/commonConsts');
+const { docKeys, INNOVATIVE_ADS_INITIAL_DOC, DEFAULT_META } = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
 const siteModel = require('../models/siteModel');
+const { appBucket, errorHander, verifyOwner } = require('../helpers/routeHelpers');
 
 const router = express.Router();
-const appBucket = couchbaseService(
-	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
-	config.couchBase.DEFAULT_BUCKET,
-	config.couchBase.DEFAULT_USER_NAME,
-	config.couchBase.DEFAULT_USER_PASSWORD
-);
+// const appBucket = couchbaseService(
+// 	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
+// 	config.couchBase.DEFAULT_BUCKET,
+// 	config.couchBase.DEFAULT_USER_NAME,
+// 	config.couchBase.DEFAULT_USER_PASSWORD
+// );
 
 const fn = {
 	sendDataToZapier: data => {
@@ -31,11 +34,11 @@ const fn = {
 		options.uri = options.uri.slice(0, -1);
 
 		return request(options)
-			.then(response => console.log('Ad Creation. Called made to Zapier'))
-			.catch(err => console.log('Ad creation call to Zapier failed'));
+			.then(() => console.log('Ad Creation. Called made to Zapier'))
+			.catch(() => console.log('Ad creation call to Zapier failed'));
 	},
 	createNewDocAndDoProcessing: payload => {
-		const innovativeAdDefault = _.cloneDeep(interactiveAdsInitialDoc);
+		const innovativeAdDefault = _.cloneDeep(INNOVATIVE_ADS_INITIAL_DOC);
 		return appBucket
 			.createDoc(`${docKeys.interactiveAds}${payload.siteId}`, innovativeAdDefault, {})
 			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
@@ -97,10 +100,6 @@ const fn = {
 		}
 		return process().then(() => toReturn);
 	},
-	errorHander: (err, res) => {
-		console.log(err);
-		return sendErrorResponse({ message: 'Opertion Failed' }, res);
-	},
 	emitEventAndSendResponse: (siteId, res, data = {}) =>
 		siteModel.getSiteById(siteId).then(site => {
 			adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
@@ -117,7 +116,7 @@ const fn = {
 			.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`)
 			.then(docWithCas => processing(docWithCas))
 			.then(() => fn.emitEventAndSendResponse(req.body.siteId, res))
-			.catch(err => fn.errorHander(err, res))
+			.catch(err => errorHander(err, res))
 };
 
 router
@@ -130,8 +129,9 @@ router
 				res
 			);
 		}
-		return appBucket
-			.getDoc(`${docKeys.interactiveAds}${req.query.siteId}`)
+		const { siteId } = req.query;
+		return verifyOwner(siteId, req.user.email)
+			.then(() => appBucket.getDoc(`${docKeys.interactiveAds}${siteId}`))
 			.then(docWithCas =>
 				sendSuccessResponse(
 					{
@@ -148,42 +148,39 @@ router
 							},
 							res
 					  )
-					: fn.errorHander(err, res)
+					: errorHander(err, res)
 			);
 	})
-	.get(['/', '/:siteId'], (req, res) => {
-		const { session, params } = req;
-
-		if (!params.siteId) {
-			return res.render('404');
+	.get('/fetchMeta', (req, res) => {
+		if (!req.query || !req.query.siteId) {
+			return sendErrorResponse(
+				{
+					message: 'Incomplete Parameters. Please check siteId'
+				},
+				res
+			);
 		}
-
-		return Promise.join(siteModel.getSiteById(params.siteId), site =>
-			new Promise((resolve, reject) =>
-				site.get('ownerEmail') === session.user.email
-					? resolve()
-					: reject('Owner verification failed')
-			)
-				.then(() => appBucket.getDoc(`${docKeys.interactiveAds}${params.siteId}`))
+		const { siteId } = req.query;
+		return Promise.join(verifyOwner(siteId, req.user.email), site =>
+			appBucket
+				.getDoc(`${docKeys.interactiveAds}${siteId}`)
 				.then(docWithCas => docWithCas.value.meta)
 				.catch(err =>
-					err.name && err.name == 'CouchbaseError' && err.code == 13
-						? defaultMeta
+					err.name && err.name === 'CouchbaseError' && err.code === 13
+						? DEFAULT_META
 						: Promise.reject(err)
 				)
 				.then(meta => {
 					const channels = site.get('channels') || [];
-					return res.render('interactiveAdsManager', {
-						siteId: params.siteId,
-						isSuperUser: !!session.isSuperUser,
-						channels,
-						meta
-					});
+					return sendSuccessResponse(
+						{
+							channels,
+							meta
+						},
+						res
+					);
 				})
-		).catch(err => {
-			console.log(err.message);
-			return res.render('404');
-		});
+		).catch(err => errorHander(err, res));
 	})
 	.post('/createAd', (req, res) => {
 		if (!req.body || !req.body.siteId || !req.body.ad) {
@@ -197,28 +194,22 @@ router
 		const payload = {
 			ad: req.body.ad,
 			siteId: req.body.siteId,
-			ownerEmail: req.session.user.email
+			ownerEmail: req.user.email
 		};
-		return appBucket
-			.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`)
+		return verifyOwner(payload.siteId, req.user.email)
+			.then(() => appBucket.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`))
 			.then(docWithCas => fn.processing(docWithCas, payload))
 			.catch(err =>
-				err.name && err.name == 'CouchbaseError' && err.code == 13
+				err.name && err.name === 'CouchbaseError' && err.code === 13
 					? fn.createNewDocAndDoProcessing(payload)
 					: Promise.reject(err)
 			)
 			.spread(fn.dbWrapper)
 			.then(data => fn.emitEventAndSendResponse(req.body.siteId, res, data))
-			.catch(err => fn.errorHander(err, res));
+			.catch(err => errorHander(err, res));
 	})
 	.post('/masterSave', (req, res) => {
-		if (
-			!req.body ||
-			!req.body.siteId ||
-			!req.body.ads ||
-			!req.session.isSuperUser ||
-			!req.body.meta
-		) {
+		if (!req.body || !req.body.siteId || !req.body.ads || !req.user.isSuperUser || !req.body.meta) {
 			return sendErrorResponse(
 				{
 					message: 'Invalid Parameters.'
@@ -229,9 +220,11 @@ router
 		return fn.adUpdateProcessing(req, res, docWithCas => {
 			const doc = docWithCas.value;
 			const { siteId } = req.body;
-
-			if (doc.ownerEmail != req.session.user.email) {
-				return Promise.reject('Owner verfication fail');
+			if (doc.ownerEmail !== req.user.email) {
+				throw new AdPushupError({
+					message: 'Unauthorized Request',
+					code: HTTP_STATUS.PERMISSION_DENIED
+				});
 			}
 			if (!doc.ads.length) {
 				doc.ads = req.body.ads;
@@ -240,7 +233,7 @@ router
 
 				_.forEach(doc.ads, adFromDoc => {
 					_.forEach(req.body.ads, adFromClient => {
-						if (adFromDoc.id == adFromClient.id) {
+						if (adFromDoc.id === adFromClient.id) {
 							newAds.push({
 								...adFromDoc,
 								...adFromClient,
@@ -270,11 +263,14 @@ router
 		}
 		return fn.adUpdateProcessing(req, res, docWithCas => {
 			const doc = docWithCas.value;
-			if (doc.ownerEmail != req.session.user.email) {
-				return Promise.reject('Owner verfication fail');
+			if (doc.ownerEmail !== req.user.email) {
+				throw new AdPushupError({
+					message: 'Unauthorized Request',
+					code: HTTP_STATUS.PERMISSION_DENIED
+				});
 			}
 			_.forEach(doc.ads, (ad, index) => {
-				if (ad.id == req.body.adId) {
+				if (ad.id === req.body.adId) {
 					doc.ads[index] = { ...ad, ...req.body.data };
 					return false;
 				}

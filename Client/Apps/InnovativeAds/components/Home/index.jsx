@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Nav, NavItem } from 'react-bootstrap';
 import ActionCard from '../../../../Components/ActionCard';
 import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';
-// import AdListContainer from '../../containers/AdListContainer';
+import Loader from '../../../../Components/Loader';
+import AdListContainer from '../../containers/AdListContainer';
 import { COMPONENT_TITLES } from '../../configs/commonConsts';
 
 class Home extends Component {
@@ -17,6 +18,11 @@ class Home extends Component {
 		this.renderContent = this.renderContent.bind(this);
 	}
 
+	componentDidMount() {
+		const { meta, fetchMeta, match } = this.props;
+		if (!meta.fetched) fetchMeta(match.params.siteId);
+	}
+
 	handleNavSelect(value) {
 		this.setState({ activeNav: value, title: COMPONENT_TITLES[value] });
 	}
@@ -27,20 +33,29 @@ class Home extends Component {
 			default:
 			case 2:
 				return <AdCodeGeneratorContainer {...this.props} />;
-			// case 3:
-			// 	return <AdListContainer {...this.props} />;
+			case 3:
+				return <AdListContainer {...this.props} />;
 		}
 	}
 
 	render() {
 		const { title, activeNav } = this.state;
+		const { meta } = this.props;
 		return (
 			<ActionCard title={title}>
-				<Nav bsStyle="tabs" activeKey={activeNav} onSelect={this.handleNavSelect}>
-					<NavItem eventKey={2}>AdCode Generation</NavItem>
-					<NavItem eventKey={3}>Manage Ads</NavItem>
-				</Nav>
-				{this.renderContent()}
+				{!meta.fetched ? (
+					<div style={{ position: 'relative', minHeight: '200px' }}>
+						<Loader />
+					</div>
+				) : (
+					<React.Fragment>
+						<Nav bsStyle="tabs" activeKey={activeNav} onSelect={this.handleNavSelect}>
+							<NavItem eventKey={2}>AdCode Generation</NavItem>
+							<NavItem eventKey={3}>Manage Ads</NavItem>
+						</Nav>
+						{this.renderContent()}
+					</React.Fragment>
+				)}
 			</ActionCard>
 		);
 	}
