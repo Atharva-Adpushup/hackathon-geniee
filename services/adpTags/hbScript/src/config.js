@@ -51,7 +51,7 @@ module.exports = {
 		pixelId: 1236239
 	},
 	DEFAULT_WINNER: 'adx',
-	FEEDBACK_URL: '//e3.adpushup.com/ApHbWebService/feedback',
+	FEEDBACK_URL: '//staging.adpushup.com/AdPushupFeedbackWebService/feedback/aphb?data=',
 	POSTBID_PASSBACKS: {
 		'*': 'PGgxPkJPTyBZQUghPC9oMT4='
 	},
