@@ -1,11 +1,14 @@
 const Promise = require('bluebird');
 const _ = require('lodash');
 const { couchbaseService } = require('node-utils');
+const request = require('request-promise');
 
 const config = require('../configs/config');
-const { sendErrorResponse, sendSuccessResponse } = require('./commonFunctions');
 const siteModel = require('../models/siteModel');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
+const adpushup = require('./adpushupEvent');
+const AdPushupError = require('./AdPushupError');
+const { sendErrorResponse, sendSuccessResponse } = require('./commonFunctions');
 
 const appBucket = couchbaseService(
 	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
@@ -31,8 +34,160 @@ function errorHander(err, res, code = HTTP_STATUS.BAD_REQUEST) {
 	return sendErrorResponse({ message: 'Opertion Failed' }, res, errorCode);
 }
 
+function sendDataToZapier(uri, data) {
+	const options = {
+		method: 'GET',
+		uri,
+		qs: data,
+		json: true
+	};
+
+	return request(options)
+		.then(() => console.log('Ad Creation. Called made to Zapier'))
+		.catch(() => console.log('Ad creation call to Zapier failed'));
+}
+
+function emitEventAndSendResponse(siteId, res, data = {}) {
+	return siteModel.getSiteById(siteId).then(site => {
+		adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
+		return sendSuccessResponse(
+			{
+				message: 'Operation Successfull',
+				...data
+			},
+			res
+		);
+	});
+}
+
+function fetchAds(req, res, docKey) {
+	if (!req.query || !req.query.siteId) {
+		return sendErrorResponse(
+			{
+				message: 'Incomplete Parameters. Please check siteId'
+			},
+			res
+		);
+	}
+	const { siteId } = req.query;
+	return verifyOwner(siteId, req.user.email)
+		.then(() => appBucket.getDoc(`${docKey}${siteId}`))
+		.then(docWithCas =>
+			sendSuccessResponse(
+				{
+					ads: docWithCas.value.ads || []
+				},
+				res
+			)
+		)
+		.catch(err =>
+			err.code && err.code === 13 && err.message.includes('key does not exist')
+				? sendSuccessResponse(
+						{
+							ads: []
+						},
+						res
+				  )
+				: errorHander(err, res)
+		);
+}
+
+function createNewDocAndDoProcessing(payload, initialDoc, docKey, processing) {
+	const innovativeAdDefault = _.cloneDeep(initialDoc);
+	return appBucket
+		.createDoc(`${docKey}${payload.siteId}`, innovativeAdDefault, {})
+		.then(() => appBucket.getDoc(`site::${payload.siteId}`))
+		.then(docWithCas => {
+			payload.siteDomain = docWithCas.value.siteDomain;
+			return processing(innovativeAdDefault, payload);
+		});
+}
+
+function masterSave(req, res, adUpdateProcessing, directDBUpdate, docKey, mode = 1) {
+	if (!req.body || !req.body.siteId || !req.body.ads || !req.user.isSuperUser || !req.body.meta) {
+		return sendErrorResponse(
+			{
+				message: 'Invalid Parameters.'
+			},
+			res
+		);
+	}
+	return adUpdateProcessing(req, res, docWithCas => {
+		const doc = docWithCas.value;
+		const { siteId } = req.body;
+		if (doc.ownerEmail !== req.user.email) {
+			throw new AdPushupError({
+				message: 'Unauthorized Request',
+				code: HTTP_STATUS.PERMISSION_DENIED
+			});
+		}
+		if (!doc.ads.length) {
+			doc.ads = req.body.ads;
+		} else {
+			const newAds = [];
+
+			_.forEach(doc.ads, adFromDoc => {
+				_.forEach(req.body.ads, adFromClient => {
+					if (adFromDoc.id === adFromClient.id) {
+						newAds.push({
+							...adFromDoc,
+							...adFromClient,
+							networkData: {
+								...adFromDoc.networkData,
+								...adFromClient.networkData
+							}
+						});
+					}
+				});
+			});
+			doc.ads = newAds;
+		}
+		if (mode === 2 && (doc.meta || req.body.meta)) {
+			doc.meta = req.body.meta;
+		}
+		return directDBUpdate(`${docKey}${siteId}`, doc, docWithCas.cas);
+	});
+}
+
+function modifyAd(req, res, adUpdateProcessing, directDBUpdate) {
+	if (!req.body || !req.body.siteId || !req.body.adId) {
+		return sendErrorResponse(
+			{
+				message: 'Invalid Parameters.'
+			},
+			res
+		);
+	}
+	return adUpdateProcessing(req, res, docWithCas => {
+		const doc = docWithCas.value;
+		if (doc.ownerEmail !== req.user.email) {
+			throw new AdPushupError({
+				message: 'Unauthorized Request',
+				code: HTTP_STATUS.PERMISSION_DENIED
+			});
+		}
+		_.forEach(doc.ads, (ad, index) => {
+			if (ad.id === req.body.adId) {
+				doc.ads[index] = { ...ad, ...req.body.data };
+				return false;
+			}
+		});
+		if (req.body.metaUpdate && Object.keys(req.body.metaUpdate).length) {
+			const { mode, logs } = req.body.metaUpdate;
+			doc.meta[mode] = logs;
+		}
+		return directDBUpdate(`${docKeys.interactiveAds}${req.body.siteId}`, doc, docWithCas.cas);
+	});
+}
+
 module.exports = {
 	verifyOwner,
 	errorHander,
-	appBucket
+	appBucket,
+	sendDataToZapier,
+	emitEventAndSendResponse,
+	fetchAds,
+	createNewDocAndDoProcessing,
+	masterSave,
+	modifyAd
 };
