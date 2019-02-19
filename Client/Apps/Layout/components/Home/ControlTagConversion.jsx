@@ -12,6 +12,9 @@ class ControlTagConversion extends Component {
 	constructor(props) {
 		super(props);
 		this.state = this.getDefaultState();
+		this.handleInputChangeHandler = this.handleInputChangeHandler.bind(this);
+		this.handleButtonGroupChangeHandler = this.handleButtonGroupChangeHandler.bind(this);
+		this.handleButtonClickHandler = this.handleButtonClickHandler.bind(this);
 	}
 
 	getDefaultState() {
@@ -60,7 +63,9 @@ class ControlTagConversion extends Component {
 			return false;
 		}
 
-		const template = CONTROL_CONVERSION_NETWORKS[adControlType].template;
+		const {
+			[adControlType]: { template }
+		} = CONTROL_CONVERSION_NETWORKS;
 		const parameterCollection = isAllAdNetworksSelection
 			? [
 					{ replacee: '_CODE_', replacer: getEncodedData(inputCode) },
@@ -80,28 +85,24 @@ class ControlTagConversion extends Component {
 		return compiledTemplate;
 	}
 
-	handleInputChangeHandler(elementType, inputParam) {
-		const elementTypeArray = ['siteId', 'inputCode', 'adNetworkToggle'];
+	handleButtonGroupChangeHandler(value) {
+		this.setState({ adControlType: Number(value) });
+	}
+
+	handleInputChangeHandler(inputParam) {
 		const isInputParam = !!inputParam;
 		const isElement = !!(isInputParam && inputParam.target);
-		const isInputParamInElementTypeArray = !!(
-			isInputParam &&
-			!isElement &&
-			elementTypeArray.includes(elementType)
-		);
-		const isValue = !!((isElement && inputParam.target.value) || isInputParamInElementTypeArray);
+		const isValue = !!(isElement && inputParam.target.value);
 
 		if (isValue) {
-			const value = isInputParamInElementTypeArray ? inputParam : inputParam.target.value;
+			const {
+				target: { name, value }
+			} = inputParam;
 			const { medianet } = this.state;
 
-			switch (elementType) {
+			switch (name) {
 				case 'inputCode':
 					this.setState({ inputCode: value });
-					break;
-
-				case 'adNetworkToggle':
-					this.setState({ adControlType: Number(value) });
 					break;
 
 				case 'adId':
@@ -140,10 +141,13 @@ class ControlTagConversion extends Component {
 		}
 	}
 
-	handleButtonClickHandler(buttonType) {
+	handleButtonClickHandler(inputParam) {
 		let convertedAdCode;
+		const isInputParam = !!inputParam;
+		const isElement = !!(isInputParam && inputParam.target);
+		const name = isElement && inputParam.target.name;
 
-		switch (buttonType) {
+		switch (name) {
 			case 'convertButton':
 				convertedAdCode = this.getConvertedAdCode();
 
@@ -178,7 +182,8 @@ class ControlTagConversion extends Component {
 					type="text"
 					placeholder="Random alphanumeric values of 5 digits like 12wsa, 6hw5n etc."
 					className=""
-					onChange={this.handleInputChangeHandler.bind(this, 'adId')}
+					name="adId"
+					onChange={this.handleInputChangeHandler}
 					value={adId}
 				/>
 
@@ -188,7 +193,8 @@ class ControlTagConversion extends Component {
 					type="number"
 					placeholder="For example 728, 300, 320, 480, 160, 900 etc."
 					className=""
-					onChange={this.handleInputChangeHandler.bind(this, 'adWidth')}
+					name="adWidth"
+					onChange={this.handleInputChangeHandler}
 					value={adWidth}
 				/>
 
@@ -198,7 +204,8 @@ class ControlTagConversion extends Component {
 					type="number"
 					placeholder="For example 60, 200, 250, 600 etc."
 					className=""
-					onChange={this.handleInputChangeHandler.bind(this, 'adHeight')}
+					name="adHeight"
+					onChange={this.handleInputChangeHandler}
 					value={adHeight}
 				/>
 
@@ -208,7 +215,8 @@ class ControlTagConversion extends Component {
 					type="number"
 					placeholder="For example 12345678 etc."
 					className=""
-					onChange={this.handleInputChangeHandler.bind(this, 'crId')}
+					name="crId"
+					onChange={this.handleInputChangeHandler}
 					value={crId}
 				/>
 
@@ -218,7 +226,8 @@ class ControlTagConversion extends Component {
 					type="number"
 					placeholder="For example 87654321 etc."
 					className=""
-					onChange={this.handleInputChangeHandler.bind(this, 'versionId')}
+					name="versionId"
+					onChange={this.handleInputChangeHandler}
 					value={versionId}
 				/>
 
@@ -228,7 +237,8 @@ class ControlTagConversion extends Component {
 					type="number"
 					placeholder="For example 12348765 etc."
 					className=""
-					onChange={this.handleInputChangeHandler.bind(this, 'cId')}
+					name="cId"
+					onChange={this.handleInputChangeHandler}
 					value={cId}
 				/>
 			</div>
@@ -259,7 +269,8 @@ class ControlTagConversion extends Component {
 					cols="10"
 					className=""
 					componentClass="textarea"
-					onChange={this.handleInputChangeHandler.bind(this, 'inputCode')}
+					name="inputCode"
+					onChange={this.handleInputChangeHandler}
 					value={inputCode}
 				/>
 			</div>
@@ -287,7 +298,8 @@ class ControlTagConversion extends Component {
 					label="Select ad network type"
 					type="toggle-button-group"
 					buttonToggle={buttonToggle}
-					onChange={this.handleInputChangeHandler.bind(this, 'adNetworkToggle')}
+					name="adNetworkToggle"
+					onChange={this.handleButtonGroupChangeHandler}
 				/>
 
 				{isAllAdNetworksSelection ? this.renderAllAdNetworksUI() : this.renderMedianetNetworkUI()}
@@ -295,14 +307,16 @@ class ControlTagConversion extends Component {
 				<CustomButton
 					variant="primary"
 					className=""
-					onClick={this.handleButtonClickHandler.bind(this, 'convertButton')}
+					name="convertButton"
+					onClick={this.handleButtonClickHandler}
 				>
 					Convert
 				</CustomButton>
 				<CustomButton
 					variant="secondary"
 					className="u-margin-l3"
-					onClick={this.handleButtonClickHandler.bind(this, 'resetButton')}
+					name="resetButton"
+					onClick={this.handleButtonClickHandler}
 				>
 					Reset
 				</CustomButton>
