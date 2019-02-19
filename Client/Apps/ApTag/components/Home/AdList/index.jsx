@@ -18,7 +18,8 @@ class AdList extends Component {
 			updateAd,
 			modifyAdOnServer,
 			user,
-			networkConfig
+			networkConfig,
+			match
 		} = this.props;
 		const customStyle = user.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
 
@@ -39,7 +40,7 @@ class AdList extends Component {
 						<CustomButton
 							variant="primary"
 							className="u-margin-t3 u-margin-r2 pull-right"
-							onClick={() => masterSave(window.siteId, user.isSuperUser)}
+							onClick={() => masterSave(match.params.siteId, user.isSuperUser)}
 						>
 							Master Save
 						</CustomButton>

@@ -18,10 +18,10 @@ const CustomMessage = props => {
 	const classNames = getClassnames(type);
 
 	return (
-		<div className={`custom-message u-margin-b2 u-padding-v3 u-padding-h3 ${classNames}`}>
-			<h3 className="u-padding-h4 u-text-bold">{header}</h3>
+		<div className={`custom-message u-margin-b2 u-padding-v4 u-padding-h3 ${classNames}`}>
+			<h3 className="u-padding-h4 u-text-bold u-margin-0">{header}</h3>
 			<hr className="u-margin-v3" />
-			<p className="u-margin-0" dangerouslySetInnerHTML={{ __html: message }} />
+			<p className="u-margin-0 u-padding-h4" dangerouslySetInnerHTML={{ __html: message }} />
 		</div>
 	);
 };

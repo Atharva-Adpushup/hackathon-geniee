@@ -216,3 +216,23 @@ body {
 .lazyload-wrapper .toggle-container {
 	padding: 0px !important;
 }
+.inputBasic {
+	padding: $SBPaddingTB $SBPaddingLR;
+	display: inline-block;
+	cursor: pointer;
+	width: 100%;
+	text-align: left;
+	background-color: $whiteColor;
+	border: 1px solid $SBBorderColor;
+}
+
+.inputMinimal {
+	width: 100%;
+	padding: 3.5px 10px;
+	border-radius: 3px;
+	border: 1px solid rgb(204, 204, 204);
+}
+
+select.inputMinimal {
+	padding: 3.5px 5px;
+}

@@ -118,7 +118,7 @@ const SIZES = {
 	}
 };
 const DISPLAY_AD_MESSAGE =
-	'You need to copy and paste the above adcode on your site where you wish to show the ad. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>';
+	'<div>You need to copy and paste the above adcode on your site where you wish to show the ad. <div style="font-size: 16px;" class="u-text-red u-text-bold u-margin-t3">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div></div>';
 const AMP_MESSAGE =
 	'AMP adcode will be sent to your registered e-mail address by your account manager';
 const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad">

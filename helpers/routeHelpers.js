@@ -104,7 +104,13 @@ function createNewDocAndDoProcessing(payload, initialDoc, docKey, processing) {
 }
 
 function masterSave(req, res, adUpdateProcessing, directDBUpdate, docKey, mode = 1) {
-	if (!req.body || !req.body.siteId || !req.body.ads || !req.user.isSuperUser || !req.body.meta) {
+	if (
+		!req.body ||
+		!req.body.siteId ||
+		!req.body.ads ||
+		!req.user.isSuperUser ||
+		(mode == 2 && !req.body.meta)
+	) {
 		return sendErrorResponse(
 			{
 				message: 'Invalid Parameters.'
