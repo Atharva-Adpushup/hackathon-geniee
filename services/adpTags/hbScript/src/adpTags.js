@@ -197,8 +197,8 @@ var w = window,
 			if (slot && !slot.containerPresent) {
 				slot.containerPresent = true;
 				slot.sectionId = utils.getSectionId(containerId);
-				slot.variationId = utils.getVariationId(containerId);
-
+				slot.variationId = utils.getVariationId();
+				slot.variationName = utils.getVariationName();
 				slot.pageGroup = utils.getPageGroup();
 				slot.platform = utils.getPlatform();
 				adpRender.renderGPT(slot);

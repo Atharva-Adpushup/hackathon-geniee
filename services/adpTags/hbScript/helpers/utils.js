@@ -1,8 +1,7 @@
 var config = require('../src/config'),
 	find = require('lodash.find'),
 	$ = require('../src/adp').$,
-	adp = require('../src/adp').adp,
-	apConfig = adp.config;
+	adp = require('../src/adp').adp;
 
 module.exports = {
 	hashCode: function(str) {
@@ -129,20 +128,32 @@ module.exports = {
 		return null;
 	},
 	getVariationId: function() {
-		try {
-			if (adp) {
-				var variationId = apConfig.selectedVariation;
+		if (adp) {
+			var variationId = adp.config.selectedVariation;
 
-				if (variationId) {
-					return variationId;
-				}
+			if (variationId) {
+				return variationId;
 			}
-		} catch (error) {}
+		}
+		return null;
+	},
+	getVariationName: function() {
+		if (adp) {
+			var variations = adp.config.experiment[this.getPlatform()][this.getPageGroup()].variations,
+				that = this,
+				variationName = variations.filter(function(variation) {
+					return variation.id === that.getVariationId();
+				})[0].name;
+
+			if (variationName) {
+				return variationName;
+			}
+		}
 		return null;
 	},
 	getPageGroup: function() {
 		if (adp) {
-			var pageGroup = apConfig.pageGroup;
+			var pageGroup = adp.config.pageGroup;
 
 			if (pageGroup) {
 				return pageGroup;
@@ -152,7 +163,7 @@ module.exports = {
 	},
 	getPlatform: function() {
 		if (adp) {
-			var platform = apConfig.platform;
+			var platform = adp.config.platform;
 
 			if (platform) {
 				return platform;
@@ -161,8 +172,8 @@ module.exports = {
 		return null;
 	},
 	getActiveDFPNetwork: function() {
-		if (adp && apConfig) {
-			return apConfig.activeDFPNetwork;
+		if (adp && adp.config) {
+			return adp.config.activeDFPNetwork;
 		}
 		return null;
 	},
@@ -223,7 +234,7 @@ module.exports = {
 		return collection;
 	},
 	isValidThirdPartyDFPAndCurrencyConfig: function(inputObject) {
-		var inputObject = inputObject || apConfig,
+		var inputObject = inputObject || adp.config,
 			isActiveDFPNetwork = !!(inputObject.activeDFPNetwork && inputObject.activeDFPNetwork.length),
 			isActiveDFPCurrencyCode = !!(
 				inputObject.activeDFPCurrencyCode &&
