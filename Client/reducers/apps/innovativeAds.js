@@ -49,7 +49,7 @@ const global = (
 					...state.meta,
 					content: {
 						...state.meta.content,
-						[action.value.mode]: [...state.meta[action.value.mode], ...action.value.logs]
+						[action.value.mode]: [...state.meta.content[action.value.mode], ...action.value.logs]
 					}
 				}
 			};

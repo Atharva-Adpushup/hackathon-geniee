@@ -23,8 +23,8 @@ class FormatEdit extends Component {
 		onCancel();
 	}
 
-	renderButton = (label, handler) => (
-		<CustomButton variant="primary" className="u-margin-t3 u-margin-r3" onClick={handler}>
+	renderButton = (label, handler, variant = 'primary') => (
+		<CustomButton variant={variant} className="u-margin-t3 u-margin-r3" onClick={handler}>
 			{label}
 		</CustomButton>
 	);

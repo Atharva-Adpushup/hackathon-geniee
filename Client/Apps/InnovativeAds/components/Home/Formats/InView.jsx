@@ -72,8 +72,8 @@ class InView extends Component {
 					<label htmlFor="css">Custom CSS</label>
 					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={css} />
 				</Col>
-				{cancel ? cancel.renderFn(cancel.label, cancel.handler) : null}
 				{save.renderFn(save.label, this.saveHandler)}
+				{cancel ? cancel.renderFn(cancel.label, cancel.handler, 'secondary') : null}
 			</form>
 		);
 	}

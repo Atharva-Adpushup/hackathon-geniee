@@ -63,7 +63,7 @@ class Docked extends Component {
 	}
 
 	render() {
-		const { save } = this.props;
+		const { save, cancel } = this.props;
 		const { topOffset, contentOffset, contentXpath, css } = this.state;
 		return (
 			<form action="#" method="POST">
@@ -98,9 +98,8 @@ class Docked extends Component {
 					<label htmlFor="css">Custom CSS</label>
 					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={css} />
 				</Col>
-				<Col md={12} className="u-padding-r0">
-					{save.renderFn(save.label, this.saveHandler)}
-				</Col>
+				{save.renderFn(save.label, this.saveHandler)}
+				{cancel ? cancel.renderFn(cancel.label, cancel.handler, 'secondary') : null}
 			</form>
 		);
 	}

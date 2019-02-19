@@ -2,9 +2,7 @@ const express = require('express');
 const Promise = require('bluebird');
 const _ = require('lodash');
 const uuid = require('uuid');
-// const { couchbaseService } = require('node-utils');
 const request = require('request-promise');
-// const config = require('../configs/config');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
 const AdPushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
@@ -14,12 +12,6 @@ const siteModel = require('../models/siteModel');
 const { appBucket, errorHander, verifyOwner } = require('../helpers/routeHelpers');
 
 const router = express.Router();
-// const appBucket = couchbaseService(
-// 	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
-// 	config.couchBase.DEFAULT_BUCKET,
-// 	config.couchBase.DEFAULT_USER_NAME,
-// 	config.couchBase.DEFAULT_USER_PASSWORD
-// );
 
 const fn = {
 	sendDataToZapier: data => {

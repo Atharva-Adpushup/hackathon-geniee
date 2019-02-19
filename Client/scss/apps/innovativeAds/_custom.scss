@@ -189,62 +189,10 @@ body {
 	background: transparent !important;
 }
 
-.mr-10 {
-	margin-right: 10px !important;
-}
-
-.mr-5 {
-	margin-right: 5px !important;
-}
-
-.ml-5 {
-	margin-left: 5px !important;
-}
-
-.custom-message {
-	padding: 10px;
-	margin: 0px 0px 10px 0px;
-	box-shadow: 0 0 0 1px rgba(34, 36, 38, 0.22) inset, 0 0 0 0 transparent;
-	background: #f8f8f9;
-	border-radius: 0.28571429rem;
-
-	&.info-text {
-		color: #000000;
-	}
-	&.error-text {
-		color: #c3272b;
-	}
-	&.success-text {
-		color: #006442;
-	}
-	h3 {
-		font-weight: bold;
-	}
-	hr {
-		color: #000000;
-		margin: 10px 0px;
-	}
-	p {
-		margin: 0px;
-		font-size: 14px;
-	}
-}
-
 .custom-btn {
 	display: inline;
 	float: right;
 	margin: 10px 0px 0px 10px;
-}
-
-.empty-state {
-	text-align: center;
-	padding: 10px 0px 25px 0px;
-	img {
-		max-width: 25%;
-	}
-	h2 {
-		font-size: 22px;
-	}
 }
 
 // Network Options Styling
@@ -297,9 +245,6 @@ body {
 .list-heading {
 	border-bottom: 1px solid #ebebeb;
 	margin-bottom: 15px;
-	// h4 {
-	// 	margin-top: 10px;
-	// }
 }
 .information {
 	margin: 10px 0px;
