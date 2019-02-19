@@ -50,7 +50,7 @@ class AdElement extends Component {
 
 	disableAd() {
 		const { isActive } = this.state;
-		const { ad, archiveAd } = this.props;
+		const { ad, archiveAd, user } = this.props;
 		const message = isActive
 			? 'Are you sure you want to archive this ad?'
 			: 'Are you sure you want to unarchive this ad?';
@@ -68,7 +68,7 @@ class AdElement extends Component {
 						logWritten: false
 					}
 				},
-				this.isSuperUser
+				user.isSuperUser
 			).then(response => {
 				if (response) {
 					this.setState({
