@@ -11,6 +11,7 @@ import {
 	faPlusCircle
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Link } from 'react-router-dom';
 
 import ActionCard from '../../../Components/ActionCard/index';
 import OverlayTooltip from '../../../Components/OverlayTooltip/index';
@@ -192,12 +193,14 @@ class MySites extends Component {
 						}
 					/>
 
-					<div className="card card--theme-dotted u-margin-r5 u-margin-b5 aligner aligner--vCenter aligner--hCenter u-cursor-pointer">
-						<div className="aligner aligner--column aligner--vCenter aligner--hCenter">
-							<FontAwesomeIcon size="2x" icon="plus-circle" className="u-margin-b3" />
-							<span>ADD NEW SITE</span>
+					<Link to="/addSite" className="u-link-reset">
+						<div className="card card--theme-dotted u-margin-r5 u-margin-b5 aligner aligner--vCenter aligner--hCenter u-cursor-pointer">
+							<div className="aligner aligner--column aligner--vCenter aligner--hCenter">
+								<FontAwesomeIcon size="2x" icon="plus-circle" className="u-margin-b3" />
+								<span>ADD NEW SITE</span>
+							</div>
 						</div>
-					</div>
+					</Link>
 				</div>
 			</ActionCard>
 		);
