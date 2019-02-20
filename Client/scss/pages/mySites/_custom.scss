@@ -1,0 +1,13 @@
+.card {
+	box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19);
+	width: 480px;
+
+	.card-header-title {
+		font-size: 1.8rem;
+	}
+
+	.card-header-icon {
+		flex: ($numberOne / $numberTen);
+		height: ($numberOne + ($numberOne/$numberTwo) + em);
+	}
+}

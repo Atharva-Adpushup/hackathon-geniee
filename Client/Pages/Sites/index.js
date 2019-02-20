@@ -1,5 +1,7 @@
 import React from 'react';
+import MySitesContainer from './containers/MySitesContainer';
+import '../../scss/pages/mySites/index.scss';
 
-const Sites = () => <div>Sites</div>;
+const App = props => <MySitesContainer {...props} />;
 
-export default Sites;
+export default App;
