@@ -54,4 +54,20 @@
 			}
 		}
 	}
+
+	&.panel.panel-warning {
+		> .card-body {
+			.panel-body {
+				color: #8a6d3b;
+			}
+		}
+	}
+
+	&.panel.panel-danger {
+		> .card-body {
+			.panel-body {
+				color: #a94442;
+			}
+		}
+	}
 }
