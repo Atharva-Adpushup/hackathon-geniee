@@ -128,27 +128,32 @@ module.exports = {
 				return false;
 			}
 
-			data.packetId = adpConfig.packetId;
-			data.siteId = adpConfig.siteId;
-			data.siteDomain = adpConfig.siteDomain;
-			data.pageGroup = adpConfig.pageGroup;
-			data.platform = adpConfig.platform;
-			data.url = adpConfig.pageUrl;
-			data.isGeniee = adpConfig.isGeniee || false;
+			var feedbackObj = {
+				packetId: adpConfig.packetId,
+				siteId: adpConfig.siteId,
+				siteDomain: adpConfig.siteDomain,
+				url: adpConfig.pageUrl,
+				mode: data.mode,
+				errorCode: data.eventType,
+				pageGroup: adpConfig.pageGroup,
+				pageVariationId: adpConfig.selectedVariation,
+				selectedVariation: adpConfig.selectedVariationName,
+				pageVariationName: '',
+				platform: adpConfig.platform,
+				isGeniee: adpConfig.isGeniee || false
+			};
 
-			if (!data.packetId || !data.siteId) {
+			if (!feedbackObj.packetId || !feedbackObj.siteId) {
 				if (console && console.log()) {
 					console.log('Required params for feedback missing');
 				}
 				return false;
 			}
 
+			data = this.base64Encode(JSON.stringify(feedbackObj));
+			toFeedback = url + data;
+
 			options = options || {};
-
-			data = this.objToUrl(data);
-
-			toFeedback = url + '?ts=' + +new Date() + data;
-
 			if (options.method === 'image') {
 				new Image().src = toFeedback;
 				return true;

@@ -139,11 +139,7 @@ module.exports = {
 	},
 	getVariationName: function() {
 		if (adp) {
-			var variations = adp.config.experiment[this.getPlatform()][this.getPageGroup()].variations,
-				that = this,
-				variationName = variations.filter(function(variation) {
-					return variation.id === that.getVariationId();
-				})[0].name;
+			var variationName = adp.config.selectedVariationName;
 
 			if (variationName) {
 				return variationName;
