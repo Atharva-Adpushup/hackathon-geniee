@@ -34,6 +34,7 @@ var config = require('./config'),
 				data: {
 					size: slot.size[0] + 'x' + slot.size[1],
 					siteId: config.SITE_ID,
+					siteDomain: window.adpushup.config.siteDomain,
 					placement: slot.placement,
 					containerId: slot.containerId,
 					type: slot.type,
