@@ -10,4 +10,20 @@
 		flex: ($numberOne / $numberTen);
 		height: ($numberOne + ($numberOne/$numberTwo) + em);
 	}
+
+	> .card-body {
+		.panel-heading {
+			font-size: 1.6rem;
+		}
+
+		.panel-body {
+			font-size: 1.4rem;
+			opacity: 0.8;
+		}
+
+		a {
+			opacity: 1;
+			text-decoration: underline;
+		}
+	}
 }
