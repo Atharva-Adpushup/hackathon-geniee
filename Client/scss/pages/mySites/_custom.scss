@@ -26,4 +26,32 @@
 			text-decoration: underline;
 		}
 	}
+
+	> .card-footer {
+		border: 0;
+
+		button {
+			background: transparent;
+			border: 0;
+			box-shadow: none;
+			outline: 0 none;
+			padding: 1rem 1.5rem;
+
+			&:hover,
+			&:active,
+			&:focus {
+				background: #e6e6e6;
+				box-shadow: none;
+				outline: 0 none;
+			}
+		}
+	}
+
+	&.panel.panel-success {
+		> .card-body {
+			.panel-body {
+				color: #3c763d;
+			}
+		}
+	}
 }
