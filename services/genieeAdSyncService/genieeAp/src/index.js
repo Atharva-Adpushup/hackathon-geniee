@@ -11,7 +11,7 @@ var w = window,
 	browserConfig = require('../libs/browserConfig'),
 	selectVariation = require('./variationSelectionModels/index'),
 	createAds = require('./adCreater').createAds,
-	heartBeat = require('../libs/heartBeat'),
+	// heartBeat = require('../libs/heartBeat'),
 	ampInit = require('./ampInit'),
 	hookAndInit = require('./hooksAndBlockList'),
 	control = require('./control')(),
@@ -261,7 +261,7 @@ function main() {
 		}, config.pageGroupTimeout);
 	} else {
 		// start heartBeat
-		heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
+		// heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
 
 		//Init creation
 		startCreation();
