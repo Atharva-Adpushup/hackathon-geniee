@@ -151,17 +151,17 @@ var $ = require('jquery'),
 				utils.dockify.dockifyAd('#' + ad.id, ad.formatData, utils);
 			}
 
-			adp.tracker.add(
-				container,
-				function(id) {
-					utils.sendBeacon(
-						adp.config.feedbackUrl,
-						{ eventType: 2, click: true, id: id },
-						{},
-						commonConsts.BEACON_TYPE.AD_FEEDBACK
-					);
-				}.bind(adp, ad.id)
-			);
+			// adp.tracker.add(
+			// 	container,
+			// 	function(id) {
+			// 		utils.sendBeacon(
+			// 			adp.config.feedbackUrl,
+			// 			{ eventType: 2, click: true, id: id },
+			// 			{},
+			// 			commonConsts.BEACON_TYPE.AD_FEEDBACK
+			// 		);
+			// 	}.bind(adp, ad.id)
+			// );
 
 			if (ad.networkData && ad.networkData.refreshSlot) {
 				refreshAdSlot.refreshSlot(container, ad);

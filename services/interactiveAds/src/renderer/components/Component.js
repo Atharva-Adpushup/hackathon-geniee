@@ -44,17 +44,17 @@ class Component {
 			};
 		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
 
-		adp.tracker.add(
-			$format,
-			function(adId) {
-				adp.utils.sendBeacon(
-					adp.config.feedbackUrl,
-					{ eventType: 2, click: true, id: adId },
-					{},
-					commonConsts.BEACON_TYPE.AD_FEEDBACK
-				);
-			}.bind(adp, id)
-		);
+		// adp.tracker.add(
+		// 	$format,
+		// 	function(adId) {
+		// 		adp.utils.sendBeacon(
+		// 			adp.config.feedbackUrl,
+		// 			{ eventType: 2, click: true, id: adId },
+		// 			{},
+		// 			commonConsts.BEACON_TYPE.AD_FEEDBACK
+		// 		);
+		// 	}.bind(adp, id)
+		// );
 
 		switch (formatData.type) {
 			case commonConsts.FORMATS.STICKY.NAME:
