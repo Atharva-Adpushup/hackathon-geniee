@@ -2,6 +2,7 @@ var browserConfig = require('./browserConfig.js'),
 	// eslint-disable-next-line no-undef
 	$ = require('jquery'),
 	dockify = require('./dockify'),
+	commonConsts = require('../config/commonConsts'),
 	Base64 = require('Base64');
 
 module.exports = {
@@ -41,9 +42,14 @@ module.exports = {
 	sendFeedback: function(options) {
 		var adp = window.adpushup;
 
-		return this.sendBeacon(adp.config.feedbackUrl, options, {
-			method: 'image'
-		});
+		return this.sendBeacon(
+			adp.config.feedbackUrl,
+			options,
+			{
+				method: 'image'
+			},
+			commonConsts.BEACON_TYPE.AD_FEEDBACK
+		);
 	},
 	getRandomNumberBetween: function(min, max) {
 		min = Math.ceil(min);
@@ -111,40 +117,44 @@ module.exports = {
 			crossDomain: true
 		});
 	},
-	sendBeacon: function(url, data, options) {
-		if (typeof url !== 'string' || typeof data !== 'object') {
-			return false;
-		}
-
+	sendBeacon: function(url, data, options, beaconType) {
 		var toFeedback,
 			request,
 			evt,
 			adpConfig = window.adpushup.config;
 
-		data.packetId = adpConfig.packetId;
-		data.siteId = adpConfig.siteId;
-		data.siteDomain = adpConfig.siteDomain;
-		data.pageGroup = adpConfig.pageGroup;
-		data.platform = adpConfig.platform;
-		data.url = adpConfig.pageUrl;
-		data.isGeniee = adpConfig.isGeniee || false;
-
-		if (!data.packetId || !data.siteId) {
-			if (console && console.log()) {
-				console.log('Required params for feedback missing');
+		if (beaconType === commonConsts.BEACON_TYPE.AD_FEEDBACK) {
+			if (typeof url !== 'string' || typeof data !== 'object') {
+				return false;
 			}
-			return false;
-		}
 
-		options = options || {};
+			data.packetId = adpConfig.packetId;
+			data.siteId = adpConfig.siteId;
+			data.siteDomain = adpConfig.siteDomain;
+			data.pageGroup = adpConfig.pageGroup;
+			data.platform = adpConfig.platform;
+			data.url = adpConfig.pageUrl;
+			data.isGeniee = adpConfig.isGeniee || false;
 
-		data = this.objToUrl(data);
+			if (!data.packetId || !data.siteId) {
+				if (console && console.log()) {
+					console.log('Required params for feedback missing');
+				}
+				return false;
+			}
 
-		toFeedback = url + '?ts=' + +new Date() + data;
+			options = options || {};
 
-		if (options.method === 'image') {
-			new Image().src = toFeedback;
-			return true;
+			data = this.objToUrl(data);
+
+			toFeedback = url + '?ts=' + +new Date() + data;
+
+			if (options.method === 'image') {
+				new Image().src = toFeedback;
+				return true;
+			}
+		} else {
+			toFeedback = url;
 		}
 
 		switch (browserConfig.dataSendingMethod) {

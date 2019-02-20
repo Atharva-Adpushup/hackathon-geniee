@@ -47,7 +47,12 @@ class Component {
 		adp.tracker.add(
 			$format,
 			function(adId) {
-				adp.utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: adId });
+				adp.utils.sendBeacon(
+					adp.config.feedbackUrl,
+					{ eventType: 2, click: true, id: adId },
+					{},
+					commonConsts.BEACON_TYPE.AD_FEEDBACK
+				);
 			}.bind(adp, id)
 		);
 

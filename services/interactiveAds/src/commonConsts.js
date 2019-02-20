@@ -7,6 +7,9 @@ const commonConsts = {
 	NETWORKS: {
 		ADPTAGS: 'adpTags'
 	},
+	BEACON_TYPE: {
+		AD_FEEDBACK: 'AD_FEEDBACK'
+	},
 	EVENTS: {
 		DOM_LOAD: 'DOMContentLoaded',
 		SCRIPT_LOAD: 'scriptLoaded'

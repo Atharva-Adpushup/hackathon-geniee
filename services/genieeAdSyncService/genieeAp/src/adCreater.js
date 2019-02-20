@@ -154,7 +154,12 @@ var $ = require('jquery'),
 			adp.tracker.add(
 				container,
 				function(id) {
-					utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: id });
+					utils.sendBeacon(
+						adp.config.feedbackUrl,
+						{ eventType: 2, click: true, id: id },
+						{},
+						commonConsts.BEACON_TYPE.AD_FEEDBACK
+					);
 				}.bind(adp, ad.id)
 			);
 

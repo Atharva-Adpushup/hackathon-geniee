@@ -5,6 +5,7 @@ var w = window,
 	utils = require('../libs/utils'),
 	defaultConfig = $.extend({}, require('../config/config.js')),
 	config = (adp.config = require('../config/config.js')),
+	commonConsts = require('../config/commonConsts'),
 	Tracker = require('../libs/tracker'),
 	nodewatcher = require('../libs/nodeWatcher'),
 	browserConfig = require('../libs/browserConfig'),
@@ -81,6 +82,11 @@ function initAdpConfig() {
 		platform: browserConfig.platform,
 		packetId: utils.uniqueId(__SITE_ID__)
 	});
+}
+
+// Fire user async API
+function syncUser() {
+	return utils.sendBeacon(commonConsts.USER_SYNC_URL);
 }
 
 function shouldWeNotProceed() {
@@ -193,6 +199,9 @@ function initAdpQue() {
 }
 
 function main() {
+	// Set user syncing cookies
+	syncUser();
+
 	// Initialise adp config
 	initAdpConfig();
 
