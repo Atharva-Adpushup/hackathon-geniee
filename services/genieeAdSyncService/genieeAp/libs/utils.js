@@ -123,6 +123,7 @@ module.exports = {
 
 		data.packetId = adpConfig.packetId;
 		data.siteId = adpConfig.siteId;
+		data.siteDomain = adpConfig.siteDomain;
 		data.pageGroup = adpConfig.pageGroup;
 		data.platform = adpConfig.platform;
 		data.url = adpConfig.pageUrl;
