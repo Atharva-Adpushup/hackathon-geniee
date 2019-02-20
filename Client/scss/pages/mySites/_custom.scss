@@ -70,4 +70,17 @@
 			}
 		}
 	}
+
+	&.card--theme-dotted {
+		border: 2px dashed #ccc;
+		border-radius: 4px;
+		box-shadow: none;
+		height: 173px;
+		opacity: 0.8;
+		transition: all 0.2s ease;
+
+		&:hover {
+			opacity: 1;
+		}
+	}
 }

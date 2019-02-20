@@ -7,7 +7,8 @@ import {
 	faChartArea,
 	faCog,
 	faExclamationCircle,
-	faExclamationTriangle
+	faExclamationTriangle,
+	faPlusCircle
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -21,7 +22,8 @@ library.add(
 	faChartArea,
 	faCog,
 	faExclamationCircle,
-	faExclamationTriangle
+	faExclamationTriangle,
+	faPlusCircle
 );
 
 class MySites extends Component {
@@ -189,6 +191,13 @@ class MySites extends Component {
 							</div>
 						}
 					/>
+
+					<div className="card card--theme-dotted u-margin-r5 u-margin-b5 aligner aligner--vCenter aligner--hCenter u-cursor-pointer">
+						<div className="aligner aligner--column aligner--vCenter aligner--hCenter">
+							<FontAwesomeIcon size="2x" icon="plus-circle" className="u-margin-b3" />
+							<span>ADD NEW SITE</span>
+						</div>
+					</div>
 				</div>
 			</ActionCard>
 		);
