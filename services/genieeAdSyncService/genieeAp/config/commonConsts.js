@@ -32,6 +32,13 @@ module.exports = {
 		IMPRESSION: 1,
 		XPATH_MISS: 2
 	},
+	SERVICES: {
+		LAYOUT: 1,
+		TAG: 2,
+		HB: 3,
+		MEDIATION: 4,
+		INTERACTIVE_AD: 5
+	},
 	COOKIE: {
 		NAME: '_adp_utm_session_',
 		EXPIRY: 30

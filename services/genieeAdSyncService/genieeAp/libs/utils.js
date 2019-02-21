@@ -160,7 +160,8 @@ module.exports = {
 							sectionName: ad.sectionName,
 							status: ad.status,
 							network: ad.network,
-							networkAdUnitId: this.getNetworkAdUnitId(ad)
+							networkAdUnitId: this.getNetworkAdUnitId(ad),
+							services: ad.services
 						};
 					}.bind(this)
 				)

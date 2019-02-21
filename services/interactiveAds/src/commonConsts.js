@@ -10,6 +10,13 @@ const commonConsts = {
 	BEACON_TYPE: {
 		AD_FEEDBACK: 'AD_FEEDBACK'
 	},
+	SERVICES: {
+		LAYOUT: 1,
+		TAG: 2,
+		HB: 3,
+		MEDIATION: 4,
+		INTERACTIVE_AD: 5
+	},
 	EVENTS: {
 		DOM_LOAD: 'DOMContentLoaded',
 		SCRIPT_LOAD: 'scriptLoaded'

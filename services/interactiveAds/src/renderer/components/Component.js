@@ -32,7 +32,7 @@ class Component {
 		let css = { width, height },
 			$format = $('<div />'),
 			feedbackOptions = {
-				ads: [id],
+				ads: [this.interactiveAd],
 				xpathMiss: [],
 				eventType: 1,
 				mode: window.adpushup.config.mode,

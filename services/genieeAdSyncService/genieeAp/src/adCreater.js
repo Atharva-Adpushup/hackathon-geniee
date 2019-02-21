@@ -30,6 +30,7 @@ var $ = require('jquery'),
 				continue;
 			}
 
+			ad.services = [commonConsts.SERVICES.LAYOUT]; // Set service id for layout ads
 			ad.isIncontent ? inContentAds.push(ad) : null;
 			ad.network === 'geniee' &&
 				ad.networkData &&
