@@ -145,22 +145,30 @@ class AdElement extends Component {
 					</div>
 				) : null}
 				<pre style={{ wordBreak: 'break-word' }}>{code}</pre>{' '}
-				{user.isSuperUser ? (
-					<div>
-						<CustomButton variant="secondary" className="u-margin-l3 u-margin-t3 pull-right" onClick={() => this.toggleHandler('showNetworkDetails')}>
+				{user.isSuperUser && ad.formatData.type !== 'amp' ? (
+					<React.Fragment>
+						<CustomButton
+							variant="secondary"
+							className="u-margin-l3 u-margin-t3 pull-right"
+							onClick={() => this.toggleHandler('showNetworkDetails')}
+						>
 							Network Details
 						</CustomButton>
-						<CustomButton variant="secondary" className="u-margin-l3 u-margin-t3 pull-right" onClick={() => this.toggleHandler('showLazyload')}>
+						<CustomButton
+							variant="secondary"
+							className="u-margin-l3 u-margin-t3 pull-right"
+							onClick={() => this.toggleHandler('showLazyload')}
+						>
 							Lazyload Settings
 						</CustomButton>
-						{
-							!isAMP ? (
-								<CustomButton variant="secondary" className="u-margin-t3 pull-right" onClick={() => copyToClipBoard(code)}>
-									Copy AdCode
-								</CustomButton>
-							) : null
-						}
-					</div>
+						<CustomButton
+							variant="secondary"
+							className="u-margin-t3 pull-right"
+							onClick={() => copyToClipBoard(code)}
+						>
+							Copy AdCode
+						</CustomButton>
+					</React.Fragment>
 				) : null}
 			</div>
 		);
