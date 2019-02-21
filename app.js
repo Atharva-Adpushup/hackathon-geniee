@@ -44,8 +44,7 @@ app.use(compression());
 app.use(locale(languageSupport));
 app.use(helmet({
 	hsts: {
-		maxAge: 0,
-		includeSubdomains: false
+		setIf: () => false
 	}
 }));
 process.on('uncaughtException', function(err) {
