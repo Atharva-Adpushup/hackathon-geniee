@@ -335,29 +335,30 @@ module.exports = {
 
 		finalTop = adTop - viewPort.top;
 		finalBottom = viewPort.bottom - adBottom;
-		if (threshhold) {
-			return Math.abs(adTop - viewport.bottom) <= threshold || Math.abs(adBottom - viewPort.top) <= threshold;
-		}
 		if (finalTop > 0 && finalBottom > 0) {
-			return $el.height();
-		} else if (finalTop <= 0 && finalBottom > 0) {
-			return $el.height() + finalTop;
-		} else if (finalTop > 0 && finalBottom <= 0) {
-			return $el.height() + finalBottom;
+			return { inViewHeight: $el.height() };
+		} else if (finalTop <= 0 && adBottom > viewPort.top && adBottom < viewPort.bottom) {
+			return { inViewHeight: $el.height() + finalTop };
+		} else if (finalTop > 0 && adTop > viewPort.top && adTop < viewPort.bottom) {
+			return { inViewHeight: $el.height() + finalBottom };
+		} else if (threshhold) {
+			return Math.abs(adTop - viewPort.bottom) <= threshhold || Math.abs(adBottom - viewPort.top) <= threshhold;
 		}
-
 		return false;
 	},
 	checkElementInViewPercent: function (el) {
-		var $el = $(el),
-			elHeight = $el.height(),
-			elWidth = $el.width(),
-			elPixel = elWidth * elHeight,
-			inViewHeight = this.isElementInViewport(el),
-			inViewPixel = elWidth * inViewHeight,
-			percentageInView = (inViewPixel * 100) / elPixel;
-		if (elPixel < 242000) return percentageInView >= 50;
-		return percentageInView >= 30;
+		if (document.hasFocus()) {
+			var $el = $(el),
+				elHeight = $el.height(),
+				elWidth = $el.width(),
+				elPixel = elWidth * elHeight,
+				inViewHeight = this.isElementInViewport(el) && this.isElementInViewport(el).inViewHeight,
+				inViewPixel = elWidth * inViewHeight,
+				percentageInView = (inViewPixel * 100) / elPixel;
+			if (elPixel < 242000) return percentageInView >= 50;
+			return percentageInView >= 30;
+		}
+		return false;
 	},
 	queryParams: (function () {
 		var str = window.location.search,

@@ -63,7 +63,7 @@ var utils = require('../helpers/utils'),
 			/* 
 				If multiple DFP implementations exist on the page, then explicitly refresh ADP ad slot, to fetch the ad. This makes sure that the ad is fetched in all cases, even if disableInitialLoad() is used by the publisher for his own DFP implementation.
 			*/
-			if (googletag.pubads().isInitialLoadDisabled()) {
+			if (googletag.pubads().isInitialLoadDisabled() || slot.toBeRefresh) {
 				refreshGPTSlot(slot.gSlot);
 			}
 		});
@@ -208,15 +208,15 @@ var utils = require('../helpers/utils'),
 			// selected ad size is the first size present in `size` array.
 			size = isComputedSizes ? computedSizes.concat([]).reverse() : slot.size;
 		}
-
-		slot.gSlot = googletag.defineSlot(
-			'/' + networkId + '/' + slot.optionalParam.dfpAdunitCode,
-			size,
-			slot.containerId
-		);
+		if (!slot.gSlot)
+			slot.gSlot = googletag.defineSlot(
+				'/' + networkId + '/' + slot.optionalParam.dfpAdunitCode,
+				size,
+				slot.containerId
+			);
 
 		setGPTargeting(slot);
-		slot.gSlot.addService(googletag.pubads());
+		if (!slot.toBeRefresh) slot.gSlot.addService(googletag.pubads());
 	},
 	nonDFPSlotRenderSwitch = function(slot) {
 		var type = slot.type;
