@@ -854,15 +854,18 @@ function apiModule() {
 			function setPageGroupsPromises(user) {
 				return _(user.get('sites')).map(function(site) {
 					var uniquePageGroups = siteModel.getUniquePageGroups(site.siteId),
+						setupStage = siteModel.getSetupStage(site.siteId),
 						setupStep = siteModel.getSetupStep(site.siteId),
 						cmsData = siteModel.getCmsData(site.siteId);
-					return Promise.join(uniquePageGroups, setupStep, cmsData, function(pageGroups, step, cms) {
+					return Promise.join(uniquePageGroups, setupStage, setupStep, cmsData, function(pageGroups, onboardingStage, step, cms) {
+						site.onboardingStage = onboardingStage;
 						site.step = step;
 						site.cmsInfo = cms;
 						site.pageGroups = pageGroups;
 						return site;
 					}).catch(function(err) {
 						site.pageGroups = [];
+						site.onboardingStage = site.onboardingStage || 'preOnboarding';
 						site.step = site.step || false;
 						return site;
 					});

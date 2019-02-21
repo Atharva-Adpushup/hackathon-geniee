@@ -22,7 +22,10 @@
 	],
 	"tags": [
 		{
-			"name": "indexController"
+			"name": "indexController",
+			"name": "userController",
+			"name": "dataController",
+			"name": "siteController"
 		}
 	],
 	"paths": {
@@ -290,6 +293,150 @@
 								}
 							}
 						}
+					}
+				}
+			}
+		},
+
+		"/user/addSite": {
+			"post": {
+				"summary": "add site",
+				"tags": ["userController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"site": {
+										"type": "string",
+										"format": "uri"
+									}
+								},
+								"required": ["site"]
+							}
+						}
+					}
+				},
+				"security": [{ "cookieAuth": [] }],
+				"responses": {
+					"200": {
+						"description": "site added",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
+		"/data/saveSite": {
+			"post": {
+				"summary": "save site",
+				"tags": ["dataController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"siteId": {
+										"type": "string"
+									},
+									"site": {
+										"type": "string",
+										"format": "uri"
+									}
+								},
+								"required": ["siteId", "site"]
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "site added",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/site/onboarding": {
+			"get": {
+				"summary": "save site",
+				"tags": ["siteController"],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "onboarding response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"isOnboarding": {
+											"type": "boolean"
+										},
+										"siteId": {
+											"type": "integer"
+										},
+										"site": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/site/create": {
+			"post": {
+				"summary": "create site",
+				"tags": ["siteController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"siteDomain": {
+										"type": "string",
+										"format": "uri"
+									}
+								},
+								"required": ["siteDomain"]
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "site created"
 					}
 				}
 			}
