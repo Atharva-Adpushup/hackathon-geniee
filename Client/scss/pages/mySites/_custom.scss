@@ -1,16 +1,4 @@
 .card {
-	box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19);
-	width: 480px;
-
-	.card-header-title {
-		font-size: 1.8rem;
-	}
-
-	.card-header-icon {
-		flex: ($numberOne / $numberTen);
-		height: ($numberOne + ($numberOne/$numberTwo) + em);
-	}
-
 	> .card-body {
 		.panel-heading {
 			font-size: 1.6rem;
@@ -28,8 +16,6 @@
 	}
 
 	> .card-footer {
-		border: 0;
-
 		button {
 			background: transparent;
 			border: 0;
@@ -68,19 +54,6 @@
 			.panel-body {
 				color: #a94442;
 			}
-		}
-	}
-
-	&.card--theme-dotted {
-		border: 2px dashed #ccc;
-		border-radius: 4px;
-		box-shadow: none;
-		height: 173px;
-		opacity: 0.8;
-		transition: all 0.2s ease;
-
-		&:hover {
-			opacity: 1;
 		}
 	}
 }

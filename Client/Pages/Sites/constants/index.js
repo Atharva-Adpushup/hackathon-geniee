@@ -26,7 +26,7 @@ const SITE_SETUP_STATUS = {
 	4: {
 		step: 4,
 		tooltipText: 'Setup is complete',
-		text: 'Setup is complete',
+		text: 'AdPushup is running',
 		isComplete: true,
 		type: 'success',
 		icon: 'check-circle'

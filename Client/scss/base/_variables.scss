@@ -37,12 +37,16 @@ $distribute: distribute;
 $stretch: stretch;
 $baseline: baseline;
 $auto: auto;
+$all: all;
+$ease: ease;
 
 $textBold: bold;
 $textBolder: bolder;
 $textUnderline: underline;
 $textUppercase: uppercase;
 $textLowercase: lowercase;
+
+$dashed: dashed;
 
 $cursorPointer: pointer;
 
@@ -87,3 +91,5 @@ $designDimensionMD: ($designDimensionSM + $designDimensionSM); // 2rem
 $designDimensionLG: ($designDimensionMD + $designDimensionMD); // 4rem
 $designDimensionXL: ($designDimensionLG + $designDimensionLG); // 8rem
 $designDimensionXXL: ($designDimensionXL + $designDimensionXL); // 16rem
+
+$boxShadowOne: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19);
