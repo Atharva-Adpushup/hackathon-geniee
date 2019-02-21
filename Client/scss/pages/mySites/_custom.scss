@@ -1,34 +1,34 @@
 .card {
 	> .card-body {
 		.panel-heading {
-			font-size: 1.6rem;
+			font-size: ($designDimensionSM + 0.6);
 		}
 
 		.panel-body {
-			font-size: 1.4rem;
-			opacity: 0.8;
+			font-size: ($designDimensionSM + 0.4);
+			opacity: ($numberOne - 0.2);
 		}
 
 		a {
-			opacity: 1;
-			text-decoration: underline;
+			opacity: $numberOne;
+			text-decoration: $textUnderline;
 		}
 	}
 
 	> .card-footer {
 		button {
-			background: transparent;
-			border: 0;
-			box-shadow: none;
-			outline: 0 none;
-			padding: 1rem 1.5rem;
+			background: $transparent;
+			border: $numberZero;
+			box-shadow: $none;
+			outline: $numberZero $none;
+			padding: $designDimensionSM ($designDimensionSM + 0.5);
 
 			&:hover,
 			&:active,
 			&:focus {
 				background: #e6e6e6;
-				box-shadow: none;
-				outline: 0 none;
+				box-shadow: $none;
+				outline: 0 $none;
 			}
 		}
 	}
@@ -36,7 +36,7 @@
 	&.panel.panel-success {
 		> .card-body {
 			.panel-body {
-				color: #3c763d;
+				color: $successText;
 			}
 		}
 	}
@@ -44,7 +44,7 @@
 	&.panel.panel-warning {
 		> .card-body {
 			.panel-body {
-				color: #8a6d3b;
+				color: $warningText;
 			}
 		}
 	}
@@ -52,7 +52,7 @@
 	&.panel.panel-danger {
 		> .card-body {
 			.panel-body {
-				color: #a94442;
+				color: $dangerText;
 			}
 		}
 	}
