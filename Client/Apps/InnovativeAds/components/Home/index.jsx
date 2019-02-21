@@ -50,7 +50,7 @@ class Home extends Component {
 				) : (
 					<React.Fragment>
 						<Nav bsStyle="tabs" activeKey={activeNav} onSelect={this.handleNavSelect}>
-							<NavItem eventKey={2}>AdCode Generation</NavItem>
+							<NavItem eventKey={2}>Create Ads</NavItem>
 							<NavItem eventKey={3}>Manage Ads</NavItem>
 						</Nav>
 						{this.renderContent()}
