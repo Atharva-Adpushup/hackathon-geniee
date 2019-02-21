@@ -117,6 +117,18 @@ module.exports = {
 			crossDomain: true
 		});
 	},
+	getNetworkAdUnitId: function(ad) {
+		switch (ad.network) {
+			case commonConsts.NETWORKS.ADPTAGS:
+				return ad.networkData.dfpAdunit;
+			case commonConsts.NETWORKS.ADSENSE:
+			case commonConsts.NETWORKS.ADX:
+			case commonConsts.NETWORKS.MEDIANET:
+				return ad.networkData.adunitId;
+			default:
+				return null;
+		}
+	},
 	sendBeacon: function(url, data, options, beaconType) {
 		var toFeedback,
 			request,
@@ -140,7 +152,18 @@ module.exports = {
 				selectedVariation: adpConfig.selectedVariationName,
 				pageVariationName: '',
 				platform: adpConfig.platform,
-				isGeniee: adpConfig.isGeniee || false
+				isGeniee: adpConfig.isGeniee || false,
+				sections: data.ads.map(
+					function(ad) {
+						return {
+							sectionId: ad.id,
+							sectionName: ad.sectionName,
+							status: ad.status,
+							network: ad.network,
+							networkAdUnitId: this.getNetworkAdUnitId(ad)
+						};
+					}.bind(this)
+				)
 			};
 
 			if (!feedbackObj.packetId || !feedbackObj.siteId) {

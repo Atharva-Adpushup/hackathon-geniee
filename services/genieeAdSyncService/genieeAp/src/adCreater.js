@@ -209,13 +209,15 @@ var $ = require('jquery'),
 					displayCounter--;
 					if (data.success) {
 						feedbackData.xpathMiss = [];
-						feedbackData.ads = [adObj.id];
+						adObj.status = commonConsts.AD_STATUS.IMPRESSION;
+						feedbackData.ads = [adObj];
 						placeAd(data.container, adObj);
 						utils.sendFeedback(feedbackData);
 					} else {
 						adObj.xpathMiss = true;
 						feedbackData.ads = [];
-						feedbackData.xpathMiss = [adObj.id];
+						adObj.status = commonConsts.AD_STATUS.XPATH_MISS;
+						feedbackData.xpathMiss = [adObj];
 						utils.sendFeedback(feedbackData);
 					}
 				}

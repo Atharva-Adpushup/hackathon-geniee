@@ -19,12 +19,18 @@ module.exports = {
 	},
 	NETWORKS: {
 		ADPTAGS: 'adpTags',
+		ADSENSE: 'adsense',
+		ADX: 'adx',
 		MEDIANET: 'medianet'
 	},
 	AMP_PUBLISH_URL: '//autoamp.io/publishAmpJob',
 	USER_SYNC_URL: '//staging.adpushup.com/AdPushupFeedbackWebService/user/sync',
 	BEACON_TYPE: {
 		AD_FEEDBACK: 'AD_FEEDBACK'
+	},
+	AD_STATUS: {
+		IMPRESSION: 1,
+		XPATH_MISS: 2
 	},
 	COOKIE: {
 		NAME: '_adp_utm_session_',
