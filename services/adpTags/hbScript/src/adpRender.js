@@ -9,7 +9,7 @@ var utils = require('../helpers/utils'),
 	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(2));
 		if (val > 20) {
-			return 20.00;
+			return 20.0;
 		} else if (val == 0) {
 			val = 0.01;
 		}
@@ -27,35 +27,35 @@ var utils = require('../helpers/utils'),
 		slot.hasRendered = true;
 
 		var gptRefreshInterval = null;
-		if (slot.optionalParam.refreshSlot) {
-			window.focus();
+		// if (slot.optionalParam.refreshSlot) {
+		// 	window.focus();
 
-			googletag.cmd.push(function() {
-				gptRefreshInterval = setInterval(function() {
-					var el = $('#' + slot.sectionId);
-					if (adp.utils.isElementInViewport(el)) {
-						var feedbackData = {
-							ads: [],
-							xpathMiss: [],
-							eventType: 1,
-							mode: 1,
-							referrer: adp.config.referrer,
-							tracking: false
-						};
-						refreshGPTSlot(slot.gSlot);
-						feedbackData.xpathMiss = [];
-						feedbackData.ads = [slot.sectionId];
-						feedbackData.variationId = adp.config.selectedVariation;
-						adp.utils.sendFeedback(feedbackData);
-					}
-				}, config.GPT_REFRESH_INTERVAL);
-				adp.adpTags.gptRefreshIntervals.push({
-					gSlot: slot.gSlot,
-					id: gptRefreshInterval,
-					sectionId: slot.sectionId
-				});
-			});
-		}
+		// 	googletag.cmd.push(function() {
+		// 		gptRefreshInterval = setInterval(function() {
+		// 			var el = $('#' + slot.sectionId);
+		// 			if (adp.utils.isElementInViewport(el)) {
+		// 				var feedbackData = {
+		// 					ads: [],
+		// 					xpathMiss: [],
+		// 					eventType: 1,
+		// 					mode: 1,
+		// 					referrer: adp.config.referrer,
+		// 					tracking: false
+		// 				};
+		// 				refreshGPTSlot(slot.gSlot);
+		// 				feedbackData.xpathMiss = [];
+		// 				feedbackData.ads = [slot.sectionId];
+		// 				feedbackData.variationId = adp.config.selectedVariation;
+		// 				adp.utils.sendFeedback(feedbackData);
+		// 			}
+		// 		}, config.GPT_REFRESH_INTERVAL);
+		// 		adp.adpTags.gptRefreshIntervals.push({
+		// 			gSlot: slot.gSlot,
+		// 			id: gptRefreshInterval,
+		// 			sectionId: slot.sectionId
+		// 		});
+		// 	});
+		// }
 
 		googletag.cmd.push(function() {
 			googletag.display(slot.containerId);
@@ -63,7 +63,7 @@ var utils = require('../helpers/utils'),
 			/* 
 				If multiple DFP implementations exist on the page, then explicitly refresh ADP ad slot, to fetch the ad. This makes sure that the ad is fetched in all cases, even if disableInitialLoad() is used by the publisher for his own DFP implementation.
 			*/
-			if (googletag.pubads().isInitialLoadDisabled()) {
+			if (googletag.pubads().isInitialLoadDisabled() || slot.toBeRefresh) {
 				refreshGPTSlot(slot.gSlot);
 			}
 		});
@@ -208,15 +208,15 @@ var utils = require('../helpers/utils'),
 			// selected ad size is the first size present in `size` array.
 			size = isComputedSizes ? computedSizes.concat([]).reverse() : slot.size;
 		}
-
-		slot.gSlot = googletag.defineSlot(
-			'/' + networkId + '/' + slot.optionalParam.dfpAdunitCode,
-			size,
-			slot.containerId
-		);
+		if (!slot.gSlot)
+			slot.gSlot = googletag.defineSlot(
+				'/' + networkId + '/' + slot.optionalParam.dfpAdunitCode,
+				size,
+				slot.containerId
+			);
 
 		setGPTargeting(slot);
-		slot.gSlot.addService(googletag.pubads());
+		if (!slot.toBeRefresh) slot.gSlot.addService(googletag.pubads());
 	},
 	nonDFPSlotRenderSwitch = function(slot) {
 		var type = slot.type;

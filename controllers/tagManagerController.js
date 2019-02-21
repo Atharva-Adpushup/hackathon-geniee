@@ -152,14 +152,10 @@ router
 				return appBucket.getAsync('data::apNetwork');
 			})
 			.then(function(json) {
-				return res.json(json.value);
+				return res.json({ networkConfig: json.value });
 			})
-			.catch(function(err) {
-				if (err.code === 13) {
-					throw new AdPushupError([{ status: 404, message: 'Doc does not exist' }]);
-				}
-
-				return res.json(err);
+			.catch(err => {
+				return fn.errorHander(err, res);
 			});
 	})
 	.get(['/', '/:siteId'], (req, res) => {
