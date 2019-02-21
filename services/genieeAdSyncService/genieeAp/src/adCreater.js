@@ -187,7 +187,7 @@ var $ = require('jquery'),
 			feedbackData = {
 				ads: [],
 				xpathMiss: [],
-				eventType: 1,
+				eventType: commonConsts.ERROR_CODES.NO_ERROR,
 				mode: 1,
 				referrer: config.referrer,
 				tracking: browserConfig.trackerSupported,

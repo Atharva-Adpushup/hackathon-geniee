@@ -39,6 +39,10 @@ module.exports = {
 		MEDIATION: 4,
 		INTERACTIVE_AD: 5
 	},
+	ERROR_CODES: {
+		NO_ERROR: 1,
+		PAGEGROUP_NOT_FOUND: 2
+	},
 	COOKIE: {
 		NAME: '_adp_utm_session_',
 		EXPIRY: 30

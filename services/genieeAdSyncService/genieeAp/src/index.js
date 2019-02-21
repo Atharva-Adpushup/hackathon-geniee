@@ -116,7 +116,7 @@ function triggerControl(mode) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
 			w.gnsmod.triggerAds();
 			utils.sendFeedback({
-				eventType: 3,
+				eventType: commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
 				mode: mode,
 				referrer: config.referrer
 			});
@@ -125,7 +125,7 @@ function triggerControl(mode) {
 		adp.creationProcessStarted = true;
 		control.trigger();
 		utils.sendFeedback({
-			eventType: 3,
+			eventType: commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
 			mode: mode,
 			referrer: config.referrer
 		});

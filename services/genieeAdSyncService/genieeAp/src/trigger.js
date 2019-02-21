@@ -68,7 +68,7 @@ var adp = window.adpushup,
 				var feedbackData = {
 					ads: [ad],
 					xpathMiss: [],
-					eventType: 1,
+					eventType: commonConsts.ERROR_CODES.NO_ERROR,
 					// mode: 16,
 					mode: 1, // Sending Mode 1 in Manual Ads
 					referrer: config.referrer,

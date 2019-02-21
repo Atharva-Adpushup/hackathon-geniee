@@ -117,7 +117,7 @@ module.exports = {
 			crossDomain: true
 		});
 	},
-	getNetworkAdUnitId: function(ad) {
+	getNetworkAdUnitIdForAd: function(ad) {
 		switch (ad.network) {
 			case commonConsts.NETWORKS.ADPTAGS:
 				return ad.networkData.dfpAdunit;
@@ -128,6 +128,15 @@ module.exports = {
 			default:
 				return null;
 		}
+	},
+	isHBActiveForAd: function(ad) {
+		if (ad.network && ad.network === commonConsts.NETWORKS.ADPTAGS) {
+			if (ad.networkData && ad.networkData.headerBidding) {
+				return ad.networkData.headerBidding;
+			}
+			return false;
+		}
+		return false;
 	},
 	sendBeacon: function(url, data, options, beaconType) {
 		var toFeedback,
@@ -145,8 +154,8 @@ module.exports = {
 				siteId: adpConfig.siteId,
 				siteDomain: adpConfig.siteDomain,
 				url: adpConfig.pageUrl,
-				mode: data.mode,
-				errorCode: data.eventType,
+				mode: data.mode, // Denotes which mode is running (adpushup, benchmark or fallback)
+				errorCode: data.eventType, // Denotes the error code (no error, pagegroup not found etc.)
 				pageGroup: adpConfig.pageGroup,
 				pageVariationId: adpConfig.selectedVariation,
 				selectedVariation: adpConfig.selectedVariationName,
@@ -155,12 +164,16 @@ module.exports = {
 				isGeniee: adpConfig.isGeniee || false,
 				sections: data.ads.map(
 					function(ad) {
+						if (this.isHBActiveForAd(ad)) {
+							ad.services.push(commonConsts.SERVICES.HB);
+						}
+
 						return {
 							sectionId: ad.isManual ? ad.originalId : ad.id,
 							sectionName: ad.sectionName,
 							status: ad.status,
 							network: ad.network,
-							networkAdUnitId: this.getNetworkAdUnitId(ad),
+							networkAdUnitId: this.getNetworkAdUnitIdForAd(ad),
 							services: ad.services
 						};
 					}.bind(this)

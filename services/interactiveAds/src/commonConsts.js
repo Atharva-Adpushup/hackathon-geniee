@@ -17,6 +17,10 @@ const commonConsts = {
 		MEDIATION: 4,
 		INTERACTIVE_AD: 5
 	},
+	ERROR_CODES: {
+		NO_ERROR: 1,
+		PAGEGROUP_NOT_FOUND: 2
+	},
 	EVENTS: {
 		DOM_LOAD: 'DOMContentLoaded',
 		SCRIPT_LOAD: 'scriptLoaded'

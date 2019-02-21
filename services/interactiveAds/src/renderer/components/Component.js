@@ -34,7 +34,7 @@ class Component {
 			feedbackOptions = {
 				ads: [this.interactiveAd],
 				xpathMiss: [],
-				eventType: 1,
+				eventType: commonConsts.ERROR_CODES.NO_ERROR,
 				mode: window.adpushup.config.mode,
 				referrer: adp.config.referrer,
 				tracking: false,
