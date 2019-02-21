@@ -16,7 +16,7 @@ import { Link } from 'react-router-dom';
 import ActionCard from '../../../Components/ActionCard/index';
 import OverlayTooltip from '../../../Components/OverlayTooltip/index';
 import Card from '../../../Components/Layout/Card';
-import { SITE_SETUP_STATUS } from '../constants/index';
+import { SITE_SETUP_STATUS, domanize } from '../constants/index';
 
 library.add(
 	faCheckCircle,
@@ -44,6 +44,7 @@ class MySites extends Component {
 					const isStepThird = !!(isSiteStep && site.step === 3);
 					const { siteId } = site;
 					const statusObject = isSiteStep && SITE_SETUP_STATUS[site.step];
+					const domanizeDomain = domanize(site.domain);
 
 					const computedReportingUrl = `/reporting/${siteId}`;
 					const computedManageSiteUrl = `/sites/${siteId}`;
@@ -60,7 +61,7 @@ class MySites extends Component {
 							headerClassName="card-header"
 							headerChildren={
 								<div className="aligner aligner--row">
-									<span className="aligner-item card-header-title">{site.domain}</span>
+									<span className="aligner-item card-header-title">{domanizeDomain}</span>
 									<OverlayTooltip
 										id="tooltip-site-status-info"
 										placement="top"

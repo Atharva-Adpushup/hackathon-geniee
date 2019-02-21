@@ -33,4 +33,17 @@ const SITE_SETUP_STATUS = {
 	}
 };
 
-module.exports = { SITE_SETUP_STATUS };
+const rightTrim = (string, s) => (string ? string.replace(new RegExp(s + '*$'), '') : '');
+
+const domanize = domain =>
+	domain
+		? rightTrim(
+				domain
+					.replace('http://', '')
+					.replace('https://', '')
+					.replace('www.', ''),
+				'/'
+		  )
+		: '';
+
+module.exports = { SITE_SETUP_STATUS, rightTrim, domanize };
