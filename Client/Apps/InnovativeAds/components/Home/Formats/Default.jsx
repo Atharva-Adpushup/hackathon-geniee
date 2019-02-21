@@ -9,8 +9,9 @@ import { TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
 class Default extends Component {
 	constructor(props) {
 		super(props);
+		const { ad } = this.props;
 		this.state = {
-			css: ''
+			css: ad && ad.css ? window.btoa(JSON.stringify(ad.css)) : ''
 		};
 		this.saveHandler = this.saveHandler.bind(this);
 		this.handleChange = this.handleChange.bind(this);
@@ -54,7 +55,7 @@ class Default extends Component {
 			<div>
 				<Col md={12} className="u-padding-l0">
 					<label htmlFor="css">Custom CSS</label>
-					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={css} />
+					<CodeBox name="css" showButtons={false} onChange={this.handleChange} code={css} />
 				</Col>
 				{save.renderFn(save.label, this.saveHandler)}
 				{cancel ? cancel.renderFn(cancel.label, cancel.handler, 'secondary') : null}

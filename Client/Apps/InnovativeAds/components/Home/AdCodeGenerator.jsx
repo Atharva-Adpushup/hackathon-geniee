@@ -255,16 +255,6 @@ class AdCodeGenerator extends Component {
 	renderPagegroups() {
 		const { platform, format, pagegroups } = this.state;
 		const { meta, channels } = this.props;
-		/*
-			platform - desktop
-			format - stickyLeft
-			pagegroup - ??
-				- home or post
-				Conditions:
-					1. stickyLeft should not be already created
-					2. stickyRight or docked should not be already created
-		*/
-
 		const { filteredPagegroupsByPlatform, disabled } = pagegroupFiltering(
 			channels,
 			platform,

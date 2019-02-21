@@ -8,8 +8,9 @@ class InView extends Component {
 	constructor(props) {
 		super(props);
 		const { ad = false } = this.props;
+		const hasFormatData = !!(ad && ad.formatData);
 		this.state = {
-			xpath: ad && ad.formatData && ad.formatData.eventData ? ad.formatData.eventData.value : '',
+			xpath: hasFormatData && ad.formatData.eventData ? ad.formatData.eventData.value : '',
 			css: ad && ad.css ? window.btoa(JSON.stringify(ad.css)) : ''
 		};
 		this.handleChange = this.handleChange.bind(this);

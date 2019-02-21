@@ -14,7 +14,7 @@ class Docked extends Component {
 			xpath: hasFormatData ? ad.formatData.xpath : '',
 			bottomXpath: hasFormatData ? ad.formatData.bottomXpath : '',
 			bottomOffset: hasFormatData ? ad.formatData.bottomOffset : '',
-			css: ad && ad.css ? window.btoa(JSON.stringify(ad.css)) : '',
+			css: hasFormatData && ad.formatData.css ? window.btoa(JSON.stringify(ad.formatData.css)) : '',
 			operation: hasFormatData ? ad.formatData.operation : null
 		};
 		this.handleChange = this.handleChange.bind(this);
@@ -39,7 +39,8 @@ class Docked extends Component {
 
 	saveHandler(e) {
 		e.preventDefault();
-		const { xpath, bottomXpath, bottomOffset, operation, css, save } = this.state;
+		const { xpath, bottomXpath, bottomOffset, operation, css } = this.state;
+		const { save } = this.props;
 		let parsedCSS = {};
 		if (!xpath || !operation) {
 			return window.alert('Xpath and Ad Operation are mandatory fields');
