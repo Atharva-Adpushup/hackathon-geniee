@@ -43,6 +43,11 @@ module.exports = {
 		NO_ERROR: 1,
 		PAGEGROUP_NOT_FOUND: 2
 	},
+	MODE: {
+		ADPUSHUP: 1,
+		BENCHMARK: 2,
+		FALLBACK: 3
+	},
 	COOKIE: {
 		NAME: '_adp_utm_session_',
 		EXPIRY: 30

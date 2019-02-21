@@ -188,7 +188,7 @@ var $ = require('jquery'),
 				ads: [],
 				xpathMiss: [],
 				eventType: commonConsts.ERROR_CODES.NO_ERROR,
-				mode: 1,
+				mode: commonConsts.MODE.ADPUSHUP,
 				referrer: config.referrer,
 				tracking: browserConfig.trackerSupported,
 				// Replaced '-' with '_' to avoid ElasticSearch split issue

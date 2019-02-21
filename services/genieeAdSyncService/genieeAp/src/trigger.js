@@ -70,7 +70,7 @@ var adp = window.adpushup,
 					xpathMiss: [],
 					eventType: commonConsts.ERROR_CODES.NO_ERROR,
 					// mode: 16,
-					mode: 1, // Sending Mode 1 in Manual Ads
+					mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
 					referrer: config.referrer,
 					tracking: browserConfig.trackerSupported,
 					variationId: commonConsts.MANUAL_ADS.VARIATION

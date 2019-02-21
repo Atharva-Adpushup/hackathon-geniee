@@ -158,11 +158,10 @@ module.exports = {
 				errorCode: data.eventType, // Denotes the error code (no error, pagegroup not found etc.)
 				pageGroup: adpConfig.pageGroup,
 				pageVariationId: adpConfig.selectedVariation,
-				selectedVariation: adpConfig.selectedVariationName,
-				pageVariationName: '',
+				pageVariationName: adpConfig.selectedVariationName,
 				platform: adpConfig.platform,
 				isGeniee: adpConfig.isGeniee || false,
-				sections: data.ads.map(
+				sections: data.ads && data.ads.length ? data.ads.map(
 					function(ad) {
 						if (this.isHBActiveForAd(ad)) {
 							ad.services.push(commonConsts.SERVICES.HB);
@@ -177,7 +176,7 @@ module.exports = {
 							services: ad.services
 						};
 					}.bind(this)
-				)
+				) : null
 			};
 
 			if (!feedbackObj.packetId || !feedbackObj.siteId) {

@@ -171,7 +171,7 @@ function startCreation(forced) {
 
 				createAds(adp, selectedVariation);
 			} else {
-				triggerControl(3);
+				triggerControl(commonConsts.MODE.FALLBACK);
 			}
 
 			return resolve(true);
@@ -258,7 +258,7 @@ function main() {
 
 	if (!config.pageGroup) {
 		pageGroupTimer = setTimeout(function() {
-			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
+			!config.pageGroup ? triggerControl(commonConsts.MODE.FALLBACK) : clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {
 		// start heartBeat
