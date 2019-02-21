@@ -100,7 +100,7 @@ function shouldWeNotProceed() {
 	return config.disable || adp.creationProcessStarted || hasGenieeStarted;
 }
 
-function triggerControl(mode) {
+function triggerControl(mode, errorCode) {
 	var isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
 
 	//Geniee method call for control mode
@@ -116,7 +116,7 @@ function triggerControl(mode) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
 			w.gnsmod.triggerAds();
 			utils.sendFeedback({
-				eventType: commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
+				eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
 				mode: mode,
 				referrer: config.referrer
 			});
@@ -125,7 +125,7 @@ function triggerControl(mode) {
 		adp.creationProcessStarted = true;
 		control.trigger();
 		utils.sendFeedback({
-			eventType: commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
+			eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
 			mode: mode,
 			referrer: config.referrer
 		});
@@ -239,20 +239,20 @@ function main() {
 
 	// AdPushup Debug Force Control
 	if (utils.queryParams && utils.queryParams.forceControl) {
-		triggerControl(5);
+		triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_FORCED); // Control forced (run fallback)
 		return false;
 	}
 
 	// AdPushup Mode Logic
 	if (parseInt(config.mode, 10) === 2) {
-		triggerControl(2);
+		triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.PAUSED_IN_EDITOR); // Paused from editor (run fallback)
 		return false;
 	}
 
 	// AdPushup Percentage Logic
 	var rand = Math.floor(Math.random() * 100) + 1;
 	if (rand > config.adpushupPercentage) {
-		triggerControl(4);
+		triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_PLANNED); // Control planned (run fallback)
 		return false;
 	}
 
