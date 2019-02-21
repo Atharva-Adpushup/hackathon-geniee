@@ -24,6 +24,7 @@ var model = require('../helpers/model'),
 			'genieeMediaId',
 			'dateCreated',
 			'dateModified',
+			'onboardingStage',
 			'step',
 			'websiteRevenue',
 			'adsensePublisherId',
@@ -454,6 +455,16 @@ function apiModule() {
 				})
 				.catch(function(err) {
 					throw new AdPushupError('Cannot get setup step');
+				});
+		},
+		getSetupStage: function (siteId) {
+			return API.getSiteById(siteId)
+				.then(function (site) {
+					var onboardingStage = site.get('onboardingStage');
+					return onboardingStage;
+				})
+				.catch(function (err) {
+					throw new AdPushupError('Cannot get setup onboarding stage');
 				});
 		},
 		getCmsData: function(siteId) {

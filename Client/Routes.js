@@ -30,10 +30,7 @@ const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
 );
 const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/ErrorPage/index'));
-const Layout = lazy(() => import(/* webpackChunkName: "layout" */ './Apps/Layout/index'));
-const SiteSettings = lazy(() =>
-	import(/* webpackChunkName: "siteSettings" */ './Pages/SiteSettings/index')
-);
+const OnBoarding = lazy(() => import(/* webpackChunkName: "onBoarding" */ './Pages/OnBoarding'));
 
 const UserRoutes = () => (
 	<Router history={history}>
@@ -66,7 +63,7 @@ const UserRoutes = () => (
 					<PrivateRoute exact path="/payment" component={Payment} />
 					<PrivateRoute exact path="/paymentSettings" component={PaymentSettings} />
 					<PrivateRoute exact path="/ap-tag/:siteId" component={ApTag} />
-					<PrivateRoute exact path="/innovative-ads/:siteId" component={InnovativeAds} />
+					<PrivateRoute exact path="/onboarding" component={OnBoarding} />
 				</ShellContainer>
 			</Switch>
 		</Suspense>
