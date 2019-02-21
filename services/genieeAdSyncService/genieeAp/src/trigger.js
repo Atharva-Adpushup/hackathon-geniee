@@ -63,9 +63,10 @@ var adp = window.adpushup,
 
 			ad.status = 1; // Mark ap tag status as successful impression
 			ad.services = [commonConsts.SERVICES.TAG]; // Set service id for ap tag ads
+			ad.originalId = adId;
 			if (isAdElement) {
 				var feedbackData = {
-					ads: [adId],
+					ads: [ad],
 					xpathMiss: [],
 					eventType: 1,
 					// mode: 16,

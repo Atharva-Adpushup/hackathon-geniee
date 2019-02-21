@@ -156,7 +156,7 @@ module.exports = {
 				sections: data.ads.map(
 					function(ad) {
 						return {
-							sectionId: ad.id,
+							sectionId: ad.isManual ? ad.originalId : ad.id,
 							sectionName: ad.sectionName,
 							status: ad.status,
 							network: ad.network,
