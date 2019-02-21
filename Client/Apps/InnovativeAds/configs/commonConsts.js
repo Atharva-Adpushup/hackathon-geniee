@@ -132,7 +132,7 @@ const displayAdMessage = `<ol style="font-size: 15px;">
 const interactiveAdMessage =
 	'Ad has been created. AdPushup will automatically insert ad on your site on the runtime. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>';
 const COMPONENT_TITLES = {
-	2: 'AdCode Generation',
+	2: 'Create Ads',
 	3: 'Manage Ads',
 	4: 'Ads Txt Config',
 	1: 'AdPushup Header Code'
