@@ -71,9 +71,12 @@ class AdElement extends Component {
 				user.isSuperUser
 			).then(response => {
 				if (response) {
-					this.setState({
-						isActive: !isActive
-					});
+					this.setState(
+						{
+							isActive: !isActive
+						},
+						() => window.alert('Kindly, do not forget to do Master Save to presist this change.')
+					);
 				}
 				return true;
 			});
@@ -202,9 +205,9 @@ class AdElement extends Component {
 		const actions = this.isSuperUser ? OPS_AD_LIST_ACTIONS : USER_AD_LIST_ACTIONS;
 		const { ad } = this.props;
 
-		return actions.map((action, index) => (
+		return actions.map(action => (
 			<CustomButton
-				key={`adAction-${ad.id}-${index}`}
+				key={`adAction-${ad.id}`}
 				variant="secondary"
 				className="u-margin-b3"
 				onClick={() => this.userActionsHandler(action.key)}
