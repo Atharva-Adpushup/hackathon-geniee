@@ -10,7 +10,7 @@ const SITE_SETUP_STATUS = {
 	2: {
 		step: 2,
 		tooltipText: 'Setup is incomplete',
-		text: 'Ads.txt not updated',
+		text: 'Ads.txt is not updated',
 		isComplete: false,
 		type: 'danger',
 		icon: 'exclamation-triangle'
