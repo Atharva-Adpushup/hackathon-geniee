@@ -27,12 +27,12 @@ function destroyAdpSlots() {
 
 	if (adpSlots.length) {
 		var adpGSlots = [];
-		adpSlots.forEach(function(adpSlot) {
+		adpSlots.forEach(function (adpSlot) {
 			adpGSlots.push(w.adpTags.adpSlots[adpSlot].gSlot);
 		});
 
 		w.adpTags.adpSlots = {};
-		w.googletag.cmd.push(function() {
+		w.googletag.cmd.push(function () {
 			w.googletag.destroySlots(adpGSlots);
 		});
 	}
@@ -84,12 +84,10 @@ function initAdpConfig() {
 }
 
 function shouldWeNotProceed() {
-	var hasGenieeStarted = !!(
-		config.partner === 'geniee' &&
+	var hasGenieeStarted = !!(config.partner === 'geniee' &&
 		w.gnsmod &&
 		w.gnsmod.creationProcessStarted &&
-		!config.isAdPushupControlWithPartnerSSP
-	);
+		!config.isAdPushupControlWithPartnerSSP);
 
 	return config.disable || adp.creationProcessStarted || hasGenieeStarted;
 }
@@ -127,14 +125,14 @@ function triggerControl(mode) {
 }
 
 function startCreation(forced) {
-	return new Promise(function(resolve) {
+	return new Promise(function (resolve) {
 		ampInit(adp.config);
 		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
 		if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
 			return resolve(false);
 		}
 
-		return selectVariation(config).then(function(variationData) {
+		return selectVariation(config).then(function (variationData) {
 			var selectedVariation = variationData.selectedVariation,
 				moduleConfig = variationData.config,
 				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
@@ -155,8 +153,23 @@ function startCreation(forced) {
 				if (interactiveAds) {
 					require.ensure(
 						['interactiveAds/index.js'],
-						function(require) {
+						function (require) {
 							require('interactiveAds/index')(interactiveAds);
+							var interactiveAdsArr = adp.interactiveAds;
+							if (interactiveAdsArr.ads) {
+								var ads = interactiveAdsArr.ads;
+								for (var id in ads) {
+									if (ads[id].networkData && ads[id].networkData.dfpAdunit) {
+										var slotId = ads[id].networkData.dfpAdunit, container = $('#' + slotId);
+										var currentTime = new Date().getTime();
+										container.attr('data-render-time', currentTime);
+										console.log('rendered slot ', id, ' ', new Date(), ' ', document.hasFocus());
+										if (ads[id].networkData && ads[id].networkData.refreshSlot) {
+											refreshAdSlot.refreshSlot(container, ads[id]);
+										}
+									}
+								}
+							}
 						},
 						'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
 					);
@@ -186,7 +199,7 @@ function initAdpQue() {
 	}
 
 	processQue();
-	adp.que.push = function(queFunc) {
+	adp.que.push = function (queFunc) {
 		[].push.call(w.adpushup.que, queFunc);
 		processQue();
 	};
@@ -247,7 +260,7 @@ function main() {
 	}
 
 	if (!config.pageGroup) {
-		pageGroupTimer = setTimeout(function() {
+		pageGroupTimer = setTimeout(function () {
 			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {
