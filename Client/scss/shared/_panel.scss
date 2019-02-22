@@ -1,0 +1,14 @@
+.panel {
+	&.panel--transparent {
+		background: transparent;
+		border: 0;
+		box-shadow: none;
+
+		> .panel-heading,
+		> .panel-body {
+			background: transparent;
+			border: 0;
+			box-shadow: none;
+		}
+	}
+}

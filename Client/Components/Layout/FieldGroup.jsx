@@ -11,7 +11,17 @@ import {
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
-const FieldGroup = ({ id, label, help, type, buttonToggle, onChange, ...props }) => {
+const FieldGroup = ({
+	id,
+	label,
+	help,
+	type,
+	buttonToggle,
+	onChange,
+	value,
+	isTextOnly,
+	...props
+}) => {
 	const isToggleButtonGroup = !!(type === 'toggle-button-group' && buttonToggle);
 	const buttonGroup = isToggleButtonGroup ? (
 		<ButtonToolbar>
@@ -24,29 +34,46 @@ const FieldGroup = ({ id, label, help, type, buttonToggle, onChange, ...props })
 			</ToggleButtonGroup>
 		</ButtonToolbar>
 	) : null;
+	const textComponent =
+		isTextOnly && !type ? <span style={{ display: 'block' }}>{value}</span> : null;
+	let computedComponent = null;
+
+	if (isToggleButtonGroup) {
+		computedComponent = buttonGroup;
+	} else if (isTextOnly) {
+		computedComponent = textComponent;
+	} else {
+		computedComponent = <FormControl type={type} onChange={onChange} value={value} {...props} />;
+	}
+
 	return (
 		<FormGroup controlId={id} className="u-margin-b4">
 			<ControlLabel className="u-margin-b3">{label}</ControlLabel>
-			{isToggleButtonGroup ? (
-				buttonGroup
-			) : (
-				<FormControl type={type} onChange={onChange} {...props} />
-			)}
+			{computedComponent}
+
 			{help && <HelpBlock>{help}</HelpBlock>}
 		</FormGroup>
 	);
 };
+
 FieldGroup.propTypes = {
 	id: PropTypes.string.isRequired,
 	label: PropTypes.string.isRequired,
-	onChange: PropTypes.func.isRequired,
+	onChange: PropTypes.func,
 	help: PropTypes.string,
 	type: PropTypes.string,
-	buttonToggle: PropTypes.array
+	buttonToggle: PropTypes.array,
+	isTextOnly: PropTypes.bool,
+	value: PropTypes.string
 };
+
 FieldGroup.defaultProps = {
-	type: 'text',
 	help: '',
-	buttonToggle: []
+	type: '',
+	buttonToggle: [],
+	isTextOnly: false,
+	value: '',
+	onChange: () => {}
 };
+
 export default FieldGroup;

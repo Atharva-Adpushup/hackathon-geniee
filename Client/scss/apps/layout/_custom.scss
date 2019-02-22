@@ -1,0 +1,11 @@
+.layout-splitScreen {
+	input {
+		width: 80%;
+	}
+	textarea {
+		width: 90%;
+	}
+	pre {
+		max-width: ($designDimensionXXL * 4);
+	}
+}

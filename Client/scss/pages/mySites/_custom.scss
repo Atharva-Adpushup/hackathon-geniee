@@ -1,0 +1,59 @@
+.card {
+	> .card-body {
+		.panel-heading {
+			font-size: ($designDimensionSM + 0.6);
+		}
+
+		.panel-body {
+			font-size: ($designDimensionSM + 0.4);
+			opacity: ($numberOne - 0.2);
+		}
+
+		a {
+			opacity: $numberOne;
+			text-decoration: $textUnderline;
+		}
+	}
+
+	> .card-footer {
+		button {
+			background: $transparent;
+			border: $numberZero;
+			box-shadow: $none;
+			outline: $numberZero $none;
+			padding: $designDimensionSM ($designDimensionSM + 0.5);
+
+			&:hover,
+			&:active,
+			&:focus {
+				background: #e6e6e6;
+				box-shadow: $none;
+				outline: 0 $none;
+			}
+		}
+	}
+
+	&.panel.panel-success {
+		> .card-body {
+			.panel-body {
+				color: $successText;
+			}
+		}
+	}
+
+	&.panel.panel-warning {
+		> .card-body {
+			.panel-body {
+				color: $warningText;
+			}
+		}
+	}
+
+	&.panel.panel-danger {
+		> .card-body {
+			.panel-body {
+				color: $dangerText;
+			}
+		}
+	}
+}
