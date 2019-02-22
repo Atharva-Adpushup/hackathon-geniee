@@ -60,7 +60,12 @@ var utils = require('../libs/utils'),
 			slotId = 'ADP_' + siteId + '_' + adSize + '_' + ad.id,
 			slotId1 = 'ADP_' + siteId + '_' + adSize1 + '_' + ad.id,
 			adpSlots = adp.adpTags.adpSlots,
-			slot = adpSlots[slotId] || adpSlots[slotId1];
+			slot;
+		if (ad.formatData && ad.formatData.type == 'sticky') {
+			slotId = 'STICKY_' + slotId;
+			slotId1 = 'STICKY_' + slotId1;
+		}
+		slot = adpSlots[slotId] || adpSlots[slotId1];
 		return slot;
 	},
 	sendFeedback = function (ad) {
@@ -87,7 +92,6 @@ var utils = require('../libs/utils'),
 		}
 	},
 	onScroll = function () {
-		console.log('scrolled', ads);
 		getAllInViewAds();
 
 		for (var i = 0; i < inViewAds.length; i++) {
