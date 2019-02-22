@@ -44,25 +44,38 @@ class SiteSettings extends Component {
 	}
 
 	renderLeftPanel() {
+		const {
+			match: {
+				params: { siteId }
+			}
+		} = this.props;
+		const codeText = `<script data-cfasync="false" type="text/javascript">
+(function(w, d) { var s = d.createElement('script');
+	s.src = '//cdn.adpushup.com/${siteId}/adpushup.js';
+	s.type = 'text/javascript'; s.async = true;
+	(d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s);
+})(window, document);
+</script>`;
+
 		return (
 			<div className="clearfix">
-				<h4 className="u-margin-t3 u-margin-b4">AP Head Code</h4>
+				<h4 className="u-margin-t3 u-margin-b4 u-text-bold">AP Head Code</h4>
+				<p className="u-margin-t3 u-margin-b4">
+					Copy and paste this snippet in the head tag of your website
+				</p>
+				<Row className="u-margin-b2">
+					<Col xs={12} md={12} className="u-padding-r4 u-padding-l0">
+						<pre>{codeText}</pre>
+					</Col>
+				</Row>
 
 				<CustomButton
-					variant="primary"
+					variant="secondary"
 					className=""
 					name="convertButton"
 					onClick={this.handleButtonClickHandler}
 				>
-					Convert
-				</CustomButton>
-				<CustomButton
-					variant="secondary"
-					className="u-margin-l3"
-					name="resetButton"
-					onClick={this.handleButtonClickHandler}
-				>
-					Reset
+					Copy to Clipboard
 				</CustomButton>
 			</div>
 		);
@@ -73,7 +86,7 @@ class SiteSettings extends Component {
 
 		return (
 			<div className="clearfix">
-				<h4 className="u-margin-t3 u-margin-b4">Manage Blocklist</h4>
+				<h4 className="u-margin-t3 u-margin-b4 u-text-bold">Manage Blocklist</h4>
 			</div>
 		);
 	}
