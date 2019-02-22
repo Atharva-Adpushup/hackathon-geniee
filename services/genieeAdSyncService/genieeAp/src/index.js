@@ -159,11 +159,12 @@ function startCreation(forced) {
 							if (interactiveAdsArr.ads) {
 								var ads = interactiveAdsArr.ads;
 								for (var id in ads) {
-									if (ads[id].networkData && ads[id].networkData.dfpAdunit) {
+									var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
+									if (hasDfpAdUnit) {
 										var slotId = ads[id].networkData.dfpAdunit, container = $('#' + slotId);
-										var currentTime = new Date().getTime();
-										container.attr('data-render-time', currentTime);
-										console.log('rendered slot ', id, ' ', new Date(), ' ', document.hasFocus());
+										var currentTime = new Date();
+										container.attr('data-render-time', currentTime.getTime());
+										console.log('rendered slot ', id, ' ', currentTime, ' ', document.hasFocus());
 										if (ads[id].networkData && ads[id].networkData.refreshSlot) {
 											refreshAdSlot.refreshSlot(container, ads[id]);
 										}

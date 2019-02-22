@@ -92,7 +92,6 @@ var utils = require('../libs/utils'),
 		}
 	},
 	onScroll = function () {
-		console.log('scrolled', ads);
 		getAllInViewAds();
 
 		for (var i = 0; i < inViewAds.length; i++) {
