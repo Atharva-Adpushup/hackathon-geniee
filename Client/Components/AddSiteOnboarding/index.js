@@ -1,23 +1,13 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import CustomButton from '../CustomButton';
 import siteService from '../../services/siteService';
 import userService from '../../services/userService';
+import OnboardingCard from '../OnboardingCard';
 
 class AddSiteOnboarding extends Component {
-	constructor(props) {
-		super(props);
-	}
-
 	state = {
-		site: this.props.existingSite,
 		showForm: false
-	};
-
-	onChange = e => {
-		const { name, value } = e.target;
-
-		this.setState({ [name]: value });
 	};
 
 	toggleForm = () => this.setState(state => ({ showForm: !state.showForm }));
@@ -55,8 +45,7 @@ class AddSiteOnboarding extends Component {
 	addNewSite = e => {
 		e.preventDefault();
 
-		const { onSiteAdd } = this.props;
-		const { site } = this.state;
+		const { onSiteAdd, site } = this.props;
 		const onboardingStage = 'onboarding';
 		const step = 1;
 
@@ -87,42 +76,65 @@ class AddSiteOnboarding extends Component {
 	};
 
 	render() {
-		const { siteId, existingSite, completed, onSiteAdd } = this.props;
-		const { showForm, site } = this.state;
+		const { siteId, existingSite, site, completed, onSiteAdd, changeSite, className } = this.props;
+		const { showForm } = this.state;
 
-		if (!completed && showForm) {
-			return (
-				<form onSubmit={this.addNewSite}>
-					<input type="text" name="site" value={site} onChange={this.onChange} />
-					<CustomButton type="submit">Add Site</CustomButton>
-				</form>
-			);
-		}
+		return (
+			<OnboardingCard
+				isActiveStep={!completed}
+				count={1}
+				imgPath="/assets/images/ob_add_site.png"
+				heading="Add Site"
+				description="Let us know the website on which you want to use AdPushup. If you have more than one
+						site then you can easily add them later through the dashboard."
+			>
+				<Fragment>
+					{!completed && showForm && (
+						<form onSubmit={this.addNewSite}>
+							<input type="text" name="site" value={site} onChange={changeSite} />
+							<CustomButton type="submit">Edit Site</CustomButton>
+						</form>
+					)}
 
-		if (!completed && existingSite) {
-			return (
-				<section>
-					<CustomButton onClick={this.addExistingSite}>Continue with {existingSite}</CustomButton>{' '}
-					or{' '}
-					<CustomButton variant="secondary" onClick={this.toggleForm}>
-						Edit Site
-					</CustomButton>
-				</section>
-			);
-		}
+					{!completed && existingSite && (
+						<Fragment>
+							<CustomButton onClick={this.addExistingSite}>
+								Continue with {existingSite}
+							</CustomButton>
 
-		return <div>{existingSite} added!</div>;
+							<CustomButton variant="secondary" onClick={this.toggleForm}>
+								Edit Site
+							</CustomButton>
+						</Fragment>
+					)}
+
+					{!completed && !existingSite && (
+						<Fragment>
+							<form onSubmit={this.addNewSite}>
+								<input type="text" name="site" value={site} onChange={changeSite} />
+								<CustomButton type="submit">Add Site</CustomButton>
+							</form>
+						</Fragment>
+					)}
+
+					{completed && <Fragment>{site} added!</Fragment>}
+				</Fragment>
+			</OnboardingCard>
+		);
 	}
 }
 
 AddSiteOnboarding.propTypes = {
 	existingSite: PropTypes.string,
+	site: PropTypes.string,
+	changeSite: PropTypes.func.isRequired,
 	completed: PropTypes.bool.isRequired,
 	onSiteAdd: PropTypes.func.isRequired
 };
 
 AddSiteOnboarding.defaultProps = {
-	existingSite: ''
+	existingSite: '',
+	site: ''
 };
 
 export default AddSiteOnboarding;

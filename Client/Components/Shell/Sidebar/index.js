@@ -51,7 +51,7 @@ const Sidebar = ({ show }) => (
 		</ul>
 
 		<div className="cta-btn-wrap">
-			<NavLink to="/addSite" className="cta-btn" activeClassName="active">
+			<NavLink to="/onboarding" className="cta-btn" activeClassName="active">
 				<span className="cta-btn-txt-wrap">
 					<span className="cta-btn-text">Add New Website</span>
 				</span>

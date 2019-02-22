@@ -9,6 +9,7 @@ class OnBoarding extends Component {
 	state = {
 		isOnboarding: null,
 		siteId: null,
+		existingSite: '',
 		site: '',
 		onboardingStage: '',
 		step: 0
@@ -27,9 +28,10 @@ class OnBoarding extends Component {
 					const { isOnboarding, onboardingStage, siteId, site } = response.data;
 					this.setState({
 						isOnboarding,
-						onboardingStage,
-						siteId,
-						site,
+						onboardingStage: onboardingStage || '',
+						siteId: siteId || null,
+						existingSite: site || '',
+						site: site || '',
 						step: 0
 					});
 				})
@@ -52,6 +54,12 @@ class OnBoarding extends Component {
 		}
 	}
 
+	changeSite = e => {
+		const { value } = e.target;
+
+		this.setState({ site: value });
+	};
+
 	onSiteAdd = (siteId, site, onboardingStage, step) => {
 		// TODO:update onboardingStage and step
 		this.setState({ isOnboarding: false, siteId, site, onboardingStage, step });
@@ -62,18 +70,18 @@ class OnBoarding extends Component {
 	};
 
 	render() {
-		const { siteId, site, step } = this.state;
+		const { siteId, existingSite, site, step } = this.state;
 
 		return (
-			<div>
+			<div className="onboarding-wrapper">
 				<AddSiteOnboarding
 					siteId={siteId}
-					existingSite={site}
+					existingSite={existingSite}
+					site={site}
+					changeSite={this.changeSite}
 					onSiteAdd={this.onSiteAdd}
 					completed={step >= 1}
 				/>
-				<br />
-				<br />
 				<VerifyInitCodeOnboarding
 					siteId={siteId}
 					site={site}
