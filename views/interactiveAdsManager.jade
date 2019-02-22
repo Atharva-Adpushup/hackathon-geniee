@@ -1,0 +1,31 @@
+//- Innovative Ads Manager interface
+extends layout/base
+
+block getTitle
+	- var titleVar = "Innovative Ads Manager"
+
+block append headScripts
+	- siteId = siteId ? siteId : false
+	script.
+		window.siteId = !{siteId}
+		window.isSuperUser = !{isSuperUser}
+		window.iam = { siteId: !{siteId}, isSuperUser: !{isSuperUser}, channels: !{JSON.stringify(channels)}, meta: !{JSON.stringify(meta)} }
+
+block append headCss
+	if environment == "production"
+		link(href="/assets/css/builds/interactiveAdsManager.min.css", rel="stylesheet", type="text/css")
+	else
+		link(href="/assets/css/libs/interactiveAdsManager.css", rel="stylesheet", type="text/css")
+
+
+block bodyContent
+	include layout/sideBar
+	.pageContainer.page-container
+		include layout/header
+		.pageContentWrapper.page-content
+			.pageContentInner.page-content--inner
+				.loaderwrapper.spinner
+					img(src="/assets/images/loaderLogo.png")
+				#interactiveAdsPanel
+
+	script(src="/assets/js/builds/interactiveAdsManager.js?v=1524575103971")

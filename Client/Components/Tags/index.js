@@ -1,4 +1,5 @@
 import React from 'react';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const Tags = props => {
 	const { labels = [] } = props;
@@ -9,9 +10,17 @@ const Tags = props => {
 		<ul className="tags">
 			{labels.map((label, key) => (
 				<li key={key}>
-					<a href="#" className="tag">
-						{label}
-					</a>
+					<OverlayTrigger
+						placement="bottom"
+						overlay={
+							<Tooltip id={`custom-tooltip-${key}-${label}}`}>{label.replace(':', '-')}</Tooltip>
+						}
+						key={`custom-overlay-${key}-${label}}`}
+					>
+						<a href="#" className="tag" onClick={e => e.preventDefault()}>
+							{label}
+						</a>
+					</OverlayTrigger>
 				</li>
 			))}
 		</ul>

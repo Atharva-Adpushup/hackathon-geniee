@@ -9,8 +9,8 @@ var indexController = require('./indexController'),
 	authController = require('./authController'),
 	opsController = require('./opsController'),
 	tagManagerController = require('./tagManagerController'),
-	commonConsts = require('../configs/commonConsts'),
-	_ = require('lodash');
+	innovativeAdsManagerController = require('./innovativeAdsManagerController');
+(commonConsts = require('../configs/commonConsts')), (_ = require('lodash'));
 
 module.exports = function(app) {
 	// Always invoked middleware added to check for user demo
@@ -64,6 +64,8 @@ module.exports = function(app) {
 				[
 					'/ops',
 					'/tagManager',
+					'/innovative-ads-manager/',
+					'/innovativeAdsManager/data/',
 					'/user/site',
 					'/genieeApi',
 					'/user/connectGoogle',
@@ -180,6 +182,14 @@ module.exports = function(app) {
 			next();
 		},
 		tagManagerController
+	);
+
+	app.use(
+		['/innovative-ads-manager/', '/innovativeAdsManager/data/'],
+		function(req, res, next) {
+			next();
+		},
+		innovativeAdsManagerController
 	);
 
 	/*****************Login URL's End *******************/
