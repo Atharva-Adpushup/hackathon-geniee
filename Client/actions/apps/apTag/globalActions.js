@@ -3,9 +3,9 @@ import axiosInstance from '../../../helpers/axiosInstance';
 import { errorHandler } from '../../../helpers/commonFunctions';
 
 const masterSave = siteId => (_, getState) => {
-	const data = { siteId, ads: getState().ads.content };
-	axiosInstance
-		.post('/apTag/masterSave', { data })
+	const data = { siteId, ads: getState().apps.apTag.ads.content };
+	return axiosInstance
+		.post('/apTag/masterSave', data)
 		.then(() => window.alert('Save successful'))
 		.catch(err => errorHandler(err, 'Master Save Failed'));
 };

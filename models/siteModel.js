@@ -29,6 +29,7 @@ var model = require('../helpers/model'),
 			'adsensePublisherId',
 			'adNetworkSettings',
 			'isManual',
+			'isInnovative',
 			'gdpr',
 			'ampSettings'
 		];
@@ -44,6 +45,7 @@ var model = require('../helpers/model'),
 			'genieeMediaId',
 			'adsensePublisherId',
 			'isManual',
+			'isInnovative',
 			'gdpr',
 			'ampSettings'
 		];

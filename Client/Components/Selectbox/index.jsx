@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 const findSelected = props => {
-	const { selected = null, title, options } = props;
+	const { selected, title, options } = props;
 	let name = title;
 	if (selected) {
 		for (let i = 0; i < options.length; i += 1) {
@@ -35,9 +35,9 @@ class SelectBox extends Component {
 	};
 
 	render() {
-		const { selected, name } = this.state;
-		const { options, id, title, wrapperClassName, dropdownClassName, type } = this.props;
-		const buttonTitle = name || title;
+		const { name } = this.state;
+		const { selected, options, id, title, wrapperClassName, dropdownClassName, type } = this.props;
+		const buttonTitle = selected ? name : title;
 		return (
 			<div className={`custom-select-box-wrapper ${wrapperClassName}`}>
 				<DropdownButton
@@ -67,8 +67,13 @@ class SelectBox extends Component {
 SelectBox.propTypes = {
 	id: PropTypes.string.isRequired,
 	onSelect: PropTypes.func.isRequired,
-	options: PropTypes.arrayOf(PropTypes.shape({ name: PropTypes.string, value: PropTypes.string }))
-		.isRequired,
+	options: PropTypes.arrayOf(
+		PropTypes.shape({
+			name: PropTypes.string,
+			value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.number])
+		})
+	).isRequired,
+	selected: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.number]),
 	dropdownClassName: PropTypes.string,
 	wrapperClassName: PropTypes.string,
 	title: PropTypes.string,
@@ -79,7 +84,8 @@ SelectBox.defaultProps = {
 	title: 'Select Value',
 	dropdownClassName: '',
 	wrapperClassName: '',
-	type: 'default'
+	type: 'default',
+	selected: null
 };
 
 export default SelectBox;
