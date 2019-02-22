@@ -351,10 +351,15 @@ module.exports = {
 			var $el = $(el),
 				elHeight = $el.height(),
 				elWidth = $el.width(),
+				elTop = $el.offset().top,
+				viewPort = this.getViewport(),
 				elPixel = elWidth * elHeight,
 				inViewHeight = this.isElementInViewport(el) && this.isElementInViewport(el).inViewHeight,
 				inViewPixel = elWidth * inViewHeight,
 				percentageInView = (inViewPixel * 100) / elPixel;
+			if (elHeight == 0 && elTop >= viewPort.top && elTop <= viewPort.bottom) {
+				return true;
+			}
 			if (elPixel < 242000) return percentageInView >= 50;
 			return percentageInView >= 30;
 		}
