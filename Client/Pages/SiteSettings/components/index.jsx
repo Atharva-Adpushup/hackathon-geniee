@@ -2,15 +2,7 @@ import React, { Component } from 'react';
 import { Row, Col, Panel, Button } from 'react-bootstrap';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import {
-	faCheckCircle,
-	faThumbsUp,
-	faChartArea,
-	faCog,
-	faExclamationCircle,
-	faExclamationTriangle,
-	faPlusCircle
-} from '@fortawesome/free-solid-svg-icons';
+import { faCopy } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 
@@ -19,21 +11,29 @@ import FieldGroup from '../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../Components/CustomButton/index';
 import ActionCard from '../../../Components/ActionCard/index';
 import OverlayTooltip from '../../../Components/OverlayTooltip/index';
+import { copyToClipBoard } from '../../../Apps/ApTag/lib/helpers';
 
-library.add(
-	faCheckCircle,
-	faThumbsUp,
-	faChartArea,
-	faCog,
-	faExclamationCircle,
-	faExclamationTriangle,
-	faPlusCircle
-);
+library.add(faCopy);
 
 class SiteSettings extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {};
+		const {
+			match: {
+				params: { siteId }
+			}
+		} = props;
+
+		this.state = {
+			codeText: `<script data-cfasync="false" type="text/javascript">
+(function(w, d) {
+	var s = d.createElement('script');
+	s.src = '//cdn.adpushup.com/${siteId}/adpushup.js';
+	s.type = 'text/javascript'; s.async = true;
+	(d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s);
+})(window, document);
+</script>`
+		};
 		this.handleButtonClickHandler = this.handleButtonClickHandler.bind(this);
 	}
 
@@ -44,18 +44,7 @@ class SiteSettings extends Component {
 	}
 
 	renderLeftPanel() {
-		const {
-			match: {
-				params: { siteId }
-			}
-		} = this.props;
-		const codeText = `<script data-cfasync="false" type="text/javascript">
-(function(w, d) { var s = d.createElement('script');
-	s.src = '//cdn.adpushup.com/${siteId}/adpushup.js';
-	s.type = 'text/javascript'; s.async = true;
-	(d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s);
-})(window, document);
-</script>`;
+		const { codeText } = this.state;
 
 		return (
 			<div className="clearfix">
@@ -73,9 +62,12 @@ class SiteSettings extends Component {
 					variant="secondary"
 					className=""
 					name="convertButton"
-					onClick={this.handleButtonClickHandler}
+					onClick={() => copyToClipBoard(codeText)}
 				>
-					Copy to Clipboard
+					<span>
+						Copy to Clipboard
+						<FontAwesomeIcon icon="copy" className="u-margin-l2" />
+					</span>
 				</CustomButton>
 			</div>
 		);
