@@ -150,7 +150,8 @@ function startCreation(forced) {
 				adp.creationProcessStarted = true;
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
-				config.selectedVariationName = selectVariation.name;
+				config.selectedVariationName = selectedVariation.name;
+				config.selectedVariationType = selectedVariation.isControl ? commonConsts.PAGE_VARIATION_TYPE.BENCHMARK : commonConsts.PAGE_VARIATION_TYPE.NON_BENCHMARK;
 
 				//Geniee method call for chosen variation id
 				if (isGenieeModeSelected) {

@@ -154,29 +154,33 @@ module.exports = {
 				siteId: adpConfig.siteId,
 				siteDomain: adpConfig.siteDomain,
 				url: adpConfig.pageUrl,
-				mode: data.mode, // Denotes which mode is running (adpushup, benchmark or fallback)
+				mode: data.mode, // Denotes which mode is running (adpushup or fallback)
 				errorCode: data.eventType, // Denotes the error code (no error, pagegroup not found etc.)
 				pageGroup: adpConfig.pageGroup,
 				pageVariationId: adpConfig.selectedVariation,
 				pageVariationName: adpConfig.selectedVariationName,
+				pageVariationType: adpConfig.selectedVariationType,
 				platform: adpConfig.platform,
 				isGeniee: adpConfig.isGeniee || false,
-				sections: data.ads && data.ads.length ? data.ads.map(
-					function(ad) {
-						if (this.isHBActiveForAd(ad)) {
-							ad.services.push(commonConsts.SERVICES.HB);
-						}
+				sections:
+					data.ads && data.ads.length
+						? data.ads.map(
+								function(ad) {
+									if (this.isHBActiveForAd(ad)) {
+										ad.services.push(commonConsts.SERVICES.HB);
+									}
 
-						return {
-							sectionId: ad.isManual ? ad.originalId : ad.id,
-							sectionName: ad.sectionName,
-							status: ad.status,
-							network: ad.network,
-							networkAdUnitId: this.getNetworkAdUnitIdForAd(ad),
-							services: ad.services
-						};
-					}.bind(this)
-				) : null
+									return {
+										sectionId: ad.isManual ? ad.originalId : ad.id,
+										sectionName: ad.sectionName,
+										status: ad.status,
+										network: ad.network,
+										networkAdUnitId: this.getNetworkAdUnitIdForAd(ad),
+										services: ad.services
+									};
+								}.bind(this)
+						  )
+						: null
 			};
 
 			if (!feedbackObj.packetId || !feedbackObj.siteId) {

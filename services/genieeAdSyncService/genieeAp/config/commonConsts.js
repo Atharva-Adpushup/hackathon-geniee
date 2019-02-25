@@ -48,8 +48,11 @@ module.exports = {
 	},
 	MODE: {
 		ADPUSHUP: 1,
-		BENCHMARK: 2,
-		FALLBACK: 3
+		FALLBACK: 2
+	},
+	PAGE_VARIATION_TYPE: {
+		NON_BENCHMARK: 1,
+		BENCHMARK: 2
 	},
 	COOKIE: {
 		NAME: '_adp_utm_session_',

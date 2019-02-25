@@ -157,6 +157,7 @@ const _ = require('lodash'),
 			customJs: variation.customJs,
 			adpKeyValues: variation.adpKeyValues,
 			contentSelector: isContentSelector ? contentSelector : '',
+			isControl: variation.isControl ? variation.isControl : false,
 			ads: ads,
 			personalization: variation.personalization,
 			// Data required for auto optimiser model
