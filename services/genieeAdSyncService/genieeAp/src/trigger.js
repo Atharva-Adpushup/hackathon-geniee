@@ -9,15 +9,15 @@ var adp = window.adpushup,
 	generateMediaNetHeadCode = require('./adCodeGenerator').generateMediaNetHeadCode,
 	isAdContainerInView = require('../libs/lazyload'),
 	browserConfig = require('../libs/browserConfig'),
-	getContainer = function(ad) {
+	getContainer = function (ad) {
 		var defer = $.Deferred(),
 			isResponsive = !!(ad.networkData && ad.networkData.isResponsive),
 			computedStylesObject = isResponsive
 				? {}
 				: {
-						width: ad.width,
-						height: ad.height
-				  };
+					width: ad.width,
+					height: ad.height
+				};
 
 		try {
 			var $adEl = $('#' + ad.id);
@@ -28,7 +28,7 @@ var adp = window.adpushup,
 			return defer.reject('Unable to get adpushup container');
 		}
 	},
-	trigger = function(adId) {
+	trigger = function (adId) {
 		var isDOMElement = !!document.getElementById(adId);
 
 		// NOTE: Stop execution of this module if related DOM element does not exist
@@ -43,7 +43,7 @@ var adp = window.adpushup,
 		if (adp && Array.isArray(adp.config.manualAds) && adp.config.manualAds.length && adp.utils.isUrlMatching()) {
 			var manualAds = adp.config.manualAds,
 				newAdId = utils.uniqueId(),
-				manualAd = manualAds.filter(function(ad) {
+				manualAd = manualAds.filter(function (ad) {
 					return ad.id == adId;
 				})[0],
 				ad = $.extend(true, {}, manualAd),
@@ -51,12 +51,14 @@ var adp = window.adpushup,
 				adSize = ad.width + 'x' + ad.height,
 				isAdId = !!(ad && ad.id),
 				domElem = document.getElementById(ad.id),
+				currentTime = new Date().getTime(),
 				isAdElement = !!(isAdId && domElem && domElem.children && domElem.children.length === 1);
 
 			ad.id = newAdId;
 			document.getElementById(adId).setAttribute('id', newAdId);
 			document.getElementById(newAdId).setAttribute('data-section', newAdId);
 			document.getElementById(newAdId).setAttribute('data-orig-id', adId);
+			document.getElementById(newAdId).setAttribute('data-render-time', currentTime);
 			if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
 				if (ad.networkData) ad.networkData.zoneContainerId = 'ADP_' + siteId + '_' + adSize + '_' + newAdId;
 			}
@@ -77,7 +79,7 @@ var adp = window.adpushup,
 				};
 
 				return getContainer(ad)
-					.done(function(container) {
+					.done(function (container) {
 						adp.config.renderedTagAds = adp.config.renderedTagAds || [];
 						adp.config.renderedTagAds.push({ newId: newAdId, oldId: adId });
 						// Once container has been found, execute adp head code if ad network is "adpTags"
@@ -89,7 +91,7 @@ var adp = window.adpushup,
 							isMedianetHeaderCodePlaced = true;
 						}
 						if (ad.enableLazyLoading == true) {
-							isAdContainerInView(container).done(function() {
+							isAdContainerInView(container).done(function () {
 								// Send feedback call
 								utils.sendFeedback(feedbackData);
 								// Place the ad in the container
@@ -102,7 +104,7 @@ var adp = window.adpushup,
 							return placeAd(container, ad);
 						}
 					})
-					.fail(function(err) {
+					.fail(function (err) {
 						throw new Error(err);
 					});
 			}

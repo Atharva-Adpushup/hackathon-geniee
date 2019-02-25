@@ -50,7 +50,7 @@ function init(w, d) {
 		} else {
 			adpQue = [];
 		}
-		gpt.refreshIntervalSwitch(w);
+		//gpt.refreshIntervalSwitch(w);
 
 		var existingAdpTags = Object.assign({}, adp.adpTags),
 			adpTagsModule = require('./adpTags');
@@ -90,6 +90,7 @@ function init(w, d) {
 		// Declaring prebid winner, if anyone
 		w.pbjs.que.push(function() {
 			w.pbjs.onEvent('bidWon', function(bidData) {
+				console.log('===BidWon====', bidData);
 				var slot = adp.adpTags.adpSlots[bidData.adUnitCode],
 					computedCPMValue = utils.isValidThirdPartyDFPAndCurrencyConfig(apConfig) ? 'originalCpm' : 'cpm';
 
