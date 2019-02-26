@@ -104,6 +104,9 @@ class NetworkOptions extends Component {
 			refreshSlot = isAdNetworkData && props.ad.networkData.refreshSlot
 				? props.ad.networkData.refreshSlot
 				: false,
+			refreshInterval = isAdNetworkData && props.ad.networkData.refreshInterval
+				? props.ad.networkData.refreshInterval
+				: null,
 			overrideActive = isAdNetworkData && props.ad.networkData.overrideActive
 				? props.ad.networkData.overrideActive
 				: false,
@@ -147,6 +150,7 @@ class NetworkOptions extends Component {
 						onCancel={props.onCancel}
 						code={code}
 						refreshSlot={refreshSlot}
+						refreshInterval={refreshInterval}
 						overrideActive={overrideActive}
 						overrideSizeTo={overrideSizeTo}
 						buttonType={props.buttonType || 1}
@@ -194,6 +198,7 @@ class NetworkOptions extends Component {
 						fpKey={fpKey}
 						priceFloor={priceFloor}
 						refreshSlot={refreshSlot}
+						refreshInterval={refreshInterval}
 						headerBidding={dynamicAllocation}
 						submitHandler={this.submitHandler}
 						onCancel={this.props.onCancel}
