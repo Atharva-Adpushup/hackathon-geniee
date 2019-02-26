@@ -66,10 +66,6 @@ class ReportingPanel extends React.Component {
 					this.setState({
 						updateStatusText: `Note - The reports were last updated on ${updatedDate}.`
 					});
-				} else if (res.status == 'Running') {
-					this.setState({
-						updateStatusText: `Note - The network reporting data is being crunched and you will see updated data shortly.`
-					});
 				}
 			}
 		});
@@ -256,7 +252,11 @@ class ReportingPanel extends React.Component {
 						/>
 					</Col>
 					<Col sm={12} className="updateStatusDiv">
-						{updateStatusText}
+						{updateStatusText
+							? <span>{updateStatusText}</span>
+							: <span className="runningStatus">
+									Note - The network reporting data is being crunched right now which may affect the reporting data. You will see updated data shortly.
+								</span>}
 					</Col>
 					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : reportPane}</Col>
 				</Row>
