@@ -58,4 +58,23 @@ const CONTROL_CONVERSION_NETWORKS = {
 	}
 };
 
-module.exports = { COMPONENT_TITLES, CONTROL_CONVERSION_NETWORKS };
+const NETWORKS_COLLECTION = [
+	{
+		name: 'Adsense',
+		value: 'adsense'
+	},
+	{
+		name: 'AdX',
+		value: 'adx'
+	},
+	{
+		name: 'DFP',
+		value: 'dfp'
+	},
+	{
+		name: 'Medianet',
+		value: 'medianet'
+	}
+];
+
+module.exports = { COMPONENT_TITLES, CONTROL_CONVERSION_NETWORKS, NETWORKS_COLLECTION };
