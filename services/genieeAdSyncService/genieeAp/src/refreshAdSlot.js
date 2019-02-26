@@ -10,7 +10,10 @@ var utils = require('../libs/utils'),
 	inViewAds = [],
 	setRefreshTimeOut = function (container, ad, refreshInterval) {
 		if (utils.checkElementInViewPercent(container)) {
-			var refreshInterval = refreshInterval !== undefined ? refreshInterval : commonConsts.AD_REFRESH_INTERVAL;
+			var refreshInterval =
+				refreshInterval !== undefined
+					? refreshInterval
+					: parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL;
 			var currentTime = new Date().getTime();
 			container.attr('data-refresh-time', currentTime);
 			var oldTimeoutId = container.attr('data-timeout');
@@ -101,12 +104,13 @@ var utils = require('../libs/utils'),
 				adRenderTime = container.attr('data-render-time'),
 				lastRefreshTime = container.attr('data-refresh-time'),
 				currentTime = new Date().getTime(),
+				adRefreshInterval = parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL,
 				timeDifferenceInSec,
 				refreshInterval;
 			if (lastRefreshTime) {
 				// if Ad has been rendered before
 				timeDifferenceInSec = currentTime - lastRefreshTime;
-				if (timeDifferenceInSec > commonConsts.AD_REFRESH_INTERVAL) {
+				if (timeDifferenceInSec > adRefreshInterval) {
 					// if last refresh turn has been missed
 					refreshInterval = 0;
 					setRefreshTimeOut(container, ad, refreshInterval);
@@ -115,10 +119,12 @@ var utils = require('../libs/utils'),
 			} else {
 				// If ad is rendering for the first time.
 				timeDifferenceInSec = currentTime - adRenderTime;
-				if (timeDifferenceInSec > commonConsts.AD_REFRESH_INTERVAL) {
+				if (timeDifferenceInSec > adRefreshInterval) {
 					// wait for 2 sec to count the impression of ad renedered first time.
 					refreshInterval = 2000;
-				} else refreshInterval = commonConsts.AD_REFRESH_INTERVAL; // lazyloading case (if ad has just rendered, refreesh it after 30sec.)
+				} else {
+					refreshInterval = adRefreshInterval;
+				} // lazyloading case (if ad has just rendered, refreesh it after 30sec.)
 				setRefreshTimeOut(container, ad, refreshInterval);
 			}
 		}
@@ -132,12 +138,13 @@ var utils = require('../libs/utils'),
 				ad = inViewAd.ad,
 				lastRefreshTime = container.attr('data-refresh-time'),
 				currentTime = new Date().getTime(),
+				adRefreshInterval = parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL,
 				timeDifferenceInSec,
 				refreshInterval;
 			if (lastRefreshTime) {
 				// if Ad has been rendered before
 				timeDifferenceInSec = currentTime - lastRefreshTime;
-				if (timeDifferenceInSec > commonConsts.AD_REFRESH_INTERVAL) {
+				if (timeDifferenceInSec > adRefreshInterval) {
 					// if last refresh turn has been missed
 					refreshInterval = 0;
 					setRefreshTimeOut(container, ad, refreshInterval);

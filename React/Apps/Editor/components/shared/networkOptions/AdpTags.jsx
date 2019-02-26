@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import { Row, Col, Button, OverlayTrigger, Tooltip, Alert } from 'react-bootstrap';
 import CodeBox from '../codeBox';
-import { priceFloorKeys, iabSizes } from '../../../consts/commonConsts';
+import { priceFloorKeys, iabSizes, refreshIntervals } from '../../../consts/commonConsts';
 import SelectBox from '../select/select.js';
 import CustomToggleSwitch from '../customToggleSwitch.jsx';
 import { getSupportedAdSizes } from '../../../../OpsPanel/lib/helpers';
@@ -17,6 +17,7 @@ class AdpTags extends Component {
 			headerBidding,
 			code,
 			refreshSlot,
+			refreshInterval,
 			overrideActive,
 			overrideSizeTo,
 			primaryAdSize
@@ -47,6 +48,7 @@ class AdpTags extends Component {
 			multipleAdSizes: [],
 			dfpAdunitId: '',
 			refreshSlot,
+			refreshInterval,
 			isBackwardCompatibleSizes: true,
 			isResponsive: isResponsiveAdSize,
 			overrideActive,
@@ -98,6 +100,7 @@ class AdpTags extends Component {
 			pf,
 			keyValues,
 			refreshSlot,
+			refreshInterval,
 			overrideActive,
 			overrideSizeTo,
 			multipleAdSizes,
@@ -113,7 +116,6 @@ class AdpTags extends Component {
 		if (shouldMultipleAdSizesBeComputed) {
 			computedMultipleAdSizes = this.getMultipleAdSizesOfPrimaryAdSize(isBackwardCompatibleSizes);
 		}
-
 		this.props.submitHandler({
 			headerBidding: !!hbAcivated,
 			keyValues: {
@@ -121,6 +123,7 @@ class AdpTags extends Component {
 				[fpKey]: pf
 			},
 			refreshSlot,
+			refreshInterval,
 			overrideActive,
 			overrideSizeTo: overrideActive ? overrideSizeTo : null,
 			multipleAdSizes: computedMultipleAdSizes,
@@ -527,30 +530,53 @@ class AdpTags extends Component {
 				{this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null}
 				{!this.props.geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
 				{!this.props.geniee && this.props.networkConfig && this.props.networkConfig.enableRefreshSlot
-					? <Row>
-							<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
-								<CustomToggleSwitch
-									labelText="Refresh Slot"
-									className="mB-10"
-									checked={this.state.refreshSlot}
-									onChange={val => {
-										this.setState({ refreshSlot: !!val });
-									}}
-									layout="horizontal"
-									size="m"
-									on="Yes"
-									off="No"
-									defaultLayout={this.props.fromPanel ? false : true}
-									name={this.props.id ? `refreshSlotSwitch-${this.props.id}` : 'refreshSlotSwitch'}
-									id={
-										this.props.id
-											? `js-refresh-slot-switch-${this.props.id}`
-											: 'js-refresh-slot-switch'
-									}
-									customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
-								/>
-							</Col>
-						</Row>
+					? <div>
+							<Row>
+								<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+									<CustomToggleSwitch
+										labelText="Refresh Slot"
+										className="mB-10"
+										checked={this.state.refreshSlot}
+										onChange={val => {
+											this.setState({ refreshSlot: !!val });
+										}}
+										layout="horizontal"
+										size="m"
+										on="Yes"
+										off="No"
+										defaultLayout={this.props.fromPanel ? false : true}
+										name={this.props.id ? `refreshSlotSwitch-${this.props.id}` : 'refreshSlotSwitch'}
+										id={
+											this.props.id
+												? `js-refresh-slot-switch-${this.props.id}`
+												: 'js-refresh-slot-switch'
+										}
+										customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+									/>
+								</Col>
+							</Row>
+							<Row>
+								<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
+									<strong>Refresh Interval</strong>
+								</Col>
+								<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
+									<SelectBox
+										className="mB-10"
+										value={this.state.refreshInterval || refreshIntervals[0]}
+										showClear={false}
+										onChange={refreshInterval => {
+											this.setState({ refreshInterval });
+										}}
+									>
+										{refreshIntervals.map((item, index) => (
+											<option key={item} value={item}>
+												{item}
+											</option>
+										))}
+									</SelectBox>
+								</Col>
+							</Row>
+						</div>
 					: null}
 				{this.renderAdvancedBlock()}
 				<div>{this.renderButtons(buttonType, showButtons, this.save, onCancel)}</div>
