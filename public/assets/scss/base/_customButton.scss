@@ -1,232 +1,226 @@
 .btn.btn-lightBg {
-    padding:        5px 10px;
-    font-size:      $LPFormButtonSize;
-    text-transform: uppercase;
-    @include border-radius(3px);
-    border:         1px solid $primaryColor !important;
-    color:          $primaryColor;
-    @include transition(all, .2s, ease);
-    font-weight:    bold;
-    background:     $whiteColor;
-    box-shadow:     none;
+	padding: 5px 10px;
+	font-size: $LPFormButtonSize;
+	text-transform: uppercase;
+	@include border-radius(3px);
+	border: 1px solid $primaryColor !important;
+	color: $primaryColor;
+	@include transition(all, 0.2s, ease);
+	font-weight: bold;
+	background: $whiteColor;
+	box-shadow: none;
 
-    &:hover {
-        border-color: $primaryColor;
-        box-shadow:   0 6px 10px rgba(0, 0, 0, .23), 0 10px 30px rgba(0, 0, 0, .19);
-        background:   $whiteColor;
-        color:        $primaryColor;
-    }
-    &:focus {
-        background: $whiteColor;
-    }
-    &.btn-red {
-        background: $primaryColor;
-        color:      $whiteColor;
-    }
-    &.btn--success {
-        background: $GreenColor;
-        color: $whiteColor;
-    }
-    &.btn--success.btn-lightBg {
-        border-color: $GreenColor !important;
-    }
-    &.btn-del {
-        &:before {
-            content: '\f1f8';
-            @extend iconStyle;
-        }
-    }
-    &.btn-code {
-        &:before {
-            content: '\f121';
-            @extend iconStyle;
-        }
-    }
-    &.btn-del-line {
-        &:before {
-            content: '\f014';
-            @extend iconStyle;
-        }
-    }
-    &.btn-copy {
-        &:before {
-            content: '\f24d';
-            @extend iconStyle;
-        }
-    }
-    &.btn-expand {
-        &:before {
-            content: '\f065';
-            @extend iconStyle;            
-        }
-    }    
-    &.btn-compress {
-        &:before {
-            content: '\f066';
-            @extend iconStyle;            
-        }
-    }    
-    &.btn-edit {
-        &:before {
-            content: '\f121';
-            @extend iconStyle;
-        }
-    }
-    &.btn-save {
-        &:before {
-            content: '\f0c7';
-            @extend iconStyle;
-        }
-    }
-    &.btn-cancel {
-        &:before {
-            content: '\f00d';
-            @extend iconStyle;
-        }
-    }
-    &.btn-add {
-        &:before {
-            content: '\f067';
-            @extend iconStyle;
-        }
-    }
-    &.btn-download {
-        &:before {
-            content: '\f019';
-            @extend iconStyle;
-        }
-    }
-    &.btn-before {
-        &:before {
-            content: '\f0aa';
-            @extend iconStyle;
-        }
-    }
-    &.btn-after {
-        &:before {
-            content: '\f0ab';
-            @extend iconStyle;
-        }
-    }
-    &.btn-transform {
-        &:before {
-            content: '\f079';
-            @extend iconStyle;
-        }
-    }
-    &.btn-option {
-        &:before {
-            content: '\f013';
-            @extend iconStyle;
-        }
-    }
-    &.btn-back {
-        &:before {
-            content: '\f053';
-            @extend iconStyle;
-        }
-    }
-    &.btn-chevron-down
-    {
-        &:before {
-            content: '\f078';
-            @extend iconStyle;
-        }
-    }
-    &.btn-chevron-up
-    {
-        &:before {
-            content: '\f077';
-            @extend iconStyle;
-        }
-    }
-    &.btn--icon
-    {
-        &:before
-        {
-            margin: 0 !important;
-        }
-    }
+	&:hover {
+		border-color: $primaryColor;
+		box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19);
+		background: $whiteColor;
+		color: $primaryColor;
+	}
+	&:focus {
+		background: $whiteColor;
+	}
+	&.btn-red {
+		background: $primaryColor;
+		color: $whiteColor;
+	}
+	&.btn--success {
+		background: $GreenColor;
+		color: $whiteColor;
+	}
+	&.btn--success.btn-lightBg {
+		border-color: $GreenColor !important;
+	}
+	&.btn-del {
+		&:before {
+			content: '\f1f8';
+			@extend iconStyle;
+		}
+	}
+	&.btn-code {
+		&:before {
+			content: '\f121';
+			@extend iconStyle;
+		}
+	}
+	&.btn-del-line {
+		&:before {
+			content: '\f014';
+			@extend iconStyle;
+		}
+	}
+	&.btn-copy {
+		&:before {
+			content: '\f24d';
+			@extend iconStyle;
+		}
+	}
+	&.btn-expand {
+		&:before {
+			content: '\f065';
+			@extend iconStyle;
+		}
+	}
+	&.btn-compress {
+		&:before {
+			content: '\f066';
+			@extend iconStyle;
+		}
+	}
+	&.btn-edit {
+		&:before {
+			content: '\f121';
+			@extend iconStyle;
+		}
+	}
+	&.btn-save {
+		&:before {
+			content: '\f0c7';
+			@extend iconStyle;
+		}
+	}
+	&.btn-cancel {
+		&:before {
+			content: '\f00d';
+			@extend iconStyle;
+		}
+	}
+	&.btn-add {
+		&:before {
+			content: '\f067';
+			@extend iconStyle;
+		}
+	}
+	&.btn-download {
+		&:before {
+			content: '\f019';
+			@extend iconStyle;
+		}
+	}
+	&.btn-before {
+		&:before {
+			content: '\f0aa';
+			@extend iconStyle;
+		}
+	}
+	&.btn-after {
+		&:before {
+			content: '\f0ab';
+			@extend iconStyle;
+		}
+	}
+	&.btn-transform {
+		&:before {
+			content: '\f079';
+			@extend iconStyle;
+		}
+	}
+	&.btn-option {
+		&:before {
+			content: '\f013';
+			@extend iconStyle;
+		}
+	}
+	&.btn-back {
+		&:before {
+			content: '\f053';
+			@extend iconStyle;
+		}
+	}
+	&.btn-chevron-down {
+		&:before {
+			content: '\f078';
+			@extend iconStyle;
+		}
+	}
+	&.btn-chevron-up {
+		&:before {
+			content: '\f077';
+			@extend iconStyle;
+		}
+	}
+	&.btn--icon {
+		&:before {
+			margin: 0 !important;
+		}
+	}
 }
 
-
-
-.btn-align-left 
-{
-	&:before 
-	{
+.btn-align-left {
+	&:before {
 		content: '\f036';
-		font:normal normal normal 14px/1 FontAwesome;
-		transform:translate(0, 0);
-		-webkit-font-smoothing:antialiased;
+		font: normal normal normal 14px/1 FontAwesome;
+		transform: translate(0, 0);
+		-webkit-font-smoothing: antialiased;
 		display: inline-block;
-		margin-right: 5px;	
+		margin-right: 5px;
 	}
 }
-.btn-align-center 
-{
-	&:before 
-	{
+.btn-align-center {
+	&:before {
 		content: '\f039';
-		font:normal normal normal 14px/1 FontAwesome;
-		transform:translate(0, 0);
-		-webkit-font-smoothing:antialiased;
+		font: normal normal normal 14px/1 FontAwesome;
+		transform: translate(0, 0);
+		-webkit-font-smoothing: antialiased;
 		display: inline-block;
 		margin-right: 5px;
 	}
 }
-.btn-align-right 
-{
-	&:before 
-	{
+.btn-align-right {
+	&:before {
 		content: '\f038';
-		font:normal normal normal 14px/1 FontAwesome;
-		transform:translate(0, 0);
-		-webkit-font-smoothing:antialiased;
+		font: normal normal normal 14px/1 FontAwesome;
+		transform: translate(0, 0);
+		-webkit-font-smoothing: antialiased;
 		display: inline-block;
 		margin-right: 5px;
 	}
 }
-.btn-edit-css 
-{
-	&:before 
-	{
+.btn-edit-css {
+	&:before {
 		content: 'css \A \f121';
-		font:normal normal normal 14px/1 FontAwesome;
-		transform:translate(0, 0);
-		-webkit-font-smoothing:antialiased;
+		font: normal normal normal 14px/1 FontAwesome;
+		transform: translate(0, 0);
+		-webkit-font-smoothing: antialiased;
 		display: inline-block;
 	}
 }
 
-.btn.btn-Small 
-{
+.btn.btn-Small {
 	padding: 0 2px;
-	text-transform:capitalize;
+	text-transform: capitalize;
 	width: 100%;
 }
 
 %btn-icn {
-    font:normal normal normal 14px/1 FontAwesome;
-    color: $primaryColor;
-    background: none;
-    border: none;
-    margin: 0 10px;
+	font: normal normal normal 14px/1 FontAwesome;
+	color: $primaryColor;
+	background: none;
+	border: none;
+	margin: 0 10px;
 }
 
 .btn-icn-edit {
-    @extend %btn-icn;
-    margin: 0;
+	@extend %btn-icn;
+	margin: 0;
 
-    &:before {
-        content: '\f040';
-    }
+	&:before {
+		content: '\f040';
+	}
+}
+
+.btn-icn-copy {
+	@extend %btn-icn;
+	margin: 0;
+
+	&:before {
+		content: '\f24d';
+	}
 }
 
 .btn.btn-lightBg.btn-cancel.btn-ie-cancel {
-    padding: 5px 8px;
+	padding: 5px 8px;
 
-    &:before {
-        margin-right: 0;
-    }
+	&:before {
+		margin-right: 0;
+	}
 }

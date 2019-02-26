@@ -44,3 +44,7 @@ services/adpTags/Prebid.js
 Prebid.js
 __queries.sql
 clientDist
+flow.txt
+local-files/
+.eslintrc
+.prettierrc

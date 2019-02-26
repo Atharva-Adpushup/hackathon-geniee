@@ -13,7 +13,6 @@ class customCodeEditor extends React.Component {
 		};
 		this.updateCode = this.updateCode.bind(this);
 		this.save = this.save.bind(this);
-		this.updateCode = this.updateCode.bind(this);
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -81,9 +80,7 @@ class customCodeEditor extends React.Component {
 		// Check if code box is meant to be a regular text editor
 		if (this.props.textEdit) {
 			let className = 'codeEditor-small ';
-
 			const disabled = this.props.enableSave ? false : this.props.code == '';
-
 			className += this.props.parentExpanded ? ' codeEditor-large' : ' ';
 
 			return (

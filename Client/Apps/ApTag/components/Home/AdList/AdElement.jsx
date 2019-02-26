@@ -32,7 +32,6 @@ class AdElement extends Component {
 			: AMP_MESSAGE;
 
 	disableAd() {
-		const { ad, updateAd, modifyAdOnServer, user, match } = this.props;
 		const { isActive } = this.state;
 		const message = isActive
 			? 'Are you sure you want to archive this ad?'
@@ -42,10 +41,7 @@ class AdElement extends Component {
 				{
 					isActive: !isActive
 				},
-				() =>
-					user.isSuperUser
-						? updateAd(ad.id, { isActive, archivedOn: +new Date() })
-						: modifyAdOnServer(match.params.siteId, ad.id, { isActive, archivedOn: +new Date() })
+				() => this.updateWrapper({ isActive: !isActive, archivedOn: +new Date() })
 			);
 		}
 	}
@@ -149,22 +145,30 @@ class AdElement extends Component {
 					</div>
 				) : null}
 				<pre style={{ wordBreak: 'break-word' }}>{code}</pre>{' '}
-				{user.isSuperUser ? (
-					<div>
-						<CustomButton variant="secondary" className="u-margin-l3 u-margin-t3 pull-right" onClick={() => this.toggleHandler('showNetworkDetails')}>
+				{user.isSuperUser && ad.formatData.type !== 'amp' ? (
+					<React.Fragment>
+						<CustomButton
+							variant="secondary"
+							className="u-margin-l3 u-margin-t3 pull-right"
+							onClick={() => this.toggleHandler('showNetworkDetails')}
+						>
 							Network Details
 						</CustomButton>
-						<CustomButton variant="secondary" className="u-margin-l3 u-margin-t3 pull-right" onClick={() => this.toggleHandler('showLazyload')}>
+						<CustomButton
+							variant="secondary"
+							className="u-margin-l3 u-margin-t3 pull-right"
+							onClick={() => this.toggleHandler('showLazyload')}
+						>
 							Lazyload Settings
 						</CustomButton>
-						{
-							!isAMP ? (
-								<CustomButton variant="secondary" className="u-margin-t3 pull-right" onClick={() => copyToClipBoard(code)}>
-									Copy AdCode
-								</CustomButton>
-							) : null
-						}
-					</div>
+						<CustomButton
+							variant="secondary"
+							className="u-margin-t3 pull-right"
+							onClick={() => copyToClipBoard(code)}
+						>
+							Copy AdCode
+						</CustomButton>
+					</React.Fragment>
 				) : null}
 			</div>
 		);
