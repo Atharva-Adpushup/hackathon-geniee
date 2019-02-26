@@ -1,24 +1,24 @@
 const status = {
-		text: {
-			SUCCESS: 'SUCCESS',
-			PENDING: 'PENDING',
-			FAILED: 'FAILED',
-			LOADING: 'LOADING',
-			RESET: 'RESET'
-		},
-		RESET: 0,
-		PENDING: 1,
-		SUCCESS: 2,
-		FAILED: 3,
-		LOADING: 4,
-		NOT_LOADED: 5,
-		LOADED: 6,
-		ARCHIVED: 7,
-		ACTIVE: 8,
-		PAUSED: 9,
-		FALSE: false,
-		TRUE: true
+	text: {
+		SUCCESS: 'SUCCESS',
+		PENDING: 'PENDING',
+		FAILED: 'FAILED',
+		LOADING: 'LOADING',
+		RESET: 'RESET'
 	},
+	RESET: 0,
+	PENDING: 1,
+	SUCCESS: 2,
+	FAILED: 3,
+	LOADING: 4,
+	NOT_LOADED: 5,
+	LOADED: 6,
+	ARCHIVED: 7,
+	ACTIVE: 8,
+	PAUSED: 9,
+	FALSE: false,
+	TRUE: true
+},
 	partners = {
 		geniee: {
 			name: 'geniee',
@@ -495,7 +495,8 @@ const status = {
 	},
 	incontentSections = {
 		SELECTORS_TREE_LEVEL: ['any', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
-	};
+	},
+	refreshIntervals = [30, 45, 60, 75, 90, 105, 120];
 
 export {
 	status,
@@ -541,5 +542,6 @@ export {
 	personalizationTypes,
 	typeOfAds,
 	iabSizes,
-	incontentSections
+	incontentSections,
+	refreshIntervals
 };
