@@ -10,23 +10,25 @@ import {
 	ToggleButton
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import SelectBox from '../Selectbox/index';
 
 const FieldGroup = ({
 	id,
 	label,
 	help,
 	type,
-	buttonToggle,
+	itemCollection,
 	onChange,
 	value,
 	isTextOnly,
 	...props
 }) => {
-	const isToggleButtonGroup = !!(type === 'toggle-button-group' && buttonToggle);
+	const isToggleButtonGroup = !!(type === 'toggle-button-group' && itemCollection);
+	const isDropDownButton = !!(type === 'toggle-dropdown-button' && itemCollection);
 	const buttonGroup = isToggleButtonGroup ? (
 		<ButtonToolbar>
 			<ToggleButtonGroup onChange={onChange} type="radio" name="options" defaultValue={1}>
-				{map(buttonToggle, (itemObject, key) => (
+				{map(itemCollection, (itemObject, key) => (
 					<ToggleButton key={`toggle-button-${key}`} value={itemObject.value}>
 						{itemObject.text}
 					</ToggleButton>
@@ -34,12 +36,24 @@ const FieldGroup = ({
 			</ToggleButtonGroup>
 		</ButtonToolbar>
 	) : null;
+	const dropdownButton = isDropDownButton ? (
+		<SelectBox
+			selected={value}
+			onSelect={onChange}
+			title={label}
+			id={id}
+			options={itemCollection}
+		/>
+	) : null;
+
 	const textComponent =
 		isTextOnly && !type ? <span style={{ display: 'block' }}>{value}</span> : null;
 	let computedComponent = null;
 
 	if (isToggleButtonGroup) {
 		computedComponent = buttonGroup;
+	} else if (isDropDownButton) {
+		computedComponent = dropdownButton;
 	} else if (isTextOnly) {
 		computedComponent = textComponent;
 	} else {
@@ -61,14 +75,14 @@ FieldGroup.propTypes = {
 	onChange: PropTypes.func,
 	help: PropTypes.string,
 	type: PropTypes.string,
-	buttonToggle: PropTypes.array,
+	itemCollection: PropTypes.array,
 	isTextOnly: PropTypes.bool,
 	value: PropTypes.string
 };
 FieldGroup.defaultProps = {
 	help: '',
 	type: '',
-	buttonToggle: [],
+	itemCollection: [],
 	isTextOnly: false,
 	value: '',
 	onChange: () => {}
