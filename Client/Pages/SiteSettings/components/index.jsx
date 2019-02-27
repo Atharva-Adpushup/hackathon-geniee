@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 
 import SplitScreen from '../../../Components/Layout/SplitScreen';
-import FieldGroup from '../../../Components/Layout/FieldGroup';
+import UiList from '../../../Components/Layout/UiList';
 import CustomButton from '../../../Components/CustomButton/index';
 import ActionCard from '../../../Components/ActionCard/index';
 import OverlayTooltip from '../../../Components/OverlayTooltip/index';
@@ -49,12 +49,10 @@ class SiteSettings extends Component {
 		return (
 			<div className="clearfix">
 				<h4 className="u-margin-t3 u-margin-b4 u-text-bold">AP Head Code</h4>
-				<p className="u-margin-t3 u-margin-b4">
-					Copy and paste this snippet in the head tag of your website
-				</p>
-				<Row className="u-margin-b2">
+				<p className="u-margin-b4">Copy and paste this snippet in the head tag of your website</p>
+				<Row className="u-margin-b4">
 					<Col xs={12} md={12} className="u-padding-r4 u-padding-l0">
-						<pre>{codeText}</pre>
+						<pre className="u-margin-0">{codeText}</pre>
 					</Col>
 				</Row>
 
@@ -79,6 +77,12 @@ class SiteSettings extends Component {
 		return (
 			<div className="clearfix">
 				<h4 className="u-margin-t3 u-margin-b4 u-text-bold">Manage Blocklist</h4>
+				<UiList
+					itemCollection={['http://a.com']}
+					emptyCollectionPlaceHolder="No blocklist added"
+					inputPlaceholder="Enter Url or pattern to block"
+					saveButtonText="Save"
+				/>
 			</div>
 		);
 	}
