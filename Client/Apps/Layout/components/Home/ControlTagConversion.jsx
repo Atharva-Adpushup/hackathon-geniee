@@ -47,13 +47,14 @@ class ControlTagConversion extends Component {
 			medianet: { adId, adWidth, adHeight, crId, versionId, cId }
 		} = this.state;
 		// Check for ad network toggle UI selection ('All ad networks' or 'Medianet')
-		const isAllAdNetworksSelection = this.isNotMedianetNetworkSelection();
+		const isValidNetworkSelection = this.isValidNetworkSelection();
+		const isNotMedianetNetworkSelection = this.isNotMedianetNetworkSelection();
 		const isMedianetNetworkSelection = this.isMedianetNetworkSelection();
 		const isValidAllNetworksData = !!(siteId && inputCode);
 		const isValidMedianetNetworkData = !!(adId && adWidth && adHeight && crId && versionId && cId);
 		const computedNetworkNumber = isMedianetNetworkSelection ? 2 : 1;
 
-		if (isAllAdNetworksSelection && !isValidAllNetworksData) {
+		if (!isValidNetworkSelection || (isNotMedianetNetworkSelection && !isValidAllNetworksData)) {
 			// eslint-disable-next-line no-alert
 			window.alert('Please fill All networks related UI fields');
 			return false;
@@ -68,7 +69,7 @@ class ControlTagConversion extends Component {
 		const {
 			[computedNetworkNumber]: { template }
 		} = CONTROL_CONVERSION_NETWORKS;
-		const parameterCollection = isAllAdNetworksSelection
+		const parameterCollection = isNotMedianetNetworkSelection
 			? [
 					{ replacee: '_CODE_', replacer: getEncodedData(inputCode) },
 					{ replacee: '_SITEID_', replacer: siteId },
