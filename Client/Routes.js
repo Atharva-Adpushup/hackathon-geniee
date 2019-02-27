@@ -29,6 +29,9 @@ const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/in
 const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
 );
+const ManageSite = lazy(() =>
+	import(/* webpackChunkName: "innovativeAds" */ './Pages/ManageSite/index')
+);
 const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/ErrorPage/index'));
 const OnBoarding = lazy(() => import(/* webpackChunkName: "onBoarding" */ './Pages/OnBoarding'));
 
@@ -63,7 +66,9 @@ const UserRoutes = () => (
 					<PrivateRoute exact path="/payment" component={Payment} />
 					<PrivateRoute exact path="/paymentSettings" component={PaymentSettings} />
 					<PrivateRoute exact path="/ap-tag/:siteId" component={ApTag} />
-					<PrivateRoute exact path="/onboarding" component={OnBoarding} />
+					<PrivateRoute exact path="/ap-layout/:siteId" component={Layout} />
+					<PrivateRoute exact path="/innovative-ads/:siteId" component={InnovativeAds} />
+					<PrivateRoute exact path="/sites/:siteId" component={ManageSite} />
 				</ShellContainer>
 			</Switch>
 		</Suspense>

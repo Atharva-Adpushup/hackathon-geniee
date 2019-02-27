@@ -56,7 +56,6 @@ class MySites extends Component {
 					return (
 						<Card
 							key={`card-${siteId}`}
-							rootClassName="u-margin-r5 u-margin-b5"
 							type={statusObject.type}
 							headerClassName="card-header"
 							headerChildren={
@@ -104,7 +103,7 @@ class MySites extends Component {
 									</Link>
 									<Link to={computedManageSiteUrl} className="u-link-reset aligner aligner-item">
 										<Button className="aligner-item aligner aligner--hEnd aligner--vCenter">
-											Manage Site
+											Manage App
 											<FontAwesomeIcon icon="cog" className="u-margin-l2" />
 										</Button>
 									</Link>
@@ -121,7 +120,7 @@ class MySites extends Component {
 	render() {
 		return (
 			<ActionCard title="My Sites">
-				<div className="u-padding-h4 u-padding-v5 aligner aligner--row aligner--wrap">
+				<div className="u-padding-h4 u-padding-v5 aligner aligner--row aligner--wrap aligner--hSpaceEvenly">
 					{this.renderStatusCards()}
 
 					<Link to="/addSite" className="u-link-reset">

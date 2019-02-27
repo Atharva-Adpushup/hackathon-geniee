@@ -1,6 +1,13 @@
+$transition: $all 0.2s $ease;
+
 .card {
 	box-shadow: $boxShadowOne;
 	width: 480px;
+	transition: $transition;
+
+	&:hover {
+		box-shadow: $boxShadowTwo;
+	}
 
 	.card-header-title {
 		font-size: ($designDimensionSM + 0.8);
@@ -21,7 +28,7 @@
 		box-shadow: $none;
 		height: 173px;
 		opacity: ($numberOne - 0.2);
-		transition: $all 0.2s $ease;
+		transition: $transition;
 
 		&:hover {
 			opacity: $numberOne;

@@ -6,6 +6,7 @@ module.exports = {
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops',
 	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
+	PRODUCT_LIST_API: 'https://staging.adpushup.com/CentralReportingWebService/common/productList',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
@@ -403,5 +404,43 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		pubmatic: 'pubmaticBidAdapter',
 		aardvark: 'aardvarkBidAdapter',
 		adyoulike: 'adyoulikeBidAdapter'
+	},
+	APP_KEYS: {
+		0: {
+			app: 'UNKNOWN',
+			key: 0
+		},
+		1: {
+			app: 'LAYOUT',
+			key: 1
+		},
+		2: {
+			app: 'TAG',
+			key: 2
+		},
+		3: {
+			app: 'HB',
+			key: 3
+		},
+		4: {
+			app: 'MEDIATION',
+			key: 4
+		},
+		5: {
+			app: 'INTERACTIVE_AD',
+			key: 5
+		},
+		6: {
+			app: 'AMP',
+			key: 6
+		},
+		7: {
+			app: 'AdRecover',
+			key: 7
+		},
+		8: {
+			app: 'Manage Ads.txt',
+			key: 8
+		}
 	}
 };
