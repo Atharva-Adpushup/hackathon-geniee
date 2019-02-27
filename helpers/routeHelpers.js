@@ -9,7 +9,13 @@ const HTTP_STATUS = require('../configs/httpStatusConsts');
 const adpushup = require('./adpushupEvent');
 const AdPushupError = require('./AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('./commonFunctions');
-const { PRODUCT_LIST_API, APP_KEYS } = require('../configs/commonConsts');
+const {
+	PRODUCT_LIST_API,
+	APP_KEYS,
+	GOOGLE_BOT_USER_AGENT,
+	DEFAULT_APP_STATUS_RESPONSE,
+	ADS_TXT_REDIRECT_PATTERN
+} = require('../configs/commonConsts');
 
 const appBucket = couchbaseService(
 	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
@@ -205,17 +211,22 @@ function fetchStatusesFromReporting(site) {
 		json: true
 	};
 
-	return request(options).then(response => {
-		const { data } = response;
-		const { products = [] } = data;
-		const response = {};
+	return request(options)
+		.then(response => {
+			const { data } = response;
+			const { products = [] } = data;
+			const output = {};
 
-		_.forEach(products, product => {
-			const { key } = product;
-			response[key] = APP_KEYS[key];
+			_.forEach(products, product => {
+				const { key } = product;
+				key ? (output[key] = APP_KEYS[key]) : null;
+			});
+			return output;
+		})
+		.catch(err => {
+			console.log(err);
+			return DEFAULT_APP_STATUS_RESPONSE;
 		});
-		return response;
-	});
 }
 
 function getChannelsAndComputeStatuses(site) {
@@ -223,17 +234,43 @@ function getChannelsAndComputeStatuses(site) {
 		const response = {};
 		if (channels && channels.length) {
 			_.forEach(channels, channel => {
-				const isAutoOptimiseOn =
-					Object.prototype.hasOwnProperty.call(channel, 'autoOptimise') && channel.autoOptimise;
-				const isAMPEnabled =
+				const isAutoOptimiseOn = !!(
+					Object.prototype.hasOwnProperty.call(channel, 'autoOptimise') && channel.autoOptimise
+				);
+				const isAMPEnabled = !!(
 					Object.prototype.hasOwnProperty.call(channel, 'ampSettings') &&
-					channel.ampSettings.isEnabled;
+					channel.ampSettings &&
+					channel.ampSettings.isEnabled
+				);
 
 				isAMPEnabled ? (response['6'] = APP_KEYS['6']) : null;
 				isAutoOptimiseOn ? (response['4'] = APP_KEYS['4']) : null;
 			});
 		}
 		return response;
+	});
+}
+
+function checkManageAdsTxtStatus(site) {
+	const siteDomain = site.get('siteDomain');
+	const lastChar = siteDomain[siteDomain.length - 1] !== '/' ? '/' : '';
+	const sanitizedDomain = `${siteDomain}${lastChar}`;
+	const options = {
+		method: 'GET',
+		uri: `${sanitizedDomain}ads.txt`,
+		headers: {
+			'User-Agent': GOOGLE_BOT_USER_AGENT
+		},
+		simple: false,
+		resolveWithFullResponse: true
+	};
+
+	return request(options).then(response => {
+		const output = {};
+		const isRedirecting = response.request.uri.href.indexOf(ADS_TXT_REDIRECT_PATTERN) !== -1;
+
+		isRedirecting ? (output['8'] = APP_KEYS['8']) : null;
+		return output;
 	});
 }
 
@@ -246,7 +283,10 @@ function fetchCustomStatuses(site) {
 				...statusesFromChannels,
 				...statusFromManageAds
 			})
-	);
+	).catch(err => {
+		console.log(err);
+		return DEFAULT_APP_STATUS_RESPONSE;
+	});
 }
 
 module.exports = {

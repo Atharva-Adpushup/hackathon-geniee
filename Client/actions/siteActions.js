@@ -2,18 +2,17 @@ import { SITE_ACTIONS } from '../constants/global';
 import axiosInstance from '../helpers/axiosInstance';
 import { errorHandler } from '../helpers/commonFunctions';
 
-const fetchAppStatuses = () => dispatch =>
+const fetchAppStatuses = siteId => dispatch =>
 	axiosInstance
-		.get('/site/fetchAppStatues')
+		.get('/site/fetchAppStatuses', { params: { siteId } })
 		.then(response => {
-			const { data } = response;
+			const { data } = response.data;
+			console.log(data);
 			dispatch({
 				type: SITE_ACTIONS.UPDATE_SITE_DATA,
-				data: data.sites
+				data
 			});
 		})
-		.catch(err => {
-			console.log(err);
-		});
+		.catch(err => errorHandler(err));
 
 export { fetchAppStatuses };

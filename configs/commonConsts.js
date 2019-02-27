@@ -408,5 +408,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			app: 'Manage Ads.txt',
 			key: 8
 		}
-	}
+	},
+	ADS_TXT_REDIRECT_PATTERN: 'manageadstxt.com',
+	GOOGLE_BOT_USER_AGENT:
+		'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html).',
+	DEFAULT_APP_STATUS_RESPONSE: {}
 };
