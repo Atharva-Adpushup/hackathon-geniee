@@ -6,9 +6,8 @@ const mapStateToProps = (state, ownProps) => {
 	const { sites } = state.global;
 	const { match } = ownProps;
 	const siteId = match.params ? match.params.siteId : false;
-	const site = siteId ? sites.data[siteId] : false;
+	const site = siteId && sites.data[siteId] ? sites.data[siteId] : false;
 	return {
-		fetched: sites.fetched,
 		site,
 		...ownProps
 	};

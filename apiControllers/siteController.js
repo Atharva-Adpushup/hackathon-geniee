@@ -1,9 +1,12 @@
 const Promise = require('bluebird');
-const _ = require('lodash');
 const express = require('express');
 
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { verifyOwner } = require('../helpers/routeHelpers');
+const {
+	verifyOwner,
+	fetchStatusesFromReporting,
+	fetchCustomStatuses
+} = require('../helpers/routeHelpers');
 const httpStatus = require('../configs/httpStatusConsts');
 
 const router = express.Router();
@@ -34,15 +37,15 @@ router.get('/fetchAppStatuses', (req, res) => {
 		3. Prepare final JSON for client
 	*/
 
-	return verifyOwner(email, siteId)
-		.then(site => {
+	return verifyOwner(siteId, email)
+		.then(site =>
 			Promise.join(
 				fetchStatusesFromReporting(site),
 				fetchCustomStatuses(site),
 				(statusesFromReporting, customStatuses) =>
 					sendSuccessResponse(
 						{
-							...site,
+							...site.data,
 							appStatuses: {
 								...statusesFromReporting,
 								...customStatuses
@@ -50,11 +53,11 @@ router.get('/fetchAppStatuses', (req, res) => {
 						},
 						res
 					)
-			);
-		})
+			)
+		)
 		.catch(err => {
-			debugger;
-			sendErrorResponse(err);
+			console.log(err);
+			sendErrorResponse(err, res);
 		});
 });
 

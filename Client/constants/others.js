@@ -2,6 +2,7 @@
 const APPS = [
 	{
 		name: 'Layout Editor',
+		key: 1,
 		link: 1,
 		icon: '/assets/images/manageSites/layout-optimization.png',
 		description:
@@ -9,6 +10,7 @@ const APPS = [
 	},
 	{
 		name: 'AdRecover',
+		key: 7,
 		type: 2,
 		icon: '/assets/images/manageSites/adrecover.png',
 		description:
@@ -16,6 +18,7 @@ const APPS = [
 	},
 	{
 		name: 'Innovative Ads',
+		key: 5,
 		link: 1,
 		icon: '/assets/images/manageSites/innovative-ads.png',
 		description:
@@ -23,6 +26,7 @@ const APPS = [
 	},
 	{
 		name: 'AP Tag',
+		key: 2,
 		link: 1,
 		icon: '/assets/images/manageSites/innovative-ads.png',
 		description:
@@ -30,6 +34,7 @@ const APPS = [
 	},
 	{
 		name: 'Mediation',
+		key: 4,
 		link: 3,
 		icon: '/assets/images/manageSites/ad-mediation.png',
 		description:
@@ -37,6 +42,7 @@ const APPS = [
 	},
 	{
 		name: 'AMP',
+		key: 6,
 		link: 3,
 		icon: '/assets/images/manageSites/amp.png',
 		description:
@@ -44,6 +50,7 @@ const APPS = [
 	},
 	{
 		name: 'Header Bidding',
+		key: 3,
 		link: 3,
 		icon: '/assets/images/manageSites/header-bidding.png',
 		description:
@@ -51,6 +58,7 @@ const APPS = [
 	},
 	{
 		name: 'Manage Ads.txt',
+		key: 8,
 		link: 1,
 		icon: '/assets/images/manageSites/header-bidding.png',
 		description:
