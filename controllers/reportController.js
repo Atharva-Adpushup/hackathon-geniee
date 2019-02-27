@@ -27,6 +27,7 @@ var express = require('express'),
 	router = express.Router({ mergeParams: true }),
 	reports = require('../models/reportsModel'),
 	csv = require('express-csv'),
+	logger = require('../helpers/globalBucketLogger'),
 	request = require('request-promise');
 
 function resultProcessing(queryResult, response, needAggregated, res) {
@@ -791,9 +792,21 @@ router
 		return request({
 			method: 'GET',
 			uri: `${commonConsts.REPORT_STATUS}?fromDate=${req.params.fromDate}&toDate=${req.params.toDate}&report=GETADPTAGREPORTSTATUS`
-		}).then(result => {
-			return res.send(result);
-		});
+		})
+			.then(result => {
+				return res.send(result);
+			})
+			.catch(err => {
+				logger({
+					source: 'AdpTag_Report_Status_Api',
+					message: 'API Failed',
+					details: `Failed to get adptag report status`,
+					debugData: JSON.stringify(err)
+				});
+				return res.send({
+					error: true
+				});
+			});
 	});
 
 module.exports = router;
