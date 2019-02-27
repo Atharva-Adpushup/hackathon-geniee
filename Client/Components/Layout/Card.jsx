@@ -38,16 +38,18 @@ Card.propTypes = {
 	headerClassName: PropTypes.string,
 	bodyClassName: PropTypes.string,
 	footerClassName: PropTypes.string,
-	headerChildren: PropTypes.element.isRequired,
+	headerChildren: PropTypes.element,
 	bodyChildren: PropTypes.element.isRequired,
-	footerChildren: PropTypes.element.isRequired
+	footerChildren: PropTypes.element
 };
 
 Card.defaultProps = {
 	rootClassName: '',
 	headerClassName: '',
 	bodyClassName: '',
-	footerClassName: ''
+	footerClassName: '',
+	headerChildren: false,
+	footerChildren: false
 };
 
 export default Card;

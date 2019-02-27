@@ -5,6 +5,7 @@ module.exports = {
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://staging.adpushup.com/InternalOpsWebService/stats',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
+	PRODUCT_LIST_API: 'https://staging.adpushup.com/CentralReportingWebService/common/productList',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	DEMO_REPORT_SITE_ID: 31764,
 	DEMO_PAGEGROUPS: ['HOME', 'IMAGE', 'POST', 'PHPBB3', 'NEW', 'CATEGORY'],
@@ -368,6 +369,44 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		networkData: {
 			adCode: '',
 			forceByPass: true
+		}
+	},
+	APP_KEYS: {
+		0: {
+			app: 'UNKNOWN',
+			key: 0
+		},
+		1: {
+			app: 'LAYOUT',
+			key: 1
+		},
+		2: {
+			app: 'TAG',
+			key: 2
+		},
+		3: {
+			app: 'HB',
+			key: 3
+		},
+		4: {
+			app: 'MEDIATION',
+			key: 4
+		},
+		5: {
+			app: 'INTERACTIVE_AD',
+			key: 5
+		},
+		6: {
+			app: 'AMP',
+			key: 6
+		},
+		7: {
+			app: 'AdRecover',
+			key: 7
+		},
+		8: {
+			app: 'Manage Ads.txt',
+			key: 8
 		}
 	}
 };

@@ -1,8 +1,11 @@
 const Promise = require('bluebird');
 const express = require('express');
 const md5 = require('md5');
+const _ = require('lodash');
+const { promiseForeach } = require('node-utils');
 
 const userModel = require('../models/userModel');
+const siteModel = require('../models/siteModel');
 const consts = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
 
@@ -88,6 +91,24 @@ function createNewUser(params) {
 		});
 }
 
+function getUserSites(user) {
+	const userSites = user.get('sites');
+	const siteIds = _.compact(_.map(userSites, 'siteId'));
+	const sites = {};
+
+	function getSite(siteId) {
+		return siteModel.getSiteById(siteId).then(site => {
+			sites[site.get('siteId')] = site;
+			return true;
+		});
+	}
+
+	return promiseForeach(siteIds, getSite, (data, err) => {
+		console.log(err);
+		return true;
+	}).then(() => sites);
+}
+
 // Set user session data and redirects to relevant screen based on provided parameters
 /* 
 	Type defines where the call is coming from 
@@ -98,22 +119,24 @@ function createNewUser(params) {
 router
 	.get('/globalData', (req, res) => {
 		const { email, isSuperUser } = req.user;
-		return Promise.join(
-			userModel.getUserByEmail(email),
-			getNetworkConfig(),
-			(user, networkConfig) => {
-				const userData = user.cleanData();
-				return res.status(httpStatus.OK).json({
-					user: { ...userData, isSuperUser },
-					networkConfig
+		return userModel
+			.getUserByEmail(email)
+			.then(user =>
+				Promise.join(getNetworkConfig(), getUserSites(user), (networkConfig, sites) => {
+					const userData = user.cleanData();
+					return res.status(httpStatus.OK).json({
+						user: { ...userData, isSuperUser },
+						networkConfig,
+						sites
+					});
+				})
+			)
+			.catch(err => {
+				console.log(err);
+				return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+					message: err.message
 				});
-			}
-		).catch(err => {
-			console.log(err);
-			return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-				message: err.message
 			});
-		});
 	})
 	.post('/signup', (req, res) => {
 		createNewUser(req.body)

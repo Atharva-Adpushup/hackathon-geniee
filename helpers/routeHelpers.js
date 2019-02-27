@@ -9,6 +9,7 @@ const HTTP_STATUS = require('../configs/httpStatusConsts');
 const adpushup = require('./adpushupEvent');
 const AdPushupError = require('./AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('./commonFunctions');
+const { PRODUCT_LIST_API, APP_KEYS } = require('../configs/commonConsts');
 
 const appBucket = couchbaseService(
 	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
@@ -18,14 +19,24 @@ const appBucket = couchbaseService(
 );
 
 function verifyOwner(siteId, userEmail) {
-	return siteModel.getSiteById(siteId).then(site => {
-		if (site.get('ownerEmail') !== userEmail) {
-			return Promise.reject(
-				new Error({ message: 'Unauthorized Request', code: HTTP_STATUS.PERMISSION_DENIED })
-			);
-		}
-		return site;
-	});
+	return siteModel
+		.getSiteById(siteId)
+		.then(site => {
+			if (site.get('ownerEmail') !== userEmail) {
+				throw new AdPushupError({
+					message: 'Unauthorized Request',
+					code: HTTP_STATUS.PERMISSION_DENIED
+				});
+			}
+			return site;
+		})
+		.catch(err => {
+			if (err instanceof AdPushupError) throw err;
+			throw new AdPushupError({
+				message: 'Request Failed',
+				code: HTTP_STATUS.BAD_REQUEST
+			});
+		});
 }
 
 function errorHander(err, res, code = HTTP_STATUS.BAD_REQUEST) {
@@ -186,6 +197,58 @@ function modifyAd(req, res, adUpdateProcessing, directDBUpdate) {
 	});
 }
 
+function fetchStatusesFromReporting(site) {
+	const options = {
+		method: 'GET',
+		uri: PRODUCT_LIST_API,
+		qs: { siteId: site.get('siteId') },
+		json: true
+	};
+
+	return request(options).then(response => {
+		const { data } = response;
+		const { products = [] } = data;
+		const response = {};
+
+		_.forEach(products, product => {
+			const { key } = product;
+			response[key] = APP_KEYS[key];
+		});
+		return response;
+	});
+}
+
+function getChannelsAndComputeStatuses(site) {
+	return site.getAllChannels().then(channels => {
+		const response = {};
+		if (channels && channels.length) {
+			_.forEach(channels, channel => {
+				const isAutoOptimiseOn =
+					Object.prototype.hasOwnProperty.call(channel, 'autoOptimise') && channel.autoOptimise;
+				const isAMPEnabled =
+					Object.prototype.hasOwnProperty.call(channel, 'ampSettings') &&
+					channel.ampSettings.isEnabled;
+
+				isAMPEnabled ? (response['6'] = APP_KEYS['6']) : null;
+				isAutoOptimiseOn ? (response['4'] = APP_KEYS['4']) : null;
+			});
+		}
+		return response;
+	});
+}
+
+function fetchCustomStatuses(site) {
+	return Promise.join(
+		getChannelsAndComputeStatuses(site),
+		checkManageAdsTxtStatus(site),
+		(statusesFromChannels, statusFromManageAds) =>
+			Promise.resolve({
+				...statusesFromChannels,
+				...statusFromManageAds
+			})
+	);
+}
+
 module.exports = {
 	verifyOwner,
 	errorHander,
@@ -195,5 +258,7 @@ module.exports = {
 	fetchAds,
 	createNewDocAndDoProcessing,
 	masterSave,
-	modifyAd
+	modifyAd,
+	fetchStatusesFromReporting,
+	fetchCustomStatuses
 };

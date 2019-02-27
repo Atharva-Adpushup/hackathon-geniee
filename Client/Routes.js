@@ -29,6 +29,9 @@ const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/in
 const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
 );
+const ManageSite = lazy(() =>
+	import(/* webpackChunkName: "innovativeAds" */ './Pages/ManageSite/index')
+);
 const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/ErrorPage/index'));
 const Layout = lazy(() => import(/* webpackChunkName: "layout" */ './Apps/Layout/index'));
 
@@ -64,6 +67,7 @@ const Routes = () => (
 					<PrivateRoute exact path="/ap-tag/:siteId" component={ApTag} />
 					<PrivateRoute exact path="/ap-layout/:siteId" component={Layout} />
 					<PrivateRoute exact path="/innovative-ads/:siteId" component={InnovativeAds} />
+					<PrivateRoute exact path="/sites/:siteId" component={ManageSite} />
 				</ShellContainer>
 			</Switch>
 		</Suspense>
