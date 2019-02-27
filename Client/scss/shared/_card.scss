@@ -26,9 +26,9 @@ $transition: $all 0.2s $ease;
 		border: 2px $dashed $dottedBorderColor;
 		border-radius: 4px;
 		box-shadow: $none;
-		height: 173px;
-		opacity: ($numberOne - 0.2);
-		transition: $transition;
+		height: $cardHeight;
+		opacity: $defaultOpacity;
+		transition: $all 0.2s $ease;
 
 		&:hover {
 			opacity: $numberOne;
