@@ -4,7 +4,6 @@ import { Row, Col } from 'react-bootstrap';
 import SplitScreen from '../../../../Components/Layout/SplitScreen';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../Components/CustomButton/index';
-import SelectBox from '../../../../Components/Selectbox/index';
 import { CONTROL_CONVERSION_NETWORKS, NETWORKS_COLLECTION } from '../../constants/index';
 import { getRandomString, getEncodedData, getCompiledTemplate } from '../../lib/helpers';
 import { copyToClipBoard } from '../../../ApTag/lib/helpers';
@@ -108,19 +107,6 @@ class ControlTagConversion extends Component {
 
 		return isValid;
 	}
-
-	renderSelect = (value, label, changeHandler, array) => (
-		<div className="u-margin-b4">
-			<p className="u-margin-b3">{label}</p>
-			<SelectBox
-				selected={value}
-				onSelect={changeHandler}
-				title={label}
-				id={label.toUpperCase()}
-				options={array}
-			/>
-		</div>
-	);
 
 	handleSelectChangeHandler(value) {
 		this.setState({ selectedNetwork: value });
@@ -329,12 +315,14 @@ class ControlTagConversion extends Component {
 
 		return (
 			<div className="clearfix">
-				{this.renderSelect(
-					selectedNetwork,
-					'Select ad network type',
-					this.handleSelectChangeHandler,
-					NETWORKS_COLLECTION
-				)}
+				<FieldGroup
+					id="toggle-dropdown-button"
+					label="Select ad network type"
+					type="toggle-dropdown-button"
+					onChange={this.handleSelectChangeHandler}
+					value={selectedNetwork}
+					itemCollection={NETWORKS_COLLECTION}
+				/>
 
 				{computedRenderUI}
 
