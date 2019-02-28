@@ -1,1 +1,12 @@
 /*****Normalize bootstrap CSS according to our product*****/
+.list-group-item {
+	&.is-active {
+		border: 1px solid $borderColor;
+		box-shadow: $boxShadowInsetOne;
+
+		svg,
+		i {
+			color: $primaryColor;
+		}
+	}
+}

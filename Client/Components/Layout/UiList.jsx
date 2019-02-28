@@ -9,11 +9,53 @@ import {
 	FormControl
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faEdit, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CustomButton from '../CustomButton/index';
 import PlaceHolder from '../PlaceHolder/index';
+import OverlayTooltip from '../OverlayTooltip/index';
+
+library.add(faEdit, faTimesCircle);
 
 class UiList extends React.Component {
-	state = {};
+	constructor(props) {
+		super(props);
+		this.state = {
+			activeItemValue: '',
+			activeItemKey: '',
+			collection: props.itemCollection
+		};
+	}
+
+	updateItem = () => {
+		const { activeItemValue, activeItemKey, collection } = this.state;
+		const item = collection[activeItemKey];
+		const message = `Are you sure you want to update ${item}`;
+
+		if (window.confirm(message)) {
+			collection[activeItemKey] = activeItemValue;
+			this.setState({ collection, activeItemKey: '', activeItemValue: '' });
+		}
+	};
+
+	deleteItem = key => {
+		const { collection } = this.state;
+		const item = collection[key];
+		const message = `Are you sure you want to delete ${item}`;
+
+		if (window.confirm(message)) {
+			collection.splice(key, 1);
+			this.setState({ collection, activeItemValue: '', activeItemKey: '' });
+		}
+	};
+
+	editItem = key => {
+		const { collection } = this.state;
+		const activeItemValue = collection[key];
+
+		this.setState({ activeItemValue, activeItemKey: key });
+	};
 
 	generatePlaceHolder = () => {
 		const { emptyCollectionPlaceHolder } = this.props;
@@ -22,27 +64,101 @@ class UiList extends React.Component {
 	};
 
 	generateContent = () => {
-		const { itemCollection } = this.props;
-		const isItemCollection = !!(itemCollection && itemCollection.length);
+		const _ref = this;
+		const { collection, activeItemKey, activeItemValue } = _ref.state;
+		const isItemCollection = !!(collection && collection.length);
 
 		return isItemCollection ? (
 			<ListGroup className="u-margin-b4">
-				{itemCollection.map(itemValue => (
-					<ListGroupItem>{itemValue}</ListGroupItem>
-				))}
+				{collection.map((itemValue, itemKey) => {
+					const listItemKey = `blocklist-item-${itemKey}`;
+					const isActiveItem = !!(
+						itemValue === activeItemValue && itemKey === Number(activeItemKey)
+					);
+					const computedActiveClassName = isActiveItem ? ' is-active' : '';
+					const computedRootClassName = `u-padding-3 aligner aligner--row u-margin-b3${computedActiveClassName}`;
+
+					return (
+						<ListGroupItem key={listItemKey} className={computedRootClassName}>
+							<div className="aligner-item">{itemValue}</div>
+							<div className="aligner-item aligner aligner--row aligner--vCenter aligner--hEnd">
+								<OverlayTooltip
+									id="tooltip-edit-item-info"
+									placement="top"
+									tooltip="Edit this value"
+								>
+									<FontAwesomeIcon
+										data-key={`${itemKey}-edit`}
+										size="1x"
+										icon="edit"
+										className="u-margin-r3 u-cursor-pointer"
+										data-name="edit"
+										onClick={_ref.handleClickHandler}
+									/>
+								</OverlayTooltip>
+
+								<OverlayTooltip
+									id="tooltip-delete-item-info"
+									placement="top"
+									tooltip="Delete this value"
+								>
+									<FontAwesomeIcon
+										data-key={`${itemKey}-delete`}
+										size="1x"
+										icon="times-circle"
+										className="u-cursor-pointer"
+										data-name="delete"
+										onClick={_ref.handleClickHandler}
+									/>
+								</OverlayTooltip>
+							</div>
+						</ListGroupItem>
+					);
+				})}
 			</ListGroup>
 		) : (
-			this.generatePlaceHolder()
+			_ref.generatePlaceHolder()
 		);
+	};
+
+	handleClickHandler = inputParam => {
+		const { target } = inputParam;
+		const isPathElement = !!(target && target.parentNode.tagName.toUpperCase() === 'SVG');
+		const isSVGElement = !!(target && target.tagName.toUpperCase() === 'SVG');
+		let computedElement;
+
+		if (isPathElement) {
+			computedElement = target.parentNode;
+		} else if (isSVGElement) {
+			computedElement = target;
+		}
+
+		const name = computedElement.getAttribute('data-name');
+		const keyString = computedElement.getAttribute('data-key');
+		const computedItemKey = keyString.split('-')[0];
+
+		switch (name) {
+			case 'edit':
+				this.editItem(computedItemKey);
+				break;
+
+			case 'delete':
+				this.deleteItem(computedItemKey);
+				break;
+
+			default:
+				break;
+		}
 	};
 
 	renderActionInputGroup = () => {
 		const { inputPlaceholder, saveButtonText } = this.props;
+		const { activeItemValue } = this.state;
 
 		return (
 			<FormGroup>
 				<InputGroup>
-					<FormControl type="text" placeholder={inputPlaceholder} />
+					<FormControl type="text" value={activeItemValue} placeholder={inputPlaceholder} />
 					<InputGroup.Button>
 						<CustomButton
 							variant="primary"
