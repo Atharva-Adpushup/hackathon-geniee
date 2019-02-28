@@ -7,5 +7,6 @@ export default {
 	logout: () => authService.removeAuthToken(),
 	forgotPassword: email => axiosInstance.post('/forgotPassword', { email }),
 	resetPassword: (email, key, password) =>
-		axiosInstance.post('/resetPassword', { email, key, password })
+		axiosInstance.post('/resetPassword', { email, key, password }),
+	payments: () => axiosInstance.get('/user/payment')
 };
