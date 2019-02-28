@@ -8,5 +8,5 @@ export default {
 	forgotPassword: email => axiosInstance.post('/forgotPassword', { email }),
 	resetPassword: (email, key, password) =>
 		axiosInstance.post('/resetPassword', { email, key, password }),
-	addSite: site => axiosInstance.post('/user/addSite', { site })
+	payments: () => axiosInstance.get('/user/payment')
 };

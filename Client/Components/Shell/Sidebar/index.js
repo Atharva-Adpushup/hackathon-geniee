@@ -80,6 +80,16 @@ const Sidebar = ({ show }) => (
 					</span>
 				</li>
 			</NavLink>
+			<NavLink to="/paymentHistory" className="clearfix" activeClassName="active">
+				<li>
+					<span className="link-text-wrap">
+						<span className="link-text">Payment History</span>
+					</span>
+					<span className="sb-nav-icon-wrap">
+						<FontAwesomeIcon icon="dollar-sign" className="sb-nav-icon" />
+					</span>
+				</li>
+			</NavLink>
 		</ul>
 	</aside>
 );

@@ -1,43 +1,49 @@
 const express = require('express');
 const userModel = require('../models/userModel');
-const utils = require('../helpers/utils');
-const CC = require('../configs/commonConsts');
-const httpStatus = require('../configs/httpStatusConsts');
-
+const config = require('../configs/config');
+const crypto = require('crypto');
 const router = express.Router();
 
 router
 	.get('/', (req, res) => {
 		res.status(200).json({ email: 'sdjklf@kewrle.com' });
 	})
-	.post('/addSite', (req, res) => {
-		const site = req.body.site ? utils.getSafeUrl(req.body.site) : req.body.site;
-
+	.get('/payment', function(req, res) {
 		userModel
-			.addSite(req.user.email, site)
-			.spread((user, siteId) => {
-				const userSites = user.get('sites');
-				for (const i in userSites) {
-					if (userSites[i].siteId === siteId) {
-						userSites[i].onboardingStage = 'onboarding';
-						userSites[i].step = CC.onboarding.initialStep; // initial site step i.e. 1 now
-						user.set('sites', userSites);
-						user.save();
+			.getUserByEmail(req.user.email)
+			.then(function(user) {
+				var tipaltiConfig = config.tipalti,
+					tipaltiUrl = '',
+					tipaltiBaseUrl = tipaltiConfig.baseUrl,
+					email = user.get('email'),
+					payeeId = encodeURIComponent(
+						crypto
+							.createHash('md5')
+							.update(email)
+							.digest('hex')
+							.substr(0, 64)
+					),
+					payer = tipaltiConfig.payerName,
+					date = Math.floor(+new Date() / 1000),
+					paramsStr =
+						'idap=' + payeeId + '&payer=' + payer + '&ts=' + date + '&email=' + encodeURIComponent(email),
+					key = tipaltiConfig.key,
+					hash = crypto
+						.createHmac('sha256', key)
+						.update(paramsStr.toString('utf-8'))
+						.digest('hex'),
+					paymentHistoryUrl = tipaltiConfig.paymentHistoryUrl + paramsStr + '&hashkey=' + hash;
 
-						const { siteId, domain, onboardingStage, step } = userSites[i];
-
-						return res.status(httpStatus.OK).json({ siteId, site: domain, onboardingStage, step });
-					}
-				}
-				return res
-					.status(httpStatus.INTERNAL_SERVER_ERROR)
-					.json({ error: 'Error while Adding site' });
+				tipaltiUrl = tipaltiBaseUrl + paramsStr + '&hashkey=' + hash;
+				res.send({
+					tipaltiUrl: tipaltiUrl,
+					paymentHistoryUrl: paymentHistoryUrl
+				});
 			})
-			.catch(err => {
-				console.log('Error while Adding site', err);
-				return res
-					.status(httpStatus.INTERNAL_SERVER_ERROR)
-					.json({ error: 'Error while Adding site' });
+			.catch(function(err) {
+				res.render('payment', {
+					error: 'Some error occurred!'
+				});
 			});
 	});
 
