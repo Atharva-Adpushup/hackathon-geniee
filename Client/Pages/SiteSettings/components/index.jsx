@@ -10,7 +10,6 @@ import SplitScreen from '../../../Components/Layout/SplitScreen';
 import UiList from '../../../Components/Layout/UiList';
 import CustomButton from '../../../Components/CustomButton/index';
 import ActionCard from '../../../Components/ActionCard/index';
-import OverlayTooltip from '../../../Components/OverlayTooltip/index';
 import { copyToClipBoard } from '../../../Apps/ApTag/lib/helpers';
 
 library.add(faCopy);
@@ -78,7 +77,7 @@ class SiteSettings extends Component {
 			<div className="clearfix">
 				<h4 className="u-margin-t3 u-margin-b4 u-text-bold">Manage Blocklist</h4>
 				<UiList
-					itemCollection={['http://a.com']}
+					itemCollection={['http://a.com', 'http://b.com']}
 					emptyCollectionPlaceHolder="No blocklist added"
 					inputPlaceholder="Enter Url or pattern to block"
 					saveButtonText="Save"
