@@ -56,7 +56,12 @@ class ManageSite extends React.Component {
 			}
 		} else if (type === TYPE.TEXT) {
 			return (
-				<div className="u-link-reset aligner aligner-item u-text-bold status-text" key={key}>
+				<div
+					className={`aligner aligner-item u-text-bold status-text ${
+						active ? 'u-text-success' : 'u-text-error'
+					}`}
+					key={key}
+				>
 					{text.replace('__STATUS__', active ? 'Active' : 'Inactive')}
 				</div>
 			);
@@ -64,10 +69,6 @@ class ManageSite extends React.Component {
 	};
 
 	renderFooter = (active, left, right, full, key, siteId) => {
-		/*
-			If there is right then there will be split
-			If inactive then left would be DEFAULT
-		*/
 		const response = [];
 		const goFull = !!right;
 		if (right) {
@@ -89,7 +90,7 @@ class ManageSite extends React.Component {
 					const { name, image, description, key, left, right, full = false } = app;
 					const isAppActive = !!appStatuses[key];
 					const statuses = isAppActive ? STATUSES.ACTIVE : STATUSES.INACTIVE;
-					const { type, icon } = statuses;
+					const { type, icon, tooltip } = statuses;
 
 					return (
 						<Card
@@ -102,7 +103,7 @@ class ManageSite extends React.Component {
 								<div className="aligner aligner--row">
 									<div className="aligner-item card-header-title" style={{ position: 'relative' }}>
 										<OverlayTooltip
-											id={`tooltip-site-status-info-${name}-${key}`}
+											id={`tooltip-app-info-${name}-${key}`}
 											placement="top"
 											tooltip={description}
 										>
@@ -115,10 +116,16 @@ class ManageSite extends React.Component {
 											</span>
 										</OverlayTooltip>
 									</div>
-									<FontAwesomeIcon
-										icon={icon}
-										className="aligner aligner-item aligner--hCenter card-header-icon"
-									/>
+									<OverlayTooltip
+										id={`tooltip-app-status-info-${name}-${key}`}
+										placement="top"
+										tooltip={tooltip}
+									>
+										<FontAwesomeIcon
+											icon={icon}
+											className="aligner aligner-item aligner--hCenter card-header-icon"
+										/>
+									</OverlayTooltip>
 								</div>
 							}
 							bodyChildren={

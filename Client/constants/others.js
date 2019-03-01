@@ -81,7 +81,7 @@ const APPS = [
 		name: 'AP Tag',
 		key: 2,
 		link: 1,
-		image: '/assets/images/manageSites/innovative-ads.png',
+		image: '/assets/images/manageSites/ap-tag.png',
 		description:
 			'In addition to standard IAB units, we offer sticky ads, docked ads, in-image ads, and native ads. We fill these ads with premium demand via our partner ad networks and exchanges to maximise publisher revenue.',
 		left: {
@@ -97,6 +97,25 @@ const APPS = [
 			link: LINK_TYPE.INAPP,
 			destination: '/ap-tag/__SITE_ID__',
 			icon: 'cog'
+		}
+	},
+	{
+		name: 'Manage Ads.txt',
+		key: 8,
+		link: 1,
+		image: '/assets/images/manageSites/manage-ads-txt.png',
+		description:
+			'Our ad-reinsertion technology helps web publishers recover the money that they are losing due to ad blocking software. The ads we run adhere to the highest UX standards as laid out by the Acceptable Ads Committee.',
+		left: {
+			type: TYPE.TEXT,
+			text: 'Status: __STATUS__'
+		},
+		right: {
+			type: TYPE.LINK,
+			text: 'Manage App',
+			link: LINK_TYPE.OUTWARD,
+			destination: 'https://console.manageadstxt.com',
+			icon: 'external-link-alt'
 		}
 	},
 	{
@@ -134,36 +153,19 @@ const APPS = [
 			type: TYPE.TEXT,
 			text: 'Status: __STATUS__'
 		}
-	},
-	{
-		name: 'Manage Ads.txt',
-		key: 8,
-		link: 1,
-		image: '/assets/images/manageSites/header-bidding.png',
-		description:
-			'Our ad-reinsertion technology helps web publishers recover the money that they are losing due to ad blocking software. The ads we run adhere to the highest UX standards as laid out by the Acceptable Ads Committee.',
-		left: {
-			type: TYPE.TEXT,
-			text: 'Status: __STATUS__'
-		},
-		right: {
-			type: TYPE.LINK,
-			text: 'Manage App',
-			link: LINK_TYPE.OUTWARD,
-			destination: 'https://console.manageadstxt.com',
-			icon: 'external-link-alt'
-		}
 	}
 ];
 
 const STATUSES = {
 	INACTIVE: {
 		type: 'danger',
-		icon: 'exclamation-triangle'
+		icon: 'exclamation-triangle',
+		tooltip: 'App is Inactive'
 	},
 	ACTIVE: {
 		type: 'success',
-		icon: 'check-circle'
+		icon: 'check-circle',
+		tooltip: 'App is Active'
 	}
 };
 
