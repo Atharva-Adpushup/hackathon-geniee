@@ -171,6 +171,7 @@ class ManageSite extends React.Component {
 								'<p style="font-size: 16px">To enable/disable any app please contact your respective Account Manager.</p>'
 							}
 							rootClassNames="u-margin-b4"
+							dismissible
 						/>
 						<Link to={`/settings/${site.siteId}`}>
 							<CustomButton variant="secondary" className="pull-right">
