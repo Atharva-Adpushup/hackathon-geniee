@@ -4,7 +4,7 @@ import { Row, Col } from 'react-bootstrap';
 import SplitScreen from '../../../../Components/Layout/SplitScreen';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../Components/CustomButton/index';
-import { CONTROL_CONVERSION_NETWORKS } from '../../constants/index';
+import { CONTROL_CONVERSION_NETWORKS, NETWORKS_COLLECTION } from '../../constants/index';
 import { getRandomString, getEncodedData, getCompiledTemplate } from '../../lib/helpers';
 import { copyToClipBoard } from '../../../ApTag/lib/helpers';
 
@@ -13,14 +13,14 @@ class ControlTagConversion extends Component {
 		super(props);
 		this.state = this.getDefaultState();
 		this.handleInputChangeHandler = this.handleInputChangeHandler.bind(this);
-		this.handleButtonGroupChangeHandler = this.handleButtonGroupChangeHandler.bind(this);
+		this.handleSelectChangeHandler = this.handleSelectChangeHandler.bind(this);
 		this.handleButtonClickHandler = this.handleButtonClickHandler.bind(this);
 	}
 
 	getDefaultState() {
 		const { siteId } = this.props;
 		return {
-			adControlType: 1,
+			selectedNetwork: '',
 			siteId,
 			inputCode: '',
 			convertedCode: '',
@@ -42,31 +42,34 @@ class ControlTagConversion extends Component {
 	}
 
 	getConvertedAdCode() {
-		const { adControlType, siteId, inputCode } = this.state;
+		const { siteId, inputCode } = this.state;
 		const {
 			medianet: { adId, adWidth, adHeight, crId, versionId, cId }
 		} = this.state;
 		// Check for ad network toggle UI selection ('All ad networks' or 'Medianet')
-		const isAllAdNetworksSelection = !!(Number(adControlType) === 1);
-		const isMedianetNetworkSelection = !!(Number(adControlType) === 2);
-
+		const isValidNetworkSelection = this.isValidNetworkSelection();
+		const isNotMedianetNetworkSelection = this.isNotMedianetNetworkSelection();
+		const isMedianetNetworkSelection = this.isMedianetNetworkSelection();
 		const isValidAllNetworksData = !!(siteId && inputCode);
 		const isValidMedianetNetworkData = !!(adId && adWidth && adHeight && crId && versionId && cId);
+		const computedNetworkNumber = isMedianetNetworkSelection ? 2 : 1;
 
-		if (isAllAdNetworksSelection && !isValidAllNetworksData) {
+		if (!isValidNetworkSelection || (isNotMedianetNetworkSelection && !isValidAllNetworksData)) {
+			// eslint-disable-next-line no-alert
 			window.alert('Please fill All networks related UI fields');
 			return false;
 		}
 
 		if (isMedianetNetworkSelection && !isValidMedianetNetworkData) {
+			// eslint-disable-next-line no-alert
 			window.alert('Please fill Medianet network related UI fields');
 			return false;
 		}
 
 		const {
-			[adControlType]: { template }
+			[computedNetworkNumber]: { template }
 		} = CONTROL_CONVERSION_NETWORKS;
-		const parameterCollection = isAllAdNetworksSelection
+		const parameterCollection = isNotMedianetNetworkSelection
 			? [
 					{ replacee: '_CODE_', replacer: getEncodedData(inputCode) },
 					{ replacee: '_SITEID_', replacer: siteId },
@@ -85,8 +88,29 @@ class ControlTagConversion extends Component {
 		return compiledTemplate;
 	}
 
-	handleButtonGroupChangeHandler(value) {
-		this.setState({ adControlType: Number(value) });
+	isValidNetworkSelection() {
+		const { selectedNetwork } = this.state;
+		const isValid = !!selectedNetwork;
+
+		return isValid;
+	}
+
+	isNotMedianetNetworkSelection() {
+		const { selectedNetwork } = this.state;
+		const isValid = !!(selectedNetwork && selectedNetwork !== 'medianet');
+
+		return isValid;
+	}
+
+	isMedianetNetworkSelection() {
+		const { selectedNetwork } = this.state;
+		const isValid = !!(selectedNetwork && selectedNetwork === 'medianet');
+
+		return isValid;
+	}
+
+	handleSelectChangeHandler(value) {
+		this.setState({ selectedNetwork: value });
 	}
 
 	handleInputChangeHandler(inputParam) {
@@ -278,31 +302,30 @@ class ControlTagConversion extends Component {
 	}
 
 	renderControlConversionLeftPanel() {
-		const buttonToggle = [
-			{
-				value: 1,
-				text: [CONTROL_CONVERSION_NETWORKS[1].name]
-			},
-			{
-				value: 2,
-				text: [CONTROL_CONVERSION_NETWORKS[2].name]
-			}
-		];
-		const { adControlType } = this.state;
-		const isAllAdNetworksSelection = !!(Number(adControlType) === 1);
+		const { selectedNetwork } = this.state;
+		const isValidNetworkSelection = this.isValidNetworkSelection();
+		const isMedianetNetworkSelection = this.isMedianetNetworkSelection();
+		const isNotMedianetNetworkSelection = this.isNotMedianetNetworkSelection();
+		let computedRenderUI;
+
+		if (!isValidNetworkSelection || isNotMedianetNetworkSelection) {
+			computedRenderUI = this.renderAllAdNetworksUI();
+		} else if (isMedianetNetworkSelection) {
+			computedRenderUI = this.renderMedianetNetworkUI();
+		}
 
 		return (
 			<div className="clearfix">
 				<FieldGroup
-					id="toggle-button-group"
+					id="toggle-dropdown-button"
 					label="Select ad network type"
-					type="toggle-button-group"
-					buttonToggle={buttonToggle}
-					name="adNetworkToggle"
-					onChange={this.handleButtonGroupChangeHandler}
+					type="toggle-dropdown-button"
+					onChange={this.handleSelectChangeHandler}
+					value={selectedNetwork}
+					itemCollection={NETWORKS_COLLECTION}
 				/>
 
-				{isAllAdNetworksSelection ? this.renderAllAdNetworksUI() : this.renderMedianetNetworkUI()}
+				{computedRenderUI}
 
 				<CustomButton
 					variant="primary"

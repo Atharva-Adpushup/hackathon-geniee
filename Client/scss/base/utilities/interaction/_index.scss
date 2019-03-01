@@ -11,6 +11,10 @@
 	box-shadow: $none !important;
 }
 
+.u-box-shadow-active {
+	box-shadow: $boxShadowInsetOne;
+}
+
 .u-border-none {
 	border: $none !important;
 }

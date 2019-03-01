@@ -32,8 +32,14 @@ const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/in
 const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
 );
+const ManageSite = lazy(() =>
+	import(/* webpackChunkName: "innovativeAds" */ './Pages/ManageSite/index')
+);
 const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/ErrorPage/index'));
 const Layout = lazy(() => import(/* webpackChunkName: "layout" */ './Apps/Layout/index'));
+const SiteSettings = lazy(() =>
+	import(/* webpackChunkName: "siteSettings" */ './Pages/SiteSettings/index')
+);
 
 const Routes = () => (
 	<Router history={history}>
@@ -58,6 +64,7 @@ const Routes = () => (
 					<Route exact path="/error" render={() => <ErrorPage />} />
 					<PrivateRoute exact path="/dashboard" component={Dashboard} />
 					<PrivateRoute exact path="/sites" component={Sites} />
+					<PrivateRoute exact path="/sites/:siteId/settings" component={SiteSettings} />
 					<PrivateRoute exact path="/reporting" component={Reporting} />
 					<PrivateRoute exact path="/byodPanel" component={ByodPanel} />
 					<PrivateRoute exact path="/adsTxtManagement" component={AdsTxtManagement} />
@@ -68,6 +75,7 @@ const Routes = () => (
 					<PrivateRoute exact path="/ap-tag/:siteId" component={ApTag} />
 					<PrivateRoute exact path="/ap-layout/:siteId" component={Layout} />
 					<PrivateRoute exact path="/innovative-ads/:siteId" component={InnovativeAds} />
+					<PrivateRoute exact path="/sites/:siteId" component={ManageSite} />
 				</ShellContainer>
 			</Switch>
 		</Suspense>
