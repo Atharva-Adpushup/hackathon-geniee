@@ -20,7 +20,6 @@ const ByodPanel = lazy(() => import(/* webpackChunkName: "byodPanel" */ './Pages
 const AdsTxtManagement = lazy(() =>
 	import(/* webpackChunkName: "adsTxtManagement" */ './Pages/AdsTxtManagement')
 );
-const AddNewSite = lazy(() => import(/* webpackChunkName: "addNewSite" */ './Pages/AddNewSite'));
 const Payment = lazy(() => import(/* webpackChunkName: "payment" */ './Pages/Payment'));
 const PaymentHistory = lazy(() =>
 	import(/* webpackChunkName: "paymentHistory" */ './Pages/PaymentHistory')
@@ -37,6 +36,7 @@ const ManageSite = lazy(() =>
 );
 const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/ErrorPage/index'));
 const OnBoarding = lazy(() => import(/* webpackChunkName: "onBoarding" */ './Pages/OnBoarding'));
+const AddNewSite = lazy(() => import(/* webpackChunkName: "addNewSite" */ './Pages/AddNewSite'));
 
 const UserRoutes = () => (
 	<Router history={history}>
@@ -70,9 +70,8 @@ const UserRoutes = () => (
 					<PrivateRoute exact path="/paymentHistory" component={PaymentHistory} />
 					<PrivateRoute exact path="/paymentSettings" component={PaymentSettings} />
 					<PrivateRoute exact path="/ap-tag/:siteId" component={ApTag} />
-					<PrivateRoute exact path="/ap-layout/:siteId" component={Layout} />
-					<PrivateRoute exact path="/innovative-ads/:siteId" component={InnovativeAds} />
-					<PrivateRoute exact path="/sites/:siteId" component={ManageSite} />
+					<PrivateRoute exact path="/onboarding" component={OnBoarding} />
+					<PrivateRoute exact path="/add-site" component={AddNewSite} />
 				</ShellContainer>
 			</Switch>
 		</Suspense>
