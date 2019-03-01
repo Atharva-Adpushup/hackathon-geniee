@@ -109,9 +109,17 @@ var modelAPI = (module.exports = apiModule()),
 			var me = this,
 				normalizedDomain = normalizeurl(domain);
 
-			return this.getSiteByDomain(normalizedDomain).then(function(site) {
+			return this.getSiteByDomain(normalizedDomain).then(function (site) {
 				if (site) {
-					return site;
+					return siteModel.getSiteById(site.siteId).then(() => {
+						throw new AdPushupError({ status: 409, message: 'Site already exists!' });
+					}).catch(err => {
+						if (err instanceof AdPushupError && err.message.length &&  err.message[0].status === 404) {
+							return site;
+						}
+
+						throw err;
+					});
 				}
 				return globalModel.incrSiteIdInApAppBucket().then(function(siteId) {
 					me.get('sites').push({ siteId: siteId, domain: normalizedDomain, isManual: isManual });
@@ -672,25 +680,18 @@ function apiModule() {
 					}
 				});
 		},
-		sendCodeToDev: function(json) {
-			var mailer = new Mailer(Config.email, 'html'),
-				mailHeader =
-					'Hi, <br/> Please find below the code snippet for your AdPushup setup. Paste this into the <strong>&lt;head&gt;</strong> section of your page - \n\n',
-				mailFooter = '<br/><br/>Thanks,<br/>Team AdPushup',
-				headerCode = json.code;
+		sendCodeToDev: function (json) {
+			return FormValidator.validate({ email: json.email }, schema.user.validations)
+				.then(() => {
+					var mailer = new Mailer(Config.email, 'html'),
+						email = json.email,
+						subject = utils.htmlEntities(utils.trimString(json.subject)),
+						content = json.body;
 
-			headerCode = headerCode.replace(/</g, '&lt;');
-			headerCode = headerCode.replace(/>/g, '&gt;');
+					var obj = { to: email, subject: subject, html: content };
 
-			var content =
-					mailHeader +
-					'<div style="background-color: #eaeaea; padding: 20px; margin-top: 10px;">' +
-					headerCode +
-					'</div>' +
-					mailFooter,
-				obj = { to: json.email, subject: 'AdPushup Header Snippet', html: content };
-
-			return mailer.send(obj);
+					return mailer.send(obj);
+				});
 		},
 		forgotPassword: function(json) {
 			return FormValidator.validate(json, schema.user.validations)

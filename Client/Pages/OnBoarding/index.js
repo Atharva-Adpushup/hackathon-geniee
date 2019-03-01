@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, createRef } from 'react';
 import siteService from '../../services/siteService';
 import AddSiteOnboarding from '../../Components/AddSiteOnboarding';
 import VerifyInitCodeOnboarding from '../../Components/VerifyInitCodeOnboarding';
+import VerifyAdsTxtCodeOnboarding from '../../Components/VerifyAdsTxtCodeOnboarding';
 import userService from '../../services/userService';
 import user from '../../reducers/global/user';
+import history from '../../helpers/history';
 
 class OnBoarding extends Component {
 	state = {
@@ -15,10 +17,16 @@ class OnBoarding extends Component {
 		step: 0
 	};
 
+	scrollableContainer = document.querySelector('.main-content');
+
+	verifyInitCodeRef = createRef();
+
+	verifyAdsTxtRef = createRef();
+
 	componentDidMount() {
 		const { location } = this.props;
 		const queryParams = new URLSearchParams(location.search);
-		console.log(queryParams.get('siteId'));
+
 		if (!queryParams.get('siteId')) {
 			// check preOnboarding or add new site
 			siteService
@@ -45,11 +53,33 @@ class OnBoarding extends Component {
 				.then(response => {
 					console.log(response);
 					const { siteId, site, onboardingStage, step } = response.data;
-					this.setState({ isOnboarding: false, siteId, site, onboardingStage, step });
+					this.setState(
+						() => ({ isOnboarding: false, siteId, site, onboardingStage, step }),
+						() => {
+							if (step === 1) {
+								setTimeout(() => {
+									this.scrollableContainer.scrollTo({
+										top: this.verifyInitCodeRef.current.offsetTop - 100,
+										left: 0,
+										behavior: 'smooth'
+									});
+								}, 500);
+							} else if (step === 2) {
+								setTimeout(() => {
+									this.scrollableContainer.scrollTo({
+										top: this.verifyAdsTxtRef.current.offsetTop - 100,
+										left: 0,
+										behavior: 'smooth'
+									});
+								}, 500);
+							} else {
+								history.push('/sites');
+							}
+						}
+					);
 				})
 				.catch(err => {
-					console.log(err.response.data);
-					// TODO: handle getOnboardingData failure
+					history.push('/sites');
 				});
 		}
 	}
@@ -61,12 +91,42 @@ class OnBoarding extends Component {
 	};
 
 	onSiteAdd = (siteId, site, onboardingStage, step) => {
-		// TODO:update onboardingStage and step
-		this.setState({ isOnboarding: false, siteId, site, onboardingStage, step });
+		this.setState(
+			() => ({ isOnboarding: false, siteId, site, onboardingStage, step }),
+			() => {
+				setTimeout(() => {
+					this.scrollableContainer.scrollTo({
+						top: this.verifyInitCodeRef.current.offsetTop - 100,
+						left: 0,
+						behavior: 'smooth'
+					});
+				}, 500);
+			}
+		);
 	};
 
 	onInitCodeVerify = () => {
-		this.setState({ step: 2 });
+		this.setState(
+			() => ({ step: 2 }),
+			() => {
+				setTimeout(() => {
+					this.scrollableContainer.scrollTo({
+						top: this.verifyAdsTxtRef.current.offsetTop - 100,
+						left: 0,
+						behavior: 'smooth'
+					});
+				}, 500);
+			}
+		);
+	};
+
+	onAdsTxtVerify = () => {
+		this.setState(
+			() => ({ step: 3 }),
+			() => {
+				history.push('/sites');
+			}
+		);
 	};
 
 	render() {
@@ -80,14 +140,24 @@ class OnBoarding extends Component {
 					site={site}
 					changeSite={this.changeSite}
 					onSiteAdd={this.onSiteAdd}
+					isActive={step === 0}
 					completed={step >= 1}
 				/>
 				<VerifyInitCodeOnboarding
+					forwadref={this.verifyInitCodeRef}
 					siteId={siteId}
 					site={site}
 					onComplete={this.onInitCodeVerify}
+					isActive={step === 1}
 					completed={step >= 2}
-					disabled={step !== 1}
+				/>
+				<VerifyAdsTxtCodeOnboarding
+					forwadref={this.verifyAdsTxtRef}
+					siteId={siteId}
+					site={site}
+					onComplete={this.onAdsTxtVerify}
+					isActive={step === 2}
+					completed={step === 3}
 				/>
 			</div>
 		);
