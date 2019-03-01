@@ -37,7 +37,7 @@ class Payment extends Component {
 		const { tipaltiUrl, width, height } = this.state;
 		return (
 			<ActionCard title="Payment Settings">
-				<div style={{ padding: '20px', textAlign: 'center' }}>
+				<div className="u-padding-4 text-center">
 					<iframe
 						id="tipaltiPaymentDetailIframe"
 						src={tipaltiUrl}
