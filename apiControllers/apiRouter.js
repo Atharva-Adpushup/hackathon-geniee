@@ -8,7 +8,6 @@ const indexController = require('./indexController');
 const apTagController = require('./apTagController');
 const siteController = require('./siteController');
 const dataController = require('./dataController');
-const proxyController = require('./proxyController');
 const innovativeAdsController = require('./innovativeAdsController');
 
 const apiAuthMiddleware = require('../middlewares/apiAuthMiddleware');
