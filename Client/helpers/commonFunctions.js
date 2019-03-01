@@ -5,8 +5,6 @@ function errorHandler(err, userMessage = 'Operation Failed') {
 	let message;
 	let code = 400;
 
-	console.log('Called');
-
 	if (response) {
 		const axiosDataObject = response ? response.data : false;
 		const { data } = axiosDataObject || { data: false };

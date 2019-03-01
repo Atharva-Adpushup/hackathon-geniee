@@ -6,6 +6,7 @@ const userController = require('./userController');
 const indexController = require('./indexController');
 const apTagController = require('./apTagController');
 const innovativeAdsController = require('./innovativeAdsController');
+const siteController = require('./siteController');
 
 const apiAuthMiddleware = require('../middlewares/apiAuthMiddleware');
 
@@ -15,6 +16,7 @@ router.use(apiAuthMiddleware);
 router.use('/user', userController);
 router.use('/apTag', apTagController);
 router.use('/innovativeAds', innovativeAdsController);
+router.use('/site', siteController);
 router.use('/', indexController);
 
 module.exports = router;

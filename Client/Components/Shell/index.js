@@ -2,6 +2,7 @@ import React from 'react';
 import { Grid, Row, Col } from 'react-bootstrap';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import Loader from '../Loader/index';
 
 class Shell extends React.Component {
 	state = { isSidebarOpen: true };
@@ -15,9 +16,15 @@ class Shell extends React.Component {
 		this.setState(state => ({ isSidebarOpen: !state.isSidebarOpen }));
 	};
 
+	renderLoader = () => (
+		<div style={{ position: 'relative', width: '100%', height: '100%' }}>
+			<Loader />
+		</div>
+	);
+
 	render() {
 		const { isSidebarOpen } = this.state;
-		const { children } = this.props;
+		const { children, fetched } = this.props;
 
 		return (
 			<Grid fluid>
@@ -28,7 +35,7 @@ class Shell extends React.Component {
 				</Row>
 				<Row className="sidebar-main-wrap">
 					<Sidebar show={isSidebarOpen} />
-					<main className="main-content">{children}</main>
+					<main className="main-content">{fetched ? children : this.renderLoader()}</main>
 				</Row>
 			</Grid>
 		);
