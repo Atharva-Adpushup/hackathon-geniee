@@ -97,7 +97,7 @@ router
 			});
 	})
 	.get('/onboarding', (req, res) => {
-		const { siteId } = req.query;
+		const siteId = parseInt(req.query.siteId, 10);
 		const { email } = req.user;
 
 		if (!siteId) {

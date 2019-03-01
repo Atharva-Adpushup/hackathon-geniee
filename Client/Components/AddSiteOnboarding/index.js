@@ -4,10 +4,15 @@ import CustomButton from '../CustomButton';
 import siteService from '../../services/siteService';
 import userService from '../../services/userService';
 import OnboardingCard from '../OnboardingCard';
+import InputBox from '../InputBox';
+import formValidator from '../../helpers/formValidator';
+import validationSchema from '../../helpers/validationSchema';
 
 class AddSiteOnboarding extends Component {
 	state = {
-		showForm: false
+		showForm: false,
+		isAddingSite: false,
+		error: ''
 	};
 
 	toggleForm = () => this.setState(state => ({ showForm: !state.showForm }));
@@ -19,26 +24,21 @@ class AddSiteOnboarding extends Component {
 		const onboardingStage = 'onboarding';
 		const step = 1;
 
+		this.setState({ isAddingSite: true });
+
 		userService
 			.addSite(existingSite)
-			.then(resp => {
-				console.log('add site success: ', resp.data);
+			.then(resp =>
+				siteService.saveSite(siteId, existingSite, onboardingStage, step).then(resp => {
+					console.log('site saved: ', resp.data);
 
-				siteService
-					.saveSite(siteId, existingSite, onboardingStage, step)
-					.then(resp => {
-						console.log('site saved: ', resp.data);
+					onSiteAdd(siteId, existingSite, onboardingStage, step);
 
-						onSiteAdd(siteId, existingSite, onboardingStage, step);
-					})
-					.catch(err => {
-						console.dir(err);
-						// TODO: show error
-					});
-			})
+					this.setState({ isAddingSite: false });
+				})
+			)
 			.catch(err => {
-				console.log('add site failure: ', err.response.data);
-				// TODO: handle add site error
+				this.setState({ isAddingSite: false, error: err.response.data.error });
 			});
 	};
 
@@ -46,42 +46,44 @@ class AddSiteOnboarding extends Component {
 		e.preventDefault();
 
 		const { onSiteAdd, site } = this.props;
-		const onboardingStage = 'onboarding';
-		const step = 1;
 
-		// onSiteAdd(false, site, null);
+		const validationResult = formValidator.validate({ site }, validationSchema.user.validations);
 
-		userService
-			.addSite(site)
-			.then(resp => {
-				console.log('add site success: ', resp.data);
-				const { siteId } = resp.data;
+		if (validationResult.isValid) {
+			const onboardingStage = 'onboarding';
+			const step = 1;
 
-				siteService
-					.saveSite(siteId, site, onboardingStage, step)
-					.then(resp => {
-						console.log('site saved: ', resp.data);
+			this.setState({ isAddingSite: true });
+
+			userService
+				.addSite(site)
+				.then(resp => {
+					const { siteId } = resp.data;
+
+					siteService.saveSite(siteId, site, onboardingStage, step).then(resp => {
+						this.setState({ isAddingSite: false });
 
 						onSiteAdd(siteId, site, onboardingStage, step);
-					})
-					.catch(err => {
-						console.dir(err);
-						// TODO: show error
 					});
-			})
-			.catch(err => {
-				console.log('add site failure: ', err.response.data);
-				// TODO: handle add site error
-			});
+				})
+				.catch(err => {
+					this.setState({ isAddingSite: false, error: err.response.data.error });
+				});
+		} else {
+			this.setState({ error: validationResult.errors.site });
+		}
 	};
 
 	render() {
-		const { siteId, existingSite, site, completed, onSiteAdd, changeSite, className } = this.props;
-		const { showForm } = this.state;
+		const { existingSite, site, isActive, completed, changeSite, forwadref } = this.props;
+		const { showForm, isAddingSite, error } = this.state;
 
 		return (
 			<OnboardingCard
-				isActiveStep={!completed}
+				forwadref={forwadref}
+				className="add-site-card"
+				isActiveStep={isActive}
+				expanded={isActive || completed}
 				count={1}
 				imgPath="/assets/images/ob_add_site.png"
 				heading="Add Site"
@@ -89,35 +91,62 @@ class AddSiteOnboarding extends Component {
 						site then you can easily add them later through the dashboard."
 			>
 				<Fragment>
-					{!completed && showForm && (
-						<form onSubmit={this.addNewSite}>
-							<input type="text" name="site" value={site} onChange={changeSite} />
-							<CustomButton type="submit">Edit Site</CustomButton>
-						</form>
+					{isActive && showForm && (
+						<div>
+							<form onSubmit={this.addNewSite}>
+								<InputBox type="text" name="site" value={site} onChange={changeSite} />
+								<CustomButton type="submit" showSpinner={isAddingSite}>
+									Add Site
+								</CustomButton>
+							</form>
+
+							{error && <div className="u-text-error u-margin-t3">{error}</div>}
+						</div>
 					)}
 
-					{!completed && existingSite && (
-						<Fragment>
-							<CustomButton onClick={this.addExistingSite}>
+					{isActive && !showForm && existingSite && (
+						<div>
+							<CustomButton
+								onClick={this.addExistingSite}
+								showSpinner={isAddingSite}
+								className="u-margin-r3"
+							>
 								Continue with {existingSite}
 							</CustomButton>
 
 							<CustomButton variant="secondary" onClick={this.toggleForm}>
 								Edit Site
 							</CustomButton>
-						</Fragment>
+
+							{error && <div className="u-text-error u-margin-t3">{error}</div>}
+						</div>
 					)}
 
-					{!completed && !existingSite && (
-						<Fragment>
+					{isActive && !existingSite && (
+						<div>
 							<form onSubmit={this.addNewSite}>
-								<input type="text" name="site" value={site} onChange={changeSite} />
-								<CustomButton type="submit">Add Site</CustomButton>
+								<InputBox
+									classNames="custom-input"
+									type="text"
+									name="site"
+									value={site}
+									onChange={changeSite}
+								/>
+								<CustomButton type="submit" showSpinner={isAddingSite}>
+									Add Site
+								</CustomButton>
 							</form>
-						</Fragment>
+
+							{error && <div className="u-text-error u-margin-t3">{error}</div>}
+						</div>
 					)}
 
-					{completed && <Fragment>{site} added!</Fragment>}
+					{completed && (
+						<div className="aligner aligner--hcenter">
+							<span className="u-text-underline u-text-red u-margin-r2">{site}</span> has been
+							added!
+						</div>
+					)}
 				</Fragment>
 			</OnboardingCard>
 		);
@@ -128,6 +157,7 @@ AddSiteOnboarding.propTypes = {
 	existingSite: PropTypes.string,
 	site: PropTypes.string,
 	changeSite: PropTypes.func.isRequired,
+	isActive: PropTypes.bool.isRequired,
 	completed: PropTypes.bool.isRequired,
 	onSiteAdd: PropTypes.func.isRequired
 };

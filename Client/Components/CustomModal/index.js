@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import { Modal } from 'react-bootstrap';
 
 const CustomModal = ({ show, handleClose, title, children }) => (
-	<Modal show={show} onHide={handleClose}>
+	<Modal show={show} onHide={handleClose} className="ap-modal">
 		<Modal.Header closeButton>
 			<Modal.Title>{title}</Modal.Title>
 		</Modal.Header>
-		<Modal.Body>{children}</Modal.Body>
+		{children}
 	</Modal>
 );
 

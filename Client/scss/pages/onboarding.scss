@@ -1,7 +1,9 @@
-%card {
-	border-radius: 4px;
-	padding: 20px;
-}
+@import '../shared/onboarding/card.scss';
+@import '../shared/onboarding/addSite.scss';
+@import '../shared/onboarding/verifyApCode.scss';
+@import '../shared/onboarding/verifyAdsTxt.scss';
+
+@import '../shared/inputBox.scss';
 
 %shadow {
 	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), -1px 0 0 rgba(0, 0, 0, 0.03),
@@ -11,70 +13,4 @@
 .onboarding-wrapper {
 	width: 90%;
 	margin: 20px auto;
-
-	.onboarding-step {
-		min-height: 390px;
-		position: relative;
-		background-color: $whiteColor;
-		transition: all 0.25s ease-in-out;
-		@extend %card, %shadow;
-		margin-bottom: 80px;
-		opacity: 0.55;
-		pointer-events: none;
-		&.active-step {
-			box-shadow: 0 10px 18px rgba(0, 0, 0, 0.12);
-			opacity: 1;
-			pointer-events: auto;
-			&:hover {
-				box-shadow: 0 5px 9px rgba(0, 0, 0, 0.22);
-				@include css3-prefix(transform, translateY(-3px));
-			}
-		}
-
-		.counter-icon {
-			position: absolute;
-			top: -8px;
-			left: -15px;
-			height: 44px;
-			width: 44px;
-			background-color: $whiteColor;
-			color: $fontColor;
-			font-size: 2.4em;
-			text-align: center;
-			border-radius: 50%;
-			font-weight: 700;
-			border: 2px solid $primaryColor;
-			@extend %shadow;
-		}
-
-		.card-img {
-			img {
-				width: auto;
-				max-height: 350px;
-			}
-		}
-
-		.ob-heading {
-			font-weight: 700;
-			color: $fontColor;
-			border-bottom: 1px solid lighten($fontColor, 20%);
-			padding: 0 0 8px 20px;
-		}
-
-		.snippet {
-			width: 100%;
-			border: 1px solid #ccc;
-			border-radius: 2px;
-			font-family: $codeFont;
-			background: $codeBg;
-			height: 90px;
-			margin-top: 20px;
-			font-size: 0.8em;
-			color: $fontColor;
-			line-height: 22px;
-			border-bottom-left-radius: 0;
-			border-bottom-right-radius: 0;
-			word-break: break-all;
-		}
-	}
 }

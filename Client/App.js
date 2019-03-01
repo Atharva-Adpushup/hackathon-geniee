@@ -37,11 +37,11 @@ library.add(
 );
 
 const App = () => (
-	<div id="app">
-		<ErrorBoundary>
-			<Routes />
-		</ErrorBoundary>
-	</div>
+	// <div id="app">
+	// </div>
+	<ErrorBoundary>
+		<Routes />
+	</ErrorBoundary>
 );
 
 export default hot(App);
