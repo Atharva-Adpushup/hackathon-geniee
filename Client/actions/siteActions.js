@@ -7,7 +7,6 @@ const fetchAppStatuses = siteId => dispatch =>
 		.get('/site/fetchAppStatuses', { params: { siteId } })
 		.then(response => {
 			const { data } = response.data;
-			console.log(data);
 			dispatch({
 				type: SITE_ACTIONS.UPDATE_SITE_DATA,
 				data
