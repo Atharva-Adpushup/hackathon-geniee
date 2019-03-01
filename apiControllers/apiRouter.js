@@ -6,6 +6,8 @@ const userController = require('./userController');
 const proxyController = require('./proxyController');
 const indexController = require('./indexController');
 const apTagController = require('./apTagController');
+const siteController = require('./siteController');
+const dataController = require('./dataController');
 const innovativeAdsController = require('./innovativeAdsController');
 const siteController = require('./siteController');
 
