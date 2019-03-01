@@ -29,13 +29,21 @@ class UiList extends React.Component {
 	}
 
 	updateItem = () => {
-		const { activeItemValue, activeItemKey, collection } = this.state;
-		const item = collection[activeItemKey];
-		const message = `Are you sure you want to update ${item}`;
+		const { activeItemKey, activeItemValue, collection } = this.state;
+		const isValidActiveItem = !!(activeItemKey !== null && activeItemKey !== '');
+		const computedItemAction = isValidActiveItem ? 'update' : 'add';
+		const message = `Are you sure you want to ${computedItemAction} ${activeItemValue}`;
 
 		if (window.confirm(message)) {
-			collection[activeItemKey] = activeItemValue;
-			this.setState({ collection, activeItemKey: '', activeItemValue: '' });
+			if (isValidActiveItem) {
+				collection[activeItemKey] = activeItemValue;
+			} else {
+				collection.push(activeItemValue);
+			}
+
+			this.setState({ collection, activeItemKey: '', activeItemValue: '' }, () => {
+				console.log('computed Collection Value: ', collection);
+			});
 		}
 	};
 
@@ -51,10 +59,23 @@ class UiList extends React.Component {
 	};
 
 	editItem = key => {
-		const { collection } = this.state;
-		const activeItemValue = collection[key];
+		const { collection, activeItemKey } = this.state;
+		const isValidActiveItem = !!(activeItemKey === Number(key));
+		let computedActiveItem;
+		let computedActiveItemKey;
 
-		this.setState({ activeItemValue, activeItemKey: key });
+		if (!isValidActiveItem) {
+			computedActiveItem = collection[key];
+			computedActiveItemKey = key;
+		} else {
+			computedActiveItem = '';
+			computedActiveItemKey = '';
+		}
+
+		this.setState({
+			activeItemValue: computedActiveItem,
+			activeItemKey: computedActiveItemKey ? Number(computedActiveItemKey) : ''
+		});
 	};
 
 	generatePlaceHolder = () => {
@@ -65,18 +86,19 @@ class UiList extends React.Component {
 
 	generateContent = () => {
 		const _ref = this;
-		const { collection, activeItemKey, activeItemValue } = _ref.state;
+		const { collection, activeItemKey } = _ref.state;
 		const isItemCollection = !!(collection && collection.length);
 
 		return isItemCollection ? (
 			<ListGroup className="u-margin-b4">
 				{collection.map((itemValue, itemKey) => {
 					const listItemKey = `blocklist-item-${itemKey}`;
-					const isActiveItem = !!(
-						itemValue === activeItemValue && itemKey === Number(activeItemKey)
-					);
+					const isActiveItem = !!(itemKey === activeItemKey);
 					const computedActiveClassName = isActiveItem ? ' is-active' : '';
 					const computedRootClassName = `u-padding-3 aligner aligner--row u-margin-b3${computedActiveClassName}`;
+					let computedEditTooltipText = isActiveItem ? 'Click to unselect' : 'Click to edit';
+
+					computedEditTooltipText = `${computedEditTooltipText} this value below`;
 
 					return (
 						<ListGroupItem key={listItemKey} className={computedRootClassName}>
@@ -85,7 +107,7 @@ class UiList extends React.Component {
 								<OverlayTooltip
 									id="tooltip-edit-item-info"
 									placement="top"
-									tooltip="Edit this value"
+									tooltip={computedEditTooltipText}
 								>
 									<FontAwesomeIcon
 										data-key={`${itemKey}-edit`}
@@ -100,7 +122,7 @@ class UiList extends React.Component {
 								<OverlayTooltip
 									id="tooltip-delete-item-info"
 									placement="top"
-									tooltip="Delete this value"
+									tooltip="Click to delete this value"
 								>
 									<FontAwesomeIcon
 										data-key={`${itemKey}-delete`}
@@ -124,12 +146,11 @@ class UiList extends React.Component {
 	handleClickHandler = inputParam => {
 		const { target } = inputParam;
 		const isPathElement = !!(target && target.parentNode.tagName.toUpperCase() === 'SVG');
-		const isSVGElement = !!(target && target.tagName.toUpperCase() === 'SVG');
 		let computedElement;
 
 		if (isPathElement) {
 			computedElement = target.parentNode;
-		} else if (isSVGElement) {
+		} else {
 			computedElement = target;
 		}
 
@@ -146,6 +167,10 @@ class UiList extends React.Component {
 				this.deleteItem(computedItemKey);
 				break;
 
+			case 'save':
+				this.updateItem();
+				break;
+
 			default:
 				break;
 		}
@@ -153,18 +178,32 @@ class UiList extends React.Component {
 
 	renderActionInputGroup = () => {
 		const { inputPlaceholder, saveButtonText } = this.props;
-		const { activeItemValue } = this.state;
+		const { activeItemValue, activeItemKey } = this.state;
+		const isActiveItem = !!(
+			activeItemValue &&
+			activeItemKey !== '' &&
+			!Number.isNaN(activeItemKey)
+		);
+		const computedActiveFormControl = isActiveItem ? 'u-box-shadow-active' : '';
 
 		return (
 			<FormGroup>
 				<InputGroup>
-					<FormControl type="text" value={activeItemValue} placeholder={inputPlaceholder} />
+					<FormControl
+						type="text"
+						value={activeItemValue}
+						placeholder={inputPlaceholder}
+						onChange={e => this.setState({ activeItemValue: e.target.value })}
+						className={computedActiveFormControl}
+					/>
 					<InputGroup.Button>
 						<CustomButton
 							variant="primary"
 							className=""
 							name="blocklist-save-button"
-							onClick={() => {}}
+							data-name="save"
+							data-key="0-save"
+							onClick={this.handleClickHandler}
 						>
 							{saveButtonText}
 						</CustomButton>
