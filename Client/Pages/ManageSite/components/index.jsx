@@ -173,7 +173,7 @@ class ManageSite extends React.Component {
 							rootClassNames="u-margin-b4"
 							dismissible
 						/>
-						<Link to={`/settings/${site.siteId}`}>
+						<Link to={`/sites/${site.siteId}/settings`}>
 							<CustomButton variant="secondary" className="pull-right">
 								<React.Fragment>
 									Settings
