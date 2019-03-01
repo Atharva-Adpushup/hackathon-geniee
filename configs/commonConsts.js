@@ -371,6 +371,14 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			forceByPass: true
 		}
 	},
+	onboarding: {
+		steps: ['Add Site', 'Add AP code', 'Setup Passback'],
+		adsTxtDocUrl:
+			'https://docs.google.com/feeds/download/documents/export/Export?id=1qu0IfKRGdq7Go6ABvqaoh0-9tM7hyGsCucPoRlDZiNI&exportFormat=txt',
+		revenueLowerBound: 1000,
+		initialStep: 1,
+		totalSteps: 3
+	},
 	APP_KEYS: {
 		0: {
 			app: 'UNKNOWN',
