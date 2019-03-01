@@ -35,6 +35,14 @@ router
 			.catch(err => {
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong!' });
 			})
+	)
+	.get('/getAdsTxt', (req, res) =>
+		proxy
+			.fetchOurAdsTxt()
+			.then(adsTxtSnippet => res.status(httpStatus.OK).json({ adsTxtSnippet }))
+			.catch(err =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong!' })
+			)
 	);
 
 module.exports = router;
