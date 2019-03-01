@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import ActionCard from '../../../Components/ActionCard/index';
@@ -7,6 +7,8 @@ import OverlayTooltip from '../../../Components/OverlayTooltip/index';
 import { APPS, STATUSES, LINK_TYPE, TYPE, DEFAULT_ITEM } from '../../../constants/others';
 import Card from '../../../Components/Layout/Card';
 import Loader from '../../../Components/Loader/index';
+import CustomButton from '../../../Components/CustomButton/index';
+import CustomMessage from '../../../Components/CustomMessage/index';
 
 class ManageSite extends React.Component {
 	componentDidMount() {
@@ -160,7 +162,27 @@ class ManageSite extends React.Component {
 		const { appStatuses = false } = site;
 		return (
 			<ActionCard title="Manage Site">
-				<div className="u-padding-v5">{appStatuses ? this.renderApps() : this.renderLoader()}</div>
+				<div className="u-padding-v5">
+					<Row className="u-margin-b4 u-padding-h5">
+						<CustomMessage
+							header="Information"
+							type="info"
+							message={
+								'<p style="font-size: 16px">To enable/disable any app please contact your respective Account Manager.</p>'
+							}
+							rootClassNames="u-margin-b4"
+						/>
+						<Link to={`/settings/${site.siteId}`}>
+							<CustomButton variant="secondary" className="pull-right">
+								<React.Fragment>
+									Settings
+									<FontAwesomeIcon icon="cog" className="u-margin-l2" />
+								</React.Fragment>
+							</CustomButton>
+						</Link>
+					</Row>
+					{appStatuses ? this.renderApps() : this.renderLoader()}
+				</div>
 			</ActionCard>
 		);
 	}
