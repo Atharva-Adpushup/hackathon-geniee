@@ -31,6 +31,9 @@ const InnovativeAds = lazy(() =>
 );
 const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/ErrorPage/index'));
 const Layout = lazy(() => import(/* webpackChunkName: "layout" */ './Apps/Layout/index'));
+const SiteSettings = lazy(() =>
+	import(/* webpackChunkName: "siteSettings" */ './Pages/SiteSettings/index')
+);
 
 const Routes = () => (
 	<Router history={history}>
@@ -55,6 +58,7 @@ const Routes = () => (
 					<Route exact path="/error" render={() => <ErrorPage />} />
 					<PrivateRoute exact path="/dashboard" component={Dashboard} />
 					<PrivateRoute exact path="/sites" component={Sites} />
+					<PrivateRoute exact path="/sites/:siteId/settings" component={SiteSettings} />
 					<PrivateRoute exact path="/reporting" component={Reporting} />
 					<PrivateRoute exact path="/byodPanel" component={ByodPanel} />
 					<PrivateRoute exact path="/adsTxtManagement" component={AdsTxtManagement} />

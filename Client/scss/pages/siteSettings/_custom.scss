@@ -1,0 +1,14 @@
+.list-group-item {
+	border: none;
+	border-bottom: 1px solid $borderColor;
+	border-radius: 0;
+	box-shadow: none;
+
+	&.is-active {
+		border: none;
+		border-bottom: 1px solid $borderColor;
+		border-radius: 0;
+		box-shadow: none;
+		color: $primaryColor;
+	}
+}
