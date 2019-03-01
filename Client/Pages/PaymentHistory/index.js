@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import ActionCard from '../../Components/ActionCard/index';
 import { paymentsAction } from '../../actions/userActions';
 import { connect } from 'react-redux';
-class Payment extends Component {
+class PaymentHistory extends Component {
 	state = {
-		tipaltiUrl: '',
+		paymentHistoryUrl: '',
 		width: '100%',
 		height: '0px'
 	};
@@ -13,7 +13,7 @@ class Payment extends Component {
 		payments().then(res => {
 			if (res.status == 200) {
 				this.setState({
-					tipaltiUrl: res.data.tipaltiUrl
+					paymentHistoryUrl: res.data.paymentHistoryUrl
 				});
 			}
 		});
@@ -23,7 +23,7 @@ class Payment extends Component {
 		window.removeEventListener('message', this.handleFrameTasks);
 	}
 	handleFrameTasks = e => {
-		if (e && e.data && e.data.TipaltiIframeInfo && e.data.caller == 'PaymentDetails') {
+		if (e && e.data && e.data.TipaltiIframeInfo && e.data.caller == 'PaymentHistory') {
 			if (e.data.TipaltiIframeInfo.height) {
 				this.setState({ height: e.data.TipaltiIframeInfo.height + 'px' });
 			}
@@ -34,13 +34,13 @@ class Payment extends Component {
 	};
 
 	render() {
-		const { tipaltiUrl, width, height } = this.state;
+		const { paymentHistoryUrl, width, height } = this.state;
 		return (
-			<ActionCard title="Payment Settings">
+			<ActionCard title="Payment History">
 				<div className="u-padding-4 text-center">
 					<iframe
-						id="tipaltiPaymentDetailIframe"
-						src={tipaltiUrl}
+						id="tipaltiPaymentHistoryIframe"
+						src={paymentHistoryUrl}
 						frameBorder="0"
 						style={{ width: width, height: height }}
 					/>
@@ -53,4 +53,4 @@ class Payment extends Component {
 export default connect(
 	null,
 	{ paymentsAction }
-)(Payment);
+)(PaymentHistory);
