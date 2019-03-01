@@ -230,25 +230,31 @@ function fetchStatusesFromReporting(site) {
 }
 
 function getChannelsAndComputeStatuses(site) {
-	return site.getAllChannels().then(channels => {
-		const response = {};
-		if (channels && channels.length) {
-			_.forEach(channels, channel => {
-				const isAutoOptimiseOn = !!(
-					Object.prototype.hasOwnProperty.call(channel, 'autoOptimise') && channel.autoOptimise
-				);
-				const isAMPEnabled = !!(
-					Object.prototype.hasOwnProperty.call(channel, 'ampSettings') &&
-					channel.ampSettings &&
-					channel.ampSettings.isEnabled
-				);
+	return site
+		.getAllChannels()
+		.then(channels => {
+			const response = {};
+			if (channels && channels.length) {
+				_.forEach(channels, channel => {
+					const isAutoOptimiseOn = !!(
+						Object.prototype.hasOwnProperty.call(channel, 'autoOptimise') && channel.autoOptimise
+					);
+					const isAMPEnabled = !!(
+						Object.prototype.hasOwnProperty.call(channel, 'ampSettings') &&
+						channel.ampSettings &&
+						channel.ampSettings.isEnabled
+					);
 
-				isAMPEnabled ? (response['6'] = APP_KEYS['6']) : null;
-				isAutoOptimiseOn ? (response['4'] = APP_KEYS['4']) : null;
-			});
-		}
-		return response;
-	});
+					isAMPEnabled ? (response['6'] = APP_KEYS['6']) : null;
+					isAutoOptimiseOn ? (response['4'] = APP_KEYS['4']) : null;
+				});
+			}
+			return response;
+		})
+		.catch(err => {
+			console.log(err);
+			return DEFAULT_APP_STATUS_RESPONSE;
+		});
 }
 
 function checkManageAdsTxtStatus(site) {
@@ -265,13 +271,18 @@ function checkManageAdsTxtStatus(site) {
 		resolveWithFullResponse: true
 	};
 
-	return request(options).then(response => {
-		const output = {};
-		const isRedirecting = response.request.uri.href.indexOf(ADS_TXT_REDIRECT_PATTERN) !== -1;
+	return request(options)
+		.then(response => {
+			const output = {};
+			const isRedirecting = response.request.uri.href.indexOf(ADS_TXT_REDIRECT_PATTERN) !== -1;
 
-		isRedirecting ? (output['8'] = APP_KEYS['8']) : null;
-		return output;
-	});
+			isRedirecting ? (output['8'] = APP_KEYS['8']) : null;
+			return output;
+		})
+		.catch(err => {
+			console.log(err);
+			return DEFAULT_APP_STATUS_RESPONSE;
+		});
 }
 
 function fetchCustomStatuses(site) {
