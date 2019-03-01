@@ -162,28 +162,32 @@ class ManageSite extends React.Component {
 		const { appStatuses = false } = site;
 		return (
 			<ActionCard title="Manage Site">
-				<div className="u-padding-v5">
-					<Row className="u-margin-b4 u-padding-h5">
-						<CustomMessage
-							header="Information"
-							type="info"
-							message={
-								'<p style="font-size: 16px">To enable/disable any app please contact your respective Account Manager.</p>'
-							}
-							rootClassNames="u-margin-b4"
-							dismissible
-						/>
-						<Link to={`/sites/${site.siteId}/settings`}>
-							<CustomButton variant="secondary" className="pull-right">
-								<React.Fragment>
-									Settings
-									<FontAwesomeIcon icon="cog" className="u-margin-l2" />
-								</React.Fragment>
-							</CustomButton>
-						</Link>
-					</Row>
-					{appStatuses ? this.renderApps() : this.renderLoader()}
-				</div>
+				{appStatuses ? (
+					<div className="u-padding-v5">
+						<Row className="u-margin-b4 u-padding-h5">
+							<CustomMessage
+								header="Information"
+								type="info"
+								message={
+									'<p style="font-size: 16px">To enable/disable any app please contact your respective Account Manager.</p>'
+								}
+								rootClassNames="u-margin-b4"
+								dismissible
+							/>
+							<Link to={`/sites/${site.siteId}/settings`}>
+								<CustomButton variant="secondary" className="pull-right">
+									<React.Fragment>
+										Settings
+										<FontAwesomeIcon icon="cog" className="u-margin-l2" />
+									</React.Fragment>
+								</CustomButton>
+							</Link>
+						</Row>
+						{this.renderApps()}
+					</div>
+				) : (
+					this.renderLoader()
+				)}
 			</ActionCard>
 		);
 	}
