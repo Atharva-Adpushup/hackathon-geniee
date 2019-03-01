@@ -37,7 +37,7 @@ class PaymentHistory extends Component {
 		const { paymentHistoryUrl, width, height } = this.state;
 		return (
 			<ActionCard title="Payment History">
-				<div style={{ padding: '20px', textAlign: 'center' }}>
+				<div className="u-padding-4 text-center">
 					<iframe
 						id="tipaltiPaymentHistoryIframe"
 						src={paymentHistoryUrl}
