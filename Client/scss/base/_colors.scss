@@ -11,6 +11,7 @@ $warningColor: #f0ad4e;
 $fontColor: #555555;
 $dimFontColor: #b2b2b2;
 $borderColor: #e6e6e6;
+$dottedBorderColor: #ccc;
 $iconColor: #787878;
 $dashboardBgColor: #ebf1f2;
 $lightGrey: #ccc;
@@ -27,3 +28,18 @@ $LPFormColor: #89949b;
 
 $errorText: #c3272b;
 $successText: #006442;
+
+// Global bootstrap alert background and text colors
+// Use them globally for all alert use cases
+$dangerBackground: #f2dede;
+$dangerBorder: #ebccd1;
+$dangerText: #a94442;
+$warningBackground: #fcf8e3;
+$warningBorder: #faebcc;
+$warningText: #8a6d3b;
+$successBackground: #dff0d8;
+$successBorder: #d6e9c6;
+$successText: #3c763d;
+
+$boxShadowOne: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19);
+$boxShadowInsetOne: 0 0 10px $borderColor inset;

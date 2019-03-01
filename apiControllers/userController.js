@@ -1,10 +1,12 @@
 const express = require('express');
+const crypto = require('crypto');
 const userModel = require('../models/userModel');
 const utils = require('../helpers/utils');
 const CC = require('../configs/commonConsts');
 const httpStatus = require('../configs/httpStatusConsts');
 const formValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
+const config = require('../configs/config');
 
 const router = express.Router();
 
@@ -51,6 +53,55 @@ router
 					});
 			})
 			.catch(err => res.status(httpStatus.BAD_REQUEST).json({ error: err.message[0].message }));
+	})
+	.get('/payment', (req, res) => {
+		userModel
+			.getUserByEmail(req.user.email)
+			.then(user => {
+				const tipaltiConfig = config.tipalti;
+
+				let tipaltiUrl = '';
+
+				const tipaltiBaseUrl = tipaltiConfig.baseUrl;
+
+				const email = user.get('email');
+
+				const payeeId = encodeURIComponent(
+					crypto
+						.createHash('md5')
+						.update(email)
+						.digest('hex')
+						.substr(0, 64)
+				);
+
+				const payer = tipaltiConfig.payerName;
+
+				const date = Math.floor(+new Date() / 1000);
+
+				const paramsStr = `idap=${payeeId}&payer=${payer}&ts=${date}&email=${encodeURIComponent(
+					email
+				)}`;
+
+				const key = tipaltiConfig.key;
+
+				const hash = crypto
+					.createHmac('sha256', key)
+					.update(paramsStr.toString('utf-8'))
+					.digest('hex');
+
+				const paymentHistoryUrl = `${tipaltiConfig.paymentHistoryUrl + paramsStr}&hashkey=${hash}`;
+
+				tipaltiUrl = `${tipaltiBaseUrl + paramsStr}&hashkey=${hash}`;
+				res.send({
+					tipaltiUrl,
+					paymentHistoryUrl
+				});
+			})
+			.catch(err => {
+				res.render('payment', {
+					error: 'Some error occurred!'
+				});
+			});
 	});
 
 module.exports = router;

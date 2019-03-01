@@ -16,3 +16,4 @@ export const logoutAction = () => dispatch =>
 export const forgotPasswordAction = email => dispatch => userService.forgotPassword(email);
 export const resetPasswordAction = (email, key, password) => dispatch =>
 	userService.resetPassword(email, key, password);
+export const paymentsAction = () => dispatch => userService.payments();

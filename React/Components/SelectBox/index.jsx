@@ -1,19 +1,17 @@
-'use strict';
-
-let React = require('react');
+const React = require('react');
 
 import './styles.scss';
 
-let div = React.createElement.bind(null, 'div');
-let button = React.createElement.bind(null, 'button');
-let a = React.createElement.bind(null, 'a');
-let select = React.createElement.bind(null, 'select');
-let option = React.createElement.bind(null, 'option');
-let label = React.createElement.bind(null, 'label');
+const div = React.createElement.bind(null, 'div');
+const button = React.createElement.bind(null, 'button');
+const a = React.createElement.bind(null, 'a');
+const select = React.createElement.bind(null, 'select');
+const option = React.createElement.bind(null, 'option');
+const label = React.createElement.bind(null, 'label');
 
 let idInc = 0;
 
-let keyHandlers = {
+const keyHandlers = {
 	38: 'handleUpKey',
 	40: 'handleDownKey',
 	32: 'handleSpaceKey',
@@ -86,23 +84,23 @@ module.exports = React.createClass({
 	},
 
 	handleChange(val, cb) {
-		return function (event) {
+		return function(event) {
 			this.clickingOption = false;
 			interceptEvent(event);
 			if (this.isMultiple()) {
 				let selected = [];
 				if (val != null) {
 					selected = this.value().slice(0);
-					let index = selected.indexOf(val);
+					const index = selected.indexOf(val);
 					if (index !== -1) {
 						selected.splice(index, 1);
 					} else {
 						selected.push(val);
 					}
 				}
-				this.updatePendingValue(selected, cb) || this.props.onChange(selected);
+				this.updatePendingValue(selected, cb) || this.props.onChange(selected, event);
 			} else {
-				this.updatePendingValue(val, cb) || this.props.onChange(val);
+				this.updatePendingValue(val, cb) || this.props.onChange(val, event);
 				this.handleClose();
 				this.refs.button.focus();
 			}
@@ -112,7 +110,7 @@ module.exports = React.createClass({
 	handleNativeChange(event) {
 		let val = event.target.value;
 		if (this.isMultiple()) {
-			let children = [].slice.call(event.target.childNodes, 0);
+			const children = [].slice.call(event.target.childNodes, 0);
 			val = children.reduce((memo, child) => {
 				if (child.selected) {
 					memo.push(child.value);
@@ -120,12 +118,12 @@ module.exports = React.createClass({
 				return memo;
 			}, []);
 		}
-		this.props.onChange(val);
+		this.props.onChange(val, event);
 	},
 
 	handleClear(event) {
 		interceptEvent(event);
-		this.handleChange(null, function () {
+		this.handleChange(null, function() {
 			// only called when change="true"
 			this.props.onChange(this.state.pendingValue);
 		})(event);
@@ -138,7 +136,7 @@ module.exports = React.createClass({
 
 	handleOpen(event) {
 		interceptEvent(event);
-		this.setState({ open: true }, function () {
+		this.setState({ open: true }, function() {
 			this.refs.menu.focus();
 		});
 	},
@@ -154,8 +152,8 @@ module.exports = React.createClass({
 	},
 
 	moveFocus(move) {
-		let len = React.Children.count(this.props.children);
-		let idx = (this.state.focusedIndex + move + len) % len;
+		const len = React.Children.count(this.props.children);
+		const idx = (this.state.focusedIndex + move + len) % len;
 		this.setState({ focusedIndex: idx });
 	},
 
@@ -202,13 +200,9 @@ module.exports = React.createClass({
 	},
 
 	label() {
-		let selected = this.options()
-			.filter(option => {
-				return this.isSelected(option.value);
-			})
-			.map(option => {
-				return option.label;
-			});
+		const selected = this.options()
+			.filter(option => this.isSelected(option.value))
+			.map(option => option.label);
 		return selected.length > 0 ? selected.join(', ') : this.props.label;
 	},
 
@@ -217,7 +211,7 @@ module.exports = React.createClass({
 	},
 
 	options() {
-		let options = [];
+		const options = [];
 		React.Children.forEach(this.props.children, option => {
 			options.push({
 				value: option.props.value,
@@ -228,7 +222,7 @@ module.exports = React.createClass({
 	},
 
 	value() {
-		let value = this.changeOnClose() ? this.state.pendingValue : this.props.value;
+		const value = this.changeOnClose() ? this.state.pendingValue : this.props.value;
 
 		if (!this.isMultiple() || Array.isArray(value)) {
 			return value;
@@ -270,7 +264,7 @@ module.exports = React.createClass({
 			className += ' react-select-box-empty';
 		}
 		if (this.hasValue()) {
-			className += ' react-select-box-selected'
+			className += ' react-select-box-selected';
 		}
 		if (this.props.disabled) {
 			disabledStyles = {
@@ -304,10 +298,10 @@ module.exports = React.createClass({
 	},
 
 	renderNativeSelect() {
-		let id = `${this.state.id}-native-select`;
-		let multiple = this.isMultiple();
-		let empty = multiple ? null : option({ key: '', value: '' }, 'No Selection');
-		let options = [empty].concat(this.props.children);
+		const id = `${this.state.id}-native-select`;
+		const multiple = this.isMultiple();
+		const empty = multiple ? null : option({ key: '', value: '' }, 'No Selection');
+		const options = [empty].concat(this.props.children);
 		return div(
 			{ className: 'react-select-box-native' },
 			label({ htmlFor: id }, this.props.label),

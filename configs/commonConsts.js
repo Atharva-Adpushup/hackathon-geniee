@@ -5,6 +5,7 @@ module.exports = {
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://staging.adpushup.com/InternalOpsWebService/stats',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
+	PRODUCT_LIST_API: 'https://staging.adpushup.com/CentralReportingWebService/common/productList',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	DEMO_REPORT_SITE_ID: 31764,
 	DEMO_PAGEGROUPS: ['HOME', 'IMAGE', 'POST', 'PHPBB3', 'NEW', 'CATEGORY'],
@@ -26,7 +27,8 @@ module.exports = {
 	},
 	INJECTION_TECHNIQUES: {
 		LAYOUT: 1,
-		TAG: 2
+		TAG: 2,
+		INNOVATIVE_AD: 3
 	},
 	MANUAL_ADS: {
 		VARIATION: 'manual'
@@ -326,8 +328,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	dummy: 'test',
 	docKeys: {
 		apTag: 'tgmr::',
-		user: 'user::',
-		networkConfig: 'data::apNetwork'
+		networkConfig: 'data::apNetwork',
+		interactiveAds: 'fmrt::',
+		user: 'user::'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,
@@ -335,11 +338,80 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		siteDomain: null,
 		ads: []
 	},
+	INNOVATIVE_ADS_INITIAL_DOC: {
+		siteId: null,
+		ownerEmail: null,
+		siteDomain: null,
+		ads: [],
+		meta: {
+			pagegroups: [],
+			custom: []
+		}
+	},
+	DEFAULT_META: {
+		pagegroups: [],
+		custom: []
+	},
+	INTERACTIVE_ADS_TYPES: {
+		VERTICAL: ['stickyLeft', 'stickyRight', 'docked'],
+		HORIZONTAL: ['stickyTop', 'stickyBottom'],
+		OTHER: ['inView']
+	},
+	interactiveAdsRules: {
+		vertical: {
+			noOfAdsAllowed: 1
+		},
+		horizontal: {
+			noOfAdsAllowed: 1
+		}
+	},
 	videoNetworkInfo: {
 		network: 'custom',
 		networkData: {
 			adCode: '',
 			forceByPass: true
 		}
-	}
+	},
+	APP_KEYS: {
+		0: {
+			app: 'UNKNOWN',
+			key: 0
+		},
+		1: {
+			app: 'LAYOUT',
+			key: 1
+		},
+		2: {
+			app: 'TAG',
+			key: 2
+		},
+		3: {
+			app: 'HB',
+			key: 3
+		},
+		4: {
+			app: 'MEDIATION',
+			key: 4
+		},
+		5: {
+			app: 'INTERACTIVE_AD',
+			key: 5
+		},
+		6: {
+			app: 'AMP',
+			key: 6
+		},
+		7: {
+			app: 'AdRecover',
+			key: 7
+		},
+		8: {
+			app: 'Manage Ads.txt',
+			key: 8
+		}
+	},
+	ADS_TXT_REDIRECT_PATTERN: 'manageadstxt.com',
+	GOOGLE_BOT_USER_AGENT:
+		'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html).',
+	DEFAULT_APP_STATUS_RESPONSE: {}
 };

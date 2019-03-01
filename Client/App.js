@@ -14,7 +14,15 @@ import {
 	faKey,
 	faUser,
 	faLink,
-	faEdit
+	faEdit,
+	faCopy,
+	faCog,
+	faTimes,
+	faInfoCircle,
+	faExclamationTriangle,
+	faExclamationCircle,
+	faCheckCircle,
+	faExternalLinkAlt
 } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import ErrorBoundary from './Components/ErrorBoundary';
@@ -33,7 +41,15 @@ library.add(
 	faKey,
 	faUser,
 	faLink,
-	faEdit
+	faEdit,
+	faCopy,
+	faCog,
+	faTimes,
+	faInfoCircle,
+	faExclamationTriangle,
+	faExclamationCircle,
+	faCheckCircle,
+	faExternalLinkAlt
 );
 
 const App = () => (

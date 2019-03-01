@@ -1,4 +1,4 @@
-var ApConfig = {
+const ApConfig = {
 	keys: [
 		'mode',
 		'pageGroupPattern',
@@ -7,6 +7,7 @@ var ApConfig = {
 		'xpathWaitTimeout',
 		'adpushupPercentage',
 		'autoOptimise',
+		'poweredByBanner',
 		'activeDFPNetwork',
 		'activeDFPParentId',
 		'activeDFPCurrencyCode',
@@ -16,7 +17,9 @@ var ApConfig = {
 		'isAdPushupControlWithPartnerSSP',
 		'isSPA',
 		'isThirdPartyAdx',
-		'spaPageTransitionTimeout'
+		'spaPageTransitionTimeout',
+		'isManual',
+		'isInnovative'
 	],
 	override: [
 		'mode',
@@ -26,6 +29,7 @@ var ApConfig = {
 		'xpathWaitTimeout',
 		'adpushupPercentage',
 		'autoOptimise',
+		'poweredByBanner',
 		'activeDFPNetwork',
 		'activeDFPParentId',
 		'activeDFPCurrencyCode',
@@ -35,7 +39,9 @@ var ApConfig = {
 		'isAdPushupControlWithPartnerSSP',
 		'isSPA',
 		'isThirdPartyAdx',
-		'spaPageTransitionTimeout'
+		'spaPageTransitionTimeout',
+		'isManual',
+		'isInnovative'
 	],
 	merge: []
 };

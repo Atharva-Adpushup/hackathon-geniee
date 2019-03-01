@@ -1,0 +1,207 @@
+//- Interactive ads demo view
+
+extends layout/base
+
+block getTitle
+    - var titleVar = 'AdPushup Interactive Ads Demo'
+
+block meta
+    meta(content="width=device-width,initial-scale=1" name="viewport")
+
+block append headScripts
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.js")
+
+block headCss
+    link(href="http://fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic&subset=latin,latin-ext", rel='stylesheet', type='text/css')
+    link(rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css")
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
+    style.
+        body,html{overflow-x:hidden;background-color:#f3f5f7;}.main-wrapper>.col-sm-10,.main-wrapper>.col-sm-2{padding:0}.sidebar{background-color:#eb575c}.sidebar ul{padding:0;margin:0;list-style:none}.sidebar ul ul{margin-left:10px;list-style:none}.sidebar ul li{color:#8a2424;padding:15px 15px 0;font-size:18px}.sidebar ul li.header{font-weight:700;font-size:2em;padding:15px;border-bottom:2px solid #8a2424}.demo-wraper{min-height:100%;padding:15px;background-color:#f3f5f7}.demo-content{display:none}.demo-content>h2{margin:0 0 15px;color:#222}.demo-content>p{margin-bottom:15px;color:#444;font-weight:300;font-size:16px}.demo-content>.frame{border:2px solid #e6e6e6;margin-top:-2px;border-bottom-left-radius:6px;border-bottom-right-radius:6px;overflow-y:scroll;overflow-x:hidden;background-color:#fff}.frame>.content{position:relative;padding-bottom:56.25%;padding-top:25px;height:0}.frame>.content>iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}li.format{cursor:pointer}.features>label{font-weight:300;margin-right:5px}.features>span{margin-right:15px;font-weight:300;color:#eb575c}.features>i{font-size:20px;margin-right:5px;color:#eb575c}.demo-message{font-size:1.5em;margin-top:200px;text-align:center;font-weight:300;}.demo-message>i{color:#eb575c;margin-right:10px;}.fa-chevron-up{display:none}@media screen and (max-width:767px){.container-fluid,.demo-content,.main-wrapper,.main-wrapper>.col-sm-10,.main-wrapper>.col-sm-2,.sidebar,body,html{height:auto}.sidebar{height:200px!important;padding-bottom:15px;overflow-y:scroll;border-bottom:2px solid #8a2424}.fa-chevron-up{display:inline-block}.fa-chevron-left{display:none}.demo-content{margin-top:15px}.col-sm-10,.container-fluid,.demo-wrapper,.main-wrapper,body,html{height:100%!important}}.format-pane{background:#fff;border-radius:3px;box-shadow:1px 2px 2px rgba(0,0,0,.08);margin-bottom:20px;cursor:pointer}.format-pane>img{padding:20px;height:250px;width:100%}.format-pane>h3{margin:0;font-weight:400;background-color:#f8f8f8;padding:20px;border-top:1px solid #ddd}.fa{margin-right:8px}.filters input{margin-right:15px}.demo-pane{display:none;}.demo-pane button{font-size:.55em;border-radius:3px;background:#fff;font-weight:400;margin-left:20px;border:2px solid #eb575c;color:#eb575c;padding:5px 10px}.preview-pane{margin:0 15px 25px;font-size:1.25em;font-weight:300}.preview-pane>i{color:#eb575c}.preview-pane>span{margin-right:20px;text-decoration:underline;cursor:pointer}.desktop-frame,.mobile-frame{margin:0 auto;border:1px solid #ddd}.desktop-frame{width:100%}.mobile-frame{width:35%;height:650px}.mobile-frame>.frame,.mobile-frame>.frame>.content{height:100%}.sbdf{height:650px}.sbdf>.frame,.sbdf>.frame>.content{height:100%;padding:0}.sidebar{height:900px}#docked:-webkit-full-screen,#native:-webkit-full-screen,#sticky-bottom:-webkit-full-screen,#sticky-left:-webkit-full-screen,#sticky-right:-webkit-full-screen,#sticky-top:-webkit-full-screen{width:100%;height:100%}
+
+block bodyContent
+    .container-fluid
+        .row.main-wrapper
+            .col-sm-2
+                .sidebar
+                    ul.filters
+                        li.header 
+                            i.fa.fa-sliders
+                            | Filters
+                        li 
+                            input(type="checkbox" name="all" value="all" checked) 
+                            i.fa.fa-check-circle
+                            | All
+                        li 
+                            input(type="checkbox" name="desktop" value="desktop") 
+                            i.fa.fa-desktop
+                            | Desktop
+                        li 
+                            input(type="checkbox" name="mobile" value="mobile") 
+                            i.fa.fa-mobile
+                            | Mobile
+                        li 
+                            input(type="checkbox" name="sidebar" value="sidebar") 
+                            i.fa.fa-bars
+                            | Sidebar
+                        li 
+                            input(type="checkbox" name="sticky" value="sticky") 
+                            i.fa.fa-magic
+                            | Sticky
+            .col-sm-10
+                .demo-wraper#formats-list
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
+                        i.fa.fa-cogs
+                        | Formats
+                    .row
+                        .col-sm-4.format(data-filter="all,desktop,mobile,sticky" data-format="sticky-top")
+                            .format-pane
+                                img(src="/assets/images/formats/top.png" class="img-responsive")
+                                h3 Sticky Top
+                        .col-sm-4.format(data-filter="all,desktop,mobile,sticky" data-format="sticky-bottom")
+                            .format-pane
+                                img(src="/assets/images/formats/bottom.png" class="img-responsive")
+                                h3 Sticky Bottom
+                        .col-sm-4.format(data-filter="all,desktop,sidebar,sticky" data-format="sticky-left")
+                            .format-pane
+                                img(src="/assets/images/formats/left.png" class="img-responsive")
+                                h3 Sticky Left
+                        .col-sm-4.format(data-filter="all,desktop,sidebar,sticky" data-format="sticky-right")
+                            .format-pane
+                                img(src="/assets/images/formats/right.png" class="img-responsive")
+                                h3 Sticky Right
+                        .col-sm-4.format(data-filter="all,desktop,sidebar" data-format="docked")
+                            .format-pane
+                                img(src="/assets/images/formats/docked.png" class="img-responsive")
+                                h3 Docked
+                        .col-sm-4.format(data-filter="all,desktop,mobile" data-format="native")
+                            .format-pane
+                                img(src="/assets/images/formats/native.png" class="img-responsive")
+                                h3 Native
+                .demo-wraper.demo-pane#sticky-top
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
+                        | Sticky Top
+                        button.demo-back
+                            i.fa.fa-chevron-left
+                            | Back
+                    .preview-pane
+                        i.fa.fa-arrows
+                        span.fullscreen-btn(data-format="sticky-top") Fullscreen
+                        i.fa.fa-desktop
+                        span.desktop-preview-btn Desktop preview
+                        i.fa.fa-mobile
+                        span.mobile-preview-btn Mobile preview
+                    .desktop-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-top")
+                    .mobile-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-top")
+                .demo-wraper.demo-pane#sticky-bottom
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
+                        | Sticky bottom
+                        button.demo-back
+                            i.fa.fa-chevron-left
+                            | Back
+                    .preview-pane
+                        i.fa.fa-arrows
+                        span.fullscreen-btn(data-format="sticky-bottom") Fullscreen
+                        i.fa.fa-desktop
+                        span.desktop-preview-btn Desktop preview
+                        i.fa.fa-mobile
+                        span.mobile-preview-btn Mobile preview
+                    .desktop-frame.sbdf
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-bottom")
+                    .mobile-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-bottom")
+                .demo-wraper.demo-pane#sticky-left
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
+                        | Sticky left
+                        button.demo-back
+                            i.fa.fa-chevron-left
+                            | Back
+                    .preview-pane
+                        i.fa.fa-arrows
+                        span.fullscreen-btn(data-format="sticky-left") Fullscreen
+                        i.fa.fa-desktop
+                        span.desktop-preview-btn Desktop preview
+                        i.fa.fa-mobile
+                        span(style="pointer-events: none; text-decoration: none; opacity: .65;").mobile-preview-btn This format is unavailable for mobile devices
+                    .desktop-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-left")
+                    .mobile-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-left")
+                .demo-wraper.demo-pane#sticky-right
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
+                        | Sticky right
+                        button.demo-back
+                            i.fa.fa-chevron-left
+                            | Back
+                    .preview-pane
+                        i.fa.fa-arrows
+                        span.fullscreen-btn(data-format="sticky-right") Fullscreen
+                        i.fa.fa-desktop
+                        span.desktop-preview-btn Desktop preview
+                        i.fa.fa-mobile
+                        span(style="pointer-events: none; text-decoration: none; opacity: .65;").mobile-preview-btn This format is unavailable for mobile devices
+                    .desktop-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/sticky-right")
+                .demo-wraper.demo-pane#docked
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
+                        | Docked
+                        button.demo-back
+                            i.fa.fa-chevron-left
+                            | Back
+                    .preview-pane
+                        i.fa.fa-arrows
+                        span.fullscreen-btn(data-format="docked") Fullscreen
+                        i.fa.fa-desktop
+                        span.desktop-preview-btn Desktop preview
+                        i.fa.fa-mobile
+                        span(style="pointer-events: none; text-decoration: none; opacity: .65;").mobile-preview-btn This format is unavailable for mobile devices
+                    .desktop-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/docked")
+                .demo-wraper.demo-pane#native
+                    h2(style="margin: 0; font-size: 2em; font-weight: 700; display: inline-block; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #333; margin-top: 10px;")
+                        | Native
+                        button.demo-back
+                            i.fa.fa-chevron-left
+                            | Back
+                    .preview-pane
+                        i.fa.fa-arrows
+                        span.fullscreen-btn(data-format="native") Fullscreen
+                        i.fa.fa-desktop
+                        span.desktop-preview-btn Desktop preview
+                        i.fa.fa-mobile
+                        span.mobile-preview-btn Mobile preview
+                    .desktop-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/native")
+                    .mobile-frame
+                        .frame
+                            .content
+                                iframe(src="/interactive-ads-demo/native")
+                    
+
+    script.
+        $(document).ready(function(){$("input").on("change",function(){var e=[],t=$("input"),n=$(".format");if($(t).each(function(t,n){$(n).is(":checked")&&e.push(n.value)}),e.length){var o=[],a=[];e.forEach(function(e){$(n).each(function(t,n){$(n).attr("data-filter").includes(e)?o.push(n):a.push(n)})}),$(a).each(function(e,t){$(t).fadeOut()}),$(o).each(function(e,t){$(t).fadeIn()})}}),$(".format").on("click",function(){var e=$(this).attr("data-format");$(".format").hide(),$("#formats-list").hide(),$("#"+e).show(),$(".desktop-frame").show(),$(".mobile-frame").hide()}),$(".demo-back").on("click",function(){$(".format").show(),$("#formats-list").show(),$(".demo-pane").hide()}),$(".desktop-preview-btn").on("click",function(){$(".desktop-frame").show(),$(".mobile-frame").hide()}),$(".mobile-preview-btn").on("click",function(){$(".mobile-frame").show(),$(".desktop-frame").hide()}),$(".fullscreen-btn").on("click",function(){var e=$(this).attr("data-format");document.getElementById(e).requestFullscreen&&document.getElementById(e).requestFullscreen()})});
+
+
+                            
+
+    
+   

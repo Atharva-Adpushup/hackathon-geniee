@@ -21,13 +21,26 @@ const AdsTxtManagement = lazy(() =>
 	import(/* webpackChunkName: "adsTxtManagement" */ './Pages/AdsTxtManagement')
 );
 const Payment = lazy(() => import(/* webpackChunkName: "payment" */ './Pages/Payment'));
+const PaymentHistory = lazy(() =>
+	import(/* webpackChunkName: "paymentHistory" */ './Pages/PaymentHistory')
+);
 const PaymentSettings = lazy(() =>
 	import(/* webpackChunkName: "paymentSettings" */ './Pages/PaymentSettings')
 );
 const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/index'));
+const InnovativeAds = lazy(() =>
+	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
+);
+const ManageSite = lazy(() =>
+	import(/* webpackChunkName: "innovativeAds" */ './Pages/ManageSite/index')
+);
 const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/ErrorPage/index'));
 const OnBoarding = lazy(() => import(/* webpackChunkName: "onBoarding" */ './Pages/OnBoarding'));
 const AddNewSite = lazy(() => import(/* webpackChunkName: "addNewSite" */ './Pages/AddNewSite'));
+const Layout = lazy(() => import(/* webpackChunkName: "layout" */ './Apps/Layout/index'));
+const SiteSettings = lazy(() =>
+	import(/* webpackChunkName: "siteSettings" */ './Pages/SiteSettings/index')
+);
 
 const Routes = () => (
 	<Router history={history}>
@@ -52,15 +65,20 @@ const Routes = () => (
 					<Route exact path="/error" render={() => <ErrorPage />} />
 					<PrivateRoute exact path="/dashboard" component={Dashboard} />
 					<PrivateRoute exact path="/sites" component={Sites} />
+					<PrivateRoute exact path="/sites/:siteId/settings" component={SiteSettings} />
 					<PrivateRoute exact path="/reporting" component={Reporting} />
 					<PrivateRoute exact path="/byodPanel" component={ByodPanel} />
 					<PrivateRoute exact path="/adsTxtManagement" component={AdsTxtManagement} />
 					<PrivateRoute exact path="/addSite" component={AddNewSite} />
 					<PrivateRoute exact path="/payment" component={Payment} />
+					<PrivateRoute exact path="/paymentHistory" component={PaymentHistory} />
 					<PrivateRoute exact path="/paymentSettings" component={PaymentSettings} />
 					<PrivateRoute exact path="/ap-tag/:siteId" component={ApTag} />
 					<PrivateRoute exact path="/onboarding" component={OnBoarding} />
 					<PrivateRoute exact path="/add-site" component={AddNewSite} />
+					<PrivateRoute exact path="/ap-layout/:siteId" component={Layout} />
+					<PrivateRoute exact path="/innovative-ads/:siteId" component={InnovativeAds} />
+					<PrivateRoute exact path="/sites/:siteId" component={ManageSite} />
 				</ShellContainer>
 			</Switch>
 		</Suspense>
