@@ -42,17 +42,33 @@ class UiList extends React.Component {
 			return false;
 		}
 
-		if (window.confirm(confirmMessage)) {
-			if (isValidActiveItem) {
-				collection[activeItemKey] = activeItemValue;
-			} else {
-				collection.push(activeItemValue);
-			}
-
-			this.setState({ collection, activeItemKey: '', activeItemValue: '' }, () => {
-				console.log('computed Collection Value: ', collection);
-			});
+		const confirmationMessage = window.confirm(confirmMessage);
+		if (!confirmationMessage) {
+			return false;
 		}
+
+		const bulkEntriesResult = this.isBulkEntries(activeItemValue);
+		const isBulkEntries = !!(
+			bulkEntriesResult &&
+			Object.keys(bulkEntriesResult).length &&
+			bulkEntriesResult.array &&
+			bulkEntriesResult.length
+		);
+		const isActiveItemBulkEntries = !!(isValidActiveItem && isBulkEntries);
+
+		if (isActiveItemBulkEntries) {
+			collection.splice(activeItemKey, 1, ...bulkEntriesResult.array);
+		} else if (isBulkEntries) {
+			bulkEntriesResult.array.forEach(item => collection.push(item));
+		} else if (isValidActiveItem) {
+			collection[activeItemKey] = activeItemValue;
+		} else {
+			collection.push(activeItemValue);
+		}
+
+		return this.setState({ collection, activeItemKey: '', activeItemValue: '' }, () => {
+			console.log('computed Collection Value: ', collection);
+		});
 	};
 
 	deleteItem = key => {
@@ -184,6 +200,19 @@ class UiList extends React.Component {
 		}
 	};
 
+	isBulkEntries = inputValue => {
+		const computedArray = inputValue
+			.split(',')
+			.map(value => value.trim())
+			.filter(value => !!value);
+		const isValidArray = !!(computedArray && computedArray.length);
+		const resultArray = isValidArray
+			? { array: computedArray, length: computedArray.length }
+			: null;
+
+		return resultArray;
+	};
+
 	renderActionInputGroup = () => {
 		const { inputPlaceholder, saveButtonText } = this.props;
 		const { activeItemValue, activeItemKey } = this.state;
@@ -195,7 +224,7 @@ class UiList extends React.Component {
 		const computedActiveFormControl = isActiveItem ? 'u-box-shadow-active' : '';
 
 		return (
-			<FormGroup>
+			<FormGroup className="u-margin-b4">
 				<InputGroup>
 					<FormControl
 						type="text"
@@ -232,8 +261,8 @@ class UiList extends React.Component {
 		return (
 			<Row className={computedRootClassName}>
 				<Col className="u-margin-0 u-padding-0 layout-uiList-cols">
-					{uiListItems}
 					{actionInputGroup}
+					{uiListItems}
 				</Col>
 			</Row>
 		);

@@ -76,7 +76,9 @@ class SiteSettings extends Component {
 		return (
 			<div className="clearfix">
 				<h4 className="u-margin-t3 u-margin-b4 u-text-bold">Manage Blocklist</h4>
-				<p className="u-margin-b4">Block AdPushup script on below listed websites</p>
+				<p className="u-margin-b4">
+					Block AdPushup script <code>adpushup.js</code> on below listed websites
+				</p>
 				<UiList
 					itemCollection={[]}
 					emptyCollectionPlaceHolder="No blocklist added"
