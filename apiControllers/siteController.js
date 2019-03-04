@@ -101,48 +101,80 @@ router
 		const siteId = parseInt(req.query.siteId, 10);
 		const { email } = req.user;
 
-router.get('/fetchAppStatuses', (req, res) => {
-	const { siteId } = req.query;
-	const { email } = req.user;
+		if (!siteId) {
+			return userModel.getUserByEmail(email).then(user => {
+				const { sites } = user.data;
+				if (sites[0].onboardingStage === 'preOnboarding' && sites.length === 1) {
+					return res.status(httpStatus.OK).json({
+						isOnboarding: true,
+						onboardingStage: sites[0].onboardingStage,
+						siteId: sites[0].siteId,
+						site: sites[0].domain
+					});
+				}
 
-	if (!siteId) {
-		return sendErrorResponse(
-			{
-				message: 'Incomplete params. Site Id is necessary'
-			},
-			res,
-			httpStatus.BAD_REQUEST
-		);
-	}
-	/*
-		Flow:
-		1. Fetch and Verify Site
-		2. Fetch App Statuses
-			- Call to Reporting API
-				- Layout, AdRecover, Innovative Ads, AP Tag, Header Bidding
-			- Fetch Channels
-				- Mediation: Auto Optimise in Channels
-				- AMP: IsEnabled in Channels
-			- Manage Ads.txt: Check Redirect
-		3. Prepare final JSON for client
-	*/
+				return res.status(httpStatus.OK).json({ isOnboarding: false });
+			});
+		}
 
-	return verifyOwner(siteId, email)
-		.then(site =>
-			Promise.join(
-				fetchStatusesFromReporting(site),
-				fetchCustomStatuses(site),
-				(statusesFromReporting, customStatuses) =>
-					sendSuccessResponse(
-						{
-							...site.data,
-							appStatuses: {
-								...statusesFromReporting,
-								...customStatuses
-							}
-						},
-						res
-					)
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(({ user, site }) => {
+				const { domain, onboardingStage, step } = site;
+				return res.status(httpStatus.OK).json({
+					isOnboarding: onboardingStage === 'preOnboarding',
+					siteId,
+					site: domain,
+					onboardingStage,
+					step
+				});
+			})
+			.catch(err => res.status(httpStatus.NOT_FOUND).json({ error: 'Site not found!' }));
+	})
+
+	.get('/fetchAppStatuses', (req, res) => {
+		const { siteId } = req.query;
+		const { email } = req.user;
+
+		if (!siteId) {
+			return sendErrorResponse(
+				{
+					message: 'Incomplete params. Site Id is necessary'
+				},
+				res,
+				httpStatus.BAD_REQUEST
+			);
+		}
+		/*
+			Flow:
+			1. Fetch and Verify Site
+			2. Fetch App Statuses
+				- Call to Reporting API
+					- Layout, AdRecover, Innovative Ads, AP Tag, Header Bidding
+				- Fetch Channels
+					- Mediation: Auto Optimise in Channels
+					- AMP: IsEnabled in Channels
+				- Manage Ads.txt: Check Redirect
+			3. Prepare final JSON for client
+		*/
+
+		return verifyOwner(siteId, email)
+			.then(site =>
+				Promise.join(
+					fetchStatusesFromReporting(site),
+					fetchCustomStatuses(site),
+					(statusesFromReporting, customStatuses) =>
+						sendSuccessResponse(
+							{
+								...site.data,
+								appStatuses: {
+									...statusesFromReporting,
+									...customStatuses
+								}
+							},
+							res
+						)
+				)
 			)
 		)
 		.catch(err => {

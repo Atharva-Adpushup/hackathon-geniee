@@ -71,7 +71,9 @@ const UserRoutes = () => (
 					<PrivateRoute exact path="/paymentSettings" component={PaymentSettings} />
 					<PrivateRoute exact path="/ap-tag/:siteId" component={ApTag} />
 					<PrivateRoute exact path="/onboarding" component={OnBoarding} />
-					<PrivateRoute exact path="/add-site" component={AddNewSite} />
+					<PrivateRoute exact path="/ap-layout/:siteId" component={Layout} />
+					<PrivateRoute exact path="/innovative-ads/:siteId" component={InnovativeAds} />
+					<PrivateRoute exact path="/sites/:siteId" component={ManageSite} />
 				</ShellContainer>
 			</Switch>
 		</Suspense>

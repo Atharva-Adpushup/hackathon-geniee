@@ -477,11 +477,11 @@ function apiModule() {
 					throw new AdPushupError('Cannot get cms data');
 				});
 		},
-		getSiteChannels: siteId =>
-			API.getSiteById(siteId).then(site => site.get('channels')),
-		setSiteStep: function(siteId, step) {
+		getSiteChannels: siteId => API.getSiteById(siteId).then(site => site.get('channels')),
+		setSiteStep: function(siteId, onboardingStage, step) {
 			return API.getSiteById(siteId)
 				.then(function(site) {
+					site.set('onboardingStage', onboardingStage);
 					site.set('step', parseInt(step));
 					return site.save();
 				})

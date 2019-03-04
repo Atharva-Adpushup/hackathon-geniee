@@ -1,5 +1,6 @@
 const express = require('express');
 const userModel = require('../models/userModel');
+const siteModel = require('../models/siteModel');
 const utils = require('../helpers/utils');
 const CC = require('../configs/commonConsts');
 const httpStatus = require('../configs/httpStatusConsts');
@@ -51,6 +52,68 @@ router
 					});
 			})
 			.catch(err => res.status(httpStatus.BAD_REQUEST).json({ error: err.message[0].message }));
+	})
+	.get('/payment', (req, res) => {
+		userModel
+			.getUserByEmail(req.user.email)
+			.then(user => {
+				const tipaltiConfig = config.tipalti;
+
+				let tipaltiUrl = '';
+
+				const tipaltiBaseUrl = tipaltiConfig.baseUrl;
+
+				const email = user.get('email');
+
+				const payeeId = encodeURIComponent(
+					crypto
+						.createHash('md5')
+						.update(email)
+						.digest('hex')
+						.substr(0, 64)
+				);
+
+				const payer = tipaltiConfig.payerName;
+
+				const date = Math.floor(+new Date() / 1000);
+
+				const paramsStr = `idap=${payeeId}&payer=${payer}&ts=${date}&email=${encodeURIComponent(
+					email
+				)}`;
+
+				const key = tipaltiConfig.key;
+
+				const hash = crypto
+					.createHmac('sha256', key)
+					.update(paramsStr.toString('utf-8'))
+					.digest('hex');
+
+				const paymentHistoryUrl = `${tipaltiConfig.paymentHistoryUrl + paramsStr}&hashkey=${hash}`;
+
+				tipaltiUrl = `${tipaltiBaseUrl + paramsStr}&hashkey=${hash}`;
+				res.send({
+					tipaltiUrl,
+					paymentHistoryUrl
+				});
+			})
+			.catch(err => {
+				res.render('payment', {
+					error: 'Some error occurred!'
+				});
+			});
+	})
+	.post('/setSiteStep', (req, res) => {
+		const { siteId, onboardingStage, step } = req.body;
+		siteModel
+			.setSiteStep(siteId, onboardingStage, step)
+			.then(() => userModel.setSitePageGroups(req.user.email))
+			.then(user => {
+				user.save();
+				return res.status(httpStatus.OK).send({ success: 'Update site step successfully!' });
+			})
+			.catch(() =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ error: 'Something went wrong!' })
+			);
 	});
 
 module.exports = router;
