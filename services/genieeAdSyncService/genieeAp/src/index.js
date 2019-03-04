@@ -27,12 +27,12 @@ function destroyAdpSlots() {
 
 	if (adpSlots.length) {
 		var adpGSlots = [];
-		adpSlots.forEach(function (adpSlot) {
+		adpSlots.forEach(function(adpSlot) {
 			adpGSlots.push(w.adpTags.adpSlots[adpSlot].gSlot);
 		});
 
 		w.adpTags.adpSlots = {};
-		w.googletag.cmd.push(function () {
+		w.googletag.cmd.push(function() {
 			w.googletag.destroySlots(adpGSlots);
 		});
 	}
@@ -84,16 +84,22 @@ function initAdpConfig() {
 }
 
 function shouldWeNotProceed() {
-	var hasGenieeStarted = !!(config.partner === 'geniee' &&
+	var hasGenieeStarted = !!(
+		config.partner === 'geniee' &&
 		w.gnsmod &&
 		w.gnsmod.creationProcessStarted &&
-		!config.isAdPushupControlWithPartnerSSP);
+		!config.isAdPushupControlWithPartnerSSP
+	);
 
 	return config.disable || adp.creationProcessStarted || hasGenieeStarted;
 }
 
 function triggerControl(mode) {
-	var isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
+	var isGenieeModeSelected = !!(
+		adp &&
+		adp.geniee &&
+		adp.geniee.sendSelectedModeFeedback
+	);
 
 	//Geniee method call for control mode
 	if (isGenieeModeSelected) {
@@ -125,17 +131,26 @@ function triggerControl(mode) {
 }
 
 function startCreation(forced) {
-	return new Promise(function (resolve) {
+	return new Promise(function(resolve) {
 		ampInit(adp.config);
 		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
-		if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
+		if (
+			!forced &&
+			(shouldWeNotProceed() ||
+				!config.pageGroup ||
+				parseInt(config.mode, 10) === 2)
+		) {
 			return resolve(false);
 		}
 
-		return selectVariation(config).then(function (variationData) {
+		return selectVariation(config).then(function(variationData) {
 			var selectedVariation = variationData.selectedVariation,
 				moduleConfig = variationData.config,
-				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
+				isGenieeModeSelected = !!(
+					adp &&
+					adp.geniee &&
+					adp.geniee.sendSelectedModeFeedback
+				);
 
 			config = adp.config = moduleConfig;
 			if (selectedVariation) {
@@ -153,19 +168,23 @@ function startCreation(forced) {
 				if (interactiveAds) {
 					require.ensure(
 						['interactiveAds/index.js'],
-						function (require) {
+						function(require) {
 							require('interactiveAds/index')(interactiveAds);
 							var interactiveAdsArr = adp.interactiveAds;
 							if (interactiveAdsArr.ads) {
 								var ads = interactiveAdsArr.ads;
 								for (var id in ads) {
-									var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
+									var hasDfpAdUnit =
+										ads[id].networkData && ads[id].networkData.dfpAdunit;
 									if (hasDfpAdUnit) {
-										var slotId = ads[id].networkData.dfpAdunit, container = $('#' + slotId);
+										var slotId = ads[id].networkData.dfpAdunit,
+											container = $('#' + slotId);
 										var currentTime = new Date();
 										container.attr('data-render-time', currentTime.getTime());
-										console.log('rendered slot ', id, ' ', currentTime, ' ', document.hasFocus());
-										if (ads[id].networkData && ads[id].networkData.refreshSlot) {
+										if (
+											ads[id].networkData &&
+											ads[id].networkData.refreshSlot
+										) {
 											refreshAdSlot.refreshSlot(container, ads[id]);
 										}
 									}
@@ -200,7 +219,7 @@ function initAdpQue() {
 	}
 
 	processQue();
-	adp.que.push = function (queFunc) {
+	adp.que.push = function(queFunc) {
 		[].push.call(w.adpushup.que, queFunc);
 		processQue();
 	};
@@ -232,7 +251,11 @@ function main() {
 	hookAndInit(adp, startCreation, browserConfig.platform);
 
 	// AdPushup Debug Force Variation
-	if (utils.queryParams && utils.queryParams.forceVariation && !adp.creationProcessStarted) {
+	if (
+		utils.queryParams &&
+		utils.queryParams.forceVariation &&
+		!adp.creationProcessStarted
+	) {
 		startCreation(true);
 		return false;
 	}
@@ -261,12 +284,16 @@ function main() {
 	}
 
 	if (!config.pageGroup) {
-		pageGroupTimer = setTimeout(function () {
+		pageGroupTimer = setTimeout(function() {
 			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {
 		// start heartBeat
-		heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
+		heartBeat(
+			config.feedbackUrl,
+			config.heartBeatMinInterval,
+			config.heartBeatDelay
+		).start();
 
 		//Init creation
 		startCreation();
