@@ -27,7 +27,6 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 			proxyService
 				.verifyAdsTxtCode(site)
 				.then(resp => {
-					const { successResp } = resp.data;
 					const onboardingStage = 'onboarded';
 					const step = 3;
 
@@ -35,7 +34,17 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 						.setSiteStep(siteId, onboardingStage, step)
 						.then(() =>
 							siteService.saveSite(siteId, site, onboardingStage, step).then(() => {
-								onComplete();
+								this.setState(
+									() => ({
+										ourAdsTxt: '',
+										success: 'Ads.txt verified successfully. Redirecting to My Sites Page...'
+									}),
+									() => {
+										setTimeout(() => {
+											onComplete();
+										}, 3000);
+									}
+								);
 							})
 						)
 						.catch(err => {
@@ -70,7 +79,18 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 					.setSiteStep(siteId, onboardingStage, step)
 					.then(() =>
 						siteService.saveSite(siteId, site, onboardingStage, step).then(() => {
-							onComplete();
+							this.setState(
+								() => ({
+									ourAdsTxt: '',
+									verifyingAdsTxt: false,
+									success: 'Ads.txt verified successfully. Redirecting to My Sites Page...'
+								}),
+								() => {
+									setTimeout(() => {
+										onComplete();
+									}, 3000);
+								}
+							);
 						})
 					)
 					.catch(err => {
@@ -80,7 +100,11 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 			.catch(err => {
 				const { error, ourAdsTxt } = err.response.data;
 
-				this.setState(err.response.status === 404 ? { error, ourAdsTxt } : { error });
+				this.setState(
+					err.response.status === 404
+						? { error, ourAdsTxt, verifyingAdsTxt: false }
+						: { error, verifyingAdsTxt: false }
+				);
 			});
 	};
 
