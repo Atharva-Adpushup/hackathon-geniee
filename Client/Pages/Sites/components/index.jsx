@@ -124,7 +124,7 @@ class MySites extends Component {
 					{this.renderStatusCards()}
 
 					<Link to="/addSite" className="u-link-reset">
-						<div className="card card--theme-dotted u-margin-r5 u-margin-b5 aligner aligner--vCenter aligner--hCenter u-cursor-pointer">
+						<div className="card card--theme-dotted aligner aligner--vCenter aligner--hCenter u-cursor-pointer">
 							<div className="aligner aligner--column aligner--vCenter aligner--hCenter">
 								<FontAwesomeIcon size="2x" icon="plus-circle" className="u-margin-b3" />
 								<span>ADD NEW SITE</span>
