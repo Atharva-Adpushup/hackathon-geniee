@@ -1,6 +1,7 @@
 const express = require('express');
 const crypto = require('crypto');
 const userModel = require('../models/userModel');
+const siteModel = require('../models/siteModel');
 const utils = require('../helpers/utils');
 const CC = require('../configs/commonConsts');
 const httpStatus = require('../configs/httpStatusConsts');
@@ -102,6 +103,19 @@ router
 					error: 'Some error occurred!'
 				});
 			});
+	})
+	.post('/setSiteStep', (req, res) => {
+		const { siteId, onboardingStage, step } = req.body;
+		siteModel
+			.setSiteStep(siteId, onboardingStage, step)
+			.then(() => userModel.setSitePageGroups(req.user.email))
+			.then(user => {
+				user.save();
+				return res.status(httpStatus.OK).send({ success: 'Update site step successfully!' });
+			})
+			.catch(() =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ error: 'Something went wrong!' })
+			);
 	});
 
 module.exports = router;

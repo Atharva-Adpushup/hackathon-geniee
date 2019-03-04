@@ -38,12 +38,7 @@ router
 				userModel
 					.setSitePageGroups(req.user.email)
 					.then(user => {
-						res.status(httpStatus.OK).json({
-							siteId,
-							site: data.site,
-							onboardingStage: site.data.onboardingStage,
-							step: site.data.step
-						});
+						res.status(httpStatus.OK).json(site.data);
 					})
 					.catch(() => {
 						res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'server error' });

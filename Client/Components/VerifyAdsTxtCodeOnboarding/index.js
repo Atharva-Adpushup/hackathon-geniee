@@ -5,6 +5,8 @@ import proxyService from '../../services/proxyService';
 import OnboardingCard from '../OnboardingCard';
 import { copyToClipBoard } from '../../Apps/ApTag/lib/helpers';
 import SendCodeByEmailModal from '../SendCodeByEmailModal';
+import siteService from '../../services/siteService';
+import userService from '../../services/userService';
 
 class VerifyAdsTxtCodeOnboarding extends Component {
 	state = {
@@ -18,17 +20,27 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 	adsTxtRef = React.createRef();
 
 	componentDidUpdate() {
-		const { site, onComplete, isActive } = this.props;
+		const { siteId, site, onComplete, isActive } = this.props;
 		const { ourAdsTxt, success, error } = this.state;
 
 		if (isActive && site && ourAdsTxt === 'loading...' && !success && !error) {
 			proxyService
 				.verifyAdsTxtCode(site)
 				.then(resp => {
-					const { success } = resp.data;
-					this.setState({ success });
+					const { successResp } = resp.data;
+					const onboardingStage = 'onboarded';
+					const step = 3;
 
-					onComplete();
+					return userService
+						.setSiteStep(siteId, onboardingStage, step)
+						.then(() =>
+							siteService.saveSite(siteId, site, onboardingStage, step).then(() => {
+								onComplete();
+							})
+						)
+						.catch(err => {
+							this.setState({ error: 'Something went wrong!' });
+						});
 				})
 				.catch(err => {
 					const { error, ourAdsTxt } = err.response.data;
@@ -45,17 +57,25 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 	verify = () => {
 		this.setState({ verifyingAdsTxt: true });
 
-		const { site, onComplete } = this.props;
-
-		// onComplete();
+		const { siteId, site, onComplete } = this.props;
 
 		proxyService
 			.verifyAdsTxtCode(site)
 			.then(resp => {
 				const { success } = resp.data;
-				this.setState({ success, verifyingAdsTxt: false });
+				const onboardingStage = 'onboarded';
+				const step = 3;
 
-				onComplete();
+				return userService
+					.setSiteStep(siteId, onboardingStage, step)
+					.then(() =>
+						siteService.saveSite(siteId, site, onboardingStage, step).then(() => {
+							onComplete();
+						})
+					)
+					.catch(err => {
+						this.setState({ verifyingAdsTxt: false, error: 'Something went wrong!' });
+					});
 			})
 			.catch(err => {
 				const { error, ourAdsTxt } = err.response.data;
@@ -74,7 +94,7 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 	};
 
 	render() {
-		const { siteId, site, isActive, completed, forwadref } = this.props;
+		const { siteId, site, isActive, completed, forwardedRef } = this.props;
 		const { showSendCodeByEmailModal, ourAdsTxt, verifyingAdsTxt, success, error } = this.state;
 
 		const mailHeader = `Hi, <br/> Please find below the Ads.txt entries, append the following entries on the root domain of your website: <strong>${site}/ads.txt</strong>\n\n`;
@@ -83,7 +103,7 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 
 		return (
 			<OnboardingCard
-				forwadref={forwadref}
+				ref={forwardedRef}
 				isActiveStep={isActive}
 				expanded={isActive || completed}
 				count={3}

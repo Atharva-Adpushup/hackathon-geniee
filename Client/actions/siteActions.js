@@ -14,4 +14,16 @@ const fetchAppStatuses = siteId => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
-export { fetchAppStatuses };
+const addNewSite = siteObj => dispatch =>
+	dispatch({
+		type: SITE_ACTIONS.UPDATE_SITE_DATA,
+		data: siteObj
+	});
+
+const updateSiteStep = (siteId, step, onboardingStage) => dispatch =>
+	dispatch({
+		type: SITE_ACTIONS.UPDATE_SITE_STEP,
+		data: { siteId, step, onboardingStage }
+	});
+
+export { fetchAppStatuses, addNewSite, updateSiteStep };
