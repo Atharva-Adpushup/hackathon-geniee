@@ -60,20 +60,6 @@ var request = require('request-promise'),
 				return finalData;
 			});
 		},
-		detectCustomAp: function(url, siteId) {
-			return API.load(url).then(function(body) {
-				// var apCodeDetected = body.match(`//.+.adpushup.com/${siteId}/adpushup.js`);
-				var apCodeDetected = body.match(`//.+.adpushup.com/`);
-				return !!apCodeDetected;
-			});
-			if (!json) {
-				return false;
-			}
-			finalData = { cmsName: 'wordpress', pageGroups: [] };
-			Object.keys(json.urls).forEach(key => {
-				finalData.pageGroups.push({ pageGroup: key.toUpperCase(), sampleUrl: json.urls[key] });
-			});
-		},
 		fetchOurAdsTxt() {
 			return API.load(commonConst.onboarding.adsTxtDocUrl);
 		},
