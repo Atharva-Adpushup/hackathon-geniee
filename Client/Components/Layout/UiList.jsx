@@ -30,11 +30,19 @@ class UiList extends React.Component {
 
 	updateItem = () => {
 		const { activeItemKey, activeItemValue, collection } = this.state;
-		const isValidActiveItem = !!(activeItemKey !== null && activeItemKey !== '');
-		const computedItemAction = isValidActiveItem ? 'update' : 'add';
-		const message = `Are you sure you want to ${computedItemAction} ${activeItemValue}`;
+		const isValidActiveItemKey = !!(activeItemKey !== null && activeItemKey !== '');
+		const isValidActiveItemValue = !!activeItemValue;
+		const isValidActiveItem = !!(isValidActiveItemKey && isValidActiveItemValue);
+		const computedItemAction = isValidActiveItemKey ? 'update' : 'add';
+		const confirmMessage = `Are you sure you want to ${computedItemAction} ${activeItemValue}`;
+		const emptyValueAlertMessage = 'Please fill empty value';
 
-		if (window.confirm(message)) {
+		if (!isValidActiveItemValue) {
+			window.alert(emptyValueAlertMessage);
+			return false;
+		}
+
+		if (window.confirm(confirmMessage)) {
 			if (isValidActiveItem) {
 				collection[activeItemKey] = activeItemValue;
 			} else {

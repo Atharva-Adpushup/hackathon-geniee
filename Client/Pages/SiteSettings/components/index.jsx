@@ -76,8 +76,9 @@ class SiteSettings extends Component {
 		return (
 			<div className="clearfix">
 				<h4 className="u-margin-t3 u-margin-b4 u-text-bold">Manage Blocklist</h4>
+				<p className="u-margin-b4">Block AdPushup script on below listed websites</p>
 				<UiList
-					itemCollection={['http://a.com', 'http://b.com']}
+					itemCollection={[]}
 					emptyCollectionPlaceHolder="No blocklist added"
 					inputPlaceholder="Enter Url or pattern to block"
 					saveButtonText="Save"
