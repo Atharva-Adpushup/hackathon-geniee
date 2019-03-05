@@ -1,15 +1,20 @@
 var request = require('request-promise'),
 	utils = require('../helpers/utils'),
 	_ = require('lodash'),
+	crypto = require('crypto'),
+	Promise = require('bluebird'),
+	soap = require('strong-soap').soap,
 	cheerio = require('cheerio'),
 	commonConst = require('../configs/commonConsts'),
+	config = require('../configs/config'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	API = {
 		load: function(url, userAgent, fullResponse) {
 			userAgent = userAgent
 				? userAgent
 				: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
-			return request({
+			return request(
+				{
 					uri: url,
 					jar: true,
 					strictSSL: false,
@@ -33,12 +38,12 @@ var request = require('request-promise'),
 				return !!apCodeDetected;
 			});
 		},
-		detectAdPushup: function (url) {
-			return API.load(url).then(function (body) {
+		detectAdPushup: function(url) {
+			return API.load(url).then(function(body) {
 				var $ = cheerio.load(body),
 					json = null,
 					finalData;
-				$('noscript').each(function (index, el) {
+				$('noscript').each(function(index, el) {
 					var html = $(el)
 						.text()
 						.trim();
@@ -54,7 +59,7 @@ var request = require('request-promise'),
 					return false;
 				}
 				finalData = { cmsName: 'wordpress', pageGroups: [] };
-				Object.keys(json.urls).forEach(function (key) {
+				Object.keys(json.urls).forEach(function(key) {
 					finalData.pageGroups.push({ pageGroup: key.toUpperCase(), sampleUrl: json.urls[key] });
 				});
 				return finalData;
@@ -80,9 +85,11 @@ var request = require('request-promise'),
 			let normalizedEntries = stringArr.map(str => {
 				const arr = str.trim().split(',');
 
-				const normalizedEntry = `${arr[0] && arr[0][0] !== '#' ? arr[0].trim().toLowerCase() : ''},${
-					arr[1] && arr[1][0] !== '#' ? arr[1].trim().toLowerCase() : ''
-					},${arr[2] && arr[2][0] !== '#' ? arr[2].trim().toUpperCase() : ''}`;
+				const normalizedEntry = `${
+					arr[0] && arr[0][0] !== '#' ? arr[0].trim().toLowerCase() : ''
+				},${arr[1] && arr[1][0] !== '#' ? arr[1].trim().toLowerCase() : ''},${
+					arr[2] && arr[2][0] !== '#' ? arr[2].trim().toUpperCase() : ''
+				}`;
 
 				return normalizedEntry;
 			});
@@ -136,8 +143,46 @@ var request = require('request-promise'),
 					throw err;
 				});
 		},
+		checkIfBillingProfileComplete(email) {
+			var tipaltiConfig = config.tipalti,
+				url = tipaltiConfig.soapUrl,
+				payeeId = encodeURIComponent(
+					crypto
+						.createHash('md5')
+						.update(email)
+						.digest('hex')
+						.substr(0, 64)
+				),
+				payer = tipaltiConfig.payerName,
+				date = Math.floor(+new Date() / 1000),
+				paramsStr = payer + payeeId + date + '100',
+				key = tipaltiConfig.key,
+				hash = crypto
+					.createHmac('sha256', key)
+					.update(paramsStr.toString('utf-8'))
+					.digest('hex'),
+				requestArgs = {
+					payerName: payer,
+					idap: payeeId,
+					timestamp: date,
+					key: hash,
+					amount: '100'
+				},
+				createClient = Promise.promisify(soap.createClient);
 
-
-};
+			return createClient(url)
+				.then(function(client) {
+					var method = client['PayeePayable'];
+					method = Promise.promisify(method);
+					return method(requestArgs);
+				})
+				.then(function(result) {
+					return result.PayeePayableResult && result.PayeePayableResult.b;
+				})
+				.catch(function() {
+					return 'some error occured';
+				});
+		}
+	};
 
 module.exports = API;

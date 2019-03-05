@@ -22,6 +22,7 @@ var modelAPI = (module.exports = apiModule()),
 	pipedriveAPI = require('../misc/vendors/pipedrive'),
 	mailService = require('../services/mailService/index'),
 	{ mailService: nodeUtilsMailService } = require('node-utils'),
+	proxy = require('../helpers/proxy'),
 	User = model.extend(function() {
 		this.keys = [
 			'firstName',
@@ -51,7 +52,8 @@ var modelAPI = (module.exports = apiModule()),
 			'adnetworkCredentials',
 			'miscellaneous',
 			'billingInfoComplete',
-			'paymentInfoComplete'
+			'paymentInfoComplete',
+			'isPaymentDetailsComplete'
 		];
 		this.clientKeys = [
 			'firstName',
@@ -72,7 +74,8 @@ var modelAPI = (module.exports = apiModule()),
 			'revenueAverage',
 			'adnetworkCredentials',
 			'billingInfoComplete',
-			'paymentInfoComplete'
+			'paymentInfoComplete',
+			'isPaymentDetailsComplete'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
@@ -109,17 +112,24 @@ var modelAPI = (module.exports = apiModule()),
 			var me = this,
 				normalizedDomain = normalizeurl(domain);
 
-			return this.getSiteByDomain(normalizedDomain).then(function (site) {
+			return this.getSiteByDomain(normalizedDomain).then(function(site) {
 				if (site) {
-					return siteModel.getSiteById(site.siteId).then(() => {
-						throw new AdPushupError({ status: 409, message: 'Site already exists!' });
-					}).catch(err => {
-						if (err instanceof AdPushupError && err.message.length &&  err.message[0].status === 404) {
-							return site;
-						}
+					return siteModel
+						.getSiteById(site.siteId)
+						.then(() => {
+							throw new AdPushupError({ status: 409, message: 'Site already exists!' });
+						})
+						.catch(err => {
+							if (
+								err instanceof AdPushupError &&
+								err.message.length &&
+								err.message[0].status === 404
+							) {
+								return site;
+							}
 
-						throw err;
-					});
+							throw err;
+						});
 				}
 				return globalModel.incrSiteIdInApAppBucket().then(function(siteId) {
 					me.get('sites').push({ siteId: siteId, domain: normalizedDomain, isManual: isManual });
@@ -270,8 +280,9 @@ var modelAPI = (module.exports = apiModule()),
 					filteredData[key] = value;
 				}
 			});
-	};
-});
+			return filteredData;
+		};
+	});
 
 function isPipeDriveAPIActivated() {
 	return !!(
@@ -593,7 +604,8 @@ function apiModule() {
 						[consts.analytics.pipedriveCustomFields.utmName]: miscellaneousData.utmName,
 						[consts.analytics.pipedriveCustomFields.utmContent]: miscellaneousData.utmContent,
 						[consts.analytics.pipedriveCustomFields.utmFirstHit]: miscellaneousData.utmFirstHit,
-						[consts.analytics.pipedriveCustomFields.utmFirstReferrer]: miscellaneousData.utmFirstReferrer,
+						[consts.analytics.pipedriveCustomFields.utmFirstReferrer]:
+							miscellaneousData.utmFirstReferrer,
 						currency: 'USD'
 					}
 				};
@@ -680,18 +692,17 @@ function apiModule() {
 					}
 				});
 		},
-		sendCodeToDev: function (json) {
-			return FormValidator.validate({ email: json.email }, schema.user.validations)
-				.then(() => {
-					var mailer = new Mailer(Config.email, 'html'),
-						email = json.email,
-						subject = utils.htmlEntities(utils.trimString(json.subject)),
-						content = json.body;
+		sendCodeToDev: function(json) {
+			return FormValidator.validate({ email: json.email }, schema.user.validations).then(() => {
+				var mailer = new Mailer(Config.email, 'html'),
+					email = json.email,
+					subject = utils.htmlEntities(utils.trimString(json.subject)),
+					content = json.body;
 
-					var obj = { to: email, subject: subject, html: content };
+				var obj = { to: email, subject: subject, html: content };
 
-					return mailer.send(obj);
-				});
+				return mailer.send(obj);
+			});
 		},
 		forgotPassword: function(json) {
 			return FormValidator.validate(json, schema.user.validations)
@@ -733,7 +744,10 @@ function apiModule() {
 						user.get('passwordResetKeyCreatedAt') &&
 						user.get('passwordResetKey') === options.key
 					) {
-						if (parseInt(user.get('passwordResetKeyCreatedAt'), 10) + 60 * 60 * 24 * 1000 < +new Date()) {
+						if (
+							parseInt(user.get('passwordResetKeyCreatedAt'), 10) + 60 * 60 * 24 * 1000 <
+							+new Date()
+						) {
 							config = { keyExpired: true };
 						} else {
 							config = { email: options.email, key: options.key };
@@ -782,7 +796,9 @@ function apiModule() {
 
 						return user;
 					}
-					throw new AdPushupError({ oldPassword: ["Old Password doesn't match your current password"] });
+					throw new AdPushupError({
+						oldPassword: ["Old Password doesn't match your current password"]
+					});
 				})
 				.then(function(user) {
 					_.forOwn(json, function(value, key) {
@@ -859,7 +875,12 @@ function apiModule() {
 						setupStage = siteModel.getSetupStage(site.siteId),
 						setupStep = siteModel.getSetupStep(site.siteId),
 						cmsData = siteModel.getCmsData(site.siteId);
-					return Promise.join(uniquePageGroups, setupStage, setupStep, cmsData, function(pageGroups, onboardingStage, step, cms) {
+					return Promise.join(uniquePageGroups, setupStage, setupStep, cmsData, function(
+						pageGroups,
+						onboardingStage,
+						step,
+						cms
+					) {
 						site.onboardingStage = onboardingStage;
 						site.step = step;
 						site.cmsInfo = cms;
@@ -900,6 +921,7 @@ function apiModule() {
 			return proxy.checkIfBillingProfileComplete(email).then(status => {
 				return API.getUserByEmail(email).then(user => {
 					user.set('isPaymentDetailsComplete', status);
+<<<<<<< HEAD
 					user.save();
 					console.log({ email, status });
 					return {
@@ -914,6 +936,11 @@ function apiModule() {
 			return couchbase.queryViewFromAppBucket(allUsers).then(function(results) {
 				return _.map(results, 'key');
 			});
+=======
+					return user.save();
+				});
+			});
+>>>>>>> payment page bug fixes
 		}
 	};
 
