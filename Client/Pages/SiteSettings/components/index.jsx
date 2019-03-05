@@ -84,6 +84,7 @@ class SiteSettings extends Component {
 					emptyCollectionPlaceHolder="No blocklist added"
 					inputPlaceholder="Enter Url or pattern to block"
 					saveButtonText="Save"
+					sticky
 				/>
 			</div>
 		);
@@ -96,6 +97,7 @@ class SiteSettings extends Component {
 					rootClassName="u-padding-h4 u-padding-v5"
 					leftChildren={this.renderLeftPanel()}
 					rightChildren={this.renderRightPanel()}
+					rightChildrenClassName="wrapper wrapper--blocklist"
 				/>
 			</ActionCard>
 		);

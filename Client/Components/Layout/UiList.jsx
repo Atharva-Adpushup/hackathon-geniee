@@ -214,7 +214,7 @@ class UiList extends React.Component {
 	};
 
 	renderActionInputGroup = () => {
-		const { inputPlaceholder, saveButtonText } = this.props;
+		const { inputPlaceholder, saveButtonText, sticky } = this.props;
 		const { activeItemValue, activeItemKey } = this.state;
 		const isActiveItem = !!(
 			activeItemValue &&
@@ -222,9 +222,11 @@ class UiList extends React.Component {
 			!Number.isNaN(activeItemKey)
 		);
 		const computedActiveFormControl = isActiveItem ? 'u-box-shadow-active' : '';
+		const computedStickyClassName = sticky ? 'u-position-sticky' : '';
+		const computedFormGroupClassName = `u-margin-b4 ${computedStickyClassName}`;
 
 		return (
-			<FormGroup className="u-margin-b4">
+			<FormGroup className={computedFormGroupClassName}>
 				<InputGroup>
 					<FormControl
 						type="text"
@@ -271,6 +273,7 @@ class UiList extends React.Component {
 
 UiList.propTypes = {
 	rootClassName: PropTypes.string,
+	sticky: PropTypes.bool,
 	itemCollection: PropTypes.array.isRequired,
 	emptyCollectionPlaceHolder: PropTypes.string.isRequired,
 	inputPlaceholder: PropTypes.string.isRequired,
@@ -278,7 +281,8 @@ UiList.propTypes = {
 };
 
 UiList.defaultProps = {
-	rootClassName: ''
+	rootClassName: '',
+	sticky: false
 };
 
 export default UiList;

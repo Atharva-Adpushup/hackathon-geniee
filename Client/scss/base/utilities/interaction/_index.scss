@@ -27,3 +27,10 @@
 .u-list-style-type-none {
 	list-style-type: $none !important ;
 }
+
+.u-position-sticky {
+	position: -webkit-sticky;
+	position: $positionSticky;
+	top: $numberZero;
+	z-index: $zIndexBase;
+}
