@@ -141,13 +141,15 @@ class AdList extends Component {
 
 	renderFilters() {
 		const { filters } = this.state;
-		const { channels } = this.props;
+		const { channels, user } = this.props;
 		return (
 			<React.Fragment>
 				<Row>
-					<CustomButton variant="primary" className="pull-right" onClick={this.saveWrapper}>
-						Master Save
-					</CustomButton>
+					{user.isSuperUser ? (
+							<CustomButton variant="primary" className="pull-right" onClick={this.saveWrapper}>
+								Master Save
+							</CustomButton>
+						) : null}
 					<CustomButton variant="secondary" className="u-margin-r3 pull-right" onClick={this.resetFilters}>
 						Reset Filters
 					</CustomButton>
@@ -212,14 +214,14 @@ class AdList extends Component {
 		} else if (!adsToRender.length) {
 			return (
 				<div className="u-padding-4">
-					{user.isSuperUser ? this.renderFilters() : null}
+					{this.renderFilters()}
 					<Empty message="Seems kind of empty here" />
 				</div>
 			);
 		}
 		return (
 			<div className="u-padding-4">
-				{user.isSuperUser ? this.renderFilters() : null}
+				{this.renderFilters()}
 				<Table striped bordered hover>
 					<thead>
 						<tr>

@@ -207,7 +207,7 @@ class AdElement extends Component {
 
 		return actions.map(action => (
 			<CustomButton
-				key={`adAction-${ad.id}`}
+				key={`adAction-${ad.id}-${action.key}`}
 				variant="secondary"
 				className="u-margin-b3"
 				onClick={() => this.userActionsHandler(action.key)}
