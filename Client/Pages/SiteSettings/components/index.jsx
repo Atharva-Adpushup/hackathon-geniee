@@ -86,6 +86,7 @@ class SiteSettings extends Component {
 					saveButtonText="Save"
 					sticky
 					validate
+					plugins={['url-http-https']}
 				/>
 			</div>
 		);
