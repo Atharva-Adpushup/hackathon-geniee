@@ -18,32 +18,29 @@ class VerifyInitCodeOnboarding extends Component {
 
 		this.setState({ verifyingInitCode: true });
 
-		// To verify temporarily
-		// onComplete();
-
+		const onboardingStage = 'onboarding';
+		const step = 2;
+		let success;
 		proxyService
 			.verifyApCode(site)
 			.then(resp => {
-				const { success } = resp.data;
-				const onboardingStage = 'onboarding';
-				const step = 2;
+				({ success } = resp.data);
 
-				return userService
-					.setSiteStep(siteId, onboardingStage, step)
-					.then(() =>
-						siteService.saveSite(siteId, site, onboardingStage, step).then(() => {
-							this.setState({ verifyingInitCode: false, success });
+				return userService.setSiteStep(siteId, onboardingStage, step);
+			})
+			.then(() => siteService.saveSite(siteId, site, onboardingStage, step))
+			.then(() => {
+				this.setState({ verifyingInitCode: false, success });
 
-							onComplete();
-						})
-					)
-					.catch(err => {
-						this.setState({ verifyingInitCode: false, error: 'Something went wrong!' });
-					});
+				return onComplete();
 			})
 			.catch(err => {
-				const { error } = err.response.data;
-				this.setState({ verifyingInitCode: false, error });
+				if (err.response) {
+					const { error } = err.response.data;
+					return this.setState({ verifyingInitCode: false, error });
+				}
+
+				return this.setState({ verifyingInitCode: false, error: 'Something went wrong!' });
 			});
 	};
 
