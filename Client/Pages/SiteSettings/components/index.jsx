@@ -85,6 +85,7 @@ class SiteSettings extends Component {
 					inputPlaceholder="Enter Url or pattern to block"
 					saveButtonText="Save"
 					sticky
+					validate
 				/>
 			</div>
 		);

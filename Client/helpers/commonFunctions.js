@@ -21,4 +21,23 @@ function errorHandler(err, userMessage = 'Operation Failed') {
 	return history.push('/error');
 }
 
-export { errorHandler };
+const getDuplicatesInArray = array =>
+	array.reduce(
+		(accumulator, value) => {
+			const isValueInObject = !!(
+				accumulator.object.hasOwnProperty(value) && accumulator.object[value]
+			);
+			const isValueInArray = !!accumulator.duplicates.includes(value);
+
+			if (!isValueInObject) {
+				accumulator.object[value] = value;
+			} else if (isValueInObject && !isValueInArray) {
+				accumulator.duplicates.push(value);
+			}
+
+			return accumulator;
+		},
+		{ duplicates: [], object: {} }
+	);
+
+export { errorHandler, getDuplicatesInArray };
