@@ -28,15 +28,12 @@ class AddSiteOnboarding extends Component {
 
 		userService
 			.addSite(existingSite)
-			.then(resp =>
-				siteService.saveSite(siteId, existingSite, onboardingStage, step).then(resp => {
-					console.log('site saved: ', resp.data);
+			.then(resp => siteService.saveSite(siteId, existingSite, onboardingStage, step))
+			.then(resp => {
+				onSiteAdd(resp.data);
 
-					onSiteAdd(resp.data);
-
-					this.setState({ isAddingSite: false });
-				})
-			)
+				return this.setState({ isAddingSite: false });
+			})
 			.catch(err => {
 				this.setState({ isAddingSite: false, error: err.response.data.error });
 			});
@@ -62,11 +59,12 @@ class AddSiteOnboarding extends Component {
 				.then(resp => {
 					const { siteId } = resp.data;
 
-					siteService.saveSite(siteId, site, onboardingStage, step).then(resp => {
-						this.setState({ isAddingSite: false });
+					return siteService.saveSite(siteId, site, onboardingStage, step);
+				})
+				.then(resp => {
+					this.setState({ isAddingSite: false });
 
-						onSiteAdd(resp.data);
-					});
+					onSiteAdd(resp.data);
 				})
 				.catch(err => {
 					this.setState({ isAddingSite: false, error: err.response.data.error });

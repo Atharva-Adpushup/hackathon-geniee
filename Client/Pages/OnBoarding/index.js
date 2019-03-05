@@ -45,7 +45,6 @@ class OnBoarding extends Component {
 			siteService
 				.getOnboardingData(queryParams.get('siteId'))
 				.then(response => {
-					console.log(response);
 					const { siteId, site, isOnboarding, onboardingStage, step } = response.data;
 					this.setState(
 						() => ({ isOnboarding, siteId, existingSite: site, site, onboardingStage, step }),
