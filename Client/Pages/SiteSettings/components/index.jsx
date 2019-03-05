@@ -82,7 +82,7 @@ class SiteSettings extends Component {
 				<UiList
 					itemCollection={[]}
 					emptyCollectionPlaceHolder="No blocklist added"
-					inputPlaceholder="Enter Url or pattern to block"
+					inputPlaceholder="Enter Url or pattern to block. Enter comma separated multiple values"
 					saveButtonText="Save"
 					sticky
 					validate
