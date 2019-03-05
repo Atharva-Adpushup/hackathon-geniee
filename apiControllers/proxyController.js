@@ -19,21 +19,18 @@ router
 	.get('/verifyAdsTxt', (req, res) =>
 		proxy
 			.fetchOurAdsTxt()
-			.then(ourAdsTxt =>
-				proxy
-					.verifyAdsTxt(req.query.url, ourAdsTxt)
-					.then(() => res.status(httpStatus.OK).json({ success: 'Ads.txt verified successfully!' }))
-					.catch(err => {
-						if (err instanceof AdPushupError) {
-							return res
-								.status(err.message.httpCode)
-								.json({ error: err.message.error, ourAdsTxt: err.message.ourAdsTxt });
-						}
-						throw err;
-					})
-			)
+			.then(ourAdsTxt => proxy.verifyAdsTxt(req.query.url, ourAdsTxt))
+			.then(() => res.status(httpStatus.OK).json({ success: 'Ads.txt verified successfully!' }))
 			.catch(err => {
-				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong!' });
+				if (err instanceof AdPushupError) {
+					return res
+						.status(err.message.httpCode)
+						.json({ error: err.message.error, ourAdsTxt: err.message.ourAdsTxt });
+				}
+
+				return res
+					.status(httpStatus.INTERNAL_SERVER_ERROR)
+					.json({ error: 'Something went wrong!' });
 			})
 	)
 	.get('/getAdsTxt', (req, res) =>

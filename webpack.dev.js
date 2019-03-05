@@ -6,7 +6,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 module.exports = merge(common, {
 	mode: 'development',
-	devtool: 'inline-source-map',
+	devtool: 'source-map',
 	entry: ['./index.js', 'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000'],
 	plugins: [
 		new webpack.HotModuleReplacementPlugin(),

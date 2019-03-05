@@ -45,28 +45,11 @@ class OnBoarding extends Component {
 			siteService
 				.getOnboardingData(queryParams.get('siteId'))
 				.then(response => {
-					console.log(response);
-					const { siteId, site, onboardingStage, step } = response.data;
+					const { siteId, site, isOnboarding, onboardingStage, step } = response.data;
 					this.setState(
-						() => ({ isOnboarding: false, siteId, site, onboardingStage, step }),
+						() => ({ isOnboarding, siteId, existingSite: site, site, onboardingStage, step }),
 						() => {
-							if (step === 1) {
-								setTimeout(() => {
-									this.scrollableContainer.scrollTo({
-										top: this.verifyInitCodeRef.current.offsetTop - 100,
-										left: 0,
-										behavior: 'smooth'
-									});
-								}, 500);
-							} else if (step === 2) {
-								setTimeout(() => {
-									this.scrollableContainer.scrollTo({
-										top: this.verifyAdsTxtRef.current.offsetTop - 100,
-										left: 0,
-										behavior: 'smooth'
-									});
-								}, 500);
-							} else {
+							if (step === 3) {
 								history.push('/sites');
 							}
 						}
