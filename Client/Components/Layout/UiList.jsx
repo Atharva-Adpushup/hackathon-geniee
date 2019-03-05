@@ -15,6 +15,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CustomButton from '../CustomButton/index';
 import PlaceHolder from '../PlaceHolder/index';
 import OverlayTooltip from '../OverlayTooltip/index';
+import { getDuplicatesInArray } from '../../helpers/commonFunctions';
 
 library.add(faEdit, faTimesCircle);
 
@@ -30,12 +31,14 @@ class UiList extends React.Component {
 
 	updateItem = () => {
 		const { activeItemKey, activeItemValue, collection } = this.state;
+		const { validate } = this.props;
 		const isValidActiveItemKey = !!(activeItemKey !== null && activeItemKey !== '');
 		const isValidActiveItemValue = !!activeItemValue;
 		const isValidActiveItem = !!(isValidActiveItemKey && isValidActiveItemValue);
 		const computedItemAction = isValidActiveItemKey ? 'update' : 'add';
 		const confirmMessage = `Are you sure you want to ${computedItemAction} ${activeItemValue}`;
 		const emptyValueAlertMessage = 'Please fill empty value';
+		const inputCollection = collection.concat([]);
 
 		if (!isValidActiveItemValue) {
 			window.alert(emptyValueAlertMessage);
@@ -57,39 +60,59 @@ class UiList extends React.Component {
 		const isActiveItemBulkEntries = !!(isValidActiveItem && isBulkEntries);
 
 		if (isActiveItemBulkEntries) {
-			collection.splice(activeItemKey, 1, ...bulkEntriesResult.array);
+			inputCollection.splice(activeItemKey, 1, ...bulkEntriesResult.array);
 		} else if (isBulkEntries) {
-			bulkEntriesResult.array.forEach(item => collection.push(item));
+			bulkEntriesResult.array.forEach(item => inputCollection.push(item));
 		} else if (isValidActiveItem) {
-			collection[activeItemKey] = activeItemValue;
+			inputCollection[activeItemKey] = activeItemValue;
 		} else {
-			collection.push(activeItemValue);
+			inputCollection.push(activeItemValue);
 		}
 
-		return this.setState({ collection, activeItemKey: '', activeItemValue: '' }, () => {
-			console.log('computed Collection Value: ', collection);
-		});
+		const duplicateItems = getDuplicatesInArray(inputCollection).duplicates;
+		const isValidDuplicateItems = !!(validate && duplicateItems && duplicateItems.length);
+
+		if (isValidDuplicateItems) {
+			const computedDuplicateItemPrefixMessage = isValidActiveItem
+				? 'These values are already present in list:'
+				: 'These values are duplicate:';
+			const duplicateItemsMessage = `${computedDuplicateItemPrefixMessage} ${duplicateItems.join(
+				', '
+			)}. Please delete them first.`;
+
+			window.alert(duplicateItemsMessage);
+			return false;
+		}
+
+		return this.setState(
+			{ collection: inputCollection, activeItemKey: '', activeItemValue: '' },
+			() => {
+				console.log('computed collection Value: ', this.state.collection);
+			}
+		);
 	};
 
 	deleteItem = key => {
 		const { collection } = this.state;
 		const item = collection[key];
 		const message = `Are you sure you want to delete ${item}`;
+		const inputCollection = collection.concat([]);
 
 		if (window.confirm(message)) {
-			collection.splice(key, 1);
-			this.setState({ collection, activeItemValue: '', activeItemKey: '' });
+			inputCollection.splice(key, 1);
+			this.setState({ collection: inputCollection, activeItemValue: '', activeItemKey: '' });
 		}
 	};
 
 	editItem = key => {
 		const { collection, activeItemKey } = this.state;
+		const inputCollection = collection.concat([]);
 		const isValidActiveItem = !!(activeItemKey === Number(key));
 		let computedActiveItem;
 		let computedActiveItemKey;
 
 		if (!isValidActiveItem) {
-			computedActiveItem = collection[key];
+			computedActiveItem = inputCollection[key];
 			computedActiveItemKey = key;
 		} else {
 			computedActiveItem = '';
@@ -274,6 +297,7 @@ class UiList extends React.Component {
 UiList.propTypes = {
 	rootClassName: PropTypes.string,
 	sticky: PropTypes.bool,
+	validate: PropTypes.bool,
 	itemCollection: PropTypes.array.isRequired,
 	emptyCollectionPlaceHolder: PropTypes.string.isRequired,
 	inputPlaceholder: PropTypes.string.isRequired,
@@ -282,7 +306,8 @@ UiList.propTypes = {
 
 UiList.defaultProps = {
 	rootClassName: '',
-	sticky: false
+	sticky: false,
+	validate: true
 };
 
 export default UiList;
