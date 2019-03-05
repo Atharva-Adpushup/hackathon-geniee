@@ -40,4 +40,8 @@ const getDuplicatesInArray = array =>
 		{ duplicates: [], object: {} }
 	);
 
-export { errorHandler, getDuplicatesInArray };
+const getTruthyArray = array => array.filter(value => !!value);
+
+const isItemInArray = (item, array) => array.indexOf(item) > -1;
+
+export { errorHandler, getDuplicatesInArray, getTruthyArray, isItemInArray };
