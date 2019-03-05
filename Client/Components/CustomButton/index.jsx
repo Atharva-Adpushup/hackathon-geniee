@@ -17,12 +17,14 @@ CustomButton.propTypes = {
 		'link'
 	]),
 	type: PropTypes.oneOf(['submit', 'button']),
+	showSpinner: PropTypes.bool,
 	children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired
 };
 
 CustomButton.defaultProps = {
-	variant: 'light',
-	type: 'button'
+	variant: 'primary',
+	type: 'button',
+	showSpinner: false
 };
 
 export default CustomButton;
