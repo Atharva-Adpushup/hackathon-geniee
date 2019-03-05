@@ -12,41 +12,44 @@
                             a.pull-left(id="site-report-" + siteId, target='_blank').
                                 #{utils.domanize(site.domain)} - #{siteId}
                             .pull-right.site-actions
-                                a.btn.btn-lightBg.btn-default(title="Open editor" id="editor-redirect-link", target='_blank', href='/user/site/#{siteId}/editor') 
-                                    i.fa.fa-code
+                                if !disableUiControls
+                                    a.btn.btn-lightBg.btn-default(title="Open editor" id="editor-redirect-link", target='_blank', href='/user/site/#{siteId}/editor') 
+                                        i.fa.fa-code
                                 a.btn.btn-lightBg.btn-default(title="View site report" target='_blank' id="site-custom-reports-" + siteId, href='/user/site/#{siteId}/reports/adpushupReport')
                                         i.fa.fa-area-chart
                                 if site.isManual
                                     a.btn.btn-lightBg.btn-default(id="site-tag-manager-" + siteId, href='/tagmanager/#{siteId}') AP Tag
-                                .dropdown.btn-dropdown
-                                    button.btn.btn-lightBg#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='true')
-                                        span.caret
-                                    |   
-                                    ul.dropdown-menu.btn-dd-menu(aria-labelledby='dropdownMenu1')
-                                        li
-                                            a(title="View site pagegroups" href='/user/site/#{siteId}/pagegroups') 
-                                                i.fa.fa-th-list
-                                                |  PageGroups 
-                                        if isSuperUser
+
+                                if !disableUiControls
+                                    .dropdown.btn-dropdown
+                                        button.btn.btn-lightBg#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='true')
+                                            span.caret
+                                        |   
+                                        ul.dropdown-menu.btn-dd-menu(aria-labelledby='dropdownMenu1')
                                             li
-                                                a(title="Open AMP Settings" href='/user/site/#{siteId}/ampSettings') 
+                                                a(title="View site pagegroups" href='/user/site/#{siteId}/pagegroups') 
                                                     i.fa.fa-th-list
-                                                    |  AMP Settings  
-                                        li
-                                            a(title="Open site settings" href='/user/site/#{siteId}/settings') 
-                                                i.fa.fa-cog
-                                                |  Settings   
-                                        if isSuperUser 
+                                                    |  PageGroups 
+                                            if isSuperUser
+                                                li
+                                                    a(title="Open AMP Settings" href='/user/site/#{siteId}/ampSettings') 
+                                                        i.fa.fa-th-list
+                                                        |  AMP Settings  
                                             li
-                                                a(title="Open site info panel" href='/ops/settings/#{siteId}') 
-                                                    i.fa.fa-wrench 
-                                                    |  Info Panel
-                                            li
-                                                a 
-                                                    form(action='/user/deleteSite', method='post', style='display: inline', onsubmit="return (confirm('Are you sure you want to delete this site? This step cannot be reversed !') && trackDelete(#{siteId}))")
-                                                        input(type='hidden', name='siteId', value='#{siteId}')
-                                                        input(type='hidden', name='siteDomain', value='#{site.domain}')
-                                                        button.btn.btn-lightBg.btn-default(id="site-delete-btn", type='submit') Delete Site
+                                                a(title="Open site settings" href='/user/site/#{siteId}/settings') 
+                                                    i.fa.fa-cog
+                                                    |  Settings   
+                                            if isSuperUser 
+                                                li
+                                                    a(title="Open site info panel" href='/ops/settings/#{siteId}') 
+                                                        i.fa.fa-wrench 
+                                                        |  Info Panel
+                                                li
+                                                    a 
+                                                        form(action='/user/deleteSite', method='post', style='display: inline', onsubmit="return (confirm('Are you sure you want to delete this site? This step cannot be reversed !') && trackDelete(#{siteId}))")
+                                                            input(type='hidden', name='siteId', value='#{siteId}')
+                                                            input(type='hidden', name='siteDomain', value='#{site.domain}')
+                                                            button.btn.btn-lightBg.btn-default(id="site-delete-btn", type='submit') Delete Site
 
                         - siteDomain = (site.domain) ? site.domain : "";
                         .weekly-report.weekly-report-wrapper

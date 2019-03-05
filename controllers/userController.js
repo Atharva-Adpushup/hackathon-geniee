@@ -117,7 +117,9 @@ function dashboardRedirection(req, res, allUserSites, type) {
 							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
 							requestDemo: req.session.user.requestDemo,
 							imageHeaderLogo: true,
-							isSuperUser: req.session.isSuperUser
+							isSuperUser: req.session.isSuperUser,
+							disableUiControls:
+								req.session.user.email === 'william@51cashbox.com' && !req.session.isSuperUser
 						});
 						break;
 					case 'onboarding':
