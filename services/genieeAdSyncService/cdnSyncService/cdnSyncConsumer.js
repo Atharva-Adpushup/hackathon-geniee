@@ -226,25 +226,16 @@ module.exports = function(site, externalData = {}) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			var siteId = site.get('siteId');
-			var shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
-			var isStaging = !!config.environment.IS_STAGING;
-
-			// Disable CDN upload for specific websites where generated JavaScript is added manually for testing purposes
-			if (shouldJSCdnSyncBeDisabled || isStaging) {
-				return Promise.resolve(fileConfig.uncompressed);
-			} else {
-				if (prodEnv) {
-					return connectToServer()
-						.then(cwd)
-						.then(function() {
-							return ftp.put(fileConfig.default, 'adpushup.js');
-						})
-						.then(function() {
-							return Promise.resolve(fileConfig.uncompressed);
-						});
-				}
-				return Promise.resolve(fileConfig.uncompressed);
+			const shouldUpload = prodEnv && !config.environment.IS_STAGING;
+			if (shouldUpload) {
+				return connectToServer()
+					.then(cwd)
+					.then(function() {
+						return ftp.put(fileConfig.default, 'adpushup.js');
+					})
+					.then(function() {
+						return Promise.resolve(fileConfig.uncompressed);
+					});
 			}
 		},
 		getFinalConfigWrapper = () => getFinalConfig().then(fileConfig => fileConfig);
