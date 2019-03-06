@@ -41,7 +41,7 @@ const SITE_SETUP_STATUS = {
 	}
 };
 
-const rightTrim = (string, s) => (string ? string.replace(new RegExp(s + '*$'), '') : '');
+const rightTrim = (string, s) => (string ? string.replace(new RegExp(`${s}*$`), '') : '');
 
 const domanize = domain =>
 	domain
@@ -54,4 +54,6 @@ const domanize = domain =>
 		  )
 		: '';
 
-module.exports = { SITE_SETUP_STATUS, rightTrim, domanize };
+const LAST_ONBOARDING_STEP = 4;
+
+module.exports = { SITE_SETUP_STATUS, rightTrim, domanize, LAST_ONBOARDING_STEP };
