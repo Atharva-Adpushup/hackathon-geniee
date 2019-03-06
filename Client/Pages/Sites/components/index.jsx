@@ -36,14 +36,21 @@ class MySites extends Component {
 
 	renderStatusCards() {
 		const { sites } = this.props;
-		const isSites = !!(sites && sites.length);
+		const isSites = !!(sites && Object.keys(sites).length);
 		const computedCards = isSites
-			? sites.map(site => {
-					const isSite = !!(site && Object.keys(site).length);
-					const isSiteStep = !!(isSite && site.step);
-					const isStepThird = !!(isSiteStep && site.step === 3);
+			? Object.keys(sites).map(siteIdKey => {
+					const site = sites[siteIdKey];
+					let siteStep;
+
+					if (!site.step) {
+						siteStep = 0;
+					} else {
+						siteStep = site.step;
+					}
+
+					const isStepThird = !!(siteStep === 3);
 					const { siteId } = site;
-					const statusObject = isSiteStep && SITE_SETUP_STATUS[site.step];
+					const statusObject = SITE_SETUP_STATUS[siteStep];
 					const domanizeDomain = domanize(site.domain);
 
 					const computedReportingUrl = `/reporting/${siteId}`;
@@ -76,7 +83,9 @@ class MySites extends Component {
 							bodyClassName="card-body"
 							bodyChildren={
 								<Panel className="panel--transparent u-margin-b3">
-									<Panel.Heading className="u-margin-0 u-padding-0">Setup status</Panel.Heading>
+									<Panel.Heading className="u-margin-0 u-padding-0">
+										Onboarding status
+									</Panel.Heading>
 									<Panel.Body className="u-padding-h0 u-padding-b0 u-padding-t2">
 										<div className="aligner aligner--row">
 											<span className="aligner-item">

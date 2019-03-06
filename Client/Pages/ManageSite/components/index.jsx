@@ -3,6 +3,7 @@ import { Nav, NavItem } from 'react-bootstrap';
 import ActionCard from '../../../Components/ActionCard/index';
 import ManageAppsContainer from '../containers/ManageAppsContainer';
 import { DEFAULT_NAV_ITEM, TITLES } from '../constants/index';
+import SiteSettings from '../../SiteSettings/index';
 
 class ManageSite extends React.Component {
 	state = {
@@ -21,7 +22,7 @@ class ManageSite extends React.Component {
 			case 1:
 				return <div className="u-padding-v5 u-padding-h5">Quick Snap hoga yahan</div>;
 			case 2:
-				return <div className="u-padding-v5 u-padding-h5">Settings hongi yahan</div>;
+				return <SiteSettings {...this.props} />;
 			case 3:
 				return <ManageAppsContainer {...this.props} />;
 		}
