@@ -1,7 +1,15 @@
 const SITE_SETUP_STATUS = {
+	0: {
+		step: 0,
+		tooltipText: 'Onboarding is incomplete',
+		text: 'Please complete onboarding process',
+		isComplete: false,
+		type: 'danger',
+		icon: 'exclamation-triangle'
+	},
 	1: {
 		step: 1,
-		tooltipText: 'Setup is incomplete',
+		tooltipText: 'Onboarding is incomplete',
 		text: 'AP head code is not present',
 		isComplete: false,
 		type: 'danger',
@@ -9,7 +17,7 @@ const SITE_SETUP_STATUS = {
 	},
 	2: {
 		step: 2,
-		tooltipText: 'Setup is incomplete',
+		tooltipText: 'Onboarding is incomplete',
 		text: 'Ads.txt is not updated',
 		isComplete: false,
 		type: 'danger',
@@ -17,7 +25,7 @@ const SITE_SETUP_STATUS = {
 	},
 	3: {
 		step: 3,
-		tooltipText: 'Setup is incomplete',
+		tooltipText: 'Onboarding is incomplete',
 		text: 'No App is activated',
 		isComplete: false,
 		type: 'warning',
@@ -25,7 +33,7 @@ const SITE_SETUP_STATUS = {
 	},
 	4: {
 		step: 4,
-		tooltipText: 'Setup is complete',
+		tooltipText: 'Onboarding is complete',
 		text: 'AdPushup is running',
 		isComplete: true,
 		type: 'success',
