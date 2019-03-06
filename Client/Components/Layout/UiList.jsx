@@ -47,8 +47,6 @@ class UiList extends React.Component {
 	applyUrlHttpHttpsPlugin = collection => {
 		const inputCollection = collection.concat([]);
 		const { regex } = this.constants;
-		const { activeItemValue } = this.state;
-		const isValidActiveItem = !!activeItemValue;
 
 		collection.forEach((item, idx) => {
 			const { URL, HTTPS_PREFIX, HTTP_PREFIX } = regex;
@@ -62,11 +60,7 @@ class UiList extends React.Component {
 			const isHttpsUrlPrefix = HTTPS_PREFIX.test(item);
 			const isHttpUrlPrefix = HTTP_PREFIX.test(item);
 			const isValidUrlWithoutProtocol = !!(isValidURL && !isHttpUrlPrefix && !isHttpsUrlPrefix);
-			const isItemInActiveItems = !!(
-				isValidActiveItem && activeItemValue.match(new RegExp(`${item}`))
-			);
-			const computedReplaceeArray =
-				(isHttpUrlPrefix || isHttpsUrlPrefix) && isItemInActiveItems ? [item] : [];
+			const computedReplaceeArray = isHttpUrlPrefix || isHttpsUrlPrefix ? [item] : [];
 			let computedItemString;
 			let computedProtoColSuffix;
 
