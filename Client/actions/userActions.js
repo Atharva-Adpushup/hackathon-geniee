@@ -1,5 +1,6 @@
 import userService from '../services/userService';
 import history from '../helpers/history';
+import { USER_ACTIONS } from '../constants/global';
 
 export const loginAction = (email, password) => dispatch => userService.login(email, password);
 export const signupAction = user => dispatch => userService.signup(user);
@@ -7,6 +8,9 @@ export const logoutAction = () => dispatch =>
 	userService
 		.logout()
 		.then(() => {
+			dispatch({
+				type: USER_ACTIONS.LOGOUT_USER
+			});
 			history.push('/login');
 		})
 		.catch(() => {
