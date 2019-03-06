@@ -16,7 +16,7 @@ import { Link } from 'react-router-dom';
 import ActionCard from '../../../Components/ActionCard/index';
 import OverlayTooltip from '../../../Components/OverlayTooltip/index';
 import Card from '../../../Components/Layout/Card';
-import { SITE_SETUP_STATUS, domanize } from '../constants/index';
+import { SITE_SETUP_STATUS, domanize, LAST_ONBOARDING_STEP } from '../constants/index';
 
 library.add(
 	faCheckCircle,
@@ -45,7 +45,7 @@ class MySites extends Component {
 					if (!site.step) {
 						siteStep = 0;
 					} else {
-						siteStep = site.step;
+						siteStep = site.step >= LAST_ONBOARDING_STEP ? LAST_ONBOARDING_STEP : site.step;
 					}
 
 					const isStepThird = !!(siteStep === 3);
