@@ -1,12 +1,14 @@
 const express = require('express');
 const crypto = require('crypto');
 const userModel = require('../models/userModel');
+const Promise = require('bluebird');
 const siteModel = require('../models/siteModel');
 const utils = require('../helpers/utils');
 const CC = require('../configs/commonConsts');
 const httpStatus = require('../configs/httpStatusConsts');
 const formValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
+const proxy = require('../helpers/proxy');
 const config = require('../configs/config');
 
 const router = express.Router();
@@ -56,16 +58,12 @@ router
 			.catch(err => res.status(httpStatus.BAD_REQUEST).json({ error: err.message[0].message }));
 	})
 	.get('/payment', (req, res) => {
-		userModel
-			.getUserByEmail(req.user.email)
-			.then(user => {
+		const getTipaltiUrls = email => {
 				const tipaltiConfig = config.tipalti;
 
 				let tipaltiUrl = '';
 
 				const tipaltiBaseUrl = tipaltiConfig.baseUrl;
-
-				const email = user.get('email');
 
 				const payeeId = encodeURIComponent(
 					crypto
@@ -93,15 +91,19 @@ router
 				const paymentHistoryUrl = `${tipaltiConfig.paymentHistoryUrl + paramsStr}&hashkey=${hash}`;
 
 				tipaltiUrl = `${tipaltiBaseUrl + paramsStr}&hashkey=${hash}`;
+
+				return { paymentHistoryUrl, tipaltiUrl };
+			},
+			{ email } = req.user;
+		return Promise.all([getTipaltiUrls(email), userModel.updateUserPaymentStatus(email)])
+			.spread(tipaltiUrls => {
+				console.log(tipaltiUrls);
 				res.send({
-					tipaltiUrl,
-					paymentHistoryUrl
+					tipaltiUrls
 				});
 			})
 			.catch(err => {
-				res.render('payment', {
-					error: 'Some error occurred!'
-				});
+				return res.status(500).send({ error: 'Some error occurred' });
 			});
 	})
 	.post('/setSiteStep', (req, res) => {
