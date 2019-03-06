@@ -15,6 +15,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CustomButton from '../CustomButton/index';
 import PlaceHolder from '../PlaceHolder/index';
 import OverlayTooltip from '../OverlayTooltip/index';
+import { getDuplicatesInArray, getTruthyArray, isItemInArray } from '../../helpers/commonFunctions';
 
 library.add(faEdit, faTimesCircle);
 
@@ -26,46 +27,193 @@ class UiList extends React.Component {
 			activeItemKey: '',
 			collection: props.itemCollection
 		};
+		this.constants = {
+			plugins: {
+				URL_HTTP_HTTPS: 'url-http-https'
+			},
+			regex: {
+				URL: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+				HTTPS_PREFIX: /^https:\/\//,
+				HTTP_PREFIX: /^http:\/\//
+			}
+		};
+
+		const {
+			plugins: { URL_HTTP_HTTPS }
+		} = this.constants;
+		this.plugins = [URL_HTTP_HTTPS];
 	}
+
+	applyUrlHttpHttpsPlugin = collection => {
+		const inputCollection = collection.concat([]);
+		const { regex } = this.constants;
+
+		collection.forEach((item, idx) => {
+			const { URL, HTTPS_PREFIX, HTTP_PREFIX } = regex;
+			const isValidItem = !!item;
+			const isValidURL = !!(isValidItem && URL.test(item));
+
+			if (!isValidURL) {
+				return true;
+			}
+
+			const isHttpsUrlPrefix = HTTPS_PREFIX.test(item);
+			const isHttpUrlPrefix = HTTP_PREFIX.test(item);
+			const isValidUrlWithoutProtocol = !!(isValidURL && !isHttpUrlPrefix && !isHttpsUrlPrefix);
+			const computedReplaceeArray = isHttpUrlPrefix || isHttpsUrlPrefix ? [item] : [];
+			let computedItemString;
+			let computedProtoColSuffix;
+
+			if (isValidUrlWithoutProtocol) {
+				computedItemString = `http://${item}`;
+				if (!isItemInArray(computedItemString, inputCollection)) {
+					computedReplaceeArray.push(computedItemString);
+				}
+
+				computedItemString = `https://${item}`;
+				if (!isItemInArray(computedItemString, inputCollection)) {
+					computedReplaceeArray.push(computedItemString);
+				}
+			} else if (isHttpsUrlPrefix) {
+				// Below variable gets the remaining item value by removing https prefix
+				computedProtoColSuffix = item.substring(8);
+				computedItemString = `http://${computedProtoColSuffix}`;
+				if (!isItemInArray(computedItemString, inputCollection)) {
+					computedReplaceeArray.push(computedItemString);
+				}
+			} else if (isHttpUrlPrefix) {
+				// Below variable gets the remaining item value by removing http prefix
+				computedProtoColSuffix = item.substring(7);
+				computedItemString = `https://${computedProtoColSuffix}`;
+				if (!isItemInArray(computedItemString, inputCollection)) {
+					computedReplaceeArray.push(computedItemString);
+				}
+			}
+
+			if (computedReplaceeArray) {
+				const computedIdx = inputCollection.indexOf(collection[idx]);
+				inputCollection.splice(computedIdx, 1, ...computedReplaceeArray);
+			}
+
+			return true;
+		});
+
+		return inputCollection;
+	};
+
+	applyPlugins = collection => {
+		const isActivePlugins = this.isActivePlugins();
+
+		if (!isActivePlugins) {
+			return collection;
+		}
+
+		const { plugins } = this.props;
+		const {
+			plugins: { URL_HTTP_HTTPS }
+		} = this.constants;
+		let inputCollection = collection.concat([]);
+
+		plugins.forEach(plugin => {
+			switch (plugin) {
+				case URL_HTTP_HTTPS:
+					inputCollection = this.applyUrlHttpHttpsPlugin(inputCollection);
+					break;
+
+				default:
+					break;
+			}
+		});
+
+		return inputCollection;
+	};
 
 	updateItem = () => {
 		const { activeItemKey, activeItemValue, collection } = this.state;
-		const isValidActiveItem = !!(activeItemKey !== null && activeItemKey !== '');
-		const computedItemAction = isValidActiveItem ? 'update' : 'add';
-		const message = `Are you sure you want to ${computedItemAction} ${activeItemValue}`;
+		const { validate } = this.props;
+		const isValidActiveItemKey = !!(activeItemKey !== null && activeItemKey !== '');
+		const isValidActiveItemValue = !!activeItemValue;
+		const isValidActiveItem = !!(isValidActiveItemKey && isValidActiveItemValue);
+		const computedItemAction = isValidActiveItemKey ? 'update' : 'add';
+		const confirmMessage = `Are you sure you want to ${computedItemAction} ${activeItemValue}`;
+		const emptyValueAlertMessage = 'Please fill empty value';
+		let inputCollection = collection.concat([]);
 
-		if (window.confirm(message)) {
-			if (isValidActiveItem) {
-				collection[activeItemKey] = activeItemValue;
-			} else {
-				collection.push(activeItemValue);
-			}
-
-			this.setState({ collection, activeItemKey: '', activeItemValue: '' }, () => {
-				console.log('computed Collection Value: ', collection);
-			});
+		if (!isValidActiveItemValue) {
+			window.alert(emptyValueAlertMessage);
+			return false;
 		}
+
+		const confirmationMessage = window.confirm(confirmMessage);
+		if (!confirmationMessage) {
+			return false;
+		}
+
+		const bulkEntriesResult = this.isBulkEntries(activeItemValue);
+		const isBulkEntries = !!(
+			bulkEntriesResult &&
+			Object.keys(bulkEntriesResult).length &&
+			bulkEntriesResult.array &&
+			bulkEntriesResult.length
+		);
+		const isActiveItemBulkEntries = !!(isValidActiveItem && isBulkEntries);
+
+		if (isActiveItemBulkEntries) {
+			inputCollection.splice(activeItemKey, 1, ...bulkEntriesResult.array);
+		} else if (isBulkEntries) {
+			bulkEntriesResult.array.forEach(item => inputCollection.push(item));
+		} else if (isValidActiveItem) {
+			inputCollection[activeItemKey] = activeItemValue;
+		} else {
+			inputCollection.push(activeItemValue);
+		}
+
+		const duplicateItems = getDuplicatesInArray(inputCollection).duplicates;
+		const isValidDuplicateItems = !!(validate && duplicateItems && duplicateItems.length);
+
+		if (isValidDuplicateItems) {
+			const computedDuplicateItemPrefixMessage = isValidActiveItem
+				? 'These values are already present in list:'
+				: 'These values are duplicate:';
+			const duplicateItemsMessage = `${computedDuplicateItemPrefixMessage} ${duplicateItems.join(
+				', '
+			)}. Please delete them first.`;
+
+			window.alert(duplicateItemsMessage);
+			return false;
+		}
+
+		inputCollection = this.applyPlugins(inputCollection);
+
+		return this.setState(
+			{ collection: inputCollection, activeItemKey: '', activeItemValue: '' },
+			() => {
+				console.log('computed collection Value: ', this.state.collection);
+			}
+		);
 	};
 
 	deleteItem = key => {
 		const { collection } = this.state;
 		const item = collection[key];
 		const message = `Are you sure you want to delete ${item}`;
+		const inputCollection = collection.concat([]);
 
 		if (window.confirm(message)) {
-			collection.splice(key, 1);
-			this.setState({ collection, activeItemValue: '', activeItemKey: '' });
+			inputCollection.splice(key, 1);
+			this.setState({ collection: inputCollection, activeItemValue: '', activeItemKey: '' });
 		}
 	};
 
 	editItem = key => {
 		const { collection, activeItemKey } = this.state;
+		const inputCollection = collection.concat([]);
 		const isValidActiveItem = !!(activeItemKey === Number(key));
 		let computedActiveItem;
 		let computedActiveItemKey;
 
 		if (!isValidActiveItem) {
-			computedActiveItem = collection[key];
+			computedActiveItem = inputCollection[key];
 			computedActiveItemKey = key;
 		} else {
 			computedActiveItem = '';
@@ -176,8 +324,36 @@ class UiList extends React.Component {
 		}
 	};
 
+	isBulkEntries = inputValue => {
+		const computedArray = inputValue
+			.split(',')
+			.map(value => value.trim())
+			.filter(value => !!value);
+		const isValidArray = !!(computedArray && computedArray.length);
+		const resultArray = isValidArray
+			? { array: computedArray, length: computedArray.length }
+			: null;
+
+		return resultArray;
+	};
+
+	isActivePlugins = () => {
+		const { plugins } = this.props;
+		const pluginsArray = this.plugins;
+		const isValidPlugins = !!(plugins && plugins.length);
+		// Below array map checks whether atleast one valid plugin is present in 'plugins' prop
+		const isValid = !!(
+			isValidPlugins &&
+			getTruthyArray(
+				plugins.map(plugin => !!(plugin && pluginsArray.includes(plugin.toLowerCase())))
+			).length
+		);
+
+		return isValid;
+	};
+
 	renderActionInputGroup = () => {
-		const { inputPlaceholder, saveButtonText } = this.props;
+		const { inputPlaceholder, saveButtonText, sticky } = this.props;
 		const { activeItemValue, activeItemKey } = this.state;
 		const isActiveItem = !!(
 			activeItemValue &&
@@ -185,9 +361,11 @@ class UiList extends React.Component {
 			!Number.isNaN(activeItemKey)
 		);
 		const computedActiveFormControl = isActiveItem ? 'u-box-shadow-active' : '';
+		const computedStickyClassName = sticky ? 'u-position-sticky' : '';
+		const computedFormGroupClassName = `u-margin-b4 ${computedStickyClassName}`;
 
 		return (
-			<FormGroup>
+			<FormGroup className={computedFormGroupClassName}>
 				<InputGroup>
 					<FormControl
 						type="text"
@@ -224,8 +402,8 @@ class UiList extends React.Component {
 		return (
 			<Row className={computedRootClassName}>
 				<Col className="u-margin-0 u-padding-0 layout-uiList-cols">
-					{uiListItems}
 					{actionInputGroup}
+					{uiListItems}
 				</Col>
 			</Row>
 		);
@@ -234,6 +412,9 @@ class UiList extends React.Component {
 
 UiList.propTypes = {
 	rootClassName: PropTypes.string,
+	sticky: PropTypes.bool,
+	validate: PropTypes.bool,
+	plugins: PropTypes.array,
 	itemCollection: PropTypes.array.isRequired,
 	emptyCollectionPlaceHolder: PropTypes.string.isRequired,
 	inputPlaceholder: PropTypes.string.isRequired,
@@ -241,7 +422,13 @@ UiList.propTypes = {
 };
 
 UiList.defaultProps = {
-	rootClassName: ''
+	rootClassName: '',
+	sticky: false,
+	validate: true,
+	plugins: []
 };
+
+// Example props values
+// plugins: ['url-http-https']
 
 export default UiList;

@@ -40,6 +40,8 @@ $auto: auto;
 $all: all;
 $ease: ease;
 $transparent: transparent;
+$hidden: hidden;
+$scroll: scroll;
 
 $textBold: bold;
 $textBolder: bolder;
@@ -54,6 +56,8 @@ $cursorPointer: pointer;
 $displayBlock: block;
 $displayFlex: flex;
 $displayInlineFlex: inline-flex;
+
+$positionSticky: sticky;
 
 $layoutHorizontal: horizontal;
 $layoutVertical: vertical;
@@ -95,3 +99,5 @@ $designDimensionXXL: ($designDimensionXL + $designDimensionXL); // 16rem
 
 $cardHeight: 173px;
 $defaultOpacity: 0.8;
+
+$zIndexBase: ($numberTen * $numberTen * $numberTen);

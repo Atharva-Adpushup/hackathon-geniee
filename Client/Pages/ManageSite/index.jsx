@@ -1,7 +1,7 @@
 import React from 'react';
-import ManageSiteContainer from '../../Containers/ManageSiteContainer';
+import ManageSite from './components/index';
 import '../../scss/pages/manageSites/index.scss';
 
-const App = props => <ManageSiteContainer {...props} />;
+const App = props => <ManageSite {...props} />;
 
 export default App;

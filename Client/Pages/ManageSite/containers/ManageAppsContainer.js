@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import ManageSite from '../Pages/ManageSite/components/index';
-import { fetchAppStatuses } from '../actions/siteActions';
+import ManageApps from '../components/manageApps';
+import { fetchAppStatuses } from '../../../actions/siteActions';
 
 const mapStateToProps = (state, ownProps) => {
 	const { sites } = state.global;
@@ -20,4 +20,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(ManageSite);
+)(ManageApps);
