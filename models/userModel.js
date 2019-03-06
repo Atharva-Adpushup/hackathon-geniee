@@ -957,6 +957,7 @@ function apiModule() {
 			return proxy.checkIfBillingProfileComplete(email).then(status => {
 				return API.getUserByEmail(email).then(user => {
 					user.set('isPaymentDetailsComplete', status);
+					user.save();
 					return {
 						email,
 						status
