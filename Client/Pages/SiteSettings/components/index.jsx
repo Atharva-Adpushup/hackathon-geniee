@@ -76,11 +76,17 @@ class SiteSettings extends Component {
 		return (
 			<div className="clearfix">
 				<h4 className="u-margin-t3 u-margin-b4 u-text-bold">Manage Blocklist</h4>
+				<p className="u-margin-b4">
+					Block AdPushup script <code>adpushup.js</code> on below listed websites
+				</p>
 				<UiList
-					itemCollection={['http://a.com', 'http://b.com']}
+					itemCollection={[]}
 					emptyCollectionPlaceHolder="No blocklist added"
-					inputPlaceholder="Enter Url or pattern to block"
+					inputPlaceholder="Enter Url or pattern to block. Enter comma separated multiple values"
 					saveButtonText="Save"
+					sticky
+					validate
+					plugins={['url-http-https']}
 				/>
 			</div>
 		);
@@ -93,6 +99,7 @@ class SiteSettings extends Component {
 					rootClassName="u-padding-h4 u-padding-v5"
 					leftChildren={this.renderLeftPanel()}
 					rightChildren={this.renderRightPanel()}
+					rightChildrenClassName="wrapper wrapper--blocklist"
 				/>
 			</ActionCard>
 		);

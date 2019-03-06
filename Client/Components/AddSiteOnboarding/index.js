@@ -28,15 +28,12 @@ class AddSiteOnboarding extends Component {
 
 		userService
 			.addSite(existingSite)
-			.then(resp =>
-				siteService.saveSite(siteId, existingSite, onboardingStage, step).then(resp => {
-					console.log('site saved: ', resp.data);
+			.then(resp => siteService.saveSite(siteId, existingSite, onboardingStage, step))
+			.then(resp => {
+				onSiteAdd(resp.data);
 
-					onSiteAdd(siteId, existingSite, onboardingStage, step);
-
-					this.setState({ isAddingSite: false });
-				})
-			)
+				return this.setState({ isAddingSite: false });
+			})
 			.catch(err => {
 				this.setState({ isAddingSite: false, error: err.response.data.error });
 			});
@@ -46,6 +43,8 @@ class AddSiteOnboarding extends Component {
 		e.preventDefault();
 
 		const { onSiteAdd, site } = this.props;
+
+		console.log('site: ', site);
 
 		const validationResult = formValidator.validate({ site }, validationSchema.user.validations);
 
@@ -60,11 +59,12 @@ class AddSiteOnboarding extends Component {
 				.then(resp => {
 					const { siteId } = resp.data;
 
-					siteService.saveSite(siteId, site, onboardingStage, step).then(resp => {
-						this.setState({ isAddingSite: false });
+					return siteService.saveSite(siteId, site, onboardingStage, step);
+				})
+				.then(resp => {
+					this.setState({ isAddingSite: false });
 
-						onSiteAdd(siteId, site, onboardingStage, step);
-					});
+					onSiteAdd(resp.data);
 				})
 				.catch(err => {
 					this.setState({ isAddingSite: false, error: err.response.data.error });
@@ -75,12 +75,12 @@ class AddSiteOnboarding extends Component {
 	};
 
 	render() {
-		const { existingSite, site, isActive, completed, changeSite, forwadref } = this.props;
+		const { existingSite, site, isActive, completed, changeSite, forwardedRef } = this.props;
 		const { showForm, isAddingSite, error } = this.state;
 
 		return (
 			<OnboardingCard
-				forwadref={forwadref}
+				ref={forwardedRef}
 				className="add-site-card"
 				isActiveStep={isActive}
 				expanded={isActive || completed}
@@ -92,7 +92,7 @@ class AddSiteOnboarding extends Component {
 			>
 				<Fragment>
 					{isActive && showForm && (
-						<div>
+						<div className="u-margin-t4">
 							<form onSubmit={this.addNewSite}>
 								<InputBox type="text" name="site" value={site} onChange={changeSite} />
 								<CustomButton type="submit" showSpinner={isAddingSite}>
@@ -105,13 +105,13 @@ class AddSiteOnboarding extends Component {
 					)}
 
 					{isActive && !showForm && existingSite && (
-						<div>
+						<div className="u-margin-t4">
 							<CustomButton
 								onClick={this.addExistingSite}
 								showSpinner={isAddingSite}
 								className="u-margin-r3"
 							>
-								Continue with {existingSite}
+								{`Continue with ${existingSite}`}
 							</CustomButton>
 
 							<CustomButton variant="secondary" onClick={this.toggleForm}>
@@ -123,7 +123,7 @@ class AddSiteOnboarding extends Component {
 					)}
 
 					{isActive && !existingSite && (
-						<div>
+						<div className="u-margin-t4">
 							<form onSubmit={this.addNewSite}>
 								<InputBox
 									classNames="custom-input"
@@ -142,7 +142,7 @@ class AddSiteOnboarding extends Component {
 					)}
 
 					{completed && (
-						<div className="aligner aligner--hcenter">
+						<div className="aligner aligner--hcenter u-margin-t4">
 							<span className="u-text-underline u-text-red u-margin-r2">{site}</span> has been
 							added!
 						</div>

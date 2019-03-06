@@ -142,7 +142,7 @@ function adGeneration(docKey, currentDataForSyncing, cb = false) {
 	let logUnsyncedAds = [];
 	let unSyncedAds = [];
 	return appBucket
-		.getDoc(`${docKeys}${site.get('siteId')}`)
+		.getDoc(docKey)
 		.then(docWithCas => {
 			const ads = docWithCas.value.ads;
 

@@ -41,17 +41,21 @@ class SendCodeByEmailModal extends Component {
 
 			dataService
 				.sendCodeByEmail(developerEmail, subject, encodedEmailBody)
-				.then(response => {
+				.then(response =>
 					this.setState({
 						developerEmail: '',
 						isSendingMail: false,
 						error: '',
 						success: response.data.success
-					});
-				})
-				.catch(error => {
-					this.setState({ isSendingMail: false, success: '', error: error.response.data.error });
-				});
+					})
+				)
+				.catch(error =>
+					this.setState({
+						isSendingMail: false,
+						success: '',
+						error: error.response.data.error
+					})
+				);
 		} else {
 			this.setState({ error: validationResult.errors.email });
 		}

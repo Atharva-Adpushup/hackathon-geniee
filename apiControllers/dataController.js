@@ -4,6 +4,8 @@ const siteModel = require('../models/siteModel');
 const utils = require('../helpers/utils');
 const CC = require('../configs/commonConsts');
 const httpStatus = require('../configs/httpStatusConsts');
+const pagegroupCreationAutomation = require('../services/pagegroupCreationAutomation');
+const AdpushupError = require('../helpers/AdPushupError');
 
 const router = express.Router();
 
@@ -13,8 +15,13 @@ router
 		const data = req.body;
 
 		const siteId = parseInt(req.body.siteId, 10);
+		let siteObj;
+
 		userModel
 			.verifySiteOwner(req.user.email, siteId)
+			.catch(err => {
+				throw AdpushupError({ message: 'Site not found!', status: httpStatus.NOT_FOUND });
+			})
 			.then(() => {
 				const audienceId = utils.getRandomNumber();
 				const siteData = {
@@ -31,26 +38,27 @@ router
 						isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP
 					}
 				};
-				return siteData;
+				return siteModel.saveSiteData(siteId, 'POST', siteData);
 			})
-			.then(siteModel.saveSiteData.bind(null, siteId, 'POST'))
-			.then(site =>
-				userModel
-					.setSitePageGroups(req.user.email)
-					.then(user => {
-						res.status(httpStatus.OK).json({
-							siteId,
-							site: data.site,
-							onboardingStage: site.data.onboardingStage,
-							step: site.data.step
-						});
-					})
-					.catch(() => {
-						res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'server error' });
-					})
+			.then(site => {
+				siteObj = site;
+				return userModel.setSitePageGroups(req.user.email);
+			})
+			.then(user =>
+				pagegroupCreationAutomation({
+					siteId: siteObj.data.siteId,
+					url: siteObj.data.siteDomain,
+					userEmail: req.user.email
+				})
 			)
+			.then(() => siteModel.getSiteById(siteId))
+			.then(site => res.status(httpStatus.OK).json(site.data))
 			.catch(err => {
-				res.status(httpStatus.NOT_FOUND).json({ error: 'site not found!' });
+				if (err instanceof AdpushupError)
+					return res.status(err.message.status).json({ error: err.message.message });
+				return res
+					.status(httpStatus.INTERNAL_SERVER_ERROR)
+					.json({ error: 'Something went wrong!' });
 			});
 	})
 	.post('/sendCode', (req, res) => {
@@ -61,11 +69,9 @@ router
 			body: utils.atob(req.body.emailBody)
 		};
 
-		userModel
+		return userModel
 			.sendCodeToDev(json)
-			.then(() => {
-				res.status(httpStatus.OK).send({ success: 'Email sent successfully' });
-			})
+			.then(() => res.status(httpStatus.OK).send({ success: 'Email sent successfully' }))
 			.catch(e => {
 				if (Array.isArray(e.message))
 					return res.status(httpStatus.BAD_REQUEST).send({ error: e.message[0].message });

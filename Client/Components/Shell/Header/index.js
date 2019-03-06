@@ -5,7 +5,7 @@ import { DropdownButton, MenuItem } from 'react-bootstrap';
 import { logoutAction } from '../../../actions/userActions';
 import history from '../../../helpers/history';
 
-const Header = ({ sidebarToggle, logoutAction }) => (
+const Header = ({ sidebarToggle, logoutAction, firstName }) => (
 	<header className="ap-page-header">
 		<span onClick={sidebarToggle} className="nav-toggle">
 			<FontAwesomeIcon icon="bars" />
@@ -14,7 +14,7 @@ const Header = ({ sidebarToggle, logoutAction }) => (
 			<img src="https://console.adpushup.com/assets/images/logo.png" alt="AdPushup" />
 		</span>
 
-		<DropdownButton pullRight title="Hello Arun" id="dropdown-button">
+		<DropdownButton pullRight title={`Hello ${firstName || ''}`} id="dropdown-button">
 			<MenuItem eventKey="1">Profile</MenuItem>
 			<MenuItem eventKey="2">Settings</MenuItem>
 			<MenuItem eventKey="3">Support</MenuItem>
@@ -35,6 +35,12 @@ const Header = ({ sidebarToggle, logoutAction }) => (
 );
 
 export default connect(
-	null,
+	state => {
+		const { firstName } = state.global.user.data;
+
+		return {
+			firstName
+		};
+	},
 	{ logoutAction }
 )(Header);

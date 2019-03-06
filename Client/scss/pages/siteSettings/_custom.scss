@@ -12,3 +12,11 @@
 		color: $primaryColor;
 	}
 }
+
+.wrapper {
+	&.wrapper--blocklist {
+		max-height: ($designDimensionSM * 60);
+		overflow: $hidden;
+		overflow-y: $scroll;
+	}
+}

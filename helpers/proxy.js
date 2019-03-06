@@ -9,28 +9,25 @@ var request = require('request-promise'),
 	config = require('../configs/config'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	API = {
-		load: function(url, userAgent, fullResponse) {
-			userAgent = userAgent
-				? userAgent
-				: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
-			return request(
-				{
-					uri: url,
-					jar: true,
-					strictSSL: false,
-					resolveWithFullResponse: fullResponse ? true : false,
-					headers: {
-						'User-Agent': userAgent,
-						'Accept-Encoding': 'identity'
-					}
-				},
-				err => {
-					if (err.message.indexOf('I really need an ID for this to work') === -1) {
-						return false;
-					}
-					return true;
+		load(url, userAgent, fullResponse) {
+			userAgent =
+				userAgent ||
+				'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
+			return request({
+				uri: url,
+				jar: true,
+				strictSSL: false,
+				resolveWithFullResponse: !!fullResponse,
+				headers: {
+					'User-Agent': userAgent,
+					'Accept-Encoding': 'identity'
 				}
-			);
+			}).catch(err => {
+				if (err && err.message.indexOf('I really need an ID for this to work') === -1) {
+					return false;
+				}
+				return true;
+			});
 		},
 		detectCustomAp(url, siteId) {
 			return API.load(url).then(body => {
@@ -38,13 +35,15 @@ var request = require('request-promise'),
 				return !!apCodeDetected;
 			});
 		},
-		detectAdPushup: function(url) {
-			return API.load(url).then(function(body) {
-				var $ = cheerio.load(body),
-					json = null,
-					finalData;
-				$('noscript').each(function(index, el) {
-					var html = $(el)
+		detectAdPushup(url) {
+			return API.load(url).then(body => {
+				const $ = cheerio.load(body);
+
+				let json = null;
+
+				let finalData;
+				$('noscript').each((index, el) => {
+					let html = $(el)
 						.text()
 						.trim();
 					if (html.indexOf('_ap_ufes') === -1) {
@@ -59,24 +58,16 @@ var request = require('request-promise'),
 					return false;
 				}
 				finalData = { cmsName: 'wordpress', pageGroups: [] };
-				Object.keys(json.urls).forEach(function(key) {
+				Object.keys(json.urls).forEach(key => {
 					finalData.pageGroups.push({ pageGroup: key.toUpperCase(), sampleUrl: json.urls[key] });
 				});
 				return finalData;
 			});
 		},
-		detectCustomAp: function(url, siteId) {
-			return API.load(url).then(function(body) {
-				// var apCodeDetected = body.match(`//.+.adpushup.com/${siteId}/adpushup.js`);
-				var apCodeDetected = body.match(`//.+.adpushup.com/`);
+		detectCustomAp(url, siteId) {
+			return API.load(url).then(body => {
+				const apCodeDetected = body.match(`//.+.adpushup.com/${siteId}/adpushup.js`);
 				return !!apCodeDetected;
-			});
-			if (!json) {
-				return false;
-			}
-			finalData = { cmsName: 'wordpress', pageGroups: [] };
-			Object.keys(json.urls).forEach(key => {
-				finalData.pageGroups.push({ pageGroup: key.toUpperCase(), sampleUrl: json.urls[key] });
 			});
 		},
 		fetchOurAdsTxt() {

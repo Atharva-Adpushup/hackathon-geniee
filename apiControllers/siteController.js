@@ -127,9 +127,13 @@ router
 			.verifySiteOwner(email, siteId)
 			.then(({ user, site }) => {
 				const { domain, onboardingStage, step } = site;
-				return res
-					.status(httpStatus.OK)
-					.json({ isOnboarding: false, siteId, site: domain, onboardingStage, step });
+				return res.status(httpStatus.OK).json({
+					isOnboarding: onboardingStage === 'preOnboarding',
+					siteId,
+					site: domain,
+					onboardingStage,
+					step
+				});
 			})
 			.catch(err => res.status(httpStatus.NOT_FOUND).json({ error: 'Site not found!' }));
 	})
