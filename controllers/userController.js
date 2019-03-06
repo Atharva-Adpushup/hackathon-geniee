@@ -40,7 +40,9 @@ function dashboardRedirection(req, res, allUserSites, type) {
 				encode: String,
 				httpOnly: false
 			},
-			isCookieSet = Object.keys(req.cookies).length > 0 && typeof req.cookies[cookieName] !== 'undefined';
+			isCookieSet =
+				Object.keys(req.cookies).length > 0 &&
+				typeof req.cookies[cookieName] !== 'undefined';
 
 		isCookieSet ? res.clearCookie(cookieName, cookieOptions) : '';
 		res.cookie(cookieName, req.session.user.email, cookieOptions);
@@ -51,7 +53,9 @@ function dashboardRedirection(req, res, allUserSites, type) {
 			return siteModel
 				.getSiteById(obj.siteId)
 				.then(function(site) {
-					return Object.assign(obj, { isManual: site.get('isManual') || false });
+					return Object.assign(obj, {
+						isManual: site.get('isManual') || false
+					});
 				})
 				.catch(function() {
 					return 'inValidSite';
@@ -111,22 +115,39 @@ function dashboardRedirection(req, res, allUserSites, type) {
 				switch (type) {
 					case 'dashboard':
 					case 'default':
-						return res.render('dashboard', {
-							validSites: sites,
-							unSavedSite: unSavedSite,
-							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-							requestDemo: req.session.user.requestDemo,
-							imageHeaderLogo: true,
-							isSuperUser: req.session.isSuperUser,
-							disableUiControls:
-								req.session.user.email === 'william@51cashbox.com' && !req.session.isSuperUser
-						});
+						return userModel
+							.getUserByEmail(req.session.user.email)
+							.then(user => {
+								let isPaymentDetailsComplete = user.get(
+									'isPaymentDetailsComplete'
+								);
+								return res.render('dashboard', {
+									validSites: sites,
+									unSavedSite: unSavedSite,
+									hasStep: sites.length
+										? 'step' in sites[0]
+											? true
+											: false
+										: false,
+									requestDemo: req.session.user.requestDemo,
+									imageHeaderLogo: true,
+									isSuperUser: req.session.isSuperUser,
+									disableUiControls:
+										req.session.user.email === 'william@51cashbox.com' &&
+										!req.session.isSuperUser,
+									isPaymentDetailsComplete: isPaymentDetailsComplete || false
+								});
+							});
 						break;
 					case 'onboarding':
 						return res.render('onboarding', {
 							validSites: sites,
 							unSavedSite: unSavedSite,
-							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+							hasStep: sites.length
+								? 'step' in sites[0]
+									? true
+									: false
+								: false,
 							requestDemo: req.session.user.requestDemo,
 							analyticsObj: JSON.stringify(req.session.analyticsObj),
 							imageHeaderLogo: true,
@@ -151,10 +172,19 @@ function preOnboardingPageRedirection(page, req, res) {
 		primarySiteId = isPrimarySiteDetails ? primarySiteDetails.siteId : null,
 		primarySiteDomain = isPrimarySiteDetails ? primarySiteDetails.domain : null,
 		primarySiteStep = isPrimarySiteDetails ? primarySiteDetails.step : null,
-		firstName = req.session.tempObj && req.session.tempObj.firstName ? req.session.tempObj.firstName : null,
-		email = req.session.tempObj && req.session.tempObj.email ? req.session.tempObj.email : null,
+		firstName =
+			req.session.tempObj && req.session.tempObj.firstName
+				? req.session.tempObj.firstName
+				: null,
+		email =
+			req.session.tempObj && req.session.tempObj.email
+				? req.session.tempObj.email
+				: null,
 		stage = req.session.stage ? req.session.stage : null,
-		requestDemo = req.session.user && req.session.user.requestDemo ? req.session.user.requestDemo : true,
+		requestDemo =
+			req.session.user && req.session.user.requestDemo
+				? req.session.user.requestDemo
+				: true,
 		userObj = {
 			name: firstName,
 			email: email,
@@ -163,7 +193,11 @@ function preOnboardingPageRedirection(page, req, res) {
 			primarySiteDomain,
 			primarySiteStep
 		},
-		isUserSession = !!(req.session && req.session.user && !req.session.isSuperUser),
+		isUserSession = !!(
+			req.session &&
+			req.session.user &&
+			!req.session.isSuperUser
+		),
 		isPipeDriveDealId = !!(
 			isAnalyticsObj &&
 			primarySiteDetails &&
@@ -182,7 +216,8 @@ function preOnboardingPageRedirection(page, req, res) {
 	}
 
 	if (isPipeDriveDealTitle) {
-		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE = primarySiteDetails.pipeDrive.dealTitle;
+		analyticsObj.INFO_PIPEDRIVE_DEAL_TITLE =
+			primarySiteDetails.pipeDrive.dealTitle;
 	}
 
 	// Commented for Tag Manager
@@ -252,7 +287,8 @@ router
 					if (req.body.fromDashboard == 'false') {
 						user.set('preferredModeOfReach', req.body.modeOfReach);
 						if (
-							(req.body['selectedServices[]'] && req.body['selectedServices[]'].length > 1) ||
+							(req.body['selectedServices[]'] &&
+								req.body['selectedServices[]'].length > 1) ||
 							userWebsiteRevenue > 10000
 						) {
 							req.session.stage = 'Onboarding';
@@ -314,7 +350,9 @@ router
 		return userModel
 			.getUserByEmail(req.session.user.email)
 			.then(function(user) {
-				var adSenseData = _.find(user.get('adNetworkSettings'), { networkName: 'ADSENSE' });
+				var adSenseData = _.find(user.get('adNetworkSettings'), {
+					networkName: 'ADSENSE'
+				});
 				return res.render('connectGoogle', {
 					adNetworkSettings: !_.isEmpty(user.get('adNetworkSettings'))
 						? {
@@ -386,7 +424,9 @@ router
 			});
 	})
 	.post('/switchTo', function(req, res) {
-		var email = req.body.email ? utils.sanitiseString(req.body.email) : req.body.email;
+		var email = req.body.email
+			? utils.sanitiseString(req.body.email)
+			: req.body.email;
 
 		if (req.session.isSuperUser === true) {
 			userModel.setSitePageGroups(email).then(
@@ -413,7 +453,9 @@ router
 						if (Array.isArray(sites) && sites.length > 0) {
 							if (sites.length == 1) {
 								var step = sites[0].step,
-									isIncompleteOnboardingSteps = !!(step && step < CC.onboarding.totalSteps);
+									isIncompleteOnboardingSteps = !!(
+										step && step < CC.onboarding.totalSteps
+									);
 
 								if (isRequestDemo && isIncompleteOnboardingSteps) {
 									return requestDemoRedirection(res);
@@ -458,13 +500,17 @@ router
 			res.send('Fake Request');
 		} else if (req.query.error === 'access_denied') {
 			res.status(500);
-			res.send('Seems you denied request, if done accidently please press back button to retry again.');
+			res.send(
+				'Seems you denied request, if done accidently please press back button to retry again.'
+			);
 		} else {
 			var getAccessToken = oauthHelper.getAccessTokens(req.query.code),
 				getAdsenseAccounts = getAccessToken.then(function(token) {
 					return request({
 						strictSSL: false,
-						uri: 'https://www.googleapis.com/adsense/v1.4/accounts?access_token=' + token.access_token,
+						uri:
+							'https://www.googleapis.com/adsense/v1.4/accounts?access_token=' +
+							token.access_token,
 						json: true
 					})
 						.then(function(adsenseInfo) {
@@ -474,7 +520,9 @@ router
 							if (
 								err.error &&
 								err.error.error &&
-								err.error.error.message.indexOf('User does not have an AdSense account') === 0
+								err.error.error.message.indexOf(
+									'User does not have an AdSense account'
+								) === 0
 							) {
 								throw new Error('No adsense account');
 							}
@@ -504,56 +552,59 @@ router
 				getUserInfo = getAccessToken.then(function(token) {
 					return request({
 						strictSSL: false,
-						uri: 'https://www.googleapis.com/oauth2/v2/userinfo?access_token=' + token.access_token,
+						uri:
+							'https://www.googleapis.com/oauth2/v2/userinfo?access_token=' +
+							token.access_token,
 						json: true
 					});
 				}),
 				getUser = userModel.getUserByEmail(req.session.user.email);
 
-			Promise.join(getUser, getAccessToken, getAdsenseAccounts, getUserInfo, getUserDFPInfo, function(
-				user,
-				token,
-				adsenseAccounts,
-				userInfo,
-				userDFPInfo
-			) {
-				Promise.all([
-					user.addNetworkData({
-						networkName: 'ADSENSE',
-						refreshToken: token.refresh_token,
-						accessToken: token.access_token,
-						expiresIn: token.expires_in,
-						pubId: adsenseAccounts[0].id,
-						adsenseEmail: userInfo.email,
-						userInfo: userInfo,
-						adsenseAccounts: adsenseAccounts
-					}),
-					user.addNetworkData({
-						networkName: 'DFP',
-						refreshToken: token.refresh_token,
-						accessToken: token.access_token,
-						expiresIn: token.expires_in,
-						userInfo: userInfo,
-						dfpAccounts: userDFPInfo
-					})
-				]).then(function() {
-					req.session.user = user;
-					var pubIds = _.map(adsenseAccounts, 'id'); // grab all the pubIds in case there are multiple and show them to user to choose
-					if (CC.isForceMcm) {
-						res.render('mcmConnect', {
-							baseUrl: CC.BASE_URL,
+			Promise.join(
+				getUser,
+				getAccessToken,
+				getAdsenseAccounts,
+				getUserInfo,
+				getUserDFPInfo,
+				function(user, token, adsenseAccounts, userInfo, userDFPInfo) {
+					Promise.all([
+						user.addNetworkData({
+							networkName: 'ADSENSE',
+							refreshToken: token.refresh_token,
+							accessToken: token.access_token,
+							expiresIn: token.expires_in,
+							pubId: adsenseAccounts[0].id,
 							adsenseEmail: userInfo.email,
-							pubId: pubIds.length > 1 ? pubIds : pubIds[0],
-							userEmail: user.get('email')
-						});
-					} else {
-						res.render('oauthParams', {
-							adsenseEmail: userInfo.email,
-							pubId: pubIds.length > 1 ? pubIds : pubIds[0]
-						});
-					}
-				});
-			}).catch(function(err) {
+							userInfo: userInfo,
+							adsenseAccounts: adsenseAccounts
+						}),
+						user.addNetworkData({
+							networkName: 'DFP',
+							refreshToken: token.refresh_token,
+							accessToken: token.access_token,
+							expiresIn: token.expires_in,
+							userInfo: userInfo,
+							dfpAccounts: userDFPInfo
+						})
+					]).then(function() {
+						req.session.user = user;
+						var pubIds = _.map(adsenseAccounts, 'id'); // grab all the pubIds in case there are multiple and show them to user to choose
+						if (CC.isForceMcm) {
+							res.render('mcmConnect', {
+								baseUrl: CC.BASE_URL,
+								adsenseEmail: userInfo.email,
+								pubId: pubIds.length > 1 ? pubIds : pubIds[0],
+								userEmail: user.get('email')
+							});
+						} else {
+							res.render('oauthParams', {
+								adsenseEmail: userInfo.email,
+								pubId: pubIds.length > 1 ? pubIds : pubIds[0]
+							});
+						}
+					});
+				}
+			).catch(function(err) {
 				res.status(500);
 				err.message === 'No adsense account'
 					? res.send(
@@ -584,10 +635,17 @@ router
 		);
 	})
 	.post('/profile', function(req, res) {
-		req.body.firstName = req.body.firstName ? utils.trimString(req.body.firstName) : req.body.firstName;
-		req.body.lastName = req.body.lastName ? utils.trimString(req.body.lastName) : req.body.lastName;
+		req.body.firstName = req.body.firstName
+			? utils.trimString(req.body.firstName)
+			: req.body.firstName;
+		req.body.lastName = req.body.lastName
+			? utils.trimString(req.body.lastName)
+			: req.body.lastName;
 		let jsonParams = Object.assign({}, req.body),
-			encodedParams = { firstName: req.body.firstName, lastName: req.body.lastName };
+			encodedParams = {
+				firstName: req.body.firstName,
+				lastName: req.body.lastName
+			};
 
 		encodedParams = utils.getHtmlEncodedJSON(encodedParams);
 		jsonParams = Object.assign({}, jsonParams, encodedParams);
@@ -604,11 +662,17 @@ router
 				console.log(user);
 
 				req.session.user = user;
-				return res.render('profile', { profileSaved: true, formData: req.body });
+				return res.render('profile', {
+					profileSaved: true,
+					formData: req.body
+				});
 			})
 			.catch(function(e) {
 				if (e instanceof AdPushupError) {
-					res.render('profile', { profileError: e.message, formData: req.body });
+					res.render('profile', {
+						profileError: e.message,
+						formData: req.body
+					});
 				} else if (e.name && e.name === 'CouchbaseError') {
 					res.render('profile', { userNotFound: true, formData: req.body });
 				}
@@ -764,7 +828,10 @@ router
 					taboolaPassword = req.body.taboolaPassword;
 				}
 
-				if (!req.body.revcontentPassword || req.body.revcontentPassword === '') {
+				if (
+					!req.body.revcontentPassword ||
+					req.body.revcontentPassword === ''
+				) {
 					revcontentPassword = '';
 				} else if (req.body.revcontentPassword === 'xxxxxxxxxx') {
 					revcontentPassword = userAdnetworkCredentials.revContent.password;
@@ -780,7 +847,10 @@ router
 					outbrainPassword = req.body.outbrainPassword;
 				}
 
-				if (!req.body.contentadsPassword || req.body.contentadsPassword === '') {
+				if (
+					!req.body.contentadsPassword ||
+					req.body.contentadsPassword === ''
+				) {
 					contentadsPassword = '';
 				} else if (req.body.contentadsPassword === 'xxxxxxxxxx') {
 					contentadsPassword = userAdnetworkCredentials.contentAds.password;
@@ -796,7 +866,10 @@ router
 					mediaNetPassword = req.body.medianetPassword;
 				}
 
-				if (!req.body.yellowhammerPassword || req.body.yellowhammerPassword === '') {
+				if (
+					!req.body.yellowhammerPassword ||
+					req.body.yellowhammerPassword === ''
+				) {
 					yellowhammerPassword = '';
 				} else if (req.body.yellowhammerPassword === 'xxxxxxxxxx') {
 					yellowhammerPassword = userAdnetworkCredentials.yellowhammer.password;
@@ -862,15 +935,24 @@ router
 					dataToSend = req.body;
 				req.session.user = user;
 				dataToSend.commonRandomPassword = 'xxxxxxxxxx';
-				return res.render('credentials', { profileSaved: true, formData: req.body });
+				return res.render('credentials', {
+					profileSaved: true,
+					formData: req.body
+				});
 			})
 			.catch(function(e) {
 				var dataToSend = req.body;
 				dataToSend.commonRandomPassword = 'xxxxxxxxxx';
 				if (e instanceof AdPushupError) {
-					res.render('credentials', { credentialError: e.message, formData: dataToSend });
+					res.render('credentials', {
+						credentialError: e.message,
+						formData: dataToSend
+					});
 				} else if (e.name && e.name === 'CouchbaseError') {
-					res.render('credentials', { userNotFound: true, formData: dataToSend });
+					res.render('credentials', {
+						userNotFound: true,
+						formData: dataToSend
+					});
 				}
 			});
 	})
@@ -881,13 +963,16 @@ router
 				let adNetworkSettings = user.get('adNetworkSettings') || [];
 				adNetworkSettings[0] = adNetworkSettings[0] || {};
 				adNetworkSettings[0].pubId = req.body.pubId;
-				adNetworkSettings[0].networkName = adNetworkSettings[0].networkName || 'ADSENSE';
+				adNetworkSettings[0].networkName =
+					adNetworkSettings[0].networkName || 'ADSENSE';
 				user.set('adNetworkSettings', adNetworkSettings);
 				return user.save();
 			})
 			.then(() => {
-				req.session.user.adNetworkSettings = req.session.user.adNetworkSettings || [];
-				req.session.user.adNetworkSettings[0] = req.session.user.adNetworkSettings[0] || {};
+				req.session.user.adNetworkSettings =
+					req.session.user.adNetworkSettings || [];
+				req.session.user.adNetworkSettings[0] =
+					req.session.user.adNetworkSettings[0] || {};
 				req.session.user.adNetworkSettings[0].pubId = req.body.pubId;
 				req.session.user.adNetworkSettings[0].networkName =
 					req.session.user.adNetworkSettings[0].networkName || 'ADSENSE';
@@ -903,13 +988,10 @@ router
 			});
 	})
 	.get('/payment', function(req, res) {
-		userModel
-			.getUserByEmail(req.session.user.email)
-			.then(function(user) {
+		const getTipaltiUrls = email => {
 				var tipaltiConfig = config.tipalti,
 					tipaltiUrl = '',
 					tipaltiBaseUrl = tipaltiConfig.baseUrl,
-					email = user.get('email'),
 					payeeId = encodeURIComponent(
 						crypto
 							.createHash('md5')
@@ -920,26 +1002,60 @@ router
 					payer = tipaltiConfig.payerName,
 					date = Math.floor(+new Date() / 1000),
 					paramsStr =
-						'idap=' + payeeId + '&payer=' + payer + '&ts=' + date + '&email=' + encodeURIComponent(email),
+						'idap=' +
+						payeeId +
+						'&payer=' +
+						payer +
+						'&ts=' +
+						date +
+						'&email=' +
+						encodeURIComponent(email),
 					key = tipaltiConfig.key,
 					hash = crypto
 						.createHmac('sha256', key)
 						.update(paramsStr.toString('utf-8'))
 						.digest('hex'),
-					paymentHistoryUrl = tipaltiConfig.paymentHistoryUrl + paramsStr + '&hashkey=' + hash;
+					paymentHistoryUrl =
+						tipaltiConfig.paymentHistoryUrl + paramsStr + '&hashkey=' + hash;
 
 				// date = Math.floor(date / 1000);
 				tipaltiUrl = tipaltiBaseUrl + paramsStr + '&hashkey=' + hash;
-				//tipaltiStatusCheck.checkStatus(req.session.user.email);
-				res.render('payment', {
-					tipaltiUrl: tipaltiUrl,
-					paymentHistoryUrl: paymentHistoryUrl
+
+				return { paymentHistoryUrl, tipaltiUrl };
+			},
+			email = req.session.user.email;
+		return Promise.all([
+			getTipaltiUrls(email),
+			userModel.updateUserPaymentStatus(email)
+		])
+			.spread(tipaltiUrls => {
+				return res.render('payment', {
+					tipaltiUrl: tipaltiUrls.tipaltiUrl,
+					paymentHistoryUrl: tipaltiUrls.paymentHistoryUrl
 				});
 			})
-			.catch(function(err) {
-				res.render('payment', {
+			.catch(err => {
+				return res.render('payment', {
 					error: 'Some error occurred!'
 				});
+			});
+	})
+	.get('/updatePaymentStatusAllUser', function(req, res) {
+		var userPromises = function(users) {
+			return _.map(users, user => {
+				return userModel.updateUserPaymentStatus(user);
+			});
+		};
+		return userModel
+			.getAllUsers()
+			.then(users=>{
+				return Promise.all(userPromises(users))
+			})
+			.then(result => {
+				return res.send(result);
+			})
+			.catch(err => {
+				console.log(err);
 			});
 	});
 

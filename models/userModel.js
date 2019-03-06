@@ -2,6 +2,7 @@ var modelAPI = (module.exports = apiModule()),
 	model = require('../helpers/model'),
 	couchbase = require('../helpers/couchBaseService'),
 	query = require('couchbase').ViewQuery.from('app', 'sitesByUser'),
+	allUsers = require('couchbase').ViewQuery.from('app', 'allUsers'),
 	networkSettings = require('../models/subClasses/user/networkSettings'),
 	globalModel = require('../models/globalModel'),
 	siteModel = require('../models/siteModel'),
@@ -22,6 +23,7 @@ var modelAPI = (module.exports = apiModule()),
 	pipedriveAPI = require('../misc/vendors/pipedrive'),
 	mailService = require('../services/mailService/index'),
 	{ mailService } = require('node-utils'),
+	proxy = require('../helpers/proxy'),
 	User = model.extend(function() {
 		this.keys = [
 			'firstName',
@@ -51,7 +53,8 @@ var modelAPI = (module.exports = apiModule()),
 			'adnetworkCredentials',
 			'miscellaneous',
 			'billingInfoComplete',
-			'paymentInfoComplete'
+			'paymentInfoComplete',
+			'isPaymentDetailsComplete'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
@@ -93,8 +96,16 @@ var modelAPI = (module.exports = apiModule()),
 					return site;
 				}
 				return globalModel.incrSiteIdInApAppBucket().then(function(siteId) {
-					me.get('sites').push({ siteId: siteId, domain: normalizedDomain, isManual: isManual });
-					return { siteId: siteId, domain: normalizedDomain, isManual: isManual };
+					me.get('sites').push({
+						siteId: siteId,
+						domain: normalizedDomain,
+						isManual: isManual
+					});
+					return {
+						siteId: siteId,
+						domain: normalizedDomain,
+						isManual: isManual
+					};
 				});
 			});
 		};
@@ -172,7 +183,8 @@ var modelAPI = (module.exports = apiModule()),
 		this.isMe = function(email, pass) {
 			return (
 				this.get('email') === email &&
-				this.get('passwordMd5') === md5(this.get('salt') + pass + this.get('salt'))
+				this.get('passwordMd5') ===
+					md5(this.get('salt') + pass + this.get('salt'))
 			);
 		};
 
@@ -333,13 +345,15 @@ function apiModule() {
 		verifySiteOwner: function(email, siteId, options) {
 			return API.getUserByEmail(email).then(function(user) {
 				if (options && options.fullSiteData) {
-					return siteModel.getSiteById(parseInt(siteId, 10)).then(function(site) {
-						if (site) {
-							return { user: user, site: site };
-						}
+					return siteModel
+						.getSiteById(parseInt(siteId, 10))
+						.then(function(site) {
+							if (site) {
+								return { user: user, site: site };
+							}
 
-						throw new Error('Invalid Site');
-					});
+							throw new Error('Invalid Site');
+						});
 				} else {
 					return user.getSiteById(parseInt(siteId, 10)).then(function(site) {
 						if (site) {
@@ -390,32 +404,36 @@ function apiModule() {
 
 						return Promise.resolve(isNewSite);
 					},
-					setNewDealForExistingUser = validateSiteForDealCreation(user).then(isSiteValidated => {
-						const api = {
-							params: { site: normalizedDomain },
-							options: { isExistingUser: true }
-						};
+					setNewDealForExistingUser = validateSiteForDealCreation(user).then(
+						isSiteValidated => {
+							const api = {
+								params: { site: normalizedDomain },
+								options: { isExistingUser: true }
+							};
 
-						return getUser.then(user => {
-							const isAPIActivated = isPipeDriveAPIActivated(),
-								isEmailInBLockList = isEmailInAnalyticsBlockList(email);
+							return getUser.then(user => {
+								const isAPIActivated = isPipeDriveAPIActivated(),
+									isEmailInBLockList = isEmailInAnalyticsBlockList(email);
 
-							if (!isSiteValidated || !isAPIActivated || isEmailInBLockList) {
-								return user;
-							}
+								if (!isSiteValidated || !isAPIActivated || isEmailInBLockList) {
+									return user;
+								}
 
-							return API.createNewPipeDriveDeal(api.params, user, api.options).spread(
-								(user, pipeDriveData) => {
+								return API.createNewPipeDriveDeal(
+									api.params,
+									user,
+									api.options
+								).spread((user, pipeDriveData) => {
 									const pipedriveParams = {
 										dealTitle: pipeDriveData.dealTitle || false,
 										dealId: pipeDriveData.dealId || false,
 										domain
 									};
 									return setSiteLevelPipeDriveData(user, pipedriveParams);
-								}
-							);
-						});
-					});
+								});
+							});
+						}
+					);
 
 				return setNewDealForExistingUser.then(user => {
 					return user.save().then(function(userObj) {
@@ -460,8 +478,13 @@ function apiModule() {
 							if (response.success) {
 								return response.data.id;
 							}
-							return Promise.reject('Error while creating new user in Pipedrive');
-						} else if (typeof response == 'string' || typeof response == 'number') {
+							return Promise.reject(
+								'Error while creating new user in Pipedrive'
+							);
+						} else if (
+							typeof response == 'string' ||
+							typeof response == 'number'
+						) {
 							return response;
 						}
 					}
@@ -478,14 +501,20 @@ function apiModule() {
 					return pipedriveAPI('createDeal', pipedriveParams.dealInfo);
 				})
 				.then(response => {
-					const isResponseSuccess = !!(response && response.success && response.data),
+					const isResponseSuccess = !!(
+							response &&
+							response.success &&
+							response.data
+						),
 						userRevenue = user.get('websiteRevenue'),
 						isRevenueValid = !!userRevenue,
 						isRevenueLow = !!(isRevenueValid && Number(userRevenue) <= 999),
 						isDealUnqualified = !!(isResponseSuccess && isRevenueLow);
 
 					if (!isResponseSuccess) {
-						return Promise.reject('Error while checking unqualified deal in Pipedrive');
+						return Promise.reject(
+							'Error while checking unqualified deal in Pipedrive'
+						);
 					}
 					if (!isDealUnqualified) {
 						return response;
@@ -544,17 +573,31 @@ function apiModule() {
 						value: user.get('websiteRevenue'),
 						stage_id: 81, // [2017] AP User Onboarding Pipeline | First Stage | Deal Created
 						[consts.analytics.pipedriveCustomFields.websiteName]: siteName,
-						[consts.analytics.pipedriveCustomFields.dailyPageviews]: user.get('pageviewRange'),
-						[consts.analytics.pipedriveCustomFields.adNetworks]: user.get('adNetworks').join(' | '),
-						[consts.analytics.pipedriveCustomFields.websiteRevenue]: user.get('websiteRevenue'),
-						[consts.analytics.pipedriveCustomFields.utmSource]: miscellaneousData.utmSource,
-						[consts.analytics.pipedriveCustomFields.utmMedium]: miscellaneousData.utmMedium,
-						[consts.analytics.pipedriveCustomFields.utmCampaign]: miscellaneousData.utmCampaign,
-						[consts.analytics.pipedriveCustomFields.utmTerm]: miscellaneousData.utmTerm,
-						[consts.analytics.pipedriveCustomFields.utmName]: miscellaneousData.utmName,
-						[consts.analytics.pipedriveCustomFields.utmContent]: miscellaneousData.utmContent,
-						[consts.analytics.pipedriveCustomFields.utmFirstHit]: miscellaneousData.utmFirstHit,
-						[consts.analytics.pipedriveCustomFields.utmFirstReferrer]: miscellaneousData.utmFirstReferrer,
+						[consts.analytics.pipedriveCustomFields.dailyPageviews]: user.get(
+							'pageviewRange'
+						),
+						[consts.analytics.pipedriveCustomFields.adNetworks]: user
+							.get('adNetworks')
+							.join(' | '),
+						[consts.analytics.pipedriveCustomFields.websiteRevenue]: user.get(
+							'websiteRevenue'
+						),
+						[consts.analytics.pipedriveCustomFields.utmSource]:
+							miscellaneousData.utmSource,
+						[consts.analytics.pipedriveCustomFields.utmMedium]:
+							miscellaneousData.utmMedium,
+						[consts.analytics.pipedriveCustomFields.utmCampaign]:
+							miscellaneousData.utmCampaign,
+						[consts.analytics.pipedriveCustomFields.utmTerm]:
+							miscellaneousData.utmTerm,
+						[consts.analytics.pipedriveCustomFields.utmName]:
+							miscellaneousData.utmName,
+						[consts.analytics.pipedriveCustomFields.utmContent]:
+							miscellaneousData.utmContent,
+						[consts.analytics.pipedriveCustomFields.utmFirstHit]:
+							miscellaneousData.utmFirstHit,
+						[consts.analytics.pipedriveCustomFields.utmFirstReferrer]:
+							miscellaneousData.utmFirstReferrer,
 						currency: 'USD'
 					}
 				};
@@ -566,7 +609,9 @@ function apiModule() {
 				.then(API.getUserByEmail.bind(null, json.email))
 				.then(function(user) {
 					if (user) {
-						var error = { email: ['User with email ' + json.email + ' already exists'] };
+						var error = {
+							email: ['User with email ' + json.email + ' already exists']
+						};
 						throw new AdPushupError(error);
 					}
 				})
@@ -592,12 +637,19 @@ function apiModule() {
 								user.set('createdAt', +new Date());
 								user.set('salt', consts.SALT + utils.random(0, 100000000));
 								user.set('pageviewRange', json.pageviewRange);
-								user.set('passwordMd5', md5(user.get('salt') + json.password + user.get('salt')));
-								!json.userType ? user.set('managedBy', 'adsense.apac@adpushup.com') : '';
+								user.set(
+									'passwordMd5',
+									md5(user.get('salt') + json.password + user.get('salt'))
+								);
+								!json.userType
+									? user.set('managedBy', 'adsense.apac@adpushup.com')
+									: '';
 								return user;
 							})
 							.then(function(user) {
-								const isUserTypePartner = !!(json.userType && json.userType === 'partner'),
+								const isUserTypePartner = !!(
+										json.userType && json.userType === 'partner'
+									),
 									isAPIActivated = isPipeDriveAPIActivated(),
 									isManualTagActivated = isManualTagsActivated(),
 									isEmailInBLockList = isEmailInAnalyticsBlockList(json.email);
@@ -606,7 +658,11 @@ function apiModule() {
 									sendUserSignupMail(json).then(console.log);
 								}
 
-								if (isUserTypePartner || !isAPIActivated || isEmailInBLockList) {
+								if (
+									isUserTypePartner ||
+									!isAPIActivated ||
+									isEmailInBLockList
+								) {
 									return [user, {}];
 								}
 
@@ -657,7 +713,11 @@ function apiModule() {
 					headerCode +
 					'</div>' +
 					mailFooter,
-				obj = { to: json.email, subject: 'AdPushup Header Snippet', html: content };
+				obj = {
+					to: json.email,
+					subject: 'AdPushup Header Snippet',
+					html: content
+				};
 
 			return mailer.send(obj);
 		},
@@ -686,14 +746,21 @@ function apiModule() {
 				.then(function(html) {
 					var stringifiedHtml = html.toString(),
 						mailer = new Mailer(Config.email, 'html'),
-						obj = { to: json.email, subject: 'Password Recovery', html: stringifiedHtml };
+						obj = {
+							to: json.email,
+							subject: 'Password Recovery',
+							html: stringifiedHtml
+						};
 
 					return mailer.send(obj);
 				});
 		},
 		getResetPassword: function(options) {
 			var config;
-			return FormValidator.validate({ email: options.email }, schema.user.validations)
+			return FormValidator.validate(
+				{ email: options.email },
+				schema.user.validations
+			)
 				.then(API.getUserByEmail.bind(null, options.email))
 				.then(function(user) {
 					if (
@@ -701,7 +768,11 @@ function apiModule() {
 						user.get('passwordResetKeyCreatedAt') &&
 						user.get('passwordResetKey') === options.key
 					) {
-						if (parseInt(user.get('passwordResetKeyCreatedAt'), 10) + 60 * 60 * 24 * 1000 < +new Date()) {
+						if (
+							parseInt(user.get('passwordResetKeyCreatedAt'), 10) +
+								60 * 60 * 24 * 1000 <
+							+new Date()
+						) {
 							config = { keyExpired: true };
 						} else {
 							config = { email: options.email, key: options.key };
@@ -711,10 +782,16 @@ function apiModule() {
 					}
 
 					return new Promise(function(resolve) {
-						if (config && typeof config === 'object' && Object.keys(config).length > 0) {
+						if (
+							config &&
+							typeof config === 'object' &&
+							Object.keys(config).length > 0
+						) {
 							resolve(config);
 						} else if (!config) {
-							throw new AdPushupError({ keyNotFound: ['Email or key not found'] });
+							throw new AdPushupError({
+								keyNotFound: ['Email or key not found']
+							});
 						}
 					});
 				});
@@ -730,7 +807,10 @@ function apiModule() {
 					) {
 						user.delete('passwordResetKey');
 						user.delete('passwordResetKeyCreatedAt');
-						user.set('passwordMd5', md5(user.get('salt') + json.password + user.get('salt')));
+						user.set(
+							'passwordMd5',
+							md5(user.get('salt') + json.password + user.get('salt'))
+						);
 						return user.save();
 					}
 					throw new AdPushupError({ keyNotFound: true });
@@ -740,15 +820,21 @@ function apiModule() {
 			return FormValidator.validate(json, schema.user.validations)
 				.then(API.getUserByEmail.bind(null, email))
 				.then(function(user) {
-					var oldPasswordMd5 = md5(user.get('salt') + json.oldPassword + user.get('salt')),
+					var oldPasswordMd5 = md5(
+							user.get('salt') + json.oldPassword + user.get('salt')
+						),
 						passwordMd5 = user.get('passwordMd5');
 
 					if (oldPasswordMd5 && oldPasswordMd5 === passwordMd5) {
-						json.passwordMd5 = md5(user.get('salt') + json.password + user.get('salt'));
+						json.passwordMd5 = md5(
+							user.get('salt') + json.password + user.get('salt')
+						);
 
 						return user;
 					}
-					throw new AdPushupError({ oldPassword: ["Old Password doesn't match your current password"] });
+					throw new AdPushupError({
+						oldPassword: ["Old Password doesn't match your current password"]
+					});
 				})
 				.then(function(user) {
 					_.forOwn(json, function(value, key) {
@@ -802,14 +888,18 @@ function apiModule() {
 						if (!json[key].password || json[key].password === '') {
 							throw new AdPushupError({
 								errorField: key,
-								incompleteCredentials: ['Please enter Username and Password both']
+								incompleteCredentials: [
+									'Please enter Username and Password both'
+								]
 							});
 						}
 					} else {
 						if (json[key].password) {
 							throw new AdPushupError({
 								errorField: key,
-								incompleteCredentials: ['Please enter Username and Password both']
+								incompleteCredentials: [
+									'Please enter Username and Password both'
+								]
 							});
 						}
 					}
@@ -824,7 +914,11 @@ function apiModule() {
 					var uniquePageGroups = siteModel.getUniquePageGroups(site.siteId),
 						setupStep = siteModel.getSetupStep(site.siteId),
 						cmsData = siteModel.getCmsData(site.siteId);
-					return Promise.join(uniquePageGroups, setupStep, cmsData, function(pageGroups, step, cms) {
+					return Promise.join(uniquePageGroups, setupStep, cmsData, function(
+						pageGroups,
+						step,
+						cms
+					) {
 						site.step = step;
 						site.cmsInfo = cms;
 						site.pageGroups = pageGroups;
@@ -857,6 +951,23 @@ function apiModule() {
 				user.set('revenueUpperLimit', data.revenueUpperLimit);
 				user.save();
 				return user;
+			});
+		},
+		updateUserPaymentStatus: email => {
+			return proxy.checkIfBillingProfileComplete(email).then(status => {
+				return API.getUserByEmail(email).then(user => {
+					user.set('isPaymentDetailsComplete', status);
+					return {
+						email,
+						status
+					};
+				});
+			});
+		},
+		getAllUsers: () => {
+			allUsers.reduce(false);
+			return couchbase.queryViewFromAppBucket(allUsers).then(function(results) {
+				return _.map(results, 'key');
 			});
 		}
 	};
