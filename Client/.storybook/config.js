@@ -13,6 +13,7 @@ function loadStories() {
 	require('../stories/customButton');
 	require('../stories/spinner');
 	require('../stories/customModal');
+	require('../stories/customChart');
 }
 
 configure(loadStories, module);
