@@ -5,6 +5,8 @@ import proxyService from '../../services/proxyService';
 import OnboardingCard from '../OnboardingCard';
 import { copyToClipBoard } from '../../Apps/ApTag/lib/helpers';
 import SendCodeByEmailModal from '../SendCodeByEmailModal';
+import siteService from '../../services/siteService';
+import userService from '../../services/userService';
 
 class VerifyInitCodeOnboarding extends Component {
 	state = { showSendCodeByEmailModal: false, verifyingInitCode: false, success: '', error: '' };
@@ -12,26 +14,33 @@ class VerifyInitCodeOnboarding extends Component {
 	apCodeRef = React.createRef();
 
 	verify = () => {
-		const { site, onComplete } = this.props;
+		const { siteId, site, onComplete } = this.props;
 
 		this.setState({ verifyingInitCode: true });
 
-		// To verify temporarily
-		// onComplete();
-
+		const onboardingStage = 'onboarding';
+		const step = 2;
+		let success;
 		proxyService
 			.verifyApCode(site)
 			.then(resp => {
-				const { success } = resp.data;
-				this.setState({ success });
+				({ success } = resp.data);
 
-				onComplete();
+				return userService.setSiteStep(siteId, onboardingStage, step);
+			})
+			.then(() => siteService.saveSite(siteId, site, onboardingStage, step))
+			.then(() => {
+				this.setState({ verifyingInitCode: false, success });
 
-				this.setState({ verifyingInitCode: false });
+				return onComplete();
 			})
 			.catch(err => {
-				const { error } = err.response.data;
-				this.setState({ verifyingInitCode: false, error });
+				if (err.response) {
+					const { error } = err.response.data;
+					return this.setState({ verifyingInitCode: false, error });
+				}
+
+				return this.setState({ verifyingInitCode: false, error: 'Something went wrong!' });
 			});
 	};
 
@@ -45,7 +54,7 @@ class VerifyInitCodeOnboarding extends Component {
 	};
 
 	render() {
-		const { siteId, isActive, completed, forwadref } = this.props;
+		const { siteId, isActive, completed, forwardedRef } = this.props;
 		const { showSendCodeByEmailModal, verifyingInitCode, success, error } = this.state;
 		const apHeadCode = `<script data-cfasync="false" type="text/javascript">(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/${siteId}/adpushup.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);</script>`;
 
@@ -57,7 +66,7 @@ class VerifyInitCodeOnboarding extends Component {
 
 		return (
 			<OnboardingCard
-				forwadref={forwadref}
+				ref={forwardedRef}
 				className="verify-apcode-card"
 				isActiveStep={isActive}
 				expanded={isActive || completed}

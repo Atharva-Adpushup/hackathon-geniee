@@ -381,6 +381,12 @@
 									"site": {
 										"type": "string",
 										"format": "uri"
+									},
+									"onboardingStage": {
+										"type": "string"
+									},
+									"step": {
+										"type": "integer"
 									}
 								},
 								"required": ["siteId", "site"]

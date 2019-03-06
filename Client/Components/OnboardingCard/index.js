@@ -2,19 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const OnboardingCard = React.forwardRef(
-	({
-		forwadref,
-		className,
-		isActiveStep,
-		expanded,
-		count,
-		imgPath,
-		heading,
-		description,
-		children
-	}) => (
+	({ className, isActiveStep, expanded, count, imgPath, heading, description, children }, ref) => (
 		<section
-			ref={forwadref}
+			ref={ref}
 			className={`onboarding-step${className ? ` ${className}` : ''}${
 				isActiveStep ? ' active-step' : ''
 			}`}
