@@ -23,7 +23,6 @@
 	background: $LPBg;
 	@include border-radius($LPBorderRadius);
 	@include box-shadow(0, 0, 10px, 0, rgba(0, 0, 0, 0.22), false);
-	overflow: hidden;
 	width: 700px;
 
 	.AuthHead {

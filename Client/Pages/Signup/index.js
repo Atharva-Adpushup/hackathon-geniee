@@ -99,7 +99,7 @@ class Signup extends Component {
 			const { signupAction: signup } = this.props;
 
 			signup({ name, email, password, site, websiteRevenue })
-				.then(resp => history.push('/dashboard'))
+				.then(resp => history.push('/onboarding'))
 				.catch(({ response }) => {
 					const newState = { isSigningUp: false };
 
@@ -150,7 +150,7 @@ class Signup extends Component {
 			site: { error: siteError },
 			email: { error: emailError },
 			password: { error: passwordError },
-			websiteRevenue: { error: websiteRevenueError },
+			websiteRevenue: { error: websiteRevenueError, value: websiteRevenueValue },
 			termsPolicy: { error: termsPolicyError },
 			error,
 			isSigningUp
@@ -221,6 +221,7 @@ class Signup extends Component {
 											title="Monthly Ad Revenue (in USD)"
 											onSelect={this.onRevenueSelect}
 											options={this.websiteRevenueOptions}
+											selected={websiteRevenueValue}
 										/>
 										{websiteRevenueError && (
 											<div className="error-message">{websiteRevenueError}</div>

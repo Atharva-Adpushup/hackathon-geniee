@@ -48,7 +48,7 @@ class MySites extends Component {
 
 					const computedReportingUrl = `/reporting/${siteId}`;
 					const computedManageSiteUrl = `/sites/${siteId}`;
-					const computedOnboardingUrl = `/onboarding/${siteId}`;
+					const computedOnboardingUrl = `/onboarding?siteId=${siteId}`;
 
 					const computedLinkText = isStepThird ? 'Activate Apps' : 'Complete Setup';
 					const computedLinkUrl = isStepThird ? computedManageSiteUrl : computedOnboardingUrl;

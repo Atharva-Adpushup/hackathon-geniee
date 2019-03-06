@@ -8,5 +8,8 @@ export default {
 	forgotPassword: email => axiosInstance.post('/forgotPassword', { email }),
 	resetPassword: (email, key, password) =>
 		axiosInstance.post('/resetPassword', { email, key, password }),
-	payments: () => axiosInstance.get('/user/payment')
+	addSite: site => axiosInstance.post('/user/addSite', { site }),
+	payments: () => axiosInstance.get('/user/payment'),
+	setSiteStep: (siteId, onboardingStage, step) =>
+		axiosInstance.post('/user/setSiteStep', { siteId, onboardingStage, step })
 };

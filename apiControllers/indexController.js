@@ -124,6 +124,16 @@ router
 			.then(user =>
 				Promise.join(getNetworkConfig(), getUserSites(user), (networkConfig, sites) => {
 					const userData = user.cleanData();
+
+					const sitesArray = [...userData.sites];
+					const sitesArrayLength = sitesArray.length;
+					userData.sites = {};
+
+					for (let i = 0; i < sitesArrayLength; i += 1) {
+						const site = sitesArray[i];
+						userData.sites[site.siteId] = site;
+					}
+
 					return res.status(httpStatus.OK).json({
 						user: { ...userData, isSuperUser },
 						networkConfig,

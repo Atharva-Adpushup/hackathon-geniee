@@ -22,7 +22,11 @@
 	],
 	"tags": [
 		{
-			"name": "indexController"
+			"name": "indexController",
+			"name": "userController",
+			"name": "dataController",
+			"name": "siteController",
+			"name": "proxyController"
 		}
 	],
 	"paths": {
@@ -287,6 +291,284 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
+		"/user/addSite": {
+			"post": {
+				"summary": "add site",
+				"tags": ["userController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"site": {
+										"type": "string",
+										"format": "uri"
+									}
+								},
+								"required": ["site"]
+							}
+						}
+					}
+				},
+				"security": [{ "cookieAuth": [] }],
+				"responses": {
+					"200": {
+						"description": "site added",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "site already exists!",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid site",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Something went wrong",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
+		"/data/saveSite": {
+			"post": {
+				"summary": "save site",
+				"tags": ["dataController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"siteId": {
+										"type": "string"
+									},
+									"site": {
+										"type": "string",
+										"format": "uri"
+									},
+									"onboardingStage": {
+										"type": "string"
+									},
+									"step": {
+										"type": "integer"
+									}
+								},
+								"required": ["siteId", "site"]
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "site added",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/site/onboarding": {
+			"get": {
+				"summary": "save site",
+				"tags": ["siteController"],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "onboarding response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"isOnboarding": {
+											"type": "boolean"
+										},
+										"siteId": {
+											"type": "integer"
+										},
+										"site": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/site/create": {
+			"post": {
+				"summary": "create site",
+				"tags": ["siteController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"siteDomain": {
+										"type": "string",
+										"format": "uri"
+									}
+								},
+								"required": ["siteDomain"]
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "site created"
+					}
+				}
+			}
+		},
+		"/data/sendCode": {
+			"post": {
+				"summary": "Send code by email. 'emailBody' must be base64 encoded",
+				"tags": ["dataController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"developerEmail": {
+										"type": "string",
+										"format": "email"
+									},
+									"subject": {
+										"type": "string"
+									},
+									"emailBody": {
+										"type": "string",
+										"description": "base64 encoded"
+									}
+								},
+								"required": ["siteDomain"]
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "site created"
+					}
+				}
+			}
+		},
+		"/proxy/verifyAdsTxt": {
+			"get": {
+				"summary": "Verify our Ads.txt entries",
+				"tags": ["proxyController"],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "url",
+						"schema": {
+							"type": "string",
+							"format": "uri"
+						},
+						"required": true,
+						"description": "site url to verify ads.txt"
+					}
+				],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "site created"
+					},
+					"404": {
+						"description": "Ads.txt file not found or entries not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										},
+										"ourAdsTxt": {
+											"type": "Array"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										}
+									}
 								}
 							}
 						}
