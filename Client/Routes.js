@@ -56,21 +56,42 @@ const UserRoutes = () => (
 
 				{/* Private Routes */}
 				<ShellContainer>
-					<Route exact path="/error" render={() => <ErrorPage />} />
-					<PrivateRoute exact path="/dashboard" component={Dashboard} />
-					<PrivateRoute exact path="/sites" component={Sites} />
-					<PrivateRoute exact path="/sites/:siteId/settings" component={SiteSettings} />
-					<PrivateRoute exact path="/reporting" component={Reporting} />
-					<PrivateRoute exact path="/byodPanel" component={ByodPanel} />
-					<PrivateRoute exact path="/adsTxtManagement" component={AdsTxtManagement} />
-					<PrivateRoute exact path="/addSite" component={AddNewSite} />
-					<PrivateRoute exact path="/payment" component={Payment} />
-					<PrivateRoute exact path="/paymentSettings" component={PaymentSettings} />
-					<PrivateRoute exact path="/ap-tag/:siteId" component={ApTag} />
-					<PrivateRoute exact path="/onboarding" component={OnBoarding} />
-					<PrivateRoute exact path="/ap-layout/:siteId" component={Layout} />
-					<PrivateRoute exact path="/innovative-ads/:siteId" component={InnovativeAds} />
-					<PrivateRoute exact path="/sites/:siteId" component={ManageSite} />
+					<Route exact name="Error" path="/error" render={() => <ErrorPage />} />
+					<PrivateRoute exact name="Dashboard" path="/dashboard" component={Dashboard} />
+					<PrivateRoute exact name="My Sites" path="/sites" component={Sites} />
+					<PrivateRoute
+						exact
+						name="Site Settings"
+						path="/sites/:siteId/settings"
+						component={SiteSettings}
+					/>
+					<PrivateRoute exact name="Reporting" path="/reporting" component={Reporting} />
+					<PrivateRoute exact name="ByodPanel" path="/byodPanel" component={ByodPanel} />
+					<PrivateRoute
+						exact
+						name="AdsTxt Management"
+						path="/adsTxtManagement"
+						component={AdsTxtManagement}
+					/>
+					<PrivateRoute exact name="Add Site" path="/addSite" component={AddNewSite} />
+					<PrivateRoute exact name="Payment" path="/payment" component={Payment} />
+					<PrivateRoute
+						exact
+						name="Payment History"
+						path="/paymentHistory"
+						component={PaymentHistory}
+					/>
+					<PrivateRoute
+						exact
+						name="Payment Settings"
+						path="/paymentSettings"
+						component={PaymentSettings}
+					/>
+					<PrivateRoute exact name="" path="/ap-tag/:siteId" component={ApTag} />
+					<PrivateRoute exact name="User OnBoarding" path="/onboarding" component={OnBoarding} />
+					<PrivateRoute exact name="App Layout" path="/ap-layout/:siteId" component={Layout} />
+					<PrivateRoute exact name="" path="/innovative-ads/:siteId" component={InnovativeAds} />
+					<PrivateRoute exact name="" path="/sites/:siteId" component={ManageSite} />
 				</ShellContainer>
 			</Switch>
 		</Suspense>
