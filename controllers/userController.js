@@ -1048,11 +1048,9 @@ router
 		};
 		return userModel
 			.getAllUsers()
-			.then(users=>{
-				return Promise.all(userPromises(users))
-			})
-			.then(result => {
-				return res.send(result);
+			.then(users => {
+				Promise.all(userPromises(users));
+				return res.send('done');
 			})
 			.catch(err => {
 				console.log(err);

@@ -958,6 +958,7 @@ function apiModule() {
 				return API.getUserByEmail(email).then(user => {
 					user.set('isPaymentDetailsComplete', status);
 					user.save();
+					console.log({ email, status });
 					return {
 						email,
 						status
