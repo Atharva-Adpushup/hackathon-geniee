@@ -36,9 +36,10 @@ class MySites extends Component {
 
 	renderStatusCards() {
 		const { sites } = this.props;
-		const isSites = !!(sites && sites.length);
+		const isSites = !!(sites && Object.keys(sites).length);
 		const computedCards = isSites
-			? sites.map(site => {
+			? Object.keys(sites).map(siteIdKey => {
+					const site = sites[siteIdKey];
 					const isSite = !!(site && Object.keys(site).length);
 					const isSiteStep = !!(isSite && site.step);
 					const isStepThird = !!(isSiteStep && site.step === 3);
