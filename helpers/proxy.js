@@ -64,16 +64,8 @@ var API = {
 	},
 	detectCustomAp(url, siteId) {
 		return API.load(url).then(body => {
-			// var apCodeDetected = body.match(`//.+.adpushup.com/${siteId}/adpushup.js`);
-			const apCodeDetected = body.match(`//.+.adpushup.com/`);
+			const apCodeDetected = body.match(`//.+.adpushup.com/${siteId}/adpushup.js`);
 			return !!apCodeDetected;
-		});
-		if (!json) {
-			return false;
-		}
-		finalData = { cmsName: 'wordpress', pageGroups: [] };
-		Object.keys(json.urls).forEach(key => {
-			finalData.pageGroups.push({ pageGroup: key.toUpperCase(), sampleUrl: json.urls[key] });
 		});
 	},
 	fetchOurAdsTxt() {
