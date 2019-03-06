@@ -1,21 +1,22 @@
-var queueInstance = require('amqplib');
-var Promise = require('bluebird');
-var mailService = require('../../../services/mailService/index');
-var moment = require('moment');
+const queueInstance = require('amqplib');
+const Promise = require('bluebird');
+const moment = require('moment');
+const mailService = require('../../../services/mailService/index');
+const globalConfig = require('../../../configs/config');
 
 function Consumer(config) {
 	this.config = config;
 	this.channel = null;
 	this.connection = null;
 	this.negCounter = 0;
+	this.isStaging = !!globalConfig.environment.IS_STAGING;
 	this.getQueueMessage = function(queueName) {
 		const self = this;
 
 		if (self.connection && self.channel) {
 			return self.channel.get(queueName);
-		} else {
-			return Promise.reject('issue with rabbitmq connection or channel');
 		}
+		return Promise.reject('issue with rabbitmq connection or channel');
 	};
 
 	this.connectRabbit = function() {
@@ -58,7 +59,7 @@ function Consumer(config) {
 					})
 					.then(self.checkQueues.bind(self));
 			})
-			.catch(function(err) {
+			.catch(err => {
 				console.log(err);
 			});
 	};
@@ -69,17 +70,13 @@ Consumer.prototype.registerChannel = function(conn) {
 };
 
 Consumer.prototype.checkExchange = function(ch) {
-	return ch.checkExchange(this.config.exchange.name).then(function(abc) {
-		return ch;
-	});
+	return ch.checkExchange(this.config.exchange.name).then(abc => ch);
 };
 
 Consumer.prototype.checkQueues = function(ch) {
-	var cloudStorageUploadQueueCheck = this.checkQueue(ch, this.config.queue.name);
+	const cloudStorageUploadQueueCheck = this.checkQueue(ch, this.config.queue.name);
 
-	return Promise.join(cloudStorageUploadQueueCheck, function(q1) {
-		return ch;
-	});
+	return Promise.join(cloudStorageUploadQueueCheck, q1 => ch);
 };
 
 Consumer.prototype.checkQueue = function(ch, queueName) {
@@ -94,15 +91,20 @@ Consumer.prototype.getMessage = function(queueName) {
 	const self = this;
 
 	return this.checkQueue(this.channel, queueName)
-		.then(() => {
-			return self.getQueueMessage(queueName);
-		})
+		.then(() => self.getQueueMessage(queueName))
 		.catch(err => {
 			console.log('err in checkqueue', err);
 		});
 };
 
 Consumer.prototype.sendMail = function(data) {
+	if (this.isStaging) {
+		console.log(
+			'Staging environment found. Moking Mail sent. You will not receive any mail. This is the mail'
+		);
+		return Promise.resolve();
+	}
+
 	return mailService({
 		header: `${data.header || this.config.name} | Error Counter : ${this.negCounter}`,
 		content: `${data.content}`,
