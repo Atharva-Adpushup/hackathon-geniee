@@ -59,13 +59,17 @@ const UserRoutes = () => (
 					<Route exact name="Error" path="/error" render={() => <ErrorPage />} />
 					<PrivateRoute exact name="Dashboard" path="/dashboard" component={Dashboard} />
 					<PrivateRoute exact name="My Sites" path="/sites" component={Sites} />
+					<PrivateRoute exact name=":siteId" path="/sites/:siteId" component={ManageSite} />
 					<PrivateRoute
 						exact
 						name="Site Settings"
 						path="/sites/:siteId/settings"
 						component={SiteSettings}
 					/>
+
 					<PrivateRoute exact name="Reporting" path="/reporting" component={Reporting} />
+					<PrivateRoute exact name=":siteId" path="/reporting/:siteId" component={Reporting} />
+
 					<PrivateRoute exact name="ByodPanel" path="/byodPanel" component={ByodPanel} />
 					<PrivateRoute
 						exact
@@ -87,11 +91,37 @@ const UserRoutes = () => (
 						path="/paymentSettings"
 						component={PaymentSettings}
 					/>
-					<PrivateRoute exact name="" path="/ap-tag/:siteId" component={ApTag} />
+
+					<PrivateRoute
+						exact
+						name="App Ap-Tag"
+						path="/ap-tag"
+						render={() => <Redirect to="/sites" />}
+					/>
+					<PrivateRoute exact name=":siteId" path="/ap-tag/:siteId" component={ApTag} />
+
 					<PrivateRoute exact name="User OnBoarding" path="/onboarding" component={OnBoarding} />
-					<PrivateRoute exact name="App Layout" path="/ap-layout/:siteId" component={Layout} />
-					<PrivateRoute exact name="" path="/innovative-ads/:siteId" component={InnovativeAds} />
-					<PrivateRoute exact name="" path="/sites/:siteId" component={ManageSite} />
+
+					<PrivateRoute
+						exact
+						name="App Layout"
+						path="/ap-layout"
+						render={() => <Redirect to="/sites" />}
+					/>
+					<PrivateRoute exact name=":siteId" path="/ap-layout/:siteId" component={Layout} />
+
+					<PrivateRoute
+						exact
+						name="App Innovative-Ads"
+						path="/innovative-ads"
+						render={() => <Redirect to="/sites" />}
+					/>
+					<PrivateRoute
+						exact
+						name=":siteId"
+						path="/innovative-ads/:siteId"
+						component={InnovativeAds}
+					/>
 				</ShellContainer>
 			</Switch>
 		</Suspense>
