@@ -10,6 +10,9 @@ function loadStories() {
 	require('../stories/sidebar.js');
 	require('../stories/fieldGroup.js');
 	require('../stories/splitScreen.js');
+	require('../stories/customButton');
+	require('../stories/spinner');
+	require('../stories/customModal');
 }
 
 configure(loadStories, module);

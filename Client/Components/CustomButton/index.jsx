@@ -13,12 +13,14 @@ const CustomButton = ({ children, variant, showSpinner, className, ...props }) =
 CustomButton.propTypes = {
 	variant: PropTypes.oneOf(['primary', 'secondary']),
 	type: PropTypes.oneOf(['submit', 'button']),
+	showSpinner: PropTypes.bool,
 	children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired
 };
 
 CustomButton.defaultProps = {
 	variant: 'primary',
-	type: 'button'
+	type: 'button',
+	showSpinner: false
 };
 
 export default CustomButton;

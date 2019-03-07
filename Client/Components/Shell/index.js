@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Grid, Row, Col } from 'react-bootstrap';
 import Breadcrumbs from 'react-router-dynamic-breadcrumbs';
 import Header from './Header';
@@ -6,12 +7,26 @@ import Sidebar from './Sidebar';
 import Loader from '../Loader/index';
 import { domanize } from '../../helpers/commonFunctions';
 
+import NotificationContainer from '../../Containers/NotificationContainer';
+import { showNotification } from '../../actions/uiActions';
+
 class Shell extends React.Component {
 	state = { isSidebarOpen: true };
 
 	componentDidMount() {
-		const { fetched, fetchGlobalData } = this.props;
-		if (!fetched) fetchGlobalData();
+		const { fetched, fetchGlobalData, showNotification, user } = this.props;
+		if (!fetched)
+			fetchGlobalData().then(() => {
+				const { user } = this.props;
+				if (!user.isPaymentDetailsComplete)
+					showNotification({
+						mode: 'error',
+						title: 'Payments Error',
+						message:
+							'Please complete your Payments Profile, which is required to transfer your ad revenue.',
+						autoDismiss: 0
+					});
+			});
 	}
 
 	sidebarToggle = () => {
@@ -89,9 +104,12 @@ class Shell extends React.Component {
 						{fetched ? children : this.renderLoader()}
 					</main>
 				</Row>
+				<NotificationContainer />
 			</Grid>
 		);
 	}
 }
-
-export default Shell;
+export default connect(
+	null,
+	{ showNotification }
+)(Shell);

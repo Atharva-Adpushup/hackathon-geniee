@@ -25,9 +25,6 @@ const AdsTxtManagement = lazy(() =>
 	import(/* webpackChunkName: "adsTxtManagement" */ './Pages/AdsTxtManagement')
 );
 const Payment = lazy(() => import(/* webpackChunkName: "payment" */ './Pages/Payment'));
-const PaymentHistory = lazy(() =>
-	import(/* webpackChunkName: "paymentHistory" */ './Pages/PaymentHistory')
-);
 const PaymentSettings = lazy(() =>
 	import(/* webpackChunkName: "paymentSettings" */ './Pages/PaymentSettings')
 );
@@ -140,12 +137,6 @@ const Routes = () => (
 					/>
 					<PrivateRoute exact name="Add Site" path="/addSite" component={AddNewSite} />
 					<PrivateRoute exact name="Payment" path="/payment" component={Payment} />
-					<PrivateRoute
-						exact
-						name="Payment History"
-						path="/paymentHistory"
-						component={PaymentHistory}
-					/>
 					<PrivateRoute
 						exact
 						name="Payment Settings"
