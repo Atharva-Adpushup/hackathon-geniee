@@ -7,7 +7,6 @@ import PrivateRoute from './Components/PrivateRoute';
 import authService from './services/authService';
 import Loader from './Components/Loader';
 import ShellContainer from './Containers/ShellContainer';
-import NotificationContainer from './Containers/NotificationContainer';
 
 import Login from './Pages/Login';
 import Signup from './Pages/Signup';
