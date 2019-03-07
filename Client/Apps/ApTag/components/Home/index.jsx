@@ -1,44 +1,90 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from 'react-bootstrap';
 import ActionCard from '../../../../Components/ActionCard/index';
 import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';
 import AdListContainer from '../../containers/AdListContainer';
-import { COMPONENT_TITLES } from '../../configs/commonConsts';
+import {
+	APT_NAV_ITEMS,
+	APT_NAV_ITEMS_INDEXES,
+	APT_NAV_ITEMS_VALUES
+} from '../../configs/commonConsts';
 
 class Home extends Component {
 	constructor(props) {
 		super(props);
-		const defaultNavItem = 1;
 		this.state = {
-			activeNav: defaultNavItem,
-			title: COMPONENT_TITLES[defaultNavItem]
+			redirectUrl: ''
 		};
 		this.handleNavSelect = this.handleNavSelect.bind(this);
 		this.renderContent = this.renderContent.bind(this);
 	}
 
-	handleNavSelect(value) {
-		this.setState({ activeNav: value, title: COMPONENT_TITLES[value] });
-	}
+	getActiveTab = () => {
+		const {
+			customProps: { activeTab }
+		} = this.props;
+
+		return activeTab;
+	};
+
+	getSiteId = () => {
+		const {
+			match: {
+				params: { siteId }
+			}
+		} = this.props;
+
+		return siteId;
+	};
+
+	handleNavSelect = value => {
+		const siteId = this.getSiteId();
+		const computedRedirectUrl = `/sites/${siteId}/apps/ap-tag`;
+		let redirectUrl = '';
+
+		switch (Number(value)) {
+			case 1:
+				redirectUrl = `${computedRedirectUrl}`;
+				break;
+
+			case 2:
+				redirectUrl = `${computedRedirectUrl}/manage`;
+				break;
+
+			default:
+				break;
+		}
+
+		this.setState({ redirectUrl });
+	};
 
 	renderContent() {
-		const { activeNav } = this.state;
-		switch (activeNav) {
+		const activeTab = this.getActiveTab();
+
+		switch (activeTab) {
 			default:
-			case 1:
+			case APT_NAV_ITEMS_INDEXES.CREATE_ADS:
 				return <AdCodeGeneratorContainer {...this.props} />;
-			case 2:
+			case APT_NAV_ITEMS_INDEXES.MANAGE_ADS:
 				return <AdListContainer {...this.props} />;
 		}
 	}
 
 	render() {
-		const { title, activeNav } = this.state;
+		const { redirectUrl } = this.state;
+		const activeTab = this.getActiveTab();
+		const activeItem = APT_NAV_ITEMS[activeTab];
+
+		if (redirectUrl) {
+			return <Redirect to={{ pathname: redirectUrl }} />;
+		}
+
 		return (
-			<ActionCard title={title}>
-				<Nav bsStyle="tabs" activeKey={activeNav} onSelect={this.handleNavSelect}>
-					<NavItem eventKey={1}>Create Ads</NavItem>
-					<NavItem eventKey={2}>Manage Ads</NavItem>
+			<ActionCard>
+				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
+					<NavItem eventKey={1}>{APT_NAV_ITEMS_VALUES.CREATE_ADS}</NavItem>
+					<NavItem eventKey={2}>{APT_NAV_ITEMS_VALUES.MANAGE_ADS}</NavItem>
 				</Nav>
 				{this.renderContent()}
 			</ActionCard>
