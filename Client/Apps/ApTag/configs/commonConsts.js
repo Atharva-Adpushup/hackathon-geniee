@@ -191,10 +191,29 @@ appnexus.com, 1356, RESELLER, f5ab79cb980f11d1
 emxdgt.com, 326, RESELLER, 1e1d41537f7cad7f  
 google.com, pub-5995202563537249, RESELLER, f08c47fec0942fa0`;
 const INIT_CODE = `<script data-cfasync="false" type="text/javascript">(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/__SITE_ID__/adpushup.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);</script>`;
-const COMPONENT_TITLES = {
-	1: 'Create Ads',
-	2: 'Manage Ads'
+
+// APT abbreviation stands for ApTag
+const APT_NAV_ITEMS_INDEXES = {
+	CREATE_ADS: 'create-ads',
+	MANAGE_ADS: 'manage-ads'
 };
+
+const APT_NAV_ITEMS_VALUES = {
+	CREATE_ADS: 'Create Ads',
+	MANAGE_ADS: 'Manage Ads'
+};
+
+const APT_NAV_ITEMS = {
+	[APT_NAV_ITEMS_INDEXES.CREATE_ADS]: {
+		NAME: [APT_NAV_ITEMS_VALUES.CREATE_ADS],
+		INDEX: 1
+	},
+	[APT_NAV_ITEMS_INDEXES.MANAGE_ADS]: {
+		NAME: [APT_NAV_ITEMS_VALUES.MANAGE_ADS],
+		INDEX: 2
+	}
+};
+
 const NETWORKS = ['adsense', 'adpTags', 'custom', 'geniee', 'medianet'];
 const PRICE_FLOOR_KEYS = ['FP_S_A', 'FP_B_A', 'FP_S', 'FP_A', 'FP_B'];
 const DEFAULT_PRICE_FLOOR_KEY = 'FP_S_A';
@@ -303,7 +322,9 @@ export {
 	ADS_TXT_DATA,
 	INIT_CODE,
 	AMP_MESSAGE,
-	COMPONENT_TITLES,
+	APT_NAV_ITEMS,
+	APT_NAV_ITEMS_INDEXES,
+	APT_NAV_ITEMS_VALUES,
 	NETWORKS,
 	PRICE_FLOOR_KEYS,
 	DEFAULT_PRICE_FLOOR_KEY,
