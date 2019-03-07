@@ -1,7 +1,7 @@
 import React from 'react';
-import SiteSettings from './components/index';
+import SiteSettingsContainer from './containers/SiteSettingsContainer';
 import '../../scss/pages/siteSettings/index.scss';
 
-const App = props => <SiteSettings {...props} />;
+const App = props => <SiteSettingsContainer {...props} />;
 
 export default App;

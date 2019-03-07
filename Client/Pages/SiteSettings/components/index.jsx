@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { Row, Col, Panel, Button } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCopy } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link } from 'react-router-dom';
 
 import SplitScreen from '../../../Components/Layout/SplitScreen';
 import UiList from '../../../Components/Layout/UiList';
@@ -22,6 +21,7 @@ class SiteSettings extends Component {
 				params: { siteId }
 			}
 		} = props;
+		const siteData = props.sites[siteId];
 
 		this.state = {
 			codeText: `<script data-cfasync="false" type="text/javascript">
@@ -31,7 +31,8 @@ class SiteSettings extends Component {
 	s.type = 'text/javascript'; s.async = true;
 	(d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s);
 })(window, document);
-</script>`
+</script>`,
+			siteData
 		};
 		this.handleButtonClickHandler = this.handleButtonClickHandler.bind(this);
 	}
@@ -72,6 +73,12 @@ class SiteSettings extends Component {
 
 	renderRightPanel() {
 		const _ref = this;
+		const {
+			siteData: {
+				apConfigs: { blocklist }
+			}
+		} = this.state;
+		const computedBlocklist = blocklist || [];
 
 		return (
 			<div className="clearfix">
@@ -80,7 +87,7 @@ class SiteSettings extends Component {
 					Block AdPushup script <code>adpushup.js</code> on below listed websites
 				</p>
 				<UiList
-					itemCollection={[]}
+					itemCollection={computedBlocklist}
 					emptyCollectionPlaceHolder="No blocklist added"
 					inputPlaceholder="Enter Url or pattern to block. Enter comma separated multiple values"
 					saveButtonText="Save"
