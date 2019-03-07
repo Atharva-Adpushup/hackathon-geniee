@@ -130,7 +130,7 @@ class UiList extends React.Component {
 
 	updateItem = () => {
 		const { activeItemKey, activeItemValue, collection } = this.state;
-		const { validate } = this.props;
+		const { validate, onSave } = this.props;
 		const isValidActiveItemKey = !!(activeItemKey !== null && activeItemKey !== '');
 		const isValidActiveItemValue = !!activeItemValue;
 		const isValidActiveItem = !!(isValidActiveItemKey && isValidActiveItemValue);
@@ -187,21 +187,22 @@ class UiList extends React.Component {
 
 		return this.setState(
 			{ collection: inputCollection, activeItemKey: '', activeItemValue: '' },
-			() => {
-				console.log('computed collection Value: ', this.state.collection);
-			}
+			() => onSave(inputCollection)
 		);
 	};
 
 	deleteItem = key => {
 		const { collection } = this.state;
+		const { onSave } = this.props;
 		const item = collection[key];
 		const message = `Are you sure you want to delete ${item}`;
 		const inputCollection = collection.concat([]);
 
 		if (window.confirm(message)) {
 			inputCollection.splice(key, 1);
-			this.setState({ collection: inputCollection, activeItemValue: '', activeItemKey: '' });
+			this.setState({ collection: inputCollection, activeItemValue: '', activeItemKey: '' }, () =>
+				onSave(inputCollection)
+			);
 		}
 	};
 
@@ -418,7 +419,8 @@ UiList.propTypes = {
 	itemCollection: PropTypes.array.isRequired,
 	emptyCollectionPlaceHolder: PropTypes.string.isRequired,
 	inputPlaceholder: PropTypes.string.isRequired,
-	saveButtonText: PropTypes.string.isRequired
+	saveButtonText: PropTypes.string.isRequired,
+	onSave: PropTypes.func.isRequired
 };
 
 UiList.defaultProps = {

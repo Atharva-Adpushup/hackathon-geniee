@@ -26,4 +26,10 @@ const updateSiteStep = (siteId, step, onboardingStage) => dispatch =>
 		data: { siteId, step, onboardingStage }
 	});
 
-export { fetchAppStatuses, addNewSite, updateSiteStep };
+const updateApConfig = (siteId, apConfigs) => dispatch =>
+	dispatch({
+		type: SITE_ACTIONS.UPDATE_SITE_APCONFIG,
+		data: { siteId, apConfigs }
+	});
+
+export { fetchAppStatuses, addNewSite, updateSiteStep, updateApConfig };

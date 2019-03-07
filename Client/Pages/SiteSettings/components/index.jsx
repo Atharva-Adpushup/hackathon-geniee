@@ -32,16 +32,21 @@ class SiteSettings extends Component {
 	(d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s);
 })(window, document);
 </script>`,
-			siteData
+			siteData,
+			siteId
 		};
-		this.handleButtonClickHandler = this.handleButtonClickHandler.bind(this);
 	}
 
-	handleButtonClickHandler(inputParam) {
-		const _ref = this;
+	uiListSaveHandler = collection => {
+		const { siteId } = this.state;
+		const { updateApConfig } = this.props;
+		const apConfigs = {
+			blocklist: collection
+		};
 
-		console.log('inputParam value', inputParam);
-	}
+		console.log('ui collection value: ', collection);
+		updateApConfig(siteId, apConfigs);
+	};
 
 	renderLeftPanel() {
 		const { codeText } = this.state;
@@ -72,7 +77,6 @@ class SiteSettings extends Component {
 	}
 
 	renderRightPanel() {
-		const _ref = this;
 		const {
 			siteData: {
 				apConfigs: { blocklist }
@@ -94,6 +98,7 @@ class SiteSettings extends Component {
 					sticky
 					validate
 					plugins={['url-http-https']}
+					onSave={this.uiListSaveHandler}
 				/>
 			</div>
 		);
