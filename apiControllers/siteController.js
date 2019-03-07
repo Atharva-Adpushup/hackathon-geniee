@@ -1,4 +1,5 @@
 const express = require('express');
+const Promise = require('bluebird');
 
 const router = express.Router();
 const userModel = require('../models/userModel');
@@ -8,7 +9,6 @@ const CC = require('../configs/commonConsts');
 const FormValidator = require('../helpers/FormValidator');
 const woodlotCustomLogger = require('woodlot').customLogger;
 const httpStatus = require('../configs/httpStatusConsts');
-const Promise = require('bluebird');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const {
 	verifyOwner,

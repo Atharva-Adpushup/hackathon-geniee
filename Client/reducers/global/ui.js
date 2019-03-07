@@ -1,5 +1,6 @@
-import { UI_ACTIONS } from '../../constants/global';
 import { combineReducers } from 'redux';
+import { UI_ACTIONS } from '../../constants/global';
+
 const notifications = (state = { isVisible: false }, action) => {
 	switch (action.type) {
 		case UI_ACTIONS.SHOW_NOTIFICATION:

@@ -2,16 +2,20 @@ import { connect } from 'react-redux';
 import { hideNotification } from '../actions/uiActions';
 import Notification from '../Components/Notification/index';
 
-const mapStateToProps = state => ({
-		isVisible: state.global.ui.notifications.isVisible,
-		mode: state.global.ui.notifications.mode,
-		message: state.global.ui.notifications.message,
-		title: state.global.ui.notifications.title,
-		autoDismiss: state.global.ui.notifications.autoDismiss
-	}),
-	mapDispatchToProps = dispatch => ({
-		hideNotification: () => dispatch(hideNotification())
-	});
+const mapStateToProps = state => {
+	const { notifications } = state.global.ui;
+	return {
+		isVisible: notifications.isVisible,
+		mode: notifications.mode,
+		message: notifications.message,
+		title: notifications.title,
+		autoDismiss: notifications.autoDismiss
+	};
+};
+
+const mapDispatchToProps = dispatch => ({
+	hideNotification: () => dispatch(hideNotification())
+});
 
 export default connect(
 	mapStateToProps,
