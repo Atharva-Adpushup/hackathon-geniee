@@ -77,9 +77,17 @@ const UserRoutes = () => (
 					<PrivateRoute
 						exact
 						customProps={{ activeTab: NAV_ITEMS_INDEXES.MANAGE_APPS }}
-						name={NAV_ITEMS_VALUES.MANAGE_APPS}
+						name="Apps"
 						path="/sites/:siteId/apps"
 						component={ManageSite}
+					/>
+					<PrivateRoute exact name="Layout" path="/sites/:siteId/apps/layout" component={Layout} />
+					<PrivateRoute exact name="Ap-Tag" path="/sites/:siteId/apps/ap-tag" component={ApTag} />
+					<PrivateRoute
+						exact
+						name="Innovative-Ads"
+						path="/sites/:siteId/apps/innovative-ads"
+						component={InnovativeAds}
 					/>
 
 					<PrivateRoute exact name="Reporting" path="/reporting" component={Reporting} />
@@ -107,36 +115,7 @@ const UserRoutes = () => (
 						component={PaymentSettings}
 					/>
 
-					<PrivateRoute
-						exact
-						name="App Ap-Tag"
-						path="/ap-tag"
-						render={() => <Redirect to="/sites" />}
-					/>
-					<PrivateRoute exact name=":siteId" path="/ap-tag/:siteId" component={ApTag} />
-
 					<PrivateRoute exact name="User OnBoarding" path="/onboarding" component={OnBoarding} />
-
-					<PrivateRoute
-						exact
-						name="App Layout"
-						path="/ap-layout"
-						render={() => <Redirect to="/sites" />}
-					/>
-					<PrivateRoute exact name=":siteId" path="/ap-layout/:siteId" component={Layout} />
-
-					<PrivateRoute
-						exact
-						name="App Innovative-Ads"
-						path="/innovative-ads"
-						render={() => <Redirect to="/sites" />}
-					/>
-					<PrivateRoute
-						exact
-						name=":siteId"
-						path="/innovative-ads/:siteId"
-						component={InnovativeAds}
-					/>
 				</ShellContainer>
 			</Switch>
 		</Suspense>

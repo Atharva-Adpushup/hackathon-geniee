@@ -29,7 +29,7 @@ const APPS = [
 			type: TYPE.LINK,
 			text: 'Manage App',
 			link: LINK_TYPE.INAPP,
-			destination: '/ap-layout/__SITE_ID__',
+			destination: '/sites/__SITE_ID__/apps/layout',
 			icon: 'cog'
 		}
 	},
@@ -73,7 +73,7 @@ const APPS = [
 			type: TYPE.LINK,
 			text: 'Manage App',
 			link: LINK_TYPE.INAPP,
-			destination: '/innovative-ads/__SITE_ID__',
+			destination: '/sites/__SITE_ID__/apps/innovative-ads',
 			icon: 'cog'
 		}
 	},
@@ -95,7 +95,7 @@ const APPS = [
 			type: TYPE.LINK,
 			text: 'Manage App',
 			link: LINK_TYPE.INAPP,
-			destination: '/ap-tag/__SITE_ID__',
+			destination: '/sites/__SITE_ID__/apps/ap-tag',
 			icon: 'cog'
 		}
 	},
