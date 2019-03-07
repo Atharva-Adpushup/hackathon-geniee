@@ -29,6 +29,21 @@ const sites = (state = { fetched: false, data: {} }, action) => {
 				}
 			};
 
+		case SITE_ACTIONS.UPDATE_SITE_APCONFIG:
+			return {
+				...state,
+				data: {
+					...state.data,
+					[action.data.siteId]: {
+						...state.data[action.data.siteId],
+						apConfigs: {
+							...state.data[action.data.siteId].apConfigs,
+							...action.data.apConfigs
+						}
+					}
+				}
+			};
+
 		default:
 			return state;
 	}
