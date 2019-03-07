@@ -1,6 +1,8 @@
 import React, { Suspense, lazy } from 'react';
 import { Router, Route, Redirect, Switch } from 'react-router-dom';
 
+import { NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from './Pages/ManageSite/constants/index';
+
 import history from './helpers/history';
 import PublicOnlyRoute from './Components/PublicOnlyRoute';
 import PrivateRoute from './Components/PrivateRoute';
@@ -65,7 +67,28 @@ const Routes = () => (
 					<Route exact name="Error" path="/error" render={() => <ErrorPage />} />
 					<PrivateRoute exact name="Dashboard" path="/dashboard" component={Dashboard} />
 					<PrivateRoute exact name="My Sites" path="/sites" component={Sites} />
-					<PrivateRoute exact name=":siteId" path="/sites/:siteId" component={ManageSite} />
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: NAV_ITEMS_INDEXES.QUICK_SNAPSHOT }}
+						name=":siteId"
+						path="/sites/:siteId"
+						component={ManageSite}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: NAV_ITEMS_INDEXES.SITE_SETTINGS }}
+						name={NAV_ITEMS_VALUES.SITE_SETTINGS}
+						path="/sites/:siteId/settings"
+						component={ManageSite}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: NAV_ITEMS_INDEXES.MANAGE_APPS }}
+						name={NAV_ITEMS_VALUES.MANAGE_APPS}
+						path="/sites/:siteId/apps"
+						component={ManageSite}
+					/>
+
 					<PrivateRoute
 						exact
 						name="Site Settings"

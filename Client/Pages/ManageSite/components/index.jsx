@@ -2,40 +2,42 @@ import React from 'react';
 import { Nav, NavItem } from 'react-bootstrap';
 import ActionCard from '../../../Components/ActionCard/index';
 import ManageAppsContainer from '../containers/ManageAppsContainer';
-import { DEFAULT_NAV_ITEM, TITLES } from '../constants/index';
+import { NAV_ITEMS, NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from '../constants/index';
 import SiteSettings from '../../SiteSettings/index';
 
 class ManageSite extends React.Component {
-	state = {
-		activeNav: DEFAULT_NAV_ITEM,
-		title: TITLES[DEFAULT_NAV_ITEM]
-	};
+	getActiveTab = () => {
+		const {
+			customProps: { activeTab }
+		} = this.props;
 
-	handleNavSelect = value => {
-		this.setState({ activeNav: value, title: TITLES[value] });
+		return activeTab;
 	};
 
 	renderContent() {
-		const { activeNav } = this.state;
-		switch (activeNav) {
+		const activeTab = this.getActiveTab();
+
+		switch (activeTab) {
 			default:
-			case 1:
+			case NAV_ITEMS_INDEXES.QUICK_SNAPSHOT:
 				return <div className="u-padding-v5 u-padding-h5">Quick Snap hoga yahan</div>;
-			case 2:
+			case NAV_ITEMS_INDEXES.SITE_SETTINGS:
 				return <SiteSettings {...this.props} />;
-			case 3:
+			case NAV_ITEMS_INDEXES.MANAGE_APPS:
 				return <ManageAppsContainer {...this.props} />;
 		}
 	}
 
 	render() {
-		const { activeNav, title } = this.state;
+		const activeTab = this.getActiveTab();
+		const activeItem = NAV_ITEMS[activeTab];
+
 		return (
-			<ActionCard title={title}>
-				<Nav bsStyle="tabs" activeKey={activeNav} onSelect={this.handleNavSelect}>
-					<NavItem eventKey={1}>Quick Snapshot</NavItem>
-					<NavItem eventKey={2}>Site Settings</NavItem>
-					<NavItem eventKey={3}>Manage Apps</NavItem>
+			<ActionCard>
+				<Nav bsStyle="tabs" activeKey={activeItem.INDEX}>
+					<NavItem eventKey={1}>{NAV_ITEMS_VALUES.QUICK_SNAPSHOT}</NavItem>
+					<NavItem eventKey={2}>{NAV_ITEMS_VALUES.SITE_SETTINGS}</NavItem>
+					<NavItem eventKey={3}>{NAV_ITEMS_VALUES.MANAGE_APPS}</NavItem>
 				</Nav>
 				{this.renderContent()}
 			</ActionCard>
