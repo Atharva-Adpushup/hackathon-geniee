@@ -37,6 +37,7 @@ class Shell extends React.Component {
 
 	getRoutes = (collection, location, user) => {
 		const dynamicParamsArray = [':siteId'];
+		const userSites = user && user.sites;
 
 		return collection.reduce((accumulator, value) => {
 			const { path } = value.props;
@@ -45,6 +46,7 @@ class Shell extends React.Component {
 			dynamicParamsArray.forEach(param => {
 				const isParamInPath = !!path.match(param);
 				const siteIdInEndMatch = location.pathname.match('/[0-9]{1,10}$');
+				const siteIdInBetweenMatch = location.pathname.match('/[0-9]{1,10}/');
 
 				if (!isParamInPath) {
 					return true;
@@ -52,10 +54,22 @@ class Shell extends React.Component {
 
 				if (siteIdInEndMatch) {
 					const siteId = location.pathname.substring(siteIdInEndMatch.index + 1);
-					const siteName = user && user.sites && user.sites[siteId] && user.sites[siteId].domain;
+					const siteName = userSites && user.sites[siteId] && user.sites[siteId].domain;
 
 					if (siteName) {
 						name = domanize(siteName);
+					}
+				}
+
+				if (siteIdInBetweenMatch) {
+					const siteId = siteIdInBetweenMatch[0].replace(/\//g, '');
+					const siteName = userSites && user.sites[siteId] && user.sites[siteId].domain;
+
+					if (siteName) {
+						const domanizedSiteName = domanize(siteName);
+						const paramRegex = `${param}`;
+
+						name = name.replace(new RegExp(paramRegex, 'g'), domanizedSiteName);
 					}
 				}
 

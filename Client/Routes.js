@@ -82,13 +82,6 @@ const UserRoutes = () => (
 						component={ManageSite}
 					/>
 
-					<PrivateRoute
-						exact
-						name="Site Settings"
-						path="/sites/:siteId/settings"
-						component={SiteSettings}
-					/>
-
 					<PrivateRoute exact name="Reporting" path="/reporting" component={Reporting} />
 					<PrivateRoute exact name=":siteId" path="/reporting/:siteId" component={Reporting} />
 
