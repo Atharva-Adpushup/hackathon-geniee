@@ -44,4 +44,17 @@ const getTruthyArray = array => array.filter(value => !!value);
 
 const isItemInArray = (item, array) => array.indexOf(item) > -1;
 
-export { errorHandler, getDuplicatesInArray, getTruthyArray, isItemInArray };
+const rightTrim = (string, s) => (string ? string.replace(new RegExp(s + '*$'), '') : '');
+
+const domanize = domain =>
+	domain
+		? rightTrim(
+				domain
+					.replace('http://', '')
+					.replace('https://', '')
+					.replace('www.', ''),
+				'/'
+		  )
+		: '';
+
+export { errorHandler, getDuplicatesInArray, getTruthyArray, isItemInArray, domanize };

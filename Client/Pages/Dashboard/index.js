@@ -3,7 +3,7 @@ import { Nav, NavItem } from 'react-bootstrap';
 import ActionCard from '../../Components/ActionCard/index';
 
 const Dashboard = () => (
-	<ActionCard title="Dummy Card">
+	<ActionCard>
 		<Nav bsStyle="tabs" activeKey={1}>
 			<NavItem eventKey={1}>AdPushup Header Code</NavItem>
 			<NavItem eventKey={2}>Ad code Generator</NavItem>
