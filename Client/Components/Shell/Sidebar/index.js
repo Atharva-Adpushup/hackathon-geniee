@@ -80,13 +80,6 @@ const Sidebar = ({ show }) => (
 					</span>
 				</li>
 			</NavLink>
-			<NavLink to="/paymentHistory" className="clearfix u-margin-l4" activeClassName="active">
-				<li className="u-list-style-type-none">
-					<span className="link-text-wrap">
-						<span className="link-text">Payment History</span>
-					</span>
-				</li>
-			</NavLink>
 		</ul>
 	</aside>
 );
