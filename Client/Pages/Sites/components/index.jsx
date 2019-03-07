@@ -54,7 +54,7 @@ class MySites extends Component {
 					const domanizeDomain = domanize(site.domain);
 
 					const computedReportingUrl = `/reporting/${siteId}`;
-					const computedManageSiteUrl = `/sites/${siteId}`;
+					const computedManageSiteUrl = `/sites/${siteId}/apps`;
 					const computedOnboardingUrl = `/onboarding?siteId=${siteId}`;
 
 					const computedLinkText = isStepThird ? 'Activate Apps' : 'Complete Setup';

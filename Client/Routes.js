@@ -2,6 +2,10 @@ import React, { Suspense, lazy } from 'react';
 import { Router, Route, Redirect, Switch } from 'react-router-dom';
 
 import { NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from './Pages/ManageSite/constants/index';
+import {
+	IA_NAV_ITEMS_INDEXES,
+	IA_NAV_ITEMS_VALUES
+} from './Apps/InnovativeAds/configs/commonConsts';
 
 import history from './helpers/history';
 import PublicOnlyRoute from './Components/PublicOnlyRoute';
@@ -66,6 +70,8 @@ const Routes = () => (
 				<ShellContainer>
 					<Route exact name="Error" path="/error" render={() => <ErrorPage />} />
 					<PrivateRoute exact name="Dashboard" path="/dashboard" component={Dashboard} />
+
+					{/** Sites, MySite, ManageSite */}
 					<PrivateRoute exact name="My Sites" path="/sites" component={Sites} />
 					<PrivateRoute
 						exact
@@ -77,7 +83,7 @@ const Routes = () => (
 					<PrivateRoute
 						exact
 						customProps={{ activeTab: NAV_ITEMS_INDEXES.SITE_SETTINGS }}
-						name={NAV_ITEMS_VALUES.SITE_SETTINGS}
+						name="Settings"
 						path="/sites/:siteId/settings"
 						component={ManageSite}
 					/>
@@ -88,12 +94,26 @@ const Routes = () => (
 						path="/sites/:siteId/apps"
 						component={ManageSite}
 					/>
+
+					{/** App Layout */}
 					<PrivateRoute exact name="Layout" path="/sites/:siteId/apps/layout" component={Layout} />
+
+					{/** App ApTag */}
 					<PrivateRoute exact name="Ap-Tag" path="/sites/:siteId/apps/ap-tag" component={ApTag} />
+
+					{/** Innovative Ads */}
 					<PrivateRoute
 						exact
+						customProps={{ activeTab: IA_NAV_ITEMS_INDEXES.CREATE_ADS }}
 						name="Innovative-Ads"
 						path="/sites/:siteId/apps/innovative-ads"
+						component={InnovativeAds}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: IA_NAV_ITEMS_INDEXES.MANAGE_ADS }}
+						name="Manage"
+						path="/sites/:siteId/apps/innovative-ads/manage"
 						component={InnovativeAds}
 					/>
 
