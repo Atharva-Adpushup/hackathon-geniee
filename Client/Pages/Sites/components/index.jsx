@@ -48,8 +48,6 @@ class MySites extends Component {
 						siteStep = site.step >= LAST_ONBOARDING_STEP ? LAST_ONBOARDING_STEP : site.step;
 					}
 
-					siteStep = 4;
-
 					const { siteId } = site;
 					const statusObject = SITE_SETUP_STATUS[siteStep];
 					const domanizeDomain = domanize(site.domain);
