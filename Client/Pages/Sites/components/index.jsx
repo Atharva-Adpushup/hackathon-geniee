@@ -54,6 +54,11 @@ class MySites extends Component {
 					const computedReportingUrl = `/reporting/${siteId}`;
 					const computedManageSiteUrl = `/sites/${siteId}/apps`;
 					const isSiteBlock = !!(statusObject.site && Object.keys(statusObject.site).length);
+					// TODO: Remove card flex wrap implementation with grid-col implementation
+					// so that fixed height hacks are not required. Every card container will be available
+					// to take dynamic height based on content
+					const computedFixedHeightClassName = siteStep < 3 ? ' card--height-fixed ' : '';
+					const computedRootClassName = `u-margin-r4 u-margin-b4 ${computedFixedHeightClassName}`;
 
 					const computedOnboardingBlock = () => (
 						<Panel className="panel--transparent u-margin-b4">
@@ -104,7 +109,7 @@ class MySites extends Component {
 
 					return (
 						<Card
-							rootClassName="u-margin-r4 u-margin-b4"
+							rootClassName={computedRootClassName}
 							key={`card-${siteId}`}
 							type={statusObject.type}
 							headerClassName="card-header"

@@ -97,7 +97,7 @@ $designDimensionLG: ($designDimensionMD + $designDimensionMD); // 4rem
 $designDimensionXL: ($designDimensionLG + $designDimensionLG); // 8rem
 $designDimensionXXL: ($designDimensionXL + $designDimensionXL); // 16rem
 
-$cardHeight: 173px;
+$cardHeight: 183px;
 $defaultOpacity: 0.8;
 
 $zIndexBase: ($numberTen * $numberTen * $numberTen);
