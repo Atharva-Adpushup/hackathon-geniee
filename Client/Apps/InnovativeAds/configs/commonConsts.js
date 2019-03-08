@@ -131,12 +131,29 @@ const displayAdMessage = `<ol style="font-size: 15px;">
 `;
 const interactiveAdMessage =
 	'Ad has been created. AdPushup will automatically insert ad on your site on the runtime. <div style="margin: 10px 0px; font-size: 16px; color: red; font-weight: bold; color: #eb575c">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div>';
-const COMPONENT_TITLES = {
-	2: 'Create Ads',
-	3: 'Manage Ads',
-	4: 'Ads Txt Config',
-	1: 'AdPushup Header Code'
+
+// IA abbreviation stands for Innovative Ads
+const IA_NAV_ITEMS_INDEXES = {
+	CREATE_ADS: 'create-ads',
+	MANAGE_ADS: 'manage-ads'
 };
+
+const IA_NAV_ITEMS_VALUES = {
+	CREATE_ADS: 'Create Ads',
+	MANAGE_ADS: 'Manage Ads'
+};
+
+const IA_NAV_ITEMS = {
+	[IA_NAV_ITEMS_INDEXES.CREATE_ADS]: {
+		NAME: [IA_NAV_ITEMS_VALUES.CREATE_ADS],
+		INDEX: 1
+	},
+	[IA_NAV_ITEMS_INDEXES.MANAGE_ADS]: {
+		NAME: [IA_NAV_ITEMS_VALUES.MANAGE_ADS],
+		INDEX: 2
+	}
+};
+
 const AD_OPERATIONS = ['APPEND', 'PREPEND', 'INSERTAFTER', 'INSERTBEFORE'];
 const TYPE_OF_ADS = {
 	STRUCTURAL: 1,
@@ -239,7 +256,6 @@ export {
 	displayAdMessage,
 	interactiveAdMessage,
 	interactiveAdEvents,
-	COMPONENT_TITLES,
 	AD_OPERATIONS,
 	TYPE_OF_ADS,
 	INTERACTIVE_ADS_TYPES,
@@ -250,5 +266,8 @@ export {
 	AD_LIST_ACTIONS,
 	NOOP,
 	STATUS_FILTER_OPTIONS,
-	FORMAT_FILTER_OPTIONS
+	FORMAT_FILTER_OPTIONS,
+	IA_NAV_ITEMS,
+	IA_NAV_ITEMS_INDEXES,
+	IA_NAV_ITEMS_VALUES
 };

@@ -186,6 +186,27 @@ router
 				console.log(err);
 				sendErrorResponse(err, res);
 			});
+	})
+	.post('/saveApConfigs', (req, res) => {
+		const { email } = req.user;
+		const { siteId, apConfigs } = req.body;
+
+		return verifyOwner(siteId, email)
+			.then(site => {
+				const siteApConfigs = { ...site.get('apConfigs') };
+
+				Object.keys(apConfigs).forEach(propertyKey => {
+					const propertyValue = apConfigs[propertyKey];
+					siteApConfigs[propertyKey] = propertyValue;
+				});
+
+				site.set('apConfigs', { ...siteApConfigs });
+				return site.save().then(() => sendSuccessResponse({ success: 1 }, res));
+			})
+			.catch(err => {
+				console.log(err);
+				sendErrorResponse(err, res);
+			});
 	});
 
 module.exports = router;

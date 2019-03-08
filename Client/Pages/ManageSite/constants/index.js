@@ -29,7 +29,7 @@ const APPS = [
 			type: TYPE.LINK,
 			text: 'Manage App',
 			link: LINK_TYPE.INAPP,
-			destination: '/ap-layout/__SITE_ID__',
+			destination: '/sites/__SITE_ID__/apps/layout',
 			icon: 'cog'
 		}
 	},
@@ -73,7 +73,7 @@ const APPS = [
 			type: TYPE.LINK,
 			text: 'Manage App',
 			link: LINK_TYPE.INAPP,
-			destination: '/innovative-ads/__SITE_ID__',
+			destination: '/sites/__SITE_ID__/apps/innovative-ads',
 			icon: 'cog'
 		}
 	},
@@ -95,7 +95,7 @@ const APPS = [
 			type: TYPE.LINK,
 			text: 'Manage App',
 			link: LINK_TYPE.INAPP,
-			destination: '/ap-tag/__SITE_ID__',
+			destination: '/sites/__SITE_ID__/apps/ap-tag',
 			icon: 'cog'
 		}
 	},
@@ -169,11 +169,40 @@ const STATUSES = {
 	}
 };
 
-const DEFAULT_NAV_ITEM = 1;
-const TITLES = {
-	1: 'Quick Snapshot',
-	2: 'Site Settings',
-	3: 'Manage Apps'
+const NAV_ITEMS_INDEXES = {
+	QUICK_SNAPSHOT: 'quick-snapshot',
+	SITE_SETTINGS: 'settings',
+	MANAGE_APPS: 'apps'
 };
 
-export { APPS, STATUSES, LINK_TYPE, TYPE, DEFAULT_ITEM, DEFAULT_NAV_ITEM, TITLES };
+const NAV_ITEMS_VALUES = {
+	QUICK_SNAPSHOT: 'Quick Snapshot',
+	SITE_SETTINGS: 'Site Settings',
+	MANAGE_APPS: 'Manage Apps'
+};
+
+const NAV_ITEMS = {
+	[NAV_ITEMS_INDEXES.QUICK_SNAPSHOT]: {
+		NAME: [NAV_ITEMS_VALUES.QUICK_SNAPSHOT],
+		INDEX: 1
+	},
+	[NAV_ITEMS_INDEXES.SITE_SETTINGS]: {
+		NAME: [NAV_ITEMS_VALUES.SITE_SETTINGS],
+		INDEX: 2
+	},
+	[NAV_ITEMS_INDEXES.MANAGE_APPS]: {
+		NAME: [NAV_ITEMS_VALUES.MANAGE_APPS],
+		INDEX: 3
+	}
+};
+
+export {
+	APPS,
+	STATUSES,
+	LINK_TYPE,
+	TYPE,
+	DEFAULT_ITEM,
+	NAV_ITEMS,
+	NAV_ITEMS_INDEXES,
+	NAV_ITEMS_VALUES
+};
