@@ -9,6 +9,10 @@ $transition: $all 0.2s $ease;
 		box-shadow: $boxShadowTwo;
 	}
 
+	&.card--height-fixed {
+		height: $cardHeight;
+	}
+
 	.card-header-title {
 		font-size: ($designDimensionSM + 0.8);
 	}
