@@ -85,7 +85,7 @@ class ManageApps extends React.Component {
 		const { site } = this.props;
 		const { appStatuses } = site;
 		return (
-			<div className="aligner aligner--row aligner--wrap aligner--hSpaceEvenly">
+			<div className="u-padding-h4 u-padding-v5 aligner aligner--row aligner--wrap">
 				{APPS.map(app => {
 					const { name, image, description, key, left, right, full = false } = app;
 					const isAppActive = !!appStatuses[key];
@@ -94,8 +94,8 @@ class ManageApps extends React.Component {
 
 					return (
 						<Card
+							rootClassName="manage-site-card u-margin-r4 u-margin-b4"
 							key={`card-${key}`}
-							rootClassName="manage-site-card"
 							type={type}
 							headerClassName="card-header"
 							bodyClassName="card-body"
@@ -160,16 +160,16 @@ class ManageApps extends React.Component {
 		return (
 			<React.Fragment>
 				{appStatuses ? (
-					<div className="u-padding-v5">
+					<div>
 						{this.renderApps()}
-						<Row className="u-padding-h5">
+						<Row className="u-padding-h4 u-padding-b4">
 							<CustomMessage
 								header="Information"
 								type="info"
 								message={
 									'<p style="font-size: 16px">To enable/disable any app please contact your respective Account Manager.</p>'
 								}
-								rootClassNames="u-margin-t4"
+								rootClassNames=""
 								dismissible
 							/>
 						</Row>
