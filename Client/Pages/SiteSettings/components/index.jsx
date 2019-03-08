@@ -10,6 +10,8 @@ import UiList from '../../../Components/Layout/UiList';
 import CustomButton from '../../../Components/CustomButton/index';
 import ActionCard from '../../../Components/ActionCard/index';
 import { copyToClipBoard } from '../../../Apps/ApTag/lib/helpers';
+import siteService from '../../../services/siteService';
+import { errorHandler } from '../../../helpers/commonFunctions';
 
 library.add(faCopy);
 
@@ -39,13 +41,23 @@ class SiteSettings extends Component {
 
 	uiListSaveHandler = collection => {
 		const { siteId } = this.state;
-		const { updateApConfig } = this.props;
+		const { updateApConfig, showNotification } = this.props;
 		const apConfigs = {
 			blocklist: collection
 		};
 
-		console.log('ui collection value: ', collection);
 		updateApConfig(siteId, apConfigs);
+		siteService
+			.saveApConfigs(siteId, apConfigs)
+			.then(() =>
+				showNotification({
+					mode: 'success',
+					title: 'Settings Saved',
+					message: 'Successfully saved blocklist setting',
+					autoDismiss: 1
+				})
+			)
+			.catch(err => errorHandler(err));
 	};
 
 	renderLeftPanel() {
