@@ -4,6 +4,8 @@ import { Router, Route, Redirect, Switch } from 'react-router-dom';
 import { NAV_ITEMS_INDEXES } from './Pages/ManageSite/constants/index';
 import { IA_NAV_ITEMS_INDEXES } from './Apps/InnovativeAds/configs/commonConsts';
 import { APT_NAV_ITEMS_INDEXES } from './Apps/ApTag/configs/commonConsts';
+import { PAYMENT_NAV_ITEMS_INDEXES } from './Pages/Payment/configs/commonConsts';
+import { ADSTXT_NAV_ITEMS_INDEXES } from './Pages/AdsTxtManagement/configs/commonConsts';
 
 import history from './helpers/history';
 import PublicOnlyRoute from './Components/PublicOnlyRoute';
@@ -131,17 +133,32 @@ const Routes = () => (
 					<PrivateRoute exact name="ByodPanel" path="/byodPanel" component={ByodPanel} />
 					<PrivateRoute
 						exact
-						name="AdsTxt Management"
+						name="AdsTxt Authenticator"
 						path="/adsTxtManagement"
+						customProps={{ activeTab: ADSTXT_NAV_ITEMS_INDEXES.AUTHENTICATOR }}
+						component={AdsTxtManagement}
+					/>
+					<PrivateRoute
+						exact
+						name="AdsTxt Entries"
+						path="/adsTxtManagement/entries"
+						customProps={{ activeTab: ADSTXT_NAV_ITEMS_INDEXES.ENTRIES }}
 						component={AdsTxtManagement}
 					/>
 					<PrivateRoute exact name="Add Site" path="/addSite" component={AddNewSite} />
-					<PrivateRoute exact name="Payment" path="/payment" component={Payment} />
 					<PrivateRoute
 						exact
-						name="Payment Settings"
-						path="/paymentSettings"
-						component={PaymentSettings}
+						name="Payment Details"
+						path="/payment"
+						customProps={{ activeTab: PAYMENT_NAV_ITEMS_INDEXES.DETAILS }}
+						component={Payment}
+					/>
+					<PrivateRoute
+						exact
+						name="Payment History"
+						path="/payment/history"
+						customProps={{ activeTab: PAYMENT_NAV_ITEMS_INDEXES.HISTORY }}
+						component={Payment}
 					/>
 
 					<PrivateRoute exact name="User OnBoarding" path="/onboarding" component={OnBoarding} />
