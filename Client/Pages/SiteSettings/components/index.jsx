@@ -2,18 +2,19 @@ import React, { Component } from 'react';
 import { Row, Col } from 'react-bootstrap';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCopy } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import SplitScreen from '../../../Components/Layout/SplitScreen';
 import UiList from '../../../Components/Layout/UiList';
 import CustomButton from '../../../Components/CustomButton/index';
 import ActionCard from '../../../Components/ActionCard/index';
+import SendCodeByEmailModal from '../../../Components/SendCodeByEmailModal';
 import { copyToClipBoard } from '../../../Apps/ApTag/lib/helpers';
 import siteService from '../../../services/siteService';
 import { errorHandler } from '../../../helpers/commonFunctions';
 
-library.add(faCopy);
+library.add(faCopy, faEnvelope);
 
 class SiteSettings extends Component {
 	constructor(props) {
@@ -35,7 +36,8 @@ class SiteSettings extends Component {
 })(window, document);
 </script>`,
 			siteData,
-			siteId
+			siteId,
+			showSendCodeByEmailModal: false
 		};
 	}
 
@@ -60,8 +62,17 @@ class SiteSettings extends Component {
 			.catch(err => errorHandler(err));
 	};
 
+	toggleShowSendCodeByEmailModal = () => {
+		this.setState(state => ({ showSendCodeByEmailModal: !state.showSendCodeByEmailModal }));
+	};
+
 	renderLeftPanel() {
-		const { codeText } = this.state;
+		const { codeText, showSendCodeByEmailModal } = this.state;
+		const mailHeader =
+			'Hi, <br/> Please find below the code snippet for your AdPushup setup. Paste this into the <strong>&lt;head&gt;</strong> section of your page - \n\n';
+		const mailFooter = '<br/><br/>Thanks,<br/>Team AdPushup';
+		const apHeadCodeForMail = codeText.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		const emailBody = `${mailHeader}<pre style="background-color: #eaeaea; padding: 20px; margin-top: 10px;">${apHeadCodeForMail}</pre>${mailFooter}`;
 
 		return (
 			<div className="clearfix">
@@ -84,6 +95,25 @@ class SiteSettings extends Component {
 						<FontAwesomeIcon icon="copy" className="u-margin-l2" />
 					</span>
 				</CustomButton>
+
+				<CustomButton
+					variant="secondary"
+					className="u-margin-l3"
+					name="emailCodeToDevButton"
+					onClick={this.toggleShowSendCodeByEmailModal}
+				>
+					<span>
+						Send Code to Developer
+						<FontAwesomeIcon icon="envelope" className="u-margin-l2" />
+					</span>
+				</CustomButton>
+				<SendCodeByEmailModal
+					show={showSendCodeByEmailModal}
+					title="Send Code to Developer"
+					handleClose={this.toggleShowSendCodeByEmailModal}
+					subject="Adpushup HeadCode"
+					emailBody={emailBody}
+				/>
 			</div>
 		);
 	}
