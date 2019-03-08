@@ -104,6 +104,7 @@ class MySites extends Component {
 
 					return (
 						<Card
+							rootClassName="u-margin-r4 u-margin-b4"
 							key={`card-${siteId}`}
 							type={statusObject.type}
 							headerClassName="card-header"
@@ -152,7 +153,7 @@ class MySites extends Component {
 	render() {
 		return (
 			<ActionCard title="My Sites">
-				<div className="u-padding-h4 u-padding-v5 aligner aligner--row aligner--wrap aligner--hSpaceEvenly">
+				<div className="u-padding-h4 u-padding-v5 aligner aligner--row aligner--wrap">
 					{this.renderStatusCards()}
 
 					<Link to="/addSite" className="u-link-reset">

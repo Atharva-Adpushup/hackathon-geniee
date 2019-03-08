@@ -33,26 +33,30 @@
 		}
 	}
 
-	&.panel.panel-success {
-		> .card-body {
-			.panel-body {
-				color: $successText;
+	&.panel {
+		width: ($fullPercentage - 70);
+
+		&.panel-success {
+			> .card-body {
+				.panel-body {
+					color: $successText;
+				}
 			}
 		}
-	}
 
-	&.panel.panel-warning {
-		> .card-body {
-			.panel-body {
-				color: $warningText;
+		&.panel-warning {
+			> .card-body {
+				.panel-body {
+					color: $warningText;
+				}
 			}
 		}
-	}
 
-	&.panel.panel-danger {
-		> .card-body {
-			.panel-body {
-				color: $dangerText;
+		&.panel-danger {
+			> .card-body {
+				.panel-body {
+					color: $dangerText;
+				}
 			}
 		}
 	}
