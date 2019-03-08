@@ -143,7 +143,112 @@ var API = {
 
 				throw err;
 			});
-	}
-};
+
+			// filter out duplicate entries
+			normalizedEntries = normalizedEntries.filter(
+				(item, pos, currArray) => currArray.indexOf(item) === pos
+			);
+
+			return normalizedEntries;
+		},
+		verifyAdsTxt(url, ourAdsTxt) {
+			return API.load(`${utils.rightTrim(url, '/')}/ads.txt`)
+				.then(existingAdsTxt => {
+					const existingAdsTxtArr = API.normalizeAdsTxtEntries(existingAdsTxt);
+					const ourAdsTxtArr = API.normalizeAdsTxtEntries(ourAdsTxt);
+
+					const entriesNotFound = ourAdsTxtArr.filter(
+						value => existingAdsTxtArr.indexOf(value) === -1
+					);
+
+					if (entriesNotFound.length) {
+						if (entriesNotFound.length == ourAdsTxtArr.length) {
+							return {
+								errorCode: 2,
+								ourAdsTxt: entriesNotFound.join('\n')
+							};
+						} else {
+							return {
+								errorCode: 1,
+								ourAdsTxt: entriesNotFound.join('\n')
+							};
+						}
+					}
+
+					return { errorCode: 0 };
+
+					// if (entriesNotFound.length) {
+					// 	throw new AdPushupError({
+					// 		httpCode: 404,
+					// 		error:
+					// 			'Few ads.txt entries not found on your site. Please include these ads.txt entries in your ads.txt file.',
+					// 		ourAdsTxt: entriesNotFound.join('\n')
+					// 	});
+					// }
+
+					// return true;
+				})
+				.catch(err => {
+					if (!(err instanceof AdPushupError) && err.statusCode === 404) {
+						throw new AdPushupError({
+							httpCode: 404,
+							error:
+								'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
+							ourAdsTxt
+						});
+					}
+
+					if (!(err instanceof AdPushupError) && err.error.code === 'ENOTFOUND') {
+						throw new AdPushupError({
+							httpCode: 404,
+							error: 'Unable to reach your site!',
+							ourAdsTxt
+						});
+					}
+
+					throw err;
+				});
+		},
+		checkIfBillingProfileComplete(email) {
+			var tipaltiConfig = config.tipalti,
+				url = tipaltiConfig.soapUrl,
+				payeeId = encodeURIComponent(
+					crypto
+						.createHash('md5')
+						.update(email)
+						.digest('hex')
+						.substr(0, 64)
+				),
+				payer = tipaltiConfig.payerName,
+				date = Math.floor(+new Date() / 1000),
+				paramsStr = payer + payeeId + date + '100',
+				key = tipaltiConfig.key,
+				hash = crypto
+					.createHmac('sha256', key)
+					.update(paramsStr.toString('utf-8'))
+					.digest('hex'),
+				requestArgs = {
+					payerName: payer,
+					idap: payeeId,
+					timestamp: date,
+					key: hash,
+					amount: '100'
+				},
+				createClient = Promise.promisify(soap.createClient);
+
+			return createClient(url)
+				.then(function(client) {
+					var method = client['PayeePayable'];
+					method = Promise.promisify(method);
+					return method(requestArgs);
+				})
+				.then(function(result) {
+					return result.PayeePayableResult && result.PayeePayableResult.b;
+				})
+				.catch(function() {
+					return 'some error occured';
+				});
+		}
+	};
 
 module.exports = API;

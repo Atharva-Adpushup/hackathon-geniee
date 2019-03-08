@@ -5,9 +5,15 @@ import { showNotification } from '../../actions/uiActions';
 import Loader from '../../Components/Loader/index';
 import { Nav, NavItem, Alert } from 'react-bootstrap';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
+import {
+	PAYMENT_NAV_ITEMS,
+	PAYMENT_NAV_ITEMS_INDEXES,
+	PAYMENT_NAV_ITEMS_VALUES
+} from './configs/commonConsts';
 class Payment extends Component {
 	state = {
-		activeNav: 1,
+		redirectUrl: '',
 		isBillingProfileComplete: false,
 		paymentDetails: {
 			url: '',
@@ -72,20 +78,26 @@ class Payment extends Component {
 	);
 	handleNavSelect = value => {
 		let { paymentDetails, paymentHistory } = this.state;
+		const computedRedirectUrl = `/payment`;
+		let redirectUrl = '';
 		switch (value) {
 			default:
 			case 1:
 				paymentDetails.isLoading = true;
+				redirectUrl = `${computedRedirectUrl}`;
 				this.setState({
 					paymentDetails,
-					activeNav: value
+					redirectUrl
 				});
+				break;
 			case 2:
 				paymentHistory.isLoading = true;
+				redirectUrl = `${computedRedirectUrl}/history`;
 				this.setState({
 					paymentHistory,
-					activeNav: value
+					redirectUrl
 				});
+				break;
 		}
 	};
 
@@ -102,23 +114,37 @@ class Payment extends Component {
 	};
 
 	renderContent = () => {
-		const { activeNav, paymentDetails, paymentHistory } = this.state;
-		switch (activeNav) {
+		const { paymentDetails, paymentHistory } = this.state;
+		const activeTab = this.getActiveTab();
+		switch (activeTab) {
 			default:
-			case 1:
+			case PAYMENT_NAV_ITEMS_INDEXES.DETAILS:
 				return this.renderIframe(paymentDetails);
-			case 2:
+			case PAYMENT_NAV_ITEMS_INDEXES.HISTORY:
 				return this.renderIframe(paymentHistory);
 		}
 	};
+	getActiveTab = () => {
+		const {
+			customProps: { activeTab }
+		} = this.props;
+
+		return activeTab;
+	};
 
 	render() {
-		const { activeNav } = this.state;
+		const { redirectUrl } = this.state;
+		const activeTab = this.getActiveTab();
+		const activeItem = PAYMENT_NAV_ITEMS[activeTab];
+
+		if (redirectUrl) {
+			return <Redirect to={{ pathname: redirectUrl }} />;
+		}
 		return (
 			<ActionCard title="Payment Settings">
-				<Nav bsStyle="tabs" activeKey={activeNav} onSelect={this.handleNavSelect}>
-					<NavItem eventKey={1}>Payment Details</NavItem>
-					<NavItem eventKey={2}>Payment History</NavItem>
+				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
+					<NavItem eventKey={1}>{PAYMENT_NAV_ITEMS_VALUES.DETAILS}</NavItem>
+					<NavItem eventKey={2}>{PAYMENT_NAV_ITEMS_VALUES.HISTORY}</NavItem>
 				</Nav>
 				{this.renderContent()}
 			</ActionCard>

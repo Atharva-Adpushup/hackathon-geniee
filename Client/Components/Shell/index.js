@@ -6,11 +6,13 @@ import Sidebar from './Sidebar';
 import Loader from '../Loader/index';
 import { domanize } from '../../helpers/commonFunctions';
 
+import NotificationContainer from '../../Containers/NotificationContainer';
+
 class Shell extends React.Component {
 	state = { isSidebarOpen: true };
 
 	componentDidMount() {
-		const { fetched, fetchGlobalData, showNotification, user } = this.props;
+		const { fetched, fetchGlobalData, showNotification } = this.props;
 		if (!fetched)
 			fetchGlobalData().then(() => {
 				const { user } = this.props;
@@ -105,7 +107,4 @@ class Shell extends React.Component {
 		);
 	}
 }
-export default connect(
-	null,
-	{ showNotification }
-)(Shell);
+export default Shell;
