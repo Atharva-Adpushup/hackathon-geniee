@@ -1,43 +1,82 @@
 const SITE_SETUP_STATUS = {
 	0: {
 		step: 0,
-		tooltipText: 'Onboarding is incomplete',
-		text: 'Please complete onboarding process',
-		isComplete: false,
 		type: 'danger',
-		icon: 'exclamation-triangle'
+		icon: 'exclamation-triangle',
+		tooltipText: 'Onboarding is incomplete',
+		onboarding: {
+			icon: 'exclamation-triangle',
+			isComplete: false,
+			text: 'Please complete onboarding process',
+			link: '/onboarding?siteId=__SITEID__',
+			linkText: 'Complete Setup'
+		},
+		site: {}
 	},
 	1: {
 		step: 1,
-		tooltipText: 'Onboarding is incomplete',
-		text: 'AP head code is not present',
-		isComplete: false,
 		type: 'danger',
-		icon: 'exclamation-triangle'
+		icon: 'exclamation-triangle',
+		tooltipText: 'Onboarding is incomplete',
+		onboarding: {
+			icon: 'exclamation-triangle',
+			isComplete: false,
+			text: 'AP head code is not present',
+			link: '/onboarding?siteId=__SITEID__',
+			linkText: 'Complete Setup'
+		},
+		site: {}
 	},
 	2: {
-		step: 2,
-		tooltipText: 'Onboarding is incomplete',
-		text: 'Ads.txt is not updated',
-		isComplete: false,
+		step: 1,
 		type: 'danger',
-		icon: 'exclamation-triangle'
+		icon: 'exclamation-triangle',
+		tooltipText: 'Onboarding is incomplete',
+		onboarding: {
+			icon: 'exclamation-triangle',
+			isComplete: false,
+			text: 'Ads.txt is not updated',
+			link: '/onboarding?siteId=__SITEID__',
+			linkText: 'Complete Setup'
+		},
+		site: {}
 	},
 	3: {
 		step: 3,
-		tooltipText: 'Onboarding is incomplete',
-		text: 'No App is activated',
-		isComplete: false,
 		type: 'warning',
-		icon: 'exclamation-circle'
+		icon: 'exclamation-circle',
+		tooltipText: 'No App is activated',
+		onboarding: {
+			icon: 'check-circle',
+			isComplete: true,
+			text: 'Onboarding is complete',
+			link: ''
+		},
+		site: {
+			icon: 'exclamation-circle',
+			isComplete: false,
+			text: 'No App is activated',
+			link: '/sites/__SITEID__/apps',
+			linkText: 'Activate Apps'
+		}
 	},
 	4: {
 		step: 4,
-		tooltipText: 'Onboarding is complete',
-		text: 'AdPushup is running',
-		isComplete: true,
 		type: 'success',
-		icon: 'check-circle'
+		icon: 'check-circle',
+		tooltipText: 'AdPushup is running',
+		onboarding: {
+			icon: 'check-circle',
+			isComplete: true,
+			text: 'Onboarding is complete',
+			link: ''
+		},
+		site: {
+			icon: 'check-circle',
+			isComplete: true,
+			text: 'AdPushup is running',
+			link: ''
+		}
 	}
 };
 
