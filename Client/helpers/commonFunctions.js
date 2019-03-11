@@ -21,4 +21,40 @@ function errorHandler(err, userMessage = 'Operation Failed') {
 	return history.push('/error');
 }
 
-export { errorHandler };
+const getDuplicatesInArray = array =>
+	array.reduce(
+		(accumulator, value) => {
+			const isValueInObject = !!(
+				accumulator.object.hasOwnProperty(value) && accumulator.object[value]
+			);
+			const isValueInArray = !!accumulator.duplicates.includes(value);
+
+			if (!isValueInObject) {
+				accumulator.object[value] = value;
+			} else if (isValueInObject && !isValueInArray) {
+				accumulator.duplicates.push(value);
+			}
+
+			return accumulator;
+		},
+		{ duplicates: [], object: {} }
+	);
+
+const getTruthyArray = array => array.filter(value => !!value);
+
+const isItemInArray = (item, array) => array.indexOf(item) > -1;
+
+const rightTrim = (string, s) => (string ? string.replace(new RegExp(s + '*$'), '') : '');
+
+const domanize = domain =>
+	domain
+		? rightTrim(
+				domain
+					.replace('http://', '')
+					.replace('https://', '')
+					.replace('www.', ''),
+				'/'
+		  )
+		: '';
+
+export { errorHandler, getDuplicatesInArray, getTruthyArray, isItemInArray, domanize };

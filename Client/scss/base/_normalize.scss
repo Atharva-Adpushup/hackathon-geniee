@@ -10,3 +10,20 @@
 		}
 	}
 }
+
+.breadcrumb {
+	background: $whiteColor;
+	border: 1px solid $borderColor;
+	border-radius: $numberZero;
+	box-shadow: $boxShadowThree;
+	color: $primaryColor;
+	margin: 0;
+
+	.breadcrumb-item {
+		font-size: $designDimensionMD;
+
+		a {
+			color: $primaryColor;
+		}
+	}
+}

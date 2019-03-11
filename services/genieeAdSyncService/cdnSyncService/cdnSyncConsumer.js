@@ -326,7 +326,8 @@ module.exports = function(site, externalData = {}) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			if (prodEnv) {
+			const shouldUpload = prodEnv && !config.environment.IS_STAGING;
+			if (shouldUpload) {
 				return connectToServer()
 					.then(cwd)
 					.then(function() {

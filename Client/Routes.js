@@ -1,6 +1,12 @@
 import React, { Suspense, lazy } from 'react';
 import { Router, Route, Redirect, Switch } from 'react-router-dom';
 
+import { NAV_ITEMS_INDEXES } from './Pages/ManageSite/constants/index';
+import { IA_NAV_ITEMS_INDEXES } from './Apps/InnovativeAds/configs/commonConsts';
+import { APT_NAV_ITEMS_INDEXES } from './Apps/ApTag/configs/commonConsts';
+import { PAYMENT_NAV_ITEMS_INDEXES } from './Pages/Payment/configs/commonConsts';
+import { ADSTXT_NAV_ITEMS_INDEXES } from './Pages/AdsTxtManagement/configs/commonConsts';
+
 import history from './helpers/history';
 import PublicOnlyRoute from './Components/PublicOnlyRoute';
 import PrivateRoute from './Components/PrivateRoute';
@@ -21,9 +27,6 @@ const AdsTxtManagement = lazy(() =>
 	import(/* webpackChunkName: "adsTxtManagement" */ './Pages/AdsTxtManagement')
 );
 const Payment = lazy(() => import(/* webpackChunkName: "payment" */ './Pages/Payment'));
-const PaymentHistory = lazy(() =>
-	import(/* webpackChunkName: "paymentHistory" */ './Pages/PaymentHistory')
-);
 const PaymentSettings = lazy(() =>
 	import(/* webpackChunkName: "paymentSettings" */ './Pages/PaymentSettings')
 );
@@ -62,22 +65,103 @@ const Routes = () => (
 
 				{/* Private Routes */}
 				<ShellContainer>
-					<Route exact path="/error" render={() => <ErrorPage />} />
-					<PrivateRoute exact path="/dashboard" component={Dashboard} />
-					<PrivateRoute exact path="/sites" component={Sites} />
-					<PrivateRoute exact path="/sites/:siteId/settings" component={SiteSettings} />
-					<PrivateRoute exact path="/reporting" component={Reporting} />
-					<PrivateRoute exact path="/byodPanel" component={ByodPanel} />
-					<PrivateRoute exact path="/adsTxtManagement" component={AdsTxtManagement} />
-					<PrivateRoute exact path="/addSite" component={AddNewSite} />
-					<PrivateRoute exact path="/payment" component={Payment} />
-					<PrivateRoute exact path="/paymentHistory" component={PaymentHistory} />
-					<PrivateRoute exact path="/paymentSettings" component={PaymentSettings} />
-					<PrivateRoute exact path="/ap-tag/:siteId" component={ApTag} />
-					<PrivateRoute exact path="/onboarding" component={OnBoarding} />
-					<PrivateRoute exact path="/ap-layout/:siteId" component={Layout} />
-					<PrivateRoute exact path="/innovative-ads/:siteId" component={InnovativeAds} />
-					<PrivateRoute exact path="/sites/:siteId" component={ManageSite} />
+					<Route exact name="Error" path="/error" render={() => <ErrorPage />} />
+					<PrivateRoute exact name="Dashboard" path="/dashboard" component={Dashboard} />
+
+					{/** Sites & ManageSite */}
+					<PrivateRoute exact name="My Sites" path="/sites" component={Sites} />
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: NAV_ITEMS_INDEXES.QUICK_SNAPSHOT }}
+						name=":siteId"
+						path="/sites/:siteId"
+						component={ManageSite}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: NAV_ITEMS_INDEXES.SITE_SETTINGS }}
+						name="Settings"
+						path="/sites/:siteId/settings"
+						component={ManageSite}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: NAV_ITEMS_INDEXES.MANAGE_APPS }}
+						name="Apps"
+						path="/sites/:siteId/apps"
+						component={ManageSite}
+					/>
+
+					{/** App Layout */}
+					<PrivateRoute exact name="Layout" path="/sites/:siteId/apps/layout" component={Layout} />
+
+					{/** App ApTag */}
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: APT_NAV_ITEMS_INDEXES.CREATE_ADS }}
+						name="Ap-Tag"
+						path="/sites/:siteId/apps/ap-tag"
+						component={ApTag}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: APT_NAV_ITEMS_INDEXES.MANAGE_ADS }}
+						name="Manage"
+						path="/sites/:siteId/apps/ap-tag/manage"
+						component={ApTag}
+					/>
+
+					{/** Innovative Ads */}
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: IA_NAV_ITEMS_INDEXES.CREATE_ADS }}
+						name="Innovative-Ads"
+						path="/sites/:siteId/apps/innovative-ads"
+						component={InnovativeAds}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: IA_NAV_ITEMS_INDEXES.MANAGE_ADS }}
+						name="Manage"
+						path="/sites/:siteId/apps/innovative-ads/manage"
+						component={InnovativeAds}
+					/>
+
+					<PrivateRoute exact name="Reporting" path="/reporting" component={Reporting} />
+					<PrivateRoute exact name=":siteId" path="/reporting/:siteId" component={Reporting} />
+
+					<PrivateRoute exact name="ByodPanel" path="/byodPanel" component={ByodPanel} />
+					<PrivateRoute
+						exact
+						name="AdsTxt Authenticator"
+						path="/adsTxtManagement"
+						customProps={{ activeTab: ADSTXT_NAV_ITEMS_INDEXES.AUTHENTICATOR }}
+						component={AdsTxtManagement}
+					/>
+					<PrivateRoute
+						exact
+						name="AdsTxt Entries"
+						path="/adsTxtManagement/entries"
+						customProps={{ activeTab: ADSTXT_NAV_ITEMS_INDEXES.ENTRIES }}
+						component={AdsTxtManagement}
+					/>
+					<PrivateRoute exact name="Add Site" path="/addSite" component={AddNewSite} />
+					<PrivateRoute
+						exact
+						name="Payment Details"
+						path="/payment"
+						customProps={{ activeTab: PAYMENT_NAV_ITEMS_INDEXES.DETAILS }}
+						component={Payment}
+					/>
+					<PrivateRoute
+						exact
+						name="Payment History"
+						path="/payment/history"
+						customProps={{ activeTab: PAYMENT_NAV_ITEMS_INDEXES.HISTORY }}
+						component={Payment}
+					/>
+
+					<PrivateRoute exact name="User OnBoarding" path="/onboarding" component={OnBoarding} />
 				</ShellContainer>
 			</Switch>
 		</Suspense>

@@ -2,11 +2,15 @@ $transition: $all 0.2s $ease;
 
 .card {
 	box-shadow: $boxShadowOne;
-	width: 480px;
+	width: 360px;
 	transition: $transition;
 
 	&:hover {
 		box-shadow: $boxShadowTwo;
+	}
+
+	&.card--height-fixed {
+		height: $cardHeight;
 	}
 
 	.card-header-title {

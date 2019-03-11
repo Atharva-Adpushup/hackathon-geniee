@@ -1,4 +1,5 @@
 const express = require('express');
+const Promise = require('bluebird');
 
 const router = express.Router();
 const userModel = require('../models/userModel');
@@ -8,7 +9,6 @@ const CC = require('../configs/commonConsts');
 const FormValidator = require('../helpers/FormValidator');
 const woodlotCustomLogger = require('woodlot').customLogger;
 const httpStatus = require('../configs/httpStatusConsts');
-const Promise = require('bluebird');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const {
 	verifyOwner,
@@ -182,6 +182,27 @@ router
 						)
 				)
 			)
+			.catch(err => {
+				console.log(err);
+				sendErrorResponse(err, res);
+			});
+	})
+	.post('/saveApConfigs', (req, res) => {
+		const { email } = req.user;
+		const { siteId, apConfigs } = req.body;
+
+		return verifyOwner(siteId, email)
+			.then(site => {
+				const siteApConfigs = { ...site.get('apConfigs') };
+
+				Object.keys(apConfigs).forEach(propertyKey => {
+					const propertyValue = apConfigs[propertyKey];
+					siteApConfigs[propertyKey] = propertyValue;
+				});
+
+				site.set('apConfigs', { ...siteApConfigs });
+				return site.save().then(() => sendSuccessResponse({ success: 1 }, res));
+			})
 			.catch(err => {
 				console.log(err);
 				sendErrorResponse(err, res);
