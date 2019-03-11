@@ -105,7 +105,7 @@ const APPS = [
 		link: 1,
 		image: '/assets/images/manageSites/manage-ads-txt.png',
 		description:
-			'Our ad-reinsertion technology helps web publishers recover the money that they are losing due to ad blocking software. The ads we run adhere to the highest UX standards as laid out by the Acceptable Ads Committee.',
+			'Ads.txt is a file standard created by the Interactive Advertising Bureau (IAB) to help publishers fight ad fraud. However, most publishers end up manually creating the files—a slow and error-prone process. This tool was was created by AdPushup to help publishers easily manage ads.txt files using a visual interface, thereby saving time and reducing errors.',
 		left: {
 			type: TYPE.TEXT,
 			text: 'Status: __STATUS__'
