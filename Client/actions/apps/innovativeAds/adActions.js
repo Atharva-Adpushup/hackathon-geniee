@@ -4,13 +4,13 @@ import { errorHandler } from '../../../helpers/commonFunctions';
 import { pagegroupFiltering } from '../../../Apps/InnovativeAds/lib/helpers';
 
 const helpers = {
-	makeAPICall: (adId, isSuperUser, toUpdate, updatedLogs) => {
+	makeAPICall: (adId, siteId, isSuperUser, toUpdate, updatedLogs) => {
 		if (isSuperUser) {
 			return Promise.resolve();
 		}
 		return axiosInstance
 			.post(API_PATHS.MODIFY_AD, {
-				siteId: window.siteId,
+				siteId,
 				adId,
 				data: toUpdate,
 				metaUpdate: {
@@ -27,6 +27,7 @@ const helpers = {
 	},
 	processing: (
 		adId,
+		siteId,
 		isSuperUser,
 		toUpdate,
 		updatedLogs,
@@ -35,7 +36,7 @@ const helpers = {
 		logType = GLOBAL_ACTIONS.SET_AD_TRACKING_LOGS
 	) =>
 		helpers
-			.makeAPICall(adId, isSuperUser, toUpdate, updatedLogs)
+			.makeAPICall(adId, siteId, isSuperUser, toUpdate, updatedLogs)
 			.then(() => {
 				dispatch({
 					type: AD_ACTIONS.UPDATE_AD,
@@ -95,8 +96,8 @@ const updateAd = (adId, data) => dispatch =>
 			updateThis: data
 		}
 	});
-const modifyAdOnServer = (adId, data) => dispatch =>
-	axiosInstance.post(API_PATHS.MODIFY_AD, { siteId: window.siteId, adId, data }).then(response => {
+const modifyAdOnServer = (adId, siteId, data) => dispatch =>
+	axiosInstance.post(API_PATHS.MODIFY_AD, { siteId, adId, data }).then(response => {
 		if (response.error) {
 			return window.alert(response.data.message);
 		}
@@ -108,7 +109,7 @@ const modifyAdOnServer = (adId, data) => dispatch =>
 			}
 		});
 	});
-const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
+const archiveAd = (adId, siteId, data, isSuperUser) => (dispatch, getState) => {
 	const { innovativeAds } = getState().apps;
 	const globalAdLogs = innovativeAds.global.meta.content.pagegroups;
 	const { format, platform, pagegroups, isActive, archivedOn, networkData } = data;
@@ -152,6 +153,7 @@ const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
 
 	return helpers.processing(
 		adId,
+		siteId,
 		isSuperUser,
 		{ isActive, archivedOn, networkData },
 		updatedLogs,
@@ -159,10 +161,12 @@ const archiveAd = (adId, data, isSuperUser) => (dispatch, getState) => {
 		mode
 	);
 };
-const updateTraffic = (adId, { networkData, pagegroups, platform, format }, isSuperUser) => (
-	dispatch,
-	getState
-) => {
+const updateTraffic = (
+	adId,
+	siteId,
+	{ networkData, pagegroups, platform, format },
+	isSuperUser
+) => (dispatch, getState) => {
 	const { innovativeAds } = getState().apps;
 	const currentAdLogs = pagegroups.map(pg => `${platform}-${format}-${pg}`);
 	const globalAdLogs = innovativeAds.global.meta.content.pagegroups;
@@ -179,6 +183,7 @@ const updateTraffic = (adId, { networkData, pagegroups, platform, format }, isSu
 
 	return helpers.processing(
 		adId,
+		siteId,
 		isSuperUser,
 		{ pagegroups, networkData },
 		[...updatedLogs],
