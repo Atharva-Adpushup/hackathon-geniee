@@ -120,6 +120,38 @@ var utils = require('../helpers/utils'),
 				.setTargeting(keyVal.trim().toLowerCase(), String(utmParam ? utmParam.trim().substr(0, 40) : null));
 		});
 	},
+	setCustomSlotLevelTargeting = function(slot) {
+		/*
+		Example (to be set in before js) - 
+			window.adpushup.customSlotLevelTargetingMap = {
+				"ADP_37646_728X90_dca57618-e924-48f4-9993-d1274128f36c": {
+					"adp_geo": window.adp_geo
+				}
+			};
+		*/
+		var customSlotLevelTargetingMap = window.adpushup.customSlotLevelTargetingMap;
+		if (customSlotLevelTargetingMap) {
+			var slotIds = Object.keys(customSlotLevelTargetingMap);
+	
+			if(slotIds.length) {
+				slotIds.forEach(function(slotId) {
+					if (slotId === slot.containerId) {
+						var slotTargeting = customSlotLevelTargetingMap[slotId];
+						
+						if(slotTargeting) {
+							var targetingKeys = Object.keys(slotTargeting);
+
+							if(targetingKeys.length) {
+								targetingKeys.forEach(function(key) {
+									slot.gSlot.setTargeting(key, String(slotTargeting[key]));
+								});
+							}
+						}
+					}
+				});	
+			}
+		}
+	},
 	setGPTargeting = function(slot) {
 		if (slot.optionalParam && slot.optionalParam.network == config.PARTNERS.GENIEE) {
 			var genieeSlots = Object.keys(config.TARGETING);
@@ -174,8 +206,10 @@ var utils = require('../helpers/utils'),
 			Object.assign(targeting, adServerTargeting);
 		}
 
-		targeting = setPageLevelTargeting(targeting, slot);
+		// Set custom slot level targeting, if present
+		setCustomSlotLevelTargeting(slot);
 
+		targeting = setPageLevelTargeting(targeting, slot);
 		Object.keys(targeting).forEach(function(key) {
 			//check if any of keys belong to price floor key then set price using granularity function,
 			// so that it can match with price rules on server
