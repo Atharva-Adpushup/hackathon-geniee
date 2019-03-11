@@ -35,7 +35,8 @@ router
 					templates: [],
 					apConfigs: {
 						mode: CC.site.mode.DRAFT,
-						isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP
+						isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP,
+						autoOptimise: false
 					}
 				};
 				return siteModel.saveSiteData(siteId, 'POST', siteData);

@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import Shell from '../Components/Shell/index';
 import { fetchGlobalData } from '../actions/globalActions';
+import { showNotification } from '../actions/uiActions';
 
 const mapStateToProps = (state, ownProps) => {
 	const { user } = state.global;
@@ -12,7 +13,8 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-	fetchGlobalData: () => dispatch(fetchGlobalData())
+	fetchGlobalData: () => dispatch(fetchGlobalData()),
+	showNotification: data => dispatch(showNotification(data))
 });
 
 export default connect(
