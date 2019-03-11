@@ -1,0 +1,210 @@
+{
+	"title": {
+		"text": ""
+	},
+	"subtitle": {
+		"text": ""
+	},
+	"lang": {
+		"thousandsSep": ","
+	},
+	"chart": {
+		"spacingTop": 35,
+		"style": {
+			"fontFamily": "Karla"
+		},
+		"events": {}
+	},
+	"legend": {
+		"enabled": false
+	},
+	"tooltip": {
+		"shared": true
+	},
+	"colors": [
+		"#d9d332",
+		"#d97f3e",
+		"#50a4e2",
+		"#2e3b7c",
+		"#bf4b9b",
+		"#4eba6e",
+		"#eb575c",
+		"#ca29f3"
+	],
+	"credits": {
+		"enabled": false
+	},
+	"plotOptions": {
+		"line": {
+			"animation": false
+		}
+	},
+	"yAxis": [
+		{
+			"title": {
+				"text": "Pageviews"
+			},
+			"index": 0,
+			"min": 10000,
+			"max": 500000
+		},
+		{
+			"title": {
+				"text": "Page CPM ($)"
+			},
+			"opposite": true,
+			"index": 1
+		},
+		{
+			"title": {
+				"text": "Adpushup Requests"
+			},
+			"opposite": true,
+			"index": 2
+		},
+		{
+			"title": {
+				"text": "Impressions"
+			},
+			"opposite": true,
+			"index": 3
+		},
+		{
+			"title": {
+				"text": "CPM ($)"
+			},
+			"opposite": true,
+			"index": 4
+		},
+		{
+			"title": {
+				"text": "Revenue ($)"
+			},
+			"opposite": true,
+			"index": 5
+		},
+		{
+			"title": {
+				"text": "Gross Revenue ($)"
+			},
+			"opposite": true,
+			"index": 6
+		},
+		{
+			"title": {
+				"text": "Xpath Miss"
+			},
+			"opposite": true,
+			"index": 7
+		}
+	],
+	"xAxis": {
+		"categories": [
+			"28-02-2019",
+			"01-03-2019",
+			"02-03-2019",
+			"03-03-2019",
+			"04-03-2019",
+			"05-03-2019",
+			"06-03-2019"
+		]
+	},
+	"series": [
+		{
+			"lineWidth": 1.5,
+			"marker": {
+				"symbol": "circle",
+				"radius": 3.2
+			},
+			"data": [117703, 99286, 97314, 102554, 106781, 106772, 101014],
+			"yAxis": 0,
+			"visible": false,
+			"name": "Pageviews",
+			"_colorIndex": 0
+		},
+		{
+			"lineWidth": 1.5,
+			"marker": {
+				"symbol": "circle",
+				"radius": 3.2
+			},
+			"data": [17.48, 18.43, 19.15, 19.31, 19.69, 19.4, 17.15],
+			"yAxis": 1,
+			"visible": false,
+			"name": "Page CPM ($)",
+			"_colorIndex": 1
+		},
+		{
+			"lineWidth": 1.5,
+			"marker": {
+				"symbol": "circle",
+				"radius": 3.2
+			},
+			"data": [405054, 342328, 335528, 353812, 377393, 382559, 373103],
+			"yAxis": 2,
+			"visible": false,
+			"name": "Adpushup Requests",
+			"_colorIndex": 2
+		},
+		{
+			"lineWidth": 1.5,
+			"marker": {
+				"symbol": "circle",
+				"radius": 3.2
+			},
+			"data": [362783, 320970, 323839, 356634, 363562, 363969, 311580],
+			"yAxis": 3,
+			"visible": true,
+			"name": "Impressions",
+			"_colorIndex": 3
+		},
+		{
+			"lineWidth": 1.5,
+			"marker": {
+				"symbol": "circle",
+				"radius": 3.2
+			},
+			"data": [5.67, 5.7, 5.75, 5.55, 5.78, 5.69, 5.56],
+			"yAxis": 4,
+			"visible": true,
+			"name": "CPM ($)",
+			"_colorIndex": 4
+		},
+		{
+			"lineWidth": 1.5,
+			"marker": {
+				"symbol": "circle",
+				"radius": 3.2
+			},
+			"data": [2057.34, 1829.81, 1863.45, 1980.61, 2102.11, 2071.15, 1732.37],
+			"yAxis": 5,
+			"visible": false,
+			"name": "Revenue ($)",
+			"_colorIndex": 5
+		},
+		{
+			"lineWidth": 1.5,
+			"marker": {
+				"symbol": "circle",
+				"radius": 3.2
+			},
+			"data": [2088.07, 1856.32, 1888.63, 2005.31, 2127.76, 2095.51, 1732.37],
+			"yAxis": 6,
+			"visible": false,
+			"name": "Gross Revenue ($)",
+			"_colorIndex": 6
+		},
+		{
+			"lineWidth": 1.5,
+			"marker": {
+				"symbol": "circle",
+				"radius": 3.2
+			},
+			"data": [17725, 15140, 14311, 14775, 17619, 17377, 17108],
+			"yAxis": 7,
+			"visible": false,
+			"name": "Xpath Miss",
+			"_colorIndex": 7
+		}
+	]
+}

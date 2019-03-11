@@ -1,0 +1,15 @@
+.chart-legend {
+	background-color: #fafafa;
+	border: 2px solid #eee;
+}
+
+.legend-item {
+	padding: 15px 0;
+	cursor: pointer;
+	color: silver;
+}
+
+.active-legend-item {
+	margin-bottom: -2px;
+	color: #555;
+}
