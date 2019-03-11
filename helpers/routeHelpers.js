@@ -225,7 +225,7 @@ function fetchStatusesFromReporting(site) {
 			return output;
 		})
 		.catch(err => {
-			console.log(err);
+			console.log(err.message);
 			return DEFAULT_APP_STATUS_RESPONSE;
 		});
 }
