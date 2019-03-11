@@ -117,8 +117,12 @@ const SIZES = {
 		MOBILE: ['320x50', '300x250', '250x250', '200x200', '320x100', '336x280']
 	}
 };
-const DISPLAY_AD_MESSAGE =
-	'<div>You need to copy and paste the above adcode on your site where you wish to show the ad. <div style="font-size: 16px;" class="u-text-red u-text-bold u-margin-t3">If you are creating the ads for the first time, please wait for 24-48 hours for our operations team to review and approve the website. You\'ll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</div></div>';
+
+const DISPLAY_AD_MESSAGE = `<ol style="font-size: 15px;">
+	<li style="margin-bottom: 10px;"><a href="/sites/__SITE_ID__/settings">AdPushup head code</a> needs to be present in the global head of your website.</li>
+	<li style="margin-bottom: 10px;"><a href="/adsTxtManagement">Ads.txt</a>  is mandatory. It needs to be updated incase you already have one. Else please follow the instructions provided here: <a href="https://support.google.com/admanager/answer/7441288?hl=en" target="_blank">https://support.google.com/admanager/answer/7441288?hl=en</a>. AdPushup's ads.txt should be appended alongside your existing partners.</li>
+	<li style="margin-bottom: 10px;" class="u-text-red u-text-bold">Please wait for 24-48 working hours for our operations team to review and approve the website. You'll start seeing the ads after our confirmation mail on the registered email ID. For any query please write to us at support@adpushup.com</li>
+</ol>`;
 const AMP_MESSAGE =
 	'AMP adcode will be sent to your registered e-mail address by your account manager';
 const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad">

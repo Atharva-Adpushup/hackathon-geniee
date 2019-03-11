@@ -66,9 +66,9 @@ const fn = {
 		const key = `${docKeys.apTag}${siteId}`;
 		return !cas ? fn.getAndUpdate(key, value, adId) : fn.directDBUpdate(key, value, cas, adId);
 	},
-	adUpdateProcessing: (req, res, processing) =>
+	adUpdateProcessing: (req, res, key, processing) =>
 		appBucket
-			.getDoc(`${docKeys.apTag}${req.body.siteId}`)
+			.getDoc(`${key}${req.body.siteId}`)
 			.then(docWithCas => processing(docWithCas))
 			.then(() => emitEventAndSendResponse(req.body.siteId, res))
 			.catch(err => errorHander(err, res))

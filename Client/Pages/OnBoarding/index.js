@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
+import { Helmet } from 'react-helmet';
 import siteService from '../../services/siteService';
 
 import history from '../../helpers/history';
@@ -64,14 +65,20 @@ class OnBoarding extends Component {
 	render() {
 		const { isOnboarding, siteId, existingSite, site, onboardingStage, step } = this.state;
 		return (
-			<OnboardingWrap
-				isOnboarding={isOnboarding}
-				siteId={siteId}
-				existingSite={existingSite}
-				site={site}
-				onboardingStage={onboardingStage}
-				step={step}
-			/>
+			<Fragment>
+				<Helmet>
+					<title>Onboarding</title>
+				</Helmet>
+
+				<OnboardingWrap
+					isOnboarding={isOnboarding}
+					siteId={siteId}
+					existingSite={existingSite}
+					site={site}
+					onboardingStage={onboardingStage}
+					step={step}
+				/>
+			</Fragment>
 		);
 	}
 }

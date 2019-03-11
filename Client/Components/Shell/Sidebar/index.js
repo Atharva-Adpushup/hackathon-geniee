@@ -20,7 +20,7 @@ const Sidebar = ({ show }) => {
 
 		if (showTooltip) {
 			const tooltip = (
-				<Tooltip id={`${name.slice(0, 1)}tooltip`}>
+				<Tooltip id={`${link.slice(1)}tooltip`} className="u-padding-v2 u-padding-h2">
 					<strong>{tooltipText || name}</strong>
 				</Tooltip>
 			);
