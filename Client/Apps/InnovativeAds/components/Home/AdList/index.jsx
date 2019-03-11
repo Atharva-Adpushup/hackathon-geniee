@@ -208,7 +208,7 @@ class AdList extends Component {
 
 		if (loading) {
 			return (
-				<div style={{ height: '600px' }}>
+				<div style={{ position: 'relative', minHeight: '200px' }}>
 					<Loader />
 				</div>
 			);
