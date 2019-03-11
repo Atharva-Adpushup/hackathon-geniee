@@ -63,7 +63,7 @@ class Home extends Component {
 				{this.renderContent()}
 				<h4 className="u-padding-h4 u-margin-t3 u-margin-b4 u-text-bold">
 					To visit Visual Editor, please click here
-					<a target="_blank" rel="noopener noreferrer" href="//localhost:8080/ap-layout/editor">
+					<a target="_blank" rel="noopener noreferrer" href="/ap-layout/editor">
 						<FontAwesomeIcon icon="external-link-alt" className="u-margin-l2" />
 					</a>
 				</h4>
