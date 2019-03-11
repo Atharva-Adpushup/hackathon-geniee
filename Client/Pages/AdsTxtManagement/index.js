@@ -1,21 +1,23 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
+import { Helmet } from 'react-helmet';
 import Promise from 'bluebird';
-import ActionCard from '../../Components/ActionCard/index';
 import { FormControl, Alert, Table, Button, Modal, Nav, NavItem } from 'react-bootstrap';
+import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
+import ActionCard from '../../Components/ActionCard/index';
 import proxyService from '../../services/proxyService';
 import { showNotification } from '../../actions/uiActions';
 import Loader from '../../Components/Loader/index';
-import { connect } from 'react-redux';
 import { ADSTXT_SITE_LIST_HEADERS, ADSTXT_STATUS } from '../../constants/others';
 import CustomButton from '../../Components/CustomButton';
 import { copyToClipBoard } from '../../Apps/ApTag/lib/helpers';
 import SendCodeByEmailModal from '../../Components/SendCodeByEmailModal';
-import { Redirect } from 'react-router-dom';
 import {
 	ADSTXT_NAV_ITEMS,
 	ADSTXT_NAV_ITEMS_INDEXES,
 	ADSTXT_NAV_ITEMS_VALUES
 } from './configs/commonConsts';
+
 class AdsTxtManager extends Component {
 	state = {
 		adsTxtSnippet: '',
@@ -26,6 +28,7 @@ class AdsTxtManager extends Component {
 		showSendCodeByEmailModal: false,
 		redirectUrl: ''
 	};
+
 	componentDidMount() {
 		Promise.all([proxyService.getAdsTxt(), this.getSitesAdstxtStatus()])
 			.spread((res, sites) => {
@@ -46,11 +49,12 @@ class AdsTxtManager extends Component {
 				});
 			});
 	}
+
 	getSitesAdstxtStatus = () => {
 		const { sites } = this.props;
 		console.log(sites);
-		return Promise.map(Object.keys(sites), site => {
-			return proxyService
+		return Promise.map(Object.keys(sites), site =>
+			proxyService
 				.verifyAdsTxtCode(sites[site].siteDomain)
 				.then(res => {
 					console.log(res);
@@ -61,13 +65,11 @@ class AdsTxtManager extends Component {
 							adsTxt: res.data.ourAdsTxt
 						};
 				})
-				.catch(res => {
-					return {
-						domain: sites[site].siteDomain,
-						status: 3
-					};
-				});
-		});
+				.catch(res => ({
+					domain: sites[site].siteDomain,
+					status: 3
+				}))
+		);
 	};
 
 	renderLoader = () => (
@@ -75,6 +77,7 @@ class AdsTxtManager extends Component {
 			<Loader />
 		</div>
 	);
+
 	handleClose = () => {
 		this.setState({ showModal: false });
 	};
@@ -135,6 +138,7 @@ class AdsTxtManager extends Component {
 			</Modal>
 		);
 	};
+
 	toggleShowSendCodeByEmailModal = () => {
 		this.setState(state => ({ showSendCodeByEmailModal: !state.showSendCodeByEmailModal }));
 	};
@@ -269,6 +273,7 @@ class AdsTxtManager extends Component {
 				return this.renderSnippetTextarea();
 		}
 	};
+
 	getActiveTab = () => {
 		const {
 			customProps: { activeTab }
@@ -287,39 +292,45 @@ class AdsTxtManager extends Component {
 			return <Redirect to={{ pathname: redirectUrl }} />;
 		}
 		return (
-			<ActionCard title="Ads.txt Manager">
-				{this.renderModal()}
-				{isLoading ? (
-					this.renderLoader()
-				) : (
-					<div>
-						<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-							<NavItem eventKey={1}>{ADSTXT_NAV_ITEMS_VALUES.AUTHENTICATOR}</NavItem>
-							<NavItem eventKey={2}>{ADSTXT_NAV_ITEMS_VALUES.ENTRIES}</NavItem>
-						</Nav>
-						{this.renderContent()}
-						<Alert bsStyle="warning" className="u-margin-4">
-							<strong>Bonus: </strong> Manage ads.txt for all yourpartners with AdPushup&#8217;s{' '}
-							<a className="u-text-underline" href="http://console.adpushup.com/adstxt">
-								ads.txt management solution
-							</a>
-							.
-						</Alert>
-						<Alert bsStyle="warning" className="u-margin-4">
-							<strong>Note: </strong> Ads.txt is mandatory. It needs to be updated incase you
-							already have one. Else please follow the intsructions provided here :{' '}
-							<a
-								className="u-text-underline"
-								href="https://support.google.com/admanager/answer/7441288?hl=en"
-							>
-								https://support.google.com/admanager/answer/7441288?hl=en
-							</a>
-							{'. '}
-							AdPushup&#8217;s ads.txt should be appended alongside your existing partners.
-						</Alert>
-					</div>
-				)}
-			</ActionCard>
+			<Fragment>
+				<Helmet>
+					<title>Ads.txt Management</title>
+				</Helmet>
+
+				<ActionCard title="Ads.txt Manager">
+					{this.renderModal()}
+					{isLoading ? (
+						this.renderLoader()
+					) : (
+						<div>
+							<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
+								<NavItem eventKey={1}>{ADSTXT_NAV_ITEMS_VALUES.AUTHENTICATOR}</NavItem>
+								<NavItem eventKey={2}>{ADSTXT_NAV_ITEMS_VALUES.ENTRIES}</NavItem>
+							</Nav>
+							{this.renderContent()}
+							<Alert bsStyle="warning" className="u-margin-4">
+								<strong>Bonus: </strong> Manage ads.txt for all yourpartners with AdPushup&#8217;s{' '}
+								<a className="u-text-underline" href="http://console.adpushup.com/adstxt">
+									ads.txt management solution
+								</a>
+								.
+							</Alert>
+							<Alert bsStyle="warning" className="u-margin-4">
+								<strong>Note: </strong> Ads.txt is mandatory. It needs to be updated incase you
+								already have one. Else please follow the intsructions provided here :{' '}
+								<a
+									className="u-text-underline"
+									href="https://support.google.com/admanager/answer/7441288?hl=en"
+								>
+									https://support.google.com/admanager/answer/7441288?hl=en
+								</a>
+								{'. '}
+								AdPushup&#8217;s ads.txt should be appended alongside your existing partners.
+							</Alert>
+						</div>
+					)}
+				</ActionCard>
+			</Fragment>
 		);
 	}
 }

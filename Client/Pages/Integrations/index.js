@@ -1,13 +1,14 @@
 import React, { Fragment } from 'react';
 import { Helmet } from 'react-helmet';
 
-const PaymentSettings = () => (
+const Integrations = () => (
 	<Fragment>
 		<Helmet>
-			<title>Payment Settings</title>
+			<title>Integrations</title>
 		</Helmet>
-		<div>PaymentSettings</div>
+
+		<div>Integrations</div>
 	</Fragment>
 );
 
-export default PaymentSettings;
+export default Integrations;

@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import history from '../../helpers/history';
@@ -114,57 +115,63 @@ class Login extends Component {
 			isLoggingIn
 		} = this.state;
 		return (
-			<AuthShell>
-				<AuthFormWrap formType="login" onSubmit={this.onSubmit}>
-					<Fragment>
-						{error && <div className="error-message top">{error}</div>}
-						<div className="AuthForm LoginForm u-padding-h4 u-padding-v3">
-							<FormInput
-								type="email"
-								name="email"
-								onChange={this.onChange}
-								onBlur={this.onInputBlur}
-								icon="envelope"
-							/>
-							{emailError && <div className="error-message">{emailError}</div>}
-							<FormInput
-								type="password"
-								name="password"
-								onChange={this.onChange}
-								onBlur={this.onInputBlur}
-								icon="key"
-							/>
-							{passwordError && <div className="error-message">{passwordError}</div>}
-							<div className="form-group">
-								<CustomButton
-									variant="primary"
-									showSpinner={isLoggingIn}
-									type="submit"
-									id="login-submit"
-									className="pull-right"
-								>
-									Login
-								</CustomButton>
-								<Link
-									to="/forgot-password"
-									id="login-forgotPassword-redirect-link"
-									className="forgetPassword"
-								>
-									Forgot Password?
-								</Link>
+			<Fragment>
+				<Helmet>
+					<title>Login</title>
+				</Helmet>
+
+				<AuthShell>
+					<AuthFormWrap formType="login" onSubmit={this.onSubmit}>
+						<Fragment>
+							{error && <div className="error-message top">{error}</div>}
+							<div className="AuthForm LoginForm u-padding-h4 u-padding-v3">
+								<FormInput
+									type="email"
+									name="email"
+									onChange={this.onChange}
+									onBlur={this.onInputBlur}
+									icon="envelope"
+								/>
+								{emailError && <div className="error-message">{emailError}</div>}
+								<FormInput
+									type="password"
+									name="password"
+									onChange={this.onChange}
+									onBlur={this.onInputBlur}
+									icon="key"
+								/>
+								{passwordError && <div className="error-message">{passwordError}</div>}
+								<div className="form-group">
+									<CustomButton
+										variant="primary"
+										showSpinner={isLoggingIn}
+										type="submit"
+										id="login-submit"
+										className="pull-right"
+									>
+										Login
+									</CustomButton>
+									<Link
+										to="/forgot-password"
+										id="login-forgotPassword-redirect-link"
+										className="forgetPassword"
+									>
+										Forgot Password?
+									</Link>
+								</div>
 							</div>
-						</div>
-						<div className="AuthFooter LoginFooter row">
-							<div className="pull-right">
-								Don&apos;t have an account?
-								<Link to="/signup" id="auth-signup-redirect-link" className="btn btn--secondary">
-									Sign up
-								</Link>
+							<div className="AuthFooter LoginFooter row">
+								<div className="pull-right">
+									Don&apos;t have an account?
+									<Link to="/signup" id="auth-signup-redirect-link" className="btn btn--secondary">
+										Sign up
+									</Link>
+								</div>
 							</div>
-						</div>
-					</Fragment>
-				</AuthFormWrap>
-			</AuthShell>
+						</Fragment>
+					</AuthFormWrap>
+				</AuthShell>
+			</Fragment>
 		);
 	}
 }
