@@ -15,14 +15,14 @@ class VerifyInitCodeOnboarding extends Component {
 
 	verify = () => {
 		const { siteId, site, onComplete } = this.props;
-
+		console.log(site, siteId);
 		this.setState({ verifyingInitCode: true });
 
 		const onboardingStage = 'onboarding';
 		const step = 2;
 		let success;
 		proxyService
-			.verifyApCode(site)
+			.verifyApCode(site, siteId)
 			.then(resp => {
 				({ success } = resp.data);
 

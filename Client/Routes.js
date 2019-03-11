@@ -22,7 +22,9 @@ import ResetPassword from './Pages/ResetPassword';
 const Dashboard = lazy(() => import(/* webpackChunkName: "dashboard" */ './Pages/Dashboard'));
 const Sites = lazy(() => import(/* webpackChunkName: "sites" */ './Pages/Sites'));
 const Reporting = lazy(() => import(/* webpackChunkName: "reporting" */ './Pages/Reporting'));
-const ByodPanel = lazy(() => import(/* webpackChunkName: "byodPanel" */ './Pages/ByodPanel'));
+const Integrations = lazy(() =>
+	import(/* webpackChunkName: "integrations" */ './Pages/Integrations')
+);
 const AdsTxtManagement = lazy(() =>
 	import(/* webpackChunkName: "adsTxtManagement" */ './Pages/AdsTxtManagement')
 );
@@ -35,7 +37,7 @@ const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
 );
 const ManageSite = lazy(() =>
-	import(/* webpackChunkName: "innovativeAds" */ './Pages/ManageSite/index')
+	import(/* webpackChunkName: "manageSite" */ './Pages/ManageSite/index')
 );
 const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/ErrorPage/index'));
 const OnBoarding = lazy(() => import(/* webpackChunkName: "onBoarding" */ './Pages/OnBoarding'));
@@ -126,7 +128,7 @@ const UserRoutes = () => (
 					<PrivateRoute exact name="Reporting" path="/reporting" component={Reporting} />
 					<PrivateRoute exact name=":siteId" path="/reporting/:siteId" component={Reporting} />
 
-					<PrivateRoute exact name="ByodPanel" path="/byodPanel" component={ByodPanel} />
+					<PrivateRoute exact name="Integrations" path="/integrations" component={Integrations} />
 					<PrivateRoute
 						exact
 						name="AdsTxt Authenticator"
