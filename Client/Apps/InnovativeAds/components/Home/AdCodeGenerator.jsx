@@ -316,12 +316,13 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderGeneratedAdcode() {
+		const { match } = this.props;
 		return (
 			<Col xs={12}>
 				<CustomMessage
 					header="Ad Creation Successful. Please ensure the following"
 					type="info"
-					message={displayAdMessage}
+					message={displayAdMessage.replace(/__SITE_ID__/gi, match.params.siteId)}
 				/>
 				<CustomButton
 					variant="primary"

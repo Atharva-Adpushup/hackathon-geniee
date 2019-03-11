@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { hideNotification } from '../actions/uiActions';
+import { hideNotification, showNotification } from '../actions/uiActions';
 import Notification from '../Components/Notification/index';
 
 const mapStateToProps = state => {
@@ -14,6 +14,7 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => ({
+	showNotification: () => dispatch(showNotification()),
 	hideNotification: () => dispatch(hideNotification())
 });
 
