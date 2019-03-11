@@ -30,7 +30,16 @@ class PagegroupTrafficEdit extends Component {
 	}
 
 	render() {
-		const { ad, updateTraffic, updateWrapper, onCancel, isSuperUser, meta, channels } = this.props;
+		const {
+			ad,
+			updateTraffic,
+			updateWrapper,
+			onCancel,
+			isSuperUser,
+			meta,
+			channels,
+			match
+		} = this.props;
 		const { pagegroups } = this.state;
 
 		const { filteredPagegroupsByPlatform, disabled } = pagegroupFiltering(
@@ -62,6 +71,7 @@ class PagegroupTrafficEdit extends Component {
 							if (ad.isActive) {
 								updateTraffic(
 									ad.id,
+									match.params.siteId,
 									{
 										platform: ad.formatData.platform,
 										format: ad.formatData.format,
