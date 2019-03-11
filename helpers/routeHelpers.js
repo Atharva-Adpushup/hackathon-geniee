@@ -48,6 +48,7 @@ function verifyOwner(siteId, userEmail) {
 function errorHander(err, res, code = HTTP_STATUS.BAD_REQUEST) {
 	const customMessage = err.message || err;
 	const errorCode = customMessage.code || code;
+	console.log(err);
 	return sendErrorResponse({ message: 'Opertion Failed' }, res, errorCode);
 }
 
