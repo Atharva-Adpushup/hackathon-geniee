@@ -173,7 +173,7 @@ function masterSave(req, res, adUpdateProcessing, directDBUpdate, docKey, mode =
 	});
 }
 
-function modifyAd(req, res, adUpdateProcessing, directDBUpdate) {
+function modifyAd(req, res, adUpdateProcessing, directDBUpdate, key) {
 	if (!req.body || !req.body.siteId || !req.body.adId) {
 		return sendErrorResponse(
 			{
@@ -182,7 +182,7 @@ function modifyAd(req, res, adUpdateProcessing, directDBUpdate) {
 			res
 		);
 	}
-	return adUpdateProcessing(req, res, docWithCas => {
+	return adUpdateProcessing(req, res, key, docWithCas => {
 		const doc = docWithCas.value;
 		if (doc.ownerEmail !== req.user.email) {
 			throw new AdPushupError({
@@ -200,7 +200,7 @@ function modifyAd(req, res, adUpdateProcessing, directDBUpdate) {
 			const { mode, logs } = req.body.metaUpdate;
 			doc.meta[mode] = logs;
 		}
-		return directDBUpdate(`${docKeys.interactiveAds}${req.body.siteId}`, doc, docWithCas.cas);
+		return directDBUpdate(`${key}${req.body.siteId}`, doc, docWithCas.cas);
 	});
 }
 
