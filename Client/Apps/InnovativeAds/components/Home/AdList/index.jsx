@@ -233,7 +233,7 @@ class AdList extends Component {
 					</thead>
 					<tbody>
 						{adsToRender.map(ad =>
-							ad.isActive || user.isSuperUser ? (
+							// ad.isActive || user.isSuperUser ? (
 								<AdElement
 									key={`adElement-${ad.id}`}
 									identifier={ad.id}
@@ -249,7 +249,7 @@ class AdList extends Component {
 									updateTraffic={updateTraffic}
 									match={match}
 								/>
-							) : null
+							// ) : null
 						)}
 					</tbody>
 				</Table>

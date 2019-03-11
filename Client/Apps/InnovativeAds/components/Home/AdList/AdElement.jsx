@@ -76,7 +76,10 @@ class AdElement extends Component {
 						{
 							isActive: !isActive
 						},
-						() => window.alert('Kindly, do not forget to do Master Save to presist this change.')
+						() => {
+							if (user.isSuperUser)
+								window.alert('Kindly, do not forget to do Master Save to presist this change.');
+						}
 					);
 				}
 				return true;
