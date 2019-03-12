@@ -1,87 +1,81 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { NavLink } from 'react-router-dom';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
-const Sidebar = ({ show }) => (
-	<aside className={`sidebar ${show ? 'sb-show' : 'sb-hide'}`}>
-		<ul className="sb-nav primary-nav">
-			<NavLink to="/dashboard" className="clearfix" activeClassName="active">
+const Sidebar = ({ show }) => {
+	const getNavItem = (name, link, icon, showTooltip, tooltipText) => {
+		const navItem = (
+			<NavLink to={link} className="clearfix" activeClassName="active">
 				<li>
 					<span className="link-text-wrap">
-						<span className="link-text">Dashboard</span>
+						<span className="link-text">{name}</span>
 					</span>
 					<span className="sb-nav-icon-wrap">
-						<FontAwesomeIcon icon="tachometer-alt" className="sb-nav-icon" />
+						<FontAwesomeIcon icon={icon} className="sb-nav-icon" />
 					</span>
 				</li>
 			</NavLink>
+		);
 
-			<NavLink to="/sites" className="clearfix" activeClassName="active">
-				<li>
-					<span className="link-text-wrap">
-						<span className="link-text">My Sites</span>
-					</span>
-					<span className="sb-nav-icon-wrap">
-						<FontAwesomeIcon icon="list" className="sb-nav-icon" />
-					</span>
-				</li>
-			</NavLink>
+		if (showTooltip) {
+			const tooltip = (
+				<Tooltip id={`${link.slice(1)}tooltip`} className="u-padding-v2 u-padding-h2">
+					<strong>{tooltipText || name}</strong>
+				</Tooltip>
+			);
 
-			<NavLink to="/reporting" className="clearfix" activeClassName="active">
-				<li>
-					<span className="link-text-wrap">
-						<span className="link-text">Reporting</span>
-					</span>
-					<span className="sb-nav-icon-wrap">
-						<FontAwesomeIcon icon="chart-area" className="sb-nav-icon" />
-					</span>
-				</li>
-			</NavLink>
+			return (
+				<OverlayTrigger placement="right" overlay={tooltip}>
+					{navItem}
+				</OverlayTrigger>
+			);
+		}
 
-			<NavLink to="/byodPanel" className="clearfix" activeClassName="active">
-				<li>
-					<span className="link-text-wrap">
-						<span className="link-text">BYOD Panel</span>
-					</span>
-					<span className="sb-nav-icon-wrap">
-						<FontAwesomeIcon icon="desktop" className="sb-nav-icon" />
-					</span>
-				</li>
-			</NavLink>
-		</ul>
+		return navItem;
+	};
 
-		<div className="cta-btn-wrap">
-			<NavLink to="/addSite" className="cta-btn" activeClassName="active">
-				<span className="cta-btn-txt-wrap">
-					<span className="cta-btn-text">Add New Website</span>
-				</span>
-				<FontAwesomeIcon icon="plus" className="cta-btn-icon" />
-			</NavLink>
-		</div>
+	const ctaBtn = (
+		<NavLink to="/addSite" className="cta-btn" activeClassName="active">
+			<span className="cta-btn-txt-wrap">
+				<span className="cta-btn-text">Add New Website</span>
+			</span>
+			<FontAwesomeIcon icon="plus" className="cta-btn-icon" />
+		</NavLink>
+	);
 
-		<ul className="sb-nav secondary-nav">
-			<NavLink to="/adsTxtManagement" className="clearfix" activeClassName="active">
-				<li>
-					<span className="link-text-wrap">
-						<span className="link-text">Ads.txt Management</span>
-					</span>
-					<span className="sb-nav-icon-wrap">
-						<FontAwesomeIcon icon="align-center" className="sb-nav-icon" />
-					</span>
-				</li>
-			</NavLink>
-			<NavLink to="/payment" className="clearfix" activeClassName="active">
-				<li>
-					<span className="link-text-wrap">
-						<span className="link-text">Payments</span>
-					</span>
-					<span className="sb-nav-icon-wrap">
-						<FontAwesomeIcon icon="dollar-sign" className="sb-nav-icon" />
-					</span>
-				</li>
-			</NavLink>
-		</ul>
-	</aside>
-);
+	return (
+		<aside className={`sidebar ${show ? 'sb-show' : 'sb-hide'}`}>
+			<ul className="sb-nav primary-nav">
+				{getNavItem('Dashboard', '/dashboard', 'tachometer-alt', !show)}
+				{getNavItem('My Sites', '/sites', 'list', !show)}
+				{getNavItem('Reporting', '/reporting', 'chart-area', !show)}
+				{getNavItem('Integrations', '/integrations', 'desktop', !show)}
+			</ul>
+
+			<div className="cta-btn-wrap">
+				{show ? (
+					ctaBtn
+				) : (
+					<OverlayTrigger
+						placement="right"
+						overlay={
+							<Tooltip id="addSiteTooltip">
+								<strong>Add New Website</strong>
+							</Tooltip>
+						}
+					>
+						{ctaBtn}
+					</OverlayTrigger>
+				)}
+			</div>
+
+			<ul className="sb-nav secondary-nav">
+				{getNavItem('Ads.txt Management', '/adsTxtManagement', 'align-center', !show)}
+				{getNavItem('Payments', '/payment', 'dollar-sign', !show)}
+			</ul>
+		</aside>
+	);
+};
 
 export default Sidebar;

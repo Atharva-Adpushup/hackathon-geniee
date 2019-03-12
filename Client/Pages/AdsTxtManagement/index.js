@@ -1,17 +1,18 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
+import { Helmet } from 'react-helmet';
 import Promise from 'bluebird';
+import { FormControl, Col, Alert, Table, Button, Modal, Nav, NavItem } from 'react-bootstrap';
+import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import ActionCard from '../../Components/ActionCard/index';
-import { Col, Alert, Table, Button, Modal, Nav, NavItem } from 'react-bootstrap';
 import proxyService from '../../services/proxyService';
 import { showNotification } from '../../actions/uiActions';
 import Loader from '../../Components/Loader/index';
-import { connect } from 'react-redux';
 import { ADSTXT_SITE_LIST_HEADERS, ADSTXT_STATUS } from '../../constants/others';
 import CustomButton from '../../Components/CustomButton';
 import CustomMessage from '../../Components/CustomMessage/index';
 import { copyToClipBoard } from '../../Apps/ApTag/lib/helpers';
 import SendCodeByEmailModal from '../../Components/SendCodeByEmailModal';
-import { Redirect } from 'react-router-dom';
 import {
 	ADSTXT_NAV_ITEMS,
 	ADSTXT_NAV_ITEMS_INDEXES,
@@ -19,6 +20,7 @@ import {
 	BONUS_MESSAGE,
 	NOTE_MESSAGE
 } from './configs/commonConsts';
+
 class AdsTxtManager extends Component {
 	state = {
 		adsTxtSnippet: '',
@@ -29,6 +31,7 @@ class AdsTxtManager extends Component {
 		showSendCodeByEmailModal: false,
 		redirectUrl: ''
 	};
+
 	componentDidMount() {
 		Promise.all([proxyService.getAdsTxt(), this.getSitesAdstxtStatus()]).spread((res, sites) => {
 			let adsTxtSnippet = '';
@@ -40,11 +43,12 @@ class AdsTxtManager extends Component {
 			});
 		});
 	}
+
 	getSitesAdstxtStatus = () => {
 		const { sites } = this.props;
 		console.log(sites);
-		return Promise.map(Object.keys(sites), site => {
-			return proxyService
+		return Promise.map(Object.keys(sites), site =>
+			proxyService
 				.verifyAdsTxtCode(sites[site].siteDomain)
 				.then(res => {
 					console.log(res);
@@ -61,8 +65,8 @@ class AdsTxtManager extends Component {
 						status: 3,
 						adsTxt: err.response.data.ourAdsTxt
 					};
-				});
-		});
+				})
+		);
 	};
 
 	renderLoader = () => (
@@ -70,6 +74,7 @@ class AdsTxtManager extends Component {
 			<Loader />
 		</div>
 	);
+
 	handleClose = () => {
 		this.setState({ showModal: false });
 	};
@@ -130,6 +135,7 @@ class AdsTxtManager extends Component {
 			</Modal>
 		);
 	};
+
 	toggleShowSendCodeByEmailModal = () => {
 		this.setState(state => ({ showSendCodeByEmailModal: !state.showSendCodeByEmailModal }));
 	};
@@ -264,6 +270,7 @@ class AdsTxtManager extends Component {
 				return this.renderSnippetTextarea();
 		}
 	};
+
 	getActiveTab = () => {
 		const {
 			customProps: { activeTab }
@@ -282,24 +289,30 @@ class AdsTxtManager extends Component {
 			return <Redirect to={{ pathname: redirectUrl }} />;
 		}
 		return (
-			<ActionCard title="Ads.txt Manager">
-				{this.renderModal()}
-				{isLoading ? (
-					this.renderLoader()
-				) : (
-					<div>
-						<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-							<NavItem eventKey={1}>{ADSTXT_NAV_ITEMS_VALUES.AUTHENTICATOR}</NavItem>
-							<NavItem eventKey={2}>{ADSTXT_NAV_ITEMS_VALUES.ENTRIES}</NavItem>
-						</Nav>
-						{this.renderContent()}
-						<Col xs={12}>
-							<CustomMessage header="Bonus" type="info" message={BONUS_MESSAGE} />
-							<CustomMessage header="Note" type="info" message={NOTE_MESSAGE} />
-						</Col>
-					</div>
-				)}
-			</ActionCard>
+			<Fragment>
+				<Helmet>
+					<title>Ads.txt Management</title>
+				</Helmet>
+
+				<ActionCard title="Ads.txt Manager">
+					{this.renderModal()}
+					{isLoading ? (
+						this.renderLoader()
+					) : (
+						<div>
+							<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
+								<NavItem eventKey={1}>{ADSTXT_NAV_ITEMS_VALUES.AUTHENTICATOR}</NavItem>
+								<NavItem eventKey={2}>{ADSTXT_NAV_ITEMS_VALUES.ENTRIES}</NavItem>
+							</Nav>
+							{this.renderContent()}
+							<Col xs={12}>
+								<CustomMessage header="Bonus" type="info" message={BONUS_MESSAGE} />
+								<CustomMessage header="Note" type="info" message={NOTE_MESSAGE} />
+							</Col>
+						</div>
+					)}
+				</ActionCard>
+			</Fragment>
 		);
 	}
 }
