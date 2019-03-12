@@ -116,7 +116,7 @@ Consumer.prototype.sendMail = function(data) {
 };
 
 Consumer.prototype.acknowledge = function(msg) {
-	if (this.negCounter && this.negCounter % 3 == 0) {
+	if (this.negCounter && this.negCounter % 2 == 0) {
 		this.sendMail({
 			header: this.config.mail.ack.header,
 			content: this.config.mail.ack.content,
@@ -128,7 +128,7 @@ Consumer.prototype.acknowledge = function(msg) {
 };
 
 Consumer.prototype.reject = function(msg) {
-	if (this.negCounter && this.negCounter % 3 == 0 && this.negCounter < 50) {
+	if (this.negCounter && this.negCounter % 2 == 0 && this.negCounter < 50) {
 		this.sendMail({
 			header: this.config.mail.nack.header,
 			content: this.config.mail.nack.content,
