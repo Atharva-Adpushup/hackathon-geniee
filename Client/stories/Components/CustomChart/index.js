@@ -74,7 +74,12 @@ CustomChart.propTypes = {
 	title: PropTypes.string,
 	type: PropTypes.oneOf(['line', 'pie']),
 	config: PropTypes.object.isRequired,
-	yAxisGroups: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)).isRequired,
+	yAxisGroups: PropTypes.arrayOf(
+		PropTypes.shape({
+			seriesNames: PropTypes.arrayOf(PropTypes.string).isRequired,
+			yAxisConfig: PropTypes.object
+		})
+	),
 	activeLegendItems: PropTypes.arrayOf(PropTypes.string),
 	containerClass: PropTypes.string
 };
@@ -82,6 +87,7 @@ CustomChart.propTypes = {
 CustomChart.defaultProps = {
 	title: 'Custom Chart',
 	type: 'line',
+	yAxisGroups: [],
 	activeLegendItems: [],
 	containerClass: ''
 };

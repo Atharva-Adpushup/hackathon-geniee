@@ -129,33 +129,36 @@ export function getCustomChartConfig(title, type, config, yAxisGroups, activeLeg
 				for (i = 0; i < len1; i += 1) {
 					const yAxisGroup = yAxisGroups[i];
 					const yAxisGroupNameArray = [];
-					const yAxisGroupForChart = {};
+					let yAxisGroupForChart = {};
 
-					let j;
-					const len2 = yAxisGroup.length;
-					for (j = 0; j < len2; j += 1) {
-						const yAxisGroupSeriesName = yAxisGroup[j];
-						const { series } = chartConfig;
-						const index = series.findIndex(
-							singleSeries => singleSeries.name === yAxisGroupSeriesName
-						);
+					if (yAxisGroup.seriesNames && yAxisGroup.seriesNames.length) {
+						let j;
+						const len2 = yAxisGroup.seriesNames.length;
 
-						if (index !== -1) {
-							yAxisGroupNameArray.push(yAxisGroupSeriesName);
+						for (j = 0; j < len2; j += 1) {
+							const yAxisGroupSeriesName = yAxisGroup.seriesNames[j];
+							const { series } = chartConfig;
+							const index = series.findIndex(
+								singleSeries => singleSeries.name === yAxisGroupSeriesName
+							);
 
-							const singleSeries = {
-								lineWidth: 1.5,
-								marker: {
-									symbol: 'circle',
-									radius: 3.2
-								},
-								_colorIndex: colorIndex,
-								...series[index],
-								yAxis: i
-							};
-							seriesForChart.push(singleSeries);
+							if (index !== -1) {
+								yAxisGroupNameArray.push(yAxisGroupSeriesName);
 
-							colorIndex += 1;
+								const singleSeries = {
+									lineWidth: 1.5,
+									marker: {
+										symbol: 'circle',
+										radius: 3.2
+									},
+									_colorIndex: colorIndex,
+									...series[index],
+									yAxis: i
+								};
+								seriesForChart.push(singleSeries);
+
+								colorIndex += 1;
+							}
 						}
 					}
 
@@ -164,6 +167,13 @@ export function getCustomChartConfig(title, type, config, yAxisGroups, activeLeg
 						yAxisGroupForChart.tickPositioner = tickPositioner;
 						yAxisGroupForChart.index = i;
 						yAxisGroupForChart.opposite = i > 0;
+
+						if (yAxisGroup.yAxisConfig) {
+							yAxisGroupForChart = {
+								...yAxisGroupForChart,
+								...yAxisGroup.yAxisConfig
+							};
+						}
 
 						yAxis.push(yAxisGroupForChart);
 					}

@@ -14,7 +14,7 @@ const ChartLegend = ({ chart: { series }, activeLegendItems }) => (
 );
 
 ChartLegend.propTypes = {
-	chart: PropTypes.object.isRequired,
+	chart: PropTypes.shape({ series: PropTypes.arrayOf(PropTypes.object).isRequired }).isRequired,
 	activeLegendItems: PropTypes.arrayOf(PropTypes.string).isRequired
 };
 
