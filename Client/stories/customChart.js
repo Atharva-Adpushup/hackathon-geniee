@@ -20,9 +20,25 @@ storiesOf('UI.CustomChart', module)
 		const config = object('Config', apLineChartConfig);
 		const activeLegendItems = array('Active Legend Items', ['Impressions', 'Pageviews', 'CPM ($)']);
 		const yAxisGroups = array('yAxis Groups', [
-			['Pageviews', 'Adpushup Requests', 'Impressions', 'Xpath Miss'],
-			['Page CPM ($)', 'CPM ($)'],
-			['Revenue ($)', 'Gross Revenue ($)']
+			{
+				seriesNames: ['Pageviews', 'Adpushup Requests', 'Impressions', 'Xpath Miss']
+			},
+			{
+				seriesNames: ['Page CPM ($)', 'CPM ($)'],
+				yAxisConfig: {
+					labels: {
+						format: '${value}'
+					}
+				}
+			},
+			{
+				seriesNames: ['Revenue ($)', 'Gross Revenue ($)'],
+				yAxisConfig: {
+					labels: {
+						format: '${value}'
+					}
+				}
+			}
 		]);
 
 		return (
