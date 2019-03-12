@@ -26,7 +26,10 @@ function Consumer(config) {
 		}
 
 		return queueInstance
-			.connect(self.config.url, { hearbeat: 20 })
+			.connect(
+				self.config.url,
+				{ hearbeat: 20 }
+			)
 			.then(conn => {
 				conn.on('close', () => {
 					console.log(
@@ -113,7 +116,7 @@ Consumer.prototype.sendMail = function(data) {
 };
 
 Consumer.prototype.acknowledge = function(msg) {
-	if (this.negCounter && this.negCounter % 5 == 0) {
+	if (this.negCounter && this.negCounter % 2 == 0) {
 		this.sendMail({
 			header: this.config.mail.ack.header,
 			content: this.config.mail.ack.content,
@@ -125,7 +128,7 @@ Consumer.prototype.acknowledge = function(msg) {
 };
 
 Consumer.prototype.reject = function(msg) {
-	if (this.negCounter && this.negCounter % 5 == 0 && this.negCounter < 50) {
+	if (this.negCounter && this.negCounter % 2 == 0 && this.negCounter < 50) {
 		this.sendMail({
 			header: this.config.mail.nack.header,
 			content: this.config.mail.nack.content,
