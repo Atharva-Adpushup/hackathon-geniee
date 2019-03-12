@@ -129,13 +129,11 @@ class SiteSettings extends Component {
 		return (
 			<div className="clearfix">
 				<h4 className="u-margin-t3 u-margin-b4 u-text-bold">Manage Blocklist</h4>
-				<p className="u-margin-b4">
-					Block AdPushup script <code>adpushup.js</code> on below listed websites
-				</p>
+				<p className="u-margin-b4">Block AdPushup ads on selected URLs of the website</p>
 				<UiList
 					itemCollection={computedBlocklist}
 					emptyCollectionPlaceHolder="No blocklist added"
-					inputPlaceholder="Enter Url or pattern to block. Enter comma separated multiple values"
+					inputPlaceholder="Enter comma separated URLs or URLs pattern to block AdPushup ads"
 					saveButtonText="Save"
 					sticky
 					validate
