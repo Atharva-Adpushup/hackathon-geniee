@@ -4,7 +4,7 @@ var utils = require('../libs/utils'),
 	commonConsts = require('../config/commonConsts'),
 	adCodeGenerator = require('./adCodeGenerator'),
 	adp = window.adpushup,
-	_ = require('lodash'),
+	debounce = require('lodash.debounce'),
 	$ = adp.$,
 	ads = [],
 	inViewAds = [],
@@ -13,8 +13,7 @@ var utils = require('../libs/utils'),
 			var refreshInterval =
 				refreshInterval !== undefined
 					? refreshInterval
-					: parseInt(ad.networkData.refreshInterval) * 1000 ||
-					  commonConsts.AD_REFRESH_INTERVAL;
+					: parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL;
 			var currentTime = new Date().getTime();
 			container.attr('data-refresh-time', currentTime);
 			var oldTimeoutId = container.attr('data-timeout');
@@ -27,18 +26,12 @@ var utils = require('../libs/utils'),
 		if (utils.checkElementInViewPercent(container)) {
 			var currentTime = new Date().getTime();
 			container.attr('data-refresh-time', currentTime);
-			if (
-				ad.network === commonConsts.NETWORKS.ADPTAGS &&
-				!ad.networkData.headerBidding
-			) {
+			if (ad.network === commonConsts.NETWORKS.ADPTAGS && !ad.networkData.headerBidding) {
 				var slot = getAdpSlot(ad);
 				refreshGPTSlot(slot.gSlot);
 				sendFeedback(ad);
 				setRefreshTimeOut(container, ad);
-			} else if (
-				ad.network === commonConsts.NETWORKS.ADPTAGS &&
-				ad.networkData.headerBidding
-			) {
+			} else if (ad.network === commonConsts.NETWORKS.ADPTAGS && ad.networkData.headerBidding) {
 				//container.children().remove();
 				var slot = getAdpSlot(ad);
 				slot.hasRendered = false;
@@ -97,8 +90,7 @@ var utils = require('../libs/utils'),
 	getAllInViewAds = function() {
 		inViewAds = [];
 		for (var i = 0; i < ads.length; i++) {
-			if (utils.checkElementInViewPercent(ads[i].container))
-				inViewAds.push(ads[i]);
+			if (utils.checkElementInViewPercent(ads[i].container)) inViewAds.push(ads[i]);
 		}
 	},
 	onScroll = function() {
@@ -111,9 +103,7 @@ var utils = require('../libs/utils'),
 				adRenderTime = container.attr('data-render-time'),
 				lastRefreshTime = container.attr('data-refresh-time'),
 				currentTime = new Date().getTime(),
-				adRefreshInterval =
-					parseInt(ad.networkData.refreshInterval) * 1000 ||
-					commonConsts.AD_REFRESH_INTERVAL,
+				adRefreshInterval = parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL,
 				timeDifferenceInSec,
 				refreshInterval;
 			if (lastRefreshTime) {
@@ -147,9 +137,7 @@ var utils = require('../libs/utils'),
 				ad = inViewAd.ad,
 				lastRefreshTime = container.attr('data-refresh-time'),
 				currentTime = new Date().getTime(),
-				adRefreshInterval =
-					parseInt(ad.networkData.refreshInterval) * 1000 ||
-					commonConsts.AD_REFRESH_INTERVAL,
+				adRefreshInterval = parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL,
 				timeDifferenceInSec,
 				refreshInterval;
 			if (lastRefreshTime) {
@@ -165,7 +153,7 @@ var utils = require('../libs/utils'),
 		}
 	},
 	init = function() {
-		$(window).on('scroll', _.debounce(onScroll, 50));
+		$(window).on('scroll', debounce(onScroll, 50));
 		$(window).on('focus', onFocus);
 	},
 	refreshSlot = function(container, ad) {
