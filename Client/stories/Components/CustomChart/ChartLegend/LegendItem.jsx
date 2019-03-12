@@ -52,7 +52,7 @@ class LegendItem extends Component {
 
 LegendItem.propTypes = {
 	serie: PropTypes.object.isRequired,
-	activeLegendItems: PropTypes.array.isRequired
+	activeLegendItems: PropTypes.arrayOf(PropTypes.string).isRequired
 };
 
 export default LegendItem;

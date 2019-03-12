@@ -1,6 +1,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import { withKnobs, object, select, text } from '@storybook/addon-knobs';
+import { withKnobs, object, array, select, text } from '@storybook/addon-knobs';
 import CustomChart from './Components/CustomChart';
 
 import defaultPieChartConfig from './customChartDummyData/pie.json';
@@ -18,7 +18,12 @@ storiesOf('UI.CustomChart', module)
 		const title = text('Chart Title', '');
 		const type = select('Chart Type', typeOptions, 'line');
 		const config = object('Config', apLineChartConfig);
-		const activeLegendItems = ['Impressions', 'CPM ($)'];
+		const activeLegendItems = array('Active Legend Items', ['Impressions', 'Pageviews', 'CPM ($)']);
+		const yAxisGroups = array('yAxis Groups', [
+			['Pageviews', 'Adpushup Requests', 'Impressions', 'Xpath Miss'],
+			['Page CPM ($)', 'CPM ($)'],
+			['Revenue ($)', 'Gross Revenue ($)']
+		]);
 
 		return (
 			<div>
@@ -27,6 +32,7 @@ storiesOf('UI.CustomChart', module)
 					type={type}
 					config={config}
 					activeLegendItems={activeLegendItems}
+					yAxisGroups={yAxisGroups}
 				/>
 			</div>
 		);

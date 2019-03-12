@@ -1,5 +1,5 @@
 import React from 'react';
-
+import PropTypes from 'prop-types';
 import { Row } from 'react-bootstrap';
 import LegendItem from './LegendItem';
 
@@ -12,5 +12,10 @@ const ChartLegend = ({ chart: { series }, activeLegendItems }) => (
 		</Row>
 	</div>
 );
+
+ChartLegend.propTypes = {
+	chart: PropTypes.object.isRequired,
+	activeLegendItems: PropTypes.arrayOf(PropTypes.string).isRequired
+};
 
 export default ChartLegend;
