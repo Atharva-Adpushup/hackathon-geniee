@@ -109,28 +109,37 @@ var request = require('request-promise'),
 		verifyAdsTxt(url, ourAdsTxt) {
 			return API.load(`${utils.rightTrim(url, '/')}/ads.txt`)
 				.then(existingAdsTxt => {
-					const existingAdsTxtArr = API.normalizeAdsTxtEntries(existingAdsTxt);
-					const ourAdsTxtArr = API.normalizeAdsTxtEntries(ourAdsTxt);
+					if (typeof existingAdsTxt == 'string') {
+						const existingAdsTxtArr = API.normalizeAdsTxtEntries(existingAdsTxt);
+						const ourAdsTxtArr = API.normalizeAdsTxtEntries(ourAdsTxt);
 
-					const entriesNotFound = ourAdsTxtArr.filter(
-						value => existingAdsTxtArr.indexOf(value) === -1
-					);
+						const entriesNotFound = ourAdsTxtArr.filter(
+							value => existingAdsTxtArr.indexOf(value) === -1
+						);
 
-					if (entriesNotFound.length) {
-						if (entriesNotFound.length == ourAdsTxtArr.length) {
-							return {
-								errorCode: 2,
-								ourAdsTxt: entriesNotFound.join('\n')
-							};
-						} else {
-							return {
-								errorCode: 1,
-								ourAdsTxt: entriesNotFound.join('\n')
-							};
+						if (entriesNotFound.length) {
+							if (entriesNotFound.length == ourAdsTxtArr.length) {
+								return {
+									errorCode: 2,
+									ourAdsTxt: entriesNotFound.join('\n')
+								};
+							} else {
+								return {
+									errorCode: 1,
+									ourAdsTxt: entriesNotFound.join('\n')
+								};
+							}
 						}
-					}
 
-					return { errorCode: 0 };
+						return { errorCode: 0 };
+					} else {
+						throw new AdPushupError({
+							httpCode: 404,
+							error:
+								'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
+							ourAdsTxt
+						});
+					}
 
 					// if (entriesNotFound.length) {
 					// 	throw new AdPushupError({

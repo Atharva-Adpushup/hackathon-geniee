@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Helmet } from 'react-helmet';
 import Promise from 'bluebird';
-import { FormControl, Alert, Table, Button, Modal, Nav, NavItem } from 'react-bootstrap';
+import { FormControl, Col, Alert, Table, Button, Modal, Nav, NavItem } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import ActionCard from '../../Components/ActionCard/index';
@@ -10,12 +10,15 @@ import { showNotification } from '../../actions/uiActions';
 import Loader from '../../Components/Loader/index';
 import { ADSTXT_SITE_LIST_HEADERS, ADSTXT_STATUS } from '../../constants/others';
 import CustomButton from '../../Components/CustomButton';
+import CustomMessage from '../../Components/CustomMessage/index';
 import { copyToClipBoard } from '../../Apps/ApTag/lib/helpers';
 import SendCodeByEmailModal from '../../Components/SendCodeByEmailModal';
 import {
 	ADSTXT_NAV_ITEMS,
 	ADSTXT_NAV_ITEMS_INDEXES,
-	ADSTXT_NAV_ITEMS_VALUES
+	ADSTXT_NAV_ITEMS_VALUES,
+	BONUS_MESSAGE,
+	NOTE_MESSAGE
 } from './configs/commonConsts';
 
 class AdsTxtManager extends Component {
@@ -30,24 +33,15 @@ class AdsTxtManager extends Component {
 	};
 
 	componentDidMount() {
-		Promise.all([proxyService.getAdsTxt(), this.getSitesAdstxtStatus()])
-			.spread((res, sites) => {
-				let adsTxtSnippet = '';
-				if ((res.status = 200)) adsTxtSnippet = res.data.adsTxtSnippet;
-				this.setState({
-					adsTxtSnippet,
-					sites,
-					isLoading: false
-				});
-			})
-			.catch(() => {
-				const { showNotification } = this.props;
-				showNotification({
-					mode: 'error',
-					message: 'Some error occured while fetching Ads.txt.',
-					autoDismiss: 5
-				});
+		Promise.all([proxyService.getAdsTxt(), this.getSitesAdstxtStatus()]).spread((res, sites) => {
+			let adsTxtSnippet = '';
+			if ((res.status = 200)) adsTxtSnippet = res.data.adsTxtSnippet;
+			this.setState({
+				adsTxtSnippet,
+				sites,
+				isLoading: false
 			});
+		});
 	}
 
 	getSitesAdstxtStatus = () => {
@@ -65,10 +59,13 @@ class AdsTxtManager extends Component {
 							adsTxt: res.data.ourAdsTxt
 						};
 				})
-				.catch(res => ({
-					domain: sites[site].siteDomain,
-					status: 3
-				}))
+				.catch(err => {
+					return {
+						domain: sites[site].siteDomain,
+						status: 3,
+						adsTxt: err.response.data.ourAdsTxt
+					};
+				})
 		);
 	};
 
@@ -120,7 +117,7 @@ class AdsTxtManager extends Component {
 								show={showSendCodeByEmailModal}
 								title="Send Code to Developer"
 								handleClose={this.toggleShowSendCodeByEmailModal}
-								subject="Adpushup HeadCode"
+								subject="AdPushup Ads.txt Entries"
 								emailBody={this.getEmailBody(modalAdsTxt)}
 							/>
 
@@ -228,7 +225,7 @@ class AdsTxtManager extends Component {
 							show={showSendCodeByEmailModal}
 							title="Send Code to Developer"
 							handleClose={this.toggleShowSendCodeByEmailModal}
-							subject="Adpushup HeadCode"
+							subject="AdPushup Ads.txt Entries"
 							emailBody={this.getEmailBody(adsTxtSnippet)}
 						/>
 
@@ -308,25 +305,10 @@ class AdsTxtManager extends Component {
 								<NavItem eventKey={2}>{ADSTXT_NAV_ITEMS_VALUES.ENTRIES}</NavItem>
 							</Nav>
 							{this.renderContent()}
-							<Alert bsStyle="warning" className="u-margin-4">
-								<strong>Bonus: </strong> Manage ads.txt for all yourpartners with AdPushup&#8217;s{' '}
-								<a className="u-text-underline" href="http://console.adpushup.com/adstxt">
-									ads.txt management solution
-								</a>
-								.
-							</Alert>
-							<Alert bsStyle="warning" className="u-margin-4">
-								<strong>Note: </strong> Ads.txt is mandatory. It needs to be updated incase you
-								already have one. Else please follow the intsructions provided here :{' '}
-								<a
-									className="u-text-underline"
-									href="https://support.google.com/admanager/answer/7441288?hl=en"
-								>
-									https://support.google.com/admanager/answer/7441288?hl=en
-								</a>
-								{'. '}
-								AdPushup&#8217;s ads.txt should be appended alongside your existing partners.
-							</Alert>
+							<Col xs={12}>
+								<CustomMessage header="Bonus" type="info" message={BONUS_MESSAGE} />
+								<CustomMessage header="Note" type="info" message={NOTE_MESSAGE} />
+							</Col>
 						</div>
 					)}
 				</ActionCard>
