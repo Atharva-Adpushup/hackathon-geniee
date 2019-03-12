@@ -93,13 +93,18 @@ const Routes = () => (
 					/>
 
 					{/** App Layout */}
-					<PrivateRoute exact name="Layout" path="/sites/:siteId/apps/layout" component={Layout} />
+					<PrivateRoute
+						exact
+						name="Layout Editor"
+						path="/sites/:siteId/apps/layout"
+						component={Layout}
+					/>
 
 					{/** App ApTag */}
 					<PrivateRoute
 						exact
 						customProps={{ activeTab: APT_NAV_ITEMS_INDEXES.CREATE_ADS }}
-						name="Ap-Tag"
+						name="Ap Tag"
 						path="/sites/:siteId/apps/ap-tag"
 						component={ApTag}
 					/>
@@ -115,7 +120,7 @@ const Routes = () => (
 					<PrivateRoute
 						exact
 						customProps={{ activeTab: IA_NAV_ITEMS_INDEXES.CREATE_ADS }}
-						name="Innovative-Ads"
+						name="Innovative Ads"
 						path="/sites/:siteId/apps/innovative-ads"
 						component={InnovativeAds}
 					/>

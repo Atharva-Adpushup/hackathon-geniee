@@ -17,7 +17,7 @@ class Notification extends Component {
 			message,
 			title,
 			level: mode,
-			autoDismiss: autoDismiss >= 0 || 5,
+			autoDismiss: autoDismiss > 0 ? autoDismiss : 0,
 			onRemove: notification => this.props.hideNotification()
 		});
 	}
