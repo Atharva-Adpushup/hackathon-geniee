@@ -42,7 +42,7 @@ class ControlTagConversion extends Component {
 	}
 
 	getConvertedAdCode() {
-		const { siteId, inputCode } = this.state;
+		const { siteId, inputCode, selectedNetwork } = this.state;
 		const {
 			medianet: { adId, adWidth, adHeight, crId, versionId, cId }
 		} = this.state;
@@ -54,15 +54,21 @@ class ControlTagConversion extends Component {
 		const isValidMedianetNetworkData = !!(adId && adWidth && adHeight && crId && versionId && cId);
 		const computedNetworkNumber = isMedianetNetworkSelection ? 2 : 1;
 
-		if (!isValidNetworkSelection || (isNotMedianetNetworkSelection && !isValidAllNetworksData)) {
+		if (!isValidNetworkSelection) {
 			// eslint-disable-next-line no-alert
-			window.alert('Please fill All networks related UI fields');
+			window.alert('Please select the ad network type to transform code');
+			return false;
+		}
+
+		if (isNotMedianetNetworkSelection && !isValidAllNetworksData) {
+			// eslint-disable-next-line no-alert
+			window.alert(`Please enter ${selectedNetwork} ad code`);
 			return false;
 		}
 
 		if (isMedianetNetworkSelection && !isValidMedianetNetworkData) {
 			// eslint-disable-next-line no-alert
-			window.alert('Please fill Medianet network related UI fields');
+			window.alert(`Please fill ${selectedNetwork} network related fields`);
 			return false;
 		}
 
