@@ -29,7 +29,8 @@ class UiList extends React.Component {
 		};
 		this.constants = {
 			plugins: {
-				URL_HTTP_HTTPS: 'url-http-https'
+				URL_HTTP_HTTPS: 'url-http-https',
+				URL_REMOVE_PROTOCOL_PREFIX: 'url-remove-protocol-prefix'
 			},
 			regex: {
 				URL: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
@@ -39,9 +40,9 @@ class UiList extends React.Component {
 		};
 
 		const {
-			plugins: { URL_HTTP_HTTPS }
+			plugins: { URL_HTTP_HTTPS, URL_REMOVE_PROTOCOL_PREFIX }
 		} = this.constants;
-		this.plugins = [URL_HTTP_HTTPS];
+		this.plugins = [URL_HTTP_HTTPS, URL_REMOVE_PROTOCOL_PREFIX];
 	}
 
 	applyUrlHttpHttpsPlugin = collection => {
@@ -101,6 +102,35 @@ class UiList extends React.Component {
 		return inputCollection;
 	};
 
+	applyUrlRemoveProtocolPrefix = collection => {
+		const inputCollection = collection.concat([]);
+		const { regex } = this.constants;
+
+		collection.forEach((item, idx) => {
+			const isValidItem = !!item;
+
+			if (!isValidItem) {
+				return true;
+			}
+
+			const { HTTPS_PREFIX, HTTP_PREFIX } = regex;
+			const isHttpsUrlPrefix = HTTPS_PREFIX.test(item);
+			const isHttpUrlPrefix = HTTP_PREFIX.test(item);
+			let computedItemString = item;
+
+			if (isHttpsUrlPrefix) {
+				computedItemString = item.replace(HTTPS_PREFIX, '');
+			} else if (isHttpUrlPrefix) {
+				computedItemString = item.replace(HTTP_PREFIX, '');
+			}
+
+			inputCollection[idx] = computedItemString;
+			return computedItemString;
+		});
+
+		return inputCollection;
+	};
+
 	applyPlugins = collection => {
 		const isActivePlugins = this.isActivePlugins();
 
@@ -110,7 +140,7 @@ class UiList extends React.Component {
 
 		const { plugins } = this.props;
 		const {
-			plugins: { URL_HTTP_HTTPS }
+			plugins: { URL_HTTP_HTTPS, URL_REMOVE_PROTOCOL_PREFIX }
 		} = this.constants;
 		let inputCollection = collection.concat([]);
 
@@ -118,6 +148,10 @@ class UiList extends React.Component {
 			switch (plugin) {
 				case URL_HTTP_HTTPS:
 					inputCollection = this.applyUrlHttpHttpsPlugin(inputCollection);
+					break;
+
+				case URL_REMOVE_PROTOCOL_PREFIX:
+					inputCollection = this.applyUrlRemoveProtocolPrefix(inputCollection);
 					break;
 
 				default:
@@ -266,7 +300,7 @@ class UiList extends React.Component {
 
 					return (
 						<ListGroupItem key={listItemKey} className={computedRootClassName}>
-							<div className="aligner-item">{itemValue}</div>
+							<div className="aligner-item u-text-break-all">{itemValue}</div>
 							<div className="aligner-item aligner aligner--row aligner--vCenter aligner--hEnd">
 								<OverlayTooltip
 									id="tooltip-edit-item-info"
@@ -479,6 +513,6 @@ UiList.defaultProps = {
 };
 
 // Example props values
-// plugins: ['url-http-https']
+// plugins: ['url-http-https', 'url-remove-protocol-prefix']
 
 export default UiList;
