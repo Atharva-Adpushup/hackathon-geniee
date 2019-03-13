@@ -14,8 +14,8 @@ class Notification extends Component {
 	createNotification() {
 		const { mode, message, title, autoDismiss } = this.props;
 		this._notificationSystem.addNotification({
-			message: message,
-			title: title,
+			message,
+			title,
 			level: mode,
 			autoDismiss: autoDismiss >= 0 || 5,
 			onRemove: notification => this.props.hideNotification()
@@ -36,7 +36,7 @@ class Notification extends Component {
 		return (
 			<div style={{ position: 'relative', zIndex: 1000000 }}>
 				{this.props.isVisible ? this.createNotification() : null}
-				<NotificationSystem ref="notificationSystem" allowHTML={true} style={style} />
+				<NotificationSystem ref="notificationSystem" allowHTML style={style} />
 			</div>
 		);
 	}

@@ -50,13 +50,14 @@ class AdElement extends Component {
 
 	disableAd() {
 		const { isActive } = this.state;
-		const { ad, archiveAd, user } = this.props;
+		const { ad, archiveAd, user, match } = this.props;
 		const message = isActive
 			? 'Are you sure you want to archive this ad?'
 			: 'Are you sure you want to unarchive this ad?';
 		if (window.confirm(message)) {
 			archiveAd(
 				ad.id,
+				match.params.siteId,
 				{
 					format: ad.formatData.format,
 					platform: ad.formatData.platform,
@@ -75,7 +76,10 @@ class AdElement extends Component {
 						{
 							isActive: !isActive
 						},
-						() => window.alert('Kindly, do not forget to do Master Save to presist this change.')
+						() => {
+							if (user.isSuperUser)
+								window.alert('Kindly, do not forget to do Master Save to presist this change.');
+						}
 					);
 				}
 				return true;
@@ -132,8 +136,10 @@ class AdElement extends Component {
 	}
 
 	updateWrapper(data) {
-		const { user, ad, updateAd, modifyAdOnServer } = this.props;
-		return user.isSuperUser ? updateAd(ad.id, data) : modifyAdOnServer(ad.id, data);
+		const { user, ad, updateAd, modifyAdOnServer, match } = this.props;
+		return user.isSuperUser
+			? updateAd(ad.id, data)
+			: modifyAdOnServer(ad.id, match.params.siteId, data);
 	}
 
 	userActionsHandler(action) {

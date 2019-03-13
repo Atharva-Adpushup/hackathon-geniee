@@ -48,6 +48,7 @@ function verifyOwner(siteId, userEmail) {
 function errorHander(err, res, code = HTTP_STATUS.BAD_REQUEST) {
 	const customMessage = err.message || err;
 	const errorCode = customMessage.code || code;
+	console.log(err);
 	return sendErrorResponse({ message: 'Opertion Failed' }, res, errorCode);
 }
 
@@ -172,7 +173,7 @@ function masterSave(req, res, adUpdateProcessing, directDBUpdate, docKey, mode =
 	});
 }
 
-function modifyAd(req, res, adUpdateProcessing, directDBUpdate) {
+function modifyAd(req, res, adUpdateProcessing, directDBUpdate, key) {
 	if (!req.body || !req.body.siteId || !req.body.adId) {
 		return sendErrorResponse(
 			{
@@ -181,7 +182,7 @@ function modifyAd(req, res, adUpdateProcessing, directDBUpdate) {
 			res
 		);
 	}
-	return adUpdateProcessing(req, res, docWithCas => {
+	return adUpdateProcessing(req, res, key, docWithCas => {
 		const doc = docWithCas.value;
 		if (doc.ownerEmail !== req.user.email) {
 			throw new AdPushupError({
@@ -199,7 +200,7 @@ function modifyAd(req, res, adUpdateProcessing, directDBUpdate) {
 			const { mode, logs } = req.body.metaUpdate;
 			doc.meta[mode] = logs;
 		}
-		return directDBUpdate(`${docKeys.interactiveAds}${req.body.siteId}`, doc, docWithCas.cas);
+		return directDBUpdate(`${key}${req.body.siteId}`, doc, docWithCas.cas);
 	});
 }
 
@@ -224,7 +225,7 @@ function fetchStatusesFromReporting(site) {
 			return output;
 		})
 		.catch(err => {
-			console.log(err);
+			console.log(err.message);
 			return DEFAULT_APP_STATUS_RESPONSE;
 		});
 }

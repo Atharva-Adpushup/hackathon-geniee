@@ -16,12 +16,12 @@ class Shell extends React.Component {
 		if (!fetched)
 			fetchGlobalData().then(() => {
 				const { user } = this.props;
-				if (!user.isPaymentDetailsComplete)
+				if (!user.isPaymentDetailsComplete && !window.location.pathname.includes('payment'))
 					showNotification({
 						mode: 'error',
 						title: 'Payments Error',
-						message:
-							'Please complete your Payments Profile, which is required to transfer your ad revenue.',
+						message: `Please complete your Payment Profile, for timely payments.
+							<a href='/payment'>Go to payments</a>`,
 						autoDismiss: 0
 					});
 			});

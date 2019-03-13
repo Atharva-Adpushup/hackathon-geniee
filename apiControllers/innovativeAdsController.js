@@ -85,9 +85,9 @@ const fn = {
 		}
 		return process().then(() => toReturn);
 	},
-	adUpdateProcessing: (req, res, processing) =>
+	adUpdateProcessing: (req, res, key, processing) =>
 		appBucket
-			.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`)
+			.getDoc(`${key}${req.body.siteId}`)
 			.then(docWithCas => processing(docWithCas))
 			.then(() => emitEventAndSendResponse(req.body.siteId, res))
 			.catch(err => errorHander(err, res))

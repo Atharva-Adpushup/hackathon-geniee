@@ -59,7 +59,7 @@ module.exports = {
 	plugins: [
 		new HtmlWebPackPlugin({
 			template: './index.html',
-			// favicon: './public/favicon.ico',
+			favicon: './public/assets/images/favicon.ico',
 			filename: 'index.html'
 		}),
 		new OptimizeCSSAssetsPlugin({})

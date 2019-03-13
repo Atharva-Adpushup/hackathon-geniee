@@ -198,7 +198,8 @@ class AdList extends Component {
 			archiveAd,
 			updateTraffic,
 			user,
-			channels
+			channels,
+			match
 		} = this.props;
 		const { show, modalData, filters } = this.state;
 		const HEADERS = user.isSuperUser ? OPS_AD_LIST_HEADERS : USER_AD_LIST_HEADERS;
@@ -207,7 +208,7 @@ class AdList extends Component {
 
 		if (loading) {
 			return (
-				<div style={{ height: '600px' }}>
+				<div style={{ position: 'relative', minHeight: '200px' }}>
 					<Loader />
 				</div>
 			);
@@ -232,7 +233,7 @@ class AdList extends Component {
 					</thead>
 					<tbody>
 						{adsToRender.map(ad =>
-							ad.isActive || user.isSuperUser ? (
+							// ad.isActive || user.isSuperUser ? (
 								<AdElement
 									key={`adElement-${ad.id}`}
 									identifier={ad.id}
@@ -246,8 +247,9 @@ class AdList extends Component {
 									modalToggle={this.modalToggle}
 									archiveAd={archiveAd}
 									updateTraffic={updateTraffic}
+									match={match}
 								/>
-							) : null
+							// ) : null
 						)}
 					</tbody>
 				</Table>
