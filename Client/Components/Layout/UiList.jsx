@@ -388,7 +388,7 @@ class UiList extends React.Component {
 		);
 		const isValidSeparateSaveButtonProp = !!(isSeparateSaveButton && separateSaveButtonText);
 		const computedActiveFormControlClassName = isActiveItem ? 'u-box-shadow-active' : '';
-		const computedStickyClassName = sticky ? 'u-position-sticky' : '';
+		const computedStickyClassName = sticky ? 'u-position-sticky u-bg-color-white' : '';
 		const computedFormGroupMarginClassName = isValidSeparateSaveButtonProp ? 'u-margin-b3' : '';
 		const computedRootElClassName = `u-margin-b4 ${computedStickyClassName}`;
 		const computedInputGroupButtonVariant = isValidSeparateSaveButtonProp ? 'secondary' : 'primary';
