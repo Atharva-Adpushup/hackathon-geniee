@@ -130,7 +130,7 @@ class UiList extends React.Component {
 
 	updateItem = () => {
 		const { activeItemKey, activeItemValue, collection } = this.state;
-		const { validate, onSave } = this.props;
+		const { validate, isSeparateSaveButton } = this.props;
 		const isValidActiveItemKey = !!(activeItemKey !== null && activeItemKey !== '');
 		const isValidActiveItemValue = !!activeItemValue;
 		const isValidActiveItem = !!(isValidActiveItemKey && isValidActiveItemValue);
@@ -187,22 +187,28 @@ class UiList extends React.Component {
 
 		return this.setState(
 			{ collection: inputCollection, activeItemKey: '', activeItemValue: '' },
-			() => onSave(inputCollection)
+			() => {
+				if (!isSeparateSaveButton) {
+					this.masterSaveData(inputCollection);
+				}
+			}
 		);
 	};
 
 	deleteItem = key => {
 		const { collection } = this.state;
-		const { onSave } = this.props;
+		const { isSeparateSaveButton } = this.props;
 		const item = collection[key];
 		const message = `Are you sure you want to delete ${item}`;
 		const inputCollection = collection.concat([]);
 
 		if (window.confirm(message)) {
 			inputCollection.splice(key, 1);
-			this.setState({ collection: inputCollection, activeItemValue: '', activeItemKey: '' }, () =>
-				onSave(inputCollection)
-			);
+			this.setState({ collection: inputCollection, activeItemValue: '', activeItemKey: '' }, () => {
+				if (!isSeparateSaveButton) {
+					this.masterSaveData(inputCollection);
+				}
+			});
 		}
 	};
 
@@ -225,6 +231,15 @@ class UiList extends React.Component {
 			activeItemValue: computedActiveItem,
 			activeItemKey: computedActiveItemKey ? Number(computedActiveItemKey) : ''
 		});
+	};
+
+	masterSaveData = inputCollection => {
+		const { collection } = this.state;
+		const { onSave } = this.props;
+		const computedCollection = inputCollection || collection;
+
+		onSave(computedCollection);
+		return true;
 	};
 
 	generatePlaceHolder = () => {
@@ -320,6 +335,10 @@ class UiList extends React.Component {
 				this.updateItem();
 				break;
 
+			case 'separate-save':
+				this.masterSaveData();
+				break;
+
 			default:
 				break;
 		}
@@ -354,43 +373,68 @@ class UiList extends React.Component {
 	};
 
 	renderActionInputGroup = () => {
-		const { inputPlaceholder, saveButtonText, sticky } = this.props;
+		const {
+			inputPlaceholder,
+			saveButtonText,
+			sticky,
+			separateSaveButtonText,
+			isSeparateSaveButton
+		} = this.props;
 		const { activeItemValue, activeItemKey } = this.state;
 		const isActiveItem = !!(
 			activeItemValue &&
 			activeItemKey !== '' &&
 			!Number.isNaN(activeItemKey)
 		);
-		const computedActiveFormControl = isActiveItem ? 'u-box-shadow-active' : '';
+		const isValidSeparateSaveButtonProp = !!(isSeparateSaveButton && separateSaveButtonText);
+		const computedActiveFormControlClassName = isActiveItem ? 'u-box-shadow-active' : '';
 		const computedStickyClassName = sticky ? 'u-position-sticky' : '';
-		const computedFormGroupClassName = `u-margin-b4 ${computedStickyClassName}`;
+		const computedFormGroupMarginClassName = isValidSeparateSaveButtonProp ? 'u-margin-b3' : '';
+		const computedRootElClassName = `u-margin-b4 ${computedStickyClassName}`;
+		const computedInputGroupButtonVariant = isValidSeparateSaveButtonProp ? 'secondary' : 'primary';
 
 		return (
-			<FormGroup className={computedFormGroupClassName}>
-				<InputGroup>
-					<FormControl
-						type="text"
-						value={activeItemValue}
-						placeholder={inputPlaceholder}
-						onChange={e => this.setState({ activeItemValue: e.target.value })}
-						className={computedActiveFormControl}
-					/>
-					<InputGroup.Button>
+			<div className={computedRootElClassName}>
+				<FormGroup className={computedFormGroupMarginClassName}>
+					<InputGroup>
+						<FormControl
+							type="text"
+							value={activeItemValue}
+							placeholder={inputPlaceholder}
+							onChange={e => this.setState({ activeItemValue: e.target.value })}
+							className={computedActiveFormControlClassName}
+						/>
+						<InputGroup.Button>
+							<CustomButton
+								variant={computedInputGroupButtonVariant}
+								className=""
+								name="blocklist-save-button"
+								data-name="save"
+								data-key="0-save"
+								onClick={this.handleClickHandler}
+							>
+								{saveButtonText}
+							</CustomButton>
+
+							{/* <Button>Before</Button> */}
+						</InputGroup.Button>
+					</InputGroup>
+				</FormGroup>
+				{isValidSeparateSaveButtonProp ? (
+					<div className="aligner aligner--hEnd">
 						<CustomButton
 							variant="primary"
 							className=""
-							name="blocklist-save-button"
-							data-name="save"
-							data-key="0-save"
+							name="blocklist-separate-save-button"
+							data-name="separate-save"
+							data-key="0-separate-save"
 							onClick={this.handleClickHandler}
 						>
-							{saveButtonText}
+							{separateSaveButtonText}
 						</CustomButton>
-
-						{/* <Button>Before</Button> */}
-					</InputGroup.Button>
-				</InputGroup>
-			</FormGroup>
+					</div>
+				) : null}
+			</div>
 		);
 	};
 
@@ -413,8 +457,10 @@ class UiList extends React.Component {
 
 UiList.propTypes = {
 	rootClassName: PropTypes.string,
+	separateSaveButtonText: PropTypes.string,
 	sticky: PropTypes.bool,
 	validate: PropTypes.bool,
+	isSeparateSaveButton: PropTypes.bool,
 	plugins: PropTypes.array,
 	itemCollection: PropTypes.array.isRequired,
 	emptyCollectionPlaceHolder: PropTypes.string.isRequired,
@@ -425,8 +471,10 @@ UiList.propTypes = {
 
 UiList.defaultProps = {
 	rootClassName: '',
+	separateSaveButtonText: '',
 	sticky: false,
 	validate: true,
+	isSeparateSaveButton: false,
 	plugins: []
 };
 

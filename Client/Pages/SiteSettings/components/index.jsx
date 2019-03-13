@@ -134,10 +134,11 @@ class SiteSettings extends Component {
 					itemCollection={computedBlocklist}
 					emptyCollectionPlaceHolder="No blocklist added"
 					inputPlaceholder="Enter comma separated URLs or URLs pattern to block AdPushup ads"
-					saveButtonText="Save"
+					saveButtonText="Add"
 					sticky
 					validate
-					plugins={['url-http-https']}
+					isSeparateSaveButton
+					separateSaveButtonText="Save Data"
 					onSave={this.uiListSaveHandler}
 				/>
 			</div>
