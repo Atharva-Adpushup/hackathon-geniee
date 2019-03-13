@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Col } from 'react-bootstrap';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
 import { indexOf } from 'lodash';
 
 class LegendItem extends Component {
@@ -27,7 +27,7 @@ class LegendItem extends Component {
 
 	render() {
 		const { visible } = this.state;
-		const { serie } = this.props;
+		const { serie, legend } = this.props;
 		let style = {};
 
 		if (visible) {
@@ -37,15 +37,26 @@ class LegendItem extends Component {
 		}
 
 		return (
-			<Col xs={4}>
-				<div
-					className={`legend-item${visible ? ' active-legend-item' : ''}`}
-					onClick={this.toggleSerie}
-					style={style}
+			<div
+				className={`legend-item${visible ? ' active-legend-item' : ''}`}
+				onClick={this.toggleSerie}
+				style={style}
+			>
+				<OverlayTrigger
+					trigger={['hover', 'focus']}
+					placement="bottom"
+					overlay={
+						<Popover id="moreInfo" title={serie.name}>
+							{legend.description}
+						</Popover>
+					}
 				>
-					{serie.name}
-				</div>
-			</Col>
+					<span className="legend-info" />
+				</OverlayTrigger>
+
+				<div className="name">{serie.name}</div>
+				<div className="total">{legend.total}</div>
+			</div>
 		);
 	}
 }

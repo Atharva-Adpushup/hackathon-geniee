@@ -5,9 +5,26 @@ import ReactDOM from 'react-dom';
 import { getCustomChartConfig } from '../../Services/customChartService';
 import ChartLegend from './ChartLegend';
 
-const CustomChart = ({ title, type, config, yAxisGroups, activeLegendItems, containerClass }) => {
-	if (type === 'line') {
-		const chartConfig = getCustomChartConfig(title, type, config, yAxisGroups, activeLegendItems);
+const CustomChart = ({
+	title,
+	type,
+	series,
+	xAxis,
+	legends,
+	customConfig,
+	yAxisGroups,
+	activeLegendItems,
+	containerClass
+}) => {
+	if (type === 'line' || type === 'spline') {
+		const chartConfig = getCustomChartConfig(
+			type,
+			series,
+			xAxis,
+			customConfig,
+			yAxisGroups,
+			activeLegendItems
+		);
 
 		if (chartConfig.yAxis && chartConfig.yAxis.length) {
 			chartConfig.chart = {
@@ -16,9 +33,9 @@ const CustomChart = ({ title, type, config, yAxisGroups, activeLegendItems, cont
 					load: event => {
 						const chart = event.target;
 
-						const node = document.getElementById('chart-legend');
+						const node = document.getElementById('chart-legend-wrap');
 						ReactDOM.render(
-							<ChartLegend chart={chart} activeLegendItems={activeLegendItems} />,
+							<ChartLegend chart={chart} legends={legends} activeLegendItems={activeLegendItems} />,
 							node
 						);
 					}
@@ -27,7 +44,8 @@ const CustomChart = ({ title, type, config, yAxisGroups, activeLegendItems, cont
 
 			return (
 				<div className={containerClass}>
-					<div id="chart-legend" />
+					{title && <h3 className="text-center">{title}</h3>}
+					<div id="chart-legend-wrap" />
 					<ReactHighcharts config={chartConfig} />
 				</div>
 			);
@@ -35,16 +53,14 @@ const CustomChart = ({ title, type, config, yAxisGroups, activeLegendItems, cont
 	}
 
 	if (type === 'pie') {
-		const chartConfig = getCustomChartConfig(title, type, config);
+		const chartConfig = getCustomChartConfig(type, series, customConfig);
 
 		if (chartConfig.series && chartConfig.series.length) {
 			chartConfig.chart = {
 				...chartConfig.chart,
 				events: {
 					load: event => {
-						const chart = event.target;
-
-						const node = document.getElementById('chart-legend');
+						const node = document.getElementById('chart-legend-wrap');
 						ReactDOM.render(null, node);
 					}
 				}
@@ -52,7 +68,8 @@ const CustomChart = ({ title, type, config, yAxisGroups, activeLegendItems, cont
 
 			return (
 				<div className={containerClass}>
-					<div id="chart-legend" />
+					{title && <h3 className="text-center">{title}</h3>}
+					<div id="chart-legend-wrap" />
 					<ReactHighcharts config={chartConfig} />
 				</div>
 			);
@@ -72,8 +89,18 @@ const CustomChart = ({ title, type, config, yAxisGroups, activeLegendItems, cont
 
 CustomChart.propTypes = {
 	title: PropTypes.string,
-	type: PropTypes.oneOf(['line', 'pie']),
-	config: PropTypes.object.isRequired,
+	type: PropTypes.oneOf(['line', 'spline', 'pie']),
+	series: PropTypes.arrayOf(
+		PropTypes.shape({
+			data: PropTypes.array,
+			name: PropTypes.string,
+			description: PropTypes.string,
+			total: PropTypes.string
+		})
+	).isRequired,
+	xAxis: PropTypes.shape({ categories: PropTypes.array.isRequired, className: PropTypes.string }),
+	legends: PropTypes.shape({ description: PropTypes.string, total: PropTypes.string }),
+	customConfig: PropTypes.object,
 	yAxisGroups: PropTypes.arrayOf(
 		PropTypes.shape({
 			seriesNames: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -85,8 +112,11 @@ CustomChart.propTypes = {
 };
 
 CustomChart.defaultProps = {
-	title: 'Custom Chart',
-	type: 'line',
+	title: '',
+	type: 'spline',
+	xAxis: {},
+	legends: {},
+	customConfig: {},
 	yAxisGroups: [],
 	activeLegendItems: [],
 	containerClass: ''
