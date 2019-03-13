@@ -137,6 +137,7 @@ class SiteSettings extends Component {
 					saveButtonText="Add"
 					sticky
 					validate
+					plugins={['url-remove-protocol-prefix']}
 					isSeparateSaveButton
 					separateSaveButtonText="Save Data"
 					onSave={this.uiListSaveHandler}
