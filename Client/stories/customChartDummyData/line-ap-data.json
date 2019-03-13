@@ -1,4 +1,38 @@
 {
+	"legends": {
+		"Pageviews": {
+			"description": "xyz",
+			"total": "12345"
+		},
+		"Page CPM ($)": {
+			"description": "xyz",
+			"total": "$12345"
+		},
+		"Adpushup Requests": {
+			"description": "xyz",
+			"total": "12345"
+		},
+		"Impressions": {
+			"description": "xyz",
+			"total": "12345"
+		},
+		"CPM ($)": {
+			"description": "xyz",
+			"total": "$12345"
+		},
+		"Revenue ($)": {
+			"description": "xyz",
+			"total": "$12345"
+		},
+		"Gross Revenue ($)": {
+			"description": "xyz",
+			"total": "$12345"
+		},
+		"Xpath Miss": {
+			"description": "xyz",
+			"total": "12345"
+		}
+	},
 	"series": [
 		{
 			"data": [117703, 99286, 97314, 102554, 106781, 106772, 101014],

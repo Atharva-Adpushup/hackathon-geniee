@@ -65,16 +65,88 @@ const defaultChartConfig = {
 	colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e', '#eb575c', '#ca29f3']
 };
 
-export function getCustomChartConfig(title, type, config, yAxisGroups, activeLegendItems) {
+function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
+	const yAxis = [];
+	const seriesForChart = [];
+	let colorIndex = 0;
+
+	let i;
+	const len1 = yAxisGroups.length;
+
+	for (i = 0; i < len1; i += 1) {
+		const yAxisGroup = yAxisGroups[i];
+		const yAxisGroupNameArray = [];
+		let yAxisGroupForChart = {};
+
+		if (yAxisGroup.seriesNames && yAxisGroup.seriesNames.length) {
+			let j;
+			const len2 = yAxisGroup.seriesNames.length;
+
+			for (j = 0; j < len2; j += 1) {
+				const yAxisGroupSeriesName = yAxisGroup.seriesNames[j];
+				const index = existingSeries.findIndex(
+					singleSeries => singleSeries.name === yAxisGroupSeriesName
+				);
+
+				if (index !== -1) {
+					yAxisGroupNameArray.push(yAxisGroupSeriesName);
+
+					const singleSeries = {
+						type: chartType === 'spline' ? 'spline' : 'line',
+						lineWidth: 1.5,
+						marker: {
+							enabled: chartType !== 'spline',
+							symbol: 'circle',
+							radius: 3.2
+						},
+						_colorIndex: colorIndex,
+						...existingSeries[index],
+						yAxis: i
+					};
+
+					seriesForChart.push(singleSeries);
+
+					colorIndex += 1;
+				}
+			}
+		}
+
+		if (yAxisGroupNameArray.length) {
+			yAxisGroupForChart.title = { text: yAxisGroupNameArray.join(' / ') };
+			yAxisGroupForChart.tickPositioner = tickPositioner;
+			yAxisGroupForChart.index = i;
+			yAxisGroupForChart.opposite = i > 0;
+
+			if (yAxisGroup.yAxisConfig) {
+				yAxisGroupForChart = {
+					...yAxisGroupForChart,
+					...yAxisGroup.yAxisConfig
+				};
+			}
+
+			yAxis.push(yAxisGroupForChart);
+		}
+	}
+
+	return { yAxis, seriesForChart };
+}
+
+export function getCustomChartConfig(
+	type,
+	series,
+	xAxis,
+	customConfig,
+	yAxisGroups,
+	activeLegendItems
+) {
 	let chartConfig = {
 		...defaultChartConfig,
 		chart: { ...defaultChartConfig.chart, type },
-		...config
+		title: { text: undefined },
+		series,
+		xAxis,
+		...customConfig
 	};
-
-	if (title) {
-		chartConfig.title = { text: title };
-	}
 
 	if (
 		activeLegendItems &&
@@ -82,8 +154,6 @@ export function getCustomChartConfig(title, type, config, yAxisGroups, activeLeg
 		chartConfig.series &&
 		chartConfig.series.length
 	) {
-		const { series } = chartConfig;
-
 		let i;
 		const len1 = series.length;
 		for (i = 0; i < len1; i += 1) {
@@ -98,8 +168,6 @@ export function getCustomChartConfig(title, type, config, yAxisGroups, activeLeg
 			}
 		}
 	} else if (chartConfig.series && chartConfig.series.length) {
-		const { series } = chartConfig;
-
 		let i;
 		const len1 = series.length;
 		for (i = 0; i < len1; i += 1) {
@@ -119,66 +187,37 @@ export function getCustomChartConfig(title, type, config, yAxisGroups, activeLeg
 
 			// Set yAxis Groups for Line Chart
 			if (yAxisGroups && yAxisGroups.length) {
-				const yAxis = [];
-				const seriesForChart = [];
-				let colorIndex = 0;
-
-				let i;
-				const len1 = yAxisGroups.length;
-
-				for (i = 0; i < len1; i += 1) {
-					const yAxisGroup = yAxisGroups[i];
-					const yAxisGroupNameArray = [];
-					let yAxisGroupForChart = {};
-
-					if (yAxisGroup.seriesNames && yAxisGroup.seriesNames.length) {
-						let j;
-						const len2 = yAxisGroup.seriesNames.length;
-
-						for (j = 0; j < len2; j += 1) {
-							const yAxisGroupSeriesName = yAxisGroup.seriesNames[j];
-							const { series } = chartConfig;
-							const index = series.findIndex(
-								singleSeries => singleSeries.name === yAxisGroupSeriesName
-							);
-
-							if (index !== -1) {
-								yAxisGroupNameArray.push(yAxisGroupSeriesName);
-
-								const singleSeries = {
-									lineWidth: 1.5,
-									marker: {
-										symbol: 'circle',
-										radius: 3.2
-									},
-									_colorIndex: colorIndex,
-									...series[index],
-									yAxis: i
-								};
-								seriesForChart.push(singleSeries);
-
-								colorIndex += 1;
-							}
-						}
-					}
-
-					if (yAxisGroupNameArray.length) {
-						yAxisGroupForChart.title = { text: yAxisGroupNameArray.join(' / ') };
-						yAxisGroupForChart.tickPositioner = tickPositioner;
-						yAxisGroupForChart.index = i;
-						yAxisGroupForChart.opposite = i > 0;
-
-						if (yAxisGroup.yAxisConfig) {
-							yAxisGroupForChart = {
-								...yAxisGroupForChart,
-								...yAxisGroup.yAxisConfig
-							};
-						}
-
-						yAxis.push(yAxisGroupForChart);
-					}
+				const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(
+					type,
+					yAxisGroups,
+					chartConfig.series
+				);
+				if (yAxis.length && seriesForChart.length) {
+					chartConfig.yAxis = yAxis;
+					chartConfig.series = seriesForChart;
 				}
 
+				break;
+			}
+
+			chartConfig.series = [];
+
+			break;
+		}
+		case 'spline': {
+			chartConfig.plotOptions = {
+				...chartConfig.plotOptions,
+				spline: { className: 'mySplineClass' }
+			};
+			chartConfig.xAxis.className = 'myXAxisClass';
+
+			// Set yAxis Groups for Line Chart
+			if (yAxisGroups && yAxisGroups.length) {
+				const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(
+					type,
+					yAxisGroups,
+					chartConfig.series
+				);
 				if (yAxis.length && seriesForChart.length) {
 					chartConfig.yAxis = yAxis;
 					chartConfig.series = seriesForChart;
