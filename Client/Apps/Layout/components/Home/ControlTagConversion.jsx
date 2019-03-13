@@ -122,9 +122,8 @@ class ControlTagConversion extends Component {
 	handleInputChangeHandler(inputParam) {
 		const isInputParam = !!inputParam;
 		const isElement = !!(isInputParam && inputParam.target);
-		const isValue = !!(isElement && inputParam.target.value);
 
-		if (isValue) {
+		if (isElement) {
 			const {
 				target: { name, value }
 			} = inputParam;
@@ -141,27 +140,27 @@ class ControlTagConversion extends Component {
 					break;
 
 				case 'adWidth':
-					medianet.adWidth = Number(value);
+					medianet.adWidth = value;
 					this.setState({ medianet });
 					break;
 
 				case 'adHeight':
-					medianet.adHeight = Number(value);
+					medianet.adHeight = value;
 					this.setState({ medianet });
 					break;
 
 				case 'crId':
-					medianet.crId = Number(value);
+					medianet.crId = value;
 					this.setState({ medianet });
 					break;
 
 				case 'versionId':
-					medianet.versionId = Number(value);
+					medianet.versionId = value;
 					this.setState({ medianet });
 					break;
 
 				case 'cId':
-					medianet.cId = Number(value);
+					medianet.cId = value;
 					this.setState({ medianet });
 					break;
 
