@@ -1,0 +1,28 @@
+.u-hide {
+	display: $none !important;
+}
+
+.u-box-shadow-none {
+	-webkit-box-shadow: $none !important;
+	box-shadow: $none !important;
+}
+
+.u-box-shadow-active {
+	box-shadow: $boxShadowInsetOne;
+}
+
+.u-border-top-none {
+	border-top: $numberZero !important;
+}
+
+.u-border-none {
+	border: $none !important;
+}
+
+.u-list-style-type-none {
+	list-style-type: $none !important;
+}
+
+.u-bg-color-white {
+	background: $whiteColor !important;
+}

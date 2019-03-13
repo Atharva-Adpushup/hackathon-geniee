@@ -29,7 +29,8 @@ class UiList extends React.Component {
 		};
 		this.constants = {
 			plugins: {
-				URL_HTTP_HTTPS: 'url-http-https'
+				URL_HTTP_HTTPS: 'url-http-https',
+				URL_REMOVE_PROTOCOL_PREFIX: 'url-remove-protocol-prefix'
 			},
 			regex: {
 				URL: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
@@ -39,9 +40,9 @@ class UiList extends React.Component {
 		};
 
 		const {
-			plugins: { URL_HTTP_HTTPS }
+			plugins: { URL_HTTP_HTTPS, URL_REMOVE_PROTOCOL_PREFIX }
 		} = this.constants;
-		this.plugins = [URL_HTTP_HTTPS];
+		this.plugins = [URL_HTTP_HTTPS, URL_REMOVE_PROTOCOL_PREFIX];
 	}
 
 	applyUrlHttpHttpsPlugin = collection => {
@@ -101,6 +102,35 @@ class UiList extends React.Component {
 		return inputCollection;
 	};
 
+	applyUrlRemoveProtocolPrefix = collection => {
+		const inputCollection = collection.concat([]);
+		const { regex } = this.constants;
+
+		collection.forEach((item, idx) => {
+			const isValidItem = !!item;
+
+			if (!isValidItem) {
+				return true;
+			}
+
+			const { HTTPS_PREFIX, HTTP_PREFIX } = regex;
+			const isHttpsUrlPrefix = HTTPS_PREFIX.test(item);
+			const isHttpUrlPrefix = HTTP_PREFIX.test(item);
+			let computedItemString = item;
+
+			if (isHttpsUrlPrefix) {
+				computedItemString = item.replace(HTTPS_PREFIX, '');
+			} else if (isHttpUrlPrefix) {
+				computedItemString = item.replace(HTTP_PREFIX, '');
+			}
+
+			inputCollection[idx] = computedItemString;
+			return computedItemString;
+		});
+
+		return inputCollection;
+	};
+
 	applyPlugins = collection => {
 		const isActivePlugins = this.isActivePlugins();
 
@@ -110,7 +140,7 @@ class UiList extends React.Component {
 
 		const { plugins } = this.props;
 		const {
-			plugins: { URL_HTTP_HTTPS }
+			plugins: { URL_HTTP_HTTPS, URL_REMOVE_PROTOCOL_PREFIX }
 		} = this.constants;
 		let inputCollection = collection.concat([]);
 
@@ -118,6 +148,10 @@ class UiList extends React.Component {
 			switch (plugin) {
 				case URL_HTTP_HTTPS:
 					inputCollection = this.applyUrlHttpHttpsPlugin(inputCollection);
+					break;
+
+				case URL_REMOVE_PROTOCOL_PREFIX:
+					inputCollection = this.applyUrlRemoveProtocolPrefix(inputCollection);
 					break;
 
 				default:
@@ -130,7 +164,7 @@ class UiList extends React.Component {
 
 	updateItem = () => {
 		const { activeItemKey, activeItemValue, collection } = this.state;
-		const { validate, onSave } = this.props;
+		const { validate, isSeparateSaveButton } = this.props;
 		const isValidActiveItemKey = !!(activeItemKey !== null && activeItemKey !== '');
 		const isValidActiveItemValue = !!activeItemValue;
 		const isValidActiveItem = !!(isValidActiveItemKey && isValidActiveItemValue);
@@ -187,22 +221,28 @@ class UiList extends React.Component {
 
 		return this.setState(
 			{ collection: inputCollection, activeItemKey: '', activeItemValue: '' },
-			() => onSave(inputCollection)
+			() => {
+				if (!isSeparateSaveButton) {
+					this.masterSaveData(inputCollection);
+				}
+			}
 		);
 	};
 
 	deleteItem = key => {
 		const { collection } = this.state;
-		const { onSave } = this.props;
+		const { isSeparateSaveButton } = this.props;
 		const item = collection[key];
 		const message = `Are you sure you want to delete ${item}`;
 		const inputCollection = collection.concat([]);
 
 		if (window.confirm(message)) {
 			inputCollection.splice(key, 1);
-			this.setState({ collection: inputCollection, activeItemValue: '', activeItemKey: '' }, () =>
-				onSave(inputCollection)
-			);
+			this.setState({ collection: inputCollection, activeItemValue: '', activeItemKey: '' }, () => {
+				if (!isSeparateSaveButton) {
+					this.masterSaveData(inputCollection);
+				}
+			});
 		}
 	};
 
@@ -225,6 +265,15 @@ class UiList extends React.Component {
 			activeItemValue: computedActiveItem,
 			activeItemKey: computedActiveItemKey ? Number(computedActiveItemKey) : ''
 		});
+	};
+
+	masterSaveData = inputCollection => {
+		const { collection } = this.state;
+		const { onSave } = this.props;
+		const computedCollection = inputCollection || collection;
+
+		onSave(computedCollection);
+		return true;
 	};
 
 	generatePlaceHolder = () => {
@@ -251,7 +300,7 @@ class UiList extends React.Component {
 
 					return (
 						<ListGroupItem key={listItemKey} className={computedRootClassName}>
-							<div className="aligner-item">{itemValue}</div>
+							<div className="aligner-item u-text-break-all">{itemValue}</div>
 							<div className="aligner-item aligner aligner--row aligner--vCenter aligner--hEnd">
 								<OverlayTooltip
 									id="tooltip-edit-item-info"
@@ -320,6 +369,10 @@ class UiList extends React.Component {
 				this.updateItem();
 				break;
 
+			case 'separate-save':
+				this.masterSaveData();
+				break;
+
 			default:
 				break;
 		}
@@ -354,43 +407,68 @@ class UiList extends React.Component {
 	};
 
 	renderActionInputGroup = () => {
-		const { inputPlaceholder, saveButtonText, sticky } = this.props;
+		const {
+			inputPlaceholder,
+			saveButtonText,
+			sticky,
+			separateSaveButtonText,
+			isSeparateSaveButton
+		} = this.props;
 		const { activeItemValue, activeItemKey } = this.state;
 		const isActiveItem = !!(
 			activeItemValue &&
 			activeItemKey !== '' &&
 			!Number.isNaN(activeItemKey)
 		);
-		const computedActiveFormControl = isActiveItem ? 'u-box-shadow-active' : '';
-		const computedStickyClassName = sticky ? 'u-position-sticky' : '';
-		const computedFormGroupClassName = `u-margin-b4 ${computedStickyClassName}`;
+		const isValidSeparateSaveButtonProp = !!(isSeparateSaveButton && separateSaveButtonText);
+		const computedActiveFormControlClassName = isActiveItem ? 'u-box-shadow-active' : '';
+		const computedStickyClassName = sticky ? 'u-position-sticky u-bg-color-white' : '';
+		const computedFormGroupMarginClassName = isValidSeparateSaveButtonProp ? 'u-margin-b3' : '';
+		const computedRootElClassName = `u-margin-b4 ${computedStickyClassName}`;
+		const computedInputGroupButtonVariant = isValidSeparateSaveButtonProp ? 'secondary' : 'primary';
 
 		return (
-			<FormGroup className={computedFormGroupClassName}>
-				<InputGroup>
-					<FormControl
-						type="text"
-						value={activeItemValue}
-						placeholder={inputPlaceholder}
-						onChange={e => this.setState({ activeItemValue: e.target.value })}
-						className={computedActiveFormControl}
-					/>
-					<InputGroup.Button>
+			<div className={computedRootElClassName}>
+				<FormGroup className={computedFormGroupMarginClassName}>
+					<InputGroup>
+						<FormControl
+							type="text"
+							value={activeItemValue}
+							placeholder={inputPlaceholder}
+							onChange={e => this.setState({ activeItemValue: e.target.value })}
+							className={computedActiveFormControlClassName}
+						/>
+						<InputGroup.Button>
+							<CustomButton
+								variant={computedInputGroupButtonVariant}
+								className=""
+								name="blocklist-save-button"
+								data-name="save"
+								data-key="0-save"
+								onClick={this.handleClickHandler}
+							>
+								{saveButtonText}
+							</CustomButton>
+
+							{/* <Button>Before</Button> */}
+						</InputGroup.Button>
+					</InputGroup>
+				</FormGroup>
+				{isValidSeparateSaveButtonProp ? (
+					<div className="aligner aligner--hEnd">
 						<CustomButton
 							variant="primary"
 							className=""
-							name="blocklist-save-button"
-							data-name="save"
-							data-key="0-save"
+							name="blocklist-separate-save-button"
+							data-name="separate-save"
+							data-key="0-separate-save"
 							onClick={this.handleClickHandler}
 						>
-							{saveButtonText}
+							{separateSaveButtonText}
 						</CustomButton>
-
-						{/* <Button>Before</Button> */}
-					</InputGroup.Button>
-				</InputGroup>
-			</FormGroup>
+					</div>
+				) : null}
+			</div>
 		);
 	};
 
@@ -413,8 +491,10 @@ class UiList extends React.Component {
 
 UiList.propTypes = {
 	rootClassName: PropTypes.string,
+	separateSaveButtonText: PropTypes.string,
 	sticky: PropTypes.bool,
 	validate: PropTypes.bool,
+	isSeparateSaveButton: PropTypes.bool,
 	plugins: PropTypes.array,
 	itemCollection: PropTypes.array.isRequired,
 	emptyCollectionPlaceHolder: PropTypes.string.isRequired,
@@ -425,12 +505,14 @@ UiList.propTypes = {
 
 UiList.defaultProps = {
 	rootClassName: '',
+	separateSaveButtonText: '',
 	sticky: false,
 	validate: true,
+	isSeparateSaveButton: false,
 	plugins: []
 };
 
 // Example props values
-// plugins: ['url-http-https']
+// plugins: ['url-http-https', 'url-remove-protocol-prefix']
 
 export default UiList;

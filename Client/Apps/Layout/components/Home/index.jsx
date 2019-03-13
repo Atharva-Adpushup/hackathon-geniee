@@ -23,17 +23,23 @@ class Home extends Component {
 		this.renderContent = this.renderContent.bind(this);
 	}
 
+	getSiteId = () => {
+		const {
+			match: {
+				params: { siteId }
+			}
+		} = this.props;
+
+		return siteId;
+	};
+
 	handleNavSelect(value) {
 		this.setState({ activeNav: value, title: COMPONENT_TITLES[value] });
 	}
 
 	renderContent() {
 		const { activeNav } = this.state;
-		const {
-			match: {
-				params: { siteId }
-			}
-		} = this.props;
+		const siteId = this.getSiteId();
 
 		switch (activeNav) {
 			default:
@@ -46,6 +52,9 @@ class Home extends Component {
 
 	render() {
 		const { title, activeNav } = this.state;
+		const siteId = this.getSiteId();
+		const computedEditorLink = `/user/site/${siteId}/editor`;
+
 		return (
 			<ActionCard title={title}>
 				<Nav bsStyle="tabs" activeKey={activeNav} onSelect={this.handleNavSelect}>
@@ -63,7 +72,7 @@ class Home extends Component {
 				{this.renderContent()}
 				<h4 className="u-padding-h4 u-margin-t3 u-margin-b4 u-text-bold">
 					To visit Visual Editor, please click here
-					<a target="_blank" rel="noopener noreferrer" href="/ap-layout/editor">
+					<a target="_blank" rel="noopener noreferrer" href={computedEditorLink}>
 						<FontAwesomeIcon icon="external-link-alt" className="u-margin-l2" />
 					</a>
 				</h4>
