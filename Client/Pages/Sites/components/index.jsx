@@ -52,7 +52,7 @@ class MySites extends Component {
 					const statusObject = SITE_SETUP_STATUS[siteStep];
 					const domanizeDomain = domanize(site.domain);
 					const computedReportingUrl = `/reporting/${siteId}`;
-					const computedManageSiteUrl = `/sites/${siteId}/apps`;
+					const computedManageSiteUrl = `/sites/${siteId}/`;
 					const isSiteBlock = !!(statusObject.site && Object.keys(statusObject.site).length);
 					// TODO: Remove card flex wrap implementation with grid-col implementation
 					// so that fixed height hacks are not required. Every card container will be available
@@ -141,7 +141,7 @@ class MySites extends Component {
 									</Link>
 									<Link to={computedManageSiteUrl} className="u-link-reset aligner aligner-item">
 										<Button className="aligner-item aligner aligner--hEnd aligner--vCenter">
-											Manage App
+											Manage Site
 											<FontAwesomeIcon icon="cog" className="u-margin-l2" />
 										</Button>
 									</Link>
