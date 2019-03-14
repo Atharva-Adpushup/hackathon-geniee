@@ -6,7 +6,7 @@ module.exports = {
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
-	DEMO_REPORT_SITE_ID: 31764,
+	DEMO_REPORT_SITE_ID: 31000,
 	DEMO_PAGEGROUPS: ['HOME', 'IMAGE', 'POST', 'PHPBB3', 'NEW', 'CATEGORY'],
 	REPORT_API: {
 		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
@@ -45,7 +45,8 @@ module.exports = {
 		ACTIVE: 1,
 		INACTIVE: 0
 	},
-	COOKIE_CONTROL_SCRIPT_TMPL: '!function(){var o=document.createElement("script");o.src="https://cc.cdn.civiccomputing.com/8.0/cookieControl-8.0.min.js",document.head.appendChild(o);var n=setInterval(function(){window.CookieControl&&(clearInterval(n),CookieControl.load(__COOKIE_CONTROL_CONFIG__))},10)}();',
+	COOKIE_CONTROL_SCRIPT_TMPL:
+		'!function(){var o=document.createElement("script");o.src="https://cc.cdn.civiccomputing.com/8.0/cookieControl-8.0.min.js",document.head.appendChild(o);var n=setInterval(function(){window.CookieControl&&(clearInterval(n),CookieControl.load(__COOKIE_CONTROL_CONFIG__))},10)}();',
 	GDPR: {
 		compliance: false,
 		cookieControlConfig: {
@@ -55,7 +56,8 @@ module.exports = {
 				{
 					name: 'information storage and access',
 					label: 'Information storage and access',
-					description: 'The storage of information, or access to information that is already stored, on your device such as advertising identifiers, device identifiers, cookies, and similar technologies.',
+					description:
+						'The storage of information, or access to information that is already stored, on your device such as advertising identifiers, device identifiers, cookies, and similar technologies.',
 					cookies: [],
 					onAccept: function() {},
 					onRevoke: function() {}
@@ -63,7 +65,8 @@ module.exports = {
 				{
 					name: 'personalisation',
 					label: 'Personalisation',
-					description: 'The collection and processing of information about your use of this service to subsequently personalise advertising and/or content for you in other contexts, such as on other websites or apps, over time. Typically, the content of the site or app is used to make inferences about your interests, which inform future selection of advertising and/or content.',
+					description:
+						'The collection and processing of information about your use of this service to subsequently personalise advertising and/or content for you in other contexts, such as on other websites or apps, over time. Typically, the content of the site or app is used to make inferences about your interests, which inform future selection of advertising and/or content.',
 					cookies: [],
 					onAccept: function() {},
 					onRevoke: function() {}
@@ -71,7 +74,8 @@ module.exports = {
 				{
 					name: 'ad selection, delivery, reporting',
 					label: 'Ad selection, delivery, reporting',
-					description: 'The collection of information, and combination with previously collected information, to select and deliver advertisements for you, and to measure the delivery and effectiveness of such advertisements. This includes using previously collected information about your interests to select ads, processing data about what advertisements were shown, how often they were shown, when and where they were shown, and whether you took any action related to the advertisement, including for example clicking an ad or making a purchase. This does not include personalisation, which is the collection and processing of information about your use of this service to subsequently personalise advertising and/or content for you in other contexts, such as websites or apps, over time.',
+					description:
+						'The collection of information, and combination with previously collected information, to select and deliver advertisements for you, and to measure the delivery and effectiveness of such advertisements. This includes using previously collected information about your interests to select ads, processing data about what advertisements were shown, how often they were shown, when and where they were shown, and whether you took any action related to the advertisement, including for example clicking an ad or making a purchase. This does not include personalisation, which is the collection and processing of information about your use of this service to subsequently personalise advertising and/or content for you in other contexts, such as websites or apps, over time.',
 					cookies: [],
 					onAccept: function() {},
 					onRevoke: function() {}
@@ -79,7 +83,8 @@ module.exports = {
 				{
 					name: 'content selection, delivery, reporting',
 					label: 'Content selection, delivery, reporting',
-					description: 'The collection of information, and combination with previously collected information, to select and deliver content for you, and to measure the delivery and effectiveness of such content. This includes using previously collected information about your interests to select content, processing data about what content was shown, how often or how long it was shown, when and where it was shown, and whether the you took any action related to the content, including for example clicking on content. This does not include personalisation, which is the collection and processing of information about your use of this service to subsequently personalise content and/or advertising for you in other contexts, such as websites or apps, over time.',
+					description:
+						'The collection of information, and combination with previously collected information, to select and deliver content for you, and to measure the delivery and effectiveness of such content. This includes using previously collected information about your interests to select content, processing data about what content was shown, how often or how long it was shown, when and where it was shown, and whether the you took any action related to the content, including for example clicking on content. This does not include personalisation, which is the collection and processing of information about your use of this service to subsequently personalise content and/or advertising for you in other contexts, such as websites or apps, over time.',
 					cookies: [],
 					onAccept: function() {},
 					onRevoke: function() {}
@@ -87,7 +92,8 @@ module.exports = {
 				{
 					name: 'measurement',
 					label: 'Measurement',
-					description: 'The collection of information about your use of the content, and combination with previously collected information, used to measure, understand, and report on your usage of the service. This does not include personalisation, the collection of information about your use of this service to subsequently personalise content and/or advertising for you in other contexts, i.e. on other service, such as websites or apps, over time.',
+					description:
+						'The collection of information about your use of the content, and combination with previously collected information, used to measure, understand, and report on your usage of the service. This does not include personalisation, the collection of information about your use of this service to subsequently personalise content and/or advertising for you in other contexts, i.e. on other service, such as websites or apps, over time.',
 					cookies: [],
 					onAccept: function() {},
 					onRevoke: function() {}
