@@ -49,7 +49,7 @@ const Sidebar = ({ show }) => {
 			<ul className="sb-nav primary-nav">
 				{getNavItem('Dashboard', '/dashboard', 'tachometer-alt', !show)}
 				{getNavItem('My Sites', '/sites', 'list', !show)}
-				{getNavItem('Reporting', '/reporting', 'chart-area', !show)}
+				{getNavItem('Reports', '/reports', 'chart-area', !show)}
 				{getNavItem('Integrations', '/integrations', 'desktop', !show)}
 			</ul>
 
