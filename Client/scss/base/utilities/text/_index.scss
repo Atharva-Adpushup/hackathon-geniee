@@ -1,7 +1,9 @@
 .u-text-uppercase {
 	text-transform: $textUppercase !important;
 }
-
+.u-text-normal {
+	font-weight: $textNormal !important;
+}
 .u-text-bold {
 	font-weight: $textBold !important;
 }
