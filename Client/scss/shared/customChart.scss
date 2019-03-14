@@ -1,0 +1,50 @@
+#chart-legend-wrap {
+	padding: 0 15px;
+	margin-bottom: 25px;
+
+	.chart-legend {
+		border: 1px solid #eee;
+		display: flex;
+		flex-basis: 0;
+	}
+
+	.legend-item {
+		position: relative;
+		padding: 15px 0;
+		cursor: pointer;
+		color: #999;
+		border-right: 1px solid #eee;
+		flex: 1 1 0;
+		&:last-child {
+			border-right: none;
+		}
+		&.active-legend-item {
+			margin-bottom: -2px;
+			color: #555;
+		}
+
+		.legend-info {
+			position: absolute;
+			top: 4px;
+			right: 4px;
+			padding: 3px;
+			background: #eee;
+			border: 1px solid rgba(0, 0, 0, 0.1);
+			border-radius: 50%;
+			width: 15px;
+			height: 15px;
+
+			&::before {
+				content: '?';
+				font-size: 10px;
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				line-height: 15px;
+				color: #999;
+			}
+		}
+	}
+}
