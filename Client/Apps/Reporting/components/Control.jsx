@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Glyphicon, Row, Col, FormGroup, InputGroup, FormControl, Button } from 'react-bootstrap';
+import { Glyphicon, Row, Col, FormGroup, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import 'react-dates/initialize';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
@@ -15,14 +15,14 @@ class Control extends Component {
 			dimensionList: [],
 			filterList: [],
 			metricsList: [
-				'Overview',
-				'Layout Editor',
-				'AP Tag',
-				'Innovative Ads',
-				'Mediation',
-				'Header Bidding',
-				'AMP',
-				'AdRecover'
+				{ value: 'Overview', isSelected: true },
+				{ value: 'Layout Editor', isDisabled: true },
+				{ value: 'AP Tag', isDisabled: true },
+				{ value: 'Innovative Ads', isDisabled: true },
+				{ value: 'Mediation', isDisabled: true },
+				{ value: 'Header Bidding', isDisabled: true },
+				{ value: 'AMP', isDisabled: true },
+				{ value: 'AdRecover', isDisabled: true }
 			],
 			startDate: props.startDate,
 			endDate: props.endDate,
@@ -139,6 +139,7 @@ class Control extends Component {
 		});
 	}
 	render() {
+		const tooltip = <Tooltip id="tooltip">Please select any site.</Tooltip>;
 		const today = moment();
 		const yesterday = moment().subtract(1, 'day');
 		const last7Days = moment()
@@ -235,11 +236,21 @@ class Control extends Component {
 
 				<div className="aligner aligner--wrap aligner--hSpaceBetween metricsRow u-margin-t5">
 					{state.metricsList.map(metric => {
-						return (
+						return metric.isDisabled ? (
+							<OverlayTrigger placement="top" overlay={tooltip}>
+								<div
+									className="metrics disabledMetrics aligner-item aligner aligner--vCenter aligner--hCenter u-margin-r2"
+									key={metric}
+									onClick={() => {
+										this.onMetricsChange(metric);
+									}}
+								>
+									{metric.value}
+								</div>
+							</OverlayTrigger>
+						) : (
 							<div
-								className={`${
-									state.selectedMetrics.indexOf(metric) != -1 ? 'selectedMetrics' : 'metrics'
-								} 
+								className={`${metric.isSelected ? 'selectedMetrics' : 'metrics'} 
 											${
 												metric.isDisabled ? 'disabledMetrics' : ''
 											} aligner-item aligner aligner--vCenter aligner--hCenter u-margin-r2`}
@@ -248,7 +259,7 @@ class Control extends Component {
 									this.onMetricsChange(metric);
 								}}
 							>
-								{metric}
+								{metric.value}
 							</div>
 						);
 					})}
