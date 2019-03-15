@@ -41,7 +41,7 @@ storiesOf('UI.CustomChart', module)
 		const title = text('Chart Title', 'My Chart');
 		const type = select('Chart Type', typeOptions, 'spline');
 		const series = array('Series', apLineChartConfig.series);
-		const xAxis = object('xAxis', apLineChartConfig.xAxis);
+		const categories = object('Categories', apLineChartConfig.categories);
 		const legends = object('Legends', apLineChartConfig.legends);
 		const customConfig = object('Custom Config');
 		const activeLegendItems = array('Active Legend Items', ['Impressions', 'Pageviews', 'CPM ($)']);
@@ -53,7 +53,7 @@ storiesOf('UI.CustomChart', module)
 					title={title}
 					type={type}
 					series={series}
-					xAxis={xAxis}
+					categories={categories}
 					legends={legends}
 					customConfig={customConfig}
 					activeLegendItems={activeLegendItems}
