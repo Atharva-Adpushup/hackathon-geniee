@@ -7,7 +7,22 @@ module.exports = {
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	DEMO_REPORT_SITE_ID: 31000,
-	DEMO_PAGEGROUPS: ['HOME', 'IMAGE', 'POST', 'PHPBB3', 'NEW', 'CATEGORY'],
+	DEMO_PAGEGROUPS: [
+		'HOME',
+		'CALC',
+		'FAQ',
+		'PHONEDATABASE',
+		'PHONEINFO',
+		'LATESTPHONE',
+		'ARTICLE',
+		'DEVICE_INFO',
+		'CARRIER',
+		'CARRIER NETWORK',
+		'CARRIER COUNTRY',
+		'NEWS_ARTICLE',
+		'CHECK',
+		'DOWNLOAD_FIRMWARE'
+	],
 	REPORT_API: {
 		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
 		DATE_FORMAT: 'YYYY-MM-DD'
