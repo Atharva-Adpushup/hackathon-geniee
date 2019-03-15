@@ -152,71 +152,39 @@ var API = {
 			return normalizedEntries;
 		},
 		verifyAdsTxt(url, ourAdsTxt) {
-			return API.load(`${utils.rightTrim(url, '/')}/ads.txt`)
-				.then(existingAdsTxt => {
-					if (typeof existingAdsTxt == 'string') {
-						const existingAdsTxtArr = API.normalizeAdsTxtEntries(existingAdsTxt);
-						const ourAdsTxtArr = API.normalizeAdsTxtEntries(ourAdsTxt);
+			return API.load(`${utils.rightTrim(url, '/')}/ads.txt`).then(existingAdsTxt => {
+				if (typeof existingAdsTxt === 'string') {
+					const existingAdsTxtArr = API.normalizeAdsTxtEntries(existingAdsTxt);
+					const ourAdsTxtArr = API.normalizeAdsTxtEntries(ourAdsTxt);
 
-						const entriesNotFound = ourAdsTxtArr.filter(
-							value => existingAdsTxtArr.indexOf(value) === -1
-						);
+					const entriesNotFound = ourAdsTxtArr.filter(
+						value => existingAdsTxtArr.indexOf(value) === -1
+					);
 
-						if (entriesNotFound.length) {
-							if (entriesNotFound.length == ourAdsTxtArr.length) {
-								return {
-									errorCode: 2,
-									ourAdsTxt: entriesNotFound.join('\n')
-								};
-							} else {
-								return {
-									errorCode: 1,
-									ourAdsTxt: entriesNotFound.join('\n')
-								};
-							}
+					if (entriesNotFound.length) {
+						if (entriesNotFound.length == ourAdsTxtArr.length) {
+							throw new AdPushupError({
+								httpCode: 204,
+								error: 'Our Ads.txt entries not found.',
+								ourAdsTxt: entriesNotFound.join('\n')
+							});
+						} else {
+							throw new AdPushupError({
+								httpCode: 206,
+								error: 'Few of our Ads.txt entries not found',
+								ourAdsTxt: entriesNotFound.join('\n')
+							});
 						}
-
-						return { errorCode: 0 };
-					} else {
-						throw new AdPushupError({
-							httpCode: 404,
-							error:
-								'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
-							ourAdsTxt
-						});
 					}
-
-					// if (entriesNotFound.length) {
-					// 	throw new AdPushupError({
-					// 		httpCode: 404,
-					// 		error:
-					// 			'Few ads.txt entries not found on your site. Please include these ads.txt entries in your ads.txt file.',
-					// 		ourAdsTxt: entriesNotFound.join('\n')
-					// 	});
-					// }
-
-					// return true;
-				})
-				.catch(err => {
-					if (!(err instanceof AdPushupError) && err.statusCode === 404) {
-						throw new AdPushupError({
-							httpCode: 404,
-							error:
-								'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
-							ourAdsTxt
-						});
-					}
-
-					if (!(err instanceof AdPushupError) && err.error.code === 'ENOTFOUND') {
-						throw new AdPushupError({
-							httpCode: 404,
-							error: 'Unable to reach your site!',
-							ourAdsTxt
-						});
-					}
-
-					throw err;
-				});
+				} else {
+					throw new AdPushupError({
+						httpCode: 404,
+						error:
+							'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
+						ourAdsTxt
+					});
+				}
+			});
 		},
 		checkIfBillingProfileComplete(email) {
 			var tipaltiConfig = config.tipalti,
