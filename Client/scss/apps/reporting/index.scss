@@ -186,26 +186,6 @@ body {
 	font-size: 1.2em;
 }
 
-.chart-legend {
-	margin-top: 20px;
-	background-color: $legendBg;
-	border: 2px solid $greyBg;
-
-	.legend-col {
-		width: 12.5%;
-		float: left;
-		padding: 0 5px;
-	}
-
-	.legend-item {
-		font-size: 1.2em;
-		padding: 15px 0;
-		cursor: pointer;
-		color: darken($greyBorder, 15%);
-		margin-bottom: -2px;
-	}
-}
-
 ._collapse-panel {
 	.panel {
 		border: none;
@@ -313,7 +293,7 @@ body {
 }
 
 .disabledMetrics {
-	pointer-events: none;
+	cursor: not-allowed;
 	opacity: 0.5;
 }
 
@@ -531,4 +511,33 @@ body {
 
 .PresetDateRangePicker_div {
 	padding: 0px 22px 11px !important;
+}
+
+.table-datatable {
+	.thead-default {
+		.thead-tr-default {
+			.thead-th-default {
+				.fa-sort::after {
+					font-family: 'Glyphicons Halflings';
+					content: '\e150';
+					cursor: pointer; // Changes the cursor into a pointer on hover
+				}
+				.fa-sort-asc::after {
+					font-family: 'Glyphicons Halflings';
+					content: '\e155';
+					cursor: pointer; // Changes the cursor into a pointer on hover
+				}
+				.fa-sort-desc::after {
+					font-family: 'Glyphicons Halflings';
+					content: '\e156';
+					cursor: pointer; // Changes the cursor into a pointer on hover
+				}
+			}
+		}
+	}
+}
+
+.fa-times::after {
+	font-family: 'Glyphicons Halflings';
+	content: '\e014';
 }

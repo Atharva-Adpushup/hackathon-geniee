@@ -4,6 +4,8 @@ import { Redirect } from 'react-router-dom';
 import { Nav, NavItem, Row, Col } from 'react-bootstrap';
 import ActionCard from '../../../Components/ActionCard/index';
 import Control from './Control';
+import Chart from './Chart';
+import Table from './Table';
 import moment from 'moment';
 import {
 	REPORTS_NAV_ITEMS,
@@ -102,6 +104,12 @@ class Panel extends Component {
 						selectedFilters={selectedFilters}
 						selectedMetrics={selectedMetrics}
 					/>
+				</Col>
+				<Col sm={12} className="u-margin-t5">
+					<Chart />
+				</Col>
+				<Col sm={12} className="u-margin-t5">
+					<Table />
 				</Col>
 			</Row>
 		);
