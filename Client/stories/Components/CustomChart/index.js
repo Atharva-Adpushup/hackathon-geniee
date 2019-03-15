@@ -9,7 +9,7 @@ const CustomChart = ({
 	title,
 	type,
 	series,
-	xAxis,
+	categories,
 	legends,
 	customConfig,
 	yAxisGroups,
@@ -20,7 +20,7 @@ const CustomChart = ({
 		const chartConfig = getCustomChartConfig(
 			type,
 			series,
-			xAxis,
+			categories,
 			customConfig,
 			yAxisGroups,
 			activeLegendItems
@@ -98,7 +98,7 @@ CustomChart.propTypes = {
 			total: PropTypes.string
 		})
 	).isRequired,
-	xAxis: PropTypes.shape({ categories: PropTypes.array.isRequired, className: PropTypes.string }),
+	categories: PropTypes.arrayOf(PropTypes.string).isRequired,
 	legends: PropTypes.shape({ description: PropTypes.string, total: PropTypes.string }),
 	customConfig: PropTypes.object,
 	yAxisGroups: PropTypes.arrayOf(
@@ -114,7 +114,6 @@ CustomChart.propTypes = {
 CustomChart.defaultProps = {
 	title: '',
 	type: 'spline',
-	xAxis: {},
 	legends: {},
 	customConfig: {},
 	yAxisGroups: [],
