@@ -92,8 +92,7 @@ function liveSitesByValidThirdPartyDFPAndCurrency(doc, meta) {
 			apConfig &&
 			apConfig.activeDFPCurrencyCode &&
 			apConfig.activeDFPCurrencyCode.length &&
-			apConfig.activeDFPCurrencyCode.length === 3 &&
-			apConfig.activeDFPCurrencyCode !== 'US'
+			apConfig.activeDFPCurrencyCode.length === 3
 		),
 		isPrebidGranularityMultiplier = !!(
 			apConfig &&

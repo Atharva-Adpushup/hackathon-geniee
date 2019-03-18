@@ -28,7 +28,7 @@ function getValidResult(data) {
 			parsedData.conversions.GBP
 		),
 		isValidUSOBject = !!(isValidRootObject && Object.keys(parsedData.conversions.USD).length),
-		computedObject = isValidUSOBject ? { ...parsedData.conversions.USD } : {};
+		computedObject = isValidUSOBject ? { USD: { ...parsedData.conversions.USD } } : {};
 
 	return computedObject;
 }
@@ -53,9 +53,7 @@ function updateCurrencyExchangeData(sitesArray, currencyData) {
 				);
 
 			if (isSameCurrencyExchangeRate) {
-				let currencyExchangeValue = Number(currencyData[siteConfig.currencyCode]);
-
-				apConfigs.activeDFPCurrencyExchangeRate = currencyExchangeValue;
+				apConfigs.activeDFPCurrencyExchangeRate = currencyData;
 				siteConfig.model.set('apConfigs', apConfigs);
 				return siteConfig.model.save().then(() => siteConfig.model);
 			}
