@@ -228,14 +228,14 @@ module.exports = {
 			isActiveDFPCurrencyCode = !!(
 				inputObject.activeDFPCurrencyCode &&
 				inputObject.activeDFPCurrencyCode.length &&
-				inputObject.activeDFPCurrencyCode.length === 3 &&
-				inputObject.activeDFPCurrencyCode !== config.CURRENCY_CODES.USD
+				inputObject.activeDFPCurrencyCode.length === 3
 			),
 			isPrebidGranularityMultiplier = !!(
 				inputObject.prebidGranularityMultiplier && Number(inputObject.prebidGranularityMultiplier)
 			),
 			isActiveDFPCurrencyExchangeRate = !!(
-				inputObject.activeDFPCurrencyExchangeRate && Number(inputObject.activeDFPCurrencyExchangeRate)
+				inputObject.activeDFPCurrencyExchangeRate &&
+				Object.keys(inputObject.activeDFPCurrencyExchangeRate).length
 			),
 			isValidResult = !!(
 				isActiveDFPNetwork &&
