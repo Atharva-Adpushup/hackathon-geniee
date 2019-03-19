@@ -53,13 +53,6 @@ module.exports = (req, res, next) => {
 		return next();
 	}
 
-	// if (
-	// 	(req.originalUrl.indexOf('/user') !== -1 || req.originalUrl.indexOf('/proxy') !== -1) &&
-	// 	isSessionInvalid
-	// ) {
-	// 	return res.redirect('/login');
-	// }
-
 	if (req.session && req.session.partner === 'geniee' && !isAuthorised()) {
 		if (req.url.indexOf('.map') == -1) {
 			req.session.destroy(() => res.redirect('/403'));
@@ -71,8 +64,7 @@ module.exports = (req, res, next) => {
 
 	const userCookie = req.cookies.user;
 	if (!userCookie) {
-		res.send('Auth Token not found!');
-		return;
+		return res.send('Auth Token not found!');
 	}
 
 	const token = JSON.parse(userCookie).authToken;
@@ -86,6 +78,6 @@ module.exports = (req, res, next) => {
 		})
 		.catch(err => {
 			console.log(err);
-			res.send('Server error!');
+			return res.send('Server error!');
 		});
 };

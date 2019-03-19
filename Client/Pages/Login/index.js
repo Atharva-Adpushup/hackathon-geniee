@@ -6,7 +6,7 @@ import AuthShell from '../../Components/AuthShell';
 import AuthFormWrap from '../../Components/AuthFormWrap';
 import FormInput from '../../Components/FormInput';
 import CustomButton from '../../Components/CustomButton';
-import { loginAction } from '../../actions/userActions';
+import { loginAction, logoutAction } from '../../actions/userActions';
 import formValidator from '../../helpers/formValidator';
 import validationSchema from '../../helpers/validationSchema';
 
@@ -17,6 +17,12 @@ class Login extends Component {
 		error: '',
 		isLoggingIn: false
 	};
+
+	componentDidMount() {
+		const { logoutAction } = this.props;
+
+		logoutAction();
+	}
 
 	onChange = e => {
 		const { name, value } = e.target;
@@ -171,5 +177,5 @@ class Login extends Component {
 
 export default connect(
 	null,
-	{ loginAction }
+	{ loginAction, logoutAction }
 )(Login);
