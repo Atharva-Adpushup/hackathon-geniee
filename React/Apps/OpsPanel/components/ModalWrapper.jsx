@@ -64,7 +64,7 @@ class ModalWrapper extends React.Component {
 			},
 			ix: {
 				siteId: ix ? ix.params.siteId : '',
-				size: ix ? ix.params.size : ''
+				size: ix ? JSON.stringify(ix.params.size) : ''
 			},
 			error: ''
 		};
@@ -141,7 +141,7 @@ class ModalWrapper extends React.Component {
 			},
 			ix: {
 				siteId: ix ? ix.params.siteId : '',
-				size: ix ? ix.params.size : ''
+				size: ix ? JSON.stringify(ix.params.size) : ''
 			},
 			error: ''
 		});
