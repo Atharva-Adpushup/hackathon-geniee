@@ -24,6 +24,7 @@ class ModalWrapper extends React.Component {
 		const openx = findBidder(data, 'openx');
 		const conversant = findBidder(data, 'conversant');
 		const thirtyThreeAcross = findBidder(data, '33across');
+		const ix = findBidder(data, 'ix');
 
 		this.state = {
 			partnersSelected: props.data.map(obj => obj.bidder) || [],
@@ -61,6 +62,10 @@ class ModalWrapper extends React.Component {
 				siteId: thirtyThreeAcross ? thirtyThreeAcross.params.siteId : '',
 				productId: thirtyThreeAcross ? thirtyThreeAcross.params.productId : ''
 			},
+			ix: {
+				siteId: ix ? ix.params.siteId : '',
+				size: ix ? ix.params.size : ''
+			},
 			error: ''
 		};
 
@@ -96,6 +101,7 @@ class ModalWrapper extends React.Component {
 		const openx = findBidder(data, 'openx');
 		const conversant = findBidder(data, 'conversant');
 		const thirtyThreeAcross = findBidder(data, '33across');
+		const ix = findBidder(data, 'ix');
 
 		this.setState({
 			partnersSelected: nextProps.data.map(obj => ({ value: obj.bidder, label: obj.bidder })) || [],
@@ -132,6 +138,10 @@ class ModalWrapper extends React.Component {
 			'33across': {
 				siteId: thirtyThreeAcross ? thirtyThreeAcross.params.siteId : '',
 				productId: thirtyThreeAcross ? thirtyThreeAcross.params.productId : ''
+			},
+			ix: {
+				siteId: ix ? ix.params.siteId : '',
+				size: ix ? ix.params.size : ''
 			},
 			error: ''
 		});
