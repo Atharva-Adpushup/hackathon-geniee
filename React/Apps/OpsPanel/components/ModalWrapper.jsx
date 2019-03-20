@@ -157,9 +157,14 @@ class ModalWrapper extends React.Component {
 				}
 			});
 
+			let params = this.state[partner.value];
+			if (partner.value === 'ix' && params && params.size) {
+				params.size = JSON.parse(params.size);
+			}
+
 			return {
 				bidder: partner.value,
-				params: this.state[partner.value]
+				params
 			};
 		});
 
