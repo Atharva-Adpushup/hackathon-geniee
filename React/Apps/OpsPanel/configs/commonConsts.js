@@ -363,6 +363,10 @@ const siteMappingActions = {
 		{
 			value: '33across',
 			label: '33across'
+		},
+		{
+			value: 'ix',
+			label: 'ix'
 		}
 	],
 	devicesList = [
@@ -446,6 +450,16 @@ const siteMappingActions = {
 			},
 			{
 				name: 'productId',
+				type: 'string'
+			}
+		],
+		ix: [
+			{
+				name: 'siteId',
+				type: 'string'
+			},
+			{
+				name: 'size',
 				type: 'string'
 			}
 		]
