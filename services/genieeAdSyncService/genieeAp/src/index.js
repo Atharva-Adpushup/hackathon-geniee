@@ -95,11 +95,7 @@ function shouldWeNotProceed() {
 }
 
 function triggerControl(mode) {
-	var isGenieeModeSelected = !!(
-		adp &&
-		adp.geniee &&
-		adp.geniee.sendSelectedModeFeedback
-	);
+	var isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
 
 	//Geniee method call for control mode
 	if (isGenieeModeSelected) {
@@ -134,26 +130,17 @@ function startCreation(forced) {
 	return new Promise(function(resolve) {
 		ampInit(adp.config);
 		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
-		if (
-			!forced &&
-			(shouldWeNotProceed() ||
-				!config.pageGroup ||
-				parseInt(config.mode, 10) === 2)
-		) {
+		if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
 			return resolve(false);
 		}
 
 		return selectVariation(config).then(function(variationData) {
-			var selectedVariation = variationData.selectedVariation,
+			var selectedVariation = variationData && variationData.selectedVariation,
 				moduleConfig = variationData.config,
-				isGenieeModeSelected = !!(
-					adp &&
-					adp.geniee &&
-					adp.geniee.sendSelectedModeFeedback
-				);
+				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
 
-			config = adp.config = moduleConfig;
 			if (selectedVariation) {
+				config = adp.config = moduleConfig;
 				adp.creationProcessStarted = true;
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
@@ -174,17 +161,13 @@ function startCreation(forced) {
 							if (interactiveAdsArr.ads) {
 								var ads = interactiveAdsArr.ads;
 								for (var id in ads) {
-									var hasDfpAdUnit =
-										ads[id].networkData && ads[id].networkData.dfpAdunit;
+									var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
 									if (hasDfpAdUnit) {
 										var slotId = ads[id].networkData.dfpAdunit,
 											container = $('#' + slotId);
 										var currentTime = new Date();
 										container.attr('data-render-time', currentTime.getTime());
-										if (
-											ads[id].networkData &&
-											ads[id].networkData.refreshSlot
-										) {
+										if (ads[id].networkData && ads[id].networkData.refreshSlot) {
 											refreshAdSlot.refreshSlot(container, ads[id]);
 										}
 									}
@@ -251,11 +234,7 @@ function main() {
 	hookAndInit(adp, startCreation, browserConfig.platform);
 
 	// AdPushup Debug Force Variation
-	if (
-		utils.queryParams &&
-		utils.queryParams.forceVariation &&
-		!adp.creationProcessStarted
-	) {
+	if (utils.queryParams && utils.queryParams.forceVariation && !adp.creationProcessStarted) {
 		startCreation(true);
 		return false;
 	}
@@ -289,11 +268,7 @@ function main() {
 		}, config.pageGroupTimeout);
 	} else {
 		// start heartBeat
-		heartBeat(
-			config.feedbackUrl,
-			config.heartBeatMinInterval,
-			config.heartBeatDelay
-		).start();
+		heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
 
 		//Init creation
 		startCreation();
