@@ -309,7 +309,7 @@ module.exports = {
 		}
 
 		if (url.charAt(url.length - 1) === '?') {
-			return url.substr(0, url.length - 1);
+			url = url.substr(0, url.length - 1);
 		}
 
 		computedUrlObject = this.getUrlObject(url);
