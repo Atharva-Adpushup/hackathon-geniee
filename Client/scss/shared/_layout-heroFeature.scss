@@ -1,0 +1,30 @@
+@mixin root-min-height {
+	min-height: (2 * $designDimensionXXL);
+}
+
+@mixin variable-width($value) {
+	width: ($fullPercentage - $value);
+}
+
+.layout-heroFeature {
+	@include root-min-height;
+	position: relative;
+
+	.layout-heroFeature-description {
+		@include root-min-height;
+		@include variable-width(60);
+
+		> p {
+			@include variable-width(30);
+		}
+	}
+
+	.layout-heroFeature-image {
+		@include root-min-height;
+		@include variable-width(60);
+
+		> img {
+			@include variable-width(20);
+		}
+	}
+}
