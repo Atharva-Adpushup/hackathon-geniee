@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import { Helmet } from 'react-helmet';
 import IntegrationsContainer from './containers/index';
+import '../../scss/pages/integrations/index.scss';
 
 const Integrations = props => (
 	<Fragment>
