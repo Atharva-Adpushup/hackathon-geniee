@@ -115,6 +115,20 @@ router
 			.catch(() =>
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ error: 'Something went wrong!' })
 			);
+	})
+	.get('/requestGoogleOAuth', (req, res) => {
+		const postMessageScriptTemplate = `<script type="text/javascript">
+		window.opener.postMessage({
+			"cmd":"SAVE_GOOGLE_OAUTH_INFO",
+			"data": {
+				"adsenseEmail": "zahin@adpushup.com",
+				"pubId": "ca-pub12345670"
+			}
+		}, "http://localhost:8080");
+		window.close();
+		</script>`;
+
+		return res.status(httpStatus.OK).send(postMessageScriptTemplate);
 	});
 
 module.exports = router;
