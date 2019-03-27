@@ -7,13 +7,15 @@ import Selectbox from '../../../Components/Selectbox/index';
 import moment from 'moment';
 import 'react-dates/lib/css/_datepicker.css';
 import _ from 'lodash';
+import { dimensions, filters, filtersValues } from '../configs/commonConsts';
+import { convertObjToArr } from '../helpers/utils';
 
 class Control extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			dimensionList: [],
-			filterList: [],
+			dimensionList: convertObjToArr(dimensions),
+			filterList: convertObjToArr(filters),
 			metricsList: [
 				{ value: 'Overview', isSelected: true },
 				{ value: 'Layout Editor', isDisabled: true },
@@ -26,75 +28,39 @@ class Control extends Component {
 			],
 			startDate: props.startDate,
 			endDate: props.endDate,
-			selectedDimensions: props.selectedDimensions,
+			selectedDimension: props.selectedDimension || '',
 			selectedMetrics: props.selectedMetrics,
-			selectedFilters: props.selectedFilters,
+			selectedFilters: props.selectedFilters || {},
 			disableGenerateButton: false
 		};
-		this.formatOptionLabel = this.formatOptionLabel.bind(this);
-		this.addNewDimension = this.addNewDimension.bind(this);
-		this.removeDimension = this.removeDimension.bind(this);
-		this.datesUpdated = this.datesUpdated.bind(this);
-		this.focusUpdated = this.focusUpdated.bind(this);
-		this.formatFilterAndDimensionList = this.formatFilterAndDimensionList.bind(this);
-		this.onDimensionChange = this.onDimensionChange.bind(this);
-		this.onMetricsChange = this.onMetricsChange.bind(this);
-		this.onFilterValueChange = this.onFilterValueChange.bind(this);
-		this.generateButtonHandler = this.generateButtonHandler.bind(this);
 	}
-	componentDidMount = () => {
-		this.formatFilterAndDimensionList();
-	};
-	onDimensionChange(data, index) {
-		let { selectedDimensions, dimensionList } = this.state;
-		selectedDimensions[index] = { value: data.value, label: data.label };
-		dimensionList.forEach(dimension => {
-			let isDimensionSelected = selectedDimensions.find(selectedDimension => {
-				return selectedDimension.value == dimension.value;
-			});
-			dimension.isDisabled = !!isDimensionSelected;
-		});
-		this.setState({ selectedDimensions, dimensionList });
-	}
-	formatFilterAndDimensionList() {
-		let dimensions = Object.keys(this.props.dimensionList).map(dimension => {
+	formatFilterAndDimensionList = () => {
+		let dimensions = Object.keys(this.state.dimensionList).map(dimension => {
 				return {
 					value: dimension,
-					label: this.props.dimensionList[dimension].display_name,
-					isDisabled: this.props.dimensionList[dimension].isDisabled,
-					position: this.props.dimensionList[dimension].position
+					name: this.state.dimensionList[dimension].display_name,
+					isDisabled: this.state.dimensionList[dimension].isDisabled,
+					position: this.state.dimensionList[dimension].position
 				};
 			}),
 			dimensionList = dimensions.sort(function(a, b) {
 				return a.position - b.position;
 			}),
-			filters = Object.keys(this.props.filterList).map(filter => {
+			filters = Object.keys(this.state.filterList).map(filter => {
 				return {
 					value: filter,
-					label: this.props.filterList[filter].display_name,
-					path: this.props.filterList[filter].path,
-					isDisabled: this.props.filterList[filter].isDisabled,
-					position: this.props.filterList[filter].position
+					name: this.state.filterList[filter].display_name,
+					path: this.state.filterList[filter].path,
+					isDisabled: this.state.filterList[filter].isDisabled,
+					position: this.state.filterList[filter].position
 				};
 			}),
 			filterList = filters.sort(function(a, b) {
 				return a.position - b.position;
 			});
 		this.setState({ dimensionList, filterList });
-	}
-	formatOptionLabel(data) {
-		const groupStyles = {
-			display: 'flex',
-			alignItems: 'center',
-			justifyContent: 'space-between'
-		};
-		return (
-			<div style={groupStyles}>
-				<span>{data.label}</span>
-				<Glyphicon glyph="menu-right" className="u-margin-r2" />
-			</div>
-		);
-	}
+		console.log(dimensionList, filterList);
+	};
 	addNewDimension() {
 		let { selectedDimensions } = this.state;
 		selectedDimensions.push({});
@@ -122,9 +88,9 @@ class Control extends Component {
 		else selectedMetrics.push(metric);
 		this.setState({ selectedMetrics });
 	}
-	onFilterValueChange(selectedFilters) {
+	onFilterValueChange = selectedFilters => {
 		this.setState({ selectedFilters });
-	}
+	};
 	generateButtonHandler() {
 		let { startDate, endDate, selectedDimensions, selectedFilters, selectedMetrics } = this.state;
 		this.props.generateButtonHandler({
@@ -137,6 +103,15 @@ class Control extends Component {
 		this.setState({
 			disableGenerateButton: true
 		});
+	}
+	getSelectedFilter(filter) {
+		// ajax({
+		// 	method: 'GET',
+		// 	url: `http://staging.adpushup.com/CentralReportingWebService${filter.path}`
+		// }).then(res => {
+		// 	return res.data.result;
+		// });
+		return filtersValues[filter.value];
 	}
 	render() {
 		const tooltip = <Tooltip id="tooltip">Please select any site.</Tooltip>;
@@ -190,10 +165,10 @@ class Control extends Component {
 						<Selectbox
 							isClearable={false}
 							isSearchable={false}
-							value={_.isEmpty(state.selectedDimensions) ? '' : state.selectedDimensions}
+							selected={state.selectedDimension || ''}
 							options={state.dimensionList}
-							onChange={selectedDimension => {
-								this.onDimensionChange(selectedDimension);
+							onSelect={selectedDimension => {
+								this.setState({ selectedDimension });
 							}}
 						/>
 					</div>
@@ -203,6 +178,7 @@ class Control extends Component {
 							filterList={state.filterList}
 							selectedFilters={state.selectedFilters}
 							onFilterValueChange={this.onFilterValueChange}
+							getSelectedFilter={this.getSelectedFilter}
 						/>
 					</div>
 					<div className="aligner-item ">
@@ -233,7 +209,6 @@ class Control extends Component {
 						</Button>
 					</div>
 				</div>
-
 				<div className="aligner aligner--wrap aligner--hSpaceBetween metricsRow u-margin-t5">
 					{state.metricsList.map(metric => {
 						return metric.isDisabled ? (

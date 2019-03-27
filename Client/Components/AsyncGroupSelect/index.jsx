@@ -48,25 +48,21 @@ class AsyncGroupSelect extends Component {
 	}
 
 	fetchSelectedFilterValues(filter) {
-		ajax({
-			method: 'GET',
-			url: `http://staging.adpushup.com/CentralReportingWebService${filter.path}`
-		}).then(res => {
-			let { selectedFilters } = this.state;
-			this.setState({
-				showFilterValues: true
-			});
-			if (res.description == 'SUCCESS') {
-				selectedFilters[filter.value] = selectedFilters[filter.value] || {};
-				this.setState({
-					filterValues: res.data.result,
-					filterResult: res.data.result,
-					selectedFilterKey: filter.value,
-					selectedFilters
-				});
-			}
-			console.log(res);
+		const { props } = this;
+		let response = props.getSelectedFilter(filter),
+			{ selectedFilters } = this.state;
+		this.setState({
+			showFilterValues: true
 		});
+		if (response) {
+			selectedFilters[filter.value] = selectedFilters[filter.value] || {};
+			this.setState({
+				filterValues: response,
+				filterResult: response,
+				selectedFilterKey: filter.value,
+				selectedFilters
+			});
+		}
 	}
 	hideFilterValues() {
 		this.setState({
@@ -116,11 +112,7 @@ class AsyncGroupSelect extends Component {
 					title={selectBoxLabel}
 					onClick={this.toggleList}
 				>
-					<div
-						className={`react-select-box-off-screen  ${
-							state.showFilterValues ? 'react-select-box-hidden' : ''
-						}`}
-					>
+					<div className={`react-select-box-off-screen  ${state.showFilterValues ? 'u-hide' : ''}`}>
 						{props.filterList.map(filter => {
 							return (
 								<Button
@@ -131,16 +123,14 @@ class AsyncGroupSelect extends Component {
 										this.fetchSelectedFilterValues(filter);
 									}}
 								>
-									{filter.label}
+									{filter.name}
 									<Glyphicon glyph="menu-right" className="mR-5 float-right" />
 								</Button>
 							);
 						})}
 					</div>
 					<div
-						className={`react-select-box-off-screen-1  ${
-							!state.showFilterValues ? 'react-select-box-hidden' : ''
-						}`}
+						className={`react-select-box-off-screen-1  ${!state.showFilterValues ? 'u-hide' : ''}`}
 						aria-hidden="true"
 					>
 						<a className="react-select-box-option" onClick={this.hideFilterValues}>
