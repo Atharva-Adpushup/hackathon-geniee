@@ -13,8 +13,10 @@ const formValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const oauthHelper = require('../helpers/googleOauth');
 const config = require('../configs/config');
-
+const AdpushupError = require('../helpers/AdPushupError');
 const router = express.Router();
+
+let googleOAuthUniqueString = '';
 
 router
 	.get('/', (req, res) => {
@@ -125,7 +127,7 @@ router
 	.get('/requestGoogleOAuth', (req, res) => {
 		const uniqueString = uuid.v1();
 
-		req.user.googleOAuthUniqueString = uniqueString;
+		googleOAuthUniqueString = uniqueString;
 		return res.redirect(oauthHelper.getRedirectUrl(uniqueString));
 	})
 	.get('/requestGoogleOAuth2', (req, res) => {
@@ -143,7 +145,7 @@ router
 		return res.status(httpStatus.OK).send(postMessageScriptTemplate);
 	})
 	.get('/oauth2callback', (req, res) => {
-		const isNotMatchingUniqueString = !!(req.user.googleOAuthUniqueString !== req.query.state);
+		const isNotMatchingUniqueString = !!(googleOAuthUniqueString !== req.query.state);
 		const isErrorAccessDenied = !!(req.query.error === 'access_denied');
 
 		if (isNotMatchingUniqueString) {
@@ -158,7 +160,7 @@ router
 				);
 		}
 
-		const getAccessToken = oauthHelper.getAccessTokens(req.query.code);
+		const getAccessToken = oauthHelper.getAccessTokens(req.query);
 		const getAdsenseAccounts = getAccessToken.then(token =>
 			request({
 				strictSSL: false,
@@ -245,21 +247,26 @@ router
 							"adsenseEmail": "${adsenseEmail}",
 							"pubId": "${pubId}"
 						}
-					}, "http://staging.adpushup.com");
+					}, "https://app.staging.adpushup.com");
 					window.close();
 					</script>`;
 
 					return res.status(httpStatus.OK).send(postMessageScriptTemplate);
 				});
 			}
-		).catch(err => {
-			const isNoAdsenseAccountMessage = !!(err.message === 'No adsense account');
-			const computedErrorMessage = isNoAdsenseAccountMessage
-				? `Sorry but it seems you have no AdSense account linked to your Google account. If this is a recently verified/created account, it might take upto 24 hours to come in effect. Please try again after sometime or contact support.`
-				: err;
+		)
+			.catch(err => {
+				const isNoAdsenseAccountMessage = !!(err.message === 'No adsense account');
+				const computedErrorMessage = isNoAdsenseAccountMessage
+					? `Sorry but it seems you have no AdSense account linked to your Google account. If this is a recently verified/created account, it might take upto 24 hours to come in effect. Please try again after sometime or contact support.`
+					: err;
 
-			return res.status(500).send(computedErrorMessage);
-		});
+				return res.status(500).send(computedErrorMessage);
+			})
+			.finally(() => {
+				googleOAuthUniqueString = '';
+				return true;
+			});
 	});
 
 module.exports = router;
