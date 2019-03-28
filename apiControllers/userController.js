@@ -1,4 +1,9 @@
 const express = require('express');
+const crypto = require('crypto');
+const Promise = require('bluebird');
+const uuid = require('node-uuid');
+const _ = require('lodash');
+const request = require('request-promise');
 const userModel = require('../models/userModel');
 const Promise = require('bluebird');
 const utils = require('../helpers/utils');
@@ -6,7 +11,7 @@ const CC = require('../configs/commonConsts');
 const httpStatus = require('../configs/httpStatusConsts');
 const formValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
-const proxy = require('../helpers/proxy');
+const oauthHelper = require('../helpers/googleOauth');
 const config = require('../configs/config');
 
 const router = express.Router();
@@ -118,6 +123,12 @@ router
 			);
 	})
 	.get('/requestGoogleOAuth', (req, res) => {
+		const uniqueString = uuid.v1();
+
+		req.user.googleOAuthUniqueString = uniqueString;
+		return res.redirect(oauthHelper.getRedirectUrl(uniqueString));
+	})
+	.get('/requestGoogleOAuth2', (req, res) => {
 		const postMessageScriptTemplate = `<script type="text/javascript">
 		window.opener.postMessage({
 			"cmd":"SAVE_GOOGLE_OAUTH_INFO",
@@ -130,6 +141,125 @@ router
 		</script>`;
 
 		return res.status(httpStatus.OK).send(postMessageScriptTemplate);
+	})
+	.get('/oauth2callback', (req, res) => {
+		const isNotMatchingUniqueString = !!(req.user.googleOAuthUniqueString !== req.query.state);
+		const isErrorAccessDenied = !!(req.query.error === 'access_denied');
+
+		if (isNotMatchingUniqueString) {
+			return res.status(500).send('Fake Request');
+		}
+
+		if (isErrorAccessDenied) {
+			return res
+				.status(500)
+				.send(
+					'Seems you denied request, if done accidently please press back button to retry again.'
+				);
+		}
+
+		const getAccessToken = oauthHelper.getAccessTokens(req.query.code);
+		const getAdsenseAccounts = getAccessToken.then(token =>
+			request({
+				strictSSL: false,
+				uri: `https://www.googleapis.com/adsense/v1.4/accounts?access_token=${token.access_token}`,
+				json: true
+			})
+				.then(adsenseInfo => adsenseInfo.items)
+				.catch(err => {
+					if (
+						err.error &&
+						err.error.error &&
+						err.error.error.message.indexOf('User does not have an AdSense account') === 0
+					) {
+						throw new Error('No adsense account');
+					}
+					throw err;
+				})
+		);
+		const getUserDFPInfo = getAccessToken.then(token => {
+			const { refresh_token } = token;
+			const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET } = config.googleOauth;
+
+			return request({
+				method: 'POST',
+				uri: CC.DFP_WEB_SERVICE_ENDPOINT,
+				body: {
+					clientCode: OAUTH_CLIENT_ID,
+					clientSecret: OAUTH_CLIENT_SECRET,
+					refreshToken: refresh_token
+				},
+				json: true
+			}).then(response => {
+				if (response.code === 0) {
+					return response.data;
+				}
+
+				return [];
+			});
+		});
+		const getUserInfo = getAccessToken.then(token =>
+			request({
+				strictSSL: false,
+				uri: `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${token.access_token}`,
+				json: true
+			})
+		);
+		const getUser = userModel.getUserByEmail(req.user.email);
+
+		return Promise.join(
+			getUser,
+			getAccessToken,
+			getAdsenseAccounts,
+			getUserInfo,
+			getUserDFPInfo,
+			(user, token, adsenseAccounts, userInfo, userDFPInfo) => {
+				Promise.all([
+					user.addNetworkData({
+						networkName: 'ADSENSE',
+						refreshToken: token.refresh_token,
+						accessToken: token.access_token,
+						expiresIn: token.expires_in,
+						pubId: adsenseAccounts[0].id,
+						adsenseEmail: userInfo.email,
+						userInfo,
+						adsenseAccounts
+					}),
+					user.addNetworkData({
+						networkName: 'DFP',
+						refreshToken: token.refresh_token,
+						accessToken: token.access_token,
+						expiresIn: token.expires_in,
+						userInfo,
+						dfpAccounts: userDFPInfo
+					})
+				]).then(() => {
+					// grab all the pubIds in case there are multiple and show them to user to choose
+					const pubIds = _.map(adsenseAccounts, 'id');
+					const adsenseEmail = userInfo.email;
+					const pubId = pubIds.length > 1 ? pubIds : pubIds[0];
+					const postMessageScriptTemplate = `<script type="text/javascript">
+					window.opener.postMessage({
+						"cmd":"SAVE_GOOGLE_OAUTH_INFO",
+						"data": {
+							"adsenseEmail": "${adsenseEmail}",
+							"pubId": "${pubId}"
+						}
+					}, "http://staging.adpushup.com");
+					window.close();
+					</script>`;
+
+					return res.status(httpStatus.OK).send(postMessageScriptTemplate);
+				});
+			}
+		).catch(err => {
+			const isNoAdsenseAccountMessage = !!(err.message === 'No adsense account');
+			const computedErrorMessage = isNoAdsenseAccountMessage
+				? `Sorry but it seems you have no AdSense account linked to your Google account. If this is a recently verified/created account, it might take upto 24 hours to come in effect. Please try again after sometime or contact support.`
+				: err;
+
+			return res.status(500).send(computedErrorMessage);
+		});
 	});
 
 module.exports = router;
