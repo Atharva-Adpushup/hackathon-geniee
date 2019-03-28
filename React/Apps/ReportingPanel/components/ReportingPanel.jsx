@@ -21,6 +21,7 @@ class ReportingPanel extends React.Component {
 
 		this.state = {
 			updateStatusText: '',
+			updateStatusTime: '',
 			reportLoading: true,
 			reportError: false,
 			emptyData: false,
@@ -76,7 +77,11 @@ class ReportingPanel extends React.Component {
 				if (res.status == 'Stopped') {
 					let updatedDate = res.lastRunTimePST;
 					this.setState({
-						updateStatusText: `Note - The reports were last updated on ${updatedDate}.`
+						updateStatusTime: `Note - The reports were last updated on ${updatedDate}.`
+					});
+				} else if (res.status == 'Running') {
+					this.setState({
+						updateStatusText: `Note - The network reporting data is being crunched right now. Please check back in 15 minutes.`
 					});
 				}
 			}
@@ -219,7 +224,8 @@ class ReportingPanel extends React.Component {
 				variations,
 				variation,
 				groupBy,
-				updateStatusText
+				updateStatusText,
+				updateStatusTime
 			} = this.state,
 			customToggle = {
 				toggleText: 'Network wise data',
@@ -259,9 +265,9 @@ class ReportingPanel extends React.Component {
 				</div>
 			),
 			reportContent = updateStatusText ? (
-				reportPane
+				<PaneLoader message={updateStatusText} />
 			) : (
-				<PaneLoader message="Note - The network reporting data is being crunched right now. Please check back in 15 minutes." />
+				reportPane
 			);
 
 		let csvData = '';
@@ -284,6 +290,9 @@ class ReportingPanel extends React.Component {
 							variation={variation}
 							csvData={csvData}
 						/>
+					</Col>
+					<Col sm={12} className="updateStatusDiv">
+						{updateStatusTime ? <span>{updateStatusTime}</span> : ''}
 					</Col>
 
 					<Col sm={12}>
