@@ -1,7 +1,7 @@
 /**
  * Created by Dhiraj on 3/14/2016.
  */
-var google = require('googleapis'),
+var { google } = require('googleapis'),
 	config = require('../configs/config'),
 	userModel = require('../models/userModel'),
 	AdPushupError = require('../helpers/AdPushupError'),
@@ -13,7 +13,7 @@ var google = require('googleapis'),
 		config.googleOauth.OAUTH_CALLBACK
 	);
 
-oauth2Client = Promise.promisifyAll(oauth2Client);
+// oauth2Client = Promise.promisifyAll(oauth2Client);
 
 module.exports = {
 	getClient: function(user, needAccountId) {
@@ -48,10 +48,17 @@ module.exports = {
 				return oauth2UpdatedClient.refreshAccessTokenAsync();
 			});
 
-		return Promise.join(getNetworkData, setToken, refreshToken, function(networkData, client, newCreds) {
+		return Promise.join(getNetworkData, setToken, refreshToken, function(
+			networkData,
+			client,
+			newCreds
+		) {
 			oauth2Client.setCredentials(newCreds);
 			if (needAccountId) {
-				return [oauth2Client, networkData.pubId ? networkData.pubId : networkData.adsenseAccounts[0].id];
+				return [
+					oauth2Client,
+					networkData.pubId ? networkData.pubId : networkData.adsenseAccounts[0].id
+				];
 			}
 			return oauth2Client;
 		});

@@ -143,7 +143,7 @@ class Integrations extends Component {
 		switch (activeTab) {
 			default:
 			case INTG_NAV_ITEMS_INDEXES.CONNECT_GOOGLE:
-				// return <div className="u-padding-v5 u-padding-h5">Integrations will be done here</div>;
+				// TODO: Abstract out Google Account integration functionality into a separate component
 				return (
 					<HeroFeature
 						rootClassName={computedRootClassName}
