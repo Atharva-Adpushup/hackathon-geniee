@@ -74,6 +74,6 @@ module.exports = {
 		});
 	},
 	getAccessTokens: function(code) {
-		return oauth2Client.getTokenAsync(code);
+		return oauth2Client.getToken(code);
 	}
 };
