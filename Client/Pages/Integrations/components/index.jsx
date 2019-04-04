@@ -14,9 +14,18 @@ import { INTG_NAV_ITEMS, INTG_NAV_ITEMS_INDEXES, INTG_NAV_ITEMS_VALUES } from '.
 library.add(faCheckCircle);
 
 class Integrations extends Component {
+	isGoogleOauthConnected =
+		!!(
+			this.props &&
+			this.props.user &&
+			this.props.user.adNetworkSettings &&
+			Array.isArray(this.props.user.adNetworkSettings) &&
+			this.props.user.adNetworkSettings.length
+		) || false;
+
 	state = {
 		redirectUrl: '',
-		isGoogleOauthConnected: false
+		isGoogleOauthConnected: this.isGoogleOauthConnected
 	};
 
 	$window = window;
@@ -98,7 +107,6 @@ class Integrations extends Component {
 			return false;
 		}
 
-		console.log('Got post message data', parsedData);
 		this.setState({ isGoogleOauthConnected: true });
 
 		return true;
