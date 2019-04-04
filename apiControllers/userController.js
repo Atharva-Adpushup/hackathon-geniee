@@ -123,6 +123,9 @@ router
 	.get('/requestGoogleOAuth', (req, res) => {
 		const uniqueString = uuid.v1();
 
+		// TODO: 'googleOAuthUniqueString' temporary global variable is added to keep unique id during Google Oauth authentication process.
+		// This temp global gets reset at every new and completion of Oauth authentication process.
+		// Find and implement a better unique id storage mechanism.
 		googleOAuthUniqueString = uniqueString;
 		return res.redirect(oauthHelper.getRedirectUrl(uniqueString));
 	})
@@ -141,8 +144,9 @@ router
 		return res.status(httpStatus.OK).send(postMessageScriptTemplate);
 	})
 	.get('/oauth2callback', (req, res) => {
-		const isNotMatchingUniqueString = !!(googleOAuthUniqueString !== req.query.state);
-		const isErrorAccessDenied = !!(req.query.error === 'access_denied');
+		const { state: queryState, error: queryError } = req.query;
+		const isNotMatchingUniqueString = !!(googleOAuthUniqueString !== queryState);
+		const isErrorAccessDenied = !!(queryError === 'access_denied');
 
 		if (isNotMatchingUniqueString) {
 			return res.status(500).send('Fake Request');
@@ -156,7 +160,14 @@ router
 				);
 		}
 
-		const getAccessToken = oauthHelper.getAccessTokens(req.query);
+		const getAccessToken = oauthHelper.getAccessTokens(req.query.code).then(tokenObject => {
+			const {
+				tokens: { access_token, id_token, expiry_date }
+			} = tokenObject;
+			const computedObject = { access_token, id_token, expiry_date };
+
+			return computedObject;
+		});
 		const getAdsenseAccounts = getAccessToken.then(token =>
 			request({
 				strictSSL: false,
@@ -176,7 +187,7 @@ router
 				})
 		);
 		const getUserDFPInfo = getAccessToken.then(token => {
-			const { refresh_token } = token;
+			const { id_token } = token;
 			const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET } = config.googleOauth;
 
 			return request({
@@ -185,7 +196,7 @@ router
 				body: {
 					clientCode: OAUTH_CLIENT_ID,
 					clientSecret: OAUTH_CLIENT_SECRET,
-					refreshToken: refresh_token
+					refreshToken: id_token
 				},
 				json: true
 			}).then(response => {
@@ -212,12 +223,14 @@ router
 			getUserInfo,
 			getUserDFPInfo,
 			(user, token, adsenseAccounts, userInfo, userDFPInfo) => {
-				Promise.all([
+				const { id_token, access_token, expiry_date } = token;
+
+				return Promise.all([
 					user.addNetworkData({
 						networkName: 'ADSENSE',
-						refreshToken: token.refresh_token,
-						accessToken: token.access_token,
-						expiresIn: token.expires_in,
+						refreshToken: id_token,
+						accessToken: access_token,
+						expiresIn: expiry_date,
 						pubId: adsenseAccounts[0].id,
 						adsenseEmail: userInfo.email,
 						userInfo,
@@ -225,9 +238,9 @@ router
 					}),
 					user.addNetworkData({
 						networkName: 'DFP',
-						refreshToken: token.refresh_token,
-						accessToken: token.access_token,
-						expiresIn: token.expires_in,
+						refreshToken: id_token,
+						accessToken: access_token,
+						expiresIn: expiry_date,
 						userInfo,
 						dfpAccounts: userDFPInfo
 					})
@@ -236,6 +249,8 @@ router
 					const pubIds = _.map(adsenseAccounts, 'id');
 					const adsenseEmail = userInfo.email;
 					const pubId = pubIds.length > 1 ? pubIds : pubIds[0];
+					// TODO: Below mentioned https staging url is for testing purposes.
+					// This should be replaced with https console product url once this product gets live.
 					const postMessageScriptTemplate = `<script type="text/javascript">
 					window.opener.postMessage({
 						"cmd":"SAVE_GOOGLE_OAUTH_INFO",
