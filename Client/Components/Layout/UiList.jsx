@@ -166,7 +166,7 @@ class UiList extends React.Component {
 		const { activeItemKey, activeItemValue, collection } = this.state;
 		const { validate, isSeparateSaveButton } = this.props;
 		const isValidActiveItemKey = !!(activeItemKey !== null && activeItemKey !== '');
-		const isValidActiveItemValue = !!activeItemValue;
+		const isValidActiveItemValue = !!activeItemValue.trim('');
 		const isValidActiveItem = !!(isValidActiveItemKey && isValidActiveItemValue);
 		const computedItemAction = isValidActiveItemKey ? 'update' : 'add';
 		const confirmMessage = `Are you sure you want to ${computedItemAction} ${activeItemValue}`;
