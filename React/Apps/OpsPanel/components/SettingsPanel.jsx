@@ -165,7 +165,7 @@ export default class SettingsPanel extends React.Component {
 					</Col>
 				</Row>
 
-				<h5 style={{ borderBottom: '1px solid #ccc' }} className="mTB-15 padding-b10px">
+				{/* <h5 style={{ borderBottom: '1px solid #ccc' }} className="mTB-15 padding-b10px">
 					Select country codes
 				</h5>
 				<Row>
@@ -190,7 +190,7 @@ export default class SettingsPanel extends React.Component {
 							Validate Country config
 						</button>
 					</Col>
-				</Row>
+				</Row> */}
 			</div>
 		);
 	}
