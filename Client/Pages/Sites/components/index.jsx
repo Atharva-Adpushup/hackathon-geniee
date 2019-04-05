@@ -52,7 +52,7 @@ class MySites extends Component {
 					const statusObject = SITE_SETUP_STATUS[siteStep];
 					const domanizeDomain = domanize(site.domain);
 					const computedReportingUrl = `/reporting/${siteId}`;
-					const computedManageSiteUrl = `/sites/${siteId}/`;
+					const computedManageSiteUrl = `/sites/${siteId}`;
 					const isSiteBlock = !!(statusObject.site && Object.keys(statusObject.site).length);
 					// TODO: Remove card flex wrap implementation with grid-col implementation
 					// so that fixed height hacks are not required. Every card container will be available
