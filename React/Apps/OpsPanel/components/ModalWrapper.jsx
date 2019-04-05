@@ -68,9 +68,9 @@ class ModalWrapper extends React.Component {
 				size: ix ? JSON.stringify(ix.params.size) : ''
 			},
 			rubicon: {
-				accountId: rubicon ? rubicon.accountId : '',
-				siteId: rubicon ? rubicon.siteId : '',
-				zoneId: rubicon ? rubicon.zoneId : ''
+				accountId: rubicon ? rubicon.params.accountId : '',
+				siteId: rubicon ? rubicon.params.siteId : '',
+				zoneId: rubicon ? rubicon.params.zoneId : ''
 			},
 			error: ''
 		};
@@ -151,9 +151,9 @@ class ModalWrapper extends React.Component {
 				size: ix ? JSON.stringify(ix.params.size) : ''
 			},
 			rubicon: {
-				accountId: rubicon ? rubicon.accountId : '',
-				siteId: rubicon ? rubicon.siteId : '',
-				zoneId: rubicon ? rubicon.zoneId : ''
+				accountId: rubicon ? rubicon.params.accountId : '',
+				siteId: rubicon ? rubicon.params.siteId : '',
+				zoneId: rubicon ? rubicon.params.zoneId : ''
 			},
 			error: ''
 		});
