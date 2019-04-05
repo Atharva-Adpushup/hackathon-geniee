@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import Integrations from '../components/index';
+import { updateAdNetworkSettingsAction } from '../../../actions/userActions';
 
 const mapStateToProps = (state, ownProps) => {
 	const {
@@ -12,7 +13,9 @@ const mapStateToProps = (state, ownProps) => {
 	};
 };
 
-const mapDispatchToProps = () => ({});
+const mapDispatchToProps = dispatch => ({
+	updateAdNetworkSettings: data => dispatch(updateAdNetworkSettingsAction(data))
+});
 
 export default connect(
 	mapStateToProps,
