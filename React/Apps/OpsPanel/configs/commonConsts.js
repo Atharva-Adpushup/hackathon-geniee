@@ -367,6 +367,10 @@ const siteMappingActions = {
 		{
 			value: 'ix',
 			label: 'ix'
+		},
+		{
+			value: 'rubicon',
+			label: 'rubicon'
 		}
 	],
 	devicesList = [
@@ -460,6 +464,20 @@ const siteMappingActions = {
 			},
 			{
 				name: 'size',
+				type: 'string'
+			}
+		],
+		rubicon: [
+			{
+				name: 'accountId',
+				type: 'string'
+			},
+			{
+				name: 'siteId',
+				type: 'string'
+			},
+			{
+				name: 'zoneId',
 				type: 'string'
 			}
 		]
