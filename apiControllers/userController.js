@@ -249,19 +249,13 @@ router
 						dfpAccounts: userDFPInfo
 					})
 				]).then(() => {
-					// grab all the pubIds in case there are multiple and show them to user to choose
-					const pubIds = _.map(adsenseAccounts, 'id');
-					const adsenseEmail = userInfo.email;
-					const pubId = pubIds.length > 1 ? pubIds : pubIds[0];
-					// TODO: Below mentioned https staging url is for testing purposes.
+					const postMessageData = JSON.stringify(user.get('adNetworkSettings'));
+					// TODO: Below mentioned https staging url (https://app.staging.adpushup.com) is for testing purposes.
 					// This should be replaced with https console product url once this product gets live.
 					const postMessageScriptTemplate = `<script type="text/javascript">
 					window.opener.postMessage({
 						"cmd":"SAVE_GOOGLE_OAUTH_INFO",
-						"data": {
-							"adsenseEmail": "${adsenseEmail}",
-							"pubId": "${pubId}"
-						}
+						"data": ${postMessageData}
 					}, "https://app.staging.adpushup.com");
 					window.close();
 					</script>`;
@@ -274,7 +268,7 @@ router
 				const isNoAdsenseAccountMessage = !!(err.message === 'No adsense account');
 				const computedErrorMessage = isNoAdsenseAccountMessage
 					? `Sorry but it seems you have no AdSense account linked to your Google account. If this is a recently verified/created account, it might take upto 24 hours to come in effect. Please try again after sometime or contact support.`
-					: err;
+					: `Some error occurred while connecting with your Google account. Please try again after some time or contact your account manager.`;
 
 				return res.status(500).send(computedErrorMessage);
 			})

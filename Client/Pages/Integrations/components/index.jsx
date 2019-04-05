@@ -99,14 +99,15 @@ class Integrations extends Component {
 			Object.keys(parsedData).length === 2 &&
 			parsedData.cmd &&
 			parsedData.data &&
-			parsedData.data.adsenseEmail &&
-			parsedData.data.pubId
+			Array.isArray(parsedData.data) &&
+			parsedData.data.length
 		);
 
 		if (!isValidData) {
 			return false;
 		}
 
+		console.log('Got ad network settings data: ', parsedData.data);
 		this.setState({ isGoogleOauthConnected: true });
 
 		return true;
