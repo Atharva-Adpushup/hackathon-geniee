@@ -44,13 +44,11 @@ const user = (state = { fetched: false, data: {} }, action) => {
 		}
 
 		case USER_ACTIONS.UPDATE_AD_NETWORK_SETTINGS: {
-			const adNetworkSettings = { ...action.data };
-
 			return {
 				...state,
 				data: {
 					...state.data,
-					adNetworkSettings
+					adNetworkSettings: action.data
 				}
 			};
 		}
