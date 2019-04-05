@@ -93,6 +93,7 @@ class Integrations extends Component {
 	};
 
 	handlePostMessageHandler(event) {
+		const { updateAdNetworkSettings } = this.props;
 		const isStringData = !!(typeof event.data === 'string');
 		const parsedData = isStringData ? JSON.parse(event.data) : event.data;
 		const isValidData = !!(
@@ -107,9 +108,7 @@ class Integrations extends Component {
 			return false;
 		}
 
-		console.log('Got ad network settings data: ', parsedData.data);
-		this.setState({ isGoogleOauthConnected: true });
-
+		this.setState({ isGoogleOauthConnected: true }, () => updateAdNetworkSettings(parsedData.data));
 		return true;
 	}
 
