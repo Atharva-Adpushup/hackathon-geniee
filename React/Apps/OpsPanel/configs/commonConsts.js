@@ -351,6 +351,22 @@ const siteMappingActions = {
 		{
 			value: 'districtmDMX',
 			label: 'districtmDMX'
+		},
+		{
+			value: 'openx',
+			label: 'openx'
+		},
+		{
+			value: 'conversant',
+			label: 'conversant'
+		},
+		{
+			value: '33across',
+			label: '33across'
+		},
+		{
+			value: 'ix',
+			label: 'ix'
 		}
 	],
 	devicesList = [
@@ -405,6 +421,46 @@ const siteMappingActions = {
 			{
 				name: 'memberid',
 				type: 'integer'
+			}
+		],
+		openx: [
+			{
+				name: 'delDomain',
+				type: 'string'
+			},
+			{
+				name: 'unit',
+				type: 'string'
+			}
+		],
+		conversant: [
+			{
+				name: 'site_id',
+				type: 'string'
+			},
+			{
+				name: 'secure',
+				type: 'integer'
+			}
+		],
+		'33across': [
+			{
+				name: 'siteId',
+				type: 'string'
+			},
+			{
+				name: 'productId',
+				type: 'string'
+			}
+		],
+		ix: [
+			{
+				name: 'siteId',
+				type: 'string'
+			},
+			{
+				name: 'size',
+				type: 'string'
 			}
 		]
 	},

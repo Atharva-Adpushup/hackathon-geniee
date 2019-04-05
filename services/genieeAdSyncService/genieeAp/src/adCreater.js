@@ -5,11 +5,14 @@ var $ = require('jquery'),
 	browserConfig = require('../libs/browserConfig'),
 	incontentAnalyser = __IN_CONTENT_ANALYSER_SCRIPT__,
 	adCodeGenerator = require('./adCodeGenerator'),
+	refreshAdSlot = require('./refreshAdSlot'),
 	commonConsts = require('../config/commonConsts'),
 	shouldPushToADP = function(ad) {
 		return (
 			(ad.network === 'adpTags' && ad.networkData) ||
-			(ad.network === 'geniee' && ad.networkData && ad.networkData.dynamicAllocation)
+			(ad.network === 'geniee' &&
+				ad.networkData &&
+				ad.networkData.dynamicAllocation)
 		);
 	},
 	segregateAds = function(ads) {
@@ -34,14 +37,21 @@ var $ = require('jquery'),
 				ad.networkData &&
 				!ad.networkData.dynamicAllocation &&
 				!ad.networkData.adCode &&
-				genieeIds.push({ zoneId: ad.networkData.zoneId, zoneContainerId: ad.networkData.zoneContainerId });
+				genieeIds.push({
+					zoneId: ad.networkData.zoneId,
+					zoneContainerId: ad.networkData.zoneContainerId
+				});
 			// 'isADPTags' will be true if atleast one ADP tag is present
-			shouldPushToADP(ad) ? (adpTagUnits.push(ad), (window.adpushup.config.isADPTags = true)) : null;
+			shouldPushToADP(ad)
+				? (adpTagUnits.push(ad), (window.adpushup.config.isADPTags = true))
+				: null;
 
 			// Push ads to structural ad array only if ad is not interactive or not incontent
 			if (
 				ad.type == commonConsts.AD_TYPES.STRUCTURAL ||
-				(!ad.formatData && !ad.isIncontent && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD) ||
+				(!ad.formatData &&
+					!ad.isIncontent &&
+					ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD) ||
 				ad.type == commonConsts.AD_TYPES.DOCKED_STRUCTURAL
 			) {
 				structuredAds.push(ad);
@@ -68,11 +78,19 @@ var $ = require('jquery'),
 			el = $(ad.xpath);
 		}
 		var isGenieePartner = !!(ad.network === 'geniee' && !ad.networkData.adCode),
-			isGenieeWithoutDFP = !!(isGenieePartner && !ad.networkData.dynamicAllocation),
+			isGenieeWithoutDFP = !!(
+				isGenieePartner && !ad.networkData.dynamicAllocation
+			),
 			isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
-			isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
+			isGenieeNetwork = !!(
+				ad.network === 'geniee' &&
+				ad.networkData &&
+				ad.networkData.zoneId
+			),
 			isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
-			computedSSPContainerId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.zoneId,
+			computedSSPContainerId = isZoneContainerId
+				? ad.networkData.zoneContainerId
+				: ad.networkData.zoneId,
 			defaultAdProperties = {
 				display: isGenieeWithoutDFP ? 'none' : 'block',
 				clear: ad.isIncontent ? null : 'both'
@@ -133,7 +151,11 @@ var $ = require('jquery'),
 		try {
 			utils.runScript(utils.base64Decode(variation.customJs.afterAp));
 		} catch (e) {
-			window.adpushup.err.push({ msg: 'Error in afterAp js.', js: variation.customJs.afterAp, error: e });
+			window.adpushup.err.push({
+				msg: 'Error in afterAp js.',
+				js: variation.customJs.afterAp,
+				error: e
+			});
 		}
 		window.adpushup.afterJSExecuted = true;
 	},
@@ -145,7 +167,10 @@ var $ = require('jquery'),
 			container.append(adCodeGenerator.generateAdCode(ad));
 			$.ajaxSettings.cache = false;
 
-			if (ad.type && Number(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL) {
+			if (
+				ad.type &&
+				Number(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL
+			) {
 				// Type 4 is DOCKED
 				utils.dockify.dockifyAd('#' + ad.id, ad.formatData, utils);
 			}
@@ -153,9 +178,18 @@ var $ = require('jquery'),
 			adp.tracker.add(
 				container,
 				function(id) {
-					utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: id });
+					utils.sendBeacon(adp.config.feedbackUrl, {
+						eventType: 2,
+						click: true,
+						id: id
+					});
 				}.bind(adp, ad.id)
 			);
+			var currentTime = new Date().getTime();
+			container.attr('data-render-time', currentTime);
+			if (ad.networkData && ad.networkData.refreshSlot) {
+				refreshAdSlot.refreshSlot(container, ad);
+			}
 		} catch (e) {
 			adp.err.push({ msg: 'Error in placing ad.', ad: ad, error: e });
 		}
@@ -163,7 +197,10 @@ var $ = require('jquery'),
 	},
 	filterNonInteractiveAds = function(ads) {
 		return ads.filter(function(ad) {
-			return !ad.type || (ad.type && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD);
+			return (
+				!ad.type ||
+				(ad.type && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD)
+			);
 		});
 	},
 	createAds = function(adp, variation) {
@@ -184,7 +221,9 @@ var $ = require('jquery'),
 				variationId: variation.id // set the chosenVariation variation in feedback data;
 			},
 			placeGenieeHeadCode = function(genieeIdCollection) {
-				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIdCollection);
+				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(
+					genieeIdCollection
+				);
 				genieeHeadCode && $('head').append(genieeHeadCode);
 			},
 			handleContentSelectorFailure = function(inContentAds) {
@@ -211,7 +250,11 @@ var $ = require('jquery'),
 				}
 				if (!displayCounter && !finished) {
 					finished = true;
-					if (variation.customJs && variation.customJs.afterAp && !adp.afterJSExecuted) {
+					if (
+						variation.customJs &&
+						variation.customJs.afterAp &&
+						!adp.afterJSExecuted
+					) {
 						executeAfterJS(variation);
 					}
 					//utils.sendFeedback(feedbackData);
@@ -247,7 +290,9 @@ var $ = require('jquery'),
 				});
 			},
 			placeInContentAds = function($incontentElm, inContentAds) {
-				incontentAnalyser($incontentElm, inContentAds, function(sectionsWithTargetElm) {
+				incontentAnalyser($incontentElm, inContentAds, function(
+					sectionsWithTargetElm
+				) {
 					$(inContentAds).each(function(index, ad) {
 						var sectionObj = sectionsWithTargetElm[ad.section],
 							$containerElement,
@@ -266,8 +311,12 @@ var $ = require('jquery'),
 							//feedbackData.ads.push(ad.id);
 
 							$containerElement = getContainer(ad, sectionObj.elem);
-							isContainerElement = !!($containerElement && $containerElement.length);
-							containerId = isContainerElement ? $containerElement.get(0).id : '';
+							isContainerElement = !!(
+								$containerElement && $containerElement.length
+							);
+							containerId = isContainerElement
+								? $containerElement.get(0).id
+								: '';
 
 							next(ad, { success: true, container: $containerElement });
 						} else {
@@ -283,7 +332,11 @@ var $ = require('jquery'),
 				try {
 					utils.runScript(utils.base64Decode(variation.customJs.beforeAp));
 				} catch (e) {
-					err.push({ msg: 'Error in beforeAp js.', js: variation.customJs.beforeAp, error: e });
+					err.push({
+						msg: 'Error in beforeAp js.',
+						js: variation.customJs.beforeAp,
+						error: e
+					});
 				}
 			}
 
@@ -294,7 +347,10 @@ var $ = require('jquery'),
 			}
 
 			if (ads.adpTagUnits.length) {
-				adCodeGenerator.executeAdpTagsHeadCode(ads.adpTagUnits, variation.adpKeyValues);
+				adCodeGenerator.executeAdpTagsHeadCode(
+					ads.adpTagUnits,
+					variation.adpKeyValues
+				);
 			}
 
 			if (ads.medianetAds.length) {

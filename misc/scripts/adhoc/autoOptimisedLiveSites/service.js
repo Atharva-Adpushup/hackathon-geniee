@@ -1,11 +1,13 @@
-var extend = require('extend'),
-	moment = require('moment'),
-	lodash = require('lodash'),
-	siteModel = require('../../../../models/siteModel'),
-	couchBaseService = require('../../../../helpers/couchBaseService'),
-	couchbasePromise = require('couchbase'),
-	sitesByAutoOptimiseParameterQuery = couchbasePromise.ViewQuery.from('app', 'sitesByAutoOptimiseParameter'),
-	Promise = require('bluebird');
+const _ = require('lodash');
+const extend = require('extend');
+const moment = require('moment');
+const lodash = require('lodash');
+const { promiseForeach } = require('node-utils');
+const siteModel = require('../../../../models/siteModel');
+const couchBaseService = require('../../../../helpers/couchBaseService');
+const couchbasePromise = require('couchbase');
+const sitesByAutoOptimiseParameterQuery = couchbasePromise.ViewQuery.from('app', 'sitesByAutoOptimiseParameter');
+const Promise = require('bluebird');
 
 function getDbQueryDateMillis() {
 	// NOTE: A date after which console.adpushup.com was made live
@@ -28,16 +30,42 @@ function getAllSiteModels(results) {
 	});
 }
 
+function siteProcessing(filteredSiteModels, site) {
+	const apConfigs = site.get('apConfigs') || false;
+	const isAutoOptimiseEnabled =
+		apConfigs && apConfigs.hasOwnProperty('autoOptimise') && apConfigs.autoOptimise === true;
+	if (isAutoOptimiseEnabled) {
+		filteredSiteModels.push(site);
+		return Promise.resolve();
+	}
+	return site.getAllChannels().then(channels => {
+		_.forEach(channels, channel => {
+			if (channel.hasOwnProperty('autoOptimise') && channel.autoOptimise === true) {
+				filteredSiteModels.push(site);
+				return false;
+			}
+		});
+		return true;
+	});
+}
+
+function filterSiteModels(siteModels) {
+	let filteredSiteModels = [];
+
+	return promiseForeach(siteModels, siteProcessing.bind(null, filteredSiteModels), err => {
+		console.log(err);
+		return false;
+	}).then(() => filteredSiteModels);
+}
+
 module.exports = {
 	init: function() {
-		var queryDateRange = getDbQueryDateMillis(),
-			query = sitesByAutoOptimiseParameterQuery.range(queryDateRange.startDate, queryDateRange.endDate, true),
-			performQuery = couchBaseService.queryViewFromAppBucket(query).then(getAllSiteModels);
+		const queryDateRange = getDbQueryDateMillis();
+		const query = sitesByAutoOptimiseParameterQuery.range(queryDateRange.startDate, queryDateRange.endDate, true);
+		const performQuery = couchBaseService.queryViewFromAppBucket(query).then(getAllSiteModels);
 
 		return Promise.all(performQuery)
-			.then(function(siteModels) {
-				return siteModels;
-			})
+			.then(filterSiteModels)
 			.catch(function(e) {
 				throw e;
 			});

@@ -2,10 +2,27 @@ module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: 'http://console.adpushup.com',
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
+	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
+	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
-	DEMO_REPORT_SITE_ID: 31764,
-	DEMO_PAGEGROUPS: ['HOME', 'IMAGE', 'POST', 'PHPBB3', 'NEW', 'CATEGORY'],
+	DEMO_REPORT_SITE_ID: 31000,
+	DEMO_PAGEGROUPS: [
+		'HOME',
+		'CALC',
+		'FAQ',
+		'PHONEDATABASE',
+		'PHONEINFO',
+		'LATESTPHONE',
+		'ARTICLE',
+		'DEVICE_INFO',
+		'CARRIER',
+		'CARRIER NETWORK',
+		'CARRIER COUNTRY',
+		'NEWS_ARTICLE',
+		'CHECK',
+		'DOWNLOAD_FIRMWARE'
+	],
 	REPORT_API: {
 		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
 		DATE_FORMAT: 'YYYY-MM-DD'
@@ -15,6 +32,33 @@ module.exports = {
 		ADPTAGS: 'ADPTAGS',
 		HEADER_BIDDING: 'HEADER_BIDDING',
 		GDPR: 'GDPR'
+	},
+	INJECTION_TECHNIQUES: {
+		LAYOUT: 1,
+		TAG: 2
+	},
+	MANUAL_ADS: {
+		VARIATION: 'manual'
+	},
+	NETWORKS: {
+		ADPTAGS: 'adpTags',
+		ADSENSE: 'adsense',
+		ADX: 'adx',
+		MEDIANET: 'medianet',
+		GENIEE: 'geniee'
+	},
+	TRANSACTION_SERVICES: {
+		UNKNOWN: 0,
+		HEADER_BIDDING: 1,
+		MEDIATION: 2,
+		AMP: 3,
+		NEW_FORMATS: 4,
+		DYNAMIC_ALLOCATION: 5,
+		CONTROL_TAG: 6
+	},
+	SETUP_STATUS: {
+		ACTIVE: 1,
+		INACTIVE: 0
 	},
 	COOKIE_CONTROL_SCRIPT_TMPL:
 		'!function(){var o=document.createElement("script");o.src="https://cc.cdn.civiccomputing.com/8.0/cookieControl-8.0.min.js",document.head.appendChild(o);var n=setInterval(function(){window.CookieControl&&(clearInterval(n),CookieControl.load(__COOKIE_CONTROL_CONFIG__))},10)}();',
@@ -277,6 +321,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	CDN_SYNC_MAX_ATTEMPTS: 10,
 	CURRENCY_EXCHANGE: {
 		API_URL: 'https://api.fixer.io/latest',
+		PREBID_API_URL: 'https://cdn.jsdelivr.net/gh/prebid/currency-file@1/latest.json',
 		PARAMETERS: {
 			BASE: 'base',
 			SYMBOLS: 'symbols'
@@ -288,7 +333,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	dummy: 'test',
 	docKeys: {
-		tagManager: 'tgmr::'
+		tagManager: 'tgmr::',
+		user: 'user::'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,

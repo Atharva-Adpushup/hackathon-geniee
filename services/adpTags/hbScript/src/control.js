@@ -3,6 +3,7 @@
 var initControl = require('../../../genieeAdSyncService/genieeAp/src/control'),
 	getBidDataForFeedback = require('./feedback').getBidDataForFeedback,
 	utils = require('../helpers/utils'),
+	adp = require('./adp').adp,
 	timedOutBidders = null,
 	adSlots = [],
 	initControlFeedback = function(w) {
@@ -38,9 +39,9 @@ var initControl = require('../../../genieeAdSyncService/genieeAp/src/control'),
 							selectedAdSlot = adSlot.containerId === containerId ? adSlot : null;
 						});
 
-						if (w.adpushup && w.adpushup.config) {
-							siteId = w.adpushup.config.siteId;
-							platform = w.adpushup.config.platform;
+						if (adp && adp.config) {
+							siteId = adp.config.siteId;
+							platform = adp.config.platform;
 						}
 
 						if (selectedAdSlot) {

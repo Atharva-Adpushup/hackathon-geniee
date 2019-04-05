@@ -53,6 +53,13 @@ const openChannel = channelId => ({ type: channelActions.OPEN_CHANNEL, channelId
 			sampleUrl
 		};
 	},
+	updateAutoptimize = (channelId, value) => {
+		return {
+			type: channelActions.UPDATE_AUTOPTIMIZE,
+			channelId,
+			value
+		};
+	},
 	changeContentSelector = (channelId, selector) => {
 		return {
 			type: channelActions.CHANGE_CONTENT_SELECTOR,
@@ -88,5 +95,6 @@ export {
 	saveChannelBeforeAfterJs,
 	contentSelectorWorked,
 	contentSelectorMissing,
-	closeChannel
+	closeChannel,
+	updateAutoptimize
 };

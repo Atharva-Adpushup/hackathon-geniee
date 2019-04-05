@@ -7,7 +7,9 @@ import {
 	getChannelVariationsWithAds,
 	getVariationSectionsWithAds
 } from 'selectors/variationSelectors';
+import { getSectionWithAds } from 'selectors/sectionSelectors';
 import { uiActions } from '../consts/commonConsts';
+import { updateLogWritten } from './adActions';
 
 const getLastVariationNumber = function(variations) {
 		const names = variations.map(({ name }) => {
@@ -53,6 +55,19 @@ const getLastVariationNumber = function(variations) {
 		variationId,
 		channelId
 	}),
+	updateInContentTreeSelectorsLevel = (variationId, selectorsTreeLevel) => dispatch => {
+		dispatch({
+			type: variationActions.UPDATE_INCONTENT_SELECTORS_TREE_LEVEL,
+			variationId,
+			selectorsTreeLevel
+		});
+		dispatch({
+			type: uiActions.SHOW_NOTIFICATION,
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Variation incontent selectors tree level setting saved'
+		});
+	},
 	copyVariation = (variationId, channelId) => (dispatch, getState) => {
 		const newVariationId = Utils.getRandomNumber(),
 			ads = [],
@@ -60,6 +75,9 @@ const getLastVariationNumber = function(variations) {
 			copyFromVariation = getVariationSectionsWithAds(state, { variationId }),
 			sectionIds = [],
 			newName = `Variation ${getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1}`;
+
+		// Delete 'isControl' property from copied data as only one variation can be tagged as 'control/baseline'
+		delete copyFromVariation.isControl;
 
 		dispatch({
 			type: variationActions.COPY_VARIATION,
@@ -138,6 +156,71 @@ const getLastVariationNumber = function(variations) {
 			payload
 		});
 	},
+	tagcontrolVariation = (variationId, channelId, payload) => (dispatch, getState) => {
+		let currentVariationObj = null;
+		const state = getState(),
+			allVariations = getChannelVariations(state, { channelId }),
+			isControl = !!payload.isControl,
+			controlVariations = _.compact(
+				_.map(allVariations, variationObj => {
+					const isSameVariation = !!(variationId === variationObj.id);
+
+					if (isSameVariation) {
+						currentVariationObj = variationObj;
+						return false;
+					}
+
+					return !!variationObj.isControl;
+				})
+			),
+			hasControlVariationsReachedLimit = !!(
+				controlVariations &&
+				controlVariations.length &&
+				payload &&
+				isControl
+			),
+			computedMessage = isControl ? 'tagged as' : 'removed the tag',
+			computedConfirmationMessage = `Are you sure you want to ${
+				isControl ? 'tag this variation as Baseline?' : 'remove Baseline tag from this variation'
+			}`,
+			notificationMessage = `Successfully ${computedMessage} Baseline Variation`,
+			isCurrentVariationSections = !!(currentVariationObj.sections && currentVariationObj.sections.length);
+
+		if (hasControlVariationsReachedLimit) {
+			dispatch({
+				type: uiActions.SHOW_NOTIFICATION,
+				mode: 'error',
+				title: 'Baseline Variations Limit',
+				message: 'Cannot create more than 1 baseline variation!'
+			});
+			return;
+		}
+
+		if (confirm(computedConfirmationMessage)) {
+			dispatch({
+				type: variationActions.TAG_CONTROL_VARIATION,
+				variationId,
+				payload
+			});
+			dispatch({
+				type: uiActions.SHOW_NOTIFICATION,
+				mode: 'success',
+				title: 'Operation Successful',
+				message: notificationMessage
+			});
+
+			if (isCurrentVariationSections) {
+				currentVariationObj.sections.forEach(id => {
+					const sectionObj = getSectionWithAds(state, { sectionId: id }),
+						adId = sectionObj.ads[0].id;
+
+					// Negative control value is set for all ads 'logWritten' value
+					// as this property value should be 'false' when control is 'true' as vice-versa.
+					dispatch(updateLogWritten(adId, !isControl));
+				});
+			}
+		}
+	},
 	editVariationName = (variationId, channelId, name) => (dispatch, getState) => {
 		const variations = getChannelVariations(getState(), { channelId }),
 			arr = _.map(variations, data => {
@@ -154,11 +237,19 @@ const getLastVariationNumber = function(variations) {
 		}
 		dispatch({ type: variationActions.EDIT_VARIATION_NAME, variationId, name });
 	},
-	editTrafficDistribution = (variationId, trafficDistribution) => ({
-		type: variationActions.EDIT_TRAFFIC_DISTRIBUTION,
-		variationId,
-		trafficDistribution
-	}),
+	editTrafficDistribution = (variationId, trafficDistribution) => (dispatch, getState) => {
+		dispatch({
+			type: variationActions.EDIT_TRAFFIC_DISTRIBUTION,
+			variationId,
+			trafficDistribution
+		});
+		dispatch({
+			type: uiActions.SHOW_NOTIFICATION,
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Variation traffic distribution saved'
+		});
+	},
 	saveBeforeJs = (variation, beforeJs) => (dispatch, getState) => {
 		dispatch({ type: variationActions.SAVE_BEFORE_JS, variation, beforeJs });
 		dispatch({
@@ -194,6 +285,7 @@ export {
 	deleteVariation,
 	updateVariation,
 	disableVariation,
+	tagcontrolVariation,
 	setActiveVariation,
 	editVariationName,
 	editTrafficDistribution,
@@ -201,5 +293,6 @@ export {
 	saveAfterJs,
 	saveKeyValues,
 	updateContentSelector,
+	updateInContentTreeSelectorsLevel,
 	savePersonalizationInfo
 };

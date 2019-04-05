@@ -26,10 +26,10 @@ class Notification extends Component {
 		const style = {
 			Containers: {
 				DefaultStyle: {
-					top: 'auto',
+					top: '50',
 					bottom: 'auto',
-					left: '0',
-					right: 'auto'
+					left: 'auto',
+					right: '0'
 				}
 			}
 		};

@@ -8,6 +8,7 @@ import AdNetworkDetails from './AdNetworkDetails.jsx';
 import AdEventDetails from './AdEventDetails.jsx';
 import LazyLoadSettings from './LazyLoadSettings.jsx';
 import Tags from '../../../../../Components/Tags';
+
 class AdElement extends Component {
 	constructor(props) {
 		super(props);
@@ -30,7 +31,8 @@ class AdElement extends Component {
 		});
 	}
 
-	disableAd(ad) {
+	disableAd() {
+		const { ad, updateAd, modifyAdOnServer } = this.props;
 		const message = this.state.isActive
 			? 'Are you sure you want to archive this ad?'
 			: 'Are you sure you want to unarchive this ad?';
@@ -39,12 +41,16 @@ class AdElement extends Component {
 				{
 					isActive: !this.state.isActive
 				},
-				() => {
-					this.props.updateAd(ad.id, {
-						isActive: this.state.isActive,
-						archivedOn: +new Date()
-					});
-				}
+				() =>
+					(window.isSuperUser
+						? updateAd(ad.id, {
+								isActive: this.state.isActive,
+								archivedOn: +new Date()
+							})
+						: modifyAdOnServer(ad.id, {
+								isActive: this.state.isActive,
+								archivedOn: +new Date()
+							}))
 			);
 		}
 	}
@@ -70,8 +76,8 @@ class AdElement extends Component {
 	}
 
 	renderAdDetails() {
-		const { ad, updateAd } = this.props;
-		const isAMP = ad.formatData.type == 'amp' ? true : false;
+		const { ad, updateAd, networkConfig } = this.props;
+		const isAMP = ad.formatData.type == 'amp';
 
 		let code = isAMP ? this.getAMPAdCode(ad) : adCode;
 		code = code ? code.replace(/__AD_ID__/g, ad.id) : null;
@@ -82,6 +88,7 @@ class AdElement extends Component {
 					ad={ad}
 					onCancel={this.toggleHandler.bind(null, 'showNetworkDetails')}
 					onSubmit={updateAd}
+					networkConfig={networkConfig}
 				/>
 			);
 		} else if (this.state.showEventDetails) {
@@ -113,46 +120,46 @@ class AdElement extends Component {
 					cancelHandler={this.toggleHandler.bind(null, 'showLazyload')}
 				/>
 			);
-		} else {
-			return (
-				<div key={'adDetails' + ad.id}>
-					{!this.state.isActive ? <Tags labels={['Archived']} labelClasses="custom-label" /> : null}
-					{this.renderInformation('Id', ad.id)}
-					<p>
-						Name: <strong>{ad.name ? ad.name : `Ad-${ad.id}`}</strong>{' '}
-						<OverlayTrigger placement="bottom" overlay={<Tooltip id="ad-name-edit">Edit Ad Name</Tooltip>}>
-							<span
-								className="adDetails-icon"
-								onClick={this.toggleHandler.bind(null, 'editName')}
-								style={{ cursor: 'pointer' }}
-							>
-								<i className="btn-icn-edit" />
-							</span>
-						</OverlayTrigger>
-					</p>
-					{this.renderInformation('Platform', makeFirstLetterCapitalize(ad.formatData.platform))}
-					{this.renderInformation(
-						'Type',
-						`${makeFirstLetterCapitalize(ad.formatData.type)} ${
-							ad.formatData.placement ? makeFirstLetterCapitalize(ad.formatData.placement) : ''
-						}`
-					)}
-					{this.renderInformation(
-						'Size',
-						ad.width === 'responsive' ? makeFirstLetterCapitalize(ad.width) : `${ad.width}x${ad.height}`
-					)}
-					{window.isSuperUser ? (
-						<div>
+		}
+		return (
+			<div key={`adDetails${ad.id}`}>
+				{window.isSuperUser && !this.state.isActive
+					? <Tags labels={['Archived']} labelClasses="custom-label" />
+					: null}
+				{this.renderInformation('Id', ad.id)}
+				<p>
+					Name: <strong>{ad.name ? ad.name : `Ad-${ad.id}`}</strong>{' '}
+					<OverlayTrigger placement="bottom" overlay={<Tooltip id="ad-name-edit">Edit Ad Name</Tooltip>}>
+						<span
+							className="adDetails-icon"
+							onClick={this.toggleHandler.bind(null, 'editName')}
+							style={{ cursor: 'pointer' }}
+						>
+							<i className="btn-icn-edit" />
+						</span>
+					</OverlayTrigger>
+				</p>
+				{this.renderInformation('Platform', makeFirstLetterCapitalize(ad.formatData.platform))}
+				{this.renderInformation(
+					'Type',
+					`${makeFirstLetterCapitalize(ad.formatData.type)} ${ad.formatData.placement ? makeFirstLetterCapitalize(ad.formatData.placement) : ''}`
+				)}
+				{this.renderInformation(
+					'Size',
+					ad.width === 'responsive' ? makeFirstLetterCapitalize(ad.width) : `${ad.width}x${ad.height}`
+				)}
+				{window.isSuperUser
+					? <div>
 							{this.renderInformation(
 								'Network',
 								ad.network && ad.networkData ? ad.network.toUpperCase() : 'Not Set'
 							)}
 							{this.renderInformation('Status', ad.isActive ? 'Active' : 'Archived')}
 						</div>
-					) : null}
-					<pre style={{ wordBreak: 'break-word' }}>{code}</pre>{' '}
-					{window.isSuperUser ? (
-						<div>
+					: null}
+				<pre style={{ wordBreak: 'break-word' }}>{code}</pre>{' '}
+				{window.isSuperUser
+					? <div>
 							<CustomButton
 								label="Network Details"
 								handler={this.toggleHandler.bind(null, 'showNetworkDetails')}
@@ -162,11 +169,10 @@ class AdElement extends Component {
 								handler={this.toggleHandler.bind(null, 'showLazyload')}
 							/>
 						</div>
-					) : null}
-					{!isAMP ? <CustomButton label="Copy Adcode" handler={copyToClipBoard.bind(null, code)} /> : null}
-				</div>
-			);
-		}
+					: null}
+				{!isAMP ? <CustomButton label="Copy Adcode" handler={copyToClipBoard.bind(null, code)} /> : null}
+			</div>
+		);
 	}
 
 	render() {
@@ -180,7 +186,7 @@ class AdElement extends Component {
 						<Tooltip id="delete-ad-tooltip">{this.state.isActive ? 'Archive Ad' : 'Unarchive Ad'}</Tooltip>
 					}
 				>
-					<Button className="btn-close" onClick={this.disableAd.bind(null, ad)}>
+					<Button className="btn-close" onClick={this.disableAd}>
 						x
 					</Button>
 				</OverlayTrigger>

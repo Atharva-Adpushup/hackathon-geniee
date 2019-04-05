@@ -367,9 +367,10 @@ function apiModule() {
 				return patterns;
 			};
 
-			const pageGroupPattern = setPagegroupPattern(JSON.parse(json.settings.pageGroupPattern)),
-				blocklist = JSON.parse(json.settings.blocklist);
-			let otherSettings = JSON.parse(json.settings.otherSettings),
+			const settings = json.settings,
+				pageGroupPattern = setPagegroupPattern(JSON.parse(settings.pageGroupPattern)),
+				blocklist = JSON.parse(settings.blocklist);
+			let otherSettings = JSON.parse(settings.otherSettings),
 				encodedOtherSettings = Object.assign({}, otherSettings);
 
 			delete encodedOtherSettings.cookieControlConfig;
@@ -391,14 +392,19 @@ function apiModule() {
 					adpushupPercentage: otherSettings.adpushupPercentage
 						? parseInt(otherSettings.adpushupPercentage, 10)
 						: commonConsts.apConfigDefaults.adpushupPercentage,
-					autoOptimise: json.settings.autoOptimise === 'false' ? false : true,
-					activeDFPNetwork: json.settings.activeDFPNetwork ? json.settings.activeDFPNetwork : '',
-					activeDFPParentId: json.settings.activeDFPParentId ? json.settings.activeDFPParentId : '',
+					autoOptimise: settings.autoOptimise === 'false' ? false : true,
+					activeDFPNetwork: settings.activeDFPNetwork ? settings.activeDFPNetwork : '',
+					activeDFPParentId: settings.activeDFPParentId ? settings.activeDFPParentId : '',
+					activeDFPCurrencyCode: settings.activeDFPCurrencyCode || '',
 					blocklist: blocklist.length ? blocklist : '',
+					isSPA: settings.isSPA === 'false' ? false : true,
+					isThirdPartyAdx: settings.isThirdPartyAdx === 'false' ? false : true,
+					spaPageTransitionTimeout: parseInt(settings.spaPageTransitionTimeout, 10),
 					isAdPushupControlWithPartnerSSP: !!site.get('apConfigs').isAdPushupControlWithPartnerSSP
 						? site.get('apConfigs').isAdPushupControlWithPartnerSSP
 						: commonConsts.apConfigDefaults.isAdPushupControlWithPartnerSSP
 				};
+
 				site.set('apConfigs', siteConfig);
 				return site.save();
 			});

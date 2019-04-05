@@ -26,6 +26,7 @@ const commonConsts = {
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
 	REPORT_DOWNLOAD_ENDPOINT: '/user/reports/downloadAdpushupReport',
+	REPORT_STATUS: '/user/reports/status',
 	SITE_ID: window.siteId,
 	SITE_DOMAIN: window.siteDomain,
 	PAGEGROUPS: window.pageGroups,

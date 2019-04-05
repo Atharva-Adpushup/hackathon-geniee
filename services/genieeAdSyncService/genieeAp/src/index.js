@@ -3,49 +3,85 @@ var w = window,
 	adp = (w.adpushup = w.adpushup || {}),
 	$ = (adp.$ = require('jquery')),
 	utils = require('../libs/utils'),
+	defaultConfig = $.extend({}, require('../config/config.js')),
 	config = (adp.config = require('../config/config.js')),
 	Tracker = require('../libs/tracker'),
 	nodewatcher = require('../libs/nodeWatcher'),
 	browserConfig = require('../libs/browserConfig'),
 	selectVariation = require('./variationSelectionModels/index'),
 	createAds = require('./adCreater').createAds,
-	// renderAd = require('./adCreater').renderAd,
 	heartBeat = require('../libs/heartBeat'),
 	ampInit = require('./ampInit'),
 	hookAndInit = require('./hooksAndBlockList'),
 	control = require('./control')(),
 	genieeObject = require('./genieeObject'),
 	triggerAd = require('./trigger'),
+	refreshAdSlot = require('./refreshAdSlot'),
 	session = require('../libs/session'),
+	spaHandler = require('./spaHandler'),
 	isGenieeSite;
 
-// Extend adpushup object
-// Location of below snippet should not be changed, other wise script will throw error.
-$.extend(adp, {
-	creationProcessStarted: false,
-	afterJSExecuted: false,
-	err: [],
-	utils: utils,
-	control: control,
-	tracker: new Tracker(),
-	nodewatcher: nodewatcher,
-	geniee: genieeObject,
-	triggerAd: triggerAd,
-	session: session
-});
+// Destroy ADP slots and their associated GPT slots
+function destroyAdpSlots() {
+	var adpSlots = Object.keys(w.adpTags.adpSlots);
 
-// Extend the settings with generated settings
-// eslint-disable-next-line no-undef
-$.extend(adp.config, __AP_CONFIG__, {
-	platform: browserConfig.platform
-});
+	if (adpSlots.length) {
+		var adpGSlots = [];
+		adpSlots.forEach(function(adpSlot) {
+			adpGSlots.push(w.adpTags.adpSlots[adpSlot].gSlot);
+		});
 
-// Initialise adpushup session
-session.init();
+		w.adpTags.adpSlots = {};
+		w.googletag.cmd.push(function() {
+			w.googletag.destroySlots(adpGSlots);
+		});
+	}
+}
 
-//Geniee ad network specific site check
-isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
-adp.config.isGeniee = isGenieeSite;
+// Reset adpTags config and destroy all ADP slots
+function resetAdpTagsConfig() {
+	if (w.adpTags) {
+		w.adpTags.config.INVENTORY = $.extend(true, {}, w.adpTags.defaultInventory);
+		w.adpTags.adpBatches = [];
+		w.adpTags.batchPrebiddingComplete = false;
+		w.adpTags.currentBatchAdpSlots = [];
+		w.adpTags.currentBatchId = null;
+		w.adpTags.gptRefreshIntervals = [];
+		destroyAdpSlots();
+	}
+}
+
+// Reset adpushup config
+function resetAdpConfig() {
+	config = adp.config = $.extend(true, {}, defaultConfig);
+}
+
+// Resets and initialises the adpushup config object
+function initAdpConfig() {
+	resetAdpConfig();
+	resetAdpTagsConfig();
+
+	// Extend adpushup object
+	$.extend(adp, {
+		creationProcessStarted: false,
+		afterJSExecuted: false,
+		err: [],
+		utils: utils,
+		control: control,
+		tracker: new Tracker(),
+		nodewatcher: nodewatcher,
+		geniee: genieeObject,
+		triggerAd: triggerAd,
+		session: session
+	});
+
+	// Extend the settings with generated settings
+	// eslint-disable-next-line no-undef
+	$.extend(adp.config, __AP_CONFIG__, {
+		platform: browserConfig.platform,
+		packetId: utils.uniqueId(__SITE_ID__)
+	});
+}
 
 function shouldWeNotProceed() {
 	var hasGenieeStarted = !!(
@@ -99,12 +135,12 @@ function startCreation(forced) {
 		}
 
 		return selectVariation(config).then(function(variationData) {
-			var selectedVariation = variationData.selectedVariation,
+			var selectedVariation = variationData && variationData.selectedVariation,
 				moduleConfig = variationData.config,
 				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
 
-			config = adp.config = moduleConfig;
 			if (selectedVariation) {
+				config = adp.config = moduleConfig;
 				adp.creationProcessStarted = true;
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
@@ -121,6 +157,22 @@ function startCreation(forced) {
 						['interactiveAds/index.js'],
 						function(require) {
 							require('interactiveAds/index')(interactiveAds);
+							var interactiveAdsArr = adp.interactiveAds;
+							if (interactiveAdsArr.ads) {
+								var ads = interactiveAdsArr.ads;
+								for (var id in ads) {
+									var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
+									if (hasDfpAdUnit) {
+										var slotId = ads[id].networkData.dfpAdunit,
+											container = $('#' + slotId);
+										var currentTime = new Date();
+										container.attr('data-render-time', currentTime.getTime());
+										if (ads[id].networkData && ads[id].networkData.refreshSlot) {
+											refreshAdSlot.refreshSlot(container, ads[id]);
+										}
+									}
+								}
+							}
 						},
 						'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
 					);
@@ -157,27 +209,26 @@ function initAdpQue() {
 }
 
 function main() {
+	// Initialise adp config
+	initAdpConfig();
+
+	// Initialise SPA handler
+	if (adp.config.isSPA) {
+		spaHandler(w, adp);
+	}
+
+	// Initialise adpushup session
+	session.init();
+
+	//Initialise refresh slots
+	refreshAdSlot.init(w);
+
+	//Geniee ad network specific site check
+	isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
+	adp.config.isGeniee = isGenieeSite;
+
 	// Initialise adp que
 	initAdpQue();
-
-	// Set mode in adp config in case of pure manual ads implementation
-	// if (adp.config.manualModeActive) {
-	// 	adp.config.mode = 16;
-	// 	adp.creationProcessStarted = true;
-
-	// 	var interactiveAds = utils.getInteractiveAds(adp.config);
-	// 	if (interactiveAds) {
-	// 		require.ensure(
-	// 			['interactiveAds/index.js'],
-	// 			function (require) {
-	// 				require('interactiveAds/index')(interactiveAds);
-	// 			},
-	// 			'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
-	// 		);
-	// 	}
-
-	// 	return false;
-	// }
 
 	// Hook Pagegroup, find pageGroup and check for blockList
 	hookAndInit(adp, startCreation, browserConfig.platform);
@@ -224,4 +275,5 @@ function main() {
 	}
 }
 
-module.exports = main;
+adp.init = main;
+adp.init();

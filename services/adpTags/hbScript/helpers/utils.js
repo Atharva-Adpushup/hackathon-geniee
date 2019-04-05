@@ -1,5 +1,8 @@
 var config = require('../src/config'),
-	find = require('lodash.find');
+	find = require('lodash.find'),
+	$ = require('../src/adp').$,
+	adp = require('../src/adp').adp,
+	apConfig = adp.config;
 
 module.exports = {
 	hashCode: function(str) {
@@ -82,7 +85,7 @@ module.exports = {
 		return null;
 	},
 	sendFeedback: function(feedback) {
-		window.adpushup.$.post(config.FEEDBACK_URL, JSON.stringify(feedback.data));
+		$.post(config.FEEDBACK_URL, JSON.stringify(feedback.data));
 	},
 	getBatchAdUnits: function(adpSlots) {
 		var adUnits = [];
@@ -127,8 +130,8 @@ module.exports = {
 	},
 	getVariationId: function() {
 		try {
-			if (window.adpushup) {
-				var variationId = window.adpushup.config.selectedVariation;
+			if (adp) {
+				var variationId = apConfig.selectedVariation;
 
 				if (variationId) {
 					return variationId;
@@ -138,8 +141,8 @@ module.exports = {
 		return null;
 	},
 	getPageGroup: function() {
-		if (window.adpushup) {
-			var pageGroup = window.adpushup.config.pageGroup;
+		if (adp) {
+			var pageGroup = apConfig.pageGroup;
 
 			if (pageGroup) {
 				return pageGroup;
@@ -148,8 +151,8 @@ module.exports = {
 		return null;
 	},
 	getPlatform: function() {
-		if (window.adpushup) {
-			var platform = window.adpushup.config.platform;
+		if (adp) {
+			var platform = apConfig.platform;
 
 			if (platform) {
 				return platform;
@@ -158,8 +161,8 @@ module.exports = {
 		return null;
 	},
 	getActiveDFPNetwork: function() {
-		if (window.adpushup && window.adpushup.config) {
-			return window.adpushup.config.activeDFPNetwork;
+		if (adp && apConfig) {
+			return apConfig.activeDFPNetwork;
 		}
 		return null;
 	},
@@ -177,11 +180,11 @@ module.exports = {
 	},
 	hasMultipleDfpAccounts: function() {
 		try {
-			var dfpAdSlots = Object.keys(window.googletag.pubads().pa),
+			var dfpAdSlots = window.googletag.pubads().getSlots(),
 				dfpNetworkIdMap = {};
 
 			dfpAdSlots.forEach(function(dfpAdSlot) {
-				var dfpNetworkId = dfpAdSlot.match(/\/(.*?)\//)[1];
+				var dfpNetworkId = dfpAdSlot.getAdUnitPath().match(/\/(.*?)\//)[1];
 
 				if (!dfpNetworkIdMap.hasOwnProperty(dfpNetworkId)) {
 					dfpNetworkIdMap[dfpNetworkId] = 1;
@@ -198,13 +201,6 @@ module.exports = {
 		} catch (e) {
 			return false;
 		}
-	},
-	isElementInViewport: function(el) {
-		const elementTop = $(el).offset().top,
-			elementBottom = elementTop + $(el).outerHeight(),
-			viewportTop = $(window).scrollTop(),
-			viewportBottom = viewportTop + $(window).height();
-		return elementBottom > viewportTop && elementTop < viewportBottom;
 	},
 	removeElementArrayFromCollection: function(collection, elArray) {
 		var inputCollection = collection.concat([]),
@@ -225,5 +221,29 @@ module.exports = {
 		});
 
 		return collection;
+	},
+	isValidThirdPartyDFPAndCurrencyConfig: function(inputObject) {
+		var inputObject = inputObject || apConfig,
+			isActiveDFPNetwork = !!(inputObject.activeDFPNetwork && inputObject.activeDFPNetwork.length),
+			isActiveDFPCurrencyCode = !!(
+				inputObject.activeDFPCurrencyCode &&
+				inputObject.activeDFPCurrencyCode.length &&
+				inputObject.activeDFPCurrencyCode.length === 3
+			),
+			isPrebidGranularityMultiplier = !!(
+				inputObject.prebidGranularityMultiplier && Number(inputObject.prebidGranularityMultiplier)
+			),
+			isActiveDFPCurrencyExchangeRate = !!(
+				inputObject.activeDFPCurrencyExchangeRate &&
+				Object.keys(inputObject.activeDFPCurrencyExchangeRate).length
+			),
+			isValidResult = !!(
+				isActiveDFPNetwork &&
+				isActiveDFPCurrencyCode &&
+				isPrebidGranularityMultiplier &&
+				isActiveDFPCurrencyExchangeRate
+			);
+
+		return isValidResult;
 	}
 };

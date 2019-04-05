@@ -10,7 +10,10 @@ function shouldRunControl(config) {
 }
 
 function init(w, d) {
-	var control = require('./control');
+	var control = require('./control'),
+		adp = require('./adp').adp,
+		apConfig = adp.config,
+		utils = require('../helpers/utils');
 
 	w.pbjs = w.pbjs || {};
 	w.pbjs.que = w.pbjs.que || [];
@@ -18,7 +21,7 @@ function init(w, d) {
 	w.googletag = w.googletag || {};
 	googletag.cmd = googletag.cmd || [];
 
-	if (shouldRunControl(w.adpushup.config)) {
+	if (shouldRunControl(apConfig)) {
 		w.adpTags = w.adpTags || {};
 		w.adpTags.control = control.initControl('prebid');
 		control.initControlFeedback(w);
@@ -42,27 +45,30 @@ function init(w, d) {
 		var adpQue;
 		window.adpTags = window.adpTags || {};
 		window.adpTags.que = window.adpTags.que || [];
-		if (w.adpushup.adpTags) {
-			adpQue = w.adpushup.adpTags.que;
+		if (adp.adpTags) {
+			adpQue = adp.adpTags.que;
 		} else {
 			adpQue = [];
 		}
-		gpt.refreshIntervalSwitch(w);
+		//gpt.refreshIntervalSwitch(w);
 
-		var existingAdpTags = Object.assign({}, w.adpushup.adpTags),
+		var existingAdpTags = Object.assign({}, adp.adpTags),
 			adpTagsModule = require('./adpTags');
 
 		// Set adpTags if already present else initialise module
-		w.adpushup.adpTags = existingAdpTags.adpSlots ? existingAdpTags : adpTagsModule;
+		adp.adpTags = existingAdpTags.adpSlots ? existingAdpTags : adpTagsModule;
+
+		// Keep deep copy of inventory in adpTags module
+		adp.adpTags.defaultInventory = adp.$.extend(true, {}, config.INVENTORY);
 
 		// Merge adpQue with any existing que items if present
-		w.adpushup.adpTags.que = w.adpushup.adpTags.que.concat(adpQue).concat(w.adpTags.que);
-		w.adpTags = w.adpushup.adpTags;
+		adp.adpTags.que = adp.adpTags.que.concat(adpQue).concat(w.adpTags.que);
+		w.adpTags = adp.adpTags;
 
-		w.adpushup.adpTags.processQue();
-		w.adpushup.adpTags.que.push = function(queFunc) {
-			[].push.call(w.adpushup.adpTags.que, queFunc);
-			w.adpushup.adpTags.processQue();
+		adp.adpTags.processQue();
+		adp.adpTags.que.push = function(queFunc) {
+			[].push.call(adp.adpTags.que, queFunc);
+			adp.adpTags.processQue();
 		};
 
 		function messageListener(e) {
@@ -84,16 +90,12 @@ function init(w, d) {
 		// Declaring prebid winner, if anyone
 		w.pbjs.que.push(function() {
 			w.pbjs.onEvent('bidWon', function(bidData) {
-				var slot = w.adpushup.adpTags.adpSlots[bidData.adUnitCode];
+				console.log('===BidWon====', bidData);
+				var slot = adp.adpTags.adpSlots[bidData.adUnitCode],
+					computedCPMValue = utils.isValidThirdPartyDFPAndCurrencyConfig(apConfig) ? 'originalCpm' : 'cpm';
+
 				slot.feedback.winner = bidData.bidder;
-				slot.feedback.winningRevenue = bidData.cpm / 1000;
-
-				// if(slot.feedback.winner === config.ADSENSE.bidderName) {
-				//     hbStatus.hbDfpRender(slot.containerId);
-
-				//     slot.type = 8;
-				//     feedback(slot);
-				// }
+				slot.feedback.winningRevenue = bidData[computedCPMValue] / 1000;
 			});
 		});
 	}

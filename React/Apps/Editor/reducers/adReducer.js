@@ -140,6 +140,18 @@ const adsByIds = (state = {}, action) => {
 				}
 			};
 
+		case adActions.UPDATE_LOG_WRITTEN:
+			return {
+				...state,
+				[action.adId]: {
+					...state[action.adId],
+					networkData: {
+						...state[action.adId].networkData,
+						logWritten: action.isLogWritten
+					}
+				}
+			};
+
 		case adActions.UPDATE_CSS:
 			return { ...state, [action.adId]: { ...state[action.adId], css: action.css } };
 

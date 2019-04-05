@@ -60,8 +60,7 @@ const Promise = require('bluebird'),
 				isInvalidRevenue || innerObj[identifier].aggregate.total_impressions == 0
 					? 0
 					: Number(
-							innerObj[identifier].aggregate.total_revenue *
-								1000 /
+							(innerObj[identifier].aggregate.total_revenue * 1000) /
 								innerObj[identifier].aggregate.total_impressions
 					  ).toFixed(3);
 		});
@@ -167,7 +166,7 @@ const Promise = require('bluebird'),
 			const reportDate = moment(dailyReportObject.report_date).format(dateFormat),
 				revenue = dailyReportObject.total_revenue,
 				impressions = dailyReportObject.total_impressions;
-			let cpm = Number((revenue / impressions * 1000).toFixed(2));
+			let cpm = Number(((revenue / impressions) * 1000).toFixed(2));
 
 			cpm = isNaN(cpm) ? 0 : cpm;
 			resultData[reportDate] = cpm;
@@ -301,19 +300,19 @@ const Promise = require('bluebird'),
 			totalRevenue += row.total_revenue;
 			totalPageviews += row.total_requests;
 
-			const cpm = row.total_revenue * 1000 / row.total_impressions;
+			const cpm = (row.total_revenue * 1000) / row.total_impressions;
 			totalCpm += isNaN(cpm) ? 0 : cpm;
 
-			totalPageCpm += row.total_revenue * 1000 / row.total_requests;
+			totalPageCpm += (row.total_revenue * 1000) / row.total_requests;
 		});
 
-		const totalCpmValue = (totalRevenue / totalImpressions * 1000).toFixed(2);
+		const totalCpmValue = ((totalRevenue / totalImpressions) * 1000).toFixed(2);
 		return {
 			totalImpressions,
 			totalRevenue: totalRevenue.toFixed(2),
 			totalPageviews,
 			totalCpm: isNaN(totalCpmValue) ? 0 : totalCpmValue,
-			totalPageCpm: (totalRevenue / totalPageviews * 1000).toFixed(2)
+			totalPageCpm: ((totalRevenue / totalPageviews) * 1000).toFixed(2)
 		};
 	},
 	getSiteReport = payload => {
@@ -602,6 +601,72 @@ const Promise = require('bluebird'),
 			error: true,
 			data: response
 		});
+	},
+	checkForLog = function(ad) {
+		/* 
+			Should return true only
+				1. Network is not other than adpTags or geniee
+				2. If Geniee
+					dynamicAllocation should be false.
+					if dynamicAllocation is true then adunit should be synced and other changes made
+				3. If adpTags, then adunit should be synced and other changes made 
+				4. logWritten should be false
+		*/
+		const hasNetwork = !!ad.network;
+		const isADPTags = !!(hasNetwork && ad.network == 'adpTags');
+		const isGeniee = !!(hasNetwork && ad.network == 'geniee');
+		const hasNetworkData = !!(hasNetwork && ad.networkData && Object.keys(ad.networkData).length);
+		const isLogWrittenFalse = !!(
+			hasNetworkData &&
+			ad.networkData.hasOwnProperty('logWritten') &&
+			ad.networkData.logWritten === false
+		);
+		const isADPSynced = !!(isADPTags && hasNetworkData && ad.networkData.dfpAdunit && ad.networkData.dfpAdunitCode);
+		const genieeNonSyncing = !!(
+			isGeniee &&
+			hasNetworkData &&
+			!ad.networkData.dynamicAllocation &&
+			ad.networkData.zoneId
+		);
+		const isGenieeSynced = !!(
+			isGeniee &&
+			hasNetworkData &&
+			ad.networkData.dynamicAllocation &&
+			ad.networkData.dfpAdunit &&
+			ad.networkData.dfpAdunitCode
+		);
+		const isDemandChanged = !!(
+			hasNetwork &&
+			isADPTags === false &&
+			(isGeniee === false || genieeNonSyncing) &&
+			isLogWrittenFalse
+		);
+		const isADPChanged = !!(hasNetwork && isADPTags && isADPSynced && isLogWrittenFalse);
+		const isGenieeChanged = !!(hasNetwork && isGeniee && isGenieeSynced && isLogWrittenFalse);
+
+		return isDemandChanged || isADPChanged || isGenieeChanged;
+	},
+	isValidThirdPartyDFPAndCurrency = function(config) {
+		const isActiveDFPNetwork = !!(config.activeDFPNetwork && config.activeDFPNetwork.length),
+			isActiveDFPCurrencyCode = !!(
+				config.activeDFPCurrencyCode &&
+				config.activeDFPCurrencyCode.length &&
+				config.activeDFPCurrencyCode.length === 3
+			),
+			isPrebidGranularityMultiplier = !!(
+				config.prebidGranularityMultiplier && Number(config.prebidGranularityMultiplier)
+			),
+			isActiveDFPCurrencyExchangeRate = !!(
+				config.activeDFPCurrencyExchangeRate && Object.keys(config.activeDFPCurrencyExchangeRate).length
+			),
+			isValidResult = !!(
+				isActiveDFPNetwork &&
+				isActiveDFPCurrencyCode &&
+				isPrebidGranularityMultiplier &&
+				isActiveDFPCurrencyExchangeRate
+			);
+
+		return isValidResult;
 	};
 
 module.exports = {
@@ -627,5 +692,7 @@ module.exports = {
 	getGlobalTop10SitesContributionReport,
 	getGlobalLostAndFoundLiveSitesReport,
 	sendSuccessResponse,
-	sendErrorResponse
+	sendErrorResponse,
+	checkForLog,
+	isValidThirdPartyDFPAndCurrency
 };

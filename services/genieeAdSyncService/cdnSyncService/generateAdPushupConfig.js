@@ -52,7 +52,7 @@ const _ = require('lodash'),
 			ADPTags.push(adData);
 		}
 	},
-	getSectionsPayload = function(variationSections, platform, pagegroup) {
+	getSectionsPayload = function(variationSections, platform, pagegroup, selectorsTreeLevel) {
 		var ads = [],
 			ad = null,
 			json,
@@ -112,6 +112,9 @@ const _ = require('lodash'),
 				if (section.notNear) {
 					json.notNear = section.notNear;
 				}
+				if (selectorsTreeLevel) {
+					json.selectorsTreeLevel = selectorsTreeLevel;
+				}
 			} else {
 				_.extend(json, {
 					xpath: section.xpath,
@@ -137,7 +140,7 @@ const _ = require('lodash'),
 			return true;
 		}
 
-		var ads = getSectionsPayload(variation.sections, platform, pageGroup),
+		var ads = getSectionsPayload(variation.sections, platform, pageGroup, variation.selectorsTreeLevel),
 			computedVariationObj,
 			contentSelector = variation.contentSelector,
 			isContentSelector = !!contentSelector;
@@ -203,7 +206,8 @@ const _ = require('lodash'),
 			contentSelector: channel.contentSelector,
 			pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup),
 			hasVariationsWithNoData: false,
-			ampSettings: channel.ampSettings ? { isEnabled: channel.ampSettings.isEnabled } : { isEnabled: false }
+			ampSettings: channel.ampSettings ? { isEnabled: channel.ampSettings.isEnabled } : { isEnabled: false },
+			autoOptimise: channel.hasOwnProperty('autoOptimise') ? channel.autoOptimise : false
 		};
 
 		_.each(channel.variations, (variation, id) => {

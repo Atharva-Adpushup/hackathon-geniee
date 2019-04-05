@@ -22,7 +22,7 @@ class info extends React.Component {
 	}
 
 	toggleStateValues(target, val) {
-		this.setState({ forceSampleUrl: val });
+		this.setState({ [target]: val });
 	}
 
 	onChange(sampleUrl) {

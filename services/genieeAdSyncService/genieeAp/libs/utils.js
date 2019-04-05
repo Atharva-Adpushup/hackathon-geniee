@@ -256,9 +256,32 @@ module.exports = {
 			}
 		};
 	},
+	getUrlObject: function(url) {
+		var link = document.createElement('a'),
+			computedObject = {};
+
+		link.href = url;
+		computedObject.href = link.href;
+		computedObject.protocol = link.protocol;
+		computedObject.host = link.host;
+		computedObject.hostname = link.hostname;
+		computedObject.port = link.port;
+		computedObject.pathname = link.pathname;
+		computedObject.search = link.search;
+		computedObject.hash = link.hash;
+		computedObject.origin = link.origin;
+
+		return computedObject;
+	},
 	removeUrlParameter: function(url, parameter) {
-		// Snippet from https://stackoverflow.com/a/4893927
-		var urlParts = url.split('?');
+		// Code Snippet from https://stackoverflow.com/a/4893927
+		// Added custom url hash functionality
+		var urlParts = url.split('?'),
+			originalUrlObject = this.getUrlObject(url),
+			hasOriginalUrlHash = !!(originalUrlObject && originalUrlObject.hash),
+			computedUrlObject,
+			hasComputedUrlHash,
+			isNoUrlHashAfterComputation;
 
 		if (urlParts.length >= 2) {
 			// Get first part, and remove from array
@@ -286,7 +309,15 @@ module.exports = {
 		}
 
 		if (url.charAt(url.length - 1) === '?') {
-			return url.substr(0, url.length - 1);
+			url = url.substr(0, url.length - 1);
+		}
+
+		computedUrlObject = this.getUrlObject(url);
+		hasComputedUrlHash = !!(computedUrlObject && computedUrlObject.hash);
+		isNoUrlHashAfterComputation = !!(hasOriginalUrlHash && !hasComputedUrlHash);
+
+		if (isNoUrlHashAfterComputation) {
+			url += originalUrlObject.hash;
 		}
 
 		return url;
@@ -316,16 +347,54 @@ module.exports = {
 			return interactiveAds.length ? interactiveAds : null;
 		}
 	},
-	isElementInViewport: function(el, threshold) {
-		const elementTop = $(el).offset().top,
-			elementBottom = elementTop + $(el).outerHeight(),
-			viewportTop = $(window).scrollTop(),
-			viewportBottom = viewportTop + $(window).height();
-		return (
-			Math.abs(elementTop - viewportBottom) <= threshold ||
-			Math.abs(elementBottom - viewportTop) <= threshold ||
-			(elementBottom > viewportTop && elementTop < viewportBottom)
-		);
+	getViewport: function() {
+		var $w = $(window);
+		return {
+			left: $w.scrollLeft(),
+			top: $w.scrollTop(),
+			right: $w.scrollLeft() + (window.innerWidth || $w.width()),
+			bottom: $w.scrollTop() + (window.innerHeight || $w.height())
+		};
+	},
+	isElementInViewport: function(el, threshhold) {
+		var $el = $(el),
+			adTop = $el.offset().top,
+			viewPort = this.getViewport(),
+			adBottom = adTop + $el.height(),
+			finalTop,
+			finalBottom;
+
+		finalTop = adTop - viewPort.top;
+		finalBottom = viewPort.bottom - adBottom;
+		if (finalTop > 0 && finalBottom > 0) {
+			return { inViewHeight: $el.height() };
+		} else if (finalTop <= 0 && adBottom > viewPort.top && adBottom < viewPort.bottom) {
+			return { inViewHeight: $el.height() + finalTop };
+		} else if (finalTop > 0 && adTop > viewPort.top && adTop < viewPort.bottom) {
+			return { inViewHeight: $el.height() + finalBottom };
+		} else if (threshhold) {
+			return Math.abs(adTop - viewPort.bottom) <= threshhold || Math.abs(adBottom - viewPort.top) <= threshhold;
+		}
+		return false;
+	},
+	checkElementInViewPercent: function(el) {
+		if (document.hasFocus()) {
+			var $el = $(el),
+				elHeight = $el.height(),
+				elWidth = $el.width(),
+				elTop = $el.offset().top,
+				viewPort = this.getViewport(),
+				elPixel = elWidth * elHeight,
+				inViewHeight = this.isElementInViewport(el) && this.isElementInViewport(el).inViewHeight,
+				inViewPixel = elWidth * inViewHeight,
+				percentageInView = (inViewPixel * 100) / elPixel;
+			if (elHeight == 0 && elTop >= viewPort.top && elTop <= viewPort.bottom) {
+				return true;
+			}
+			if (elPixel < 242000) return percentageInView >= 50;
+			return percentageInView >= 30;
+		}
+		return false;
 	},
 	queryParams: (function() {
 		var str = window.location.search,

@@ -11,7 +11,6 @@ class customCodeEditor extends React.Component {
 			code: this.props.textEdit ? code : atob(code),
 			error: false
 		};
-
 		this.updateCode = this.updateCode.bind(this);
 		this.save = this.save.bind(this);
 		this.updateCode = this.updateCode.bind(this);
@@ -19,7 +18,8 @@ class customCodeEditor extends React.Component {
 
 	componentWillReceiveProps(nextProps) {
 		this.setState({
-			code: nextProps.code
+			code: nextProps.textEdit ? nextProps.code : atob(nextProps.code),
+			error: false
 		});
 	}
 
@@ -87,15 +87,15 @@ class customCodeEditor extends React.Component {
 					<div className={className} key={this.props.customId}>
 						<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
 						<br />
-						{this.props.showButtons ? (
-							<Button
-								disabled={this.state.code == ''}
-								className="btn-lightBg btn-save"
-								onClick={this.save}
-							>
-								{this.props.textEditBtn ? this.props.textEditBtn : 'Save'}
-							</Button>
-						) : null}
+						{this.props.showButtons
+							? <Button
+									disabled={this.state.code == ''}
+									className="btn-lightBg btn-save"
+									onClick={this.save}
+								>
+									{this.props.textEditBtn ? this.props.textEditBtn : 'Save'}
+								</Button>
+							: null}
 					</div>
 				);
 			} else {
@@ -105,28 +105,26 @@ class customCodeEditor extends React.Component {
 				}
 				return (
 					<div className={className} key={this.props.customId}>
-						{this.state.error && <div>Some Error in CSS, remove comma in last property if there.</div>}
+						{this.state.error && <div>Some Error in Code, remove comma in last property if there.</div>}
 						<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
-						{this.props.showButtons ? (
-							<Row className="butttonsRow">
-								<Col xs={6}>
-									<Button
-										disabled={this.state.error}
-										className="btn-lightBg btn-save"
-										onClick={this.save}
-									>
-										Save
-									</Button>
-								</Col>
-								<Col xs={6}>
-									<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>
-										{this.props.cancelText || 'Cancel'}
-									</Button>
-								</Col>
-							</Row>
-						) : (
-							''
-						)}
+						{this.props.showButtons
+							? <Row className="butttonsRow">
+									<Col xs={6}>
+										<Button
+											disabled={this.state.error}
+											className="btn-lightBg btn-save"
+											onClick={this.save}
+										>
+											Save
+										</Button>
+									</Col>
+									<Col xs={6}>
+										<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>
+											{this.props.cancelText || 'Cancel'}
+										</Button>
+									</Col>
+								</Row>
+							: ''}
 					</div>
 				);
 			}

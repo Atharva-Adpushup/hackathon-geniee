@@ -42,7 +42,11 @@ if (process.env.NODE_ENV === consts.environment.production) {
 app.use(compression());
 // Locale support
 app.use(locale(languageSupport));
-app.use(helmet());
+app.use(helmet({
+	hsts: {
+		setIf: () => false
+	}
+}));
 process.on('uncaughtException', function(err) {
 	// handle the error safely
 	console.log(err);

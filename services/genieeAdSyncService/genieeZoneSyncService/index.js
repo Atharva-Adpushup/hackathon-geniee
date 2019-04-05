@@ -9,6 +9,8 @@ var config = require('../../../configs/config'),
 	crypto = require('crypto'),
 	retry = require('bluebird-retry');
 
+const { checkForLog } = require('../../../helpers/commonFunctions');
+
 module.exports = {
 	checkGenieeUnsyncedZones: function(variationId, variationName, section, ad) {
 		var isValidUnsyncedZone = !!(ad.network === 'geniee' && ad.networkData && !ad.networkData.zoneId),
@@ -39,7 +41,13 @@ module.exports = {
 					firstView: ad.firstFold ? Number(ad.firstFold) : 1,
 					useFriendlyIFrameFlag: ad.asyncTag ? Number(ad.asyncTag) : 1,
 					dynamicAllocation: ad.networkData.dynamicAllocation ? ad.networkData.dynamicAllocation : 0,
-					zoneId: ad.networkData && ad.networkData.zoneId ? ad.networkData.zoneId : false
+					zoneId: ad.networkData && ad.networkData.zoneId ? ad.networkData.zoneId : false,
+					network: ad.network,
+					networkData: {
+						dynamicAllocation: ad.hasOwnProperty('dynamicAllocation')
+							? ad.networkData.dynamicAllocation
+							: false
+					}
 				}
 			};
 
@@ -63,9 +71,17 @@ module.exports = {
 						sizeWidth: isResponsive ? 'responsive' : parseInt(ad.width, 10),
 						sizeHeight: isResponsive ? 'responsive' : parseInt(ad.height, 10),
 						sectionId: section.id,
+						sectionName: section.name,
 						type: section.formatData && section.formatData.type ? section.formatData.type : false,
 						isManual: ad.isManual || false,
-						isNative: isNative
+						isNative: isNative,
+						network: ad.network,
+						networkData: {
+							headerBidding:
+								ad.hasOwnProperty('networkData') && ad.networkData.hasOwnProperty('headerBidding')
+									? ad.networkData.headerBidding
+									: false
+						}
 					};
 
 				if (isMultipleAdSizes) {
@@ -78,17 +94,39 @@ module.exports = {
 		}
 		return false;
 	},
-	getVariationUnsyncedZones: function(variationId, variationName, channelKey, variationSections) {
+	getVariationUnsyncedZones: function(
+		variationId,
+		variationName,
+		channelKey,
+		variationSections,
+		additionalInfo = {},
+		isControl
+	) {
 		// Sample json for geniee zone
 		// {"zoneName":"test zone api0","sizeWidth":300,"sizeHeight":250,"zoneType":1,"zonePosition":0,"firstView":1,"useFriendlyIFrameFlag":0}
 		var unsyncedZones = {
 				genieeUnsyncedZones: [],
 				adpTagsUnsyncedZones: [],
-				genieeDFPCreationZones: []
+				genieeDFPCreationZones: [],
+				logsUnsyncedZones: []
 			},
 			self = this;
 		_.each(variationSections, function(section, sectionId) {
 			_.each(section.ads, function(ad) {
+				if (checkForLog(ad)) {
+					unsyncedZones.logsUnsyncedZones.push({
+						...ad,
+						variationId,
+						variationName,
+						channelKey,
+						id: sectionId,
+						adId: ad.id,
+						platform: additionalInfo.platform,
+						pageGroup: additionalInfo.pageGroup,
+						isControl,
+						sectionName: section.name
+					});
+				}
 				switch (ad.network) {
 					case 'geniee':
 						var unsyncedZone = self.checkGenieeUnsyncedZones(variationId, variationName, section, ad);
@@ -100,13 +138,15 @@ module.exports = {
 								? unsyncedZones.genieeDFPCreationZones.push(unsyncedZone.zone)
 								: null;
 						}
-						// unsyncedZone ? unsyncedZones.genieeUnsyncedZones.push(unsyncedZone) : null;
 						break;
 					case 'adpTags':
 						var unsyncedZone = self.checkAdpTagsUnsyncedZones(section, ad);
 						if (unsyncedZone) {
 							unsyncedZone.variationId = variationId;
+							unsyncedZone.variationName = variationName;
 							unsyncedZone.channelKey = channelKey;
+							unsyncedZone.pageGroup = additionalInfo.pageGroup;
+							unsyncedZone.platform = additionalInfo.platform;
 							unsyncedZones.adpTagsUnsyncedZones.push(unsyncedZone);
 						}
 						break;
@@ -114,7 +154,7 @@ module.exports = {
 			});
 		});
 		return unsyncedZones;
-	}, 
+	},
 	getAllUnsyncedZones: function(site) {
 		var finalZones = [],
 			channelUnsyncedZones = [],
@@ -132,10 +172,19 @@ module.exports = {
 					}
 
 					let channelKey = `chnl::${site.get('siteId')}:${channel.platform}:${channel.pageGroup}`;
-					// channelUnsyncedZones = self.getVariationUnsyncedZones(id, varPiation.sections);
 					channelUnsyncedZones = _.concat(
 						channelUnsyncedZones,
-						self.getVariationUnsyncedZones(id, variation.name, channelKey, variation.sections)
+						self.getVariationUnsyncedZones(
+							id,
+							variation.name,
+							channelKey,
+							variation.sections,
+							{
+								platform: channel.platform,
+								pageGroup: channel.pageGroup
+							},
+							variation.isControl
+						)
 					);
 				});
 				finalZones.push({ channel: channel, unsyncedZones: channelUnsyncedZones });

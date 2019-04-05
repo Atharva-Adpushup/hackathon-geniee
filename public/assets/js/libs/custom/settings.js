@@ -2,6 +2,7 @@
 
 $(document).ready(function() {
 	(function(w, d) {
+		var isAutoOptimiseChanged = false;
 		// Settings module object
 		var settingsModule = {
 			// Settings templates
@@ -101,16 +102,21 @@ $(document).ready(function() {
 						'Pagegroup pattern cannot be blank. Please provide valid regex patterns for all the pagegroups.'
 					);
 				} else {
-					var activeDFPNetwork = this.parseFormData(formValues, 'other').activeDFPNetwork,
-						autoOpt = this.parseFormData(formValues, 'other').autoOptimise ? true : false,
+					var parsedFormValues = this.parseFormData(formValues, 'other'),
+						activeDFPNetwork = parsedFormValues.activeDFPNetwork,
+						activeDFPCurrencyCode = parsedFormValues.activeDFPCurrencyCode,
+						autoOpt = parsedFormValues.autoOptimise ? true : false,
+						isSPA = parsedFormValues.isSPA ? true : false,
+						isThirdPartyAdx = parsedFormValues.isThirdPartyAdx ? true : false,
+						spaPageTransitionTimeout = parsedFormValues.spaPageTransitionTimeout,
 						dfpInfo = activeDFPNetwork ? activeDFPNetwork.split('-') : [],
 						activeDFPNetwork = dfpInfo.length ? dfpInfo[0] : '',
 						activeDFPParentId = dfpInfo.length ? dfpInfo[1] : '',
 						pageGroupPattern = JSON.stringify(parsedPageGroups),
-						otherSettings = JSON.stringify(this.parseFormData(formValues, 'other')),
-						gdprCompliance = this.parseFormData(formValues, 'other').gdprCompliance ? true : false,
-						cookieControlConfig = this.parseFormData(formValues, 'other').cookieControlConfig
-							? this.parseFormData(formValues, 'other').cookieControlConfig
+						otherSettings = JSON.stringify(parsedFormValues),
+						gdprCompliance = parsedFormValues.gdprCompliance ? true : false,
+						cookieControlConfig = parsedFormValues.cookieControlConfig
+							? parsedFormValues.cookieControlConfig
 							: {};
 
 					$error.html('');
@@ -120,11 +126,16 @@ $(document).ready(function() {
 							pageGroupPattern: pageGroupPattern,
 							otherSettings: otherSettings,
 							autoOptimise: autoOpt,
+							isSPA: isSPA,
+							isThirdPartyAdx: isThirdPartyAdx,
+							spaPageTransitionTimeout: spaPageTransitionTimeout,
 							activeDFPNetwork: activeDFPNetwork,
 							activeDFPParentId: activeDFPParentId,
+							activeDFPCurrencyCode: activeDFPCurrencyCode,
 							gdprCompliance: gdprCompliance,
 							cookieControlConfig: cookieControlConfig,
-							blocklist: JSON.stringify(w.blocklist)
+							blocklist: JSON.stringify(w.blocklist),
+							isAutoOptimiseChanged: isAutoOptimiseChanged
 						},
 						function(res) {
 							if (res.success) {
@@ -376,12 +387,49 @@ $(document).ready(function() {
 		// Auto optimise check trigger
 		var autoOptimise;
 		$('#autoOptimise').on('change', function() {
+			isAutoOptimiseChanged = true;
 			autoOptimise = $(this).prop('checked');
 			!autoOptimise
 				? $('#autoOptimiseErr').html(
-						'NOTE: AdPushup might be disabled right now for this site. Kindly set the traffic manually for each variation in all the page groups present for this site. <br/><br/> To update the traffic, go to Editor > Load Page Group > Traffic Distribution.'
+						'NOTE: AdPushup might be disabled right now for this site. Kindly set the traffic manually for each variation in all the page groups present for this site. Kindly, do save settings below. <br/><br/> To update the traffic, go to Editor > Load Page Group > Traffic Distribution.'
 				  )
 				: $('#autoOptimiseErr').html('');
+
+			var autoOptimiseValues = $('td[data-identifier="autoptimise"]'),
+				toAdd = autoOptimise ? 'green' : 'red';
+			autoOptimiseValues.each(function(index, ele) {
+				ele.innerText = autoOptimise ? 'Enabled' : 'Disabled';
+				ele.classList.remove('green');
+				ele.classList.remove('red');
+				ele.classList.add(toAdd);
+			});
+		});
+
+		// Active DFP Network change handler
+		$('#activeDFPNetwork').on('change', function(e) {
+			var $checkedOption = $('option:selected', this),
+				currencyCode = $checkedOption.attr('data-currencyCode'),
+				$currencyTable = $('.js-currency-table'),
+				$currencyTd = $('#currencyValue'),
+				$activeDFPCurrencyCodeHiddenInput = $('#activeDFPCurrencyCode'),
+				$thirdPartyAdxWrapper = $('.js-thirdpartyadx-wrapper'),
+				$thirdPartyAdxInput = $('#isThirdPartyAdx');
+
+			if (!currencyCode) {
+				$currencyTable.addClass('u-hide');
+				$currencyTd.text('');
+				$activeDFPCurrencyCodeHiddenInput.val('');
+
+				$thirdPartyAdxWrapper.addClass('u-hide');
+				$thirdPartyAdxInput.prop('checked', false);
+				return;
+			}
+
+			$currencyTd.text(currencyCode);
+			$activeDFPCurrencyCodeHiddenInput.val(currencyCode);
+			$currencyTable.removeClass('u-hide');
+
+			$thirdPartyAdxWrapper.removeClass('u-hide');
 		});
 
 		// Copy to clipboard trigger

@@ -26,6 +26,9 @@ const initialState = { activeChannel: null, byIds: {} },
 			case channelActions.SAVE_SAMPLE_URL:
 				return { ...state, sampleUrl: action.sampleUrl };
 
+			case channelActions.UPDATE_AUTOPTIMIZE:
+				return { ...state, autoOptimise: action.value };
+
 			case channelActions.CHANGE_CONTENT_SELECTOR:
 				return { ...state, contentSelector: action.selector };
 
@@ -96,6 +99,7 @@ const initialState = { activeChannel: null, byIds: {} },
 			case channelActions.CONTENT_SELECTOR_MISSING:
 			case channelActions.CONTENT_SELECTOR_WORKED:
 			case variationActions.DELETE_VARIATION:
+			case channelActions.UPDATE_AUTOPTIMIZE:
 				return {
 					...state,
 					byIds: {

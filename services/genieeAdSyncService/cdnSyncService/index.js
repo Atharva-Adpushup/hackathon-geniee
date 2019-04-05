@@ -3,11 +3,12 @@ var AdPushupError = require('../../../helpers/AdPushupError'),
 	CC = require('../../../configs/commonConsts'),
 	config = require('../../../configs/config');
 
-module.exports = function(site) {
-	var paramConfig = {
-		siteId: site.get('siteId')
+module.exports = function(site, useDirect = false) {
+	const siteId = useDirect ? site : site.get('siteId');
+	const paramConfig = {
+		siteId: siteId
 	};
 	return queueWorker.publish(paramConfig).then(function() {
-		return 'Published into Sync Cdn Queue ' + site.get('siteId');
+		return 'Published into Sync Cdn Queue ' + siteId;
 	});
 };

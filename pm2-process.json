@@ -9,6 +9,11 @@
 			"name": "cdnSyncConsumer",
 			"script": "./cdnSyncConsumer.js",
 			"log_date_format": "YYYY-MM-DD HH:mm Z"
+		},
+		{
+			"name": "transactionLogConsumer",
+			"script": "./transactionLogConsumer.js",
+			"log_date_format": "YYYY-MM-DD HH:mm Z"
 		}
 	]
 }

@@ -145,7 +145,8 @@ const status = {
 		EDIT_CONTENT_SELECTOR: 'EDIT_CONTENT_SELECTOR',
 		SAVE_BEFORE_AFTER_JS: 'SAVE_BEFORE_AFTER_JS',
 		CONTENT_SELECTOR_MISSING: 'CONTENT_SELECTOR_MISSING',
-		CONTENT_SELECTOR_WORKED: 'CONTENT_SELECTOR_WORKED'
+		CONTENT_SELECTOR_WORKED: 'CONTENT_SELECTOR_WORKED',
+		UPDATE_AUTOPTIMIZE: 'UPDATE_AUTOPTIMIZE'
 	},
 	insertMenuActions = {
 		HIDE_MENU: 'HIDE_MENU',
@@ -185,9 +186,12 @@ const status = {
 		OPEN_VARIATION_PANEL: 'OPEN_VARIATION_PANEL',
 		CLOSE_VARIATION_PANEL: 'CLOSE_VARIATION_PANEL',
 		UPDATE_CONTENT_SELECTOR: 'UPDATE_CONTENT_SELECTOR',
+		UPDATE_INCONTENT_SELECTORS_TREE_LEVEL:
+			'UPDATE_INCONTENT_SELECTORS_TREE_LEVEL',
 		SAVE_KEY_VALUES: 'SAVE_KEY_VALUES',
 		SAVE_PERSONALIZATION_INFO: 'SAVE_PERSONALIZATION_INFO',
-		DISABLE_VARIATION: 'DISABLE_VARIATION'
+		DISABLE_VARIATION: 'DISABLE_VARIATION',
+		TAG_CONTROL_VARIATION: 'TAG_CONTROL_VARIATION'
 	},
 	sectionActions = {
 		CREATE_SECTION: 'CREATE_SECTION',
@@ -198,7 +202,8 @@ const status = {
 		RENAME_SECTION: 'RENAME_SECTION',
 		UPDATE_PARTNER_DATA: 'UPDATE_PARTNER_DATA',
 		UPDATE_XPATH: 'UPDATE_XPATH',
-		UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD: 'UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD',
+		UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD:
+			'UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD',
 		GET_ALL_XPATHS: 'GET_ALL_XPATHS',
 		VALIDATE_XPATH: 'VALIDATE_XPATH',
 		VALIDATE_XPATH_SECTION: 'VALIDATE_XPATH_SECTION',
@@ -217,7 +222,8 @@ const status = {
 		UPDATE_CSS: 'UPDATE_CSS',
 		UPDATE_CUSTOM_CSS: 'UPDATE_CUSTOM_CSS',
 		UPDATE_NETWORK: 'UPDATE_NETWORK',
-		UPDATE_AD: 'UPDATE_AD'
+		UPDATE_AD: 'UPDATE_AD',
+		UPDATE_LOG_WRITTEN: 'UPDATE_LOG_WRITTEN'
 	},
 	adInsertOptions = {
 		INSERT_BEFORE: 'Insert Before',
@@ -274,9 +280,12 @@ const status = {
 			collections: {
 				trafficDistribution: {
 					errorMessage: {
-						sumMismatch: ['The total traffic allocation for all variations must equal ']
+						sumMismatch: [
+							'The total traffic allocation for all variations must equal '
+						]
 					},
-					description: 'Specify the traffic you want to set for each variation in the page group:'
+					description:
+						'Specify the traffic you want to set for each variation in the page group:'
 				}
 			}
 		}
@@ -298,7 +307,11 @@ const status = {
 		},
 		{
 			layoutType: 'VERTICAL',
-			sizes: [{ width: 300, height: 600 }, { width: 160, height: 600 }, { width: 120, height: 600 }]
+			sizes: [
+				{ width: 300, height: 600 },
+				{ width: 160, height: 600 },
+				{ width: 120, height: 600 }
+			]
 		},
 		{
 			layoutType: 'MOBILE',
@@ -362,8 +375,22 @@ const status = {
 				sticky: {
 					top: ['300x50', '300x100', '320x100', '728x90'],
 					bottom: ['300x50', '300x100', '320x100', '728x90'],
-					left: ['160x600', '336x280', '300x250', '300x600', '300x50', '120x600'],
-					right: ['160x600', '336x280', '300x250', '300x600', '300x50', '120x600']
+					left: [
+						'160x600',
+						'336x280',
+						'300x250',
+						'300x600',
+						'300x50',
+						'120x600'
+					],
+					right: [
+						'160x600',
+						'336x280',
+						'300x250',
+						'300x600',
+						'300x50',
+						'120x600'
+					]
 				},
 				video: {
 					custom: ['336x280']
@@ -372,7 +399,14 @@ const status = {
 			MOBILE: {
 				sticky: {
 					top: ['336x280', '300x250', '300x50', '320x100', '300x100', '320x50'],
-					bottom: ['336x280', '300x250', '300x50', '320x100', '300x100', '320x50']
+					bottom: [
+						'336x280',
+						'300x250',
+						'300x50',
+						'320x100',
+						'300x100',
+						'320x50'
+					]
 				},
 				video: {
 					custom: ['336x280']
@@ -380,8 +414,24 @@ const status = {
 			},
 			TABLET: {
 				sticky: {
-					top: ['336x280', '300x250', '300x50', '320x100', '300x100', '320x50', '728x90'],
-					bottom: ['336x280', '300x250', '300x50', '320x100', '300x100', '320x50', '728x90']
+					top: [
+						'336x280',
+						'300x250',
+						'300x50',
+						'320x100',
+						'300x100',
+						'320x50',
+						'728x90'
+					],
+					bottom: [
+						'336x280',
+						'300x250',
+						'300x50',
+						'320x100',
+						'300x100',
+						'320x50',
+						'728x90'
+					]
 				},
 				video: {
 					custom: ['336x280']
@@ -453,7 +503,15 @@ const status = {
 			'336,280': [[300, 250], [336, 280]],
 			// TABLET sizes
 			'468,60': [[468, 60]],
-			'480,320': [[250, 250], [300, 250], [320, 50], [320, 100], [336, 280], [468, 60], [480, 320]],
+			'480,320': [
+				[250, 250],
+				[300, 250],
+				[320, 50],
+				[320, 100],
+				[336, 280],
+				[468, 60],
+				[480, 320]
+			],
 			// DESKTOP sizes
 			'720,300': [[300, 250], [336, 280], [720, 300]],
 			'728,90': [[728, 90]],
@@ -461,7 +519,14 @@ const status = {
 			'728,280': [[300, 250], [336, 280], [728, 90], [728, 250], [728, 280]],
 			'900,90': [[728, 90], [900, 90]],
 			'970,90': [[728, 90], [900, 90], [970, 90]],
-			'970,250': [[300, 250], [728, 90], [728, 250], [900, 90], [970, 90], [970, 250]],
+			'970,250': [
+				[300, 250],
+				[728, 90],
+				[728, 250],
+				[900, 90],
+				[970, 90],
+				[970, 250]
+			],
 			// RESPONSIVE size
 			'responsive,responsive': [
 				[120, 600],
@@ -488,7 +553,23 @@ const status = {
 				[970, 250]
 			]
 		}
-	};
+	},
+	incontentSections = {
+		SELECTORS_TREE_LEVEL: [
+			'any',
+			'1',
+			'2',
+			'3',
+			'4',
+			'5',
+			'6',
+			'7',
+			'8',
+			'9',
+			'10'
+		]
+	},
+	refreshIntervals = [30, 60, 90, 120, 180, 240, 300, 360];
 
 export {
 	status,
@@ -533,5 +614,7 @@ export {
 	interactiveAds,
 	personalizationTypes,
 	typeOfAds,
-	iabSizes
+	iabSizes,
+	incontentSections,
+	refreshIntervals
 };

@@ -51,7 +51,9 @@ function dashboardRedirection(req, res, allUserSites, type) {
 			return siteModel
 				.getSiteById(obj.siteId)
 				.then(function(site) {
-					return Object.assign(obj, { isManual: site.get('isManual') || false });
+					return Object.assign(obj, {
+						isManual: site.get('isManual') || false
+					});
 				})
 				.catch(function() {
 					return 'inValidSite';
@@ -111,13 +113,17 @@ function dashboardRedirection(req, res, allUserSites, type) {
 				switch (type) {
 					case 'dashboard':
 					case 'default':
-						return res.render('dashboard', {
-							validSites: sites,
-							unSavedSite: unSavedSite,
-							hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
-							requestDemo: req.session.user.requestDemo,
-							imageHeaderLogo: true,
-							isSuperUser: req.session.isSuperUser
+						return userModel.getUserByEmail(req.session.user.email).then(user => {
+							let isPaymentDetailsComplete = user.get('isPaymentDetailsComplete');
+							return res.render('dashboard', {
+								validSites: sites,
+								unSavedSite: unSavedSite,
+								hasStep: sites.length ? ('step' in sites[0] ? true : false) : false,
+								requestDemo: req.session.user.requestDemo,
+								imageHeaderLogo: true,
+								isSuperUser: req.session.isSuperUser,
+								isPaymentDetailsComplete: isPaymentDetailsComplete || false
+							});
 						});
 						break;
 					case 'onboarding':
@@ -312,7 +318,9 @@ router
 		return userModel
 			.getUserByEmail(req.session.user.email)
 			.then(function(user) {
-				var adSenseData = _.find(user.get('adNetworkSettings'), { networkName: 'ADSENSE' });
+				var adSenseData = _.find(user.get('adNetworkSettings'), {
+					networkName: 'ADSENSE'
+				});
 				return res.render('connectGoogle', {
 					adNetworkSettings: !_.isEmpty(user.get('adNetworkSettings'))
 						? {
@@ -585,7 +593,10 @@ router
 		req.body.firstName = req.body.firstName ? utils.trimString(req.body.firstName) : req.body.firstName;
 		req.body.lastName = req.body.lastName ? utils.trimString(req.body.lastName) : req.body.lastName;
 		let jsonParams = Object.assign({}, req.body),
-			encodedParams = { firstName: req.body.firstName, lastName: req.body.lastName };
+			encodedParams = {
+				firstName: req.body.firstName,
+				lastName: req.body.lastName
+			};
 
 		encodedParams = utils.getHtmlEncodedJSON(encodedParams);
 		jsonParams = Object.assign({}, jsonParams, encodedParams);
@@ -602,11 +613,17 @@ router
 				console.log(user);
 
 				req.session.user = user;
-				return res.render('profile', { profileSaved: true, formData: req.body });
+				return res.render('profile', {
+					profileSaved: true,
+					formData: req.body
+				});
 			})
 			.catch(function(e) {
 				if (e instanceof AdPushupError) {
-					res.render('profile', { profileError: e.message, formData: req.body });
+					res.render('profile', {
+						profileError: e.message,
+						formData: req.body
+					});
 				} else if (e.name && e.name === 'CouchbaseError') {
 					res.render('profile', { userNotFound: true, formData: req.body });
 				}
@@ -860,15 +877,24 @@ router
 					dataToSend = req.body;
 				req.session.user = user;
 				dataToSend.commonRandomPassword = 'xxxxxxxxxx';
-				return res.render('credentials', { profileSaved: true, formData: req.body });
+				return res.render('credentials', {
+					profileSaved: true,
+					formData: req.body
+				});
 			})
 			.catch(function(e) {
 				var dataToSend = req.body;
 				dataToSend.commonRandomPassword = 'xxxxxxxxxx';
 				if (e instanceof AdPushupError) {
-					res.render('credentials', { credentialError: e.message, formData: dataToSend });
+					res.render('credentials', {
+						credentialError: e.message,
+						formData: dataToSend
+					});
 				} else if (e.name && e.name === 'CouchbaseError') {
-					res.render('credentials', { userNotFound: true, formData: dataToSend });
+					res.render('credentials', {
+						userNotFound: true,
+						formData: dataToSend
+					});
 				}
 			});
 	})
@@ -901,13 +927,10 @@ router
 			});
 	})
 	.get('/payment', function(req, res) {
-		userModel
-			.getUserByEmail(req.session.user.email)
-			.then(function(user) {
+		const getTipaltiUrls = email => {
 				var tipaltiConfig = config.tipalti,
 					tipaltiUrl = '',
 					tipaltiBaseUrl = tipaltiConfig.baseUrl,
-					email = user.get('email'),
 					payeeId = encodeURIComponent(
 						crypto
 							.createHash('md5')
@@ -928,16 +951,37 @@ router
 
 				// date = Math.floor(date / 1000);
 				tipaltiUrl = tipaltiBaseUrl + paramsStr + '&hashkey=' + hash;
-				//tipaltiStatusCheck.checkStatus(req.session.user.email);
-				res.render('payment', {
-					tipaltiUrl: tipaltiUrl,
-					paymentHistoryUrl: paymentHistoryUrl
+
+				return { paymentHistoryUrl, tipaltiUrl };
+			},
+			email = req.session.user.email;
+		return Promise.all([getTipaltiUrls(email), userModel.updateUserPaymentStatus(email)])
+			.spread(tipaltiUrls => {
+				return res.render('payment', {
+					tipaltiUrl: tipaltiUrls.tipaltiUrl,
+					paymentHistoryUrl: tipaltiUrls.paymentHistoryUrl
 				});
 			})
-			.catch(function(err) {
-				res.render('payment', {
+			.catch(err => {
+				return res.render('payment', {
 					error: 'Some error occurred!'
 				});
+			});
+	})
+	.get('/updatePaymentStatusAllUser', function(req, res) {
+		var userPromises = function(users) {
+			return _.map(users, user => {
+				return userModel.updateUserPaymentStatus(user);
+			});
+		};
+		return userModel
+			.getAllUsers()
+			.then(users => {
+				Promise.all(userPromises(users));
+				return res.send('done');
+			})
+			.catch(err => {
+				console.log(err);
 			});
 	});
 

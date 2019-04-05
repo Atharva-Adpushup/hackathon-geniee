@@ -26,7 +26,9 @@ var express = require('express'),
 	// eslint-disable-next-line new-cap
 	router = express.Router({ mergeParams: true }),
 	reports = require('../models/reportsModel'),
-	csv = require('express-csv');
+	csv = require('express-csv'),
+	logger = require('../helpers/globalBucketLogger'),
+	request = require('request-promise');
 
 function resultProcessing(queryResult, response, needAggregated, res) {
 	if (needAggregated) {
@@ -34,13 +36,12 @@ function resultProcessing(queryResult, response, needAggregated, res) {
 			return res.send({ error: false, data: reportingObj });
 		});
 	} else {
-		let columnsAndRows =
-			lodash.isArray(queryResult) && queryResult.length
-				? {
-						columns: Object.keys(queryResult.columns),
-						rows: queryResult
-				  }
-				: { rows: [], message: 'empty result from query' };
+		let columnsAndRows = lodash.isArray(queryResult) && queryResult.length
+			? {
+					columns: Object.keys(queryResult.columns),
+					rows: queryResult
+				}
+			: { rows: [], message: 'empty result from query' };
 		return res.send(Object.assign(response, columnsAndRows));
 	}
 }
@@ -80,17 +81,16 @@ router
 
 				return res.render('adpushupReport', {
 					pageGroups,
-					isManual:site.get('isManual'),
-					siteId:
-						req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL
-							? siteId
-							: commonConsts.DEMO_REPORT_SITE_ID,
-					siteDomain:
-						req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL
-							? utils.domanize(site.get('siteDomain'))
-							: '',
-					isSuperUser:
-						req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL ? req.session.isSuperUser : false
+					isManual: site.get('isManual'),
+					siteId: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL
+						? siteId
+						: commonConsts.DEMO_REPORT_SITE_ID,
+					siteDomain: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL
+						? utils.domanize(site.get('siteDomain'))
+						: '',
+					isSuperUser: req.session.user.email !== commonConsts.DEMO_ACCOUNT_EMAIL
+						? req.session.isSuperUser
+						: false
 				});
 			})
 			.catch(err => res.send('Some error occurred! Please try again later.'));
@@ -117,20 +117,14 @@ router
 		var siteId = req.params.siteId,
 			paramConfig = {
 				siteId: siteId,
-				dateFrom: moment()
-					.subtract(7, 'days')
-					.format('YYYY-MM-DD'),
-				dateTo: moment()
-					.subtract(1, 'days')
-					.format('YYYY-MM-DD')
+				dateFrom: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+				dateTo: moment().subtract(1, 'days').format('YYYY-MM-DD')
 			},
 			siteDomainName,
 			isQueryObject = !!(req.query && lodash.isObject(req.query) && lodash.keys(req.query).length),
-			isLocaleCodeQueryParameter = !!(
-				isQueryObject &&
+			isLocaleCodeQueryParameter = !!(isQueryObject &&
 				req.query.localeCode &&
-				lodash.isString(req.query.localeCode)
-			),
+				lodash.isString(req.query.localeCode)),
 			localeCodeQueryParameter = isLocaleCodeQueryParameter ? utils.sanitiseString(req.query.localeCode) : false,
 			filterDates = genieeFilterDates.getFilterDates(),
 			localeCode = localeCodeQueryParameter || utils.getLanguageLocale(languageMapping, req.locale),
@@ -188,9 +182,9 @@ router
 				.catch(function(err) {
 					console.log(`Performance Report error: ${err.toString()}`);
 					var textConfig = {
-							error: localeData.ERROR.REPORT_EXCEPTION,
-							emptyData: localeData.ERROR.REPORT_DATA_NOT_AVAILABLE
-						},
+						error: localeData.ERROR.REPORT_EXCEPTION,
+						emptyData: localeData.ERROR.REPORT_DATA_NOT_AVAILABLE
+					},
 						errorText;
 
 					if (err instanceof AdPushupError) {
@@ -214,18 +208,10 @@ router
 	})
 	.get('/getPerformanceData', function(req, res) {
 		var paramConfig = {
-				siteId: req.params.siteId,
-				dateFrom:
-					(req.query && req.query.dateFrom) ||
-					moment()
-						.subtract(7, 'days')
-						.format('YYYY-MM-DD'),
-				dateTo:
-					(req.query && req.query.dateTo) ||
-					moment()
-						.subtract(1, 'days')
-						.format('YYYY-MM-DD')
-			},
+			siteId: req.params.siteId,
+			dateFrom: (req.query && req.query.dateFrom) || moment().subtract(7, 'days').format('YYYY-MM-DD'),
+			dateTo: (req.query && req.query.dateTo) || moment().subtract(1, 'days').format('YYYY-MM-DD')
+		},
 			localeCode =
 				req.query.languageCode || req.query.localeCode || utils.getLanguageLocale(languageMapping, req.locale),
 			isLocaleCode = !!localeCode,
@@ -272,8 +258,7 @@ router
 			if (!siteId) {
 				return null;
 			}
-			var domainIndex = -1,
-				domainValue;
+			var domainIndex = -1, domainValue;
 
 			return siteModel.getSiteById(siteId).then(function(site) {
 				var queryDomain = utils.domanize(site.get('siteDomain'));
@@ -304,12 +289,8 @@ router
 				sites: JSON.stringify(adsenseDomains.rows),
 				pubId: networkData.pubId,
 				isSuperUser: req.session.isSuperUser,
-				startDate: moment()
-					.subtract(7, 'days')
-					.format('YYYY-MM-DD'),
-				endDate: moment()
-					.subtract(1, 'days')
-					.format('YYYY-MM-DD')
+				startDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+				endDate: moment().subtract(1, 'days').format('YYYY-MM-DD')
 			};
 
 			if (domainInfo && Array.isArray(domainInfo)) {
@@ -344,12 +325,8 @@ router
 			paramConfig = {
 				siteId: req.query.siteId,
 				isSuperUser: req.session.isSuperUser,
-				startDate: moment()
-					.subtract(7, 'days')
-					.format('YYYY-MM-DD'),
-				endDate: moment()
-					.subtract(1, 'days')
-					.format('YYYY-MM-DD')
+				startDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+				endDate: moment().subtract(1, 'days').format('YYYY-MM-DD')
 			};
 
 		/**
@@ -420,17 +397,17 @@ router
 				if (!networkData) {
 					throw new AdPushupError('Adsense account not connected');
 				}
-				adsenseDomains =
-					adsenseDomains.rows && Array.isArray(adsenseDomains.rows)
-						? adsenseDomains.rows.map(function(val) {
-								return utils.domanize(val[0]);
-						  })
-						: [];
+				adsenseDomains = adsenseDomains.rows && Array.isArray(adsenseDomains.rows)
+					? adsenseDomains.rows.map(function(val) {
+							return utils.domanize(val[0]);
+						})
+					: [];
 
 				var validSiteDomains = getValidDomains(adsenseDomains, adxDomains);
 
-				paramConfig.sites =
-					validSiteDomains && validSiteDomains.length ? JSON.stringify(validSiteDomains) : null;
+				paramConfig.sites = validSiteDomains && validSiteDomains.length
+					? JSON.stringify(validSiteDomains)
+					: null;
 				return res.render('adxReports', paramConfig);
 			}).catch(function(err) {
 				if (err instanceof AdPushupError) {
@@ -453,8 +430,9 @@ router
 			return Promise.join(getUser, getUserDomains, getAdxDomains, function(user, userDomains, adxDomains) {
 				var validSiteDomains = getValidDomains(userDomains, adxDomains);
 
-				paramConfig.sites =
-					validSiteDomains && validSiteDomains.length ? JSON.stringify(validSiteDomains) : null;
+				paramConfig.sites = validSiteDomains && validSiteDomains.length
+					? JSON.stringify(validSiteDomains)
+					: null;
 				return res.render('adxReports', paramConfig);
 			}).catch(function(e) {
 				res.render('adxReports', {
@@ -471,12 +449,8 @@ router
 			paramConfig = {
 				siteId: req.query.siteId,
 				isSuperUser: req.session.isSuperUser,
-				startDate: moment()
-					.subtract(7, 'days')
-					.format('YYYY-MM-DD'),
-				endDate: moment()
-					.subtract(1, 'days')
-					.format('YYYY-MM-DD')
+				startDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+				endDate: moment().subtract(1, 'days').format('YYYY-MM-DD')
 			};
 
 		/**
@@ -541,12 +515,8 @@ router
 
 		return res.render('adpushupVsControlReports', {
 			currentSiteId: currentSiteId,
-			startDate: moment()
-				.subtract(7, 'days')
-				.format('YYYY-MM-DD'),
-			endDate: moment()
-				.subtract(1, 'days')
-				.format('YYYY-MM-DD')
+			startDate: moment().subtract(7, 'days').format('YYYY-MM-DD'),
+			endDate: moment().subtract(1, 'days').format('YYYY-MM-DD')
 		});
 	})
 	.get('/adxData', function(req, res) {
@@ -684,9 +654,7 @@ router
 		});
 	})
 	.get('/getUniversalReportData', function(req, res) {
-		var siteId = req.query.siteId,
-			startDate = req.query.startDate,
-			endDate = req.query.endDate;
+		var siteId = req.query.siteId, startDate = req.query.startDate, endDate = req.query.endDate;
 
 		return siteModel
 			.getSiteById(siteId)
@@ -701,16 +669,8 @@ router
 			});
 	})
 	.get('/performESSearch', function(req, res) {
-		var startDate = req.query.startDate
-				? req.query.startDate
-				: moment()
-						.subtract(13, 'hours')
-						.valueOf(),
-			endDate = req.query.endDate
-				? req.query.endDate
-				: moment()
-						.subtract(1, 'hours')
-						.valueOf(),
+		var startDate = req.query.startDate ? req.query.startDate : moment().subtract(13, 'hours').valueOf(),
+			endDate = req.query.endDate ? req.query.endDate : moment().subtract(1, 'hours').valueOf(),
 			config = {
 				indexes: 'ex_stats_new',
 				logName: 'exlg',
@@ -729,8 +689,7 @@ router
 							must: {
 								query_string: {
 									analyze_wildcard: true,
-									query:
-										'mode:1 AND variationId:6ae3b7e1_d246_462d_ba48_949051885435 AND pageGroup:POST AND userAnalytics.platform:MOBILE AND siteId:25005'
+									query: 'mode:1 AND variationId:6ae3b7e1_d246_462d_ba48_949051885435 AND pageGroup:POST AND userAnalytics.platform:MOBILE AND siteId:25005'
 								}
 							}
 						}
@@ -767,11 +726,11 @@ router
 			);
 		}
 		let params = {
-				select: lodash.union(['report_date', 'siteid'], req.body.select),
-				where: req.body.where,
-				groupBy: req.body.groupBy || false,
-				orderBy: req.body.orderBy || false
-			},
+			select: lodash.union(['report_date', 'siteid'], req.body.select),
+			where: req.body.where,
+			groupBy: req.body.groupBy || false,
+			orderBy: req.body.orderBy || false
+		},
 			needAggregated = req.body.needAggregated || false;
 		return sqlReportingModule
 			.generate(params)
@@ -828,6 +787,26 @@ router
 			.getPVS(siteid, 3)
 			.then(queryResult => resultProcessing(queryResult, response, res))
 			.catch(err => errorHandling(err, response, res));
+	})
+	.get('/status', (req, res) => {
+		return request({
+			method: 'GET',
+			uri: `${commonConsts.REPORT_STATUS}?fromDate=${req.params.fromDate}&toDate=${req.params.toDate}&report=GETADPTAGREPORTSTATUS`
+		})
+			.then(result => {
+				return res.send(result);
+			})
+			.catch(err => {
+				logger({
+					source: 'AdpTag_Report_Status_Api',
+					message: 'API Failed',
+					details: `Failed to get adptag report status`,
+					debugData: JSON.stringify(err)
+				});
+				return res.send({
+					error: true
+				});
+			});
 	});
 
 module.exports = router;

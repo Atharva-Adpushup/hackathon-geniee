@@ -40,34 +40,26 @@ function getReportingData(channels, siteId) {
 		},
 		groupBy: ['section']
 	};
-	return sqlReporting
-		.generate(reportingParams)
-		.then(queryResultProcessing)
-		.catch(err => {
-			console.log(err);
-			return {};
-		});
+	return sqlReporting.generate(reportingParams).then(queryResultProcessing).catch(err => {
+		console.log(err);
+		return {};
+	});
 }
 
 function isPipeDriveAPIActivated() {
-	return !!(
-		config.hasOwnProperty('analytics') &&
+	return !!(config.hasOwnProperty('analytics') &&
 		config.analytics.hasOwnProperty('pipedriveActivated') &&
-		config.analytics.pipedriveActivated
-	);
+		config.analytics.pipedriveActivated);
 }
 
 function isEmailInAnalyticsBlockList(email) {
-	const blockList = CC.analytics.emailBlockList,
-		isEmailInBLockList = blockList.indexOf(email) > -1;
+	const blockList = CC.analytics.emailBlockList, isEmailInBLockList = blockList.indexOf(email) > -1;
 
 	return isEmailInBLockList;
 }
 
 function getSiteLevelPipeDriveData(user, inputData) {
-	let allSites = user.get('sites'),
-		isAllSites = !!(allSites && allSites.length),
-		resultData = {};
+	let allSites = user.get('sites'), isAllSites = !!(allSites && allSites.length), resultData = {};
 
 	if (!isAllSites) {
 		throw new AdPushupError('getSiteLevelPipeDriveData: User sites are empty');
@@ -93,11 +85,27 @@ function getSiteLevelPipeDriveData(user, inputData) {
 
 	return Promise.resolve(resultData);
 }
+function getNetworkConfigData() {
+	return couchbase
+		.connectToAppBucket()
+		.then(function(appBucket) {
+			return appBucket.getAsync('data::apNetwork');
+		})
+		.then(function(json) {
+			return json.value;
+		})
+		.catch(function(err) {
+			if (err.code === 13) {
+				throw new AdPushupError([{ status: 404, message: 'Doc does not exist' }]);
+			}
+
+			return false;
+		});
+}
 
 router
 	.get('/getData', function(req, res) {
-		var siteId = req.query.siteId,
-			computedJSON = {};
+		var siteId = req.query.siteId, computedJSON = {};
 
 		return siteModel
 			.getSiteById(siteId, 'GET')
@@ -108,11 +116,14 @@ router
 						computedJSON.channels = channels;
 						computedJSON.site = site.toClientJSON();
 						computedJSON.reporting = {};
-						return res.json(computedJSON);
-						// return getReportingData(channels, siteId).then(reporting => {
-						// 	computedJSON.reporting = reporting;
-						// 	return res.json(computedJSON);
-						// });
+						return getNetworkConfigData()
+							.then(networkConfig => {
+								computedJSON.networkConfig = networkConfig;
+								return res.json(computedJSON);
+							})
+							.catch(() => {
+								return res.json(computedJSON);
+							});
 					});
 				},
 				function() {
@@ -127,8 +138,7 @@ router
 			});
 	})
 	.post('/saveSite', function(req, res) {
-		var data = req.body,
-			siteId = parseInt(req.body.siteId, 10);
+		var data = req.body, siteId = parseInt(req.body.siteId, 10);
 		userModel
 			.verifySiteOwner(req.session.user.email, siteId)
 			.then(function() {
@@ -337,8 +347,7 @@ router
 				if (!json) {
 					res.json({ success: 2 });
 				}
-				var ad = json.ad,
-					site = json.site;
+				var ad = json.ad, site = json.site;
 
 				res.json({
 					success: 1,
@@ -480,7 +489,8 @@ router
 				});
 			})
 			.then(apJs => {
-				res.status(200)
+				res
+					.status(200)
 					.set('x-cf-geodata', country)
 					.set('Content-Type', 'application/javascript')
 					.set('Cache-Control', 'max-age=900');

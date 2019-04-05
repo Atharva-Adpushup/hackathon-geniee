@@ -1,9 +1,10 @@
-var _ = require('lodash'),
-	Promise = require('bluebird'),
-	genieePublisher = require('../../../queueWorker/rabbitMQ/workers/genieeAdSyncQueuePublisher'),
-	adpTagPublisher = require('../../../queueWorker/rabbitMQ/workers/adpTagAdSyncQueuePublisher'),
-	siteConfigGenerationModule = require('./modules/siteConfigGeneration/index'),
-	syncCdn = require('../cdnSyncService/index');
+const _ = require('lodash');
+const Promise = require('bluebird');
+const genieePublisher = require('../../../queueWorker/rabbitMQ/workers/genieeAdSyncQueuePublisher');
+const adpTagPublisher = require('../../../queueWorker/rabbitMQ/workers/adpTagAdSyncQueuePublisher');
+const transactionLogPublisher = require('../../../queueWorker/rabbitMQ/workers/transactionLogSyncQueuePublisher');
+const siteConfigGenerationModule = require('./modules/siteConfigGeneration/index');
+const syncCdn = require('../cdnSyncService/index');
 
 function genieePublishWrapper(item) {
 	return genieePublisher.publish(item);
@@ -21,17 +22,19 @@ function publishToQueueWrapper(siteConfigItems, site) {
 		return response;
 	}
 	function processing() {
-		let genieeUnsynced = !!(siteConfigItems.geniee && siteConfigItems.geniee.length),
-			adpUnsynced = !!(siteConfigItems.adp && siteConfigItems.adp.ads && siteConfigItems.adp.ads.length),
-			genieeDFPUnsynced = !!(siteConfigItems.genieeDFP && siteConfigItems.genieeDFP.length);
+		const genieeUnsynced = !!(siteConfigItems.geniee && siteConfigItems.geniee.length);
+		const adpUnsynced = !!(siteConfigItems.adp && siteConfigItems.adp.ads && siteConfigItems.adp.ads.length);
+		const genieeDFPUnsynced = !!(siteConfigItems.genieeDFP && siteConfigItems.genieeDFP.length);
+		const logsUnsynced = !!(siteConfigItems.logs && siteConfigItems.logs.ads && siteConfigItems.logs.ads.length);
 
 		genieeUnsynced ? _.forEach(siteConfigItems.geniee, item => jobs.push(genieePublishWrapper(item))) : null;
 		genieeDFPUnsynced
 			? _.forEach(siteConfigItems.genieeDFP, item => jobs.push(adpTagPublisherWrapper(siteConfigItems.genieeDFP)))
 			: null;
 		adpUnsynced ? jobs.push(adpTagPublisherWrapper(siteConfigItems.adp)) : null;
+		logsUnsynced ? jobs.push(transactionLogPublisher.publish(siteConfigItems.logs)) : null;
 
-		if (!(genieeUnsynced || adpUnsynced || genieeDFPUnsynced) || !jobs.length) {
+		if (!(genieeUnsynced || adpUnsynced || genieeDFPUnsynced || logsUnsynced) || !jobs.length) {
 			return Promise.resolve(response);
 		}
 		return Promise.all(jobs).then(() => {

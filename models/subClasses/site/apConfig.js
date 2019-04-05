@@ -9,8 +9,14 @@ var ApConfig = {
 		'autoOptimise',
 		'activeDFPNetwork',
 		'activeDFPParentId',
+		'activeDFPCurrencyCode',
+		'activeDFPCurrencyExchangeRate',
+		'prebidGranularityMultiplier',
 		'blocklist',
-		'isAdPushupControlWithPartnerSSP'
+		'isAdPushupControlWithPartnerSSP',
+		'isSPA',
+		'isThirdPartyAdx',
+		'spaPageTransitionTimeout'
 	],
 	override: [
 		'mode',
@@ -22,8 +28,14 @@ var ApConfig = {
 		'autoOptimise',
 		'activeDFPNetwork',
 		'activeDFPParentId',
+		'activeDFPCurrencyCode',
+		'activeDFPCurrencyExchangeRate',
+		'prebidGranularityMultiplier',
 		'blocklist',
-		'isAdPushupControlWithPartnerSSP'
+		'isAdPushupControlWithPartnerSSP',
+		'isSPA',
+		'isThirdPartyAdx',
+		'spaPageTransitionTimeout'
 	],
 	merge: []
 };

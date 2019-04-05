@@ -15,7 +15,8 @@ const variation = (state = {}, action) => {
 					status: config.status,
 					sections: config.sections,
 					expanded: false,
-					contentSelector: config.contentSelector || ''
+					contentSelector: config.contentSelector || '',
+					selectorsTreeLevel: config.selectorsTreeLevel || ''
 				};
 
 			default:
@@ -112,12 +113,30 @@ const variation = (state = {}, action) => {
 					}
 				};
 
+			case variationActions.TAG_CONTROL_VARIATION:
+				return {
+					...state,
+					[action.variationId]: {
+						...state[action.variationId],
+						isControl: action.payload.isControl
+					}
+				};
+
 			case variationActions.EDIT_TRAFFIC_DISTRIBUTION:
 				return {
 					...state,
 					[action.variationId]: {
 						...state[action.variationId],
 						trafficDistribution: parseInt(action.trafficDistribution, 10)
+					}
+				};
+
+			case variationActions.UPDATE_INCONTENT_SELECTORS_TREE_LEVEL:
+				return {
+					...state,
+					[action.variationId]: {
+						...state[action.variationId],
+						selectorsTreeLevel: action.selectorsTreeLevel
 					}
 				};
 

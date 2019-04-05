@@ -1,4 +1,2 @@
 require('./libs/polyfill');
-var start = require('./src/index');
-
-start();
+require('./src/index');

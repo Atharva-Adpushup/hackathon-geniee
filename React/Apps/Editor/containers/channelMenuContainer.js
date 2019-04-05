@@ -6,7 +6,7 @@ import { getActiveChannelVariationsTrafficDistributions } from 'selectors/variat
 import { getPartner } from 'selectors/siteSelectors';
 import { getActiveChannel, getActiveChannelId } from 'selectors/channelSelectors';
 import { hideChannelMenu as hideMenu } from 'actions/uiActions';
-import { saveSampleUrl, closeChannel, changeContentSelector } from 'actions/channelActions';
+import { saveSampleUrl, closeChannel, changeContentSelector, updateAutoptimize } from 'actions/channelActions';
 import { editTrafficDistribution } from 'actions/variationActions';
 
 const mapStateToProps = state => {
@@ -21,8 +21,18 @@ const mapStateToProps = state => {
 	},
 	mapDispatchToProps = dispatch =>
 		bindActionCreators(
-			{ hideMenu, saveSampleUrl, closeChannel, editTrafficDistribution, changeContentSelector },
+			{
+				hideMenu,
+				saveSampleUrl,
+				closeChannel,
+				editTrafficDistribution,
+				changeContentSelector,
+				updateAutoptimize
+			},
 			dispatch
 		);
 
-export default connect(mapStateToProps, mapDispatchToProps)(ChannelMenu);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(ChannelMenu);
