@@ -28,6 +28,7 @@ module.exports = function(site, externalData = {}) {
 		noop = 'function() {}',
 		isExternalRequest = externalData && Object.keys(externalData).length && externalData.externalRequest,
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
+		poweredByBanner = !!(site.get('apConfigs') && site.get('apConfigs').poweredByBanner),
 		jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.min.js'),
 		uncompressedJsTplPath = path.join(
 			__dirname,
@@ -68,10 +69,11 @@ module.exports = function(site, externalData = {}) {
 		setAllConfigs = function(combinedConfig) {
 			var apConfigs = site.get('apConfigs'),
 				isAdPartner = !!site.get('partner');
-			let { experiment, adpTagsConfig, manualAds } = combinedConfig;
+			let { experiment, adpTagsConfig, manualAds, innovativeAds } = combinedConfig;
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
+			apConfigs.poweredByBanner = poweredByBanner ? true : false;
 			apConfigs.siteDomain = site.get('siteDomain');
 			apConfigs.isSPA = apConfigs.isSPA ? apConfigs.isSPA : false;
 			apConfigs.spaPageTransitionTimeout = apConfigs.spaPageTransitionTimeout
@@ -79,9 +81,11 @@ module.exports = function(site, externalData = {}) {
 				: 0;
 			apConfigs.activeDFPNetwork = apConfigs.activeDFPNetwork ? apConfigs.activeDFPNetwork : null;
 			apConfigs.manualModeActive = site.get('isManual') ? site.get('isManual') : false;
+			apConfigs.innovativeModeActive = site.get('isInnovative') ? site.get('isInnovative') : false;
 			// Default 'draft' mode is selected if config mode is not present
 			apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
 			apConfigs.manualAds = manualAds || [];
+			apConfigs.innovativeAds = innovativeAds || [];
 			apConfigs.experiment = experiment;
 			delete apConfigs.pageGroupPattern;
 			return { apConfigs, adpTagsConfig };
@@ -95,14 +99,15 @@ module.exports = function(site, externalData = {}) {
 			.connectToAppBucket()
 			.then(appBucket => appBucket.getAsync(`hbcf::${site.get('siteId')}`, {}))
 			.catch(err => Promise.resolve({})),
-		generateCombinedJson = (experiment, adpTags, manualAds) => {
+		generateCombinedJson = (experiment, adpTags, manualAds, innovativeAds) => {
 			if (!(Array.isArray(adpTags) && adpTags.length)) {
-				return { experiment, adpTagsConfig: false, manualAds };
+				return { experiment, adpTagsConfig: false, manualAds, innovativeAds };
 			}
 			return generateADPTagsConfig(adpTags, site.get('siteId')).then(adpTagsConfig => ({
 				adpTagsConfig,
 				experiment,
-				manualAds
+				manualAds,
+				innovativeAds
 			}));
 		},
 		generateFinalInitScript = (jsFile, uncompressedJsFile) => {

@@ -20,7 +20,8 @@ module.exports = {
 	},
 	INJECTION_TECHNIQUES: {
 		LAYOUT: 1,
-		TAG: 2
+		TAG: 2,
+		INNOVATIVE_AD: 3
 	},
 	MANUAL_ADS: {
 		VARIATION: 'manual'
@@ -319,6 +320,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	dummy: 'test',
 	docKeys: {
 		tagManager: 'tgmr::',
+		interactiveAds: 'fmrt::',
 		user: 'user::'
 	},
 	tagManagerInitialDoc: {
@@ -326,6 +328,33 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		ownerEmail: null,
 		siteDomain: null,
 		ads: []
+	},
+	interactiveAdsInitialDoc: {
+		siteId: null,
+		ownerEmail: null,
+		siteDomain: null,
+		ads: [],
+		meta: {
+			pagegroups: [],
+			custom: []
+		}
+	},
+	defaultMeta: {
+		pagegroups: [],
+		custom: []
+	},
+	INTERACTIVE_ADS_TYPES: {
+		VERTICAL: ['stickyLeft', 'stickyRight', 'docked'],
+		HORIZONTAL: ['stickyTop', 'stickyBottom'],
+		OTHER: ['inView']
+	},
+	interactiveAdsRules: {
+		vertical: {
+			noOfAdsAllowed: 1
+		},
+		horizontal: {
+			noOfAdsAllowed: 1
+		}
 	},
 	videoNetworkInfo: {
 		network: 'custom',

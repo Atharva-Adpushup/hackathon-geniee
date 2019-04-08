@@ -1,6 +1,7 @@
 let ADPTags = [],
 	finalJson = {};
-const _ = require('lodash'),
+const Promise = require('bluebird'),
+	_ = require('lodash'),
 	AdPushupError = require('../../../helpers/AdPushupError'),
 	{ ERROR_MESSAGES } = require('../../../configs/commonConsts'),
 	config = require('../../../configs/config'),
@@ -160,6 +161,7 @@ const _ = require('lodash'),
 			isControl: variation.isControl ? variation.isControl : false,
 			ads: ads,
 			personalization: variation.personalization,
+			isControl: !!variation.isControl,
 			// Data required for auto optimiser model
 			// Page revenue is mapped as sum
 			sum:
@@ -225,29 +227,43 @@ const _ = require('lodash'),
 						: finalJson[platform][pageGroup].hasVariationsWithNoData;
 			}
 		});
-		if (!Object.keys(finalJson[platform][pageGroup].variations).length) {
-			delete finalJson[platform][pageGroup];
-		} else {
+		if (Object.keys(finalJson[platform][pageGroup].variations).length) {
+			// delete finalJson[platform][pageGroup];
+			// } else {
 			finalJson[platform][pageGroup].variations.sort(function(a, b) {
 				return a.traffic - b.traffic;
 			});
 		}
 		return finalJson;
 	},
-	getManualAds = site => {
-		const siteId = site.get('siteId');
+	getAds = (docKey, siteId) => {
 		return appBucket
-			.getDoc(`tgmr::${siteId}`)
+			.getDoc(docKey)
 			.then(docWithCas => {
 				const ads = docWithCas.value.ads.filter(ad => !ad.hasOwnProperty('isActive') || ad.isActive);
 				return ads;
 			})
 			.catch(err => Promise.reject(new Error(`Error fetching tgmr doc for ${siteId}`)));
 	},
+	getAdsAndPushToAdp = (identifier, docKey, site) => {
+		if (!site.get(identifier)) {
+			return Promise.resolve([]);
+		}
+
+		return getAds(docKey, site.get('siteId'))
+			.then(ads => {
+				_.forEach(ads, ad => pushToAdpTags(ad, ad));
+				return ads;
+			})
+			.catch(err =>
+				err.code && err.code === 13 && err.message.includes('key does not exist') ? [] : Promise.reject(err)
+			);
+	},
 	generatePayload = (site, pageGroupData) => {
 		//Empty finaJson and dfpAunits
 		finalJson = {};
 		ADPTags = [];
+		let manualAds = [];
 		let pageGroupPattern = site.get('apConfigs').pageGroupPattern;
 
 		return site
@@ -260,16 +276,13 @@ const _ = require('lodash'),
 				)
 			)
 			.then(() => {
-				if (site.get('isManual')) {
-					return getManualAds(site);
-				}
-				return Promise.resolve();
-			})
-			.then(manualAds => {
-				_.map(manualAds, ad => {
-					pushToAdpTags(ad, ad);
-				});
-				return [finalJson, ADPTags, manualAds];
+				return Promise.join(
+					getAdsAndPushToAdp('isManual', `tgmr::${site.get('siteId')}`, site),
+					getAdsAndPushToAdp('isInnovative', `fmrt::${site.get('siteId')}`, site),
+					(manualAds, innovativeAds) => {
+						return [finalJson, ADPTags, manualAds, innovativeAds];
+					}
+				);
 			});
 	};
 

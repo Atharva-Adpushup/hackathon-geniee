@@ -138,7 +138,17 @@ function startCreation(forced) {
 			return resolve(false);
 		}
 
-		return selectVariation(config).then(function (variationData) {
+		var innovativeInteractiveAds = [];
+		var layoutAndManualInteractiveAds = [];
+		var layoutRunning = false;
+		var isControlVariation = false;
+
+		if (config.innovativeModeActive && window.adpushup.config.innovativeAds.length) {
+			var channel = config.platform.toUpperCase() + ':' + config.pageGroup.toUpperCase();
+			innovativeInteractiveAds = utils.filterInteractiveAds(window.adpushup.config.innovativeAds, true, channel);
+		}
+
+		return selectVariation(config).then(function(variationData) {
 			var selectedVariation = variationData.selectedVariation,
 				moduleConfig = variationData.config,
 				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
@@ -146,6 +156,8 @@ function startCreation(forced) {
 			config = adp.config = moduleConfig;
 			if (selectedVariation) {
 				adp.creationProcessStarted = true;
+				layoutRunning = true;
+
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
 				config.selectedVariationName = selectedVariation.name;
@@ -157,14 +169,27 @@ function startCreation(forced) {
 				}
 
 				// Load interactive ads script if interactive ads are present in adpushup config
-				var interactiveAds = utils.getInteractiveAds(config);
-				if (interactiveAds) {
-					require.ensure(
-						['interactiveAds/index.js'],
-						function (require) {
-							require('interactiveAds/index')(interactiveAds);
-							var interactiveAdsArr = adp.interactiveAds;
-							if (interactiveAdsArr.ads) {
+				layoutAndManualInteractiveAds = utils.getInteractiveAds(config);
+
+				if (selectVariation.isControl) {
+					isControlVariation = true;
+        }
+       
+				createAds(adp, selectedVariation);
+			} else {
+				triggerControl(commonConsts.MODE.FALLBACK);
+			}
+
+			var finalInteractiveAds = !isControlVariation
+				? innovativeInteractiveAds.concat(layoutAndManualInteractiveAds)
+				: layoutAndManualInteractiveAds;
+
+			if (finalInteractiveAds && finalInteractiveAds.length) {
+				require.ensure(
+					['interactiveAds/index.js'],
+					function(require) {
+						require('interactiveAds/index')(finalInteractiveAds);
+            if (interactiveAdsArr.ads) {
 								var ads = interactiveAdsArr.ads;
 								for (var id in ads) {
 									var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
@@ -178,15 +203,10 @@ function startCreation(forced) {
 										}
 									}
 								}
-							}
-						},
-						'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
-					);
-				}
-
-				createAds(adp, selectedVariation);
-			} else {
-				triggerControl(commonConsts.MODE.FALLBACK);
+            }
+					},
+					'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
+				);
 			}
 
 			return resolve(true);

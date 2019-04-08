@@ -2,51 +2,45 @@ import React, { PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import Codemirror from 'react-codemirror';
 
-//require('libs/codemirror/codemirror.min');
-//require('libs/codemirror/codemirror.javascript.min');
-//	CodeMirrorEditor = require('shared/codeMirrorEditor');
-
 class CodeEditor extends React.Component {
 	constructor(props) {
 		super(props);
-		let code = JSON.stringify(props.code, null, 4);
-		//code = formatCode(code);
 
 		this.state = {
-			code: code || '{\r\n}',
-			error: false,
-			empty: !this.props.code || !Object.keys(this.props.code).length ? true : false
+			code: this.props.code ? window.atob(this.props.code) : '',
+			error: false
 		};
-
 		this.updateCode = this.updateCode.bind(this);
 		this.save = this.save.bind(this);
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.setState({ code: JSON.stringify(nextProps.code, null, 4) });
+		this.setState({
+			code: window.atob(nextProps.code),
+			error: false
+		});
 	}
 
 	save() {
 		try {
-			this.props.onSubmit(JSON.parse(this.state.code));
+			JSON.parse(window.btoa(this.state.code));
+			this.setState(
+				{
+					error: false
+				},
+				() => this.props.onSubmit(window.btoa(this.state.code))
+			);
 		} catch (e) {
 			this.setState({ error: true });
 		}
 	}
 
-	updateCode(newCode) {
+	updateCode(code) {
 		try {
-			JSON.parse(this.state.code);
-
-			if (!newCode || !Object.keys(newCode).length) {
-				this.setState({ empty: true });
-			} else {
-				this.setState({ empty: false });
-			}
-
-			this.setState({ code: newCode, error: false });
+			this.setState({ code, error: false }, () => (this.props.onChange ? this.props.onChange(code) : null));
 		} catch (e) {
-			this.setState({ error: true, code: newCode });
+			console.log(e);
+			this.setState({ error: true, code });
 		}
 	}
 
@@ -62,43 +56,56 @@ class CodeEditor extends React.Component {
 		return (
 			<div className="containerButtonBar">
 				{this.state.error && <div className="error-message">{this.props.error}</div>}
-				<Codemirror value={this.state.code} onChange={this.updateCode} options={options} />
-
-				<Row className="butttonsRow">
-					<Col xs={6}>
-						<Button
-							disabled={this.state.error || this.state.empty}
-							className="btn-lightBg btn-save"
-							onClick={this.save}
-						>
-							Save
-						</Button>
-					</Col>
-					{this.props.onCancel ? (
+				<Codemirror
+					value={this.state.code}
+					onChange={this.updateCode}
+					options={options}
+					{...this.props.extra}
+				/>
+				{this.props.showButtons ? (
+					<Row className="butttonsRow">
 						<Col xs={6}>
-							<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>
-								Cancel
+							<Button
+								disabled={this.state.error || this.state.empty}
+								className="btn-lightBg btn-save"
+								onClick={this.save}
+							>
+								Save
 							</Button>
 						</Col>
-					) : (
-						''
-					)}
-				</Row>
+						{this.props.onCancel ? (
+							<Col xs={6}>
+								<Button className="btn-lightBg btn-cancel" onClick={this.props.onCancel}>
+									Cancel
+								</Button>
+							</Col>
+						) : (
+							''
+						)}
+					</Row>
+				) : null}
 			</div>
 		);
 	}
 }
 
 CodeEditor.propTypes = {
-	code: PropTypes.object.isRequired,
+	code: PropTypes.string,
 	error: PropTypes.string.isRequired,
-	onSubmit: PropTypes.func.isRequired,
+	showButtons: PropTypes.bool,
+	onChange: PropTypes.func,
+	onSubmit: PropTypes.func,
 	onCancel: PropTypes.func
 };
 
 CodeEditor.defaultProps = {
 	code: '{}',
-	error: 'Some error occurred, please check your code.'
+	error: 'Some error occurred, please check your code.',
+	showButtons: true,
+	onChange: () => {},
+	onSubmit: () => {},
+	onCancel: () => {},
+	extra: {}
 };
 
 export default CodeEditor;

@@ -363,14 +363,16 @@ module.exports = {
 		if (config.manualModeActive && window.adpushup.config.manualAds.length) {
 			ads = ads.concat(window.adpushup.config.manualAds);
 		}
-
-		if (ads.length) {
-			var interactiveAds = ads.filter(function (ad) {
-				return ad && ad.formatData && ad.formatData.event;
-			});
-
-			return interactiveAds.length ? interactiveAds : null;
-		}
+    
+		return this.filterInteractiveAds(ads);
+	},
+	filterInteractiveAds: function(ads, isInnovative, channel) {
+		return ads && ads.length
+			? ads.filter(function(ad) {
+					var channelValid = isInnovative && ad.pagegroups ? ad.pagegroups.indexOf(channel) !== -1 : true;
+					return channelValid && ad.formatData && ad.formatData.event;
+			  })
+			: [];
 	},
 	getViewport: function () {
 		var $w = $(window);
